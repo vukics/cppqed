@@ -1,0 +1,16 @@
+use-project /lib_project : src ;
+use-project /third_party : thirdParty ;
+
+project Utils
+	: usage-requirements
+	  <include>include 
+	  <variant>debug:<define>BZ_DEBUG 
+	  <cxxflags>"-DGSL_CBLAS" # This is needed so that FLENS use the CBLAS implementation of GSL
+	: build-dir bin
+	;
+
+alias Utilslib : /lib_project//Utils ;
+
+build-project /lib_project ;
+build-project test         ;
+build-project testsuite    ;

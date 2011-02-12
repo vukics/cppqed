@@ -1,0 +1,23 @@
+use-project Utils : utils ;
+
+use-project /structure : structure ;
+use-project /elements  : elements  ;
+
+use-project /quantumdata       : quantumdata       ;
+use-project /quantumtrajectory : quantumtrajectory ;
+use-project /quantumoperator   : quantumoperator   ;
+
+project C++QED
+	: requirements <include>structure <include>quantumdata <include>quantumoperator <library>/third_party//flenslib 
+	: 
+	: build-dir bin
+	;
+
+build-project structure ;
+build-project elements  ;
+
+build-project quantumdata       ;
+build-project quantumtrajectory ;
+build-project quantumoperator   ;
+
+build-project scripts ;

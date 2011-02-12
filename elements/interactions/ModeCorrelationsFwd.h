@@ -1,0 +1,7 @@
+// -*- C++ -*-
+#ifndef   MODE_CORRELATIONS_FWD_INCLUDED
+#define   MODE_CORRELATIONS_FWD_INCLUDED
+
+class ModeCorrelations;
+
+#endif // MODE_CORRELATIONS_FWD_INCLUDED

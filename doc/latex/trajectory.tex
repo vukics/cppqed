@@ -1,0 +1,41 @@
+\documentclass[a4paper]{article}
+
+\usepackage[british]{babel}
+
+\usepackage[T1]{fontenc}
+
+\usepackage[intlimits]{amsmath}
+\usepackage{epsfig,amssymb,amstext,color,palatino}
+
+\include{TexUtils/defs}
+
+\newcommand{\Hfrak}{\mathfrak{H}}
+\newcommand{\Acal}{\mathcal{A}}
+
+\newcommand{\Ha}{H}
+\newcommand{\Hei}{_{\text{H}}}
+\newcommand{\Int}{_{\text{I}}}
+\newcommand{\Ob}{{\mathcal O}}
+\newcommand{\Obi}{{\mathcal O}\Int(t)}
+\newcommand{\Un}{U}
+\newcommand{\UnH}{U\Hei}
+\newcommand{\UnHd}{U^{\dag}\Hei(t)}
+\newcommand{\UnI}{U\Int(t)}
+\newcommand{\UnId}{U^{\dag}\Int(t)}
+\newcommand{\dt}[1]{\frac{d#1}{dt}}
+
+\newcommand\HSpace{{\mathcal H}}
+
+\pagestyle{empty}
+
+\renewcommand{\theequation}{II.\arabic{equation}}
+
+\begin{document}
+
+\begin{multline}
+\dot\rho=
+\frac1{i\hbar}\comm{H}{\rho}+\sum_m\lp{J_m\rho{J_m^\dag}-\frac12\comm{J_m^\dag J_m}{\rho}_+}\rp\equiv\\\equiv
+\frac1{i\hbar}\lp\HnH\rho-\rho\HnH^\dag\rp+\sum_mJ_m\rho{J_m^\dag}=2\Re\lbr\frac\HnH{i\hbar}\rho\rbr+\sum_mJ_m\lp{J_m\rho}\rp^\dag
+\end{multline}
+
+\end{document}

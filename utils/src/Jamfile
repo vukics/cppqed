@@ -1,0 +1,5 @@
+lib Utils : [ glob *.cc ] 
+    	    /third_party//gsllib /third_party//gslcblaslib /third_party//blitzlib /third_party//flenslib
+	    # as long as LAPACK & BLAS are used only via FLENS, linking against FLENS should be enough 
+	  : <include>.
+	  ;

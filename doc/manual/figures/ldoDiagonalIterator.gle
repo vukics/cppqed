@@ -1,0 +1,34 @@
+size 9 6.5
+
+defaulthei = 0.36
+
+set lwidth 0.03 hei defaulthei just tc font pspr arrowsize 0.25
+
+include "sub/class.gle"
+
+
+amove 5 6
+class "DiagonalIterator" "int RANK\\typename V" 1.5 2.5
+
+rmove 0 -1.5
+begin box nobox name selectorConcrete
+draw selector.tc "RANK > mpl::size<V>::value"
+end box
+
+rmove 2.5 -2
+class "DI\_ImplSpecial"
+
+rmove -5 0
+class "DI\_Impl"
+
+rmove -1 -1.5
+class "DI\_SV\_Impl"
+
+rmove 3 0
+class "DI\_DO\_Impl"
+
+set lwidth 0.02
+join "DI\_ImplSpecial".tc -> selectorConcrete.rb
+join "DI\_Impl".tc -> selectorConcrete.lb
+join "DI\_SV\_Impl".tc -> "DI\_Impl".bl
+join "DI\_DO\_Impl".tc -> "DI\_Impl".br

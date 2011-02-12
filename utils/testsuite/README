@@ -1,0 +1,3 @@
+The difference between test and testsuite is that in test output is
+generated which needs to be evaluated visually, or compile time
+behaviour is tested. In test suite the test is automatic.

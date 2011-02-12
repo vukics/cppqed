@@ -1,0 +1,57 @@
+size 17 11.5
+
+defaultlw=.03
+
+boxwidth=5
+freewidth=3
+freeheight=2
+
+titlehei=.9
+
+rubrichei=.6
+
+set font tt
+
+include "act.gle"
+
+amove 1 pageheight()-1
+
+act "ParticleAlongCavity" "PAC1" "ModeBase" "ParticleBase" 
+
+amove 1 pty(PAC1.bl)-.5
+
+act "ParticleAlongCavity" "PAC2" "ModeBase" "ParticleBase"
+
+amove 1 pty(PAC2.bl)-.5
+
+act "ParticleTwoModes" "PTM" "ModeBase" "ModeBase" "ParticleBase"
+
+set lwidth defaultwidth
+
+amove ptx(PTM.br)+1 pty(PTM.br)-.5
+free "Particle" 0 "red"
+
+joining free0 PAC11
+joining free0 PAC21
+joining free0 PTM2
+
+amove ptx(free0.tr)+.5 pty(free0.tr)
+free "LossyMode" 1 "green"
+
+joining free1 PAC10
+joining free1 PTM0
+
+amove ptx(free1.tr)+.5 pty(free1.tr)
+free "PumpedLossyMode" 2 "blue"
+
+joining free2 PAC20
+joining free2 PTM1
+
+
+set color gray lwidth defaultwidth*10
+amove .25 pageheight()-.25
+box boxwidth+1.25 2.25+3*titlehei+7*rubrichei just TL round .5 
+
+set hei .5*titlehei
+amove .25+(boxwidth+1.25)/2 pageheight()-.6
+text Composite constructor

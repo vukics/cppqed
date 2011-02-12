@@ -1,0 +1,82 @@
+size 12 6.5
+
+defaulthei = 0.36
+
+set lwidth 0.03 hei defaulthei just tc font pspr arrowsize 0.25
+
+include "sub/class.gle"
+
+amove 3 6
+class "ArrayBase" "int RANK" 
+
+rmove 1.75 -1
+set hei .15 font tt
+text RANK=2*RANK
+rmove -1.75 1
+set hei defaulthei font pspr
+
+
+rmove 5 0
+class "DimensionsBookkeeper" "int RANK\\bool IS\_CONST" .75
+
+amove 2 3.5
+class "StateVectorBase" "int RANK"
+
+rmove 4 0 
+class "DensityOperatorBase" "int RANK" .75
+
+rmove 4 0 
+class "LazyDensityOperator" "int RANK" .75
+
+amove 1.5 1
+class "StateVector" "int RANK"
+
+rmove 2.5 0
+class "NonOrthogonalStateVector" "int RANK" .5
+
+rmove 3 0
+class "DensityOperator" "int RANK" .8
+
+rmove 3 0
+class "NonOrthogonalDensityOperator" "int RANK" .5
+
+set lwidth 0.02
+
+set color darkred
+
+join LazyDensityOperator.tc -> DimensionsBookkeeper.br
+inheritance "LazyDensityOperator" "IS\_CONST=true"
+!join StochasticTrajectoryBase.tc -> TrajectoryBase.br
+set color black
+
+join StateVector.tr -> LazyDensityOperator.bl
+join NonOrthogonalStateVector.tr -> LazyDensityOperator.bl
+join DensityOperator.tr -> LazyDensityOperator.bc
+join NonOrthogonalDensityOperator.tc -> LazyDensityOperator.bc
+
+set lstyle 9 color darkred
+
+join StateVectorBase.tr -> DimensionsBookkeeper.bl
+inheritance "StateVectorBase" "IS\_CONST=true"
+
+join DensityOperatorBase.tc -> DimensionsBookkeeper.bc
+inheritance "DensityOperatorBase" "IS\_CONST=true"
+
+set color black
+
+join StateVectorBase.tc -> ArrayBase.bc
+join DensityOperatorBase.tl -> ArrayBase.br
+
+set lstyle 2 
+
+join StateVector.tc -> StateVectorBase.bc
+join NonOrthogonalStateVector.tc -> StateVectorBase.br
+join DensityOperator.tc -> DensityOperatorBase.bc
+join NonOrthogonalDensityOperator.tl -> DensityOperatorBase.br
+
+
+!join Simulated -> Trajectory.bl
+!join StochasticTrajectory.tl -> Trajectory.bc
+!join StochasticTrajectory.tr -> StochasticTrajectoryBase.bc
+!join EnsembleTrajectories.tc -> StochasticTrajectoryBase.bc
+

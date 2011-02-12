@@ -1,0 +1,33 @@
+# -*- Makefile -*-
+
+optimization = yes
+
+CXX = /opt/local/bin/g++-mp-4.4
+
+# The flags recommended in GSL 1.8 Reference Manual 
+
+CPPFLAGS = -I. $(foreach dir,$(INCDIR),-I$(dir)) \
+	 -g \
+	 -ansi -pedantic \
+	 -fno-common -DVECLIB -DLINUX
+	 # -Wall -Wextra -Wconversion -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings
+	 # -Wnon-virtual-dtor -Wshadow -Wsign-conversion -Wno-ignored-qualifiers 
+
+CC = /opt/local/bin/g++-mp-4.4
+
+LIBDIR += /opt/local/lib/ /Users/domokos/physics/C++QED/C++Utils/thirdParty/blitz/lib /Users/domokos/physics/C++QED/C++Utils/thirdParty/FLENS-lite/
+
+INCDIR += /Users/domokos/physics/C++QED/C++Utils/thirdParty/FLENS-lite /Users/domokos/physics/C++QED/C++Utils/thirdParty/blitz/include /opt/local/include/
+
+LDFLAGS = -g $(foreach dir,$(LIBDIR),-L$(dir)) #-Wl,-rpath,@rpath//Users/domokos/physics/C++QED/C++Utils/thirdParty/FLENS-lite/
+
+ifeq ($(optimization),yes)
+CPPFLAGS += -O2 -DNDEBUG
+LDFLAGS  += -O2 -DNDEBUG
+else
+CPPFLAGS += -DBZ_DEBUG
+endif
+
+# In some systems the addition of -latlas may be needed here
+
+LDLIBS = -lm -lgsl -lgslcblas -lblitz -lflens # -llapack -lblas

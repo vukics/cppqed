@@ -1,0 +1,5 @@
+// -*- C++ -*-
+#ifndef   _GENERAL_DICKE_FWD_INCLUDED
+#define   _GENERAL_DICKE_FWD_INCLUDED
+
+#endif // _GENERAL_DICKE_FWD_INCLUDED

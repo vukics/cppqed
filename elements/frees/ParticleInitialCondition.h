@@ -1,0 +1,40 @@
+// -*- C++ -*-
+#ifndef   _PARTICLE_INITIAL_CONDITION_H
+#define   _PARTICLE_INITIAL_CONDITION_H
+
+#include<boost/tuple/tuple_io.hpp>
+
+
+namespace particle {
+
+class InitialCondition
+{
+public:
+  typedef boost::tuple<double,double,double,bool> Impl;
+
+  InitialCondition(double x0, double k0, double sig, bool isItInK=false) : impl_(x0,k0,sig,isItInK) {}
+
+  double getX0 () const {return impl_.get<0>();}
+  double getK0 () const {return impl_.get<1>();}
+  double getSig() const {return impl_.get<2>();}
+  bool   isInK () const {return impl_.get<3>();}
+
+  const Impl& get() const {return impl_;}
+  
+  Impl& get() {return const_cast<Impl&>(static_cast<const InitialCondition&>(*this).get());}
+
+private:
+  const Impl impl_;
+  
+};
+
+
+inline std::ostream& operator<<(std::ostream& os, const InitialCondition& ic) {return os<<ic.get();}
+inline std::istream& operator>>(std::istream& is,       InitialCondition& ic) {return is>>ic.get();}
+
+
+
+} // particle
+
+
+#endif // _PARTICLE_INITIAL_CONDITION_H

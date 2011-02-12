@@ -1,0 +1,121 @@
+<h1>C++QED</h1>
+<h3>a framework for simulating open
+  quantum dynamics</h3>
+
+<h2>Synopsis</h2>
+
+<p> C++QED is a framework for simulating open quantum dynamics in
+general. Historically, it has in the first place been developed for
+problems in moving-particle cavity QED, but since then has been
+applied in several other fields in quantum optics. It is known to be
+able to simulate full Master equation up to several thousand, and
+quantum trajectories up to several hundred thousand dimensions. </p>
+
+<p> The basic idea of the framework is to allow users to build arbitrarily
+complex interacting quantum systems from elementary free subsystems
+and interactions between them (these are commonly referred to as
+<em>elements</em>), and simulate their time evolution with a number of
+available time-evolution drivers. Operating with elementary physical
+systems, the interface is of much higher level than in the popular
+Quantum Optics toolbox for Matlab <a href="#matlab_ref">[1]</a>, or
+the much less known, but venerable <acronym title="Quantum State Diffusion">QSD</acronym> C++ library <a href="#qsd_ref">[2]</a>, as in
+the latter two the interface is built on quantum operators. </p>
+
+<p> C++QED specifies a small grammar to describe composite quantum
+systems, which qualifies as a domain specific language (in this case
+embedded into C++). Apart from providing a number of elements out of
+the box, there are several tools which facilitate the implementation
+of new elements. These are being added continuously, <q>on demand</q>
+from the quantum-optics community.</p>
+
+<p> As of today, the following possibilities for time evolution are
+provided in the framework:
+
+<dl>
+
+<dt>Full Master equation</dt>
+
+<dt>Single <acronym title="Monte Carlo wave-function">MCWF</acronym>
+  trajectory</dt> 
+<dd> We use a modification of the original method with higher order
+   adaptive stepsize time evolution.</dd>
+
+<dt>Ensemble of quantum (at present, MCWF) trajectories</dt> 
+
+</dl>
+
+A number of other methods, e.g. the quantum state diffusion, can be
+easily incorporated into the framework. Note that in the case when the
+probability of quantum jumps vanishes, the MCWF method reduces to the
+simulation of the Schroedinger equation, so that the latter is
+naturally available in the framework.
+</p>
+
+
+<h2>Performance issues</h2>
+
+<p>The framework is very sensitive to performance both in terms of
+computer resources and coding/design. In the latter aspect the goal,
+as always in software design, is to create maximally reusable code. In
+the former aspect, there are physical and computational methods to
+increase performance. Among the physical ones, the most notable is the
+maximal use of interaction picture, which may help to get rid of very
+separate timescales in the problem. Among the computational ones we
+can mention
+
+<ul>
+
+<li>Maximal exploitation of special operator structures, i.e., sparse
+  and tridiagonal matrices</li>
+
+<li>The use of adaptive-stepsize methods for evolving ordinary
+  differential equations</li>
+
+<li>Judicious use of memory</li>
+
+</ul>
+
+</p>
+
+<h2>Analysis and Visualization</h2>
+
+<p>For fast and easy interpretation of the data produced by C++QED there exists a python
+library called PyCppQED which automatizes this task as far as possible. It also provides
+functions for creating convenient initial statevectors which then can be passed on to
+C++QED.</p>
+
+<h2>Documentation</h2> 
+
+<p>The first release of the framework has been partially documented in
+a journal article <a href="#cppqed_ref">[3]</a>, which still applies from the physics point of
+view.</p>
+
+<p>There is a
+  new <a href="http://cppqed.sourceforge.net/_downloads/tutorial.pdf">tutorial</a>
+  for the second release, and a full (reference or extenders') manual
+  is in preparation.</p>
+
+<p>For PyCppQED there exists a tutorial and a complete reference. It can be downloaded from
+<a href="http://github.com/bastikr/pycppqed/downloads">github</a>.
+
+
+<h2>Download</h2>
+
+<p>C++QED is an open source project hosted
+  by <a href="http://www.sourceforge.net">SourceForge.net</a>,
+  cf. the <a href="http://cppqed.sourceforge.net/">project homepage</a> for downloads.</p>
+<p>PyCppQED is developed on <a href="http://github.com/bastikr/pycppqed">github</a> but releases
+can also be found on the sourceforge project homepage of C++QED.</p>
+
+<h2><a href="http://www.uibk.ac.at/th-physik/people/staffdb/360525.xml">Contact the developers</a></h2>
+Any questions, remarks, comments, etc. are welcome.
+
+<h2>References</h2>
+
+
+<p><a href="http://www.iop.org/EJ/abstract/1464-4266/1/4/312" name="matlab_ref" id="matlab_ref">[1]</a> S. M. Tan, <em>A computational toolbox for quantum and atomic optics</em>, J. Opt. B, <strong>1</strong>, 424, (1999)</p>
+
+<p><a href="http://www.sciencedirect.com/science?_ob=ArticleURL&_udi=B6TJ5-3TYX2RS-H&_user=464594&_coverDate=05%2F02%2F1997&_alid=889371051&_rdoc=1&_fmt=high&_orig=search&_cdi=5301&_sort=d&_docanchor=&view=c&_ct=1&_acct=C000022278&_version=1&_urlVersion=0&_userid=464594&md5=c949abe8de16f825aaf407ec3335a417" name="qsd_ref" id="qsd_ref">[2]</a> R. Schack and T. A. Brun, <em>A C++ library using quantum trajectories to solve quantum master equations</em>, Comp. Phys. Commun., <strong>102</strong>, 210, (1997)</p>
+
+<p><a href="http://epjd.edpsciences.org/index.php?option=article&access=standard&Itemid=129&url=/articles/epjd/abs/2007/10/d07058/d07058.html" name="cppqed_ref" id="cppqed_ref">[3]</a> A. Vukics and H. Ritsch, <em>C++QED: an object-oriented framework for wave-function simulations of cavity QED systems</em>, Eur. Phys. J. D, <strong>44</strong>, 585, (2007)</p>
+
