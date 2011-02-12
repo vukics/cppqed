@@ -1,0 +1,8 @@
+project : requirements <include>frees
+	# This is necessary in order that clients in interaction find frees
+	: usage-requirements <include>frees <include>interactions <include>composites
+	# This is necessary for clients outside elements 
+	;
+
+lib C++QEDelements : [ glob frees/*.cc interactions/*.cc composites/*.cc ] 
+    		   : <library>/quantumdata//quantumdata/ <library>/quantumoperator//quantumoperator/ <library>/structure//structure ;
