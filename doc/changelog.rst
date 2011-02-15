@@ -2,6 +2,12 @@
 ChangeLog
 *************************
 
+
+2010/02/15 Switching to `Bazaar <https://sourceforge.net/scm/?type=bzr&group_id=187775>`_ revision control
+
+  History has not been migrated to Bazaar, the old history remaining accessible from `CVS <https://sourceforge.net/scm/?type=cvs&group_id=187775>`_. Cf. the `tutorial <http://cppqed.sourceforge.net/tutorial/installation.html#obtaining-c-qed>`_ for further details.
+
+
 2010/11/29 Change in the quantumtrajectory bundle
 
   Classes in the quantumtrajectory bundle (``MCWF_Trajectory``, ``Master``, etc.) do not have the IS_NO template parameter any more. This is because the selection between orthogonal and non-orthogonal state vectors / density operators will now be done relying on run-time polymorphy instead of compile-time polymorphy as so far.

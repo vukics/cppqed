@@ -35,9 +35,11 @@ I will very much appreciate all feedback regarding also the installation of the 
 Installation on Ubuntu
 --------------------------------------
 
-The following is a rudimentary list of prerequisite packages on Ubuntu 9.10
+.. highlight:: sh
 
-.. describe:: sudo apt-get install boost-build libboost1.40-all-dev autoconf automake libtool libgsl0-dev liblapack-dev liblapack-pic liblapack3gf libblas-dev libblas3gf libatlas-headers libatlas3gf-base rcs cvs
+The following is a rudimentary list of prerequisite packages on Ubuntu 9.10:: 
+
+  % sudo apt-get install boost-build libboost1.40-all-dev autoconf automake libtool libgsl0-dev liblapack-dev liblapack-pic liblapack3gf libblas-dev libblas3gf libatlas-headers libatlas3gf-base rcs cvs
 
 This will install the first three libraries listed above on system level.
 
@@ -46,33 +48,37 @@ The following steps to install the remaining two libraries constitute also the s
 Install Blitz++:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. describe:: cvs -d:pserver:anonymous@blitz.cvs.sourceforge.net:/cvsroot/blitz login
+::
 
-Hit enter when prompted for password.
+  cvs -d:pserver:anonymous@blitz.cvs.sourceforge.net:/cvsroot/blitz login
 
-.. describe:: cvs -z3 -d:pserver:anonymous@blitz.cvs.sourceforge.net:/cvsroot/blitz co -P blitz
-.. describe:: cd blitz
-.. describe:: autoreconf -fiv
-.. describe:: ./configure --with-pic
-.. describe:: make lib
-.. describe:: sudo make install
+Hit enter when prompted for password. ::
+
+  cvs -z3 -d:pserver:anonymous@blitz.cvs.sourceforge.net:/cvsroot/blitz co -P blitz
+  cd blitz
+  autoreconf -fiv
+  ./configure --with-pic
+  make lib
+  sudo make install
 
 Install FLENS:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. describe:: cvs -d:pserver:anonymous@flens.cvs.sourceforge.net:/cvsroot/flens login
-.. describe:: cvs -z3 -d:pserver:anonymous@flens.cvs.sourceforge.net:/cvsroot/flens co -P FLENS-lite
-.. describe:: cd FLENS-lite
-.. describe:: cp config.ubuntu config
+::
 
-Now you have to edit the config file adding to ``CXXFLAGS`` the flag ``-DGSL_CBLAS`` which instructs FLENS to use the CBLAS interface provided by GSL. This is good because hence you don't need a separate package for this. You may also need to remove the flag ``-latlas`` from ``LDFLAGS``. 
+  cvs -d:pserver:anonymous@flens.cvs.sourceforge.net:/cvsroot/flens login
+  cvs -z3 -d:pserver:anonymous@flens.cvs.sourceforge.net:/cvsroot/flens co -P FLENS-lite
+  cd FLENS-lite
+  cp config.ubuntu config
 
-.. describe:: make
-.. describe:: sudo make install
+Now you have to edit the config file adding to ``CXXFLAGS`` the flag ``-DGSL_CBLAS`` which instructs FLENS to use the CBLAS interface provided by GSL. This is good because hence you don't need a separate package for this. You may also need to remove the flag ``-latlas`` from ``LDFLAGS``. ::
 
-If the last command issues the error message:
+  make
+  sudo make install
 
-.. describe:: Makefile.common:19: /config: No such file or directory
+If the last command issues the error message::
+
+  Makefile.common:19: /config: No such file or directory
 
 you have to edit ``Makefile.common`` replacing the variable ``$(PWD)`` with the path of the current directory.
 
@@ -83,29 +89,30 @@ Obtaining C++QED
 
 There are two ways, the first being to download the latest package from `<http://sourceforge.net/projects/cppqed/files/>`_. This is only recommended if the package is not too old.
 
-The other is to use the CVS version:
+The other is to use the `Bazaar <https://sourceforge.net/scm/?type=bzr&group_id=187775>`_ version::
 
-.. describe:: cvs -d:pserver:anonymous@cppqed.cvs.sourceforge.net:/cvsroot/cppqed login
-.. describe:: cvs -z3 -d:pserver:anonymous@cppqed.cvs.sourceforge.net:/cvsroot/cppqed co -P C++QED
+  bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed C++QED
 
-Be aware that C++QED is under development, so changes in the CVS version may change the API of certain modules in such a way as breaks your applications. It is advisable to follow the `ChangeLog <http://cppqed.sourceforge.net/changelog.html>`_ of the project. Alternatively, the CVS option ``-D <date>`` can be used to used to retrieve the most recent revision no later than ``<date>``.
+Where the last argument can be replaced to the name of the directory for the code to appear in. Alternately, an existing checkout can be updated as::
 
+  bzr pull bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed
 
-.. todo::
+Be aware that C++QED is under development, so changes in the Bazaar version may change the API of certain modules in such a way as breaks your applications. It is advisable to follow the `ChangeLog <http://cppqed.sourceforge.net/changelog.html>`_ of the project. Alternately, the CVS option ``-r date:<date>`` can be used to retrieve the most recent revision no later than ``<date>``. E.g.::
 
-   Make cvs pull in the newest versions of Blitz++ and FLENS-lite, and somehow compile them automatically.
+  bzr pull -r date:2010-02-14 bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed
+
 
 -----------
 Compilation
 -----------
 
-The canonical way to compile the framework is the one using Boost.Build. This is best installed on system level. Typing 
+The canonical way to compile the framework is the one using Boost.Build. This is best installed on system level. Typing ::
 
-.. describe:: bjam 
+  bjam 
 
-in the main directory will compile and link the whole framework, creating separate executables from the highest level programs residing in directory ``scripts``. Typing
+in the main directory will compile and link the whole framework, creating separate executables from the highest level programs residing in directory ``scripts``. Typing ::
 
-.. describe:: bjam <script-name-without-extension>
+  bjam <script-name-without-extension>
 
 will compile only the given script.
 
@@ -114,23 +121,23 @@ The default compilation mode is ``debug``\ ging mode, meaning that in this case 
 
 .. warning::
 
-   Maximum efficiency is achieved only if the framework is compiled with 
+   Maximum efficiency is achieved only if the framework is compiled with ::
 
-   .. describe:: bjam release 
+     bjam release 
 
-   or 
+   or ::
 
-   .. describe:: bjam <script-name-without-extension> release
+     bjam <script-name-without-extension> release
 
 ``bjam`` will put the compiled files into the directories ``bin`` and ``C++Utils/bin``. These directories are the roots of directory structures which mirror the structure of the distribution.
 
-There is a ``Makefile`` which will automatically recognise the executables in directory ``scripts``, compile the framework, and statically link it with necessary libraries. Although with ``make`` it is not easy to provide the same flexibility as with Boost.Build, I am trying to maintain this possibility on an acceptable level. With ``make``, the default compilation mode is optimized mode, and to switch to debugging mode you need to use
+There is a ``Makefile`` which will automatically recognise the executables in directory ``scripts``, compile the framework, and statically link it with necessary libraries. Although with ``make`` it is not easy to provide the same flexibility as with Boost.Build, I am trying to maintain this possibility on an acceptable level. With ``make``, the default compilation mode is optimized mode, and to switch to debugging mode you need to use ::
 
-.. describe:: make optimization=no <script-name-without-extension>
+  make optimization=no <script-name-without-extension>
 
-Boost.Build, just like ``make``, supports parallel compilation, which can make a significant difference for projects of the magnitude of C++QEDv2. For starting ``n`` threads of compilation use
+Boost.Build, just like ``make``, supports parallel compilation, which can make a significant difference for projects of the magnitude of C++QEDv2. For starting ``n`` threads of compilation use ::
 
-.. describe:: bjam -j n ... 
+  bjam -j n ... 
 
 C++QEDv2 has been successfully compiled on several Linux platforms and Mac OS X. In all cases the GNU C++ Compiler has been used. Portability to other compilers remains to be demonstrated.
 
@@ -142,6 +149,9 @@ C++QEDv2 has been successfully compiled on several Linux platforms and Mac OS X.
 .. todo::
 
    Test framework with icc + under Windows
+
+.. highlight:: c++
+  :linenothreshold: 10
 
 
 ------------

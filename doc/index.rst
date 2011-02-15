@@ -28,7 +28,7 @@ ChangeLog
 .. toctree::
    :maxdepth: 2
 
-   If you are using the CVS version, you will need to consult the ChangeLog from time to time. <changelog>
+   If you are using the Bazaar version, you will need to consult the ChangeLog from time to time. <changelog>
 
 ------------------
 Printable versions
@@ -70,7 +70,6 @@ Links
 
 * `Blitz++ <http://www.oonumerics.org/blitz/>`_
 
-* `Flexible Library for Efficient Numerical Solutions (FLENS)
-  <http://flens.sourceforge.net/>`_
+* `Flexible Library for Efficient Numerical Solutions (FLENS) <http://flens.sourceforge.net/>`_
 
 * `The first journal article about the framework <http://www.springerlink.com/content/r2237020726t0614/>`_
