@@ -28,7 +28,7 @@ ChangeLog
 .. toctree::
    :maxdepth: 2
 
-   If you are using the Bazaar version, you will need to consult the ChangeLog from time to time. <changelog>
+   If you are using the development version from the Bazaar repository, you will need to consult the ChangeLog from time to time. <changelog>
 
 ------------------
 Printable versions
@@ -45,9 +45,19 @@ Printable versions
 Download
 ========
 
+.. highlight:: sh
+
 * `The project summary page <http://sourceforge.net/projects/cppqed/>`_
 
 * `Released packages <http://sourceforge.net/projects/cppqed/files/>`_
+
+* The development version from the Bazaar repository::
+
+    % bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed C++QED
+
+.. highlight:: c++
+  :linenothreshold: 10
+
 
 =========================================================================================
 Support
@@ -73,3 +83,11 @@ Links
 * `Flexible Library for Efficient Numerical Solutions (FLENS) <http://flens.sourceforge.net/>`_
 
 * `The first journal article about the framework <http://www.springerlink.com/content/r2237020726t0614/>`_
+
+
+================
+Bazaar access
+================
+
+
+
