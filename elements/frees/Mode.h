@@ -68,6 +68,7 @@ inline std::ostream& isFiniteTempStream(std::ostream& os, double nTh, boost::mpl
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl::false_) {return p.kappa             ;}
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl:: true_) {return p.kappa*(2.*p.nTh+1);}
 
+
 class Exact : public structure::FreeExact
 {
 public:
@@ -166,7 +167,6 @@ public:
 
   Averaged(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
-protected:
   virtual const Averages average(const LazyDensityOperator&) const;
   virtual void           process(Averages&)                  const;
 
@@ -183,10 +183,25 @@ inline const SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp) {return ma
 class AveragedQuadratures : public Averaged
 {
 public:
-  AveragedQuadratures();
+  AveragedQuadratures(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
   virtual const Averages average(const LazyDensityOperator&) const;
   virtual void           process(Averages&)                  const;
+
+};
+
+
+template<typename Base>
+class AveragedMonitorCutoff : public Base
+{
+public:
+  typedef typename Base::Averages Averages;
+  typedef typename Base::KeyLabels KeyLabels;
+
+  AveragedMonitorCutoff();
+
+  const Averages average(const LazyDensityOperator&) const;
+  void           process(Averages&)                  const;
 
 };
 

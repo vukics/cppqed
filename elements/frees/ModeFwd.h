@@ -15,6 +15,8 @@ class Averaged;
 
 class AveragedQuadratures;
 
+template<typename Base=Averaged> class AveragedMonitorCutoff;
+
 struct DoNotAverage {};
 
 } // mode

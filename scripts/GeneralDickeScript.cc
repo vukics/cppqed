@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 
   u/=ps.twos; y/=sqrt(ps.twos);
 
-  mode::SmartPtr mode(mode::maker(pplm,qmp));
+  mode::SmartPtr mode(mode::maker(pplm,qmp,mode::AveragedMonitorCutoff<mode::AveragedQuadratures>()));
 
   Spin spin(ps);
 
