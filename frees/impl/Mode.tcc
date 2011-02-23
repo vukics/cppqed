@@ -59,6 +59,33 @@ const SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
 #undef  TEMPLATE_PARAM_TEMP
 
 
+template<typename Base>
+AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
+  : Base(boost::assign::list_of("|Psi(cutoff-1)|^2"),KeyLabels())
+{
+}
+
+
+template<typename Base>
+const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average(const LazyDensityOperator& matrix) const
+{
+  const Averages averagesFromBase(Base::average(matrix));
+  Averages averages(averagesFromBase.size()+1);
+  averages(blitz::Range(0,averages.size()-2))=averagesFromBase;
+  averages(averages.size()-1)=matrix(matrix.getDimension()-1);
+  return averages;
+}
+
+
+template<typename Base>
+void AveragedMonitorCutoff<Base>::process(Averages& averages) const
+{
+  Averages ranged(averages(blitz::Range(0,averages.size()-2)));
+  Averaged::process(ranged);
+}
+
+
+
 } // mode
 
 

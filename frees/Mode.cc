@@ -231,8 +231,9 @@ void Averaged::process(Averages& averages) const
 
 
 
-AveragedQuadratures::AveragedQuadratures()
-  : Averaged(list_of("<X^2>-<X>^2")("<Y^2>-<Y>^2")("<(XY+YX)/2>-<X><Y>"),KeyLabels())
+AveragedQuadratures::AveragedQuadratures(const KeyLabels& follow, const KeyLabels& precede)
+  : Averaged(Assemble(KeyLabels(),list_of("<X^2>-<X>^2")("<Y^2>-<Y>^2")("<(XY+YX)/2>-<X><Y>"),follow),precede)
+    // Last parameter is necessary, otherwise ambiguity with Averaged copy constructor
 {
 }
 
