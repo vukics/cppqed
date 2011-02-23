@@ -55,9 +55,6 @@ Download
 
     % bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed C++QED
 
-.. highlight:: c++
-  :linenothreshold: 10
-
 
 =========================================================================================
 Support
@@ -89,5 +86,13 @@ Links
 Bazaar access
 ================
 
+To access the Bazaar repository, configure your Bazaar client as follows::
 
+  bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed (read-only)
+
+  bzr+ssh://vukics@cppqed.bzr.sourceforge.net/bzrroot/cppqed (read/write)
+
+
+.. highlight:: c++
+  :linenothreshold: 10
 
