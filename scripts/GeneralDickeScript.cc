@@ -29,6 +29,8 @@ int main(int argc, char* argv[])
   double& u=p.add("u","General Dicke interaction u parameter",1.);
   double& y=p.add("y","General Dicke interaction y parameter",1.);
 
+  QM_Picture& qmp=p.add("picture","QM_Picture for mode (IP=UIP or Sch) and field (IP, UIP, or Sch)",QMP_IP);
+
   // Parameter finalization
   update(p,argc,argv,"--");
   
@@ -36,7 +38,7 @@ int main(int argc, char* argv[])
 
   u/=ps.twos; y/=sqrt(ps.twos);
 
-  mode::SmartPtr mode(mode::maker(pplm,QMP_IP));
+  mode::SmartPtr mode(mode::maker(pplm,qmp));
 
   Spin spin(ps);
 
