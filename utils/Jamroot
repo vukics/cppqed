@@ -1,5 +1,3 @@
-use-project /lib_project : src ;
-
 project Utils
 	: usage-requirements
 	  <include>include 
@@ -9,11 +7,11 @@ project Utils
 	: build-dir bin
 	;
 
-alias Utilslib : /lib_project//Utils ;
+alias Utilslib : src//Utils ;
 
-build-project /lib_project ;
-build-project test         ;
-build-project testsuite    ;
+build-project src       ;
+build-project test      ;
+build-project testsuite ;
 
 
 lib blitzlib : : <name>blitz ;

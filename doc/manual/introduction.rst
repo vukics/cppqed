@@ -12,10 +12,6 @@ The organization of the framework may be sketched as follows:
 .. image:: figures/organization.png
    :height: 676
 
-.. todo::
-
-  This organization should be reflected on the build system (dependencies)
-
 The document is accordingly organized as follows:
 
 * In section :ref:`multiarray` we describe the basic organizing concept of the framework, which directly follows from the algebra of composite quantum systems, and entails the need for using template metaprogramming. This section would properly belong to a latter section describing the utility library :ref:`C++Utils <cpputils>`, but due to its importance we put it to the beginning.

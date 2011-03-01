@@ -1,5 +1,1 @@
-project : requirements <include>.
-        : usage-requirements <include>.
-        ;
-
-lib quantumtrajectory : [ glob *.cc ] : <library>/Utils//Utilslib ;
+lib quantumtrajectory : [ glob *.cc ] : <library>../structure//structure <include>. : : <include>. ;

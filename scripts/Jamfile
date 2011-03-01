@@ -1,4 +1,4 @@
-project : requirements <library>/quantumtrajectory//quantumtrajectory <library>/elements//C++QEDelements ;
+project : requirements <library>../quantumtrajectory//quantumtrajectory <library>../elements//C++QEDelements ;
 
 for local ccfile in [ glob *.cc ]
 {

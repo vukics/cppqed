@@ -1,23 +1,17 @@
 use-project Utils : utils ;
 
-use-project /structure : structure ;
-use-project /elements  : elements  ;
+project : : : build-dir bin ;
 
-use-project /quantumdata       : quantumdata       ;
-use-project /quantumtrajectory : quantumtrajectory ;
-use-project /quantumoperator   : quantumoperator   ;
-
-project C++QED
-	: requirements <include>structure <include>quantumdata <include>quantumoperator
-	: 
-	: build-dir bin
-	;
-
-build-project structure ;
-build-project elements  ;
-
+# Core
 build-project quantumdata       ;
+build-project structure         ;
 build-project quantumtrajectory ;
+
+# Helpers
 build-project quantumoperator   ;
 
+# Elements
+build-project elements  ;
+
+# Scripts
 build-project scripts ;

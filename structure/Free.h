@@ -6,7 +6,9 @@
 
 #include "DensityOperatorFwd.h"
 #include "StateVectorFwd.h"
-#include "TridiagonalFwd.h"
+
+#include "../quantumoperator/TridiagonalFwd.h"
+// Normally, structure is not allowed to depend on quantumoperator, here we make a small exception
 
 #include "DynamicsBase.h"
 #include "QuantumSystem.h"
