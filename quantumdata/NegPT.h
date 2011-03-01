@@ -1,10 +1,15 @@
 // -*- C++ -*-
-#ifndef _NEGPT_H
-#define _NEGPT_H
+#ifndef   NEGPT_H_INCLUDED
+#define   NEGPT_H_INCLUDED
 
-#include "DensityOperatorFwd.h"
+#include "DensityOperator.h"
 
+#include "BlitzArraySliceIterator.h"
 #include "TMP_Tools.h"
+
+
+
+#ifndef   DO_NOT_USE_FLENS
 
 
 namespace quantumdata {
@@ -30,6 +35,27 @@ double negPT(const DensityOperator<RANK>&, tmptools::V0)
 
 } // quantumdata 
 
+
 #include "impl/NegPT.tcc"
 
-#endif // _NEGPT_H
+
+#else  // DO_NOT_USE_FLENS
+
+namespace quantumdata {
+
+// If FLENS is not used, a dummy definition of negPT is provided
+
+template<int RANK, typename V>
+double negPT(const DensityOperator<RANK>&, V=V())
+{
+  return 0;
+}
+
+
+} // quantumdata 
+
+
+#endif // DO_NOT_USE_FLENS
+
+
+#endif // NEGPT_H_INCLUDED

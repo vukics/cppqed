@@ -1,15 +1,8 @@
 // -*- C++ -*-
-#ifndef   _NEGPT_IMPL_H
-#define   _NEGPT_IMPL_H
 
-#include "DensityOperator.h"
-
-#include "BlitzArraySliceIterator.h"
 #include "Blitz2FLENS.h"
 
-#include<flens/flens.h>
-
-#include<boost/mpl/transform.hpp>
+#include <boost/mpl/transform.hpp>
 
 namespace quantumdata {
 
@@ -103,4 +96,3 @@ struct ExtendV : namehider::Algorithm<RANK,V>
 } // quantumdata
 
 
-#endif // _NEGPT_IMPL_H

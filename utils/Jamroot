@@ -5,6 +5,7 @@ project Utils
 	  <include>include 
 	  <variant>debug:<define>BZ_DEBUG 
 	  <cxxflags>"-DGSL_CBLAS" # This is needed so that FLENS use the CBLAS implementation of GSL
+	  <with-flens>no:<define>DO_NOT_USE_FLENS
 	: build-dir bin
 	;
 

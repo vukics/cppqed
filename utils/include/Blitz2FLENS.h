@@ -5,9 +5,7 @@
 #include "BlitzArray.h"
 #include "ComplexExtensions.h"
 
-#include<flens/densevector.h>
-#include<flens/generalmatrix.h>
-#include<flens/storage.h>
+#include<flens/flens.h>
 
 #include<blitz/array.h>
 

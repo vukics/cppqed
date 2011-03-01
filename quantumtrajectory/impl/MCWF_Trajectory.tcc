@@ -9,7 +9,8 @@
 
 #include "FormDouble.h"
 
-#include<fstream>
+#include <fstream>
+#include <vector>
 
 // #include<blitz/tinyvec-et.h>
 
