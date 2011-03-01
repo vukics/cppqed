@@ -1,5 +1,4 @@
 use-project /lib_project : src ;
-use-project /third_party : thirdParty ;
 
 project Utils
 	: usage-requirements
@@ -14,3 +13,34 @@ alias Utilslib : /lib_project//Utils ;
 build-project /lib_project ;
 build-project test         ;
 build-project testsuite    ;
+
+
+lib blitzlib : : <name>blitz ;
+
+lib gsllib      : : <name>gsl      ;
+lib gslcblaslib : : <name>gslcblas ;
+
+
+import feature : feature ;
+feature with-flens : yes no : incidental propagated ;
+
+lib flenslib : : <name>flens <link>shared <with-flens>yes ;
+
+
+
+# Some further examples for specifying the third-party libraries
+
+# lib cblaslib : : <file>/opt/atlas/3.8.2/lib/libcblas.so <link>shared ;
+# lib atlaslib : : <file>/opt/atlas/3.8.2/lib/libatlas.so <link>shared ;
+
+#project : usage-requirements <include>/home/C++QED_lib/include <library>cblaslib <library>atlaslib <include>/opt/atlas/3.8.2/include ;
+
+# lib blitzlib : : <file>/home/C++QED_lib/lib/libblitz.a ;
+# lib flenslib : : <file>/home/C++QED_lib/lib/libflens.so <link>shared ;
+
+# lib blitzlib : : <name>blitz ;
+
+# lib flenslib : : <name>flens <link>shared ;
+
+# lib gsllib      : : <name>gsl      ;
+# lib gslcblaslib : : <name>gslcblas ;

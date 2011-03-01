@@ -1,4 +1,4 @@
 for local ccfile in [ glob *.cc ]
 {
-	exe $(ccfile:B) : $(ccfile) : <library>..//Utilslib <library>/third_party//flenslib ;
+	exe $(ccfile:B) : $(ccfile) : <library>..//Utilslib ;
 }

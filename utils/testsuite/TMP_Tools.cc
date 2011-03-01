@@ -78,7 +78,7 @@ BOOST_STATIC_ASSERT((
 		     ));
 
 
-int main()
+void f()
 {
   /*
   // Should not compile:

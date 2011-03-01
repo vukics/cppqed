@@ -8,7 +8,7 @@ use-project /quantumtrajectory : quantumtrajectory ;
 use-project /quantumoperator   : quantumoperator   ;
 
 project C++QED
-	: requirements <include>structure <include>quantumdata <include>quantumoperator <library>/third_party//flenslib 
+	: requirements <include>structure <include>quantumdata <include>quantumoperator
 	: 
 	: build-dir bin
 	;
