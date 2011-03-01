@@ -139,7 +139,7 @@ This is a full-fledged script, so if you copy this into directory ``scripts`` un
 
 .. describe:: bjam <release> temp 
 
-Let us analyse it line by line. ``ParameterTable`` is the module from ``C++Utils`` which stores all the parameters of the problem, and enables them to be manipulated from the command line. It can store any type for which i\/o operations are defined. Next we instantiate the actual parameters for the time-evolution driver(s) and the mode, respectively. All the modules in the framework provide corresponding ``Pars...`` classes. In the following we specify the desired default values, e.g. we set that the default evolution mode should be Master equation [#]_. Next, the command line is parsed by the ``update`` function. Parsing is not very sophisticated at the moment, but some errors do get detected at this point.
+Let us analyse it line by line. ``ParameterTable`` is the module from ``utils`` which stores all the parameters of the problem, and enables them to be manipulated from the command line. It can store any type for which i\/o operations are defined. Next we instantiate the actual parameters for the time-evolution driver(s) and the mode, respectively. All the modules in the framework provide corresponding ``Pars...`` classes. In the following we specify the desired default values, e.g. we set that the default evolution mode should be Master equation [#]_. Next, the command line is parsed by the ``update`` function. Parsing is not very sophisticated at the moment, but some errors do get detected at this point.
 
 In the next line we instantiate our mode, but now instead of the concrete ``PumpedLossyMode`` class, we are using a maker (or dispatcher) function, which selects the best mode class corresponding to the parameters. There are 10 possibilities: ``Mode``, ``ModeSch``, ``PumpedMode``, ``PumpedModeSch``, ``LossyMode``, ``LossyModeUIP``, ``LossyModeSch``, and ``PumpedLossyMode``, ``PumpedLossyModeUIP``, ``PumpedLossyModeSch``. Roughly speaking, ``mode::SmartPtr`` is an entity that can store either of these classes. E.g. if ``kappa=0``, and ``eta=0``, then we will have a ``Mode``; if ``eta`` is nonzero, a ``PumpedMode``; and if both are nonzero, a ``PumpedLossyMode``. The significance of this is that e.g. if the mode is not lossy, then the possibility of a quantum jump will not even be considered during time evolution, which speeds things up. 
 
@@ -363,6 +363,8 @@ Without much ado we are quoting the kernel of a corresponding script::
 (A pumped particle can also be in a coherent state: a coherent state of the pump potential approximated as harmonic.)
 
 
+
+.. _assessingEntanglement:
 
 ----------------------
 Assessing entanglement

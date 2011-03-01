@@ -17,17 +17,24 @@ These three are best installed on system level.
 
 The following two libraries are stable, but under more or less steady development.
 
+.. highlight:: sh
+
+
 Blitz++ 
   provides the fundamental data structure. It hence performs a lot of numerics and lies at the absolute heart of the framework. Blitz++ lives up to its name, as it provides near-Fortran performance in spite of the very high-level abstractions used in the library. This is achieved by TMP, which was discovered in prototype during the development of this very library. More on `the Blitz++ homepage <http://www.oonumerics.org/blitz/>`_.
+
+  .. warning::
+
+    At the time of this writing the released version of Blitz++ is version 0.9. Do not use this release! The CVS version is to be used instead. There is no knowing when a new release will appear, but that future release can be used, of course.
 
 Flexible Library for Efficient Numerical Solutions (FLENS) 
   is a very impressive effort to wrap BLAS-LAPACK functions in a high-level C++ interface. FLENS in turn depends on BLAS-LAPACK (ATLAS). More on `the FLENS homepage <http://flens.sourceforge.net/>`_.
 
-.. warning::
+  .. note::
 
-   At the time of this writing the released version of Blitz++ is version 0.9. Do not use this release! The CVS version is to be used instead. There is no knowing when a new release will appear, but that future release can be used, of course.
+    The use of FLENS is optional because only a very small section of the framework depends on it. Cf. the section :ref:`compilingWithoutFLENS`.
 
-At the corresponding websites instructions for installing the libraries can be found, while below I have given guidelines concerning installation on an Ubuntu system, cf. also the ``getLibs.sh`` script in directory ``C++Utils/thirdParty``. This will download the CVS versions of both libraries into the subdirectories ``blitz`` and ``FLENS-lite``, respectively, and will also compile them.
+At the corresponding websites instructions for installing the libraries can be found, while below I have given guidelines concerning installation on an Ubuntu system, cf. also the ``getLibs.sh`` script in directory ``utils``. This will download the CVS versions of both libraries into the subdirectories ``blitz`` and ``FLENS-lite``, respectively, and will also compile them.
 
 I will very much appreciate all feedback regarding also the installation of the framework. 
 
@@ -35,15 +42,13 @@ I will very much appreciate all feedback regarding also the installation of the 
 Installation on Ubuntu
 --------------------------------------
 
-.. highlight:: sh
-
 The following is a rudimentary list of prerequisite packages on Ubuntu 9.10:: 
 
   % sudo apt-get install boost-build libboost1.40-all-dev autoconf automake libtool libgsl0-dev liblapack-dev liblapack-pic liblapack3gf libblas-dev libblas3gf libatlas-headers libatlas3gf-base rcs cvs
 
 This will install the first three libraries listed above on system level.
 
-The following steps to install the remaining two libraries constitute also the script ``C++Utils/thirdParty/getLibs.sh``.
+The following steps to install the remaining two libraries constitute also the script ``utils/getLibs.sh``.
 
 Install Blitz++:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -63,6 +68,10 @@ Hit enter when prompted for password. ::
 
 Install FLENS:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+
+  The use of FLENS is optional because only a very small section of the framework depends on it. Cf. the section :ref:`compilingWithoutFLENS`.
 
 ::
 
@@ -129,7 +138,7 @@ The default compilation mode is ``debug``\ ging mode, meaning that in this case 
 
      bjam <script-name-without-extension> release
 
-``bjam`` will put the compiled files into the directories ``bin`` and ``C++Utils/bin``. These directories are the roots of directory structures which mirror the structure of the distribution.
+``bjam`` will put the compiled files into the directories ``bin`` and ``utils/bin``. These directories are the roots of directory structures which mirror the structure of the distribution.
 
 There is a ``Makefile`` which will automatically recognise the executables in directory ``scripts``, compile the framework, and statically link it with necessary libraries. Although with ``make`` it is not easy to provide the same flexibility as with Boost.Build, I am trying to maintain this possibility on an acceptable level. With ``make``, the default compilation mode is optimized mode, and to switch to debugging mode you need to use ::
 
@@ -150,12 +159,23 @@ C++QEDv2 has been successfully compiled on several Linux platforms and Mac OS X.
 
    Test framework with icc + under Windows
 
+.. _compilingWithoutFLENS:
+
+Compiling without FLENS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There is a compilation feature which can be supplied to Boost.Build::
+
+  bjam with-flens=no <all the rest as before>
+
+In this case, those parts of the framework that rely on FLENS are discreetly disabled. Most notable is the calculation of the negativity of partially transposed density operators, cf. :ref:`assessingEntanglement`.
+
 .. highlight:: c++
   :linenothreshold: 10
 
 
 ------------
-``C++Utils``
+``utils``
 ------------
 
-The content of the directory ``C++Utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves.
+The content of the directory ``utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves.
