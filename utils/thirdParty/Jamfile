@@ -1,3 +1,6 @@
+import feature : feature ;
+feature with-flens : : free ;
+
 lib blitzlib : : <name>blitz ;
 
 # lib flenslib : : <file>/usr/lib64/libflens.so <link>shared ;

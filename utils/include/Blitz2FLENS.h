@@ -2,13 +2,12 @@
 #ifndef   _BLITZ_TO_FLENS_H
 #define   _BLITZ_TO_FLENS_H
 
-#include "Blitz2FLENSFwd.h"
-
 #include "BlitzArray.h"
 #include "ComplexExtensions.h"
 
 #include<flens/densevector.h>
 #include<flens/generalmatrix.h>
+#include<flens/storage.h>
 
 #include<blitz/array.h>
 
@@ -18,6 +17,11 @@ namespace mpl=boost::mpl;
 
 namespace blitz2flens {
 
+
+using namespace flens;
+
+template<StorageOrder>
+struct StorageTag {};
 
 typedef StorageTag<RowMajor> RowMajorTag;
 typedef StorageTag<ColMajor> ColMajorTag;
