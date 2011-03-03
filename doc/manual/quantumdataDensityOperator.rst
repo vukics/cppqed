@@ -24,7 +24,7 @@ Density operator
 
     Both functions return the trace "norm", but the latter one also renormalizes.
 
-  .. function:: const linalg::CMatrix matrixView()
+  .. function:: const linalg::CMatrix matrixView() const
 
     (also in non-constant version) Returns a two-dimensional view of the underlying data.
 

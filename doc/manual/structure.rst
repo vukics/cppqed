@@ -267,7 +267,18 @@ This class describes interaction between free systems.
 ``Hamiltonian``
 ---------------------------------------
 
+.. class:: structure::Hamiltonian
+
 .. class:: structure::TridiagonalHamiltonian
+
+
+---------------------------------------
+``Exact``
+---------------------------------------
+
+.. class:: structure::Exact
+
+.. class:: structure::FreeExact
 
 
 ---------------------------------------

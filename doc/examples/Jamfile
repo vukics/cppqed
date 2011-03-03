@@ -1,4 +1,4 @@
-project : requirements <library>/quantumtrajectory//quantumtrajectory <library>/elements//C++QEDelements : : build-dir bin ;
+project : requirements <library>../../quantumtrajectory//quantumtrajectory <library>../../elements//C++QEDelements : : build-dir bin ;
 
 obj ExampleMode.o : ExampleMode.cc ;
 obj ExampleModeImpl.o : ExampleModeImpl.cc ;
