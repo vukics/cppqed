@@ -55,7 +55,7 @@ EvolvedGSL<A>::EvolvedGSL(
 
 
 
-template<typename A> void EvolvedGSL<A>::step(double deltaT)
+template<typename A> void EvolvedGSL<A>::doStep(double deltaT)
 {
   double time=getTime(), dtTry=getDtTry();
   apply(pImpl_,&time,time+deltaT,&dtTry,Traits::data(getA()));

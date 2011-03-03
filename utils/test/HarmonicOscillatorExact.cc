@@ -5,7 +5,7 @@
   diff(y(t),t,t)+2*gamma*diff(y(t),t)+y(t)-exp(-I*omega*t)=0
 
   gamma==1 (critically damped)
-  
+
   y(t)=exp(-t)*_C2+exp(-t)*t*_C1-exp(-I*omega*t)/(-1+(2*I)*omega+omega^2)
 
   with
@@ -14,9 +14,9 @@
 
   gamma!=1
 
-  y(t)=exp((-gamma+sqrt(gamma^2-1))*t)*_C2+exp((-gamma-sqrt(gamma^2-1))*t)*_C1-exp(-I*omega*t)/(-1+(2*I)*gamma*omega+omega^2)  
+ y(t)=exp((-gamma+sqrt(gamma^2-1))*t)*_C2+exp((-gamma-sqrt(gamma^2-1))*t)*_C1-exp(-I*omega*t)/(-1+(2*I)*gamma*omega+omega^2)
 
- */
+*/
 
 #include "SimulatedHigh.h"
 

@@ -21,9 +21,9 @@
 
 #include "ArrayTraitsFwd.h"
 
-#include<boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
-#include<boost/function.hpp>   // instead of std::tr1::function
-#include<boost/utility.hpp>
+#include <boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
+#include <boost/function.hpp>   // instead of std::tr1::function
+#include <boost/utility.hpp>
 
 namespace evolved {
 
@@ -82,16 +82,18 @@ public:
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
   virtual ~Evolved() {}
-    
-  virtual void step(double deltaT) = 0;
-  // Takes a single adaptive step of maximum length deltaT
 
-        A& getA()       {return a_;}
-  const A& getA() const {return a_;}
+  // Takes a single adaptive step of maximum length deltaT    
+  void step(double deltaT);
+
+  A      & getA()       {return a_;}
+  A const& getA() const {return a_;}
 
   const Derivs getDerivs() const {return derivs_;}
 
 private:
+  virtual void doStep(double deltaT) = 0;
+
   A& a_;
 
   Derivs derivs_;
@@ -102,6 +104,15 @@ private:
 template<typename E>
 void evolve(E&, double deltaT);
 // evolves for exactly deltaT
+
+
+template<typename E>
+void evolveTo(E& e, double t)
+// evolves to a given time t
+{
+  evolve(e,t-e.getTime());
+}
+
 
 
 ////////////////
@@ -128,39 +139,6 @@ public:
 } // evolved
 
 #include "impl/Evolved.tcc"
-
-/*
-The problem with the original solution of defining a static factory
-function inside Evolved together with an enum for the implementations
-is that all the implementation templates need to be instantiated,
-which may not be possible for all Array types.
-
-E.g.
-
-template<typename A>
-typename Evolved<A>::SmartPtr Evolved<A>::create(
-						 A& b,
-						 Derivs derivs,
-						 double dtInit,
-						 double epsRel,
-						 double epsAbs,
-						 const A& scaleAbs,
-						 Implementation ei
-						 )
-{
-  if (ei==NR) 
-    return typename Evolved<A>::SmartPtr(new details:: NR_Evolved<A>(b,Derivs,dtInit,epsRel,epsAbs,scaleAbs));
-  else
-    return typename Evolved<A>::SmartPtr(new details::GSL_Evolved<A>(b,Derivs,dtInit,epsRel,epsAbs,scaleAbs));
-}
-
-
-The factory CLASS technique, however, allows for both compile-time &
-run-time implementation-selection, and also for implementations whose
-constructors take additional arguments.
-
-*/
-
 
 
 #endif // _EVOLVED_H
