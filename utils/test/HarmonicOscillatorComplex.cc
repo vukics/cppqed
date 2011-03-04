@@ -31,13 +31,13 @@ int main(int argc, char* argv[])
   double& omega=p.add("O","Driving frequency",1.);
   double& gamma=p.add("G","Damping rate"     ,1.);
 
-  dcomp&    yinit=p.add(   "yinit"," y   initial condition",dcomp( 1,-1));
-  dcomp& dydtinit=p.add("dydtinit","dydt initial condition",dcomp(-1, 1));
+  dcomp&    yinit=p.add(   "yinit"," y   initial condition",dcomp( 3.45263,-2.0746 ));
+  dcomp& dydtinit=p.add("dydtinit","dydt initial condition",dcomp(-4.83065, 1.16527));
 
   // Parameter finalization
   update(p,argc,argv,"--");
 
-  if (pt.T<0) pt.T=10./min(1.,min(omega,gamma));
+  if (pt.T<0) pt.T=20./min(1.,min(omega,gamma));
   // Note: 1.0 is also and existing frequency in the system, which defines the unit of time 
 
   CA1R y(2); y=yinit,dydtinit;
