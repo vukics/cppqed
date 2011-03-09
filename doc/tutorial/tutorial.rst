@@ -1,9 +1,9 @@
 .. highlight:: c++
   :linenothreshold: 10
 
-*****************
-C++QEDv2 Tutorial
-*****************
+********************
+C++QEDv2 User Guide
+********************
 
 
 
@@ -400,7 +400,7 @@ Milestone 9
   will concentrate on improving the documentation. A reference or extenders' manual will be provided.
 
 Milestone 10 
-  will be a release with some new features implemented. For some of these, the idea arose when writing this tutorial.
+  will be a release with some new features implemented. For some of these, the idea arose when writing this user guide.
 
 Milestone 11 
   will be a release with improved coding. While the runtime performance should be close to optimal by now, there is probably a lot to improve in the template and preprocessor metaprogramming parts. This can significantly cut on resources needed to compile the framework.

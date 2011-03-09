@@ -10,14 +10,14 @@ C++QED: a framework for simulating open quantum dynamics
 Documentation
 =============
 
-To start to understand and use the framework on the highest level, consult the tutorial. This will allow for building simulations using the already existing modules and elementary systems as building blocks.
+To start to understand and use the framework on the highest level, consult the user guide. This will allow for building simulations using the already existing modules and elementary systems as building blocks.
 
 For a deeper understanding and to be able to extend the framework with new elements, the upcoming reference manual will have to be consulted. In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
 
 .. toctree::
    :maxdepth: 2
 
-   Tutorial <tutorial/tutorial>
+   User Guide <tutorial/tutorial>
    
    Reference Manual <manual/manual>
 
