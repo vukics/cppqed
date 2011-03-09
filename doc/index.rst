@@ -34,7 +34,7 @@ ChangeLog
 Printable versions
 ------------------
 
-* :download:`Tutorial in pdf <./tutorial/_build/latex/C++QED_Tutorial.pdf>`
+* :download:`User guide in pdf <./tutorial/_build/latex/C++QED_Tutorial.pdf>`
 
 * `PyCppQED tutorial <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
 
