@@ -142,7 +142,7 @@ public:
     return add(s+mod,d,v);
   }
 
-  ParameterTable& addTitle(const std::string& s, const std::string& mod);
+  ParameterTable& addTitle(const std::string& s, const std::string& mod="");
 
   void printList() const;
   

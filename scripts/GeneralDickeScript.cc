@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
   // generaldicke::Pars pgd(p);
 
-  double& u=p.add("u","General Dicke interaction u parameter",1.);
+  double& u=p.addTitle("Script").add("u","General Dicke interaction u parameter",1.);
   double& y=p.add("y","General Dicke interaction y parameter",1.);
 
   QM_Picture& qmp=p.add("picture","QM_Picture for mode (IP=UIP or Sch) and field (IP, UIP, or Sch)",QMP_IP);
