@@ -54,6 +54,8 @@ public:
 
   SpinBase(size_t twos, double omega, double gamma, size_t dim=0);
 
+  size_t getTwoS() const {return twos_;}
+
   double getOmega() const {return omega_;}
   double getGamma() const {return gamma_;}
 
@@ -65,7 +67,9 @@ private:
 
   const Averages average(const LazyDensityOperator&) const;
 
-  double omega_, gamma_, s_;
+  const size_t twos_;
+
+  const double omega_, gamma_, s_;
 
 };
 

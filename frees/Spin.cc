@@ -60,7 +60,7 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 
 SpinBase::SpinBase(size_t twos, double omega, double gamma, size_t dim) 
   : Free(spin::decideDimension(twos,dim),tuple_list_of("omega",omega,1)("gamma",gamma,1)),
-    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), omega_(omega), gamma_(gamma), s_(twos/2.)
+    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), twos_(twos), omega_(omega), gamma_(gamma), s_(twos/2.)
 {
   getParsStream()<<"# Spin "<<s_<<endl;
 }
@@ -80,7 +80,7 @@ const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) co
     averages(1)+=mathutils::sqr(n-s_)*diag;
 
     if (n<matrix.getDimension()-1) {
-      dcomp temp(sqrt((2*s_-n)*(n+1))*matrix(n,n+1));
+      dcomp temp(sqrt((twos_-n)*(n+1))*matrix(n,n+1));
       averages(2)+=real(temp);
       averages(3)+=imag(temp);
     }
