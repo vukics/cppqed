@@ -65,7 +65,7 @@ private:
 
   const Averages average(const LazyDensityOperator&) const;
 
-  double omega_, gamma_;
+  double omega_, gamma_, s_;
 
 };
 

@@ -60,17 +60,15 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 
 SpinBase::SpinBase(size_t twos, double omega, double gamma, size_t dim) 
   : Free(spin::decideDimension(twos,dim),tuple_list_of("omega",omega,1)("gamma",gamma,1)),
-    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), omega_(omega), gamma_(gamma)
+    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), omega_(omega), gamma_(gamma), s_(twos/2.)
 {
-  getParsStream()<<"# Spin "<<twos/2.<<endl;
+  getParsStream()<<"# Spin "<<s_<<endl;
 }
 
 
 
 const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) const
 {
-  double s=(getDimension()-1.)/2.;
-
   Averages averages(5);
 
   averages=0;
@@ -78,11 +76,11 @@ const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) co
   for (int n=0; n<matrix.getDimension(); n++) {
 
     double diag=matrix(n);
-    averages(0)+=   (n-s)*diag;
-    averages(1)+=mathutils::sqr(n-s)*diag;
+    averages(0)+=              (n-s_)*diag;
+    averages(1)+=mathutils::sqr(n-s_)*diag;
 
-    if (n<2*s) {
-      dcomp temp(sqrt((2*s-n)*(n+1))*matrix(n,n+1));
+    if (n<matrix.getDimension()-1) {
+      dcomp temp(sqrt((2*s_-n)*(n+1))*matrix(n,n+1));
       averages(2)+=real(temp);
       averages(3)+=imag(temp);
     }
