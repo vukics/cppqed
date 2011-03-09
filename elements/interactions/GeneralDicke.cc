@@ -10,15 +10,6 @@ using namespace spin;
 using namespace mode;
 
 
-namespace {
-
-size_t spinN(const SpinBase* spin)
-{
-  return spin->getDimension()-1;
-}
-
-}
-
 
 generaldicke::Base::Base(const ModeBase* mode, const SpinBase* spin, dcomp u, dcomp y)
   : Interaction<2>(Frees(mode,spin),
@@ -26,9 +17,9 @@ generaldicke::Base::Base(const ModeBase* mode, const SpinBase* spin, dcomp u, dc
 		   tuple_list_of("u",u,mode->getDimension()*spin->getDimension())("y",y,
 										  sqrt(mode->getDimension()*spin->getDimension()))
 		   ),
-    TridiagonalHamiltonian<2,true>((u*nop(mode)*(sz(spinN(spin))+spinN(spin)/2.*quantumoperator::identity(spin->getDimension()))
+    TridiagonalHamiltonian<2,true>((u*nop(mode)*(sz(spin->getTwoS(),spin->getDimension())+spin->getTwoS()/2.*quantumoperator::identity(spin->getDimension()))
 				   +
-				    y*(aop(mode).dagger()+aop(mode))*sx(spinN(spin)))/DCOMP_I,
+				    y*(aop(mode).dagger()+aop(mode))*sx(spin->getTwoS(),spin->getDimension()))/DCOMP_I,
 				   freqs(mode)*freqs(spin))
 {
   getParsStream()<<"# General Dicke interaction\n";
