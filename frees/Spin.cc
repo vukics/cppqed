@@ -16,19 +16,24 @@ using namespace mathutils;
 
 namespace spin {
 
+size_t decideDimension(size_t twos, size_t dim)
+{
+  return dim && dim<twos+1 ? dim : twos+1;
+}
 
-const Tridiagonal splus(size_t twos)
+
+const Tridiagonal splus(size_t twos, size_t dim)
 {
   typedef Tridiagonal::Diagonal Diagonal;
-  Diagonal diagonal(twos);
+  Diagonal diagonal(decideDimension(twos,dim)-1);
   using blitz::tensor::i;
   return Tridiagonal(Diagonal(),1,diagonal=sqrt((twos-i)*(i+1)));
 }
 
 
-const Tridiagonal sz(size_t twos)
+const Tridiagonal sz(size_t twos, size_t dim)
 {
-  Tridiagonal::Diagonal diagonal(twos+1);
+  Tridiagonal::Diagonal diagonal(decideDimension(twos,dim));
   return Tridiagonal(diagonal=blitz::tensor::i-twos/2.);
 }
 
@@ -42,7 +47,8 @@ const Frequencies freqs(const SpinBase* spin)
 
 
 Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
-  : twos(p.addMod<size_t>("twos",mod,"2*s, the size of the spin (dimension twos+1)",1)),
+  : twos(p.addTitle("Spin",mod).addMod<size_t>("twos",mod,"2*s, the size of the spin (dimension: twos+1 or spinDim)",1)),
+    dim (p.addMod<size_t>("spinDim",mod,"the dimension of the truncated spin Hilbert space",0)),
     omega(p.addMod("omega",mod,"Spin precession frequency",1.)),
     gamma(p.addMod("gamma",mod,"Spin decay rate"          ,1.))
 {}
@@ -52,8 +58,9 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 } // spin
 
 
-SpinBase::SpinBase(size_t twos, double omega, double gamma) 
-  : Free(twos+1,tuple_list_of("omega",omega,1)("gamma",gamma,1)), structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")), omega_(omega), gamma_(gamma)
+SpinBase::SpinBase(size_t twos, double omega, double gamma, size_t dim) 
+  : Free(spin::decideDimension(twos,dim),tuple_list_of("omega",omega,1)("gamma",gamma,1)),
+    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")), omega_(omega), gamma_(gamma)
 {
   getParsStream()<<"# Spin "<<twos/2.<<endl;
 }
