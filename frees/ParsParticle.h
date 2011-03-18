@@ -4,7 +4,7 @@
 
 #include "ParticleFwd.h"
 
-#include "ModeFunctionTypeFwd.h"
+#include "ModeFunction.h"
 
 #include "ParsFwd.h"
 

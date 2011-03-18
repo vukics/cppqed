@@ -6,10 +6,10 @@
 
 #include "ParsParticle.h"
 
-#include "ModeFunctionTypeFwd.h"
 #include "QM_PictureFwd.h"
 #include "StateVectorFwd.h"
 
+#include "ModeFunction.h"
 #include "ElementAveraged.h"
 #include "Free.h"
 #include "FreeExact.h"
@@ -17,14 +17,12 @@
 
 #include "FFTFwd.h"
 
-#include<boost/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace particle {
 
 using namespace structure::free;
 
-typedef boost::tuple<ModeFunctionType,ptrdiff_t> ModeFunction;
-std::ostream& operator<<(std::ostream&, const particle::ModeFunction&);
 
 typedef boost::shared_ptr<ParticleBase> SmartPtr;
 
@@ -182,15 +180,15 @@ class PumpedParticleBase
 public:
   double getV_Class() const {return vClass_;}
 
-  const particle::ModeFunction& getMF() const {return mf_;}
+  const ModeFunction& getMF() const {return mf_;}
 
 protected:
-  PumpedParticleBase(size_t fin, double vClass, const particle::ModeFunction&,
+  PumpedParticleBase(size_t fin, double vClass, const ModeFunction&,
 		     const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
 
 private:
-  const double                 vClass_;
-  const particle::ModeFunction mf_    ;
+  const double       vClass_;
+  const ModeFunction mf_    ;
 
 };
 

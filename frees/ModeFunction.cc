@@ -1,4 +1,4 @@
-#include "ModeFunctionType.h"
+#include "ModeFunction.h"
 
 #include<iostream>
 
@@ -44,3 +44,14 @@ const dcomp modeFunction(ModeFunctionType mf, double x)
   }
   return exp(-DCOMP_I*x);
 }
+
+
+/*
+std::ostream& operator<<(std::ostream& os, const ModeFunction& mf)
+{
+  os<<"mode-function type is "<<mf.get<0>()<<", wave number: "<<mf.get<1>();
+  return os;
+}
+
+
+*/

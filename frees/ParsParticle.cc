@@ -2,8 +2,6 @@
 
 #include "ParticleInitialCondition.h"
 
-#include "ModeFunctionType.h"
-
 #include "Pars.h"
 
 

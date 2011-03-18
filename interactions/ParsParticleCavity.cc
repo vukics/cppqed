@@ -1,7 +1,5 @@
 #include "ParsParticleCavity.h"
 
-#include "ModeFunctionType.h"
-
 #include "Pars.h"
 
 
