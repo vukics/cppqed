@@ -4,8 +4,6 @@
 
 #include "Mode.h"
 
-#include "ModeFunctionType.h"
-
 #include<boost/assign/list_of.hpp>
 #include<boost/assign/list_inserter.hpp>
 
@@ -18,7 +16,6 @@ using namespace mathutils;
 
 using particle:: mfNKX;
 using particle::cosNKX;
-using particle::ModeFunction;
 
 using namespace mode;
 

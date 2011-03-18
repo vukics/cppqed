@@ -4,7 +4,6 @@
 #include "ParticleInitialCondition.h"
 
 #include "StateVector.h"
-#include "ModeFunctionType.h"
 
 #include "BlitzArrayTraits.h"
 #include "FFT.h"
@@ -254,13 +253,6 @@ PumpedParticleSch::PumpedParticleSch(const ParsPumped& p)
 
 
 namespace particle {
-
-
-std::ostream& operator<<(std::ostream& os, const ModeFunction& mf)
-{
-  os<<"mode-function type is "<<mf.get<0>()<<", wave number: "<<mf.get<1>();
-  return os;
-}
 
 
 

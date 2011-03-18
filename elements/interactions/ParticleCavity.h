@@ -44,13 +44,13 @@ protected:
 
 
 class InterferenceBase
-  : private boost::base_from_member<const particle::ModeFunction>, 
+  : private boost::base_from_member<const ModeFunction>, 
     public structure::Interaction<2>, public particlecavity::TridiagonalHamiltonian
 {
 public:
-  typedef boost::base_from_member<const particle::ModeFunction> MF_Base;
+  typedef boost::base_from_member<const ModeFunction> MF_Base;
 
-  const particle::ModeFunction& getMF() const {return MF_Base::member;}
+  const ModeFunction& getMF() const {return MF_Base::member;}
 
   InterferenceBase(const ModeBase*, const ParticleBase*, double u, size_t kCav, ModeFunctionType);
 
@@ -67,13 +67,13 @@ public:
 
 
 class PAC_Base 
-  : private boost::base_from_member<const particle::ModeFunction>,
+  : private boost::base_from_member<const ModeFunction>,
     public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
 {
 public:
-  typedef boost::base_from_member<const particle::ModeFunction> MF_Base;
+  typedef boost::base_from_member<const ModeFunction> MF_Base;
 
-  const particle::ModeFunction& getMF() const {return MF_Base::member;}
+  const ModeFunction& getMF() const {return MF_Base::member;}
 
   PAC_Base(const ModeBase*, const ParticleBase*, double uNot, size_t kCav, ModeFunctionType, double etaeff);
 

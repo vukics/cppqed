@@ -3,7 +3,6 @@
 #include "ParticleCavity.h"
 #include "ParticleTwoModes.h"
 
-#include "ModeFunctionType.h"
 
 int main(int argc, char* argv[])
 {
