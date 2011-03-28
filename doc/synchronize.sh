@@ -1,12 +1,8 @@
-for dir in manual; do
-  cd $dir/figures
-  bash ../../processImages.sh
-  cd ../..
-done
-
-cd manual; make latexpdf; 
+figures
+bash processImages.sh
 cd ..
 
 make html
+make latexpdf
 
 rsync -Cavuz --exclude '*~' --delete _build/html/* vukics,cppqed@web.sourceforge.net:htdocs/

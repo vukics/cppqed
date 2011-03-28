@@ -131,7 +131,7 @@ In the above, the necessary parameters must be previously defined somewhere. Par
 
 This possibility is indeed supported by the framework. Consider the following program:
 
-.. literalinclude:: ../examples/tutorialMode.cc
+.. literalinclude:: examples/tutorialMode.cc
   :language: c++
   :linenos:
 
@@ -231,7 +231,7 @@ From this point on, usage is the same as we have seen above for the mode example
 
 If the system is not to be used for anything else, just for being ``evolve``\ d, we can shake off the burden of having to invent all these redundant names like ``qbit``, ``mode``, ``act``, ``system``, ``trajectory``, and create everything in place. In this case a full-fledged script can be as terse as:
 
-.. literalinclude:: ../examples/tutorialBinary.cc
+.. literalinclude:: examples/tutorialBinary.cc
   :language: c++
   :linenos:
 
@@ -323,7 +323,7 @@ Therefore, if we need a named object storing our ``Composite``, we are better of
 
 A full-fledged script in the terse way may read as:
 
-.. literalinclude:: ../examples/tutorialComposite.cc
+.. literalinclude:: examples/tutorialComposite.cc
   :language: c++
   :linenos:
 

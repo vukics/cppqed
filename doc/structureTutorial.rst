@@ -24,14 +24,14 @@ The non-Hermitian Hamiltonian for the Monte Carlo wave-function method reads:
 
 The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`structure::ElementAveraged` that have to be written. Consider the file ``ExampleMode.h``:
 
-.. literalinclude:: ../examples/ExampleMode.h
+.. literalinclude:: examples/ExampleMode.h
   :language: c++
   :linenos:
   :lines: 2-
 
 This will suffice here. Let us look at the implementations in ``ExampleMode.cc``:
 
-.. literalinclude:: ../examples/ExampleMode.cc
+.. literalinclude:: examples/ExampleMode.cc
   :language: c++
   :linenos:
 
@@ -59,6 +59,6 @@ Lines 35-52:
 
 The implementation of the helpers is also quite straightforward. It may come to a separate file ``ExampleModeImpl.cc``:
 
-.. literalinclude:: ../examples/ExampleModeImpl.cc
+.. literalinclude:: examples/ExampleModeImpl.cc
   :language: c++
   :linenos:
