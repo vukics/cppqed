@@ -5,13 +5,13 @@ Requirements
 C++QEDv2 depends on a number of open source libraries:
 
 Boost C++ libraries 
-  provide indispensable extensions to the C++ standard, and are *de facto* standard by their own right. The framework depends on a number of them, the most notable ones being Fusion, Lambda, MPL, Operators, and Preprocessor. On many systems (a selection of) the Boost libraries are available. They are packaged for Debian and Mac OS X. Alternatively, they can be downloaded and installed from `the main Boost portal <http://www.boost.org>`_. Version 1.35 or higher is required.
+  provide indispensable extensions to the C++ standard, and are *de facto* standard by their own right. The framework depends on a number of them, the most notable ones being Fusion, Lambda, MPL, Operators, and Preprocessor. On many systems, (a selection of) the Boost libraries are available. They are packaged for Debian and Mac OS X. Alternatively, they can be downloaded and installed from `the main Boost portal <http://www.boost.org>`_. Version 1.35 or higher is required.
 
 GNU Scientific library (GSL) 
-  provides a very wide variety of numerical solutions in a solid object-oriented design (in C!). They are not used directly, but are wrapped into C++ classes and functions, so that they are easily replaced. Packaged for Debian and Mac OS X, or can be downloaded from `the GSL homepage <http://www.gnu.org/software/gsl/>`_. I haven't thoroughly determined the minimal version, but 1.8 is known to work.
+  provides a very wide variety of numerical solutions in a solid object-oriented design (in C!). They are not used directly, but are wrapped into C++ classes and functions, so that they are easily replaced (e.g. if licensing problems arise). Packaged for Debian and Mac OS X, or can be downloaded from `the GSL homepage <http://www.gnu.org/software/gsl/>`_. I haven't thoroughly determined the minimal version, but 1.8 is known to work.
 
 An implementation of BLAS and LAPACK
-  For many system optimized versions of these libraries exist and are even preinstalled. As a fallback, the reference implementation can always be used, which is packaged e.g. for Ubuntu.
+  For many system, optimized versions of these libraries exist and are even preinstalled. As a fallback, the reference implementation can always be used, which is packaged e.g. for Ubuntu.
 
 These three are best installed on system level. 
 
@@ -34,7 +34,7 @@ Flexible Library for Efficient Numerical Solutions (FLENS)
 
     The use of FLENS is optional because only a very small section of the framework depends on it. Cf. the section :ref:`compilingWithoutFLENS`.
 
-At the corresponding websites instructions for installing the libraries can be found, while below I have given guidelines concerning installation on an Ubuntu system, cf. also the ``getLibs.sh`` script in directory ``utils``. This will download the CVS versions of both libraries into the subdirectories ``blitz`` and ``FLENS-lite``, respectively, and will also compile them.
+At the corresponding websites, instructions for installing the libraries can be found, while below I have given guidelines concerning installation on an Ubuntu system, cf. also the ``getLibs.sh`` script in directory ``utils``. This will download the CVS versions of both libraries into the subdirectories ``blitz`` and ``FLENS-lite``, respectively, and will also compile them.
 
 I will very much appreciate all feedback regarding also the installation of the framework. 
 
@@ -178,4 +178,4 @@ In this case, those parts of the framework that rely on FLENS are discreetly dis
 ``utils``
 ------------
 
-The content of the directory ``utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves.
+The content of the directory ``utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves. Cf. :ref:`cpputils`.

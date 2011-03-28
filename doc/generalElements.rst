@@ -17,16 +17,43 @@ Mode
   H_\text{mode}&=\omega\adagger a+i\lp\eta\adagger-\hermConj\rp\\
   &\equiv-iz\adagger a+i\lp\eta\adagger-\hermConj\rp\equiv(-\delta-i\kappa)\adagger a+i\lp\eta\adagger-\hermConj\rp
 
+.. type:: mode::SmartPtr
+
+  ::
+
+    typedef boost::shared_ptr<const ModeBase> SmartPtr;
+
 
 .. class:: Mode
+
+
+.. function:: const mode::StateVector mode::coherent(const dcomp& alpha, size_t cutoff)
+
+.. function:: const mode::StateVector mode::init(const mode::Pars&)
+
+.. function:: const mode::SmartPtr mode::maker(const mode::Pars           &, QM_Picture, const A&)
+
+.. function:: const mode::SmartPtr mode::maker(const mode::ParsLossy      &, QM_Picture, const A&)
+
+.. function:: const mode::SmartPtr mode::maker(const mode::ParsPumped     &, QM_Picture, const A&)
+
+.. function:: const mode::SmartPtr mode::maker(const mode::ParsPumpedLossy&, QM_Picture, const A&)
+
+  template<typename A>
+
 
 .. todo::
 
    Clarify mfNKX_AbsSqr
 
 
-Particle
-^^^^^^^^^
+
+
+
+.. _generalElements_Particle:
+
+Particle in momentum space
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. math::
 

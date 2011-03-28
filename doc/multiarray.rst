@@ -56,7 +56,7 @@ Action of the operator in extended Hilbert spaces can then be calculated by acti
 The ``Array`` class of the Blitz++ library
 ----------------------------------------------
 
-Due to the abovementioned recursiveness, the state vector of a composite quantum system is most conveniently represented as a complex (:c:type:`dcomp`) multi-array. For a definition of the multi-array concept cf. the `Boost.MultiArray manual <http://www.boost.org/doc/libs/1_44_0/libs/multi_array/doc/reference.html#MultiArray>`_.
+Due to the abovementioned recursiveness, the state vector of a composite quantum system is most conveniently represented as a complex (:type:`dcomp`) multi-array. For a definition of the multi-array concept cf. the `Boost.MultiArray manual <http://www.boost.org/doc/libs/1_44_0/libs/multi_array/doc/reference.html#MultiArray>`_.
 
 By virtue of its adequacy for numerics and its efficiency, we have chosen the ``Array`` class from the `Blitz++ library <http://www.oonumerics.org>`_ to represent state vectors on the lowest level in the framework.
 
@@ -216,7 +216,7 @@ The following two classes are mainly helpers for :class:`~blitzplusplus::basi::I
 
 .. class:: blitzplusplus::basi::Indexer
 
-  :ref:`template parameters <basiTemplates>`: RANK, V
+  :ref:`template parameters <basiTemplates>`: ``<int RANK, typename V>``
 
   .. function::  static TTD_RES_CARRAY__LP__V__RP__& index(TTD_CARRAY__LP__RANK__RP__& array, TTD_RES_CARRAY__LP__V__RP__& arrayRes, const TTD_VEC_IDXTINY__LP__RANK__CO__V__RP__& idx)
 
