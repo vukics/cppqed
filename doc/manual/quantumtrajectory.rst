@@ -31,6 +31,12 @@ Ensembles of trajectories
 Master equation evolution
 ---------------------------
 
+.. math::
+  :label: masterEqInTermsOfMCWF
+
+  \dot\rho=\frac1{i\hbar}\comm{H}{\rho}+\sum_m\lp{J_m\rho{J_m^\dag}-\frac12\comm{J_m^\dag J_m}{\rho}_+}\rp\equiv\\\equiv\frac1{i\hbar}\lp\HnH\rho-\rho\HnH^\dag\rp+\sum_mJ_m\rho{J_m^\dag}=2\Re\lbr\frac\HnH{i\hbar}\rho\rbr+\sum_mJ_m\lp{J_m\rho}\rp^\dag
+
+
 .. namespace:: quantumtrajectory
 .. class:: quantumtrajectory::Master
 

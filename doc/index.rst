@@ -15,7 +15,7 @@ To start to understand and use the framework on the highest level, consult the u
 .. toctree::
    :maxdepth: 2
 
-   User Guide <tutorial/tutorial>
+   User Guide <manual/tutorial>
 
 To be able to write new modules representing elementary subsystems or interactions, consult the following guide:
 
@@ -44,11 +44,12 @@ ChangeLog
 Printable versions
 ------------------
 
-* :download:`User guide in pdf <./tutorial/_build/latex/C++QED_Tutorial.pdf>`
+* :download:`User Guide in pdf <./manual/_build/latex/C++QED_Tutorial.pdf>`
 
-* `PyCppQED tutorial <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
+* :download:`Element Guide in pdf <./manual/_build/latex/C++QED_structureTutorial.pdf>`
 
-.. * Manual: `pdf <_static/manual.pdf>`_
+* `PyCppQED tutorial in pdf <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
+
 
 
 ========

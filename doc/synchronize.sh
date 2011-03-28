@@ -1,10 +1,10 @@
-for dir in tutorial manual; do
+for dir in manual; do
   cd $dir/figures
   bash ../../processImages.sh
   cd ../..
 done
 
-cd tutorial; make latexpdf; 
+cd manual; make latexpdf; 
 cd ..
 
 make html
