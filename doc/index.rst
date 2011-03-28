@@ -12,13 +12,23 @@ Documentation
 
 To start to understand and use the framework on the highest level, consult the user guide. This will allow for building simulations using the already existing modules and elementary systems as building blocks.
 
-For a deeper understanding and to be able to extend the framework with new elements, the upcoming reference manual will have to be consulted. In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
-
 .. toctree::
    :maxdepth: 2
 
    User Guide <tutorial/tutorial>
-   
+
+To be able to write new modules representing elementary subsystems or interactions, consult the following guide:
+
+.. toctree::
+   :maxdepth: 2
+
+   Element Guide <manual/structureTutorial>
+
+For a deeper understanding and to be able to extend the framework with new modules, the upcoming reference manual will have to be consulted. In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
+
+.. toctree::
+   :maxdepth: 2
+
    Reference Manual <manual/manual>
 
 -------------
