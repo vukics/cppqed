@@ -22,7 +22,7 @@
 
     ::
 
-      typedef TTD_EXTTINY(RANK) Dimensions;
+      typedef TTD_ExtTiny<RANK> Dimensions;
 
 
 
@@ -53,11 +53,11 @@
 
   ::
 
-    typedef TTD_CARRAY(  RANK)     StateVectorLow;
+    typedef TTD_CArray<RANK> StateVectorLow;
 
   .. type:: DensityOperatorLow
 
   ::
 
-    typedef TTD_CARRAY(2*RANK) DensityOperatorLow;
+    typedef TTD_CArray<2*RANK> DensityOperatorLow;
 

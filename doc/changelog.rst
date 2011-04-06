@@ -1,6 +1,6 @@
-*************************
+*********
 ChangeLog
-*************************
+*********
 
 
 2010/02/15 Switching to `Bazaar <https://sourceforge.net/scm/?type=bzr&group_id=187775>`_ revision control

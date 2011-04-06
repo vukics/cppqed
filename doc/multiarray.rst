@@ -1,13 +1,13 @@
 .. _multiarray:
 
-==================================
+***********************
 The multi-array concept
-==================================
+***********************
 
 
----------------------------------------------
+===========================================
 Synopsis: The state vector as a multi-array
----------------------------------------------
+===========================================
 
 First we introduce basic definitions about the algebra of composite quantum systems, that is, when the state vector of the system is an element of a Hilbert space which is the direct product of elementary Hilbert spaces (by elementary we mean that it cannot be further decomposed as a direct product of more elementary Hilbert spaces):
 
@@ -26,7 +26,7 @@ Via an example we define *state-vector slices*
 
   \ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}=\sum_{i=1,3,6,7,9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i
 
-Slicing is fully recursive in that a state-vector slice behaves exactly as a state vector only with a lower rank. It can even be further sliced. It is in particular true that
+Slicing is fully recursive in that a state-vector slice behaves exactly as a state vector, only with a lower rank. It can even be further sliced. It is in particular true that
 
 .. math::
   :label: stateVectorSlicesRecursive
@@ -52,22 +52,22 @@ Action of the operator in extended Hilbert spaces can then be calculated by acti
   \bra\iota A^{\avr{3,6,1,9,7}}(\HSpace)\ket\Psi=\bra{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}A^{\avr{1,2,0,4,3}}\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}
 
 
-----------------------------------------------
+==========================================
 The ``Array`` class of the Blitz++ library
-----------------------------------------------
+==========================================
 
 Due to the abovementioned recursiveness, the state vector of a composite quantum system is most conveniently represented as a complex (:type:`dcomp`) multi-array. For a definition of the multi-array concept cf. the `Boost.MultiArray manual <http://www.boost.org/doc/libs/1_44_0/libs/multi_array/doc/reference.html#MultiArray>`_.
 
 By virtue of its adequacy for numerics and its efficiency, we have chosen the ``Array`` class from the `Blitz++ library <http://www.oonumerics.org>`_ to represent state vectors on the lowest level in the framework.
 
-In :ref:`C++Utils <cpputils>`, our collection of general-purpose modules, we rely on the macro :c:macro:`TTD_CARRAY`, while in higher levels of the framework we use the more intuitive name :type:`~quantumdata::Types::StateVectorLow`.
+In :ref:`utils <cpputils>`, our collection of general-purpose modules, we rely on the template alias :class:`TTD_CArray`, while in higher levels of the framework we use the more intuitive name :type:`~quantumdata::Types::StateVectorLow`.
 
 
 .. _basiSlicing:
 
----------------------------------------------
+==============
 Slice iterator
----------------------------------------------
+==============
 
 .. namespace:: blitzplusplus::basi
 
@@ -102,12 +102,12 @@ The name of the namespace stands for BlitzArraySliceIterator.
     Governs the constness of :class:`~blitzplusplus::basi::Iterator`.
 
   ``typename A``
-    Must be a :c:macro:`TTD_CARRAY(RANK) <TTD_CARRAY>`.
+    Must be a :class:`TTD_CArray`\ ``<RANK>``.
 
 
 .. class:: blitzplusplus::basi::Iterator
 
-  :ref:`template parameters <basiTemplates>`: RANK, V, IS_CONST
+  ``template <int RANK, typename V, bool IS_CONST>`` (cf. :ref:`template parameters <basiTemplates>`)
 
   Model of `ForwardIterator <http://www.cplusplus.com/reference/std/iterator/ForwardIterator/>`_.
 
@@ -115,11 +115,11 @@ The name of the namespace stands for BlitzArraySliceIterator.
 
     This is equivalent to ::
 
-      TTD_CARRAY(RANK-mpl::size<V>::value)
+      TTD_CArray<RANK-mpl::size<V>::value>
 
     when ``IS_CONST`` is ``false`` and ::
 
-      const TTD_CARRAY(RANK-mpl::size<V>::value)
+      const TTD_CArray<RANK-mpl::size<V>::value>
 
     when it is ``true``. ``Iterator`` can be both const and non-const iterator depending on the last template argument.
 
@@ -140,13 +140,13 @@ The name of the namespace stands for BlitzArraySliceIterator.
 **Semantics:**
   Sticking to the example in :eq:`canonicalOperatorExtensionsAction` above, assume that the function ::
 
-    void actWithA(TTD_CARRAY(5)&);
+    void actWithA(TTD_CArray<5>&);
 
   implements the action of the operator :math:`A` on a state vector of rank 5, then the action on the extended Hilbert space can be calculated as ::
 
     static const int RANK=11;
 
-    TTD_CARRAY(RANK) psi;
+    TTD_CArray<RANK> psi;
 
     typedef tmptools::Vector<3,6,1,9,7> Vec;
     for_each(blitzplusplus::basi::fullRange(psi,Vec()),actWithA);
@@ -173,7 +173,7 @@ The name of the namespace stands for BlitzArraySliceIterator.
 
   .. function:: const Range  blitzplusplus::basi::fullRange(      A& array, V v)
 
-    :ref:`template parameters <basiTemplates>` for all these functions: A, V
+    ``template <typename A, typename V>`` for all these functions (cf. :ref:`template parameters <basiTemplates>`) 
 
     The return types are defined as ::
 
@@ -190,9 +190,9 @@ The following two classes are mainly helpers for :class:`~blitzplusplus::basi::I
 
 .. class:: blitzplusplus::basi::Transposer
 
-  :ref:`template parameters <basiTemplates>`: RANK, V
+  ``template <int RANK, typename V>`` (cf. :ref:`template parameters <basiTemplates>`)
 
-  .. function:: static TTD_CARRAY__LP__RANK__RP__& transpose(TTD_CARRAY__LP__RANK__RP__& array)
+  .. function:: static TTD_CArray<RANK>& transpose(TTD_CArray<RANK>& array)
 
     The returned reference simply equals the function argument.
 
@@ -203,7 +203,7 @@ The following two classes are mainly helpers for :class:`~blitzplusplus::basi::I
 
       static const int RANK=11;
 
-      TTD_CARRAY(RANK) psi;
+      TTD_CArray<RANK> psi;
 
       typedef tmptools::Vector<3,6,1,9,7> Vec;
       Transposer<RANK,Vec>::transpose(psi);
@@ -216,36 +216,36 @@ The following two classes are mainly helpers for :class:`~blitzplusplus::basi::I
 
 .. class:: blitzplusplus::basi::Indexer
 
-  :ref:`template parameters <basiTemplates>`: ``<int RANK, typename V>``
+  ``template <int RANK, typename V>`` (cf. :ref:`template parameters <basiTemplates>`)
 
-  .. function::  static TTD_RES_CARRAY__LP__V__RP__& index(TTD_CARRAY__LP__RANK__RP__& array, TTD_RES_CARRAY__LP__V__RP__& arrayRes, const TTD_VEC_IDXTINY__LP__RANK__CO__V__RP__& idx)
+  .. function::  static TTD_ResCArray<V>& index(TTD_CArray<RANK>& array, TTD_ResCArray<V>& arrayRes, const TTD_VecIdxTiny<RANK,V>& idx)
 
     The returned reference simply equals the second function argument.
 
-    Here the following local macros are in effect:
+    Here the following local template aliases are in effect:
   
-    .. c:macro:: TTD_RES_CARRAY(V)
+    .. class:: TTD_ResCArray
 
-    ::
+      ``template <typename V>``::
   
-      #define TTD_RES_CARRAY(V) TTD_CARRAY(mpl::size<V>::value)
+        template <typename V> using TTD_ResCArray=TTD_CArray<mpl::size<V>::value>
 
-    .. c:macro:: TTD_VEC_IDXTINY(RANK,V)
-  
-    ::
+    .. class:: TTD_VecIdxTiny
 
-      #define TTD_VEC_IDXTINY(RANK,V) TTD_IDXTINY(RANK-mpl::size<V>::value)
+      ``template <int RANK, typename V>``::
+
+        template <int RANK, typename V> using TTD_VecIdxTiny=TTD_IdxTiny<RANK-mpl::size<V>::value>
 
   **Semantics:**
     ::
 
       static const int RANK=11;
 
-      TTD_CARRAY(RANK) psi;
+      TTD_CArray<RANK> psi;
 
       typedef tmptools::Vector<3,6,1,9,7> Vec;
-      TTD_RES_CARRAY(VEC) psiRes;
-      TTD_VEC_IDXTINY(RANK,VEC) idxTiny;
+      TTD_ResCArray<VEC> psiRes;
+      TTD_VecIdxTiny<RANK,VEC> idxTiny;
 
       Indexer<RANK,Vec>::index(psi,psiRes,idxTiny);
 
@@ -255,16 +255,14 @@ The following two classes are mainly helpers for :class:`~blitzplusplus::basi::I
       psiRes.reference(psi(0,a,2,a,4,5,a,a,8,a,10));
 
 
-
-Implementation
-^^^^^^^^^^^^^^^^
-
 .. toctree::
    :maxdepth: 2
 
    Notes on implementation <multiarrayImplementation>
 
 
+------------
 Performance
-^^^^^^^^^^^^^^^^
+------------
+
 As a function of the arity of slices (size of V) cf. C++Utils/testsuite/BlitzArraySliceIterator.cc 5th test case.

@@ -74,9 +74,9 @@ The solution adopted to this problem in C++QED is represented by the class :clas
 
   .. type:: Idx
 
-    The type used for indexing the "rows" and the "columns", this is either a normal, or a multi-index, in the latter case represented by a :c:macro:`TTD_IDXTINY`::
+    The type used for indexing the "rows" and the "columns", this is either a normal, or a multi-index, in the latter case represented by a :class:`TTD_IdxTiny`::
 
-      typedef typename mpl::if_c<(RANK==1),int,TTD_IDXTINY(RANK)>::type Idx;
+      typedef typename mpl::if_c<(RANK==1),int,TTD_IdxTiny<RANK> >::type Idx;
       // Idx is just an int if RANK==1, otherwise a tiny of ints
 
   .. function:: LazyDensityOperator(const Dimensions& dims)
@@ -156,18 +156,9 @@ The :class:`~quantumdata::StateVector` and :class:`~quantumdata::DensityOperator
   * As an implementation of :class:`~quantumdata::LazyDensityOperator`
 
 
-State vector
-^^^^^^^^^^^^^^^
-
 .. toctree::
 
   quantumdataStateVector
-
-
-Density operator
-^^^^^^^^^^^^^^^^^
-
-.. toctree::
 
   quantumdataDensityOperator
 
@@ -177,23 +168,12 @@ Representing state vectors & density operators in non-orthogonal bases
 
 We rely on the :ref:`covariant-contravariant formalism <NonOrthogonalFormalism>` to represent these in the framework.
 
-The user has considerable freedom in how he defines the metrical transformation for a given non-orthogonal basis, the only requirement being that there is a specialized instant of :class:`quantumdata::transformation::Traits` for the type representing the transformation. When compositing elementary Hilbert spaces, the framework takes care about the correct composition of the elementary metrical transformations. Of course, once there is a single non-orthogonal component, the whole composite has to be represented by non-orthogonal classes, in which case the system substitutes a :class:`quantumdata::transformation::Identity` dummy transformation for the metrics of such components as are represented in orthogonal bases.
-
-
-The infrastructure for defining metrical transformations
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The user has considerable freedom in how the metrical transformation for a given non-orthogonal basis is defined, the only requirement being that there is a specialized instant of :class:`quantumdata::transformation::Traits` for the type representing the transformation. When compositing elementary Hilbert spaces, the framework takes care of the correct composition of the elementary metrical transformations. Of course, once there is a single non-orthogonal component, the whole composite has to be represented by non-orthogonal classes, in which case the system substitutes a :class:`quantumdata::transformation::Identity` dummy transformation for the metrics of such components as are represented in orthogonal bases.
 
 .. toctree::
    :maxdepth: 2
 
    The infrastructure for defining metrical transformations <quantumdataTransformations>
-
-
-Non-orthogonal state vector & density operator
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-.. toctree::
-   :maxdepth: 2
 
    quantumdataNonOrthogonalStateVector
 
@@ -303,11 +283,11 @@ On higher levels of the framework, the iteration is performed via the function:
       This will calculate :math:`\avr{a^\dag b}` (now :math:`b` and :math:`a` being the ladder operators of the modes at position 1 and 3, respectively) for the partial density operator of the embedded system (but without explicitly calculating this partial density operator).
 
     Accumulating an arbitrary ensemble of quantum averages:
-      An arbitrary ensemble of real or complex numbers can be stored in a :c:macro:`TTD_DARRAY(1) <TTD_DARRAY>` or :c:macro:`TTD_CARRAY(1) <TTD_CARRAY>` (or even ``std::valarray``\ s), as these types fulfill all the requirements on type ``T``. The former was used to define the abstract interface :class:`structure::Averages`, one implementation being :class:`Mode`.
+      An arbitrary ensemble of real or complex numbers can be stored in a :class:`TTD_DArray`\ ``<1>`` or :class:`TTD_CArray`\ ``<1>`` (or even ``std::valarray``\ s), as these types fulfill all the requirements on type ``T``. The former was used to define the abstract interface :class:`structure::Averages`, one implementation being :class:`Mode`.
 
       E.g. a function for a harmonic-oscillator mode calculating :math:`\avr{a^\dag a}`, :math:`\avr{\lp a^\dag a\rp^2}`, and the real and imaginary parts of :math:`\avr{a}`, may be defined as ::
 
-        typedef TTD_DARRAY(1) Averages;
+        typedef TTD_DArray<1> Averages;
 
 	const Averages
 	calculateModeAverages(const LazyDensityOperator<1>& matrix) const

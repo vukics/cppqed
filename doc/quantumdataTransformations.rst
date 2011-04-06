@@ -68,17 +68,17 @@ For the dummy transformation :class:`~quantumdata::transformation::Identity`:
 
   (Most of the times, the dummy ``transform`` function will not be called for such classes because the :class:`~quantumdata::transformation::Identity` components are filtered out at compile time from :class:`~quantumdata::transformation::Composite` transformations.)
 
-A :c:macro:`TTD_CARRAY(2*RANK) <TTD_CARRAY>` can represent a transformation of rank ``RANK``:
+A :class:`TTD_CArray`\ ``<2*RANK>`` can represent a transformation of rank ``RANK``:
 
   ::
 
     template<int TWO_TIMES_RANK>
-    struct Traits<TTD_CARRAY(TWO_TIMES_RANK)> : ElementaryTraits<TTD_CARRAY(TWO_TIMES_RANK)>
+    struct Traits<TTD_CArray<TWO_TIMES_RANK> > : ElementaryTraits<TTD_CArray<TWO_TIMES_RANK> >
     {
       static const int N_RANK=TWO_TIMES_RANK/2;
 
       typedef typename Types<N_RANK>::StateVectorLow StateVectorLow;
-      static void transform(const TTD_CARRAY(TWO_TIMES_RANK)& trafo, const StateVectorLow& in, StateVectorLow& out);
+      static void transform(const TTD_CArray<TWO_TIMES_RANK>& trafo, const StateVectorLow& in, StateVectorLow& out);
 
     };
 
@@ -89,7 +89,7 @@ A pointer to a function with the appropriate signature:
   ::
 
     template<int RANK>
-    struct Traits< void(*)(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&) > : ElementaryTraits< void(*)(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&) >
+    struct Traits< void(*)(const TTD_CArray<RANK>&, TTD_CArray<RANK>&) > : ElementaryTraits< void(*)(const TTD_CArray<RANK>&, TTD_CArray<RANK>&) >
     {
       static const int N_RANK=RANK;
 

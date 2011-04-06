@@ -412,22 +412,16 @@ Release
 The current release of the framework is C++QEDv2 Milestone 8, and it is a bugfix release. The development is now in beta stage with no known major bugs. The foreseeable steps in the development are as follows:
 
 Milestone 9 
-  will concentrate on improving the documentation. A reference or extenders' manual will be provided.
+  will concentrate on improving the documentation. A reference or extenders' manual will be provided, together with introductory guides.
 
 Milestone 10 
-  will be a release with some new features implemented. For some of these, the idea arose when writing this user guide.
-
-Milestone 11 
-  will be a release with improved coding. While the runtime performance should be close to optimal by now, there is probably a lot to improve in the template and preprocessor metaprogramming parts. This can significantly cut on resources needed to compile the framework.
+  will see the creation of a more general quantum-operator class of which :class:`~quantumoperator::Tridiagonal` will be only one implementation, while others can be operators with sparse and full matrices. They should be arbitrarily combinable with expression-template like closures taking care of the necessary internal loops. The expression-template mechanism will be implemented using the `Boost.Proto library <http://www.boost.org/doc/libs/1_46_1/doc/html/proto.html>`_.
 
 Milestone 12 
-  will see the possibility to use non-orthogonal bases for free elements implemented. The framework is already prepared for this. A prominent example is of course modes in coherent-state bases.
+  will see the possibility to use non-orthogonal bases for free elements implemented. The framework is already prepared for this, and it is already present in prototype. A prominent example is of course modes in coherent-state bases.
 
 Milestone ... 
   will achieve complete recursiveness in the definition of composite systems.
-
-Milestone ... 
-  will see the creation of a more general quantum-operator class of which :class:`~quantumoperator::Tridiagonal` will be only one implementation, while others can be operators with sparse and full matrices. They should be arbitrarily combinable with expression-template like closures taking care of the necessary internal loops.
 
 Milestone ...
   possibility of partial differential equations as Schrödinger equations.

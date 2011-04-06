@@ -66,7 +66,7 @@ State vector
 
       template<typename OTHER> StateVector& operator=(const OTHER& other) {operator()()=other; return *this;}
 
-    Together with the default assigment, which has the desired (by value) semantics in this case, this assignment covers a lot of possibilities, including also assignment from a StateVectorLow, but for example also from a :c:macro:`TTD_DARRAY(RANK) <TTD_DARRAY>`.
+    Together with the default assigment, which has the desired (by value) semantics in this case, this assignment covers a lot of possibilities, including also assignment from a StateVectorLow, but for example also from a :class:`TTD_DArray`\ ``<RANK>``.
 
   .. function:: StateVector& operator+=(const StateVector& psi)
   

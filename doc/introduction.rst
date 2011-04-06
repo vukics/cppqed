@@ -1,9 +1,9 @@
 
-=============
+*************
 Introduction
-=============
+*************
 
-This manual describes C++QED: a framework for simulating open quantum dynamics. 
+**This manual describes C++QED: a framework for simulating open quantum dynamics.**
 
 It is mainly for developers who wish to extend the framework for their own further purposes. For a first introduction and the description of some basic ideas underlying the framework cf. the `tutorial <http://cppqed.sourceforge.net/tutorial/tutorial.html>`_.
 
@@ -14,7 +14,7 @@ The organization of the framework may be sketched as follows:
 
 The document is accordingly organized as follows:
 
-* In section :ref:`multiarray` we describe the basic organizing concept of the framework, which directly follows from the algebra of composite quantum systems, and entails the need for using template metaprogramming. This section would properly belong to a latter section describing the utility library :ref:`C++Utils <cpputils>`, but due to its importance we put it to the beginning.
+* In section :ref:`multiarray` we describe the basic organizing concept of the framework, which directly follows from the algebra of composite quantum systems, and entails the need for using C++ template metaprogramming (TMP). This section would properly belong to a latter section describing the utility library :ref:`utils <cpputils>`, but due to its importance we put it to the beginning.
 
 * The following sections :ref:`quantumdata`, :ref:`structure`, and :ref:`quantumtrajectory` describe the core of the framework.
 
@@ -24,23 +24,23 @@ The document is accordingly organized as follows:
 
 * There follows a selection of :ref:`generalElements` for demonstrating how elementary quantum systems acting as building blocks for composites can be implemented.
 
-* The next section describes our utility library :ref:`C++Utils <cpputils>`. The scope of this extends far beyond C++QED proper, defining very general (physical) concepts, which may be useful for other projects as well.
+* The next section describes our utility library :ref:`utils <cpputils>`. The scope of this extends far beyond C++QED proper, defining very general (physical) concepts, which may be useful for other projects as well.
 
 * Thorough :ref:`Testing <testing>` of the framework is a highly nontrivial problem, which forms the subject of the next section.
 
 * Finally, the :ref:`appendices` describe some physical considerations underlying the framework, followed by :ref:`rationales` of style, design, and implementation, which have been observed throughout the development, and should be observed by any extension as well.
 
 
---------------------
+================
 A note on ranges
---------------------
+================
 
 For algorithms we rely throughout on the range concept from the `Boost.Range <http://www.boost.org/doc/libs/1_44_0/libs/range/index.html>`_ library. Since at the moment (Boost version 1.41) the range algorithms are not part of Boost yet (this will be Boost.RangeEx in the future), these are provided in the distribution of the framework under ``C++Utils/include/range_ex/``.
 
 
-------------------------------
+=============================
 A note on the use of Blitz++
-------------------------------
+=============================
 
 A general problem is that the use of ``int``, ``size_t``, and ``ptrdiff_t`` is not consistent. In the framework we tried to use them consistently, but in Blitz only ``int`` is used in all situations like indexing, extents and even rank template parameters, so in the interaction with Blitz we could not remain consistent.
 
@@ -58,12 +58,11 @@ Our own extensions to blitz can be found in :ref:`C++Utils <cpputils>` and are d
 
 .. _globalDefs:
 
--------------------------------
+===========================
 Global typedefs and macros
--------------------------------
+===========================
 
-The following definitions are in effect throughout the framework and
-the present manual:
+The following definitions are in effect throughout the framework and the present manual:
 
 .. type:: dcomp 
 
@@ -77,29 +76,44 @@ the present manual:
 
     const dcomp DCOMP_I(0,1);
 
-.. c:macro:: TTD_DARRAY(r)
 
-  ::
+-----------------
+Template aliases
+-----------------
+
+In this manual, we are relying on the C++0x feature of *template aliases* to make documentation easier. However, in the framework, we are not using this feature, as this would limit too much the range of compilers able to cope with the framework.
+
+For instance:
+
+.. class:: TTD_DArray
+
+  ``template <int RANK>``
+
+  is assumed in this document to be a template alias::
+
+    template <int RANK> using TTD_DArray=blitz::Array<double,RANK>;
+
+  In the framework, however, it is simply defined as a macro (with all capitals)::
 
     #define TTD_DARRAY(r) blitz::Array<double,r>
 
-.. c:macro:: TTD_CARRAY(r)
+.. class:: TTD_CArray
 
-  ::
+  ``template <int RANK>``::
 
-    #define TTD_CARRAY(r) blitz::Array<dcomp ,r>
+    template <int RANK> using TTD_CArray=blitz::Array<dcomp,RANK>;
 
-.. c:macro:: TTD_EXTTINY(r)
+.. class:: TTD_ExtTiny
 
-  ::
+  ``template <int RANK>``::
 
-    #define TTD_EXTTINY(r) blitz::TinyVector<   size_t,r>
+    template <int RANK> using TTD_ExtTiny=blitz::TinyVector<size_t,RANK>;
 
-.. c:macro:: TTD_IDXTINY(r)
+.. class:: TTD_IdxTiny::
 
-  ::
+  ``template <int RANK>``::
 
-    #define TTD_IDXTINY(r) blitz::TinyVector<ptrdiff_t,r>
+    template <int RANK> using TTD_IdxTiny=blitz::TinyVector<ptrdiff_t,RANK>
 
 .. type:: linalg::CVector
 
@@ -107,7 +121,7 @@ the present manual:
 
     namespace linalg {
 
-    typedef TTD_CARRAY(1) CVector;
+    typedef TTD_CArray<1> CVector;
 
     } // linalg
 
@@ -117,11 +131,16 @@ the present manual:
 
     namespace linalg {
 
-    typedef TTD_CARRAY(2) CMatrix;
+    typedef TTD_CArray<2> CMatrix;
 
     } // linalg
 
 The prefix ``TTD`` stands for "template typedef" here and throughout the framework.
+
+
+------------------
+Namespace aliases
+------------------
 
 We will also use the following namespace alias ::
 

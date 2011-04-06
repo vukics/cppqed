@@ -1,5 +1,7 @@
+******************************************************************
 :class:`~blitzplusplus::basi::Iterator`---Notes on implementation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+******************************************************************
+
 
 .. py:module:: IndexerImplementations(Specializations).h
    :synopsis: Auto-generates code for Transposer and Indexer

@@ -2,7 +2,7 @@
    :linenothreshold: 10
 
 *************************
-C++QEDv2 Reference Manual
+Reference Manual
 *************************
 
 The manual is currently heavily under development... In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.

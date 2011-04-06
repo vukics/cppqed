@@ -1,6 +1,6 @@
-------------
+************
 Requirements
-------------
+************
 
 C++QEDv2 depends on a number of open source libraries:
 
@@ -38,9 +38,9 @@ At the corresponding websites, instructions for installing the libraries can be 
 
 I will very much appreciate all feedback regarding also the installation of the framework. 
 
---------------------------------------
+======================
 Installation on Ubuntu
---------------------------------------
+======================
 
 The following is a rudimentary list of prerequisite packages on Ubuntu 9.10:: 
 
@@ -50,8 +50,9 @@ This will install the first three libraries listed above on system level.
 
 The following steps to install the remaining two libraries constitute also the script ``utils/getLibs.sh``.
 
+-----------------
 Install Blitz++:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------
 
 ::
 
@@ -66,8 +67,9 @@ Hit enter when prompted for password. ::
   make lib
   sudo make install
 
+---------------
 Install FLENS:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------
 
 .. note::
 
@@ -92,9 +94,9 @@ If the last command issues the error message::
 you have to edit ``Makefile.common`` replacing the variable ``$(PWD)`` with the path of the current directory.
 
 
---------------------------
+================
 Obtaining C++QED
---------------------------
+================
 
 There are two ways, the first being to download the latest package from `<http://sourceforge.net/projects/cppqed/files/>`_. This is only recommended if the package is not too old.
 
@@ -111,9 +113,9 @@ Be aware that C++QED is under development, so changes in the Bazaar version may 
   bzr pull -r date:2010-02-14 bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed
 
 
------------
+===========
 Compilation
------------
+===========
 
 The canonical way to compile the framework is the one using Boost.Build. This is best installed on system level. Typing ::
 
@@ -161,8 +163,9 @@ C++QEDv2 has been successfully compiled on several Linux platforms and Mac OS X.
 
 .. _compilingWithoutFLENS:
 
+-------------------------
 Compiling without FLENS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 There is a compilation feature which can be supplied to Boost.Build::
 
@@ -174,8 +177,8 @@ In this case, those parts of the framework that rely on FLENS are discreetly dis
   :linenothreshold: 10
 
 
-------------
+=========
 ``utils``
-------------
+=========
 
 The content of the directory ``utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves. Cf. :ref:`cpputils`.

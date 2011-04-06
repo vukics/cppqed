@@ -1,5 +1,6 @@
+****************************************
 Implementing a harmonic-oscillator mode
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+****************************************
 
 We demonstrate how to implement an element representing a pumped lossy mode in a truncated Fock space. It is described by the Hamiltonian:
 
