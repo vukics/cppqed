@@ -43,15 +43,34 @@ The ``trajectory`` namespace
 .. class:: cpputils::MultiIndexIterator
 
 
---------------------
-``vfmsi::Iterator``
---------------------
+.. _cpputils_VFMSI:
 
+------------------------------
+VectorFromMatrixSliceIterator
+------------------------------
 
 
 ------------------
 Other
 ------------------
+
+
+.. class:: tmptools::OrdinalMF
+
+  ``template <int RANK>``
+
+  .. type:: type
+
+
+.. class:: tmptools::numerical_contains
+
+  ``template<typename Seq, typename ICW>``
+
+
+.. class:: tmptools::Vector
+
+  ``template <int V0=TMPTOOLS_VECTOR_DEFAULT_ARG, ...>``
+
 
 .. todo::
 

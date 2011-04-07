@@ -129,7 +129,7 @@ The name of the namespace stands for BlitzArraySliceIterator.
 
   * :class:`Composite` and :class:`BinarySystem`
 
-  * :class:`blitzplusplus::vfmsi::Iterator`
+  * iterations over (multi)matrix rows and columns to get (multi)vectors (cf. :ref:`cpputils_VFMSI`)
 
   * :class:`quantumdata::ldo::DiagonalIterator`
 
