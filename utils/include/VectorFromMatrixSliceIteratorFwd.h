@@ -14,21 +14,8 @@ struct Right;
 template<int RANK, typename S>
 struct LeftRight 
 
-template<int, typename, bool> 
-struct Iterator;
-
 
 } // vfmsi
-
-
-namespace vfmsi_fast {
-
-
-template<int, typename, bool> 
-struct Iterator;
-
-
-} // vfmsi_fast
 
 
 } // blitzplusplus
