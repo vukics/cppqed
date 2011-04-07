@@ -9,7 +9,7 @@ The multi-array concept
 Synopsis: The state vector as a multi-array
 ===========================================
 
-First we introduce basic definitions about the algebra of composite quantum systems, that is, when the state vector of the system is an element of a Hilbert space which is the direct product of elementary Hilbert spaces (by elementary we mean that it cannot be further decomposed as a direct product of more elementary Hilbert spaces):
+First, we introduce basic definitions on the algebra of composite quantum systems, that is, when the state vector of the system is an element of a Hilbert space which is the direct product of elementary Hilbert spaces (by elementary we mean that it cannot be further decomposed as a direct product of more elementary Hilbert spaces):
 
 .. math::
   :label: compositeHilbertSpace
@@ -19,7 +19,7 @@ First we introduce basic definitions about the algebra of composite quantum syst
 
 The number of elementary Hilbert spaces (the number of quantum numbers of the system) is referred to throughout as the *rank* or *arity* (un\ *ary*, bin\ *ary*, tern\ *ary*, quatern\ *ary*, etc.) of the system.
 
-Via an example we define *state-vector slices* 
+Via an example we define *state-vector slices:*
 
 .. math::
   :label: stateVectorSlices
@@ -33,7 +33,7 @@ Slicing is fully recursive in that a state-vector slice behaves exactly as a sta
 
   \braket\iota\Psi=\braket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}
 
-Via an example we define *canonical operator extensions* 
+Via an example we define *canonical operator extensions:*
 
 .. math::
   :label: canonicalOperatorExtensions
@@ -94,7 +94,7 @@ The name of the namespace stands for BlitzArraySliceIterator.
   ``typename V``
     Holds vectors like :math:`\avr{3,6,1,9,7}` in :eq:`canonicalOperatorExtensions` describing the slice.
     
-    Models: :class:`tmptools::Vector` and ``mpl::range_c``.
+    Example models: :class:`tmptools::Vector` and ``mpl::range_c`` from `Boost.MPL <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/range-c.html>`_.
 
     ``mpl::size<V>::value`` must not be larger than ``RANK``. ``V`` must not "contain" negative values, values not smaller than ``RANK``, and duplicate values. These are checked for at compile time, and any violation is signalled by more or less intelligent compiler-errors generated with the help of `static asserts of Boost.MPL <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/asserts.html>`_.
 
@@ -159,31 +159,31 @@ The name of the namespace stands for BlitzArraySliceIterator.
 .. _basiMakers:
 
 **Maker functions**
-  corresponding to :class:`~blitzplusplus::basi::Iterator` intelligently dispatch the constness of the Array:
+  :class:`~blitzplusplus::basi::Iterator`\ 's maker functions intelligently dispatch the constness of the Array:
 
-  .. function:: const IterC blitzplusplus::basi::begin(const A& array, V v)
+  .. function:: const IterC<A,V> blitzplusplus::basi::begin(const A& array, V v)
 
-  .. function:: const IterC blitzplusplus::basi::end  (const A& array, V v)
+  .. function:: const IterC<A,V> blitzplusplus::basi::end  (const A& array, V v)
 
-  .. function:: const Iter  blitzplusplus::basi::begin(      A& array, V v)
+  .. function:: const Iter<A,V>  blitzplusplus::basi::begin(      A& array, V v)
 
-  .. function:: const Iter  blitzplusplus::basi::end  (      A& array, V v)
+  .. function:: const Iter<A,V>  blitzplusplus::basi::end  (      A& array, V v)
 
-  .. function:: const RangeC blitzplusplus::basi::fullRange(const A& array, V v)
+  .. function:: const RangeC<A,V> blitzplusplus::basi::fullRange(const A& array, V v)
 
-  .. function:: const Range  blitzplusplus::basi::fullRange(      A& array, V v)
+  .. function:: const Range<A,V>  blitzplusplus::basi::fullRange(      A& array, V v)
 
     ``template <typename A, typename V>`` for all these functions (cf. :ref:`template parameters <basiTemplates>`) 
 
-    The return types are defined as ::
+    Here, the following template aliases are in effect::
 
-      #define IterC Iterator<A::_bz_rank,V,true >
-      #define Iter  Iterator<A::_bz_rank,V,false>
+      template <typename A, typename V> using IterC=Iterator<A::_bz_rank,V,true >;
+      template <typename A, typename V> using Iter =Iterator<A::_bz_rank,V,false>;
 
-      #define RangeC boost::iterator_range<IterC>
-      #define Range  boost::iterator_range<Iter >
+      template <typename A, typename V> using RangeC=boost::iterator_range<IterC<A,V> >
+      template <typename A, typename V> using Range =boost::iterator_range<Iter <A,V> >
 
-    the trailing dummy argument ``V`` is necessary for allowing template-parameter deduction
+    the trailing dummy argument ``V`` is present for allowing template-parameter deduction
 
 
 The following two classes are mainly helpers for :class:`~blitzplusplus::basi::Iterator`, but sometimes are used on their own as well, so they are exposed in the header file:
