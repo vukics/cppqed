@@ -1,20 +1,25 @@
+*************
 State vector
-^^^^^^^^^^^^^^^
+*************
 
 .. py:module:: StateVector.h
    :synopsis: Defines StateVector in namespace quantumdata and corresponding operations
 
 .. class:: quantumdata::StateVector
 
-  :ref:`template parameters <quantumdataTemplates>`: RANK; inherits publicly from :class:`~quantumdata::LazyDensityOperator`, and privately from :class:`~quantumdata::ArrayBase`, and also from :class:`linalg::VectorSpace` which adds a lot of free-standing arithmetic functions.
+  ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`); inherits publicly from :class:`~quantumdata::LazyDensityOperator`\ ``<RANK>``, and privately from :class:`~quantumdata::ArrayBase`\ ``<RANK>``, and also from :class:`linalg::VectorSpace`\ ``<StateVector<RANK> >`` which adds a lot of free-standing arithmetic functions.
 
   .. type:: Dimensions
 
     (inherited from :class:`DimensionsBookkeeper`)
 
   .. type:: StateVectorLow
+
+    same as :type:`quantumdata::Types::StateVectorLow`
   
   .. type:: DensityOperatorLow
+
+    same as :type:`quantumdata::Types::DensityOperatorLow`
 
   .. function:: StateVector(const StateVectorLow& psi, ByReference)
 
@@ -30,7 +35,7 @@ State vector
 
   .. function:: StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK__MI__RANK2>& psi2)
 
-    :ref:`template parameters <quantumdataTemplates>`: RANK2
+    ``template <int RANK2>``
 
     Constructs the class as the direct product of ``psi1`` and ``psi2``, whose arities add up to ``RANK``.
 
@@ -62,7 +67,7 @@ State vector
 
   .. function:: StateVector& operator=(const OTHER& other)
 
-    ::
+    ``template <typename OTHER>`` ::
 
       template<typename OTHER> StateVector& operator=(const OTHER& other) {operator()()=other; return *this;}
 
@@ -79,6 +84,8 @@ State vector
   .. function:: StateVector& operator*=(const OTHER& dc)
 
   .. function:: StateVector& operator/=(const OTHER& dc)
+
+    ``template <typename OTHER>``
 
     These are vector-space operations implemented in a naive way (as opposed to e.g. the expression-template mechanism of Blitz), the last two being templated to allow for mixed-mode arithmetics.
 
@@ -109,3 +116,42 @@ State vector
     :ref:`template parameters <quantumdataTemplates>`: RANK
 
     Calculates the inner product.
+
+
+****************
+Density operator
+****************
+
+.. py:module:: DensityOperator.h
+   :synopsis: Defines DensityOperator in namespace quantumdata and corresponding operations
+
+.. class:: quantumdata::DensityOperator
+
+  ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`); inherits publicly from :class:`~quantumdata::LazyDensityOperator`\ ``<RANK>``, and privately from :class:`~quantumdata::ArrayBase`\ ``<2*RANK>``, and also from :class:`linalg::VectorSpace` ``<DensityOperator<RANK> >`` which adds a lot of free-standing arithmetic functions.
+
+  .. note::
+
+    A :class:`~quantumdata::DensityOperator`\ ``<RANK>`` represents a density operator on a Hilbert space of arity ``RANK``. This makes that the number of its indeces is actually ``2*RANK``. This is the reason why it inherits from :class:`~quantumdata::ArrayBase`\ ``<2*RANK>``.
+
+  The interface is similar to :class:`~quantumdata::StateVector` with obvious differences. Here only the most important will be tackled:
+
+  .. function:: explicit DensityOperator(const StateVector<RANK>& psi)
+
+    Constructs the class as a dyadic product of ``psi``.
+
+  .. function:: double norm() const
+
+  .. function:: double renorm()
+
+    Both functions return the trace "norm", but the latter one also renormalizes.
+
+  .. function:: const linalg::CMatrix matrixView() const
+
+    (also in non-constant version) Returns a two-dimensional view of the underlying data.
+
+  .. function:: const dcomp operator()(const Idx& i, const Idx& j)
+
+    This function implements the virtual indexing function :func:`quantumdata::LazyDensityOperator::operator()` in a trivial way, simply by accessing the necessary element in memory::
+
+      const dcomp operator()(const Idx& i, const Idx& j) const {return operator()()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));}
+

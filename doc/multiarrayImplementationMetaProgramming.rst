@@ -23,7 +23,7 @@ Lines 15-25
 
   #. (Lines 21-24:) the iterator is `advanced <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/next.html>`_ (Line 22) if the same numerical containment criterion is met, otherwise it is left untouched for the same element to be considered again (Line 23).
 
-(Note that in TMP, writing ``numerical_contains<V,mpl::_2>`` twice is not a waste because the second time no further template instantiations are needed, the compiler will use the ones already instantiated the first time.)
+(Note that in TMP, "calling" ``numerical_contains<V,mpl::_2>`` twice is not a waste because the second time no further template instantiations are needed, the compiler will use the ones already instantiated the first time.)
 
-Lines 32-34: the `first element <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/trivial-metafunctions-summary.html#first>`_ of the resulting pair of the above algorithm is picked. As it is easy to verify ``TransposerMeta<11,tmptools::Vector<3,6,1,9,7> >::type`` will be an ``mpl::vector_c<int,0,3,2,6,4,5,1,9,8,7,10>``.
+Lines 32-34: the `first element <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/trivial-metafunctions-summary.html#first>`_ of the resulting pair of the above algorithm is picked. As it is easy to verify, ``TransposerMeta<11,tmptools::Vector<3,6,1,9,7> >::type`` will be an ``mpl::vector_c<int,0,3,2,6,4,5,1,9,8,7,10>``.
   

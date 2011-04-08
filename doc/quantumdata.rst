@@ -1,12 +1,8 @@
 .. _quantumdata:
 
-=====================================
+*******************************
 The ``quantumdata`` namespace
-=====================================
-
-::
-
-  namespace quantumdata
+*******************************
 
 The ``quantumdata`` namespace comprises classes which represent the state of composite quantum systems and provide various interfaces to manipulate this data. Some of its most important classes fit into a single class hierarchy, which may be sketched as follows:
 
@@ -37,19 +33,19 @@ The ``quantumdata`` namespace comprises classes which represent the state of com
   ``typename TRAFO``
     Type representing a metrical transformation
 
-------------------------
+==========
 Utilities
-------------------------
+==========
 
 .. toctree::
 
   quantumdataUtils
 
-----------------------------------------------------
+==================================================
 Common interface for calculating quantum averages
-----------------------------------------------------
+==================================================
 
-In a quantum-simulation framework, users should be given the possibility to write code able to calculate quantum expectation values from quantumdata, independently of whether this data is represented by state vectors or density operators, in orthogonal or non-orthogonal bases. One obvious solution is relying on the formula
+In a quantum-simulation framework, users should be provided with the ability to write code able to calculate quantum expectation values from quantumdata, independently of whether this data is represented by state vectors or density operators, in orthogonal or non-orthogonal bases. One obvious solution is relying on the formula
 
 .. math::
 
@@ -57,14 +53,15 @@ In a quantum-simulation framework, users should be given the possibility to writ
 
 (:math:`A` being an observable and :math:`\rho` the density operator of the system), to write code only for the density-operator case, and fall back to this in the state-vector case as well, by calculating a dyad from the state vector. This is, however, extremely wasteful, since usually not all the matrix elements of :math:`\rho` are needed for calculating the average, furthermore, for large dimensionality this solution may become outright unaffordable in terms of memory.
 
-The solution adopted to this problem in C++QED is represented by the class :class:`~quantumdata::LazyDensityOperator`, which provides a common interface for all the four cases :class:`~quantumdata::StateVector`, :class:`~quantumdata::DensityOperator`, and their non-orthogonal versions, to calculate quantum averages from their data. The "laziness" is constituted by that in the case of state vectors, only those elements of the density operator are calculated that are asked for.
+The solution adopted to this problem in C++QED is represented by the class :class:`~quantumdata::LazyDensityOperator`, which provides a common interface for all the four cases :class:`~quantumdata::StateVector`, :class:`~quantumdata::DensityOperator`, and their non-orthogonal counterparts, to calculate quantum averages from their data. The "laziness" means that in the case of state vectors, only those elements of the density operator are calculated that are asked for.
 
 .. py:module:: LazyDensityOperator.h
    :synopsis: Defines LazyDensityOperator abstract interface
 
+
 .. class:: quantumdata::LazyDensityOperator
 
-  :ref:`template parameters <quantumdataTemplates>`: RANK; inherits publicly from :class:`DimensionsBookkeeper`
+  ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`); inherits publicly from :class:`DimensionsBookkeeper`\ ``<RANK,true>``
 
   This class is totally inmutable, all its member functions being constant.
 
@@ -74,7 +71,7 @@ The solution adopted to this problem in C++QED is represented by the class :clas
 
   .. type:: Idx
 
-    The type used for indexing the "rows" and the "columns", this is either a normal, or a multi-index, in the latter case represented by a :class:`TTD_IdxTiny`::
+    The type used for indexing the "rows" and the "columns", this is either an index, or a multi-index, in the latter case represented by a :class:`TTD_IdxTiny`::
 
       typedef typename mpl::if_c<(RANK==1),int,TTD_IdxTiny<RANK> >::type Idx;
       // Idx is just an int if RANK==1, otherwise a tiny of ints
@@ -93,11 +90,11 @@ The solution adopted to this problem in C++QED is represented by the class :clas
 
       double operator()(const Idx& i) const {return real((*this)(i,i));}
 
-  .. function:: begin(V v) const
+  .. function:: const quantumdata::ldo::DiagonalIterator<RANK,V> begin(V v) const
 
-  .. function:: end(V v) const
+  .. function:: const quantumdata::ldo::DiagonalIterator<RANK,V> end(V v) const
 
-    :ref:`template parameters <quantumdataTemplates>`: V
+    ``template <typename V>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
     These functions return the :class:`quantumdata::ldo::DiagonalIterator`\ s corresponding to the start and end of the sequence of slices defined by ``V`` (cf. the :ref:`section on slicing a LazyDensityOperator <ldoSlicing>`). 
 
@@ -105,7 +102,7 @@ The solution adopted to this problem in C++QED is represented by the class :clas
 **Semantics:**
 
   *Unary system*
-    Imagine having a mode represented in Fock basis with ladder-operator :math:`a`. To calculate the quantum expectation value 
+    Assume a mode represented in Fock basis with ladder-operator :math:`a`. To calculate the quantum expectation value 
 
     .. math::
 
@@ -125,7 +122,7 @@ The solution adopted to this problem in C++QED is represented by the class :clas
 .. _calculateADaggerB:
 
   *Binary system*
-    Imagine having two modes represented in Fock bases with ladder-operators :math:`a` and :math:`b`, respectively. To calculate the quantum expectation value 
+    Assume two modes represented in Fock bases with ladder-operators :math:`a` and :math:`b`, respectively. To calculate the quantum expectation value 
 
     .. math::
 
@@ -146,9 +143,9 @@ The solution adopted to this problem in C++QED is represented by the class :clas
       }
 
 
----------------------------
+============================
 High-level data structures
----------------------------
+============================
 
 The :class:`~quantumdata::StateVector` and :class:`~quantumdata::DensityOperator` classes (and their non-orthogonal counterparts) exist for two main reasons:
   * As interfaces to :type:`~quantumdata::Types::StateVectorLow` and :type:`~quantumdata::Types::DensityOperatorLow`, respectively, which are more convenient to use on higher levels of the framework, e.g. in scripts, and in quantum trajectories. This is especially because while ``blitz::Array`` uses by-reference copy semantics and expression templates, these classes use the more usual by-value copy semantics and normal semantics for arithmetic operations. This means, however, that copying and arithmetics should be used judiciously, if possible only in the startup phase of simulations.
@@ -158,27 +155,24 @@ The :class:`~quantumdata::StateVector` and :class:`~quantumdata::DensityOperator
 
 .. toctree::
 
-  quantumdataStateVector
+  quantumdataHighLevel
 
-  quantumdataDensityOperator
-
-
+----------------------------------------------------------------------
 Representing state vectors & density operators in non-orthogonal bases
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------------------------------------------
 
 We rely on the :ref:`covariant-contravariant formalism <NonOrthogonalFormalism>` to represent these in the framework.
 
 The user has considerable freedom in how the metrical transformation for a given non-orthogonal basis is defined, the only requirement being that there is a specialized instant of :class:`quantumdata::transformation::Traits` for the type representing the transformation. When compositing elementary Hilbert spaces, the framework takes care of the correct composition of the elementary metrical transformations. Of course, once there is a single non-orthogonal component, the whole composite has to be represented by non-orthogonal classes, in which case the system substitutes a :class:`quantumdata::transformation::Identity` dummy transformation for the metrics of such components as are represented in orthogonal bases.
+
+.. note:: The infrastructure for representing non-orthogonals is not yet fully matured, and will not be so before Milestone 11.
 
 .. toctree::
    :maxdepth: 2
 
    The infrastructure for defining metrical transformations <quantumdataTransformations>
 
-   quantumdataNonOrthogonalStateVector
-
-   quantumdataNonOrthogonalDensityOperator
-
+   quantumdataNonOrthogonal
 
 
 
@@ -186,14 +180,14 @@ The user has considerable freedom in how the metrical transformation for a given
 
 .. _ldoSlicing:
 
-------------------------------------------------------
+==================================
 Slicing of ``LazyDensityOperator``
-------------------------------------------------------
+==================================
+
+
 
 :ref:`Analogously to state vectors <basiSlicing>`, it is also necessary to slice :class:`~quantumdata::LazyDensityOperator`\ s because for calculating quantum expectation values of subsystem-observables (e.g. in :class:`Composite`\ s), the partial-trace density operator is needed. For the partial trace, however, only such elements of the full density operator are needed as are diagonal in the indeces *not* belonging to the given subsystem (dummy indeces). This is the reason why the tool performing the iteration is called :class:`~quantumdata::ldo::DiagonalIterator`.
 
-Notes on implementation
-^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. toctree::
    :maxdepth: 2
@@ -203,14 +197,15 @@ Notes on implementation
 Slicing is fully recursive, a sliced :class:`~quantumdata::LazyDensityOperator` (usually obtained by dereferencing a :class:`~quantumdata::ldo::DiagonalIterator`) can be further sliced.
 
 
+-------------
 Partial trace
-^^^^^^^^^^^^^^
+-------------
 
 On higher levels of the framework, the iteration is performed via the function:
 
 .. function:: const T quantumdata::partialTrace(const quantumdata::LazyDensityOperator<RANK>& matrix, F f, V v, T t)
 
-  :ref:`template parameters <quantumdataTemplates>`: RANK, F, V, T
+  ``template <int RANK, typename F, typename V, typename T>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
 
   ``T`` is an arithmetic type which must be default-constructible.
@@ -320,9 +315,9 @@ On higher levels of the framework, the iteration is performed via the function:
 
 
 
-----------------------------
+=======================
 Assessing entanglement
-----------------------------
+=======================
 
 .. py:module:: NegPT.h
    :synopsis: Defines the function calculating the negativity of a partially transposed density operator

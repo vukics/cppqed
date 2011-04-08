@@ -6,7 +6,7 @@ Difficulty: :class:`~quantumdata::LazyDensityOperator` is an abstract interface,
 
 .. class:: quantumdata::ldo::DiagonalIterator
 
-  :ref:`template parameters <quantumdataTemplates>`: RANK, V
+  ``template <int RANK, typename V>`` (:ref:`template parameters <quantumdataTemplates>`)
 
   Model of `InputIterator <http://www.cplusplus.com/reference/std/iterator/InputIterator/>`_.
 
@@ -18,3 +18,5 @@ Implemented using a classical inheritance-based strategy idiom, together with so
 
 .. image:: figures/ldoDiagonalIterator.png
    :width: 643
+
+...

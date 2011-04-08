@@ -74,11 +74,6 @@ Slice iterator
 .. py:module:: BlitzArraySliceIterator.h
    :synopsis: Defines Iterator and Indexer in namespace blitzplusplus::basi
 
-::
-
-  #include "BlitzArraySliceIterator.h"
-
-  namespace blitzplusplus::basi
 
 The name of the namespace stands for BlitzArraySliceIterator.
 

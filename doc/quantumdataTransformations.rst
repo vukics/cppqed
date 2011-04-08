@@ -1,5 +1,7 @@
+**********************************
 Defining metrical transformations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**********************************
+
 
 .. py:module:: Transformation.h
    :synopsis: Provides the infrastructure for representing metrical transformations in non-orthogonal basesoperations
@@ -10,7 +12,7 @@ The general requirements on the structure of the traits class is:
 
 .. class:: quantumdata::transformation::Traits
 
-  :ref:`template parameters <quantumdataTemplates>`: TRAFO
+  ``template <typename TRAFO>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
   .. c:var:: N_RANK
 
@@ -33,9 +35,7 @@ There is a class which helps with the specialization of :class:`quantumdata::tra
 
 .. class:: quantumdata::transformation::ElementaryTraits
 
-  :ref:`template parameters <quantumdataTemplates>`: TRAFO
-
-  ::
+  ``template <typename TRAFO>`` (cf. :ref:`template parameters <quantumdataTemplates>`) ::
   
     template<typename TRAFO>
     struct ElementaryTraits
@@ -49,8 +49,9 @@ There is a class which helps with the specialization of :class:`quantumdata::tra
     };
 
 
+=======================
 Traits specializations
-%%%%%%%%%%%%%%%%%%%%%%%%
+=======================
 
 For the dummy transformation :class:`~quantumdata::transformation::Identity`:
 

@@ -411,13 +411,13 @@ Release
 
 The current release of the framework is C++QEDv2 Milestone 8, and it is a bugfix release. The development is now in beta stage with no known major bugs. The foreseeable steps in the development are as follows:
 
-Milestone 9 
+Milestone 9
   will concentrate on improving the documentation. A reference or extenders' manual will be provided, together with introductory guides.
 
-Milestone 10 
+Milestone 10
   will see the creation of a more general quantum-operator class of which :class:`~quantumoperator::Tridiagonal` will be only one implementation, while others can be operators with sparse and full matrices. They should be arbitrarily combinable with expression-template like closures taking care of the necessary internal loops. The expression-template mechanism will be implemented using the `Boost.Proto library <http://www.boost.org/doc/libs/1_46_1/doc/html/proto.html>`_.
 
-Milestone 12 
+Milestone 11
   will see the possibility to use non-orthogonal bases for free elements implemented. The framework is already prepared for this, and it is already present in prototype. A prominent example is of course modes in coherent-state bases.
 
 Milestone ... 

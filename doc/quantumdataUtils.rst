@@ -1,12 +1,14 @@
+**************************
 ``DimensionsBookkeeper``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************
 
 .. py:module:: DimensionsBookkeeper.h
    :synopsis: Defines DimensionsBookkeeper
 
+
 .. class:: DimensionsBookkeeper
 
-  :ref:`template parameters <quantumdataTemplates>`: RANK, IS_CONST
+  ``template <int RANK, bool IS_CONST>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
   This class is designed to store and manipulate dimensions of constructs on composite Hilbert spaces of arity ``RANK``.
 
@@ -25,27 +27,29 @@
       typedef TTD_ExtTiny<RANK> Dimensions;
 
 
-
+**************
 ``ArrayBase``
-^^^^^^^^^^^^^^^^^^^
+**************
+
 
 .. py:module:: ArrayBase.h
    :synopsis: Defines ArrayBase in namespace quantumdata
 
 .. class:: quantumdata::ArrayBase
 
-  :ref:`template parameters <quantumdataTemplates>`: RANK, IS_CONST
+  ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
 
+**********
 ``Types``
-^^^^^^^^^^^^^
+**********
 
 .. py:module:: Types.h
    :synopsis: Defines the metafunction Types in namespace quantumdata
 
 .. class:: quantumdata::Types
 
-  :ref:`template parameters <quantumdataTemplates>`: RANK, B
+  ``template <int RANK, typename B>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
   This class is basically only a metafunction.
 
