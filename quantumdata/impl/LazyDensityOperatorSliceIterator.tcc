@@ -330,14 +330,14 @@ DiagonalIterator<RANK,V>::isEqualTo(const DiagonalIterator& other) const
 
 
 template<int RANK> template<typename V>
-ldo::DiagonalIterator<RANK,V>
+const ldo::DiagonalIterator<RANK,V>
 LazyDensityOperator<RANK>::begin(V) const
 {
   return ldo::DiagonalIterator<RANK,V>(*this,mpl::false_());
 }
 
 template<int RANK> template<typename V>
-ldo::DiagonalIterator<RANK,V>
+const ldo::DiagonalIterator<RANK,V>
 LazyDensityOperator<RANK>::end  (V) const
 {
   return ldo::DiagonalIterator<RANK,V>(*this,mpl:: true_());

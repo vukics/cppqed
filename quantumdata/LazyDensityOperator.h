@@ -57,10 +57,10 @@ public:
   // iterator
   
   template<typename V>
-  ldo::DiagonalIterator<RANK,V> begin(V) const;
+  const ldo::DiagonalIterator<RANK,V> begin(V) const;
 
   template<typename V>
-  ldo::DiagonalIterator<RANK,V> end  (V) const;
+  const ldo::DiagonalIterator<RANK,V> end  (V) const;
 
 protected:
   LazyDensityOperator(const Dimensions& dims) : Base(dims) {}
