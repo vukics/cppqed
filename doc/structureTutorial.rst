@@ -6,22 +6,22 @@ We demonstrate how to implement an element representing a pumped lossy mode in a
 
 .. math::
 
-  H=\omega a^\dagger a+\lp\eta a^\dagger+\hermConj\rp
+  H=-\delta a^\dagger a+\lp\eta a^\dagger+\hermConj\rp,
 
 
-and Liouvillean:
+where :math:`\delta` is the detuning between the oscillator and the pump frequencies. The Liouvillean:
 
 .. math::
 
   \Liou\rho=\kappa\lp(n+1)\lp2a\rho a^\dagger-\comm{a^\dagger a}{\rho}_+\rp+n\lp2a^\dagger\rho a-\comm{a\,a^\dagger}{\rho}_+\rp\rp
 
-The frequency-like parameters are :math:`\omega`, :math:`\kappa`, and :math:`\eta`, representing the mode frequency, loss rate, and pumping Rabi frequency, respectively. A dimensionless parameter is :math:`n`, the average number of thermal photons in the heat bath, and the cutoff of the Fock space.
+The frequency-like parameters are :math:`\delta`, :math:`\kappa`, and :math:`\eta`, representing the mode frequency, loss rate, and pumping Rabi frequency, respectively. A dimensionless parameter is :math:`n`, the average number of thermal photons in the heat bath, and the cutoff of the Fock space.
 
 The non-Hermitian Hamiltonian for the Monte Carlo wave-function method reads:
 
 .. math::
 
-  \HnH=\lp\omega-i\kappa\rp a^\dagger a+\lp\eta a^\dagger+\hermConj\rp
+  \HnH=\lp-\delta-i\kappa\rp a^\dagger a+\lp\eta a^\dagger+\hermConj\rp
 
 The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`structure::ElementAveraged` that have to be written. Consider the file ``ExampleMode.h``:
 
@@ -63,3 +63,22 @@ The implementation of the helpers is also quite straightforward. It may come to 
 .. literalinclude:: examples/ExampleModeImpl.cc
   :language: c++
   :linenos:
+
+
+=============================
+Interaction picture
+=============================
+
+In many situations it pays to transfer to interaction picture defined by the first term of the Hamiltonian. The ladder operator in interaction picture is :math:`a\Int(t)=e^{i\delta t}a`, so that the Hamiltonian reads
+
+.. math::
+
+  H\Int(t)=\lp\eta a^\dagger e^{-i\delta t}+\hermConj\rp
+
+Note that the Liouvillean remains unchanged, an important feature which allows us to use the same implementation for the jump as above.
+
+
+****************************************
+Implementing an X-X interaction
+****************************************
+

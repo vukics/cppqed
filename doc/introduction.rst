@@ -138,6 +138,14 @@ For instance:
 The prefix ``TTD`` stands for "template typedef" here and throughout the framework.
 
 
+-------------------
+Metafunctions
+-------------------
+
+Metafunctions are class templates used to "compute" some type. By convention, the resulting type is stored as a ``type`` typename.
+
+In the framework, metafunctions are named with an ``MF`` suffix. Many of them are simple template aliases, but with some extra functionality, as e.g. compile-time assertions.
+
 ------------------
 Namespace aliases
 ------------------
@@ -148,4 +156,16 @@ We will also use the following namespace alias ::
 
 However, in the framework we are not using this alias globally, as this would lead to all sorts of name clashes.
 
+We assume that the following definitions are in effect:
 
+.. c:var:: mpl::constant_true
+
+  ::
+
+    const mpl::true_ mpl::constants_true;
+
+.. c:var:: mpl::constant_false
+
+  ::
+
+    const mpl::false_ mpl::constant_false;

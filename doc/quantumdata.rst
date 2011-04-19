@@ -24,9 +24,6 @@ The ``quantumdata`` namespace comprises classes which represent the state of com
   ``typename B``
     An optional base class for base-class chaining. An empty class (``quantumdata::details::Empty``) by default.
 
-  ``typename F``
-    A functor.
-    
   ``typename V``
     A compile-time vector with the same functionality and characteristics as :ref:`above <basiTemplates>`.
 
@@ -45,7 +42,7 @@ Utilities
 Common interface for calculating quantum averages
 ==================================================
 
-In a quantum-simulation framework, users should be provided with the ability to write code able to calculate quantum expectation values from quantumdata, independently of whether this data is represented by state vectors or density operators, in orthogonal or non-orthogonal bases. One obvious solution is relying on the formula
+In a quantum-simulation framework, users should be able to write code for calculating quantum expectation values from quantumdata, independently of whether this data is represented by state vectors or density operators, in orthogonal or non-orthogonal bases. One obvious solution is relying on the formula
 
 .. math::
 
@@ -53,7 +50,7 @@ In a quantum-simulation framework, users should be provided with the ability to 
 
 (:math:`A` being an observable and :math:`\rho` the density operator of the system), to write code only for the density-operator case, and fall back to this in the state-vector case as well, by calculating a dyad from the state vector. This is, however, extremely wasteful, since usually not all the matrix elements of :math:`\rho` are needed for calculating the average, furthermore, for large dimensionality this solution may become outright unaffordable in terms of memory.
 
-The solution adopted to this problem in C++QED is represented by the class :class:`~quantumdata::LazyDensityOperator`, which provides a common interface for all the four cases :class:`~quantumdata::StateVector`, :class:`~quantumdata::DensityOperator`, and their non-orthogonal counterparts, to calculate quantum averages from their data. The "laziness" means that in the case of state vectors, only those elements of the density operator are calculated that are asked for.
+The solution adopted for this problem in the framework is represented by the class :class:`~quantumdata::LazyDensityOperator`, which provides a common interface for all the four cases :class:`~quantumdata::StateVector`, :class:`~quantumdata::DensityOperator`, and their :ref:`non-orthogonal counterparts <quantumdataNonOrthogonal>`, to calculate quantum averages from their data. The "laziness" means that in the case of state vectors, only those elements of the density operator are calculated that are asked for.
 
 .. py:module:: LazyDensityOperator.h
    :synopsis: Defines LazyDensityOperator abstract interface
@@ -157,6 +154,8 @@ The :class:`~quantumdata::StateVector` and :class:`~quantumdata::DensityOperator
 
   quantumdataHighLevel
 
+.. _quantumdataNonOrthogonal:
+
 ----------------------------------------------------------------------
 Representing state vectors & density operators in non-orthogonal bases
 ----------------------------------------------------------------------
@@ -165,7 +164,7 @@ We rely on the :ref:`covariant-contravariant formalism <NonOrthogonalFormalism>`
 
 The user has considerable freedom in how the metrical transformation for a given non-orthogonal basis is defined, the only requirement being that there is a specialized instant of :class:`quantumdata::transformation::Traits` for the type representing the transformation. When compositing elementary Hilbert spaces, the framework takes care of the correct composition of the elementary metrical transformations. Of course, once there is a single non-orthogonal component, the whole composite has to be represented by non-orthogonal classes, in which case the system substitutes a :class:`quantumdata::transformation::Identity` dummy transformation for the metrics of such components as are represented in orthogonal bases.
 
-.. note:: The infrastructure for representing non-orthogonals is not yet fully matured, and will not be so before Milestone 11.
+.. note:: The infrastructure for representing non-orthogonals is not yet fully matured, and will not be made fully available before Milestone 11.
 
 .. toctree::
    :maxdepth: 2
@@ -322,5 +321,10 @@ Assessing entanglement
 .. py:module:: NegPT.h
    :synopsis: Defines the function calculating the negativity of a partially transposed density operator
 
-...
+.. function:: double quantumdata::negPT(const quantumdata::DensityOperator<RANK>& do, V v)
 
+  ``template<int RANK, typename V>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
+
+  Calculates the negativity of the partial transpose of the density operator of an arbitrarily complex system. Of course it should be regarded as a bipartite system, so that a subsystem has to be specified to be one party of the bipartite. The compile-time vector ``V`` specifies the subsystem.
+
+  ...

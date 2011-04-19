@@ -127,7 +127,7 @@ Density operator
 
 .. class:: quantumdata::DensityOperator
 
-  ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`); inherits publicly from :class:`~quantumdata::LazyDensityOperator`\ ``<RANK>``, and privately from :class:`~quantumdata::ArrayBase`\ ``<2*RANK>``, and also from :class:`linalg::VectorSpace` ``<DensityOperator<RANK> >`` which adds a lot of free-standing arithmetic functions.
+  ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`); inherits publicly from :class:`~quantumdata::LazyDensityOperator`\ ``<RANK>``, and privately from :class:`~quantumdata::ArrayBase`\ ``<2*RANK>``, and also from :class:`linalg::VectorSpace`\ ``<DensityOperator<RANK> >`` which adds a lot of free-standing arithmetic functions.
 
   .. note::
 

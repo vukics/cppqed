@@ -16,7 +16,7 @@
 
   It has a straightforward interface which does not need documentation, the only notable point being a technique which is used from time to time throughout the framework. Consider the following constructor:
 
-  .. function:: explicit DimensionsBookkeeper(mpl::bool_<IS_CONST> = mpl::false_ __LP__ __RP__ )
+  .. function:: explicit DimensionsBookkeeper(mpl::bool_<IS_CONST> is_const = mpl::constant_false)
 
     The aim of the dummy argument with a default value---which creates a nonsensical function signature in the case when ``IS_CONST`` is ``true``---is that this constructor only compiles in the case when ``IS_CONST`` is ``false`` because it is only in the non-constant case that we allow default construction of the class. Since from a template only such parts are compiled as are actually used, a client can use the class in the case when ``IS_CONST`` is ``true`` without problems, getting a compile-time error only when trying to default-construct such an object.
 
@@ -39,6 +39,7 @@
 
   ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
+  This class collects the common functionalities of :class:`~quantumdata::StateVector` and :class:`~quantumdata::DensityOperator`.
 
 **********
 ``Types``
