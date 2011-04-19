@@ -19,11 +19,15 @@ namespace ldo {
 namespace details {
 
 
-template<int RANK, typename V> struct ExtendV : mpl::fold<V,
-							  V,
-							  mpl::push_back<mpl::_1,
-									 mpl::plus<mpl::_2,
-										   mpl::int_<RANK> > > >
+template<int RANK, typename V>
+struct ExtendV : mpl::fold<V,
+			   V,
+			   mpl::push_back<mpl::_1,
+					  mpl::plus<mpl::_2,
+						    mpl::int_<RANK>
+						    >
+					  >
+			   >
 {};
 
 

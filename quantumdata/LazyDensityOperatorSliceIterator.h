@@ -42,11 +42,11 @@ class DI_Impl;
 
 #define TTD_LAZY_DENSITY_OPERATOR_RES const LazyDensityOperator<mpl::size<V>::value> 
 
-#define TTD_FORWARD_ITERATOR_HELPER boost::input_iterator_helper<DiagonalIterator<RANK,V>,TTD_LAZY_DENSITY_OPERATOR_RES>
+#define TTD_INPUT_ITERATOR_HELPER boost::input_iterator_helper<DiagonalIterator<RANK,V>,TTD_LAZY_DENSITY_OPERATOR_RES>
 
 template<int RANK, typename V>
 class DiagonalIterator 
-  : public TTD_FORWARD_ITERATOR_HELPER 
+  : public TTD_INPUT_ITERATOR_HELPER 
 {
 public:
   static const bool IS_SPECIAL=(RANK==mpl::size<V>::value);
@@ -55,7 +55,7 @@ public:
 						    mpl::identity<details::DI_ImplSpecial<V> >,
 						    mpl::identity<details::DI_Impl<RANK,V> > >::type> Impl;
 
-  typedef TTD_FORWARD_ITERATOR_HELPER Base;
+  typedef TTD_INPUT_ITERATOR_HELPER Base;
 
   typedef typename Base::value_type LazyDensityOperatorRes;
 
@@ -74,7 +74,7 @@ private:
 
 };
 
-#undef TTD_FORWARD_ITERATOR_HELPER
+#undef TTD_INPUT_ITERATOR_HELPER
 
 template<int RANK, typename V>
 inline
