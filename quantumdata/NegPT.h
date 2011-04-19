@@ -23,7 +23,7 @@ namespace quantumdata {
 // specifying the subsystem
 
 template<int RANK, typename V>
-double negPT(const DensityOperator<RANK>&, V=V());
+double negPT(const DensityOperator<RANK>&, V);
 
 template<int RANK>
 inline
@@ -46,7 +46,7 @@ namespace quantumdata {
 // If FLENS is not used, a dummy definition of negPT is provided
 
 template<int RANK, typename V>
-double negPT(const DensityOperator<RANK>&, V=V())
+double negPT(const DensityOperator<RANK>&, V)
 {
   return 0;
 }
