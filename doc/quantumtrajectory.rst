@@ -15,13 +15,17 @@ The ``quantumtrajectory`` namespace
 
 .. function:: void evolve(quantumdata::StateVector<RANK>&, const structure::QuantumSystem<RANK>&, const ParsEvolution&, V)
 
-  template<int RANK, typename V>
+  ``template<int RANK, typename V>``
 
 --------------------
 MCWF trajectory
 --------------------
 
 .. class:: quantumtrajectory::MCWF_Trajectory
+
+  ``template <RANK>``
+
+  .. function:: void step(double deltaT) const
 
 Alternative probability calculation based on tabbed jumped state vectors signalled by negative jump probabilities.
 

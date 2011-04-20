@@ -5,6 +5,7 @@ Implementing a harmonic-oscillator mode
 We demonstrate how to implement an element representing a pumped lossy mode in a truncated Fock space. It is described by the Hamiltonian:
 
 .. math::
+  :label: harmonicOscillatorHamiltonian
 
   H=-\delta a^\dagger a+\lp\eta a^\dagger+\hermConj\rp,
 
@@ -20,10 +21,11 @@ The frequency-like parameters are :math:`\delta`, :math:`\kappa`, and :math:`\et
 The non-Hermitian Hamiltonian for the Monte Carlo wave-function method reads:
 
 .. math::
+  :label: harmonicOscillatorNonHermitianHamiltonian
 
   \HnH=\lp-\delta-i\kappa\rp a^\dagger a+\lp\eta a^\dagger+\hermConj\rp
 
-The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`structure::ElementAveraged` that have to be written. Consider the file ``ExampleMode.h``:
+The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`~structure::ElementAveraged` that have to be written. Consider the file ``ExampleMode.h``:
 
 .. literalinclude:: examples/ExampleMode.h
   :language: c++
@@ -65,20 +67,27 @@ The implementation of the helpers is also quite straightforward. It may come to 
   :linenos:
 
 
-=============================
+===================
 Interaction picture
-=============================
+===================
 
-In many situations it pays to transfer to interaction picture defined by the first term of the Hamiltonian. The ladder operator in interaction picture is :math:`a\Int(t)=e^{i\delta t}a`, so that the Hamiltonian reads
+In many situations, it pays to transfer to interaction picture defined by the first term of the Hamiltonian :eq:`harmonicOscillatorHamiltonian`. The ladder operator in interaction picture is :math:`a\Int(t)=e^{i\delta t}a`, so that the Hamiltonian reads
 
 .. math::
 
   H\Int(t)=\lp\eta a^\dagger e^{-i\delta t}+\hermConj\rp
 
-Note that the Liouvillean remains unchanged, an important feature which allows us to use the same implementation for the jump as above.
+In this case, the class representing the element has to be derived from :class:`~structure::Exact` as well, which represents the transformation between the two pictures. In addition, instead of :class:`~structure::TridiagonalHamiltonian`\ ``<1,false>``, we need to derive from :class:`~structure::TridiagonalHamiltonian`\ ``<1,true>``, because the Hamiltonian is now time-dependent.
+
+...
+
+.. note:: 
+
+  The framework requires that the jump and the averages be calculated in the normal picture also in this case (cf. :func:`quantumtrajectory::MCWF_Trajectory::step`). (Here the Liouvillean remains unchanged anyway.) This allows for reusing the same code in both pictures.
 
 
-****************************************
+*******************************
 Implementing an X-X interaction
-****************************************
+*******************************
 
+...

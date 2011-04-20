@@ -22,7 +22,7 @@ To be able to write new modules representing elementary subsystems or interactio
 .. toctree::
    :maxdepth: 2
 
-   Element Guide <structureTutorial>
+   elementGuide
 
 For a deeper understanding and to be able to extend the framework with new modules, the upcoming reference manual will have to be consulted. In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
 

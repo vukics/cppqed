@@ -159,7 +159,7 @@ The class also stores an ``std::stringstream`` object, on which the constructor 
 ``Free``
 ---------------
 
-In the language of the framework, a free system is one whose arity is 1.
+In the language of the framework, a free system is a system whit arity 1.
 
 .. py:module:: Free.h
    :synopsis: Defines Free in namespace structure and some related types
@@ -285,6 +285,10 @@ This class describes interaction between free systems.
 ``Liouvillean``
 ---------------------------------------
 
+.. note:: 
+
+  The framework requires that the jump be calculated in the normal picture even in the case when the Hamiltonian is in interaction picture (cf. :func:`quantumtrajectory::MCWF_Trajectory::step`). This allows for reusing the same code in both pictures.
+
 .. class:: structure::Liouvillean
 
 .. class:: structure::ElementLiouvillean
@@ -299,7 +303,9 @@ This class describes interaction between free systems.
 
 .. class:: structure::ElementAveraged
 
+.. note:: 
 
+  The framework requires that the averages be calculated in the normal picture even in the case when the Hamiltonian is in interaction picture (cf. :func:`quantumtrajectory::MCWF_Trajectory::step`). This allows for reusing the same code in both pictures.
 
 
 
