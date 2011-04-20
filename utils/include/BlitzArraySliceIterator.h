@@ -148,6 +148,8 @@ class Iterator
 public:
   typedef typename BASE_class Base;
 
+#undef  BASE_class
+
   typedef typename Base::CcCA CcCA;
 
   typedef boost::iterator_range<Iterator> Range;
@@ -159,7 +161,6 @@ public:
 
 };
 
-#undef  BASE_class
 
 
 #define NS_NAME basi

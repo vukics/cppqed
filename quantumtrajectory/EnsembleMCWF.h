@@ -47,6 +47,8 @@ public:
 
   typedef BASE_class EnsembleTrajectories;
 
+#undef  BASE_class
+
   typedef MCWF_Trajectory<RANK> Trajectory;
 
   typedef typename Trajectory::StateVector    StateVector   ;
@@ -73,7 +75,6 @@ private:
 
 };
 
-#undef  BASE_class
 
 } // ensemblemcwf
 
@@ -86,6 +87,8 @@ class EnsembleMCWF : public BASE_class
 {
 public:
   typedef BASE_class Base;
+
+#undef  BASE_class
 
   typedef details::DO_Display<RANK,V> DO_Display;
 
@@ -117,7 +120,6 @@ private:
 
 };
 
-#undef  BASE_class
 
 } // quantumtrajectory
 
