@@ -269,6 +269,11 @@ This class describes interaction between free systems.
 
 .. class:: structure::Hamiltonian
 
+.. warning::
+
+  When implementing the Hamiltonian, not :math:`H` itself but :math:`\frac Hi` has to supplied!
+
+
 .. class:: structure::TridiagonalHamiltonian
 
 
@@ -279,6 +284,8 @@ This class describes interaction between free systems.
 .. class:: structure::Exact
 
 .. class:: structure::FreeExact
+
+  .. function:: void updateU(double dtDid) const
 
 
 ---------------------------------------

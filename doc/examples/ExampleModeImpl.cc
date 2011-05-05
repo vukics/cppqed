@@ -53,3 +53,10 @@ const Tridiagonal nop(size_t dim)
   Tridiagonal::Diagonal diagonal(dim);
   return Tridiagonal(diagonal=blitz::tensor::i);
 }
+
+
+const Frequencies freqs(double delta, size_t dim)
+{
+  Tridiagonal::Diagonal diagonal(dim-1); diagonal=dcomp(0,-delta);
+  return Frequencies(1,diagonal);
+}

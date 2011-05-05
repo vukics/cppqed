@@ -14,13 +14,13 @@ double aJumpProba   (const LazyDensityOperator&, double kappa_nPlus1);
 double aDagJumpProba(const LazyDensityOperator&, double kappa_n     );
 
 
-PumpedLossyMode::PumpedLossyMode(double omega, double kappa, dcomp eta, double n, size_t cutoff)
+PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double n, size_t cutoff)
   : Free(cutoff,
 	 RealFreqs(),
 	 tuple_list_of
-	 ("(kappa*(2*n+1),omega)",dcomp(kappa*(2*n+1),omega),cutoff)
+	 ("(kappa*(2*n+1),delta)",dcomp(kappa*(2*n+1),delta),cutoff)
 	 ("eta",eta,sqrt(cutoff))),
-    TridiagonalHamiltonian<1,false>(dcomp(-kappa,-omega)*nop(cutoff)
+    TridiagonalHamiltonian<1,false>(dcomp(-kappa*(2*n+1),delta)*nop(cutoff)
 				    +
 				    tridiagPlusHC_overI(conj(eta)*aop(cutoff))),
     ElementLiouvillean<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(n+1)),
@@ -29,10 +29,61 @@ PumpedLossyMode::PumpedLossyMode(double omega, double kappa, dcomp eta, double n
 						      bind(aDagJumpProba,_1,kappa* n   ))),
     ElementAveraged<1>("PumpedLossyMode",
 		       list_of("<number operator>")("real(<ladder operator>)")("imag(\")"))
-{}
+{
+  getParsStream()<<"# Pumped lossy mode";
+}
 
 
 const PumpedLossyMode::Averages PumpedLossyMode::average(const LazyDensityOperator& matrix) const
+{
+  Averages averages(3);
+
+  averages=0;
+
+  averages(0)=aJumpProba(matrix,1);
+
+  for (int n=1; n<int(matrix.getDimension()); n++) {
+    double sqrtn=sqrt(n);
+    dcomp offdiag(matrix(n,n-1));
+    averages(1)+=sqrtn*real(offdiag);
+    averages(2)+=sqrtn*imag(offdiag);
+  }
+
+  return averages;
+
+}
+
+
+PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, double n, size_t cutoff)
+  : Free(cutoff,
+	 tuple_list_of
+	 ("kappa*(2*n+1)",kappa*(2*n+1),cutoff)
+	 ("delta",delta,1),
+	 tuple_list_of
+	 ("eta",eta,sqrt(cutoff))),
+    FreeExact(cutoff),
+    TridiagonalHamiltonian<1,true>(dcomp(-kappa*(2*n+1),delta)*nop(cutoff)
+				   +
+				   tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
+				   freqs(delta,cutoff)
+				   ),
+    ElementLiouvillean<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(n+1)),
+					   bind(aDagJump,_1,kappa* n   )),
+			    JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(n+1)),
+						      bind(aDagJumpProba,_1,kappa* n   ))),
+    ElementAveraged<1>("PumpedLossyMode",
+		       list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
+    delta_(delta)
+{}
+
+
+void PumpedLossyModeIP::updateU(double dtDid) const
+{
+  getFactors()=exp(DCOMP_I*delta_*(dtDid*blitz::tensor::i));
+}
+
+
+const PumpedLossyModeIP::Averages PumpedLossyModeIP::average(const LazyDensityOperator& matrix) const
 {
   Averages averages(3);
 

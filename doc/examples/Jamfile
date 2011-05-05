@@ -3,7 +3,9 @@ project : requirements <library>../../quantumtrajectory//quantumtrajectory <libr
 obj ExampleMode.o : ExampleMode.cc ;
 obj ExampleModeImpl.o : ExampleModeImpl.cc ;
 
-exe ExampleModeMain : ExampleModeMain.cc ExampleMode.o ExampleModeImpl.o ;
+obj ExampleInteraction.o : ExampleInteraction.cc ;
+
+exe ExampleModeMain : ExampleModeMain.cc ExampleMode.o ExampleModeImpl.o ExampleInteraction.o ;
 
 exe tutorialMode : tutorialMode.cc ;
 exe tutorialBinary : tutorialBinary.cc ;

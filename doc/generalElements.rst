@@ -8,6 +8,7 @@ Some general-purpose elements
 Polarizable particles in optical fields
 -------------------------------------------
 
+.. _generalElements_Mode:
 
 Mode
 ^^^^^^

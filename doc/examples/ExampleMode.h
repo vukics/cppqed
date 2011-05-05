@@ -3,6 +3,7 @@
 #include "TridiagonalHamiltonian.h"
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"
+#include "FreeExact.h"
 
 using namespace structure;
 using namespace free;
@@ -18,9 +19,34 @@ class PumpedLossyMode
 public:
   typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
 
-  PumpedLossyMode(double omega, double kappa, dcomp eta, double n, size_t cutoff);
+  PumpedLossyMode(double delta, double kappa, dcomp eta, double n, size_t cutoff);
 
   const Averages average(const LazyDensityOperator&) const;
   void           process(Averages&)                  const {}
+
+};
+
+
+const Frequencies freqs(double, size_t);
+
+
+class PumpedLossyModeIP
+  : public Free, public FreeExact, public TridiagonalHamiltonian<1,true>, public ElementLiouvillean<1,2>, public ElementAveraged<1>
+{
+public:
+  typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
+
+  PumpedLossyModeIP(double delta, double kappa, dcomp eta, double n, size_t cutoff);
+
+  void updateU(double dtDid) const;
+  bool isUnitary() const {return true;}
+
+  const Averages average(const LazyDensityOperator&) const;
+  void           process(Averages&)                  const {}
+
+  double getDelta() const {return delta_;}
+
+private:
+  const double delta_; // Needed for updateU
 
 };
