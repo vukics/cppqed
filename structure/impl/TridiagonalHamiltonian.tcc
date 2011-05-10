@@ -17,9 +17,9 @@ namespace structure {
 
 template<int RANK>
 void 
-details::TDH_True<RANK>::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+details::TDH_True<RANK>::addContribution(double tMinusIntPic0, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  cpputils::for_each(hOverIs_,freqss_.begin(),bind(quantumoperator::apply<RANK>,psi,dpsidt,bind(&Tridiagonal::propagate,_1,_2,t-tIntPic0)));
+  cpputils::for_each(hOverIs_,freqss_.begin(),bind(quantumoperator::apply<RANK>,psi,dpsidt,bind(&Tridiagonal::propagate,_1,_2,tMinusIntPic0)));
 }
 
 

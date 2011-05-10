@@ -166,9 +166,10 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
   if (ha_) getEvolved()->step(Dt);
   else getEvolved()->update(getTime()+Dt,Dt);
 
-  Exact::actWithU(getDtDid(),psi_(),ex_);
-
-  tIntPic0_=getTime();
+  if (ex_) {
+    ex_->actWithU(getDtDid(),psi_());
+    tIntPic0_=getTime();
+  }
 
   psi_.renorm();
 
@@ -189,9 +190,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 
 	  probas(i)=mathutils::sqr(psiTemp.renorm());
 
-	  // psiTemp disappears here, but its storage does not,
-	  // because the ownership is taken over by the SVL in the
-	  // tuple
+	  // psiTemp disappears here, but its storage does not, because the ownership is taken over by the SVL in the tuple
 
 	}
     }
@@ -206,13 +205,13 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
       for (; random_>0 && jumpNo!=probas.size(); random_-=probas(jumpNo++))
 	;
 
-      if(random_<0) {
+      if(random_<0) { // Jump No. jumpNo-1 occurs
 	struct helper
 	{
 	  static bool p(int i, indexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
 	};
 
-	typename std::vector<indexSVL_tuple>::const_iterator i(find_if(probasSpecial,bind(&helper::p,--jumpNo,_1)));
+	typename std::vector<indexSVL_tuple>::const_iterator i(find_if(probasSpecial,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
 	if (i!=probasSpecial.end())
 	  // special jump
 	  psi_()=i->template get<1>(); // RHS already normalized above
@@ -226,7 +225,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 
     if (dpOverDt*getEvolved()->getDtTry()>dpLimit_)
       getEvolved()->setDtTry(dpLimit_/dpOverDt);
-    // Time step management --- jump probability should not overshoot dpLimit
+    // Time-step management --- jump probability should not overshoot dpLimit
 
   }
 

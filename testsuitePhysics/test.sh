@@ -1,4 +1,4 @@
-export PATH_TO_EXECS=~/quantologia/bin/scripts/gcc-4.4/release/
+export PATH_TO_EXECS=~/quantologia/bin/scripts/gcc-4.5/release/
 
 PATH=.:$PATH_TO_EXECS:"${PATH}"
 
