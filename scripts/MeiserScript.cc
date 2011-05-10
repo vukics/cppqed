@@ -5,11 +5,11 @@
 #include "Mode.h"
 
 #include "Interaction.h"
-#include "TimeIndependentHamiltonian.h"
+#include "Hamiltonian.h"
 
 
 
-class MeiserToyModel : public structure::Interaction<2>, public structure::TimeIndependentHamiltonian<2>
+class MeiserToyModel : public structure::Interaction<2>, public structure::Hamiltonian<2,structure::NO_TIME>
 {
 public:
   MeiserToyModel(mode::SmartPtr cavity, mode::SmartPtr oscillator, double g);
