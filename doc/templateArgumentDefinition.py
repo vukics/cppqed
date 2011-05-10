@@ -9,6 +9,6 @@ text=file.read()
 file.close()
 
 text=text.replace('''Note</p>
-<p>Template argument definitions:</p>''','Template argument definitions</p>')
+<p>Template argument definitions:</p>''','Template argument definitions</p>')#.replace('''__LP__''','''(''')
 
 open(sys.argv[1],'w').write(text)

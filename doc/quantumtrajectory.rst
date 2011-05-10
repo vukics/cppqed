@@ -17,9 +17,30 @@ The ``quantumtrajectory`` namespace
 
   ``template<int RANK, typename V>``
 
+.. _MCWF_Trajectory:
+
 --------------------
 MCWF trajectory
 --------------------
+
+In the framework, a single :ref:`Monte-Carlo wave function step <MCWF_method>` at time :math:`t` (at which point the Schrödinger and interaction pictures coincide) is implemented as a sequence of the following stages:
+
+1. If the system time evolution has Hamiltonian part, it is evolved with an adaptive-size step (cf. :ref:`Evolved <cpputils_Evolved>`). This takes the system into :math:`t+\Delta t`.
+
+2. The exact part (if any) of the time evolution is applied, making that the Schrödinger and interaction pictures coincide again at :math:`t+\Delta t`.
+
+3. The state vector is renormalized.
+
+4. If the system is Liouvillean, the possibility of a quantum jump is considered:
+
+  #. The rates (probabilities per unit time) corresponding to all jump operators are calculated. If some rates are found negative ("special jump", cf. explanation at :func:`~structure::Liovillean::probability`), then :math:`J_\text{at}\ket\Psi` is calculated (and tabulated) instead, and the probability is calculated as :math:`\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2`.
+
+  #. The total jump rate :math:`\delta r` is calculated.
+
+  #. It is randomly decided which (if any) of the jumps to perform. If it is found to be a special jump, then the tabulated :math:`J_\text{at}\ket\Psi` is taken.
+
+5. Time-step management is performed: the adaptive-stepsize ODE stepper gives a guess for the next timestep (:math:`\Delta t_\text{next}`). If the probability :math:`\delta r\Delta t_\text{next}` is found to overshoot a given limit (usually 0.1), then the next timestep is decreased.
+
 
 .. class:: quantumtrajectory::MCWF_Trajectory
 

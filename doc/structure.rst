@@ -12,6 +12,9 @@ The ``structure`` namespace
 
 The ``structure`` namespace comprises modules for describing quantum systems. Among them the most important is :class:`~structure::QuantumSystem`, which is an abstract interface every system has to provide to be usable with :ref:`quantum trajectories <quantumtrajectory>` like :class:`~quantumtrajectory::MCWF_Trajectory` or :class:`~quantumtrajectory::Master`. This is why all the :ref:`elementary <generalElements>` and :ref:`composite systems <composites>` are more or less directly derived from :class:`~structure::QuantumSystem`.
 
+Much of the design here depends on the requirements of a step of the Monte-Carlo wave function method, as described in Sec. :ref:`MCWF_Trajectory`, so the reader is asked to have a look at there, too.
+
+
 Most of the classes in this namespace belong to a single hierarchy, sketched in the diagram below (the broken lines signifying that the inheritance is not direct, due to some classes in between, which can be considered implementation details):
 
 .. image:: figures/structure.png
@@ -137,7 +140,7 @@ The class also stores an ``std::stringstream`` object, on which the constructor 
 
 .. class:: structure::QuantumSystem
 
-  :ref:`template parameters <structureTemplates>`: RANK; inherits publicly from :class:`DimensionsBookkeeper`
+  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`); inherits publicly from :class:`DimensionsBookkeeper`
 
   This class describes an entity that has dimensions in a Hilbert space of arity RANK, it may have some frequencies, and some parameters to communicate towards the user.
 
@@ -166,7 +169,7 @@ In the language of the framework, a free system is a system whit arity 1.
 
 .. class:: structure::Free
 
-  Inherits publicly from :class:`~structure::QuantumSystem` with RANK=1 and :class:`~structure::DynamicsBase`
+  Inherits publicly from :class:`~structure::QuantumSystem`\ ``<1>`` and :class:`~structure::DynamicsBase`
 
   .. function:: explicit Free(size_t dimension, const RealFreqs& realFreqs= RealFreqs__LP__ __RP__, const ComplexFreqs& complexFreqs= ComplexFreqs__LP__ __RP__)
 
@@ -193,13 +196,13 @@ This namespace contains some type definitions for convenience in defining free s
 
 .. type:: structure::free::Tridiagonal
 
-  ::
+  typedef for :class:`quantumoperator::Tridiagonal`\ ``<1>``::
 
     typedef quantumoperator::Tridiagonal<1> Tridiagonal;
 
 .. type:: structure::free::Frequencies
 
-  ::
+  typedef for :class:`quantumoperator::Frequencies`\ ``<1>``::
 
     typedef quantumoperator::Frequencies<1> Frequencies;
 
@@ -245,7 +248,7 @@ This class describes interaction between free systems.
 
 .. class:: structure::Interaction
 
-  :ref:`template parameters <structureTemplates>`: RANK; inherits publicly from :class:`~structure::DynamicsBase`
+  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`); inherits publicly from :class:`~structure::DynamicsBase`
 
   It does not inherit from :class:`~structure::QuantumSystem` because it does not make sense to simulate such an element as describes an interaction alone. However, an interaction can have frequency-like parameters, hence the inheritance from :class:`~structure::DynamicsBase`.
 
@@ -257,9 +260,9 @@ This class describes interaction between free systems.
 
   .. function:: explicit Interaction(const Frees& frees, const RealFreqs& realFreqs=RealFreqs__LP__ __RP__, const ComplexFreqs& complexFreqs=ComplexFreqs__LP__ __RP__)
 
-    
-
   .. function:: const Frees& getFrees() const
+
+    The class has knowledge of its :class:`~structure::Free` constituents, and will also communicate them.
 
 
 
@@ -269,19 +272,79 @@ This class describes interaction between free systems.
 
 .. class:: structure::Hamiltonian
 
-.. warning::
+  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`);
 
-  When implementing the Hamiltonian, not :math:`H` itself but :math:`\frac Hi` has to supplied!
+  .. function:: void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0)
 
+    Pure virtual.
+
+    Adds the Hamiltonian contribution :math:`\frac{H(t)}i\ket\Psi` of the given (sub)system to ``dpsidt`` assuming that the time when the Schrödinger picture and interaction picture (if any) coincide is ``tIntPic0``. There are two important points to note:
+
+    1. The contribution has to be *added* to ``dpsidt`` instead of ``dpsidt`` being *replaced*. This is because when the given system is embedded in a larger system, other (sub)systems may also contribute.
+
+      .. todo::
+
+        Somehow signal to the function whether it has to add or replace.
+
+    2. The function has to calculate the effect of :math:`\frac{H(t)}i` and not merely :math:`H`, since it is the former which determines the derivative of the state vector. This is so often missed, that we emphasize it again (although we know that it will still be missed from time to time):
+
+      .. warning::
+
+        When implementing the Hamiltonian, not :math:`H` itself but :math:`\frac Hi` has to supplied!
+
+
+.. class:: structure::TimeIndependentHamiltonian
+
+  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`); inherits publicly from :class:`~structure::Hamiltonian`\ ``<RANK>``
+
+  .. function:: void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0)
+
+    Implements the inherited virtual function::
+
+      void addContribution(double, const StateVectorLow& psi, StateVectorLow& dpsidt, double) const {addContribution(psi,dpsidt);}
+
+  .. function:: void addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt)
+
+    Pure virtual. The time-independent version of :func:`~structure::Hamiltonian::addContribution`.
+
+    
 
 .. class:: structure::TridiagonalHamiltonian
+
+  ``template <int RANK, bool IS_TD>`` (cf. :ref:`template parameters <structureTemplates>`); inherits publicly from :class:`~structure::Hamiltonian`\ ``<RANK>`` when ``IS_TD`` is ``true`` and :class:`~structure::TimeIndependentHamiltonian`\ ``<RANK>`` when it is ``false``.
+
+  It implements the action of a Hamiltonian
+
+  .. math::
+
+    H_\text{tridiagonals}(t)=H_0(t)+H_1(t)+H_2(t)+\dots
+
+  With the :math:`H_i(t)` being all described by :class:`~quantumoperator::Tridiagonal`\ ``<RANK>`` objects, their time-dependence being described by corresponding :class:`~quantumoperator::Frequencies`\ ``<RANK>`` objects.
+
+  Such a class can be constructed with either a list of :class:`~quantumoperator::Tridiagonal`\ ``<RANK>`` (and, in the case when ``IS_TD`` is ``true``, corresponding :class:`~quantumoperator::Frequencies`\ ``<RANK>``) objects, or only one such object when the above sum consists of only one term.
 
 
 ---------------------------------------
 ``Exact``
 ---------------------------------------
 
+Experience shows that even when a system uses interaction picture (which is automatically the case if any of its subsystems does), it may still want to calculate the jump operators and quantum averages in the normal picture. (Note that at the moment, time is not even communicated to the latter functions.) In this case, the framework has to be provided with some means to transform between the two pictures. This is fulfilled by the following class, from which classes describing such systems have to inherit.
+
 .. class:: structure::Exact
+
+  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`);
+
+  .. function:: void actWithU(double dt, StateVectorLow& psi) const
+
+    Pure virtual.
+
+    Describes the operation which transforms from interaction picture to the normal picture.
+
+  .. function:: bool isUnitary() const
+
+    Pure virtual.
+
+    Describes whether the above operation is unitary.
 
 .. class:: structure::FreeExact
 
@@ -297,6 +360,11 @@ This class describes interaction between free systems.
   The framework requires that the jump be calculated in the normal picture even in the case when the Hamiltonian is in interaction picture (cf. :func:`quantumtrajectory::MCWF_Trajectory::step`). This allows for reusing the same code in both pictures.
 
 .. class:: structure::Liouvillean
+
+  .. function:: const Probabilities probabilities(const LazyDensityOperator&) const
+
+    Pure virtual.
+
 
 .. class:: structure::ElementLiouvillean
 

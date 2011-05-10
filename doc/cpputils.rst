@@ -6,6 +6,8 @@ Some further general-purpose modules from ``utils``
 
 From ``utils`` what deserves documentation.
 
+.. _cpputils_Evolved:
+
 ---------------------------------------------
 ``Evolved`` and the underlying principle
 ---------------------------------------------

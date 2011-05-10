@@ -138,10 +138,21 @@ Let us consider the interaction described by the Hamiltonian
 
   H_\text{X-X}=g(a+a^\dagger)(b+b^\dagger)
 
+The class implementing this interaction has to be derived from :class:`~structure::Interaction`\ ``<2>`` because it is a binary interaction, and :class:`~structure::TridiagonalHamiltonian`\ ``<2,...>`` (note that :class:`quantumoperator::Tridiagonal` is capable to represent direct products of tridiagonal matrices).
+
+The only thing requiring some care is that once we transform some elements into interaction picture, the whole Hamiltonian is transformed, that is, :math:`a` or :math:`b` or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type ``PumpedLossyModeIP``.
+
+Consider ``ExampleInteraction.h``:
+
 .. literalinclude:: examples/ExampleInteraction.h
   :language: c++
   :linenos:
+  :lines: 2-
+
+``ExampleInteraction.cc`` then reads
 
 .. literalinclude:: examples/ExampleInteraction.cc
   :language: c++
   :linenos:
+
+As we see, the Hamiltonian can be written in a rather straightforward way, and the corresponding :class:`quantumoperator::Frequencies` objects are also multiplied, expressing the fact that both constituents are in interaction picture.
