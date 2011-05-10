@@ -16,7 +16,7 @@
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"
 #include "Free.h"
-#include "TimeIndependentHamiltonian.h"
+#include "Hamiltonian.h"
 
 #include "CMatrix.h"
 
@@ -57,7 +57,7 @@ private:
 
 
 // In Schroedinger picture the Hamiltonian is implemented as a CMatrix
-class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::TimeIndependentHamiltonian<1>
+class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::Hamiltonian<1,structure::NO_TIME>
 {
 public:
   typedef PumpedTwoLevelAtom Base;
