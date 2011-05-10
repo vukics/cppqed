@@ -80,14 +80,13 @@ public:
 
   void step(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
 
-  void   displayParameters(   ) const;
+  void displayParameters() const;
 
 protected:
   virtual size_t displayMoreKey (   ) const;
 
   virtual void   displayEvenMore(int) const {}
 
-  const StateVector& getPsi      () const {return psi_;} 
   const StateVector& toBeAveraged() const {return psi_;} 
 
 private:

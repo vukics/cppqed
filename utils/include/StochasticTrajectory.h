@@ -128,9 +128,9 @@ public:
   
   The implicit interface:
   
-      reference case : T_ELEM needs to be able to be added to T via an addTo function.
+      reference case : T_ELEM must be addable to T via an addTo function.
 
-  non-reference case : T needs to be able to be constructed from a T_ELEM
+  non-reference case : T must be constructible from a T_ELEM
 
 */
 
