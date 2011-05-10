@@ -40,14 +40,13 @@ public:
 
 // NEEDS_WORK factor out template-parameter independent code
 
-template<int RANK> 
-struct MCWF_TrajectoryBaseMF
-  : mpl::identity<trajectory::StochasticTrajectory<typename quantumdata::Types<RANK>::StateVectorLow,
-						   const quantumdata::StateVector<RANK>&> > {};
 
+
+
+#define BASE_class trajectory::StochasticTrajectory<typename quantumdata::Types<RANK>::StateVectorLow, const quantumdata::StateVector<RANK>&>
 
 template<int RANK>
-class MCWF_Trajectory : public MCWF_TrajectoryBaseMF<RANK>::type 
+class MCWF_Trajectory : public BASE_class
 {
 public:
   typedef quantumdata::StateVector<RANK> StateVector;
@@ -60,7 +59,9 @@ public:
   typedef structure::Liouvillean  <RANK> Liouvillean  ;
   typedef structure::Averaged     <RANK> Averaged     ;  
 
-  typedef typename MCWF_TrajectoryBaseMF<RANK>::type Base;
+  typedef BASE_class Base;
+
+#undef  BASE_class
 
   typedef boost::tuple<int,StateVectorLow> indexSVL_tuple;
 

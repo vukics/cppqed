@@ -123,6 +123,8 @@ class Master : public BASE_class
 public:
   typedef typename BASE_class Base;
 
+#undef  BASE_class
+
   typedef typename Base::QuantumSystem QuantumSystem;
 
   typedef typename Base::DensityOperatorLow DensityOperatorLow; 
@@ -146,8 +148,6 @@ private:
 
 };
 
-
-#undef  BASE_class
 
 
 } // quantumtrajectory

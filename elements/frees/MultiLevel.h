@@ -10,7 +10,7 @@
 #include "ElementLiouvillean.h"
 #include "Free.h"
 #include "FreeExact.h"
-#include "TimeIndependentHamiltonian.h"
+#include "Hamiltonian.h"
 
 #include<boost/fusion/mpl/size.hpp>
 
@@ -166,7 +166,7 @@ private:
 
 template<int NL, typename VP>
 class HamiltonianSch 
-  : public structure::TimeIndependentHamiltonian<1>
+  : public structure::Hamiltonian<1,structure::NO_TIME>
 {
 public:
   static const int NPT=mpl::size<VP>::value; // number of pumped transitions

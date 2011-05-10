@@ -4,8 +4,8 @@
 #include "BlitzArraySliceIterator.h"
 #include "Range.h"
 
-#include<boost/assign/list_of.hpp>
-#include<boost/assign/list_inserter.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/assign/list_inserter.hpp>
 
 
 using namespace std;
@@ -14,8 +14,6 @@ using namespace boost::assign;
 using namespace mathutils;
 
 using particle::mfNKX;
-using particle::ModeFunction;
-
 
 using namespace mode;
 

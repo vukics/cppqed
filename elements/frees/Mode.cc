@@ -33,12 +33,7 @@ Exact::Exact(const dcomp& zI, size_t dim)
 
 void Exact::updateU(double dtdid) const
 {
-  Factors& factors(getFactors());
-  // NEEDS_WORK is it not possible to use tensor here?
-  if (imag(zI_))
-    for (int i=0; i<getFactors().size(); i++)
-      factors(i)=exp(-dtdid*i*zI_);
-  else factors=exp(-dtdid*real(zI_)*blitz::tensor::i);
+  getFactors()=exp(-zI_*(dtdid*blitz::tensor::i));
 }
 
 

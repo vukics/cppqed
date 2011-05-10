@@ -2,7 +2,7 @@
 #ifndef   _PARS_PARTICLE_CAVITY_H
 #define   _PARS_PARTICLE_CAVITY_H
 
-#include "ModeFunctionTypeFwd.h"
+#include "ModeFunction.h"
 
 #include "ParsFwd.h"
 

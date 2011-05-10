@@ -15,7 +15,7 @@ class NX_coupledModesElim
   : private boost::base_from_member<Spatial>, 
     public structure::Free, 
     public Averaged, 
-    public structure::TimeIndependentHamiltonian<1>/*, public structure::ElementLiouvillean<1,1>*/
+    public structure::Hamiltonian<1,structure::NO_TIME>/*, public structure::ElementLiouvillean<1,1>*/
 {
 public:
   typedef boost::base_from_member<Spatial> SpatialStorage;

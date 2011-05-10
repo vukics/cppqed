@@ -4,7 +4,7 @@
 
 #include "TridiagonalHamiltonianFwd.h"
 
-#include "TimeIndependentHamiltonian.h"
+#include "Hamiltonian.h"
 
 #include "Frequencies.h"
 
@@ -36,7 +36,7 @@ protected:
 
 template<int RANK>
 class TDH_True // TridiagonalHamiltonian time-dependent base
-  : public Hamiltonian<RANK>, private TridiagonalStore<RANK>
+  : public Hamiltonian<RANK,ONE_TIME>, private TridiagonalStore<RANK>
 {
 public:
   typedef TridiagonalStore<RANK> Base;
@@ -53,7 +53,7 @@ public:
 
   TDH_True(const Tridiagonals& hOverIs, const Frequenciess& freqss) : Base(hOverIs), freqss_(freqss) {}
 
-  virtual void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
+  virtual void addContribution(double, const StateVectorLow&, StateVectorLow&) const;
 
   const Frequenciess& getFreqss() const {return freqss_;}
 
@@ -67,7 +67,7 @@ private:
 
 template<int RANK>
 class TDH_False // TridiagonalHamiltonian time-independent base
-  : public TimeIndependentHamiltonian<RANK>, private TridiagonalStore<RANK>
+  : public Hamiltonian<RANK,NO_TIME>, private TridiagonalStore<RANK>
 {
 public:
   typedef TridiagonalStore<RANK> Base;
@@ -107,7 +107,7 @@ public:
   typedef boost::tuple<Tridiagonal,Frequencies> TridiagonalIP ;
   typedef std::list<TridiagonalIP>              TridiagonalIPs;
 
-  // Only one of the two constructors can be called depending on the value of IS_TD
+  // From the two sets of constructors, only one can be used, depending on the value of IS_TD
   // IS_TD=true
   TridiagonalHamiltonian(const Tridiagonal & hOverI , const Frequencies & freqs ) 
     : Base(Tridiagonals(1,hOverI),Frequenciess(1,freqs)) {}

@@ -3,7 +3,6 @@
 #include "ParticleTwoModes.h"
 
 #include "ParticleInitialCondition.h"
-#include "ModeFunctionType.h"
 
 
 using namespace std       ;

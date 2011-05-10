@@ -1,6 +1,10 @@
-*************************
+*********
 ChangeLog
-*************************
+*********
+
+2010/05/10 Switching to a more refined definition of time-dependence schemes in :class:`structure::Hamiltonian`
+
+  As a consequence, :class:`structure::TimeIndependentHamiltonian` has been deprecated.
 
 
 2010/02/15 Switching to `Bazaar <https://sourceforge.net/scm/?type=bzr&group_id=187775>`_ revision control

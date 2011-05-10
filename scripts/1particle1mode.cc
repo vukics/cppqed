@@ -11,8 +11,6 @@
 
 #include "BinarySystem.h"
 
-#include "ModeFunctionType.h"
-
 
 using namespace std      ;
 using namespace mathutils;

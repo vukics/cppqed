@@ -12,14 +12,24 @@ Documentation
 
 To start to understand and use the framework on the highest level, consult the user guide. This will allow for building simulations using the already existing modules and elementary systems as building blocks.
 
-For a deeper understanding and to be able to extend the framework with new elements, the upcoming reference manual will have to be consulted. In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
+.. toctree::
+   :maxdepth: 2
+
+   User Guide <tutorial>
+
+To be able to write new modules representing elementary subsystems or interactions, consult the following guide:
 
 .. toctree::
    :maxdepth: 2
 
-   User Guide <tutorial/tutorial>
-   
-   Reference Manual <manual/manual>
+   elementGuide
+
+For a deeper understanding and to be able to extend the framework with new modules, the upcoming reference manual will have to be consulted. In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
+
+.. toctree::
+   :maxdepth: 2
+
+   Reference Manual <manual>
 
 -------------
 ChangeLog
@@ -34,11 +44,12 @@ ChangeLog
 Printable versions
 ------------------
 
-* :download:`User guide in pdf <./tutorial/_build/latex/C++QED_Tutorial.pdf>`
+* :download:`User Guide in pdf <_build/latex/C++QED_Tutorial.pdf>`
 
-* `PyCppQED tutorial <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
+* :download:`Element Guide in pdf <_build/latex/C++QED_structureTutorial.pdf>`
 
-.. * Manual: `pdf <_static/manual.pdf>`_
+* `PyCppQED tutorial in pdf <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
+
 
 
 ========

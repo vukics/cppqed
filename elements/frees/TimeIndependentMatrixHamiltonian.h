@@ -5,11 +5,11 @@
 #include "TimeIndependentMatrixHamiltonianFwd.h"
 
 #include "Free.h"
-#include "TimeIndependentHamiltonian.h"
+#include "Hamiltonian.h"
 
 #include "CMatrix.h"
 
-class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::TimeIndependentHamiltonian<1>
+class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::Hamiltonian<1,structure::NO_TIME>
 {
 public:
   typedef linalg::CMatrix CMatrix;

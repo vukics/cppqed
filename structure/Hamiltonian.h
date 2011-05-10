@@ -11,12 +11,10 @@ namespace structure {
 
 
 template<int RANK>
-class Hamiltonian : public quantumdata::Types<RANK>
+class Hamiltonian<RANK,TWO_TIME> : private quantumdata::Types<RANK>
 {
 public:
-  typedef quantumdata::Types<RANK> Base;
-
-  typedef typename Base::StateVectorLow StateVectorLow;
+  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
   static  void addContribution(double t,
 			       const StateVectorLow& psi, StateVectorLow& dpsidt,
@@ -33,6 +31,43 @@ public:
   virtual void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const = 0; 
 
 };
+
+
+template<int RANK>
+class Hamiltonian<RANK,ONE_TIME> : public Hamiltonian<RANK>
+{
+public:
+  typedef Hamiltonian<RANK> Base;
+
+  typedef typename Base::StateVectorLow StateVectorLow;
+
+private:
+  void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+  {
+    addContribution(t-tIntPic0,psi,dpsidt);
+  }
+
+  virtual void addContribution(double, const StateVectorLow&, StateVectorLow&) const = 0;
+};
+
+
+template<int RANK>
+class Hamiltonian<RANK,NO_TIME> : public Hamiltonian<RANK>
+{
+public:
+  typedef Hamiltonian<RANK> Base;
+
+  typedef typename Base::StateVectorLow StateVectorLow;
+
+private:
+  void addContribution(double, const StateVectorLow& psi, StateVectorLow& dpsidt, double) const 
+  {
+    addContribution(psi,dpsidt);
+  }
+
+  virtual void addContribution(const StateVectorLow&, StateVectorLow&) const = 0;
+};
+
 
 
 } // structure

@@ -1,6 +1,7 @@
 cd _build/html
 for i in `find . -name "*.html"`; do 
   echo $i
+  ../../templateArgumentDefinition.py $i
   sed -i "
 	{s/__PL__/+/g}
 	{s/__MI__/-/g}
@@ -9,10 +10,6 @@ for i in `find . -name "*.html"`; do
 	{s/__LP__/(/g}
 	{s/C++QED vMilestone 8 documentation/C++QEDv2 Milestone8 documentation/g}
 	{s/Python Module Index/Index of Header Files/g}
-        {
-N
-s/Note<\/p>\n<p>Template argument definitions:/Template argument definitions/
-}
         "\
 	$i; 
 done

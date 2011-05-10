@@ -62,8 +62,10 @@ double photonNumber(const StateVectorLow&);
 double photonNumber(const LazyDensityOperator&);
 
 
-inline std::ostream& isFiniteTempStream(std::ostream& os, double    , boost::mpl::false_) {return os                                     ;}
-inline std::ostream& isFiniteTempStream(std::ostream& os, double nTh, boost::mpl:: true_) {return os<<" Finite temperature.\n# nTh="<<nTh;}
+inline std::ostream& isFiniteTempStream(std::ostream& os, double    , boost::mpl::false_)
+{return os                                     <<std::endl;}
+inline std::ostream& isFiniteTempStream(std::ostream& os, double nTh, boost::mpl:: true_)
+{return os<<" Finite temperature.\n# nTh="<<nTh<<std::endl;}
 
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl::false_) {return p.kappa             ;}
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl:: true_) {return p.kappa*(2.*p.nTh+1);}
