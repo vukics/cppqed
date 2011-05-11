@@ -86,15 +86,15 @@ size_t BinarySystem::nJumps() const
 
 
 
-const BinarySystem::Probabilities BinarySystem::probabilities(const LazyDensityOperator& ldo) const
+const BinarySystem::Probabilities BinarySystem::probabilities(double t, const LazyDensityOperator& ldo) const
 {
   using quantumdata::partialTrace;
   using boost::copy;
   
   const Probabilities 
-    p0 (partialTrace(ldo,bind(&Li1::probabilities,_1,free0_.getLi(),theStaticOne),v0,defaultArray)),
-    p1 (partialTrace(ldo,bind(&Li1::probabilities,_1,free1_.getLi(),theStaticOne),v1,defaultArray)),
-    p01(Li2::probabilities(ldo,ia_.getLi()));
+    p0 (partialTrace(ldo,bind(&Li1::probabilities,t,_1,free0_.getLi(),theStaticOne),v0,defaultArray)),
+    p1 (partialTrace(ldo,bind(&Li1::probabilities,t,_1,free1_.getLi(),theStaticOne),v1,defaultArray)),
+    p01(Li2::probabilities(t,ldo,ia_.getLi()));
 
   Probabilities p(nJumps());
 
@@ -106,7 +106,7 @@ const BinarySystem::Probabilities BinarySystem::probabilities(const LazyDensityO
 
 
 
-void BinarySystem::actWithJ(StateVectorLow& psi, size_t i) const
+void BinarySystem::actWithJ(double t, StateVectorLow& psi, size_t i) const
 {
   using namespace blitzplusplus::basi;
 
@@ -118,19 +118,19 @@ void BinarySystem::actWithJ(StateVectorLow& psi, size_t i) const
 
   size_t n=Li1::nJumps(li0);
   if (li0 && i<n) {
-    for_each(fullRange(psi,v0),bind(&Li1::actWithJ,li0,_1,i));
+    for_each(fullRange(psi,v0),bind(&Li1::actWithJ,li0,t,_1,i));
     return;
   }
 
   i-=n;  
   if (li1 && i<(n=Li1::nJumps(li1))) {
-    for_each(fullRange(psi,v1),bind(&Li1::actWithJ,li1,_1,i));
+    for_each(fullRange(psi,v1),bind(&Li1::actWithJ,li1,t,_1,i));
     return;
   }
 
   i-=n;
   if (i<(n=Li2::nJumps(li01)))
-    Li2::actWithJ(psi,i,li01);
+    Li2::actWithJ(t,psi,i,li01);
 
 }
 
@@ -153,15 +153,15 @@ size_t BinarySystem::nAvr() const
 
 
 
-const BinarySystem::Averages BinarySystem::average(const LazyDensityOperator& ldo) const
+const BinarySystem::Averages BinarySystem::average(double t, const LazyDensityOperator& ldo) const
 {
   using quantumdata::partialTrace;
   using boost::copy;
 
   const Averages 
-    a0 (partialTrace(ldo,bind(&Av1::average,_1,free0_.getAv(),theStaticOne),v0,defaultArray)),
-    a1 (partialTrace(ldo,bind(&Av1::average,_1,free1_.getAv(),theStaticOne),v1,defaultArray)),
-    a01(Av2::average(ldo,ia_.getAv()));
+    a0 (partialTrace(ldo,bind(&Av1::average,t,_1,free0_.getAv(),theStaticOne),v0,defaultArray)),
+    a1 (partialTrace(ldo,bind(&Av1::average,t,_1,free1_.getAv(),theStaticOne),v1,defaultArray)),
+    a01(Av2::average(t,ldo,ia_.getAv()));
 
   Averages a(nAvr());
 

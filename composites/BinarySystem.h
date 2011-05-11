@@ -48,14 +48,14 @@ private:
 
   void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
 
-  size_t              nJumps       ()                           const;
-  const Probabilities probabilities(const LazyDensityOperator&) const;
-  void                actWithJ     (StateVectorLow&, size_t)    const;
+  size_t              nJumps       ()                                   const;
+  const Probabilities probabilities(double, const LazyDensityOperator&) const;
+  void                actWithJ     (double, StateVectorLow&, size_t)    const;
 
   void   displayKey(std::ostream&, size_t&) const;
   size_t nAvr      ()                       const;
 
-  const Averages average(const LazyDensityOperator&)          const;
+  const Averages average(double, const LazyDensityOperator&)  const;
   void           process(Averages&)                           const;
   void           display(const Averages&, std::ostream&, int) const;
 
