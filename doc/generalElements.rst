@@ -18,6 +18,12 @@ Mode
   H_\text{mode}&=\omega\adagger a+i\lp\eta\adagger-\hermConj\rp\\
   &\equiv-iz\adagger a+i\lp\eta\adagger-\hermConj\rp\equiv(-\delta-i\kappa)\adagger a+i\lp\eta\adagger-\hermConj\rp
 
+where we have introduced
+
+.. math::
+
+  z\equiv\kappa-i\delta
+
 .. type:: mode::SmartPtr
 
   ::
