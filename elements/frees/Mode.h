@@ -391,6 +391,34 @@ public:
 };
 
 
+//////////////////////////////////////////////////////////////////////
+// One more to test time-dependent jump and averages 
+//////////////////////////////////////////////////////////////////////
+
+class PumpedLossyModeIP_NoExact
+  : public ModeBase,
+    public structure::TridiagonalHamiltonian<1,true>, 
+    public structure::ElementLiouvillean<1,1,true>,
+    public structure::ElementAveraged<1,true>
+{
+public:
+  PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy&);
+
+private:
+  typedef structure::TridiagonalHamiltonian<1,true>::StateVectorLow StateVectorLow;
+  typedef structure::ElementLiouvillean<1,1,true>::LazyDensityOperator LazyDensityOperator;
+
+
+  void   doActWithJ (double t, StateVectorLow&           ) const;
+  double probability(double t, const LazyDensityOperator&) const;
+
+  const Averages average(double t, const LazyDensityOperator&) const;
+
+  void           process(Averages&)                  const;
+
+};
+
+
 #include "impl/Mode.tcc"
 
 #endif // _MODE_ELEMENT_H
