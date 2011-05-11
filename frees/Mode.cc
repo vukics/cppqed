@@ -421,3 +421,11 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 }
 
 
+
+
+
+PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
+  : ModeBase(p.cutoff),
+    structure::TridiagonalHamiltonian<1,true>(mode::details::pumping(p.eta,p.cutoff),mode::freqs(dcomp(p.kappa,-p.delta),p.cutoff)),
+    structure::ElementAveraged<1,true>("Mode",list_of("<number operator>")("VAR(number operator)")("real(<ladder operator>)")("imag(\")"))
+{}
