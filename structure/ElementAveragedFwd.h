@@ -6,7 +6,7 @@ namespace structure {
 
 class ElementAveragedCommon;
 
-template<int RANK>
+template<int RANK, bool IS_TD=false>
 class ElementAveraged;
 
 

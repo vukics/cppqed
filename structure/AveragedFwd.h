@@ -10,7 +10,7 @@ class AveragedCommon;
 struct AveragesFishyException;
 #endif // NDEBUG
 
-template<int> class Averaged;
+template<int, bool IS_TD=true> class Averaged;
 
 } // structure
 

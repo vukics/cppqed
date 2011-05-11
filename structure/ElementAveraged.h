@@ -43,8 +43,8 @@ private:
 //////////////////
 
 
-template<int RANK>
-class ElementAveraged : public Averaged<RANK>, private ElementAveragedCommon
+template<int RANK, bool IS_TD>
+class ElementAveraged : public Averaged<RANK,IS_TD>, private ElementAveragedCommon
 {
 public:
   typedef AveragedCommon::Averages Averages;

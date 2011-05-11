@@ -42,7 +42,7 @@ struct LiouvilleanFishyException : cpputils::Exception {};
 
 
 template<int RANK>
-class Liouvillean : public quantumdata::Types<RANK,LiouvilleanCommon>
+class Liouvillean<RANK,true> : public quantumdata::Types<RANK,LiouvilleanCommon>
 {
 public:
   typedef quantumdata::Types<RANK,LiouvilleanCommon> Base;
@@ -55,9 +55,9 @@ public:
   typedef typename Base::Probabilities Probabilities;
 
 
-  static const Probabilities probabilities(const LazyDensityOperator& matrix, const Liouvillean* liouvillean, StaticTag=theStaticOne) 
+  static const Probabilities probabilities(double t, const LazyDensityOperator& matrix, const Liouvillean* liouvillean, StaticTag=theStaticOne)
   {
-    const Probabilities probas(liouvillean ? liouvillean->probabilities(matrix) : Probabilities());
+    const Probabilities probas(liouvillean ? liouvillean->probabilities(t,matrix) : Probabilities());
 #ifndef   NDEBUG
     if (size_t(probas.size())!=nJumps(liouvillean))
       throw LiouvilleanFishyException();
@@ -66,21 +66,42 @@ public:
   }
 
 
-  static void actWithJ(StateVectorLow& psi, size_t jumpNo, const Liouvillean* liouvillean, StaticTag=theStaticOne)
-  // jumpNo is the principal number of the jump to be performed
+  static void actWithJ(double t, StateVectorLow& psi, size_t jumpNo, const Liouvillean* liouvillean, StaticTag=theStaticOne)
+  // jumpNo is the ordinal number of the jump to be performed
   {
-    if (liouvillean) liouvillean->actWithJ(psi,jumpNo);
+    if (liouvillean) liouvillean->actWithJ(t,psi,jumpNo);
   }
 
 
   virtual ~Liouvillean() {}
 
-  virtual void                actWithJ     (StateVectorLow&, size_t   ) const = 0;
+  virtual void                actWithJ     (double, StateVectorLow&, size_t   ) const = 0;
 
 private:    
+  virtual const Probabilities probabilities(double, const LazyDensityOperator&) const = 0;
+
+};
+
+
+
+template<int RANK>
+class Liouvillean<RANK,false> : public Liouvillean<RANK,true>
+{
+public:
+  typedef typename Liouvillean<RANK,true>::StateVectorLow      StateVectorLow     ;
+  typedef typename Liouvillean<RANK,true>::LazyDensityOperator LazyDensityOperator;
+  typedef typename Liouvillean<RANK,true>::Probabilities       Probabilities      ;
+
+
+private:
+  void                actWithJ     (double, StateVectorLow& psi, size_t jumpNo) const {actWithJ(psi,jumpNo);}
+  const Probabilities probabilities(double, const LazyDensityOperator&  matrix) const {return probabilities(matrix);}
+
+  virtual void                actWithJ     (StateVectorLow&, size_t   ) const = 0;
   virtual const Probabilities probabilities(const LazyDensityOperator&) const = 0;
 
 };
+
 
 
 } // structure

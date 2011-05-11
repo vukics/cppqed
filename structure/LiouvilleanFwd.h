@@ -12,7 +12,7 @@ struct LiouvilleanCommon;
 struct LiouvilleanFishyException;
 #endif // NDEBUG
 
-template<int>
+template<int, bool IS_TD=true>
 class Liouvillean;
 
 

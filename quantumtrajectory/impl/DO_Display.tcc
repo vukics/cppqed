@@ -47,14 +47,14 @@ DO_Display<RANK,V>::displayMoreKey(std::ostream& os) const
 
 template<int RANK, typename V>
 void
-DO_Display<RANK,V>::displayMore(const DensityOperator& rho, std::ostream& os, int precision) const 
+DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   throw(StoppingCriterionReachedException)
 {
   using namespace std;
   stringstream line(stringstream::in | stringstream::out);
   {
     if (av_) 
-      Averaged::display(rho,line,precision,av_);
+      Averaged::display(t,rho,line,precision,av_);
     if (negativity_) line<<'\t'<<formdouble::FormDouble(precision)(quantumdata::negPT(rho,V()));
     line<<endl;
   }

@@ -25,7 +25,7 @@ public:
 
   typedef boost::ptr_vector<StateVector> Basis;
 
-  using Base::getOstream; using Base::getPsi;
+  using Base::getOstream; using Base::toBeAveraged;
 
   ProjectingMCWF_Trajectory(
 			    StateVector& psi,

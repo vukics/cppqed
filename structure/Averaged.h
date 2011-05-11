@@ -71,7 +71,8 @@ struct AveragesFishyException : cpputils::Exception {};
 #endif // NDEBUG
 
 
-template<int RANK> class Averaged 
+template<int RANK>
+class Averaged<RANK,true>
   : public quantumdata::Types<RANK,AveragedCommon>
 {
 public:
@@ -83,9 +84,9 @@ public:
 
   using Base::display;
 
-  static const Averages average(const LazyDensityOperator& matrix, const Averaged* averaged, StaticTag=theStaticOne)
+  static const Averages average(double t, const LazyDensityOperator& matrix, const Averaged* averaged, StaticTag=theStaticOne)
   {
-    const Averages averages(averaged ? averaged->average(matrix) : Averages());
+    const Averages averages(averaged ? averaged->average(t,matrix) : Averages());
 #ifndef   NDEBUG
     if (size_t(averages.size())!=nAvr(averaged))
       throw AveragesFishyException();
@@ -94,10 +95,10 @@ public:
   }
 
 
-  static void display(const LazyDensityOperator& matrix, std::ostream& os, int precision, const Averaged* averaged, StaticTag=theStaticOne)
+  static void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision, const Averaged* averaged, StaticTag=theStaticOne)
   {
     if (averaged) {
-      Averages averages(averaged->average(matrix));
+      Averages averages(averaged->average(t,matrix));
       averaged->process(averages);
       averaged->display(averages,os,precision);
     }
@@ -107,7 +108,23 @@ public:
   virtual ~Averaged() {}
 
 private:
-  virtual const Averages average(const LazyDensityOperator&)     const = 0;
+  virtual const Averages average(double, const LazyDensityOperator&)     const = 0;
+
+};
+
+
+template<int RANK>
+class Averaged<RANK,false>
+  : public Averaged<RANK,true>
+{
+public:
+  typedef typename Averaged<RANK,true>::Averages            Averages           ;
+  typedef typename Averaged<RANK,true>::LazyDensityOperator LazyDensityOperator;
+
+private:
+  const Averages average(double, const LazyDensityOperator& matrix) const {return average(matrix);}
+
+  virtual const Averages average(const LazyDensityOperator&) const = 0;
 
 };
 

@@ -147,7 +147,7 @@ void MCWF_Trajectory<RANK>::displayMore(int precision) const
 
   ostream& os=getOstream();
 
-  Averaged::display(psi_,os,precision,av_);
+  Averaged::display(getTime(),psi_,os,precision,av_);
 
   displayEvenMore(precision);
 
@@ -166,9 +166,11 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
   if (ha_) getEvolved()->step(Dt);
   else getEvolved()->update(getTime()+Dt,Dt);
 
+  double t=getTime();
+
   if (ex_) {
     ex_->actWithU(getDtDid(),psi_());
-    tIntPic0_=getTime();
+    tIntPic0_=t;
   }
 
   psi_.renorm();
@@ -177,7 +179,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
   // Jump
   if (li_) {
 
-    typename Liouvillean::Probabilities probas(Liouvillean::probabilities(psi_,li_));
+    typename Liouvillean::Probabilities probas(Liouvillean::probabilities(t,psi_,li_));
 
     std::vector<indexSVL_tuple> probasSpecial;
 
@@ -185,7 +187,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
       for (int i=0; i<probas.size(); i++)
 	if (probas(i)<0) {
 	  StateVector psiTemp(psi_);
-	  Liouvillean::actWithJ(psiTemp(),i,li_);
+	  Liouvillean::actWithJ(t,psiTemp(),i,li_);
 	  probasSpecial.push_back(indexSVL_tuple(i,psiTemp()));
 
 	  probas(i)=mathutils::sqr(psiTemp.renorm());
@@ -217,7 +219,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 	  psi_()=i->template get<1>(); // RHS already normalized above
 	else {
 	  // normal  jump
-	  Liouvillean::actWithJ(psi_(),jumpNo,li_); 
+	  Liouvillean::actWithJ(t,psi_(),jumpNo,li_); 
 	  psi_()/=sqrt(probas(jumpNo));
 	}
       }
@@ -256,7 +258,7 @@ void MCWF_Trajectory<RANK>::displayParameters() const
 
   os<<"# Alternative jumps: ";
   {
-    typename Liouvillean::Probabilities probas(Liouvillean::probabilities(psi_,li_));
+    typename Liouvillean::Probabilities probas(Liouvillean::probabilities(0,psi_,li_));
     
     for (int i=0; i<probas.size(); i++) if (probas(i)<0) os<<i<<' ';
   }

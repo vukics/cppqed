@@ -76,7 +76,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
   for (size_t i=0; i<Liouvillean::nJumps(li_); i++) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     DensityOperatorLow rhotemp(rhoLow.copy());
-    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,_1,i,li_,structure::theStaticOne));
+    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,t,_1,i,li_,structure::theStaticOne));
     unaryIter(rhotemp,functionLi);
     blitzplusplus::hermitianConjugateSelf(rhotemp);
     unaryIter(rhotemp,functionLi);

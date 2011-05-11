@@ -131,7 +131,7 @@ public:
 
   typedef typename Base::DensityOperator DensityOperator;
 
-  using Base::getOstream;
+  using Base::getOstream; using Base::getTime;
 
   Master(DensityOperator& rho, const QuantumSystem& sys, const master::Pars& pt, bool negativity,
 	 const DensityOperatorLow& scaleAbs=DensityOperatorLow())
@@ -141,7 +141,7 @@ public:
 private:
   using Base::rho_;
 
-  void   displayMore   (int precision) const {doDisplay_.displayMore(rho_,getOstream(),precision);}
+  void   displayMore   (int precision) const {doDisplay_.displayMore(getTime(),rho_,getOstream(),precision);}
   size_t displayMoreKey(             ) const {return doDisplay_.displayMoreKey(getOstream());}
   
   const details::DO_Display<RANK,V> doDisplay_;

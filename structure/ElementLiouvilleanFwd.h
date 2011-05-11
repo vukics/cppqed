@@ -4,14 +4,12 @@
 
 namespace structure {
 
-template<int RANK, int NOJ=1> // NOJ stands for the number of jumps
+template<int RANK, int NOJ=1, bool IS_TD=false> // NOJ stands for the number of jumps
 // Note that even an elementary system can have several possible
 // jumps. Eg direction of recoil for atoms. This should be known at
 // compile time.
 class ElementLiouvillean;
 
-template<int RANK>
-class ElementLiouvillean<RANK,1>;
 
 } // structure
 

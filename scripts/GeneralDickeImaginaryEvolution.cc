@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
       for (pair<MCWF::Basis::const_iterator,DARRAY::const_iterator> i(eigenStates.begin(),eigenValues.begin()); 
 	   i.first!=eigenStates.end(); 
 	   ++i.first, ++i.second) {
-	os<<formdouble::high()(*i.second); Averaged::display(*i.first,os,pe.precision,&sys); os<<endl;
+	os<<formdouble::high()(*i.second); Averaged::display(0,*i.first,os,pe.precision,&sys); os<<endl;
       }
 
     }

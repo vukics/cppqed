@@ -43,7 +43,7 @@ public:
 
   const Averaged*const getAveraged() const {return av_;}
 
-  void   displayMore(const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
+  void   displayMore(double t, const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
   size_t displayMoreKey(std::ostream&) const;
 
 private:

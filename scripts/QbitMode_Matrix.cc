@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   
   {
 
-#define TRAJ_DISPLAY traj.getOstream()<<special()(traj.getTime())<<special()(traj.getDtDid()); structure::Averaged<2>::display(psi2,traj.getOstream(),pe.precision,&system2); traj.getOstream()<<endl;
+#define TRAJ_DISPLAY traj.getOstream()<<special()(traj.getTime())<<special()(traj.getDtDid()); structure::Averaged<2>::display(0,psi2,traj.getOstream(),pe.precision,&system2); traj.getOstream()<<endl;
 
     traj.displayParameters();
     traj.getOstream()<<"# Run Trajectory. Displaying in every "<<pe.Dt<<endl<<endl

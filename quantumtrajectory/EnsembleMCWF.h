@@ -101,7 +101,7 @@ public:
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;
 
-  using Base::getOstream;
+  using Base::getOstream; using Base::getTime;
 
   EnsembleMCWF(
 	       const StateVector& psi,
@@ -113,7 +113,7 @@ public:
     : trajectory::TrajectoryBase(p), Base(psi,sys,p,scaleAbs), doDisplay_(sys,p,negativity) {}
 
 private:
-  void   displayMore   (int precision) const {doDisplay_.displayMore(EnsembleTrajectories::toBeAveraged(),getOstream(),precision);}
+  void   displayMore   (int precision) const {doDisplay_.displayMore(getTime(),EnsembleTrajectories::toBeAveraged(),getOstream(),precision);}
   size_t displayMoreKey(             ) const {return doDisplay_.displayMoreKey(getOstream());}
 
   const DO_Display doDisplay_;

@@ -480,13 +480,13 @@ public:
   typedef std::list<Probabilities> SeqProbabilities;
   typedef typename SeqProbabilities::iterator SAI;
 
-  Probas(const Frees& frees, const LazyDensityOperator& ldo, SAI& iter) 
-    : frees_(frees), ldo_(ldo), iter_(iter) {}
+  Probas(const Frees& frees, double t, const LazyDensityOperator& ldo, SAI& iter) 
+    : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Li>
   void help(const Li*const li, Vec v) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Li::probabilities,_1,li,structure::theStaticOne),v,defaultArray));    
+    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne),v,defaultArray));    
   }
 
   template<typename Act>
@@ -504,6 +504,7 @@ public:
 private:
   const Frees& frees_;
 
+  const double t_;
   const LazyDensityOperator& ldo_;
   
   SAI& iter_;
@@ -513,7 +514,7 @@ private:
 
 template<typename VA>
 const typename Composite<VA>::Probabilities
-Composite<VA>::probabilities(const LazyDensityOperator& ldo) const
+Composite<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
 {
   using namespace std;
   list<Probabilities> seqProbabilities(RANK+mpl::size<VA>::value);
@@ -521,7 +522,7 @@ Composite<VA>::probabilities(const LazyDensityOperator& ldo) const
   {
     typename list<Probabilities>::iterator iter(seqProbabilities.begin());
 
-    worker(Probas(frees_,ldo,iter));
+    worker(Probas(frees_,t,ldo,iter));
   }
 
   Probabilities res(nJumps()); res=0;
@@ -535,7 +536,7 @@ template<typename VA>
 class Composite<VA>::ActWithJ
 {
 public:
-  ActWithJ(const Frees& frees, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
+  ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
 
   template<typename Vec, typename Li>
   void help(const Li*const li, Vec v) const
@@ -545,7 +546,7 @@ public:
     if (!flag_ && li) {
       size_t n=Li::nJumps(li);
       if (ordoJump_<n) {
-	boost::for_each(fullRange(psi_,v),bind(&Li::actWithJ,li,_1,ordoJump_));
+	boost::for_each(fullRange(psi_,v),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
 	flag_=true;
       }
       ordoJump_-=n;  
@@ -567,6 +568,7 @@ public:
 private:
   const Frees& frees_;
 
+  const double t_;
   StateVectorLow& psi_; 
   size_t& ordoJump_;
   bool& flag_;
@@ -575,10 +577,10 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::actWithJ(StateVectorLow& psi, size_t ordoJump) const
+void Composite<VA>::actWithJ(double t, StateVectorLow& psi, size_t ordoJump) const
 {
   bool flag=false;
-  worker(ActWithJ(frees_,psi,ordoJump,flag));
+  worker(ActWithJ(frees_,t,psi,ordoJump,flag));
 }
 
 
@@ -682,13 +684,13 @@ public:
   typedef std::list<Averages> SeqAverages;
   typedef typename SeqAverages::iterator SAI;
 
-  Average(const Frees& frees, const LazyDensityOperator& ldo, SAI& iter) 
-    : frees_(frees), ldo_(ldo), iter_(iter) {}
+  Average(const Frees& frees, double t, const LazyDensityOperator& ldo, SAI& iter) 
+    : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Av>
   void help(const Av*const av, Vec v) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,_1,av,structure::theStaticOne),v,defaultArray));
+    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne),v,defaultArray));
   }
 
   template<typename Act>
@@ -706,6 +708,7 @@ public:
 private:
   const Frees& frees_;
 
+  const double t_;
   const LazyDensityOperator& ldo_;
   
   SAI& iter_;
@@ -715,7 +718,7 @@ private:
 
 template<typename VA>
 const typename Composite<VA>::Averages
-Composite<VA>::average(const LazyDensityOperator& ldo) const
+Composite<VA>::average(double t, const LazyDensityOperator& ldo) const
 {
   using namespace std;
   list<Averages> seqAverages(RANK+mpl::size<VA>::value);
@@ -723,7 +726,7 @@ Composite<VA>::average(const LazyDensityOperator& ldo) const
   {
     typename list<Averages>::iterator iter(seqAverages.begin());
 
-    worker(Average(frees_,ldo,iter));
+    worker(Average(frees_,t,ldo,iter));
   }
 
   Averages res(nAvr()); res=0;

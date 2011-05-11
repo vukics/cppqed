@@ -25,7 +25,10 @@ int main(int argc, char* argv[])
   update(p,argc,argv,"--");
 
   PumpedLossyMode<> 
-    m0(pm0), m2(pm2);
+    m0(pm0);
+
+  PumpedLossyModeIP_NoExact
+    m2(pm2);
 
   PumpedLossyModeAlternative<>
     m1(pm1), m3(pm3);
