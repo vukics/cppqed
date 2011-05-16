@@ -1,4 +1,4 @@
-export PATH_TO_EXECS=~/quantologia/bin/scripts/gcc-4.5/release/
+export PATH_TO_EXECS=/home/vukics/quantologia/bin/scripts/gcc-4.4/release
 
 PATH=.:$PATH_TO_EXECS:"${PATH}"
 
@@ -14,8 +14,8 @@ ARGS0Base="--etat '(1,3)' --gamma 1.2 --deltaA -1 --qbitInit '(.4,.3)'"
 
 ARGS0="$ARGSTraj $ARGS0Base"
 
-$1 "PTLA_Ev.d" "PTLA_Evolved $ARGS0"
-$1 "PTLA_Ma.d" "PTLA_C++QED  $ARGS0               --evol master"
+$1 "PTLA_Ev.d" "PTLA_Evolved $ARGS0              "
+$1 "PTLA_Ma.d" "PTLA_C++QED  $ARGS0 --evol master"
 
 $1 "PTLA_En.d"   "PTLA_C++QED     $ARGS0               $ARGSEnsemble"
 
@@ -47,7 +47,7 @@ ARGS1Base="--minit '(1,-.5)' --eta '(30,10)' --deltaC 100 --cutoff 30"
 ARGS1="$ARGSTraj $ARGS1Base --T 1"
 
 $1 "PLM_Ev.d"    "PumpedLossyMode_Evolved $ARGS1                            "
-#$1 "PLM_En.d"    "PumpedLossyMode_C++QED  $ARGS1               $ARGSEnsemble"
+$1 "PLM_En.d"    "PumpedLossyMode_C++QED  $ARGS1               $ARGSEnsemble"
 $1 "PLM_Si.d"    "PumpedLossyMode_C++QED  $ARGS1                            "
 $1 "PLM_SiSch.d" "PumpedLossyMode_C++QED  $ARGS1 --picture Sch              "
 $1 "PLM_SiUIP.d" "PumpedLossyMode_C++QED  $ARGS1 --picture UIP              "
@@ -60,7 +60,7 @@ $1 "PLM_MaUIP.d" "PumpedLossyMode_C++QED  $ARGS1 --picture UIP --evol master"
 
 ARGS2="$ARGSTraj $ARGS0Base $ARGS1Base --g 0"
 
-#$1 "QMJ_En.d"    "QbitMode_C++QED  $ARGS2 $ARGSEnsemble"
+$1 "QMJ_En.d"    "QbitMode_C++QED  $ARGS2 $ARGSEnsemble"
 $1 "QMJ_Ma.d"    "QbitMode_C++QED  $ARGS2 --evol master"
 # This is an example where UIP is slower than Sch because the largest frequency is the pump
 
@@ -74,10 +74,10 @@ $1 "QMJ_MaSch.d" "QbitMode_C++QED  $ARGS2 --evol master --picture Sch"
 ARGSDecay="--qbitInit '(.4,.3)' --etat 0 --gamma 1 --deltaA 0 --eta 0 --kappa 2 --deltaC 0 --g 0 --dc 0 --Dt .01 --T 2"
 
 $1 "DecayMa.d"     "QbitMode_C++QED $ARGSDecay --minit '(1.,-.5)' --evol master  "
-#$1 "DecayEn.d"     "QbitMode_C++QED $ARGSDecay --minit '(1.,-.5)' $ARGSEnsemble  "
+$1 "DecayEn.d"     "QbitMode_C++QED $ARGSDecay --minit '(1.,-.5)' $ARGSEnsemble  "
 
 $1 "DecayFockMa.d" "QbitMode_C++QED $ARGSDecay --minitFock 8 --evol master  "
-#$1 "DecayFockEn.d" "QbitMode_C++QED $ARGSDecay --minitFock 8 $ARGSEnsemble  "
+$1 "DecayFockEn.d" "QbitMode_C++QED $ARGSDecay --minitFock 8 $ARGSEnsemble  "
 
 ########################
 # VI. Interacting binary
@@ -93,7 +93,7 @@ $1 "QMJ_Int_Matrix.d" "QbitMode_Matrix  $ARGS3               --no_noise"
 
 $1 "QMJ_Int_Si.d"     "QbitMode_C++QED  $ARGS3               --no_noise"
 
-#$1 "QMJ_Int_En.d"     "QbitMode_C++QED  $ARGS3 $ARGSEnsemble"
+$1 "QMJ_Int_En.d"     "QbitMode_C++QED  $ARGS3 $ARGSEnsemble"
 $1 "QMJ_Int_Ma.d"     "QbitMode_C++QED  $ARGS3 --evol master"
 
 $1 "QMJ_Int_MaSch.d"  "QbitMode_C++QED  $ARGS3 --evol master --picture Sch"
@@ -225,5 +225,5 @@ ARGS="--vClass -10 --modePart Sin --T 200 --pinit '(-.5 0 0 0)' --dc 0 --Dt .1"
 
 ARGSDecay="--eta0 0 --eta1 0 --eta2 0 --eta3 0 --deltaC0 0 --deltaC1 0 --deltaC2 0 --deltaC3 0 --cutoff0 6 --cutoff1 5 --cutoff2 4 --cutoff3 3 --kappa0 1 --kappa1 2 --kappa2 .5 --kappa3 1 --minitFock0 5 --minitFock1 4 --minitFock2 3 --minitFock3 2 --dc 0 --Dt .01 --T 2"
 
-#$1 "DecayCompositeMa.d" "FourModes $ARGSDecay --evol master"
-#$1 "DecayCompositeEn.d" "FourModes $ARGSDecay $ARGSEnsemble"
+$1 "DecayCompositeMa.d" "FourModes $ARGSDecay --evol master"
+$1 "DecayCompositeEn.d" "FourModes $ARGSDecay $ARGSEnsemble"

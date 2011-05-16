@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 import pycppqed as qed
 
-exact=qed.load_cppqed("PTLA_Ev.d")
-toBeVerified=qed.load_cppqed("QMJ_En.d")
+from pyUtils.regression import regression
 
-evs=toBeVerified[0]
+from pyUtils.interpolate import *
 
-import scipy.interpolate, scipy.integrate
+PTLA_Ev=qed.load_cppqed("data/PTLA_Ev.d")[0]
 
-exactInterp=scipy.interpolate.interp1d(exact[0].time,exact[0][3,:]/2.)
+PTLA_Ma=qed.load_cppqed("data/QMJ_En.d")[0]
 
-toBeVerifiedInterp=scipy.interpolate.interp1d(evs.time,evs[4,:])
+print regression(interpolate(PTLA_Ev.time,(1+PTLA_Ev[2])/2),interpolateEVC(PTLA_Ma,2),PTLA_Ev.time)
 
-print scipy.integrate.quadrature(lambda t : (exactInterp(t)-toBeVerifiedInterp(t))**2,exact[0].time[0],exact[0].time[-1])/(exact[0].time[-1]-exact[0].time[0])
-
-print ((exact[0][3,:]/2.-evs[4,:])**2).mean()
