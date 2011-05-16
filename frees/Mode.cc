@@ -207,10 +207,9 @@ const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) co
     averages(0)+=  n*diag;
     averages(1)+=n*n*diag;
 
-    double sqrtn=sqrt(double(n));
-    dcomp offdiag(matrix(n,n-1));
-    averages(2)+=sqrtn*real(offdiag);
-    averages(3)+=sqrtn*imag(offdiag);
+    dcomp offdiag(sqrt(n)*matrix(n,n-1));
+    averages(2)+=real(offdiag);
+    averages(3)+=imag(offdiag);
 
   }
 
@@ -243,11 +242,9 @@ const AveragedQuadratures::Averages AveragedQuadratures::average(const LazyDensi
 
   for (int n=2; n<int(matrix.getDimension()); n++) {
 
-    double sqrtn=sqrt(double(n));
-    dcomp  offdiag(matrix(n,n-2));
-
-    averages(4)+=sqrtn*sqrt(n-1.)*real(offdiag);
-    averages(5)+=sqrtn*sqrt(n-1.)*imag(offdiag);
+    dcomp  offdiag(sqrt(n*(n-1.))*matrix(n,n-2));
+    averages(4)+=real(offdiag);
+    averages(5)+=imag(offdiag);
 
   }
 
@@ -427,5 +424,47 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
   : ModeBase(p.cutoff),
     structure::TridiagonalHamiltonian<1,true>(mode::details::pumping(p.eta,p.cutoff),mode::freqs(dcomp(p.kappa,-p.delta),p.cutoff)),
-    structure::ElementAveraged<1,true>("Mode",list_of("<number operator>")("VAR(number operator)")("real(<ladder operator>)")("imag(\")"))
-{}
+    structure::ElementAveraged<1,true>("Mode",list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
+    z_(p.kappa,-p.delta)
+{
+  getParsStream()<<"# Interaction picture, not derived from Exact\n";
+}
+
+
+
+double PumpedLossyModeIP_NoExact::probability(double, const LazyDensityOperator& m) const
+{
+  return mode::photonNumber(m);
+}
+
+
+void PumpedLossyModeIP_NoExact::doActWithJ(double t, StateVectorLow& psi) const
+{
+  dcomp fact=sqrt(2.*real(z_))*exp(-z_*t);
+  int ubound=psi.ubound(0);
+  for (int n=0; n<ubound; ++n)
+    psi(n)=fact*sqrt(n+1)*psi(n+1);
+  psi(ubound)=0;
+}
+
+
+
+const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average(double t, const LazyDensityOperator& matrix) const
+{
+  Averages averages(3);
+
+  averages=0;
+
+  for (int n=1; n<int(matrix.getDimension()); n++) {
+
+    averages(0)+=n*exp(-2*real(z_)*n*t)*matrix(n);
+
+    dcomp offdiag(sqrt(n)*matrix(n,n-1)*exp(-(z_+2*(n-1)*real(z_))*t));
+    averages(1)+=real(offdiag);
+    averages(2)+=imag(offdiag);
+
+  }
+
+  return averages;
+
+}
