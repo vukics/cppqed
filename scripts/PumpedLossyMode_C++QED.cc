@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
   ParsEvolution pe(p); // Driver Parameters
   ParsPumpedLossy pplm(p); 
 
+  bool& alternative=p.add("alternative","Alternative mode",false);
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
 
   // Parameter finalization
@@ -26,7 +27,7 @@ int main(int argc, char* argv[])
 
   if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
-  SmartPtr mode(maker(pplm,qmp,AveragedQuadratures()));
+  SmartPtr mode(alternative ? SmartPtr(new PumpedLossyModeIP_NoExact(pplm)) : maker(pplm,qmp,AveragedQuadratures()));
 
   StateVector psi(mode::init(pplm));
 
