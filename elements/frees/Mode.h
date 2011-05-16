@@ -408,13 +408,14 @@ private:
   typedef structure::TridiagonalHamiltonian<1,true>::StateVectorLow StateVectorLow;
   typedef structure::ElementLiouvillean<1,1,true>::LazyDensityOperator LazyDensityOperator;
 
-
   void   doActWithJ (double t, StateVectorLow&           ) const;
   double probability(double t, const LazyDensityOperator&) const;
 
   const Averages average(double t, const LazyDensityOperator&) const;
 
-  void           process(Averages&)                  const;
+  void           process(Averages&)                  const {}
+
+  const dcomp z_;
 
 };
 
