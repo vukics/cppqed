@@ -175,7 +175,6 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 
   psi_.renorm();
 
-
   // Jump
   if (li_) {
 
