@@ -6,11 +6,7 @@ SRCDIRS := quantumdata quantumoperator quantumtrajectory structure elements/free
 
 EXECS := $(patsubst scripts/%.cc,%,$(wildcard scripts/*.cc))
 
-# Driver programs directory "driver" and are then found automatically
-
-EXCLUDED := MovingParticleCavity.o ParticleAlongCavity.o MovingParticleBase.o
-# These are excluded from compiling & linking of an EXEC
-# Nevertheless, they can still be compiled by invoking explicitely make foo.o
+# Scripts to be put into directory "scripts" and are then found automatically
 
 vpath %.cc scripts:$(SRCDIRS)
 vpath %.h $(SRCDIRS):utils/include utils/include/details
@@ -20,13 +16,13 @@ LIBDIR := utils/lib /usr/lib/atlas
 
 include utils/make.inc
 
-LDLIBS += -lutils
+LDLIBS += -lC++Utils
 
 ifeq ($(static),yes)
 LDFLAGS += -static
 endif
 
-LIBUTILS := utils/lib/libutils.a
+LIBUTILS := utils/lib/libC++Utils.a
 
 all : $(EXECS)
 .PHONY : all utils install clean
@@ -43,7 +39,7 @@ utils : $(LIBUTILS)
 # ************
 STDOBJ := $(filter-out $(EXCLUDED),$(foreach dir,$(SRCDIRS),$(patsubst $(dir)/%.cc,%.o,$(wildcard $(dir)/*.cc))))
 
-$(EXECS) : $(STDOBJ) $(LIBUTILS)
+$(EXECS) : $(STDOBJ) # $(LIBUTILS)
 
 # ************************
 # Determining dependencies 

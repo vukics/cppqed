@@ -11,7 +11,9 @@ LIBDIR := ../lib /usr/lib/atlas
 
 include ../make.inc
 
-LDLIBS += -lutils
+CPPFLAGS += -DBOOST_TEST_DYN_LINK
+
+LDLIBS += -lC++Utils -lboost_unit_test_framework
 
 ifeq ($(static),yes)
 LDFLAGS += -static

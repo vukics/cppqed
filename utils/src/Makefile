@@ -4,7 +4,7 @@ LIBDIR := ../lib
 
 EXCLUDED := Combinatorics.o
 
-ARCH := $(LIBDIR)/libutils.a
+ARCH := $(LIBDIR)/libC++Utils.a
 
 include ../make.inc
 
