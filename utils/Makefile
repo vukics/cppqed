@@ -21,5 +21,5 @@ clean :
 	rm -f *~ include/*~ include/*.h.gch
 
 pack : clean
-	tar -C.. -czf ../C++Utils.tgz C++Utils
+	tar -C.. -czf ../utils.tgz utils
 

@@ -15,11 +15,11 @@ CPPFLAGS = -I. $(foreach dir,$(INCDIR),-I$(dir)) \
 
 CC = /opt/local/bin/g++-mp-4.4
 
-LIBDIR += /opt/local/lib/ /Users/domokos/physics/C++QED/C++Utils/thirdParty/blitz/lib /Users/domokos/physics/C++QED/C++Utils/thirdParty/FLENS-lite/
+LIBDIR += /opt/local/lib/ /Users/domokos/physics/C++QED/utils/blitz/lib /Users/domokos/physics/C++QED/utils/FLENS-lite/
 
-INCDIR += /Users/domokos/physics/C++QED/C++Utils/thirdParty/FLENS-lite /Users/domokos/physics/C++QED/C++Utils/thirdParty/blitz/include /opt/local/include/
+INCDIR += /Users/domokos/physics/C++QED/utils/FLENS-lite /Users/domokos/physics/C++QED/utils/blitz/include /opt/local/include/
 
-LDFLAGS = -g $(foreach dir,$(LIBDIR),-L$(dir)) #-Wl,-rpath,@rpath//Users/domokos/physics/C++QED/C++Utils/thirdParty/FLENS-lite/
+LDFLAGS = -g $(foreach dir,$(LIBDIR),-L$(dir)) #-Wl,-rpath,@rpath//Users/domokos/physics/C++QED/utils/FLENS-lite/
 
 ifeq ($(optimization),yes)
 CPPFLAGS += -O2 -DNDEBUG

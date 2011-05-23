@@ -11,7 +11,7 @@ LIBDIR := ../lib /usr/lib/atlas
 
 include ../make.inc
 
-LDLIBS += -lC++Utils -llapack -lblas
+LDLIBS += -lutils -llapack -lblas
 # LDLIBS += -llapack -lblas
 
 ifeq ($(static),yes)

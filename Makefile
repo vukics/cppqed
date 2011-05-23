@@ -13,20 +13,20 @@ EXCLUDED := MovingParticleCavity.o ParticleAlongCavity.o MovingParticleBase.o
 # Nevertheless, they can still be compiled by invoking explicitely make foo.o
 
 vpath %.cc scripts:$(SRCDIRS)
-vpath %.h $(SRCDIRS):C++Utils/include C++Utils/include/details
+vpath %.h $(SRCDIRS):utils/include utils/include/details
 
-INCDIR := $(SRCDIRS) C++Utils/include C++Utils/include/details
-LIBDIR := C++Utils/lib /usr/lib/atlas
+INCDIR := $(SRCDIRS) utils/include utils/include/details
+LIBDIR := utils/lib /usr/lib/atlas
 
-include C++Utils/make.inc
+include utils/make.inc
 
-LDLIBS += -lC++Utils
+LDLIBS += -lutils
 
 ifeq ($(static),yes)
 LDFLAGS += -static
 endif
 
-LIBUTILS := C++Utils/lib/libC++Utils.a
+LIBUTILS := utils/lib/libutils.a
 
 all : $(EXECS)
 .PHONY : all utils install clean
@@ -34,7 +34,7 @@ all : $(EXECS)
 install : all ; mv $(EXECS) ~/bin/
 
 $(LIBUTILS) :
-	$(MAKE) -CC++Utils s
+	$(MAKE) -Cutils s
 
 utils : $(LIBUTILS)
 
@@ -68,4 +68,4 @@ clean :
 	rm -f $(foreach dir,$(SRCDIRS),$(dir)/*.h.gch)
 	@echo "Removing executables..."
 	rm -f $(EXECS)
-	make -C C++Utils clean
+	make -C utils clean
