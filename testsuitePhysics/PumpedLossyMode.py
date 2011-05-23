@@ -21,20 +21,25 @@ trajectories=loadTrajectories([
 ],
 "data")
 
+
 timeArray=trajectories[0].time
 
-averageArray=trajectories[0][4]
-for trajectory in trajectories[1:5] : averageArray+=trajectory[4]
-for trajectory in trajectories[6:]  : averageArray+=trajectory[8][:101]
-averageArray/=9
 
-def compare(i) :
-    # res=True
-    for trajectory in trajectories :
-        #res&=
-        print regression(interpolate(timeArray,averageArray),interpolateEVC(trajectory,i),timeArray)
-    # return res
+def compare(i,eps) :
+    averageArray=trajectories[0][i]
+    for trajectory in trajectories[1:6] : averageArray+=trajectory[i]
+    for trajectory in trajectories[6:]  : averageArray+=trajectory[i+4][:101]
+    averageArray/=9.
+    res=True
+    for trajectory in trajectories[0:6] :
+        reg=regression(interpolate(timeArray,averageArray),interpolateEVC(trajectory,i  ),timeArray)
+        # print reg
+        res&=reg<eps
+    for trajectory in trajectories[6:]  :
+        reg=regression(interpolate(timeArray,averageArray),interpolateEVC(trajectory,i+4),timeArray)
+        # print reg
+        res&=reg<eps
+    return res
 
-compare(4)
 
-# print compare((1+trajectories[0][2])/2,2, [ 1.5e-7, .0008, .0003 ] ) & compare((1-trajectories[0][2])/2,3, [ 1.5e-7, .0008, .0003 ] ) & compare(trajectories[0][3]/2,4, [ 3e-10, .0002, 4e-5 ] ) & compare(trajectories[0][4]/2,5, [ 1.2e-7, .0007, .00015 ] )
+print compare(2,1e-34) & compare(3,1e-34) & compare(4,1e-34) & compare(5,1e-34)

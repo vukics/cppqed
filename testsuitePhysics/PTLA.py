@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
 from pyUtils.regression import regression
 from pyUtils.interpolate import *
