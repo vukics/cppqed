@@ -35,6 +35,8 @@ Overview
 
    testing
 
+   resources
+
    appendices
 
    rationales
@@ -68,6 +70,8 @@ Full contents
    cpputils
 
    testing
+
+   resources
 
    appendices
 

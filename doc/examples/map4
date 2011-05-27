@@ -1,0 +1,86 @@
+2358:   bin/scripts/gcc-4.5/release/PumpedLossyMode_C++QED --minitFock 3 --eta (.5,-.8) --T 1e6 --dc 0 --Dt 1e5 --cutoff 100000
+0000000000400000    280K r-x--  /home/vukics/quantologia/bin/scripts/gcc-4.5/release/PumpedLossyMode_C++QED
+0000000000646000     52K r----  /home/vukics/quantologia/bin/scripts/gcc-4.5/release/PumpedLossyMode_C++QED
+0000000000653000      4K rw---  /home/vukics/quantologia/bin/scripts/gcc-4.5/release/PumpedLossyMode_C++QED
+0000000002113000  31396K rw---    [ anon ]
+00007f07c6192000     96K r-x--  /lib/x86_64-linux-gnu/libpthread-2.13.so
+00007f07c61aa000   2048K -----  /lib/x86_64-linux-gnu/libpthread-2.13.so
+00007f07c63aa000      4K r----  /lib/x86_64-linux-gnu/libpthread-2.13.so
+00007f07c63ab000      4K rw---  /lib/x86_64-linux-gnu/libpthread-2.13.so
+00007f07c63ac000     16K rw---    [ anon ]
+00007f07c63b0000    900K r-x--  /usr/lib/x86_64-linux-gnu/libgfortran.so.3.0.0
+00007f07c6491000   2048K -----  /usr/lib/x86_64-linux-gnu/libgfortran.so.3.0.0
+00007f07c6691000      4K r----  /usr/lib/x86_64-linux-gnu/libgfortran.so.3.0.0
+00007f07c6692000      4K rw---  /usr/lib/x86_64-linux-gnu/libgfortran.so.3.0.0
+00007f07c6693000      4K rw---    [ anon ]
+00007f07c6694000   6576K r-x--  /usr/lib/atlas-base/atlas/libblas.so.3gf.0
+00007f07c6d00000   2048K -----  /usr/lib/atlas-base/atlas/libblas.so.3gf.0
+00007f07c6f00000     36K rw---  /usr/lib/atlas-base/atlas/libblas.so.3gf.0
+00007f07c6f09000   9100K r-x--  /usr/lib/atlas-base/atlas/liblapack.so.3gf.0
+00007f07c77ec000   2048K -----  /usr/lib/atlas-base/atlas/liblapack.so.3gf.0
+00007f07c79ec000     20K rw---  /usr/lib/atlas-base/atlas/liblapack.so.3gf.0
+00007f07c79f1000   1076K rw---    [ anon ]
+00007f07c7afe000     60K r-x--  /usr/local/lib/libflens.so
+00007f07c7b0d000   2044K -----  /usr/local/lib/libflens.so
+00007f07c7d0c000      4K r----  /usr/local/lib/libflens.so
+00007f07c7d0d000      4K rw---  /usr/local/lib/libflens.so
+00007f07c7d0e000    228K r-x--  /usr/lib/libgslcblas.so.0.0.0
+00007f07c7d47000   2048K -----  /usr/lib/libgslcblas.so.0.0.0
+00007f07c7f47000      4K r----  /usr/lib/libgslcblas.so.0.0.0
+00007f07c7f48000      4K rw---  /usr/lib/libgslcblas.so.0.0.0
+00007f07c7f49000   2068K r-x--  /usr/lib/libgsl.so.0.15.0
+00007f07c814e000   2044K -----  /usr/lib/libgsl.so.0.15.0
+00007f07c834d000     12K r----  /usr/lib/libgsl.so.0.15.0
+00007f07c8350000     56K rw---  /usr/lib/libgsl.so.0.15.0
+00007f07c835e000      8K r-x--  /home/vukics/quantologia/bin/quantumdata/gcc-4.5/release/libquantumdata.so
+00007f07c8360000   2044K -----  /home/vukics/quantologia/bin/quantumdata/gcc-4.5/release/libquantumdata.so
+00007f07c855f000      4K r----  /home/vukics/quantologia/bin/quantumdata/gcc-4.5/release/libquantumdata.so
+00007f07c8560000      4K rw---  /home/vukics/quantologia/bin/quantumdata/gcc-4.5/release/libquantumdata.so
+00007f07c8561000    108K r-x--  /home/vukics/quantologia/utils/bin/src/gcc-4.5/release/libUtils.so
+00007f07c857c000   2044K -----  /home/vukics/quantologia/utils/bin/src/gcc-4.5/release/libUtils.so
+00007f07c877b000      8K r----  /home/vukics/quantologia/utils/bin/src/gcc-4.5/release/libUtils.so
+00007f07c877d000     60K rw---  /home/vukics/quantologia/utils/bin/src/gcc-4.5/release/libUtils.so
+00007f07c878c000     72K r-x--  /home/vukics/quantologia/bin/structure/gcc-4.5/release/libstructure.so
+00007f07c879e000   2044K -----  /home/vukics/quantologia/bin/structure/gcc-4.5/release/libstructure.so
+00007f07c899d000      8K r----  /home/vukics/quantologia/bin/structure/gcc-4.5/release/libstructure.so
+00007f07c899f000      4K rw---  /home/vukics/quantologia/bin/structure/gcc-4.5/release/libstructure.so
+00007f07c89a0000    108K r-x--  /home/vukics/quantologia/bin/quantumoperator/gcc-4.5/release/libquantumoperator.so
+00007f07c89bb000   2048K -----  /home/vukics/quantologia/bin/quantumoperator/gcc-4.5/release/libquantumoperator.so
+00007f07c8bbb000      4K r----  /home/vukics/quantologia/bin/quantumoperator/gcc-4.5/release/libquantumoperator.so
+00007f07c8bbc000      4K rw---  /home/vukics/quantologia/bin/quantumoperator/gcc-4.5/release/libquantumoperator.so
+00007f07c8bbd000   1576K r-x--  /lib/x86_64-linux-gnu/libc-2.13.so
+00007f07c8d47000   2044K -----  /lib/x86_64-linux-gnu/libc-2.13.so
+00007f07c8f46000     16K r----  /lib/x86_64-linux-gnu/libc-2.13.so
+00007f07c8f4a000      4K rw---  /lib/x86_64-linux-gnu/libc-2.13.so
+00007f07c8f4b000     24K rw---    [ anon ]
+00007f07c8f51000     84K r-x--  /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f07c8f66000   2044K -----  /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f07c9165000      4K r----  /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f07c9166000      4K rw---  /lib/x86_64-linux-gnu/libgcc_s.so.1
+00007f07c9167000    528K r-x--  /lib/x86_64-linux-gnu/libm-2.13.so
+00007f07c91eb000   2044K -----  /lib/x86_64-linux-gnu/libm-2.13.so
+00007f07c93ea000      4K r----  /lib/x86_64-linux-gnu/libm-2.13.so
+00007f07c93eb000      4K rw---  /lib/x86_64-linux-gnu/libm-2.13.so
+00007f07c93ec000    928K r-x--  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.14
+00007f07c94d4000   2044K -----  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.14
+00007f07c96d3000     32K r----  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.14
+00007f07c96db000      8K rw---  /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.14
+00007f07c96dd000     84K rw---    [ anon ]
+00007f07c96f2000     40K r-x--  /home/vukics/quantologia/bin/quantumtrajectory/gcc-4.5/release/libquantumtrajectory.so
+00007f07c96fc000   2048K -----  /home/vukics/quantologia/bin/quantumtrajectory/gcc-4.5/release/libquantumtrajectory.so
+00007f07c98fc000      4K r----  /home/vukics/quantologia/bin/quantumtrajectory/gcc-4.5/release/libquantumtrajectory.so
+00007f07c98fd000      4K rw---  /home/vukics/quantologia/bin/quantumtrajectory/gcc-4.5/release/libquantumtrajectory.so
+00007f07c98fe000   1052K r-x--  /home/vukics/quantologia/bin/elements/gcc-4.5/release/libC++QEDelements.so
+00007f07c9a05000   2044K -----  /home/vukics/quantologia/bin/elements/gcc-4.5/release/libC++QEDelements.so
+00007f07c9c04000     60K r----  /home/vukics/quantologia/bin/elements/gcc-4.5/release/libC++QEDelements.so
+00007f07c9c13000      4K rw---  /home/vukics/quantologia/bin/elements/gcc-4.5/release/libC++QEDelements.so
+00007f07c9c14000      4K rw---    [ anon ]
+00007f07c9c15000    132K r-x--  /lib/x86_64-linux-gnu/ld-2.13.so
+00007f07c9e01000     40K rw---    [ anon ]
+00007f07c9e31000     16K rw---    [ anon ]
+00007f07c9e35000      4K r----  /lib/x86_64-linux-gnu/ld-2.13.so
+00007f07c9e36000      8K rw---  /lib/x86_64-linux-gnu/ld-2.13.so
+00007fffa7c56000    132K rw---    [ stack ]
+00007fffa7dff000      4K r-x--    [ anon ]
+ffffffffff600000      4K r-x--    [ anon ]
+ total            91988K
