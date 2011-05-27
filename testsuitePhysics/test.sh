@@ -1,4 +1,5 @@
-export PATH_TO_EXECS=/home/vukics/quantologia/bin/scripts/gcc-4.4/release
+# export PATH_TO_EXECS=/home/vukics/quantologia/bin/scripts/gcc-4.4/release
+export PATH_TO_EXECS=/nfshome/vukics/h/quantologia/bin/scripts/gcc-4.4/release
 
 PATH=.:$PATH_TO_EXECS:"${PATH}"
 
