@@ -24,7 +24,7 @@ Via an example we define *state-vector slices:*
 .. math::
   :label: stateVectorSlices
 
-  \ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}=\sum_{i=1,3,6,7,9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i
+  \ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}\equiv\sum_{i=1,3,6,7,9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i
 
 Slicing is fully recursive in that a state-vector slice behaves exactly as a state vector, only with a lower rank. It can even be further sliced. It is in particular true that
 
@@ -44,7 +44,7 @@ Via an example we define *canonical operator extensions:*
 
 When the numbers in the angular brackets are permutations of a sequence of ordinals, this is in fact not even an extension, only a permutation of the underlying elementary Hilbert spaces.
 
-Action of the operator in extended Hilbert spaces can then be calculated by acting with the (possibly permutated) original operator on an appropriate vector slice:
+Matrix elements of the operator in extended Hilbert spaces can then be calculated by acting with the (possibly permutated) original operator on an appropriate vector slice:
 
 .. math::
   :label: canonicalOperatorExtensionsAction

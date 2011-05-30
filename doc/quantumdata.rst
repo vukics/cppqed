@@ -112,7 +112,7 @@ The solution adopted for this problem in the framework is represented by the cla
       const dcomp calculateASqr(const LazyDensityOperator<1>& matrix)
       {
         dcomp res;
-        for (int i=2; i<matrix.getTotalDimensions(); ++i) res+=sqrt(i*(i-2))*matrix(i,i-2);
+        for (int i=2; i<matrix.getTotalDimension(); ++i) res+=sqrt(i*(i-2))*matrix(i,i-2);
         return res;
       }
 
