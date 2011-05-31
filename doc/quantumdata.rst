@@ -135,7 +135,7 @@ The solution adopted for this problem in the framework is represented by the cla
         const LazyDensityOperator<2>::Dimensions dim(matrix.getDimensions());
 
         dcomp res;
-        for (int i=0; i<dim[0]-1; ++i) for (int j=1; m<dim[1]; ++j) res+=sqrt((i+1)*j)*matrix(Idx(i,j),Idx(i+1,j-1));
+        for (int i=0; i<dim[0]-1; ++i) for (int j=1; j<dim[1]; ++j) res+=sqrt((i+1)*j)*matrix(Idx(i,j),Idx(i+1,j-1));
         return res;
       }
 
@@ -284,7 +284,7 @@ On higher levels of the framework, the iteration is performed via the function:
         typedef TTD_DArray<1> Averages;
 
 	const Averages
-	calculateModeAverages(const LazyDensityOperator<1>& matrix) const
+	calculateModeAverages(const LazyDensityOperator<1>& matrix)
 	{
   	  Averages averages(4); averages=0;
 
@@ -307,9 +307,9 @@ On higher levels of the framework, the iteration is performed via the function:
 
         template<int RANK, int MODE_POSITION> // for the subsystem indexed by the index MODE_POSITION
         const Averages
-	calculateEmbeddedHarmonicOscillatorAverages(const StateVector<RANK>& psi)
+	calculateEmbeddedModeAverages(const StateVector<RANK>& psi)
 	{
-	  return partialTrace(psi,calculateHarmonicOscillatorAverages,tmptools::Vector<MODE_POSITION>(),Averages()); 
+	  return partialTrace(psi,calculateModeAverages,tmptools::Vector<MODE_POSITION>(),Averages()); 
 	}
 
 

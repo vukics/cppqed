@@ -127,7 +127,7 @@ Here, ``dc`` is expected to be an integer, and it is the number of (adaptive) ti
 Parameters
 ^^^^^^^^^^
 
-In the above, the necessary parameters must be previously defined somewhere. Parameters can of course come from several sources, but the alternative I usually find most useful is to have sensible defaults for all parameters, and to be able to override each of them separately in the command line when I actually execute the program with a given set of parameters. This allows for a very fine-grained control above what I want to accept as default and what I want to override, and the command line never gets crowded by those parameters for which the default is fine.
+In the above, the necessary parameters must be previously defined somewhere. Parameters can of course come from several sources, but the alternative I usually find most useful is to have sensible defaults for all parameters, and to be able to override each of them separately in the command line when I actually execute the program with a given set of parameters. This allows for a very fine-grained control over what I want to accept as default and what I want to override, and the command line never gets crowded by those parameters for which the default is fine.
 
 This possibility is indeed supported by the framework, cf. :ref:`cpputils_Parameters`. Consider the following program:
 
