@@ -61,17 +61,17 @@ box 10 7 justify tc round 0.1 name "elements" fill gray10
 rmove 0 -1.25
 class "frees" "Mode, Spin, etc." 2
 
-rmove 2.5 -2
+rmove -2.5 -2.5
 class "interactions" "JaynesCummings, etc." 2
 
-rmove -5 -2
+rmove 5 -1.5
 class "composites" "BinarySystem, Composite" 2
 
 set lwidth .05
 
-join interactions.tc -> frees.br
-join composites.tc -> frees.bl
-join composites.tr -> interactions.bl
+join interactions.tc -> frees.bl
+join composites.tc -> frees.br
+join composites.tl -> interactions.br
 
 set lwidth .08 color gray60 arrowsize .8
 
@@ -93,12 +93,14 @@ set lwidth .05
 
 join quantumoperator.tl -> quantumdata.lc curve 90 0 10 -5
 
+set lstyle 2
+
+join interactions.lc -> helpers.h
+join frees.lc -> helpers.tr
+
 set lstyle 2 lwidth .08 color gray60 arrowsize .7
 
-join elements.h -> helpers.rc
-
-
-rmove -4 6
+rmove -2.5 4.5
 
 set lwidth .1 lstyle 2 just tc color gray40 hei 1 font plge arrowsize 0.4
 
