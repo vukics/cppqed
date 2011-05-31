@@ -109,11 +109,12 @@ box 4 2 justify tc round 0.1 name "scripts" fill gray10
       rmove 0 -.5
       text Scripts
 
-set lwidth .08 color gray60 arrowsize .8
+set lwidth .08 lstyle 2 color gray60 arrowsize .8
 
 join scripts.rc -> elements.h
 join scripts.tc -> core.v
 
+set lstyle 0
 
 rmove 12.5 8
 
