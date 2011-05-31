@@ -1,5 +1,7 @@
 project : requirements <library>../../quantumtrajectory//quantumtrajectory <library>../../elements//C++QEDelements : : build-dir bin ;
 
+obj cpcPaperExamples.o : cpcPaperExamples.cc ;
+
 obj ExampleMode.o : ExampleMode.cc ;
 obj ExampleModeImpl.o : ExampleModeImpl.cc ;
 
