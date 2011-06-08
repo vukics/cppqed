@@ -3,7 +3,7 @@
 C++QED: a framework for simulating open quantum dynamics
 ********************************************************
 
-**C++QED is a highly flexible framework for simulating open quantum dynamics. It allows users to build arbitrarily complex systems from elementary free subsystems and interactions, and simulate their time evolution with a number of available time-evolution drivers.**
+**C++QED is a highly flexible framework for simulating open quantum dynamics. It allows users to build arbitrarily complex interacting quantum systems from elementary free subsystems and interactions, and simulate their time evolution with a number of available time-evolution drivers.**
 
 
 =============
@@ -17,7 +17,7 @@ To start to understand and use the framework on the highest level, consult the u
 
    User Guide <tutorial>
 
-To be able to write new modules representing elementary subsystems or interactions, consult the following guide:
+To be able to write new modules representing elementary free subsystems or interactions, consult the following guide:
 
 .. toctree::
    :maxdepth: 2
@@ -86,7 +86,7 @@ Links
 
 * `GNU Scientific library (GSL) <http://www.gnu.org/software/gsl/>`_
 
-* `Blitz++ <http://www.oonumerics.org/blitz/>`_
+* `Blitz++ <http://www.oonumerics.org/blitz/>`_, `new homepage <http://blitz.sourceforge.net>`_
 
 * `Flexible Library for Efficient Numerical Solutions (FLENS) <http://flens.sourceforge.net/>`_
 
