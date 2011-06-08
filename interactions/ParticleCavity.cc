@@ -5,9 +5,6 @@
 #include "Mode.h"
 
 #include<boost/assign/list_of.hpp>
-#include<boost/assign/list_inserter.hpp>
-
-#include<boost/tuple/tuple_io.hpp>
 
 
 using namespace std;
@@ -36,15 +33,26 @@ const Tridiagonal interferic(size_t modeDim, size_t particleDim, double uNotTime
 }
 
 
-const TridiagonalIPs fill(const ModeBase* mode, const ParticleBase* particle, double uNot, double etaeff, const ModeFunction& mf)
+const Tridiagonals fillT(const ModeBase* mode, const ParticleBase* particle, double uNot, double etaeff, const ModeFunction& mf)
 {
-  TridiagonalIPs res;
+  Tridiagonals res;
 
-  if (uNot && !isComplex(mf.get<0>())) push_back(res)(dispersive(mode->getDimension(),particle->getDimension(),uNot,mf),
-						      freqs(mode)*freqs(particle,mf.get<1>()<<1));
+  if (uNot && !isComplex(mf.get<0>())) res.push_back(dispersive(mode->getDimension(),particle->getDimension(),uNot,mf));
 
-  if (double factor=uNot*etaeff) push_back(res)(interferic(mode->getDimension(),particle->getDimension(),factor,uNot,mf),
-						freqs(mode)*freqs(particle,mf.get<1>()));
+  if (double factor=uNot*etaeff) res.push_back(interferic(mode->getDimension(),particle->getDimension(),factor,uNot,mf));
+
+  return res;
+
+}
+
+
+const Frequenciess fillF(const ModeBase* mode, const ParticleBase* particle, double uNot, double etaeff, const ModeFunction& mf)
+{
+  Frequenciess res;
+
+  if (uNot && !isComplex(mf.get<0>())) res.push_back(freqs(mode)*freqs(particle,mf.get<1>()<<1));
+
+  if (uNot*etaeff) res.push_back(freqs(mode)*freqs(particle,mf.get<1>()));
 
   return res;
 
@@ -85,7 +93,7 @@ POC_Base::POC_Base(const ModeBase* mode, const PumpedParticleBase* particle, dou
 PAC_Base::PAC_Base(const ModeBase* mode, const ParticleBase* particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
   : MF_Base(modeCav,kCav),
     particlecavity::Base(mode,particle,uNot,etaeff),
-    TridiagonalHamiltonian(fill(mode,particle,uNot,etaeff,MF_Base::member))
+    TridiagonalHamiltonian(fillT(mode,particle,uNot,etaeff,MF_Base::member),fillF(mode,particle,uNot,etaeff,MF_Base::member))
 {
   getParsStream()<<"# Particle moving along cavity with "<<getMF()<<endl;
 }

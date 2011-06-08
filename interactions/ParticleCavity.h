@@ -14,7 +14,7 @@
 
 #include "Exception.h"
 
-#include<boost/utility.hpp>
+#include <boost/utility.hpp>
 
 
 namespace particlecavity {
@@ -30,8 +30,8 @@ typedef quantumoperator::Tridiagonal<2> Tridiagonal;
 typedef structure::TridiagonalHamiltonian<2,true> TridiagonalHamiltonian;
 
 
-typedef TridiagonalHamiltonian::TridiagonalIP  TridiagonalIP ;
-typedef TridiagonalHamiltonian::TridiagonalIPs TridiagonalIPs;
+typedef TridiagonalHamiltonian::Tridiagonals Tridiagonals;
+typedef TridiagonalHamiltonian::Frequenciess Frequenciess;
 
 class Base
   : public structure::Interaction<2>
