@@ -193,12 +193,14 @@ public:
 
   typedef cpputils::MultiIndexIterator<RANKIDX> Impl;
 
+  typedef Indexer<RANK,V> Base;
+
   IteratorBase(CcCA&, boost::mpl::false_); // if it's not the end, it's the beginning
   IteratorBase(CcCA&, boost::mpl:: true_);
 
   void increment() {++impl_;}
 
-  CcCARes& operator*() const {return Indexer<RANK,V>::index(array_,arrayRes_,*impl_);}
+  CcCARes& operator*() const {return Base::index(array_,arrayRes_,*impl_);}
   // This has to return a reference, cf eg
   // ElementLiovillean::JumpStrategy takes its argument as a non-const
   // reference!!! Or, it has to take a copy there...

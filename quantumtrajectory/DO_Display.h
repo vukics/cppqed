@@ -5,8 +5,9 @@
 #include "DensityOperatorFwd.h"
 #include "DO_DisplayFwd.h"
 
+#include "DimensionsBookkeeper.h"
+
 #include "AveragedFwd.h"
-#include "DimensionsBookkeeperFwd.h"
 #include "QuantumSystemFwd.h"
 
 #include "Trajectory.h"

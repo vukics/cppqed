@@ -6,7 +6,7 @@
 namespace structure {
 
 
-struct LiouvilleanCommon;
+class LiouvilleanCommon;
 
 #ifndef   NDEBUG
 struct LiouvilleanFishyException;

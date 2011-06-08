@@ -88,7 +88,7 @@ public:
   {
     const Averages averages(averaged ? averaged->average(t,matrix) : Averages());
 #ifndef   NDEBUG
-    if (size_t(averages.size())!=nAvr(averaged))
+    if (size_t(averages.size())!=Base::nAvr(averaged))
       throw AveragesFishyException();
 #endif // NDEBUG
     return averages;

@@ -5,7 +5,7 @@
 
 namespace quantumtrajectory {
 
-struct MCWF_TrajectoryFileOpeningException;
+class MCWF_TrajectoryFileOpeningException;
 
 struct ParsMCWF_Trajectory;
 

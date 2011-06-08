@@ -97,7 +97,7 @@ IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl::false_)
   : array_(), arrayRes_(), impl_(ctorHelper<false>(array))
 {
   array_.reference(array);
-  transpose(array_);
+  Base::transpose(array_);
 }
 
 

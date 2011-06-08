@@ -59,7 +59,7 @@ public:
   {
     const Probabilities probas(liouvillean ? liouvillean->probabilities(t,matrix) : Probabilities());
 #ifndef   NDEBUG
-    if (size_t(probas.size())!=nJumps(liouvillean))
+    if (size_t(probas.size())!=Base::nJumps(liouvillean))
       throw LiouvilleanFishyException();
 #endif // NDEBUG
     return probas;
