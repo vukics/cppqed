@@ -8,9 +8,7 @@
 
 #include "Frequencies.h"
 
-#include<boost/tuple/tuple.hpp>
-
-#include<list>
+#include <list>
 
 namespace structure {
 
@@ -104,19 +102,13 @@ public:
   typedef typename Base::Tridiagonal  Tridiagonal ;
   typedef typename Base::Tridiagonals Tridiagonals;
 
-  typedef boost::tuple<Tridiagonal,Frequencies> TridiagonalIP ;
-  typedef std::list<TridiagonalIP>              TridiagonalIPs;
-
   // From the two sets of constructors, only one can be used, depending on the value of IS_TD
   // IS_TD=true
-  TridiagonalHamiltonian(const Tridiagonal & hOverI , const Frequencies & freqs ) 
-    : Base(Tridiagonals(1,hOverI),Frequenciess(1,freqs)) {}
+  TridiagonalHamiltonian(const Tridiagonal & hOverI , const Frequencies & freqs ) : Base(Tridiagonals(1,hOverI),Frequenciess(1,freqs)) {}
   TridiagonalHamiltonian(const Tridiagonals& hOverIs, const Frequenciess& freqss) : Base(hOverIs,freqss) {}
-  TridiagonalHamiltonian(const TridiagonalIPs&);
 
   // IS_TD=false
-  TridiagonalHamiltonian(const Tridiagonal & hOverI                             ) 
-    : Base(Tridiagonals(1,hOverI)) {}
+  TridiagonalHamiltonian(const Tridiagonal & hOverI                             ) : Base(Tridiagonals(1,hOverI)) {}
   TridiagonalHamiltonian(const Tridiagonals& hOverIs                            ) : Base(hOverIs       ) {}
 
 };
