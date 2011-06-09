@@ -96,7 +96,7 @@ In this case, the class representing the element has to be derived from :class:`
 
 .. note:: 
 
-  The framework requires that the jump and the averages be calculated in the normal picture also in this case (cf. :func:`quantumtrajectory::MCWF_Trajectory::step`). (Here the Liouvillean remains unchanged anyway.) This allows for reusing the same code in both pictures.
+  The framework requires that the jump and the averages be calculated in the normal picture also in this case (cf. explanation of classes :class:`structure::Hamiltonian`, :class:`structure::Exact`, :class:`structure::Liouvillean`, and :class:`structure::Averaged`, and furthermore Sec. :ref:`MCWF_Trajectory`). This allows for reusing the same code in both pictures. (Incidentally, here the Liouvillean remains unchanged anyway.)
 
 
 .. literalinclude:: examples/ExampleMode.h

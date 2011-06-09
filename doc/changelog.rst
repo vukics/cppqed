@@ -2,12 +2,18 @@
 ChangeLog
 *********
 
-2010/05/10 Switching to a more refined definition of time-dependence schemes in :class:`structure::Hamiltonian`
+2011/06/08 Successful compilation with the svn version of the `clang++ <http://clang.llvm.org/>`_ compiler.
+
+  This required correction of some small mistakes which were accepted by gcc for some reason.
+
+  Also, for some reason, clang++ could note compile ``quantumoperator/impl/TridiagonalHamiltonian.tcc``, so this had to be changed. (It had been crazy anyway.) This broke only one client, ``elements/interactions/ParticleCavity.cc``, which therefore needed to be slightly modified as well. This looks a bit awful now, but all these will anyway become deprecated with the new quantumoperator architecture.
+
+2011/05/10 Switching to a more refined definition of time-dependence schemes in :class:`structure::Hamiltonian`
 
   As a consequence, :class:`structure::TimeIndependentHamiltonian` has been deprecated.
 
 
-2010/02/15 Switching to `Bazaar <https://sourceforge.net/scm/?type=bzr&group_id=187775>`_ revision control
+2011/02/15 Switching to `Bazaar <https://sourceforge.net/scm/?type=bzr&group_id=187775>`_ revision control
 
   History has not been migrated to Bazaar, the old history remaining accessible from `CVS <https://sourceforge.net/scm/?type=cvs&group_id=187775>`_. Cf. the `tutorial <http://cppqed.sourceforge.net/tutorial/installation.html#obtaining-c-qed>`_ for further details.
 

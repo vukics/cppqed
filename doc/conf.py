@@ -232,7 +232,7 @@ html_theme_options = {
 latex_documents = [
   ('tutorial', 'C++QED_Tutorial.tex', ur'C++QEDv2 User Guide', ur'András Vukics', 'howto'),
   ('structureTutorial', 'C++QED_structureTutorial.tex', ur'C++QEDv2 Element Guide', ur'András Vukics', 'howto'),
-  ('manual', 'C++QED_ReferenceManual.tex', ur'C++QEDv2 Reference Manual', ur'András Vukics', 'manual'),
+#  ('manual', 'C++QED_ReferenceManual.tex', ur'C++QEDv2 Reference Manual', ur'András Vukics', 'manual'),
 ]
 
 latex_use_parts = False

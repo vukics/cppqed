@@ -150,7 +150,7 @@ Boost.Build, just like ``make``, supports parallel compilation, which can make a
 
   bjam -j n ... 
 
-C++QEDv2 has been successfully compiled on several Linux platforms and Mac OS X. In all cases the GNU C++ Compiler has been used. Portability to other compilers remains to be demonstrated.
+C++QEDv2 has been successfully compiled on several Linux platforms and Mac OS X. In all cases the GNU C++ Compiler has been used. It also compiles with the `clang++ <http://clang.llvm.org/>`_ compiler. Portability to other compilers remains to be demonstrated.
 
 
 .. todo::

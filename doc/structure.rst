@@ -15,14 +15,14 @@ The ``structure`` namespace comprises modules for describing quantum systems. Am
 Much of the design here depends on the requirements of a step of the Monte-Carlo wave function method, as described in Sec. :ref:`MCWF_Trajectory`, so the reader is asked to have a look at there, too.
 
 
-Most of the classes in this namespace belong to a single hierarchy, sketched in the diagram below (the broken lines signifying that the inheritance is not direct, due to some classes in between, which can be considered implementation details):
+Most of the classes in this namespace belong to a single hierarchy, sketched in the following diagram (the broken lines signifying that the inheritance is not direct, due to some classes in between, which can be considered implementation details). [#f1]_
 
 .. image:: figures/structure.png
    :height: 605
 
 We have also indicated how :ref:`elements <generalElements>` like :class:`Mode` and :class:`JaynesCummings`, and :ref:`composite systems <composites>` as :class:`BinarySystem` and :class:`Composite` fit into the hierarchy.
 
-This class hierarchy provides a lot of services for implementing new elements in the framework. For examples on how to optimally use these services, cf. :ref:`the structure-bundle tutorial below <structureTutorial>`.
+These modules provide a lot of services for implementing new elements in the framework. For examples on how to optimally use these services, cf. :ref:`the structure-bundle tutorial below <structureTutorial>`.
 
 .. _structureTutorial:
 
@@ -50,6 +50,9 @@ Template argument definitions
 
   ``bool IS_CONST``
     Governs the constness of the corresponding class.
+
+  ``bool IS_TD``
+    Governs the time-dependence of the corresponding class.
 
 
 .. _dynamicsBase:
@@ -270,9 +273,27 @@ This class describes interaction between free systems.
 ``Hamiltonian``
 ---------------------------------------
 
+
+.. type:: structure::TimeDependence
+
+  An enumeration of the following possibilities for time dependence::
+
+    enum TimeDependence {TWO_TIME, ONE_TIME, NO_TIME};
+
+  ==== ====================== ====================== =========================================================================
+  Case ``TimeDependence``     The Hamiltonian
+  ==== ====================== ====================== =========================================================================
+  1    ``TWO_TIME``           :math:`H(t,t_0)`       Time-dependent problem + :ref:`exact part <Exact>` (:math:`U(t,t_0)`)
+  2    ``ONE_TIME``           :math:`H(t)`           Time-dependent problem, no exact part
+  3    "                      :math:`H(t-t_0)`       Time-independent problem + :ref:`exact part <Exact>` (:math:`U(t-t_0)`)
+  4    ``NO_TIME``            :math:`H(0)`           Time-independent problem, no exact part
+  ==== ====================== ====================== =========================================================================
+
+  Where :math:`t_0` is the time instant where the :ref:`two pictures <Exact>` coincide.
+
 .. class:: structure::Hamiltonian
 
-  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`);
+  ``template <int RANK, TimeDependence TD>`` (cf. :ref:`template parameters <structureTemplates>`);
 
   .. function:: void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0)
 
@@ -292,26 +313,37 @@ This class describes interaction between free systems.
 
         When implementing the Hamiltonian, not :math:`H` itself but :math:`\frac Hi` has to supplied!
 
+    For the class, we use partial specializations in the template parameter ``TimeDependent``, and both cases ``ONE_TIME`` and ``NO_TIME`` inherit from ``TWO_TIME``.
 
-.. class:: structure::TimeIndependentHamiltonian
+    ``ONE_TIME``
+      defines ::
 
-  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`); inherits publicly from :class:`~structure::Hamiltonian`\ ``<RANK>``
+        virtual void addContribution(double, const StateVectorLow&, StateVectorLow&) const = 0;
 
-  .. function:: void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0)
+      and implements the :func:`above function <structure::Hamiltonian::addContribution>` as ::
 
-    Implements the inherited virtual function::
+        void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+        {
+          addContribution(t-tIntPic0,psi,dpsidt);
+        }
 
-      void addContribution(double, const StateVectorLow& psi, StateVectorLow& dpsidt, double) const {addContribution(psi,dpsidt);}
+    ``NO_TIME``
+      defines ::
 
-  .. function:: void addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt)
+        virtual void addContribution(const StateVectorLow&, StateVectorLow&) const = 0;
 
-    Pure virtual. The time-independent version of :func:`~structure::Hamiltonian::addContribution`.
+      and implements the :func:`above function <structure::Hamiltonian::addContribution>` as ::
 
-    
+        void addContribution(double, const StateVectorLow& psi, StateVectorLow& dpsidt, double) const
+        {
+          addContribution(psi,dpsidt);
+        }
+
+
 
 .. class:: structure::TridiagonalHamiltonian
 
-  ``template <int RANK, bool IS_TD>`` (cf. :ref:`template parameters <structureTemplates>`); inherits publicly from :class:`~structure::Hamiltonian`\ ``<RANK>`` when ``IS_TD`` is ``true`` and :class:`~structure::TimeIndependentHamiltonian`\ ``<RANK>`` when it is ``false``.
+  ``template <int RANK, bool IS_TD>`` (cf. :ref:`template parameters <structureTemplates>`); inherits publicly from :class:`~structure::Hamiltonian`\ ``<RANK,ONE_TIME>`` when ``IS_TD=true`` and :class:`~structure::Hamiltonian`\ ``<RANK,NO_TIME>`` when ``IS_TD=false``. The present architecture of the classes :class:`~quantumoperator::Tridiagonal` and :class:`~quantumoperator::Frequencies` does not allow to cover the case ``TWO_TIME``.
 
   It implements the action of a Hamiltonian
 
@@ -324,15 +356,21 @@ This class describes interaction between free systems.
   Such a class can be constructed with either a list of :class:`~quantumoperator::Tridiagonal`\ ``<RANK>`` (and, in the case when ``IS_TD`` is ``true``, corresponding :class:`~quantumoperator::Frequencies`\ ``<RANK>``) objects, or only one such object when the above sum consists of only one term.
 
 
+.. _Exact:
+
 ---------------------------------------
 ``Exact``
 ---------------------------------------
 
-Experience shows that even when a system uses interaction picture (which is automatically the case if any of its subsystems does), it may still want to calculate the jump operators and quantum averages in the normal picture. (Note that at the moment, time is not even communicated to the latter functions.) In this case, the framework has to be provided with some means to transform between the two pictures. This is fulfilled by the following class, from which classes describing such systems have to inherit.
+Experience shows that even when a system uses interaction picture (which is automatically the case if any of its subsystems does)---that is, part of its dynamics is solved exactly---it may still want to calculate the jump operators and quantum averages in the normal picture. (Cases 1 & 3 :type:`above <structure::TimeDependence>`.) This is useful e.g. to reuse the code written for the non-interaction-picture case.
+
+In this case, the framework has to be provided with some means to transform between the two pictures. This is fulfilled by the following class, from which classes describing such systems have to inherit.
+
+E.g. if :class:`~quantumtrajectory::MCWF_Trajectory` sees that the simulated system inherits from :class:`~structure::Exact`, then it will make the coherent part of the evolution in interaction picture, and then transform back to normal picture, so that all the rest (jump probabilities, eventual jumps, calculation of quantum averages) can take place in this latter picture. This makes that the two pictures coincide before each timestep. (Cf. also the stages described in Sec. :ref:`MCWF_Trajectory`.)
 
 .. class:: structure::Exact
 
-  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`);
+  ``template <int RANK>`` (cf. :ref:`template parameters <structureTemplates>`).
 
   .. function:: void actWithU(double dt, StateVectorLow& psi) const
 
@@ -355,16 +393,27 @@ Experience shows that even when a system uses interaction picture (which is auto
 ``Liouvillean``
 ---------------------------------------
 
-.. note:: 
-
-  The framework requires that the jump be calculated in the normal picture even in the case when the Hamiltonian is in interaction picture (cf. :func:`quantumtrajectory::MCWF_Trajectory::step`). This allows for reusing the same code in both pictures.
-
 .. class:: structure::Liouvillean
 
-  .. function:: const Probabilities probabilities(const LazyDensityOperator&) const
+  ``template <int RANK, bool IS_TD>`` (cf. :ref:`template parameters <structureTemplates>`), we use partial specialization in the second parameter, as with :class:`~structure::Hamiltonian`:
 
-    Pure virtual.
+  ``IS_TD=true``
+    corresponds to Cases 1 & 2 :type:`above <structure::TimeDependence>`.
 
+  ``IS_TD=false``
+    corresponds to Cases 3 & 4 :type:`above <structure::TimeDependence>`. This partial specialization inherits from :class:`~structure::Liouvillean`\ ``<RANK,true>`` and similar function forwarding happens as in :class:`~structure::Hamiltonian`.
+
+  .. type:: Probabilities
+
+    This is just a ``TTD_DArray<1>``.
+
+  .. function:: const Probabilities probabilities(double t, const LazyDensityOperator& matrix) const
+
+    Pure virtual. The first argument is missing when ``IS_TD=false``.
+
+  .. function:: void actWithJ(double t, StateVectorLow& psi, size_t jumpNo) const
+
+    Pure virtual. The first argument is missing when ``IS_TD=false``. The last argument describes which jump is to be performed (a system may define several, assigning an ordinal to each of them).
 
 .. class:: structure::ElementLiouvillean
 
@@ -374,13 +423,15 @@ Experience shows that even when a system uses interaction picture (which is auto
 
 .. class:: structure::Averaged
 
-  .. function:: const Averages average(const LazyDensityOperator& matrix) const
+  ``template <int RANK, bool IS_TD>`` (cf. :ref:`template parameters <structureTemplates>`), the same holds for the time-dependence as with :class:`~structure::Liouvillean`.
+
+  .. type:: Averages
+
+    This is just a ``TTD_DArray<1>``.
+
+  .. function:: const Averages average(double t, const LazyDensityOperator& matrix) const
 
 .. class:: structure::ElementAveraged
-
-.. note:: 
-
-  The framework requires that the averages be calculated in the normal picture even in the case when the Hamiltonian is in interaction picture (cf. :func:`quantumtrajectory::MCWF_Trajectory::step`). This allows for reusing the same code in both pictures.
 
 
 
@@ -394,3 +445,6 @@ Experience shows that even when a system uses interaction picture (which is auto
    This works correctly only in Schrödinger picture!
 
 
+.. rubric:: Footnotes
+
+.. [#f1] Note that this figure is tentative, and does not fully reflect the actual situation, which cannot be displayed in such a way either, due to the heavy use of templates, partial specializations, and conditional inheritance.
