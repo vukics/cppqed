@@ -24,7 +24,7 @@ namespace structure {
 class AveragedCommon : public virtual LiouvilleanAveragedCommon
 {
 public:
-  typedef TTD_DARRAY(1) Averages;
+  typedef DArray1D Averages;
 
 
   static size_t nAvr(const AveragedCommon* averagedCommon)

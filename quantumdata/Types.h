@@ -18,7 +18,8 @@ const StaticTag theStaticOne=StaticTag();
 
 struct LiouvilleanAveragedCommon
 {
-  static const TTD_DARRAY(1) defaultArray;
+  typedef TTD_DARRAY(1) DArray1D;
+  static const DArray1D defaultArray;
 };
 
 

@@ -15,7 +15,7 @@ namespace structure {
 class LiouvilleanCommon : public virtual LiouvilleanAveragedCommon
 {
 public:
-  typedef TTD_DARRAY(1) Probabilities;
+  typedef DArray1D Probabilities;
   // dpoverdt ladder type for Liouvilleans. Note that the extent is
   // not known at compile time because it depends on how many
   // subsystems there are which themselves are Liouvillean, which, in
