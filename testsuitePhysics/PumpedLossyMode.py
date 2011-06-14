@@ -3,10 +3,10 @@
 from pyUtils.regression import regression
 from pyUtils.interpolate import *
 from pyUtils.loadTrajectories import loadTrajectories
+from pyUtils.parseFile import parseFile
 
 trajectories=loadTrajectories([
 
-#"PLM_Ev.d", # u 1:3 "%lf %lf (%lf,%lf)" w lp lw 2, 
 "PLM_En.d",
 "PLM_Si.d",
 "PLM_SiSch.d",
@@ -21,25 +21,33 @@ trajectories=loadTrajectories([
 ],
 "data")
 
+evolvedArray=parseFile("f+f+c","data/PLM_Ev.d")
 
 timeArray=trajectories[0].time
 
 
+def averageArray(i) :
+    res=trajectories[0][i]
+    for trajectory in trajectories[1:6] : res+=trajectory[i]
+    for trajectory in trajectories[6:]  : res+=trajectory[i+4][:101]
+    res/=9.
+    return res
+
+
 def compare(i,eps) :
-    averageArray=trajectories[0][i]
-    for trajectory in trajectories[1:6] : averageArray+=trajectory[i]
-    for trajectory in trajectories[6:]  : averageArray+=trajectory[i+4][:101]
-    averageArray/=9.
     res=True
     for trajectory in trajectories[0:6] :
-        reg=regression(interpolate(timeArray,averageArray),interpolateEVC(trajectory,i  ),timeArray)
+        reg=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i  ),timeArray)
         # print reg
         res&=reg<eps
     for trajectory in trajectories[6:]  :
-        reg=regression(interpolate(timeArray,averageArray),interpolateEVC(trajectory,i+4),timeArray)
+        reg=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i+4),timeArray)
         # print reg
         res&=reg<eps
     return res
 
 
-print compare(2,1e-34) & compare(3,1e-34) & compare(4,1e-34) & compare(5,1e-34)
+alphaRe=evolvedArray[:,2]
+alphaIm=evolvedArray[:,3]
+
+print compare(2,1e-34) & compare(3,1e-34) & compare(4,1e-34) & compare(5,1e-34) & (regression(interpolate(timeArray,averageArray(4)),interpolate(timeArray,alphaRe),timeArray)<1e-8) & (regression(interpolate(timeArray,averageArray(5)),interpolate(timeArray,alphaIm),timeArray)<1e-7) & (regression(interpolate(timeArray,averageArray(2)),interpolate(timeArray,alphaRe*alphaRe+alphaIm*alphaIm),timeArray)<1e-8)
