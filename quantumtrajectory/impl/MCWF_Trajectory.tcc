@@ -195,7 +195,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 
 	}
     }
-    
+
 
     double dpOverDt=std::accumulate(probas.begin(),probas.end(),0.);
 

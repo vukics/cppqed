@@ -1,0 +1,1709 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PyCppQED Reference &mdash; PyCppQED v0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyCppQED v0.1.1 documentation" href="index.html" />
+    <link rel="prev" title="PyCppQED User Guide" href="user_guide.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="user_guide.html" title="PyCppQED User Guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyCppQED v0.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pycppqed-reference">
+<span id="reference"></span><h1><a class="toc-backref" href="#contents">PyCppQED Reference</a><a class="headerlink" href="#pycppqed-reference" title="Permalink to this headline">¶</a></h1>
+<p>This document lists all classes and functions implemented in PyCppQED. It&#8217;s
+recommended to read the <a class="reference internal" href="user_guide.html#user-guide"><em>PyCppQED User Guide</em></a> first and only use the Reference to look
+up specific classes and methods.</p>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#pycppqed-reference" id="id1">PyCppQED Reference</a><ul>
+<li><a class="reference internal" href="#module-pycppqed.statevector" id="id2"><a class="reference internal" href="#module-pycppqed.statevector" title="pycppqed.statevector"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.statevector</span></tt></a></a></li>
+<li><a class="reference internal" href="#module-pycppqed.expvalues" id="id3"><a class="reference internal" href="#module-pycppqed.expvalues" title="pycppqed.expvalues"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.expvalues</span></tt></a></a></li>
+<li><a class="reference internal" href="#module-pycppqed.io" id="id4"><a class="reference internal" href="#module-pycppqed.io" title="pycppqed.io"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.io</span></tt></a></a></li>
+<li><a class="reference internal" href="#module-pycppqed.initialconditions" id="id5"><a class="reference internal" href="#module-pycppqed.initialconditions" title="pycppqed.initialconditions"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.initialconditions</span></tt></a></a></li>
+<li><a class="reference internal" href="#module-pycppqed.quantumsystem" id="id6"><a class="reference internal" href="#module-pycppqed.quantumsystem" title="pycppqed.quantumsystem"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.quantumsystem</span></tt></a></a></li>
+<li><a class="reference internal" href="#module-pycppqed.description" id="id7"><a class="reference internal" href="#module-pycppqed.description" title="pycppqed.description"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.description</span></tt></a></a></li>
+<li><a class="reference internal" href="#module-pycppqed.visualization" id="id8"><a class="reference internal" href="#module-pycppqed.visualization" title="pycppqed.visualization"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.visualization</span></tt></a></a></li>
+<li><a class="reference internal" href="#module-pycppqed.animation" id="id9"><a class="reference internal" href="#module-pycppqed.animation" title="pycppqed.animation"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.animation</span></tt></a></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-pycppqed.statevector">
+<span id="pycppqed-statevector"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.statevector" title="pycppqed.statevector"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.statevector</span></tt></a></a><a class="headerlink" href="#module-pycppqed.statevector" title="Permalink to this headline">¶</a></h2>
+<p>This module provides an implementation for state vectors.</p>
+<dl class="docutils">
+<dt>The relevant classes are:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">StateVector</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.statevector.StateVectorTrajectory" title="pycppqed.statevector.StateVectorTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">StateVectorTrajectory</span></tt></a></li>
+</ul>
+</dd>
+</dl>
+<p>The <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">StateVector</span></tt></a> represents a state vector at a specific point of time
+while the <a class="reference internal" href="#pycppqed.statevector.StateVectorTrajectory" title="pycppqed.statevector.StateVectorTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">StateVectorTrajectory</span></tt></a> represents a state vector at different
+points of time.</p>
+<dl class="class">
+<dt id="pycppqed.statevector.StateVector">
+<em class="property">class </em><tt class="descclassname">pycppqed.statevector.</tt><tt class="descname">StateVector</tt><a class="headerlink" href="#pycppqed.statevector.StateVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></tt></p>
+<p>A class representing a quantum mechanical state vector in a specific basis.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span>
+<span class="go">StateVector(3 x 4)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
+<span class="go">StateVector([[ 0,  1,  2,  3],</span>
+<span class="go">       [ 4,  5,  6,  7],</span>
+<span class="go">       [ 8,  9, 10, 11]])</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>data</em></dt>
+<dd><p class="first last">Anything that can be used to create a numpy array, e.g. a nested
+tuple or another numpy array.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>time</em> (optional)</dt>
+<dd><p class="first last">A number defining the point of time when this state vector was
+reached. (Default is 0)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>norm</em> (optional)</dt>
+<dd><p class="first last">If set True the StateVector will be automatically normalized.
+(Default is False)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other argument that a numpy array takes. E.g. <tt class="docutils literal"><span class="pre">copy=False</span></tt> can
+be used so that the StateVector shares the data storage with the
+given numpy array.</p>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Most useful is maybe the tensor product which lets you easily calculate
+state vectors for combined systems:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv1</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv2</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">sv1</span> <span class="o">^</span> <span class="n">sv2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span>
+<span class="go">StateVector(3 x 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
+<span class="go">StateVector([[ 0.6,  0.8,  0. ],</span>
+<span class="go">       [ 1.2,  1.6,  0. ],</span>
+<span class="go">       [ 1.8,  2.4,  0. ]])</span>
+</pre></div>
+</div>
+<p>The tensor product is abbreviated by the &#8220;^&#8221; operator. But be aware that
+this operator follows the built-in operator precedence - that means &#8220;+&#8221;,
+&#8220;*&#8221; etc. have <strong>higher</strong> precedence!</p>
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.diagexpvalue">
+<tt class="descname">diagexpvalue</tt><big>(</big><em>operator</em>, <em>indices=None</em>, <em>title=None</em>, <em>multi=False</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.diagexpvalue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the expectation value for the given diagonal operator.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">a</span>
+<span class="go">array([ 0.,  1.,  2.,  3.])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span><span class="o">.</span><span class="n">diagexpvalue</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">2.45454545455</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>operator</em></dt>
+<dd><p class="first last">The diagonal elements of a tensor representing an arbitrary
+diagonal operator in the basis of the StateVector.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>indices</em> (optional)</dt>
+<dd><p class="first last">Specifies which subsystems should be taken. If None is given
+the whole system is used.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>multi</em> (optional)</dt>
+<dd><p class="first last">If multi is True it is assumed that a list of operators is
+given. (Default is False)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Expectation values for combined systems are calculated in the following
+way (Assuming the operator only acts on first subsystem):</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/37a82778391e7711b226d52a1a9471e4bc824bd9.png" alt="\langle \Psi | \hat A (k) | \Psi \rangle =
+    \sum_k \langle k | \hat A (k) | k \rangle
+    \sum_m \Psi_{k m}^* \Psi_{k m}" /></p>
+</div></div></blockquote>
+<p>Other than the general <a class="reference internal" href="#pycppqed.statevector.StateVector.expvalue" title="pycppqed.statevector.StateVector.expvalue"><tt class="xref py py-meth docutils literal"><span class="pre">expvalue()</span></tt></a> method <a class="reference internal" href="#pycppqed.statevector.StateVector.diagexpvalue" title="pycppqed.statevector.StateVector.diagexpvalue"><tt class="xref py py-meth docutils literal"><span class="pre">diagexpvalue()</span></tt></a>
+only works for diagonal operators and only needs the diagonal elements
+of the matrix representation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.expvalue">
+<tt class="descname">expvalue</tt><big>(</big><em>operator</em>, <em>indices=None</em>, <em>title=None</em>, <em>multi=False</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.expvalue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the expectation value of the given operator.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">a</span>
+<span class="go">array([[ 0.,  0.,  0.,  0.],</span>
+<span class="go">       [ 1.,  0.,  0.,  0.],</span>
+<span class="go">       [ 0.,  1.,  0.,  0.],</span>
+<span class="go">       [ 0.,  0.,  1.,  0.]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span><span class="o">.</span><span class="n">expvalue</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">0.6</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>operator</em></dt>
+<dd><p class="first last">A tensor representing an arbitrary operator in the
+basis of the StateVector.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>indices</em> (optional)</dt>
+<dd><p class="first last">Specifies which subsystems should be taken. If None is given
+the whole system is used.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>multi</em> (optional)</dt>
+<dd><p class="first last">If multi is True it is assumed that a list of operators is
+given. (Default is False)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Expectation values for combined systems are calculated in the following
+way (Assuming the operator only acts on first subsystem):</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/8bcc8acfd64f25543c481c5e3c0ba1e30d3054fe.png" alt="\langle \Psi | \hat A (k) | \Psi \rangle =
+    \sum_{k_1 k_2} \langle k_1 | \hat A (k) | k_2 \rangle
+    \sum_m \Psi_{k_1 m}^* \Psi_{k_2 m}" /></p>
+</div></div></blockquote>
+<p>The second sum is exactly what <a class="reference internal" href="#pycppqed.statevector.StateVector.reducesquare" title="pycppqed.statevector.StateVector.reducesquare"><tt class="xref py py-meth docutils literal"><span class="pre">reducesquare()</span></tt></a> does while the
+first expression is the matrix representation of the given operator
+in the same basis as the StateVector.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.fft">
+<tt class="descname">fft</tt><big>(</big><em>axis=0</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.fft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a StateVector where the given axis is Fourier transformed.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">1.7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.7</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span><span class="o">.</span><span class="n">fft</span><span class="p">()</span>
+<span class="go">StateVector(7)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>axis</em> (optional)</dt>
+<dd><p class="first last">Axis over which the fft is done. (Default is 0)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.norm">
+<tt class="descname">norm</tt><big>(</big><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the norm of the StateVector.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.normalize">
+<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a normalized StateVector.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+<span class="go">4.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nsv</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">nsv</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.outer">
+<tt class="descname">outer</tt><big>(</big><em>array</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.outer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the outer product between this and the given StateVector.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">sv</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">StateVector</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)))</span>
+<span class="go">StateVector([[ 0.        ,  0.        ],</span>
+<span class="go">       [ 0.26832816,  0.35777088],</span>
+<span class="go">       [ 0.53665631,  0.71554175]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span><span class="o">.</span><span class="n">outer</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span> <span class="c"># Not normalized!</span>
+<span class="go">StateVector([[ 0.        ,  0.        ],</span>
+<span class="go">       [ 1.34164079,  1.78885438],</span>
+<span class="go">       [ 2.68328157,  3.57770876]])</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>array</em></dt>
+<dd><p class="first last">Some kind of array (E.g. StateVector, numpy.array, list, ...).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>As abbreviation <tt class="docutils literal"><span class="pre">sv1^sv2</span></tt> can be written instead of
+<tt class="docutils literal"><span class="pre">sv1.outer(sv2)</span></tt>. But be aware that the operator precedence of <tt class="docutils literal"><span class="pre">^</span></tt>
+follows the python rules - that means <tt class="docutils literal"><span class="pre">sv1</span> <span class="pre">^</span> <span class="pre">sv2</span> <span class="pre">+</span> <span class="pre">sv3</span></tt> is the same
+as <tt class="docutils literal"><span class="pre">sv1</span> <span class="pre">^</span> <span class="pre">(sv2</span> <span class="pre">+</span> <span class="pre">sv3)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.plot">
+<tt class="descname">plot</tt><big>(</big><em>sv</em>, <em>x=None</em>, <em>y=None</em>, <em>re=False</em>, <em>im=False</em>, <em>abs=True</em>, <em>show=True</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize a 2d or 3d <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVector</span></tt></a>.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">pycppqed</span><span class="o">.</span><span class="n">StateVector</span><span class="p">((</span><span class="mf">0.4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.4</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>x</em> (optional)</dt>
+<dd><p class="first last">X-coordinates that should be used for plotting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>y</em> (optional)</dt>
+<dd><p class="first last">Y-coordinates that should be used for plotting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>re</em> (optional)</dt>
+<dd><p class="first last">If True the real part of the statevector is plotted. (Default
+is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>im</em> (optional)</dt>
+<dd><p class="first last">If True the imaginary part of the state vector is plotted.
+(Default is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>abs</em> (optional):</dt>
+<dd><p class="first last">If True the absolute square of the state vector is plotted.
+(Default is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>show</em> (optional):</dt>
+<dd><p class="first last">If True pylab.show() is called finally. This means a plotting
+window will pop up automatically. (Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other arguments that the pylab plotting command can use.</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.reduce">
+<tt class="descname">reduce</tt><big>(</big><em>indices</em>, <em>norm=True</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.reduce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a StateVector where the given indices are reduced.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rsv</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rsv</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">reduce</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>indices</em></dt>
+<dd><p class="first last">An integer or a list of integers specifying over which
+subspaces should be summated.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>norm</em> (optional)</dt>
+<dd><p class="first last">If set True the resulting StateVector will be renormalized.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Reducing means nothing else then summing up over all given indices.
+E.g. a StateVector of rank 4 can be reduced to the first two indices:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv1</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv2</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv3</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv4</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">sv1</span><span class="o">^</span><span class="n">sv2</span><span class="o">^</span><span class="n">sv3</span><span class="o">^</span><span class="n">sv4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span>
+<span class="go">StateVector(2 x 3 x 5 x 6)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span><span class="o">.</span><span class="n">reduce</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">StateVector(2 x 3)</span>
+</pre></div>
+</div>
+<p>This is mathematically equivalent to:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/cb80a3323370813b8a53f7b84f33d0a8a44a27e3.png" alt="\Psi_{\alpha \beta} = \frac
+  {\sum_{\gamma \delta} \Psi_{\alpha \beta \gamma \delta}}
+  {\| \sum_{\gamma \delta} \Psi_{\alpha \beta \gamma \delta} \|}" /></p>
+</div></div></blockquote>
+<p>Reducing is an easy way to find out how subspaces of a high rank
+state vectors behave. Don&#8217;t use reduced StateVectors for calculating
+expectation values - this will most likely give wrong answers!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVector.reducesquare">
+<tt class="descname">reducesquare</tt><big>(</big><em>indices</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVector.reducesquare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the reduced Psi-square tensor.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv1</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv2</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">sv1</span><span class="o">^</span><span class="n">sv2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sqtensor</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">reducesquare</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>indices</em></dt>
+<dd><p class="first last">An integer or a list of integers specifying over which
+subsystems should be summed up.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>This method calculates the following quantity (simplified for rank 2
+state vectors):</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/ae7c9f1cad9b43692d7c6740d477167dacd65a50.png" alt="w_{\alpha_1 \alpha_2} = \sum_\beta \Psi_{\alpha_1 \beta}^*
+                        \Psi_{\alpha_2 \beta}" /></p>
+</div></div></blockquote>
+<p>Where <img class="math" src="_images/math/fdb63b9e51abe6bbb16acfb5d7b773ddbb5bf4a8.png" alt="\beta"/> is the reduced index.</p>
+<p>This quantity is useful to calculate expectation values in the
+corresponding subspaces.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.statevector.StateVectorTrajectory">
+<em class="property">class </em><tt class="descclassname">pycppqed.statevector.</tt><tt class="descname">StateVectorTrajectory</tt><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></tt></p>
+<p>A class holding StateVectors for different points of time.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">svs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pycppqed</span><span class="o">.</span><span class="n">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">svtraj</span> <span class="o">=</span> <span class="n">StateVectorTrajectory</span><span class="p">(</span><span class="n">svs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">svtraj</span>
+<span class="go">StateVectorTrajectory(100 x (64))</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>data</em></dt>
+<dd><p class="first last">Some nested structure which holds state vector like arrays for
+different points of time.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>time</em> (optional)</dt>
+<dd><p class="first last">An array which specifies the point of time for every state
+vector. This array must have as many entries as there are state
+vectors.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other argument that a numpy array takes. E.g. <tt class="docutils literal"><span class="pre">copy=False</span></tt> can
+be used so that the StateVectorTrajectory shares the data storage
+with the given numpy array.</p>
+</li>
+</ul>
+</dd>
+</dl>
+<p>Most methods are simple mapped to all single StateVectors. For more
+documentation regarding these methods look into the docstrings of the
+corresponding <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">StateVector</span></tt></a> methods.</p>
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.animate">
+<tt class="descname">animate</tt><big>(</big><em>x=None</em>, <em>y=None</em>, <em>re=False</em>, <em>im=False</em>, <em>abs=True</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.animate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an interactive animation of this StateVectorTrajectory.</p>
+<p>For more information look into the docstring of
+<a class="reference internal" href="#pycppqed.animation.animate_statevector" title="pycppqed.animation.animate_statevector"><tt class="xref py py-meth docutils literal"><span class="pre">pycppqed.animation.animate_statevector()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.diagexpvalue">
+<tt class="descname">diagexpvalue</tt><big>(</big><em>operator</em>, <em>indices=None</em>, <em>multi=False</em>, <em>titles=None</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.diagexpvalue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the expectation value of the diagonal operator for all SVs.</p>
+<dl class="docutils">
+<dt><em>Returns</em></dt>
+<dd><dl class="first last docutils">
+<dt><em>evtraj</em></dt>
+<dd>An <tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValuesTrajectory</span></tt>
+instance.</dd>
+</dl>
+</dd>
+</dl>
+<p>See also: <a class="reference internal" href="#pycppqed.statevector.StateVector.diagexpvalue" title="pycppqed.statevector.StateVector.diagexpvalue"><tt class="xref py py-meth docutils literal"><span class="pre">StateVector.diagexpvalue()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.expvalue">
+<tt class="descname">expvalue</tt><big>(</big><em>operator</em>, <em>indices=None</em>, <em>multi=False</em>, <em>titles=None</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.expvalue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the expectation value of the operator for all StateVectors.</p>
+<dl class="docutils">
+<dt><em>Returns</em></dt>
+<dd><dl class="first last docutils">
+<dt><em>evtraj</em></dt>
+<dd>An <tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValuesTrajectory</span></tt>
+instance.</dd>
+</dl>
+</dd>
+</dl>
+<p>See also: <a class="reference internal" href="#pycppqed.statevector.StateVector.expvalue" title="pycppqed.statevector.StateVector.expvalue"><tt class="xref py py-meth docutils literal"><span class="pre">StateVector.expvalue()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.fft">
+<tt class="descname">fft</tt><big>(</big><em>axis=0</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.fft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a StateVectorTrajectory whith Fourier transformed StateVectors.</p>
+<p>See also: <a class="reference internal" href="#pycppqed.statevector.StateVector.fft" title="pycppqed.statevector.StateVector.fft"><tt class="xref py py-meth docutils literal"><span class="pre">StateVector.fft()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.map">
+<tt class="descname">map</tt><big>(</big><em>func</em>, <em>svt=True</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the given function to every single StateVector.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">norm</span> <span class="o">=</span> <span class="n">svt</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">sv</span><span class="p">:</span><span class="n">sv</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>func</em></dt>
+<dd><p class="first last">Function that takes a StateVector as argument.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>svt</em> (optional)</dt>
+<dd><p class="first last">If svt is True, the return value will be an instance of
+StateVectorTrajectory.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.norm">
+<tt class="descname">norm</tt><big>(</big><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of norms for every single StateVector.</p>
+<p>See also: <a class="reference internal" href="#pycppqed.statevector.StateVector.norm" title="pycppqed.statevector.StateVector.norm"><tt class="xref py py-meth docutils literal"><span class="pre">StateVector.norm()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.normalize">
+<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a StateVectorTrajectory where all StateVectors are normalized.</p>
+<p>See also: <a class="reference internal" href="#pycppqed.statevector.StateVector.normalize" title="pycppqed.statevector.StateVector.normalize"><tt class="xref py py-meth docutils literal"><span class="pre">StateVector.normalize()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.statevector.StateVectorTrajectory.reduce">
+<tt class="descname">reduce</tt><big>(</big><em>indices</em>, <em>norm=True</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.StateVectorTrajectory.reduce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a StateVectorTrajectory where all StateVectors are reduced.</p>
+<p>See also: <a class="reference internal" href="#pycppqed.statevector.StateVector.reduce" title="pycppqed.statevector.StateVector.reduce"><tt class="xref py py-meth docutils literal"><span class="pre">StateVector.reduce()</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.statevector.adjust">
+<tt class="descclassname">pycppqed.statevector.</tt><tt class="descname">adjust</tt><big>(</big><em>array</em>, <em>length</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.adjust" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust the dimensionality of a 1D array.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.statevector.norm">
+<tt class="descclassname">pycppqed.statevector.</tt><tt class="descname">norm</tt><big>(</big><em>array</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the norm of the array.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.statevector.normalize">
+<tt class="descclassname">pycppqed.statevector.</tt><tt class="descname">normalize</tt><big>(</big><em>array</em><big>)</big><a class="headerlink" href="#pycppqed.statevector.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a normalized array.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycppqed.expvalues">
+<span id="pycppqed-expvalues"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.expvalues" title="pycppqed.expvalues"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.expvalues</span></tt></a></a><a class="headerlink" href="#module-pycppqed.expvalues" title="Permalink to this headline">¶</a></h2>
+<p>This module provides classes for working with expectation values.</p>
+<dl class="docutils">
+<dt>The relevant classes are:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#pycppqed.expvalues.ExpectationValueTrajectory" title="pycppqed.expvalues.ExpectationValueTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">ExpectationValueTrajectory</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.expvalues.ExpectationValueCollection" title="pycppqed.expvalues.ExpectationValueCollection"><tt class="xref py py-class docutils literal"><span class="pre">ExpectationValueCollection</span></tt></a></li>
+</ul>
+</dd>
+</dl>
+<p>The <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueTrajectory" title="pycppqed.expvalues.ExpectationValueTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">ExpectationValueTrajectory</span></tt></a> stores <strong>one</strong> expectation value at
+different points of time while the <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueCollection" title="pycppqed.expvalues.ExpectationValueCollection"><tt class="xref py py-class docutils literal"><span class="pre">ExpectationValueCollection</span></tt></a> stores
+<strong>several</strong> expectation values at different points of time.</p>
+<dl class="class">
+<dt id="pycppqed.expvalues.ExpectationValueCollection">
+<em class="property">class </em><tt class="descclassname">pycppqed.expvalues.</tt><tt class="descname">ExpectationValueCollection</tt><a class="headerlink" href="#pycppqed.expvalues.ExpectationValueCollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></tt></p>
+<p>A class representing several expectation values at different points of time.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ev</span> <span class="o">=</span> <span class="n">ExpectationValueTrajectoryCollection</span><span class="p">((</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">),</span> <span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;&lt;x&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;&lt;y&gt;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>data</em></dt>
+<dd><p class="first last">A list of 1D arrays or some similar data structure.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>time</em> (optional)</dt>
+<dd><p class="first last">A 1d array or list specifying the points of time.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>titles</em> (optional)</dt>
+<dd><p class="first last">A list of names for the expectation values. (The names can be any
+unicode string)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>subsystems</em> (optional)</dt>
+<dd><p class="first last">Dictionary specifying subsystems. E.g. <tt class="docutils literal"><span class="pre">{&quot;Mode1&quot;</span> <span class="pre">:</span> <span class="pre">(1,3)}</span></tt>.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other argument that a numpy array can use for creation. E.g.
+<tt class="docutils literal"><span class="pre">copy</span> <span class="pre">=</span> <span class="pre">False</span></tt> can be used so that the
+ExpectationValueCollection shares the data storage with the given
+numpy array.</p>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pycppqed.expvalues.ExpectationValueCollection.plot">
+<tt class="descname">plot</tt><big>(</big><em>evc</em>, <em>show=True</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pycppqed.expvalues.ExpectationValueCollection.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize a <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueCollection" title="pycppqed.expvalues.ExpectationValueCollection"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueCollection</span></tt></a>.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">T</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">titles</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;&lt;x&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;&lt;y&gt;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evc</span> <span class="o">=</span> <span class="n">pycppqed</span><span class="o">.</span><span class="n">expvalues</span><span class="o">.</span><span class="n">ExpectationValueCollection</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">titles</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>evc</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueCollection" title="pycppqed.expvalues.ExpectationValueCollection"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueCollection</span></tt></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>show</em> (optional):</dt>
+<dd><p class="first last">If True pylab.show() is called finally. This means a plotting
+window will pop up automatically. (Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other arguments that the pylab plotting command can use.</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pycppqed.expvalues.ExpectationValueCollection.titles">
+<tt class="descname">titles</tt><a class="headerlink" href="#pycppqed.expvalues.ExpectationValueCollection.titles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of titles of the holded ExpectationValueTrajectories.</p>
+<p>Unknown titles are represented by &#8221;?&#8221;.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.expvalues.ExpectationValueTrajectory">
+<em class="property">class </em><tt class="descclassname">pycppqed.expvalues.</tt><tt class="descname">ExpectationValueTrajectory</tt><a class="headerlink" href="#pycppqed.expvalues.ExpectationValueTrajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></tt></p>
+<p>A class representing one expectation value at different points of time.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">T</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ev</span> <span class="o">=</span> <span class="n">ExpectationValueTrajectory</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="s">&quot;&lt;x&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>data</em></dt>
+<dd><p class="first last">A 1d array or similar data structure representing an expectation
+value at different points of time.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>time</em> (optional)</dt>
+<dd><p class="first last">A 1d array or list specifying the points of time.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>title</em> (optional)</dt>
+<dd><p class="first last">The name of the expectation value. (Can be any unicode string)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other argument that a numpy array can use for creation. E.g.
+<tt class="docutils literal"><span class="pre">copy</span> <span class="pre">=</span> <span class="pre">False</span></tt> can be used so that the ExpectationValueTrajecory
+shares the data storage with the given numpy array.</p>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pycppqed.expvalues.ExpectationValueTrajectory.plot">
+<tt class="descname">plot</tt><big>(</big><em>evt</em>, <em>show=True</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pycppqed.expvalues.ExpectationValueTrajectory.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize a <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueTrajectory" title="pycppqed.expvalues.ExpectationValueTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueTrajectory</span></tt></a>.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">evt</span> <span class="o">=</span> <span class="n">pycppqed</span><span class="o">.</span><span class="n">expvalues</span><span class="o">.</span><span class="n">ExpectationValueTrajectory</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evt</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>evt</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueTrajectory" title="pycppqed.expvalues.ExpectationValueTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueTrajectory</span></tt></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>show</em> (optional):</dt>
+<dd><p class="first last">If True pylab.show() is called finally. This means a plotting
+window will pop up automatically. (Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other arguments that the pylab plotting command can use.</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycppqed.io">
+<span id="pycppqed-io"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.io" title="pycppqed.io"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.io</span></tt></a></a><a class="headerlink" href="#module-pycppqed.io" title="Permalink to this headline">¶</a></h2>
+<p>This module provides functions to read and write C++QED files.</p>
+<dl class="docutils">
+<dt>Most important are:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#pycppqed.io.load_cppqed" title="pycppqed.io.load_cppqed"><tt class="xref py py-func docutils literal"><span class="pre">load_cppqed()</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.io.load_statevector" title="pycppqed.io.load_statevector"><tt class="xref py py-func docutils literal"><span class="pre">load_statevector()</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.io.save_statevector" title="pycppqed.io.save_statevector"><tt class="xref py py-func docutils literal"><span class="pre">save_statevector()</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.io.split_cppqed" title="pycppqed.io.split_cppqed"><tt class="xref py py-func docutils literal"><span class="pre">split_cppqed()</span></tt></a></li>
+</ul>
+</dd>
+</dl>
+<dl class="function">
+<dt id="pycppqed.io.load_cppqed">
+<tt class="descclassname">pycppqed.io.</tt><tt class="descname">load_cppqed</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#pycppqed.io.load_cppqed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a C++QED output file from the given location.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">evs</span><span class="p">,</span> <span class="n">svs</span> <span class="o">=</span> <span class="n">load_cppqed</span><span class="p">(</span><span class="s">&quot;ring.dat&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>filename</em></dt>
+<dd><p class="first last">Path to the C++QED output file that should be loaded.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><em>Returns</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>evs</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueCollection" title="pycppqed.expvalues.ExpectationValueCollection"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueCollection</span></tt></a> holding
+all expectation values.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>qs</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.quantumsystem.QuantumSystem" title="pycppqed.quantumsystem.QuantumSystem"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.quantumsystem.QuantumSystem</span></tt></a> holding all
+state vectors and information about the calculated system.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.io.load_statevector">
+<tt class="descclassname">pycppqed.io.</tt><tt class="descname">load_statevector</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#pycppqed.io.load_statevector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a C++QED state vector file from the given location.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">load_statevector</span><span class="p">(</span><span class="s">&quot;ring.sv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>filename</em></dt>
+<dd><p class="first last">Path to the C++QED state vector file that should be loaded.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><em>Returns</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>sv</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVector</span></tt></a> instance.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.io.save_statevector">
+<tt class="descclassname">pycppqed.io.</tt><tt class="descname">save_statevector</tt><big>(</big><em>filename</em>, <em>sv</em><big>)</big><a class="headerlink" href="#pycppqed.io.save_statevector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a C++QED state vector to the given location.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">time</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">save_statevector</span><span class="p">(</span><span class="s">&quot;my_statevector.sv&quot;</span><span class="p">,</span> <span class="n">sv</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><dl class="first last docutils">
+<dt><em>filename</em></dt>
+<dd>Path to the location where the StateVector should be saved to.</dd>
+<dt><em>sv</em></dt>
+<dd>A <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVector</span></tt></a> instance.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.io.split_cppqed">
+<tt class="descclassname">pycppqed.io.</tt><tt class="descname">split_cppqed</tt><big>(</big><em>readpath</em>, <em>writepath</em>, <em>header=True</em><big>)</big><a class="headerlink" href="#pycppqed.io.split_cppqed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split a C++QED output file into default part and state vectors.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">split_cppqed</span><span class="p">(</span><span class="s">&quot;ring.dat&quot;</span><span class="p">,</span> <span class="s">&quot;r.dat&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>readpath</em></dt>
+<dd><p class="first last">Path to the C++QED output file that should be split up.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>writepath</em></dt>
+<dd><p class="first last">Path where the output should be saved to.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>header</em> (optional)</dt>
+<dd><p class="first last">If True a header line of the form <tt class="docutils literal"><span class="pre">#</span> <span class="pre">{time}</span> <span class="pre">{next_time_step}</span></tt>
+is written. (Default is True)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>The standard part of the C++QED output file is saved to the given path,
+while the state vectors are saved to the same directory with the
+naming convention <tt class="docutils literal"><span class="pre">{path}_{time}.sv</span></tt>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycppqed.initialconditions">
+<span id="pycppqed-initialconditions"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.initialconditions" title="pycppqed.initialconditions"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.initialconditions</span></tt></a></a><a class="headerlink" href="#module-pycppqed.initialconditions" title="Permalink to this headline">¶</a></h2>
+<p>This module provides convenient methods for creating initial conditions.</p>
+<dl class="docutils">
+<dt>At the moment the following initial conditions are implemented:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#pycppqed.initialconditions.gaussian" title="pycppqed.initialconditions.gaussian"><tt class="xref py py-func docutils literal"><span class="pre">gaussian()</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.initialconditions.coherent" title="pycppqed.initialconditions.coherent"><tt class="xref py py-func docutils literal"><span class="pre">coherent()</span></tt></a></li>
+</ul>
+</dd>
+</dl>
+<dl class="function">
+<dt id="pycppqed.initialconditions.coherent">
+<tt class="descclassname">pycppqed.initialconditions.</tt><tt class="descname">coherent</tt><big>(</big><em>alpha=2</em>, <em>N=20</em><big>)</big><a class="headerlink" href="#pycppqed.initialconditions.coherent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a coherent StateVector in the Fock space.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">coherent</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span>
+<span class="go">StateVector(20)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>alpha</em> (optional)</dt>
+<dd><p class="first last">A complex number specifying the coherent state. (Default is 2)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>N</em> (optional)</dt>
+<dd><p class="first last">A number determining the dimension of the Fock space. (Default is
+20)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><em>Returns</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>sv</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVector</span></tt></a>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>The coherent state is given by the formula:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/f52af9e4afe49facbf855a2bc5ace5edfb15ab09.png" alt="|\alpha\rangle = e^{-\frac {|\alpha|^2} {2}} \sum_{n=0}^{N}
+                    \frac {\alpha^n} {\sqrt{n!}} |n\rangle" /></p>
+</div></div></blockquote>
+<p>Calculation is done using the recursive formula:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/e633327b3a398cf969722a78af2ebc6935d33661.png" alt="a_0 = e^{- \frac {|\alpha|^2} {2}}" /></p>
+</div><div class="math">
+<p><img src="_images/math/75970d9b2a8520c166191f04c575c8a5a5de8eab.png" alt="a_n = a_{n-1} * \frac {\alpha} {\sqrt n}" /></p>
+</div></div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.initialconditions.gaussian">
+<tt class="descclassname">pycppqed.initialconditions.</tt><tt class="descname">gaussian</tt><big>(</big><em>x0=0</em>, <em>k0=0</em>, <em>sigma=0.5</em>, <em>fin=6</em><big>)</big><a class="headerlink" href="#pycppqed.initialconditions.gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a StateVector with a normal distribution.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">k0</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">fin</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">sv</span>
+<span class="go">StateVector(128)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>x0</em> (optional)</dt>
+<dd><p class="first last">Center in the real space.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>k0</em> (optional)</dt>
+<dd><p class="first last">Center in the k-space.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>sigma</em> (optional)</dt>
+<dd><p class="first last">Width in the real space <img class="math" src="_images/math/7dc488bb710a2b0d646e8376c250c33e4b34b123.png" alt="(\sigma = \sqrt{Var(x)})"/>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>fin</em> (optional)</dt>
+<dd><p class="first last"><img class="math" src="_images/math/9d396e056bf5f5117ff0b443d863bd2f0827f33e.png" alt="2^{fin}"/> determines the amount of sample points.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><em>Returns</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>sv</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVector</span></tt></a> representing this
+gaussian wave packet in the k-space.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p>The generated StateVector is normalized and given in the k-space. It
+is the Fourier transformed of the following expression:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="_images/math/846d4e288d972ec275152318f91c3ac5efb8f125.png" alt="\Psi(x) = \frac {1} {\sqrt[4]{2 \pi}} *
+                e^{-\frac {x^2} {4*{\Delta x}^2}}" /></p>
+</div></div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycppqed.quantumsystem">
+<span id="pycppqed-quantumsystem"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.quantumsystem" title="pycppqed.quantumsystem"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.quantumsystem</span></tt></a></a><a class="headerlink" href="#module-pycppqed.quantumsystem" title="Permalink to this headline">¶</a></h2>
+<p>This module provides classes to represent quantum systems calculated by C++QED.</p>
+<dl class="docutils">
+<dt>Following components are implemented:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#pycppqed.quantumsystem.Particle" title="pycppqed.quantumsystem.Particle"><tt class="xref py py-class docutils literal"><span class="pre">Particle</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.quantumsystem.Mode" title="pycppqed.quantumsystem.Mode"><tt class="xref py py-class docutils literal"><span class="pre">Mode</span></tt></a></li>
+</ul>
+</dd>
+</dl>
+<p>Components can be combined to new systems in the class
+<tt class="xref py py-class docutils literal"><span class="pre">QuantumSystemCombound</span></tt>.</p>
+<p>All classes in this module inherit from <a class="reference internal" href="#pycppqed.quantumsystem.QuantumSystem" title="pycppqed.quantumsystem.QuantumSystem"><tt class="xref py py-class docutils literal"><span class="pre">QuantumSystem</span></tt></a>.</p>
+<p># TODO: Improve quantumsystem.py</p>
+<dl class="class">
+<dt id="pycppqed.quantumsystem.CoherentMode">
+<em class="property">class </em><tt class="descclassname">pycppqed.quantumsystem.</tt><tt class="descname">CoherentMode</tt><big>(</big><em>statevector</em>, <em>number=0</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.CoherentMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pycppqed.quantumsystem.QuantumSystem" title="pycppqed.quantumsystem.QuantumSystem"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.quantumsystem.QuantumSystem</span></tt></a></p>
+<p>A class representing a single mode in a coherent basis.</p>
+<dl class="method">
+<dt id="pycppqed.quantumsystem.CoherentMode.animate">
+<tt class="descname">animate</tt><big>(</big><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.CoherentMode.animate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pycppqed.quantumsystem.CoherentMode.expvalues">
+<tt class="descname">expvalues</tt><big>(</big><em>n=True</em>, <em>a=True</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.CoherentMode.expvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.quantumsystem.Mode">
+<em class="property">class </em><tt class="descclassname">pycppqed.quantumsystem.</tt><tt class="descname">Mode</tt><big>(</big><em>statevector</em>, <em>number=0</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.Mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pycppqed.quantumsystem.QuantumSystem" title="pycppqed.quantumsystem.QuantumSystem"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.quantumsystem.QuantumSystem</span></tt></a></p>
+<p>A class representing a single mode.</p>
+<dl class="method">
+<dt id="pycppqed.quantumsystem.Mode.expvalues">
+<tt class="descname">expvalues</tt><big>(</big><em>n=True</em>, <em>a=True</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.Mode.expvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the default expectation values for this particle.</p>
+<dl class="docutils">
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>n</em> (optional)</dt>
+<dd><p class="first last">If True all n related expectation values are calculated. That
+means <img class="math" src="_images/math/07825f9a98b2ef66bc671feb1794935101838c38.png" alt="\langle n \rangle"/> and <img class="math" src="_images/math/b2e4540edac9661f83984f9d677af0e4c258f797.png" alt="Var(n)"/>.
+(Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>a</em> (optional)</dt>
+<dd><p class="first last">If True all a related expectation values are calculated. That
+means <img class="math" src="_images/math/ea19850a63159f661a2f2989e39c28c799632204.png" alt="Re(\langle a \rangle)"/> and
+<img class="math" src="_images/math/a9c678e7b32598822647b35891b066779d418ee3.png" alt="Im(\langle a \rangle)"/>. (Default is True)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><em>Returns</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>expvalues</em></dt>
+<dd><p class="first last">A <tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValuesCollection</span></tt>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.quantumsystem.Particle">
+<em class="property">class </em><tt class="descclassname">pycppqed.quantumsystem.</tt><tt class="descname">Particle</tt><big>(</big><em>statevector</em>, <em>number=0</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.Particle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pycppqed.quantumsystem.QuantumSystem" title="pycppqed.quantumsystem.QuantumSystem"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.quantumsystem.QuantumSystem</span></tt></a></p>
+<p>A class representing a single particle.</p>
+<dl class="method">
+<dt id="pycppqed.quantumsystem.Particle.expvalues">
+<tt class="descname">expvalues</tt><big>(</big><em>k=True</em>, <em>x=True</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.Particle.expvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the default expectation values for this particle.</p>
+<dl class="docutils">
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>k</em> (optional)</dt>
+<dd><p class="first last">If True all k related expectation values are calculated. That
+means <img class="math" src="_images/math/db75f70f31e1ce3db28c30d46ab9c50aa4e879a2.png" alt="\langle k \rangle"/> and <img class="math" src="_images/math/d3a50f42e2e3a034140382b5f4cf09bbefe9f844.png" alt="Var(k)"/>.
+(Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>x</em> (optional)</dt>
+<dd><p class="first last">If True all x related expectation values are calculated. That
+means <img class="math" src="_images/math/f19d79332370c5814d7b271f70ccf2d8b6690d2f.png" alt="\langle x \rangle"/> and <img class="math" src="_images/math/1eb29f9de3753a59530941141fcb5c7aa3fa2e38.png" alt="\Delta x"/>.
+(Default is True)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><em>Returns</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>expvalues</em></dt>
+<dd><p class="first last">A <tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValuesCollection</span></tt>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.quantumsystem.QBit">
+<em class="property">class </em><tt class="descclassname">pycppqed.quantumsystem.</tt><tt class="descname">QBit</tt><big>(</big><em>statevector</em>, <em>number=0</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.QBit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pycppqed.quantumsystem.QuantumSystem" title="pycppqed.quantumsystem.QuantumSystem"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.quantumsystem.QuantumSystem</span></tt></a></p>
+<p>A class representing a single qubit.</p>
+<dl class="method">
+<dt id="pycppqed.quantumsystem.QBit.expvalues">
+<tt class="descname">expvalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.QBit.expvalues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.quantumsystem.QuantumSystem">
+<em class="property">class </em><tt class="descclassname">pycppqed.quantumsystem.</tt><tt class="descname">QuantumSystem</tt><big>(</big><em>statevector</em>, <em>number=0</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.QuantumSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>A base class for all other specific quantum system.</p>
+<dl class="method">
+<dt id="pycppqed.quantumsystem.QuantumSystem.expvalues">
+<tt class="descname">expvalues</tt><big>(</big><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.QuantumSystem.expvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the default expectation values for this system.</p>
+<p>This method has to be overridden in all inheriting classes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.quantumsystem.QuantumSystemCompound">
+<em class="property">class </em><tt class="descclassname">pycppqed.quantumsystem.</tt><tt class="descname">QuantumSystemCompound</tt><big>(</big><em>statevector</em>, <em>*args</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.QuantumSystemCompound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pycppqed.quantumsystem.QuantumSystem" title="pycppqed.quantumsystem.QuantumSystem"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.quantumsystem.QuantumSystem</span></tt></a></p>
+<p>A class representing a combined quantum system.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv1</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv2</span> <span class="o">=</span> <span class="n">StateVector</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">norm</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">sv1</span> <span class="o">^</span> <span class="n">sv2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span> <span class="o">=</span> <span class="n">QuantumSystem</span><span class="p">(</span><span class="n">sv</span><span class="p">,</span> <span class="n">Particle</span><span class="p">,</span> <span class="n">Mode</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evs</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">evs</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">evs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">ExpectationValueCollection(&#39;&lt;k&gt;&#39;, &#39;Var(k)&#39;, &#39;&lt;x&gt;&#39;, &#39;Var(x)&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">evs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">ExpectationValueCollection(&#39;&lt;n&gt;&#39;, &#39;Var(n)&#39;, &#39;&lt;a&gt;&#39;)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>statevector</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVector</span></tt></a> or
+<a class="reference internal" href="#pycppqed.statevector.StateVectorTrajectory" title="pycppqed.statevector.StateVectorTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVectorTrajectory</span></tt></a> describing
+this system.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>*args</em></dt>
+<dd><p class="first last">Elementary quantum systems which together build this combined
+quantum system.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="pycppqed.quantumsystem.QuantumSystemCompound.expvalues">
+<tt class="descname">expvalues</tt><big>(</big><em>subsystems=None</em><big>)</big><a class="headerlink" href="#pycppqed.quantumsystem.QuantumSystemCompound.expvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the default expectation values for this system.</p>
+<dl class="docutils">
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>subsystems</em> (optional)</dt>
+<dd><p class="first last">A list of integers specifying for which subsystems the
+expectation values should be calculated.
+(Default is None which means all subsystems are calculated).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt><em>Returns</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>expvalues</em></dt>
+<dd><p class="first last">An <tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValuesCollection</span></tt>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycppqed.description">
+<span id="pycppqed-description"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.description" title="pycppqed.description"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.description</span></tt></a></a><a class="headerlink" href="#module-pycppqed.description" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pycppqed.description.Description">
+<em class="property">class </em><tt class="descclassname">pycppqed.description.</tt><tt class="descname">Description</tt><big>(</big><em>commentstr</em><big>)</big><a class="headerlink" href="#pycppqed.description.Description" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for working with the comment section of a C++QED output file.</p>
+<dl class="docutils">
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>commentstr</em></dt>
+<dd><p class="first last">A string following the style of the comment section of C++QED
+output files.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.description.ExpectationValues">
+<em class="property">class </em><tt class="descclassname">pycppqed.description.</tt><tt class="descname">ExpectationValues</tt><big>(</big><em>datakeystr</em><big>)</big><a class="headerlink" href="#pycppqed.description.ExpectationValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class representing the datakey section of C++QED output files.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.description.ExpectationValuesSubsection">
+<em class="property">class </em><tt class="descclassname">pycppqed.description.</tt><tt class="descname">ExpectationValuesSubsection</tt><big>(</big><em>sectionstr</em><big>)</big><a class="headerlink" href="#pycppqed.description.ExpectationValuesSubsection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class representing a single set of keys in the datakey section.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pycppqed.description.QuantumSystem">
+<em class="property">class </em><tt class="descclassname">pycppqed.description.</tt><tt class="descname">QuantumSystem</tt><big>(</big><em>buf</em><big>)</big><a class="headerlink" href="#pycppqed.description.QuantumSystem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-pycppqed.visualization">
+<span id="pycppqed-visualization"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.visualization" title="pycppqed.visualization"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.visualization</span></tt></a></a><a class="headerlink" href="#module-pycppqed.visualization" title="Permalink to this headline">¶</a></h2>
+<p>This module provides convenient functions to visualize pycppqed objects.</p>
+<dl class="docutils">
+<dt>Some functions are also available as methods for the specific classes:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#pycppqed.visualization.statevector" title="pycppqed.visualization.statevector"><tt class="xref py py-func docutils literal"><span class="pre">statevector()</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.visualization.expvaluetrajectory" title="pycppqed.visualization.expvaluetrajectory"><tt class="xref py py-func docutils literal"><span class="pre">expvaluetrajectory()</span></tt></a></li>
+<li><a class="reference internal" href="#pycppqed.visualization.expvaluecollection" title="pycppqed.visualization.expvaluecollection"><tt class="xref py py-func docutils literal"><span class="pre">expvaluecollection()</span></tt></a></li>
+</ul>
+</dd>
+<dt>Others can be used to easily compare expecation values:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#pycppqed.visualization.compare_expvaluecollections" title="pycppqed.visualization.compare_expvaluecollections"><tt class="xref py py-func docutils literal"><span class="pre">compare_expvaluecollections()</span></tt></a></li>
+</ul>
+</dd>
+</dl>
+<dl class="function">
+<dt id="pycppqed.visualization.compare_expvaluecollections">
+<tt class="descclassname">pycppqed.visualization.</tt><tt class="descname">compare_expvaluecollections</tt><big>(</big><em>coll1</em>, <em>coll2</em>, <em>show=True</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pycppqed.visualization.compare_expvaluecollections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot all subsystems of two ExpectationValueCollections.</p>
+<dl class="docutils">
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>coll1</em></dt>
+<dd><p class="first last">First <tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValue.Collection</span></tt>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>coll2</em></dt>
+<dd><p class="first last">Second <tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValue.Collection</span></tt>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>show</em> (optional):</dt>
+<dd><p class="first last">If True pylab.show() is called finally. This means a plotting
+window will pop up automatically. (Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other arguments that the pylab plotting command can use.</p>
+</li>
+</ul>
+</dd>
+</dl>
+<p>This function allows a fast comparison between two sets of expectation
+values that were obtained by different calculations.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.visualization.expvaluecollection">
+<tt class="descclassname">pycppqed.visualization.</tt><tt class="descname">expvaluecollection</tt><big>(</big><em>evc</em>, <em>show=True</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pycppqed.visualization.expvaluecollection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize a <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueCollection" title="pycppqed.expvalues.ExpectationValueCollection"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueCollection</span></tt></a>.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">T</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">titles</span> <span class="o">=</span> <span class="p">(</span><span class="s">&quot;&lt;x&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;&lt;y&gt;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evc</span> <span class="o">=</span> <span class="n">pycppqed</span><span class="o">.</span><span class="n">expvalues</span><span class="o">.</span><span class="n">ExpectationValueCollection</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">titles</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>evc</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueCollection" title="pycppqed.expvalues.ExpectationValueCollection"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueCollection</span></tt></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>show</em> (optional):</dt>
+<dd><p class="first last">If True pylab.show() is called finally. This means a plotting
+window will pop up automatically. (Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other arguments that the pylab plotting command can use.</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.visualization.expvaluetrajectory">
+<tt class="descclassname">pycppqed.visualization.</tt><tt class="descname">expvaluetrajectory</tt><big>(</big><em>evt</em>, <em>show=True</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pycppqed.visualization.expvaluetrajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize a <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueTrajectory" title="pycppqed.expvalues.ExpectationValueTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueTrajectory</span></tt></a>.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">evt</span> <span class="o">=</span> <span class="n">pycppqed</span><span class="o">.</span><span class="n">expvalues</span><span class="o">.</span><span class="n">ExpectationValueTrajectory</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evt</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>evt</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.expvalues.ExpectationValueTrajectory" title="pycppqed.expvalues.ExpectationValueTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.expvalues.ExpectationValueTrajectory</span></tt></a>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>show</em> (optional):</dt>
+<dd><p class="first last">If True pylab.show() is called finally. This means a plotting
+window will pop up automatically. (Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other arguments that the pylab plotting command can use.</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pycppqed.visualization.statevector">
+<tt class="descclassname">pycppqed.visualization.</tt><tt class="descname">statevector</tt><big>(</big><em>sv</em>, <em>x=None</em>, <em>y=None</em>, <em>re=False</em>, <em>im=False</em>, <em>abs=True</em>, <em>show=True</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#pycppqed.visualization.statevector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Visualize a 2d or 3d <a class="reference internal" href="#pycppqed.statevector.StateVector" title="pycppqed.statevector.StateVector"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVector</span></tt></a>.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span> <span class="o">=</span> <span class="n">pycppqed</span><span class="o">.</span><span class="n">StateVector</span><span class="p">((</span><span class="mf">0.4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.4</span><span class="p">),</span> <span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sv</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>x</em> (optional)</dt>
+<dd><p class="first last">X-coordinates that should be used for plotting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>y</em> (optional)</dt>
+<dd><p class="first last">Y-coordinates that should be used for plotting.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>re</em> (optional)</dt>
+<dd><p class="first last">If True the real part of the statevector is plotted. (Default
+is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>im</em> (optional)</dt>
+<dd><p class="first last">If True the imaginary part of the state vector is plotted.
+(Default is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>abs</em> (optional):</dt>
+<dd><p class="first last">If True the absolute square of the state vector is plotted.
+(Default is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>show</em> (optional):</dt>
+<dd><p class="first last">If True pylab.show() is called finally. This means a plotting
+window will pop up automatically. (Default is True)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">Any other arguments that the pylab plotting command can use.</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pycppqed.animation">
+<span id="pycppqed-animation"></span><h2><a class="toc-backref" href="#contents"><a class="reference internal" href="#module-pycppqed.animation" title="pycppqed.animation"><tt class="xref py py-mod docutils literal"><span class="pre">pycppqed.animation</span></tt></a></a><a class="headerlink" href="#module-pycppqed.animation" title="Permalink to this headline">¶</a></h2>
+<p>This module implements animations with matplotlib.</p>
+<p>The function <a class="reference internal" href="#pycppqed.animation.animate_statevector" title="pycppqed.animation.animate_statevector"><tt class="xref py py-func docutils literal"><span class="pre">animate_statevector()</span></tt></a> provides an easy way to animate
+2D and 3D StateVectorTrajectories. This function can also be accessed through
+<a class="reference internal" href="#pycppqed.statevector.StateVectorTrajectory.animate" title="pycppqed.statevector.StateVectorTrajectory.animate"><tt class="xref py py-meth docutils literal"><span class="pre">pycppqed.statevector.StateVectorTrajectory.animate()</span></tt></a>.</p>
+<dl class="function">
+<dt id="pycppqed.animation.animate_statevector">
+<tt class="descclassname">pycppqed.animation.</tt><tt class="descname">animate_statevector</tt><big>(</big><em>svtraj</em>, <em>x=None</em>, <em>y=None</em>, <em>re=False</em>, <em>im=False</em>, <em>abs=True</em><big>)</big><a class="headerlink" href="#pycppqed.animation.animate_statevector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an interactive animation of the given StateVectorTrajectory.</p>
+<dl class="docutils">
+<dt><em>Usage</em></dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">svs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pycppqed</span><span class="o">.</span><span class="n">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">svtraj</span> <span class="o">=</span> <span class="n">pycppqed</span><span class="o">.</span><span class="n">StateVectorTrajectory</span><span class="p">(</span><span class="n">svs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">animate_statevector</span><span class="p">(</span><span class="n">svtraj</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><em>Arguments</em></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><em>svtraj</em></dt>
+<dd><p class="first last">A <a class="reference internal" href="#pycppqed.statevector.StateVectorTrajectory" title="pycppqed.statevector.StateVectorTrajectory"><tt class="xref py py-class docutils literal"><span class="pre">pycppqed.statevector.StateVectorTrajectory</span></tt></a> that should
+be animated.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>x</em> (optional)</dt>
+<dd><p class="first last">An array giving the 1st-coordinates of the state vectors.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>y</em> (optional)</dt>
+<dd><p class="first last">An array giving the 2nd-coordinates of the state vectors.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>re</em> (optional)</dt>
+<dd><p class="first last">If set True the real part of the state vectors will be animated.
+(Default is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>im</em> (optional)</dt>
+<dd><p class="first last">If set True the imaginary part of the state vectors will be
+animated. (Default is False)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>abs</em> (optional)</dt>
+<dd><p class="first last">If set True the absolute square of the state vectors will be
+animated. (Default is True)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PyCppQED Reference</a><ul>
+<li><a class="reference internal" href="#module-pycppqed.statevector"><tt class="docutils literal"><span class="pre">pycppqed.statevector</span></tt></a></li>
+<li><a class="reference internal" href="#module-pycppqed.expvalues"><tt class="docutils literal"><span class="pre">pycppqed.expvalues</span></tt></a></li>
+<li><a class="reference internal" href="#module-pycppqed.io"><tt class="docutils literal"><span class="pre">pycppqed.io</span></tt></a></li>
+<li><a class="reference internal" href="#module-pycppqed.initialconditions"><tt class="docutils literal"><span class="pre">pycppqed.initialconditions</span></tt></a></li>
+<li><a class="reference internal" href="#module-pycppqed.quantumsystem"><tt class="docutils literal"><span class="pre">pycppqed.quantumsystem</span></tt></a></li>
+<li><a class="reference internal" href="#module-pycppqed.description"><tt class="docutils literal"><span class="pre">pycppqed.description</span></tt></a></li>
+<li><a class="reference internal" href="#module-pycppqed.visualization"><tt class="docutils literal"><span class="pre">pycppqed.visualization</span></tt></a></li>
+<li><a class="reference internal" href="#module-pycppqed.animation"><tt class="docutils literal"><span class="pre">pycppqed.animation</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="user_guide.html"
+                        title="previous chapter">PyCppQED User Guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/reference.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="user_guide.html" title="PyCppQED User Guide"
+             >previous</a> |</li>
+        <li><a href="index.html">PyCppQED v0.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Sebastian Krämer.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

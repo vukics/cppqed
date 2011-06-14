@@ -31,6 +31,10 @@ For a deeper understanding and to be able to extend the framework with new modul
 
    Reference Manual <manual>
 
+`PyCppQED <http://github.com/bastikr/pycppqed>`_ is a Python backend for processing and visualizing data produced by the framework:
+
+* `PyCppQED documentation <http://cppqed.sourceforge.net/pyCppQED_doc/index.html>`_
+
 -------------
 ChangeLog
 -------------
