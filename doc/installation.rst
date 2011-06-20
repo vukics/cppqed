@@ -142,7 +142,12 @@ The default compilation mode is ``debug``\ ging mode, meaning that in this case 
 
 ``bjam`` will put the compiled files into the directories ``bin`` and ``utils/bin``. These directories are the roots of directory structures which mirror the structure of the distribution.
 
-There is a ``Makefile`` which will automatically recognise the executables in directory ``scripts``, compile the framework, and statically link it with necessary libraries. Although with ``make`` it is not easy to provide the same flexibility as with Boost.Build, I am trying to maintain this possibility on an acceptable level. With ``make``, the default compilation mode is optimized mode, and to switch to debugging mode you need to use ::
+There is a ``Makefile`` which will automatically recognise the executables in directory ``scripts``, compile the framework, and statically link it with necessary libraries. Although with ``make`` it is not easy to provide the same flexibility as with Boost.Build, I am trying to maintain this possibility on an acceptable level. With ``make``, the default compilation mode is optimized mode. Type ::
+
+  make utils
+  make <script-name-without-extension>
+
+To switch to debugging mode you need to use ::
 
   make optimization=no <script-name-without-extension>
 
