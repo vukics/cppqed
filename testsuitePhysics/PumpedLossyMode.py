@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-from pyUtils.regression import regression
+from pyUtils.regression import *
 from pyUtils.interpolate import *
 from pyUtils.loadTrajectories import loadTrajectories
 from pyUtils.parseFile import parseFile
@@ -50,4 +50,4 @@ def compare(i,eps) :
 alphaRe=evolvedArray[:,2]
 alphaIm=evolvedArray[:,3]
 
-print compare(2,1e-34) & compare(3,1e-34) & compare(4,1e-34) & compare(5,1e-34) & (regression(interpolate(timeArray,averageArray(4)),interpolate(timeArray,alphaRe),timeArray)<1e-8) & (regression(interpolate(timeArray,averageArray(5)),interpolate(timeArray,alphaIm),timeArray)<1e-7) & (regression(interpolate(timeArray,averageArray(2)),interpolate(timeArray,alphaRe*alphaRe+alphaIm*alphaIm),timeArray)<1e-8)
+print compare(2,1e-34) & compare(3,1e-34) & compare(4,1e-34) & compare(5,1e-34) & (regressionArrays(averageArray(4),alphaRe,timeArray)<1e-8) & (regressionArrays(averageArray(5),alphaIm,timeArray)<1e-7) & (regressionArrays(averageArray(2),alphaRe*alphaRe+alphaIm*alphaIm,timeArray)<1e-8)
