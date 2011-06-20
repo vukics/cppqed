@@ -21,4 +21,4 @@ g=eta1/alpha
 
 eta=-alpha*z
 
-print "--eta '("+str(eta.real)+","+str(eta.imag)+")' --gs '(("+str(g.real)+","+str(g.imag)+"))'" 
+print "--eta '("+str(eta.real)+","+str(eta.imag)+")' --gs '[("+str(g.real)+","+str(g.imag)+")]'" 
