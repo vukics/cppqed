@@ -226,5 +226,5 @@ $1 "NXCME_oscillation.d" "NX_coupledModesElim --fin 6 --T 10 --pinit '(-1 0.02 .
 
 ARGSDecay="--eta0 0 --eta1 0 --eta2 0 --eta3 0 --deltaC0 0 --deltaC1 0 --deltaC2 0 --deltaC3 0 --cutoff0 6 --cutoff1 5 --cutoff2 4 --cutoff3 3 --kappa0 1 --kappa1 2 --kappa2 .5 --kappa3 1 --minitFock0 5 --minitFock1 4 --minitFock2 3 --minitFock3 2 --dc 0 --Dt .01 --T 2"
 
-$1 "DecayCompositeMa.d" "FourModes $ARGSDecay --evol master"
+#$1 "DecayCompositeMa.d" "FourModes $ARGSDecay --evol master"
 $1 "DecayCompositeEn.d" "FourModes $ARGSDecay $ARGSEnsemble"
