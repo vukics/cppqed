@@ -106,7 +106,7 @@ $1 "QMJ_Int_SiUIP.d"  "QbitMode_C++QED  $ARGS3 --picture UIP --no_noise"
 # VII. Free particle
 ####################
 
-ARGS4="--vClass 0 --fin 6 --pinit '(-0.5 10 0.1 0)' --T .5 --dc 0 --Dt 0.01"
+ARGS4="--vClass 0 --fin 6 --pinit '(-0.5 10 0.1 0)' --T .3 --dc 0 --Dt 0.01"
 
 $1 "freeParticle.d"     "SingleParticle $ARGS4              "
 $1 "freeParticle_Sch.d" "SingleParticle $ARGS4 --picture Sch"
@@ -118,11 +118,11 @@ $1 "freeParticle1p1m.d" "1particle1mode $ARGS4 $ARGS1Base --Unot 0 --1p1mconf 4"
 
 ARGS5="--pinit '(-0.01 0 0 0)' --modePart Cos --fin 10"
 
-$1 "oscillation10000.d" "SingleParticle $ARGS5 --vClass -10000 --T 1 "
-$1 "oscillation1000.d"  "SingleParticle $ARGS5 --vClass -1000  --T 3 "
-$1 "oscillation100.d"   "SingleParticle $ARGS5 --vClass -100   --T 10"
+$1 "oscillation10000.d" "SingleParticle $ARGS5 --vClass -10000 --T .063 "
+$1 "oscillation1000.d"  "SingleParticle $ARGS5 --vClass -1000  --T .4 "
+$1 "oscillation100.d"   "SingleParticle $ARGS5 --vClass -100   --T .66"
 
-$1 "oscillation10000_Sch.d" "SingleParticle $ARGS5 --vClass -10000 --T 1 --picture Sch"
+$1 "oscillation10000_Sch.d" "SingleParticle $ARGS5 --vClass -10000 --T .063 --picture Sch"
 
 #$PATH/SingleParticle $ARGS5 --picture Sch --vClass -100 --T 10 > oscillation100_Sch.d
 
@@ -133,7 +133,7 @@ $1 "oscillation10000_Sch.d" "SingleParticle $ARGS5 --vClass -10000 --T 1 --pictu
 # IX. Heavy particle not affected by the cavity field
 #####################################################
 
-ARGS6Base="--cutoff 3 --fin 11 --deltaC -1e5 --kappa 1e5 --T .1 --pinit '(0 1000 0.05 0)'"
+ARGS6Base="--cutoff 3 --fin 11 --deltaC -1e5 --kappa 1e5 --T .01 --pinit '(0 1000 0.05 0)'"
 
 ARGS6="$ARGS6Base --Unot -2e7 --vClass -0.1"
 
@@ -156,7 +156,7 @@ $1 "confAX_Minus.d"  "1particle1mode $ARGS6bis --modeCav Minus"
 # X. Multilevel system
 ######################
 
-ARGS7="--T 120 --dc 0 --Dt .5"
+ARGS7="--T 100 --dc 0 --Dt .5"
 
 delta02="-1e3"
 reta0="6"
