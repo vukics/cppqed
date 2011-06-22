@@ -174,7 +174,7 @@ Finally, in the last line :func:`evolve` is a dispatcher for different evolution
   ensemble of MCWF trajectories
 
 
-If in the command line we specify the ``--help`` option, the program will display all the available parameters together with their types, a short description, and the default value. The names of the parameters are pretty much what you would expect. The type information becomes less and less readable for more and more complex types, so I am actually considering to remove this.
+If we specify the ``--help`` option in the command line, the program will display all the available parameters together with their types, a short description, and the default value. The names of the parameters are pretty much what you would expect. The type information becomes less and less readable for more and more complex types, so I am actually considering to remove this.
 
 An example command line then looks like:
 
