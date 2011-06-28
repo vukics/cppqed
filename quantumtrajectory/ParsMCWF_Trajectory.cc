@@ -12,7 +12,8 @@ ParsMCWF_Trajectory::ParsMCWF_Trajectory(parameters::ParameterTable& p, const st
     svdc(p.addMod("svdc",mod,"Number of displays between two state-vector Displays",0u)),
     initFile (p.addMod<std::string>("initFile" ,mod,"file containing the initial state vector","")),
     basisDim(p.addMod("basisDim",mod,"number of basis vectors the stochastic wave function is compared against",size_t(0))),
-    basisFile(p.addMod<std::string>("basisFile",mod,"file containing the basis vectors",""))
+    basisFile(p.addMod<std::string>("basisFile",mod,"file containing the basis vectors","")),
+    doLog(p.addMod("doLog",mod,"governs whether trajectory does logging",false))
 {}
 
 

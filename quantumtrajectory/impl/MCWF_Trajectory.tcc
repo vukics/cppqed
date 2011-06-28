@@ -85,7 +85,9 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     dpLimit_(p.dpLimit),
     svdc_(p.svdc),
     file_(p.ofn),
-    initFile_(p.initFile+".sv")
+    initFile_(p.initFile+".sv"),
+    doLog_(p.doLog),
+    normMaxDeviation_(0)
 {
   using namespace std;
 
@@ -131,6 +133,8 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
 {
   using namespace std;
 
+  if (doLog_) getOstream()<<"# Maximal deviation of norm from 1: "<<normMaxDeviation_<<endl;
+
   if (file_!="") {
     ofstream file((file_+".sv").data());
     file<<psi_();
@@ -162,6 +166,8 @@ void MCWF_Trajectory<RANK>::displayMore(int precision) const
 template<int RANK>
 void MCWF_Trajectory<RANK>::step(double Dt) const
 {
+  using namespace std;
+
   // Coherent time development
   if (ha_) getEvolved()->step(Dt);
   else getEvolved()->update(getTime()+Dt,Dt);
@@ -173,14 +179,18 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
     tIntPic0_=t;
   }
 
-  psi_.renorm();
+  {
+    double norm=psi_.renorm();
+    if (doLog_)
+      normMaxDeviation_=max(normMaxDeviation_,fabs(1-norm)); // NEEDS_WORK this should be somehow weighed by the timestep
+  }
 
   // Jump
   if (li_) {
 
     typename Liouvillean::Probabilities probas(Liouvillean::probabilities(t,psi_,li_));
 
-    std::vector<indexSVL_tuple> probasSpecial;
+    vector<indexSVL_tuple> probasSpecial;
 
     {
       for (int i=0; i<probas.size(); i++)
@@ -197,7 +207,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
     }
 
 
-    double dpOverDt=std::accumulate(probas.begin(),probas.end(),0.);
+    double dpOverDt=accumulate(probas.begin(),probas.end(),0.);
 
     double random_=(*getRandomized())()/getDtDid();
 
@@ -212,7 +222,7 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 	  static bool p(int i, indexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
 	};
 
-	typename std::vector<indexSVL_tuple>::const_iterator i(find_if(probasSpecial,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
+	typename vector<indexSVL_tuple>::const_iterator i(find_if(probasSpecial,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
 	if (i!=probasSpecial.end())
 	  // special jump
 	  psi_()=i->template get<1>(); // RHS already normalized above
@@ -224,10 +234,14 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
       }
     }
 
-    if (dpOverDt*getEvolved()->getDtTry()>dpLimit_)
-      getEvolved()->setDtTry(dpLimit_/dpOverDt);
-    // Time-step management --- jump probability should not overshoot dpLimit
-
+    {
+      double totalProbability=dpOverDt*getEvolved()->getDtTry();
+      if (totalProbability>dpLimit_) {
+	if (doLog_) getOstream()<<"# dpLimit overshot: "<<getEvolved()->getTime()<<" "<<totalProbability<<endl;
+	getEvolved()->setDtTry(dpLimit_/dpOverDt);
+	// Time-step management --- jump probability should not overshoot dpLimit
+      }
+    }
   }
 
 }

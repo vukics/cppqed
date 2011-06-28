@@ -15,9 +15,9 @@
 
 #include "StochasticTrajectory.h"
 
-#include<boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple.hpp>
 
-#include<boost/mpl/identity.hpp>
+#include <boost/mpl/identity.hpp>
 
 
 namespace mpl=boost::mpl;
@@ -112,6 +112,9 @@ private:
   const std::string file_;
 
   const std::string initFile_;
+
+  const bool doLog_;
+  mutable double normMaxDeviation_;
 
 };
 
