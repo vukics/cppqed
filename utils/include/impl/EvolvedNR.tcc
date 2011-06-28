@@ -45,7 +45,7 @@ rkqs(A&, const A&, double&, double, double, const A&, double&, double&, typename
 
 template<typename A>
 void
-EvolvedNR<A>::step(double deltaT)
+EvolvedNR<A>::doStep(double deltaT)
 {
   double t=getTime(), dtTry=getDtTry(), dtDummy;
 

@@ -48,9 +48,9 @@ public:
 
   EvolvedNR(A&, Derivs, double, double, double, const A&);
 
-  void step(double);
-
 private:
+  void doStep(double);
+
   A yscal_, dydt_;
   const A& scaleAbs_;
 

@@ -73,9 +73,9 @@ public:
 	     const A&
 	     );
 
-  void step(double);
-  
 private:
+  void doStep(double);
+
   ImplSmartPtr pImpl_;
 
 };
