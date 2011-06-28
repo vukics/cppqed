@@ -103,7 +103,7 @@ The solution adopted for this problem in the framework is represented by the cla
 
     .. math::
 
-      \avr{a^2}=\Tr{a^\dag b\rho}=\sum_i\sqrt{i(i-1)}\,\rho_{i;i-2},
+      \avr{a^2}=\Tr{a^2\rho}=\sum_i\sqrt{i(i-1)}\,\rho_{i;i-2},
 
     one can write the following function::
 
@@ -112,7 +112,7 @@ The solution adopted for this problem in the framework is represented by the cla
       const dcomp calculateASqr(const LazyDensityOperator<1>& matrix)
       {
         dcomp res;
-        for (int i=2; i<matrix.getTotalDimension(); ++i) res+=sqrt(i*(i-2))*matrix(i,i-2);
+        for (int i=2; i<matrix.getTotalDimension(); ++i) res+=sqrt(i*(i-1))*matrix(i,i-2);
         return res;
       }
 
