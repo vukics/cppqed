@@ -99,11 +99,10 @@ calculateADaggerB(const LazyDensityOperator<2>& m)
   return res;
 }
 
-/*
 template <int RANK, typename F, typename V, typename T>
-const T partialTrace
-( const LazyDensityOperator<RANK>& matrix, F f, V v, T t ) ;
-*/
+const T quantumdata::partialTrace
+(const quantumdata::LazyDensityOperator<RANK>& matrix, F f, V v, T t);
+
 
 const DensityOperator<1>
 copyDensityOperator(const LazyDensityOperator<1>& m)
@@ -113,6 +112,17 @@ copyDensityOperator(const LazyDensityOperator<1>& m)
   for (int i=0; i<dim; i++) for (int j=0; j<dim; j++)
     res(i,j)=m(i,j);
   return res;
+}
+
+template<int RANK, int SUBSYSTEM>
+// for the subsystem defined by the index SUBSYSTEM
+const DensityOperator<1>
+partialTraceOfUnarySubsystem(const LazyDensityOperator<RANK>& m)
+{
+  return partialTrace(m,
+                      copyDensityOperator,
+                      Vector<SUBSYSTEM>(),
+                      DensityOperator<1>());
 }
 
 template<int RANK>

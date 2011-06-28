@@ -1,7 +1,3 @@
-#include <blitz/array.h>
-
-//#include "Types.h"
-/*
 #include "LazyDensityOperator.h"
 #include "StateVector.h"
 
@@ -10,7 +6,7 @@
 
 #include <valarray>
 
-*/
+
 template <int RANK> using StateVector=blitz::Array<std::complex<double>,RANK> quantumdata::Types<RANK>::StateVectorLow;
 
 /*

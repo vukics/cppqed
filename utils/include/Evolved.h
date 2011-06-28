@@ -3,7 +3,7 @@
   Evolved is intended as a common interface for (adaptive stepsize)
   ODE drivers. It takes the Array it operates on as template
   parameter. A given Array can be adapted to the form expected by
-  Evolved by a suitable specialization of EvolvedArrayTraits. 
+  Evolved by a suitable specialization of ArrayMemoryTraits. 
 
   The Array which is actually "Evolved" is by no means owned by
   Evolved (meaning that it is not deallocated when an Evolved is

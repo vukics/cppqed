@@ -110,11 +110,7 @@ struct ArrayTraversalTraits<TTD_CARRAY(n)> : ArrayMemoryTraits<TTD_CARRAY(n)> {
   typedef TTD_CARRAY(n) CA;
 
   static const dcomp& ss(const CA& a, size_t i) {return *(a.begin()+i);}
-  /*
-    This funny-looking solution is to ensure that the array is
-    traversed contiguously independent of the rank.
-    Bounds checking? --- CheckedIterator.
-  */
+  // This funny-looking solution is aimed at ensuring that the array is traversed contiguously independently of the rank. Bounds checking? --- CheckedIterator.
   static       dcomp& ss(      CA& a, size_t i) {return const_cast<dcomp&>(ss(static_cast<const CA&>(a),i));}
 
   static size_t ssLimit(const CA& a) {return a.size();}
