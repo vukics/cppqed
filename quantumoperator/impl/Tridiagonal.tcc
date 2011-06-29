@@ -4,13 +4,15 @@
 
 #include "ComplexArrayExtensions.h"
 
-#include<algorithm>
+#include <algorithm>
+
+
+
+namespace quantumoperator {
 
 
 namespace bll=boost::lambda;
 
-
-namespace quantumoperator {
 
 
 template<int RANK> template<int RANK2>
@@ -18,7 +20,8 @@ Tridiagonal<RANK>::Tridiagonal(const Tridiagonal<RANK2>& t1, const Tridiagonal<R
   : Base(blitzplusplus::concatenateTinies(t1.getDimensions(),t2.getDimensions())),
     diagonals_(blitzplusplus::TOA_ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,true>(t1.get(),t2.get())),
     differences_(blitzplusplus::concatenateTinies(t1.getDifferences(),t2.getDifferences())),
-    tCurrent_(0)
+    tCurrent_(0),
+    freqs_(blitzplusplus::TOA_ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,false>(t1.getFreqs(),t2.getFreqs()))
 {
 }
 
@@ -32,35 +35,33 @@ Tridiagonal<RANK>::operator*=(const dcomp& dc)
 }
 
 
-namespace details {
-
-template<int RANK>
-int transposeIndex(int ind)
-{
-  int res=0;
-  // std::cout<<ind<<' ';
-  for (int k=RANK-1; k>=0; k--) {
-    int threeToK=int(floor(pow(3.,k)));
-    int ik=int(floor(ind/double(threeToK)));
-    res+=((3-ik)%3)*threeToK;
-    ind-=ik*threeToK;
-  }
-  // std::cout<<res<<std::endl;
-  return res;
-}
-
-
-
-} // details
 
 
 template<int RANK>
 const Tridiagonal<RANK> Tridiagonal<RANK>::hermitianConjugate() const
 {
-  Tridiagonal res(*this,Diagonals(),differences_);
+  struct helper {
+
+    static int transposeIndex(int ind)
+    {
+      int res=0;
+      // std::cout<<ind<<' ';
+      for (int k=RANK-1; k>=0; k--) {
+	int threeToK=int(floor(pow(3.,k)));
+	int ik=int(floor(ind/double(threeToK)));
+	res+=((3-ik)%3)*threeToK;
+	ind-=ik*threeToK;
+      }
+      // std::cout<<res<<std::endl;
+      return res;
+    }
+
+  };
+
+  Tridiagonal res(*this,Diagonals(),differences_,tCurrent_,freqs_);
 
   for (int ind=0; ind<LENGTH; ind++)
-    res.diagonals_(details::transposeIndex<RANK>(ind)).reference(Diagonal(conj(diagonals_(ind))));
+    res.diagonals_(helper::transposeIndex(ind)).reference(Diagonal(conj(diagonals_(ind))));
 
   return res;
 
@@ -69,24 +70,7 @@ const Tridiagonal<RANK> Tridiagonal<RANK>::hermitianConjugate() const
 
 namespace details {
 
-
 size_t binOp1(size_t otherDifference, size_t& difference);
-
-
-template<int RANK>
-typename Tridiagonal<RANK>::Diagonal& 
-binOp2(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
-{
-  if (from.size()) {
-    if (!to.size()) {
-      to.resize(from.shape());
-      to=from;
-    }
-    else to+=from; // This will check for the compatibility of shapes
-  }
-  return to;
-}
-
 
 } // details
 
@@ -95,8 +79,26 @@ template<int RANK>
 Tridiagonal<RANK>&
 Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
 {
+  struct helper
+  {
+    static typename Tridiagonal<RANK>::Diagonal& 
+    doIt(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
+    {
+      if (from.size()) {
+	if (!to.size()) {
+	  to.resize(from.shape());
+	  to=from;
+	}
+	else to+=from; // This will check for the compatibility of shapes
+      }
+      return to;
+    }
+
+  };
+
   boost::transform(tridiag.differences_,differences_.begin(),differences_.begin(),details::binOp1);
-  boost::transform(tridiag.diagonals_,diagonals_.begin(),diagonals_.begin(),details::binOp2<RANK>);
+  boost::transform(tridiag.diagonals_,diagonals_.begin(),diagonals_.begin(),helper::doIt);
+  if (tridiag.freqs_!=freqs_) throw TridiagonalStructureMismatchException();
 
   return *this;
 
@@ -141,11 +143,26 @@ directDiagonals(const typename Tridiagonal<RANK1>::Diagonals& ds1,
 } // details
 
 
+
+template<int RANK>
+Tridiagonal<RANK>& Tridiagonal<RANK>::propagate(double t)
+{
+  // Diagonal (i=0) left out
+  if (double dt=t-tCurrent_)
+    for (int i=1; i<LENGTH; i++)
+      if (diagonals_(i).size() && freqs_(i).size())
+	diagonals_(i)*=exp(dt*freqs_(i));
+  tCurrent_=t;
+  return *this;
+}
+
+
+
 template<int RANK>
 std::ostream& operator<<(std::ostream& os, const Tridiagonal<RANK>& tridiag)
 {
   using namespace std;
-  os<<tridiag.get()<<endl<<tridiag.getDifferences()<<endl<<tridiag.getDimensions()<<endl;
+  os<<tridiag.get()<<endl<<tridiag.getFreqs()<<endl<<tridiag.getDifferences()<<endl<<tridiag.getDimensions()<<endl;
   return os;
 }
 

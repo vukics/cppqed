@@ -4,12 +4,13 @@
 
 #include "BlitzTinyOfArraysFwd.h"
 
-#include<blitz/array.h>
+#include <blitz/array.h>
 
-#include<boost/preprocessor/iteration/iterate.hpp>
-#include<boost/preprocessor/repetition.hpp>
-#include<boost/preprocessor/arithmetic/mul.hpp>
+#include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/repetition.hpp>
+#include <boost/preprocessor/arithmetic/mul.hpp>
 
+#include <boost/operators.hpp>
 
 namespace blitzplusplus {
 
@@ -18,10 +19,14 @@ struct TOA_ShallowCopy {}; // For referencing constructors
 struct TOA_DeepCopy    {}; // For copying     constructors
 
 
+template<typename T, int RANK, int LENGTH>
+bool operator==(const TinyOfArrays<T,RANK,LENGTH>&, const TinyOfArrays<T,RANK,LENGTH>&);
+
+
 #define BASE_class blitz::TinyVector<blitz::Array<T,RANK>,LENGTH>
 
 template<typename T, int RANK, int LENGTH>
-class TinyOfArrays : public BASE_class
+class TinyOfArrays : public BASE_class, private boost::equality_comparable<TinyOfArrays<T,RANK,LENGTH> >
 {
 public:
   typedef BASE_class Base;

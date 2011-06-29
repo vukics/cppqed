@@ -20,7 +20,6 @@ namespace structure {
 namespace free {
 
 typedef quantumoperator::Tridiagonal<1> Tridiagonal;
-typedef quantumoperator::Frequencies<1> Frequencies;
 
 typedef quantumdata::Types<1>::    StateVectorLow     StateVectorLow;
 typedef quantumdata::Types<1>::DensityOperatorLow DensityOperatorLow;

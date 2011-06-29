@@ -32,9 +32,6 @@ const Tridiagonal nop(const ModeBase*);
 const Tridiagonal xop(const ModeBase*);
 const Tridiagonal yop(const ModeBase*);
 
-const Frequencies freqs(const dcomp& zI, size_t);
-const Frequencies freqs(const ModeBase*);
-
 struct PrepError : public cpputils::Exception {};
 
 const StateVector coherent(const dcomp&, size_t);

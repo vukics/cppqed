@@ -152,12 +152,16 @@ bool Compatible(const TTD_CARRAY(1)& a, size_t diffA, const TTD_CARRAY(1)& b, si
 
 
 template<>
-Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minus, const Diagonal& plus, mpl::int_<1>)
+Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minus, const Diagonal& plus, bool toFreqs, mpl::int_<1>)
   : Base(std::max(std::max(size_t(zero.size()),minus.size()+k),plus.size()+k)),
     // funnily enough, Array::size() returns an int ...
-    diagonals_(blitzplusplus::TOA_DeepCopy(),zero,minus,plus),
+    diagonals_(blitzplusplus::TOA_DeepCopy(),
+	       toFreqs ? empty : zero,
+	       minus,
+	       plus),
     differences_(k),
-    tCurrent_(0)
+    tCurrent_(0),
+    freqs_(toFreqs ? calculateFreqs(zero,k) : Diagonals())
 {
   // Consistency check:
   if (
