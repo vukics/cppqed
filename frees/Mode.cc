@@ -308,10 +308,26 @@ const Tridiagonal aop(size_t dim)
 }
 
 
+/*
+
+This should return a Tridiagonal furnished with frequencies, when mode is derived from mode::Exact
+
 const Tridiagonal aop(const ModeBase* mode)
 {
   return aop(mode->getDimension());
 }
+
+
+confer:
+
+const Frequencies freqs(const ModeBase* mode)
+{
+  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode)) return freqs(exact->get_zI(),mode->getDimension());
+  else return Frequencies(mode->getDimension());
+}
+
+
+*/
 
 
 const Tridiagonal nop(size_t dim)
@@ -335,21 +351,7 @@ const Tridiagonal xop(size_t dim)
 
 const Tridiagonal xop(const ModeBase* mode)
 {
-  return xop(mode->getDimension());
-}
-
-
-const Frequencies freqs(const dcomp& zI, size_t dim)
-{
-  Tridiagonal::Diagonal diagonal(dim-1); diagonal=zI;
-  return Frequencies(1,diagonal);
-}
-
-
-const Frequencies freqs(const ModeBase* mode)
-{
-  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode)) return freqs(exact->get_zI(),mode->getDimension());
-  else return Frequencies(mode->getDimension());
+  return tridiagPlusHC(aop(mode))/sqrt(2.);
 }
 
 
