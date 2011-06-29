@@ -11,7 +11,7 @@ GNU Scientific library (GSL)
   provides a very wide variety of numerical solutions in a solid object-oriented design (in C!). They are not used directly, but are wrapped into C++ classes and functions, so that they are easily replaced (e.g. if licensing problems arise). Packaged for Debian and Mac OS X, or can be downloaded from `the GSL homepage <http://www.gnu.org/software/gsl/>`_. I haven't thoroughly determined the minimal version, but 1.8 is known to work.
 
 An implementation of BLAS and LAPACK
-  For many system, optimized versions of these libraries exist and are even preinstalled. As a fallback, the reference implementation can always be used, which is packaged e.g. for Ubuntu.
+  For many systems, optimized versions of these libraries exist and are even preinstalled. As a fallback, the reference implementation can always be used, which is packaged e.g. for Ubuntu.
 
 These three are best installed on system level. 
 
