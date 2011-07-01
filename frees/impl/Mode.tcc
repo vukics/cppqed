@@ -145,7 +145,7 @@ PumpedModeSch<A>::PumpedModeSch(const mode::ParsPumped& p)
 
 template<bool IS_FINITE_TEMP, typename A>
 LossyMode<IS_FINITE_TEMP,A>::LossyMode(const mode::ParsLossy& p)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p),
+  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))),
     A()
@@ -156,7 +156,7 @@ LossyMode<IS_FINITE_TEMP,A>::LossyMode(const mode::ParsLossy& p)
 
 template<bool IS_FINITE_TEMP, typename A>
 LossyModeUIP<IS_FINITE_TEMP,A>::LossyModeUIP(const mode::ParsLossy& p)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p),
+  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),0.),dcomp(0.,-p.delta),0,p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1))),
     A()
@@ -167,7 +167,7 @@ LossyModeUIP<IS_FINITE_TEMP,A>::LossyModeUIP(const mode::ParsLossy& p)
 
 template<bool IS_FINITE_TEMP, typename A>
 LossyModeSch<IS_FINITE_TEMP,A>::LossyModeSch(const mode::ParsLossy& p)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p),
+  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),0,p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(0))),
     A()
@@ -178,7 +178,7 @@ LossyModeSch<IS_FINITE_TEMP,A>::LossyModeSch(const mode::ParsLossy& p)
 
 template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyMode<IS_FINITE_TEMP,A>::PumpedLossyMode(const mode::ParsPumpedLossy& p)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p), 
+  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))(TUPLE_eta)),
     A()
@@ -189,7 +189,7 @@ PumpedLossyMode<IS_FINITE_TEMP,A>::PumpedLossyMode(const mode::ParsPumpedLossy& 
 
 template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyModeUIP<IS_FINITE_TEMP,A>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p), 
+  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
     BASE_init(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1)),boost::assign::tuple_list_of(TUPLE_eta)),
     A()
@@ -200,7 +200,7 @@ PumpedLossyModeUIP<IS_FINITE_TEMP,A>::PumpedLossyModeUIP(const mode::ParsPumpedL
 
 template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyModeSch<IS_FINITE_TEMP,A>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p), 
+  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(0))(TUPLE_eta)),
     A()
@@ -214,7 +214,7 @@ PumpedLossyModeSch<IS_FINITE_TEMP,A>::PumpedLossyModeSch(const mode::ParsPumpedL
 
 template<typename A>
 PumpedLossyModeAlternative<A>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p)
-  : mode::Liouvillean<false,true>(p), 
+  : mode::Liouvillean<false,true>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(p.kappa,-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))(TUPLE_eta)),
     A()
