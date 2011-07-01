@@ -6,114 +6,12 @@
 
 #include "ParsQbit.h"
 
-#include "QM_PictureFwd.h"
-#include "StateVectorFwd.h"
+#include "Mode.h"
+#include "StateVector.h"
 
-#include "ElementLiouvillean.h"
-#include "ElementAveraged.h"
-#include "Free.h"
-#include "FreeExact.h"
-#include "TridiagonalHamiltonian.h"
-
-#include<boost/shared_ptr.hpp>
-
+// Qbit traced back to Mode with dim=2
 
 namespace qbit {
-
-using namespace structure::free;
-
-typedef boost::shared_ptr<const QbitBase> SmartPtr;
-
-const Tridiagonal sigmaop();
-const Tridiagonal sigmadagop();
-const Tridiagonal sigmadagsigmaop();
-const Tridiagonal sigmaxop();
-const Tridiagonal sigmayop();
-const Tridiagonal sigmazop();
-
-const Frequencies freqs(const dcomp& zI);
-
-const Frequencies freqs(const QbitBase*);
-
-
-double saturation(const StateVectorLow&); 
-
-double saturation(const LazyDensityOperator&);
-
-
-const StateVector state0();
-const StateVector state1();
-const StateVector init(const dcomp& psi1);
-const StateVector init(const Pars&);
-
-
-SmartPtr maker(const ParsPumpedLossy&, QM_Picture);
-
-
-
-
-class Exact : public structure::FreeExact
-{
-public:
-  Exact(const dcomp& zI);
-
-  const dcomp& get_zI() const {return zI_;}
-  
-private:
-  void updateU(double) const;
-
-  bool isUnitary() const {return !bool(real(zI_));}
-
-  const dcomp zI_;
-
-};
-
-
-
-namespace details {
-
-struct Empty {};
-
-}
-
-
-template<bool IS_TD>
-class Hamiltonian 
-  : public structure::TridiagonalHamiltonian<1,IS_TD>,
-    public mpl::if_c<IS_TD,Exact,details::Empty>::type
-{
-public:
-  typedef structure::TridiagonalHamiltonian<1,IS_TD> Base;
-
-  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, mpl::bool_<IS_TD> =mpl:: true_()); // works for IS_TD=true
-  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, mpl::bool_<IS_TD> =mpl::false_()); // works for IS_TD=false
-
-protected:
-  const dcomp& get_zSch() const {return zSch_;}
-  const dcomp& get_zI  () const {return Exact::get_zI();}
-
-  const dcomp& get_eta() const {return eta_;}
-
-private:
-  const dcomp zSch_, eta_;
-
-};
-
-
-
-class Liouvillean : public structure::ElementLiouvillean<1,1>
-{
-protected:
-  Liouvillean(double gamma) : gamma_(gamma) {}
-
-private:
-  void   doActWithJ (StateVectorLow&           ) const;
-  double probability(const LazyDensityOperator&) const;
-
-  const double gamma_;
-
-};
- 
 
 
 class Averaged
@@ -135,14 +33,9 @@ private:
 
 
 
-////////////////
-//
-// Highest level
-//
-////////////////
 
 class QbitBase 
-  : public structure::Free, public qbit::Averaged
+  : public ModeBase, public qbit::Averaged
 {
 public:
   QbitBase(const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs());
@@ -150,6 +43,79 @@ public:
   virtual ~QbitBase() {}
 
 };
+
+namespace qbit {
+
+using namespace structure::free;
+
+typedef boost::shared_ptr<const QbitBase> SmartPtr;
+
+//const Tridiagonal sigmaop()                     {return mode::aop(2   );}
+const Tridiagonal sigmaop(const QbitBase* qbit) {return mode::aop(qbit);}
+
+const Tridiagonal sigmadagsigmaop() {return mode::nop(2);}
+
+const Tridiagonal sigmaxop(const QbitBase*);
+const Tridiagonal sigmayop(const QbitBase*);
+const Tridiagonal sigmazop();
+
+
+double saturation(const StateVectorLow& psi) {return mode::photonNumber(psi);}
+
+double saturation(const LazyDensityOperator& m) {return mode::photonNumber(m);}
+
+
+const StateVector state0() {return mode::fock(0,2);}
+const StateVector state1() {return mode::fock(1,2);}
+const StateVector init(const dcomp& psi1) {return mode::coherent(psi1,2);}
+const StateVector init(const Pars& p) {return init(p.qbitInit);}
+
+
+SmartPtr maker(const ParsPumpedLossy&, QM_Picture);
+
+
+
+
+class Exact : public mode::Exact
+{
+public:
+  Exact(const dcomp& zI) : mode::Exact(zI,2) {}
+
+};
+
+
+
+template<bool IS_TD>
+class Hamiltonian : public mode::Hamiltonian<IS_TD>
+{
+public:
+  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta)
+    : mode::Hamiltonian<true >(zSch,zI,-eta,2) {}
+
+  Hamiltonian(const dcomp& zSch,                  const dcomp& eta)
+    : mode::Hamiltonian<false>(zSch,   -eta,2) {}
+
+};
+
+
+
+class Liouvillean : public mode::Liouvillean<false>
+{
+protected:
+  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma) {}
+
+};
+ 
+
+} // qbit
+
+
+
+////////////////
+//
+// Highest level
+//
+////////////////
 
 
 class Qbit
