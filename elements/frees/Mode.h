@@ -131,7 +131,8 @@ class Liouvillean<false,IS_ALTERNATIVE>
   : public structure::ElementLiouvillean<1,1>
 {
 protected:
-  Liouvillean(const ParsLossy& p) : kappa_(p.kappa) {}
+  Liouvillean(double kappa, double=0) : kappa_(kappa) {}
+  // the trailing dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
 
 private:
   void   doActWithJ (StateVectorLow&           ) const;
@@ -149,7 +150,7 @@ class Liouvillean<true >
 protected:
   typedef structure::ElementLiouvillean<1,2> Base;
 
-  Liouvillean(const ParsLossy&);
+  Liouvillean(double kappa, double nTh);
 
 private:
   const double kappa_, nTh_;
