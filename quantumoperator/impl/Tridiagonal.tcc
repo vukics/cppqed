@@ -157,6 +157,14 @@ Tridiagonal<RANK>& Tridiagonal<RANK>::propagate(double t)
 }
 
 
+template<int RANK>
+const Tridiagonal<RANK>
+furnishWithFreqs(const Tridiagonal<RANK>& tridiag, const typename Tridiagonal<RANK>::Diagonal& mainDiagonal)
+{
+  Tridiagonal<RANK> res(tridiag);
+  return res.furnishWithFreqs(mainDiagonal);
+}
+
 
 template<int RANK>
 std::ostream& operator<<(std::ostream& os, const Tridiagonal<RANK>& tridiag)

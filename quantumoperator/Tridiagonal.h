@@ -41,6 +41,11 @@ apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename qua
       const Tridiagonal<RANK>&);
 
 
+template<int RANK>
+const Tridiagonal<RANK>
+furnishWithFreqs(const Tridiagonal<RANK>& tridiag, const typename Tridiagonal<RANK>::Diagonal& mainDiagonal);
+
+
 const Tridiagonal<1> zero    (size_t);
 const Tridiagonal<1> identity(size_t);
 
@@ -105,6 +110,7 @@ public:
   const Tridiagonal hermitianConjugate    () const;
   const Tridiagonal dagger                () const {return hermitianConjugate();}
 
+  Tridiagonal& furnishWithFreqs(const Diagonal& mainDiagonal, IntRANK=_1_);
 
   Tridiagonal& operator+=(const Tridiagonal&);
 
@@ -175,6 +181,7 @@ template<int RANK>
 inline 
 const Tridiagonal<RANK>
 tridiagPlusHC_overI(const Tridiagonal<RANK>& tridiag) {return tridiagPlusHC(tridiag)/DCOMP_I;}
+
 
 
 template<int RANK>
