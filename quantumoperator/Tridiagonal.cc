@@ -152,6 +152,20 @@ bool Compatible(const TTD_CARRAY(1)& a, size_t diffA, const TTD_CARRAY(1)& b, si
 
 
 template<>
+Tridiagonal<1>&
+Tridiagonal<1>::furnishWithFreqs(const Diagonal& mainDiagonal, mpl::int_<1>)
+{
+  const size_t k=differences_(0), diagonalSize=getTotalDimension()-k;
+  freqs_(1).resize(diagonalSize);
+  for (int n=0; n<diagonalSize; n++)
+    freqs_(1)(n)=mainDiagonal(n+k)-mainDiagonal(n);
+  freqs_(2).resize(diagonalSize);
+  freqs_(2)=-freqs_(1);
+  return *this;
+}
+
+
+template<>
 Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minus, const Diagonal& plus, bool toFreqs, mpl::int_<1>)
   : Base(std::max(std::max(size_t(zero.size()),minus.size()+k),plus.size()+k)),
     // funnily enough, Array::size() returns an int ...
@@ -161,8 +175,9 @@ Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minu
 	       plus),
     differences_(k),
     tCurrent_(0),
-    freqs_(toFreqs ? calculateFreqs(zero,k) : Diagonals())
+    freqs_()
 {
+  if (toFreqs) furnishWithFreqs(zero);
   // Consistency check:
   if (
       !Compatible(minus,k,zero) || !Compatible(plus,k,zero) || !Compatible(minus,k,plus,k) || 
@@ -195,7 +210,6 @@ size_t binOp1(size_t otherDifference, size_t& difference)
 
 
 } // details
-
 
 
 

@@ -139,9 +139,6 @@ private:
 
   Diagonals freqs_;
 
-  const Diagonals calculateFreqs(const Diagonal& zero, size_t k, IntRANK=_1_);
-  // helper for the RANK=1 ctor
-
 };
 
 

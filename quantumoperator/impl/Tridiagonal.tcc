@@ -63,6 +63,8 @@ const Tridiagonal<RANK> Tridiagonal<RANK>::hermitianConjugate() const
   for (int ind=0; ind<LENGTH; ind++)
     res.diagonals_(helper::transposeIndex(ind)).reference(Diagonal(conj(diagonals_(ind))));
 
+  // freqs_ at any moment stores the correct transposed values as well
+
   return res;
 
 }
@@ -82,7 +84,7 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
   struct helper
   {
     static typename Tridiagonal<RANK>::Diagonal& 
-    doIt(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
+    doIt1(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
     {
       if (from.size()) {
 	if (!to.size()) {
@@ -94,11 +96,24 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
       return to;
     }
 
+    static typename Tridiagonal<RANK>::Diagonal& 
+    doIt2(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
+    {
+      if (from.size()) {
+	if (to.size() && all(to!=from)) throw TridiagonalStructureMismatchException();
+	else {
+	  to.resize(from.shape());
+	  to=from;
+	}
+      }
+      return to;
+    }
+
   };
 
   boost::transform(tridiag.differences_,differences_.begin(),differences_.begin(),details::binOp1);
-  boost::transform(tridiag.diagonals_,diagonals_.begin(),diagonals_.begin(),helper::doIt);
-  if (tridiag.freqs_!=freqs_) throw TridiagonalStructureMismatchException();
+  boost::transform(tridiag.  diagonals_,  diagonals_.begin(),  diagonals_.begin(), helper::doIt1 );
+  boost::transform(tridiag.      freqs_,      freqs_.begin(),      freqs_.begin(), helper::doIt2 );
 
   return *this;
 
