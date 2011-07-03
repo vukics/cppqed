@@ -44,6 +44,9 @@ void Exact::updateU(double dtdid) const
 //////////////
 
 
+namespace {
+
+
 const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
 {
   Tridiagonal::Diagonal res(dim);
@@ -73,6 +76,7 @@ const Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
 }
 
 
+}
 
 
 template<>
@@ -93,6 +97,8 @@ Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, size_t dim,
 // Liouvillean
 //
 //////////////
+
+namespace {
 
 
 void aJump   (StateVectorLow& psi, double kappa)
@@ -126,7 +132,7 @@ double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
 }
 
 
-
+}
 
 
 Liouvillean<true >::Liouvillean(double kappa, double nTh) 

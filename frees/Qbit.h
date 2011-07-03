@@ -51,24 +51,24 @@ using namespace structure::free;
 typedef boost::shared_ptr<const QbitBase> SmartPtr;
 
 //const Tridiagonal sigmaop()                     {return mode::aop(2   );}
-const Tridiagonal sigmaop(const QbitBase* qbit) {return mode::aop(qbit);}
+inline const Tridiagonal sigmaop(const QbitBase* qbit) {return mode::aop(qbit);}
 
-const Tridiagonal sigmadagsigmaop() {return mode::nop(2);}
+inline const Tridiagonal sigmadagsigmaop() {return mode::nop(2);}
 
 const Tridiagonal sigmaxop(const QbitBase*);
 const Tridiagonal sigmayop(const QbitBase*);
 const Tridiagonal sigmazop();
 
 
-double saturation(const StateVectorLow& psi) {return mode::photonNumber(psi);}
+inline double saturation(const StateVectorLow& psi) {return mode::photonNumber(psi);}
 
-double saturation(const LazyDensityOperator& m) {return mode::photonNumber(m);}
+inline double saturation(const LazyDensityOperator& m) {return mode::photonNumber(m);}
 
 
-const StateVector state0() {return mode::fock(0,2);}
-const StateVector state1() {return mode::fock(1,2);}
-const StateVector init(const dcomp& psi1) {return mode::coherent(psi1,2);}
-const StateVector init(const Pars& p) {return init(p.qbitInit);}
+inline const StateVector state0() {return mode::fock(0,2);}
+inline const StateVector state1() {return mode::fock(1,2);}
+inline const StateVector init(const dcomp& psi1) {return mode::coherent(psi1,2);}
+inline const StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
 SmartPtr maker(const ParsPumpedLossy&, QM_Picture);
