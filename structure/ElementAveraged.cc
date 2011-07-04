@@ -55,7 +55,7 @@ void structure::ElementAveragedCommon::display(const AveragedCommon::Averages& a
 
 namespace structure { namespace averaged {
 
-namespace details {
+namespace {
 
 struct Helper
 {
@@ -73,10 +73,10 @@ private:
   size_t i_;
 };
 
-} // details
+}
 
 DiagonalDO::DiagonalDO(size_t dim) : 
-  Base("Multilevel",list_of(string("rho00")).repeat_fun(dim-1,details::Helper())),
+  Base("Multilevel",list_of(string("rho00")).repeat_fun(dim-1,Helper())),
   dim_(dim)
 {}
 

@@ -62,9 +62,8 @@ void TrajectoryBase::displayKey() const
 }
 
 
-namespace details {
 
-void doRun(TrajectoryBase& traj, double time, double deltaT)
+void details::doRun(TrajectoryBase& traj, double time, double deltaT)
 {
   while (traj.getTime()<time) {
     traj.evolve(std::min(deltaT,time-traj.getTime()));
@@ -72,7 +71,6 @@ void doRun(TrajectoryBase& traj, double time, double deltaT)
   }
 }
 
-} // details
 
 
 } // trajectory
