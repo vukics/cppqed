@@ -72,15 +72,15 @@ Exact<NL>::isUnitary() const
 }
 
 
+/*
 template<int NL, int N1, int N2>
 const quantumoperator::Frequencies<1>
 shift(const MultiLevelBase<NL>& mlb, const Frequencies& freq)
 {
-  if (/*const Exact<NL>* exact=*/dynamic_cast<const Exact<NL>* >(&mlb)) abort();
   else return freq;
 
 }
-
+*/
 
 //////////////
 //
