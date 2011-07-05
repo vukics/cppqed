@@ -33,7 +33,6 @@ class Base : public structure::Interaction<2>, public structure::Hamiltonian<2>
 {
 public:
   typedef mode::Tridiagonal Tridiagonal;
-  typedef mode::Frequencies Frequencies;
 
   Base(const MultiLevelBase<NL>*, const ModeBase*, const VC&);
 

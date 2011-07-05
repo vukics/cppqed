@@ -24,11 +24,12 @@ template<int NL, typename VC> template<int N1, int N2>
 struct Base<NL,VC>::ModeDynamics : public tmptools::pair_c<N1,N2>
 {
   ModeDynamics(const MultiLevelBase<NL>& ml, const ModeBase& mode, const dcomp& g)
-    : freq(multilevel::shift<NL,N1,N2>(ml,mode::freqs(&mode))),
-      a      (-g*mode::aop(&mode)),
-      adagger((g*mode::aop(&mode)).dagger()) {}
+    : a      (-g*mode::aop(&mode)),
+      adagger((g*mode::aop(&mode)).dagger())
+  {
+    if (dynamic_cast<const multilevel::Exact<NL>*>(&ml)) throw multilevel::MultiLevelExactNotImplementedException();
+  }
 
-  const Frequencies freq;
   mutable Tridiagonal a, adagger;
 
 };
@@ -94,10 +95,9 @@ public:
   {
     Sigma<MD::first,MD::second> sigma;
 
-    const Frequencies& freq(modeDynamics.freq);
     Tridiagonal& 
-      a      (modeDynamics.a      .propagate(freq,dt_)),
-      adagger(modeDynamics.adagger.propagate(freq,dt_));
+      a      (modeDynamics.a      .propagate(dt_)),
+      adagger(modeDynamics.adagger.propagate(dt_));
 
     // Note that the multiplication with -g and conj(g) has already
     // been taken care of by ModeDynamics above
