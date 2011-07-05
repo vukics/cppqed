@@ -25,6 +25,8 @@ using namespace fft;
 
 namespace particle {
 
+const Tridiagonal cosNKX (size_t, ptrdiff_t);
+
 
 ////////
 //
@@ -68,12 +70,18 @@ const Tridiagonal hOverI(size_t dim, double vClass, const ModeFunction& mf)
   return (vClass && !isComplex(mf.get<0>())) ? vClass*(mf.get<0>()==MFT_SIN ? -1 : 1)*cosNKX(dim,mf.get<1>()<<1)/(2.*DCOMP_I) : Tridiagonal();
 }
 
+
+const Tridiagonal::Diagonal mainDiagonal(const Spatial& space, double omrec)
+{
+  return Tridiagonal::Diagonal(DCOMP_I*omrec*blitz::sqr(space.getK()));
+}
+
 } 
 
 
 template<>
 Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
-  : Base(hOverI(space.getDimension(),vClass,mf),freqs(space,omrec,mf.get<1>()<<1)), Exact(space,omrec)
+  : Base(furnishWithFreqs(hOverI(space.getDimension(),vClass,mf),mainDiagonal(space,omrec))), Exact(space,omrec)
 {
 }
 
@@ -81,7 +89,7 @@ Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClas
 template<>
 Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
   : Base(
-	 kinetic(space,omrec)/DCOMP_I
+	 Tridiagonal(mainDiagonal(space,-omrec))
 	 +
 	 hOverI(space.getDimension(),vClass,mf)
 	 )
@@ -92,7 +100,7 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClas
 template<>
 Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>)
   : Base(
-	 kinetic(space,omrec)/DCOMP_I
+	 Tridiagonal(mainDiagonal(space,-omrec))
 	 )
 {
 }
@@ -256,24 +264,6 @@ namespace particle {
 
 
 
-const Frequencies freqs(const Spatial& space, double omrec, ptrdiff_t nK)
-{
-  ptrdiff_t dimmie=space.getDimension()-nK;
-  if (dimmie<0) return Frequencies(space.getDimension());
-
-  return Frequencies(nK,Frequencies::Diagonal(DCOMP_I*(omrec*nK)*(nK+2.*space.getK()(blitz::Range(0,dimmie-1)))));
-
-}
-
-
-const Frequencies freqs(const ParticleBase* particle, ptrdiff_t nK)
-{
-  const Exact* exact(dynamic_cast<const Exact*>(particle));
-  if (exact) return freqs(exact->get<0>(),exact->get<1>(),nK);
-  else return Frequencies(particle->getDimension());
-}
-
-
 namespace {
 
 inline void aux(StateVectorLow& psi, int i1, int i2, double norm)
@@ -330,11 +320,6 @@ void Spatial::header(std::ostream& os) const
 }
 
 
-const Tridiagonal kinetic(const Spatial& space, double omrec)
-{
-  return Tridiagonal(Tridiagonal::Diagonal(omrec*blitz::sqr(space.getK())));
-}
-
 
 const Tridiagonal expINKX(size_t dim, ptrdiff_t nK)
 {
@@ -350,27 +335,32 @@ const Tridiagonal expINKX(size_t dim, ptrdiff_t nK)
 }
 
 
-const Tridiagonal sinNKX(size_t dim, ptrdiff_t nK)
-{
-  return (expINKX(dim,nK)-expINKX(dim,-nK))/(2.*DCOMP_I);
-}
-
 const Tridiagonal cosNKX(size_t dim, ptrdiff_t nK)
 {
   return (expINKX(dim,nK)+expINKX(dim,-nK))/2.;
 }
 
-const Tridiagonal mfNKX(size_t dim, const ModeFunction& modeFunction)
+
+const Tridiagonal expINKX(const ParticleBase* particle, ptrdiff_t nK)
+{
+  size_t dim=particle->getDimension();
+  Tridiagonal res(expINKX(dim,nK));
+  if (const particle::Exact* exact=dynamic_cast<const particle::Exact*>(particle)) res.furnishWithFreqs(mainDiagonal(exact->get<0>(),exact->get<1>()));
+  return res;
+}
+
+
+const Tridiagonal mfNKX(const ParticleBase* particle, const ModeFunction& modeFunction)
 {
   ModeFunctionType mf(modeFunction.get<0>());
   ptrdiff_t        nK(modeFunction.get<1>());
   switch (mf) {
-  case MFT_SIN  : return sinNKX (dim,nK);
-  case MFT_COS  : return cosNKX (dim,nK);
-  case MFT_PLUS : return expINKX(dim,nK);
-  case MFT_MINUS:                       ;
+  case MFT_SIN  : return sinNKX (particle,nK);
+  case MFT_COS  : return cosNKX (particle,nK);
+  case MFT_PLUS : return expINKX(particle,nK);
+  case MFT_MINUS:                                      ;
   }
-  return expINKX(dim,-nK);
+  return expINKX(particle,-nK);
 }
 
 /*
@@ -403,7 +393,7 @@ const StateVector wavePacket(const InitialCondition& init, const Spatial& space,
 }
 
 
-const StateVector wavePacket(const Pars&       p, bool kFlag)
+const StateVector wavePacket(const Pars& p, bool kFlag)
 {
   return wavePacket(p.init,Spatial(p.fin),kFlag);
 }

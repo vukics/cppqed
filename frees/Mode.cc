@@ -17,6 +17,8 @@ using namespace mathutils;
 
 namespace mode {
 
+const Tridiagonal aop(size_t);
+
 
 ////////
 //
@@ -67,7 +69,7 @@ const Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
 {
   bool isPumped=isNonZero(eta);
   if (isNonZero(z)) {
-    Tridiagonal res(-z*nop(dim));
+    Tridiagonal res(mainDiagonal(-z,dim));
     if (isPumped) return res+pumping(eta,dim);
     else return res;
   }
@@ -328,29 +330,11 @@ const Tridiagonal aop(const ModeBase* mode)
 
 
 
-const Tridiagonal nop(size_t dim)
-{
-  Tridiagonal::Diagonal diagonal(dim);
-  return Tridiagonal(diagonal=blitz::tensor::i);
-}
-
-
 const Tridiagonal nop(const ModeBase* mode)
 {
-  return nop(mode->getDimension());
+  return Tridiagonal(mainDiagonal(1.,mode->getDimension()));
 }
 
-
-const Tridiagonal xop(size_t dim)
-{
-  return tridiagPlusHC(aop(dim))/sqrt(2.);
-}
-
-
-const Tridiagonal xop(const ModeBase* mode)
-{
-  return tridiagPlusHC(aop(mode))/sqrt(2.);
-}
 
 
 double photonNumber(const StateVectorLow& psi)
