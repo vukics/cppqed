@@ -26,19 +26,3 @@ Base::Base(const QbitBase* qbit, const ModeBase* mode, const dcomp& g)
 } // jaynescummings
 
 
-
-/*
-template<typename QbitType, typename ModeType>
-JaynesCummings<QbitType,ModeType>::JaynesCummings(const QbitType& qbit, const ModeType& mode, const dcomp& g, mpl::bool_<IS_TD>)
-  : JaynesCummingsBase(&qbit,&mode,g),
-    TDH_Base(conj(g)*sigmaop()*aop(&mode).dagger()-g*sigmaop().dagger()*aop(&mode))
-{
-}
-
-template<typename QbitType, typename ModeType>
-JaynesCummings<QbitType,ModeType>::JaynesCummings(const QbitType& qbit, const ModeType& mode, const dcomp& g, mpl::bool_<IS_TD>)
-  : JaynesCummingsBase(&qbit,&mode,g),
-    TDH_Base(conj(g)*sigmaop()*aop(&mode).dagger()-g*sigmaop().dagger()*aop(&mode))
-{
-}
-*/

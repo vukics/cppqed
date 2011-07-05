@@ -177,4 +177,12 @@ SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp)
 }
 
 
+const Tridiagonal sigmadagsigmaop()
+{
+  QbitBase dummie;
+  return mode::nop(&dummie);
+}
+
+
+
 } // qbit

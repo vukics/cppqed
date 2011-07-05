@@ -50,10 +50,9 @@ using namespace structure::free;
 
 typedef boost::shared_ptr<const QbitBase> SmartPtr;
 
-//const Tridiagonal sigmaop()                     {return mode::aop(2   );}
 inline const Tridiagonal sigmaop(const QbitBase* qbit) {return mode::aop(qbit);}
 
-inline const Tridiagonal sigmadagsigmaop() {return mode::nop(2);}
+const Tridiagonal sigmadagsigmaop();
 
 const Tridiagonal sigmaxop(const QbitBase*);
 const Tridiagonal sigmayop(const QbitBase*);

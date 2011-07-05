@@ -2,8 +2,6 @@
 #ifndef   MULTI_LEVEL_SYSTEM_IMPL_INCLUDED
 #define   MULTI_LEVEL_SYSTEM_IMPL_INCLUDED
 
-#include "Frequencies.h"
-
 #include<boost/assign/list_inserter.hpp>
 
 #include<boost/lambda/bind.hpp>

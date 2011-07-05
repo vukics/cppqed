@@ -27,10 +27,8 @@ private:
   void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; 
 
   mutable quantumoperator::Tridiagonal<3> firstH_, firstHT_;
-  const   quantumoperator::Frequencies<3> firstF_;
 
   mutable quantumoperator::Tridiagonal<1> secondH_, secondHT_;
-  const   quantumoperator::Frequencies<1> secondF_;
 
 };
 

@@ -23,14 +23,11 @@ using namespace structure::free;
 
 typedef boost::shared_ptr<const ModeBase> SmartPtr;
 
-const Tridiagonal aop(size_t);
-const Tridiagonal nop(size_t);
-const Tridiagonal xop(size_t);
-const Tridiagonal yop(size_t);
 const Tridiagonal aop(const ModeBase*);
 const Tridiagonal nop(const ModeBase*);
-const Tridiagonal xop(const ModeBase*);
-const Tridiagonal yop(const ModeBase*);
+
+inline const Tridiagonal xop(const ModeBase* mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
+// inline const Tridiagonal yop(const ModeBase*) {return ...}
 
 struct PrepError : public cpputils::Exception {};
 

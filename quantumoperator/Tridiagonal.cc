@@ -156,11 +156,13 @@ Tridiagonal<1>&
 Tridiagonal<1>::furnishWithFreqs(const Diagonal& mainDiagonal, mpl::int_<1>)
 {
   const size_t k=differences_(0), diagonalSize=getTotalDimension()-k;
-  freqs_(1).resize(diagonalSize);
-  for (int n=0; n<diagonalSize; n++)
-    freqs_(1)(n)=mainDiagonal(n+k)-mainDiagonal(n);
-  freqs_(2).resize(diagonalSize);
-  freqs_(2)=-freqs_(1);
+  if (diagonalSize>0) {
+    freqs_(1).resize(diagonalSize);
+    for (int n=0; n<diagonalSize; n++)
+      freqs_(1)(n)=mainDiagonal(n+k)-mainDiagonal(n);
+    freqs_(2).resize(diagonalSize);
+    freqs_(2)=-freqs_(1);
+  }
   return *this;
 }
 
