@@ -28,17 +28,15 @@ typedef boost::shared_ptr<ParticleBase> SmartPtr;
 
 typedef boost::shared_ptr<PumpedParticleBase> SmartPtrPumped;
 
-const Tridiagonal kinetic(const Spatial&, double omrec);
 
-const Tridiagonal expINKX(size_t, ptrdiff_t);
-const Tridiagonal sinNKX (size_t, ptrdiff_t);
-const Tridiagonal cosNKX (size_t, ptrdiff_t);
+const Tridiagonal expINKX(const ParticleBase*, ptrdiff_t);
 
-const Tridiagonal mfNKX       (size_t, const ModeFunction&);
-const Tridiagonal mfNKX_AbsSqr(size_t, const ModeFunction&);
+inline const Tridiagonal sinNKX(const ParticleBase* particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*DCOMP_I);}
+inline const Tridiagonal cosNKX(const ParticleBase* particle, ptrdiff_t nK) {return (expINKX(particle,nK)+expINKX(particle,-nK))/ 2.         ;}
 
-const Frequencies freqs(const Spatial&, double omrec, ptrdiff_t nK);
-const Frequencies freqs(const ParticleBase*         , ptrdiff_t nK);
+const Tridiagonal mfNKX       (const ParticleBase*, const ModeFunction&);
+const Tridiagonal mfNKX_AbsSqr(const ParticleBase*, const ModeFunction&);
+
 
 const StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag=true);
 const StateVector wavePacket(const Pars      &,                       bool kFlag=true);
@@ -99,10 +97,7 @@ public:
 
 
 
-// Spatial is a tool to facilitate state vector representations in
-// both X and K space, where the two are canonically conjugate
-// operators, so that [X,K]=i, and hence the two representations are
-// linked with ffTransform
+// Spatial is a tool to facilitate state vector representations in both X and K space, where the two are canonically conjugate operators, so that [X,K]=i, and hence the two representations are linked with ffTransform.
 
 class Spatial
 {

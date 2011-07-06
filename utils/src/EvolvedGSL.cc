@@ -10,9 +10,7 @@ namespace evolved {
 namespace details  {
 
 
-// The purpose of the arrangement is to separate the visible interface
-// from GSL. (That is, no GSL headers need be included in
-// EvolvedGSL.H)
+// The purpose of the arrangement is to separate the visible interface from GSL. (That is, no GSL headers need be included in EvolvedGSL.h)
 
 
 class Impl
@@ -23,7 +21,7 @@ public:
   ~Impl();
 
 private:
-  // NEEDS_WORK See which one can be made const
+  // NEEDS_WORK See which of the following can be made const
   gsl_odeiv_system dydt_;
   gsl_odeiv_step   *const s_;
   gsl_odeiv_control*const c_;
@@ -32,6 +30,7 @@ private:
   friend void apply(ImplSmartPtr,double*,double,double*,double*);
 
 };
+
 
 gsl_odeiv_system GSL_OdeivSystemFill(void* self, size_t size, int (*derivs)(double, const double*, double*, void*))
 {
@@ -42,6 +41,7 @@ gsl_odeiv_system GSL_OdeivSystemFill(void* self, size_t size, int (*derivs)(doub
   res.params=self;
   return res;
 }
+
 
 Impl::Impl(void* self, size_t size, int (*derivs)(double, const double*, double*, void*), double epsRel, double epsAbs, const double* scaleAbs)
   : dydt_(GSL_OdeivSystemFill(self,size,derivs)),
@@ -64,17 +64,20 @@ Impl::~Impl()
   gsl_odeiv_step_free(s_);
 }
 
+
 ImplSmartPtr createImpl(void* self, size_t size, int (*derivs)(double, const double*, double*, void*),
 			double epsRel, double epsAbs, const double* scaleAbs)
 {
   return ImplSmartPtr(new Impl(self,size,derivs,epsRel,epsAbs,scaleAbs));
 }
 
+
 void apply(ImplSmartPtr p, double* t, double t1, double* h, double* y)
 {
   gsl_odeiv_evolve_reset(p->e_);
   gsl_odeiv_evolve_apply(p->e_,p->c_,p->s_,&p->dydt_,t,t1,h,y);
 }
+
 
 const int onSuccess=GSL_SUCCESS;
 

@@ -2,8 +2,6 @@
 
 #include "ParsQbit.h"
 
-#include "StateVector.h"
-
 #include<boost/assign/list_of.hpp>
 
 #include<boost/bind.hpp>
@@ -16,110 +14,6 @@ using namespace mathutils;
 
 
 namespace qbit {
-
-
-////////
-//
-// Exact
-//
-////////
-
-
-Exact::Exact(const dcomp& zI)
-  : FreeExact(2), zI_(zI)
-{
-}
-
-
-void Exact::updateU(double dtdid) const
-{
-  getFactors()(0)=1;
-  getFactors()(1)=exp(-dtdid*zI_);
-}
-
-
-//////////////
-//
-// Hamiltonian
-//
-//////////////
-
-
-namespace details {
-
-
-const Tridiagonal pumping(const dcomp& eta)
-{
-  return tridiagMinusHC(-eta*sigmaop().dagger());
-}
-
-
-const Tridiagonal hOverI(const dcomp& z, const dcomp& eta)
-// Here we use runtime dispatching because runtime dispatching will
-// anyway happen at the latest in some maker function.
-{
-  bool isPumped=isNonZero(eta);
-  if (isNonZero(z)) {
-    Tridiagonal res(-z*sigmadagsigmaop());
-    if (isPumped) return res+pumping(eta);
-    else return res;
-  }
-  else if(isPumped) return pumping(eta);
-  else return Tridiagonal();
-}
-
-
-} // details
-
-
-template<>
-Hamiltonian<true >::Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, boost::mpl::true_)
-  : Base(details::hOverI(zSch,eta),freqs(zI)), Exact(zI), zSch_(zSch), eta_(eta)
-{}
-
-template<>
-Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, boost::mpl::false_)
-  : Base(details::hOverI(zSch,eta)), zSch_(zSch), eta_(eta)
-{}
-
-
-
-//////////////
-//
-// Liouvillean
-//
-//////////////
-
-
-namespace details {
-
-
-void sigmaJump(StateVectorLow& psi, double gamma)
-{
-  psi(0)=sqrt(2.*gamma)*psi(1);
-  psi(1)=0;
-}
-
-
-double sigmaJumpProba(const LazyDensityOperator& matrix, double gamma)
-{
-  return 2.*gamma*saturation(matrix);
-}
-
-
-} // details
-
-
-
-void Liouvillean::doActWithJ(StateVectorLow& psi) const
-{
-  details::sigmaJump(psi,gamma_);
-}
-
-double Liouvillean::probability(const LazyDensityOperator& matrix) const
-{
-  return details::sigmaJumpProba(matrix,gamma_);
-}
 
 
 ///////////
@@ -154,7 +48,7 @@ const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) co
 
 
 QbitBase::QbitBase(const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
-    : Free(2,realFreqs,complexFreqs), Averaged()
+  : ModeBase(2,realFreqs,complexFreqs), Averaged()
 {
   getParsStream()<<"# Qbit\n";
 }
@@ -269,78 +163,6 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
 namespace qbit {
 
 
-const Tridiagonal sigmaop()
-{
-  typedef Tridiagonal::Diagonal Diagonal;
-  Diagonal diagonal(1); diagonal=1;
-  return Tridiagonal(Diagonal(),1,Diagonal(),diagonal);
-}
-
-
-const Tridiagonal sigmadagsigmaop()
-{
-  Tridiagonal::Diagonal diagonal(2);
-  return Tridiagonal(diagonal=blitz::tensor::i);
-}
-
-
-const Frequencies freqs(const dcomp& zI)
-{
-  Tridiagonal::Diagonal diagonal(1); diagonal=zI;
-  return Frequencies(1,diagonal);
-}
-
-
-const Frequencies freqs(const QbitBase* qbit)
-{
-  if (const qbit::Exact* exact=dynamic_cast<const qbit::Exact*>(qbit)) return freqs(exact->get_zI());
-  else return Frequencies(qbit->getDimension());
-}
-
-
-double saturation(const StateVectorLow& psi)
-{
-  return sqrAbs(psi(1));
-}
-
-
-double saturation(const LazyDensityOperator& matrix)
-{
-  return matrix(1);
-}
-
-
-
-const StateVector state0()
-{
-  StateVector res(2);
-  res()(0)=1;
-  return res;
-}
-
-
-const StateVector state1()
-{
-  StateVector res(2);
-  res()(1)=1;
-  return res;
-}
-
-
-const StateVector init(const dcomp& psi1)
-{
-  StateVector res(2);
-  res()(0)=sqrt(1-sqrAbs(psi1)); res()(1)=psi1;
-  return res;
-}
-
-
-const StateVector init(const Pars& p)
-{
-  return init(p.qbitInit);
-} 
-
-
 SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
@@ -353,6 +175,14 @@ SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp)
   }
   return SmartPtr(new PumpedLossyQbitSch(p));
 }
+
+
+const Tridiagonal sigmadagsigmaop()
+{
+  QbitBase dummie;
+  return mode::nop(&dummie);
+}
+
 
 
 } // qbit

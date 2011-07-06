@@ -16,7 +16,7 @@ template<int RANK>
 void 
 details::TDH_True<RANK>::addContribution(double tMinusIntPic0, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  cpputils::for_each(hOverIs_,freqss_.begin(),bind(quantumoperator::apply<RANK>,psi,dpsidt,bind(&Tridiagonal::propagate,_1,_2,tMinusIntPic0)));
+  boost::for_each(hOverIs_,bind(quantumoperator::apply<RANK>,psi,dpsidt,bind(&Tridiagonal::propagate,_1,tMinusIntPic0)));
 }
 
 

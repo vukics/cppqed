@@ -78,8 +78,6 @@ ParameterTable& ParameterTable::addTitle(const std::string& s, const std::string
 
 void update(ParameterTable& table, int argc, char* argv[], const string& sc)
 {
-  //  using namespace details;
-
   if (argc<2) return;
 
   iostream& line=table.getStream();

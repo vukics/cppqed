@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  u/=ps.twos; y/=sqrt(ps.twos);
+  u/=ps.twoS; y/=sqrt(ps.twoS);
 
   mode::SmartPtr mode(mode::maker(pplm,qmp,mode::AveragedMonitorCutoff<mode::AveragedQuadratures>()));
 

@@ -41,6 +41,11 @@ apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename qua
       const Tridiagonal<RANK>&);
 
 
+template<int RANK>
+const Tridiagonal<RANK>
+furnishWithFreqs(const Tridiagonal<RANK>& tridiag, const typename Tridiagonal<RANK>::Diagonal& mainDiagonal);
+
+
 const Tridiagonal<1> zero    (size_t);
 const Tridiagonal<1> identity(size_t);
 
@@ -57,7 +62,7 @@ class Tridiagonal
   : public DimensionsBookkeeper<RANK>, 
     private linalg::VectorSpace<Tridiagonal<RANK> >
 {
-public:  
+public:
   static const int LENGTH=tmptools::Power<3,RANK>::value;
 
   typedef blitzplusplus::TinyOfArrays<dcomp,RANK,LENGTH> Diagonals;
@@ -70,13 +75,17 @@ public:
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
+private:
+  typedef mpl::int_<RANK> IntRANK;
+
   static const mpl::int_<1> _1_  ;//=mpl::int_<1>();
   static const Diagonal     empty;//=Diagonal    ();
 
-  explicit Tridiagonal(const Diagonal& zero=empty, size_t k=0, const Diagonal& minus=empty, const Diagonal& plus=empty, mpl::int_<RANK> =_1_);
+public:
+  explicit Tridiagonal(const Diagonal& zero=empty, size_t k=0, const Diagonal& minus=empty, const Diagonal& plus=empty, bool toFreqs=false, IntRANK=_1_);
 
   Tridiagonal(const Tridiagonal& tridiag) 
-    : Base(tridiag), diagonals_(blitzplusplus::TOA_DeepCopy(),tridiag.diagonals_), differences_(tridiag.differences_), tCurrent_(0) {}
+    : Base(tridiag), diagonals_(blitzplusplus::TOA_DeepCopy(),tridiag.diagonals_), differences_(tridiag.differences_), tCurrent_(tridiag.tCurrent_), freqs_(blitzplusplus::TOA_DeepCopy(),tridiag.freqs_) {}
 
   template<int RANK2>
   Tridiagonal(const Tridiagonal<RANK2>&, const Tridiagonal<RANK-RANK2>&); // Direct product
@@ -88,22 +97,25 @@ public:
 
 
   const dcomp average(const quantumdata::LazyDensityOperator<RANK>&, 
-		      const typename quantumdata::LazyDensityOperator<RANK>::Idx&, mpl::int_<RANK> =_1_);
+		      const typename quantumdata::LazyDensityOperator<RANK>::Idx&, IntRANK=_1_);
 
 
   const Diagonals & get           () const {return diagonals_  ;}
   const Dimensions& getDifferences() const {return differences_;}
+
+  const Diagonals & getFreqs      () const {return freqs_;}
 
 
   // void           hermitianConjugateSelf();
   const Tridiagonal hermitianConjugate    () const;
   const Tridiagonal dagger                () const {return hermitianConjugate();}
 
+  Tridiagonal& furnishWithFreqs(const Diagonal& mainDiagonal, IntRANK=_1_);
 
   Tridiagonal& operator+=(const Tridiagonal&);
 
   const Tridiagonal operator-() const 
-  {return Tridiagonal(*this,blitzplusplus::negate(diagonals_),differences_);}
+  {return Tridiagonal(*this,blitzplusplus::negate(diagonals_),differences_,tCurrent_,freqs_);}
 
   const Tridiagonal operator+() const {return *this;}
   Tridiagonal& operator-=(const Tridiagonal& tridiag) {(*this)+=-tridiag; return *this;}
@@ -113,17 +125,19 @@ public:
   Tridiagonal& operator*=(double d) {(*this)*=dcomp(d,0); return *this;}
   Tridiagonal& operator/=(double d) {(*this)*=1./dcomp(d,0); return *this;} 
 
-  Tridiagonal& propagate(const Frequencies<RANK>&, double t);
+  Tridiagonal& propagate(double t);
 
 private:
-  Tridiagonal(const Base& base, const Diagonals& diagonals, const Dimensions& differences)
-    : Base(base), diagonals_(blitzplusplus::TOA_DeepCopy(),diagonals), differences_(differences), tCurrent_(0) {}
+  Tridiagonal(const Base& base, const Diagonals& diagonals, const Dimensions& differences, double tCurrent, const Diagonals& freqs)
+    : Base(base), diagonals_(blitzplusplus::TOA_DeepCopy(),diagonals), differences_(differences), tCurrent_(tCurrent), freqs_(blitzplusplus::TOA_DeepCopy(),freqs) {}
 
   Diagonals diagonals_;
 
   Dimensions differences_;
 
   double tCurrent_;
+
+  Diagonals freqs_;
 
 };
 
@@ -164,6 +178,7 @@ template<int RANK>
 inline 
 const Tridiagonal<RANK>
 tridiagPlusHC_overI(const Tridiagonal<RANK>& tridiag) {return tridiagPlusHC(tridiag)/DCOMP_I;}
+
 
 
 template<int RANK>

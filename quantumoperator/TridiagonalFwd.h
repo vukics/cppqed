@@ -10,9 +10,6 @@ struct TridiagonalStructureMismatchException;
 namespace quantumoperator {
 
 template<int>
-class Frequencies;
-
-template<int>
 class Tridiagonal;
 
 

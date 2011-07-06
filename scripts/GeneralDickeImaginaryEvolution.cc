@@ -59,11 +59,11 @@ int main(int argc, char* argv[])
   // ****** ****** ****** ****** ****** ******
   // ****** ****** ****** ****** ****** ******
 
-  u/=ps.twos+1; y/=sqrt(ps.twos+1);
+  u/=ps.twoS+1; y/=sqrt(ps.twoS+1);
 
   plm.kappa=ps.gamma=0;
 
-  const size_t dim=plm.cutoff*(ps.twos+1);
+  const size_t dim=plm.cutoff*(ps.twoS+1);
 
   numberOfProjectingStates=noEigenStates ? 0 : min(size_t(numberOfProjectingStates),dim);
     

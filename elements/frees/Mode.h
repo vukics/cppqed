@@ -23,17 +23,11 @@ using namespace structure::free;
 
 typedef boost::shared_ptr<const ModeBase> SmartPtr;
 
-const Tridiagonal aop(size_t);
-const Tridiagonal nop(size_t);
-const Tridiagonal xop(size_t);
-const Tridiagonal yop(size_t);
 const Tridiagonal aop(const ModeBase*);
 const Tridiagonal nop(const ModeBase*);
-const Tridiagonal xop(const ModeBase*);
-const Tridiagonal yop(const ModeBase*);
 
-const Frequencies freqs(const dcomp& zI, size_t);
-const Frequencies freqs(const ModeBase*);
+inline const Tridiagonal xop(const ModeBase* mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
+// inline const Tridiagonal yop(const ModeBase*) {return ...}
 
 struct PrepError : public cpputils::Exception {};
 
@@ -134,7 +128,8 @@ class Liouvillean<false,IS_ALTERNATIVE>
   : public structure::ElementLiouvillean<1,1>
 {
 protected:
-  Liouvillean(const ParsLossy& p) : kappa_(p.kappa) {}
+  Liouvillean(double kappa, double=0) : kappa_(kappa) {}
+  // the trailing dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
 
 private:
   void   doActWithJ (StateVectorLow&           ) const;
@@ -152,7 +147,7 @@ class Liouvillean<true >
 protected:
   typedef structure::ElementLiouvillean<1,2> Base;
 
-  Liouvillean(const ParsLossy&);
+  Liouvillean(double kappa, double nTh);
 
 private:
   const double kappa_, nTh_;
