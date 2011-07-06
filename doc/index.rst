@@ -86,6 +86,8 @@ Issues with C++QED proper should be addressed to `András Vukics <http://sourcef
 Links
 =====
 
+* `Homepage of A. Vukics at the Researh Institute for Solid State Physics & Optics <http://optics.szfki.kfki.hu/Vukics/Vukics>`_
+
 * `Boost C++ libraries <http://www.boost.org>`_
 
 * `GNU Scientific library (GSL) <http://www.gnu.org/software/gsl/>`_

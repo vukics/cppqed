@@ -62,6 +62,10 @@ where we have introduced
 Particle in momentum space
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. class::Spatial
+
+  discuss intimacies of discrete Fourier transform...
+
 .. math::
 
   H_\text{kinetic}=\frac{p^2}{2m}\equiv\omrec k^2
