@@ -20,21 +20,19 @@ namespace spin {
 using namespace structure::free;
 
 
-const Tridiagonal splus (size_t twos, size_t dim=0);
+const Tridiagonal splus(const SpinBase*);
 
-inline const Tridiagonal sminus(size_t twos, size_t dim=0) {return splus(twos,dim).dagger();}
+inline const Tridiagonal sminus(const SpinBase* spin) {return splus(spin).dagger();}
 
-inline const Tridiagonal sx(size_t twos, size_t dim=0) {return (splus(twos,dim)+sminus(twos,dim))/2;}
-inline const Tridiagonal sy(size_t twos, size_t dim=0) {return (splus(twos,dim)-sminus(twos,dim))/(2.*DCOMP_I);}
+inline const Tridiagonal sx(const SpinBase* spin) {return (splus(spin)+sminus(spin))/2;}
+inline const Tridiagonal sy(const SpinBase* spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
 
-const Tridiagonal sz(size_t, size_t dim=0);
-
-const Frequencies freqs(const SpinBase*);
+const Tridiagonal sz(const SpinBase*);
 
 
 struct Pars
 {
-  size_t &twos, &dim;
+  size_t &twoS, &dim;
   double &omega, &gamma;
 
   Pars(parameters::ParameterTable&, const std::string& ="");
@@ -52,9 +50,9 @@ class SpinBase
 public:
   typedef structure::ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
 
-  SpinBase(size_t twos, double omega, double gamma, size_t dim=0);
+  SpinBase(size_t twoS, double omega, double gamma, size_t dim=0);
 
-  size_t getTwoS() const {return twos_;}
+  size_t getTwoS() const {return twoS_;}
 
   double getOmega() const {return omega_;}
   double getGamma() const {return gamma_;}
@@ -67,7 +65,7 @@ private:
 
   const Averages average(const LazyDensityOperator&) const;
 
-  const size_t twos_;
+  const size_t twoS_;
 
   const double omega_, gamma_, s_;
 
@@ -82,7 +80,7 @@ class Spin
 public:
 
   Spin(const spin::Pars& p) 
-    : SpinBase(p.twos,p.omega,p.gamma,p.dim), FreeExact(getTotalDimension())
+    : SpinBase(p.twoS,p.omega,p.gamma,p.dim), FreeExact(getTotalDimension())
   {}
 
 private:
@@ -100,8 +98,8 @@ class SpinSch
 public:
 
   SpinSch(const spin::Pars& p) 
-    : SpinBase(p.twos,p.omega,p.gamma,p.dim),
-      structure::TridiagonalHamiltonian<1,false>(-get_z()*spin::sz(p.twos))
+    : SpinBase(p.twoS,p.omega,p.gamma,p.dim),
+      structure::TridiagonalHamiltonian<1,false>(-get_z()*spin::sz(this))
   {
     getParsStream()<<"# Schrodinger picture."<<std::endl;
   }

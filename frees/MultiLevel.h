@@ -37,6 +37,7 @@ struct RealLevelsMF : mpl::identity<blitz::TinyVector<double,NL> > {};
 //
 ////////
 
+struct MultiLevelExactNotImplementedException : public cpputils::Exception {};
 
 template<int NL>
 class Exact : public structure::FreeExact
@@ -58,18 +59,6 @@ private:
 };
 
 
-template<int NL, int N1, int N2>
-inline
-const Frequencies
-shift(const MultiLevelBase<NL>& mlb, const Frequencies& freq);
-/*{
-  return freq;
-}
-
-template<int NL, int N1, int N2>
-const Frequencies
-shift(const MultiLevelBase<NL>&, const Frequencies&);
-*/
 
 //////////////
 //

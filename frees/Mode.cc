@@ -17,6 +17,8 @@ using namespace mathutils;
 
 namespace mode {
 
+const Tridiagonal aop(size_t);
+
 
 ////////
 //
@@ -44,7 +46,15 @@ void Exact::updateU(double dtdid) const
 //////////////
 
 
-namespace details {
+namespace {
+
+
+const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
+{
+  Tridiagonal::Diagonal res(dim);
+  res=blitz::tensor::i;
+  return res*=z;
+}
 
 
 const Tridiagonal pumping(const dcomp& eta, size_t dim)
@@ -59,7 +69,7 @@ const Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
 {
   bool isPumped=isNonZero(eta);
   if (isNonZero(z)) {
-    Tridiagonal res(-z*nop(dim));
+    Tridiagonal res(mainDiagonal(-z,dim));
     if (isPumped) return res+pumping(eta,dim);
     else return res;
   }
@@ -68,17 +78,17 @@ const Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
 }
 
 
-} // details
+}
 
 
 template<>
 Hamiltonian<true >::Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t dim, boost::mpl::true_)
-  : Base(details::hOverI(zSch,eta,dim),freqs(zI,dim)), Exact(zI,dim), zSch_(zSch), eta_(eta), dim_(dim)
+  : Base(furnishWithFreqs(hOverI(zSch,eta,dim),mainDiagonal(zI,dim))), Exact(zI,dim), zSch_(zSch), eta_(eta), dim_(dim)
 {}
 
 template<>
 Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, size_t dim, boost::mpl::false_)
-  : Base(details::hOverI(zSch,eta,dim)), zSch_(zSch), eta_(eta), dim_(dim)
+  : Base(hOverI(zSch,eta,dim)), zSch_(zSch), eta_(eta), dim_(dim)
 {}
 
 
@@ -90,8 +100,7 @@ Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, size_t dim,
 //
 //////////////
 
-
-namespace details {
+namespace {
 
 
 void aJump   (StateVectorLow& psi, double kappa)
@@ -125,35 +134,35 @@ double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
 }
 
 
-} // details
+}
 
 
-Liouvillean<true >::Liouvillean(const ParsLossy& p) 
-  : Base(JumpStrategies(bind(details::aJump   ,_1,p.kappa*(p.nTh+1)),
-			bind(details::aDagJump,_1,p.kappa* p.nTh  )),
-	 JumpProbabilityStrategies(bind(details::aJumpProba   ,_1,p.kappa*(p.nTh+1)),
-				   bind(details::aDagJumpProba,_1,p.kappa* p.nTh  ))),
-    kappa_(p.kappa), nTh_(p.nTh)
+Liouvillean<true >::Liouvillean(double kappa, double nTh) 
+  : Base(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
+			bind(aDagJump,_1,kappa* nTh  )),
+	 JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(nTh+1)),
+				   bind(aDagJumpProba,_1,kappa* nTh  ))),
+    kappa_(kappa), nTh_(nTh)
 {
 }
 
 template<>
 void Liouvillean<false,false>::doActWithJ(StateVectorLow& psi) const
 {
-  details::aJump(psi,kappa_);
+  aJump(psi,kappa_);
 }
 
 template<>
 void Liouvillean<false,true>::doActWithJ(StateVectorLow& psi) const
 {
-  details::aJump(psi,kappa_);
+  aJump(psi,kappa_);
 }
 
 
 template<>
 double Liouvillean<false,false>::probability(const LazyDensityOperator& matrix) const
 {
-  return details::aJumpProba(matrix,kappa_);
+  return aJumpProba(matrix,kappa_);
 }
 
 
@@ -308,49 +317,24 @@ const Tridiagonal aop(size_t dim)
 }
 
 
+
+// This returns a Tridiagonal furnished with frequencies, when mode is derived from mode::Exact
+
 const Tridiagonal aop(const ModeBase* mode)
 {
-  return aop(mode->getDimension());
+  size_t dim=mode->getDimension();
+  Tridiagonal res(aop(dim));
+  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode)) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
+  return res;
 }
 
-
-const Tridiagonal nop(size_t dim)
-{
-  Tridiagonal::Diagonal diagonal(dim);
-  return Tridiagonal(diagonal=blitz::tensor::i);
-}
 
 
 const Tridiagonal nop(const ModeBase* mode)
 {
-  return nop(mode->getDimension());
+  return Tridiagonal(mainDiagonal(1.,mode->getDimension()));
 }
 
-
-const Tridiagonal xop(size_t dim)
-{
-  return tridiagPlusHC(aop(dim))/sqrt(2.);
-}
-
-
-const Tridiagonal xop(const ModeBase* mode)
-{
-  return xop(mode->getDimension());
-}
-
-
-const Frequencies freqs(const dcomp& zI, size_t dim)
-{
-  Tridiagonal::Diagonal diagonal(dim-1); diagonal=zI;
-  return Frequencies(1,diagonal);
-}
-
-
-const Frequencies freqs(const ModeBase* mode)
-{
-  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode)) return freqs(exact->get_zI(),mode->getDimension());
-  else return Frequencies(mode->getDimension());
-}
 
 
 double photonNumber(const StateVectorLow& psi)
@@ -423,7 +407,8 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
   : ModeBase(p.cutoff),
-    structure::TridiagonalHamiltonian<1,true>(mode::details::pumping(p.eta,p.cutoff),mode::freqs(dcomp(p.kappa,-p.delta),p.cutoff)),
+    structure::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
+							       mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.cutoff))),
     structure::ElementAveraged<1,true>("Mode",list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
     z_(p.kappa,-p.delta)
 {

@@ -16,38 +16,48 @@ using namespace mathutils;
 
 namespace spin {
 
-size_t decideDimension(size_t twos, size_t dim)
-{
-  return dim && dim<twos+1 ? dim : twos+1;
+namespace {
+
+typedef Tridiagonal::Diagonal Diagonal;
+
 }
 
 
-const Tridiagonal splus(size_t twos, size_t dim)
+size_t decideDimension(size_t twoS, size_t dim)
 {
-  typedef Tridiagonal::Diagonal Diagonal;
-  Diagonal diagonal(decideDimension(twos,dim)-1);
+  return dim && dim<twoS+1 ? dim : twoS+1;
+}
+
+
+const Diagonal mainDiagonal(const SpinBase* spin)
+{
+  Diagonal diagonal(spin->getDimension());
+  diagonal=blitz::tensor::i-spin->getTwoS()/2.;
+  return Diagonal(spin->get_z()*diagonal);
+}
+
+
+const Tridiagonal splus(const SpinBase* spin)
+{
+  Diagonal diagonal(spin->getDimension());
   using blitz::tensor::i;
-  return Tridiagonal(Diagonal(),1,diagonal=sqrt((twos-i)*(i+1)));
+  Tridiagonal res(Diagonal(),1,diagonal=sqrt((spin->getTwoS()-i)*(i+1)));
+  if (dynamic_cast<const structure::FreeExact*>(spin)) res.furnishWithFreqs(mainDiagonal(spin));
+  return res;
 }
 
 
-const Tridiagonal sz(size_t twos, size_t dim)
+const Tridiagonal sz(const SpinBase* spin)
 {
-  Tridiagonal::Diagonal diagonal(decideDimension(twos,dim));
-  return Tridiagonal(diagonal=blitz::tensor::i-twos/2.);
+  Diagonal diagonal(spin->getDimension());
+  return Tridiagonal(diagonal=blitz::tensor::i-spin->getTwoS()/2.);
 }
 
 
-
-const Frequencies freqs(const SpinBase* spin)
-{
-  if (dynamic_cast<const structure::FreeExact*>(spin)) return mode::freqs(spin->get_z(),spin->getDimension());
-  else return Frequencies(spin->getDimension());
-}
 
 
 Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
-  : twos(p.addTitle("Spin",mod).addMod<size_t>("twos",mod,"2*s, the size of the spin (dimension: twos+1 or spinDim)",1)),
+  : twoS(p.addTitle("Spin",mod).addMod<size_t>("twoS",mod,"2*s, the size of the spin (dimension: twoS+1 or spinDim)",1)),
     dim (p.addMod<size_t>("spinDim",mod,"the dimension of the truncated spin Hilbert space",0)),
     omega(p.addMod("omega",mod,"Spin precession frequency",1.)),
     gamma(p.addMod("gamma",mod,"Spin decay rate"          ,1.))
@@ -58,9 +68,9 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 } // spin
 
 
-SpinBase::SpinBase(size_t twos, double omega, double gamma, size_t dim) 
-  : Free(spin::decideDimension(twos,dim),tuple_list_of("omega",omega,1)("gamma",gamma,1)),
-    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), twos_(twos), omega_(omega), gamma_(gamma), s_(twos/2.)
+SpinBase::SpinBase(size_t twoS, double omega, double gamma, size_t dim) 
+  : Free(spin::decideDimension(twoS,dim),tuple_list_of("omega",omega,1)("gamma",gamma,1)),
+    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), twoS_(twoS), omega_(omega), gamma_(gamma), s_(twoS/2.)
 {
   getParsStream()<<"# Spin "<<s_<<endl;
 }
@@ -80,7 +90,7 @@ const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) co
     averages(1)+=mathutils::sqr(n-s_)*diag;
 
     if (n<matrix.getDimension()-1) {
-      dcomp temp(sqrt((twos_-n)*(n+1))*matrix(n,n+1));
+      dcomp temp(sqrt((twoS_-n)*(n+1))*matrix(n,n+1));
       averages(2)+=real(temp);
       averages(3)+=imag(temp);
     }
