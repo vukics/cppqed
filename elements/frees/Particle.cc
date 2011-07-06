@@ -286,10 +286,9 @@ void ffTransform(StateVectorLow& psi, Direction dir)
   transform(psi,dir);
 
   int halfnumber=psi.size()>>1;
-  double norm=pow(size,-.5);
 
   // NEEDS_WORK express the following with blitz
-  for (int j=0; j<halfnumber; j++ ) aux(psi,j,j+halfnumber,norm);
+  for (int j=0; j<halfnumber; j++ ) aux(psi,j,j+halfnumber,pow(size,-.5));
   for (int j=1; j<size      ; j+=2) psi(j)*=-1;
 
 }
