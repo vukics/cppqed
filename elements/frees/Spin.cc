@@ -39,8 +39,9 @@ const Diagonal mainDiagonal(const SpinBase* spin)
 
 const Tridiagonal splus(const SpinBase* spin)
 {
-  Diagonal diagonal(spin->getDimension());
+  Diagonal diagonal(spin->getDimension()-1);
   using blitz::tensor::i;
+  // i=m+s (m is the magnetic quantum number)
   Tridiagonal res(Diagonal(),1,diagonal=sqrt((spin->getTwoS()-i)*(i+1)));
   if (dynamic_cast<const structure::FreeExact*>(spin)) res.furnishWithFreqs(mainDiagonal(spin));
   return res;
