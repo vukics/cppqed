@@ -27,9 +27,6 @@ public:
 };
 
 
-const Frequencies freqs(double, size_t);
-
-
 class PumpedLossyModeIP
   : public Free, public FreeExact, public TridiagonalHamiltonian<1,true>, public ElementLiouvillean<1,2>, public ElementAveraged<1>
 {
@@ -44,9 +41,12 @@ public:
   const Averages average(const LazyDensityOperator&) const;
   void           process(Averages&)                  const {}
 
-  double getDelta() const {return delta_;}
+  const dcomp get_z() const {return z_;}
 
 private:
-  const double delta_; // Needed for updateU
+  const dcomp z_; // Needed for updateU
 
 };
+
+
+const Tridiagonal aop(const PumpedLossyModeIP&);

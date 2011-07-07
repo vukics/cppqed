@@ -33,7 +33,13 @@ The non-Hermitian Hamiltonian for the Monte Carlo wave-function method reads:
 .. math::
   :label: harmonicOscillatorNonHermitianHamiltonian
 
-  \HnH=\lp-\delta-i\kappa(2n+1)\rp a^\dagger a+\lp\eta a^\dagger+\hermConj\rp
+  \HnH=\lp-\delta-i\kappa(2n+1)\rp a^\dagger a+\lp\eta a^\dagger+\hermConj\rp\equiv-iz\,a^\dagger a+\lp\eta a^\dagger+\hermConj\rp
+
+where we have introduced the complex frequency
+
+.. math::
+
+  z\equiv\kappa(2n+1)-i\delta
 
 The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`~structure::ElementAveraged` that have to be written. Consider the file ``ExampleMode.h``:
 
@@ -65,13 +71,13 @@ Lines 26-29:
 Lines 30-31:
   We construct the :class:`~structure::ElementAveraged` base, with parameters necessary to produce a simple key for quantum averages communicated towards the user. Here we calculate only three such averages, the expectation value of the number operator, and the real and imaginary parts of that of the ladder operator.
 
-Lines 35-52:
+Lines 37-54:
   The inherited function :func:`~structure::Averaged::average` is implemented.
 
-  Line 41:
+  Line 43:
     the expectation value of the photon number is calculated
 
-  Lines 46-47:
+  Lines 48-49:
     the expectation value of the ladder operator is calculated
 
 
@@ -80,23 +86,34 @@ The implementation of the helpers is also quite straightforward. It may come to 
 .. literalinclude:: examples/ExampleModeImpl.cc
   :language: c++
   :linenos:
+  :lines: 1-64
 
 
 ===================
 Interaction picture
 ===================
 
-In many situations, it pays to transfer to interaction picture defined by the first term of the Hamiltonian :eq:`harmonicOscillatorHamiltonian`. The ladder operator in interaction picture is :math:`a\Int(t)=e^{i\delta t}a`, so that the Hamiltonian reads
+In many situations, it pays to transfer to interaction picture defined by the first term of the Hamiltonian :eq:`harmonicOscillatorHamiltonian`. The ladder operator in interaction picture is 
 
 .. math::
+  :label: ladderOperatorInIP
 
-  H\Int(t)=-i\kappa(2n+1) a^\dagger a+\lp\eta a^\dagger e^{-i\delta t}+\hermConj\rp
+  a\Int(t)=a e^{-zt},
+
+so that the Hamiltonian reads
+
+.. math::
+  :label: HamiltonianInIP
+
+  H\Int(t)=\lp\eta a^\dagger e^{zt}+\eta^*ae^{-zt}\rp
+
+(Cf. these `notes <http://optics.szfki.kfki.hu/~vukics/Pictures.pdf>`_ about how to treat interaction pictures defined by non-unitary transition operators in a consistent way.)
 
 In this case, the class representing the element has to be derived from :class:`~structure::Exact` as well, which represents the transformation between the two pictures. In addition, instead of :class:`~structure::TridiagonalHamiltonian`\ ``<1,false>``, we need to derive from :class:`~structure::TridiagonalHamiltonian`\ ``<1,true>``, because the Hamiltonian is now time-dependent.
 
 .. note:: 
 
-  The framework requires that the jump and the averages be calculated in the normal picture also in this case (cf. explanation of classes :class:`structure::Hamiltonian`, :class:`structure::Exact`, :class:`structure::Liouvillean`, and :class:`structure::Averaged`, and furthermore Sec. :ref:`MCWF_Trajectory`). This allows for reusing the same code in both pictures. (Incidentally, here the Liouvillean remains unchanged anyway.)
+  In general usage, the jump and the averages are calculated in the normal picture also in this case (cf. explanation of classes :class:`structure::Hamiltonian`, :class:`structure::Exact`, :class:`structure::Liouvillean`, and :class:`structure::Averaged`, and furthermore Sec. :ref:`MCWF_Trajectory`). This allows for reusing the same code in both pictures. (Incidentally, here the Liouvillean remains unchanged anyway.)
 
 
 .. literalinclude:: examples/ExampleMode.h
@@ -105,7 +122,9 @@ In this case, the class representing the element has to be derived from :class:`
   :lines: 2-11, 30-
 
 
-In the implementation, the only difference from the previous case will be the constructor which now also requires a :type:`~structure::free::Frequencies` object, and the virtual function :func:`~structure::FreeExact::updateU`.
+In the implementation, the only difference from the previous case will be the constructor, because the Hamiltonian now also requires :func:`furnishing with frequencies <quantumoperator::furnishWithFreqs>`, and the implementation of the virtual function :func:`~structure::FreeExact::updateU`.
+
+When "furnished with frequencies", a :class:`quantumoperator::Tridiagonal` object will internally take care about the time-dependent phases appearing in :eq:`ladderOperatorInIP` and :eq:`HamiltonianInIP`.
 
 .. literalinclude:: examples/ExampleMode.cc
   :language: c++
@@ -114,12 +133,12 @@ In the implementation, the only difference from the previous case will be the co
 
 :class:`~structure::FreeExact` assumes that the operator transforming between the two pictures is diagonal, and the factors to update are simply its diagonal elements. If this is not the case, :class:`~structure::Exact` has to be used instead.
 
-The construction of the :type:`~structure::free::Frequencies` object is also straightforward:
+The construction of the object representing the ladder operator furnished with frequencies is also straightforward:
 
 .. literalinclude:: examples/ExampleModeImpl.cc
   :language: c++
   :linenos:
-  :lines: 58-62
+  :lines: 66-70
 
 .. note::
 
@@ -140,7 +159,14 @@ Let us consider the interaction described by the Hamiltonian
 
 The class implementing this interaction has to be derived from :class:`~structure::Interaction`\ ``<2>`` because it is a binary interaction, and :class:`~structure::TridiagonalHamiltonian`\ ``<2,...>`` (note that :class:`quantumoperator::Tridiagonal` is capable to represent direct products of tridiagonal matrices).
 
-The only thing requiring some care is that once we transform some elements into interaction picture, the whole Hamiltonian is transformed, that is, :math:`a` or :math:`b` or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type ``PumpedLossyModeIP``.
+The only thing requiring some care is that once we transform some elements into interaction picture, the whole Hamiltonian is transformed, that is, :math:`a` or :math:`b` or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type ``PumpedLossyModeIP``. (So that the Hamiltonian is in fact
+
+.. math::
+  :label: XX_HamiltonianInIP
+
+  H_{\text{X-X;I}}(t)=g(ae^{-z_at}+a^\dagger e^{z_at})(be^{-z_bt}+b^\dagger e^{z_bt}).
+
+)
 
 Consider ``ExampleInteraction.h``:
 
@@ -155,4 +181,4 @@ Consider ``ExampleInteraction.h``:
   :language: c++
   :linenos:
 
-As we see, the Hamiltonian can be written in a rather straightforward way, and the corresponding :class:`quantumoperator::Frequencies` objects are also multiplied, expressing the fact that both constituents are in interaction picture.
+As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in   :eq:`XX_HamiltonianInIP`, which result from the use of interaction picture.

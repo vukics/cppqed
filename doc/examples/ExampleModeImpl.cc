@@ -34,9 +34,18 @@ double aJumpProba   (const LazyDensityOperator& matrix, double kappa_nPlus1)
   return 2.*kappa_nPlus1*photonNumber(matrix);
 }
 
+
 double aDagJumpProba(const LazyDensityOperator& matrix, double kappa_n     )
 {
   return 2.*kappa_n*(photonNumber(matrix)+1.);
+}
+
+
+const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
+{
+  Tridiagonal::Diagonal res(dim);
+  res=blitz::tensor::i;
+  return res*=z;
 }
 
 
@@ -50,13 +59,12 @@ const Tridiagonal aop(size_t dim)
 
 const Tridiagonal nop(size_t dim)
 {
-  Tridiagonal::Diagonal diagonal(dim);
-  return Tridiagonal(diagonal=blitz::tensor::i);
+  return Tridiagonal(mainDiagonal(1.,dim));
 }
 
 
-const Frequencies freqs(double delta, size_t dim)
+const Tridiagonal aop(const PumpedLossyModeIP& mode)
 {
-  Tridiagonal::Diagonal diagonal(dim-1); diagonal=dcomp(0,-delta);
-  return Frequencies(1,diagonal);
+  size_t dim=mode.getDimension();
+  return furnishWithFreqs(aop(dim),mainDiagonal(mode.get_z(),dim));
 }

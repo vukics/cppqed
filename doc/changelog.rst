@@ -2,11 +2,17 @@
 ChangeLog
 *********
 
+2011/07/06 Deprecation of :class:`quantumoperator::Frequencies`.
+
+  The functionality of this class has been incorporated into :class:`quantumoperator::Tridiagonal`, following the usage patterns we have observed so far. Usage became much more convenient this way.
+
+
 2011/06/08 Successful compilation with the svn version of the `clang++ <http://clang.llvm.org/>`_ compiler.
 
   This required correction of some small mistakes which were accepted by gcc for some reason.
 
   Also, for some reason, clang++ could note compile ``quantumoperator/impl/TridiagonalHamiltonian.tcc``, so this had to be changed. (It had been crazy anyway.) This broke only one client, ``elements/interactions/ParticleCavity.cc``, which therefore needed to be slightly modified as well. This looks a bit awful now, but all these will anyway become deprecated with the new quantumoperator architecture.
+
 
 2011/05/10 Switching to a more refined definition of time-dependence schemes in :class:`structure::Hamiltonian`
 

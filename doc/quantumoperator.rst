@@ -106,6 +106,8 @@ Implementation
   ``template <int RANK>`` (cf. :ref:`template parameters <tridiagTemplates>`)
 
 
+.. function:: const Tridiagonal<RANK> quantumoperator::furnishWithFreqs(const Tridiagonal<RANK>& tridiag, const Diagonal& mainDiagonal)
+
 .. note::
 
   A serious limitation of :class:`~quantumoperator::Tridiagonal` is that the composition of two such operators does not in general yield one of the same form. This is one of the reasons why we are planning to deprecate :class:`~quantumoperator::Tridiagonal` in favour of a much more general form 

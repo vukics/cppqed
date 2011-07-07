@@ -54,6 +54,9 @@ const PumpedLossyMode::Averages PumpedLossyMode::average(const LazyDensityOperat
 }
 
 
+const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t cutoff);
+
+
 PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, double n, size_t cutoff)
   : Free(cutoff,
 	 tuple_list_of
@@ -62,24 +65,21 @@ PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, doub
 	 tuple_list_of
 	 ("eta",eta,sqrt(cutoff))),
     FreeExact(cutoff),
-    TridiagonalHamiltonian<1,true>(dcomp(-kappa*(2*n+1),delta)*nop(cutoff)
-				   +
-				   tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
-				   freqs(delta,cutoff)
-				   ),
+    TridiagonalHamiltonian<1,true>(furnishWithFreqs(tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
+						    mainDiagonal(dcomp(kappa*(2*n+1),-delta),cutoff))),
     ElementLiouvillean<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(n+1)),
 					   bind(aDagJump,_1,kappa* n   )),
 			    JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(n+1)),
 						      bind(aDagJumpProba,_1,kappa* n   ))),
     ElementAveraged<1>("PumpedLossyMode",
 		       list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
-    delta_(delta)
+    z_(kappa*(2*n+1),-delta)
 {}
 
 
 void PumpedLossyModeIP::updateU(double dtDid) const
 {
-  getFactors()=exp(DCOMP_I*delta_*(dtDid*blitz::tensor::i));
+  getFactors()=exp(-z_*(dtDid*blitz::tensor::i));
 }
 
 
