@@ -66,7 +66,7 @@ inline double saturation(const LazyDensityOperator& m) {return mode::photonNumbe
 
 inline const StateVector state0() {return mode::fock(0,2);}
 inline const StateVector state1() {return mode::fock(1,2);}
-inline const StateVector init(const dcomp& psi1) {return mode::coherent(psi1,2);}
+const StateVector init(const dcomp& psi1);
 inline const StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
