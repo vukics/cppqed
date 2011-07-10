@@ -22,6 +22,7 @@
 
 struct TridiagonalConsistencyErrorException  : public cpputils::Exception {};
 struct TridiagonalStructureMismatchException : public cpputils::Exception {};
+struct TridiagonalTimeMismatchException : public cpputils::Exception {};
 
 /*
 struct TridiagonalFrequenciesDiscrepancy : public TridiagonalError {};
@@ -100,10 +101,12 @@ public:
 		      const typename quantumdata::LazyDensityOperator<RANK>::Idx&, IntRANK=_1_);
 
 
-  const Diagonals & get           () const {return diagonals_  ;}
+  const Diagonals & get           () const {return   diagonals_;}
   const Dimensions& getDifferences() const {return differences_;}
 
-  const Diagonals & getFreqs      () const {return freqs_;}
+  double            getTime       () const {return    tCurrent_;}
+
+  const Diagonals & getFreqs      () const {return       freqs_;}
 
 
   // void           hermitianConjugateSelf();

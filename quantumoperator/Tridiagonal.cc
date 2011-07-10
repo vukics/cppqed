@@ -179,8 +179,9 @@ Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minu
     tCurrent_(0),
     freqs_()
 {
-  if (toFreqs) furnishWithFreqs(zero);
-  // Consistency check:
+  if (toFreqs) furnishWithFreqs(Diagonal(-zero));
+  // The minus sign here assures that the dynamics in the two cases of toFreqs are compatible.
+  // Consistency check follows:
   if (
       !Compatible(minus,k,zero) || !Compatible(plus,k,zero) || !Compatible(minus,k,plus,k) || 
       ((minus.size() || plus.size()) && !k)
