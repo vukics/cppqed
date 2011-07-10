@@ -21,11 +21,11 @@ Overview
 
    quantumdata
 
+   quantumoperator
+
    structure
 
    quantumtrajectory
-
-   quantumoperator
 
    composites
 
@@ -57,11 +57,11 @@ Full contents
 
    quantumdata
 
+   quantumoperator
+
    structure
 
    quantumtrajectory
-
-   quantumoperator
 
    composites
 

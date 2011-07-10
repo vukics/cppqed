@@ -13,13 +13,13 @@ Representing "tridiagonal" matrices
 Synopsis
 --------
 
-Let us consider the following example, which displays the full potential of classes :class:`~quantumoperator::Tridiagonal` and :class:`~quantumoperator::Frequencies`: We have a system consisting of :math:`M` subsystems, each featuring a free (in general, non-Hermitian) Hamiltonian, which is diagonal in the given system's Hilbert space. In addition, we have one more term of a special form in the Hamiltonian coupling all the subsystems:
+Let us consider the following situation, which displays the full potential of the :class:`~quantumoperator::Tridiagonal` class: We have a system consisting of :math:`M` subsystems, each featuring a free (in general, non-Hermitian) Hamiltonian, which is diagonal in the given system's Hilbert space. In addition, we have one more term of a special form in the Hamiltonian coupling all the subsystems:
 
 .. math::
-
+  :label: HTridiag
   H=H^\text{free}+H^\text{interaction}=&\sum_{m=0}^{M-1}\bigotimes_{k=0}^{m-1}\mathbf{1}_k\otimes\lp\sum_{n_m=0}^{N_m-1}\omega_{m,n}\ket{n_m}\bra{n_m}\rp\otimes\bigotimes_{k=m+1}^{M-1}\mathbf{1}_k\\&+\bigotimes_{m=0}^{M-1}\lp\sum_{n_m=0}^{N_m-1}\alpha^{(0)}_{m,n}\ket{n_m}\bra{n_m}\right.+\left.\sum_{n_m=0}^{N_m-1-K_m}\lp\alpha^{(+)}_{m,n}\ket{n_m}\bra{n_m+K_m}+\alpha^{(-)}_{m,n}\ket{n_m+K_m}\bra{n_m}\rp\rp.
 
-Here the coefficients :math:`\omega` and :math:`\alpha` are in general complex with the dimension of frequency (:math:`\hbar=1`). The :math:`N` are the dimensions of the subsystems' Hilbert space in which the vectors :math:`\ket{n}` form an orthonormal basis.
+Here, the coefficients :math:`\omega` and :math:`\alpha` are in general complex with the dimension of frequency (:math:`\hbar=1`). The :math:`N_m`\ s are the dimensions of the subsystems' Hilbert spaces in which the vectors :math:`\ket{n_m}` form an orthonormal basis.
 
 The Hamiltonian is indeed in a special form because the interaction term is a direct product of such operators acting on the Hilbert spaces of the individual subsystems, whose matrix contains only three diagonals of nonzero elements. Hence the name of the class :class:`~quantumoperator::Tridiagonal`, although this usually refers to the case when :math:`K=1`.
 
@@ -33,10 +33,11 @@ Now let us transform to the interaction picture defined by :math:`H^\text{free}`
 
 where :math:`\delta_{m,n}=i\lp\omega_{m,n+K_m}-\omega_{m,n}\rp`.
 
-Quite generally, classes :class:`~quantumoperator::Tridiagonal` and :class:`~quantumoperator::Frequencies` are designed to store and manipulate Hamiltonians of the form :eq:`HITridiag` for an arbitrary number of subsystems. In particular, the Hamiltonian can be evaluated at a given :math:`t`, applied on a state vector and combined with other :class:`~quantumoperator::Tridiagonal`\ s using algebraic operations.
+Quite generally, the :class:`~quantumoperator::Tridiagonal` class is designed to store and manipulate Hamiltonians of the form either :eq:`HTridiag` or :eq:`HITridiag` for an arbitrary number of subsystems. In the latter case, it also stores and manipulates the :math:`\delta_{m,n}` frequencies. In particular, the Hamiltonian can be evaluated at a given time :math:`t`, applied on a state vector and combined with other :class:`~quantumoperator::Tridiagonal`\ s using algebraic operations.
 
-As their names reflect, a pair of objects of classes :class:`~quantumoperator::Tridiagonal` and :class:`~quantumoperator::Frequencies` correspond to a given Hamiltonian (or a given term of a more complex Hamiltonian) of the form :eq:`HITridiag`, the :class:`~quantumoperator::Tridiagonal` object roughly speaking storing the coefficients :math:`\alpha^{(0,-,+)}_{m,n}`, while the :class:`~quantumoperator::Frequencies` object the frequencies :math:`\delta_{m,n}` for all :math:`m,n`. In itself a :class:`~quantumoperator::Tridiagonal` object therefore reflects the matrix of the operator :eq:`HITridiag` at :math:`t=0`, while it can be updated using the corresponding :class:`~quantumoperator::Frequencies` object to some arbitrary time instant :math:`t`.
+Tridiagonal internally bookkeeps to which time instant its state corresponds.
 
+Policy of storing diagonals: only the non-zeros. Policy of storing frequencies: either none or all of them.
 
 --------------
 Implementation
@@ -98,12 +99,8 @@ Implementation
 
   .. function:: void apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 
-    ``template <int>`` (A dummy template parameter multiplication with Sigma.)
+    ``template <int>`` (A dummy template parameter, cf. multiplication with Sigma.)
 
-
-.. class:: quantumoperator::Frequencies
-
-  ``template <int RANK>`` (cf. :ref:`template parameters <tridiagTemplates>`)
 
 
 .. function:: const Tridiagonal<RANK> quantumoperator::furnishWithFreqs(const Tridiagonal<RANK>& tridiag, const Diagonal& mainDiagonal)
