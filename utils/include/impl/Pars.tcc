@@ -4,6 +4,7 @@
 
 #include<iostream>
 #include<iomanip>
+#include<typeinfo>
 
 #include "BooleanNegatedProxy.h"
 

@@ -33,7 +33,7 @@ const string errorMessage(const string& sc)
 
 void versionHelper()
 {
-  cout<<"\nC++QED Version 2 Milestone 9\nAndras Vukics, vukics@users.sourceforge.net\n\nCompiled with\nBoost library collection : Version "<<string(BOOST_LIB_VERSION).replace(1,1,".")<<"\nGnu Scientific Library   : Version "<<GSL_VERSION<<"\nBlitz++ numerical library: Config date: "<<BZ__config_date<<endl<<endl;
+  cout<<"\nC++QED CPC Program Library Version derived from Version 2 Milestone 9\nAndras Vukics, vukics@users.sourceforge.net\n\nCompiled with\nBoost library collection : Version "<<string(BOOST_LIB_VERSION).replace(1,1,".")<<"\nGnu Scientific Library   : Version "<<GSL_VERSION<<"\nBlitz++ numerical library: Config date: "<<BZ__config_date<<endl<<endl;
 }
 
 }
