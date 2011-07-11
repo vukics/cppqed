@@ -17,6 +17,7 @@ Let us consider the following situation, which displays the full potential of th
 
 .. math::
   :label: HTridiag
+
   H=H^\text{free}+H^\text{interaction}=&\sum_{m=0}^{M-1}\bigotimes_{k=0}^{m-1}\mathbf{1}_k\otimes\lp\sum_{n_m=0}^{N_m-1}\omega_{m,n}\ket{n_m}\bra{n_m}\rp\otimes\bigotimes_{k=m+1}^{M-1}\mathbf{1}_k\\&+\bigotimes_{m=0}^{M-1}\lp\sum_{n_m=0}^{N_m-1}\alpha^{(0)}_{m,n}\ket{n_m}\bra{n_m}\right.+\left.\sum_{n_m=0}^{N_m-1-K_m}\lp\alpha^{(+)}_{m,n}\ket{n_m}\bra{n_m+K_m}+\alpha^{(-)}_{m,n}\ket{n_m+K_m}\bra{n_m}\rp\rp.
 
 Here, the coefficients :math:`\omega` and :math:`\alpha` are in general complex with the dimension of frequency (:math:`\hbar=1`). The :math:`N_m`\ s are the dimensions of the subsystems' Hilbert spaces in which the vectors :math:`\ket{n_m}` form an orthonormal basis.

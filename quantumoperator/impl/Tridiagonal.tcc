@@ -63,6 +63,7 @@ const Tridiagonal<RANK> Tridiagonal<RANK>::hermitianConjugate() const
 
   for (int ind=0; ind<LENGTH; ind++)
     res.diagonals_(helper::transposeIndex(ind)).reference(Diagonal(conj(diagonals_(ind))));
+  // Here a new copy of the conjugated diagonal gets created & referenced.
 
   // freqs_ at any moment stores the correct transposed values as well
 
