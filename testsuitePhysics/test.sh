@@ -1,9 +1,9 @@
-export PATH_TO_EXECS=/home/vukics/quantologia/TridiagonalRestructure/bin/scripts/gcc-4.5/release
+export PATH_TO_EXECS=/home/vukics/quantologia/bin/scripts/gcc-4.5/release
 #export PATH_TO_EXECS=/nfshome/vukics/h/quantologia/bin/scripts/gcc-4.4/release
 
 PATH=.:$PATH_TO_EXECS:"${PATH}"
 
-ARGSTraj="--dc 0 --Dt .01 --T 2 --doLog"
+ARGSTraj="--dc 0 --Dt .01 --T 2"
 
 ARGSEnsemble="--nTraj 200 --evol ensemble"
 
