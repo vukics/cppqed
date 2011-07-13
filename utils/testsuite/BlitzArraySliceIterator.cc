@@ -6,7 +6,7 @@
 #include "Profiling.h"
 
 #define BOOST_TEST_MODULE BlitzArraySliceIterator test
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <boost/fusion/sequence/io.hpp>
 #include <boost/fusion/sequence/comparison.hpp>

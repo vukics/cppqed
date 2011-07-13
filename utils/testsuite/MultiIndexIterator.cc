@@ -1,6 +1,6 @@
 #include "MultiIndexIterator.h"
 #define BOOST_TEST_MODULE MultiIndexIterator test
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 using namespace cpputils;
 namespace mpl=boost::mpl;
