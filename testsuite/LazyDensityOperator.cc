@@ -71,7 +71,10 @@ BOOST_AUTO_TEST_CASE( RANK_TWO )
 
   mode::DensityOperator res(-braket(d23,d12)/sqr(norm)*dyad(d22,d12));
 
-  linalg::calculateTwoTimesRealPartOfSelf(res.matrixView());
+  {
+    linalg::CMatrix tempView(res.matrixView());
+    linalg::calculateTwoTimesRealPartOfSelf(tempView);
+  }
 
   res()+=(d12.dyad()+d22.dyad())/sqr(norm);
 
