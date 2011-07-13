@@ -1,6 +1,6 @@
 #include "Combinatorics.h"
 #define BOOST_TEST_MODULE CWR test
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include "BlitzTiny.h"
 

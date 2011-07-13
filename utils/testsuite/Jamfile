@@ -1,12 +1,12 @@
 project : requirements <library>..//Utilslib ;
 
-lib boost_test_lib : : <name>boost_unit_test_framework ;
+# lib boost_test_lib : : <name>boost_unit_test_framework ;
 
 import testing ;
 
 for local ccfile in [ glob *.cc : TMP_Tools*.cc ]
 {
-	unit-test $(ccfile:B) : $(ccfile) boost_test_lib : <define>BOOST_TEST_DYN_LINK ;
+	unit-test $(ccfile:B) : $(ccfile) ; # boost_test_lib : <define>BOOST_TEST_DYN_LINK ;
 }
 
 compile TMP_Tools.cc ;
