@@ -4,16 +4,18 @@
 
 #include "BooleanNegatedProxy.h"
 
-#include<blitz/bzconfig.h>
+#include <blitz/bzconfig.h>
 
-#include<gsl/gsl_version.h>
+#include <gsl/gsl_version.h>
 
-#include<boost/bind.hpp>
-#include<boost/version.hpp>
+#include <boost/bind.hpp>
+#include <boost/version.hpp>
 
-#include<iostream>
-#include<iomanip>
+#include <boost/preprocessor/stringize.hpp>
 
+#include <iostream>
+#include <iomanip>
+#include <fstream>
 
 
 
@@ -33,7 +35,18 @@ const string errorMessage(const string& sc)
 
 void versionHelper()
 {
-  cout<<"\nC++QED Version 2 Milestone 9\nAndras Vukics, vukics@users.sourceforge.net\n\nCompiled with\nBoost library collection : Version "<<string(BOOST_LIB_VERSION).replace(1,1,".")<<"\nGnu Scientific Library   : Version "<<GSL_VERSION<<"\nBlitz++ numerical library: Config date: "<<BZ__config_date<<endl<<endl;
+  string versionString="C++QED Version 2 Milestone 9";
+  {
+    ifstream file((string(BOOST_PP_STRINGIZE(TOP_LEVEL_DIRECTORY))+string("/.bzr/branch/last-revision")).data());
+    if (file.is_open()) {
+      versionString="Revision #";
+      char temp[256];
+      file.getline(temp,256);
+      versionString+=string(temp);
+    }
+  }
+
+  cout<<endl<<versionString<<"\nAndras Vukics, vukics@users.sourceforge.net\n\nCompiled with\nBoost library collection : Version "<<string(BOOST_LIB_VERSION).replace(1,1,".")<<"\nGnu Scientific Library   : Version "<<GSL_VERSION<<"\nBlitz++ numerical library: Config date: "<<BZ__config_date<<endl<<endl;
 }
 
 }

@@ -1,3 +1,5 @@
-lib Utils : [ glob *.cc ] 
+obj Pars.o : Pars.cc : <include>../include <define>TOP_LEVEL_DIRECTORY="$(TOP)" ;
+
+lib Utils : [ glob *.cc : Pars.cc ] Pars.o
 	  : <include>. <library>..//gsllib <library>..//gslcblaslib <library>..//blitzlib <with-flens>yes:<library>..//flenslib # as long as LAPACK & BLAS are used only via FLENS, linking against FLENS should be enough
 	  ;
