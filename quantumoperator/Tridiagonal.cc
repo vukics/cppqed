@@ -205,7 +205,7 @@ size_t details::binOp1(size_t otherDifference, size_t& difference)
 // Declared in Tridiagonal.tcc
 {
   if (!difference) return otherDifference;
-  else if (difference==otherDifference) return difference;
+  else if (!otherDifference || difference==otherDifference) return difference;
   else throw TridiagonalStructureMismatchException();
 }
 
