@@ -49,6 +49,14 @@ const Tridiagonal splus(const SpinBase* spin)
 }
 
 
+const Tridiagonal sn(const SpinBase* spin)
+{
+  const double theta=spin->getTheta(), phi=spin->getPhi();
+  return sin(theta)*(cos(phi)*sx(spin)+sin(phi)*sy(spin))+cos(theta)*sz(spin);
+} 
+
+
+
 const Tridiagonal sz(const SpinBase* spin)
 {
   Diagonal diagonal(spin->getDimension());
@@ -61,6 +69,8 @@ const Tridiagonal sz(const SpinBase* spin)
 Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
   : twoS(p.addTitle("Spin",mod).addMod<size_t>("twoS",mod,"2*s, the size of the spin (dimension: twoS+1 or spinDim)",1)),
     dim (p.addMod<size_t>("spinDim",mod,"the dimension of the truncated spin Hilbert space",0)),
+    theta(p.addMod("theta",mod,"Spin orientation inclination",0.)),
+    phi  (p.addMod("phi"  ,mod,"Spin orientation azimuth    ",0.)),
     omega(p.addMod("omega",mod,"Spin precession frequency",1.)),
     gamma(p.addMod("gamma",mod,"Spin decay rate"          ,1.))
 {}
@@ -70,11 +80,12 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 } // spin
 
 
-SpinBase::SpinBase(size_t twoS, double omega, double gamma, size_t dim) 
+SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double gamma, size_t dim) 
   : Free(spin::decideDimension(twoS,dim),tuple_list_of("omega",omega,1)("gamma",gamma,1)),
-    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), twoS_(twoS), omega_(omega), gamma_(gamma), s_(twoS/2.)
+    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), twoS_(twoS), theta_(theta), phi_(phi), omega_(omega), gamma_(gamma), s_(twoS/2.)
 {
   getParsStream()<<"# Spin "<<s_<<endl;
+  getParsStream()<<"# theta="<<theta_<<" phi="<<phi_<<endl;
 }
 
 

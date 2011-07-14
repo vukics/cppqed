@@ -78,6 +78,7 @@ int main(int argc, char* argv[])
     GeneralDicke<> gd(mode,spin,u,y);
     BinarySystem sys(gd);
 
+    static_cast<structure::QuantumSystem<2>&>(sys).displayParameters(cout);
 
     CMatrix 
       hamiltonian (calculateMatrix(sys)), 
