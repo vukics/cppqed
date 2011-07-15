@@ -1,5 +1,3 @@
-# Jamroot for the Innsbruck ITP HPC cluster.
-
 lib cblaslib : : <file>/opt/atlas/3.8.2/lib/libcblas.so <link>shared ;
 lib atlaslib : : <file>/opt/atlas/3.8.2/lib/libatlas.so <link>shared ;
 
