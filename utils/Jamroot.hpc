@@ -1,8 +1,14 @@
-# General-purpose Jamroot, mainly for Debian/Ubuntu
+# Jamroot for the Innsbruck ITP HPC cluster.
+
+lib cblaslib : : <file>/opt/atlas/3.8.2/lib/libcblas.so <link>shared ;
+lib atlaslib : : <file>/opt/atlas/3.8.2/lib/libatlas.so <link>shared ;
 
 project Utils
+	: requirements
+  	  <include>/home/C++QED_lib/include <library>cblaslib <library>atlaslib <include>/opt/atlas/3.8.2/include
 	: usage-requirements
-	  <include>include 
+	  <include>include
+  	  <include>/home/C++QED_lib/include
 	  <variant>debug:<define>BZ_DEBUG 
 	  <define>GSL_CBLAS # This is needed so that FLENS use the CBLAS implementation of GSL
 	  <with-flens>no:<define>DO_NOT_USE_FLENS
@@ -18,8 +24,6 @@ build-project test      ;
 build-project testsuite ;
 
 
-lib blitzlib : : <name>blitz ;
-
 lib gsllib      : : <name>gsl      ;
 lib gslcblaslib : : <name>gslcblas ;
 
@@ -27,5 +31,6 @@ lib gslcblaslib : : <name>gslcblas ;
 import feature : feature ;
 feature with-flens : yes no : incidental propagated ;
 
-lib flenslib : : <name>flens <link>shared <with-flens>yes ;
+lib blitzlib : : <file>/home/C++QED_lib/lib/libblitz.a ;
+lib flenslib : : <file>/home/C++QED_lib/lib/libflens.so <link>shared ;
 
