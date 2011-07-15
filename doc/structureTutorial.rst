@@ -88,6 +88,10 @@ The implementation of the helpers is also quite straightforward. It may come to 
   :linenos:
   :lines: 1-64
 
+.. warning::
+
+  In situations like the one in Line 56, it is extremely important to write ``blitz::tensor::i+1.``, otherwise the ``blitz::sqrt`` function will operate within the integers.
+
 
 ===================
 Interaction picture
