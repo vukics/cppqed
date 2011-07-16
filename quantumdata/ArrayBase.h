@@ -48,6 +48,7 @@ protected:
 
   const CVector vectorView() const {return blitzplusplus::rankOneArray(arrayLow_);}
   CVector       vectorView()       {return blitzplusplus::rankOneArray(arrayLow_);}
+  // The usual technique doesn't work here, because `CVector is not a pointer, reference, nor a pointer-to-data-member type'
 
 
 private:
