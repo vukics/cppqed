@@ -23,8 +23,8 @@ ParsPumped::ParsPumped(parameters::ParameterTable& p, const std::string& mod)
 
 ParsLossy::ParsLossy(parameters::ParameterTable& p, const std::string& mod)
   : Pars(p,mod),
-    kappa(p.addTitle("LossyMode",mod).addMod("kappa",mod,"Mode decay rate"           ,-delta)),
-    nTh  (p.addMod("nTh"  ,mod,"Mode thermal-photon number",0.    ))
+    kappa(p.addTitle("LossyMode",mod).addMod("kappa",mod,"Mode decay rate",-delta)),
+    nTh  (p.addMod("nTh"  ,mod,"Mode thermal-photon number",0.))
 {}
 
 

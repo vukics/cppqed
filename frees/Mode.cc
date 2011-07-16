@@ -6,8 +6,6 @@
 
 #include<boost/bind.hpp>
 
-#include<boost/preprocessor/control/if.hpp>
-#include<boost/preprocessor/comparison/equal.hpp>
 
 using namespace std;
 using namespace boost;
@@ -46,9 +44,6 @@ void Exact::updateU(double dtdid) const
 //////////////
 
 
-namespace {
-
-
 const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
 {
   Tridiagonal::Diagonal res(dim);
@@ -61,6 +56,9 @@ const Tridiagonal pumping(const dcomp& eta, size_t dim)
 {
   return tridiagMinusHC(eta*aop(dim).dagger());
 }
+
+
+namespace {
 
 
 const Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
