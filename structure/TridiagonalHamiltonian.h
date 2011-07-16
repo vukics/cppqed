@@ -26,6 +26,7 @@ protected:
   TridiagonalStore(const Tridiagonals& hOverIs) : hOverIs_(hOverIs) {}
 
   const Tridiagonals& getH_OverIs() const {return hOverIs_;}
+        Tridiagonals& getH_OverIs()       {return const_cast<Tridiagonals&>(static_cast<const TridiagonalStore*>(this)->getH_OverIs());}
 
   mutable Tridiagonals hOverIs_;
 
