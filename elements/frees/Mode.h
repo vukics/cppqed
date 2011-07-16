@@ -61,8 +61,15 @@ inline std::ostream& isFiniteTempStream(std::ostream& os, double    , boost::mpl
 inline std::ostream& isFiniteTempStream(std::ostream& os, double nTh, boost::mpl:: true_)
 {return os<<" Finite temperature.\n# nTh="<<nTh<<std::endl;}
 
+
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl::false_) {return p.kappa             ;}
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl:: true_) {return p.kappa*(2.*p.nTh+1);}
+
+
+const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim);
+
+const Tridiagonal pumping(const dcomp& eta, size_t dim);
+
 
 
 class Exact : public structure::FreeExact
@@ -125,7 +132,8 @@ template<bool IS_FINITE_TEMP, bool IS_ALTERNATIVE=false> class Liouvillean;
 
 template<bool IS_ALTERNATIVE> 
 class Liouvillean<false,IS_ALTERNATIVE> 
-  : public structure::ElementLiouvillean<1,1>
+  : protected boost::mpl::false_, // Tagging for the isFiniteTemp... functions
+    public structure::ElementLiouvillean<1,1>
 {
 protected:
   Liouvillean(double kappa, double=0) : kappa_(kappa) {}
@@ -142,7 +150,8 @@ private:
 
 template<> 
 class Liouvillean<true >
-  : public structure::ElementLiouvillean<1,2>
+  : protected boost::mpl::true_,
+    public structure::ElementLiouvillean<1,2>
 {
 protected:
   typedef structure::ElementLiouvillean<1,2> Base;

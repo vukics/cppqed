@@ -30,8 +30,8 @@ const SmartPtr maker(const ParsLossy& p, QM_Picture qmp, const A& a)
 {
   if (!p.kappa) return maker(static_cast<const Pars&>(p),qmp,a);
   else {
-    if(p.nTh) { SWITCH_helper(Lossy,TEMPLATE_PARAM_TEMP(true ) ) }
-    else      { SWITCH_helper(Lossy,TEMPLATE_PARAM_TEMP(false) ) }
+    if (p.nTh) { SWITCH_helper(Lossy,TEMPLATE_PARAM_TEMP(true ) ) }
+    else       { SWITCH_helper(Lossy,TEMPLATE_PARAM_TEMP(false) ) }
   }
 }
 
@@ -50,8 +50,8 @@ const SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
   if      (!p.kappa)          return maker(static_cast<const ParsPumped&>(p),qmp,a);
   else if (!isNonZero(p.eta)) return maker(static_cast<const ParsLossy &>(p),qmp,a);
   else { 
-    if(p.nTh) { SWITCH_helper(PumpedLossy,TEMPLATE_PARAM_TEMP(true ) ) }
-    else      { SWITCH_helper(PumpedLossy,TEMPLATE_PARAM_TEMP(false) ) }
+    if (p.nTh) { SWITCH_helper(PumpedLossy,TEMPLATE_PARAM_TEMP(true ) ) }
+    else       { SWITCH_helper(PumpedLossy,TEMPLATE_PARAM_TEMP(false) ) }
   }
 }
 
@@ -146,66 +146,66 @@ PumpedModeSch<A>::PumpedModeSch(const mode::ParsPumped& p)
 template<bool IS_FINITE_TEMP, typename A>
 LossyMode<IS_FINITE_TEMP,A>::LossyMode(const mode::ParsLossy& p)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
-    mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),p.cutoff),
+    mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))),
     A()
 {
-  getParsStream()<<"# Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
+  getParsStream()<<"# Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
 LossyModeUIP<IS_FINITE_TEMP,A>::LossyModeUIP(const mode::ParsLossy& p)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
-    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),0.),dcomp(0.,-p.delta),0,p.cutoff),
+    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),0,p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1))),
     A()
 {
-  getParsStream()<<"# Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
+  getParsStream()<<"# Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
 LossyModeSch<IS_FINITE_TEMP,A>::LossyModeSch(const mode::ParsLossy& p)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
-    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),0,p.cutoff),
+    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),0,p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(0))),
     A()
 {
-  getParsStream()<<"# Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
+  getParsStream()<<"# Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyMode<IS_FINITE_TEMP,A>::PumpedLossyMode(const mode::ParsPumpedLossy& p)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
-    mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),p.eta,p.cutoff),
+    mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))(TUPLE_eta)),
     A()
 {
-  getParsStream()<<"# PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
+  getParsStream()<<"# PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyModeUIP<IS_FINITE_TEMP,A>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
-    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
+    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
     BASE_init(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1)),boost::assign::tuple_list_of(TUPLE_eta)),
     A()
 {
-  getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
+  getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyModeSch<IS_FINITE_TEMP,A>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
-    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,mpl::bool_<IS_FINITE_TEMP>()),-p.delta),p.eta,p.cutoff),
+    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(0))(TUPLE_eta)),
     A()
 {
-  getParsStream()<<"# PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
+  getParsStream()<<"# PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 

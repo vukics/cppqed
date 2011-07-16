@@ -228,3 +228,16 @@ ARGSDecay="--eta0 0 --eta1 0 --eta2 0 --eta3 0 --deltaC0 0 --deltaC1 0 --deltaC2
 
 #$1 "DecayCompositeMa.d" "FourModes $ARGSDecay --evol master"
 #$1 "DecayCompositeEn.d" "FourModes $ARGSDecay $ARGSEnsemble"
+
+
+######################
+# XV. Bichromatic mode
+######################
+
+ARGS1Base="--minit '(1,-.5)' --eta '(30,10)' --deltaC 100 --cutoff 30"
+
+ARGS1bis="$ARGS1 --etaOther '(10,-20)' --deltaC_Other -200 --Dt .001"
+
+$1 "BiM_Ev.d"    "PumpedLossyMode_Evolved $ARGS1bis"
+$1 "BiM_Si.d"    "PumpedLossyMode_C++QED  $ARGS1bis"
+

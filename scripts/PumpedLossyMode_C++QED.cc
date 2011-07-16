@@ -1,9 +1,9 @@
 #include "EvolutionHigh.h"
 
-#include "Mode.h"
-#include "ParsMode.h"
+#include "BichromaticMode.h"
 
-using namespace std;
+
+using namespace std ;
 using namespace mode;
 
 
@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   ParsEvolution pe(p); // Driver Parameters
-  ParsPumpedLossy pplm(p); 
+  ParsBichromatic pplm(p); 
 
   bool& alternative=p.add("alternative","Alternative mode",false);
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
