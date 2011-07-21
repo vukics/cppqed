@@ -49,8 +49,9 @@ cd $SCRIPTDIR
 
 
 if [ $1 == "local" ]; then
-  cp Jamfile Jamfile.global
-  echo "project : usage-requirements <include>blitz/include <include>FLENS-lite/include ;" > Jamfile
-  echo "lib blitzlib : : <file>"$SCRIPTDIR"/blitz/lib/libblitz.a ;" >> Jamfile
-  echo "lib flenslib : : <file>"$SCRIPTDIR"/FLENS-lite/lib/libflens.so <link>shared ;" >> Jamfile
+  cp Jamroot Jamroot.global
+  sed -i '
+s|usage-requirements|usage-requirements <include>blitz/include <include>FLENS-lite/include|g
+s|lib flenslib : : <name>flens|lib flenslib : : <file>'$SCRIPTDIR'/FLENS-lite/lib/libflens.so|g
+s|lib blitzlib : : <name>blitz|lib blitzlib : : <file>'$SCRIPTDIR'/blitz/lib/libblitz.a|g' Jamroot
 fi

@@ -5,7 +5,9 @@ Requirements
 C++QEDv2 depends on a number of open source libraries:
 
 Boost C++ libraries 
-  provide indispensable extensions to the C++ standard, and are *de facto* standard by their own right. The framework depends on a number of them, the most notable ones being Fusion, Lambda, MPL, Operators, and Preprocessor. On many systems, (a selection of) the Boost libraries are available. They are packaged for Debian and Mac OS X. Alternatively, they can be downloaded and installed from `the main Boost portal <http://www.boost.org>`_. Version 1.35 or higher is required.
+  provide indispensable extensions to the C++ standard, and are *de facto* standard by their own right. The framework depends on a number of them, the most notable ones being Fusion, Lambda, MPL, Operators, and Preprocessor. On many systems, (a selection of) the Boost libraries are available. They are packaged for Debian and Mac OS X. Alternatively, they can be downloaded and installed from `the main Boost portal <http://www.boost.org>`_. Although version 1.35 is in principle sufficient for the framework, it is advisable to use as new a version as possible, since experience has shown that there can be clashes between old versions of Boost and new versions of compilers.
+
+  All the Boost libraries necessary for the framework are header-only. Therefore, we also provide an alternative package in which the Boost dependencies are placed in a subdirectory under ``utils/include``. When using this package, no separate Boost libraries need to be installed. Cf. sec. :ref:`boostIntegration`.
 
 GNU Scientific library (GSL) 
   provides a very wide variety of numerical solutions in a solid object-oriented design (in C!). They are not used directly, but are wrapped into C++ classes and functions, so that they are easily replaced (e.g. if licensing problems arise). Packaged for Debian and Mac OS X, or can be downloaded from `the GSL homepage <http://www.gnu.org/software/gsl/>`_. I haven't thoroughly determined the minimal version, but 1.8 is known to work.
@@ -44,11 +46,11 @@ Installation on Ubuntu
 
 The following is a rudimentary list of prerequisite packages on Ubuntu 9.10:: 
 
-  % sudo apt-get install boost-build libboost1.40-all-dev autoconf automake libtool libgsl0-dev liblapack-dev liblapack-pic liblapack3gf libblas-dev libblas3gf libatlas-headers libatlas3gf-base rcs cvs
+  % sudo apt-get install boost-build libboost1.40-all-dev autoconf automake libtool libgsl0-dev liblapack-dev liblapack-pic liblapack3gf libblas-dev libblas3gf libatlas-headers libatlas3gf-base bzr
 
 This will install the first three libraries listed above on system level.
 
-The following steps to install the remaining two libraries constitute also the script ``utils/getLibs.sh``.
+The following steps to install the remaining two libraries constitute also the script ``utils/getLibs.sh``. The ``sed`` command in the last lines of this script also demonstrates what needs to be changed in ``utils/Jamroot`` if Blitz and FLENS are installed at a location which is not in the search path of the C++ compiler/linker.
 
 -----------------
 Install Blitz++:
@@ -108,10 +110,20 @@ Where the last argument can be replaced to the name of the directory for the cod
 
   bzr pull bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed
 
-Be aware that C++QED is under development, so changes in the Bazaar version may change the API of certain modules in such a way as breaks your applications. It is advisable to follow the `ChangeLog <http://cppqed.sourceforge.net/changelog.html>`_ of the project. Alternately, the CVS option ``-r date:<date>`` can be used to retrieve the most recent revision no later than ``<date>``. E.g.::
+Be aware that C++QED is under development, so changes in the Bazaar version may change the API of certain modules in such a way as breaks your applications. It is advisable to follow the `ChangeLog <http://cppqed.sourceforge.net/changelog.html>`_ of the project. Alternately, the Bazaar option ``-r date:<date>`` can be used to retrieve the most recent revision no later than ``<date>``. E.g.::
 
   bzr pull -r date:2010-02-14 bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed
 
+
+.. _boostIntegration:
+
+=================
+Boost integration
+=================
+
+To obtain the package with the necessary Boost libraries integrated, download the package file with ``...BoostIntegration...`` in its name. To get the development version, the corresponding Bazaar branch has to be used::
+
+  bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed/BoostIntegration C++QED
 
 ===========
 Compilation
