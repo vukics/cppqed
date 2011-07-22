@@ -21,7 +21,7 @@ TrajectoryBase::~TrajectoryBase()
 
 ostream& TrajectoryBaseHelper(const string& ofn)
 {
-  return ofn=="" ? cout : *new ofstream(ofn.data(),ios_base::app);
+  return ofn=="" ? cout : *new ofstream(ofn.c_str(),ios_base::app);
 }
 
 

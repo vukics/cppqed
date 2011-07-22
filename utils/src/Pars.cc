@@ -37,7 +37,7 @@ void versionHelper()
 {
   string versionString="C++QED Version 2 Milestone 9";
   {
-    ifstream file((string(BOOST_PP_STRINGIZE(TOP_LEVEL_DIRECTORY))+string("/.bzr/branch/last-revision")).data());
+    ifstream file((string(BOOST_PP_STRINGIZE(TOP_LEVEL_DIRECTORY))+string("/.bzr/branch/last-revision")).c_str());
     if (file.is_open()) {
       versionString="Revision #";
       char temp[256];

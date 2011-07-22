@@ -44,7 +44,7 @@ const vector<HS_Vector> ReadBasis(const string& basisFile, size_t basisDim, size
 {
   vector<HS_Vector> basis(basisDim);
   if (basisDim) {
-    ifstream FILE(basisFile.data());
+    ifstream FILE(basisFile.c_str());
     for (vector<HS_Vector>::iterator i=basis.begin(); i!=basis.end(); ++i) {
       HS_Vector temp(systemDim);
       FILE>>temp;
@@ -95,7 +95,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
   
 
   if (initFile_!=".sv") {
-    ifstream file(initFile_.data());
+    ifstream file(initFile_.c_str());
     if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(initFile_);
 #define READ_INTO_PSI {StateVectorLow psiTemp; file>>psiTemp; psi_=psiTemp; psi_.renorm();}
     READ_INTO_PSI;
@@ -103,11 +103,11 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
   if (file_!="") {
     {
-      ifstream file(file_.data());
+      ifstream file(file_.c_str());
       if (!file.is_open() || file.peek()==EOF) return;
     }
     {
-      ifstream file((file_+".sv").data());
+      ifstream file((file_+".sv").c_str());
       if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+".sv");
       {
 	READ_INTO_PSI;
@@ -136,7 +136,7 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
   if (doLog_) getOstream()<<"# Maximal deviation of norm from 1: "<<normMaxDeviation_<<endl;
 
   if (file_!="") {
-    ofstream file((file_+".sv").data());
+    ofstream file((file_+".sv").c_str());
     file<<psi_();
     file<<"# "<<getEvolved()->getTime()<<' '<<getEvolved()->getDtTry()<<endl;
   }
