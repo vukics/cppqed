@@ -1,7 +1,9 @@
+.. _codeOrganization:
 
------------------
+*****************
 Code organization
------------------
+*****************
+
 
 * Organize headers around a single concept: either a class (e.g. ``Evolved.h``) or a coherent set of services (eg ``BlitzArrayExtensions.h``)
 

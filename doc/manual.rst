@@ -16,6 +16,8 @@ Overview
    :maxdepth: 1
 
    introduction
+
+   codeMap
    
    multiarray
 
@@ -52,7 +54,9 @@ Full contents
    :maxdepth: 4
 
    introduction
-   
+
+   codeMap
+
    multiarray
 
    quantumdata

@@ -12,6 +12,8 @@ From ``utils`` what deserves documentation.
 ``Evolved`` and the underlying principle
 ---------------------------------------------
 
+.. class:: evolved::Evolved
+
 
 ------------------------------
 The ``trajectory`` namespace
