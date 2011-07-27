@@ -202,3 +202,62 @@ Directory ``range_ex``
 ----------------------
 
 This contains the future Boost.RangeEx library (algorithms for Boost.Range). To be removed once Boost.RangeEx gets incorporated into Boost.
+
+
+
+==========================
+Directory ``elements``
+==========================
+
+-------------------------
+directory ``composites``
+-------------------------
+
+-------------------
+directory ``frees``
+-------------------
+
+--------------------------
+directory ``interactions``
+--------------------------
+
+
+
+==========================
+Directory ``quantumdata``
+==========================
+
+``ArrayBase``, ``DensityOperator``, ``DimensionsBookkeeper``, ``StateVector``, ``Types``
+
+  define classes :class:`quantumdata::ArrayBase`, :class:`quantumdata::DensityOperator`, :class:`DimensionsBookkeeper`, :class:`quantumdata::StateVector`, and :class:`quantumdata::Types`, respectively
+
+``LazyDensityOperator``, ``LazyDensityOperatorSliceIterator``
+
+  define classes :class:`quantumdata::LazyDensityOperator` and :class:`quantumdata::ldo::DiagonalIterator` together with the function :func:`quantumdata::partialTrace`
+
+``NegPT``
+
+  defines the function :func:`quantumdata::negPT`
+
+``NonOrthogonalDensityOperator``, ``NonOrthogonalStateVector``, ``Transformation``
+
+  defines the infrastructure for :ref:`representing quantumdata in non-orthogonal bases <quantumdataNonOrthogonal>` (covariant-contravariant formalism) **INCOMPLETE**
+
+
+==============================
+Directory ``quantumoperator``
+==============================
+
+``Sigma``, ``Tridiagonal``
+
+  define classes :class:`quantumoperator::Sigma` and :class:`quantumoperator::Tridiagonal`, respectively
+
+
+==============================
+Directory ``scripts``
+==============================
+
+
+==============================
+Directory ``structure``
+==============================

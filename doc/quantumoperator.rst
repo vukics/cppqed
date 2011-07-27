@@ -119,3 +119,7 @@ Implementation
 ======
 Sigma
 ======
+
+.. class:: quantumoperator::Sigma
+
+  ...

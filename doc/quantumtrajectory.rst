@@ -57,6 +57,8 @@ Ensembles of trajectories
 
 .. class:: quantumtrajectory::EnsembleMCWF
 
+  ...
+
 ---------------------------
 Master equation evolution
 ---------------------------
@@ -68,8 +70,10 @@ Master equation evolution
 
 
 .. namespace:: quantumtrajectory
+
 .. class:: quantumtrajectory::Master
 
+  ...
 
 Alternative Liouvillean calculation based on additional virtual function signalled by something.
 
