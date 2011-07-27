@@ -47,10 +47,14 @@ public:
 
   void update(double t, double dtTry) {dtDid_=t-t_; t_=t; dtTry_=dtTry;}
 
+  virtual std::ostream& displayParameters(std::ostream&) const = 0;
+
 protected:
   EvolvedCommon(double dtInit, double epsRel, double epsAbs);
 
   void setDtDid(double dtDid) {dtDid_=dtDid;}
+
+  virtual ~EvolvedCommon() {}
 
 private:
   double t_, dtTry_, dtDid_;
@@ -78,6 +82,7 @@ public:
 
   typedef boost::shared_ptr<Evolved> SmartPtr;
 
+  using details::EvolvedCommon::displayParameters;
 
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 

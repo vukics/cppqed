@@ -16,7 +16,7 @@ namespace details  {
 class Impl
 {
 public:
-  Impl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*);
+  Impl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*, SteppingFunction);
 
   ~Impl();
 
@@ -43,9 +43,9 @@ gsl_odeiv_system GSL_OdeivSystemFill(void* self, size_t size, int (*derivs)(doub
 }
 
 
-Impl::Impl(void* self, size_t size, int (*derivs)(double, const double*, double*, void*), double epsRel, double epsAbs, const double* scaleAbs)
+Impl::Impl(void* self, size_t size, int (*derivs)(double, const double*, double*, void*), double epsRel, double epsAbs, const double* scaleAbs, SteppingFunction sf)
   : dydt_(GSL_OdeivSystemFill(self,size,derivs)),
-    s_(gsl_odeiv_step_alloc(gsl_odeiv_step_rkck,size)),
+    s_(gsl_odeiv_step_alloc(sf==SF_RKCK ? gsl_odeiv_step_rkck : gsl_odeiv_step_rk8pd,size)),
     c_(
        scaleAbs
        ?
@@ -66,9 +66,9 @@ Impl::~Impl()
 
 
 ImplSmartPtr createImpl(void* self, size_t size, int (*derivs)(double, const double*, double*, void*),
-			double epsRel, double epsAbs, const double* scaleAbs)
+			double epsRel, double epsAbs, const double* scaleAbs, SteppingFunction sf)
 {
-  return ImplSmartPtr(new Impl(self,size,derivs,epsRel,epsAbs,scaleAbs));
+  return ImplSmartPtr(new Impl(self,size,derivs,epsRel,epsAbs,scaleAbs,sf));
 }
 
 
@@ -83,6 +83,32 @@ const int onSuccess=GSL_SUCCESS;
 
 
 } // details
+
+
+using namespace std;
+
+ostream& operator<<(ostream& os, SteppingFunction sf)
+{
+  switch (sf) {
+  case SF_RKCK  : return os<<"rkck" ;
+  case SF_RK8PD :        os<<"rk8pd";
+  }
+  return os;
+}
+
+istream& operator>>(istream& is, SteppingFunction& sf) 
+{
+  SteppingFunction sftemp=SF_RK8PD;
+  string s;
+
+  is>>s;
+       if (s=="rkck"  ) sftemp=SF_RKCK ;
+  else if (s!="rk8pd") 
+    is.clear(ios_base::badbit);
+
+  if (is) sf=sftemp;
+  return is;
+}
 
 
 } // evolved
