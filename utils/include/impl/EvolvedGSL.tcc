@@ -16,7 +16,7 @@ const typename Maker<A>::SmartPtr MakerGSL<A>::operator()(
 							  const A& scaleAbs
 							  ) const
 {
-  return SmartPtr(new details::EvolvedGSL<A>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs));
+  return SmartPtr(new details::EvolvedGSL<A>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_));
 }
 
 
@@ -45,10 +45,12 @@ EvolvedGSL<A>::EvolvedGSL(
 			  double dtInit,
 			  double epsRel,
 			  double epsAbs,
-			  const A& scaleAbs
+			  const A& scaleAbs,
+			  SteppingFunction sf
 			  )
   : Base(a,derivs,dtInit,epsRel,epsAbs),
-    pImpl_(createImpl(this,Traits::size(getA()),auxFunction<A>,epsRel,epsAbs,Traits::data(scaleAbs)))
+    pImpl_(createImpl(this,Traits::size(getA()),auxFunction<A>,epsRel,epsAbs,Traits::data(scaleAbs),sf)),
+    sf_(sf)
 {
   if (!Traits::isStorageContiguous(a)) throw (NonContiguousStorageException());
 }

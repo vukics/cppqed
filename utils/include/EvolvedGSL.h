@@ -12,6 +12,13 @@
 namespace evolved {
 
 
+enum SteppingFunction {SF_RKCK, SF_RK8PD};
+
+std::ostream& operator<<(std::ostream&, SteppingFunction);
+std::istream& operator>>(std::istream&, SteppingFunction&);
+
+
+
 template<typename A>
 class MakerGSL : public Maker<A>
 {
@@ -19,7 +26,12 @@ public:
   typedef typename Maker<A>::SmartPtr SmartPtr;
   typedef typename Maker<A>::Derivs   Derivs  ;
 
+  MakerGSL(SteppingFunction sf=SF_RKCK) : sf_(sf) {}
+
   const SmartPtr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
+
+private:
+  const SteppingFunction sf_;
   
 };
 
@@ -38,7 +50,7 @@ typedef boost::shared_ptr<Impl> ImplSmartPtr;
 
 // Two indirections needed because cannot declare member functions for Impl here
 
-ImplSmartPtr createImpl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*);
+ImplSmartPtr createImpl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*, SteppingFunction);
 
 void apply(ImplSmartPtr, double*, double, double*, double*);
 
@@ -70,13 +82,18 @@ public:
 	     double,
 	     double,
 	     double,
-	     const A&
+	     const A&,
+	     SteppingFunction
 	     );
+
+  std::ostream& displayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
 
 private:
   void doStep(double);
 
   ImplSmartPtr pImpl_;
+
+  const SteppingFunction sf_;
 
 };
 

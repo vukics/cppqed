@@ -69,7 +69,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 	 1./(sys.highestFrequency()*Base::factor()),
 	 scaleAbs,
 	 p,
-	 evolved::MakerGSL<StateVectorLow>(),
+	 evolved::MakerGSL<StateVectorLow>(p.sf),
 	 randomized::MakerGSL()),
     tIntPic0_(0),// random_(0),
     psi_(psi),
