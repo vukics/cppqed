@@ -11,7 +11,7 @@ project Utils
 
 path-constant TOP : .. ;
 
-alias Utilslib : src//Utils ;
+alias Utilslib : src//Utilslib ;
 
 build-project src       ;
 build-project test      ;
