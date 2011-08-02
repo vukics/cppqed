@@ -7,7 +7,9 @@ fi
 
 SCRIPTDIR=`pwd`
 
-hg clone http://blitz.hg.sourceforge.net:8000/hgroot/blitz/blitz
+cvs -d:pserver:anonymous@blitz.cvs.sourceforge.net:/cvsroot/blitz login
+cvs -z3 -d:pserver:anonymous@blitz.cvs.sourceforge.net:/cvsroot/blitz co -P blitz
+# hg clone http://blitz.hg.sourceforge.net:8000/hgroot/blitz/blitz
 cd blitz
 autoreconf -vif
 if [ $1 == "local" ]; then
