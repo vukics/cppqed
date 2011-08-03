@@ -1,3 +1,4 @@
+#include "ParsEvolution.h"
 #include "SimulatedHigh.h"
 
 #include "ParsQbit.h"
@@ -36,7 +37,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsTrajectory pt(p);
+  ParsEvolution pt(p);
   ParsPumpedLossy pp2la(p); 
 
   // Parameter finalization

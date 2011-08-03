@@ -1,0 +1,8 @@
+#########################################
+# Two-level atom with Heisenberg-Langevin
+#########################################
+
+ARGS1="$ARGSTraj --etat '(5,-4)' --gamma 100 --deltaA 1000 --qbitInit '(-.1,.05)' --Dt .001"
+
+l "PTLAHL_Si.d" "PTLA_C++QED    $ARGS1 --no_noise"
+l "PTLAHL_Ev.d" "PTLA_EvolvedHL $ARGS1           "
