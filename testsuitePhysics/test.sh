@@ -1,112 +1,11 @@
-export PATH_TO_EXECS=/home/vukics/quantologia/bin/scripts/gcc-4.5/release
-#export PATH_TO_EXECS=/nfshome/vukics/h/quantologia/bin/scripts/gcc-4.4/release
-
-PATH=.:$PATH_TO_EXECS:"${PATH}"
-
-ARGSTraj="--dc 0 --Dt .01 --T 2"
-
-ARGSEnsemble="--nTraj 200 --evol ensemble"
-
-##################################################
-# I. Two-level atom with different implementations
-##################################################
-
-ARGS0Base="--etat '(1,3)' --gamma 1.2 --deltaA -1 --qbitInit '(.4,.3)'"
-
-ARGS0="$ARGSTraj $ARGS0Base"
-
-$1 "PTLA_Ev.d" "PTLA_Evolved $ARGS0              "
-$1 "PTLA_Ma.d" "PTLA_C++QED  $ARGS0 --evol master"
-
-$1 "PTLA_En.d"   "PTLA_C++QED     $ARGS0               $ARGSEnsemble"
-
-$1 "PLQ_En.d"    "PumpedLossyQbit $ARGS0               $ARGSEnsemble"
-$1 "PLQ_EnSch.d" "PumpedLossyQbit $ARGS0 --picture Sch $ARGSEnsemble"
-$1 "PLQ_EnUIP.d" "PumpedLossyQbit $ARGS0 --picture UIP $ARGSEnsemble"
-$1 "PLQ_MaSch.d" "PumpedLossyQbit $ARGS0 --picture Sch --evol master"
-$1 "PLQ_MaUIP.d" "PumpedLossyQbit $ARGS0 --picture UIP --evol master"
 
 
-#############################################
-# II. Two-level atom with Heisenberg-Langevin
-#############################################
-
-ARGS0bisBase="--etat '(5,-4)' --gamma 100 --deltaA 1000 --qbitInit '(-.1,.05)'"
-
-ARGS0bis="$ARGSTraj $ARGS0bisBase --Dt .001"
-
-$1 "PTLAHL_Si.d" "PTLA_C++QED    $ARGS0bis --no_noise"
-$1 "PTLAHL_Ev.d" "PTLA_EvolvedHL $ARGS0bis           "
-
-
-################################################
-# III. Lossy mode with different implementations
-################################################
-
-ARGS1Base="--minit '(1,-.5)' --eta '(30,10)' --deltaC 100 --cutoff 30"
-
-ARGS1="$ARGSTraj $ARGS1Base --T 1"
-
-$1 "PLM_Ev.d"    "PumpedLossyMode_Evolved $ARGS1                            "
-$1 "PLM_En.d"    "PumpedLossyMode_C++QED  $ARGS1               $ARGSEnsemble"
-$1 "PLM_Si.d"    "PumpedLossyMode_C++QED  $ARGS1                            "
-$1 "PLM_SiSch.d" "PumpedLossyMode_C++QED  $ARGS1 --picture Sch              "
-$1 "PLM_SiUIP.d" "PumpedLossyMode_C++QED  $ARGS1 --picture UIP              "
-$1 "PLM_MaSch.d" "PumpedLossyMode_C++QED  $ARGS1 --picture Sch --evol master"
-$1 "PLM_MaUIP.d" "PumpedLossyMode_C++QED  $ARGS1 --picture UIP --evol master"
-
-###############################
-# IV. Non-interacting composite
-###############################
-
-ARGS2="$ARGSTraj $ARGS0Base $ARGS1Base --g 0"
-
-$1 "QMJ_En.d"    "QbitMode_C++QED  $ARGS2 $ARGSEnsemble"
-$1 "QMJ_Ma.d"    "QbitMode_C++QED  $ARGS2 --evol master"
-# This is an example where UIP is slower than Sch because the largest frequency is the pump
-
-$1 "QMJ_MaSch.d" "QbitMode_C++QED  $ARGS2 --evol master --picture Sch"
-
-
-####################################
-# V. Pure decay in composite systems
-####################################
-
-ARGSDecay="--qbitInit '(.4,.3)' --etat 0 --gamma 1 --deltaA 0 --eta 0 --kappa 2 --deltaC 0 --g 0 --dc 0 --Dt .01 --T 2 --doLog"
-
-$1 "DecayMa.d"     "QbitMode_C++QED $ARGSDecay --minit '(1.,-.5)' --evol master  "
-$1 "DecayEn.d"     "QbitMode_C++QED $ARGSDecay --minit '(1.,-.5)' $ARGSEnsemble  "
-
-$1 "DecayFockMa.d" "QbitMode_C++QED $ARGSDecay --minitFock 8 --evol master  "
-$1 "DecayFockEn.d" "QbitMode_C++QED $ARGSDecay --minitFock 8 $ARGSEnsemble  "
-
-########################
-# VI. Interacting binary
-########################
-
-ARGS3Base="--deltaA -1000 --gamma 100 --g '(80,10)' --etat '(-8,1)' --eta '(1,8)' --kappa 10 --deltaC -62"
-
-ARGS3="$ARGSTraj $ARGS3Base --Dt .001 --T 1"
-
-$1 "QMJ_Int_Ev.d"     "QbitMode_Evolved $ARGS3                         "
-
-$1 "QMJ_Int_Matrix.d" "QbitMode_Matrix  $ARGS3               --no_noise"
-
-$1 "QMJ_Int_Si.d"     "QbitMode_C++QED  $ARGS3               --no_noise"
-
-$1 "QMJ_Int_En.d"     "QbitMode_C++QED  $ARGS3 $ARGSEnsemble"
-$1 "QMJ_Int_Ma.d"     "QbitMode_C++QED  $ARGS3 --evol master"
-
-$1 "QMJ_Int_MaSch.d"  "QbitMode_C++QED  $ARGS3 --evol master --picture Sch"
-
-$1 "QMJ_Int_SiSch.d"  "QbitMode_C++QED  $ARGS3 --picture Sch --no_noise"
-$1 "QMJ_Int_SiUIP.d"  "QbitMode_C++QED  $ARGS3 --picture UIP --no_noise"
 
 ####################
 # VII. Free particle
 ####################
 
-ARGS4="--vClass 0 --fin 6 --pinit '(-0.5 10 0.1 0)' --T .3 --dc 0 --Dt 0.01"
+ARGS4="$ARGSTraj --vClass 0 --fin 6 --pinit '(-0.5 10 0.1 0)' --T .3 --Dt 0.005"
 
 #$1 "freeParticle.d"     "SingleParticle $ARGS4              "
 #$1 "freeParticle_Sch.d" "SingleParticle $ARGS4 --picture Sch"
@@ -116,7 +15,7 @@ ARGS4="--vClass 0 --fin 6 --pinit '(-0.5 10 0.1 0)' --T .3 --dc 0 --Dt 0.01"
 # VIII. Particle oscillating in classical potential
 ###################################################
 
-ARGS5="--pinit '(-0.01 0 0 0)' --modePart Cos --fin 10"
+ARGS5="$ARGSTrajBase --pinit '(-0.01 0 0 0)' --modePart Cos --fin 10"
 
 #$1 "oscillation10000.d" "SingleParticle $ARGS5 --vClass -10000 --T .063 "
 #$1 "oscillation1000.d"  "SingleParticle $ARGS5 --vClass -1000  --T .4 "
@@ -124,16 +23,12 @@ ARGS5="--pinit '(-0.01 0 0 0)' --modePart Cos --fin 10"
 
 #$1 "oscillation10000_Sch.d" "SingleParticle $ARGS5 --vClass -10000 --T .063 --picture Sch"
 
-#$PATH/SingleParticle $ARGS5 --picture Sch --vClass -100 --T 10 > oscillation100_Sch.d
-
-#$PATH/1particle1mode $ARGS --evol master --fin 8  --etaeff -10000 --T 1 --dc 0 --Dt 0.01 > oscillation10000.dMaster
-
 
 #####################################################
 # IX. Heavy particle not affected by the cavity field
 #####################################################
 
-ARGS6Base="--cutoff 3 --fin 11 --deltaC -1e5 --kappa 1e5 --T .01 --pinit '(0 1000 0.05 0)'"
+ARGS6Base="$ARGSTrajBase --cutoff 3 --fin 11 --deltaC -1e5 --kappa 1e5 --T .01 --pinit '(0 1000 0.05 0)'"
 
 ARGS6="$ARGS6Base --Unot -2e7 --vClass -0.1"
 
@@ -156,7 +51,7 @@ ARGS6bis="$ARGS6Base --Unot -6e4 --vClass -10 --1p1mconf 2"
 # X. Multilevel system
 ######################
 
-ARGS7="--T 100 --dc 0 --Dt .5"
+ARGS7="$ARGSTrajBase --T 100 --dc 0 --Dt .5"
 
 delta02="-1e3"
 reta0="6"
@@ -176,7 +71,7 @@ ARGS7bis="$ARGS7 --gammas '[.01 .005]' --deltas '[0 0 $delta02]'"
 # XI. Ring
 ##########
 
-ARGS8Base="--pinit '(-.3 0 .01 0)' --UnotM .3 --UnotP .6 --deltaCM -5 --deltaCP -6 --kappaM .5 --kappaP .4 --etaP '(.3,-.1)' --etaM '(.2,-.2)' --T 15 --dc 0 --Dt .1 --fin 10 --cutoffM 3 --cutoffP 3 --omrec 1e-10"
+ARGS8Base="$ARGSTraj --pinit '(-.3 0 .01 0)' --UnotM .3 --UnotP .6 --deltaCM -5 --deltaCP -6 --kappaM .5 --kappaP .4 --etaP '(.3,-.1)' --etaM '(.2,-.2)' --T 15 --Dt .1 --fin 10 --cutoffM 3 --cutoffP 3 --omrec 1e-10"
 
 ARGS8="$ARGS8Base --modeCavP Sin --modeCavM Cos"
 
@@ -190,7 +85,7 @@ ARGS8bis="$ARGS8Base --modeCavP Sin --modeCavM Sin --kCavM 2"
 #$1 "RingS2S.d"    "Ring         $ARGS8bis"
 
 
-ARGS9Base="--pinit '(0 1600 .05 0)' --UnotM 9 --UnotP 12 --deltaCM -5 --deltaCP -6 --kappaM 50 --kappaP 60 --etaP '(.9,-.2)' --etaM '(.4,-.4)' --T 120 --dc 0 --Dt .1 --fin 12 --cutoffM 3 --cutoffP 3 --omrec 1e-6"
+ARGS9Base="$ARGSTraj --pinit '(0 1600 .05 0)' --UnotM 9 --UnotP 12 --deltaCM -5 --deltaCP -6 --kappaM 50 --kappaP 60 --etaP '(.9,-.2)' --etaM '(.4,-.4)' --T 120 --Dt .1 --fin 12 --cutoffM 3 --cutoffP 3 --omrec 1e-6"
 
 ARGS9="$ARGS9Base --modeCavP Sin --modeCavM Cos"
 
@@ -205,10 +100,10 @@ ARGS9bis="$ARGS9Base --modeCavP Sin --modeCavM Sin --kCavM 2"
 # XII. Tunneling
 ################
 
-ARGS="--vClass -10 --modePart Sin --T 200 --pinit '(-.5 0 0 0)' --dc 0 --Dt .1"
+ARGS10="$ARGSTraj --vClass -10 --modePart Sin --T 200 --pinit '(-.5 0 0 0)' --Dt .1"
 
-#$1 "tunnel.d"     "SingleParticle $ARGS --picture IP  --fin 8"
-#$1 "tunnel_Sch.d" "SingleParticle $ARGS --picture Sch --fin 8"
+#$1 "tunnel.d"     "SingleParticle $ARGS10 --picture IP  --fin 8"
+#$1 "tunnel_Sch.d" "SingleParticle $ARGS10 --picture Sch --fin 8"
 
 
 #$PATH/2particles1mode $ARGS --fin 8 > tunnel2particles.d
@@ -218,13 +113,13 @@ ARGS="--vClass -10 --modePart Sin --T 200 --pinit '(-.5 0 0 0)' --dc 0 --Dt .1"
 # XIII. NX_CoupledModesElim as oscillator
 #########################################
 
-#$1 "NXCME_oscillation.d" "NX_coupledModesElim --fin 6 --T 10 --pinit '(-1 0.02 .707 0)' --eta 0"
+#$1 "NXCME_oscillation.d" "NX_coupledModesElim $ARGSTrajBase --fin 6 --T 10 --pinit '(-1 0.02 .707 0)' --eta 0"
 
 ############################################################################
 # XIV. Pure decay in even more composite systems involving alternative decay
 ############################################################################
 
-ARGSDecay="--eta0 0 --eta1 0 --eta2 0 --eta3 0 --deltaC0 0 --deltaC1 0 --deltaC2 0 --deltaC3 0 --cutoff0 6 --cutoff1 5 --cutoff2 4 --cutoff3 3 --kappa0 1 --kappa1 2 --kappa2 .5 --kappa3 1 --minitFock0 5 --minitFock1 4 --minitFock2 3 --minitFock3 2 --dc 0 --Dt .01 --T 2"
+ARGSDecay="$ARGSTraj --eta0 0 --eta1 0 --eta2 0 --eta3 0 --deltaC0 0 --deltaC1 0 --deltaC2 0 --deltaC3 0 --cutoff0 6 --cutoff1 5 --cutoff2 4 --cutoff3 3 --kappa0 1 --kappa1 2 --kappa2 .5 --kappa3 1 --minitFock0 5 --minitFock1 4 --minitFock2 3 --minitFock3 2 --Dt .01 --T 2"
 
 #$1 "DecayCompositeMa.d" "FourModes $ARGSDecay --evol master"
 #$1 "DecayCompositeEn.d" "FourModes $ARGSDecay $ARGSEnsemble"
@@ -234,10 +129,8 @@ ARGSDecay="--eta0 0 --eta1 0 --eta2 0 --eta3 0 --deltaC0 0 --deltaC1 0 --deltaC2
 # XV. Bichromatic mode
 ######################
 
-ARGS1Base="--minit '(1,-.5)' --eta '(30,10)' --deltaC 100 --cutoff 30"
+ARGS11="$ARGS1 --etaOther '(10,-20)' --deltaC_Other -200 --Dt .001"
 
-ARGS1bis="$ARGS1 --etaOther '(10,-20)' --deltaC_Other -200 --Dt .001"
-
-$1 "BiM_Ev.d"    "PumpedLossyMode_Evolved $ARGS1bis"
-$1 "BiM_Si.d"    "PumpedLossyMode_C++QED  $ARGS1bis"
+#$1 "BiM_Ev.d"    "PumpedLossyMode_Evolved $ARGS11"
+#$1 "BiM_Si.d"    "PumpedLossyMode_C++QED  $ARGS11"
 
