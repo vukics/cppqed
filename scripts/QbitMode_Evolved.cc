@@ -1,3 +1,4 @@
+#include "ParsEvolution.h"
 #include "SimulatedHigh.h"
 
 #include "Mode.h"
@@ -31,7 +32,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsTrajectory pt(p);
+  ParsEvolution pt(p);
 
   qbit::ParsPumpedLossy pplqb(p); 
   mode::ParsPumpedLossy pplm (p); 

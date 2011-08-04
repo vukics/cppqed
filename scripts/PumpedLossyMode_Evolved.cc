@@ -1,3 +1,4 @@
+#include "ParsEvolution.h"
 #include "SimulatedHigh.h"
 
 #include "BichromaticMode.h"
@@ -17,7 +18,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsTrajectory pt(p);
+  ParsEvolution pt(p);
   ParsBichromatic pplm(p); 
 
   // Parameter finalization

@@ -1,6 +1,6 @@
 export pathToExecs=$2
 
-export pluginToRun="plugins/$3.sh"
+export pluginToRun=$3
 
 export dataDirectory=$4
 export additionalArgs=$5 
@@ -27,5 +27,5 @@ export -f l
 
 # Calling the main script:
 
-bash bits/$1
+bash $1
 
