@@ -13,9 +13,6 @@ The ``quantumtrajectory`` namespace
    Apply Boost.Parameter for facilitating call of functions with complex signature, e.g. constructors of complex classes, especially in cases like in the trajectory bundle where many sensible default parameter values could be defined. (Eg. it is extremely tedious scaleAbs needs to be specified each time.) This is in general most useful for constructors of complex classes.
 
 
-.. function:: void evolve(quantumdata::StateVector<RANK>&, const structure::QuantumSystem<RANK>&, const ParsEvolution&, V)
-
-  ``template<int RANK, typename V>``
 
 .. _MCWF_Trajectory:
 
@@ -97,3 +94,13 @@ Exact                    1               0.40s
 Smoothing                1               0.10s
 Averaging                ≤1              0.04s
 ======================== =============== =========================
+
+
+---------------------------------
+Dispatcher
+---------------------------------
+
+.. function:: evolve(quantumdata::StateVector<RANK>& psi, const structure::QuantumSystem<RANK>& sys, const ParsEvolution& pe, V v)
+
+  ``template<int RANK, typename V>``
+

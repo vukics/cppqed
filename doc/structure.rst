@@ -440,9 +440,16 @@ E.g. if :class:`~quantumtrajectory::MCWF_Trajectory` sees that the simulated sys
 ``MatrixOfHamiltonian``
 -----------------------------------
 
-.. note:: 
 
-   This works correctly only in Schrödinger picture!
+.. function:: const linalg::CMatrix calculateMatrix(const T& hamiltonian, double t=0, double tIntPic0=0)
+
+  ``template<typename T>`` (``T`` should model both :class:`~structure::Hamiltonian` and :class:`DimensionsBookkeeper`)
+
+  Calculates the matrix of a Hamiltonian of arbitrary rank.
+
+  .. note:: 
+
+     This works correctly only in Schrödinger picture!
 
 
 .. rubric:: Footnotes

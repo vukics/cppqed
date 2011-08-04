@@ -125,7 +125,9 @@ g pump mode function, f cavity mode function
 ``MultiLevel``
 ---------------
 
+.. class:: MultiLevel
 
+  Define multi-level systems (e.g. atoms with arbitrary level schemes) with various driving and loss schemes at compile time.
 
 ------------------
 Other

@@ -23,10 +23,10 @@ namespace structure {
 
 
 #define ISTD 0
-#include "ElementLiouvilleanReentrant.h"
+#include "details/ElementLiouvilleanReentrant.h"
 #undef  ISTD
 #define ISTD 1
-#include "ElementLiouvilleanReentrant.h"
+#include "details/ElementLiouvilleanReentrant.h"
 #undef  ISTD
 
 

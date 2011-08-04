@@ -28,3 +28,7 @@ Composites
    ...
    
    It is the task of this class to keep track of the elements of the system together with their corresponding slices, and implement the operations of the full system in terms of such loops...
+
+.. class:: Act
+
+.. function:: makeComposite()

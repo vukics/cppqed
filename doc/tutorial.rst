@@ -309,7 +309,7 @@ The :class:`Composite` module of the framework is designed to represent such a n
 
 Here ``MFT_`` means the type of the mode function and can be ``PLUS``, ``MINUS``, ``COS``, and ``SIN`` [EPJD]_.
 
-Then the system can be created by invoking the maker function for :class:`Composite` with a helper class called :class:`Act`::
+Then the system can be created by invoking the :func:`maker function <makeComposite>` for :class:`Composite` with a helper class called :class:`Act`::
 
   makeComposite(
                 Act<1,0>  (actP),
@@ -393,7 +393,7 @@ To show the syntax we assume e.g. that in the previous example we are looking fo
 
   evolve(psi,system,pe,tmptools::Vector<1,2>());
 
-We simply have to list in my compile-time vector the frees that consist one party. Of course in this case this is equivalent to :class:`tmptools::Vector`\ ``<0>``. Later I may invent a better name for the vector when used for this special purpose.
+We simply have to list in the compile-time vector :class:`tmptools::Vector` the frees that consist one party. Of course in this case this is equivalent to :class:`tmptools::Vector`\ ``<0>``. Later I may invent a better name for the vector when used for this special purpose.
 
 The negativity will appear as a last column in the output, separated by a tab character from the rest.
 
