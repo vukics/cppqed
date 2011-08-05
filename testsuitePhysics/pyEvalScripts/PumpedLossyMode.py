@@ -36,12 +36,12 @@ def averageArray(i) :
 
 def compare(i,eps) :
     res=True
-    for trajectory in trajectories[0:6] : res&=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i  ),timeArray,argv)<eps
-    for trajectory in trajectories[6:]  : res&=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i+4),timeArray,argv)<eps
+    for trajectory in trajectories[0:6] : res&=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i  ),timeArray,argv,eps)
+    for trajectory in trajectories[6:]  : res&=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i+4),timeArray,argv,eps)
     return res
 
 
-def helper(i,array,eps) : return regressionArrays(averageArray(i),array,timeArray,argv)<eps
+def helper(i,array,eps) : return regressionArrays(averageArray(i),array,timeArray,argv,eps)
 
 
 alphaRe=evolvedArray[:,2]

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from pyUtils.regression import *
 from pyUtils.interpolate import *
-from pyUtils.loadTrajectories import loadTrajectories, argv
+from pyUtils.loadTrajectories import loadTrajectories, argv, decidePath, join
 from pyUtils.parseFile import parseFile
 
 trajectories=loadTrajectories([
@@ -19,7 +19,7 @@ trajectories=loadTrajectories([
 ],
 argv)
 
-evolvedArray=parseFile("f+f+c+c","data/QMJ_Int_Ev.d")
+evolvedArray=parseFile("f+f+c+c",join(decidePath(argv),"QMJ_Int_Ev.d"))
 
 timeArray=trajectories[0].time
 
@@ -34,9 +34,9 @@ def averageArray(i) :
 def compare(i,eps) :
     res=True
     for trajectory in trajectories :
-        res&=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i),timeArray,argv)<eps
+        res&=regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectory,i),timeArray,argv,eps)
     return res
 
-def helper(i,j,eps) : return regressionArrays(averageArray(i),evolvedArray[:,j],timeArray,argv)<eps
+def helper(i,j,eps) : return regressionArrays(averageArray(i),evolvedArray[:,j],timeArray,argv,eps)
 
 print compare(4,1e-37) & compare(5,3e-38) & compare(8,1e-40) & compare(9,1e-40) & helper(4,4,3e-8) & helper(5,5,6e-9) & helper(8,2,7e-6) & helper(9,3,5e-6)
