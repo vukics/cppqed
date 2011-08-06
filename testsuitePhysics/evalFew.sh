@@ -1,1 +1,1 @@
-for evalScript in Decay.py PTLAHL.py PTLA.py PumpedLossyMode.py QMJ_Int.py; do pyEvalScripts/$evalScript data $1 | awk '{if ($1!="maxiter" && $1!="Error") print}'; done
+for evalScript in Decay.py PTLAHL.py PTLA.py PumpedLossyMode.py QMJ_Int.py; do pyEvalScripts/$evalScript $1 $2 | awk '{if ($1!="maxiter" && $1!="Error") print}'; done
