@@ -63,7 +63,7 @@ public:
 
 #undef  BASE_class
 
-  typedef boost::tuple<int,StateVectorLow> indexSVL_tuple;
+  typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
   using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getDtDid; using Base::getTime;
 
@@ -91,7 +91,14 @@ protected:
   const StateVector& toBeAveraged() const {return psi_;} 
 
 private:
+  typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
+  typedef typename Liouvillean::Probabilities Probabilities;
+
   void displayMore(int) const;
+
+  double coherentTimeDevelopment(double Dt) const;
+  const IndexSVL_tuples calculateProbabilitiesSpecial(Probabilities& probabilities, double t) const;
+  // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
   // mutable double random_   ; 
