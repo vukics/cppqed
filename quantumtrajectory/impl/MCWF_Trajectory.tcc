@@ -86,14 +86,13 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     svdc_(p.svdc),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
-    doLog_(p.doLog),
+    logLevel_(p.logLevel),
     normMaxDeviation_(0)
 {
   using namespace std;
 
   if (psi!=sys) throw DimensionalityMismatchException();
   
-
   if (initFile_!=".sv") {
     ifstream file(initFile_.c_str());
     if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(initFile_);
@@ -120,11 +119,13 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       }
       double t0, dtTry;
       file>>t0; file>>dtTry;
-      getEvolved()->setTime(t0); getEvolved()->setDtTry(dtTry);
+      getEvolved()->update(t0,dtTry);
     }
 
   }
-
+  else
+    manageTimeStep(Liouvillean::probabilities(0.,psi_,li_));
+  // Initially, dpLimit should not be overshot, either.
 }
 
 
@@ -133,12 +134,12 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
 {
   using namespace std;
 
-  if (doLog_) getOstream()<<"# Maximal deviation of norm from 1: "<<normMaxDeviation_<<endl;
+  if (logLevel_) getOstream()<<"# Maximal deviation of norm from 1: "<<normMaxDeviation_<<endl;
 
   if (file_!="") {
     ofstream file((file_+".sv").c_str());
     file<<psi_();
-    file<<"# "<<getEvolved()->getTime()<<' '<<getEvolved()->getDtTry()<<endl;
+    file<<"# "<<getTime()<<' '<<getDtTry()<<endl;
   }
 
 }
@@ -168,7 +169,10 @@ template<int RANK>
 double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 {
   if (ha_) getEvolved()->step(Dt);
-  else getEvolved()->update(getTime()+Dt,Dt);
+  else {
+    double stepToDo=getDtTry()>Dt ? Dt : getDtTry(); 
+    getEvolved()->update(getTime()+stepToDo,stepToDo);
+  }
 
   double t=getTime();
 
@@ -179,7 +183,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 
   {
     double norm=psi_.renorm();
-    if (doLog_)
+    if (logLevel_)
       normMaxDeviation_=std::max(normMaxDeviation_,fabs(1-norm)); // NEEDS_WORK this should be somehow weighed by the timestep
   }
       
@@ -189,17 +193,32 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 
 template<int RANK>
 const typename MCWF_Trajectory<RANK>::IndexSVL_tuples
-MCWF_Trajectory<RANK>::calculateProbabilitiesSpecial(Probabilities& probabilities, double t) const
+MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet& dpOverDtSet, double t) const
 {
   IndexSVL_tuples res;
-  for (int i=0; i<probabilities.size(); i++)
-    if (probabilities(i)<0) {
+  for (int i=0; i<dpOverDtSet.size(); i++)
+    if (dpOverDtSet(i)<0) {
       StateVector psiTemp(psi_);
       Liouvillean::actWithJ(t,psiTemp(),i,li_);
       res.push_back(IndexSVL_tuple(i,psiTemp()));
-      probabilities(i)=mathutils::sqr(psiTemp.renorm());
+      dpOverDtSet(i)=mathutils::sqr(psiTemp.renorm());
     } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the SVL in the tuple
   return res;
+}
+
+
+template<int RANK>
+void MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet) const
+{
+  const double dpOverDt=accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
+  const double dp=dpOverDt*getDtTry();
+  if (!ha_)
+    getEvolved()->setDtTry(dpLimit_/dpOverDt);
+  else if (dp>dpLimit_) {
+    if (logLevel_>1) getOstream()<<"# dpLimit overshot: "<<getEvolved()->getTime()<<" "<<dp<<std::endl;
+    getEvolved()->setDtTry(dpLimit_/dpOverDt);
+    // Time-step management --- jump probability should not overshoot dpLimit
+  }
 }
 
 
@@ -211,25 +230,17 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
   // Jump
   if (li_) {
 
-    Probabilities probabilities(Liouvillean::probabilities(t,psi_,li_));
+    DpOverDtSet dpOverDtSet(Liouvillean::probabilities(t,psi_,li_));
 
-    IndexSVL_tuples probabilitiesSpecial=calculateProbabilitiesSpecial(probabilities,t);
+    const IndexSVL_tuples dpOverDtSpecialSet=calculateDpOverDtSpecialSet(dpOverDtSet,t);
 
-    {
-      double dpOverDt=accumulate(probabilities.begin(),probabilities.end(),0.);
-      double totalProbability=dpOverDt*getEvolved()->getDtTry();
-      if (totalProbability>dpLimit_) {
-	if (doLog_) getOstream()<<"# dpLimit overshot: "<<getEvolved()->getTime()<<" "<<totalProbability<<std::endl;
-	getEvolved()->setDtTry(dpLimit_/dpOverDt);
-	// Time-step management --- jump probability should not overshoot dpLimit
-      }
-    }
+    manageTimeStep(dpOverDtSet);
 
     double random_=(*getRandomized())()/getDtDid();
 
     {
       int jumpNo=0;
-      for (; random_>0 && jumpNo!=probabilities.size(); random_-=probabilities(jumpNo++))
+      for (; random_>0 && jumpNo!=dpOverDtSet.size(); random_-=dpOverDtSet(jumpNo++))
 	;
 
       if(random_<0) { // Jump No. jumpNo-1 occurs
@@ -238,14 +249,14 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 	  static bool p(int i, IndexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
 	};
 
-	typename IndexSVL_tuples::const_iterator i(find_if(probabilitiesSpecial,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
-	if (i!=probabilitiesSpecial.end())
+	typename IndexSVL_tuples::const_iterator i(find_if(dpOverDtSpecialSet,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
+	if (i!=dpOverDtSpecialSet.end())
 	  // special jump
 	  psi_()=i->template get<1>(); // RHS already normalized above
 	else {
 	  // normal  jump
 	  Liouvillean::actWithJ(t,psi_(),jumpNo,li_); 
-	  psi_()/=sqrt(probabilities(jumpNo));
+	  psi_()/=sqrt(dpOverDtSet(jumpNo));
 	}
       }
     }
@@ -279,9 +290,8 @@ void MCWF_Trajectory<RANK>::displayParameters() const
 
   os<<"# Alternative jumps: ";
   {
-    typename Liouvillean::Probabilities probabilities(Liouvillean::probabilities(0,psi_,li_));
-    
-    for (int i=0; i<probabilities.size(); i++) if (probabilities(i)<0) os<<i<<' ';
+    const DpOverDtSet dpOverDtSet(Liouvillean::probabilities(0,psi_,li_));
+    for (int i=0; i<dpOverDtSet.size(); i++) if (dpOverDtSet(i)<0) os<<i<<' ';
   }
   os<<endl;
 

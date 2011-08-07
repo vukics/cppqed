@@ -65,7 +65,7 @@ public:
 
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getDtDid; using Base::getTime;
+  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
 
   MCWF_Trajectory(
@@ -92,12 +92,13 @@ protected:
 
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
-  typedef typename Liouvillean::Probabilities Probabilities;
+  typedef typename Liouvillean::Probabilities DpOverDtSet;
 
   void displayMore(int) const;
 
-  double coherentTimeDevelopment(double Dt) const;
-  const IndexSVL_tuples calculateProbabilitiesSpecial(Probabilities& probabilities, double t) const;
+  double                coherentTimeDevelopment    (                                double Dt) const;
+  const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet& dpOverDtSet, double  t) const;
+  void                  manageTimeStep             (const DpOverDtSet& dpOverDtSet           ) const;
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
@@ -120,7 +121,7 @@ private:
 
   const std::string initFile_;
 
-  const bool doLog_;
+  const bool logLevel_;
   mutable double normMaxDeviation_;
 
 };
