@@ -63,9 +63,9 @@ public:
 
 #undef  BASE_class
 
-  typedef boost::tuple<int,StateVectorLow> indexSVL_tuple;
+  typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getDtDid; using Base::getTime;
+  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
 
   MCWF_Trajectory(
@@ -91,7 +91,15 @@ protected:
   const StateVector& toBeAveraged() const {return psi_;} 
 
 private:
+  typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
+  typedef typename Liouvillean::Probabilities DpOverDtSet;
+
   void displayMore(int) const;
+
+  double                coherentTimeDevelopment    (                                double Dt) const;
+  const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet& dpOverDtSet, double  t) const;
+  void                  manageTimeStep             (const DpOverDtSet& dpOverDtSet           ) const;
+  // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
   // mutable double random_   ; 
@@ -113,7 +121,7 @@ private:
 
   const std::string initFile_;
 
-  const bool doLog_;
+  const bool logLevel_;
   mutable double normMaxDeviation_;
 
 };

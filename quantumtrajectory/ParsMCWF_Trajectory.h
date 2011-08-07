@@ -21,7 +21,7 @@ struct ParsMCWF_Trajectory : public trajectory::ParsStochasticTrajectory {
   size_t &basisDim;
   std::string &basisFile;
 
-  bool& doLog;
+  unsigned& logLevel;
 
   evolved::SteppingFunction& sf;
 
