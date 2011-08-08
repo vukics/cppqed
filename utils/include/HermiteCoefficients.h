@@ -2,7 +2,8 @@
 #ifndef _HERMITE_COEFFICIENTS_H
 #define _HERMITE_COEFFICIENTS_H
 
-#include<vector>
+#include <vector>
+#include <cstddef>
 
 namespace cpputils {
 

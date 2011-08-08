@@ -203,7 +203,7 @@ MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet& dpOverDtSet, dou
 template<int RANK>
 void MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet) const
 {
-  const double dpOverDt=accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
+  const double dpOverDt=std::accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
   const double dtTry=getDtTry();
   const double dp=dpOverDt*dtTry;
   if (!ha_)
