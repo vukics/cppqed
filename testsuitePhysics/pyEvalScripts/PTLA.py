@@ -41,4 +41,4 @@ def compare(array,i,eps) :
         res&=regression(interpolate(timeArray,array),interpolateEVC(trajectory,i),timeArray,argv,eps[epsi])
     return res
 
-print compare((1+trajectories[0][2])/2,2, [ 1.5e-7, .0008, .0003 ] ) & compare((1-trajectories[0][2])/2,3, [ 1.3e-7, .0008, .0003 ] ) & compare(trajectories[0][3]/2,4, [ 2.2e-10, .0002, 4e-5 ] ) & compare(trajectories[0][4]/2,5, [ 1.2e-7, .0007, .00015 ] )
+print compare((1+trajectories[0][2])/2,2, [ 1.5e-7, .0008, .0003 ] ) & compare((1-trajectories[0][2])/2,3, [ 1.3e-7, .0008, .0003 ] ) & compare(trajectories[0][3]/2,4, [ 2.2e-10, .0002, 4e-5 ] ) & compare(trajectories[0][4]/2,5, [ 1.1e-7, .0007, .00015 ] )
