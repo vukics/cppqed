@@ -2,6 +2,10 @@
 ChangeLog
 *********
 
+2011/08/08 Change in the timestep management in :class:`quantumtrajectory::MCWF_Trajectory`
+
+  The API has not been changed, and according to the tests, the changes are visible only in such cases where the system has no :class:`~structure::Hamiltonian` evolution, only :class:`~structure::Exact` (and :class:`~structure::Liouvillean`, of course). The convergence became much better in these cases, as previously they were not handled completely correctly by the timestep manager.
+
 2011/07/06 Deprecation of :class:`quantumoperator::Frequencies`.
 
   The functionality of this class has been incorporated into :class:`quantumoperator::Tridiagonal`, following the usage patterns we have observed so far. Usage became much more convenient this way.

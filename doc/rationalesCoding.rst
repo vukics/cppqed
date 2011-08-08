@@ -26,7 +26,7 @@ Coding-style conventions
 
 #. The name of the object is implicit, and should be avoided in a method name
 
-#. The terms `get/set` must be used where an attribute is accessed directly --- This, together with items 2 3 4 6 10 allows for very convenient naming, eg::
+#. The terms ``get``/``set`` must be used where an attribute is accessed directly --- This, together with items 2, 3, 4, 6, and 10, allows for very convenient naming, eg::
   
 	class Foo
 	{
@@ -44,13 +44,13 @@ Coding-style conventions
 
 #. Plural form should be used on names representing a collection of objects
 
-#. The prefix *n* should be used for variables representing a number of objects
+#. The prefix ``n`` should be used for variables representing a number of objects
 
-#. The suffix *No* should be used for variables representing an entity number
+#. The suffix ``No`` should be used for variables representing an entity number
 
 #. Iterator variables should be called i, j, k etc.
 
-#. The prefix *is* should be used for boolean variables and methods
+#. The prefix ``is`` should be used for boolean variables and methods
 
 #. Naming pointers specifically should be avoided
 
@@ -80,7 +80,7 @@ Coding-style conventions
 
 #. Use alignment wherever it enhances readability
 
-#. Use // for all comments, including multi-line comments --- then any larger passage can be commented out with ``/*...*/``
+#. Use // for all comments, including multi-line comments --- then any larger passage can be commented out with ``/* ... */``
 
 #. The function return type can be put in the left column immediately above the function name
 

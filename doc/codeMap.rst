@@ -23,7 +23,7 @@ Each file in the framework revolve around a single concept, and is named after t
 
 ``Filename.cc``
 
-  implementation header, containing non-template definitions
+  implementation file, containing non-template definitions
 
 Headers under directories ``details`` are mostly very technical, often used for code generation.
 
@@ -38,15 +38,15 @@ Headers under directories ``details`` are mostly very technical, often used for 
 
 ``Act``
 
-  defines the :class:`Act` helper class for defining :class:`Composite`\ s
+  the :class:`Act` helper class for defining :class:`Composite`\ s
 
 ``BinarySystem``
 
-  defines class :class:`BinarySystem`
+  class :class:`BinarySystem`
 
 ``Composite``
 
-  defines the :class:`Composite` class and the maker function :func:`makeComposite`
+  the :class:`Composite` class and the maker function :func:`makeComposite`
 
 -------------------
 ``frees``
@@ -60,11 +60,11 @@ This directory contains the definitions of elementary free building blocks.
 
 ``Mode``
 
-  defines the classes :class:`(Pumped)(Lossy)Mode <Mode>`, together with numerous helpers to handle harmonic-oscillator mode operators, states, and dynamics
+  the classes :class:`(Pumped)(Lossy)Mode <Mode>`, together with numerous helpers to handle harmonic-oscillator mode operators, states, and dynamics
 
 ``MultiLevel``
 
-  defines the class :class:`MultiLevel` 
+  the class :class:`MultiLevel` 
 
 ``TimeIndependentMatrixHamiltonian``
 
@@ -91,11 +91,11 @@ This directory contains the definitions of elementary interaction building block
 
 ``NegPT``
 
-  defines the function :func:`quantumdata::negPT`
+  the function :func:`quantumdata::negPT`
 
 ``NonOrthogonalDensityOperator``, ``NonOrthogonalStateVector``, ``Transformation``
 
-  defines the infrastructure for :ref:`representing quantumdata in non-orthogonal bases <quantumdataNonOrthogonal>` (covariant-contravariant formalism) **INCOMPLETE**
+  define the infrastructure for :ref:`representing quantumdata in non-orthogonal bases <quantumdataNonOrthogonal>` (covariant-contravariant formalism) **INCOMPLETE**
 
 
 ==============================
@@ -118,7 +118,7 @@ This directory contains the definitions of elementary interaction building block
 
 ``Evolution``
 
-  defines the function :func:`evolve`
+  the function :func:`evolve`
 
 ``EvolutionHigh``
 
@@ -150,7 +150,7 @@ This directory contains the clients of the framework, the actual programs corres
 
 ``Averaged``, ``DynamicsBase``, ``ElementLiouvillean``, ``Exact``, ``FreeExact``, ``Free``, ``Hamiltonian``, ``Interaction``, ``Liouvillean``, ``QuantumSystem``, ``TridiagonalHamiltonian``
 
-  define classes :class:`structure::Averaged`, :class:`structure::DynamicsBase`, :class:`structure::ElementLiouvillean`, :class:`structure::Exact`, :class:`structure::FreeExact`, :class:`structure::Free`, :class:`structure::Hamiltonian`, :class:`structure::Interaction`, :class:`structure::Liouvillean`, :class:`structure::QuantumSystem`, :class:`structure::TridiagonalHamiltonian`, respectively
+  classes :class:`structure::Averaged`, :class:`structure::DynamicsBase`, :class:`structure::ElementLiouvillean`, :class:`structure::Exact`, :class:`structure::FreeExact`, :class:`structure::Free`, :class:`structure::Hamiltonian`, :class:`structure::Interaction`, :class:`structure::Liouvillean`, :class:`structure::QuantumSystem`, :class:`structure::TridiagonalHamiltonian`, respectively
 
 ``ElementAveraged``
 
