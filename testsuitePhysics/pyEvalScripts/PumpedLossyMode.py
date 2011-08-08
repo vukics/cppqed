@@ -26,12 +26,8 @@ evolvedArray=parseFile("f+f+c",join(decidePath(argv),"PLM_Ev.d"))
 timeArray=trajectories[0].time
 
 
-def averageArray(i) :
-    res=trajectories[0][i]
-    for trajectory in trajectories[1:6] : res+=trajectory[i]
-    for trajectory in trajectories[6:]  : res+=trajectory[i+4][:101]
-    res/=9.
-    return res
+def averageArray(i) : # only the Master ones
+    return (trajectories[4][i]+trajectories[5][i]+trajectories[7][i+4][:101]+trajectories[8][i+4][:101])/4.
 
 
 def compare(i,eps) :
