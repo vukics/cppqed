@@ -4,6 +4,8 @@
 
 #include "MCWF_TrajectoryFwd.h"
 
+#include "MCWF_TrajectoryLogger.h"
+
 #include "DimensionsBookkeeperFwd.h"
 #include "QuantumSystemFwd.h"
 #include "ExactFwd.h"
@@ -32,6 +34,7 @@ public:
 
 };
 
+
 ///////////////////////////////////////
 //
 // Monte Carlo wave-function trajectory
@@ -39,8 +42,6 @@ public:
 ///////////////////////////////////////
 
 // NEEDS_WORK factor out template-parameter independent code
-
-
 
 
 #define BASE_class trajectory::StochasticTrajectory<typename quantumdata::Types<RANK>::StateVectorLow, const quantumdata::StateVector<RANK>&>
@@ -121,8 +122,7 @@ private:
 
   const std::string initFile_;
 
-  const bool logLevel_;
-  mutable double normMaxDeviation_;
+  const MCWF_TrajectoryLogger logger_;
 
 };
 

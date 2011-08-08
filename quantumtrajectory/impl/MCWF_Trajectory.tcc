@@ -86,8 +86,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     svdc_(p.svdc),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
-    logLevel_(p.logLevel),
-    normMaxDeviation_(0)
+    logger_(p.logLevel,getOstream())
 {
   using namespace std;
 
@@ -134,8 +133,6 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
 {
   using namespace std;
 
-  if (logLevel_) getOstream()<<"# Maximal deviation of norm from 1: "<<normMaxDeviation_<<endl;
-
   if (file_!="") {
     ofstream file((file_+".sv").c_str());
     file<<psi_();
@@ -181,12 +178,8 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
     tIntPic0_=t;
   }
 
-  {
-    double norm=psi_.renorm();
-    if (logLevel_)
-      normMaxDeviation_=std::max(normMaxDeviation_,fabs(1-norm)); // NEEDS_WORK this should be somehow weighed by the timestep
-  }
-      
+  logger_.processNorm(psi_.renorm());
+
   return t;
 }
 
@@ -211,13 +204,13 @@ template<int RANK>
 void MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet) const
 {
   const double dpOverDt=accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
-  const double dp=dpOverDt*getDtTry();
+  const double dtTry=getDtTry();
+  const double dp=dpOverDt*dtTry;
   if (!ha_)
     getEvolved()->setDtTry(dpLimit_/dpOverDt);
   else if (dp>dpLimit_) {
-    if (logLevel_>1) getOstream()<<"# dpLimit overshot: "<<getEvolved()->getTime()<<" "<<dp<<std::endl;
     getEvolved()->setDtTry(dpLimit_/dpOverDt);
-    // Time-step management --- jump probability should not overshoot dpLimit
+    logger_.overshot(dp,dtTry,getDtTry());
   }
 }
 
@@ -262,6 +255,8 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
     }
 
   }
+
+  logger_.step();
 
 }
 
