@@ -1,1 +1,1 @@
-lib quantumoperator : [ glob *.cc ] : <library>../quantumdata//quantumdata <include>. : : <include>. ;
+lib qo : [ glob *.cc ] ../quantumdata//qd : : : <include>. ;

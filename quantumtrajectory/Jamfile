@@ -1,1 +1,1 @@
-lib quantumtrajectory : [ glob *.cc ] : <library>../structure//structure <include>. : : <include>. ;
+lib qt : [ glob *.cc ] : <library>../structure//st <include>. : : <include>. ;

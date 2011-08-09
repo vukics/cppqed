@@ -1,4 +1,4 @@
-project : requirements <library>..//Utilslib ;
+project : requirements <library>..//utils ;
 
 lib boost_test_lib : : <name>boost_unit_test_framework ;
 

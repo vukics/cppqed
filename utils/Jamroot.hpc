@@ -1,8 +1,7 @@
 lib cblaslib : : <file>/opt/atlas/3.8.2/lib/libcblas.so <link>shared ;
 lib atlaslib : : <file>/opt/atlas/3.8.2/lib/libatlas.so <link>shared ;
 
-project Utils
-	: requirements
+project : requirements
   	  <include>/home/C++QED_lib/include <library>cblaslib <library>atlaslib <include>/opt/atlas/3.8.2/include
 	: usage-requirements
 	  <include>include
@@ -15,20 +14,19 @@ project Utils
 
 path-constant TOP : .. ;
 
-alias Utilslib : src//Utils ;
+alias utils : src//_ ;
 
 build-project src       ;
 build-project test      ;
 build-project testsuite ;
 
 
-lib gsllib      : : <name>gsl      ;
-lib gslcblaslib : : <name>gslcblas ;
+lib gsl gslcblas
 
 
 import feature : feature ;
 feature with-flens : yes no : incidental propagated ;
 
-lib blitzlib : : <file>/home/C++QED_lib/lib/libblitz.a ;
-lib flenslib : : <file>/home/C++QED_lib/lib/libflens.so <link>shared ;
+lib blitz : : <file>/home/C++QED_lib/lib/libblitz.a ;
+lib flens : : <file>/home/C++QED_lib/lib/libflens.so <link>shared ;
 

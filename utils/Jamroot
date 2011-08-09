@@ -1,7 +1,6 @@
 # General-purpose Jamroot, mainly for Debian/Ubuntu
 
-project Utils
-	: usage-requirements
+project : usage-requirements
 	  <include>include 
 	  <variant>debug:<define>BZ_DEBUG 
 	  <define>GSL_CBLAS # This is needed so that FLENS use the CBLAS implementation of GSL
@@ -11,21 +10,18 @@ project Utils
 
 path-constant TOP : .. ;
 
-alias Utilslib : src//Utilslib ;
+alias utils : src//utils ;
 
 build-project src       ;
 build-project test      ;
 build-project testsuite ;
 
 
-lib blitzlib : : <name>blitz ;
-
-lib gsllib      : : <name>gsl      ;
-lib gslcblaslib : : <name>gslcblas ;
+lib blitz gsl gslcblas ;
 
 
 import feature : feature ;
 feature with-flens : yes no : incidental propagated ;
 
-lib flenslib : : <name>flens <link>shared <with-flens>yes ;
+lib flens : : <name>flens <link>shared <with-flens>yes ;
 
