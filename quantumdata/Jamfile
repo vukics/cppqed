@@ -1,1 +1,1 @@
-lib quantumdata : [ glob *.cc ] : <library>/Utils//Utilslib : : <include>. ;
+lib qd : [ glob *.cc ] ..//utils : : : <include>. ;
