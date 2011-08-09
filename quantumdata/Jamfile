@@ -1,1 +1,1 @@
-lib qd : [ glob *.cc ] : <library>..//utils : : <include>. ;
+lib qd : [ glob *.cc ] ..//utils : : : <include>. ;

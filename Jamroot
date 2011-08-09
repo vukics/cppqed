@@ -1,5 +1,10 @@
 alias utils : utils//utils ;
 
+alias st : structure//st ;
+alias qd : quantumdata//qd ;
+
+alias executables_link_against : : : : <library>quantumtrajectory//qt <library>elements//el ;
+
 project : : : build-dir bin ;
 
 # Core

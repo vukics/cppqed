@@ -1,6 +1,6 @@
 for local ccfile in [ glob *.cc ]
 {
-	exe $(ccfile:B) : $(ccfile) : <library>../quantumtrajectory//qt <library>../elements//el ;
+	exe $(ccfile:B) : $(ccfile) ..//executables_link_against ;
 }
 
 alias fewerScripts : PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix ;

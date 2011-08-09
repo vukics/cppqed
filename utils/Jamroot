@@ -23,5 +23,4 @@ lib blitz gsl gslcblas ;
 import feature : feature ;
 feature with-flens : yes no : incidental propagated ;
 
-lib flens : : <name>flens <link>shared <with-flens>yes ;
-
+lib flens : : <name>flens <with-flens>yes ;
