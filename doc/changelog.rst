@@ -2,6 +2,10 @@
 ChangeLog
 *********
 
+2011/08/09 Build system changed to conform with `dynamic linking change <https://fedoraproject.org/wiki/UnderstandingDSOLinkChange>`_.
+
+  Executables have to link against more shared libraries now.
+
 2011/08/08 Change in the timestep management in :class:`quantumtrajectory::MCWF_Trajectory`
 
   The API has not been changed, and according to the tests, the changes are visible only in such cases where the system has no :class:`~structure::Hamiltonian` evolution, only :class:`~structure::Exact` (and :class:`~structure::Liouvillean`, of course). The convergence became much better in these cases, as previously they were not handled completely correctly by the timestep manager.
