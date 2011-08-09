@@ -10,7 +10,7 @@ project : usage-requirements
 
 path-constant TOP : .. ;
 
-alias utils : src//_ ;
+alias utils : src//utils ;
 
 build-project src       ;
 build-project test      ;

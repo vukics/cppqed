@@ -1,1 +1,1 @@
-lib _ : [ glob *.cc ] ../structure//_ : <include>. : : <include>. ;
+lib qt : [ glob *.cc ] : <library>../structure//st <include>. : : <include>. ;

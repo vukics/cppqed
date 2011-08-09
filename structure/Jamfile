@@ -1,1 +1,1 @@
-lib _ : [ glob *.cc ] ../quantumdata//_ : : : <include>. ;
+lib st : [ glob *.cc ] : <library>../quantumdata//qd : : <include>. ;
