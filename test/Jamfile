@@ -1,6 +1,5 @@
-project : requirements <library>/elements//C++QEDelements ;
 
 for local ccfile in [ glob *.cc ]
 {
-	exe $(ccfile:B) : $(ccfile) ;
+	exe $(ccfile:B) : $(ccfile) ..//executables_link_against ;
 }

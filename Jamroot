@@ -3,7 +3,7 @@ alias utils : utils//utils ;
 alias st : structure//st ;
 alias qd : quantumdata//qd ;
 
-alias executables_link_against : : : : <library>quantumtrajectory//qt <library>elements//el ;
+alias executables_link_against : : : : <library>quantumtrajectory//qt <library>elements//el <library>st <library>quantumoperator//qo <library>utils <library>qd ;
 
 project : : : build-dir bin ;
 
