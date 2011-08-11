@@ -252,7 +252,7 @@ class Mode
   : public mode::Exact, public ModeBase, public A
 {
 public:
-  Mode(const mode::Pars&, const A&);
+  Mode(const mode::Pars&, const A& =A());
 };
 
 
@@ -260,7 +260,7 @@ template<typename A>
 struct ModeUIP : Mode<A>
 // in this case the uip and ip coincide, 
 {
-  ModeUIP(const mode::Pars& p, const A& a) : Mode<A>(p,a) {}
+  ModeUIP(const mode::Pars& p, const A& a=A()) : Mode<A>(p,a) {}
 };
 
 
@@ -274,7 +274,7 @@ class ModeSch
   : public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  ModeSch(const mode::Pars&, const A&);
+  ModeSch(const mode::Pars&, const A& =A());
 };
 
 
@@ -287,14 +287,14 @@ class PumpedMode
   : public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedMode(const mode::ParsPumped&, const A&);
+  PumpedMode(const mode::ParsPumped&, const A& =A());
 };
 
 
 template<typename A>
 struct PumpedModeUIP : PumpedMode<A>
 {
-  PumpedModeUIP(const mode::ParsPumped& p, const A& a) : PumpedMode<A>(p,a) {}
+  PumpedModeUIP(const mode::ParsPumped& p, const A& a=A()) : PumpedMode<A>(p,a) {}
 };
 
 
@@ -307,7 +307,7 @@ class PumpedModeSch
   : public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  PumpedModeSch(const mode::ParsPumped&, const A&);
+  PumpedModeSch(const mode::ParsPumped&, const A& =A());
 };
 
 
@@ -320,7 +320,7 @@ class LossyMode
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Exact, public ModeBase, public A
 {
 public:
-  LossyMode(const mode::ParsLossy&, const A&);
+  LossyMode(const mode::ParsLossy&, const A& =A());
 
 };
 
@@ -333,7 +333,7 @@ class LossyModeUIP
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  LossyModeUIP(const mode::ParsLossy&, const A&);
+  LossyModeUIP(const mode::ParsLossy&, const A& =A());
 
 };
 
@@ -346,7 +346,7 @@ class LossyModeSch
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  LossyModeSch(const mode::ParsLossy&, const A&);
+  LossyModeSch(const mode::ParsLossy&, const A& =A());
 
 };
 
@@ -360,7 +360,7 @@ class PumpedLossyMode
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedLossyMode(const mode::ParsPumpedLossy&, const A&);
+  PumpedLossyMode(const mode::ParsPumpedLossy&, const A& =A());
 };
 
 /////
@@ -372,7 +372,7 @@ class PumpedLossyModeUIP
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, const A&);
+  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, const A& =A());
 };
 
 /////
@@ -384,7 +384,7 @@ class PumpedLossyModeSch
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  PumpedLossyModeSch(const mode::ParsPumpedLossy&, const A&);
+  PumpedLossyModeSch(const mode::ParsPumpedLossy&, const A& =A());
 };
 
 
@@ -397,7 +397,7 @@ class PumpedLossyModeAlternative
   : public mode::Liouvillean<false,true>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const A&);
+  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const A& =A());
 };
 
 
