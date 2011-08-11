@@ -11,15 +11,15 @@ namespace mode {
 #define TEMPLATE_PARAM_TEMP(temp) temp,A
 #define SWITCH_helper(name,templateParam)				\
   switch (qmp) {							\
-  case QMP_IP  : return SmartPtr(new name##Mode<templateParam>(p));	\
-  case QMP_UIP : return SmartPtr(new name##ModeUIP<templateParam>(p));	\
+  case QMP_IP  : return SmartPtr(new name##Mode<templateParam>(p,a));	\
+  case QMP_UIP : return SmartPtr(new name##ModeUIP<templateParam>(p,a));\
   case QMP_SCH : ;							\
   }									\
-  return SmartPtr(new name##ModeSch<templateParam>(p));
+  return SmartPtr(new name##ModeSch<templateParam>(p,a));
 
 
 template<typename A>
-const SmartPtr maker(const Pars& p, QM_Picture qmp, const A&)
+const SmartPtr maker(const Pars& p, QM_Picture qmp, const A& a)
 {
   SWITCH_helper( ,A)
 }
@@ -106,104 +106,104 @@ void AveragedMonitorCutoff<Base>::process(Averages& averages) const
 
 
 template<typename A>
-Mode<A>::Mode(const mode::Pars& p) 
+Mode<A>::Mode(const mode::Pars& p, const A& a) 
   : mode::Exact(dcomp(0,-p.delta),p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_delta(1))),
-    A()
+    A(a)
 {}
 
 
 template<typename A>
-ModeSch<A>::ModeSch(const mode::Pars& p) 
+ModeSch<A>::ModeSch(const mode::Pars& p, const A& a) 
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),0,p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_delta(0))),
-    A()
+    A(a)
 {
   getParsStream()<<"# Schroedinger picture.\n";
 }
 
 
 template<typename A>
-PumpedMode<A>::PumpedMode(const mode::ParsPumped& p)
+PumpedMode<A>::PumpedMode(const mode::ParsPumped& p, const A& a)
   : mode::Hamiltonian<true>(0,dcomp(0,-p.delta),p.eta,p.cutoff),
     BASE_init(boost::assign::tuple_list_of(TUPLE_delta(1)),boost::assign::tuple_list_of(TUPLE_eta)),
-    A()
+    A(a)
 {
   getParsStream()<<"# Pumped.\n";
 }
 
 
 template<typename A>
-PumpedModeSch<A>::PumpedModeSch(const mode::ParsPumped& p)
+PumpedModeSch<A>::PumpedModeSch(const mode::ParsPumped& p, const A& a)
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),p.eta,p.cutoff),
     BASE_init(boost::assign::tuple_list_of(TUPLE_delta(0)),boost::assign::tuple_list_of(TUPLE_eta)),
-    A()
+    A(a)
 {
   getParsStream()<<"# Pumped, Schroedinger picture.\n";
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
-LossyMode<IS_FINITE_TEMP,A>::LossyMode(const mode::ParsLossy& p)
+LossyMode<IS_FINITE_TEMP,A>::LossyMode(const mode::ParsLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))),
-    A()
+    A(a)
 {
   getParsStream()<<"# Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
-LossyModeUIP<IS_FINITE_TEMP,A>::LossyModeUIP(const mode::ParsLossy& p)
+LossyModeUIP<IS_FINITE_TEMP,A>::LossyModeUIP(const mode::ParsLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),0,p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1))),
-    A()
+    A(a)
 {
   getParsStream()<<"# Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
-LossyModeSch<IS_FINITE_TEMP,A>::LossyModeSch(const mode::ParsLossy& p)
+LossyModeSch<IS_FINITE_TEMP,A>::LossyModeSch(const mode::ParsLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),0,p.cutoff),
     BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(0))),
-    A()
+    A(a)
 {
   getParsStream()<<"# Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
-PumpedLossyMode<IS_FINITE_TEMP,A>::PumpedLossyMode(const mode::ParsPumpedLossy& p)
+PumpedLossyMode<IS_FINITE_TEMP,A>::PumpedLossyMode(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))(TUPLE_eta)),
-    A()
+    A(a)
 {
   getParsStream()<<"# PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
-PumpedLossyModeUIP<IS_FINITE_TEMP,A>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p)
+PumpedLossyModeUIP<IS_FINITE_TEMP,A>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
     BASE_init(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1)),boost::assign::tuple_list_of(TUPLE_eta)),
-    A()
+    A(a)
 {
   getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename A>
-PumpedLossyModeSch<IS_FINITE_TEMP,A>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p)
+PumpedLossyModeSch<IS_FINITE_TEMP,A>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(0))(TUPLE_eta)),
-    A()
+    A(a)
 {
   getParsStream()<<"# PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
@@ -213,11 +213,11 @@ PumpedLossyModeSch<IS_FINITE_TEMP,A>::PumpedLossyModeSch(const mode::ParsPumpedL
 
 
 template<typename A>
-PumpedLossyModeAlternative<A>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p)
+PumpedLossyModeAlternative<A>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<false,true>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(p.kappa,-p.delta),p.eta,p.cutoff),
     BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))(TUPLE_eta)),
-    A()
+    A(a)
 {
   getParsStream()<<"# PumpedLossy---Alternative jumping.\n";
 }

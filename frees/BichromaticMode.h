@@ -23,8 +23,8 @@ const SmartPtr maker(const ParsBichromatic& p, QM_Picture qmp, const A& a)
 {
   if (!isNonZero(p.etaOther)) return maker(static_cast<const ParsPumpedLossy&>(p),qmp,a);
   else {
-    if (p.nTh) {return SmartPtr(new BichromaticMode<true ,A>(p));}
-    else       {return SmartPtr(new BichromaticMode<false,A>(p));}
+    if (p.nTh) {return SmartPtr(new BichromaticMode<true ,A>(p,a));}
+    else       {return SmartPtr(new BichromaticMode<false,A>(p,a));}
   }
 }
 
@@ -39,14 +39,14 @@ class BichromaticMode
     public ModeBase, public A
 {
 public:
-  BichromaticMode(const mode::ParsBichromatic& p)
+  BichromaticMode(const mode::ParsBichromatic& p, const A& a)
     : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
       ModeBase(p.cutoff,
 	       boost::assign::tuple_list_of("deltaOther",p.deltaOther,1),
 	       boost::assign::tuple_list_of("(kappa*(2*nTh+1),delta)",conj(get_zI()),1)("eta",get_eta(),sqrt(p.cutoff))("etaOther",p.etaOther,sqrt(p.cutoff))
 	       ),
-      A(),
+      A(a),
       zI_Other(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.deltaOther)
   {
     mode::Hamiltonian<true>::getH_OverIs().push_back(
