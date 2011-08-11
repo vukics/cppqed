@@ -9,6 +9,9 @@ class ElementAveragedCommon;
 template<int RANK, bool IS_TD=false>
 class ElementAveraged;
 
+template<int RANK, bool IS_TD=false>
+class ClonableElementAveraged;
+
 
 namespace averaged {
 

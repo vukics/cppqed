@@ -20,9 +20,21 @@ T
 accumulate(In, In, T, UnOp, BinOp);
 
 
+template<typename SeqOfSeqs_In, typename Out_Iterator>
+const Out_Iterator
+concatenate(SeqOfSeqs_In begin, SeqOfSeqs_In end, Out_Iterator);
+
+
+template<typename SeqOfSeqs, typename Out>
+const Out
+concatenateGrow(const SeqOfSeqs&, Out empty);
+// Filling an empty container with concatenated values
+
+
 template<typename SeqOfSeqs, typename Out>
 const Out&
 concatenate(const SeqOfSeqs&, Out&);
+// Filling a container of the necessary size with concatenated values
 
 
 } // cpputils

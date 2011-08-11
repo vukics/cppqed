@@ -64,7 +64,7 @@ struct Helper
   const string operator()()
   {
     stringstream ss(stringstream::out);
-    ss<<"rho"<<i_<<i_;
+    ss<<"rho_"<<i_<<','<<i_;
     i_++;
     return ss.str();
   }
@@ -75,8 +75,8 @@ private:
 
 }
 
-DiagonalDO::DiagonalDO(size_t dim) : 
-  Base("Multilevel",list_of(string("rho00")).repeat_fun(dim-1,Helper())),
+DiagonalDO::DiagonalDO(const std::string& label, size_t dim) : 
+  Base(label,list_of(string("rho_0,0")).repeat_fun(dim-1,Helper())),
   dim_(dim)
 {}
 
@@ -90,5 +90,5 @@ DiagonalDO::average(const LazyDensityOperator& matrix) const
   return averages;
 }
 
-} // structure
 } // averaged
+} // structure

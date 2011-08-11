@@ -166,15 +166,18 @@ private:
 
 
 // A basic, extensible Averaging class
-class Averaged : public structure::ElementAveraged<1>
+class Averaged : public structure::ClonableElementAveraged<1>
 {
 public:
-  typedef structure::ElementAveraged<1> Base;
+  typedef structure::ClonableElementAveraged<1> Base;
 
   Averaged(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
   virtual const Averages average(const LazyDensityOperator&) const;
   virtual void           process(Averages&)                  const;
+
+private:
+  const ClonedPtr do_clone() const {return new Averaged(*this);}
 
 };
 
@@ -193,6 +196,9 @@ public:
 
   virtual const Averages average(const LazyDensityOperator&) const;
   virtual void           process(Averages&)                  const;
+
+private:
+  const ClonedPtr do_clone() const {return new AveragedQuadratures(*this);}
 
 };
 
@@ -246,7 +252,7 @@ class Mode
   : public mode::Exact, public ModeBase, public A
 {
 public:
-  Mode(const mode::Pars&);
+  Mode(const mode::Pars&, const A&);
 };
 
 
@@ -254,7 +260,7 @@ template<typename A>
 struct ModeUIP : Mode<A>
 // in this case the uip and ip coincide, 
 {
-  ModeUIP(const mode::Pars& p) : Mode<A>(p) {}
+  ModeUIP(const mode::Pars& p, const A& a) : Mode<A>(p,a) {}
 };
 
 
@@ -268,7 +274,7 @@ class ModeSch
   : public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  ModeSch(const mode::Pars&);
+  ModeSch(const mode::Pars&, const A&);
 };
 
 
@@ -281,14 +287,14 @@ class PumpedMode
   : public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedMode(const mode::ParsPumped&);
+  PumpedMode(const mode::ParsPumped&, const A&);
 };
 
 
 template<typename A>
 struct PumpedModeUIP : PumpedMode<A>
 {
-  PumpedModeUIP(const mode::ParsPumped& p) : PumpedMode<A>(p) {}
+  PumpedModeUIP(const mode::ParsPumped& p, const A& a) : PumpedMode<A>(p,a) {}
 };
 
 
@@ -301,7 +307,7 @@ class PumpedModeSch
   : public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  PumpedModeSch(const mode::ParsPumped&);
+  PumpedModeSch(const mode::ParsPumped&, const A&);
 };
 
 
@@ -314,7 +320,7 @@ class LossyMode
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Exact, public ModeBase, public A
 {
 public:
-  LossyMode(const mode::ParsLossy&);
+  LossyMode(const mode::ParsLossy&, const A&);
 
 };
 
@@ -327,7 +333,7 @@ class LossyModeUIP
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  LossyModeUIP(const mode::ParsLossy&);
+  LossyModeUIP(const mode::ParsLossy&, const A&);
 
 };
 
@@ -340,7 +346,7 @@ class LossyModeSch
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  LossyModeSch(const mode::ParsLossy&);
+  LossyModeSch(const mode::ParsLossy&, const A&);
 
 };
 
@@ -354,7 +360,7 @@ class PumpedLossyMode
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedLossyMode(const mode::ParsPumpedLossy&);
+  PumpedLossyMode(const mode::ParsPumpedLossy&, const A&);
 };
 
 /////
@@ -366,7 +372,7 @@ class PumpedLossyModeUIP
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedLossyModeUIP(const mode::ParsPumpedLossy&);
+  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, const A&);
 };
 
 /////
@@ -378,7 +384,7 @@ class PumpedLossyModeSch
   : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public A
 {
 public:
-  PumpedLossyModeSch(const mode::ParsPumpedLossy&);
+  PumpedLossyModeSch(const mode::ParsPumpedLossy&, const A&);
 };
 
 
@@ -391,7 +397,7 @@ class PumpedLossyModeAlternative
   : public mode::Liouvillean<false,true>, public mode::Hamiltonian<true>, public ModeBase, public A
 {
 public:
-  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&);
+  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const A&);
 };
 
 

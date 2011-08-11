@@ -52,9 +52,7 @@ int main(int argc, char* argv[])
 
   StateVector psi(psiML*mode::init(pplm)); psi.renorm();
 
-  multilevel::DiagonalDO averaged(NL);
-
-  MultiLevelBase<NL>::SmartPtr plml(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO(NL)));
+  MultiLevelBase<NL>::SmartPtr plml(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Lambda atom",NL)));
 
   mode::SmartPtr mode(mode::maker(pplm,QMP_IP));
 

@@ -1,12 +1,14 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_ELEMENT_AVERAGED_H
-#define _STRUCTURE_ELEMENT_AVERAGED_H
+#ifndef STRUCTURE_ELEMENT_AVERAGED_H_INCLUDED
+#define STRUCTURE_ELEMENT_AVERAGED_H_INCLUDED
 
 #include "ElementAveragedFwd.h"
 
 #include "Averaged.h"
 
-#include<list>
+#include <boost/ptr_container/ptr_list.hpp>
+
+#include <list>
 
 
 namespace structure {
@@ -30,6 +32,9 @@ public:
   size_t nAvr      ()                                                    const {return keyLabels_.size();}
   void   displayKey(std::ostream&, size_t&)                              const;
 
+  const std::string& getTitle () const {return keyTitle_ ;}
+  const KeyLabels  & getLabels() const {return keyLabels_;}
+
 private:
   const std::string keyTitle_ ;  
   const KeyLabels   keyLabels_;
@@ -52,13 +57,44 @@ public:
 
   ElementAveraged(const std::string& keyTitle, const KeyLabels& keyLabels) : ElementAveragedCommon(keyTitle,keyLabels) {}
 
+  const KeyLabels& getLabels() const {return ElementAveragedCommon::getLabels();}
+
+  using ElementAveragedCommon::getTitle;
+
+  size_t nAvr()                                                      const {return ElementAveragedCommon::nAvr()                 ;}
+
 private: 
   void   display(const Averages& a, std::ostream& os, int precision) const {       ElementAveragedCommon::display(a,os,precision);}
-  size_t nAvr()                                                      const {return ElementAveragedCommon::nAvr()                 ;}
   void   displayKey(std::ostream& os, size_t& i)                     const {       ElementAveragedCommon::displayKey(os,i)       ;}
 
 };
 
+
+
+template<int RANK, bool IS_TD>
+class ClonableElementAveraged : public ElementAveraged<RANK,IS_TD>
+{
+public:
+  typedef ElementAveraged<RANK,IS_TD> Base;
+  typedef typename Base::KeyLabels KeyLabels;
+
+  typedef ClonableElementAveraged* ClonedPtr;
+
+  ClonableElementAveraged(const std::string& keyTitle, const KeyLabels& keyLabels) : Base(keyTitle,keyLabels) {}
+
+  const ClonedPtr clone() const {return do_clone();}
+
+private:
+  virtual const ClonedPtr do_clone() const = 0;
+
+};
+
+
+template<int RANK, bool IS_TD>
+inline ClonableElementAveraged<RANK,IS_TD>*const new_clone(const ClonableElementAveraged<RANK,IS_TD>& cea)
+{
+  return cea.clone();
+}
 
 
 namespace averaged {
@@ -66,14 +102,16 @@ namespace averaged {
 
 // NEEDS_WORK generalize this for arbitrary RANK
 
-class DiagonalDO : public structure::ElementAveraged<1>
+class DiagonalDO : public ClonableElementAveraged<1>
 {
 public:
-  typedef structure::ElementAveraged<1> Base;
+  typedef ClonableElementAveraged<1> Base;
 
-  DiagonalDO(size_t);
+  DiagonalDO(const std::string&, size_t);
 
 private:
+  Base*const do_clone() const {return new DiagonalDO(*this);}
+
   const Averages average(const LazyDensityOperator&) const;
   void           process(Averages&                 ) const {}
 
@@ -82,10 +120,43 @@ private:
 };
 
 
+
+template<int RANK>
+class Collecting : public ClonableElementAveraged<RANK>
+{
+public:
+  typedef ClonableElementAveraged<RANK> Element;
+  typedef boost::ptr_list<Element> Collection;
+
+  typedef ClonableElementAveraged<RANK> Base;
+
+  typedef AveragedCommon::Averages Averages;
+  typedef typename Base::LazyDensityOperator LazyDensityOperator;
+
+  Collecting(const Collection&);
+  Collecting(const Collecting&);
+
+private:
+  Base*const do_clone() const {return new Collecting(*this);}
+
+  using Base::nAvr;
+
+  const Averages average(const LazyDensityOperator&) const;
+  void           process(Averages&                 ) const;
+
+  const Collection collection_;
+
+};
+
+
+
 } // averaged
 
 
 } // structure
 
 
-#endif // _STRUCTURE_ELEMENT_AVERAGED_H
+#include "impl/ElementAveraged.tcc"
+
+
+#endif // STRUCTURE_ELEMENT_AVERAGED_H_INCLUDED

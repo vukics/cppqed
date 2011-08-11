@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
   StateVector psi(psiML*mode::init(pplm));
 
   evolve(psi,
-	 BinarySystem(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO(NL)),mode::maker(pplm,QMP_IP),pmljc)),
+	 BinarySystem(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Atom",NL)),mode::maker(pplm,QMP_IP),pmljc)),
 	 pe,
 	 tmptools::Vector<0>());
 

@@ -48,8 +48,9 @@ public:
   virtual ~AveragedCommon() {}
 
 
-protected:
   virtual void   process   (Averages&)                           const = 0;
+
+protected:
   virtual void   display   (const Averages&, std::ostream&, int) const = 0;
 
 private:
@@ -108,7 +109,7 @@ public:
   virtual ~Averaged() {}
 
 private:
-  virtual const Averages average(double, const LazyDensityOperator&)     const = 0;
+  virtual const Averages average(double, const LazyDensityOperator&) const = 0;
 
 };
 
@@ -121,10 +122,10 @@ public:
   typedef typename Averaged<RANK,true>::Averages            Averages           ;
   typedef typename Averaged<RANK,true>::LazyDensityOperator LazyDensityOperator;
 
+  virtual const Averages average(const LazyDensityOperator&) const = 0;
+
 private:
   const Averages average(double, const LazyDensityOperator& matrix) const {return average(matrix);}
-
-  virtual const Averages average(const LazyDensityOperator&) const = 0;
 
 };
 
