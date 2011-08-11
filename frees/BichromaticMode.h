@@ -39,7 +39,7 @@ class BichromaticMode
     public ModeBase, public A
 {
 public:
-  BichromaticMode(const mode::ParsBichromatic& p, const A& a)
+  BichromaticMode(const mode::ParsBichromatic& p, const A& a=A())
     : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
       ModeBase(p.cutoff,
