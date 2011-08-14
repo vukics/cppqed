@@ -1,3 +1,5 @@
+use-project utils : utils ;
+
 alias utils : utils//utils ;
 
 alias st : structure//st ;
