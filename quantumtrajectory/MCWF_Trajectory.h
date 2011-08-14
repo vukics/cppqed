@@ -21,6 +21,7 @@
 
 #include <boost/mpl/identity.hpp>
 
+#include <vector>
 
 namespace mpl=boost::mpl;
 
