@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 
   evolve(psi,system,pe);
 
-  } catch (ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 
 
 }

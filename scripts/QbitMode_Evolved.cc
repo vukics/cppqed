@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
   evolve(S,pt);
 
-  } catch (ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 
 
 }

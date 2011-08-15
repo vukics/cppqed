@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   }
 
 
-  } catch (ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 
 
 }

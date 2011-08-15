@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
 	 pe,
 	 tmptools::Vector<0>());
 
-  } catch (ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 
 }
 
