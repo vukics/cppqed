@@ -99,14 +99,19 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     READ_INTO_PSI;
   }
 
+  class NoPresetDtTry {};
+
+  try {
+
   if (file_!="") {
     {
       ifstream file(file_.c_str());
-      if (!file.is_open() || file.peek()==EOF) return;
+      if (!file.is_open() || file.peek()==EOF) throw NoPresetDtTry();
     }
     {
       ifstream file((file_+".sv").c_str());
       if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+".sv");
+
       {
 	READ_INTO_PSI;
       }
@@ -114,8 +119,9 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       {
 	char c;
 	file>>c; // eat '#'
-	if (c!='#') return;
+	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+".sv");
       }
+      file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
       double t0, dtTry;
       file>>t0; file>>dtTry;
       getEvolved()->update(t0,dtTry);
@@ -123,8 +129,13 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
   }
   else
+    throw NoPresetDtTry();
+
+  } catch (NoPresetDtTry) {
+    if (p.logLevel>1) getOstream()<<"# Adjusting initial dtTry\n";
     manageTimeStep(Liouvillean::probabilities(0.,psi_,li_));
-  // Initially, dpLimit should not be overshot, either.
+    // Initially, dpLimit should not be overshot, either.
+  }
 }
 
 

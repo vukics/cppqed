@@ -36,6 +36,14 @@ public:
 };
 
 
+class MCWF_TrajectoryFileParsingException : public cpputils::TaggedException
+{
+public:
+  MCWF_TrajectoryFileParsingException(const std::string tag) : cpputils::TaggedException(tag) {}
+
+};
+
+
 ///////////////////////////////////////
 //
 // Monte Carlo wave-function trajectory
