@@ -1,3 +1,5 @@
+rm -rf _build
+
 cd figures
 bash processImages.sh
 cd ..

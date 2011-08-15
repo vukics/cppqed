@@ -2,6 +2,10 @@
 ChangeLog
 *********
 
+2011/08/15 New ``Makefile`` in the main directory.
+
+  This will compile the whole framework (together with ``utils``) into a single shared library, and link scripts against this. The new ``Makefile`` features the option ``with-flens``. All other ``Makefile``\ s have been removed.
+
 2011/08/09 Build system changed to conform with `dynamic linking change <https://fedoraproject.org/wiki/UnderstandingDSOLinkChange>`_.
 
   Executables have to link against more shared libraries now.
