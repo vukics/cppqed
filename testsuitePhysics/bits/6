@@ -2,7 +2,7 @@
 # Finite-temperature mode
 #########################
 
-ARGS6="$ARGSTraj --cutoff 36 --minit "(2.,-3.)" --nTh 4 --doDisplay --kappa 10 --Dt .005 --T 1"
+ARGS6="$ARGSTraj --cutoff 36 --minit '(2.,-3.)' --nTh 4 --doDisplay --kappa 10 --Dt .005 --T 1"
 
 l "PLM_FT_En.d"     "PumpedLossyMode_C++QED  $ARGS6 $ARGSEnsemble"
 l "PLM_FT_Ma.d"     "PumpedLossyMode_C++QED  $ARGS6 --evol master"
