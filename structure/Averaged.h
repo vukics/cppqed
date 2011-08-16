@@ -8,7 +8,9 @@
 
 #include "Exception.h"
 
-#include<iosfwd>
+#include "BlitzArrayExtensions.h"
+
+#include <iosfwd>
 
 
 namespace structure {
@@ -71,6 +73,8 @@ private:
 struct AveragesFishyException : cpputils::Exception {};
 #endif // NDEBUG
 
+struct AveragesInfiniteDetectedException : cpputils::Exception {};
+
 
 template<int RANK>
 class Averaged<RANK,true>
@@ -87,12 +91,7 @@ public:
 
   static const Averages average(double t, const LazyDensityOperator& matrix, const Averaged* averaged, StaticTag=theStaticOne)
   {
-    const Averages averages(averaged ? averaged->average(t,matrix) : Averages());
-#ifndef   NDEBUG
-    if (size_t(averages.size())!=Base::nAvr(averaged))
-      throw AveragesFishyException();
-#endif // NDEBUG
-    return averages;
+    return averaged ? averaged->average(t,matrix) : Averages();
   }
 
 
@@ -100,6 +99,10 @@ public:
   {
     if (averaged) {
       Averages averages(averaged->average(t,matrix));
+#ifndef   NDEBUG
+      if (size_t(averages.size())!=Base::nAvr(averaged)) throw AveragesFishyException();
+#endif // NDEBUG
+      if (!all(blitzplusplus::isfinite(averages))) throw AveragesInfiniteDetectedException();
       averaged->process(averages);
       averaged->display(averages,os,precision);
     }

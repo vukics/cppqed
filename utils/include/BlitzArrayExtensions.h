@@ -4,13 +4,19 @@
 
 #include "Exception.h"
 
-#include<blitz/array.h>
+#include <blitz/array.h>
+
+#include <boost/math/special_functions/fpclassify.hpp>
 
 
 namespace blitzplusplus {
 
+inline bool isfinite(double d) {return boost::math::isfinite<double>(d);}
 
-class      NonContiguousStorageException : public cpputils::Exception {};
+BZ_DECLARE_FUNCTION_RET(isfinite,bool)
+
+
+class NonContiguousStorageException : public cpputils::Exception {};
 
 
 template<typename T, int RANK>
