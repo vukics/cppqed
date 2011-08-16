@@ -259,8 +259,10 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 	  psi_()=i->template get<1>(); // RHS already normalized above
 	else {
 	  // normal  jump
-	  Liouvillean::actWithJ(t,psi_(),jumpNo,li_); 
-	  psi_()/=sqrt(dpOverDtSet(jumpNo));
+	  Liouvillean::actWithJ(t,psi_(),jumpNo,li_);
+	  double normFactor=sqrt(dpOverDtSet(jumpNo));
+	  if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
+	  psi_()/=normFactor;
 	}
 	
 	logger_.jumpOccured(t,jumpNo);

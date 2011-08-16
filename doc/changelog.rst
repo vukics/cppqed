@@ -2,6 +2,10 @@
 ChangeLog
 *********
 
+2011/08/16 :class:`structure::Averages` now throws an exception if it encounters ``nan`` or ``inf``.
+
+  This is for avoiding numerical traps. For the moment, this works only for single trajectories.
+
 2011/08/15 New ``Makefile`` in the main directory.
 
   This will compile the whole framework (together with ``utils``) into a single shared library, and link scripts against this. The new ``Makefile`` features the option ``with-flens``. All other ``Makefile``\ s have been removed.

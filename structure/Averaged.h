@@ -73,7 +73,7 @@ private:
 struct AveragesFishyException : cpputils::Exception {};
 #endif // NDEBUG
 
-struct AveragesInfiniteDetectedException : cpputils::Exception {};
+struct InfiniteDetectedException : cpputils::Exception {};
 
 
 template<int RANK>
@@ -102,7 +102,7 @@ public:
 #ifndef   NDEBUG
       if (size_t(averages.size())!=Base::nAvr(averaged)) throw AveragesFishyException();
 #endif // NDEBUG
-      if (!all(blitzplusplus::isfinite(averages))) throw AveragesInfiniteDetectedException();
+      if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
       averaged->process(averages);
       averaged->display(averages,os,precision);
     }
