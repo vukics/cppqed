@@ -11,7 +11,7 @@
 
 namespace blitzplusplus {
 
-inline bool isfinite(double d) {return boost::math::isfinite<double>(d);}
+inline bool isfinite(double d) {return boost::math::isfinite(d);}
 
 BZ_DECLARE_FUNCTION_RET(isfinite,bool)
 
