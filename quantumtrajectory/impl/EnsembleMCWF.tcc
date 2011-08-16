@@ -60,7 +60,7 @@ Base<RANK>::Base(
 		 const StateVectorLow& scaleAbs
 		 )
   : StateVectorsBase(details::stateVectors<RANK>(psi,p.nTraj)),
-    EnsembleTrajectories(details::trajectories<RANK>(StateVectorsBase::member,sys,p,scaleAbs)),
+    EnsembleTrajectories(details::trajectories<RANK>(StateVectorsBase::member,sys,p,scaleAbs),p.logLevel<0),
     rho_(psi.getDimensions(),false)
 {
 }

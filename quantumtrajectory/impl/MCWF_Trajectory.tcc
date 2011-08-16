@@ -262,6 +262,8 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 	  Liouvillean::actWithJ(t,psi_(),jumpNo,li_); 
 	  psi_()/=sqrt(dpOverDtSet(jumpNo));
 	}
+	
+	logger_.jumpOccured(t,jumpNo);
       }
     }
 

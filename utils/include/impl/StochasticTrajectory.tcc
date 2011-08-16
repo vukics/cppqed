@@ -7,7 +7,9 @@
 
 #include "Range.h"
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
+
+#include <boost/progress.hpp>
 
 
 namespace trajectory {
@@ -69,7 +71,15 @@ template<typename T, typename T_ELEM>
 void
 EnsembleTrajectories<T,T_ELEM>::evolve(double deltaT) const
 {
-  boost::for_each(trajs_,bind(&TrajectoryBase::evolve,_1,deltaT));
+  using namespace boost;
+
+  if (log_) {
+    progress_display pd(trajs_.size(),std::cerr);
+    for (typename Impl::const_iterator i=trajs_.begin(); i!=trajs_.end(); ++i, ++pd) i->evolve(deltaT);
+  }
+  else
+    for_each(trajs_,bind(&TrajectoryBase::evolve,_1,deltaT));
+
 }
 
 

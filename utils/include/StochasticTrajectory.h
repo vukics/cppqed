@@ -161,13 +161,15 @@ public:
 protected:
   typedef std::auto_ptr<Impl> SmartPtr;
   
-  EnsembleTrajectories(SmartPtr trajs) : trajs_(trajs) {}
+  EnsembleTrajectories(SmartPtr trajs, bool log) : trajs_(trajs), log_(log) {}
 
 private:
   double getDtDid() const;
   // An average of getDtDid()-s from individual trajectories.
 
   const Impl trajs_;
+
+  const bool log_;
 
 };
 
