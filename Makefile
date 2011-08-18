@@ -13,6 +13,7 @@ INCDIR := $(SRCDIRS) utils/include
 
 optimization = yes
 with-flens = yes
+profiling = no
 
 CXX = g++
 
@@ -33,6 +34,11 @@ CPPFLAGS += -DDO_NOT_USE_FLENS
 EXCLUDED := utils/src/DrivenDampedHarmonicOscillator.o # If this is included in libC++QED.so, then linkage without FLENS will not work
 else
 LDLIBS += -lflens 
+endif
+
+ifeq ($(profiling),yes)
+CPPFLAGS += -pg
+LDFLAGS += -pg
 endif
 
 
