@@ -154,9 +154,8 @@ The default compilation mode is ``debug``\ ging mode, meaning that in this case 
 
 ``bjam`` will put the compiled files into the directories ``bin`` and ``utils/bin``. These directories are the roots of directory structures which mirror the structure of the distribution.
 
-There is a ``Makefile`` which will automatically recognise the executables in directory ``scripts``, compile the framework, and statically link it with necessary libraries. Although with ``make`` it is not easy to provide the same flexibility as with Boost.Build, I am trying to maintain this possibility on an acceptable level. With ``make``, the default compilation mode is optimized mode. Type ::
+A ``Makefile`` is also provided. This will compile the whole framework (together with ``utils``) into a single shared library, and link scripts against this, and the necessary third-party libraries. It automatically recognises the program files in directory ``scripts`` as scripts. The ``Makefile`` also features the option ``with-flens``. All other Makefiles have been removed. Note that in contrast to Boost.Build, ``make`` does not provide the possibility of having several build variants simultaneously. With ``make``, the default compilation mode is optimized mode. Type ::
 
-  make utils
   make <script-name-without-extension>
 
 To switch to debugging mode you need to use ::
@@ -188,7 +187,11 @@ There is a compilation feature which can be supplied to Boost.Build::
 
   bjam with-flens=no <all the rest as before>
 
-In this case, those parts of the framework that rely on FLENS are discreetly disabled. Most notable is the calculation of the negativity of partially transposed density operators, cf. :ref:`assessingEntanglement`.
+and also to ``make``::
+
+  make with-flens=no <all the rest as before>
+
+In this case, those parts of the framework that rely on FLENS are discreetly disabled. Most notable is the calculation of the negativity of partially transposed density operators, cf. :ref:`assessingEntanglement`. The file ``utils/src/DrivenDampedHarmonicOscillator.cc`` is also basically disabled, so that :class:`DrivenDampedHarmonicOscillator` becomes unusable.
 
 .. highlight:: c++
   :linenothreshold: 10
@@ -199,3 +202,16 @@ In this case, those parts of the framework that rely on FLENS are discreetly dis
 =========
 
 The content of the directory ``utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves. Cf. :ref:`cpputils`.
+
+
+=========
+Profiling
+=========
+
+With Boost.Build, profiling (e.g. with ``gprof``) will never work in release mode because in this mode it automatically adds the ``--strip-all`` option to ``ld``, which removes the symbols necessary for profiling. Therefore, for profiling, ``make`` has to be used, which provides the pertaining option. Type::
+
+  make profiling=yes <script-name-without-extension>
+
+.. note::
+
+  Be sure that the whole framework gets recompiled.
