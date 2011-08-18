@@ -1,3 +1,6 @@
+#ifndef   DO_NOT_USE_FLENS
+
+
 #include "DrivenDampedHarmonicOscillator.h"
 
 #include "MathExtensions.h"
@@ -89,3 +92,6 @@ const DDHO_SmartPtr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampD
   else
     return DDHO_SmartPtr(new DDHO   (gamma,omega,ampTI,ampDerivTI,tInit));
 }
+
+
+#endif // DO_NOT_USE_FLENS
