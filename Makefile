@@ -61,6 +61,6 @@ clean :
 	@echo "Removing library file..."
 	rm -f libC++QED.so
 	@echo "Removing object files..."
-	rm -rf $(STDOBJ)
+	rm -f $(STDOBJ)
 	@echo "Removing executables..."
 	rm -f $(EXECS)

@@ -107,7 +107,7 @@ To access the Bazaar repository, configure your Bazaar client as follows::
 
   bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed (read-only)
 
-  bzr+ssh://USERNAME@cppqed.bzr.sourceforge.net/bzrroot/cppqed (read/write)
+  bzr+ssh://vukics@cppqed.bzr.sourceforge.net/bzrroot/cppqed (read/write)
 
 
 .. highlight:: c++
