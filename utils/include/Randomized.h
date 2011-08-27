@@ -28,8 +28,7 @@ public:
 
   virtual double gaussian(double sigma=1) const = 0;
 
-  dcomp dcompRan() const {double reRan=(*this)(), imRan=(*this)(); return dcomp(reRan,imRan);}
-  // Note that the result of return dcomp((*this)(),(*this)()); is undefined!
+  dcomp dcompRan() const;
 
 };
 

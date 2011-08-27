@@ -8,6 +8,15 @@
 
 namespace randomized {
 
+
+dcomp Randomized::dcompRan() const
+{
+  // Note that the result of return dcomp((*this)(),(*this)()); is undefined!
+  double reRan=(*this)(), imRan=(*this)();
+  return dcomp(reRan,imRan);
+}
+
+
 class RandomizedGSL : public Randomized 
 {
 public: 
