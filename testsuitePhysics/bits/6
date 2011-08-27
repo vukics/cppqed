@@ -1,9 +1,0 @@
-#########################
-# Finite-temperature mode
-#########################
-
-ARGS6="$ARGSTraj --cutoff 36 --minit '(2.,-3.)' --nTh 4 --doDisplay --kappa 5 --Dt .005 --T 1"
-
-l "PLM_FT_En.d" "PumpedLossyMode_C++QED  $ARGS6 $ARGSEnsemble --cutoff 60 --T 10"
-# If cutoff is not big enough, some trajectories might get caught in a numerical trap.
-l "PLM_FT_Ma.d" "PumpedLossyMode_C++QED  $ARGS6 --evol master"

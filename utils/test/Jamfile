@@ -1,4 +1,0 @@
-for local ccfile in [ glob *.cc ]
-{
-	exe $(ccfile:B) : $(ccfile) : <library>..//utils ;
-}

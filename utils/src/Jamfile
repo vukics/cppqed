@@ -1,6 +1,6 @@
 obj Pars.o : Pars.cc : <include>../include <define>TOP_LEVEL_DIRECTORY="$(TOP)" ;
 
-lib utils : [ glob *.cc : Pars.cc ] Pars.o
+lib utils : [ glob *.cc : Pars.cc DrivenDampedHarmonicOscillator.cc ] Pars.o
       	  : <library>..//gsl <library>..//gslcblas <library>..//blitz <with-flens>yes:<library>..//flens
             # as long as LAPACK & BLAS are used only via FLENS, linking against FLENS should be enough
 	    # furthermore, as long as all these libraries are used by clients only via wrappers in utils, linking againts them ONLY HERE should be enough

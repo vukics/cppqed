@@ -1,9 +1,0 @@
-lib boost_test_lib : : <name>boost_unit_test_framework ;
-
-import testing ;
-
-for local ccfile in [ glob *.cc ]
-{
-	unit-test $(ccfile:B) : $(ccfile) boost_test_lib ..//executables_link_against : <define>BOOST_TEST_DYN_LINK ;
-}
-
