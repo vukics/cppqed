@@ -6,7 +6,6 @@
 
 using namespace mode;
 
-const unsigned nRepeat=1000;
 
 int main(int argc, char* argv[])
 {
@@ -17,15 +16,15 @@ int main(int argc, char* argv[])
   ParsPumpedLossy pplm(p);
 
   pplm.eta=dcomp(4.,-2.);
-  pplm.cutoff=1000;
+  pplm.cutoff=16;
 
   // ****** ****** ****** ****** ****** ******
-
 
   const PumpedLossyModeSch<false> modeH(pplm);
   const ModeBase mode0(pplm.cutoff);
 
-  const Composite<composite::result_of::make_vector<Act<0,1> >::type> sys(makeComposite(Act<0,1>(structure::Interaction<2>(structure::Interaction<2>::Frees(&modeH,&mode0)))));
+  const Composite<composite::result_of::make_vector<Act<0,1,2,3,4> >::type>
+    sys(makeComposite(Act<0,1,2,3,4>(structure::Interaction<5>(structure::Interaction<5>::Frees(&mode0,&mode0,&modeH,&mode0,&mode0)))));
   
   benchmark(sys);
 
