@@ -257,7 +257,16 @@ Output of scripts, initial condition
 
 Following a header part, the time-dependent simulated data is displayed, organized into columns. The first two columns are time and timestep, respectively, and then, separated by tab characters, the data stemming from the different subsystems follows. A key to the data is provided in the header part of the output. The output of real numbers has a precision of three digits by default, this can be overridden by the ``--precision`` option.
 
-In the case of a single MCWF trajectory there is a last column, which, roughly speaking, shows how far the system was from a quantum jump to happen in the given timestep. If this number becomes negative, it means that a quantum jump has happened. In this case it would be easy to signal *which kind* of jump has happened, which is useful if e.g. the user wants to monitor fluorescence of a given atomic transition, or the output of a cavity.
+In the case of a single MCWF trajectory, there is the option ``--logLevel``, which, when nonzero, makes that the stepper will record certain data during the execution:
+
+logLevel>0
+  no log output during the trajectory, at the end a summary and a list of the jump time instants and jump kinds (ordinal number of the jump which occured)
+
+logLevel>1
+  reporting jumps also during the trajectory
+
+logLevel>2
+  reporting dpLimit overshoots and the resulting stepsize decrease also during trajectory
 
 The output can be piped into a file, or an output file can be specified with the ``--o`` option. In the latter case if the simulation comes to an end, the final state vector will be stored in a corresponding file with extension ``.sv``. This allows the framework to resume a trajectory.
 

@@ -208,10 +208,16 @@ The content of the directory ``utils`` is a small library of very diverse but qu
 Profiling
 =========
 
-With Boost.Build, profiling (e.g. with ``gprof``) will never work in release mode because in this mode it automatically adds the ``--strip-all`` option to ``ld``, which removes the symbols necessary for profiling. Therefore, for profiling, ``make`` has to be used, which provides the pertaining option. Type::
+With Boost.Build, profiling (e.g. with ``gprof``) will never work in release mode because in this mode it automatically adds the ``--strip-all`` option to ``ld``, which removes the symbols necessary for profiling.
+
+Therefore, for profiling, the ``profile`` variant has to be used. Type::
+
+  bjam profile <script-name-without-extension>
+
+The ``Makefile`` also provides the pertaining option. Type::
 
   make profiling=yes <script-name-without-extension>
 
 .. note::
 
-  Be sure that the whole framework gets recompiled.
+  With ``make``, be sure that the whole framework gets recompiled. ``bjam`` will anyway put the binaries into separate directories.
