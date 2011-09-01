@@ -14,7 +14,7 @@ project : requirements
 
 path-constant TOP : .. ;
 
-alias utils : src//utils ;
+alias utilslib : src//utils ;
 
 build-project src       ;
 build-project test      ;

@@ -1,4 +1,4 @@
-project : requirements : : build-dir bin ;
+project : requirements <library>../../quantumtrajectory//qt <library>../../elements//el : : build-dir bin ;
 
 obj cpcPaperExamples.o : cpcPaperExamples.cc ;
 # obj cpcPaperExamplesC++0x.o : cpcPaperExamplesC++0x.cc ;
