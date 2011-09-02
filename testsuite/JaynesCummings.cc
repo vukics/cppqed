@@ -15,12 +15,12 @@ typedef StateVector::Dimensions     Dimensions ;
 int main()
 {
   parameters::ParameterTable p;
-  ParsJaynesCummings  pjc  (p); 
+  jaynescummings::Pars pjc(p); 
   pjc.g=dcomp(1,2);
 
-  ModeBase mb(5,0);
+  ModeBase mb(5);
   QbitBase qb;
-  JaynesCummings<false> jc(qb,mb,pjc);
+  JaynesCummings<> jc(qb,mb,pjc);
 
   StateVector psi(Dimensions(2,5));
 

@@ -33,10 +33,10 @@ using namespace blitzplusplus;
 using namespace vfmsi;
 using namespace fft;
 
-typedef structure::Types<2>::StateVectorLow SVL;
+typedef quantumdata::Types<2>::StateVectorLow SVL;
 
 typedef GeMatrix<FullStorage<double, ColMajor> >  GEMatrix;
-typedef DenseVector<Array<double> >        DEVector;
+typedef DenseVector<flens::Array<double> >        DEVector;
 
 int main()
 {
@@ -58,7 +58,7 @@ int main()
   GEMatrix Ainv(A);
 
   {
-    DenseVector<Array<int> > p(2);
+    DenseVector<flens::Array<int> > p(2);
     trf(Ainv,p);
     tri(Ainv,p);
   }
@@ -85,11 +85,11 @@ int main()
 
   SVL psiFFT(psi.copy()), psiKFFT(psiK.copy());
 
-  for_each(begin<1,vfmsi::Left ,false>(psiFFT),end<1,vfmsi::Left ,false>(psiFFT),bind(&ffTransform,_1,FFTDIR_XK));
-  for_each(begin<1,vfmsi::Right,false>(psiFFT),end<1,vfmsi::Right,false>(psiFFT),bind(&ffTransform,_1,FFTDIR_XK));
+  boost::for_each(fullRange(psiFFT ,vfmsi::Left ()),bind(&ffTransform,_1,FFTDIR_XK));
+  boost::for_each(fullRange(psiFFT ,vfmsi::Right()),bind(&ffTransform,_1,FFTDIR_XK));
 
-  for_each(begin<1,vfmsi::Left ,false>(psiKFFT),end<1,vfmsi::Left ,false>(psiKFFT),bind(&ffTransform,_1,FFTDIR_KX));
-  for_each(begin<1,vfmsi::Right,false>(psiKFFT),end<1,vfmsi::Right,false>(psiKFFT),bind(&ffTransform,_1,FFTDIR_KX));
+  boost::for_each(fullRange(psiKFFT,vfmsi::Left ()),bind(&ffTransform,_1,FFTDIR_KX));
+  boost::for_each(fullRange(psiKFFT,vfmsi::Right()),bind(&ffTransform,_1,FFTDIR_KX));
 
   /*
   for (int i=0; i<dim; i++) {

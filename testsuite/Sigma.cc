@@ -7,16 +7,18 @@ using namespace mode;
 
 using blitz::shape;
 
-using quantumdata::Sigma;
+using quantumoperator::Sigma;
 
 int main()
 {
   Sigma<4,1> sigma4_1;
   Sigma<2,3> sigma2_3;
 
-  Tridiagonal a1(aop(10)), a2(aop(8).dagger());
+  ModeBase m1(10), m2(8);
+
+  Tridiagonal a1(aop(&m1)), a2(aop(&m2).dagger());
   
-  structure::Types<4>::StateVectorLow psi(shape(6,10,8,5)), dpsidt(shape(6,10,8,5));
+  quantumdata::Types<4>::StateVectorLow psi(shape(6,10,8,5)), dpsidt(shape(6,10,8,5));
 
   psi=0; dpsidt=0; psi(1,7,6,3)=1;
 

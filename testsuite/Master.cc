@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   qbit::SmartPtr qbit(qbit::maker(pplqb,qmp));
   mode::SmartPtr mode(mode::maker(pplm ,qmp));
 
-  JaynesCummings jc(qbit,mode,pjc);
+  JaynesCummings<> jc(qbit,mode,pjc);
 
   BinarySystem system(jc);
 

@@ -15,8 +15,8 @@ struct LDOSI_MF : mpl::identity<quantumdata::ldo::DiagonalIterator<R,V> > {};
 template<typename V>
 struct LDO_Res_MF : mpl::identity<quantumdata::LazyDensityOperator<mpl::size<V>::value> > {};
 
-typedef tmptools::Vector<0> Vec0;
-typedef tmptools::Vector<1> Vec1;
+const tmptools::Vector<0> vec0=tmptools::Vector<0>();
+const tmptools::Vector<1> vec1=tmptools::Vector<1>();
 
 
 using namespace std;
@@ -51,14 +51,14 @@ int main()
 
   // cout<<*++++i;
 
-  std::for_each(psi.begin<Vec0>(),psi.end<Vec0>(),bind(print,_1));
-  std::for_each(psi.begin<Vec1>(),psi.end<Vec1>(),bind(print,_1));
+  std::for_each(psi.begin(vec0),psi.end(vec0),bind(print,_1));
+  std::for_each(psi.begin(vec1),psi.end(vec1),bind(print,_1));
 
   DensityOperator rho(StateVector::Dimensions(3,4));
   rho()(Idx(2,1,2,2))=dcomp(1,2);
   rho()(Idx(1,3,0,3))=dcomp(1,0);
 
-  std::for_each(rho.begin<Vec0>(),rho.end<Vec0>(),bind(print,_1));
-  std::for_each(rho.begin<Vec1>(),rho.end<Vec1>(),bind(print,_1));
+  std::for_each(rho.begin(vec0),rho.end(vec0),bind(print,_1));
+  std::for_each(rho.begin(vec1),rho.end(vec1),bind(print,_1));
 
 }
