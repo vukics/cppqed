@@ -1,11 +1,11 @@
 use-project utils : utils ;
 
-alias utils : utils//utils ;
+alias utilslib : utils//utilslib ;
 
 alias st : structure//st ;
 alias qd : quantumdata//qd ;
 
-alias executables_link_against : : : : <library>quantumtrajectory//qt <library>elements//el <library>st <library>quantumoperator//qo <library>utils <library>qd ;
+alias executables_link_against : : : : <library>quantumtrajectory//qt <library>elements//el <library>st <library>quantumoperator//qo <library>utilslib <library>qd <library>utils//flens ;
 
 project : : : build-dir bin ;
 

@@ -10,7 +10,7 @@ project : usage-requirements
 
 path-constant TOP : .. ;
 
-alias utils : src//utils ;
+alias utilslib : src//utils ;
 
 build-project src       ;
 build-project test      ;
@@ -23,4 +23,8 @@ lib blitz gsl gslcblas ;
 import feature : feature ;
 feature with-flens : yes no : optional propagated ;
 
-lib flens : : <name>flens <with-flens>yes ;
+lib flenslib : : <name>flens ;
+
+alias flens : : <with-flens>no  ;
+alias flens : flenslib ;
+
