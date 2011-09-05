@@ -25,8 +25,10 @@ lib gsl gslcblas ;
 
 
 import feature : feature ;
-feature with-flens : yes no : incidental propagated ;
+feature with-flens : yes no : optional propagated ;
 
 lib blitz : : <file>/home/C++QED_lib/lib/libblitz.a ;
-lib flens : : <file>/home/C++QED_lib/lib/libflens.so <link>shared ;
+lib flenslib : : <file>/home/C++QED_lib/lib/libflens.so <link>shared ;
 
+alias flens : : <with-flens>no  ;
+alias flens : flenslib ;
