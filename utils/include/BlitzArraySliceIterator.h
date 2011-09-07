@@ -86,6 +86,9 @@ FilterOut(const TTD_IDXTINY(RANK)&);
 /////////////////////////////////
 
 // These are just rudimentary definitions, the actual definitions are as partial specializations (cf. details/IndexerImplementationsSpecializations.h)
+// The functions will throw if 
+
+class TransposerOrIndexerRankTooHighException : public cpputils::Exception {};
 
 template<int RANK, typename V>
 class Transposer
@@ -93,7 +96,7 @@ class Transposer
 public:
   static 
   TTD_CARRAY(RANK)&
-  transpose(TTD_CARRAY(RANK)&);
+  transpose(TTD_CARRAY(RANK)&) {throw TransposerOrIndexerRankTooHighException();}
 
 };
 
@@ -106,7 +109,7 @@ public:
   TTD_RES_CARRAY(V)&
   index(TTD_CARRAY(RANK)&,
 	TTD_RES_CARRAY(V)&,
-	const TTD_VEC_IDXTINY(RANK,V)&);
+	const TTD_VEC_IDXTINY(RANK,V)&) {throw TransposerOrIndexerRankTooHighException();}
 
 };
 
