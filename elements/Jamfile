@@ -1,6 +1,6 @@
 # A list enough for simplified testing: interactions/JaynesCummings.cc frees/PumpedTwoLevelAtom.cc frees/TimeIndependentMatrixHamiltonian.cc frees/QM_Picture.cc [ glob frees/*Mode*.cc frees/*Qbit*.cc composites/*.cc ]
 
-lib el : [ glob frees/*.cc interactions/*.cc composites/*.cc ] ../quantumoperator//qo ..//st
+lib el : [ glob frees/*.cc interactions/*.cc composites/*.cc ] ..//C++QED
        : <include>frees
          # This is necessary in order that clients in interaction find frees
        :
