@@ -1,1 +1,4 @@
-lib qt : [ glob *.cc ] ..//st : <include>. : : <include>. ;
+for local ccfile in [ glob *.cc ]
+{
+	obj $(ccfile:B).o : $(ccfile) ../structure : <include>. : : <include>. ;
+}
