@@ -11,18 +11,18 @@
 #include "Algorithm.h"
 #include "Range.h"
 
-#include<boost/fusion/algorithm/iteration/for_each.hpp>
-#include<boost/fusion/algorithm/iteration/fold.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
+#include <boost/fusion/algorithm/iteration/fold.hpp>
 
-#include<boost/mpl/for_each.hpp>
+#include <boost/mpl/for_each.hpp>
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
 
-#include<boost/lambda/lambda.hpp>
+#include <boost/lambda/lambda.hpp>
 namespace bll=boost::lambda;
 
-#include<algorithm>
-#include<list>
+#include <algorithm>
+#include <list>
 
 
 // NEEDS_WORK in the helper classes worker member functions could be factored out. (Eg ActWithU --- the amount of code we save is incredible!)
@@ -49,7 +49,7 @@ template<typename VA> template<typename H>
 void Composite<VA>::worker(const H& helper) const
 {
   mpl::for_each<Ordinals>(helper);
-  boost::fusion::for_each(acts_,helper);
+  boost::fusion::for_each(furnishedActs_,helper);
 
   // IMPORTANT NOTICE!!! Both mpl::for_each and
   // boost::fusion::for_each stores the helper BY VALUE. So, what
@@ -316,7 +316,7 @@ bool Composite<VA>::isUnitary() const
   bool res=true;
   IsUnitary helper(frees_,res);
   mpl::for_each<Ordinals>(helper);
-  if (res) res=boost::fusion::fold(acts_,res,helper);
+  if (res) res=boost::fusion::fold(furnishedActs_,res,helper);
   return res;
 }
 
@@ -385,7 +385,7 @@ public:
 
     if (ha) 
       cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),
-		      bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+			 bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
   }
 
   template<typename Act>
@@ -465,7 +465,7 @@ size_t Composite<VA>::nJumps() const
   size_t res=0;
   NJumps helper(frees_,res);
   mpl::for_each<Ordinals>(helper);
-  res=boost::fusion::fold(acts_,res,helper);
+  res=boost::fusion::fold(furnishedActs_,res,helper);
   return res;
 }
 
@@ -669,7 +669,7 @@ size_t Composite<VA>::nAvr() const
   size_t res=0;
   NAvr helper(frees_,res);
   mpl::for_each<Ordinals>(helper);
-  res=boost::fusion::fold(acts_,res,helper);
+  res=boost::fusion::fold(furnishedActs_,res,helper);
   return res;
 }
 

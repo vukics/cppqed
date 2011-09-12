@@ -23,7 +23,7 @@ class Act
 public:
   typedef typename BASE_class2::Interaction Interaction;
 
-  Act(const Interaction& ia) : BASE_class2(&ia) {}
+  explicit Act(const Interaction& ia) : BASE_class2(&ia) {}
 
 };
 

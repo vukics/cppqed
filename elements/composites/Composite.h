@@ -91,18 +91,36 @@ private:
 
   static const Dimensions fillDimensions(const Frees&);
 
+  template<typename A> // A must be an Act type (which is also a compile-time vector)
+  class FurnishedAct : public A
+  {
+  public:
+    typedef FurnishedAct<A> type; // so that it can act as a metafunction
+    typedef blitzplusplus::SlicesData<RANK,A> SlicesData;
+
+    FurnishedAct(const A& a, const StateVectorLow& psiProbe) : A(a), sd_(psiProbe) {}
+
+    const SlicesData& getSlicesData() const {return sd_;}
+
+  private:
+    const SlicesData sd_;
+  };
+
+  typedef typename boost::fusion::result_of::as_vector<typename mpl::transform<VA,FurnishedAct<mpl::_1> >::type>::type VFA;
+
+  static const VFA furnish(const VA&, const Dimensions&);
+
 public:
   // Constructor
 
   explicit Composite(const VA& acts) 
-    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)), frees_(FreesBase::member), acts_(acts) {}
+    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)), frees_(FreesBase::member), furnishedActs_(furnish(acts,getDimensions())) {}
 
 
 private:
   // Implementing QS_Base
 
   double highestFrequency (             ) const;
-
 
   void   displayParameters(std::ostream&) const; class DisplayParameters;
 
@@ -140,7 +158,9 @@ private:
   // Note that Frees are stored by value in FreesBase
 
   const Frees& frees_;
-  const VA      acts_;
+  // const VA      acts_;
+
+  const VFA furnishedActs_;
 
 };
 
