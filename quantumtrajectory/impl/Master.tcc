@@ -167,16 +167,15 @@ void Base<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow
 template<int RANK>
 void BaseFast<RANK>::unaryIter(DensityOperatorLow& rhoLow, UnaryFunction function) const
 {
-  using namespace blitzplusplus;
-  boost::for_each(vfmsi_fast::fullRange(slicesData_,rhoLow,vfmsi::Left()),function);
+  boost::for_each(blitzplusplus::basi_fast::fullRange(rhoLow,slicesData_),function);
 }
 
 
 template<int RANK>
 void BaseFast<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
 {
-  using namespace blitzplusplus;
-  cpputils::for_each(vfmsi_fast::fullRange(slicesData_,rhoLow,vfmsi::Left()),vfmsi_fast::begin(slicesData_,drhodtLow,vfmsi::Left()),function);
+  cpputils::for_each(blitzplusplus::basi_fast::fullRange(   rhoLow,slicesData_),
+		     blitzplusplus::basi_fast::begin    (drhodtLow,slicesData_),function);
 }
 
 

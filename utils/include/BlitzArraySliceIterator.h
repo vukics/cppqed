@@ -14,6 +14,8 @@
 #include <boost/mpl/unique.hpp>
 #include <boost/mpl/max_element.hpp>
 
+#include <boost/preprocessor/control/iif.hpp>
+
 #include <boost/range.hpp>
 
 #include <list>
@@ -166,10 +168,9 @@ public:
 
 
 
+#define IS_SD 0
 #define NS_NAME basi
-#define ADD_PARAMETER
-#define ADD_parameter
-#define RETURN_type1(CONST) Iterator<A::_bz_rank,V,CONST>
+#define RETURN_type1(CONST) Iterator<A::_bz_rank,SD_V,CONST>
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
@@ -311,6 +312,8 @@ class Iterator
   : public TTD_FORWARD_ITERATOR_HELPER
 {
 public:
+  typedef V Vector;
+
   typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA   ;
   typedef TTD_RES_CARRAY(V)                           CARes;
   typedef TTD_CONDITIONAL_CONST_RES_CARRAY(V,CONST) CcCARes;
@@ -328,7 +331,7 @@ public:
   friend bool operator==(const Iterator& i1, const Iterator& i2) {return i1.iter_==i2.iter_;}
 
   template<bool IS_END>
-  Iterator(const SlicesData<RANK,V>&, CcCA& array, boost::mpl::bool_<IS_END> b);
+  Iterator(CcCA& array, const SlicesData<RANK,V>&, boost::mpl::bool_<IS_END> b);
 
 private:
   typename SlicesData<RANK,V>::Impl::const_iterator iter_;
@@ -343,10 +346,9 @@ private:
 };
 
 
+#define IS_SD 1
 #define NS_NAME basi_fast
-#define ADD_PARAMETER const SlicesData<A::_bz_rank,V>&
-#define ADD_parameter slicesData,
-#define RETURN_type1(CONST) Iterator<A::_bz_rank,V,CONST>
+#define RETURN_type1(CONST) Iterator<A::_bz_rank,typename SD_V::Vector,CONST>
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 

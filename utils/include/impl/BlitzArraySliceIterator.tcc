@@ -325,7 +325,7 @@ arrayDataDispatcher(      TTD_CARRAY(RANK)& array)
 
 template<int RANK, typename V, bool CONST>
 template<bool IS_END>
-Iterator<RANK,V,CONST>::Iterator(const SlicesData<RANK,V>& slicesData, CcCA& array, boost::mpl::bool_<IS_END> isEnd)
+Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesData, boost::mpl::bool_<IS_END> isEnd)
   : iter_(details::iterDispatcher(slicesData.firstOffsets_,isEnd)),
     arrayRes_(),
     arrayData_(details::arrayDataDispatcher(array)),

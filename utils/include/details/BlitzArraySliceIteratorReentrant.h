@@ -1,46 +1,49 @@
 // -*- C++ -*-
 
-template<typename A, typename V>
+#define ADD_argument BOOST_PP_IIF(IS_SD,sd,) BOOST_PP_COMMA_IF(IS_SD)
+
+template<typename A, typename SD_V>
 inline
 const RETURN_type1(true )
-begin(ADD_PARAMETER ADD_parameter const A& array, V)
-{return RETURN_type1(true )(ADD_parameter array,boost::mpl::false_());}
+begin(const A& array, BOOST_PP_IIF(IS_SD,const SD_V&,SD_V) BOOST_PP_IIF(IS_SD,sd,) )
+{return RETURN_type1(true )(array, ADD_argument boost::mpl::false_());}
 
-template<typename A, typename V>
+template<typename A, typename SD_V>
 inline
 const RETURN_type1(true )
-end  (ADD_PARAMETER ADD_parameter const A& array, V) 
-{return RETURN_type1(true )(ADD_parameter array,boost::mpl:: true_());}
+end  (const A& array, BOOST_PP_IIF(IS_SD,const SD_V&,SD_V) BOOST_PP_IIF(IS_SD,sd,) )
+{return RETURN_type1(true )(array, ADD_argument boost::mpl:: true_());}
 
-template<typename A, typename V>
+template<typename A, typename SD_V>
 inline
 const RETURN_type1(false)
-begin(ADD_PARAMETER ADD_parameter       A& array, V) 
-{return RETURN_type1(false)(ADD_parameter array,boost::mpl::false_());}
+begin(      A& array, BOOST_PP_IIF(IS_SD,const SD_V&,SD_V) BOOST_PP_IIF(IS_SD,sd,) )
+{return RETURN_type1(false)(array, ADD_argument boost::mpl::false_());}
 
-template<typename A, typename V>
+template<typename A, typename SD_V>
 inline
 const RETURN_type1(false)
-end  (ADD_PARAMETER ADD_parameter       A& array, V) 
-{return RETURN_type1(false)(ADD_parameter array,boost::mpl:: true_());}
+end  (      A& array, BOOST_PP_IIF(IS_SD,const SD_V&,SD_V) BOOST_PP_IIF(IS_SD,sd,) ) 
+{return RETURN_type1(false)(array, ADD_argument boost::mpl:: true_());}
 
 
 #define RETURN_type2(CONST) boost::iterator_range<RETURN_type1(CONST)>
 
-template<typename A, typename V>
+template<typename A, typename SD_V>
 inline
 const RETURN_type2(true ) 
-fullRange(ADD_PARAMETER ADD_parameter const A& array, V v) 
-{return RETURN_type2(true )(blitzplusplus::NS_NAME::begin<A,V>(ADD_parameter array,v),blitzplusplus::NS_NAME::end<A,V>(ADD_parameter array,v));}
+fullRange(const A& array, BOOST_PP_IIF(IS_SD,const SD_V&,SD_V) sd_v ) 
+{return RETURN_type2(true )(blitzplusplus::NS_NAME::begin<A,SD_V>(array,sd_v),blitzplusplus::NS_NAME::end<A,SD_V>(array,sd_v));}
 
-template<typename A, typename V>
+template<typename A, typename SD_V>
 inline
 const RETURN_type2(false) 
-fullRange(ADD_PARAMETER ADD_parameter       A& array, V v) 
-{return RETURN_type2(false)(blitzplusplus::NS_NAME::begin<A,V>(ADD_parameter array,v),blitzplusplus::NS_NAME::end<A,V>(ADD_parameter array,v));}
+fullRange(      A& array, BOOST_PP_IIF(IS_SD,const SD_V&,SD_V) sd_v ) 
+{return RETURN_type2(false)(blitzplusplus::NS_NAME::begin<A,SD_V>(array,sd_v),blitzplusplus::NS_NAME::end<A,SD_V>(array,sd_v));}
+
 
 #undef  RETURN_type2
+#undef  ADD_argument
+#undef  IS_SD
 #undef  RETURN_type1
-#undef  ADD_PARAMETER
-#undef  ADD_parameter
 #undef  NS_NAME
