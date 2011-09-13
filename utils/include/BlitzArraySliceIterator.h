@@ -14,8 +14,6 @@
 #include <boost/mpl/unique.hpp>
 #include <boost/mpl/max_element.hpp>
 
-#include <boost/preprocessor/control/iif.hpp>
-
 #include <boost/range.hpp>
 
 #include <list>
@@ -168,9 +166,8 @@ public:
 
 
 
-#define IS_SD 0
 #define NS_NAME basi
-#define RETURN_type1(CONST) Iterator<A::_bz_rank,SD_V,CONST>
+#define RETURN_type1(CONST) Iterator<A::_bz_rank,V_S,CONST>
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
@@ -312,8 +309,6 @@ class Iterator
   : public TTD_FORWARD_ITERATOR_HELPER
 {
 public:
-  typedef V Vector;
-
   typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA   ;
   typedef TTD_RES_CARRAY(V)                           CARes;
   typedef TTD_CONDITIONAL_CONST_RES_CARRAY(V,CONST) CcCARes;
@@ -346,11 +341,53 @@ private:
 };
 
 
-#define IS_SD 1
-#define NS_NAME basi_fast
-#define RETURN_type1(CONST) Iterator<A::_bz_rank,typename SD_V::Vector,CONST>
 
-#include "details/BlitzArraySliceIteratorReentrant.h"
+#define RETURN_type1(CONST) Iterator<A::_bz_rank,V,CONST>
+
+
+template<typename A, typename V>
+inline
+const RETURN_type1(true )
+begin(const A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type1(true )(array,sd,boost::mpl::false_());}
+
+template<typename A, typename V>
+inline
+const RETURN_type1(true )
+end  (const A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type1(true )(array,sd,boost::mpl:: true_());}
+
+template<typename A, typename V>
+inline
+const RETURN_type1(false)
+begin(      A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type1(false)(array,sd,boost::mpl::false_());}
+
+template<typename A, typename V>
+inline
+const RETURN_type1(false)
+end  (      A& array, const SlicesData<A::_bz_rank,V>& sd) 
+{return RETURN_type1(false)(array,sd,boost::mpl:: true_());}
+
+
+#define RETURN_type2(CONST) boost::iterator_range<RETURN_type1(CONST)>
+
+template<typename A, typename V>
+inline
+const RETURN_type2(true ) 
+fullRange(const A& array, const SlicesData<A::_bz_rank,V>& sd) 
+{return RETURN_type2(true )(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
+
+template<typename A, typename V>
+inline
+const RETURN_type2(false) 
+fullRange(      A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type2(false)(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
+
+
+#undef  RETURN_type2
+#undef  RETURN_type1
+
 
 
 } // basi_fast

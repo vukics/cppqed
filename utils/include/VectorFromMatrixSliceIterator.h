@@ -36,9 +36,8 @@ struct LeftRight
 
 #define TTD_VFMSI(RANK,S,CONST) basi::Iterator<RANK,typename LeftRight<RANK/2,S>::type,CONST>
 
-#define IS_SD 0
 #define NS_NAME vfmsi
-#define RETURN_type1(CONST) TTD_VFMSI(A::_bz_rank,SD_V,CONST)
+#define RETURN_type1(CONST) TTD_VFMSI(A::_bz_rank,V_S,CONST)
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
@@ -46,24 +45,6 @@ struct LeftRight
 
 } // vfmsi
 
-
-/*
-
-namespace vfmsi_fast {
-
-#define TTD_VFMSI(RANK,V,CONST) basi_fast::Iterator<RANK,V,CONST>
-
-#define IS_SD 1
-#define NS_NAME vfmsi_fast
-#define RETURN_type1(CONST) TTD_VFMSI(A::_bz_rank,typename SD_V::Vector,CONST)
-
-#include "details/BlitzArraySliceIteratorReentrant.h"
-
-#undef  TTD_VFMSI
-
-} // vfmsi_fast
-
-*/
 
 } // blitzplusplus
 
