@@ -69,6 +69,12 @@ Hit enter when prompted for password. ::
   make lib
   sudo make install
 
+Under Debian-like operating systems, instead of the last line one can use::
+
+  sudo checkinstall --fstrans=0 -D make install
+
+The ``--fstrans=0`` option has to be used because of a bug in ``checkinstall``.
+
 ---------------
 Install FLENS:
 ---------------
@@ -94,6 +100,10 @@ If the last command issues the error message::
   Makefile.common:19: /config: No such file or directory
 
 you have to edit ``Makefile.common`` replacing the variable ``$(PWD)`` with the path of the current directory.
+
+Alternatively, again,
+
+  sudo checkinstall --fstrans=0 -D make install
 
 
 ================
@@ -166,7 +176,7 @@ Boost.Build, just like ``make``, supports parallel compilation, which can make a
 
   bjam -j n ... 
 
-C++QEDv2 has been successfully compiled on several Linux platforms and Mac OS X. In all cases the GNU C++ Compiler has been used. It also compiles with the `clang++ <http://clang.llvm.org/>`_ compiler. Portability to other compilers remains to be demonstrated.
+C++QEDv2 has been successfully compiled on several Linux platforms and :ref:`Mac OS X (cf. section below) <installingOnMacOsX>`. In all cases the GNU C++ Compiler has been used. It also compiles with the `clang++ <http://clang.llvm.org/>`_ compiler. Portability to other compilers remains to be demonstrated.
 
 
 .. todo::
@@ -193,9 +203,6 @@ and also to ``make``::
 
 In this case, those parts of the framework that rely on FLENS are discreetly disabled. Most notable is the calculation of the negativity of partially transposed density operators, cf. :ref:`assessingEntanglement`. The file ``utils/src/DrivenDampedHarmonicOscillator.cc`` is also basically disabled, so that :class:`DrivenDampedHarmonicOscillator` becomes unusable.
 
-.. highlight:: c++
-  :linenothreshold: 10
-
 
 =========
 ``utils``
@@ -203,6 +210,8 @@ In this case, those parts of the framework that rely on FLENS are discreetly dis
 
 The content of the directory ``utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves. Cf. :ref:`cpputils`.
 
+
+.. _installingOnMacOsX:
 
 =========
 Profiling
@@ -221,3 +230,47 @@ The ``Makefile`` also provides the pertaining option. Type::
 .. note::
 
   With ``make``, be sure that the whole framework gets recompiled. ``bjam`` will anyway put the binaries into separate directories.
+
+============
+Mac OS X
+============
+
+Relying on `MacPorts <http://www.macports.org/>`_, installation under Mac OS X is straightforward. There are only a few points to take care about, hence we will describe an example procedure.
+
+In this case, the operating system was Snow Leopard, and initially, there were two instances of GCC installed on the system:
+
+Version ``i686-apple-darwin10-gcc-4.2.1``
+  The default version
+
+Version ``gcc-mp-4.4 4.4.6.``
+  The version from MacPorts
+
+Since MacPorts uses the second one for its installations, to ensure binary compatibility, we will use this one to compile everything else. Install GSL and Boost.Build::
+
+  port install gsl boost-build
+
+Get Blitz++ from the CVS repository, and perform the steps above with the modification ::
+
+  export CXX=g++-mp-4.4; ./configure --with-pic
+
+For simplicity, use the ``BoostIntegration`` branch::
+
+  bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed/BoostIntegration C++QED
+
+(Bazaar can be obtained from binary installer for Mac.) Copy ``utils/Jamroot.macosx`` to ``utils/Jamroot``. In your home directory, create a ``user-config.jam`` file with the single line ::
+
+  using darwin : 4.4 : gcc-mp-4.4 ;
+
+(Without this, Boost.Build will pass bad options to ``ld``.) Use ::
+
+  bjam with-flens=no <whatever you want to build>
+
+since FLENS is not present on the system.
+
+
+
+
+
+
+.. highlight:: c++
+  :linenothreshold: 10
