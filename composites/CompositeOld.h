@@ -157,6 +157,6 @@ private:
 #undef BOOST_PP_ITERATION_LIMITS
 
 
-#include "impl/Composite.tcc"
+#include "impl/CompositeOld.tcc"
 
 #endif // _COMPOSITE_SYSTEM_INCLUDED
