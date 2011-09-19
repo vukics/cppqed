@@ -169,7 +169,7 @@ struct Helper
 
     PROGRESS_TIMER_IN_POINT(cout);
     SlicesData<11,V> slicesData(array1);
-    for (int i=nRepetition; i; --i) cpputils::for_each(basi_fast::fullRange(slicesData,array1,v),basi_fast::begin(slicesData,array2,v),bll::_1*=bll::_2); 
+    for (int i=nRepetition; i; --i) cpputils::for_each(basi_fast::fullRange(array1,slicesData),basi_fast::begin(array2,slicesData),bll::_1*=bll::_2); 
     cout<<"Fast. Arity "<<11-mpl::size<V>::value;
     PROGRESS_TIMER_OUT_POINT("");
 
@@ -235,13 +235,13 @@ struct Helper
   
   template<typename V> void operator()(V v)
   {
-    SlicesData<6,V> slices_data(array1);
+    SlicesData<6,V> slicesData(array1);
 
     cout<<endl<<
       "****************\n"<<
       "*** Slice Arity: "<<mpl::size<V>::value<<endl<<
       "****************\n";
-    cpputils::for_each(fullRange(array1,v),basi_fast::begin(slices_data,array2,v),boost::bind(helper<mpl::size<V>::value>,_1,_2,array1.data(),array2.data())); 
+    cpputils::for_each(fullRange(array1,v),basi_fast::begin(array2,slicesData),boost::bind(helper<mpl::size<V>::value>,_1,_2,array1.data(),array2.data())); 
   }
 
 };

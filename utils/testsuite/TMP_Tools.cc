@@ -19,7 +19,7 @@ BOOST_STATIC_ASSERT((
 // numerical_contains for ...
 BOOST_STATIC_ASSERT((
 		     numerical_contains_c<
-		     RangeMF<10,1>::type,
+		     Range<10,1>,
 		     size_t, // ... another type
 		     10
 		     >::value
@@ -29,7 +29,7 @@ BOOST_STATIC_ASSERT((
 BOOST_STATIC_ASSERT((
 		     !
 		     numerical_contains_c<
-		     RangeMF<10,1>::type,
+		     Range<10,1>,
 		     int,
 		     11
 		     >::value
@@ -82,7 +82,7 @@ void f()
 {
   /*
   // Should not compile:
-  typedef tmptools::OrdinalMF<-1>::type ordinalError;
+  typedef tmptools::Ordinals<-1> ordinalError;
   IsEvenAssert<31> error_IsEvenAssert;
   P_23_42::SanityCheck<24,45>();
   P_23_42::SanityCheck<21,40>();
