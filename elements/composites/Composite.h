@@ -70,7 +70,7 @@ public:
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
-  typedef typename tmptools::OrdinalMF<RANK>::type Ordinals;
+  typedef tmptools::Ordinals<RANK> Ordinals;
 
   typedef typename QS_Base::Dimensions    Dimensions   ;
   typedef typename Li_Base::Probabilities Probabilities;

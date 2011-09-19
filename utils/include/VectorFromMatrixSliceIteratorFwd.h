@@ -12,7 +12,7 @@ struct Left ;
 struct Right;
 
 template<int RANK, typename S>
-struct LeftRight 
+struct LeftRight;
 
 
 } // vfmsi

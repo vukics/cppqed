@@ -11,7 +11,7 @@ This is done by the following snippet in ``utils/include/impl/BlitzArraySliceIte
   :linenos:
 
 Line 13:
-  We are using the `fold <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/fold.html>`_ meta-algorithm from Boost.MPL. It iterates over the :type:`sequence of ordinals <tmptools::OrdinalMF::type>` between ``0`` and ``RANK-1``.
+  We are using the `fold <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/fold.html>`_ meta-algorithm from Boost.MPL. It iterates over the :type:`sequence of ordinals <tmptools::Ordinals>` between ``0`` and ``RANK-1``.
 
 Line 14:
   The initial state for the fold algorithm is an empty `compile-time vector of integers <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/vector-c.html>`_ and the `iterator <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/begin.html>`_ pointing to the first element of the compile-time vector ``V``. These two are "zipped" into a `compile-time pair <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/pair.html>`_. At the end, the first element of this pair will hold the result.

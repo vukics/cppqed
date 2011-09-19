@@ -59,8 +59,8 @@ concatenateTinies(const TinyVector<T1,RANK1>& op1, const TinyVector<T2,RANK2>& o
   details::TinyAssigner<RES,OP1      > assigner1(res,op1);
   details::TinyAssigner<RES,OP2,RANK1> assigner2(res,op2);
 
-  for_each<typename tmptools::OrdinalMF<RANK1>::type>(assigner1);
-  for_each<typename tmptools::OrdinalMF<RANK2>::type>(assigner2);
+  for_each<tmptools::Ordinals<RANK1> >(assigner1);
+  for_each<tmptools::Ordinals<RANK2> >(assigner2);
 
   return res;
     
@@ -105,7 +105,7 @@ halfCutTiny(const TinyVector<T,TWO_TIMES_RANK>& tiny)
 
 #ifndef   NDEBUG
   details::TinyChecker<T,RANK> checker(tiny);
-  boost::mpl::for_each<typename tmptools::OrdinalMF<RANK>::type>(checker);
+  boost::mpl::for_each<tmptools::Ordinals<RANK> >(checker);
 #endif // NDEBUG
 
   typedef TinyVector<T,TWO_TIMES_RANK> OP ;
@@ -115,7 +115,7 @@ halfCutTiny(const TinyVector<T,TWO_TIMES_RANK>& tiny)
 
   details::TinyAssigner<RES,OP> assigner(res,tiny);
 
-  for_each<typename tmptools::OrdinalMF<RANK>::type>(assigner);
+  for_each<tmptools::Ordinals<RANK> >(assigner);
 
   return res;
 

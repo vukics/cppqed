@@ -63,8 +63,8 @@ using namespace tmptools;
 
 template<int RANK, typename V>
 struct Algorithm 
-  : fold<typename tmptools::RangeMF<RANK,RANK>::type,
-	 typename fold<typename OrdinalMF<RANK>::type,
+  : fold<Range<RANK,RANK>,
+	 typename fold<Ordinals<RANK>,
 		       vector_c<int>,
 		       push_back<mpl::_1,
 				 if_<numerical_contains<V,mpl::_2>,

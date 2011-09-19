@@ -11,9 +11,9 @@ struct ConditionalAddConst;
 
 
 template<int N, int Nbeg>
-struct RangeMF;
+struct Range;
 
-template<int> struct OrdinalMF;
+template<int> struct Ordinals;
 
 
 template<int, int> struct Power;

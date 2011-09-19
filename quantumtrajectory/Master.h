@@ -104,7 +104,7 @@ private:
 
   const std::string addToParameterDisplay() const {return " Fast Iteration.";}
 
-  const blitzplusplus::SlicesData<2*RANK,typename blitzplusplus::vfmsi::LeftRight<RANK,blitzplusplus::vfmsi::Left>::type> slicesData_;
+  const blitzplusplus::SlicesData<2*RANK,blitzplusplus::vfmsi::LeftRight<RANK,blitzplusplus::vfmsi::Left> > slicesData_;
 
 };
 
