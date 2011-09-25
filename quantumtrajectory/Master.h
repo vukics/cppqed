@@ -93,7 +93,7 @@ public:
   typedef typename Base<RANK>::DensityOperatorLow DensityOperatorLow;
 
   BaseFast(DensityOperator& rho, const QuantumSystem& sys, const Pars& p, const DensityOperatorLow& scaleAbs=DensityOperatorLow())
-    : Base<RANK>(rho,sys,p,scaleAbs), slicesData_(rho()) {std::cerr<<"BaseFast constructor called";}
+    : Base<RANK>(rho,sys,p,scaleAbs), slicesData_(rho()) {}
 
 private:
   typedef typename Base<RANK>:: UnaryFunction  UnaryFunction;
@@ -104,7 +104,7 @@ private:
 
   const std::string addToParameterDisplay() const {return " Fast Iteration.";}
 
-  const blitzplusplus::SlicesData<2*RANK,typename blitzplusplus::vfmsi::LeftRight<RANK,blitzplusplus::vfmsi::Left>::type> slicesData_;
+  const blitzplusplus::SlicesData<2*RANK,blitzplusplus::vfmsi::LeftRight<RANK,blitzplusplus::vfmsi::Left> > slicesData_;
 
 };
 

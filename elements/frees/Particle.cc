@@ -10,10 +10,10 @@
 #include "VectorFromMatrixSliceIterator.h"
 #include "Hermite.h"
 
-#include<boost/assign/list_of.hpp>
-#include<boost/assign/list_inserter.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/assign/list_inserter.hpp>
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
 
 
 using namespace std;

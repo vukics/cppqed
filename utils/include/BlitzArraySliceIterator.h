@@ -64,10 +64,12 @@ template<int RANK, typename V> struct ConsistencyChecker
 
 
 
-// A dummy specialization: boost::mpl::range_c cannot be sorted, but
-// it is consistent for sure!
-template<int RANK, int I1, int I2> struct ConsistencyChecker<RANK,boost::mpl::range_c<int,I1,I2> >
-{};
+// Specializations: boost::mpl::range_c cannot be sorted
+template<int RANK, int I1, int I2>  struct ConsistencyChecker<RANK,boost::mpl::range_c<int,I1,I2> >
+{ BOOST_MPL_ASSERT_MSG( ( I1>=0 && I2<RANK ), BASI_ITERATOR_VECTOR_OUT_of_RANGE, ( boost::mpl::range_c<int,I1,I2> ) ) ; };
+
+template<int RANK, int N, int Nbeg> struct ConsistencyChecker<RANK,tmptools::Range<N,Nbeg> > : private ConsistencyChecker<RANK,boost::mpl::range_c<int,Nbeg,Nbeg+N> > {};
+template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ordinals<N>   > : private ConsistencyChecker<RANK,tmptools::Range<N,0> >             {};
 
 
 
@@ -167,9 +169,7 @@ public:
 
 
 #define NS_NAME basi
-#define ADD_PARAMETER
-#define ADD_parameter
-#define RETURN_type1(CONST) Iterator<A::_bz_rank,V,CONST>
+#define RETURN_type1(CONST) Iterator<A::_bz_rank,V_S,CONST>
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
@@ -277,6 +277,8 @@ template<int RANK, typename V>
 class SlicesData
 {
 public:
+  typedef SlicesData<RANK,V> type;
+
   typedef TTD_CARRAY(RANK) CArray;
 
   typedef std::list<ptrdiff_t> Impl;
@@ -328,7 +330,7 @@ public:
   friend bool operator==(const Iterator& i1, const Iterator& i2) {return i1.iter_==i2.iter_;}
 
   template<bool IS_END>
-  Iterator(const SlicesData<RANK,V>&, CcCA& array, boost::mpl::bool_<IS_END> b);
+  Iterator(CcCA& array, const SlicesData<RANK,V>&, boost::mpl::bool_<IS_END> b);
 
 private:
   typename SlicesData<RANK,V>::Impl::const_iterator iter_;
@@ -343,12 +345,53 @@ private:
 };
 
 
-#define NS_NAME basi_fast
-#define ADD_PARAMETER const SlicesData<A::_bz_rank,V>&
-#define ADD_parameter slicesData,
+
 #define RETURN_type1(CONST) Iterator<A::_bz_rank,V,CONST>
 
-#include "details/BlitzArraySliceIteratorReentrant.h"
+
+template<typename A, typename V>
+inline
+const RETURN_type1(true )
+begin(const A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type1(true )(array,sd,boost::mpl::false_());}
+
+template<typename A, typename V>
+inline
+const RETURN_type1(true )
+end  (const A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type1(true )(array,sd,boost::mpl:: true_());}
+
+template<typename A, typename V>
+inline
+const RETURN_type1(false)
+begin(      A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type1(false)(array,sd,boost::mpl::false_());}
+
+template<typename A, typename V>
+inline
+const RETURN_type1(false)
+end  (      A& array, const SlicesData<A::_bz_rank,V>& sd) 
+{return RETURN_type1(false)(array,sd,boost::mpl:: true_());}
+
+
+#define RETURN_type2(CONST) boost::iterator_range<RETURN_type1(CONST)>
+
+template<typename A, typename V>
+inline
+const RETURN_type2(true ) 
+fullRange(const A& array, const SlicesData<A::_bz_rank,V>& sd) 
+{return RETURN_type2(true )(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
+
+template<typename A, typename V>
+inline
+const RETURN_type2(false) 
+fullRange(      A& array, const SlicesData<A::_bz_rank,V>& sd)
+{return RETURN_type2(false)(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
+
+
+#undef  RETURN_type2
+#undef  RETURN_type1
+
 
 
 } // basi_fast

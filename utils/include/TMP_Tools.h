@@ -49,13 +49,13 @@ typedef boost::mpl::range_c<int,0,0> emptyRange;
 } // details
 
 
-template<int N, int Nbeg> struct RangeMF : boost::mpl::identity<boost::mpl::range_c<int,Nbeg,Nbeg+N> >
+template<int N, int Nbeg> struct Range : boost::mpl::range_c<int,Nbeg,Nbeg+N>
 {
   BOOST_MPL_ASSERT_MSG( N >= 0, RANGE_with_NEGATIVE_LENGTH, (boost::mpl::int_<N>) );
 };
 
 
-template<int N> struct OrdinalMF : RangeMF<N,0> {};
+template<int N> struct Ordinals : Range<N,0> {};
 
 
 template<int N1, int N2> struct Power       : boost::mpl::int_<N1*Power<N1,N2-1>::value> {};
@@ -119,10 +119,7 @@ struct pair_c<N1,N2,false>
 
 };
 
-// Apparently, in the above, the static const is DECLARED only. Some
-// compilers (including gcc in some circumstances) need to have them
-// DEFINED as well, which is done below. Funny. Cf EffC++ 3rd Edition,
-// item 2.
+// Apparently, in the above, the static const is DECLARED only. Some compilers (including gcc in some circumstances) need to have them DEFINED as well, which is done below. Cf EffC++ 3rd Edition, item 2.
 
 template<int N1, int N2>
 const int pair_c<N1,N2,false>::first;

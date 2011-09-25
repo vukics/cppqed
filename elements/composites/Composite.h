@@ -11,7 +11,7 @@
 
 #include "details/TMP_helpers.h"
 
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/container/generation/make_list.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition.hpp>
@@ -20,12 +20,11 @@
 
 namespace composite {
 
-using boost::fusion::make_vector;
+using boost::fusion::make_list;
 
 namespace result_of {
 
-// using boost::fusion::result_of::make_list;
-using boost::fusion::result_of::make_vector;
+using boost::fusion::result_of::make_list;
 
 } // result_of
 
@@ -70,7 +69,7 @@ public:
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
-  typedef typename tmptools::OrdinalMF<RANK>::type Ordinals;
+  typedef tmptools::Ordinals<RANK> Ordinals;
 
   typedef typename QS_Base::Dimensions    Dimensions   ;
   typedef typename Li_Base::Probabilities Probabilities;

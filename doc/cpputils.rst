@@ -59,7 +59,7 @@ Other
 ------------------
 
 
-.. class:: tmptools::OrdinalMF
+.. class:: tmptools::Ordinals
 
   ``template <int RANK>``
 

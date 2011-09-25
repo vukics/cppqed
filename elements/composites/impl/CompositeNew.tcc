@@ -11,18 +11,18 @@
 #include "Algorithm.h"
 #include "Range.h"
 
-#include<boost/fusion/algorithm/iteration/for_each.hpp>
-#include<boost/fusion/algorithm/iteration/fold.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
+#include <boost/fusion/algorithm/iteration/fold.hpp>
 
-#include<boost/mpl/for_each.hpp>
+#include <boost/mpl/for_each.hpp>
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
 
-#include<boost/lambda/lambda.hpp>
+#include <boost/lambda/lambda.hpp>
 namespace bll=boost::lambda;
 
-#include<algorithm>
-#include<list>
+#include <algorithm>
+#include <list>
 
 
 // NEEDS_WORK in the helper classes worker member functions could be factored out. (Eg ActWithU --- the amount of code we save is incredible!)
@@ -36,33 +36,6 @@ struct CompositeConsistencyException : cpputils::Exception
 
   const int idx, i;
 };
-
-
-//////////////////
-//
-// Overall helpers
-//
-//////////////////
-
-
-template<typename VA> template<typename H>
-void Composite<VA>::worker(const H& helper) const
-{
-  mpl::for_each<Ordinals>(helper);
-  boost::fusion::for_each(acts_,helper);
-
-  // IMPORTANT NOTICE!!! Both mpl::for_each and
-  // boost::fusion::for_each stores the helper BY VALUE. So, what
-  // happens is that the initial helper is COPIED to both, so the
-  // changes made during mpl::for_each in those members of the helper
-  // which are stored BY VALUE in H, will be "undone" at startup of
-  // boost::fusion::for_each. Ergo, there MUST NOT BE such
-  // members. (There can be const members stored by value though, of
-  // course.)
-  //
-  // How about static members?
-
-}
 
 
 ///////////////
@@ -156,7 +129,7 @@ const RETURN_type
 Composite<VA>::fillFrees(const VA& acts)
 {
   RETURN_type res; res=structure::SubSystemFree();
-  boost::fusion::for_each(acts,composite::FillFrees<RANK>(res));
+  fusion::for_each(acts,composite::FillFrees<RANK>(res));
   return res;
 }
 
@@ -174,6 +147,24 @@ Composite<VA>::fillDimensions(const Frees& frees)
 
 #undef  RETURN_type
 
+
+//////////////////
+//
+// Overall helpers
+//
+//////////////////
+
+
+template<typename VA> template<typename H>
+void Composite<VA>::worker(const H& helper) const
+{
+  mpl::for_each<Ordinals>(helper);
+  fusion::for_each(furnishedActs_,helper);
+
+  // IMPORTANT NOTICE!!! Both mpl::for_each and fusion::for_each store the helper BY VALUE. So, what happens is that the initial helper is COPIED to both, so the changes made during mpl::for_each in those members of the helper which are stored BY VALUE in H, will be "undone" at startup of fusion::for_each. Ergo, there MUST NOT BE such members. (There can be const members stored by value though, of course.)
+  // Question: How about static members?
+
+}
 
 
 /////////////
@@ -316,7 +307,7 @@ bool Composite<VA>::isUnitary() const
   bool res=true;
   IsUnitary helper(frees_,res);
   mpl::for_each<Ordinals>(helper);
-  if (res) res=boost::fusion::fold(acts_,res,helper);
+  if (res) res=fusion::fold(furnishedActs_,res,helper);
   return res;
 }
 
@@ -385,7 +376,7 @@ public:
 
     if (ha) 
       cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),
-		      bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+			 bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
   }
 
   template<typename Act>
@@ -465,7 +456,7 @@ size_t Composite<VA>::nJumps() const
   size_t res=0;
   NJumps helper(frees_,res);
   mpl::for_each<Ordinals>(helper);
-  res=boost::fusion::fold(acts_,res,helper);
+  res=fusion::fold(furnishedActs_,res,helper);
   return res;
 }
 
@@ -669,7 +660,7 @@ size_t Composite<VA>::nAvr() const
   size_t res=0;
   NAvr helper(frees_,res);
   mpl::for_each<Ordinals>(helper);
-  res=boost::fusion::fold(acts_,res,helper);
+  res=fusion::fold(furnishedActs_,res,helper);
   return res;
 }
 

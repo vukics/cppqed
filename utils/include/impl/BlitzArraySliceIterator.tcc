@@ -63,7 +63,7 @@ FilterOut(const TTD_IDXTINY(RANK)& v)
 
   {
     VecIdxTinyImpl<RANK,V> body(v,res);
-    for_each<filter_view<typename OrdinalMF<RANK>::type,not_<numerical_contains<V,_> > > >(body);
+    for_each<filter_view<Ordinals<RANK>,not_<numerical_contains<V,_> > > >(body);
   }
 
   return res;
@@ -137,7 +137,7 @@ namespace details {
 
 
 template<int RANK, typename V>
-struct IdxTypes : boost::mpl::fold<typename tmptools::OrdinalMF<RANK>::type,
+struct IdxTypes : boost::mpl::fold<tmptools::Ordinals<RANK>,
 				   boost::fusion::vector<>,
 				   boost::mpl::push_back<boost::mpl::_1,
 							 boost::mpl::if_<tmptools::numerical_contains<V,boost::mpl::_2>,blitz::Range,int>
@@ -220,7 +220,7 @@ using namespace tmptools;
 
 template<int RANK, typename V>
 struct Algorithm 
-  : fold<typename OrdinalMF<RANK>::type,
+  : fold<Ordinals<RANK>,
 	 pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
 	 pair<push_back<first<mpl::_1>,
 			if_<numerical_contains<V,mpl::_2>,
@@ -325,7 +325,7 @@ arrayDataDispatcher(      TTD_CARRAY(RANK)& array)
 
 template<int RANK, typename V, bool CONST>
 template<bool IS_END>
-Iterator<RANK,V,CONST>::Iterator(const SlicesData<RANK,V>& slicesData, CcCA& array, boost::mpl::bool_<IS_END> isEnd)
+Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesData, boost::mpl::bool_<IS_END> isEnd)
   : iter_(details::iterDispatcher(slicesData.firstOffsets_,isEnd)),
     arrayRes_(),
     arrayData_(details::arrayDataDispatcher(array)),

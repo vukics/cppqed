@@ -10,7 +10,7 @@ using namespace tmptools;
 
 template<int RANK, typename V>
 struct Algorithm 
-  : fold<typename OrdinalMF<RANK>::type,
+  : fold<Ordinals<RANK>,
 	 pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
 	 pair<push_back<first<mpl::_1>,
 			if_<numerical_contains<V,mpl::_2>,

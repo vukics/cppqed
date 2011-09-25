@@ -86,8 +86,8 @@ int main()
   const SlicesData sd(array);
 
   const BASI_FAST
-    begin(sd,array,boost::mpl::false_()),
-    end  (sd,array,boost::mpl:: true_());
+    begin(array,sd,boost::mpl::false_()),
+    end  (array,sd,boost::mpl:: true_());
 
   {
     dcomp res;

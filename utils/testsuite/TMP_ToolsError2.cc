@@ -1,7 +1,5 @@
 #include "TMP_Tools.h"
 
-void f()
-{
-  // Should not compile:
-  IsEvenAssert<31> error_IsEvenAssert;
-}
+// Explicit instantiation should not compile:
+
+template struct tmptools::IsEvenAssert<31>;

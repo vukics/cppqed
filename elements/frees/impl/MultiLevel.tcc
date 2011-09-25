@@ -144,7 +144,7 @@ void
 HamiltonianSch<NL,VP>::addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using namespace details;
-  mpl::for_each<typename tmptools::OrdinalMF<NL>::type>(ElementaryLevel<NL>(psi,dpsidt,zSchs_));
+  mpl::for_each<tmptools::Ordinals<NL> >(ElementaryLevel<NL>(psi,dpsidt,zSchs_));
   for_each(etas_,ElementaryPumping<NL>(psi,dpsidt));
 }
 
@@ -229,7 +229,7 @@ const typename Liouvillean<NL,VL>::JumpStrategies
 Liouvillean<NL,VL>::fillJS(const Liouvillean* liouvillean)
 {
   typename Liouvillean::JumpStrategies res;
-  mpl::for_each<typename tmptools::OrdinalMF<NLT>::type>(JS_helper(res,liouvillean));
+  mpl::for_each<tmptools::Ordinals<NLT> >(JS_helper(res,liouvillean));
   return res;
 }
 
@@ -239,7 +239,7 @@ const typename Liouvillean<NL,VL>::JumpProbabilityStrategies
 Liouvillean<NL,VL>::fillJPS(const Liouvillean* liouvillean)
 {
   typename Liouvillean::JumpProbabilityStrategies res;
-  mpl::for_each<typename tmptools::OrdinalMF<NLT>::type>(JPS_helper(res,liouvillean));
+  mpl::for_each<tmptools::Ordinals<NLT> >(JPS_helper(res,liouvillean));
   return res;
 }
 

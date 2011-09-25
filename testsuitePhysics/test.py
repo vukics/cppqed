@@ -40,7 +40,9 @@ for i in range(numberOfBits) :
       m=re.match('l\s*"[^"]*"\s*"([^"\s]*)\s',line)
       if m :
         necessaryScripts.add(m.group(1))
-print "\nNecessary scripts:", necessaryScripts, "\n"
+print "\nNecessary scripts:",
+for script in necessaryScripts : print script, 
+print "\n"
 
 scriptPath=sys.argv[2]
 for script in necessaryScripts :
