@@ -277,6 +277,8 @@ template<int RANK, typename V>
 class SlicesData
 {
 public:
+  typedef SlicesData<RANK,V> type;
+
   typedef TTD_CARRAY(RANK) CArray;
 
   typedef std::list<ptrdiff_t> Impl;

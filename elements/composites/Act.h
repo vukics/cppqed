@@ -21,6 +21,7 @@ class Act
     public BASE_class2
 {
 public:
+  typedef          BASE_class1              Vector     ;
   typedef typename BASE_class2::Interaction Interaction;
 
   explicit Act(const Interaction& ia) : BASE_class2(&ia) {}
