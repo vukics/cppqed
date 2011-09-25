@@ -11,21 +11,26 @@
 
 #include "details/TMP_helpers.h"
 
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/container/generation/make_list.hpp>
+#include <boost/fusion/algorithm/transformation/transform.hpp>
+#include <boost/fusion/container/list/convert.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/preprocessor/arithmetic/mul.hpp>
 
 
+namespace fusion=boost::fusion;
+
+
 namespace composite {
 
-using boost::fusion::make_vector;
+using fusion::make_list;
 
 namespace result_of {
 
-// using boost::fusion::result_of::make_list;
-using boost::fusion::result_of::make_vector;
+// using fusion::result_of::make_list;
+using fusion::result_of::make_list;
 
 } // result_of
 
@@ -70,7 +75,7 @@ public:
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
-  typedef typename tmptools::OrdinalMF<RANK>::type Ordinals;
+  typedef tmptools::Ordinals<RANK> Ordinals;
 
   typedef typename QS_Base::Dimensions    Dimensions   ;
   typedef typename Li_Base::Probabilities Probabilities;
@@ -91,18 +96,97 @@ private:
 
   static const Dimensions fillDimensions(const Frees&);
 
+  template<typename A> // A must be an Act type (which is also a compile-time vector)
+  class FurnishedAct : public A
+  {
+  public:
+    typedef FurnishedAct<A> type; // so that it can act as a metafunction
+    typedef blitzplusplus::SlicesData<RANK,typename A::Vector> SlicesData;
+
+    FurnishedAct(const A& a, const StateVectorLow& psiProbe) : A(a), sd_(psiProbe) {}
+
+    const SlicesData& getSlicesData() const {return sd_;}
+
+  private:
+    const SlicesData sd_;
+  };
+
+  
+  class FurnishWithAct
+  {
+  public:
+    FurnishWithAct(const Dimensions& dim) : psi_(dim) {}
+
+    template<typename> struct result;
+
+    template<typename T, typename A>
+    struct result<T(const A&)> : FurnishedAct<A> {};
+
+    template<typename A>
+    const FurnishedAct<A>
+    operator()(const A& a) const
+    {
+      std::cerr<<"here"<<std::endl;
+      return FurnishedAct<A>(a,psi_);
+    }
+
+  private:
+    const StateVectorLow psi_;
+
+  };
+  
+
+  typedef typename fusion::result_of::transform<VA const,FurnishWithAct>::type VFA;
+
+
+  class CalculateFreeSlice
+  {
+  public:
+    CalculateFreeSlice(const Dimensions& dim) : psi_(dim) {}
+
+    template<typename> struct result;
+
+#define SD_icw blitzplusplus::SlicesData<RANK,tmptools::Vector<ICW::value> >
+
+    template<typename T, typename ICW>
+    struct result<T(const ICW&)> : SD_icw {};
+
+    template<typename ICW>
+    const SD_icw
+    operator()(const ICW& icw) const
+    {
+      std::cerr<<"here Free"<<std::endl;
+      return SD_icw(psi_);
+    }
+
+#undef  SD_icw
+
+  private:
+    const StateVectorLow psi_;
+
+  };
+
+  typedef typename mpl::transform<tmptools::Ordinals<RANK>,mpl::_,mpl::back_inserter<fusion::vector<> > >::type FusionOrdinals;
+
+  // mpl::transform<tmptools::Ordinals<RANK>,mpl::_,mpl::back_inserter<> >
+
+  typedef typename fusion::result_of::as_list<typename fusion::result_of::transform<FusionOrdinals const,CalculateFreeSlice>::type>::type FreeSlicesData;
+
+
 public:
   // Constructor
 
   explicit Composite(const VA& acts) 
-    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)), frees_(FreesBase::member), acts_(acts) {}
+    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)), frees_(FreesBase::member),
+      furnishedActs_ (fusion::transform(acts            ,FurnishWithAct    (getDimensions()))),
+      freeSlicesData_(fusion::as_list(fusion::transform(FusionOrdinals(),CalculateFreeSlice(getDimensions()))))
+  {}
 
 
 private:
   // Implementing QS_Base
 
   double highestFrequency (             ) const;
-
 
   void   displayParameters(std::ostream&) const; class DisplayParameters;
 
@@ -137,10 +221,12 @@ private:
   void worker(const H&) const;
 
   // Storage
-  // Note that Frees are stored by value in FreesBase
 
-  const Frees& frees_;
-  const VA      acts_;
+  const Frees& frees_; // Frees are stored by value in FreesBase
+
+  const VFA furnishedActs_;
+
+  const FreeSlicesData freeSlicesData_;
 
 };
 
@@ -157,6 +243,6 @@ private:
 #undef BOOST_PP_ITERATION_LIMITS
 
 
-#include "impl/CompositeOld.tcc"
+#include "impl/Composite.tcc"
 
 #endif // _COMPOSITE_SYSTEM_INCLUDED
