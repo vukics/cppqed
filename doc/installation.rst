@@ -101,7 +101,7 @@ If the last command issues the error message::
 
 you have to edit ``Makefile.common`` replacing the variable ``$(PWD)`` with the path of the current directory.
 
-Alternatively, again,
+Alternatively, again::
 
   sudo checkinstall --fstrans=0 -D make install
 
