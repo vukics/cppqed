@@ -52,6 +52,8 @@ This will install the first three libraries listed above on system level.
 
 The following steps to install the remaining two libraries constitute also the script ``utils/getLibs.sh``. The ``sed`` command in the last lines of this script also demonstrates what needs to be changed in ``utils/Jamroot`` if Blitz and FLENS are installed at a location which is not in the search path of the C++ compiler/linker.
 
+.. _installBlitz:
+
 -----------------
 Install Blitz++:
 -----------------
@@ -104,6 +106,10 @@ you have to edit ``Makefile.common`` replacing the variable ``$(PWD)`` with the 
 Alternatively, again::
 
   sudo checkinstall --fstrans=0 -D make install
+
+.. note::
+
+  By default, FLENS gets installed as a shared library under ``/usr/local/lib``. If this was not in the dynamic loader's path previously, the ``ldconfig`` utility has to be used as superuser.
 
 
 ================
@@ -235,40 +241,42 @@ The ``Makefile`` also provides the pertaining option. Type::
 Mac OS X
 ============
 
-Relying on `MacPorts <http://www.macports.org/>`_, installation under Mac OS X is straightforward. There are only a few points to take care about, hence we will describe an example procedure.
+Relying on `Xcode <https://developer.apple.com/xcode>`_ and `MacPorts <http://www.macports.org/>`_, installation under Mac OS X is straightforward. The following is an example procedure on Snow Leopard:
 
-In this case, the operating system was Snow Leopard, and initially, there were two instances of GCC installed on the system:
+1. Install Xcode 3 or 4. This either comes on the application DVD which comes together with the operating system, or can be downloaded from `here <http://developer.apple.com/xcode>`_.
 
-Version ``i686-apple-darwin10-gcc-4.2.1``
-  The default version
+  .. note::
 
-Version ``gcc-mp-4.4 4.4.6.``
-  The version from MacPorts
+    Installing Xcode may appear an overkill, however, it looks as the only consistent way to obtain a complete toolchain for Unix development.
+  
+2. Macports can be installed from binary package (X11 is not needed if all we want to do is run C++QED).
 
-Since MacPorts uses the second one for its installations, to ensure binary compatibility, we will use this one to compile everything else. Install GSL and Boost.Build::
+3. Install GSL and Boost.Build:: 
 
-  port install gsl boost-build
+    sudo port selfupdate
+    sudo port install gsl boost-build
 
-Get Blitz++ from the CVS repository, and perform the steps above with the modification ::
+  .. note::
 
-  export CXX=g++-mp-4.4; ./configure --with-pic
+    In the present case, the apple darwin version of gcc-4.2 was present on the system, so GSL and all the following will be compiled with this.
 
-For simplicity, use the ``BoostIntegration`` branch::
+4. Install Blitz++ with exactly the :ref:`same commands as under linux <installBlitz>`.
 
-  bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed/BoostIntegration C++QED
+5. Install Bazaar from binary package. For simplicity, use the ``BoostIntegration`` branch::
 
-(Bazaar can be obtained from binary installer for Mac.) Copy ``utils/Jamroot.macosx`` to ``utils/Jamroot``. In your home directory, create a ``user-config.jam`` file with the single line ::
+    bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed/BoostIntegration C++QED
 
-  using darwin : 4.4 : gcc-mp-4.4 ;
+6. Copy ``utils/Jamroot.macosx`` to ``utils/Jamroot``. In your home directory, create a ``user-config.jam`` file with the single line ::
 
-(Without this, Boost.Build will pass bad options to ``ld``.) Use ::
+    using darwin : 4.2 : g++ ;
 
-  bjam with-flens=no <whatever you want to build>
+  (Without this, Boost.Build will pass bad options to ``ld``, and STL-related errors can occur as well.)
 
-since FLENS is not present on the system.
+7. Use ::
 
+    bjam with-flens=no <whatever you want to build>
 
-
+  since FLENS is not present on the system.
 
 
 
