@@ -9,7 +9,9 @@ EXECS := $(patsubst scripts/%.cc,%,$(wildcard scripts/*.cc))
 vpath %.cc scripts:$(SRCDIRS)
 vpath %.h $(SRCDIRS):utils/include
 
-include make.inc
+INCDIR := $(SRCDIRS) utils/include /opt/local/include
+LIBDIR := /opt/local/lib
+with-flens = no
 
 optimization = yes
 profiling = no

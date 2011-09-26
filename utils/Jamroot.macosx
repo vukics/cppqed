@@ -1,4 +1,4 @@
-# General-purpose Jamroot, mainly for Debian/Ubuntu
+# General-purpose Jamroot for Mac OS X
 
 project : requirements
 	  <include>/opt/local/include
