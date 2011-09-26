@@ -8,7 +8,7 @@ using blitz::Range;
 #include<boost/preprocessor/arithmetic/sub.hpp>
 
 #define BOOST_PP_ITERATION_LIMITS (2,10)
-#define BOOST_PP_FILENAME_1 "details/PartialProjectImplementationSpecializations.h"
+#define BOOST_PP_FILENAME_1 "../quantumoperator/details/PartialProjectImplementationSpecializations.h"
 
 #include BOOST_PP_ITERATE()
 

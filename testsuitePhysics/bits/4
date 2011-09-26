@@ -1,0 +1,11 @@
+#################################
+# Pure decay in composite systems
+#################################
+
+ARGS4="$ARGSTraj --qbitInit '(.4,.3)' --etat 0 --gamma 1 --deltaA 0 --eta 0 --kappa 2 --deltaC 0 --g 0"
+
+l "DecayMa.d"     "QbitMode_C++QED $ARGS4 --minit '(1.,-.5)' --evol master  "
+l "DecayEn.d"     "QbitMode_C++QED $ARGS4 --minit '(1.,-.5)' $ARGSEnsemble  "
+
+l "DecayFockMa.d" "QbitMode_C++QED $ARGS4 --minitFock 8 --evol master  "
+l "DecayFockEn.d" "QbitMode_C++QED $ARGS4 --minitFock 8 $ARGSEnsemble  "

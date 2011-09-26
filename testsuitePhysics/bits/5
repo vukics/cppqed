@@ -1,0 +1,19 @@
+####################
+# Interacting binary
+####################
+
+ARGS5="$ARGSTraj --deltaA -1000 --gamma 100 --g '(80,10)' --etat '(-8,1)' --eta '(1,8)' --kappa 10 --deltaC -62 --Dt .001 --T 1"
+
+l "QMJ_Int_Ev.d"     "QbitMode_Evolved $ARGS5                         "
+
+l "QMJ_Int_Matrix.d" "QbitMode_Matrix  $ARGS5               --no_noise"
+
+l "QMJ_Int_Si.d"     "QbitMode_C++QED  $ARGS5               --no_noise"
+
+l "QMJ_Int_En.d"     "QbitMode_C++QED  $ARGS5 $ARGSEnsemble"
+l "QMJ_Int_Ma.d"     "QbitMode_C++QED  $ARGS5 --evol master"
+
+l "QMJ_Int_MaSch.d"  "QbitMode_C++QED  $ARGS5 --evol master --picture Sch"
+
+l "QMJ_Int_SiSch.d"  "QbitMode_C++QED  $ARGS5 --picture Sch --no_noise"
+l "QMJ_Int_SiUIP.d"  "QbitMode_C++QED  $ARGS5 --picture UIP --no_noise"

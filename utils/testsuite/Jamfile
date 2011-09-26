@@ -10,7 +10,6 @@ for local ccfile in [ glob *.cc : TMP_Tools*.cc Blitz2FLENS.cc BlitzArraySliceIt
 }
 
 compile TMP_Tools.cc ;
-compile BlitzArraySliceIteratorTMP.cc ;
 
 for local ccfile in [ glob TMP_ToolsError*.cc ]
 {

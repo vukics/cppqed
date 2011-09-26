@@ -1,0 +1,12 @@
+###########################
+# Non-interacting composite
+###########################
+
+ARGS3="$ARGSTraj $ARGS0Base $ARGS2Base --g 0"
+
+l "QMJ_En.d"    "QbitMode_C++QED  $ARGS3 $ARGSEnsemble"
+l "QMJ_Ma.d"    "QbitMode_C++QED  $ARGS3 --evol master"
+# This is an example where UIP is slower than Sch because the largest frequency is the pump
+
+l "QMJ_MaSch.d" "QbitMode_C++QED  $ARGS3 --evol master --picture Sch"
+
