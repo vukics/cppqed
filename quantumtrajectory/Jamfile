@@ -1,1 +1,4 @@
-lib quantumtrajectory : [ glob *.cc ] : <library>../structure//structure <include>. : : <include>. ;
+for local ccfile in [ glob *.cc ]
+{
+	obj $(ccfile:B).o : $(ccfile) ../structure : <include>. : : <include>. ;
+}

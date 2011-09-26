@@ -1,1 +1,4 @@
-lib structure : [ glob *.cc ] : <library>../quantumdata//quantumdata : : <include>. ;
+for local ccfile in [ glob *.cc ]
+{
+	obj $(ccfile:B).o : $(ccfile) ../quantumdata : : : <include>. ;
+}

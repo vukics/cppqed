@@ -1,1 +1,4 @@
-lib quantumdata : [ glob *.cc ] : <library>/Utils//Utilslib : : <include>. ;
+for local ccfile in [ glob *.cc ]
+{
+	obj $(ccfile:B).o : $(ccfile) ..//utilslib : : : <include>. ;
+}

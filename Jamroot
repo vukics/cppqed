@@ -1,6 +1,12 @@
-use-project Utils : utils ;
-
 project : : : build-dir bin ;
+
+use-project utils : utils ;
+
+alias utilslib : utils//utilslib ;
+
+lib C++QED : quantumdata structure quantumtrajectory quantumoperator utilslib ;
+
+alias executables_link_against : : : : <library>C++QED <library>elements//el <library>utilslib <library>utils//flens ;
 
 # Core
 build-project quantumdata       ;
@@ -15,3 +21,4 @@ build-project elements  ;
 
 # Scripts
 build-project scripts ;
+alias fewerScripts : scripts//fewerScripts ;
