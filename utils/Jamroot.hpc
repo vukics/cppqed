@@ -1,0 +1,36 @@
+# Innsbruck University, Institute for Theoretical Physics, High Performance Computing Cluster
+
+lib cblaslib : : <file>/opt/atlas/3.8.2/lib/libcblas.so <link>shared ;
+lib atlaslib : : <file>/opt/atlas/3.8.2/lib/libatlas.so <link>shared ;
+
+project : requirements
+  	  <include>/home/C++QED_lib/include <library>cblaslib <library>atlaslib <include>/opt/atlas/3.8.2/include
+	: usage-requirements
+	  <include>include
+  	  <include>/home/C++QED_lib/include
+	  <variant>debug:<define>BZ_DEBUG 
+	  <define>GSL_CBLAS # This is needed so that FLENS use the CBLAS implementation of GSL
+	  <with-flens>no:<define>DO_NOT_USE_FLENS
+	: build-dir bin
+	;
+
+path-constant TOP : .. ;
+
+alias utilslib : src//utils ;
+
+build-project src       ;
+build-project test      ;
+build-project testsuite ;
+
+
+lib gsl gslcblas ;
+
+
+import feature : feature ;
+feature with-flens : yes no : optional propagated ;
+
+lib blitz : : <file>/home/C++QED_lib/lib/libblitz.a ;
+lib flenslib : : <file>/home/C++QED_lib/lib/libflens.so <link>shared ;
+
+alias flens : : <with-flens>no  ;
+alias flens : flenslib ;
