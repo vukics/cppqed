@@ -8,7 +8,7 @@ using namespace mode;
 
 const unsigned nRepeat=1000;
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
   // ****** Parameters of the Problem
 
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 
   const Composite<composite::result_of::make_vector<Act<0,1> >::type> sys(makeComposite(Act<0,1>(structure::Interaction<2>(structure::Interaction<2>::Frees(&modeH,&mode0)))));
   
-  benchmark(sys);
+  benchmark(sys,modeH,Vector<0>());
 
 }
 

@@ -13,7 +13,7 @@ struct Ia : structure::Interaction<2>, structure::TridiagonalHamiltonian<2,false
 };
 
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
   // ****** Parameters of the Problem
 
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 
   const Composite<composite::result_of::make_vector<Act<0,1> >::type> sys(makeComposite(Act<0,1>(ia)));
 
-  benchmark(sys);
+  benchmark(sys,ia,Vector<0,1>());
 
 }
 

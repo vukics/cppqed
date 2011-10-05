@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 		      Act<0,1,2,3,4>(dummy)
 				     ));
 
-  benchmark(sys);
+  benchmark(sys,ia,tmptools::Vector<0,2>());
 
 }
 

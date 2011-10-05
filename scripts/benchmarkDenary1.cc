@@ -8,7 +8,7 @@ using namespace mode;
 using structure::Interaction;
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
   // ****** Parameters of the Problem
 
@@ -28,6 +28,6 @@ int main(int argc, char* argv[])
     sys(makeComposite(Act<0,1,2,3,4,5,6,7,8,9>(Interaction<10>(Interaction<10>::Frees(&mode0,&mode0,&modeH,&mode0,&mode0,
 										      &mode0,&mode0,&mode0,&mode0,&mode0)))));
   
-  benchmark(sys);
+  benchmark(sys,modeH,Vector<2>());
 
 }
