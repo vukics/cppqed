@@ -73,79 +73,6 @@ void RunTimeRanked::operator()(const Size& idx, double v)
 
 size_t RunTimeRanked::calculateIndex(const Size& idx) const
 {
-  size_t res=0;
-  for (Size::const_iterator
-#ifndef NDEBUG
-	 z=sizes_.begin(),
-#endif
-	 i=idx.begin(),
-	 s=strides_.begin();
-       i!=idx.end();
-#ifndef NDEBUG
-       ++z,
-#endif
-	 ++i, ++s) {
-#ifndef NDEBUG
-    if (!(*z>*i)) abort();
-#endif
-    res+=(*i)*(*s);
-  }
-  return res;
-}
-
-
-
-
-class RunTimeRankedV
-{
-public:
-  static const Size calculateStrides(const Size& sizes)
-  {
-    Size res(1,1);
-    for (Size::const_iterator i=sizes.begin(); i!=sizes.end()-1; ++i)
-      res.push_back((*i)*(*--res.end()));
-    return res;
-  }
-
-  RunTimeRankedV(const Size& sizes, const Data& data)
-    : rank_(sizes.size()),
-      data_(data),
-      sizes_(sizes),
-      strides_(calculateStrides(sizes))
-  {
-    // for (Size::const_iterator i=strides_.begin(); i!=strides_.end(); ++i) cout<<*i<<' '<<endl;
-  }
-
-  double operator()(const Size&) const;
-  
-  void operator()(const Size&, double);
-
-private:
-  size_t calculateIndex(const Size&) const;
-
-  const size_t rank_;
-
-  Data data_;
-
-  const Size sizes_, strides_;
-
-};
-
-
-double RunTimeRankedV::operator()(const Size& idx) const
-{
-  return data_[calculateIndex(idx)];
-}
-
-
-void RunTimeRankedV::operator()(const Size& idx, double v)
-{
-  data_[calculateIndex(idx)]=v;
-}
-
-
-size_t RunTimeRankedV::calculateIndex(const Size& idx) const
-{
   // size_t res=0;
   switch(rank_) {
   case 1:
@@ -177,7 +104,7 @@ size_t RunTimeRankedV::calculateIndex(const Size& idx) const
       idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4]+
       idx[5]*strides_[5]+idx[6]*strides_[6]+idx[7]*strides_[7]+idx[8]*strides_[8]+idx[9]*strides_[9];
   default :
-    return 0;
+    abort();
   }
 
 }
@@ -205,24 +132,11 @@ int main()
     Size size; size+=16,15,14,17,18;
     Data temp(16*15*14*17*18);
     Size idx(5), idxv(5);
+    /*
 
     { // Handcrafted
       RunTimeRanked target(size,fillRan(temp));
       const RunTimeRanked source(size,fillRan(temp));
-
-      {
-	boost::progress_timer t;
-	for (size_t count=0; count<nRepeat; ++count)
-	  for (int j=0; j<16; ++j) {
-	    idx[0]=13; idx[1]=4; idx[2]=11; idx[3]=j; idx[4]=12;
-	    idxv[0]=11; idxv[1]=6; idxv[2]=10; idxv[3]=j+1; idxv[4]=11;
-	    target(idx,source(idxv));
-	  }
-      }
-    }
-    { // HandcraftedV
-      RunTimeRankedV target(size,fillRan(temp));
-      const RunTimeRankedV source(size,fillRan(temp));
 
       {
 	boost::progress_timer t;
@@ -245,7 +159,32 @@ int main()
 	    target(13,4,11,j,12)=source(11,6,10,j+1,11);
       }
     }
+    */
+  }
 
+
+  double  arrayBI[1028160
+    ];
+  double* arrayDY=new double[1028160
+    ];
+
+
+  {
+    boost::progress_timer t;
+    for (size_t count=0; count<nRepeat; ++count)
+      for (int j=0; j<601243
+	     ; ++j) {
+	arrayBI[123405+j]=arrayBI[296732+j];
+	arrayDY[296732+j]=arrayBI[123405+j];
+      }
+  }
+
+  {
+    boost::progress_timer t;
+    for (size_t count=0; count<nRepeat; ++count)
+      for (int j=0; j<601243
+	     ; ++j)
+	arrayDY[123405+j]=arrayDY[296732+j];
   }
 
 
