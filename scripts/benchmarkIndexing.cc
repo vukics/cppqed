@@ -15,12 +15,12 @@ using namespace boost::assign;
 using blitz::Array;
 
 typedef std::vector<double> Data;
-typedef std::vector<int> Size;
+typedef std::vector<int   > Size;
 
-const size_t nRepeat=10000000;
+const size_t nRepeat=100000000;
 
 
-class RunTimeRanked // Rank<=11, just like with blitz
+class RunTimeRanked // In this form works only for Rank=5
 {
 public:
   static const Size calculateStrides(const Size& sizes)
@@ -31,92 +31,34 @@ public:
   }
 
   RunTimeRanked(const Size& sizes, const Data& data)
-    : rank_(sizes.size()), data_(data), sizes_(sizes), strides_(calculateStrides(sizes)) {}
+    : rank_(sizes.size()), data_(data), sizes_(sizes), strides_(calculateStrides(sizes)), stridesRaw_(&strides_[0]) {}
 
-  double operator()(const Size&        ) const;
-  void   operator()(const Size&, double)      ;
 
-  double operator()(int, int, int, int, int        ) const;
-  void   operator()(int, int, int, int, int, double)      ;
+  double operator()(int i0, int i1, int i2, int i3, int i4) const     {return data_[calculateIndex(i0,i1,i2,i3,i4)]  ;}
+  void   operator()(int i0, int i1, int i2, int i3, int i4, double v) {       data_[calculateIndex(i0,i1,i2,i3,i4)]=v;}
+  // ... similar brute-force implementations for all ranks.
 
 private:
-  size_t calculateIndex(const Size&) const;
+  size_t calculateIndex(int i0, int i1, int i2, int i3, int i4) const {return i0**stridesRaw_+i1**(stridesRaw_+1)+i2**(stridesRaw_+2)+i3**(stridesRaw_+3)+i4**(stridesRaw_+4);}
+  // ... similar brute-force implementations for all ranks.
 
   const size_t rank_;
   Data data_;
   const Size sizes_, strides_;
+  const int*const stridesRaw_;
 
 };
-
-
-double RunTimeRanked::operator()(const Size& idx) const
-{
-  return data_[calculateIndex(idx)];
-}
-
-
-void RunTimeRanked::operator()(const Size& idx, double v)
-{
-  data_[calculateIndex(idx)]=v;
-}
-
-
-size_t RunTimeRanked::calculateIndex(const Size& idx) const // Brute-force implementation.
-{
-  switch(rank_) {
-  case 1:
-    return idx[0]*strides_[0];
-  case 2:
-    return idx[0]*strides_[0]+idx[1]*strides_[1];
-  case 3:
-    return idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2];
-  case 4:
-    return idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3];
-  case 5:
-    return idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4];
-  case 6:
-    return 
-      idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4]+
-      idx[5]*strides_[5];
-  case 7:
-    return 
-      idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4]+
-      idx[5]*strides_[5]+idx[6]*strides_[6];
-    return 0;
-  case 8:
-    return 
-      idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4]+
-      idx[5]*strides_[5]+idx[6]*strides_[6]+idx[7]*strides_[7];
-    return 0;
-  case 9:
-    return 
-      idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4]+
-      idx[5]*strides_[5]+idx[6]*strides_[6]+idx[7]*strides_[7]+idx[8]*strides_[8];
-    return 0;
-  case 10:
-    return 
-      idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4]+
-      idx[5]*strides_[5]+idx[6]*strides_[6]+idx[7]*strides_[7]+idx[8]*strides_[8]+idx[9]*strides_[9];
-  case 11:
-    return 
-      idx[0]*strides_[0]+idx[1]*strides_[1]+idx[2]*strides_[2]+idx[3]*strides_[3]+idx[4]*strides_[4]+
-      idx[5]*strides_[5]+idx[6]*strides_[6]+idx[7]*strides_[7]+idx[8]*strides_[8]+idx[9]*strides_[9]+
-      idx[10]*strides_[10];
-  default :
-    abort();
-  }
-
-}
-
 
 
 template<typename A>
 const A& fillRan(A& data)
 {
+  using namespace randomized;
   Randomized::SmartPtr Ran(MakerGSL()(1001));
   boost::generate(data,bind(&Randomized::operator(),Ran));
   return data;
 }
+
 
 
 int main()
@@ -125,38 +67,37 @@ int main()
   // RANK=5
   /////////
 
-  {
+  double d=0;
 
-    Size size; size+=16,15,14,17,18;
-    Data temp(16*15*14*17*18);
-    Size idx(5), idxv(5);
+  { // Handcrafted
+    Size size; size+=16,15,14,17,18 ;
+    Data temp       (16*15*14*17*18);
+    RunTimeRanked       target(size,fillRan(temp));
+    const RunTimeRanked source(size,fillRan(temp));
 
-    { // Handcrafted
-      RunTimeRanked       target(size,fillRan(temp));
-      const RunTimeRanked source(size,fillRan(temp));
-
-      {
-	boost::progress_timer t;
-	for (size_t count=0; count<nRepeat; ++count)
-	  for (int j=0; j<16; ++j) {
-	    idx [0]=13; idx [1]=4; idx [2]=11; idx [3]=j  ; idx [4]=12;
-	    idxv[0]=11; idxv[1]=6; idxv[2]=10; idxv[3]=j+1; idxv[4]=11;
-	    target(idx,source(idxv));
-	  }
-      }
+    {
+      boost::progress_timer t;
+      for (size_t count=0; count<nRepeat; ++count)
+	for (int j=1; j<16; ++j) {
+	  target(13,4,11,j,12,source(11,6,10,j+1,11));
+	  d+=target(13,4,11,j-1,12);
+	}
     }
-    { // Blitz++
-      Array<double,5> target(16,15,14,17,18), source(16,15,14,17,18);
-      fillRan(target); fillRan(source);
-
-      {
-	boost::progress_timer t;
-	for (size_t count=0; count<nRepeat; ++count)
-	  for (int j=0; j<16; ++j)
-	    target(13,4,11,j,12)=source(11,6,10,j+1,11);
-      }
-    }
-
   }
+  { // Blitz++
+    Array<double,5> target(16,15,14,17,18), source(16,15,14,17,18);
+    fillRan(target); fillRan(source);
+    
+    {
+      boost::progress_timer t;
+      for (size_t count=0; count<nRepeat; ++count)
+	for (int j=1; j<16; ++j) {
+	  target(13,4,11,j,12)=source(11,6,10,j+1,11);
+	  d+=target(13,4,11,j-1,12);
+	}
+      
+    }
+  }
+  std::cout<<d<<std::endl;
 
 }
