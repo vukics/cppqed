@@ -102,8 +102,8 @@ public:
     // Note that the multiplication with -g and conj(g) has already
     // been taken care of by ModeDynamics above
     
-    (sigma         *adagger).template apply<2>(psi_,dpsidt_);
-    (sigma.dagger()*a      ).template apply<2>(psi_,dpsidt_);
+    (sigma         *adagger).apply(psi_,dpsidt_);
+    (sigma.dagger()*a      ).apply(psi_,dpsidt_);
 
   }
 
