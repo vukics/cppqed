@@ -243,7 +243,7 @@ Mac OS X
 
 Relying on `Xcode <https://developer.apple.com/xcode>`_ and `MacPorts <http://www.macports.org/>`_, installation under Mac OS X is straightforward. The following is an example procedure on Snow Leopard:
 
-1. Install Xcode 3 or 4. This either comes on the application DVD which comes together with the operating system, or can be downloaded from `here <http://developer.apple.com/xcode>`_.
+1. Install Xcode 3 or 4. This either comes on the application DVD which comes together with the operating system, or can be downloaded from `here <http://developer.apple.com/xcode>`_. Xcode 3 is free of charge, while Xcode 4 might cost money.
 
   .. note::
 
