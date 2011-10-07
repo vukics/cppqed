@@ -15,14 +15,22 @@ template<>
 const Tridiagonal<1>::Diagonal Tridiagonal<1>::empty=Tridiagonal<1>::Diagonal();
 
 
+
+template<int RANK>
+void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+{
+}
+
+
+
 /////////
 //
 // RANK=1
 //
 /////////
 
-template<> template<>
-void Tridiagonal<1>::apply<1>(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+template<>
+void Tridiagonal<1>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using blitz::Range;
 
@@ -51,8 +59,8 @@ void Tridiagonal<1>::apply<1>(const StateVectorLow& psi, StateVectorLow& dpsidt)
 //
 /////////
 
-template<> template<>
-void Tridiagonal<2>::apply<2>(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+template<>
+void Tridiagonal<2>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using blitz::Range;
   
@@ -88,8 +96,8 @@ void Tridiagonal<2>::apply<2>(const StateVectorLow& psi, StateVectorLow& dpsidt)
 //
 /////////
 
-template<> template<>
-void Tridiagonal<3>::apply<3>(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+template<>
+void Tridiagonal<3>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using blitz::Range;
   

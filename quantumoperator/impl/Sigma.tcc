@@ -10,14 +10,17 @@ template<int L, int R, typename OTHER, bool IS_HEAD>
 class directProduct
 {
 public:
+  static const int N_RANK=OTHER::N_RANK+1;
+
+  typedef typename quantumdata::Types<N_RANK>::StateVectorLow StateVectorLow;
+
   directProduct(const OTHER& other) : other_(other) {}
 
-  template<int RANK>
   void
-  apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename quantumdata::Types<RANK>::StateVectorLow& dpsidt) const
+  apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
   {
-    typename quantumdata::Types<RANK-1>::StateVectorLow dpsidtProjected(partialProject<RANK,IS_HEAD>(dpsidt,L));
-    other_.template apply<RANK-1>(partialProject<RANK,IS_HEAD>(psi,R),dpsidtProjected);
+    typename quantumdata::Types<N_RANK-1>::StateVectorLow dpsidtProjected(partialProject<N_RANK,IS_HEAD>(dpsidt,L));
+    other_.apply(partialProject<N_RANK,IS_HEAD>(psi,R),dpsidtProjected);
   }
 
 private:

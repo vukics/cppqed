@@ -65,6 +65,7 @@ class Tridiagonal
 {
 public:
   static const int LENGTH=tmptools::Power<3,RANK>::value;
+  static const int N_RANK=RANK;
 
   typedef blitzplusplus::TinyOfArrays<dcomp,RANK,LENGTH> Diagonals;
 
@@ -92,9 +93,7 @@ public:
   Tridiagonal(const Tridiagonal<RANK2>&, const Tridiagonal<RANK-RANK2>&); // Direct product
 
 
-  template<int> // dummy template cf multiplication with Sigma
-  void
-  apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const;
+  void apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const;
 
 
   const dcomp average(const quantumdata::LazyDensityOperator<RANK>&, 
@@ -152,7 +151,7 @@ void
 apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename quantumdata::Types<RANK>::StateVectorLow& dpsidt,
       const Tridiagonal<RANK>& tridiag)
 {
-  tridiag.apply<RANK>(psi,dpsidt);
+  tridiag.apply(psi,dpsidt);
 }
 
 

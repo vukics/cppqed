@@ -25,8 +25,8 @@ print """#include "Tridiagonal.h"
 namespace quantumoperator {
 
 
-template<> template<>
-void Tridiagonal<"""+argv[1]+">::apply<"+argv[1]+""">(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+template<>
+void Tridiagonal<"""+argv[1]+">::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using blitz::Range;
   

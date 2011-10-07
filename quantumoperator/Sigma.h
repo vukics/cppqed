@@ -27,9 +27,10 @@ template<int L, int R>
 class Sigma
 {
 public:
+  static const int N_RANK=1;
+
   typedef quantumdata::Types<1>::StateVectorLow StateVectorLow;
 
-  template<int> // dummy template
   void
   apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
   {
