@@ -79,6 +79,7 @@ public:
 
 private:
   typedef mpl::int_<RANK> IntRANK;
+  typedef blitz::TinyVector<blitz::TinyVector<blitz::Range,3>,RANK> Ranges;
 
   static const mpl::int_<1> _1_  ;//=mpl::int_<1>();
   static const Diagonal     empty;//=Diagonal    ();
@@ -132,6 +133,19 @@ public:
 private:
   Tridiagonal(const Base& base, const Diagonals& diagonals, const Dimensions& differences, double tCurrent, const Diagonals& freqs)
     : Base(base), diagonals_(blitzplusplus::TOA_DeepCopy(),diagonals), differences_(differences), tCurrent_(tCurrent), freqs_(blitzplusplus::TOA_DeepCopy(),freqs) {}
+
+  template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
+  void doApply(mpl::int_<START>, V_DPSIDT, V_A, V_PSI, mpl::int_<REMAINING>,
+	       const Ranges&, const StateVectorLow&, StateVectorLow&) const;
+
+  // "Specialization" for the REMAINING=0 case:
+  // This should be specialized for all RANKs in Tridiagonal.tcc
+  template<int START, typename V_DPSIDT, typename V_A, typename V_PSI>
+  void doApply(mpl::int_<START>, V_DPSIDT, V_A, V_PSI, mpl::int_<0>,
+	       const Ranges&, const StateVectorLow&, StateVectorLow&) const;
+
+  static const Ranges fillRanges(const typename StateVectorLow::T_index&);
+
 
   Diagonals diagonals_;
 

@@ -192,8 +192,66 @@ std::ostream& operator<<(std::ostream& os, const Tridiagonal<RANK>& tridiag)
 }
 
 
+
+template<int RANK>
+void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+{
+  static const int step=tmptools::Power<3,RANK-1>::value;
+
+  using tmptools::Vector; using mpl::int_;
+
+  const Ranges ranges(fillRanges(psi.ubound()));
+
+  doApply(int_<0*step>(),Vector<0>(),Vector<0>(),Vector<0>(),int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply(int_<1*step>(),Vector<1>(),Vector<2>(),Vector<2>(),int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply(int_<2*step>(),Vector<2>(),Vector<2>(),Vector<1>(),int_<RANK-1>(),ranges,psi,dpsidt);
+
+}
+
+
+
+template<int RANK> template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
+void Tridiagonal<RANK>::doApply(mpl::int_<START>, V_DPSIDT, V_A, V_PSI, mpl::int_<REMAINING>,
+				const Ranges& ranges, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+{
+  static const int step=tmptools::Power<3,REMAINING-1>::value;
+
+  using mpl::push_back; using mpl::int_;
+
+  doApply(int_<START+0*step>(),
+	  typename push_back<V_DPSIDT,int_<0> >::type(),
+	  typename push_back<V_A     ,int_<0> >::type(),
+	  typename push_back<V_PSI   ,int_<0> >::type(),
+	  int_<REMAINING-1>(),ranges,psi,dpsidt);
+
+  doApply(int_<START+1*step>(),
+	  typename push_back<V_DPSIDT,int_<1> >::type(),
+	  typename push_back<V_A     ,int_<2> >::type(),
+	  typename push_back<V_PSI   ,int_<2> >::type(),
+	  int_<REMAINING-1>(),ranges,psi,dpsidt);
+
+  doApply(int_<START+2*step>(),
+	  typename push_back<V_DPSIDT,int_<2> >::type(),
+	  typename push_back<V_A     ,int_<2> >::type(),
+	  typename push_back<V_PSI   ,int_<1> >::type(),
+	  int_<REMAINING-1>(),ranges,psi,dpsidt);
+
+}
+
+
 } // quantumoperator
 
+
+#include<boost/preprocessor/iteration/iterate.hpp>
+#include<boost/preprocessor/repetition.hpp>
+
+#define BOOST_PP_ITERATION_LIMITS (1,11)
+#define BOOST_PP_FILENAME_1 "../../quantumoperator/details/TridiagonalApplySpecialization.h"
+
+#include BOOST_PP_ITERATE()
+
+#undef BOOST_PP_FILENAME_1
+#undef BOOST_PP_ITERATION_LIMITS
 
 
 #endif // _TRIDIAGONAL_IMPL_H
