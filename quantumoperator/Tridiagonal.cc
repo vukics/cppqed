@@ -15,7 +15,8 @@ template<>
 const Tridiagonal<1>::Diagonal Tridiagonal<1>::empty=Tridiagonal<1>::Diagonal();
 
 
-template class Tridiagonal<2>;
+
+#ifdef DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
 
 
 /////////
@@ -48,7 +49,6 @@ void Tridiagonal<1>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) co
 }
 
 
-/*
 /////////
 //
 // RANK=2
@@ -83,7 +83,6 @@ void Tridiagonal<2>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) co
   if (a(8).size()) dpsidt(I0l,I1l)+=a(8)(I0l,I1l)*psi(I0h,I1h);
 
 }
-*/
 
 
 /////////
@@ -142,6 +141,8 @@ void Tridiagonal<3>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) co
 
 }
 
+
+#endif // DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
 
 
 namespace {

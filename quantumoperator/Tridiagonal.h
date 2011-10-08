@@ -135,16 +135,29 @@ private:
     : Base(base), diagonals_(blitzplusplus::TOA_DeepCopy(),diagonals), differences_(differences), tCurrent_(tCurrent), freqs_(blitzplusplus::TOA_DeepCopy(),freqs) {}
 
   template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
-  void doApply(mpl::int_<START>, V_DPSIDT, V_A, V_PSI, mpl::int_<REMAINING>,
-	       const Ranges&, const StateVectorLow&, StateVectorLow&) const;
+  void doApply(mpl::int_<REMAINING>,const Ranges&, const StateVectorLow&, StateVectorLow&) const;
 
   // "Specialization" for the REMAINING=0 case:
   // This should be specialized for all RANKs in Tridiagonal.tcc
   template<int START, typename V_DPSIDT, typename V_A, typename V_PSI>
-  void doApply(mpl::int_<START>, V_DPSIDT, V_A, V_PSI, mpl::int_<0>,
-	       const Ranges&, const StateVectorLow&, StateVectorLow&) const;
+  void doApply(mpl::int_<0>,const Ranges&, const StateVectorLow&, StateVectorLow&) const;
 
-  static const Ranges fillRanges(const typename StateVectorLow::T_index&);
+  struct FillRangesHelper
+  {
+    typedef const typename StateVectorLow::T_index Bound;
+    
+    FillRangesHelper(Ranges& ranges, const Bound& ubound, const Dimensions& k) : ranges_(ranges), ubound_(ubound), k_(k) {}
+
+    template<typename ICW> void operator()(ICW);
+  
+  private:
+    Ranges ranges_;
+    const Bound& ubound_;
+    const Dimensions& k_;
+
+  };
+
+  const Ranges fillRanges(const typename StateVectorLow::T_index&) const;
 
 
   Diagonals diagonals_;

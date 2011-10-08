@@ -4,6 +4,8 @@
 
 #include "ComplexArrayExtensions.h"
 
+#include <boost/mpl/for_each.hpp>
+
 #include <algorithm>
 
 
@@ -192,6 +194,31 @@ std::ostream& operator<<(std::ostream& os, const Tridiagonal<RANK>& tridiag)
 }
 
 
+template<int RANK> template<typename ICW>
+void Tridiagonal<RANK>::FillRangesHelper::operator()(ICW)
+{
+  using blitz::Range;
+
+  static const int i=ICW::value;
+  
+  ranges_(i)(0)=Range(0,ubound_(i));
+  ranges_(i)(1)=Range(0,ubound_(i)-int(k_(i)));
+  ranges_(i)(2)=ranges_(i)(1)+int(k_(i));
+
+}
+
+
+
+template<int RANK>
+const typename Tridiagonal<RANK>::Ranges Tridiagonal<RANK>::fillRanges(const typename StateVectorLow::T_index& ubound) const
+{
+  Ranges res;
+  
+  mpl::for_each<tmptools::Ordinals<RANK> >(FillRangesHelper(res,ubound,differences_));
+  return res;
+}
+
+
 
 template<int RANK>
 void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
@@ -202,39 +229,39 @@ void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt)
 
   const Ranges ranges(fillRanges(psi.ubound()));
 
-  doApply(int_<0*step>(),Vector<0>(),Vector<0>(),Vector<0>(),int_<RANK-1>(),ranges,psi,dpsidt);
-  doApply(int_<1*step>(),Vector<1>(),Vector<2>(),Vector<2>(),int_<RANK-1>(),ranges,psi,dpsidt);
-  doApply(int_<2*step>(),Vector<2>(),Vector<2>(),Vector<1>(),int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply<0*step,Vector<0>,Vector<0>,Vector<0> >(int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply<1*step,Vector<1>,Vector<2>,Vector<2> >(int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply<2*step,Vector<2>,Vector<2>,Vector<1> >(int_<RANK-1>(),ranges,psi,dpsidt);
 
 }
 
 
 
 template<int RANK> template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
-void Tridiagonal<RANK>::doApply(mpl::int_<START>, V_DPSIDT, V_A, V_PSI, mpl::int_<REMAINING>,
+void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
 				const Ranges& ranges, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   static const int step=tmptools::Power<3,REMAINING-1>::value;
 
   using mpl::push_back; using mpl::int_;
 
-  doApply(int_<START+0*step>(),
-	  typename push_back<V_DPSIDT,int_<0> >::type(),
-	  typename push_back<V_A     ,int_<0> >::type(),
-	  typename push_back<V_PSI   ,int_<0> >::type(),
-	  int_<REMAINING-1>(),ranges,psi,dpsidt);
+  doApply<START+0*step,
+	  typename push_back<V_DPSIDT,int_<0> >::type,
+	  typename push_back<V_A     ,int_<0> >::type,
+	  typename push_back<V_PSI   ,int_<0> >::type>
+    (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
-  doApply(int_<START+1*step>(),
-	  typename push_back<V_DPSIDT,int_<1> >::type(),
-	  typename push_back<V_A     ,int_<2> >::type(),
-	  typename push_back<V_PSI   ,int_<2> >::type(),
-	  int_<REMAINING-1>(),ranges,psi,dpsidt);
+  doApply<START+1*step,
+	  typename push_back<V_DPSIDT,int_<1> >::type,
+	  typename push_back<V_A     ,int_<2> >::type,
+	  typename push_back<V_PSI   ,int_<2> >::type>
+    (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
-  doApply(int_<START+2*step>(),
-	  typename push_back<V_DPSIDT,int_<2> >::type(),
-	  typename push_back<V_A     ,int_<2> >::type(),
-	  typename push_back<V_PSI   ,int_<1> >::type(),
-	  int_<REMAINING-1>(),ranges,psi,dpsidt);
+  doApply<START+2*step,
+	  typename push_back<V_DPSIDT,int_<2> >::type,
+	  typename push_back<V_A     ,int_<2> >::type,
+	  typename push_back<V_PSI   ,int_<1> >::type>
+    (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
 }
 
