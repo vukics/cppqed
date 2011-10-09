@@ -282,4 +282,43 @@ void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
 #undef BOOST_PP_ITERATION_LIMITS
 
 
+#ifdef DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
+
+namespace quantumoperator {
+
+
+template<>
+void Tridiagonal<1>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<2>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<3>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<4>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<5>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<6>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<7>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<8>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+template<>
+void Tridiagonal<9>::apply(const StateVectorLow&, StateVectorLow&) const;
+
+
+} // quantumoperator
+
+
+#endif // DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
+
+
 #endif // _TRIDIAGONAL_IMPL_H
