@@ -151,7 +151,7 @@ private:
     template<typename ICW> void operator()(ICW);
   
   private:
-    Ranges ranges_;
+    Ranges& ranges_;
     const Bound& ubound_;
     const Dimensions& k_;
 

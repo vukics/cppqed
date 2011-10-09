@@ -202,8 +202,9 @@ void Tridiagonal<RANK>::FillRangesHelper::operator()(ICW)
   static const int i=ICW::value;
   
   ranges_(i)(0)=Range(0,ubound_(i));
-  ranges_(i)(1)=Range(0,ubound_(i)-int(k_(i)));
-  ranges_(i)(2)=ranges_(i)(1)+int(k_(i));
+  ranges_(i)(2)=((
+		  ranges_(i)(1)=Range(0,ubound_(i)-int(k_(i)))
+		  )+int(k_(i)));
 
 }
 
@@ -230,8 +231,8 @@ void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt)
   const Ranges ranges(fillRanges(psi.ubound()));
 
   doApply<0*step,Vector<0>,Vector<0>,Vector<0> >(int_<RANK-1>(),ranges,psi,dpsidt);
-  doApply<1*step,Vector<1>,Vector<2>,Vector<2> >(int_<RANK-1>(),ranges,psi,dpsidt);
-  doApply<2*step,Vector<2>,Vector<2>,Vector<1> >(int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply<1*step,Vector<2>,Vector<1>,Vector<1> >(int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply<2*step,Vector<1>,Vector<1>,Vector<2> >(int_<RANK-1>(),ranges,psi,dpsidt);
 
 }
 
@@ -252,15 +253,15 @@ void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
     (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
   doApply<START+1*step,
-	  typename push_back<V_DPSIDT,int_<1> >::type,
-	  typename push_back<V_A     ,int_<2> >::type,
-	  typename push_back<V_PSI   ,int_<2> >::type>
+	  typename push_back<V_DPSIDT,int_<2> >::type,
+	  typename push_back<V_A     ,int_<1> >::type,
+	  typename push_back<V_PSI   ,int_<1> >::type>
     (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
   doApply<START+2*step,
-	  typename push_back<V_DPSIDT,int_<2> >::type,
-	  typename push_back<V_A     ,int_<2> >::type,
-	  typename push_back<V_PSI   ,int_<1> >::type>
+	  typename push_back<V_DPSIDT,int_<1> >::type,
+	  typename push_back<V_A     ,int_<1> >::type,
+	  typename push_back<V_PSI   ,int_<2> >::type>
     (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
 }
