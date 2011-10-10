@@ -186,10 +186,7 @@ BOOST_AUTO_TEST_CASE( BASI_Performance )
 
   using namespace randomized; using namespace basi_performance;
 
-  Randomized::SmartPtr Ran(MakerGSL()(1001));
-
-  generate(array1,bind(&Randomized::dcompRan,Ran));
-  generate(array2,bind(&Randomized::dcompRan,Ran));
+  fillWithRandom(array2,fillWithRandom(array1));
 
   arrayRes=arrayOrig=array1;
 
@@ -253,13 +250,11 @@ struct Helper
 BOOST_AUTO_TEST_CASE( BASI_Monitor )
 {
 
-  using namespace randomized; using namespace basi_monitor;
+  using namespace basi_monitor;
 
-  Randomized::SmartPtr Ran(MakerGSL()(1001));
+  randomized::fillWithRandom(array1);
 
-  generate(array1,bind(&Randomized::dcompRan,Ran));
   array2=array1;
-  // generate(array2,bind(&Randomized::dcompRan,Ran));
 
   mpl::for_each<mpl::vector<
   tmptools::Vector<3,0,4,1,5>,

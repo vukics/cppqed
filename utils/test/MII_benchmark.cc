@@ -34,10 +34,7 @@ int main()
   TTD_CARRAY(10) array(size);
   TTD_CARRAY( 4) arrayRes/*(6,2,5,4)*/;
 
-  {
-    Randomized::SmartPtr Ran(MakerGSL()(1001));
-    boost::generate(array,bind(&Randomized::dcompRan,Ran));
-  }
+  fillWithRandom(array);
 
   { // 1
 

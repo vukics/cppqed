@@ -16,11 +16,9 @@ typedef blitzplusplus::Array<dcomp,6> MyArray;
 
 int main()
 {
-  Randomized::SmartPtr Ran(MakerGSL()(1001));
-
   Array array(blitz::shape(2,4,3,2,5,4));
 
-  boost::generate(array,bind(&Randomized::dcompRan,Ran));
+  fillWithRandom(array);
 
   array.transposeSelf(1,3,0,4,2,5);
 

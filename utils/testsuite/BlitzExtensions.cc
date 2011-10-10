@@ -42,12 +42,12 @@ typedef TTD_CARRAY(RA+1) CARP1;
 
 int main()
 {
-  Randomized::SmartPtr Ran(MakerGSL()(1001));
+  Randomized::SmartPtr ran(MakerGSL()(1001));
 
   { // 2*RePartOfSelf
     TTD_EXTTINY(RA/2) dims(6,4);
     CAR array(concatenateTinies(dims,dims));
-    generate(array,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(array,ran);
 
     CAR arrayHC(hermitianConjugate(array));
     CAR arrayReal(array.shape()); arrayReal=(array+arrayHC);
@@ -79,8 +79,7 @@ int main()
     CARM1 am1(dims0);
     CARP1 ap1(dims1);
 
-    generate(am1,bind(&Randomized::dcompRan,Ran));
-    generate(ap1,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(ap1,fillWithRandom(am1,ran));
 
     CA2R a2r(concatenateTinies(dims0,dims1));
     {
@@ -107,8 +106,7 @@ int main()
     TTD_CARRAY(6) a(concatenateTinies(dims0,dims0));
     TTD_CARRAY(5) v(dims1), vResTensor(dims1), vResBASI(dims1);
 
-    generate(a,bind(&Randomized::dcompRan,Ran));
-    generate(v,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(v,fillWithRandom(a,ran));
 
     {
       using namespace blitz::tensor;
@@ -136,8 +134,7 @@ int main()
     TTD_EXTTINY(3) dims0(4,5,2);
     TTD_CARRAY(6) rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
 
-    generate(a  ,bind(&Randomized::dcompRan,Ran));
-    generate(rho,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(rho,fillWithRandom(a,ran));
 
     {
       using namespace blitz::tensor;
@@ -160,8 +157,7 @@ int main()
     TTD_CARRAY(6) rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
     CMatrix matrixView(rankTwoArray(rho));
 
-    generate(a,bind(&Randomized::dcompRan,Ran));
-    generate(rho,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(rho,fillWithRandom(a,ran));
 
     calculateTwoTimesRealPartOfSelf(matrixView);
     {

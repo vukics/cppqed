@@ -44,8 +44,6 @@ using namespace blitz2flens;
 using namespace blitzplusplus;
 using namespace mathutils;
 
-using boost::generate;
-
 using blitz::ColumnMajorArray;
 
 const double epsilonCmp=1e-12;
@@ -67,7 +65,7 @@ typedef HeMatrixMF<RowMajor>::type HeMatrixRM;
 
 int main()
 {
-  Randomized::SmartPtr Ran(MakerGSL()(1001));
+  Randomized::SmartPtr ran(MakerGSL()(1001));
 
   TTD_EXTTINY(RA) dims(6,4,5);
 
@@ -85,7 +83,7 @@ int main()
       vrFLENS(matrix(vrBlitz,RowMajorTag()));
 
 
-    generate(matBlitz,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(matBlitz,ran);
     
     {
       CA2R a(matBlitz.copy());
@@ -127,7 +125,7 @@ int main()
       vrFLENS(matrix(vrBlitz,ColMajorTag()));
 
 
-    generate(matBlitz,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(matBlitz,ran);
     
     {
       CA2R a(matBlitz.copy());
@@ -162,7 +160,7 @@ int main()
     DAR  vecBlitz2(dims);
     CA2R matBlitz(concatenateTinies(dims,dims));
 
-    generate(matBlitz,bind(&Randomized::dcompRan,Ran));
+    fillWithRandom(matBlitz,ran);
 
     matBlitz+=hermitianConjugate(matBlitz);
     

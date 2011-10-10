@@ -9,10 +9,10 @@
 namespace randomized {
 
 
-dcomp Randomized::dcompRan() const
+const dcomp Randomized::dcompRan() const
 {
   // Note that the result of return dcomp((*this)(),(*this)()); is undefined!
-  double reRan=(*this)(), imRan=(*this)();
+  double reRan=doSample(), imRan=doSample();
   return dcomp(reRan,imRan);
 }
 
@@ -25,11 +25,9 @@ public:
 
   ~RandomizedGSL() {delete _ran_gen;}
   
-  double operator()() const {return gsl_rng_uniform(_ran_gen);}
-
-  double gaussian(double sigma) const {return gsl_ran_gaussian_ziggurat(_ran_gen,sigma);}
-
 private:
+  double doSample() const {return gsl_rng_uniform(_ran_gen);}
+
   gsl_rng*const _ran_gen;
   // NEEDS_WORK can this be wrapped into shared_ptr? the same in Evolved.cc?
 };

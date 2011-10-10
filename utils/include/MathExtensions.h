@@ -41,6 +41,11 @@ bool parity(unsigned long);
 // even --- false, odd --- true;
 
 
+inline int round(double r) {
+  return (r>0) ? floor(r+0.5) : ceil(r-0.5);
+}
+
+
 } // mathutils
 
 #endif // _CPPUTILS_MATH_H

@@ -130,11 +130,7 @@ void trafoFunction(const Array2& in, Array2& out) {out=in; swap(out(1,2),out(2,1
 
 BOOST_AUTO_TEST_CASE(MoreCompositeTransformation)
 {
-  using namespace randomized; using namespace blitzplusplus;
-  Randomized::SmartPtr Ran(MakerGSL()(1001));
-
-  boost::function<const dcomp()> RanGen(boost::bind(&Randomized::dcompRan,Ran));
-
+  using randomized::fillWithRandom; using namespace blitzplusplus;
 
   Array1 
     psi1(6), psi1v(psi1.shape()),
@@ -148,15 +144,7 @@ BOOST_AUTO_TEST_CASE(MoreCompositeTransformation)
 
   Array4 t56(3,2,3,2);
 
-
-  generate(psi1 ,RanGen);
-  generate(psi23,RanGen);
-  generate(psi4 ,RanGen);
-  generate(psi56,RanGen);
-
-  generate(t1 ,RanGen);
-  generate(t4 ,RanGen);
-  generate(t56,RanGen);
+  fillWithRandom(t56,fillWithRandom(t4,fillWithRandom(t1,fillWithRandom(psi56,fillWithRandom(psi4,fillWithRandom(psi23,fillWithRandom(psi1)))))));
 
   t1 +=hermitianConjugate(t1 );
   t4 +=hermitianConjugate(t4 );
@@ -186,7 +174,7 @@ BOOST_AUTO_TEST_CASE(MoreCompositeTransformation)
       .transform(psiAll,psiAllvv);
   }
 
-  BOOST_CHECK( max( sqrAbs(psiAllv-psiAllvv) ) < 1e-24 /* blitz::all(psiAllv==psiAllvv) */ );
+  BOOST_CHECK( max( sqrAbs(psiAllv-psiAllvv) ) < 1e-24 );
   // For some reason, there is no exact equality
 
 
@@ -209,7 +197,7 @@ BOOST_AUTO_TEST_CASE(MoreCompositeTransformation)
   }
 
 
-  BOOST_CHECK( max( sqrAbs(psiAllv-psiAllvv) ) < 1e-24 /* blitz::all(psiAllv==psiAllvv) */ );
+  BOOST_CHECK( max( sqrAbs(psiAllv-psiAllvv) ) < 1e-24 );
 
 }
 
