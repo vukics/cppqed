@@ -1,6 +1,9 @@
 #include "Tridiagonal.h"
 
-#define RANK 8
+#define RANK 5
 
-template class quantumoperator::Tridiagonal<RANK>;
+
+typedef typename quantumoperator::Tridiagonal<RANK>::StateVectorLow StateVectorLow;
+
+template void quantumoperator::Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const;
 
