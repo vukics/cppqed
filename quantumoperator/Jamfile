@@ -1,4 +1,4 @@
 for local ccfile in [ glob *.cc applyImpl/*.cc ]
 {
-	obj $(ccfile:B).o : $(ccfile) ../quantumdata : : : <include>. ;
+	obj $(ccfile:B).o : $(ccfile) ../quantumdata : <include>. : : <include>. ;
 }

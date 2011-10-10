@@ -22,7 +22,7 @@
 
 struct TridiagonalConsistencyErrorException  : public cpputils::Exception {};
 struct TridiagonalStructureMismatchException : public cpputils::Exception {};
-struct TridiagonalTimeMismatchException : public cpputils::Exception {};
+struct TridiagonalTimeMismatchException      : public cpputils::Exception {};
 
 /*
 struct TridiagonalFrequenciesDiscrepancy : public TridiagonalError {};
@@ -88,7 +88,8 @@ public:
   explicit Tridiagonal(const Diagonal& zero=empty, size_t k=0, const Diagonal& minus=empty, const Diagonal& plus=empty, bool toFreqs=false, IntRANK=_1_);
 
   Tridiagonal(const Tridiagonal& tridiag) 
-    : Base(tridiag), diagonals_(blitzplusplus::TOA_DeepCopy(),tridiag.diagonals_), differences_(tridiag.differences_), tCurrent_(tridiag.tCurrent_), freqs_(blitzplusplus::TOA_DeepCopy(),tridiag.freqs_) {}
+    : Base(tridiag), diagonals_(blitzplusplus::TOA_DeepCopy(),tridiag.diagonals_), differences_(tridiag.differences_), tCurrent_(tridiag.tCurrent_), 
+      freqs_(blitzplusplus::TOA_DeepCopy(),tridiag.freqs_) {}
 
   template<int RANK2>
   Tridiagonal(const Tridiagonal<RANK2>&, const Tridiagonal<RANK-RANK2>&); // Direct product
@@ -134,6 +135,10 @@ private:
   Tridiagonal(const Base& base, const Diagonals& diagonals, const Dimensions& differences, double tCurrent, const Diagonals& freqs)
     : Base(base), diagonals_(blitzplusplus::TOA_DeepCopy(),diagonals), differences_(differences), tCurrent_(tCurrent), freqs_(blitzplusplus::TOA_DeepCopy(),freqs) {}
 
+  ///////////////////////
+  // Apply implementation
+  ///////////////////////
+
   template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
   void doApply(mpl::int_<REMAINING>,const Ranges&, const StateVectorLow&, StateVectorLow&) const;
 
@@ -159,6 +164,9 @@ private:
 
   const Ranges fillRanges(const typename StateVectorLow::T_index&) const;
 
+  ///////
+  // Data
+  ///////
 
   Diagonals diagonals_;
 

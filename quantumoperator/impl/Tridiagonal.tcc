@@ -194,6 +194,15 @@ std::ostream& operator<<(std::ostream& os, const Tridiagonal<RANK>& tridiag)
 }
 
 
+} // quantumoperator
+
+
+#ifndef DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
+
+
+namespace quantumoperator {
+
+
 template<int RANK> template<typename ICW>
 void Tridiagonal<RANK>::FillRangesHelper::operator()(ICW)
 {
@@ -282,7 +291,7 @@ void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
 #undef BOOST_PP_ITERATION_LIMITS
 
 
-#ifdef DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
+#else // DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
 
 namespace quantumoperator {
 
