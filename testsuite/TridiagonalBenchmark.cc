@@ -1,3 +1,5 @@
+// #define DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
+
 #include "Tridiagonal.h"
 #include "StateVector.h"
 
@@ -10,7 +12,7 @@
 #include <boost/preprocessor/control/iif.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 
-#define RANK 5
+#define RANK 4
 
 using namespace std;
 
@@ -30,14 +32,15 @@ int main()
 {
   int dim=mathutils::round(pow(totalDim,1./RANK));
   
-  Diagonal1 zero(dim), minus(dim-2), plus(dim-2);
+  Diagonal1 zero(dim), minus(dim-2)//, plus(dim-2)
+    ;
 
   {
     using randomized::fillWithRandom;
-    fillWithRandom(plus,fillWithRandom(minus,fillWithRandom(zero)));
+    fillWithRandom(minus,fillWithRandom(zero));
   }
 
-  const Tridiagonal1 element(zero,2,minus,plus);
+  const Tridiagonal1 element(zero,2,minus);
 
 
 #define PRINT_factor(z,n,data) element BOOST_PP_IIF(BOOST_PP_LESS(n, BOOST_PP_SUB(RANK, 1) ) , *, ) 
