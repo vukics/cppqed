@@ -9,7 +9,7 @@ EXECS := $(patsubst scripts/%.cc,%,$(wildcard scripts/*.cc))
 vpath %.cc scripts:$(SRCDIRS)
 vpath %.h $(SRCDIRS):utils/include
 
-include make.macosx.inc
+include make.inc
 
 optimization = yes
 profiling = no

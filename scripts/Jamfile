@@ -1,6 +1,8 @@
-for local ccfile in [ glob *.cc ]
+for local ccfile in [ glob *.cc : cpcPaperExamples.cc ]
 {
 	exe $(ccfile:B) : $(ccfile) ..//executables_link_against ;
 }
+
+obj cpcPaperExamples.o : cpcPaperExamples.cc ..//executables_link_against ;
 
 alias fewerScripts : PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix ;
