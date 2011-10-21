@@ -19,7 +19,6 @@ CXX = g++
 CPPFLAGS = -ftemplate-depth-128 -w -fPIC $(foreach dir,$(INCDIR),-I$(dir)) -DGSL_CBLAS
 
 LDFLAGSLIBS := $(foreach dir,$(LIBDIR),-L$(dir))
-LDFLAGS = -L. $(LDFLAGSLIBS) -Wl,-R -Wl,"`pwd`" -Wl,-rpath-link -Wl,"`pwd`"
 
 ifeq ($(optimization),yes)
 CPPFLAGS += -finline-functions    -O3 -DNDEBUG
@@ -53,14 +52,14 @@ all : $(EXECS)
 
 STDOBJ := $(filter-out $(EXCLUDED),$(foreach dir,$(SRCDIRS),$(patsubst $(dir)/%.cc,$(dir)/%.o,$(wildcard $(dir)/*.cc))))
 
-$(EXECS) : libC++QED.so
+$(EXECS) : $(CPPQEDLIB)
 
-libC++QED.so : $(STDOBJ)
-	g++ $(LDFLAGSLIBS) $(LDLIBSTHIRDPARTY) -shared -o libC++QED.so $(STDOBJ)
+$(CPPQEDLIB) : $(STDOBJ)
+	g++ $(LDFLAGSLIBS) $(LDLIBSTHIRDPARTY) $(CPPQEDLIBLINKFLAGS) -o $(CPPQEDLIB) $(STDOBJ)
 
 clean :
 	@echo "Removing library file..."
-	rm -f libC++QED.so
+	rm -f $(CPPQEDLIB)
 	@echo "Removing object files..."
 	rm -f $(STDOBJ)
 	@echo "Removing executables..."
