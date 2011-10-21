@@ -23,7 +23,8 @@ build-project test      ;
 build-project testsuite ;
 
 
-lib gsl gslcblas ;
+lib gslcblas ;
+lib gsl : : <use>gslcblas ;
 
 
 import feature : feature ;

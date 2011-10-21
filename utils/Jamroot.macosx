@@ -21,7 +21,9 @@ build-project test      ;
 build-project testsuite ;
 
 
-lib blitz gsl gslcblas ;
+lib blitz ;
+lib gslcblas ;
+lib gsl : : <use>gslcblas ;
 
 
 import feature : feature ;
