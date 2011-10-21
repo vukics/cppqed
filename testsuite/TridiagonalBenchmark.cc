@@ -67,4 +67,6 @@ int main()
       tridiag.apply(psi(),dpsidt());
   }
 
+  // std::cout<<dpsidt();
+
 }
