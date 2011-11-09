@@ -209,6 +209,10 @@ and also to ``make``::
 
 In this case, those parts of the framework that rely on FLENS are discreetly disabled. Most notable is the calculation of the negativity of partially transposed density operators, cf. :ref:`assessingEntanglement`. The file ``utils/src/DrivenDampedHarmonicOscillator.cc`` is also basically disabled, so that :class:`DrivenDampedHarmonicOscillator` becomes unusable.
 
+.. note::
+
+  Scripts depending directly on FLENS will not compile in this case.
+
 
 =========
 ``utils``
@@ -277,6 +281,25 @@ Relying on `Xcode <https://developer.apple.com/xcode>`_ and `MacPorts <http://ww
     bjam with-flens=no <whatever you want to build>
 
   since FLENS is not present on the system.
+
+
+.. note::
+
+  It seems that on Mac, the script so built cannot be moved from where it is put by Boost.Build, and can be executed only from the root directory of the project.
+
+
+Instead of steps 6-7, one can again use ``make``, in which case in the main ``Makefile`` the line::
+
+  include make.inc
+
+has to be replaced with::
+
+  include make.macosx.inc
+
+
+.. note::
+
+  The script so built can both be moved to and executed from anywhere, as long as the built C++QED library is not moved from where it is put by ``make``, thanks to the ``-install_name`` option in ``make.macosx.inc``.
 
 
 
