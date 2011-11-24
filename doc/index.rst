@@ -24,16 +24,12 @@ To be able to write new modules representing elementary free subsystems or inter
 
    elementGuide
 
-For a deeper understanding and to be able to extend the framework with new modules, the upcoming reference manual will have to be consulted. In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
+For a deeper understanding and to be able to extend the framework with new modules, consult the constantly developing reference manual. If your problem is not (yet) covered therein, feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
 
 .. toctree::
    :maxdepth: 2
 
    Reference Manual <manual>
-
-`PyCppQED <http://github.com/bastikr/pycppqed>`_ is a Python backend for processing and visualizing data produced by the framework:
-
-* `PyCppQED documentation <http://cppqed.sourceforge.net/pyCppQED_doc/index.html>`_
 
 -------------
 ChangeLog
@@ -42,7 +38,17 @@ ChangeLog
 .. toctree::
    :maxdepth: 2
 
-   If you are using the development version from the Bazaar repository, you will need to consult the ChangeLog from time to time. <changelog>
+   When using the development version from the Bazaar repository, the ChangeLog should be consulted from time to time. <changelog>
+
+
+-------------
+PyCppQED
+-------------
+
+`PyCppQED <http://github.com/bastikr/pycppqed>`_ is a Python backend for processing and visualizing data produced by the framework:
+
+* `PyCppQED documentation <http://cppqed.sourceforge.net/pyCppQED_doc/index.html>`_
+
 
 ------------------
 Printable versions
@@ -52,7 +58,7 @@ Printable versions
 
 * :download:`Element Guide in pdf <_build/latex/C++QED_structureTutorial.pdf>`
 
-* `PyCppQED tutorial in pdf <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
+* `PyCppQED user guide in pdf <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
 
 
 
@@ -71,9 +77,9 @@ Download
     % bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed C++QED
 
 
-=========================================================================================
+=======
 Support
-=========================================================================================
+=======
 
 * `The project mailing list <https://lists.sourceforge.net/lists/listinfo/cppqed-support>`_ or ...
 
@@ -87,6 +93,8 @@ Links
 =====
 
 * `Homepage of A. Vukics at the Researh Institute for Solid State Physics & Optics <http://optics.szfki.kfki.hu/Vukics/Vukics>`_
+
+* Sebastian Krämer's :download:`Master's Thesis <_static/SebastianKraemerThesis.pdf>` at the University of Innsbruck, on simulating harmonic-oscillator modes by an adaptive set of coherent states as basis.
 
 * `Boost C++ libraries <http://www.boost.org>`_
 
@@ -107,7 +115,7 @@ To access the Bazaar repository, configure your Bazaar client as follows::
 
   bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed (read-only)
 
-  bzr+ssh://vukics@cppqed.bzr.sourceforge.net/bzrroot/cppqed (read/write)
+  bzr+ssh://vukics@cppqed.bzr.sourceforge.net/bzrroot/cppqed (read/write—replace ‘vukics’ with your username)
 
 
 .. highlight:: c++
