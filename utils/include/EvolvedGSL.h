@@ -86,7 +86,7 @@ public:
 	     SteppingFunction
 	     );
 
-  std::ostream& displayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
+  std::ostream& doDisplayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
 
 private:
   void doStep(double);

@@ -1,17 +1,12 @@
 // -*- C++ -*-
 /*
-  Evolved is intended as a common interface for (adaptive stepsize)
-  ODE drivers. It takes the Array it operates on as template
-  parameter. A given Array can be adapted to the form expected by
-  Evolved by a suitable specialization of ArrayMemoryTraits. 
 
-  The Array which is actually "Evolved" is by no means owned by
-  Evolved (meaning that it is not deallocated when an Evolved is
-  destructed).
+  Evolved is intended as a common interface for (adaptive stepsize) ODE drivers. It takes the Array it operates on as template parameter. A given Array can be adapted to the form expected by Evolved by a suitable specialization of ArrayMemoryTraits.
 
-  Note that the function calculating the derivative cannot be
-  processed as metadata: Indeed, usually it's a functor, which
-  incorporates additional data obtained at run-time.
+  The Array which is actually "Evolved" is by no means owned by Evolved (meaning that it is not deallocated when an Evolved is destructed).
+
+  Note that the function calculating the derivative cannot be processed as metadata: Indeed, usually it's a functor, which incorporates additional data obtained at run-time.
+
 */
 
 #ifndef _EVOLVED_H
@@ -25,13 +20,11 @@
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
 
+
 namespace evolved {
 
   
-namespace details {
-
-
-class EvolvedCommon : private boost::noncopyable 
+class TimeStepBookkeeper
 {
 public:
   double getTime(        ) const {return t_;}
@@ -45,16 +38,14 @@ public:
   double getEpsRel() const {return epsRel_;}
   double getEpsAbs() const {return epsAbs_;}
 
-  void update(double t, double dtTry) {dtDid_=t-t_; t_=t; dtTry_=dtTry;}
+  void update(double t, double dtTry);
 
-  virtual std::ostream& displayParameters(std::ostream&) const = 0;
+  TimeStepBookkeeper& operator=(const TimeStepBookkeeper&);
 
 protected:
-  EvolvedCommon(double dtInit, double epsRel, double epsAbs);
+  TimeStepBookkeeper(double dtInit, double epsRel, double epsAbs);
 
   void setDtDid(double dtDid) {dtDid_=dtDid;}
-
-  virtual ~EvolvedCommon() {}
 
 private:
   double t_, dtTry_, dtDid_;
@@ -62,8 +53,6 @@ private:
   const double epsRel_, epsAbs_;
 
 };
-
-} // details
 
 
 ////////////////////
@@ -73,7 +62,7 @@ private:
 ////////////////////
 
 template<typename A>
-class Evolved : public details::EvolvedCommon
+class Evolved : public TimeStepBookkeeper, private boost::noncopyable 
 {
 public:
   typedef cpputils::ArrayMemoryTraits<A> Traits;
@@ -82,14 +71,14 @@ public:
 
   typedef boost::shared_ptr<Evolved> SmartPtr;
 
-  using details::EvolvedCommon::displayParameters;
-
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
   virtual ~Evolved() {}
 
   // Takes a single adaptive step of maximum length deltaT    
   void step(double deltaT);
+
+  std::ostream& displayParameters(std::ostream& os) const {return doDisplayParameters(os);};
 
   A      & getA()       {return a_;}
   A const& getA() const {return a_;}
@@ -98,12 +87,14 @@ public:
 
 private:
   virtual void doStep(double deltaT) = 0;
+  virtual std::ostream& doDisplayParameters(std::ostream&) const = 0;
 
   A& a_;
 
   Derivs derivs_;
 
 };
+
 
 
 template<typename E>

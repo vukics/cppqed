@@ -4,12 +4,13 @@
 
 #include "MathExtensions.h"
 
+
 namespace evolved {
 
 
 template<typename A>
 Evolved<A>::Evolved(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs) 
-  : EvolvedCommon(dtInit,epsRel,epsAbs), a_(a), derivs_(derivs)
+  : TimeStepBookkeeper(dtInit,epsRel,epsAbs), a_(a), derivs_(derivs)
 {} 
 
 
@@ -25,6 +26,7 @@ void Evolved<A>::step(double deltaT)
 }
 
 
+
 template<typename E>
 void evolve(E& e, double deltaT)
 {
@@ -34,6 +36,6 @@ void evolve(E& e, double deltaT)
 // evolves for exactly deltaT
 
 
-}
+} // evolved
 
 #endif // _EVOLVED_IMPL_H
