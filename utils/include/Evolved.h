@@ -73,6 +73,8 @@ public:
 
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
+  using TimeStepBookkeeper::operator=;
+
   virtual ~Evolved() {}
 
   // Takes a single adaptive step of maximum length deltaT    

@@ -18,9 +18,12 @@ void TimeStepBookkeeper::update(double t, double dtTry)
 
 TimeStepBookkeeper& TimeStepBookkeeper::operator=(const TimeStepBookkeeper& other)
 {
-  dtDid_=other.dtDid_;
-  t_    =other.t_    ;
-  dtTry_=other.dtTry_;
+  if (&other!=this) {
+    dtDid_=other.dtDid_;
+    t_    =other.t_    ;
+    dtTry_=other.dtTry_;
+  }
+  return *this;
 }
 
 
