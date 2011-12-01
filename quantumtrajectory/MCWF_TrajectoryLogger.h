@@ -21,7 +21,8 @@ public:
 
   void step() const;
 
-  void overshot(double dp, double oldDtTry, double newDtTry) const;
+  void stepBack(double dp, double    dtDid, double newDtTry, double t) const;
+  void overshot(double dp, double oldDtTry, double newDtTry          ) const;
 
   void processNorm(double norm) const;
 
@@ -31,8 +32,8 @@ private:
   const int logLevel_;
   std::ostream& os_;
 
-  mutable size_t nSteps_, nOvershot_;
-  mutable double dpMaxOvershoot_, normMaxDeviation_;
+  mutable size_t nSteps_, nOvershot_, nToleranceOvershot_;
+  mutable double dpMaxOvershoot_, dpToleranceMaxOvershoot_, normMaxDeviation_;
 
   mutable MCWF_Trajectory traj_;
   

@@ -71,7 +71,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 	 p,
 	 evolved::MakerGSL<StateVectorLow>(p.sf),
 	 randomized::MakerGSL()),
-    tIntPic0_(0),// random_(0),
+    tIntPic0_(0),
     psi_(psi),
     qs_(&sys),
     ex_(structure::qse(&sys)),
@@ -82,7 +82,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 	: 
 	0),
     av_(structure::qsa(&sys)),
-    dpLimit_(p.dpLimit),
+    dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
@@ -133,7 +133,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
   } catch (NoPresetDtTry) {
     if (p.logLevel>1) getOstream()<<"# Adjusting initial dtTry\n";
-    manageTimeStep(Liouvillean::probabilities(0.,psi_,li_));
+    manageTimeStep(Liouvillean::probabilities(0.,psi_,li_),getEvolved().get());
     // Initially, dpLimit should not be overshot, either.
   }
 }
@@ -164,7 +164,7 @@ void MCWF_Trajectory<RANK>::displayMore(int precision) const
 
   displayEvenMore(precision);
 
-  os<</*'\t'<<high()(random_)<<*/endl;
+  os<<endl;
 
   static unsigned svdCount_=0;
   if (svdc_ && !(svdCount_%svdc_)) os<<psi_();
@@ -197,31 +197,74 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 
 template<int RANK>
 const typename MCWF_Trajectory<RANK>::IndexSVL_tuples
-MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet& dpOverDtSet, double t) const
+MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet* dpOverDtSet, double t) const
 {
   IndexSVL_tuples res;
-  for (int i=0; i<dpOverDtSet.size(); i++)
-    if (dpOverDtSet(i)<0) {
+  for (int i=0; i<dpOverDtSet->size(); i++)
+    if ((*dpOverDtSet)(i)<0) {
       StateVector psiTemp(psi_);
       Liouvillean::actWithJ(t,psiTemp(),i,li_);
       res.push_back(IndexSVL_tuple(i,psiTemp()));
-      dpOverDtSet(i)=mathutils::sqr(psiTemp.renorm());
+      (*dpOverDtSet)(i)=mathutils::sqr(psiTemp.renorm());
     } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the SVL in the tuple
   return res;
 }
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet) const
+bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper* evolvedCache) const
 {
   const double dpOverDt=std::accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
-  const double dtTry=getDtTry();
-  const double dp=dpOverDt*dtTry;
-  if (!ha_)
+  const double dtDid=getDtDid(), dtTry=getDtTry();
+
+  if (!ha_) {
+    getEvolved()->setDtTry(dpLimit_/dpOverDt); // No timestep-related problem can arise is such a way. 
+  }
+  // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
+  else if (dpOverDt*dtDid>overshootTolerance_*dpLimit_) {
+    evolvedCache->setDtTry(dpLimit_/dpOverDt);
+    (*getEvolved())=*evolvedCache;
+    logger_.stepBack(dpOverDt*dtDid,dtDid,getDtTry(),getTime());
+    return true; // Step-back required.      
+  }
+  else if (dpOverDt*dtTry>dpLimit_) {
+    // dtTry-adjustment for next step required
     getEvolved()->setDtTry(dpLimit_/dpOverDt);
-  else if (dp>dpLimit_) {
-    getEvolved()->setDtTry(dpLimit_/dpOverDt);
-    logger_.overshot(dp,dtTry,getDtTry());
+    logger_.overshot(dpOverDt*dtTry,dtTry,getDtTry());
+  }
+  
+  return false; // Step-back not required.
+}
+
+
+template<int RANK>
+void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const IndexSVL_tuples& dpOverDtSpecialSet, double t) const
+{
+  double random=(*getRandomized())()/getDtDid();
+
+  int jumpNo=0;
+  for (; random>0 && jumpNo!=dpOverDtSet.size(); random-=dpOverDtSet(jumpNo++))
+    ;
+
+  if(random<0) { // Jump No. jumpNo-1 occurs
+    struct helper
+    {
+      static bool p(int i, IndexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
+    };
+
+    typename IndexSVL_tuples::const_iterator i(find_if(dpOverDtSpecialSet,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
+    if (i!=dpOverDtSpecialSet.end())
+      // special jump
+      psi_()=i->template get<1>(); // RHS already normalized above
+    else {
+      // normal  jump
+      Liouvillean::actWithJ(t,psi_(),jumpNo,li_);
+      double normFactor=sqrt(dpOverDtSet(jumpNo));
+      if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
+      psi_()/=normFactor;
+    }
+	
+    logger_.jumpOccured(t,jumpNo);
   }
 }
 
@@ -229,47 +272,25 @@ void MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet) const
 template<int RANK>
 void MCWF_Trajectory<RANK>::step(double Dt) const
 {
+  const StateVectorLow psiCache(psi_().copy());
+  evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.
+
   double t=coherentTimeDevelopment(Dt);
 
-  // Jump
-  if (li_) {
+  // the following two should somehow be fused into a tuple:
+  DpOverDtSet dpOverDtSet(Liouvillean::probabilities(t,psi_,li_));
+  IndexSVL_tuples dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
 
-    DpOverDtSet dpOverDtSet(Liouvillean::probabilities(t,psi_,li_));
-
-    const IndexSVL_tuples dpOverDtSpecialSet=calculateDpOverDtSpecialSet(dpOverDtSet,t);
-
-    manageTimeStep(dpOverDtSet);
-
-    double random_=(*getRandomized())()/getDtDid();
-
-    {
-      int jumpNo=0;
-      for (; random_>0 && jumpNo!=dpOverDtSet.size(); random_-=dpOverDtSet(jumpNo++))
-	;
-
-      if(random_<0) { // Jump No. jumpNo-1 occurs
-	struct helper
-	{
-	  static bool p(int i, IndexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
-	};
-
-	typename IndexSVL_tuples::const_iterator i(find_if(dpOverDtSpecialSet,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
-	if (i!=dpOverDtSpecialSet.end())
-	  // special jump
-	  psi_()=i->template get<1>(); // RHS already normalized above
-	else {
-	  // normal  jump
-	  Liouvillean::actWithJ(t,psi_(),jumpNo,li_);
-	  double normFactor=sqrt(dpOverDtSet(jumpNo));
-	  if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
-	  psi_()/=normFactor;
-	}
-	
-	logger_.jumpOccured(t,jumpNo);
-      }
-    }
-
+  while (li_ && manageTimeStep(dpOverDtSet,&evolvedCache)) {
+    psi_()=psiCache;
+    t=coherentTimeDevelopment(Dt); // the next try
+    dpOverDtSet=Liouvillean::probabilities(t,psi_,li_);
+    dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
   }
+
+  // Jump
+  if (li_) 
+    performJump(dpOverDtSet,dpOverDtSpecialSet,t);
 
   logger_.step();
 

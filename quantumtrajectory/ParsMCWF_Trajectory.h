@@ -13,7 +13,7 @@ namespace quantumtrajectory {
 
 struct ParsMCWF_Trajectory : public trajectory::ParsStochasticTrajectory {
   
-  double &dpLimit;
+  double &dpLimit, &overshootTolerance;
   unsigned &svdc;
 
   std::string &initFile;
