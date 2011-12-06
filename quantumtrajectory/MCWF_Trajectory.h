@@ -109,7 +109,7 @@ private:
   double                coherentTimeDevelopment    (                                double Dt) const;
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
 
-  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*) const;
+  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true) const;
 
   void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double) const;
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed

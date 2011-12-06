@@ -36,6 +36,7 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
     dpsidt=0;
 
     Hamiltonian::addContribution(t,psi,dpsidt,tIntPic0_,ha_);
+    logger_.hamiltonianCalled();
   }
 }
 
@@ -86,7 +87,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     svdc_(p.svdc),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
-    logger_(p.logLevel,getOstream())
+    logger_(p.logLevel,ha_,getOstream())
 {
   using namespace std;
 
@@ -133,7 +134,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
   } catch (NoPresetDtTry) {
     if (p.logLevel>1) getOstream()<<"# Adjusting initial dtTry\n";
-    manageTimeStep(Liouvillean::probabilities(0.,psi_,li_),getEvolved().get());
+    manageTimeStep(Liouvillean::probabilities(0.,psi_,li_),getEvolved().get(),false);
     // Initially, dpLimit should not be overshot, either.
   }
 }
@@ -180,6 +181,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
   else {
     double stepToDo=getDtTry()>Dt ? Dt : getDtTry(); 
     getEvolved()->update(getTime()+stepToDo,stepToDo);
+    logger_.logFailedSteps(getEvolved()->nFailedSteps());
   }
 
   double t=getTime();
@@ -212,25 +214,25 @@ MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet* dpOverDtSet, dou
 
 
 template<int RANK>
-bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper* evolvedCache) const
+bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper* evolvedCache, bool logControl) const
 {
   const double dpOverDt=std::accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
   const double dtDid=getDtDid(), dtTry=getDtTry();
 
   if (!ha_) {
-    getEvolved()->setDtTry(dpLimit_/dpOverDt); // No timestep-related problem can arise is such a way. 
+    getEvolved()->setDtTry(dpLimit_/dpOverDt); // No timestep-related problem can arise is such a way.
   }
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
   else if (dpOverDt*dtDid>overshootTolerance_*dpLimit_) {
     evolvedCache->setDtTry(dpLimit_/dpOverDt);
     (*getEvolved())=*evolvedCache;
-    logger_.stepBack(dpOverDt*dtDid,dtDid,getDtTry(),getTime());
-    return true; // Step-back required.      
+    logger_.stepBack(dpOverDt*dtDid,dtDid,getDtTry(),getTime(),logControl);
+    return true; // Step-back required.
   }
   else if (dpOverDt*dtTry>dpLimit_) {
     // dtTry-adjustment for next step required
     getEvolved()->setDtTry(dpLimit_/dpOverDt);
-    logger_.overshot(dpOverDt*dtTry,dtTry,getDtTry());
+    logger_.overshot(dpOverDt*dtTry,dtTry,getDtTry(),logControl);
   }
   
   return false; // Step-back not required.
@@ -305,7 +307,7 @@ void MCWF_Trajectory<RANK>::displayParameters() const
 
   ostream& os=getOstream();
 
-  os<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<endl;
+  os<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl;
   if (svdc_) os<<"# Displaying State Vector in every "<<svdc_<<" Display"<<endl;
   os<<endl;
 

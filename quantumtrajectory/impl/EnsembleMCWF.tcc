@@ -41,6 +41,8 @@ trajectories(
 
   Trajectories res;
 
+  p.logLevel=0; // No logging of individual trajectories in an Ensemble
+
   typename StateVectors::iterator i=psis.begin();
   for (size_t j=0; j<p.nTraj; (++i, j++, p.seed++))
     res.push_back(new MCWF_Trajectory<RANK>(*i,sys,p,scaleAbs));

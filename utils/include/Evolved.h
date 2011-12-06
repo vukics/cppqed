@@ -87,9 +87,13 @@ public:
 
   const Derivs getDerivs() const {return derivs_;}
 
+  // Number of failed steps in the last timestep
+  size_t nFailedSteps() const {return reportNFailedSteps();}
+
 private:
   virtual void doStep(double deltaT) = 0;
   virtual std::ostream& doDisplayParameters(std::ostream&) const = 0;
+  virtual size_t reportNFailedSteps() const = 0;
 
   A& a_;
 
