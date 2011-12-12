@@ -1,15 +1,15 @@
 .. _appendices:
 
-================================
+********************************
 Appendices
-================================
+********************************
 
 
 .. _MCWF_method:
 
--------------------------------
+==============================
 Description of the MCWF method
--------------------------------
+==============================
 
 The MCWF method \cite{carmichael87,dalibard92,dum92,molmer93} aims at the simulation of open quantum systems based on a stochastic ("Monte Carlo") trajectory. In terms of dimensionality, this is certainly a huge advantage as compared to solving the Master equation directly. On the other hand, stochasticity requires us to run many trajectories, but the method provides an optimal sampling of the ensemble density operator so that the relative error is inversely proportional to the number of trajectories.
 
@@ -59,7 +59,7 @@ At time :math:`t` the system is in a state with normalised state vector :math:`\
 
      \delta p_m&=\delta t\,\bra{\Psi(t)} J^\dag_m J_m\ket{\Psi(t)}\geq 0.
 
-   Note that the time step :math:`\delta t` should be small enough so that this first-order calculation be valid. In particular, we require that
+   Note that the timestep :math:`\delta t` should be small enough so that this first-order calculation be valid. In particular, we require that
 
    .. math::
      :label: dplimit
@@ -79,27 +79,53 @@ At time :math:`t` the system is in a state with normalised state vector :math:`\
   
     \ket{\Psi(t+\delta t)}=\sqrt{\delta t}\frac{J_m\ket{\Psi(t)}}{\sqrt{\delta p_m}}.
 
-Obviously, however, we can and must do much better than this. Indeed, assume that for some time no quantum jump occurs, and we perform Step 1 several times consecutively. This would be equivalent to evolving the Schr\"odinger equation with the most naive first order (Euler) method, which is known to be unstable and hence fail in most cases of interest. In our framework, we choose to use instead an adaptive step-size ODE routine, usually the embedded Runge-Kutta Cash-Karp algorithm \cite{numrec}. In this case the time step is intrinsically bounded by a precision requirement in the ODE stepper, but also by the condition :eq:`dplimit`, which is taken care of by our MCWF stepper. Since in the ODE we are now much better than :math:`O(\delta t)`, the renormalisation of the state vector is performed exactly, rather than to :math:`O(\delta t)` as in Eq. :eq:`renorm_ordodt`.
 
-In many situations it pays to use some sort of interaction picture, which means that instead of Eq. :eq:`DynnU` we strive to solve 
+------------------------
+Refinement of the method
+------------------------
+
+An adaptive MCWF method
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The method as described above has several shortcomings. Firstly, subsequent steps of no-jump evolution (Step 1) reduce to the first order (Euler) method of evolving the Schrödinger equation, which is inappropriate in most cases of interest. Instead, to perform Step 1, we use an adaptive step-size ODE routine, usually the embedded Runge-Kutta Cash-Karp algorithm \cite{numrec}. This has an intrinsic time-step management, which strives to achieve an optimal stepsize within specified (absolute and relative) error bounds.
+
+A second problem with the original proposal is that it leaves unspecified what is to be done if *after the coherent step,* when calculating :math:`\delta p`, we find that condition :eq:`dplimit` is not fulfilled. (With the fixed stepsize Euler method this happens if the jump *rate* grows too big, but with the adaptive stepsize algorithm, it can happen also if the timestep grows too big.)
+
+In the framework, we adopt a further heuristic in this case, introducing a tolerance interval for too big :math:`\delta p` values: If at :math:`t+\delta t`, :math:`\delta p` overshoots a certain :math:`\delta p_\text{limit}\ll1`, then from the jump rate at this time instant, a decreased stepsize is extracted to be feeded into the ODE stepper as the stepsize to try for the next timestep. On the other hand, if :math:`\delta p` overshoots a :math:`\delta p_\text{limit}'>\delta p_\text{limit}`, then the step is altogether discarded, the state vector and the state of the ODE stepper being restored to cached states at time :math:`t`.
+
+
+.. note::
+
+  In spite of the RKCK method being of order :math:`O\lp\delta t^4\rp`, the whole method remains :math:`O\lp\sqrt{\delta t}\rp`, since the treatment of jumps is essentially the same as in the original proposal. (Events of multiple jumps in one timestep are neglected.)
+
+
+
+
+Exploiting interaction picture
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In many situations it is worth using some sort of interaction picture, which means that instead of Eq. :eq:`DynnU` we strive to solve 
 
 .. math::
 
   i\hbar\frac{d\ket{\Psi_{\text{I}}}}{dt}=U^{-1}\lp\HnH U-i\hbar\frac{dU}{dt}\rp\ket{\Psi_{\text I}},
 
-where :math:`\ket{\Psi_{\text I}}=U^{-1}\ket\Psi`. Note that :math:`U` can be nonunitary. The two pictures are accorded after each time step, i.e. before the time step :math:`\ket{\Psi_{\text I}(t)}=\ket{\Psi(t)}` and after the time step the transformation :math:`\ket{\Psi(t+\delta t)}=U(\delta t)\ket{\Psi_{\text I}(t+\delta t)}` is performed. This we do on one hand for convenience and for compatibility with the case when no interaction picture is used, but on the other hand also because :math:`U(t)` is nonunitary and hence for :math:`t\to\infty` some of its elements will become very large, while others very small, possibly resulting in numerical problems. It is in fact advisable to avoid evaluating :math:`U(t)` with very large :math:`t` arguments.
+where :math:`\ket{\Psi_{\text I}}=U^{-1}\ket\Psi`. Note that :math:`U` can be nonunitary, and therefore in general :math:`U^{-1}\neq U^\dagger`. (On non-unitary transformations in quantum mechanics cf. `these notes <http://optics.szfki.kfki.hu/~vukics/Pictures.pdf>`_.) The two pictures are accorded after each timestep, i.e. before the timestep :math:`\ket{\Psi_{\text I}(t)}=\ket{\Psi(t)}` and after the timestep the transformation :math:`\ket{\Psi(t+\delta t)}=U(\delta t)\ket{\Psi_{\text I}(t+\delta t)}` is performed. This we do on one hand for convenience and for compatibility with the case when no interaction picture is used, but on the other hand also because :math:`U(t)` is nonunitary and hence for :math:`t\to\infty` some of its elements will become very large, while others very small, possibly resulting in numerical problems. It is in fact advisable to avoid evaluating :math:`U(t)` with very large :math:`t` arguments.
+
+Cf. also the discussion at :ref:`Exact`.
 
 
 .. _NonOrthogonalFormalism:
 
---------------------------
+========================
 Nonorthogonal basis sets
---------------------------
+========================
 
+---------
 Formalism
-^^^^^^^^^^^
+---------
 
-We adopt the so-called covariant-contravariant formalism (see also \cite{artacho91}), which in physics is primarily known from the theory of relativity. Assume we have a basis :math:`\lbr\ket{i}\rbr_{i\in\mathbb{N}}`, where the basis vectors are nonorthogonal, so that the "metric tensor"
+We adopt the so-called covariant-contravariant formalism (see also \cite{artacho91}), which in physics is primarily known from the theory of relativity. Assume we have a basis :math:`\lbr\ket{i}\rbr_{i\in\mathbb{N}}`, where the basis vectors are nonorthogonal, so that the metric tensor
 
 .. math::
 
@@ -111,7 +137,7 @@ is nondiagonal. The contravariant components of a state vector :math:`\ket\Psi` 
 
   \ket\Psi\equiv\Psi^i\ket{i},
 
-where we have adopted the Einstein convention, that is, there is summation for indeces appearing twice. In this case one index has to be down, while the other one up, otherwise we have as it were a syntax error. This ensures that the result is independent of the choice of basis, as one would very well expect e.g. from the trace of an operator. The covariant components are the projections
+where we have adopted the convention that there is summation for indeces appearing twice. In this case one index has to be down, while the other one up, otherwise we have as it were a syntax error. This ensures that the result is independent of the choice of basis, as one would very well expect e.g. from the trace of an operator. The covariant components are the projections
 
 .. math::
 
@@ -149,7 +175,7 @@ While the definition of the up-indeces matrix of the operator can be read from
 
 
 Hermitian conjugation
-%%%%%%%%%%%%%%%%%%%%%%%%%
+^^^^^^^^^^^^^^^^^^^^^
 
 From the above it is easy to see that
 
@@ -179,8 +205,9 @@ where we have used the Hermiticity of the metric tensor.
 
 .. _NonOrthogonalFormalismImplications:
 
+------------
 Implications
-^^^^^^^^^^^^^
+------------
 
 If one is to apply the above formalism for density matrices in nonorthogonal bases, one has to face some strange implications: The well-known properties of Hermiticity and unit trace are split: :math:`\rho_{ij}` and :math:`\rho^{ij}` will be Hermitian matrices, but their trace is irrelevant, in fact, it is not conserved during time evolution, while :math:`{\rho_i}^j` and :math:`{\rho^i}_j` have unit conserved trace.
 
@@ -221,9 +248,9 @@ However, an actual implementor of such a function does not see the difference be
 For reference we finally list the Master equation for :math:`\rho^{ij}`:
 
 
-------------------
+================
 Some conventions
-------------------
+================
 
 The Schr\"odinger equation is:
 \begin{equation}
