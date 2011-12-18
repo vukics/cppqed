@@ -84,6 +84,8 @@ At time :math:`t` the system is in a state with normalised state vector :math:`\
 Refinement of the method
 ------------------------
 
+.. _MCWF_method_adaptive:
+
 An adaptive MCWF method
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -98,7 +100,7 @@ In the framework, we adopt a further heuristic in this case, introducing a toler
 
   In spite of the RKCK method being of order :math:`O\lp\delta t^4\rp`, the whole method remains :math:`O\lp\sqrt{\delta t}\rp`, since the treatment of jumps is essentially the same as in the original proposal. (Events of multiple jumps in one timestep are neglected.)
 
-
+For the implementation cf. :ref:`MCWF_Trajectory`.
 
 
 Exploiting interaction picture

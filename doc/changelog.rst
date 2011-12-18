@@ -5,6 +5,10 @@ ChangeLog
 The following is a list of only the more substantial changes (e.g. such as break certain applications). For a full log of development, `browse the Bazaar repository <http://cppqed.bzr.sourceforge.net/bzr/cppqed/changes>`_.
 
 
+2011/12/18 A more chiselled overshoot managment introduced in :class:`~quantumtrajectory::MCWF_Trajectory`
+
+  This entailed the introduction of the new command-line parameter ``overshootTolerance``. This has such a big default value, that backward compatibility of scripts is preserved. Cf. the discussion at :ref:`MCWF_method_adaptive` and :ref:`MCWF_Trajectory`.
+
 2011/08/16 :class:`structure::Averages` now throws an exception if it encounters ``nan`` or ``inf``.
 
   This is for avoiding numerical traps. For the moment, this works only for single trajectories.

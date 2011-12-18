@@ -219,11 +219,8 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolv
   const double dpOverDt=std::accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
   const double dtDid=getDtDid(), dtTry=getDtTry();
 
-  if (!ha_) {
-    getEvolved()->setDtTry(dpLimit_/dpOverDt); // No timestep-related problem can arise is such a way.
-  }
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
-  else if (dpOverDt*dtDid>overshootTolerance_*dpLimit_) {
+  if (dpOverDt*dtDid>overshootTolerance_*dpLimit_) {
     evolvedCache->setDtTry(dpLimit_/dpOverDt);
     (*getEvolved())=*evolvedCache;
     logger_.stepBack(dpOverDt*dtDid,dtDid,getDtTry(),getTime(),logControl);
@@ -279,20 +276,22 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 
   double t=coherentTimeDevelopment(Dt);
 
-  // the following two should somehow be fused into a tuple:
-  DpOverDtSet dpOverDtSet(Liouvillean::probabilities(t,psi_,li_));
-  IndexSVL_tuples dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
+  if (li_) {
 
-  while (li_ && manageTimeStep(dpOverDtSet,&evolvedCache)) {
-    psi_()=psiCache;
-    t=coherentTimeDevelopment(Dt); // the next try
-    dpOverDtSet=Liouvillean::probabilities(t,psi_,li_);
-    dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
-  }
+    DpOverDtSet dpOverDtSet(Liouvillean::probabilities(t,psi_,li_));
+    IndexSVL_tuples dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
 
-  // Jump
-  if (li_) 
+    while (manageTimeStep(dpOverDtSet,&evolvedCache)) {
+      psi_()=psiCache;
+      t=coherentTimeDevelopment(Dt); // the next try
+      dpOverDtSet=Liouvillean::probabilities(t,psi_,li_);
+      dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
+    }
+
+    // Jump
     performJump(dpOverDtSet,dpOverDtSpecialSet,t);
+
+  }
 
   logger_.step();
 

@@ -30,7 +30,7 @@ needs_sphinx = '1.0'
 extensions = [#'sphinx.ext.intersphinx',
   'sphinx.ext.todo', 'sphinx.ext.pngmath']
 
-pngmath_latex_preamble = r'\input '+docRootDirectory+'TexUtils/defs'
+pngmath_latex_preamble = r'\usepackage{technicalDefinitions}'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

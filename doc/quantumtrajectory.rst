@@ -24,21 +24,32 @@ MCWF trajectory
 
 In the framework, a single :ref:`Monte-Carlo wave function step <MCWF_method>` at time :math:`t` (at which point the Schrödinger- and interaction pictures coincide) is implemented as a sequence of the following stages:
 
-1. If the system time evolution has Hamiltonian part, it is evolved with an adaptive-size step (cf. :ref:`Evolved <cpputils_Evolved>`). This takes the system into :math:`t+\Delta t`.
+I. Coherent time development is applied:
 
-2. The exact part (if any) of the time evolution is applied, making that the Schrödinger and interaction pictures coincide again at :math:`t+\Delta t`.
+  #. If the system time evolution has Hamiltonian part, it is evolved with an adaptive-size step (cf. :ref:`Evolved <cpputils_Evolved>`). This takes the system into :math:`t+\Delta t`.
 
-3. The state vector is renormalized.
+  #. The exact part (if any) of the time evolution is applied, making that the Schrödinger and interaction pictures coincide again at :math:`t+\Delta t`.
 
-4. If the system is Liouvillean, the possible occurence of a quantum jump is considered:
+  #. The state vector is renormalized.
+
+II. If the system is *not* Liouvillean, the timestep ends here, reducing to a simple ODE evolution. Otherwise:
 
   #. The rates (probabilities per unit time) corresponding to all jump operators are calculated. If some rates are found negative ("special jump", cf. explanation at :func:`~structure::Liouvillean::probabilities`), then :math:`J_\text{at}\ket\Psi` is calculated (and tabulated) instead, and the probability is calculated as :math:`\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2`.
 
-  #. The total jump rate :math:`\delta r` is calculated.
+  #. First, it is verified whether the total jump probability is not too big. Cf. also the discussion at :ref:`MCWF_method_adaptive`. This is performed on two levels:
 
-  #. It is randomly decided which (if any) of the jumps to perform. If it is found to be a special jump, then the tabulated :math:`J_\text{at}\ket\Psi` is taken.
+    a. The total jump rate :math:`\delta r` is calculated.
 
-5. Time-step management is performed: the adaptive-stepsize ODE stepper gives a guess for the next timestep (:math:`\Delta t_\text{next}`). If the probability :math:`\delta r\Delta t_\text{next}` is found to overshoot a given limit (usually 0.1), then the next timestep is decreased.
+    b. If :math:`\delta r\delta t>\delta p_\text{limit}'`, the step is retraced: both the state vector and the state of the ODE stepper are restored to cached values at the beginning of the timestep, and phase I. is performed anew with a smaller stepsize :math:`\delta p_\text{limit}/\delta r`. With this, we ensure that :math:`\delta p_\text{limit}` is likely not to be overshot in the next try.
+
+      .. note:: It is assumed that :math:`\delta p_\text{limit}'>\delta p_\text{limit}`, their ratio being a parameter of the MCWF stepper.
+
+    c. If just :math:`\delta r\delta t_\text{next}>\delta p_\text{limit}` (where :math:`\Delta t_\text{next}` is a guess for the next timestep given by the ODE stepper), the coherent step is accepted, but the timestep to try next is modified, to reduce the likeliness of overshoot: :math:`\delta t_\text{next}\longrightarrow\delta p_\text{limit}/\delta r`.
+
+  3. After a successful coherent step resulting in an acceptable :math:`\delta r`, the possible occurence of a quantum jump is considered: It is randomly decided which (if any) of the jumps to perform. If it is found to be a special jump, then the tabulated :math:`J_\text{at}\ket\Psi` is taken.
+
+
+.. note:: In phase II.2.b., another approach would be not to trace back the whole step, but make a coherent step *backwards* to an intermediate time instant found by linear interpolation. This has several drawbacks, however, the most significant being that in the ODE stepper, it is not clear what to take as the timestep to try at the point when the direction of time is reversed. (Although in :class:`Evolved` it is simply taken to be the timestep done in the last step…)
 
 
 .. class:: quantumtrajectory::MCWF_Trajectory
