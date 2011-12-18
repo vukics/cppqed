@@ -107,13 +107,14 @@ private:
   void displayMore(int) const;
 
   double                coherentTimeDevelopment    (                                double Dt) const;
-  const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet& dpOverDtSet, double  t) const;
-  void                  manageTimeStep             (const DpOverDtSet& dpOverDtSet           ) const;
+  const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
+
+  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true) const;
+
+  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double) const;
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
-  // mutable double random_   ; 
-  // Maybe put into StochasticTrajectory somehow.
 
   StateVector& psi_;
 
@@ -123,7 +124,7 @@ private:
   const Liouvillean  *const li_; 
   const Averaged     *const av_;
 
-  const double dpLimit_;
+  const double dpLimit_, overshootTolerance_;
 
   const unsigned svdc_;
 

@@ -19,10 +19,9 @@ void run(T& traj, double time, D d, void (*doRun)(T&,double,D), bool timestep, b
   if (displayInfo) {
     if (!traj.getTime()) {
       traj.displayParameters();
-      traj.getOstream()<<"# Run Trajectory. Displaying in every "<<d<<(timestep ? " timestep" : "")<<endl<<endl
-		       <<"# Key to data:"<<endl;
+      traj.getOstream()<<endl<<"# Key to data:"<<endl;
       traj.displayKey();
-      traj.getOstream()<<endl;
+      traj.getOstream()<<endl<<"# Run Trajectory. Displaying in every "<<d<<(timestep ? " timestep" : "")<<endl<<endl;
     }
     else traj.getOstream()<<"# Continuing..."<<endl;
   }

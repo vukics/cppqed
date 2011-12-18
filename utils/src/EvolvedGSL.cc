@@ -28,6 +28,7 @@ private:
   gsl_odeiv_evolve *const e_;
 
   friend void apply(ImplSmartPtr,double*,double,double*,double*);
+  friend size_t extractFailedSteps(ImplSmartPtr);
 
 };
 
@@ -76,6 +77,12 @@ void apply(ImplSmartPtr p, double* t, double t1, double* h, double* y)
 {
   gsl_odeiv_evolve_reset(p->e_);
   gsl_odeiv_evolve_apply(p->e_,p->c_,p->s_,&p->dydt_,t,t1,h,y);
+}
+
+
+size_t extractFailedSteps(ImplSmartPtr p)
+{
+  return p->e_->failed_steps;
 }
 
 

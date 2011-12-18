@@ -54,6 +54,8 @@ ImplSmartPtr createImpl(void*, size_t, int(double,const double*,double*,void*), 
 
 void apply(ImplSmartPtr, double*, double, double*, double*);
 
+size_t extractFailedSteps(ImplSmartPtr);
+
 extern const int onSuccess;
 
 class NonContiguousStorageException : public cpputils::Exception {};
@@ -86,12 +88,14 @@ public:
 	     SteppingFunction
 	     );
 
-  std::ostream& displayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
+  std::ostream& doDisplayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
 
 private:
   void doStep(double);
 
-  ImplSmartPtr pImpl_;
+  size_t reportNFailedSteps() const {return extractFailedSteps(pImpl_);}
+
+  const ImplSmartPtr pImpl_;
 
   const SteppingFunction sf_;
 

@@ -5,6 +5,8 @@
 
 namespace evolved {
 
+class TimeStepBookkeeper;
+
 template<typename>
 class Evolved;
 

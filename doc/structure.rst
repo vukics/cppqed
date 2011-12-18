@@ -411,6 +411,8 @@ E.g. if :class:`~quantumtrajectory::MCWF_Trajectory` sees that the simulated sys
 
     Pure virtual. The first argument is missing when ``IS_TD=false``.
 
+    It is always possible to forgo the explicit calculation of certain probabilities because the probability can be calculated also on the basis of the :func:`actWithJ` by the MCWF stepper. The fact that such a fallback is desired can be signalled by setting a negative value for the probability of the given jump ("special jump").
+
   .. function:: void actWithJ(double t, StateVectorLow& psi, size_t jumpNo) const
 
     Pure virtual. The first argument is missing when ``IS_TD=false``. The last argument describes which jump is to be performed (a system may define several, assigning an ordinal to each of them).
