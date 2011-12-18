@@ -87,10 +87,14 @@ Implementation
 
     The arguments ``zero``, ``minus``, ``plus``, and ``k`` correspond respectively to :math:`\alpha^{(0)}`, :math:`\alpha^{(-)}`, :math:`\alpha^{(+)}`, and :math:`K`
 
+  .. note::
+
+    It is a dilemma whether the parameter ``k`` should be considered a compile-time or a runtime parameter. In the majority of cases it is known already an compile time (e.g. ladder operators, angular momentum operators, etc.). The reason why it is treated as a runtime parameter is spatial degrees of freedom. There, operators like :math:`sin(Kx)`, :math:`cos(Kx)`, etc., are also tridiagonal in momentum space, and we wanted to have to possibility of specifying :math:`k` at runtime.
+
 
   .. function:: Tridiagonal(const Tridiagonal& tridiag)
 
-    Copy constructor with deep copy semantics.
+    Copy constructor with deep-copy semantics.
 
   .. function:: Tridiagonal(const Tridiagonal<RANK2>& tridiag1, const Tridiagonal<RANK__MI__RANK2>& tridiag2)
 
@@ -108,7 +112,7 @@ Implementation
 
 .. note::
 
-  A serious limitation of :class:`~quantumoperator::Tridiagonal` is that the composition of two such operators does not in general yield one of the same form. This is one of the reasons why we are planning to deprecate :class:`~quantumoperator::Tridiagonal` in favour of a much more general form 
+  A serious limitation of :class:`~quantumoperator::Tridiagonal` is that the composition of two such operators does not in general yield an operator of the same form. This is one of the reasons why we are planning to deprecate :class:`~quantumoperator::Tridiagonal` in favour of a much more general form 
 
   .. math::
 
