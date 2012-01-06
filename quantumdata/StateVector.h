@@ -54,14 +54,20 @@ public:
   using LDO_Base::getTotalDimension; using ABase::operator(); using ABase::vectorView;
 
   StateVector(const StateVectorLow& psi, ByReference) : LDO_Base(psi.shape()), ABase(psi) {}
-  // By reference semantics! Simply furnishes an already existing StateVectorLow with a StateVector interface.
+  // By-reference semantics! Simply furnishes an already existing StateVectorLow with a StateVector interface.
   // The trailing dummy argument is there only to make the user conscious of this fact.
 
   explicit StateVector(const Dimensions&, bool init=true);
 
   StateVector(const StateVector&); // use by value semantics (deep copy)
 
-  // Default assignment is fine.
+  // Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
+  StateVector& operator=(const StateVector& sv) {operator=<StateVector>(sv); return *this;}
+
+  template<typename OTHER>
+  StateVector& operator=(const OTHER& other) {ABase::operator=(other); return *this;}
+  // Together with the default assigment, this covers a lot of possibilities, including assignment from a StateVectorLow
+
 
   // direct product
   template<int RANK2>
@@ -73,9 +79,6 @@ public:
   const DensityOperatorLow dyad(const StateVector&) const;
   const DensityOperatorLow dyad(                  ) const {return dyad(*this);}
 
-  template<typename OTHER>
-  StateVector& operator=(const OTHER& other) {operator()()=other; return *this;}
-  // Together with the default assigment, this covers a lot of possibilities, including assignment from a StateVectorLow
 
   // naive operations for vector space
 
