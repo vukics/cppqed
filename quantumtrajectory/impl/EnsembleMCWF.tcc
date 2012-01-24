@@ -41,7 +41,7 @@ trajectories(
 
   Trajectories res;
 
-  p.logLevel=0; // No logging of individual trajectories in an Ensemble
+  p.logLevel=(p.logLevel>0 ? 1 : 0); // reduced logging for individual trajectories in an Ensemble
 
   typename StateVectors::iterator i=psis.begin();
   for (size_t j=0; j<p.nTraj; (++i, j++, p.seed++))
