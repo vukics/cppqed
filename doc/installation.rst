@@ -185,14 +185,6 @@ Boost.Build, just like ``make``, supports parallel compilation, which can make a
 C++QEDv2 has been successfully compiled on several Linux platforms and :ref:`Mac OS X (cf. section below) <installingOnMacOsX>`. In all cases the GNU C++ Compiler has been used. It also compiles with the `clang++ <http://clang.llvm.org/>`_ compiler. Portability to other compilers remains to be demonstrated.
 
 
-.. todo::
-
-   In the make version of build, clarify dynamic linkage.
-
-.. todo::
-
-   Test framework with icc + under Windows
-
 .. _compilingWithoutFLENS:
 
 -------------------------

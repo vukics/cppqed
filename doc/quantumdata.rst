@@ -210,10 +210,6 @@ On higher levels of the framework, the iteration is performed via the function:
   ``T`` is an arithmetic type which must be default-constructible.
     The trailing function argument is only a dummy one, facilitating template-argument deduction.
 
-    .. todo::
-
-      (Re)consider whether it is not better to use the last argument's value as initial value in the accumulation. In this case one has to be careful e.g. that it is not correct to assign to a default-constructed ``blitz::Array``.
-
   ``F`` is a functor with signature
     ``const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)``
 

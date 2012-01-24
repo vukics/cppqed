@@ -27,8 +27,8 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [#'sphinx.ext.intersphinx',
-  'sphinx.ext.todo', 'sphinx.ext.pngmath']
+extensions = [#'sphinx.ext.intersphinx', 'sphinx.ext.todo', 
+    'sphinx.ext.pngmath']
 
 pngmath_latex_preamble = r'\usepackage{technicalDefinitions}'
 
@@ -198,7 +198,7 @@ latex_preamble = pngmath_latex_preamble
 # If false, no module index is generated.
 #latex_domain_indices = True
 
-todo_include_todos=False
+# todo_include_todos=False
 
 # The master toctree document.
 master_doc = 'index'

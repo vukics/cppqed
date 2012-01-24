@@ -43,8 +43,6 @@ Overview
 
    rationales
 
-   todolist
-
 
 ===============
 Full contents
@@ -80,8 +78,6 @@ Full contents
    appendices
 
    rationales
-
-   todolist
 
 
 

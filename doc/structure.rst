@@ -303,10 +303,6 @@ This class describes interaction between free systems.
 
     1. The contribution has to be *added* to ``dpsidt`` instead of ``dpsidt`` being *replaced*. This is because when the given system is embedded in a larger system, other (sub)systems may also contribute.
 
-      .. todo::
-
-        Somehow signal to the function whether it has to add or replace.
-
     2. The function has to calculate the effect of :math:`\frac{H(t)}i` and not merely :math:`H`, since it is the former which determines the derivative of the state vector. This is so often missed, that we emphasize it again (although we know that it will still be missed from time to time):
 
       .. warning::

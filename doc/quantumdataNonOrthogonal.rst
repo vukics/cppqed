@@ -11,11 +11,6 @@ Non-orthogonal state vector
 
 
 
-.. todo::
-
-  Non-orthogonal part of quantumdata.
-
-
 *********************************
 Non-orthogonal density operator
 *********************************
@@ -28,7 +23,3 @@ Non-orthogonal density operator
   ``template <int RANK, typename TRAFO>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
 
-
-.. todo::
-
-  Non-orthogonal part of quantumdata.

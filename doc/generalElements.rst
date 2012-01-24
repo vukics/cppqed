@@ -49,12 +49,6 @@ where we have introduced
   template<typename A>
 
 
-.. todo::
-
-   Clarify mfNKX_AbsSqr
-
-
-
 
 
 .. _generalElements_Particle:
@@ -70,10 +64,6 @@ Particle in momentum space
 
   H_\text{kinetic}=\frac{p^2}{2m}\equiv\omrec k^2
 
-
-.. todo::
-
-   Particle::Averaged is wasteful since it FFTs a matrix even in the case when the LazyDensityOperator it receives is in fact a StateVector. Solution: implement an fft in LazyDensityOperator depending on its "origin". 
 
 Interactions
 ^^^^^^^^^^^^^^
@@ -133,6 +123,5 @@ g pump mode function, f cavity mode function
 Other
 ------------------
 
-.. todo::
 
-   Implement a bosonic many-body system with an arbitrary number of modes (the number known at compile time). The mode operators can be sparse matrices. This needs the system of extended quantum operators.
+

@@ -31,18 +31,3 @@ To store and manipulate the heterogenous collection of slicing indeces like ``0,
 A special implementation is needed when the size of the compile-time vector ``V`` equals ``RANK`` because in this case actually no slicing takes place, only transposition. For this, as at several other places in the framework, we apply conditional inheritance: :class:`~blitzplusplus::basi::Iterator` inherits from either of two classes (``IteratorBase`` or ``IteratorBaseSpecial``), the decision being made at compile time with the help of ``mpl::if_c``.
 
 The iteration over dummy indeces is implemented with the help of :class:`~cpputils::MultiIndexIterator`.
-
-
-.. todo::
-
-  Implement default versions of :class:`~blitzplusplus::basi::Iterator`\ s for the case when no slicing needs to be performed, that is, when the compile-time vector equals a range<0,RANK-1>. This is, however, not easy, because not a type but some property of the type is the criterion of selection.
-
-.. todo::
-
-  It would be desirable to refine the iterator category according to the `New-Style Iterator <http://www.boost.org/doc/libs/1_44_0/libs/iterator/doc/index.html#new-style-iterators>`_ concepts. A Blitz++.Array is not a container of slices, so :class:`~blitzplusplus::basi::Iterator` is definitely not a standard iterator. It seems rather like a proxy iterator. 
-
-
-.. todo::
-
-  Where templates are such that they accept only a very restricted set of types, this should be checked for. Examples are :class:`blitzplusplus::basi::Iterator`'s V parameter or :class:`Composite`'s VA. An implementation could be that these types are derived from some tag class and then a static assertion with the help of is_base_of could be performed. An other solution can be Boost.ConceptChecking
-

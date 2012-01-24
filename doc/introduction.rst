@@ -50,11 +50,6 @@ Our own extensions to blitz can be found in :ref:`C++Utils <cpputils>` and are d
 
   namespace blitzplusplus
 
-.. todo:: 
-
-   Try to make an array class which acts and feels like a blitz::Array with respect to the functionality needed here. It could be much simpler, leaving every work to the underlying blitz::Array storage, but solving this silly problem of size_t, ptrdiff_t, int conversions. This is not very easy at the moment because of the immense number of constructors a blitz::Array provides, but with the constructor inheritance of C++0x it should be easy.
-
-
 
 .. _globalDefs:
 

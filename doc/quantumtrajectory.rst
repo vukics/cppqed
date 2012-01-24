@@ -7,12 +7,6 @@ The ``quantumtrajectory`` namespace
 .. image:: figures/trajectory.png
    :width: 801
    
-   
-.. todo::
-
-   Apply Boost.Parameter for facilitating call of functions with complex signature, e.g. constructors of complex classes, especially in cases like in the trajectory bundle where many sensible default parameter values could be defined. (Eg. it is extremely tedious scaleAbs needs to be specified each time.) This is in general most useful for constructors of complex classes.
-
-
 
 .. _MCWF_Trajectory:
 
