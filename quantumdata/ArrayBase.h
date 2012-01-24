@@ -4,8 +4,9 @@
 
 #include "ArrayBaseFwd.h"
 
-#include "CMatrix.h"
 #include "BlitzArrayExtensions.h"
+#include "CMatrix.h"
+#include "ComplexArrayExtensions.h"
 
 
 namespace quantumdata {
@@ -50,6 +51,7 @@ protected:
   CVector       vectorView()       {return blitzplusplus::rankOneArray(arrayLow_);}
   // The usual technique doesn't work here, because `CVector is not a pointer, reference, nor a pointer-to-data-member type'
 
+  double frobeniusNorm() const {return sqrt(sum(blitzplusplus::sqrAbs(arrayLow_)));}
 
 private:
   ArrayBase(const ArrayBase&); // forbid copying

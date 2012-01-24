@@ -29,6 +29,10 @@ const DensityOperator<RANK1+RANK2>
 operator*(const DensityOperator<RANK1>&, const DensityOperator<RANK2>&);
 
 
+template<int RANK>
+inline
+double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm();}
+
 
 template<int RANK>
 class DensityOperator
@@ -48,7 +52,7 @@ public:
 
   typedef linalg::CMatrix CMatrix;
 
-  using ABase::operator();
+  using ABase::operator(); using ABase::frobeniusNorm;
 
   /*
   DensityOperator() : Base() {}
