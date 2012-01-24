@@ -86,9 +86,9 @@ EnsembleTrajectories<T,T_ELEM>::evolve(double deltaT) const
 
 template<typename T, typename T_ELEM>
 const typename EnsembleTrajectories<T,T_ELEM>::TBA_Type
-EnsembleTrajectories<T,T_ELEM>::toBeAveraged() const
+EnsembleTrajectories<T,T_ELEM>::toBeAveraged(size_t begin, size_t n) const
 {
-  return EnsembleTrajectoriesTraits<T,T_ELEM>::toBeAveraged(*this);
+  return EnsembleTrajectoriesTraits<T,T_ELEM>::toBeAveraged(trajs_.begin()+begin,trajs_.begin()+(begin+n),*this);
 
 }
 
@@ -99,16 +99,13 @@ EnsembleTrajectories<T,T_ELEM>::toBeAveraged() const
 
 template<typename T, typename T_ELEM>
 const typename EnsembleTrajectoriesTraits<T,T_ELEM>::TBA_Type 
-EnsembleTrajectoriesTraits<T,T_ELEM>::toBeAveraged(const ET& et)
+EnsembleTrajectoriesTraits<T,T_ELEM>::toBeAveraged(typename Impl::const_iterator begin, typename Impl::const_iterator end, const ET&)
 {
-  const Impl& trajs(et.getTrajs());
-  return T(cpputils::accumulate(++trajs.begin(),trajs.end(),trajs.begin()->toBeAveraged(),
-				bind(&Elem::toBeAveraged,_1),
-				cpputils::plus<T>())/size2Double(trajs.size()));
+  return T(cpputils::accumulate(++begin,end,begin->toBeAveraged(),bind(&Elem::toBeAveraged,_1),cpputils::plus<T>())/size2Double(end-begin));
 }
 
 
-// A tentative specialization for the case when IS_REF=true and T_ELEM has a member function addTo
+// A tentative specialization for the case when TBA_Type is a reference, it has a member function getInitializedTBA, and T_ELEM has a member function addTo
 
 template<typename T, typename T_ELEM>
 class EnsembleTrajectoriesTraits<T&,T_ELEM>
@@ -120,14 +117,13 @@ public:
   typedef typename ET::Impl     Impl    ;
   typedef typename ET::TBA_Type TBA_Type;
 
-  static const TBA_Type toBeAveraged(const ET& et)
+  static const TBA_Type toBeAveraged(typename Impl::const_iterator begin, typename Impl::const_iterator end, const ET& et)
   {
     TBA_Type res(et.getInitializedTBA());
-    const Impl& trajs(et.getTrajs());
     
-    for (typename Impl::const_iterator i=trajs.begin(); i!=trajs.end(); i++) i->toBeAveraged().addTo(res);
+    for (typename Impl::const_iterator i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
 
-    return res/=size2Double(trajs.size());
+    return res/=size2Double(end-begin);
 
   }
 
