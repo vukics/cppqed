@@ -56,28 +56,8 @@ int main(int argc, char* argv[])
 
   const CMatrix hamiltonian(calculateMatrix(system2));
 
-  TimeIndependentMatrixHamiltonian system1(CMatrix(hamiltonian/DCOMP_I));
-
-  quantumtrajectory::MCWF_Trajectory<1> traj(psi1,system1,pe);
+  evolve(psi1,TimeIndependentMatrixHamiltonianAveraged<2>(CMatrix(hamiltonian/DCOMP_I),system2,psi2),pe);
   
-  {
-
-#define TRAJ_DISPLAY traj.getOstream()<<special()(traj.getTime())<<special()(traj.getDtDid()); structure::Averaged<2>::display(0,psi2,traj.getOstream(),pe.precision,&system2); traj.getOstream()<<endl;
-
-    traj.displayParameters();
-    traj.getOstream()<<"# Run Trajectory. Displaying in every "<<pe.Dt<<endl<<endl
-		     <<"# Key to data:"<<endl;
-    traj.displayKey();
-    traj.getOstream()<<endl;
-    TRAJ_DISPLAY
-    while (traj.getTime()<pe.T) {
-      traj.evolve(std::min(pe.Dt,pe.T-traj.getTime()));
-      TRAJ_DISPLAY
-    }
-
-  }
-
-
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 
 

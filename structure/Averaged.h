@@ -51,11 +51,8 @@ public:
 
 
   virtual void   process   (Averages&)                           const = 0;
-
-protected:
   virtual void   display   (const Averages&, std::ostream&, int) const = 0;
 
-private:
   virtual void   displayKey(std::ostream&, size_t&) const = 0;
   virtual size_t nAvr      ()                       const = 0;
 
@@ -111,7 +108,6 @@ public:
 
   virtual ~Averaged() {}
 
-private:
   virtual const Averages average(double, const LazyDensityOperator&) const = 0;
 
 };
@@ -127,7 +123,6 @@ public:
 
   virtual const Averages average(const LazyDensityOperator&) const = 0;
 
-private:
   const Averages average(double, const LazyDensityOperator& matrix) const {return average(matrix);}
 
 };
