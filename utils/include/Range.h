@@ -4,9 +4,8 @@
 
 #include "Algorithm.h"
 
-#include "range_ex/algorithm.hpp"
-
 #include <boost/range.hpp>
+#include <boost/range/algorithm.hpp>
 
 
 namespace cpputils {
@@ -27,8 +26,8 @@ for_each(      Range& r, In2 i2, Function f)
 }
 
 
-
 } // cpputils
+
 
 
 #endif // _RANGE_UTILS_INCLUDED

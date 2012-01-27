@@ -5,6 +5,7 @@
 #include "ComplexArrayExtensions.h"
 
 #include <boost/mpl/for_each.hpp>
+#include <boost/range/algorithm_ext/for_each.hpp>
 
 #include <algorithm>
 
@@ -76,7 +77,7 @@ const Tridiagonal<RANK> Tridiagonal<RANK>::hermitianConjugate() const
 
 namespace details {
 
-size_t binOp1(size_t otherDifference, size_t& difference);
+void binOp1(size_t otherDifference, size_t& difference);
 
 } // details
 
@@ -87,7 +88,7 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
 {
   struct helper
   {
-    static typename Tridiagonal<RANK>::Diagonal& 
+    static void
     doIt1(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
     {
       if (from.size()) {
@@ -97,10 +98,9 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
 	}
 	else to+=from; // This will check for the compatibility of shapes
       }
-      return to;
     }
 
-    static typename Tridiagonal<RANK>::Diagonal& 
+    static void
     doIt2(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
     {
       if (from.size()) {
@@ -110,14 +110,13 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
 	  to=from;
 	}
       }
-      return to;
     }
 
   };
 
-  boost::transform(tridiag.differences_,differences_.begin(),differences_.begin(),details::binOp1);
-  boost::transform(tridiag.  diagonals_,  diagonals_.begin(),  diagonals_.begin(), helper::doIt1 );
-  boost::transform(tridiag.      freqs_,      freqs_.begin(),      freqs_.begin(), helper::doIt2 );
+  boost::for_each(tridiag.differences_,differences_,details::binOp1);
+  boost::for_each(tridiag.  diagonals_,  diagonals_, helper::doIt1 );
+  boost::for_each(tridiag.      freqs_,      freqs_, helper::doIt2 );
 
   return *this;
 
