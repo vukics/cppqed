@@ -1,0 +1,10 @@
+###############
+# Free particle
+###############
+
+ARGS7="$ARGSTraj --vClass 0 --fin 6 --pinit '(-0.5 10 0.1 0)' --T .3 --Dt 0.005"
+
+l "freeParticle.d"     "SingleParticle $ARGS7              "
+l "freeParticle_Sch.d" "SingleParticle $ARGS7 --picture Sch"
+
+#$1 "freeParticle1p1m.d" "1particle1mode $ARGS4 $ARGS1Base --Unot 0 --1p1mconf 4"

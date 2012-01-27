@@ -9,7 +9,7 @@ pnot=10
 set ytics ('-' -pi/2, '0' 0, '+' pi/2)
 set grid ytics
 
-set term x11 0
+set term wxt 0
 
 plot "freeParticle.d" u 1:(xnot+2*pnot*$1) w l lw 2 t "exact", "freeParticle.d" u 1:5 w l lw 2 t "<x>", "freeParticle_Sch.d" u 1:5 w l lw 2 t "<x>", "freeParticle1p1m.d" u 1:9 w p lw 2 t "<x>"
 
@@ -20,7 +20,7 @@ Deltapnot=25
 
 set yra [0:]
 
-set term x11 1
+set term wxt 1
 
 plot "freeParticle.d" u 1:((Deltaxnot+4*Deltapnot*$1**2)**.5) w l lw 2 t "exact", "freeParticle.d" u 1:6 w l lw 2 t "Delta x", "freeParticle_Sch.d" u 1:6 w l lw 2 t "Delta x", "freeParticle1p1m.d" u 1:10 w p lw 2 t "Delta x"
 pause -1
