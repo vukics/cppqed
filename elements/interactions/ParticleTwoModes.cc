@@ -52,7 +52,7 @@ Base::Base(const ModeBase* mode0, const ModeBase* mode1, const ParticleBase* par
 void Base::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   using namespace blitzplusplus;
-  using basi::fullRange; using cpputils::for_each;
+  using basi::fullRange;
 
   typedef tmptools::Vector<2> V2;
 
@@ -66,12 +66,12 @@ void Base::addContribution(double t, const StateVectorLow& psi, StateVectorLow& 
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstH_);
-    for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondH_));
+    cpputils::for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondH_));
   }
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstHT_);
-    for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
+    cpputils::for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
   }
 
 }

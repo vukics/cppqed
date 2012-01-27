@@ -1,6 +1,6 @@
 #include "MCWF_TrajectoryLogger.h"
 
-#include "range_ex/algorithm.hpp"
+#include <boost/range/algorithm/for_each.hpp>
 
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>

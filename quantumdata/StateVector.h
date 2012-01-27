@@ -65,7 +65,7 @@ public:
   StateVector& operator=(const StateVector& sv) {operator=<StateVector>(sv); return *this;}
 
   template<typename OTHER>
-  StateVector& operator=(const OTHER& other) {ABase::operator=(other); return *this;}
+  StateVector& operator=(const OTHER& other) {operator()()=other; return *this;}
   // Together with the default assigment, this covers a lot of possibilities, including assignment from a StateVectorLow
 
 
