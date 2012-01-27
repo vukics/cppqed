@@ -24,7 +24,7 @@ The document is accordingly organized as follows:
 
 * There follows a selection of :ref:`generalElements` for demonstrating how elementary quantum systems acting as building blocks for composites can be implemented.
 
-* The next section describes our utility library :ref:`utils <cpputils>`. The scope of this extends far beyond C++QED proper, defining very general (physical) concepts, which may be useful for other projects as well.
+* The next section describes our utility library :ref:`utils <utilsDefinition>`. The scope of this extends far beyond C++QED proper, defining very general (physical) concepts, which may be useful for other projects as well.
 
 * Thorough :ref:`Testing <testing>` of the framework is a highly nontrivial problem, which forms the subject of the next section.
 
@@ -92,7 +92,7 @@ For instance:
 
     #define TTD_DARRAY(r) blitz::Array<double,r>
 
-.. class:: TTD_CArray
+.. class:: TTD_CArray<RANK>
 
   ``template <int RANK>``::
 
@@ -164,3 +164,15 @@ We assume that the following definitions are in effect:
   ::
 
     const mpl::false_ mpl::constant_false;
+
+
+.. _utilsDefinition:
+
+
+==========================
+The ``utils`` directory
+==========================
+
+The content of the directory :file:`utils` in the distribution is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves. 
+
+.. seealso:: :ref:`cpputils`.

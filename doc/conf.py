@@ -210,24 +210,26 @@ html_title = u'C++QED Documentation'
 
 htmlhelp_basename = 'CQEDdoc'
 
+html_theme = "sphinxdoc"
 
-html_theme_options = {
-    "footerbgcolor" : "#808080",
-    "footertextcolor" : "black",
-    "sidebarbgcolor" : "#fff0f0",
-    "sidebartextcolor" : "#800000",
-    "sidebarlinkcolor" : "#804040",
-    "relbarbgcolor" : "#800000",
-    "relbartextcolor" : "#804040",
-    "relbarlinkcolor" : "#fff0f0",
-    "linkcolor" : "#804040",
-    "visitedlinkcolor" : "#804040",
-    "headbgcolor" : "#f0f0f0",
-    "headtextcolor" : "#404040",
-    "headlinkcolor" : "#808080",
-    "bodyfont" : "Palatino Linotype",
-    "headfont" : "Palatino Linotype"
-}
+# html_theme_options = {
+#     "footerbgcolor" : "#808080",
+#     "footertextcolor" : "black",
+#     "sidebarbgcolor" : "#fff0f0",
+#     "sidebartextcolor" : "#800000",
+#     "sidebarlinkcolor" : "#804040",
+#     "relbarbgcolor" : "#800000",
+#     "relbartextcolor" : "#804040",
+#     "relbarlinkcolor" : "#fff0f0",
+#     "linkcolor" : "#804040",
+#     "visitedlinkcolor" : "#804040",
+#     "headbgcolor" : "#f0f0f0",
+#     "headtextcolor" : "#404040",
+#     "headlinkcolor" : "#808080",
+#     # "stickysidebar" : True,
+#     "bodyfont" : "Arial, Helvetica, sans-serif", #"Georgia, serif", #"Palatino Linotype",
+#     "headfont" : "Arial, Helvetica, sans-serif" #"Georgia, serif" #"Palatino Linotype"
+# }
 
 latex_documents = [
   ('tutorial', 'C++QED_Tutorial.tex', ur'C++QEDv2 User Guide', ur'András Vukics', 'howto'),

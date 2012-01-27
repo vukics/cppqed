@@ -43,6 +43,7 @@ Overview
 
    rationales
 
+   changelog
 
 ===============
 Full contents
@@ -79,7 +80,7 @@ Full contents
 
    rationales
 
-
+   changelog
 
 ******************
 Indices and tables

@@ -1,6 +1,6 @@
-*********
-ChangeLog
-*********
+**********
+Change Log
+**********
 
 The following is a list of only the more substantial changes (e.g. such as break certain applications). For a full log of development, `browse the Bazaar repository <http://cppqed.bzr.sourceforge.net/bzr/cppqed/changes>`_.
 

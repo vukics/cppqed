@@ -1,23 +1,29 @@
 
+.. |cppqed| replace:: C++QED
+
+..
+  image:: figures/logoCppQED.svg
+  :alt: C++QED
+  :width: 20
+
 ********************************************************
 C++QED: a framework for simulating open quantum dynamics
 ********************************************************
 
 **C++QED is a highly flexible framework for simulating open quantum dynamics. It allows users to build arbitrarily complex interacting quantum systems from elementary free subsystems and interactions, and simulate their time evolution with a number of available time-evolution drivers.**
 
-
 =============
 Documentation
 =============
 
-To start to understand and use the framework on the highest level, consult the user guide. This will allow for building simulations using the already existing modules and elementary systems as building blocks.
+To start to understand and use the framework on the highest level, consult the :doc:`User Guide <tutorial>`. This will allow for building simulations using the already existing modules and elementary systems as building blocks.
 
 .. toctree::
    :maxdepth: 2
 
    User Guide <tutorial>
 
-To be able to write new modules representing elementary free subsystems or interactions, consult the following guide:
+To be able to write new modules representing elementary free subsystems or interactions, consult the :doc:`Element Guide <elementGuide>`.
 
 .. toctree::
    :maxdepth: 2
@@ -32,13 +38,10 @@ For a deeper understanding and to be able to extend the framework with new modul
    Reference Manual <manual>
 
 -------------
-ChangeLog
+Change Log
 -------------
 
-.. toctree::
-   :maxdepth: 2
-
-   When using the development version from the Bazaar repository, the ChangeLog should be consulted from time to time. <changelog>
+Users of the development version from the Bazaar repository, should consult the :doc:`Change Log <changelog>` from time to time.
 
 
 -------------

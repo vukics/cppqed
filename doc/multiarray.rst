@@ -97,10 +97,10 @@ The name of the namespace stands for BlitzArraySliceIterator.
     Governs the constness of :class:`~blitzplusplus::basi::Iterator`.
 
   ``typename A``
-    Must be a :class:`TTD_CArray`\ ``<RANK>``.
+    Must be a :class:`TTD_CArray\<RANK>`.
 
 
-.. class:: blitzplusplus::basi::Iterator
+.. class:: blitzplusplus::basi::Iterator<RANK,V,IS_CONST> 
 
   ``template <int RANK, typename V, bool IS_CONST>`` (cf. :ref:`template parameters <basiTemplates>`)
 

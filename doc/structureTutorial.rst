@@ -93,6 +93,8 @@ The implementation of the helpers is also quite straightforward. It may come to 
   In situations like the one in Line 56, it is extremely important to write ``blitz::tensor::i+1.``, otherwise the ``blitz::sqrt`` function will operate within the integers.
 
 
+.. _structureTutorialInteractionPicture:
+
 ===================
 Interaction picture
 ===================
@@ -111,7 +113,7 @@ so that the Hamiltonian reads
 
   H\Int(t)=\lp\eta a^\dagger e^{zt}+\eta^*ae^{-zt}\rp
 
-(Cf. these `notes <http://optics.szfki.kfki.hu/~vukics/Pictures.pdf>`_ about how to treat interaction pictures defined by non-unitary transition operators in a consistent way.)
+.. seealso:: These `notes <http://optics.szfki.kfki.hu/~vukics/Pictures.pdf>`_ about how to treat interaction pictures defined by non-unitary transition operators in a consistent way.
 
 In this case, the class representing the element has to be derived from :class:`~structure::Exact` as well, which represents the transformation between the two pictures. In addition, instead of :class:`~structure::TridiagonalHamiltonian`\ ``<1,false>``, we need to derive from :class:`~structure::TridiagonalHamiltonian`\ ``<1,true>``, because the Hamiltonian is now time-dependent.
 

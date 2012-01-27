@@ -100,8 +100,10 @@ In the framework, we adopt a further heuristic in this case, introducing a toler
 
   In spite of the RKCK method being of order :math:`O\lp\delta t^4\rp`, the whole method remains :math:`O\lp\sqrt{\delta t}\rp`, since the treatment of jumps is essentially the same as in the original proposal. (Events of multiple jumps in one timestep are neglected.)
 
-For the implementation cf. :ref:`MCWF_Trajectory`.
+.. seealso:: For the implementation :ref:`MCWF_Trajectory`.
 
+
+.. _MCWF_interactionPicture:
 
 Exploiting interaction picture
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -112,7 +114,11 @@ In many situations it is worth using some sort of interaction picture, which mea
 
   i\hbar\frac{d\ket{\Psi_{\text{I}}}}{dt}=U^{-1}\lp\HnH U-i\hbar\frac{dU}{dt}\rp\ket{\Psi_{\text I}},
 
-where :math:`\ket{\Psi_{\text I}}=U^{-1}\ket\Psi`. Note that :math:`U` can be nonunitary, and therefore in general :math:`U^{-1}\neq U^\dagger`. (On non-unitary transformations in quantum mechanics cf. `these notes <http://optics.szfki.kfki.hu/~vukics/Pictures.pdf>`_.) The two pictures are accorded after each timestep, i.e. before the timestep :math:`\ket{\Psi_{\text I}(t)}=\ket{\Psi(t)}` and after the timestep the transformation :math:`\ket{\Psi(t+\delta t)}=U(\delta t)\ket{\Psi_{\text I}(t+\delta t)}` is performed. This we do on one hand for convenience and for compatibility with the case when no interaction picture is used, but on the other hand also because :math:`U(t)` is nonunitary and hence for :math:`t\to\infty` some of its elements will become very large, while others very small, possibly resulting in numerical problems. It is in fact advisable to avoid evaluating :math:`U(t)` with very large :math:`t` arguments.
+where :math:`\ket{\Psi_{\text I}}=U^{-1}\ket\Psi`. Note that :math:`U` can be nonunitary, and therefore in general :math:`U^{-1}\neq U^\dagger`. 
+
+  .. seealso:: On non-unitary transformations in quantum mechanics `these notes <http://optics.szfki.kfki.hu/~vukics/Pictures.pdf>`_.
+
+The two pictures are accorded after each timestep, i.e. before the timestep :math:`\ket{\Psi_{\text I}(t)}=\ket{\Psi(t)}` and after the timestep the transformation :math:`\ket{\Psi(t+\delta t)}=U(\delta t)\ket{\Psi_{\text I}(t+\delta t)}` is performed. This we do on one hand for convenience and for compatibility with the case when no interaction picture is used, but on the other hand also because :math:`U(t)` is nonunitary and hence for :math:`t\to\infty` some of its elements will become very large, while others very small, possibly resulting in numerical problems. It is in fact advisable to avoid evaluating :math:`U(t)` with very large :math:`t` arguments.
 
 Cf. also the discussion at :ref:`Exact`.
 

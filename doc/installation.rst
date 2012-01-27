@@ -206,12 +206,6 @@ In this case, those parts of the framework that rely on FLENS are discreetly dis
   Scripts depending directly on FLENS will not compile in this case.
 
 
-=========
-``utils``
-=========
-
-The content of the directory ``utils`` is a small library of very diverse but quite general tools, that I have abstracted during the development of the framework, and used also in several other projects. This may in time become a project on its own. The reader is encouraged to have a look in there, too: some modules may be useful in themselves. Cf. :ref:`cpputils`.
-
 
 .. _installingOnMacOsX:
 

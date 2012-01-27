@@ -30,7 +30,7 @@ II. If the system is *not* Liouvillean, the timestep ends here, reducing to a si
 
   #. The rates (probabilities per unit time) corresponding to all jump operators are calculated. If some rates are found negative ("special jump", cf. explanation at :func:`~structure::Liouvillean::probabilities`), then :math:`J_\text{at}\ket\Psi` is calculated (and tabulated) instead, and the probability is calculated as :math:`\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2`.
 
-  #. First, it is verified whether the total jump probability is not too big. Cf. also the discussion at :ref:`MCWF_method_adaptive`. This is performed on two levels:
+  #. First, it is verified whether the total jump probability is not too big. This is performed on two levels:
 
     a. The total jump rate :math:`\delta r` is calculated.
 
@@ -39,6 +39,8 @@ II. If the system is *not* Liouvillean, the timestep ends here, reducing to a si
       .. note:: It is assumed that :math:`\delta p_\text{limit}'>\delta p_\text{limit}`, their ratio being a parameter of the MCWF stepper.
 
     c. If just :math:`\delta r\delta t_\text{next}>\delta p_\text{limit}` (where :math:`\Delta t_\text{next}` is a guess for the next timestep given by the ODE stepper), the coherent step is accepted, but the timestep to try next is modified, to reduce the likeliness of overshoot: :math:`\delta t_\text{next}\longrightarrow\delta p_\text{limit}/\delta r`.
+
+    .. seealso:: The discussion at :ref:`MCWF_method_adaptive`.
 
   3. After a successful coherent step resulting in an acceptable :math:`\delta r`, the possible occurence of a quantum jump is considered: It is randomly decided which (if any) of the jumps to perform. If it is found to be a special jump, then the tabulated :math:`J_\text{at}\ket\Psi` is taken.
 
