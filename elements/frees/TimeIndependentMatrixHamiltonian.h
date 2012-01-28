@@ -26,31 +26,16 @@ private:
 };
 
 
-template <int RANK>
-class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public structure::Averaged<1,false>
+template <int RANK, bool IS_TD>
+class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public structure::averaged::Transferring<1,RANK,IS_TD>
 {
 public:
-  typedef structure::Averaged<RANK,true> Averaged;
+  typedef structure::Averaged<RANK,IS_TD> Averaged;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, const Averaged& averaged, const LazyDensityOperator& ldo)
-    : TimeIndependentMatrixHamiltonian(matrix), averaged_(averaged), ldo_(ldo) {}
-
-private:
-  void process(Averages& averages) const {averaged_.process(averages);}
-
-  void display(const Averages& averages, std::ostream& os, int n) const {averaged_.display(averages,os,n);}
-
-  void displayKey(std::ostream& os, size_t& n) const {averaged_.displayKey(os,n);}
-
-  size_t nAvr() const {return averaged_.nAvr();}
-
-  const Averages average(const quantumdata::LazyDensityOperator<1>&) const {return averaged_.average(0,ldo_);}
-
-  const Averaged& averaged_;
-
-  const LazyDensityOperator& ldo_;
+    : TimeIndependentMatrixHamiltonian(matrix), structure::averaged::Transferring<1,RANK,IS_TD>(averaged,ldo) {}
 
 };
 

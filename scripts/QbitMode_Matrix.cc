@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
   const CMatrix hamiltonian(calculateMatrix(system2));
 
-  evolve(psi1,TimeIndependentMatrixHamiltonianAveraged<2>(CMatrix(hamiltonian/DCOMP_I),system2,psi2),pe);
+  evolve(psi1,TimeIndependentMatrixHamiltonianAveraged<2,true>(CMatrix(hamiltonian/DCOMP_I),system2,psi2),pe);
   
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

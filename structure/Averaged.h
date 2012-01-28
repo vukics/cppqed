@@ -128,6 +128,47 @@ public:
 };
 
 
+namespace averaged {
+
+
+template<int RANKFROM, int RANKTO, bool IS_TD>
+class Transferring : public Averaged<RANKFROM,IS_TD>
+// Transfers the calculation of averages to another Averaged class, possibly with different RANK.
+// The LazyDensityOperator for the other class should reference the same data.
+// For a usage example cf. scripts/QbitMode_Matrix.cc
+{
+public:
+  typedef typename Averaged<RANKFROM,IS_TD>::Averages            Averages           ;
+  typedef typename Averaged<RANKFROM,IS_TD>::LazyDensityOperator LazyDensityOperator;
+
+  typedef Averaged<RANKTO,IS_TD> AveragedTo;
+  typedef quantumdata::LazyDensityOperator<RANKTO> LazyDensityOperatorTo;
+
+  Transferring(const AveragedTo& averaged, const LazyDensityOperatorTo& ldo)
+    : averaged_(averaged), ldo_(ldo) {}
+
+  void process(Averages& averages) const {averaged_.process(averages);}
+
+  void display(const Averages& averages, std::ostream& os, int n) const {averaged_.display(averages,os,n);}
+
+  void displayKey(std::ostream& os, size_t& n) const {averaged_.displayKey(os,n);}
+
+  size_t nAvr() const {return averaged_.nAvr();}
+
+  const Averages average(double time, const LazyDensityOperator&) const {return averaged_.average(time,ldo_);}
+
+  const Averages average(const LazyDensityOperator&) const {return averaged_.average(ldo_);}
+
+private:
+  const AveragedTo& averaged_;
+  const LazyDensityOperatorTo& ldo_;
+
+};
+
+
+} // averaged
+
+
 
 } // structure
 
