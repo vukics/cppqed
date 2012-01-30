@@ -24,9 +24,9 @@ PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double n
 				    +
 				    tridiagPlusHC_overI(conj(eta)*aop(cutoff))),
     ElementLiouvillean<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(n+1)),
-					   bind(aDagJump,_1,kappa* n   )),
+                                           bind(aDagJump,_1,kappa* n   )),
 			    JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(n+1)),
-						      bind(aDagJumpProba,_1,kappa* n   ))),
+                                                      bind(aDagJumpProba,_1,kappa* n   ))),
     ElementAveraged<1>("PumpedLossyMode",
 		       list_of("<number operator>")("real(<ladder operator>)")("imag(\")"))
 {

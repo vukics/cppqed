@@ -24,7 +24,7 @@ Via an example we define *state-vector slices:*
 .. math::
   :label: stateVectorSlices
 
-  \ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}\equiv\sum_{i=1,3,6,7,9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i
+  \ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}\equiv\sum_{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i
 
 Slicing is fully recursive in that a state-vector slice behaves exactly as a state vector, only with a lower rank. It can even be further sliced. It is in particular true that
 
@@ -60,20 +60,18 @@ Due to the abovementioned recursiveness, the state vector of a composite quantum
 
 By virtue of its adequacy for numerics and its efficiency, we have chosen the ``Array`` class from the `Blitz++ library <http://www.oonumerics.org>`_ to represent state vectors on the lowest level in the framework.
 
+  .. seealso:: :ref:`noteOnUsingBlitz`
+
 In :ref:`utils <cpputils>`, our collection of general-purpose modules, we rely on the template alias :class:`TTD_CArray`, while in higher levels of the framework we use the more intuitive name :type:`~quantumdata::Types::StateVectorLow`.
 
 
 .. _basiSlicing:
 
-==============
-Slice iterator
-==============
+==========================================
+Slice iterator and the namespace ``basi``
+==========================================
 
 .. namespace:: blitzplusplus::basi
-
-.. py:module:: BlitzArraySliceIterator.h
-   :synopsis: Defines Iterator and Indexer in namespace blitzplusplus::basi
-
 
 The name of the namespace stands for BlitzArraySliceIterator.
 
@@ -91,16 +89,16 @@ The name of the namespace stands for BlitzArraySliceIterator.
     
     Example models: :class:`tmptools::Vector` and ``mpl::range_c`` from `Boost.MPL <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/range-c.html>`_.
 
-    ``mpl::size<V>::value`` must not be larger than ``RANK``. ``V`` must not "contain" negative values, values not smaller than ``RANK``, and duplicate values. These are checked for at compile time, and any violation is signalled by more or less intelligent compiler-errors generated with the help of `static asserts of Boost.MPL <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/asserts.html>`_.
+    ``mpl::size<V>::value`` must not be larger than ``RANK``. ``V`` must not "contain" negative values, values not smaller than ``RANK``, and duplicate values. These are checked for at compile time, and any violation is signalled by more or less intelligent compiler errors generated with the help of `Boost.MPL's static assertions <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/asserts.html>`_.
 
   ``bool IS_CONST``
     Governs the constness of :class:`~blitzplusplus::basi::Iterator`.
 
   ``typename A``
-    Must be a :class:`TTD_CArray\<RANK>`.
+    Must be a :class:`TTD_CArray`\ ``<RANK>``.
 
 
-.. class:: blitzplusplus::basi::Iterator<RANK,V,IS_CONST> 
+.. class:: blitzplusplus::basi::Iterator
 
   ``template <int RANK, typename V, bool IS_CONST>`` (cf. :ref:`template parameters <basiTemplates>`)
 
@@ -122,63 +120,65 @@ The name of the namespace stands for BlitzArraySliceIterator.
 
   This class is at the absolute heart of the framework as it is indispensable to implement 
 
-  * :class:`Composite` and :class:`BinarySystem`
+  * composite quantum systems (:class:`Composite` and :class:`BinarySystem`)
 
   * iterations over (multi)matrix rows and columns to get (multi)vectors (cf. :ref:`cpputils_VFMSI`)
 
   * :class:`quantumdata::ldo::DiagonalIterator`
 
-  This said, it is never really used directly in the framework, but rather through the :ref:`maker functions <basiMakers>` below in standard or Boost.RangeEx algorithms.
+  This said, it is never really used directly in the framework, but rather through the :ref:`maker functions <basiMakers>` below in standard or `Boost.Range algorithms <http://www.boost.org/doc/libs/1_48_0/libs/range/doc/html/range/reference/algorithms.html>`_.
 
-  Quite generally, by iterating through all the combinations of indeces *not* belonging to the given subsystem (dummy indeces) and when dereferenced returning the corresponding slice, it can be used to implement the action of operators in extended Hilbert spaces.
+  Quite generally, by iterating through all the combinations of indeces *not* belonging to the given subsystem (dummy indeces) and when dereferenced returning the corresponding slice, it can be used to implement the action of operators in extended (and/or permutated) Hilbert spaces.
 
-**Semantics:**
+  .. rubric:: Semantics
+
   Sticking to the example in :eq:`canonicalOperatorExtensionsAction` above, assume that the function ::
 
     void actWithA(TTD_CArray<5>&);
 
-  implements the action of the operator :math:`A` on a state vector of rank 5, then the action on the extended Hilbert space can be calculated as ::
+  implements the action of the operator :math:`A` on a state vector of rank 5. Then the action on the extended Hilbert space can be calculated as ::
 
-    static const int RANK=11;
+    void actOnExtended(TTD_CArray<11>& psi)
+    {
+      boost::for_each(blitzplusplus::basi::fullRange(psi, 
+                                                     tmptools::Vector<3,6,1,9,7>()),
+                      actWithA);
+    }
 
-    TTD_CArray<RANK> psi;
-
-    typedef tmptools::Vector<3,6,1,9,7> Vec;
-    for_each(blitzplusplus::basi::fullRange(psi,Vec()),actWithA);
-
-  The return type of :func:`~blitzplusplus::basi::fullRange` returning a Boost.Range-complying range, we use the algorithm ``for_each`` from Boost.RangeEx.
+  The value returned by :func:`~blitzplusplus::basi::fullRange` is a Boost.Range-compliant range, a full range of slice iterators corresponding to all the possible combinations of dummy indices (:math:`\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots`), and ``for_each`` is the range algorithm from Boost.Range.
 
   For further basic examples of usage cf. ``C++Utils/testsuite/BlitzArraySliceIterator.cc``.
 
 
 .. _basiMakers:
 
-**Maker functions**
-  :class:`~blitzplusplus::basi::Iterator`\ 's maker functions intelligently dispatch the constness of the Array:
+.. rubric:: Maker functions
 
-  .. function:: const IterC<A,V> blitzplusplus::basi::begin(const A& array, V v)
+:class:`~blitzplusplus::basi::Iterator`\ 's maker functions intelligently dispatch the constness of the Array:
 
-  .. function:: const IterC<A,V> blitzplusplus::basi::end  (const A& array, V v)
+.. function:: const IterC<A,V> blitzplusplus::basi::begin(const A& array, V v)
 
-  .. function:: const Iter<A,V>  blitzplusplus::basi::begin(      A& array, V v)
+.. function:: const IterC<A,V> blitzplusplus::basi::end  (const A& array, V v)
 
-  .. function:: const Iter<A,V>  blitzplusplus::basi::end  (      A& array, V v)
+.. function:: const Iter<A,V>  blitzplusplus::basi::begin(      A& array, V v)
 
-  .. function:: const RangeC<A,V> blitzplusplus::basi::fullRange(const A& array, V v)
+.. function:: const Iter<A,V>  blitzplusplus::basi::end  (      A& array, V v)
 
-  .. function:: const Range<A,V>  blitzplusplus::basi::fullRange(      A& array, V v)
+.. function:: const RangeC<A,V> blitzplusplus::basi::fullRange(const A& array, V v)
 
-    ``template <typename A, typename V>`` for all these functions (cf. :ref:`template parameters <basiTemplates>`) 
+.. function:: const Range<A,V>  blitzplusplus::basi::fullRange(      A& array, V v)
 
-    Here, the following template aliases are in effect::
+  ``template <typename A, typename V>`` for all these functions (cf. :ref:`template parameters <basiTemplates>`) 
 
-      template <typename A, typename V> using IterC=Iterator<A::_bz_rank,V,true >;
-      template <typename A, typename V> using Iter =Iterator<A::_bz_rank,V,false>;
+  Here, the following template aliases are in effect::
 
-      template <typename A, typename V> using RangeC=boost::iterator_range<IterC<A,V> >
-      template <typename A, typename V> using Range =boost::iterator_range<Iter <A,V> >
+    template <typename A, typename V> using IterC=Iterator<A::_bz_rank,V,true >;
+    template <typename A, typename V> using Iter =Iterator<A::_bz_rank,V,false>;
 
-    the trailing dummy argument ``V`` is present for allowing template-parameter deduction
+    template <typename A, typename V> using RangeC=boost::iterator_range<IterC<A,V> >
+    template <typename A, typename V> using Range =boost::iterator_range<Iter <A,V> >
+
+  the trailing dummy argument ``V`` is present for allowing template-parameter deduction
 
 
 The following two classes are mainly helpers for :class:`~blitzplusplus::basi::Iterator`, but sometimes are used on their own as well, so they are exposed in the header file:
@@ -193,21 +193,22 @@ The following two classes are mainly helpers for :class:`~blitzplusplus::basi::I
 
     Transposition corresponds to the "possible permutation" mentioned before Eq. :eq:`canonicalOperatorExtensionsAction`, and is necessary in order that :math:`\avr{1,3,6,7,9}` be the corresponding state vector slice, since this is how it is expected in applications. Cf. :class:`Composite` for further explanations.
 
-  **Semantics:**
-    ::
+  .. rubric:: Semantics
 
-      static const int RANK=11;
+  ::
 
-      TTD_CArray<RANK> psi;
+    static const int RANK=11;
 
-      typedef tmptools::Vector<3,6,1,9,7> Vec;
-      Transposer<RANK,Vec>::transpose(psi);
+    TTD_CArray<RANK> psi;
 
-    is equivalent to ::
+    typedef tmptools::Vector<3,6,1,9,7> Vec;
+    Transposer<RANK,Vec>::transpose(psi);
 
-      psi.transposeSelf(0,3,2,6,4,5,1,9,8,7,10);
+  is equivalent to ::
 
-    that is, in place of the indeces specified by the elements of the compile-time vector ``Vec``, the elements of ``Vec`` are put, but in the *order* specified by ``Vec``.
+    psi.transposeSelf(0,3,2,6,4,5,1,9,8,7,10);
+
+  that is, in place of the indeces specified by the elements of the compile-time vector ``Vec``, the elements of ``Vec`` are put, but in the *order* specified by ``Vec``.
 
 .. class:: blitzplusplus::basi::Indexer
 
@@ -231,29 +232,34 @@ The following two classes are mainly helpers for :class:`~blitzplusplus::basi::I
 
         template <int RANK, typename V> using TTD_VecIdxTiny=TTD_IdxTiny<RANK-mpl::size<V>::value>
 
-  **Semantics:**
-    ::
+  .. rubric:: Semantics
 
-      static const int RANK=11;
+  ::
 
-      TTD_CArray<RANK> psi;
+    static const int RANK=11;
 
-      typedef tmptools::Vector<3,6,1,9,7> Vec;
-      TTD_ResCArray<VEC> psiRes;
-      TTD_VecIdxTiny<RANK,VEC> idxTiny;
+    TTD_CArray<RANK> psi;
 
-      Indexer<RANK,Vec>::index(psi,psiRes,idxTiny);
+    typedef tmptools::Vector<3,6,1,9,7> Vec;
+    TTD_ResCArray<VEC> psiRes;
+    TTD_VecIdxTiny<RANK,VEC> idxTiny;
 
-    is equivalent to ::
+    Indexer<RANK,Vec>::index(psi,psiRes,idxTiny);
 
-      const blitz::Range a(blitz::Range::all());
-      psiRes.reference(psi(0,a,2,a,4,5,a,a,8,a,10));
+  is equivalent to ::
 
+    const blitz::Range a(blitz::Range::all());
+    psiRes.reference(psi(0,a,2,a,4,5,a,a,8,a,10));
+
+
+-----------------------
+Notes on implementation
+-----------------------
 
 .. toctree::
    :maxdepth: 2
 
-   Notes on implementation <multiarrayImplementation>
+   Some notes on the slice iterator's implementation <multiarrayImplementation>
 
 
 ------------

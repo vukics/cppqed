@@ -71,7 +71,7 @@ The solution adopted for this problem in the framework is represented by the cla
     The type used for indexing the "rows" and the "columns", this is either an index, or a multi-index, in the latter case represented by a :class:`TTD_IdxTiny`::
 
       typedef typename mpl::if_c<(RANK==1),int,TTD_IdxTiny<RANK> >::type Idx;
-      // Idx is just an int if RANK==1, otherwise a tiny of ints
+      // Idx is just an int if RANK==1, otherwise a TinyVector of ints
 
   .. function:: LazyDensityOperator(const Dimensions& dims)
 
@@ -93,10 +93,10 @@ The solution adopted for this problem in the framework is represented by the cla
 
     ``template <typename V>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
-    These functions return the :class:`quantumdata::ldo::DiagonalIterator`\ s corresponding to the start and end of the sequence of slices defined by ``V`` (cf. the :ref:`section on slicing a LazyDensityOperator <ldoSlicing>`). 
+    These functions return the :class:`quantumdata::ldo::DiagonalIterator`\ s corresponding to the start and end of the sequence of slices defined by ``V`` (cf. the section on :ref:`slicing a LazyDensityOperator <ldoSlicing>`). 
 
 
-**Semantics:**
+  .. rubric:: Semantics
 
   *Unary system*
     Assume a mode represented in Fock basis with ladder-operator :math:`a`. To calculate the quantum expectation value 
@@ -135,7 +135,8 @@ The solution adopted for this problem in the framework is represented by the cla
         const LazyDensityOperator<2>::Dimensions dim(matrix.getDimensions());
 
         dcomp res;
-        for (int i=0; i<dim[0]-1; ++i) for (int j=1; j<dim[1]; ++j) res+=sqrt((i+1)*j)*matrix(Idx(i,j),Idx(i+1,j-1));
+        for (int i=0; i<dim[0]-1; ++i) for (int j=1; j<dim[1]; ++j)
+	    res+=sqrt((i+1)*j)*matrix(Idx(i,j),Idx(i+1,j-1));
         return res;
       }
 
@@ -147,7 +148,7 @@ High-level data structures
 The :class:`~quantumdata::StateVector` and :class:`~quantumdata::DensityOperator` classes (and their non-orthogonal counterparts) exist for two main reasons:
   * As interfaces to :type:`~quantumdata::Types::StateVectorLow` and :type:`~quantumdata::Types::DensityOperatorLow`, respectively, which are more convenient to use on higher levels of the framework, e.g. in scripts, and in quantum trajectories. This is especially because while ``blitz::Array`` uses by-reference copy semantics and expression templates, these classes use the more usual by-value copy semantics and normal semantics for arithmetic operations. This means, however, that copying and arithmetics should be used judiciously, if possible only in the startup phase of simulations.
 
-  * As an implementation of :class:`~quantumdata::LazyDensityOperator`
+  * As implementations of :class:`~quantumdata::LazyDensityOperator`.
 
 
 .. toctree::

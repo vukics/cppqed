@@ -1,3 +1,9 @@
+.. |FLENS| replace:: :abbr:`FLENS (Flexible Library for Efficient Numerical Solutions)`
+
+.. |TMP| replace:: :abbr:`TMP (template metaprogramming)`
+
+
+
 ************
 Requirements
 ************
@@ -5,9 +11,9 @@ Requirements
 C++QEDv2 depends on a number of open source libraries:
 
 Boost C++ libraries 
-  provide indispensable extensions to the C++ standard, and are *de facto* standard by their own right. The framework depends on a number of them, the most notable ones being Fusion, Lambda, MPL, Operators, and Preprocessor. On many systems, (a selection of) the Boost libraries are available. They are packaged for Debian and Mac OS X. Alternatively, they can be downloaded and installed from `the main Boost portal <http://www.boost.org>`_. Although version 1.35 is in principle sufficient for the framework, it is advisable to use as new a version as possible, since experience has shown that there can be clashes between old versions of Boost and new versions of compilers.
+  provide indispensable extensions to the C++ standard, and are *de facto* standard by their own right. The framework depends on a number of them, the most notable ones being Fusion, Lambda, MPL, Operators, and Preprocessor. On many systems, (a selection of) the Boost libraries are available. They are packaged for Debian and Mac OS X. Alternatively, they can be downloaded and installed from `the main Boost portal <http://www.boost.org>`_. Although version 1.43 is in principle sufficient for the framework, it is advisable to use as new a version as possible, since experience has shown that there can be clashes between old versions of Boost and new versions of compilers, especially when template metaprogramming is concerned.
 
-  All the Boost libraries necessary for the framework are header-only. Therefore, we also provide an alternative package in which the Boost dependencies are placed in a subdirectory under ``utils/include``. When using this package, no separate Boost libraries need to be installed. Cf. sec. :ref:`boostIntegration`.
+  All the Boost libraries necessary for the framework are header-only. Therefore, we also provide an alternative package in which the Boost dependencies are placed in a subdirectory under :file:`utils/include`. When using this package, no separate Boost libraries need to be installed. Cf. Sec. :ref:`boostIntegration`.
 
 GNU Scientific library (GSL) 
   provides a very wide variety of numerical solutions in a solid object-oriented design (in C!). They are not used directly, but are wrapped into C++ classes and functions, so that they are easily replaced (e.g. if licensing problems arise). Packaged for Debian and Mac OS X, or can be downloaded from `the GSL homepage <http://www.gnu.org/software/gsl/>`_. I haven't thoroughly determined the minimal version, but 1.8 is known to work.
@@ -23,7 +29,7 @@ The following two libraries are stable, but under more or less steady developmen
 
 
 Blitz++ 
-  provides the fundamental data structure. It hence performs a lot of numerics and lies at the absolute heart of the framework. Blitz++ lives up to its name, as it provides near-Fortran performance in spite of the very high-level abstractions used in the library. This is achieved by TMP, which was discovered in prototype during the development of this very library. More on `the Blitz++ homepage <http://www.oonumerics.org/blitz/>`_.
+  provides the fundamental data structure. It hence performs a lot of numerics and lies at the absolute heart of the framework. Blitz++ lives up to its name, as it provides near-Fortran performance in spite of the very high-level abstractions used in the library. This is achieved by |TMP|, which was discovered in prototype during the development of this very library. More on `the Blitz++ homepage <http://www.oonumerics.org/blitz/>`_.
 
   .. warning::
 
@@ -36,7 +42,7 @@ Flexible Library for Efficient Numerical Solutions (FLENS)
 
     The use of FLENS is optional because only a very small section of the framework depends on it. Cf. the section :ref:`compilingWithoutFLENS`.
 
-At the corresponding websites, instructions for installing the libraries can be found, while below I have given guidelines concerning installation on an Ubuntu system, cf. also the ``getLibs.sh`` script in directory ``utils``. This will download the CVS versions of both libraries into the subdirectories ``blitz`` and ``FLENS-lite``, respectively, and will also compile them.
+At the corresponding websites, instructions for installing the libraries can be found, while below I have given guidelines concerning installation on an Ubuntu system, cf. also the :file:`getLibs.sh` script in directory :file:`utils`. This will download the CVS versions of both libraries into the subdirectories :file:`blitz` and :file:`FLENS-lite`, respectively, and will also compile them.
 
 I will very much appreciate all feedback regarding also the installation of the framework. 
 
@@ -50,7 +56,7 @@ The following is a rudimentary list of prerequisite packages on Ubuntu 9.10::
 
 This will install the first three libraries listed above on system level.
 
-The following steps to install the remaining two libraries constitute also the script ``utils/getLibs.sh``. The ``sed`` command in the last lines of this script also demonstrates what needs to be changed in ``utils/Jamroot`` if Blitz and FLENS are installed at a location which is not in the search path of the C++ compiler/linker.
+The following steps to install the remaining two libraries constitute also the script :file:`utils/getLibs.sh`. The :command:`sed` command in the last lines of this script also demonstrates what needs to be changed in :file:`utils/Jamroot` if Blitz and |FLENS| are installed at a location which is not in the search path of the C++ compiler/linker.
 
 .. _installBlitz:
 
@@ -75,7 +81,7 @@ Under Debian-like operating systems, instead of the last line one can use::
 
   sudo checkinstall --fstrans=0 -D make install
 
-The ``--fstrans=0`` option has to be used because of a bug in ``checkinstall``.
+The ``--fstrans=0`` option has to be used because of a bug in :command:`checkinstall`.
 
 ---------------
 Install FLENS:
@@ -83,7 +89,7 @@ Install FLENS:
 
 .. note::
 
-  The use of FLENS is optional because only a very small section of the framework depends on it. Cf. the section :ref:`compilingWithoutFLENS`.
+  The use of |FLENS| is optional because only a very small section of the framework depends on it. Cf. the section :ref:`compilingWithoutFLENS`.
 
 ::
 
@@ -92,7 +98,7 @@ Install FLENS:
   cd FLENS-lite
   cp config.ubuntu config
 
-Now you have to edit the config file adding to ``CXXFLAGS`` the flag ``-DGSL_CBLAS`` which instructs FLENS to use the CBLAS interface provided by GSL. This is good because hence you don't need a separate package for this. You may also need to remove the flag ``-latlas`` from ``LDFLAGS``. ::
+Now you have to edit the config file adding to ``CXXFLAGS`` the flag ``-DGSL_CBLAS`` which instructs |FLENS| to use the CBLAS interface provided by GSL. This is good because hence you don't need a separate package for this. You may also need to remove the flag ``-latlas`` from ``LDFLAGS``. ::
 
   make
   sudo make install
@@ -101,7 +107,7 @@ If the last command issues the error message::
 
   Makefile.common:19: /config: No such file or directory
 
-you have to edit ``Makefile.common`` replacing the variable ``$(PWD)`` with the path of the current directory.
+you have to edit :file:`Makefile.common` replacing the variable ``$(PWD)`` with the path of the current directory.
 
 Alternatively, again::
 
@@ -109,7 +115,7 @@ Alternatively, again::
 
 .. note::
 
-  By default, FLENS gets installed as a shared library under ``/usr/local/lib``. If this was not in the dynamic loader's path previously, the ``ldconfig`` utility has to be used as superuser.
+  By default, |FLENS| gets installed as a shared library under :file:`/usr/local/lib`. If this was not in the dynamic loader's path previously, the :command:`ldconfig` utility has to be used as superuser.
 
 
 ================
@@ -149,14 +155,14 @@ The canonical way to compile the framework is the one using Boost.Build. This is
 
   bjam 
 
-in the main directory will compile and link the whole framework, creating separate executables from the highest level programs residing in directory ``scripts``. Typing ::
+in the main directory will compile and link the whole framework, creating separate executables from the highest level programs residing in directory :file:`scripts`. Typing ::
 
   bjam <script-name-without-extension>
 
-will compile only the given script.
+will compile only the given :term:`script`.
 
 
-The default compilation mode is ``debug``\ ging mode, meaning that in this case a lot of runtime checks are compiled into the framework, which come from Blitz++, FLENS, and myself. Every time a new script is added it should be compiled and tested in this way because this can detect a *lot* of errors. When we are absolutely sure that everything is all right, for data collection we may compile with ``bjam release``, in which all the checks are omitted and optimisations are used, making the programs *about an order of magnitude faster*.
+The default compilation mode is ``debug``\ ging mode, meaning that in this case a lot of runtime checks are compiled into the framework, which come from Blitz++, |FLENS|, and myself. Every time a new script is added it should be compiled and tested in this way because this can detect a *lot* of errors. When we are absolutely sure that everything is all right, for data collection we may compile with :command:`bjam release`, in which all the checks are omitted and optimisations are used, making the programs *about an order of magnitude faster*.
 
 .. warning::
 
@@ -168,9 +174,9 @@ The default compilation mode is ``debug``\ ging mode, meaning that in this case 
 
      bjam <script-name-without-extension> release
 
-``bjam`` will put the compiled files into the directories ``bin`` and ``utils/bin``. These directories are the roots of directory structures which mirror the structure of the distribution.
+:command:`bjam` will put the compiled files into the directories :file:`bin` and :file:`utils/bin`. These directories are the roots of directory structures which mirror the structure of the distribution.
 
-A ``Makefile`` is also provided. This will compile the whole framework (together with ``utils``) into a single shared library, and link scripts against this, and the necessary third-party libraries. It automatically recognises the program files in directory ``scripts`` as scripts. The ``Makefile`` also features the option ``with-flens``. All other Makefiles have been removed. Note that in contrast to Boost.Build, ``make`` does not provide the possibility of having several build variants simultaneously. With ``make``, the default compilation mode is optimized mode. Type ::
+A :file:`Makefile` is also provided. This will compile the whole framework (together with :file:`utils`) into a single shared library, and link scripts against this, and the necessary third-party libraries. It automatically recognises the program files in directory :file:`scripts` as scripts. The :file:`Makefile` also features the option ``with-flens``. All other Makefiles have been removed. Note that in contrast to Boost.Build, :command:`make` does not provide the possibility of having several build variants simultaneously. With :command:`make`, the default compilation mode is optimized mode. Type ::
 
   make <script-name-without-extension>
 
@@ -178,7 +184,7 @@ To switch to debugging mode you need to use ::
 
   make optimization=no <script-name-without-extension>
 
-Boost.Build, just like ``make``, supports parallel compilation, which can make a significant difference for projects of the magnitude of C++QEDv2. For starting ``n`` threads of compilation use ::
+Boost.Build, just like :command:`make`, supports parallel compilation, which can make a significant difference for projects of the magnitude of C++QEDv2. For starting ``n`` threads of compilation use ::
 
   bjam -j n ... 
 
@@ -195,15 +201,15 @@ There is a compilation feature which can be supplied to Boost.Build::
 
   bjam with-flens=no <all the rest as before>
 
-and also to ``make``::
+and also to :command:`make`::
 
   make with-flens=no <all the rest as before>
 
-In this case, those parts of the framework that rely on FLENS are discreetly disabled. Most notable is the calculation of the negativity of partially transposed density operators, cf. :ref:`assessingEntanglement`. The file ``utils/src/DrivenDampedHarmonicOscillator.cc`` is also basically disabled, so that :class:`DrivenDampedHarmonicOscillator` becomes unusable.
+In this case, those parts of the framework that rely on |FLENS| are discreetly disabled. Most notable is the calculation of the negativity of partially transposed density operators, cf. :ref:`assessingEntanglement`. The file :file:`utils/src/DrivenDampedHarmonicOscillator.cc` is also basically disabled, so that :class:`DrivenDampedHarmonicOscillator` becomes unusable.
 
 .. note::
 
-  Scripts depending directly on FLENS will not compile in this case.
+  Scripts depending directly on |FLENS| will not compile in this case.
 
 
 
@@ -213,19 +219,19 @@ In this case, those parts of the framework that rely on FLENS are discreetly dis
 Profiling
 =========
 
-With Boost.Build, profiling (e.g. with ``gprof``) will never work in release mode because in this mode it automatically adds the ``--strip-all`` option to ``ld``, which removes the symbols necessary for profiling.
+With Boost.Build, profiling (e.g. with :command:`gprof`) will never work in release mode because in this mode it automatically adds the ``--strip-all`` option to :command:`ld`, which removes the symbols necessary for profiling.
 
 Therefore, for profiling, the ``profile`` variant has to be used. Type::
 
   bjam profile <script-name-without-extension>
 
-The ``Makefile`` also provides the pertaining option. Type::
+The :file:`Makefile` also provides the pertaining option. Type::
 
   make profiling=yes <script-name-without-extension>
 
 .. note::
 
-  With ``make``, be sure that the whole framework gets recompiled. ``bjam`` will anyway put the binaries into separate directories.
+  With :command:`make`, be sure that the whole framework gets recompiled. :command:`bjam` will anyway put the binaries into separate directories.
 
 ============
 Mac OS X
@@ -250,23 +256,23 @@ Relying on `Xcode <https://developer.apple.com/xcode>`_ and `MacPorts <http://ww
 
     In the present case, the apple darwin version of gcc-4.2 was present on the system, so GSL and all the following will be compiled with this.
 
-4. Install Blitz++ with exactly the :ref:`same commands as under linux <installBlitz>`.
+4. Install Blitz++ with exactly the :ref:`same commands as under Linux <installBlitz>`.
 
 5. Install Bazaar from binary package. For simplicity, use the ``BoostIntegration`` branch::
 
     bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed/BoostIntegration C++QED
 
-6. Copy ``utils/Jamroot.macosx`` to ``utils/Jamroot``. In your home directory, create a ``user-config.jam`` file with the single line ::
+6. Copy :file:`utils/Jamroot.macosx` to :file:`utils/Jamroot`. In your home directory, create a :file:`user-config.jam` file with the single line ::
 
     using darwin : 4.2 : g++ ;
 
-  (Without this, Boost.Build will pass bad options to ``ld``, and STL-related errors can occur as well.)
+  (Without this, Boost.Build will pass bad options to :command:`ld`, and STL-related errors can occur as well.)
 
 7. Use ::
 
     bjam with-flens=no <whatever you want to build>
 
-  since FLENS is not present on the system.
+  since |FLENS| is not present on the system.
 
 
 .. note::
@@ -274,7 +280,7 @@ Relying on `Xcode <https://developer.apple.com/xcode>`_ and `MacPorts <http://ww
   It seems that on Mac, the script so built cannot be moved from where it is put by Boost.Build, and can be executed only from the root directory of the project.
 
 
-Instead of steps 6-7, one can again use ``make``, in which case in the main ``Makefile`` the line::
+Instead of steps 6-7, one can again use :command:`make`, in which case in the main :file:`Makefile` the line::
 
   include make.inc
 
@@ -285,7 +291,7 @@ has to be replaced with::
 
 .. note::
 
-  The script so built can both be moved to and executed from anywhere, as long as the built C++QED library is not moved from where it is put by ``make``, thanks to the ``-install_name`` option in ``make.macosx.inc``.
+  The script so built can both be moved to and executed from anywhere, as long as the built C++QED library is not moved from where it is put by :command:`make`, thanks to the ``-install_name`` option in :file:`make.macosx.inc`.
 
 
 

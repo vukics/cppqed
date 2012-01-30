@@ -5,6 +5,7 @@ for i in `find . -name "*.html"`; do
   sed -i "
 	{s/__PL__/+/g}
 	{s/__MI__/-/g}
+	{s|__PE__|/|g}
 	{s/__CO__/,/g}
 	{s/__RP__/)/g}
 	{s/__LP__/(/g}

@@ -7,7 +7,9 @@ Naming scheme
 =======================
 
 
-Each file in the framework revolve around a single concept, and is named after this concept. Cf. sec. :ref:`codeOrganization`.
+Each file in the framework revolves around a single concept, and is named after this concept. 
+
+  .. seealso:: Sec. :ref:`codeOrganization`.
 
 ``FilenameFwd.h``
 
@@ -54,9 +56,9 @@ Headers under directories ``details`` are mostly very technical, often used for 
 
 This directory contains the definitions of elementary free building blocks. 
 
-.. note::
+  .. note::
 
-  Since most of the files are extremely special here, and the directory's content is continually extending and is subject to changes according to the framework's usage, we are listing only the most typical files here.
+    Since most of the files are extremely special here, and the directory's content is continually extending and is subject to changes according to the framework's usage, we are listing only the most typical files here.
 
 ``Mode``
 
@@ -154,7 +156,7 @@ This directory contains the clients of the framework, the actual programs corres
 
 ``ElementAveraged``
 
-  defines class :class:`structure::ElementAveraged` and a generic implementation :class:`structure::averaged::DiagonalDO`
+  defines class :class:`structure::ElementAveraged` and the generic implementations :class:`structure::averaged::DiagonalDO`, :class:`structure::averaged::Collecting`
 
 ``MatrixOfHamiltonian``
 

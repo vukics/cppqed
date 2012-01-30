@@ -27,19 +27,6 @@
       typedef TTD_ExtTiny<RANK> Dimensions;
 
 
-**************
-``ArrayBase``
-**************
-
-
-.. py:module:: ArrayBase.h
-   :synopsis: Defines ArrayBase in namespace quantumdata
-
-.. class:: quantumdata::ArrayBase
-
-  ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
-
-  This class collects the common functionalities of :class:`~quantumdata::StateVector` and :class:`~quantumdata::DensityOperator`.
 
 **********
 ``Types``
@@ -52,7 +39,7 @@
 
   ``template <int RANK, typename B>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
-  This class is basically only a metafunction.
+  This class is basically only a metafunction defining the following types:
 
   .. type:: StateVectorLow
 

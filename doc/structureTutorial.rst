@@ -41,14 +41,14 @@ where we have introduced the complex frequency
 
   z\equiv\kappa(2n+1)-i\delta
 
-The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`~structure::ElementAveraged` that have to be written. Consider the file ``ExampleMode.h``:
+The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`~structure::ElementAveraged` that have to be written. Consider the file :file:`ExampleMode.h` [#]_:
 
 .. literalinclude:: examples/ExampleMode.h
   :language: c++
   :linenos:
   :lines: 2-5, 7-28
 
-This will suffice here. Let us look at the implementations in ``ExampleMode.cc``:
+This will suffice here. Let us look at the implementations in :file:`ExampleMode.cc`:
 
 .. literalinclude:: examples/ExampleMode.cc
   :language: c++
@@ -61,9 +61,9 @@ Lines 18-22:
 Lines 23-25:
   We construct the time-independent :class:`~structure::TridiagonalHamiltonian` base. This is greatly facilitated by the algebra and helpers of the :class:`quantumoperator::Tridiagonal` class.
 
-.. warning::
+  .. warning::
 
-  When implementing the Hamiltonian, not :math:`H` itself but :math:`\frac Hi` has to supplied!
+    When implementing the Hamiltonian, not :math:`H` itself but :math:`\frac Hi` has to supplied!
 
 Lines 26-29:
   We construct the :class:`~structure::ElementLiouvillean` base whose second template argument denotes the number of different quantum jumps, which is 2 in this case. The constructor takes the strategies for calculating the impact of a jump on a :type:`~structure::free::StateVectorLow`, and for calculating the probability from a :type:`~structure::free::LazyDensityOperator`. These strategy functions are produced from the free-standing helpers in Lines 10-14 through binding.
@@ -81,7 +81,7 @@ Lines 37-54:
     the expectation value of the ladder operator is calculated
 
 
-The implementation of the helpers is also quite straightforward. It may come to a separate file ``ExampleModeImpl.cc``:
+The implementation of the helpers is also quite straightforward. It may come to a separate file :file:`ExampleModeImpl.cc`:
 
 .. literalinclude:: examples/ExampleModeImpl.cc
   :language: c++
@@ -174,17 +174,22 @@ The only thing requiring some care is that once we transform some elements into 
 
 )
 
-Consider ``ExampleInteraction.h``:
+Consider :file:`ExampleInteraction.h`:
 
 .. literalinclude:: examples/ExampleInteraction.h
   :language: c++
   :linenos:
   :lines: 2-
 
-``ExampleInteraction.cc`` then reads
+:file:`ExampleInteraction.cc` then reads
 
 .. literalinclude:: examples/ExampleInteraction.cc
   :language: c++
   :linenos:
 
 As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in   :eq:`XX_HamiltonianInIP`, which result from the use of interaction picture.
+
+
+.. rubric:: Footnotes
+
+.. [#] The files referred to in this Section are found in directory :file:`doc/examples` in the distribution. The code examples are expected to compile, cf. :file:`doc/examples/Jamfile`.

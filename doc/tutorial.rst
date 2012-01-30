@@ -153,7 +153,7 @@ Parameters
 
 In the above, the necessary parameters must be previously defined somewhere. Parameters can of course come from several sources, but the alternative I usually find most useful is to have sensible defaults for all parameters, and to be able to override each of them separately in the command line when I actually execute the program with a given set of parameters. This allows for a very fine-grained control over what is to be accepted as default and what is to be overridden, and the command line never gets crowded by those parameters for which the default is fine.
 
-This possibility is indeed supported by the framework, cf. :ref:`cpputils_Parameters`. Consider the following program:
+This possibility is indeed supported by the framework, cf. :ref:`cpputils_Parameters`. Consider the following program [#]_:
 
 .. literalinclude:: examples/tutorialMode.cc
   :language: c++
@@ -467,7 +467,7 @@ This is a first step towards providing a full Python frontend for the framework.
 Release
 =======
 
-The current release of the framework is |cppqed|\ v2 Milestone 9, and it is a bugfix release. The development is now in beta stage with no known major bugs. The foreseeable steps in the development are as follows:
+The current release of the framework is |cppqed|\ v2 Milestone 9, and it is a release corresponding to a new significant step in the documentation and to an upcoming paper in Computer Physics Communications. The development is now in beta stage with no known major bugs. The foreseeable steps in the development are as follows:
 
 Milestone 10
   will see the creation of a more general quantum-operator class of which :class:`~quantumoperator::Tridiagonal` will be only one implementation, while others can be operators with sparse and full matrices. They should be arbitrarily combinable with expression-template like closures taking care of the necessary internal loops. The expression-template mechanism will be implemented using the `Boost.Proto library <http://www.boost.org/doc/libs/1_46_1/doc/html/proto.html>`_.
@@ -587,6 +587,8 @@ Evolution parameters:
 
 
 .. rubric:: Footnotes
+
+.. [#] Some of the code examples presented in this Guide can be found in the files :file:`doc/examples/tutorial[...].cc` in the distribution. These files are expected to compile, cf. :file:`doc/examples/Jamfile`.
 
 .. [#] Ultimate defaults are anyway given by the framework at the point where the :class:`Pars...` classes are defined, but since at that point there is no knowledge about the details of the problem, these cannot always qualify as “sensible”.
 

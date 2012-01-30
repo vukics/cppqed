@@ -5,7 +5,9 @@ Miscellaneous rationales, ideas, notes
 
 * Instead of the current ``utils/Blitz2FLENS.h`` Blitz and FLENS could be better integrated by making a ``GeneralStorageView`` of a ``blitz::Array`` and passing it to ``GEMatrix`` as template parameter.
 
-* Transposition of ``blitz::Array`` only permutes strides, does not touch storage, as we very well know. What is maybe not so clear is that *this remains the case after deep copying as well*, since also in this case the strides are just copied so that the result does not have obvious ordering. The way to go is to first create an array with the desired ordering and then assign to it from the original array. This means that naive uses of :func:`~blitzplusplus::rankTwoArray` (and hence direct products --- coming back to an Array from a :type:`linalg::CMatrix`\ ???), ``Blitz2FLENS`` can produce very severe bugs. First of all, exceptional checks should be added to these routines. Basically, forms like 
+* Transposition of ``blitz::Array`` only permutes strides, does not touch storage, as we very well know. What is maybe not so clear is that *this remains the case after deep copying as well*, since also in this case the strides are just copied so that the result does not have obvious ordering. The way to go is to first create an array with the desired ordering and then assign to it from the original array. 
+
+  This means that naive uses of :func:`~blitzplusplus::binaryArray` (and hence direct products --- coming back to an Array from a :type:`linalg::CMatrix`\ ???), ``Blitz2FLENS`` can produce very severe bugs. First of all, exceptional checks should be added to these routines. Basically, forms like 
 
   1 3 2 0 | 5 7 6 4
 
