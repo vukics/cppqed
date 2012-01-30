@@ -62,12 +62,12 @@ public:
   StateVector(const StateVector&); // use by value semantics (deep copy)
 
   // Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
-  StateVector& operator=(const StateVector& sv) {operator=<StateVector>(sv); return *this;}
+  StateVector& operator=(const StateVector& sv) {ABase::operator=(sv()); return *this;}
 
   template<typename OTHER>
   StateVector& operator=(const OTHER& other) {operator()()=other; return *this;}
-  // Together with the default assigment, this covers a lot of possibilities, including assignment from a StateVectorLow
-
+  // This covers a lot of possibilities, including assignment from a StateVectorLow
+  // Can be assigned from anything a TTD_CARRAY(RANK) can be assigned from.
 
   // direct product
   template<int RANK2>

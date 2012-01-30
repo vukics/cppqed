@@ -16,7 +16,7 @@ using blitz::neverDeleteData;
 
 template<typename T, int RANK>
 const blitz::Array<T,1>
-rankOneArray(const blitz::Array<T,RANK>& array)
+unaryArray(const blitz::Array<T,RANK>& array)
 {
   if (!array.data()) return blitz::Array<T,1>();
 #ifndef   NDEBUG
@@ -28,7 +28,7 @@ rankOneArray(const blitz::Array<T,RANK>& array)
 
 template<typename T, int TWO_TIMES_RANK>
 const blitz::Array<T,2>
-rankTwoArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
+binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
 {
   if (!array.data()) return blitz::Array<T,2>();
 
@@ -42,7 +42,7 @@ rankTwoArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
     bool correct=true;
     for (int i=0; i<RANK; i++)
       correct&=(ordering(i)==ordering(i+RANK)+RANK);
-    if (!correct) throw RankTwoArrayOrderingErrorException();
+    if (!correct) throw BinaryArrayOrderingErrorException();
   }
 #endif // NDEBUG
 

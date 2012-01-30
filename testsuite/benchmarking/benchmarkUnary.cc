@@ -35,7 +35,7 @@ int main(int, char**)
 
   // 1
 
-  // if (doDisplay) cout<<blitzplusplus::rankOneArray(psi());
+  // if (doDisplay) cout<<blitzplusplus::unaryArray(psi());
   quantumdata::StateVector<1> psiout(psi);
 
   {
@@ -46,7 +46,7 @@ int main(int, char**)
       structure::Hamiltonian<1>::addContribution(0.,psi(),psiout(),0.,ha);
   }
 
-  // if (doDisplay) cout<<blitzplusplus::rankOneArray(psiout());
+  // if (doDisplay) cout<<blitzplusplus::unaryArray(psiout());
 
 
 }

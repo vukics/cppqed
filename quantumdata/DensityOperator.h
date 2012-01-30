@@ -69,8 +69,8 @@ public:
   double   norm() const;
   double renorm()      ;
 
-  const CMatrix matrixView() const {return blitzplusplus::rankTwoArray(operator()());}
-  CMatrix       matrixView()       {return blitzplusplus::rankTwoArray(operator()());}
+  const CMatrix matrixView() const {return blitzplusplus::binaryArray(operator()());}
+  CMatrix       matrixView()       {return blitzplusplus::binaryArray(operator()());}
 
   // naive operations for vector space
 

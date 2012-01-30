@@ -17,5 +17,5 @@ for local ccfile in [ glob TMP_ToolsError*.cc ]
 	compile-fail $(ccfile) ;
 }
 
-unit-test Blitz2FLENS : Blitz2FLENS.cc boost_test_lib : <define>BOOST_TEST_DYN_LINK <library>..//flens ;
+unit-test Blitz2FLENS : Blitz2FLENS.cc boost_test_lib : <define>BOOST_TEST_DYN_LINK <library>..//flens <library>..//blitz ;
 

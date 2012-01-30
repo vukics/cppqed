@@ -53,7 +53,7 @@ int main()
     CAR arrayReal(array.shape()); arrayReal=(array+arrayHC);
 
     CAR arrayLow(array.copy());
-    CMatrix matrixView(rankTwoArray(arrayLow));
+    CMatrix matrixView(binaryArray(arrayLow));
     calculateTwoTimesRealPartOfSelf(matrixView);
 
     //cout<<array;
@@ -155,7 +155,7 @@ int main()
   { // VFMSI computing a*rho*adagger (rho Hermitian)
     TTD_EXTTINY(3) dims0(4,5,2);
     TTD_CARRAY(6) rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
-    CMatrix matrixView(rankTwoArray(rho));
+    CMatrix matrixView(binaryArray(rho));
 
     fillWithRandom(rho,fillWithRandom(a,ran));
 

@@ -27,7 +27,7 @@ void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v,
 
   // 1
 
-  if (doDisplay) cout<<blitzplusplus::rankOneArray(psi());
+  if (doDisplay) cout<<blitzplusplus::unaryArray(psi());
   quantumdata::StateVector<RANK> psiout(psi);
 
   {
@@ -38,7 +38,7 @@ void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v,
       structure::Hamiltonian<RANK>::addContribution(0.,psi(),psiout(),0.,ha);
   }
 
-  if (doDisplay) cout<<blitzplusplus::rankOneArray(psiout());
+  if (doDisplay) cout<<blitzplusplus::unaryArray(psiout());
 
 
   // 2

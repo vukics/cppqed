@@ -13,7 +13,7 @@ namespace quantumdata {
 
 
 template<int RANK>
-class ArrayBase
+class ArrayBase : private boost::noncopyable
 {
 protected:
   typedef TTD_CARRAY(RANK) ArrayLow;
@@ -24,9 +24,8 @@ protected:
   virtual ~ArrayBase() {}
 
   // Assignment: by value semantics. 
-  // (Default assignment is wasteful as it assigns the vectorView_ as well, even though it refers to the same data.)
-  ArrayBase& operator=(const ArrayLow & arrayLow ) {arrayLow_=arrayLow; return *this;}
-  ArrayBase& operator=(const ArrayBase& arrayBase) {return operator=(arrayBase());}
+  ArrayBase& operator=(const ArrayLow& arrayLow ) {arrayLow_=arrayLow; return *this;}
+  // + default assignment
 
   const ArrayLow& operator()() const {return arrayLow_;}
   ArrayLow& operator()() {return const_cast<ArrayLow&>(static_cast<const ArrayBase&>(*this)());}
@@ -46,14 +45,12 @@ protected:
 
   // The following two can be called only if the underlying storage is contigous
 
-  const CVector vectorView() const {return blitzplusplus::rankOneArray(arrayLow_);}
-  CVector       vectorView()       {return blitzplusplus::rankOneArray(arrayLow_);}
+  const CVector vectorView() const {return blitzplusplus::unaryArray(arrayLow_);}
+  CVector       vectorView()       {return blitzplusplus::unaryArray(arrayLow_);}
   // The usual technique doesn't work here, because `CVector is not a pointer, reference, nor a pointer-to-data-member type'
 
 
 private:
-  ArrayBase(const ArrayBase&); // forbid copying
-  
   ArrayLow arrayLow_;
 
 };

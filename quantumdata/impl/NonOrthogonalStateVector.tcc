@@ -9,7 +9,7 @@ namespace quantumdata {
 template<int RANK, typename TRAFO>
 double NonOrthogonalStateVector<RANK,TRAFO>::norm() const
 {
-  return sqrt(real(sum(conj(vectorView())*blitzplusplus::rankOneArray(dual_))));
+  return sqrt(real(sum(conj(vectorView())*blitzplusplus::unaryArray(dual_))));
 }
 
 #include <iostream>

@@ -65,7 +65,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   {
     PROGRESS_TIMER_IN_POINT(getOstream())
-    linalg::CMatrix drhodtMatrixView(blitzplusplus::rankTwoArray(drhodtLow));
+    linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
     linalg::calculateTwoTimesRealPartOfSelf(drhodtMatrixView);
     PROGRESS_TIMER_OUT_POINT("RealPartOfSelf")
   }

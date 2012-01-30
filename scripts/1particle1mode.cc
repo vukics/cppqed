@@ -118,6 +118,8 @@ int main(int argc, char* argv[])
   
   psi.renorm();
 
+  psi=psiPart*psiPart; 
+  StateVector psi1(psi);
 
   evolve(psi,BinarySystem(*particlecavityBase),pe,tmptools::Vector<0>());
 

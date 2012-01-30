@@ -64,8 +64,8 @@ doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2, boost
   using namespace linalg;
   TTD_CARRAY(RANK1+RANK2) res(concatenateTinies(array1.shape(),array2.shape()));
   if (res.data()) {
-    CVector r1array1(rankOneArray(array1));
-    CVector r1array2(rankOneArray(array2));
+    CVector r1array1(unaryArray(array1));
+    CVector r1array2(unaryArray(array2));
     CMatrix r2res(res.data(),shape(array1.size(),array2.size()),neverDeleteData);
     
     dodirect::doDirect<MULT>(r2res,r1array1,r1array2);

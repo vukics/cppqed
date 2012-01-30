@@ -21,15 +21,15 @@ class NonContiguousStorageException : public cpputils::Exception {};
 
 template<typename T, int RANK>
 const blitz::Array<T,1>
-rankOneArray(const blitz::Array<T,RANK>&);
+unaryArray(const blitz::Array<T,RANK>&);
 
 
-class RankTwoArrayOrderingErrorException : public cpputils::Exception {};
+class BinaryArrayOrderingErrorException : public cpputils::Exception {};
 
 
 template<typename T, int TWO_TIMES_RANK>
 const blitz::Array<T,2>
-rankTwoArray(const blitz::Array<T,TWO_TIMES_RANK>&);
+binaryArray(const blitz::Array<T,TWO_TIMES_RANK>&);
 
 
 } // blitzplusplus
