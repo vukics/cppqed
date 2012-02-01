@@ -73,8 +73,8 @@ public:
   template<int RANK2>
   StateVector(const StateVector<RANK2>&, const StateVector<RANK-RANK2>&);
 
-  double   norm() const;
-  double renorm()      ;
+  double   norm() const {return ABase::frobeniusNorm();}
+  double renorm()                                     ;
 
   const DensityOperatorLow dyad(const StateVector&) const;
   const DensityOperatorLow dyad(                  ) const {return dyad(*this);}

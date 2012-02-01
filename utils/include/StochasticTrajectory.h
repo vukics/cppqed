@@ -27,7 +27,7 @@
 #include "Randomized.h"
 
 
-#include<boost/ptr_container/ptr_list.hpp>
+#include<boost/ptr_container/ptr_vector.hpp>
 
 
 namespace trajectory {
@@ -148,13 +148,16 @@ public:
 
   double getTime() const {return trajs_.begin()->getTime();}
 
-  const TBA_Type toBeAveraged() const;
+  const TBA_Type toBeAveraged(size_t begin, size_t n) const;
+  // Averages only in a range begin..begin+n-1
+  const TBA_Type toBeAveraged() const {return toBeAveraged(0,trajs_.size());}
 
   void displayParameters() const;
 
   virtual ~EnsembleTrajectories() {}
 
-  typedef boost::ptr_list<Elem> Impl;
+  typedef boost::ptr_vector<Elem> Impl;
+  // We use a vector in order that individual trajectories are addressed more easily.
 
   const Impl& getTrajs() const {return trajs_;}
 
@@ -187,7 +190,7 @@ public:
   typedef typename ET::Impl     Impl    ;
   typedef typename ET::TBA_Type TBA_Type;
 
-  static const TBA_Type toBeAveraged(const ET& et);
+  static const TBA_Type toBeAveraged(typename Impl::const_iterator, typename Impl::const_iterator, const ET&);
 
 };
 

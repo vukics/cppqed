@@ -22,28 +22,21 @@ namespace quantumtrajectory {
 namespace ensemblemcwf {
 
 
-namespace details {
-
-template<int RANK>
-struct StateVectorsMF {
-
-  typedef quantumdata::StateVector<RANK> StateVector;
-  typedef boost::ptr_list<StateVector> type;
-
-};
-
-} // details
-
+#define STATE_VECTORS(r) boost::ptr_vector<quantumdata::StateVector<r> >
 
 #define BASE_class trajectory::EnsembleTrajectories< quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>& >
 
 template<int RANK>
 class Base
-  : private boost::base_from_member<typename details::StateVectorsMF<RANK>::type>,
+  : private boost::base_from_member<STATE_VECTORS(RANK) >,
     public BASE_class
 {
 public:
-  typedef boost::base_from_member<typename details::StateVectorsMF<RANK>::type> StateVectorsBase;
+  typedef STATE_VECTORS(RANK) StateVectors;
+
+#undef  STATE_VECTORS
+
+  typedef boost::base_from_member<StateVectors> StateVectorsBase;
 
   typedef BASE_class EnsembleTrajectories;
 
@@ -52,13 +45,11 @@ public:
   typedef MCWF_Trajectory<RANK> Trajectory;
 
   typedef typename Trajectory::StateVector    StateVector   ;
-
   typedef typename Trajectory::StateVectorLow StateVectorLow; 
 
   typedef structure::QuantumSystem<RANK> QuantumSystem;
 
-  typedef typename details::StateVectorsMF<RANK>::type StateVectors;
-  typedef typename EnsembleTrajectories::Impl          Trajectories;
+  typedef typename EnsembleTrajectories::Impl Trajectories;
 
 
   Base(
@@ -68,10 +59,12 @@ public:
        const StateVectorLow& =StateVectorLow()
        );
 
-private:
-  mutable quantumdata::DensityOperator<RANK> rho_;
+  const StateVectors& getStateVectors() const {return StateVectorsBase::member;}
 
   const typename EnsembleTrajectories::TBA_Type getInitializedTBA() const {rho_()=0; return rho_;}
+
+private:
+  mutable quantumdata::DensityOperator<RANK> rho_;
 
 };
 
@@ -101,7 +94,7 @@ public:
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;
 
-  using Base::getOstream; using Base::getTime;
+  using Base::getOstream; using Base::getTime; using Base::getStateVectors;
 
   EnsembleMCWF(
 	       const StateVector& psi,

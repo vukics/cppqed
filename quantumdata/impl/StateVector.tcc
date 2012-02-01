@@ -2,8 +2,6 @@
 #ifndef   _STATE_VECTOR_IMPL_H
 #define   _STATE_VECTOR_IMPL_H
 
-#include "ComplexArrayExtensions.h"
-
 
 namespace quantumdata {
 
@@ -38,14 +36,6 @@ StateVector<RANK>::dyad(const StateVector& sv) const
 {
   using namespace blitzplusplus;
   return doDirect(operator()(),StateVectorLow(conj(sv())),dodirect::Mul());
-}
-
-
-template<int RANK>
-double 
-StateVector<RANK>::norm() const
-{
-  return sqrt(sum(blitzplusplus::sqrAbs(operator()())));
 }
 
 

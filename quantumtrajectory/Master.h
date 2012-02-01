@@ -55,6 +55,8 @@ public:
 
   void step             (double) const;
 
+  void displayParameters(      ) const;
+
 protected:
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
   typedef boost::function<void(const StateVectorLow&, StateVectorLow&)> BinaryFunction;
@@ -62,8 +64,6 @@ protected:
   DensityOperator& rho_;
 
 private:
-  void displayParameters(      ) const;
-
   virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
 
