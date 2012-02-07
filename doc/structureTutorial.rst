@@ -43,6 +43,8 @@ where we have introduced the complex frequency
 
 The element has to be represented by a class which inherits publicly from the necessary classes in the ``structure`` namespace. In this simple case, it is basically two helper functions returning :class:`quantumoperator::Tridiagonal`\ s, a constructor, and two virtual functions inherited from :class:`~structure::ElementAveraged` that have to be written. Consider the file :file:`ExampleMode.h` [#]_:
 
+.. seealso:: The description of :class:`~quantumoperator::Tridiagonal`
+
 .. literalinclude:: examples/ExampleMode.h
   :language: c++
   :linenos:

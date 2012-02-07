@@ -48,9 +48,9 @@ In a quantum-simulation framework, users should be able to write code for calcul
 
   \avr{A}=\Tr{A\rho}
 
-(:math:`A` being an observable and :math:`\rho` the density operator of the system), to write code only for the density-operator case, and fall back to this in the state-vector case as well, by calculating a dyad from the state vector. This is, however, extremely wasteful, since usually not all the matrix elements of :math:`\rho` are needed for calculating the average, furthermore, for large dimensionality this solution may become outright unaffordable in terms of memory.
+(:math:`A` being an observable and :math:`\rho` the density operator of the system), to write code only for the density-operator case, and fall back to this in the state-vector case as well, by calculating a dyad from the state vector. This is, however, extremely wasteful, since usually not all the matrix elements of :math:`\rho` are needed for calculating the average, furthermore, for large dimensionality this solution may become outright unaffordable in terms of memory: for large systems, we may afford to store :math:`\ket\Psi`, but not :math:`\ket\Psi\bra\Psi`.
 
-The solution adopted for this problem in the framework is represented by the class :class:`~quantumdata::LazyDensityOperator`, which provides a common interface for all the four cases :class:`~quantumdata::StateVector`, :class:`~quantumdata::DensityOperator`, and their :ref:`non-orthogonal counterparts <quantumdataNonOrthogonal>`, to calculate quantum averages from their data. The "laziness" means that in the case of state vectors, only those elements of the density operator are calculated that are asked for.
+The solution adopted for this problem in the framework is represented by the class :class:`~quantumdata::LazyDensityOperator`, which provides a common interface for all the four cases :class:`~quantumdata::StateVector`, :class:`~quantumdata::DensityOperator`, and their :ref:`non-orthogonal counterparts <quantumdataNonOrthogonal>`, to calculate quantum averages from their data. The "laziness" means that in the case of state vectors only those elements of the density operator are calculated that are actually asked for.
 
 .. py:module:: LazyDensityOperator.h
    :synopsis: Defines LazyDensityOperator abstract interface
@@ -235,79 +235,80 @@ On higher levels of the framework, the iteration is performed via the function:
       }
 
 
-  **Semantics:**
-    The function iterates through all the combinations of the dummy indeces, for each slice it takes the value returned by the functor ``function``, and accumulates these values. In the following we give some instructive examples of usage.
+  .. rubric:: Semantics
 
-    Calculating the full partial density operator of a unary subsystem:
-      Assume having a function which simply copies the content of a unary :class:`~quantumdata::LazyDensityOperator` into a :type:`structure::free::DensityOperatorLow`::
+  The function iterates through all the combinations of the dummy indeces, for each slice it takes the value returned by the functor ``function``, and accumulates these values. In the following we give some instructive examples of usage.
 
-        using structure::free::DensityOperatorLow
+  Calculating the full partial density operator of a unary subsystem:
+    Assume having a function which simply copies the content of a unary :class:`~quantumdata::LazyDensityOperator` into a :type:`structure::free::DensityOperatorLow`::
 
-        const DensityOperatorLow
-	densityOperator(const LazyDensityOperator<1>& m)
-	{
-	  size_t dim=m.getDimension();
-	  DensityOperatorLow res(dim,dim);
-  	  for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) res(i,j)=m(i,j);
-  	  return res;    
+      using structure::free::DensityOperatorLow
+
+      const DensityOperatorLow
+      densityOperator(const LazyDensityOperator<1>& m)
+      {
+        size_t dim=m.getDimension();
+	DensityOperatorLow res(dim,dim);
+  	for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) res(i,j)=m(i,j);
+  	return res;    
+      }
+
+    Then the partial density operator of any unary subsystem of a system of any rank may be calculated as follows (e.g. from a :class:`~quantumdata::StateVector`)::
+
+      template<int RANK, int SUBSYSTEM> // for the subsystem indexed by the index SUBSYSTEM
+      const DensityOperatorLow
+      partialTraceOfUnarySubsystem(const StateVector<RANK>& psi)
+      {
+        return partialTrace(psi,densityOperator,tmptools::Vector<SUBSYSTEM>(),DensityOperatorLow()); 
+      }
+
+  Calculating correlations for two harmonic-oscillator modes:
+    Assume having the function ``calculateADaggerB`` as defined :ref:`above <calculateADaggerB>`. Then, if these modes are embedded at index positions 3 and 1 (note that the order might be important) in a larger system of arity larger than 3, we can write the following function::
+
+      template<int RANK> // RANK>3
+      const dcomp
+      calculateADaggerB_atPositions3and1(const LazyDensityOperator<RANK>& matrix)
+      {
+        return partialTrace(matrix,calculateADaggerB,tmptools::Vector<3,1>(),dcomp());
+      }
+
+    This will calculate :math:`\avr{a^\dag b}` (now :math:`b` and :math:`a` being the ladder operators of the modes at position 1 and 3, respectively) for the partial density operator of the embedded system (but without explicitly calculating this partial density operator).
+
+  Accumulating an arbitrary ensemble of quantum averages:
+    An arbitrary ensemble of real or complex numbers can be stored in a :class:`TTD_DArray`\ ``<1>`` or :class:`TTD_CArray`\ ``<1>`` (or even ``std::valarray``\ s), as these types fulfill all the requirements on type ``T``. The former was used to define the abstract interface :class:`structure::Averages`, one implementation being :class:`Mode`.
+
+    E.g. a function for a harmonic-oscillator mode calculating :math:`\avr{a^\dag a}`, :math:`\avr{\lp a^\dag a\rp^2}`, and the real and imaginary parts of :math:`\avr{a}`, may be defined as ::
+
+      typedef TTD_DArray<1> Averages;
+
+      const Averages
+      calculateModeAverages(const LazyDensityOperator<1>& matrix)
+      {
+        Averages averages(4); averages=0;
+
+	for (int n=1; n<int(matrix.getDimension()); n++) {
+    	  double diag=matrix(n);
+    	  averages(0)+=  n*diag;
+    	  averages(1)+=n*n*diag;
+
+    	  double sqrtn=sqrt(double(n));
+    	  dcomp offdiag(matrix(n,n-1));
+    	  averages(2)+=sqrtn*real(offdiag);
+    	  averages(3)+=sqrtn*imag(offdiag);
 	}
 
-      Then the partial density operator of any unary subsystem of a system of any rank may be calculated as follows (e.g. from a :class:`~quantumdata::StateVector`)::
+  	return averages;
 
-        template<int RANK, int SUBSYSTEM> // for the subsystem indexed by the index SUBSYSTEM
-        const DensityOperatorLow
-	partialTraceOfUnarySubsystem(const StateVector<RANK>& psi)
-	{
-	  return partialTrace(psi,densityOperator,tmptools::Vector<SUBSYSTEM>(),DensityOperatorLow()); 
-	}
+      }
 
-    Calculating correlations for two harmonic-oscillator modes:
-      Assume having the function ``calculateADaggerB`` as defined :ref:`above <calculateADaggerB>`. Then, if these modes are embedded at index positions 3 and 1 (note that the order might be important) in a larger system of arity larger than 3, we can write the following function::
+    Then the following function will calculate these averages for a mode embedded in a larger system at index position ``MODE_POSITION``::
 
-        template<int RANK> // RANK>3
-	const dcomp
-	calculateADaggerB_atPositions3and1(const LazyDensityOperator<RANK>& matrix)
-	{
-	  return partialTrace(matrix,calculateADaggerB,tmptools::Vector<3,1>(),dcomp());
-	}
-
-      This will calculate :math:`\avr{a^\dag b}` (now :math:`b` and :math:`a` being the ladder operators of the modes at position 1 and 3, respectively) for the partial density operator of the embedded system (but without explicitly calculating this partial density operator).
-
-    Accumulating an arbitrary ensemble of quantum averages:
-      An arbitrary ensemble of real or complex numbers can be stored in a :class:`TTD_DArray`\ ``<1>`` or :class:`TTD_CArray`\ ``<1>`` (or even ``std::valarray``\ s), as these types fulfill all the requirements on type ``T``. The former was used to define the abstract interface :class:`structure::Averages`, one implementation being :class:`Mode`.
-
-      E.g. a function for a harmonic-oscillator mode calculating :math:`\avr{a^\dag a}`, :math:`\avr{\lp a^\dag a\rp^2}`, and the real and imaginary parts of :math:`\avr{a}`, may be defined as ::
-
-        typedef TTD_DArray<1> Averages;
-
-	const Averages
-	calculateModeAverages(const LazyDensityOperator<1>& matrix)
-	{
-  	  Averages averages(4); averages=0;
-
-  	  for (int n=1; n<int(matrix.getDimension()); n++) {
-    	    double diag=matrix(n);
-    	    averages(0)+=  n*diag;
-    	    averages(1)+=n*n*diag;
-
-    	    double sqrtn=sqrt(double(n));
-    	    dcomp offdiag(matrix(n,n-1));
-    	    averages(2)+=sqrtn*real(offdiag);
-    	    averages(3)+=sqrtn*imag(offdiag);
-	  }
-
-  	  return averages;
-
-	}
-
-      Then the following function will calculate these averages for a mode embedded in a larger system at index position ``MODE_POSITION``::
-
-        template<int RANK, int MODE_POSITION> // for the subsystem indexed by the index MODE_POSITION
-        const Averages
-	calculateEmbeddedModeAverages(const StateVector<RANK>& psi)
-	{
-	  return partialTrace(psi,calculateModeAverages,tmptools::Vector<MODE_POSITION>(),Averages()); 
-	}
+      template<int RANK, int MODE_POSITION> // for the subsystem indexed by the index MODE_POSITION
+      const Averages
+      calculateEmbeddedModeAverages(const StateVector<RANK>& psi)
+      {
+        return partialTrace(psi,calculateModeAverages,tmptools::Vector<MODE_POSITION>(),Averages()); 
+      }
 
 
 

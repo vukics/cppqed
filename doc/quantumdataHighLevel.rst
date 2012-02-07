@@ -207,13 +207,13 @@ There are two further free-standing helpers:
 
   ``template <int RANK1, int RANK2>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
-  This function creates the direct product.
+  This function creates the direct product, relying on the direct-product constructor.
 
 .. function:: const dcomp quantumdata::braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 
   ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`)
 
-  Calculates the inner product.
+  Calculates the inner product, relying on :func:`~quantumdata::StateVector::vectorView`.
 
 
 ****************
@@ -223,6 +223,8 @@ Density operator
 .. py:module:: DensityOperator.h
    :synopsis: Defines DensityOperator in namespace quantumdata and corresponding operations
 
+:class:`~quantumdata::DensityOperator`\ s interface is similar to :class:`~quantumdata::StateVector`\ s with obvious differences. Here only the most important will be tackled:
+
 .. class:: quantumdata::DensityOperator
 
   ``template <int RANK>`` (cf. :ref:`template parameters <quantumdataTemplates>`); inherits publicly from :class:`~quantumdata::LazyDensityOperator`\ ``<RANK>``, and privately from :class:`~quantumdata::ArrayBase`\ ``<2*RANK>``, and also from :class:`linalg::VectorSpace`\ ``<DensityOperator<RANK> >`` which adds a lot of free-standing arithmetic functions.
@@ -230,8 +232,6 @@ Density operator
   .. note::
 
     A :class:`~quantumdata::DensityOperator`\ ``<RANK>`` represents a density operator on a Hilbert space of arity ``RANK``. This makes that the number of its indeces is actually ``2*RANK``. This is the reason why it inherits from :class:`~quantumdata::ArrayBase`\ ``<2*RANK>``.
-
-  The interface is similar to :class:`~quantumdata::StateVector` with obvious differences. Here only the most important will be tackled:
 
   .. function:: explicit DensityOperator(const StateVector<RANK>& psi)
 
@@ -245,11 +245,11 @@ Density operator
 
   .. function:: const linalg::CMatrix matrixView() const
 
-    (also in non-constant version) Returns a two-dimensional view of the underlying data.
+    (also in non-constant version) Returns a two-dimensional view of the underlying data, created on the fly via :func:`blitzplusplus::binaryArray`.
 
   .. function:: const dcomp operator()(const Idx& i, const Idx& j)
 
-    This function implements the virtual indexing function :func:`quantumdata::LazyDensityOperator::operator()` in a trivial way, simply by accessing the necessary element in memory::
+    This function implements the virtual indexing function :func:`quantumdata::LazyDensityOperator::operator()` in a trivial way, simply by accessing the necessary element in memory (it must rely on :func:`blitzplusplus::concatenateTinies`, though)::
 
       const dcomp operator()(const Idx& i, const Idx& j) const 
       {

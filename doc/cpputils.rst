@@ -1,3 +1,5 @@
+.. _compile-time assertion: http://www.boost.org/doc/libs/1_48_0/libs/mpl/doc/refmanual/assert-msg.html
+
 .. _cpputils:
 
 ***************************************************
@@ -37,7 +39,7 @@ The ``trajectory`` namespace
 .. function:: void parameters::update(parameters::ParameterTable& table, int argc, char** argv, const std::string& mod="--")
 
 ======================
-``MultiIndexIterator``
+Multi-index iterator
 ======================
 
 .. class:: cpputils::MultiIndexIterator
@@ -45,9 +47,10 @@ The ``trajectory`` namespace
 
 .. _cpputils_VFMSI:
 
-=================================
-``VectorFromMatrixSliceIterator``
-=================================
+=================================================
+Iterating through rows/columns of multi-matrices
+=================================================
+
 
 
 ==============================
@@ -55,12 +58,15 @@ Template metaprogramming tools
 ==============================
 
 
+.. class:: tmptools::Range
+
+  ``template <int N, int Nbeg>``, inherits publicly from ``boost::mpl::range_c<int,Nbeg,Nbeg+N>`` (Cf. `semantics <http://www.boost.org/doc/libs/1_48_0/libs/mpl/doc/refmanual/range-c.html>`_)
+
+  Contains a `compile-time assertion`_ of ``N`` being nonnegative.
+
 .. class:: tmptools::Ordinals
 
-  ``template <int RANK>``
-
-  .. type:: type
-
+  ``template <int N>``, inherits publicly from :class:`~tmptools::Range`\ ``<N,0>``
 
 .. class:: tmptools::numerical_contains
 
@@ -69,6 +75,13 @@ Template metaprogramming tools
   ``Seq`` is a Boost.MPL `forward sequence <http://www.boost.org/doc/libs/1_48_0/libs/mpl/doc/refmanual/forward-sequence.html>`_, and ``ICW`` is a compliant `integral constant wrapper <http://www.boost.org/doc/libs/1_48_0/libs/mpl/doc/refmanual/integral-constant.html>`_.
 
   This metaalgorithm differs from `boost::mpl::contains <http://www.boost.org/doc/libs/1_48_0/libs/mpl/doc/refmanual/contains.html>`_ in that it does not look for whether ``ICW`` as a *type* is contained in ``Seq``, but whether the *value* held (statically) by ``ICW`` is held by any element of the type sequence ``Seq``.
+
+
+.. class:: tmptools::IsEvenAssert
+
+  ``template <int N>``, inherits publicly from ``boost::mpl::int_<N/2>`` (Cf. `semantics <http://www.boost.org/doc/libs/1_48_0/libs/mpl/doc/refmanual/int.html>`_)
+
+  Contains a `compile-time assertion`_ of ``N`` being an even number. 
 
 
 .. class:: tmptools::Vector
@@ -122,8 +135,11 @@ Further extensions to Blitz
 
   Returns a binary view of ``array``. ``TWO_TIMES_RANK`` must be an even number, violation is detected at compile time by :class:`tmptools::IsEvenAssert`.
 
+  The same requirement of contiguity an the same warning applies as :func:`above <blitzplusplus::unaryArray>`, and in addition, further assumptions on the storage order must be made: The storage of the two multi-indeces must not be intertwined and must be layed out in the same way, so that e.g. for ``RANK=4``, the member function ``array.ordering()`` should return an octary tiny vector like::
 
+    <1 3 2 0 | 5 7 6 4>
 
+  Violation is detected at runtime, and an exception of type :class:`~blitzplusplus::BinaryArrayOrderingErrorException` is thrown.
 
 .. py:module:: ComplexArrayExtensions.h
    :synopsis: Defines some generic extensions for complex ``blitz::Array``\ s.
@@ -153,5 +169,3 @@ Further extensions to Blitz
   ``template<typename T, int TWO_TIMES_RANK>``
 
 
-
-.. function:: 
