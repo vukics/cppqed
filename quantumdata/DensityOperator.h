@@ -67,8 +67,11 @@ public:
 
   DensityOperator(const DensityOperator&); // By value semantics (deep copy)
 
-  // Default assignment is wasteful due to the presence of matrixView_, which references the same data
-  DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho); return *this;}
+  // Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
+  DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho()); return *this;}
+
+  template<typename OTHER>
+  DensityOperator& operator=(const OTHER& other) {operator()()=other; return *this;}
 
   double   norm() const;
   double renorm()      ;
@@ -77,9 +80,6 @@ public:
   CMatrix       matrixView()       {return blitzplusplus::binaryArray(operator()());}
 
   // naive operations for vector space
-
-  template<typename OTHER>
-  DensityOperator& operator=(const OTHER& other) {operator()()=other; return *this;}
 
   DensityOperator& operator+=(const DensityOperator& rho) {ABase::operator+=(rho); return *this;}
   DensityOperator& operator-=(const DensityOperator& rho) {ABase::operator-=(rho); return *this;}

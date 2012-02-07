@@ -92,10 +92,9 @@ struct numerical_equal : boost::mpl::equal<Seq1,Seq2,details::value_equal<boost:
 
 
 template<int N>
-struct IsEvenAssert
+struct IsEvenAssert : boost::mpl::int_<N/2>
 {
   BOOST_MPL_ASSERT_MSG( (2*(N/2)==N) , ARGUMENT_NOT_EVEN, (boost::mpl::int_<N>) );
-  static const int value=N/2;
 };
 
 
