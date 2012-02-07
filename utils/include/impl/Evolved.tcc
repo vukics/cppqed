@@ -31,7 +31,7 @@ template<typename E>
 void evolve(E& e, double deltaT)
 {
   double endTime=e.getTime()+deltaT;
-  while (double dt=endTime-e.getTime()) e.step(dt);
+  for (double dt=endTime-e.getTime(); fabs(dt/endTime)>e.getEpsRel(); e.step(dt), dt=endTime-e.getTime());
 }
 // evolves for exactly deltaT
 

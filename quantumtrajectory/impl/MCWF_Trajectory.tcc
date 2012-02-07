@@ -179,7 +179,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 {
   if (ha_) getEvolved()->step(Dt);
   else {
-    double stepToDo=getDtTry()>Dt ? Dt : getDtTry(); 
+    double stepToDo=li_ ? (getDtTry()>Dt ? Dt : getDtTry()) : Dt;
     getEvolved()->update(getTime()+stepToDo,stepToDo);
     logger_.logFailedSteps(getEvolved()->nFailedSteps());
   }

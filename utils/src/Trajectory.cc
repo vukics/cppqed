@@ -65,7 +65,7 @@ void TrajectoryBase::displayKey() const
 
 void details::doRun(TrajectoryBase& traj, double time, double deltaT)
 {
-  while (traj.getTime()<time) {
+  while (traj.getTime()<time*(1.-traj.getEpsRel())) {
     traj.evolve(std::min(deltaT,time-traj.getTime()));
     traj.display();
   }
