@@ -11,15 +11,15 @@ namespace quantumoperator {
 
 
 template<int L, int R, typename OTHER>
-const directProduct<L,R,OTHER,true >
+const DirectProduct<L,R,OTHER,true >
 operator*(const Sigma<L,R>&, const OTHER&);
 
 template<int L, int R, typename OTHER>
-const directProduct<L,R,OTHER,false>
+const DirectProduct<L,R,OTHER,false>
 operator*(const OTHER&, const Sigma<L,R>&);
 
 template<int L1, int R1, int L2, int R2>
-const directProduct<L1,R1,Sigma<L2,R2>,true>
+const DirectProduct<L1,R1,Sigma<L2,R2>,true>
 operator*(const Sigma<L1,R1>&, const Sigma<L2,R2>&);
 
 
@@ -44,9 +44,9 @@ public:
 
 template<int RANK, bool IS_HEAD>
 const typename quantumdata::Types<RANK-1>::StateVectorLow
-partialProject(const typename quantumdata::Types<RANK>::StateVectorLow&, int n);
-// it's better to convert n into a runtime variable because then we can use complete specializations of this function
-
+partialProject(const typename quantumdata::Types<RANK>::StateVectorLow& psi, int n);
+// It's better to convert n into a runtime variable because then we can use complete specializations of this function
+// Eventually it has to be converted anyway into an index of psi
 
 } // quantumoperator
 

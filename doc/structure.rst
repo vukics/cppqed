@@ -22,7 +22,7 @@ Most of the classes in this namespace belong to a single hierarchy, sketched in 
 
 We have also indicated how :ref:`elements <generalElements>` like :class:`Mode` and :class:`JaynesCummings`, and :ref:`composite systems <composites>` as :class:`BinarySystem` and :class:`Composite` fit into the hierarchy.
 
-These modules provide a lot of services for implementing new elements in the framework. For examples on how to optimally use these services, cf. :ref:`the structure-bundle tutorial below <structureTutorial>`.
+These modules provide a lot of services for implementing new elements in the framework. For examples on how to optimally use these services, cf. :doc:`the structure-bundle guide below <structureTutorial>`.
 
 .. _structureTutorial:
 
@@ -83,7 +83,7 @@ the multiplier will be different::
 
    "eta",eta,sqrt(cutoff)
 
-The class also stores an ``std::stringstream`` object, on which the constructor of the given element can write its parameters, and these will in turn be displayed when :func:`~structure::QuantumSystem::displayParameters` is called for the system. Cf. :ref:`tutorial above <structureTutorial>`.
+The class also stores an ``std::stringstream`` object, on which the constructor of any client (derived element class) can write its parameters, and these will in turn be displayed when :func:`~structure::QuantumSystem::displayParameters` is called for the system. Cf. :doc:`tutorial above <structureTutorial>`.
 
 
 .. py:module:: DynamicsBase.h
@@ -133,6 +133,7 @@ The class also stores an ``std::stringstream`` object, on which the constructor 
 
   .. member:: std::stringstream paramsStream_
 
+    (private) data member
 
 -----------------------------------
 ``QuantumSystem``

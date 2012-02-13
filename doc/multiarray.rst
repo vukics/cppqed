@@ -14,24 +14,26 @@ First, we introduce basic definitions on the algebra of composite quantum system
 .. math::
   :label: compositeHilbertSpace
 
-  \HSpace=\bigotimes_i\HSpace_i,\quad\ket\iota\in\HSpace,\quad\ket{\iota_i}\in\HSpace_i,\quad\ket\iota=\bigotimes_i\ket{\iota_i}\equiv\ket{\iota_0,\iota_1,\dots}
+  \HSpace=\bigotimes_i\HSpace_i,\quad\ket\iota\in\HSpace,\quad\ket{\iota_i}\in\HSpace_i,\quad\ket\iota=\bigotimes_i\ket{\iota_i}\equiv\ket{\iota_0,\iota_1,…}
 
 
 The number of elementary Hilbert spaces (the number of quantum numbers of the system) is referred to throughout as the *rank* or *arity* (un\ *ary*, bin\ *ary*, tern\ *ary*, quatern\ *ary*, etc.) of the system.
 
-Via an example we define *state-vector slices:*
+Via an example we define :term:`state-vector slices <multi-array slice>`:
 
 .. math::
   :label: stateVectorSlices
 
-  \ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}\equiv\sum_{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i
+  \ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}\equiv\sum_{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i
+
+A state-vector slice is defined by the :term:`retained index positions` :math:`\avr{1,3,6,7,9}`, which define the subsystem, and the :term:`“dummy” indices` :math:`(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)`. In situations when slicing occurs in the framework, the set of retained index positions is an information available at compile time, while the set of dummy indices is an information becoming available only at runtime.
 
 Slicing is fully recursive in that a state-vector slice behaves exactly as a state vector, only with a lower rank. It can even be further sliced. It is in particular true that
 
 .. math::
   :label: stateVectorSlicesRecursive
 
-  \braket\iota\Psi=\braket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}
+  \braket\iota\Psi=\braket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}
 
 Via an example we define *canonical operator extensions:*
 
@@ -40,7 +42,7 @@ Via an example we define *canonical operator extensions:*
 
   A\equiv\sum_kA_\text{k,3}\otimes A_\text{k,6}\otimes A_\text{k,1}\otimes A_\text{k,9}\otimes A_\text{k,7}\in\Lfrak\lp\HSpace_\text{3}\otimes\HSpace_\text{6}\otimes\HSpace_\text{1}\otimes\HSpace_\text{9}\otimes\HSpace_\text{7}\rp
 
-  A^{\avr{3,6,1,9,7}}(\HSpace)\equiv\sum_k\lp\idop_0\otimes A_\text{k,1}\otimes\idop_2\otimes A_\text{k,3}\otimes\idop_4\otimes\idop_5\otimes A_\text{k,6}\otimes A_\text{k,7}\otimes\idop_8\otimes A_\text{k,9}\otimes\idop_{10}\dots\rp\in\Lfrak(\HSpace)
+  A^{\avr{3,6,1,9,7}}(\HSpace)\equiv\sum_k\lp\idop_0\otimes A_\text{k,1}\otimes\idop_2\otimes A_\text{k,3}\otimes\idop_4\otimes\idop_5\otimes A_\text{k,6}\otimes A_\text{k,7}\otimes\idop_8\otimes A_\text{k,9}\otimes\idop_{10}…\rp\in\Lfrak(\HSpace)
 
 When the numbers in the angular brackets are permutations of a sequence of ordinals, this is in fact not even an extension, only a permutation of the underlying elementary Hilbert spaces.
 
@@ -49,7 +51,7 @@ Matrix elements of the operator in extended Hilbert spaces can then be calculate
 .. math::
   :label: canonicalOperatorExtensionsAction
 
-  \bra\iota A^{\avr{3,6,1,9,7}}(\HSpace)\ket\Psi=\bra{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}A^{\avr{1,2,0,4,3}}\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots)}
+  \bra\iota A^{\avr{3,6,1,9,7}}(\HSpace)\ket\Psi=\bra{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}A^{\avr{1,2,0,4,3}}\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}
 
 
 ==========================================
@@ -82,10 +84,10 @@ The name of the namespace stands for BlitzArraySliceIterator.
   Template argument definitions:
 
   ``int RANK``
-    Positive integer standing for the number of elementary Hilbert spaces in :eq:`compositeHilbertSpace`
+    Positive integer standing for the number of elementary Hilbert spaces in :eq:`compositeHilbertSpace`.
 
   ``typename V``
-    Holds vectors like :math:`\avr{3,6,1,9,7}` in :eq:`canonicalOperatorExtensions` describing the slice.
+    Compile-time vector holding the :term:`retained index positions` like :math:`\avr{3,6,1,9,7}` in :eq:`canonicalOperatorExtensions`.
     
     Example models: :class:`tmptools::Vector` and ``mpl::range_c`` from `Boost.MPL <http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/range-c.html>`_.
 
@@ -145,7 +147,7 @@ The name of the namespace stands for BlitzArraySliceIterator.
                       actWithA);
     }
 
-  The value returned by :func:`~blitzplusplus::basi::fullRange` is a Boost.Range-compliant range, a full range of slice iterators corresponding to all the possible combinations of dummy indices (:math:`\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\dots`), and ``for_each`` is the range algorithm from Boost.Range.
+  The value returned by :func:`~blitzplusplus::basi::fullRange` is a Boost.Range-compliant range, a full range of slice iterators corresponding to all the possible combinations of dummy indices (:math:`\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…`), and ``for_each`` is the range algorithm from Boost.Range.
 
   For further basic examples of usage cf. ``C++Utils/testsuite/BlitzArraySliceIterator.cc``.
 

@@ -72,6 +72,10 @@ Implementation
 
       static const int LENGTH=tmptools::Power<3,RANK>::value;
 
+  .. c:var:: N_RANK
+  
+    Reports the class's rank for example towards :class:`~quantumoperator::DirectProduct`.
+
   .. type:: Diagonals 
   
     The class is implemented in terms of a :class:`blitzplusplus::TinyOfArrays`, this is the class used to store the :type:`Diagonal`\ s::
@@ -264,4 +268,122 @@ Sigma
 
 .. class:: quantumoperator::Sigma
 
-  ...
+  ``template<int L, int R>``
+
+  Stateless class implementing the unary quantumoperator
+
+  .. math::
+
+    \ket{L}\bra{R}
+
+  The template parameters are eventually converted to runtime data when :func:`applying <quantumoperator::Sigma::apply>` the operator. At that point, dimensionality errors are detected in debug mode. All members are fairly trivial:
+
+  .. c:var:: N_RANK
+
+    ::
+
+      static const int N_RANK=1;
+
+  .. type:: StateVectorLow
+
+    ::
+
+      typedef quantumdata::Types<1>::StateVectorLow 
+
+  .. function:: void apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+
+    ::
+
+      {dpsidt(L)+=psi(R);}  
+
+  .. function:: const Sigma<R,L> dagger() const
+
+    ::
+
+      {return Sigma<R,L>();}
+
+  .. note::
+
+    :class:`~quantumoperator::Sigma` should perhaps inherit from :class:`DimensionsBookkeeper`\ —this would allow for an earlier detection of dimensionality errors.
+
+
+.. class:: quantumoperator::DirectProduct
+
+  ``template<int L, int R, typename OTHER, bool IS_HEAD>``
+
+  This class is a direct-product clause, representing a germinal expression-template mechanism for direct products of :class:`~quantumoperator::Sigma`\ ``<L,R>`` with ``OTHER`` types. 
+
+  Models for ``OTHER`` at the moment:
+    #. Another class :class:`~quantumoperator::Sigma`\ ``<L1,R1>``
+
+    #. A :class:`~quantumoperator::Tridiagonal` type
+
+    #. Another :class:`~quantumoperator::DirectProduct` (recursivity)
+
+  ``IS_HEAD`` signifies whether :class:`~quantumoperator::Sigma`\ ``<L,R>`` is at the head or at the tail of the direct product.
+
+  .. c:var:: N_RANK
+
+    Reports the rank of the class for recursive usage::
+
+      static const int N_RANK=OTHER::N_RANK+1;
+
+  .. type:: StateVectorLow
+
+    ::
+
+      typedef typename quantumdata::Types<N_RANK>::StateVectorLow StateVectorLow;
+
+  .. function:: DirectProduct(const OTHER& other)
+
+    The class has to store a reference to the ``OTHER`` class to enable :func:`~quantumoperator::DirectProduct::apply`\ ing.
+
+  .. function:: void apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+
+    Applies the clause on a state vector ``psi``, adding the result to ``dpsidt``, analogously to :func:`quantumoperator::Tridiagonal::apply` and :func:`structure::Hamiltonian::addContribution`. It is implemented as taking the :func:`partial projection <quantumoperator::partialProject>` of the state vectors according to ``L`` and ``R`` (which at this point are converted into runtime data), and calling the ``apply`` function of the ``OTHER`` type.
+
+
+.. rubric:: Free-standing helpers
+
+.. function:: const DirectProduct<L,R,OTHER,true > quantumoperator::operator*(const Sigma<L,R>& head, const OTHER& tail)
+
+  ``template<int L, int R, typename OTHER>``
+
+.. function:: const DirectProduct<L,R,OTHER,false> quantumoperator::operator*(const OTHER& head, const Sigma<L,R>& tail)
+
+  ``template<int L, int R, typename OTHER>``
+
+.. function:: const DirectProduct<L1,R1,Sigma<L2,R2>,true> quantumoperator::operator*(const Sigma<L1,R1>& head, const Sigma<L2,R2>& tail)
+
+  ``template<int L1, int R1, int L2, int R2>``
+
+  These operators aptly demonstrate the use of :class:`~quantumoperator::DirectProduct` and the meaning of its template parameters:
+
+
+
+.. highlight:: sh
+
+.. function:: const StateVectorLow<RANK__MI__1> quantumoperator::partialProject(const StateVectorLow<RANK>& psi, int n)
+
+  ``template<int RANK, bool IS_HEAD>``
+
+  Helper for :func:`quantumoperator::DirectProduct::apply`. Calculates the state-vector slice
+
+  .. math::
+
+    \ket{\Psi^{\avr{1,2,3,…,\text{rank-2},\text{rank-1}}}(\iota_0=n)}\in\bigotimes_{i=1,2,3,…,\text{rank-2},\text{rank-1}}\HSpace_i
+
+  if ``IS_HEAD=true`` and
+
+  .. math::
+
+    \ket{\Psi^{\avr{0,1,2,…,\text{rank-3},\text{rank-2}}}(\iota_\text{rank-1}=n)}\in\bigotimes_{i=0,1,2,…,\text{rank-3},\text{rank-2}}\HSpace_i
+
+  if ``IS_HEAD=false``.
+
+  The code is automatically generated for all template-parameter combinations (``RANK`` up to 11) via preprocessor metaprogramming. Cf. :file:`quantumoperator::Sigma.cc`::
+
+    g++ -P -E -Iutils/include/ -Iquantumoperator/ -Iquantumdata/ quantumoperator/Sigma.cc | tail -n128
+
+.. highlight:: c++
+  :linenothreshold: 10

@@ -11,7 +11,7 @@ class Sigma;
 
 
 template<int L, int R, typename OTHER, bool IS_HEAD>
-class directProduct;
+class DirectProduct;
 
 
 } // quantumoperator
