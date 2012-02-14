@@ -4,6 +4,8 @@ Change Log
 
 The following is a list of only the more substantial changes (e.g. such as break certain applications). For a full log of development, `browse the Bazaar repository <http://cppqed.bzr.sourceforge.net/bzr/cppqed/changes>`_.
 
+2012/02/07 Main branch revision #204 fixes `bug <http://sourceforge.net/tracker/?func=detail&aid=3482771&group_id=187775&atid=922653>`_ by introducing a little fuzziness to the time comparison of trajectories. Cf. also `this tracker <http://sourceforge.net/tracker/?func=detail&aid=3485727&group_id=187775&atid=922653>`_.
+
 
 2012/01/27 Migrated to the Boost.Range version of range algorithms. This means that as of today, the minimal Boost version is 1.43.
 
