@@ -169,7 +169,7 @@ public:
 
 
 #define NS_NAME basi
-#define RETURN_type1(CONST) Iterator<A::_bz_rank,V_S,CONST>
+#define RETURN_type1(CONST) Iterator<ArrayRankTraits<A>::value,V_S,CONST>
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
@@ -346,31 +346,31 @@ private:
 
 
 
-#define RETURN_type1(CONST) Iterator<A::_bz_rank,V,CONST>
+#define RETURN_type1(CONST) Iterator<ArrayRankTraits<A>::value,V,CONST>
 
 
 template<typename A, typename V>
 inline
 const RETURN_type1(true )
-begin(const A& array, const SlicesData<A::_bz_rank,V>& sd)
+begin(const A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 {return RETURN_type1(true )(array,sd,boost::mpl::false_());}
 
 template<typename A, typename V>
 inline
 const RETURN_type1(true )
-end  (const A& array, const SlicesData<A::_bz_rank,V>& sd)
+end  (const A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 {return RETURN_type1(true )(array,sd,boost::mpl:: true_());}
 
 template<typename A, typename V>
 inline
 const RETURN_type1(false)
-begin(      A& array, const SlicesData<A::_bz_rank,V>& sd)
+begin(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 {return RETURN_type1(false)(array,sd,boost::mpl::false_());}
 
 template<typename A, typename V>
 inline
 const RETURN_type1(false)
-end  (      A& array, const SlicesData<A::_bz_rank,V>& sd) 
+end  (      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd) 
 {return RETURN_type1(false)(array,sd,boost::mpl:: true_());}
 
 
@@ -379,13 +379,13 @@ end  (      A& array, const SlicesData<A::_bz_rank,V>& sd)
 template<typename A, typename V>
 inline
 const RETURN_type2(true ) 
-fullRange(const A& array, const SlicesData<A::_bz_rank,V>& sd) 
+fullRange(const A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd) 
 {return RETURN_type2(true )(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
 
 template<typename A, typename V>
 inline
 const RETURN_type2(false) 
-fullRange(      A& array, const SlicesData<A::_bz_rank,V>& sd)
+fullRange(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 {return RETURN_type2(false)(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
 
 

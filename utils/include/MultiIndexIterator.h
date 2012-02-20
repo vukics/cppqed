@@ -6,11 +6,9 @@
 
 #include "BlitzTiny.h"
 
-#include<blitz/tinyvec-et.h>
+#include <boost/operators.hpp>
 
-#include<boost/operators.hpp>
-
-#include<boost/mpl/identity.hpp>
+#include <boost/mpl/identity.hpp>
 
 
 namespace cpputils {

@@ -4,12 +4,24 @@
 
 #include "ComplexExtensions.h"
 
-#include<blitz/array.h>
+#include <blitz/array.h>
 
-#include<boost/utility.hpp>
+#include <boost/utility.hpp>
+
+#include <boost/mpl/int.hpp>
 
 
 namespace blitzplusplus {
+
+
+// A wrapper for blitz::Array::rank_; which did change from the CVS (where it used to be called _bz_rank) to the Mercurial version.
+template<typename A>
+struct ArrayRankTraits;
+
+template<typename T, int RANK>
+struct ArrayRankTraits<blitz::Array<T,RANK> > : boost::mpl::int_<RANK> {};
+
+
 
 struct ShallowCopy {}; // For referencing constructors
 struct DeepCopy    {}; // For copying     constructors

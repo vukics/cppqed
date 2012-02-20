@@ -6,7 +6,8 @@
 
 #include "ParsFwd.h"
 
-#include <blitz/tinyvec.h>
+#include "BlitzTiny.h"
+
 
 namespace multilevel {
 

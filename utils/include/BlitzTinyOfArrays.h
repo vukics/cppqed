@@ -36,11 +36,10 @@ public:
   typedef typename Base::T_numtype       T_numtype;
   typedef typename Base::T_vector        T_vector;
   typedef typename Base::T_iterator      T_iterator;
-  typedef typename Base::T_constIterator T_constIterator;
   typedef typename Base::iterator        iterator;
   typedef typename Base::const_iterator  const_iterator;
   
-  using Base::numElements; using Base::operator=;
+  using Base::operator=;
 
 
   // In all the constructors the base is implicitly default constructed
