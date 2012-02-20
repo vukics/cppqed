@@ -206,7 +206,7 @@ public:
   typedef typename Base::JumpStrategies            JumpStrategies           ;
   typedef typename Base::JumpProbabilityStrategies JumpProbabilityStrategies;
   
-  BOOST_STATIC_ASSERT( JumpProbabilityStrategies::numElements==mpl::size<VL>::value );
+  BOOST_STATIC_ASSERT( blitzplusplus::TinyVectorLengthTraits<JumpProbabilityStrategies>::value==mpl::size<VL>::value );
 
 
   static const int NLT=mpl::size<VL>::value; // number of lossy transitions
