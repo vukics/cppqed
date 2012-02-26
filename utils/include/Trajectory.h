@@ -36,6 +36,13 @@ inline void evolve(Trajectory<A>&, const ParsTrajectory&);
 class StoppingCriterionReachedException : public cpputils::Exception {};
 
 
+class OutfileOpeningException : public cpputils::TaggedException
+{
+public:
+  OutfileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
+
+};
+
 
 /////////////////
 //

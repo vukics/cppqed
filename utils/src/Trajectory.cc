@@ -21,7 +21,10 @@ TrajectoryBase::~TrajectoryBase()
 
 ostream& TrajectoryBaseHelper(const string& ofn)
 {
-  return ofn=="" ? cout : *new ofstream(ofn.c_str(),ios_base::app);
+  if (ofn=="") return cout;
+  ofstream*const res=new ofstream(ofn.c_str(),ios_base::app);
+  if (res->fail()) throw OutfileOpeningException(ofn);
+  return *res;
 }
 
 
