@@ -125,7 +125,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
       double t0, dtTry;
       file>>t0; file>>dtTry;
-      getEvolved()->update(t0,dtTry);
+      getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
+      getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0);
     }
 
   }

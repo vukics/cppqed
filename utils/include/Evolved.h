@@ -39,13 +39,12 @@ public:
   double getEpsAbs() const {return epsAbs_;}
 
   void update(double t, double dtTry);
+  void setDtDid(double dtDid) {dtDid_=dtDid;}
 
   TimeStepBookkeeper& operator=(const TimeStepBookkeeper&);
 
 protected:
   TimeStepBookkeeper(double dtInit, double epsRel, double epsAbs);
-
-  void setDtDid(double dtDid) {dtDid_=dtDid;}
 
 private:
   double t_, dtTry_, dtDid_;
