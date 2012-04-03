@@ -5,7 +5,7 @@
 Reference Manual
 *************************
 
-The manual is currently heavily under development... In the meantime feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
+The manual is currently heavily under development... In the meantime feel free to `ask for support <http://cppqed.sourceforge.net/#support>`_.
 
 
 ===========

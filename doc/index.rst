@@ -12,6 +12,9 @@ C++QED: a framework for simulating open quantum dynamics
 
 **C++QED is a highly flexible framework for simulating open quantum dynamics. It allows users to build arbitrarily complex interacting quantum systems from elementary free subsystems and interactions, and simulate their time evolution with a number of available time-evolution drivers.**
 
+The SourceForge.net `project summary page <http://sourceforge.net/projects/cppqed/>`_.
+
+
 =============
 Documentation
 =============
@@ -30,7 +33,7 @@ To be able to write new modules representing elementary free subsystems or inter
 
    elementGuide
 
-For a deeper understanding and to be able to extend the framework with new modules, consult the constantly developing reference manual. If your problem is not (yet) covered therein, feel free to `contact the developers <http://sourceforge.net/project/memberlist.php?group_id=187775>`_.
+For a deeper understanding and to be able to extend the framework with new modules, consult the constantly developing reference manual. If your problem is not (yet) covered therein, :ref:`ask for support <support>`.
 
 .. toctree::
    :maxdepth: 2
@@ -48,21 +51,19 @@ Users of the development version from the Bazaar repository, should consult the 
 PyCppQED
 -------------
 
-`PyCppQED <http://github.com/bastikr/pycppqed>`_ is a Python backend for processing and visualizing data produced by the framework:
-
-* `PyCppQED documentation <http://cppqed.sourceforge.net/pyCppQED_doc/index.html>`_
+`PyCppQED <http://github.com/bastikr/pycppqed>`_ is a Python backend for processing and visualizing data produced by the framework. Cf. `documentation <http://cppqed.sourceforge.net/pyCppQED_doc/index.html>`_.
 
 
 ------------------
 Printable versions
 ------------------
 
-* :download:`User Guide in pdf <_build/latex/C++QED_Tutorial.pdf>`
+.. hlist::
+  :columns: 3
 
-* :download:`Element Guide in pdf <_build/latex/C++QED_structureTutorial.pdf>`
-
-* `PyCppQED user guide in pdf <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
-
+  * :download:`User Guide in pdf <_build/latex/C++QED_Tutorial.pdf>`
+  * :download:`Element Guide in pdf <_build/latex/C++QED_structureTutorial.pdf>`
+  * `PyCppQED user guide in pdf <http://github.com/downloads/bastikr/pycppqed/PyCppQED-0.1.1.pdf>`_
 
 
 ========
@@ -71,8 +72,6 @@ Download
 
 .. highlight:: sh
 
-* `The project summary page <http://sourceforge.net/projects/cppqed/>`_
-
 * `Released packages <http://sourceforge.net/projects/cppqed/files/>`_
 
 * The development version from the Bazaar repository::
@@ -80,15 +79,18 @@ Download
     bzr checkout bzr://cppqed.bzr.sourceforge.net/bzrroot/cppqed C++QED
 
 
+.. _support:
+
 =======
 Support
 =======
 
-* `The project mailing list <https://lists.sourceforge.net/lists/listinfo/cppqed-support>`_ or ...
+.. hlist::
 
-* `... contact the developers directly <http://sourceforge.net/project/memberlist.php?group_id=187775>`_
+  * `the project mailing list <https://lists.sourceforge.net/lists/listinfo/cppqed-support>`_
+  * `the tracker system <http://sourceforge.net/tracker/?group_id=187775>`_
 
-Issues with C++QED proper should be addressed to `András Vukics <http://sourceforge.net/users/vukics>`_, those with PyCppQED to `Sebastian Krämer <http://sourceforge.net/users/bastikr>`_.
+Issues with PyCppQED should be addressed to `Sebastian Krämer <http://sourceforge.net/users/bastikr>`_ directly.
 
 
 =====
@@ -99,6 +101,10 @@ Links
 
 * Sebastian Krämer's :download:`Master's Thesis <_static/SebastianKraemerThesis.pdf>` at the University of Innsbruck, on simulating harmonic-oscillator modes by an adaptive set of coherent states as basis.
 
+* `The second journal article about the framework <http://dx.doi.org/10.1016/j.cpc.2012.02.004>`_
+
+* `The first journal article about the framework <http://www.springerlink.com/content/r2237020726t0614/>`_
+
 * `Boost C++ libraries <http://www.boost.org>`_
 
 * `GNU Scientific library (GSL) <http://www.gnu.org/software/gsl/>`_
@@ -107,12 +113,11 @@ Links
 
 * `Flexible Library for Efficient Numerical Solutions (FLENS) <http://flens.sourceforge.net/>`_
 
-* `The first journal article about the framework <http://www.springerlink.com/content/r2237020726t0614/>`_
 
 
-================
+=============
 Bazaar access
-================
+=============
 
 To access the Bazaar repository, configure your Bazaar client as follows::
 
