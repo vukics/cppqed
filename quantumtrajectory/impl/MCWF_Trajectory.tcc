@@ -125,6 +125,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
       double t0, dtTry;
       file>>t0; file>>dtTry;
+      tIntPic0_=t0;
       getEvolved()->update(t0,dtTry);
     }
 
