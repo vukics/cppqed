@@ -127,6 +127,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       file>>t0; file>>dtTry;
       getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
       getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0);
+      if (ex_) tIntPic0_=t0;
     }
 
   }
