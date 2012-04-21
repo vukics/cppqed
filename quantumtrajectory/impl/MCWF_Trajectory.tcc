@@ -149,7 +149,7 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
   if (file_!="") {
     ofstream file((file_+".sv").c_str());
     file<<psi_();
-    file<<"# "<<getTime()<<' '<<getDtTry()<<endl;
+    file<<"\n# "<<getTime()<<' '<<getDtTry()<<endl;
   }
 
 }
