@@ -148,8 +148,6 @@ public:
 
   double getTime() const {return trajs_.begin()->getTime();}
 
-  double getEpsRel() const {return trajs_.begin()->getEpsRel();}
-
   const TBA_Type toBeAveraged(size_t begin, size_t n) const;
   // Averages only in a range begin..begin+n-1
   const TBA_Type toBeAveraged() const {return toBeAveraged(0,trajs_.size());}

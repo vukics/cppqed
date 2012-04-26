@@ -62,8 +62,6 @@ public:
 
   virtual double getTime()             const = 0;
 
-  virtual double getEpsRel()           const = 0;
-
   virtual double getDtDid()            const = 0;
 
   virtual void   displayParameters()   const = 0;
@@ -104,9 +102,10 @@ public:
 
   double getTime() const {return evolved_->getTime();}
 
-  double getEpsRel() const {return evolved_->getEpsRel();}
-
-  // Preference for purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved. (Only Simulated, but neither Master, nor MCWF_Trajectory)
+  // Preference for purely virtual functions, so that there is no
+  // danger of forgetting to override them. Very few examples anyway
+  // for a trajectory wanting to perform only a step of Evolved. (Only
+  // Simulated, but neither Master, nor MCWF_Trajectory)
   virtual void step(double deltaT) const = 0;
 
   void evolve(double deltaT) const {evolved::evolve<const Trajectory>(*this,deltaT);}
