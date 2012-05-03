@@ -181,8 +181,8 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 {
   if (ha_) getEvolved()->step(Dt);
   else {
-    double stepToDo=li_ ? (getDtTry()>Dt ? Dt : getDtTry()) : Dt;
-    getEvolved()->update(getTime()+stepToDo,stepToDo);
+    double stepToDo=li_ ? std::min(getDtTry(),Dt) : Dt;
+    getEvolved()->update(getTime()+stepToDo,getDtTry());
     logger_.logFailedSteps(getEvolved()->nFailedSteps());
   }
 
