@@ -127,6 +127,7 @@ private:
   const double dpLimit_, overshootTolerance_;
 
   const unsigned svdc_;
+  mutable long svdCount_;
 
   const std::string file_;
 
