@@ -15,6 +15,7 @@ template<typename T, typename D>
 void run(T& traj, double time, D d, void (*doRun)(T&,double,D), bool timestep, bool displayInfo)
 {
   using namespace std;
+  bool continuing=false;
   
   if (displayInfo) {
     if (!traj.getTime()) {
@@ -23,11 +24,15 @@ void run(T& traj, double time, D d, void (*doRun)(T&,double,D), bool timestep, b
       traj.displayKey();
       traj.getOstream()<<endl<<"# Run Trajectory. Displaying in every "<<d<<(timestep ? " timestep" : "")<<endl<<endl;
     }
-    else traj.getOstream()<<"# Continuing..."<<endl;
+    else {
+      traj.getOstream()<<"# Continuing..."<<endl;
+      continuing=true;
+    }
   }
 
   try {
-    traj.display(); doRun(traj,time,d);
+    if (!continuing) traj.display(); 
+    doRun(traj,time,d);
   }
   catch (const StoppingCriterionReachedException& except) {
     traj.getOstream()<<"# Stopping criterion has been reached"<<endl;
