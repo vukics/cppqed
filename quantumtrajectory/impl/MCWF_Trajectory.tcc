@@ -85,7 +85,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     av_(structure::qsa(&sys)),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
-    svdCount_(p.firstSVDisplay ? 0 : 1),
+    firstSVDisplay_(p.firstSVDisplay),
+    svdCount_(0),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
     logger_(p.logLevel,ha_,getOstream())
@@ -170,7 +171,7 @@ void MCWF_Trajectory<RANK>::displayMore(int precision) const
 
   os<<endl;
 
-  if (svdc_ && !(svdCount_%svdc_)) os<<psi_();
+  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<psi_();
   svdCount_++;
 }
 
