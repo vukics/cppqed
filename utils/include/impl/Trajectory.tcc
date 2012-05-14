@@ -15,10 +15,10 @@ template<typename T, typename D>
 void run(T& traj, double time, D d, void (*doRun)(T&,double,D), bool timestep, bool displayInfo)
 {
   using namespace std;
-  bool continuing=false;
+  bool continuing=traj.getTime();
   
   if (displayInfo) {
-    if (!traj.getTime()) {
+    if (!continuing) {
       traj.displayParameters();
       traj.getOstream()<<endl<<"# Key to data:"<<endl;
       traj.displayKey();
@@ -26,7 +26,6 @@ void run(T& traj, double time, D d, void (*doRun)(T&,double,D), bool timestep, b
     }
     else {
       traj.getOstream()<<"# Continuing..."<<endl;
-      continuing=true;
     }
   }
 
