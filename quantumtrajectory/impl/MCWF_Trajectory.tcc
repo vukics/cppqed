@@ -85,6 +85,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     av_(structure::qsa(&sys)),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
+    firstSVDisplay_(p.firstSVDisplay),
+    svdCount_(0),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
     logger_(p.logLevel,ha_,getOstream())
@@ -126,7 +128,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       double t0, dtTry;
       file>>t0; file>>dtTry;
       getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
-      getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0);
+      getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
       if (ex_) tIntPic0_=t0;
     }
 
@@ -169,8 +171,7 @@ void MCWF_Trajectory<RANK>::displayMore(int precision) const
 
   os<<endl;
 
-  static unsigned svdCount_=0;
-  if (svdc_ && !(svdCount_%svdc_)) os<<psi_();
+  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<psi_();
   svdCount_++;
 }
 
