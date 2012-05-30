@@ -9,8 +9,8 @@
 #include "FormDouble.h"
 #include "ParsTrajectory.h"
 
-#include<string>
-#include<sstream>
+#include <string>
+#include <sstream>
 
 
 namespace quantumtrajectory {
@@ -55,7 +55,7 @@ DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostre
   {
     if (av_) 
       Averaged::display(t,rho,line,precision,av_);
-    if (negativity_) line<<'\t'<<formdouble::FormDouble(precision)(quantumdata::negPT(rho,V()));
+    if (negativity_) line<<'\t'<<FormDouble(precision)(quantumdata::negPT(rho,V()));
     line<<endl;
   }
 

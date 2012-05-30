@@ -325,4 +325,22 @@ Assessing entanglement
 
   Calculates the negativity of the partial transpose of the density operator of an arbitrarily complex system. Of course it should be regarded as a bipartite system, so that a subsystem has to be specified to be one party of the bipartite. The compile-time vector ``V`` specifies the subsystem.
 
-  ...
+  The negativity is calculated as *the sum of the negative eigenvalues* of the partially transposed density operator.
+
+  .. note:: This definition is equivalent to the original definition of Vidal and Werner [#]_ up to a sign, because the partially transposed density operator's eigenvalues come in two sorts:
+
+      * solitary positive numbers (:math:`a_i`) adding up to one
+
+      * pairs of opposite-sign numbers (:math:`b_i`)
+
+    .. math::
+
+      \mathcal{N}(\rho)\equiv\frac{\norm{\rho^{\text{PT}}}_1-1}2=\frac{\sum_i\abs{\rho^{\text{PT}}_{ii}}-1}2=\frac{\sum_ia_i+2\sum_ib_i-1}2=\sum_ib_i
+
+
+
+
+
+.. rubric:: Footnotes
+
+.. [#] G. Vidal and R. F. Werner, *Computable measure of entanglement*, Phys. Rev. A, **65**, 032314, (2002)

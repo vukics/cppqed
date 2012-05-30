@@ -51,8 +51,8 @@ TrajectoryBase::TrajectoryBase(const ParsTrajectory& p)
 
 void TrajectoryBase::display() const
 {
-  using formdouble::special;
-  getOstream()<<special()(getTime())<<special()(getDtDid());
+  const FormDouble fd(formdouble::positive(precision_));
+  getOstream()<<fd(getTime())<<fd(getDtDid());
   displayMore(precision_);
   getOstream().flush();
 }
