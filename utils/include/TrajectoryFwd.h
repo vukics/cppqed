@@ -8,6 +8,7 @@ namespace trajectory {
 struct ParsTrajectory;
 
 class StoppingCriterionReachedException;
+class OutfileOpeningException;
 
 class TrajectoryBase;
 

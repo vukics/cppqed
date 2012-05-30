@@ -14,7 +14,9 @@ namespace quantumtrajectory {
 struct ParsMCWF_Trajectory : public trajectory::ParsStochasticTrajectory {
   
   double &dpLimit, &overshootTolerance;
+
   unsigned &svdc;
+  bool &firstSVDisplay;
 
   std::string &initFile;
 

@@ -447,6 +447,8 @@ In a composite system we may want to assess the entanglement between two parts o
 
 The subsystem to be considered as one party of the two has to be specified in an additional compile-time vector argument to the :func:`evolve` function.
 
+  .. seealso:: The discussion of :func:`quantumdata::negPT`.
+
 To show the syntax we assume e.g. that in the previous example we are looking for the entanglement between the two particles together as one party, and the mode as the other party. Then the invocation of :func:`evolve` is modified as ::
 
   evolve(psi,system,pe,tmptools::Vector<1,2>());
@@ -467,7 +469,7 @@ This is a first step towards providing a full Python frontend for the framework.
 Release
 =======
 
-The current release of the framework is |cppqed|\ v2 Milestone 9, and it is a release corresponding to a new significant step in the documentation and to an upcoming paper in Computer Physics Communications. The development is now in beta stage with no known major bugs. The foreseeable steps in the development are as follows:
+The current release of the framework is |cppqed|\ v2 Milestone 9, and it is a release corresponding to a new significant step in the documentation and to an upcoming paper in Computer Physics Communications [CPC]_. The development is now in beta stage with no known major bugs. The foreseeable steps in the development are as follows:
 
 Milestone 10
   will see the creation of a more general quantum-operator class of which :class:`~quantumoperator::Tridiagonal` will be only one implementation, while others can be operators with sparse and full matrices. They should be arbitrarily combinable with expression-template like closures taking care of the necessary internal loops. The expression-template mechanism will be implemented using the `Boost.Proto library <http://www.boost.org/doc/libs/1_46_1/doc/html/proto.html>`_.
@@ -511,6 +513,7 @@ References
 
 .. [EPJD] \A. Vukics and H. Ritsch, *C++QED: an object-oriented framework for wave-function simulations of cavity QED systems*, Eur. Phys. J. D, *44*, 585, (2007)
 
+.. [CPC] \A. Vukics, *C++QEDv2: The multi-array concept and compile-time algorithms in the definition of composite quantum systems*, Comp. Phys. Commun., **183**, 1381, (2012)
 
 
 .. rubric:: Glossary

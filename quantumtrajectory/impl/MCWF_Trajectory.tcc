@@ -85,6 +85,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     av_(structure::qsa(&sys)),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
+    firstSVDisplay_(p.firstSVDisplay),
+    svdCount_(0),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
     logger_(p.logLevel,ha_,getOstream())
@@ -125,7 +127,9 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
       double t0, dtTry;
       file>>t0; file>>dtTry;
-      getEvolved()->update(t0,dtTry);
+      getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
+      getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
+      if (ex_) tIntPic0_=t0;
     }
 
   }
@@ -148,7 +152,7 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
   if (file_!="") {
     ofstream file((file_+".sv").c_str());
     file<<psi_();
-    file<<"# "<<getTime()<<' '<<getDtTry()<<endl;
+    file<<"\n# "<<getTime()<<' '<<getDtTry()<<endl;
   }
 
 }
@@ -167,8 +171,7 @@ void MCWF_Trajectory<RANK>::displayMore(int precision) const
 
   os<<endl;
 
-  static unsigned svdCount_=0;
-  if (svdc_ && !(svdCount_%svdc_)) os<<psi_();
+  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<psi_();
   svdCount_++;
 }
 
@@ -179,8 +182,8 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 {
   if (ha_) getEvolved()->step(Dt);
   else {
-    double stepToDo=li_ ? (getDtTry()>Dt ? Dt : getDtTry()) : Dt;
-    getEvolved()->update(getTime()+stepToDo,stepToDo);
+    double stepToDo=li_ ? std::min(getDtTry(),Dt) : Dt;
+    getEvolved()->update(getTime()+stepToDo,getDtTry());
     logger_.logFailedSteps(getEvolved()->nFailedSteps());
   }
 

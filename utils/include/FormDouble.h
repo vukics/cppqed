@@ -13,6 +13,10 @@
 
 namespace formdouble {
 
+std::ostream& operator<<(std::ostream&, const Bound&);
+
+}
+
 
 class FormDouble 
 {
@@ -20,10 +24,10 @@ public:
   explicit FormDouble(int precision);
   FormDouble(int precision, int width) : precision_(precision), width_(width) {}
 
-  const BoundFormDouble operator()(double) const;
+  const formdouble::Bound operator()(double) const;
 
 private:
-  friend std::ostream& operator<<(std::ostream&, const BoundFormDouble&);
+  friend std::ostream& formdouble::operator<<(std::ostream&, const Bound&);
   
   int precision_;
   int width_;
@@ -31,21 +35,25 @@ private:
 };
 
 
-class BoundFormDouble 
+
+namespace formdouble {
+
+
+class Bound 
 {
 public:
   const FormDouble& f;
   double val;
-  BoundFormDouble(const FormDouble& ff, double v) : f(ff), val(v) {}
+  Bound(const FormDouble& ff, double v) : f(ff), val(v) {}
 };
 
 
-std::ostream& operator<<(std::ostream&, const BoundFormDouble&);
+const FormDouble positive(int precision); // This is for quantities that can only be positive, such as time.
 
 
-inline FormDouble low    () {return FormDouble(3   );}
-inline FormDouble high   () {return FormDouble(6   );}
-inline FormDouble special() {return FormDouble(6,13);} // This is for things that can only be positive, such as time.
+// Generic values:
+inline const FormDouble low    () {return FormDouble(3);}
+inline const FormDouble high   () {return FormDouble(6);}
 
 
 } // formdouble

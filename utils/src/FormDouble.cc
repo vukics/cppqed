@@ -1,37 +1,53 @@
 #include "FormDouble.h"
 
-#include<limits>
-#include<sstream>
-
+#include <cmath>
+#include <limits>
+#include <sstream>
 
 
 using namespace std;
 
 
-namespace formdouble {
+namespace {
+
+/*
+  It is easy to see that if there can be three digits in the exponent then the output takes at most 8 additional characters (together with the trailing space necessary to separate from the next field). Eg with precision=3 :
+  |-1.23e-456 | => 11 characters
+  |-0.0000123 |
+
+  For positive numbers, the additional characters are at most 7.
+*/
+
+
+int widthPositive(int precision)
+{
+  return precision+int(log10(-log10(numeric_limits<double>::min())))+5;
+}
+
+
+int widthAny     (int precision)
+{
+  return widthPositive(precision)+1;
+}
+
+
+}
+
 
 
 FormDouble::FormDouble(int precision) 
-  : precision_(precision), width_(precision+(std::numeric_limits<double>::min()<1e-99 ? 8 : 7))
-    /*
-      It is easy to see that if there can be three digits in the exponent
-      then the output takes at most 8 additional characters.
-      (together with the trailing space necessary to separate from the next field)
-      Eg with precision=3
-      |-1.23e-456 | => 11 characters
-      |-0.0000123 |
-    */
+  : precision_(precision), width_(widthAny(precision))
 {
 }
 
 
-const BoundFormDouble FormDouble::operator()(double d) const
+const formdouble::Bound FormDouble::operator()(double d) const
 {
-  return BoundFormDouble(*this,d);
+  return formdouble::Bound(*this,d);
 }
 
 
-std::ostream& operator<<(std::ostream& os, const BoundFormDouble& bf)
+std::ostream& formdouble::operator<<(std::ostream& os, const formdouble::Bound& bf)
 {
   ostringstream s; 
   // the intermediate stringstream is taken so that the manips don't affect the NEXT output
@@ -43,5 +59,11 @@ std::ostream& operator<<(std::ostream& os, const BoundFormDouble& bf)
 }
 
 
-} // formdouble
+
+const FormDouble formdouble::positive(int precision)
+{
+  const int precisionActual=max(6,precision);
+  return FormDouble(precisionActual,widthPositive(precisionActual));
+}
+
 

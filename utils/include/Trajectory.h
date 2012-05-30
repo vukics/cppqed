@@ -36,6 +36,13 @@ inline void evolve(Trajectory<A>&, const ParsTrajectory&);
 class StoppingCriterionReachedException : public cpputils::Exception {};
 
 
+class OutfileOpeningException : public cpputils::TaggedException
+{
+public:
+  OutfileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
+
+};
+
 
 /////////////////
 //
@@ -54,8 +61,6 @@ public:
   virtual void   evolve(double deltaT) const = 0; // A step of exactly deltaT
 
   virtual double getTime()             const = 0;
-
-  virtual double getEpsRel()           const = 0;
 
   virtual double getDtDid()            const = 0;
 
@@ -97,9 +102,10 @@ public:
 
   double getTime() const {return evolved_->getTime();}
 
-  double getEpsRel() const {return evolved_->getEpsRel();}
-
-  // Preference for purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved. (Only Simulated, but neither Master, nor MCWF_Trajectory)
+  // Preference for purely virtual functions, so that there is no
+  // danger of forgetting to override them. Very few examples anyway
+  // for a trajectory wanting to perform only a step of Evolved. (Only
+  // Simulated, but neither Master, nor MCWF_Trajectory)
   virtual void step(double deltaT) const = 0;
 
   void evolve(double deltaT) const {evolved::evolve<const Trajectory>(*this,deltaT);}

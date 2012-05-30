@@ -21,7 +21,10 @@ TrajectoryBase::~TrajectoryBase()
 
 ostream& TrajectoryBaseHelper(const string& ofn)
 {
-  return ofn=="" ? cout : *new ofstream(ofn.c_str(),ios_base::app);
+  if (ofn=="") return cout;
+  ofstream*const res=new ofstream(ofn.c_str(),ios_base::app);
+  if (res->fail()) throw OutfileOpeningException(ofn);
+  return *res;
 }
 
 
@@ -48,8 +51,8 @@ TrajectoryBase::TrajectoryBase(const ParsTrajectory& p)
 
 void TrajectoryBase::display() const
 {
-  using formdouble::special;
-  getOstream()<<special()(getTime())<<special()(getDtDid());
+  const FormDouble fd(formdouble::positive(precision_));
+  getOstream()<<fd(getTime())<<fd(getDtDid());
   displayMore(precision_);
   getOstream().flush();
 }
@@ -65,7 +68,7 @@ void TrajectoryBase::displayKey() const
 
 void details::doRun(TrajectoryBase& traj, double time, double deltaT)
 {
-  while (traj.getTime()<time*(1.-traj.getEpsRel())) {
+  while (traj.getTime()<time) {
     traj.evolve(std::min(deltaT,time-traj.getTime()));
     traj.display();
   }

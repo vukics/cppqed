@@ -2,11 +2,11 @@
 #ifndef   _FORM_DOUBLE_FWD_H
 #define   _FORM_DOUBLE_FWD_H
 
+class FormDouble;
+
 namespace formdouble {
 
-class BoundFormDouble;
-
-class FormDouble;
+class Bound;
 
 } // formdouble
 
