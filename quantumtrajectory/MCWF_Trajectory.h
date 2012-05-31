@@ -103,7 +103,10 @@ protected:
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
-
+  
+  void readIntoPsi(std::ifstream &);
+  void writeFromPsi(std::ofstream &) const;
+  
   void displayMore(int) const;
 
   double                coherentTimeDevelopment    (                                double Dt) const;
@@ -129,6 +132,10 @@ private:
   const unsigned svdc_;
   const bool firstSVDisplay_;
   mutable long svdCount_;
+  
+  const bool binarySVFile_;
+  
+  const std::string svExtension_;
 
   const std::string file_;
 

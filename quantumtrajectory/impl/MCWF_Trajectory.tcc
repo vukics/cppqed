@@ -9,6 +9,11 @@
 
 #include "FormDouble.h"
 
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/complex.hpp>
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 #include <fstream>
 
 
@@ -86,20 +91,25 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
     firstSVDisplay_(p.firstSVDisplay),
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+    binarySVFile_(p.binarySVFile),
+#else // DO_NOT_USE_BOOST_SERIALIZATION
+    binarySVFile_(false),
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+    svExtension_(binarySVFile_?".svbin":".sv"),
     svdCount_(0),
     file_(p.ofn),
-    initFile_(p.initFile+".sv"),
+    initFile_(p.initFile+svExtension_),
     logger_(p.logLevel,ha_,getOstream())
 {
   using namespace std;
 
   if (psi!=sys) throw DimensionalityMismatchException();
   
-  if (initFile_!=".sv") {
+  if (initFile_!=svExtension_) {
     ifstream file(initFile_.c_str());
     if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(initFile_);
-#define READ_INTO_PSI {StateVectorLow psiTemp; file>>psiTemp; psi_=psiTemp; psi_.renorm();}
-    READ_INTO_PSI;
+    readIntoPsi(file);
   }
 
   class NoPresetDtTry {};
@@ -112,19 +122,16 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       if (!file.is_open() || file.peek()==EOF) throw NoPresetDtTry();
     }
     {
-      ifstream file((file_+".sv").c_str());
-      if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+".sv");
+      ifstream file((file_+svExtension_).c_str());
+      if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+svExtension_);
 
-      {
-	READ_INTO_PSI;
-      }
-#undef READ_INTO_PSI
+      readIntoPsi(file);
       file>>*getRandomized();
       {
 	char c;
 	file>>c; // eat newline
 	file>>c; // eat '#'
-	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+".sv");
+	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+svExtension_);
       }
       file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
       double t0, dtTry;
@@ -152,14 +159,46 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
   using namespace std;
 
   if (file_!="") {
-    ofstream file((file_+".sv").c_str());
-    file<<psi_();
+    ofstream file((file_+svExtension_).c_str());
+    writeFromPsi(file);
     file<<*getRandomized();
     file<<"\n# "<<getTime()<<' '<<getDtTry()<<endl;
   }
 
 }
 
+
+template<int RANK>
+void MCWF_Trajectory<RANK>::readIntoPsi(std::ifstream &ifs)
+{
+  StateVectorLow psiTemp;
+  if (!binarySVFile_) ifs>>psiTemp;
+  else {
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+    boost::archive::binary_iarchive ia(ifs);
+    ia>>psiTemp;
+#else // DO_NOT_USE_BOOST_SERIALIZATION
+    throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+  }
+  psi_=psiTemp; 
+  psi_.renorm();
+}
+
+template<int RANK>
+void MCWF_Trajectory<RANK>::writeFromPsi(std::ofstream &ofs) const
+{
+  if (!binarySVFile_) ofs<<psi_();
+  else {
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+    boost::archive::binary_oarchive oa(ofs);
+    oa<<psi_();
+    ofs << std::endl;
+#else // DO_NOT_USE_BOOST_SERIALIZATION
+    throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+  }
+}
 
 template<int RANK>
 void MCWF_Trajectory<RANK>::displayMore(int precision) const
