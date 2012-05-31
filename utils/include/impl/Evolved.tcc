@@ -22,7 +22,11 @@ void Evolved<A>::step(double deltaT)
     setDtTry(-getDtDid());
     doStep(deltaT);
   }
-  else doStep(deltaT);
+  else {
+    double nextDtTry= ( fabs(deltaT)<fabs(getDtTry()) ? getDtTry() : 0. );
+    doStep(deltaT);
+    if (nextDtTry) setDtTry(nextDtTry);
+  }
 }
 
 
