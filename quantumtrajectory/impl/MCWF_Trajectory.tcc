@@ -119,8 +119,10 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 	READ_INTO_PSI;
       }
 #undef READ_INTO_PSI
+      file>>*getRandomized();
       {
 	char c;
+	file>>c; // eat newline
 	file>>c; // eat '#'
 	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+".sv");
       }
@@ -152,6 +154,7 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
   if (file_!="") {
     ofstream file((file_+".sv").c_str());
     file<<psi_();
+    file<<*getRandomized();
     file<<"\n# "<<getTime()<<' '<<getDtTry()<<endl;
   }
 

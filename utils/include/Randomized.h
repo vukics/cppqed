@@ -29,9 +29,14 @@ public:
   double operator()() const {return doSample();};
 
   const dcomp dcompRan() const;
+  
+  friend std::ostream& operator<<(std::ostream&, const Randomized&);
+  friend std::istream& operator>>(std::istream&, const Randomized&);
 
 private:
   virtual double doSample() const = 0;
+  virtual std::ostream& writeState(std::ostream&) const = 0;
+  virtual std::istream& readState(std::istream&) const = 0;
 
 };
 
@@ -54,7 +59,17 @@ const dcomp  sample<dcomp >(Randomized::SmartPtr ran)
   return ran->dcompRan();
 }
 
+inline
+std::ostream& operator<<(std::ostream& os, const Randomized &r)
+{
+  return r.writeState(os);
+}
 
+inline
+std::istream& operator>>(std::istream& is, const Randomized &r)
+{
+  return r.readState(is);
+}
 
 ////////////////
 //
