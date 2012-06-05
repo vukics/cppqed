@@ -75,7 +75,7 @@ public:
 
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
+  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getPrecision; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
 
   MCWF_Trajectory(
@@ -94,9 +94,9 @@ public:
   void displayParameters() const;
 
 protected:
-  virtual size_t displayMoreKey (   ) const;
+  virtual size_t displayMoreKey () const;
 
-  virtual void   displayEvenMore(int) const {}
+  virtual void   displayEvenMore() const {}
 
   const StateVector& toBeAveraged() const {return psi_;} 
 
@@ -104,7 +104,7 @@ private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
 
-  void displayMore(int) const;
+  void displayMore() const;
 
   double                coherentTimeDevelopment    (                                double Dt) const;
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;

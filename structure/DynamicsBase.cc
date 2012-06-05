@@ -1,11 +1,12 @@
 #include "DynamicsBase.h"
 
+#include "FormDouble.h"
 #include "Range.h"
 
-#include<boost/bind.hpp>
-#include<boost/function.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 
-#include<boost/mpl/identity.hpp>
+#include <boost/mpl/identity.hpp>
 
 namespace mpl=boost::mpl;
 
@@ -65,9 +66,9 @@ void DynamicsBase::displayParameters(ostream& os) const
 namespace {
 
 template<typename T>
-void displayFreq(ostream& os, const typename TTD_NAMED_FREQUENCY(T)& pair)
+void displayFreq(ostream& os, int precision, const typename TTD_NAMED_FREQUENCY(T)& pair)
 {
-  os<<"# "<<pair.template get<0>()<<"="<<pair.template get<1>()<<endl;
+  os<<"# "<<pair.template get<0>()<<"="<<formdouble::zeroWidth(precision)(pair.template get<1>())<<endl;
 }
 
 } // unnamed namespace
@@ -76,8 +77,8 @@ void displayFreq(ostream& os, const typename TTD_NAMED_FREQUENCY(T)& pair)
 void DynamicsBase::displayMoreParameters(ostream& os) const
 {
   using boost::ref; using boost::for_each;
-  for_each(   realFreqs_,bind(displayFreq<double>,ref(os),_1));
-  for_each(complexFreqs_,bind(displayFreq<dcomp >,ref(os),_1));  
+  for_each(   realFreqs_,bind(displayFreq<double>,ref(os),os.precision(),_1));
+  for_each(complexFreqs_,bind(displayFreq<dcomp >,ref(os),os.precision(),_1));  
 }
 
 

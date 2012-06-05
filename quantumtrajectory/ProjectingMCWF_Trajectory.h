@@ -36,8 +36,8 @@ public:
 			    );
 
 private:
-  void   displayEvenMore(int) const;
-  size_t displayMoreKey (   ) const;
+  void   displayEvenMore() const;
+  size_t displayMoreKey () const;
 
   const linalg::CMatrix help() const;
 

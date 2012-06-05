@@ -1,9 +1,11 @@
-#include<fstream>
-#include<iostream>
+#include "Trajectory.h"
 
 #include "ParsTrajectory.h"
-#include "Trajectory.h"
 #include "FormDouble.h"
+
+#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 
 using namespace std;
@@ -19,31 +21,32 @@ TrajectoryBase::~TrajectoryBase()
 }
 
 
-ostream& TrajectoryBaseHelper(const string& ofn)
+ostream& TrajectoryBaseHelper(const string& ofn, int precision)
 {
-  if (ofn=="") return cout;
-  ofstream*const res=new ofstream(ofn.c_str(),ios_base::app);
+  ofstream*const res = ( ofn=="" ? static_cast<ofstream*const>(&cout) : new ofstream(ofn.c_str(),ios_base::app) );
+
   if (res->fail()) throw OutfileOpeningException(ofn);
-  return *res;
+
+  return (*res)<<setprecision(formdouble::actualPrecision(precision));
 }
 
 
 TrajectoryBase::TrajectoryBase(ostream& os, int precision)
-  : ostream_(os),
+  : ostream_(os<<setprecision(formdouble::actualPrecision(precision))),
     precision_(precision)
 {
 }
 
 
 TrajectoryBase::TrajectoryBase(const string& ofn, int precision)
-  : ostream_(TrajectoryBaseHelper(ofn)),
+  : ostream_(TrajectoryBaseHelper(ofn,precision)),
     precision_(precision)
 {
 }
 
 
 TrajectoryBase::TrajectoryBase(const ParsTrajectory& p)
-  : ostream_(TrajectoryBaseHelper(p.ofn)),
+  : ostream_(TrajectoryBaseHelper(p.ofn,p.precision)),
     precision_(p.precision)
 {
 } 
@@ -53,7 +56,7 @@ void TrajectoryBase::display() const
 {
   const FormDouble fd(formdouble::positive(precision_));
   getOstream()<<fd(getTime())<<fd(getDtDid());
-  displayMore(precision_);
+  displayMore();
   getOstream().flush();
 }
 
