@@ -86,6 +86,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
     firstSVDisplay_(p.firstSVDisplay),
+    svdPrecision_(p.svdPrecision ? p.svdPrecision : p.precision),
     svdCount_(0),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
@@ -172,7 +173,7 @@ void MCWF_Trajectory<RANK>::displayMore() const
 
   os<<endl;
 
-  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<FormDouble(getPrecision(),0)(psi_());
+  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<FormDouble(svdPrecision_,0)(psi_());
   svdCount_++;
 }
 

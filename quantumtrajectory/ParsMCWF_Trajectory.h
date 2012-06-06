@@ -17,6 +17,7 @@ struct ParsMCWF_Trajectory : public trajectory::ParsStochasticTrajectory {
 
   unsigned &svdc;
   bool &firstSVDisplay;
+  int &svdPrecision;
 
   std::string &initFile;
 

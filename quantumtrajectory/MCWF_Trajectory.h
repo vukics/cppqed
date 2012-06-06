@@ -128,6 +128,7 @@ private:
 
   const unsigned svdc_;
   const bool firstSVDisplay_;
+  const int svdPrecision_;
   mutable long svdCount_;
 
   const std::string file_;
