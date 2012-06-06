@@ -15,8 +15,7 @@ ParsMCWF_Trajectory::ParsMCWF_Trajectory(parameters::ParameterTable& p, const st
     initFile (p.addMod<std::string>("initFile" ,mod,"file containing the initial state vector","")),
     basisDim(p.addMod("basisDim",mod,"number of basis vectors the stochastic wave function is compared against",size_t(0))),
     basisFile(p.addMod<std::string>("basisFile",mod,"file containing the basis vectors","")),
-    logLevel(p.addMod("logLevel",mod,"logging level",0)),
-    sf(p.addMod("steppingFunction",mod,"Stepping function for EvolvedGSL",evolved::SF_RKCK))
+    logLevel(p.addMod("logLevel",mod,"logging level",0))
 {}
 
 

@@ -16,7 +16,7 @@ const typename Maker<A>::SmartPtr MakerGSL<A>::operator()(
 							  const A& scaleAbs
 							  ) const
 {
-  return SmartPtr(new details::EvolvedGSL<A>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_));
+  return SmartPtr(new details::EvolvedGSL<A>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_));
 }
 
 
@@ -46,11 +46,13 @@ EvolvedGSL<A>::EvolvedGSL(
 			  double epsRel,
 			  double epsAbs,
 			  const A& scaleAbs,
-			  SteppingFunction sf
+			  SteppingFunction sf,
+			  double nextDtTryCorretionFactor
 			  )
   : Base(a,derivs,dtInit,epsRel,epsAbs),
     pImpl_(createImpl(this,Traits::size(getA()),auxFunction<A>,epsRel,epsAbs,Traits::data(scaleAbs),sf)),
-    sf_(sf)
+    sf_(sf),
+    nextDtTryCorretionFactor_(nextDtTryCorretionFactor)
 {
   if (!Traits::isStorageContiguous(a)) throw (NonContiguousStorageException());
 }
@@ -59,9 +61,15 @@ EvolvedGSL<A>::EvolvedGSL(
 
 template<typename A> void EvolvedGSL<A>::doStep(double deltaT)
 {
-  double time=getTime(), dtTry=getDtTry();
+  double
+    time=getTime(),
+    dtTry=getDtTry(),
+    nextDtTry=( fabs(deltaT)<fabs(dtTry/nextDtTryCorretionFactor_) ? dtTry : 0. );
+
   apply(pImpl_,&time,time+deltaT,&dtTry,Traits::data(getA()));
-  Base::update(time,dtTry);
+
+  Base::update(time, nextDtTry ? nextDtTry/nextDtTryCorretionFactor_ : dtTry );
+
 }
 
 
