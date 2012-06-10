@@ -9,11 +9,11 @@
 
 #include "FormDouble.h"
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef USE_BOOST_SERIALIZATION
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/complex.hpp>
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // USE_BOOST_SERIALIZATION
 #include <fstream>
 
 
@@ -91,11 +91,11 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
     firstSVDisplay_(p.firstSVDisplay),
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef USE_BOOST_SERIALIZATION
     binarySVFile_(p.binarySVFile),
-#else // DO_NOT_USE_BOOST_SERIALIZATION
+#else // USE_BOOST_SERIALIZATION
     binarySVFile_(false),
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // USE_BOOST_SERIALIZATION
     svExtension_(binarySVFile_?".svbin":".sv"),
     svdCount_(0),
     file_(p.ofn),
@@ -174,12 +174,12 @@ void MCWF_Trajectory<RANK>::readIntoPsi(std::ifstream &ifs)
   StateVectorLow psiTemp;
   if (!binarySVFile_) ifs>>psiTemp;
   else {
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef USE_BOOST_SERIALIZATION
     boost::archive::binary_iarchive ia(ifs);
     ia>>psiTemp;
-#else // DO_NOT_USE_BOOST_SERIALIZATION
+#else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // USE_BOOST_SERIALIZATION
   }
   psi_=psiTemp; 
   psi_.renorm();
@@ -190,13 +190,13 @@ void MCWF_Trajectory<RANK>::writeFromPsi(std::ofstream &ofs) const
 {
   if (!binarySVFile_) ofs<<psi_();
   else {
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef USE_BOOST_SERIALIZATION
     boost::archive::binary_oarchive oa(ofs);
     oa<<psi_();
     ofs << std::endl;
-#else // DO_NOT_USE_BOOST_SERIALIZATION
+#else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // USE_BOOST_SERIALIZATION
   }
 }
 
