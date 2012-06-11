@@ -182,7 +182,7 @@ ifs.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit ); \
     ia>>psiTemp;
     psi_=psiTemp;
     if (onlySV) return;
-    ia>>const_cast<randomized::Randomized&>(*getRandomized())>>t0>>dtTry;
+    ia>>t0>>dtTry>>const_cast<randomized::Randomized&>(*getRandomized());
 #else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
 #endif // USE_BOOST_SERIALIZATION
@@ -210,7 +210,7 @@ void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
       int d=psi_().extent(i);
       oa<<d;
     }
-    oa<<psi_()<<*getRandomized()<<t<<dttry;
+    oa<<psi_()<<t<<dttry<<*getRandomized();
 #else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
 #endif // USE_BOOST_SERIALIZATION
