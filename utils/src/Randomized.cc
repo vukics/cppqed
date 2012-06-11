@@ -2,12 +2,14 @@
 
 #include "Randomized.h"
 
-#include<gsl/gsl_rng.h>
-#include<gsl/gsl_randist.h>
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/binary_from_base64.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 
 
 namespace randomized {
-
 
 const dcomp Randomized::dcompRan() const
 {
@@ -36,15 +38,32 @@ private:
 
 std::ostream& RandomizedGSL::writeState(std::ostream& os) const
 {
-  void *state=gsl_rng_state(_ran_gen);
-  os.write((char*) state,gsl_rng_size(_ran_gen));
+  using namespace boost::archive::iterators;
+  typedef base64_from_binary<  transform_width<  const char *, 6, 8 > > base64_t;
+  char *state=static_cast<char*>(gsl_rng_state(_ran_gen));
+  int size = gsl_rng_size(_ran_gen);
+  std::copy(base64_t(state),base64_t(state+size),std::ostream_iterator<char>(os));
+  os << '~';
   return os;
 }
 
 std::istream& RandomizedGSL::readState(std::istream& is) const
 {
-  void *state=gsl_rng_state(_ran_gen);
-  is.read((char*) state,gsl_rng_size(_ran_gen));
+  using namespace boost::archive::iterators;
+  typedef transform_width< binary_from_base64< std::istream_iterator<char> >, 8, 6 > binary_t;
+  char *state=static_cast<char*>(gsl_rng_state(_ran_gen));
+  int size = gsl_rng_size(_ran_gen);
+  binary_t begin = binary_t(std::istream_iterator<char>(is));
+  // don't increment anymore than necessary
+  while(--size>0) {
+    *state++ = static_cast<char>(*begin);
+    ++begin;
+  }
+  *state++ = static_cast<char>(*begin);
+  {
+    char c = is.get();
+    if (c!='~') throw RNGStateParsingException(std::string("Expected ~, found ")+std::string(1,c));
+  }
   return is;
 }
 

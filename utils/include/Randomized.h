@@ -5,6 +5,7 @@
 #include "RandomizedFwd.h"
 
 #include "ComplexExtensions.h"
+#include "Exception.h"
 #include "Range.h"
 
 #include <boost/shared_ptr.hpp>
@@ -13,6 +14,12 @@
 
 namespace randomized {
 
+class RNGStateParsingException : public cpputils::TaggedException
+{
+public:
+  RNGStateParsingException(const std::string tag) : cpputils::TaggedException(tag) {}
+};
+  
 ///////////////////////
 //
 // Randomized interface

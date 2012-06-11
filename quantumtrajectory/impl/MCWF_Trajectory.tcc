@@ -126,14 +126,17 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+svExtension_);
 
       readIntoPsi(file);
-      file>>*getRandomized();
-      {
-	char c;
-	file>>c; // eat newline
-	file>>c; // eat '#'
-	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+svExtension_);
-      }
+
+#define EAT_COMMENT_CHAR  { \
+	char c; file>>c; \
+	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+svExtension_); \
+      } \
       file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
+      
+      EAT_COMMENT_CHAR
+      file>>*getRandomized();
+      EAT_COMMENT_CHAR
+#undef EAT_COMMENT_CHAR
       double t0, dtTry;
       file>>t0; file>>dtTry;
       getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
@@ -161,8 +164,8 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
   if (file_!="") {
     ofstream file((file_+svExtension_).c_str());
     writeFromPsi(file);
-    file<<*getRandomized();
-    file<<"\n# "<<getTime()<<' '<<getDtTry()<<endl;
+    file<<"\n#"<<*getRandomized();
+    file<<"\n# "<<getTime()<<' '<<getDtTry()<<"\n";
   }
 
 }
