@@ -74,6 +74,12 @@ void details::doRun(TrajectoryBase& traj, double time, double deltaT)
   }
 }
 
-
+void details::doRunNDt(TrajectoryBase& traj, long nDt, double deltaT)
+{
+  for (long i=0; i<nDt; i++){
+    traj.evolve(deltaT);
+    traj.display();
+  }
+}
 
 } // trajectory
