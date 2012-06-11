@@ -10,6 +10,10 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+#ifdef USE_BOOST_SERIALIZATION
+#include <boost/serialization/serialization.hpp>
+#include <sstream>
+#endif // USE_BOOST_SERIALIZATION
 
 
 namespace randomized {
@@ -38,12 +42,31 @@ public:
   const dcomp dcompRan() const;
   
   friend std::ostream& operator<<(std::ostream&, const Randomized&);
-  friend std::istream& operator>>(std::istream&, const Randomized&);
+  friend std::istream& operator>>(std::istream&, Randomized&);
 
 private:
   virtual double doSample() const = 0;
   virtual std::ostream& writeState(std::ostream&) const = 0;
-  virtual std::istream& readState(std::istream&) const = 0;
+  virtual std::istream& readState(std::istream&) = 0;
+#ifdef USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+
+  template<class T_arch>
+  void save(T_arch& ar, const unsigned int version) const {
+    std::stringstream ss;
+    writeState(ss);
+    std::string s=ss.str();
+    ar << s;
+  };
+  template<class T_arch>
+  void load(T_arch& ar, const unsigned int version) {
+    std::string s;
+    ar >> s;
+    std::stringstream ss(s);
+    readState(ss);
+  };
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
+#endif // USE_BOOST_SERIALIZATION
 
 };
 
@@ -73,7 +96,7 @@ std::ostream& operator<<(std::ostream& os, const Randomized &r)
 }
 
 inline
-std::istream& operator>>(std::istream& is, const Randomized &r)
+std::istream& operator>>(std::istream& is, Randomized &r)
 {
   return r.readState(is);
 }

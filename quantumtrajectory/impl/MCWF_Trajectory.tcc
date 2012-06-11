@@ -109,7 +109,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
   if (initFile_!=svExtension_) {
     ifstream file(initFile_.c_str());
     if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(initFile_);
-    readIntoPsi(file);
+    readState(file,true);
   }
 
   class NoPresetDtTry {};
@@ -124,26 +124,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     {
       ifstream file((file_+svExtension_).c_str());
       if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+svExtension_);
-
-      readIntoPsi(file);
-
-#define EAT_COMMENT_CHAR  { \
-	char c; file>>c; \
-	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+svExtension_); \
-      } \
-      file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
-      
-      EAT_COMMENT_CHAR
-      file>>*getRandomized();
-      EAT_COMMENT_CHAR
-#undef EAT_COMMENT_CHAR
-      double t0, dtTry;
-      file>>t0; file>>dtTry;
-      getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
-      getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
-      if (ex_) tIntPic0_=t0;
+      readState(file);
     }
-
   }
   else
     throw NoPresetDtTry();
@@ -163,40 +145,72 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
 
   if (file_!="") {
     ofstream file((file_+svExtension_).c_str());
-    writeFromPsi(file);
-    file<<"\n#"<<*getRandomized();
-    file<<"\n# "<<getTime()<<' '<<getDtTry()<<"\n";
+    writeState(file);
   }
 
 }
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::readIntoPsi(std::ifstream &ifs)
+void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV=false)
 {
+  using namespace std;
+  
   StateVectorLow psiTemp;
-  if (!binarySVFile_) ifs>>psiTemp;
+  double t0, dtTry;
+  if (!binarySVFile_) {
+    ifs>>psiTemp;
+    psi_=psiTemp;
+    psi_.renorm();
+    if (onlySV) return;
+    
+#define EAT_COMMENT_CHAR  {char c; ifs>>c;  if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+svExtension_);} \
+ifs.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit ); \
+/**/
+    EAT_COMMENT_CHAR
+    ifs>>const_cast<randomized::Randomized&>(*getRandomized());
+    EAT_COMMENT_CHAR
+#undef EAT_COMMENT_CHAR
+    ifs>>t0; ifs>>dtTry;
+  }
   else {
 #ifdef USE_BOOST_SERIALIZATION
     boost::archive::binary_iarchive ia(ifs);
+    int d;
+    ia>>d; // RANK
+    for(int i=0;i<RANK;i++) ia>>d; // dimensions
     ia>>psiTemp;
+    psi_=psiTemp;
+    if (onlySV) return;
+    ia>>const_cast<randomized::Randomized&>(*getRandomized())>>t0>>dtTry;
 #else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
 #endif // USE_BOOST_SERIALIZATION
   }
-  psi_=psiTemp; 
-  psi_.renorm();
+  getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
+  if (ex_) tIntPic0_=t0;
+  getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
 }
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::writeFromPsi(std::ofstream &ofs) const
+void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
 {
-  if (!binarySVFile_) ofs<<psi_();
+  if (!binarySVFile_) {
+    ofs<<psi_();
+    ofs<<"\n#"<<*getRandomized();
+    ofs<<"\n# "<<getTime()<<' '<<getDtTry()<<std::endl;
+  }
   else {
 #ifdef USE_BOOST_SERIALIZATION
     boost::archive::binary_oarchive oa(ofs);
-    oa<<psi_();
-    ofs << std::endl;
+    double t=getTime(); double dttry=getDtTry();
+    int r=RANK;
+    oa<<r;
+    for(int i=0;i<RANK;i++) {
+      int d=psi_().extent(i);
+      oa<<d;
+    }
+    oa<<psi_()<<*getRandomized()<<t<<dttry;
 #else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
 #endif // USE_BOOST_SERIALIZATION

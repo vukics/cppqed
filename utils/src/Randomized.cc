@@ -30,7 +30,7 @@ public:
 private:
   double doSample() const {return gsl_rng_uniform(_ran_gen);}
   std::ostream& writeState(std::ostream&) const;
-  std::istream& readState(std::istream&) const;
+  std::istream& readState(std::istream&);
 
   gsl_rng*const _ran_gen;
   // NEEDS_WORK can this be wrapped into shared_ptr? the same in Evolved.cc?
@@ -47,7 +47,7 @@ std::ostream& RandomizedGSL::writeState(std::ostream& os) const
   return os;
 }
 
-std::istream& RandomizedGSL::readState(std::istream& is) const
+std::istream& RandomizedGSL::readState(std::istream& is)
 {
   using namespace boost::archive::iterators;
   typedef transform_width< binary_from_base64< std::istream_iterator<char> >, 8, 6 > binary_t;

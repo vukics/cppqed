@@ -104,8 +104,8 @@ private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
   
-  void readIntoPsi(std::ifstream &);
-  void writeFromPsi(std::ofstream &) const;
+  void readState(std::ifstream &, bool onlySV);
+  void writeState(std::ofstream &) const;
   
   void displayMore(int) const;
 
