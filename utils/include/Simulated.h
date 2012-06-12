@@ -37,7 +37,7 @@ public:
 
   void step(double deltaT) const {getEvolved()->step(deltaT);}
 
-  void   displayMore(int) const;
+  void   displayMore   () const;
   size_t displayMoreKey() const;
 
   void   displayParameters() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters();}

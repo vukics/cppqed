@@ -1,6 +1,7 @@
 #include "ParsTrajectory.h"
 #include "ParsStochasticTrajectory.h"
 
+#include "FormDouble.h"
 #include "Pars.h"
 
 namespace trajectory {
@@ -18,7 +19,7 @@ ParsTrajectory::ParsTrajectory(parameters::ParameterTable& p, const std::string&
     Dt(p.addMod("Dt",mod,"Timestep between two Displays",.1)),
     ofn(p.addMod<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
     autoStop(p.addMod("autoStop",mod,"Parameter for automatic stopping criterion",0.)),
-    precision(p.addMod("precision",mod,"General precision of output",3)),
+    precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision/2))),
     displayInfo(p.addMod("displayInfo",mod,"",true))
 {}
 

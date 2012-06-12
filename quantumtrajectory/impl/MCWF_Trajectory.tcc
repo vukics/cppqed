@@ -86,6 +86,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
     firstSVDisplay_(p.firstSVDisplay),
+    svdPrecision_(p.svdPrecision ? p.svdPrecision : getPrecision()),
     svdCount_(0),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
@@ -151,27 +152,28 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
 
   if (file_!="") {
     ofstream file((file_+".sv").c_str());
-    file<<psi_();
-    file<<"\n# "<<getTime()<<' '<<getDtTry()<<endl;
+    file<<formdouble::zeroWidth(getPrecision())(psi_())<<"\n# "
+	<<formdouble::positive(getPrecision())(getTime ())
+	<<formdouble::positive(getPrecision())(getDtTry())<<endl;
   }
 
 }
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::displayMore(int precision) const
+void MCWF_Trajectory<RANK>::displayMore() const
 {
   using namespace std;
 
   ostream& os=getOstream();
 
-  Averaged::display(getTime(),psi_,os,precision,av_);
+  Averaged::display(getTime(),psi_,os,getPrecision(),av_);
 
-  displayEvenMore(precision);
+  displayEvenMore();
 
   os<<endl;
 
-  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<psi_();
+  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<FormDouble(svdPrecision_,0)(psi_());
   svdCount_++;
 }
 

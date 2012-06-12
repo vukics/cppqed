@@ -26,9 +26,8 @@ public:
   typedef TTD_FREQUENCY_MAP(double)    RealFreqs;
   typedef TTD_FREQUENCY_MAP(dcomp ) ComplexFreqs;
 
-  explicit DynamicsBase(const    RealFreqs&    realFreqs=   RealFreqs(), 
-			const ComplexFreqs& complexFreqs=ComplexFreqs()) 
-    : realFreqs_(realFreqs), complexFreqs_(complexFreqs), paramsStream_(std::stringstream::out) {}
+  explicit DynamicsBase(const    RealFreqs& =RealFreqs   (), 
+			const ComplexFreqs& =ComplexFreqs());
 
   // Calculating the fastest timescale of the system
   double highestFrequency() const;

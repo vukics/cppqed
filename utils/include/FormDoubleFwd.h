@@ -6,7 +6,12 @@ class FormDouble;
 
 namespace formdouble {
 
+template<typename T>
 class Bound;
+
+
+class Zero;
+
 
 } // formdouble
 

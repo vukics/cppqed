@@ -3,6 +3,9 @@
 #define   _SIMULATED_IMPL_H
 
 
+#include "FormDouble.h"
+
+
 namespace trajectory {
 
 
@@ -28,11 +31,11 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 
 
 template<typename A> 
-void Simulated<A>::displayMore(int) const
+void Simulated<A>::displayMore() const
 {
   const A& a=getEvolved()->getA();
   for (size_t i=0; i<Traits::ssLimit(a); i++)
-    getOstream()<<Traits::ss(a,i)<<' ';
+    getOstream()<<FormDouble(TrajectoryBase::getPrecision())(Traits::ss(a,i))<<' ';
   getOstream()<<std::endl;
 }
 

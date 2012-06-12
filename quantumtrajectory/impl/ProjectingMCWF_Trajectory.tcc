@@ -59,12 +59,12 @@ ProjectingMCWF_Trajectory<RANK>::ProjectingMCWF_Trajectory(
 
 template<int RANK>
 void
-ProjectingMCWF_Trajectory<RANK>::displayEvenMore(int precision) const
+ProjectingMCWF_Trajectory<RANK>::displayEvenMore() const
 {
   using namespace formdouble;
 
   const StateVector& psi=toBeAveraged();
-  const FormDouble fd(precision);
+  const FormDouble fd(getPrecision());
  
   if (int dim=basis_.size()) {
     getOstream()<<"\t";

@@ -16,9 +16,9 @@
 #include "Exception.h"
 #include "Evolved.h"
 
-#include<iostream>
+#include <iostream>
 
-#include<boost/utility.hpp>
+#include <boost/utility.hpp>
 
 
 namespace trajectory {
@@ -50,10 +50,12 @@ public:
 //
 /////////////////
 
+
 class TrajectoryBase : private boost::noncopyable
 {
 public:
-  std::ostream& getOstream() const {return ostream_;}
+  std::ostream& getOstream  () const {return   ostream_;}
+  int           getPrecision() const {return precision_;}
 
   void display   () const;
   void displayKey() const;
@@ -78,8 +80,8 @@ protected:
   TrajectoryBase() : ostream_(std::cerr), precision_(0) {assert(false);} // A dummy constructor, which should never be called
 
 private:
-  virtual void   displayMore   (int)   const = 0; // LOGICALLY const
-  virtual size_t displayMoreKey()      const = 0;
+  virtual void   displayMore   () const = 0; // LOGICALLY const
+  virtual size_t displayMoreKey() const = 0;
 
   std::ostream& ostream_;
 

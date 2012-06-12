@@ -4,10 +4,13 @@ Change Log
 
 The following is a list of only the more substantial changes (e.g. such as break certain applications). For a full log of development, `browse the Bazaar repository <http://cppqed.bzr.sourceforge.net/bzr/cppqed/changes>`_.
 
-2012/02/07 Main branch revision #204 fixes `bug <http://sourceforge.net/tracker/?func=detail&aid=3482771&group_id=187775&atid=922653>`_ by introducing a little fuzziness to the time comparison of trajectories. Cf. also `this tracker <http://sourceforge.net/tracker/?func=detail&aid=3485727&group_id=187775&atid=922653>`_.
-
+2012/06/12 State-vector and parameter output now also has the same precision as ``--precision``, the latter also at least 6 digits.
 
 2012/05/30 Time and timestep output has now the same precision as the overall precision governed by ``--precision``, but at least 6 digits.
+
+2012/05/03 Main branch revision #213 recants the fuzziness of time in trajectories and fixes `bug <http://sourceforge.net/tracker/?func=detail&aid=3482771&group_id=187775&atid=922653>`_ in a different way. Cf. also `this mailing-list thread <http://sourceforge.net/mailarchive/forum.php?thread_name=7482582.AJihbhQsLk%40gil&forum_name=cppqed-support>`_.
+
+2012/02/07 Main branch revision #204 fixes `bug <http://sourceforge.net/tracker/?func=detail&aid=3482771&group_id=187775&atid=922653>`_ by introducing a little fuzziness to the time comparison of trajectories. Cf. also `this tracker <http://sourceforge.net/tracker/?func=detail&aid=3485727&group_id=187775&atid=922653>`_.
 
 2012/01/27 Migrated to the Boost.Range version of range algorithms. This means that as of today, the minimal Boost version is 1.43.
 

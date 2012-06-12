@@ -47,7 +47,7 @@ void structure::ElementAveragedCommon::display(const AveragedCommon::Averages& a
   os<<'\t';
   {
     const FormDouble fd(precision);
-    for_each(averages,os<<bll::bind(&FormDouble::operator(),&fd,bll::_1));
+    for_each(averages,os<<bll::bind(&FormDouble::operator()<double>,&fd,bll::_1));
   }
 
 }
