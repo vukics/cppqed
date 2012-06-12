@@ -33,41 +33,23 @@ public:
 class Randomized : private boost::noncopyable
 {
 public:
-  typedef boost::shared_ptr<const Randomized> SmartPtr;
+  typedef boost::shared_ptr<Randomized> SmartPtr;
 
   virtual ~Randomized() {}
 
-  double operator()() const {return doSample();};
+  double operator()() {return doSample();};
 
-  const dcomp dcompRan() const;
+  const dcomp dcompRan();
   
   friend std::ostream& operator<<(std::ostream&, const Randomized&);
   friend std::istream& operator>>(std::istream&, Randomized&);
 
 private:
-  virtual double doSample() const = 0;
+  virtual double doSample() = 0;
   virtual std::ostream& writeState(std::ostream&) const = 0;
   virtual std::istream& readState(std::istream&) = 0;
-#ifdef USE_BOOST_SERIALIZATION
-  friend class boost::serialization::access;
-
-  template<class T_arch>
-  void save(T_arch& ar, const unsigned int version) const {
-    std::stringstream ss;
-    writeState(ss);
-    std::string s=ss.str();
-    ar << s;
-  };
-  template<class T_arch>
-  void load(T_arch& ar, const unsigned int version) {
-    std::string s;
-    ar >> s;
-    std::stringstream ss(s);
-    readState(ss);
-  };
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
-#endif // USE_BOOST_SERIALIZATION
-
+  virtual std::ostream& writeImplID(std::ostream&) const = 0;
+  virtual std::istream& readImplID(std::istream&) const = 0;
 };
 
 
@@ -92,13 +74,13 @@ const dcomp  sample<dcomp >(Randomized::SmartPtr ran)
 inline
 std::ostream& operator<<(std::ostream& os, const Randomized &r)
 {
-  return r.writeState(os);
+  return r.writeState(r.writeImplID(os));
 }
 
 inline
 std::istream& operator>>(std::istream& is, Randomized &r)
 {
-  return r.readState(is);
+  return r.readState(r.readImplID(is));
 }
 
 ////////////////

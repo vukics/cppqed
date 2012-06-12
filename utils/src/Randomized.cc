@@ -11,7 +11,7 @@
 
 namespace randomized {
 
-const dcomp Randomized::dcompRan() const
+const dcomp Randomized::dcompRan()
 {
   // Note that the result of return dcomp((*this)(),(*this)()); is undefined!
   double reRan=doSample(), imRan=doSample();
@@ -23,20 +23,23 @@ class RandomizedGSL : public Randomized
 {
 public: 
   explicit RandomizedGSL(unsigned long seed, const gsl_rng_type* ran_gen_type=gsl_rng_taus2) 
-    : _ran_gen(gsl_rng_alloc(ran_gen_type)) {gsl_rng_set(_ran_gen,seed);}
+    : _ran_gen(gsl_rng_alloc(ran_gen_type)), _implID("RandomizedGSL") {gsl_rng_set(_ran_gen,seed);}
 
   ~RandomizedGSL() {delete _ran_gen;}
   
 private:
-  double doSample() const {return gsl_rng_uniform(_ran_gen);}
+  double doSample() {return gsl_rng_uniform(_ran_gen);}
   std::ostream& writeState(std::ostream&) const;
   std::istream& readState(std::istream&);
+  std::ostream& writeImplID(std::ostream&) const;
+  std::istream& readImplID(std::istream&) const;
 
   gsl_rng*const _ran_gen;
   // NEEDS_WORK can this be wrapped into shared_ptr? the same in Evolved.cc?
+  const std::string _implID;
 };
 
-std::ostream& RandomizedGSL::writeState(std::ostream& os) const
+std::ostream& RandomizedGSL::writeState(std::ostream &os) const
 {
   using namespace boost::archive::iterators;
   typedef base64_from_binary<  transform_width<  const char *, 6, 8 > > base64_t;
@@ -47,7 +50,7 @@ std::ostream& RandomizedGSL::writeState(std::ostream& os) const
   return os;
 }
 
-std::istream& RandomizedGSL::readState(std::istream& is)
+std::istream& RandomizedGSL::readState(std::istream &is)
 {
   using namespace boost::archive::iterators;
   typedef transform_width< binary_from_base64< std::istream_iterator<char> >, 8, 6 > binary_t;
@@ -67,7 +70,22 @@ std::istream& RandomizedGSL::readState(std::istream& is)
   return is;
 }
 
+std::ostream& RandomizedGSL::writeImplID(std::ostream &os) const
+{
+  os << _implID << " ";
+  return os;
+}
 
+std::istream& RandomizedGSL::readImplID(std::istream &is) const
+{
+  std::string id;
+  char c;
+  is >> id;
+  if (id!=_implID) throw RNGStateParsingException(std::string("Wrong implementation ID, expected "+_implID+", found "+id));
+  if (!(is >> c)) throw RNGStateParsingException(std::string("Unexpected EOF"));
+  is.unget();
+  return is;
+}
 
 const Randomized::SmartPtr MakerGSL::operator()(unsigned long seed) const
 {

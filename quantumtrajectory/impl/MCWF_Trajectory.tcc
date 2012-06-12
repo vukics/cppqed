@@ -168,7 +168,7 @@ void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV=false)
 ifs.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit ); \
 /**/
     EAT_COMMENT_CHAR
-    ifs>>const_cast<randomized::Randomized&>(*getRandomized());
+    ifs>>*getRandomized();
     EAT_COMMENT_CHAR
 #undef EAT_COMMENT_CHAR
     ifs>>t0; ifs>>dtTry;
@@ -182,7 +182,8 @@ ifs.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit ); \
     ia>>psiTemp;
     psi_=psiTemp;
     if (onlySV) return;
-    ia>>t0>>dtTry>>const_cast<randomized::Randomized&>(*getRandomized());
+    ia>>t0>>dtTry;
+    ifs>>*getRandomized();
 #else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
 #endif // USE_BOOST_SERIALIZATION
@@ -197,7 +198,7 @@ void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
 {
   if (!binarySVFile_) {
     ofs<<psi_();
-    ofs<<"\n#"<<*getRandomized();
+    ofs<<"\n# "<<*getRandomized();
     ofs<<"\n# "<<getTime()<<' '<<getDtTry()<<std::endl;
   }
   else {
@@ -210,7 +211,8 @@ void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
       int d=psi_().extent(i);
       oa<<d;
     }
-    oa<<psi_()<<t<<dttry<<*getRandomized();
+    oa<<psi_()<<t<<dttry;
+    ofs<<*getRandomized();
 #else // USE_BOOST_SERIALIZATION
     throw MCWF_TrajectoryFileOpeningException("boost serialization not available");
 #endif // USE_BOOST_SERIALIZATION
