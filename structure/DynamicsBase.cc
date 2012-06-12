@@ -15,6 +15,14 @@ using namespace std;
 namespace structure {
 
 
+DynamicsBase::DynamicsBase(const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs) 
+  : realFreqs_(realFreqs), complexFreqs_(complexFreqs), paramsStream_(std::stringstream::out)
+{
+  paramsStream_.precision(formdouble::actualPrecision(FormDouble::overallPrecision));
+}
+
+
+
 #define TTD_NAMED_FREQUENCY(T) std::list<boost::tuple<std::string,T,double> >::value_type
 
 

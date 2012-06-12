@@ -3,13 +3,15 @@
   Collecting to one place all the issues of the formatting of doubles, necessary for output in various places.
   The idea is from Stroustrup's The C++ Programming Language (special edition) 21.4.6.3.
 
-  Named FormDouble here, since it is only issues pertaining to the display of doubles that is treated. formdouble::Bound should be able to deal with everything consisting only doubles (eg dcomp).
+  Named FormDouble here, since it is only issues pertaining to the display of doubles that are treated. formdouble::Bound should be able to deal with everything consisting only doubles (eg dcomp).
 */
 
 #ifndef _FORM_DOUBLE_H
 #define _FORM_DOUBLE_H
 
 #include "FormDoubleFwd.h"
+
+#include "Pars.h"
 
 #include <algorithm>
 #include <iosfwd>
@@ -20,15 +22,17 @@ namespace formdouble {
 template<typename T>
 std::ostream& operator<<(std::ostream&, const Bound<T>&);
 
-}
+} // formdouble
 
 
 class FormDouble 
 {
 public:
   static const int defaultPrecision;
+  static       int overallPrecision;
 
   explicit FormDouble(int precision);
+  // Calculates an appropriate width from the maximal possible width of a number of the given precision in the representation of the given machine.
   FormDouble(int precision, int width) : precision_(precision), width_(width) {}
 
   template<typename T>
@@ -80,7 +84,49 @@ inline const FormDouble zeroWidth(int precision) // without additional width
 {return FormDouble(actualPrecision(precision),0);}
 
 
+
+class Zero : public FormDouble
+{
+public:
+  Zero() : FormDouble(FormDouble::defaultPrecision) {}
+  Zero(int precision) : FormDouble(precision,0) {}
+  // Implicit conversion from int possible.
+
+  operator double() const {return getPrecision();}
+
+};
+
+
+
 } // formdouble
+
+
+
+namespace parameters {
+
+
+template<>
+class Parameter<formdouble::Zero> : public Parameter<int>
+{
+public:
+  typedef Parameter<int> Base;
+
+  Parameter(const std::string& s, const std::string& d, const formdouble::Zero& v) : Base(s,d,v), v_() {}
+
+  void read(std::istream& is) {Base::read(is); FormDouble::overallPrecision=getReference();}
+
+  const formdouble::Zero& getReference() const {return v_=formdouble::Zero(Base::getReference());}
+
+  formdouble::Zero& getReference() {return const_cast<formdouble::Zero&>(static_cast<const Parameter*>(this)->getReference());}
+
+private:
+  mutable formdouble::Zero v_; // Just a buffer, the actual value is stored in Base
+
+};
+
+
+} // parameters
+
 
 
 #include "impl/FormDouble.tcc"

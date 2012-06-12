@@ -298,7 +298,7 @@ If the system is not to be used for anything else, just for being :func:`evolve 
 Output of scripts, initial condition
 ------------------------------------
 
-Following a header part, the time-dependent simulated data is displayed, organized into columns. The first two columns are time and timestep, respectively, and then, separated by tab characters, the data stemming from the different subsystems follows. A key to the data is provided in the header part of the output. The output of real numbers has a precision of three digits by default, this can be overridden by the ``--precision`` option.
+Following a header part, the time-dependent simulated data is displayed, organized into columns. The first two columns are time and timestep, respectively, and then, separated by tab characters, the data stemming from the different subsystems follows. A key to the data is provided in the header part of the output.
 
 In the case of a single |MCWF| trajectory, there is the option ``--logLevel``, which, when nonzero, makes that the stepper will record certain data during the execution:
 
@@ -328,6 +328,28 @@ A custom initial condition can be provided in a file whose name can be passed to
 .. note::
 
    If the ``--initFile`` option is given, it will override any other initial condition specified in the |script|. 
+
+
+The output of real numbers has a precision of three digits by default, this can be overridden by the ``--precision`` option. This characteristic propagates throughout the framework from trajectory headers to state-vector outputs as follows:
+
+  * Trajectory header: real-number parameters of overall precision, but at least 6
+
+  * Time and timestep: of overall precision, but at least 6
+
+  * Quantum averages: of overall precision
+
+  * State-vector display *within trajectories*: of ``--svdPrecision`` whose default value 0 signifies falling back to the overall precision
+
+  * In ``.sv`` file: 
+
+    * state-vector of overall precision
+
+    * time and timestep: of overall precision, but at least 6
+
+
+.. note::
+
+  Parameters written by elements on :func:`paramsStream <structure::DynamicsBase::getParsStream>` inherit the overall precision via a static data member of :class:`FormDouble`.
 
 
 ---------------------
@@ -552,7 +574,7 @@ References
 
   .. option:: --precision <int>
 
-    number of digits in the output of doubles
+    number of digits in the output of doubles throughout the framework
 
   .. option:: --displayInfo, --no_displayInfo
 

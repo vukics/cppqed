@@ -4,7 +4,7 @@ Change Log
 
 The following is a list of only the more substantial changes (e.g. such as break certain applications). For a full log of development, `browse the Bazaar repository <http://cppqed.bzr.sourceforge.net/bzr/cppqed/changes>`_.
 
-2012/06/05 State-vector, and parameter output now also has the same precision as ``--precision``, the latter also at least 6 digits. Problem: parameters written on :func:`paramsStream <structure::DynamicsBase::getParsStream>` do not inherit this precision.
+2012/06/12 State-vector and parameter output now also has the same precision as ``--precision``, the latter also at least 6 digits.
 
 2012/05/30 Time and timestep output has now the same precision as the overall precision governed by ``--precision``, but at least 6 digits.
 

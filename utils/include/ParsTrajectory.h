@@ -5,7 +5,9 @@
 
 #include "TrajectoryFwd.h"
 
+#include "FormDoubleFwd.h"
 #include "ParsFwd.h"
+
 
 namespace trajectory {
 
@@ -49,7 +51,9 @@ struct ParsTrajectory {
   double &Dt;
   std::string &ofn;
   double &autoStop;
-  int &precision;
+
+  formdouble::Zero &precision;
+
   bool &displayInfo;
 
   ParsTrajectory(parameters::ParameterTable&, const std::string& mod="");

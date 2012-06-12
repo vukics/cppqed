@@ -85,7 +85,7 @@ Trajectory<A>::Trajectory(A& y, typename Evolved::Derivs derivs, double dtInit,
 template<typename A>
 void Trajectory<A>::displayParameters() const 
 {
-  evolved_->displayParameters(getOstream()<<std::endl)<<"# Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
+  evolved_->displayParameters(getOstream()<<std::endl)<<"# Trajectory Parameters: precision="<<getPrecision()<<" epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }
 
 

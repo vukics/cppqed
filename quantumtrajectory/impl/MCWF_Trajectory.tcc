@@ -86,7 +86,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     svdc_(p.svdc),
     firstSVDisplay_(p.firstSVDisplay),
-    svdPrecision_(p.svdPrecision ? p.svdPrecision : p.precision),
+    svdPrecision_(p.svdPrecision ? p.svdPrecision : getPrecision()),
     svdCount_(0),
     file_(p.ofn),
     initFile_(p.initFile+".sv"),
