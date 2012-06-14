@@ -16,6 +16,7 @@ ParsTrajectory::ParsTrajectory(parameters::ParameterTable& p, const std::string&
     epsAbs(p.addMod("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
     dc(p.addMod("dc",mod,"Number of steps between two Displays",10)),
     Dt(p.addMod("Dt",mod,"Timestep between two Displays",.1)),
+    NDt(p.addMod("NDt",mod,"Number of steps in Dt mode",0L)),
     ofn(p.addMod<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
     autoStop(p.addMod("autoStop",mod,"Parameter for automatic stopping criterion",0.)),
     precision(p.addMod("precision",mod,"General precision of output",3)),

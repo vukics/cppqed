@@ -12,6 +12,9 @@ ParsMCWF_Trajectory::ParsMCWF_Trajectory(parameters::ParameterTable& p, const st
     overshootTolerance(p.addMod("overshootTolerance",mod,"Jump probability overshoot tolerance factor",10.)),
     svdc(p.addMod("svdc",mod,"Number of displays between two state-vector Displays",0u)),
     firstSVDisplay(p.addMod("firstSVDisplay",mod,"Displays state vector at startup",true)),
+#ifdef USE_BOOST_SERIALIZATION
+    binarySVFile(p.addMod("binarySVFile",mod,"Statevector file is in binary form (.svbin, full precision) if true, or textform (.sv, lower precision) if false",false)),
+#endif // USE_BOOST_SERIALIZATION
     initFile (p.addMod<std::string>("initFile" ,mod,"file containing the initial state vector","")),
     basisDim(p.addMod("basisDim",mod,"number of basis vectors the stochastic wave function is compared against",size_t(0))),
     basisFile(p.addMod<std::string>("basisFile",mod,"file containing the basis vectors","")),

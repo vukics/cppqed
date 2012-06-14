@@ -11,8 +11,8 @@ namespace trajectory {
 namespace details {
 
 
-template<typename T, typename D>
-void run(T& traj, double time, D d, void (*doRun)(T&,double,D), bool timestep, bool displayInfo)
+template<typename T, typename L, typename D>
+void run(T& traj, L l, D d, void (*doRun)(T&,L,D), bool timestep, bool displayInfo)
 {
   using namespace std;
   bool continuing=traj.getTime();
@@ -31,13 +31,15 @@ void run(T& traj, double time, D d, void (*doRun)(T&,double,D), bool timestep, b
 
   try {
     if (!continuing) traj.display(); 
-    doRun(traj,time,d);
+    doRun(traj,l,d);
   }
   catch (const StoppingCriterionReachedException& except) {
     traj.getOstream()<<"# Stopping criterion has been reached"<<endl;
     throw except;
   }
 }
+
+void doRunNDt(TrajectoryBase&, long nDt, double deltaT);
 
 void doRun(TrajectoryBase&, double time, double deltaT);
 // Evolves the system on a Trajectory up to time T and Displays in every deltaT
@@ -55,15 +57,20 @@ void doRun(Trajectory<A>& traj, double time, int dc)
 
 inline void runDt(TrajectoryBase& traj, double time, double deltaT, bool displayInfo) {details::run(traj,time,deltaT,details::doRun,false,displayInfo);}
 
+inline void runNDt(TrajectoryBase& traj, long nDt, double deltaT, bool displayInfo) {details::run(traj,nDt,deltaT,details::doRunNDt,false,displayInfo);}
+
 template<typename A>
 inline void run  (Trajectory<A> & traj, double time, int    dc    , bool displayInfo) {details::run(traj,time,dc    ,details::doRun,true ,displayInfo);}
 
 
 template<typename A>
-inline void evolve(Trajectory<A>& traj, const ParsTrajectory& p)
+void evolve(Trajectory<A>& traj, const ParsTrajectory& p)
 {
   if      (p.dc) run  (traj,p.T,p.dc,p.displayInfo);
-  else if (p.Dt) runDt(traj,p.T,p.Dt,p.displayInfo);
+  else if (p.Dt) {
+    if (p.NDt) runNDt(traj,p.NDt,p.Dt,p.displayInfo);
+    else runDt(traj,p.T,p.Dt,p.displayInfo);
+  }
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
   std::cerr<<std::endl;
 }

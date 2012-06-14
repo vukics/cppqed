@@ -30,7 +30,10 @@ void evolve(quantumdata::StateVector<RANK>& psi, const structure::QuantumSystem<
       traj(psi,sys,pe);
     
     if      (pe.dc) run  (traj,pe.T,pe.dc,pe.displayInfo);
-    else if (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
+    else if (pe.Dt) {
+      if (pe.NDt) runNDt(traj,pe.NDt,pe.Dt,pe.displayInfo);
+      else runDt(traj,pe.T,pe.Dt,pe.displayInfo);
+    }
     else cout<<"Nonzero dc OR Dt required!"<<endl;
 
     break;
