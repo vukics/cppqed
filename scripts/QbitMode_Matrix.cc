@@ -11,7 +11,6 @@
 using namespace std;
 using namespace blitz;
 
-using formdouble::special;
 using linalg::CMatrix;
 
 typedef quantumdata::StateVector<1> StateVector1;
