@@ -105,7 +105,10 @@ private:
   typedef typename Liouvillean::Probabilities DpOverDtSet;
 
   void displayMore() const;
-
+  
+  void readState(std::ifstream &, bool onlySV);
+  void writeState(std::ofstream &) const;
+  
   double                coherentTimeDevelopment    (                                double Dt) const;
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
 
@@ -130,6 +133,11 @@ private:
   const bool firstSVDisplay_;
   const int svdPrecision_;
   mutable long svdCount_;
+
+  const std::string svExtension_;
+#ifdef USE_BOOST_SERIALIZATION
+  const bool binarySVFile_;
+#endif // USE_BOOST_SERIALIZATION
 
   const std::string file_;
 

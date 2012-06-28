@@ -282,8 +282,8 @@ SlicesData<RANK,V>::SlicesData(const CArray& array)
     stride_ (basi::begin(array,v_)->stride  ()),
     storage_(basi::begin(array,v_)->ordering() ,blitz::TinyVector<bool,MPL_SIZE(V)>(true))
 {
-  assert( ( blitz::all(storage_.ascendingFlag()==blitz::TinyVector<bool,RANK>(true)) ) );
-  assert( ( blitz::all(array   .base         ()==blitz::TinyVector<int ,RANK>(0   )) ) );
+  assert( ( blitz::all(storage_.ascendingFlag()==blitz::TinyVector<bool,MPL_SIZE(V)>(true)) ) );
+  assert( ( blitz::all(array   .base         ()==blitz::TinyVector<int ,       RANK>(0   )) ) );
 }
 
 

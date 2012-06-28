@@ -5,6 +5,8 @@
 #define USE_BOOST_PROGRESS_TIMER_PROFILING
 #include "Profiling.h"
 
+#define DUMMY_TEST_FUNCTION( A ) void A()
+
 #define BOOST_TEST_MODULE BlitzArraySliceIterator test
 #include <boost/test/unit_test.hpp>
 
@@ -79,7 +81,7 @@ BOOST_AUTO_TEST_CASE( FilterOutTest )
 {
   using namespace details;
 
-  BOOST_CHECK(all(filteredIdx==IdxTiny(21,4,11,3,23,7)));
+  BOOST_CHECK(all(filteredIdx==VecIdxTiny(21,4,11,3,23,7)));
 
 }
 
@@ -146,9 +148,7 @@ void actWithA(TTD_CARRAY(5)&) {}
 
 
 
-// The following test comes from the old version of this file, and is
-// intended on one hand to demonstrate the performance as a function
-// of the arity of slices
+// The following test comes from the old version of this file, and is intended to demonstrate the performance as a function of the arity of slices
 
 namespace basi_performance {
 
@@ -167,6 +167,7 @@ struct Helper
 
     BOOST_CHECK(all(array1==arrayRes)); array1=arrayOrig;
 
+    /*
     PROGRESS_TIMER_IN_POINT(cout);
     SlicesData<11,V> slicesData(array1);
     for (int i=nRepetition; i; --i) cpputils::for_each(basi_fast::fullRange(array1,slicesData),basi_fast::begin(array2,slicesData),bll::_1*=bll::_2); 
@@ -174,6 +175,7 @@ struct Helper
     PROGRESS_TIMER_OUT_POINT("");
 
     BOOST_CHECK(all(array1==arrayRes)); array1=arrayOrig;
+    */
   }
 
 };
@@ -247,7 +249,7 @@ struct Helper
 
 
 
-BOOST_AUTO_TEST_CASE( BASI_Monitor )
+DUMMY_TEST_FUNCTION( BASI_Monitor )
 {
 
   using namespace basi_monitor;

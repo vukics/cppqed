@@ -142,9 +142,9 @@ directDiagonals(const typename Tridiagonal<RANK1>::Diagonals& ds1,
 
 
   typename TridiagonalRes::Diagonals res;
-  size_t length=ds2.numElements;
+  size_t length=ds2.numElements();
 
-  for (size_t i=0; i<ds1.numElements; ++i) for (size_t j=0; j<length; ++j) {
+  for (size_t i=0; i<ds1.numElements(); ++i) for (size_t j=0; j<length; ++j) {
       const typename Tridiagonal1::Diagonal& d1=ds1(i);
       const typename Tridiagonal2::Diagonal& d2=ds2(j);
       typename TridiagonalRes::Diagonal& d=res(i*length+j);

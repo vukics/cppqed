@@ -9,6 +9,11 @@
 
 #include "FormDouble.h"
 
+#ifdef USE_BOOST_SERIALIZATION
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/complex.hpp>
+#endif // USE_BOOST_SERIALIZATION
 #include <fstream>
 
 
@@ -88,19 +93,24 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     firstSVDisplay_(p.firstSVDisplay),
     svdPrecision_(p.svdPrecision ? p.svdPrecision : getPrecision()),
     svdCount_(0),
+#ifdef USE_BOOST_SERIALIZATION
+    svExtension_(binarySVFile_?".svbin":".sv"),
+    binarySVFile_(p.binarySVFile),
+#else // USE_BOOST_SERIALIZATION
+    svExtension_(".sv"),
+#endif // USE_BOOST_SERIALIZATION
     file_(p.ofn),
-    initFile_(p.initFile+".sv"),
+    initFile_(p.initFile+svExtension_),
     logger_(p.logLevel,ha_,getOstream())
 {
   using namespace std;
 
   if (psi!=sys) throw DimensionalityMismatchException();
   
-  if (initFile_!=".sv") {
+  if (initFile_!=svExtension_) {
     ifstream file(initFile_.c_str());
     if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(initFile_);
-#define READ_INTO_PSI {StateVectorLow psiTemp; file>>psiTemp; psi_=psiTemp; psi_.renorm();}
-    READ_INTO_PSI;
+    readState(file,true);
   }
 
   class NoPresetDtTry {};
@@ -113,26 +123,10 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
       if (!file.is_open() || file.peek()==EOF) throw NoPresetDtTry();
     }
     {
-      ifstream file((file_+".sv").c_str());
-      if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+".sv");
-
-      {
-	READ_INTO_PSI;
-      }
-#undef READ_INTO_PSI
-      {
-	char c;
-	file>>c; // eat '#'
-	if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+".sv");
-      }
-      file.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit );
-      double t0, dtTry;
-      file>>t0; file>>dtTry;
-      getOstream()<<"# Next timestep to try: "<<dtTry<<std::endl;
-      getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
-      if (ex_) tIntPic0_=t0;
+      ifstream file((file_+svExtension_).c_str());
+      if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+svExtension_);
+      readState(file);
     }
-
   }
   else
     throw NoPresetDtTry();
@@ -151,13 +145,83 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
   using namespace std;
 
   if (file_!="") {
-    ofstream file((file_+".sv").c_str());
-    file<<formdouble::zeroWidth(getPrecision())(psi_())<<"\n# "
-	<<formdouble::positive(getPrecision())(getTime ())
-	<<formdouble::positive(getPrecision())(getDtTry())<<endl;
+    ofstream file((file_+svExtension_).c_str());
+    writeState(file);
   }
 
 }
+
+
+template<int RANK>
+void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV=false)
+{
+  using namespace std;
+  
+  StateVectorLow psiTemp;
+  double t0, dtTry;
+#ifdef USE_BOOST_SERIALIZATION
+  if (!binarySVFile_) {
+#endif // USE_BOOST_SERIALIZATION
+    ifs>>psiTemp;
+    psi_=psiTemp;
+    psi_.renorm();
+    if (onlySV) return;
+    
+#define EAT_COMMENT_CHAR  {char c; ifs>>c;  if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+svExtension_);} ifs.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit ); \
+/**/
+    EAT_COMMENT_CHAR
+    ifs>>*getRandomized();
+    EAT_COMMENT_CHAR
+#undef EAT_COMMENT_CHAR
+    ifs>>t0>>dtTry;
+#ifdef USE_BOOST_SERIALIZATION
+  }
+  else {
+    boost::archive::binary_iarchive ia(ifs);
+    for(int i=0, d; i<=RANK; i++) ia>>d; // eat RANK and dimensions
+    ia>>psiTemp;
+    psi_=psiTemp;
+    if (onlySV) return;
+    ia>>t0>>dtTry;
+    ifs>>*getRandomized();
+  }
+#endif // USE_BOOST_SERIALIZATION
+  getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
+  if (ex_) tIntPic0_=t0;
+  getOstream()<<"# Next timestep to try: "<<dtTry<<endl;
+}
+
+
+template<int RANK>
+void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
+{
+  using namespace std;
+
+#ifdef USE_BOOST_SERIALIZATION
+  if (!binarySVFile_) {
+#endif // USE_BOOST_SERIALIZATION
+    ofs<<formdouble::zeroWidth(getPrecision())(psi_())<<"\n# "
+       <<*getRandomized()<<"\n# "
+       <<formdouble::positive(getPrecision())(getTime ())
+       <<formdouble::positive(getPrecision())(getDtTry())<<endl;
+#ifdef USE_BOOST_SERIALIZATION
+  }
+  else {
+    boost::archive::binary_oarchive oa(ofs);
+    double t=getTime(); double dttry=getDtTry();
+    int r=RANK;
+    oa<<r;
+    for(int i=0;i<RANK;i++) {
+      int d=psi_().extent(i);
+      oa<<d;
+    }
+    oa<<psi_()<<t<<dttry;
+    ofs<<*getRandomized();
+  }
+#endif // USE_BOOST_SERIALIZATION
+
+}
+
 
 
 template<int RANK>

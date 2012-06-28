@@ -39,7 +39,7 @@ struct LeftRight
 #define TTD_VFMSI(RANK,S,CONST) basi::Iterator<RANK,LeftRight<RANK/2,S>,CONST>
 
 #define NS_NAME vfmsi
-#define RETURN_type1(CONST) TTD_VFMSI(A::_bz_rank,V_S,CONST)
+#define RETURN_type1(CONST) TTD_VFMSI(ArrayRankTraits<A>::value,V_S,CONST)
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 

@@ -8,7 +8,7 @@
 #include "Exception.h"
 #endif // NDEBUG
 
-#include<blitz/tinyvec.h>
+#include <blitz/tinyvec2.h>
 
 
 namespace blitzplusplus {

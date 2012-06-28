@@ -21,7 +21,7 @@
 
 #include "DynamicsBase.h"
 
-#include<blitz/tinyvec.h>
+#include "BlitzTiny.h"
 
 
 namespace structure {

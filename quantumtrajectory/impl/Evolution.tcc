@@ -28,10 +28,8 @@ void evolve(quantumdata::StateVector<RANK>& psi, const structure::QuantumSystem<
 
     MCWF_Trajectory<RANK>
       traj(psi,sys,pe);
-    
-    if      (pe.dc) run  (traj,pe.T,pe.dc,pe.displayInfo);
-    else if (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
-    else cout<<"Nonzero dc OR Dt required!"<<endl;
+
+    trajectory::evolve(traj,pe);
 
     break;
 

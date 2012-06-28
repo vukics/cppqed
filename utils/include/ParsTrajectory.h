@@ -49,6 +49,7 @@ struct ParsTrajectory {
   double &T, &epsRel, &epsAbs;
   int &dc;
   double &Dt;
+  long &NDt;
   std::string &ofn;
   double &autoStop;
 
