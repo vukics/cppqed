@@ -23,16 +23,16 @@ namespace master {
 template<int RANK>
 Base<RANK>::Base(DensityOperator& rho,
 		 const QuantumSystem& sys,
-		 const master::Pars& pt,
+		 const master::Pars& p,
 		 const DensityOperatorLow& scaleAbs
 		 )
-  : trajectory::TrajectoryBase(pt),
+  : trajectory::TrajectoryBase(p),
     TrajectoryBase(rho(),
 		   bind(&Base<RANK>::derivs,this,_1,_2,_3),
 		   1./(sys.highestFrequency()*TrajectoryBase::factor()),
 		   scaleAbs,
-		   pt,
-		   evolved::MakerGSL<DensityOperatorLow>()),
+		   p,
+		   evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
     rho_(rho),
     tIntPic0_(0),
     qs_(&sys),

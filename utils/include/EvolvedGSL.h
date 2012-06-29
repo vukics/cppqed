@@ -26,12 +26,13 @@ public:
   typedef typename Maker<A>::SmartPtr SmartPtr;
   typedef typename Maker<A>::Derivs   Derivs  ;
 
-  MakerGSL(SteppingFunction sf=SF_RKCK) : sf_(sf) {}
+  MakerGSL(SteppingFunction sf=SF_RKCK, double nextDtTryCorretionFactor=100.) : sf_(sf), nextDtTryCorretionFactor_(nextDtTryCorretionFactor) {}
 
   const SmartPtr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
 
 private:
   const SteppingFunction sf_;
+  const double nextDtTryCorretionFactor_;
   
 };
 
@@ -85,7 +86,8 @@ public:
 	     double,
 	     double,
 	     const A&,
-	     SteppingFunction
+	     SteppingFunction,
+	     double nextDtTryCorretionFactor
 	     );
 
   std::ostream& doDisplayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
@@ -98,6 +100,7 @@ private:
   const ImplSmartPtr pImpl_;
 
   const SteppingFunction sf_;
+  const double nextDtTryCorretionFactor_;
 
 };
 
