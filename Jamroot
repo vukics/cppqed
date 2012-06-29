@@ -14,10 +14,7 @@ lib C++QED : quantumdata structure quantumtrajectory quantumoperator utilslib ;
 
 lib boost_serializationlib : : <name>boost_serialization ;
 
-alias boost_serialization : boost_serializationlib : <enable-binary-output>yes ;
-alias boost_serialization : ;
-
-alias executables_link_against : : : : <library>C++QED <library>elements//el <library>utilslib <library>utils//flens <library>boost_serialization ;
+alias executables_link_against : : : : <library>C++QED <library>elements//el <library>utilslib <library>utils//flens <enable-binary-output>yes:<library>boost_serializationlib ;
 
 # Core
 build-project quantumdata       ;

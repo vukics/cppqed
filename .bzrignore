@@ -18,3 +18,4 @@ utils/test/Jamfile
 utils/test/MII_benchmark.cc
 utils/test/MultiIndexIterator.cc
 utils/test/rt.d
+doc

@@ -1,3 +1,5 @@
+// A "new" composite architecture based on basi_fast type iterators. Out of order at the moment.
+
 // -*- C++ -*-
 #ifndef   _COMPOSITE_SYSTEM_INCLUDED
 #define   _COMPOSITE_SYSTEM_INCLUDED

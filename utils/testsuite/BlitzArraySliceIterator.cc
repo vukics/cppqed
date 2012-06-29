@@ -167,7 +167,6 @@ struct Helper
 
     BOOST_CHECK(all(array1==arrayRes)); array1=arrayOrig;
 
-    /*
     PROGRESS_TIMER_IN_POINT(cout);
     SlicesData<11,V> slicesData(array1);
     for (int i=nRepetition; i; --i) cpputils::for_each(basi_fast::fullRange(array1,slicesData),basi_fast::begin(array2,slicesData),bll::_1*=bll::_2); 
@@ -175,7 +174,6 @@ struct Helper
     PROGRESS_TIMER_OUT_POINT("");
 
     BOOST_CHECK(all(array1==arrayRes)); array1=arrayOrig;
-    */
   }
 
 };
@@ -249,7 +247,7 @@ struct Helper
 
 
 
-DUMMY_TEST_FUNCTION( BASI_Monitor )
+BOOST_AUTO_TEST_CASE( BASI_Monitor )
 {
 
   using namespace basi_monitor;
