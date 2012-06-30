@@ -36,4 +36,4 @@ def compare(i,eps) :
 
 def helper(i,j,eps) : return regressionArrays(averageArray(i),evolvedArray[:,j],timeArray,argv,eps)
 
-print compare(4,1e-40) & compare(5,1e-40) & compare(8,1e-40) & compare(9,1e-40) & helper(4,4,3e-8) & helper(5,5,6e-9) & helper(8,2,7e-6) & helper(9,3,5e-6)
+print compare(4,1e-40) & compare(5,1e-40) & compare(8,1e-40) & compare(9,1e-40) & helper(4,4,3e-8) & helper(5,5,6e-9) & helper(8,2,6e-6) & helper(9,3,5e-6)

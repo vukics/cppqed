@@ -43,4 +43,4 @@ def helper(i,array,eps) : return regressionArrays(averageArray(i),array,timeArra
 alphaRe=evolvedArray[:,2]
 alphaIm=evolvedArray[:,3]
 
-print compare(2,1e-34) & compare(3,1e-34) & compare(4,1e-34) & compare(5,1e-34) & helper(4,alphaRe,5e-9) & helper(5,alphaIm,5e-8) & helper(2,alphaRe*alphaRe+alphaIm*alphaIm,9e-9)
+print compare(2,1e-34) & compare(3,1e-34) & compare(4,1e-34) & compare(5,1e-34) & helper(4,alphaRe,1e-34) & helper(5,alphaIm,1e-34) & helper(2,alphaRe*alphaRe+alphaIm*alphaIm,2e-8)

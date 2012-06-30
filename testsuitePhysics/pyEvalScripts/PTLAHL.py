@@ -20,5 +20,5 @@ def averageArray(i) : return (trajectories[0][i]+trajectories[1][i+2])/2
 
 def helper(i,j,k,eps) : return regression(interpolate(timeArray,averageArray(i)),interpolateEVC(trajectories[j],k),timeArray,argv,eps)
 
-print helper(2,0,2,8e-11) & helper(2,1,4,8e-11) & helper(3,0,3,5e-10) & helper(3,1,5,5e-10)
+print helper(2,0,2,9e-11) & helper(2,1,4,9e-11) & helper(3,0,3,6e-10) & helper(3,1,5,6e-10)
 
