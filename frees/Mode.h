@@ -19,6 +19,9 @@
 
 namespace mode {
 
+const std::string keyTitle="Mode";
+
+
 using namespace structure::free;
 
 typedef boost::shared_ptr<const ModeBase> SmartPtr;
@@ -136,7 +139,7 @@ class Liouvillean<false,IS_ALTERNATIVE>
     public structure::ElementLiouvillean<1,1>
 {
 protected:
-  Liouvillean(double kappa, double=0) : kappa_(kappa) {}
+  Liouvillean(double kappa, double=0) : structure::ElementLiouvillean<1,1>(keyTitle,"photon loss"), kappa_(kappa) {}
   // the trailing dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
 
 private:
