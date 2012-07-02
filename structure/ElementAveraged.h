@@ -6,39 +6,16 @@
 
 #include "Averaged.h"
 
+#include "KeyPrinter.h"
+
 #include <boost/ptr_container/ptr_list.hpp>
 
-#include <list>
 
 
 namespace structure {
 
 
-////////////////////////
-//
-// ElementAveragedCommon
-//
-////////////////////////
-
-
-class ElementAveragedCommon
-{
-public:
-  typedef std::list<std::string> KeyLabels;
-
-  ElementAveragedCommon(const std::string&, const KeyLabels&);
-
-  void   display   (const AveragedCommon::Averages&, std::ostream&, int) const;
-  size_t nAvr      ()                                                    const {return keyLabels_.size();}
-  void   displayKey(std::ostream&, size_t&)                              const;
-
-  const std::string& getTitle () const {return keyTitle_ ;}
-  const KeyLabels  & getLabels() const {return keyLabels_;}
-
-private:
-  const std::string keyTitle_ ;  
-  const KeyLabels   keyLabels_;
-};
+void displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
 
 
 //////////////////
@@ -49,23 +26,23 @@ private:
 
 
 template<int RANK, bool IS_TD>
-class ElementAveraged : public Averaged<RANK,IS_TD>, private ElementAveragedCommon
+class ElementAveraged : public Averaged<RANK,IS_TD>
 {
 public:
   typedef AveragedCommon::Averages Averages;
-  typedef ElementAveragedCommon::KeyLabels KeyLabels;
+  typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
 
-  ElementAveraged(const std::string& keyTitle, const KeyLabels& keyLabels) : ElementAveragedCommon(keyTitle,keyLabels) {}
+  ElementAveraged(const std::string& keyTitle, const KeyLabels& keyLabels) : keyPrinter_(keyTitle,keyLabels) {}
 
-  const KeyLabels& getLabels() const {return ElementAveragedCommon::getLabels();}
+  const KeyLabels& getLabels() const {return keyPrinter_.getLabels();}
 
-  using ElementAveragedCommon::getTitle;
-
-  size_t nAvr()                                                      const {return ElementAveragedCommon::nAvr()                 ;}
+  size_t nAvr()                                                      const {return keyPrinter_.length()         ;}
 
 private: 
-  void   display(const Averages& a, std::ostream& os, int precision) const {       ElementAveragedCommon::display(a,os,precision);}
-  void   displayKey(std::ostream& os, size_t& i)                     const {       ElementAveragedCommon::displayKey(os,i)       ;}
+  void   display(const Averages& a, std::ostream& os, int precision) const {       displayCommon(a,os,precision);}
+  void   displayKey(std::ostream& os, size_t& i)                     const {       keyPrinter_.displayKey(os,i) ;}
+
+  const cpputils::KeyPrinter keyPrinter_;
 
 };
 
@@ -129,6 +106,7 @@ public:
   typedef boost::ptr_list<Element> Collection;
 
   typedef ClonableElementAveraged<RANK> Base;
+  typedef typename Base::KeyLabels KeyLabels;
 
   typedef AveragedCommon::Averages Averages;
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
@@ -139,7 +117,7 @@ public:
 private:
   Base*const do_clone() const {return new Collecting(*this);}
 
-  using Base::nAvr;
+  using Base::nAvr; using Base::getLabels;
 
   const Averages average(const LazyDensityOperator&) const;
   void           process(Averages&                 ) const;

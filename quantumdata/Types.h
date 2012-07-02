@@ -15,16 +15,7 @@ struct StaticTag {};
 
 const StaticTag theStaticOne=StaticTag();
 
-
-struct LiouvilleanAveragedCommon
-{
-  typedef TTD_DARRAY(1) DArray1D;
-  static const DArray1D defaultArray;
-};
-
-
-} // structure
-
+} //structure
 
 
 namespace quantumdata {

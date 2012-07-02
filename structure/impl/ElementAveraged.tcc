@@ -7,12 +7,12 @@
 
 #include <boost/iterator/transform_iterator.hpp>
 
-#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
+#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(getLabels,_1))
 
 template<int RANK>
 structure::averaged::Collecting<RANK>::Collecting(const Collection& collection)
   : Base(collection.begin()->getTitle(),
-	 cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),ElementAveragedCommon::KeyLabels())),
+	 cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),KeyLabels())),
     collection_(collection.clone())
 {}
 

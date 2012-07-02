@@ -4,6 +4,7 @@
 
 #include "LiouvilleanFwd.h"
 
+#include "LiouvilleanAveragedCommon.h"
 #include "Types.h"
 
 #include "Exception.h"
@@ -12,16 +13,11 @@
 namespace structure {
 
 
-class LiouvilleanCommon : public virtual LiouvilleanAveragedCommon
+class LiouvilleanCommon : public LiouvilleanAveragedCommon
 {
 public:
   typedef DArray1D Probabilities;
-  // dpoverdt ladder type for Liouvilleans. Note that the extent is
-  // not known at compile time because it depends on how many
-  // subsystems there are which themselves are Liouvillean, which, in
-  // turn, depends on parameters. This may also actually be only a
-  // RANGE of a larger array if the present system is subsystem to a
-  // larger system.
+  // dpoverdt ladder type for Liouvilleans. Note that the extent is not known at compile time because it depends on how many subsystems there are which themselves are Liouvillean, which, in turn, depends on parameters. This may also actually be only a RANGE of a larger array if the present system is subsystem to a larger system.
 
   static size_t nJumps(const LiouvilleanCommon* liouvillean)
   {
