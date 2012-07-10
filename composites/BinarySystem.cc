@@ -10,11 +10,35 @@
 
 
 
-#define DISPLAY_KEY(Class,fun) void binary::Class::displayKey(std::ostream& os, size_t& i) const { \
-  os<<"# Binary system\n";						\
-  if (mask_(0)) free0_.fun()->displayKey(os,i);				\
-  if (mask_(1)) free1_.fun()->displayKey(os,i);				\
-  if (mask_(2)) ia_   .fun()->displayKey(os,i);				\
+#define DISPLAY_KEY(Class,Aux) void binary::Class::displayKey(std::ostream& os, size_t& i) const \
+  {									\
+    os<<"# Binary system\n";						\
+    Aux##1::displayKey(os,i,free0_.get##Aux());				\
+    Aux##1::displayKey(os,i,free1_.get##Aux());				\
+    Aux##2::displayKey(os,i,   ia_.get##Aux());				\
+  }									\
+
+
+#define ADD_UP_N(Class,Aux,Func) size_t binary::Class::n##Func() const	\
+  {									\
+    return Aux##1::n##Func(free0_.get##Aux()) + Aux##1::n##Func(free1_.get##Aux()) + Aux##2::n##Func(ia_.get##Aux()); \
+  }									\
+
+
+#define CONCATENATE_ARRAYS(Class,Aux,ArrayName,func,NumberName) const binary::Class::ArrayName binary::Class::func(double t, const LazyDensityOperator& ldo) const \
+  {									\
+  using quantumdata::partialTrace;					\
+  using boost::copy;							\
+									\
+  const ArrayName a0 (partialTrace(ldo,bind(&Aux##1::func,t,_1,free0_.get##Aux(),theStaticOne),v0,defaultArray)), \
+    a1 (partialTrace(ldo,bind(&Aux##1::func,t,_1,free1_.get##Aux(),theStaticOne),v1,defaultArray)), \
+    a01(Aux##2::func(t,ldo,ia_.get##Aux()));				\
+									\
+  ArrayName a(n##NumberName());						\
+									\
+  copy(a01,copy(a1,copy(a0,a.begin())));				\
+									\
+  return a;								\
   }									\
 
 
@@ -28,15 +52,6 @@ namespace {
 }
 
 
-//// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-template<typename UN, typename BI>
-const binary::Mask createMask(UN un,BI bi,const binary::SSF& free0, const binary::SSF& free1, const binary::SSI& ia)
-{
-  return binary::Mask(un(free0.get()),un(free1.get()),bi(ia.get()));
-}
-
-
-
 using cpputils::for_each;
 using boost   ::for_each;
 
@@ -48,17 +63,11 @@ using boost   ::for_each;
 //////////
 
 
-binary::Base::Base(const Interaction& ia, const Mask& mask)
+binary::Base::Base(const Interaction& ia)
   : QuantumSystem<2>(Dimensions(ia.getFrees()(0)->getDimension(),ia.getFrees()(1)->getDimension())),
-    free0_(ia.getFrees()(0)), free1_(ia.getFrees()(1)), ia_(&ia),
-    mask_(mask)
+    free0_(ia.getFrees()(0)), free1_(ia.getFrees()(1)), ia_(&ia)
 {
 } 
-
-
-
-
-// NEEDS_WORK a lot of boilerplate should be eliminated!!!
 
 
 double binary::Base::highestFrequency () const
@@ -66,7 +75,6 @@ double binary::Base::highestFrequency () const
   using std::max;
   return max(ia_.get()->highestFrequency(),max(free0_.get()->highestFrequency(),free1_.get()->highestFrequency()));
 }
-
 
 
 void binary::Base::displayParameters(std::ostream& os) const
@@ -79,35 +87,11 @@ void binary::Base::displayParameters(std::ostream& os) const
 }
 
 
+DISPLAY_KEY(Base,Av);
 
-DISPLAY_KEY(Base,getAv);
+ADD_UP_N(Base,Av,Avr);
 
-
-
-size_t binary::Base::nAvr() const
-{
-  return Av1::nAvr(free0_.getAv()) + Av1::nAvr(free1_.getAv()) + Av2::nAvr(ia_.getAv());
-}
-
-
-
-const binary::Base::Averages binary::Base::average(double t, const LazyDensityOperator& ldo) const
-{
-  using quantumdata::partialTrace;
-  using boost::copy;
-
-  const Averages 
-    a0 (partialTrace(ldo,bind(&Av1::average,t,_1,free0_.getAv(),theStaticOne),v0,defaultArray)),
-    a1 (partialTrace(ldo,bind(&Av1::average,t,_1,free1_.getAv(),theStaticOne),v1,defaultArray)),
-    a01(Av2::average(t,ldo,ia_.getAv()));
-
-  Averages a(nAvr());
-
-  copy(a01,copy(a1,copy(a0,a.begin())));
-
-  return a;  
-}
-
+CONCATENATE_ARRAYS(Base,Av,Averages,average,Avr);
 
 
 void binary::Base::process(Averages& averages) const
@@ -168,14 +152,15 @@ void binary::Base::display(const Averages& averages, std::ostream& os, int preci
 ///////////
 
 
-bool BinarySystem::isUnitary() const
+
+bool binary::Exact::isUnitary() const
 {
   return Ex1::isUnitary(free0_.getEx()) && Ex1::isUnitary(free1_.getEx()) && Ex2::isUnitary(ia_.getEx());
 }
 
 
 
-void BinarySystem::actWithU(double dt, StateVectorLow& psi) const
+void binary::Exact::actWithU(double dt, StateVectorLow& psi) const
 {
   using namespace blitzplusplus::basi;
   if (const Ex1* ex1=free0_.getEx()) for_each(fullRange(psi,v0),bind(&Ex1::actWithU,ex1,dt,_1));
@@ -185,12 +170,14 @@ void BinarySystem::actWithU(double dt, StateVectorLow& psi) const
 }
 
 
-///////////////////////////////
-///////////////////////////////
-///////////////////////////////
+/////////////////
+//             //
+// Hamiltonian //
+//             //
+/////////////////
 
 
-void BinarySystem::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void binary::Hamiltonian::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   using namespace blitzplusplus; using basi::fullRange;
   if (const Ha1* ha1=free0_.getHa()) for_each(fullRange(psi,v0),basi::begin(dpsidt,v0),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
@@ -208,36 +195,9 @@ void BinarySystem::addContribution(double t, const StateVectorLow& psi, StateVec
 /////////////////
 
 
-binary::Liouvillean::Liouvillean(const SSF& free0, const SSF& free1, const SSI& ia, const Mask& mask)
-  : free0_(free0), free1_(free1), ia_(ia), mask_(mask)
-{}
+ADD_UP_N(Liouvillean,Li,Jumps)
 
-
-size_t binary::Liouvillean::nJumps() const
-{
-  return Li1::nJumps(free0_.getLi()) + Li1::nJumps(free1_.getLi()) + Li2::nJumps(ia_.getLi());
-}
-
-
-
-const binary::Liouvillean::Probabilities binary::Liouvillean::probabilities(double t, const LazyDensityOperator& ldo) const
-{
-  using quantumdata::partialTrace;
-  using boost::copy;
-  
-  const Probabilities 
-    p0 (partialTrace(ldo,bind(&Li1::probabilities,t,_1,free0_.getLi(),theStaticOne),v0,defaultArray)),
-    p1 (partialTrace(ldo,bind(&Li1::probabilities,t,_1,free1_.getLi(),theStaticOne),v1,defaultArray)),
-    p01(Li2::probabilities(t,ldo,ia_.getLi()));
-
-  Probabilities p(nJumps());
-
-  copy(p01,copy(p1,copy(p0,p.begin())));
-
-  return p;
-
-}
-
+CONCATENATE_ARRAYS(Liouvillean,Li,Probabilities,probabilities,Jumps);
 
 
 void binary::Liouvillean::actWithJ(double t, StateVectorLow& psi, size_t i) const
@@ -269,8 +229,7 @@ void binary::Liouvillean::actWithJ(double t, StateVectorLow& psi, size_t i) cons
 }
 
 
-
-DISPLAY_KEY(Liouvillean,getLi)
+DISPLAY_KEY(Liouvillean,Li)
 
 
 
@@ -280,15 +239,20 @@ DISPLAY_KEY(Liouvillean,getLi)
 //              //
 //////////////////
 
-#define CREATE_MASK(fun) binary::Mask(fun(ia.getFrees()(0)),fun(ia.getFrees()(1)),fun<2>(&ia))
+
+#define BASE_CTOR(Class) binary::Class(getFree0(),getFree1(),getIA())
+
 
 BinarySystem::BinarySystem(const Interaction& ia) 
-: binary::Base(ia,CREATE_MASK(qsa)),
-  binary::Liouvillean(getFree0(),getFree1(),getIA(),CREATE_MASK(qsl)),
-  free0_(ia.getFrees()(0)), free1_(ia.getFrees()(1)), ia_(&ia)
+: binary::Base(ia),
+  BASE_CTOR(Exact),
+  BASE_CTOR(Hamiltonian),
+  BASE_CTOR(Liouvillean)
 {
 } 
 
 
-#undef CREATE_MASK
+#undef BASE_CTOR
+#undef CONCATENATE_ARRAYS
+#undef ADD_UP_N
 #undef DISPLAY_KEY
