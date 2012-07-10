@@ -101,7 +101,7 @@ public:
 class Liouvillean : public mode::Liouvillean<false>
 {
 protected:
-  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma) {}
+  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma,0,"Qbit") {}
 
 };
  

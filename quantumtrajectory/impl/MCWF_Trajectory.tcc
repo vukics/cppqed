@@ -391,7 +391,7 @@ void MCWF_Trajectory<RANK>::displayParameters() const
   if (li_) {
     os<<"# Decay channels:\n";
     {
-      size_t i=1;
+      size_t i=0;
       Liouvillean::displayKey(getOstream(),i,li_);
     }
     os<<"# Alternative jumps: ";

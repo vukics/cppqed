@@ -7,9 +7,8 @@
 #include "SubSystem.h"
 
 
-namespace binary {
 
-typedef blitz::TinyVector<bool,3> Mask;
+namespace binary {
 
 typedef structure::Interaction<2> Interaction;
 
@@ -17,15 +16,16 @@ typedef structure::SubSystemFree            SSF;
 typedef structure::SubSystemsInteraction<2> SSI;
 
 
+
 class Base
   : public structure::QuantumSystem<2>,
-    public structure::Averaged<2>
+    public structure::Averaged     <2>
 {
 public:
   typedef structure::Averaged<1> Av1;
   typedef structure::Averaged<2> Av2;
 
-  Base(const Interaction&, const Mask&);
+  Base(const Interaction&);
 
   const SSF& getFree0() const {return free0_;}
   const SSF& getFree1() const {return free1_;}
@@ -46,74 +46,75 @@ private:
 
   const SSI ia_;
   
-  const Mask mask_;
+};
+
+
+#define CLASS_HEADER(Class) class Class : public structure::Class<2>
+
+#define CLASS_BODY_PART(Class,Aux) public:				\
+  typedef structure::Class<1> Aux##1;					\
+  typedef structure::Class<2> Aux##2;					\
+									\
+  Class(const SSF& free0, const SSF& free1, const SSI& ia) : free0_(free0), free1_(free1), ia_(ia) {} \
+									\
+private:								\
+  const SSF &free0_, &free1_;						\
+  const SSI &ia_;							\
+
+
+
+CLASS_HEADER(Exact)
+{
+  CLASS_BODY_PART(Exact,Ex)
+
+  bool isUnitary() const;
+
+  void actWithU(double, StateVectorLow&) const;
 
 };
 
 
-
-class Liouvillean : public structure::Liouvillean<2>
+CLASS_HEADER(Hamiltonian)
 {
-public:
-  typedef structure::Liouvillean  <1> Li1; 
-  typedef structure::Liouvillean  <2> Li2; 
+  CLASS_BODY_PART(Hamiltonian,Ha)
 
-  Liouvillean(const SSF&, const SSF&, const SSI&, const Mask&);
+  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
 
-private:
+};
+
+
+CLASS_HEADER(Liouvillean)
+{
+  CLASS_BODY_PART(Liouvillean,Li)
+
   size_t              nJumps       ()                                   const;
   const Probabilities probabilities(double, const LazyDensityOperator&) const;
   void                actWithJ     (double, StateVectorLow&, size_t)    const;
 
   void displayKey(std::ostream&, size_t&) const;
 
-  const SSF &free0_, &free1_;
-  const SSI &ia_;
-
-  const Mask mask_;
-
 };
 
+
+#undef CLASS_BODY_PART
+#undef CLASS_HEADER
 
 
 } // binary
 
 
 
+template<bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
 class BinarySystem 
   : public binary::Base,
-    public structure::Exact        <2>, 
-    public structure::Hamiltonian  <2>,
+    public binary::Exact, 
+    public binary::Hamiltonian,
     public binary::Liouvillean
 {
 public:
   typedef structure::Interaction<2> Interaction;
-  typedef quantumdata::Types<2> Types;
-
-  typedef Types::    StateVectorLow     StateVectorLow;
-  typedef Types::DensityOperatorLow DensityOperatorLow;
-
-  typedef quantumdata::LazyDensityOperator<2> LazyDensityOperator;
-
-  typedef structure::Exact        <1> Ex1; 
-  typedef structure::Hamiltonian  <1> Ha1;
-  typedef structure::Liouvillean  <1> Li1; 
-
-  typedef structure::Exact        <2> Ex2; 
-  typedef structure::Hamiltonian  <2> Ha2;
-  typedef structure::Liouvillean  <2> Li2; 
 
   BinarySystem(const Interaction&);
-
-private:
-  bool isUnitary() const;
-
-  void actWithU(double, StateVectorLow&) const;
-
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
-
-  const binary::SSF free0_, free1_;
-  const binary::SSI ia_;
 
 };
 
