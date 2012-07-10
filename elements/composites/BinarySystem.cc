@@ -9,6 +9,18 @@
 #include "Range.h"
 
 
+
+#define DISPLAY_KEY(Class,fun) void binary::Class::displayKey(std::ostream& os, size_t& i) const { \
+  os<<"# Binary system\n";						\
+  if (mask_(0)) free0_.fun()->displayKey(os,i);				\
+  if (mask_(1)) free1_.fun()->displayKey(os,i);				\
+  if (mask_(2)) ia_   .fun()->displayKey(os,i);				\
+  }									\
+
+
+
+using namespace structure;
+
 namespace {
 
 #include "../interactions/details/BinaryHelper.h"
@@ -16,21 +28,40 @@ namespace {
 }
 
 
+//// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+template<typename UN, typename BI>
+const binary::Mask createMask(UN un,BI bi,const binary::SSF& free0, const binary::SSF& free1, const binary::SSI& ia)
+{
+  return binary::Mask(un(free0.get()),un(free1.get()),bi(ia.get()));
+}
+
+
+
 using cpputils::for_each;
 using boost   ::for_each;
 
 
-BinarySystem::BinarySystem(const Interaction& ia)
-  : QS2(Dimensions(ia.getFrees()(0)->getDimension(),ia.getFrees()(1)->getDimension())),
-    free0_(ia.getFrees()(0)), free1_(ia.getFrees()(1)), ia_(&ia)
+//////////
+//      //
+// Base //
+//      //
+//////////
+
+
+binary::Base::Base(const Interaction& ia, const Mask& mask)
+  : QuantumSystem<2>(Dimensions(ia.getFrees()(0)->getDimension(),ia.getFrees()(1)->getDimension())),
+    free0_(ia.getFrees()(0)), free1_(ia.getFrees()(1)), ia_(&ia),
+    mask_(mask)
 {
 } 
+
+
 
 
 // NEEDS_WORK a lot of boilerplate should be eliminated!!!
 
 
-double BinarySystem::highestFrequency () const
+double binary::Base::highestFrequency () const
 {
   using std::max;
   return max(ia_.get()->highestFrequency(),max(free0_.get()->highestFrequency(),free1_.get()->highestFrequency()));
@@ -38,7 +69,7 @@ double BinarySystem::highestFrequency () const
 
 
 
-void BinarySystem::displayParameters(std::ostream& os) const
+void binary::Base::displayParameters(std::ostream& os) const
 {
   using namespace std;
   os<<"# Binary System\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<endl<<endl
@@ -47,6 +78,94 @@ void BinarySystem::displayParameters(std::ostream& os) const
   os<<"# 0 - 1 - Interaction\n"; ia_.get()->displayParameters(os);
 }
 
+
+
+DISPLAY_KEY(Base,getAv);
+
+
+
+size_t binary::Base::nAvr() const
+{
+  return Av1::nAvr(free0_.getAv()) + Av1::nAvr(free1_.getAv()) + Av2::nAvr(ia_.getAv());
+}
+
+
+
+const binary::Base::Averages binary::Base::average(double t, const LazyDensityOperator& ldo) const
+{
+  using quantumdata::partialTrace;
+  using boost::copy;
+
+  const Averages 
+    a0 (partialTrace(ldo,bind(&Av1::average,t,_1,free0_.getAv(),theStaticOne),v0,defaultArray)),
+    a1 (partialTrace(ldo,bind(&Av1::average,t,_1,free1_.getAv(),theStaticOne),v1,defaultArray)),
+    a01(Av2::average(t,ldo,ia_.getAv()));
+
+  Averages a(nAvr());
+
+  copy(a01,copy(a1,copy(a0,a.begin())));
+
+  return a;  
+}
+
+
+
+void binary::Base::process(Averages& averages) const
+{
+  using blitz::Range;
+
+  const Av1 
+    * av0 =free0_.getAv(),
+    * av1 =free1_.getAv();
+  const Av2 
+    * av01=   ia_.getAv();
+
+  ptrdiff_t l=-1, u;
+
+  if ((u=l+Av1::nAvr(av0 ))>l) {
+    Averages temp(averages(Range(l+1,u)));
+    Av1::process(temp,av0 );
+  }
+  if ((l=u+Av1::nAvr(av1 ))>u) {
+    Averages temp(averages(Range(u+1,l)));
+    Av1::process(temp,av1 );
+  }
+  if ((u=l+Av2::nAvr(av01))>l) {
+    Averages temp(averages(Range(l+1,u)));
+    Av2::process(temp,av01);
+  }
+
+}
+
+
+
+void binary::Base::display(const Averages& averages, std::ostream& os, int precision) const
+{
+  using blitz::Range;
+
+  const Av1 
+    * av0 =free0_.getAv(),
+    * av1 =free1_.getAv();
+  const Av2 
+    * av01=   ia_.getAv();
+
+  ptrdiff_t l=-1, u;
+
+  if ((u=l+Av1::nAvr(av0 ))>l) av0 ->display(averages(Range(l+1,u)),os,precision);
+
+  if ((l=u+Av1::nAvr(av1 ))>u) av1 ->display(averages(Range(u+1,l)),os,precision);
+
+  if ((u=l+Av2::nAvr(av01))>l) av01->display(averages(Range(l+1,u)),os,precision);
+
+}
+
+
+
+///////////
+//       //
+// Exact //
+//       //
+///////////
 
 
 bool BinarySystem::isUnitary() const
@@ -66,6 +185,10 @@ void BinarySystem::actWithU(double dt, StateVectorLow& psi) const
 }
 
 
+///////////////////////////////
+///////////////////////////////
+///////////////////////////////
+
 
 void BinarySystem::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
@@ -78,15 +201,26 @@ void BinarySystem::addContribution(double t, const StateVectorLow& psi, StateVec
 }
 
 
+/////////////////
+//             //
+// Liouvillean //
+//             //
+/////////////////
 
-size_t BinarySystem::nJumps() const
+
+binary::Liouvillean::Liouvillean(const SSF& free0, const SSF& free1, const SSI& ia, const Mask& mask)
+  : free0_(free0), free1_(free1), ia_(ia), mask_(mask)
+{}
+
+
+size_t binary::Liouvillean::nJumps() const
 {
   return Li1::nJumps(free0_.getLi()) + Li1::nJumps(free1_.getLi()) + Li2::nJumps(ia_.getLi());
 }
 
 
 
-const BinarySystem::Probabilities BinarySystem::probabilities(double t, const LazyDensityOperator& ldo) const
+const binary::Liouvillean::Probabilities binary::Liouvillean::probabilities(double t, const LazyDensityOperator& ldo) const
 {
   using quantumdata::partialTrace;
   using boost::copy;
@@ -106,7 +240,7 @@ const BinarySystem::Probabilities BinarySystem::probabilities(double t, const La
 
 
 
-void BinarySystem::actWithJ(double t, StateVectorLow& psi, size_t i) const
+void binary::Liouvillean::actWithJ(double t, StateVectorLow& psi, size_t i) const
 {
   using namespace blitzplusplus::basi;
 
@@ -136,87 +270,25 @@ void BinarySystem::actWithJ(double t, StateVectorLow& psi, size_t i) const
 
 
 
-void BinarySystem::displayKey(std::ostream& os, size_t& i) const
+DISPLAY_KEY(Liouvillean,getLi)
+
+
+
+//////////////////
+//              //
+// Constructors //
+//              //
+//////////////////
+
+#define CREATE_MASK(fun) binary::Mask(fun(ia.getFrees()(0)),fun(ia.getFrees()(1)),fun<2>(&ia))
+
+BinarySystem::BinarySystem(const Interaction& ia) 
+: binary::Base(ia,CREATE_MASK(qsa)),
+  binary::Liouvillean(getFree0(),getFree1(),getIA(),CREATE_MASK(qsl)),
+  free0_(ia.getFrees()(0)), free1_(ia.getFrees()(1)), ia_(&ia)
 {
-  os<<"# Binary system\n";
-  Av1::displayKey(os,i,free0_.getAv());
-  Av1::displayKey(os,i,free1_.getAv());
-  Av2::displayKey(os,i,   ia_.getAv());
-}
+} 
 
 
-
-size_t BinarySystem::nAvr() const
-{
-  return Av1::nAvr(free0_.getAv()) + Av1::nAvr(free1_.getAv()) + Av2::nAvr(ia_.getAv());
-}
-
-
-
-const BinarySystem::Averages BinarySystem::average(double t, const LazyDensityOperator& ldo) const
-{
-  using quantumdata::partialTrace;
-  using boost::copy;
-
-  const Averages 
-    a0 (partialTrace(ldo,bind(&Av1::average,t,_1,free0_.getAv(),theStaticOne),v0,defaultArray)),
-    a1 (partialTrace(ldo,bind(&Av1::average,t,_1,free1_.getAv(),theStaticOne),v1,defaultArray)),
-    a01(Av2::average(t,ldo,ia_.getAv()));
-
-  Averages a(nAvr());
-
-  copy(a01,copy(a1,copy(a0,a.begin())));
-
-  return a;  
-}
-
-
-
-void BinarySystem::process(Averages& averages) const
-{
-  using blitz::Range;
-
-  const Av1 
-    * av0 =free0_.getAv(),
-    * av1 =free1_.getAv();
-  const Av2 
-    * av01=   ia_.getAv();
-
-  ptrdiff_t l=-1, u;
-
-  if ((u=l+Av1::nAvr(av0 ))>l) {
-    Averages temp(averages(Range(l+1,u)));
-    Av1::process(temp,av0 );
-  }
-  if ((l=u+Av1::nAvr(av1 ))>u) {
-    Averages temp(averages(Range(u+1,l)));
-    Av1::process(temp,av1 );
-  }
-  if ((u=l+Av2::nAvr(av01))>l) {
-    Averages temp(averages(Range(l+1,u)));
-    Av2::process(temp,av01);
-  }
-
-}
-
-
-
-void BinarySystem::display(const Averages& averages, std::ostream& os, int precision) const
-{
-  using blitz::Range;
-
-  const Av1 
-    * av0 =free0_.getAv(),
-    * av1 =free1_.getAv();
-  const Av2 
-    * av01=   ia_.getAv();
-
-  ptrdiff_t l=-1, u;
-
-  if ((u=l+Av1::nAvr(av0 ))>l) av0 ->display(averages(Range(l+1,u)),os,precision);
-
-  if ((l=u+Av1::nAvr(av1 ))>u) av1 ->display(averages(Range(u+1,l)),os,precision);
-
-  if ((u=l+Av2::nAvr(av01))>l) av01->display(averages(Range(l+1,u)),os,precision);
-
-}
+#undef CREATE_MASK
+#undef DISPLAY_KEY
