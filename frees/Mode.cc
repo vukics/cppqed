@@ -135,12 +135,12 @@ double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
 }
 
 
-Liouvillean<true >::Liouvillean(double kappa, double nTh) 
+Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
   : Base(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
 			bind(aDagJump,_1,kappa* nTh  )),
 	 JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(nTh+1)),
 				   bind(aDagJumpProba,_1,kappa* nTh  )),
-	 keyTitle,list_of("photon loss")("photon absorption")),
+	 kT,list_of("excitation loss")("excitation absorption")),
     kappa_(kappa), nTh_(nTh)
 {
 }
@@ -408,7 +408,7 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
   : ModeBase(p.cutoff),
     structure::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
 							       mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.cutoff))),
-    structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"photon loss"),
+    structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"excitation loss"),
     structure::ElementAveraged<1,true>(mode::keyTitle,list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
     z_(p.kappa,-p.delta)
 {
