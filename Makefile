@@ -1,6 +1,6 @@
 SHELL = /bin/sh
 
-SRCDIRS := quantumdata quantumoperator structure quantumtrajectory elements/frees elements/interactions elements/composites utils/src
+SRCDIRS := quantumdata quantumoperator structure quantumtrajectory elements/frees elements/interactions elements/composites elements/utils utils/src
 
 EXECS := $(patsubst scripts/%.cc,%,$(wildcard scripts/*.cc))
 
