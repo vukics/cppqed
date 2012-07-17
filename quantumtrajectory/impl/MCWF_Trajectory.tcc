@@ -94,8 +94,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     svdPrecision_(p.svdPrecision ? p.svdPrecision : getPrecision()),
     svdCount_(0),
 #ifdef USE_BOOST_SERIALIZATION
-    svExtension_(binarySVFile_?".svbin":".sv"),
     binarySVFile_(p.binarySVFile),
+    svExtension_(binarySVFile_?".svbin":".sv"),
 #else // USE_BOOST_SERIALIZATION
     svExtension_(".sv"),
 #endif // USE_BOOST_SERIALIZATION
