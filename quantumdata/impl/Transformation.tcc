@@ -198,13 +198,6 @@ private:
 
 #undef TYPEDEF_TRAFO
 
-    template<typename TUPLE>
-    const StateVectorLow& operator()(TUPLE tuple, const StateVectorLow& in)
-    {
-      return operator()(in,tuple);
-    }
-
-
   private:
     StateVectorLow& out_, buf_;
 

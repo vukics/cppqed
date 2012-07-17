@@ -162,23 +162,12 @@ private:
   {
     typedef CI result_type;
 
-    // A strange thing: both versions below are needed to work with any
-    // version of Boost since the definition of how boost::fusion::fold
-    // expects the functor changed on Oct 12, 2009
-    // cf. http://www.boost.org/doc/libs/1_43_0/libs/fusion/doc/html/fusion/change_log.html
-
-    template<typename T>
-    const CI operator()(CI iter, T& t) const
-    {
-      return operator()(t,iter);
-    }
-
-    const CI operator()(blitz::Range& t, CI iter) const
+    const CI operator()(CI iter, blitz::Range& t) const
     {
       t=blitz::Range::all(); return iter;
     }
 
-    const CI operator()(         int& t, CI iter) const
+    const CI operator()(CI iter,          int& t) const
     {
       t=*iter++; return iter;
     }
