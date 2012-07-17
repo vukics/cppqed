@@ -286,12 +286,6 @@ public:
   template<typename Act>
   bool operator()(bool s, const Act& act)
   {
-    return operator()(act,s);
-  }
-
-  template<typename Act>
-  bool operator()(const Act& act, bool s)
-  {
     return s && structure::ExactCommon::isUnitary(act.getEx());
   }
 
@@ -435,12 +429,6 @@ public:
   
   template<typename Act>
   size_t operator()(size_t s, const Act& act)
-  {
-    return operator()(act,s);
-  }
-
-  template<typename Act>
-  size_t operator()(const Act& act, size_t s)
   {
     return s+structure::LiouvilleanCommon::nJumps(act.getLi());
   }
@@ -638,12 +626,6 @@ public:
   
   template<typename Act>
   size_t operator()(size_t s, const Act& act)
-  {
-    return operator()(act,s);
-  }
-
-  template<typename Act>
-  size_t operator()(const Act& act, size_t s)
   {
     return s+structure::AveragedCommon::nAvr(act.getAv());
   }
