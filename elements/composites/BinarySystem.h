@@ -100,24 +100,40 @@ CLASS_HEADER(Liouvillean)
 #undef CLASS_HEADER
 
 
+template<typename>
+class EmptyBase
+{
+public:
+  EmptyBase(const SSF&, const SSF&, const SSI&) {}
+};
+
+
 } // binary
 
 
+#define BASE_CLASS(Aux,Class) mpl::if_c<IS_##Aux,binary::Class,binary::EmptyBase<binary::Class> >::type
+
 
 template<bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
-class BinarySystem 
+class BinarySystem
   : public binary::Base,
-    public binary::Exact, 
-    public binary::Hamiltonian,
-    public binary::Liouvillean
+    public BASE_CLASS(EX,Exact), 
+    public BASE_CLASS(HA,Hamiltonian),
+    public BASE_CLASS(LI,Liouvillean)
 {
 public:
+  typedef typename BASE_CLASS(EX,Exact)             ExactBase;
+  typedef typename BASE_CLASS(HA,Hamiltonian) HamiltonianBase;
+  typedef typename BASE_CLASS(LI,Liouvillean) LiouvilleanBase;
+  
   typedef structure::Interaction<2> Interaction;
 
   BinarySystem(const Interaction&);
 
 };
 
+
+#undef BASE_CLASS
 
 
 #endif // _BINARY_SYSTEM_H

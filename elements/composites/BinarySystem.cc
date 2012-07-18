@@ -240,10 +240,11 @@ DISPLAY_KEY(Liouvillean,Li)
 //////////////////
 
 
-#define BASE_CTOR(Class) binary::Class(getFree0(),getFree1(),getIA())
+#define BASE_CTOR(Class) Class##Base(getFree0(),getFree1(),getIA())
 
 
-BinarySystem::BinarySystem(const Interaction& ia) 
+template<bool IS_EX, bool IS_HA, bool IS_LI>
+BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(const Interaction& ia) 
 : binary::Base(ia),
   BASE_CTOR(Exact),
   BASE_CTOR(Hamiltonian),
@@ -256,3 +257,5 @@ BinarySystem::BinarySystem(const Interaction& ia)
 #undef CONCATENATE_ARRAYS
 #undef ADD_UP_N
 #undef DISPLAY_KEY
+
+template class BinarySystem<false,true,false>;
