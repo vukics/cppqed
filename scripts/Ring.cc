@@ -22,9 +22,9 @@ int main(int argc, char* argv[])
   pmP.delta-=ppcP.uNot/(isComplex(ppcP.modeCav) ? 1. : 2.);
   pmM.delta-=ppcM.uNot/(isComplex(ppcM.modeCav) ? 1. : 2.);
 
-  particle::SmartPtr part (maker(pp ,QMP_IP));
-  mode    ::SmartPtr plus (maker(pmP,QMP_IP));
-  mode    ::SmartPtr minus(maker(pmM,QMP_IP));
+  particle::SmartPtr part (make(pp ,QMP_IP));
+  mode    ::SmartPtr plus (make(pmP,QMP_IP));
+  mode    ::SmartPtr minus(make(pmM,QMP_IP));
 
   quantumdata::StateVector<3> psi(init(pp)*
 				  init(pmP)*

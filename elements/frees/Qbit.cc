@@ -163,7 +163,7 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
 namespace qbit {
 
 
-SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp)
+SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :

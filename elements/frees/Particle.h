@@ -51,8 +51,8 @@ const StateVector init(const Pars&);
 
 void ffTransform(StateVectorLow&, fft::Direction);
 
-SmartPtr maker(const Pars      &, QM_Picture);
-SmartPtr maker(const ParsPumped&, QM_Picture);
+SmartPtr make(const Pars      &, QM_Picture);
+SmartPtr make(const ParsPumped&, QM_Picture);
 
 
 

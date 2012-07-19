@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
   pe.nTraj=1000/*00*/;
   const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)/*(2000)(5000)(10000)(20000)(50000)(100000)*/;
 
-  SmartPtr modeMaster(maker(pplm,QMP_UIP)), mode(maker(pplm,QMP_IP));
+  SmartPtr modeMaster(make(pplm,QMP_UIP)), mode(make(pplm,QMP_IP));
   StateVector psi(init(pplm));
 
   DensityOperator rho(psi);

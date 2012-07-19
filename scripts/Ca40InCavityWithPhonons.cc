@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
   Mode<> phonon(pphon);
   
-  mode::SmartPtr cavityMode(mode::maker(pplm,QMP_IP));
+  mode::SmartPtr cavityMode(mode::make(pplm,QMP_IP));
 
   // The interaction components
 

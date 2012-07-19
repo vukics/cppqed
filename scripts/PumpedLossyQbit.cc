@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
   if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
-  SmartPtr qbit(maker(pplqb,qmp));
+  SmartPtr qbit(make(pplqb,qmp));
 
   StateVector psi(init(pplqb));
   /*

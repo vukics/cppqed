@@ -37,8 +37,8 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  qbit::SmartPtr qbit(qbit::maker(pplqb,qmp));
-  mode::SmartPtr mode(mode::maker(pplm ,qmp));
+  qbit::SmartPtr qbit(qbit::make(pplqb,qmp));
+  mode::SmartPtr mode(mode::make(pplm ,qmp));
 
   JaynesCummings<true> jc(*qbit,*mode,pjc);
 

@@ -462,7 +462,7 @@ const StateVector init(const Pars& p)
 
 
 
-SmartPtr maker(const Pars& p, QM_Picture qmp)
+SmartPtr make(const Pars& p, QM_Picture qmp)
 {
   return SmartPtr(qmp==QMP_SCH 
 		  ? 
@@ -472,7 +472,7 @@ SmartPtr maker(const Pars& p, QM_Picture qmp)
 		  );
 }
 
-SmartPtr maker(const ParsPumped& p, QM_Picture qmp)
+SmartPtr make(const ParsPumped& p, QM_Picture qmp)
 {
   if (p.vClass)
     return SmartPtr(qmp==QMP_SCH 
@@ -481,7 +481,7 @@ SmartPtr maker(const ParsPumped& p, QM_Picture qmp)
 		    :
 		    static_cast<ParticleBase*>(new PumpedParticle   (p))
 		    );
-  else return maker(static_cast<const Pars&>(p),qmp);
+  else return make(static_cast<const Pars&>(p),qmp);
 
 }
 
