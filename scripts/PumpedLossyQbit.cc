@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   StateVector psi(state0()()+state1()());
   psi.renorm();
   */
-  evolve(psi,*qbit,pe);
+  evolve(psi,qbit,pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

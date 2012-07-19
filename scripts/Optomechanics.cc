@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   StateVector psi(mode::init(pA)*mode::init(pB));
   psi.renorm();
 
-  evolve(psi,BinarySystem(nx),pe,tmptools::Vector<0>());
+  evolve(psi,binary::make(nx),pe,tmptools::Vector<0>());
 
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}

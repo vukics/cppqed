@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
   JaynesCummings<> jc(qbit,mode,pjc);
 
-  BinarySystem system(jc);
+  BinarySystem<> system(jc);
 
   double dtinit=.1/static_cast<structure::QuantumSystem<2>*>(&system)->highestFrequency();
 

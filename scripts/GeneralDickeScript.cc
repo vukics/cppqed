@@ -44,15 +44,13 @@ int main(int argc, char* argv[])
 
   GeneralDicke<> gd(mode,spin,u,y);
 
-  BinarySystem sys(gd);
-
   StateVector1 psiMode(mode::init(pplm)), psiSpin(spin.getDimension());
 
   psiSpin()(0)=1; psiSpin.renorm();
 
   StateVector2 psi(psiMode*psiSpin);
 
-  evolve(psi,sys,pe,tmptools::Vector<0>());
+  evolve(psi,binary::make(gd),pe,tmptools::Vector<0>());
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

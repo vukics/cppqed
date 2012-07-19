@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   MLJC<NL,Couplings> mljc(plml,mode,pmljc);
 
   evolve(psi,
-	 BinarySystem(mljc),
+	 binary::make(mljc),
 	 pe,
 	 tmptools::Vector<0>());
 

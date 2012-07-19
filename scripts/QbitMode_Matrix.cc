@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 
   JaynesCummings<> jc(qbit,mode,pjc);
 
-  BinarySystem system2(jc);
+  BinarySystem<> system2(jc);
 
   StateVector2 psi2(qbit::init(pplqb)*mode::init(pplm)); psi2.renorm();
   StateVector1 psi1(StateVectorLow1(psi2().data(),shape(system2.getTotalDimension()),neverDeleteData),quantumdata::byReference);

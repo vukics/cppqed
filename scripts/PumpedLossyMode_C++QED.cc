@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
   StateVector psi(mode::init(pplm));
 
-  evolve(psi,*mode,pe);
+  evolve(psi,mode,pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

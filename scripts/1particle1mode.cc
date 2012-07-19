@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
   psi.renorm();
 
 
-  evolve(psi,BinarySystem(*particlecavityBase),pe,tmptools::Vector<0>());
+  evolve(psi,binary::make(*particlecavityBase),pe,tmptools::Vector<0>());
 
 
   /*
