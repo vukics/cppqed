@@ -182,7 +182,7 @@ struct Vector
 #undef  VECTOR_MAX_SIZE
 
 
-typedef Vector<> V0;
+typedef Vector<> V_Empty;
 
 
 } // tmptools

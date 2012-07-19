@@ -18,7 +18,7 @@ class Base;
 } // master
 
 
-template<int RANK, typename V=tmptools::V0, bool IS_FAST=false>
+template<int RANK, typename V=tmptools::V_Empty, bool IS_FAST=false>
 class Master;
 
 } // quantumtrajectory
