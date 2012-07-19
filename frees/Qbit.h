@@ -70,7 +70,7 @@ const StateVector init(const dcomp& psi1);
 inline const StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
-SmartPtr maker(const ParsPumpedLossy&, QM_Picture);
+SmartPtr make(const ParsPumpedLossy&, QM_Picture);
 
 
 

@@ -40,16 +40,16 @@ const StateVector init(const Pars&);
 
 
 template<typename A>
-const SmartPtr maker(const Pars           &, QM_Picture, const A&);
+const SmartPtr make(const Pars           &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr maker(const ParsLossy      &, QM_Picture, const A&);
+const SmartPtr make(const ParsLossy      &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr maker(const ParsPumped     &, QM_Picture, const A&);
+const SmartPtr make(const ParsPumped     &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr maker(const ParsPumpedLossy&, QM_Picture, const A&);
+const SmartPtr make(const ParsPumpedLossy&, QM_Picture, const A&);
 
 
 double photonNumber(const StateVectorLow&); 
@@ -185,10 +185,10 @@ private:
 };
 
 
-inline const SmartPtr maker(const Pars           & p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
-inline const SmartPtr maker(const ParsLossy      & p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
-inline const SmartPtr maker(const ParsPumped     & p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
-inline const SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
+inline const SmartPtr make(const Pars           & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const SmartPtr make(const ParsLossy      & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const SmartPtr make(const ParsPumped     & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp) {return make(p,qmp,Averaged());}
 
 
 
