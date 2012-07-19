@@ -225,8 +225,7 @@ private:
 
   // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters?
 
-  // This would be needed to fuse fillJS and fillJPS into a template
-  // together with the helper classes below
+  // This would be needed to fuse fillJS and fillJPS into a template together with the helper classes below
   
   class  JS_helper;
   class JPS_helper;
@@ -262,7 +261,7 @@ class MultiLevelBase
   : public structure::Free
 {
 public:
-  typedef boost::shared_ptr<MultiLevelBase> SmartPtr;
+  typedef boost::shared_ptr<const MultiLevelBase> SmartPtr;
 
   using structure::Free::getParsStream;
 
