@@ -8,6 +8,7 @@
 #include "BlitzArraySliceIterator.h"
 #include "Range.h"
 
+#include "BlitzTiny.h"
 
 
 #define DISPLAY_KEY(Class,Aux) void binary::Class::displayKey(std::ostream& os, size_t& i) const \
@@ -258,4 +259,39 @@ BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(const Interaction& ia)
 #undef ADD_UP_N
 #undef DISPLAY_KEY
 
-template class BinarySystem<false,true,false>;
+
+namespace {
+
+typedef blitz::TinyVector<bool,3> SystemCharacteristics;
+
+const SystemCharacteristics querySystemCharacteristics(const binary::Interaction& ia)
+{
+  using namespace structure;
+  const Free 
+    *const free0=ia.getFrees()(0),
+    *const free1=ia.getFrees()(1);
+  return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(&ia),
+			       qsh(free0) || qsh(free1) || qsh<2>(&ia),
+			       qsl(free0) || qsl(free1) || qsl<2>(&ia));
+}
+
+} 
+
+
+#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return binary::SmartPtr(new BinarySystem<EX,HA,LI>(ia))
+
+
+const binary::SmartPtr binary::make(const Interaction& ia)
+{
+  if      DISPATCHER(true ,true ,true ) ;
+  else if DISPATCHER(true ,true ,false) ;
+  else if DISPATCHER(true ,false,true ) ;
+  else if DISPATCHER(true ,false,false) ;
+  else if DISPATCHER(false,true ,true ) ;
+  else if DISPATCHER(false,true ,false) ;
+  else if DISPATCHER(false,false,true ) ;
+  else return binary::SmartPtr(new BinarySystem<false,false,false>(ia));
+}
+
+
+#undef DISPATCHER
