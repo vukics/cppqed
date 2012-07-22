@@ -2,15 +2,23 @@
 #ifndef _BINARY_SYSTEM_H
 #define _BINARY_SYSTEM_H
 
-#include "QuantumSystem.h"
+#include "BinarySystemFwd.h"
 
+#include "QuantumSystem.h"
 #include "SubSystem.h"
 
 
 
 namespace binary {
 
+
+typedef boost::shared_ptr<const Base> SmartPtr;
+
 typedef structure::Interaction<2> Interaction;
+
+
+const SmartPtr make(const Interaction&);
+
 
 typedef structure::SubSystemFree            SSF;
 typedef structure::SubSystemsInteraction<2> SSI;
@@ -114,7 +122,7 @@ public:
 #define BASE_CLASS(Aux,Class) mpl::if_c<IS_##Aux,binary::Class,binary::EmptyBase<binary::Class> >::type
 
 
-template<bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
+template<bool IS_EX, bool IS_HA, bool IS_LI>
 class BinarySystem
   : public binary::Base,
     public BASE_CLASS(EX,Exact), 
