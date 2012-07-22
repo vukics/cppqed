@@ -239,7 +239,8 @@ class ModeBase
 {
 public:
   ModeBase(size_t dim,
-	   const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs());
+	   const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs(),
+	   const std::string& keyTitle=mode::keyTitle);
 
   virtual ~ModeBase() {}
 

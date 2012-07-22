@@ -13,6 +13,8 @@
 
 namespace qbit {
 
+const std::string keyTitle="Qbit";
+
 
 class Averaged
   : public structure::ElementAveraged<1>
@@ -101,7 +103,7 @@ public:
 class Liouvillean : public mode::Liouvillean<false>
 {
 protected:
-  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma,0,"Qbit") {}
+  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma,0,keyTitle) {}
 
 };
  

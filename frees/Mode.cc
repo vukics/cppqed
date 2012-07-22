@@ -394,10 +394,10 @@ const StateVector init(const Pars& p)
 
 
 
-ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
+ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs, const string& keyTitle)
     : Free(dim,realFreqs,complexFreqs)
 {
-  getParsStream()<<"# Mode\n";
+  getParsStream()<<"# "<<keyTitle<<endl;
 }
 
 
