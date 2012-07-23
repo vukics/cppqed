@@ -226,23 +226,54 @@ private:
 
 template<int NL, typename VL>
 const typename Liouvillean<NL,VL>::JumpStrategies
-Liouvillean<NL,VL>::fillJS(const Liouvillean* liouvillean)
+Liouvillean<NL,VL>::fillJS() const
 {
   typename Liouvillean::JumpStrategies res;
-  mpl::for_each<tmptools::Ordinals<NLT> >(JS_helper(res,liouvillean));
+  mpl::for_each<tmptools::Ordinals<NLT> >(JS_helper(res,this));
   return res;
 }
 
 
 template<int NL, typename VL>
 const typename Liouvillean<NL,VL>::JumpProbabilityStrategies
-Liouvillean<NL,VL>::fillJPS(const Liouvillean* liouvillean)
+Liouvillean<NL,VL>::fillJPS() const
 {
   typename Liouvillean::JumpProbabilityStrategies res;
-  mpl::for_each<tmptools::Ordinals<NLT> >(JPS_helper(res,liouvillean));
+  mpl::for_each<tmptools::Ordinals<NLT> >(JPS_helper(res,this));
   return res;
 }
 
+
+
+template<int NL, typename VL>
+class Liouvillean<NL,VL>::KeyHelper
+{
+public:
+  KeyHelper(KeyLabels& keyLabels) : keyLabels_(keyLabels) {}
+
+  template<typename T>
+  void operator()(T)
+  {
+    using namespace std;
+    stringstream slate(stringstream::out);
+    slate<<"Jump "<<T::second<<" -> "<<T::first;
+    keyLabels_.push_back(slate.str());
+  }
+
+private:
+  KeyLabels& keyLabels_;
+
+};
+
+
+template<int NL, typename VL>
+const typename Liouvillean<NL,VL>::KeyLabels
+Liouvillean<NL,VL>::fillKeyLabels()
+{
+  typename Liouvillean::KeyLabels res;
+  mpl::for_each<VL>(KeyHelper(res));
+  return res;
+}
 
 ///////////
 //
