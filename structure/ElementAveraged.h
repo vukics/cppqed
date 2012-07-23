@@ -34,7 +34,8 @@ public:
 
   ElementAveraged(const std::string& keyTitle, const KeyLabels& keyLabels) : keyPrinter_(keyTitle,keyLabels) {}
 
-  const KeyLabels& getLabels() const {return keyPrinter_.getLabels();}
+  const std::string& getTitle () const {return keyPrinter_.getTitle ();}
+  const KeyLabels  & getLabels() const {return keyPrinter_.getLabels();}
 
   size_t nAvr()                                                      const {return keyPrinter_.length()         ;}
 

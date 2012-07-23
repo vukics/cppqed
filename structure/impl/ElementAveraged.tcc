@@ -7,7 +7,7 @@
 
 #include <boost/iterator/transform_iterator.hpp>
 
-#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(getLabels,_1))
+#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
 
 template<int RANK>
 structure::averaged::Collecting<RANK>::Collecting(const Collection& collection)
