@@ -1,6 +1,7 @@
 #include "Qbit.h"
 
 #include "ParsQbit.h"
+#include "impl/StateVector.tcc"
 
 #include<boost/assign/list_of.hpp>
 

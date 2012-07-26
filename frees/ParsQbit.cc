@@ -1,6 +1,6 @@
 #include "ParsQbit.h"
 
-#include "Pars.h"
+#include "impl/Pars.tcc"
 
 
 namespace qbit {

@@ -2,6 +2,8 @@
 #ifndef   MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
 #define   MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
 
+#include "MLJC.h"
+
 #include "Sigma.h"
 
 using quantumoperator::Sigma;

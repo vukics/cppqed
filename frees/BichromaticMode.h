@@ -5,7 +5,9 @@
 #include "BichromaticModeFwd.h"
 
 #include "Mode.h"
+#include "impl/TridiagonalHamiltonian.tcc"
 
+#include <boost/assign.hpp>
 
 namespace mode {
 

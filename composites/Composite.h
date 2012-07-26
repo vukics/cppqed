@@ -186,6 +186,4 @@ struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PA
 #undef DEFAULT_print
 
 
-#include "impl/Composite.tcc"
-
 #endif // _COMPOSITE_SYSTEM_INCLUDED

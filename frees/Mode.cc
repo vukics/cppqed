@@ -2,9 +2,12 @@
 
 #include "ParsMode.h"
 
-#include "StateVector.h"
+#include "impl/StateVector.tcc"
 
-#include<boost/bind.hpp>
+#include "impl/TridiagonalHamiltonian.tcc"
+
+#include <boost/assign.hpp>
+#include <boost/bind.hpp>
 
 
 using namespace std;

@@ -1,6 +1,8 @@
 #include "JaynesCummings.h"
 
-#include "Pars.h"
+#include "impl/Pars.tcc"
+
+#include "impl/Tridiagonal.tcc"
 
 #include<boost/assign/list_of.hpp>
 
