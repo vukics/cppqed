@@ -1,7 +1,7 @@
 #include "EvolutionHigh.h"
+#include "ModeHigh.h"
+#include "MCWFHigh.h"
 
-#include "Mode.h"
-#include "ParsMode.h"
 #include "ParsParticle.h"
 #include "Particle.h"
 #include "ParticleInitialCondition.h"

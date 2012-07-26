@@ -1,8 +1,8 @@
 #include "ParsEvolution.h"
 #include "SimulatedHigh.h"
 
-#include "StateVector.h"
-#include "DensityOperator.h"
+#include "impl/StateVector.tcc"
+#include "impl/DensityOperator.tcc"
 #include "ParsQbit.h"
 #include "PumpedTwoLevelAtom.h"
 #include "Qbit.h"

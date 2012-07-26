@@ -338,6 +338,4 @@ makePumpedLossyMultiLevelSch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, con
 
 #undef  RETURN_type
 
-#include "impl/MultiLevel.tcc"
-
 #endif // MULTI_LEVEL_SYSTEM_INCLUDED

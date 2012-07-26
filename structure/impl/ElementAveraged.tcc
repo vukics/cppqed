@@ -2,6 +2,7 @@
 #ifndef STRUCTURE_ELEMENT_AVERAGED_IMPL_INCLUDED
 #define STRUCTURE_ELEMENT_AVERAGED_IMPL_INCLUDED
 
+#include "ElementAveraged.h"
 
 #include "Algorithm.h"
 

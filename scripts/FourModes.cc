@@ -1,6 +1,6 @@
 #include "EvolutionHigh.h"
-
-#include "Mode.h"
+#include "MCWFHigh.h"
+#include "ModeHigh.h"
 
 #include "Composite.h"
 

@@ -1,4 +1,7 @@
 #include "EvolutionHigh.h"
+#include "ModeHigh.h"
+#include "MCWFHigh.h"
+
 #include "Composite.h"
 #include "ParticleCavity.h"
 #include "IdenticalParticles.h"

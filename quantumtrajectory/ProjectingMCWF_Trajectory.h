@@ -50,7 +50,5 @@ private:
 } // quantumtrajectory
 
 
-#include "impl/ProjectingMCWF_Trajectory.tcc"
-
 
 #endif // PROJECTING_MCWF_TRAJECTORY_INCLUDED

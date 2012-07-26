@@ -2,12 +2,17 @@
 #ifndef   LAZY_DENSITY_OPERATOR_SMART_ITERATOR_IMPL_INCLUDED
 #define   LAZY_DENSITY_OPERATOR_SMART_ITERATOR_IMPL_INCLUDED
 
-#include "DensityOperator.h"
+#include "LazyDensityOperatorSliceIterator.h"
+
+#include "impl/DensityOperator.tcc"
+#include "LazyDensityOperator.h"
 #include "StateVector.h"
 
-#include "Algorithm.h"
+#include "impl/Algorithm.tcc"
 #include "BlitzArraySliceIterator.h"
+#include "impl/BlitzTinyExtensions.tcc"
 #include "Functional.h"
+#include "impl/MultiIndexIterator.tcc"
 
 
 namespace quantumdata {
@@ -94,7 +99,7 @@ public:
   typedef blitzplusplus::basi::Iterator<RANK,V,true> BASI;
   typedef typename BASI::Impl MII;
 
-  typedef TTD_LAZY_DENSITY_OPERATOR_RES LazyDensityOperatorRes;
+  typedef typename DiagonalIterator<RANK,V>::LazyDensityOperatorRes LazyDensityOperatorRes;
 
   bool isEqualTo(const DI_Impl& other) const {return getMII()==other.getMII();}
 

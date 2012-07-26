@@ -139,7 +139,5 @@ public:
 
 } // evolved
 
-#include "impl/Evolved.tcc"
-
 
 #endif // _EVOLVED_H

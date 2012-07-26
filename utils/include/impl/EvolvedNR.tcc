@@ -2,6 +2,7 @@
 #ifndef   EVOLVED_NR_IMPL_INCLUDED
 #define   EVOLVED_NR_IMPL_INCLUDED
 
+#include "EvolvedNR.h"
 
 namespace evolved {
 

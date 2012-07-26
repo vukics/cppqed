@@ -50,8 +50,4 @@ partialProject(const typename quantumdata::Types<RANK>::StateVectorLow& psi, int
 
 } // quantumoperator
 
-
-#include "impl/Sigma.tcc"
-
-
 #endif // SIGMA_TYPE_OPERATOR_INCLUDED

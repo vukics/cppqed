@@ -2,6 +2,8 @@
 #ifndef   _MULTI_INDEX_ITERATOR_IMPL_H
 #define   _MULTI_INDEX_ITERATOR_IMPL_H
 
+#include "MultiIndexIterator.h"
+
 namespace cpputils {
 
 namespace details {

@@ -1,5 +1,7 @@
 #include "NX_CoupledModes.h"
 
+#include "impl/Tridiagonal.tcc"
+
 #include<boost/assign/list_of.hpp>
 
 using namespace boost::assign;

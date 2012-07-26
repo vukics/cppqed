@@ -62,7 +62,5 @@ private:
 
 } // evolved
 
-#include "impl/EvolvedNR.tcc"
-
 
 #endif // _EVOLVED_NR_H

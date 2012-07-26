@@ -1,6 +1,9 @@
+
 #include "ModeCorrelations.h"
 
-#include "LazyDensityOperatorSliceIterator.h"
+#include "impl/LazyDensityOperatorSliceIterator.tcc"
+
+#include <boost/assign/list_of.hpp>
 
 using namespace boost;
 using namespace assign;
@@ -28,6 +31,7 @@ namespace {
 const ModeCorrelations::Averages
 ModeCorrelations::average(const LazyDensityOperator& matrix) const
 {
+  using quantumdata::partialTrace;
   typedef LazyDensityOperator::Idx Idx;
 
   Averages averages(18);

@@ -2,12 +2,15 @@
 #ifndef   _MCWF_TRAJECTORY_IMPL_H
 #define   _MCWF_TRAJECTORY_IMPL_H
 
+#include "MCWF_Trajectory.h"
+
 #include "ParsMCWF_Trajectory.h"
 
 #include "StateVector.h"
+#include "impl/StochasticTrajectory.tcc"
 #include "Structure.h"
 
-#include "FormDouble.h"
+#include "impl/FormDouble.tcc"
 
 #ifdef USE_BOOST_SERIALIZATION
 #include <boost/archive/binary_oarchive.hpp>

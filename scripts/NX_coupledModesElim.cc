@@ -1,4 +1,5 @@
 #include "EvolutionHigh.h"
+#include "MCWFHigh.h"
 
 #include "ParsParticle.h"
 #include "ParsMode.h"

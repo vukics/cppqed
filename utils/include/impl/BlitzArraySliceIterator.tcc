@@ -2,6 +2,10 @@
 #ifndef   _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
 #define   _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
 
+#ifdef IN_IDE_PARSER
+#include "BlitzArraySliceIterator.h"
+#endif //IN_IDE_PARSER
+
 #include "Range.h"
 
 #include <boost/bind.hpp>

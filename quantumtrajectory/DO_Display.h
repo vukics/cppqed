@@ -67,6 +67,4 @@ private:
 
 } // quantumtrajectory
 
-#include "impl/DO_Display.tcc"
-
 #endif // _DO_DISPLAY_H

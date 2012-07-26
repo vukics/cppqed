@@ -47,6 +47,5 @@ public:
 
 } // trajectory
 
-#include "impl/Simulated.tcc"
 
 #endif // _SIMULATED_H

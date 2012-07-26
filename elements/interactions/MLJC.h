@@ -93,6 +93,4 @@ public:
 };
 
 
-#include "impl/MLJC.tcc"
-
 #endif // MULTI_LEVEL_JAYNES_CUMMINGS_INCLUDED

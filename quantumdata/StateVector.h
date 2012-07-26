@@ -114,6 +114,4 @@ operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
 
 } // quantumdata
 
-#include "impl/StateVector.tcc"
-
 #endif // _STATE_VECTOR_H

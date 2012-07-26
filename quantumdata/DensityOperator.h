@@ -104,7 +104,4 @@ private:
 } // quantumdata
 
 
-#include "impl/DensityOperator.tcc"
-
-
 #endif // _DENSITY_OPERATOR_H

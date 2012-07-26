@@ -58,7 +58,4 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
 // C++11: use default template argument tmptools::V_Empty to fuse the last two functions
 
-
-#include "impl/Evolution.tcc"
-
 #endif // _EVOLUTION_MODE_H

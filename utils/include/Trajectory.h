@@ -133,10 +133,24 @@ private:
 
 };
 
+namespace details {
+
+template<typename T, typename L, typename D>
+void run(T& traj, L l, D d, void (*doRun)(T&,L,D), bool timestep, bool displayInfo);
+
+void doRun(TrajectoryBase&, long   nDt , double deltaT);
+// Evolves the system on a Trajectory for nDt display intervals deltaT
+
+void doRun(TrajectoryBase&, double time, double deltaT);
+// Evolves the system on a Trajectory up to time T and Displays in every deltaT
+
+template<typename A> 
+void doRun(Trajectory<A>& traj, double time, int dc);
+
+} // details
 
 
 } // trajectory
 
-#include "impl/Trajectory.tcc"
 
 #endif // _TRAJECTORY_H

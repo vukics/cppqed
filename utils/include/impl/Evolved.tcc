@@ -2,6 +2,8 @@
 #ifndef   _EVOLVED_IMPL_H
 #define   _EVOLVED_IMPL_H
 
+#include "Evolved.h"
+
 #include "MathExtensions.h"
 
 

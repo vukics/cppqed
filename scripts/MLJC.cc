@@ -1,7 +1,10 @@
 #include "EvolutionHigh.h"
+#include "ModeHigh.h"
+#include "MCWFHigh.h"
+#include "MultiLevelHigh.h"
 
 #include "MultiLevel.h"
-#include "ParsMode.h"
+
 #include "ParsMultiLevel.h"
 
 #include "MLJC.h"

@@ -2,7 +2,9 @@
 #ifndef   _DENSITY_OPERATOR_IMPL_H
 #define   _DENSITY_OPERATOR_IMPL_H
 
+#include "DensityOperator.h"
 
+#include "impl/BlitzTinyExtensions.tcc"
 
 namespace quantumdata {
 

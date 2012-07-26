@@ -1,4 +1,6 @@
 #include "EvolutionHigh.h"
+#include "ModeHigh.h"
+#include "MCWFHigh.h"
 
 #include "ModeCorrelations.h"
 #include "NX_CoupledModes.h"

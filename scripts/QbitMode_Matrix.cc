@@ -1,4 +1,6 @@
 #include "EvolutionHigh.h"
+#include "ModeHigh.h"
+#include "MCWFHigh.h"
 
 #include "TimeIndependentMatrixHamiltonian.h"
 #include "JaynesCummings.h"

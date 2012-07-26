@@ -2,8 +2,10 @@
 #ifndef   _DO_DISPLAY_IMPL_H
 #define   _DO_DISPLAY_IMPL_H
 
+#include "DO_Display.h"
+
 #include "DimensionsBookkeeper.h"
-#include "NegPT.h"
+#include "impl/NegPT.tcc"
 #include "Structure.h"
 
 #include "FormDouble.h"

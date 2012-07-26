@@ -2,10 +2,14 @@
 #ifndef   _EVOLUTION_MODE_IMPL_H
 #define   _EVOLUTION_MODE_IMPL_H
 
+#include "Evolution.h"
+
 #include "ParsEvolution.h"
 
+#include "impl/DO_Display.tcc"
 #include "EnsembleMCWF.h"
 #include "Master.h"
+#include "impl/Trajectory.tcc"
 
 #include<iostream>
 #include<string>

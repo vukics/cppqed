@@ -2,6 +2,10 @@
 #ifndef   _STATE_VECTOR_IMPL_H
 #define   _STATE_VECTOR_IMPL_H
 
+#include "StateVector.h"
+
+#include "impl/BlitzTinyExtensions.tcc"
+#include "impl/ComplexArrayExtensions.tcc"
 
 namespace quantumdata {
 

@@ -2,8 +2,11 @@
 #ifndef _TRIDIAGONAL_IMPL_H
 #define _TRIDIAGONAL_IMPL_H
 
-#include "ComplexArrayExtensions.h"
+#include "Tridiagonal.h"
 
+#include "impl/ComplexArrayExtensions.tcc"
+
+#include <boost/lambda/lambda.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 

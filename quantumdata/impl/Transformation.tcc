@@ -2,6 +2,8 @@
 #ifndef _TRANSFORMATION_IMPL_H
 #define _TRANSFORMATION_IMPL_H
 
+#include "Transformation.h"
+
 #include <boost/fusion/adapted/mpl.hpp>
 #include <boost/fusion/tuple.hpp>
 #include <boost/fusion/view/zip_view.hpp>

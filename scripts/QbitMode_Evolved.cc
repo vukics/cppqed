@@ -1,8 +1,7 @@
 #include "ParsEvolution.h"
 #include "SimulatedHigh.h"
+#include "ModeHigh.h"
 
-#include "Mode.h"
-#include "ParsMode.h"
 #include "ParsQbit.h"
 #include "Qbit.h"
 

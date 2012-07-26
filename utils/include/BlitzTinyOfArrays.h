@@ -82,7 +82,4 @@ negate(const TinyOfArrays<T,RANK,LENGTH>&);
 } // blitzplusplus
 
 
-#include "impl/BlitzTinyOfArrays.tcc"
-
-
 #endif // _BLITZ_TINY_OF_ARRAYS_H

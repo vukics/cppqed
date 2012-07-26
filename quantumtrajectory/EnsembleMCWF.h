@@ -117,7 +117,4 @@ private:
 } // quantumtrajectory
 
 
-#include "impl/EnsembleMCWF.tcc"
-
-
 #endif // _ENSEMBLE_OF_MCWF_TRAJECTORIES_H

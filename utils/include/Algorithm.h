@@ -40,6 +40,4 @@ concatenate(const SeqOfSeqs&, Out&);
 } // cpputils
 
 
-#include "impl/Algorithm.tcc"
-
 #endif // _CPPUTILS_ALGORITHM_H

@@ -3,8 +3,8 @@
 #define _SIMULATED_HIGH_H
 
 #include "BlitzArrayTraits.h"
-#include "EvolvedGSL.h"
-#include "Simulated.h"
+#include "impl/EvolvedGSL.tcc"
+#include "impl/Simulated.tcc"
 
 #include "Pars.h"
 

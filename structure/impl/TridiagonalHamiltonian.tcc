@@ -2,9 +2,11 @@
 #ifndef   TRIDIAGONAL_HAMILTONIAN_IMPL_INCLUDED
 #define   TRIDIAGONAL_HAMILTONIAN_IMPL_INCLUDED
 
-#include "Algorithm.h"
+#include "TridiagonalHamiltonian.h"
 
+#include "Algorithm.h"
 #include "Range.h"
+#include "impl/Tridiagonal.tcc"
 
 #include <boost/bind.hpp>
 

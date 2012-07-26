@@ -135,7 +135,4 @@ private:
 } // structure
 
 
-#include "impl/ElementAveraged.tcc"
-
-
 #endif // STRUCTURE_ELEMENT_AVERAGED_H_INCLUDED

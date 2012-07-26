@@ -1,10 +1,13 @@
 #include "Spin.h"
 
+#include "MathExtensions.h"
+
 #include "Mode.h"
 
 #include "LazyDensityOperator.h"
+#include "impl/Tridiagonal.tcc"
 
-#include "Pars.h"
+#include "impl/Pars.tcc"
 
 #include<boost/assign/list_of.hpp>
 #include<boost/assign/std/list.hpp>

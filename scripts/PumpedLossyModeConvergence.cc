@@ -1,6 +1,6 @@
 #include "EvolutionHigh.h"
-
-#include "Mode.h"
+#include "ModeHigh.h"
+#include "MCWFHigh.h"
 
 #include <boost/assign/list_of.hpp>
 

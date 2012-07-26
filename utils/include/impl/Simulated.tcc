@@ -2,8 +2,10 @@
 #ifndef   _SIMULATED_IMPL_H
 #define   _SIMULATED_IMPL_H
 
+#include "Simulated.h"
 
-#include "FormDouble.h"
+#include "impl/FormDouble.tcc"
+#include "impl/Trajectory.tcc"
 
 
 namespace trajectory {

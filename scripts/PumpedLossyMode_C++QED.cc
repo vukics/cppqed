@@ -1,6 +1,9 @@
 #include "EvolutionHigh.h"
+#include "ModeHigh.h"
+#include "MCWFHigh.h"
 
 #include "BichromaticMode.h"
+#include "impl/ElementAveraged.tcc"
 
 
 using namespace std ;

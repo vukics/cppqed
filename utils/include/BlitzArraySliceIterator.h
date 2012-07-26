@@ -399,7 +399,7 @@ fullRange(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 
 } // blitzplusplus
 
-
+#ifndef IN_IDE_PARSER
 #include "impl/BlitzArraySliceIterator.tcc"
 
 #undef TTD_FORWARD_ITERATOR_HELPER
@@ -409,7 +409,7 @@ fullRange(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 #undef TTD_RES_CARRAY
 #undef MPL_SIZE
 #undef TTD_CONDITIONAL_CONST_CARRAY
-
+#endif // IN_IDE_PARSER
 #endif // _BLITZ_ARRAY_SMART_ITERATOR_H
 
 

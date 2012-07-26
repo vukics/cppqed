@@ -2,6 +2,8 @@
 #ifndef   _BLITZ_TINY_EXTENSIONS_IMPL_H
 #define   _BLITZ_TINY_EXTENSIONS_IMPL_H
 
+#include "BlitzTinyExtensions.h"
+
 #include "Conversions.h"
 #include "TMP_Tools.h"
 

@@ -2,6 +2,8 @@
 #ifndef   _MASTER_IMPL_H
 #define   _MASTER_IMPL_H
 
+#include "Master.h"
+
 #include "Structure.h"
 
 #include "MathExtensions.h"

@@ -153,7 +153,4 @@ private:
 } // quantumtrajectory
 
 
-#include "impl/Master.tcc"
-
-
 #endif // _MASTER_H

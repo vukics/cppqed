@@ -2,6 +2,7 @@
 #ifndef   SIGMA_TYPE_OPERATOR_IMPL_INCLUDED
 #define   SIGMA_TYPE_OPERATOR_IMPL_INCLUDED
 
+#include "Sigma.h"
 
 namespace quantumoperator {
 
