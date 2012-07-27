@@ -2,9 +2,9 @@
 #ifndef   _NEGPT_IMPL_H
 #define   _NEGPT_IMPL_H
 
-#ifndef DO_NOT_USE_FLENS
-
 #include "NegPT.h"
+
+#ifndef DO_NOT_USE_FLENS
 
 #include "impl/Blitz2FLENS.tcc"
 
