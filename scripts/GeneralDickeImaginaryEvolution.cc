@@ -11,6 +11,8 @@
 
 #include "MathExtensions.h"
 
+#include "impl/ProjectingMCWF_Trajectory.tcc"
+
 #include<flens/flens.h>
 
 #include<boost/lambda/bind.hpp>
