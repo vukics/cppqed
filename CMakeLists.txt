@@ -6,7 +6,6 @@ project (C++QED)
 
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
 
 find_package(blitz++ REQUIRED)
 find_package(Boost REQUIRED)
