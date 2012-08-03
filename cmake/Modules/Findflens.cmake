@@ -13,7 +13,7 @@ find_path(flens_INCLUDE_DIR
 )
 
 # Finally the library itself
-find_library(blitz++_LIBRARY
+find_library(flens_LIBRARY
   NAMES flens
 )
 

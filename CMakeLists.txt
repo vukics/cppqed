@@ -4,6 +4,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 project (C++QED)
 
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
+
 find_package(blitz++ REQUIRED)
 find_package(Boost REQUIRED)
 find_package(Boost QUIET COMPONENTS serialization)
@@ -31,12 +35,12 @@ else( ENABLE_SERIALIATZION )
   message("Optional support for binary statevector output disabled.")
 endif( ENABLE_SERIALIATZION )
 
-IF( ${flens_FOUND} )
+if( flens_FOUND )
   include_directories(${flens_INCLUDE_DIR})
-ELSE( ${flens_FOUND} )
+else( flens_FOUND )
   message("Flens library not found, optional flens support disabled.")
   add_definitions( -DDO_NOT_USE_FLENS )
-ENDIF( ${flens_FOUND} )
+endif( flens_FOUND )
 
 set(INCLUDEDIRS ${blitz++_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${flens_INCLUDE_DIR})
 
@@ -51,8 +55,10 @@ foreach(d ${CORE_SOURCE_DIRS})
 endforeach(d)
 
 add_library(C++QED SHARED ${CORE_SOURCE_FILES})
-target_link_libraries(C++QED utils ${blitz++_LIBRARY} ${Boost_SERIALIZATION_LIBRARY} )
+target_link_libraries(C++QED utils ${blitz++_LIBRARY} ${flens_LIBRARY} ${Boost_SERIALIZATION_LIBRARY} )
 
-if( ${flens_FOUND} )
-  target_link_libraries(C++QED ${flens_LIBRARY})
-endif( ${flens_FOUND} )
+add_subdirectory(elements)
+add_subdirectory(scripts)
+
+add_custom_target(fewer_scripts)
+add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix)
