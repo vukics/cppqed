@@ -1,21 +1,9 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.6.4)
 include(FeatureSummary)
 
 project (C++QED)
 
-set(C++QED_CMAKE_MODULE_DIR ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-
-# Add packaged CMake scripts for backwards compatibility 
-set(CMAKE_MODULE_PATH_INIT ${C++QED_CMAKE_MODULE_DIR})
-file(GLOB BACKCOMP_VERSIONS RELATIVE ${C++QED_CMAKE_MODULE_DIR} ${C++QED_CMAKE_MODULE_DIR}/2.8.*)
-foreach(BACKCOMP_VERSION ${BACKCOMP_VERSIONS})
-  if (${CMAKE_VERSION} VERSION_LESS ${BACKCOMP_VERSION})
-    set(CMAKE_MODULE_PATH_INIT ${CMAKE_MODULE_PATH_INIT} ${C++QED_CMAKE_MODULE_DIR}/${BACKCOMP_VERSION})
-  endif()
-endforeach()
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH_INIT} CACHE FILEPATH
-  "Search path for CMake scripts and modules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 ##################################################
 # Flags for release and debug mode
@@ -29,12 +17,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
 ##################################################
 
 # This will be disabled if any of the compoments required for serialization is missing
-option(WITH_SERIALIZATION "Boost serialization" ON)
-if(WITH_SERIALIZATION)
-  set(ENABLE_SERIALIATZION 1)
-else(WITH_SERIALIZATION)
-  set(ENABLE_SERIALIATZION 0)
-endif(WITH_SERIALIZATION)
+option(SERIALIZATION "Boost serialization" ON)
+if(SERIALIZATION)
+  set(ENABLE_SERIALIZATION 1)
+else(SERIALIZATION)
+  set(ENABLE_SERIALIZATION 0)
+endif(SERIALIZATION)
+
+option(FLENS "FLENS support" ON)
 
 # blitz++
 
@@ -43,52 +33,49 @@ if( blitz++_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built with serialization support.")
 else( blitz++_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built without serialization support. Please configure blitz++ with --enable-serialization to enable optional binary statevector output.")
-  set(ENABLE_SERIALIATZION 0)
+  set(ENABLE_SERIALIZATION 0)
 endif( blitz++_SERIALIZATION_FOUND )
 
 include_directories( ${blitz++_INCLUDE_DIR} )
 
-set_package_properties(blitz++ PROPERTIES  
-                                  DESCRIPTION "Multi-array library for C++."
-                                  TYPE REQUIRED)
-set_package_properties(blitz++_SERIALIZATION PROPERTIES  
-                                  DESCRIPTION "Boost serialization support for blitz++ arrays."
-                                  TYPE REQUIRED)
 
 # Boost
 
-find_package(Boost REQUIRED)
-set_package_properties(Boost PROPERTIES  
-                                  DESCRIPTION "Boost library."
-                                  TYPE REQUIRED)
-find_package(BoostSerialization)
-if( BoostSerialization_FOUND )
+if(${CMAKE_VERSION} VERSION_LESS "2.8.8")
+  find_package(Boost REQUIRED)
+  find_package(Boost COMPONENTS serialization)
+else(${CMAKE_VERSION} VERSION_LESS "2.8.8")
+  find_package(Boost REQUIRED OPTIONAL_COMPONENTS serialization)
+endif(${CMAKE_VERSION} VERSION_LESS "2.8.8")
+
+if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library found.")
-else( BoostSerialization_FOUND )
+else( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library not found.")
-  set(ENABLE_SERIALIATZION 0)
-endif( BoostSerialization_FOUND )
+  set(ENABLE_SERIALIZATION 0)
+endif( Boost_SERIALIZATION_FOUND )
 include_directories( ${Boost_INCLUDE_DIRS} )
 
 # FLENS
 
 find_package(flens)
-if( flens_FOUND )
+if( flens_FOUND AND FLENS )
   include_directories(${flens_INCLUDE_DIR})
-  set(OPTLIBS ${OPTLIBS} ${flens_LIBRARY})
-else( flens_FOUND )
-  message(STATUS "Flens library not found, optional flens support disabled.")
+  set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
+  add_definitions(${flens_DEFINITIONS})
+else( flens_FOUND AND FLENS )
+  message(STATUS "Flens library not found or disabled, optional flens support disabled.")
   add_definitions( -DDO_NOT_USE_FLENS )
-endif( flens_FOUND )
+endif( flens_FOUND AND FLENS )
 
 # Check if serialization can be enabled, inform user
 
-add_feature_info(Serialization ENABLE_SERIALIATZION "Support for binary statevector output." )
-
 if( ENABLE_SERIALIZATION )
-  #message(STATUS "Support for binary statevector output enabled.")
+  message(STATUS "Support for binary statevector output enabled.")
   add_definitions( -DUSE_BOOST_SERIALIZATION )
-  set(OPTLIBS ${OPTLIBS} ${BoostSerialization_LIBRARY})
+  set(OPTLIBS ${OPTLIBS} ${Boost_SERIALIZATION_LIBRARY})
+else( ENABLE_SERIALIZATION )
+  message(STATUS "Optional support for binary statevector output disabled.")
 endif( ENABLE_SERIALIZATION )
 
 ##################################################
@@ -125,4 +112,30 @@ add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_Evo
 # (requires cmake >= )
 ##################################################
 
-feature_summary( WHAT ALL )
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
+  set_package_properties(PkgConfig PROPERTIES URL "http://pkgconfig.freedesktop.org/wiki"
+                                 DESCRIPTION "Package config system that manages compile/link flags"
+                                 TYPE OPTIONAL
+                                 PURPOSE "Assists cmake in finding libraries.")
+  set_package_properties(blitz++ PROPERTIES  URL "http://sf.net/projects/blitz/"
+                                 DESCRIPTION "High-performance C++ vector mathematics library"
+                                 TYPE REQUIRED
+                                 PURPOSE "Multi-Array implementation used in the framework.")
+  set_package_properties(flens PROPERTIES URL "http://www.mathematik.uni-ulm.de/~lehn/FLENS/"
+                                 DESCRIPTION "Flexible Library for Efficient Numerical Solutions."
+                                 TYPE OPTIONAL
+                                 PURPOSE "With FLENS the partial transpose of the density operator can be calculated.")
+  set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
+                                 DESCRIPTION "Boost C++ Library."
+                                 TYPE REQUIRED
+                                 PURPOSE "Advanced template metaprogramming and preprocessor algorithms.")
+  set_package_properties(GSL PROPERTIES URL "http://www.gnu.org/software/gsl/"
+                                 DESCRIPTION "GNU Scientific Library"
+                                 TYPE REQUIRED
+                                 PURPOSE "Used as implementation of an ODE solver and random number generator.")
+  set_package_properties(CBLAS PROPERTIES URL "http://www.gnu.org/software/gsl/"
+                                 DESCRIPTION "C library for Basic Linear Algebra Subprograms"
+                                 TYPE REQUIRED)
+  add_feature_info(Serialization ENABLE_SERIALIZATION "needed for binary statevector output." )
+  feature_summary( WHAT ALL )
+endif(${CMAKE_VERSION} VERSION_GREATER "2.8.7")

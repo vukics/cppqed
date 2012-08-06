@@ -1,17 +1,16 @@
 find_package(GSL REQUIRED)
-add_definitions( -DGSL_CBLAS )
 
-include_directories(include ${GSL_INCLUDE_DIRS} ${GSLCBLAS_INCLUDE_DIRS})
+include_directories(include ${GSL_INCLUDE_DIRS})
 
 AUX_SOURCE_DIRECTORY(src UTILS_SOURCE_FILES)
 
 # checks if libutils should be linked with FLENS
-IF( flens_FOUND )
-  set(UTILS_OPTLIBS ${UTILS_OPTLIBS} ${flens_LIBRARY})
-ELSE( flens_FOUND )
+IF( FLENS )
+  set(UTILS_OPTLIBS ${UTILS_OPTLIBS} ${flens_LIBRARIES})
+ELSE( FLENS )
   # linkage of this will fail without FLENS support
   LIST(REMOVE_ITEM UTILS_SOURCE_FILES src/DrivenDampedHarmonicOscillator.cc)
-ENDIF( flens_FOUND )
+ENDIF( FLENS )
 
 set(UTILS_LIBS ${UTILS_OPTLIBS} ${GSL_LIBRARIES} ${blitz++_LIBRARY})
 

@@ -7,6 +7,13 @@
 
 include(LibFindMacros)
 
+libfind_package(flens CBLAS)
+if(CBLAS_FOUND AND ${CBLAS_LIBRARY} MATCHES "gslcblas")
+  set(flens_DEFINITIONS "-DGSL_CBLAS")
+else(CBLAS_FOUND AND ${CBLAS_LIBRARY} MATCHES "gslcblas")
+  set(flens_DEFINITIONS "")
+endif(CBLAS_FOUND AND ${CBLAS_LIBRARY} MATCHES "gslcblas")
+
 libfind_pkg_check_modules(flens_PKGCONF flens)
 
 # Include dir
@@ -24,5 +31,5 @@ find_library(flens_LIBRARY
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
 set(flens_PROCESS_INCLUDES flens_INCLUDE_DIR)
-set(flens_PROCESS_LIBS flens_LIBRARY)
+set(flens_PROCESS_LIBS flens_LIBRARY CBLAS_LIBRARY)
 libfind_process(flens)

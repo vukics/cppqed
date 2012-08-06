@@ -21,7 +21,7 @@
 #
 
 #gsl needs cblas
-find_package(CBLAS REQUIRED)
+#find_package(CBLAS REQUIRED)
 
 find_package(PkgConfig)
 
@@ -34,7 +34,7 @@ include(FindPackageHandleStandardArgs)
 # if all listed variables are TRUE
 find_package_handle_standard_args(GSL DEFAULT_MSG GSL_LIBRARY GSL_INCLUDE_DIR )
 
-set(GSL_LIBRARIES "${GSL_LIBRARY};${CBLAS_LIBRARY}")
+set(GSL_LIBRARIES "${GSL_LIBRARY}")
 set(GSL_INCLUDE_DIRS ${GSL_INCLUDE_DIR} )
 
 mark_as_advanced(GSL_INCLUDE_DIR GSL_LIBRARY)

@@ -1,6 +1,0 @@
-include(LibFindMacros)
-
-find_package(Boost QUIET COMPONENTS serialization)
-
-set(BoostSerialization_PROCESS_LIBS Boost_SERIALIZATION_LIBRARY)
-libfind_process(BoostSerialization)
