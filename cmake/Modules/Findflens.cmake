@@ -7,14 +7,18 @@
 
 include(LibFindMacros)
 
+libfind_pkg_check_modules(flens_PKGCONF flens)
+
 # Include dir
 find_path(flens_INCLUDE_DIR
   NAMES flens/flens.h
+  PATHS ${flens_PKGCONF_INCLUDE_DIRS}
 )
 
 # Finally the library itself
 find_library(flens_LIBRARY
   NAMES flens
+  PATHS ${flens_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
