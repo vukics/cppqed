@@ -125,7 +125,7 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
                                  TYPE OPTIONAL
                                  PURPOSE "With FLENS the partial transpose of the density operator can be calculated.")
   set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
-                                 DESCRIPTION "Boost C++ Library."
+                                 DESCRIPTION "Collection of portable C++ source libraries."
                                  TYPE REQUIRED
                                  PURPOSE "Advanced template metaprogramming and preprocessor algorithms.")
   set_package_properties(GSL PROPERTIES URL "http://www.gnu.org/software/gsl/"
