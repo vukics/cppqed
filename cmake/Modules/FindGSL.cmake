@@ -20,14 +20,11 @@
 # limitations under the License.
 #
 
-#gsl needs cblas
-#find_package(CBLAS REQUIRED)
-
 find_package(PkgConfig)
 
 pkg_check_modules(PC_GSL gsl)
-find_path(GSL_INCLUDE_DIR gsl/gsl_linalg.h HINTS ${PC_GSL_INCLUDE_DIRS})
-find_library(GSL_LIBRARY NAMES gsl HINTS ${PC_GSL_LIBRARY_DIRS} )
+find_path(GSL_INCLUDE_DIR gsl/gsl_linalg.h HINTS ${PC_GSL_INCLUDE_DIRS} $ENV{UIBK_GSL_INC})
+find_library(GSL_LIBRARY NAMES gsl HINTS ${PC_GSL_LIBRARY_DIRS} $ENV{UIBK_GSL_LIB})
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set GSL_FOUND to TRUE

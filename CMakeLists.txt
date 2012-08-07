@@ -11,13 +11,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnon-virtual-dtor")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
 
 ##################################################
 # Library detection
 ##################################################
 
-# This will be disabled if any of the compoments required for serialization is missing
+# The option SERIALIZATION will be disabled if any of the compoments required for serialization is missing
 option(SERIALIZATION "Boost serialization" ON)
 if(SERIALIZATION)
   set(ENABLE_SERIALIZATION 1)
@@ -25,10 +25,10 @@ else(SERIALIZATION)
   set(ENABLE_SERIALIZATION 0)
 endif(SERIALIZATION)
 
+# The option FLENS will be disabled if flens is missing
 option(FLENS "FLENS support" ON)
 
 # blitz++
-
 find_package(blitz++ REQUIRED)
 if( blitz++_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built with serialization support.")
@@ -41,7 +41,6 @@ include_directories( ${blitz++_INCLUDE_DIR} )
 
 
 # Boost
-
 if(${CMAKE_VERSION} VERSION_LESS "2.8.8")
   find_package(Boost REQUIRED)
   find_package(Boost COMPONENTS serialization)
@@ -58,7 +57,6 @@ endif( Boost_SERIALIZATION_FOUND )
 include_directories( ${Boost_INCLUDE_DIRS} )
 
 # FLENS
-
 find_package(flens)
 if( flens_FOUND AND FLENS )
   include_directories(${flens_INCLUDE_DIRS})
@@ -70,7 +68,6 @@ else( flens_FOUND AND FLENS )
 endif( flens_FOUND AND FLENS )
 
 # Check if serialization can be enabled, inform user
-
 if( ENABLE_SERIALIZATION )
   message(STATUS "Support for binary statevector output enabled.")
   add_definitions( -DUSE_BOOST_SERIALIZATION )
@@ -110,7 +107,7 @@ add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_Evo
 
 ##################################################
 # Summary of enabled/disabled features
-# (requires cmake >= )
+# (requires cmake >= 2.8.8)
 ##################################################
 
 if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
@@ -134,9 +131,10 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
                                  DESCRIPTION "GNU Scientific Library"
                                  TYPE REQUIRED
                                  PURPOSE "Used as implementation of an ODE solver and random number generator.")
-  set_package_properties(CBLAS PROPERTIES URL "http://www.gnu.org/software/gsl/"
+  set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
                                  DESCRIPTION "C library for Basic Linear Algebra Subprograms"
-                                 TYPE REQUIRED)
+                                 TYPE OPTIONAL
+                                 PURPOSE "Needed for FLENS.")
   add_feature_info(Serialization ENABLE_SERIALIZATION "needed for binary statevector output." )
   feature_summary( WHAT ALL )
 endif(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
