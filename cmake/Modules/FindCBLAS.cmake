@@ -18,16 +18,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include(LibFindMacros)
 
-find_library(CBLAS_LIBRARY NAMES cblas gslcblas HINTS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 )
+# Include dir
+find_path(CBLAS_INCLUDE_DIR
+  NAMES cblas.h gsl/gsl_cblas.h
+  PATHS $ENV{CBLASDIR}/include
+)
 
-set(CBLAS_LIBRARIES ${CBLAS_LIBRARY} )
+if(${CBLAS_INCLUDE_DIR} MATCHES gsl_cblas.h)
+  set(CBLAS_LIB_CANDIDATE gslcblas)
+else(${CBLAS_INCLUDE_DIR} MATCHES gsl_cblas.h)
+  set(CBLAS_LIB_CANDIDATE cblas)
+endif(${CBLAS_INCLUDE_DIR} MATCHES gsl_cblas.h)
 
-include(FindPackageHandleStandardArgs)
-# handle the QUIETLY and REQUIRED arguments and set FFTW3_FOUND to TRUE
-# if all listed variables are TRUE
+find_library(CBLAS_LIBRARY ${CBLAS_LIB_CANDIDATE} HINTS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 )
 
-find_package_handle_standard_args(CBLAS DEFAULT_MSG CBLAS_LIBRARY )
-
-
-mark_as_advanced( CBLAS_LIBRARY )
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(CBLAS_PROCESS_INCLUDES CBLAS_INCLUDE_DIR)
+set(CBLAS_PROCESS_LIBS CBLAS_LIBRARY)
+libfind_process(CBLAS)
