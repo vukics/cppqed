@@ -7,8 +7,7 @@
 #include <blitz/array.h>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition.hpp>
-#include <boost/preprocessor/arithmetic/mul.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
 
 #include <boost/operators.hpp>
 

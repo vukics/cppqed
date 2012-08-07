@@ -1,0 +1,10 @@
+// -*- C++ -*-
+
+#define N BOOST_PP_ITERATION()
+
+template<BOOST_PP_ENUM_PARAMS(N,int V)>
+struct Vector<BOOST_PP_ENUM_PARAMS(N,V) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(TMPTOOLS_MAX_VECTOR_SIZE,N),DEFAULT_print,~) >
+  : boost::mpl::vector_c<int BOOST_PP_ENUM_TRAILING(N,ARGUMENTDISPATCHER_print,~)>
+{};
+
+

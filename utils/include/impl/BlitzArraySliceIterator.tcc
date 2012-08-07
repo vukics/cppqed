@@ -2,10 +2,6 @@
 #ifndef   _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
 #define   _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
 
-#ifndef FUSION_MAX_VECTOR_SIZE
-#define FUSION_MAX_VECTOR_SIZE 20
-#endif // FUSION_MAX_VECTOR_SIZE
-
 #include "Range.h"
 
 #include <boost/bind.hpp>
@@ -20,6 +16,8 @@
 #include <boost/fusion/mpl.hpp> // include all, otherwise difficult to find out what is actually needed
 #include <boost/fusion/container/vector/convert.hpp>
 #include <boost/fusion/algorithm/iteration/fold.hpp>
+#include <boost/fusion/sequence/intrinsic/at_c.hpp>
+
 
 
 namespace blitzplusplus {
@@ -341,8 +339,14 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 //
 //////////////////////////////////////////
 
-#include "details/IndexerImplementations.h"
 
+#define BOOST_PP_ITERATION_LIMITS (1,11)
+#define BOOST_PP_FILENAME_1 "details/IndexerImplementationsSpecialization.h"
+
+#include BOOST_PP_ITERATE()
+
+#undef BOOST_PP_FILENAME_1
+#undef BOOST_PP_ITERATION_LIMITS
 
 
 #endif // _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
