@@ -135,7 +135,7 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
   set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
                                  DESCRIPTION "C library for Basic Linear Algebra Subprograms"
                                  TYPE OPTIONAL
-                                 PURPOSE "Needed for FLENS.")
+                                 PURPOSE "Needed for GSL.")
   add_feature_info(Serialization ENABLE_SERIALIZATION "needed for binary statevector output." )
   feature_summary( WHAT ALL )
 endif(${CMAKE_VERSION} VERSION_GREATER "2.8.7")

@@ -20,19 +20,16 @@
 # limitations under the License.
 #
 
-find_package(PkgConfig)
+include(LibFindMacros)
+libfind_package(GSL CBLAS)
 
-pkg_check_modules(PC_GSL gsl)
-find_path(GSL_INCLUDE_DIR gsl/gsl_linalg.h HINTS ${PC_GSL_INCLUDE_DIRS} $ENV{UIBK_GSL_INC})
-find_library(GSL_LIBRARY NAMES gsl HINTS ${PC_GSL_LIBRARY_DIRS} $ENV{UIBK_GSL_LIB})
+libfind_pkg_check_modules(GSL_PKGCONF gsl)
 
-include(FindPackageHandleStandardArgs)
-# handle the QUIETLY and REQUIRED arguments and set GSL_FOUND to TRUE
-# if all listed variables are TRUE
-find_package_handle_standard_args(GSL DEFAULT_MSG GSL_LIBRARY GSL_INCLUDE_DIR )
+find_path(GSL_INCLUDE_DIR gsl/gsl_linalg.h HINTS ${GSL_PKGCONF_INCLUDE_DIRS} $ENV{UIBK_GSL_INC})
+find_library(GSL_LIBRARY NAMES gsl HINTS ${GSL_PKGCONF_LIBRARY_DIRS} $ENV{UIBK_GSL_LIB})
 
-set(GSL_LIBRARIES "${GSL_LIBRARY}")
-set(GSL_INCLUDE_DIRS ${GSL_INCLUDE_DIR} )
-
-mark_as_advanced(GSL_INCLUDE_DIR GSL_LIBRARY)
-
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(GSL_PROCESS_INCLUDES GSL_INCLUDE_DIR CBLAS_INCLUDE_DIRS)
+set(GSL_PROCESS_LIBS GSL_LIBRARY CBLAS_LIBRARIES)
+libfind_process(GSL)

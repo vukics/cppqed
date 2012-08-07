@@ -24,7 +24,7 @@ include(LibFindMacros)
 # Include dir
 find_library(CBLAS_LIBRARY
   NAMES cblas gslcblas
-  PATHS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64
+  PATHS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 $ENV{UIBK_GSL_LIB}
 )
 
 if(${CBLAS_LIBRARY} MATCHES gslcblas)
@@ -33,7 +33,7 @@ else(${CBLAS_LIBRARY} MATCHES gslcblas)
   set(CBLAS_INCLUDE_CANDIDATE cblas.h)
 endif(${CBLAS_LIBRARY} MATCHES gslcblas)
 
-find_path(CBLAS_INCLUDE_DIR ${CBLAS_INCLUDE_CANDIDATE} HINTS $ENV{CBLASDIR}/include )
+find_path(CBLAS_INCLUDE_DIR ${CBLAS_INCLUDE_CANDIDATE} HINTS $ENV{CBLASDIR}/include $ENV{UIBK_GSL_INC})
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
