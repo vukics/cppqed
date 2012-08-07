@@ -19,16 +19,16 @@ namespace mode {
 
 
 template<typename A>
-const SmartPtr maker(const Pars& p, QM_Picture qmp, const A& a)
+const SmartPtr make(const Pars& p, QM_Picture qmp, const A& a)
 {
   SWITCH_helper( ,A)
 }
 
 
 template<typename A>
-const SmartPtr maker(const ParsLossy& p, QM_Picture qmp, const A& a)
+const SmartPtr make(const ParsLossy& p, QM_Picture qmp, const A& a)
 {
-  if (!p.kappa) return maker(static_cast<const Pars&>(p),qmp,a);
+  if (!p.kappa) return make(static_cast<const Pars&>(p),qmp,a);
   else {
     if (p.nTh) { SWITCH_helper(Lossy,TEMPLATE_PARAM_TEMP(true ) ) }
     else       { SWITCH_helper(Lossy,TEMPLATE_PARAM_TEMP(false) ) }
@@ -37,18 +37,18 @@ const SmartPtr maker(const ParsLossy& p, QM_Picture qmp, const A& a)
 
 
 template<typename A>
-const SmartPtr maker(const ParsPumped& p, QM_Picture qmp, const A& a)
+const SmartPtr make(const ParsPumped& p, QM_Picture qmp, const A& a)
 {
-  if (!isNonZero(p.eta)) return maker(static_cast<const Pars&>(p),qmp,a);
+  if (!isNonZero(p.eta)) return make(static_cast<const Pars&>(p),qmp,a);
   else { SWITCH_helper(Pumped,A) }
 }
 
 
 template<typename A>
-const SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
+const SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
 {
-  if      (!p.kappa)          return maker(static_cast<const ParsPumped&>(p),qmp,a);
-  else if (!isNonZero(p.eta)) return maker(static_cast<const ParsLossy &>(p),qmp,a);
+  if      (!p.kappa)          return make(static_cast<const ParsPumped&>(p),qmp,a);
+  else if (!isNonZero(p.eta)) return make(static_cast<const ParsLossy &>(p),qmp,a);
   else { 
     if (p.nTh) { SWITCH_helper(PumpedLossy,TEMPLATE_PARAM_TEMP(true ) ) }
     else       { SWITCH_helper(PumpedLossy,TEMPLATE_PARAM_TEMP(false) ) }

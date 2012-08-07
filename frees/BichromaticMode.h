@@ -19,9 +19,9 @@ struct ParsBichromatic : ParsPumpedLossy
 
 
 template<typename A>
-const SmartPtr maker(const ParsBichromatic& p, QM_Picture qmp, const A& a)
+const SmartPtr make(const ParsBichromatic& p, QM_Picture qmp, const A& a)
 {
-  if (!isNonZero(p.etaOther)) return maker(static_cast<const ParsPumpedLossy&>(p),qmp,a);
+  if (!isNonZero(p.etaOther)) return make(static_cast<const ParsPumpedLossy&>(p),qmp,a);
   else {
     if (p.nTh) {return SmartPtr(new BichromaticMode<true ,A>(p,a));}
     else       {return SmartPtr(new BichromaticMode<false,A>(p,a));}

@@ -24,9 +24,9 @@ namespace particle {
 using namespace structure::free;
 
 
-typedef boost::shared_ptr<ParticleBase> SmartPtr;
+typedef boost::shared_ptr<const ParticleBase> SmartPtr;
 
-typedef boost::shared_ptr<PumpedParticleBase> SmartPtrPumped;
+typedef boost::shared_ptr<const PumpedParticleBase> SmartPtrPumped;
 
 
 const Tridiagonal expINKX(const ParticleBase*, ptrdiff_t);
@@ -51,8 +51,8 @@ const StateVector init(const Pars&);
 
 void ffTransform(StateVectorLow&, fft::Direction);
 
-SmartPtr maker(const Pars      &, QM_Picture);
-SmartPtr maker(const ParsPumped&, QM_Picture);
+SmartPtr make(const Pars      &, QM_Picture);
+SmartPtr make(const ParsPumped&, QM_Picture);
 
 
 

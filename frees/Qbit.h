@@ -13,6 +13,8 @@
 
 namespace qbit {
 
+const std::string keyTitle="Qbit";
+
 
 class Averaged
   : public structure::ElementAveraged<1>
@@ -70,7 +72,7 @@ const StateVector init(const dcomp& psi1);
 inline const StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
-SmartPtr maker(const ParsPumpedLossy&, QM_Picture);
+SmartPtr make(const ParsPumpedLossy&, QM_Picture);
 
 
 
@@ -101,7 +103,7 @@ public:
 class Liouvillean : public mode::Liouvillean<false>
 {
 protected:
-  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma) {}
+  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma,0,keyTitle) {}
 
 };
  

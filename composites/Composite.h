@@ -13,9 +13,16 @@
 
 #include <boost/fusion/container/generation/make_list.hpp>
 
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition.hpp>
-#include <boost/preprocessor/arithmetic/mul.hpp>
+
+/*
+  TODO:
+  * makeComposite => composite::make
+  * composite::result_of::make metafunction returning the composite type with a growing number of Act arguments
+  * in user guide:
+    - document changes of BinarySystem (binary::make)
+    - composite::result_of::make
+    - element makers => make
+*/
 
 
 namespace composite {
@@ -146,14 +153,37 @@ private:
 
 // The following provides a much more convenient interface:
 
+namespace composite {
 
-#define BOOST_PP_ITERATION_LIMITS (1,10)
+namespace result_of {
+
+
+namespace mpl=boost::mpl;
+
+typedef Act<> DefaultArgument;
+
+
+template<BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
+struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type> >
+{};
+
+
+} // result_of
+
+} // composite
+
+
+#define DEFAULT_print(z, n, data) DefaultArgument
+
+#define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,1) )
 #define BOOST_PP_FILENAME_1 "details/CompositeMakerImplementationsSpecialization.h"
 
 #include BOOST_PP_ITERATE()
 
 #undef BOOST_PP_FILENAME_1
 #undef BOOST_PP_ITERATION_LIMITS
+
+#undef DEFAULT_print
 
 
 #include "impl/Composite.tcc"

@@ -23,7 +23,7 @@ namespace qbit {
 ///////////
 
 Averaged::Averaged() 
-  : Base("Qbit",list_of("rho00")("rho11")("real(rho10=<sigma>)")("imag(\")"))
+  : Base(keyTitle,list_of("rho00")("rho11")("real(rho10=<sigma>)")("imag(\")"))
 {
 }
 
@@ -48,10 +48,8 @@ const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) co
 
 
 QbitBase::QbitBase(const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
-  : ModeBase(2,realFreqs,complexFreqs), Averaged()
-{
-  getParsStream()<<"# Qbit\n";
-}
+  : ModeBase(2,realFreqs,complexFreqs,qbit::keyTitle), Averaged()
+{}
 
 #define BASE_init(R,C) QbitBase((R),(C))
 #define BASE_initR(R)  BASE_init((R),ComplexFreqs())
@@ -163,7 +161,7 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
 namespace qbit {
 
 
-SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp)
+SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :

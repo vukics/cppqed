@@ -19,6 +19,9 @@
 
 namespace mode {
 
+const std::string keyTitle="Mode";
+
+
 using namespace structure::free;
 
 typedef boost::shared_ptr<const ModeBase> SmartPtr;
@@ -37,16 +40,16 @@ const StateVector init(const Pars&);
 
 
 template<typename A>
-const SmartPtr maker(const Pars           &, QM_Picture, const A&);
+const SmartPtr make(const Pars           &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr maker(const ParsLossy      &, QM_Picture, const A&);
+const SmartPtr make(const ParsLossy      &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr maker(const ParsPumped     &, QM_Picture, const A&);
+const SmartPtr make(const ParsPumped     &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr maker(const ParsPumpedLossy&, QM_Picture, const A&);
+const SmartPtr make(const ParsPumpedLossy&, QM_Picture, const A&);
 
 
 double photonNumber(const StateVectorLow&); 
@@ -136,7 +139,7 @@ class Liouvillean<false,IS_ALTERNATIVE>
     public structure::ElementLiouvillean<1,1>
 {
 protected:
-  Liouvillean(double kappa, double=0) : kappa_(kappa) {}
+  Liouvillean(double kappa, double=0, const std::string& kT=keyTitle) : structure::ElementLiouvillean<1,1>(kT,"excitation loss"), kappa_(kappa) {}
   // the trailing dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
 
 private:
@@ -156,7 +159,7 @@ class Liouvillean<true >
 protected:
   typedef structure::ElementLiouvillean<1,2> Base;
 
-  Liouvillean(double kappa, double nTh);
+  Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle);
 
 private:
   const double kappa_, nTh_;
@@ -182,10 +185,10 @@ private:
 };
 
 
-inline const SmartPtr maker(const Pars           & p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
-inline const SmartPtr maker(const ParsLossy      & p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
-inline const SmartPtr maker(const ParsPumped     & p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
-inline const SmartPtr maker(const ParsPumpedLossy& p, QM_Picture qmp) {return maker(p,qmp,Averaged());}
+inline const SmartPtr make(const Pars           & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const SmartPtr make(const ParsLossy      & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const SmartPtr make(const ParsPumped     & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp) {return make(p,qmp,Averaged());}
 
 
 
@@ -236,7 +239,8 @@ class ModeBase
 {
 public:
   ModeBase(size_t dim,
-	   const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs());
+	   const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs(),
+	   const std::string& keyTitle=mode::keyTitle);
 
   virtual ~ModeBase() {}
 

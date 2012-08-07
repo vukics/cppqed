@@ -12,12 +12,16 @@
 #include "FreeExact.h"
 #include "Hamiltonian.h"
 
-#include<boost/fusion/mpl/size.hpp>
+#include <boost/fusion/mpl/size.hpp>
 
-#include<boost/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 
 namespace multilevel {
+
+
+const std::string keyTitle="MultiLevel";
+
 
 using namespace structure::free;
 
@@ -201,20 +205,23 @@ class Liouvillean : public structure::ElementLiouvillean<1,mpl::size<VL>::value>
 // Note that, at some point, the Fusion sequence VL needs to be converted into a runtime sequence (JumpStrategies & JumpProbabilityStrategies)
 {
 public:
-  typedef structure::ElementLiouvillean<1,mpl::size<VL>::value> Base;
+  static const int NLT=mpl::size<VL>::value; // number of lossy transitions
+
+  typedef structure::ElementLiouvillean<1,NLT> Base;
   
   typedef typename Base::JumpStrategies            JumpStrategies           ;
   typedef typename Base::JumpProbabilityStrategies JumpProbabilityStrategies;
-  
-  BOOST_STATIC_ASSERT( blitzplusplus::TinyVectorLengthTraits<JumpProbabilityStrategies>::value==mpl::size<VL>::value );
 
+  BOOST_STATIC_ASSERT( blitzplusplus::TinyVectorLengthTraits<JumpProbabilityStrategies>::value==NLT );
 
-  static const int NLT=mpl::size<VL>::value; // number of lossy transitions
+  typedef typename Base::KeyLabels KeyLabels;
 
-  Liouvillean(const VL& gammas) : Base(Liouvillean::fillJS(this),Liouvillean::fillJPS(this)), gammas_(gammas) {}
+  Liouvillean(const VL& gammas) : Base(Liouvillean::fillJS(),Liouvillean::fillJPS(),keyTitle,fillKeyLabels()), gammas_(gammas) {}
 
-  static const JumpStrategies            fillJS (const Liouvillean*);
-  static const JumpProbabilityStrategies fillJPS(const Liouvillean*);
+  const JumpStrategies            fillJS () const;
+  const JumpProbabilityStrategies fillJPS() const;
+
+  static const KeyLabels fillKeyLabels();
 
 private:
   template<int>
@@ -223,13 +230,12 @@ private:
   template<int>
   double jumpProbabilityStrategy(const LazyDensityOperator&) const;
 
-  // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters?
-
-  // This would be needed to fuse fillJS and fillJPS into a template
-  // together with the helper classes below
+  // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters? This would be needed to fuse fillJS and fillJPS into a template together with the helper classes below
   
   class  JS_helper;
   class JPS_helper;
+
+  class KeyHelper;
 
   const VL gammas_;
 
@@ -262,14 +268,14 @@ class MultiLevelBase
   : public structure::Free
 {
 public:
-  typedef boost::shared_ptr<MultiLevelBase> SmartPtr;
+  typedef boost::shared_ptr<const MultiLevelBase> SmartPtr;
 
   using structure::Free::getParsStream;
 
   MultiLevelBase(const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs())
     : structure::Free(NL,realFreqs,complexFreqs)
   {
-    getParsStream()<<"# MultiLevel\n";
+    getParsStream()<<"# "<<multilevel::keyTitle<<std::endl;
   }
 
   virtual ~MultiLevelBase() {}
