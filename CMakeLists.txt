@@ -61,7 +61,7 @@ include_directories( ${Boost_INCLUDE_DIRS} )
 
 find_package(flens)
 if( flens_FOUND AND FLENS )
-  include_directories(${flens_INCLUDE_DIR})
+  include_directories(${flens_INCLUDE_DIRS})
   set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
   add_definitions(${flens_DEFINITIONS})
 else( flens_FOUND AND FLENS )
