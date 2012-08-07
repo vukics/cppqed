@@ -6,14 +6,15 @@
 
 #include "Liouvillean.h"
 
+#include "KeyPrinter.h"
 #include "Range.h"
 
 #ifndef   NDEBUG
 #include "Exception.h"
 #endif // NDEBUG
 
-#include<boost/function.hpp>
-#include<boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 #include <boost/preprocessor/control/expr_iif.hpp>
 #include <boost/preprocessor/control/iif.hpp>

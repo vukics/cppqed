@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
   StateVector psi(psiML*mode::init(pplm));
 
   evolve(psi,
-	 BinarySystem(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Atom",NL)),mode::maker(pplm,QMP_IP),pmljc)),
+	 binary::make(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Atom",NL)),mode::make(pplm,QMP_IP),pmljc)),
 	 pe,
 	 tmptools::Vector<0>());
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 Note that the following snippet yields undefined behaviour (clearly!)
 
 
-1. MLJC<NL,Couplings> mljc(*makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO(NL)),*mode::maker(pplm,QMP_IP),gs);
+1. MLJC<NL,Couplings> mljc(*makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO(NL)),*mode::make(pplm,QMP_IP),gs);
 
 2. evolve(psi,BinarySystem(mljc),pe);
 

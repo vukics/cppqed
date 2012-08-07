@@ -22,9 +22,11 @@ public:
   typedef blitz::TinyVector<JumpStrategy           ,NOJ> JumpStrategies;
   typedef blitz::TinyVector<JumpProbabilityStrategy,NOJ> JumpProbabilityStrategies;
 
+  typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
+
 protected:
-  ElementLiouvillean(const JumpStrategies& jumps, const JumpProbabilityStrategies& jumpProbas) 
-    : jumps_(jumps), jumpProbas_(jumpProbas) {}
+  ElementLiouvillean(const JumpStrategies& jumps, const JumpProbabilityStrategies& jumpProbas, const std::string& keyTitle, const KeyLabels& keyLabels) 
+    : jumps_(jumps), jumpProbas_(jumpProbas), keyPrinter_(keyTitle,keyLabels) {}
 
 private:
   size_t nJumps() const {return NOJ;}
@@ -34,8 +36,12 @@ private:
   void actWithJ(COND_ARG_T(ISTD) StateVectorLow& psi, size_t jumpNo) const
   {jumps_(jumpNo)(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);}
 
+  void displayKey(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
+
   const JumpStrategies            jumps_     ;
   const JumpProbabilityStrategies jumpProbas_;
+
+  const cpputils::KeyPrinter keyPrinter_;
 
 };
 
@@ -52,6 +58,12 @@ public:
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
   typedef typename LiouvilleanCommon::Probabilities Probabilities;
+
+  typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
+
+protected:
+  ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) 
+    : keyPrinter_(keyTitle,KeyLabels(1,keyLabel)) {}
 
 private:
   size_t nJumps() const {return 1;}
@@ -74,9 +86,12 @@ private:
     doActWithJ(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);
   }
 
+  void displayKey(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
 
   virtual void   doActWithJ (COND_ARG(ISTD)       StateVectorLow     &) const = 0;
   virtual double probability(COND_ARG(ISTD) const LazyDensityOperator&) const = 0;
+
+  const cpputils::KeyPrinter keyPrinter_;
 
 };
 

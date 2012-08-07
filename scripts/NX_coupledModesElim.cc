@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
   NX_coupledModesElim system(ppart,pmode,u);
 
   /*
-  SmartPtr part(maker(ppart,qmp));
+  SmartPtr part(make(ppart,qmp));
 
   if (!ppart.init.getSig() && !ppart.vClass) {cerr<<"Incorrect initial condition"<<endl; abort();}
   */

@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
   Mode<> phonon(pphon);
   
-  mode::SmartPtr cavityMode(mode::maker(pplm,QMP_IP));
+  mode::SmartPtr cavityMode(mode::make(pplm,QMP_IP));
 
   // The interaction components
 
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
   MLJC<NL,      Couplings> ia02(atomInner,cavityMode,pmljc           );
 
   evolve(psi,
-	 makeComposite(Act<0,1>(ia01),Act<0,2>(ia02)),
+	 composite::make(Act<0,1>(ia01),Act<0,2>(ia02)),
 	 pe,
 	 tmptools::Vector<0>());
 

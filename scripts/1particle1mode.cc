@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
   if (conf!=1) pplm.delta-=ppci.uNot/(isComplex(ppci.modeCav) ? 1. : 2.);
 
-  mode::SmartPtr mode(mode::maker(pplm,qmp));
+  mode::SmartPtr mode(mode::make(pplm,qmp));
 
   Particle    particle   (ppp);
   ParticleSch particleSch(ppp);
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
   psi.renorm();
 
 
-  evolve(psi,BinarySystem(*particlecavityBase),pe,tmptools::Vector<0>());
+  evolve(psi,binary::make(*particlecavityBase),pe,tmptools::Vector<0>());
 
 
   /*

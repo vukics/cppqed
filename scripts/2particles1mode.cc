@@ -22,9 +22,9 @@ int main(int argc, char* argv[])
   quantumdata::StateVector<3> psi(init(pm)*init(pp)*init(pp));
   
   evolve(psi,
-	 makeComposite(
-		       Act<0,1>(act),Act<0,2>(act),
-		       Act<1,2>(IdenticalParticles<2>(part))
-		       ),
+	 composite::make(
+			 Act<0,1>(act),Act<0,2>(act),
+			 Act<1,2>(IdenticalParticles<2>(part))
+			 ),
 	 pe);
 }

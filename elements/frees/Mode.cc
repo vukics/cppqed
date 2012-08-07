@@ -135,11 +135,12 @@ double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
 }
 
 
-Liouvillean<true >::Liouvillean(double kappa, double nTh) 
+Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
   : Base(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
 			bind(aDagJump,_1,kappa* nTh  )),
 	 JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(nTh+1)),
-				   bind(aDagJumpProba,_1,kappa* nTh  ))),
+				   bind(aDagJumpProba,_1,kappa* nTh  )),
+	 kT,list_of("excitation loss")("excitation absorption")),
     kappa_(kappa), nTh_(nTh)
 {
 }
@@ -180,7 +181,7 @@ double Liouvillean<false,true>::probability(const LazyDensityOperator&) const
 
 namespace {
 
-typedef structure::ElementAveragedCommon::KeyLabels KeyLabels;
+typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
 
 const KeyLabels Assemble(const KeyLabels& first,
 			 const KeyLabels& middle,
@@ -196,7 +197,7 @@ const KeyLabels Assemble(const KeyLabels& first,
 
 
 Averaged::Averaged(const KeyLabels& follow, const KeyLabels& precede)
-  : Base("Mode",
+  : Base(keyTitle,
 	 Assemble(precede,list_of("<number operator>")("VAR(number operator)")("real(<ladder operator>)")("imag(\")"),follow))
 {
 }
@@ -393,10 +394,10 @@ const StateVector init(const Pars& p)
 
 
 
-ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
+ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs, const string& keyTitle)
     : Free(dim,realFreqs,complexFreqs)
 {
-  getParsStream()<<"# Mode\n";
+  getParsStream()<<"# "<<keyTitle<<endl;
 }
 
 
@@ -407,7 +408,8 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
   : ModeBase(p.cutoff),
     structure::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
 							       mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.cutoff))),
-    structure::ElementAveraged<1,true>("Mode",list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
+    structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"excitation loss"),
+    structure::ElementAveraged<1,true>(mode::keyTitle,list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
     z_(p.kappa,-p.delta)
 {
   getParsStream()<<"# Interaction picture, not derived from Exact\n";

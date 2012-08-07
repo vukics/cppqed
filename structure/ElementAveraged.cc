@@ -3,43 +3,22 @@
 #include "LazyDensityOperator.h"
 
 #include "FormDouble.h"
-
 #include "Range.h"
 
-#include<boost/lambda/lambda.hpp>
-#include<boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
 
-#include<boost/assign/list_of.hpp>
+#include <boost/assign/list_of.hpp>
 
-#include<algorithm>
+#include <algorithm>
 
 
-using namespace boost::assign;
 using namespace std;
-namespace bll=boost::lambda;
-
-using boost::for_each;
 
 
-structure::ElementAveragedCommon::ElementAveragedCommon(const std::string& keyTitle, const KeyLabels& keyLabels) 
-  : keyTitle_(keyTitle), keyLabels_(keyLabels) 
+
+void structure::displayCommon(const AveragedCommon::Averages& averages, std::ostream& os, int precision)
 {
-}
-
-
-
-void structure::ElementAveragedCommon::displayKey(std::ostream& os, size_t& i) const
-{
-  os<<"# "<<keyTitle_;
-  for_each(keyLabels_,os<<bll::constant("\n# ")<<bll::constant(setw(2))<<bll::var(i)++<<". "<<bll::_1);
-  os<<endl;
-}
-
-
-
-void structure::ElementAveragedCommon::display(const AveragedCommon::Averages& averages, std::ostream& os, int precision) const
-{
-  using namespace cpputils;
   using namespace formdouble;
 
   namespace bll=boost::lambda;
@@ -47,7 +26,7 @@ void structure::ElementAveragedCommon::display(const AveragedCommon::Averages& a
   os<<'\t';
   {
     const FormDouble fd(precision);
-    for_each(averages,os<<bll::bind(&FormDouble::operator()<double>,&fd,bll::_1));
+    boost::for_each(averages,os<<bll::bind(&FormDouble::operator()<double>,&fd,bll::_1));
   }
 
 }
@@ -76,7 +55,7 @@ private:
 }
 
 DiagonalDO::DiagonalDO(const std::string& label, size_t dim) : 
-  Base(label,list_of(string("rho_0,0")).repeat_fun(dim-1,Helper())),
+  Base(label,boost::assign::list_of(string("rho_0,0")).repeat_fun(dim-1,Helper())),
   dim_(dim)
 {}
 

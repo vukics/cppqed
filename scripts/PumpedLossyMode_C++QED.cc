@@ -36,11 +36,11 @@ int main(int argc, char* argv[])
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
   if (doDisplay) collection.push_back(new structure::averaged::DiagonalDO("",pplm.cutoff));
 
-  SmartPtr mode(alternative ? SmartPtr(new PumpedLossyModeIP_NoExact(pplm)) : maker(pplm,qmp,Collecting(collection)));
+  SmartPtr mode(alternative ? SmartPtr(new PumpedLossyModeIP_NoExact(pplm)) : make(pplm,qmp,Collecting(collection)));
 
   StateVector psi(mode::init(pplm));
 
-  evolve(psi,*mode,pe);
+  evolve(psi,mode,pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

@@ -12,9 +12,9 @@ alias utilslib : utils//utilslib ;
 
 lib C++QED : quantumdata structure quantumtrajectory quantumoperator utilslib ;
 
-lib boost_serializationlib : : <name>boost_serialization ;
+lib boost_serialization ;
 
-alias executables_link_against : : : : <library>C++QED <library>elements//el <library>utilslib <library>utils//flens <enable-binary-output>yes:<library>boost_serializationlib ;
+alias executables_link_against : : : : <library>C++QED <library>elements//el <library>utilslib <library>utils//flens <enable-binary-output>yes:<library>boost_serialization ;
 
 # Core
 build-project quantumdata       ;

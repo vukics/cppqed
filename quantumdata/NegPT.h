@@ -27,7 +27,7 @@ double negPT(const DensityOperator<RANK>&, V);
 
 template<int RANK>
 inline
-double negPT(const DensityOperator<RANK>&, tmptools::V0)
+double negPT(const DensityOperator<RANK>&, tmptools::V_Empty)
 {
   return 0;
 }

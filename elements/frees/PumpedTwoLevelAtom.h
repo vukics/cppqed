@@ -20,12 +20,6 @@
 
 #include "CMatrix.h"
 
-/*
-#include "Algorithm.h"
-#include "Pars.h"
-
-
-*/
 
 
 

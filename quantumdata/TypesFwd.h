@@ -8,8 +8,6 @@ namespace structure {
 struct StaticTag;
 // We declare this here because this is the only file which is included everywhere in structure.
 
-struct LiouvilleanAveragedCommon;
-
 } // structure
 
 

@@ -15,7 +15,7 @@ class Base;
 } // ensemblemcwf
 
 
-template<int RANK, typename V=tmptools::V0>
+template<int RANK, typename V=tmptools::V_Empty>
 class EnsembleMCWF;
 
 

@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
 
   if (qmp==QMP_IP) qmp=QMP_UIP;
 
-  qbit::SmartPtr qbit(qbit::maker(pplqb,qmp));
-  mode::SmartPtr mode(mode::maker(pplm ,qmp));
+  qbit::SmartPtr qbit(qbit::make(pplqb,qmp));
+  mode::SmartPtr mode(mode::make(pplm ,qmp));
 
   JaynesCummings<> jc(qbit,mode,pjc);
 

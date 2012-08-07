@@ -33,8 +33,8 @@ int main(int argc, char* argv[])
 
   if ((pe.evol==EM_MASTER /* || pe.evol==EM_convergence */) && qmp==QMP_IP) qmp=QMP_UIP;
 
-  qbit::SmartPtr qbit(qbit::maker(pplqb,qmp));
-  mode::SmartPtr mode(mode::maker(pplm ,qmp));
+  qbit::SmartPtr qbit(qbit::make(pplqb,qmp));
+  mode::SmartPtr mode(mode::make(pplm ,qmp));
 
   JaynesCummings<> jc(qbit,mode,pjc);
 
@@ -48,13 +48,13 @@ int main(int argc, char* argv[])
   */
   psi.renorm();
 
-  evolve(psi,BinarySystem(jc),pe,tmptools::Vector<0>());
+  evolve(psi,binary::make(jc),pe,tmptools::Vector<0>());
 
 
   // The 3 further ways to create a JaynesCummings:
   {
     PumpedLossyQbitSch qbitv(pplqb);
-    PumpedLossyMode<>    modev(pplm);
+    PumpedLossyMode<>  modev(pplm );
     {
       JaynesCummings<> jc(qbitv,mode ,pjc);
     }
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
 
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+  } catch (const cpputils::TaggedException& te) {cerr<<"Caught exception with tag: "<<te.getTag()<<endl; exit(1);}
 
 
 }

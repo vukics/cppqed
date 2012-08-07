@@ -38,13 +38,11 @@ int main(int argc, char* argv[])
 
   u/=ps.twoS; y/=sqrt(ps.twoS);
 
-  mode::SmartPtr mode(mode::maker(pplm,qmp,mode::AveragedMonitorCutoff<mode::AveragedQuadratures>()));
+  mode::SmartPtr mode(mode::make(pplm,qmp,mode::AveragedMonitorCutoff<mode::AveragedQuadratures>()));
 
   Spin spin(ps);
 
   GeneralDicke<> gd(mode,spin,u,y);
-
-  BinarySystem sys(gd);
 
   StateVector1 psiMode(mode::init(pplm)), psiSpin(spin.getDimension());
 
@@ -52,7 +50,7 @@ int main(int argc, char* argv[])
 
   StateVector2 psi(psiMode*psiSpin);
 
-  evolve(psi,sys,pe,tmptools::Vector<0>());
+  evolve(psi,binary::make(gd),pe,tmptools::Vector<0>());
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

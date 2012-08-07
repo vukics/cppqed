@@ -4,6 +4,7 @@
 
 #include "AveragedFwd.h"
 
+#include "LiouvilleanAveragedCommon.h"
 #include "Types.h"
 
 #include "Exception.h"
@@ -23,7 +24,7 @@ namespace structure {
 /////////////////
 
 
-class AveragedCommon : public virtual LiouvilleanAveragedCommon
+class AveragedCommon : public LiouvilleanAveragedCommon
 {
 public:
   typedef DArray1D Averages;
@@ -32,12 +33,6 @@ public:
   static size_t nAvr(const AveragedCommon* averagedCommon)
   {
     return averagedCommon ? averagedCommon->nAvr() : 0;
-  }
-
-
-  static void displayKey(std::ostream& o, size_t& i, const AveragedCommon* averagedCommon)
-  {
-    if (averagedCommon) averagedCommon->displayKey(o,i);
   }
 
 
@@ -53,8 +48,7 @@ public:
   virtual void   process   (Averages&)                           const = 0;
   virtual void   display   (const Averages&, std::ostream&, int) const = 0;
 
-  virtual void   displayKey(std::ostream&, size_t&) const = 0;
-  virtual size_t nAvr      ()                       const = 0;
+  virtual size_t nAvr      ()                                    const = 0;
 
 };
 

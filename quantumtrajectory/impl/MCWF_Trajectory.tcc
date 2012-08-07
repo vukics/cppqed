@@ -388,13 +388,21 @@ void MCWF_Trajectory<RANK>::displayParameters() const
     <<(av_ ? "calculates Averages."    : "")
     <<endl;
 
-
-  os<<"# Alternative jumps: ";
-  {
-    const DpOverDtSet dpOverDtSet(Liouvillean::probabilities(0,psi_,li_));
-    for (int i=0; i<dpOverDtSet.size(); i++) if (dpOverDtSet(i)<0) os<<i<<' ';
+  if (li_) {
+    os<<"# Decay channels:\n";
+    {
+      size_t i=0;
+      Liouvillean::displayKey(getOstream(),i,li_);
+    }
+    os<<"# Alternative jumps: ";
+    {
+      const DpOverDtSet dpOverDtSet(Liouvillean::probabilities(0,psi_,li_));
+      int n=0;
+      for (int i=0; i<dpOverDtSet.size(); i++) if (dpOverDtSet(i)<0) {os<<i<<' '; n++;}
+      if (!n) os<<"none";
+    }
+    os<<endl;
   }
-  os<<endl;
 
 }
 

@@ -12,7 +12,7 @@
 template<int RANK>
 structure::averaged::Collecting<RANK>::Collecting(const Collection& collection)
   : Base(collection.begin()->getTitle(),
-	 cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),ElementAveragedCommon::KeyLabels())),
+	 cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),KeyLabels())),
     collection_(collection.clone())
 {}
 

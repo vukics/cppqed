@@ -54,12 +54,12 @@ int main(int argc, char* argv[])
 
   MultiLevelBase<NL>::SmartPtr plml(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Lambda atom",NL)));
 
-  mode::SmartPtr mode(mode::maker(pplm,QMP_IP));
+  mode::SmartPtr mode(mode::make(pplm,QMP_IP));
 
   MLJC<NL,Couplings> mljc(plml,mode,pmljc);
 
   evolve(psi,
-	 BinarySystem(mljc),
+	 binary::make(mljc),
 	 pe,
 	 tmptools::Vector<0>());
 

@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     // Important that everything is in Sch picture here.
 
     GeneralDicke<> gd(mode,spin,u,y);
-    BinarySystem sys(gd);
+    BinarySystem<> sys(gd);
 
     static_cast<structure::QuantumSystem<2>&>(sys).displayParameters(cout);
 
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 
     pe.noise=false;
 
-    mode::SmartPtr mode(mode::maker(plm,QMP_IP));
+    mode::SmartPtr mode(mode::make(plm,QMP_IP));
 
     Spin spin(ps);
 
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
     psi.renorm();
 
     GeneralDicke<> gd(mode,spin,u,y);
-    BinarySystem sys(gd);
+    BinarySystem<> sys(gd);
 
     
     MCWF traj(psi,eigenStates,sys,pe);
