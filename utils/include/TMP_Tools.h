@@ -2,6 +2,15 @@
 #ifndef _TEMPLATE_METAPROG_TOOLS_H
 #define _TEMPLATE_METAPROG_TOOLS_H
 
+#ifndef FUSION_MAX_VECTOR_SIZE
+#define FUSION_MAX_VECTOR_SIZE 20
+#endif // FUSION_MAX_VECTOR_SIZE
+
+#ifndef TMPTOOLS_MAX_VECTOR_SIZE
+#define TMPTOOLS_MAX_VECTOR_SIZE FUSION_MAX_VECTOR_SIZE
+#endif // TMPTOOLS_MAX_VECTOR_SIZE
+
+
 #include "TMP_ToolsFwd.h"
 
 #include <boost/type_traits/add_const.hpp>
@@ -19,9 +28,12 @@
 
 #include <boost/mpl/assert.hpp>
 
-#include <boost/preprocessor/repetition.hpp>
-#include <boost/preprocessor/punctuation/comma_if.hpp>
-#include <boost/preprocessor/arithmetic/add.hpp>
+#include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/preprocessor/repetition/enum_binary_params.hpp>
+#include <boost/preprocessor/facilities/intercept.hpp>
+#include <boost/preprocessor/repetition/enum_trailing.hpp>
+#include <boost/preprocessor/arithmetic/sub.hpp>
 
 
 #define DEFINE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName;
@@ -154,32 +166,48 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
   NEEDS_WORK Check Abrahams-Gurtuvoy if there is a better solution for this.
 */
 
-#define TMPTOOLS_VECTOR_DEFAULT_ARG 10011001
+
+
+/*
+TODO:
+* minimize Boost.Preprocessor inclusions everywhere
+*/
+
+const int vectorDefaultArgument=-1001;
+
 
 template<int V, int N>
-struct ArgumentDispatcher : boost::mpl::bool_<(V==TMPTOOLS_VECTOR_DEFAULT_ARG)>
+struct ArgumentDispatcher : boost::mpl::int_<V>
 {
-  BOOST_MPL_ASSERT_MSG( (V>=0 || V==TMPTOOLS_VECTOR_DEFAULT_ARG) , NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR_at, (boost::mpl::int_<N>) );
+  BOOST_MPL_ASSERT_MSG( V>=0 , NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR_at, (boost::mpl::int_<N>) );
 };
 
 
-#define VECTOR_MAX_SIZE 20
-#define VECTOR_print(z,n,unused) typename boost::mpl::eval_if<ArgumentDispatcher<V##n,n>,boost::mpl::vector_c<int,BOOST_PP_ENUM_PARAMS(n,V)> BOOST_PP_COMMA_IF(n)
-#define VECTOR_trailingPrint(z,n,unused) >::type
 
-
-template<BOOST_PP_ENUM_BINARY_PARAMS(VECTOR_MAX_SIZE,int V,=TMPTOOLS_VECTOR_DEFAULT_ARG BOOST_PP_INTERCEPT)> 
-struct Vector
-  : boost::mpl::eval_if_c<V0==TMPTOOLS_VECTOR_DEFAULT_ARG,boost::mpl::vector_c<int>,
-			  BOOST_PP_REPEAT_FROM_TO(1,VECTOR_MAX_SIZE,VECTOR_print,~)
-                          boost::mpl::vector_c<int,BOOST_PP_ENUM_PARAMS(VECTOR_MAX_SIZE,V)>
-                          BOOST_PP_REPEAT(VECTOR_MAX_SIZE,VECTOR_trailingPrint,~)
+template<BOOST_PP_ENUM_BINARY_PARAMS(TMPTOOLS_MAX_VECTOR_SIZE,int V,=vectorDefaultArgument BOOST_PP_INTERCEPT)> 
+struct Vector : boost::mpl::vector_c<int,BOOST_PP_ENUM_PARAMS(TMPTOOLS_MAX_VECTOR_SIZE,V) >
 {};
 
 
-#undef  VECTOR_trailingPrint
-#undef  VECTOR_print
-#undef  VECTOR_MAX_SIZE
+#define DEFAULT_print(z, n, data) vectorDefaultArgument
+
+template<>
+struct Vector<BOOST_PP_ENUM(TMPTOOLS_MAX_VECTOR_SIZE,DEFAULT_print,~) >
+  : boost::mpl::vector_c<int >
+{};
+
+
+#define ARGUMENTDISPATCHER_print(z, n, data) ArgumentDispatcher<V##n,n>::value
+
+#define BOOST_PP_ITERATION_LIMITS (1, BOOST_PP_SUB(TMPTOOLS_MAX_VECTOR_SIZE,1) )
+#define BOOST_PP_FILENAME_1 "details/TMP_VectorSpecialization.h"
+
+#include BOOST_PP_ITERATE()
+
+#undef BOOST_PP_FILENAME_1
+#undef BOOST_PP_ITERATION_LIMITS
+#undef ARGUMENTDISPATCHER_print
+#undef DEFAULT_print
 
 
 typedef Vector<> V_Empty;

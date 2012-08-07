@@ -1,5 +1,7 @@
 #include "BlitzTinyExtensions.h"
 
+#include <blitz/tinyvec2io.cc>
+
 using namespace std;
 using namespace blitzplusplus;
 

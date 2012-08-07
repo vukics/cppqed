@@ -1,9 +1,12 @@
 #include "TMP_Tools.h"
 
-#include<boost/mpl/size.hpp>
-#include<boost/mpl/at.hpp>
+#include <boost/mpl/size.hpp>
+#include <boost/mpl/at.hpp>
 
-#include<boost/static_assert.hpp>
+#include <boost/static_assert.hpp>
+
+#include <boost/type_traits/is_base_of.hpp>
+
 
 using namespace tmptools;
 
@@ -59,6 +62,10 @@ BOOST_STATIC_ASSERT((
 
 
 typedef Vector<87,28,93,1,23,25,97,345,6> V;
+
+BOOST_STATIC_ASSERT((
+		     boost::is_base_of<boost::mpl::vector_c<int,87,28,93,1,23,25,97,345,6>, V >::value
+		     ));
 
 BOOST_STATIC_ASSERT((
 		     boost::mpl::size<V>::value==9
