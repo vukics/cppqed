@@ -6,6 +6,10 @@
 #define FUSION_MAX_VECTOR_SIZE 20
 #endif // FUSION_MAX_VECTOR_SIZE
 
+#ifndef FUSION_MAX_LIST_SIZE
+#define FUSION_MAX_LIST_SIZE FUSION_MAX_VECTOR_SIZE
+#endif // FUSION_MAX_LIST_SIZE
+
 #ifndef TMPTOOLS_MAX_VECTOR_SIZE
 #define TMPTOOLS_MAX_VECTOR_SIZE FUSION_MAX_VECTOR_SIZE
 #endif // TMPTOOLS_MAX_VECTOR_SIZE
@@ -151,22 +155,6 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
 // A nonnegative compile-time integer vector
 //
 ////////////////////////////////////////////
-
-/*
-  While the adopted solution relying on a nested series of
-  mpl::eval_if-s may seem formidable, it provides the syntactic sugar
-  of being able to write 
-
-  Vector<1,3,2> 
-
-  which immediately produces the Vector with the desired elements.
-  Due to the lazy evaluation of mpl::eval_if, the solution should not
-  be very inefficient.
-
-  NEEDS_WORK Check Abrahams-Gurtuvoy if there is a better solution for this.
-*/
-
-
 
 /*
 TODO:

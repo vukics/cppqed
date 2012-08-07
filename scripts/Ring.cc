@@ -35,11 +35,11 @@ int main(int argc, char* argv[])
   ParticleTwoModes ptm(plus,minus,part,ppcP,ppcM);
 
   evolve(psi,
-	 makeComposite(	         
-		       Act<1,0>  (pacP),
-		       Act<2,0>  (pacM),
-		       Act<1,2,0>(ptm)
-				 ),
+	 composite::make(	         
+			 Act<1,0>  (pacP),
+			 Act<2,0>  (pacM),
+			 Act<1,2,0>(ptm)
+					 ),
 	 pe);
 
 }
