@@ -6,16 +6,13 @@
 
 #include "TMP_Tools.h"
 
-#include<boost/preprocessor/repetition.hpp>
+#include <boost/mpl/size.hpp>
 
-#include<boost/mpl/size.hpp>
 
-#define VECTOR_MAX_SIZE 20
-
-#define BASE_class1 tmptools::Vector<BOOST_PP_ENUM_PARAMS(VECTOR_MAX_SIZE,V)>
+#define BASE_class1 tmptools::Vector<BOOST_PP_ENUM_PARAMS(TMPTOOLS_MAX_VECTOR_SIZE,V)>
 #define BASE_class2 structure::SubSystemsInteraction<mpl::size<BASE_class1>::value>
 
-template<BOOST_PP_ENUM_BINARY_PARAMS(VECTOR_MAX_SIZE,int V,=TMPTOOLS_VECTOR_DEFAULT_ARG BOOST_PP_INTERCEPT)>
+template<BOOST_PP_ENUM_BINARY_PARAMS(TMPTOOLS_MAX_VECTOR_SIZE,int V,=tmptools::vectorDefaultArgument BOOST_PP_INTERCEPT)>
 class Act
   : public BASE_class1,
     public BASE_class2
@@ -31,20 +28,5 @@ public:
 #undef  BASE_class2
 #undef  BASE_class1
 
-#undef  VECTOR_MAX_SIZE
-
-/*
-#include<boost/preprocessor/iteration/iterate.hpp>
-#include<boost/preprocessor/repetition.hpp>
-#include<boost/preprocessor/arithmetic/sub.hpp>
-
-#define BOOST_PP_ITERATION_LIMITS (2,10)
-#define BOOST_PP_FILENAME_1 "details/ActImplementationSpecializations.h"
-
-#include BOOST_PP_ITERATE()
-
-#undef BOOST_PP_FILENAME_1
-#undef BOOST_PP_ITERATION_LIMITS
-*/
 
 #endif // _ACT_HELPER_INCLUDED
