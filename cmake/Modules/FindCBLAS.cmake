@@ -2,6 +2,7 @@
 # Find the native CBLAS headers and libraries.
 #
 #  CBLAS_LIBRARIES    - List of libraries when using cblas.
+#  CBLAS_INCLUDE_DIRS - List of include directories
 #  CBLAS_FOUND        - True if cblas found.
 #
 # Copyright 2009-2011 The VOTCA Development Team (http://www.votca.org)
@@ -21,18 +22,18 @@
 include(LibFindMacros)
 
 # Include dir
-find_path(CBLAS_INCLUDE_DIR
-  NAMES cblas.h gsl/gsl_cblas.h
-  PATHS $ENV{CBLASDIR}/include
+find_library(CBLAS_LIBRARY
+  NAMES cblas gslcblas
+  PATHS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64
 )
 
-if(${CBLAS_INCLUDE_DIR} MATCHES gsl_cblas.h)
-  set(CBLAS_LIB_CANDIDATE gslcblas)
-else(${CBLAS_INCLUDE_DIR} MATCHES gsl_cblas.h)
-  set(CBLAS_LIB_CANDIDATE cblas)
-endif(${CBLAS_INCLUDE_DIR} MATCHES gsl_cblas.h)
+if(${CBLAS_LIBRARY} MATCHES gslcblas)
+  set(CBLAS_INCLUDE_CANDIDATE gsl/gsl_cblas.h)
+else(${CBLAS_LIBRARY} MATCHES gslcblas)
+  set(CBLAS_INCLUDE_CANDIDATE cblas.h)
+endif(${CBLAS_LIBRARY} MATCHES gslcblas)
 
-find_library(CBLAS_LIBRARY ${CBLAS_LIB_CANDIDATE} HINTS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 )
+find_path(CBLAS_INCLUDE_DIR ${CBLAS_INCLUDE_CANDIDATE} HINTS $ENV{CBLASDIR}/include )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
