@@ -63,9 +63,11 @@ if( flens_FOUND AND FLENS )
   include_directories(${flens_INCLUDE_DIRS})
   set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
   add_definitions(${flens_DEFINITIONS})
+  set(ENABLE_FLENS 1)
 else( flens_FOUND AND FLENS )
   message(STATUS "Flens library not found or disabled, optional flens support disabled.")
   add_definitions( -DDO_NOT_USE_FLENS )
+  set(ENABLE_FLENS 0)
 endif( flens_FOUND AND FLENS )
 
 # Check if serialization can be enabled, inform user
@@ -136,6 +138,7 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
                                  DESCRIPTION "C library for Basic Linear Algebra Subprograms"
                                  TYPE OPTIONAL
                                  PURPOSE "Needed for GSL.")
+  add_feature_info("FLENS" ENABLE_FLENS "compile framework with FLENS support.")
   add_feature_info(Serialization ENABLE_SERIALIZATION "needed for binary statevector output." )
   feature_summary( WHAT ALL )
 endif(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
