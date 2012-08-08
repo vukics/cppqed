@@ -230,8 +230,8 @@ PumpedLossyModeAlternative<A>::PumpedLossyModeAlternative(const mode::ParsPumped
 #undef  TUPLE_eta
 #undef  TUPLE_delta
 
-
-#undef  BASE_initS
+#undef  BASE_initC
+#undef  BASE_initR
 #undef  BASE_init
 
 
