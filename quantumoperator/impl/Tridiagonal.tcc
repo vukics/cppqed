@@ -7,6 +7,9 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 
+#include <boost/preprocessor/iteration/iterate.hpp>
+#include <boost/preprocessor/repetition/enum.hpp>
+
 #include <algorithm>
 
 
@@ -277,9 +280,6 @@ void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
 
 } // quantumoperator
 
-
-#include<boost/preprocessor/iteration/iterate.hpp>
-#include<boost/preprocessor/repetition.hpp>
 
 #define BOOST_PP_ITERATION_LIMITS (1,11)
 #define BOOST_PP_FILENAME_1 "../../quantumoperator/details/TridiagonalApplySpecialization.h"

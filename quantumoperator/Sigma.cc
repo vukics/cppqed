@@ -4,7 +4,7 @@ using quantumdata::Types;
 using blitz::Range;
 
 #include<boost/preprocessor/iteration/iterate.hpp>
-#include<boost/preprocessor/repetition.hpp>
+#include<boost/preprocessor/repetition/enum.hpp>
 #include<boost/preprocessor/arithmetic/sub.hpp>
 
 #define BOOST_PP_ITERATION_LIMITS (2,10)
