@@ -10,4 +10,4 @@ include_directories(${ELEMENTS_SOURCE_DIRS})
 set(ELEMENTS_INCLUDE_DIRS ${ELEMENTS_INCLUDE_DIRS} PARENT_SCOPE)
 
 add_library(el SHARED ${ELEMENTS_SOURCE_FILES})
-target_link_libraries(el utils C++QED)
+target_link_libraries(el C++QED)
