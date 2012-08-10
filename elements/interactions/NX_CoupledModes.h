@@ -4,7 +4,7 @@
 
 #include "NX_CoupledModesFwd.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 #include "Interaction.h"
 

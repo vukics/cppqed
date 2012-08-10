@@ -4,7 +4,7 @@
 
 #include "ModeCorrelationsFwd.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 #include "ElementAveraged.h"
 #include "Interaction.h"

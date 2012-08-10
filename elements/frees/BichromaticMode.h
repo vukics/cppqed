@@ -4,7 +4,7 @@
 
 #include "BichromaticModeFwd.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 #include "impl/TridiagonalHamiltonian.tcc"
 
 #include <boost/assign.hpp>

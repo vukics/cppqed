@@ -1,6 +1,6 @@
 #include "BlitzArraySliceIterator.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 #include "LazyDensityOperatorSliceIterator.h"
 #include "StateVector.h"

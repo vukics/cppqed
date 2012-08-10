@@ -1,7 +1,7 @@
-#include "EvolutionHigh.h"
+#include "Evolution.h"
 #include "MCWFHigh.h"
 
-#include "ModeHigh.h"
+#include "Mode.h"
 
 #include "GeneralDicke.h"
 

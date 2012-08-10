@@ -1,6 +1,6 @@
 #include "Sigma.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 using namespace std;
 using namespace mode;

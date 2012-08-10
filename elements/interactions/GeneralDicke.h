@@ -7,7 +7,7 @@
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 #include "Spin.h"
 
 

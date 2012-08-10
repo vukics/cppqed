@@ -1,61 +1,21 @@
 // -*- C++ -*-
-#ifndef _EVOLUTION_MODE_H
-#define _EVOLUTION_MODE_H
+#ifndef _EVOLUTION_HIGH_H
+#define _EVOLUTION_HIGH_H
 
-#include "EvolutionFwd.h"
+#include "impl/Composite.tcc"
+#include "impl/Evolution.tcc"
+#include "ParsEvolution.h"
+#include "impl/Master.tcc"
+#include "QM_Picture.h"
+#include "impl/StateVector.tcc"
+#include "impl/Tridiagonal.tcc"
 
-#include "StateVectorFwd.h"
-#include "QuantumSystemFwd.h"
+#include "BlitzArrayTraits.h"
+#include "impl/EvolvedGSL.tcc"
+#include "impl/Pars.tcc"
 
-#include "TMP_Tools.h"
+using parameters::ParameterTable    ;
+using parameters::update            ;
+using parameters::ParsNamedException;
 
-#include <boost/shared_ptr.hpp>
-
-#include <iosfwd>
-
-
-std::ostream& operator<<(std::ostream&, EvolutionMode );
-std::istream& operator>>(std::istream&, EvolutionMode&);
-
-
-template<int RANK, typename V>
-void evolve(quantumdata::StateVector<RANK>&, const structure::QuantumSystem<RANK>&,
-	    const ParsEvolution&,
-	    V);
-
-
-
-template<int RANK>
-inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-	    const structure::QuantumSystem<RANK>& sys,
-	    const ParsEvolution& p)
-{
-  evolve(psi,sys,p,tmptools::V_Empty());
-}
-
-
-template<int RANK, typename SYS, typename V>
-inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-	    boost::shared_ptr<const SYS> sys,
-	    const ParsEvolution& p,
-	    V v)
-{
-  evolve(psi,*sys,p,v);
-}
-
-
-template<int RANK, typename SYS>
-inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-	    boost::shared_ptr<const SYS> sys,
-	    const ParsEvolution& p)
-{
-  evolve(psi,*sys,p);
-}
-
-
-// C++11: use default template argument tmptools::V_Empty to fuse the last two functions
-
-#endif // _EVOLUTION_MODE_H
+#endif // _EVOLUTION_HIGH_H

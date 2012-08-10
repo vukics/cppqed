@@ -6,7 +6,7 @@
 
 #include "ParsQbit.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 #include "StateVector.h"
 
 // Qbit traced back to Mode with dim=2
