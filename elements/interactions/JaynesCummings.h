@@ -10,7 +10,7 @@
 #include "TridiagonalHamiltonian.h"
 
 #include "Mode_.h"
-#include "Qbit.h"
+#include "Qbit_.h"
 
 #include "ParsFwd.h"
 

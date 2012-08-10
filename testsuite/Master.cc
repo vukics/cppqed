@@ -1,7 +1,6 @@
 #include "Evolution.h"
 
 #include "Mode.h"
-#include "ParsQbit.h"
 #include "Qbit.h"
 
 #include "JaynesCummings.h"

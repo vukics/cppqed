@@ -4,14 +4,14 @@
 // framework: Structure, MCWF_Trajectory, Master, EnsembleMCWF,
 // etc. If there is an error, it is probably in there and not
 // here. The corresponding driver is PTLA_C++QED. Better
-// implementation based on class composition is found in Qbit.h
+// implementation based on class composition is found in Qbit_.h
 
 #ifndef _PUMPED_TWO_LEVEL_ATOM_H
 #define _PUMPED_TWO_LEVEL_ATOM_H
 
 #include "PumpedTwoLevelAtomFwd.h"
 
-#include "QbitFwd.h"
+#include "Qbit_Fwd.h"
 
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"

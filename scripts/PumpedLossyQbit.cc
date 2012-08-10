@@ -1,7 +1,6 @@
 #include "Evolution.h"
 #include "MCWF.h"
 
-#include "ParsQbit.h"
 #include "Qbit.h"
 
 using namespace qbit;

@@ -1,7 +1,6 @@
 #include "ParsEvolution.h"
 #include "Simulated.h"
 
-#include "ParsQbit.h"
 #include "PumpedTwoLevelAtom.h"
 #include "Qbit.h"
 
