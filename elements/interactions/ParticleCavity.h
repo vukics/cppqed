@@ -10,7 +10,7 @@
 #include "TridiagonalHamiltonian.h"
 
 #include "Mode_.h" // for the UI
-#include "Particle.h"
+#include "Particle_.h"
 
 #include "Exception.h"
 

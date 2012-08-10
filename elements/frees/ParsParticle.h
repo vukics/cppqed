@@ -2,7 +2,7 @@
 #ifndef   _PARS_PARTICLE_H
 #define   _PARS_PARTICLE_H
 
-#include "ParticleFwd.h"
+#include "Particle_Fwd.h"
 
 #include "ModeFunction.h"
 

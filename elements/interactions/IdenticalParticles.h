@@ -4,7 +4,7 @@
 
 #include "IdenticalParticlesFwd.h"
 
-#include "Particle.h"
+#include "Particle_.h"
 
 #include "Interaction.h"
 
