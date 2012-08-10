@@ -9,7 +9,7 @@
 #include "StateVector.h"
 
 #include "impl/Algorithm.tcc"
-#include "BlitzArraySliceIterator.h"
+#include "impl/BlitzArraySliceIterator.tcc"
 #include "impl/BlitzTinyExtensions.tcc"
 #include "Functional.h"
 #include "impl/MultiIndexIterator.tcc"
