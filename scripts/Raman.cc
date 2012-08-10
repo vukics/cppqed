@@ -1,6 +1,6 @@
 #include "Evolution.h"
-#include "MCWFHigh.h"
-#include "MultiLevelHigh.h"
+#include "MCWF.h"
+#include "MultiLevel.h"
 
 #include "StateVector.h"
 

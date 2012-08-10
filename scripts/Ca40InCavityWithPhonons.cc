@@ -1,7 +1,7 @@
 #include "Evolution.h"
-#include "MCWFHigh.h"
+#include "MCWF.h"
 #include "Mode.h"
-#include "MultiLevelHigh.h"
+#include "MultiLevel.h"
 
 #include <boost/fusion/sequence/intrinsic/at.hpp>
 
