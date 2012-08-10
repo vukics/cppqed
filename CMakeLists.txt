@@ -99,6 +99,7 @@ target_link_libraries( C++QED utils ${blitz++_LIBRARY} ${OPTLIBS} )
 
 # build libel.so
 add_subdirectory(elements)
+include_directories(${ELEMENTS_INCLUDE_DIRS})
 
 # build all the scripts
 add_subdirectory(scripts)

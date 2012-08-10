@@ -1,7 +1,5 @@
 aux_source_directory(. SCRIPTS)
 
-include_directories(${ELEMENTS_INCLUDE_DIRS})
-
 IF( NOT flens_FOUND )
   # this cannot be built without FLENS support
   LIST(REMOVE_ITEM SCRIPTS ./GeneralDickeImaginaryEvolution.cc)
