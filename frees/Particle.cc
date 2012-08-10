@@ -10,7 +10,7 @@
 #include "impl/FFT.tcc"
 #include "Hermite.h"
 #include "impl/MultiIndexIterator.tcc"
-#include "VectorFromMatrixSliceIterator.h"
+#include "impl/VectorFromMatrixSliceIterator.tcc"
 
 #include <boost/assign/list_of.hpp>
 #include <boost/assign/list_inserter.hpp>

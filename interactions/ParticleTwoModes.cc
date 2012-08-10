@@ -1,7 +1,7 @@
 #include "ParticleTwoModes.h"
 
 #include "impl/Algorithm.tcc"
-#include "BlitzArraySliceIterator.h"
+#include "impl/BlitzArraySliceIterator.tcc"
 #include "MathExtensions.h"
 #include "impl/MultiIndexIterator.tcc"
 #include "Range.h"
