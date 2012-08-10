@@ -2,7 +2,7 @@
 #ifndef _MODE_ELEMENT_IMPLEMENTATION_H
 #define _MODE_ELEMENT_IMPLEMENTATION_H
 
-#include "Mode.h"
+#include "Mode_.h"
 
 #include<boost/assign/list_of.hpp>
 #include<boost/assign/std/list.hpp>

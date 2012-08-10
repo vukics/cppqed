@@ -3,7 +3,7 @@
 #include "MathExtensions.h"
 #include "ParsParticleCavity.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 #include "impl/TridiagonalHamiltonian.tcc"
 
 #include<boost/assign/list_of.hpp>

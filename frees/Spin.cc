@@ -2,7 +2,7 @@
 
 #include "MathExtensions.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 #include "LazyDensityOperator.h"
 #include "impl/Tridiagonal.tcc"
