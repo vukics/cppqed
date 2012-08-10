@@ -1,7 +1,7 @@
 
 #include "ModeCorrelations.h"
 
-#include "impl/LazyDensityOperatorSliceIterator.tcc"
+#include "impl/LazyDensityOperator.tcc"
 
 #include <boost/assign/list_of.hpp>
 

@@ -6,7 +6,7 @@
 
 #include "Interaction.h"
 
-#include "impl/LazyDensityOperatorSliceIterator.tcc"
+#include "impl/LazyDensityOperator.tcc"
 
 #include "Exception.h"
 
