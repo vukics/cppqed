@@ -2,7 +2,7 @@
 #ifndef   _SIMULATED_IMPL_H
 #define   _SIMULATED_IMPL_H
 
-#include "Simulated.h"
+#include "Simulated_.h"
 
 #include "impl/FormDouble.tcc"
 #include "impl/Trajectory.tcc"

@@ -1,6 +1,6 @@
 #include "DrivenDampedHarmonicOscillator.h"
 
-#include "SimulatedHigh.h"
+#include "Simulated.h"
 
 using namespace std       ;
 using namespace trajectory;

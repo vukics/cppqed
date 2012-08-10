@@ -15,7 +15,7 @@
 
  */
 
-#include "SimulatedHigh.h"
+#include "Simulated.h"
 
 #include "MathExtensions.h"
 
