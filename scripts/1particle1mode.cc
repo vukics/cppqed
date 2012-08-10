@@ -5,7 +5,6 @@
 #include "Particle.h"
 #include "ParticleInitialCondition.h"
 
-#include "ParsParticleCavity.h"
 #include "ParticleCavity.h"
 
 #include "BinarySystem.h"
