@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _EVOLUTION_HIGH_H
-#define _EVOLUTION_HIGH_H
+#ifndef _EVOLUTION_H
+#define _EVOLUTION_H
 
 #include "impl/Composite.tcc"
 #include "impl/Evolution.tcc"
@@ -18,4 +18,4 @@ using parameters::ParameterTable    ;
 using parameters::update            ;
 using parameters::ParsNamedException;
 
-#endif // _EVOLUTION_HIGH_H
+#endif // _EVOLUTION_H

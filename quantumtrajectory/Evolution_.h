@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _EVOLUTION_MODE_H
-#define _EVOLUTION_MODE_H
+#ifndef _EVOLUTION__H
+#define _EVOLUTION__H
 
 #include "Evolution_Fwd.h"
 
@@ -58,4 +58,4 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
 // C++11: use default template argument tmptools::V_Empty to fuse the last two functions
 
-#endif // _EVOLUTION_MODE_H
+#endif // _EVOLUTION__H
