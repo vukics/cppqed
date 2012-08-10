@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _ELEMENT_PARTICLE_FWD_H
-#define   _ELEMENT_PARTICLE_FWD_H
+#ifndef   _PARTICLE_FWD_H
+#define   _PARTICLE_FWD_H
 
 class ParticleBase;
 class PumpedParticleBase;
@@ -21,4 +21,4 @@ class InitialCondition;
 } // particle
 
 
-#endif // _ELEMENT_PARTICLE_FWD_H
+#endif // _PARTICLE_FWD_H
