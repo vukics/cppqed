@@ -4,8 +4,8 @@
 
 #include "MLJCFwd.h"
 
-#include "Mode.h"
-#include "MultiLevel.h"
+#include "Mode_.h"
+#include "MultiLevel_.h"
 
 #include "Interaction.h"
 
@@ -92,7 +92,5 @@ public:
     : Base(dispatchFreeType(ml),dispatchFreeType(m),p.gs) {}
 };
 
-
-#include "impl/MLJC.tcc"
 
 #endif // MULTI_LEVEL_JAYNES_CUMMINGS_INCLUDED

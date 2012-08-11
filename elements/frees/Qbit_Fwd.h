@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENT_QBIT_FWD_INCLUDED
-#define   ELEMENT_QBIT_FWD_INCLUDED
+#ifndef   _QBIT_FWD_H
+#define   _QBIT_FWD_H
 
 class QbitBase;
 
@@ -31,4 +31,4 @@ struct ParsPumpedLossy;
 } // qbit
 
 
-#endif // ELEMENT_QBIT_FWD_INCLUDED
+#endif // _QBIT_FWD_H

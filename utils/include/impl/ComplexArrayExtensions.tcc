@@ -2,8 +2,10 @@
 #ifndef   _COMPLEX_ARRAY_EXTENSIONS_IMPL_H
 #define   _COMPLEX_ARRAY_EXTENSIONS_IMPL_H
 
-#include "BlitzArrayExtensions.h"
-#include "CMatrix.h"
+#include "ComplexArrayExtensions.h"
+
+#include "impl/BlitzArrayExtensions.tcc"
+#include "impl/BlitzTinyExtensions.tcc"
 #include "TMP_Tools.h"
 
 namespace blitzplusplus {

@@ -9,8 +9,8 @@
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.h"
 
-#include "Mode.h" // for the UI
-#include "Particle.h"
+#include "Mode_.h" // for the UI
+#include "Particle_.h"
 
 #include "Exception.h"
 

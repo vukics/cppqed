@@ -1,4 +1,5 @@
-#include "Tridiagonal.h"
+// Tridiagonal.tcc needed because of binOp1
+#include "impl/Tridiagonal.tcc"
 
 
 
@@ -74,6 +75,7 @@ const Tridiagonal<1> identity(size_t dim)
 
 void details::binOp1(size_t otherDifference, size_t& difference)
 // Declared in Tridiagonal.tcc
+// TODO: Why?
 {
   if (!difference) difference=otherDifference;
   else if (otherDifference && difference!=otherDifference) throw TridiagonalStructureMismatchException();

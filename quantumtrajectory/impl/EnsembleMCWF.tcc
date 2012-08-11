@@ -2,6 +2,7 @@
 #ifndef   _ENSEMBLE_OF_MCWF_TRAJECTORIES_IMPL_H
 #define   _ENSEMBLE_OF_MCWF_TRAJECTORIES_IMPL_H
 
+#include "EnsembleMCWF.h"
 
 namespace quantumtrajectory {
 

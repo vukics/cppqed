@@ -9,8 +9,8 @@
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.h"
 
-#include "Mode.h"
-#include "Qbit.h"
+#include "Mode_.h"
+#include "Qbit_.h"
 
 #include "ParsFwd.h"
 

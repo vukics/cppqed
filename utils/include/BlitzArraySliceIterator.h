@@ -18,16 +18,8 @@
 
 #include <list>
 
-#define TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST) typename tmptools::ConditionalAddConst<TTD_CARRAY(RANK),(CONST)>::type
-
-#define MPL_SIZE(V) (boost::mpl::size<V>::value)
-
-#define TTD_RES_CARRAY(V) TTD_CARRAY(MPL_SIZE(V))
-
-#define TTD_CONDITIONAL_CONST_RES_CARRAY(V,CONST) typename tmptools::ConditionalAddConst<TTD_RES_CARRAY(V),(CONST)>::type
-
-#define TTD_VEC_IDXTINY(RANK,V) TTD_IDXTINY(RANK-MPL_SIZE(V))
-// note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
+#define DEFINE_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
+#include "details/BlitzArraySliceIteratorMacros.h"
 
 
 namespace blitzplusplus {
@@ -137,8 +129,6 @@ class IteratorBaseSpecial;
 template<int, typename, bool>
 class IteratorBase;
 
-
-#define TTD_FORWARD_ITERATOR_HELPER boost::forward_iterator_helper<Iterator<RANK,V,CONST>,TTD_CONDITIONAL_CONST_RES_CARRAY(V,CONST)>
 
 #define BASE_class boost::mpl::if_c<RANK==MPL_SIZE(V),\
 				    IteratorBaseSpecial<V,CONST>,\
@@ -400,15 +390,8 @@ fullRange(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 } // blitzplusplus
 
 
-#include "impl/BlitzArraySliceIterator.tcc"
-
-#undef TTD_FORWARD_ITERATOR_HELPER
-
-#undef TTD_VEC_IDXTINY
-#undef TTD_CONDITIONAL_CONST_RES_CARRAY
-#undef TTD_RES_CARRAY
-#undef MPL_SIZE
-#undef TTD_CONDITIONAL_CONST_CARRAY
+#define UNDEF_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
+#include "details/BlitzArraySliceIteratorMacros.h"
 
 #endif // _BLITZ_ARRAY_SMART_ITERATOR_H
 

@@ -2,6 +2,9 @@
 #ifndef   EVOLVED_GSL_IMPL_INCLUDED
 #define   EVOLVED_GSL_IMPL_INCLUDED
 
+#include "EvolvedGSL.h"
+
+#include "impl/Evolved.tcc"
 
 namespace evolved {
 

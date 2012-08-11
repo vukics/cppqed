@@ -2,6 +2,8 @@
 #ifndef   _TRAJECTORY_IMPL_H
 #define   _TRAJECTORY_IMPL_H
 
+#include "Trajectory.h"
+
 #include "ParsTrajectory.h"
 
 

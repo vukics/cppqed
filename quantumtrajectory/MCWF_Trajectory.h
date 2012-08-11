@@ -151,7 +151,4 @@ private:
 } // quantumtrajectory
 
 
-#include "impl/MCWF_Trajectory.tcc"
-
-
 #endif // _MCWF_TRAJECTORY_H

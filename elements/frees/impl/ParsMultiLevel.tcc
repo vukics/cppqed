@@ -2,7 +2,7 @@
 #ifndef   PARS_MULTI_LEVEL_IMPL_INCLUDED
 #define   PARS_MULTI_LEVEL_IMPL_INCLUDED
 
-#include "Pars.h"
+#include "impl/Pars.tcc"
 
 #include <boost/fusion/sequence/io.hpp>
 #include <boost/fusion/include/io.hpp>

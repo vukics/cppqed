@@ -2,9 +2,11 @@
 #ifndef   _BLITZ_TO_FLENS_IMPL_H
 #define   _BLITZ_TO_FLENS_IMPL_H
 
+#include "Blitz2FLENS.h"
+
 #include "TMP_Tools.h"
 
-#include "BlitzTinyExtensions.h"
+#include "impl/BlitzTinyExtensions.tcc"
 #include "ComplexArrayExtensions.h"
 
 

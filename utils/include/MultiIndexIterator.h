@@ -72,7 +72,5 @@ private:
 } // cpputils
 
 
-#include "impl/MultiIndexIterator.tcc"
-
 
 #endif // _MULTI_INDEX_ITERATOR_H

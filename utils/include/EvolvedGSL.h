@@ -111,7 +111,4 @@ private:
 } // evolved
 
 
-#include "impl/EvolvedGSL.tcc"
-
-
 #endif // _EVOLVED_GSL_H

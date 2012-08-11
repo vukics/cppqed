@@ -1,5 +1,5 @@
 #include "LazyDensityOperatorSliceIterator.h"
-#include "Mode.h"
+#include "Mode_.h"
 
 static const int R=2;
 

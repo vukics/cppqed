@@ -2,9 +2,11 @@
 #ifndef   _COMPOSITE_SYSTEM_IMPL_INCLUDED
 #define   _COMPOSITE_SYSTEM_IMPL_INCLUDED
 
+#include "Composite.h"
+
 #include "Interaction.h"
 
-#include "LazyDensityOperatorSliceIterator.h"
+#include "impl/LazyDensityOperator.tcc"
 
 #include "Exception.h"
 

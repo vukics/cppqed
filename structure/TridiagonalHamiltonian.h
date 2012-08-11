@@ -101,6 +101,5 @@ public:
 
 } // structure
 
-#include "impl/TridiagonalHamiltonian.tcc"
 
 #endif // _TRIDIAGONAL_HAMILTONIAN_H

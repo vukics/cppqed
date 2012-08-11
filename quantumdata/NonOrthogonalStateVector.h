@@ -150,6 +150,4 @@ operator*(const StateVector<RANK1>& sv1, const NonOrthogonalStateVector<RANK2,TR
 
 } // quantumdata
 
-#include "impl/NonOrthogonalStateVector.tcc"
-
 #endif // _NON_ORTHOGONAL_STATE_VECTOR_H

@@ -1,4 +1,4 @@
-#include "SimulatedHigh.h"
+#include "Simulated.h"
 
 #include "ParticleTwoModes.h"
 

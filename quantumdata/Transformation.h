@@ -116,7 +116,5 @@ struct Traits<boost::function<void(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&)> 
 
 } // quantumdata
 
-#include "impl/Transformation.tcc"
-
 #endif // _DUAL_TRANSFORMATION_H
 

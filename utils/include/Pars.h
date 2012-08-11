@@ -162,6 +162,5 @@ private:
 
 } // parameters
 
-#include "impl/Pars.tcc"
 
 #endif // _PARS_H

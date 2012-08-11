@@ -89,8 +89,6 @@ bool operator==(const DiagonalIterator<RANK,V>& i1, const DiagonalIterator<RANK,
 } // quantumdata
 
 
-#include "impl/LazyDensityOperatorSliceIterator.tcc"
-
 #undef TTD_LAZY_DENSITY_OPERATOR_RES
 
 #endif // _LAZY_DENSITY_OPERATOR_SMART_ITERATOR_H

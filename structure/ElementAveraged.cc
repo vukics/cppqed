@@ -2,7 +2,7 @@
 
 #include "LazyDensityOperator.h"
 
-#include "FormDouble.h"
+#include "impl/FormDouble.tcc"
 #include "Range.h"
 
 #include <boost/lambda/lambda.hpp>

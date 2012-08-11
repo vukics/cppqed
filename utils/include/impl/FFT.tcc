@@ -2,19 +2,13 @@
 #ifndef   _FAST_FOURIER_TRANSFORM_IMPL_H
 #define   _FAST_FOURIER_TRANSFORM_IMPL_H
 
+#include "FFT.h"
+
 #include "ArrayTraitsFwd.h"
 
 #include<cstddef>
 
 namespace fft {
-
-
-namespace details {
-
-void transform(double*, size_t, size_t, Direction) throw(FFT_Exception);
-
-} // details
-
 
 template<typename A>
 void transform(A& a, Direction dir) throw(FFT_Exception)

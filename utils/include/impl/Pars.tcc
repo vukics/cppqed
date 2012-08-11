@@ -2,6 +2,8 @@
 #ifndef   _PARS_IMPL_H
 #define   _PARS_IMPL_H
 
+#include "Pars.h"
+
 #include<iostream>
 #include<iomanip>
 #include<typeinfo>

@@ -2,6 +2,8 @@
 #ifndef   _BLITZ_ARRAY_EXTENSIONS_IMPL_H
 #define   _BLITZ_ARRAY_EXTENSIONS_IMPL_H
 
+#include "BlitzArrayExtensions.h"
+
 #include "TMP_Tools.h"
 #include "Conversions.h"
 

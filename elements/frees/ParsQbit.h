@@ -2,7 +2,7 @@
 #ifndef   PARS_QBIT_INCLUDED
 #define   PARS_QBIT_INCLUDED
 
-#include "QbitFwd.h"
+#include "Qbit_Fwd.h"
 
 #include "ParsFwd.h"
 

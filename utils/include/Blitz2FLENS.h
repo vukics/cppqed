@@ -60,6 +60,4 @@ const typename HeMatrixMF<SO>::type hermitianMatrix(const TTD_CARRAY(TWO_TIMES_R
 
 } // blitz2flens
 
-#include "impl/Blitz2FLENS.tcc"
-
 #endif // _BLITZ_TO_FLENS_H

@@ -3,6 +3,7 @@
 #define   _COMPLEX_ARRAY_EXTENSIONS_H
 
 #include "BlitzArray.h"
+#include "CMatrix.h"
 #include "MathExtensions.h"
 
 #include<boost/mpl/bool.hpp>
@@ -36,6 +37,5 @@ doDirect(const TTD_CARRAY(RANK1)&, const TTD_CARRAY(RANK2)&, boost::mpl::bool_<M
 
 } // blitzplusplus
 
-#include "impl/ComplexArrayExtensions.tcc"
 
 #endif // _COMPLEX_ARRAY_EXTENSIONS_H

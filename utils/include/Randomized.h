@@ -8,6 +8,7 @@
 #include "Exception.h"
 #include "Range.h"
 
+#include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 #ifdef USE_BOOST_SERIALIZATION

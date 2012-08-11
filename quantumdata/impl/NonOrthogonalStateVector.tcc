@@ -2,6 +2,8 @@
 #ifndef _NO_STATE_VECTOR_IMPL_H
 #define _NO_STATE_VECTOR_IMPL_H
 
+#include "NonOrthogonalStateVector.h"
+
 #include "ComplexArrayExtensions.h"
 
 namespace quantumdata {

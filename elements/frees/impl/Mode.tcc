@@ -2,6 +2,8 @@
 #ifndef _MODE_ELEMENT_IMPLEMENTATION_H
 #define _MODE_ELEMENT_IMPLEMENTATION_H
 
+#include "Mode_.h"
+
 #include<boost/assign/list_of.hpp>
 #include<boost/assign/std/list.hpp>
 
@@ -228,8 +230,8 @@ PumpedLossyModeAlternative<A>::PumpedLossyModeAlternative(const mode::ParsPumped
 #undef  TUPLE_eta
 #undef  TUPLE_delta
 
-
-#undef  BASE_initS
+#undef  BASE_initC
+#undef  BASE_initR
 #undef  BASE_init
 
 

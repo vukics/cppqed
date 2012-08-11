@@ -36,9 +36,6 @@ double negPT(const DensityOperator<RANK>&, tmptools::V_Empty)
 } // quantumdata 
 
 
-#include "impl/NegPT.tcc"
-
-
 #else  // DO_NOT_USE_FLENS
 
 namespace quantumdata {

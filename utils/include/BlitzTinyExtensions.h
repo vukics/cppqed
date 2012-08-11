@@ -31,7 +31,4 @@ halfCutTiny(const blitz::TinyVector<T,TWO_TIMES_RANK>&);
 } // blitzplusplus
 
 
-#include "impl/BlitzTinyExtensions.tcc"
-
-
 #endif // _BLITZ_TINY_EXTENSIONS_H

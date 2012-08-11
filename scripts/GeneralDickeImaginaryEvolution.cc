@@ -1,5 +1,7 @@
-#include "EvolutionHigh.h"
-#include "ProjectingMCWF_Trajectory.h"
+#include "Evolution.h"
+#include "MCWF.h"
+
+#include "Mode.h"
 
 #include "GeneralDicke.h"
 
@@ -8,6 +10,8 @@
 #include "MatrixOfHamiltonian.h"
 
 #include "MathExtensions.h"
+
+#include "impl/ProjectingMCWF_Trajectory.tcc"
 
 #include<flens/flens.h>
 

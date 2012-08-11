@@ -2,6 +2,8 @@
 #ifndef   _BLITZ_TINY_OF_ARRAYS_IMPL_H
 #define   _BLITZ_TINY_OF_ARRAYS_IMPL_H
 
+#include "BlitzTinyOfArrays.h"
+
 #include "Range.h"
 
 #include<boost/lambda/lambda.hpp>

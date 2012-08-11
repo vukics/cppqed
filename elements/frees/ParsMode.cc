@@ -1,6 +1,6 @@
 #include "ParsMode.h"
 
-#include "Pars.h"
+#include "impl/Pars.tcc"
 
 
 namespace mode {

@@ -2,7 +2,7 @@
 #include "ParsStochasticTrajectory.h"
 
 #include "FormDouble.h"
-#include "Pars.h"
+#include "impl/Pars.tcc"
 
 namespace trajectory {
 

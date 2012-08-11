@@ -2,6 +2,8 @@
 #ifndef   _CPPUTILS_ALGORITHM_IMPL_H
 #define   _CPPUTILS_ALGORITHM_IMPL_H
 
+#include "Algorithm.h"
+
 #include<boost/bind.hpp>
 
 #include<functional>

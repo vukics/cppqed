@@ -197,6 +197,5 @@ public:
 
 } // trajectory
 
-#include "impl/StochasticTrajectory.tcc"
 
 #endif // _STOCHASTIC_TRAJECTORY_H

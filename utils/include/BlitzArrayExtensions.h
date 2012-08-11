@@ -34,7 +34,5 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>&);
 
 } // blitzplusplus
 
-#include "impl/BlitzArrayExtensions.tcc"
-
 
 #endif // _BLITZ_ARRAY_EXTENSIONS_H

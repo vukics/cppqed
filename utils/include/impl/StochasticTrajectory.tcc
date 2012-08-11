@@ -2,6 +2,8 @@
 #ifndef   _STOCHASTIC_TRAJECTORY_IMPL_H
 #define   _STOCHASTIC_TRAJECTORY_IMPL_H
 
+#include "StochasticTrajectory.h"
+
 #include "Algorithm.h"
 #include "Functional.h"
 

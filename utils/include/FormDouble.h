@@ -128,8 +128,4 @@ private:
 } // parameters
 
 
-
-#include "impl/FormDouble.tcc"
-
-
 #endif // _FORM_DOUBLE_H
