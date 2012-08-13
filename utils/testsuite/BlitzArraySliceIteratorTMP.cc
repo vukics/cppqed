@@ -1,4 +1,4 @@
-#include "VectorFromMatrixSliceIterator.h"
+#include "impl/VectorFromMatrixSliceIterator.tcc"
 
 using namespace blitzplusplus;
 

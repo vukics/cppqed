@@ -1,12 +1,9 @@
-#include "ComplexArrayExtensions.h"
-#include "VectorFromMatrixSliceIterator.h"
+#include "impl/ComplexArrayExtensions.tcc"
+#include "impl/VectorFromMatrixSliceIterator.tcc"
 
 #include "Algorithm.h"
-#include "BlitzTiny.h"
 #include "MathExtensions.h"
 #include "Randomized.h"
-#include "Range.h"
-
 #include "Range.h"
 
 #include<boost/bind.hpp>

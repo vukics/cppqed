@@ -12,7 +12,6 @@
 #include "impl/BlitzArraySliceIterator.tcc"
 #include "impl/BlitzTinyExtensions.tcc"
 #include "Functional.h"
-#include "impl/MultiIndexIterator.tcc"
 
 
 namespace quantumdata {

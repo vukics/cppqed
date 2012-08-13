@@ -9,7 +9,6 @@
 #include "BlitzArrayTraits.h"
 #include "impl/FFT.tcc"
 #include "Hermite.h"
-#include "impl/MultiIndexIterator.tcc"
 #include "impl/VectorFromMatrixSliceIterator.tcc"
 
 #include <boost/assign/list_of.hpp>

@@ -4,6 +4,7 @@
 
 #include "BlitzArraySliceIterator.h"
 
+#include "impl/MultiIndexIterator.tcc"
 #include "Range.h"
 
 #include <boost/bind.hpp>

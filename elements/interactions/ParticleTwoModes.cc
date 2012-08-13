@@ -3,7 +3,6 @@
 #include "impl/Algorithm.tcc"
 #include "impl/BlitzArraySliceIterator.tcc"
 #include "MathExtensions.h"
-#include "impl/MultiIndexIterator.tcc"
 #include "Range.h"
 #include "impl/Tridiagonal.tcc"
 

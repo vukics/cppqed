@@ -6,7 +6,7 @@
 
 #include "impl/BlitzArrayExtensions.tcc"
 #include "impl/BlitzTinyExtensions.tcc"
-#include "TMP_Tools.h"
+
 
 namespace blitzplusplus {
 

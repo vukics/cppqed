@@ -1,5 +1,5 @@
 // Tridiagonal.tcc needed because of binOp1
-#include "impl/Tridiagonal.tcc"
+#include "Tridiagonal.h"
 
 
 
@@ -72,16 +72,15 @@ const Tridiagonal<1> identity(size_t dim)
 
 
 
+namespace details {
 
-void details::binOp1(size_t otherDifference, size_t& difference)
-// Declared in Tridiagonal.tcc
-// TODO: Why?
+void binOp1(size_t otherDifference, size_t& difference)
 {
   if (!difference) difference=otherDifference;
   else if (otherDifference && difference!=otherDifference) throw TridiagonalStructureMismatchException();
 }
 
-
+} // details
 
 } // quantumoperator
 
