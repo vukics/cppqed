@@ -115,6 +115,7 @@ foreach(d ${CORE_SOURCE_DIRS})
 endforeach(d)
 add_library(C++QED SHARED ${CORE_SOURCE_FILES})
 target_link_libraries( C++QED utils ${blitz++_LIBRARY} ${OPTLIBS} )
+set_target_properties( C++QED PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib )
 
 # build libel.so
 add_subdirectory(elements)
@@ -126,6 +127,10 @@ add_subdirectory(scripts)
 add_custom_target(fewer_scripts)
 add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix)
 
+# install targets
+
+install(TARGETS C++QED
+	LIBRARY DESTINATION lib)
 
 ##################################################
 # Summary of enabled/disabled features
