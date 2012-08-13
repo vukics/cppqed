@@ -15,6 +15,25 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
 
 ##################################################
+# Compiler detection
+##################################################
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+  execute_process (
+    COMMAND ${CMAKE_CXX_COMPILER} --version
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    RESULT_VARIABLE CMAKE_CXX_COMPILER_RESULT
+    OUTPUT_VARIABLE CMAKE_CXX_COMPILER_OUTPUT
+    ERROR_VARIABLE CMAKE_CXX_COMPILER_ERROR
+  )
+  if (CMAKE_CXX_COMPILER_RESULT EQUAL 0)
+    string (REPLACE "\n" " " CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_OUTPUT})
+    set (CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION} CACHE INTERNAL "C++ compiler version")
+  endif (CMAKE_CXX_COMPILER_RESULT EQUAL 0)
+endif (CMAKE_COMPILER_IS_GNUCXX)
+
+
+##################################################
 # Library detection
 ##################################################
 
