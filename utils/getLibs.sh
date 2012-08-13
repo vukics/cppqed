@@ -1,4 +1,7 @@
-if [ $1 == "local" ]; then
+# exit on first error
+set -e
+
+if [ "$1" == "local" ]; then
   echo "Installing locally"
 else
   echo "Installing globally"
@@ -6,29 +9,29 @@ fi
 
 
 SCRIPTDIR=`pwd`
+LOCALLIBDIR=$SCRIPTDIR/local
 
 hg clone http://blitz.hg.sourceforge.net:8000/hgroot/blitz/blitz
 cd blitz
 autoreconf -vif
-if [ $1 == "local" ]; then
+if [ "$1" == "local" ]; then
   echo "Installing Blitz++ locally"
-  ./configure --with-pic --prefix=$PWD
+  ./configure --with-pic --enable-serialization --prefix=$LOCALLIBDIR
   make lib
   make install
 else
   echo "Installing Blitz++ globally"
-  ./configure --with-pic
+  ./configure --with-pic --enable-serialization
   make lib
   sudo make install
 fi
 cd $SCRIPTDIR
 
-cvs -d:pserver:anonymous@flens.cvs.sourceforge.net:/cvsroot/flens login
-cvs -z3 -d:pserver:anonymous@flens.cvs.sourceforge.net:/cvsroot/flens co -P FLENS-lite
+cvs -z3 -d:pserver:anonymous:@flens.cvs.sourceforge.net:/cvsroot/flens co -P FLENS-lite
 cd FLENS-lite
-if [ $1 == "local" ]; then
+if [ "$1" == "local" ]; then
   echo "Installing FLENS locally"
-  echo "PREFIX="$PWD >> config
+  echo "PREFIX="$LOCALLIBDIR >> config
   cat config.ubuntu >> config
 else
   echo "Installing FLENS globally"
@@ -41,7 +44,7 @@ sed -i '
 s|$(PWD)|'$PWD'|g
 s|SUBDIRS = $(LIBDIRS) $(EXECDIRS)|SUBDIRS = $(LIBDIRS)|g' Makefile.common
 make
-if [ $1 == "local" ]; then
+if [ "$1" == "local" ]; then
   make install
 else
   sudo make install
@@ -49,12 +52,17 @@ fi
 cd $SCRIPTDIR
 
 
+echo -e "\n\nInstallation of blitz++ and FLENS successfull.\n\n"
 
+if [ "$1" == "local" ]; then
+  echo -e "****************************************************************************************************"
+  echo -e "Use the following commands to configure the build system (build type can be 'debug' or 'release'):\n"
+  echo -e "mkdir -p build; cd build; cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_PREFIX_PATH=$LOCALLIBDIR .."
+  echo -e "****************************************************************************************************\n"
 
-if [ $1 == "local" ]; then
-  cp Jamroot Jamroot.global
-  sed -i '
-s|usage-requirements|usage-requirements <include>blitz/include <include>FLENS-lite/include|g
-s|lib flenslib : : <name>flens|lib flenslib : : <file>'$SCRIPTDIR'/FLENS-lite/lib/libflens.so|g
-s|lib blitzlib : : <name>blitz|lib blitzlib : : <file>'$SCRIPTDIR'/blitz/lib/libblitz.a|g' Jamroot
+  echo -e "****************************************************************************************************"
+  echo -e "For Boost.Build, add the following lines to ~/user-config.jam\n"
+  echo -e "local PREFIX = $LOCALLIBDIR ;"
+  echo -e 'project genconfig : requirements <include>$(PREFIX)/include <library-path>$(PREFIX)/lib ;'
+  echo -e "****************************************************************************************************\n"
 fi
