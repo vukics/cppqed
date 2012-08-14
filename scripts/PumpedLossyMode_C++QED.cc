@@ -1,6 +1,5 @@
 #include "Evolution.h"
 #include "Mode.h"
-#include "MCWF.h"
 
 #include "BichromaticMode.h"
 #include "impl/ElementAveraged.tcc"

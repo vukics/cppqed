@@ -1,5 +1,4 @@
 #include "Evolution.h"
-#include "MCWF.h"
 
 #include "Particle.h"
 #include "ParticleInitialCondition.h"

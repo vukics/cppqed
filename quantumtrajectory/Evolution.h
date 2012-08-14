@@ -3,9 +3,11 @@
 #define _EVOLUTION_H
 
 #include "impl/Composite.tcc"
+#include "impl/EnsembleMCWF.tcc"
 #include "impl/Evolution.tcc"
 #include "ParsEvolution.h"
 #include "impl/Master.tcc"
+#include "impl/MCWF_Trajectory.tcc"
 #include "QM_Picture.h"
 #include "impl/StateVector.tcc"
 #include "impl/Tridiagonal.tcc"
