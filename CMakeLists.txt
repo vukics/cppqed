@@ -15,6 +15,25 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
 
 ##################################################
+# Compiler detection
+##################################################
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+  execute_process (
+    COMMAND ${CMAKE_CXX_COMPILER} --version
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    RESULT_VARIABLE CMAKE_CXX_COMPILER_RESULT
+    OUTPUT_VARIABLE CMAKE_CXX_COMPILER_OUTPUT
+    ERROR_VARIABLE CMAKE_CXX_COMPILER_ERROR
+  )
+  if (CMAKE_CXX_COMPILER_RESULT EQUAL 0)
+    string (REPLACE "\n" " " CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_OUTPUT})
+    set (CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION} CACHE INTERNAL "C++ compiler version")
+  endif (CMAKE_CXX_COMPILER_RESULT EQUAL 0)
+endif (CMAKE_COMPILER_IS_GNUCXX)
+
+
+##################################################
 # Library detection
 ##################################################
 
@@ -96,6 +115,7 @@ foreach(d ${CORE_SOURCE_DIRS})
 endforeach(d)
 add_library(C++QED SHARED ${CORE_SOURCE_FILES})
 target_link_libraries( C++QED utils ${blitz++_LIBRARY} ${OPTLIBS} )
+set_target_properties( C++QED PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib )
 
 # build libel.so
 add_subdirectory(elements)
@@ -107,6 +127,10 @@ add_subdirectory(scripts)
 add_custom_target(fewer_scripts)
 add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix)
 
+# install targets
+
+install(TARGETS C++QED
+	LIBRARY DESTINATION lib)
 
 ##################################################
 # Summary of enabled/disabled features
