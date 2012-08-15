@@ -2,9 +2,6 @@
 
 #include "ParticleTwoModes.h"
 
-#include "ParticleInitialCondition.h"
-
-
 using namespace std       ;
 using namespace cpputils  ;
 using namespace trajectory;

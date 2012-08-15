@@ -2,7 +2,6 @@
 
 #include "ParsMode.h"
 #include "Particle.h"
-#include "ParticleInitialCondition.h"
 
 #include "ElementLiouvillean.h"
 

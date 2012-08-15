@@ -1,8 +1,4 @@
 #include "Evolution.h"
-#include "Mode.h"
-
-#include "Particle.h"
-#include "ParticleInitialCondition.h"
 
 #include "ParticleCavity.h"
 

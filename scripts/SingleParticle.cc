@@ -1,7 +1,6 @@
 #include "Evolution.h"
 
 #include "Particle.h"
-#include "ParticleInitialCondition.h"
 
 using namespace std;
 using namespace particle;

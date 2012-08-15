@@ -1,4 +1,4 @@
-#include "ParticleTwoModes.h"
+#include "ParticleTwoModes_.h"
 
 #include "impl/Algorithm.tcc"
 #include "impl/BlitzArraySliceIterator.tcc"
