@@ -4,6 +4,8 @@
 
 #include "EnsembleMCWF.h"
 
+#include "ParsMCWF_Trajectory.h"
+
 namespace quantumtrajectory {
 
 
