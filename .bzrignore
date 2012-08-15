@@ -1,6 +1,11 @@
 bin
 *.png
 _build
+build
+blitz
+FLENS-lite
+local
+Jamroot.global
 testsuitePhysics/data
 utils/test/co.d
 utils/test/g1.d

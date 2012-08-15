@@ -16,3 +16,7 @@ set(UTILS_LIBS ${UTILS_OPTLIBS} ${GSL_LIBRARIES} ${blitz++_LIBRARIES})
 
 add_library(utils SHARED ${UTILS_SOURCE_FILES})
 target_link_libraries(utils ${UTILS_LIBS})
+set_target_properties( utils PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib )
+
+install(TARGETS utils
+	LIBRARY DESTINATION lib)
