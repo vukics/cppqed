@@ -1,8 +1,10 @@
-#include "JaynesCummings.h"
+#include "JaynesCummings_.h"
 
-#include "Pars.h"
+#include "impl/Tridiagonal.tcc"
 
-#include<boost/assign/list_of.hpp>
+#include "impl/Pars.tcc"
+
+#include <boost/assign/list_of.hpp>
 
 using namespace boost::assign;
 

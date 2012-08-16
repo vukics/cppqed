@@ -1,11 +1,13 @@
 // -*- C++ -*-
-#ifndef   BICHROMATIC_MODE_ELEMENT_INCLUDED
-#define   BICHROMATIC_MODE_ELEMENT_INCLUDED
+#ifndef   ELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED
+#define   ELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED
 
 #include "BichromaticModeFwd.h"
 
-#include "Mode.h"
+#include "Mode_.h"
+#include "impl/TridiagonalHamiltonian.tcc"
 
+#include <boost/assign.hpp>
 
 namespace mode {
 
@@ -67,4 +69,4 @@ template class BichromaticMode<true>;
 template class BichromaticMode<false>;
 
 
-#endif // BICHROMATIC_MODE_ELEMENT_INCLUDED
+#endif // ELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED

@@ -1,10 +1,10 @@
 // -*- C++ -*-
-#ifndef   NX_COUPLED_MODES_INCLUDED
-#define   NX_COUPLED_MODES_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_NX_COUPLEDMODES_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_NX_COUPLEDMODES_H_INCLUDED
 
 #include "NX_CoupledModesFwd.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 #include "Interaction.h"
 
@@ -28,4 +28,4 @@ public:
 
 #include "details/BinaryInteractionGenerator.h"
 
-#endif // NX_COUPLED_MODES_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_NX_COUPLEDMODES_H_INCLUDED

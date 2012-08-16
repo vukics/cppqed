@@ -1,10 +1,10 @@
 // -*- C++ -*-
-#ifndef   MODE_CORRELATIONS_INCLUDED
-#define   MODE_CORRELATIONS_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_MODECORRELATIONS_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_MODECORRELATIONS_H_INCLUDED
 
 #include "ModeCorrelationsFwd.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 #include "ElementAveraged.h"
 #include "Interaction.h"
@@ -28,4 +28,4 @@ private:
 
 
 
-#endif // MODE_CORRELATIONS_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_MODECORRELATIONS_H_INCLUDED

@@ -1,5 +1,7 @@
 #include "GeneralDicke.h"
 
+#include "impl/Tridiagonal.tcc"
+
 #include<boost/assign/list_of.hpp>
 
 

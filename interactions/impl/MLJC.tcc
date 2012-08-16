@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
-#define   MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_IMPL_MLJC_TCC_INCLUDED
+#define   ELEMENTS_INTERACTIONS_IMPL_MLJC_TCC_INCLUDED
+
+#include "MLJC.h"
 
 #include "Sigma.h"
 
@@ -125,4 +127,4 @@ void Base<NL,VC>::addContribution(double t, const StateVectorLow& psi, StateVect
 
 } // mljc
 
-#endif // MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_IMPL_MLJC_TCC_INCLUDED

@@ -1,8 +1,8 @@
 // -*- C++ -*-
-#ifndef   PARS_MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
-#define   PARS_MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_IMPL_PARSMLJC_TCC_INCLUDED
+#define   ELEMENTS_INTERACTIONS_IMPL_PARSMLJC_TCC_INCLUDED
 
-#include "Pars.h"
+#include "impl/Pars.tcc"
 
 #include <boost/fusion/sequence/io.hpp>
 #include <boost/fusion/include/io.hpp>
@@ -21,4 +21,4 @@ Pars<VC>::Pars(parameters::ParameterTable& p, const std::string& mod)
 } // mljc
 
 
-#endif // PARS_MULTI_LEVEL_JAYNES_CUMMINGS_IMPL_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_IMPL_PARSMLJC_TCC_INCLUDED
