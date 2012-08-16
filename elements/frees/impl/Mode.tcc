@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _MODE_ELEMENT_IMPLEMENTATION_H
-#define _MODE_ELEMENT_IMPLEMENTATION_H
+#ifndef ELEMENTS_FREES_IMPL_MODE_TCC_INCLUDED
+#define ELEMENTS_FREES_IMPL_MODE_TCC_INCLUDED
 
 #include "Mode_.h"
 
@@ -235,4 +235,4 @@ PumpedLossyModeAlternative<A>::PumpedLossyModeAlternative(const mode::ParsPumped
 #undef  BASE_init
 
 
-#endif // _MODE_ELEMENT_IMPLEMENTATION_H
+#endif // ELEMENTS_FREES_IMPL_MODE_TCC_INCLUDED

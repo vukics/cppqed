@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _TRIDIAGONAL_H
-#define _TRIDIAGONAL_H
+#ifndef QUANTUMOPERATOR_TRIDIAGONAL_H_INCLUDED
+#define QUANTUMOPERATOR_TRIDIAGONAL_H_INCLUDED
 
 #include "TridiagonalFwd.h"
 
@@ -234,4 +234,4 @@ directDiagonals(const typename Tridiagonal<RANK1>::Diagonals&, const typename Tr
 } // quantumoperator
 
 
-#endif // _TRIDIAGONAL_H
+#endif // QUANTUMOPERATOR_TRIDIAGONAL_H_INCLUDED

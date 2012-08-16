@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _COMPLEX_EXTENSIONS_H
-#define _COMPLEX_EXTENSIONS_H
+#ifndef UTILS_INCLUDE_COMPLEXEXTENSIONS_H_INCLUDED
+#define UTILS_INCLUDE_COMPLEXEXTENSIONS_H_INCLUDED
 
 #include<complex>
 
@@ -18,4 +18,4 @@ inline bool hasImagPart(const dcomp& c) {return bool(imag(c));}
 inline bool  absCompare(const dcomp& c1, const dcomp& c2) {return  abs(c1)< abs(c2);}
 inline bool realCompare(const dcomp& c1, const dcomp& c2) {return real(c1)<real(c2);}
 
-#endif // _COMPLEX_EXTENSIONS_H
+#endif // UTILS_INCLUDE_COMPLEXEXTENSIONS_H_INCLUDED

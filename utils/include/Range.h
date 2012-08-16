@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _RANGE_UTILS_INCLUDED
-#define   _RANGE_UTILS_INCLUDED
+#ifndef   UTILS_INCLUDE_RANGE_H_INCLUDED
+#define   UTILS_INCLUDE_RANGE_H_INCLUDED
 
 #include "impl/Algorithm.tcc"
 
@@ -30,4 +30,4 @@ for_each(      Range& r, In2 i2, Function f)
 
 
 
-#endif // _RANGE_UTILS_INCLUDED
+#endif // UTILS_INCLUDE_RANGE_H_INCLUDED

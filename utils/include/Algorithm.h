@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _CPPUTILS_ALGORITHM_H
-#define   _CPPUTILS_ALGORITHM_H
+#ifndef   UTILS_INCLUDE_ALGORITHM_H_INCLUDED
+#define   UTILS_INCLUDE_ALGORITHM_H_INCLUDED
 
 namespace cpputils {
 
@@ -40,4 +40,4 @@ concatenate(const SeqOfSeqs&, Out&);
 } // cpputils
 
 
-#endif // _CPPUTILS_ALGORITHM_H
+#endif // UTILS_INCLUDE_ALGORITHM_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _FAST_FOURIER_TRANSFORM_FWD_H
-#define   _FAST_FOURIER_TRANSFORM_FWD_H
+#ifndef   UTILS_INCLUDE_FFTFWD_H_INCLUDED
+#define   UTILS_INCLUDE_FFTFWD_H_INCLUDED
 
 namespace fft {
 
@@ -10,4 +10,4 @@ struct FFT_Exception;
 
 } // fft
 
-#endif // _FAST_FOURIER_TRANSFORM_FWD_H
+#endif // UTILS_INCLUDE_FFTFWD_H_INCLUDED

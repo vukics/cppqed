@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _EVOLVED_GSL_H
-#define _EVOLVED_GSL_H
+#ifndef UTILS_INCLUDE_EVOLVEDGSL_H_INCLUDED
+#define UTILS_INCLUDE_EVOLVEDGSL_H_INCLUDED
 
 #include "EvolvedGSLFwd.h"
 
@@ -111,4 +111,4 @@ private:
 } // evolved
 
 
-#endif // _EVOLVED_GSL_H
+#endif // UTILS_INCLUDE_EVOLVEDGSL_H_INCLUDED

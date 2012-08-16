@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   COMBINATORICS_INCLUDED
-#define   COMBINATORICS_INCLUDED
+#ifndef   UTILS_INCLUDE_COMBINATORICS_H_INCLUDED
+#define   UTILS_INCLUDE_COMBINATORICS_H_INCLUDED
 
 #include "CombinatoricsFwd.h"
 
@@ -60,4 +60,4 @@ private:
 } // cpputils
 
 
-#endif // COMBINATORICS_INCLUDED
+#endif // UTILS_INCLUDE_COMBINATORICS_H_INCLUDED

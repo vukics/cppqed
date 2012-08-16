@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _BLITZ_ARRAY_TRAITS
-#define _BLITZ_ARRAY_TRAITS
+#ifndef UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED
+#define UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED
 
 #include "BlitzArrayTraitsFwd.h"
 
@@ -134,4 +134,4 @@ struct ArrayTraversalTraits<TTD_CARRAY(1)> : ArrayMemoryTraits<TTD_CARRAY(1)> {
 
 } // cpputils
 
-#endif // _BLITZ_ARRAY_TRAITS
+#endif // UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED

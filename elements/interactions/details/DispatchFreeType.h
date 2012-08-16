@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   DISPATCH_FREE_TYPE_INCLUDED
-#define   DISPATCH_FREE_TYPE_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_DETAILS_DISPATCHFREETYPE_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_DETAILS_DISPATCHFREETYPE_H_INCLUDED
 
 #include <boost/smart_ptr.hpp>
 
@@ -20,4 +20,4 @@ const FT*const dispatchFreeType(const             FT& free) {return &free      ;
 struct EmptyAveragingBaseForBinaryInteractions {};
 
 
-#endif // DISPATCH_FREE_TYPE_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_DETAILS_DISPATCHFREETYPE_H_INCLUDED

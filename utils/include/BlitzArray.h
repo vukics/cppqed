@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_ARRAY_TEMPLATE_TYPEDEFS_H
-#define   _BLITZ_ARRAY_TEMPLATE_TYPEDEFS_H
+#ifndef   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
+#define   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
 
 #include "ComplexExtensions.h"
 
@@ -69,4 +69,4 @@ public:
 // TTD stands for "template typedef"
 
 
-#endif // _BLITZ_ARRAY_TEMPLATE_TYPEDEFS_H
+#endif // UTILS_INCLUDE_BLITZARRAY_H_INCLUDED

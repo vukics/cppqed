@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _MCWF_TRAJECTORY_IMPL_H
-#define   _MCWF_TRAJECTORY_IMPL_H
+#ifndef   QUANTUMTRAJECTORY_IMPL_MCWF_TRAJECTORY_TCC_INCLUDED
+#define   QUANTUMTRAJECTORY_IMPL_MCWF_TRAJECTORY_TCC_INCLUDED
 
 #include "MCWF_Trajectory.h"
 
@@ -422,4 +422,4 @@ size_t MCWF_Trajectory<RANK>::displayMoreKey() const
 } // quantumtrajectory
 
 
-#endif // _MCWF_TRAJECTORY_IMPL_H
+#endif // QUANTUMTRAJECTORY_IMPL_MCWF_TRAJECTORY_TCC_INCLUDED

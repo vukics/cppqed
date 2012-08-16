@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_EXACT_H
-#define _STRUCTURE_EXACT_H
+#ifndef STRUCTURE_EXACT_H_INCLUDED
+#define STRUCTURE_EXACT_H_INCLUDED
 
 #include "ExactFwd.h"
 
@@ -48,4 +48,4 @@ public:
 
 } // structure
 
-#endif // _STRUCTURE_EXACT_H
+#endif // STRUCTURE_EXACT_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   EVOLVED_NR_IMPL_INCLUDED
-#define   EVOLVED_NR_IMPL_INCLUDED
+#ifndef   UTILS_INCLUDE_IMPL_EVOLVEDNR_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_EVOLVEDNR_TCC_INCLUDED
 
 #include "EvolvedNR.h"
 
@@ -204,4 +204,4 @@ rkck(const A& y, const A& dydx, double x, double h, A& yout, A& yerr, typename E
 } // evolved
 
 
-#endif // EVOLVED_NR_IMPL_INCLUDED
+#endif // UTILS_INCLUDE_IMPL_EVOLVEDNR_TCC_INCLUDED

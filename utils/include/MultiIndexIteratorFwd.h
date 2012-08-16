@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _MULTI_INDEX_ITERATOR_FWD_H
-#define   _MULTI_INDEX_ITERATOR_FWD_H
+#ifndef   UTILS_INCLUDE_MULTIINDEXITERATORFWD_H_INCLUDED
+#define   UTILS_INCLUDE_MULTIINDEXITERATORFWD_H_INCLUDED
 
 namespace cpputils {
 
@@ -9,4 +9,4 @@ class MultiIndexIterator;
 
 } // cpputils
 
-#endif // _MULTI_INDEX_ITERATOR_FWD_H
+#endif // UTILS_INCLUDE_MULTIINDEXITERATORFWD_H_INCLUDED

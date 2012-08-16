@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _MODE__H
-#define _MODE__H
+#ifndef ELEMENTS_FREES_MODE__H_INCLUDED
+#define ELEMENTS_FREES_MODE__H_INCLUDED
 
 #include "Mode_Fwd.h"
 
@@ -434,4 +434,4 @@ private:
 };
 
 
-#endif // _MODE__H
+#endif // ELEMENTS_FREES_MODE__H_INCLUDED

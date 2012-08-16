@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _C_VECTOR_H
-#define _C_VECTOR_H
+#ifndef UTILS_INCLUDE_CVECTOR_H_INCLUDED
+#define UTILS_INCLUDE_CVECTOR_H_INCLUDED
 
 #include "BlitzArray.h"
 
@@ -13,4 +13,4 @@ typedef TTD_CARRAY(1) CVector;
 
 } // linalg
 
-#endif // _C_VECTOR_H
+#endif // UTILS_INCLUDE_CVECTOR_H_INCLUDED

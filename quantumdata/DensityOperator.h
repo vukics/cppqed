@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _DENSITY_OPERATOR_H
-#define _DENSITY_OPERATOR_H
+#ifndef QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
+#define QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
 
 #include "DensityOperatorFwd.h"
 
@@ -104,4 +104,4 @@ private:
 } // quantumdata
 
 
-#endif // _DENSITY_OPERATOR_H
+#endif // QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED

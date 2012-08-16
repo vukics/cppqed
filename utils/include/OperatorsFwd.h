@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _CPP_UTILS_OPERATORS_FWD_H
-#define   _CPP_UTILS_OPERATORS_FWD_H
+#ifndef   UTILS_INCLUDE_OPERATORSFWD_H_INCLUDED
+#define   UTILS_INCLUDE_OPERATORSFWD_H_INCLUDED
 
 namespace linalg {
 
@@ -10,10 +10,10 @@ struct EmptyBase;
 
 } // details
 
-template<typename, typename=details::EmptyBase>
+template<typename T, typename B=details::EmptyBase>
 struct VectorSpace;
 
 
 } // linalg
 
-#endif // _CPP_UTILS_OPERATORS_FWD_H
+#endif // UTILS_INCLUDE_OPERATORSFWD_H_INCLUDED

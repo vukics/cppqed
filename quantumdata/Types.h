@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_TYPES_H
-#define _STRUCTURE_TYPES_H
+#ifndef QUANTUMDATA_TYPES_H_INCLUDED
+#define QUANTUMDATA_TYPES_H_INCLUDED
 
 #include "TypesFwd.h"
 
@@ -39,4 +39,4 @@ struct Types : B
 
 } // quantumdata
 
-#endif // _STRUCTURE_TYPES_H
+#endif // QUANTUMDATA_TYPES_H_INCLUDED

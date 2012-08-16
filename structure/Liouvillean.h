@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_LIOUVILLEAN_h
-#define _STRUCTURE_LIOUVILLEAN_h
+#ifndef STRUCTURE_LIOUVILLEAN_H_INCLUDED
+#define STRUCTURE_LIOUVILLEAN_H_INCLUDED
 
 #include "LiouvilleanFwd.h"
 
@@ -102,4 +102,4 @@ private:
 
 } // structure
 
-#endif // _STRUCTURE_LIOUVILLEAN_h
+#endif // STRUCTURE_LIOUVILLEAN_H_INCLUDED

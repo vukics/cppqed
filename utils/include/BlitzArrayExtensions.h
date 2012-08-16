@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_ARRAY_EXTENSIONS_H
-#define   _BLITZ_ARRAY_EXTENSIONS_H
+#ifndef   UTILS_INCLUDE_BLITZARRAYEXTENSIONS_H_INCLUDED
+#define   UTILS_INCLUDE_BLITZARRAYEXTENSIONS_H_INCLUDED
 
 #include "Exception.h"
 
@@ -35,4 +35,4 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>&);
 } // blitzplusplus
 
 
-#endif // _BLITZ_ARRAY_EXTENSIONS_H
+#endif // UTILS_INCLUDE_BLITZARRAYEXTENSIONS_H_INCLUDED

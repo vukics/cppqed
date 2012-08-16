@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _DO_DISPLAY_H
-#define _DO_DISPLAY_H
+#ifndef QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
+#define QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
 
 #include "DensityOperatorFwd.h"
 #include "DO_DisplayFwd.h"
@@ -67,4 +67,4 @@ private:
 
 } // quantumtrajectory
 
-#endif // _DO_DISPLAY_H
+#endif // QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED

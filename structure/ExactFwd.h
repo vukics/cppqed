@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   STRUCTURE_EXACT_FWD_INCLUDED
-#define   STRUCTURE_EXACT_FWD_INCLUDED
+#ifndef   STRUCTURE_EXACTFWD_H_INCLUDED
+#define   STRUCTURE_EXACTFWD_H_INCLUDED
 
 namespace structure {
 
@@ -13,4 +13,4 @@ class Exact;
 
 } // structure
 
-#endif // STRUCTURE_EXACT_FWD_INCLUDED
+#endif // STRUCTURE_EXACTFWD_H_INCLUDED

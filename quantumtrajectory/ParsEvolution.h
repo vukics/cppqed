@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _PARS_EVOLUTION_MODE
-#define _PARS_EVOLUTION_MODE
+#ifndef QUANTUMTRAJECTORY_PARSEVOLUTION_H_INCLUDED
+#define QUANTUMTRAJECTORY_PARSEVOLUTION_H_INCLUDED
 
 #include "Evolution_Fwd.h"
 
@@ -19,4 +19,4 @@ struct ParsEvolution : public ParsMCWF_Trajectory {
 };
 
 
-#endif // _PARS_EVOLUTION_MODE
+#endif // QUANTUMTRAJECTORY_PARSEVOLUTION_H_INCLUDED

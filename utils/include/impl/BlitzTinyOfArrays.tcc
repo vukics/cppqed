@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_TINY_OF_ARRAYS_IMPL_H
-#define   _BLITZ_TINY_OF_ARRAYS_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_BLITZTINYOFARRAYS_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_BLITZTINYOFARRAYS_TCC_INCLUDED
 
 #include "BlitzTinyOfArrays.h"
 
@@ -60,4 +60,4 @@ negate(const TinyOfArrays<T,RANK,LENGTH>& arrays)
 
 } // blitzplusplus
 
-#endif // _BLITZ_TINY_OF_ARRAYS_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_BLITZTINYOFARRAYS_TCC_INCLUDED

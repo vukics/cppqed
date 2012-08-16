@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STATE_VECTOR_H
-#define _STATE_VECTOR_H
+#ifndef QUANTUMDATA_STATEVECTOR_H_INCLUDED
+#define QUANTUMDATA_STATEVECTOR_H_INCLUDED
 
 #include "StateVectorFwd.h"
 
@@ -114,4 +114,4 @@ operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
 
 } // quantumdata
 
-#endif // _STATE_VECTOR_H
+#endif // QUANTUMDATA_STATEVECTOR_H_INCLUDED

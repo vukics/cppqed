@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _EVOLUTION_H
-#define _EVOLUTION_H
+#ifndef QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
+#define QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 
 #include "impl/Composite.tcc"
 #include "impl/EnsembleMCWF.tcc"
@@ -20,4 +20,4 @@ using parameters::ParameterTable    ;
 using parameters::update            ;
 using parameters::ParsNamedException;
 
-#endif // _EVOLUTION_H
+#endif // QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED

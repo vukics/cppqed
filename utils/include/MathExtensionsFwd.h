@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   CPPUTILS_MATH_FWD_INCLUDED
-#define   CPPUTILS_MATH_FWD_INCLUDED
+#ifndef   UTILS_INCLUDE_MATHEXTENSIONSFWD_H_INCLUDED
+#define   UTILS_INCLUDE_MATHEXTENSIONSFWD_H_INCLUDED
 
 namespace mathutils {
 
@@ -8,4 +8,4 @@ struct FactOverflow;
 
 } // mathutils
 
-#endif // CPPUTILS_MATH_FWD_INCLUDED
+#endif // UTILS_INCLUDE_MATHEXTENSIONSFWD_H_INCLUDED

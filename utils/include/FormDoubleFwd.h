@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _FORM_DOUBLE_FWD_H
-#define   _FORM_DOUBLE_FWD_H
+#ifndef   UTILS_INCLUDE_FORMDOUBLEFWD_H_INCLUDED
+#define   UTILS_INCLUDE_FORMDOUBLEFWD_H_INCLUDED
 
 class FormDouble;
 
@@ -15,4 +15,4 @@ class Zero;
 
 } // formdouble
 
-#endif // _FORM_DOUBLE_FWD_H
+#endif // UTILS_INCLUDE_FORMDOUBLEFWD_H_INCLUDED

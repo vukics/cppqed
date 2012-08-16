@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _ELEMENT_LIOUVILLEAN_H
-#define _ELEMENT_LIOUVILLEAN_H
+#ifndef STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
+#define STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
 
 #include "ElementLiouvilleanFwd.h"
 
@@ -35,4 +35,4 @@ namespace structure {
 
 
 
-#endif // _ELEMENT_LIOUVILLEAN_H
+#endif // STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED

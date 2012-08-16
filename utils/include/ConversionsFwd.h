@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _CONVERSIONS_FWD_H
-#define   _CONVERSIONS_FWD_H
+#ifndef   UTILS_INCLUDE_CONVERSIONSFWD_H_INCLUDED
+#define   UTILS_INCLUDE_CONVERSIONSFWD_H_INCLUDED
 
 namespace cpputils {
 
@@ -9,4 +9,4 @@ struct ConverterMF;
 
 } // cpputils
 
-#endif // _CONVERSIONS_FWD_H
+#endif // UTILS_INCLUDE_CONVERSIONSFWD_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _FREE_EXACT_H
-#define _FREE_EXACT_H
+#ifndef STRUCTURE_FREEEXACT_H_INCLUDED
+#define STRUCTURE_FREEEXACT_H_INCLUDED
 
 #include "FreeExactFwd.h"
 
@@ -33,4 +33,4 @@ private:
 } // structure
 
 
-#endif // _FREE_EXACT_H
+#endif // STRUCTURE_FREEEXACT_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _RANDOMIZED_H
-#define _RANDOMIZED_H
+#ifndef UTILS_INCLUDE_RANDOMIZED_H_INCLUDED
+#define UTILS_INCLUDE_RANDOMIZED_H_INCLUDED
 
 #include "RandomizedFwd.h"
 
@@ -136,4 +136,4 @@ const Randomized::SmartPtr fillWithRandom(A& data, unsigned long seed=1001ul, co
 
 } // randomized
 
-#endif // _RANDOMIZED_H
+#endif // UTILS_INCLUDE_RANDOMIZED_H_INCLUDED

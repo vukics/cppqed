@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _FREE_H
-#define _FREE_H
+#ifndef STRUCTURE_FREE_H_INCLUDED
+#define STRUCTURE_FREE_H_INCLUDED
 
 #include "FreeFwd.h"
 
@@ -48,4 +48,4 @@ private:
 
 } // structure
 
-#endif // _FREE_H
+#endif // STRUCTURE_FREE_H_INCLUDED

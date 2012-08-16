@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _HERMITE_H
-#define _HERMITE_H
+#ifndef UTILS_INCLUDE_HERMITE_H_INCLUDED
+#define UTILS_INCLUDE_HERMITE_H_INCLUDED
 
 #include "ComplexExtensions.h"
 
@@ -13,4 +13,4 @@ const dcomp  HermiteC(size_t, const dcomp&);
 
 }
 
-#endif // _HERMITE_H
+#endif // UTILS_INCLUDE_HERMITE_H_INCLUDED
