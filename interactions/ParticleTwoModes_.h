@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENT_PARTICLE_TWO_MODES__INCLUDED
-#define   ELEMENT_PARTICLE_TWO_MODES__INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_PARTICLETWOMODES__H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_PARTICLETWOMODES__H_INCLUDED
 
 #include "ParticleTwoModesFwd.h"
 
@@ -47,4 +47,4 @@ public:
     : Base(dispatchFreeType(f0),dispatchFreeType(f1),dispatchFreeType(f2),p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
 };
 
-#endif // PARTICLE_TWO_MODES__INCLUDED
+#endif // ELEMENTS_INTERACTIONS_PARTICLETWOMODES__H_INCLUDED

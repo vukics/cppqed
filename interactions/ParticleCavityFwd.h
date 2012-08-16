@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _PARTICLE_CAVITY_FWD_H
-#define   _PARTICLE_CAVITY_FWD_H
+#ifndef   ELEMENTS_INTERACTIONS_PARTICLECAVITYFWD_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_PARTICLECAVITYFWD_H_INCLUDED
 
 namespace particlecavity {
 
@@ -17,4 +17,4 @@ struct UnotEtaeffSignDiscrepancy;
 class ParticleOrthogonalToCavity;
 class ParticleAlongCavity;
 
-#endif // _PARTICLE_CAVITY_FWD_H
+#endif // ELEMENTS_INTERACTIONS_PARTICLECAVITYFWD_H_INCLUDED

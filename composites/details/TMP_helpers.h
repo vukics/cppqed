@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   TMP_HELPERS_INCLUDED
-#define   TMP_HELPERS_INCLUDED
+#ifndef   ELEMENTS_COMPOSITES_DETAILS_TMP_HELPERS_H_INCLUDED
+#define   ELEMENTS_COMPOSITES_DETAILS_TMP_HELPERS_H_INCLUDED
 
 #include "TMP_ToolsFwd.h"
 
@@ -48,4 +48,4 @@ struct CheckMeta : namehider::Algorithm<RANK,VA>
 } // composite
 
 
-#endif // TMP_HELPERS_INCLUDED
+#endif // ELEMENTS_COMPOSITES_DETAILS_TMP_HELPERS_H_INCLUDED

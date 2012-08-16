@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _MODE_FUNCTION_TYPE_H
-#define _MODE_FUNCTION_TYPE_H
+#ifndef ELEMENTS_UTILS_MODEFUNCTION_H_INCLUDED
+#define ELEMENTS_UTILS_MODEFUNCTION_H_INCLUDED
 
 #include "ComplexExtensions.h"
 
@@ -24,4 +24,4 @@ typedef boost::tuple<ModeFunctionType,ptrdiff_t> ModeFunction;
 
 // std::ostream& operator<<(std::ostream&, const particle::ModeFunction&);
 
-#endif // _MODE_FUNCTION_TYPE_H
+#endif // ELEMENTS_UTILS_MODEFUNCTION_H_INCLUDED

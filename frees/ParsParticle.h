@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _PARS_PARTICLE_H
-#define   _PARS_PARTICLE_H
+#ifndef   ELEMENTS_FREES_PARSPARTICLE_H_INCLUDED
+#define   ELEMENTS_FREES_PARSPARTICLE_H_INCLUDED
 
 #include "Particle_Fwd.h"
 
@@ -37,4 +37,4 @@ struct ParsPumped : Pars
 
 } // particle
 
-#endif // _PARS_PARTICLE_H
+#endif // ELEMENTS_FREES_PARSPARTICLE_H_INCLUDED
