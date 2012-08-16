@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_INTERACTIONS_JAYNESCUMMINGS_FWD_H_INCLUDED
-#define   ELEMENTS_INTERACTIONS_JAYNESCUMMINGS_FWD_H_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED
 
 namespace jaynescummings {
 
@@ -11,4 +11,4 @@ struct Pars;
 // class JaynesCummings;
 // Here it is not good to forward declare the class because of the default template parameter
 
-#endif // ELEMENTS_INTERACTIONS_JAYNESCUMMINGS_FWD_H_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED

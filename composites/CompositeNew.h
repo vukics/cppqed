@@ -1,8 +1,8 @@
 // A "new" composite architecture based on basi_fast type iterators. Out of order at the moment.
 
 // -*- C++ -*-
-#ifndef   ELEMENTS_COMPOSITE_COMPOSITENEW_H_INCLUDED
-#define   ELEMENTS_COMPOSITE_COMPOSITENEW_H_INCLUDED
+#ifndef   ELEMENTS_COMPOSITES_COMPOSITENEW_H_INCLUDED
+#define   ELEMENTS_COMPOSITES_COMPOSITENEW_H_INCLUDED
 
 #include "CompositeFwd.h"
 
@@ -247,4 +247,4 @@ private:
 
 #include "impl/Composite.tcc"
 
-#endif // ELEMENTS_COMPOSITE_COMPOSITENEW_H_INCLUDED
+#endif // ELEMENTS_COMPOSITES_COMPOSITENEW_H_INCLUDED
