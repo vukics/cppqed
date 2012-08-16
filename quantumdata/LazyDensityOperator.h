@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _VIEWED_AS_MATRIX_H
-#define _VIEWED_AS_MATRIX_H
+#ifndef QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
+#define QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
 
 #include "LazyDensityOperatorFwd.h"
 
@@ -70,4 +70,4 @@ protected:
 
 } // quantumdata
 
-#endif // _VIEWED_AS_MATRIX_H
+#endif // QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED

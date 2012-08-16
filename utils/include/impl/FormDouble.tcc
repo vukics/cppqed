@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FORMDOUBLE_IMPL_H_INCLUDED
-#define   FORMDOUBLE_IMPL_H_INCLUDED
+#ifndef   UTILS_INCLUDE_IMPL_FORMDOUBLE_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_FORMDOUBLE_TCC_INCLUDED
 
 #include "FormDouble.h"
 
@@ -27,4 +27,4 @@ const formdouble::Bound<T> FormDouble::operator()(const T& v) const
 }
 
 
-#endif // FORMDOUBLE_IMPL_H_INCLUDED
+#endif // UTILS_INCLUDE_IMPL_FORMDOUBLE_TCC_INCLUDED

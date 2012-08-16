@@ -1,9 +1,11 @@
 // -*- C++ -*-
-#ifndef   _SIMULATED_IMPL_H
-#define   _SIMULATED_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_SIMULATED_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_SIMULATED_TCC_INCLUDED
 
+#include "Simulated_.h"
 
-#include "FormDouble.h"
+#include "impl/FormDouble.tcc"
+#include "impl/Trajectory.tcc"
 
 
 namespace trajectory {
@@ -49,4 +51,4 @@ size_t Simulated<A>::displayMoreKey() const
 
 } // trajectory
 
-#endif // _SIMULATED_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_SIMULATED_TCC_INCLUDED

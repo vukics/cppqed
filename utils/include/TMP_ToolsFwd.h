@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _TEMPLATE_METAPROG_TOOLS_FWD_H
-#define   _TEMPLATE_METAPROG_TOOLS_FWD_H
+#ifndef   UTILS_INCLUDE_TMP_TOOLSFWD_H_INCLUDED
+#define   UTILS_INCLUDE_TMP_TOOLSFWD_H_INCLUDED
 
 
 namespace tmptools {
@@ -36,4 +36,4 @@ struct pair_c;
 } // tmptools
 
 
-#endif // _TEMPLATE_METAPROG_TOOLS_FWD_H
+#endif // UTILS_INCLUDE_TMP_TOOLSFWD_H_INCLUDED

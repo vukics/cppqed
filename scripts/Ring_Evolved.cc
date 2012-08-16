@@ -1,9 +1,6 @@
-#include "SimulatedHigh.h"
+#include "Simulated.h"
 
 #include "ParticleTwoModes.h"
-
-#include "ParticleInitialCondition.h"
-
 
 using namespace std       ;
 using namespace cpputils  ;

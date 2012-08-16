@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   _TRAJECTORY_IMPL_H
-#define   _TRAJECTORY_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_TRAJECTORY_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_TRAJECTORY_TCC_INCLUDED
+
+#include "Trajectory.h"
 
 #include "ParsTrajectory.h"
 
@@ -100,4 +102,4 @@ void Trajectory<A>::displayParameters() const
 
 } // trajectory
 
-#endif // _TRAJECTORY_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_TRAJECTORY_TCC_INCLUDED

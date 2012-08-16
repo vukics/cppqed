@@ -23,12 +23,11 @@ right | v | u^*
 */
 
 
-#include "Blitz2FLENS.h"
+#include "impl/Blitz2FLENS.tcc"
 
 #include "MathExtensions.h"
 #include "BlitzTiny.h"
-#include "BlitzArray.h"
-#include "ComplexArrayExtensions.h"
+#include "impl/ComplexArrayExtensions.tcc"
 #include "Randomized.h"
 
 #include "Range.h"

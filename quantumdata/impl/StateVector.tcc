@@ -1,7 +1,11 @@
 // -*- C++ -*-
-#ifndef   _STATE_VECTOR_IMPL_H
-#define   _STATE_VECTOR_IMPL_H
+#ifndef   QUANTUMDATA_IMPL_STATEVECTOR_TCC_INCLUDED
+#define   QUANTUMDATA_IMPL_STATEVECTOR_TCC_INCLUDED
 
+#include "StateVector.h"
+
+#include "impl/BlitzTinyExtensions.tcc"
+#include "impl/ComplexArrayExtensions.tcc"
 
 namespace quantumdata {
 
@@ -79,4 +83,4 @@ braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 } // quantumdata
 
 
-#endif // _STATE_VECTOR_IMPL_H
+#endif // QUANTUMDATA_IMPL_STATEVECTOR_TCC_INCLUDED

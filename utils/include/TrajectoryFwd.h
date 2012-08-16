@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _TRAJECTORY_FWD_H
-#define   _TRAJECTORY_FWD_H
+#ifndef   UTILS_INCLUDE_TRAJECTORYFWD_H_INCLUDED
+#define   UTILS_INCLUDE_TRAJECTORYFWD_H_INCLUDED
 
 
 namespace trajectory {
@@ -17,4 +17,4 @@ class Trajectory;
 
 } // trajectory
 
-#endif // _TRAJECTORY_FWD_H
+#endif // UTILS_INCLUDE_TRAJECTORYFWD_H_INCLUDED

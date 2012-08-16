@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _EVOLVED_FWD_H
-#define   _EVOLVED_FWD_H
+#ifndef   UTILS_INCLUDE_EVOLVEDFWD_H_INCLUDED
+#define   UTILS_INCLUDE_EVOLVEDFWD_H_INCLUDED
 
 
 namespace evolved {
@@ -22,4 +22,4 @@ class MakerNR;
 } // evolved
 
 
-#endif // _EVOLVED_FWD_H
+#endif // UTILS_INCLUDE_EVOLVEDFWD_H_INCLUDED

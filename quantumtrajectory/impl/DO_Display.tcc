@@ -1,9 +1,11 @@
 // -*- C++ -*-
-#ifndef   _DO_DISPLAY_IMPL_H
-#define   _DO_DISPLAY_IMPL_H
+#ifndef   QUANTUMTRAJECTORY_IMPL_DO_DISPLAY_TCC_INCLUDED
+#define   QUANTUMTRAJECTORY_IMPL_DO_DISPLAY_TCC_INCLUDED
+
+#include "DO_Display.h"
 
 #include "DimensionsBookkeeper.h"
-#include "NegPT.h"
+#include "impl/NegPT.tcc"
 #include "Structure.h"
 
 #include "FormDouble.h"
@@ -83,4 +85,4 @@ DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostre
 } // quantumtrajectory
 
 
-#endif // _DO_DISPLAY_IMPL_H
+#endif // QUANTUMTRAJECTORY_IMPL_DO_DISPLAY_TCC_INCLUDED

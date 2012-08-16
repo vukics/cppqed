@@ -1,4 +1,4 @@
-#include "MultiIndexIterator.h"
+#include "impl/MultiIndexIterator.tcc"
 #define BOOST_TEST_MODULE MultiIndexIterator test
 #include <boost/test/unit_test.hpp>
 

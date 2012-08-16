@@ -1,9 +1,12 @@
 // -*- C++ -*-
-#ifndef _TRIDIAGONAL_IMPL_H
-#define _TRIDIAGONAL_IMPL_H
+#ifndef QUANTUMOPERATOR_IMPL_TRIDIAGONAL_TCC_INCLUDED
+#define QUANTUMOPERATOR_IMPL_TRIDIAGONAL_TCC_INCLUDED
 
-#include "ComplexArrayExtensions.h"
+#include "Tridiagonal.h"
 
+#include "impl/ComplexArrayExtensions.tcc"
+
+#include <boost/lambda/lambda.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 
@@ -329,4 +332,4 @@ void Tridiagonal<9>::apply(const StateVectorLow&, StateVectorLow&) const;
 #endif // DO_CONSIDER_EXPLICITLY_SPECIALIZED_TRIDIAGONAL_APPLIES
 
 
-#endif // _TRIDIAGONAL_IMPL_H
+#endif // QUANTUMOPERATOR_IMPL_TRIDIAGONAL_TCC_INCLUDED

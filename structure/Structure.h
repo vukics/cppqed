@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_H
-#define _STRUCTURE_H
+#ifndef STRUCTURE_STRUCTURE_H_INCLUDED
+#define STRUCTURE_STRUCTURE_H_INCLUDED
 
 #include "QuantumSystemFwd.h"
 #include "DynamicsBaseFwd.h"
@@ -73,4 +73,4 @@ qsa(const DynamicsBase* base)
 
 
 
-#endif // _STRUCTURE_H
+#endif // STRUCTURE_STRUCTURE_H_INCLUDED

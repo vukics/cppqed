@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   _EVOLVED_IMPL_H
-#define   _EVOLVED_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_EVOLVED_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_EVOLVED_TCC_INCLUDED
+
+#include "Evolved.h"
 
 #include "MathExtensions.h"
 
@@ -38,4 +40,4 @@ void evolve(E& e, double deltaT)
 
 } // evolved
 
-#endif // _EVOLVED_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_EVOLVED_TCC_INCLUDED

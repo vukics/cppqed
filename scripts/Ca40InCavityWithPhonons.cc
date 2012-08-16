@@ -1,13 +1,6 @@
-#include "EvolutionHigh.h"
-
+#include "Evolution.h"
+#include "Mode.h"
 #include "MultiLevel.h"
-#include "ParsMode.h"
-#include "ParsMultiLevel.h"
-
-#include "MLJC.h"
-#include "ParsMLJC.h"
-
-#include "Composite.h"
 
 #include <boost/fusion/sequence/intrinsic/at.hpp>
 

@@ -1,12 +1,16 @@
 // -*- C++ -*-
-#ifndef   LAZY_DENSITY_OPERATOR_SMART_ITERATOR_IMPL_INCLUDED
-#define   LAZY_DENSITY_OPERATOR_SMART_ITERATOR_IMPL_INCLUDED
+#ifndef   QUANTUMDATA_IMPL_LAZYDENSITYOPERATORSLICEITERATOR_TCC_INCLUDED
+#define   QUANTUMDATA_IMPL_LAZYDENSITYOPERATORSLICEITERATOR_TCC_INCLUDED
 
-#include "DensityOperator.h"
+#include "LazyDensityOperatorSliceIterator.h"
+
+#include "impl/DensityOperator.tcc"
+#include "LazyDensityOperator.h"
 #include "StateVector.h"
 
-#include "Algorithm.h"
-#include "BlitzArraySliceIterator.h"
+#include "impl/Algorithm.tcc"
+#include "impl/BlitzArraySliceIterator.tcc"
+#include "impl/BlitzTinyExtensions.tcc"
 #include "Functional.h"
 
 
@@ -94,7 +98,7 @@ public:
   typedef blitzplusplus::basi::Iterator<RANK,V,true> BASI;
   typedef typename BASI::Impl MII;
 
-  typedef TTD_LAZY_DENSITY_OPERATOR_RES LazyDensityOperatorRes;
+  typedef typename DiagonalIterator<RANK,V>::LazyDensityOperatorRes LazyDensityOperatorRes;
 
   bool isEqualTo(const DI_Impl& other) const {return getMII()==other.getMII();}
 
@@ -333,42 +337,8 @@ DiagonalIterator<RANK,V>::isEqualTo(const DiagonalIterator& other) const
 } // ldo
 
 
-template<int RANK> template<typename V>
-const ldo::DiagonalIterator<RANK,V>
-LazyDensityOperator<RANK>::begin(V) const
-{
-  return ldo::DiagonalIterator<RANK,V>(*this,mpl::false_());
-}
-
-template<int RANK> template<typename V>
-const ldo::DiagonalIterator<RANK,V>
-LazyDensityOperator<RANK>::end  (V) const
-{
-  return ldo::DiagonalIterator<RANK,V>(*this,mpl:: true_());
-}
-
-
-template<int RANK, typename F, typename V, typename T>
-const T
-partialTrace(const LazyDensityOperator<RANK>& matrix, F function, V v, T)
-{
-  ldo::DiagonalIterator<RANK,V> begin(matrix.begin(v));
-  T init(function(*begin));
-
-  using namespace cpputils;
-  return T(
-	   accumulate(++begin,
-		      matrix.end(v),
-		      init,
-		      function,
-		      cpputils::plus<T>()
-		      )
-	   );
-}
-
-
 } // quantumdata
 
 
 
-#endif // LAZY_DENSITY_OPERATOR_SMART_ITERATOR_IMPL_INCLUDED
+#endif // QUANTUMDATA_IMPL_LAZYDENSITYOPERATORSLICEITERATOR_TCC_INCLUDED

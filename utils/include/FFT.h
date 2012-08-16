@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _FAST_FOURIER_TRANSFORM_H
-#define   _FAST_FOURIER_TRANSFORM_H
+#ifndef   UTILS_INCLUDE_FFT_H_INCLUDED
+#define   UTILS_INCLUDE_FFT_H_INCLUDED
 
 #include "FFTFwd.h"
 
@@ -11,11 +11,16 @@ namespace fft {
 
 struct FFT_Exception : public cpputils::Exception {};
 
+namespace details {
+
+void transform(double*, size_t, size_t, Direction) throw(FFT_Exception);
+
+} // details
+
+
 template<typename A>
 void transform(A&, Direction) throw(FFT_Exception);
 
 } // fft
 
-#include "impl/FFT.tcc"
-
-#endif // _FAST_FOURIER_TRANSFORM_H
+#endif // UTILS_INCLUDE_FFT_H_INCLUDED

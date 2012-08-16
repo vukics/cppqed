@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _DIMENSIONS_BOOKKEEPER_H
-#define _DIMENSIONS_BOOKKEEPER_H
+#ifndef QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED
+#define QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED
 
 #include "DimensionsBookkeeperFwd.h"
 
@@ -56,4 +56,4 @@ operator!=(const DimensionsBookkeeper<RANK,IS_CONST1>& d1, const DimensionsBookk
 }
 
 
-#endif // _DIMENSIONS_BOOKKEEPER_H
+#endif // QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED

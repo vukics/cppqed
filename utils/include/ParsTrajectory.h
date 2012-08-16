@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _PARS_TRAJECTORY_H
-#define _PARS_TRAJECTORY_H
+#ifndef UTILS_INCLUDE_PARSTRAJECTORY_H_INCLUDED
+#define UTILS_INCLUDE_PARSTRAJECTORY_H_INCLUDED
 
 #include "TrajectoryFwd.h"
 
@@ -60,4 +60,4 @@ struct ParsTrajectory {
 
 } // trajectory
 
-#endif // _PARS_TRAJECTORY_H
+#endif // UTILS_INCLUDE_PARSTRAJECTORY_H_INCLUDED

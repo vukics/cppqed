@@ -1,8 +1,10 @@
 // -*- C++ -*-
-#ifndef   _DENSITY_OPERATOR_IMPL_H
-#define   _DENSITY_OPERATOR_IMPL_H
+#ifndef   QUANTUMDATA_IMPL_DENSITYOPERATOR_TCC_INCLUDED
+#define   QUANTUMDATA_IMPL_DENSITYOPERATOR_TCC_INCLUDED
 
+#include "DensityOperator.h"
 
+#include "impl/BlitzTinyExtensions.tcc"
 
 namespace quantumdata {
 
@@ -79,4 +81,4 @@ DensityOperator<RANK>::operator()(const Idx& i, const Idx& j) const
 
 } // quantumdata
 
-#endif // _DENSITY_OPERATOR_IMPL_H
+#endif // QUANTUMDATA_IMPL_DENSITYOPERATOR_TCC_INCLUDED

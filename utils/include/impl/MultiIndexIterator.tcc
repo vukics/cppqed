@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   _MULTI_INDEX_ITERATOR_IMPL_H
-#define   _MULTI_INDEX_ITERATOR_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_MULTIINDEXITERATOR_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_MULTIINDEXITERATOR_TCC_INCLUDED
+
+#include "MultiIndexIterator.h"
 
 namespace cpputils {
 
@@ -41,4 +43,4 @@ void doIt(const TTD_IDXTINY(RANK)& lbound,
 } // cpputils
 
 
-#endif // _MULTI_INDEX_ITERATOR_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_MULTIINDEXITERATOR_TCC_INCLUDED

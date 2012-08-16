@@ -2,9 +2,9 @@
 
 #include "Interaction.h"
 
-#include "LazyDensityOperatorSliceIterator.h"
+#include "impl/LazyDensityOperator.tcc"
 
-#include "Algorithm.h"
+#include "impl/Algorithm.tcc"
 #include "BlitzArraySliceIterator.h"
 #include "Range.h"
 
@@ -295,3 +295,12 @@ const binary::SmartPtr binary::make(const Interaction& ia)
 
 
 #undef DISPATCHER
+
+template class BinarySystem<true ,true ,true >;
+template class BinarySystem<true ,true ,false>;
+template class BinarySystem<true ,false,true >;
+template class BinarySystem<true ,false,false>;
+template class BinarySystem<false,true ,true >;
+template class BinarySystem<false,true ,false>;
+template class BinarySystem<false,false,true >;
+template class BinarySystem<false,false,false>;

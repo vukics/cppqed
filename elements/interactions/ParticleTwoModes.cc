@@ -1,8 +1,10 @@
-#include "ParticleTwoModes.h"
+#include "ParticleTwoModes_.h"
 
-#include "Algorithm.h"
-#include "BlitzArraySliceIterator.h"
+#include "impl/Algorithm.tcc"
+#include "impl/BlitzArraySliceIterator.tcc"
+#include "MathExtensions.h"
 #include "Range.h"
+#include "impl/Tridiagonal.tcc"
 
 #include <boost/assign/list_of.hpp>
 #include <boost/assign/list_inserter.hpp>

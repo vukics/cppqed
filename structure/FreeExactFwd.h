@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FREE_EXACT_FWD_INCLUDED
-#define   FREE_EXACT_FWD_INCLUDED
+#ifndef   STRUCTURE_FREEEXACTFWD_H_INCLUDED
+#define   STRUCTURE_FREEEXACTFWD_H_INCLUDED
 
 namespace structure {
 
@@ -8,4 +8,4 @@ class FreeExact;
 
 } // structure
 
-#endif // FREE_EXACT_FWD_INCLUDED
+#endif // STRUCTURE_FREEEXACTFWD_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _SHARED_MEMORY_ALLOCATOR_H
-#define _SHARED_MEMORY_ALLOCATOR_H
+#ifndef UTILS_INCLUDE_SHAREDMEMORYALLOCATOR_H_INCLUDED
+#define UTILS_INCLUDE_SHAREDMEMORYALLOCATOR_H_INCLUDED
 
 
 namespace cpputils {
@@ -138,4 +138,4 @@ bool operator!= (const SharedMemoryAllocator<T1>&,  const SharedMemoryAllocator<
 
 
 
-#endif // _SHARED_MEMORY_ALLOCATOR_H
+#endif // UTILS_INCLUDE_SHAREDMEMORYALLOCATOR_H_INCLUDED

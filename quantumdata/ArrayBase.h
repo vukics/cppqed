@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ARRAY_BASE_INCLUDED
-#define   ARRAY_BASE_INCLUDED
+#ifndef   QUANTUMDATA_ARRAYBASE_H_INCLUDED
+#define   QUANTUMDATA_ARRAYBASE_H_INCLUDED
 
 #include "ArrayBaseFwd.h"
 
@@ -62,4 +62,4 @@ private:
 
 
 
-#endif // ARRAY_BASE_INCLUDED
+#endif // QUANTUMDATA_ARRAYBASE_H_INCLUDED

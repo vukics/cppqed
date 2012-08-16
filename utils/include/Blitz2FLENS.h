@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_TO_FLENS_H
-#define   _BLITZ_TO_FLENS_H
+#ifndef   UTILS_INCLUDE_BLITZ2FLENS_H_INCLUDED
+#define   UTILS_INCLUDE_BLITZ2FLENS_H_INCLUDED
 
 #include "BlitzArray.h"
 #include "ComplexExtensions.h"
@@ -60,6 +60,4 @@ const typename HeMatrixMF<SO>::type hermitianMatrix(const TTD_CARRAY(TWO_TIMES_R
 
 } // blitz2flens
 
-#include "impl/Blitz2FLENS.tcc"
-
-#endif // _BLITZ_TO_FLENS_H
+#endif // UTILS_INCLUDE_BLITZ2FLENS_H_INCLUDED

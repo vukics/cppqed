@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _MULTI_INDEX_ITERATOR_H
-#define _MULTI_INDEX_ITERATOR_H
+#ifndef UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED
+#define UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED
 
 #include "MultiIndexIteratorFwd.h"
 
@@ -72,7 +72,5 @@ private:
 } // cpputils
 
 
-#include "impl/MultiIndexIterator.tcc"
 
-
-#endif // _MULTI_INDEX_ITERATOR_H
+#endif // UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED

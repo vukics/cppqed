@@ -1,6 +1,12 @@
 // -*- C++ -*-
+#ifndef   QUANTUMDATA_IMPL_NEGPT_TCC_INCLUDED
+#define   QUANTUMDATA_IMPL_NEGPT_TCC_INCLUDED
 
-#include "Blitz2FLENS.h"
+#include "NegPT.h"
+
+#ifndef DO_NOT_USE_FLENS
+
+#include "impl/Blitz2FLENS.tcc"
 
 #include <boost/mpl/transform.hpp>
 
@@ -95,4 +101,6 @@ struct ExtendV : namehider::Algorithm<RANK,V>
 
 } // quantumdata
 
+#endif // DO_NOT_USE_FLENS
 
+#endif // QUANTUMDATA_IMPL_NEGPT_TCC_INCLUDED

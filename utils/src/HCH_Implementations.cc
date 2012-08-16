@@ -1,4 +1,4 @@
-#include "ComplexArrayExtensions.h"
+#include "impl/ComplexArrayExtensions.tcc"
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>

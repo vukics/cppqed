@@ -1,7 +1,8 @@
 // -*- C++ -*-
-#ifndef   SIGMA_TYPE_OPERATOR_IMPL_INCLUDED
-#define   SIGMA_TYPE_OPERATOR_IMPL_INCLUDED
+#ifndef   QUANTUMOPERATOR_IMPL_SIGMA_TCC_INCLUDED
+#define   QUANTUMOPERATOR_IMPL_SIGMA_TCC_INCLUDED
 
+#include "Sigma.h"
 
 namespace quantumoperator {
 
@@ -54,4 +55,4 @@ operator*(const Sigma<L1,R1>&, const Sigma<L2,R2>& sigma)
 
 } // quantumoperator
 
-#endif // SIGMA_TYPE_OPERATOR_IMPL_INCLUDED
+#endif // QUANTUMOPERATOR_IMPL_SIGMA_TCC_INCLUDED

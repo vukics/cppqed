@@ -1,13 +1,13 @@
 // -*- C++ -*-
-#ifndef   _GENERAL_DICKE_INCLUDED
-#define   _GENERAL_DICKE_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_GENERALDICKE_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_GENERALDICKE_H_INCLUDED
 
 #include "GeneralDickeFwd.h"
 
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 #include "Spin.h"
 
 
@@ -33,4 +33,4 @@ public:
 
 
 
-#endif // _GENERAL_DICKE_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_GENERALDICKE_H_INCLUDED

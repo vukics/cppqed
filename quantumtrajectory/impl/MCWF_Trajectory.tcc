@@ -1,13 +1,16 @@
 // -*- C++ -*-
-#ifndef   _MCWF_TRAJECTORY_IMPL_H
-#define   _MCWF_TRAJECTORY_IMPL_H
+#ifndef   QUANTUMTRAJECTORY_IMPL_MCWF_TRAJECTORY_TCC_INCLUDED
+#define   QUANTUMTRAJECTORY_IMPL_MCWF_TRAJECTORY_TCC_INCLUDED
+
+#include "MCWF_Trajectory.h"
 
 #include "ParsMCWF_Trajectory.h"
 
 #include "StateVector.h"
+#include "impl/StochasticTrajectory.tcc"
 #include "Structure.h"
 
-#include "FormDouble.h"
+#include "impl/FormDouble.tcc"
 
 #ifdef USE_BOOST_SERIALIZATION
 #include <boost/archive/binary_oarchive.hpp>
@@ -419,4 +422,4 @@ size_t MCWF_Trajectory<RANK>::displayMoreKey() const
 } // quantumtrajectory
 
 
-#endif // _MCWF_TRAJECTORY_IMPL_H
+#endif // QUANTUMTRAJECTORY_IMPL_MCWF_TRAJECTORY_TCC_INCLUDED

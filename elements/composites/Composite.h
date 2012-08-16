@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _COMPOSITE_SYSTEM_INCLUDED
-#define   _COMPOSITE_SYSTEM_INCLUDED
+#ifndef   ELEMENTS_COMPOSITES_COMPOSITE_H_INCLUDED
+#define   ELEMENTS_COMPOSITES_COMPOSITE_H_INCLUDED
 
 #include "CompositeFwd.h"
 
@@ -186,6 +186,4 @@ struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PA
 #undef DEFAULT_print
 
 
-#include "impl/Composite.tcc"
-
-#endif // _COMPOSITE_SYSTEM_INCLUDED
+#endif // ELEMENTS_COMPOSITES_COMPOSITE_H_INCLUDED

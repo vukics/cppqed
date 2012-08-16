@@ -1,11 +1,11 @@
 // -*- C++ -*-
-#ifndef   MULTI_LEVEL_JAYNES_CUMMINGS_INCLUDED
-#define   MULTI_LEVEL_JAYNES_CUMMINGS_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED
 
 #include "MLJCFwd.h"
 
-#include "Mode.h"
-#include "MultiLevel.h"
+#include "Mode_.h"
+#include "MultiLevel_.h"
 
 #include "Interaction.h"
 
@@ -93,6 +93,4 @@ public:
 };
 
 
-#include "impl/MLJC.tcc"
-
-#endif // MULTI_LEVEL_JAYNES_CUMMINGS_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED

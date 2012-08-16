@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _LAZY_DENSITY_OPERATOR_SMART_ITERATOR_H
-#define _LAZY_DENSITY_OPERATOR_SMART_ITERATOR_H
+#ifndef QUANTUMDATA_LAZYDENSITYOPERATORSLICEITERATOR_H_INCLUDED
+#define QUANTUMDATA_LAZYDENSITYOPERATORSLICEITERATOR_H_INCLUDED
 
 #include "LazyDensityOperatorFwd.h"
 
@@ -89,11 +89,9 @@ bool operator==(const DiagonalIterator<RANK,V>& i1, const DiagonalIterator<RANK,
 } // quantumdata
 
 
-#include "impl/LazyDensityOperatorSliceIterator.tcc"
-
 #undef TTD_LAZY_DENSITY_OPERATOR_RES
 
-#endif // _LAZY_DENSITY_OPERATOR_SMART_ITERATOR_H
+#endif // QUANTUMDATA_LAZYDENSITYOPERATORSLICEITERATOR_H_INCLUDED
 
 
 

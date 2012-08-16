@@ -17,8 +17,8 @@
   EnsembleStochastic.
 
 */
-#ifndef _STOCHASTIC_TRAJECTORY_H
-#define _STOCHASTIC_TRAJECTORY_H
+#ifndef UTILS_INCLUDE_STOCHASTICTRAJECTORY_H_INCLUDED
+#define UTILS_INCLUDE_STOCHASTICTRAJECTORY_H_INCLUDED
 
 
 #include "StochasticTrajectoryFwd.h"
@@ -197,6 +197,5 @@ public:
 
 } // trajectory
 
-#include "impl/StochasticTrajectory.tcc"
 
-#endif // _STOCHASTIC_TRAJECTORY_H
+#endif // UTILS_INCLUDE_STOCHASTICTRAJECTORY_H_INCLUDED

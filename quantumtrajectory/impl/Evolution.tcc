@@ -1,11 +1,15 @@
 // -*- C++ -*-
-#ifndef   _EVOLUTION_MODE_IMPL_H
-#define   _EVOLUTION_MODE_IMPL_H
+#ifndef   QUANTUMTRAJECTORY_IMPL_EVOLUTION_TCC_INCLUDED
+#define   QUANTUMTRAJECTORY_IMPL_EVOLUTION_TCC_INCLUDED
+
+#include "Evolution_.h"
 
 #include "ParsEvolution.h"
 
+#include "impl/DO_Display.tcc"
 #include "EnsembleMCWF.h"
 #include "Master.h"
+#include "impl/Trajectory.tcc"
 
 #include<iostream>
 #include<string>
@@ -108,4 +112,4 @@ void evolve(quantumdata::StateVector<RANK>& psi, const structure::QuantumSystem<
 
 
 
-#endif // _EVOLUTION_MODE_IMPL_H
+#endif // QUANTUMTRAJECTORY_IMPL_EVOLUTION_TCC_INCLUDED

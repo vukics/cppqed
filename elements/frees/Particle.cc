@@ -1,14 +1,15 @@
-#include "Particle.h"
+#include "Particle_.h"
 
 #include "ParsParticle.h"
 #include "ParticleInitialCondition.h"
 
-#include "StateVector.h"
+#include "impl/StateVector.tcc"
+#include "impl/TridiagonalHamiltonian.tcc"
 
 #include "BlitzArrayTraits.h"
-#include "FFT.h"
-#include "VectorFromMatrixSliceIterator.h"
+#include "impl/FFT.tcc"
 #include "Hermite.h"
+#include "impl/VectorFromMatrixSliceIterator.tcc"
 
 #include <boost/assign/list_of.hpp>
 #include <boost/assign/list_inserter.hpp>

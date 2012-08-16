@@ -1,10 +1,12 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_TO_FLENS_IMPL_H
-#define   _BLITZ_TO_FLENS_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_BLITZ2FLENS_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_BLITZ2FLENS_TCC_INCLUDED
+
+#include "Blitz2FLENS.h"
 
 #include "TMP_Tools.h"
 
-#include "BlitzTinyExtensions.h"
+#include "impl/BlitzTinyExtensions.tcc"
 #include "ComplexArrayExtensions.h"
 
 
@@ -70,4 +72,4 @@ const typename HeMatrixMF<SO>::type hermitianMatrix(TTD_CARRAY(TWO_TIMES_RANK)& 
 } // blitz2flens
 
 
-#endif // _BLITZ_TO_FLENS_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_BLITZ2FLENS_TCC_INCLUDED

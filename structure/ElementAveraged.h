@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef STRUCTURE_ELEMENT_AVERAGED_H_INCLUDED
-#define STRUCTURE_ELEMENT_AVERAGED_H_INCLUDED
+#ifndef STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
+#define STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
 
 #include "ElementAveragedFwd.h"
 
@@ -135,7 +135,4 @@ private:
 } // structure
 
 
-#include "impl/ElementAveraged.tcc"
-
-
-#endif // STRUCTURE_ELEMENT_AVERAGED_H_INCLUDED
+#endif // STRUCTURE_ELEMENTAVERAGED_H_INCLUDED

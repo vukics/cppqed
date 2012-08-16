@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _PARS_FWD_H
-#define   _PARS_FWD_H
+#ifndef   UTILS_INCLUDE_PARSFWD_H_INCLUDED
+#define   UTILS_INCLUDE_PARSFWD_H_INCLUDED
 
 #include<string>
 
@@ -25,4 +25,4 @@ struct TitleLine {};
 } // parameters
 
 
-#endif // _PARS_FWD_H
+#endif // UTILS_INCLUDE_PARSFWD_H_INCLUDED

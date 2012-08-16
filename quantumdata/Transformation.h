@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _DUAL_TRANSFORMATION_H
-#define _DUAL_TRANSFORMATION_H
+#ifndef QUANTUMDATA_TRANSFORMATION_H_INCLUDED
+#define QUANTUMDATA_TRANSFORMATION_H_INCLUDED
 
 #include "TransformationFwd.h"
 
@@ -116,7 +116,5 @@ struct Traits<boost::function<void(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&)> 
 
 } // quantumdata
 
-#include "impl/Transformation.tcc"
-
-#endif // _DUAL_TRANSFORMATION_H
+#endif // QUANTUMDATA_TRANSFORMATION_H_INCLUDED
 

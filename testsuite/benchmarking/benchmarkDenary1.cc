@@ -1,8 +1,8 @@
-#include "EvolutionHigh.h"
+#include "Evolution.h"
 
 #include "benchmarking.h"
 
-#include "Mode.h"
+#include "Mode_.h"
 
 using namespace mode;
 using structure::Interaction;

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _FREE_FWD_H
-#define   _FREE_FWD_H
+#ifndef   STRUCTURE_FREEFWD_H_INCLUDED
+#define   STRUCTURE_FREEFWD_H_INCLUDED
 
 
 namespace structure {
@@ -9,4 +9,4 @@ class Free;
 
 } // structure
 
-#endif // _FREE_FWD_H
+#endif // STRUCTURE_FREEFWD_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_QUANTUM_SYSTEM_H
-#define _STRUCTURE_QUANTUM_SYSTEM_H
+#ifndef STRUCTURE_QUANTUMSYSTEM_H_INCLUDED
+#define STRUCTURE_QUANTUMSYSTEM_H_INCLUDED
 
 #include "QuantumSystemFwd.h"
 
@@ -35,4 +35,4 @@ public:
 
 } // structure
 
-#endif // _STRUCTURE_QUANTUM_SYSTEM_H
+#endif // STRUCTURE_QUANTUMSYSTEM_H_INCLUDED

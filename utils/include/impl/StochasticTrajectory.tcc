@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   _STOCHASTIC_TRAJECTORY_IMPL_H
-#define   _STOCHASTIC_TRAJECTORY_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_STOCHASTICTRAJECTORY_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_STOCHASTICTRAJECTORY_TCC_INCLUDED
+
+#include "StochasticTrajectory.h"
 
 #include "Algorithm.h"
 #include "Functional.h"
@@ -135,4 +137,4 @@ public:
 } // trajectory
 
 
-#endif // _STOCHASTIC_TRAJECTORY_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_STOCHASTICTRAJECTORY_TCC_INCLUDED

@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   _PARS_IMPL_H
-#define   _PARS_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_PARS_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_PARS_TCC_INCLUDED
+
+#include "Pars.h"
 
 #include<iostream>
 #include<iomanip>
@@ -76,4 +78,4 @@ void Parameter<TitleLine>::read(std::istream&);
 
 }
 
-#endif // _PARS_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_PARS_TCC_INCLUDED

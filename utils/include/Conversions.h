@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _CONVERSIONS_H
-#define   _CONVERSIONS_H
+#ifndef   UTILS_INCLUDE_CONVERSIONS_H_INCLUDED
+#define   UTILS_INCLUDE_CONVERSIONS_H_INCLUDED
 
 #include<boost/mpl/identity.hpp>
 
@@ -146,4 +146,4 @@ typedef boost::numeric::converter<double,
 
 const Size2Double size2Double=Size2Double();
 
-#endif // _CONVERSIONS_H
+#endif // UTILS_INCLUDE_CONVERSIONS_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _TRIDIAGONAL_HAMILTONIAN_H
-#define _TRIDIAGONAL_HAMILTONIAN_H
+#ifndef STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
+#define STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 
 #include "TridiagonalHamiltonianFwd.h"
 
@@ -101,6 +101,5 @@ public:
 
 } // structure
 
-#include "impl/TridiagonalHamiltonian.tcc"
 
-#endif // _TRIDIAGONAL_HAMILTONIAN_H
+#endif // STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED

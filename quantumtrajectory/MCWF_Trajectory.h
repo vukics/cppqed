@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _MCWF_TRAJECTORY_H
-#define _MCWF_TRAJECTORY_H
+#ifndef QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
+#define QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
 
 #include "MCWF_TrajectoryFwd.h"
 
@@ -151,7 +151,4 @@ private:
 } // quantumtrajectory
 
 
-#include "impl/MCWF_Trajectory.tcc"
-
-
-#endif // _MCWF_TRAJECTORY_H
+#endif // QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED

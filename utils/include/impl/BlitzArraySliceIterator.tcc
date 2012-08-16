@@ -1,7 +1,10 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
-#define   _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED
 
+#include "BlitzArraySliceIterator.h"
+
+#include "impl/MultiIndexIterator.tcc"
 #include "Range.h"
 
 #include <boost/bind.hpp>
@@ -19,6 +22,8 @@
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
 
 
+#define DEFINE_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
+#include "details/BlitzArraySliceIteratorMacros.h"
 
 namespace blitzplusplus {
 
@@ -349,4 +354,7 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 #undef BOOST_PP_ITERATION_LIMITS
 
 
-#endif // _BLITZ_ARRAY_SMART_ITERATOR_IMPL_H
+#define UNDEF_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
+#include "details/BlitzArraySliceIteratorMacros.h"
+
+#endif // UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED

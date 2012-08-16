@@ -119,6 +119,7 @@ set_target_properties( C++QED PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX
 
 # build libel.so
 add_subdirectory(elements)
+include_directories(${ELEMENTS_INCLUDE_DIRS})
 
 # build all the scripts
 add_subdirectory(scripts)

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _TRIDIAGONAL_H
-#define _TRIDIAGONAL_H
+#ifndef QUANTUMOPERATOR_TRIDIAGONAL_H_INCLUDED
+#define QUANTUMOPERATOR_TRIDIAGONAL_H_INCLUDED
 
 #include "TridiagonalFwd.h"
 
@@ -8,7 +8,7 @@
 #include "LazyDensityOperator.h"
 #include "Types.h"
 
-#include "BlitzTinyOfArrays.h"
+#include "impl/BlitzTinyOfArrays.tcc"
 #include "Operators.h"
 
 #include "Exception.h"
@@ -234,7 +234,4 @@ directDiagonals(const typename Tridiagonal<RANK1>::Diagonals&, const typename Tr
 } // quantumoperator
 
 
-#include "impl/Tridiagonal.tcc"
-
-
-#endif // _TRIDIAGONAL_H
+#endif // QUANTUMOPERATOR_TRIDIAGONAL_H_INCLUDED

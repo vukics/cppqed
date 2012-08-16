@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ARRAY_BASE_FWD_INCLUDED
-#define   ARRAY_BASE_FWD_INCLUDED
+#ifndef   QUANTUMDATA_ARRAYBASEFWD_H_INCLUDED
+#define   QUANTUMDATA_ARRAYBASEFWD_H_INCLUDED
 
 
 namespace quantumdata {
@@ -12,4 +12,4 @@ class ArrayBase;
 
 
 
-#endif // ARRAY_BASE_FWD_INCLUDED
+#endif // QUANTUMDATA_ARRAYBASEFWD_H_INCLUDED

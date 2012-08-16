@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _DUAL_TRANSFORMATION_FWD_H
-#define _DUAL_TRANSFORMATION_FWD_H
+#ifndef QUANTUMDATA_TRANSFORMATIONFWD_H_INCLUDED
+#define QUANTUMDATA_TRANSFORMATIONFWD_H_INCLUDED
 
 
 namespace quantumdata {
@@ -22,5 +22,5 @@ struct Identity;
 } // quantumdata
 
 
-#endif // _DUAL_TRANSFORMATION_FWD_H
+#endif // QUANTUMDATA_TRANSFORMATIONFWD_H_INCLUDED
 

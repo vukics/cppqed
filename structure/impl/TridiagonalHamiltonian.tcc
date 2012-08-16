@@ -1,10 +1,12 @@
 // -*- C++ -*-
-#ifndef   TRIDIAGONAL_HAMILTONIAN_IMPL_INCLUDED
-#define   TRIDIAGONAL_HAMILTONIAN_IMPL_INCLUDED
+#ifndef   STRUCTURE_IMPL_TRIDIAGONALHAMILTONIAN_TCC_INCLUDED
+#define   STRUCTURE_IMPL_TRIDIAGONALHAMILTONIAN_TCC_INCLUDED
+
+#include "TridiagonalHamiltonian.h"
 
 #include "Algorithm.h"
-
 #include "Range.h"
+#include "impl/Tridiagonal.tcc"
 
 #include <boost/bind.hpp>
 
@@ -31,4 +33,4 @@ details::TDH_False<RANK>::addContribution(const StateVectorLow& psi, StateVector
 
 } // structure
 
-#endif // TRIDIAGONAL_HAMILTONIAN_IMPL_INCLUDED
+#endif // STRUCTURE_IMPL_TRIDIAGONALHAMILTONIAN_TCC_INCLUDED

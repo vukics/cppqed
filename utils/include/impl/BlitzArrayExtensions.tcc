@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_ARRAY_EXTENSIONS_IMPL_H
-#define   _BLITZ_ARRAY_EXTENSIONS_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_BLITZARRAYEXTENSIONS_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_BLITZARRAYEXTENSIONS_TCC_INCLUDED
+
+#include "BlitzArrayExtensions.h"
 
 #include "TMP_Tools.h"
 #include "Conversions.h"
@@ -55,4 +57,4 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
 } // blitzplusplus
 
 
-#endif // _BLITZ_ARRAY_EXTENSIONS_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_BLITZARRAYEXTENSIONS_TCC_INCLUDED

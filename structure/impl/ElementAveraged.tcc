@@ -1,7 +1,8 @@
 // -*- C++ -*-
-#ifndef STRUCTURE_ELEMENT_AVERAGED_IMPL_INCLUDED
-#define STRUCTURE_ELEMENT_AVERAGED_IMPL_INCLUDED
+#ifndef STRUCTURE_IMPL_ELEMENTAVERAGED_TCC_INCLUDED
+#define STRUCTURE_IMPL_ELEMENTAVERAGED_TCC_INCLUDED
 
+#include "ElementAveraged.h"
 
 #include "Algorithm.h"
 
@@ -67,4 +68,4 @@ structure::averaged::Collecting<RANK>::process(Averages& avr) const
 
 
 
-#endif // STRUCTURE_ELEMENT_AVERAGED_IMPL_INCLUDED
+#endif // STRUCTURE_IMPL_ELEMENTAVERAGED_TCC_INCLUDED

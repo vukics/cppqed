@@ -1,10 +1,12 @@
 // -*- C++ -*-
-#ifndef   _COMPLEX_ARRAY_EXTENSIONS_IMPL_H
-#define   _COMPLEX_ARRAY_EXTENSIONS_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_COMPLEXARRAYEXTENSIONS_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_COMPLEXARRAYEXTENSIONS_TCC_INCLUDED
 
-#include "BlitzArrayExtensions.h"
-#include "CMatrix.h"
-#include "TMP_Tools.h"
+#include "ComplexArrayExtensions.h"
+
+#include "impl/BlitzArrayExtensions.tcc"
+#include "impl/BlitzTinyExtensions.tcc"
+
 
 namespace blitzplusplus {
 
@@ -79,4 +81,4 @@ doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2, boost
 } // blitzplusplus
 
 
-#endif // _COMPLEX_ARRAY_EXTENSIONS_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_COMPLEXARRAYEXTENSIONS_TCC_INCLUDED

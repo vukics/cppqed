@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   STRUCTURE_AVERAGED_FWD_INCLUDED
-#define   STRUCTURE_AVERAGED_FWD_INCLUDED
+#ifndef   STRUCTURE_AVERAGEDFWD_H_INCLUDED
+#define   STRUCTURE_AVERAGEDFWD_H_INCLUDED
 
 namespace structure {
 
@@ -15,4 +15,4 @@ template<int, bool IS_TD=true> class Averaged;
 } // structure
 
 
-#endif // STRUCTURE_AVERAGED_FWD_INCLUDED
+#endif // STRUCTURE_AVERAGEDFWD_H_INCLUDED

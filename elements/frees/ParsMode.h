@@ -1,8 +1,8 @@
 // -*- C++ -*-
-#ifndef   _PARS_MODE_H
-#define   _PARS_MODE_H
+#ifndef   ELEMENTS_FREES_PARSMODE_H_INCLUDED
+#define   ELEMENTS_FREES_PARSMODE_H_INCLUDED
 
-#include "ModeFwd.h"
+#include "Mode_Fwd.h"
 
 #include "ParsFwd.h"
 
@@ -49,4 +49,4 @@ struct ParsPumpedLossy : ParsPumped, ParsLossy
 
 } // mode
 
-#endif // _PARS_MODE_H
+#endif // ELEMENTS_FREES_PARSMODE_H_INCLUDED

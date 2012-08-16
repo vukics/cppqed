@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_INTERACTION_H
-#define _STRUCTURE_INTERACTION_H
+#ifndef STRUCTURE_INTERACTION_H_INCLUDED
+#define STRUCTURE_INTERACTION_H_INCLUDED
 
 /*
   The simplest possible implementation allowing for interaction
@@ -48,4 +48,4 @@ private:
 
 } // structure
 
-#endif // _STRUCTURE_INTERACTION_H
+#endif // STRUCTURE_INTERACTION_H_INCLUDED

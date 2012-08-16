@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _PARS_H
-#define _PARS_H
+#ifndef UTILS_INCLUDE_PARS_H_INCLUDED
+#define UTILS_INCLUDE_PARS_H_INCLUDED
 
 #include "ParsFwd.h"
 
@@ -162,6 +162,5 @@ private:
 
 } // parameters
 
-#include "impl/Pars.tcc"
 
-#endif // _PARS_H
+#endif // UTILS_INCLUDE_PARS_H_INCLUDED

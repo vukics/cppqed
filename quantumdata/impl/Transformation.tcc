@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef _TRANSFORMATION_IMPL_H
-#define _TRANSFORMATION_IMPL_H
+#ifndef QUANTUMDATA_IMPL_TRANSFORMATION_TCC_INCLUDED
+#define QUANTUMDATA_IMPL_TRANSFORMATION_TCC_INCLUDED
+
+#include "Transformation.h"
 
 #include <boost/fusion/adapted/mpl.hpp>
 #include <boost/fusion/tuple.hpp>
@@ -255,4 +257,4 @@ struct Traits<Composite<TRAFOS> >
 
 } // quantumdata
 
-#endif // _TRANSFORMATION_IMPL_H
+#endif // QUANTUMDATA_IMPL_TRANSFORMATION_TCC_INCLUDED

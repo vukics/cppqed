@@ -1,10 +1,10 @@
 // -*- C++ -*-
-#ifndef   IDENTICAL_PARTICLES_INCLUDED
-#define   IDENTICAL_PARTICLES_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_IDENTICALPARTICLES_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_IDENTICALPARTICLES_H_INCLUDED
 
 #include "IdenticalParticlesFwd.h"
 
-#include "Particle.h"
+#include "Particle_.h"
 
 #include "Interaction.h"
 
@@ -25,4 +25,4 @@ private:
 };
 
 
-#endif // IDENTICAL_PARTICLES_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_IDENTICALPARTICLES_H_INCLUDED

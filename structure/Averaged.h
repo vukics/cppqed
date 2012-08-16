@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_AVERAGED_H
-#define _STRUCTURE_AVERAGED_H
+#ifndef STRUCTURE_AVERAGED_H_INCLUDED
+#define STRUCTURE_AVERAGED_H_INCLUDED
 
 #include "AveragedFwd.h"
 
@@ -166,4 +166,4 @@ private:
 
 } // structure
 
-#endif // _STRUCTURE_AVERAGED_H
+#endif // STRUCTURE_AVERAGED_H_INCLUDED

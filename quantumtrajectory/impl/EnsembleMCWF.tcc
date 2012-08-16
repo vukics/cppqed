@@ -1,7 +1,10 @@
 // -*- C++ -*-
-#ifndef   _ENSEMBLE_OF_MCWF_TRAJECTORIES_IMPL_H
-#define   _ENSEMBLE_OF_MCWF_TRAJECTORIES_IMPL_H
+#ifndef   QUANTUMTRAJECTORY_IMPL_ENSEMBLEMCWF_TCC_INCLUDED
+#define   QUANTUMTRAJECTORY_IMPL_ENSEMBLEMCWF_TCC_INCLUDED
 
+#include "EnsembleMCWF.h"
+
+#include "ParsMCWF_Trajectory.h"
 
 namespace quantumtrajectory {
 
@@ -73,4 +76,4 @@ Base<RANK>::Base(
 } // quantumtrajectory
 
 
-#endif // _ENSEMBLE_OF_MCWF_TRAJECTORIES_IMPL_H
+#endif // QUANTUMTRAJECTORY_IMPL_ENSEMBLEMCWF_TCC_INCLUDED

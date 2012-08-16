@@ -1,6 +1,8 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_TINY_EXTENSIONS_IMPL_H
-#define   _BLITZ_TINY_EXTENSIONS_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_BLITZTINYEXTENSIONS_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_BLITZTINYEXTENSIONS_TCC_INCLUDED
+
+#include "BlitzTinyExtensions.h"
 
 #include "Conversions.h"
 #include "TMP_Tools.h"
@@ -125,4 +127,4 @@ halfCutTiny(const TinyVector<T,TWO_TIMES_RANK>& tiny)
 } // blitzplusplus
 
 
-#endif // _BLITZ_TINY_EXTENSIONS_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_BLITZTINYEXTENSIONS_TCC_INCLUDED
