@@ -19,7 +19,7 @@ struct Empty;
 
 } // details
 
-template<int, typename=details::Empty>
+template<int RANK, typename B=details::Empty>
 struct Types;
 
 } // quantumdata

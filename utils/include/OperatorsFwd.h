@@ -10,7 +10,7 @@ struct EmptyBase;
 
 } // details
 
-template<typename, typename=details::EmptyBase>
+template<typename T, typename B=details::EmptyBase>
 struct VectorSpace;
 
 
