@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _MASTER_FWD_H
-#define   _MASTER_FWD_H
+#ifndef   QUANTUMTRAJECTORY_MASTERFWD_H_INCLUDED
+#define   QUANTUMTRAJECTORY_MASTERFWD_H_INCLUDED
 
 #include "TMP_Tools.h"
 
@@ -24,4 +24,4 @@ class Master;
 } // quantumtrajectory
 
 
-#endif // _MASTER_FWD_H
+#endif // QUANTUMTRAJECTORY_MASTERFWD_H_INCLUDED

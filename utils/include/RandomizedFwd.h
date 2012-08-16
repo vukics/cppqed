@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   RANDOMIZED_FWD_INCLUDED
-#define   RANDOMIZED_FWD_INCLUDED
+#ifndef   UTILS_INCLUDE_RANDOMIZEDFWD_H_INCLUDED
+#define   UTILS_INCLUDE_RANDOMIZEDFWD_H_INCLUDED
 
 namespace randomized {
 
@@ -12,4 +12,4 @@ class MakerGSL;
 } // randomized
 
 
-#endif // RANDOMIZED_FWD_INCLUDED
+#endif // UTILS_INCLUDE_RANDOMIZEDFWD_H_INCLUDED

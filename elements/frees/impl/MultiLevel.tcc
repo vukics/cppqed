@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   MULTI_LEVEL_SYSTEM_IMPL_INCLUDED
-#define   MULTI_LEVEL_SYSTEM_IMPL_INCLUDED
+#ifndef   ELEMENTS_FREES_IMPL_MULTILEVEL_TCC_INCLUDED
+#define   ELEMENTS_FREES_IMPL_MULTILEVEL_TCC_INCLUDED
 
 #include "MultiLevel_.h"
 
@@ -418,7 +418,7 @@ PumpedLossyMultiLevelSch<NL,VP,VL,Averaged>::PumpedLossyMultiLevelSch(const Real
 }
 
 
-#endif // MULTI_LEVEL_SYSTEM_IMPL_INCLUDED
+#endif // ELEMENTS_FREES_IMPL_MULTILEVEL_TCC_INCLUDED
 
 
 

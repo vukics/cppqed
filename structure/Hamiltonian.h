@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_HAMILTONIAN_H
-#define _STRUCTURE_HAMILTONIAN_H
+#ifndef STRUCTURE_HAMILTONIAN_H_INCLUDED
+#define STRUCTURE_HAMILTONIAN_H_INCLUDED
 
 #include "HamiltonianFwd.h"
 
@@ -72,4 +72,4 @@ private:
 
 } // structure
 
-#endif // _STRUCTURE_HAMILTONIAN_H
+#endif // STRUCTURE_HAMILTONIAN_H_INCLUDED

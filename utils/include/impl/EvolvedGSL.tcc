@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   EVOLVED_GSL_IMPL_INCLUDED
-#define   EVOLVED_GSL_IMPL_INCLUDED
+#ifndef   UTILS_INCLUDE_IMPL_EVOLVEDGSL_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_EVOLVEDGSL_TCC_INCLUDED
 
 #include "EvolvedGSL.h"
 
@@ -81,4 +81,4 @@ template<typename A> void EvolvedGSL<A>::doStep(double deltaT)
 
 } // evolved
 
-#endif // EVOLVED_GSL_IMPL_INCLUDED
+#endif // UTILS_INCLUDE_IMPL_EVOLVEDGSL_TCC_INCLUDED

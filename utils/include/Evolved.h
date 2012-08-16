@@ -9,8 +9,8 @@
 
 */
 
-#ifndef _EVOLVED_H
-#define _EVOLVED_H
+#ifndef UTILS_INCLUDE_EVOLVED_H_INCLUDED
+#define UTILS_INCLUDE_EVOLVED_H_INCLUDED
 
 #include "EvolvedFwd.h"
 
@@ -140,4 +140,4 @@ public:
 } // evolved
 
 
-#endif // _EVOLVED_H
+#endif // UTILS_INCLUDE_EVOLVED_H_INCLUDED

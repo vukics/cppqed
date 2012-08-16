@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   COMBINATORICS_FWD_INCLUDED
-#define   COMBINATORICS_FWD_INCLUDED
+#ifndef   UTILS_INCLUDE_COMBINATORICSFWD_H_INCLUDED
+#define   UTILS_INCLUDE_COMBINATORICSFWD_H_INCLUDED
 
 namespace cpputils {
 
@@ -10,4 +10,4 @@ class CWR_Dir; // Combinations with repetitions
 
 } // cpputils
 
-#endif // COMBINATORICS_FWD_INCLUDED
+#endif // UTILS_INCLUDE_COMBINATORICSFWD_H_INCLUDED

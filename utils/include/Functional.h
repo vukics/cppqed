@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _CPPUTILS_FUNCTIONAL_H
-#define _CPPUTILS_FUNCTIONAL_H
+#ifndef UTILS_INCLUDE_FUNCTIONAL_H_INCLUDED
+#define UTILS_INCLUDE_FUNCTIONAL_H_INCLUDED
 
 #include<functional>
 
@@ -18,4 +18,4 @@ struct plus : public std::binary_function<T,T,T>
 } // cpputils
 
 
-#endif // _CPPUTILS_FUNCTIONAL_H
+#endif // UTILS_INCLUDE_FUNCTIONAL_H_INCLUDED

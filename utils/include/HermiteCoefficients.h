@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _HERMITE_COEFFICIENTS_H
-#define _HERMITE_COEFFICIENTS_H
+#ifndef UTILS_INCLUDE_HERMITECOEFFICIENTS_H_INCLUDED
+#define UTILS_INCLUDE_HERMITECOEFFICIENTS_H_INCLUDED
 
 #include <vector>
 #include <cstddef>
@@ -16,4 +16,4 @@ namespace HermiteCoefficients {
 
 }
 
-#endif //_HERMITE_COEFFICIENTS_H
+#endif // UTILS_INCLUDE_HERMITECOEFFICIENTS_H_INCLUDED

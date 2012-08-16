@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   BOOLEAN_NEGATED_PROXY_INCLUDED
-#define   BOOLEAN_NEGATED_PROXY_INCLUDED
+#ifndef   UTILS_INCLUDE_BOOLEANNEGATEDPROXY_H_INCLUDED
+#define   UTILS_INCLUDE_BOOLEANNEGATEDPROXY_H_INCLUDED
 
 #include "BooleanNegatedProxyFwd.h"
 
@@ -31,4 +31,4 @@ std::istream& operator>>(std::istream&,       BooleanNegatedProxy&);
 
 } // cpputils
 
-#endif // BOOLEAN_NEGATED_PROXY_INCLUDED
+#endif // UTILS_INCLUDE_BOOLEANNEGATEDPROXY_H_INCLUDED

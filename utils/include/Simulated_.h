@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _SIMULATED__H
-#define _SIMULATED__H
+#ifndef UTILS_INCLUDE_SIMULATED__H_INCLUDED
+#define UTILS_INCLUDE_SIMULATED__H_INCLUDED
 
 #include "SimulatedFwd.h"
 
@@ -48,4 +48,4 @@ public:
 } // trajectory
 
 
-#endif // _SIMULATED__H
+#endif // UTILS_INCLUDE_SIMULATED__H_INCLUDED

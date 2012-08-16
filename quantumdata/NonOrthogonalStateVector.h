@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _NON_ORTHOGONAL_STATE_VECTOR_H
-#define _NON_ORTHOGONAL_STATE_VECTOR_H
+#ifndef QUANTUMDATA_NONORTHOGONALSTATEVECTOR_H_INCLUDED
+#define QUANTUMDATA_NONORTHOGONALSTATEVECTOR_H_INCLUDED
 
 #include "NonOrthogonalStateVectorFwd.h"
 #include "NonOrthogonalDensityOperator.h"
@@ -150,4 +150,4 @@ operator*(const StateVector<RANK1>& sv1, const NonOrthogonalStateVector<RANK2,TR
 
 } // quantumdata
 
-#endif // _NON_ORTHOGONAL_STATE_VECTOR_H
+#endif // QUANTUMDATA_NONORTHOGONALSTATEVECTOR_H_INCLUDED

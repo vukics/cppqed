@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _EVOLVED_NR_H
-#define _EVOLVED_NR_H
+#ifndef UTILS_INCLUDE_EVOLVEDNR_H_INCLUDED
+#define UTILS_INCLUDE_EVOLVEDNR_H_INCLUDED
 
 #include "EvolvedNRFwd.h"
 
@@ -63,4 +63,4 @@ private:
 } // evolved
 
 
-#endif // _EVOLVED_NR_H
+#endif // UTILS_INCLUDE_EVOLVEDNR_H_INCLUDED

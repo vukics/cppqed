@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _CPPUTILS_FUNCTIONAL_FWD_H
-#define   _CPPUTILS_FUNCTIONAL_FWD_H
+#ifndef   UTILS_INCLUDE_FUNCTIONALFWD_H_INCLUDED
+#define   UTILS_INCLUDE_FUNCTIONALFWD_H_INCLUDED
 
 namespace cpputils {
 
@@ -12,4 +12,4 @@ struct plus;
 } // cpputils
 
 
-#endif // _CPPUTILS_FUNCTIONAL_FWD_H
+#endif // UTILS_INCLUDE_FUNCTIONALFWD_H_INCLUDED

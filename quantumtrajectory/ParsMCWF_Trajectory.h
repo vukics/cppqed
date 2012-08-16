@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _PARS_MCWF_TRAJECTORY_H
-#define _PARS_MCWF_TRAJECTORY_H
+#ifndef QUANTUMTRAJECTORY_PARSMCWF_TRAJECTORY_H_INCLUDED
+#define QUANTUMTRAJECTORY_PARSMCWF_TRAJECTORY_H_INCLUDED
 
 #include "MCWF_TrajectoryFwd.h"
 
@@ -36,4 +36,4 @@ struct ParsMCWF_Trajectory : public trajectory::ParsStochasticTrajectory {
 
 } // quantumtrajectory
 
-#endif // _PARS_MCWF_TRAJECTORY_H
+#endif // QUANTUMTRAJECTORY_PARSMCWF_TRAJECTORY_H_INCLUDED

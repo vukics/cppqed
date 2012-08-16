@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _MCWF_TRAJECTORY_FWD_H
-#define   _MCWF_TRAJECTORY_FWD_H
+#ifndef   QUANTUMTRAJECTORY_MCWF_TRAJECTORYFWD_H_INCLUDED
+#define   QUANTUMTRAJECTORY_MCWF_TRAJECTORYFWD_H_INCLUDED
 
 
 namespace quantumtrajectory {
@@ -18,4 +18,4 @@ class MCWF_Trajectory;
 } // quantumtrajectory
 
 
-#endif // _MCWF_TRAJECTORY_FWD_H
+#endif // QUANTUMTRAJECTORY_MCWF_TRAJECTORYFWD_H_INCLUDED

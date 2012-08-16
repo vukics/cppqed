@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _BLITZ_ARRAY_SMART_ITERATOR_H
-#define _BLITZ_ARRAY_SMART_ITERATOR_H
+#ifndef UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
+#define UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
 
 #include "BlitzArraySliceIteratorFwd.h"
 
@@ -393,6 +393,6 @@ fullRange(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
 #define UNDEF_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
 #include "details/BlitzArraySliceIteratorMacros.h"
 
-#endif // _BLITZ_ARRAY_SMART_ITERATOR_H
+#endif // UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
 
 

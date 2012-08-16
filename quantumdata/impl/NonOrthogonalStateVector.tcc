@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _NO_STATE_VECTOR_IMPL_H
-#define _NO_STATE_VECTOR_IMPL_H
+#ifndef QUANTUMDATA_IMPL_NONORTHOGONALSTATEVECTOR_TCC_INCLUDED
+#define QUANTUMDATA_IMPL_NONORTHOGONALSTATEVECTOR_TCC_INCLUDED
 
 #include "NonOrthogonalStateVector.h"
 
@@ -24,5 +24,5 @@ void NonOrthogonalStateVector<RANK,TRAFO>::update() const
 
 } // quantumdata
 
-#endif // _NO_STATE_VECTOR_IMPL_H
+#endif // QUANTUMDATA_IMPL_NONORTHOGONALSTATEVECTOR_TCC_INCLUDED
 

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _DO_DISPLAY_FWD_H
-#define   _DO_DISPLAY_FWD_H
+#ifndef   QUANTUMTRAJECTORY_DO_DISPLAYFWD_H_INCLUDED
+#define   QUANTUMTRAJECTORY_DO_DISPLAYFWD_H_INCLUDED
 
 
 namespace quantumtrajectory {
@@ -15,4 +15,4 @@ class DO_Display;
 } // quantumtrajectory
 
 
-#endif // _DO_DISPLAY_FWD_H
+#endif // QUANTUMTRAJECTORY_DO_DISPLAYFWD_H_INCLUDED

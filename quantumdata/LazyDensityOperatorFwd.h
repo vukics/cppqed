@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _LAZY_DENSITY_OPERATOR_FWD_H
-#define   _LAZY_DENSITY_OPERATOR_FWD_H
+#ifndef   QUANTUMDATA_LAZYDENSITYOPERATORFWD_H_INCLUDED
+#define   QUANTUMDATA_LAZYDENSITYOPERATORFWD_H_INCLUDED
 
 namespace quantumdata {
 
@@ -17,4 +17,4 @@ class LazyDensityOperator;
 
 } // quantumdata
 
-#endif // _LAZY_DENSITY_OPERATOR_FWD_H
+#endif // QUANTUMDATA_LAZYDENSITYOPERATORFWD_H_INCLUDED

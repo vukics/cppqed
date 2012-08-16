@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _MASTER_H
-#define _MASTER_H
+#ifndef QUANTUMTRAJECTORY_MASTER_H_INCLUDED
+#define QUANTUMTRAJECTORY_MASTER_H_INCLUDED
 
 #include "MasterFwd.h"
 
@@ -153,4 +153,4 @@ private:
 } // quantumtrajectory
 
 
-#endif // _MASTER_H
+#endif // QUANTUMTRAJECTORY_MASTER_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   EVOLVED_GSL_FWD_INCLUDED
-#define   EVOLVED_GSL_FWD_INCLUDED
+#ifndef   UTILS_INCLUDE_EVOLVEDGSLFWD_H_INCLUDED
+#define   UTILS_INCLUDE_EVOLVEDGSLFWD_H_INCLUDED
 
 namespace evolved {
 
@@ -17,4 +17,4 @@ class EvolvedGSL;
 
 } // evolved
 
-#endif // EVOLVED_GSL_FWD_INCLUDED
+#endif // UTILS_INCLUDE_EVOLVEDGSLFWD_H_INCLUDED

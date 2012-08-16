@@ -8,8 +8,8 @@
 
 */
 
-#ifndef _CPPUTILS_MATH_H
-#define _CPPUTILS_MATH_H
+#ifndef UTILS_INCLUDE_MATHEXTENSIONS_H_INCLUDED
+#define UTILS_INCLUDE_MATHEXTENSIONS_H_INCLUDED
 
 #include "MathExtensionsFwd.h"
 
@@ -48,4 +48,4 @@ inline int round(double r) {
 
 } // mathutils
 
-#endif // _CPPUTILS_MATH_H
+#endif // UTILS_INCLUDE_MATHEXTENSIONS_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   SIGMA_TYPE_OPERATOR_FWD_INCLUDED
-#define   SIGMA_TYPE_OPERATOR_FWD_INCLUDED
+#ifndef   QUANTUMOPERATOR_SIGMAFWD_H_INCLUDED
+#define   QUANTUMOPERATOR_SIGMAFWD_H_INCLUDED
 
 namespace quantumoperator {
 
@@ -16,4 +16,4 @@ class DirectProduct;
 
 } // quantumoperator
 
-#endif // SIGMA_TYPE_OPERATOR_FWD_INCLUDED
+#endif // QUANTUMOPERATOR_SIGMAFWD_H_INCLUDED

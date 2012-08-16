@@ -8,8 +8,8 @@
 
 // Consider copying of Trajectories
 
-#ifndef _TRAJECTORY_H
-#define _TRAJECTORY_H
+#ifndef UTILS_INCLUDE_TRAJECTORY_H_INCLUDED
+#define UTILS_INCLUDE_TRAJECTORY_H_INCLUDED
 
 #include "TrajectoryFwd.h"
 
@@ -153,4 +153,4 @@ void doRun(Trajectory<A>& traj, double time, int dc);
 } // trajectory
 
 
-#endif // _TRAJECTORY_H
+#endif // UTILS_INCLUDE_TRAJECTORY_H_INCLUDED

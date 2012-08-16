@@ -2,8 +2,8 @@
 /*
 http://www.josuttis.com/libbook/memory/myalloc.hpp.html
 */
-#ifndef _VECTOR_TRAITS_H
-#define _VECTOR_TRAITS_H
+#ifndef UTILS_INCLUDE_VECTORTRAITS_H_INCLUDED
+#define UTILS_INCLUDE_VECTORTRAITS_H_INCLUDED
 
 #include<vector>
 #include<limits>
@@ -56,4 +56,4 @@ struct VectorTraits<std::vector<dcomp> >
 
 
 
-#endif // _VECTOR_TRAITS_H
+#endif // UTILS_INCLUDE_VECTORTRAITS_H_INCLUDED

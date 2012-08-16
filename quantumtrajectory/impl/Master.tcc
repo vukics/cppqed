@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _MASTER_IMPL_H
-#define   _MASTER_IMPL_H
+#ifndef   QUANTUMTRAJECTORY_IMPL_MASTER_TCC_INCLUDED
+#define   QUANTUMTRAJECTORY_IMPL_MASTER_TCC_INCLUDED
 
 #include "Master.h"
 
@@ -187,4 +187,4 @@ void BaseFast<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperato
 } // quantumtrajectory
 
 
-#endif // _MASTER_IMPL_H
+#endif // QUANTUMTRAJECTORY_IMPL_MASTER_TCC_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _BLITZ_TINY_EXTENSIONS_H
-#define _BLITZ_TINY_EXTENSIONS_H
+#ifndef UTILS_INCLUDE_BLITZTINYEXTENSIONS_H_INCLUDED
+#define UTILS_INCLUDE_BLITZTINYEXTENSIONS_H_INCLUDED
 
 #include "BlitzTinyExtensionsFwd.h"
 
@@ -31,4 +31,4 @@ halfCutTiny(const blitz::TinyVector<T,TWO_TIMES_RANK>&);
 } // blitzplusplus
 
 
-#endif // _BLITZ_TINY_EXTENSIONS_H
+#endif // UTILS_INCLUDE_BLITZTINYEXTENSIONS_H_INCLUDED

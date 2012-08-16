@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _PARS_STOCHASTIC_TRAJECTORY_H
-#define _PARS_STOCHASTIC_TRAJECTORY_H
+#ifndef UTILS_INCLUDE_PARSSTOCHASTICTRAJECTORY_H_INCLUDED
+#define UTILS_INCLUDE_PARSSTOCHASTICTRAJECTORY_H_INCLUDED
 
 
 #include "StochasticTrajectoryFwd.h"
@@ -27,4 +27,4 @@ struct ParsStochasticTrajectory : ParsTrajectory {
 } // trajectory
 
 
-#endif // _PARS_STOCHASTIC_TRAJECTORY_H
+#endif // UTILS_INCLUDE_PARSSTOCHASTICTRAJECTORY_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _STRUCTURE_TYPES_FWD_H
-#define   _STRUCTURE_TYPES_FWD_H
+#ifndef   QUANTUMDATA_TYPESFWD_H_INCLUDED
+#define   QUANTUMDATA_TYPESFWD_H_INCLUDED
 
 
 namespace structure {
@@ -24,4 +24,4 @@ struct Types;
 
 } // quantumdata
 
-#endif // _STRUCTURE_TYPES_FWD_H
+#endif // QUANTUMDATA_TYPESFWD_H_INCLUDED

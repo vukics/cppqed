@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   EVOLVED_NR_FWD_INCLUDED
-#define   EVOLVED_NR_FWD_INCLUDED
+#ifndef   UTILS_INCLUDE_EVOLVEDNRFWD_H_INCLUDED
+#define   UTILS_INCLUDE_EVOLVEDNRFWD_H_INCLUDED
 
 
 namespace evolved {
@@ -14,4 +14,4 @@ class EvolvedNR;
 
 } // evolved
 
-#endif // EVOLVED_NR_FWD_INCLUDED
+#endif // UTILS_INCLUDE_EVOLVEDNRFWD_H_INCLUDED

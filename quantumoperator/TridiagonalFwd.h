@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _TRIDIAGONAL_FWD_H
-#define   _TRIDIAGONAL_FWD_H
+#ifndef   QUANTUMOPERATOR_TRIDIAGONALFWD_H_INCLUDED
+#define   QUANTUMOPERATOR_TRIDIAGONALFWD_H_INCLUDED
 
 
 struct TridiagonalConsistencyErrorException ;
@@ -15,4 +15,4 @@ class Tridiagonal;
 
 } // quantumoperator
 
-#endif // _TRIDIAGONAL_FWD_H
+#endif // QUANTUMOPERATOR_TRIDIAGONALFWD_H_INCLUDED

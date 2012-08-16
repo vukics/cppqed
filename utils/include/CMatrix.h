@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _C_MATRIX_H
-#define _C_MATRIX_H
+#ifndef UTILS_INCLUDE_CMATRIX_H_INCLUDED
+#define UTILS_INCLUDE_CMATRIX_H_INCLUDED
 
 #include "CVector.h"
 
@@ -20,4 +20,4 @@ calculateTwoTimesRealPartOfSelf(CMatrix&);
 
 } // linalg
 
-#endif // _C_MATRIX_H
+#endif // UTILS_INCLUDE_CMATRIX_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _VECTOR_FROM_MATRIX_SMART_ITERATOR_H
-#define _VECTOR_FROM_MATRIX_SMART_ITERATOR_H
+#ifndef UTILS_INCLUDE_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
+#define UTILS_INCLUDE_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 
 #include "VectorFromMatrixSliceIteratorFwd.h"
 
@@ -62,4 +62,4 @@ template<int RANK, typename S> struct ConsistencyChecker<RANK,blitzplusplus::vfm
 } // blitzplusplus
 
 
-#endif // _VECTOR_FROM_MATRIX_SMART_ITERATOR_H
+#endif // UTILS_INCLUDE_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED

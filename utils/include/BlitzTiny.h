@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_TINY_TEMPLATE_TYPEDEFS_H
-#define   _BLITZ_TINY_TEMPLATE_TYPEDEFS_H
+#ifndef   UTILS_INCLUDE_BLITZTINY_H_INCLUDED
+#define   UTILS_INCLUDE_BLITZTINY_H_INCLUDED
 
 #include <blitz/array.h>
 
@@ -26,4 +26,4 @@ struct TinyVectorLengthTraits<blitz::TinyVector<T,LENGTH> > : boost::mpl::int_<L
 #define TTD_IDXTINY(r) blitz::TinyVector<ptrdiff_t,r>
 
 
-#endif // _BLITZ_TINY_TEMPLATE_TYPEDEFS_H
+#endif // UTILS_INCLUDE_BLITZTINY_H_INCLUDED

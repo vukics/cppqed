@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _FAST_FOURIER_TRANSFORM_IMPL_H
-#define   _FAST_FOURIER_TRANSFORM_IMPL_H
+#ifndef   UTILS_INCLUDE_IMPL_FFT_TCC_INCLUDED
+#define   UTILS_INCLUDE_IMPL_FFT_TCC_INCLUDED
 
 #include "FFT.h"
 
@@ -20,4 +20,4 @@ void transform(A& a, Direction dir) throw(FFT_Exception)
 
 } // fft
 
-#endif // _FAST_FOURIER_TRANSFORM_IMPL_H
+#endif // UTILS_INCLUDE_IMPL_FFT_TCC_INCLUDED

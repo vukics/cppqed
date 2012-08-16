@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _SIMULATED_HIGH_H
-#define _SIMULATED_HIGH_H
+#ifndef UTILS_INCLUDE_SIMULATED_H_INCLUDED
+#define UTILS_INCLUDE_SIMULATED_H_INCLUDED
 
 #include "BlitzArrayTraits.h"
 #include "impl/EvolvedGSL.tcc"
@@ -12,4 +12,4 @@ using parameters::ParameterTable    ;
 using parameters::update            ;
 using parameters::ParsNamedException;
 
-#endif // _SIMULATED_HIGH_H
+#endif // UTILS_INCLUDE_SIMULATED_H_INCLUDED

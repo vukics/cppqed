@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _COMPLEX_ARRAY_EXTENSIONS_H
-#define   _COMPLEX_ARRAY_EXTENSIONS_H
+#ifndef   UTILS_INCLUDE_COMPLEXARRAYEXTENSIONS_H_INCLUDED
+#define   UTILS_INCLUDE_COMPLEXARRAYEXTENSIONS_H_INCLUDED
 
 #include "BlitzArray.h"
 #include "CMatrix.h"
@@ -38,4 +38,4 @@ doDirect(const TTD_CARRAY(RANK1)&, const TTD_CARRAY(RANK2)&, boost::mpl::bool_<M
 } // blitzplusplus
 
 
-#endif // _COMPLEX_ARRAY_EXTENSIONS_H
+#endif // UTILS_INCLUDE_COMPLEXARRAYEXTENSIONS_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _FUZZY_DOUBLE_H
-#define _FUZZY_DOUBLE_H
+#ifndef UTILS_INCLUDE_FUZZYDOUBLE_H_INCLUDED
+#define UTILS_INCLUDE_FUZZYDOUBLE_H_INCLUDED
 
 #include "FuzzyDoubleFwd.h"
 
@@ -39,4 +39,4 @@ private:
 
 } // cpputils
 
-#endif // _FUZZY_DOUBLE_H
+#endif // UTILS_INCLUDE_FUZZYDOUBLE_H_INCLUDED

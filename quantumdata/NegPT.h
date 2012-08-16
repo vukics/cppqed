@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   NEGPT_H_INCLUDED
-#define   NEGPT_H_INCLUDED
+#ifndef   QUANTUMDATA_NEGPT_H_INCLUDED
+#define   QUANTUMDATA_NEGPT_H_INCLUDED
 
 #include "DensityOperator.h"
 
@@ -55,4 +55,4 @@ double negPT(const DensityOperator<RANK>&, V)
 #endif // DO_NOT_USE_FLENS
 
 
-#endif // NEGPT_H_INCLUDED
+#endif // QUANTUMDATA_NEGPT_H_INCLUDED

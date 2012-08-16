@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _CPP_UTILS_OPERATORS_H
-#define _CPP_UTILS_OPERATORS_H
+#ifndef UTILS_INCLUDE_OPERATORS_H_INCLUDED
+#define UTILS_INCLUDE_OPERATORS_H_INCLUDED
 
 #include "OperatorsFwd.h"
 
@@ -28,4 +28,4 @@ struct VectorSpace
 
 } // linalg
 
-#endif // _CPP_UTILS_OPERATORS_H
+#endif // UTILS_INCLUDE_OPERATORS_H_INCLUDED

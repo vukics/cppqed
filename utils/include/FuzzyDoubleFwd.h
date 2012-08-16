@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _FUZZY_DOUBLE_FWD_H
-#define   _FUZZY_DOUBLE_FWD_H
+#ifndef   UTILS_INCLUDE_FUZZYDOUBLEFWD_H_INCLUDED
+#define   UTILS_INCLUDE_FUZZYDOUBLEFWD_H_INCLUDED
 
 namespace cpputils {
 
@@ -11,4 +11,4 @@ class FuzzyDouble;
 } // FuzzyDouble
 
 
-#endif // _FUZZY_DOUBLE_FWD_H
+#endif // UTILS_INCLUDE_FUZZYDOUBLEFWD_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _ACT_HELPER_INCLUDED
-#define   _ACT_HELPER_INCLUDED
+#ifndef   ELEMENTS_COMPOSITE_ACT_H_INCLUDED
+#define   ELEMENTS_COMPOSITE_ACT_H_INCLUDED
 
 #include "SubSystem.h"
 
@@ -29,4 +29,4 @@ public:
 #undef  BASE_class1
 
 
-#endif // _ACT_HELPER_INCLUDED
+#endif // ELEMENTS_COMPOSITE_ACT_H_INCLUDED

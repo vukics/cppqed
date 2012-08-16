@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _INTEGRATION_H
-#define _INTEGRATION_H
+#ifndef UTILS_INCLUDE_INTEGRATION_H_INCLUDED
+#define UTILS_INCLUDE_INTEGRATION_H_INCLUDED
 
 #include "ComplexExtensions.h"
 
@@ -10,4 +10,4 @@ double RealIntegration(double (*)(double, void*), double, double, void*, double 
 
 }
 
-#endif // _INTEGRATION_H
+#endif // UTILS_INCLUDE_INTEGRATION_H_INCLUDED

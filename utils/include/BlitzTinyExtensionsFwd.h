@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _BLITZ_TINY_EXTENSIONS_FWD_H
-#define   _BLITZ_TINY_EXTENSIONS_FWD_H
+#ifndef   UTILS_INCLUDE_BLITZTINYEXTENSIONSFWD_H_INCLUDED
+#define   UTILS_INCLUDE_BLITZTINYEXTENSIONSFWD_H_INCLUDED
 
 namespace blitzplusplus {
 
@@ -10,4 +10,4 @@ struct HalfCutTinyFishyException;
 
 } // blitzplusplus
 
-#endif // _BLITZ_TINY_EXTENSIONS_FWD_H
+#endif // UTILS_INCLUDE_BLITZTINYEXTENSIONSFWD_H_INCLUDED

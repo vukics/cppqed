@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _NEGPT_IMPL_H
-#define   _NEGPT_IMPL_H
+#ifndef   QUANTUMDATA_IMPL_NEGPT_TCC_INCLUDED
+#define   QUANTUMDATA_IMPL_NEGPT_TCC_INCLUDED
 
 #include "NegPT.h"
 
@@ -103,4 +103,4 @@ struct ExtendV : namehider::Algorithm<RANK,V>
 
 #endif // DO_NOT_USE_FLENS
 
-#endif // _NEGPT_IMPL_H
+#endif // QUANTUMDATA_IMPL_NEGPT_TCC_INCLUDED

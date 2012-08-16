@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _FAST_FOURIER_TRANSFORM_H
-#define   _FAST_FOURIER_TRANSFORM_H
+#ifndef   UTILS_INCLUDE_FFT_H_INCLUDED
+#define   UTILS_INCLUDE_FFT_H_INCLUDED
 
 #include "FFTFwd.h"
 
@@ -23,4 +23,4 @@ void transform(A&, Direction) throw(FFT_Exception);
 
 } // fft
 
-#endif // _FAST_FOURIER_TRANSFORM_H
+#endif // UTILS_INCLUDE_FFT_H_INCLUDED
