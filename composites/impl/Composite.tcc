@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _COMPOSITE_SYSTEM_IMPL_INCLUDED
-#define   _COMPOSITE_SYSTEM_IMPL_INCLUDED
+#ifndef   ELEMENTS_COMPOSITE_IMPL_COMPOSITE_TCC_INCLUDED
+#define   ELEMENTS_COMPOSITE_IMPL_COMPOSITE_TCC_INCLUDED
 
 #include "Composite.h"
 
@@ -822,4 +822,4 @@ Composite<VA>::display(const Averages& avr, std::ostream& os, int precision) con
 
 
 
-#endif // _COMPOSITE_SYSTEM_IMPL_INCLUDED
+#endif // ELEMENTS_COMPOSITE_IMPL_COMPOSITE_TCC_INCLUDED

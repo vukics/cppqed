@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef _STRUCTURE_SUBSYSTEM_H
-#define _STRUCTURE_SUBSYSTEM_H
+#ifndef ELEMENTS_COMPOSITE_SUBSYSTEM_H_INCLUDED
+#define ELEMENTS_COMPOSITE_SUBSYSTEM_H_INCLUDED
 
 #include "SubSystemFwd.h"
 
@@ -80,4 +80,4 @@ private:
 } // structure
 
 
-#endif // _STRUCTURE_SUBSYSTEM_H
+#endif // ELEMENTS_COMPOSITE_SUBSYSTEM_H_INCLUDED

@@ -4,8 +4,8 @@
 // (-delta-i*kappa)*adagger*a+i*(eta*adagger-h.c.)
 // with the usual Liouvillean
 
-#ifndef   _MODE_FWD_H
-#define   _MODE_FWD_H
+#ifndef   ELEMENTS_FREES_MODE_FWD_H_INCLUDED
+#define   ELEMENTS_FREES_MODE_FWD_H_INCLUDED
 
 
 namespace mode {
@@ -53,4 +53,4 @@ struct PrepError;
 
 } // mode
 
-#endif // _MODE_FWD_H
+#endif // ELEMENTS_FREES_MODE_FWD_H_INCLUDED

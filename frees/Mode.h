@@ -1,8 +1,8 @@
 // -*- C++ -*-
-#ifndef   MODE_INCLUDED
-#define   MODE_INCLUDED
+#ifndef   ELEMENTS_FREES_MODE_H_INCLUDED
+#define   ELEMENTS_FREES_MODE_H_INCLUDED
 
 #include "impl/Mode.tcc"
 #include "ParsMode.h"
 
-#endif // MODE_INCLUDED
+#endif // ELEMENTS_FREES_MODE_H_INCLUDED

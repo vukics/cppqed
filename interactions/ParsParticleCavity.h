@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   _PARS_PARTICLE_CAVITY_H
-#define   _PARS_PARTICLE_CAVITY_H
+#ifndef   ELEMENTS_INTERACTIONS_PARSPARTICLECAVITY_H_INCLUDED
+#define   ELEMENTS_INTERACTIONS_PARSPARTICLECAVITY_H_INCLUDED
 
 #include "ModeFunction.h"
 
@@ -29,4 +29,4 @@ struct ParsAlong : ParsOrthogonal {
 
 } // particlecavity
 
-#endif // _PARS_PARTICLE_CAVITY_H
+#endif // ELEMENTS_INTERACTIONS_PARSPARTICLECAVITY_H_INCLUDED

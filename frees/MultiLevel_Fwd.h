@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   MULTI_LEVEL_SYSTEM_FWD_INCLUDED
-#define   MULTI_LEVEL_SYSTEM_FWD_INCLUDED
+#ifndef   ELEMENTS_FREES_MULTILEVEL_FWD_H_INCLUDED
+#define   ELEMENTS_FREES_MULTILEVEL_FWD_H_INCLUDED
 
 #include "ElementAveragedFwd.h"
 
@@ -97,4 +97,4 @@ struct ParsPumpedLossy;
 } // multilevel
 
 
-#endif // MULTI_LEVEL_SYSTEM_FWD_INCLUDED
+#endif // ELEMENTS_FREES_MULTILEVEL_FWD_H_INCLUDED
