@@ -254,7 +254,7 @@ void Composite<VA>::displayParameters(std::ostream& os) const
 
 namespace composite {
 
-bool compFrees(const SubSystemFree& ssf1, const SubSystemFree& ssf2)
+inline bool compFrees(const SubSystemFree& ssf1, const SubSystemFree& ssf2)
 {
   return ssf1.get()->highestFrequency() < ssf2.get()->highestFrequency();
 }
