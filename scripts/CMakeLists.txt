@@ -1,4 +1,4 @@
-aux_source_directory(. SCRIPTS)
+file(GLOB SCRIPTS *.cc)
 
 include_directories(${ELEMENTS_INCLUDE_DIRS})
 
