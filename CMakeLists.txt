@@ -1,9 +1,39 @@
 cmake_minimum_required (VERSION 2.6.4)
 include(FeatureSummary)
 
-project (C++QED)
+project (CPPQED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+##################################################
+# Version
+##################################################
+
+
+set(CPPQED_MAJOR_VERSION 2)
+set(CPPQED_MINOR_VERSION 9)
+set(CPPQED_VERSION
+  ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
+  
+##################################################
+# Installation directories
+##################################################
+
+# Offer the user the choice of overriding the installation directories
+set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
+set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
+set(INSTALL_INCLUDE_DIR include CACHE PATH
+  "Installation directory for header files")
+set(INSTALL_CMAKE_DIR ${INSTALL_LIB_DIR}/cmake/CPPQED CACHE PATH
+  "Installation directory for CMake files")
+ 
+# Make relative paths absolute (needed later on)
+foreach(p LIB BIN INCLUDE CMAKE)
+  set(var INSTALL_${p}_DIR)
+  if(NOT IS_ABSOLUTE "${${var}}")
+    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  endif()
+endforeach()
 
 ##################################################
 # Flags for release and debug mode
@@ -92,9 +122,9 @@ endif( flens_FOUND AND FLENS )
 # Check if serialization can be enabled, inform user
 if( ENABLE_SERIALIZATION )
   message(STATUS "Support for binary statevector output enabled.")
-  add_definitions( -DUSE_BOOST_SERIALIZATION )
   set(OPTLIBS ${OPTLIBS} ${Boost_SERIALIZATION_LIBRARY})
 else( ENABLE_SERIALIZATION )
+  add_definitions( -DUSE_BOOST_SERIALIZATION )
   message(STATUS "Optional support for binary statevector output disabled.")
 endif( ENABLE_SERIALIZATION )
 
@@ -105,7 +135,7 @@ endif( ENABLE_SERIALIZATION )
 # build libutils.so
 add_subdirectory(utils)
 # add utils/include to include path for all the other components
-include_directories(${C++QED_SOURCE_DIR}/utils/include)
+include_directories(utils/include)
 
 # build libC++QED.so
 set(CORE_SOURCE_DIRS quantumdata quantumoperator structure quantumtrajectory)
@@ -128,10 +158,57 @@ add_subdirectory(scripts)
 add_custom_target(fewer_scripts)
 add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix)
 
-# install targets
+##################################################
+# Installation
+##################################################
 
+# The other libraries and scripts are installed in their own CMakeLists.txt
 install(TARGETS C++QED
-	LIBRARY DESTINATION lib)
+        EXPORT CPPQEDLibraryDepends
+	LIBRARY DESTINATION ${INSTALL_LIB_DIR}
+	COMPONENT shlib
+)
+
+# Install include files in their directory structure
+set(ALL_INCLUDE_DIRS ${CORE_SOURCE_DIRS} ${ELEMENTS_INCLUDE_DIRS} utils/include)
+foreach(d ${ALL_INCLUDE_DIRS})
+  file(GLOB INC ${d}/*.h)
+  file(GLOB DETAILS_INC ${d}/details/*.h)
+  file(GLOB IMPL_INC ${d}/impl/tcc)
+  install(FILES ${INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
+  install(FILES ${DETAILS_INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d}/details)
+  install(FILES ${IMPL_INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d}/impl)
+  file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/${d})
+  set(CONF_REL_INCLUDE_DIRS ${CONF_REL_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
+endforeach(d)
+
+
+# Add all targets to the build-tree export set
+export(TARGETS el C++QED utils
+  FILE "${PROJECT_BINARY_DIR}/CPPQEDLibraryDepends.cmake")
+ 
+# Export the package for use from the build-tree
+# (this registers the build-tree with a global CMake-registry)
+export(PACKAGE CPPQED)
+ 
+# Create a CPPQEDBuildTreeSettings.cmake file for the use from the build tree
+configure_file(CPPQEDBuildTreeSettings.cmake.in
+  "${PROJECT_BINARY_DIR}/CPPQEDBuildTreeSettings.cmake" @ONLY)
+ 
+configure_file(CPPQEDConfig.cmake.in
+  "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake" @ONLY)
+configure_file(CPPQEDConfigVersion.cmake.in
+  "${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake" @ONLY)
+ 
+# Install the CPPQEDConfig.cmake and CPPQEDConfigVersion.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake"
+  "${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake"
+  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+ 
+# Install the export set for use with the install-tree
+install(EXPORT CPPQEDLibraryDepends DESTINATION
+  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
 ##################################################
 # Summary of enabled/disabled features

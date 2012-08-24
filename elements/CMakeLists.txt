@@ -14,6 +14,6 @@ target_link_libraries(el C++QED)
 set_target_properties( el PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib )
 
 install(TARGETS el
-        EXPORT C++QEDLibraryDepends
+        EXPORT CPPQEDLibraryDepends
 	LIBRARY DESTINATION ${INSTALL_LIB_DIR}
 	COMPONENT shlib)

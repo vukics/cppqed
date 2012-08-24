@@ -1,0 +1,50 @@
+# - Config file for the CPPQED package
+# It defines the following variables
+#  CPPQED_INCLUDE_DIRS - include directories for CPPQED
+#  CPPQED_LIBRARIES    - libraries to link against
+#  CPPQED_EXECUTABLE   - the bar executable
+#  CPPQED_HAS_SERIALIZATION - serialization support enabled
+#  CPPQED_HAS_FLENS    - FLENS support enabled
+
+# Compute paths
+get_filename_component(CPPQED_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+if(EXISTS "${CPPQED_CMAKE_DIR}/CMakeCache.txt")
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_DIR}/../cmake/Modules)
+else()
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CPPQED_CMAKE_DIR}")
+endif()
+
+set(CPPQED_HAS_SERIALIZATION @ENABLE_SERIALIZATION@)
+set(CPPQED_HAS_FLENS @ENABLE_FLENS@)
+
+if(CPPQED_HAS_SERIALIZATION)
+  find_package(Boost REQUIRED serialization)
+else()
+  find_package(Boost REQUIRED)
+  set(CPPQED_DEFINITIOINS ${CPPQED_DEFINITIOINS} "-DDO_NOT_USE_BOOST_SERIALIZATION")
+endif()
+set(CPPQED_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+
+if(CPPQED_HAS_FLENS)
+  find_package(flens REQUIRED)
+else()
+  set(CPPQED_DEFINITIOINS ${CPPQED_DEFINITIOINS} "-DDO_NOT_USE_FLENS")
+endif()
+set(CPPQED_INCLUDE_DIRS ${flens_INCLUDE_DIRS})
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${CPPQED_CMAKE_DIR}/CPPQEDLibraryDepends.cmake")
+
+if(EXISTS "${CPPQED_CMAKE_DIR}/CMakeCache.txt")
+   # In build tree
+   include("${CPPQED_CMAKE_DIR}/CPPQEDBuildTreeSettings.cmake")
+else()
+  foreach(d @CONF_REL_INCLUDE_DIRS@)
+    get_filename_component(NEW_INCLUDE_DIR ${CPPQED_CMAKE_DIR}/${d} ABSOLUTE)
+    set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
+  endforeach(d)
+endif()
+ 
+ 
+# These are IMPORTED targets created by CPPQEDLibraryDepends.cmake
+set(CPPQED_LIBRARIES el C++QED utils)
