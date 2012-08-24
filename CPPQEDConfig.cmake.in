@@ -8,11 +8,14 @@
 
 # Compute paths
 get_filename_component(CPPQED_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+get_filename_component(CPPQED_PREFIX_DIR ${CPPQED_CMAKE_DIR}/../../../ ABSOLUTE) # get the chosen install prefix
 if(EXISTS "${CPPQED_CMAKE_DIR}/CMakeCache.txt")
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_DIR}/../cmake/Modules)
 else()
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CPPQED_CMAKE_DIR}")
 endif()
+
+include(LibFindMacros)
 
 set(CPPQED_HAS_SERIALIZATION @ENABLE_SERIALIZATION@)
 set(CPPQED_HAS_FLENS @ENABLE_FLENS@)
@@ -21,19 +24,23 @@ if(CPPQED_HAS_SERIALIZATION)
   find_package(Boost REQUIRED serialization)
 else()
   find_package(Boost REQUIRED)
-  set(CPPQED_DEFINITIOINS ${CPPQED_DEFINITIOINS} "-DDO_NOT_USE_BOOST_SERIALIZATION")
+  set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DDO_NOT_USE_BOOST_SERIALIZATION")
 endif()
-set(CPPQED_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+set(THIRDPARTY ${THIRDPARTY} ${Boost_LIBRARIES})
 
 if(CPPQED_HAS_FLENS)
   find_package(flens REQUIRED)
+  set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
+  set(THIRDPARTY ${THIRDPARTY} ${flens_LIBRARY})
 else()
-  set(CPPQED_DEFINITIOINS ${CPPQED_DEFINITIOINS} "-DDO_NOT_USE_FLENS")
+  set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DDO_NOT_USE_FLENS")
 endif()
 set(CPPQED_INCLUDE_DIRS ${flens_INCLUDE_DIRS})
 
-# Our library dependencies (contains definitions for IMPORTED targets)
-include("${CPPQED_CMAKE_DIR}/CPPQEDLibraryDepends.cmake")
+find_package(blitz++ REQUIRED)
+set(CPPQED_INCLUDE_DIRS ${blitz++_INCLUDE_DIRS})
+set(THIRDPARTY ${THIRDPARTY} ${blitz++_LIBRARIES})
 
 if(EXISTS "${CPPQED_CMAKE_DIR}/CMakeCache.txt")
    # In build tree
@@ -44,7 +51,10 @@ else()
     set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
   endforeach(d)
 endif()
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${CPPQED_CMAKE_DIR}/CPPQEDLibraryDepends.cmake")
+set(CPPQED_LIBRARIES el C++QED utils ${THIRDPARTY} )
+
+message(STATUS "CPPQED libraries: ${CPPQED_LIBRARIES}" )
  
- 
-# These are IMPORTED targets created by CPPQEDLibraryDepends.cmake
-set(CPPQED_LIBRARIES el C++QED utils)
+

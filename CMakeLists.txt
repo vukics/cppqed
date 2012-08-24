@@ -12,15 +12,16 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set(CPPQED_MAJOR_VERSION 2)
 set(CPPQED_MINOR_VERSION 9)
+set(CPPQED_PATCH_VERSION 0)
 set(CPPQED_VERSION
-  ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
+  ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
   
 ##################################################
 # Installation directories
 ##################################################
 
 # Offer the user the choice of overriding the installation directories
-set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
+set(INSTALL_LIB_DIR lib64 CACHE PATH "Installation directory for libraries")
 set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
 set(INSTALL_INCLUDE_DIR include CACHE PATH
   "Installation directory for header files")
@@ -124,7 +125,7 @@ if( ENABLE_SERIALIZATION )
   message(STATUS "Support for binary statevector output enabled.")
   set(OPTLIBS ${OPTLIBS} ${Boost_SERIALIZATION_LIBRARY})
 else( ENABLE_SERIALIZATION )
-  add_definitions( -DUSE_BOOST_SERIALIZATION )
+  add_definitions( -DDO_NOT_USE_BOOST_SERIALIZATION )
   message(STATUS "Optional support for binary statevector output disabled.")
 endif( ENABLE_SERIALIZATION )
 
@@ -174,11 +175,11 @@ set(ALL_INCLUDE_DIRS ${CORE_SOURCE_DIRS} ${ELEMENTS_INCLUDE_DIRS} utils/include)
 foreach(d ${ALL_INCLUDE_DIRS})
   file(GLOB INC ${d}/*.h)
   file(GLOB DETAILS_INC ${d}/details/*.h)
-  file(GLOB IMPL_INC ${d}/impl/tcc)
+  file(GLOB IMPL_INC ${d}/impl/*tcc)
   install(FILES ${INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
   install(FILES ${DETAILS_INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d}/details)
   install(FILES ${IMPL_INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d}/impl)
-  file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/${d})
+  file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
   set(CONF_REL_INCLUDE_DIRS ${CONF_REL_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
 endforeach(d)
 
@@ -189,7 +190,7 @@ export(TARGETS el C++QED utils
  
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
-export(PACKAGE CPPQED)
+#export(PACKAGE CPPQED)
  
 # Create a CPPQEDBuildTreeSettings.cmake file for the use from the build tree
 configure_file(CPPQEDBuildTreeSettings.cmake.in
@@ -204,12 +205,28 @@ configure_file(CPPQEDConfigVersion.cmake.in
 install(FILES
   "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake"
   "${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake"
+  "cmake/Modules/FindCBLAS.cmake"
+  "cmake/Modules/Findflens.cmake"
+  "cmake/Modules/Findblitz++.cmake"
+  "cmake/Modules/LibFindMacros.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
  
 # Install the export set for use with the install-tree
 install(EXPORT CPPQEDLibraryDepends DESTINATION
   "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
+  
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Raimar Sandner") #required
+SET(CPACK_PACKAGE_CONTACT "vukics.andras@wigner.mta.hu")
+SET(CPACK_PACKAGE_VERSION_MAJOR "${CPPQED_MAJOR_VERSION}")
+SET(CPACK_PACKAGE_VERSION_MINOR "${CPPQED_MINOR_VERSION}")
+#SET(CPACK_PACKAGE_VERSION_PATCH "${PATCH_VERSION}")
+SET(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${CPPQED_VERSION}")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${CPPQED_VERSION}")
+ 
+INCLUDE(CPack)
+  
 ##################################################
 # Summary of enabled/disabled features
 # (requires cmake >= 2.8.8)
