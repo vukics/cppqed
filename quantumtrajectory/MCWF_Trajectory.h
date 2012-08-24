@@ -134,9 +134,9 @@ private:
   const int svdPrecision_;
   mutable long svdCount_;
 
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
   const bool binarySVFile_;
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
   const std::string svExtension_;
 
   const std::string file_;

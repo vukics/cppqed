@@ -19,4 +19,6 @@ target_link_libraries(utils ${UTILS_LIBS})
 set_target_properties( utils PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib )
 
 install(TARGETS utils
-	LIBRARY DESTINATION lib)
+        EXPORT C++QEDLibraryDepends
+	LIBRARY DESTINATION ${INSTALL_LIB_DIR}
+	COMPONENT shlib)

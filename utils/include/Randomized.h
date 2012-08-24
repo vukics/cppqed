@@ -11,10 +11,10 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
 #include <boost/serialization/serialization.hpp>
 #include <sstream>
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
 namespace randomized {
