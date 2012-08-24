@@ -27,12 +27,11 @@ else()
   set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DDO_NOT_USE_BOOST_SERIALIZATION")
 endif()
 set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-set(THIRDPARTY ${THIRDPARTY} ${Boost_LIBRARIES})
+
 
 if(CPPQED_HAS_FLENS)
   find_package(flens REQUIRED)
   set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
-  set(THIRDPARTY ${THIRDPARTY} ${flens_LIBRARY})
 else()
   set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DDO_NOT_USE_FLENS")
 endif()
@@ -40,7 +39,6 @@ set(CPPQED_INCLUDE_DIRS ${flens_INCLUDE_DIRS})
 
 find_package(blitz++ REQUIRED)
 set(CPPQED_INCLUDE_DIRS ${blitz++_INCLUDE_DIRS})
-set(THIRDPARTY ${THIRDPARTY} ${blitz++_LIBRARIES})
 
 if(EXISTS "${CPPQED_CMAKE_DIR}/CMakeCache.txt")
    # In build tree
@@ -53,8 +51,7 @@ else()
 endif()
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${CPPQED_CMAKE_DIR}/CPPQEDLibraryDepends.cmake")
-set(CPPQED_LIBRARIES el C++QED utils ${THIRDPARTY} )
+set(CPPQED_LIBRARIES el C++QED utils)
 
-message(STATUS "CPPQED libraries: ${CPPQED_LIBRARIES}" )
  
 
