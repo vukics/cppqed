@@ -22,6 +22,7 @@
 include(LibFindMacros)
 
 # Include dir
+set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .so.3gf)
 find_library(CBLAS_LIBRARY
   NAMES cblas gslcblas
   PATHS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 $ENV{UIBK_GSL_LIB}
