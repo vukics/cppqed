@@ -2,11 +2,18 @@ lib boost_test_lib : : <name>boost_unit_test_framework ;
 
 import testing ;
 
-for local ccfile in [ glob *.cc : BinarySystem.cc FFT.cc JaynesCummings.cc LDOSI.cc Master.cc Sigma.cc TridiagonalBenchmark.cc ]
+for local ccfile in [ glob CompositeError*.cc ]
 {
-	unit-test $(ccfile:B) : $(ccfile) boost_test_lib ..//executables_link_against : <define>BOOST_TEST_DYN_LINK ;
+	compile-fail $(ccfile) ..//executables_link_against ;
 }
 
-exe TridiagonalBenchmark : TridiagonalBenchmark.cc ..//executables_link_against ;
 
-obj TridiagonalBenchmarkCompilation.o : TridiagonalBenchmarkCompilation.cc ..//quantumoperator ;
+#for local ccfile in [ glob *.cc : BinarySystem.cc FFT.cc JaynesCummings.cc LDOSI.cc Master.cc Sigma.cc TridiagonalBenchmark.cc ]
+#{
+#	unit-test $(ccfile:B) : $(ccfile) boost_test_lib ..//executables_link_against : <define>BOOST_TEST_DYN_LINK ;
+#}
+
+#exe TridiagonalBenchmark : TridiagonalBenchmark.cc ..//executables_link_against ;
+
+#obj TridiagonalBenchmarkCompilation.o : TridiagonalBenchmarkCompilation.cc ..//quantumoperator ;
+
