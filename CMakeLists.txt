@@ -79,16 +79,16 @@ endif(SERIALIZATION)
 # The option FLENS will be disabled if flens is missing
 option(FLENS "FLENS support" ON)
 
-# blitz++
-find_package(blitz++ REQUIRED)
-if( blitz++_SERIALIZATION_FOUND )
+# blitz
+find_package(blitz REQUIRED)
+if( blitz_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built with serialization support.")
-else( blitz++_SERIALIZATION_FOUND )
-  message(STATUS "Blitz++ built without serialization support. Please configure blitz++ with --enable-serialization to enable optional binary statevector output.")
+else( blitz_SERIALIZATION_FOUND )
+  message(STATUS "Blitz++ built without serialization support. Please configure blitz with --enable-serialization to enable optional binary statevector output.")
   set(ENABLE_SERIALIZATION 0)
-endif( blitz++_SERIALIZATION_FOUND )
+endif( blitz_SERIALIZATION_FOUND )
 
-include_directories( ${blitz++_INCLUDE_DIR} )
+include_directories( ${blitz_INCLUDE_DIR} )
 
 
 # Boost
@@ -145,7 +145,7 @@ foreach(d ${CORE_SOURCE_DIRS})
   include_directories(${d})
 endforeach(d)
 add_library(C++QED SHARED ${CORE_SOURCE_FILES})
-target_link_libraries( C++QED utils ${blitz++_LIBRARY} ${OPTLIBS} )
+target_link_libraries( C++QED utils ${blitz_LIBRARY} ${OPTLIBS} )
 set_target_properties( C++QED PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib )
 
 # build libel.so
@@ -207,7 +207,7 @@ install(FILES
   "${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake"
   "cmake/Modules/FindCBLAS.cmake"
   "cmake/Modules/Findflens.cmake"
-  "cmake/Modules/Findblitz++.cmake"
+  "cmake/Modules/Findblitz.cmake"
   "cmake/Modules/LibFindMacros.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
  
@@ -237,7 +237,7 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
                                  DESCRIPTION "Package config system that manages compile/link flags"
                                  TYPE OPTIONAL
                                  PURPOSE "Assists cmake in finding libraries.")
-  set_package_properties(blitz++ PROPERTIES  URL "http://sf.net/projects/blitz/"
+  set_package_properties(blitz PROPERTIES  URL "http://sf.net/projects/blitz/"
                                  DESCRIPTION "High-performance C++ vector mathematics library"
                                  TYPE REQUIRED
                                  PURPOSE "Multi-Array implementation used in the framework.")

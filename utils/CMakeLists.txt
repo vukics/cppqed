@@ -12,7 +12,7 @@ ELSE( FLENS )
   LIST(REMOVE_ITEM UTILS_SOURCE_FILES src/DrivenDampedHarmonicOscillator.cc)
 ENDIF( FLENS )
 
-set(UTILS_LIBS ${UTILS_OPTLIBS} ${GSL_LIBRARIES} ${blitz++_LIBRARIES})
+set(UTILS_LIBS ${UTILS_OPTLIBS} ${GSL_LIBRARIES} ${blitz_LIBRARIES})
 
 add_library(utils SHARED ${UTILS_SOURCE_FILES})
 target_link_libraries(utils ${UTILS_LIBS})
