@@ -42,7 +42,7 @@ endforeach()
 ##################################################
 
 # linker on MacOs doesn't like --no-undefined
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined -Wl,--as-needed")
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined -Wl,--as-needed")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
 
@@ -71,6 +71,7 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 
 find_package(GSL REQUIRED)
 include_directories(include ${GSL_INCLUDE_DIRS})
+set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${GSL_INCLUDE_DIRS})
 
 # The option SERIALIZATION will be disabled if any of the compoments required for serialization is missing
 option(SERIALIZATION "Boost serialization" ON)
@@ -93,6 +94,7 @@ else( blitz_SERIALIZATION_FOUND )
 endif( blitz_SERIALIZATION_FOUND )
 
 include_directories( ${blitz_INCLUDE_DIR} )
+set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIR})
 
 
 # Boost
@@ -110,11 +112,13 @@ else( Boost_SERIALIZATION_FOUND )
   set(ENABLE_SERIALIZATION 0)
 endif( Boost_SERIALIZATION_FOUND )
 include_directories( ${Boost_INCLUDE_DIRS} )
+set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # FLENS
 find_package(flens)
 if( flens_FOUND AND FLENS )
   include_directories(${flens_INCLUDE_DIRS})
+  set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
   set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
   add_definitions(${flens_DEFINITIONS})
   set(ENABLE_FLENS 1)

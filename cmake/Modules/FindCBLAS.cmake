@@ -21,23 +21,58 @@
 #
 include(LibFindMacros)
 
-# Include dir
-set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES} .so.3gf)
+libfind_pkg_check_modules(CBLAS_PKGCONF cblas)
+
+if (NOT CBLAS_FOUND)
+
+if(CBLAS_PKGCONF_FOUND)
+
+foreach(NEW_CBLAS_LIB ${CBLAS_PKGCONF_LIBRARIES})
+  find_library(LIB_${NEW_CBLAS_LIB} ${NEW_CBLAS_LIB} HINTS ${CBLAS_PKGCONF_LIBRARY_DIRS})
+  if(NOT LIB_${NEW_CBLAS_LIB})
+    message(FATAL_ERROR "Could not find ${NEW_CBLAS_LIB} where pkgconfig said it is: ${CBLAS_PKGCONF_LIBRARY_DIRS}")
+  else(NOT LIB_${NEW_CBLAS_LIB})
+    message(STATUS "Found ${LIB_${NEW_CBLAS_LIB}}.")
+  endif(NOT LIB_${NEW_CBLAS_LIB})
+  set(CBLAS_LIBRARY ${CBLAS_LIBRARY} ${LIB_${NEW_CBLAS_LIB}})
+endforeach(NEW_CBLAS_LIB)
+
+else(CBLAS_PKGCONFI_FOUND)
+
+set(CBLAS_HINT_PATH $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 $ENV{UIBK_GSL_LIB})
+
+# Check if libblas provides cblas (Ubuntu)
+find_library(BLAS_LIBRARY NAMES blas PATHS ${CBLAS_HINT_PATH})
+if(BLAS_LIBRARY)
+  set(CMAKE_REQUIRED_LIBRARY ${BLAS_LIBRARY})
+  include(CheckSymbolExists "cblas.h" BLAS_HAS_CBLAS)
+endif(BLAS_LIBRARY)
+
+set(CBLAS_CANDIDATES cblas gslcblas)
+if(BLAS_HAS_CBLAS)
+  message(STATUS "libblas provides cblas.")
+  set(CBLAS_CANDIDATES blas ${CBLAS_CANDIDATES})
+endif(BLAS_HAS_CBLAS)
+
 find_library(CBLAS_LIBRARY
-  NAMES cblas gslcblas
-  PATHS $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 $ENV{UIBK_GSL_LIB}
+  NAMES ${CBLAS_CANDIDATES}
+  PATHS ${CBLAS_HINT_PATH}
 )
+endif(CBLAS_PKGCONF_FOUND)
 
-if(${CBLAS_LIBRARY} MATCHES gslcblas)
+if("${CBLAS_LIBRARY}" MATCHES gslcblas)
   set(CBLAS_INCLUDE_CANDIDATE gsl/gsl_cblas.h)
-else(${CBLAS_LIBRARY} MATCHES gslcblas)
+else("${CBLAS_LIBRARY}" MATCHES gslcblas)
   set(CBLAS_INCLUDE_CANDIDATE cblas.h)
-endif(${CBLAS_LIBRARY} MATCHES gslcblas)
+endif("${CBLAS_LIBRARY}" MATCHES gslcblas)
 
-find_path(CBLAS_INCLUDE_DIR ${CBLAS_INCLUDE_CANDIDATE} HINTS $ENV{CBLASDIR}/include $ENV{UIBK_GSL_INC})
+find_path(CBLAS_INCLUDE_DIR ${CBLAS_INCLUDE_CANDIDATE} HINTS ${CBLAS_PKGCONF_INCLUDE_DIRS} $ENV{CBLASDIR}/include $ENV{UIBK_GSL_INC})
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
 set(CBLAS_PROCESS_INCLUDES CBLAS_INCLUDE_DIR)
 set(CBLAS_PROCESS_LIBS CBLAS_LIBRARY)
 libfind_process(CBLAS)
+message(STATUS "Using ${CBLAS_LIBRARIES} for cblas.")
+
+endif(NOT CBLAS_FOUND)

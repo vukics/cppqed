@@ -21,24 +21,24 @@ set(CPPQED_HAS_SERIALIZATION @ENABLE_SERIALIZATION@)
 set(CPPQED_HAS_FLENS @ENABLE_FLENS@)
 
 if(CPPQED_HAS_SERIALIZATION)
-  find_package(Boost REQUIRED serialization)
+#  find_package(Boost REQUIRED serialization)
 else()
-  find_package(Boost REQUIRED)
+#  find_package(Boost REQUIRED)
   set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DDO_NOT_USE_BOOST_SERIALIZATION")
 endif()
 set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 
 if(CPPQED_HAS_FLENS)
-  find_package(flens REQUIRED)
+#  find_package(flens REQUIRED)
   set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
 else()
   set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DDO_NOT_USE_FLENS")
 endif()
 set(CPPQED_INCLUDE_DIRS ${flens_INCLUDE_DIRS})
 
-find_package(blitz++ REQUIRED)
-set(CPPQED_INCLUDE_DIRS ${blitz++_INCLUDE_DIRS})
+#find_package(blitz++ REQUIRED)
+#set(CPPQED_INCLUDE_DIRS ${blitz++_INCLUDE_DIRS})
 
 if(EXISTS "${CPPQED_CMAKE_DIR}/CMakeCache.txt")
    # In build tree
@@ -49,9 +49,14 @@ else()
     set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
   endforeach(d)
 endif()
+
+set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} @THIRDPARTY_INCLUDE_DIRS@)
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
+
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${CPPQED_CMAKE_DIR}/CPPQEDLibraryDepends.cmake")
-set(CPPQED_LIBRARIES el C++QED utils)
+set(CPPQED_LIBRARIES @CPPQEDLIB@)
 
  
 
