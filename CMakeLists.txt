@@ -229,10 +229,10 @@ INCLUDE(CPack)
   
 ##################################################
 # Summary of enabled/disabled features
-# (requires cmake >= 2.8.8)
+# (requires cmake >= 2.8.9)
 ##################################################
 
-if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
+if(${CMAKE_VERSION} VERSION_GREATER "2.8.8")
   set_package_properties(PkgConfig PROPERTIES URL "http://pkgconfig.freedesktop.org/wiki"
                                  DESCRIPTION "Package config system that manages compile/link flags"
                                  TYPE OPTIONAL
@@ -260,4 +260,4 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
   add_feature_info("FLENS" ENABLE_FLENS "compile framework with FLENS support.")
   add_feature_info(Serialization ENABLE_SERIALIZATION "needed for binary statevector output." )
   feature_summary( WHAT ALL )
-endif(${CMAKE_VERSION} VERSION_GREATER "2.8.7")
+endif(${CMAKE_VERSION} VERSION_GREATER "2.8.8")
