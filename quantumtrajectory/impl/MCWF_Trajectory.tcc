@@ -156,7 +156,7 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV=false)
+void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV)
 {
   using namespace std;
   

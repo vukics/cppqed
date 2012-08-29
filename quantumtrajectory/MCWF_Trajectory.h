@@ -106,7 +106,7 @@ private:
 
   void displayMore() const;
   
-  void readState(std::ifstream &, bool onlySV);
+  void readState(std::ifstream &, bool onlySV=false);
   void writeState(std::ofstream &) const;
   
   double                coherentTimeDevelopment    (                                double Dt) const;

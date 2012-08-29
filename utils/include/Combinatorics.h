@@ -8,6 +8,7 @@
 
 #include <blitz/array.h>
 
+#include <boost/range/algorithm/equal.hpp>
 
 namespace cpputils {
 
@@ -37,11 +38,12 @@ public:
   };
 
   template<typename C>
-  const size_t operator[](const C& c) const
+  size_t operator[](const C& c) const
+  // gives the ordinal number of a certain configuration, which is given by a Boost.Range-complying range C
   {
     if (c.size()!=impl_.extent(1)) throw SubscriptingException<C,SIZE_MISMATCH>(c);
     for (size_t i=0; i<impl_.extent(0); i++)
-      if (equal(c.begin(),c.end(),impl_(i,blitz::Range::all()).begin())) return i;
+      if (boost::equal(c,impl_(i,blitz::Range::all()))) return i;
     throw SubscriptingException<C,NOT_FOUND>(c);
   }
 
