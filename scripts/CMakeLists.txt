@@ -16,7 +16,7 @@ endif ( CMAKE_CXX_COMPILER_VERSION MATCHES " 4.2" )
 foreach(s ${SCRIPTS})
   get_filename_component(SCRIPT ${s} NAME_WE)
   add_executable(${SCRIPT} ${s})
-  target_link_libraries(${SCRIPT} el)
+  target_link_libraries(${SCRIPT} ${CPPQEDLIB})
   install(TARGETS ${SCRIPT}
 	  RUNTIME DESTINATION bin)
 endforeach(s)

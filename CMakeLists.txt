@@ -13,6 +13,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(CPPQED_MAJOR_VERSION 2)
 set(CPPQED_MINOR_VERSION 9)
 set(CPPQED_PATCH_VERSION 0)
+set(CPPQED_ABI_VERSION 0)
 set(CPPQED_VERSION
   ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
   
@@ -41,7 +42,7 @@ endforeach()
 ##################################################
 
 # linker on MacOs doesn't like --no-undefined
-#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined -Wl,--as-needed")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
 
@@ -67,6 +68,9 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 ##################################################
 # Library detection
 ##################################################
+
+find_package(GSL REQUIRED)
+include_directories(include ${GSL_INCLUDE_DIRS})
 
 # The option SERIALIZATION will be disabled if any of the compoments required for serialization is missing
 option(SERIALIZATION "Boost serialization" ON)
@@ -134,23 +138,29 @@ endif( ENABLE_SERIALIZATION )
 ##################################################
 
 # build libutils.so
-add_subdirectory(utils)
+# add_subdirectory(utils)
 # add utils/include to include path for all the other components
+file(GLOB UTILS_SOURCE_FILES utils/src/*.cc)
 include_directories(utils/include)
 
-# build libC++QED.so
+add_subdirectory(elements)
+include_directories(${ELEMENTS_INCLUDE_DIRS})
+
+# build libC++QEDcore.so
 set(CORE_SOURCE_DIRS quantumdata quantumoperator structure quantumtrajectory)
 foreach(d ${CORE_SOURCE_DIRS})
   aux_source_directory(${d} CORE_SOURCE_FILES)
   include_directories(${d})
 endforeach(d)
-add_library(C++QED SHARED ${CORE_SOURCE_FILES})
-target_link_libraries( C++QED utils ${blitz_LIBRARY} ${OPTLIBS} )
-set_target_properties( C++QED PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib )
+set(CPPQEDLIB C++QED-${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
+add_library(${CPPQEDLIB} SHARED ${CORE_SOURCE_FILES} ${ELEMENTS_SOURCE_FILES} ${UTILS_SOURCE_FILES})
+target_link_libraries(${CPPQEDLIB} ${blitz_LIBRARY} ${OPTLIBS} ${GSL_LIBRARIES})
+set_target_properties(${CPPQEDLIB}
+		      PROPERTIES 
+		      INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib
+                      VERSION ${CPPQED_ABI_VERSION}.0.${CPPQED_PATCH_VERSION}
+                      SOVERSION ${CPPQED_ABI_VERSION})
 
-# build libel.so
-add_subdirectory(elements)
-include_directories(${ELEMENTS_INCLUDE_DIRS})
 
 # build all the scripts
 add_subdirectory(scripts)
@@ -164,7 +174,7 @@ add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_Evo
 ##################################################
 
 # The other libraries and scripts are installed in their own CMakeLists.txt
-install(TARGETS C++QED
+install(TARGETS ${CPPQEDLIB}
         EXPORT CPPQEDLibraryDepends
 	LIBRARY DESTINATION ${INSTALL_LIB_DIR}
 	COMPONENT shlib
@@ -185,7 +195,7 @@ endforeach(d)
 
 
 # Add all targets to the build-tree export set
-export(TARGETS el C++QED utils
+export(TARGETS ${CPPQEDLIB}
   FILE "${PROJECT_BINARY_DIR}/CPPQEDLibraryDepends.cmake")
  
 # Export the package for use from the build-tree
