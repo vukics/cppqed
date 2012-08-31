@@ -9,13 +9,47 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 # Version
 ##################################################
 
+# Versioning scheme
+
+# MAJOR - the grand version of C++QED, as in v2
+# MINOR - the milestone release, as in v2m9
+# PATCH - should be increased on every snapshot package release, reset on milestone change
 
 set(CPPQED_MAJOR_VERSION 2)
 set(CPPQED_MINOR_VERSION 9)
 set(CPPQED_PATCH_VERSION 0)
-set(CPPQED_ABI_VERSION 0)
 set(CPPQED_VERSION
   ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
+
+
+# Adopt the shared library versioning scheme of libtool
+# CURRENT  - the current ABI version
+# AGE      - number of versions backwards that CURRENT is compatible with
+# REVISION - patch revision
+
+# Rationale:
+# Bugfixes and Patches which do not affect ABI:
+#  * increase REVISION
+# Symbols added to library (i.e. binary compatibility NOT broken):
+#  * increase AGE
+#  * remember to call dh_makeshlibs with -V packagename (>=packageversion) when packaging
+# Symbols removed or changed (i.e. binary compatibility broken):
+#  * set CURRENT -> CURRENT + AGE + 1, reset AGE
+# On every change of AGE or CURRENT: reset REVISION
+
+# The library version (.so.X.Y.Z) is {CURRENT-AGE}.{AGE}.{REVISION}, here named
+# {ABI_MAJOR}.{ABI_MINOR}.{ABI_MICRO}. This way it is ensured that ABI_MAJOR only changes
+# when binary compatibility is broken.
+
+# The SONAME of the library always is: libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}.so.${ABI_MAJOR}
+# and the packages are named libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}-${ABI_MAJOR}[-dev]
+
+set(CPPQED_ABI_CURRENT 0)
+set(CPPQED_ABI_AGE 0)
+set(CPPQED_ABI_REVISION 0)
+math(EXPR CPPQED_ABI_MAJOR ${CPPQED_ABI_CURRENT}-${CPPQED_ABI_AGE})
+set(CPPQED_ABI_MINOR ${CPPQED_ABI_AGE})
+set(CPPQED_ABI_MICRO ${CPPQED_ABI_REVISION})
   
 ##################################################
 # Installation directories
@@ -162,8 +196,8 @@ target_link_libraries(${CPPQEDLIB} ${blitz_LIBRARY} ${OPTLIBS} ${GSL_LIBRARIES})
 set_target_properties(${CPPQEDLIB}
 		      PROPERTIES 
 		      INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib
-                      VERSION ${CPPQED_ABI_VERSION}.0.${CPPQED_PATCH_VERSION}
-                      SOVERSION ${CPPQED_ABI_VERSION})
+                      VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
+                      SOVERSION ${CPPQED_ABI_MAJOR})
 
 
 # build all the scripts
