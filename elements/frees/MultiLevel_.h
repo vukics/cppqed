@@ -319,10 +319,9 @@ RETURN_type
 makePumpedLossyMultiLevelSch(const blitz::TinyVector<double,NL>& deltas,
 			     // note that, understandably, if we write
 			     // const typename RealLevelsMF<NL>::type&
-			     // here, the compiler cannot deduce NL
-			     // anymore
+			     // here, the compiler cannot deduce NL anymore
 			     const VP& etas, const VL& gammas,
-			     const Averaged& averaged=multilevel::DiagonalDO(NL))
+			     const Averaged& averaged)
 {
   return RETURN_type(new PumpedLossyMultiLevelSch<NL,VP,VL,Averaged>(deltas,etas,gammas,averaged));
 }
@@ -331,7 +330,7 @@ makePumpedLossyMultiLevelSch(const blitz::TinyVector<double,NL>& deltas,
 template<int NL, typename VP, typename VL, typename Averaged>
 inline
 RETURN_type
-makePumpedLossyMultiLevelSch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const Averaged& averaged=multilevel::DiagonalDO(NL))
+makePumpedLossyMultiLevelSch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const Averaged& averaged)
 {
   return RETURN_type(new PumpedLossyMultiLevelSch<NL,VP,VL,Averaged>(p.deltas,p.etas,p.gammas,averaged));
 }

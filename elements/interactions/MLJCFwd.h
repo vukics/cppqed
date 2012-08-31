@@ -13,7 +13,7 @@ template<int, int>
 class Coupling;
 
 template<typename VC>
-class Pars;
+struct Pars;
 
 
 } // mljc

@@ -42,7 +42,7 @@ private:
   void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; 
 
   template<int,int>
-  class ModeDynamics;
+  struct ModeDynamics;
 
 
   class CouplingToModeDynamics
