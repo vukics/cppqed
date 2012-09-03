@@ -16,11 +16,10 @@
 
 /*
   TODO:
-  * makeComposite => composite::make
-  * composite::result_of::make metafunction returning the composite type with a growing number of Act arguments
   * in user guide:
     - document changes of BinarySystem (binary::make)
-    - composite::result_of::make
+    - composite::make
+    - composite::result_of::Make
     - element makers => make
 */
 
@@ -35,32 +34,60 @@ using boost::fusion::result_of::make_list;
 
 } // result_of
 
-} // composite
 
 template<typename VA>
-struct MaxRankMF : composite::MaxMF<typename composite::MaxMF<VA,composite::SeqLess<mpl::_1,mpl::_2> >::type>::type {};
+struct MaxRank : MaxMF<typename MaxMF<VA,composite::SeqLess<mpl::_1,mpl::_2> >::type>::type::type {};
+
+
+template<typename VA>
+class Exact
+  : public structure::Exact<MaxRank<VA>::value+1>
+{
+private:
+  static const int RANK=composite::MaxRank<VA>::value+1;
+
+  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+
+  typedef quantumdata::Types<RANK> Types;
+  typedef typename Types::StateVectorLow StateVectorLow;
+
+  typedef tmptools::Ordinals<RANK> Ordinals;
+
+protected:
+  Exact(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
+
+private:
+  bool isUnitary(                       ) const; class IsUnitary;
+  void actWithU (double, StateVectorLow&) const; class ActWithU ;
+
+  const Frees& frees_;
+  const VA   &  acts_;
+
+};
+
+
+} // composite
+
 
 
 template<typename VA>
 // VA should model a fusion sequence of Acts
 class Composite 
 // The base_from_member idiom appears because the Frees has to be calculated and stored somehow first
-  : private boost::base_from_member<const blitz::TinyVector<structure::SubSystemFree,MaxRankMF<VA>::type::value+1> >,
-    public structure::QuantumSystem<MaxRankMF<VA>::type::value+1>,
-    public structure::Exact        <MaxRankMF<VA>::type::value+1>, 
-    public structure::Hamiltonian  <MaxRankMF<VA>::type::value+1>,
-    public structure::Liouvillean  <MaxRankMF<VA>::type::value+1>,
-    public structure::Averaged     <MaxRankMF<VA>::type::value+1>
+  : private boost::base_from_member<const blitz::TinyVector<structure::SubSystemFree,composite::MaxRank<VA>::value+1> >,
+    public structure::QuantumSystem<composite::MaxRank<VA>::value+1>,
+    public composite::Exact<VA>, 
+    public structure::Hamiltonian  <composite::MaxRank<VA>::value+1>,
+    public structure::Liouvillean  <composite::MaxRank<VA>::value+1>,
+    public structure::Averaged     <composite::MaxRank<VA>::value+1>
 {
 public:
   // The calculated RANK
-
-  static const int RANK=MaxRankMF<VA>::type::value+1;
+  static const int RANK=composite::MaxRank<VA>::value+1;
 
   // Public types
 
   typedef structure::QuantumSystem<RANK> QS_Base;
-  typedef structure::Exact        <RANK> Ex_Base;
   typedef structure::Hamiltonian  <RANK> Ha_Base;
   typedef structure::Liouvillean  <RANK> Li_Base;
   typedef structure::Averaged     <RANK> Av_Base;
@@ -101,7 +128,7 @@ public:
   // Constructor
 
   explicit Composite(const VA& acts) 
-    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)), frees_(FreesBase::member), acts_(acts) {}
+    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)), composite::Exact<VA>(FreesBase::member,acts), frees_(FreesBase::member), acts_(acts) {}
 
 
 private:
@@ -109,14 +136,7 @@ private:
 
   double highestFrequency (             ) const;
 
-
   void   displayParameters(std::ostream&) const; class DisplayParameters;
-
-  // Implementing Ex_Base
-
-  bool isUnitary() const; class IsUnitary;
-
-  void actWithU(double, StateVectorLow&) const; class ActWithU;
 
   // Implementing Ha_Base
 
@@ -137,10 +157,6 @@ private:
   void           process(Averages&)                           const; class Process;
   void           display(const Averages&, std::ostream&, int) const; class Display;
 
-  // overall helpers
-
-  template<typename H>
-  void worker(const H&) const;
 
   // Storage
   // Note that Frees are stored by value in FreesBase

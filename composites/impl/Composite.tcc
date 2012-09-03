@@ -27,6 +27,9 @@ namespace bll=boost::lambda;
 #include<list>
 
 
+#define CALL_COMPOSITE_WORKER(object) composite::worker(acts_,object,Ordinals());
+
+
 // NEEDS_WORK in the helper classes worker member functions could be factored out. (Eg ActWithU --- the amount of code we save is incredible!)
 // Similarly, like in BinarySystem, there is too much boilerplate.
 
@@ -47,22 +50,16 @@ struct CompositeConsistencyException : cpputils::Exception
 //////////////////
 
 
-template<typename VA> template<typename H>
-void Composite<VA>::worker(const H& helper) const
+namespace composite {
+
+
+template<typename VA, typename H, typename Ordinals>
+void worker(const VA& acts, const H& helper, Ordinals)
 {
   mpl::for_each<Ordinals>(helper);
-  boost::fusion::for_each(acts_,helper);
+  boost::fusion::for_each(acts,helper);
 
-  // IMPORTANT NOTICE!!! Both mpl::for_each and
-  // boost::fusion::for_each stores the helper BY VALUE. So, what
-  // happens is that the initial helper is COPIED to both, so the
-  // changes made during mpl::for_each in those members of the helper
-  // which are stored BY VALUE in H, will be "undone" at startup of
-  // boost::fusion::for_each. Ergo, there MUST NOT BE such
-  // members. (There can be const members stored by value though, of
-  // course.)
-  //
-  // How about static members?
+  // IMPORTANT NOTICE!!! Both mpl::for_each and boost::fusion::for_each stores the helper BY VALUE. So, what happens is that the initial helper is COPIED to both, so the changes made during mpl::for_each in those members of the helper which are stored BY VALUE in H, will be "undone" at startup of boost::fusion::for_each. Ergo, there MUST NOT BE such members. (There can be const members stored by value though, of course.) ... How about static members then?
 
 }
 
@@ -73,8 +70,6 @@ void Composite<VA>::worker(const H& helper) const
 //
 ///////////////
 
-
-namespace composite {
 
 
 using structure::SubSystemFree;
@@ -242,7 +237,7 @@ template<typename VA>
 void Composite<VA>::displayParameters(std::ostream& os) const
 {
   os<<"# Composite\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<std::endl;
-  worker(DisplayParameters(frees_,os));
+  CALL_COMPOSITE_WORKER( DisplayParameters(frees_,os) ) ;
 }
 
 //////////////
@@ -278,7 +273,7 @@ double Composite<VA>::highestFrequency() const
 
 
 template<typename VA>
-class Composite<VA>::IsUnitary
+class composite::Exact<VA>::IsUnitary
 {
 public:
   IsUnitary(const Frees& frees, bool& isIt) : frees_(frees), isIt_(isIt) {}
@@ -307,7 +302,7 @@ private:
 
 
 template<typename VA>
-bool Composite<VA>::isUnitary() const
+bool composite::Exact<VA>::isUnitary() const
 {
   bool res=true;
   IsUnitary helper(frees_,res);
@@ -319,7 +314,7 @@ bool Composite<VA>::isUnitary() const
 
 
 template<typename VA>
-class Composite<VA>::ActWithU
+class composite::Exact<VA>::ActWithU
 {
 public:
   ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
@@ -355,9 +350,9 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::actWithU(double dtdid, StateVectorLow& psi) const
+void composite::Exact<VA>::actWithU(double dtdid, StateVectorLow& psi) const
 {
-  worker(ActWithU(frees_,dtdid,psi));
+  CALL_COMPOSITE_WORKER( ActWithU(frees_,dtdid,psi) ) ;
 }
 
 
@@ -380,8 +375,7 @@ public:
     using namespace blitzplusplus;
 
     if (ha) 
-      cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),
-		      bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+      cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
   }
 
   template<typename Act>
@@ -410,7 +404,7 @@ private:
 template<typename VA>
 void Composite<VA>::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
-  worker(Hamiltonian(frees_,t,psi,dpsidt,tIntPic0));
+  CALL_COMPOSITE_WORKER( Hamiltonian(frees_,t,psi,dpsidt,tIntPic0) ) ;
 }
 
 
@@ -512,7 +506,7 @@ Composite<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
   {
     typename list<Probabilities>::iterator iter(seqProbabilities.begin());
 
-    worker(Probas(frees_,t,ldo,iter));
+    CALL_COMPOSITE_WORKER( Probas(frees_,t,ldo,iter) ) ;
   }
 
   Probabilities res(nJumps()); res=0;
@@ -570,7 +564,7 @@ template<typename VA>
 void Composite<VA>::actWithJ(double t, StateVectorLow& psi, size_t ordoJump) const
 {
   bool flag=false;
-  worker(ActWithJ(frees_,t,psi,ordoJump,flag));
+  CALL_COMPOSITE_WORKER( ActWithJ(frees_,t,psi,ordoJump,flag) ) ;
 }
 
 
@@ -613,7 +607,7 @@ private:
 template<typename VA>
 void Composite<VA>::displayKey(std::ostream& os, size_t& i) const
 {
-  worker(DisplayKey(frees_,os,i));
+  CALL_COMPOSITE_WORKER( DisplayKey(frees_,os,i) ) ;
 }
 
 
@@ -710,7 +704,7 @@ Composite<VA>::average(double t, const LazyDensityOperator& ldo) const
   {
     typename list<Averages>::iterator iter(seqAverages.begin());
 
-    worker(Average(frees_,t,ldo,iter));
+    CALL_COMPOSITE_WORKER( Average(frees_,t,ldo,iter) ) ;
   }
 
   Averages res(nAvr()); res=0;
@@ -767,7 +761,7 @@ void
 Composite<VA>::process(Averages& avr) const
 {
   ptrdiff_t l=-1, u=0;
-  worker(Process(frees_,avr,l,u));
+  CALL_COMPOSITE_WORKER( Process(frees_,avr,l,u) ) ;
 }
 
 
@@ -817,7 +811,7 @@ void
 Composite<VA>::display(const Averages& avr, std::ostream& os, int precision) const
 {
   ptrdiff_t l=-1, u=0;
-  worker(Display(frees_,avr,os,precision,l,u));
+  CALL_COMPOSITE_WORKER( Display(frees_,avr,os,precision,l,u) ) ;
 }
 
 
