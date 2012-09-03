@@ -28,6 +28,8 @@ namespace composite {
 
 using boost::fusion::make_list;
 
+using ::size_t;
+
 namespace result_of {
 
 using boost::fusion::result_of::make_list;
@@ -48,8 +50,7 @@ private:
 
   typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
 
-  typedef quantumdata::Types<RANK> Types;
-  typedef typename Types::StateVectorLow StateVectorLow;
+  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
   typedef tmptools::Ordinals<RANK> Ordinals;
 
@@ -66,6 +67,63 @@ private:
 };
 
 
+template<typename VA>
+class Hamiltonian
+  : public structure::Hamiltonian<MaxRank<VA>::value+1>
+{
+private:
+  static const int RANK=composite::MaxRank<VA>::value+1;
+
+  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+
+  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+
+  typedef tmptools::Ordinals<RANK> Ordinals;
+
+protected:
+  Hamiltonian(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
+
+private:
+  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; class AddContribution;
+
+  const Frees& frees_;
+  const VA   &  acts_;
+
+};
+
+
+template<typename VA>
+class Liouvillean
+  : public structure::Liouvillean<MaxRank<VA>::value+1>
+{
+private:
+  static const int RANK=composite::MaxRank<VA>::value+1;
+
+  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+
+  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+
+  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
+
+  typedef tmptools::Ordinals<RANK> Ordinals;
+
+  typedef typename structure::Liouvillean<RANK>::Probabilities Probabilities;
+
+protected:
+  Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
+
+private:
+  size_t              nJumps       ()                                   const; class NJumps;
+  const Probabilities probabilities(double, const LazyDensityOperator&) const; class Probas;
+  void                actWithJ     (double, StateVectorLow&, size_t)    const; class ActWithJ;
+
+  const Frees& frees_;
+  const VA   &  acts_;
+
+};
+
+
+
 } // composite
 
 
@@ -76,9 +134,9 @@ class Composite
 // The base_from_member idiom appears because the Frees has to be calculated and stored somehow first
   : private boost::base_from_member<const blitz::TinyVector<structure::SubSystemFree,composite::MaxRank<VA>::value+1> >,
     public structure::QuantumSystem<composite::MaxRank<VA>::value+1>,
-    public composite::Exact<VA>, 
-    public structure::Hamiltonian  <composite::MaxRank<VA>::value+1>,
-    public structure::Liouvillean  <composite::MaxRank<VA>::value+1>,
+    public composite::Exact      <VA>, 
+    public composite::Hamiltonian<VA>,
+    public composite::Liouvillean<VA>,
     public structure::Averaged     <composite::MaxRank<VA>::value+1>
 {
 public:
@@ -88,8 +146,6 @@ public:
   // Public types
 
   typedef structure::QuantumSystem<RANK> QS_Base;
-  typedef structure::Hamiltonian  <RANK> Ha_Base;
-  typedef structure::Liouvillean  <RANK> Li_Base;
   typedef structure::Averaged     <RANK> Av_Base;
 
   typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
@@ -106,12 +162,11 @@ public:
   typedef tmptools::Ordinals<RANK> Ordinals;
 
   typedef typename QS_Base::Dimensions    Dimensions   ;
-  typedef typename Li_Base::Probabilities Probabilities;
   typedef typename Av_Base::Averages      Averages     ;
 
   // Base class names
 
-  using QS_Base::getDimensions; using QS_Base::getTotalDimension; using Li_Base::defaultArray;
+  using QS_Base::getDimensions; using QS_Base::getTotalDimension;
 
   // Compile-time sanity check
 
@@ -128,8 +183,9 @@ public:
   // Constructor
 
   explicit Composite(const VA& acts) 
-    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)), composite::Exact<VA>(FreesBase::member,acts), frees_(FreesBase::member), acts_(acts) {}
-
+    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)),
+      composite::Exact<VA>(FreesBase::member,acts), composite::Hamiltonian<VA>(FreesBase::member,acts), composite::Liouvillean<VA>(FreesBase::member,acts),
+      frees_(FreesBase::member), acts_(acts) {}
 
 private:
   // Implementing QS_Base
@@ -137,16 +193,6 @@ private:
   double highestFrequency (             ) const;
 
   void   displayParameters(std::ostream&) const; class DisplayParameters;
-
-  // Implementing Ha_Base
-
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; class Hamiltonian;
-
-  // Implementing Li_Base
-
-  size_t              nJumps       ()                                   const; class NJumps;
-  const Probabilities probabilities(double, const LazyDensityOperator&) const; class Probas;
-  void                actWithJ     (double, StateVectorLow&, size_t)    const; class ActWithJ;
 
   // Implementing Av_Base
 
@@ -156,7 +202,6 @@ private:
   const Averages average(double, const LazyDensityOperator&)  const; class Average;
   void           process(Averages&)                           const; class Process;
   void           display(const Averages&, std::ostream&, int) const; class Display;
-
 
   // Storage
   // Note that Frees are stored by value in FreesBase

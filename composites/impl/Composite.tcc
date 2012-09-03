@@ -13,18 +13,18 @@
 #include "Algorithm.h"
 #include "Range.h"
 
-#include<boost/fusion/algorithm/iteration/for_each.hpp>
-#include<boost/fusion/algorithm/iteration/fold.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
+#include <boost/fusion/algorithm/iteration/fold.hpp>
 
-#include<boost/mpl/for_each.hpp>
+#include <boost/mpl/for_each.hpp>
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
 
-#include<boost/lambda/lambda.hpp>
+#include <boost/lambda/lambda.hpp>
 namespace bll=boost::lambda;
 
-#include<algorithm>
-#include<list>
+#include <algorithm>
+#include <list>
 
 
 #define CALL_COMPOSITE_WORKER(object) composite::worker(acts_,object,Ordinals());
@@ -324,7 +324,8 @@ public:
   {
     using namespace blitzplusplus::basi;
 
-    if (ex) boost::for_each(fullRange(psi_,v),bind(&Ex::actWithU,ex,dtdid_,_1));
+    if (ex) boost::for_each(fullRange(psi_,v),boost::bind(&Ex::actWithU,ex,dtdid_,::_1));
+    // namespace qualification :: is necessary because otherwise :: and mpl:: are equally good matches.
   }
 
   template<typename Act>
@@ -363,10 +364,10 @@ void composite::Exact<VA>::actWithU(double dtdid, StateVectorLow& psi) const
 //////////////
 
 template<typename VA>
-class Composite<VA>::Hamiltonian
+class composite::Hamiltonian<VA>::AddContribution
 {
 public:
-  Hamiltonian(const Frees& frees, double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) 
+  AddContribution(const Frees& frees, double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) 
     : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
 
   template<typename Vec, typename Ha>
@@ -375,7 +376,7 @@ public:
     using namespace blitzplusplus;
 
     if (ha) 
-      cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+      cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,tIntPic0_)); 
   }
 
   template<typename Act>
@@ -402,9 +403,9 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void composite::Hamiltonian<VA>::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
-  CALL_COMPOSITE_WORKER( Hamiltonian(frees_,t,psi,dpsidt,tIntPic0) ) ;
+  CALL_COMPOSITE_WORKER( AddContribution(frees_,t,psi,dpsidt,tIntPic0) ) ;
 }
 
 
@@ -416,7 +417,7 @@ void Composite<VA>::addContribution(double t, const StateVectorLow& psi, StateVe
 
 
 template<typename VA>
-class Composite<VA>::NJumps
+class composite::Liouvillean<VA>::NJumps
 {
 public:
   NJumps(const Frees& frees, size_t& num) : frees_(frees), num_(num) {}
@@ -444,7 +445,7 @@ private:
 
 
 template<typename VA>
-size_t Composite<VA>::nJumps() const
+size_t composite::Liouvillean<VA>::nJumps() const
 {
   size_t res=0;
   NJumps helper(frees_,res);
@@ -457,20 +458,24 @@ size_t Composite<VA>::nJumps() const
 
 
 template<typename VA>
-class Composite<VA>::Probas
+class composite::Liouvillean<VA>::Probas
 {
 public:
 
-  typedef std::list<Probabilities> SeqProbabilities;
-  typedef typename SeqProbabilities::iterator SAI;
+  typedef typename std::list<Probabilities>::iterator Iter;
 
-  Probas(const Frees& frees, double t, const LazyDensityOperator& ldo, SAI& iter) 
+  Probas(const Frees& frees, double t, const LazyDensityOperator& ldo, Iter& iter) 
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Li>
   void help(const Li*const li, Vec v) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne),v,defaultArray));    
+    iter_++->reference(
+		       quantumdata::partialTrace(ldo_,
+						 boost::bind(&Li::probabilities,t_,::_1,li,structure::theStaticOne),
+						 v,
+						 structure::Liouvillean<RANK>::defaultArray)
+		       );
   }
 
   template<typename Act>
@@ -491,20 +496,19 @@ private:
   const double t_;
   const LazyDensityOperator& ldo_;
   
-  SAI& iter_;
+  Iter& iter_;
 
 };
 
 
 template<typename VA>
-const typename Composite<VA>::Probabilities
-Composite<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
+const typename composite::Liouvillean<VA>::Probabilities
+composite::Liouvillean<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
 {
-  using namespace std;
-  list<Probabilities> seqProbabilities(RANK+mpl::size<VA>::value);
+  std::list<Probabilities> seqProbabilities(RANK+mpl::size<VA>::value);
 
   {
-    typename list<Probabilities>::iterator iter(seqProbabilities.begin());
+    typename Probas::Iter iter(seqProbabilities.begin());
 
     CALL_COMPOSITE_WORKER( Probas(frees_,t,ldo,iter) ) ;
   }
@@ -517,7 +521,7 @@ Composite<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
 
 
 template<typename VA>
-class Composite<VA>::ActWithJ
+class composite::Liouvillean<VA>::ActWithJ
 {
 public:
   ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
@@ -530,7 +534,7 @@ public:
     if (!flag_ && li) {
       size_t n=Li::nJumps(li);
       if (ordoJump_<n) {
-	boost::for_each(fullRange(psi_,v),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
+	boost::for_each(fullRange(psi_,v),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
 	flag_=true;
       }
       ordoJump_-=n;  
@@ -561,7 +565,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::actWithJ(double t, StateVectorLow& psi, size_t ordoJump) const
+void composite::Liouvillean<VA>::actWithJ(double t, StateVectorLow& psi, size_t ordoJump) const
 {
   bool flag=false;
   CALL_COMPOSITE_WORKER( ActWithJ(frees_,t,psi,ordoJump,flag) ) ;
@@ -659,16 +663,15 @@ class Composite<VA>::Average
 {
 public:
 
-  typedef std::list<Averages> SeqAverages;
-  typedef typename SeqAverages::iterator SAI;
+  typedef typename std::list<Averages>::iterator Iter;
 
-  Average(const Frees& frees, double t, const LazyDensityOperator& ldo, SAI& iter) 
+  Average(const Frees& frees, double t, const LazyDensityOperator& ldo, Iter& iter) 
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Av>
   void help(const Av*const av, Vec v) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne),v,defaultArray));
+    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne),v,structure::Liouvillean<RANK>::defaultArray));
   }
 
   template<typename Act>
@@ -689,7 +692,7 @@ private:
   const double t_;
   const LazyDensityOperator& ldo_;
   
-  SAI& iter_;
+  Iter& iter_;
 
 };
 
