@@ -2,7 +2,7 @@
 
 #include "impl/Tridiagonal.tcc"
 
-#include<boost/assign/list_of.hpp>
+#include <boost/assign/list_of.hpp>
 
 
 using namespace boost::assign;
@@ -13,7 +13,7 @@ using namespace mode;
 
 
 
-generaldicke::Base::Base(const ModeBase* mode, const SpinBase* spin, dcomp u, dcomp y)
+GeneralDicke::GeneralDicke(mode::SmartPtr mode, spin::SmartPtr spin, dcomp u, dcomp y)
   : Interaction<2>(Frees(mode,spin),
 		   RealFreqs(),
 		   tuple_list_of("u",u,mode->getDimension()*spin->getDimension())("y",y,

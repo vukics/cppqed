@@ -8,24 +8,13 @@
 
 #include "Interaction.h"
 
-namespace nxcoupledmodes {
 
-class Base: public structure::Interaction<2>, public structure::TridiagonalHamiltonian<2,true>
+class NX_CoupledModes: public structure::Interaction<2>, public structure::TridiagonalHamiltonian<2,true>
 {
 public:
-  Base(const ModeBase*, const ModeBase*, double u);
+  NX_CoupledModes(mode::SmartPtr, mode::SmartPtr, double u);
 
 };
 
-} // nxcoupledmodes
-
-
-
-#define BIG_NAMESPACE_NAME             nxcoupledmodes
-#define BIG_CLASS_NAME                 NX_CoupledModes
-#define BIG_ADDITIONAL_PARAMETERS      , double u
-#define BIG_ADDITIONAL_PARAMETERS_PASS ,u
-
-#include "details/BinaryInteractionGenerator.h"
 
 #endif // ELEMENTS_INTERACTIONS_NX_COUPLEDMODES_H_INCLUDED

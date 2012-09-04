@@ -24,7 +24,7 @@ namespace particletwomodes {
 
 
 const quantumoperator::Tridiagonal<3> 
-helper(const ModeBase* mode0, const ModeBase* mode1, const ParticleBase* part, const ModeFunction& mf0)
+helper(mode::SmartPtr mode0, mode::SmartPtr mode1, particle::SmartPtr part, const ModeFunction& mf0)
 {
   return aop(mode0)*aop(mode1).dagger()*mfNKX(part,mf0);
 }
@@ -37,7 +37,7 @@ const dcomp factor(double uNot0, double uNot1, double phi)
 }
 
 
-Base::Base(const ModeBase* mode0, const ModeBase* mode1, const ParticleBase* part, 
+Base::Base(mode::SmartPtr mode0, mode::SmartPtr mode1, particle::SmartPtr part, 
 	   double uNot0, double uNot1, 
 	   const ModeFunction& mf0, const ModeFunction& mf1,
 	   double phi)
