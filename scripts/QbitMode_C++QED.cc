@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   qbit::SmartPtr qbit(qbit::make(pplqb,qmp));
   mode::SmartPtr mode(mode::make(pplm ,qmp));
 
-  JaynesCummings<> jc(qbit,mode,pjc);
+  JaynesCummings jc(qbit,mode,pjc);
 
   // BinarySystem system(jc);
 
@@ -50,23 +50,6 @@ int main(int argc, char* argv[])
   psi.renorm();
 
   evolve(psi,binary::make(jc),pe,tmptools::Vector<0>());
-
-
-  // The 3 further ways to create a JaynesCummings:
-  {
-    PumpedLossyQbitSch qbitv(pplqb);
-    PumpedLossyMode<>  modev(pplm );
-    {
-      JaynesCummings<> jc(qbitv,mode ,pjc);
-    }
-    {
-      JaynesCummings<> jc(qbit ,modev,pjc);
-    }
-    {
-      JaynesCummings<> jc(qbitv,modev,pjc);
-    }
-  }
-
 
 
   } catch (const cpputils::TaggedException& te) {cerr<<"Caught exception with tag: "<<te.getTag()<<endl; exit(1);}

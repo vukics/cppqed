@@ -22,6 +22,8 @@ struct Pars
 {
   dcomp& g;
 
+  operator dcomp&() const {return g;}
+
   Pars(parameters::ParameterTable&, const std::string& ="");
 
 };
@@ -32,11 +34,12 @@ struct Pars
 
 class JaynesCummings : public structure::Interaction<2>, public structure::TridiagonalHamiltonian<2,true>
 {
-protected:
+public:
+  JaynesCummings(qbit::SmartPtr, mode::SmartPtr, const dcomp& g);
+
+private:
   typedef structure::Interaction<2> IA_Base;
   typedef structure::TridiagonalHamiltonian<2,true> TDH_Base;
-
-  JaynesCummings(qbit::SmartPtr, mode::SmartPtr, const dcomp& g);
 
 };
 
