@@ -5,6 +5,8 @@
 
 #include "MathExtensions.h"
 
+#include <boost/make_shared.hpp>
+
 
 
 const dcomp DrivenDampedHarmonicOscillator::c(double t) const
@@ -88,9 +90,9 @@ public:
 const DDHO_SmartPtr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit)
 {
   if (gamma==1.)
-    return DDHO_SmartPtr(new DDHO_Critical(omega,ampTI,ampDerivTI,tInit));
+    return boost::make_shared<DDHO_Critical>(omega,ampTI,ampDerivTI,tInit);
   else
-    return DDHO_SmartPtr(new DDHO   (gamma,omega,ampTI,ampDerivTI,tInit));
+    return boost::make_shared<DDHO>(gamma,omega,ampTI,ampDerivTI,tInit);
 }
 
 

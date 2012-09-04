@@ -17,9 +17,8 @@
 
 #include "InteractionFwd.h"
 
-#include "FreeFwd.h"
-
 #include "DynamicsBase.h"
+#include "Free.h"
 
 #include "BlitzTiny.h"
 
@@ -31,7 +30,7 @@ template<int RANK>
 class Interaction : public DynamicsBase
 {
 public:
-  typedef blitz::TinyVector<const Free*,RANK> Frees;
+  typedef blitz::TinyVector<Free::SmartPtr,RANK> Frees;
 
   explicit Interaction(const Frees& frees, 
 		       const    RealFreqs&    realFreqs=   RealFreqs(), 

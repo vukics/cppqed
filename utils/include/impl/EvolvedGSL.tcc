@@ -6,6 +6,8 @@
 
 #include "impl/Evolved.tcc"
 
+#include <boost/make_shared.hpp>
+
 namespace evolved {
 
 
@@ -19,7 +21,7 @@ const typename Maker<A>::SmartPtr MakerGSL<A>::operator()(
 							  const A& scaleAbs
 							  ) const
 {
-  return SmartPtr(new details::EvolvedGSL<A>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_));
+  return boost::make_shared<details::EvolvedGSL<A>, A& >(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_);
 }
 
 

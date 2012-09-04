@@ -26,11 +26,11 @@ using namespace structure::free;
 
 typedef boost::shared_ptr<const ModeBase> SmartPtr;
 
-const Tridiagonal aop(const ModeBase*);
-const Tridiagonal nop(const ModeBase*);
+const Tridiagonal aop(SmartPtr);
+const Tridiagonal nop(SmartPtr);
 
-inline const Tridiagonal xop(const ModeBase* mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
-// inline const Tridiagonal yop(const ModeBase*) {return ...}
+inline const Tridiagonal xop(SmartPtr mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
+// inline const Tridiagonal yop(mode::SmartPtr) {return ...}
 
 struct PrepError : public cpputils::Exception {};
 

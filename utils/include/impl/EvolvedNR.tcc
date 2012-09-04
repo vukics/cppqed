@@ -4,6 +4,8 @@
 
 #include "EvolvedNR.h"
 
+#include <boost/make_shared.hpp>
+
 namespace evolved {
 
 
@@ -17,7 +19,7 @@ MakerNR<A>::operator()(A& a,
 		       const A& scaleAbs
 		       ) const
 {
-  return SmartPtr(new details::EvolvedNR<A>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs));
+  return boost::make_shared<details::EvolvedNR<A>, A& >(a,derivs,dtInit,epsRel,epsAbs,scaleAbs);
 }
 
 

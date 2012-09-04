@@ -12,6 +12,8 @@
 
 #include "ParsFwd.h"
 
+#include <boost/enable_shared_from_this.hpp>
+
 // A general Spin yet incomplete
 // Note: jump is not yet implemented, only "Hamiltonian" decay.
 
@@ -20,17 +22,20 @@ namespace spin {
 using namespace structure::free;
 
 
-const Tridiagonal splus(const SpinBase*);
-
-inline const Tridiagonal sminus(const SpinBase* spin) {return splus(spin).dagger();}
-
-inline const Tridiagonal sx(const SpinBase* spin) {return (splus(spin)+sminus(spin))/2;}
-inline const Tridiagonal sy(const SpinBase* spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
-
-const Tridiagonal sn(const SpinBase*);
+typedef boost::shared_ptr<const SpinBase> SmartPtr;
 
 
-const Tridiagonal sz(const SpinBase*);
+const Tridiagonal splus(SmartPtr);
+
+inline const Tridiagonal sminus(SmartPtr spin) {return splus(spin).dagger();}
+
+inline const Tridiagonal sx(SmartPtr spin) {return (splus(spin)+sminus(spin))/2;}
+inline const Tridiagonal sy(SmartPtr spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
+
+const Tridiagonal sn(SmartPtr);
+
+
+const Tridiagonal sz(SmartPtr);
 
 
 struct Pars
@@ -100,14 +105,15 @@ private:
 
 
 class SpinSch
-  : public SpinBase,
+  : public boost::enable_shared_from_this<SpinSch>,
+    public SpinBase,
     public structure::TridiagonalHamiltonian<1,false>
 {
 public:
 
   SpinSch(const spin::Pars& p) 
     : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim),
-      structure::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(this))
+      structure::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(shared_from_this()))
   {
     getParsStream()<<"# Schrodinger picture."<<std::endl;
   }

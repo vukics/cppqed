@@ -36,10 +36,10 @@ protected:
 
 private:
   // const QuantumSystem<RANK>* qs_;
-  const Exact        <RANK>* ex_; 
-  const Hamiltonian  <RANK>* ha_;
-  const Liouvillean  <RANK>* li_; 
-  const Averaged     <RANK>* av_;
+  const Exact        <RANK>*const ex_; 
+  const Hamiltonian  <RANK>*const ha_;
+  const Liouvillean  <RANK>*const li_; 
+  const Averaged     <RANK>*const av_;
   
 };
 
@@ -56,6 +56,7 @@ public:
   const Interaction*const get() const {return ia_;} 
 
 private:
+  // TODO: Why do we need to store a pointer here???
   const Interaction* ia_;
 
 };
@@ -65,14 +66,14 @@ private:
 class SubSystemFree : public SubSystem<1>
 {
 public:
-  SubSystemFree(const Free* free) : SubSystem<1>(free), free_(free) {}
+  SubSystemFree(Free::SmartPtr free) : SubSystem<1>(free.get()), free_(free) {}
 
   SubSystemFree() : free_() {}
 
-  const Free*const get() const {return free_;}
+  const Free::SmartPtr get() const {return free_;}
 
 private:
-  const Free* free_;
+  const Free::SmartPtr free_;
 
 };
 

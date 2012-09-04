@@ -3,9 +3,10 @@
 #include "ParsQbit.h"
 #include "impl/StateVector.tcc"
 
-#include<boost/assign/list_of.hpp>
+#include <boost/assign/list_of.hpp>
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
+#include <boost/make_shared.hpp>
 
 
 using namespace std;
@@ -178,8 +179,7 @@ SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp)
 
 const Tridiagonal sigmadagsigmaop()
 {
-  QbitBase dummie;
-  return mode::nop(&dummie);
+  return mode::nop(boost::make_shared<QbitBase>());
 }
 
 

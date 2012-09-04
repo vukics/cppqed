@@ -10,6 +10,8 @@
 
 #include "BlitzTiny.h"
 
+#include <boost/make_shared.hpp>
+
 
 #define DISPLAY_KEY(Class,Aux) void binary::Class::displayKey(std::ostream& os, size_t& i) const \
   {									\
@@ -268,8 +270,8 @@ const SystemCharacteristics querySystemCharacteristics(const binary::Interaction
 {
   using namespace structure;
   const Free 
-    *const free0=ia.getFrees()(0),
-    *const free1=ia.getFrees()(1);
+    *const free0=ia.getFrees()(0).get(),
+    *const free1=ia.getFrees()(1).get();
   return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(&ia),
 			       qsh(free0) || qsh(free1) || qsh<2>(&ia),
 			       qsl(free0) || qsl(free1) || qsl<2>(&ia));
@@ -278,7 +280,7 @@ const SystemCharacteristics querySystemCharacteristics(const binary::Interaction
 } 
 
 
-#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return binary::SmartPtr(new BinarySystem<EX,HA,LI>(ia))
+#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
 const binary::SmartPtr binary::make(const Interaction& ia)
@@ -290,7 +292,7 @@ const binary::SmartPtr binary::make(const Interaction& ia)
   else if DISPATCHER(false,true ,true ) ;
   else if DISPATCHER(false,true ,false) ;
   else if DISPATCHER(false,false,true ) ;
-  else return binary::SmartPtr(new BinarySystem<false,false,false>(ia));
+  else return boost::make_shared<BinarySystem<false,false,false> >(ia);
 }
 
 
