@@ -11,8 +11,8 @@
 #include "TridiagonalHamiltonian.h"
 
 #include "ParsFwd.h"
+#include "SmartPtr.h"
 
-#include <boost/enable_shared_from_this.hpp>
 
 // A general Spin yet incomplete
 // Note: jump is not yet implemented, only "Hamiltonian" decay.
@@ -105,15 +105,14 @@ private:
 
 
 class SpinSch
-  : public boost::enable_shared_from_this<SpinSch>,
-    public SpinBase,
+  : public SpinBase,
     public structure::TridiagonalHamiltonian<1,false>
 {
 public:
 
   SpinSch(const spin::Pars& p) 
     : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim),
-      structure::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(shared_from_this()))
+      structure::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(cpputils::nonOwningConstSharedPtr(this)))
   {
     getParsStream()<<"# Schrodinger picture."<<std::endl;
   }
