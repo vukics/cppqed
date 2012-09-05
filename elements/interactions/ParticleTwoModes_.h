@@ -10,6 +10,8 @@
 
 #include "Exception.h"
 
+#include "details/DispatchFreeType.h"
+
 
 namespace particletwomodes {
 
@@ -39,9 +41,10 @@ class ParticleTwoModes : public particletwomodes::Base
 public:
   typedef particletwomodes::Base Base;
 
-  ParticleTwoModes(mode::SmartPtr f0, mode::SmartPtr f1, particle::SmartPtr f2,
+  template<typename F0, typename F1, typename F2>
+  ParticleTwoModes(const F0& f0, const F1& f1, const F2& f2, 
 		   const particlecavity::ParsAlong& p0, const particlecavity::ParsAlong& p1, double phi=0)
-    : Base(f0,f1,f2,p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
+    : Base(dispatchFreeType(f0),dispatchFreeType(f1),dispatchFreeType(f2),p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
 };
 
 #endif // ELEMENTS_INTERACTIONS_PARTICLETWOMODES__H_INCLUDED
