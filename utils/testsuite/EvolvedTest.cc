@@ -19,7 +19,10 @@
 
 #include "MathExtensions.h"
 
-#include<boost/bind.hpp>
+#define BOOST_TEST_MODULE Evolved test
+#include <boost/test/unit_test.hpp>
+
+#include <boost/bind.hpp>
 
 
 using namespace std;
@@ -57,7 +60,7 @@ void derivs(double tau, const CA1D& yA, CA1D& dydtA, const dcomp& Z)
 }
 
 
-int main()
+BOOST_AUTO_TEST_CASE( ComparisonToExactSolution )
 {
 
   dcomp Z(-1.,10);
@@ -97,6 +100,6 @@ int main()
     }
   }
 
-  return diff/sum<1e-5 ? 0 : 1;
+  BOOST_CHECK(diff/sum<1e-5);
   
 }
