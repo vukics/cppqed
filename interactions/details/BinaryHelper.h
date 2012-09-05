@@ -2,7 +2,10 @@
 
 using structure::theStaticOne;
 
-const tmptools::Vector<0> v0=tmptools::Vector<0>();
-const tmptools::Vector<1> v1=tmptools::Vector<1>();
+typedef tmptools::Vector<0> V0;
+typedef tmptools::Vector<1> V1;
+
+const V0 v0=V0();
+const V1 v1=V1();
 
 

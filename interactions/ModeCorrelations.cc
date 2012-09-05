@@ -39,8 +39,8 @@ ModeCorrelations::average(const LazyDensityOperator& matrix) const
 
   {
     const Averages 
-      a0(partialTrace(matrix,bind(&structure::Averaged<1>::average,0,_1,&averagedMode_,theStaticOne),v0,defaultArray)),
-      a1(partialTrace(matrix,bind(&structure::Averaged<1>::average,0,_1,&averagedMode_,theStaticOne),v1,defaultArray));
+      a0(partialTrace<V0,Averages>(matrix,bind(&structure::Averaged<1>::average,0,_1,&averagedMode_,theStaticOne))),
+      a1(partialTrace<V1,Averages>(matrix,bind(&structure::Averaged<1>::average,0,_1,&averagedMode_,theStaticOne)));
 
     copy(a1,copy(a0,averages.begin()));
   }

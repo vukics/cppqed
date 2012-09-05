@@ -33,8 +33,8 @@
   using quantumdata::partialTrace;					\
   using boost::copy;							\
 									\
-  const ArrayName a0 (partialTrace(ldo,bind(&Aux##1::func,t,_1,free0_.get##Aux(),theStaticOne),v0,defaultArray)), \
-    a1 (partialTrace(ldo,bind(&Aux##1::func,t,_1,free1_.get##Aux(),theStaticOne),v1,defaultArray)), \
+  const ArrayName a0 (partialTrace<V0,ArrayName>(ldo,bind(&Aux##1::func,t,_1,free0_.get##Aux(),theStaticOne))), \
+    a1 (partialTrace<V1,ArrayName>(ldo,bind(&Aux##1::func,t,_1,free1_.get##Aux(),theStaticOne))), \
     a01(Aux##2::func(t,ldo,ia_.get##Aux()));				\
 									\
   ArrayName a(n##NumberName());						\

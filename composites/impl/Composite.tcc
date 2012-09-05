@@ -474,21 +474,21 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(const Li*const li) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne),v,defaultArray));    
+    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne)));    
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getLi(),act);
+    help<Act>(act.getLi());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getLi(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX> >(frees_(IDX).getLi());
   }
 
 private:
@@ -672,21 +672,21 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Av>
-  void help(const Av*const av, Vec v) const
+  void help(const Av*const av) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne),v,defaultArray));
+    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne)));
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getAv(),act);
+    help<Act>(act.getAv());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getAv(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX> >(frees_(IDX).getAv());
   }
 
 private:
