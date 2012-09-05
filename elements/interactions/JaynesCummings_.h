@@ -45,8 +45,8 @@ protected:
 
 #define BIG_NAMESPACE_NAME             jaynescummings
 #define BIG_CLASS_NAME                 JaynesCummings
-#define BIG_ADDITIONAL_PARAMETERS      , const jaynescummings::Pars& p
-#define BIG_ADDITIONAL_PARAMETERS_PASS ,p.g
+#define BIG_ADDITIONAL_PARAMETERS      , const dcomp& g
+#define BIG_ADDITIONAL_PARAMETERS_PASS ,g
 
 #include "details/BinaryInteractionGenerator.h"
 
