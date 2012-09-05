@@ -84,7 +84,7 @@ public:
 
   // Base class names
 
-  using QS_Base::getDimensions; using QS_Base::getTotalDimension; using Li_Base::defaultArray;
+  using QS_Base::getDimensions; using QS_Base::getTotalDimension;
 
   // Compile-time sanity check
 
