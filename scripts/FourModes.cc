@@ -3,10 +3,14 @@
 
 #include "Composite.h"
 
+#include "SmartPtr.h"
+
+using cpputils::nonOwningConstSharedPtr;
+
 
 struct DummyQuaternary : structure::Interaction<4>
 {
-  DummyQuaternary(ModeBase* m0, ModeBase* m1, ModeBase* m2, ModeBase* m3) 
+  DummyQuaternary(mode::SmartPtr m0, mode::SmartPtr m1, mode::SmartPtr m2, mode::SmartPtr m3) 
     : structure::Interaction<4>(Frees(m0,m1,m2,m3)) {}
 };
 
@@ -29,7 +33,7 @@ int main(int argc, char* argv[])
   PumpedLossyModeAlternative<>
     m1(pm1), m3(pm3);
 
-  DummyQuaternary dq(&m0,&m1,&m2,&m3);
+  DummyQuaternary dq(nonOwningConstSharedPtr(&m0),nonOwningConstSharedPtr(&m1),nonOwningConstSharedPtr(&m2),nonOwningConstSharedPtr(&m3));
 
   quantumdata::StateVector<4> psi(init(pm0)*init(pm1)*init(pm2)*init(pm3));
 
