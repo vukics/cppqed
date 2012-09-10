@@ -166,8 +166,8 @@ bool binary::Exact::isUnitary() const
 void binary::Exact::actWithU(double dt, StateVectorLow& psi) const
 {
   using namespace blitzplusplus::basi;
-  if (const Ex1* ex1=free0_.getEx()) for_each(fullRange(psi,v0),bind(&Ex1::actWithU,ex1,dt,_1));
-  if (const Ex1* ex1=free1_.getEx()) for_each(fullRange(psi,v1),bind(&Ex1::actWithU,ex1,dt,_1));
+  if (const Ex1* ex1=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex1,dt,_1));
+  if (const Ex1* ex1=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex1,dt,_1));
 
   Ex2::actWithU(dt,psi,ia_.getEx());
 }
@@ -183,8 +183,8 @@ void binary::Exact::actWithU(double dt, StateVectorLow& psi) const
 void binary::Hamiltonian::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   using namespace blitzplusplus; using basi::fullRange;
-  if (const Ha1* ha1=free0_.getHa()) for_each(fullRange(psi,v0),basi::begin(dpsidt,v0),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
-  if (const Ha1* ha1=free1_.getHa()) for_each(fullRange(psi,v1),basi::begin(dpsidt,v1),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
+  if (const Ha1* ha1=free0_.getHa()) for_each(fullRange<V0>(psi),basi::begin<V0>(dpsidt),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
+  if (const Ha1* ha1=free1_.getHa()) for_each(fullRange<V1>(psi),basi::begin<V1>(dpsidt),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
 
   Ha2::addContribution(t,psi,dpsidt,tIntPic0,ia_.getHa());
 
@@ -215,13 +215,13 @@ void binary::Liouvillean::actWithJ(double t, StateVectorLow& psi, size_t i) cons
 
   size_t n=Li1::nJumps(li0);
   if (li0 && i<n) {
-    for_each(fullRange(psi,v0),bind(&Li1::actWithJ,li0,t,_1,i));
+    for_each(fullRange<V0>(psi),bind(&Li1::actWithJ,li0,t,_1,i));
     return;
   }
 
   i-=n;  
   if (li1 && i<(n=Li1::nJumps(li1))) {
-    for_each(fullRange(psi,v1),bind(&Li1::actWithJ,li1,t,_1,i));
+    for_each(fullRange<V1>(psi),bind(&Li1::actWithJ,li1,t,_1,i));
     return;
   }
 

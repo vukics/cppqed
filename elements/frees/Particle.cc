@@ -150,8 +150,8 @@ const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) co
 
   }
 
-  for_each(fullRange(rhotemp, Left()),bind(&ffTransform,_1,FFTDIR_KX));
-  for_each(fullRange(rhotemp,Right()),bind(&ffTransform,_1,FFTDIR_XK));
+  for_each(fullRange<Left >(rhotemp),bind(&ffTransform,_1,FFTDIR_KX));
+  for_each(fullRange<Right>(rhotemp),bind(&ffTransform,_1,FFTDIR_XK));
 
   for (int i=0; i<dim; i++) {
     double diag=real(rhotemp(i,i));

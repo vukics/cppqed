@@ -145,24 +145,21 @@ Base<RANK>::displayParameters() const
 }
 
 
-// NEEDS_WORK needs to create again the iterators because the
-// array stored in the iterator IS NOT transposed because
-// transpose does not touch the data. For this reason one must be
-// very careful with reusing SliceIterators because probably most
-// of the times it does not produce the required
-// semantics. Alternatively, one could imagine a rebind
-// functionality in SliceIterators.
+// NEEDS_WORK needs to create again the iterators because the array stored in the iterator IS NOT transposed because transpose does not touch the data. For this reason one must be very careful with reusing SliceIterators because probably most of the times it does not produce the required semantics. Alternatively, one could imagine a rebind functionality in SliceIterators.
+
 template<int RANK>
 void Base<RANK>::unaryIter(DensityOperatorLow& rhoLow, UnaryFunction function) const
 {
-  boost::for_each(fullRange(rhoLow,blitzplusplus::vfmsi::Left()),function);
+  using namespace blitzplusplus::vfmsi;
+  boost::for_each(fullRange<Left>(rhoLow),function);
 }
 
 
 template<int RANK>
 void Base<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
 {
-  cpputils::for_each(fullRange(rhoLow,blitzplusplus::vfmsi::Left()),begin(drhodtLow,blitzplusplus::vfmsi::Left()),function);
+  using namespace blitzplusplus::vfmsi;
+  cpputils::for_each(fullRange<Left>(rhoLow),begin<Left>(drhodtLow),function);
 }
 
 

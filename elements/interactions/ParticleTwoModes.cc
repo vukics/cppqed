@@ -68,12 +68,12 @@ void Base::addContribution(double t, const StateVectorLow& psi, StateVectorLow& 
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstH_);
-    cpputils::for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondH_));
+    cpputils::for_each(fullRange<V2>(dpsidtTemp),basi::begin<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondH_));
   }
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstHT_);
-    cpputils::for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
+    cpputils::for_each(fullRange<V2>(dpsidtTemp),basi::begin<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
   }
 
 }
