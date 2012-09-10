@@ -8,6 +8,7 @@
 
 include(LibFindMacros)
 include(CheckIncludeFiles)
+include(CheckSymbolExists)
 
 libfind_pkg_check_modules(blitz_PKGCONF blitz)
 
@@ -42,8 +43,6 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
     set(blitz_LIBRARY)
     message(FATAL_ERROR "Blitz++ version >= 0.10 (or mercurial checkout) is needed.")
   endif(NOT blitz_IS_MERCURIAL_VERSION)
-  CHECK_SYMBOL_EXISTS(BZ_HAVE_BOOST_SERIALIZATION ${blitz_INCLUDE_DIR}/blitz/gnu/bzconfig.h blitz_SERIALIZATION_FOUND)
-else(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
-  file( STRINGS ${blitz_INCLUDE_DIR}/blitz/gnu/bzconfig.h blitz_SERIALIZATION_FOUND REGEX "^#define BZ_HAVE_BOOST_SERIALIZATION")
 endif(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
 
+CHECK_SYMBOL_EXISTS(BZ_HAVE_BOOST_SERIALIZATION ${blitz_INCLUDE_DIR}/blitz/gnu/bzconfig.h blitz_SERIALIZATION_FOUND)
