@@ -325,11 +325,9 @@ public:
   ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
 
   template<typename Vec, typename Ex>
-  void help(const Ex*const ex, Vec v) const
+  void help(const Ex*const ex, Vec) const
   {
-    using namespace blitzplusplus::basi;
-
-    if (ex) boost::for_each(fullRange(psi_,v),bind(&Ex::actWithU,ex,dtdid_,_1));
+    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Ex::actWithU,ex,dtdid_,_1));
   }
 
   template<typename Act>
@@ -375,13 +373,12 @@ public:
     : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
 
   template<typename Vec, typename Ha>
-  void help(const Ha*const ha, Vec v) const
+  void help(const Ha*const ha, Vec) const
   {
-    using namespace blitzplusplus;
-
     if (ha) 
-      cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),
-		      bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+      cpputils::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),
+			 blitzplusplus::basi::begin<Vec>(dpsidt_),
+			 bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
   }
 
   template<typename Act>
@@ -529,14 +526,12 @@ public:
   ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(const Li*const li, Vec) const
   {
-    using namespace blitzplusplus::basi;
-
     if (!flag_ && li) {
       size_t n=Li::nJumps(li);
       if (ordoJump_<n) {
-	boost::for_each(fullRange(psi_,v),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
+	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
 	flag_=true;
       }
       ordoJump_-=n;  
