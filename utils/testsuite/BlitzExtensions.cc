@@ -130,9 +130,8 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
   }
     
   {
-    using namespace blitzplusplus::basi;
     typedef tmptools::Vector<2,1,4> V214;
-    for_each(fullRange(v,V214()),basi::begin(vResBASI,V214()),bind(myFunc,a,_1,_2));
+    for_each(blitzplusplus::basi::fullRange<V214>(v),blitzplusplus::basi::begin<V214>(vResBASI),bind(myFunc,a,_1,_2));
   }
 
   BOOST_CHECK(all(vResBASI==vResTensor));
@@ -157,7 +156,7 @@ BOOST_AUTO_TEST_CASE( MatrixProducts ) // VFMSI for matrix products a*rho
 
   {
     using namespace blitzplusplus::vfmsi;
-    for_each(fullRange(rho,Left()),bind(myFunc,a,_1,_1));
+    for_each(fullRange<Left>(rho),bind(myFunc,a,_1,_1));
   }
   //cout<<max(abs(rho-resTensor))<<endl;
   //BOOST_CHECK(!fcmp(1-max(abs(rho-hermitianConjugate(rho))),1,epsilonCmp));
@@ -186,12 +185,12 @@ BOOST_AUTO_TEST_CASE( VFMSI_Test ) // VFMSI computing a*rho*adagger (rho Hermiti
   {
     {
       using namespace blitzplusplus::vfmsi;
-      for_each(fullRange(rho,Left()),bind(myFunc,a,_1,_1));
+      for_each(fullRange<Left>(rho),bind(myFunc,a,_1,_1));
     }
     hermitianConjugateSelf(rho);
     {
       using namespace blitzplusplus::vfmsi;
-      for_each(fullRange(rho,Left()),bind(myFunc,a,_1,_1));
+      for_each(fullRange<Left>(rho),bind(myFunc,a,_1,_1));
     }
   }
   //cout<<max(abs(rho-resTensor))<<endl;
