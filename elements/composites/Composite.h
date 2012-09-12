@@ -9,6 +9,8 @@
 #include "BlitzArraySliceIterator.h"
 // This is included at this point mainly to pull in necessary TMP tools
 
+#include "SubSystemFwd.h"
+
 #include "details/TMP_helpers.h"
 
 #include <boost/fusion/container/generation/make_list.hpp>
@@ -28,6 +30,8 @@
 namespace composite {
 
 using boost::fusion::make_list;
+
+bool compFrees(const structure::SubSystemFree& ssf1, const structure::SubSystemFree& ssf2);
 
 namespace result_of {
 
