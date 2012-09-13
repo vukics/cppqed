@@ -5,7 +5,7 @@
 #include "SubSystemFwd.h"
 
 #include "Free.h"
-#include "InteractionFwd.h"
+#include "Interaction.h"
 
 #include "Structure.h"
 
@@ -18,13 +18,13 @@ class SubSystem
 {
 public:
   // const QuantumSystem<RANK>*const getQS() const {return qs_;}
-  const Exact        <RANK>*const getEx() const {return ex_;} 
-  const Hamiltonian  <RANK>*const getHa() const {return ha_;}
-  const Liouvillean  <RANK>*const getLi() const {return li_;} 
-  const Averaged     <RANK>*const getAv() const {return av_;}  
+  const typename Exact      <RANK>::Ptr getEx() const {return ex_;} 
+  const typename Hamiltonian<RANK>::Ptr getHa() const {return ha_;}
+  const typename Liouvillean<RANK>::Ptr getLi() const {return li_;} 
+  const typename Averaged   <RANK>::Ptr getAv() const {return av_;}  
 
 protected:
-  SubSystem(const DynamicsBase* qs)
+  SubSystem(DynamicsBase::Ptr qs)
     : // qs_(qs),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
@@ -36,10 +36,10 @@ protected:
 
 private:
   // const QuantumSystem<RANK>* qs_;
-  const Exact        <RANK>* ex_; 
-  const Hamiltonian  <RANK>* ha_;
-  const Liouvillean  <RANK>* li_; 
-  const Averaged     <RANK>* av_;
+  typename Exact        <RANK>::Ptr ex_; 
+  typename Hamiltonian  <RANK>::Ptr ha_;
+  typename Liouvillean  <RANK>::Ptr li_; 
+  typename Averaged     <RANK>::Ptr av_;
   
 };
 
@@ -51,12 +51,12 @@ class SubSystemsInteraction : public SubSystem<RANK>
 public:
   typedef class Interaction<RANK> Interaction;
 
-  SubSystemsInteraction(const Interaction* ia) : SubSystem<RANK>(ia), ia_(ia) {}
+  SubSystemsInteraction(typename Interaction::Ptr ia) : SubSystem<RANK>(ia), ia_(ia) {}
 
-  const Interaction*const get() const {return ia_;} 
+  const typename Interaction::Ptr get() const {return ia_;} 
 
 private:
-  const Interaction* ia_;
+  typename Interaction::Ptr ia_;
 
 };
 
@@ -65,7 +65,7 @@ private:
 class SubSystemFree : public SubSystem<1>
 {
 public:
-  SubSystemFree(Free::SmartPtr free) : SubSystem<1>(free.get()), free_(free) {}
+  SubSystemFree(Free::SmartPtr free) : SubSystem<1>(free), free_(free) {}
 
   SubSystemFree() : free_() {}
 

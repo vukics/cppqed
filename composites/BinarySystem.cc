@@ -66,9 +66,9 @@ using boost   ::for_each;
 //////////
 
 
-binary::Base::Base(const Interaction& ia)
-  : QuantumSystem<2>(Dimensions(ia.getFrees()(0)->getDimension(),ia.getFrees()(1)->getDimension())),
-    free0_(ia.getFrees()(0)), free1_(ia.getFrees()(1)), ia_(&ia)
+binary::Base::Base(Interaction::Ptr ia)
+  : QuantumSystem<2>(Dimensions(ia->getFrees()(0)->getDimension(),ia->getFrees()(1)->getDimension())),
+    free0_(ia->getFrees()(0)), free1_(ia->getFrees()(1)), ia_(ia)
 {
 } 
 
@@ -101,11 +101,11 @@ void binary::Base::process(Averages& averages) const
 {
   using blitz::Range;
 
-  const Av1 
-    * av0 =free0_.getAv(),
-    * av1 =free1_.getAv();
-  const Av2 
-    * av01=   ia_.getAv();
+  const Av1::Ptr 
+    av0 =free0_.getAv(),
+    av1 =free1_.getAv();
+  const Av2::Ptr 
+    av01=   ia_.getAv();
 
   ptrdiff_t l=-1, u;
 
@@ -130,11 +130,11 @@ void binary::Base::display(const Averages& averages, std::ostream& os, int preci
 {
   using blitz::Range;
 
-  const Av1 
-    * av0 =free0_.getAv(),
-    * av1 =free1_.getAv();
-  const Av2 
-    * av01=   ia_.getAv();
+  const Av1::Ptr 
+    av0 =free0_.getAv(),
+    av1 =free1_.getAv();
+  const Av2::Ptr
+    av01=   ia_.getAv();
 
   ptrdiff_t l=-1, u;
 
@@ -166,8 +166,8 @@ bool binary::Exact::isUnitary() const
 void binary::Exact::actWithU(double dt, StateVectorLow& psi) const
 {
   using namespace blitzplusplus::basi;
-  if (const Ex1* ex1=free0_.getEx()) for_each(fullRange(psi,v0),bind(&Ex1::actWithU,ex1,dt,_1));
-  if (const Ex1* ex1=free1_.getEx()) for_each(fullRange(psi,v1),bind(&Ex1::actWithU,ex1,dt,_1));
+  if (const Ex1::Ptr ex1=free0_.getEx()) for_each(fullRange(psi,v0),bind(&Ex1::actWithU,ex1,dt,_1));
+  if (const Ex1::Ptr ex1=free1_.getEx()) for_each(fullRange(psi,v1),bind(&Ex1::actWithU,ex1,dt,_1));
 
   Ex2::actWithU(dt,psi,ia_.getEx());
 }
@@ -183,8 +183,8 @@ void binary::Exact::actWithU(double dt, StateVectorLow& psi) const
 void binary::Hamiltonian::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   using namespace blitzplusplus; using basi::fullRange;
-  if (const Ha1* ha1=free0_.getHa()) for_each(fullRange(psi,v0),basi::begin(dpsidt,v0),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
-  if (const Ha1* ha1=free1_.getHa()) for_each(fullRange(psi,v1),basi::begin(dpsidt,v1),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
+  if (const Ha1::Ptr ha1=free0_.getHa()) for_each(fullRange(psi,v0),basi::begin(dpsidt,v0),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
+  if (const Ha1::Ptr ha1=free1_.getHa()) for_each(fullRange(psi,v1),basi::begin(dpsidt,v1),bind(&Ha1::addContribution,ha1,t,_1,_2,tIntPic0));
 
   Ha2::addContribution(t,psi,dpsidt,tIntPic0,ia_.getHa());
 
@@ -207,11 +207,11 @@ void binary::Liouvillean::actWithJ(double t, StateVectorLow& psi, size_t i) cons
 {
   using namespace blitzplusplus::basi;
 
-  const Li1 
-    * li0 =free0_.getLi(),
-    * li1 =free1_.getLi();
-  const Li2 
-    * li01=   ia_.getLi();
+  const Li1::Ptr
+    li0 =free0_.getLi(),
+    li1 =free1_.getLi();
+  const Li2::Ptr
+    li01=   ia_.getLi();
 
   size_t n=Li1::nJumps(li0);
   if (li0 && i<n) {
@@ -247,7 +247,7 @@ DISPLAY_KEY(Liouvillean,Li)
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI>
-BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(const Interaction& ia) 
+BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(Interaction::Ptr ia) 
 : binary::Base(ia),
   BASE_CTOR(Exact),
   BASE_CTOR(Hamiltonian),
@@ -266,24 +266,27 @@ namespace {
 
 typedef blitz::TinyVector<bool,3> SystemCharacteristics;
 
-const SystemCharacteristics querySystemCharacteristics(const binary::Interaction& ia)
+const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr ia)
 {
   using namespace structure;
-  const Free 
-    *const free0=ia.getFrees()(0).get(),
-    *const free1=ia.getFrees()(1).get();
-  return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(&ia),
-			       qsh(free0) || qsh(free1) || qsh<2>(&ia),
-			       qsl(free0) || qsl(free1) || qsl<2>(&ia));
+  
+  QuantumSystem<1>::Ptr
+    free0=ia->getFrees()(0),
+    free1=ia->getFrees()(1);
+
+  return SystemCharacteristics(/* Why can't the compiler deduce RANK here for frees? */
+			       qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
+			       qsh<1>(free0) || qsh<1>(free1) || qsh<2>(ia),
+			       qsl<1>(free0) || qsl<1>(free1) || qsl<2>(ia));
 }
 
-} 
+}
 
 
 #define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
-const binary::SmartPtr binary::make(const Interaction& ia)
+const binary::SmartPtr binary::make(Interaction::Ptr ia)
 {
   if      DISPATCHER(true ,true ,true ) ;
   else if DISPATCHER(true ,true ,false) ;
