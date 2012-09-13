@@ -6,6 +6,7 @@
 
 #include "Types.h"
 
+#include <boost/shared_ptr.hpp>
 
 namespace structure {
 
@@ -13,7 +14,9 @@ namespace structure {
 class ExactCommon
 {
 public:
-  static  bool isUnitary(const ExactCommon* exactCommon) {return exactCommon ? exactCommon->isUnitary() : true;}
+  typedef boost::shared_ptr<const ExactCommon> Ptr;
+
+  static  bool isUnitary(Ptr exactCommon) {return exactCommon ? exactCommon->isUnitary() : true;}
 
   virtual ~ExactCommon() {}
 
@@ -27,10 +30,12 @@ template<int RANK>
 class Exact : public ExactCommon, private quantumdata::Types<RANK> 
 {
 public:
+  typedef boost::shared_ptr<const Exact> Ptr;
+
   typedef quantumdata::Types<RANK> Base;
   typedef typename Base::StateVectorLow StateVectorLow;
 
-  static  void actWithU(double t, StateVectorLow& psi, const Exact* exact, StaticTag=theStaticOne) {if (exact) exact->actWithU(t,psi);}
+  static  void actWithU(double t, StateVectorLow& psi, Ptr exact, StaticTag=theStaticOne) {if (exact) exact->actWithU(t,psi);}
   // The exact (in general, non-unitary) part of evolution. Put
   // otherwise, the operator transfoming between normal and
   // interaction pictures.

@@ -17,56 +17,57 @@
 
 namespace structure {
 
+using boost::dynamic_pointer_cast;
 
 template<int RANK>
 inline 
-const Exact<RANK>*const 
-qse(const QuantumSystem<RANK>* quantumSystem)
-{return dynamic_cast<const Exact<RANK>*>(quantumSystem);}
+const typename Exact<RANK>::Ptr 
+qse(typename QuantumSystem<RANK>::Ptr quantumSystem)
+{return dynamic_pointer_cast<const Exact<RANK> >(quantumSystem);}
 
 template<int RANK>
 inline 
-const Hamiltonian<RANK,TWO_TIME>*const 
-qsh(const QuantumSystem<RANK>* quantumSystem)
-{return dynamic_cast<const Hamiltonian<RANK,TWO_TIME>*>(quantumSystem);}
+const typename Hamiltonian<RANK,TWO_TIME>::Ptr 
+qsh(typename QuantumSystem<RANK>::Ptr quantumSystem)
+{return dynamic_pointer_cast<const Hamiltonian<RANK,TWO_TIME> >(quantumSystem);}
 
 template<int RANK>
 inline 
-const Liouvillean<RANK,true>*const 
-qsl(const QuantumSystem<RANK>* quantumSystem)
-{return dynamic_cast<const Liouvillean<RANK,true>*>(quantumSystem);}
+const typename Liouvillean<RANK,true>::Ptr 
+qsl(typename QuantumSystem<RANK>::Ptr quantumSystem)
+{return dynamic_pointer_cast<const Liouvillean<RANK,true> >(quantumSystem);}
 
 template<int RANK>
 inline 
-const Averaged<RANK,true>*const 
-qsa(const QuantumSystem<RANK>* quantumSystem)
-{return dynamic_cast<const Averaged<RANK,true>*>(quantumSystem);}
+const typename Averaged<RANK,true>::Ptr 
+qsa(typename QuantumSystem<RANK>::Ptr quantumSystem)
+{return dynamic_pointer_cast<const Averaged<RANK,true> >(quantumSystem);}
 
 
 
 template<int RANK>
 inline 
-const Exact<RANK>*const 
-qse(const DynamicsBase* base)
-{return dynamic_cast<const Exact<RANK>*>(base);}
+const typename Exact<RANK>::Ptr 
+qse(DynamicsBase::Ptr base)
+{return dynamic_pointer_cast<const Exact<RANK> >(base);}
 
 template<int RANK>
 inline 
-const Hamiltonian<RANK,TWO_TIME>*const 
-qsh(const DynamicsBase* base)
-{return dynamic_cast<const Hamiltonian<RANK,TWO_TIME>*>(base);}
+const typename Hamiltonian<RANK,TWO_TIME>::Ptr 
+qsh(DynamicsBase::Ptr base)
+{return dynamic_pointer_cast<const Hamiltonian<RANK,TWO_TIME> >(base);}
 
 template<int RANK>
 inline 
-const Liouvillean<RANK,true>*const 
-qsl(const DynamicsBase* base)
-{return dynamic_cast<const Liouvillean<RANK,true>*>(base);}
+const typename Liouvillean<RANK,true>::Ptr 
+qsl(DynamicsBase::Ptr base)
+{return dynamic_pointer_cast<const Liouvillean<RANK,true> >(base);}
 
 template<int RANK>
 inline 
-const Averaged<RANK,true>*const 
-qsa(const DynamicsBase* base)
-{return dynamic_cast<const Averaged<RANK,true>*>(base);}
+const typename Averaged<RANK,true>::Ptr 
+qsa(DynamicsBase::Ptr base)
+{return dynamic_pointer_cast<const Averaged<RANK,true> >(base);}
 
 
 } // structure

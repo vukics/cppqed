@@ -14,12 +14,14 @@ template<int RANK>
 class Hamiltonian<RANK,TWO_TIME> : private quantumdata::Types<RANK>
 {
 public:
+  typedef boost::shared_ptr<const Hamiltonian> Ptr;
+
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
   static  void addContribution(double t,
 			       const StateVectorLow& psi, StateVectorLow& dpsidt,
 			       double tIntPic0,
-			       const Hamiltonian* hamiltonian,
+			       Ptr hamiltonian,
 			       StaticTag=theStaticOne) {if (hamiltonian) hamiltonian->addContribution(t,psi,dpsidt,tIntPic0);} 
   // The (in general, non-Hermitian) Hamiltonian part of evolution.
   // dpsidt+=H*psi/DCOMP_I --- Two things to pay attention to: (1) the

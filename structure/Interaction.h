@@ -30,6 +30,8 @@ template<int RANK>
 class Interaction : public DynamicsBase
 {
 public:
+  typedef boost::shared_ptr<const Interaction> Ptr;
+
   typedef blitz::TinyVector<Free::SmartPtr,RANK> Frees;
 
   explicit Interaction(const Frees& frees, 

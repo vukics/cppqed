@@ -34,6 +34,26 @@ nonOwningConstSharedPtr(T* t)
 }
 
 
+template<typename T>
+boost::shared_ptr<T> sharedPointerize(boost::shared_ptr<T> t) {return                               t ;}
+
+template<typename T>
+boost::shared_ptr<T> sharedPointerize(                  T& t) {return cpputils::nonOwningSharedPtr(&t);}
+
+template<typename T>
+boost::shared_ptr<T> sharedPointerize(                  T* t) {return cpputils::nonOwningSharedPtr( t);}
+
+/*
+template<typename T>
+boost::shared_ptr<const T> sharedPointerize(boost::shared_ptr<const T> t) {return                               t ;}
+
+template<typename T>
+boost::shared_ptr<const T> sharedPointerize(const                   T& t) {return cpputils::nonOwningSharedPtr(&t);}
+
+template<typename T>
+boost::shared_ptr<const T> sharedPointerize(const                   T* t) {return cpputils::nonOwningSharedPtr( t);}
+*/
+
 } // cpputils
 
 

@@ -17,6 +17,8 @@ template<int RANK>
 class QuantumSystem : public DimensionsBookkeeper<RANK>
 {
 public:
+  typedef boost::shared_ptr<const QuantumSystem> Ptr;
+
   typedef DimensionsBookkeeper<RANK> Base;
 
   typedef typename Base::Dimensions Dimensions;

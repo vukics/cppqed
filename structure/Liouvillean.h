@@ -16,10 +16,12 @@ namespace structure {
 class LiouvilleanCommon : public LiouvilleanAveragedCommon
 {
 public:
+  typedef boost::shared_ptr<const LiouvilleanCommon> Ptr;
+
   typedef DArray1D Probabilities;
   // dpoverdt ladder type for Liouvilleans. Note that the extent is not known at compile time because it depends on how many subsystems there are which themselves are Liouvillean, which, in turn, depends on parameters. This may also actually be only a RANGE of a larger array if the present system is subsystem to a larger system.
 
-  static size_t nJumps(const LiouvilleanCommon* liouvillean)
+  static size_t nJumps(Ptr liouvillean)
   {
     return liouvillean ? liouvillean->nJumps() : 0;
   }
@@ -41,6 +43,8 @@ template<int RANK>
 class Liouvillean<RANK,true> : public quantumdata::Types<RANK,LiouvilleanCommon>
 {
 public:
+  typedef boost::shared_ptr<const Liouvillean> Ptr;
+
   typedef quantumdata::Types<RANK,LiouvilleanCommon> Base;
 
   typedef typename Base::    StateVectorLow     StateVectorLow;
@@ -51,7 +55,7 @@ public:
   typedef typename Base::Probabilities Probabilities;
 
 
-  static const Probabilities probabilities(double t, const LazyDensityOperator& matrix, const Liouvillean* liouvillean, StaticTag=theStaticOne)
+  static const Probabilities probabilities(double t, const LazyDensityOperator& matrix, Ptr liouvillean, StaticTag=theStaticOne)
   {
     const Probabilities probas(liouvillean ? liouvillean->probabilities(t,matrix) : Probabilities());
 #ifndef   NDEBUG
@@ -62,7 +66,7 @@ public:
   }
 
 
-  static void actWithJ(double t, StateVectorLow& psi, size_t jumpNo, const Liouvillean* liouvillean, StaticTag=theStaticOne)
+  static void actWithJ(double t, StateVectorLow& psi, size_t jumpNo, Ptr liouvillean, StaticTag=theStaticOne)
   // jumpNo is the ordinal number of the jump to be performed
   {
     if (liouvillean) liouvillean->actWithJ(t,psi,jumpNo);
