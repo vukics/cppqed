@@ -9,20 +9,12 @@
 #include "BlitzArraySliceIterator.h"
 // This is included at this point mainly to pull in necessary TMP tools
 
+#include "SubSystemFwd.h"
+
 #include "details/TMP_helpers.h"
 
 #include <boost/fusion/container/generation/make_list.hpp>
 
-
-/*
-  TODO:
-  * makeComposite => composite::make
-  * composite::result_of::make metafunction returning the composite type with a growing number of Act arguments
-  * in user guide:
-    - document changes of BinarySystem (binary::make)
-    - composite::result_of::make
-    - element makers => make
-*/
 
 
 namespace composite {
@@ -176,7 +168,7 @@ struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PA
 #define DEFAULT_print(z, n, data) DefaultArgument
 
 #define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,1) )
-#define BOOST_PP_FILENAME_1 "details/CompositeMakerImplementationsSpecialization.h"
+#define BOOST_PP_FILENAME_1 "../composites/details/CompositeMakerImplementationsSpecialization.h"
 
 #include BOOST_PP_ITERATE()
 

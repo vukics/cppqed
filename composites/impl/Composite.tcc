@@ -76,8 +76,10 @@ void Composite<VA>::worker(const H& helper) const
 
 namespace composite {
 
-
 using structure::SubSystemFree;
+
+
+bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
 
 
 template<int RANK>
@@ -252,20 +254,10 @@ void Composite<VA>::displayParameters(std::ostream& os) const
 //////////////
 
 
-namespace composite {
-
-bool compFrees(const SubSystemFree& ssf1, const SubSystemFree& ssf2)
-{
-  return ssf1.get()->highestFrequency() < ssf2.get()->highestFrequency();
-}
-
-} // composite
-
-
 template<typename VA>
 double Composite<VA>::highestFrequency() const
 {
-  return boost::max_element(frees_,composite::compFrees)->get()->highestFrequency();
+  return boost::max_element(frees_,composite::compareFreesFrequency)->get()->highestFrequency();
   // NEEDS_WORK add the interactions here
 }
 
