@@ -1,11 +1,11 @@
-#include "MultiIndexIterator.h"
+#include "impl/MultiIndexIterator.tcc"
 
-#include<boost/lambda/lambda.hpp>
+#include <boost/lambda/lambda.hpp>
 namespace bll=boost::lambda;
 namespace mpl=boost::mpl;
 
 
-#include<algorithm>
+#include <algorithm>
 
 using namespace std;
 using namespace cpputils;

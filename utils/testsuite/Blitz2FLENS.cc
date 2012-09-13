@@ -32,9 +32,12 @@ right | v | u^*
 
 #include "Range.h"
 
-#include<flens/flens.h>
+#include <flens/flens.h>
 
-#include<boost/bind.hpp>
+#define BOOST_TEST_MODULE Blitz2FLENS test
+#include <boost/test/unit_test.hpp>
+
+#include <boost/bind.hpp>
 
 
 using namespace std;
@@ -47,12 +50,12 @@ using blitz::ColumnMajorArray;
 
 const double epsilonCmp=1e-12;
 
-const int RA=3;
+const int RANK=3;
 
 
-typedef TTD_CARRAY(  RA) CAR ;
-typedef TTD_DARRAY(  RA) DAR ;
-typedef TTD_CARRAY(2*RA) CA2R;
+typedef TTD_CARRAY(  RANK) CAR ;
+typedef TTD_DARRAY(  RANK) DAR ;
+typedef TTD_CARRAY(2*RANK) CA2R;
 
 
 typedef DenseVectorMF<dcomp >::type CDenseVector;
@@ -62,153 +65,157 @@ typedef GeMatrixMF<dcomp,ColMajor>::type GeMatrixCM;
 
 typedef HeMatrixMF<RowMajor>::type HeMatrixRM;
 
-int main()
+
+Randomized::SmartPtr ran(MakerGSL()(1001));
+
+TTD_EXTTINY(RANK) dims(6,4,5);
+
+
+// RowMajor, C/C++Array
+
+BOOST_AUTO_TEST_CASE( RowMajorTest )
 {
-  Randomized::SmartPtr ran(MakerGSL()(1001));
+  CAR  vecBlitz(dims);
+  CA2R matBlitz(concatenateTinies(dims,dims));
+  CA2R vlBlitz(matBlitz.shape()), vrBlitz(matBlitz.shape());
 
-  TTD_EXTTINY(RA) dims(6,4,5);
+  CDenseVector vecFLENS(blitz2flens::vector(vecBlitz));
 
-  // RowMajor, C/C++Array
+  GeMatrixRM
+    vlFLENS(matrix(vlBlitz,RowMajorTag())),
+    vrFLENS(matrix(vrBlitz,RowMajorTag()));
+
+
+  fillWithRandom(matBlitz,ran);
 
   {
-    CAR  vecBlitz(dims);
-    CA2R matBlitz(concatenateTinies(dims,dims));
-    CA2R vlBlitz(matBlitz.shape()), vrBlitz(matBlitz.shape());
+    CA2R a(matBlitz.copy());
+    GeMatrixRM aFLENS(matrix(a,RowMajorTag()));
+    cerr<<"Entering ev routine ... "; BOOST_CHECK(!ev(true,true,aFLENS,vecFLENS,vlFLENS,vrFLENS)); cerr<<"exiting, checking result ... ";
+  }
 
-    CDenseVector vecFLENS(blitz2flens::vector(vecBlitz));
-
-    GeMatrixRM
-      vlFLENS(matrix(vlBlitz,RowMajorTag())),
-      vrFLENS(matrix(vrBlitz,RowMajorTag()));
-
-
-    fillWithRandom(matBlitz,ran);
-    
+  {
+    CA2R resTensor(matBlitz.shape());
+    TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
     {
-      CA2R a(matBlitz.copy());
-      GeMatrixRM aFLENS(matrix(a,RowMajorTag()));
-      cerr<<"Entering ev routine ... "; assert(!ev(true,true,aFLENS,vecFLENS,vlFLENS,vrFLENS)); cerr<<"exiting, checking result ... ";
+      using namespace blitz::tensor;
+      temp9=matBlitz(i,j,k,o,p,q)*conj(vlBlitz(l,m,n,o,p,q))/vecBlitz(l,m,n);
+      resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
+
+      BOOST_CHECK(!fcmp(1-max(abs(vlBlitz.transpose(3,4,5,0,1,2)-conj(resTensor))),1,epsilonCmp));
+
+      temp9=matBlitz(o,p,q,i,j,k)*vrBlitz(l,m,n,o,p,q)/vecBlitz(l,m,n);
+      resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
     }
+    BOOST_CHECK(!fcmp(1-max(abs(vrBlitz.transpose(3,4,5,0,1,2)-resTensor)),1,epsilonCmp));
+
+    cerr<<"Nonsymmetric eigenproblem in RowMajor OK!\n";
+
+  }
+}
+
+
+// ColMajor, FortranArray
+
+BOOST_AUTO_TEST_CASE( ColMajorTest )
+{
+  CAR  vecBlitz(dims,ColumnMajorArray<RANK>());
+  CA2R matBlitz(concatenateTinies(dims,dims),ColumnMajorArray<2*RANK>());
+  CA2R vlBlitz(matBlitz.shape(),ColumnMajorArray<2*RANK>()), vrBlitz(matBlitz.shape(),ColumnMajorArray<2*RANK>());
+
+  CDenseVector vecFLENS(blitz2flens::vector(vecBlitz));
+
+  GeMatrixCM
+    vlFLENS(matrix(vlBlitz,ColMajorTag())),
+    vrFLENS(matrix(vrBlitz,ColMajorTag()));
+
+
+  fillWithRandom(matBlitz,ran);
+    
+  {
+    CA2R a(matBlitz.copy());
+    GeMatrixCM aFLENS(matrix(a,ColMajorTag()));
+    
+    cerr<<"Entering ev routine ... "; BOOST_CHECK(!ev(true,true,aFLENS,vecFLENS,vlFLENS,vrFLENS)); cerr<<"exiting, checking result ... ";
+  }
+
+  {
+    CA2R resTensor(matBlitz.shape());
+    TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
+    {
+      using namespace blitz::tensor;
+      temp9=matBlitz(i,j,k,o,p,q)*vrBlitz(o,p,q,l,m,n)/vecBlitz(l,m,n);
+      resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
+
+      BOOST_CHECK(!fcmp(1-max(abs(vrBlitz-resTensor)),1,epsilonCmp));
+
+      temp9=matBlitz(o,p,q,i,j,k)*conj(vlBlitz(o,p,q,l,m,n))/vecBlitz(l,m,n);
+      resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
+    }
+
+    BOOST_CHECK(!fcmp(1-max(abs(vlBlitz-conj(resTensor))),1,epsilonCmp));
+
+    cerr<<"\"                            ColMajor OK!\n";
+
+  }
+}
+
+
+
+BOOST_AUTO_TEST_CASE( HermitianTest )
+{
+  CAR  vecBlitz1(dims);
+  DAR  vecBlitz2(dims);
+  CA2R matBlitz(concatenateTinies(dims,dims));
+
+  fillWithRandom(matBlitz,ran);
+
+  matBlitz+=hermitianConjugate(matBlitz);
+    
+  {
+    CA2R a(matBlitz.copy());
+
+    CDenseVector vecFLENS(blitz2flens::vector(vecBlitz1));
+    GeMatrixRM aFLENS(matrix(a,RowMajorTag()));
+    
+    cerr<<"Entering ev routine ... "; ev(false,false,aFLENS,vecFLENS,aFLENS,aFLENS); cerr<<"exiting, checking result ... ";
+  }
+  BOOST_CHECK(!fcmp(1-max(abs(imag(vecBlitz1))),1,epsilonCmp));
+  cerr<<"Hermitian eigenproblem eigenvalues all real.\n";
+
+  {
+    CA2R a(matBlitz.copy());
+
+    DDenseVector vecFLENS(blitz2flens::vector(vecBlitz2));
+    HeMatrixRM aFLENS(hermitianMatrix(a,RowMajorTag()));
+    
+    cerr<<"Entering ev routine ... "; ev(true,aFLENS,vecFLENS); cerr<<"exiting, checking result ... ";
 
     {
       CA2R resTensor(matBlitz.shape());
       TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
       {
 	using namespace blitz::tensor;
-	temp9=matBlitz(i,j,k,o,p,q)*conj(vlBlitz(l,m,n,o,p,q))/vecBlitz(l,m,n);
+	temp9=matBlitz(o,p,q,i,j,k)*a(l,m,n,o,p,q)/vecBlitz2(l,m,n);
 	resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
-
-	assert(!fcmp(1-max(abs(vlBlitz.transpose(3,4,5,0,1,2)-conj(resTensor))),1,epsilonCmp));
-
-	temp9=matBlitz(o,p,q,i,j,k)*vrBlitz(l,m,n,o,p,q)/vecBlitz(l,m,n);
-	resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
-      }
-      assert(!fcmp(1-max(abs(vrBlitz.transpose(3,4,5,0,1,2)-resTensor)),1,epsilonCmp));
-
-      cerr<<"Nonsymmetric eigenproblem in RowMajor OK!\n";
-
-    }
-  }
-
-  // ColMajor, FortranArray
-
-  {
-    CAR  vecBlitz(dims,ColumnMajorArray<RA>());
-    CA2R matBlitz(concatenateTinies(dims,dims),ColumnMajorArray<2*RA>());
-    CA2R vlBlitz(matBlitz.shape(),ColumnMajorArray<2*RA>()), vrBlitz(matBlitz.shape(),ColumnMajorArray<2*RA>());
-
-    CDenseVector vecFLENS(blitz2flens::vector(vecBlitz));
-
-    GeMatrixCM
-      vlFLENS(matrix(vlBlitz,ColMajorTag())),
-      vrFLENS(matrix(vrBlitz,ColMajorTag()));
-
-
-    fillWithRandom(matBlitz,ran);
-    
-    {
-      CA2R a(matBlitz.copy());
-      GeMatrixCM aFLENS(matrix(a,ColMajorTag()));
-    
-      cerr<<"Entering ev routine ... "; assert(!ev(true,true,aFLENS,vecFLENS,vlFLENS,vrFLENS)); cerr<<"exiting, checking result ... ";
-    }
-
-    {
-      CA2R resTensor(matBlitz.shape());
-      TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
-      {
-	using namespace blitz::tensor;
-	temp9=matBlitz(i,j,k,o,p,q)*vrBlitz(o,p,q,l,m,n)/vecBlitz(l,m,n);
-	resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
-
-	assert(!fcmp(1-max(abs(vrBlitz-resTensor)),1,epsilonCmp));
-
-	temp9=matBlitz(o,p,q,i,j,k)*conj(vlBlitz(o,p,q,l,m,n))/vecBlitz(l,m,n);
-	resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
-      }
-
-      assert(!fcmp(1-max(abs(vlBlitz-conj(resTensor))),1,epsilonCmp));
-
-      cerr<<"\"                            ColMajor OK!\n";
-
-    }
-  }
-
-  {
-    CAR  vecBlitz1(dims);
-    DAR  vecBlitz2(dims);
-    CA2R matBlitz(concatenateTinies(dims,dims));
-
-    fillWithRandom(matBlitz,ran);
-
-    matBlitz+=hermitianConjugate(matBlitz);
-    
-    {
-      CA2R a(matBlitz.copy());
-
-      CDenseVector vecFLENS(blitz2flens::vector(vecBlitz1));
-      GeMatrixRM aFLENS(matrix(a,RowMajorTag()));
-    
-      cerr<<"Entering ev routine ... "; ev(false,false,aFLENS,vecFLENS,aFLENS,aFLENS); cerr<<"exiting, checking result ... ";
-    }
-    assert(!fcmp(1-max(abs(imag(vecBlitz1))),1,epsilonCmp));
-    cerr<<"Hermitian eigenproblem eigenvalues all real.\n";
-
-    {
-      CA2R a(matBlitz.copy());
-
-      DDenseVector vecFLENS(blitz2flens::vector(vecBlitz2));
-      HeMatrixRM aFLENS(hermitianMatrix(a,RowMajorTag()));
-    
-      cerr<<"Entering ev routine ... "; ev(true,aFLENS,vecFLENS); cerr<<"exiting, checking result ... ";
-
-      {
-	CA2R resTensor(matBlitz.shape());
-	TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
-	{
-	  using namespace blitz::tensor;
-	  temp9=matBlitz(o,p,q,i,j,k)*a(l,m,n,o,p,q)/vecBlitz2(l,m,n);
-	  resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
 	  
-	  assert(!fcmp(1-max(abs(a.transpose(3,4,5,0,1,2)-resTensor)),1,epsilonCmp));
+	BOOST_CHECK(!fcmp(1-max(abs(a.transpose(3,4,5,0,1,2)-resTensor)),1,epsilonCmp));
 	  
-	}
-
       }
 
     }
 
-    cerr<<"\"                      eigenproblem OK.\n";
-
-    std::sort(vecBlitz1.data(),vecBlitz1.data()+vecBlitz1.size(),realCompare);
-
-    // note: vecBlitz2 is already sorted
-
-    assert(!fcmp(1-max(abs(vecBlitz2-real(vecBlitz1))),1,epsilonCmp));
-
-    cerr<<"Hermitian eigenproblem eigenvalues match.\n";
-
   }
+
+  cerr<<"\"                      eigenproblem OK.\n";
+
+  std::sort(vecBlitz1.data(),vecBlitz1.data()+vecBlitz1.size(),realCompare);
+
+  // note: vecBlitz2 is already sorted
+
+  BOOST_CHECK(!fcmp(1-max(abs(vecBlitz2-real(vecBlitz1))),1,epsilonCmp));
+
+  cerr<<"Hermitian eigenproblem eigenvalues match.\n";
 
 }
 

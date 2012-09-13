@@ -182,7 +182,7 @@ struct Vector : boost::mpl::vector_c<int,BOOST_PP_ENUM_PARAMS(TMPTOOLS_MAX_VECTO
 
 template<>
 struct Vector<BOOST_PP_ENUM(TMPTOOLS_MAX_VECTOR_SIZE,DEFAULT_print,~) >
-  : boost::mpl::vector_c<int >
+  : boost::mpl::vector_c<int>
 {};
 
 

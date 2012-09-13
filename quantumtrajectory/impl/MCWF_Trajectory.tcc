@@ -12,11 +12,11 @@
 
 #include "impl/FormDouble.tcc"
 
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/complex.hpp>
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 #include <fstream>
 
 
@@ -96,12 +96,12 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     firstSVDisplay_(p.firstSVDisplay),
     svdPrecision_(p.svdPrecision ? p.svdPrecision : getPrecision()),
     svdCount_(0),
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
     binarySVFile_(p.binarySVFile),
     svExtension_(binarySVFile_?".svbin":".sv"),
-#else // USE_BOOST_SERIALIZATION
+#else // DO_NOT_USE_BOOST_SERIALIZATION
     svExtension_(".sv"),
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
     file_(p.ofn),
     initFile_(p.initFile+svExtension_),
     logger_(p.logLevel,ha_,getOstream())
@@ -162,9 +162,9 @@ void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV)
   
   StateVectorLow psiTemp;
   double t0, dtTry;
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
   if (!binarySVFile_) {
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
     ifs>>psiTemp;
     psi_=psiTemp;
     psi_.renorm();
@@ -177,7 +177,7 @@ void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV)
     EAT_COMMENT_CHAR
 #undef EAT_COMMENT_CHAR
     ifs>>t0>>dtTry;
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
   }
   else {
     boost::archive::binary_iarchive ia(ifs);
@@ -188,7 +188,7 @@ void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV)
     ia>>t0>>dtTry;
     ifs>>*getRandomized();
   }
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
   getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
   if (ex_) tIntPic0_=t0;
   getOstream()<<"# Next timestep to try: "<<dtTry<<endl;
@@ -200,14 +200,14 @@ void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
 {
   using namespace std;
 
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
   if (!binarySVFile_) {
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
     ofs<<formdouble::zeroWidth(getPrecision())(psi_())<<"\n# "
        <<*getRandomized()<<"\n# "
        <<formdouble::positive(getPrecision())(getTime ())
        <<formdouble::positive(getPrecision())(getDtTry())<<endl;
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
   }
   else {
     boost::archive::binary_oarchive oa(ofs);
@@ -221,7 +221,7 @@ void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
     oa<<psi_()<<t<<dttry;
     ofs<<*getRandomized();
   }
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 }
 

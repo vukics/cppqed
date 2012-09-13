@@ -6,7 +6,7 @@
 #include "impl/EvolvedGSL.tcc"
 #include "impl/Simulated.tcc"
 
-#include "Pars.h"
+#include "impl/Pars.tcc"
 
 using parameters::ParameterTable    ;
 using parameters::update            ;
