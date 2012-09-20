@@ -214,14 +214,14 @@ template<int RANK, typename V>
 struct Algorithm 
   : fold<Ordinals<RANK>,
 	 pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
-	 pair<push_back<first<mpl::_1>,
+	 pair<push_back<mpl::first<mpl::_1>,
 			if_<numerical_contains<V,mpl::_2>,
 			    deref<second<mpl::_1> >,
 			    mpl::_2
 			    >
 			>,
 	      if_<numerical_contains<V,mpl::_2>,
-		  next<second<mpl::_1> >,
+		  mpl::next<second<mpl::_1> >,
 		  second<mpl::_1>
 		  >
 	      >
@@ -279,6 +279,8 @@ SlicesData<RANK,V>::SlicesData(const CArray& array)
 }
 
 
+template<int Rank, typename V>
+const V SlicesData<Rank,V>::v_ = V();
 
 namespace basi_fast {
 

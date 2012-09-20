@@ -7,7 +7,7 @@
 #include "QuantumSystem.h"
 #include "SubSystem.h"
 
-
+#include <boost/shared_ptr.hpp>
 
 namespace binary {
 
