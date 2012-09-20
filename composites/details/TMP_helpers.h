@@ -14,7 +14,7 @@ namespace composite {
 using namespace mpl;
 
 template<typename VEC, typename Pred=less<mpl::_1,mpl::_2> >
-struct MaxMF : deref<typename max_element<VEC,Pred>::type>::type {};
+struct MaxMF : deref<typename boost::mpl::max_element<VEC,Pred>::type>::type {};
 
 template<typename VEC1, typename VEC2>
 struct SeqLess : less<typename MaxMF<VEC1>::type,typename MaxMF<VEC2>::type> {};
