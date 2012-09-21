@@ -5,15 +5,7 @@
 #include "MCWF_TrajectoryFwd.h"
 
 #include "MCWF_TrajectoryLogger.h"
-
-#include "DimensionsBookkeeperFwd.h"
-#include "QuantumSystemFwd.h"
-#include "ExactFwd.h"
-#include "HamiltonianFwd.h"
-#include "LiouvilleanFwd.h"
-#include "AveragedFwd.h"
-
-#include "Types.h"
+#include "Structure.h"
 
 #include "StochasticTrajectory.h"
 
@@ -59,15 +51,16 @@ template<int RANK>
 class MCWF_Trajectory : public BASE_class
 {
 public:
+  typedef structure::Exact        <RANK> Exact      ;
+  typedef structure::Hamiltonian  <RANK> Hamiltonian;
+  typedef structure::Liouvillean  <RANK> Liouvillean;
+  typedef structure::Averaged     <RANK> Averaged   ;
+
   typedef quantumdata::StateVector<RANK> StateVector;
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
-  typedef structure::QuantumSystem<RANK> QuantumSystem;
-  typedef structure::Exact        <RANK> Exact        ;
-  typedef structure::Hamiltonian  <RANK> Hamiltonian  ;
-  typedef structure::Liouvillean  <RANK> Liouvillean  ;
-  typedef structure::Averaged     <RANK> Averaged     ;  
+  typedef structure::QuantumSystemWrapper<RANK> QuantumSystemWrapper;
 
   typedef BASE_class Base;
 
@@ -77,10 +70,10 @@ public:
 
   using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getPrecision; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
-
+  template<typename SYS>
   MCWF_Trajectory(
 		  StateVector& psi,
-		  const QuantumSystem& sys,
+		  const SYS& sys,
 		  const ParsMCWF_Trajectory&,
 		  const StateVectorLow& =StateVectorLow()
 		  );
@@ -121,11 +114,7 @@ private:
 
   StateVector& psi_;
 
-  const QuantumSystem*const qs_;
-  const Exact        *const ex_; 
-  const Hamiltonian  *const ha_;
-  const Liouvillean  *const li_; 
-  const Averaged     *const av_;
+  const QuantumSystemWrapper qs_;
 
   const double dpLimit_, overshootTolerance_;
 
@@ -134,9 +123,9 @@ private:
   const int svdPrecision_;
   mutable long svdCount_;
 
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
   const bool binarySVFile_;
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
   const std::string svExtension_;
 
   const std::string file_;

@@ -6,11 +6,11 @@
 
 #include "ComplexExtensions.h"
 
-#include<boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/utility.hpp>
+#include <boost/tuple/tuple.hpp>
 
-#include<boost/tuple/tuple.hpp>
-
-#include<list>
+#include <list>
 
 
 #define TTD_FREQUENCY_MAP(T) std::list<boost::tuple<std::string,T,double> >
@@ -23,6 +23,8 @@ namespace structure {
 class DynamicsBase : private boost::noncopyable
 {
 public:
+  typedef boost::shared_ptr<const DynamicsBase> Ptr;
+
   typedef TTD_FREQUENCY_MAP(double)    RealFreqs;
   typedef TTD_FREQUENCY_MAP(dcomp ) ComplexFreqs;
 

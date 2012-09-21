@@ -6,6 +6,7 @@
 
 #include "BlitzArray.h"
 
+#include <boost/shared_ptr.hpp>
 
 namespace structure {
 
@@ -13,13 +14,14 @@ namespace structure {
 class LiouvilleanAveragedCommon
 {
 public:
+  typedef boost::shared_ptr<const LiouvilleanAveragedCommon> Ptr;
+
   typedef TTD_DARRAY(1) DArray1D;
 
   virtual ~LiouvilleanAveragedCommon() {}
 
-  // For a  Liouvillean, the key is a description of decay channels,
-  // for an Averaged   , it describes the displayed columns
-  static void displayKey(std::ostream& o, size_t& i, const LiouvilleanAveragedCommon* common)
+  // For a  Liouvillean, the key is a description of decay channels, for an Averaged, it describes the displayed columns
+  static void displayKey(std::ostream& o, size_t& i, Ptr common)
   {
     if (common) common->displayKey(o,i);
   }

@@ -27,16 +27,18 @@ namespace structure {
 class AveragedCommon : public LiouvilleanAveragedCommon
 {
 public:
+  typedef boost::shared_ptr<const AveragedCommon> Ptr;
+
   typedef DArray1D Averages;
 
 
-  static size_t nAvr(const AveragedCommon* averagedCommon)
+  static size_t nAvr(Ptr averagedCommon)
   {
     return averagedCommon ? averagedCommon->nAvr() : 0;
   }
 
 
-  static void process(Averages& averages, const AveragedCommon* averagedCommon) 
+  static void process(Averages& averages, Ptr averagedCommon) 
   {
     if (averagedCommon) averagedCommon->process(averages);
   }
@@ -72,6 +74,8 @@ class Averaged<RANK,true>
   : public quantumdata::Types<RANK,AveragedCommon>
 {
 public:
+  typedef boost::shared_ptr<const Averaged> Ptr;
+
   typedef quantumdata::Types<RANK,AveragedCommon> Base;
 
   typedef AveragedCommon::Averages Averages;
@@ -80,13 +84,13 @@ public:
 
   using Base::display;
 
-  static const Averages average(double t, const LazyDensityOperator& matrix, const Averaged* averaged, StaticTag=theStaticOne)
+  static const Averages average(double t, const LazyDensityOperator& matrix, Ptr averaged, StaticTag=theStaticOne)
   {
     return averaged ? averaged->average(t,matrix) : Averages();
   }
 
 
-  static void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision, const Averaged* averaged, StaticTag=theStaticOne)
+  static void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision, Ptr averaged, StaticTag=theStaticOne)
   {
     if (averaged) {
       Averages averages(averaged->average(t,matrix));

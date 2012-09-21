@@ -24,32 +24,29 @@ namespace master {
 
 template<int RANK>
 Base<RANK>::Base(DensityOperator& rho,
-		 const QuantumSystem& sys,
+		 typename QuantumSystem::Ptr qs,
 		 const master::Pars& p,
 		 const DensityOperatorLow& scaleAbs
 		 )
   : trajectory::TrajectoryBase(p),
     TrajectoryBase(rho(),
 		   bind(&Base<RANK>::derivs,this,_1,_2,_3),
-		   1./(sys.highestFrequency()*TrajectoryBase::factor()),
+		   1./(qs->highestFrequency()*TrajectoryBase::factor()),
 		   scaleAbs,
 		   p,
 		   evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
     rho_(rho),
     tIntPic0_(0),
-    qs_(&sys),
-    ex_(structure::qse(&sys)),
-    ha_(structure::qsh(&sys)),
-    li_(structure::qsl(&sys))
+    qs_(qs)
 {
-  if (!Exact::isUnitary(ex_)) throw master::NonUnitaryIP();
+  if (!Exact::isUnitary(qs_.getEx())) throw master::NonUnitaryIP();
   // If the interaction picture is non-unitary, the density matrix in
   // IP is non-Hermitian. This cannot be allowed here because then the
   // calculation of the Hamiltonian part of the dynamics as
   // implemented below would fail.
   // if (!li_) throw master::NoLiouvillean();
 
-  if (rho!=sys) throw DimensionalityMismatchException();
+  if (rho!=*qs_.getQS()) throw DimensionalityMismatchException();
 
 }
 
@@ -61,7 +58,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   PROGRESS_TIMER_IN_POINT(getOstream());
 
-  binaryIter(rhoLow,drhodtLow,bind(&Hamiltonian::addContribution,t,_1,_2,tIntPic0_,ha_,structure::theStaticOne));
+  binaryIter(rhoLow,drhodtLow,bind(&Hamiltonian::addContribution,t,_1,_2,tIntPic0_,qs_.getHa(),structure::theStaticOne));
 
   PROGRESS_TIMER_OUT_POINT("Hamiltonian");
 
@@ -75,10 +72,10 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
   // Now act with the reset operator --- implement this in terms of
   // the individual jumps by iteration and addition
 
-  for (size_t i=0; i<Liouvillean::nJumps(li_); i++) {
+  for (size_t i=0; i<Liouvillean::nJumps(qs_.getLi()); i++) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     DensityOperatorLow rhotemp(rhoLow.copy());
-    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,t,_1,i,li_,structure::theStaticOne));
+    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,qs_.getLi(),t,_1,i));
     unaryIter(rhotemp,functionLi);
     blitzplusplus::hermitianConjugateSelf(rhotemp);
     unaryIter(rhotemp,functionLi);
@@ -96,12 +93,12 @@ Base<RANK>::step(double deltaT) const
   PROGRESS_TIMER_IN_POINT( getOstream() )
   getEvolved()->step(deltaT);
   PROGRESS_TIMER_OUT_POINT("Evolved step total")
-
-  if (ex_) {
+    ;
+  if (const typename Exact::Ptr ex=qs_.getEx()) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_());
-    UnaryFunction functionEx(bind(&Exact::actWithU,getDtDid(),_1,ex_,structure::theStaticOne));
+    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);
@@ -140,7 +137,7 @@ Base<RANK>::displayParameters() const
 
   getOstream()<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl;
 
-  qs_->displayParameters(getOstream());
+  qs_.getQS()->displayParameters(getOstream());
 
 }
 
