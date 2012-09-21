@@ -33,7 +33,7 @@ private:
 class SubSystemFree : public structure::QuantumSystemWrapper<1>
 {
 public:
-  typedef structure::Free::SmartPtr FreePtr;
+  typedef structure::Free::Ptr FreePtr;
 
   SubSystemFree(FreePtr free) : structure::QuantumSystemWrapper<1>(free,true), free_(free) {}
 

@@ -10,7 +10,7 @@ using cpputils::nonOwningConstSharedPtr;
 
 struct DummyQuaternary : structure::Interaction<4>
 {
-  DummyQuaternary(mode::SmartPtr m0, mode::SmartPtr m1, mode::SmartPtr m2, mode::SmartPtr m3) 
+  DummyQuaternary(mode::Ptr m0, mode::Ptr m1, mode::Ptr m2, mode::Ptr m3) 
     : structure::Interaction<4>(Frees(m0,m1,m2,m3)) {}
 };
 

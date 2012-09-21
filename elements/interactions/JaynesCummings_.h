@@ -35,7 +35,7 @@ protected:
   typedef structure::Interaction<2> IA_Base;
   typedef structure::TridiagonalHamiltonian<2,true> TDH_Base;
 
-  Base(qbit::SmartPtr, mode::SmartPtr, const dcomp& g);
+  Base(qbit::Ptr, mode::Ptr, const dcomp& g);
 
 };
 

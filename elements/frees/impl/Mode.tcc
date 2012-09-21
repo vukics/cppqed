@@ -13,22 +13,22 @@ namespace mode {
 #define TEMPLATE_PARAM_TEMP(temp) temp,A
 #define SWITCH_helper(name,templateParam)				\
   switch (qmp) {							\
-  case QMP_IP  : return SmartPtr(new name##Mode<templateParam>(p,a));	\
-  case QMP_UIP : return SmartPtr(new name##ModeUIP<templateParam>(p,a));\
+  case QMP_IP  : return Ptr(new name##Mode<templateParam>(p,a));	\
+  case QMP_UIP : return Ptr(new name##ModeUIP<templateParam>(p,a));\
   case QMP_SCH : ;							\
   }									\
-  return SmartPtr(new name##ModeSch<templateParam>(p,a));
+  return Ptr(new name##ModeSch<templateParam>(p,a));
 
 
 template<typename A>
-const SmartPtr make(const Pars& p, QM_Picture qmp, const A& a)
+const Ptr make(const Pars& p, QM_Picture qmp, const A& a)
 {
   SWITCH_helper( ,A)
 }
 
 
 template<typename A>
-const SmartPtr make(const ParsLossy& p, QM_Picture qmp, const A& a)
+const Ptr make(const ParsLossy& p, QM_Picture qmp, const A& a)
 {
   if (!p.kappa) return make(static_cast<const Pars&>(p),qmp,a);
   else {
@@ -39,7 +39,7 @@ const SmartPtr make(const ParsLossy& p, QM_Picture qmp, const A& a)
 
 
 template<typename A>
-const SmartPtr make(const ParsPumped& p, QM_Picture qmp, const A& a)
+const Ptr make(const ParsPumped& p, QM_Picture qmp, const A& a)
 {
   if (!isNonZero(p.eta)) return make(static_cast<const Pars&>(p),qmp,a);
   else { SWITCH_helper(Pumped,A) }
@@ -47,7 +47,7 @@ const SmartPtr make(const ParsPumped& p, QM_Picture qmp, const A& a)
 
 
 template<typename A>
-const SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
+const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
 {
   if      (!p.kappa)          return make(static_cast<const ParsPumped&>(p),qmp,a);
   else if (!isNonZero(p.eta)) return make(static_cast<const ParsLossy &>(p),qmp,a);

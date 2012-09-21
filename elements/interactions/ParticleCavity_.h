@@ -37,7 +37,7 @@ class Base
   : public structure::Interaction<2>
 {
 protected:
-  Base(mode::SmartPtr, particle::SmartPtr, double uNot, double etaeff);
+  Base(mode::Ptr, particle::Ptr, double uNot, double etaeff);
 
 };
 
@@ -52,7 +52,7 @@ public:
 
   const ModeFunction& getMF() const {return MF_Base::member;}
 
-  InterferenceBase(mode::SmartPtr, particle::SmartPtr, double u, size_t kCav, ModeFunctionType);
+  InterferenceBase(mode::Ptr, particle::Ptr, double u, size_t kCav, ModeFunctionType);
 
 };
 
@@ -61,7 +61,7 @@ class POC_Base
   : public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
 {
 public:
-  POC_Base(mode::SmartPtr, particle::SmartPtrPumped, double uNot);
+  POC_Base(mode::Ptr, particle::PtrPumped, double uNot);
 
 };
 
@@ -75,7 +75,7 @@ public:
 
   const ModeFunction& getMF() const {return MF_Base::member;}
 
-  PAC_Base(mode::SmartPtr, particle::SmartPtr, double uNot, size_t kCav, ModeFunctionType, double etaeff);
+  PAC_Base(mode::Ptr, particle::Ptr, double uNot, size_t kCav, ModeFunctionType, double etaeff);
 
 };
 
@@ -101,7 +101,7 @@ class ParticleOrthogonalToCavity
 public:
   typedef particlecavity::POC_Base Base;
 
-  ParticleOrthogonalToCavity(mode::SmartPtr mode, particle::SmartPtrPumped part, const particlecavity::ParsOrthogonal& p)
+  ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsOrthogonal& p)
     : Base(mode,part,p.uNot) {}
 
 };
@@ -114,11 +114,11 @@ class ParticleAlongCavity
 public:
   typedef particlecavity::PAC_Base Base;
 
-  ParticleAlongCavity(mode::SmartPtr mode, particle::SmartPtr part, const particlecavity::ParsAlong& p, double etaeff=0)
+  ParticleAlongCavity(mode::Ptr mode, particle::Ptr part, const particlecavity::ParsAlong& p, double etaeff=0)
     : Base(mode,part,p.uNot,p.kCav,p.modeCav,etaeff) {}
 
   // The following two describe the case when there is an additional fixed standing wave ALONG the cavity
-  ParticleAlongCavity(mode::SmartPtr mode, particle::SmartPtrPumped part, const particlecavity::ParsAlong& p)
+  ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
     : Base(mode,part,p.uNot,p.kCav,p.modeCav,part->getV_Class()) {}
 
 

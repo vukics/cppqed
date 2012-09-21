@@ -30,8 +30,8 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  mode::SmartPtr mA(mode::make(pA,QMP_UIP,mode::DoNotAverage()));
-  mode::SmartPtr mB(mode::make(pB,QMP_UIP,mode::DoNotAverage()));
+  mode::Ptr mA(mode::make(pA,QMP_UIP,mode::DoNotAverage()));
+  mode::Ptr mB(mode::make(pB,QMP_UIP,mode::DoNotAverage()));
 
   NX_CoupledModes<ModeCorrelations> nx(mA,mB,-sqrt(2)*u);
 

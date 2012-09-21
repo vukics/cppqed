@@ -87,7 +87,7 @@ public:
 
 
 
-const DDHO_SmartPtr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit)
+const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit)
 {
   if (gamma==1.)
     return boost::make_shared<DDHO_Critical>(omega,ampTI,ampDerivTI,tInit);

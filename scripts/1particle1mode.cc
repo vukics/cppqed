@@ -41,12 +41,12 @@ int main(int argc, char* argv[])
 
   if (conf!=1) pplm.delta-=ppci.uNot/(isComplex(ppci.modeCav) ? 1. : 2.);
 
-  mode::SmartPtr mode(mode::make(pplm,qmp));
+  mode::Ptr mode(mode::make(pplm,qmp));
 
 
-  particle::SmartPtr particle(make(ppp,qmp));
+  particle::Ptr particle(make(ppp,qmp));
 
-  particle::SmartPtrPumped pumpedparticle(makePumped(ppp,qmp));
+  particle::PtrPumped pumpedparticle(makePumped(ppp,qmp));
 
   particlecavity::Base* particlecavityBase;
   switch (conf) {

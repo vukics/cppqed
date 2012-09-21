@@ -13,15 +13,15 @@
 namespace binary {
 
 
-typedef boost::shared_ptr<const Base> SmartPtr;
+typedef boost::shared_ptr<const Base> Ptr;
 
 typedef structure::Interaction<2> Interaction;
 
 
-const SmartPtr doMake(Interaction::Ptr);
+const Ptr doMake(Interaction::Ptr);
 
 template<typename IA>
-const SmartPtr make(const IA& ia)
+const Ptr make(const IA& ia)
 {
   return doMake(cpputils::sharedPointerize(ia));
 }

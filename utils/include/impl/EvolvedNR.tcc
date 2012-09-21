@@ -10,7 +10,7 @@ namespace evolved {
 
 
 template<typename A>
-const typename Maker<A>::SmartPtr 
+const typename Maker<A>::Ptr 
 MakerNR<A>::operator()(A& a,
 		       Derivs derivs,
 		       double dtInit,

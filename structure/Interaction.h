@@ -32,7 +32,7 @@ class Interaction : public DynamicsBase
 public:
   typedef boost::shared_ptr<const Interaction> Ptr;
 
-  typedef blitz::TinyVector<Free::SmartPtr,RANK> Frees;
+  typedef blitz::TinyVector<Free::Ptr,RANK> Frees;
 
   explicit Interaction(const Frees& frees, 
 		       const    RealFreqs&    realFreqs=   RealFreqs(), 

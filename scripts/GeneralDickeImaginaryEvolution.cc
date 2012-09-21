@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 
     pe.noise=false;
 
-    mode::SmartPtr mode(mode::make(plm,QMP_IP));
+    mode::Ptr mode(mode::make(plm,QMP_IP));
 
     Spin spin(ps);
 

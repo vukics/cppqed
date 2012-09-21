@@ -40,7 +40,7 @@ typedef TTD_CARRAY(RA-1) CARM1;
 typedef TTD_CARRAY(RA+1) CARP1;
 
 
-Randomized::SmartPtr ran(MakerGSL()(1001));
+Randomized::Ptr ran(MakerGSL()(1001));
 
 
 

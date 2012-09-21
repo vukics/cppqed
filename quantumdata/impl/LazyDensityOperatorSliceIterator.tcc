@@ -46,16 +46,16 @@ public:
   static const int RANK=mpl::size<V>::value;
 
   typedef LazyDensityOperator<RANK>    LDO         ;
-  typedef boost::shared_ptr<const LDO> LDO_SmartPtr;
+  typedef boost::shared_ptr<const LDO> LDO_Ptr;
 
 
-  DI_ImplSpecial(const LDO&    , mpl:: true_) : ldoSmartPtr_()             , isEnd_( true) {}
-  // In this case, the SmartPtr is never actually touched
+  DI_ImplSpecial(const LDO&    , mpl:: true_) : ldoPtr_()             , isEnd_( true) {}
+  // In this case, the Ptr is never actually touched
 
-  DI_ImplSpecial(const LDO& ldo, mpl::false_) : ldoSmartPtr_(dispatch(ldo)), isEnd_(false) {}
+  DI_ImplSpecial(const LDO& ldo, mpl::false_) : ldoPtr_(dispatch(ldo)), isEnd_(false) {}
 
 
-  const LDO_SmartPtr dispatch(const LDO& ldo)
+  const LDO_Ptr dispatch(const LDO& ldo)
   {
     using blitzplusplus::basi::Transposer;
 
@@ -65,11 +65,11 @@ public:
     if      (const SV*const sV=dynamic_cast<const SV*>(&ldo)) {
       typename SV::StateVectorLow temp(sV->operator()()); 
       // We do not want to transpose that StateVectorLow which is the storage of sV.
-      return LDO_SmartPtr(new SV(Transposer<RANK,V>::transpose(temp),byReference));
+      return LDO_Ptr(new SV(Transposer<RANK,V>::transpose(temp),byReference));
     }
     else if (const DO*const dO=dynamic_cast<const DO*>(&ldo)) {
       typename DO::DensityOperatorLow temp(dO->operator()());
-      return LDO_SmartPtr(new DO(Transposer<2*RANK,typename ExtendV<RANK,V>::type>::transpose(temp),byReference));
+      return LDO_Ptr(new DO(Transposer<2*RANK,typename ExtendV<RANK,V>::type>::transpose(temp),byReference));
     }
     else throw NoSuchImplementation();
   }
@@ -78,12 +78,12 @@ public:
 
   void doIncrement() {if (!isEnd_) isEnd_=true; else throw OutOfRange();}
 
-  const LDO& dereference() const {if (isEnd_) throw OutOfRange(); return *ldoSmartPtr_;}
+  const LDO& dereference() const {if (isEnd_) throw OutOfRange(); return *ldoPtr_;}
 
   virtual ~DI_ImplSpecial() {}
 
 private:
-  mutable LDO_SmartPtr ldoSmartPtr_;
+  mutable LDO_Ptr ldoPtr_;
 
   bool isEnd_;
 
@@ -132,23 +132,23 @@ public:
   typedef typename Base::MII  MII ;
 
   typedef StateVector<mpl::size<V>::value>        StateVectorRes        ;
-  typedef boost::shared_ptr<const StateVectorRes> StateVectorResSmartPtr;
+  typedef boost::shared_ptr<const StateVectorRes> StateVectorResPtr;
 
   typedef typename Base::LazyDensityOperatorRes LazyDensityOperatorRes;
 
   template<bool IS_END>
-  DI_SV_Impl(const StateVector<RANK>& psi, mpl::bool_<IS_END> tag) : impl_(psi(),tag), stateVectorResSmartPtr_() {}
+  DI_SV_Impl(const StateVector<RANK>& psi, mpl::bool_<IS_END> tag) : impl_(psi(),tag), stateVectorResPtr_() {}
 
 private:
   void doIncrement() {++impl_;}
 
   const MII& getMII() const {return impl_();}
 
-  const LazyDensityOperatorRes& dereference() const {stateVectorResSmartPtr_.reset(new StateVectorRes(*impl_,byReference)); return *stateVectorResSmartPtr_;}
+  const LazyDensityOperatorRes& dereference() const {stateVectorResPtr_.reset(new StateVectorRes(*impl_,byReference)); return *stateVectorResPtr_;}
 
   Impl impl_;
 
-  mutable StateVectorResSmartPtr stateVectorResSmartPtr_;
+  mutable StateVectorResPtr stateVectorResPtr_;
 
 };
 
@@ -172,7 +172,7 @@ public:
   static const int RANKRES=mpl::size<V>::value;
 
   typedef DensityOperator<RANKRES>                     DensityOperatorRes        ;
-  typedef boost::shared_ptr<const DensityOperatorRes > DensityOperatorResSmartPtr;
+  typedef boost::shared_ptr<const DensityOperatorRes > DensityOperatorResPtr;
 
 
   typedef typename Base::LazyDensityOperatorRes LazyDensityOperatorRes;
@@ -205,7 +205,7 @@ private:
   mutable DensityOperatorLow    densityOperatorLow_   ; 
   mutable DensityOperatorLowRes densityOperatorLowRes_;
 
-  mutable DensityOperatorResSmartPtr densityOperatorResSmartPtr_; 
+  mutable DensityOperatorResPtr densityOperatorResPtr_; 
 
 };
 
@@ -226,7 +226,7 @@ DI_DO_Impl<RANK,V>::ctorHelper(const DensityOperator<RANK>& rho)
 template<int RANK, typename V>
 DI_DO_Impl<RANK,V>::DI_DO_Impl(const DensityOperator<RANK>& rho, mpl::false_)
   : mii_(ctorHelper<false>(rho)),
-    densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResSmartPtr_()
+    densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()
 {
   densityOperatorLow_.reference(rho());
   BASI::transpose(densityOperatorLow_);
@@ -236,7 +236,7 @@ DI_DO_Impl<RANK,V>::DI_DO_Impl(const DensityOperator<RANK>& rho, mpl::false_)
 template<int RANK, typename V>
 DI_DO_Impl<RANK,V>::DI_DO_Impl(const DensityOperator<RANK>& rho, mpl:: true_)
   : mii_(ctorHelper< true>(rho)),
-    densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResSmartPtr_()    
+    densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()    
 {
 }
 
@@ -248,7 +248,7 @@ DI_DO_Impl<RANK,V>::dereference() const
   IdxTinyHalf idxHalf(*mii_);
   IdxTiny idx(concatenateTinies(idxHalf,idxHalf));
 
-  densityOperatorResSmartPtr_.reset(new DensityOperatorRes(
+  densityOperatorResPtr_.reset(new DensityOperatorRes(
 							   BASI::index(
 								       densityOperatorLow_,
 								       densityOperatorLowRes_,
@@ -257,7 +257,7 @@ DI_DO_Impl<RANK,V>::dereference() const
 							   byReference
 							   )
 				    );
-  return *densityOperatorResSmartPtr_;
+  return *densityOperatorResPtr_;
 }
 
 
@@ -274,12 +274,12 @@ makeDI_Impl(const LazyDensityOperator<RANK>& ldo, mpl::false_)
 // The last argument governing whether the special implementation is needed.
 {
   static const mpl::bool_<IS_END> isEnd=mpl::bool_<IS_END>();
-  typedef typename DiagonalIterator<RANK,V>::Impl DI_ImplSmartPtr;
+  typedef typename DiagonalIterator<RANK,V>::Impl DI_ImplPtr;
 
   if      (const StateVector    <RANK>*const stateVector    =dynamic_cast<const StateVector    <RANK>*>(&ldo))
-    return DI_ImplSmartPtr(new DI_SV_Impl<RANK,V>(*stateVector    ,isEnd));
+    return DI_ImplPtr(new DI_SV_Impl<RANK,V>(*stateVector    ,isEnd));
   else if (const DensityOperator<RANK>*const densityOperator=dynamic_cast<const DensityOperator<RANK>*>(&ldo))
-    return DI_ImplSmartPtr(new DI_DO_Impl<RANK,V>(*densityOperator,isEnd));
+    return DI_ImplPtr(new DI_DO_Impl<RANK,V>(*densityOperator,isEnd));
   else
     throw NoSuchImplementation();
   
@@ -292,9 +292,9 @@ makeDI_Impl(const LazyDensityOperator<RANK>& ldo, mpl::true_)
 // The last argument governing whether the special implementation is needed.
 {
   static const mpl::bool_<IS_END> isEnd=mpl::bool_<IS_END>();
-  typedef typename DiagonalIterator<RANK,V>::Impl DI_ImplSmartPtr;
+  typedef typename DiagonalIterator<RANK,V>::Impl DI_ImplPtr;
 
-  return DI_ImplSmartPtr(new DI_ImplSpecial<V>(ldo,isEnd));
+  return DI_ImplPtr(new DI_ImplSpecial<V>(ldo,isEnd));
 
 }
 

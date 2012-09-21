@@ -66,7 +66,7 @@ typedef GeMatrixMF<dcomp,ColMajor>::type GeMatrixCM;
 typedef HeMatrixMF<RowMajor>::type HeMatrixRM;
 
 
-Randomized::SmartPtr ran(MakerGSL()(1001));
+Randomized::Ptr ran(MakerGSL()(1001));
 
 TTD_EXTTINY(RANK) dims(6,4,5);
 

@@ -29,7 +29,7 @@ int main(int, char**)
   quantumdata::StateVector<1> psi(mode.getDimensions());
 
   {
-    Randomized::SmartPtr Ran(MakerGSL()(1001));
+    Randomized::Ptr Ran(MakerGSL()(1001));
     boost::generate(psi(),bind(&Randomized::dcompRan,Ran));
   }
 

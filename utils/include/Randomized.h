@@ -36,7 +36,7 @@ class Randomized : private boost::noncopyable
 public:
   // The logical state of the class is the state of the underlying generator, so that everything that (may) change this state, for example sampling, is logically non-const.
 
-  typedef boost::shared_ptr<Randomized> SmartPtr;
+  typedef boost::shared_ptr<Randomized> Ptr;
 
   virtual ~Randomized() {}
 
@@ -59,18 +59,18 @@ private:
 
 template<typename D>
 inline
-const D sample(Randomized::SmartPtr ran);
+const D sample(Randomized::Ptr ran);
 
 template<>
 inline
-const double sample<double>(Randomized::SmartPtr ran)
+const double sample<double>(Randomized::Ptr ran)
 {
   return ran->operator()();
 }
 
 template<>
 inline
-const dcomp  sample<dcomp >(Randomized::SmartPtr ran)
+const dcomp  sample<dcomp >(Randomized::Ptr ran)
 {
   return ran->dcompRan();
 }
@@ -96,7 +96,7 @@ std::istream& operator>>(std::istream& is, Randomized &r)
 class Maker
 {
 public:
-  virtual const Randomized::SmartPtr operator()(unsigned long seed) const = 0;
+  virtual const Randomized::Ptr operator()(unsigned long seed) const = 0;
 
   virtual ~Maker() {}
   
@@ -106,7 +106,7 @@ public:
 class MakerGSL : public Maker
 {
 public:
-  const Randomized::SmartPtr operator()(unsigned long seed) const;
+  const Randomized::Ptr operator()(unsigned long seed) const;
   
 };
 
@@ -119,7 +119,7 @@ public:
 ////////////////////////////
 
 template<typename A>
-const Randomized::SmartPtr fillWithRandom(A& data, Randomized::SmartPtr ran)
+const Randomized::Ptr fillWithRandom(A& data, Randomized::Ptr ran)
 {
   boost::generate(data,boost::bind(sample<typename A::T_numtype>,ran));
   return ran;
@@ -127,9 +127,9 @@ const Randomized::SmartPtr fillWithRandom(A& data, Randomized::SmartPtr ran)
 
 
 template<typename A>
-const Randomized::SmartPtr fillWithRandom(A& data, unsigned long seed=1001ul, const Maker& maker=MakerGSL())
+const Randomized::Ptr fillWithRandom(A& data, unsigned long seed=1001ul, const Maker& maker=MakerGSL())
 {
-  Randomized::SmartPtr ran(maker(seed));
+  Randomized::Ptr ran(maker(seed));
   return fillWithRandom(data,ran);
 }
 

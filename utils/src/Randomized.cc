@@ -106,7 +106,7 @@ istream& RandomizedGSL::readImplID(istream &is) const
 }
 
 
-const Randomized::SmartPtr MakerGSL::operator()(unsigned long seed) const
+const Randomized::Ptr MakerGSL::operator()(unsigned long seed) const
 {
   return boost::make_shared<RandomizedGSL>(seed);
 }

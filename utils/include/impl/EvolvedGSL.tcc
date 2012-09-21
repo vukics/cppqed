@@ -12,7 +12,7 @@ namespace evolved {
 
 
 template<typename A>
-const typename Maker<A>::SmartPtr MakerGSL<A>::operator()(
+const typename Maker<A>::Ptr MakerGSL<A>::operator()(
 							  A& a,
 							  Derivs derivs,
 							  double dtInit,
