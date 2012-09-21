@@ -277,8 +277,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
     free0=ia->getFrees()(0),
     free1=ia->getFrees()(1);
 
-  return SystemCharacteristics(/* NEED_TO_UNDERSTAND Why can't the compiler deduce RANK here for frees? */
-			       qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
+  return SystemCharacteristics(qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
 			       qsh<1>(free0) || qsh<1>(free1) || qsh<2>(ia),
 			       qsl<1>(free0) || qsl<1>(free1) || qsl<2>(ia));
 }
@@ -289,7 +288,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 #define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
-const binary::SmartPtr binary::make(Interaction::Ptr ia)
+const binary::SmartPtr binary::doMake(Interaction::Ptr ia)
 {
   if      DISPATCHER(true ,true ,true ) ;
   else if DISPATCHER(true ,true ,false) ;

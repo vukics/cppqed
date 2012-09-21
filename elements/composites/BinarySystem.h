@@ -18,12 +18,12 @@ typedef boost::shared_ptr<const Base> SmartPtr;
 typedef structure::Interaction<2> Interaction;
 
 
-const SmartPtr make(Interaction::Ptr);
+const SmartPtr doMake(Interaction::Ptr);
 
 template<typename IA>
 const SmartPtr make(const IA& ia)
 {
-  return make(cpputils::sharedPointerize(ia));
+  return doMake(cpputils::sharedPointerize(ia));
 }
 
 
