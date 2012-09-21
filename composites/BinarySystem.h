@@ -46,7 +46,6 @@ public:
   const SSF& getFree1() const {return free1_;}
   const SSI& getIA   () const {return    ia_;}
 
-private:
   double highestFrequency (             ) const;
   void   displayParameters(std::ostream&) const;
 
@@ -57,6 +56,7 @@ private:
   void           process(Averages&)                           const;
   void           display(const Averages&, std::ostream&, int) const;
 
+private:
   const SSF free0_, free1_;
 
   const SSI ia_;
