@@ -7,6 +7,7 @@
 #include "QuantumSystem.h"
 #include "SubSystem.h"
 
+#include "SmartPtr.h"
 
 
 namespace binary {
@@ -17,11 +18,17 @@ typedef boost::shared_ptr<const Base> SmartPtr;
 typedef structure::Interaction<2> Interaction;
 
 
-const SmartPtr make(const Interaction&);
+const SmartPtr make(Interaction::Ptr);
+
+template<typename IA>
+const SmartPtr make(const IA& ia)
+{
+  return make(cpputils::sharedPointerize(ia));
+}
 
 
-typedef structure::SubSystemFree            SSF;
-typedef structure::SubSystemsInteraction<2> SSI;
+typedef composite::SubSystemFree            SSF;
+typedef composite::SubSystemsInteraction<2> SSI;
 
 
 
@@ -33,7 +40,7 @@ public:
   typedef structure::Averaged<1> Av1;
   typedef structure::Averaged<2> Av2;
 
-  Base(const Interaction&);
+  Base(Interaction::Ptr);
 
   const SSF& getFree0() const {return free0_;}
   const SSF& getFree1() const {return free1_;}
@@ -136,7 +143,7 @@ public:
   
   typedef structure::Interaction<2> Interaction;
 
-  BinarySystem(const Interaction&);
+  BinarySystem(Interaction::Ptr);
 
 };
 

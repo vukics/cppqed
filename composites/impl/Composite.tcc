@@ -77,7 +77,7 @@ void Composite<VA>::worker(const H& helper) const
 namespace composite {
 
 
-using structure::SubSystemFree;
+bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
 
 
 template<int RANK>
@@ -157,7 +157,7 @@ template<typename VA>
 const RETURN_type
 Composite<VA>::fillFrees(const VA& acts)
 {
-  RETURN_type res; res=structure::SubSystemFree();
+  RETURN_type res; res=composite::SubSystemFree();
   boost::fusion::for_each(acts,composite::FillFrees<RANK>(res));
   return res;
 }
@@ -252,20 +252,10 @@ void Composite<VA>::displayParameters(std::ostream& os) const
 //////////////
 
 
-namespace composite {
-
-bool compFrees(const SubSystemFree& ssf1, const SubSystemFree& ssf2)
-{
-  return ssf1.get()->highestFrequency() < ssf2.get()->highestFrequency();
-}
-
-} // composite
-
-
 template<typename VA>
 double Composite<VA>::highestFrequency() const
 {
-  return boost::max_element(frees_,composite::compFrees)->get()->highestFrequency();
+  return boost::max_element(frees_,composite::compareFreesFrequency)->get()->highestFrequency();
   // NEEDS_WORK add the interactions here
 }
 
@@ -325,7 +315,7 @@ public:
   ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
 
   template<typename Vec, typename Ex>
-  void help(const Ex*const ex, Vec) const
+  void help(typename Ex::Ptr ex, Vec) const
   {
     if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Ex::actWithU,ex,dtdid_,_1));
   }
@@ -373,7 +363,7 @@ public:
     : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
 
   template<typename Vec, typename Ha>
-  void help(const Ha*const ha, Vec) const
+  void help(typename Ha::Ptr ha, Vec) const
   {
     if (ha) 
       cpputils::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),
@@ -471,7 +461,7 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li) const
+  void help(typename Li::Ptr li, Vec) const
   {
     iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne)));    
   }
@@ -526,7 +516,7 @@ public:
   ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec) const
+  void help(typename Li::Ptr li, Vec) const
   {
     if (!flag_ && li) {
       size_t n=Li::nJumps(li);
@@ -667,7 +657,7 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av, Vec) const
   {
     iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne)));
   }
@@ -725,7 +715,7 @@ public:
 
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
     if ((u_=l_+Av::nAvr(av))>l_) {
@@ -775,7 +765,7 @@ public:
     : frees_(frees), avr_(avr), os_(os), precision_(precision), l_(l), u_(u) {}
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
     if ((u_=l_+Av::nAvr(av))>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
