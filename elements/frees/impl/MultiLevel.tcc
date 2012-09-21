@@ -66,8 +66,8 @@ Exact<NL>::isUnitary() const
   // using namespace lambda;
 
   return !accumulate(
-		     make_transform_iterator(zIs_.begin(),hasRealPart),
-		     make_transform_iterator(zIs_.end  (),hasRealPart),
+		     boost::make_transform_iterator(zIs_.begin(),hasRealPart),
+		     boost::make_transform_iterator(zIs_.end  (),hasRealPart),
 		     false,
 		     bll::_1 || bll::_2 //logical_or<bool>()
 		     );

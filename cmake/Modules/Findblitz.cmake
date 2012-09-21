@@ -30,6 +30,9 @@ set(blitz_PROCESS_INCLUDES blitz_INCLUDE_DIR)
 set(blitz_PROCESS_LIBS blitz_LIBRARY)
 libfind_process(blitz)
 
+
+file(GLOB BZCONFIG ${blitz_INCLUDE_DIR}/blitz/*/bzconfig.h)
+
 if(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
   # the symbol blitz::paddedArray is new in blitz++-0.10,we check if it exists in the library
   # if not we might have accidentially picked up an older version of the library.
@@ -45,4 +48,4 @@ if(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
   endif(NOT blitz_IS_MERCURIAL_VERSION)
 endif(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
 
-CHECK_SYMBOL_EXISTS(BZ_HAVE_BOOST_SERIALIZATION ${blitz_INCLUDE_DIR}/blitz/gnu/bzconfig.h blitz_SERIALIZATION_FOUND)
+CHECK_SYMBOL_EXISTS(BZ_HAVE_BOOST_SERIALIZATION ${BZCONFIG} blitz_SERIALIZATION_FOUND)
