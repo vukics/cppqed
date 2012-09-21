@@ -274,7 +274,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
     free0=ia->getFrees()(0),
     free1=ia->getFrees()(1);
 
-  return SystemCharacteristics(/* Why can't the compiler deduce RANK here for frees? */
+  return SystemCharacteristics(/* NEED_TO_UNDERSTAND Why can't the compiler deduce RANK here for frees? */
 			       qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
 			       qsh<1>(free0) || qsh<1>(free1) || qsh<2>(ia),
 			       qsl<1>(free0) || qsl<1>(free1) || qsl<2>(ia));

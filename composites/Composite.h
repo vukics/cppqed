@@ -37,7 +37,7 @@ template<typename VA>
 // VA should model a fusion sequence of Acts
 class Composite 
 // The base_from_member idiom appears because the Frees has to be calculated and stored somehow first
-  : private boost::base_from_member<const blitz::TinyVector<structure::SubSystemFree,MaxRankMF<VA>::type::value+1> >,
+  : private boost::base_from_member<const blitz::TinyVector<composite::SubSystemFree,MaxRankMF<VA>::type::value+1> >,
     public structure::QuantumSystem<MaxRankMF<VA>::type::value+1>,
     public structure::Exact        <MaxRankMF<VA>::type::value+1>, 
     public structure::Hamiltonian  <MaxRankMF<VA>::type::value+1>,
@@ -57,7 +57,7 @@ public:
   typedef structure::Liouvillean  <RANK> Li_Base;
   typedef structure::Averaged     <RANK> Av_Base;
 
-  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+  typedef blitz::TinyVector<composite::SubSystemFree,RANK> Frees;
 
   typedef boost::base_from_member<const Frees> FreesBase;
 

@@ -10,74 +10,44 @@
 #include "Structure.h"
 
 
-namespace structure {
+namespace composite {
 
 
 template<int RANK> 
-class SubSystem
+class SubSystemsInteraction : public structure::QuantumSystemWrapper<RANK>
 {
 public:
-  // const QuantumSystem<RANK>*const getQS() const {return qs_;}
-  const typename Exact      <RANK>::Ptr getEx() const {return ex_;} 
-  const typename Hamiltonian<RANK>::Ptr getHa() const {return ha_;}
-  const typename Liouvillean<RANK>::Ptr getLi() const {return li_;} 
-  const typename Averaged   <RANK>::Ptr getAv() const {return av_;}  
+  typedef typename structure::Interaction<RANK>::Ptr InteractionPtr;
 
-protected:
-  SubSystem(DynamicsBase::Ptr qs)
-    : // qs_(qs),
-      ex_(qse<RANK>(qs)),
-      ha_(qsh<RANK>(qs)),
-      li_(qsl<RANK>(qs)),
-      av_(qsa<RANK>(qs))
-  {}
+  SubSystemsInteraction(InteractionPtr ia) : structure::QuantumSystemWrapper<RANK>(ia), ia_(ia) {}
 
-  SubSystem() : ex_(), ha_(), li_(), av_() {}
+  const InteractionPtr get() const {return ia_;} 
 
 private:
-  // const QuantumSystem<RANK>* qs_;
-  typename Exact        <RANK>::Ptr ex_; 
-  typename Hamiltonian  <RANK>::Ptr ha_;
-  typename Liouvillean  <RANK>::Ptr li_; 
-  typename Averaged     <RANK>::Ptr av_;
-  
-};
-
-
-
-template<int RANK> 
-class SubSystemsInteraction : public SubSystem<RANK>
-{
-public:
-  typedef class Interaction<RANK> Interaction;
-
-  SubSystemsInteraction(typename Interaction::Ptr ia) : SubSystem<RANK>(ia), ia_(ia) {}
-
-  const typename Interaction::Ptr get() const {return ia_;} 
-
-private:
-  typename Interaction::Ptr ia_;
+  InteractionPtr ia_;
 
 };
 
 
 
-class SubSystemFree : public SubSystem<1>
+class SubSystemFree : public structure::QuantumSystemWrapper<1>
 {
 public:
-  SubSystemFree(Free::SmartPtr free) : SubSystem<1>(free), free_(free) {}
+  typedef structure::Free::SmartPtr FreePtr;
+
+  SubSystemFree(FreePtr free) : structure::QuantumSystemWrapper<1>(free,true), free_(free) {}
 
   SubSystemFree() : free_() {}
 
-  const Free::SmartPtr get() const {return free_;}
+  const FreePtr get() const {return free_;}
 
 private:
-  Free::SmartPtr free_;
+  FreePtr free_;
 
 };
 
 
-} // structure
+} // composite
 
 
 #endif // ELEMENTS_COMPOSITES_SUBSYSTEM_H_INCLUDED

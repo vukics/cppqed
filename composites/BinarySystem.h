@@ -27,8 +27,8 @@ const SmartPtr make(const IA& ia)
 }
 
 
-typedef structure::SubSystemFree            SSF;
-typedef structure::SubSystemsInteraction<2> SSI;
+typedef composite::SubSystemFree            SSF;
+typedef composite::SubSystemsInteraction<2> SSI;
 
 
 
