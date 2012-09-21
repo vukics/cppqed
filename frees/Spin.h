@@ -22,20 +22,20 @@ namespace spin {
 using namespace structure::free;
 
 
-typedef boost::shared_ptr<const SpinBase> SmartPtr;
+typedef boost::shared_ptr<const SpinBase> Ptr;
 
 
-const Tridiagonal splus(SmartPtr);
+const Tridiagonal splus(Ptr);
 
-inline const Tridiagonal sminus(SmartPtr spin) {return splus(spin).dagger();}
+inline const Tridiagonal sminus(Ptr spin) {return splus(spin).dagger();}
 
-inline const Tridiagonal sx(SmartPtr spin) {return (splus(spin)+sminus(spin))/2;}
-inline const Tridiagonal sy(SmartPtr spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
+inline const Tridiagonal sx(Ptr spin) {return (splus(spin)+sminus(spin))/2;}
+inline const Tridiagonal sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
 
-const Tridiagonal sn(SmartPtr);
+const Tridiagonal sn(Ptr);
 
 
-const Tridiagonal sz(SmartPtr);
+const Tridiagonal sz(Ptr);
 
 
 struct Pars

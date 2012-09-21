@@ -13,7 +13,7 @@ namespace nxcoupledmodes {
 class Base: public structure::Interaction<2>, public structure::TridiagonalHamiltonian<2,true>
 {
 public:
-  Base(mode::SmartPtr, mode::SmartPtr, double u);
+  Base(mode::Ptr, mode::Ptr, double u);
 
 };
 

@@ -20,7 +20,7 @@ class UnotsSignDiscrepancy : public cpputils::Exception {};
 class Base : public structure::Interaction<3>, public structure::Hamiltonian<3>
 {
 public:
-  Base(mode::SmartPtr, mode::SmartPtr, particle::SmartPtr, double uNot0, double uNot1, const ModeFunction&, const ModeFunction&, double);
+  Base(mode::Ptr, mode::Ptr, particle::Ptr, double uNot0, double uNot1, const ModeFunction&, const ModeFunction&, double);
 
 private:
   void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; 

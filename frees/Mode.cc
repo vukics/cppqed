@@ -322,7 +322,7 @@ const Tridiagonal aop(size_t dim)
 
 // This returns a Tridiagonal furnished with frequencies, when mode is derived from mode::Exact
 
-const Tridiagonal aop(SmartPtr mode)
+const Tridiagonal aop(Ptr mode)
 {
   size_t dim=mode->getDimension();
   Tridiagonal res(aop(dim));
@@ -332,7 +332,7 @@ const Tridiagonal aop(SmartPtr mode)
 
 
 
-const Tridiagonal nop(SmartPtr mode)
+const Tridiagonal nop(Ptr mode)
 {
   return Tridiagonal(mainDiagonal(1.,mode->getDimension()));
 }

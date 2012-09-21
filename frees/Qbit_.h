@@ -50,14 +50,14 @@ namespace qbit {
 
 using namespace structure::free;
 
-typedef boost::shared_ptr<const QbitBase> SmartPtr;
+typedef boost::shared_ptr<const QbitBase> Ptr;
 
-inline const Tridiagonal sigmaop(SmartPtr qbit) {return mode::aop(qbit);}
+inline const Tridiagonal sigmaop(Ptr qbit) {return mode::aop(qbit);}
 
 const Tridiagonal sigmadagsigmaop();
 
-const Tridiagonal sigmaxop(SmartPtr);
-const Tridiagonal sigmayop(SmartPtr);
+const Tridiagonal sigmaxop(Ptr);
+const Tridiagonal sigmayop(Ptr);
 const Tridiagonal sigmazop();
 
 
@@ -72,7 +72,7 @@ const StateVector init(const dcomp& psi1);
 inline const StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
-SmartPtr make(const ParsPumpedLossy&, QM_Picture);
+Ptr make(const ParsPumpedLossy&, QM_Picture);
 
 
 

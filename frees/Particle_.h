@@ -24,18 +24,18 @@ namespace particle {
 using namespace structure::free;
 
 
-typedef boost::shared_ptr<const ParticleBase> SmartPtr;
+typedef boost::shared_ptr<const ParticleBase> Ptr;
 
-typedef boost::shared_ptr<const PumpedParticleBase> SmartPtrPumped;
+typedef boost::shared_ptr<const PumpedParticleBase> PtrPumped;
 
 
-const Tridiagonal expINKX(particle::SmartPtr, ptrdiff_t);
+const Tridiagonal expINKX(particle::Ptr, ptrdiff_t);
 
-inline const Tridiagonal sinNKX(particle::SmartPtr particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*DCOMP_I);}
-inline const Tridiagonal cosNKX(particle::SmartPtr particle, ptrdiff_t nK) {return (expINKX(particle,nK)+expINKX(particle,-nK))/ 2.         ;}
+inline const Tridiagonal sinNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*DCOMP_I);}
+inline const Tridiagonal cosNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)+expINKX(particle,-nK))/ 2.         ;}
 
-const Tridiagonal mfNKX       (particle::SmartPtr, const ModeFunction&);
-const Tridiagonal mfNKX_AbsSqr(particle::SmartPtr, const ModeFunction&);
+const Tridiagonal mfNKX       (particle::Ptr, const ModeFunction&);
+const Tridiagonal mfNKX_AbsSqr(particle::Ptr, const ModeFunction&);
 
 
 const StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag=true);
@@ -51,10 +51,10 @@ const StateVector init(const Pars&);
 
 void ffTransform(StateVectorLow&, fft::Direction);
 
-SmartPtr make(const Pars      &, QM_Picture);
-SmartPtr make(const ParsPumped&, QM_Picture);
+Ptr make(const Pars      &, QM_Picture);
+Ptr make(const ParsPumped&, QM_Picture);
 
-SmartPtrPumped makePumped(const ParsPumped&, QM_Picture);
+PtrPumped makePumped(const ParsPumped&, QM_Picture);
 
 
 namespace details {

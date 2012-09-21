@@ -21,12 +21,12 @@ struct ParsBichromatic : ParsPumpedLossy
 
 
 template<typename A>
-const SmartPtr make(const ParsBichromatic& p, QM_Picture qmp, const A& a)
+const Ptr make(const ParsBichromatic& p, QM_Picture qmp, const A& a)
 {
   if (!isNonZero(p.etaOther)) return make(static_cast<const ParsPumpedLossy&>(p),qmp,a);
   else {
-    if (p.nTh) {return SmartPtr(new BichromaticMode<true ,A>(p,a));}
-    else       {return SmartPtr(new BichromaticMode<false,A>(p,a));}
+    if (p.nTh) {return Ptr(new BichromaticMode<true ,A>(p,a));}
+    else       {return Ptr(new BichromaticMode<false,A>(p,a));}
   }
 }
 

@@ -20,20 +20,20 @@ using namespace mode;
 namespace particlecavity {
 
 
-const Tridiagonal dispersive(mode::SmartPtr mode, particle::SmartPtr particle, double uNot, const ModeFunction& mf)
+const Tridiagonal dispersive(mode::Ptr mode, particle::Ptr particle, double uNot, const ModeFunction& mf)
 {
   return uNot*nop(mode)*(mf.get<0>()==MFT_SIN ? -1 : 1)*cosNKX(particle,mf.get<1>()<<1)/(2.*DCOMP_I);
 }
 
 
-const Tridiagonal interferic(mode::SmartPtr mode, particle::SmartPtr particle, double uNotTimesEtaeff, double uNot, const ModeFunction& mf)
+const Tridiagonal interferic(mode::Ptr mode, particle::Ptr particle, double uNotTimesEtaeff, double uNot, const ModeFunction& mf)
 {
   if (uNotTimesEtaeff>=0) return sign(uNot)*sqrt(uNotTimesEtaeff)*tridiagPlusHC_overI(aop(mode).dagger()*mfNKX(particle,mf));
   else                    throw UnotEtaeffSignDiscrepancy();
 }
 
 
-const Tridiagonals fillT(mode::SmartPtr mode, particle::SmartPtr particle, double uNot, double etaeff, const ModeFunction& mf)
+const Tridiagonals fillT(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff, const ModeFunction& mf)
 {
   Tridiagonals res;
 
@@ -46,7 +46,7 @@ const Tridiagonals fillT(mode::SmartPtr mode, particle::SmartPtr particle, doubl
 }
 
 
-Base::Base(mode::SmartPtr mode, particle::SmartPtr particle, double uNot, double etaeff)
+Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff)
   : structure::Interaction<2>(Frees(mode,particle),
 			      tuple_list_of("Unot",uNot,mode->getDimension())("etaeff",etaeff,sqrt(mode->getDimension()))
 			      )
@@ -55,7 +55,7 @@ Base::Base(mode::SmartPtr mode, particle::SmartPtr particle, double uNot, double
 }
 
 
-InterferenceBase::InterferenceBase(mode::SmartPtr mode, particle::SmartPtr particle, double u, size_t kCav, ModeFunctionType modeCav)
+InterferenceBase::InterferenceBase(mode::Ptr mode, particle::Ptr particle, double u, size_t kCav, ModeFunctionType modeCav)
   : MF_Base(modeCav,kCav),
     structure::Interaction<2>(Frees(mode,particle),
 			      tuple_list_of("u",u,mode->getDimension())),
@@ -66,7 +66,7 @@ InterferenceBase::InterferenceBase(mode::SmartPtr mode, particle::SmartPtr parti
 
 
 
-POC_Base::POC_Base(mode::SmartPtr mode, particle::SmartPtrPumped particle, double uNot)
+POC_Base::POC_Base(mode::Ptr mode, particle::PtrPumped particle, double uNot)
   : particlecavity::Base(mode,particle,uNot,particle->getV_Class()),
     TridiagonalHamiltonian(interferic(mode,particle,uNot*particle->getV_Class(),uNot,particle->getMF()))
 {
@@ -75,7 +75,7 @@ POC_Base::POC_Base(mode::SmartPtr mode, particle::SmartPtrPumped particle, doubl
 }
 
 
-PAC_Base::PAC_Base(mode::SmartPtr mode, particle::SmartPtr particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
+PAC_Base::PAC_Base(mode::Ptr mode, particle::Ptr particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
   : MF_Base(modeCav,kCav),
     particlecavity::Base(mode,particle,uNot,etaeff),
     TridiagonalHamiltonian(fillT(mode,particle,uNot,etaeff,MF_Base::member))

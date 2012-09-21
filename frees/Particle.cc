@@ -344,7 +344,7 @@ const Tridiagonal cosNKX(size_t dim, ptrdiff_t nK)
 }
 
 
-const Tridiagonal expINKX(particle::SmartPtr particle, ptrdiff_t nK)
+const Tridiagonal expINKX(particle::Ptr particle, ptrdiff_t nK)
 {
   size_t dim=particle->getDimension();
   Tridiagonal res(expINKX(dim,nK));
@@ -353,7 +353,7 @@ const Tridiagonal expINKX(particle::SmartPtr particle, ptrdiff_t nK)
 }
 
 
-const Tridiagonal mfNKX(particle::SmartPtr particle, const ModeFunction& modeFunction)
+const Tridiagonal mfNKX(particle::Ptr particle, const ModeFunction& modeFunction)
 {
   ModeFunctionType mf(modeFunction.get<0>());
   ptrdiff_t        nK(modeFunction.get<1>());
@@ -466,19 +466,19 @@ const StateVector init(const Pars& p)
 
 
 
-SmartPtr make(const Pars& p, QM_Picture qmp)
+Ptr make(const Pars& p, QM_Picture qmp)
 {
-  return qmp==QMP_SCH ? SmartPtr(make_shared<ParticleSch>(p)) : SmartPtr(make_shared<Particle>(p));
+  return qmp==QMP_SCH ? Ptr(make_shared<ParticleSch>(p)) : Ptr(make_shared<Particle>(p));
 }
 
 
-SmartPtrPumped makePumped(const ParsPumped& p, QM_Picture qmp)
+PtrPumped makePumped(const ParsPumped& p, QM_Picture qmp)
 {
-  return qmp==QMP_SCH ? SmartPtrPumped(make_shared<PumpedParticleSch>(p)) : SmartPtrPumped(make_shared<PumpedParticle>(p));
+  return qmp==QMP_SCH ? PtrPumped(make_shared<PumpedParticleSch>(p)) : PtrPumped(make_shared<PumpedParticle>(p));
 }
 
 
-SmartPtr make(const ParsPumped& p, QM_Picture qmp)
+Ptr make(const ParsPumped& p, QM_Picture qmp)
 {
   if (p.vClass)
     return makePumped(p,qmp);

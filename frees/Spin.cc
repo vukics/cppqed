@@ -32,7 +32,7 @@ size_t decideDimension(size_t twoS, size_t dim)
 }
 
 
-const Diagonal mainDiagonal(SmartPtr spin)
+const Diagonal mainDiagonal(Ptr spin)
 {
   Diagonal diagonal(spin->getDimension());
   diagonal=blitz::tensor::i-spin->getTwoS()/2.;
@@ -40,7 +40,7 @@ const Diagonal mainDiagonal(SmartPtr spin)
 }
 
 
-const Tridiagonal splus(SmartPtr spin)
+const Tridiagonal splus(Ptr spin)
 {
   Diagonal diagonal(spin->getDimension()-1);
   using blitz::tensor::i;
@@ -52,7 +52,7 @@ const Tridiagonal splus(SmartPtr spin)
 }
 
 
-const Tridiagonal sn(SmartPtr spin)
+const Tridiagonal sn(Ptr spin)
 {
   const double theta=spin->getTheta(), phi=spin->getPhi();
   return sin(theta)*(cos(phi)*sx(spin)+sin(phi)*sy(spin))+cos(theta)*sz(spin);
@@ -60,7 +60,7 @@ const Tridiagonal sn(SmartPtr spin)
 
 
 
-const Tridiagonal sz(SmartPtr spin)
+const Tridiagonal sz(Ptr spin)
 {
   Diagonal diagonal(spin->getDimension());
   return Tridiagonal(diagonal=blitz::tensor::i-spin->getTwoS()/2.);

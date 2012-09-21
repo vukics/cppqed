@@ -24,13 +24,13 @@ const std::string keyTitle="Mode";
 
 using namespace structure::free;
 
-typedef boost::shared_ptr<const ModeBase> SmartPtr;
+typedef boost::shared_ptr<const ModeBase> Ptr;
 
-const Tridiagonal aop(SmartPtr);
-const Tridiagonal nop(SmartPtr);
+const Tridiagonal aop(Ptr);
+const Tridiagonal nop(Ptr);
 
-inline const Tridiagonal xop(SmartPtr mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
-// inline const Tridiagonal yop(mode::SmartPtr) {return ...}
+inline const Tridiagonal xop(Ptr mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
+// inline const Tridiagonal yop(mode::Ptr) {return ...}
 
 struct PrepError : public cpputils::Exception {};
 
@@ -40,16 +40,16 @@ const StateVector init(const Pars&);
 
 
 template<typename A>
-const SmartPtr make(const Pars           &, QM_Picture, const A&);
+const Ptr make(const Pars           &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr make(const ParsLossy      &, QM_Picture, const A&);
+const Ptr make(const ParsLossy      &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr make(const ParsPumped     &, QM_Picture, const A&);
+const Ptr make(const ParsPumped     &, QM_Picture, const A&);
 
 template<typename A>
-const SmartPtr make(const ParsPumpedLossy&, QM_Picture, const A&);
+const Ptr make(const ParsPumpedLossy&, QM_Picture, const A&);
 
 
 double photonNumber(const StateVectorLow&); 
@@ -185,10 +185,10 @@ private:
 };
 
 
-inline const SmartPtr make(const Pars           & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
-inline const SmartPtr make(const ParsLossy      & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
-inline const SmartPtr make(const ParsPumped     & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
-inline const SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const Ptr make(const Pars           & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const Ptr make(const ParsLossy      & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const Ptr make(const ParsPumped     & p, QM_Picture qmp) {return make(p,qmp,Averaged());}
+inline const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp) {return make(p,qmp,Averaged());}
 
 
 

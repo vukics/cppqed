@@ -18,7 +18,7 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 {}
 
 
-Base::Base(qbit::SmartPtr qbit, mode::SmartPtr mode, const dcomp& g)
+Base::Base(qbit::Ptr qbit, mode::Ptr mode, const dcomp& g)
   : IA_Base(Frees(qbit,mode),RealFreqs(),tuple_list_of("g",g,sqrt(mode->getDimension()))),
     TDH_Base(tridiagMinusHC(conj(g)*qbit::sigmaop(qbit)*aop(mode).dagger()))
 {
