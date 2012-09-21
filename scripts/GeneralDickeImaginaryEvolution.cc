@@ -78,13 +78,12 @@ int main(int argc, char* argv[])
     SpinSch        spin(ps );
     // Important that everything is in Sch picture here.
 
-    GeneralDicke<> gd(mode,spin,u,y);
-    BinarySystem<> sys(gd);
+    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
 
-    static_cast<structure::QuantumSystem<2>&>(sys).displayParameters(cout);
+    sys->displayParameters(cout);
 
     CMatrix 
-      hamiltonian (calculateMatrix(sys)), 
+      hamiltonian (calculateMatrix(*sys)), 
       eigenVectors(hamiltonian.copy()  );
 
     assert(!mathutils::fcmp(1-max(abs(hamiltonian.copy()-blitzplusplus::hermitianConjugate(hamiltonian))),1,1e-12));
@@ -99,7 +98,7 @@ int main(int argc, char* argv[])
     }
 
     for (int i=0; i<dim; i++) {
-      eigenStates.push_back(new StateVector2(sys.getDimensions()));
+      eigenStates.push_back(new StateVector2(sys->getDimensions()));
       eigenStates[i].vectorView()=eigenVectors(i,blitz::Range::all());
     }
 
@@ -128,9 +127,7 @@ int main(int argc, char* argv[])
 
     psi.renorm();
 
-    GeneralDicke<> gd(mode,spin,u,y);
-    BinarySystem<> sys(gd);
-
+    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
     
     MCWF traj(psi,eigenStates,sys,pe);
 
@@ -143,7 +140,7 @@ int main(int argc, char* argv[])
       for (pair<MCWF::Basis::const_iterator,DARRAY::const_iterator> i(eigenStates.begin(),eigenValues.begin()); 
 	   i.first!=eigenStates.end(); 
 	   ++i.first, ++i.second) {
-	os<<formdouble::high()(*i.second); Averaged::display(0,*i.first,os,pe.precision,&sys); os<<endl;
+	os<<formdouble::high()(*i.second); Averaged::display(0,*i.first,os,pe.precision,sys); os<<endl;
       }
 
     }

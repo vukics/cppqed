@@ -43,22 +43,3 @@ int main(int argc, char* argv[])
 	 pe);
 
 }
-
-
-/*
-  {
-
-    quantumdata::StateVector<3> psi(init(pmP)*init(pmM)*init(pp));
-
-    psi()=0;
-  
-    quantumdata::StateVector<3> dpsidt(psi.getDimensions());
-  
-    psi()(0,1,7)=1;
-
-    static_cast<structure::Hamiltonian<3>*>(&ptm)->addContribution(0,psi(),dpsidt(),0);
-
-    std::cout<<dpsidt();
-  
-  }
-*/
