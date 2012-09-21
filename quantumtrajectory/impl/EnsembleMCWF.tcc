@@ -34,7 +34,7 @@ template<int RANK>
 std::auto_ptr<typename Base<RANK>::Trajectories>
 trajectories(
 	     typename Base<RANK>::StateVectors& psis,
-	     const typename Base<RANK>::QuantumSystem& sys,
+	     typename Base<RANK>::QuantumSystemPtr qs,
 	     const ParsMCWF_Trajectory& p, 
 	     const typename Base<RANK>::StateVectorLow& scaleAbs
 	     )
@@ -48,7 +48,7 @@ trajectories(
 
   typename StateVectors::iterator i=psis.begin();
   for (size_t j=0; j<p.nTraj; (++i, j++, p.seed++))
-    res.push_back(new MCWF_Trajectory<RANK>(*i,sys,p,scaleAbs));
+    res.push_back(new MCWF_Trajectory<RANK>(*i,qs,p,scaleAbs));
 
   return res.release();
 }
@@ -60,13 +60,13 @@ trajectories(
 template<int RANK>
 Base<RANK>::Base(
 		 const StateVector& psi,
-		 const QuantumSystem& sys,
+		 QuantumSystemPtr qs,
 		 const ParsMCWF_Trajectory& p,
 		 const StateVectorLow& scaleAbs
 		 )
   : StateVectorsBase(details::stateVectors<RANK>(psi,p.nTraj)),
-    EnsembleTrajectories(details::trajectories<RANK>(StateVectorsBase::member,sys,p,scaleAbs),p.logLevel<0),
-    rho_(psi.getDimensions(),false)
+    EnsembleTrajectories(details::trajectories<RANK>(StateVectorsBase::member,qs,p,scaleAbs),p.logLevel<0),
+    rho_(psi.getDimensions(),false), qs_(qs)
 {
 }
 

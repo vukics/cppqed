@@ -77,7 +77,6 @@ public:
 
   virtual void                actWithJ     (double, StateVectorLow&, size_t   ) const = 0;
 
-private:    
   virtual const Probabilities probabilities(double, const LazyDensityOperator&) const = 0;
 
 };
@@ -92,11 +91,10 @@ public:
   typedef typename Liouvillean<RANK,true>::LazyDensityOperator LazyDensityOperator;
   typedef typename Liouvillean<RANK,true>::Probabilities       Probabilities      ;
 
-
-private:
   void                actWithJ     (double, StateVectorLow& psi, size_t jumpNo) const {actWithJ(psi,jumpNo);}
   const Probabilities probabilities(double, const LazyDensityOperator&  matrix) const {return probabilities(matrix);}
 
+private:
   virtual void                actWithJ     (StateVectorLow&, size_t   ) const = 0;
   virtual const Probabilities probabilities(const LazyDensityOperator&) const = 0;
 

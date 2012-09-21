@@ -76,8 +76,6 @@ void Composite<VA>::worker(const H& helper) const
 
 namespace composite {
 
-using structure::SubSystemFree;
-
 
 bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
 
@@ -159,7 +157,7 @@ template<typename VA>
 const RETURN_type
 Composite<VA>::fillFrees(const VA& acts)
 {
-  RETURN_type res; res=structure::SubSystemFree();
+  RETURN_type res; res=composite::SubSystemFree();
   boost::fusion::for_each(acts,composite::FillFrees<RANK>(res));
   return res;
 }
