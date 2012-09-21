@@ -315,7 +315,7 @@ public:
   ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
 
   template<typename Vec, typename Ex>
-  void help(const Ex*const ex, Vec v) const
+  void help(typename Ex::Ptr ex, Vec v) const
   {
     using namespace blitzplusplus::basi;
 
@@ -365,7 +365,7 @@ public:
     : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
 
   template<typename Vec, typename Ha>
-  void help(const Ha*const ha, Vec v) const
+  void help(typename Ha::Ptr ha, Vec v) const
   {
     using namespace blitzplusplus;
 
@@ -464,7 +464,7 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(typename Li::Ptr li, Vec v) const
   {
     iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne),v,defaultArray));    
   }
@@ -519,7 +519,7 @@ public:
   ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(typename Li::Ptr li, Vec v) const
   {
     using namespace blitzplusplus::basi;
 
@@ -662,7 +662,7 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Av>
-  void help(const Av*const av, Vec v) const
+  void help(typename Av::Ptr av, Vec v) const
   {
     iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne),v,defaultArray));
   }
@@ -720,7 +720,7 @@ public:
 
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
     if ((u_=l_+Av::nAvr(av))>l_) {
@@ -770,7 +770,7 @@ public:
     : frees_(frees), avr_(avr), os_(os), precision_(precision), l_(l), u_(u) {}
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
     if ((u_=l_+Av::nAvr(av))>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
