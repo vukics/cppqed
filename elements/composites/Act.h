@@ -4,6 +4,7 @@
 
 #include "SubSystem.h"
 
+#include "SmartPtr.h"
 #include "TMP_Tools.h"
 
 #include <boost/mpl/size.hpp>
@@ -18,10 +19,10 @@ class Act
     public BASE_class2
 {
 public:
-  typedef          BASE_class1              Vector     ;
-  typedef typename BASE_class2::Interaction Interaction;
+  typedef BASE_class1 Vector;
 
-  explicit Act(const Interaction& ia) : BASE_class2(&ia) {}
+  template<typename IA>
+  explicit Act(const IA& ia) : BASE_class2(cpputils::sharedPointerize(ia)) {}
 
 };
 
