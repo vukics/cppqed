@@ -77,11 +77,17 @@ template<int RANK>
 class QuantumSystemWrapper
 {
 public:
-  typedef typename QuantumSystem<RANK>::Ptr QuantumSystemPtr;
-  typedef typename Exact        <RANK>::Ptr ExactPtr;
-  typedef typename Hamiltonian  <RANK>::Ptr HamiltonianPtr;
-  typedef typename Liouvillean  <RANK>::Ptr LiouvilleanPtr;
-  typedef typename Averaged     <RANK>::Ptr AveragedPtr;
+  typedef QuantumSystem<RANK> QS;
+  typedef Exact        <RANK> Ex;
+  typedef Hamiltonian  <RANK> Ha;
+  typedef Liouvillean  <RANK> Li;
+  typedef Averaged     <RANK> Av;
+
+  typedef typename QS::Ptr QuantumSystemPtr;
+  typedef typename Ex::Ptr ExactPtr;
+  typedef typename Ha::Ptr HamiltonianPtr;
+  typedef typename Li::Ptr LiouvilleanPtr;
+  typedef typename Av::Ptr AveragedPtr;
 
   const QuantumSystemPtr getQS() const {return qs_;}
   const ExactPtr         getEx() const {return ex_;} 
