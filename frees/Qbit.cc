@@ -167,19 +167,19 @@ Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :
-    return Ptr(new PumpedLossyQbit   (p));
+    return make_shared<PumpedLossyQbit   >(p);
   case QMP_UIP :
-    return Ptr(new PumpedLossyQbitUIP(p));
+    return make_shared<PumpedLossyQbitUIP>(p);
   case QMP_SCH :
     ;
   }
-  return Ptr(new PumpedLossyQbitSch(p));
+  return make_shared<PumpedLossyQbitSch>(p);
 }
 
 
 const Tridiagonal sigmadagsigmaop()
 {
-  return mode::nop(boost::make_shared<QbitBase>());
+  return mode::nop(make_shared<QbitBase>());
 }
 
 
