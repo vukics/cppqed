@@ -86,30 +86,12 @@ int main(int argc, char* argv[])
 
   StateVector psi(psiML*mode::init(pplm));
 
-  evolve(psi,
-	 binary::make(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Atom",NL)),mode::make(pplm,QMP_IP),pmljc)),
-	 pe,
-	 tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >
+    (psi,
+     binary::make(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Atom",NL)),
+				     mode::make(pplm,QMP_IP),pmljc)),
+     pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 
 }
-
-
-/*
-
-Note that the following snippet yields undefined behaviour (clearly!)
-
-
-1. MLJC<NL,Couplings> mljc(*makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO(NL)),*mode::make(pplm,QMP_IP),gs);
-
-2. evolve(psi,BinarySystem(mljc),pe);
-
-
-In Line 1 TEMPORARY Ptrs are created with the maker functions and
-are COPIED into mljc::Interaction as plain ptrs. "Between" Lines 1 and
-2 the Ptrs are destructed and the ptrs deleted. So, they become
-dangling ptrs in mljc!
-
-
-*/

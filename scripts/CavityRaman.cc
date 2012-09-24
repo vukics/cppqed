@@ -53,10 +53,9 @@ int main(int argc, char* argv[])
 
   MLJC<NL,Couplings> mljc(plml,mode,pmljc);
 
-  evolve(psi,
-	 binary::make(mljc),
-	 pe,
-	 tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >(psi,
+			       binary::make(mljc),
+			       pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

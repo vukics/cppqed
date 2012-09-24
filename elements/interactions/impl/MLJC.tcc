@@ -26,11 +26,11 @@ namespace mljc {
 template<int NL, typename VC> template<int N1, int N2>
 struct Base<NL,VC>::ModeDynamics : public tmptools::pair_c<N1,N2>
 {
-  ModeDynamics(const MultiLevelBase<NL>& ml, const ModeBase& mode, const dcomp& g)
-    : a      (-g*mode::aop(&mode)),
-      adagger((g*mode::aop(&mode)).dagger())
+  ModeDynamics(MultiLevelPtr ml, mode::Ptr mode, const dcomp& g)
+    : a      (-g*mode::aop(mode)),
+      adagger((g*mode::aop(mode)).dagger())
   {
-    if (dynamic_cast<const multilevel::Exact<NL>*>(&ml)) throw multilevel::MultiLevelExactNotImplementedException();
+    if (dynamic_cast<const multilevel::Exact<NL>*>(ml.get())) throw multilevel::MultiLevelExactNotImplementedException();
   }
 
   mutable Tridiagonal a, adagger;
@@ -63,11 +63,11 @@ complexFreqs(const VP& etas)
 
 
 template<int NL, typename VC>
-Base<NL,VC>::Base(const MultiLevelBase<NL>* ml, const ModeBase* mode, const VC& gs) 
+Base<NL,VC>::Base(MultiLevelPtr ml, mode::Ptr mode, const VC& gs) 
   : structure::Interaction<2>(Frees(ml,mode),
 			      structure::DynamicsBase::RealFreqs(),
 			      complexFreqs(gs)), 
-    mds_(boost::fusion::transform(gs,CouplingToModeDynamics(*ml,*mode)))
+    mds_(boost::fusion::transform(gs,CouplingToModeDynamics(ml,mode)))
 {
   getParsStream()<<"# Multi-Level Jaynes-Cummings\n";
 }
