@@ -13,6 +13,7 @@
 #include "Particle_.h"
 
 #include "Exception.h"
+#include "SmartPtr.h"
 
 #include <boost/utility.hpp>
 
@@ -101,8 +102,9 @@ class ParticleOrthogonalToCavity
 public:
   typedef particlecavity::POC_Base Base;
 
-  ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsOrthogonal& p)
-    : Base(mode,part,p.uNot) {}
+  template<typename MODE, typename PUMPED_PART>
+  ParticleOrthogonalToCavity(const MODE& mode, const PUMPED_PART& part, const particlecavity::ParsOrthogonal& p)
+    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot) {}
 
 };
 
@@ -114,12 +116,20 @@ class ParticleAlongCavity
 public:
   typedef particlecavity::PAC_Base Base;
 
-  ParticleAlongCavity(mode::Ptr mode, particle::Ptr part, const particlecavity::ParsAlong& p, double etaeff=0)
-    : Base(mode,part,p.uNot,p.kCav,p.modeCav,etaeff) {}
+  template<typename MODE, typename PART>
+  ParticleAlongCavity(const MODE& mode, const PART& part, const particlecavity::ParsAlong& p, double etaeff=0)
+    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,etaeff) {}
 
-  // The following two describe the case when there is an additional fixed standing wave ALONG the cavity
-  ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
-    : Base(mode,part,p.uNot,p.kCav,p.modeCav,part->getV_Class()) {}
+  // The following two describe the case when there is an additional fixed standing wave ALONG the cavity, in which case PUMPEDPART must be derived from PumpedParticleBase
+  // We write two constructors to avoid ambiguity with the previous one
+
+  template<typename MODE>
+  ParticleAlongCavity(const MODE& mode, const PumpedParticleBase& part, const particlecavity::ParsAlong& p)
+    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,part.getV_Class()) {}
+
+  template<typename MODE>
+  ParticleAlongCavity(const MODE& mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
+    : Base(cpputils::sharedPointerize(mode),part,p.uNot,p.kCav,p.modeCav,part->getV_Class()) {}
 
 
 };

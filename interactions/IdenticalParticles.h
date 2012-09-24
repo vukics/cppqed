@@ -17,10 +17,11 @@ public:
   typedef structure::Interaction<NP> Base;
   typedef typename Base::Frees Particles;
 
-  IdenticalParticles(const ParticleBase& part) : Base(ctorHelper(part)) {}
+  IdenticalParticles(const ParticleBase& part) : Base(ctorHelper(cpputils::sharedPointerize(part))) {}
+  IdenticalParticles(particle::Ptr       part) : Base(ctorHelper                           (part) ) {}
 
 private:
-  static const Particles ctorHelper(const ParticleBase& part) {Particles res; res=&part; return res;}
+  static const Particles ctorHelper(particle::Ptr part) {Particles res; res=part; return res;}
 
 };
 
