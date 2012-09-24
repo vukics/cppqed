@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   */
   psi.renorm();
 
-  evolve(psi,binary::make(jc),pe,tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >(psi,binary::make(jc),pe);
 
 
   // The 3 further ways to create a JaynesCummings:

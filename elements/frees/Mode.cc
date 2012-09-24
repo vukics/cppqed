@@ -1,4 +1,4 @@
-#include "Mode_.h"
+#include "impl/Mode.tcc"
 
 #include "ParsMode.h"
 
@@ -17,6 +17,16 @@ using namespace mathutils;
 
 
 namespace mode {
+
+#define MAKE_redirect return make<Averaged>(p,qmp)
+
+const Ptr make(const Pars           & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsLossy      & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsPumped     & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp) {MAKE_redirect ;}
+
+#undef MAKE_redirect
+
 
 const Tridiagonal aop(size_t);
 

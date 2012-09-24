@@ -8,6 +8,8 @@
 #include "impl/TridiagonalHamiltonian.tcc"
 
 #include <boost/assign.hpp>
+#include <boost/make_shared.hpp>
+
 
 namespace mode {
 
@@ -23,10 +25,11 @@ struct ParsBichromatic : ParsPumpedLossy
 template<typename A>
 const Ptr make(const ParsBichromatic& p, QM_Picture qmp, const A& a)
 {
+  using boost::make_shared;
   if (!isNonZero(p.etaOther)) return make(static_cast<const ParsPumpedLossy&>(p),qmp,a);
   else {
-    if (p.nTh) {return Ptr(new BichromaticMode<true ,A>(p,a));}
-    else       {return Ptr(new BichromaticMode<false,A>(p,a));}
+    if (p.nTh) {return make_shared<BichromaticMode<true ,A> >(p,a);}
+    else       {return make_shared<BichromaticMode<false,A> >(p,a);}
   }
 }
 

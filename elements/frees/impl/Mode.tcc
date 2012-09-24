@@ -4,20 +4,24 @@
 
 #include "Mode_.h"
 
-#include<boost/assign/list_of.hpp>
-#include<boost/assign/std/list.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/assign/std/list.hpp>
+
+#include <boost/make_shared.hpp>
+
 
 namespace mode {
 
 
 #define TEMPLATE_PARAM_TEMP(temp) temp,A
 #define SWITCH_helper(name,templateParam)				\
+  using boost::make_shared;                                             \
   switch (qmp) {							\
-  case QMP_IP  : return Ptr(new name##Mode<templateParam>(p,a));	\
-  case QMP_UIP : return Ptr(new name##ModeUIP<templateParam>(p,a));\
+  case QMP_IP  : return make_shared<name##Mode   <templateParam> >(p,a); \
+  case QMP_UIP : return make_shared<name##ModeUIP<templateParam> >(p,a); \
   case QMP_SCH : ;							\
   }									\
-  return Ptr(new name##ModeSch<templateParam>(p,a));
+  return make_shared<name##ModeSch<templateParam> >(p,a);
 
 
 template<typename A>

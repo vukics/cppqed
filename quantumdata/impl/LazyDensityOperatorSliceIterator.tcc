@@ -13,6 +13,8 @@
 #include "impl/BlitzTinyExtensions.tcc"
 #include "Functional.h"
 
+#include <boost/make_shared.hpp>
+
 
 namespace quantumdata {
 
@@ -58,6 +60,7 @@ public:
   const LDO_Ptr dispatch(const LDO& ldo)
   {
     using blitzplusplus::basi::Transposer;
+    using boost::make_shared;
 
     typedef StateVector    <RANK> SV;
     typedef DensityOperator<RANK> DO;
@@ -65,11 +68,11 @@ public:
     if      (const SV*const sV=dynamic_cast<const SV*>(&ldo)) {
       typename SV::StateVectorLow temp(sV->operator()()); 
       // We do not want to transpose that StateVectorLow which is the storage of sV.
-      return LDO_Ptr(new SV(Transposer<RANK,V>::transpose(temp),byReference));
+      return make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
     }
     else if (const DO*const dO=dynamic_cast<const DO*>(&ldo)) {
       typename DO::DensityOperatorLow temp(dO->operator()());
-      return LDO_Ptr(new DO(Transposer<2*RANK,typename ExtendV<RANK,V>::type>::transpose(temp),byReference));
+      return make_shared<DO>(Transposer<2*RANK,typename ExtendV<RANK,V>::type>::transpose(temp),byReference);
     }
     else throw NoSuchImplementation();
   }
@@ -273,13 +276,15 @@ typename DiagonalIterator<RANK,V>::Impl
 makeDI_Impl(const LazyDensityOperator<RANK>& ldo, mpl::false_)
 // The last argument governing whether the special implementation is needed.
 {
+  using boost::make_shared;
+
   static const mpl::bool_<IS_END> isEnd=mpl::bool_<IS_END>();
   typedef typename DiagonalIterator<RANK,V>::Impl DI_ImplPtr;
 
   if      (const StateVector    <RANK>*const stateVector    =dynamic_cast<const StateVector    <RANK>*>(&ldo))
-    return DI_ImplPtr(new DI_SV_Impl<RANK,V>(*stateVector    ,isEnd));
+    return make_shared<DI_SV_Impl<RANK,V> >(*stateVector    ,isEnd);
   else if (const DensityOperator<RANK>*const densityOperator=dynamic_cast<const DensityOperator<RANK>*>(&ldo))
-    return DI_ImplPtr(new DI_DO_Impl<RANK,V>(*densityOperator,isEnd));
+    return make_shared<DI_DO_Impl<RANK,V> >(*densityOperator,isEnd);
   else
     throw NoSuchImplementation();
   
@@ -294,7 +299,7 @@ makeDI_Impl(const LazyDensityOperator<RANK>& ldo, mpl::true_)
   static const mpl::bool_<IS_END> isEnd=mpl::bool_<IS_END>();
   typedef typename DiagonalIterator<RANK,V>::Impl DI_ImplPtr;
 
-  return DI_ImplPtr(new DI_ImplSpecial<V>(ldo,isEnd));
+  return boost::make_shared<DI_ImplSpecial<V> >(ldo,isEnd);
 
 }
 
