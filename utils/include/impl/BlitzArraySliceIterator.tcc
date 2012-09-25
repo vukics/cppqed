@@ -279,9 +279,6 @@ SlicesData<RANK,V>::SlicesData(const CArray& array)
 }
 
 
-template<int Rank, typename V>
-const V SlicesData<Rank,V>::v_ = V();
-
 namespace basi_fast {
 
 namespace details {
