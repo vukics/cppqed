@@ -1,4 +1,4 @@
-#include "Mode_.h"
+#include "impl/Mode.tcc"
 
 #include "ParsMode.h"
 
@@ -17,6 +17,16 @@ using namespace mathutils;
 
 
 namespace mode {
+
+#define MAKE_redirect return make<Averaged>(p,qmp)
+
+const Ptr make(const Pars           & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsLossy      & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsPumped     & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp) {MAKE_redirect ;}
+
+#undef MAKE_redirect
+
 
 const Tridiagonal aop(size_t);
 
@@ -322,17 +332,17 @@ const Tridiagonal aop(size_t dim)
 
 // This returns a Tridiagonal furnished with frequencies, when mode is derived from mode::Exact
 
-const Tridiagonal aop(const ModeBase* mode)
+const Tridiagonal aop(Ptr mode)
 {
   size_t dim=mode->getDimension();
   Tridiagonal res(aop(dim));
-  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode)) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
+  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode.get())) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
   return res;
 }
 
 
 
-const Tridiagonal nop(const ModeBase* mode)
+const Tridiagonal nop(Ptr mode)
 {
   return Tridiagonal(mainDiagonal(1.,mode->getDimension()));
 }

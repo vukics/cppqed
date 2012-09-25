@@ -22,6 +22,8 @@ struct Pars
 {
   dcomp& g;
 
+  operator dcomp&() const {return g;}
+
   Pars(parameters::ParameterTable&, const std::string& ="");
 
 };
@@ -33,7 +35,7 @@ protected:
   typedef structure::Interaction<2> IA_Base;
   typedef structure::TridiagonalHamiltonian<2,true> TDH_Base;
 
-  Base(const QbitBase*, const ModeBase*, const dcomp& g);
+  Base(qbit::Ptr, mode::Ptr, const dcomp& g);
 
 };
 
@@ -43,8 +45,8 @@ protected:
 
 #define BIG_NAMESPACE_NAME             jaynescummings
 #define BIG_CLASS_NAME                 JaynesCummings
-#define BIG_ADDITIONAL_PARAMETERS      , const jaynescummings::Pars& p
-#define BIG_ADDITIONAL_PARAMETERS_PASS ,p.g
+#define BIG_ADDITIONAL_PARAMETERS      , const dcomp& g
+#define BIG_ADDITIONAL_PARAMETERS_PASS ,g
 
 #include "details/BinaryInteractionGenerator.h"
 

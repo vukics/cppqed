@@ -7,21 +7,28 @@
 #include "QuantumSystem.h"
 #include "SubSystem.h"
 
-#include <boost/shared_ptr.hpp>
+#include "SmartPtr.h"
+
 
 namespace binary {
 
 
-typedef boost::shared_ptr<const Base> SmartPtr;
+typedef boost::shared_ptr<const Base> Ptr;
 
 typedef structure::Interaction<2> Interaction;
 
 
-const SmartPtr make(const Interaction&);
+const Ptr doMake(Interaction::Ptr);
+
+template<typename IA>
+const Ptr make(const IA& ia)
+{
+  return doMake(cpputils::sharedPointerize(ia));
+}
 
 
-typedef structure::SubSystemFree            SSF;
-typedef structure::SubSystemsInteraction<2> SSI;
+typedef composite::SubSystemFree            SSF;
+typedef composite::SubSystemsInteraction<2> SSI;
 
 
 
@@ -33,13 +40,12 @@ public:
   typedef structure::Averaged<1> Av1;
   typedef structure::Averaged<2> Av2;
 
-  Base(const Interaction&);
+  Base(Interaction::Ptr);
 
   const SSF& getFree0() const {return free0_;}
   const SSF& getFree1() const {return free1_;}
   const SSI& getIA   () const {return    ia_;}
 
-private:
   double highestFrequency (             ) const;
   void   displayParameters(std::ostream&) const;
 
@@ -50,6 +56,7 @@ private:
   void           process(Averages&)                           const;
   void           display(const Averages&, std::ostream&, int) const;
 
+private:
   const SSF free0_, free1_;
 
   const SSI ia_;
@@ -136,7 +143,7 @@ public:
   
   typedef structure::Interaction<2> Interaction;
 
-  BinarySystem(const Interaction&);
+  BinarySystem(Interaction::Ptr);
 
 };
 

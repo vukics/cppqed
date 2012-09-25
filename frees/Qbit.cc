@@ -3,9 +3,10 @@
 #include "ParsQbit.h"
 #include "impl/StateVector.tcc"
 
-#include<boost/assign/list_of.hpp>
+#include <boost/assign/list_of.hpp>
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
+#include <boost/make_shared.hpp>
 
 
 using namespace std;
@@ -162,24 +163,23 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
 namespace qbit {
 
 
-SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp)
+Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :
-    return SmartPtr(new PumpedLossyQbit   (p));
+    return make_shared<PumpedLossyQbit   >(p);
   case QMP_UIP :
-    return SmartPtr(new PumpedLossyQbitUIP(p));
+    return make_shared<PumpedLossyQbitUIP>(p);
   case QMP_SCH :
     ;
   }
-  return SmartPtr(new PumpedLossyQbitSch(p));
+  return make_shared<PumpedLossyQbitSch>(p);
 }
 
 
 const Tridiagonal sigmadagsigmaop()
 {
-  QbitBase dummie;
-  return mode::nop(&dummie);
+  return mode::nop(make_shared<QbitBase>());
 }
 
 

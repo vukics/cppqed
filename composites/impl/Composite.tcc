@@ -76,8 +76,6 @@ void Composite<VA>::worker(const H& helper) const
 
 namespace composite {
 
-using structure::SubSystemFree;
-
 
 bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
 
@@ -159,7 +157,7 @@ template<typename VA>
 const RETURN_type
 Composite<VA>::fillFrees(const VA& acts)
 {
-  RETURN_type res; res=structure::SubSystemFree();
+  RETURN_type res; res=composite::SubSystemFree();
   boost::fusion::for_each(acts,composite::FillFrees<RANK>(res));
   return res;
 }
@@ -317,23 +315,21 @@ public:
   ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
 
   template<typename Vec, typename Ex>
-  void help(const Ex*const ex, Vec v) const
+  void help(typename Ex::Ptr ex) const
   {
-    using namespace blitzplusplus::basi;
-
-    if (ex) boost::for_each(fullRange(psi_,v),bind(&Ex::actWithU,ex,dtdid_,_1));
+    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Ex::actWithU,ex,dtdid_,_1));
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getEx(),act);
+    help<Act,typename Act::Ex>(act.getEx());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getEx(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Ex>(frees_(IDX).getEx());
   }
 
 
@@ -367,25 +363,24 @@ public:
     : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
 
   template<typename Vec, typename Ha>
-  void help(const Ha*const ha, Vec v) const
+  void help(typename Ha::Ptr ha) const
   {
-    using namespace blitzplusplus;
-
     if (ha) 
-      cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),
-		      bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+      cpputils::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),
+			 blitzplusplus::basi::begin<Vec>(dpsidt_),
+			 bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getHa(),act);
+    help<Act,typename Act::Ha>(act.getHa());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getHa(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Ha>(frees_(IDX).getHa());
   }
 
 private:
@@ -466,21 +461,21 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(typename Li::Ptr li) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne),v,defaultArray));    
+    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne)));    
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getLi(),act);
+    help<Act,typename Act::Li>(act.getLi());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getLi(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Li>(frees_(IDX).getLi());
   }
 
 private:
@@ -521,14 +516,12 @@ public:
   ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(typename Li::Ptr li) const
   {
-    using namespace blitzplusplus::basi;
-
     if (!flag_ && li) {
       size_t n=Li::nJumps(li);
       if (ordoJump_<n) {
-	boost::for_each(fullRange(psi_,v),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
+	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
 	flag_=true;
       }
       ordoJump_-=n;  
@@ -538,13 +531,13 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getLi(),act);
+    help<Act,typename Act::Li>(act.getLi());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getLi(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Li>(frees_(IDX).getLi());
   }
 
 private:
@@ -664,21 +657,21 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Av>
-  void help(const Av*const av, Vec v) const
+  void help(typename Av::Ptr av) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne),v,defaultArray));
+    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne)));
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getAv(),act);
+    help<Act,typename Act::Av>(act.getAv());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getAv(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Av>(frees_(IDX).getAv());
   }
 
 private:
@@ -722,7 +715,7 @@ public:
 
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
     if ((u_=l_+Av::nAvr(av))>l_) {
@@ -735,13 +728,13 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getAv());
+    help<typename Act::Av>(act.getAv());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getAv());
+    help<composite::SubSystemFree::Av>(frees_(IDX).getAv());
   }
 
 private:
@@ -772,7 +765,7 @@ public:
     : frees_(frees), avr_(avr), os_(os), precision_(precision), l_(l), u_(u) {}
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
     if ((u_=l_+Av::nAvr(av))>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
@@ -782,13 +775,13 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getAv());
+    help<typename Act::Av>(act.getAv());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getAv());
+    help<composite::SubSystemFree::Av>(frees_(IDX).getAv());
   }
 
 private:

@@ -9,9 +9,7 @@
 
 #include "Interaction.h"
 
-#include "details/DispatchFreeType.h"
-
-#include<boost/fusion/algorithm/transformation/transform.hpp>
+#include <boost/fusion/algorithm/transformation/transform.hpp>
 
 
 template<int N1, int N2>
@@ -34,7 +32,9 @@ class Base : public structure::Interaction<2>, public structure::Hamiltonian<2>
 public:
   typedef mode::Tridiagonal Tridiagonal;
 
-  Base(const MultiLevelBase<NL>*, const ModeBase*, const VC&);
+  typedef typename MultiLevelBase<NL>::Ptr MultiLevelPtr;
+
+  Base(MultiLevelPtr, mode::Ptr, const VC&);
 
 private:
   class ElementaryCoupling;
@@ -48,7 +48,7 @@ private:
   class CouplingToModeDynamics
   {
   public:
-    CouplingToModeDynamics(const MultiLevelBase<NL>& ml, const ModeBase& mode) : ml_(ml), mode_(mode) {}
+    CouplingToModeDynamics(MultiLevelPtr ml, mode::Ptr mode) : ml_(ml), mode_(mode) {}
     
     template<typename> struct result;
 
@@ -63,8 +63,8 @@ private:
     }
     
   private:
-    const MultiLevelBase<NL>& ml_  ;
-    const ModeBase&           mode_;
+    const MultiLevelPtr ml_  ;
+    const mode::Ptr     mode_;
     
   };
 
@@ -89,7 +89,7 @@ public:
 
   template<typename MLB, typename MB>
   MLJC(const MLB& ml, const MB& m, const mljc::Pars<VC>& p)
-    : Base(dispatchFreeType(ml),dispatchFreeType(m),p.gs) {}
+    : Base(cpputils::sharedPointerize(ml),cpputils::sharedPointerize(m),p.gs) {}
 };
 
 
