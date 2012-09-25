@@ -21,7 +21,7 @@ void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v,
   quantumdata::StateVector<RANK> psi(sys.getDimensions());
 
   {
-    Randomized::SmartPtr Ran(MakerGSL()(1001));
+    Randomized::Ptr Ran(MakerGSL()(1001));
     boost::generate(psi(),bind(&Randomized::dcompRan,Ran));
   }
 

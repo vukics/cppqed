@@ -34,8 +34,8 @@ int main(int argc, char* argv[])
 
   if ((pe.evol==EM_MASTER /* || pe.evol==EM_convergence */) && qmp==QMP_IP) qmp=QMP_UIP;
 
-  qbit::SmartPtr qbit(qbit::make(pplqb,qmp));
-  mode::SmartPtr mode(mode::make(pplm ,qmp));
+  qbit::Ptr qbit(qbit::make(pplqb,qmp));
+  mode::Ptr mode(mode::make(pplm ,qmp));
 
   JaynesCummings<> jc(qbit,mode,pjc);
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   */
   psi.renorm();
 
-  evolve(psi,binary::make(jc),pe,tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >(psi,binary::make(jc),pe);
 
 
   // The 3 further ways to create a JaynesCummings:

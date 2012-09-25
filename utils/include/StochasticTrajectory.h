@@ -70,7 +70,7 @@ public:
   virtual ~StochasticTrajectory() {}
 
 protected:
-  typedef randomized::Randomized::SmartPtr RandomizedSmartPtr;
+  typedef randomized::Randomized::Ptr RandomizedPtr;
 
   StochasticTrajectory(A&, typename Evolved::Derivs, double dtInit, 
 		       double epsRel, double epsAbs, const A& scaleAbs, 
@@ -84,14 +84,14 @@ protected:
 		       const evolved::Maker<A>&,
 		       const randomized::Maker&);
 
-  const RandomizedSmartPtr getRandomized() const {return randomized_;}
+  const RandomizedPtr getRandomized() const {return randomized_;}
   bool                     noise        () const {return isNoisy_   ;}
 
 private:
   const unsigned long seed_ ;
   const bool          isNoisy_;
 
-  RandomizedSmartPtr randomized_;
+  RandomizedPtr randomized_;
 
 };
 
@@ -162,9 +162,9 @@ public:
   const Impl& getTrajs() const {return trajs_;}
 
 protected:
-  typedef std::auto_ptr<Impl> SmartPtr;
+  typedef std::auto_ptr<Impl> Ptr;
   
-  EnsembleTrajectories(SmartPtr trajs, bool log) : trajs_(trajs), log_(log) {}
+  EnsembleTrajectories(Ptr trajs, bool log) : trajs_(trajs), log_(log) {}
 
 private:
   double getDtDid() const;

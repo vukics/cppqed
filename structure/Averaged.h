@@ -27,16 +27,18 @@ namespace structure {
 class AveragedCommon : public LiouvilleanAveragedCommon
 {
 public:
+  typedef boost::shared_ptr<const AveragedCommon> Ptr;
+
   typedef DArray1D Averages;
 
 
-  static size_t nAvr(const AveragedCommon* averagedCommon)
+  static size_t nAvr(Ptr averagedCommon)
   {
     return averagedCommon ? averagedCommon->nAvr() : 0;
   }
 
 
-  static void process(Averages& averages, const AveragedCommon* averagedCommon) 
+  static void process(Averages& averages, Ptr averagedCommon) 
   {
     if (averagedCommon) averagedCommon->process(averages);
   }
@@ -72,6 +74,8 @@ class Averaged<RANK,true>
   : public quantumdata::Types<RANK,AveragedCommon>
 {
 public:
+  typedef boost::shared_ptr<const Averaged> Ptr;
+
   typedef quantumdata::Types<RANK,AveragedCommon> Base;
 
   typedef AveragedCommon::Averages Averages;
@@ -80,13 +84,13 @@ public:
 
   using Base::display;
 
-  static const Averages average(double t, const LazyDensityOperator& matrix, const Averaged* averaged, StaticTag=theStaticOne)
+  static const Averages average(double t, const LazyDensityOperator& matrix, Ptr averaged, StaticTag=theStaticOne)
   {
     return averaged ? averaged->average(t,matrix) : Averages();
   }
 
 
-  static void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision, const Averaged* averaged, StaticTag=theStaticOne)
+  static void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision, Ptr averaged, StaticTag=theStaticOne)
   {
     if (averaged) {
       Averages averages(averaged->average(t,matrix));
@@ -135,26 +139,26 @@ public:
   typedef typename Averaged<RANKFROM,IS_TD>::Averages            Averages           ;
   typedef typename Averaged<RANKFROM,IS_TD>::LazyDensityOperator LazyDensityOperator;
 
-  typedef Averaged<RANKTO,IS_TD> AveragedTo;
+  typedef typename Averaged<RANKTO,IS_TD>::Ptr AveragedToPtr;
   typedef quantumdata::LazyDensityOperator<RANKTO> LazyDensityOperatorTo;
 
-  Transferring(const AveragedTo& averaged, const LazyDensityOperatorTo& ldo)
+  Transferring(AveragedToPtr averaged, const LazyDensityOperatorTo& ldo)
     : averaged_(averaged), ldo_(ldo) {}
 
-  void process(Averages& averages) const {averaged_.process(averages);}
+  void process(Averages& averages) const {averaged_->process(averages);}
 
-  void display(const Averages& averages, std::ostream& os, int n) const {averaged_.display(averages,os,n);}
+  void display(const Averages& averages, std::ostream& os, int n) const {averaged_->display(averages,os,n);}
 
-  void displayKey(std::ostream& os, size_t& n) const {averaged_.displayKey(os,n);}
+  void displayKey(std::ostream& os, size_t& n) const {averaged_->displayKey(os,n);}
 
-  size_t nAvr() const {return averaged_.nAvr();}
+  size_t nAvr() const {return averaged_->nAvr();}
 
-  const Averages average(double time, const LazyDensityOperator&) const {return averaged_.average(time,ldo_);}
+  const Averages average(double time, const LazyDensityOperator&) const {return averaged_->average(time,ldo_);}
 
-  const Averages average(const LazyDensityOperator&) const {return averaged_.average(ldo_);}
+  const Averages average(const LazyDensityOperator&) const {return averaged_->average(ldo_);}
 
 private:
-  const AveragedTo& averaged_;
+  const AveragedToPtr averaged_;
   const LazyDensityOperatorTo& ldo_;
 
 };

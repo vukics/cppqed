@@ -41,36 +41,18 @@ int main(int argc, char* argv[])
 
   if (conf!=1) pplm.delta-=ppci.uNot/(isComplex(ppci.modeCav) ? 1. : 2.);
 
-  mode::SmartPtr mode(mode::make(pplm,qmp));
-
-  Particle    particle   (ppp);
-  ParticleSch particleSch(ppp);
-
-  PumpedParticle    pumpedparticle   (ppp);
-  PumpedParticleSch pumpedparticleSch(ppp);
+  mode::Ptr mode(mode::make(pplm,qmp));
 
 
-  ParticleBase& particleBase=(
-			      qmp==QMP_SCH 
-			      ? 
-			      static_cast<ParticleBase&>(particleSch) 
-			      : 
-			      static_cast<ParticleBase&>(particle   )
-			      );
+  particle::Ptr particle(make(ppp,qmp));
 
-  PumpedParticleBase& pumpedparticleBase=(
-					  qmp==QMP_SCH 
-					  ? 
-					  static_cast<PumpedParticleBase&>(pumpedparticleSch) 
-					  : 
-					  static_cast<PumpedParticleBase&>(pumpedparticle   )
-					  );
+  particle::PtrPumped pumpedparticle(makePumped(ppp,qmp));
 
   particlecavity::Base* particlecavityBase;
   switch (conf) {
   case 1:
     // Pumped particle moving orthogonal to (pumped) cavity
-    particlecavityBase=new ParticleOrthogonalToCavity(*mode.get(),pumpedparticleBase,ppci);
+    particlecavityBase=new ParticleOrthogonalToCavity(mode,pumpedparticle,ppci);
     break;
   case 2:
     // (Pumped) particle moving along cavity. 
@@ -78,18 +60,18 @@ int main(int argc, char* argv[])
     // Cavity pumped + atom scatters from atomic pump into cavity.
     if (!abs(pplm.eta) && !ppp.vClass) {cerr<<"No driving in the system!"<<endl; return 1;}
     if (!ppp.init.getSig()) {cerr<<"No initial spread specified!"<<endl; return 1;}
-    particlecavityBase=new ParticleAlongCavity(*mode.get(),particleBase,ppci,ppp.vClass);
+    particlecavityBase=new ParticleAlongCavity(mode,particle,ppci,ppp.vClass);
     break;
   case 3:
     // Pumped particle moving along cavity. 
     // Atomic pump aligned along cavity -> atomic moves in additional classical potential. 
     // Cavity pumped + atom scatters from atomic pump into cavity.
-    particlecavityBase=new ParticleAlongCavity(*mode.get(),pumpedparticleBase,ppci);
+    particlecavityBase=new ParticleAlongCavity(mode,pumpedparticle,ppci);
     break;
   case 4:
     // Same as case 3, but atom doesn't scatter from atomic pump to cavity.
     // -> Atomic pump merely a classical potential.
-    particlecavityBase=new ParticleAlongCavity(*mode.get(),pumpedparticleBase,ppci,0);
+    particlecavityBase=new ParticleAlongCavity(mode,pumpedparticle,ppci,0);
     break;
   default:
     cerr<<"Configuration not recognized!"<<endl; 
@@ -112,7 +94,7 @@ int main(int argc, char* argv[])
   psi.renorm();
 
 
-  evolve(psi,binary::make(*particlecavityBase),pe,tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >(psi,binary::make(*particlecavityBase),pe);
 
 
   /*

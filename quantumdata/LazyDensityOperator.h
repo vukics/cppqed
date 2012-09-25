@@ -18,9 +18,9 @@ namespace quantumdata {
 
 
 
-template<int RANK, typename F, typename V, typename T>
+template<typename V, typename T, int RANK, typename F>
 const T
-partialTrace(const LazyDensityOperator<RANK>&, F, V, T);
+partialTrace(const LazyDensityOperator<RANK>&, F);
 
 
 /*
@@ -57,10 +57,10 @@ public:
   // iterator
   
   template<typename V>
-  const ldo::DiagonalIterator<RANK,V> begin(V) const;
+  const ldo::DiagonalIterator<RANK,V> begin() const;
 
   template<typename V>
-  const ldo::DiagonalIterator<RANK,V> end  (V) const;
+  const ldo::DiagonalIterator<RANK,V> end  () const;
 
 protected:
   LazyDensityOperator(const Dimensions& dims) : Base(dims) {}

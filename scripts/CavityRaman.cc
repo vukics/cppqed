@@ -47,16 +47,15 @@ int main(int argc, char* argv[])
 
   StateVector psi(psiML*mode::init(pplm)); psi.renorm();
 
-  MultiLevelBase<NL>::SmartPtr plml(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Lambda atom",NL)));
+  MultiLevelBase<NL>::Ptr plml(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Lambda atom",NL)));
 
-  mode::SmartPtr mode(mode::make(pplm,QMP_IP));
+  mode::Ptr mode(mode::make(pplm,QMP_IP));
 
   MLJC<NL,Couplings> mljc(plml,mode,pmljc);
 
-  evolve(psi,
-	 binary::make(mljc),
-	 pe,
-	 tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >(psi,
+			       binary::make(mljc),
+			       pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

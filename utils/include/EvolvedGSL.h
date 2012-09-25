@@ -23,12 +23,12 @@ template<typename A>
 class MakerGSL : public Maker<A>
 {
 public:
-  typedef typename Maker<A>::SmartPtr SmartPtr;
+  typedef typename Maker<A>::Ptr Ptr;
   typedef typename Maker<A>::Derivs   Derivs  ;
 
   MakerGSL(SteppingFunction sf=SF_RKCK, double nextDtTryCorretionFactor=100.) : sf_(sf), nextDtTryCorretionFactor_(nextDtTryCorretionFactor) {}
 
-  const SmartPtr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
+  const Ptr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
 
 private:
   const SteppingFunction sf_;
@@ -47,15 +47,15 @@ namespace details  {
 //
 ///////////////////////
 
-typedef boost::shared_ptr<Impl> ImplSmartPtr;
+typedef boost::shared_ptr<Impl> ImplPtr;
 
 // Two indirections needed because cannot declare member functions for Impl here
 
-ImplSmartPtr createImpl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*, SteppingFunction);
+ImplPtr createImpl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*, SteppingFunction);
 
-void apply(ImplSmartPtr, double*, double, double*, double*);
+void apply(ImplPtr, double*, double, double*, double*);
 
-size_t extractFailedSteps(ImplSmartPtr);
+size_t extractFailedSteps(ImplPtr);
 
 extern const int onSuccess;
 
@@ -97,7 +97,7 @@ private:
 
   size_t reportNFailedSteps() const {return extractFailedSteps(pImpl_);}
 
-  const ImplSmartPtr pImpl_;
+  const ImplPtr pImpl_;
 
   const SteppingFunction sf_;
   const double nextDtTryCorretionFactor_;

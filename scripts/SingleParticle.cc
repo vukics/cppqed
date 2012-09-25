@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
   // if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
-  SmartPtr part(make(ppart,qmp));
+  Ptr part(make(ppart,qmp));
 
   if (!ppart.init.getSig() && !ppart.vClass) {cerr<<"Incorrect initial condition"<<endl; abort();}
 

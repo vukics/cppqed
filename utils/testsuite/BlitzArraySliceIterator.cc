@@ -140,8 +140,7 @@ BOOST_AUTO_TEST_CASE( ExampleFromManual )
 
   TTD_CARRAY(RANK) psi;
 
-  tmptools::Vector<3,6,1,9,7> v;
-  boost::for_each(blitzplusplus::basi::fullRange(psi,v),actWithA);
+  boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<3,6,1,9,7> >(psi),actWithA);
 }
 
 void actWithA(TTD_CARRAY(5)&) {}
@@ -158,10 +157,10 @@ TTD_CARRAY(11) array1(5,4,5,4,5,4,5,4,5,4,5), array2(array1.shape()), arrayRes(a
 
 struct Helper
 {
-  template<typename V> void operator()(V v)
+  template<typename V> void operator()(V)
   {
     PROGRESS_TIMER_IN_POINT(cout);
-    for (int i=nRepetition; i; --i) cpputils::for_each(fullRange(array1,v),basi::begin(array2,v),bll::_1*=bll::_2); 
+    for (int i=nRepetition; i; --i) cpputils::for_each(fullRange<V>(array1),basi::begin<V>(array2),bll::_1*=bll::_2); 
     cout<<"Arity "<<11-mpl::size<V>::value<<": ";
     PROGRESS_TIMER_OUT_POINT("");
 
@@ -230,7 +229,7 @@ void helper(const TTD_CARRAY(RANK)& a1, const TTD_CARRAY(RANK)& a2, const dcomp*
 struct Helper
 {
   
-  template<typename V> void operator()(V v)
+  template<typename V> void operator()(V)
   {
     SlicesData<6,V> slicesData(array1);
 
@@ -238,7 +237,7 @@ struct Helper
       "****************\n"<<
       "*** Slice Arity: "<<mpl::size<V>::value<<endl<<
       "****************\n";
-    cpputils::for_each(fullRange(array1,v),basi_fast::begin(array2,slicesData),boost::bind(helper<mpl::size<V>::value>,_1,_2,array1.data(),array2.data())); 
+    cpputils::for_each(fullRange<V>(array1),basi_fast::begin(array2,slicesData),boost::bind(helper<mpl::size<V>::value>,_1,_2,array1.data(),array2.data())); 
   }
 
 };

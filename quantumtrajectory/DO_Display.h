@@ -30,11 +30,11 @@ class DO_Display
 public:
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  typedef structure::QuantumSystem<RANK> QuantumSystem;
-  typedef structure::Averaged     <RANK> Averaged     ;  
+  typedef          structure::Averaged<RANK>      Averaged   ;
+  typedef typename structure::Averaged<RANK>::Ptr AveragedPtr;
 
   DO_Display(
-	     const QuantumSystem&, 
+	     AveragedPtr,
 	     const ParsTrajectory&,
 	     bool negativity,
 	     size_t equalCount=10
@@ -42,13 +42,11 @@ public:
 
   virtual ~DO_Display() {}
 
-  const Averaged*const getAveraged() const {return av_;}
-
   void   displayMore(double t, const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
   size_t displayMoreKey(std::ostream&) const;
 
 private:
-  const Averaged*const av_ ;
+  const AveragedPtr av_ ;
 
   const bool negativity_;
 

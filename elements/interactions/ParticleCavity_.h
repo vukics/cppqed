@@ -13,6 +13,7 @@
 #include "Particle_.h"
 
 #include "Exception.h"
+#include "SmartPtr.h"
 
 #include <boost/utility.hpp>
 
@@ -37,7 +38,7 @@ class Base
   : public structure::Interaction<2>
 {
 protected:
-  Base(const ModeBase*, const ParticleBase*, double uNot, double etaeff);
+  Base(mode::Ptr, particle::Ptr, double uNot, double etaeff);
 
 };
 
@@ -52,7 +53,7 @@ public:
 
   const ModeFunction& getMF() const {return MF_Base::member;}
 
-  InterferenceBase(const ModeBase*, const ParticleBase*, double u, size_t kCav, ModeFunctionType);
+  InterferenceBase(mode::Ptr, particle::Ptr, double u, size_t kCav, ModeFunctionType);
 
 };
 
@@ -61,7 +62,7 @@ class POC_Base
   : public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
 {
 public:
-  POC_Base(const ModeBase*, const PumpedParticleBase*, double uNot);
+  POC_Base(mode::Ptr, particle::PtrPumped, double uNot);
 
 };
 
@@ -75,7 +76,7 @@ public:
 
   const ModeFunction& getMF() const {return MF_Base::member;}
 
-  PAC_Base(const ModeBase*, const ParticleBase*, double uNot, size_t kCav, ModeFunctionType, double etaeff);
+  PAC_Base(mode::Ptr, particle::Ptr, double uNot, size_t kCav, ModeFunctionType, double etaeff);
 
 };
 
@@ -101,11 +102,9 @@ class ParticleOrthogonalToCavity
 public:
   typedef particlecavity::POC_Base Base;
 
-  ParticleOrthogonalToCavity(const ModeBase& mode, const PumpedParticleBase& part, const particlecavity::ParsOrthogonal& p)
-    : Base(&mode,&part,p.uNot) {}
-
-  ParticleOrthogonalToCavity(mode::SmartPtr  mode, particle::SmartPtrPumped  part, const particlecavity::ParsOrthogonal& p)
-    : Base(mode.get(),part.get(),p.uNot) {}
+  template<typename MODE, typename PUMPED_PART>
+  ParticleOrthogonalToCavity(const MODE& mode, const PUMPED_PART& part, const particlecavity::ParsOrthogonal& p)
+    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot) {}
 
 };
 
@@ -117,18 +116,20 @@ class ParticleAlongCavity
 public:
   typedef particlecavity::PAC_Base Base;
 
-  ParticleAlongCavity(const ModeBase& mode, const ParticleBase& part, const particlecavity::ParsAlong& p, double etaeff=0)
-    : Base(&mode,&part,p.uNot,p.kCav,p.modeCav,etaeff) {}
+  template<typename MODE, typename PART>
+  ParticleAlongCavity(const MODE& mode, const PART& part, const particlecavity::ParsAlong& p, double etaeff=0)
+    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,etaeff) {}
 
-  ParticleAlongCavity(mode::SmartPtr  mode, particle::SmartPtr  part, const particlecavity::ParsAlong& p, double etaeff=0)
-    : Base(mode.get(),part.get(),p.uNot,p.kCav,p.modeCav,etaeff) {}
+  // The following two describe the case when there is an additional fixed standing wave ALONG the cavity, in which case PUMPEDPART must be derived from PumpedParticleBase
+  // We write two constructors to avoid ambiguity with the previous one
 
-  // The following two describe the case when there is an additional fixed standing wave ALONG the cavity
-  ParticleAlongCavity(const ModeBase& mode, const PumpedParticleBase& part, const particlecavity::ParsAlong& p)
-    : Base(&mode,&part,p.uNot,p.kCav,p.modeCav,part.getV_Class()) {}
+  template<typename MODE>
+  ParticleAlongCavity(const MODE& mode, const PumpedParticleBase& part, const particlecavity::ParsAlong& p)
+    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,part.getV_Class()) {}
 
-  ParticleAlongCavity(mode::SmartPtr  mode, particle::SmartPtrPumped  part, const particlecavity::ParsAlong& p)
-    : Base(mode.get(),part.get(),p.uNot,p.kCav,p.modeCav,part.get()->getV_Class()) {}
+  template<typename MODE>
+  ParticleAlongCavity(const MODE& mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
+    : Base(cpputils::sharedPointerize(mode),part,p.uNot,p.kCav,p.modeCav,part->getV_Class()) {}
 
 
 };

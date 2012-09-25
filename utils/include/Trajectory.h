@@ -123,13 +123,13 @@ protected:
   Trajectory(A&, typename Evolved::Derivs, double, const A&, const ParsTrajectory&,
 	     const evolved::Maker<A>&);
 
-  typename Evolved::SmartPtr getEvolved() const {return evolved_;}
+  typename Evolved::Ptr getEvolved() const {return evolved_;}
 
   double getDtDid() const {return evolved_->getDtDid();}
   double getDtTry() const {return evolved_->getDtTry();}
 
 private:
-  typename Evolved::SmartPtr evolved_;
+  typename Evolved::Ptr evolved_;
 
 };
 

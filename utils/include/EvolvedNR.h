@@ -14,10 +14,10 @@ template<typename A>
 class MakerNR : public Maker<A> 
 {
 public:
-  typedef typename Maker<A>::SmartPtr SmartPtr;
+  typedef typename Maker<A>::Ptr Ptr;
   typedef typename Maker<A>::Derivs   Derivs  ;
 
-  const SmartPtr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
+  const Ptr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
   
 };
 

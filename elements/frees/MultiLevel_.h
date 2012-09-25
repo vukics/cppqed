@@ -268,7 +268,7 @@ class MultiLevelBase
   : public structure::Free
 {
 public:
-  typedef boost::shared_ptr<const MultiLevelBase> SmartPtr;
+  typedef boost::shared_ptr<const MultiLevelBase> Ptr;
 
   using structure::Free::getParsStream;
 
@@ -301,7 +301,7 @@ public:
   typedef multilevel::Liouvillean<NL,VL> Liouvillean;
   typedef MultiLevelBase<NL> Base;
 
-  typedef typename Base::SmartPtr SmartPtr;
+  typedef typename Base::Ptr Ptr;
 
   using Hamiltonian::get_zSchs;
   using Base::getParsStream;
@@ -311,7 +311,7 @@ public:
 };
 
 
-#define RETURN_type typename MultiLevelBase<NL>::SmartPtr
+#define RETURN_type typename MultiLevelBase<NL>::Ptr
 
 template<int NL, typename VP, typename VL, typename Averaged>
 inline

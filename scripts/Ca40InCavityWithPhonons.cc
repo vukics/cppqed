@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 
   Mode<> phonon(pphon);
   
-  mode::SmartPtr cavityMode(mode::make(pplm,QMP_IP));
+  mode::Ptr cavityMode(mode::make(pplm,QMP_IP));
 
   // The interaction components
 
@@ -132,10 +132,10 @@ int main(int argc, char* argv[])
 
   MLJC<NL,      Couplings> ia02(atomInner,cavityMode,pmljc           );
 
-  evolve(psi,
-	 composite::make(Act<0,1>(ia01),Act<0,2>(ia02)),
-	 pe,
-	 tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >
+    (psi,
+     composite::make(Act<0,1>(ia01),Act<0,2>(ia02)),
+     pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

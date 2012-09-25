@@ -8,8 +8,9 @@
 
 
 using namespace std;
+using namespace mode;
 
-typedef quantumdata::StateVector<2> StateVector;
+typedef quantumdata::StateVector<2> StateVector2;
 
 
 int main(int argc, char* argv[])
@@ -20,8 +21,8 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   ParsEvolution pe(p); // Driver Parameters
-  mode::ParsPumpedLossy pA(p,"Opt");
-  mode::ParsLossy       pB(p,"Mech"); 
+  ParsPumpedLossy pA(p,"Opt");
+  ParsLossy       pB(p,"Mech"); 
 
   double& u=p.addTitle("Optomechanics","").add("u","N-Q coupling",1.);
 
@@ -30,16 +31,15 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  mode::SmartPtr mA(mode::make(pA,QMP_UIP,mode::DoNotAverage()));
-  mode::SmartPtr mB(mode::make(pB,QMP_UIP,mode::DoNotAverage()));
-
-  NX_CoupledModes<ModeCorrelations> nx(mA,mB,-sqrt(2)*u);
-
-  StateVector psi(mode::init(pA)*mode::init(pB));
+  StateVector2 psi(init(pA)*init(pB));
   psi.renorm();
 
-  evolve(psi,binary::make(nx),pe,tmptools::Vector<0>());
-
+  evolve<tmptools::Vector<0> >
+    (psi,
+     binary::make(NX_CoupledModes<ModeCorrelations>(make<DoNotAverage>(pA,QMP_UIP),
+						    make<DoNotAverage>(pB,QMP_UIP),
+						    -sqrt(2)*u)),
+     pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

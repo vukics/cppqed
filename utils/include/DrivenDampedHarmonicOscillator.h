@@ -22,9 +22,9 @@
 #include <boost/shared_ptr.hpp>
 
 
-typedef boost::shared_ptr<DrivenDampedHarmonicOscillator> DDHO_SmartPtr;
+typedef boost::shared_ptr<DrivenDampedHarmonicOscillator> DDHO_Ptr;
 
-const DDHO_SmartPtr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
+const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
 
 
 class DrivenDampedHarmonicOscillator

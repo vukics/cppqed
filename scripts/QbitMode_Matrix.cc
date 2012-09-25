@@ -43,18 +43,16 @@ int main(int argc, char* argv[])
 
   // ****** ****** ****** ****** ****** ******
 
-  qbit::SmartPtr qbit(qbit::make(pplqb,qmp));
-  mode::SmartPtr mode(mode::make(pplm ,qmp));
+  qbit::Ptr qbit(qbit::make(pplqb,qmp));
+  mode::Ptr mode(mode::make(pplm ,qmp));
 
-  JaynesCummings<> jc(qbit,mode,pjc);
-
-  BinarySystem<> system2(jc);
+  binary::Ptr system2(binary::make(JaynesCummings<>(qbit,mode,pjc)));
 
   StateVector2 psi2(qbit::init(pplqb)*mode::init(pplm)); psi2.renorm();
-  StateVector1 psi1(StateVectorLow1(psi2().data(),shape(system2.getTotalDimension()),neverDeleteData),quantumdata::byReference);
+  StateVector1 psi1(StateVectorLow1(psi2().data(),shape(system2->getTotalDimension()),neverDeleteData),quantumdata::byReference);
   // Now psi1 and psi2 referece the same data.
 
-  const CMatrix hamiltonian(calculateMatrix(system2));
+  const CMatrix hamiltonian(calculateMatrix(*system2));
 
   evolve(psi1,TimeIndependentMatrixHamiltonianAveraged<2,true>(CMatrix(hamiltonian/DCOMP_I),system2,psi2),pe);
   

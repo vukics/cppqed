@@ -19,9 +19,10 @@
 using namespace quantumtrajectory;
 
 
-template<int RANK, typename V>
-void evolve(quantumdata::StateVector<RANK>& psi, const structure::QuantumSystem<RANK>& sys,
-	    const ParsEvolution& pe, V)
+template<typename V, int RANK>
+void evolve(quantumdata::StateVector<RANK>& psi,
+	    typename structure::QuantumSystem<RANK>::Ptr sys,
+	    const ParsEvolution& pe)
 {
   using namespace std;
 

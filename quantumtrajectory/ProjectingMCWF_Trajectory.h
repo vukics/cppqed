@@ -21,19 +21,20 @@ public:
   typedef typename Base::StateVector    StateVector   ;
   typedef typename Base::StateVectorLow StateVectorLow;
 
-  typedef typename Base::QuantumSystem QuantumSystem;
-
   typedef boost::ptr_vector<StateVector> Basis;
 
   using Base::getOstream; using Base::toBeAveraged; using Base::getPrecision;
 
+  template<typename SYS>
   ProjectingMCWF_Trajectory(
 			    StateVector& psi,
-			    const Basis&,
-			    const QuantumSystem& sys,
-			    const ParsMCWF_Trajectory&,
-			    const StateVectorLow& =StateVectorLow()
-			    );
+			    const Basis& basis,
+			    const SYS& sys,
+			    const ParsMCWF_Trajectory& p,
+			    const StateVectorLow& scaleAbs=StateVectorLow()
+			    )
+    : TrajectoryBase(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
+  {}
 
 private:
   void   displayEvenMore() const;

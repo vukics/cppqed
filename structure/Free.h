@@ -14,6 +14,8 @@
 #include "QuantumSystem.h"
 #include "Types.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace structure {
 
 
@@ -35,6 +37,8 @@ typedef quantumdata::DensityOperator<1> DensityOperator;
 class Free : public QuantumSystem<1>, public DynamicsBase
 {
 public:
+  typedef boost::shared_ptr<const Free> Ptr;
+
   explicit Free(size_t, const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
 
   double highestFrequency (                ) const {return DynamicsBase::highestFrequency (  );}

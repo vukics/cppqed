@@ -260,7 +260,7 @@ SlicesData<RANK,V>::ctorHelper(const CArray& array)
   };
 
   RETURN_type res;
-  boost::transform(basi::fullRange(array,v_),back_inserter(res),boost::bind(&Helper::doIt,_1,array.data()));
+  boost::transform(basi::fullRange<V>(array),back_inserter(res),boost::bind(&Helper::doIt,_1,array.data()));
   return res;
 }
 
@@ -270,9 +270,9 @@ SlicesData<RANK,V>::ctorHelper(const CArray& array)
 template<int RANK, typename V>
 SlicesData<RANK,V>::SlicesData(const CArray& array)
   : firstOffsets_(ctorHelper(array)),
-    shape_  (basi::begin(array,v_)->shape   ()),
-    stride_ (basi::begin(array,v_)->stride  ()),
-    storage_(basi::begin(array,v_)->ordering() ,blitz::TinyVector<bool,MPL_SIZE(V)>(true))
+    shape_  (basi::begin<V>(array)->shape   ()),
+    stride_ (basi::begin<V>(array)->stride  ()),
+    storage_(basi::begin<V>(array)->ordering() ,blitz::TinyVector<bool,MPL_SIZE(V)>(true))
 {
   assert( ( blitz::all(storage_.ascendingFlag()==blitz::TinyVector<bool,MPL_SIZE(V)>(true)) ) );
   assert( ( blitz::all(array   .base         ()==blitz::TinyVector<int ,       RANK>(0   )) ) );
