@@ -60,7 +60,7 @@ public:
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
-  typedef structure::QuantumSystemWrapper<RANK> QuantumSystemWrapper;
+  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
   typedef BASE_class Base;
 

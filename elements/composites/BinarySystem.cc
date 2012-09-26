@@ -156,9 +156,9 @@ void binary::Base::display(const Averages& averages, std::ostream& os, int preci
 
 
 
-bool binary::Exact::isUnitary() const
+bool binary::Exact::isUnitary_v() const
 {
-  return Ex1::isUnitary(free0_.getEx()) && Ex1::isUnitary(free1_.getEx()) && Ex2::isUnitary(ia_.getEx());
+  return free0_.isUnitary() && free1_.isUnitary() && ia_.isUnitary();
 }
 
 

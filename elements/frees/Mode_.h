@@ -91,7 +91,7 @@ public:
 private:
   void updateU(double) const;
 
-  bool isUnitary() const {return !bool(real(zI_));}
+  bool isUnitary_v() const {return !bool(real(zI_));}
 
   const dcomp zI_;
 

@@ -16,12 +16,12 @@ class ExactCommon
 public:
   typedef boost::shared_ptr<const ExactCommon> Ptr;
 
-  static  bool isUnitary(Ptr exactCommon) {return exactCommon ? exactCommon->isUnitary() : true;}
-
   virtual ~ExactCommon() {}
 
+  bool isUnitary() const {return isUnitary();}
+
 private:
-  virtual bool isUnitary() const = 0;
+  virtual bool isUnitary_v() const = 0;
 
 };
 
@@ -36,13 +36,7 @@ public:
   typedef typename Base::StateVectorLow StateVectorLow;
 
   static  void actWithU(double t, StateVectorLow& psi, Ptr exact, StaticTag=theStaticOne) {if (exact) exact->actWithU(t,psi);}
-  // The exact (in general, non-unitary) part of evolution. Put
-  // otherwise, the operator transfoming between normal and
-  // interaction pictures.
-
-  // The tag is for helping boost.bind to distinguish between this
-  // function and the virtual one below. Simply permuting the
-  // arguments is not enough for this!
+  // The exact (in general, non-unitary) part of evolution. Put otherwise, the operator transfoming between normal and interaction pictures.
 
   virtual ~Exact() {}
 

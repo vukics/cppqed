@@ -59,7 +59,7 @@ Exact<NL>::updateU(double dtdid) const
 
 template<int NL>
 bool 
-Exact<NL>::isUnitary() const
+Exact<NL>::isUnitary_v() const
 {
   using namespace std  ;
   // using namespace boost::lambda;

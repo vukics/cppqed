@@ -82,7 +82,7 @@ CLASS_HEADER(Exact)
 {
   CLASS_BODY_PART(Exact,Ex)
 
-  bool isUnitary() const;
+  bool isUnitary_v() const;
 
   void actWithU(double, StateVectorLow&) const;
 

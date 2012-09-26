@@ -73,7 +73,7 @@ qsa(DynamicsBase::Ptr base)
 
 
 
-template<int RANK> 
+template<int RANK, bool IS_CONST> 
 class QuantumSystemWrapper
 {
 public:
@@ -111,23 +111,27 @@ public:
       av_(qsa<RANK>(qs))
   {}
 
-  QuantumSystemWrapper(QuantumSystemPtr qs, bool noise=true)
+  QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy=true)
     : qs_(qs),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
-      li_(noise ? qsl<RANK>(qs) : LiouvilleanPtr()),
+      li_(isNoisy ? qsl<RANK>(qs) : LiouvilleanPtr()),
       av_(qsa<RANK>(qs))
   {}
+
+
+  bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
+
 
 protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}
 
 private:
-  QuantumSystemPtr qs_;
-  ExactPtr         ex_; 
-  HamiltonianPtr   ha_;
-  LiouvilleanPtr   li_; 
-  AveragedPtr      av_;
+  typename tmptools::ConditionalAddConst<QuantumSystemPtr,IS_CONST>::type qs_;
+  typename tmptools::ConditionalAddConst<ExactPtr        ,IS_CONST>::type ex_; 
+  typename tmptools::ConditionalAddConst<HamiltonianPtr  ,IS_CONST>::type ha_;
+  typename tmptools::ConditionalAddConst<LiouvilleanPtr  ,IS_CONST>::type li_; 
+  typename tmptools::ConditionalAddConst<AveragedPtr     ,IS_CONST>::type av_;
   
 };
 
