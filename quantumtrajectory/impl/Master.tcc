@@ -9,6 +9,7 @@
 #include "MathExtensions.h"
 
 #include "Algorithm.h"
+#include "impl/BlitzArraySliceIterator.tcc"
 #include "ComplexArrayExtensions.h"
 #include "Range.h"
 

@@ -1,10 +1,8 @@
-#include "Evolution.h"
+#include "EvolutionBinary.h"
 #include "Mode.h"
 
 #include "ModeCorrelations.h"
 #include "NX_CoupledModes.h"
-
-#include "BinarySystem.h"
 
 
 using namespace std;

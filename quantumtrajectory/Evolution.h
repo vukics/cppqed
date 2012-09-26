@@ -2,7 +2,7 @@
 #ifndef QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 #define QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 
-#include "impl/Composite.tcc"
+#include "impl/DensityOperator.tcc"
 #include "impl/EnsembleMCWF.tcc"
 #include "impl/Evolution.tcc"
 #include "ParsEvolution.h"

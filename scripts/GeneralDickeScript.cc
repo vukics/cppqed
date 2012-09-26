@@ -1,9 +1,7 @@
-#include "Evolution.h"
+#include "EvolutionBinary.h"
 #include "Mode.h"
 
 #include "GeneralDicke.h"
-
-#include "BinarySystem.h"
 
 
 using namespace std;

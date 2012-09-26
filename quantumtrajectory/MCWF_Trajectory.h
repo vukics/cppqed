@@ -5,6 +5,7 @@
 #include "MCWF_TrajectoryFwd.h"
 
 #include "MCWF_TrajectoryLogger.h"
+#include "StateVectorFwd.h"
 #include "Structure.h"
 
 #include "StochasticTrajectory.h"

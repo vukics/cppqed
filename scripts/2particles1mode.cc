@@ -1,9 +1,7 @@
-#include "Evolution.h"
+#include "EvolutionComposite.h"
 
 #include "ParticleCavity.h"
 #include "IdenticalParticles.h"
-
-#include "Composite.h"
 
 
 int main(int argc, char* argv[])
