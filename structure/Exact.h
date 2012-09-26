@@ -18,7 +18,7 @@ public:
 
   virtual ~ExactCommon() {}
 
-  bool isUnitary() const {return isUnitary();}
+  bool isUnitary() const {return isUnitary_v();}
 
 private:
   virtual bool isUnitary_v() const = 0;
@@ -35,12 +35,13 @@ public:
   typedef quantumdata::Types<RANK> Base;
   typedef typename Base::StateVectorLow StateVectorLow;
 
-  static  void actWithU(double t, StateVectorLow& psi, Ptr exact, StaticTag=theStaticOne) {if (exact) exact->actWithU(t,psi);}
-  // The exact (in general, non-unitary) part of evolution. Put otherwise, the operator transfoming between normal and interaction pictures.
-
   virtual ~Exact() {}
 
-  virtual void actWithU(double, StateVectorLow&) const = 0;
+  void actWithU(double t, StateVectorLow& psi) const {return actWithU_v(t,psi);}
+  // The exact (in general, non-unitary) part of evolution. Put otherwise, the operator transfoming between normal and interaction pictures.
+
+private:
+  virtual void actWithU_v(double, StateVectorLow&) const = 0;
 
 };
 

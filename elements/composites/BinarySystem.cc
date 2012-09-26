@@ -73,14 +73,14 @@ binary::Base::Base(Interaction::Ptr ia)
 } 
 
 
-double binary::Base::highestFrequency () const
+double binary::Base::highestFrequency_v() const
 {
   using std::max;
   return max(ia_.get()->highestFrequency(),max(free0_.get()->highestFrequency(),free1_.get()->highestFrequency()));
 }
 
 
-void binary::Base::displayParameters(std::ostream& os) const
+void binary::Base::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
   os<<"# Binary System\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<endl<<endl
@@ -163,14 +163,14 @@ bool binary::Exact::isUnitary_v() const
 
 
 
-void binary::Exact::actWithU(double dt, StateVectorLow& psi) const
+void binary::Exact::actWithU_v(double dt, StateVectorLow& psi) const
 {
   using namespace blitzplusplus::basi;
 
-  if (const Ex1::Ptr ex1=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex1,dt,_1));
-  if (const Ex1::Ptr ex1=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex1,dt,_1));
+  if (const Ex1::Ptr ex=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex,dt,_1));
+  if (const Ex1::Ptr ex=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex,dt,_1));
 
-  Ex2::actWithU(dt,psi,ia_.getEx());
+  ia_.actWithU(dt,psi);
 
 }
 

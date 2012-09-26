@@ -4,7 +4,7 @@ namespace structure {
 
 using namespace std;
 
-void FreeExact::actWithU(double dtDid, StateVectorLow& psi) const
+void FreeExact::actWithU_v(double dtDid, StateVectorLow& psi) const
 {
   if (dtDid!=dtDid_) {updateU(dtDid_=dtDid);}
   psi*=factors_;

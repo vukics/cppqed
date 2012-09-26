@@ -29,8 +29,12 @@ public:
 
   virtual ~QuantumSystem() {}
 
-  virtual double highestFrequency (             ) const = 0;
-  virtual void   displayParameters(std::ostream&) const = 0;
+  double highestFrequency (                ) const {return  highestFrequency_v(  );}
+  void   displayParameters(std::ostream& os) const {return displayParameters_v(os);}
+
+private:
+  virtual double  highestFrequency_v(             ) const = 0;
+  virtual void   displayParameters_v(std::ostream&) const = 0;
 
 };
 

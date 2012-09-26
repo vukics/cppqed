@@ -89,21 +89,9 @@ public:
   typedef typename Li::Ptr LiouvilleanPtr;
   typedef typename Av::Ptr AveragedPtr;
 
-  const QuantumSystemPtr getQS() const {return qs_;}
-  const ExactPtr         getEx() const {return ex_;} 
-  const HamiltonianPtr   getHa() const {return ha_;}
-  const LiouvilleanPtr   getLi() const {return li_;} 
-  const AveragedPtr      getAv() const {return av_;}  
+  typedef typename Ex::StateVectorLow StateVectorLow;
 
-  /*
-  QuantumSystemPtr getQS() {return qs_;}
-  ExactPtr getEx() {return ex_;} 
-  HamiltonianPtr getHa() {return ha_;}
-  LiouvilleanPtr getLi() {return li_;} 
-  AveragedPtr getAv() {return av_;}  
-  */
-
-  QuantumSystemWrapper(DynamicsBase::Ptr qs)
+  explicit QuantumSystemWrapper(DynamicsBase::Ptr qs)
     : qs_(dynamic_pointer_cast<const QuantumSystem<RANK> >(qs)),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
@@ -111,7 +99,7 @@ public:
       av_(qsa<RANK>(qs))
   {}
 
-  QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy=true)
+  explicit QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy=true)
     : qs_(qs),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
@@ -119,9 +107,22 @@ public:
       av_(qsa<RANK>(qs))
   {}
 
+  const QuantumSystemPtr getQS() const {return qs_;}
+  const ExactPtr         getEx() const {return ex_;} 
+  const HamiltonianPtr   getHa() const {return ha_;}
+  const LiouvilleanPtr   getLi() const {return li_;} 
+  const AveragedPtr      getAv() const {return av_;}  
+
+  QuantumSystemPtr getQS() {return qs_;}
+  ExactPtr getEx() {return ex_;} 
+  HamiltonianPtr getHa() {return ha_;}
+  LiouvilleanPtr getLi() {return li_;} 
+  AveragedPtr getAv() {return av_;}  
 
   bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
+  void actWithU(double t, StateVectorLow& psi) const {if (ex_) ex_->actWithU(t,psi);}
 
+  
 
 protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}

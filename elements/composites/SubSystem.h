@@ -19,7 +19,7 @@ class SubSystemsInteraction : public structure::QuantumSystemWrapper<RANK,false>
 public:
   typedef typename structure::Interaction<RANK>::Ptr InteractionPtr;
 
-  SubSystemsInteraction(InteractionPtr ia) : structure::QuantumSystemWrapper<RANK,false>(ia), ia_(ia) {}
+  explicit SubSystemsInteraction(InteractionPtr ia) : structure::QuantumSystemWrapper<RANK,false>(ia), ia_(ia) {}
 
   const InteractionPtr get() const {return ia_;} 
 
@@ -35,7 +35,7 @@ class SubSystemFree : public structure::QuantumSystemWrapper<1,false>
 public:
   typedef structure::Free::Ptr FreePtr;
 
-  SubSystemFree(FreePtr free) : structure::QuantumSystemWrapper<1,false>(free,true), free_(free) {}
+  explicit SubSystemFree(FreePtr free) : structure::QuantumSystemWrapper<1,false>(free,true), free_(free) {}
 
   SubSystemFree() : free_() {}
 
