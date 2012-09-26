@@ -76,7 +76,7 @@ public:
 private:
   void updateU(double) const;
 
-  bool isUnitary() const {return true;}
+  bool isUnitary_v() const {return true;}
 
   const Factors factorExponents_;
 

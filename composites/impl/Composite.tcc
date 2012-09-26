@@ -278,13 +278,13 @@ public:
   template<typename Act>
   bool operator()(bool s, const Act& act)
   {
-    return s && structure::ExactCommon::isUnitary(act.getEx());
+    return s && act.isUnitary();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    isIt_&=structure::ExactCommon::isUnitary(frees_(T::value).getEx());
+    isIt_&=frees_(T::value).isUnitary();
   }
 
 private:
@@ -297,7 +297,7 @@ private:
 
 
 template<typename VA>
-bool Composite<VA>::isUnitary() const
+bool Composite<VA>::isUnitary_v() const
 {
   bool res=true;
   IsUnitary helper(frees_,res);

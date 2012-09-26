@@ -106,7 +106,7 @@ private:
 
   // Implementing Ex_Base
 
-  bool isUnitary() const; class IsUnitary;
+  bool isUnitary_v() const; class IsUnitary;
 
   void actWithU(double, StateVectorLow&) const; class ActWithU;
 
