@@ -9,6 +9,7 @@
 #include "MathExtensions.h"
 
 #include "Algorithm.h"
+#include "impl/BlitzArraySliceIterator.tcc"
 #include "ComplexArrayExtensions.h"
 #include "Range.h"
 
@@ -39,11 +40,8 @@ Base<RANK>::Base(DensityOperator& rho,
     tIntPic0_(0),
     qs_(qs)
 {
-  if (!Exact::isUnitary(qs_.getEx())) throw master::NonUnitaryIP();
-  // If the interaction picture is non-unitary, the density matrix in
-  // IP is non-Hermitian. This cannot be allowed here because then the
-  // calculation of the Hamiltonian part of the dynamics as
-  // implemented below would fail.
+  if (!qs_.isUnitary()) throw master::NonUnitaryIP();
+  // If the interaction picture is non-unitary, the density matrix in IP is non-Hermitian. This cannot be allowed here because then the calculation of the Hamiltonian part of the dynamics as implemented below would fail.
   // if (!li_) throw master::NoLiouvillean();
 
   if (rho!=*qs_.getQS()) throw DimensionalityMismatchException();

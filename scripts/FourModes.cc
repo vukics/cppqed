@@ -1,7 +1,5 @@
-#include "Evolution.h"
+#include "EvolutionComposite.h"
 #include "Mode.h"
-
-#include "Composite.h"
 
 #include "SmartPtr.h"
 

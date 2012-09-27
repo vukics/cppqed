@@ -1,7 +1,6 @@
 #include "Evolution.h"
 #include "MultiLevel.h"
 
-#include "StateVector.h"
 
 using namespace std;
 using namespace multilevel;

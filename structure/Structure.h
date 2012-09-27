@@ -73,7 +73,7 @@ qsa(DynamicsBase::Ptr base)
 
 
 
-template<int RANK> 
+template<int RANK, bool IS_CONST> 
 class QuantumSystemWrapper
 {
 public:
@@ -89,21 +89,9 @@ public:
   typedef typename Li::Ptr LiouvilleanPtr;
   typedef typename Av::Ptr AveragedPtr;
 
-  const QuantumSystemPtr getQS() const {return qs_;}
-  const ExactPtr         getEx() const {return ex_;} 
-  const HamiltonianPtr   getHa() const {return ha_;}
-  const LiouvilleanPtr   getLi() const {return li_;} 
-  const AveragedPtr      getAv() const {return av_;}  
+  typedef typename Ex::StateVectorLow StateVectorLow;
 
-  /*
-  QuantumSystemPtr getQS() {return qs_;}
-  ExactPtr getEx() {return ex_;} 
-  HamiltonianPtr getHa() {return ha_;}
-  LiouvilleanPtr getLi() {return li_;} 
-  AveragedPtr getAv() {return av_;}  
-  */
-
-  QuantumSystemWrapper(DynamicsBase::Ptr qs)
+  explicit QuantumSystemWrapper(DynamicsBase::Ptr qs)
     : qs_(dynamic_pointer_cast<const QuantumSystem<RANK> >(qs)),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
@@ -111,23 +99,40 @@ public:
       av_(qsa<RANK>(qs))
   {}
 
-  QuantumSystemWrapper(QuantumSystemPtr qs, bool noise=true)
+  explicit QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy=true)
     : qs_(qs),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
-      li_(noise ? qsl<RANK>(qs) : LiouvilleanPtr()),
+      li_(isNoisy ? qsl<RANK>(qs) : LiouvilleanPtr()),
       av_(qsa<RANK>(qs))
   {}
+
+  const QuantumSystemPtr getQS() const {return qs_;}
+  const ExactPtr         getEx() const {return ex_;} 
+  const HamiltonianPtr   getHa() const {return ha_;}
+  const LiouvilleanPtr   getLi() const {return li_;} 
+  const AveragedPtr      getAv() const {return av_;}  
+
+  QuantumSystemPtr getQS() {return qs_;}
+  ExactPtr getEx() {return ex_;} 
+  HamiltonianPtr getHa() {return ha_;}
+  LiouvilleanPtr getLi() {return li_;} 
+  AveragedPtr getAv() {return av_;}  
+
+  bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
+  void actWithU(double t, StateVectorLow& psi) const {if (ex_) ex_->actWithU(t,psi);}
+
+  
 
 protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}
 
 private:
-  QuantumSystemPtr qs_;
-  ExactPtr         ex_; 
-  HamiltonianPtr   ha_;
-  LiouvilleanPtr   li_; 
-  AveragedPtr      av_;
+  typename tmptools::ConditionalAddConst<QuantumSystemPtr,IS_CONST>::type qs_;
+  typename tmptools::ConditionalAddConst<ExactPtr        ,IS_CONST>::type ex_; 
+  typename tmptools::ConditionalAddConst<HamiltonianPtr  ,IS_CONST>::type ha_;
+  typename tmptools::ConditionalAddConst<LiouvilleanPtr  ,IS_CONST>::type li_; 
+  typename tmptools::ConditionalAddConst<AveragedPtr     ,IS_CONST>::type av_;
   
 };
 

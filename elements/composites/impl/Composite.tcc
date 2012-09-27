@@ -239,7 +239,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::displayParameters(std::ostream& os) const
+void Composite<VA>::displayParameters_v(std::ostream& os) const
 {
   os<<"# Composite\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<std::endl;
   worker(DisplayParameters(frees_,os));
@@ -253,7 +253,7 @@ void Composite<VA>::displayParameters(std::ostream& os) const
 
 
 template<typename VA>
-double Composite<VA>::highestFrequency() const
+double Composite<VA>::highestFrequency_v() const
 {
   return boost::max_element(frees_,composite::compareFreesFrequency)->get()->highestFrequency();
   // NEEDS_WORK add the interactions here
@@ -278,13 +278,13 @@ public:
   template<typename Act>
   bool operator()(bool s, const Act& act)
   {
-    return s && structure::ExactCommon::isUnitary(act.getEx());
+    return s && act.isUnitary();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    isIt_&=structure::ExactCommon::isUnitary(frees_(T::value).getEx());
+    isIt_&=frees_(T::value).isUnitary();
   }
 
 private:
@@ -297,7 +297,7 @@ private:
 
 
 template<typename VA>
-bool Composite<VA>::isUnitary() const
+bool Composite<VA>::isUnitary_v() const
 {
   bool res=true;
   IsUnitary helper(frees_,res);
@@ -343,7 +343,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::actWithU(double dtdid, StateVectorLow& psi) const
+void Composite<VA>::actWithU_v(double dtdid, StateVectorLow& psi) const
 {
   worker(ActWithU(frees_,dtdid,psi));
 }

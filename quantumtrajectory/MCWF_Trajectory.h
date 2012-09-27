@@ -5,6 +5,7 @@
 #include "MCWF_TrajectoryFwd.h"
 
 #include "MCWF_TrajectoryLogger.h"
+#include "StateVectorFwd.h"
 #include "Structure.h"
 
 #include "StochasticTrajectory.h"
@@ -60,7 +61,7 @@ public:
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
-  typedef structure::QuantumSystemWrapper<RANK> QuantumSystemWrapper;
+  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
   typedef BASE_class Base;
 

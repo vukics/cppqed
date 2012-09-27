@@ -97,9 +97,9 @@ public:
   {}
 
 private:
-  bool isUnitary() const {return !getGamma();}
-
   void updateU(double) const;
+
+  bool isUnitary_v() const {return !getGamma();}
 
 };
 

@@ -49,7 +49,7 @@ public:
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
   
-  typedef structure::QuantumSystemWrapper<RANK> QuantumSystemWrapper;
+  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
   using TrajectoryBase::getEvolved; using TrajectoryBase::getDtDid; using TrajectoryBase::getTime; using TrajectoryBase::getOstream;
 

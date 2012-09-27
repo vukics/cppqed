@@ -99,16 +99,15 @@ public:
 private:
   // Implementing QS_Base
 
-  double highestFrequency (             ) const;
+  double  highestFrequency_v(             ) const;
 
-
-  void   displayParameters(std::ostream&) const; class DisplayParameters;
+  void   displayParameters_v(std::ostream&) const; class DisplayParameters;
 
   // Implementing Ex_Base
 
-  bool isUnitary() const; class IsUnitary;
+  bool isUnitary_v() const; class IsUnitary;
 
-  void actWithU(double, StateVectorLow&) const; class ActWithU;
+  void  actWithU_v(double, StateVectorLow&) const; class ActWithU;
 
   // Implementing Ha_Base
 

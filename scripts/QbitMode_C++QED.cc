@@ -1,9 +1,7 @@
-#include "Evolution.h"
+#include "EvolutionBinary.h"
 #include "Mode.h"
 
 #include "JaynesCummings.h"
-
-#include "BinarySystem.h"
 
 #include "MatrixOfHamiltonian.h"
 

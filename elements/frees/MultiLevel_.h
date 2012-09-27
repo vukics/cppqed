@@ -56,7 +56,7 @@ public:
 private:
   void updateU(double) const;
 
-  bool isUnitary() const;
+  bool isUnitary_v() const;
 
   const Levels zIs_;
 

@@ -40,14 +40,11 @@ public:
   typedef structure::Averaged<1> Av1;
   typedef structure::Averaged<2> Av2;
 
-  Base(Interaction::Ptr);
+  explicit Base(Interaction::Ptr);
 
   const SSF& getFree0() const {return free0_;}
   const SSF& getFree1() const {return free1_;}
   const SSI& getIA   () const {return    ia_;}
-
-  double highestFrequency (             ) const;
-  void   displayParameters(std::ostream&) const;
 
   void   displayKey(std::ostream&, size_t&) const;
   size_t nAvr      (                      ) const;
@@ -57,6 +54,9 @@ public:
   void           display(const Averages&, std::ostream&, int) const;
 
 private:
+  double  highestFrequency_v(             ) const;
+  void   displayParameters_v(std::ostream&) const;
+
   const SSF free0_, free1_;
 
   const SSI ia_;
@@ -82,9 +82,9 @@ CLASS_HEADER(Exact)
 {
   CLASS_BODY_PART(Exact,Ex)
 
-  bool isUnitary() const;
+  bool isUnitary_v() const;
 
-  void actWithU(double, StateVectorLow&) const;
+  void  actWithU_v(double, StateVectorLow&) const;
 
 };
 
@@ -143,7 +143,7 @@ public:
   
   typedef structure::Interaction<2> Interaction;
 
-  BinarySystem(Interaction::Ptr);
+  explicit BinarySystem(Interaction::Ptr);
 
 };
 

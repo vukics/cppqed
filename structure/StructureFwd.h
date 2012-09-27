@@ -6,7 +6,7 @@
 namespace structure {
 
 
-template<int> 
+template<int,bool> 
 class QuantumSystemWrapper;
 
 
