@@ -51,7 +51,7 @@ Base::Base(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part,
 
 
 
-void Base::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void Base::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   using namespace blitzplusplus;
   using basi::fullRange;

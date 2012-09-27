@@ -395,7 +395,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void Composite<VA>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   worker(Hamiltonian(frees_,t,psi,dpsidt,tIntPic0));
 }

@@ -143,7 +143,7 @@ private:
 
 template<int NL, typename VP>
 void
-HamiltonianSch<NL,VP>::addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+HamiltonianSch<NL,VP>::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using namespace details;
   mpl::for_each<tmptools::Ordinals<NL> >(ElementaryLevel<NL>(psi,dpsidt,zSchs_));

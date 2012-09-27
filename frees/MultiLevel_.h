@@ -147,7 +147,7 @@ public:
     : Exact<NL>(zIs), zSchs_(zSchs), etas_(etas) {}
 
 private:
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
 
   const Levels zSchs_;
@@ -171,7 +171,7 @@ public:
   const Levels& get_zSchs() const {return zSchs_;}
 
 private:
-  void addContribution(const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v(const StateVectorLow&, StateVectorLow&) const;
 
 
   const Levels zSchs_;

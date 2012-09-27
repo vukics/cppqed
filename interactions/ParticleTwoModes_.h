@@ -23,7 +23,7 @@ public:
   Base(mode::Ptr, mode::Ptr, particle::Ptr, double uNot0, double uNot1, const ModeFunction&, const ModeFunction&, double);
 
 private:
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; 
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; 
 
   mutable quantumoperator::Tridiagonal<3> firstH_, firstHT_;
 

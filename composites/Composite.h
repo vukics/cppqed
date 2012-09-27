@@ -111,7 +111,7 @@ private:
 
   // Implementing Ha_Base
 
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; class Hamiltonian;
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; class Hamiltonian;
 
   // Implementing Li_Base
 
