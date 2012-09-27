@@ -56,7 +56,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   PROGRESS_TIMER_IN_POINT(getOstream());
 
-  binaryIter(rhoLow,drhodtLow,bind(&Hamiltonian::addContribution,t,_1,_2,tIntPic0_,qs_.getHa(),structure::theStaticOne));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumSystemWrapper::addContribution,qs_,t,_1,_2,tIntPic0_));
 
   PROGRESS_TIMER_OUT_POINT("Hamiltonian");
 

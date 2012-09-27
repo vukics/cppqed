@@ -19,7 +19,7 @@ public:
   // For safety, the matrix will be copied in.
 
 private:
-  void addContribution(const StateVectorLow&, StateVectorLow&) const; 
+  void addContribution_v(const StateVectorLow&, StateVectorLow&) const; 
 
   const CMatrix hamiltonianOverI_;
 

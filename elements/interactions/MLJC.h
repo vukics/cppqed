@@ -39,7 +39,7 @@ public:
 private:
   class ElementaryCoupling;
 
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; 
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; 
 
   template<int,int>
   struct ModeDynamics;
@@ -80,17 +80,14 @@ private:
 
 
 
+#define BIG_NAMESPACE_NAME                      mljc
+#define BIG_CLASS_NAME                          MLJC
+#define BIG_ADDITIONAL_PARAMETERS               , const mljc::Pars<VC>& p
+#define BIG_ADDITIONAL_PARAMETERS_PASS          ,p.gs
+#define BIG_ADDITIONAL_TEMPLATE_PARAMETERS      int NL, typename VC,
+#define BIG_ADDITIONAL_TEMPLATE_PARAMETERS_PASS <NL,VC>
 
-template<int NL, typename VC>
-class MLJC : public mljc::Base<NL,VC>
-{
-public:
-  typedef mljc::Base<NL,VC> Base;
-
-  template<typename MLB, typename MB>
-  MLJC(const MLB& ml, const MB& m, const mljc::Pars<VC>& p)
-    : Base(cpputils::sharedPointerize(ml),cpputils::sharedPointerize(m),p.gs) {}
-};
+#include "details/BinaryInteractionGenerator.h"
 
 
 #endif // ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED

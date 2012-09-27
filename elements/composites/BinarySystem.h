@@ -93,7 +93,7 @@ CLASS_HEADER(Hamiltonian)
 {
   CLASS_BODY_PART(Hamiltonian,Ha)
 
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
 };
 

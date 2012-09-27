@@ -119,10 +119,12 @@ public:
   LiouvilleanPtr getLi() {return li_;} 
   AveragedPtr getAv() {return av_;}  
 
+  // highestFrequency & displayParameters from QuantumSystem ?
+
   bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
   void actWithU(double t, StateVectorLow& psi) const {if (ex_) ex_->actWithU(t,psi);}
 
-  
+  void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const {if (ha_) ha_->addContribution(t,psi,dpsidt,tIntPic0);}
 
 protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}

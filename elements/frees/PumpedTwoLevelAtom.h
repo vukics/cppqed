@@ -59,10 +59,9 @@ public:
 
   PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy&);
   
-  void addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt) const 
-  {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
-
 private:
+  void addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
+
   static const linalg::CMatrix hamiltonianOverI(const dcomp& za, const dcomp& etat);
 
   const linalg::CMatrix hamiltonianOverI_;
