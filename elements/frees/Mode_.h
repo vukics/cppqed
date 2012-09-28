@@ -182,8 +182,9 @@ public:
 
   Averaged(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
-  virtual const Averages average(const LazyDensityOperator&) const;
-  virtual void           process(Averages&)                  const;
+protected:
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&)                  const;
 
 private:
   const ClonedPtr do_clone() const {return new Averaged(*this);}
@@ -196,10 +197,10 @@ class AveragedQuadratures : public Averaged
 public:
   AveragedQuadratures(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
-  virtual const Averages average(const LazyDensityOperator&) const;
-  virtual void           process(Averages&)                  const;
-
 private:
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&)                  const;
+
   const ClonedPtr do_clone() const {return new AveragedQuadratures(*this);}
 
 };
@@ -214,8 +215,9 @@ public:
 
   AveragedMonitorCutoff();
 
-  const Averages average(const LazyDensityOperator&) const;
-  void           process(Averages&)                  const;
+private:
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&)                  const;
 
 };
 
@@ -424,9 +426,9 @@ private:
   void   doActWithJ (double t, StateVectorLow&           ) const;
   double probability(double t, const LazyDensityOperator&) const;
 
-  const Averages average(double t, const LazyDensityOperator&) const;
+  const Averages average_v(double t, const LazyDensityOperator&) const;
 
-  void           process(Averages&)                  const {}
+  void           process_v(Averages&)                  const {}
 
   const dcomp z_;
 

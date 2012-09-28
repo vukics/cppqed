@@ -1,6 +1,7 @@
 #include "ModeCorrelations.h"
 
 #include "impl/LazyDensityOperator.tcc"
+#include "Structure.h"
 
 #include "SmartPtr.h"
 
@@ -44,8 +45,8 @@ ModeCorrelations::average(const LazyDensityOperator& matrix) const
     const Averaged1::Ptr p(sharedPointerize(averagedMode_));
 
     const Averages 
-      a0(partialTrace<V0,Averages>(matrix,bind(&Averaged1::average,0,_1,p,theStaticOne))),
-      a1(partialTrace<V1,Averages>(matrix,bind(&Averaged1::average,0,_1,p,theStaticOne)));
+      a0(partialTrace<V0,Averages>(matrix,bind(structure::average<1>,p,0,_1))),
+      a1(partialTrace<V1,Averages>(matrix,bind(structure::average<1>,p,0,_1)));
 
     copy(a1,copy(a0,averages.begin()));
   }

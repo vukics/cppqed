@@ -46,9 +46,6 @@ public:
   const SSF& getFree1() const {return free1_;}
   const SSI& getIA   () const {return    ia_;}
 
-  void   displayKey(std::ostream&, size_t&) const;
-  size_t nAvr      (                      ) const;
-
   const Averages average(double, const LazyDensityOperator&)  const;
   void           process(Averages&)                           const;
   void           display(const Averages&, std::ostream&, int) const;
@@ -56,6 +53,9 @@ public:
 private:
   double  highestFrequency_v(             ) const;
   void   displayParameters_v(std::ostream&) const;
+
+  size_t       nAvr_v(                      ) const;
+  void   displayKey_v(std::ostream&, size_t&) const;
 
   const SSF free0_, free1_;
 
@@ -102,11 +102,11 @@ CLASS_HEADER(Liouvillean)
 {
   CLASS_BODY_PART(Liouvillean,Li)
 
-  size_t              nJumps       ()                                   const;
-  const Probabilities probabilities(double, const LazyDensityOperator&) const;
-  void                actWithJ     (double, StateVectorLow&, size_t)    const;
+  size_t                     nJumps_v()                                   const;
+  const Probabilities probabilities_v(double, const LazyDensityOperator&) const;
+  void                     actWithJ_v(double, StateVectorLow&, size_t)    const;
 
-  void displayKey(std::ostream&, size_t&) const;
+  void displayKey_v(std::ostream&, size_t&) const;
 
 };
 

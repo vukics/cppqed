@@ -73,9 +73,9 @@ AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
 
 
 template<typename Base>
-const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average(const LazyDensityOperator& matrix) const
+const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average_v(const LazyDensityOperator& matrix) const
 {
-  const Averages averagesFromBase(Base::average(matrix));
+  const Averages averagesFromBase(Base::average_v(matrix));
   Averages averages(averagesFromBase.size()+1);
   averages(blitz::Range(0,averages.size()-2))=averagesFromBase;
   averages(averages.size()-1)=matrix(matrix.getDimension()-1);
@@ -84,10 +84,10 @@ const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>
 
 
 template<typename Base>
-void AveragedMonitorCutoff<Base>::process(Averages& averages) const
+void AveragedMonitorCutoff<Base>::process_v(Averages& averages) const
 {
   Averages ranged(averages(blitz::Range(0,averages.size()-2)));
-  Averaged::process(ranged);
+  Averaged::process_v(ranged);
 }
 
 

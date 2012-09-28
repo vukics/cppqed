@@ -61,7 +61,7 @@ DiagonalDO::DiagonalDO(const std::string& label, size_t dim) :
 
 
 const DiagonalDO::Averages 
-DiagonalDO::average(const LazyDensityOperator& matrix) const
+DiagonalDO::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(dim_);
   for (size_t i=0; i<dim_; i++)

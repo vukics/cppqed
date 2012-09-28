@@ -37,11 +37,11 @@ public:
   const std::string& getTitle () const {return keyPrinter_.getTitle ();}
   const KeyLabels  & getLabels() const {return keyPrinter_.getLabels();}
 
-  size_t nAvr()                                                      const {return keyPrinter_.length()         ;}
-
 private: 
-  void   display(const Averages& a, std::ostream& os, int precision) const {       displayCommon(a,os,precision);}
-  void   displayKey(std::ostream& os, size_t& i)                     const {       keyPrinter_.displayKey(os,i) ;}
+  size_t       nAvr_v()                                                   const {return keyPrinter_.length()         ;}
+
+  void      display_v(const Averages& a, std::ostream& os, int precision) const {       displayCommon(a,os,precision);}
+  void   displayKey_v(std::ostream& os, size_t& i)                        const {       keyPrinter_.displayKey(os,i) ;}
 
   const cpputils::KeyPrinter keyPrinter_;
 
@@ -90,8 +90,8 @@ public:
 private:
   Base*const do_clone() const {return new DiagonalDO(*this);}
 
-  const Averages average(const LazyDensityOperator&) const;
-  void           process(Averages&                 ) const {}
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&                 ) const {}
 
   const size_t dim_;
 

@@ -129,7 +129,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
   } catch (NoPresetDtTry) {
     if (p.logLevel>1) getOstream()<<"# Adjusting initial dtTry\n";
-    manageTimeStep(Liouvillean::probabilities(0.,psi_,qs_.getLi()),getEvolved().get(),false);
+    manageTimeStep(qs_.probabilities(0.,psi_),getEvolved().get(),false);
     // Initially, dpLimit should not be overshot, either.
   }
 }
@@ -227,7 +227,7 @@ void MCWF_Trajectory<RANK>::displayMore() const
 
   ostream& os=getOstream();
 
-  Averaged::display(getTime(),psi_,os,getPrecision(),qs_.getAv());
+  qs_.display(getTime(),psi_,os,getPrecision());
 
   displayEvenMore();
 
@@ -271,7 +271,7 @@ MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet* dpOverDtSet, dou
   for (int i=0; i<dpOverDtSet->size(); i++)
     if ((*dpOverDtSet)(i)<0) {
       StateVector psiTemp(psi_);
-      Liouvillean::actWithJ(t,psiTemp(),i,qs_.getLi());
+      qs_.actWithJ(t,psiTemp(),i);
       res.push_back(IndexSVL_tuple(i,psiTemp()));
       (*dpOverDtSet)(i)=mathutils::sqr(psiTemp.renorm());
     } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the SVL in the tuple
@@ -323,7 +323,7 @@ void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const In
       psi_()=i->template get<1>(); // RHS already normalized above
     else {
       // normal  jump
-      Liouvillean::actWithJ(t,psi_(),jumpNo,qs_.getLi());
+      qs_.actWithJ(t,psi_(),jumpNo);
       double normFactor=sqrt(dpOverDtSet(jumpNo));
       if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
       psi_()/=normFactor;
@@ -408,7 +408,7 @@ template<int RANK>
 size_t MCWF_Trajectory<RANK>::displayMoreKey() const
 {
   size_t i=3;
-  Averaged::displayKey(getOstream(),i,qs_.getAv());
+  qs_.displayAveragedKey(getOstream(),i);
   return i;
 }
 
