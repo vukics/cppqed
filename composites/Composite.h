@@ -115,18 +115,18 @@ private:
 
   // Implementing Li_Base
 
-  size_t              nJumps       ()                                   const; class NJumps;
-  const Probabilities probabilities(double, const LazyDensityOperator&) const; class Probas;
-  void                actWithJ     (double, StateVectorLow&, size_t)    const; class ActWithJ;
+  size_t                     nJumps_v()                                   const; class NJumps;
+  const Probabilities probabilities_v(double, const LazyDensityOperator&) const; class Probas;
+  void                     actWithJ_v(double, StateVectorLow&, size_t)    const; class ActWithJ;
 
   // Implementing Av_Base
 
-  void   displayKey(std::ostream&, size_t&) const; class DisplayKey;
-  size_t nAvr      ()                       const; class NAvr;
+  void   displayKey_v(std::ostream&, size_t&) const; class DisplayKey;
+  size_t       nAvr_v()                       const; class NAvr;
 
-  const Averages average(double, const LazyDensityOperator&)  const; class Average;
-  void           process(Averages&)                           const; class Process;
-  void           display(const Averages&, std::ostream&, int) const; class Display;
+  const Averages average_v(double, const LazyDensityOperator&)  const; class Average;
+  void           process_v(Averages&)                           const; class Process;
+  void           display_v(const Averages&, std::ostream&, int) const; class Display;
 
   // overall helpers
 

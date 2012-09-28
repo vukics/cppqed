@@ -130,7 +130,7 @@ Averaged::Averaged(const Spatial& space)
 }
 
 
-const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
 {
   using namespace blitzplusplus::vfmsi;
   using boost::for_each;
@@ -164,7 +164,7 @@ const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) co
 
 
 
-void Averaged::process(Averages& averages) const
+void Averaged::process_v(Averages& averages) const
 {
   averages(1)-=sqr(averages(0));
   averages(3)=sqrt(averages(3)-sqr(averages(2)));

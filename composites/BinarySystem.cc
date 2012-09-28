@@ -13,29 +13,33 @@
 #include <boost/make_shared.hpp>
 
 
-#define DISPLAY_KEY(Class,Aux) void binary::Class::displayKey(std::ostream& os, size_t& i) const \
+using composite::SubSystemFree;
+
+
+#define DISPLAY_KEY(Class,Aux) void binary::Class::displayKey_v(std::ostream& os, size_t& i) const \
   {									\
     os<<"# Binary system\n";						\
-    Aux##1::displayKey(os,i,free0_.get##Aux());				\
-    Aux##1::displayKey(os,i,free1_.get##Aux());				\
-    Aux##2::displayKey(os,i,   ia_.get##Aux());				\
+    free0_.display##Aux##Key(os,i);					\
+    free1_.display##Aux##Key(os,i);					\
+    ia_   .display##Aux##Key(os,i);					\
   }									\
 
 
-#define ADD_UP_N(Class,Aux,Func) size_t binary::Class::n##Func() const	\
+#define ADD_UP_N(Class,Func) size_t binary::Class::n##Func##_v() const	\
   {									\
-    return Aux##1::n##Func(free0_.get##Aux()) + Aux##1::n##Func(free1_.get##Aux()) + Aux##2::n##Func(ia_.get##Aux()); \
+    return free0_.n##Func() + free1_.n##Func() + ia_.n##Func(); \
   }									\
 
 
-#define CONCATENATE_ARRAYS(Class,Aux,ArrayName,func,NumberName) const binary::Class::ArrayName binary::Class::func(double t, const LazyDensityOperator& ldo) const \
+#define CONCATENATE_ARRAYS(Class,ArrayName,func,NumberName) const binary::Class::ArrayName binary::Class::func(double t, const LazyDensityOperator& ldo) const \
   {									\
   using quantumdata::partialTrace;					\
   using boost::copy;							\
 									\
-  const ArrayName a0 (partialTrace<V0,ArrayName>(ldo,bind(&Aux##1::func,t,_1,free0_.get##Aux(),theStaticOne))), \
-    a1 (partialTrace<V1,ArrayName>(ldo,bind(&Aux##1::func,t,_1,free1_.get##Aux(),theStaticOne))), \
-    a01(Aux##2::func(t,ldo,ia_.get##Aux()));				\
+  const ArrayName							\
+    a0 (partialTrace<V0,ArrayName>(ldo,bind(&SubSystemFree::func,free0_,t,_1))), \
+    a1 (partialTrace<V1,ArrayName>(ldo,bind(&SubSystemFree::func,free1_,t,_1))), \
+    a01(ia_.func(t,ldo));						\
 									\
   ArrayName a(n##NumberName());						\
 									\
@@ -90,11 +94,11 @@ void binary::Base::displayParameters_v(std::ostream& os) const
 }
 
 
-DISPLAY_KEY(Base,Av);
+DISPLAY_KEY(Base,Averaged);
 
-ADD_UP_N(Base,Av,Avr);
+ADD_UP_N(Base,Avr);
 
-CONCATENATE_ARRAYS(Base,Av,Averages,average,Avr);
+CONCATENATE_ARRAYS(Base,Averages,average,Avr);
 
 
 void binary::Base::process(Averages& averages) const
@@ -201,41 +205,39 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
 /////////////////
 
 
-ADD_UP_N(Liouvillean,Li,Jumps)
+ADD_UP_N(Liouvillean,Jumps)
 
-CONCATENATE_ARRAYS(Liouvillean,Li,Probabilities,probabilities,Jumps);
+CONCATENATE_ARRAYS(Liouvillean,Probabilities,probabilities,Jumps);
 
 
-void binary::Liouvillean::actWithJ(double t, StateVectorLow& psi, size_t i) const
+void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) const
 {
   using namespace blitzplusplus::basi;
 
   const Li1::Ptr
     li0 =free0_.getLi(),
     li1 =free1_.getLi();
-  const Li2::Ptr
-    li01=   ia_.getLi();
 
-  size_t n=Li1::nJumps(li0);
+  size_t n=free0_.nJumps();
   if (li0 && i<n) {
     for_each(fullRange<V0>(psi),bind(&Li1::actWithJ,li0,t,_1,i));
     return;
   }
 
   i-=n;  
-  if (li1 && i<(n=Li1::nJumps(li1))) {
+  if (li1 && i<(n=free1_.nJumps())) {
     for_each(fullRange<V1>(psi),bind(&Li1::actWithJ,li1,t,_1,i));
     return;
   }
 
   i-=n;
-  if (i<(n=Li2::nJumps(li01)))
-    Li2::actWithJ(t,psi,i,li01);
+  if (i<ia_.nJumps())
+    ia_.actWithJ(t,psi,i);
 
 }
 
 
-DISPLAY_KEY(Liouvillean,Li)
+DISPLAY_KEY(Liouvillean,Liouvillean)
 
 
 
@@ -277,9 +279,9 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
     free0=ia->getFrees()(0),
     free1=ia->getFrees()(1);
 
-  return SystemCharacteristics(qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
-			       qsh<1>(free0) || qsh<1>(free1) || qsh<2>(ia),
-			       qsl<1>(free0) || qsl<1>(free1) || qsl<2>(ia));
+  return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(ia),
+			       qsh(free0) || qsh(free1) || qsh<2>(ia),
+			       qsl(free0) || qsl(free1) || qsl<2>(ia));
 }
 
 }
