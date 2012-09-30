@@ -29,10 +29,10 @@ Base<RANK>::Base(DensityOperator& rho,
 		 const master::Pars& p,
 		 const DensityOperatorLow& scaleAbs
 		 )
-  : trajectory::TrajectoryBase(p),
-    TrajectoryBase(rho(),
+  : trajectory::Trajectory(p),
+    Trajectory(rho(),
 		   bind(&Base<RANK>::derivs,this,_1,_2,_3),
-		   1./(qs->highestFrequency()*TrajectoryBase::factor()),
+		   1./(qs->highestFrequency()*Trajectory::factor()),
 		   scaleAbs,
 		   p,
 		   evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
@@ -131,7 +131,7 @@ void
 Base<RANK>::displayParameters() const
 {
   using namespace std;
-  TrajectoryBase::displayParameters();
+  Trajectory::displayParameters();
 
   getOstream()<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl;
 

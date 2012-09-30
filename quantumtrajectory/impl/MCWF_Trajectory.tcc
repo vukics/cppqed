@@ -73,7 +73,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 				       const ParsMCWF_Trajectory& p,
 				       const StateVectorLow& scaleAbs
 				       )
-  : TrajectoryBase(p),
+  : Trajectory(p),
     Base(psi(),
 	 bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
 	 1./(cpputils::sharedPointerize(sys)->highestFrequency()*Base::factor()),

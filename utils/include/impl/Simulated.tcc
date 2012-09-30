@@ -17,7 +17,7 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 			const A& scaleAbs, 
 			std::ostream& os, int precision, 
 			const evolved::Maker<A>& maker)
-  : TrajectoryBase(os,precision),
+  : Trajectory(os,precision),
     Base(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,maker)
 {}
 
@@ -27,7 +27,7 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 			const A& scaleAbs,
 			const ParsTrajectory& p,
 			const evolved::Maker<A>& maker)
-  : TrajectoryBase(p),
+  : Trajectory(p),
     Base(y,derivs,dtInit,scaleAbs,p,maker)
 {}
 
@@ -37,7 +37,7 @@ void Simulated<A>::displayMore() const
 {
   const A& a=getEvolved()->getA();
   for (size_t i=0; i<Traits::ssLimit(a); i++)
-    getOstream()<<FormDouble(TrajectoryBase::getPrecision())(Traits::ss(a,i))<<' ';
+    getOstream()<<FormDouble(Trajectory::getPrecision())(Traits::ss(a,i))<<' ';
   getOstream()<<std::endl;
 }
 

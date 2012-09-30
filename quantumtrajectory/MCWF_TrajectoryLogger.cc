@@ -31,7 +31,7 @@ quantumtrajectory::MCWF_TrajectoryLogger::~MCWF_TrajectoryLogger()
 	<<"\n# Failed ODE steps: "<<nFailedSteps_
 	<<"\n# Number of Hamiltonian calls: "<<nHamiltonianCalls_<<endl;
     os_
-      <<"\n# Trajectory:\n";
+      <<"\n# MCWF Trajectory:\n";
     boost::for_each(traj_,os_<<constant("# ")<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
   }
 }

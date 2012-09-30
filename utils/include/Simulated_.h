@@ -14,10 +14,10 @@ namespace trajectory {
 
 
 template<typename A> 
-class Simulated : public Trajectory<A>
+class Simulated : public AdaptiveTrajectory<A>
 {
 public:
-  typedef Trajectory<A> Base;
+  typedef AdaptiveTrajectory<A> Base;
   typedef cpputils::ArrayTraversalTraits<A> Traits;
 
   typedef evolved::Evolved<A> Evolved;

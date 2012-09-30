@@ -1,6 +1,6 @@
 // -*- C++ -*-
 
-// Trajectory is more than Evolved only in that it takes into account
+// AdaptiveTrajectory is more than Evolved only in that it takes into account
 // the need for communicating towards the user from time to time during
 // Evolution.
 
@@ -24,13 +24,13 @@
 namespace trajectory {
 
 
-inline void runDt(TrajectoryBase&, double time, double deltaT, bool displayInfo);
+inline void runDt(Trajectory&, double time, double deltaT, bool displayInfo);
 
 template<typename A>
-inline void run  (Trajectory<A> &, double time, int          , bool displayInfo);
+inline void run  (AdaptiveTrajectory<A> &, double time, int          , bool displayInfo);
 
 template<typename A>
-inline void evolve(Trajectory<A>&, const ParsTrajectory&);
+inline void evolve(AdaptiveTrajectory<A>&, const ParsTrajectory&);
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
@@ -46,12 +46,12 @@ public:
 
 /////////////////
 //
-// TrajectoryBase
+// Trajectory
 //
 /////////////////
 
 
-class TrajectoryBase : private boost::noncopyable
+class Trajectory : private boost::noncopyable
 {
 public:
   std::ostream& getOstream  () const {return   ostream_;}
@@ -70,14 +70,14 @@ public:
   
   static  double factor() {return 10.;}
 
-  virtual ~TrajectoryBase();
+  virtual ~Trajectory();
 
 protected:
-  TrajectoryBase(      std::ostream&, int);
-  TrajectoryBase(const std::string &, int);
-  TrajectoryBase(const ParsTrajectory&   );
+  Trajectory(      std::ostream&, int);
+  Trajectory(const std::string &, int);
+  Trajectory(const ParsTrajectory&   );
 
-  TrajectoryBase() : ostream_(std::cerr), precision_(0) {assert(false);} // A dummy constructor, which should never be called
+  Trajectory() : ostream_(std::cerr), precision_(0) {assert(false);} // A dummy constructor, which should never be called
 
 private:
   virtual void   displayMore   () const = 0; // LOGICALLY const
@@ -91,12 +91,12 @@ private:
 
 /////////////
 //
-// Trajectory
+// AdaptiveTrajectory
 //
 /////////////
 
 template<typename A>
-class Trajectory : public virtual TrajectoryBase 
+class AdaptiveTrajectory : public virtual Trajectory 
 {
 public:
   // Some parameter-independent code could still be factored out, but probably very little
@@ -110,17 +110,17 @@ public:
   // Simulated, but neither Master, nor MCWF_Trajectory)
   virtual void step(double deltaT) const = 0;
 
-  void evolve(double deltaT) const {evolved::evolve<const Trajectory>(*this,deltaT);}
+  void evolve(double deltaT) const {evolved::evolve<const AdaptiveTrajectory>(*this,deltaT);}
 
   virtual void displayParameters() const;
 
-  virtual ~Trajectory() {}
+  virtual ~AdaptiveTrajectory() {}
 
 protected:
-  Trajectory(A&, typename Evolved::Derivs, double, double, double, const A&,
+  AdaptiveTrajectory(A&, typename Evolved::Derivs, double, double, double, const A&,
 	     const evolved::Maker<A>&);
 
-  Trajectory(A&, typename Evolved::Derivs, double, const A&, const ParsTrajectory&,
+  AdaptiveTrajectory(A&, typename Evolved::Derivs, double, const A&, const ParsTrajectory&,
 	     const evolved::Maker<A>&);
 
   typename Evolved::Ptr getEvolved() const {return evolved_;}
@@ -138,14 +138,14 @@ namespace details {
 template<typename T, typename L, typename D>
 void run(T& traj, L l, D d, void (*doRun)(T&,L,D), bool timestep, bool displayInfo);
 
-void doRun(TrajectoryBase&, long   nDt , double deltaT);
-// Evolves the system on a Trajectory for nDt display intervals deltaT
+void doRun(Trajectory&, long   nDt , double deltaT);
+// Evolves the system on an AdaptiveTrajectory for nDt display intervals deltaT
 
-void doRun(TrajectoryBase&, double time, double deltaT);
-// Evolves the system on a Trajectory up to time T and Displays in every deltaT
+void doRun(Trajectory&, double time, double deltaT);
+// Evolves the system on an AdaptiveTrajectory up to time T and Displays in every deltaT
 
 template<typename A> 
-void doRun(Trajectory<A>& traj, double time, int dc);
+void doRun(AdaptiveTrajectory<A>& traj, double time, int dc);
 
 } // details
 

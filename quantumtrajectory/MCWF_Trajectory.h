@@ -87,16 +87,18 @@ public:
 
   void displayParameters() const;
 
+  const StateVector& getPsi() const {return psi_;} 
+
 protected:
   virtual size_t displayMoreKey () const;
 
   virtual void   displayEvenMore() const {}
 
-  const StateVector& toBeAveraged() const {return psi_;} 
-
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
+
+  const StateVector& toBeAveraged_v() const {return psi_;} 
 
   void displayMore() const;
   

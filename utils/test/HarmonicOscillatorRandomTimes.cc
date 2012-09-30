@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
   if (pt.T<0) pt.T=20./min(1.,min(omega,gamma));
 
-  double dtInit=1./(max(1.,max(omega,gamma))*TrajectoryBase::factor());  
+  double dtInit=1./(max(1.,max(omega,gamma))*Trajectory::factor());  
 
   DDOscPars params(omega,gamma);
 

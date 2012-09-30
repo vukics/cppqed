@@ -51,7 +51,7 @@ ProjectingMCWF_Trajectory<RANK>::displayEvenMore() const
 {
   using namespace formdouble;
 
-  const StateVector& psi=toBeAveraged();
+  const StateVector& psi=getPsi();
   const FormDouble fd(getPrecision());
  
   if (int dim=basis_.size()) {
