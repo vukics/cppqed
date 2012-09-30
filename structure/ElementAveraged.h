@@ -99,14 +99,14 @@ private:
 
 
 
-template<int RANK>
-class Collecting : public ClonableElementAveraged<RANK>
+template<int RANK, bool IS_TD>
+class Collecting : public ClonableElementAveraged<RANK,IS_TD>
 {
 public:
-  typedef ClonableElementAveraged<RANK> Element;
+  typedef ClonableElementAveraged<RANK,IS_TD> Element;
   typedef boost::ptr_list<Element> Collection;
 
-  typedef ClonableElementAveraged<RANK> Base;
+  typedef ClonableElementAveraged<RANK,IS_TD> Base;
   typedef typename Base::KeyLabels KeyLabels;
 
   typedef AveragedCommon::Averages Averages;
@@ -120,8 +120,11 @@ private:
 
   using Base::nAvr; using Base::getLabels;
 
-  const Averages average(const LazyDensityOperator&) const;
-  void           process(Averages&                 ) const;
+  const Averages average_v(double, const LazyDensityOperator&) const;
+
+  const Averages average_v(const LazyDensityOperator& matrix) const {return average_v(0.,matrix);}
+
+  void  process_v(Averages&) const;
 
   const Collection collection_;
 

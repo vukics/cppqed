@@ -7,7 +7,7 @@ namespace structure {
 class AveragedCommon;
 
 #ifndef   NDEBUG
-struct AveragesFishyException;
+struct AveragesNumberMismatchException;
 #endif // NDEBUG
 
 template<int, bool IS_TD=true> class Averaged;

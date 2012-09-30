@@ -55,7 +55,7 @@ private:
 
 
 #ifndef   NDEBUG
-struct AveragesFishyException : cpputils::Exception {};
+struct AveragesNumberMismatchException : cpputils::Exception {};
 #endif // NDEBUG
 
 struct InfiniteDetectedException : cpputils::Exception {};
@@ -82,7 +82,7 @@ public:
   {
     const Averages averages(average_v(t,matrix));
 #ifndef   NDEBUG
-    if (size_t(averages.size())!=Base::nAvr()) throw AveragesFishyException();
+    if (size_t(averages.size())!=Base::nAvr()) throw AveragesNumberMismatchException();
 #endif // NDEBUG
     if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
 
@@ -130,17 +130,17 @@ public:
   Transferring(AveragedToPtr averaged, const LazyDensityOperatorTo& ldo)
     : averaged_(averaged), ldo_(ldo) {}
 
-  void process(Averages& averages) const {averaged_->process(averages);}
-
-  void display(const Averages& averages, std::ostream& os, int n) const {averaged_->display(averages,os,n);}
-
-  void displayKey(std::ostream& os, size_t& n) const {averaged_->displayKey(os,n);}
-
 private:
-  const Averages average_v(double time, const LazyDensityOperator&) const {return averaged_->average(time,ldo_);}
-  const Averages average_v(const LazyDensityOperator&) const {return averaged_->average(ldo_);}
+  void displayKey_v(std::ostream& os, size_t& n) const {averaged_->displayKey(os,n);}
+
+  void process_v(Averages& averages) const {averaged_->process(averages);}
+
+  void display_v(const Averages& averages, std::ostream& os, int n) const {averaged_->display(averages,os,n);}
 
   size_t nAvr_v() const {return averaged_->nAvr();}
+
+  const Averages average_v(double time, const LazyDensityOperator&) const {return averaged_->average(time,ldo_);}
+  const Averages average_v(             const LazyDensityOperator&) const {return averaged_->average(     ldo_);}
 
   const AveragedToPtr averaged_;
   const LazyDensityOperatorTo& ldo_;

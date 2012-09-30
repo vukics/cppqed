@@ -197,10 +197,11 @@ class AveragedQuadratures : public Averaged
 public:
   AveragedQuadratures(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
-private:
+protected:
   const Averages average_v(const LazyDensityOperator&) const;
   void           process_v(Averages&)                  const;
 
+private:
   const ClonedPtr do_clone() const {return new AveragedQuadratures(*this);}
 
 };

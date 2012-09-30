@@ -33,7 +33,7 @@ namespace {
 
 
 const ModeCorrelations::Averages
-ModeCorrelations::average(const LazyDensityOperator& matrix) const
+ModeCorrelations::average_v(const LazyDensityOperator& matrix) const
 {
   using quantumdata::partialTrace;
   typedef LazyDensityOperator::Idx Idx;
@@ -70,7 +70,7 @@ ModeCorrelations::average(const LazyDensityOperator& matrix) const
 
 
 void
-ModeCorrelations::process(Averages& averages) const
+ModeCorrelations::process_v(Averages& averages) const
 {
   {
     Averages ranged(averages(blitz::Range(0, 6)));

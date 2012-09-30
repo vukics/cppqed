@@ -31,7 +31,7 @@ using composite::SubSystemFree;
   }									\
 
 
-#define CONCATENATE_ARRAYS(Class,ArrayName,func,NumberName) const binary::Class::ArrayName binary::Class::func(double t, const LazyDensityOperator& ldo) const \
+#define CONCATENATE_ARRAYS(Class,ArrayName,func,NumberName) const binary::Class::ArrayName binary::Class::func##_v(double t, const LazyDensityOperator& ldo) const \
   {									\
   using quantumdata::partialTrace;					\
   using boost::copy;							\
@@ -101,36 +101,30 @@ ADD_UP_N(Base,Avr);
 CONCATENATE_ARRAYS(Base,Averages,average,Avr);
 
 
-void binary::Base::process(Averages& averages) const
+void binary::Base::process_v(Averages& averages) const
 {
   using blitz::Range;
 
-  const Av1::Ptr 
-    av0 =free0_.getAv(),
-    av1 =free1_.getAv();
-  const Av2::Ptr 
-    av01=   ia_.getAv();
-
   ptrdiff_t l=-1, u;
 
-  if ((u=l+Av1::nAvr(av0 ))>l) {
+  if ((u=l+free0_.nAvr())>l) {
     Averages temp(averages(Range(l+1,u)));
-    Av1::process(temp,av0 );
+    free0_.process(temp);
   }
-  if ((l=u+Av1::nAvr(av1 ))>u) {
+  if ((l=u+free1_.nAvr())>u) {
     Averages temp(averages(Range(u+1,l)));
-    Av1::process(temp,av1 );
+    free1_.process(temp);
   }
-  if ((u=l+Av2::nAvr(av01))>l) {
+  if ((u=l+ia_.nAvr())>l) {
     Averages temp(averages(Range(l+1,u)));
-    Av2::process(temp,av01);
+    ia_.process(temp);
   }
 
 }
 
 
 
-void binary::Base::display(const Averages& averages, std::ostream& os, int precision) const
+void binary::Base::display_v(const Averages& averages, std::ostream& os, int precision) const
 {
   using blitz::Range;
 
@@ -142,11 +136,11 @@ void binary::Base::display(const Averages& averages, std::ostream& os, int preci
 
   ptrdiff_t l=-1, u;
 
-  if ((u=l+Av1::nAvr(av0 ))>l) av0 ->display(averages(Range(l+1,u)),os,precision);
+  if ((u=l+free0_.nAvr())>l) av0 ->display(averages(Range(l+1,u)),os,precision);
 
-  if ((l=u+Av1::nAvr(av1 ))>u) av1 ->display(averages(Range(u+1,l)),os,precision);
+  if ((l=u+free1_.nAvr())>u) av1 ->display(averages(Range(u+1,l)),os,precision);
 
-  if ((u=l+Av2::nAvr(av01))>l) av01->display(averages(Range(l+1,u)),os,precision);
+  if ((u=l+   ia_.nAvr())>l) av01->display(averages(Range(l+1,u)),os,precision);
 
 }
 

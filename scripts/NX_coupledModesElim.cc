@@ -25,11 +25,11 @@ public:
 
   NX_coupledModesElim(Pars, const mode::ParsPumpedLossy&, double u);
 
-  void addContribution(const StateVectorLow&, StateVectorLow&) const;
-
   const Spatial& getSpace() const {return space_;}
 
 private:
+  void addContribution_v(const StateVectorLow&, StateVectorLow&) const;
+
   const Spatial& space_;
 
   const DArray& x_, y_;
@@ -104,7 +104,7 @@ NX_coupledModesElim::NX_coupledModesElim(Pars ppart, const mode::ParsPumpedLossy
 
 
 
-void NX_coupledModesElim::addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+void NX_coupledModesElim::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   dpsidt+=hOverI_X_*psi;
 
