@@ -95,7 +95,7 @@ public:
 
 private:
   // virtual from LDO_Base
-  const dcomp operator()(const Idx&, const Idx&) const;
+  const dcomp index(const Idx&, const Idx&) const;
 
 };
 
