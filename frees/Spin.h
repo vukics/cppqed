@@ -73,9 +73,9 @@ public:
   // This plays analogous role as Z in Mode
 
 private:
-  void process(Averages&) const;
+  void process_v(Averages&) const;
 
-  const Averages average(const LazyDensityOperator&) const;
+  const Averages average_v(const LazyDensityOperator&) const;
 
   const size_t twoS_;
 

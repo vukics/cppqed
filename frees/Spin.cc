@@ -93,7 +93,7 @@ SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double g
 
 
 
-const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) const
+const SpinBase::Averages SpinBase::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(5);
 
@@ -120,7 +120,7 @@ const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) co
 }
 
 
-void SpinBase::process(Averages& averages) const
+void SpinBase::process_v(Averages& averages) const
 {
   averages(1)-=sqr(averages(0));
 }

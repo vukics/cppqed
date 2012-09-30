@@ -32,19 +32,19 @@ public:
   typedef Base::StateVectorLow StateVectorLow;
   typedef Base::LazyDensityOperator LazyDensityOperator;
 
-  double probability(const LazyDensityOperator&) const;
-
-  void doActWithJ(StateVectorLow&) const;
-
-  const Averages average(const LazyDensityOperator&) const;
-  void           process(Averages&) const;
-
   const dcomp getZa() const {return za_;}
 
 protected:
   PumpedTwoLevelAtom(const qbit::ParsPumpedLossy&);
 
 private:
+  double probability(const LazyDensityOperator&) const;
+
+  void doActWithJ(StateVectorLow&) const;
+
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&) const;
+
   const dcomp za_, eta_;
 
 };
