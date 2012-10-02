@@ -14,10 +14,10 @@ namespace trajectory {
 
 
 template<typename A> 
-class Simulated : public Trajectory<A>
+class Simulated : public AdaptiveTrajectory<A>
 {
 public:
-  typedef Trajectory<A> Base;
+  typedef AdaptiveTrajectory<A> Base;
   typedef cpputils::ArrayTraversalTraits<A> Traits;
 
   typedef evolved::Evolved<A> Evolved;
@@ -35,12 +35,13 @@ public:
 	    const ParsTrajectory&,
 	    const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
-  void step(double deltaT) const {getEvolved()->step(deltaT);}
+private:
+  void step_v(double deltaT) const {getEvolved()->step(deltaT);}
 
   void   displayMore   () const;
   size_t displayMoreKey() const;
 
-  void   displayParameters() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters();}
+  void   displayParameters_v() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters_v();}
 
 };
 

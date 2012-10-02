@@ -18,7 +18,9 @@ template<int RANK, bool IS_CONST>
 class DimensionsBookkeeper
 {
 public:
-  static const int N_RANK=RANK;
+  static const int                    N_RANK=RANK;
+  static const int DIMESIONS_BOOKKEEPER_RANK=RANK;
+  // This is introduced in order to break ambiguity if a class is derived from another base which features N_RANK;
 
   typedef TTD_EXTTINY(RANK) Dimensions;
 

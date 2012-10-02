@@ -44,10 +44,10 @@ public:
 
 #undef  BASE_class
 
-  typedef MCWF_Trajectory<RANK> Trajectory;
+  typedef MCWF_Trajectory<RANK> AdaptiveTrajectory;
 
-  typedef typename Trajectory::StateVector    StateVector   ;
-  typedef typename Trajectory::StateVectorLow StateVectorLow; 
+  typedef typename AdaptiveTrajectory::StateVector    StateVector   ;
+  typedef typename AdaptiveTrajectory::StateVectorLow StateVectorLow; 
 
   typedef typename structure::QuantumSystem<RANK>::Ptr QuantumSystemPtr;
 
@@ -63,12 +63,12 @@ public:
 
   const StateVectors& getStateVectors() const {return StateVectorsBase::member;}
 
-  const typename EnsembleTrajectories::TBA_Type getInitializedTBA() const {rho_()=0; return rho_;}
-
 protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
+  const typename EnsembleTrajectories::TBA_Type getInitializedTBA_v() const {rho_()=0; return rho_;}
+
   mutable quantumdata::DensityOperator<RANK> rho_;
 
   const QuantumSystemPtr qs_;
@@ -99,7 +99,7 @@ public:
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;
 
-  using Base::getQS; using Base::getOstream; using Base::getPrecision; using Base::getTime; using Base::getStateVectors;
+  using Base::getQS; using Base::getOstream; using Base::getPrecision; using Base::getTime; using Base::getStateVectors; using Base::toBeAveraged;
 
   template<typename SYS>
   EnsembleMCWF(
@@ -109,10 +109,10 @@ public:
 	       bool negativity,
 	       const StateVectorLow& scaleAbs=StateVectorLow()
 	       )
-    : trajectory::TrajectoryBase(p), Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
+    : trajectory::Trajectory(p), Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
 
 private:
-  void   displayMore   () const {doDisplay_.displayMore(getTime(),EnsembleTrajectories::toBeAveraged(),getOstream(),getPrecision());}
+  void   displayMore   () const {doDisplay_.displayMore(getTime(),toBeAveraged(),getOstream(),getPrecision());}
   size_t displayMoreKey() const {return doDisplay_.displayMoreKey(getOstream());}
 
   const DO_Display doDisplay_;

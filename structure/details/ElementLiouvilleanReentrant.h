@@ -3,12 +3,14 @@
 #define COND_ARG(IS_TD) BOOST_PP_EXPR_IIF(ISTD,double) BOOST_PP_COMMA_IF(ISTD)
 #define COND_ARG_T(IS_TD) BOOST_PP_EXPR_IIF(ISTD,double t) BOOST_PP_COMMA_IF(ISTD)
 
+#define ISTD_true_false BOOST_PP_IIF(ISTD,true,false)
+
 
 template<int RANK, int NOJ>
-class ElementLiouvillean<RANK,NOJ,BOOST_PP_IIF(ISTD,true,false)> : public Liouvillean<RANK,BOOST_PP_IIF(ISTD,true,false)>
+class ElementLiouvillean<RANK,NOJ,ISTD_true_false> : public Liouvillean<RANK,ISTD_true_false>
 {
 public:
-  typedef Liouvillean<RANK,BOOST_PP_IIF(ISTD,true,false)> Base;
+  typedef Liouvillean<RANK,ISTD_true_false> Base;
 
   typedef typename Base::     StateVectorLow      StateVectorLow;
 
@@ -29,14 +31,14 @@ protected:
     : jumps_(jumps), jumpProbas_(jumpProbas), keyPrinter_(keyTitle,keyLabels) {}
 
 private:
-  size_t nJumps() const {return NOJ;}
+  size_t nJumps_v() const {return NOJ;}
 
-  const Probabilities probabilities(COND_ARG(ISTD) const LazyDensityOperator&) const;
+  const Probabilities probabilities_v(COND_ARG(ISTD) const LazyDensityOperator&) const;
 
-  void actWithJ(COND_ARG_T(ISTD) StateVectorLow& psi, size_t jumpNo) const
+  void actWithJ_v(COND_ARG_T(ISTD) StateVectorLow& psi, size_t jumpNo) const
   {jumps_(jumpNo)(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);}
 
-  void displayKey(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
+  void displayKey_v(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
 
   const JumpStrategies            jumps_     ;
   const JumpProbabilityStrategies jumpProbas_;
@@ -47,11 +49,11 @@ private:
 
 
 template<int RANK>
-class ElementLiouvillean<RANK,1,BOOST_PP_IIF(ISTD,true,false)> : public Liouvillean<RANK,BOOST_PP_IIF(ISTD,true,false)>
+class ElementLiouvillean<RANK,1,ISTD_true_false> : public Liouvillean<RANK,ISTD_true_false>
 // This specialization can use the virtual-function technique of old
 {
 public:
-  typedef Liouvillean<RANK,BOOST_PP_IIF(ISTD,true,false)> Base;
+  typedef Liouvillean<RANK,ISTD_true_false> Base;
 
   typedef typename Base::    StateVectorLow     StateVectorLow;
 
@@ -66,16 +68,16 @@ protected:
     : keyPrinter_(keyTitle,KeyLabels(1,keyLabel)) {}
 
 private:
-  size_t nJumps() const {return 1;}
+  size_t nJumps_v() const {return 1;}
 
-  const Probabilities probabilities(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const 
+  const Probabilities probabilities_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const 
   {Probabilities probas(1); probas(0)=probability(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) matrix); return probas;}
 
 #ifndef   NDEBUG
   struct ElementLiouvilleanException : cpputils::Exception {};
 #endif // NDEBUG
 
-  void actWithJ(COND_ARG_T(ISTD) StateVectorLow& psi, size_t 
+  void actWithJ_v(COND_ARG_T(ISTD) StateVectorLow& psi, size_t 
 #ifndef   NDEBUG
 		  jumpNo
 #endif // NDEBUG
@@ -86,7 +88,7 @@ private:
     doActWithJ(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);
   }
 
-  void displayKey(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
+  void displayKey_v(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
 
   virtual void   doActWithJ (COND_ARG(ISTD)       StateVectorLow     &) const = 0;
   virtual double probability(COND_ARG(ISTD) const LazyDensityOperator&) const = 0;
@@ -99,7 +101,7 @@ private:
 
 
 template<int RANK, int NOJ>
-const LiouvilleanCommon::Probabilities ElementLiouvillean<RANK,NOJ,BOOST_PP_IIF(ISTD,true,false)>::probabilities(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const
+const LiouvilleanCommon::Probabilities ElementLiouvillean<RANK,NOJ,ISTD_true_false>::probabilities_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const
 {
   Probabilities probas(NOJ);
   // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
@@ -109,6 +111,8 @@ const LiouvilleanCommon::Probabilities ElementLiouvillean<RANK,NOJ,BOOST_PP_IIF(
   return probas;
 }
 
+
+#undef ISTD_true_false
 
 #undef COND_ARG
 #undef COND_ARG_T

@@ -16,7 +16,7 @@ namespace structure {
 
 template<int RANK>
 void 
-details::TDH_True<RANK>::addContribution(double tMinusIntPic0, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+details::TDH_True<RANK>::addContribution_v(double tMinusIntPic0, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   boost::for_each(hOverIs_,bind(quantumoperator::apply<RANK>,psi,dpsidt,bind(&Tridiagonal::propagate,_1,tMinusIntPic0)));
 }
@@ -24,7 +24,7 @@ details::TDH_True<RANK>::addContribution(double tMinusIntPic0, const StateVector
 
 template<int RANK>
 void 
-details::TDH_False<RANK>::addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+details::TDH_False<RANK>::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   boost::for_each(hOverIs_,bind(quantumoperator::apply<RANK>,psi,dpsidt,_1));
 }

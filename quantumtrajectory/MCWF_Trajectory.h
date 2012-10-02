@@ -83,20 +83,22 @@ public:
 
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
-  void step(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
-
-  void displayParameters() const;
+  const StateVector& getPsi() const {return psi_;} 
 
 protected:
   virtual size_t displayMoreKey () const;
 
   virtual void   displayEvenMore() const {}
 
-  const StateVector& toBeAveraged() const {return psi_;} 
-
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
+
+  void step_v(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
+
+  void displayParameters_v() const;
+
+  const StateVector& toBeAveraged_v() const {return psi_;} 
 
   void displayMore() const;
   

@@ -23,7 +23,7 @@ public:
 
   typedef boost::ptr_vector<StateVector> Basis;
 
-  using Base::getOstream; using Base::toBeAveraged; using Base::getPrecision;
+  using Base::getOstream; using Base::getPsi; using Base::getPrecision;
 
   template<typename SYS>
   ProjectingMCWF_Trajectory(
@@ -33,7 +33,7 @@ public:
 			    const ParsMCWF_Trajectory& p,
 			    const StateVectorLow& scaleAbs=StateVectorLow()
 			    )
-    : TrajectoryBase(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
+    : Trajectory(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
   {}
 
 private:

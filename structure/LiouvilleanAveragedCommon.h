@@ -21,12 +21,10 @@ public:
   virtual ~LiouvilleanAveragedCommon() {}
 
   // For a  Liouvillean, the key is a description of decay channels, for an Averaged, it describes the displayed columns
-  static void displayKey(std::ostream& o, size_t& i, Ptr common)
-  {
-    if (common) common->displayKey(o,i);
-  }
+  void displayKey(std::ostream& o, size_t& i) const {displayKey_v(o,i);}
 
-  virtual void displayKey(std::ostream&, size_t&) const = 0;
+private:
+  virtual void displayKey_v(std::ostream&, size_t&) const = 0;
 
 };
 

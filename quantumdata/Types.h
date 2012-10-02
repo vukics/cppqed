@@ -9,15 +9,6 @@
 #include "BlitzArray.h"
 
 
-namespace structure {
-
-struct StaticTag {};
-
-const StaticTag theStaticOne=StaticTag();
-
-} //structure
-
-
 namespace quantumdata {
 
 

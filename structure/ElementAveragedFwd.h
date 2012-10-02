@@ -16,6 +16,9 @@ namespace averaged {
 
 class DiagonalDO;
 
+template<int, bool IS_TD=false>
+class Collecting;
+
 } // averaged
 
 } // structure

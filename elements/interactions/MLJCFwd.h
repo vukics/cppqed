@@ -3,10 +3,6 @@
 #define   ELEMENTS_INTERACTIONS_MLJCFWD_H_INCLUDED
 
 
-template<int NL, typename VC>
-class MLJC;
-
-
 namespace mljc {
 
 template<int, int>

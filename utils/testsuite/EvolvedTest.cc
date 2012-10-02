@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE( ComparisonToExactSolution )
   {
     double 
       T     =4.,//10./min(fabs(real(Z)),fabs(imag(Z))),
-      dtInit=1./(abs(Z)*TrajectoryBase::factor());
+      dtInit=trajectory::initialTimeStep(abs(Z));
  
     CA1D y(2);
   

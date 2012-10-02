@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     for (list<size_t>::const_iterator i=sections.begin(); i!=sections.end(); ++i) {
       double avr=0;
       for (size_t begin=0; begin<pe.nTraj; begin+=*i)
-	avr+=frobeniusNorm(rho-e.toBeAveraged(begin,*i));
+	avr+=frobeniusNorm(rho-e.averageInRange(begin,*i));
       cout<<avr*(double(*i)/pe.nTraj)<<'\t';
     }
 

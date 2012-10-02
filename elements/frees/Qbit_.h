@@ -25,8 +25,8 @@ public:
   Averaged();
 
 private:
-  const Averages average(const LazyDensityOperator&) const;
-  void           process(Averages&                 ) const {}
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&                 ) const {}
 
 };
 

@@ -31,26 +31,18 @@ public:
 
   typedef DArray1D Averages;
 
-
-  static size_t nAvr(Ptr averagedCommon)
-  {
-    return averagedCommon ? averagedCommon->nAvr() : 0;
-  }
-
-
-  static void process(Averages& averages, Ptr averagedCommon) 
-  {
-    if (averagedCommon) averagedCommon->process(averages);
-  }
-
-
   virtual ~AveragedCommon() {}
 
+  void process(Averages& averages) const {process_v(averages);}
 
-  virtual void   process   (Averages&)                           const = 0;
-  virtual void   display   (const Averages&, std::ostream&, int) const = 0;
+  void display(const Averages& averages, std::ostream& os, int i) const {display_v(averages,os,i);}
 
-  virtual size_t nAvr      ()                                    const = 0;
+  size_t nAvr() const {return nAvr_v();}
+
+private:
+  virtual void   process_v(Averages&)                           const = 0;
+  virtual void   display_v(const Averages&, std::ostream&, int) const = 0;
+  virtual size_t    nAvr_v()                                    const = 0;
 
 };
 
@@ -63,7 +55,7 @@ public:
 
 
 #ifndef   NDEBUG
-struct AveragesFishyException : cpputils::Exception {};
+struct AveragesNumberMismatchException : cpputils::Exception {};
 #endif // NDEBUG
 
 struct InfiniteDetectedException : cpputils::Exception {};
@@ -74,6 +66,8 @@ class Averaged<RANK,true>
   : public quantumdata::Types<RANK,AveragedCommon>
 {
 public:
+  static const int N_RANK=RANK;
+
   typedef boost::shared_ptr<const Averaged> Ptr;
 
   typedef quantumdata::Types<RANK,AveragedCommon> Base;
@@ -82,31 +76,21 @@ public:
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
-  using Base::display;
-
-  static const Averages average(double t, const LazyDensityOperator& matrix, Ptr averaged, StaticTag=theStaticOne)
-  {
-    return averaged ? averaged->average(t,matrix) : Averages();
-  }
-
-
-  static void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision, Ptr averaged, StaticTag=theStaticOne)
-  {
-    if (averaged) {
-      Averages averages(averaged->average(t,matrix));
-#ifndef   NDEBUG
-      if (size_t(averages.size())!=Base::nAvr(averaged)) throw AveragesFishyException();
-#endif // NDEBUG
-      if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
-      averaged->process(averages);
-      averaged->display(averages,os,precision);
-    }
-  }
-
-
   virtual ~Averaged() {}
 
-  virtual const Averages average(double, const LazyDensityOperator&) const = 0;
+  const Averages average(double t, const LazyDensityOperator& matrix) const
+  {
+    const Averages averages(average_v(t,matrix));
+#ifndef   NDEBUG
+    if (size_t(averages.size())!=Base::nAvr()) throw AveragesNumberMismatchException();
+#endif // NDEBUG
+    if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
+
+    return averages;
+  }
+
+private:
+  virtual const Averages average_v(double, const LazyDensityOperator&) const = 0;
 
 };
 
@@ -119,9 +103,10 @@ public:
   typedef typename Averaged<RANK,true>::Averages            Averages           ;
   typedef typename Averaged<RANK,true>::LazyDensityOperator LazyDensityOperator;
 
-  virtual const Averages average(const LazyDensityOperator&) const = 0;
+private:
+  const Averages average_v(double, const LazyDensityOperator& matrix) const {return average_v(matrix);}
 
-  const Averages average(double, const LazyDensityOperator& matrix) const {return average(matrix);}
+  virtual const Averages average_v(const LazyDensityOperator&) const = 0;
 
 };
 
@@ -145,19 +130,18 @@ public:
   Transferring(AveragedToPtr averaged, const LazyDensityOperatorTo& ldo)
     : averaged_(averaged), ldo_(ldo) {}
 
-  void process(Averages& averages) const {averaged_->process(averages);}
-
-  void display(const Averages& averages, std::ostream& os, int n) const {averaged_->display(averages,os,n);}
-
-  void displayKey(std::ostream& os, size_t& n) const {averaged_->displayKey(os,n);}
-
-  size_t nAvr() const {return averaged_->nAvr();}
-
-  const Averages average(double time, const LazyDensityOperator&) const {return averaged_->average(time,ldo_);}
-
-  const Averages average(const LazyDensityOperator&) const {return averaged_->average(ldo_);}
-
 private:
+  void displayKey_v(std::ostream& os, size_t& n) const {averaged_->displayKey(os,n);}
+
+  void process_v(Averages& averages) const {averaged_->process(averages);}
+
+  void display_v(const Averages& averages, std::ostream& os, int n) const {averaged_->display(averages,os,n);}
+
+  size_t nAvr_v() const {return averaged_->nAvr();}
+
+  const Averages average_v(double time, const LazyDensityOperator&) const {return averaged_->average(time,ldo_);}
+  const Averages average_v(             const LazyDensityOperator&) const {return averaged_->average(     ldo_);}
+
   const AveragedToPtr averaged_;
   const LazyDensityOperatorTo& ldo_;
 

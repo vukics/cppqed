@@ -395,7 +395,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void Composite<VA>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   worker(Hamiltonian(frees_,t,psi,dpsidt,tIntPic0));
 }
@@ -419,13 +419,13 @@ public:
   template<typename Act>
   size_t operator()(size_t s, const Act& act)
   {
-    return s+structure::LiouvilleanCommon::nJumps(act.getLi());
+    return s+act.nJumps();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    num_+=structure::LiouvilleanCommon::nJumps(frees_(T::value).getLi());
+    num_+=frees_(T::value).nJumps();
   }
 
 private:
@@ -437,7 +437,7 @@ private:
 
 
 template<typename VA>
-size_t Composite<VA>::nJumps() const
+size_t Composite<VA>::nJumps_v() const
 {
   size_t res=0;
   NJumps helper(frees_,res);
@@ -453,7 +453,6 @@ template<typename VA>
 class Composite<VA>::Probas
 {
 public:
-
   typedef std::list<Probabilities> SeqProbabilities;
   typedef typename SeqProbabilities::iterator SAI;
 
@@ -463,7 +462,7 @@ public:
   template<typename Vec, typename Li>
   void help(typename Li::Ptr li) const
   {
-    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(&Li::probabilities,t_,_1,li,structure::theStaticOne)));    
+    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(structure::probabilities<Li::N_RANK>,li,t_,_1)));    
   }
 
   template<typename Act>
@@ -491,7 +490,7 @@ private:
 
 template<typename VA>
 const typename Composite<VA>::Probabilities
-Composite<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
+Composite<VA>::probabilities_v(double t, const LazyDensityOperator& ldo) const
 {
   using namespace std;
   list<Probabilities> seqProbabilities(RANK+mpl::size<VA>::value);
@@ -502,7 +501,7 @@ Composite<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
     worker(Probas(frees_,t,ldo,iter));
   }
 
-  Probabilities res(nJumps()); res=0;
+  Probabilities res(nJumps_v()); res=0;
   return cpputils::concatenate(seqProbabilities,res);
 
 }
@@ -519,7 +518,7 @@ public:
   void help(typename Li::Ptr li) const
   {
     if (!flag_ && li) {
-      size_t n=Li::nJumps(li);
+      size_t n=li->nJumps();
       if (ordoJump_<n) {
 	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
 	flag_=true;
@@ -552,7 +551,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::actWithJ(double t, StateVectorLow& psi, size_t ordoJump) const
+void Composite<VA>::actWithJ_v(double t, StateVectorLow& psi, size_t ordoJump) const
 {
   bool flag=false;
   worker(ActWithJ(frees_,t,psi,ordoJump,flag));
@@ -577,13 +576,13 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    structure::AveragedCommon::displayKey(os_,i_,act.getAv());
+    act.displayAveragedKey(os_,i_);
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    structure::AveragedCommon::displayKey(os_,i_,frees_(IDX).getAv());
+    frees_(IDX).displayAveragedKey(os_,i_);
   }
 
 private:
@@ -596,7 +595,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::displayKey(std::ostream& os, size_t& i) const
+void Composite<VA>::displayKey_v(std::ostream& os, size_t& i) const
 {
   worker(DisplayKey(frees_,os,i));
 }
@@ -614,13 +613,13 @@ public:
   template<typename Act>
   size_t operator()(size_t s, const Act& act)
   {
-    return s+structure::AveragedCommon::nAvr(act.getAv());
+    return s+act.nAvr();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    num_+=structure::AveragedCommon::nAvr(frees_(T::value).getAv());
+    num_+=frees_(T::value).nAvr();
   }
 
 private:
@@ -633,7 +632,7 @@ private:
 
 
 template<typename VA>
-size_t Composite<VA>::nAvr() const
+size_t Composite<VA>::nAvr_v() const
 {
   size_t res=0;
   NAvr helper(frees_,res);
@@ -659,7 +658,7 @@ public:
   template<typename Vec, typename Av>
   void help(typename Av::Ptr av) const
   {
-    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne)));
+    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(structure::average<Av::N_RANK>,av,t_,_1)));
   }
 
   template<typename Act>
@@ -687,7 +686,7 @@ private:
 
 template<typename VA>
 const typename Composite<VA>::Averages
-Composite<VA>::average(double t, const LazyDensityOperator& ldo) const
+Composite<VA>::average_v(double t, const LazyDensityOperator& ldo) const
 {
   using namespace std;
   list<Averages> seqAverages(RANK+mpl::size<VA>::value);
@@ -698,7 +697,7 @@ Composite<VA>::average(double t, const LazyDensityOperator& ldo) const
     worker(Average(frees_,t,ldo,iter));
   }
 
-  Averages res(nAvr()); res=0;
+  Averages res(nAvr_v()); res=0;
   return cpputils::concatenate(seqAverages,res);
 
 }
@@ -718,9 +717,9 @@ public:
   void help(typename Av::Ptr av) const
   {
     using blitz::Range;
-    if ((u_=l_+Av::nAvr(av))>l_) {
+    if (av && (u_=l_+av->nAvr())>l_) {
       Averages temp(avr_(Range(l_+1,u_)));
-      Av::process(temp,av);
+      av->process(temp);
     }
     std::swap(l_,u_);
   }
@@ -749,7 +748,7 @@ private:
 
 template<typename VA>
 void
-Composite<VA>::process(Averages& avr) const
+Composite<VA>::process_v(Averages& avr) const
 {
   ptrdiff_t l=-1, u=0;
   worker(Process(frees_,avr,l,u));
@@ -768,7 +767,7 @@ public:
   void help(typename Av::Ptr av) const
   {
     using blitz::Range;
-    if ((u_=l_+Av::nAvr(av))>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
+    if (av && (u_=l_+av->nAvr())>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
     std::swap(l_,u_);
   }
 
@@ -799,7 +798,7 @@ private:
 
 template<typename VA>
 void
-Composite<VA>::display(const Averages& avr, std::ostream& os, int precision) const
+Composite<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
 {
   ptrdiff_t l=-1, u=0;
   worker(Display(frees_,avr,os,precision,l,u));

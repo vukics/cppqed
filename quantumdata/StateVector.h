@@ -96,9 +96,9 @@ public:
 
   void addTo(DensityOperator<RANK>&) const;
 
-protected:
+private:
   // virtual from LDO_Base
-  const dcomp operator()(const Idx& i, const Idx& j) const {return operator()()(i)*conj(operator()()(j));}
+  const dcomp index(const Idx& i, const Idx& j) const {return operator()()(i)*conj(operator()()(j));}
 
 };
 

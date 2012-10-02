@@ -29,13 +29,13 @@ Base<RANK>::Base(DensityOperator& rho,
 		 const master::Pars& p,
 		 const DensityOperatorLow& scaleAbs
 		 )
-  : trajectory::TrajectoryBase(p),
-    TrajectoryBase(rho(),
-		   bind(&Base<RANK>::derivs,this,_1,_2,_3),
-		   1./(qs->highestFrequency()*TrajectoryBase::factor()),
-		   scaleAbs,
-		   p,
-		   evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
+  : trajectory::Trajectory(p),
+    AdaptiveTrajectory(rho(),
+		       bind(&Base<RANK>::derivs,this,_1,_2,_3),
+		       trajectory::initialTimeStep(qs->highestFrequency()),
+		       scaleAbs,
+		       p,
+		       evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
     rho_(rho),
     tIntPic0_(0),
     qs_(qs)
@@ -56,7 +56,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   PROGRESS_TIMER_IN_POINT(getOstream());
 
-  binaryIter(rhoLow,drhodtLow,bind(&Hamiltonian::addContribution,t,_1,_2,tIntPic0_,qs_.getHa(),structure::theStaticOne));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumSystemWrapper::addContribution,qs_,t,_1,_2,tIntPic0_));
 
   PROGRESS_TIMER_OUT_POINT("Hamiltonian");
 
@@ -70,7 +70,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
   // Now act with the reset operator --- implement this in terms of
   // the individual jumps by iteration and addition
 
-  for (size_t i=0; i<Liouvillean::nJumps(qs_.getLi()); i++) {
+  for (size_t i=0; i<qs_.nJumps(); i++) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     DensityOperatorLow rhotemp(rhoLow.copy());
     UnaryFunction functionLi(bind(&Liouvillean::actWithJ,qs_.getLi(),t,_1,i));
@@ -86,7 +86,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
 template<int RANK>
 void 
-Base<RANK>::step(double deltaT) const
+Base<RANK>::step_v(double deltaT) const
 {
   PROGRESS_TIMER_IN_POINT( getOstream() )
   getEvolved()->step(deltaT);
@@ -128,10 +128,10 @@ Base<RANK>::step(double deltaT) const
 
 template<int RANK>
 void
-Base<RANK>::displayParameters() const
+Base<RANK>::displayParameters_v() const
 {
   using namespace std;
-  TrajectoryBase::displayParameters();
+  AdaptiveTrajectory::displayParameters_v();
 
   getOstream()<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl;
 

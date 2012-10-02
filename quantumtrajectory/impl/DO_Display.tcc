@@ -41,7 +41,7 @@ size_t
 DO_Display<RANK,V>::displayMoreKey(std::ostream& os) const 
 {
   size_t i=3; 
-  Averaged::displayKey(os,i,av_); 
+  if (av_) av_->displayKey(os,i); 
   if (negativity_) os<<"# Trajectory "<<i<<". negativity"<<std::endl;
   return i;
 }
@@ -55,7 +55,7 @@ DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostre
   using namespace std;
   stringstream line(stringstream::in | stringstream::out);
   {
-    Averaged::display(t,rho,line,precision,av_);
+    display(av_,t,rho,line,precision);
     if (negativity_) line<<'\t'<<FormDouble(precision)(quantumdata::negPT(rho,V()));
     line<<endl;
   }

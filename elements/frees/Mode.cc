@@ -216,7 +216,7 @@ Averaged::Averaged(const KeyLabels& follow, const KeyLabels& precede)
 }
 
 
-const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(4);
 
@@ -239,7 +239,7 @@ const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) co
 }
 
 
-void Averaged::process(Averages& averages) const
+void Averaged::process_v(Averages& averages) const
 {
   averages(1)-=sqr(averages(0));
 }
@@ -253,13 +253,13 @@ AveragedQuadratures::AveragedQuadratures(const KeyLabels& follow, const KeyLabel
 }
 
 
-const AveragedQuadratures::Averages AveragedQuadratures::average(const LazyDensityOperator& matrix) const
+const AveragedQuadratures::Averages AveragedQuadratures::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(7);
 
   averages=0;
 
-  averages(blitz::Range(0,3))=Averaged::average(matrix);
+  averages(blitz::Range(0,3))=Averaged::average_v(matrix);
 
   for (int n=2; n<int(matrix.getDimension()); n++) {
 
@@ -274,11 +274,11 @@ const AveragedQuadratures::Averages AveragedQuadratures::average(const LazyDensi
 }
 
 
-void AveragedQuadratures::process(Averages& averages) const
+void AveragedQuadratures::process_v(Averages& averages) const
 {
   {
     Averages ranged(averages(blitz::Range(0,3)));
-    Averaged::process(ranged);
+    Averaged::process_v(ranged);
   }
 
   double 
@@ -447,7 +447,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(double t, StateVectorLow& psi) const
 
 
 
-const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average(double t, const LazyDensityOperator& matrix) const
+const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(double t, const LazyDensityOperator& matrix) const
 {
   Averages averages(3);
 
