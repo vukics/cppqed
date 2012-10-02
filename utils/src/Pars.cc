@@ -80,7 +80,7 @@ bool& ParameterTable::add(const std::string& s, const std::string& d, bool v)
 
 ParameterTable& ParameterTable::addTitle(const std::string& s, const std::string& mod)
 {
-  try {(*this)[s]; throw AttemptedRecreationOfParameterException(s);}
+  try {(*this)[s+mod]; throw AttemptedRecreationOfParameterException(s);}
   catch (UnrecognisedParameterException) {
     Parameter<TitleLine>* pptr=new Parameter<TitleLine>(s+mod,"",TitleLine());
     table_.push_back(pptr);
