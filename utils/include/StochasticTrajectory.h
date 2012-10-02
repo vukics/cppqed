@@ -60,8 +60,6 @@ public:
 
   typedef typename Base::Evolved Evolved;
 
-  virtual void displayParameters() const;
-
   virtual ~StochasticTrajectory() {}
 
 protected:
@@ -81,6 +79,8 @@ protected:
 
   const RandomizedPtr getRandomized() const {return randomized_;}
   bool                noise        () const {return isNoisy_   ;}
+
+  void displayParameters_v() const;
 
 private:
   const unsigned long seed_ ;
@@ -110,9 +110,12 @@ class EnsembleBase<T&>
 public:
   typedef T& TBA_Type;
 
-  virtual TBA_Type getInitializedTBA() const = 0;
+  const TBA_Type getInitializedTBA() const {return getInitializedTBA_v();}
 
   virtual ~EnsembleBase() {}
+
+private:
+  virtual const TBA_Type getInitializedTBA_v() const = 0;
   
 };
 
@@ -139,14 +142,8 @@ public:
 
   typedef T TBA_Type;
 
-  void evolve(double deltaT) const;
-
-  double getTime() const {return trajs_.begin()->getTime();}
-
   const TBA_Type averageInRange(size_t begin, size_t n) const;
   // Averages only in a range begin..begin+n-1
-
-  void displayParameters() const;
 
   virtual ~EnsembleTrajectories() {}
 
@@ -161,10 +158,16 @@ protected:
   EnsembleTrajectories(Ptr trajs, bool log) : trajs_(trajs), log_(log) {}
 
 private:
-  const TBA_Type toBeAveraged_v() const {return averageInRange(0,trajs_.size());}
+  void evolve_v(double deltaT) const;
 
-  double getDtDid() const;
+  double getTime_v() const {return trajs_.begin()->getTime();}
+
+  void displayParameters_v() const;
+
+  double getDtDid_v() const;
   // An average of getDtDid()-s from individual trajectories.
+
+  const TBA_Type toBeAveraged_v() const {return averageInRange(0,trajs_.size());}
 
   const Impl trajs_;
 

@@ -19,9 +19,9 @@ namespace trajectory {
 
 template<typename A, typename T> 
 void 
-StochasticTrajectory<A,T>::displayParameters() const
+StochasticTrajectory<A,T>::displayParameters_v() const
 {
-  AdaptiveTrajectory<A>::displayParameters();
+  AdaptiveTrajectory<A>::displayParameters_v();
   Trajectory::getOstream()<<"# Stochastic Trajectory Parameters: seed="<<seed_<<std::endl;
   if (!isNoisy_) 
     Trajectory::getOstream()<<"# No noise."<<std::endl;
@@ -54,7 +54,7 @@ StochasticTrajectory<A,T>::StochasticTrajectory(A& y, typename Evolved::Derivs d
 
 template<typename T, typename T_ELEM>
 void 
-EnsembleTrajectories<T,T_ELEM>::displayParameters() const
+EnsembleTrajectories<T,T_ELEM>::displayParameters_v() const
 {
   Trajectory::getOstream()<<"# Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl;
   trajs_.begin()->displayParameters();
@@ -63,7 +63,7 @@ EnsembleTrajectories<T,T_ELEM>::displayParameters() const
 
 template<typename T, typename T_ELEM>
 double
-EnsembleTrajectories<T,T_ELEM>::getDtDid() const
+EnsembleTrajectories<T,T_ELEM>::getDtDid_v() const
 {
   return cpputils::accumulate(trajs_.begin(),trajs_.end(),0.,bind(&Trajectory::getDtDid,_1))/size2Double(trajs_.size());
 }
@@ -71,7 +71,7 @@ EnsembleTrajectories<T,T_ELEM>::getDtDid() const
 
 template<typename T, typename T_ELEM>
 void
-EnsembleTrajectories<T,T_ELEM>::evolve(double deltaT) const
+EnsembleTrajectories<T,T_ELEM>::evolve_v(double deltaT) const
 {
   using namespace boost;
 

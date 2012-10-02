@@ -45,21 +45,17 @@ public:
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
   typedef typename quantumdata::Types<RANK>::    StateVectorLow     StateVectorLow;
 
-  typedef trajectory::AdaptiveTrajectory<DensityOperatorLow> Trajectory;
+  typedef trajectory::AdaptiveTrajectory<DensityOperatorLow> AdaptiveTrajectory;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
   
   typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
-  using Trajectory::getEvolved; using Trajectory::getDtDid; using Trajectory::getTime; using Trajectory::getOstream;
+  using AdaptiveTrajectory::getEvolved; using AdaptiveTrajectory::getDtDid; using AdaptiveTrajectory::getTime; using AdaptiveTrajectory::getOstream;
 
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
-
-  void step             (double) const;
-
-  void displayParameters(      ) const;
 
 protected:
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
@@ -70,6 +66,10 @@ protected:
   const typename Averaged::Ptr getAv() const {return qs_.getAv();}
 
 private:
+  void              step_v(double) const;
+
+  void displayParameters_v(      ) const;
+
   virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
 

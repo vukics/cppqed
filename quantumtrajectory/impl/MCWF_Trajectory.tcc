@@ -76,7 +76,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
   : Trajectory(p),
     Base(psi(),
 	 bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
-	 1./(cpputils::sharedPointerize(sys)->highestFrequency()*Base::factor()),
+	 trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),
 	 scaleAbs,
 	 p,
 	 evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorretionFactor),
@@ -335,7 +335,7 @@ void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const In
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::step(double Dt) const
+void MCWF_Trajectory<RANK>::step_v(double Dt) const
 {
   const StateVectorLow psiCache(psi_().copy());
   evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.
@@ -365,10 +365,10 @@ void MCWF_Trajectory<RANK>::step(double Dt) const
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::displayParameters() const
+void MCWF_Trajectory<RANK>::displayParameters_v() const
 {
   using namespace std;
-  Base::displayParameters();
+  Base::displayParameters_v();
 
   ostream& os=getOstream();
 

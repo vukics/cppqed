@@ -44,6 +44,10 @@ public:
 };
 
 
+inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFrequency);}
+// A heuristic determination of the inital timestep from the highest frequency of a physical system.
+
+
 /////////////////
 //
 // Trajectory
@@ -60,16 +64,14 @@ public:
   void display   () const;
   void displayKey() const;
 
-  virtual void   evolve(double deltaT) const = 0; // A step of exactly deltaT
+  void evolve(double deltaT) const {evolve_v(deltaT);} // A step of exactly deltaT
 
-  virtual double getTime()             const = 0;
+  double getTime() const {return getTime_v();}
 
-  virtual double getDtDid()            const = 0;
+  double getDtDid() const {return getDtDid_v();}
 
-  virtual void   displayParameters()   const = 0;
+  void displayParameters() const {displayParameters_v();}
   
-  static  double factor() {return 10.;}
-
   virtual ~Trajectory();
 
 protected:
@@ -80,6 +82,11 @@ protected:
   Trajectory() : ostream_(std::cerr), precision_(0) {assert(false);} // A dummy constructor, which should never be called
 
 private:
+  virtual void            evolve_v(double) const = 0; // A step of exactly deltaT
+  virtual double         getTime_v()       const = 0;
+  virtual double        getDtDid_v()       const = 0;
+  virtual void displayParameters_v()       const = 0;
+
   virtual void   displayMore   () const = 0; // LOGICALLY const
   virtual size_t displayMoreKey() const = 0;
 
@@ -102,18 +109,8 @@ public:
   // Some parameter-independent code could still be factored out, but probably very little
   typedef evolved::Evolved<A> Evolved;
 
-  double getTime() const {return evolved_->getTime();}
-
-  // Preference for purely virtual functions, so that there is no
-  // danger of forgetting to override them. Very few examples anyway
-  // for a trajectory wanting to perform only a step of Evolved. (Only
-  // Simulated, but neither Master, nor MCWF_Trajectory)
-  virtual void step(double deltaT) const = 0;
-
-  void evolve(double deltaT) const {evolved::evolve<const AdaptiveTrajectory>(*this,deltaT);}
-
-  virtual void displayParameters() const;
-
+  void step(double deltaT) const {step_v(deltaT);}
+  
   virtual ~AdaptiveTrajectory() {}
 
 protected:
@@ -125,13 +122,23 @@ protected:
 
   typename Evolved::Ptr getEvolved() const {return evolved_;}
 
-  double getDtDid() const {return evolved_->getDtDid();}
-  double getDtTry() const {return evolved_->getDtTry();}
+  double getDtTry  () const {return evolved_->getDtTry();}
+
+  void displayParameters_v() const;
 
 private:
+  double getDtDid_v() const {return evolved_->getDtDid();}
+
+  virtual void step_v(double deltaT) const = 0; // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved. (Only Simulated, but neither Master, nor MCWF_Trajectory)
+
+  void evolve_v(double deltaT) const {evolved::evolve<const AdaptiveTrajectory>(*this,deltaT);}
+
+  double getTime_v() const {return evolved_->getTime();}
+
   typename Evolved::Ptr evolved_;
 
 };
+
 
 namespace details {
 

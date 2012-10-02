@@ -35,12 +35,13 @@ public:
 	    const ParsTrajectory&,
 	    const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
-  void step(double deltaT) const {getEvolved()->step(deltaT);}
+private:
+  void step_v(double deltaT) const {getEvolved()->step(deltaT);}
 
   void   displayMore   () const;
   size_t displayMoreKey() const;
 
-  void   displayParameters() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters();}
+  void   displayParameters_v() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters_v();}
 
 };
 

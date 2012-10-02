@@ -93,7 +93,7 @@ AdaptiveTrajectory<A>::AdaptiveTrajectory(A& y, typename Evolved::Derivs derivs,
 
 
 template<typename A>
-void AdaptiveTrajectory<A>::displayParameters() const 
+void AdaptiveTrajectory<A>::displayParameters_v() const 
 {
   evolved_->displayParameters(getOstream()<<std::endl)<<"# Trajectory Parameters: precision="<<getPrecision()<<" epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }

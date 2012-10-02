@@ -63,12 +63,12 @@ public:
 
   const StateVectors& getStateVectors() const {return StateVectorsBase::member;}
 
-  const typename EnsembleTrajectories::TBA_Type getInitializedTBA() const {rho_()=0; return rho_;}
-
 protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
+  const typename EnsembleTrajectories::TBA_Type getInitializedTBA_v() const {rho_()=0; return rho_;}
+
   mutable quantumdata::DensityOperator<RANK> rho_;
 
   const QuantumSystemPtr qs_;
