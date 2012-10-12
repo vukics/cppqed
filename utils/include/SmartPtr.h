@@ -9,20 +9,15 @@
 
 namespace cpputils {
 
-
-class NullDeleter
-{
-public:
-  void operator()(const void*) const {}
-
-};
+template<typename T>
+inline void nullDelete (T*) {}
 
 
 template<typename T>
 const boost::shared_ptr<T>
 nonOwningSharedPtr(T* t)
 {
-  return boost::shared_ptr<T>(t,NullDeleter());
+  return boost::shared_ptr<T>(t,nullDelete<T>);
 }
 
 
@@ -30,29 +25,19 @@ template<typename T>
 const boost::shared_ptr<const T>
 nonOwningConstSharedPtr(T* t)
 {
-  return boost::shared_ptr<const T>(t,NullDeleter());
+  return boost::shared_ptr<const T>(t,nullDelete<T>);
 }
 
 
 template<typename T>
-boost::shared_ptr<T> sharedPointerize(boost::shared_ptr<T> t) {return                               t ;}
+const boost::shared_ptr<T> sharedPointerize(boost::shared_ptr<T> t) {return                     t ;}
 
 template<typename T>
-boost::shared_ptr<T> sharedPointerize(                  T& t) {return cpputils::nonOwningSharedPtr(&t);}
+const boost::shared_ptr<T> sharedPointerize(                  T& t) {return nonOwningSharedPtr(&t);}
 
 template<typename T>
-boost::shared_ptr<T> sharedPointerize(                  T* t) {return cpputils::nonOwningSharedPtr( t);}
+const boost::shared_ptr<T> sharedPointerize(                  T* t) {return nonOwningSharedPtr( t);}
 
-/*
-template<typename T>
-boost::shared_ptr<const T> sharedPointerize(boost::shared_ptr<const T> t) {return                               t ;}
-
-template<typename T>
-boost::shared_ptr<const T> sharedPointerize(const                   T& t) {return cpputils::nonOwningSharedPtr(&t);}
-
-template<typename T>
-boost::shared_ptr<const T> sharedPointerize(const                   T* t) {return cpputils::nonOwningSharedPtr( t);}
-*/
 
 } // cpputils
 
