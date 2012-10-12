@@ -344,7 +344,7 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 //////////////////////////////////////////
 
 
-#define BOOST_PP_ITERATION_LIMITS (1,11)
+#define BOOST_PP_ITERATION_LIMITS (1,BLITZ_ARRAY_LARGEST_RANK)
 #define BOOST_PP_FILENAME_1 "details/IndexerImplementationsSpecialization.h"
 
 #include BOOST_PP_ITERATE()
