@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 
   if (conf!=1) pplm.delta-=ppci.uNot/(isComplex(ppci.modeCav) ? 1. : 2.);
 
-  mode::Ptr mode(mode::make(pplm,qmp));
+  mode::Ptr mode(make(pplm,qmp));
 
 
   particle::Ptr particle(make(ppp,qmp));

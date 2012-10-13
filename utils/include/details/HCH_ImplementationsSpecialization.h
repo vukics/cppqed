@@ -5,17 +5,10 @@
 
 #define HCH_print(z,m,unused) m ,
 
-namespace blitzplusplus {
-namespace details {
-
-template<> 
-void 
-helpHermitianConjugate<ITER>(TTD_CARRAY(ITERT2)& array)
+inline void 
+helpHermitianConjugate(TTD_CARRAY(ITERT2)& array)
 {
   array.transposeSelf(BOOST_PP_REPEAT_FROM_TO(ITER,ITERT2,HCH_print,~) BOOST_PP_ENUM_PARAMS(ITER,));
-}
-
-}
 }
 
 #undef HCH_print

@@ -7,14 +7,24 @@
 #include "impl/BlitzArrayExtensions.tcc"
 #include "impl/BlitzTinyExtensions.tcc"
 
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/arithmetic/mul.hpp>
+#include <boost/preprocessor/arithmetic/div.hpp>
+
 
 namespace blitzplusplus {
 
 
 namespace details {
 
-template<int RANK>
-void helpHermitianConjugate(TTD_CARRAY(2*RANK)&);
+#define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_DIV(BLITZ_ARRAY_LARGEST_RANK,2))
+#define BOOST_PP_FILENAME_1 "details/HCH_ImplementationsSpecialization.h"
+
+#include BOOST_PP_ITERATE()
+
+#undef BOOST_PP_FILENAME_1
+#undef BOOST_PP_ITERATION_LIMITS
 
 } // details
 
@@ -23,9 +33,9 @@ inline
 void
 hermitianConjugateSelf(TTD_CARRAY(TWO_TIMES_RANK)& array) 
 {
-  static const int RANK=tmptools::IsEvenAssert<TWO_TIMES_RANK>::value;
+  BOOST_STATIC_ASSERT( tmptools::IsEvenAssert<TWO_TIMES_RANK>::value );
   array=conj(array); 
-  details::helpHermitianConjugate<RANK>(array);
+  details::helpHermitianConjugate(array);
 }
 
 
@@ -33,13 +43,10 @@ template<int TWO_TIMES_RANK>
 inline
 const TTD_CARRAY(TWO_TIMES_RANK)
 hermitianConjugate(const TTD_CARRAY(TWO_TIMES_RANK)& array)
-// NEED_TO_UNDERSTAND Funnily enough, if it is declared in such a way:
-// hermitianConjugate(const typename CAMF<TWO_TIMES_RANK>::type&)
-// then the compiler cannot deduce the argument any more
 {
-  static const int RANK=tmptools::IsEvenAssert<TWO_TIMES_RANK>::value;
+  BOOST_STATIC_ASSERT( tmptools::IsEvenAssert<TWO_TIMES_RANK>::value );
   TTD_CARRAY(TWO_TIMES_RANK) res(conj(array));
-  details::helpHermitianConjugate<RANK>(res);
+  details::helpHermitianConjugate(res);
   return res;
 }
 
@@ -79,6 +86,5 @@ doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2, boost
 
 
 } // blitzplusplus
-
 
 #endif // UTILS_INCLUDE_IMPL_COMPLEXARRAYEXTENSIONS_TCC_INCLUDED

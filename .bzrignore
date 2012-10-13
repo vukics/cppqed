@@ -14,3 +14,6 @@ utils/test/g1pe.d
 utils/test/rt.d
 doc
 commit.txt
+testsuitePhysics
+.kdev4
+quantologia.kdev4
