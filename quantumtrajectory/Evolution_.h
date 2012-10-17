@@ -48,7 +48,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 	    const structure::QuantumSystem<RANK>& sys,
 	    const ParsEvolution& p)
 {
-  evolve<tmptools::V_Empty>(psi,sys,p);
+  evolve<tmptools::V_Empty>(psi,cpputils::sharedPointerize(sys),p);
 }
 
 
