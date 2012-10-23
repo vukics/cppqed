@@ -72,7 +72,7 @@ void worker(const VA& acts, const H& helper, Ordinals)
 
 
 
-using structure::SubSystemFree;
+bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
 
 
 template<int RANK>
@@ -152,7 +152,7 @@ template<typename VA>
 const RETURN_type
 Composite<VA>::fillFrees(const VA& acts)
 {
-  RETURN_type res; res=structure::SubSystemFree();
+  RETURN_type res; res=composite::SubSystemFree();
   boost::fusion::for_each(acts,composite::FillFrees<RANK>(res));
   return res;
 }
@@ -234,7 +234,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::displayParameters(std::ostream& os) const
+void Composite<VA>::displayParameters_v(std::ostream& os) const
 {
   os<<"# Composite\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<std::endl;
   CALL_COMPOSITE_WORKER( DisplayParameters(frees_,os) ) ;
@@ -247,20 +247,10 @@ void Composite<VA>::displayParameters(std::ostream& os) const
 //////////////
 
 
-namespace composite {
-
-bool compFrees(const SubSystemFree& ssf1, const SubSystemFree& ssf2)
-{
-  return ssf1.get()->highestFrequency() < ssf2.get()->highestFrequency();
-}
-
-} // composite
-
-
 template<typename VA>
-double Composite<VA>::highestFrequency() const
+double Composite<VA>::highestFrequency_v() const
 {
-  return boost::max_element(frees_,composite::compFrees)->get()->highestFrequency();
+  return boost::max_element(frees_,composite::compareFreesFrequency)->get()->highestFrequency();
   // NEEDS_WORK add the interactions here
 }
 
@@ -283,13 +273,13 @@ public:
   template<typename Act>
   bool operator()(bool s, const Act& act)
   {
-    return s && structure::ExactCommon::isUnitary(act.getEx());
+    return s && act.isUnitary();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    isIt_&=structure::ExactCommon::isUnitary(frees_(T::value).getEx());
+    isIt_&=frees_(T::value).isUnitary();
   }
 
 private:
@@ -302,7 +292,7 @@ private:
 
 
 template<typename VA>
-bool composite::Exact<VA>::isUnitary() const
+bool composite::Exact<VA>::isUnitary_v() const
 {
   bool res=true;
   IsUnitary helper(frees_,res);
@@ -320,24 +310,21 @@ public:
   ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
 
   template<typename Vec, typename Ex>
-  void help(const Ex*const ex, Vec v) const
+  void help(typename Ex::Ptr ex) const
   {
-    using namespace blitzplusplus::basi;
-
-    if (ex) boost::for_each(fullRange(psi_,v),boost::bind(&Ex::actWithU,ex,dtdid_,::_1));
-    // namespace qualification :: is necessary because otherwise :: and mpl:: are equally good matches.
+    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Ex::actWithU,ex,dtdid_,_1));
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getEx(),act);
+    help<Act,typename Act::Ex>(act.getEx());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getEx(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Ex>(frees_(IDX).getEx());
   }
 
 
@@ -351,7 +338,7 @@ private:
 
 
 template<typename VA>
-void composite::Exact<VA>::actWithU(double dtdid, StateVectorLow& psi) const
+void composite::Exact<VA>::actWithU_v(double dtdid, StateVectorLow& psi) const
 {
   CALL_COMPOSITE_WORKER( ActWithU(frees_,dtdid,psi) ) ;
 }
@@ -371,24 +358,24 @@ public:
     : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
 
   template<typename Vec, typename Ha>
-  void help(const Ha*const ha, Vec v) const
+  void help(typename Ha::Ptr ha) const
   {
-    using namespace blitzplusplus;
-
     if (ha) 
-      cpputils::for_each(basi::fullRange(psi_,v),basi::begin(dpsidt_,v),boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,tIntPic0_)); 
+      cpputils::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),
+			 blitzplusplus::basi::begin<Vec>(dpsidt_),
+			 bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getHa(),act);
+    help<Act,typename Act::Ha>(act.getHa());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getHa(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Ha>(frees_(IDX).getHa());
   }
 
 private:
@@ -403,7 +390,7 @@ private:
 
 
 template<typename VA>
-void composite::Hamiltonian<VA>::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void composite::Hamiltonian<VA>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   CALL_COMPOSITE_WORKER( AddContribution(frees_,t,psi,dpsidt,tIntPic0) ) ;
 }
@@ -427,13 +414,13 @@ public:
   template<typename Act>
   size_t operator()(size_t s, const Act& act)
   {
-    return s+structure::LiouvilleanCommon::nJumps(act.getLi());
+    return s+act.nJumps();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    num_+=structure::LiouvilleanCommon::nJumps(frees_(T::value).getLi());
+    num_+=frees_(T::value).nJumps();
   }
 
 private:
@@ -445,7 +432,7 @@ private:
 
 
 template<typename VA>
-size_t composite::Liouvillean<VA>::nJumps() const
+size_t composite::Liouvillean<VA>::nJumps_v() const
 {
   size_t res=0;
   NJumps helper(frees_,res);
@@ -461,33 +448,27 @@ template<typename VA>
 class composite::Liouvillean<VA>::Probas
 {
 public:
-
   typedef typename std::list<Probabilities>::iterator Iter;
 
   Probas(const Frees& frees, double t, const LazyDensityOperator& ldo, Iter& iter) 
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(typename Li::Ptr li) const
   {
-    iter_++->reference(
-		       quantumdata::partialTrace(ldo_,
-						 boost::bind(&Li::probabilities,t_,::_1,li,structure::theStaticOne),
-						 v,
-						 structure::Liouvillean<RANK>::defaultArray)
-		       );
+    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(structure::probabilities<Li::N_RANK>,li,t_,_1)));    
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getLi(),act);
+    help<Act,typename Act::Li>(act.getLi());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getLi(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Li>(frees_(IDX).getLi());
   }
 
 private:
@@ -503,7 +484,7 @@ private:
 
 template<typename VA>
 const typename composite::Liouvillean<VA>::Probabilities
-composite::Liouvillean<VA>::probabilities(double t, const LazyDensityOperator& ldo) const
+composite::Liouvillean<VA>::probabilities_v(double t, const LazyDensityOperator& ldo) const
 {
   std::list<Probabilities> seqProbabilities(RANK+mpl::size<VA>::value);
 
@@ -513,7 +494,7 @@ composite::Liouvillean<VA>::probabilities(double t, const LazyDensityOperator& l
     CALL_COMPOSITE_WORKER( Probas(frees_,t,ldo,iter) ) ;
   }
 
-  Probabilities res(nJumps()); res=0;
+  Probabilities res(nJumps_v()); res=0;
   return cpputils::concatenate(seqProbabilities,res);
 
 }
@@ -527,14 +508,12 @@ public:
   ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
 
   template<typename Vec, typename Li>
-  void help(const Li*const li, Vec v) const
+  void help(typename Li::Ptr li) const
   {
-    using namespace blitzplusplus::basi;
-
     if (!flag_ && li) {
-      size_t n=Li::nJumps(li);
+      size_t n=li->nJumps();
       if (ordoJump_<n) {
-	boost::for_each(fullRange(psi_,v),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
+	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
 	flag_=true;
       }
       ordoJump_-=n;  
@@ -544,13 +523,13 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getLi(),act);
+    help<Act,typename Act::Li>(act.getLi());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getLi(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Li>(frees_(IDX).getLi());
   }
 
 private:
@@ -565,7 +544,7 @@ private:
 
 
 template<typename VA>
-void composite::Liouvillean<VA>::actWithJ(double t, StateVectorLow& psi, size_t ordoJump) const
+void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_t ordoJump) const
 {
   bool flag=false;
   CALL_COMPOSITE_WORKER( ActWithJ(frees_,t,psi,ordoJump,flag) ) ;
@@ -590,13 +569,13 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    structure::AveragedCommon::displayKey(os_,i_,act.getAv());
+    act.displayAveragedKey(os_,i_);
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    structure::AveragedCommon::displayKey(os_,i_,frees_(IDX).getAv());
+    frees_(IDX).displayAveragedKey(os_,i_);
   }
 
 private:
@@ -609,7 +588,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::displayKey(std::ostream& os, size_t& i) const
+void Composite<VA>::displayKey_v(std::ostream& os, size_t& i) const
 {
   CALL_COMPOSITE_WORKER( DisplayKey(frees_,os,i) ) ;
 }
@@ -627,13 +606,13 @@ public:
   template<typename Act>
   size_t operator()(size_t s, const Act& act)
   {
-    return s+structure::AveragedCommon::nAvr(act.getAv());
+    return s+act.nAvr();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    num_+=structure::AveragedCommon::nAvr(frees_(T::value).getAv());
+    num_+=frees_(T::value).nAvr();
   }
 
 private:
@@ -646,7 +625,7 @@ private:
 
 
 template<typename VA>
-size_t Composite<VA>::nAvr() const
+size_t Composite<VA>::nAvr_v() const
 {
   size_t res=0;
   NAvr helper(frees_,res);
@@ -669,21 +648,21 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, typename Av>
-  void help(const Av*const av, Vec v) const
+  void help(typename Av::Ptr av) const
   {
-    iter_++->reference(quantumdata::partialTrace(ldo_,bind(&Av::average,t_,_1,av,structure::theStaticOne),v,structure::Liouvillean<RANK>::defaultArray));
+    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(structure::average<Av::N_RANK>,av,t_,_1)));
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getAv(),act);
+    help<Act,typename Act::Av>(act.getAv());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getAv(),tmptools::Vector<IDX>());
+    help<tmptools::Vector<IDX>,composite::SubSystemFree::Av>(frees_(IDX).getAv());
   }
 
 private:
@@ -699,7 +678,7 @@ private:
 
 template<typename VA>
 const typename Composite<VA>::Averages
-Composite<VA>::average(double t, const LazyDensityOperator& ldo) const
+Composite<VA>::average_v(double t, const LazyDensityOperator& ldo) const
 {
   using namespace std;
   list<Averages> seqAverages(RANK+mpl::size<VA>::value);
@@ -710,7 +689,7 @@ Composite<VA>::average(double t, const LazyDensityOperator& ldo) const
     CALL_COMPOSITE_WORKER( Average(frees_,t,ldo,iter) ) ;
   }
 
-  Averages res(nAvr()); res=0;
+  Averages res(nAvr_v()); res=0;
   return cpputils::concatenate(seqAverages,res);
 
 }
@@ -727,12 +706,12 @@ public:
 
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
-    if ((u_=l_+Av::nAvr(av))>l_) {
+    if (av && (u_=l_+av->nAvr())>l_) {
       Averages temp(avr_(Range(l_+1,u_)));
-      Av::process(temp,av);
+      av->process(temp);
     }
     std::swap(l_,u_);
   }
@@ -740,13 +719,13 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getAv());
+    help<typename Act::Av>(act.getAv());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getAv());
+    help<composite::SubSystemFree::Av>(frees_(IDX).getAv());
   }
 
 private:
@@ -761,7 +740,7 @@ private:
 
 template<typename VA>
 void
-Composite<VA>::process(Averages& avr) const
+Composite<VA>::process_v(Averages& avr) const
 {
   ptrdiff_t l=-1, u=0;
   CALL_COMPOSITE_WORKER( Process(frees_,avr,l,u) ) ;
@@ -777,23 +756,23 @@ public:
     : frees_(frees), avr_(avr), os_(os), precision_(precision), l_(l), u_(u) {}
 
   template<typename Av>
-  void help(const Av*const av) const
+  void help(typename Av::Ptr av) const
   {
     using blitz::Range;
-    if ((u_=l_+Av::nAvr(av))>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
+    if (av && (u_=l_+av->nAvr())>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
     std::swap(l_,u_);
   }
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    help(act.getAv());
+    help<typename Act::Av>(act.getAv());
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help(frees_(IDX).getAv());
+    help<composite::SubSystemFree::Av>(frees_(IDX).getAv());
   }
 
 private:
@@ -811,7 +790,7 @@ private:
 
 template<typename VA>
 void
-Composite<VA>::display(const Averages& avr, std::ostream& os, int precision) const
+Composite<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
 {
   ptrdiff_t l=-1, u=0;
   CALL_COMPOSITE_WORKER( Display(frees_,avr,os,precision,l,u) ) ;

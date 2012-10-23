@@ -32,7 +32,7 @@ size_t decideDimension(size_t twoS, size_t dim)
 }
 
 
-const Diagonal mainDiagonal(const SpinBase* spin)
+const Diagonal mainDiagonal(Ptr spin)
 {
   Diagonal diagonal(spin->getDimension());
   diagonal=blitz::tensor::i-spin->getTwoS()/2.;
@@ -40,19 +40,19 @@ const Diagonal mainDiagonal(const SpinBase* spin)
 }
 
 
-const Tridiagonal splus(const SpinBase* spin)
+const Tridiagonal splus(Ptr spin)
 {
   Diagonal diagonal(spin->getDimension()-1);
   using blitz::tensor::i;
   // i=m+s (m is the magnetic quantum number)
   Tridiagonal res(Diagonal(),1,diagonal=sqrt((spin->getTwoS()-i)*(i+1.)));
   // writing "1." is tremendously important here, for converting the whole thing to doubles: otherwise, the sqrt is apparently performed within integers by blitz!!! 
-  if (dynamic_cast<const structure::FreeExact*>(spin)) res.furnishWithFreqs(mainDiagonal(spin));
+  if (dynamic_cast<const structure::FreeExact*>(spin.get())) res.furnishWithFreqs(mainDiagonal(spin));
   return res;
 }
 
 
-const Tridiagonal sn(const SpinBase* spin)
+const Tridiagonal sn(Ptr spin)
 {
   const double theta=spin->getTheta(), phi=spin->getPhi();
   return sin(theta)*(cos(phi)*sx(spin)+sin(phi)*sy(spin))+cos(theta)*sz(spin);
@@ -60,7 +60,7 @@ const Tridiagonal sn(const SpinBase* spin)
 
 
 
-const Tridiagonal sz(const SpinBase* spin)
+const Tridiagonal sz(Ptr spin)
 {
   Diagonal diagonal(spin->getDimension());
   return Tridiagonal(diagonal=blitz::tensor::i-spin->getTwoS()/2.);
@@ -93,7 +93,7 @@ SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double g
 
 
 
-const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) const
+const SpinBase::Averages SpinBase::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(5);
 
@@ -120,7 +120,7 @@ const SpinBase::Averages SpinBase::average(const LazyDensityOperator& matrix) co
 }
 
 
-void SpinBase::process(Averages& averages) const
+void SpinBase::process_v(Averages& averages) const
 {
   averages(1)-=sqr(averages(0));
 }

@@ -24,7 +24,7 @@ namespace particletwomodes {
 
 
 const quantumoperator::Tridiagonal<3> 
-helper(const ModeBase* mode0, const ModeBase* mode1, const ParticleBase* part, const ModeFunction& mf0)
+helper(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part, const ModeFunction& mf0)
 {
   return aop(mode0)*aop(mode1).dagger()*mfNKX(part,mf0);
 }
@@ -37,7 +37,7 @@ const dcomp factor(double uNot0, double uNot1, double phi)
 }
 
 
-Base::Base(const ModeBase* mode0, const ModeBase* mode1, const ParticleBase* part, 
+Base::Base(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part, 
 	   double uNot0, double uNot1, 
 	   const ModeFunction& mf0, const ModeFunction& mf1,
 	   double phi)
@@ -51,7 +51,7 @@ Base::Base(const ModeBase* mode0, const ModeBase* mode1, const ParticleBase* par
 
 
 
-void Base::addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void Base::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   using namespace blitzplusplus;
   using basi::fullRange;
@@ -68,12 +68,12 @@ void Base::addContribution(double t, const StateVectorLow& psi, StateVectorLow& 
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstH_);
-    cpputils::for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondH_));
+    cpputils::for_each(fullRange<V2>(dpsidtTemp),basi::begin<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondH_));
   }
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstHT_);
-    cpputils::for_each(fullRange(dpsidtTemp,V2()),basi::begin(dpsidt,V2()),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
+    cpputils::for_each(fullRange<V2>(dpsidtTemp),basi::begin<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
   }
 
 }

@@ -9,19 +9,12 @@
 #include "BlitzArraySliceIterator.h"
 // This is included at this point mainly to pull in necessary TMP tools
 
+#include "SubSystemFwd.h"
+
 #include "details/TMP_helpers.h"
 
 #include <boost/fusion/container/generation/make_list.hpp>
 
-
-/*
-  TODO:
-  * in user guide:
-    - document changes of BinarySystem (binary::make)
-    - composite::make
-    - composite::result_of::Make
-    - element makers => make
-*/
 
 
 namespace composite {
@@ -58,8 +51,8 @@ protected:
   Exact(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  bool isUnitary(                       ) const; class IsUnitary;
-  void actWithU (double, StateVectorLow&) const; class ActWithU ;
+  bool isUnitary_v(                       ) const; class IsUnitary;
+  void  actWithU_v(double, StateVectorLow&) const; class ActWithU ;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -84,7 +77,7 @@ protected:
   Hamiltonian(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; class AddContribution;
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; class AddContribution;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -113,9 +106,9 @@ protected:
   Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  size_t              nJumps       ()                                   const; class NJumps;
-  const Probabilities probabilities(double, const LazyDensityOperator&) const; class Probas;
-  void                actWithJ     (double, StateVectorLow&, size_t)    const; class ActWithJ;
+  size_t                     nJumps_v()                                   const; class NJumps;
+  const Probabilities probabilities_v(double, const LazyDensityOperator&) const; class Probas;
+  void                     actWithJ_v(double, StateVectorLow&, size_t)    const; class ActWithJ;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -148,7 +141,7 @@ public:
   typedef structure::QuantumSystem<RANK> QS_Base;
   typedef structure::Averaged     <RANK> Av_Base;
 
-  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+  typedef blitz::TinyVector<composite::SubSystemFree,RANK> Frees;
 
   typedef boost::base_from_member<const Frees> FreesBase;
 
@@ -190,18 +183,17 @@ public:
 private:
   // Implementing QS_Base
 
-  double highestFrequency (             ) const;
-
-  void   displayParameters(std::ostream&) const; class DisplayParameters;
+  double  highestFrequency_v(             ) const;
+  void   displayParameters_v(std::ostream&) const; class DisplayParameters;
 
   // Implementing Av_Base
 
-  void   displayKey(std::ostream&, size_t&) const; class DisplayKey;
-  size_t nAvr      ()                       const; class NAvr;
+  void   displayKey_v(std::ostream&, size_t&) const; class DisplayKey;
+  size_t       nAvr_v()                       const; class NAvr;
 
-  const Averages average(double, const LazyDensityOperator&)  const; class Average;
-  void           process(Averages&)                           const; class Process;
-  void           display(const Averages&, std::ostream&, int) const; class Display;
+  const Averages average_v(double, const LazyDensityOperator&)  const; class Average;
+  void           process_v(Averages&)                           const; class Process;
+  void           display_v(const Averages&, std::ostream&, int) const; class Display;
 
   // Storage
   // Note that Frees are stored by value in FreesBase
@@ -237,7 +229,7 @@ struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PA
 #define DEFAULT_print(z, n, data) DefaultArgument
 
 #define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,1) )
-#define BOOST_PP_FILENAME_1 "details/CompositeMakerImplementationsSpecialization.h"
+#define BOOST_PP_FILENAME_1 "../composites/details/CompositeMakerImplementationsSpecialization.h"
 
 #include BOOST_PP_ITERATE()
 

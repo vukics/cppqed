@@ -4,31 +4,35 @@
 
 #include "Mode_.h"
 
-#include<boost/assign/list_of.hpp>
-#include<boost/assign/std/list.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/assign/std/list.hpp>
+
+#include <boost/make_shared.hpp>
+
 
 namespace mode {
 
 
 #define TEMPLATE_PARAM_TEMP(temp) temp,A
 #define SWITCH_helper(name,templateParam)				\
+  using boost::make_shared;                                             \
   switch (qmp) {							\
-  case QMP_IP  : return SmartPtr(new name##Mode<templateParam>(p,a));	\
-  case QMP_UIP : return SmartPtr(new name##ModeUIP<templateParam>(p,a));\
+  case QMP_IP  : return make_shared<name##Mode   <templateParam> >(p,a); \
+  case QMP_UIP : return make_shared<name##ModeUIP<templateParam> >(p,a); \
   case QMP_SCH : ;							\
   }									\
-  return SmartPtr(new name##ModeSch<templateParam>(p,a));
+  return make_shared<name##ModeSch<templateParam> >(p,a);
 
 
 template<typename A>
-const SmartPtr make(const Pars& p, QM_Picture qmp, const A& a)
+const Ptr make(const Pars& p, QM_Picture qmp, const A& a)
 {
   SWITCH_helper( ,A)
 }
 
 
 template<typename A>
-const SmartPtr make(const ParsLossy& p, QM_Picture qmp, const A& a)
+const Ptr make(const ParsLossy& p, QM_Picture qmp, const A& a)
 {
   if (!p.kappa) return make(static_cast<const Pars&>(p),qmp,a);
   else {
@@ -39,7 +43,7 @@ const SmartPtr make(const ParsLossy& p, QM_Picture qmp, const A& a)
 
 
 template<typename A>
-const SmartPtr make(const ParsPumped& p, QM_Picture qmp, const A& a)
+const Ptr make(const ParsPumped& p, QM_Picture qmp, const A& a)
 {
   if (!isNonZero(p.eta)) return make(static_cast<const Pars&>(p),qmp,a);
   else { SWITCH_helper(Pumped,A) }
@@ -47,7 +51,7 @@ const SmartPtr make(const ParsPumped& p, QM_Picture qmp, const A& a)
 
 
 template<typename A>
-const SmartPtr make(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
+const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp, const A& a)
 {
   if      (!p.kappa)          return make(static_cast<const ParsPumped&>(p),qmp,a);
   else if (!isNonZero(p.eta)) return make(static_cast<const ParsLossy &>(p),qmp,a);
@@ -69,9 +73,9 @@ AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
 
 
 template<typename Base>
-const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average(const LazyDensityOperator& matrix) const
+const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average_v(const LazyDensityOperator& matrix) const
 {
-  const Averages averagesFromBase(Base::average(matrix));
+  const Averages averagesFromBase(Base::average_v(matrix));
   Averages averages(averagesFromBase.size()+1);
   averages(blitz::Range(0,averages.size()-2))=averagesFromBase;
   averages(averages.size()-1)=matrix(matrix.getDimension()-1);
@@ -80,10 +84,10 @@ const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>
 
 
 template<typename Base>
-void AveragedMonitorCutoff<Base>::process(Averages& averages) const
+void AveragedMonitorCutoff<Base>::process_v(Averages& averages) const
 {
   Averages ranged(averages(blitz::Range(0,averages.size()-2)));
-  Averaged::process(ranged);
+  Averaged::process_v(ranged);
 }
 
 

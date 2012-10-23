@@ -59,15 +59,15 @@ Exact<NL>::updateU(double dtdid) const
 
 template<int NL>
 bool 
-Exact<NL>::isUnitary() const
+Exact<NL>::isUnitary_v() const
 {
   using namespace std  ;
   // using namespace boost::lambda;
   // using namespace lambda;
 
   return !accumulate(
-		     make_transform_iterator(zIs_.begin(),hasRealPart),
-		     make_transform_iterator(zIs_.end  (),hasRealPart),
+		     boost::make_transform_iterator(zIs_.begin(),hasRealPart),
+		     boost::make_transform_iterator(zIs_.end  (),hasRealPart),
 		     false,
 		     bll::_1 || bll::_2 //logical_or<bool>()
 		     );
@@ -143,7 +143,7 @@ private:
 
 template<int NL, typename VP>
 void
-HamiltonianSch<NL,VP>::addContribution(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+HamiltonianSch<NL,VP>::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using namespace details;
   mpl::for_each<tmptools::Ordinals<NL> >(ElementaryLevel<NL>(psi,dpsidt,zSchs_));

@@ -24,18 +24,18 @@ namespace particle {
 using namespace structure::free;
 
 
-typedef boost::shared_ptr<const ParticleBase> SmartPtr;
+typedef boost::shared_ptr<const ParticleBase> Ptr;
 
-typedef boost::shared_ptr<const PumpedParticleBase> SmartPtrPumped;
+typedef boost::shared_ptr<const PumpedParticleBase> PtrPumped;
 
 
-const Tridiagonal expINKX(const ParticleBase*, ptrdiff_t);
+const Tridiagonal expINKX(particle::Ptr, ptrdiff_t);
 
-inline const Tridiagonal sinNKX(const ParticleBase* particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*DCOMP_I);}
-inline const Tridiagonal cosNKX(const ParticleBase* particle, ptrdiff_t nK) {return (expINKX(particle,nK)+expINKX(particle,-nK))/ 2.         ;}
+inline const Tridiagonal sinNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*DCOMP_I);}
+inline const Tridiagonal cosNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)+expINKX(particle,-nK))/ 2.         ;}
 
-const Tridiagonal mfNKX       (const ParticleBase*, const ModeFunction&);
-const Tridiagonal mfNKX_AbsSqr(const ParticleBase*, const ModeFunction&);
+const Tridiagonal mfNKX       (particle::Ptr, const ModeFunction&);
+const Tridiagonal mfNKX_AbsSqr(particle::Ptr, const ModeFunction&);
 
 
 const StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag=true);
@@ -51,9 +51,10 @@ const StateVector init(const Pars&);
 
 void ffTransform(StateVectorLow&, fft::Direction);
 
-SmartPtr make(const Pars      &, QM_Picture);
-SmartPtr make(const ParsPumped&, QM_Picture);
+Ptr make(const Pars      &, QM_Picture);
+Ptr make(const ParsPumped&, QM_Picture);
 
+PtrPumped makePumped(const ParsPumped&, QM_Picture);
 
 
 namespace details {
@@ -75,7 +76,7 @@ public:
 private:
   void updateU(double) const;
 
-  bool isUnitary() const {return true;}
+  bool isUnitary_v() const {return true;}
 
   const Factors factorExponents_;
 
@@ -139,8 +140,8 @@ public:
   const Spatial& getSpace() const {return space_;}
 
 private:
-  const Averages average(const LazyDensityOperator&) const;
-  void           process(Averages&)                  const;
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&)                  const;
 
   const Spatial space_;
 

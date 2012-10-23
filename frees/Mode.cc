@@ -1,4 +1,4 @@
-#include "Mode_.h"
+#include "impl/Mode.tcc"
 
 #include "ParsMode.h"
 
@@ -17,6 +17,16 @@ using namespace mathutils;
 
 
 namespace mode {
+
+#define MAKE_redirect return make<Averaged>(p,qmp)
+
+const Ptr make(const Pars           & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsLossy      & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsPumped     & p, QM_Picture qmp) {MAKE_redirect ;}
+const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp) {MAKE_redirect ;}
+
+#undef MAKE_redirect
+
 
 const Tridiagonal aop(size_t);
 
@@ -206,7 +216,7 @@ Averaged::Averaged(const KeyLabels& follow, const KeyLabels& precede)
 }
 
 
-const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(4);
 
@@ -229,7 +239,7 @@ const Averaged::Averages Averaged::average(const LazyDensityOperator& matrix) co
 }
 
 
-void Averaged::process(Averages& averages) const
+void Averaged::process_v(Averages& averages) const
 {
   averages(1)-=sqr(averages(0));
 }
@@ -243,13 +253,13 @@ AveragedQuadratures::AveragedQuadratures(const KeyLabels& follow, const KeyLabel
 }
 
 
-const AveragedQuadratures::Averages AveragedQuadratures::average(const LazyDensityOperator& matrix) const
+const AveragedQuadratures::Averages AveragedQuadratures::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(7);
 
   averages=0;
 
-  averages(blitz::Range(0,3))=Averaged::average(matrix);
+  averages(blitz::Range(0,3))=Averaged::average_v(matrix);
 
   for (int n=2; n<int(matrix.getDimension()); n++) {
 
@@ -264,11 +274,11 @@ const AveragedQuadratures::Averages AveragedQuadratures::average(const LazyDensi
 }
 
 
-void AveragedQuadratures::process(Averages& averages) const
+void AveragedQuadratures::process_v(Averages& averages) const
 {
   {
     Averages ranged(averages(blitz::Range(0,3)));
-    Averaged::process(ranged);
+    Averaged::process_v(ranged);
   }
 
   double 
@@ -322,17 +332,17 @@ const Tridiagonal aop(size_t dim)
 
 // This returns a Tridiagonal furnished with frequencies, when mode is derived from mode::Exact
 
-const Tridiagonal aop(const ModeBase* mode)
+const Tridiagonal aop(Ptr mode)
 {
   size_t dim=mode->getDimension();
   Tridiagonal res(aop(dim));
-  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode)) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
+  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode.get())) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
   return res;
 }
 
 
 
-const Tridiagonal nop(const ModeBase* mode)
+const Tridiagonal nop(Ptr mode)
 {
   return Tridiagonal(mainDiagonal(1.,mode->getDimension()));
 }
@@ -437,7 +447,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(double t, StateVectorLow& psi) const
 
 
 
-const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average(double t, const LazyDensityOperator& matrix) const
+const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(double t, const LazyDensityOperator& matrix) const
 {
   Averages averages(3);
 
