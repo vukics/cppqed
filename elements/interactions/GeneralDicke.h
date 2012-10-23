@@ -16,7 +16,7 @@ namespace generaldicke {
 class Base : public structure::Interaction<2>, public structure::TridiagonalHamiltonian<2,true>
 {
 public:
-  Base(const ModeBase*, const SpinBase*, dcomp u, dcomp y);
+  Base(mode::Ptr, spin::Ptr, dcomp u, dcomp y);
 
 };
 

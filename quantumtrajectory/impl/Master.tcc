@@ -9,6 +9,7 @@
 #include "MathExtensions.h"
 
 #include "Algorithm.h"
+#include "impl/BlitzArraySliceIterator.tcc"
 #include "ComplexArrayExtensions.h"
 #include "Range.h"
 
@@ -24,32 +25,26 @@ namespace master {
 
 template<int RANK>
 Base<RANK>::Base(DensityOperator& rho,
-		 const QuantumSystem& sys,
+		 typename QuantumSystem::Ptr qs,
 		 const master::Pars& p,
 		 const DensityOperatorLow& scaleAbs
 		 )
-  : trajectory::TrajectoryBase(p),
-    TrajectoryBase(rho(),
-		   bind(&Base<RANK>::derivs,this,_1,_2,_3),
-		   1./(sys.highestFrequency()*TrajectoryBase::factor()),
-		   scaleAbs,
-		   p,
-		   evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
+  : trajectory::Trajectory(p),
+    AdaptiveTrajectory(rho(),
+		       bind(&Base<RANK>::derivs,this,_1,_2,_3),
+		       trajectory::initialTimeStep(qs->highestFrequency()),
+		       scaleAbs,
+		       p,
+		       evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
     rho_(rho),
     tIntPic0_(0),
-    qs_(&sys),
-    ex_(structure::qse(&sys)),
-    ha_(structure::qsh(&sys)),
-    li_(structure::qsl(&sys))
+    qs_(qs)
 {
-  if (!Exact::isUnitary(ex_)) throw master::NonUnitaryIP();
-  // If the interaction picture is non-unitary, the density matrix in
-  // IP is non-Hermitian. This cannot be allowed here because then the
-  // calculation of the Hamiltonian part of the dynamics as
-  // implemented below would fail.
+  if (!qs_.isUnitary()) throw master::NonUnitaryIP();
+  // If the interaction picture is non-unitary, the density matrix in IP is non-Hermitian. This cannot be allowed here because then the calculation of the Hamiltonian part of the dynamics as implemented below would fail.
   // if (!li_) throw master::NoLiouvillean();
 
-  if (rho!=sys) throw DimensionalityMismatchException();
+  if (rho!=*qs_.getQS()) throw DimensionalityMismatchException();
 
 }
 
@@ -61,7 +56,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   PROGRESS_TIMER_IN_POINT(getOstream());
 
-  binaryIter(rhoLow,drhodtLow,bind(&Hamiltonian::addContribution,t,_1,_2,tIntPic0_,ha_,structure::theStaticOne));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumSystemWrapper::addContribution,qs_,t,_1,_2,tIntPic0_));
 
   PROGRESS_TIMER_OUT_POINT("Hamiltonian");
 
@@ -75,10 +70,10 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
   // Now act with the reset operator --- implement this in terms of
   // the individual jumps by iteration and addition
 
-  for (size_t i=0; i<Liouvillean::nJumps(li_); i++) {
+  for (size_t i=0; i<qs_.nJumps(); i++) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     DensityOperatorLow rhotemp(rhoLow.copy());
-    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,t,_1,i,li_,structure::theStaticOne));
+    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,qs_.getLi(),t,_1,i));
     unaryIter(rhotemp,functionLi);
     blitzplusplus::hermitianConjugateSelf(rhotemp);
     unaryIter(rhotemp,functionLi);
@@ -91,17 +86,17 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
 template<int RANK>
 void 
-Base<RANK>::step(double deltaT) const
+Base<RANK>::step_v(double deltaT) const
 {
   PROGRESS_TIMER_IN_POINT( getOstream() )
   getEvolved()->step(deltaT);
   PROGRESS_TIMER_OUT_POINT("Evolved step total")
-
-  if (ex_) {
+    ;
+  if (const typename Exact::Ptr ex=qs_.getEx()) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_());
-    UnaryFunction functionEx(bind(&Exact::actWithU,getDtDid(),_1,ex_,structure::theStaticOne));
+    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);
@@ -133,36 +128,33 @@ Base<RANK>::step(double deltaT) const
 
 template<int RANK>
 void
-Base<RANK>::displayParameters() const
+Base<RANK>::displayParameters_v() const
 {
   using namespace std;
-  TrajectoryBase::displayParameters();
+  AdaptiveTrajectory::displayParameters_v();
 
   getOstream()<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl;
 
-  qs_->displayParameters(getOstream());
+  qs_.getQS()->displayParameters(getOstream());
 
 }
 
 
-// NEEDS_WORK needs to create again the iterators because the
-// array stored in the iterator IS NOT transposed because
-// transpose does not touch the data. For this reason one must be
-// very careful with reusing SliceIterators because probably most
-// of the times it does not produce the required
-// semantics. Alternatively, one could imagine a rebind
-// functionality in SliceIterators.
+// NEEDS_WORK needs to create again the iterators because the array stored in the iterator IS NOT transposed because transpose does not touch the data. For this reason one must be very careful with reusing SliceIterators because probably most of the times it does not produce the required semantics. Alternatively, one could imagine a rebind functionality in SliceIterators.
+
 template<int RANK>
 void Base<RANK>::unaryIter(DensityOperatorLow& rhoLow, UnaryFunction function) const
 {
-  boost::for_each(fullRange(rhoLow,blitzplusplus::vfmsi::Left()),function);
+  using namespace blitzplusplus::vfmsi;
+  boost::for_each(fullRange<Left>(rhoLow),function);
 }
 
 
 template<int RANK>
 void Base<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
 {
-  cpputils::for_each(fullRange(rhoLow,blitzplusplus::vfmsi::Left()),begin(drhodtLow,blitzplusplus::vfmsi::Left()),function);
+  using namespace blitzplusplus::vfmsi;
+  cpputils::for_each(fullRange<Left>(rhoLow),begin<Left>(drhodtLow),function);
 }
 
 

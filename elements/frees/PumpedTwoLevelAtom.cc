@@ -37,7 +37,7 @@ void PumpedTwoLevelAtom::doActWithJ(StateVectorLow& psi) const
 }
 
 
-const PumpedTwoLevelAtom::Averages PumpedTwoLevelAtom::average(const LazyDensityOperator& M) const
+const PumpedTwoLevelAtom::Averages PumpedTwoLevelAtom::average_v(const LazyDensityOperator& M) const
 // Calculates the complete density matrix
 {
   Averages avr(4);
@@ -49,7 +49,7 @@ const PumpedTwoLevelAtom::Averages PumpedTwoLevelAtom::average(const LazyDensity
 }
 
 
-void PumpedTwoLevelAtom::process(Averages&) const
+void PumpedTwoLevelAtom::process_v(Averages&) const
 {
 }
 

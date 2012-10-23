@@ -40,6 +40,8 @@ struct LeftRight
 
 #define NS_NAME vfmsi
 #define RETURN_type1(CONST) TTD_VFMSI(ArrayRankTraits<A>::value,V_S,CONST)
+#define ADDITIONAL_PARAMETER
+#define ADDITIONAL_ARGUMENT
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 

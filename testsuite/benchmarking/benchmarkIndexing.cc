@@ -57,7 +57,7 @@ template<typename A>
 const A& fillRan(A& data)
 {
   using namespace randomized;
-  Randomized::SmartPtr Ran(MakerGSL()(1001));
+  Randomized::Ptr Ran(MakerGSL()(1001));
   boost::generate(data,bind(&Randomized::operator(),Ran));
   return data;
 }

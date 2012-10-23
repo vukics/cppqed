@@ -160,6 +160,8 @@ public:
 
 #define NS_NAME basi
 #define RETURN_type1(CONST) Iterator<ArrayRankTraits<A>::value,V_S,CONST>
+#define ADDITIONAL_PARAMETER
+#define ADDITIONAL_ARGUMENT
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
@@ -281,8 +283,6 @@ public:
 private:
   static const Impl ctorHelper(const CArray&);
 
-  static const V v_;
-
   const Impl firstOffsets_;
 
   const blitz::TinyVector<int      ,MPL_SIZE(V)>  shape_;
@@ -336,52 +336,12 @@ private:
 
 
 
-#define RETURN_type1(CONST) Iterator<ArrayRankTraits<A>::value,V,CONST>
+#define NS_NAME basi_fast
+#define RETURN_type1(CONST) Iterator<ArrayRankTraits<A>::value,V_S,CONST>
+#define ADDITIONAL_PARAMETER , sd
+#define ADDITIONAL_ARGUMENT  , const SlicesData<ArrayRankTraits<A>::value,V_S>& sd
 
-
-template<typename A, typename V>
-inline
-const RETURN_type1(true )
-begin(const A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
-{return RETURN_type1(true )(array,sd,boost::mpl::false_());}
-
-template<typename A, typename V>
-inline
-const RETURN_type1(true )
-end  (const A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
-{return RETURN_type1(true )(array,sd,boost::mpl:: true_());}
-
-template<typename A, typename V>
-inline
-const RETURN_type1(false)
-begin(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
-{return RETURN_type1(false)(array,sd,boost::mpl::false_());}
-
-template<typename A, typename V>
-inline
-const RETURN_type1(false)
-end  (      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd) 
-{return RETURN_type1(false)(array,sd,boost::mpl:: true_());}
-
-
-#define RETURN_type2(CONST) boost::iterator_range<RETURN_type1(CONST)>
-
-template<typename A, typename V>
-inline
-const RETURN_type2(true ) 
-fullRange(const A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd) 
-{return RETURN_type2(true )(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
-
-template<typename A, typename V>
-inline
-const RETURN_type2(false) 
-fullRange(      A& array, const SlicesData<ArrayRankTraits<A>::value,V>& sd)
-{return RETURN_type2(false)(blitzplusplus::basi_fast::begin(array,sd),blitzplusplus::basi_fast::end(array,sd));}
-
-
-#undef  RETURN_type2
-#undef  RETURN_type1
-
+#include "details/BlitzArraySliceIteratorReentrant.h"
 
 
 } // basi_fast

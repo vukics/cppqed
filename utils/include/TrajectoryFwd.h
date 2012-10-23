@@ -10,10 +10,10 @@ struct ParsTrajectory;
 class StoppingCriterionReachedException;
 class OutfileOpeningException;
 
-class TrajectoryBase;
+class Trajectory;
 
 template<typename>
-class Trajectory;
+class AdaptiveTrajectory;
 
 } // trajectory
 

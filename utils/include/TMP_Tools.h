@@ -2,6 +2,10 @@
 #ifndef UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 #define UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 
+#ifndef BLITZ_ARRAY_LARGEST_RANK
+#define BLITZ_ARRAY_LARGEST_RANK 11
+#endif // BLITZ_ARRAY_LARGEST_RANK
+
 #ifndef FUSION_MAX_VECTOR_SIZE
 #define FUSION_MAX_VECTOR_SIZE 20
 #endif // FUSION_MAX_VECTOR_SIZE
@@ -182,7 +186,7 @@ struct Vector : boost::mpl::vector_c<int,BOOST_PP_ENUM_PARAMS(TMPTOOLS_MAX_VECTO
 
 template<>
 struct Vector<BOOST_PP_ENUM(TMPTOOLS_MAX_VECTOR_SIZE,DEFAULT_print,~) >
-  : boost::mpl::vector_c<int >
+  : boost::mpl::vector_c<int>
 {};
 
 

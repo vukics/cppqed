@@ -20,7 +20,7 @@ protected:
   Factors& getFactors() const {return factors_;}
 
 private:
-  void actWithU(double, StateVectorLow&) const;
+  void actWithU_v(double, StateVectorLow&) const;
 
   virtual void updateU(double) const = 0;
 

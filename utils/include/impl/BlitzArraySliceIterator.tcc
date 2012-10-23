@@ -214,14 +214,14 @@ template<int RANK, typename V>
 struct Algorithm 
   : fold<Ordinals<RANK>,
 	 pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
-	 pair<push_back<first<mpl::_1>,
+	 pair<push_back<mpl::first<mpl::_1>,
 			if_<numerical_contains<V,mpl::_2>,
 			    deref<second<mpl::_1> >,
 			    mpl::_2
 			    >
 			>,
 	      if_<numerical_contains<V,mpl::_2>,
-		  next<second<mpl::_1> >,
+		  mpl::next<second<mpl::_1> >,
 		  second<mpl::_1>
 		  >
 	      >
@@ -260,7 +260,7 @@ SlicesData<RANK,V>::ctorHelper(const CArray& array)
   };
 
   RETURN_type res;
-  boost::transform(basi::fullRange(array,v_),back_inserter(res),boost::bind(&Helper::doIt,_1,array.data()));
+  boost::transform(basi::fullRange<V>(array),back_inserter(res),boost::bind(&Helper::doIt,_1,array.data()));
   return res;
 }
 
@@ -270,14 +270,13 @@ SlicesData<RANK,V>::ctorHelper(const CArray& array)
 template<int RANK, typename V>
 SlicesData<RANK,V>::SlicesData(const CArray& array)
   : firstOffsets_(ctorHelper(array)),
-    shape_  (basi::begin(array,v_)->shape   ()),
-    stride_ (basi::begin(array,v_)->stride  ()),
-    storage_(basi::begin(array,v_)->ordering() ,blitz::TinyVector<bool,MPL_SIZE(V)>(true))
+    shape_  (basi::begin<V>(array)->shape   ()),
+    stride_ (basi::begin<V>(array)->stride  ()),
+    storage_(basi::begin<V>(array)->ordering() ,blitz::TinyVector<bool,MPL_SIZE(V)>(true))
 {
   assert( ( blitz::all(storage_.ascendingFlag()==blitz::TinyVector<bool,MPL_SIZE(V)>(true)) ) );
   assert( ( blitz::all(array   .base         ()==blitz::TinyVector<int ,       RANK>(0   )) ) );
 }
-
 
 
 namespace basi_fast {
@@ -345,7 +344,7 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 //////////////////////////////////////////
 
 
-#define BOOST_PP_ITERATION_LIMITS (1,11)
+#define BOOST_PP_ITERATION_LIMITS (1,BLITZ_ARRAY_LARGEST_RANK)
 #define BOOST_PP_FILENAME_1 "details/IndexerImplementationsSpecialization.h"
 
 #include BOOST_PP_ITERATE()

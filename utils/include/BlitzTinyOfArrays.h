@@ -60,7 +60,7 @@ public:
   inline TinyOfArrays(TOA_DeepCopy   , const T_numtype& initValue);
 
 
-#define BOOST_PP_ITERATION_LIMITS (2,11)
+#define BOOST_PP_ITERATION_LIMITS (2,BLITZ_ARRAY_LARGEST_RANK)
 #define BOOST_PP_FILENAME_1 "details/BlitzTinyOfArraysSpecialization.h"
 
 #include BOOST_PP_ITERATE()

@@ -49,9 +49,9 @@ public:
 
   TDH_True(const Tridiagonals& hOverIs) : Base(hOverIs) {}
 
-  virtual void addContribution(double, const StateVectorLow&, StateVectorLow&) const;
-
 private:
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&) const;
+
   using Base::hOverIs_;
 
 };
@@ -73,9 +73,9 @@ public:
 
   TDH_False(const Tridiagonals& hOverIs) : Base(hOverIs) {}
 
-  virtual void addContribution(const StateVectorLow&, StateVectorLow&) const;
-
 private:
+  void addContribution_v(const StateVectorLow&, StateVectorLow&) const;
+
   using Base::hOverIs_;
 
 };

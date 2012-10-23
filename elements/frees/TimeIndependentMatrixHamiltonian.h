@@ -19,7 +19,7 @@ public:
   // For safety, the matrix will be copied in.
 
 private:
-  void addContribution(const StateVectorLow&, StateVectorLow&) const; 
+  void addContribution_v(const StateVectorLow&, StateVectorLow&) const; 
 
   const CMatrix hamiltonianOverI_;
 
@@ -30,11 +30,11 @@ template <int RANK, bool IS_TD>
 class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public structure::averaged::Transferring<1,RANK,IS_TD>
 {
 public:
-  typedef structure::Averaged<RANK,IS_TD> Averaged;
+  typedef typename structure::Averaged<RANK,IS_TD>::Ptr AveragedPtr;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
-  TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, const Averaged& averaged, const LazyDensityOperator& ldo)
+  TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, AveragedPtr averaged, const LazyDensityOperator& ldo)
     : TimeIndependentMatrixHamiltonian(matrix), structure::averaged::Transferring<1,RANK,IS_TD>(averaged,ldo) {}
 
 };

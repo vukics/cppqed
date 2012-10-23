@@ -56,7 +56,7 @@ public:
 private:
   void updateU(double) const;
 
-  bool isUnitary() const;
+  bool isUnitary_v() const;
 
   const Levels zIs_;
 
@@ -147,7 +147,7 @@ public:
     : Exact<NL>(zIs), zSchs_(zSchs), etas_(etas) {}
 
 private:
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
 
   const Levels zSchs_;
@@ -171,7 +171,7 @@ public:
   const Levels& get_zSchs() const {return zSchs_;}
 
 private:
-  void addContribution(const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v(const StateVectorLow&, StateVectorLow&) const;
 
 
   const Levels zSchs_;
@@ -268,7 +268,7 @@ class MultiLevelBase
   : public structure::Free
 {
 public:
-  typedef boost::shared_ptr<const MultiLevelBase> SmartPtr;
+  typedef boost::shared_ptr<const MultiLevelBase> Ptr;
 
   using structure::Free::getParsStream;
 
@@ -301,7 +301,7 @@ public:
   typedef multilevel::Liouvillean<NL,VL> Liouvillean;
   typedef MultiLevelBase<NL> Base;
 
-  typedef typename Base::SmartPtr SmartPtr;
+  typedef typename Base::Ptr Ptr;
 
   using Hamiltonian::get_zSchs;
   using Base::getParsStream;
@@ -311,7 +311,7 @@ public:
 };
 
 
-#define RETURN_type typename MultiLevelBase<NL>::SmartPtr
+#define RETURN_type typename MultiLevelBase<NL>::Ptr
 
 template<int NL, typename VP, typename VL, typename Averaged>
 inline

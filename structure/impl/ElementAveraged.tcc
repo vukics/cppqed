@@ -10,16 +10,16 @@
 
 #define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
 
-template<int RANK>
-structure::averaged::Collecting<RANK>::Collecting(const Collection& collection)
+template<int RANK, bool IS_TD>
+structure::averaged::Collecting<RANK,IS_TD>::Collecting(const Collection& collection)
   : Base(collection.begin()->getTitle(),
 	 cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),KeyLabels())),
     collection_(collection.clone())
 {}
 
 
-template<int RANK>
-structure::averaged::Collecting<RANK>::Collecting(const Collecting& collecting)
+template<int RANK, bool IS_TD>
+structure::averaged::Collecting<RANK,IS_TD>::Collecting(const Collecting& collecting)
   : Base(collecting),
     collection_(collecting.collection_.clone())
 {}
@@ -28,11 +28,11 @@ structure::averaged::Collecting<RANK>::Collecting(const Collecting& collecting)
 
 
 
-#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection_.beginend(),boost::bind(&Element::average,_1,boost::cref(ldo)))
+#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection_.beginend(),boost::bind(&Element::average,_1,t,boost::cref(matrix)))
 
-template<int RANK>
-const typename structure::averaged::Collecting<RANK>::Averages
-structure::averaged::Collecting<RANK>::average(const LazyDensityOperator& ldo) const
+template<int RANK, bool IS_TD>
+const typename structure::averaged::Collecting<RANK,IS_TD>::Averages
+structure::averaged::Collecting<RANK,IS_TD>::average_v(double t, const LazyDensityOperator& matrix) const
 {
   Averages res(nAvr()); res=0;
   return cpputils::concatenate(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),res);
@@ -43,9 +43,9 @@ structure::averaged::Collecting<RANK>::average(const LazyDensityOperator& ldo) c
 
 
 
-template<int RANK>
+template<int RANK, bool IS_TD>
 void
-structure::averaged::Collecting<RANK>::process(Averages& avr) const
+structure::averaged::Collecting<RANK,IS_TD>::process_v(Averages& avr) const
 {
   struct Helper
   {

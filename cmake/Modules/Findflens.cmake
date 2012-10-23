@@ -8,11 +8,11 @@
 
 include(LibFindMacros)
 libfind_package(flens CBLAS)
-if(CBLAS_FOUND AND ${CBLAS_LIBRARY} MATCHES "gslcblas")
+if(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
   set(flens_DEFINITIONS "-DGSL_CBLAS")
-else(CBLAS_FOUND AND ${CBLAS_LIBRARY} MATCHES "gslcblas")
+else(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
   set(flens_DEFINITIONS "")
-endif(CBLAS_FOUND AND ${CBLAS_LIBRARY} MATCHES "gslcblas")
+endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
 
 libfind_pkg_check_modules(flens_PKGCONF flens)
 

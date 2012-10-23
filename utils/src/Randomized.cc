@@ -5,6 +5,9 @@
 #include <boost/archive/iterators/base64_from_binary.hpp>
 #include <boost/archive/iterators/binary_from_base64.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
+
+#include <boost/make_shared.hpp>
+
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
@@ -103,9 +106,9 @@ istream& RandomizedGSL::readImplID(istream &is) const
 }
 
 
-const Randomized::SmartPtr MakerGSL::operator()(unsigned long seed) const
+const Randomized::Ptr MakerGSL::operator()(unsigned long seed) const
 {
-  return Randomized::SmartPtr(new RandomizedGSL(seed));
+  return boost::make_shared<RandomizedGSL>(seed);
 }
 
 

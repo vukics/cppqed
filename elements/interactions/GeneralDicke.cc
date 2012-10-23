@@ -13,7 +13,7 @@ using namespace mode;
 
 
 
-generaldicke::Base::Base(const ModeBase* mode, const SpinBase* spin, dcomp u, dcomp y)
+generaldicke::Base::Base(mode::Ptr mode, spin::Ptr spin, dcomp u, dcomp y)
   : Interaction<2>(Frees(mode,spin),
 		   RealFreqs(),
 		   tuple_list_of("u",u,mode->getDimension()*spin->getDimension())("y",y,

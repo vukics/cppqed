@@ -1,6 +1,5 @@
-#include "Evolution.h"
+#include "EvolutionComposite.h"
 
-#include "Composite.h"
 #include "ParticleTwoModes.h"
 
 
@@ -22,9 +21,9 @@ int main(int argc, char* argv[])
   pmP.delta-=ppcP.uNot/(isComplex(ppcP.modeCav) ? 1. : 2.);
   pmM.delta-=ppcM.uNot/(isComplex(ppcM.modeCav) ? 1. : 2.);
 
-  particle::SmartPtr part (make(pp ,QMP_IP));
-  mode    ::SmartPtr plus (make(pmP,QMP_IP));
-  mode    ::SmartPtr minus(make(pmM,QMP_IP));
+  particle::Ptr part (make(pp ,QMP_IP));
+  mode    ::Ptr plus (make(pmP,QMP_IP));
+  mode    ::Ptr minus(make(pmM,QMP_IP));
 
   quantumdata::StateVector<3> psi(init(pp)*
 				  init(pmP)*
@@ -43,22 +42,3 @@ int main(int argc, char* argv[])
 	 pe);
 
 }
-
-
-/*
-  {
-
-    quantumdata::StateVector<3> psi(init(pmP)*init(pmM)*init(pp));
-
-    psi()=0;
-  
-    quantumdata::StateVector<3> dpsidt(psi.getDimensions());
-  
-    psi()(0,1,7)=1;
-
-    static_cast<structure::Hamiltonian<3>*>(&ptm)->addContribution(0,psi(),dpsidt(),0);
-
-    std::cout<<dpsidt();
-  
-  }
-*/

@@ -2,11 +2,8 @@
 #ifndef   ELEMENTS_COMPOSITES_SUBSYSTEMFWD_H_INCLUDED
 #define   ELEMENTS_COMPOSITES_SUBSYSTEMFWD_H_INCLUDED
 
-namespace structure {
+namespace composite {
 
-
-template<int> 
-class SubSystem;
 
 template<int RANK> 
 class SubSystemsInteraction;
@@ -15,6 +12,6 @@ class SubSystemsInteraction;
 class SubSystemFree;
 
 
-} // structure
+} // composite
 
 #endif // ELEMENTS_COMPOSITES_SUBSYSTEMFWD_H_INCLUDED

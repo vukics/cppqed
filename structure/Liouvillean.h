@@ -16,24 +16,23 @@ namespace structure {
 class LiouvilleanCommon : public LiouvilleanAveragedCommon
 {
 public:
+  typedef boost::shared_ptr<const LiouvilleanCommon> Ptr;
+
   typedef DArray1D Probabilities;
   // dpoverdt ladder type for Liouvilleans. Note that the extent is not known at compile time because it depends on how many subsystems there are which themselves are Liouvillean, which, in turn, depends on parameters. This may also actually be only a RANGE of a larger array if the present system is subsystem to a larger system.
 
-  static size_t nJumps(const LiouvilleanCommon* liouvillean)
-  {
-    return liouvillean ? liouvillean->nJumps() : 0;
-  }
-
   virtual ~LiouvilleanCommon() {}
 
+  size_t nJumps() const {return nJumps_v();}
+
 private:
-  virtual size_t nJumps() const = 0;
+  virtual size_t nJumps_v() const = 0;
 
 };
 
 
 #ifndef   NDEBUG
-struct LiouvilleanFishyException : cpputils::Exception {};
+struct LiouvilleanNumberMismatchException : cpputils::Exception {};
 #endif // NDEBUG
 
 
@@ -41,6 +40,10 @@ template<int RANK>
 class Liouvillean<RANK,true> : public quantumdata::Types<RANK,LiouvilleanCommon>
 {
 public:
+  static const int N_RANK=RANK;
+
+  typedef boost::shared_ptr<const Liouvillean> Ptr;
+
   typedef quantumdata::Types<RANK,LiouvilleanCommon> Base;
 
   typedef typename Base::    StateVectorLow     StateVectorLow;
@@ -50,31 +53,23 @@ public:
 
   typedef typename Base::Probabilities Probabilities;
 
+  virtual ~Liouvillean() {}
 
-  static const Probabilities probabilities(double t, const LazyDensityOperator& matrix, const Liouvillean* liouvillean, StaticTag=theStaticOne)
+  const Probabilities probabilities(double t, const LazyDensityOperator& matrix) const
   {
-    const Probabilities probas(liouvillean ? liouvillean->probabilities(t,matrix) : Probabilities());
+    const Probabilities probas(probabilities_v(t,matrix));
 #ifndef   NDEBUG
-    if (size_t(probas.size())!=Base::nJumps(liouvillean))
-      throw LiouvilleanFishyException();
+    if (size_t(probas.size())!=Base::nJumps()) throw LiouvilleanNumberMismatchException();
 #endif // NDEBUG
     return probas;
   }
 
-
-  static void actWithJ(double t, StateVectorLow& psi, size_t jumpNo, const Liouvillean* liouvillean, StaticTag=theStaticOne)
+  void actWithJ(double t, StateVectorLow& psi, size_t jumpNo) const {return actWithJ_v(t,psi,jumpNo);}
   // jumpNo is the ordinal number of the jump to be performed
-  {
-    if (liouvillean) liouvillean->actWithJ(t,psi,jumpNo);
-  }
 
-
-  virtual ~Liouvillean() {}
-
-  virtual void                actWithJ     (double, StateVectorLow&, size_t   ) const = 0;
-
-private:    
-  virtual const Probabilities probabilities(double, const LazyDensityOperator&) const = 0;
+private:
+  virtual const Probabilities probabilities_v(double, const LazyDensityOperator&) const = 0;
+  virtual void                     actWithJ_v(double, StateVectorLow&, size_t   ) const = 0;
 
 };
 
@@ -88,13 +83,12 @@ public:
   typedef typename Liouvillean<RANK,true>::LazyDensityOperator LazyDensityOperator;
   typedef typename Liouvillean<RANK,true>::Probabilities       Probabilities      ;
 
-
 private:
-  void                actWithJ     (double, StateVectorLow& psi, size_t jumpNo) const {actWithJ(psi,jumpNo);}
-  const Probabilities probabilities(double, const LazyDensityOperator&  matrix) const {return probabilities(matrix);}
+  void                     actWithJ_v(double, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(psi,jumpNo);}
+  const Probabilities probabilities_v(double, const LazyDensityOperator&  matrix) const {return probabilities_v(matrix);}
 
-  virtual void                actWithJ     (StateVectorLow&, size_t   ) const = 0;
-  virtual const Probabilities probabilities(const LazyDensityOperator&) const = 0;
+  virtual void                     actWithJ_v(StateVectorLow&, size_t   ) const = 0;
+  virtual const Probabilities probabilities_v(const LazyDensityOperator&) const = 0;
 
 };
 

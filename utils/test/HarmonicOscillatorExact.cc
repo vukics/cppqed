@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
   double dtInit=.1/max(1.,max(omega,gamma));  
 
-  DDHO_SmartPtr oscillator(makeDDHO(gamma,omega,dcomp(1.,-1.),dcomp(-1.,1.),1.));
+  DDHO_Ptr oscillator(makeDDHO(gamma,omega,dcomp(1.,-1.),dcomp(-1.,1.),1.));
 
   for (double t=0.; t<pt.T; t+=dtInit)
     cout<<t<<' '<<dtInit<<' '<<oscillator->amp(t)<<' '<<oscillator->ampDeriv(t)<<endl;

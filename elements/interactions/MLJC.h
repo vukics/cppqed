@@ -9,9 +9,7 @@
 
 #include "Interaction.h"
 
-#include "details/DispatchFreeType.h"
-
-#include<boost/fusion/algorithm/transformation/transform.hpp>
+#include <boost/fusion/algorithm/transformation/transform.hpp>
 
 
 template<int N1, int N2>
@@ -34,12 +32,14 @@ class Base : public structure::Interaction<2>, public structure::Hamiltonian<2>
 public:
   typedef mode::Tridiagonal Tridiagonal;
 
-  Base(const MultiLevelBase<NL>*, const ModeBase*, const VC&);
+  typedef typename MultiLevelBase<NL>::Ptr MultiLevelPtr;
+
+  Base(MultiLevelPtr, mode::Ptr, const VC&);
 
 private:
   class ElementaryCoupling;
 
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const; 
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; 
 
   template<int,int>
   struct ModeDynamics;
@@ -48,7 +48,7 @@ private:
   class CouplingToModeDynamics
   {
   public:
-    CouplingToModeDynamics(const MultiLevelBase<NL>& ml, const ModeBase& mode) : ml_(ml), mode_(mode) {}
+    CouplingToModeDynamics(MultiLevelPtr ml, mode::Ptr mode) : ml_(ml), mode_(mode) {}
     
     template<typename> struct result;
 
@@ -63,8 +63,8 @@ private:
     }
     
   private:
-    const MultiLevelBase<NL>& ml_  ;
-    const ModeBase&           mode_;
+    const MultiLevelPtr ml_  ;
+    const mode::Ptr     mode_;
     
   };
 
@@ -80,17 +80,14 @@ private:
 
 
 
+#define BIG_NAMESPACE_NAME                      mljc
+#define BIG_CLASS_NAME                          MLJC
+#define BIG_ADDITIONAL_PARAMETERS               , const mljc::Pars<VC>& p
+#define BIG_ADDITIONAL_PARAMETERS_PASS          ,p.gs
+#define BIG_ADDITIONAL_TEMPLATE_PARAMETERS      int NL, typename VC,
+#define BIG_ADDITIONAL_TEMPLATE_PARAMETERS_PASS <NL,VC>
 
-template<int NL, typename VC>
-class MLJC : public mljc::Base<NL,VC>
-{
-public:
-  typedef mljc::Base<NL,VC> Base;
-
-  template<typename MLB, typename MB>
-  MLJC(const MLB& ml, const MB& m, const mljc::Pars<VC>& p)
-    : Base(dispatchFreeType(ml),dispatchFreeType(m),p.gs) {}
-};
+#include "details/BinaryInteractionGenerator.h"
 
 
 #endif // ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED

@@ -46,26 +46,12 @@ ProjectingMCWF_Trajectory<RANK>::help() const
 
 
 template<int RANK>
-ProjectingMCWF_Trajectory<RANK>::ProjectingMCWF_Trajectory(
-							   StateVector& psi,
-							   const Basis& basis,
-							   const QuantumSystem& sys,
-							   const ParsMCWF_Trajectory& p,
-							   const StateVectorLow& scaleAbs
-							   )
-  : TrajectoryBase(p), Base(psi,sys,p,scaleAbs),
-    basis_(basis), metricTensor_uu_(help())
-{
-}
-
-
-template<int RANK>
 void
 ProjectingMCWF_Trajectory<RANK>::displayEvenMore() const
 {
   using namespace formdouble;
 
-  const StateVector& psi=toBeAveraged();
+  const StateVector& psi=getPsi();
   const FormDouble fd(getPrecision());
  
   if (int dim=basis_.size()) {

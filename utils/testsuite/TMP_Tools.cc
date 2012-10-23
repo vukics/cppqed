@@ -85,19 +85,12 @@ BOOST_STATIC_ASSERT((
 		     ));
 
 
-void f()
-{
-  /*
-  // Should not compile:
-  typedef tmptools::Ordinals<-1> ordinalError;
-  IsEvenAssert<31> error_IsEvenAssert;
-  P_23_42::SanityCheck<24,45>();
-  P_23_42::SanityCheck<21,40>();
-  pair_c<23,23>();
-  */
 
-  pair_c<23,23,false>();
+namespace tmptools {
 
-  P_23_42::SanityCheck<21,45>();
+template struct pair_c<23,23,false>;
 
-}
+} // tmptools
+
+template struct P_23_42::SanityCheck<21,45>;
+

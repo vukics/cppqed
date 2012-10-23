@@ -44,11 +44,7 @@ int main(int argc, char* argv[])
   PumpedLossyQbitSch   qbit(pplqb);
   PumpedLossyModeSch<> mode(pplm);
 
-  JaynesCummings<> jc(qbit,mode,pjc);
-
-  BinarySystem<> system(jc);
-
-  double dtinit=.1/static_cast<structure::QuantumSystem<2>*>(&system)->highestFrequency();
+  double dtinit=.1/binary::make(JaynesCummings<>(qbit,mode,pjc))->highestFrequency();
 
   Array alpha(2);
   

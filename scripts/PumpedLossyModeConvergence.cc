@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   pe.nTraj=1000/*00*/;
   const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)/*(2000)(5000)(10000)(20000)(50000)(100000)*/;
 
-  SmartPtr modeMaster(make(pplm,QMP_UIP)), mode(make(pplm,QMP_IP));
+  Ptr modeMaster(make(pplm,QMP_UIP)), mode(make(pplm,QMP_IP));
   StateVector psi(init(pplm));
 
   DensityOperator rho(psi);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     for (list<size_t>::const_iterator i=sections.begin(); i!=sections.end(); ++i) {
       double avr=0;
       for (size_t begin=0; begin<pe.nTraj; begin+=*i)
-	avr+=frobeniusNorm(rho-e.toBeAveraged(begin,*i));
+	avr+=frobeniusNorm(rho-e.averageInRange(begin,*i));
       cout<<avr*(double(*i)/pe.nTraj)<<'\t';
     }
 

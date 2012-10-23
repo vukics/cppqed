@@ -1,9 +1,7 @@
-#include "Evolution.h"
+#include "EvolutionBinary.h"
 #include "Mode.h"
 
 #include "GeneralDicke.h"
-
-#include "BinarySystem.h"
 
 
 using namespace std;
@@ -39,11 +37,7 @@ int main(int argc, char* argv[])
 
   u/=ps.twoS; y/=sqrt(ps.twoS);
 
-  mode::SmartPtr mode(mode::make(pplm,qmp,mode::AveragedMonitorCutoff<mode::AveragedQuadratures>()));
-
   Spin spin(ps);
-
-  GeneralDicke<> gd(mode,spin,u,y);
 
   StateVector1 psiMode(mode::init(pplm)), psiSpin(spin.getDimension());
 
@@ -51,7 +45,10 @@ int main(int argc, char* argv[])
 
   StateVector2 psi(psiMode*psiSpin);
 
-  evolve(psi,binary::make(gd),pe,tmptools::Vector<0>());
+  evolve<tmptools::Vector<0> >
+    (psi,
+     binary::make(GeneralDicke<>(mode::make<mode::AveragedMonitorCutoff<mode::AveragedQuadratures> >(pplm,qmp),spin,u,y)),
+     pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 

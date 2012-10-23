@@ -284,7 +284,7 @@ void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
 } // quantumoperator
 
 
-#define BOOST_PP_ITERATION_LIMITS (1,11)
+#define BOOST_PP_ITERATION_LIMITS (1,QUANTUMOPERATOR_TRIDIAGONAL_MAX_RANK)
 #define BOOST_PP_FILENAME_1 "../../quantumoperator/details/TridiagonalApplySpecialization.h"
 
 #include BOOST_PP_ITERATE()

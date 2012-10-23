@@ -66,16 +66,10 @@ DensityOperator<RANK>::renorm()
 template<int RANK> 
 inline
 const dcomp 
-DensityOperator<RANK>::operator()(const Idx& i, const Idx& j) const
+DensityOperator<RANK>::index(const Idx& i, const Idx& j) const
 {
   return operator()()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
-  // We have to explicitly indicate the template parameters for
-  // concatenateTinies here, otherwise when RANK=1, that is, Idx
-  // is int, the compiler cannot find the function. This is despite
-  // TinyVector<int,1> has an implicit constructor from int, because
-  // implicit type conversions are NEVER considered for template
-  // parameter deduction (for further details see EffC++ 3rd edition
-  // item 46.)
+  // We have to explicitly indicate the template parameters for concatenateTinies here, otherwise when RANK=1, that is, Idx is int, the compiler cannot find the function. This is despite TinyVector<int,1> has an implicit constructor from int, because implicit type conversions are NEVER considered for template parameter deduction (for further details see EffC++ 3rd edition item 46.)
 }
 
 

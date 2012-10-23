@@ -5,79 +5,49 @@
 #include "SubSystemFwd.h"
 
 #include "Free.h"
-#include "InteractionFwd.h"
+#include "Interaction.h"
 
 #include "Structure.h"
 
 
-namespace structure {
+namespace composite {
 
 
 template<int RANK> 
-class SubSystem
+class SubSystemsInteraction : public structure::QuantumSystemWrapper<RANK,false>
 {
 public:
-  // const QuantumSystem<RANK>*const getQS() const {return qs_;}
-  const Exact        <RANK>*const getEx() const {return ex_;} 
-  const Hamiltonian  <RANK>*const getHa() const {return ha_;}
-  const Liouvillean  <RANK>*const getLi() const {return li_;} 
-  const Averaged     <RANK>*const getAv() const {return av_;}  
+  typedef typename structure::Interaction<RANK>::Ptr InteractionPtr;
 
-protected:
-  SubSystem(const DynamicsBase* qs)
-    : // qs_(qs),
-      ex_(qse<RANK>(qs)),
-      ha_(qsh<RANK>(qs)),
-      li_(qsl<RANK>(qs)),
-      av_(qsa<RANK>(qs))
-  {}
+  explicit SubSystemsInteraction(InteractionPtr ia) : structure::QuantumSystemWrapper<RANK,false>(ia), ia_(ia) {}
 
-  SubSystem() : ex_(), ha_(), li_(), av_() {}
+  const InteractionPtr get() const {return ia_;} 
 
 private:
-  // const QuantumSystem<RANK>* qs_;
-  const Exact        <RANK>* ex_; 
-  const Hamiltonian  <RANK>* ha_;
-  const Liouvillean  <RANK>* li_; 
-  const Averaged     <RANK>* av_;
-  
-};
-
-
-
-template<int RANK> 
-class SubSystemsInteraction : public SubSystem<RANK>
-{
-public:
-  typedef class Interaction<RANK> Interaction;
-
-  SubSystemsInteraction(const Interaction* ia) : SubSystem<RANK>(ia), ia_(ia) {}
-
-  const Interaction*const get() const {return ia_;} 
-
-private:
-  const Interaction* ia_;
+  InteractionPtr ia_;
 
 };
 
 
 
-class SubSystemFree : public SubSystem<1>
+class SubSystemFree : public structure::QuantumSystemWrapper<1,false>
 {
 public:
-  SubSystemFree(const Free* free) : SubSystem<1>(free), free_(free) {}
+  typedef structure::Free::Ptr FreePtr;
+
+  explicit SubSystemFree(FreePtr free) : structure::QuantumSystemWrapper<1,false>(free,true), free_(free) {}
 
   SubSystemFree() : free_() {}
 
-  const Free*const get() const {return free_;}
+  const FreePtr get() const {return free_;}
 
 private:
-  const Free* free_;
+  FreePtr free_;
 
 };
 
 
-} // structure
+} // composite
 
 
 #endif // ELEMENTS_COMPOSITES_SUBSYSTEM_H_INCLUDED

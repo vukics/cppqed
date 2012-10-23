@@ -68,7 +68,7 @@ public:
 
   typedef boost::function<void(double, const A&, A&)> Derivs;
 
-  typedef boost::shared_ptr<Evolved> SmartPtr;
+  typedef boost::shared_ptr<Evolved> Ptr;
 
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
@@ -126,10 +126,10 @@ template<typename A>
 class Maker
 {
 public:
-  typedef typename Evolved<A>::SmartPtr SmartPtr;
+  typedef typename Evolved<A>::Ptr Ptr;
   typedef typename Evolved<A>::Derivs   Derivs  ;
   
-  virtual const SmartPtr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const = 0;
+  virtual const Ptr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const = 0;
 
   virtual ~Maker() {}
   

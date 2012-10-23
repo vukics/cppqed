@@ -5,15 +5,8 @@
 #include "MCWF_TrajectoryFwd.h"
 
 #include "MCWF_TrajectoryLogger.h"
-
-#include "DimensionsBookkeeperFwd.h"
-#include "QuantumSystemFwd.h"
-#include "ExactFwd.h"
-#include "HamiltonianFwd.h"
-#include "LiouvilleanFwd.h"
-#include "AveragedFwd.h"
-
-#include "Types.h"
+#include "StateVectorFwd.h"
+#include "Structure.h"
 
 #include "StochasticTrajectory.h"
 
@@ -59,15 +52,16 @@ template<int RANK>
 class MCWF_Trajectory : public BASE_class
 {
 public:
+  typedef structure::Exact        <RANK> Exact      ;
+  typedef structure::Hamiltonian  <RANK> Hamiltonian;
+  typedef structure::Liouvillean  <RANK> Liouvillean;
+  typedef structure::Averaged     <RANK> Averaged   ;
+
   typedef quantumdata::StateVector<RANK> StateVector;
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
-  typedef structure::QuantumSystem<RANK> QuantumSystem;
-  typedef structure::Exact        <RANK> Exact        ;
-  typedef structure::Hamiltonian  <RANK> Hamiltonian  ;
-  typedef structure::Liouvillean  <RANK> Liouvillean  ;
-  typedef structure::Averaged     <RANK> Averaged     ;  
+  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
   typedef BASE_class Base;
 
@@ -77,10 +71,10 @@ public:
 
   using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getPrecision; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
-
+  template<typename SYS>
   MCWF_Trajectory(
 		  StateVector& psi,
-		  const QuantumSystem& sys,
+		  const SYS& sys,
 		  const ParsMCWF_Trajectory&,
 		  const StateVectorLow& =StateVectorLow()
 		  );
@@ -89,20 +83,22 @@ public:
 
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
-  void step(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
-
-  void displayParameters() const;
+  const StateVector& getPsi() const {return psi_;} 
 
 protected:
   virtual size_t displayMoreKey () const;
 
   virtual void   displayEvenMore() const {}
 
-  const StateVector& toBeAveraged() const {return psi_;} 
-
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
+
+  void step_v(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
+
+  void displayParameters_v() const;
+
+  const StateVector& toBeAveraged_v() const {return psi_;} 
 
   void displayMore() const;
   
@@ -121,11 +117,7 @@ private:
 
   StateVector& psi_;
 
-  const QuantumSystem*const qs_;
-  const Exact        *const ex_; 
-  const Hamiltonian  *const ha_;
-  const Liouvillean  *const li_; 
-  const Averaged     *const av_;
+  const QuantumSystemWrapper qs_;
 
   const double dpLimit_, overshootTolerance_;
 
@@ -134,9 +126,9 @@ private:
   const int svdPrecision_;
   mutable long svdCount_;
 
-#ifdef USE_BOOST_SERIALIZATION
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
   const bool binarySVFile_;
-#endif // USE_BOOST_SERIALIZATION
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
   const std::string svExtension_;
 
   const std::string file_;

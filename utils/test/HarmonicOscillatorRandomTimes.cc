@@ -13,7 +13,7 @@ using namespace parameters;
 
 
 typedef TTD_CARRAY(1) CA1D;
-typedef evolved::Evolved<CA1D>::SmartPtr ESP;
+typedef evolved::Evolved<CA1D>::Ptr ESP;
 
 /*
   y(0) y
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
   if (pt.T<0) pt.T=20./min(1.,min(omega,gamma));
 
-  double dtInit=1./(max(1.,max(omega,gamma))*TrajectoryBase::factor());  
+  double dtInit=1./(max(1.,max(omega,gamma))*Trajectory::factor());  
 
   DDOscPars params(omega,gamma);
 
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
   Simulated<CA1D> simulated(y,bind(derivs,_1,_2,_3,params),dtInit,CA1D(),pt);
   simulated.displayParameters();
 
-  randomized::Randomized::SmartPtr Ran(randomized::MakerGSL()(1001));
+  randomized::Randomized::Ptr Ran(randomized::MakerGSL()(1001));
 
   for (size_t n=1000; n>0; n--) {
     evolved::evolveTo(simulated,pt.T*(*Ran)()); simulated.display();

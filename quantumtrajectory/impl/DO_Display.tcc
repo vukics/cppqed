@@ -22,11 +22,11 @@ namespace details {
 
 
 template<int RANK, typename V>
-DO_Display<RANK,V>::DO_Display(const QuantumSystem& qs,
-				     const ParsTrajectory& p,
-				     bool negativity,
-				     size_t equalCount) throw(DimensionalityMismatchException)
-  : av_(structure::qsa(&qs)),
+DO_Display<RANK,V>::DO_Display(AveragedPtr av,
+			       const ParsTrajectory& p,
+			       bool negativity,
+			       size_t equalCount) throw(DimensionalityMismatchException)
+  : av_(av),
     negativity_(negativity),    
     autoStop_(p.autoStop),
     lastCrit_(),
@@ -41,7 +41,7 @@ size_t
 DO_Display<RANK,V>::displayMoreKey(std::ostream& os) const 
 {
   size_t i=3; 
-  Averaged::displayKey(os,i,av_); 
+  if (av_) av_->displayKey(os,i); 
   if (negativity_) os<<"# Trajectory "<<i<<". negativity"<<std::endl;
   return i;
 }
@@ -55,15 +55,12 @@ DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostre
   using namespace std;
   stringstream line(stringstream::in | stringstream::out);
   {
-    if (av_) 
-      Averaged::display(t,rho,line,precision,av_);
+    display(av_,t,rho,line,precision);
     if (negativity_) line<<'\t'<<FormDouble(precision)(quantumdata::negPT(rho,V()));
     line<<endl;
   }
 
-  // A heuristic stopping criterion: If in column autoStop the same
-  // value (in the given precision) is Displayed equalCountLimit_
-  // times in a row, then stop.
+  // A heuristic stopping criterion: If in column autoStop the same value (in the given precision) is Displayed equalCountLimit_ times in a row, then stop.
   if (autoStop_ && av_) {
     double crit;
     for (size_t i=0; i<autoStop_; i++)

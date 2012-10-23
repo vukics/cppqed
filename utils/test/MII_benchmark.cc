@@ -1,4 +1,4 @@
-#include "BlitzArraySliceIterator.h"
+#include "impl/BlitzArraySliceIterator.tcc"
 #include "Randomized.h"
 
 #include <boost/progress.hpp>

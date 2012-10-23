@@ -7,21 +7,28 @@
 #include "QuantumSystem.h"
 #include "SubSystem.h"
 
+#include "SmartPtr.h"
 
 
 namespace binary {
 
 
-typedef boost::shared_ptr<const Base> SmartPtr;
+typedef boost::shared_ptr<const Base> Ptr;
 
 typedef structure::Interaction<2> Interaction;
 
 
-const SmartPtr make(const Interaction&);
+const Ptr doMake(Interaction::Ptr);
+
+template<typename IA>
+const Ptr make(const IA& ia)
+{
+  return doMake(cpputils::sharedPointerize(ia));
+}
 
 
-typedef structure::SubSystemFree            SSF;
-typedef structure::SubSystemsInteraction<2> SSI;
+typedef composite::SubSystemFree            SSF;
+typedef composite::SubSystemsInteraction<2> SSI;
 
 
 
@@ -33,22 +40,21 @@ public:
   typedef structure::Averaged<1> Av1;
   typedef structure::Averaged<2> Av2;
 
-  Base(const Interaction&);
+  explicit Base(Interaction::Ptr);
 
   const SSF& getFree0() const {return free0_;}
   const SSF& getFree1() const {return free1_;}
   const SSI& getIA   () const {return    ia_;}
 
 private:
-  double highestFrequency (             ) const;
-  void   displayParameters(std::ostream&) const;
+  double  highestFrequency_v(             ) const;
+  void   displayParameters_v(std::ostream&) const;
 
-  void   displayKey(std::ostream&, size_t&) const;
-  size_t nAvr      (                      ) const;
-
-  const Averages average(double, const LazyDensityOperator&)  const;
-  void           process(Averages&)                           const;
-  void           display(const Averages&, std::ostream&, int) const;
+  size_t            nAvr_v()                                    const;
+  const Averages average_v(double, const LazyDensityOperator&)  const;
+  void           process_v(Averages&)                           const;
+  void           display_v(const Averages&, std::ostream&, int) const;
+  void        displayKey_v(std::ostream&, size_t&)              const;
 
   const SSF free0_, free1_;
 
@@ -75,9 +81,9 @@ CLASS_HEADER(Exact)
 {
   CLASS_BODY_PART(Exact,Ex)
 
-  bool isUnitary() const;
+  bool isUnitary_v() const;
 
-  void actWithU(double, StateVectorLow&) const;
+  void  actWithU_v(double, StateVectorLow&) const;
 
 };
 
@@ -86,7 +92,7 @@ CLASS_HEADER(Hamiltonian)
 {
   CLASS_BODY_PART(Hamiltonian,Ha)
 
-  void addContribution(double, const StateVectorLow&, StateVectorLow&, double) const;
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
 };
 
@@ -95,11 +101,11 @@ CLASS_HEADER(Liouvillean)
 {
   CLASS_BODY_PART(Liouvillean,Li)
 
-  size_t              nJumps       ()                                   const;
-  const Probabilities probabilities(double, const LazyDensityOperator&) const;
-  void                actWithJ     (double, StateVectorLow&, size_t)    const;
+  size_t                     nJumps_v()                                   const;
+  const Probabilities probabilities_v(double, const LazyDensityOperator&) const;
+  void                     actWithJ_v(double, StateVectorLow&, size_t)    const;
 
-  void displayKey(std::ostream&, size_t&) const;
+  void displayKey_v(std::ostream&, size_t&) const;
 
 };
 
@@ -136,7 +142,7 @@ public:
   
   typedef structure::Interaction<2> Interaction;
 
-  BinarySystem(const Interaction&);
+  explicit BinarySystem(Interaction::Ptr);
 
 };
 

@@ -18,9 +18,9 @@ namespace quantumdata {
 
 
 
-template<int RANK, typename F, typename V, typename T>
+template<typename V, typename T, int RANK, typename F>
 const T
-partialTrace(const LazyDensityOperator<RANK>&, F, V, T);
+partialTrace(const LazyDensityOperator<RANK>&, F);
 
 
 /*
@@ -46,24 +46,25 @@ public:
   typedef typename mpl::if_c<(RANK==1),int,TTD_IDXTINY(RANK)>::type Idx;
   // Idx is just an int if RANK==1, otherwise a tiny of ints
 
-
   virtual ~LazyDensityOperator() {}
 
-
-  virtual const dcomp operator()(const Idx& i, const Idx& j) const = 0;
+  const dcomp operator()(const Idx& i, const Idx& j) const {return index(i,j);}
 
   double operator()(const Idx& i) const {return real((*this)(i,i));}
 
   // iterator
   
   template<typename V>
-  const ldo::DiagonalIterator<RANK,V> begin(V) const;
+  const ldo::DiagonalIterator<RANK,V> begin() const;
 
   template<typename V>
-  const ldo::DiagonalIterator<RANK,V> end  (V) const;
+  const ldo::DiagonalIterator<RANK,V> end  () const;
 
 protected:
   LazyDensityOperator(const Dimensions& dims) : Base(dims) {}
+
+private:
+  virtual const dcomp index(const Idx& i, const Idx& j) const = 0;
 
 };
 

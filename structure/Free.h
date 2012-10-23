@@ -14,6 +14,8 @@
 #include "QuantumSystem.h"
 #include "Types.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace structure {
 
 
@@ -35,12 +37,18 @@ typedef quantumdata::DensityOperator<1> DensityOperator;
 class Free : public QuantumSystem<1>, public DynamicsBase
 {
 public:
+  typedef boost::shared_ptr<const Free> Ptr;
+
   explicit Free(size_t, const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
 
-  double highestFrequency (                ) const {return DynamicsBase::highestFrequency (  );}
-  void   displayParameters(std::ostream& os) const {return DynamicsBase::displayParameters(os);}
+  double highestFrequency (                ) const {return  highestFrequency_v(  );}
+  void   displayParameters(std::ostream& os) const {return displayParameters_v(os);}
+  // We take an exception here of the rule "never redefine an inherited non-virtual function" because these functions are called the same in the two bases of Free, which would otherwise create ambiguities.
 
 private:
+  double  highestFrequency_v(                ) const {return DynamicsBase::highestFrequency (  );}
+  void   displayParameters_v(std::ostream& os) const {return DynamicsBase::displayParameters(os);}
+
   void displayMoreParameters(std::ostream&) const;
 
 };

@@ -7,9 +7,8 @@
 #include "StateVectorFwd.h"
 #include "QuantumSystemFwd.h"
 
+#include "SmartPtr.h"
 #include "TMP_Tools.h"
-
-#include <boost/shared_ptr.hpp>
 
 #include <iosfwd>
 
@@ -18,11 +17,29 @@ std::ostream& operator<<(std::ostream&, EvolutionMode );
 std::istream& operator>>(std::istream&, EvolutionMode&);
 
 
-template<int RANK, typename V>
-void evolve(quantumdata::StateVector<RANK>&, const structure::QuantumSystem<RANK>&,
-	    const ParsEvolution&,
-	    V);
+template<typename V, int RANK>
+void evolve(quantumdata::StateVector<RANK>&, typename structure::QuantumSystem<RANK>::Ptr,
+	    const ParsEvolution&);
 
+
+
+template<int RANK>
+inline
+void evolve(quantumdata::StateVector<RANK>& psi,
+	    typename structure::QuantumSystem<RANK>::Ptr sys,
+	    const ParsEvolution& p)
+{
+  evolve<tmptools::V_Empty>(psi,sys,p);
+}
+
+template<typename V, int RANK>
+inline
+void evolve(quantumdata::StateVector<RANK>& psi,
+	    const structure::QuantumSystem<RANK>& sys,
+	    const ParsEvolution& p)
+{
+  evolve<V>(psi,cpputils::sharedPointerize(sys),p);
+}
 
 
 template<int RANK>
@@ -31,28 +48,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 	    const structure::QuantumSystem<RANK>& sys,
 	    const ParsEvolution& p)
 {
-  evolve(psi,sys,p,tmptools::V_Empty());
-}
-
-
-template<int RANK, typename SYS, typename V>
-inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-	    boost::shared_ptr<const SYS> sys,
-	    const ParsEvolution& p,
-	    V v)
-{
-  evolve(psi,*sys,p,v);
-}
-
-
-template<int RANK, typename SYS>
-inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-	    boost::shared_ptr<const SYS> sys,
-	    const ParsEvolution& p)
-{
-  evolve(psi,*sys,p);
+  evolve<tmptools::V_Empty>(psi,cpputils::sharedPointerize(sys),p);
 }
 
 

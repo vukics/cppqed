@@ -12,6 +12,7 @@
 #include "Types.h"
 
 #include "Exception.h"
+#include "SmartPtr.h"
 #include "VectorFromMatrixSliceIterator.h"
 
 #include <boost/function.hpp>
@@ -32,30 +33,29 @@ struct NoLiouvillean : cpputils::Exception {};
 
 
 template<int RANK>
-class Base : public trajectory::Trajectory<typename quantumdata::Types<RANK>::DensityOperatorLow>
+class Base : public trajectory::AdaptiveTrajectory<typename quantumdata::Types<RANK>::DensityOperatorLow>
 {
 public:
   typedef structure::QuantumSystem<RANK> QuantumSystem;
   typedef structure::Exact        <RANK> Exact        ;
   typedef structure::Hamiltonian  <RANK> Hamiltonian  ;
   typedef structure::Liouvillean  <RANK> Liouvillean  ;
+  typedef structure::Averaged     <RANK> Averaged   ;
 
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
   typedef typename quantumdata::Types<RANK>::    StateVectorLow     StateVectorLow;
 
-  typedef trajectory::Trajectory<DensityOperatorLow> TrajectoryBase;
+  typedef trajectory::AdaptiveTrajectory<DensityOperatorLow> AdaptiveTrajectory;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
   
-  using TrajectoryBase::getEvolved; using TrajectoryBase::getDtDid; using TrajectoryBase::getTime; using TrajectoryBase::getOstream;
+  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
-  Base(DensityOperator&, const QuantumSystem&, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
+  using AdaptiveTrajectory::getEvolved; using AdaptiveTrajectory::getDtDid; using AdaptiveTrajectory::getTime; using AdaptiveTrajectory::getOstream;
+
+  Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
-
-  void step             (double) const;
-
-  void displayParameters(      ) const;
 
 protected:
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
@@ -63,7 +63,13 @@ protected:
 
   DensityOperator& rho_;
 
+  const typename Averaged::Ptr getAv() const {return qs_.getAv();}
+
 private:
+  void              step_v(double) const;
+
+  void displayParameters_v(      ) const;
+
   virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
 
@@ -74,10 +80,7 @@ private:
 
   mutable double tIntPic0_; // The time instant of the beginning of the current time step.
 
-  const QuantumSystem*const qs_;
-  const Exact        *const ex_;
-  const Hamiltonian  *const ha_;
-  const Liouvillean  *const li_;
+  const QuantumSystemWrapper qs_;
 
 };
 
@@ -92,7 +95,7 @@ public:
 
   typedef typename Base<RANK>::DensityOperatorLow DensityOperatorLow;
 
-  BaseFast(DensityOperator& rho, const QuantumSystem& sys, const Pars& p, const DensityOperatorLow& scaleAbs=DensityOperatorLow())
+  BaseFast(DensityOperator& rho, typename QuantumSystem::Ptr sys, const Pars& p, const DensityOperatorLow& scaleAbs=DensityOperatorLow())
     : Base<RANK>(rho,sys,p,scaleAbs), slicesData_(rho()) {}
 
 private:
@@ -131,11 +134,12 @@ public:
 
   typedef typename Base::DensityOperator DensityOperator;
 
-  using Base::getOstream; using Base::getPrecision; using Base::getTime;
+  using Base::getOstream; using Base::getPrecision; using Base::getTime; using Base::getAv;
 
-  Master(DensityOperator& rho, const QuantumSystem& sys, const master::Pars& pt, bool negativity,
+  template<typename SYS>
+  Master(DensityOperator& rho, const SYS& sys, const master::Pars& pt, bool negativity,
 	 const DensityOperatorLow& scaleAbs=DensityOperatorLow())
-    : trajectory::TrajectoryBase(pt), Base(rho,sys,pt,scaleAbs), doDisplay_(sys,pt,negativity)
+    : trajectory::Trajectory(pt), Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),pt,negativity)
   {}
 
 private:

@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
   if (doDisplay) collection.push_back(new structure::averaged::DiagonalDO("",pplm.cutoff));
 
-  SmartPtr mode(alternative ? SmartPtr(new PumpedLossyModeIP_NoExact(pplm)) : make(pplm,qmp,Collecting(collection)));
+  Ptr mode(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make(pplm,qmp,Collecting(collection)));
 
   StateVector psi(mode::init(pplm));
 

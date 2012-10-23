@@ -57,8 +57,7 @@ BOOST_AUTO_TEST_CASE( ONE_CORRECT_AND_ONE_INCORRECT_COMPOSITE )
 
 namespace incorrect_acts {
 
-// Does not compile: (NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR)
-// const composite::result_of::make_vector<Act<1,0>,Act<2,0>,Act<3,4>,Act<1,2,0>,Act<2,-1,0>,Act<3,2,0,1> >::type acts1;
+// const composite::result_of::make_vector< >::type acts1;
 
 // Does not compile:
 // const composite::result_of::make_vector<Act<1,0>,Act<2,0>,Act<3,4>,Act<1,2,0>,Act<2,1,0>,Act<3,3,0,1> >::type acts2;

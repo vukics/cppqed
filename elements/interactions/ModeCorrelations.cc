@@ -1,12 +1,16 @@
-
 #include "ModeCorrelations.h"
 
 #include "impl/LazyDensityOperator.tcc"
+#include "Structure.h"
+
+#include "SmartPtr.h"
 
 #include <boost/assign/list_of.hpp>
 
 using namespace boost;
 using namespace assign;
+using cpputils::sharedPointerize;
+
 
 ModeCorrelations::ModeCorrelations()
   : EA_Base(
@@ -29,7 +33,7 @@ namespace {
 
 
 const ModeCorrelations::Averages
-ModeCorrelations::average(const LazyDensityOperator& matrix) const
+ModeCorrelations::average_v(const LazyDensityOperator& matrix) const
 {
   using quantumdata::partialTrace;
   typedef LazyDensityOperator::Idx Idx;
@@ -38,9 +42,11 @@ ModeCorrelations::average(const LazyDensityOperator& matrix) const
   averages=0;
 
   {
+    const Averaged1::Ptr p(sharedPointerize(averagedMode_));
+
     const Averages 
-      a0(partialTrace(matrix,bind(&structure::Averaged<1>::average,0,_1,&averagedMode_,theStaticOne),v0,defaultArray)),
-      a1(partialTrace(matrix,bind(&structure::Averaged<1>::average,0,_1,&averagedMode_,theStaticOne),v1,defaultArray));
+      a0(partialTrace<V0,Averages>(matrix,bind(structure::average<1>,p,0,_1))),
+      a1(partialTrace<V1,Averages>(matrix,bind(structure::average<1>,p,0,_1)));
 
     copy(a1,copy(a0,averages.begin()));
   }
@@ -64,7 +70,7 @@ ModeCorrelations::average(const LazyDensityOperator& matrix) const
 
 
 void
-ModeCorrelations::process(Averages& averages) const
+ModeCorrelations::process_v(Averages& averages) const
 {
   {
     Averages ranged(averages(blitz::Range(0, 6)));
