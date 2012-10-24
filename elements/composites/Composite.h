@@ -34,14 +34,76 @@ template<typename VA>
 struct MaxRank : MaxMF<typename MaxMF<VA,composite::SeqLess<mpl::_1,mpl::_2> >::type>::type::type {};
 
 
+
+template<typename VA>
+// VA should model a fusion sequence of Acts
+class Base
+// The base_from_member idiom appears because the Frees has to be calculated and stored somehow first
+  : public structure::QuantumSystem<composite::MaxRank<VA>::value+1>,
+    public structure::Averaged     <composite::MaxRank<VA>::value+1>
+{
+public:
+  // The calculated RANK
+  static const int RANK=composite::MaxRank<VA>::value+1;
+
+  // Public types
+
+  typedef structure::QuantumSystem<RANK> QS_Base;
+  typedef structure::Averaged     <RANK> Av_Base;
+
+  typedef blitz::TinyVector<composite::SubSystemFree,RANK> Frees;
+
+  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
+
+  typedef tmptools::Ordinals<RANK> Ordinals;
+
+  typedef typename QS_Base::Dimensions Dimensions;
+  typedef typename Av_Base::Averages   Averages  ;
+
+  // Base class names
+
+  using QS_Base::getDimensions; using QS_Base::getTotalDimension;
+
+private:
+  // Constructor helper
+  static const Dimensions fillDimensions(const Frees&);
+
+public:
+  // Constructor
+  explicit Base(const Frees& frees, const VA& acts) 
+    : QS_Base(fillDimensions(frees)), frees_(frees), acts_(acts) {}
+
+private:
+  // Implementing QS_Base
+
+  double  highestFrequency_v(             ) const;
+  void   displayParameters_v(std::ostream&) const; class DisplayParameters;
+
+  // Implementing Av_Base
+
+  void   displayKey_v(std::ostream&, size_t&) const; class DisplayKey;
+  size_t       nAvr_v()                       const; class NAvr;
+
+  const Averages average_v(double, const LazyDensityOperator&)  const; class Average;
+  void           process_v(Averages&)                           const; class Process;
+  void           display_v(const Averages&, std::ostream&, int) const; class Display;
+
+  const Frees& frees_;
+  const VA   &  acts_;
+
+};
+
+
+
+
 template<typename VA>
 class Exact
   : public structure::Exact<MaxRank<VA>::value+1>
 {
 private:
-  static const int RANK=composite::MaxRank<VA>::value+1;
+  static const int RANK=MaxRank<VA>::value+1;
 
-  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
@@ -65,9 +127,9 @@ class Hamiltonian
   : public structure::Hamiltonian<MaxRank<VA>::value+1>
 {
 private:
-  static const int RANK=composite::MaxRank<VA>::value+1;
+  static const int RANK=MaxRank<VA>::value+1;
 
-  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
@@ -90,9 +152,9 @@ class Liouvillean
   : public structure::Liouvillean<MaxRank<VA>::value+1>
 {
 private:
-  static const int RANK=composite::MaxRank<VA>::value+1;
+  static const int RANK=MaxRank<VA>::value+1;
 
-  typedef blitz::TinyVector<structure::SubSystemFree,RANK> Frees;
+  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
@@ -110,98 +172,79 @@ private:
   const Probabilities probabilities_v(double, const LazyDensityOperator&) const; class Probas;
   void                     actWithJ_v(double, StateVectorLow&, size_t)    const; class ActWithJ;
 
+  void displayKey_v(std::ostream&, size_t&) const; // {}
+
   const Frees& frees_;
   const VA   &  acts_;
 
 };
 
 
+template<typename VA>
+class EmptyBase
+{
+public:
+  typedef blitz::TinyVector<SubSystemFree,MaxRank<VA>::value+1> Frees;
+
+  EmptyBase(const Frees&, const VA&) {}
+  
+};
+
 
 } // composite
 
 
 
-template<typename VA>
+#define BASE_CLASS(Aux,Class) mpl::if_c<IS_##Aux,composite::Class<VA>,composite::EmptyBase<VA> >::type
+
+template<typename VA, bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
 // VA should model a fusion sequence of Acts
 class Composite 
 // The base_from_member idiom appears because the Frees has to be calculated and stored somehow first
-  : private boost::base_from_member<const blitz::TinyVector<structure::SubSystemFree,composite::MaxRank<VA>::value+1> >,
-    public structure::QuantumSystem<composite::MaxRank<VA>::value+1>,
-    public composite::Exact      <VA>, 
-    public composite::Hamiltonian<VA>,
-    public composite::Liouvillean<VA>,
-    public structure::Averaged     <composite::MaxRank<VA>::value+1>
+  : private boost::base_from_member<const blitz::TinyVector<composite::SubSystemFree,composite::MaxRank<VA>::value+1> >,
+    public composite::Base<VA>,
+    public BASE_CLASS(EX,Exact),
+    public BASE_CLASS(HA,Hamiltonian),
+    public BASE_CLASS(LI,Liouvillean)
 {
 public:
+  typedef typename BASE_CLASS(EX,Exact)             ExactBase;
+  typedef typename BASE_CLASS(HA,Hamiltonian) HamiltonianBase;
+  typedef typename BASE_CLASS(LI,Liouvillean) LiouvilleanBase;
+  
   // The calculated RANK
   static const int RANK=composite::MaxRank<VA>::value+1;
 
   // Public types
 
-  typedef structure::QuantumSystem<RANK> QS_Base;
-  typedef structure::Averaged     <RANK> Av_Base;
-
   typedef blitz::TinyVector<composite::SubSystemFree,RANK> Frees;
 
   typedef boost::base_from_member<const Frees> FreesBase;
 
-  typedef quantumdata::Types<RANK> Types;
-
-  typedef typename Types::    StateVectorLow     StateVectorLow;
-  typedef typename Types::DensityOperatorLow DensityOperatorLow;
-
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
-  typedef tmptools::Ordinals<RANK> Ordinals;
-
-  typedef typename QS_Base::Dimensions    Dimensions   ;
-  typedef typename Av_Base::Averages      Averages     ;
-
-  // Base class names
-
-  using QS_Base::getDimensions; using QS_Base::getTotalDimension;
-
   // Compile-time sanity check
-
   BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (mpl::void_) );
 
 private:
-  // Constructor helpers
-		      
+  // Constructor helper
   static const Frees fillFrees(const VA&);
-
-  static const Dimensions fillDimensions(const Frees&);
 
 public:
   // Constructor
-
-  explicit Composite(const VA& acts) 
-    : FreesBase(fillFrees(acts)), QS_Base(fillDimensions(FreesBase::member)),
-      composite::Exact<VA>(FreesBase::member,acts), composite::Hamiltonian<VA>(FreesBase::member,acts), composite::Liouvillean<VA>(FreesBase::member,acts),
-      frees_(FreesBase::member), acts_(acts) {}
+  explicit Composite(const VA& acts)
+    : FreesBase(fillFrees(acts)), composite::Base<VA>(FreesBase::member,acts),
+      ExactBase      (FreesBase::member,acts),
+      HamiltonianBase(FreesBase::member,acts),
+      LiouvilleanBase(FreesBase::member,acts),
+      acts_(acts) {}
 
 private:
-  // Implementing QS_Base
-
-  double  highestFrequency_v(             ) const;
-  void   displayParameters_v(std::ostream&) const; class DisplayParameters;
-
-  // Implementing Av_Base
-
-  void   displayKey_v(std::ostream&, size_t&) const; class DisplayKey;
-  size_t       nAvr_v()                       const; class NAvr;
-
-  const Averages average_v(double, const LazyDensityOperator&)  const; class Average;
-  void           process_v(Averages&)                           const; class Process;
-  void           display_v(const Averages&, std::ostream&, int) const; class Display;
-
   // Storage
-  // Note that Frees are stored by value in FreesBase
-
-  const Frees& frees_;
-  const VA      acts_;
+  // Note that Frees are stored by value in FreesBase, but the Acts need to be stored by value here:
+  const VA acts_;
 
 };
+
+#undef BASE_CLASS
 
 
 // The following provides a much more convenient interface:
