@@ -146,11 +146,11 @@ private:
 
 } // composite
 
-#define RETURN_type typename Composite<VA>::Frees
+#define RETURN_type typename Composite<VA,IS_EX,IS_HA,IS_LI>::Frees
 
-template<typename VA>
+template<typename VA, bool IS_EX, bool IS_HA, bool IS_LI>
 const RETURN_type
-Composite<VA>::fillFrees(const VA& acts)
+Composite<VA,IS_EX,IS_HA,IS_LI>::fillFrees(const VA& acts)
 {
   RETURN_type res; res=composite::SubSystemFree();
   boost::fusion::for_each(acts,composite::FillFrees<RANK>(res));
@@ -158,11 +158,11 @@ Composite<VA>::fillFrees(const VA& acts)
 }
 
 #undef  RETURN_type
-#define RETURN_type typename Composite<VA>::Dimensions
+#define RETURN_type typename composite::Base<VA>::Dimensions
 
 template<typename VA>
 const RETURN_type
-Composite<VA>::fillDimensions(const Frees& frees)
+composite::Base<VA>::fillDimensions(const Frees& frees)
 {
   RETURN_type res;
   mpl::for_each<Ordinals>(composite::FillDimensions<RANK>(frees,res));
@@ -182,7 +182,7 @@ Composite<VA>::fillDimensions(const Frees& frees)
 
 
 template<typename VA>
-class Composite<VA>::DisplayParameters
+class composite::Base<VA>::DisplayParameters
 {
 public:
   DisplayParameters(const Frees& frees, std::ostream& os) : frees_(frees), os_(os) {}
@@ -234,7 +234,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::displayParameters_v(std::ostream& os) const
+void composite::Base<VA>::displayParameters_v(std::ostream& os) const
 {
   os<<"# Composite\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<std::endl;
   CALL_COMPOSITE_WORKER( DisplayParameters(frees_,os) ) ;
@@ -248,7 +248,7 @@ void Composite<VA>::displayParameters_v(std::ostream& os) const
 
 
 template<typename VA>
-double Composite<VA>::highestFrequency_v() const
+double composite::Base<VA>::highestFrequency_v() const
 {
   return boost::max_element(frees_,composite::compareFreesFrequency)->get()->highestFrequency();
   // NEEDS_WORK add the interactions here
@@ -312,7 +312,8 @@ public:
   template<typename Vec, typename Ex>
   void help(typename Ex::Ptr ex) const
   {
-    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Ex::actWithU,ex,dtdid_,_1));
+    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,dtdid_,::_1));
+    // namespace qualification :: is necessary because otherwise :: and mpl:: are equally good matches.
   }
 
   template<typename Act>
@@ -363,7 +364,7 @@ public:
     if (ha) 
       cpputils::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),
 			 blitzplusplus::basi::begin<Vec>(dpsidt_),
-			 bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+			 boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,tIntPic0_)); 
   }
 
   template<typename Act>
@@ -456,7 +457,7 @@ public:
   template<typename Vec, typename Li>
   void help(typename Li::Ptr li) const
   {
-    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(structure::probabilities<Li::N_RANK>,li,t_,_1)));    
+    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,boost::bind(structure::probabilities<Li::N_RANK>,li,t_,::_1)));    
   }
 
   template<typename Act>
@@ -513,7 +514,7 @@ public:
     if (!flag_ && li) {
       size_t n=li->nJumps();
       if (ordoJump_<n) {
-	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
+	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
 	flag_=true;
       }
       ordoJump_-=n;  
@@ -560,7 +561,7 @@ void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_
 
 
 template<typename VA>
-class Composite<VA>::DisplayKey
+class composite::Base<VA>::DisplayKey
 {
 public:
   DisplayKey(const Frees& frees, std::ostream& os, size_t& i) 
@@ -588,7 +589,7 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::displayKey_v(std::ostream& os, size_t& i) const
+void composite::Base<VA>::displayKey_v(std::ostream& os, size_t& i) const
 {
   CALL_COMPOSITE_WORKER( DisplayKey(frees_,os,i) ) ;
 }
@@ -596,7 +597,7 @@ void Composite<VA>::displayKey_v(std::ostream& os, size_t& i) const
 
 
 template<typename VA>
-class Composite<VA>::NAvr
+class composite::Base<VA>::NAvr
 {
 public:
   NAvr(const Frees& frees, size_t& num) : frees_(frees), num_(num) {}
@@ -625,7 +626,7 @@ private:
 
 
 template<typename VA>
-size_t Composite<VA>::nAvr_v() const
+size_t composite::Base<VA>::nAvr_v() const
 {
   size_t res=0;
   NAvr helper(frees_,res);
@@ -638,7 +639,7 @@ size_t Composite<VA>::nAvr_v() const
 
 
 template<typename VA>
-class Composite<VA>::Average
+class composite::Base<VA>::Average
 {
 public:
 
@@ -650,7 +651,7 @@ public:
   template<typename Vec, typename Av>
   void help(typename Av::Ptr av) const
   {
-    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(structure::average<Av::N_RANK>,av,t_,_1)));
+    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,boost::bind(structure::average<Av::N_RANK>,av,t_,::_1)));
   }
 
   template<typename Act>
@@ -677,14 +678,13 @@ private:
 
 
 template<typename VA>
-const typename Composite<VA>::Averages
-Composite<VA>::average_v(double t, const LazyDensityOperator& ldo) const
+const typename composite::Base<VA>::Averages
+composite::Base<VA>::average_v(double t, const LazyDensityOperator& ldo) const
 {
-  using namespace std;
-  list<Averages> seqAverages(RANK+mpl::size<VA>::value);
+  std::list<Averages> seqAverages(RANK+mpl::size<VA>::value);
 
   {
-    typename list<Averages>::iterator iter(seqAverages.begin());
+    typename std::list<Averages>::iterator iter(seqAverages.begin());
 
     CALL_COMPOSITE_WORKER( Average(frees_,t,ldo,iter) ) ;
   }
@@ -698,7 +698,7 @@ Composite<VA>::average_v(double t, const LazyDensityOperator& ldo) const
 
 
 template<typename VA>
-class Composite<VA>::Process
+class composite::Base<VA>::Process
 {
 public:
   Process(const Frees& frees, const Averages& avr, ptrdiff_t& l, ptrdiff_t& u) 
@@ -740,7 +740,7 @@ private:
 
 template<typename VA>
 void
-Composite<VA>::process_v(Averages& avr) const
+composite::Base<VA>::process_v(Averages& avr) const
 {
   ptrdiff_t l=-1, u=0;
   CALL_COMPOSITE_WORKER( Process(frees_,avr,l,u) ) ;
@@ -749,7 +749,7 @@ Composite<VA>::process_v(Averages& avr) const
 
 
 template<typename VA>
-class Composite<VA>::Display
+class composite::Base<VA>::Display
 {
 public:
   Display(const Frees& frees, const Averages& avr, std::ostream& os, int precision, ptrdiff_t& l, ptrdiff_t& u) 
@@ -790,7 +790,7 @@ private:
 
 template<typename VA>
 void
-Composite<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
+composite::Base<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
 {
   ptrdiff_t l=-1, u=0;
   CALL_COMPOSITE_WORKER( Display(frees_,avr,os,precision,l,u) ) ;
