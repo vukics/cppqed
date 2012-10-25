@@ -10,7 +10,6 @@
 #include "TridiagonalHamiltonian.h"
 
 #include "Mode_.h"
-#include "Qbit_.h"
 
 #include "ParsFwd.h"
 
@@ -29,13 +28,20 @@ struct Pars
 };
 
 
+typedef boost::shared_ptr<const structure::Free> QbitSpinCommonPtr;
+
+const structure::free::Tridiagonal sigmaop(QbitSpinCommonPtr); // a simple dispatcher
+
+class UnrecognizedPluginToJaynesCummings : public cpputils::Exception {};
+
+
 class Base : public structure::Interaction<2>, public structure::TridiagonalHamiltonian<2,true>
 {
 protected:
   typedef structure::Interaction<2> IA_Base;
   typedef structure::TridiagonalHamiltonian<2,true> TDH_Base;
 
-  Base(qbit::Ptr, mode::Ptr, const dcomp& g);
+  Base(QbitSpinCommonPtr, mode::Ptr, const dcomp& g);
 
 };
 
