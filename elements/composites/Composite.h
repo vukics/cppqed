@@ -9,7 +9,7 @@
 #include "BlitzArraySliceIterator.h"
 // This is included at this point mainly to pull in necessary TMP tools
 
-#include "SubSystemFwd.h"
+#include "SubSystem.h"
 
 #include "details/TMP_helpers.h"
 
@@ -81,7 +81,7 @@ private:
 
   // Implementing Av_Base
 
-  void   displayKey_v(std::ostream&, size_t&) const; class DisplayKey;
+  void   displayKey_v(std::ostream&, size_t&) const;
   size_t       nAvr_v()                       const; class NAvr;
 
   const Averages average_v(double, const LazyDensityOperator&)  const; class Average;

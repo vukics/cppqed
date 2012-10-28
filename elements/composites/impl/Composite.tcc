@@ -560,23 +560,28 @@ void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_
 ///////////
 
 
-template<typename VA>
-class composite::Base<VA>::DisplayKey
+namespace composite {
+
+
+template<int RANK, typename VA, void (structure::QuantumSystemWrapper<RANK,false>::*displaySomeKey)(std::ostream&, size_t&) const>
+class DisplayKey
 {
 public:
+  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
+  
   DisplayKey(const Frees& frees, std::ostream& os, size_t& i) 
     : frees_(frees), os_(os), i_(i) {}
 
   template<typename Act>
   void operator()(const Act& act) const
   {
-    act.displayAveragedKey(os_,i_);
+    act.*displaySomeKey(os_,i_);
   }
 
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    frees_(IDX).displayAveragedKey(os_,i_);
+    frees_(IDX).*displaySomeKey(os_,i_);
   }
 
 private:
@@ -588,10 +593,12 @@ private:
 };
 
 
+} // composite
+
 template<typename VA>
 void composite::Base<VA>::displayKey_v(std::ostream& os, size_t& i) const
 {
-  CALL_COMPOSITE_WORKER( DisplayKey(frees_,os,i) ) ;
+  CALL_COMPOSITE_WORKER( ( DisplayKey<RANK,VA,&structure::QuantumSystemWrapper<RANK,false>::displayAveragedKey>(frees_,os,i) ) );
 }
 
 
@@ -797,5 +804,6 @@ composite::Base<VA>::display_v(const Averages& avr, std::ostream& os, int precis
 }
 
 
+#undef CALL_COMPOSITE_WORKER
 
 #endif // ELEMENTS_COMPOSITES_IMPL_COMPOSITE_TCC_INCLUDED
