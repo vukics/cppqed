@@ -1,4 +1,6 @@
 // -*- C++ -*-
+#if !BOOST_PP_IS_ITERATING
+
 #ifndef QUANTUMOPERATOR_IMPL_TRIDIAGONAL_TCC_INCLUDED
 #define QUANTUMOPERATOR_IMPL_TRIDIAGONAL_TCC_INCLUDED
 
@@ -285,7 +287,7 @@ void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
 
 
 #define BOOST_PP_ITERATION_LIMITS (1,QUANTUMOPERATOR_TRIDIAGONAL_MAX_RANK)
-#define BOOST_PP_FILENAME_1 "../../quantumoperator/details/TridiagonalApplySpecialization.h"
+#define BOOST_PP_FILENAME_1 "impl/Tridiagonal.tcc"
 
 #include BOOST_PP_ITERATE()
 
@@ -333,3 +335,43 @@ void Tridiagonal<9>::apply(const StateVectorLow&, StateVectorLow&) const;
 
 
 #endif // QUANTUMOPERATOR_IMPL_TRIDIAGONAL_TCC_INCLUDED
+
+
+#else  // BOOST_PP_IS_ITERATING
+
+
+#define rank BOOST_PP_ITERATION()
+
+#define AT_helper(V,i) ranges(i)(at_c<V,i>::type::value)
+
+#define DPSIDT_print(z,m,data) AT_helper(V_DPSIDT,m)
+#define      A_print(z,m,data) AT_helper(V_A     ,m)
+#define    PSI_print(z,m,data) AT_helper(V_PSI   ,m)
+
+
+template<> template<int START, typename V_DPSIDT, typename V_A, typename V_PSI>
+void quantumoperator::Tridiagonal<rank>::doApply(mpl::int_<0>,
+                                                 const Ranges& ranges, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+{
+  using mpl::at_c;
+
+  if (diagonals_(START).size()) 
+    dpsidt             (BOOST_PP_ENUM(rank,DPSIDT_print,~))
+      +=
+      diagonals_(START)(BOOST_PP_ENUM(rank,     A_print,~))
+      *
+      psi              (BOOST_PP_ENUM(rank,   PSI_print,~))
+      ;
+
+}
+
+#undef    PSI_print
+#undef      A_print
+#undef DPSIDT_print
+
+#undef AT_helper
+
+#undef rank
+
+
+#endif // BOOST_PP_IS_ITERATING

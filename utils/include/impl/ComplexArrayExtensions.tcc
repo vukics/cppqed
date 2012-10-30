@@ -1,4 +1,6 @@
 // -*- C++ -*-
+#if !BOOST_PP_IS_ITERATING
+
 #ifndef   UTILS_INCLUDE_IMPL_COMPLEXARRAYEXTENSIONS_TCC_INCLUDED
 #define   UTILS_INCLUDE_IMPL_COMPLEXARRAYEXTENSIONS_TCC_INCLUDED
 
@@ -19,7 +21,7 @@ namespace blitzplusplus {
 namespace details {
 
 #define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_DIV(BLITZ_ARRAY_LARGEST_RANK,2))
-#define BOOST_PP_FILENAME_1 "details/HCH_ImplementationsSpecialization.h"
+#define BOOST_PP_FILENAME_1 "impl/ComplexArrayExtensions.tcc"
 
 #include BOOST_PP_ITERATE()
 
@@ -88,3 +90,26 @@ doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2, boost
 } // blitzplusplus
 
 #endif // UTILS_INCLUDE_IMPL_COMPLEXARRAYEXTENSIONS_TCC_INCLUDED
+
+
+#else  // BOOST_PP_IS_ITERATING
+
+
+#define ITER BOOST_PP_ITERATION()
+#define ITERT2 BOOST_PP_MUL(2,ITER)
+
+#define HCH_print(z,m,unused) m ,
+
+inline void 
+helpHermitianConjugate(TTD_CARRAY(ITERT2)& array)
+{
+  array.transposeSelf(BOOST_PP_REPEAT_FROM_TO(ITER,ITERT2,HCH_print,~) BOOST_PP_ENUM_PARAMS(ITER,));
+}
+
+#undef HCH_print
+
+#undef ITERT2
+#undef ITER
+
+
+#endif // BOOST_PP_IS_ITERATING
