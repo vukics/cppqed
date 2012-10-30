@@ -6,5 +6,6 @@
 
 #include "Mode.h"
 #include "Qbit.h"
+#include "Spin.h"
 
 #endif // ELEMENTS_INTERACTIONS_JAYNESCUMMINGS_H_INCLUDED
