@@ -1,4 +1,6 @@
 // -*- C++ -*-
+#if !BOOST_PP_IS_ITERATING
+
 #ifndef UTILS_INCLUDE_BLITZTINYOFARRAYS_H_INCLUDED
 #define UTILS_INCLUDE_BLITZTINYOFARRAYS_H_INCLUDED
 
@@ -47,11 +49,8 @@ public:
   ~TinyOfArrays() {}
 
   TinyOfArrays(const TinyOfArrays&);
-  // NEED_TO_UNDERSTAND if this is not declared then OK (how, when the
-  // composed constructor doesn't have good semantics?), if this is
-  // declared private then compile error with return statements, if it
-  // is declared public but not DEFINED then OK. For the solution
-  // cf. GotW.#1
+  // NEED_TO_UNDERSTAND if this is not declared then OK (how, when the composed constructor doesn't have good semantics?), if this is declared private then compile error with return statements, if it is declared public but not DEFINED then OK.
+  // For the solution cf. GotW.#1
 
   inline TinyOfArrays(TOA_ShallowCopy, const TinyOfArrays&);
   inline TinyOfArrays(TOA_DeepCopy   , const TinyOfArrays&);
@@ -61,7 +60,7 @@ public:
 
 
 #define BOOST_PP_ITERATION_LIMITS (2,BLITZ_ARRAY_LARGEST_RANK)
-#define BOOST_PP_FILENAME_1 "details/BlitzTinyOfArraysSpecialization.h"
+#define BOOST_PP_FILENAME_1 "BlitzTinyOfArrays.h"
 
 #include BOOST_PP_ITERATE()
 
@@ -83,3 +82,32 @@ negate(const TinyOfArrays<T,RANK,LENGTH>&);
 
 
 #endif // UTILS_INCLUDE_BLITZTINYOFARRAYS_H_INCLUDED
+
+
+#else  // BOOST_PP_IS_ITERATING
+
+
+#define ITER BOOST_PP_ITERATION()
+
+#define TOA_print1(z,m,unused) (*this)(m).reference(x##m);
+#define TOA_print2(z,m,unused) (*this)(m).reference(x##m.copy());
+
+
+TinyOfArrays(TOA_ShallowCopy, BOOST_PP_ENUM_PARAMS(ITER,const T_numtype& x) )
+{
+  BOOST_PP_REPEAT(ITER,TOA_print1,~);
+}
+
+TinyOfArrays(TOA_DeepCopy   , BOOST_PP_ENUM_PARAMS(ITER,const T_numtype& x) )
+{
+  BOOST_PP_REPEAT(ITER,TOA_print2,~);
+}
+
+
+#undef TOA_print2
+#undef TOA_print1
+
+#undef ITER
+
+
+#endif // BOOST_PP_IS_ITERATING

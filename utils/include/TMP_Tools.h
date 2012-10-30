@@ -1,4 +1,6 @@
 // -*- C++ -*-
+#if !BOOST_PP_IS_ITERATING
+
 #ifndef UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 #define UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 
@@ -160,11 +162,6 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
 //
 ////////////////////////////////////////////
 
-/*
-TODO:
-* minimize Boost.Preprocessor inclusions everywhere
-*/
-
 
 const int vectorDefaultArgument=-1001;
 
@@ -193,7 +190,7 @@ struct Vector<BOOST_PP_ENUM(TMPTOOLS_MAX_VECTOR_SIZE,DEFAULT_print,~) >
 #define ARGUMENTDISPATCHER_print(z, n, data) ArgumentDispatcher<V##n,n>::value
 
 #define BOOST_PP_ITERATION_LIMITS (1, BOOST_PP_SUB(TMPTOOLS_MAX_VECTOR_SIZE,1) )
-#define BOOST_PP_FILENAME_1 "details/TMP_VectorSpecialization.h"
+#define BOOST_PP_FILENAME_1 "TMP_Tools.h"
 
 #include BOOST_PP_ITERATE()
 
@@ -211,3 +208,17 @@ typedef Vector<> V_Empty;
 
 
 #endif // UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
+
+
+#else  // BOOST_PP_IS_ITERATING
+
+
+#define ITER BOOST_PP_ITERATION()
+
+template<BOOST_PP_ENUM_PARAMS(ITER,int V)>
+struct Vector<BOOST_PP_ENUM_PARAMS(ITER,V) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(TMPTOOLS_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
+  : boost::mpl::vector_c<int BOOST_PP_ENUM_TRAILING(ITER,ARGUMENTDISPATCHER_print,~)>
+{};
+
+
+#endif // BOOST_PP_IS_ITERATING

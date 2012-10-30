@@ -1,4 +1,6 @@
 // -*- C++ -*-
+#if !BOOST_PP_IS_ITERATING
+
 #ifndef   UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED
 #define   UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED
 
@@ -345,7 +347,7 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 
 
 #define BOOST_PP_ITERATION_LIMITS (1,BLITZ_ARRAY_LARGEST_RANK)
-#define BOOST_PP_FILENAME_1 "details/IndexerImplementationsSpecialization.h"
+#define BOOST_PP_FILENAME_1 "impl/BlitzArraySliceIterator.tcc"
 
 #include BOOST_PP_ITERATE()
 
@@ -357,3 +359,57 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 #include "details/BlitzArraySliceIteratorMacros.h"
 
 #endif // UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED
+
+
+#else  // BOOST_PP_IS_ITERATING
+
+
+#define rank BOOST_PP_ITERATION()
+
+#define INDEXER_print1(z,m,data) boost::mpl::at_c<TM,m>::type::value
+#define INDEXER_print2(z,m,data) boost::fusion::at_c<m>(Base::cache_)
+
+namespace blitzplusplus {
+namespace basi {
+
+template<typename V> struct Transposer<rank,V>
+{
+  typedef typename details::TransposerMeta<rank,V>::type TM;
+
+  typedef TTD_CARRAY(rank) Array;
+
+  static Array& transpose(Array& array)
+  {
+    array.transposeSelf(BOOST_PP_ENUM(rank,INDEXER_print1,~) );
+    return array;
+  }
+
+};
+
+
+template<typename V> struct Indexer<rank,V> : Transposer<rank,V>, private details::IndexerBase<rank,V>
+{
+  typedef details::IndexerBase<rank,V> Base;
+
+  typedef TTD_CARRAY(rank)  Array   ;
+  typedef TTD_RES_CARRAY(V) ArrayRes;
+
+  static ArrayRes& index(Array& array, ArrayRes& arrayRes, const typename Base::VecIdxTiny& idx)
+  {
+    Base::fillIdxValues(idx);
+    arrayRes.reference(array(BOOST_PP_ENUM(rank,INDEXER_print2,~) ) );
+    return arrayRes;
+  }
+
+};
+
+}
+}
+
+#undef INDEXER_print1
+#undef INDEXER_print2
+
+#undef rank
+
+
+#endif // BOOST_PP_IS_ITERATING
