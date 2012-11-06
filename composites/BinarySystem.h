@@ -125,20 +125,20 @@ public:
 } // binary
 
 
-#define BASE_CLASS(Aux,Class) mpl::if_c<IS_##Aux,binary::Class,binary::EmptyBase<binary::Class> >::type
+#define BASE_class(Aux,Class) mpl::if_c<IS_##Aux,binary::Class,binary::EmptyBase<binary::Class> >::type
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI>
 class BinarySystem
   : public binary::Base,
-    public BASE_CLASS(EX,Exact), 
-    public BASE_CLASS(HA,Hamiltonian),
-    public BASE_CLASS(LI,Liouvillean)
+    public BASE_class(EX,Exact), 
+    public BASE_class(HA,Hamiltonian),
+    public BASE_class(LI,Liouvillean)
 {
 public:
-  typedef typename BASE_CLASS(EX,Exact)             ExactBase;
-  typedef typename BASE_CLASS(HA,Hamiltonian) HamiltonianBase;
-  typedef typename BASE_CLASS(LI,Liouvillean) LiouvilleanBase;
+  typedef typename BASE_class(EX,Exact)             ExactBase;
+  typedef typename BASE_class(HA,Hamiltonian) HamiltonianBase;
+  typedef typename BASE_class(LI,Liouvillean) LiouvilleanBase;
   
   typedef structure::Interaction<2> Interaction;
 
@@ -147,7 +147,7 @@ public:
 };
 
 
-#undef BASE_CLASS
+#undef BASE_class
 
 
 #endif // ELEMENTS_COMPOSITES_BINARYSYSTEM_H_INCLUDED
