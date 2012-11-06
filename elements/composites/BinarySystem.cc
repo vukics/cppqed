@@ -222,31 +222,31 @@ void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) co
 //////////////////
 
 
-#define BASE_CTOR(Class) Class##Base(getFree0(),getFree1(),getIA())
+#define BASE_ctor(Class) Class##Base(getFree0(),getFree1(),getIA())
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI>
 BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(Interaction::Ptr ia) 
 : binary::Base(ia),
-  BASE_CTOR(Exact),
-  BASE_CTOR(Hamiltonian),
-  BASE_CTOR(Liouvillean)
+  BASE_ctor(Exact),
+  BASE_ctor(Hamiltonian),
+  BASE_ctor(Liouvillean)
 {
 } 
 
 
-#undef BASE_CTOR
+#undef BASE_ctor
 
 
 namespace {
 
-typedef blitz::TinyVector<bool,3> SystemCharacteristics;
+using structure::SystemCharacteristics;
 
 const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr ia)
 {
   using namespace structure;
   
-  QuantumSystem<1>::Ptr
+  const QuantumSystem<1>::Ptr
     free0=ia->getFrees()(0),
     free1=ia->getFrees()(1);
 

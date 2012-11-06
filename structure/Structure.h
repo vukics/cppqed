@@ -19,6 +19,10 @@
 
 namespace structure {
 
+
+typedef blitz::TinyVector<bool,3> SystemCharacteristics;
+
+
 using boost::dynamic_pointer_cast;
 
 template<int RANK>
