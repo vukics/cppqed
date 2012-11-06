@@ -33,50 +33,76 @@ using boost::fusion::result_of::make_list;
 
 
 template<typename VA>
-struct MaxRank : MaxMF<typename MaxMF<VA,composite::SeqLess<mpl::_1,mpl::_2> >::type>::type::type {};
+struct MaxRank : MaxMF<typename MaxMF<VA,SeqLess<mpl::_1,mpl::_2> >::type>::type::type {};
 
 
 
-template<typename VA>
-// VA should model a fusion sequence of Acts
-class Base
-// The base_from_member idiom appears because the Frees has to be calculated and stored somehow first
-  : public structure::QuantumSystem<composite::MaxRank<VA>::value+1>,
-    public structure::Averaged     <composite::MaxRank<VA>::value+1>
+template<int N_RANK>
+// Factoring out code that depends only on RANK:
+class RankedBase : public structure::QuantumSystem<N_RANK>
 {
 public:
-  // The calculated RANK
-  static const int RANK=composite::MaxRank<VA>::value+1;
+  static const int RANK=N_RANK;
 
-  // Public types
+  typedef boost::shared_ptr<const RankedBase<RANK> > Ptr;
+
+  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
 
   typedef structure::QuantumSystem<RANK> QS_Base;
-  typedef structure::Averaged     <RANK> Av_Base;
-
-  typedef blitz::TinyVector<composite::SubSystemFree,RANK> Frees;
-
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
-  typedef tmptools::Ordinals<RANK> Ordinals;
 
   typedef typename QS_Base::Dimensions Dimensions;
-  typedef typename Av_Base::Averages   Averages  ;
 
-  // Base class names
-
-  using QS_Base::getDimensions; using QS_Base::getTotalDimension;
+  typedef tmptools::Ordinals<RANK> Ordinals;
 
 private:
   // Constructor helper
   static const Dimensions fillDimensions(const Frees&);
 
-public:
-  // Constructor
-  explicit Base(const Frees& frees, const VA& acts) 
-    : QS_Base(fillDimensions(frees)), frees_(frees), acts_(acts) {}
+protected:
+  explicit RankedBase(const Frees& frees)
+    : QS_Base(fillDimensions(frees)), frees_(frees) {}
+  
+  const Frees& getFrees() const {return frees_;}
 
 private:
-  // Implementing QS_Base
+  const Frees frees_;
+ 
+};
+
+
+template<typename VA>
+// VA should model a fusion sequence of Acts
+class Base
+  : public RankedBase<MaxRank<VA>::value+1>,
+    public structure::Averaged<MaxRank<VA>::value+1>
+{
+public:
+  typedef boost::shared_ptr<const Base<VA> > Ptr;
+  
+  // The calculated RANK
+  static const int RANK=MaxRank<VA>::value+1;
+
+  // Public types
+  typedef RankedBase<RANK>          RBase  ;
+  typedef structure::Averaged<RANK> Av_Base;
+  
+  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
+
+  typedef typename Av_Base::Averages Averages  ;
+
+  typedef typename RBase::   Frees    Frees;
+  typedef typename RBase::Ordinals Ordinals;
+  
+  // Base class names
+  using RBase::getDimensions; using RBase::getTotalDimension; using RBase::getFrees;
+  
+protected:
+  // Constructor
+  explicit Base(const Frees& frees, const VA& acts) 
+    : RBase(frees), frees_(frees), acts_(acts) {}
+
+private:
+  // Implementing QuantumSystem interface
 
   double  highestFrequency_v(             ) const;
   void   displayParameters_v(std::ostream&) const; class DisplayParameters;
@@ -91,10 +117,19 @@ private:
   void           display_v(const Averages&, std::ostream&, int) const; class Display;
 
   const Frees& frees_;
-  const VA   &  acts_;
+  const VA      acts_;
 
 };
 
+
+// Constructor helper
+template<typename VA>
+const typename Base<VA>::Frees fillFrees(const VA& acts);
+
+
+
+template<typename VA>
+const typename Base<VA>::Ptr doMake(const VA&);
 
 
 
@@ -182,13 +217,12 @@ private:
 };
 
 
-template<typename VA>
+template<typename>
 class EmptyBase
 {
 public:
-  typedef blitz::TinyVector<SubSystemFree,MaxRank<VA>::value+1> Frees;
-
-  EmptyBase(const Frees&, const VA&) {}
+  template<typename VA>
+  EmptyBase(const blitz::TinyVector<SubSystemFree,MaxRank<VA>::value+1>&, const VA&) {}
   
 };
 
@@ -197,56 +231,54 @@ public:
 
 
 
-#define BASE_CLASS(Aux,Class) mpl::if_c<IS_##Aux,composite::Class<VA>,composite::EmptyBase<VA> >::type
+#define BASE_class(Aux,Class) mpl::if_c<IS_##Aux,composite::Class<VA>,composite::EmptyBase<composite::Class<VA> > >::type
 
 template<typename VA, bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
 // VA should model a fusion sequence of Acts
-class Composite 
-// The base_from_member idiom appears because the Frees has to be calculated and stored somehow first
-  : private boost::base_from_member<const blitz::TinyVector<composite::SubSystemFree,composite::MaxRank<VA>::value+1> >,
-    public composite::Base<VA>,
-    public BASE_CLASS(EX,Exact),
-    public BASE_CLASS(HA,Hamiltonian),
-    public BASE_CLASS(LI,Liouvillean)
+class Composite
+  : public composite::Base<VA>,
+    public BASE_class(EX,Exact),
+    public BASE_class(HA,Hamiltonian),
+    public BASE_class(LI,Liouvillean)
 {
 public:
-  typedef typename BASE_CLASS(EX,Exact)             ExactBase;
-  typedef typename BASE_CLASS(HA,Hamiltonian) HamiltonianBase;
-  typedef typename BASE_CLASS(LI,Liouvillean) LiouvilleanBase;
+  typedef typename BASE_class(EX,Exact)             ExactBase;
+  typedef typename BASE_class(HA,Hamiltonian) HamiltonianBase;
+  typedef typename BASE_class(LI,Liouvillean) LiouvilleanBase;
+  
+  typedef typename composite::Base<VA>::Frees Frees;
   
   // The calculated RANK
   static const int RANK=composite::MaxRank<VA>::value+1;
-
-  // Public types
-
-  typedef blitz::TinyVector<composite::SubSystemFree,RANK> Frees;
-
-  typedef boost::base_from_member<const Frees> FreesBase;
 
   // Compile-time sanity check
   BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (mpl::void_) );
 
 private:
-  // Constructor helper
-  static const Frees fillFrees(const VA&);
-
+  using composite::Base<VA>::getFrees;
+  
 public:
   // Constructor
   explicit Composite(const VA& acts)
-    : FreesBase(fillFrees(acts)), composite::Base<VA>(FreesBase::member,acts),
-      ExactBase      (FreesBase::member,acts),
-      HamiltonianBase(FreesBase::member,acts),
-      LiouvilleanBase(FreesBase::member,acts),
-      acts_(acts) {}
-
+    : composite::Base<VA>(composite::fillFrees(acts),acts),
+      ExactBase      (getFrees(),acts),
+      HamiltonianBase(getFrees(),acts),
+      LiouvilleanBase(getFrees(),acts) {}
+      
 private:
-  // Storage
-  // Note that Frees are stored by value in FreesBase, but the Acts need to be stored by value here:
-  const VA acts_;
+  Composite(const Frees& frees, const VA& acts)
+    : composite::Base<VA>(frees ,acts),
+      ExactBase      (getFrees(),acts),
+      HamiltonianBase(getFrees(),acts),
+      LiouvilleanBase(getFrees(),acts) {}
+  
+  friend const typename composite::Base<VA>::Ptr composite::doMake<VA>(const VA&);
+
+  // Note that Frees and Acts are stored by value in Base
 
 };
 
-#undef BASE_CLASS
+#undef BASE_class
 
 
 // The following provides a much more convenient interface:
@@ -261,9 +293,15 @@ namespace mpl=boost::mpl;
 typedef Act<> DefaultArgument;
 
 
-template<BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
-struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type> >
+template<bool IS_EX, bool IS_HA, bool IS_LI, BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
+struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type, IS_EX, IS_HA, IS_LI> >
 {};
+
+
+template<BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
+struct MakeBase : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type>::Ptr>
+{};
+
 
 
 } // result_of
@@ -296,22 +334,28 @@ namespace composite {
 namespace result_of {
 
 
+template<bool IS_EX, bool IS_HA, bool IS_LI, BOOST_PP_ENUM_PARAMS(ITER,typename A)>
+struct Make<IS_EX, IS_HA, IS_LI, BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
+  : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(ITER,A) >::type, IS_EX, IS_HA, IS_LI> >
+{};
+
+
 template<BOOST_PP_ENUM_PARAMS(ITER,typename A)>
-struct Make<BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
-  : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(ITER,A) >::type> >
+struct MakeBase<BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
+  : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENUM_PARAMS(ITER,A) >::type>::Ptr>
 {};
 
 
 } // result_of
 
 
-#define RETURN_type typename result_of::Make<BOOST_PP_ENUM_PARAMS(ITER,A) >::type
+#define RETURN_type typename result_of::MakeBase<BOOST_PP_ENUM_PARAMS(ITER,A) >::type
 
 template<BOOST_PP_ENUM_PARAMS(ITER,typename A)> 
 const RETURN_type
 make(BOOST_PP_ENUM_BINARY_PARAMS(ITER,const A,& act) )
 {
-  return RETURN_type(make_list(BOOST_PP_ENUM_PARAMS(ITER,act)));
+  return doMake(make_list(BOOST_PP_ENUM_PARAMS(ITER,act)));
 }
 
 #undef  RETURN_type
