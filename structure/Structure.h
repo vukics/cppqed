@@ -169,6 +169,8 @@ public:
   const Averages average(double t, const LazyDensityOperator& matrix) const {return structure::average(av_,t,matrix);}
 
   void displayAveragedKey(std::ostream& o, size_t& i) const {if (av_) av_->displayKey(o,i);}
+  
+  std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"# System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
 
 protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}

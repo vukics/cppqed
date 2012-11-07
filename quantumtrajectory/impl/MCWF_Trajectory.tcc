@@ -378,18 +378,13 @@ void MCWF_Trajectory<RANK>::displayParameters_v() const
 
   qs_.getQS()->displayParameters(os);
 
-  os<<"# System characteristics: "
-    <<(qs_.getEx() ? "Interaction picture, "   : "")
-    <<(qs_.getHa() ? "Hamiltonian evolution, " : "")
-    <<(qs_.getLi() ? "Liouvillean evolution, " : "")
-    <<(qs_.getAv() ? "calculates Averages."    : "")
-    <<endl;
+  qs_.displayCharacteristics(os)<<endl;
 
   if (const typename Liouvillean::Ptr li=qs_.getLi()) {
     os<<"# Decay channels:\n";
     {
       size_t i=0;
-      li->displayKey(getOstream(),i);
+      li->displayKey(os,i);
     }
     os<<"# Alternative jumps: ";
     {
