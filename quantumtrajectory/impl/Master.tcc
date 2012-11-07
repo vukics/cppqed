@@ -136,7 +136,17 @@ Base<RANK>::displayParameters_v() const
   getOstream()<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl;
 
   qs_.getQS()->displayParameters(getOstream());
+  
+  qs_.displayCharacteristics(getOstream())<<endl;
 
+  if (const typename Liouvillean::Ptr li=qs_.getLi()) {
+    getOstream()<<"# Decay channels:\n";
+    {
+      size_t i=0;
+      li->displayKey(getOstream(),i);
+    }
+    getOstream()<<endl;
+  }  
 }
 
 
