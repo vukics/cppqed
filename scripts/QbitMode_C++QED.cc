@@ -1,5 +1,4 @@
 #include "EvolutionBinary.h"
-#include "Mode.h"
 
 #include "JaynesCummings.h"
 

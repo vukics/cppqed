@@ -29,7 +29,7 @@ namespace bll=boost::lambda;
 #include <list>
 
 
-#define CALL_composite_worker(object) composite::worker(acts_,object,Ordinals());
+#define CALL_composite_worker(object) composite::worker<Ordinals>(acts_,object);
 
 
 // NEEDS_WORK in the helper classes worker member functions could be factored out. (Eg ActWithU --- the amount of code we save is incredible!)
@@ -55,8 +55,8 @@ struct CompositeConsistencyException : cpputils::Exception
 namespace composite {
 
 
-template<typename VA, typename H, typename Ordinals>
-void worker(const VA& acts, const H& helper, Ordinals)
+template<typename Ordinals, typename VA, typename H>
+void worker(const VA& acts, const H& helper)
 {
   mpl::for_each<Ordinals>(helper);
   boost::fusion::for_each(acts,helper);

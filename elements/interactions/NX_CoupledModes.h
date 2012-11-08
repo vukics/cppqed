@@ -53,8 +53,6 @@ namespace nxcoupledmodes {
 template<typename A, typename F1, typename F2>
 const Ptr make(const F1& f1, const F2& f2, double u)
 {
-  typedef structure::Interaction<2> Interaction;
-
   if (u) return boost::make_shared<NX_CoupledModes<true ,A> >(f1,f2,u);
   else   return boost::make_shared<NX_CoupledModes<false,A> >(f1,f2,0);
 }

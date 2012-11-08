@@ -265,7 +265,7 @@ public:
       HamiltonianBase(getFrees(),acts),
       LiouvilleanBase(getFrees(),acts) {}
       
-private:
+// private:
   Composite(const Frees& frees, const VA& acts)
     : composite::Base<VA>(frees ,acts),
       ExactBase      (getFrees(),acts),
@@ -294,12 +294,12 @@ typedef Act<> DefaultArgument;
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI, BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
-struct Make : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type, IS_EX, IS_HA, IS_LI> >
+struct MakeConcrete : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type, IS_EX, IS_HA, IS_LI> >
 {};
 
 
 template<BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
-struct MakeBase : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type>::Ptr>
+struct Make : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type>::Ptr>
 {};
 
 
@@ -335,13 +335,13 @@ namespace result_of {
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI, BOOST_PP_ENUM_PARAMS(ITER,typename A)>
-struct Make<IS_EX, IS_HA, IS_LI, BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
+struct MakeConcrete<IS_EX, IS_HA, IS_LI, BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
   : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(ITER,A) >::type, IS_EX, IS_HA, IS_LI> >
 {};
 
 
 template<BOOST_PP_ENUM_PARAMS(ITER,typename A)>
-struct MakeBase<BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
+struct Make<BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
   : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENUM_PARAMS(ITER,A) >::type>::Ptr>
 {};
 
@@ -349,7 +349,7 @@ struct MakeBase<BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB
 } // result_of
 
 
-#define RETURN_type typename result_of::MakeBase<BOOST_PP_ENUM_PARAMS(ITER,A) >::type
+#define RETURN_type typename result_of::Make<BOOST_PP_ENUM_PARAMS(ITER,A) >::type
 
 template<BOOST_PP_ENUM_PARAMS(ITER,typename A)> 
 const RETURN_type
