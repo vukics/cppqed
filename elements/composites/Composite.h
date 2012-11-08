@@ -93,13 +93,16 @@ public:
   typedef typename RBase::   Frees    Frees;
   typedef typename RBase::Ordinals Ordinals;
   
+private:
   // Base class names
   using RBase::getDimensions; using RBase::getTotalDimension; using RBase::getFrees;
   
 protected:
   // Constructor
   explicit Base(const Frees& frees, const VA& acts) 
-    : RBase(frees), frees_(frees), acts_(acts) {}
+    : RBase(frees), frees_(getFrees()), acts_(acts) {}
+    
+  const VA& getActs() const {return acts_;}
 
 private:
   // Implementing QuantumSystem interface
@@ -242,6 +245,8 @@ class Composite
     public BASE_class(LI,Liouvillean)
 {
 public:
+  typedef composite::Base<VA> Base;
+  
   typedef typename BASE_class(EX,Exact)             ExactBase;
   typedef typename BASE_class(HA,Hamiltonian) HamiltonianBase;
   typedef typename BASE_class(LI,Liouvillean) LiouvilleanBase;
@@ -255,22 +260,23 @@ public:
   BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (mpl::void_) );
 
 private:
-  using composite::Base<VA>::getFrees;
+  using Base::getFrees;
+  using Base::getActs ;
   
 public:
   // Constructor
   explicit Composite(const VA& acts)
-    : composite::Base<VA>(composite::fillFrees(acts),acts),
-      ExactBase      (getFrees(),acts),
-      HamiltonianBase(getFrees(),acts),
-      LiouvilleanBase(getFrees(),acts) {}
+    : Base(composite::fillFrees(acts),acts),
+      ExactBase      (getFrees(),getActs()),
+      HamiltonianBase(getFrees(),getActs()),
+      LiouvilleanBase(getFrees(),getActs()) {}
       
 // private:
   Composite(const Frees& frees, const VA& acts)
-    : composite::Base<VA>(frees ,acts),
-      ExactBase      (getFrees(),acts),
-      HamiltonianBase(getFrees(),acts),
-      LiouvilleanBase(getFrees(),acts) {}
+    : Base(frees ,acts),
+      ExactBase      (getFrees(),getActs()),
+      HamiltonianBase(getFrees(),getActs()),
+      LiouvilleanBase(getFrees(),getActs()) {}
   
   friend const typename composite::Base<VA>::Ptr composite::doMake<VA>(const VA&);
 
