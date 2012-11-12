@@ -41,9 +41,7 @@ int main(int argc, char* argv[])
 
   // ****** ****** ****** ****** ****** ******
 
-  JaynesCummings<> jc(qbit::make(pplqb,qmp),mode::make(pplm ,qmp),pjc);
-
-  binary::Ptr system2(binary::make(jc));
+  binary::Ptr system2(binary::make(jaynescummings::make(qbit::make(pplqb,qmp),mode::make(pplm ,qmp),pjc)));
 
   StateVector2 psi2(qbit::init(pplqb)*mode::init(pplm)); psi2.renorm();
   StateVector1 psi1(StateVectorLow1(psi2().data(),shape(system2->getTotalDimension()),neverDeleteData),quantumdata::byReference);

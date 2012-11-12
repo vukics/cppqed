@@ -34,8 +34,6 @@ int main(int argc, char* argv[])
   qbit::Ptr qbit(qbit::make(pplqb,qmp));
   mode::Ptr mode(mode::make(pplm ,qmp));
 
-  JaynesCummings<> jc(qbit,mode,pjc);
-
   // BinarySystem system(jc);
 
   StateVector psi(qbit::init(pplqb)*mode::init(pplm));
@@ -46,23 +44,7 @@ int main(int argc, char* argv[])
   */
   psi.renorm();
 
-  evolve<tmptools::Vector<0> >(psi,binary::make(jc),pe);
-
-
-  // The 3 further ways to create a JaynesCummings:
-  {
-    PumpedLossyQbitSch qbitv(pplqb);
-    PumpedLossyMode<>  modev(pplm );
-    {
-      JaynesCummings<> jc(qbitv,mode ,pjc);
-    }
-    {
-      JaynesCummings<> jc(qbit ,modev,pjc);
-    }
-    {
-      JaynesCummings<> jc(qbitv,modev,pjc);
-    }
-  }
+  evolve<tmptools::Vector<0> >(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);
 
 
 

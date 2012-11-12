@@ -86,7 +86,7 @@ namespace jaynescummings {
 
 
 template<typename A, typename F1, typename F2>
-const Ptr make(const F1& f1, const F2& f2, const dcomp& g)
+const Ptr make(const F1& f1, const F2& f2, const dcomp& g, const A& =A())
 {
   if (isNonZero(g)) return boost::make_shared<JaynesCummings<true ,A> >(f1,f2,g );
   else              return boost::make_shared<JaynesCummings<false,A> >(f1,f2,0.);
