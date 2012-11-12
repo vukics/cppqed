@@ -726,8 +726,9 @@ public:
   template<typename Act>
   result_type operator()(result_type sc, const Act& act)
   {
-    const typename Act::QuantumSystemPtr ia=act.getQS();
-    return sc || result_type(qse(ia),qsh(ia),qsl(ia));
+    using namespace structure;
+    const DynamicsBase::Ptr ia=act.get();
+    return sc || result_type(qse<Act::N_RANK>(ia),qsh<Act::N_RANK>(ia),qsl<Act::N_RANK>(ia));
   }
 
   template<typename T>

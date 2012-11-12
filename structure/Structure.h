@@ -98,6 +98,8 @@ template<int RANK, bool IS_CONST>
 class QuantumSystemWrapper
 {
 public:
+  static const int N_RANK=RANK;
+  
   typedef QuantumSystem<RANK> QS;
   typedef Exact        <RANK> Ex;
   typedef Hamiltonian  <RANK> Ha;
