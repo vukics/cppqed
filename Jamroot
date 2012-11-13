@@ -29,4 +29,6 @@ build-project elements  ;
 
 # Scripts
 build-project scripts ;
+
+alias exceptHardScripts : scripts//exceptHardScripts ;
 alias fewerScripts : scripts//fewerScripts ;
