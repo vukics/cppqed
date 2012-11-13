@@ -5,11 +5,8 @@
 #include "AveragedFwd.h"
 
 #include "LiouvilleanAveragedCommon.h"
-#include "Types.h"
 
 #include "Exception.h"
-
-#include "BlitzArrayExtensions.h"
 
 #include <iosfwd>
 
@@ -24,12 +21,12 @@ namespace structure {
 /////////////////
 
 
-class AveragedCommon : public LiouvilleanAveragedCommon
+class AveragedCommon
 {
 public:
   typedef boost::shared_ptr<const AveragedCommon> Ptr;
 
-  typedef DArray1D Averages;
+  typedef LiouvilleanAveragedCommon::DArray1D Averages;
 
   virtual ~AveragedCommon() {}
 
@@ -37,12 +34,9 @@ public:
 
   void display(const Averages& averages, std::ostream& os, int i) const {display_v(averages,os,i);}
 
-  size_t nAvr() const {return nAvr_v();}
-
 private:
-  virtual void   process_v(Averages&)                           const = 0;
-  virtual void   display_v(const Averages&, std::ostream&, int) const = 0;
-  virtual size_t    nAvr_v()                                    const = 0;
+  virtual void process_v(      Averages&                    ) const = 0;
+  virtual void display_v(const Averages&, std::ostream&, int) const = 0;
 
 };
 
@@ -54,43 +48,21 @@ private:
 ///////////
 
 
-#ifndef   NDEBUG
-struct AveragesNumberMismatchException : cpputils::Exception {};
-#endif // NDEBUG
-
-struct InfiniteDetectedException : cpputils::Exception {};
-
 
 template<int RANK>
 class Averaged<RANK,true>
-  : public quantumdata::Types<RANK,AveragedCommon>
+  : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >,public AveragedCommon
 {
 public:
   static const int N_RANK=RANK;
 
   typedef boost::shared_ptr<const Averaged> Ptr;
 
-  typedef quantumdata::Types<RANK,AveragedCommon> Base;
+  typedef quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> > Base;
 
-  typedef AveragedCommon::Averages Averages;
+  typedef typename AveragedCommon::Averages Averages;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
-  virtual ~Averaged() {}
-
-  const Averages average(double t, const LazyDensityOperator& matrix) const
-  {
-    const Averages averages(average_v(t,matrix));
-#ifndef   NDEBUG
-    if (size_t(averages.size())!=Base::nAvr()) throw AveragesNumberMismatchException();
-#endif // NDEBUG
-    if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
-
-    return averages;
-  }
-
-private:
-  virtual const Averages average_v(double, const LazyDensityOperator&) const = 0;
 
 };
 

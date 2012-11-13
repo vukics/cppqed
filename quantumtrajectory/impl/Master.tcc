@@ -70,7 +70,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
   // Now act with the reset operator --- implement this in terms of
   // the individual jumps by iteration and addition
 
-  for (size_t i=0; i<qs_.nJumps(); i++) {
+  for (size_t i=0; i<qs_.template nAvr<structure::LA_Li>(); i++) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     DensityOperatorLow rhotemp(rhoLow.copy());
     UnaryFunction functionLi(bind(&Liouvillean::actWithJ,qs_.getLi(),t,_1,i));

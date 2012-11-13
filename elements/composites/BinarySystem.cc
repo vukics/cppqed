@@ -1,5 +1,3 @@
-#ifndef BINARY_SYSTEM_AVERAGED_LIOUVILLEAN_ITERATING
-
 #include "BinarySystem.h"
 
 #include "Interaction.h"
@@ -64,13 +62,13 @@ void binary::Base::displayParameters_v(std::ostream& os) const
 
 
 #define SUCCESSIVE_Ranges(f0,f1,ia) ptrdiff_t l=-1, u;  \
-  if ((u=l+free0_.nAvr())>l) {                          \
+  if ((u=l+free0_.nAvr<LA_Av>())>l) {                          \
     PROCESS_Range( averages(blitz::Range(l+1,u)) , f0)  \
   }                                                     \
-  if ((l=u+free1_.nAvr())>u) {                          \
+  if ((l=u+free1_.nAvr<LA_Av>())>u) {                          \
     PROCESS_Range( averages(blitz::Range(u+1,l)) , f1)  \
   }                                                     \
-  if ((u=l+ia_.nAvr())>l) {                             \
+  if ((u=l+ia_.nAvr<LA_Av>())>l) {                             \
     PROCESS_Range( averages(blitz::Range(l+1,u)) , ia)  \
   }                                                     \
 
@@ -111,27 +109,49 @@ void binary::Base::display_v(const Averages& averages, std::ostream& os, int pre
 ////////////////////////////
 
 
-#define BINARY_SYSTEM_AVERAGED_LIOUVILLEAN_ITERATING
+namespace binary {
 
-#define Class      Base
-#define keyName    displayAveragedKey
-#define numberName nAvr
-#define ArrayName  Averages
-#define func       average
+// These possibilities get instantiated through compilation, so that explicit instantiation is not necessary here.
+  
+template<LiouvilleanAveragedTag LA>
+void displayKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
+{
+  os<<"# Binary system\n";
+  free0.displayKey<LA>(os,i);
+  free1.displayKey<LA>(os,i);
+  ia   .displayKey<LA>(os,i);
+}
 
-#include "BinarySystem.cc"
+
+template<LiouvilleanAveragedTag LA>
+size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia)
+{
+  return free0.nAvr<LA>() + free1.nAvr<LA>() + ia.nAvr<LA>();
+}
 
 
-#define BINARY_SYSTEM_AVERAGED_LIOUVILLEAN_ITERATING
+template<LiouvilleanAveragedTag LA>
+const Base::Averages average(double t, const Base::LazyDensityOperator& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr)
+{
+  typedef Base::Averages ArrayName;
+  
+  using quantumdata::partialTrace;
+  using boost::copy;
 
-#define Class      Liouvillean
-#define keyName    displayLiouvilleanKey
-#define numberName nJumps
-#define ArrayName  Probabilities
-#define func       probabilities
+  const ArrayName
+    a0 (partialTrace<V0,ArrayName>(ldo,bind(&SubSystemFree::average<LA>,free0,t,_1))),
+    a1 (partialTrace<V1,ArrayName>(ldo,bind(&SubSystemFree::average<LA>,free1,t,_1))),
+    a01(ia.average<LA>(t,ldo));
 
-#include "BinarySystem.cc"
+  ArrayName a(numberAvr);
 
+  copy(a01,copy(a1,copy(a0,a.begin())));
+
+  return a;
+}
+
+
+} // binary
 
 
 ///////////
@@ -195,20 +215,20 @@ void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) co
     li0 =free0_.getLi(),
     li1 =free1_.getLi();
 
-  size_t n=free0_.nJumps();
+  size_t n=free0_.nAvr<LA_Li>();
   if (li0 && i<n) {
     for_each(fullRange<V0>(psi),bind(&Li1::actWithJ,li0,t,_1,i));
     return;
   }
 
   i-=n;  
-  if (li1 && i<(n=free1_.nJumps())) {
+  if (li1 && i<(n=free1_.nAvr<LA_Li>())) {
     for_each(fullRange<V1>(psi),bind(&Li1::actWithJ,li1,t,_1,i));
     return;
   }
 
   i-=n;
-  if (i<ia_.nJumps())
+  if (i<ia_.nAvr<LA_Li>())
     ia_.actWithJ(t,psi,i);
 
 }
@@ -284,50 +304,4 @@ template class BinarySystem<false,true ,true >;
 template class BinarySystem<false,true ,false>;
 template class BinarySystem<false,false,true >;
 template class BinarySystem<false,false,false>;
-
-
-#else // BINARY_SYSTEM_AVERAGED_LIOUVILLEAN_ITERATING
-
-
-void binary::Class::displayKey_v(std::ostream& os, size_t& i) const
-{
-  os<<"# Binary system\n";
-  free0_.keyName(os,i);
-  free1_.keyName(os,i);
-  ia_   .keyName(os,i);
-}
-
-
-size_t binary::Class::BOOST_PP_CAT(numberName,_v)() const
-{
-  return free0_.numberName() + free1_.numberName() + ia_.numberName();
-}
-
-
-const binary::Class::ArrayName binary::Class::BOOST_PP_CAT(func,_v)(double t, const LazyDensityOperator& ldo) const
-{
-  using quantumdata::partialTrace;
-  using boost::copy;
-
-  const ArrayName
-    a0 (partialTrace<V0,ArrayName>(ldo,bind(&SubSystemFree::func,free0_,t,_1))),
-    a1 (partialTrace<V1,ArrayName>(ldo,bind(&SubSystemFree::func,free1_,t,_1))),
-    a01(ia_.func(t,ldo));
-
-  ArrayName a(numberName());
-
-  copy(a01,copy(a1,copy(a0,a.begin())));
-
-  return a;
-}
-
-#undef Class
-#undef keyName
-#undef numberName
-#undef ArrayName
-#undef func
-
-#undef BINARY_SYSTEM_AVERAGED_LIOUVILLEAN_ITERATING
-
-#endif // BINARY_SYSTEM_AVERAGED_LIOUVILLEAN_ITERATING
 

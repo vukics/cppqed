@@ -31,6 +31,15 @@ typedef composite::SubSystemFree            SSF;
 typedef composite::SubSystemsInteraction<2> SSI;
 
 
+template<structure::LiouvilleanAveragedTag>
+void displayKey(std::ostream& , size_t&, const SSF& free0, const SSF& free1, const SSI& ia);
+
+template<structure::LiouvilleanAveragedTag>
+size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia);
+
+template<structure::LiouvilleanAveragedTag>
+const structure::LiouvilleanAveragedCommon::DArray1D average(double t, const quantumdata::LazyDensityOperator<2>& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr);
+
 
 class Base
   : public structure::QuantumSystem<2>,
@@ -50,11 +59,11 @@ private:
   double  highestFrequency_v(             ) const;
   void   displayParameters_v(std::ostream&) const;
 
-  size_t            nAvr_v()                                    const;
-  const Averages average_v(double, const LazyDensityOperator&)  const;
-  void           process_v(Averages&)                           const;
-  void           display_v(const Averages&, std::ostream&, int) const;
-  void        displayKey_v(std::ostream&, size_t&)              const;
+  size_t            nAvr_v()                                          const {return binary::nAvr      <structure::LA_Av>(      free0_,free1_,ia_       );}
+  const Averages average_v(double t, const LazyDensityOperator& ldo)  const {return binary::average   <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}
+  void           process_v(Averages&)                                 const;
+  void           display_v(const Averages&, std::ostream&, int)       const;
+  void        displayKey_v(std::ostream& os, size_t& i)               const {       binary::displayKey<structure::LA_Av>(os,i, free0_,free1_,ia_       );}
 
   const SSF free0_, free1_;
 
@@ -101,11 +110,11 @@ CLASS_HEADER(Liouvillean)
 {
   CLASS_BODY_PART(Liouvillean,Li)
 
-  size_t                     nJumps_v()                                   const;
-  const Probabilities probabilities_v(double, const LazyDensityOperator&) const;
   void                     actWithJ_v(double, StateVectorLow&, size_t)    const;
 
-  void displayKey_v(std::ostream&, size_t&) const;
+  void             displayKey_v(std::ostream& os, size_t& i             ) const {       binary::displayKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
+  size_t                 nAvr_v(                                        ) const {return binary::nAvr      <structure::LA_Li>(      free0_,free1_,ia_);}
+  const Probabilities average_v(double t, const LazyDensityOperator& ldo) const {return binary::average   <structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
 
 };
 

@@ -75,22 +75,16 @@ const typename Averaged<RANK,true>::Ptr
 qsa(DynamicsBase::Ptr base)
 {return dynamic_pointer_cast<const Averaged<RANK,true> >(base);}
 
+
 // Some functions that are used in contexts other than QuantumSystemWrapper are factored out:
 
 template<int RANK>
 void display(boost::shared_ptr<const Averaged<RANK> >, double, const quantumdata::LazyDensityOperator<RANK>&, std::ostream&, int);
 
 
-template<int RANK>
-const typename Liouvillean<RANK>::Probabilities probabilities(boost::shared_ptr<const Liouvillean<RANK> >,
-							      double,
-							      const quantumdata::LazyDensityOperator<RANK>&);
-
 
 template<int RANK>
-const typename Averaged<RANK>::Averages average(boost::shared_ptr<const Averaged<RANK> >,
-						double,
-						const quantumdata::LazyDensityOperator<RANK>&);
+const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr, double, const quantumdata::LazyDensityOperator<RANK>&);
 
 
 
@@ -147,37 +141,53 @@ public:
   LiouvilleanPtr getLi() {return li_;} 
   AveragedPtr getAv() {return av_;}  
 
-  // highestFrequency & displayParameters from QuantumSystem ?
 
+  std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"# System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
+
+  
+  // Exact
+  
   bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
 
   void actWithU(double t, StateVectorLow& psi) const {if (ex_) ex_->actWithU(t,psi);}
 
 
+  // Hamiltonian
+  
   void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const {if (ha_) ha_->addContribution(t,psi,dpsidt,tIntPic0);}
 
 
-  size_t nJumps() const {return li_ ? li_->nJumps() : 0;}
-
+  // Liouvillean
+  
   void actWithJ(double t, StateVectorLow& psi, size_t jumpNo) const {if (li_) li_->actWithJ(t,psi,jumpNo);}
 
-  const Probabilities probabilities(double t, const LazyDensityOperator& matrix) const {return structure::probabilities(li_,t,matrix);}
-
-  void displayLiouvilleanKey(std::ostream& o, size_t& i) const {if (li_) li_->displayKey(o,i);}
-
-
-  size_t nAvr() const {return av_ ? av_->nAvr() : 0;}
-
+  
+  // Averaged
+  
   void process(Averages& averages) const {if (av_) av_->process(averages);}
 
   void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const {structure::display(av_,t,matrix,os,precision);}
 
-  const Averages average(double t, const LazyDensityOperator& matrix) const {return structure::average(av_,t,matrix);}
 
-  void displayAveragedKey(std::ostream& o, size_t& i) const {if (av_) av_->displayKey(o,i);}
+  // LiouvilleanAveragedCommon
+
+private:
+  typedef typename LiouvilleanAveragedCommonRanked<RANK>::Ptr L_or_A_Ptr;
+
+  // overload instead of template specialization, which is only possible in namespace scope
+  const L_or_A_Ptr dispatch(LA_Li_tagType) const {return li_;}
+  const L_or_A_Ptr dispatch(LA_Av_tagType) const {return av_;}
   
-  std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"# System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
+public:  
+  template<LiouvilleanAveragedTag LA>
+  size_t nAvr() const {const L_or_A_Ptr ptr=dispatch(LiouvilleanAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
 
+  template<LiouvilleanAveragedTag LA>
+  void displayKey(std::ostream& os, size_t& i) const {if (const L_or_A_Ptr ptr=dispatch(LiouvilleanAveragedTag_<LA>())) ptr->displayKey(os,i);}
+
+  template<LiouvilleanAveragedTag LA>
+  const Averages average(double t, const LazyDensityOperator& matrix) const {return structure::average(dispatch(LiouvilleanAveragedTag_<LA>()),t,matrix);}
+  
 protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}
 
@@ -208,22 +218,10 @@ void display(boost::shared_ptr<const Averaged<RANK> > av,
 
 
 template<int RANK>
-const typename Liouvillean<RANK>::Probabilities probabilities(boost::shared_ptr<const Liouvillean<RANK> > li,
-							      double t,
-							      const quantumdata::LazyDensityOperator<RANK>& matrix)
+const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
 {
-  return li ? li->probabilities(t,matrix) : typename Liouvillean<RANK>::Probabilities();
+  return ptr ? ptr->average(t,matrix) : LiouvilleanAveragedCommon::DArray1D();
 }
-
-
-template<int RANK>
-const typename Averaged<RANK>::Averages average(boost::shared_ptr<const Averaged<RANK> > av,
-						double t,
-						const quantumdata::LazyDensityOperator<RANK>& matrix)
-{
-  return av ? av->average(t,matrix) : typename Averaged<RANK>::Averages();
-}
-
 
 
 } // structure

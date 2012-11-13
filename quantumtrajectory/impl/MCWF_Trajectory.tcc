@@ -129,7 +129,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
   } catch (NoPresetDtTry) {
     if (p.logLevel>1) getOstream()<<"# Adjusting initial dtTry\n";
-    manageTimeStep(qs_.probabilities(0.,psi_),getEvolved().get(),false);
+    manageTimeStep(qs_.template average<structure::LA_Li>(0.,psi_),getEvolved().get(),false);
     // Initially, dpLimit should not be overshot, either.
   }
 }
@@ -344,13 +344,13 @@ void MCWF_Trajectory<RANK>::step_v(double Dt) const
 
   if (const typename Liouvillean::Ptr li=qs_.getLi()) {
 
-    DpOverDtSet dpOverDtSet(li->probabilities(t,psi_));
+    DpOverDtSet dpOverDtSet(li->average(t,psi_));
     IndexSVL_tuples dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
 
     while (manageTimeStep(dpOverDtSet,&evolvedCache)) {
       psi_()=psiCache;
       t=coherentTimeDevelopment(Dt); // the next try
-      dpOverDtSet=li->probabilities(t,psi_);
+      dpOverDtSet=li->average(t,psi_);
       dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
     }
 
@@ -388,7 +388,7 @@ void MCWF_Trajectory<RANK>::displayParameters_v() const
     }
     os<<"# Alternative jumps: ";
     {
-      const DpOverDtSet dpOverDtSet(li->probabilities(0,psi_));
+      const DpOverDtSet dpOverDtSet(li->average(0,psi_));
       int n=0;
       for (int i=0; i<dpOverDtSet.size(); i++) if (dpOverDtSet(i)<0) {os<<i<<' '; n++;}
       if (!n) os<<"none";
@@ -403,7 +403,7 @@ template<int RANK>
 size_t MCWF_Trajectory<RANK>::displayMoreKey() const
 {
   size_t i=3;
-  qs_.displayAveragedKey(getOstream(),i);
+  qs_.template displayKey<structure::LA_Av>(getOstream(),i);
   return i;
 }
 
