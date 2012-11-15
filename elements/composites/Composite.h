@@ -93,14 +93,28 @@ public:
   typedef typename RBase::   Frees    Frees;
   typedef typename RBase::Ordinals Ordinals;
   
-private:
-  // Base class names
-  using RBase::getDimensions; using RBase::getTotalDimension; using RBase::getFrees;
+  template<structure::LiouvilleanAveragedTag>
+  static void displayKeyLA(std::ostream& , size_t&, const Frees&, const VA& acts);
+
+  template<structure::LiouvilleanAveragedTag>
+  class DisplayKey;
   
+  template<structure::LiouvilleanAveragedTag>
+  static size_t nAvrLA(const Frees& frees, const VA& acts);
+
+  template<structure::LiouvilleanAveragedTag>
+  class NAvr;
+ 
+  template<structure::LiouvilleanAveragedTag>
+  static const Averages averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr);
+
+  template<structure::LiouvilleanAveragedTag>
+  class Average;
+
 protected:
   // Constructor
-  explicit Base(const Frees& frees, const VA& acts) 
-    : RBase(frees), frees_(getFrees()), acts_(acts) {}
+  explicit Base(const Frees& frees, const VA& acts)
+    : RBase(frees), frees_(RBase::getFrees()), acts_(acts) {}
     
   const VA& getActs() const {return acts_;}
 
@@ -112,12 +126,12 @@ private:
 
   // Implementing Av_Base
 
-  void   displayKey_v(std::ostream&, size_t&) const;
-  size_t       nAvr_v()                       const; class NAvr;
-
-  const Averages average_v(double, const LazyDensityOperator&)  const; class Average;
-  void           process_v(Averages&)                           const; class Process;
-  void           display_v(const Averages&, std::ostream&, int) const; class Display;
+  void        displayKey_v(std::ostream& os, size_t& i)              const {       displayKeyLA<structure::LA_Av>(os,i, frees_,acts_         );}
+  size_t            nAvr_v()                                         const {return       nAvrLA<structure::LA_Av>(      frees_,acts_         );}
+  const Averages average_v(double t, const LazyDensityOperator& ldo) const {return    averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
+  
+  void process_v(Averages&)                           const; class Process;
+  void display_v(const Averages&, std::ostream&, int) const; class Display;
 
   const Frees& frees_;
   const VA      acts_;
@@ -208,11 +222,11 @@ protected:
   Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  size_t                     nJumps_v()                                   const; class NJumps;
-  const Probabilities probabilities_v(double, const LazyDensityOperator&) const; class Probas;
-  void                     actWithJ_v(double, StateVectorLow&, size_t)    const; class ActWithJ;
+  void             displayKey_v(std::ostream& os, size_t& i)              const {       Base<VA>::template displayKeyLA<structure::LA_Li>(os,i, frees_,acts_         );}
+  size_t                 nAvr_v()                                         const {return Base<VA>::template       nAvrLA<structure::LA_Li>(      frees_,acts_         );}
+  const Probabilities average_v(double t, const LazyDensityOperator& ldo) const {return Base<VA>::template    averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
-  void displayKey_v(std::ostream&, size_t&) const; // {}
+  void actWithJ_v(double, StateVectorLow&, size_t) const; class ActWithJ;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -260,8 +274,7 @@ public:
   BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (mpl::void_) );
 
 private:
-  using Base::getFrees;
-  using Base::getActs ;
+  using Base::getFrees; using Base::getActs ;
   
 public:
   // Constructor

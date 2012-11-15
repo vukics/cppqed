@@ -136,11 +136,19 @@ public:
   const AveragedPtr      getAv() const {return av_;}  
 
   QuantumSystemPtr getQS() {return qs_;}
-  ExactPtr getEx() {return ex_;} 
-  HamiltonianPtr getHa() {return ha_;}
-  LiouvilleanPtr getLi() {return li_;} 
-  AveragedPtr getAv() {return av_;}  
+  ExactPtr         getEx() {return ex_;} 
+  HamiltonianPtr   getHa() {return ha_;}
+  LiouvilleanPtr   getLi() {return li_;} 
+  AveragedPtr      getAv() {return av_;}  
 
+private:
+  typedef typename LiouvilleanAveragedCommonRanked<RANK>::Ptr L_or_A_Ptr;
+
+public:  
+  // overload instead of template specialization, which is only possible in namespace scope
+  const L_or_A_Ptr getLA(LA_Li_tagType) const {return li_;}
+  const L_or_A_Ptr getLA(LA_Av_tagType) const {return av_;}
+  
 
   std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"# System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
 
@@ -171,22 +179,14 @@ public:
 
   // LiouvilleanAveragedCommon
 
-private:
-  typedef typename LiouvilleanAveragedCommonRanked<RANK>::Ptr L_or_A_Ptr;
-
-  // overload instead of template specialization, which is only possible in namespace scope
-  const L_or_A_Ptr dispatch(LA_Li_tagType) const {return li_;}
-  const L_or_A_Ptr dispatch(LA_Av_tagType) const {return av_;}
-  
-public:  
   template<LiouvilleanAveragedTag LA>
-  size_t nAvr() const {const L_or_A_Ptr ptr=dispatch(LiouvilleanAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
+  size_t nAvr() const {const L_or_A_Ptr ptr=getLA(LiouvilleanAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
 
   template<LiouvilleanAveragedTag LA>
-  void displayKey(std::ostream& os, size_t& i) const {if (const L_or_A_Ptr ptr=dispatch(LiouvilleanAveragedTag_<LA>())) ptr->displayKey(os,i);}
+  void displayKey(std::ostream& os, size_t& i) const {if (const L_or_A_Ptr ptr=getLA(LiouvilleanAveragedTag_<LA>())) ptr->displayKey(os,i);}
 
   template<LiouvilleanAveragedTag LA>
-  const Averages average(double t, const LazyDensityOperator& matrix) const {return structure::average(dispatch(LiouvilleanAveragedTag_<LA>()),t,matrix);}
+  const Averages average(double t, const LazyDensityOperator& matrix) const {return structure::average(getLA(LiouvilleanAveragedTag_<LA>()),t,matrix);}
   
 protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}
