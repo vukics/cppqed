@@ -13,11 +13,13 @@
 
 class ModeCorrelations : public structure::ElementAveraged<2>
 {
+public:
+
+  ModeCorrelations();
+
 protected:
   typedef structure::ElementAveraged<2> EA_Base  ;
   typedef structure::       Averaged<1> Averaged1;
-
-  ModeCorrelations();
 
 private:
   const Averages average_v(const LazyDensityOperator&) const;
