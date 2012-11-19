@@ -11,7 +11,7 @@
 
 #include "PumpedTwoLevelAtomFwd.h"
 
-#include "Qbit_Fwd.h"
+#include "Qbit_.h"
 
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"
@@ -23,11 +23,9 @@
 
 
 
-class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillean<1>, public structure::ElementAveraged<1> 
+class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillean<1>, public qbit::Averaged
 {
 public:
-  typedef structure::ElementAveraged<1> Averaged;
-
   typedef structure::ElementLiouvillean<1> Base;
   typedef Base::StateVectorLow StateVectorLow;
   typedef Base::LazyDensityOperator LazyDensityOperator;
@@ -41,9 +39,6 @@ private:
   double probability(const LazyDensityOperator&) const;
 
   void doActWithJ(StateVectorLow&) const;
-
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&) const;
 
   const dcomp za_, eta_;
 

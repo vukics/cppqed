@@ -32,10 +32,7 @@ Averaged::Averaged()
 const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
 {
   Averages averages(4);
-  averages(0)=matrix(0);
-  averages(1)=matrix(1);
-  averages(2)=real(matrix(1,0));
-  averages(3)=imag(matrix(1,0));
+  averages=matrix(0),matrix(1),real(matrix(1,0)),imag(matrix(1,0));
   return averages;
 }
 
