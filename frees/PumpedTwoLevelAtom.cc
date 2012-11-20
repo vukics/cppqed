@@ -4,18 +4,12 @@
 
 #include "LazyDensityOperator.h"
 
-#include <boost/assign/list_of.hpp>
-
-
 using namespace linalg;
 using namespace std;
 
-using namespace boost;
-using namespace assign;
-
 
 PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
-  : Free(2,RealFreqs(),tuple_list_of("(gamma,deltaA)",-conj(dcomp(-pp2la.gamma,pp2la.delta)),1.)("eta",pp2la.eta,1.)), 
+  : Free(2,RealFreqs(),FREQS("(gamma,deltaA)",-conj(dcomp(-pp2la.gamma,pp2la.delta)),1.)("eta",pp2la.eta,1.)), 
     Base("Pumped Two-Level Atom","atomic decay"),
     za_(-pp2la.gamma,pp2la.delta), eta_(pp2la.eta)
 {

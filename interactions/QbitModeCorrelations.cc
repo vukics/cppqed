@@ -4,14 +4,11 @@
 
 #include <boost/assign/list_of.hpp>
 
-using namespace boost;
-using namespace assign;
-
 
 QbitModeCorrelations::QbitModeCorrelations()
   : EA_Base(
 	    "QbitModeCorrelations",
-	    list_of("real(<sigma*adaggerr>")("imag(\")")
+	    boost::assign::list_of("real(<sigma*adaggerr>")("imag(\")")
 	    )
 {
 }
