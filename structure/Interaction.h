@@ -27,11 +27,12 @@ public:
 
   typedef blitz::TinyVector<Free::Ptr,RANK> Frees;
 
-  explicit Interaction(const Frees& frees, 
+  explicit Interaction(const Frees& frees,
 		       const    RealFreqs&    realFreqs=   RealFreqs(), 
 		       const ComplexFreqs& complexFreqs=ComplexFreqs())
     : DynamicsBase(realFreqs,complexFreqs), frees_(frees) {}
 
+    
   const Frees& getFrees() const {return frees_;}
 
 private:

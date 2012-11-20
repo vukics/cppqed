@@ -4,9 +4,6 @@
 
 #include "Mode_.h"
 
-#include <boost/assign/list_of.hpp>
-#include <boost/assign/std/list.hpp>
-
 #include <boost/make_shared.hpp>
 
 
@@ -114,7 +111,7 @@ void AveragedMonitorCutoff<Base>::process_v(Averages& averages) const
 template<typename A>
 Mode<A>::Mode(const mode::Pars& p, const A& a) 
   : mode::Exact(dcomp(0,-p.delta),p.cutoff),
-    BASE_initR(boost::assign::tuple_list_of(TUPLE_delta(1))),
+    BASE_initR(FREQS(TUPLE_delta(1))),
     A(a)
 {}
 
@@ -122,7 +119,7 @@ Mode<A>::Mode(const mode::Pars& p, const A& a)
 template<typename A>
 ModeSch<A>::ModeSch(const mode::Pars& p, const A& a) 
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),0,p.cutoff),
-    BASE_initR(boost::assign::tuple_list_of(TUPLE_delta(0))),
+    BASE_initR(FREQS(TUPLE_delta(0))),
     A(a)
 {
   getParsStream()<<"# Schroedinger picture.\n";
@@ -132,7 +129,7 @@ ModeSch<A>::ModeSch(const mode::Pars& p, const A& a)
 template<typename A>
 PumpedMode<A>::PumpedMode(const mode::ParsPumped& p, const A& a)
   : mode::Hamiltonian<true>(0,dcomp(0,-p.delta),p.eta,p.cutoff),
-    BASE_init(boost::assign::tuple_list_of(TUPLE_delta(1)),boost::assign::tuple_list_of(TUPLE_eta)),
+    BASE_init(FREQS(TUPLE_delta(1)),FREQS(TUPLE_eta)),
     A(a)
 {
   getParsStream()<<"# Pumped.\n";
@@ -142,7 +139,7 @@ PumpedMode<A>::PumpedMode(const mode::ParsPumped& p, const A& a)
 template<typename A>
 PumpedModeSch<A>::PumpedModeSch(const mode::ParsPumped& p, const A& a)
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),p.eta,p.cutoff),
-    BASE_init(boost::assign::tuple_list_of(TUPLE_delta(0)),boost::assign::tuple_list_of(TUPLE_eta)),
+    BASE_init(FREQS(TUPLE_delta(0)),FREQS(TUPLE_eta)),
     A(a)
 {
   getParsStream()<<"# Pumped, Schroedinger picture.\n";
@@ -153,7 +150,7 @@ template<bool IS_FINITE_TEMP, typename A>
 LossyMode<IS_FINITE_TEMP,A>::LossyMode(const mode::ParsLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.cutoff),
-    BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))),
+    BASE_initC(FREQS(TUPLE_kappadelta(1))),
     A(a)
 {
   getParsStream()<<"# Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -164,7 +161,7 @@ template<bool IS_FINITE_TEMP, typename A>
 LossyModeUIP<IS_FINITE_TEMP,A>::LossyModeUIP(const mode::ParsLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),0,p.cutoff),
-    BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1))),
+    BASE_initR(FREQS(TUPLE_kappa)(TUPLE_delta(1))),
     A(a)
 {
   getParsStream()<<"# Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -175,7 +172,7 @@ template<bool IS_FINITE_TEMP, typename A>
 LossyModeSch<IS_FINITE_TEMP,A>::LossyModeSch(const mode::ParsLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),0,p.cutoff),
-    BASE_initR(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(0))),
+    BASE_initR(FREQS(TUPLE_kappa)(TUPLE_delta(0))),
     A(a)
 {
   getParsStream()<<"# Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -186,7 +183,7 @@ template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyMode<IS_FINITE_TEMP,A>::PumpedLossyMode(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
-    BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))(TUPLE_eta)),
+    BASE_initC(FREQS(TUPLE_kappadelta(1))(TUPLE_eta)),
     A(a)
 {
   getParsStream()<<"# PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -197,7 +194,7 @@ template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyModeUIP<IS_FINITE_TEMP,A>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
-    BASE_init(boost::assign::tuple_list_of(TUPLE_kappa)(TUPLE_delta(1)),boost::assign::tuple_list_of(TUPLE_eta)),
+    BASE_init(FREQS(TUPLE_kappa)(TUPLE_delta(1)),FREQS(TUPLE_eta)),
     A(a)
 {
   getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -208,7 +205,7 @@ template<bool IS_FINITE_TEMP, typename A>
 PumpedLossyModeSch<IS_FINITE_TEMP,A>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
-    BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(0))(TUPLE_eta)),
+    BASE_initC(FREQS(TUPLE_kappadelta(0))(TUPLE_eta)),
     A(a)
 {
   getParsStream()<<"# PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -222,7 +219,7 @@ template<typename A>
 PumpedLossyModeAlternative<A>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, const A& a)
   : mode::Liouvillean<false,true>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(p.kappa,-p.delta),p.eta,p.cutoff),
-    BASE_initC(boost::assign::tuple_list_of(TUPLE_kappadelta(1))(TUPLE_eta)),
+    BASE_initC(FREQS(TUPLE_kappadelta(1))(TUPLE_eta)),
     A(a)
 {
   getParsStream()<<"# PumpedLossy---Alternative jumping.\n";

@@ -11,9 +11,6 @@
 #include "Hermite.h"
 #include "impl/VectorFromMatrixSliceIterator.tcc"
 
-#include <boost/assign/list_of.hpp>
-#include <boost/assign/list_inserter.hpp>
-
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
 
@@ -119,11 +116,10 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::
 
 Averaged::Averaged(const Spatial& space)
   : Base("Particle",
-	 list_of
-	 ("<P>")
-	 ("VAR(P)")
-	 ("<X>")
-	 ("DEV(X)")
+	 list_of("<P>")
+		("VAR(P)")
+		("<X>")
+		("DEV(X)")
 	 ),
     space_(space)
 {
@@ -220,7 +216,7 @@ PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunc
 
 Particle::Particle(const Pars& p)
   : ParticleBase(p.fin,
-		 tuple_list_of("omrec",p.omrec,1<<p.fin)
+		 FREQS("omrec",p.omrec,1<<p.fin)
 		 ),
     Exact(getSpace(),p.omrec)
 {
@@ -229,7 +225,7 @@ Particle::Particle(const Pars& p)
 
 ParticleSch::ParticleSch(const Pars& p)
   : ParticleBase(p.fin,
-		 tuple_list_of("omrec",p.omrec,sqr(1<<p.fin))
+		 FREQS("omrec",p.omrec,sqr(1<<p.fin))
 		 ),
     Hamiltonian<false>(getSpace(),p.omrec)
 {
@@ -240,7 +236,7 @@ ParticleSch::ParticleSch(const Pars& p)
 
 PumpedParticle::PumpedParticle(const ParsPumped& p)
   : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),
-		       tuple_list_of("omrec",p.omrec,1<<p.fin)
+		       FREQS("omrec",p.omrec,1<<p.fin)
 		       ),
     Hamiltonian<true>(getSpace(),p.omrec,p.vClass,getMF())
 {
@@ -249,7 +245,7 @@ PumpedParticle::PumpedParticle(const ParsPumped& p)
 
 PumpedParticleSch::PumpedParticleSch(const ParsPumped& p)
   : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),
-		       tuple_list_of("omrec" ,p.omrec,sqr(1<<p.fin))
+		       FREQS("omrec" ,p.omrec,sqr(1<<p.fin))
 		       ),
     Hamiltonian<false>(getSpace(),p.omrec,p.vClass,getMF())
 {
