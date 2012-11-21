@@ -6,10 +6,7 @@
 #include "impl/StateVector.tcc"
 #include "impl/TridiagonalHamiltonian.tcc"
 
-#include "BlitzArrayTraits.h"
-#include "impl/FFT.tcc"
 #include "Hermite.h"
-#include "impl/VectorFromMatrixSliceIterator.tcc"
 
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
@@ -128,29 +125,22 @@ Averaged::Averaged(const Spatial& space)
 
 const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
 {
-  using namespace blitzplusplus::vfmsi;
-  using boost::for_each;
-
   int dim=space_.getDimension();
 
   Averages averages(4);
   averages=0;
-  DensityOperatorLow rhotemp(dim);
-
+  
+  const LazyDensityOperator::Ptr matrixX(matrix.ffTransform(DIR_KX));
+  
   for (int i=0; i<dim; i++) {
 
     double diag=matrix(i);
-    averages(0)+=    space_.k(i) *diag; 
-    averages(1)+=sqr(space_.k(i))*diag;      
-    for (int j=0; j<dim; j++) rhotemp(i,j)=matrix(i,j);
-
+    averages(0)+=    space_.k(i) *diag;
+    averages(1)+=sqr(space_.k(i))*diag;
   }
 
-  for_each(fullRange<Left >(rhotemp),bind(&ffTransform,_1,FFTDIR_KX));
-  for_each(fullRange<Right>(rhotemp),bind(&ffTransform,_1,FFTDIR_XK));
-
   for (int i=0; i<dim; i++) {
-    double diag=real(rhotemp(i,i));
+    double diag=real(matrixX->operator()(i,i));
     averages(2)+=    space_.x(i) *diag; 
     averages(3)+=sqr(space_.x(i))*diag;      
   }
@@ -266,36 +256,6 @@ namespace particle {
 
 namespace {
 
-inline void aux(StateVectorLow& psi, int i1, int i2, double norm)
-{
-  dcomp temp(psi(i1));
-  psi(i1)=norm*psi(i2);
-  psi(i2)=norm*temp;
-
-}
-
-} 
-
-
-void ffTransform(StateVectorLow& psi, Direction dir)
-{
-  int size=psi.size();
-
-  if (size<2) return;
-
-  transform(psi,dir);
-
-  int halfnumber=psi.size()>>1;
-
-  // NEEDS_WORK express the following with blitz
-  for (int j=0; j<halfnumber; j++ ) aux(psi,j,j+halfnumber,pow(size,-.5));
-  for (int j=1; j<size      ; j+=2) psi(j)*=-1;
-
-}
-
-
-namespace {
-
 const Spatial::Array fill(size_t fin, double d, double m)
 {
   Spatial::Array res(1<<fin);
@@ -382,8 +342,8 @@ const StateVector wavePacket(const InitialCondition& init, const Spatial& space,
 
   StateVectorLow psiLow(exp(-blitz::sqr(array-offset1)/(4*sqr(init.getSig()))+DCOMP_I*array*offset2));
 
-  if      ( kFlag && !init.isInK()) ffTransform(psiLow,FFTDIR_XK);
-  else if (!kFlag &&  init.isInK()) ffTransform(psiLow,FFTDIR_KX);
+  if      ( kFlag && !init.isInK()) quantumdata::ffTransform(psiLow,DIR_XK);
+  else if (!kFlag &&  init.isInK()) quantumdata::ffTransform(psiLow,DIR_KX);
 
   StateVector res(psiLow,quantumdata::byReference); res.renorm();
 
@@ -426,7 +386,7 @@ const StateVector hoState(size_t n, const InitialCondition& init, const Spatial&
     psiLow(j)=exp(-sqr(temp)/2.)*Hermite(n,temp);
   }
 
-  if (kFlag) ffTransform(psiLow,FFTDIR_XK);
+  if (kFlag) quantumdata::ffTransform(psiLow,DIR_XK);
   
   StateVector res(psiLow,quantumdata::byReference); res.renorm();
 
