@@ -1,4 +1,4 @@
-#include "ArrayBase.h"
+#include "LazyDensityOperatorFFT.h"
 
 #include "BlitzArrayTraits.h"
 #include "impl/FFT.tcc"
@@ -41,13 +41,14 @@ void ffTransformCV(CVector& psi, Direction dir)
 }
 
 
-void quantumdata::ffTransform(CVector& psi, Direction dir)
+void quantumdata::ffTransform(linalg::CVector& psi, fft::Direction dir)
 {
   ffTransformCV(psi,dir);
 }
 
 
-void quantumdata::ffTransform(CMatrix& rho, Direction dir)
+
+void quantumdata::ffTransform(linalg::CMatrix& rho, fft::Direction dir)
 {
   using namespace blitzplusplus::vfmsi; using boost::for_each;
 
@@ -55,6 +56,5 @@ void quantumdata::ffTransform(CMatrix& rho, Direction dir)
   for_each(fullRange<Right>(rho),bind(&ffTransformCV,_1,reverse(dir)));
 
 }
-
 
 

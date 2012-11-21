@@ -96,8 +96,6 @@ public:
 private:
   // virtual from LDO_Base
   const dcomp index(const Idx&, const Idx&) const;
-  
-  const typename LDO_Base::Ptr ffTransform_v(fft::Direction) const;
 
 };
 

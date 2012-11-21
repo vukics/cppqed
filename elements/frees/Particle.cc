@@ -3,14 +3,12 @@
 #include "ParsParticle.h"
 #include "ParticleInitialCondition.h"
 
-#include "impl/StateVector.tcc"
+#include "impl/LazyDensityOperatorFFT.tcc"
 #include "impl/TridiagonalHamiltonian.tcc"
 
 #include "Hermite.h"
 
 #include <boost/bind.hpp>
-#include <boost/make_shared.hpp>
-
 
 using namespace std;
 using namespace boost::assign;
@@ -130,7 +128,7 @@ const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) 
   Averages averages(4);
   averages=0;
   
-  const LazyDensityOperator::Ptr matrixX(matrix.ffTransform(DIR_KX));
+  const LazyDensityOperator::Ptr matrixX(ffTransform(matrix,DIR_KX));
   
   for (int i=0; i<dim; i++) {
 

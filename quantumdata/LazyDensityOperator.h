@@ -8,9 +8,9 @@
 
 #include "ComplexExtensions.h"
 
-#include "FFTFwd.h"
+#include <boost/shared_ptr.hpp>
 
-#include<boost/mpl/if.hpp>
+#include <boost/mpl/if.hpp>
 
 
 namespace mpl=boost::mpl;
@@ -53,8 +53,6 @@ public:
   virtual ~LazyDensityOperator() {}
 
   const dcomp operator()(const Idx& i, const Idx& j) const {return index(i,j);}
-  
-  const Ptr ffTransform(fft::Direction dir) const {return ffTransform_v(dir);}
 
   double operator()(const Idx& i) const {return real((*this)(i,i));}
 
@@ -71,8 +69,6 @@ protected:
 
 private:
   virtual const dcomp index(const Idx& i, const Idx& j) const = 0;
-
-  virtual const Ptr ffTransform_v(fft::Direction) const = 0;
 
 };
 

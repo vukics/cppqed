@@ -7,9 +7,6 @@
 #include "impl/BlitzTinyExtensions.tcc"
 #include "impl/ComplexArrayExtensions.tcc"
 
-#include <boost/make_shared.hpp>
-
-
 namespace quantumdata {
 
 
@@ -80,17 +77,6 @@ braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
   linalg::CVector temp(psi1.getTotalDimension());
   temp=conj(psi1.vectorView()(i))*psi2.vectorView()(i);
   return sum(temp);
-}
-
-
-template<int RANK>
-const typename StateVector<RANK>::LDO_Base::Ptr
-StateVector<RANK>::ffTransform_v(fft::Direction dir) const
-{
-  const boost::shared_ptr<StateVector> res(boost::make_shared<StateVector>(*this));
-  linalg::CVector view(res->vectorView());
-  quantumdata::ffTransform(view,dir);
-  return res;
 }
 
 
