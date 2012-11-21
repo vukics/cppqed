@@ -8,9 +8,14 @@
 #include "CMatrix.h"
 #include "ComplexArrayExtensions.h"
 
+#include "FFTFwd.h"
+
 
 namespace quantumdata {
 
+
+void ffTransform(linalg::CVector&, fft::Direction);
+void ffTransform(linalg::CMatrix&, fft::Direction);
 
 
 template<int RANK>

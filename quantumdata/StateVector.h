@@ -28,10 +28,7 @@ const dcomp
 braket(const StateVector<RANK>&, const StateVector<RANK>&);
 
 
-// RANK is the number of quantum numbers
-
-
-template<int RANK>
+template<int RANK> // RANK is the number of quantum numbers
 class StateVector 
   : public LazyDensityOperator<RANK>, 
     private ArrayBase<RANK>,
@@ -99,6 +96,8 @@ public:
 private:
   // virtual from LDO_Base
   const dcomp index(const Idx& i, const Idx& j) const {return operator()()(i)*conj(operator()()(j));}
+  
+  const typename LDO_Base::Ptr ffTransform_v(fft::Direction) const;
 
 };
 
