@@ -1,4 +1,3 @@
-#include "ParsTrajectory.h"
 #include "ParsStochasticTrajectory.h"
 
 #include "FormDouble.h"
@@ -7,11 +6,11 @@
 namespace trajectory {
 
 
-const double ParsTrajectory::epsRelDefault=1e-6;
-const double ParsTrajectory::epsAbsDefault=1e-30;
+const double Pars::epsRelDefault=1e-6;
+const double Pars::epsAbsDefault=1e-30;
 
 
-ParsTrajectory::ParsTrajectory(parameters::ParameterTable& p, const std::string& mod)
+Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
   : T(p.addTitle("Trajectory",mod).addMod("T",mod,"Simulated time",1.)),
     epsRel(p.addMod("eps"   ,mod,"ODE stepper relative precision",epsRelDefault)),
     epsAbs(p.addMod("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
@@ -27,8 +26,8 @@ ParsTrajectory::ParsTrajectory(parameters::ParameterTable& p, const std::string&
 {}
 
 
-ParsStochasticTrajectory::ParsStochasticTrajectory(parameters::ParameterTable& p, const std::string& mod)
-  : ParsTrajectory(p,mod),
+ParsStochastic::ParsStochastic(parameters::ParameterTable& p, const std::string& mod)
+  : Pars(p,mod),
     seed(p.addTitle("StochasticTrajectory",mod).addMod("seed",mod,"Random number generator seed",1001ul)),
     noise(p.addMod("noise",mod,"Switching noise on/off",true)),
     nTraj(p.addMod("nTraj",mod,"Number of trajectories",size_t(100))) 

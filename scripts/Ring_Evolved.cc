@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsTrajectory pt(p);
+  Pars pt(p);
 
   particle::Pars pp(p);
   mode::ParsPumpedLossy pmP(p,"P");

@@ -46,7 +46,7 @@ public:
 // NEEDS_WORK factor out template-parameter independent code
 
 
-#define BASE_class trajectory::StochasticTrajectory<typename quantumdata::Types<RANK>::StateVectorLow, const quantumdata::StateVector<RANK>&>
+#define BASE_class trajectory::Stochastic<typename quantumdata::Types<RANK>::StateVectorLow, const quantumdata::StateVector<RANK>&>
 
 template<int RANK>
 class MCWF_Trajectory : public BASE_class

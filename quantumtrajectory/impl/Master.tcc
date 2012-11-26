@@ -30,12 +30,12 @@ Base<RANK>::Base(DensityOperator& rho,
 		 const DensityOperatorLow& scaleAbs
 		 )
   : trajectory::Trajectory(p),
-    AdaptiveTrajectory(rho(),
-		       bind(&Base<RANK>::derivs,this,_1,_2,_3),
-		       trajectory::initialTimeStep(qs->highestFrequency()),
-		       scaleAbs,
-		       p,
-		       evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
+    Adaptive(rho(),
+	     bind(&Base<RANK>::derivs,this,_1,_2,_3),
+	     trajectory::initialTimeStep(qs->highestFrequency()),
+	     scaleAbs,
+	     p,
+	     evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
     rho_(rho),
     tIntPic0_(0),
     qs_(qs)
@@ -131,7 +131,7 @@ void
 Base<RANK>::displayParameters_v() const
 {
   using namespace std;
-  AdaptiveTrajectory::displayParameters_v();
+  Adaptive::displayParameters_v();
 
   getOstream()<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl;
 

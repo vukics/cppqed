@@ -9,7 +9,6 @@
 #include "Structure.h"
 
 #include "FormDouble.h"
-#include "ParsTrajectory.h"
 
 #include <string>
 #include <sstream>
@@ -23,7 +22,7 @@ namespace details {
 
 template<int RANK, typename V>
 DO_Display<RANK,V>::DO_Display(AveragedPtr av,
-			       const ParsTrajectory& p,
+			       const Pars& p,
 			       bool negativity,
 			       size_t equalCount) throw(DimensionalityMismatchException)
   : av_(av),

@@ -14,10 +14,10 @@ namespace trajectory {
 
 
 template<typename A> 
-class Simulated : public AdaptiveTrajectory<A>
+class Simulated : public Adaptive<A>
 {
 public:
-  typedef AdaptiveTrajectory<A> Base;
+  typedef Adaptive<A> Base;
   typedef cpputils::ArrayTraversalTraits<A> Traits;
 
   typedef evolved::Evolved<A> Evolved;
@@ -32,7 +32,7 @@ public:
 
   Simulated(A&, typename Evolved::Derivs, double dtInit,
 	    const A& scaleAbs,
-	    const ParsTrajectory&,
+	    const Pars&,
 	    const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
 private:
