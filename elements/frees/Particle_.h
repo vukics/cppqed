@@ -15,8 +15,6 @@
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
 
-#include "FFTFwd.h"
-
 #include <boost/shared_ptr.hpp>
 
 namespace particle {
@@ -47,9 +45,6 @@ const StateVector hoState(const Pars      &,                                 boo
 const StateVector hoState(const ParsPumped&,                                 bool Kflag=true);
 
 const StateVector init(const Pars&);
-
-
-void ffTransform(StateVectorLow&, fft::Direction);
 
 Ptr make(const Pars      &, QM_Picture);
 Ptr make(const ParsPumped&, QM_Picture);

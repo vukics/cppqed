@@ -10,7 +10,7 @@
 namespace quantumtrajectory {
 
 
-struct ParsMCWF_Trajectory : public trajectory::ParsStochasticTrajectory {
+struct ParsMCWF_Trajectory : public trajectory::ParsStochastic {
   
   double &dpLimit, &overshootTolerance;
 

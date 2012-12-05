@@ -5,7 +5,7 @@
 
 namespace trajectory {
 
-struct ParsTrajectory;
+struct Pars;
 
 class StoppingCriterionReachedException;
 class OutfileOpeningException;
@@ -13,7 +13,7 @@ class OutfileOpeningException;
 class Trajectory;
 
 template<typename>
-class AdaptiveTrajectory;
+class Adaptive;
 
 } // trajectory
 

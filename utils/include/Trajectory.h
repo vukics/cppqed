@@ -1,6 +1,6 @@
 // -*- C++ -*-
 
-// AdaptiveTrajectory is more than Evolved only in that it takes into account
+// Adaptive is more than Evolved only in that it takes into account
 // the need for communicating towards the user from time to time during
 // Evolution.
 
@@ -27,10 +27,10 @@ namespace trajectory {
 inline void runDt(Trajectory&, double time, double deltaT, bool displayInfo);
 
 template<typename A>
-inline void run  (AdaptiveTrajectory<A> &, double time, int          , bool displayInfo);
+inline void run  (Adaptive<A> &, double time, int        , bool displayInfo);
 
 template<typename A>
-inline void evolve(AdaptiveTrajectory<A>&, const ParsTrajectory&);
+inline void evolve(Adaptive<A>&, const Pars&);
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
@@ -48,11 +48,11 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
 // A heuristic determination of the inital timestep from the highest frequency of a physical system.
 
 
-/////////////////
+/////////////
 //
 // Trajectory
 //
-/////////////////
+/////////////
 
 
 class Trajectory : private boost::noncopyable
@@ -77,7 +77,7 @@ public:
 protected:
   Trajectory(      std::ostream&, int);
   Trajectory(const std::string &, int);
-  Trajectory(const ParsTrajectory&   );
+  Trajectory(const Pars&             );
 
   Trajectory() : ostream_(std::cerr), precision_(0) {assert(false);} // A dummy constructor, which should never be called
 
@@ -96,14 +96,14 @@ private:
 
 };
 
-/////////////
+///////////
 //
-// AdaptiveTrajectory
+// Adaptive
 //
-/////////////
+///////////
 
 template<typename A>
-class AdaptiveTrajectory : public virtual Trajectory 
+class Adaptive : public virtual Trajectory 
 {
 public:
   // Some parameter-independent code could still be factored out, but probably very little
@@ -111,13 +111,13 @@ public:
 
   void step(double deltaT) const {step_v(deltaT);}
   
-  virtual ~AdaptiveTrajectory() {}
+  virtual ~Adaptive() {}
 
 protected:
-  AdaptiveTrajectory(A&, typename Evolved::Derivs, double, double, double, const A&,
+  Adaptive(A&, typename Evolved::Derivs, double, double, double, const A&,
 	     const evolved::Maker<A>&);
 
-  AdaptiveTrajectory(A&, typename Evolved::Derivs, double, const A&, const ParsTrajectory&,
+  Adaptive(A&, typename Evolved::Derivs, double, const A&, const Pars&,
 	     const evolved::Maker<A>&);
 
   typename Evolved::Ptr getEvolved() const {return evolved_;}
@@ -131,7 +131,7 @@ private:
 
   virtual void step_v(double deltaT) const = 0; // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved. (Only Simulated, but neither Master, nor MCWF_Trajectory)
 
-  void evolve_v(double deltaT) const {evolved::evolve<const AdaptiveTrajectory>(*this,deltaT);}
+  void evolve_v(double deltaT) const {evolved::evolve<const Adaptive>(*this,deltaT);}
 
   double getTime_v() const {return evolved_->getTime();}
 
@@ -146,13 +146,13 @@ template<typename T, typename L, typename D>
 void run(T& traj, L l, D d, void (*doRun)(T&,L,D), bool timestep, bool displayInfo);
 
 void doRun(Trajectory&, long   nDt , double deltaT);
-// Evolves the system on an AdaptiveTrajectory for nDt display intervals deltaT
+// Evolves the system on an Adaptive for nDt display intervals deltaT
 
 void doRun(Trajectory&, double time, double deltaT);
-// Evolves the system on an AdaptiveTrajectory up to time T and Displays in every deltaT
+// Evolves the system on an Adaptive up to time T and Displays in every deltaT
 
 template<typename A> 
-void doRun(AdaptiveTrajectory<A>& traj, double time, int dc);
+void doRun(Adaptive<A>& traj, double time, int dc);
 
 } // details
 

@@ -5,9 +5,19 @@
 
 namespace structure {
 
-struct StaticTag;
+#ifndef   NDEBUG
+struct AveragesNumberMismatchException;
+#endif // NDEBUG
+
+struct InfiniteDetectedException;
+
 
 class LiouvilleanAveragedCommon;
+
+
+template<int>
+class LiouvilleanAveragedCommonRanked;
+
 
 } // structure
 

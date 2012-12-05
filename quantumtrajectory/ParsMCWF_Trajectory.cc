@@ -7,7 +7,7 @@ namespace quantumtrajectory {
 
 
 ParsMCWF_Trajectory::ParsMCWF_Trajectory(parameters::ParameterTable& p, const std::string& mod)
-  : ParsStochasticTrajectory(p,mod),
+  : ParsStochastic(p,mod),
     dpLimit(p.addTitle("MCWF_Trajectory",mod).addMod("dpLimit",mod,"MCWFS stepper total jump probability limit",0.1)),
     overshootTolerance(p.addMod("overshootTolerance",mod,"Jump probability overshoot tolerance factor",10.)),
     svdc(p.addMod("svdc",mod,"Number of displays between two state-vector Displays",0u)),

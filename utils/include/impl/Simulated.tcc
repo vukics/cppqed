@@ -25,7 +25,7 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 template<typename A> 
 Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 			const A& scaleAbs,
-			const ParsTrajectory& p,
+			const Pars& p,
 			const evolved::Maker<A>& maker)
   : Trajectory(p),
     Base(y,derivs,dtInit,scaleAbs,p,maker)

@@ -1,8 +1,7 @@
 #include "EvolutionBinary.h"
 
 #include "JaynesCummings.h"
-
-#include "MatrixOfHamiltonian.h"
+#include "QbitModeCorrelations.h"
 
 
 using namespace std;
@@ -36,7 +35,7 @@ int main(int argc, char* argv[])
 
   // BinarySystem system(jc);
 
-  StateVector psi(qbit::init(pplqb)*mode::init(pplm));
+  StateVector psi(qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff));             // (qbit::init(pplqb)*mode::init(pplm));
   // entangled state: 
   // psi(qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff));
   /*()+qbit::state1()())*
@@ -44,7 +43,7 @@ int main(int argc, char* argv[])
   */
   psi.renorm();
 
-  evolve<tmptools::Vector<0> >(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);
+  evolve<tmptools::Vector<0> >(psi,binary::make(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc)),pe);
 
 
 

@@ -32,7 +32,7 @@ namespace trajectory {
 
 */
 
-struct ParsTrajectory {
+struct Pars {
 
   static const double epsRelDefault;
   static const double epsAbsDefault;
@@ -51,9 +51,9 @@ struct ParsTrajectory {
   evolved::SteppingFunction& sf;
   double &nextDtTryCorretionFactor;
 
-  ParsTrajectory(parameters::ParameterTable&, const std::string& mod="");
+  Pars(parameters::ParameterTable&, const std::string& mod="");
 
-  virtual ~ParsTrajectory() {}
+  virtual ~Pars() {}
 
 };
 

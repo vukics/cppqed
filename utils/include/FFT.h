@@ -21,6 +21,9 @@ void transform(double*, size_t, size_t, Direction) throw(FFT_Exception);
 template<typename A>
 void transform(A&, Direction) throw(FFT_Exception);
 
+
+inline const Direction reverse(Direction dir) {return dir==DIR_KX ? DIR_XK : DIR_KX;}
+
 } // fft
 
 #endif // UTILS_INCLUDE_FFT_H_INCLUDED

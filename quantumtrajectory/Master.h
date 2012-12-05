@@ -25,7 +25,7 @@ namespace quantumtrajectory {
 namespace master {
 
 
-typedef trajectory::ParsTrajectory Pars;
+typedef trajectory::Pars Pars;
 
 
 struct NonUnitaryIP  : cpputils::Exception {};
@@ -33,7 +33,7 @@ struct NoLiouvillean : cpputils::Exception {};
 
 
 template<int RANK>
-class Base : public trajectory::AdaptiveTrajectory<typename quantumdata::Types<RANK>::DensityOperatorLow>
+class Base : public trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow>
 {
 public:
   typedef structure::QuantumSystem<RANK> QuantumSystem;
@@ -45,13 +45,13 @@ public:
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
   typedef typename quantumdata::Types<RANK>::    StateVectorLow     StateVectorLow;
 
-  typedef trajectory::AdaptiveTrajectory<DensityOperatorLow> AdaptiveTrajectory;
+  typedef trajectory::Adaptive<DensityOperatorLow> Adaptive;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
   
   typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
-  using AdaptiveTrajectory::getEvolved; using AdaptiveTrajectory::getDtDid; using AdaptiveTrajectory::getTime; using AdaptiveTrajectory::getOstream;
+  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime; using Adaptive::getOstream;
 
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 

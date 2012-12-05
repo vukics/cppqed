@@ -7,7 +7,6 @@
 #include "Mode_.h"
 #include "impl/TridiagonalHamiltonian.tcc"
 
-#include <boost/assign.hpp>
 #include <boost/make_shared.hpp>
 
 
@@ -48,8 +47,8 @@ public:
     : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
       ModeBase(p.cutoff,
-	       boost::assign::tuple_list_of("deltaOther",p.deltaOther,1),
-	       boost::assign::tuple_list_of("(kappa*(2*nTh+1),delta)",conj(get_zI()),1)("eta",get_eta(),sqrt(p.cutoff))("etaOther",p.etaOther,sqrt(p.cutoff))
+	       FREQS("deltaOther",p.deltaOther,1),
+	       FREQS("(kappa*(2*nTh+1),delta)",conj(get_zI()),1)("eta",get_eta(),sqrt(p.cutoff))("etaOther",p.etaOther,sqrt(p.cutoff))
 	       ),
       A(a),
       zI_Other(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.deltaOther)

@@ -45,7 +45,7 @@ Trajectory::Trajectory(const string& ofn, int precision)
 }
 
 
-Trajectory::Trajectory(const ParsTrajectory& p)
+Trajectory::Trajectory(const Pars& p)
   : ostream_(TrajectoryBaseHelper(p.ofn,p.precision)),
     precision_(p.precision)
 {

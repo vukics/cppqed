@@ -4,11 +4,8 @@
 
 #include "impl/TridiagonalHamiltonian.tcc"
 
-#include <boost/assign/list_of.hpp>
-
 
 using namespace std;
-using namespace boost::assign;
 using namespace mathutils;
 
 using particle:: mfNKX;
@@ -48,7 +45,7 @@ const Tridiagonals fillT(mode::Ptr mode, particle::Ptr particle, double uNot, do
 
 Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff)
   : structure::Interaction<2>(Frees(mode,particle),
-			      tuple_list_of("Unot",uNot,mode->getDimension())("etaeff",etaeff,sqrt(mode->getDimension()))
+			      FREQS("Unot",uNot,mode->getDimension())("etaeff",etaeff,sqrt(mode->getDimension()))
 			      )
 {
   getParsStream()<<"# Particle-Cavity Interaction\n";
@@ -58,7 +55,7 @@ Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff)
 InterferenceBase::InterferenceBase(mode::Ptr mode, particle::Ptr particle, double u, size_t kCav, ModeFunctionType modeCav)
   : MF_Base(modeCav,kCav),
     structure::Interaction<2>(Frees(mode,particle),
-			      tuple_list_of("u",u,mode->getDimension())),
+			      FREQS("u",u,mode->getDimension())),
     TridiagonalHamiltonian(interferic(mode,particle,sqr(u),u,MF_Base::member))
 {
   getParsStream()<<"# Interference term with "<<getMF()<<endl;

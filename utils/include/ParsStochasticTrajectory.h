@@ -13,13 +13,13 @@
 namespace trajectory {
 
 
-struct ParsStochasticTrajectory : ParsTrajectory {
+struct ParsStochastic : Pars {
 
   unsigned long &seed;
   bool &noise;
   size_t &nTraj;
 
-  ParsStochasticTrajectory(parameters::ParameterTable&, const std::string& mod="");
+  ParsStochastic(parameters::ParameterTable&, const std::string& mod="");
       
 };
 

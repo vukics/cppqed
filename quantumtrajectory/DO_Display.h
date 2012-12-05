@@ -35,7 +35,7 @@ public:
 
   DO_Display(
 	     AveragedPtr,
-	     const ParsTrajectory&,
+	     const Pars&,
 	     bool negativity,
 	     size_t equalCount=10
 	     ) throw(DimensionalityMismatchException);
