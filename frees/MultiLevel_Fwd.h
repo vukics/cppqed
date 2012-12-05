@@ -24,7 +24,7 @@ to
 
 namespace multilevel {
 
-using structure::averaged::DiagonalDO;
+using structure::averaged::ReducedDensityOperator;
 
 struct ElementaryComplexFreqs;
 
@@ -37,42 +37,42 @@ template<int NL>
 class MultiLevelBase;
 
 
-template<int NL, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename Averaged=multilevel::ReducedDensityOperator>
 class MultiLevel;
 
-template<int NL, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename Averaged=multilevel::ReducedDensityOperator>
 class MultiLevelSch;
 
 
-template<int NL, typename VP, typename Averaged=multilevel::DiagonalDO> 
+template<int NL, typename VP, typename Averaged=multilevel::ReducedDensityOperator> 
 // VP is a compile-time container of pairs, specifying which
 // transitions are pumped It should model a Boost.Fusion sequence,
 // which stores the pairs for compile-time use and the pump Rabi
 // frequencies for run-time use.
 class PumpedMultiLevel;
 
-template<int NL, typename VP, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename VP, typename Averaged=multilevel::ReducedDensityOperator>
 class PumpedMultiLevelSch;
 
 
-template<int NL, typename VL, typename Averaged=multilevel::DiagonalDO> 
+template<int NL, typename VL, typename Averaged=multilevel::ReducedDensityOperator> 
 // VL is a compile-time container of pairs, specifying which transitions have radiative loss
 class LossyMultiLevel;
 
-template<int NL, typename VL, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename VL, typename Averaged=multilevel::ReducedDensityOperator>
 class LossyMultiLevelSch;
 
-template<int NL, typename VL, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename VL, typename Averaged=multilevel::ReducedDensityOperator>
 class LossyMultiLevelUIP;
 
 
-template<int NL, typename VP, typename VL, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename VP, typename VL, typename Averaged=multilevel::ReducedDensityOperator>
 class PumpedLossyMultiLevel;
 
-template<int NL, typename VP, typename VL, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename VP, typename VL, typename Averaged=multilevel::ReducedDensityOperator>
 class PumpedLossyMultiLevelSch;
 
-template<int NL, typename VP, typename VL, typename Averaged=multilevel::DiagonalDO>
+template<int NL, typename VP, typename VL, typename Averaged=multilevel::ReducedDensityOperator>
 class PumpedLossyMultiLevelUIP;
 
 
