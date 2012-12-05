@@ -24,13 +24,15 @@
 namespace trajectory {
 
 
-inline void runDt(Trajectory&, double time, double deltaT, bool displayInfo);
+void runDt (Trajectory&, double time, double deltaT, bool displayInfo);
+
+void runNDt(Trajectory&, long   nDt , double deltaT, bool displayInfo);
 
 template<typename A>
-inline void run  (Adaptive<A> &, double time, int        , bool displayInfo);
+void run  (Adaptive<A>&, double time, int dc       , bool displayInfo);
 
 template<typename A>
-inline void evolve(Adaptive<A>&, const Pars&);
+void evolve(Adaptive<A>&, const Pars&);
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
