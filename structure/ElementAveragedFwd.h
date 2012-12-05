@@ -14,7 +14,7 @@ class ClonableElementAveraged;
 
 namespace averaged {
 
-class DiagonalDO;
+class ReducedDensityOperator;
 
 template<int, bool IS_TD=false>
 class Collecting;

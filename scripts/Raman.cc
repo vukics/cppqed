@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   StateVector psi(NL); psi()(0)=1; psi()(1)=1; psi.renorm();
 
   evolve(psi,
-	 makePumpedLossyMultiLevelSch(pml,DiagonalDO("Lambda atom",NL)),
+	 makePumpedLossyMultiLevelSch(pml,ReducedDensityOperator("Lambda atom",NL)),
 	 pe);
 
   } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}

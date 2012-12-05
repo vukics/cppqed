@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsTrajectory pt(p);
+  Pars pt(p);
 
   double
     &omega=p.add("O","Driving frequency",1.),

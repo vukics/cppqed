@@ -42,13 +42,13 @@ void run(T& traj, L l, D d, void (*doRun)(T&,L,D), bool timestep, bool displayIn
 }
 
 void doRun(Trajectory&, long   nDt , double deltaT);
-// Evolves the system on an AdaptiveTrajectory for nDt display intervals deltaT
+// Evolves the system on an Adaptive for nDt display intervals deltaT
 
 void doRun(Trajectory&, double time, double deltaT);
-// Evolves the system on an AdaptiveTrajectory up to time T and Displays in every deltaT
+// Evolves the system on an Adaptive up to time T and Displays in every deltaT
 
 template<typename A> 
-void doRun(AdaptiveTrajectory<A>& traj, double time, int dc)
+void doRun(Adaptive<A>& traj, double time, int dc)
 {
   for (int count=1; traj.getTime()<time; count++) {
     traj.step(time-traj.getTime());
@@ -58,16 +58,16 @@ void doRun(AdaptiveTrajectory<A>& traj, double time, int dc)
 
 } // details
 
-inline void runDt (Trajectory& traj, double time, double deltaT, bool displayInfo) {details::run(traj,time,deltaT,details::doRun,false,displayInfo);}
+void runDt (Trajectory & traj, double time, double deltaT, bool displayInfo) {details::run(traj,time,deltaT,details::doRun,false,displayInfo);}
 
-inline void runNDt(Trajectory& traj, long   nDt , double deltaT, bool displayInfo) {details::run(traj,nDt ,deltaT,details::doRun,false,displayInfo);}
-
-template<typename A>
-inline void run   (AdaptiveTrajectory<A> & traj, double time, int    dc    , bool displayInfo) {details::run(traj,time,dc    ,details::doRun,true ,displayInfo);}
-
+void runNDt(Trajectory & traj, long   nDt , double deltaT, bool displayInfo) {details::run(traj,nDt ,deltaT,details::doRun,false,displayInfo);}
 
 template<typename A>
-void evolve(AdaptiveTrajectory<A>& traj, const ParsTrajectory& p)
+void run   (Adaptive<A>& traj, double time, int    dc    , bool displayInfo) {details::run(traj,time,dc    ,details::doRun,true ,displayInfo);}
+
+
+template<typename A>
+void evolve(Adaptive<A>& traj, const Pars& p)
 {
   if      (p.dc) run  (traj,p.T,p.dc,p.displayInfo);
   else if (p.Dt) {
@@ -80,20 +80,20 @@ void evolve(AdaptiveTrajectory<A>& traj, const ParsTrajectory& p)
 
 
 template<typename A>
-AdaptiveTrajectory<A>::AdaptiveTrajectory(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs,
+Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs,
 			  const A& scaleAbs, const evolved::Maker<A>& maker)
   : evolved_(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs))
 {}
 
 
 template<typename A>
-AdaptiveTrajectory<A>::AdaptiveTrajectory(A& y, typename Evolved::Derivs derivs, double dtInit,
-			  const A& scaleAbs, const ParsTrajectory& p, const evolved::Maker<A>& maker)
+Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit,
+			  const A& scaleAbs, const Pars& p, const evolved::Maker<A>& maker)
   : evolved_(maker(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs)) {}
 
 
 template<typename A>
-void AdaptiveTrajectory<A>::displayParameters_v() const 
+void Adaptive<A>::displayParameters_v() const 
 {
   evolved_->displayParameters(getOstream()<<std::endl)<<"# Trajectory Parameters: precision="<<getPrecision()<<" epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }

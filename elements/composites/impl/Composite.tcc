@@ -13,22 +13,24 @@
 #include "Algorithm.h"
 #include "Range.h"
 
-#include<boost/fusion/algorithm/iteration/for_each.hpp>
-#include<boost/fusion/algorithm/iteration/fold.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
+#include <boost/fusion/algorithm/iteration/fold.hpp>
 
-#include<boost/mpl/for_each.hpp>
+#include <boost/mpl/for_each.hpp>
 
-#include<boost/bind.hpp>
+#include <boost/bind.hpp>
 
-#include<boost/lambda/lambda.hpp>
+#include <boost/lambda/lambda.hpp>
 namespace bll=boost::lambda;
 
-#include<algorithm>
-#include<list>
+#include <algorithm>
+#include <list>
 
 
-// NEEDS_WORK in the helper classes worker member functions could be factored out. (Eg ActWithU --- the amount of code we save is incredible!)
-// Similarly, like in BinarySystem, there is too much boilerplate.
+#define CALL_composite_worker(object) composite::worker<Ordinals>(acts_,object);
+
+
+// Note that classes defined in function scope cannot have template members, that is why we define the helper classes in class scope (e.g. Base::DisplayParameters, Exact::ActWithU, etc.).
 
 
 // template<int>
@@ -47,22 +49,16 @@ struct CompositeConsistencyException : cpputils::Exception
 //////////////////
 
 
-template<typename VA> template<typename H>
-void Composite<VA>::worker(const H& helper) const
+namespace composite {
+
+
+template<typename Ordinals, typename VA, typename H>
+void worker(const VA& acts, const H& helper)
 {
   mpl::for_each<Ordinals>(helper);
-  boost::fusion::for_each(acts_,helper);
+  boost::fusion::for_each(acts,helper);
 
-  // IMPORTANT NOTICE!!! Both mpl::for_each and
-  // boost::fusion::for_each stores the helper BY VALUE. So, what
-  // happens is that the initial helper is COPIED to both, so the
-  // changes made during mpl::for_each in those members of the helper
-  // which are stored BY VALUE in H, will be "undone" at startup of
-  // boost::fusion::for_each. Ergo, there MUST NOT BE such
-  // members. (There can be const members stored by value though, of
-  // course.)
-  //
-  // How about static members?
+  // IMPORTANT NOTICE!!! Both mpl::for_each and boost::fusion::for_each stores the helper BY VALUE. So, what happens is that the initial helper is COPIED to both, so the changes made during mpl::for_each in those members of the helper which are stored BY VALUE in H, will be "undone" at startup of boost::fusion::for_each. Ergo, there MUST NOT BE such members. (There can be const members stored by value though, of course.) ... How about static members then?
 
 }
 
@@ -73,8 +69,6 @@ void Composite<VA>::worker(const H& helper) const
 //
 ///////////////
 
-
-namespace composite {
 
 
 bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
@@ -151,26 +145,26 @@ private:
 
 } // composite
 
-#define RETURN_type typename Composite<VA>::Frees
+#define RETURN_type typename composite::Base<VA>::Frees
 
 template<typename VA>
 const RETURN_type
-Composite<VA>::fillFrees(const VA& acts)
+composite::fillFrees(const VA& acts)
 {
-  RETURN_type res; res=composite::SubSystemFree();
-  boost::fusion::for_each(acts,composite::FillFrees<RANK>(res));
+  RETURN_type res; res=SubSystemFree();
+  boost::fusion::for_each(acts,FillFrees<blitzplusplus::TinyVectorLengthTraits<RETURN_type>::value>(res));
   return res;
 }
 
 #undef  RETURN_type
-#define RETURN_type typename Composite<VA>::Dimensions
+#define RETURN_type typename composite::RankedBase<RANK>::Dimensions
 
-template<typename VA>
+template<int RANK>
 const RETURN_type
-Composite<VA>::fillDimensions(const Frees& frees)
+composite::RankedBase<RANK>::fillDimensions(const Frees& frees)
 {
   RETURN_type res;
-  mpl::for_each<Ordinals>(composite::FillDimensions<RANK>(frees,res));
+  mpl::for_each<Ordinals>(FillDimensions<RANK>(frees,res));
   return res;
 }
 
@@ -187,7 +181,7 @@ Composite<VA>::fillDimensions(const Frees& frees)
 
 
 template<typename VA>
-class Composite<VA>::DisplayParameters
+class composite::Base<VA>::DisplayParameters
 {
 public:
   DisplayParameters(const Frees& frees, std::ostream& os) : frees_(frees), os_(os) {}
@@ -239,10 +233,10 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::displayParameters_v(std::ostream& os) const
+void composite::Base<VA>::displayParameters_v(std::ostream& os) const
 {
-  os<<"# Composite\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<std::endl;
-  worker(DisplayParameters(frees_,os));
+  os<<"# Composite\n# Dimensions: "<<RBase::getDimensions()<<". Total: "<<RBase::getTotalDimension()<<std::endl;
+  CALL_composite_worker( DisplayParameters(frees_,os) ) ;
 }
 
 //////////////
@@ -253,7 +247,7 @@ void Composite<VA>::displayParameters_v(std::ostream& os) const
 
 
 template<typename VA>
-double Composite<VA>::highestFrequency_v() const
+double composite::Base<VA>::highestFrequency_v() const
 {
   return boost::max_element(frees_,composite::compareFreesFrequency)->get()->highestFrequency();
   // NEEDS_WORK add the interactions here
@@ -268,7 +262,7 @@ double Composite<VA>::highestFrequency_v() const
 
 
 template<typename VA>
-class Composite<VA>::IsUnitary
+class composite::Exact<VA>::IsUnitary
 {
 public:
   IsUnitary(const Frees& frees, bool& isIt) : frees_(frees), isIt_(isIt) {}
@@ -297,19 +291,28 @@ private:
 
 
 template<typename VA>
-bool Composite<VA>::isUnitary_v() const
+bool composite::Exact<VA>::isUnitary_v() const
 {
   bool res=true;
-  IsUnitary helper(frees_,res);
-  mpl::for_each<Ordinals>(helper);
-  if (res) res=boost::fusion::fold(acts_,res,helper);
+  {
+    const IsUnitary helper(frees_,res);
+    mpl::for_each<Ordinals>(helper);
+    if (res) res=boost::fusion::fold(acts_,res,helper);
+  }
   return res;
 }
 
 
+#define VEC_act  Act                  ,
+#define VEC_free tmptools::Vector<IDX>,
+#define ACTS_FREES_operator(CL) \
+template<typename Act> void operator()(const Act& act          ) const {help<VEC_act  typename Act::CL            >(act        .get##CL());} \
+template<int IDX     > void operator()(mpl::integral_c<int,IDX>) const {help<VEC_free composite::SubSystemFree::CL>(frees_(IDX).get##CL());}
+
+
 
 template<typename VA>
-class Composite<VA>::ActWithU
+class composite::Exact<VA>::ActWithU
 {
 public:
   ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
@@ -317,22 +320,12 @@ public:
   template<typename Vec, typename Ex>
   void help(typename Ex::Ptr ex) const
   {
-    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Ex::actWithU,ex,dtdid_,_1));
+    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,dtdid_,::_1));
+    // namespace qualification :: is necessary because otherwise :: and mpl:: are equally good matches.
   }
 
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    help<Act,typename Act::Ex>(act.getEx());
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    help<tmptools::Vector<IDX>,composite::SubSystemFree::Ex>(frees_(IDX).getEx());
-  }
-
-
+  ACTS_FREES_operator(Ex);
+  
 private:
   const Frees& frees_;
 
@@ -343,9 +336,9 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::actWithU_v(double dtdid, StateVectorLow& psi) const
+void composite::Exact<VA>::actWithU_v(double dtdid, StateVectorLow& psi) const
 {
-  worker(ActWithU(frees_,dtdid,psi));
+  CALL_composite_worker( ActWithU(frees_,dtdid,psi) ) ;
 }
 
 
@@ -356,10 +349,10 @@ void Composite<VA>::actWithU_v(double dtdid, StateVectorLow& psi) const
 //////////////
 
 template<typename VA>
-class Composite<VA>::Hamiltonian
+class composite::Hamiltonian<VA>::AddContribution
 {
 public:
-  Hamiltonian(const Frees& frees, double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) 
+  AddContribution(const Frees& frees, double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) 
     : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
 
   template<typename Vec, typename Ha>
@@ -368,20 +361,10 @@ public:
     if (ha) 
       cpputils::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),
 			 blitzplusplus::basi::begin<Vec>(dpsidt_),
-			 bind(&Ha::addContribution,ha,t_,_1,_2,tIntPic0_)); 
+			 boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,tIntPic0_)); 
   }
 
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    help<Act,typename Act::Ha>(act.getHa());
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    help<tmptools::Vector<IDX>,composite::SubSystemFree::Ha>(frees_(IDX).getHa());
-  }
+  ACTS_FREES_operator(Ha);
 
 private:
   const Frees& frees_;
@@ -395,9 +378,145 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void composite::Hamiltonian<VA>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
-  worker(Hamiltonian(frees_,t,psi,dpsidt,tIntPic0));
+  CALL_composite_worker( AddContribution(frees_,t,psi,dpsidt,tIntPic0) ) ;
+}
+
+
+///////////////////////
+//
+// Liouvillean-Averaged
+//
+///////////////////////
+
+
+template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+class composite::Base<VA>::DisplayKey
+{
+public:
+  DisplayKey(const Frees& frees, std::ostream& os, size_t& i) 
+    : frees_(frees), os_(os), i_(i) {}
+
+  template<typename Act>
+  void operator()(const Act& act) const
+  {
+    act.template displayKey<LA>(os_,i_);
+  }
+
+  template<int IDX>
+  void operator()(mpl::integral_c<int,IDX>) const
+  {
+    frees_(IDX).template displayKey<LA>(os_,i_);
+  }
+
+private:
+  const Frees& frees_;
+
+  std::ostream& os_;
+  size_t& i_;
+
+};
+
+
+template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+void composite::Base<VA>::displayKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
+{
+  worker<Ordinals>(acts,DisplayKey<LA>(frees,os,i));
+}
+
+
+template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+class composite::Base<VA>::NAvr
+{
+public:
+  NAvr(const Frees& frees, size_t& num) : frees_(frees), num_(num) {}
+
+  typedef size_t result_type;
+  
+  template<typename Act>
+  size_t operator()(size_t s, const Act& act)
+  {
+    return s+act.template nAvr<LA>();
+  }
+
+  template<typename T>
+  void operator()(T) const
+  {
+    num_+=frees_(T::value).template nAvr<LA>();
+  }
+
+private:
+  const Frees& frees_;
+
+  size_t& num_;
+
+};
+
+
+template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+size_t composite::Base<VA>::nAvrLA(const Frees& frees, const VA& acts)
+{
+  size_t res=0;
+  const NAvr<LA> helper(frees,res);
+  mpl::for_each<Ordinals>(helper);
+  return boost::fusion::fold(acts,res,helper);
+}
+
+
+template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+class composite::Base<VA>::Average
+{
+public:
+  typedef typename std::list<Averages>::iterator Iter;
+
+  Average(const Frees& frees, double t, const LazyDensityOperator& ldo, Iter& iter) 
+    : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
+
+  template<typename Vec, int SS_RANK>
+  void help(boost::shared_ptr<const structure::LiouvilleanAveragedCommonRanked<SS_RANK> > av) const
+  {
+    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,boost::bind(structure::average<SS_RANK>,av,t_,::_1)));
+  }
+
+  template<typename Act>
+  void operator()(const Act& act) const
+  {
+    help<Act,Act::Av::N_RANK>(act.getLA(structure::LiouvilleanAveragedTag_<LA>()));
+  }
+
+  template<int IDX>
+  void operator()(mpl::integral_c<int,IDX>) const
+  {
+    help<tmptools::Vector<IDX>,1>(frees_(IDX).getLA(structure::LiouvilleanAveragedTag_<LA>()));
+  }
+
+private:
+  const Frees& frees_;
+
+  const double t_;
+  const LazyDensityOperator& ldo_;
+  
+  Iter& iter_;
+
+};
+
+
+template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+const typename composite::Base<VA>::Averages
+composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr)
+{
+  std::list<Averages> seqAverages(RANK+mpl::size<VA>::value);
+
+  {
+    typename std::list<Averages>::iterator iter(seqAverages.begin());
+
+    worker<Ordinals>(acts,Average<LA>(frees,t,ldo,iter)) ;
+  }
+
+  Averages res(numberAvr); res=0;
+  return cpputils::concatenate(seqAverages,res);
+
 }
 
 
@@ -409,107 +528,7 @@ void Composite<VA>::addContribution_v(double t, const StateVectorLow& psi, State
 
 
 template<typename VA>
-class Composite<VA>::NJumps
-{
-public:
-  NJumps(const Frees& frees, size_t& num) : frees_(frees), num_(num) {}
-
-  typedef size_t result_type;
-  
-  template<typename Act>
-  size_t operator()(size_t s, const Act& act)
-  {
-    return s+act.nJumps();
-  }
-
-  template<typename T>
-  void operator()(T) const
-  {
-    num_+=frees_(T::value).nJumps();
-  }
-
-private:
-  const Frees& frees_;
-
-  size_t& num_;
-
-};
-
-
-template<typename VA>
-size_t Composite<VA>::nJumps_v() const
-{
-  size_t res=0;
-  NJumps helper(frees_,res);
-  mpl::for_each<Ordinals>(helper);
-  res=boost::fusion::fold(acts_,res,helper);
-  return res;
-}
-
-
-
-
-template<typename VA>
-class Composite<VA>::Probas
-{
-public:
-  typedef std::list<Probabilities> SeqProbabilities;
-  typedef typename SeqProbabilities::iterator SAI;
-
-  Probas(const Frees& frees, double t, const LazyDensityOperator& ldo, SAI& iter) 
-    : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
-
-  template<typename Vec, typename Li>
-  void help(typename Li::Ptr li) const
-  {
-    iter_++->reference(quantumdata::partialTrace<Vec,Probabilities>(ldo_,bind(structure::probabilities<Li::N_RANK>,li,t_,_1)));    
-  }
-
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    help<Act,typename Act::Li>(act.getLi());
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    help<tmptools::Vector<IDX>,composite::SubSystemFree::Li>(frees_(IDX).getLi());
-  }
-
-private:
-  const Frees& frees_;
-
-  const double t_;
-  const LazyDensityOperator& ldo_;
-  
-  SAI& iter_;
-
-};
-
-
-template<typename VA>
-const typename Composite<VA>::Probabilities
-Composite<VA>::probabilities_v(double t, const LazyDensityOperator& ldo) const
-{
-  using namespace std;
-  list<Probabilities> seqProbabilities(RANK+mpl::size<VA>::value);
-
-  {
-    typename list<Probabilities>::iterator iter(seqProbabilities.begin());
-
-    worker(Probas(frees_,t,ldo,iter));
-  }
-
-  Probabilities res(nJumps_v()); res=0;
-  return cpputils::concatenate(seqProbabilities,res);
-
-}
-
-
-
-template<typename VA>
-class Composite<VA>::ActWithJ
+class composite::Liouvillean<VA>::ActWithJ
 {
 public:
   ActWithJ(const Frees& frees, double t, StateVectorLow& psi, size_t& ordoJump, bool& flag) : frees_(frees), t_(t), psi_(psi), ordoJump_(ordoJump), flag_(flag) {}
@@ -518,27 +537,17 @@ public:
   void help(typename Li::Ptr li) const
   {
     if (!flag_ && li) {
-      size_t n=li->nJumps();
+      size_t n=li->nAvr();
       if (ordoJump_<n) {
-	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),bind(&Li::actWithJ,li,t_,_1,ordoJump_));
+	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
 	flag_=true;
       }
       ordoJump_-=n;  
     }
   }
 
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    help<Act,typename Act::Li>(act.getLi());
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    help<tmptools::Vector<IDX>,composite::SubSystemFree::Li>(frees_(IDX).getLi());
-  }
-
+  ACTS_FREES_operator(Li);
+  
 private:
   const Frees& frees_;
 
@@ -551,12 +560,11 @@ private:
 
 
 template<typename VA>
-void Composite<VA>::actWithJ_v(double t, StateVectorLow& psi, size_t ordoJump) const
+void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_t ordoJump) const
 {
   bool flag=false;
-  worker(ActWithJ(frees_,t,psi,ordoJump,flag));
+  CALL_composite_worker( ActWithJ(frees_,t,psi,ordoJump,flag) ) ;
 }
-
 
 
 ///////////
@@ -565,148 +573,14 @@ void Composite<VA>::actWithJ_v(double t, StateVectorLow& psi, size_t ordoJump) c
 //
 ///////////
 
-
-template<typename VA>
-class Composite<VA>::DisplayKey
-{
-public:
-  DisplayKey(const Frees& frees, std::ostream& os, size_t& i) 
-    : frees_(frees), os_(os), i_(i) {}
-
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    act.displayAveragedKey(os_,i_);
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    frees_(IDX).displayAveragedKey(os_,i_);
-  }
-
-private:
-  const Frees& frees_;
-
-  std::ostream& os_;
-  size_t& i_;
-
-};
+#undef  VEC_act
+#undef  VEC_free
+#define VEC_act
+#define VEC_free
 
 
 template<typename VA>
-void Composite<VA>::displayKey_v(std::ostream& os, size_t& i) const
-{
-  worker(DisplayKey(frees_,os,i));
-}
-
-
-
-template<typename VA>
-class Composite<VA>::NAvr
-{
-public:
-  NAvr(const Frees& frees, size_t& num) : frees_(frees), num_(num) {}
-
-  typedef size_t result_type;
-  
-  template<typename Act>
-  size_t operator()(size_t s, const Act& act)
-  {
-    return s+act.nAvr();
-  }
-
-  template<typename T>
-  void operator()(T) const
-  {
-    num_+=frees_(T::value).nAvr();
-  }
-
-private:
-  const Frees& frees_;
-
-  size_t& num_;
-
-};
-
-
-
-template<typename VA>
-size_t Composite<VA>::nAvr_v() const
-{
-  size_t res=0;
-  NAvr helper(frees_,res);
-  mpl::for_each<Ordinals>(helper);
-  res=boost::fusion::fold(acts_,res,helper);
-  return res;
-}
-
-
-
-
-template<typename VA>
-class Composite<VA>::Average
-{
-public:
-
-  typedef std::list<Averages> SeqAverages;
-  typedef typename SeqAverages::iterator SAI;
-
-  Average(const Frees& frees, double t, const LazyDensityOperator& ldo, SAI& iter) 
-    : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
-
-  template<typename Vec, typename Av>
-  void help(typename Av::Ptr av) const
-  {
-    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,bind(structure::average<Av::N_RANK>,av,t_,_1)));
-  }
-
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    help<Act,typename Act::Av>(act.getAv());
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    help<tmptools::Vector<IDX>,composite::SubSystemFree::Av>(frees_(IDX).getAv());
-  }
-
-private:
-  const Frees& frees_;
-
-  const double t_;
-  const LazyDensityOperator& ldo_;
-  
-  SAI& iter_;
-
-};
-
-
-template<typename VA>
-const typename Composite<VA>::Averages
-Composite<VA>::average_v(double t, const LazyDensityOperator& ldo) const
-{
-  using namespace std;
-  list<Averages> seqAverages(RANK+mpl::size<VA>::value);
-
-  {
-    typename list<Averages>::iterator iter(seqAverages.begin());
-
-    worker(Average(frees_,t,ldo,iter));
-  }
-
-  Averages res(nAvr_v()); res=0;
-  return cpputils::concatenate(seqAverages,res);
-
-}
-
-
-
-
-template<typename VA>
-class Composite<VA>::Process
+class composite::Base<VA>::Process
 {
 public:
   Process(const Frees& frees, const Averages& avr, ptrdiff_t& l, ptrdiff_t& u) 
@@ -724,17 +598,7 @@ public:
     std::swap(l_,u_);
   }
 
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    help<typename Act::Av>(act.getAv());
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    help<composite::SubSystemFree::Av>(frees_(IDX).getAv());
-  }
+  ACTS_FREES_operator(Av);
 
 private:
   const Frees& frees_;
@@ -748,16 +612,16 @@ private:
 
 template<typename VA>
 void
-Composite<VA>::process_v(Averages& avr) const
+composite::Base<VA>::process_v(Averages& avr) const
 {
   ptrdiff_t l=-1, u=0;
-  worker(Process(frees_,avr,l,u));
+  CALL_composite_worker( Process(frees_,avr,l,u) ) ;
 }
 
 
 
 template<typename VA>
-class Composite<VA>::Display
+class composite::Base<VA>::Display
 {
 public:
   Display(const Frees& frees, const Averages& avr, std::ostream& os, int precision, ptrdiff_t& l, ptrdiff_t& u) 
@@ -771,17 +635,7 @@ public:
     std::swap(l_,u_);
   }
 
-  template<typename Act>
-  void operator()(const Act& act) const
-  {
-    help<typename Act::Av>(act.getAv());
-  }
-
-  template<int IDX>
-  void operator()(mpl::integral_c<int,IDX>) const
-  {
-    help<composite::SubSystemFree::Av>(frees_(IDX).getAv());
-  }
+  ACTS_FREES_operator(Av);
 
 private:
   const Frees& frees_;
@@ -796,14 +650,94 @@ private:
 };
 
 
+#undef ACTS_FREES_operator
+
+
 template<typename VA>
 void
-Composite<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
+composite::Base<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
 {
   ptrdiff_t l=-1, u=0;
-  worker(Display(frees_,avr,os,precision,l,u));
+  CALL_composite_worker( Display(frees_,avr,os,precision,l,u) ) ;
 }
 
 
+
+////////
+//
+// Maker
+//
+////////
+
+
+namespace composite {
+
+template<typename VA>
+class QuerySystemCharacteristics
+{
+public:
+  typedef typename Base<VA>::Frees Frees;
+  
+  typedef structure::SystemCharacteristics result_type;
+
+  QuerySystemCharacteristics(const Frees& frees, result_type& sc) : frees_(frees), sc_(sc) {}
+
+  
+  template<typename Act>
+  result_type operator()(result_type sc, const Act& act)
+  {
+    using namespace structure;
+    const DynamicsBase::Ptr ia=act.get();
+    return sc || result_type(qse<Act::N_RANK>(ia),qsh<Act::N_RANK>(ia),qsl<Act::N_RANK>(ia));
+  }
+
+  template<typename T>
+  void operator()(T) const
+  {
+    const structure::QuantumSystem<1>::Ptr free=frees_(T::value).get();
+    sc_|=result_type(qse(free),qsh(free),qsl(free));
+  }
+
+private:
+  const Frees& frees_;
+
+  result_type& sc_;
+
+};
+
+} // composite
+
+
+#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
+
+template<typename VA>
+const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
+{
+  using namespace structure;
+  
+  const typename Base<VA>::Frees frees(fillFrees(acts));
+
+  SystemCharacteristics systemCharacteristics(false,false,false);
+  
+  {
+    const composite::QuerySystemCharacteristics<VA> helper(frees,systemCharacteristics);
+    mpl::for_each<typename Base<VA>::Ordinals>(helper);
+    systemCharacteristics=boost::fusion::fold(acts,systemCharacteristics,helper);
+  }
+    
+  if      DISPATCHER(true ,true ,true ) ;
+  else if DISPATCHER(true ,true ,false) ;
+  else if DISPATCHER(true ,false,true ) ;
+  else if DISPATCHER(true ,false,false) ;
+  else if DISPATCHER(false,true ,true ) ;
+  else if DISPATCHER(false,true ,false) ;
+  else if DISPATCHER(false,false,true ) ;
+  else return boost::make_shared<Composite<VA,false,false,false> >(frees,acts);
+}
+
+
+#undef DISPATCHER
+
+#undef CALL_composite_worker
 
 #endif // ELEMENTS_COMPOSITES_IMPL_COMPOSITE_TCC_INCLUDED

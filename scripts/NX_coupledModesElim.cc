@@ -5,6 +5,9 @@
 
 #include "ElementLiouvillean.h"
 
+#include "FFT.h"
+
+
 using namespace std;
 using namespace particle;
 using namespace mathutils;
@@ -23,7 +26,7 @@ public:
   typedef Spatial::Array DArray;
   typedef StateVectorLow CArray;
 
-  NX_coupledModesElim(Pars, const mode::ParsPumpedLossy&, double u);
+  NX_coupledModesElim(particle::Pars, const mode::ParsPumpedLossy&, double u);
 
   const Spatial& getSpace() const {return space_;}
 
@@ -89,7 +92,7 @@ int main(int argc, char* argv[])
 
 
 
-NX_coupledModesElim::NX_coupledModesElim(Pars ppart, const mode::ParsPumpedLossy& pmode, double u) 
+NX_coupledModesElim::NX_coupledModesElim(particle::Pars ppart, const mode::ParsPumpedLossy& pmode, double u) 
   : SpatialStorage(ppart.fin,sqrt(2*PI/(1<<ppart.fin))),
     Free(member.getDimension()),
     Averaged(member),
@@ -110,5 +113,5 @@ void NX_coupledModesElim::addContribution_v(const StateVectorLow& psi, StateVect
 
   StateVectorLow psiY(psi.copy());
 
-  ffTransform(psiY,fft::FFTDIR_XK); psiY*=twoOmrecY_SqrOverI_; ffTransform(psiY,fft::FFTDIR_KX); dpsidt+=psiY;
+  transform(psiY,fft::DIR_XK); psiY*=twoOmrecY_SqrOverI_; transform(psiY,fft::DIR_KX); dpsidt+=psiY;
 }

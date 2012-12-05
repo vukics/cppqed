@@ -5,20 +5,20 @@
 
 namespace trajectory {
 
-struct ParsStochasticTrajectory;
+struct ParsStochastic;
 
 template<typename T> 
-class AverageableTrajectory;
+class Averageable;
 
 template<typename T, typename T_ELEM=T>
-class EnsembleTrajectories;
+class Ensemble;
 
 template<typename T, typename T_ELEM>
-class EnsembleTrajectoriesTraits;
+class EnsembleTraits;
 
 
 template<typename A, typename T> 
-class StochasticTrajectory;
+class Stochastic;
 
 
 }

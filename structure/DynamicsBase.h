@@ -10,11 +10,15 @@
 #include <boost/utility.hpp>
 #include <boost/tuple/tuple.hpp>
 
+#include <boost/assign/list_of.hpp>
+
 #include <list>
 
 
 #define TTD_FREQUENCY_MAP(T) std::list<boost::tuple<std::string,T,double> >
 
+
+#define FREQS boost::assign::tuple_list_of
 
 
 namespace structure {

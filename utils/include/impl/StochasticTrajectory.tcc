@@ -19,9 +19,9 @@ namespace trajectory {
 
 template<typename A, typename T> 
 void 
-StochasticTrajectory<A,T>::displayParameters_v() const
+Stochastic<A,T>::displayParameters_v() const
 {
-  AdaptiveTrajectory<A>::displayParameters_v();
+  Adaptive<A>::displayParameters_v();
   Trajectory::getOstream()<<"# Stochastic Trajectory Parameters: seed="<<seed_<<std::endl;
   if (!isNoisy_) 
     Trajectory::getOstream()<<"# No noise."<<std::endl;
@@ -29,32 +29,32 @@ StochasticTrajectory<A,T>::displayParameters_v() const
 
 
 template<typename A, typename T>
-StochasticTrajectory<A,T>::StochasticTrajectory(A& y, typename Evolved::Derivs derivs,
-						double dtInit,
-						double epsRel, double epsAbs, const A& scaleAbs,
-						const evolved::Maker<A>& makerE,
-						unsigned long seed,
-						bool n,
-						const randomized::Maker& makerR)
-  : AdaptiveTrajectory<A>(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,makerE),
+Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
+                            double dtInit,
+                            double epsRel, double epsAbs, const A& scaleAbs,
+                            const evolved::Maker<A>& makerE,
+                            unsigned long seed,
+                            bool n,
+                            const randomized::Maker& makerR)
+  : Adaptive<A>(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,makerE),
     seed_(seed), isNoisy_(n), randomized_(makerR(seed)) {}
 
 
 template<typename A, typename T>
-StochasticTrajectory<A,T>::StochasticTrajectory(A& y, typename Evolved::Derivs derivs,
-						double dtInit,
-						const A& scaleAbs,
-						const ParsStochasticTrajectory& p,
-						const evolved::Maker<A>& makerE,
-						const randomized::Maker& makerR)
-  : AdaptiveTrajectory<A>(y,derivs,dtInit,scaleAbs,p,makerE),
+Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
+                            double dtInit,
+                            const A& scaleAbs,
+                            const ParsStochastic& p,
+                            const evolved::Maker<A>& makerE,
+                            const randomized::Maker& makerR)
+  : Adaptive<A>(y,derivs,dtInit,scaleAbs,p,makerE),
     seed_(p.seed), isNoisy_(p.noise), randomized_(makerR(p.seed)) {}
 
 
 
 template<typename T, typename T_ELEM>
 void 
-EnsembleTrajectories<T,T_ELEM>::displayParameters_v() const
+Ensemble<T,T_ELEM>::displayParameters_v() const
 {
   Trajectory::getOstream()<<"# Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl;
   trajs_.begin()->displayParameters();
@@ -63,7 +63,7 @@ EnsembleTrajectories<T,T_ELEM>::displayParameters_v() const
 
 template<typename T, typename T_ELEM>
 double
-EnsembleTrajectories<T,T_ELEM>::getDtDid_v() const
+Ensemble<T,T_ELEM>::getDtDid_v() const
 {
   return cpputils::accumulate(trajs_.begin(),trajs_.end(),0.,bind(&Trajectory::getDtDid,_1))/size2Double(trajs_.size());
 }
@@ -71,7 +71,7 @@ EnsembleTrajectories<T,T_ELEM>::getDtDid_v() const
 
 template<typename T, typename T_ELEM>
 void
-EnsembleTrajectories<T,T_ELEM>::evolve_v(double deltaT) const
+Ensemble<T,T_ELEM>::evolve_v(double deltaT) const
 {
   using namespace boost;
 
@@ -87,10 +87,10 @@ EnsembleTrajectories<T,T_ELEM>::evolve_v(double deltaT) const
 
 
 template<typename T, typename T_ELEM>
-const typename EnsembleTrajectories<T,T_ELEM>::TBA_Type
-EnsembleTrajectories<T,T_ELEM>::averageInRange(size_t begin, size_t n) const
+const typename Ensemble<T,T_ELEM>::TBA_Type
+Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const
 {
-  return EnsembleTrajectoriesTraits<T,T_ELEM>::averageInRange(trajs_.begin()+begin,trajs_.begin()+(begin+n),*this);
+  return EnsembleTraits<T,T_ELEM>::averageInRange(trajs_.begin()+begin,trajs_.begin()+(begin+n),*this);
 
 }
 
@@ -100,8 +100,8 @@ EnsembleTrajectories<T,T_ELEM>::averageInRange(size_t begin, size_t n) const
 // Implementation of the traits class for the most commonly used case:
 
 template<typename T, typename T_ELEM>
-const typename EnsembleTrajectoriesTraits<T,T_ELEM>::TBA_Type 
-EnsembleTrajectoriesTraits<T,T_ELEM>::averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const ET&)
+const typename EnsembleTraits<T,T_ELEM>::TBA_Type 
+EnsembleTraits<T,T_ELEM>::averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const ET&)
 {
   return T(cpputils::accumulate(++begin,end,begin->toBeAveraged(),bind(&Elem::toBeAveraged,_1),cpputils::plus<T>())/size2Double(end-begin));
 }
@@ -110,10 +110,10 @@ EnsembleTrajectoriesTraits<T,T_ELEM>::averageInRange(typename Impl::const_iterat
 // A tentative specialization for the case when TBA_Type is a reference, it has a member function getInitializedTBA, and T_ELEM has a member function addTo
 
 template<typename T, typename T_ELEM>
-class EnsembleTrajectoriesTraits<T&,T_ELEM>
+class EnsembleTraits<T&,T_ELEM>
 {
 public:
-  typedef EnsembleTrajectories<T&,T_ELEM> ET;
+  typedef Ensemble<T&,T_ELEM> ET;
 
   typedef typename ET::Elem     Elem    ;
   typedef typename ET::Impl     Impl    ;

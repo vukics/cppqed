@@ -3,6 +3,7 @@
 #include "LazyDensityOperator.h"
 
 #include "impl/FormDouble.tcc"
+#include "MathExtensions.h"
 #include "Range.h"
 
 #include <boost/lambda/lambda.hpp>
@@ -38,34 +39,58 @@ namespace {
 
 struct Helper
 {
-  Helper() : i_(1) {}
+  Helper(size_t dim) : dim_(dim), i_(1), j_(1), real_(true) {}
 
   const string operator()()
   {
     stringstream ss(stringstream::out);
-    ss<<"rho_"<<i_<<','<<i_;
-    i_++;
+    if (i_<dim_) {
+      ss<<"rho_"<<i_<<','<<i_;
+      ++i_;
+    }
+    else {
+      size_t ii=i_-dim_;
+      ss<<(real_ ? "real(" : "imag(")<<"rho_"<<ii<<','<<j_<<')';
+      if (real_)
+	real_=false;
+      else {
+	real_=true;
+	if (j_<dim_-1)
+	  ++j_;
+	else
+	  j_=++i_-dim_+1;
+      }
+    }
     return ss.str();
   }
 
 private:
-  size_t i_;
+  const size_t dim_;
+  size_t i_, j_;
+  bool real_;
+  
 };
 
 }
 
-DiagonalDO::DiagonalDO(const std::string& label, size_t dim) : 
-  Base(label,boost::assign::list_of(string("rho_0,0")).repeat_fun(dim-1,Helper())),
-  dim_(dim)
+ReducedDensityOperator::ReducedDensityOperator(const std::string& label, size_t dim, bool offDiagonals) : 
+  Base(label,boost::assign::list_of(string("rho_0,0")).repeat_fun((offDiagonals ? mathutils::sqr(dim) : dim)-1,Helper(dim))),
+  dim_(dim), offDiagonals_(offDiagonals)
 {}
 
 
-const DiagonalDO::Averages 
-DiagonalDO::average_v(const LazyDensityOperator& matrix) const
+const ReducedDensityOperator::Averages 
+ReducedDensityOperator::average_v(const LazyDensityOperator& matrix) const
 {
-  Averages averages(dim_);
-  for (size_t i=0; i<dim_; i++)
+  Averages averages(offDiagonals_ ? mathutils::sqr(dim_): dim_);
+  for (size_t i=0; i<dim_; ++i)
     averages(i)=matrix(i);
+  if (offDiagonals_)
+    for (size_t i=0, idx=dim_; i<dim_; ++i)
+      for (size_t j=i+1; j<dim_; ++j) {
+	averages(idx++)=real(matrix(i,j));
+	averages(idx++)=imag(matrix(i,j));
+      }
   return averages;
 }
 

@@ -3,14 +3,6 @@
 #define   QUANTUMDATA_TYPESFWD_H_INCLUDED
 
 
-namespace structure {
-
-struct StaticTag;
-// We declare this here because this is the only file which is included everywhere in structure.
-
-} // structure
-
-
 namespace quantumdata {
 
 namespace details {

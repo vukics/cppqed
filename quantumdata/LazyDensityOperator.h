@@ -8,7 +8,9 @@
 
 #include "ComplexExtensions.h"
 
-#include<boost/mpl/if.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include <boost/mpl/if.hpp>
 
 
 namespace mpl=boost::mpl;
@@ -39,6 +41,8 @@ class LazyDensityOperator
   : public DimensionsBookkeeper<RANK,true>
 {
 public:
+  typedef boost::shared_ptr<const LazyDensityOperator> Ptr;
+  
   typedef DimensionsBookkeeper<RANK,true> Base;
 
   typedef typename Base::Dimensions Dimensions;

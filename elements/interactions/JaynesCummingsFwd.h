@@ -6,6 +6,9 @@ namespace jaynescummings {
 
 struct Pars;
 
+template<bool IS_HA>
+class Base;
+
 } // jaynescummings
 
 // class JaynesCummings;

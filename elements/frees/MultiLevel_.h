@@ -306,7 +306,7 @@ public:
   using Hamiltonian::get_zSchs;
   using Base::getParsStream;
 
-  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, const Averaged& =multilevel::DiagonalDO("PumpedLossyMultiLevelSch",NL));
+  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, const Averaged& =multilevel::ReducedDensityOperator("PumpedLossyMultiLevelSch",NL));
 
 };
 

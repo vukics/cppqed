@@ -7,4 +7,4 @@ ccfilesExceptHardScripts = [ glob *.cc : 6qbits.cc 10qbits.cc ] ;
 
 alias exceptHardScripts : $(ccfilesExceptHardScripts:B) ;
 
-alias fewerScripts : PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix ;
+alias fewerScripts : PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix SingleParticle Ring Ring_Evolved ;

@@ -1,8 +1,7 @@
 #include "EvolutionBinary.h"
 
 #include "JaynesCummings.h"
-
-#include "MatrixOfHamiltonian.h"
+#include "QbitModeCorrelations.h"
 
 
 using namespace std;
@@ -32,14 +31,11 @@ int main(int argc, char* argv[])
   if ((pe.evol==EM_MASTER /* || pe.evol==EM_convergence */) && qmp==QMP_IP) qmp=QMP_UIP;
 
   qbit::Ptr qbit(qbit::make(pplqb,qmp));
-  mode::Ptr mode(mode::make(pplm ,qmp/*,structure::averaged::ReducedDensityOperator("Mode",pplm.cutoff,true)*/));
+  mode::Ptr mode(mode::make(pplm ,qmp));
 
   // BinarySystem system(jc);
-  /*
-  mode::StateVector psiMode(pplm.cutoff);
-  psiMode=(mode::fock(0,pplm.cutoff,mathutils::PI/2.)+mode::fock(1,pplm.cutoff)+mode::fock(2,pplm.cutoff,-mathutils::PI/2.))/sqrt(3.);
-  */
-  StateVector psi(qbit::init(pplqb)*mode::init(pplm));
+
+  StateVector psi(qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff));             // (qbit::init(pplqb)*mode::init(pplm));
   // entangled state: 
   // psi(qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff));
   /*()+qbit::state1()())*
@@ -47,7 +43,7 @@ int main(int argc, char* argv[])
   */
   psi.renorm();
 
-  evolve<tmptools::Vector<0> >(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);
+  evolve<tmptools::Vector<0> >(psi,binary::make(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc)),pe);
 
 
 

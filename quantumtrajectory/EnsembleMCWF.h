@@ -26,7 +26,7 @@ namespace ensemblemcwf {
 
 #define STATE_VECTORS(r) boost::ptr_vector<quantumdata::StateVector<r> >
 
-#define BASE_class trajectory::EnsembleTrajectories< quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>& >
+#define BASE_class trajectory::Ensemble< quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>& >
 
 template<int RANK>
 class Base
@@ -40,18 +40,18 @@ public:
 
   typedef boost::base_from_member<StateVectors> StateVectorsBase;
 
-  typedef BASE_class EnsembleTrajectories;
+  typedef BASE_class Ensemble;
 
 #undef  BASE_class
 
-  typedef MCWF_Trajectory<RANK> AdaptiveTrajectory;
+  typedef MCWF_Trajectory<RANK> Adaptive;
 
-  typedef typename AdaptiveTrajectory::StateVector    StateVector   ;
-  typedef typename AdaptiveTrajectory::StateVectorLow StateVectorLow; 
+  typedef typename Adaptive::StateVector    StateVector   ;
+  typedef typename Adaptive::StateVectorLow StateVectorLow; 
 
   typedef typename structure::QuantumSystem<RANK>::Ptr QuantumSystemPtr;
 
-  typedef typename EnsembleTrajectories::Impl Trajectories;
+  typedef typename Ensemble::Impl Trajectories;
 
 
   Base(
@@ -67,7 +67,7 @@ protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
-  const typename EnsembleTrajectories::TBA_Type getInitializedTBA_v() const {rho_()=0; return rho_;}
+  const typename Ensemble::TBA_Type getInitializedTBA_v() const {rho_()=0; return rho_;}
 
   mutable quantumdata::DensityOperator<RANK> rho_;
 
@@ -94,7 +94,7 @@ public:
 
   typedef typename Base::StateVectorLow StateVectorLow; 
 
-  typedef typename Base::EnsembleTrajectories EnsembleTrajectories;
+  typedef typename Base::Ensemble Ensemble;
 
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;

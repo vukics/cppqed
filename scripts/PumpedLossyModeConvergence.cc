@@ -1,7 +1,6 @@
 #include "Evolution.h"
 #include "Mode.h"
 
-#include <boost/assign/list_of.hpp>
 
 using namespace std ;
 using namespace mode;

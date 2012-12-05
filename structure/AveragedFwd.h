@@ -6,10 +6,6 @@ namespace structure {
 
 class AveragedCommon;
 
-#ifndef   NDEBUG
-struct AveragesNumberMismatchException;
-#endif // NDEBUG
-
 template<int, bool IS_TD=true> class Averaged;
 
 } // structure

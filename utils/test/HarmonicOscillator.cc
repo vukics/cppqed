@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsTrajectory pt(p);
+  Pars pt(p);
 
   double& omega=p.add("O","Driving frequency",1.);
   double& gamma=p.add("G","Damping rate"     ,1.);

@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsTrajectory pt(p);
+  Pars pt(p);
 
   double 
     &omega=p.add("O","Driving frequency",1.),
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
   if (pt.T<0) pt.T=20./min(1.,min(omega,gamma));
 
-  double dtInit=1./(max(1.,max(omega,gamma))*Trajectory::factor());  
+  double dtInit=initialTimeStep(max(1.,max(omega,gamma)));  
 
   DDOscPars params(omega,gamma);
 
