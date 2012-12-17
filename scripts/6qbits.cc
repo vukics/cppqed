@@ -13,7 +13,6 @@ typedef quantumdata::StateVector<7> StateVector;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -47,7 +46,7 @@ int main(int argc, char* argv[])
 						   Act<4,6>(jc),
 						   Act<5,6>(jc)),pe);
  
-  } catch (const cpputils::TaggedException& te) {cerr<<"Caught exception with tag: "<<te.getTag()<<endl; exit(1);}
+
 
 
 }

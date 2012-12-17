@@ -18,6 +18,6 @@
 
 using parameters::ParameterTable    ;
 using parameters::update            ;
-using parameters::ParsNamedException;
+using parameters::NamedException;
 
 #endif // QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED

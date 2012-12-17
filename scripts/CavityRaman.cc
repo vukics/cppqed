@@ -25,7 +25,6 @@ typedef quantumdata::StateVector<2> StateVector;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -55,7 +54,7 @@ int main(int argc, char* argv[])
 			       binary::make(mljc),
 			       pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 }
 

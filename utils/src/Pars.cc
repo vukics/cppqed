@@ -23,6 +23,14 @@ using namespace std;
 using boost::cref;
 
 
+parameters::NamedException::NamedException(const std::string& name)
+  : name_(name)
+{
+  cerr<<name<<endl;
+}
+
+
+
 namespace parameters {
 
 
@@ -82,8 +90,7 @@ ParameterTable& ParameterTable::addTitle(const std::string& s, const std::string
 {
   try {(*this)[s+mod]; throw AttemptedRecreationOfParameterException(s);}
   catch (UnrecognisedParameterException) {
-    Parameter<TitleLine>* pptr=new Parameter<TitleLine>(s+mod,"",TitleLine());
-    table_.push_back(pptr);
+    table_.push_back(new Parameter<TitleLine>(s+mod,"",TitleLine()));
   }
   return *this;
 }

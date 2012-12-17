@@ -10,7 +10,6 @@ using namespace mode;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -56,7 +55,7 @@ int main(int argc, char* argv[])
 
   }
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 
 }

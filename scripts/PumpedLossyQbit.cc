@@ -9,8 +9,7 @@ using namespace std;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
-
+  
   ParameterTable p;
 
   ParsEvolution pe(p); // Driver Parameters
@@ -34,7 +33,7 @@ int main(int argc, char* argv[])
   */
   evolve(psi,qbit,pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 
 }

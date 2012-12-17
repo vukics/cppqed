@@ -13,7 +13,6 @@ typedef quantumdata::StateVector<2> StateVector2;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -50,7 +49,7 @@ int main(int argc, char* argv[])
      binary::make(GeneralDicke<>(mode::make<mode::AveragedMonitorCutoff<mode::AveragedQuadratures> >(pplm,qmp),spin,u,y)),
      pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 
 }

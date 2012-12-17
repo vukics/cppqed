@@ -14,8 +14,7 @@ typedef composite::result_of::Make<Act<0,2>,Act<1,2> >::type System;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
-
+  
   ParameterTable p;
 
   ParsEvolution pe(p); // Driver Parameters
@@ -66,7 +65,7 @@ evolve<tmptools::Vector<0> >(psi,binary::make(jc),pe);
 
 */
 
-  } catch (const cpputils::TaggedException& te) {cerr<<"Caught exception with tag: "<<te.getTag()<<endl; exit(1);}
+
 
 
 }
