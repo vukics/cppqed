@@ -20,6 +20,10 @@
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
 
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#include <boost/serialization/base_object.hpp>
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
 
 namespace evolved {
 
@@ -47,6 +51,12 @@ protected:
   TimeStepBookkeeper(double dtInit, double epsRel, double epsAbs);
 
 private:
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & t_ & dtDid_ & dtTry_;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
   double t_, dtTry_, dtDid_;
 
   const double epsRel_, epsAbs_;
@@ -93,6 +103,12 @@ private:
   virtual void doStep(double deltaT) = 0;
   virtual std::ostream& doDisplayParameters(std::ostream&) const = 0;
   virtual size_t reportNFailedSteps() const = 0;
+
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & boost::serialization::base_object<TimeStepBookkeeper>(*this) & a_;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
   A& a_;
 
