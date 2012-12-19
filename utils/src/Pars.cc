@@ -25,10 +25,14 @@ using boost::cref;
 
 parameters::NamedException::NamedException(const std::string& name)
   : name_(name)
+{}
+
+
+parameters::AttemptedRecreationOfParameterException::AttemptedRecreationOfParameterException(const std::string& name)
+  : parameters::NamedException(name)
 {
   cerr<<name<<endl;
 }
-
 
 
 namespace parameters {
