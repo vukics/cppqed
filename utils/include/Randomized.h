@@ -64,7 +64,7 @@ private:
   {
     std::string state, id;
     ar & state & id;
-    if (id!=getImplID()) throw RNGStateParsingException(std::string("Wrong implementation ID, expected "+id+", found "+getImplID()));
+    if (id!=getImplID()) throw RNGStateParsingException("Wrong implementation ID, expected "+id+", found "+getImplID());
     setState(state);
   }
 
