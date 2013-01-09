@@ -1,10 +1,5 @@
 #include "MCWF_TrajectoryLogger.h"
 
-#include <boost/range/algorithm/for_each.hpp>
-
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
-
 #include <iostream>
 #include <cmath>
 
@@ -19,7 +14,6 @@ quantumtrajectory::MCWF_TrajectoryLogger::MCWF_TrajectoryLogger(unsigned logLeve
 
 quantumtrajectory::MCWF_TrajectoryLogger::~MCWF_TrajectoryLogger()
 {
-  using namespace boost::lambda;
   if (logLevel_) {
     os_
       <<"\n# Total number of steps: "<<nSteps_<<endl
@@ -32,7 +26,11 @@ quantumtrajectory::MCWF_TrajectoryLogger::~MCWF_TrajectoryLogger()
 	<<"\n# Number of Hamiltonian calls: "<<nHamiltonianCalls_<<endl;
     os_
       <<"\n# MCWF Trajectory:\n";
-    boost::for_each(traj_,os_<<constant("# ")<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
+      
+    for (MCWF_Trajectory::const_iterator i=traj_.begin(); i!=traj_.end(); ++i) os_<<"# "<<i->first<<"\t"<<i->second<<std::endl;
+      
+    // NEEDS_WORK the lambda expression of old doesn’t work with c++0x
+    // boost::for_each(traj_,os_<<constant("# ")<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
   }
 }
 

@@ -1,6 +1,7 @@
 # General-purpose Jamroot, mainly for Debian/Ubuntu
 
 project : usage-requirements
+          <cxxflags>"-std=c++0x"
 	  <include>include 
 	  <variant>debug:<define>BZ_DEBUG 
 	  <define>GSL_CBLAS # This is needed so that FLENS use the CBLAS implementation of GSL
