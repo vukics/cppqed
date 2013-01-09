@@ -9,9 +9,9 @@ const int NL=3; // NL stands for "Number of Levels"
 
 typedef RealLevelsMF<NL>::type Levels;
 
-typedef result_of::make_vector<Pump <0,2>,Pump <1,2> >::type Pumps;
+typedef multilevel::result_of::make_vector<Pump <0,2>,Pump <1,2> >::type Pumps;
 
-typedef result_of::make_vector<Decay<0,2>,Decay<1,2> >::type Decays;
+typedef multilevel::result_of::make_vector<Decay<0,2>,Decay<1,2> >::type Decays;
 
 
 int main(int argc, char* argv[])
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   StateVector psi(NL); psi()(0)=1; psi()(1)=1; psi.renorm();
 
   evolve(psi,
-	 makePumpedLossyMultiLevelSch(pml,ReducedDensityOperator("Lambda atom",NL)),
+	 makePumpedLossyMultiLevelSch(pml,ReducedDensityOperator<1>("Lambda atom",NL)),
 	 pe);
 
 

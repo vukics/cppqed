@@ -2,14 +2,14 @@
 #include "Mode.h"
 
 #include "BichromaticMode.h"
-#include "impl/ElementAveraged.tcc"
+#include "AveragingUtils.h"
 
 
 using namespace std ;
 using namespace mode;
 
 
-typedef structure::averaged::Collecting<1> Collecting;
+typedef averagingUtils::Collecting<1> Collecting;
 
 
 int main(int argc, char* argv[])
@@ -35,9 +35,9 @@ int main(int argc, char* argv[])
   if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
-  if (doDisplay) collection.push_back(new structure::averaged::ReducedDensityOperator("",pplm.cutoff));
+  if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff));
 
-  Ptr mode(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make(pplm,qmp,Collecting(collection)));
+  Ptr mode(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make<Collecting>(pplm,qmp,collection));
 
   StateVector psi(mode::init(pplm));
 

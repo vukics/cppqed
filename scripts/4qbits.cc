@@ -1,4 +1,4 @@
-#define BLITZ_ARRAY_LARGEST_RANK 15
+// #define BLITZ_ARRAY_LARGEST_RANK 15
 
 #include "EvolutionComposite.h"
 
@@ -8,7 +8,7 @@
 
 using namespace std;
 
-typedef quantumdata::StateVector<7> StateVector;
+typedef quantumdata::StateVector<5> StateVector;
 
 
 int main(int argc, char* argv[])
@@ -33,19 +33,18 @@ int main(int argc, char* argv[])
 
   const qbit::Ptr qbit(qbit::make(pplqb,qmp));
 
-  const mode::Ptr mode(mode::make<ReducedDensityOperator<1> >(pplm ,qmp,"Mode",pplm.cutoff,true));
+  const mode::Ptr mode(mode::make<mode::AveragedQuadratures>(pplm ,qmp));
 
-  const jaynescummings::Ptr jcCorr(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc)), jc(jaynescummings::make(qbit,mode,pjc));
+  const jaynescummings::Ptr jcCorr(jaynescummings::make<ReducedDensityOperator<2> >(qbit,mode,pjc,"JaynesCummings0-4",pplm.cutoff,true)), jc(jaynescummings::make(qbit,mode,pjc));
   
-  StateVector psi(qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*mode::init(pplm));
+  StateVector psi(qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*mode::init(pplm));
   psi.renorm();
 
-  evolve<tmptools::Vector<0> >(psi,composite::make(Act<0,6>(jcCorr),
-						   Act<1,6>(jc),
-						   Act<2,6>(jc),
-						   Act<3,6>(jc),
-						   Act<4,6>(jc),
-						   Act<5,6>(jc)),pe);
+  evolve(psi,composite::make(Act<0,4>(jcCorr),
+                             Act<1,4>(jc),
+                             Act<2,4>(jc),
+                             Act<3,4>(jc)),
+         pe);
  
 
 
