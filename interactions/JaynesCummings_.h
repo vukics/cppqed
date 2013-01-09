@@ -84,11 +84,11 @@ protected:
 namespace jaynescummings {
 
 
-template<typename A, typename F1, typename F2>
-const Ptr make(const F1& f1, const F2& f2, const dcomp& g, const A& =A())
+template<typename A, typename F1, typename F2, typename... AveragingConstructorParameters>
+const Ptr make(const F1& f1, const F2& f2, const dcomp& g, const AveragingConstructorParameters&... a)
 {
-  if (isNonZero(g)) return boost::make_shared<JaynesCummings<true ,A> >(f1,f2,g );
-  else              return boost::make_shared<JaynesCummings<false,A> >(f1,f2,0.);
+  if (isNonZero(g)) return boost::make_shared<JaynesCummings<true ,A> >(f1,f2,g ,a...);
+  else              return boost::make_shared<JaynesCummings<false,A> >(f1,f2,0.,a...);
 }
 
 
