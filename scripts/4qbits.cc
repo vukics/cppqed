@@ -35,7 +35,9 @@ int main(int argc, char* argv[])
 
   const mode::Ptr mode(mode::make<mode::AveragedQuadratures>(pplm ,qmp));
 
-  const jaynescummings::Ptr jcCorr(jaynescummings::make<ReducedDensityOperator<2> >(qbit,mode,pjc,"JaynesCummings0-4",pplm.cutoff,true)), jc(jaynescummings::make(qbit,mode,pjc));
+  const jaynescummings::Ptr jc(jaynescummings::make(qbit,mode,pjc)),
+                            jcCorr(jaynescummings::make<ReducedDensityOperator<2> >(qbit,mode,pjc,"JaynesCummings0-4",jc->getDimensions(),true));
+                            
   
   StateVector psi(qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*mode::init(pplm));
   psi.renorm();

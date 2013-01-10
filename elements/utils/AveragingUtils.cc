@@ -4,6 +4,7 @@
 
 #include "Algorithm.h"
 #include "MathExtensions.h"
+#include "MultiIndexIterator.h"
 
 #include <boost/bind.hpp>
 
@@ -15,68 +16,98 @@
 
 
 using namespace std;
+using mathutils::sqr;
 
-namespace {
 
-struct Helper
+template<int RANK>
+struct ReducedDensityOperator<RANK>::Helper
 {
-  Helper(size_t dim) : dim_(dim), i_(1), j_(1), real_(true) {}
+  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  
+  Helper(const Dimensions& dim) : i_(Dimensions(0ul),dim-1,Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {++i_; ++j_;}
+  
+  Helper() : i_(Dimensions(0ul),Dimensions(0ul),Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {}
 
   const string operator()()
   {
     stringstream ss(stringstream::out);
-    if (i_<dim_) {
-      ss<<"rho_"<<i_<<','<<i_;
+
+    // Diagonals
+    if (!offDiagonals_ && i_!=i_.getEnd()) {
+      ss<<"rho_"<<*i_<<';'<<*i_;
       ++i_;
     }
-    else {
-      size_t ii=i_-dim_;
-      ss<<(real_ ? "real(" : "imag(")<<"rho_"<<ii<<','<<j_<<')';
+    else if (!offDiagonals_ && i_==i_.getEnd()) {
+      offDiagonals_=true;
+      i_.setToBegin();
+    }
+    
+    // Offdiagonals
+    if (offDiagonals_) {
+      ss<<(real_ ? "real[" : "imag[")<<"rho_"<<*i_<<','<<*j_<<']';
       if (real_)
         real_=false;
       else {
         real_=true;
-        if (j_<dim_-1)
-          ++j_;
-        else
-          j_=++i_-dim_+1;
+        ++j_;
+        if (j_==j_.getEnd())
+          ++(j_=++i_);
       }
     }
+    
     return ss.str();
   }
 
 private:
-  const size_t dim_;
-  size_t i_, j_;
-  bool real_;
+  Iterator i_, j_;
+  bool real_, offDiagonals_;
   
 };
 
-}
 
 
 template<int RANK>
-ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, size_t dim, bool offDiagonals) : 
-  Base(label,boost::assign::list_of(string("rho_0,0")).repeat_fun((offDiagonals ? mathutils::sqr(dim) : dim)-1,Helper(dim))),
-  dim_(dim), offDiagonals_(offDiagonals)
-{}
+ReducedDensityOperator<RANK>::ReducedDensityOperator(const string& label, const Dimensions& dim, bool offDiagonals) :
+  DimensionsBookkeeper<RANK>(dim),
+  Base(label,boost::assign::list_of(Helper()()).repeat_fun((offDiagonals ? sqr(getTotalDimension()) : getTotalDimension())-1,Helper(getDimensions()))),
+  offDiagonals_(offDiagonals)
+{
+/*  using namespace std; cerr<<dim<<endl;
+  typedef typename Base::KeyLabels KeyLabels;
+  const KeyLabels labels=Base::getLabels();
+  for (typename KeyLabels::const_iterator i=labels.begin(); i!=labels.end(); ++i) cerr<<*i<<endl;*/
+}
 
 
 template<int RANK>
 const typename ReducedDensityOperator<RANK>::Averages 
 ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
 {
-  Averages averages(offDiagonals_ ? mathutils::sqr(dim_): dim_);
-  for (size_t i=0; i<dim_; ++i)
-    averages(i)=matrix(i);
+  const size_t dim=getTotalDimension();
+  Averages averages(offDiagonals_ ? sqr(dim) : dim);
+  
+  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(Dimensions(0ul),getDimensions()-1,Iterator::begin);
+  
+  size_t idx=0;
+
+  for (Iterator i(etalon); idx<dim; ++i)
+    averages(idx++)=matrix(quantumdata::dispatchLDO_index(*i));
+  
   if (offDiagonals_)
-    for (size_t i=0, idx=dim_; i<dim_; ++i)
-      for (size_t j=i+1; j<dim_; ++j) {
-        averages(idx++)=real(matrix(i,j));
-        averages(idx++)=imag(matrix(i,j));
+    for (Iterator i=etalon.getBegin(); idx<sqr(dim); ++i)
+      for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
+        averages(idx++)=real(matrix(quantumdata::dispatchLDO_index(*i),quantumdata::dispatchLDO_index(*j)));
+        averages(idx++)=imag(matrix(quantumdata::dispatchLDO_index(*i),quantumdata::dispatchLDO_index(*j)));
       }
+
   return averages;
+  
 }
+
+
+template class ReducedDensityOperator<1>;
+template class ReducedDensityOperator<2>;
 
 
 #define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
@@ -127,7 +158,7 @@ averagingUtils::Collecting<RANK,IS_TD>::process_v(Averages& avr) const
         Averages temp(avr(Range(l+1,u)));
         eav.process(temp);
       }
-      std::swap(l,u);
+      swap(l,u);
     }
   };
  
