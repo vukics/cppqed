@@ -13,22 +13,27 @@
 
 
 template<int RANK>
-class ReducedDensityOperator : public structure::ClonableElementAveraged<RANK>
+class ReducedDensityOperator : private DimensionsBookkeeper<RANK>, public structure::ClonableElementAveraged<RANK>
 {
 public:
   typedef structure::ClonableElementAveraged<RANK> Base;
   typedef typename Base::Averages Averages;
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
   
-  ReducedDensityOperator(const std::string&, size_t, bool offDiagonals=false);
+  typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
+  
+  ReducedDensityOperator(const std::string&, const Dimensions&, bool offDiagonals=false);
 
 private:
+  struct Helper;
+
+  using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension;
+  
   Base*const do_clone() const {return new ReducedDensityOperator(*this);}
 
   const Averages average_v(const LazyDensityOperator&) const;
   void           process_v(Averages&                 ) const {}
 
-  const DimensionsBookkeeper<RANK> dim_;
   const bool offDiagonals_;
 
 };
