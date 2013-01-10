@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
   // The free components
 
-  PumpedLossyMultiLevelSch<NL,Pumps,Decays> atomInner(pml.deltas,pml.etas,pml.gammas);
+  MultiLevelBase<NL>::Ptr atomInner(multilevel::makePumpedLossySch(pml.deltas,pml.etas,pml.gammas));
 
   Mode<> phonon(pphon);
   

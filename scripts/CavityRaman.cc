@@ -44,11 +44,9 @@ int main(int argc, char* argv[])
 
   StateVector psi(psiML*mode::init(pplm)); psi.renorm();
 
-  MultiLevelBase<NL>::Ptr plml(makePumpedLossyMultiLevelSch(pml,ReducedDensityOperator<1>("Lambda atom",NL)));
-
   mode::Ptr mode(mode::make(pplm,QMP_IP));
 
-  MLJC<NL,Couplings> mljc(plml,mode,pmljc);
+  MLJC<NL,Couplings> mljc(multilevel::makePumpedLossySch(pml,"Lambda atom"),mode,pmljc);
 
   evolve<tmptools::Vector<0> >(psi,
 			       binary::make(mljc),

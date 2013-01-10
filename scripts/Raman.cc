@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   StateVector psi(NL); psi()(0)=1; psi()(1)=1; psi.renorm();
 
   evolve(psi,
-	 makePumpedLossyMultiLevelSch(pml,ReducedDensityOperator<1>("Lambda atom",NL)),
+	 multilevel::makePumpedLossySch(pml,"Lambda atom",true),
 	 pe);
 
 
