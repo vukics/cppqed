@@ -5,6 +5,7 @@
 #include "Algorithm.h"
 #include "MathExtensions.h"
 #include "MultiIndexIterator.h"
+#include "Range.h"
 
 #include <boost/bind.hpp>
 
@@ -72,10 +73,6 @@ ReducedDensityOperator<RANK>::ReducedDensityOperator(const string& label, const 
   Base(label,boost::assign::list_of(Helper()()).repeat_fun((offDiagonals ? sqr(getTotalDimension()) : getTotalDimension())-1,Helper(getDimensions()))),
   offDiagonals_(offDiagonals)
 {
-/*  using namespace std; cerr<<dim<<endl;
-  typedef typename Base::KeyLabels KeyLabels;
-  const KeyLabels labels=Base::getLabels();
-  for (typename KeyLabels::const_iterator i=labels.begin(); i!=labels.end(); ++i) cerr<<*i<<endl;*/
 }
 
 
@@ -166,3 +163,6 @@ averagingUtils::Collecting<RANK,IS_TD>::process_v(Averages& avr) const
   for_each(collection_,boost::bind(Helper::doIt,_1,avr,l,u));
 }
 
+
+template class averagingUtils::Collecting<1>;
+template class averagingUtils::Collecting<2>;
