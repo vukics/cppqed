@@ -37,8 +37,8 @@ public:
   {}
 
 private:
-  void   displayEvenMore() const;
-  size_t displayMoreKey () const;
+  std::ostream& displayMore() const;
+  size_t displayMoreKey() const;
 
   const linalg::CMatrix help() const;
 

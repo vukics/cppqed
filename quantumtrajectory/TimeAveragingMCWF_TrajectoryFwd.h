@@ -1,0 +1,16 @@
+// -*- C++ -*-
+#ifndef   QUANTUMTRAJECTORY_TIMEAVERAGINGMCWF_TRAJECTORYFWD_H_INCLUDED
+#define   QUANTUMTRAJECTORY_TIMEAVERAGINGMCWF_TRAJECTORYFWD_H_INCLUDED
+
+
+namespace quantumtrajectory {
+
+
+template<int RANK>
+class TimeAveragingMCWF_Trajectory;
+
+
+} // quantumtrajectory
+
+
+#endif // QUANTUMTRAJECTORY_TIMEAVERAGINGMCWF_TRAJECTORYFWD_H_INCLUDED
