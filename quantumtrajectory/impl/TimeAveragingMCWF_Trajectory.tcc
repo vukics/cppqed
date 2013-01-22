@@ -4,6 +4,7 @@
 
 #include "TimeAveragingMCWF_Trajectory.h"
 
+#include "impl/MCWF_Trajectory.tcc"
 
 
 template<int RANK>
@@ -11,7 +12,7 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::displayMore
 {
   if (getTime()>relaxationTime_) {
     const double dtDid=getDtDid();
-    avegares_ = ( averages_*sumDt_ + getQS().template average<structure::LA_Av>()*dtDid )/(sumDt_+dtDid) ;
+    averages_ = ( averages_*sumDt_ + getQS().template average<structure::LA_Av>(getTime(),getPsi())*dtDid )/(sumDt_+dtDid) ;
     sumDt_+=dtDid;
   }
   return Base::displayMore();

@@ -23,7 +23,7 @@ public:
   
   typedef typename Averaged::Averages Averages;
   
-  using Base::getQS; using Base::getDtDid; using Base::getTime; using Base::getOstream; using Base::getPrecision;
+  using Base::getQS; using Base::getDtDid; using Base::getTime; using Base::getOstream; using Base::getPrecision; using Base::getPsi;
   
   template<typename SYS>
   TimeAveragingMCWF_Trajectory(
@@ -35,7 +35,7 @@ public:
                                )
     : MCWF_Trajectory<RANK>(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQS().template nAvr<structure::LA_Av>()) {}
 
-  ~TimeAveragingMCWF_Trajectory() {}
+  ~TimeAveragingMCWF_Trajectory();
 
   const Averages getAverages() const {return averages_;}
   
