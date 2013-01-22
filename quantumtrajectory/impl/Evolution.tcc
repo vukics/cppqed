@@ -9,14 +9,15 @@
 #include "impl/DO_Display.tcc"
 #include "EnsembleMCWF.h"
 #include "Master.h"
+#include "impl/TimeAveragingMCWF_Trajectory.tcc"
+
 #include "impl/Trajectory.tcc"
+
+#include <boost/make_shared.hpp>
 
 #include <iostream>
 #include <string>
 
-
-
-using namespace quantumtrajectory;
 
 
 template<typename V, int RANK>
@@ -31,10 +32,9 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
   case EM_SINGLE: {
 
-    MCWF_Trajectory<RANK>
-      traj(psi,sys,pe);
+    const boost::shared_ptr<MCWF_Trajectory<RANK> > traj(makeMCWF(psi,sys,pe));
 
-    trajectory::evolve(traj,pe);
+    trajectory::evolve(*traj,pe);
 
     break;
 
@@ -107,6 +107,13 @@ void evolve(quantumdata::StateVector<RANK>& psi,
   
 }
 
+
+template<int RANK, typename SYS>
+const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const ParsEvolution& pe)
+{
+  if (pe.timeAverage) return boost::make_shared<TimeAveragingMCWF_Trajectory<RANK> >(psi,sys,pe,pe.relaxationTime);
+  else                return boost::make_shared<             MCWF_Trajectory<RANK> >(psi,sys,pe                  );
+}
 
 
 #endif // QUANTUMTRAJECTORY_IMPL_EVOLUTION_TCC_INCLUDED
