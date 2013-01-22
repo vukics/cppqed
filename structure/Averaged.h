@@ -32,7 +32,7 @@ public:
 
   void process(Averages& averages) const {process_v(averages);}
 
-  void display(const Averages& averages, std::ostream& os, int i) const {display_v(averages,os,i);}
+  std::ostream& display(const Averages& averages, std::ostream& os, int i) const {display_v(averages,os,i); return os;}
 
 private:
   virtual void process_v(      Averages&                    ) const = 0;

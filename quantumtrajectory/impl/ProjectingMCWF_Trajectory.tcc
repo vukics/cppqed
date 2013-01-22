@@ -46,25 +46,29 @@ ProjectingMCWF_Trajectory<RANK>::help() const
 
 
 template<int RANK>
-void
-ProjectingMCWF_Trajectory<RANK>::displayEvenMore() const
+std::ostream&
+ProjectingMCWF_Trajectory<RANK>::displayMore() const
 {
   using namespace formdouble;
 
   const StateVector& psi=getPsi();
   const FormDouble fd(getPrecision());
- 
+  std::ostream& os=getOstream();
+  
+  Base::displayMore();
+  
   if (int dim=basis_.size()) {
-    getOstream()<<"\t";
+    os<<"\t";
     double sumR=0;
     for (int i=0; i<dim; i++) {
       double temp=0;
       for (int j=0; j<dim; j++) temp+=real(braket(psi,basis_[j])*braket(basis_[i],psi)*metricTensor_uu_(j,i));
-      getOstream()<<fd(mathutils::sqrAbs(braket(basis_[i],psi)));
+      os<<fd(mathutils::sqrAbs(braket(basis_[i],psi)));
       sumR+=temp;
     }
-    getOstream()<<'\t'<<fd(sumR);
+    os<<'\t'<<fd(sumR);
   }
+  return os;
 }
 
 
@@ -73,7 +77,7 @@ size_t
 ProjectingMCWF_Trajectory<RANK>::displayMoreKey() const
 {
   size_t res=Base::displayMoreKey();
-  getOstream()<<"# ProjectingMCWF_Trajectory "<<res<<'-'<<res+basis_.size()-1<<". Overlap of Monte-Carlo state vector with basis vectors "<<res+basis_.size()<<". Sum of overlaps"<<std::endl;
+  getOstream()<<"# ProjectingMCWF_Trajectory\n# "<<res<<'-'<<res+basis_.size()-1<<". Overlap of Monte-Carlo state vector with basis vectors\n# "<<res+basis_.size()<<". Sum of overlaps"<<std::endl;
   return res;
 }
 

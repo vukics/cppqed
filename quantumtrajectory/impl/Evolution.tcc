@@ -11,8 +11,8 @@
 #include "Master.h"
 #include "impl/Trajectory.tcc"
 
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 
 
 
@@ -61,10 +61,8 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V>
       traj(rho,sys,pe,pe.negativity);
 
-    if      (pe.dc) run  (traj,pe.T,pe.dc,pe.displayInfo);
-    else if (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
-    else cout<<"Nonzero dc OR Dt required!"<<endl;
-
+    trajectory::evolve(traj,pe);
+    
     break;
 
   }
@@ -77,9 +75,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V,true>
       traj(rho,sys,pe,pe.negativity);
 
-    if      (pe.dc) run  (traj,pe.T,pe.dc,pe.displayInfo);
-    else if (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
-    else cout<<"Nonzero dc OR Dt required!"<<endl;
+    trajectory::evolve(traj,pe);
 
     break;
 
