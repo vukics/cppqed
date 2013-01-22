@@ -10,23 +10,27 @@
 template<int RANK>
 std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::displayMore() const
 {
-  if (getTime()>relaxationTime_) {
-    const double dtDid=getDtDid();
-    averages_ = ( averages_*sumDt_ + getQS().template average<structure::LA_Av>(getTime(),getPsi())*dtDid )/(sumDt_+dtDid) ;
-    sumDt_+=dtDid;
+  if (av_) {
+    Averages averagesNow(av_->average(getTime(),getPsi()));
+    if (getTime()>relaxationTime_) {
+      const double dtDid=getDtDid();
+      averages_ = ( averages_*sumDt_ + averagesNow*dtDid )/(sumDt_+dtDid) ;
+      sumDt_+=dtDid;
+    }
+    av_->process(averagesNow);
+    av_->display(averagesNow,getOstream(),getPrecision());
   }
-  return Base::displayMore();
+  return getOstream();
 }
 
 
 template<int RANK>
 quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::~TimeAveragingMCWF_Trajectory()
 {
-  const typename Averaged::Ptr av(getQS().getAv());
-  if (av) {
+  if (av_) {
     std::ostream& os=getOstream()<<"# Time averages:\n# ";
-    av->process(averages_);
-    av->display(averages_,os,getPrecision())<<std::endl;
+    av_->process(averages_);
+    av_->display(averages_,os,getPrecision())<<std::endl;
   }
 
 }

@@ -30,8 +30,6 @@
 
 namespace quantumtrajectory {
 
-using namespace trajectory;
-
 //////////////////
 //
 // Implementations
@@ -57,7 +55,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 				       const ParsMCWF_Trajectory& p,
 				       const StateVectorLow& scaleAbs
 				       )
-  : Trajectory(p),
+  : trajectory::Trajectory(p),
     Base(psi(),
 	 bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
 	 trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),

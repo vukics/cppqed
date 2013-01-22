@@ -32,9 +32,9 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
   case EM_SINGLE: {
 
-    const boost::shared_ptr<MCWF_Trajectory<RANK> > traj(makeMCWF(psi,sys,pe));
-
-    trajectory::evolve(*traj,pe);
+    // This solution is rather lame, but the makeMCWF function as implemented below does not work for some reason
+    if (pe.timeAverage) {TimeAveragingMCWF_Trajectory<RANK> traj(psi,sys,pe,pe.relaxationTime); trajectory::evolve(traj,pe);}
+    else {MCWF_Trajectory<RANK> traj(psi,sys,pe); trajectory::evolve(traj,pe);}
 
     break;
 
@@ -108,6 +108,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 }
 
 
+// For some reason, this does not compile:
 template<int RANK, typename SYS>
 const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const ParsEvolution& pe)
 {
