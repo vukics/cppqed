@@ -4,7 +4,7 @@
 
 #include "Algorithm.h"
 #include "MathExtensions.h"
-#include "MultiIndexIterator.h"
+#include "impl/MultiIndexIterator.tcc"
 #include "Range.h"
 
 #include <boost/bind.hpp>

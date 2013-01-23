@@ -56,7 +56,6 @@ DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostre
   {
     display(av_,t,rho,line,precision);
     if (negativity_) line<<'\t'<<FormDouble(precision)(quantumdata::negPT(rho,V()));
-    line<<endl;
   }
 
   // A heuristic stopping criterion: If in column autoStop the same value (in the given precision) is Displayed equalCountLimit_ times in a row, then stop.

@@ -23,7 +23,8 @@ int main(int argc, char* argv[])
 
   bool
     &alternative=p.add("alternative","Alternative mode",false),
-    &doDisplay=p.add("doDisplay","Display diagonal elements of density operator",false);
+    &doDisplay=p.add("doDisplay","Display diagonal elements of density operator",false),
+    &doOffDiag=p.add("doOffDiag","Display offdiagonal elements of density operator",false);
 
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
 
@@ -35,7 +36,7 @@ int main(int argc, char* argv[])
   if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
-  if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff));
+  if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));
 
   Ptr mode(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make<Collecting>(pplm,qmp,collection));
 
