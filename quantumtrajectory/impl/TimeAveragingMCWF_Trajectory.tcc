@@ -13,9 +13,8 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::displayMore
   if (av_) {
     Averages averagesNow(av_->average(getTime(),getPsi()));
     if (getTime()>relaxationTime_) {
-      const double dtDid=getDtDid();
-      averages_ = ( averages_*sumDt_ + averagesNow*dtDid )/(sumDt_+dtDid) ;
-      sumDt_+=dtDid;
+      averages_ = ( averages_*sum_ + averagesNow )/(sum_+1) ;
+      ++sum_;
     }
     av_->process(averagesNow);
     av_->display(averagesNow,getOstream(),getPrecision());

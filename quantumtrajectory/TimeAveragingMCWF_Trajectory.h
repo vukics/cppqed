@@ -33,7 +33,7 @@ public:
                                double relaxationTime,
                                const StateVectorLow& scaleAbs=StateVectorLow()
                                )
-    : trajectory::Trajectory(p), MCWF_Trajectory<RANK>(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQS().template nAvr<structure::LA_Av>()), sumDt_(0.), av_(getQS().getAv())
+    : trajectory::Trajectory(p), MCWF_Trajectory<RANK>(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQS().template nAvr<structure::LA_Av>()), sum_(0), av_(getQS().getAv())
     {
       averages_=0.;
     }
@@ -48,7 +48,7 @@ private:
   const double relaxationTime_;
   
   mutable Averages averages_;
-  mutable double sumDt_;
+  mutable double sum_;
   
   const typename Averaged::Ptr av_;
 
