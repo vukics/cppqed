@@ -7,7 +7,7 @@
 #include "impl/Evolution.tcc"
 #include "ParsEvolution.h"
 #include "impl/Master.tcc"
-#include "impl/MCWF_Trajectory.tcc"
+#include "impl/TimeAveragingMCWF_Trajectory.tcc"
 #include "QM_Picture.h"
 #include "impl/StateVector.tcc"
 #include "impl/Tridiagonal.tcc"

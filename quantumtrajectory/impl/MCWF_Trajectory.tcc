@@ -30,8 +30,6 @@
 
 namespace quantumtrajectory {
 
-using namespace trajectory;
-
 //////////////////
 //
 // Implementations
@@ -49,22 +47,6 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
   }
 }
 
-/*
-const vector<HS_Vector> ReadBasis(const string& basisFile, size_t basisDim, size_t systemDim)
-{
-  vector<HS_Vector> basis(basisDim);
-  if (basisDim) {
-    ifstream FILE(basisFile.c_str());
-    for (vector<HS_Vector>::iterator i=basis.begin(); i!=basis.end(); ++i) {
-      HS_Vector temp(systemDim);
-      FILE>>temp;
-      (*i)=temp;
-    }
-  }
-  return basis;
-}
-
-*/
 
 template<int RANK> template<typename SYS>
 MCWF_Trajectory<RANK>::MCWF_Trajectory(
@@ -73,7 +55,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 				       const ParsMCWF_Trajectory& p,
 				       const StateVectorLow& scaleAbs
 				       )
-  : Trajectory(p),
+  : trajectory::Trajectory(p),
     Base(psi(),
 	 bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
 	 trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),
@@ -221,24 +203,15 @@ void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::displayMore() const
+std::ostream& MCWF_Trajectory<RANK>::displayMore() const
 {
   using namespace std;
 
-  ostream& os=getOstream();
+  return qs_.display(getTime(),psi_,getOstream(),getPrecision());
 
-  qs_.display(getTime(),psi_,os,getPrecision());
-
-  displayEvenMore();
-
-  os<<endl;
-
-  if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<FormDouble(svdPrecision_,0)(psi_());
-  svdCount_++;
+  // if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<FormDouble(svdPrecision_,0)(psi_()); svdCount_++;
 }
 
-
-// NEEDS_WORK factor out the functions coherentTimeDevelopment calculateDpOverDtSpecialSet manageTimeStep performJump
 
 template<int RANK>
 double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const

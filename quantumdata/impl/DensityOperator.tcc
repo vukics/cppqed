@@ -4,6 +4,7 @@
 
 #include "DensityOperator.h"
 
+#include "impl/BlitzArrayExtensions.tcc"
 #include "impl/BlitzTinyExtensions.tcc"
 
 namespace quantumdata {

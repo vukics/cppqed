@@ -84,9 +84,9 @@ void displayFreq(ostream& os, int precision, const typename TTD_NAMED_FREQUENCY(
 
 void DynamicsBase::displayMoreParameters(ostream& os) const
 {
-  using boost::ref; using boost::for_each;
-  for_each(   realFreqs_,bind(displayFreq<double>,ref(os),os.precision(),_1));
-  for_each(complexFreqs_,bind(displayFreq<dcomp >,ref(os),os.precision(),_1));  
+  using boost::for_each;
+  for_each(   realFreqs_,bind(displayFreq<double>,boost::ref(os),os.precision(),_1));
+  for_each(complexFreqs_,bind(displayFreq<dcomp >,boost::ref(os),os.precision(),_1));  
 }
 
 

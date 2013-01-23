@@ -73,6 +73,12 @@ private:
 };
 
 
+template<int RANK>
+inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const TTD_IDXTINY(RANK)& idx) {return idx   ;}
+
+inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const TTD_IDXTINY(1   )& idx) {return idx[0];}
+
+
 } // quantumdata
 
 #endif // QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED

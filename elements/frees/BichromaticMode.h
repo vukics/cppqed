@@ -21,14 +21,14 @@ struct ParsBichromatic : ParsPumpedLossy
 };
 
 
-template<typename A>
-const Ptr make(const ParsBichromatic& p, QM_Picture qmp, const A& a)
+template<typename AveragingType, typename... AveragingConstructorParameters>
+const Ptr make(const ParsBichromatic& p, QM_Picture qmp, const AveragingConstructorParameters&... a)
 {
   using boost::make_shared;
-  if (!isNonZero(p.etaOther)) return make(static_cast<const ParsPumpedLossy&>(p),qmp,a);
+  if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsPumpedLossy&>(p),qmp,a...);
   else {
-    if (p.nTh) {return make_shared<BichromaticMode<true ,A> >(p,a);}
-    else       {return make_shared<BichromaticMode<false,A> >(p,a);}
+    if (p.nTh) {return make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
+    else       {return make_shared<BichromaticMode<false,AveragingType> >(p,a...);}
   }
 }
 
@@ -36,21 +36,22 @@ const Ptr make(const ParsBichromatic& p, QM_Picture qmp, const A& a)
 } //mode
 
 
-template<bool IS_FINITE_TEMP, typename A>
+template<bool IS_FINITE_TEMP, typename AveragingType>
 class BichromaticMode
   : public mode::Liouvillean<IS_FINITE_TEMP>,
     public mode::Hamiltonian<true>,
-    public ModeBase, public A
+    public ModeBase, public AveragingType
 {
 public:
-  BichromaticMode(const mode::ParsBichromatic& p, const A& a=A())
+  template<typename... AveragingConstructorParameters>
+  BichromaticMode(const mode::ParsBichromatic& p, const AveragingConstructorParameters&... a)
     : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
       ModeBase(p.cutoff,
 	       FREQS("deltaOther",p.deltaOther,1),
 	       FREQS("(kappa*(2*nTh+1),delta)",conj(get_zI()),1)("eta",get_eta(),sqrt(p.cutoff))("etaOther",p.etaOther,sqrt(p.cutoff))
 	       ),
-      A(a),
+      AveragingType(a...),
       zI_Other(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.deltaOther)
   {
     mode::Hamiltonian<true>::getH_OverIs().push_back(

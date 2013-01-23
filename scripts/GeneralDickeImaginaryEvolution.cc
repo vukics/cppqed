@@ -75,7 +75,9 @@ int main(int argc, char* argv[])
     SpinSch        spin(ps );
     // Important that everything is in Sch picture here.
 
-    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
+    GeneralDicke<> gd(mode,spin,u,y);
+    
+    binary::Ptr sys(binary::make(gd));
 
     sys->displayParameters(cout);
 
@@ -124,7 +126,9 @@ int main(int argc, char* argv[])
 
     psi.renorm();
 
-    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
+    GeneralDicke<> gd(mode,spin,u,y);
+    
+    binary::Ptr sys(binary::make(gd));
     
     MCWF traj(psi,eigenStates,sys,pe);
 
