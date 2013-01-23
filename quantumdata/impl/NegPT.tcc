@@ -7,6 +7,7 @@
 #ifndef DO_NOT_USE_FLENS
 
 #include "impl/Blitz2FLENS.tcc"
+#include "impl/BlitzArraySliceIterator.tcc"
 
 #include <boost/mpl/transform.hpp>
 
