@@ -8,6 +8,8 @@
 
 #include "DimensionsBookkeeper.h"
 
+#include <boost/assign/list_of.hpp>
+
 #include <boost/ptr_container/ptr_list.hpp>
 
 
@@ -20,15 +22,17 @@ public:
   typedef typename Base::Averages Averages;
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
   
+  typedef typename Base::KeyLabels KeyLabels;
+  
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
-  ReducedDensityOperator(const std::string&, const Dimensions&, bool offDiagonals=false);
+  ReducedDensityOperator(const std::string&, const Dimensions&, bool offDiagonals=false, const KeyLabels& =KeyLabels());
 
+  using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension; using Base::nAvr;
+  
 private:
   struct Helper;
 
-  using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension;
-  
   Base*const do_clone() const {return new ReducedDensityOperator(*this);}
 
   const Averages average_v(const LazyDensityOperator&) const;
@@ -36,6 +40,24 @@ private:
 
   const bool offDiagonals_;
 
+};
+
+
+template<int RANK, typename V>
+class ReducedDensityOperatorNegativity : public ReducedDensityOperator<RANK>
+{
+public:
+  typedef ReducedDensityOperator<RANK> Base;
+  typedef typename Base::Dimensions Dimensions;
+  typedef typename Base::Averages Averages;
+  
+  using Base::getDimensions; using Base::getTotalDimension;
+  
+  ReducedDensityOperatorNegativity(const std::string& label, const Dimensions& dim)
+    : Base(label,dim,true,boost::assign::list_of("negativity")) {}
+  
+  void process_v(Averages&) const;
+  
 };
 
 

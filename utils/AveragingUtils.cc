@@ -1,6 +1,7 @@
 #include "AveragingUtils.h"
 
-#include "LazyDensityOperator.h"
+#include "impl/DensityOperator.tcc"
+#include "impl/NegPT.tcc"
 
 #include "Algorithm.h"
 #include "MathExtensions.h"
@@ -10,8 +11,6 @@
 #include <boost/bind.hpp>
 
 #include <boost/iterator/transform_iterator.hpp>
-
-#include <boost/assign/list_of.hpp>
 
 #include <algorithm>
 
@@ -68,9 +67,9 @@ private:
 
 
 template<int RANK>
-ReducedDensityOperator<RANK>::ReducedDensityOperator(const string& label, const Dimensions& dim, bool offDiagonals) :
+ReducedDensityOperator<RANK>::ReducedDensityOperator(const string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
   DimensionsBookkeeper<RANK>(dim),
-  Base(label,boost::assign::list_of(Helper()()).repeat_fun((offDiagonals ? sqr(getTotalDimension()) : getTotalDimension())-1,Helper(getDimensions()))),
+  Base(label,boost::assign::list_of(Helper()()).repeat_fun((offDiagonals ? sqr(getTotalDimension()) : getTotalDimension())-1,Helper(getDimensions())).range(subsequent)),
   offDiagonals_(offDiagonals)
 {
 }
@@ -81,7 +80,7 @@ const typename ReducedDensityOperator<RANK>::Averages
 ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
 {
   const size_t dim=getTotalDimension();
-  Averages averages(offDiagonals_ ? sqr(dim) : dim);
+  Averages averages(nAvr());
   
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
   const Iterator etalon(Dimensions(0ul),getDimensions()-1,Iterator::begin);
@@ -103,8 +102,28 @@ ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
 }
 
 
+template<int RANK, typename V>
+void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) const
+{
+  quantumdata::DensityOperator<RANK> rho(getDimensions());
+  linalg::CMatrix matrix(rho.matrixView()); // references the same data
+  const size_t dim=getTotalDimension();
+  
+  {
+    int idx=0;  
+    for (int i=0; i<dim; ++i, ++idx) matrix(i,i)=averages(idx);
+    for (int i=0; i<dim; ++i) for (int j=i+1; j<dim; ++j, idx+=2) matrix(j,i)=conj(matrix(i,j)=dcomp(averages(idx),averages(idx+1)));
+  }
+  
+  averages(averages.size()-1)=quantumdata::negPT(rho,V());
+  
+}
+
+
 template class ReducedDensityOperator<1>;
 template class ReducedDensityOperator<2>;
+
+template class ReducedDensityOperatorNegativity<2,tmptools::Vector<0> >;
 
 
 #define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
