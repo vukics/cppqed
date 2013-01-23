@@ -38,8 +38,8 @@ public:
 private:
   void step_v(double deltaT) const {getEvolved()->step(deltaT);}
 
-  void   displayMore   () const;
-  size_t displayMoreKey() const;
+  std::ostream& displayMore   () const;
+  size_t        displayMoreKey() const;
 
   void   displayParameters_v() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters_v();}
 

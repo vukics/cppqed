@@ -33,7 +33,7 @@ public:
 			    const ParsMCWF_Trajectory& p,
 			    const StateVectorLow& scaleAbs=StateVectorLow()
 			    )
-    : Trajectory(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
+    : trajectory::Trajectory(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
   {}
 
 private:

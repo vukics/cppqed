@@ -33,12 +33,12 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 
 
 template<typename A> 
-void Simulated<A>::displayMore() const
+std::ostream& Simulated<A>::displayMore() const
 {
   const A& a=getEvolved()->getA();
   for (size_t i=0; i<Traits::ssLimit(a); i++)
     getOstream()<<FormDouble(Trajectory::getPrecision())(Traits::ss(a,i))<<' ';
-  getOstream()<<std::endl;
+  return getOstream();
 }
 
 
