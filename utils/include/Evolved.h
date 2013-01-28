@@ -14,8 +14,6 @@
 
 #include "EvolvedFwd.h"
 
-#include "ArrayTraitsFwd.h"
-
 #include <boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
@@ -64,8 +62,6 @@ template<typename A>
 class Evolved : public TimeStepBookkeeper, private boost::noncopyable 
 {
 public:
-  typedef cpputils::ArrayMemoryTraits<A> Traits;
-
   typedef boost::function<void(double, const A&, A&)> Derivs;
 
   typedef boost::shared_ptr<Evolved> Ptr;

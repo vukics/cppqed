@@ -2,135 +2,108 @@
 #ifndef UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED
 #define UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED
 
-#include "BlitzArrayTraitsFwd.h"
+#include "BlitzArray.h"
 
-
-namespace blitzplusplus {
-
-#define RETURN_type blitz::Array<T,RANK>
-
-namespace details {
-
-template<typename T, int RANK>
-class MyArray : public RETURN_type
-{
-public:
-  static const blitz::GeneralArrayStorage<RANK>& stealStorage(const RETURN_type& array) {return array.storage_;}
-};
-
-} // details
-
-template<typename T, int RANK>
-const RETURN_type
-clone(T* restrict data, const RETURN_type& array)
-{
-  RETURN_type(data,array.shape(),array.stride(),blitz::neverDeleteData/*,details::MyArray<T,RANK>::stealStorage(array)*/);
-}
-
-#undef  RETURN_type
-
-} // blitzplusplus
-
-
-/////////////////////////
-//
-// blitz::Array<double,n>
-//
-/////////////////////////
 
 namespace cpputils {
 
-template<int n>
-struct ArrayMemoryTraits<TTD_DARRAY(n)> {
-
-  typedef TTD_DARRAY(n) DA;
-  
-  static bool isStorageContiguous(const DA& a) {return a.isStorageContiguous();}
-
-  static size_t size(const DA& a) {return a.size();}
-
-  static const double* data(const DA& a) {return a.size() ? a.data() : 0;}
-  static       double* data(      DA& a) {return const_cast<double*>(data(static_cast<const DA&>(a)));}
-
-  static       DA create(      double* y, const DA& a) {return DA(y,a.shape(),blitz::neverDeleteData);} // blitzplusplus::clone(y,a);}
-  static const DA create(const double* y, const DA& a) {return create(const_cast<double*>(y),a);}
-
-  static DA create(const DA& a) {return DA(a.shape());}
-
-};
-
-
-////////////////////////
+/////////////////////////
 //
+// „Memory traits”
+//
+/////////////////////////
+
+
+// blitz::Array<double,n>
+
+
+template<int n>
+inline bool isStorageContiguous(const TTD_DARRAY(n)& a) {return a.isStorageContiguous();}
+
+
+template<int n>
+inline size_t size(const TTD_DARRAY(n)& a) {return a.size();}
+
+
+template<int n>
+inline const double* data(const TTD_DARRAY(n)& a) {return a.size() ? a.data() : 0;}
+
+template<int n>
+inline       double* data(      TTD_DARRAY(n)& a) {return const_cast<double*>(data(static_cast<const TTD_DARRAY(n)&>(a)));}
+
+
+template<int n>
+inline       TTD_DARRAY(n) create(      double* y, const TTD_DARRAY(n)& a) {return TTD_DARRAY(n)(y,a.shape(),blitz::neverDeleteData);}
+
+template<int n>
+inline const TTD_DARRAY(n) create(const double* y, const TTD_DARRAY(n)& a) {return create(const_cast<double*>(y),a);}
+
+
+template<int n>
+inline TTD_DARRAY(n) create(const TTD_DARRAY(n)& a) {return TTD_DARRAY(n)(a.shape());}
+
+
 // blitz::Array<dcomp,n>
+
+
+template<int n>
+inline bool isStorageContiguous(const TTD_CARRAY(n)& a) {return a.isStorageContiguous();}
+
+
+template<int n>
+inline size_t size(const TTD_CARRAY(n)& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
+
+
+template<int n>
+inline const double* data(const TTD_CARRAY(n)& a) {return a.size() ? real(a).data() : 0;}
+
+template<int n>
+inline       double* data(      TTD_CARRAY(n)& a) {return const_cast<double*>(data(static_cast<const TTD_CARRAY(n)&>(a)));}
+
+
+template<int n>
+inline       TTD_CARRAY(n) create(      double* y, const TTD_CARRAY(n)& a) {return TTD_CARRAY(n)(reinterpret_cast<dcomp*>(y),a.shape(),blitz::neverDeleteData);}
+
+template<int n>
+inline const TTD_CARRAY(n) create(const double* y, const TTD_CARRAY(n)& a) {return create(const_cast<double*>(y),a);}
+
+
+template<int n>
+inline TTD_CARRAY(n) create(const TTD_CARRAY(n)& a) {return TTD_CARRAY(n)(a.shape());}
+
+
+
+/////////////////////////
 //
-////////////////////////
+// „Traversal traits”
+//
+/////////////////////////
+
+
+inline const double& subscript(const TTD_DARRAY(1)& a, size_t i) {return a(i);}
+inline       double& subscript(      TTD_DARRAY(1)& a, size_t i) {return const_cast<double&>(subscript(static_cast<const TTD_DARRAY(1)&>(a),i));}
+
+inline size_t subscriptLimit(const TTD_DARRAY(1)& a) {return a.size();}
 
 
 template<int n>
-struct ArrayMemoryTraits<TTD_CARRAY(n)> {
-
-  typedef TTD_CARRAY(n) CA;
-  
-  static bool isStorageContiguous(const CA& a) {return a.isStorageContiguous();}
-
-  static size_t size(const CA& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
-
-  // static const double* data(const CA& a) {return a.size() ? reinterpret_cast<const double*>(a.data()) : 0;}
-  static const double* data(const CA& a) {return a.size() ? real(a).data() : 0;}
-  static       double* data(      CA& a) {return const_cast<double*>(data(static_cast<const CA&>(a)));}
-
-  static       CA create(      double* y, const CA& a) {return CA(reinterpret_cast<dcomp*>(y),a.shape(),blitz::neverDeleteData);}
-  // blitzplusplus::clone(reinterpret_cast<dcomp*>(y),a);}
-  static const CA create(const double* y, const CA& a) {return create(const_cast<double*>(y),a);}
-
-  static CA create(const CA& a) {return CA(a.shape());}
-
-};
-
-
-
-
-template<>
-struct ArrayTraversalTraits<TTD_DARRAY(1)> : ArrayMemoryTraits<TTD_DARRAY(1)> {
-
-  typedef TTD_DARRAY(1) DA;
-
-  static const double& ss(const DA& a, size_t i) {return a(i);}
-  static       double& ss(      DA& a, size_t i) {return const_cast<double&>(ss(static_cast<const DA&>(a),i));}
-
-  static size_t ssLimit(const DA& a) {return a.size();}
-
-};
-
-
-template<int n>
-struct ArrayTraversalTraits<TTD_CARRAY(n)> : ArrayMemoryTraits<TTD_CARRAY(n)> {
-
-  typedef TTD_CARRAY(n) CA;
-
-  static const dcomp& ss(const CA& a, size_t i) {return *(a.begin()+i);}
+inline const dcomp& subscript(const TTD_CARRAY(n)& a, size_t i) {return *(a.begin()+i);}
   // This funny-looking solution is aimed at ensuring that the array is traversed contiguously independently of the rank. Bounds checking? --- CheckedIterator.
-  static       dcomp& ss(      CA& a, size_t i) {return const_cast<dcomp&>(ss(static_cast<const CA&>(a),i));}
 
-  static size_t ssLimit(const CA& a) {return a.size();}
+template<int n>
+inline       dcomp& subscript(      TTD_CARRAY(n)& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const TTD_CARRAY(n)&>(a),i));}
 
-};
+template<int n>
+inline size_t subscriptLimit(const TTD_CARRAY(n)& a) {return a.size();}
 
 
-template<> 
-struct ArrayTraversalTraits<TTD_CARRAY(1)> : ArrayMemoryTraits<TTD_CARRAY(1)> {
+inline const dcomp& subscript(const TTD_CARRAY(1)& a, size_t i) {return a(i);}
+inline       dcomp& subscript(      TTD_CARRAY(1)& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const TTD_CARRAY(1)&>(a),i));}
 
-  typedef TTD_CARRAY(1) CA;
+inline size_t subscriptLimit(const TTD_CARRAY(1)& a) {return a.size();}
 
-  static const dcomp& ss(const CA& a, size_t i) {return a(i);}
-  static       dcomp& ss(      CA& a, size_t i) {return const_cast<dcomp&>(ss(static_cast<const CA&>(a),i));}
+inline size_t stride(const TTD_CARRAY(1)& a) {return a.stride(0);}
 
-  static size_t ssLimit(const CA& a) {return a.size();}
-
-  static size_t stride(const CA& a) {return a.stride(0);}
-
-};
 
 } // cpputils
 

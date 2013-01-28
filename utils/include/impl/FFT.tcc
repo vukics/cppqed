@@ -4,17 +4,13 @@
 
 #include "FFT.h"
 
-#include "ArrayTraitsFwd.h"
-
-#include<cstddef>
 
 namespace fft {
 
 template<typename A>
 void transform(A& a, Direction dir) throw(FFT_Exception)
 {
-  typedef cpputils::ArrayTraversalTraits<A> Traits;
-  details::transform(Traits::data(a),Traits::stride(a),Traits::ssLimit(a),dir);
+  details::transform(cpputils::data(a),cpputils::stride(a),cpputils::subscriptLimit(a),dir);
 }
 
 

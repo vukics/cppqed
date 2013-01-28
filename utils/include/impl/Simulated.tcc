@@ -35,9 +35,10 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 template<typename A> 
 std::ostream& Simulated<A>::displayMore() const
 {
+  using namespace cpputils;
   const A& a=getEvolved()->getA();
-  for (size_t i=0; i<Traits::ssLimit(a); i++)
-    getOstream()<<FormDouble(Trajectory::getPrecision())(Traits::ss(a,i))<<' ';
+  for (size_t i=0; i<subscriptLimit(a); i++)
+    getOstream()<<FormDouble(Trajectory::getPrecision())(subscript(a,i))<<' ';
   return getOstream();
 }
 

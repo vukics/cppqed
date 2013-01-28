@@ -4,7 +4,6 @@
 
 #include "SimulatedFwd.h"
 
-#include "ArrayTraitsFwd.h"
 #include "EvolvedFwd.h"
 
 #include "Trajectory.h"
@@ -18,7 +17,6 @@ class Simulated : public Adaptive<A>
 {
 public:
   typedef Adaptive<A> Base;
-  typedef cpputils::ArrayTraversalTraits<A> Traits;
 
   typedef evolved::Evolved<A> Evolved;
 
