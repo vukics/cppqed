@@ -4,7 +4,7 @@
 
 #include "Mode_Fwd.h"
 
-#include "ParsMode.h" // for the UI
+#include "ParsMode.h" // for the user interface
 
 #include "QM_PictureFwd.h"
 #include "StateVectorFwd.h"
@@ -15,7 +15,7 @@
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
 
-#include<boost/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace mode {
 
@@ -39,17 +39,17 @@ const StateVector fock(size_t n, size_t dim, double phase=0) throw(PrepError);
 const StateVector init(const Pars&);
 
 
-template<typename A>
-const Ptr make(const Pars           &, QM_Picture, const A& =A() );
+template<typename AveragingType, typename... AveragingConstructorParameters>
+const Ptr make(const Pars           &, QM_Picture, const AveragingConstructorParameters&... );
 
-template<typename A>
-const Ptr make(const ParsLossy      &, QM_Picture, const A& =A() );
+template<typename AveragingType, typename... AveragingConstructorParameters>
+const Ptr make(const ParsLossy      &, QM_Picture, const AveragingConstructorParameters&... );
 
-template<typename A>
-const Ptr make(const ParsPumped     &, QM_Picture, const A& =A() );
+template<typename AveragingType, typename... AveragingConstructorParameters>
+const Ptr make(const ParsPumped     &, QM_Picture, const AveragingConstructorParameters&... );
 
-template<typename A>
-const Ptr make(const ParsPumpedLossy&, QM_Picture, const A& =A() );
+template<typename AveragingType, typename... AveragingConstructorParameters>
+const Ptr make(const ParsPumpedLossy&, QM_Picture, const AveragingConstructorParameters&... );
 
 
 const Ptr make(const Pars           &, QM_Picture);
@@ -59,9 +59,7 @@ const Ptr make(const ParsPumpedLossy&, QM_Picture);
 
 
 double photonNumber(const StateVectorLow&); 
-// This can be implemented in an extremely elegant way using tensor
-// notation from blitz++, but it is not enough, the one below is
-// needed.
+// This can be implemented in an extremely elegant way using tensor notation from blitz++, but it is not enough, the one below is needed.
 double photonNumber(const LazyDensityOperator&);
 
 
@@ -253,20 +251,22 @@ public:
 // 1
 /////
 
-template<typename A>
+template<typename AveragingType>
 class Mode 
-  : public mode::Exact, public ModeBase, public A
+  : public mode::Exact, public ModeBase, public AveragingType
 {
 public:
-  Mode(const mode::Pars&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  Mode(const mode::Pars&, const AveragingConstructorParameters&... );
 };
 
 
-template<typename A>
-struct ModeUIP : Mode<A>
+template<typename AveragingType>
+struct ModeUIP : Mode<AveragingType>
 // in this case the uip and ip coincide, 
 {
-  ModeUIP(const mode::Pars& p, const A& a=A()) : Mode<A>(p,a) {}
+  template<typename... AveragingConstructorParameters>
+  ModeUIP(const mode::Pars& p, const AveragingConstructorParameters&... a) : Mode<AveragingType>(p,a...) {}
 };
 
 
@@ -275,12 +275,13 @@ struct ModeUIP : Mode<A>
 /////
 
 
-template<typename A>
+template<typename AveragingType>
 class ModeSch
-  : public mode::Hamiltonian<false>, public ModeBase, public A
+  : public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
-  ModeSch(const mode::Pars&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  ModeSch(const mode::Pars&, const AveragingConstructorParameters&... );
 };
 
 
@@ -288,19 +289,21 @@ public:
 // 3
 /////
 
-template<typename A>
+template<typename AveragingType>
 class PumpedMode 
-  : public mode::Hamiltonian<true>, public ModeBase, public A
+  : public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
-  PumpedMode(const mode::ParsPumped&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  PumpedMode(const mode::ParsPumped&, const AveragingConstructorParameters&... );
 };
 
 
-template<typename A>
-struct PumpedModeUIP : PumpedMode<A>
+template<typename AveragingType>
+struct PumpedModeUIP : PumpedMode<AveragingType>
 {
-  PumpedModeUIP(const mode::ParsPumped& p, const A& a=A()) : PumpedMode<A>(p,a) {}
+  template<typename... AveragingConstructorParameters>
+  PumpedModeUIP(const mode::ParsPumped& p, const AveragingConstructorParameters&... a) : PumpedMode<AveragingType>(p,a...) {}
 };
 
 
@@ -308,12 +311,13 @@ struct PumpedModeUIP : PumpedMode<A>
 // 4
 /////
 
-template<typename A>
+template<typename AveragingType>
 class PumpedModeSch
-  : public mode::Hamiltonian<false>, public ModeBase, public A
+  : public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
-  PumpedModeSch(const mode::ParsPumped&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  PumpedModeSch(const mode::ParsPumped&, const AveragingConstructorParameters&... );
 };
 
 
@@ -321,12 +325,13 @@ public:
 // 5
 /////
 
-template<bool IS_FINITE_TEMP, typename A>
+template<bool IS_FINITE_TEMP, typename AveragingType>
 class LossyMode 
-  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Exact, public ModeBase, public A
+  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Exact, public ModeBase, public AveragingType
 {
 public:
-  LossyMode(const mode::ParsLossy&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  LossyMode(const mode::ParsLossy&, const AveragingConstructorParameters&... );
 
 };
 
@@ -334,12 +339,13 @@ public:
 // 6
 /////
 
-template<bool IS_FINITE_TEMP, typename A>
+template<bool IS_FINITE_TEMP, typename AveragingType>
 class LossyModeUIP 
-  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
+  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
-  LossyModeUIP(const mode::ParsLossy&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  LossyModeUIP(const mode::ParsLossy&, const AveragingConstructorParameters&... );
 
 };
 
@@ -347,12 +353,13 @@ public:
 // 7
 /////
 
-template<bool IS_FINITE_TEMP, typename A>
+template<bool IS_FINITE_TEMP, typename AveragingType>
 class LossyModeSch 
-  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public A
+  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
-  LossyModeSch(const mode::ParsLossy&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  LossyModeSch(const mode::ParsLossy&, const AveragingConstructorParameters&... );
 
 };
 
@@ -361,36 +368,39 @@ public:
 // 8
 /////
 
-template<bool IS_FINITE_TEMP, typename A>
+template<bool IS_FINITE_TEMP, typename AveragingType>
 class PumpedLossyMode 
-  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
+  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
-  PumpedLossyMode(const mode::ParsPumpedLossy&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  PumpedLossyMode(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
 };
 
 /////
 // 9
 /////
 
-template<bool IS_FINITE_TEMP, typename A>
+template<bool IS_FINITE_TEMP, typename AveragingType>
 class PumpedLossyModeUIP 
-  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public A
+  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
-  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
 };
 
 /////
 // 10
 /////
 
-template<bool IS_FINITE_TEMP, typename A>
+template<bool IS_FINITE_TEMP, typename AveragingType>
 class PumpedLossyModeSch
-  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public A
+  : public mode::Liouvillean<IS_FINITE_TEMP>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
-  PumpedLossyModeSch(const mode::ParsPumpedLossy&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  PumpedLossyModeSch(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
 };
 
 
@@ -398,12 +408,13 @@ public:
 // One more to help testing the alternative jumping in MCWF_Trajectory
 //////////////////////////////////////////////////////////////////////
 
-template<typename A=mode::Averaged>
+template<typename AveragingType=mode::Averaged>
 class PumpedLossyModeAlternative 
-  : public mode::Liouvillean<false,true>, public mode::Hamiltonian<true>, public ModeBase, public A
+  : public mode::Liouvillean<false,true>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
-  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const A& =A());
+  template<typename... AveragingConstructorParameters>
+  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
 };
 
 

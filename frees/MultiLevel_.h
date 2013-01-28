@@ -6,6 +6,8 @@
 
 #include "ParsMultiLevel.h"
 
+#include "AveragingUtils.h"
+
 #include "ElementAveraged.h"
 #include "ElementLiouvillean.h"
 #include "Free.h"
@@ -283,12 +285,12 @@ public:
 };
 
 
-template<int NL, typename VP, typename VL, typename Averaged>
+template<int NL, typename VP, typename VL, typename AveragingType>
 class PumpedLossyMultiLevelSch 
   : public multilevel::HamiltonianSch<NL,VP>,
     public multilevel::Liouvillean<NL,VL>,
     public MultiLevelBase<NL>,
-    public Averaged
+    public AveragingType
   // The ordering becomes important here
 {
 public:
@@ -306,35 +308,62 @@ public:
   using Hamiltonian::get_zSchs;
   using Base::getParsStream;
 
-  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, const Averaged& =multilevel::ReducedDensityOperator("PumpedLossyMultiLevelSch",NL));
+  template<typename... AveragingConstructorParameters>
+  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, const AveragingConstructorParameters&...);
 
 };
 
 
+
+namespace multilevel {
+
 #define RETURN_type typename MultiLevelBase<NL>::Ptr
 
-template<int NL, typename VP, typename VL, typename Averaged>
+
+template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 inline
 RETURN_type
-makePumpedLossyMultiLevelSch(const blitz::TinyVector<double,NL>& deltas,
-			     // note that, understandably, if we write
-			     // const typename RealLevelsMF<NL>::type&
-			     // here, the compiler cannot deduce NL anymore
-			     const VP& etas, const VL& gammas,
-			     const Averaged& averaged)
+makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas,
+                   // note that, understandably, if we write
+                   // const typename RealLevelsMF<NL>::type&
+                   // here, the compiler cannot deduce NL anymore
+                   const VP& etas, const VL& gammas,
+                   const AveragingConstructorParameters&... a)
 {
-  return RETURN_type(new PumpedLossyMultiLevelSch<NL,VP,VL,Averaged>(deltas,etas,gammas,averaged));
+  return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType> >(deltas,etas,gammas,a...);
 }
 
 
-template<int NL, typename VP, typename VL, typename Averaged>
+template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 inline
 RETURN_type
-makePumpedLossyMultiLevelSch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const Averaged& averaged)
+makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const AveragingConstructorParameters&... a)
 {
-  return RETURN_type(new PumpedLossyMultiLevelSch<NL,VP,VL,Averaged>(p.deltas,p.etas,p.gammas,averaged));
+  return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,a...);
 }
+
+
+template<int NL, typename VP, typename VL>
+inline
+RETURN_type
+makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas, const VP& etas, const VL& gammas, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+{
+  return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,keyTitle,NL,offDiagonals);
+}
+
+
+template<int NL, typename VP, typename VL>
+inline
+RETURN_type
+makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+{
+  return makePumpedLossySch<ReducedDensityOperator<1> >(p,keyTitle,NL,offDiagonals);
+}
+
 
 #undef  RETURN_type
+
+} // multilevel
+
 
 #endif // ELEMENTS_FREES_MULTILEVEL__H_INCLUDED
