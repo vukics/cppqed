@@ -5,8 +5,7 @@
 #include<complex>
 
 typedef std::complex<double> dcomp;
-// Even though it is a type we name it this way because we would like
-// it to closely resemble built-in types
+// Even though it is a type we name it this way because we would like it to closely resemble built-in types
 
 const dcomp DCOMP_I(0,1);
 

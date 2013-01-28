@@ -4,7 +4,6 @@
 
 #include "StateVector.h"
 
-#include "impl/BlitzTinyExtensions.tcc"
 #include "impl/ComplexArrayExtensions.tcc"
 
 namespace quantumdata {

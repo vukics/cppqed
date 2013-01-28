@@ -4,7 +4,7 @@
 
 #include "impl/LazyDensityOperator.tcc"
 
-#include "impl/Algorithm.tcc"
+#include "Algorithm.h"
 #include "BlitzArraySliceIterator.h"
 #include "Range.h"
 

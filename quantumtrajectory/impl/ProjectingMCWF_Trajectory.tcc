@@ -33,7 +33,7 @@ ProjectingMCWF_Trajectory<RANK>::help() const
     using namespace blitz2flens;
     typedef GeMatrixMF<dcomp,RowMajor>::type GeMatrix;
 
-    GeMatrix a(matrix(res,RowMajorTag()));
+    GeMatrix a(matrix<RowMajor>(res));
     DenseVector<Array<int> > pivots(dim);
     
     trf(a,pivots);

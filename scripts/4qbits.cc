@@ -36,7 +36,8 @@ int main(int argc, char* argv[])
   const mode::Ptr mode(mode::make<mode::AveragedQuadratures>(pplm ,qmp));
 
   const jaynescummings::Ptr jc(jaynescummings::make(qbit,mode,pjc)),
-                            jcCorr(jaynescummings::make<ReducedDensityOperatorNegativity<2,tmptools::Vector<0> > >(qbit,mode,pjc,"JaynesCummings0-4",jc->getDimensions()));
+                            jcRDO(jaynescummings::make<ReducedDensityOperatorNegativity<2,tmptools::Vector<0> > >(qbit,mode,pjc,"JaynesCummings0-4",jc->getDimensions())),
+                            jcCorr(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc));
                             
   
   StateVector psi(qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*mode::init(pplm)
@@ -45,7 +46,7 @@ int main(int argc, char* argv[])
   psi.renorm();
 
   evolve(psi,composite::make(Act<0,4>(jcCorr),
-                             Act<1,4>(jc),
+                             Act<1,4>(jcRDO),
                              Act<2,4>(jc),
                              Act<3,4>(jc)),
          pe);

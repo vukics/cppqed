@@ -8,7 +8,7 @@
 #include "LazyDensityOperator.h"
 #include "StateVector.h"
 
-#include "impl/Algorithm.tcc"
+#include "Algorithm.h"
 #include "impl/BlitzArraySliceIterator.tcc"
 #include "impl/BlitzTinyExtensions.tcc"
 #include "Functional.h"

@@ -7,7 +7,7 @@
 #include "TMP_Tools.h"
 #include "Conversions.h"
 
-#include "BlitzTinyExtensions.h"
+#include "impl/BlitzTinyExtensions.tcc"
 
 
 namespace blitzplusplus {
