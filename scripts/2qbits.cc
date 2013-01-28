@@ -1,4 +1,8 @@
+// #define BLITZ_ARRAY_LARGEST_RANK 15
+
 #include "EvolutionComposite.h"
+
+#include "AveragingUtils.h"
 #include "JaynesCummings.h"
 #include "QbitModeCorrelations.h"
 
@@ -10,16 +14,13 @@ typedef quantumdata::StateVector<3> StateVector;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
   ParsEvolution pe(p); // Driver Parameters
   qbit::ParsPumpedLossy pplqb(p);
-  qbit::ParsPumpedLossy pplqb2(p,"2");
   mode::ParsPumpedLossy pplm (p); 
   jaynescummings::Pars  pjc  (p);
-  jaynescummings::Pars  pjc2  (p,"2");
 
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
 
@@ -30,18 +31,25 @@ int main(int argc, char* argv[])
 
   if ((pe.evol==EM_MASTER /* || pe.evol==EM_convergence */) && qmp==QMP_IP) qmp=QMP_UIP;
 
-  qbit::Ptr qbit(qbit::make(pplqb,qmp));
-  qbit::Ptr qbit2(qbit::make(pplqb2,qmp));
+  const qbit::Ptr qbit(qbit::make(pplqb,qmp));
 
-  mode::Ptr mode(mode::make(pplm ,qmp));
+  const mode::Ptr mode(mode::make<mode::AveragedQuadratures>(pplm ,qmp));
 
-  StateVector psi(qbit::init(pplqb)*qbit::init(pplqb2)*mode::init(pplm));
+  const jaynescummings::Ptr jc(jaynescummings::make(qbit,mode,pjc)),
+                            jcRDO(jaynescummings::make<ReducedDensityOperatorNegativity<2,tmptools::Vector<0> > >(qbit,mode,pjc,"JaynesCummings0-4",jc->getDimensions())),
+                            jcCorr(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc));
+                            
+  
+  StateVector psi(qbit::init(pplqb)*qbit::init(pplqb)*mode::init(pplm)
+    // qbit::state0()*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*mode::fock(0,pplm.cutoff)+qbit::state1()*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*mode::fock(1,pplm.cutoff)
+  );
   psi.renorm();
 
-  evolve<tmptools::Vector<0> >(psi,composite::make(Act<0,2>(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc)),
-						   Act<1,2>(jaynescummings::make(qbit2,mode,pjc2))),pe);
+  evolve(psi,composite::make(Act<0,2>(jcCorr),
+                             Act<1,2>(jcRDO)),
+         pe);
  
-  } catch (const cpputils::TaggedException& te) {cerr<<"Caught exception with tag: "<<te.getTag()<<endl; exit(1);}
+
 
 
 }
