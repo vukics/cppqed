@@ -27,17 +27,17 @@ void update(ParameterTable&, int, char*[], const std::string& ="--");
 //////////////////
 
 
-class ParsException : public cpputils::Exception
+class Exception : public cpputils::Exception
 {
 public:
-  virtual ~ParsException() {}
+  virtual ~Exception() {}
 };
 
 
-class ParsNamedException : public ParsException 
+class NamedException : public Exception 
 {
 public:
-  ParsNamedException(const std::string& name) : name_(name) {}
+  NamedException(const std::string& name);
 
   const std::string& getName() const {return name_;}
 
@@ -46,25 +46,19 @@ private:
 };
 
 
-class UnrecognisedParameterException : public ParsNamedException 
+class UnrecognisedParameterException : public NamedException 
 {
 public: 
-  UnrecognisedParameterException(const std::string& name) : ParsNamedException(name) {}
+  UnrecognisedParameterException(const std::string& name) : NamedException(name) {}
 };
 
 
-class AttemptedRecreationOfParameterException : public ParsNamedException 
+class AttemptedRecreationOfParameterException : public NamedException 
 {
 public: 
-  AttemptedRecreationOfParameterException(const std::string& name) : ParsNamedException(name) {}
+  AttemptedRecreationOfParameterException(const std::string& name);
 };
 
-
-class ParameterTypeMismatchException : public ParsNamedException 
-{
-public:
-  ParameterTypeMismatchException(const std::string& name) : ParsNamedException(name) {}
-};
 
 
 ////////////////////

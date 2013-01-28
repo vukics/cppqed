@@ -56,8 +56,7 @@ void Trajectory::display() const
 {
   const FormDouble fd(formdouble::positive(precision_));
   getOstream()<<fd(getTime())<<fd(getDtDid());
-  displayMore();
-  getOstream().flush();
+  (displayMore()<<std::endl).flush();
 }
 
 

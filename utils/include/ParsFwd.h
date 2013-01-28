@@ -7,11 +7,10 @@
 
 namespace parameters {
 
-class ParsException;
-class ParsNamedException;
+class Exception;
+class NamedException;
 class UnrecognisedParameterException;
 class AttemptedRecreationOfParameterException;
-class ParameterTypeMismatchException;
 
 template<typename>
 class Parameter;

@@ -32,8 +32,7 @@ void derivs(double, const Array& b, Array& dbdt,
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
-
+  
   ParameterTable p;
 
   Pars pt(p);
@@ -54,7 +53,7 @@ int main(int argc, char* argv[])
 
   evolve(S,pt);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 
 }

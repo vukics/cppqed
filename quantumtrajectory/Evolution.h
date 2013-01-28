@@ -7,7 +7,7 @@
 #include "impl/Evolution.tcc"
 #include "ParsEvolution.h"
 #include "impl/Master.tcc"
-#include "impl/MCWF_Trajectory.tcc"
+#include "impl/TimeAveragingMCWF_Trajectory.tcc"
 #include "QM_Picture.h"
 #include "impl/StateVector.tcc"
 #include "impl/Tridiagonal.tcc"
@@ -18,6 +18,6 @@
 
 using parameters::ParameterTable    ;
 using parameters::update            ;
-using parameters::ParsNamedException;
+using parameters::NamedException;
 
 #endif // QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED

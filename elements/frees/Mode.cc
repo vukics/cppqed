@@ -201,8 +201,7 @@ const KeyLabels Assemble(const KeyLabels& first,
 			 const KeyLabels& last=KeyLabels()
 			 )
 {
-  KeyLabels res(first);
-  boost::copy(last,boost::copy(middle,std::back_inserter(res)));
+  KeyLabels res(first); push_back(res).range(middle).range(last);
   return res;
 }
 

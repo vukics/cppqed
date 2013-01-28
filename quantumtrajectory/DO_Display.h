@@ -42,8 +42,8 @@ public:
 
   virtual ~DO_Display() {}
 
-  void   displayMore(double t, const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
-  size_t displayMoreKey(std::ostream&) const;
+  std::ostream& displayMore   (double t, const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
+  size_t        displayMoreKey(std::ostream&) const;
 
 private:
   const AveragedPtr av_ ;

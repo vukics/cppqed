@@ -32,7 +32,6 @@ typedef TTD_DARRAY(1) DARRAY;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -76,7 +75,9 @@ int main(int argc, char* argv[])
     SpinSch        spin(ps );
     // Important that everything is in Sch picture here.
 
-    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
+    GeneralDicke<> gd(mode,spin,u,y);
+    
+    binary::Ptr sys(binary::make(gd));
 
     sys->displayParameters(cout);
 
@@ -125,7 +126,9 @@ int main(int argc, char* argv[])
 
     psi.renorm();
 
-    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
+    GeneralDicke<> gd(mode,spin,u,y);
+    
+    binary::Ptr sys(binary::make(gd));
     
     MCWF traj(psi,eigenStates,sys,pe);
 
@@ -149,7 +152,7 @@ int main(int argc, char* argv[])
 
   }
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 
 

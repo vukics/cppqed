@@ -33,12 +33,12 @@ public:
 			    const ParsMCWF_Trajectory& p,
 			    const StateVectorLow& scaleAbs=StateVectorLow()
 			    )
-    : Trajectory(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
+    : trajectory::Trajectory(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
   {}
 
 private:
-  void   displayEvenMore() const;
-  size_t displayMoreKey () const;
+  std::ostream& displayMore() const;
+  size_t displayMoreKey() const;
 
   const linalg::CMatrix help() const;
 

@@ -30,7 +30,6 @@ using boost::fusion::at_c;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   // Clebsches:
   const double sqrt13=sqrt(1./3), sqrt23=sqrt(2./3), sqrt12=sqrt(1./2), sqrt16=sqrt(1./6);
@@ -119,7 +118,7 @@ int main(int argc, char* argv[])
 
   // The free components
 
-  PumpedLossyMultiLevelSch<NL,Pumps,Decays> atomInner(pml.deltas,pml.etas,pml.gammas);
+  MultiLevelBase<NL>::Ptr atomInner(multilevel::makePumpedLossySch(pml.deltas,pml.etas,pml.gammas));
 
   Mode<> phonon(pphon);
   
@@ -137,7 +136,7 @@ int main(int argc, char* argv[])
      composite::make(Act<0,1>(ia01),Act<0,2>(ia02)),
      pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 }
 

@@ -5,6 +5,7 @@
 #include "Evolution_Fwd.h"
 
 #include "StateVectorFwd.h"
+#include "MCWF_TrajectoryFwd.h"
 #include "QuantumSystemFwd.h"
 
 #include "SmartPtr.h"
@@ -13,8 +14,16 @@
 #include <iosfwd>
 
 
+
+using namespace quantumtrajectory;
+
+
 std::ostream& operator<<(std::ostream&, EvolutionMode );
 std::istream& operator>>(std::istream&, EvolutionMode&);
+
+
+template<int RANK, typename SYS>
+const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const ParsEvolution&);
 
 
 template<typename V, int RANK>
