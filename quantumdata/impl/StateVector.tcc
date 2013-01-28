@@ -28,7 +28,7 @@ StateVector<RANK>::StateVector(const StateVector& sv)
 template<int RANK> template<int RANK2>
 StateVector<RANK>::StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)
   : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
-    ABase(blitzplusplus::doDirect(psi1(),psi2(),blitzplusplus::dodirect::Mul()))
+    ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication>(psi1(),psi2()))
 {
 }
 
@@ -38,7 +38,7 @@ const typename StateVector<RANK>::DensityOperatorLow
 StateVector<RANK>::dyad(const StateVector& sv) const 
 {
   using namespace blitzplusplus;
-  return doDirect(operator()(),StateVectorLow(conj(sv())),dodirect::Mul());
+  return doDirect<dodirect::multiplication>(operator()(),StateVectorLow(conj(sv())));
 }
 
 

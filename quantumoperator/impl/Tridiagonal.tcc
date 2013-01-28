@@ -157,7 +157,7 @@ directDiagonals(const typename Tridiagonal<RANK1>::Diagonals& ds1,
       const typename Tridiagonal2::Diagonal& d2=ds2(j);
       typename TridiagonalRes::Diagonal& d=res(i*length+j);
 
-      d.reference(doDirect(d1,d2,mpl::bool_<MULT>()));
+      d.reference(doDirect<MULT>(d1,d2));
 
     }
 

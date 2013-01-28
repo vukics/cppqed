@@ -112,9 +112,9 @@ BOOST_AUTO_TEST_CASE(CompositeTransformation)
   Array2Traits::transform(T1,x,x_);
   Array2Traits::transform(T2,y,y_);
 
-  xy_1 = blitzplusplus::doDirect(x_,y_,blitzplusplus::dodirect::Mul());
+  xy_1 = blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication>(x_,y_);
 
-  xy   = blitzplusplus::doDirect(x ,y ,blitzplusplus::dodirect::Mul());
+  xy   = blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication>(x ,y );
 
   CTraits::transform(c,xy,xy_2);
 
