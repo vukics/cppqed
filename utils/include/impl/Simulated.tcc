@@ -4,6 +4,8 @@
 
 #include "Simulated_.h"
 
+// #include "ArrayTraits.h"
+// The same note applies as with EvolvedGSL.tcc
 #include "impl/FormDouble.tcc"
 #include "impl/Trajectory.tcc"
 
@@ -13,10 +15,10 @@ namespace trajectory {
 
 template<typename A>
 Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit, 
-			double epsRel, double epsAbs,
-			const A& scaleAbs, 
-			std::ostream& os, int precision, 
-			const evolved::Maker<A>& maker)
+                        double epsRel, double epsAbs,
+                        const A& scaleAbs, 
+                        std::ostream& os, int precision, 
+                        const evolved::Maker<A>& maker)
   : Trajectory(os,precision),
     Base(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,maker)
 {}
@@ -24,9 +26,9 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 
 template<typename A> 
 Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
-			const A& scaleAbs,
-			const Pars& p,
-			const evolved::Maker<A>& maker)
+                        const A& scaleAbs,
+                        const Pars& p,
+                        const evolved::Maker<A>& maker)
   : Trajectory(p),
     Base(y,derivs,dtInit,scaleAbs,p,maker)
 {}

@@ -58,8 +58,8 @@ using namespace linalg;
 
 template<bool> void doDirect(CMatrix&, const CVector&, const CVector&);
 
-static const bool multiplication=true;
-static const bool addition=false;
+const bool multiplication=true;
+const bool addition=false;
 
 
 } // dodirect

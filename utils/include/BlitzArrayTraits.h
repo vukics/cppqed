@@ -88,7 +88,7 @@ inline size_t subscriptLimit(const TTD_DARRAY(1)& a) {return a.size();}
 
 template<int n>
 inline const dcomp& subscript(const TTD_CARRAY(n)& a, size_t i) {return *(a.begin()+i);}
-  // This funny-looking solution is aimed at ensuring that the array is traversed contiguously independently of the rank. Bounds checking? --- CheckedIterator.
+// NEEDS_WORK this is broken since blitz::Array iterators are not random-access
 
 template<int n>
 inline       dcomp& subscript(      TTD_CARRAY(n)& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const TTD_CARRAY(n)&>(a),i));}

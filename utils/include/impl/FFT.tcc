@@ -3,7 +3,8 @@
 #define   UTILS_INCLUDE_IMPL_FFT_TCC_INCLUDED
 
 #include "FFT.h"
-
+// #include "ArrayTraits.h"
+// The same note applies as with EvolvedGSL.tcc
 
 namespace fft {
 

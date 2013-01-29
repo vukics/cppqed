@@ -37,6 +37,17 @@ void doIt(const TTD_IDXTINY(RANK)& lbound,
 } // details
 
 
+namespace mii {
+ 
+typedef boost::mpl::false_ Begin;
+typedef boost::mpl::true_  End  ;
+  
+const Begin begin=Begin();
+const End   end  =End  ();
+  
+}
+
+
 template<int RANK>
 class MultiIndexIterator 
   : public details::IterHelper<RANK>
@@ -46,16 +57,10 @@ public:
 
   typedef typename Base::value_type IdxTiny;
   
-  typedef boost::mpl::false_ Begin;
-  typedef boost::mpl::true_  End  ;
-  
-  static const Begin begin;
-  static const End   end  ;
-
-  MultiIndexIterator(const IdxTiny& lbound, const IdxTiny& ubound, Begin)
+  MultiIndexIterator(const IdxTiny& lbound, const IdxTiny& ubound, mii::Begin)
     : lbound_(lbound), ubound_(ubound), idx_(lbound_) {}
   // if it's not the end, it's the beginning
-  MultiIndexIterator(const IdxTiny& lbound, const IdxTiny& ubound, End  )
+  MultiIndexIterator(const IdxTiny& lbound, const IdxTiny& ubound, mii::End  )
     : lbound_(lbound), ubound_(ubound), idx_(ubound_) {operator++();}
   // the end iterator is in fact beyond the end by one, hence the need for the increment
   
@@ -69,8 +74,8 @@ public:
   friend bool operator==(const MultiIndexIterator& i1, const MultiIndexIterator& i2) {return all(i1.idx_==i2.idx_);}
   // The user has to take care that the bounds are actually the same
 
-  const MultiIndexIterator getBegin() const {return MultiIndexIterator(lbound_,ubound_,begin);}
-  const MultiIndexIterator getEnd  () const {return MultiIndexIterator(lbound_,ubound_,end  );}
+  const MultiIndexIterator getBegin() const {return MultiIndexIterator(lbound_,ubound_,mii::begin);}
+  const MultiIndexIterator getEnd  () const {return MultiIndexIterator(lbound_,ubound_,mii::end  );}
   
   MultiIndexIterator& setToBegin() {idx_=lbound_; return    *this ;}
   MultiIndexIterator& setToEnd  () {idx_=ubound_; return ++(*this);}
