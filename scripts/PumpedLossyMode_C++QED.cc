@@ -2,7 +2,7 @@
 #include "Mode.h"
 
 #include "BichromaticMode.h"
-#include "AveragingUtils.h"
+#include "impl/AveragingUtils.tcc"
 
 
 using namespace std ;
