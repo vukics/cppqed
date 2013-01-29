@@ -24,9 +24,9 @@ struct ReducedDensityOperator<RANK>::Helper
 {
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
   
-  Helper(const Dimensions& dim) : i_(Dimensions(0ul),dim-1,Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {++i_; ++j_;}
+  Helper(const Dimensions& dim) : i_(Dimensions(size_t(0)),dim-1,Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {++i_; ++j_;}
   
-  Helper() : i_(Dimensions(0ul),Dimensions(0ul),Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {}
+  Helper() : i_(Dimensions(size_t(0)),Dimensions(size_t(0)),Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {}
 
   const string operator()()
   {
@@ -83,7 +83,7 @@ ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
   Averages averages(nAvr());
   
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(Dimensions(0ul),getDimensions()-1,Iterator::begin);
+  const Iterator etalon(Dimensions(size_t(0)),getDimensions()-1,Iterator::begin);
   
   size_t idx=0;
 
