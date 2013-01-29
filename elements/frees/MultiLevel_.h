@@ -6,7 +6,7 @@
 
 #include "ParsMultiLevel.h"
 
-#include "AveragingUtils.h"
+#include "impl/AveragingUtils.tcc"
 
 #include "ElementAveraged.h"
 #include "ElementLiouvillean.h"

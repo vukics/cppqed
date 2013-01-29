@@ -1,4 +1,3 @@
-#include "AveragingUtils.h"
 #include "EvolutionBinary.h"
 #include "Mode.h"
 #include "MultiLevel.h"

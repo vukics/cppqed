@@ -1,3 +1,6 @@
+#ifndef   ELEMENTS_UTILS_IMPL_AVERAGINGUTILS_TCC_INCLUDED
+#define   ELEMENTS_UTILS_IMPL_AVERAGINGUTILS_TCC_INCLUDED
+
 #include "AveragingUtils.h"
 
 #include "impl/DensityOperator.tcc"
@@ -120,12 +123,6 @@ void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) con
 }
 
 
-template class ReducedDensityOperator<1>;
-template class ReducedDensityOperator<2>;
-
-template class ReducedDensityOperatorNegativity<2,tmptools::Vector<0> >;
-
-
 #define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
 
 template<int RANK, bool IS_TD>
@@ -183,5 +180,4 @@ averagingUtils::Collecting<RANK,IS_TD>::process_v(Averages& avr) const
 }
 
 
-template class averagingUtils::Collecting<1>;
-template class averagingUtils::Collecting<2>;
+#endif // ELEMENTS_UTILS_IMPL_AVERAGINGUTILS_TCC_INCLUDED
