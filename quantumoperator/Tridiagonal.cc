@@ -43,7 +43,7 @@ template<>
 Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minus, const Diagonal& plus, bool toFreqs, mpl::int_<1>)
   : Base(std::max(std::max(size_t(zero.size()),minus.size()+k),plus.size()+k)),
     // funnily enough, Array::size() returns an int ...
-    diagonals_(blitzplusplus::TOA_DeepCopy(),
+    diagonals_(blitzplusplus::DeepCopy(),
 	       toFreqs ? empty : zero,
 	       minus,
 	       plus),

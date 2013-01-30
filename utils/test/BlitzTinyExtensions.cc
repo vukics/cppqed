@@ -32,8 +32,8 @@ int main()
     cout<<"Trying to half cut "<<v<<"..."<<endl;
     halfCutTiny(v);
   }
-  catch (HalfCutTinyFishyException) {
-    cout<<"HalfCutTinyFishyException caught"<<endl; 
+  catch (HalfCutTinyException) {
+    cout<<"HalfCutTinyException caught"<<endl; 
   }
 #endif // NDEBUG
 

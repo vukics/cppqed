@@ -29,10 +29,10 @@ namespace bll=boost::lambda;
 template<int RANK> template<int RANK2>
 Tridiagonal<RANK>::Tridiagonal(const Tridiagonal<RANK2>& t1, const Tridiagonal<RANK-RANK2>& t2)
   : Base(blitzplusplus::concatenateTinies(t1.getDimensions(),t2.getDimensions())),
-    diagonals_(blitzplusplus::TOA_ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,true>(t1.get(),t2.get())),
+    diagonals_(blitzplusplus::ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,true>(t1.get(),t2.get())),
     differences_(blitzplusplus::concatenateTinies(t1.getDifferences(),t2.getDifferences())),
     tCurrent_(t1.getTime()),
-    freqs_(blitzplusplus::TOA_ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,false>(t1.getFreqs(),t2.getFreqs()))
+    freqs_(blitzplusplus::ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,false>(t1.getFreqs(),t2.getFreqs()))
 {
   if (t1.getTime()!=t2.getTime()) throw TridiagonalTimeMismatchException();
 }
@@ -157,7 +157,7 @@ directDiagonals(const typename Tridiagonal<RANK1>::Diagonals& ds1,
       const typename Tridiagonal2::Diagonal& d2=ds2(j);
       typename TridiagonalRes::Diagonal& d=res(i*length+j);
 
-      d.reference(doDirect(d1,d2,mpl::bool_<MULT>()));
+      d.reference(doDirect<MULT>(d1,d2));
 
     }
 

@@ -11,7 +11,7 @@ class Impl;
 class NonContiguousStorageException;
 
 template<typename>
-class EvolvedGSL;
+class GSL;
 
 } // details
 

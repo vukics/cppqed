@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 	
     {
       typedef HeMatrixMF<RowMajor>::type HeMatrix;
-      HeMatrix a(hermitianMatrix(eigenVectors,RowMajorTag()));
+      HeMatrix a(hermitianMatrix<RowMajor>(eigenVectors));
 
       DenseVectorMF<double>::type v(blitz2flens::vector(eigenValues));
     
