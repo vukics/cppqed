@@ -16,6 +16,8 @@
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/complex.hpp>
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 #include <fstream>
@@ -90,8 +92,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     svdPrecision_(p.svdPrecision ? p.svdPrecision : getPrecision()),
     svdCount_(0),
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
-    binarySVFile_(p.binarySVFile),
-    svExtension_(binarySVFile_?".svbin":".sv"),
+    svExtension_(".svbin"),
 #else // DO_NOT_USE_BOOST_SERIALIZATION
     svExtension_(".sv"),
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
@@ -147,77 +148,26 @@ MCWF_Trajectory<RANK>::~MCWF_Trajectory()
 
 }
 
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
 
 template<int RANK>
 void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV)
 {
-  using namespace std;
-  
-  StateVectorLow psiTemp;
-  double t0, dtTry;
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  if (!binarySVFile_) {
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-    ifs>>psiTemp;
-    psi_=psiTemp;
-    psi_.renorm();
-    if (onlySV) return;
-    
-#define EAT_COMMENT_CHAR  {char c; ifs>>c;  if (c!='#') throw MCWF_TrajectoryFileParsingException(file_+svExtension_);} ifs.exceptions ( ifstream::failbit | ifstream::badbit | ifstream::eofbit ); \
-/**/
-    EAT_COMMENT_CHAR
-    ifs>>*getRandomized();
-    EAT_COMMENT_CHAR
-#undef EAT_COMMENT_CHAR
-    ifs>>t0>>dtTry;
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  }
-  else {
-    boost::archive::binary_iarchive ia(ifs);
-    for(int i=0, d; i<=RANK; i++) ia>>d; // eat RANK and dimensions
-    ia>>psiTemp;
-    psi_=psiTemp;
-    if (onlySV) return;
-    ia>>t0>>dtTry;
-    ifs>>*getRandomized();
-  }
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-  getEvolved()->update(t0,dtTry); getEvolved()->setDtDid(0); svdCount_=1;
-  if (qs_.getEx()) tIntPic0_=t0;
-  getOstream()<<"# Next timestep to try: "<<dtTry<<endl;
+  boost::archive::text_iarchive ar(ifs); // Add possibility of opting for binary archive
+  ar & *getEvolved() & *getRandomized();
+  if (qs_.getEx()) tIntPic0_=getTime();
+  getOstream()<<"# Next timestep to try: "<<getDtTry()<<std::endl;
 }
 
 
 template<int RANK>
 void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
 {
-  using namespace std;
-
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  if (!binarySVFile_) {
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-    ofs<<formdouble::zeroWidth(getPrecision())(psi_())<<"\n# "
-       <<*getRandomized()<<"\n# "
-       <<formdouble::positive(getPrecision())(getTime ())
-       <<formdouble::positive(getPrecision())(getDtTry())<<endl;
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  }
-  else {
-    boost::archive::binary_oarchive oa(ofs);
-    double t=getTime(); double dttry=getDtTry();
-    int r=RANK;
-    oa<<r;
-    for(int i=0;i<RANK;i++) {
-      int d=psi_().extent(i);
-      oa<<d;
-    }
-    oa<<psi_()<<t<<dttry;
-    ofs<<*getRandomized();
-  }
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-
+  boost::archive::text_oarchive ar(ofs);
+  ar & *getEvolved() & *getRandomized();
 }
 
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
 template<int RANK>
@@ -237,8 +187,6 @@ void MCWF_Trajectory<RANK>::displayMore() const
   svdCount_++;
 }
 
-
-// NEEDS_WORK factor out the functions coherentTimeDevelopment calculateDpOverDtSpecialSet manageTimeStep performJump
 
 template<int RANK>
 double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const

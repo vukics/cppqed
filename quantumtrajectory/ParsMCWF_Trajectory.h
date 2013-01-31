@@ -18,10 +18,6 @@ struct ParsMCWF_Trajectory : public trajectory::ParsStochastic {
   bool &firstSVDisplay;
   int &svdPrecision;
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  bool &binarySVFile;
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-
   std::string &initFile;
 
   size_t &basisDim;

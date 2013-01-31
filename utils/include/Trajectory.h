@@ -74,6 +74,9 @@ public:
 
   void displayParameters() const {displayParameters_v();}
   
+  virtual void  readState(std::ifstream &)       = 0;
+  virtual void writeState(std::ofstream &) const = 0;
+  
   virtual ~Trajectory();
 
 protected:
@@ -117,10 +120,10 @@ public:
 
 protected:
   Adaptive(A&, typename Evolved::Derivs, double, double, double, const A&,
-	     const evolved::Maker<A>&);
+           const evolved::Maker<A>&);
 
   Adaptive(A&, typename Evolved::Derivs, double, const A&, const Pars&,
-	     const evolved::Maker<A>&);
+           const evolved::Maker<A>&);
 
   typename Evolved::Ptr getEvolved() const {return evolved_;}
 

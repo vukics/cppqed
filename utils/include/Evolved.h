@@ -107,7 +107,7 @@ private:
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int) {ar & boost::serialization::base_object<TimeStepBookkeeper>(*this) & a_;}
+  void serialize(Archive& ar, const unsigned int) {ar & a_ & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
   A& a_;
