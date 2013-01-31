@@ -73,11 +73,11 @@ public:
 
   template<typename SYS>
   MCWF_Trajectory(
-		  StateVector& psi,
-		  const SYS& sys,
-		  const ParsMCWF_Trajectory&,
-		  const StateVectorLow& =StateVectorLow()
-		  );
+                  StateVector& psi,
+                  const SYS& sys,
+                  const ParsMCWF_Trajectory&,
+                  const StateVectorLow& =StateVectorLow()
+                  );
 
   ~MCWF_Trajectory();
 
@@ -101,8 +101,8 @@ private:
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  void readState(std::ifstream &, bool onlySV=false);
-  void writeState(std::ofstream &) const;
+  void readState (boost::archive::binary_iarchive&);
+  void writeState(boost::archive::binary_oarchive&) const;
   
   double                coherentTimeDevelopment    (                                double Dt) const;
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
@@ -119,17 +119,6 @@ private:
   const QuantumSystemWrapper qs_;
 
   const double dpLimit_, overshootTolerance_;
-
-  const unsigned svdc_;
-  const bool firstSVDisplay_;
-  const int svdPrecision_;
-  mutable long svdCount_;
-
-  const std::string svExtension_;
-
-  const std::string file_;
-
-  const std::string initFile_;
 
   const MCWF_TrajectoryLogger logger_;
 

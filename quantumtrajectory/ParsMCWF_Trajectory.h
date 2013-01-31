@@ -14,15 +14,6 @@ struct ParsMCWF_Trajectory : public trajectory::ParsStochastic {
   
   double &dpLimit, &overshootTolerance;
 
-  unsigned &svdc;
-  bool &firstSVDisplay;
-  int &svdPrecision;
-
-  std::string &initFile;
-
-  size_t &basisDim;
-  std::string &basisFile;
-
   int &logLevel;
 
   ParsMCWF_Trajectory(parameters::ParameterTable& p, const std::string& mod="");

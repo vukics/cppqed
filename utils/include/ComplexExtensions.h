@@ -4,6 +4,11 @@
 
 #include<complex>
 
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#include <boost/serialization/complex.hpp>
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
+
 typedef std::complex<double> dcomp;
 // Even though it is a type we name it this way because we would like it to closely resemble built-in types
 

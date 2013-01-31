@@ -13,21 +13,6 @@
 #include "impl/FormDouble.tcc"
 #include "SmartPtr.h"
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/complex.hpp>
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-#include <fstream>
-
-
-// #include<blitz/tinyvec-et.h>
-
-// #include "Eigen.h"
-
-
 
 
 namespace quantumtrajectory {
@@ -52,101 +37,48 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
 
 template<int RANK> template<typename SYS>
 MCWF_Trajectory<RANK>::MCWF_Trajectory(
-				       StateVector& psi,
-				       const SYS& sys,
-				       const ParsMCWF_Trajectory& p,
-				       const StateVectorLow& scaleAbs
-				       )
+                                       StateVector& psi,
+                                       const SYS& sys,
+                                       const ParsMCWF_Trajectory& p,
+                                       const StateVectorLow& scaleAbs
+                                       )
   : trajectory::Trajectory(p),
     Base(psi(),
-	 bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
-	 trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),
-	 scaleAbs,
-	 p,
-	 evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorretionFactor),
-	 randomized::MakerGSL()),
+         bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
+         trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),
+         scaleAbs,
+         p,
+         evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorretionFactor),
+         randomized::MakerGSL()),
     tIntPic0_(0),
     psi_(psi),
     qs_(cpputils::sharedPointerize(sys),Base::noise()),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
-    svdc_(p.svdc),
-    firstSVDisplay_(p.firstSVDisplay),
-    svdPrecision_(p.svdPrecision ? p.svdPrecision : getPrecision()),
-    svdCount_(0),
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-    svExtension_(".svbin"),
-#else // DO_NOT_USE_BOOST_SERIALIZATION
-    svExtension_(".sv"),
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-    file_(p.ofn),
-    initFile_(p.initFile+svExtension_),
     logger_(p.logLevel,qs_.getHa(),getOstream())
 {
-  using namespace std;
-
   if (psi!=*qs_.getQS()) throw DimensionalityMismatchException();
   
-  if (initFile_!=svExtension_) {
-    ifstream file(initFile_.c_str());
-    if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(initFile_);
-    readState(file,true);
-  }
-
-  class NoPresetDtTry {};
-
-  try {
-
-  if (file_!="") {
-    {
-      ifstream file(file_.c_str());
-      if (!file.is_open() || file.peek()==EOF) throw NoPresetDtTry();
-    }
-    {
-      ifstream file((file_+svExtension_).c_str());
-      if (!file.is_open()) throw MCWF_TrajectoryFileOpeningException(file_+svExtension_);
-      readState(file);
-    }
-  }
-  else
-    throw NoPresetDtTry();
-
-  } catch (NoPresetDtTry) {
-    if (p.logLevel>1) getOstream()<<"# Adjusting initial dtTry\n";
-    manageTimeStep(qs_.template average<structure::LA_Li>(0.,psi_),getEvolved().get(),false);
-    // Initially, dpLimit should not be overshot, either.
-  }
-}
-
-
-template<int RANK>
-MCWF_Trajectory<RANK>::~MCWF_Trajectory()
-{
-  using namespace std;
-
-  if (file_!="") {
-    ofstream file((file_+svExtension_).c_str());
-    writeState(file);
-  }
+  manageTimeStep(qs_.template average<structure::LA_Li>(0.,psi_),getEvolved().get(),false);
+  // Initially, dpLimit should not be overshot, either.
 
 }
+
 
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::readState(std::ifstream &ifs, bool onlySV)
+void MCWF_Trajectory<RANK>::readState(boost::archive::binary_iarchive& iar)
 {
-  boost::archive::text_iarchive ar(ifs); // Add possibility of opting for binary archive
-  ar & *getEvolved() & *getRandomized();
+  iar & *getEvolved() & *getRandomized();
   if (qs_.getEx()) tIntPic0_=getTime();
   getOstream()<<"# Next timestep to try: "<<getDtTry()<<std::endl;
 }
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::writeState(std::ofstream &ofs) const
+void MCWF_Trajectory<RANK>::writeState(boost::archive::binary_oarchive& oar) const
 {
-  boost::archive::text_oarchive ar(ofs);
-  ar & *getEvolved() & *getRandomized();
+  oar & *getEvolved() & *getRandomized();
 }
 
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
@@ -251,7 +183,7 @@ void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const In
       if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
       psi_()/=normFactor;
     }
-	
+
     logger_.jumpOccured(t,jumpNo);
   }
 }
@@ -295,9 +227,7 @@ void MCWF_Trajectory<RANK>::displayParameters_v() const
 
   ostream& os=getOstream();
 
-  os<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl;
-  if (svdc_) os<<"# Displaying State Vector in every "<<svdc_<<" Display"<<endl;
-  os<<endl;
+  os<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl;
 
   qs_.getQS()->displayParameters(os);
 

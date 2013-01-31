@@ -16,9 +16,16 @@
 #include "Exception.h"
 #include "Evolved.h"
 
+#include <boost/utility.hpp>
+
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
+
 #include <iostream>
 
-#include <boost/utility.hpp>
 
 
 namespace trajectory {
@@ -74,8 +81,8 @@ public:
 
   void displayParameters() const {displayParameters_v();}
   
-  virtual void  readState(std::ifstream &)       = 0;
-  virtual void writeState(std::ofstream &) const = 0;
+  virtual void  readState(boost::archive::binary_iarchive&)       = 0;
+  virtual void writeState(boost::archive::binary_oarchive&) const = 0;
   
   virtual ~Trajectory();
 
