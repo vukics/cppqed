@@ -26,9 +26,10 @@ void derivs(double, const Array& b, Array& dbdt, const ParsPumpedLossy& p)
   dcomp
     temp(-2.*conj(p.eta)*z+conj(Omega)*s);
 
-  dbdt(0)= 2.*real(p.eta*s)+2*p.gamma*(1-z);
-  dbdt(1)= real(temp);
-  dbdt(2)=-imag(temp);
+  dbdt=
+    2.*real(p.eta*s)+2*p.gamma*(1-z),
+     real(temp),
+    -imag(temp);
 }
 
 
@@ -51,9 +52,10 @@ int main(int argc, char* argv[])
   {  
     quantumdata::DensityOperator<1> rho(qbit::init(pp2la));
 
-    zxy(0)= 2*real(rho()(0,0))-1;
-    zxy(1)= 2*real(rho()(0,1));
-    zxy(2)=-2*imag(rho()(0,1));
+    zxy=
+      2*real(rho()(0,0))-1,
+      2*real(rho()(0,1))  ,
+     -2*imag(rho()(0,1))  ;
   }
 
   Simulated<Array> S(zxy,bind(derivs,_1,_2,_3,pp2la),dtinit,Array(),pt);
