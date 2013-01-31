@@ -4,12 +4,11 @@
 
 #include "StochasticTrajectory.h"
 
-#include "Algorithm.h"
+#include "Conversions.h"
 #include "Functional.h"
-
+#include "ParsStochasticTrajectory.h"
 #include "Range.h"
-
-#include <boost/bind.hpp>
+#include "impl/Trajectory.tcc"
 
 #include <boost/progress.hpp>
 

@@ -69,26 +69,25 @@ class NonContiguousStorageException : public cpputils::Exception {};
 /////////////////////////////
 
 template<typename A>
-class EvolvedGSL : public Evolved<A> 
+class GSL : public Evolved<A> 
 {
 public:
   typedef Evolved<A> Base;
 
   typedef typename Base::Derivs Derivs;
-  typedef typename Base::Traits Traits;
 
   using Base::getA; using Base::getTime; using Base::getDtTry;
 
-  EvolvedGSL(
-	     A&,
-	     Derivs,
-	     double,
-	     double,
-	     double,
-	     const A&,
-	     SteppingFunction,
-	     double nextDtTryCorretionFactor
-	     );
+  GSL(
+      A&,
+      Derivs,
+      double,
+      double,
+      double,
+      const A&,
+      SteppingFunction,
+      double nextDtTryCorretionFactor
+      );
 
   std::ostream& doDisplayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
 

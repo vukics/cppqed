@@ -145,8 +145,8 @@ public:
 private:
   using Base::rho_;
 
-  void   displayMore   () const {doDisplay_.displayMore(getTime(),rho_,getOstream(),getPrecision());}
-  size_t displayMoreKey() const {return doDisplay_.displayMoreKey(getOstream());}
+  std::ostream& displayMore   () const {return doDisplay_.displayMore(getTime(),rho_,getOstream(),getPrecision());}
+  size_t        displayMoreKey() const {return doDisplay_.displayMoreKey(getOstream());}
   
   const details::DO_Display<RANK,V> doDisplay_;
 

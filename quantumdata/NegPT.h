@@ -4,7 +4,6 @@
 
 #include "DensityOperator.h"
 
-#include "BlitzArraySliceIterator.h"
 #include "TMP_Tools.h"
 
 

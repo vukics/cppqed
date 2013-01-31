@@ -29,15 +29,15 @@ struct EmptyAveragingBaseForInteractions {};
 #define BASE_class BIG_NAMESPACE_NAME::Base BIG_ADDITIONAL_TEMPLATE_PARAMETERS_PASS
 
 
-template<BIG_ADDITIONAL_TEMPLATE_PARAMETERS typename A=EmptyAveragingBaseForInteractions>
-class BIG_CLASS_NAME : public BASE_class, public A
+template<BIG_ADDITIONAL_TEMPLATE_PARAMETERS typename AveragingType=EmptyAveragingBaseForInteractions>
+class BIG_CLASS_NAME : public BASE_class, public AveragingType
 {
 public:
 
-  template<typename F1, typename F2>
-  BIG_CLASS_NAME(const F1& f1, const F2& f2 BIG_ADDITIONAL_PARAMETERS)
+  template<typename F1, typename F2, typename... AveragingConstructorParameters>
+  BIG_CLASS_NAME(const F1& f1, const F2& f2 BIG_ADDITIONAL_PARAMETERS , const AveragingConstructorParameters&... a)
     : BASE_class(cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f2) BIG_ADDITIONAL_PARAMETERS_PASS),
-      A()
+      AveragingType(a...)
   {}
 
 };

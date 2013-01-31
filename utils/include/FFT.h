@@ -6,6 +6,7 @@
 
 #include "Exception.h"
 
+#include <cstddef>
 
 namespace fft {
 

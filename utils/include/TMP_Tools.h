@@ -1,6 +1,4 @@
 // -*- C++ -*-
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 #define UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 
@@ -15,10 +13,6 @@
 #ifndef FUSION_MAX_LIST_SIZE
 #define FUSION_MAX_LIST_SIZE FUSION_MAX_VECTOR_SIZE
 #endif // FUSION_MAX_LIST_SIZE
-
-#ifndef TMPTOOLS_MAX_VECTOR_SIZE
-#define TMPTOOLS_MAX_VECTOR_SIZE FUSION_MAX_VECTOR_SIZE
-#endif // TMPTOOLS_MAX_VECTOR_SIZE
 
 
 #include "TMP_ToolsFwd.h"
@@ -37,14 +31,6 @@
 #include <boost/mpl/equal.hpp>
 
 #include <boost/mpl/assert.hpp>
-
-#include <boost/preprocessor/iteration/iterate.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/facilities/intercept.hpp>
-#include <boost/preprocessor/repetition/enum_trailing.hpp>
-#include <boost/preprocessor/arithmetic/sub.hpp>
-
 
 #define DEFINE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName;
 
@@ -87,11 +73,11 @@ template<int N1>         struct Power<N1,0> : boost::mpl::int_<1>               
 
 template<typename Seq, typename ICW>
 struct numerical_contains : boost::mpl::not_<boost::is_same<typename boost::mpl::find_if<Seq,
-											 boost::mpl::equal_to<boost::mpl::_,ICW> 
-											 >::type,
-							    typename boost::mpl::end<Seq>::type
-							    >
-					     > {};
+                                                                                         boost::mpl::equal_to<boost::mpl::_,ICW> 
+                                                                                         >::type,
+                                                            typename boost::mpl::end<Seq>::type
+                                                            >
+                                             > {};
 
 
 template<typename Seq, typename T, T VALUE>
@@ -163,41 +149,16 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
 ////////////////////////////////////////////
 
 
-const int vectorDefaultArgument=-1001;
-
-
-template<int V, int N>
+template<int V>
 struct ArgumentDispatcher : boost::mpl::int_<V>
 {
-  BOOST_MPL_ASSERT_MSG( V>=0 , NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR_at, (boost::mpl::int_<N>) );
+  BOOST_MPL_ASSERT_MSG( V>=0 , NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR, (boost::mpl::int_<V>) );
 };
 
 
-
-template<BOOST_PP_ENUM_BINARY_PARAMS(TMPTOOLS_MAX_VECTOR_SIZE,int V,=vectorDefaultArgument BOOST_PP_INTERCEPT)> 
-struct Vector : boost::mpl::vector_c<int,BOOST_PP_ENUM_PARAMS(TMPTOOLS_MAX_VECTOR_SIZE,V) >
+template<int... V> 
+struct Vector : boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...>
 {};
-
-
-#define DEFAULT_print(z, n, data) vectorDefaultArgument
-
-template<>
-struct Vector<BOOST_PP_ENUM(TMPTOOLS_MAX_VECTOR_SIZE,DEFAULT_print,~) >
-  : boost::mpl::vector_c<int>
-{};
-
-
-#define ARGUMENTDISPATCHER_print(z, n, data) ArgumentDispatcher<V##n,n>::value
-
-#define BOOST_PP_ITERATION_LIMITS (1, BOOST_PP_SUB(TMPTOOLS_MAX_VECTOR_SIZE,1) )
-#define BOOST_PP_FILENAME_1 "TMP_Tools.h"
-
-#include BOOST_PP_ITERATE()
-
-#undef BOOST_PP_FILENAME_1
-#undef BOOST_PP_ITERATION_LIMITS
-#undef ARGUMENTDISPATCHER_print
-#undef DEFAULT_print
 
 
 typedef Vector<> V_Empty;
@@ -208,17 +169,3 @@ typedef Vector<> V_Empty;
 
 
 #endif // UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
-
-
-#else  // BOOST_PP_IS_ITERATING
-
-
-#define ITER BOOST_PP_ITERATION()
-
-template<BOOST_PP_ENUM_PARAMS(ITER,int V)>
-struct Vector<BOOST_PP_ENUM_PARAMS(ITER,V) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(TMPTOOLS_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
-  : boost::mpl::vector_c<int BOOST_PP_ENUM_TRAILING(ITER,ARGUMENTDISPATCHER_print,~)>
-{};
-
-
-#endif // BOOST_PP_IS_ITERATING

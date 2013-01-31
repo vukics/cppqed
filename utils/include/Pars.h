@@ -4,12 +4,13 @@
 
 #include "ParsFwd.h"
 
+#include "BooleanNegatedProxy.h"
 #include "Exception.h"
 
-#include<boost/ptr_container/ptr_list.hpp>
+#include <boost/ptr_container/ptr_list.hpp>
 
-#include<string>
-#include<sstream>
+#include <string>
+#include <sstream>
 
 
 namespace parameters {
@@ -56,7 +57,7 @@ public:
 class AttemptedRecreationOfParameterException : public NamedException 
 {
 public: 
-  AttemptedRecreationOfParameterException(const std::string& name) : NamedException(name) {}
+  AttemptedRecreationOfParameterException(const std::string& name);
 };
 
 
@@ -152,6 +153,41 @@ private:
   std::stringstream stream_;
   
 };
+
+
+///////////////////////////////////
+//
+// Boolean Parameter Specialization
+//
+///////////////////////////////////
+
+
+template<>
+void Parameter<bool>::print(size_t smw, size_t tmw, size_t dmw) const;
+
+
+template<>
+void Parameter<bool>::read(std::istream&);
+
+
+template<>
+void Parameter<cpputils::BooleanNegatedProxy>::read(std::istream&);
+
+
+////////////////////////////
+//
+// TitleLine specializations
+//
+////////////////////////////
+
+
+template<>
+void Parameter<TitleLine>::print(size_t smw, size_t tmw, size_t dmw) const;
+
+
+template<>
+void Parameter<TitleLine>::read(std::istream&);
+
 
 
 } // parameters

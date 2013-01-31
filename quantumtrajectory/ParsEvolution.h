@@ -12,7 +12,8 @@ using namespace quantumtrajectory;
 struct ParsEvolution : public ParsMCWF_Trajectory {
 
   EvolutionMode &evol;
-  bool &negativity;
+  bool &negativity, &timeAverage;
+  double &relaxationTime;
 
   ParsEvolution(parameters::ParameterTable& p, const std::string& mod="");
 

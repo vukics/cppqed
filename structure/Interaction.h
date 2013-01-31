@@ -15,27 +15,44 @@
 
 #include "BlitzTiny.h"
 
+#include <boost/bind.hpp>
+
+#include <boost/iterator/transform_iterator.hpp>
+
 
 namespace structure {
 
 
 template<int RANK>
-class Interaction : public DynamicsBase
+class Interaction : public DynamicsBase, public DimensionsBookkeeper<RANK>
 {
 public:
   typedef boost::shared_ptr<const Interaction> Ptr;
 
   typedef blitz::TinyVector<Free::Ptr,RANK> Frees;
 
+  typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
+  
   explicit Interaction(const Frees& frees,
 		       const    RealFreqs&    realFreqs=   RealFreqs(), 
 		       const ComplexFreqs& complexFreqs=ComplexFreqs())
-    : DynamicsBase(realFreqs,complexFreqs), frees_(frees) {}
+    : DynamicsBase(realFreqs,complexFreqs), DimensionsBookkeeper<RANK>(extractDimensions(frees)), frees_(frees) {}
 
     
   const Frees& getFrees() const {return frees_;}
 
 private:
+#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(frees.beginend(),boost::bind(&Free::getTotalDimension,_1))
+
+  static const Dimensions extractDimensions(const Frees& frees)
+  {
+    Dimensions res;
+    std::copy(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end),res.begin());
+    return res;
+  }
+  
+#undef TRANSFORMED_iterator
+  
   const Frees frees_;
 
 };

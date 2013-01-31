@@ -27,11 +27,7 @@ struct ShallowCopy {}; // For referencing constructors
 struct DeepCopy    {}; // For copying     constructors
 
 
-// The semantics of the "DeepCopy" of Array is different from
-// blitz::Array in that the storage order is NOT copied but rather a
-// user-specified (by default the C) storage order is applied in the
-// copy. I believe it is more in line with the fact that usually the
-// way we think about the storage in Array is the C way.
+// The semantics of the "DeepCopy" of Array is different from blitz::Array in that the storage order is NOT copied but rather a user-specified (by default the C) storage order is applied in the copy. I believe it is more in line with the fact that usually the way we think about the storage in Array is the C way.
 
 template<typename T, int RANK>
 class Array : public blitz::Array<T,RANK>, private boost::noncopyable

@@ -79,16 +79,17 @@ public:
 		  const StateVectorLow& =StateVectorLow()
 		  );
 
-  virtual ~MCWF_Trajectory();
+  ~MCWF_Trajectory();
 
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
   const StateVector& getPsi() const {return psi_;} 
 
 protected:
-  virtual size_t displayMoreKey () const;
-
-  virtual void   displayEvenMore() const {}
+  std::ostream& displayMore() const;
+  size_t displayMoreKey() const;
+  
+  const QuantumSystemWrapper getQS() const {return qs_;}
 
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
@@ -100,8 +101,6 @@ private:
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  void displayMore() const;
-  
   void readState(std::ifstream &, bool onlySV=false);
   void writeState(std::ofstream &) const;
   

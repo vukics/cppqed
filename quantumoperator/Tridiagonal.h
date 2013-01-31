@@ -93,8 +93,8 @@ public:
   explicit Tridiagonal(const Diagonal& zero=empty, size_t k=0, const Diagonal& minus=empty, const Diagonal& plus=empty, bool toFreqs=false, IntRANK=_1_);
 
   Tridiagonal(const Tridiagonal& tridiag) 
-    : Base(tridiag), diagonals_(blitzplusplus::TOA_DeepCopy(),tridiag.diagonals_), differences_(tridiag.differences_), tCurrent_(tridiag.tCurrent_), 
-      freqs_(blitzplusplus::TOA_DeepCopy(),tridiag.freqs_) {}
+    : Base(tridiag), diagonals_(blitzplusplus::DeepCopy(),tridiag.diagonals_), differences_(tridiag.differences_), tCurrent_(tridiag.tCurrent_), 
+      freqs_(blitzplusplus::DeepCopy(),tridiag.freqs_) {}
 
   template<int RANK2>
   Tridiagonal(const Tridiagonal<RANK2>&, const Tridiagonal<RANK-RANK2>&); // Direct product
@@ -138,7 +138,7 @@ public:
 
 private:
   Tridiagonal(const Base& base, const Diagonals& diagonals, const Dimensions& differences, double tCurrent, const Diagonals& freqs)
-    : Base(base), diagonals_(blitzplusplus::TOA_DeepCopy(),diagonals), differences_(differences), tCurrent_(tCurrent), freqs_(blitzplusplus::TOA_DeepCopy(),freqs) {}
+    : Base(base), diagonals_(blitzplusplus::DeepCopy(),diagonals), differences_(differences), tCurrent_(tCurrent), freqs_(blitzplusplus::DeepCopy(),freqs) {}
 
   ///////////////////////
   // Apply implementation

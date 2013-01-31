@@ -7,6 +7,7 @@
 #ifndef DO_NOT_USE_FLENS
 
 #include "impl/Blitz2FLENS.tcc"
+#include "impl/BlitzArraySliceIterator.tcc"
 
 #include <boost/mpl/transform.hpp>
 
@@ -47,7 +48,7 @@ double negPT(const DensityOperator<RANK>& rho, V)
   TTD_CARRAY(1) eigenValues(rho.getTotalDimension());
 
   {
-    GeMatrix a(matrix(rhoDeepPT,RowMajorTag()));
+    GeMatrix a(matrix<RowMajor>(rhoDeepPT));
     typename DenseVectorMF<dcomp>::type v(blitz2flens::vector(eigenValues));
 
     ev(false,false,a,v,a,a);

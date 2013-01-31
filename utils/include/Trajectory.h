@@ -92,8 +92,8 @@ private:
   virtual double        getDtDid_v()       const = 0;
   virtual void displayParameters_v()       const = 0;
 
-  virtual void   displayMore   () const = 0; // LOGICALLY const
-  virtual size_t displayMoreKey() const = 0;
+  virtual std::ostream& displayMore   () const = 0; // LOGICALLY const
+  virtual size_t        displayMoreKey() const = 0;
 
   std::ostream& ostream_;
 

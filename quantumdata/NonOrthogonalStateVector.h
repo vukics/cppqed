@@ -114,7 +114,7 @@ const RETURN_type
 operator*(const NonOrthogonalStateVector<RANK1,TRAFO1>& sv1, const NonOrthogonalStateVector<RANK2,TRAFO2>& sv2)
 {
   using namespace blitzplusplus; 
-  return RETURN_type(doDirect(sv1(),sv2(),dodirect::Mul()),RETURN_typeKERNEL::compose(sv1.getTrafo(),sv2.getTrafo()),byReference);
+  return RETURN_type(doDirect<dodirect::multiplication>(sv1(),sv2()),RETURN_typeKERNEL::compose(sv1.getTrafo(),sv2.getTrafo()),byReference);
 }
 
 #undef RETURN_typeKERNEL
@@ -127,7 +127,7 @@ const RETURN_type
 operator*(const NonOrthogonalStateVector<RANK1,TRAFO1>& sv1, const StateVector<RANK2>& sv2)
 {
   using namespace blitzplusplus; 
-  return RETURN_type(doDirect(sv1(),sv2(),dodirect::Mul()),RETURN_typeKERNEL::compose(sv1.getTrafo(),
+  return RETURN_type(doDirect<dodirect::multiplication>(sv1(),sv2()),RETURN_typeKERNEL::compose(sv1.getTrafo(),
 										      transformation::Identity<RANK2>()),byReference);
 }
 
@@ -141,7 +141,7 @@ const RETURN_type
 operator*(const StateVector<RANK1>& sv1, const NonOrthogonalStateVector<RANK2,TRAFO2>& sv2)
 {
   using namespace blitzplusplus; 
-  return RETURN_type(doDirect(sv1(),sv2(),dodirect::Mul()),RETURN_typeKERNEL::compose(transformation::Identity<RANK1>(),
+  return RETURN_type(doDirect<dodirect::multiplication>(sv1(),sv2()),RETURN_typeKERNEL::compose(transformation::Identity<RANK1>(),
 										      sv2.getTrafo()),byReference);
 }
 

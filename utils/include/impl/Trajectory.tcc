@@ -4,6 +4,7 @@
 
 #include "Trajectory.h"
 
+#include "impl/Evolved.tcc"
 #include "ParsTrajectory.h"
 
 
@@ -81,14 +82,14 @@ void evolve(Adaptive<A>& traj, const Pars& p)
 
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs,
-			  const A& scaleAbs, const evolved::Maker<A>& maker)
+                      const A& scaleAbs, const evolved::Maker<A>& maker)
   : evolved_(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs))
 {}
 
 
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit,
-			  const A& scaleAbs, const Pars& p, const evolved::Maker<A>& maker)
+                      const A& scaleAbs, const Pars& p, const evolved::Maker<A>& maker)
   : evolved_(maker(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs)) {}
 
 

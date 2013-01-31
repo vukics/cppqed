@@ -4,7 +4,6 @@
 
 #include "SimulatedFwd.h"
 
-#include "ArrayTraitsFwd.h"
 #include "EvolvedFwd.h"
 
 #include "Trajectory.h"
@@ -18,7 +17,6 @@ class Simulated : public Adaptive<A>
 {
 public:
   typedef Adaptive<A> Base;
-  typedef cpputils::ArrayTraversalTraits<A> Traits;
 
   typedef evolved::Evolved<A> Evolved;
 
@@ -38,8 +36,8 @@ public:
 private:
   void step_v(double deltaT) const {getEvolved()->step(deltaT);}
 
-  void   displayMore   () const;
-  size_t displayMoreKey() const;
+  std::ostream& displayMore   () const;
+  size_t        displayMoreKey() const;
 
   void   displayParameters_v() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters_v();}
 

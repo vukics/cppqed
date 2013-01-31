@@ -2,6 +2,7 @@
 
 #include "EvolutionComposite.h"
 
+#include "impl/AveragingUtils.tcc"
 #include "JaynesCummings.h"
 #include "QbitModeCorrelations.h"
 
@@ -32,7 +33,7 @@ int main(int argc, char* argv[])
 
   const qbit::Ptr qbit(qbit::make(pplqb,qmp));
 
-  const mode::Ptr mode(mode::make(pplm ,qmp,structure::averaged::ReducedDensityOperator("Mode",pplm.cutoff,true)));
+  const mode::Ptr mode(mode::make<ReducedDensityOperator<1> >(pplm ,qmp,"Mode",pplm.cutoff,true));
 
   const jaynescummings::Ptr jcCorr(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc)), jc(jaynescummings::make(qbit,mode,pjc));
   
