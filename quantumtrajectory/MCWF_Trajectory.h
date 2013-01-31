@@ -4,37 +4,17 @@
 
 #include "MCWF_TrajectoryFwd.h"
 
-#include "MCWF_TrajectoryLogger.h"
 #include "StateVectorFwd.h"
+
+#include "MCWF_TrajectoryLogger.h"
 #include "Structure.h"
 
 #include "StochasticTrajectory.h"
 
 #include <boost/tuple/tuple.hpp>
 
-#include <boost/mpl/identity.hpp>
-
-#include <vector>
-
-namespace mpl=boost::mpl;
 
 namespace quantumtrajectory {
-
-
-class MCWF_TrajectoryFileOpeningException : public cpputils::TaggedException
-{
-public:
-  MCWF_TrajectoryFileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
-
-
-class MCWF_TrajectoryFileParsingException : public cpputils::TaggedException
-{
-public:
-  MCWF_TrajectoryFileParsingException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
 
 
 ///////////////////////////////////////
@@ -75,11 +55,11 @@ public:
   MCWF_Trajectory(
                   StateVector& psi,
                   const SYS& sys,
-                  const ParsMCWF_Trajectory&,
+                  const ParsMCWF&,
                   const StateVectorLow& =StateVectorLow()
                   );
 
-  ~MCWF_Trajectory();
+  ~MCWF_Trajectory() {}
 
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
@@ -101,8 +81,10 @@ private:
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  void readState (boost::archive::binary_iarchive&);
-  void writeState(boost::archive::binary_oarchive&) const;
+#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  void readState_v(boost::archive::binary_iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime();}
+  // writeState_v inherited
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
   
   double                coherentTimeDevelopment    (                                double Dt) const;
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
@@ -120,7 +102,7 @@ private:
 
   const double dpLimit_, overshootTolerance_;
 
-  const MCWF_TrajectoryLogger logger_;
+  const MCWF_Logger logger_;
 
 };
 

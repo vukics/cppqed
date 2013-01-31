@@ -5,11 +5,9 @@
 
 namespace quantumtrajectory {
 
-class MCWF_TrajectoryFileOpeningException;
+class MCWF_Logger;
 
-class MCWF_TrajectoryLogger;
-
-struct ParsMCWF_Trajectory;
+struct ParsMCWF;
 
 template<int RANK>
 class MCWF_Trajectory;

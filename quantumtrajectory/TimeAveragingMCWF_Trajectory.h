@@ -29,7 +29,7 @@ public:
   TimeAveragingMCWF_Trajectory(
                                StateVector& psi,
                                const SYS& sys,
-                               const ParsMCWF_Trajectory& p,
+                               const ParsMCWF& p,
                                double relaxationTime,
                                const StateVectorLow& scaleAbs=StateVectorLow()
                                )

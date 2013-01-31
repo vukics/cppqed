@@ -7,12 +7,12 @@
 using namespace std;
 
 
-quantumtrajectory::MCWF_TrajectoryLogger::MCWF_TrajectoryLogger(unsigned logLevel, bool isHamiltonian, std::ostream& os)
+quantumtrajectory::MCWF_Logger::MCWF_Logger(unsigned logLevel, bool isHamiltonian, std::ostream& os)
   : logLevel_(logLevel), isHamiltonian_(isHamiltonian), os_(os), nSteps_(), nOvershot_(), nToleranceOvershot_(), nFailedSteps_(), nHamiltonianCalls_(), dpMaxOvershoot_(), dpToleranceMaxOvershoot_(), normMaxDeviation_(), traj_()
 {}
 
 
-quantumtrajectory::MCWF_TrajectoryLogger::~MCWF_TrajectoryLogger()
+quantumtrajectory::MCWF_Logger::~MCWF_Logger()
 {
   if (logLevel_) {
     os_
@@ -35,10 +35,10 @@ quantumtrajectory::MCWF_TrajectoryLogger::~MCWF_TrajectoryLogger()
 }
 
 
-void quantumtrajectory::MCWF_TrajectoryLogger::step() const {++nSteps_;}
+void quantumtrajectory::MCWF_Logger::step() const {++nSteps_;}
 
 
-void quantumtrajectory::MCWF_TrajectoryLogger::stepBack(double dp, double dtDid, double newDtTry, double t, bool logControl) const
+void quantumtrajectory::MCWF_Logger::stepBack(double dp, double dtDid, double newDtTry, double t, bool logControl) const
 {
   ++nToleranceOvershot_;
   if (logControl) dpToleranceMaxOvershoot_=max(dpToleranceMaxOvershoot_,dp);
@@ -47,7 +47,7 @@ void quantumtrajectory::MCWF_TrajectoryLogger::stepBack(double dp, double dtDid,
 }
 
 
-void quantumtrajectory::MCWF_TrajectoryLogger::overshot(double dp, double oldDtTry, double newDtTry, bool logControl) const
+void quantumtrajectory::MCWF_Logger::overshot(double dp, double oldDtTry, double newDtTry, bool logControl) const
 {
   ++nOvershot_;
   if (logControl) dpMaxOvershoot_=max(dpMaxOvershoot_,dp);
@@ -56,14 +56,14 @@ void quantumtrajectory::MCWF_TrajectoryLogger::overshot(double dp, double oldDtT
 }
 
 
-void quantumtrajectory::MCWF_TrajectoryLogger::processNorm(double norm) const
+void quantumtrajectory::MCWF_Logger::processNorm(double norm) const
 {
   normMaxDeviation_=max(normMaxDeviation_,fabs(1-norm));
   // NEEDS_WORK this should be somehow weighed by the timestep
 }
 
 
-void quantumtrajectory::MCWF_TrajectoryLogger::jumpOccured(double t, size_t jumpNo) const
+void quantumtrajectory::MCWF_Logger::jumpOccured(double t, size_t jumpNo) const
 {
   traj_.push_back(make_pair(t,jumpNo));
   if (logLevel_>1)
@@ -71,7 +71,7 @@ void quantumtrajectory::MCWF_TrajectoryLogger::jumpOccured(double t, size_t jump
 }
 
 
-void quantumtrajectory::MCWF_TrajectoryLogger::logFailedSteps(size_t n) const
+void quantumtrajectory::MCWF_Logger::logFailedSteps(size_t n) const
 {
   nFailedSteps_+=n;
   if (logLevel_>3)
@@ -79,7 +79,7 @@ void quantumtrajectory::MCWF_TrajectoryLogger::logFailedSteps(size_t n) const
 }
 
 
-void quantumtrajectory::MCWF_TrajectoryLogger::hamiltonianCalled() const
+void quantumtrajectory::MCWF_Logger::hamiltonianCalled() const
 {
   nHamiltonianCalls_++;
 }

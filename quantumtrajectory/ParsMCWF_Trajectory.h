@@ -10,13 +10,13 @@
 namespace quantumtrajectory {
 
 
-struct ParsMCWF_Trajectory : public trajectory::ParsStochastic {
+struct ParsMCWF : public trajectory::ParsStochastic {
   
   double &dpLimit, &overshootTolerance;
 
   int &logLevel;
 
-  ParsMCWF_Trajectory(parameters::ParameterTable& p, const std::string& mod="");
+  ParsMCWF(parameters::ParameterTable& p, const std::string& mod="");
 
 };
 

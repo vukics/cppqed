@@ -67,8 +67,9 @@ void Trajectory::displayKey() const
 }
 
 
+namespace details {
 
-void details::doRun(Trajectory& traj, double time, double deltaT)
+void doRun(Trajectory& traj, double time, double deltaT)
 {
   while (traj.getTime()<time) {
     traj.evolve(std::min(deltaT,time-traj.getTime()));
@@ -76,12 +77,14 @@ void details::doRun(Trajectory& traj, double time, double deltaT)
   }
 }
 
-void details::doRun(Trajectory& traj, long nDt, double deltaT)
+void doRun(Trajectory& traj, long nDt, double deltaT)
 {
   for (long i=0; i<nDt; i++){
     traj.evolve(deltaT);
     traj.display();
   }
 }
+
+} // details
 
 } // trajectory

@@ -35,7 +35,7 @@ std::auto_ptr<typename Base<RANK>::Trajectories>
 trajectories(
 	     typename Base<RANK>::StateVectors& psis,
 	     typename Base<RANK>::QuantumSystemPtr qs,
-	     const ParsMCWF_Trajectory& p, 
+	     const ParsMCWF& p, 
 	     const typename Base<RANK>::StateVectorLow& scaleAbs
 	     )
 {
@@ -61,7 +61,7 @@ template<int RANK>
 Base<RANK>::Base(
 		 const StateVector& psi,
 		 QuantumSystemPtr qs,
-		 const ParsMCWF_Trajectory& p,
+		 const ParsMCWF& p,
 		 const StateVectorLow& scaleAbs
 		 )
   : StateVectorsBase(details::stateVectors<RANK>(psi,p.nTraj)),

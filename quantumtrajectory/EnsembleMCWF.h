@@ -57,7 +57,7 @@ public:
   Base(
        const StateVector&,
        QuantumSystemPtr,
-       const ParsMCWF_Trajectory&,
+       const ParsMCWF&,
        const StateVectorLow& =StateVectorLow()
        );
 
@@ -105,7 +105,7 @@ public:
   EnsembleMCWF(
 	       const StateVector& psi,
 	       const SYS& sys,
-	       const ParsMCWF_Trajectory& p,
+	       const ParsMCWF& p,
 	       bool negativity,
 	       const StateVectorLow& scaleAbs=StateVectorLow()
 	       )

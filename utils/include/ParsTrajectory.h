@@ -12,7 +12,7 @@
 namespace trajectory {
 
 /*
-  The following suit of Pars(Stochastic)Trajectory, + eg ParsMCWF_Trajectory in C++QED demonstrates a technique to facilitate reading parameters from command line and using them to initialize a (hierarchy of) class(es).
+  The following suit of Pars(Stochastic)Trajectory, + eg ParsMCWF in C++QED demonstrates a technique to facilitate reading parameters from command line and using them to initialize a (hierarchy of) class(es).
 
   The same technique is to be used in quantum/elements when there is a detailed hierarchy of elements.
 

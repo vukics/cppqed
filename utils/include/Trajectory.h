@@ -1,12 +1,8 @@
 // -*- C++ -*-
 
-// Adaptive is more than Evolved only in that it takes into account
-// the need for communicating towards the user from time to time during
-// Evolution.
-
+// Adaptive is more than Evolved only in that it takes into account the need for communicating towards the user from time to time during Evolution.
 // This is manifested in the abstract function Display.
-
-// Consider copying of Trajectories
+// Consider copying (cloning) of Trajectories
 
 #ifndef UTILS_INCLUDE_TRAJECTORY_H_INCLUDED
 #define UTILS_INCLUDE_TRAJECTORY_H_INCLUDED
@@ -18,7 +14,7 @@
 
 #include <boost/utility.hpp>
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
@@ -81,8 +77,10 @@ public:
 
   void displayParameters() const {displayParameters_v();}
   
-  virtual void  readState(boost::archive::binary_iarchive&)       = 0;
-  virtual void writeState(boost::archive::binary_oarchive&) const = 0;
+#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  void  readState(boost::archive::binary_iarchive& iar)       { readState_v(iar);}
+  void writeState(boost::archive::binary_oarchive& oar) const {writeState_v(oar);};
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
   
   virtual ~Trajectory();
 
@@ -101,6 +99,11 @@ private:
 
   virtual std::ostream& displayMore   () const = 0; // LOGICALLY const
   virtual size_t        displayMoreKey() const = 0;
+
+#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  virtual void  readState_v(boost::archive::binary_iarchive&)       = 0;
+  virtual void writeState_v(boost::archive::binary_oarchive&) const = 0;
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
   std::ostream& ostream_;
 
@@ -138,6 +141,11 @@ protected:
 
   void displayParameters_v() const;
 
+#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  void  readState_v(boost::archive::binary_iarchive& iar)       {iar & *evolved_;}
+  void writeState_v(boost::archive::binary_oarchive& oar) const {oar & *evolved_;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
 private:
   double getDtDid_v() const {return evolved_->getDtDid();}
 
@@ -150,23 +158,6 @@ private:
   typename Evolved::Ptr evolved_;
 
 };
-
-
-namespace details {
-
-template<typename T, typename L, typename D>
-void run(T& traj, L l, D d, void (*doRun)(T&,L,D), bool timestep, bool displayInfo);
-
-void doRun(Trajectory&, long   nDt , double deltaT);
-// Evolves the system on an Adaptive for nDt display intervals deltaT
-
-void doRun(Trajectory&, double time, double deltaT);
-// Evolves the system on an Adaptive up to time T and Displays in every deltaT
-
-template<typename A> 
-void doRun(Adaptive<A>& traj, double time, int dc);
-
-} // details
 
 
 } // trajectory

@@ -9,15 +9,15 @@
 namespace quantumtrajectory {
 
 
-class MCWF_TrajectoryLogger
+class MCWF_Logger
 {
 public:
   typedef std::list<std::pair<double,size_t> > MCWF_Trajectory;
   // Stores <time instant, jumpNo> pairs
 
-  MCWF_TrajectoryLogger(unsigned logLevel, bool isHamiltonian, std::ostream& os);
+  MCWF_Logger(unsigned logLevel, bool isHamiltonian, std::ostream& os);
 
-  ~MCWF_TrajectoryLogger();
+  ~MCWF_Logger();
 
   void step() const;
 

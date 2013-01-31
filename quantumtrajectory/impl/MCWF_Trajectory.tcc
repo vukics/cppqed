@@ -39,7 +39,7 @@ template<int RANK> template<typename SYS>
 MCWF_Trajectory<RANK>::MCWF_Trajectory(
                                        StateVector& psi,
                                        const SYS& sys,
-                                       const ParsMCWF_Trajectory& p,
+                                       const ParsMCWF& p,
                                        const StateVectorLow& scaleAbs
                                        )
   : trajectory::Trajectory(p),
@@ -62,26 +62,6 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
   // Initially, dpLimit should not be overshot, either.
 
 }
-
-
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-
-template<int RANK>
-void MCWF_Trajectory<RANK>::readState(boost::archive::binary_iarchive& iar)
-{
-  iar & *getEvolved() & *getRandomized();
-  if (qs_.getEx()) tIntPic0_=getTime();
-  getOstream()<<"# Next timestep to try: "<<getDtTry()<<std::endl;
-}
-
-
-template<int RANK>
-void MCWF_Trajectory<RANK>::writeState(boost::archive::binary_oarchive& oar) const
-{
-  oar & *getEvolved() & *getRandomized();
-}
-
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
 template<int RANK>
