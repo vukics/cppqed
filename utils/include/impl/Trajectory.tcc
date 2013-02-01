@@ -11,6 +11,15 @@
 namespace trajectory {
 
 
+template<typename A>
+void run(Adaptive<A>& traj, const Pars& p)
+{
+  if      (p.dc) run(traj,p.T,p.dc,p.displayInfo);
+  else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
+  else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
+}
+
+
 namespace details {
 
 
@@ -67,17 +76,6 @@ template<typename A>
 void run   (Adaptive<A>& traj, double time, int    dc    , bool displayInfo) {details::run(traj,time,dc    ,details::doRun,true ,displayInfo);}
 
 
-template<typename A>
-void evolve(Adaptive<A>& traj, const Pars& p)
-{
-  if      (p.dc) run  (traj,p.T,p.dc,p.displayInfo);
-  else if (p.Dt) {
-    if (p.NDt) runNDt(traj,p.NDt,p.Dt,p.displayInfo);
-    else runDt(traj,p.T,p.Dt,p.displayInfo);
-  }
-  else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
-  //  std::cerr<<std::endl;
-}
 
 
 template<typename A>
