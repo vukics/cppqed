@@ -14,29 +14,6 @@
 namespace cpputils {
 
 
-namespace details {
-
-
-template<int RANK>
-struct IterHelper : boost::input_iterator_helper<MultiIndexIterator<RANK>,TTD_IDXTINY(RANK)> {};
-
-template<int RANK>
-void doIt(const TTD_IDXTINY(RANK)& lbound, 
-	  const TTD_IDXTINY(RANK)& ubound,
-	  TTD_IDXTINY(RANK)& idx,
-	  boost::mpl::int_<0>);
-
-
-template<int RANK, int N>
-void doIt(const TTD_IDXTINY(RANK)& lbound, 
-	  const TTD_IDXTINY(RANK)& ubound,
-	  TTD_IDXTINY(RANK)& idx,
-	  boost::mpl::int_<N>);
-
-
-} // details
-
-
 namespace mii {
  
 typedef boost::mpl::false_ Begin;
@@ -48,12 +25,16 @@ const End   end  =End  ();
 }
 
 
+#define INPUT_IteratorHelper boost::input_iterator_helper<MultiIndexIterator<RANK>,TTD_IDXTINY(RANK)>
+
+
 template<int RANK>
-class MultiIndexIterator 
-  : public details::IterHelper<RANK>
+class MultiIndexIterator : public INPUT_IteratorHelper
 {
 public:
-  typedef details::IterHelper<RANK> Base;
+  typedef INPUT_IteratorHelper Base;
+  
+#undef INPUT_IteratorHelper
 
   typedef typename Base::value_type IdxTiny;
   
@@ -66,7 +47,7 @@ public:
   
   MultiIndexIterator& operator=(const MultiIndexIterator& other) {idx_=other.idx_; return *this;}
   
-  MultiIndexIterator& operator++() {details::doIt(lbound_,ubound_,idx_,boost::mpl::int_<RANK-1>()); return *this;}
+  MultiIndexIterator& operator++() {doIt(boost::mpl::int_<RANK-1>()); return *this;}
 
   const IdxTiny& operator*() const {return idx_;}
         IdxTiny& operator*()       {return const_cast<IdxTiny&>(static_cast<const MultiIndexIterator*>(this)->operator*());}
@@ -81,6 +62,11 @@ public:
   MultiIndexIterator& setToEnd  () {idx_=ubound_; return ++(*this);}
   
 private:
+  void doIt(boost::mpl::int_<0>);
+
+  template<int N>
+  void doIt(boost::mpl::int_<N>);
+
   const IdxTiny lbound_, ubound_;
 
   IdxTiny idx_;

@@ -11,7 +11,83 @@
 
 #include <boost/make_shared.hpp>
 
+
 namespace evolved {
+
+  
+namespace details  {
+
+// Two indirections needed because cannot declare member functions for Impl here
+
+ImplPtr createImpl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*, SteppingFunction);
+
+void apply(ImplPtr, double*, double, double*, double*);
+
+size_t extractFailedSteps(ImplPtr);
+
+} // details
+
+
+template<typename A>
+class MakerGSL<A>::GSL : public Evolved<A> 
+{
+public:
+  typedef Evolved<A> Base;
+
+  typedef typename Base::Derivs Derivs;
+
+  using Base::getA; using Base::getTime; using Base::getDtTry;
+
+  GSL(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorretionFactor)
+    : Base(a,derivs,dtInit,epsRel,epsAbs),
+      pImpl_(details::createImpl(this,cpputils::size(getA()),auxFunction,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
+      sf_(sf),
+      nextDtTryCorretionFactor_(nextDtTryCorretionFactor)
+  {
+    if (!cpputils::isStorageContiguous(a)) throw (NonContiguousStorageException());
+  }
+
+  std::ostream& doDisplayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
+
+private:
+
+  static int auxFunction(double t, const double* y, double* dydt, void* aux)
+  {
+    using namespace cpputils;
+    
+    GSL* e=static_cast<GSL*>(aux);
+
+    const A    yInterfaceA(create(y   ,e->getA()));
+          A dydtInterfaceA(create(dydt,e->getA()));
+
+    e->getDerivs()(t,yInterfaceA,dydtInterfaceA);
+
+    return details::onSuccess;
+  }
+
+  void doStep(double deltaT)
+  {
+    double
+      time=getTime(),
+      dtTry=getDtTry(),
+      nextDtTry=( fabs(deltaT)<fabs(dtTry/nextDtTryCorretionFactor_) ? dtTry : 0. );
+
+    apply(pImpl_,&time,time+deltaT,&dtTry,cpputils::data(getA()));
+
+    Base::update(time, nextDtTry ? nextDtTry/nextDtTryCorretionFactor_ : dtTry );
+
+  }
+
+  size_t reportNFailedSteps() const {return extractFailedSteps(pImpl_);}
+
+  const details::ImplPtr pImpl_;
+
+  const SteppingFunction sf_;
+  const double nextDtTryCorretionFactor_;
+
+};
+
+
 
 
 template<typename A>
@@ -24,66 +100,9 @@ const typename Maker<A>::Ptr MakerGSL<A>::operator()(
                                                      const A& scaleAbs
                                                      ) const
 {
-  return boost::make_shared<details::GSL<A>, A& >(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_);
+  return boost::make_shared<GSL, A& >(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_);
 }
 
-
-
-namespace details {
-
-using namespace cpputils;
-  
-template<typename A>
-int auxFunction(double t, const double* y, double* dydt, void* aux)
-{
-  GSL<A>* e=static_cast<GSL<A>*>(aux);
-
-  const A    yInterfaceA(create(y   ,e->getA()));
-        A dydtInterfaceA(create(dydt,e->getA()));
-
-  e->getDerivs()(t,yInterfaceA,dydtInterfaceA);
-
-  return onSuccess;
-}
-
-
-
-template<typename A>
-GSL<A>::GSL(
-            A& a,
-            Derivs derivs,
-            double dtInit,
-            double epsRel,
-            double epsAbs,
-            const A& scaleAbs,
-            SteppingFunction sf,
-            double nextDtTryCorretionFactor
-            )
-  : Base(a,derivs,dtInit,epsRel,epsAbs),
-    pImpl_(createImpl(this,cpputils::size(getA()),auxFunction<A>,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
-    sf_(sf),
-    nextDtTryCorretionFactor_(nextDtTryCorretionFactor)
-{
-  if (!cpputils::isStorageContiguous(a)) throw (NonContiguousStorageException());
-}
-
-
-
-template<typename A> void GSL<A>::doStep(double deltaT)
-{
-  double
-    time=getTime(),
-    dtTry=getDtTry(),
-    nextDtTry=( fabs(deltaT)<fabs(dtTry/nextDtTryCorretionFactor_) ? dtTry : 0. );
-
-  apply(pImpl_,&time,time+deltaT,&dtTry,cpputils::data(getA()));
-
-  Base::update(time, nextDtTry ? nextDtTry/nextDtTryCorretionFactor_ : dtTry );
-
-}
-
-
-} // details
 
 
 } // evolved
