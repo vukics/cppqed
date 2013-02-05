@@ -50,13 +50,14 @@ double binary::Base::highestFrequency_v() const
 }
 
 
-void binary::Base::displayParameters_v(std::ostream& os) const
+std::ostream& binary::Base::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
   os<<"# Binary System\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<endl<<endl
     <<"# Subsystem Nr. 0\n";     free0_.get()->displayParameters(os);
   os<<"# Subsystem Nr. 1\n";     free1_.get()->displayParameters(os);
-  os<<"# 0 - 1 - Interaction\n"; ia_.get()->displayParameters(os);
+  os<<"# 0 - 1 - Interaction\n";
+  return ia_.get()->displayParameters(os);
 }
 
 
