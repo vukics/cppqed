@@ -33,13 +33,13 @@ public:
   typedef TTD_FREQUENCY_MAP(dcomp ) ComplexFreqs;
 
   explicit DynamicsBase(const    RealFreqs& =RealFreqs   (), 
-			const ComplexFreqs& =ComplexFreqs());
+                        const ComplexFreqs& =ComplexFreqs());
 
   // Calculating the fastest timescale of the system
   double highestFrequency() const;
 
   // Displaying parameters of the system
-  void displayParameters(std::ostream&) const;
+  std::ostream& displayParameters(std::ostream&) const;
 
   virtual ~DynamicsBase() {}
 
@@ -49,7 +49,7 @@ protected:
   RealFreqs&    getRealFreqs   () {return    realFreqs_;}
   ComplexFreqs& getComplexFreqs() {return complexFreqs_;}
 
-  virtual void displayMoreParameters(std::ostream&) const;
+  virtual std::ostream& displayMoreParameters(std::ostream&) const;
 
 private:
   RealFreqs       realFreqs_;

@@ -43,7 +43,7 @@ public:
   const Averages getAverages() const {return averages_;}
   
 private:
-  std::ostream& displayMore() const;
+  std::ostream& display_v(std::ostream&, int) const;
   
   const double relaxationTime_;
   

@@ -4,8 +4,8 @@
 
 #include "TrajectoryFwd.h"
 
+#include "Evolved.h"
 #include "FormDoubleFwd.h"
-#include "EvolvedGSL.h"
 #include "ParsFwd.h"
 
 
@@ -32,31 +32,43 @@ namespace trajectory {
 
 */
 
-struct Pars {
-
+struct ParsEvolved
+{
   static const double epsRelDefault;
   static const double epsAbsDefault;
 
-  double &T, &epsRel, &epsAbs;
+  double &epsRel, &epsAbs;
+
+  evolved::SteppingFunction& sf;
+  double &nextDtTryCorretionFactor;
+  
+  ParsEvolved(parameters::ParameterTable&, const std::string& mod="");
+  
+};
+
+
+struct ParsRun
+{
+  double &T;
   int &dc;
   double &Dt;
   long &NDt;
   std::string &ofn;
-  double &autoStop;
 
   formdouble::Zero &precision;
 
   bool &displayInfo;
 
-  evolved::SteppingFunction& sf;
-  double &nextDtTryCorretionFactor;
-
-  Pars(parameters::ParameterTable&, const std::string& mod="");
-
-  virtual ~Pars() {}
+  ParsRun(parameters::ParameterTable&, const std::string& mod="");
 
 };
 
+/*
+struct Pars : ParsRun, ParsEvolved
+{
+  Pars(parameters::ParameterTable& p, const std::string& mod="") : ParsRun(p,mod), ParsEvolved(p,mod) {}
+};
+*/
 
 } // trajectory
 

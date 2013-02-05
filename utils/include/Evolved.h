@@ -26,6 +26,12 @@
 namespace evolved {
 
   
+enum SteppingFunction {SF_RKCK, SF_RK8PD};
+
+std::ostream& operator<<(std::ostream&, SteppingFunction);
+std::istream& operator>>(std::istream&, SteppingFunction&);
+
+
 class TimeStepBookkeeper
 {
 public:

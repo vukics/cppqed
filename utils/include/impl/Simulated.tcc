@@ -34,21 +34,14 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 {}
 
 
-template<typename A> 
-std::ostream& Simulated<A>::displayMore() const
+template<typename A>
+std::ostream& Simulated<A>::display_v(std::ostream& os, int precision) const
 {
   using namespace cpputils;
   const A& a=getEvolved()->getA();
   for (size_t i=0; i<subscriptLimit(a); i++)
     getOstream()<<FormDouble(Trajectory::getPrecision())(subscript(a,i))<<' ';
   return getOstream();
-}
-
-
-template<typename A> 
-size_t Simulated<A>::displayMoreKey() const
-{
-  return 0;
 }
 
 

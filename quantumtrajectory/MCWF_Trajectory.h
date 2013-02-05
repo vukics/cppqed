@@ -49,15 +49,10 @@ public:
 
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getPrecision; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
+  using Base::getEvolved; using Base::getRandomized; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
   template<typename SYS>
-  MCWF_Trajectory(
-                  StateVector& psi,
-                  const SYS& sys,
-                  const ParsMCWF&,
-                  const StateVectorLow& =StateVectorLow()
-                  );
+  MCWF_Trajectory(StateVector& psi, const SYS& sys, const ParsMCWF&, const StateVectorLow& =StateVectorLow());
 
   ~MCWF_Trajectory() {}
 
@@ -66,8 +61,8 @@ public:
   const StateVector& getPsi() const {return psi_;} 
 
 protected:
-  std::ostream& displayMore() const;
-  size_t displayMoreKey() const;
+  std::ostream&    display_v(std::ostream&, int    ) const;
+  std::ostream& displayKey_v(std::ostream&, size_t&) const;
   
   const QuantumSystemWrapper getQS() const {return qs_;}
 
@@ -77,13 +72,14 @@ private:
 
   void step_v(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
 
-  void displayParameters_v() const;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
 #ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-  void readState_v(boost::archive::binary_iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime();}
-  // writeState_v inherited
+  typedef typename Base::iarchive iarchive;
+
+  iarchive& readState_v(iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime();} // writeState_v inherited
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
   
   double                coherentTimeDevelopment    (                                double Dt) const;

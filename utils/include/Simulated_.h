@@ -23,23 +23,24 @@ public:
   using Base::getEvolved; using Base::getOstream;
 
   Simulated(A&, typename Evolved::Derivs, double dtInit, 
-	    double, double, 
-	    const A& scaleAbs,
-	    std::ostream&, int,
-	    const evolved::Maker<A>& =evolved::MakerGSL<A>());
+            double, double, 
+            const A& scaleAbs,
+            std::ostream&, int,
+            const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
   Simulated(A&, typename Evolved::Derivs, double dtInit,
-	    const A& scaleAbs,
-	    const Pars&,
-	    const evolved::Maker<A>& =evolved::MakerGSL<A>());
+            const A& scaleAbs,
+            const Pars&,
+            const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
 private:
   void step_v(double deltaT) const {getEvolved()->step(deltaT);}
 
-  std::ostream& displayMore   () const;
-  size_t        displayMoreKey() const;
+  std::ostream& display_v(std::ostream&, int) const;
+  
+  std::ostream& displayKey_v(std::ostream& os, size_t&) const {return os;}
 
-  void   displayParameters_v() const {getOstream()<<std::endl<<"# Simulated."<<std::endl; Base::displayParameters_v();}
+  std::ostream& displayParameters_v(std::ostream& os) const {return Base::displayParameters_v(os<"\n# Simulated.\n");}
 
 };
 

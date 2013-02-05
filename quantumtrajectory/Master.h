@@ -25,7 +25,7 @@ namespace quantumtrajectory {
 namespace master {
 
 
-typedef trajectory::Pars Pars;
+typedef trajectory::ParsEvolved Pars;
 
 
 struct NonUnitaryIP  : cpputils::Exception {};
@@ -68,7 +68,7 @@ protected:
 private:
   void              step_v(double) const;
 
-  void displayParameters_v(      ) const;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
@@ -145,9 +145,9 @@ public:
 private:
   using Base::rho_;
 
-  std::ostream& displayMore   () const {return doDisplay_.displayMore(getTime(),rho_,getOstream(),getPrecision());}
-  size_t        displayMoreKey() const {return doDisplay_.displayMoreKey(getOstream());}
-  
+  std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),rho_,os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
+
   const details::DO_Display<RANK,V> doDisplay_;
 
 };

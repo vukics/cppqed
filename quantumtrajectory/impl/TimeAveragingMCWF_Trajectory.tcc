@@ -8,7 +8,7 @@
 
 
 template<int RANK>
-std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::displayMore() const
+std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) const
 {
   if (av_) {
     Averages averagesNow(av_->average(getTime(),getPsi()));

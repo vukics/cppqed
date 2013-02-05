@@ -33,8 +33,8 @@ void evolve(quantumdata::StateVector<RANK>& psi,
   case EM_SINGLE: {
 
     // This solution is rather lame, but the makeMCWF function as implemented below does not work for some reason
-    if (pe.timeAverage) {TimeAveragingMCWF_Trajectory<RANK> traj(psi,sys,pe,pe.relaxationTime); trajectory::evolve(traj,pe);}
-    else {MCWF_Trajectory<RANK> traj(psi,sys,pe); trajectory::evolve(traj,pe);}
+    if (pe.timeAverage) {TimeAveragingMCWF_Trajectory<RANK> traj(psi,sys,pe,pe.relaxationTime); trajectory::run(traj,pe);}
+    else {MCWF_Trajectory<RANK> traj(psi,sys,pe); trajectory::run(traj,pe);}
 
     break;
 
@@ -61,7 +61,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V>
       traj(rho,sys,pe,pe.negativity);
 
-    trajectory::evolve(traj,pe);
+    trajectory::run(traj,pe);
     
     break;
 
@@ -75,7 +75,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V,true>
       traj(rho,sys,pe,pe.negativity);
 
-    trajectory::evolve(traj,pe);
+    trajectory::run(traj,pe);
 
     break;
 

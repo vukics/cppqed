@@ -94,30 +94,4 @@ const int onSuccess=GSL_SUCCESS;
 } // details
 
 
-using namespace std;
-
-ostream& operator<<(ostream& os, SteppingFunction sf)
-{
-  switch (sf) {
-  case SF_RKCK  : return os<<"rkck" ;
-  case SF_RK8PD :        os<<"rk8pd";
-  }
-  return os;
-}
-
-istream& operator>>(istream& is, SteppingFunction& sf) 
-{
-  SteppingFunction sftemp=SF_RK8PD;
-  string s;
-
-  is>>s;
-       if (s=="rkck"  ) sftemp=SF_RKCK ;
-  else if (s!="rk8pd") 
-    is.clear(ios_base::badbit);
-
-  if (is) sf=sftemp;
-  return is;
-}
-
-
 } // evolved

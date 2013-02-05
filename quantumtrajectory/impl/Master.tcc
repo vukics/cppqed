@@ -127,8 +127,7 @@ Base<RANK>::step_v(double deltaT) const
 
 
 template<int RANK>
-void
-Base<RANK>::displayParameters_v() const
+std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
   Adaptive::displayParameters_v();

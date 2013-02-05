@@ -112,8 +112,8 @@ public:
     : trajectory::Trajectory(p), Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
 
 private:
-  std::ostream& displayMore   () const {return doDisplay_.displayMore(getTime(),toBeAveraged(),getOstream(),getPrecision());}
-  size_t        displayMoreKey() const {return doDisplay_.displayMoreKey(getOstream());}
+  std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
 

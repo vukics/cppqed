@@ -33,10 +33,10 @@ void run(Trajectory &, long   nDt , double deltaT, bool displayInfo);
 template<typename A>
 void run(Adaptive<A>&, double time, int dc       , bool displayInfo);
 
-void run(Trajectory &, const Pars&);
+void run(Trajectory &, const ParsRun&);
 
 template<typename A>
-void run(Adaptive<A>&, const Pars&);
+void run(Adaptive<A>&, const ParsRun&);
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
@@ -64,9 +64,6 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
 class Trajectory : private boost::noncopyable
 {
 public:
-  typedef boost::archive::binary_iarchive iarchive;
-  typedef boost::archive::binary_oarchive oarchive;
-  
   std::ostream& display   (std::ostream&, int) const;
   std::ostream& displayKey(std::ostream&     ) const;
 
@@ -79,6 +76,9 @@ public:
   std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);}
   
 #ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  typedef boost::archive::binary_iarchive iarchive;
+  typedef boost::archive::binary_oarchive oarchive;
+  
   iarchive&  readState(iarchive& iar)       {return  readState_v(iar);}
   oarchive& writeState(oarchive& oar) const {return writeState_v(oar);};
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
@@ -92,8 +92,8 @@ private:
   
   virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
 
-  virtual std::ostream& display_v          (std::ostream&, int) const = 0;
-  virtual std::ostream& displayKey_v       (std::ostream&     ) const = 0;
+  virtual std::ostream& display_v          (std::ostream&, int    ) const = 0;
+  virtual std::ostream& displayKey_v       (std::ostream&, size_t&) const = 0;
 
 #ifndef   DO_NOT_USE_BOOST_SERIALIZATION
   virtual iarchive&  readState_v(iarchive&)       = 0;
@@ -122,9 +122,9 @@ public:
   virtual ~Adaptive() {}
 
 protected:
-  Adaptive(A&, typename Evolved::Derivs, double, double, double, const A&, const evolved::Maker<A>&);
+  Adaptive(A&, typename Evolved::Derivs, double, double, double    , const A&, const evolved::Maker<A>&);
 
-  Adaptive(A&, typename Evolved::Derivs, double, const Pars&   , const A&, const evolved::Maker<A>&);
+  Adaptive(A&, typename Evolved::Derivs, double, const ParsEvolved&, const A&, const evolved::Maker<A>&);
 
   typename Evolved::Ptr getEvolved() const {return evolved_;}
 

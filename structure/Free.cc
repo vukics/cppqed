@@ -10,10 +10,9 @@ Free::Free(size_t dimension, const RealFreqs& realFreqs, const ComplexFreqs& com
 }
 
 
-void Free::displayMoreParameters(std::ostream& os) const
+std::ostream& Free::displayMoreParameters(std::ostream& os) const
 {
-  os<<"# Dimension: "<<getDimension()<<std::endl;
-  DynamicsBase::displayMoreParameters(os);
+  return DynamicsBase::displayMoreParameters(os<<"# Dimension: "<<getDimension()<<std::endl);
 }
 
 

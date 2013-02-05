@@ -22,7 +22,7 @@ namespace details {
 
 template<int RANK, typename V>
 DO_Display<RANK,V>::DO_Display(AveragedPtr av,
-			       const Pars& p,
+			       const ParsEvolved& p,
 			       bool negativity,
 			       size_t equalCount) throw(DimensionalityMismatchException)
   : av_(av),
@@ -36,19 +36,18 @@ DO_Display<RANK,V>::DO_Display(AveragedPtr av,
 
 
 template<int RANK, typename V>
-size_t
-DO_Display<RANK,V>::displayMoreKey(std::ostream& os) const 
+std::ostream&
+DO_Display<RANK,V>::displayKey(std::ostream& os, size_t& i) const 
 {
-  size_t i=3; 
   if (av_) av_->displayKey(os,i); 
   if (negativity_) os<<"# Trajectory "<<i<<". negativity"<<std::endl;
-  return i;
+  return os;
 }
 
 
 template<int RANK, typename V>
 std::ostream&
-DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
+DO_Display<RANK,V>::display(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   throw(StoppingCriterionReachedException)
 {
   using namespace std;

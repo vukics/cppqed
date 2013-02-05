@@ -42,8 +42,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
                                        const ParsMCWF& p,
                                        const StateVectorLow& scaleAbs
                                        )
-  : trajectory::Trajectory(p),
-    Base(psi(),
+  : Base(psi(),
          bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
          trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),
          scaleAbs,
@@ -65,11 +64,11 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
 
 template<int RANK>
-std::ostream& MCWF_Trajectory<RANK>::displayMore() const
+std::ostream& MCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) const
 {
   using namespace std;
 
-  return qs_.display(getTime(),psi_,getOstream(),getPrecision());
+  return qs_.display(getTime(),psi_,os,precision);
 
   // if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<FormDouble(svdPrecision_,0)(psi_()); svdCount_++;
 }
@@ -200,18 +199,11 @@ void MCWF_Trajectory<RANK>::step_v(double Dt) const
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::displayParameters_v() const
+std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
-  Base::displayParameters_v();
-
-  ostream& os=getOstream();
-
-  os<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl;
-
-  qs_.getQS()->displayParameters(os);
-
-  qs_.displayCharacteristics(os)<<endl;
+  
+  qs_.displayCharacteristics(qs_.getQS()->displayParameters(Base::displayParameters_v(os)<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
 
   if (const typename Liouvillean::Ptr li=qs_.getLi()) {
     os<<"# Decay channels:\n";
@@ -233,11 +225,9 @@ void MCWF_Trajectory<RANK>::displayParameters_v() const
 
 
 template<int RANK>
-size_t MCWF_Trajectory<RANK>::displayMoreKey() const
+std::ostream& MCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) const
 {
-  size_t i=3;
-  qs_.template displayKey<structure::LA_Av>(getOstream(),i);
-  return i;
+  return qs_.template displayKey<structure::LA_Av>(os,i);
 }
 
 
