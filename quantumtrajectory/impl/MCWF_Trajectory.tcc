@@ -53,7 +53,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     psi_(psi),
     qs_(cpputils::sharedPointerize(sys),Base::noise()),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
-    logger_(p.logLevel,qs_.getHa(),getOstream())
+    logger_(p.logLevel,qs_.getHa())
 {
   if (psi!=*qs_.getQS()) throw DimensionalityMismatchException();
   
@@ -221,6 +221,8 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
     os<<endl;
   }
 
+  return os;
+  
 }
 
 

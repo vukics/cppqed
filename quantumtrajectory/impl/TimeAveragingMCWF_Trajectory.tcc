@@ -17,20 +17,20 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::display_v(s
       ++sum_;
     }
     av_->process(averagesNow);
-    av_->display(averagesNow,getOstream(),getPrecision());
+    av_->display(averagesNow,os,precision);
   }
-  return getOstream();
+  return os;
 }
 
 
 template<int RANK>
 quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::~TimeAveragingMCWF_Trajectory()
 {
-  if (av_) {
+/*  if (av_) {
     std::ostream& os=getOstream()<<"# Time averages:\n# ";
     av_->process(averages_);
     av_->display(averages_,os,getPrecision())<<std::endl;
-  }
+  }*/
 
 }
 

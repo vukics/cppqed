@@ -15,9 +15,7 @@ public:
   typedef std::list<std::pair<double,size_t> > MCWF_Trajectory;
   // Stores <time instant, jumpNo> pairs
 
-  MCWF_Logger(unsigned logLevel, bool isHamiltonian, std::ostream& os);
-
-  ~MCWF_Logger();
+  MCWF_Logger(unsigned logLevel, bool isHamiltonian);
 
   void step() const;
 
@@ -32,10 +30,11 @@ public:
 
   void hamiltonianCalled() const;
 
+  std::ostream& onEnd(std::ostream&) const;
+  
 private:
   const int logLevel_;
   const bool isHamiltonian_;
-  std::ostream& os_;
 
   mutable size_t nSteps_, nOvershot_, nToleranceOvershot_, nFailedSteps_, nHamiltonianCalls_;
   mutable double dpMaxOvershoot_, dpToleranceMaxOvershoot_, normMaxDeviation_;

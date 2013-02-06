@@ -99,21 +99,28 @@ public:
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;
 
-  using Base::getQS; using Base::getOstream; using Base::getPrecision; using Base::getTime; using Base::getStateVectors; using Base::toBeAveraged;
+  using Base::getQS; using Base::getTime; using Base::getStateVectors; using Base::toBeAveraged;
 
   template<typename SYS>
   EnsembleMCWF(
-	       const StateVector& psi,
-	       const SYS& sys,
-	       const ParsMCWF& p,
-	       bool negativity,
-	       const StateVectorLow& scaleAbs=StateVectorLow()
-	       )
-    : trajectory::Trajectory(p), Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
+               const StateVector& psi,
+               const SYS& sys,
+               const ParsMCWF& p,
+               bool negativity,
+               const StateVectorLow& scaleAbs=StateVectorLow()
+               )
+    : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
 
 private:
   std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
+
+#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  typedef typename Base::iarchive iarchive;
+  typedef typename Base::oarchive oarchive;
+  iarchive&  readState_v(iarchive& iar)       {return iar;}
+  oarchive& writeState_v(oarchive& oar) const {return oar;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
   const DO_Display doDisplay_;
 

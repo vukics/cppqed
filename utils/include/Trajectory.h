@@ -26,12 +26,12 @@
 namespace trajectory {
 
 
-void run(Trajectory &, double time, double deltaT, bool displayInfo);
+void run(Trajectory &, double time, double deltaT, const std::string& ofn, int precision, bool displayInfo);
 
-void run(Trajectory &, long   nDt , double deltaT, bool displayInfo);
+void run(Trajectory &, long   nDt , double deltaT, const std::string& ofn, int precision, bool displayInfo);
 
 template<typename A>
-void run(Adaptive<A>&, double time, int dc       , bool displayInfo);
+void run(Adaptive<A>&, double time, int dc       , const std::string& ofn, int precision, bool displayInfo);
 
 void run(Trajectory &, const ParsRun&);
 
@@ -75,6 +75,8 @@ public:
 
   std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);}
   
+  std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);}
+  
 #ifndef   DO_NOT_USE_BOOST_SERIALIZATION
   typedef boost::archive::binary_iarchive iarchive;
   typedef boost::archive::binary_oarchive oarchive;
@@ -90,8 +92,7 @@ private:
   virtual double         getTime_v()       const = 0;
   virtual double        getDtDid_v()       const = 0;
   
-  virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
-
+  virtual std::ostream& displayParameters_v(std::ostream&         ) const = 0;
   virtual std::ostream& display_v          (std::ostream&, int    ) const = 0;
   virtual std::ostream& displayKey_v       (std::ostream&, size_t&) const = 0;
 
@@ -100,6 +101,8 @@ private:
   virtual oarchive& writeState_v(oarchive&) const = 0;
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
+  virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
+  
 };
 
 
@@ -115,6 +118,7 @@ class Adaptive : public virtual Trajectory
 {
 public:
   // Some parameter-independent code could still be factored out, but probably very little
+  
   typedef evolved::Evolved<A> Evolved;
 
   void step(double deltaT) const {step_v(deltaT);}
@@ -130,22 +134,23 @@ protected:
 
   double getDtTry() const {return evolved_->getDtTry();}
 
-  std::ostream& displayParameters_v(std::ostream&) const;
+  std::ostream& displayParameters_v(std::ostream&) const override;
 
 #ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-  iarchive&  readState_v(iarchive& iar)       {return iar & *evolved_;}
-  oarchive& writeState_v(oarchive& oar) const {return oar & *evolved_;}
+  iarchive&  readState_v(iarchive& iar)       override {return iar & *evolved_;}
+  oarchive& writeState_v(oarchive& oar) const override {return oar & *evolved_;}
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 private:
-  double getDtDid_v() const {return evolved_->getDtDid();}
+  double getDtDid_v() const final {return evolved_->getDtDid();}
 
-  void evolve_v(double deltaT) const {evolved::evolve<const Adaptive>(*this,deltaT);}
+  void evolve_v(double deltaT) const final {evolved::evolve<const Adaptive>(*this,deltaT);}
 
-  double getTime_v() const {return evolved_->getTime();}
+  double getTime_v() const final {return evolved_->getTime();}
 
   virtual void step_v(double deltaT) const = 0;
-  // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved. (Only Simulated, but neither Master, nor MCWF_Trajectory)
+  // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved.
+  // (Only Simulated, but neither Master, nor MCWF_Trajectory)
 
   typename Evolved::Ptr evolved_;
 

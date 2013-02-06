@@ -46,7 +46,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     EnsembleMCWF<RANK,V>
       traj(psi,sys,pe,pe.negativity);
 
-    if      (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
+    if      (pe.Dt) run(traj,pe.T,pe.Dt,pe.ofn,pe.precision,pe.displayInfo);
     else cout<<"Nonzero Dt required!"<<endl;
 
     break;

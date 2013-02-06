@@ -73,6 +73,7 @@ namespace {
 
 template<typename T>
 void displayFreq(ostream& os, int precision, const typename TTD_NAMED_FREQUENCY(T)& pair)
+#undef TTD_NAMED_FREQUENCY
 {
   os<<"# "<<pair.template get<0>()<<"="<<formdouble::zeroWidth(precision)(pair.template get<1>())<<endl;
 }
@@ -84,11 +85,10 @@ std::ostream& DynamicsBase::displayMoreParameters(ostream& os) const
 {
   using boost::for_each;
   for_each(   realFreqs_,bind(displayFreq<double>,boost::ref(os),os.precision(),_1));
-  for_each(complexFreqs_,bind(displayFreq<dcomp >,boost::ref(os),os.precision(),_1));  
+  for_each(complexFreqs_,bind(displayFreq<dcomp >,boost::ref(os),os.precision(),_1));
+  return os;
 }
 
 
 } // structure
 
-
-#undef TTD_NAMED_FREQUENCY

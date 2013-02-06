@@ -22,12 +22,12 @@ namespace details {
 
 template<int RANK, typename V>
 DO_Display<RANK,V>::DO_Display(AveragedPtr av,
-			       const ParsEvolved& p,
-			       bool negativity,
-			       size_t equalCount) throw(DimensionalityMismatchException)
+                               const ParsEvolved& p,
+                               bool negativity,
+                               size_t equalCount) throw(DimensionalityMismatchException)
   : av_(av),
     negativity_(negativity),    
-    autoStop_(p.autoStop),
+    autoStop_(0), // Disabled at the moment
     lastCrit_(),
     equalCount_(equalCount)
 {
@@ -53,7 +53,7 @@ DO_Display<RANK,V>::display(double t, const DensityOperator& rho, std::ostream& 
   using namespace std;
   stringstream line(stringstream::in | stringstream::out);
   {
-    display(av_,t,rho,line,precision);
+    structure::display(av_,t,rho,line,precision);
     if (negativity_) line<<'\t'<<FormDouble(precision)(quantumdata::negPT(rho,V()));
   }
 

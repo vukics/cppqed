@@ -4,6 +4,7 @@
 
 #include "Trajectory.h"
 
+#include "FormDouble.h"
 #include "impl/Evolved.tcc"
 #include "ParsTrajectory.h"
 #include "SmartPtr.h"
@@ -16,7 +17,7 @@ namespace trajectory {
 template<typename A>
 void run(Adaptive<A>& traj, const ParsRun& p)
 {
-  if      (p.dc) run(traj,p.T,p.dc,p.displayInfo);
+  if      (p.dc) run(traj,p.T,p.dc,p.ofn,p.precision,p.displayInfo);
   else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
 }
@@ -37,7 +38,7 @@ template<typename A>
 inline void advance(Adaptive<A>& traj, double time, int          ) {traj.step(time-traj.getTime());}
 
 inline bool doDisplay(long      , double         ) {return true;}
-inline bool doDisplay(long count, int displayFreq) {return !(count%displayFreq);}
+inline bool doDisplay(long count, int displayFreq) {return !((count+1)%displayFreq);}
 
 inline const std::string writeTimestep(int   ) {return " timestep";}
 inline const std::string writeTimestep(double) {return ""         ;}
@@ -74,9 +75,10 @@ void run(T& traj, L length, D displayFreq, const std::string& ofn, int precision
       advance(traj,length,displayFreq);
       if (doDisplay(count,displayFreq)) traj.display(os,precision);
     }
+    traj.logOnEnd(os);
   }
   catch (const StoppingCriterionReachedException& except) {
-    os<<"# Stopping criterion has been reached"<<endl;
+    traj.logOnEnd(os<<"# Stopping criterion has been reached"<<endl);
     throw except;
   }
 }

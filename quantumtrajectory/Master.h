@@ -51,7 +51,7 @@ public:
   
   typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
-  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime; using Adaptive::getOstream;
+  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime;
 
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
@@ -134,12 +134,12 @@ public:
 
   typedef typename Base::DensityOperator DensityOperator;
 
-  using Base::getOstream; using Base::getPrecision; using Base::getTime; using Base::getAv;
+  using Base::getTime; using Base::getAv;
 
   template<typename SYS>
   Master(DensityOperator& rho, const SYS& sys, const master::Pars& pt, bool negativity,
-	 const DensityOperatorLow& scaleAbs=DensityOperatorLow())
-    : trajectory::Trajectory(pt), Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),pt,negativity)
+         const DensityOperatorLow& scaleAbs=DensityOperatorLow())
+    : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),pt,negativity)
   {}
 
 private:
