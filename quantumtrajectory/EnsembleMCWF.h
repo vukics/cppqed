@@ -115,13 +115,6 @@ private:
   std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
 
-#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-  typedef typename Base::iarchive iarchive;
-  typedef typename Base::oarchive oarchive;
-  iarchive&  readState_v(iarchive& iar)       {return iar;}
-  oarchive& writeState_v(oarchive& oar) const {return oar;}
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-
   const DO_Display doDisplay_;
 
 };

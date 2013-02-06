@@ -81,6 +81,13 @@ protected:
   bool                noise        () const {return isNoisy_   ;}
 
   std::ostream& displayParameters_v(std::ostream&) const;
+  
+#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  typedef typename Base::iarchive iarchive;
+  typedef typename Base::oarchive oarchive;
+  iarchive&  readState_v(iarchive& iar)       {return Base:: readState_v(iar) & *randomized_;}
+  oarchive& writeState_v(oarchive& oar) const {return Base::writeState_v(oar) & *randomized_;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 private:
   const unsigned long seed_ ;
@@ -156,6 +163,13 @@ protected:
   typedef std::auto_ptr<Impl> Ptr;
   
   Ensemble(Ptr trajs, bool log) : trajs_(trajs), log_(log) {}
+
+  #ifndef   DO_NOT_USE_BOOST_SERIALIZATION
+  typedef typename Base::iarchive iarchive;
+  typedef typename Base::oarchive oarchive;
+  iarchive&  readState_v(iarchive& iar)       {for_each(trajs_,bind(&Elem:: readState,_1,boost::ref(iar))); return iar;}
+  oarchive& writeState_v(oarchive& oar) const {for_each(trajs_,bind(&Elem::writeState,_1,boost::ref(oar))); return oar;}
+  #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 private:
   void evolve_v(double deltaT) const;
