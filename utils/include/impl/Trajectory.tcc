@@ -9,7 +9,6 @@
 #include "ParsTrajectory.h"
 #include "SmartPtr.h"
 
-#include <boost/concept_check.hpp>
 
 namespace trajectory {
 
