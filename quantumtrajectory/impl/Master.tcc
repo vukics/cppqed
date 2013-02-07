@@ -138,7 +138,6 @@ std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
       size_t i=0;
       li->displayKey(os,i);
     }
-    os<<endl;
   }
   
   return os;

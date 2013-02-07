@@ -25,9 +25,9 @@ ostream& quantumtrajectory::MCWF_Logger::onEnd(ostream& os) const
     os<<"\n# MCWF Trajectory:\n";
       
     for (MCWF_Trajectory::const_iterator i=traj_.begin(); i!=traj_.end(); ++i) os<<"# "<<i->first<<"\t"<<i->second<<std::endl;
-      
-    // NEEDS_WORK the lambda expression of old doesn’t work with c++0x
+    // NEEDS_WORK the lambda expression of old doesn’t work with c++11
     // boost::for_each(traj_,os<<constant("# ")<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
+    os<<endl;
   }
   return os;
 }

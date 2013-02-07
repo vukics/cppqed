@@ -56,9 +56,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     logger_(p.logLevel,qs_.getHa())
 {
   if (psi!=*qs_.getQS()) throw DimensionalityMismatchException();
-  
-  manageTimeStep(qs_.template average<structure::LA_Li>(0.,psi_),getEvolved().get(),false);
-  // Initially, dpLimit should not be overshot, either.
+  if (!getTime())  manageTimeStep(qs_.template average<structure::LA_Li>(0.,psi_),getEvolved().get(),false);
+  // On startup, dpLimit should not be overshot, either.
 
 }
 
