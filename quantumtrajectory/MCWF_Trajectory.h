@@ -76,11 +76,7 @@ private:
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-  typedef typename Base::iarchive iarchive;
-
-  iarchive& readState_v(iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime(); return iar;} // writeState_v inherited
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+  cpputils::iarchive& readState_v(cpputils::iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime(); return iar;} // writeState_v inherited
 
   std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);}
   

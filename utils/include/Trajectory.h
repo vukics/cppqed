@@ -8,16 +8,11 @@
 
 #include "TrajectoryFwd.h"
 
+#include "Archive.h"
 #include "Exception.h"
 #include "Evolved.h"
 
 #include <boost/utility.hpp>
-
-#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-
 
 #include <iosfwd>
 
@@ -77,13 +72,8 @@ public:
   
   std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);}
   
-#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-  typedef boost::archive::binary_iarchive iarchive;
-  typedef boost::archive::binary_oarchive oarchive;
-  
-  iarchive&  readState(iarchive& iar)       {return  readState_v(iar);}
-  oarchive& writeState(oarchive& oar) const {return writeState_v(oar);};
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+  cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return  readState_v(iar);}
+  cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return writeState_v(oar);};
   
   virtual ~Trajectory() {}
 
@@ -96,10 +86,8 @@ private:
   virtual std::ostream& display_v          (std::ostream&, int    ) const = 0;
   virtual std::ostream& displayKey_v       (std::ostream&, size_t&) const = 0;
 
-#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-  virtual iarchive&  readState_v(iarchive&)       = 0;
-  virtual oarchive& writeState_v(oarchive&) const = 0;
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+  virtual cpputils::iarchive&  readState_v(cpputils::iarchive&)       = 0;
+  virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
 
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
   
@@ -136,10 +124,8 @@ protected:
 
   std::ostream& displayParameters_v(std::ostream&) const override;
 
-#ifndef   DO_NOT_USE_BOOST_SERIALIZATION
-  iarchive&  readState_v(iarchive& iar)       override {return iar & *evolved_;}
-  oarchive& writeState_v(oarchive& oar) const override {return oar & *evolved_;}
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       override {return iar >> *evolved_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const override {return oar << *evolved_;}
 
 private:
   double getDtDid_v() const final {return evolved_->getDtDid();}
