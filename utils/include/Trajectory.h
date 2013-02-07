@@ -37,10 +37,18 @@ void run(Adaptive<A>&, const ParsRun&);
 class StoppingCriterionReachedException : public cpputils::Exception {};
 
 
-class OutfileOpeningException : public cpputils::TaggedException
+class TrajectoryFileOpeningException : public cpputils::TaggedException
 {
 public:
-  OutfileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
+  TrajectoryFileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
+
+};
+
+
+class StateFileOpeningException : public cpputils::TaggedException
+{
+public:
+  StateFileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
 
 };
 

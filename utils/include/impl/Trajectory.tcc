@@ -42,30 +42,49 @@ inline bool doDisplay(long count, int displayFreq) {return !((count+1)%displayFr
 inline const std::string writeTimestep(int   ) {return " timestep";}
 inline const std::string writeTimestep(double) {return ""         ;}
 
+inline double endTime(long    nDt, double dt, double currentTime=0.) {return nDt*dt+currentTime;}
+inline double endTime(double time, double   , double            =0.) {return time              ;}
+
 }
 
 template<typename T, typename L, typename D>
-void run(T& traj, L length, D displayFreq, const std::string& ofn, int precision, bool displayInfo)
+void run(T& traj, L length, D displayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo)
 {
   using namespace std; using namespace boost; using namespace runTraits;
 
-  const bool continuing=false;
+  static const string stateExtension(".state");
+  const string stateFileName(trajectoryFileName+stateExtension);
   
-  struct {
-    const shared_ptr<ostream> os_;
-  } outstreams = { ofn=="" ? cpputils::nonOwningSharedPtr<ostream>(&cout) : shared_ptr<ostream>(new ofstream(ofn.c_str(),ios_base::app)) };
+  bool continuing=false;
   
-  ostream& os=*outstreams.os_;
+  if (trajectoryFileName!="") {
+    ifstream trajectoryFile(trajectoryFileName.c_str());
+    if (trajectoryFile.is_open() && trajectoryFile.peek()!=EOF) {
+      ifstream stateFile(stateFileName.c_str());
+      if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
+      cpputils::iarchive stateArchive(stateFile);
+      traj.readState(stateArchive);
+      if (endTime(length,displayFreq,traj.getTime())<=traj.getTime()) return;
+      continuing=true;
+    }
+  }
 
-  if (os.fail()) throw OutfileOpeningException(ofn);
+  const shared_ptr<ostream> outstream(trajectoryFileName=="" ? cpputils::nonOwningSharedPtr<ostream>(&cout) : shared_ptr<ostream>(new ofstream(trajectoryFileName.c_str(),ios_base::app)));
+  // regulates the deletion policy
+  
+  ostream& os=*outstream;
+
+  if (os.fail()) throw TrajectoryFileOpeningException(trajectoryFileName);
  
   os<<setprecision(formdouble::actualPrecision(precision));
   
   if (displayInfo) {
     if (!continuing)
-      traj.displayKey(traj.displayParameters(os)<<endl<<"# Key to data:"<<endl)<<endl<<"# Run Trajectory. Displaying in every "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
+      traj.displayKey(traj.displayParameters(os)<<endl<<"# Key to data:"<<endl)
+        <<endl<<"# Run Trajectory for time "<<endTime(length,displayFreq)
+        <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
     else
-      os<<"# Continuing..."<<endl;
+      os<<"# Continuing up to time "<<endTime(length,displayFreq,traj.getTime())<<endl;
   }
 
   try {
@@ -74,10 +93,19 @@ void run(T& traj, L length, D displayFreq, const std::string& ofn, int precision
       advance(traj,length,displayFreq);
       if (doDisplay(count,displayFreq)) traj.display(os,precision);
     }
-    traj.logOnEnd(os);
+#define ON_END \
+    traj.logOnEnd(os); \
+    if (trajectoryFileName!="") { \
+      ofstream stateFile(stateFileName.c_str()); \
+      cpputils::oarchive stateArchive(stateFile); \
+      traj.writeState(stateArchive); \
+    } 
+    ON_END
   }
   catch (const StoppingCriterionReachedException& except) {
-    traj.logOnEnd(os<<"# Stopping criterion has been reached"<<endl);
+    os<<"# Stopping criterion has been reached"<<endl;
+    ON_END
+#undef ON_END
     throw except;
   }
 }
