@@ -54,8 +54,6 @@ public:
   template<typename SYS>
   MCWF_Trajectory(StateVector& psi, const SYS& sys, const ParsMCWF&, const StateVectorLow& =StateVectorLow());
 
-  ~MCWF_Trajectory() {}
-
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
   const StateVector& getPsi() const {return psi_;} 
@@ -66,6 +64,10 @@ protected:
   
   const QuantumSystemWrapper getQS() const {return qs_;}
 
+  cpputils::iarchive& readState_v(cpputils::iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime(); return iar;} // writeState_v inherited
+
+  std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);}
+  
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
@@ -76,10 +78,6 @@ private:
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  cpputils::iarchive& readState_v(cpputils::iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime(); return iar;} // writeState_v inherited
-
-  std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);}
-  
   double                coherentTimeDevelopment    (                                double Dt) const;
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
 

@@ -38,17 +38,20 @@ public:
       averages_=0.;
     }
 
-  ~TimeAveragingMCWF_Trajectory();
-
   const Averages getAverages() const {return averages_;}
   
 private:
   std::ostream& display_v(std::ostream&, int) const;
   
+  std::ostream& logOnEnd_v(std::ostream& os) const;
+  
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return Base:: readState_v(iar) & averages_ & sum_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & averages_ & sum_;}
+  
   const double relaxationTime_;
   
   mutable Averages averages_;
-  mutable double sum_;
+  mutable long sum_;
   
   const typename Averaged::Ptr av_;
 
