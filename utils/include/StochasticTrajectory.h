@@ -82,8 +82,8 @@ protected:
 
   std::ostream& displayParameters_v(std::ostream&) const;
   
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return Base:: readState_v(iar) >> *randomized_;}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) << *randomized_;}
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return Base:: readState_v(iar) & *randomized_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & *randomized_;}
 
 private:
   const unsigned long seed_ ;

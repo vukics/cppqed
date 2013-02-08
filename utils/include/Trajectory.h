@@ -132,8 +132,8 @@ protected:
 
   std::ostream& displayParameters_v(std::ostream&) const override;
 
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       override {return iar >> *evolved_;}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const override {return oar << *evolved_;}
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       override {return iar & *evolved_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const override {return oar & *evolved_;}
 
 private:
   double getDtDid_v() const final {return evolved_->getDtDid();}

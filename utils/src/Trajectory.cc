@@ -1,11 +1,9 @@
-#include "Trajectory.h"
+#include "impl/Trajectory.tcc"
 
 #include "ParsTrajectory.h"
 #include "impl/FormDouble.tcc"
 
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 
 
 using namespace std;

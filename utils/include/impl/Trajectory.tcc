@@ -9,6 +9,8 @@
 #include "ParsTrajectory.h"
 #include "SmartPtr.h"
 
+#include <iomanip>
+#include <fstream>
 
 namespace trajectory {
 
