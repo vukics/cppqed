@@ -15,7 +15,7 @@ public:
   typedef std::list<std::pair<double,size_t> > MCWF_Trajectory;
   // Stores <time instant, jumpNo> pairs
 
-  MCWF_Logger(unsigned logLevel, bool isHamiltonian);
+  MCWF_Logger(int logLevel, bool isHamiltonian);
 
   void step() const;
 

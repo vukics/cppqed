@@ -21,8 +21,8 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  pe.nTraj=1000/*00*/;
-  const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)/*(2000)(5000)(10000)(20000)(50000)(100000)*/;
+  pe.nTraj=10000/*00*/;
+  const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)(2000)(5000)(10000)(20000)(50000)(100000);
 
   Ptr modeMaster(make(pplm,QMP_UIP)), mode(make(pplm,QMP_IP));
   StateVector psi(init(pplm));
@@ -33,11 +33,11 @@ int main(int argc, char* argv[])
 
   swap(epsRelOld,pe.epsRel);
   Master      <1> m(rho,*modeMaster,pe,false);
-  m.displayParameters();
+  m.displayParameters(cout);
 
   swap(epsRelOld,pe.epsRel);
   EnsembleMCWF<1> e(psi,*mode,pe,false);
-  e.displayParameters();
+  e.displayParameters(cout);
 
   while (m.getTime()<pe.T) {
     {
@@ -49,10 +49,10 @@ int main(int argc, char* argv[])
     for (list<size_t>::const_iterator i=sections.begin(); i!=sections.end(); ++i) {
       double avr=0;
       for (size_t begin=0; begin<pe.nTraj; begin+=*i)
-	avr+=frobeniusNorm(rho-e.averageInRange(begin,*i));
+        avr+=frobeniusNorm(rho-e.averageInRange(begin,*i));
       cout<<avr*(double(*i)/pe.nTraj)<<'\t';
     }
-
+    cout<<endl;
   }
 
 

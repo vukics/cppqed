@@ -7,7 +7,7 @@
 using namespace std;
 
 
-quantumtrajectory::MCWF_Logger::MCWF_Logger(unsigned logLevel, bool isHamiltonian)
+quantumtrajectory::MCWF_Logger::MCWF_Logger(int logLevel, bool isHamiltonian)
   : logLevel_(logLevel), isHamiltonian_(isHamiltonian), nSteps_(), nOvershot_(), nToleranceOvershot_(), nFailedSteps_(), nHamiltonianCalls_(), dpMaxOvershoot_(), dpToleranceMaxOvershoot_(), normMaxDeviation_(), traj_()
 {}
 
