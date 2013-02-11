@@ -4,6 +4,9 @@
 
 #include "Range.h"
 
+#define BOOST_TEST_MODULE BlitzArray test
+#include <boost/test/unit_test.hpp>
+
 #include<boost/bind.hpp>
 
 using namespace std;
@@ -14,7 +17,7 @@ typedef blitz::Array<dcomp,6> Array;
 typedef blitzplusplus::Array<dcomp,6> MyArray;
 
 
-int main()
+BOOST_AUTO_TEST_CASE( BlitzArrayTest )
 {
   Array array(blitz::shape(2,4,3,2,5,4));
 
@@ -26,15 +29,13 @@ int main()
   
   cout<<array.ordering()<<arrayv.ordering()<<arrayvv.ordering()<<endl;
 
-  cout<<all(arrayvv==array)<<endl;
-
   dcomp* data=new dcomp[array.size()];
 
   memcpy(data,array.dataFirst(),array.size());
 
   blitzplusplus::Array<dcomp,6> myArray(MyArray(array,blitzplusplus::ShallowCopy()).clone(data),blitzplusplus::ShallowCopy());
 
-  cout<<all((2.*myArray)!=array)<<endl;
+  BOOST_CHECK( all(arrayvv==array) && all((2.*myArray)!=array) );
 
   // return 0;
 

@@ -1,11 +1,9 @@
-#include "Trajectory.h"
+#include "impl/Trajectory.tcc"
 
 #include "ParsTrajectory.h"
 #include "impl/FormDouble.tcc"
 
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 
 
 using namespace std;
@@ -14,74 +12,26 @@ using namespace std;
 namespace trajectory {
 
 
-Trajectory::~Trajectory()
-{
-  if (dynamic_cast<ofstream*>(&ostream_)) delete &ostream_;
-  // NEEDS_WORK
+void run(Trajectory& traj, const ParsRun& p)
+{ 
+  if (!p.Dt) {cerr<<"Nonzero Dt required!"<<endl; return;}
+  if (p.NDt) run(traj,p.NDt,p.Dt,p.ofn,p.precision,p.displayInfo);
+  else       run(traj,p.T  ,p.Dt,p.ofn,p.precision,p.displayInfo);
 }
 
 
-ostream& TrajectoryBaseHelper(const string& ofn, int precision)
+ostream& Trajectory::display(ostream& os, int precision) const
 {
-  ofstream*const res = ( ofn=="" ? static_cast<ofstream*const>(&cout) : new ofstream(ofn.c_str(),ios_base::app) );
-
-  if (res->fail()) throw OutfileOpeningException(ofn);
-
-  return (*res)<<setprecision(formdouble::actualPrecision(precision));
+  const FormDouble fd(formdouble::positive(precision));
+  return display_v( os<<fd(getTime())<<fd(getDtDid()) , precision)<<endl; // Note: endl flushes the buffer
 }
 
 
-Trajectory::Trajectory(ostream& os, int precision)
-  : ostream_(os<<setprecision(formdouble::actualPrecision(precision))),
-    precision_(precision)
+ostream& Trajectory::displayKey(ostream& os) const
 {
+  size_t i=3;
+  return displayKey_v( os<<"# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
 }
 
-
-Trajectory::Trajectory(const string& ofn, int precision)
-  : ostream_(TrajectoryBaseHelper(ofn,precision)),
-    precision_(precision)
-{
-}
-
-
-Trajectory::Trajectory(const Pars& p)
-  : ostream_(TrajectoryBaseHelper(p.ofn,p.precision)),
-    precision_(p.precision)
-{
-} 
-
-
-void Trajectory::display() const
-{
-  const FormDouble fd(formdouble::positive(precision_));
-  getOstream()<<fd(getTime())<<fd(getDtDid());
-  (displayMore()<<std::endl).flush();
-}
-
-
-void Trajectory::displayKey() const
-{
-  getOstream()<<"# Trajectory\n#  1. time\n#  2. dtDid\n";
-  displayMoreKey();
-}
-
-
-
-void details::doRun(Trajectory& traj, double time, double deltaT)
-{
-  while (traj.getTime()<time) {
-    traj.evolve(std::min(deltaT,time-traj.getTime()));
-    traj.display();
-  }
-}
-
-void details::doRun(Trajectory& traj, long nDt, double deltaT)
-{
-  for (long i=0; i<nDt; i++){
-    traj.evolve(deltaT);
-    traj.display();
-  }
-}
 
 } // trajectory

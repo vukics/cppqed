@@ -9,7 +9,7 @@
 using namespace quantumtrajectory;
 
 
-struct ParsEvolution : public ParsMCWF_Trajectory {
+struct ParsEvolution : public trajectory::ParsRun, public ParsMCWF {
 
   EvolutionMode &evol;
   bool &negativity, &timeAverage;

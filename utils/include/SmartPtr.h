@@ -2,8 +2,6 @@
 #ifndef   UTILS_INCLUDE_SMARTPTR_H_INCLUDED
 #define   UTILS_INCLUDE_SMARTPTR_H_INCLUDED
 
-#include "SmartPtrFwd.h"
-
 #include <boost/shared_ptr.hpp>
 
 

@@ -5,10 +5,13 @@
 
 namespace trajectory {
 
-struct Pars;
+struct ParsRun;
+
+struct ParsEvolved;
 
 class StoppingCriterionReachedException;
-class OutfileOpeningException;
+class TrajectoryFileOpeningException;
+class StateFileOpeningException;
 
 class Trajectory;
 

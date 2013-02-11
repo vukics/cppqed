@@ -16,8 +16,6 @@
 #include "impl/EvolvedGSL.tcc"
 #include "impl/Pars.tcc"
 
-using parameters::ParameterTable    ;
-using parameters::update            ;
-using parameters::NamedException;
+using parameters::ParameterTable;
 
 #endif // QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED

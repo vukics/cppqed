@@ -3,18 +3,15 @@
 #define   UTILS_INCLUDE_IMPL_FFT_TCC_INCLUDED
 
 #include "FFT.h"
-
-#include "ArrayTraitsFwd.h"
-
-#include<cstddef>
+// #include "ArrayTraits.h"
+// The same note applies as with EvolvedGSL.tcc
 
 namespace fft {
 
 template<typename A>
 void transform(A& a, Direction dir) throw(FFT_Exception)
 {
-  typedef cpputils::ArrayTraversalTraits<A> Traits;
-  details::transform(Traits::data(a),Traits::stride(a),Traits::ssLimit(a),dir);
+  details::transform(cpputils::data(a),cpputils::stride(a),cpputils::subscriptLimit(a),dir);
 }
 
 

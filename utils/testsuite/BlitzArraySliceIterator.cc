@@ -222,7 +222,7 @@ template<int RANK>
 void helper(const TTD_CARRAY(RANK)& a1, const TTD_CARRAY(RANK)& a2, const dcomp* dc1, const dcomp* dc2)
 {
   cout<<a1.zeroOffset()<<' '<<a1.shape()<<' '<<a1.stride()<<' '<<a1.ordering()<<' '<<a1.data()-dc1<<endl<<a2.zeroOffset()<<' '<<a2.shape()<<' '<<a2.stride()<<' '<<a2.ordering()<<' '<<a2.data()-dc2<<endl;
-    BOOST_CHECK(all(a1==a2));
+  BOOST_CHECK(all(a1==a2));
 }
 
 

@@ -5,7 +5,7 @@
 namespace cpputils {
 
 template<typename T, typename S>
-struct ConverterMF;
+struct Converter;
 
 } // cpputils
 

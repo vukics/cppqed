@@ -2,7 +2,7 @@
 #ifndef   UTILS_INCLUDE_RANGE_H_INCLUDED
 #define   UTILS_INCLUDE_RANGE_H_INCLUDED
 
-#include "impl/Algorithm.tcc"
+#include "Algorithm.h"
 
 #include <boost/range.hpp>
 #include <boost/range/algorithm.hpp>

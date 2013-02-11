@@ -22,8 +22,8 @@
 
 template<typename V, int RANK>
 void evolve(quantumdata::StateVector<RANK>& psi,
-	    typename structure::QuantumSystem<RANK>::Ptr sys,
-	    const ParsEvolution& pe)
+            typename structure::QuantumSystem<RANK>::Ptr sys,
+            const ParsEvolution& pe)
 {
   using namespace std;
 
@@ -33,8 +33,8 @@ void evolve(quantumdata::StateVector<RANK>& psi,
   case EM_SINGLE: {
 
     // This solution is rather lame, but the makeMCWF function as implemented below does not work for some reason
-    if (pe.timeAverage) {TimeAveragingMCWF_Trajectory<RANK> traj(psi,sys,pe,pe.relaxationTime); trajectory::evolve(traj,pe);}
-    else {MCWF_Trajectory<RANK> traj(psi,sys,pe); trajectory::evolve(traj,pe);}
+    if (pe.timeAverage) {TimeAveragingMCWF_Trajectory<RANK> traj(psi,sys,pe,pe.relaxationTime); run(traj,pe);}
+    else {MCWF_Trajectory<RANK> traj(psi,sys,pe); run(traj,pe);}
 
     break;
 
@@ -46,8 +46,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     EnsembleMCWF<RANK,V>
       traj(psi,sys,pe,pe.negativity);
 
-    if      (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
-    else cout<<"Nonzero Dt required!"<<endl;
+    run(traj,pe);
 
     break;
 
@@ -61,7 +60,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V>
       traj(rho,sys,pe,pe.negativity);
 
-    trajectory::evolve(traj,pe);
+    trajectory::run(traj,pe);
     
     break;
 
@@ -75,7 +74,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V,true>
       traj(rho,sys,pe,pe.negativity);
 
-    trajectory::evolve(traj,pe);
+    trajectory::run(traj,pe);
 
     break;
 

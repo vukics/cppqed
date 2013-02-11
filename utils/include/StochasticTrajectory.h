@@ -67,20 +67,23 @@ protected:
 
   Stochastic(A&, typename Evolved::Derivs, double dtInit, 
              double epsRel, double epsAbs, const A& scaleAbs, 
-	     const evolved::Maker<A>&,
-	     unsigned long seed,
-	     bool n,
-	     const randomized::Maker&);
+             const evolved::Maker<A>&,
+             unsigned long seed,
+             bool n,
+             const randomized::Maker&);
 
   Stochastic(A&, typename Evolved::Derivs, double dtInit,
-	     const A& scaleAbs, const ParsStochastic&,
-	     const evolved::Maker<A>&,
-	     const randomized::Maker&);
+             const A& scaleAbs, const ParsStochastic&,
+             const evolved::Maker<A>&,
+             const randomized::Maker&);
 
   const RandomizedPtr getRandomized() const {return randomized_;}
   bool                noise        () const {return isNoisy_   ;}
 
-  void displayParameters_v() const;
+  std::ostream& displayParameters_v(std::ostream&) const;
+  
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return Base:: readState_v(iar) & *randomized_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & *randomized_;}
 
 private:
   const unsigned long seed_ ;
@@ -157,12 +160,15 @@ protected:
   
   Ensemble(Ptr trajs, bool log) : trajs_(trajs), log_(log) {}
 
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {for_each(trajs_,bind(&Elem:: readState,_1,boost::ref(iar))); return iar;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {for_each(trajs_,bind(&Elem::writeState,_1,boost::ref(oar))); return oar;}
+
 private:
   void evolve_v(double deltaT) const;
 
   double getTime_v() const {return trajs_.begin()->getTime();}
 
-  void displayParameters_v() const;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   double getDtDid_v() const;
   // An average of getDtDid()-s from individual trajectories.

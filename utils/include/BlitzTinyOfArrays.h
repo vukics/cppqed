@@ -6,7 +6,7 @@
 
 #include "BlitzTinyOfArraysFwd.h"
 
-#include <blitz/array.h>
+#include "BlitzArray.h"
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -14,10 +14,6 @@
 #include <boost/operators.hpp>
 
 namespace blitzplusplus {
-
-
-struct TOA_ShallowCopy {}; // For referencing constructors
-struct TOA_DeepCopy    {}; // For copying     constructors
 
 
 template<typename T, int RANK, int LENGTH>
@@ -52,11 +48,11 @@ public:
   // NEED_TO_UNDERSTAND if this is not declared then OK (how, when the composed constructor doesn't have good semantics?), if this is declared private then compile error with return statements, if it is declared public but not DEFINED then OK.
   // For the solution cf. GotW.#1
 
-  inline TinyOfArrays(TOA_ShallowCopy, const TinyOfArrays&);
-  inline TinyOfArrays(TOA_DeepCopy   , const TinyOfArrays&);
+  inline TinyOfArrays(ShallowCopy, const TinyOfArrays&);
+  inline TinyOfArrays(DeepCopy   , const TinyOfArrays&);
 
-  inline TinyOfArrays(TOA_ShallowCopy, const T_numtype& initValue);
-  inline TinyOfArrays(TOA_DeepCopy   , const T_numtype& initValue);
+  inline TinyOfArrays(ShallowCopy, const T_numtype& initValue);
+  inline TinyOfArrays(DeepCopy   , const T_numtype& initValue);
 
 
 #define BOOST_PP_ITERATION_LIMITS (2,BLITZ_ARRAY_LARGEST_RANK)
@@ -89,23 +85,23 @@ negate(const TinyOfArrays<T,RANK,LENGTH>&);
 
 #define ITER BOOST_PP_ITERATION()
 
-#define TOA_print1(z,m,unused) (*this)(m).reference(x##m);
-#define TOA_print2(z,m,unused) (*this)(m).reference(x##m.copy());
+#define print1(z,m,unused) (*this)(m).reference(x##m);
+#define print2(z,m,unused) (*this)(m).reference(x##m.copy());
 
 
-TinyOfArrays(TOA_ShallowCopy, BOOST_PP_ENUM_PARAMS(ITER,const T_numtype& x) )
+TinyOfArrays(ShallowCopy, BOOST_PP_ENUM_PARAMS(ITER,const T_numtype& x) )
 {
-  BOOST_PP_REPEAT(ITER,TOA_print1,~);
+  BOOST_PP_REPEAT(ITER,print1,~);
 }
 
-TinyOfArrays(TOA_DeepCopy   , BOOST_PP_ENUM_PARAMS(ITER,const T_numtype& x) )
+TinyOfArrays(DeepCopy   , BOOST_PP_ENUM_PARAMS(ITER,const T_numtype& x) )
 {
-  BOOST_PP_REPEAT(ITER,TOA_print2,~);
+  BOOST_PP_REPEAT(ITER,print2,~);
 }
 
 
-#undef TOA_print2
-#undef TOA_print1
+#undef print2
+#undef print1
 
 #undef ITER
 

@@ -18,21 +18,18 @@
 #include <algorithm>
 
 
-using namespace std;
-using mathutils::sqr;
-
-
 template<int RANK>
 struct ReducedDensityOperator<RANK>::Helper
 {
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
   
-  Helper(const Dimensions& dim) : i_(Dimensions(size_t(0)),dim-1,Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {++i_; ++j_;}
+  Helper(const Dimensions& dim) : i_(Dimensions(size_t(0)),dim-1,cpputils::mii::begin), j_(i_), real_(true), offDiagonals_(false) {++i_; ++j_;}
   
-  Helper() : i_(Dimensions(size_t(0)),Dimensions(size_t(0)),Iterator::begin), j_(i_), real_(true), offDiagonals_(false) {}
+  Helper() : i_(Dimensions(size_t(0)),Dimensions(size_t(0)),cpputils::mii::begin), j_(i_), real_(true), offDiagonals_(false) {}
 
-  const string operator()()
+  const std::string operator()()
   {
+    using namespace std;
     stringstream ss(stringstream::out);
 
     // Diagonals
@@ -70,9 +67,9 @@ private:
 
 
 template<int RANK>
-ReducedDensityOperator<RANK>::ReducedDensityOperator(const string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
+ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
   DimensionsBookkeeper<RANK>(dim),
-  Base(label,boost::assign::list_of(Helper()()).repeat_fun((offDiagonals ? sqr(getTotalDimension()) : getTotalDimension())-1,Helper(getDimensions())).range(subsequent)),
+  Base(label,boost::assign::list_of(Helper()()).repeat_fun((offDiagonals ? mathutils::sqr(getTotalDimension()) : getTotalDimension())-1,Helper(getDimensions())).range(subsequent)),
   offDiagonals_(offDiagonals)
 {
 }
@@ -86,7 +83,7 @@ ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
   Averages averages(nAvr());
   
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(Dimensions(size_t(0)),getDimensions()-1,Iterator::begin);
+  const Iterator etalon(Dimensions(size_t(0)),getDimensions()-1,cpputils::mii::begin);
   
   size_t idx=0;
 
@@ -94,7 +91,7 @@ ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
     averages(idx++)=matrix(quantumdata::dispatchLDO_index(*i));
   
   if (offDiagonals_)
-    for (Iterator i=etalon.getBegin(); idx<sqr(dim); ++i)
+    for (Iterator i=etalon.getBegin(); idx<mathutils::sqr(dim); ++i)
       for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
         averages(idx++)=real(matrix(quantumdata::dispatchLDO_index(*i),quantumdata::dispatchLDO_index(*j)));
         averages(idx++)=imag(matrix(quantumdata::dispatchLDO_index(*i),quantumdata::dispatchLDO_index(*j)));
@@ -171,7 +168,7 @@ averagingUtils::Collecting<RANK,IS_TD>::process_v(Averages& avr) const
         Averages temp(avr(Range(l+1,u)));
         eav.process(temp);
       }
-      swap(l,u);
+      std::swap(l,u);
     }
   };
  

@@ -57,7 +57,7 @@ public:
   Base(
        const StateVector&,
        QuantumSystemPtr,
-       const ParsMCWF_Trajectory&,
+       const ParsMCWF&,
        const StateVectorLow& =StateVectorLow()
        );
 
@@ -99,21 +99,21 @@ public:
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;
 
-  using Base::getQS; using Base::getOstream; using Base::getPrecision; using Base::getTime; using Base::getStateVectors; using Base::toBeAveraged;
+  using Base::getQS; using Base::getTime; using Base::getStateVectors; using Base::toBeAveraged;
 
   template<typename SYS>
   EnsembleMCWF(
-	       const StateVector& psi,
-	       const SYS& sys,
-	       const ParsMCWF_Trajectory& p,
-	       bool negativity,
-	       const StateVectorLow& scaleAbs=StateVectorLow()
-	       )
-    : trajectory::Trajectory(p), Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
+               const StateVector& psi,
+               const SYS& sys,
+               const ParsMCWF& p,
+               bool negativity,
+               const StateVectorLow& scaleAbs=StateVectorLow()
+               )
+    : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
 
 private:
-  std::ostream& displayMore   () const {return doDisplay_.displayMore(getTime(),toBeAveraged(),getOstream(),getPrecision());}
-  size_t        displayMoreKey() const {return doDisplay_.displayMoreKey(getOstream());}
+  std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
 

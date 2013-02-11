@@ -6,7 +6,8 @@
 
 
 ParsEvolution::ParsEvolution(parameters::ParameterTable& p, const std::string& mod) 
-  : ParsMCWF_Trajectory(p,mod),
+  : ParsRun(p,mod),
+    ParsMCWF(p,mod),
     evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master, master_fast)",EM_SINGLE)),
     negativity(p.addMod("negativity",mod,"Calculates negativity in ensemble & master",false)),
     timeAverage(p.addMod("timeAverage",mod,"Calculates time averages in MCWF trajectory",false)),

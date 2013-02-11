@@ -23,32 +23,35 @@ public:
   
   typedef typename Averaged::Averages Averages;
   
-  using Base::getQS; using Base::getDtDid; using Base::getTime; using Base::getOstream; using Base::getPrecision; using Base::getPsi;
+  using Base::getQS; using Base::getDtDid; using Base::getTime; using Base::getPsi;
   
   template<typename SYS>
   TimeAveragingMCWF_Trajectory(
                                StateVector& psi,
                                const SYS& sys,
-                               const ParsMCWF_Trajectory& p,
+                               const ParsMCWF& p,
                                double relaxationTime,
                                const StateVectorLow& scaleAbs=StateVectorLow()
                                )
-    : trajectory::Trajectory(p), MCWF_Trajectory<RANK>(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQS().template nAvr<structure::LA_Av>()), sum_(0), av_(getQS().getAv())
+    : MCWF_Trajectory<RANK>(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQS().template nAvr<structure::LA_Av>()), sum_(0), av_(getQS().getAv())
     {
       averages_=0.;
     }
 
-  ~TimeAveragingMCWF_Trajectory();
-
   const Averages getAverages() const {return averages_;}
   
 private:
-  std::ostream& displayMore() const;
+  std::ostream& display_v(std::ostream&, int) const;
+  
+  std::ostream& logOnEnd_v(std::ostream& os) const;
+  
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return Base:: readState_v(iar) & averages_ & sum_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & averages_ & sum_;}
   
   const double relaxationTime_;
   
   mutable Averages averages_;
-  mutable double sum_;
+  mutable long sum_;
   
   const typename Averaged::Ptr av_;
 

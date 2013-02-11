@@ -4,37 +4,17 @@
 
 #include "MCWF_TrajectoryFwd.h"
 
-#include "MCWF_TrajectoryLogger.h"
 #include "StateVectorFwd.h"
+
+#include "MCWF_TrajectoryLogger.h"
 #include "Structure.h"
 
 #include "StochasticTrajectory.h"
 
 #include <boost/tuple/tuple.hpp>
 
-#include <boost/mpl/identity.hpp>
-
-#include <vector>
-
-namespace mpl=boost::mpl;
 
 namespace quantumtrajectory {
-
-
-class MCWF_TrajectoryFileOpeningException : public cpputils::TaggedException
-{
-public:
-  MCWF_TrajectoryFileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
-
-
-class MCWF_TrajectoryFileParsingException : public cpputils::TaggedException
-{
-public:
-  MCWF_TrajectoryFileParsingException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
 
 
 ///////////////////////////////////////
@@ -69,41 +49,35 @@ public:
 
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getPrecision; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
+  using Base::getEvolved; using Base::getRandomized; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
   template<typename SYS>
-  MCWF_Trajectory(
-		  StateVector& psi,
-		  const SYS& sys,
-		  const ParsMCWF_Trajectory&,
-		  const StateVectorLow& =StateVectorLow()
-		  );
-
-  ~MCWF_Trajectory();
+  MCWF_Trajectory(StateVector& psi, const SYS& sys, const ParsMCWF&, const StateVectorLow& =StateVectorLow());
 
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
   const StateVector& getPsi() const {return psi_;} 
 
 protected:
-  std::ostream& displayMore() const;
-  size_t displayMoreKey() const;
+  std::ostream&    display_v(std::ostream&, int    ) const;
+  std::ostream& displayKey_v(std::ostream&, size_t&) const;
   
   const QuantumSystemWrapper getQS() const {return qs_;}
 
+  cpputils::iarchive& readState_v(cpputils::iarchive& iar) {Base::readState_v(iar); if (qs_.getEx()) tIntPic0_=getTime(); return iar;} // writeState_v inherited
+
+  std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);}
+  
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
 
   void step_v(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
 
-  void displayParameters_v() const;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  void readState(std::ifstream &, bool onlySV=false);
-  void writeState(std::ofstream &) const;
-  
   double                coherentTimeDevelopment    (                                double Dt) const;
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
 
@@ -120,21 +94,7 @@ private:
 
   const double dpLimit_, overshootTolerance_;
 
-  const unsigned svdc_;
-  const bool firstSVDisplay_;
-  const int svdPrecision_;
-  mutable long svdCount_;
-
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  const bool binarySVFile_;
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-  const std::string svExtension_;
-
-  const std::string file_;
-
-  const std::string initFile_;
-
-  const MCWF_TrajectoryLogger logger_;
+  const MCWF_Logger logger_;
 
 };
 

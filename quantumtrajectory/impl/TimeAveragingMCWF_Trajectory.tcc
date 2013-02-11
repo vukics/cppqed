@@ -8,7 +8,7 @@
 
 
 template<int RANK>
-std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::displayMore() const
+std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) const
 {
   if (av_) {
     Averages averagesNow(av_->average(getTime(),getPsi()));
@@ -17,21 +17,22 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::displayMore
       ++sum_;
     }
     av_->process(averagesNow);
-    av_->display(averagesNow,getOstream(),getPrecision());
+    av_->display(averagesNow,os,precision);
   }
-  return getOstream();
+  return os;
 }
 
 
 template<int RANK>
-quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::~TimeAveragingMCWF_Trajectory()
+std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::logOnEnd_v(std::ostream& os) const
 {
   if (av_) {
-    std::ostream& os=getOstream()<<"# Time averages:\n# ";
-    av_->process(averages_);
-    av_->display(averages_,os,getPrecision())<<std::endl;
+    Averages endValues(averages_.copy());
+    // process would „corrupt” the averages_, which would be incorrectly saved afterwards by writeState_v, therefore we process a copy instead
+    av_->process(endValues);
+    av_->display(endValues,os<<"# Time averages after relaxation time "<<relaxationTime_<<std::endl<<"#",FormDouble::overallPrecision)<<std::endl;
   }
-
+  return Base::logOnEnd_v(os);
 }
 
 

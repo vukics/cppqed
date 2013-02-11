@@ -5,7 +5,7 @@
 namespace blitzplusplus {
 
 #ifndef   NDEBUG
-struct HalfCutTinyFishyException;
+struct HalfCutTinyException;
 #endif // NDEBUG
 
 } // blitzplusplus
