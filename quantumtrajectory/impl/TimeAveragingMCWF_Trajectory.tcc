@@ -16,8 +16,8 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::display_v(s
       averages_ = ( averages_*sum_ + averagesNow )/(sum_+1) ;
       ++sum_;
     }
-    av_->process(averagesNow);
-    av_->display(averagesNow,os,precision);
+    // av_->process(averagesNow);
+    // av_->display(averagesNow,os,precision);
   }
   return os;
 }

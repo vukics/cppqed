@@ -1,8 +1,4 @@
-import feature : feature ;
-feature enable-binary-output : no yes : propagated ;
-
 project : requirements
-          <enable-binary-output>no:<define>DO_NOT_USE_BOOST_SERIALIZATION
         : build-dir bin 
         ;
 
@@ -14,7 +10,7 @@ lib C++QED : quantumdata structure quantumtrajectory quantumoperator utilslib ;
 
 lib boost_serialization ;
 
-alias executables_link_against : : : : <library>C++QED <library>elements//el <library>utilslib <library>utils//flens <library>utils//blitz <enable-binary-output>yes:<library>boost_serialization ;
+alias executables_link_against : : : : <library>C++QED <library>elements//el <library>utilslib <library>utils//flens <library>utils//blitz <library>boost_serialization ;
 
 # Core
 build-project quantumdata       ;
