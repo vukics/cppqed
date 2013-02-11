@@ -121,8 +121,8 @@ protected:
 private:
   // Implementing QuantumSystem interface
 
-  double  highestFrequency_v(             ) const;
-  void   displayParameters_v(std::ostream&) const; class DisplayParameters;
+  double         highestFrequency_v(             ) const;
+  std::ostream& displayParameters_v(std::ostream&) const; class DisplayParameters;
 
   // Implementing Av_Base
 

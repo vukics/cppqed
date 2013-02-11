@@ -1,6 +1,6 @@
 #include "ParticleTwoModes_.h"
 
-#include "impl/Algorithm.tcc"
+#include "Algorithm.h"
 #include "impl/BlitzArraySliceIterator.tcc"
 #include "MathExtensions.h"
 #include "Range.h"
