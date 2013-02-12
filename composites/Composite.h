@@ -17,6 +17,9 @@
 
 #include <boost/fusion/container/generation/make_list.hpp>
 
+#include <boost/preprocessor/repetition/enum_params.hpp>
+#include <boost/preprocessor/repetition/enum_trailing.hpp>
+#include <boost/preprocessor/arithmetic/sub.hpp>
 
 
 namespace composite {
