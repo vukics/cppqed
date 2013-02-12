@@ -56,7 +56,7 @@ public:
 class AttemptedRecreationOfParameterException : public NamedException 
 {
 public: 
-  AttemptedRecreationOfParameterException(const std::string& name) : NamedException(name) {}
+  AttemptedRecreationOfParameterException(const std::string& name);
 };
 
 
