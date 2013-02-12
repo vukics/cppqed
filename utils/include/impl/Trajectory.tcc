@@ -9,6 +9,8 @@
 #include "ParsTrajectory.h"
 #include "SmartPtr.h"
 
+#include <boost/make_shared.hpp>
+
 #include <iomanip>
 #include <fstream>
 
@@ -18,7 +20,7 @@ namespace trajectory {
 template<typename A>
 void run(Adaptive<A>& traj, const ParsRun& p)
 {
-  if      (p.dc) run(traj,p.T,p.dc,p.ofn,p.precision,p.displayInfo);
+  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.precision,p.displayInfo);
   else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
 }
@@ -50,28 +52,35 @@ inline double endTime(double time, double   , double            =0.) {return tim
 }
 
 template<typename T, typename L, typename D>
-void run(T& traj, L length, D displayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo)
+void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo)
 {
-  using namespace std; using namespace boost; using namespace runTraits;
+  using namespace std; using namespace boost; using namespace runTraits; using namespace cpputils;
+
+  ////////////////////////////////////////////////
+  // Determining i/o streams, eventual state input
+  ////////////////////////////////////////////////
 
   static const string stateExtension(".state");
   const string stateFileName(trajectoryFileName+stateExtension);
   
+  const bool outputToFile=(trajectoryFileName!="");
   bool continuing=false;
   
-  if (trajectoryFileName!="") {
+  if (outputToFile) {
     ifstream trajectoryFile(trajectoryFileName.c_str());
     if (trajectoryFile.is_open() && trajectoryFile.peek()!=EOF) {
       ifstream stateFile(stateFileName.c_str());
       if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
-      cpputils::iarchive stateArchive(stateFile);
+      iarchive stateArchive(stateFile);
       traj.readState(stateArchive);
       if (endTime(length,displayFreq,traj.getTime())<=traj.getTime()) return;
       continuing=true;
     }
   }
 
-  const shared_ptr<ostream> outstream(trajectoryFileName=="" ? cpputils::nonOwningSharedPtr<ostream>(&cout) : shared_ptr<ostream>(new ofstream(trajectoryFileName.c_str(),ios_base::app)));
+  const shared_ptr<ostream> outstream(!outputToFile ?
+                                      nonOwningSharedPtr<ostream>(&cout) :
+                                      static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app)));
   // regulates the deletion policy
   
   ostream& os=*outstream;
@@ -80,47 +89,62 @@ void run(T& traj, L length, D displayFreq, const std::string& trajectoryFileName
  
   os<<setprecision(formdouble::actualPrecision(precision));
   
+  ///////////////////////
+  // Writing introduction
+  ///////////////////////
+
   if (displayInfo) {
     if (!continuing)
       traj.displayKey(traj.displayParameters(os)<<endl<<"# Key to data:"<<endl)
-        <<endl<<"# Run Trajectory for time "<<endTime(length,displayFreq)
+        <<endl<<"# Run Trajectory up to time "<<endTime(length,displayFreq)
         <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
     else
-      os<<"# Continuing up to time "<<endTime(length,displayFreq,traj.getTime())<<endl;
+      os<<"# Continuing from time "<<traj.getTime()<<" up to time "<<endTime(length,displayFreq,traj.getTime())<<endl;
   }
+  if (!continuing) traj.display(os,precision);
+
+  //////////////////////////////
+  // Mid section: the actual run
+  //////////////////////////////
 
   try {
-    if (!continuing) traj.display(os,precision);
-    for (long count=0; doContinue(traj,length,count); ++count) {
+    struct {
+      const shared_ptr<ofstream> ofs_;
+      const shared_ptr<oarchive> oar_;
+    } oarchiveWrapper = {
+                          !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(),ios_base::app) ,
+                          (!oarchiveWrapper.ofs_ || !oarchiveWrapper.ofs_->is_open()) ? shared_ptr<oarchive>() : make_shared<oarchive>(boost::ref(*oarchiveWrapper.ofs_))
+                        };
+      
+    for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
       advance(traj,length,displayFreq);
-      if (doDisplay(count,displayFreq)) traj.display(os,precision);
+      if (doDisplay(count,displayFreq)) {traj.display(os,precision); ++stateCount;}
+      if (oarchiveWrapper.oar_ && !(stateCount%stateDisplayFreq)) traj.writeState(*oarchiveWrapper.oar_);
     }
-#define ON_END \
-    traj.logOnEnd(os); \
-    if (trajectoryFileName!="") { \
-      ofstream stateFile(stateFileName.c_str()); \
-      cpputils::oarchive stateArchive(stateFile); \
-      traj.writeState(stateArchive); \
-    } 
-    ON_END
+  } catch (const StoppingCriterionReachedException& except) {os<<"\n# Stopping criterion has been reached"<<endl;}
+
+  //////////////////////////////////////////
+  // Logging on end, saving trajectory state
+  //////////////////////////////////////////
+  
+  traj.logOnEnd(os);
+  if (outputToFile) {
+    ofstream stateFile(stateFileName.c_str(),ios_base::app);
+    oarchive stateArchive(stateFile);
+    traj.writeState(stateArchive);
   }
-  catch (const StoppingCriterionReachedException& except) {
-    os<<"# Stopping criterion has been reached"<<endl;
-    ON_END
-#undef ON_END
-    throw except;
-  }
+  
 }
 
 } // details
 
 
-void run(Trajectory & traj, double time, double deltaT, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,time,deltaT,ofn,precision,displayInfo);}
+void run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,time,deltaT,sdf,ofn,precision,displayInfo);}
 
-void run(Trajectory & traj, long   nDt , double deltaT, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,nDt ,deltaT,ofn,precision,displayInfo);}
+void run(Trajectory & traj, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,nDt ,deltaT,sdf,ofn,precision,displayInfo);}
 
 template<typename A>
-void run(Adaptive<A>& traj, double time, int    dc    , const std::string& ofn, int precision, bool displayInfo) {details::run(traj,time,dc    ,ofn,precision,displayInfo);}
+void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,time,dc    ,sdf,ofn,precision,displayInfo);}
 
 
 

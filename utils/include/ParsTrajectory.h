@@ -59,6 +59,8 @@ struct ParsRun
 
   bool &displayInfo;
 
+  unsigned &sdf;
+  
   ParsRun(parameters::ParameterTable&, const std::string& mod="");
 
 };
