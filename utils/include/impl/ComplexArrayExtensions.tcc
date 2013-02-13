@@ -12,6 +12,7 @@
 #include <boost/preprocessor/repetition/enum_params.hpp>
 #include <boost/preprocessor/arithmetic/mul.hpp>
 #include <boost/preprocessor/arithmetic/div.hpp>
+#include <boost/preprocessor/iteration/iterate.hpp>
 
 
 namespace blitzplusplus {
