@@ -17,8 +17,7 @@ typedef result_of::make_vector<Decay<0,2>,Decay<1,2> >::type Decays;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
-
+  
   ParameterTable p;
 
   ParsPumpedLossy<NL,Pumps,Decays> pml(p);
@@ -38,9 +37,9 @@ int main(int argc, char* argv[])
   StateVector psi(NL); psi()(0)=1; psi()(1)=1; psi.renorm();
 
   evolve(psi,
-	 makePumpedLossyMultiLevelSch(pml,DiagonalDO("Lambda atom",NL)),
+	 makePumpedLossyMultiLevelSch(pml,ReducedDensityOperator("Lambda atom",NL)),
 	 pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 }

@@ -15,7 +15,6 @@ typedef structure::averaged::Collecting<1> Collecting;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -36,7 +35,7 @@ int main(int argc, char* argv[])
   if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
-  if (doDisplay) collection.push_back(new structure::averaged::DiagonalDO("",pplm.cutoff));
+  if (doDisplay) collection.push_back(new structure::averaged::ReducedDensityOperator("",pplm.cutoff));
 
   Ptr mode(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make(pplm,qmp,Collecting(collection)));
 
@@ -44,7 +43,7 @@ int main(int argc, char* argv[])
 
   evolve(psi,mode,pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 
 }

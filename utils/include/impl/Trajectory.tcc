@@ -58,12 +58,12 @@ void doRun(Adaptive<A>& traj, double time, int dc)
 
 } // details
 
-inline void runDt (Trajectory & traj, double time, double deltaT, bool displayInfo) {details::run(traj,time,deltaT,details::doRun,false,displayInfo);}
+void runDt (Trajectory & traj, double time, double deltaT, bool displayInfo) {details::run(traj,time,deltaT,details::doRun,false,displayInfo);}
 
-inline void runNDt(Trajectory & traj, long   nDt , double deltaT, bool displayInfo) {details::run(traj,nDt ,deltaT,details::doRun,false,displayInfo);}
+void runNDt(Trajectory & traj, long   nDt , double deltaT, bool displayInfo) {details::run(traj,nDt ,deltaT,details::doRun,false,displayInfo);}
 
 template<typename A>
-inline void run   (Adaptive<A>& traj, double time, int    dc    , bool displayInfo) {details::run(traj,time,dc    ,details::doRun,true ,displayInfo);}
+void run   (Adaptive<A>& traj, double time, int    dc    , bool displayInfo) {details::run(traj,time,dc    ,details::doRun,true ,displayInfo);}
 
 
 template<typename A>

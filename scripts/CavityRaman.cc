@@ -25,7 +25,6 @@ typedef quantumdata::StateVector<2> StateVector;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -45,7 +44,7 @@ int main(int argc, char* argv[])
 
   StateVector psi(psiML*mode::init(pplm)); psi.renorm();
 
-  MultiLevelBase<NL>::Ptr plml(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Lambda atom",NL)));
+  MultiLevelBase<NL>::Ptr plml(makePumpedLossyMultiLevelSch(pml,multilevel::ReducedDensityOperator("Lambda atom",NL)));
 
   mode::Ptr mode(mode::make(pplm,QMP_IP));
 
@@ -55,7 +54,7 @@ int main(int argc, char* argv[])
 			       binary::make(mljc),
 			       pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 }
 

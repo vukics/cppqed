@@ -23,7 +23,6 @@ typedef quantumdata::StateVector<2> StateVector;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
 
   ParameterTable p;
 
@@ -45,10 +44,10 @@ int main(int argc, char* argv[])
 
   evolve<tmptools::Vector<0> >
     (psi,
-     binary::make(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::DiagonalDO("Atom",NL)),
+     binary::make(MLJC<NL,Couplings>(makePumpedLossyMultiLevelSch(pml,multilevel::ReducedDensityOperator("Atom",NL)),
 				     mode::make(pplm,QMP_IP),pmljc)),
      pe);
 
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 }

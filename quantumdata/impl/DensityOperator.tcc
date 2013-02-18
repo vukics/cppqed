@@ -56,7 +56,7 @@ DensityOperator<RANK>::renorm()
 {
   using blitz::tensor::i;
   linalg::CMatrix m(matrixView());
-  double res=sum(real(m(i,i)));
+  double res=real(sum(m(i,i)));
   m/=res;
   return res;
 }

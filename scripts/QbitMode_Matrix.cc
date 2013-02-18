@@ -21,8 +21,7 @@ typedef StateVector2::StateVectorLow StateVectorLow2;
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
-  try {
-
+  
   ParameterTable p;
 
   ParsEvolution pe(p); // Driver Parameters
@@ -51,7 +50,7 @@ int main(int argc, char* argv[])
 
   evolve(psi1,TimeIndependentMatrixHamiltonianAveraged<2,true>(CMatrix(hamiltonian/DCOMP_I),system2,psi2),pe);
   
-  } catch (const ParsNamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+
 
 
 }

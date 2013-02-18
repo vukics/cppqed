@@ -10,6 +10,6 @@
 
 using parameters::ParameterTable    ;
 using parameters::update            ;
-using parameters::ParsNamedException;
+using parameters::NamedException;
 
 #endif // UTILS_INCLUDE_SIMULATED_H_INCLUDED

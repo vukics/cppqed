@@ -80,20 +80,21 @@ namespace averaged {
 
 // NEEDS_WORK generalize this for arbitrary RANK
 
-class DiagonalDO : public ClonableElementAveraged<1>
+class ReducedDensityOperator : public ClonableElementAveraged<1>
 {
 public:
   typedef ClonableElementAveraged<1> Base;
 
-  DiagonalDO(const std::string&, size_t);
+  ReducedDensityOperator(const std::string&, size_t, bool offDiagonals=false);
 
 private:
-  Base*const do_clone() const {return new DiagonalDO(*this);}
+  Base*const do_clone() const {return new ReducedDensityOperator(*this);}
 
   const Averages average_v(const LazyDensityOperator&) const;
   void           process_v(Averages&                 ) const {}
 
   const size_t dim_;
+  const bool offDiagonals_;
 
 };
 
