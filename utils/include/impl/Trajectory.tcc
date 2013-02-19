@@ -51,6 +51,9 @@ inline double endTime(double time, double   , double            =0.) {return tim
 
 }
 
+
+bool restoreState(Trajectory&, const std::string&, const std::string&);
+
 template<typename T, typename L, typename D>
 void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo)
 {
@@ -63,21 +66,14 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   static const string stateExtension(".state");
   const string stateFileName(trajectoryFileName+stateExtension);
   
-  const bool outputToFile=(trajectoryFileName!="");
-  bool continuing=false;
+  const bool
+    outputToFile=(trajectoryFileName!=""),  
+    continuing=restoreState(traj,trajectoryFileName,stateFileName);
   
-  if (outputToFile) {
-    ifstream trajectoryFile(trajectoryFileName.c_str());
-    if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
-      ifstream stateFile(stateFileName.c_str(), ios_base::binary); stateFile.exceptions(ifstream::eofbit);
-      if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
-      iarchive stateArchive(stateFile);
-      try {while (true) traj.readState(stateArchive);} catch (ifstream::failure) {} // boost::archive::archive_exception
-      if (endTime(length,displayFreq,traj.getTime())<=traj.getTime()) return;
-      continuing=true;
-    }
-  }
-
+  const double timeToReach=endTime(length,displayFreq,traj.getTime());
+    
+  if (timeToReach<=traj.getTime()) return;
+    
   const shared_ptr<ostream> outstream(!outputToFile ?
                                       nonOwningSharedPtr<ostream>(&cout) :
                                       static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app)));
@@ -96,10 +92,10 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   if (displayInfo) {
     if (!continuing)
       traj.displayKey(traj.displayParameters(os)<<endl<<"# Key to data:"<<endl)
-        <<endl<<"# Run Trajectory up to time "<<endTime(length,displayFreq)
+        <<endl<<"# Run Trajectory up to time "<<timeToReach
         <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
     else
-      os<<"# Continuing from time "<<traj.getTime()<<" up to time "<<endTime(length,displayFreq,traj.getTime())<<endl;
+      os<<"# Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
   }
   if (!continuing) traj.display(os,precision);
 
@@ -107,15 +103,15 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Mid section: the actual run
   //////////////////////////////
 
+  struct {
+    const shared_ptr<ofstream> ofs_;
+    const shared_ptr<oarchive> oar_;
+  } oarchiveWrapper = {
+                        !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(), ios_base::binary | ios_base::out) ,
+                        (!oarchiveWrapper.ofs_ || !oarchiveWrapper.ofs_->is_open()) ? shared_ptr<oarchive>() : make_shared<oarchive>(boost::ref(*oarchiveWrapper.ofs_))
+                      };
+                        
   try {
-    struct {
-      const shared_ptr<ofstream> ofs_;
-      const shared_ptr<oarchive> oar_;
-    } oarchiveWrapper = {
-                          (!stateDisplayFreq || !outputToFile) ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(), ios::binary | ios_base::app) ,
-                          (!oarchiveWrapper.ofs_ || !oarchiveWrapper.ofs_->is_open()) ? shared_ptr<oarchive>() : make_shared<oarchive>(boost::ref(*oarchiveWrapper.ofs_))
-                        };
-      
     for (long count=0, stateCount=1; doContinue(traj,length,count); ++count) {
       advance(traj,length,displayFreq);
       if (doDisplay(count,displayFreq)) {traj.display(os,precision); ++stateCount;}
@@ -128,11 +124,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   //////////////////////////////////////////
   
   traj.logOnEnd(os);
-  if (outputToFile) {
-    ofstream stateFile(stateFileName.c_str(),ios::binary | ios_base::app);
-    oarchive stateArchive(stateFile);
-    traj.writeState(stateArchive);
-  }
+  if (outputToFile) traj.writeState(*oarchiveWrapper.oar_);
   
 }
 

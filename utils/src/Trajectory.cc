@@ -33,5 +33,29 @@ ostream& Trajectory::displayKey(ostream& os) const
   return displayKey_v( os<<"# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
 }
 
+bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, const string& stateFileName)
+{
+  if (trajectoryFileName!="") {
+
+    ifstream trajectoryFile(trajectoryFileName.c_str());
+
+    if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
+      
+      ifstream stateFile(stateFileName.c_str(), ios_base::binary); stateFile.exceptions(ifstream::eofbit);
+      
+      if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
+      
+      cpputils::iarchive stateArchive(stateFile);
+      
+      try {
+        while (true) /* for (int i=0; i<2; ++i) */ traj.readState(stateArchive);
+      }
+      catch (boost::archive::archive_exception /*ifstream::failure*/) {}
+      
+      return true;
+    }
+  }
+  return false;
+}
 
 } // trajectory
