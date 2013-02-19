@@ -68,11 +68,11 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   
   if (outputToFile) {
     ifstream trajectoryFile(trajectoryFileName.c_str());
-    if (trajectoryFile.is_open() && trajectoryFile.peek()!=EOF) {
-      ifstream stateFile(stateFileName.c_str());
+    if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
+      ifstream stateFile(stateFileName.c_str(), ios_base::binary); stateFile.exceptions(ifstream::eofbit);
       if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
       iarchive stateArchive(stateFile);
-      traj.readState(stateArchive);
+      try {while (true) traj.readState(stateArchive);} catch (ifstream::failure) {} // boost::archive::archive_exception
       if (endTime(length,displayFreq,traj.getTime())<=traj.getTime()) return;
       continuing=true;
     }
@@ -112,11 +112,11 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
       const shared_ptr<ofstream> ofs_;
       const shared_ptr<oarchive> oar_;
     } oarchiveWrapper = {
-                          !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(),ios_base::app) ,
+                          (!stateDisplayFreq || !outputToFile) ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(), ios::binary | ios_base::app) ,
                           (!oarchiveWrapper.ofs_ || !oarchiveWrapper.ofs_->is_open()) ? shared_ptr<oarchive>() : make_shared<oarchive>(boost::ref(*oarchiveWrapper.ofs_))
                         };
       
-    for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
+    for (long count=0, stateCount=1; doContinue(traj,length,count); ++count) {
       advance(traj,length,displayFreq);
       if (doDisplay(count,displayFreq)) {traj.display(os,precision); ++stateCount;}
       if (oarchiveWrapper.oar_ && !(stateCount%stateDisplayFreq)) traj.writeState(*oarchiveWrapper.oar_);
@@ -129,7 +129,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   
   traj.logOnEnd(os);
   if (outputToFile) {
-    ofstream stateFile(stateFileName.c_str(),ios_base::app);
+    ofstream stateFile(stateFileName.c_str(),ios::binary | ios_base::app);
     oarchive stateArchive(stateFile);
     traj.writeState(stateArchive);
   }

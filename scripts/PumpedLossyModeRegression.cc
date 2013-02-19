@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
   // ****** ****** ****** ****** ****** ******
 
   pe.nTraj=10000/*00*/;
-  const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)(2000)(5000)(10000)(20000)(50000)(100000);
+  const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)(2000)(5000)(10000)/*(20000)(50000)(100000)*/;
 
   Ptr modeMaster(make(pplm,QMP_UIP)), mode(make(pplm,QMP_IP));
   StateVector psi(init(pplm));
@@ -62,4 +62,4 @@ int main(int argc, char* argv[])
 
 
 
-// bin/scripts/gcc-4.6/release/PumpedLossyModeConvergence --nTh 10 --cutoff 100 --kappa 5 --eta "(-10,9)" --T 0.5 --Dt 0.0005 --precision 6 --minitFock 20 --seed 1000 --logLevel 1 --logLevel -1
+// PumpedLossyModeConvergence --nTh 10 --cutoff 100 --kappa 5 --eta "(-10,9)" --T 0.5 --Dt 0.0005 --precision 6 --minitFock 20 --seed 1000 --logLevel 1 --logLevel -1
