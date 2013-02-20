@@ -57,7 +57,7 @@ struct ParsRun
 
   formdouble::Zero &precision;
 
-  bool &displayInfo;
+  bool &displayInfo, &firstStateDisplay;
 
   unsigned &sdf;
   

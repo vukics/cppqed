@@ -18,6 +18,7 @@ ParsRun::ParsRun(parameters::ParameterTable& p, const std::string& mod)
     ofn(p.addMod<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
     precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision/2))),
     displayInfo(p.addMod("displayInfo",mod,"Whether to display header for trajectories",true)),
+    firstStateDisplay(p.addMod("firstStateDisplay",mod,"Displays state vector at startup",true)),
     sdf(p.addMod("sdf",mod,"State output frequency",0u))
 {}
 

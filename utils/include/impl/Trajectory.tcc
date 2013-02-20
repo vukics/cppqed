@@ -20,7 +20,7 @@ namespace trajectory {
 template<typename A>
 void run(Adaptive<A>& traj, const ParsRun& p)
 {
-  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.precision,p.displayInfo);
+  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.precision,p.displayInfo,p.firstStateDisplay);
   else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
 }
@@ -41,7 +41,7 @@ template<typename A>
 inline void advance(Adaptive<A>& traj, double time, int          ) {traj.step(time-traj.getTime());}
 
 inline bool doDisplay(long      , double         ) {return true;}
-inline bool doDisplay(long count, int displayFreq) {return !((count+1)%displayFreq);}
+inline bool doDisplay(long count, int displayFreq) {return !(count%displayFreq);}
 
 inline const std::string writeTimestep(int   ) {return " timestep";}
 inline const std::string writeTimestep(double) {return ""         ;}
@@ -55,7 +55,7 @@ inline double endTime(double time, double   , double            =0.) {return tim
 bool restoreState(Trajectory&, const std::string&, const std::string&);
 
 template<typename T, typename L, typename D>
-void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo)
+void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo, bool firstStateDisplay)
 {
   using namespace std; using namespace boost; using namespace runTraits; using namespace cpputils;
 
@@ -97,7 +97,6 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     else
       os<<"# Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
   }
-  if (!continuing) traj.display(os,precision);
 
   //////////////////////////////
   // Mid section: the actual run
@@ -112,10 +111,18 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
                       };
                         
   try {
-    for (long count=0, stateCount=1; doContinue(traj,length,count); ++count) {
-      advance(traj,length,displayFreq);
-      if (doDisplay(count,displayFreq)) {traj.display(os,precision); ++stateCount;}
-      if (oarchiveWrapper.oar_ && !(stateCount%stateDisplayFreq)) traj.writeState(*oarchiveWrapper.oar_);
+    for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
+      if (count) advance(traj,length,displayFreq);
+      if (!count || doDisplay(count,displayFreq)) {
+        if (
+            stateDisplayFreq && 
+            oarchiveWrapper.oar_ && 
+            !(stateCount%stateDisplayFreq) && 
+            (stateCount || firstStateDisplay)
+           ) 
+          traj.writeState(*oarchiveWrapper.oar_);
+        traj.display(os,precision); ++stateCount;
+      }
     }
   } catch (const StoppingCriterionReachedException& except) {os<<"\n# Stopping criterion has been reached"<<endl;}
 
@@ -124,19 +131,22 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   //////////////////////////////////////////
   
   traj.logOnEnd(os);
-  if (outputToFile) traj.writeState(*oarchiveWrapper.oar_);
+  if (oarchiveWrapper.oar_) traj.writeState(*oarchiveWrapper.oar_);
   
 }
 
 } // details
 
 
-void run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,time,deltaT,sdf,ofn,precision,displayInfo);}
+void run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo, bool firstStateDisplay)
+{details::run(traj,time,deltaT,sdf,ofn,precision,displayInfo,firstStateDisplay);}
 
-void run(Trajectory & traj, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,nDt ,deltaT,sdf,ofn,precision,displayInfo);}
+void run(Trajectory & traj, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo, bool firstStateDisplay)
+{details::run(traj,nDt ,deltaT,sdf,ofn,precision,displayInfo,firstStateDisplay);}
 
 template<typename A>
-void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, int precision, bool displayInfo) {details::run(traj,time,dc    ,sdf,ofn,precision,displayInfo);}
+void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, int precision, bool displayInfo, bool firstStateDisplay)
+{details::run(traj,time,dc    ,sdf,ofn,precision,displayInfo,firstStateDisplay);}
 
 
 
