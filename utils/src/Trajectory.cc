@@ -33,6 +33,7 @@ ostream& Trajectory::displayKey(ostream& os) const
   return displayKey_v( os<<"# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
 }
 
+
 bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, const string& stateFileName)
 {
   if (trajectoryFileName!="") {
@@ -41,21 +42,37 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
 
     if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
       
-      ifstream stateFile(stateFileName.c_str(), ios_base::binary); stateFile.exceptions(ifstream::eofbit);
+      ifstream stateFile(stateFileName.c_str()/*, ios_base::binary*/);// stateFile.exceptions(ifstream::eofbit);
       
       if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
       
-      cpputils::iarchive stateArchive(stateFile);
-      
-      try {
-        while (true) /* for (int i=0; i<2; ++i) */ traj.readState(stateArchive);
+      { // scope of buffer
+        string buffer;
+        for (streamsize n; (stateFile.peek(), !stateFile.eof()); stateFile.read(&buffer[0],n)) {stateFile>>n; buffer.resize(n);}
+        istringstream iss(buffer,ios_base::binary);
+        cpputils::iarchive stateArchive(iss);
+        traj.readState(stateArchive);
       }
-      catch (boost::archive::archive_exception /*ifstream::failure*/) {}
       
       return true;
     }
+    
   }
+  
   return false;
 }
+
+
+void details::streamViaSStream(const Trajectory& traj, boost::shared_ptr<std::ofstream> ofs)
+{
+  if (ofs && ofs->is_open()) {
+    ostringstream oss(ios_base::binary);
+    cpputils::oarchive stateArchive(oss);
+    traj.writeState(stateArchive);
+    *ofs<<oss.str().size(); ofs->write(&(oss.str()[0]),oss.str().size());
+  }
+}
+
+
 
 } // trajectory

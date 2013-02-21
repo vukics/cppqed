@@ -54,6 +54,8 @@ inline double endTime(double time, double   , double            =0.) {return tim
 
 bool restoreState(Trajectory&, const std::string&, const std::string&);
 
+void streamViaSStream(const Trajectory&, boost::shared_ptr<std::ofstream>);
+
 template<typename T, typename L, typename D>
 void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo, bool firstStateDisplay)
 {
@@ -102,28 +104,28 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Mid section: the actual run
   //////////////////////////////
 
-  struct {
-    const shared_ptr<ofstream> ofs_;
-    const shared_ptr<oarchive> oar_;
-  } oarchiveWrapper = {
-                        !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(), ios_base::binary | ios_base::out) ,
-                        (!oarchiveWrapper.ofs_ || !oarchiveWrapper.ofs_->is_open()) ? shared_ptr<oarchive>() : make_shared<oarchive>(boost::ref(*oarchiveWrapper.ofs_))
-                      };
-                        
+  const shared_ptr<ofstream> ofs = !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str() /*, ios_base::binary | ios_base::out */);
+
   try {
+
     for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
+
       if (count) advance(traj,length,displayFreq);
+      
       if (!count || doDisplay(count,displayFreq)) {
+      
         if (
             stateDisplayFreq && 
-            oarchiveWrapper.oar_ && 
             !(stateCount%stateDisplayFreq) && 
-            (stateCount || firstStateDisplay)
-           ) 
-          traj.writeState(*oarchiveWrapper.oar_);
+            (stateCount || (!continuing && firstStateDisplay))
+           ) streamViaSStream(traj,ofs); // traj.writeState(*oarchiveWrapper.oar_);
+
         traj.display(os,precision); ++stateCount;
+              
       }
+    
     }
+
   } catch (const StoppingCriterionReachedException& except) {os<<"\n# Stopping criterion has been reached"<<endl;}
 
   //////////////////////////////////////////
@@ -131,7 +133,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   //////////////////////////////////////////
   
   traj.logOnEnd(os);
-  if (oarchiveWrapper.oar_) traj.writeState(*oarchiveWrapper.oar_);
+  streamViaSStream(traj,ofs); //if (oarchiveWrapper.oar_) traj.writeState(*oarchiveWrapper.oar_);
   
 }
 
