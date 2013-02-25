@@ -48,7 +48,8 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
       
       { // scope of buffer
         string buffer;
-        for (streamsize n; (stateFile.peek(), !stateFile.eof()); stateFile.read(&buffer[0],n)) {stateFile>>n; buffer.resize(n);}
+        streamsize n; stateFile>>n; buffer.resize(n);
+        stateFile.seekg(-n,ios_base::end); stateFile.read(&buffer[0],n);
         istringstream iss(buffer,ios_base::binary);
         cpputils::iarchive stateArchive(iss);
         traj.readState(stateArchive);
@@ -69,7 +70,8 @@ void details::streamViaSStream(const Trajectory& traj, boost::shared_ptr<std::of
     ostringstream oss(ios_base::binary);
     cpputils::oarchive stateArchive(oss);
     traj.writeState(stateArchive);
-    *ofs<<oss.str().size(); ofs->write(&(oss.str()[0]),oss.str().size());
+    const string& buffer=oss.str();
+    *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
   }
 }
 
