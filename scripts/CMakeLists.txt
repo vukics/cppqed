@@ -10,7 +10,10 @@ endif( NOT ENABLE_FLENS )
 # checks if libutils should be linked with FLENS
 if ( CMAKE_CXX_COMPILER_VERSION MATCHES " 4.2" )
   message(STATUS "Detected gcc version 4.2, removing some scripts from build targets.")
-  list(REMOVE_ITEM SCRIPTS ./2particles1mode.cc ./Ca40InCavity.cc ./QbitMode_Matrix.cc ./MLJC.cc )
+  list(REMOVE_ITEM SCRIPTS ${CMAKE_SOURCE_DIR}/scripts/2particles1mode.cc
+      ${CMAKE_SOURCE_DIR}/scripts/Ca40InCavity.cc
+      ${CMAKE_SOURCE_DIR}/scripts/QbitMode_Matrix.cc
+      ${CMAKE_SOURCE_DIR}/scripts/MLJC.cc )
 endif ( CMAKE_CXX_COMPILER_VERSION MATCHES " 4.2" )
 
 foreach(s ${SCRIPTS})

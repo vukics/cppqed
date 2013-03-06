@@ -119,7 +119,7 @@ PumpedLossyQbit::PumpedLossyQbit(const qbit::ParsPumpedLossy& p)
     qbit::Hamiltonian<true>(0,dcomp(p.gamma,-p.delta),p.eta),
     BASE_initC(FREQS(TUPLE_gammadelta(1))(TUPLE_eta))
 {
-  getParsStream()<<"# Lossy, Unitary interaction picture.\n";
+  getParsStream()<<"# PumpedLossy.\n";
 }
 
 
