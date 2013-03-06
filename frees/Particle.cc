@@ -6,7 +6,7 @@
 #include "impl/LazyDensityOperatorFFT.tcc"
 #include "impl/TridiagonalHamiltonian.tcc"
 
-#include "Hermite.h"
+#include <boost/math/special_functions/hermite.hpp>
 
 #include <boost/bind.hpp>
 
@@ -381,7 +381,7 @@ const StateVector hoState(size_t n, const InitialCondition& init, const Spatial&
 
   for (size_t j=0; j<dim; j++) {
     double temp=(space.getX()(j)-kx0)/init.getSig();
-    psiLow(j)=exp(-sqr(temp)/2.)*Hermite(n,temp);
+    psiLow(j)=exp(-sqr(temp)/2.)*boost::math::hermite(n,temp);
   }
 
   if (kFlag) quantumdata::ffTransform(psiLow,DIR_XK);
