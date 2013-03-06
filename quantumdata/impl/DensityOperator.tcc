@@ -5,6 +5,7 @@
 #include "DensityOperator.h"
 
 #include "impl/BlitzArrayExtensions.tcc"
+#include "impl/MultiIndexIterator.tcc"
 
 
 namespace quantumdata {
@@ -65,12 +66,40 @@ DensityOperator<RANK>::renorm()
 
 
 template<int RANK> 
-inline
-const dcomp 
-DensityOperator<RANK>::index(const Idx& i, const Idx& j) const
+const dcomp&
+DensityOperator<RANK>::operator()(const Idx& i, const Idx& j) const
 {
   return operator()()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
   // We have to explicitly indicate the template parameters for concatenateTinies here, otherwise when RANK=1, that is, Idx is int, the compiler cannot find the function. This is despite TinyVector<int,1> has an implicit constructor from int, because implicit type conversions are NEVER considered for template parameter deduction (for further details see EffC++ 3rd edition item 46.)
+}
+
+
+
+template<int RANK>
+void inflate(const TTD_DARRAY(1)& flattened, DensityOperator<RANK>& rho, bool offDiagonals)
+{
+  using mathutils::sqr;
+  typedef typename DensityOperator<RANK>::Dimensions Dimensions;
+  
+  const size_t dim=rho.getTotalDimension();
+  
+  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(Dimensions(size_t(0)),rho.getDimensions()-1,cpputils::mii::begin);
+  
+  size_t idx=0;
+
+  // Diagonal
+  for (Iterator i(etalon); idx<dim; ++i)
+    rho(dispatchLDO_index(*i),dispatchLDO_index(*i))=flattened(idx++);
+  
+  // OffDiagonal
+  if (offDiagonals)
+    for (Iterator i=etalon.getBegin(); idx<mathutils::sqr(dim); ++i)
+      for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j, idx+=2) {
+        dcomp matrixElement(rho(dispatchLDO_index(*i),dispatchLDO_index(*j))=dcomp(flattened(idx),flattened(idx+1)));
+        rho(dispatchLDO_index(*j),dispatchLDO_index(*i))=conj(matrixElement);
+      }
+  
 }
 
 

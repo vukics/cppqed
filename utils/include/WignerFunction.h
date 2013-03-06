@@ -50,6 +50,7 @@ private:
 
 template<typename DensityOperator>
 double wignerFunction(const DensityOperator& rho, double x, double y, size_t truncatedDimension=0)
+// NEEDS_WORK should refer rho only via some traits class to make the code really generic.
 {
   using namespace std; using namespace mathutils;
   
