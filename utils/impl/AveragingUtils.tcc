@@ -79,26 +79,7 @@ template<int RANK>
 const typename ReducedDensityOperator<RANK>::Averages 
 ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
 {
-  const size_t dim=getTotalDimension();
-  Averages averages(nAvr());
-  
-  typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(Dimensions(size_t(0)),getDimensions()-1,cpputils::mii::begin);
-  
-  size_t idx=0;
-
-  for (Iterator i(etalon); idx<dim; ++i)
-    averages(idx++)=matrix(quantumdata::dispatchLDO_index(*i));
-  
-  if (offDiagonals_)
-    for (Iterator i=etalon.getBegin(); idx<mathutils::sqr(dim); ++i)
-      for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
-        averages(idx++)=real(matrix(quantumdata::dispatchLDO_index(*i),quantumdata::dispatchLDO_index(*j)));
-        averages(idx++)=imag(matrix(quantumdata::dispatchLDO_index(*i),quantumdata::dispatchLDO_index(*j)));
-      }
-
-  return averages;
-  
+  return deflate(matrix,offDiagonals_);
 }
 
 
