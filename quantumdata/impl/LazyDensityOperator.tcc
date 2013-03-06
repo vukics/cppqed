@@ -61,10 +61,11 @@ const TTD_DARRAY(1) deflate(const LazyDensityOperator<RANK>& matrix, bool offDia
     res(idx++)=matrix(dispatchLDO_index(*i));
   
   if (offDiagonals)
-    for (Iterator i=etalon.getBegin(); idx<mathutils::sqr(dim); ++i)
+    for (Iterator i(etalon); idx<mathutils::sqr(dim); ++i)
       for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
-        res(idx++)=real(matrix(dispatchLDO_index(*i),dispatchLDO_index(*j)));
-        res(idx++)=imag(matrix(dispatchLDO_index(*i),dispatchLDO_index(*j)));
+        dcomp matrixElement(matrix(dispatchLDO_index(*i),dispatchLDO_index(*j)));
+        res(idx++)=real(matrixElement);
+        res(idx++)=imag(matrixElement);
       }
 
   return res;

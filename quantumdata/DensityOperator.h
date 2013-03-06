@@ -108,6 +108,10 @@ template<int RANK>
 void inflate(const TTD_DARRAY(1)&, DensityOperator<RANK>&, bool offDiagonals);
 
 
+template<int RANK>
+const DensityOperator<RANK>
+densityOperatorize(const LazyDensityOperator<RANK>&);
+
 
 } // quantumdata
 
