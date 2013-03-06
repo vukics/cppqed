@@ -6,6 +6,7 @@
 
 #include "DimensionsBookkeeper.h"
 
+#include "BlitzArray.h"
 #include "ComplexExtensions.h"
 
 #include <boost/shared_ptr.hpp>
@@ -77,6 +78,10 @@ template<int RANK>
 inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const TTD_IDXTINY(RANK)& idx) {return idx   ;}
 
 inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const TTD_IDXTINY(1   )& idx) {return idx[0];}
+
+
+template<int RANK>
+const TTD_DARRAY(1) deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
 
 
 } // quantumdata

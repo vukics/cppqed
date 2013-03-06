@@ -42,6 +42,36 @@ LazyDensityOperator<RANK>::end  () const
 }
 
 
+template<int RANK>
+const TTD_DARRAY(1) deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
+{
+  using mathutils::sqr;
+  typedef typename LazyDensityOperator<RANK>::Dimensions Dimensions;
+  
+  const size_t dim=matrix.getTotalDimension();
+  
+  TTD_DARRAY(1) res(offDiagonals ? mathutils::sqr(dim) : dim);
+  
+  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(Dimensions(size_t(0)),matrix.getDimensions()-1,cpputils::mii::begin);
+  
+  size_t idx=0;
+
+  for (Iterator i(etalon); idx<dim; ++i)
+    res(idx++)=matrix(dispatchLDO_index(*i));
+  
+  if (offDiagonals)
+    for (Iterator i=etalon.getBegin(); idx<mathutils::sqr(dim); ++i)
+      for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
+        res(idx++)=real(matrix(dispatchLDO_index(*i),dispatchLDO_index(*j)));
+        res(idx++)=imag(matrix(dispatchLDO_index(*i),dispatchLDO_index(*j)));
+      }
+
+  return res;
+
+}
+
+
 } //quantumdata
 
 #endif // QUANTUMDATA_IMPL_LAZYDENSITYOPERATOR_TCC_INCLUDED
