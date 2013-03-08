@@ -4,10 +4,15 @@
 
 #include "LazyDensityOperatorFFT.h"
 
+#include "impl/BlitzArraySliceIterator.tcc"
 #include "impl/DensityOperator.tcc"
 #include "impl/StateVector.tcc"
+#include "TMP_Tools.h"
 
+#include <boost/range/algorithm/for_each.hpp>
 #include <boost/make_shared.hpp>
+#include <boost/mpl/fold.hpp>
+#include <boost/mpl/placeholders.hpp>
 
 namespace quantumdata {
 
@@ -24,10 +29,14 @@ const boost::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const Lazy
   typedef StateVector    <RANK> SV;
   typedef DensityOperator<RANK> DO;
   
+  using blitzplusplus::basi::fullRange;
+  
+  void (&ffTransformWorker)(linalg::CVector&, fft::Direction) = quantumdata::ffTransform;
+  
+  
   if      (const SV*const psi=dynamic_cast<const SV*>(&matrix) ) {
     const boost::shared_ptr<SV> res(boost::make_shared<SV>(*psi));
-    linalg::CVector view(res->vectorView());
-    ffTransform(view,dir);
+    boost::for_each(fullRange<tmptools::Vector<0> >((*res)()),boost::bind(ffTransformWorker,_1,dir));
     return res;
   }
   else if (const DO*const rho=dynamic_cast<const DO*>(&matrix) ) {

@@ -124,15 +124,22 @@ public:
 
 
 template<typename, bool>
+class IteratorBaseTrivial;
+
+template<typename, bool>
 class IteratorBaseSpecial;
 
 template<int, typename, bool>
 class IteratorBase;
 
 
-#define BASE_class boost::mpl::if_c<RANK==MPL_SIZE(V),\
-				    IteratorBaseSpecial<V,CONST>,\
-				    IteratorBase<RANK,V,CONST> >::type
+#define BASE_class boost::mpl::if_c<RANK==1,\
+                                    IteratorBaseTrivial<V,CONST>,\
+                                    typename boost::mpl::if_c<RANK==MPL_SIZE(V),\
+                                                              IteratorBaseSpecial<V,CONST>,\
+                                                              IteratorBase<RANK,V,CONST>\
+                                                             >::type\
+                                   >::type
 
 template<int RANK, typename V, bool CONST>
 class Iterator 
@@ -222,11 +229,9 @@ private:
 };
 
 
-
-
 //////////////
 //
-// BaseSpecial
+// BaseTrivial
 //
 //////////////
 
@@ -234,7 +239,7 @@ class OutOfRange : public cpputils::Exception {};
 
 
 template<typename V, bool CONST>
-class IteratorBaseSpecial
+class IteratorBaseTrivial
 {
 public:
   static const int RANK=MPL_SIZE(V);
@@ -242,23 +247,39 @@ public:
   typedef TTD_CARRAY(RANK)                            CA;
   typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA;
 
-  IteratorBaseSpecial(CcCA&, boost::mpl::false_); // if it's not the end, it's the beginning
-  IteratorBaseSpecial(CcCA&, boost::mpl:: true_);
+  IteratorBaseTrivial(CcCA&, boost::mpl::false_); // if it's not the end, it's the beginning
+  IteratorBaseTrivial(CcCA&, boost::mpl:: true_);
 
   void increment() {if (!isEnd_) isEnd_=true; else throw OutOfRange();}
 
   CcCA& operator*() const {if (isEnd_) throw OutOfRange(); return array_;}
 
-  friend bool operator==(const IteratorBaseSpecial& i1, const IteratorBaseSpecial& i2) {return i1.isEnd_==i2.isEnd_;}
+  friend bool operator==(const IteratorBaseTrivial& i1, const IteratorBaseTrivial& i2) {return i1.isEnd_==i2.isEnd_;}
 
-private:
+protected:
   mutable CA array_;
 
+private:
   bool isEnd_;
 
 };
 
+//////////////
+//
+// BaseSpecial
+//
+//////////////
 
+template<typename V, bool CONST>
+class IteratorBaseSpecial : public IteratorBaseTrivial<V,CONST>
+{
+public:
+  typedef typename IteratorBaseTrivial<V,CONST>::CcCA CcCA;
+  
+  IteratorBaseSpecial(CcCA&, boost::mpl::false_); // if it's not the end, it's the beginning
+  IteratorBaseSpecial(CcCA&, boost::mpl:: true_);
+
+};
 
 } // basi
 

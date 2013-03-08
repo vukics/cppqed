@@ -114,22 +114,32 @@ IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl:: true_)
   // end, and is never dereferenced.
 }
 
-
 template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl::false_)
+IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA& array, boost::mpl::false_)
   : array_(), isEnd_(false)
 {
   array_.reference(array);
-  Transposer<boost::mpl::size<V>::value,V>::transpose(array_);
 }
 
-
 template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA&, boost::mpl:: true_) 
+IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA&, boost::mpl::true_)
   : array_(), isEnd_(true)
 {
 }
 
+template<typename V, bool CONST>
+IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl::false_)
+  : IteratorBaseTrivial<V,CONST>(array, false)
+{
+  Transposer<boost::mpl::size<V>::value,V>::transpose(this->array_);
+}
+
+
+template<typename V, bool CONST>
+IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl:: true_) 
+  : IteratorBaseTrivial<V,CONST>(array, true)
+{
+}
 
 
 //////////////////////////
