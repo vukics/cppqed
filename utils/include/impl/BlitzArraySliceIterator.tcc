@@ -129,7 +129,7 @@ IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA&, boost::mpl::true_)
 
 template<typename V, bool CONST>
 IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl::false_)
-  : IteratorBaseTrivial<V,CONST>(array, false)
+  : IteratorBaseTrivial<V,CONST>(array, boost::mpl::false_())
 {
   Transposer<boost::mpl::size<V>::value,V>::transpose(this->array_);
 }
@@ -137,7 +137,7 @@ IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl::false
 
 template<typename V, bool CONST>
 IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl:: true_) 
-  : IteratorBaseTrivial<V,CONST>(array, true)
+  : IteratorBaseTrivial<V,CONST>(array, boost::mpl::true_())
 {
 }
 
