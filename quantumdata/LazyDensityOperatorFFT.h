@@ -11,6 +11,7 @@
 
 #include "StateVector.h"
 
+#include <boost/mpl/integral_c.hpp>
 #include <boost/shared_ptr.hpp>
 
 
@@ -35,7 +36,7 @@ class fftWorkerSV
 public:
   typedef StateVector<RANK> SV;
   fftWorkerSV(const boost::shared_ptr<SV> psi, fft::Direction dir) : psi_(psi), dir_(dir) {};
-  template<typename I> void operator()(I &);
+  template<int IDX> void operator()(mpl::integral_c<int,IDX> &);
 private:
   boost::shared_ptr<SV> psi_;
   fft::Direction dir_;
@@ -47,7 +48,7 @@ class fftWorkerDO
 public:
   typedef DensityOperator<RANK> DO;
   fftWorkerDO(const boost::shared_ptr<DO> rho, fft::Direction dir) : rho_(rho), dir_(dir) {};
-  template<typename I> void operator()(I &);
+  template<int IDX> void operator()(mpl::integral_c<int,IDX> &);
 private:
   boost::shared_ptr<DO> rho_;
   fft::Direction dir_;

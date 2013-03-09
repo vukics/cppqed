@@ -21,23 +21,23 @@ namespace quantumdata {
 namespace details {
 
 template<int RANK>
-template<typename I>
-void fftWorkerSV<RANK>::operator()(I &)
+template<int IDX>
+void fftWorkerSV<RANK>::operator()(mpl::integral_c<int,IDX> &)
 {
-  using boost::mpl::vector;
+  using tmptools::Vector;
   using blitzplusplus::basi::fullRange;
   void (* const ffTransformWorker)(linalg::CVector&, fft::Direction) = &quantumdata::ffTransform;
-  boost::for_each(fullRange<vector<I> >((*psi_)()),boost::bind(ffTransformWorker,_1,dir_));
+  boost::for_each(fullRange<Vector<IDX> >((*psi_)()),boost::bind(ffTransformWorker,_1,dir_));
 }
 
 template<int RANK>
-template<typename I>
-void fftWorkerDO<RANK>::operator()(I &)
+template<int IDX>
+void fftWorkerDO<RANK>::operator()(mpl::integral_c<int,IDX> &)
 {
-  using boost::mpl::vector; using boost::mpl::plus; using boost::mpl::int_;
+  using tmptools::Vector; using boost::mpl::plus; using boost::mpl::int_;
   using blitzplusplus::basi::fullRange;
   void (* const ffTransformWorker)(linalg::CMatrix&, fft::Direction) = &quantumdata::ffTransform;
-  boost::for_each(fullRange<vector<I,plus<I,int_<RANK> > > >((*rho_)()),boost::bind(ffTransformWorker,_1,dir_));
+  boost::for_each(fullRange<Vector<IDX,IDX+RANK> >((*rho_)()),boost::bind(ffTransformWorker,_1,dir_));
 }
 
 } // details
