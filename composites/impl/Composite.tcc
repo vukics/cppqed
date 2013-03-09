@@ -594,8 +594,8 @@ public:
     if (av && (u_=l_+av->nAvr())>l_) {
       Averages temp(avr_(Range(l_+1,u_)));
       av->process(temp);
+      std::swap(l_,u_);
     }
-    std::swap(l_,u_);
   }
 
   ACTS_FREES_operator(Av);
@@ -631,8 +631,10 @@ public:
   void help(typename Av::Ptr av) const
   {
     using blitz::Range;
-    if (av && (u_=l_+av->nAvr())>l_) av->display(avr_(Range(l_+1,u_)),os_,precision_);
-    std::swap(l_,u_);
+    if (av && (u_=l_+av->nAvr())>l_) {
+      av->display(avr_(Range(l_+1,u_)),os_,precision_);
+      std::swap(l_,u_);
+    }
   }
 
   ACTS_FREES_operator(Av);
