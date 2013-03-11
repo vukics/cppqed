@@ -34,7 +34,7 @@ template<int RANK>
 template<int IDX>
 void fftWorkerDO<RANK>::operator()(mpl::integral_c<int,IDX> &)
 {
-  using tmptools::Vector; using boost::mpl::plus; using boost::mpl::int_;
+  using tmptools::Vector;
   using blitzplusplus::basi::fullRange;
   void (* const ffTransformWorker)(linalg::CMatrix&, fft::Direction) = &quantumdata::ffTransform;
   boost::for_each(fullRange<Vector<IDX,IDX+RANK> >((*rho_)()),boost::bind(ffTransformWorker,_1,dir_));
