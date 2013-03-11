@@ -22,12 +22,12 @@ BOOST_AUTO_TEST_CASE( LAZY_DENSITY_OPERATOR_FFTRANSFORM )
   using namespace quantumdata;
   using namespace blitz;
   using mathutils::fcmp;
-  double s1=1.;
-  double s2=2.;
-  double s3=3.;
+  InitialCondition ic1(0.5,0,1,true);
+  InitialCondition ic2(0.5,0,2,true);
+  InitialCondition ic3(0.5,0,3,true);
   Spatial spacial(3);
-  SV3 psi1 = wavePacket(InitialCondition(0.5,0,s1,true),spacial,true)*wavePacket(InitialCondition(0,0,s2,true),spacial,true)*wavePacket(InitialCondition(-0.5,0,s3,true),spacial,true);
-  SV3 psi2 = wavePacket(InitialCondition(0.5,0,s1,true),spacial,false)*wavePacket(InitialCondition(0,0,s2,true),spacial,true)*wavePacket(InitialCondition(-0.5,0,s3,true),spacial,false);
+  SV3 psi1 = wavePacket(ic1,spacial,true)*wavePacket(ic2,spacial,true)*wavePacket(ic3,spacial,true);
+  SV3 psi2 = wavePacket(ic1,spacial,false)*wavePacket(ic2,spacial,true)*wavePacket(ic3,spacial,false);
   LDO3::Ptr psiX = ffTransform<Vector<0,2> >(psi1,fft::DIR_KX);
   const SV3 *psi3 = dynamic_cast<const SV3 *>(psiX.get());
   BOOST_CHECK(max(abs(psi2()-(*psi3)()))<eps);
