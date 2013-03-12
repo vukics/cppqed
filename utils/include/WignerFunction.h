@@ -6,6 +6,8 @@
 #include "ComplexExtensions.h"
 #include "MathExtensions.h"
 
+#include "boost/math/special_functions/factorials.hpp"
+
 
 namespace cpputils {
 
@@ -52,19 +54,19 @@ template<typename DensityOperator>
 double wignerFunction(const DensityOperator& rho, double x, double y, size_t truncatedDimension=0)
 // NEEDS_WORK should refer rho only via some traits class to make the code really generic.
 {
-  using namespace std; using namespace mathutils;
+  using namespace mathutils; using boost::math::factorial;
   
-  const size_t dim=truncatedDimension ? truncatedDimension : rho.getDimensions(0);
+  const size_t dim=truncatedDimension ? truncatedDimension : rho.getDimensions()(0);
   
   const WignerFunctionKernel wignerFunctionKernel(x,y,dim);
   
   double res=0;
 
   for (int m=0; m<dim; ++m) {
-    res+=real(rho(m,m)/fact(m)*pow(-1.,m)*pow(2.*DCOMP_I,-2*m)*wignerFunctionKernel(m,m));
+    res+=real(rho(m,m)/factorial<double>(m)*pow(-1.,m)*pow(2.*DCOMP_I,-2*m)*wignerFunctionKernel(m,m));
     
     for (int n=m+1; n<dim; ++n)
-      res+=2.*real(rho(n,m)/sqrt(fact(n)*fact(m))*pow(-1.,m)*pow(2.*DCOMP_I,-m-n)*wignerFunctionKernel(n,m));
+      res+=2.*real(rho(n,m)/sqrt(factorial<double>(n)*factorial<double>(m))*pow(-1.,m)*pow(2.*DCOMP_I,-m-n)*wignerFunctionKernel(n,m));
     
   }
   
