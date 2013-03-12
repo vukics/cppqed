@@ -12,6 +12,7 @@
 #include <boost/make_shared.hpp>
 
 #include <iomanip>
+#include <iostream>
 #include <fstream>
 
 namespace trajectory {
