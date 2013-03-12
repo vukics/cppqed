@@ -2,9 +2,12 @@
 #ifndef QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED
 #define QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED
 
-#include <iosfwd>
-#include <list>
+#include "Archive.h"
 
+#include <iosfwd>
+
+#include <boost/serialization/list.hpp>
+#include <boost/serialization/utility.hpp>
 
 namespace quantumtrajectory {
 
