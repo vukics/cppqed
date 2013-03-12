@@ -33,6 +33,14 @@ public:
   std::ostream& onEnd(std::ostream&) const;
   
 private:
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & nSteps_ & nOvershot_ & nToleranceOvershot_ & nFailedSteps_ & nHamiltonianCalls_
+                                                      & dpMaxOvershoot_ & dpToleranceMaxOvershoot_ & normMaxDeviation_
+                                                      & traj_;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
   const int logLevel_;
   const bool isHamiltonian_;
 
