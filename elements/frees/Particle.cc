@@ -8,6 +8,8 @@
 
 #include "Hermite.h"
 
+#include "TMP_Tools.h"
+
 #include <boost/bind.hpp>
 
 using namespace std;
@@ -128,7 +130,7 @@ const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) 
   Averages averages(4);
   averages=0;
   
-  const LazyDensityOperator::Ptr matrixX(ffTransform(matrix,DIR_KX));
+  const LazyDensityOperator::Ptr matrixX(quantumdata::ffTransform<tmptools::Vector<0> >(matrix,DIR_KX));
   
   for (int i=0; i<dim; i++) {
 
