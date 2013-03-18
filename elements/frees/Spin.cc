@@ -131,3 +131,16 @@ void Spin::updateU(double dtdid) const
   for (int i=0; i<factors.size(); i++)
     factors(i)=exp(-dtdid*i*get_z());
 }
+
+
+void LossySpin::doActWithJ(structure::free::StateVectorLow& psi) const
+{
+  double fact=sqrt(2.*getGamma());
+  int ubound=psi.ubound(0);
+  for (int n=0; n<ubound; ++n)
+    psi(n)=fact*sqrt((n+1)*(getTwoS()-n))*psi(n+1);
+  psi(ubound)=0;
+}
+
+
+// double probability(const LazyDensityOperator&) const;

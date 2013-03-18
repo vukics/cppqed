@@ -83,7 +83,7 @@ private:
 
 };
 
-
+// NOTE if p.gamma is nonzero, Spin & SpinSch will contain the „Hamiltonian” part of the loss!
 
 class Spin 
   : public SpinBase,
@@ -117,6 +117,22 @@ public:
     getParsStream()<<"# Schrodinger picture."<<std::endl;
   }
 
+};
+
+
+class LossySpin
+  : public Spin,
+    public structure::ElementLiouvillean<1,1,false>
+{
+public:
+  
+  LossySpin(const spin::Pars& p) : Spin(p), structure::ElementLiouvillean<1,1,false>("Spin","S-") {}
+  
+private:
+  
+  void   doActWithJ (      structure::free::StateVectorLow     &) const;
+  double probability(const structure::free::LazyDensityOperator&) const {return -1.;}
+  
 };
 
 
