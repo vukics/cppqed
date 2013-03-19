@@ -4,6 +4,7 @@
 #include "AveragingUtils.h"
 
 #include "impl/DensityOperator.tcc"
+#include "impl/LazyDensityOperator.tcc"
 #include "impl/NegPT.tcc"
 
 #include "Algorithm.h"
