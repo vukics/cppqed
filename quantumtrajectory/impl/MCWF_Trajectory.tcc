@@ -114,8 +114,10 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
   } catch (NoPresetDtTry) {
     if (p.logLevel>1) getOstream()<<"# Adjusting initial dtTry\n";
-    manageTimeStep(qs_.template average<structure::LA_Li>(0.,psi_),getEvolved().get(),false);
-    // Initially, dpLimit should not be overshot, either.
+    if (const typename Liouvillean::Ptr li=qs_.getLi()) { // Initially, dpLimit should not be overshot, either.
+      DpOverDtSet dpOverDtSet(li->average(0.,psi_)); calculateDpOverDtSpecialSet(&dpOverDtSet,0.);
+      manageTimeStep(dpOverDtSet,getEvolved().get(),false);
+    }
   }
 }
 
