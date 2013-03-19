@@ -47,7 +47,7 @@ public:
     if (!cpputils::isStorageContiguous(a)) throw (NonContiguousStorageException());
   }
 
-  std::ostream& doDisplayParameters(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
+  std::ostream& displayParameters_v(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
 
 private:
 
@@ -65,7 +65,7 @@ private:
     return details::onSuccess;
   }
 
-  void doStep(double deltaT)
+  void step_v(double deltaT)
   {
     double
       time=getTime(),
@@ -78,7 +78,7 @@ private:
 
   }
 
-  size_t reportNFailedSteps() const {return extractFailedSteps(pImpl_);}
+  size_t nFailedSteps_v() const {return extractFailedSteps(pImpl_);}
 
   const details::ImplPtr pImpl_;
 

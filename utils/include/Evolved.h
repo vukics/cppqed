@@ -75,7 +75,7 @@ public:
   // Takes a single adaptive step of maximum length deltaT    
   void step(double deltaT);
 
-  std::ostream& displayParameters(std::ostream& os) const {return doDisplayParameters(os);};
+  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);};
 
   A      & getA()       {return a_;}
   A const& getA() const {return a_;}
@@ -83,12 +83,12 @@ public:
   const Derivs getDerivs() const {return derivs_;}
 
   // Number of failed steps in the last timestep
-  size_t nFailedSteps() const {return reportNFailedSteps();}
+  size_t nFailedSteps() const {return nFailedSteps_v();}
 
 private:
-  virtual void doStep(double deltaT) = 0;
-  virtual std::ostream& doDisplayParameters(std::ostream&) const = 0;
-  virtual size_t reportNFailedSteps() const = 0;
+  virtual void step_v(double deltaT) = 0;
+  virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
+  virtual size_t nFailedSteps_v() const = 0;
 
   A& a_;
 
