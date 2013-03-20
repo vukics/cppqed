@@ -22,9 +22,9 @@ void Evolved<A>::step(double deltaT)
   if (mathutils::sign(deltaT)!=mathutils::sign(getDtTry())) {
     // Stepping backward
     setDtTry(-getDtDid());
-    doStep(deltaT);
+    step_v(deltaT);
   }
-  else doStep(deltaT);
+  else step_v(deltaT);
 }
 
 

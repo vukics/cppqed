@@ -13,6 +13,7 @@
 #include "impl/FormDouble.tcc"
 #include "SmartPtr.h"
 
+#include <boost/range/numeric.hpp>
 
 
 namespace quantumtrajectory {
@@ -56,9 +57,10 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     logger_(p.logLevel,qs_.getHa())
 {
   if (psi!=*qs_.getQS()) throw DimensionalityMismatchException();
-  if (!getTime())  manageTimeStep(qs_.template average<structure::LA_Li>(0.,psi_),getEvolved().get(),false);
-  // On startup, dpLimit should not be overshot, either.
-
+  if (!getTime()) if(const typename Liouvillean::Ptr li=qs_.getLi()) { // On startup, dpLimit should not be overshot, either.
+    DpOverDtSet dpOverDtSet(li->average(0.,psi_)); calculateDpOverDtSpecialSet(&dpOverDtSet,0.);
+    manageTimeStep(dpOverDtSet,getEvolved().get(),false);
+  }
 }
 
 
@@ -69,20 +71,25 @@ std::ostream& MCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) 
 
   return qs_.display(getTime(),psi_,os,precision);
 
-  // if (svdc_ && !(svdCount_%svdc_) && (svdCount_||firstSVDisplay_)) os<<FormDouble(svdPrecision_,0)(psi_()); svdCount_++;
 }
 
 
 template<int RANK>
 double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
 {
-  if (qs_.getHa()) getEvolved()->step(Dt);
-  else {
-    double stepToDo=qs_.getLi() ? std::min(getDtTry(),Dt) : Dt;
-    getEvolved()->update(getTime()+stepToDo,getDtTry());
+  if (qs_.getHa()) {
+    getEvolved()->step(Dt);
     logger_.logFailedSteps(getEvolved()->nFailedSteps());
   }
-
+  else {
+    double stepToDo=qs_.getLi() ? std::min(getDtTry(),Dt) : Dt; // Cf. tracker #3482771
+    getEvolved()->update(getTime()+stepToDo,getDtTry());
+  }
+  // This defines three levels:
+  // 1. System is Hamiltonian -> internal timestep control is used with dtTry possibly modified by Liouvillean needs (cf. manageTimeStep)
+  // 2. System is not Hamiltonian, but it is Liouvillean -> dtTry is used, which is governed solely by Liouvillean in this case (cf. manageTimeStep)
+  // 3. System is neither Hamiltonian nor Liouvillean (might be of Exact) -> as step of Dt is taken
+  
   double t=getTime();
 
   if (const typename Exact::Ptr ex=qs_.getEx()) {
@@ -107,7 +114,7 @@ MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet* dpOverDtSet, dou
       qs_.actWithJ(t,psiTemp(),i);
       res.push_back(IndexSVL_tuple(i,psiTemp()));
       (*dpOverDtSet)(i)=mathutils::sqr(psiTemp.renorm());
-    } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the SVL in the tuple
+    } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the StateVectorLow in the tuple
   return res;
 }
 
@@ -115,7 +122,7 @@ MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet* dpOverDtSet, dou
 template<int RANK>
 bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper* evolvedCache, bool logControl) const
 {
-  const double dpOverDt=std::accumulate(dpOverDtSet.begin(),dpOverDtSet.end(),0.);
+  const double dpOverDt=boost::accumulate(dpOverDtSet,0.);
   const double dtDid=getDtDid(), dtTry=getDtTry();
 
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
@@ -126,11 +133,14 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolv
     return true; // Step-back required.
   }
   else if (dpOverDt*dtTry>dpLimit_) {
-    // dtTry-adjustment for next step required
-    getEvolved()->setDtTry(dpLimit_/dpOverDt);
     logger_.overshot(dpOverDt*dtTry,dtTry,getDtTry(),logControl);
   }
-  
+
+  { // dtTry-adjustment for next step:
+    const double liouvilleanSuggestedDtTry=dpLimit_/dpOverDt;
+    getEvolved()->setDtTry(qs_.getHa() ? std::min(getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
+  }
+
   return false; // Step-back not required.
 }
 
