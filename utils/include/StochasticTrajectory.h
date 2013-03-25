@@ -160,10 +160,16 @@ protected:
   
   Ensemble(Ptr trajs, bool log) : trajs_(trajs), log_(log) {}
 
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {for_each(trajs_,bind(&Elem:: readState,_1,boost::ref(iar))); return iar;}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {for_each(trajs_,bind(&Elem::writeState,_1,boost::ref(oar))); return oar;}
+#define FOR_EACH_function(f) for_each(trajs_,bind(&Elem::f,_1,boost::ref(ios))); return ios;
+  
+  cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       {FOR_EACH_function( readState)}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const {FOR_EACH_function(writeState)}
 
 private:
+  std::ostream& logOnEnd_v(std::ostream& ios) const {FOR_EACH_function(logOnEnd)}
+
+#undef FOR_EACH_function
+  
   void evolve_v(double deltaT) const;
 
   double getTime_v() const {return trajs_.begin()->getTime();}

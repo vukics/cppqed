@@ -61,12 +61,15 @@ public:
        const StateVectorLow& =StateVectorLow()
        );
 
-  const StateVectors& getStateVectors() const {return StateVectorsBase::member;}
-
 protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
+  // static helpers to constructor
+  static std::auto_ptr<StateVectors> stateVectors(const StateVector& psi, size_t nTraj);
+  static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs);
+
+  
   const typename Ensemble::TBA_Type getInitializedTBA_v() const {rho_()=0; return rho_;}
 
   mutable quantumdata::DensityOperator<RANK> rho_;
@@ -99,7 +102,7 @@ public:
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;
 
-  using Base::getQS; using Base::getTime; using Base::getStateVectors; using Base::toBeAveraged;
+  using Base::getQS; using Base::getTime; using Base::toBeAveraged;
 
   template<typename SYS>
   EnsembleMCWF(
