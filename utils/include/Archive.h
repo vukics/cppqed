@@ -23,13 +23,13 @@ public:
   trivial_iarchive(std::istream&) {}
   
   template<class T> void register_type(){}
-  template<class T> trivial_iarchive & operator>>(const T & t){
+  template<class T> trivial_iarchive & operator>>(const T & ){
       return *this;
   }
   template<class T> trivial_iarchive & operator&(const T & t){
       return *this >> t;
   }
-  void load_binary(void *address, std::size_t count){};
+  void load_binary(void *, std::size_t){};
 };
 
 
@@ -41,13 +41,13 @@ public:
   trivial_oarchive(std::ostream&) {}
 
   template<class T> void register_type(){}
-  template<class T> trivial_oarchive & operator<<(const T & t){
+  template<class T> trivial_oarchive & operator<<(const T & ){
       return *this;
   }
   template<class T> trivial_oarchive & operator&(const T & t){
       return *this << t;
   }
-  void save_binary(void *address, std::size_t count){};
+  void save_binary(void *, std::size_t){};
 };
 
 

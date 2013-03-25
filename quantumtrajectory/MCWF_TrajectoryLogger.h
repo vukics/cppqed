@@ -4,10 +4,14 @@
 
 #include "Archive.h"
 
-#include <iosfwd>
-
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
+#include <iosfwd>
+#include <list>
+
 
 namespace quantumtrajectory {
 
