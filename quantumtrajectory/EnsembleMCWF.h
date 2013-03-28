@@ -65,6 +65,10 @@ protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
+  using Ensemble::getTrajs;
+  
+  std::ostream& logOnEnd_v(std::ostream& os) const;
+  
   // static helpers to constructor
   static std::auto_ptr<StateVectors> stateVectors(const StateVector& psi, size_t nTraj);
   static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs);

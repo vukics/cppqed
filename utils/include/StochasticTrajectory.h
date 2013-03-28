@@ -172,7 +172,7 @@ private:
   
   void evolve_v(double deltaT) const;
 
-  double getTime_v() const {return trajs_.begin()->getTime();}
+  double getTime_v() const {return trajs_.front().getTime();}
 
   std::ostream& displayParameters_v(std::ostream&) const;
 

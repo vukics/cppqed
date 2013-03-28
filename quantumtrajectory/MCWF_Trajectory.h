@@ -58,6 +58,8 @@ public:
 
   const StateVector& getPsi() const {return psi_;} 
 
+  const MCWF_Logger& getLogger() const {return logger_;}
+  
 protected:
   std::ostream&    display_v(std::ostream&, int    ) const;
   std::ostream& displayKey_v(std::ostream&, size_t&) const;

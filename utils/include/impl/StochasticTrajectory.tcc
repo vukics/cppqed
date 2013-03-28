@@ -52,7 +52,7 @@ template<typename T, typename T_ELEM>
 std::ostream&
 Ensemble<T,T_ELEM>::displayParameters_v(std::ostream& os) const
 {
-  return trajs_.begin()->displayParameters( os<<"# Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );
+  return trajs_.front().displayParameters( os<<"# Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );
 }
 
 

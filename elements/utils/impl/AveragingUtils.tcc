@@ -106,7 +106,7 @@ void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) con
 
 template<int RANK, bool IS_TD>
 averagingUtils::Collecting<RANK,IS_TD>::Collecting(const Collection& collection)
-  : Base(collection.begin()->getTitle(),
+  : Base(collection.front().getTitle(),
          cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),KeyLabels())),
     collection_(collection.clone())
 {}

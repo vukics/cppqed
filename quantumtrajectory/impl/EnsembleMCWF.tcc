@@ -4,7 +4,9 @@
 
 #include "EnsembleMCWF.h"
 
+#include "impl/MCWF_Trajectory.tcc"
 #include "ParsMCWF_Trajectory.h"
+
 
 namespace quantumtrajectory {
 
@@ -51,7 +53,19 @@ Base<RANK>::Base(
     Ensemble(trajectories(StateVectorsBase::member,qs,p,scaleAbs),p.logLevel<0),
     rho_(psi.getDimensions(),false), qs_(qs)
 {
-  std::cerr<<p.logLevel<<std::endl;
+}
+
+
+template<int RANK>
+std::ostream&
+Base<RANK>::logOnEnd_v(std::ostream& os) const
+{
+  LoggerList loggerList;
+  for (typename Trajectories::const_iterator i=getTrajs().begin(); i!=getTrajs().end(); ++i)
+    if (const MCWF_Trajectory<RANK>*const traj=dynamic_cast<const MCWF_Trajectory<RANK>*const>(&(*i)))
+      loggerList.push_back(&traj->getLogger());
+  
+  return displayLog(os,loggerList);
 }
 
 
