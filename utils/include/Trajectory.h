@@ -34,6 +34,10 @@ template<typename A>
 void run(Adaptive<A>&, const ParsRun&);
 
 
+void writeViaSStream(const Trajectory&, std::ofstream*              );
+void  readViaSStream(      Trajectory&, std::ifstream&, bool fromEnd);
+
+
 class StoppingCriterionReachedException : public cpputils::Exception {};
 
 

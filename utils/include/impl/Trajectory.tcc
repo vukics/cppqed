@@ -55,7 +55,6 @@ inline double endTime(double time, double   , double            =0.) {return tim
 
 bool restoreState(Trajectory&, const std::string&, const std::string&);
 
-void streamViaSStream(const Trajectory&, boost::shared_ptr<std::ofstream>);
 
 template<typename T, typename L, typename D>
 void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, int precision, bool displayInfo, bool firstStateDisplay)
@@ -119,7 +118,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
             stateDisplayFreq && 
             !(stateCount%stateDisplayFreq) && 
             (stateCount || (!continuing && firstStateDisplay))
-           ) streamViaSStream(traj,ofs); // traj.writeState(*oarchiveWrapper.oar_);
+           ) writeViaSStream(traj,ofs.get()); // traj.writeState(*oarchiveWrapper.oar_);
 
         traj.display(os,precision); ++stateCount;
               
@@ -134,7 +133,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   //////////////////////////////////////////
   
   traj.logOnEnd(os);
-  streamViaSStream(traj,ofs); //if (oarchiveWrapper.oar_) traj.writeState(*oarchiveWrapper.oar_);
+  writeViaSStream(traj,ofs.get()); //if (oarchiveWrapper.oar_) traj.writeState(*oarchiveWrapper.oar_);
   
 }
 

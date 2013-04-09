@@ -45,15 +45,8 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
       ifstream stateFile(stateFileName.c_str()/*, ios_base::binary*/);// stateFile.exceptions(ifstream::eofbit);
       
       if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
-      
-      { // scope of buffer
-        string buffer;
-        streamsize n; stateFile>>n; buffer.resize(n);
-        stateFile.seekg(-n,ios_base::end); stateFile.read(&buffer[0],n);
-        istringstream iss(buffer,ios_base::binary);
-        cpputils::iarchive stateArchive(iss);
-        traj.readState(stateArchive);
-      }
+
+      readViaSStream(traj,stateFile,true);
       
       return true;
     }
@@ -64,7 +57,7 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
 }
 
 
-void details::streamViaSStream(const Trajectory& traj, boost::shared_ptr<std::ofstream> ofs)
+void writeViaSStream(const Trajectory& traj, ofstream* ofs)
 {
   if (ofs && ofs->is_open()) {
     ostringstream oss(ios_base::binary);
@@ -75,6 +68,17 @@ void details::streamViaSStream(const Trajectory& traj, boost::shared_ptr<std::of
   }
 }
 
+
+void readViaSStream(Trajectory& traj, ifstream& ifs, bool fromEnd)
+{ // scope of buffer
+  string buffer;
+  streamsize n; ifs>>n; buffer.resize(n);
+  if (fromEnd) ifs.seekg(-n,ios_base::end); 
+  ifs.read(&buffer[0],n);
+  istringstream iss(buffer,ios_base::binary);
+  cpputils::iarchive stateArchive(iss);
+  traj.readState(stateArchive);
+}
 
 
 } // trajectory

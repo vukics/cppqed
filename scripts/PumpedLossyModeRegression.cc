@@ -23,9 +23,9 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  pe.nTraj=10000//00
+  pe.nTraj=100000
     ;
-  const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)(2000)(5000)(10000)//(20000)(50000)(100000)
+  const list<size_t> sections=boost::assign::list_of(100)(200)(500)(1000)(2000)(5000)(10000)(20000)(50000)(100000)
     ;
 
   Ptr modeMaster(make(pplm,QMP_UIP)), mode(make(pplm,QMP_IP));
@@ -42,16 +42,10 @@ int main(int argc, char* argv[])
   
   while ( (referenceStateFile.peek(), !referenceStateFile.eof()) ) {
     {
-      { // restoring next state of m
-        string buffer; streamsize n; referenceStateFile>>n; buffer.resize(n);
-        referenceStateFile.read(&buffer[0],n);
-        istringstream iss(buffer,ios_base::binary);
-        cpputils::iarchive referenceStateArchive(iss);
-        m.readState(referenceStateArchive);
-      }
-      cout<<m.getTime()<<'\t';
+      trajectory::readViaSStream(m,referenceStateFile,false);
       // evolving e to the same instant:
       e.evolve(m.getTime()-e.getTime());
+      cout<<m.getTime()<<'\t'<<e.getDtDid()<<'\t';
     }
     for (list<size_t>::const_iterator i=sections.begin(); i!=sections.end(); ++i) {
       double avr=0;
