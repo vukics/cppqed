@@ -24,6 +24,7 @@
 
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/vector_c.hpp>
+#include <boost/mpl/vector.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/int.hpp>
@@ -150,14 +151,21 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
 
 
 template<int V>
-struct ArgumentDispatcher : boost::mpl::int_<V>
+struct ArgumentDispatcher : boost::mpl::integral_c<int,V>
 {
   BOOST_MPL_ASSERT_MSG( V>=0 , NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR, (boost::mpl::int_<V>) );
 };
 
 
+// Workaround for gcc <4.7 http://stackoverflow.com/a/11297765
+template<template <typename...> class T, typename... Args>
+struct Join : boost::mpl::identity<T<Args...> > 
+{};
+
+
 template<int... V> 
-struct Vector : boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...>
+struct Vector : // boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...>
+  Join<boost::mpl::vector,ArgumentDispatcher<V>...>::type
 {};
 
 
