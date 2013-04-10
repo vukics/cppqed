@@ -134,17 +134,17 @@ protected:
 
   double getDtTry() const {return evolved_->getDtTry();}
 
-  std::ostream& displayParameters_v(std::ostream&) const override;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       override {return iar & *evolved_;}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const override {return oar & *evolved_;}
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return iar & *evolved_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return oar & *evolved_;}
 
 private:
-  double getDtDid_v() const final {return evolved_->getDtDid();}
+  double getDtDid_v() const {return evolved_->getDtDid();}
 
-  void evolve_v(double deltaT) const final {evolved::evolve<const Adaptive>(*this,deltaT);}
+  void evolve_v(double deltaT) const {evolved::evolve<const Adaptive>(*this,deltaT);}
 
-  double getTime_v() const final {return evolved_->getTime();}
+  double getTime_v() const {return evolved_->getTime();}
 
   virtual void step_v(double deltaT) const = 0;
   // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved.
