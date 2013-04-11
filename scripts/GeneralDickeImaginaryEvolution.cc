@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
       eigenVectors(hamiltonian.copy()  );
 
     assert(!mathutils::fcmp(1-max(abs(hamiltonian.copy()-blitzplusplus::hermitianConjugate(hamiltonian))),1,1e-12));
-	
+        
     {
       typedef HeMatrixMF<RowMajor>::type HeMatrix;
       HeMatrix a(hermitianMatrix<RowMajor>(eigenVectors));
@@ -139,9 +139,9 @@ int main(int argc, char* argv[])
       ostream& os=traj.getOstream();
 
       for (pair<MCWF::Basis::const_iterator,DARRAY::const_iterator> i(eigenStates.begin(),eigenValues.begin()); 
-	   i.first!=eigenStates.end(); 
-	   ++i.first, ++i.second) {
-	os<<formdouble::high()(*i.second); structure::display(structure::qsa<2>(sys),0,*i.first,os,pe.precision); os<<endl;
+           i.first!=eigenStates.end(); 
+           ++i.first, ++i.second) {
+        os<<formdouble::high()(*i.second); structure::display(structure::qsa<2>(sys),0,*i.first,os,pe.precision); os<<endl;
       }
 
     }

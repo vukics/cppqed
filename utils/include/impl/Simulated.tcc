@@ -19,18 +19,16 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
                         const A& scaleAbs, 
                         std::ostream& os, int precision, 
                         const evolved::Maker<A>& maker)
-  : Trajectory(os,precision),
-    Base(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,maker)
+  : Base(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,maker)
 {}
 
 
 template<typename A> 
 Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
                         const A& scaleAbs,
-                        const Pars& p,
+                        const ParsEvolved& p,
                         const evolved::Maker<A>& maker)
-  : Trajectory(p),
-    Base(y,derivs,dtInit,scaleAbs,p,maker)
+  : Base(y,derivs,dtInit,p,scaleAbs,maker)
 {}
 
 
@@ -40,8 +38,8 @@ std::ostream& Simulated<A>::display_v(std::ostream& os, int precision) const
   using namespace cpputils;
   const A& a=getEvolved()->getA();
   for (size_t i=0; i<subscriptLimit(a); i++)
-    getOstream()<<FormDouble(Trajectory::getPrecision())(subscript(a,i))<<' ';
-  return getOstream();
+    os<<FormDouble(precision)(subscript(a,i))<<' ';
+  return os;
 }
 
 

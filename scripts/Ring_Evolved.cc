@@ -11,9 +11,9 @@ typedef TTD_CARRAY(1) Array;
 
 
 void derivs(double, const Array& b, Array& dbdt,
-	    const particle::Pars& pp,
-	    const mode::ParsPumpedLossy& pm1, const mode::ParsPumpedLossy& pm2,
-	    const particlecavity::ParsAlong pac1, const particlecavity::ParsAlong pac2)
+            const particle::Pars& pp,
+            const mode::ParsPumpedLossy& pm1, const mode::ParsPumpedLossy& pm2,
+            const particlecavity::ParsAlong pac1, const particlecavity::ParsAlong pac2)
 {
   const double x=PI*pp.init.getX0();
 
@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  Pars pt(p);
+  ParsEvolved pe(p);
+  ParsRun pr(p);
 
   particle::Pars pp(p);
   mode::ParsPumpedLossy pmP(p,"P");
@@ -49,9 +50,9 @@ int main(int argc, char* argv[])
 
   Array alpha(2); alpha=pmP.minit,pmM.minit;
 
-  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pp,pmP,pmM,ppcP,ppcM),1e-6,Array(),pt);
+  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pp,pmP,pmM,ppcP,ppcM),1e-6,Array(),pe);
 
-  evolve(S,pt);
+  run(S,pr);
 
 
 

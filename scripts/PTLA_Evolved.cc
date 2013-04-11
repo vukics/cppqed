@@ -60,6 +60,6 @@ int main(int argc, char* argv[])
 
   Simulated<Array> S(zxy,bind(derivs,_1,_2,_3,pp2la),dtinit,Array(),pt);
   
-  evolve(S,pt);
+  run(S,pt);
   
 }

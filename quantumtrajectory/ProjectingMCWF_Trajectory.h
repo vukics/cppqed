@@ -27,13 +27,13 @@ public:
 
   template<typename SYS>
   ProjectingMCWF_Trajectory(
-			    StateVector& psi,
-			    const Basis& basis,
-			    const SYS& sys,
-			    const ParsMCWF& p,
-			    const StateVectorLow& scaleAbs=StateVectorLow()
-			    )
-    : trajectory::Trajectory(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
+                            StateVector& psi,
+                            const Basis& basis,
+                            const SYS& sys,
+                            const ParsMCWF& p,
+                            const StateVectorLow& scaleAbs=StateVectorLow()
+                            )
+    : Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
   {}
 
 private:

@@ -20,7 +20,7 @@ public:
 
   typedef evolved::Evolved<A> Evolved;
 
-  using Base::getEvolved; using Base::getOstream;
+  using Base::getEvolved;
 
   Simulated(A&, typename Evolved::Derivs, double dtInit, 
             double, double, 
@@ -30,7 +30,7 @@ public:
 
   Simulated(A&, typename Evolved::Derivs, double dtInit,
             const A& scaleAbs,
-            const Pars&,
+            const ParsEvolved&,
             const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
 private:
@@ -40,7 +40,7 @@ private:
   
   std::ostream& displayKey_v(std::ostream& os, size_t&) const {return os;}
 
-  std::ostream& displayParameters_v(std::ostream& os) const {return Base::displayParameters_v(os<"\n# Simulated.\n");}
+  std::ostream& displayParameters_v(std::ostream& os) const {return Base::displayParameters_v(os<<"\n# Simulated.\n");}
 
 };
 

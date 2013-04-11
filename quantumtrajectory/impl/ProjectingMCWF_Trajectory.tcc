@@ -52,10 +52,9 @@ ProjectingMCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) cons
   using namespace formdouble;
 
   const StateVector& psi=getPsi();
-  const FormDouble fd(getPrecision());
-  std::ostream& os=getOstream();
+  const FormDouble fd(precision);
   
-  Base::display_v();
+  Base::display_v(os,precision);
   
   if (int dim=basis_.size()) {
     os<<"\t";
@@ -76,7 +75,7 @@ template<int RANK>
 std::ostream&
 ProjectingMCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) const
 {
-  return Base::displayKey_v()<<"# ProjectingMCWF_Trajectory\n# "
+  return Base::displayKey_v(os,i)<<"# ProjectingMCWF_Trajectory\n# "
                              <<i<<'-'<<i+basis_.size()-1<<". Overlap of Monte-Carlo state vector with basis vectors\n# "
                              <<i+basis_.size()<<". Sum of overlaps\n";
 }
