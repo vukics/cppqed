@@ -46,7 +46,8 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
       
       if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
 
-      readViaSStream(traj,stateFile,true);
+      // readViaSStream(traj,stateFile,true);
+      while ( (stateFile.peek(), !stateFile.eof()) ) readViaSStream(traj,stateFile,false);
       
       return true;
     }
