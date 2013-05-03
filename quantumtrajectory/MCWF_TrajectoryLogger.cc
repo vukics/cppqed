@@ -101,7 +101,7 @@ ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerLi
   using namespace boost;
 
 #define AVERAGE_function(f) accumulate(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)),0.)/loggerList.size()
-#define MAX_function(f)   *max_element(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)))
+#define MAX_function(f) *max_element(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)))
   
   os<<"\n# Average number of total steps: "<<AVERAGE_function(nSteps_)<<endl
     <<"\n# On average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
@@ -132,7 +132,7 @@ ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerLi
   Histogram hist=density(acc);
  
   size_t total=0;
-  for(Histogram::const_iterator i=hist.begin(); i!=hist.end(); (++i, ++total))
+  for(Histogram::const_iterator i=hist.begin(); i!=hist.end(); (++i, total+=i->second))
     os<<"# "<<i->first<<"\t"<<i->second<<endl;
  
   os<<"\n# Total number of jumps: "<<total<<endl;
