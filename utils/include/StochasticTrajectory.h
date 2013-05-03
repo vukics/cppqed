@@ -170,7 +170,7 @@ private:
 
 #undef FOR_EACH_function
   
-  void evolve_v(double deltaT) const;
+  void evolve_v(double deltaT);
 
   double getTime_v() const {return trajs_.front().getTime();}
 
@@ -181,7 +181,7 @@ private:
 
   const TBA_Type toBeAveraged_v() const {return averageInRange(0,trajs_.size());}
 
-  const Impl trajs_;
+  Impl trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
   const bool log_;
 

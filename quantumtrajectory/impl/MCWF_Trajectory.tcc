@@ -75,7 +75,7 @@ std::ostream& MCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) 
 
 
 template<int RANK>
-double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt) const
+double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
 {
   if (qs_.getHa()) {
     getEvolved()->step(Dt);
@@ -120,7 +120,7 @@ MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet* dpOverDtSet, dou
 
 
 template<int RANK>
-bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper* evolvedCache, bool logControl) const
+bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper* evolvedCache, bool logControl)
 {
   const double dpOverDt=boost::accumulate(dpOverDtSet,0.);
   const double dtDid=getDtDid(), dtTry=getDtTry();
@@ -146,7 +146,7 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolv
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const IndexSVL_tuples& dpOverDtSpecialSet, double t) const
+void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const IndexSVL_tuples& dpOverDtSpecialSet, double t)
 {
   double random=(*getRandomized())()/getDtDid();
 
@@ -178,7 +178,7 @@ void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const In
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::step_v(double Dt) const
+void MCWF_Trajectory<RANK>::step_v(double Dt)
 {
   const StateVectorLow psiCache(psi_().copy());
   evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.

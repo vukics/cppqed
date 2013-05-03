@@ -74,7 +74,7 @@ public:
   std::ostream& display   (std::ostream&, int) const;
   std::ostream& displayKey(std::ostream&     ) const;
 
-  void evolve(double deltaT) const {evolve_v(deltaT);} // A step of exactly deltaT
+  void evolve(double deltaT) {evolve_v(deltaT);} // A step of exactly deltaT
 
   double getTime() const {return getTime_v();}
 
@@ -90,7 +90,7 @@ public:
   virtual ~Trajectory() {}
 
 private:
-  virtual void            evolve_v(double) const = 0; // A step of exactly deltaT
+  virtual void            evolve_v(double)       = 0; // A step of exactly deltaT
   virtual double         getTime_v()       const = 0;
   virtual double        getDtDid_v()       const = 0;
   
@@ -121,7 +121,7 @@ public:
   
   typedef evolved::Evolved<A> Evolved;
 
-  void step(double deltaT) const {step_v(deltaT);}
+  void step(double deltaT) {step_v(deltaT);}
   
   virtual ~Adaptive() {}
 
@@ -130,7 +130,11 @@ protected:
 
   Adaptive(A&, typename Evolved::Derivs, double, const ParsEvolved&, const A&, const evolved::Maker<A>&);
 
-  typename Evolved::Ptr getEvolved() const {return evolved_;}
+  typedef typename Evolved::ConstPtr ConstPtr;
+  typedef typename Evolved::Ptr Ptr;
+  
+  const ConstPtr getEvolved() const {return ConstPtr(evolved_);}
+  const      Ptr getEvolved()       {return          evolved_ ;}
 
   double getDtTry() const {return evolved_->getDtTry();}
 
@@ -142,15 +146,15 @@ protected:
 private:
   double getDtDid_v() const {return evolved_->getDtDid();}
 
-  void evolve_v(double deltaT) const {evolved::evolve<const Adaptive>(*this,deltaT);}
+  void evolve_v(double deltaT) {evolved::evolve<Adaptive>(*this,deltaT);}
 
   double getTime_v() const {return evolved_->getTime();}
 
-  virtual void step_v(double deltaT) const = 0;
+  virtual void step_v(double deltaT) = 0;
   // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved.
   // (Only Simulated, but neither Master, nor MCWF_Trajectory)
 
-  typename Evolved::Ptr evolved_;
+  const Ptr evolved_;
 
 };
 

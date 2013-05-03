@@ -80,8 +80,9 @@ class Evolved : public TimeStepBookkeeper, private boost::noncopyable
 public:
   typedef boost::function<void(double, const A&, A&)> Derivs;
 
-  typedef boost::shared_ptr<Evolved> Ptr;
-
+  typedef boost::shared_ptr<      Evolved>      Ptr;
+  typedef boost::shared_ptr<const Evolved> ConstPtr;
+  
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
   using TimeStepBookkeeper::operator=;

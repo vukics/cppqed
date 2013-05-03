@@ -34,7 +34,7 @@ public:
             const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
 private:
-  void step_v(double deltaT) const {getEvolved()->step(deltaT);}
+  void step_v(double deltaT) {getEvolved()->step(deltaT);}
 
   std::ostream& display_v(std::ostream&, int) const;
   

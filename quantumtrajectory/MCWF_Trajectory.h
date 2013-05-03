@@ -75,18 +75,18 @@ private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
 
-  void step_v(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
+  void step_v(double); // performs one single adaptive-stepsize MCWF step of specified maximal length
 
   std::ostream& displayParameters_v(std::ostream&) const;
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  double                coherentTimeDevelopment    (                                double Dt) const;
+  double                coherentTimeDevelopment    (                                double Dt);
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
 
-  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true) const;
+  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true);
 
-  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double) const;
+  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double);
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.

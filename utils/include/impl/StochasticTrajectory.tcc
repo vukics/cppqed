@@ -66,13 +66,13 @@ Ensemble<T,T_ELEM>::getDtDid_v() const
 
 template<typename T, typename T_ELEM>
 void
-Ensemble<T,T_ELEM>::evolve_v(double deltaT) const
+Ensemble<T,T_ELEM>::evolve_v(double deltaT)
 {
   using namespace boost;
 
   if (log_) {
     progress_display pd(trajs_.size(),std::cerr);
-    for (typename Impl::const_iterator i=trajs_.begin(); i!=trajs_.end(); ++i, ++pd) i->evolve(deltaT);
+    for (typename Impl::iterator i=trajs_.begin(); i!=trajs_.end(); ++i, ++pd) i->evolve(deltaT);
   }
   else
     for_each(trajs_,bind(&Trajectory::evolve,_1,deltaT));

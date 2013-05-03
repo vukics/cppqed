@@ -85,7 +85,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
 template<int RANK>
 void 
-Base<RANK>::step_v(double deltaT) const
+Base<RANK>::step_v(double deltaT)
 {
   PROGRESS_TIMER_IN_POINT( getOstream() )
   getEvolved()->step(deltaT);

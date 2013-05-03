@@ -66,7 +66,7 @@ protected:
   const typename Averaged::Ptr getAv() const {return qs_.getAv();}
 
 private:
-  void              step_v(double) const;
+  void              step_v(double);
 
   std::ostream& displayParameters_v(std::ostream&) const;
 
