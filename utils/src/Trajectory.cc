@@ -1,11 +1,9 @@
-#include "Trajectory.h"
+#include "impl/Trajectory.tcc"
 
 #include "ParsTrajectory.h"
 #include "impl/FormDouble.tcc"
 
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 
 
 using namespace std;
@@ -14,75 +12,74 @@ using namespace std;
 namespace trajectory {
 
 
-Trajectory::~Trajectory()
-{
-  if (dynamic_cast<ofstream*>(&ostream_)) delete &ostream_;
-  // NEEDS_WORK
+void run(Trajectory& traj, const ParsRun& p)
+{ 
+  if (!p.Dt) {cerr<<"Nonzero Dt required!"<<endl; return;}
+  if (p.NDt) run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.precision,p.displayInfo,p.firstStateDisplay);
+  else       run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.precision,p.displayInfo,p.firstStateDisplay);
 }
 
 
-ostream& TrajectoryBaseHelper(const string& ofn, int precision)
+ostream& Trajectory::display(ostream& os, int precision) const
 {
-  ofstream*const res = ( ofn=="" ? static_cast<ofstream*const>(&cout) : new ofstream(ofn.c_str(),ios_base::app) );
-
-  if (res->fail()) throw OutfileOpeningException(ofn);
-
-  return (*res)<<setprecision(formdouble::actualPrecision(precision));
+  const FormDouble fd(formdouble::positive(precision));
+  return display_v( os<<fd(getTime())<<fd(getDtDid()) , precision)<<endl; // Note: endl flushes the buffer
 }
 
 
-Trajectory::Trajectory(ostream& os, int precision)
-  : ostream_(os<<setprecision(formdouble::actualPrecision(precision))),
-    precision_(precision)
+ostream& Trajectory::displayKey(ostream& os) const
 {
+  size_t i=3;
+  return displayKey_v( os<<"# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
 }
 
 
-Trajectory::Trajectory(const string& ofn, int precision)
-  : ostream_(TrajectoryBaseHelper(ofn,precision)),
-    precision_(precision)
+bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, const string& stateFileName)
 {
+  if (trajectoryFileName!="") {
+
+    ifstream trajectoryFile(trajectoryFileName.c_str());
+
+    if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
+      
+      ifstream stateFile(stateFileName.c_str()/*, ios_base::binary*/);// stateFile.exceptions(ifstream::eofbit);
+      
+      if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
+
+      // readViaSStream(traj,stateFile,true);
+      while ( (stateFile.peek(), !stateFile.eof()) ) readViaSStream(traj,stateFile,false);
+      
+      return true;
+    }
+    
+  }
+  
+  return false;
 }
 
 
-Trajectory::Trajectory(const Pars& p)
-  : ostream_(TrajectoryBaseHelper(p.ofn,p.precision)),
-    precision_(p.precision)
+void writeViaSStream(const Trajectory& traj, ofstream* ofs)
 {
-} 
-
-
-void Trajectory::display() const
-{
-  const FormDouble fd(formdouble::positive(precision_));
-  getOstream()<<fd(getTime())<<fd(getDtDid());
-  displayMore();
-  getOstream().flush();
-}
-
-
-void Trajectory::displayKey() const
-{
-  getOstream()<<"# Trajectory\n#  1. time\n#  2. dtDid\n";
-  displayMoreKey();
-}
-
-
-
-void details::doRun(Trajectory& traj, double time, double deltaT)
-{
-  while (traj.getTime()<time) {
-    traj.evolve(std::min(deltaT,time-traj.getTime()));
-    traj.display();
+  if (ofs && ofs->is_open()) {
+    ostringstream oss(ios_base::binary);
+    cpputils::oarchive stateArchive(oss);
+    traj.writeState(stateArchive);
+    const string& buffer=oss.str();
+    *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
   }
 }
 
-void details::doRun(Trajectory& traj, long nDt, double deltaT)
-{
-  for (long i=0; i<nDt; i++){
-    traj.evolve(deltaT);
-    traj.display();
-  }
+
+void readViaSStream(Trajectory& traj, ifstream& ifs, bool fromEnd)
+{ // scope of buffer
+  string buffer;
+  streamsize n; ifs>>n; buffer.resize(n);
+  if (fromEnd) ifs.seekg(-n,ios_base::end); 
+  ifs.read(&buffer[0],n);
+  istringstream iss(buffer,ios_base::binary);
+  cpputils::iarchive stateArchive(iss);
+  traj.readState(stateArchive);
 }
+
 
 } // trajectory

@@ -7,7 +7,6 @@
 #include "ComplexArrayExtensions.h"
 
 #include "impl/BlitzArrayExtensions.tcc"
-#include "impl/BlitzTinyExtensions.tcc"
 
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/preprocessor/repetition/enum_params.hpp>
@@ -60,18 +59,17 @@ using namespace linalg;
 
 template<bool> void doDirect(CMatrix&, const CVector&, const CVector&);
 
-
-struct Mul : boost::mpl::true_  {};
-struct Add : boost::mpl::false_ {};
+const bool multiplication=true;
+const bool addition=false;
 
 
 } // dodirect
 
 
 
-template<int RANK1, int RANK2, bool MULT>
+template<bool IS_MULTIPLICATION, int RANK1, int RANK2>
 const TTD_CARRAY(RANK1+RANK2)
-doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2, boost::mpl::bool_<MULT>)
+doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2)
 {
   using namespace linalg;
   TTD_CARRAY(RANK1+RANK2) res(concatenateTinies(array1.shape(),array2.shape()));
@@ -80,7 +78,7 @@ doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2, boost
     CVector r1array2(unaryArray(array2));
     CMatrix r2res(res.data(),shape(array1.size(),array2.size()),neverDeleteData);
     
-    dodirect::doDirect<MULT>(r2res,r1array1,r1array2);
+    dodirect::doDirect<IS_MULTIPLICATION>(r2res,r1array1,r1array2);
   }
   return res;
 

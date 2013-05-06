@@ -56,8 +56,8 @@ public:
   const SSI& getIA   () const {return    ia_;}
 
 private:
-  double  highestFrequency_v(             ) const;
-  void   displayParameters_v(std::ostream&) const;
+  double         highestFrequency_v(             ) const;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   size_t            nAvr_v()                                          const {return binary::nAvr      <structure::LA_Av>(      free0_,free1_,ia_       );}
   const Averages average_v(double t, const LazyDensityOperator& ldo)  const {return binary::average   <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}

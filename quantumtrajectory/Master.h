@@ -25,7 +25,7 @@ namespace quantumtrajectory {
 namespace master {
 
 
-typedef trajectory::Pars Pars;
+typedef trajectory::ParsEvolved Pars;
 
 
 struct NonUnitaryIP  : cpputils::Exception {};
@@ -51,7 +51,7 @@ public:
   
   typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
 
-  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime; using Adaptive::getOstream;
+  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime;
 
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
@@ -66,9 +66,9 @@ protected:
   const typename Averaged::Ptr getAv() const {return qs_.getAv();}
 
 private:
-  void              step_v(double) const;
+  void              step_v(double);
 
-  void displayParameters_v(      ) const;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
@@ -134,20 +134,20 @@ public:
 
   typedef typename Base::DensityOperator DensityOperator;
 
-  using Base::getOstream; using Base::getPrecision; using Base::getTime; using Base::getAv;
+  using Base::getTime; using Base::getAv;
 
   template<typename SYS>
   Master(DensityOperator& rho, const SYS& sys, const master::Pars& pt, bool negativity,
-	 const DensityOperatorLow& scaleAbs=DensityOperatorLow())
-    : trajectory::Trajectory(pt), Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),pt,negativity)
+         const DensityOperatorLow& scaleAbs=DensityOperatorLow())
+    : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),pt,negativity)
   {}
 
 private:
   using Base::rho_;
 
-  void   displayMore   () const {doDisplay_.displayMore(getTime(),rho_,getOstream(),getPrecision());}
-  size_t displayMoreKey() const {return doDisplay_.displayMoreKey(getOstream());}
-  
+  std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),rho_,os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
+
   const details::DO_Display<RANK,V> doDisplay_;
 
 };

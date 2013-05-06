@@ -4,7 +4,9 @@
 
 #include "DensityOperator.h"
 
-#include "impl/BlitzTinyExtensions.tcc"
+#include "impl/BlitzArrayExtensions.tcc"
+#include "impl/MultiIndexIterator.tcc"
+
 
 namespace quantumdata {
 
@@ -64,12 +66,71 @@ DensityOperator<RANK>::renorm()
 
 
 template<int RANK> 
-inline
-const dcomp 
-DensityOperator<RANK>::index(const Idx& i, const Idx& j) const
+const dcomp&
+DensityOperator<RANK>::operator()(const Idx& i, const Idx& j) const
 {
   return operator()()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
   // We have to explicitly indicate the template parameters for concatenateTinies here, otherwise when RANK=1, that is, Idx is int, the compiler cannot find the function. This is despite TinyVector<int,1> has an implicit constructor from int, because implicit type conversions are NEVER considered for template parameter deduction (for further details see EffC++ 3rd edition item 46.)
+}
+
+
+
+template<int RANK>
+void inflate(const TTD_DARRAY(1)& flattened, DensityOperator<RANK>& rho, bool offDiagonals)
+{
+  using mathutils::sqr;
+
+  const size_t dim=rho.getTotalDimension();
+  
+  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(typename DensityOperator<RANK>::Dimensions(size_t(0)),rho.getDimensions()-1,cpputils::mii::begin);
+  
+  size_t idx=0;
+
+  typedef typename DensityOperator<RANK>::Idx Idx;
+  // Diagonal
+  for (Iterator i(etalon); idx<dim; ++i) {
+    const Idx ii(dispatchLDO_index(*i));
+    rho(ii,ii)=flattened(idx++);
+  }
+  
+  // OffDiagonal
+  if (offDiagonals)
+    for (Iterator i(etalon); idx<mathutils::sqr(dim); ++i) {
+      const Idx ii(dispatchLDO_index(*i));
+      for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j, idx+=2) {
+        const Idx jj(dispatchLDO_index(*j));
+        dcomp matrixElement(rho(ii,jj)=dcomp(flattened(idx),flattened(idx+1)));
+        rho(jj,ii)=conj(matrixElement);
+      }
+    }
+  
+}
+
+
+template<int RANK>
+const DensityOperator<RANK>
+densityOperatorize(const LazyDensityOperator<RANK>& matrix)
+{
+  DensityOperator<RANK> res(matrix.getDimension());
+  
+  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(typename DensityOperator<RANK>::Dimensions(size_t(0)),matrix.getDimensions()-1,cpputils::mii::begin);
+  
+  typedef typename DensityOperator<RANK>::Idx Idx;
+  
+  for (Iterator i(etalon); i!=etalon.getEnd(); ++i) {
+    const Idx ii(dispatchLDO_index(*i));
+    res(ii,ii)=matrix(ii);
+    for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
+      const Idx jj(dispatchLDO_index(*j));
+      dcomp matrixElement(res(ii,jj)=matrix(ii,jj));
+      res(jj,ii)=conj(matrixElement);
+    }
+  }
+
+  return res;
+  
 }
 
 

@@ -75,7 +75,9 @@ int main(int argc, char* argv[])
     SpinSch        spin(ps );
     // Important that everything is in Sch picture here.
 
-    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
+    GeneralDicke<> gd(mode,spin,u,y);
+    
+    binary::Ptr sys(binary::make(gd));
 
     sys->displayParameters(cout);
 
@@ -84,10 +86,10 @@ int main(int argc, char* argv[])
       eigenVectors(hamiltonian.copy()  );
 
     assert(!mathutils::fcmp(1-max(abs(hamiltonian.copy()-blitzplusplus::hermitianConjugate(hamiltonian))),1,1e-12));
-	
+        
     {
       typedef HeMatrixMF<RowMajor>::type HeMatrix;
-      HeMatrix a(hermitianMatrix(eigenVectors,RowMajorTag()));
+      HeMatrix a(hermitianMatrix<RowMajor>(eigenVectors));
 
       DenseVectorMF<double>::type v(blitz2flens::vector(eigenValues));
     
@@ -124,7 +126,9 @@ int main(int argc, char* argv[])
 
     psi.renorm();
 
-    binary::Ptr sys(binary::make(GeneralDicke<>(mode,spin,u,y)));
+    GeneralDicke<> gd(mode,spin,u,y);
+    
+    binary::Ptr sys(binary::make(gd));
     
     MCWF traj(psi,eigenStates,sys,pe);
 
@@ -135,9 +139,9 @@ int main(int argc, char* argv[])
       ostream& os=traj.getOstream();
 
       for (pair<MCWF::Basis::const_iterator,DARRAY::const_iterator> i(eigenStates.begin(),eigenValues.begin()); 
-	   i.first!=eigenStates.end(); 
-	   ++i.first, ++i.second) {
-	os<<formdouble::high()(*i.second); structure::display(structure::qsa<2>(sys),0,*i.first,os,pe.precision); os<<endl;
+           i.first!=eigenStates.end(); 
+           ++i.first, ++i.second) {
+        os<<formdouble::high()(*i.second); structure::display(structure::qsa<2>(sys),0,*i.first,os,pe.precision); os<<endl;
       }
 
     }

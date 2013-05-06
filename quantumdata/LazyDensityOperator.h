@@ -6,6 +6,7 @@
 
 #include "DimensionsBookkeeper.h"
 
+#include "BlitzArray.h"
 #include "ComplexExtensions.h"
 
 #include <boost/shared_ptr.hpp>
@@ -23,17 +24,9 @@ namespace quantumdata {
 template<typename V, typename T, int RANK, typename F>
 const T
 partialTrace(const LazyDensityOperator<RANK>&, F);
+// F must be an object callable with the signature:
+// const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)
 
-
-/*
-NOTE: The following definition does not work because implicit type-conversions (here, from a functor to a boost::function) are not considered for template parameter deduction. Nevertheless, Boost.ConceptCheck could help here.
-
-template<int RANK, typename V, typename T>
-const T
-partialTrace(const LazyDensityOperator<RANK>&,
-	     boost::function<const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)>, V, T);
-
-*/
 
 
 template<int RANK> 
@@ -71,6 +64,16 @@ private:
   virtual const dcomp index(const Idx& i, const Idx& j) const = 0;
 
 };
+
+
+template<int RANK>
+inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const TTD_IDXTINY(RANK)& idx) {return idx   ;}
+
+inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const TTD_IDXTINY(1   )& idx) {return idx[0];}
+
+
+template<int RANK>
+const TTD_DARRAY(1) deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
 
 
 } // quantumdata

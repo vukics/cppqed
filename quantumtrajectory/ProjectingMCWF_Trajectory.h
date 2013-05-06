@@ -23,22 +23,22 @@ public:
 
   typedef boost::ptr_vector<StateVector> Basis;
 
-  using Base::getOstream; using Base::getPsi; using Base::getPrecision;
+  using Base::getPsi;
 
   template<typename SYS>
   ProjectingMCWF_Trajectory(
-			    StateVector& psi,
-			    const Basis& basis,
-			    const SYS& sys,
-			    const ParsMCWF_Trajectory& p,
-			    const StateVectorLow& scaleAbs=StateVectorLow()
-			    )
-    : Trajectory(p), Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
+                            StateVector& psi,
+                            const Basis& basis,
+                            const SYS& sys,
+                            const ParsMCWF& p,
+                            const StateVectorLow& scaleAbs=StateVectorLow()
+                            )
+    : Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
   {}
 
 private:
-  void   displayEvenMore() const;
-  size_t displayMoreKey () const;
+  std::ostream&    display_v(std::ostream&, int    ) const;
+  std::ostream& displayKey_v(std::ostream&, size_t&) const;
 
   const linalg::CMatrix help() const;
 

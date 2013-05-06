@@ -14,16 +14,24 @@
 
 #include "EvolvedFwd.h"
 
-#include "ArrayTraitsFwd.h"
-
 #include <boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
+
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#include <boost/serialization/base_object.hpp>
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
 namespace evolved {
 
   
+enum SteppingFunction {SF_RKCK, SF_RK8PD};
+
+std::ostream& operator<<(std::ostream&, SteppingFunction);
+std::istream& operator>>(std::istream&, SteppingFunction&);
+
+
 class TimeStepBookkeeper
 {
 public:
@@ -47,6 +55,12 @@ protected:
   TimeStepBookkeeper(double dtInit, double epsRel, double epsAbs);
 
 private:
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & t_ & dtDid_ & dtTry_;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
   double t_, dtTry_, dtDid_;
 
   const double epsRel_, epsAbs_;
@@ -64,12 +78,11 @@ template<typename A>
 class Evolved : public TimeStepBookkeeper, private boost::noncopyable 
 {
 public:
-  typedef cpputils::ArrayMemoryTraits<A> Traits;
-
   typedef boost::function<void(double, const A&, A&)> Derivs;
 
-  typedef boost::shared_ptr<Evolved> Ptr;
-
+  typedef boost::shared_ptr<      Evolved>      Ptr;
+  typedef boost::shared_ptr<const Evolved> ConstPtr;
+  
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
   using TimeStepBookkeeper::operator=;
@@ -79,7 +92,7 @@ public:
   // Takes a single adaptive step of maximum length deltaT    
   void step(double deltaT);
 
-  std::ostream& displayParameters(std::ostream& os) const {return doDisplayParameters(os);};
+  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);};
 
   A      & getA()       {return a_;}
   A const& getA() const {return a_;}
@@ -87,12 +100,18 @@ public:
   const Derivs getDerivs() const {return derivs_;}
 
   // Number of failed steps in the last timestep
-  size_t nFailedSteps() const {return reportNFailedSteps();}
+  size_t nFailedSteps() const {return nFailedSteps_v();}
 
 private:
-  virtual void doStep(double deltaT) = 0;
-  virtual std::ostream& doDisplayParameters(std::ostream&) const = 0;
-  virtual size_t reportNFailedSteps() const = 0;
+  virtual void step_v(double deltaT) = 0;
+  virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
+  virtual size_t nFailedSteps_v() const = 0;
+
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & a_ & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
 
   A& a_;
 

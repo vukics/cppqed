@@ -9,20 +9,21 @@
 #include "impl/DO_Display.tcc"
 #include "EnsembleMCWF.h"
 #include "Master.h"
+#include "impl/TimeAveragingMCWF_Trajectory.tcc"
+
 #include "impl/Trajectory.tcc"
 
-#include<iostream>
-#include<string>
+#include <boost/make_shared.hpp>
 
+#include <iostream>
+#include <string>
 
-
-using namespace quantumtrajectory;
 
 
 template<typename V, int RANK>
 void evolve(quantumdata::StateVector<RANK>& psi,
-	    typename structure::QuantumSystem<RANK>::Ptr sys,
-	    const ParsEvolution& pe)
+            typename structure::QuantumSystem<RANK>::Ptr sys,
+            const ParsEvolution& pe)
 {
   using namespace std;
 
@@ -31,10 +32,9 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
   case EM_SINGLE: {
 
-    MCWF_Trajectory<RANK>
-      traj(psi,sys,pe);
-
-    trajectory::evolve(traj,pe);
+    // This solution is rather lame, but the makeMCWF function as implemented below does not work for some reason
+    if (pe.timeAverage) {TimeAveragingMCWF_Trajectory<RANK> traj(psi,sys,pe,pe.relaxationTime); run(traj,pe);}
+    else {MCWF_Trajectory<RANK> traj(psi,sys,pe); run(traj,pe);}
 
     break;
 
@@ -46,8 +46,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     EnsembleMCWF<RANK,V>
       traj(psi,sys,pe,pe.negativity);
 
-    if      (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
-    else cout<<"Nonzero Dt required!"<<endl;
+    run(traj,pe);
 
     break;
 
@@ -61,10 +60,8 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V>
       traj(rho,sys,pe,pe.negativity);
 
-    if      (pe.dc) run  (traj,pe.T,pe.dc,pe.displayInfo);
-    else if (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
-    else cout<<"Nonzero dc OR Dt required!"<<endl;
-
+    trajectory::run(traj,pe);
+    
     break;
 
   }
@@ -77,9 +74,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     Master<RANK,V,true>
       traj(rho,sys,pe,pe.negativity);
 
-    if      (pe.dc) run  (traj,pe.T,pe.dc,pe.displayInfo);
-    else if (pe.Dt) runDt(traj,pe.T,pe.Dt,pe.displayInfo);
-    else cout<<"Nonzero dc OR Dt required!"<<endl;
+    trajectory::run(traj,pe);
 
     break;
 
@@ -111,6 +106,14 @@ void evolve(quantumdata::StateVector<RANK>& psi,
   
 }
 
+
+// For some reason, this does not compile:
+template<int RANK, typename SYS>
+const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const ParsEvolution& pe)
+{
+  if (pe.timeAverage) return boost::make_shared<TimeAveragingMCWF_Trajectory<RANK> >(psi,sys,pe,pe.relaxationTime);
+  else                return boost::make_shared<             MCWF_Trajectory<RANK> >(psi,sys,pe                  );
+}
 
 
 #endif // QUANTUMTRAJECTORY_IMPL_EVOLUTION_TCC_INCLUDED

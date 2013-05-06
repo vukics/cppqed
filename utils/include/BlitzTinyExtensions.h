@@ -20,7 +20,7 @@ concatenateTinies(const blitz::TinyVector<T1,RANK1>&, const blitz::TinyVector<T2
 
 
 #ifndef   NDEBUG
-struct HalfCutTinyFishyException : cpputils::Exception {};
+struct HalfCutTinyException : cpputils::Exception {};
 #endif // NDEBUG
 
 template<typename T, int TWO_TIMES_RANK> 

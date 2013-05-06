@@ -4,6 +4,8 @@
 
 #include "TimeIndependentMatrixHamiltonianFwd.h"
 
+#include "AveragingUtils.h"
+
 #include "Averaged.h"
 #include "Free.h"
 #include "Hamiltonian.h"
@@ -27,7 +29,7 @@ private:
 
 
 template <int RANK, bool IS_TD>
-class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public structure::averaged::Transferring<1,RANK,IS_TD>
+class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public averagingUtils::Transferring<1,RANK,IS_TD>
 {
 public:
   typedef typename structure::Averaged<RANK,IS_TD>::Ptr AveragedPtr;
@@ -35,7 +37,7 @@ public:
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, AveragedPtr averaged, const LazyDensityOperator& ldo)
-    : TimeIndependentMatrixHamiltonian(matrix), structure::averaged::Transferring<1,RANK,IS_TD>(averaged,ldo) {}
+    : TimeIndependentMatrixHamiltonian(matrix), averagingUtils::Transferring<1,RANK,IS_TD>(averaged,ldo) {}
 
 };
 

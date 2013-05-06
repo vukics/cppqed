@@ -67,20 +67,23 @@ protected:
 
   Stochastic(A&, typename Evolved::Derivs, double dtInit, 
              double epsRel, double epsAbs, const A& scaleAbs, 
-	     const evolved::Maker<A>&,
-	     unsigned long seed,
-	     bool n,
-	     const randomized::Maker&);
+             const evolved::Maker<A>&,
+             unsigned long seed,
+             bool n,
+             const randomized::Maker&);
 
   Stochastic(A&, typename Evolved::Derivs, double dtInit,
-	     const A& scaleAbs, const ParsStochastic&,
-	     const evolved::Maker<A>&,
-	     const randomized::Maker&);
+             const A& scaleAbs, const ParsStochastic&,
+             const evolved::Maker<A>&,
+             const randomized::Maker&);
 
   const RandomizedPtr getRandomized() const {return randomized_;}
   bool                noise        () const {return isNoisy_   ;}
 
-  void displayParameters_v() const;
+  std::ostream& displayParameters_v(std::ostream&) const;
+  
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return Base:: readState_v(iar) & *randomized_;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & *randomized_;}
 
 private:
   const unsigned long seed_ ;
@@ -157,19 +160,28 @@ protected:
   
   Ensemble(Ptr trajs, bool log) : trajs_(trajs), log_(log) {}
 
+#define FOR_EACH_function(f) for_each(trajs_,bind(&Elem::f,_1,boost::ref(ios))); return ios;
+  
+  cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       {FOR_EACH_function( readState)}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const {FOR_EACH_function(writeState)}
+
 private:
-  void evolve_v(double deltaT) const;
+  std::ostream& logOnEnd_v(std::ostream& ios) const {FOR_EACH_function(logOnEnd)}
 
-  double getTime_v() const {return trajs_.begin()->getTime();}
+#undef FOR_EACH_function
+  
+  void evolve_v(double deltaT);
 
-  void displayParameters_v() const;
+  double getTime_v() const {return trajs_.front().getTime();}
+
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   double getDtDid_v() const;
   // An average of getDtDid()-s from individual trajectories.
 
   const TBA_Type toBeAveraged_v() const {return averageInRange(0,trajs_.size());}
 
-  const Impl trajs_;
+  Impl trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
   const bool log_;
 

@@ -34,6 +34,6 @@ int main(int argc, char* argv[])
 
   Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pplm),dtinit,Array(),pt);
   
-  evolve(S,pt);
+  run(S,pt);
   
 }

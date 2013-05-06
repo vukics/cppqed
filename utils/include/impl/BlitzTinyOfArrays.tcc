@@ -16,7 +16,7 @@ namespace blitzplusplus {
 
 
 template<typename T, int RANK, int LENGTH>
-inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(TOA_ShallowCopy, const T_numtype& initValue)
+inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(ShallowCopy, const T_numtype& initValue)
 {
   for (int i=0; i<LENGTH; ++i)
     (*this)(i).reference(initValue);
@@ -24,7 +24,7 @@ inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(TOA_ShallowCopy, const T_numtyp
 
 
 template<typename T, int RANK, int LENGTH>
-inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(TOA_DeepCopy   , const T_numtype& initValue)
+inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(DeepCopy   , const T_numtype& initValue)
 {
   for (int i=0; i<LENGTH; ++i)
     (*this)(i).reference(initValue.copy());
@@ -32,7 +32,7 @@ inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(TOA_DeepCopy   , const T_numtyp
 
 
 template<typename T, int RANK, int LENGTH>
-inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(TOA_ShallowCopy, const TinyOfArrays& x)
+inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(ShallowCopy, const TinyOfArrays& x)
 {
   for (int i=0; i<LENGTH; ++i)
     (*this)(i).reference(x(i));
@@ -40,7 +40,7 @@ inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(TOA_ShallowCopy, const TinyOfAr
 
 
 template<typename T, int RANK, int LENGTH>
-inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(TOA_DeepCopy   , const TinyOfArrays& x)
+inline TinyOfArrays<T,RANK,LENGTH>::TinyOfArrays(DeepCopy   , const TinyOfArrays& x)
 {
   for (int i=0; i<LENGTH; ++i)
     (*this)(i).reference(x(i).copy());
@@ -52,7 +52,7 @@ template<typename T, int RANK, int LENGTH>
 const TinyOfArrays<T,RANK,LENGTH>
 negate(const TinyOfArrays<T,RANK,LENGTH>& arrays)
 {
-  TinyOfArrays<T,RANK,LENGTH> res(TOA_DeepCopy(),arrays);
+  TinyOfArrays<T,RANK,LENGTH> res(DeepCopy(),arrays);
   boost::for_each(res,boost::lambda::_1*=-1);
   return res;
 }

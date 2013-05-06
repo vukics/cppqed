@@ -5,6 +5,8 @@
 
 namespace evolved {
 
+class NonContiguousStorageException;
+
 class TimeStepBookkeeper;
 
 template<typename>

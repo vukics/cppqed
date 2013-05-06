@@ -33,7 +33,7 @@ ProjectingMCWF_Trajectory<RANK>::help() const
     using namespace blitz2flens;
     typedef GeMatrixMF<dcomp,RowMajor>::type GeMatrix;
 
-    GeMatrix a(matrix(res,RowMajorTag()));
+    GeMatrix a(matrix<RowMajor>(res));
     DenseVector<Array<int> > pivots(dim);
     
     trf(a,pivots);
@@ -46,35 +46,38 @@ ProjectingMCWF_Trajectory<RANK>::help() const
 
 
 template<int RANK>
-void
-ProjectingMCWF_Trajectory<RANK>::displayEvenMore() const
+std::ostream&
+ProjectingMCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) const
 {
   using namespace formdouble;
 
   const StateVector& psi=getPsi();
-  const FormDouble fd(getPrecision());
- 
+  const FormDouble fd(precision);
+  
+  Base::display_v(os,precision);
+  
   if (int dim=basis_.size()) {
-    getOstream()<<"\t";
+    os<<"\t";
     double sumR=0;
     for (int i=0; i<dim; i++) {
       double temp=0;
       for (int j=0; j<dim; j++) temp+=real(braket(psi,basis_[j])*braket(basis_[i],psi)*metricTensor_uu_(j,i));
-      getOstream()<<fd(mathutils::sqrAbs(braket(basis_[i],psi)));
+      os<<fd(mathutils::sqrAbs(braket(basis_[i],psi)));
       sumR+=temp;
     }
-    getOstream()<<'\t'<<fd(sumR);
+    os<<'\t'<<fd(sumR);
   }
+  return os;
 }
 
 
 template<int RANK>
-size_t
-ProjectingMCWF_Trajectory<RANK>::displayMoreKey() const
+std::ostream&
+ProjectingMCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) const
 {
-  size_t res=Base::displayMoreKey();
-  getOstream()<<"# ProjectingMCWF_Trajectory "<<res<<'-'<<res+basis_.size()-1<<". Overlap of Monte-Carlo state vector with basis vectors "<<res+basis_.size()<<". Sum of overlaps"<<std::endl;
-  return res;
+  return Base::displayKey_v(os,i)<<"# ProjectingMCWF_Trajectory\n# "
+                             <<i<<'-'<<i+basis_.size()-1<<". Overlap of Monte-Carlo state vector with basis vectors\n# "
+                             <<i+basis_.size()<<". Sum of overlaps\n";
 }
 
 

@@ -72,6 +72,10 @@ public:
 
   template<typename OTHER>
   DensityOperator& operator=(const OTHER& other) {operator()()=other; return *this;}
+  
+  // (multi-)matrix style indexing:
+  const dcomp& operator()(const Idx& i, const Idx& j) const;
+        dcomp& operator()(const Idx& i, const Idx& j) {return const_cast<dcomp&>(static_cast<const DensityOperator&>(*this)(i,j));}
 
   double   norm() const;
   double renorm()      ;
@@ -95,10 +99,18 @@ public:
 
 private:
   // virtual from LDO_Base
-  const dcomp index(const Idx&, const Idx&) const;
+  const dcomp index(const Idx& i, const Idx& j) const {return operator()(i,j); }
 
 };
 
+
+template<int RANK>
+void inflate(const TTD_DARRAY(1)&, DensityOperator<RANK>&, bool offDiagonals);
+
+
+template<int RANK>
+const DensityOperator<RANK>
+densityOperatorize(const LazyDensityOperator<RANK>&);
 
 
 } // quantumdata

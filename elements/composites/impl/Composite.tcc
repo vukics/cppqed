@@ -233,10 +233,11 @@ private:
 
 
 template<typename VA>
-void composite::Base<VA>::displayParameters_v(std::ostream& os) const
+std::ostream& composite::Base<VA>::displayParameters_v(std::ostream& os) const
 {
   os<<"# Composite\n# Dimensions: "<<RBase::getDimensions()<<". Total: "<<RBase::getTotalDimension()<<std::endl;
   CALL_composite_worker( DisplayParameters(frees_,os) ) ;
+  return os;
 }
 
 //////////////

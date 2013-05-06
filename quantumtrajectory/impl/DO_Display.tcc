@@ -22,12 +22,12 @@ namespace details {
 
 template<int RANK, typename V>
 DO_Display<RANK,V>::DO_Display(AveragedPtr av,
-			       const Pars& p,
-			       bool negativity,
-			       size_t equalCount) throw(DimensionalityMismatchException)
+                               const ParsEvolved& p,
+                               bool negativity,
+                               size_t equalCount) throw(DimensionalityMismatchException)
   : av_(av),
     negativity_(negativity),    
-    autoStop_(p.autoStop),
+    autoStop_(0), // Disabled at the moment
     lastCrit_(),
     equalCount_(equalCount)
 {
@@ -36,27 +36,25 @@ DO_Display<RANK,V>::DO_Display(AveragedPtr av,
 
 
 template<int RANK, typename V>
-size_t
-DO_Display<RANK,V>::displayMoreKey(std::ostream& os) const 
+std::ostream&
+DO_Display<RANK,V>::displayKey(std::ostream& os, size_t& i) const 
 {
-  size_t i=3; 
   if (av_) av_->displayKey(os,i); 
   if (negativity_) os<<"# Trajectory "<<i<<". negativity"<<std::endl;
-  return i;
+  return os;
 }
 
 
 template<int RANK, typename V>
-void
-DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
+std::ostream&
+DO_Display<RANK,V>::display(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   throw(StoppingCriterionReachedException)
 {
   using namespace std;
   stringstream line(stringstream::in | stringstream::out);
   {
-    display(av_,t,rho,line,precision);
+    structure::display(av_,t,rho,line,precision);
     if (negativity_) line<<'\t'<<FormDouble(precision)(quantumdata::negPT(rho,V()));
-    line<<endl;
   }
 
   // A heuristic stopping criterion: If in column autoStop the same value (in the given precision) is Displayed equalCountLimit_ times in a row, then stop.
@@ -72,6 +70,7 @@ DO_Display<RANK,V>::displayMore(double t, const DensityOperator& rho, std::ostre
   os<<line.str();
   if (!equalCount_) throw StoppingCriterionReachedException();
 
+  return os;
 }
 
 

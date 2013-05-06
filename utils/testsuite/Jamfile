@@ -1,13 +1,17 @@
 project : requirements <library>..//utilslib ;
 
 lib boost_test_lib : : <name>boost_unit_test_framework ;
+lib boost_serialization : : <name>boost_serialization ;
 
 import testing ;
 
-for local ccfile in [ glob *.cc : TMP_Tools*.cc Blitz2FLENS.cc BlitzArraySliceIteratorTMP.cc ]
+for local ccfile in [ glob *.cc : TMP_Tools*.cc Blitz2FLENS.cc BlitzArraySliceIteratorTMP.cc Randomized.cc ]
 {
 	unit-test $(ccfile:B) : $(ccfile) boost_test_lib : <define>BOOST_TEST_DYN_LINK <library>..//blitz ;
 }
+
+unit-test Randomized : Randomized.cc boost_test_lib boost_serialization : <define>BOOST_TEST_DYN_LINK <library>..//blitz ;
+
 
 compile TMP_Tools.cc ;
 compile BlitzArraySliceIteratorTMP.cc ;

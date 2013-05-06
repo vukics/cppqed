@@ -35,15 +35,15 @@ public:
 
   DO_Display(
 	     AveragedPtr,
-	     const Pars&,
+	     const ParsEvolved&,
 	     bool negativity,
 	     size_t equalCount=10
 	     ) throw(DimensionalityMismatchException);
 
   virtual ~DO_Display() {}
 
-  void   displayMore(double t, const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
-  size_t displayMoreKey(std::ostream&) const;
+  std::ostream& display   (double t, const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
+  std::ostream& displayKey(std::ostream&, size_t&) const;
 
 private:
   const AveragedPtr av_ ;

@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( DoDirectTest )
     a2r=am1(i,j,k)*ap1(l,m,n,o,p);
   }
 
-  BOOST_CHECK(all(doDirect(am1,ap1,dodirect::Mul())==a2r));
+  BOOST_CHECK(all(doDirect<dodirect::multiplication>(am1,ap1)==a2r));
   cout<<"Direct product OK\n";
 
   {
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE( DoDirectTest )
     a2r=am1(i,j,k)+ap1(l,m,n,o,p);
   }
 
-  BOOST_CHECK(all(doDirect(am1,ap1,dodirect::Add())==a2r));
+  BOOST_CHECK(all(doDirect<dodirect::addition>(am1,ap1)==a2r));
   cout<<"Direct sum OK\n";
 }
 

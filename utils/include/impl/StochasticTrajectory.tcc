@@ -4,12 +4,11 @@
 
 #include "StochasticTrajectory.h"
 
-#include "Algorithm.h"
+#include "Conversions.h"
 #include "Functional.h"
-
+#include "ParsStochasticTrajectory.h"
 #include "Range.h"
-
-#include <boost/bind.hpp>
+#include "impl/Trajectory.tcc"
 
 #include <boost/progress.hpp>
 
@@ -18,13 +17,10 @@ namespace trajectory {
 
 
 template<typename A, typename T> 
-void 
-Stochastic<A,T>::displayParameters_v() const
+std::ostream&
+Stochastic<A,T>::displayParameters_v(std::ostream& os) const
 {
-  Adaptive<A>::displayParameters_v();
-  Trajectory::getOstream()<<"# Stochastic Trajectory Parameters: seed="<<seed_<<std::endl;
-  if (!isNoisy_) 
-    Trajectory::getOstream()<<"# No noise."<<std::endl;
+  return Adaptive<A>::displayParameters_v(os)<<"# Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "# No noise.\n");
 }
 
 
@@ -47,17 +43,16 @@ Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
                             const ParsStochastic& p,
                             const evolved::Maker<A>& makerE,
                             const randomized::Maker& makerR)
-  : Adaptive<A>(y,derivs,dtInit,scaleAbs,p,makerE),
+  : Adaptive<A>(y,derivs,dtInit,p,scaleAbs,makerE),
     seed_(p.seed), isNoisy_(p.noise), randomized_(makerR(p.seed)) {}
 
 
 
 template<typename T, typename T_ELEM>
-void 
-Ensemble<T,T_ELEM>::displayParameters_v() const
+std::ostream&
+Ensemble<T,T_ELEM>::displayParameters_v(std::ostream& os) const
 {
-  Trajectory::getOstream()<<"# Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl;
-  trajs_.begin()->displayParameters();
+  return trajs_.front().displayParameters( os<<"# Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );
 }
 
 
@@ -71,13 +66,13 @@ Ensemble<T,T_ELEM>::getDtDid_v() const
 
 template<typename T, typename T_ELEM>
 void
-Ensemble<T,T_ELEM>::evolve_v(double deltaT) const
+Ensemble<T,T_ELEM>::evolve_v(double deltaT)
 {
   using namespace boost;
 
   if (log_) {
     progress_display pd(trajs_.size(),std::cerr);
-    for (typename Impl::const_iterator i=trajs_.begin(); i!=trajs_.end(); ++i, ++pd) i->evolve(deltaT);
+    for (typename Impl::iterator i=trajs_.begin(); i!=trajs_.end(); ++i, ++pd) i->evolve(deltaT);
   }
   else
     for_each(trajs_,bind(&Trajectory::evolve,_1,deltaT));

@@ -41,9 +41,6 @@ int main(int argc, char* argv[])
   StateVector psi(qbit::init(pplqb)*mode::init(pplm));
   // entangled state: 
   // psi(qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff));
-  /*()+qbit::state1()())*
-  psi()(0,0)=1; psi()(1,0)=1;
-  */
   psi.renorm();
 
   evolve<tmptools::Vector<0> >(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);

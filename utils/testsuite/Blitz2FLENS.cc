@@ -82,15 +82,15 @@ BOOST_AUTO_TEST_CASE( RowMajorTest )
   CDenseVector vecFLENS(blitz2flens::vector(vecBlitz));
 
   GeMatrixRM
-    vlFLENS(matrix(vlBlitz,RowMajorTag())),
-    vrFLENS(matrix(vrBlitz,RowMajorTag()));
+    vlFLENS(matrix<RowMajor>(vlBlitz)),
+    vrFLENS(matrix<RowMajor>(vrBlitz));
 
 
   fillWithRandom(matBlitz,ran);
 
   {
     CA2R a(matBlitz.copy());
-    GeMatrixRM aFLENS(matrix(a,RowMajorTag()));
+    GeMatrixRM aFLENS(matrix<RowMajor>(a));
     cerr<<"Entering ev routine ... "; BOOST_CHECK(!ev(true,true,aFLENS,vecFLENS,vlFLENS,vrFLENS)); cerr<<"exiting, checking result ... ";
   }
 
@@ -126,15 +126,15 @@ BOOST_AUTO_TEST_CASE( ColMajorTest )
   CDenseVector vecFLENS(blitz2flens::vector(vecBlitz));
 
   GeMatrixCM
-    vlFLENS(matrix(vlBlitz,ColMajorTag())),
-    vrFLENS(matrix(vrBlitz,ColMajorTag()));
+    vlFLENS(matrix<ColMajor>(vlBlitz)),
+    vrFLENS(matrix<ColMajor>(vrBlitz));
 
 
   fillWithRandom(matBlitz,ran);
     
   {
     CA2R a(matBlitz.copy());
-    GeMatrixCM aFLENS(matrix(a,ColMajorTag()));
+    GeMatrixCM aFLENS(matrix<ColMajor>(a));
     
     cerr<<"Entering ev routine ... "; BOOST_CHECK(!ev(true,true,aFLENS,vecFLENS,vlFLENS,vrFLENS)); cerr<<"exiting, checking result ... ";
   }
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE( HermitianTest )
     CA2R a(matBlitz.copy());
 
     CDenseVector vecFLENS(blitz2flens::vector(vecBlitz1));
-    GeMatrixRM aFLENS(matrix(a,RowMajorTag()));
+    GeMatrixRM aFLENS(matrix<RowMajor>(a));
     
     cerr<<"Entering ev routine ... "; ev(false,false,aFLENS,vecFLENS,aFLENS,aFLENS); cerr<<"exiting, checking result ... ";
   }
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE( HermitianTest )
     CA2R a(matBlitz.copy());
 
     DDenseVector vecFLENS(blitz2flens::vector(vecBlitz2));
-    HeMatrixRM aFLENS(hermitianMatrix(a,RowMajorTag()));
+    HeMatrixRM aFLENS(hermitianMatrix<RowMajor>(a));
     
     cerr<<"Entering ev routine ... "; ev(true,aFLENS,vecFLENS); cerr<<"exiting, checking result ... ";
 

@@ -25,17 +25,16 @@ namespace master {
 
 template<int RANK>
 Base<RANK>::Base(DensityOperator& rho,
-		 typename QuantumSystem::Ptr qs,
-		 const master::Pars& p,
-		 const DensityOperatorLow& scaleAbs
-		 )
-  : trajectory::Trajectory(p),
-    Adaptive(rho(),
-	     bind(&Base<RANK>::derivs,this,_1,_2,_3),
-	     trajectory::initialTimeStep(qs->highestFrequency()),
-	     scaleAbs,
-	     p,
-	     evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
+                 typename QuantumSystem::Ptr qs,
+                 const master::Pars& p,
+                 const DensityOperatorLow& scaleAbs
+                 )
+  : Adaptive(rho(),
+             bind(&Base<RANK>::derivs,this,_1,_2,_3),
+             trajectory::initialTimeStep(qs->highestFrequency()),
+             p,
+             scaleAbs,
+             evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
     rho_(rho),
     tIntPic0_(0),
     qs_(qs)
@@ -86,7 +85,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
 template<int RANK>
 void 
-Base<RANK>::step_v(double deltaT) const
+Base<RANK>::step_v(double deltaT)
 {
   PROGRESS_TIMER_IN_POINT( getOstream() )
   getEvolved()->step(deltaT);
@@ -127,26 +126,21 @@ Base<RANK>::step_v(double deltaT) const
 
 
 template<int RANK>
-void
-Base<RANK>::displayParameters_v() const
+std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
-  Adaptive::displayParameters_v();
-
-  getOstream()<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl;
-
-  qs_.getQS()->displayParameters(getOstream());
   
-  qs_.displayCharacteristics(getOstream())<<endl;
+  qs_.displayCharacteristics( qs_.getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
 
   if (const typename Liouvillean::Ptr li=qs_.getLi()) {
-    getOstream()<<"# Decay channels:\n";
+    os<<"# Decay channels:\n";
     {
       size_t i=0;
-      li->displayKey(getOstream(),i);
+      li->displayKey(os,i);
     }
-    getOstream()<<endl;
-  }  
+  }
+  
+  return os;
 }
 
 
@@ -179,7 +173,7 @@ template<int RANK>
 void BaseFast<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
 {
   cpputils::for_each(blitzplusplus::basi_fast::fullRange(   rhoLow,slicesData_),
-  		     blitzplusplus::basi_fast::begin    (drhodtLow,slicesData_),function);
+                     blitzplusplus::basi_fast::begin    (drhodtLow,slicesData_),function);
 }
 
 

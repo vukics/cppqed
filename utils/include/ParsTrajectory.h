@@ -4,15 +4,15 @@
 
 #include "TrajectoryFwd.h"
 
+#include "Evolved.h"
 #include "FormDoubleFwd.h"
-#include "EvolvedGSL.h"
 #include "ParsFwd.h"
 
 
 namespace trajectory {
 
 /*
-  The following suit of Pars(Stochastic)Trajectory, + eg ParsMCWF_Trajectory in C++QED demonstrates a technique to facilitate reading parameters from command line and using them to initialize a (hierarchy of) class(es).
+  The following suit of Pars(Stochastic)Trajectory, + eg ParsMCWF in C++QED demonstrates a technique to facilitate reading parameters from command line and using them to initialize a (hierarchy of) class(es).
 
   The same technique is to be used in quantum/elements when there is a detailed hierarchy of elements.
 
@@ -32,31 +32,45 @@ namespace trajectory {
 
 */
 
-struct Pars {
-
+struct ParsEvolved
+{
   static const double epsRelDefault;
   static const double epsAbsDefault;
 
-  double &T, &epsRel, &epsAbs;
+  double &epsRel, &epsAbs;
+
+  evolved::SteppingFunction& sf;
+  double &nextDtTryCorretionFactor;
+  
+  ParsEvolved(parameters::ParameterTable&, const std::string& mod="");
+  
+};
+
+
+struct ParsRun
+{
+  double &T;
   int &dc;
   double &Dt;
   long &NDt;
   std::string &ofn;
-  double &autoStop;
 
   formdouble::Zero &precision;
 
-  bool &displayInfo;
+  bool &displayInfo, &firstStateDisplay;
 
-  evolved::SteppingFunction& sf;
-  double &nextDtTryCorretionFactor;
-
-  Pars(parameters::ParameterTable&, const std::string& mod="");
-
-  virtual ~Pars() {}
+  unsigned &sdf;
+  
+  ParsRun(parameters::ParameterTable&, const std::string& mod="");
 
 };
 
+/*
+struct Pars : ParsRun, ParsEvolved
+{
+  Pars(parameters::ParameterTable& p, const std::string& mod="") : ParsRun(p,mod), ParsEvolved(p,mod) {}
+};
+*/
 
 } // trajectory
 

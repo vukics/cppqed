@@ -7,7 +7,7 @@
 #include "Conversions.h"
 #include "TMP_Tools.h"
 
-#include<boost/mpl/for_each.hpp>
+#include <boost/mpl/for_each.hpp>
 
 
 
@@ -32,7 +32,7 @@ public:
     typedef typename V1::T_numtype V1_numtype;
     typedef typename V2::T_numtype V2_numtype;
 
-    v1_(T::value+OFFSET)=cpputils::ConverterMF<V1_numtype,V2_numtype>::type::convert(v2_(T::value));
+    v1_(T::value+OFFSET)=cpputils::Converter<V1_numtype,V2_numtype>::convert(v2_(T::value));
   }
 
 private:
@@ -83,7 +83,7 @@ public:
   template<typename U>
   void operator()(U)
   {
-    if (v_(U::value)!=v_(U::value+RANK)) throw HalfCutTinyFishyException();
+    if (v_(U::value)!=v_(U::value+RANK)) throw HalfCutTinyException();
   }
 
 private:

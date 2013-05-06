@@ -79,7 +79,7 @@ qsa(DynamicsBase::Ptr base)
 // Some functions that are used in contexts other than QuantumSystemWrapper are factored out:
 
 template<int RANK>
-void display(boost::shared_ptr<const Averaged<RANK> >, double, const quantumdata::LazyDensityOperator<RANK>&, std::ostream&, int);
+std::ostream& display(boost::shared_ptr<const Averaged<RANK> >, double, const quantumdata::LazyDensityOperator<RANK>&, std::ostream&, int);
 
 
 
@@ -174,7 +174,7 @@ public:
   
   void process(Averages& averages) const {if (av_) av_->process(averages);}
 
-  void display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const {structure::display(av_,t,matrix,os,precision);}
+  std::ostream& display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const {return structure::display(av_,t,matrix,os,precision);}
 
 
   // LiouvilleanAveragedCommon
@@ -183,7 +183,7 @@ public:
   size_t nAvr() const {const L_or_A_Ptr ptr=getLA(LiouvilleanAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
 
   template<LiouvilleanAveragedTag LA>
-  void displayKey(std::ostream& os, size_t& i) const {if (const L_or_A_Ptr ptr=getLA(LiouvilleanAveragedTag_<LA>())) ptr->displayKey(os,i);}
+  std::ostream& displayKey(std::ostream& os, size_t& i) const {if (const L_or_A_Ptr ptr=getLA(LiouvilleanAveragedTag_<LA>())) ptr->displayKey(os,i); return os;}
 
   template<LiouvilleanAveragedTag LA>
   const Averages average(double t, const LazyDensityOperator& matrix) const {return structure::average(getLA(LiouvilleanAveragedTag_<LA>()),t,matrix);}
@@ -203,17 +203,18 @@ private:
 
 
 template<int RANK>
-void display(boost::shared_ptr<const Averaged<RANK> > av,
-	     double t,
-	     const quantumdata::LazyDensityOperator<RANK>& matrix,
-	     std::ostream& os,
-	     int precision)
+std::ostream& display(boost::shared_ptr<const Averaged<RANK> > av,
+                      double t,
+                      const quantumdata::LazyDensityOperator<RANK>& matrix,
+                      std::ostream& os,
+                      int precision)
 {
   if (av) {
     typename Averaged<RANK>::Averages averages(av->average(t,matrix));
     av->process(averages);
     av->display(averages,os,precision);
   }
+  return os;
 }
 
 

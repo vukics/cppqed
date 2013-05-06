@@ -11,9 +11,10 @@
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
+
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
-#include <boost/serialization/serialization.hpp>
-#include <sstream>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/split_member.hpp>
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
@@ -44,15 +45,37 @@ public:
 
   const dcomp dcompRan();
   
-  friend std::ostream& operator<<(std::ostream&, const Randomized&);
-  friend std::istream& operator>>(std::istream&, Randomized&);
-
 private:
   virtual double doSample() = 0;
-  virtual std::ostream& writeState(std::ostream&) const = 0;
-  virtual std::istream& readState(std::istream&) = 0;
-  virtual std::ostream& writeImplID(std::ostream&) const = 0;
-  virtual std::istream& readImplID(std::istream&) const = 0;
+
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+
+  friend class boost::serialization::access;
+
+  template<class Archive>
+  void save(Archive& ar, const unsigned int /* version */) const
+  {
+    const std::string state(getState()), id(getImplID());
+    ar  & state & id;
+  }
+  
+  template<class Archive>
+  void load(Archive& ar, const unsigned int /* version */)
+  {
+    std::string state, id;
+    ar & state & id;
+    if (id!=getImplID()) throw RNGStateParsingException("Wrong implementation ID, expected "+id+", found "+getImplID());
+    setState(state);
+  }
+
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
+  
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+  
+  virtual const std::string getState() const = 0;
+  virtual void setState(const std::string&) = 0;
+  
+  virtual const std::string getImplID() const = 0;
 
 };
 
@@ -75,17 +98,6 @@ const dcomp  sample<dcomp >(Randomized::Ptr ran)
   return ran->dcompRan();
 }
 
-inline
-std::ostream& operator<<(std::ostream& os, const Randomized &r)
-{
-  return r.writeState(r.writeImplID(os));
-}
-
-inline
-std::istream& operator>>(std::istream& is, Randomized &r)
-{
-  return r.readState(r.readImplID(is));
-}
 
 ////////////////
 //

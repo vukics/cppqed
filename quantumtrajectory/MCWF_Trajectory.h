@@ -4,37 +4,17 @@
 
 #include "MCWF_TrajectoryFwd.h"
 
-#include "MCWF_TrajectoryLogger.h"
 #include "StateVectorFwd.h"
+
+#include "MCWF_TrajectoryLogger.h"
 #include "Structure.h"
 
 #include "StochasticTrajectory.h"
 
 #include <boost/tuple/tuple.hpp>
 
-#include <boost/mpl/identity.hpp>
-
-#include <vector>
-
-namespace mpl=boost::mpl;
 
 namespace quantumtrajectory {
-
-
-class MCWF_TrajectoryFileOpeningException : public cpputils::TaggedException
-{
-public:
-  MCWF_TrajectoryFileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
-
-
-class MCWF_TrajectoryFileParsingException : public cpputils::TaggedException
-{
-public:
-  MCWF_TrajectoryFileParsingException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
 
 
 ///////////////////////////////////////
@@ -69,48 +49,44 @@ public:
 
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-  using Base::getEvolved; using Base::getRandomized; using Base::getOstream; using Base::getPrecision; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
+  using Base::getEvolved; using Base::getRandomized; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
 
   template<typename SYS>
-  MCWF_Trajectory(
-		  StateVector& psi,
-		  const SYS& sys,
-		  const ParsMCWF_Trajectory&,
-		  const StateVectorLow& =StateVectorLow()
-		  );
-
-  virtual ~MCWF_Trajectory();
+  MCWF_Trajectory(StateVector& psi, const SYS& sys, const ParsMCWF&, const StateVectorLow& =StateVectorLow());
 
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
   const StateVector& getPsi() const {return psi_;} 
 
+  const MCWF_Logger& getLogger() const {return logger_;}
+  
 protected:
-  virtual size_t displayMoreKey () const;
+  std::ostream&    display_v(std::ostream&, int    ) const;
+  std::ostream& displayKey_v(std::ostream&, size_t&) const;
+  
+  const QuantumSystemWrapper getQS() const {return qs_;}
 
-  virtual void   displayEvenMore() const {}
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {Base:: readState_v(iar) & logger_; if (qs_.getEx()) tIntPic0_=getTime(); return iar;}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & logger_;}
 
+  std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);}
+  
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Probabilities DpOverDtSet;
 
-  void step_v(double) const; // performs one single adaptive-stepsize MCWF step of specified maximal length
+  void step_v(double); // performs one single adaptive-stepsize MCWF step of specified maximal length
 
-  void displayParameters_v() const;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  void displayMore() const;
-  
-  void readState(std::ifstream &, bool onlySV=false);
-  void writeState(std::ofstream &) const;
-  
-  double                coherentTimeDevelopment    (                                double Dt) const;
+  double                coherentTimeDevelopment    (                                double Dt);
   const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
 
-  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true) const;
+  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true);
 
-  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double) const;
+  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
@@ -121,21 +97,7 @@ private:
 
   const double dpLimit_, overshootTolerance_;
 
-  const unsigned svdc_;
-  const bool firstSVDisplay_;
-  const int svdPrecision_;
-  mutable long svdCount_;
-
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  const bool binarySVFile_;
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-  const std::string svExtension_;
-
-  const std::string file_;
-
-  const std::string initFile_;
-
-  const MCWF_TrajectoryLogger logger_;
+  mutable MCWF_Logger logger_;
 
 };
 

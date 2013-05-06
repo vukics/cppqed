@@ -1,12 +1,15 @@
 # General-purpose Jamroot, mainly for Debian/Ubuntu
 
 project : usage-requirements
-	  <include>include 
-	  <variant>debug:<define>BZ_DEBUG 
-	  <define>GSL_CBLAS # This is needed so that FLENS use the CBLAS implementation of GSL
-	  <with-flens>no:<define>DO_NOT_USE_FLENS
-	: build-dir bin
-	;
+          <enable-boost-linkage>no:<define>DO_NOT_USE_BOOST_SERIALIZATION
+          <cxxflags>"-Wno-c++11-extensions"
+#          <cxxflags>"-std=c++0x"
+          <include>include 
+          <variant>debug:<define>BZ_DEBUG 
+          <define>GSL_CBLAS # This is needed so that FLENS use the CBLAS implementation of GSL
+          <with-flens>no:<define>DO_NOT_USE_FLENS
+        : build-dir bin
+        ;
 
 path-constant TOP : .. ;
 
@@ -21,12 +24,19 @@ lib blitz ;
 lib gslcblas ;
 lib gsl : : <use>gslcblas ;
 
-
 import feature : feature ;
 feature with-flens : yes no : optional propagated ;
 
 lib flenslib : : <name>flens ;
 
-alias flens : : <with-flens>no  ;
+alias flens : : <with-flens>no ;
 alias flens : flenslib ;
+
+
+feature enable-boost-linkage : yes no : optional propagated ;
+
+lib boost_serializationlib : : <name>boost_serialization ;
+
+alias boost_serialization : : <enable-boost-linkage>no ;
+alias boost_serialization : boost_serializationlib ;
 

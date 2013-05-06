@@ -24,21 +24,21 @@ struct DoNotAverage {};
 
 class ModeBase;
 
-template<typename A=mode::Averaged> class Mode;
-template<typename A=mode::Averaged> class ModeSch;
+template<typename AveragingType=mode::Averaged> class Mode;
+template<typename AveragingType=mode::Averaged> class ModeSch;
 
-template<typename A=mode::Averaged> class PumpedMode;
-template<typename A=mode::Averaged> class PumpedModeSch;
+template<typename AveragingType=mode::Averaged> class PumpedMode;
+template<typename AveragingType=mode::Averaged> class PumpedModeSch;
 
 // When not lossy, IP and UIP coincides
 
-template<bool IS_FINITE_TEMP=false, typename A=mode::Averaged> class LossyMode;
-template<bool IS_FINITE_TEMP=false, typename A=mode::Averaged> class LossyModeSch;
-template<bool IS_FINITE_TEMP=false, typename A=mode::Averaged> class LossyModeUIP;
+template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class LossyMode;
+template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class LossyModeSch;
+template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class LossyModeUIP;
 
-template<bool IS_FINITE_TEMP=false, typename A=mode::Averaged> class PumpedLossyMode;
-template<bool IS_FINITE_TEMP=false, typename A=mode::Averaged> class PumpedLossyModeSch;
-template<bool IS_FINITE_TEMP=false, typename A=mode::Averaged> class PumpedLossyModeUIP;
+template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class PumpedLossyMode;
+template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class PumpedLossyModeSch;
+template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class PumpedLossyModeUIP;
 
 
 

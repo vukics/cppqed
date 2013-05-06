@@ -4,11 +4,10 @@
 
 #include "Pars.h"
 
-#include<iostream>
-#include<iomanip>
-#include<typeinfo>
+#include <iostream>
+#include <iomanip>
+#include <typeinfo>
 
-#include "BooleanNegatedProxy.h"
 
 namespace parameters {
 
@@ -42,40 +41,6 @@ ParameterTable::add(const std::string& s, const std::string& d, const T& v)
 }
 
 
-///////////////////////////////////
-//
-// Boolean Parameter Specialization
-//
-///////////////////////////////////
-
-
-template<>
-void Parameter<bool>::print(size_t smw, size_t tmw, size_t dmw) const;
-
-
-template<>
-void Parameter<bool>::read(std::istream&);
-
-
-template<>
-void Parameter<cpputils::BooleanNegatedProxy>::read(std::istream&);
-
-
-////////////////////////////
-//
-// TitleLine specializations
-//
-////////////////////////////
-
-
-template<>
-void Parameter<TitleLine>::print(size_t smw, size_t tmw, size_t dmw) const;
-
-
-template<>
-void Parameter<TitleLine>::read(std::istream&);
-
-
-}
+} // parameters
 
 #endif // UTILS_INCLUDE_IMPL_PARS_TCC_INCLUDED

@@ -13,7 +13,8 @@
 namespace trajectory {
 
 
-struct ParsStochastic : Pars {
+struct ParsStochastic : ParsEvolved
+{
 
   unsigned long &seed;
   bool &noise;
