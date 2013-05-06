@@ -70,7 +70,7 @@ typedef boost::numeric::converter<int,
                                   cpputils::details::OverflowHandler,
                                   boost::numeric::Trunc<boost::numeric::conversion_traits<int,double>::source_type>,
                                   boost::numeric::raw_converter<boost::numeric::conversion_traits<int,double> >,
-                                  typename cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,double> >::type
+                                  cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,double> >::type
                                   > Double2Int;
 
 const Double2Int double2Int=Double2Int();
@@ -84,7 +84,7 @@ typedef boost::numeric::converter<int,
                                   cpputils::details::OverflowHandler,
                                   boost::numeric::Trunc<boost::numeric::conversion_traits<int,long>::source_type>,
                                   boost::numeric::raw_converter<boost::numeric::conversion_traits<int,long> >,
-                                  typename cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,long> >::type
+                                  cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,long> >::type
                                   > Long2Int;
 
 const Long2Int long2Int=Long2Int();
@@ -98,7 +98,7 @@ typedef boost::numeric::converter<int,
                                   cpputils::details::OverflowHandler,
                                   boost::numeric::Trunc<boost::numeric::conversion_traits<int,size_t>::source_type>,
                                   boost::numeric::raw_converter<boost::numeric::conversion_traits<int,size_t> >,
-                                  typename cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,size_t> >::type
+                                  cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,size_t> >::type
                                   > Size2Int;
 
 const Size2Int size2Int=Size2Int();
@@ -112,7 +112,7 @@ typedef boost::numeric::converter<int,
                                   cpputils::details::OverflowHandler,
                                   boost::numeric::Trunc<boost::numeric::conversion_traits<int,ptrdiff_t>::source_type>,
                                   boost::numeric::raw_converter<boost::numeric::conversion_traits<int,ptrdiff_t> >,
-                                  typename cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,ptrdiff_t> >::type
+                                  cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,ptrdiff_t> >::type
                                   > Idx2Int;
 
 const Idx2Int idx2Int=Idx2Int();
@@ -126,7 +126,7 @@ typedef boost::numeric::converter<size_t,
                                   cpputils::details::OverflowHandler,
                                   boost::numeric::Trunc<boost::numeric::conversion_traits<size_t,int>::source_type>,
                                   boost::numeric::raw_converter<boost::numeric::conversion_traits<size_t,int> >,
-                                  typename cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<size_t,int> >::type
+                                  cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<size_t,int> >::type
                                   > Int2Size;
 
 const Int2Size int2Size=Int2Size();
@@ -140,7 +140,7 @@ typedef boost::numeric::converter<double,
                                   cpputils::details::OverflowHandler,
                                   boost::numeric::Trunc<boost::numeric::conversion_traits<double,size_t>::source_type>,
                                   boost::numeric::raw_converter<boost::numeric::conversion_traits<double,size_t> >,
-                                  typename cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<double,size_t> >::type
+                                  cpputils::details::RangeCheckerMF<boost::numeric::conversion_traits<double,size_t> >::type
                                   > Size2Double;
 
 const Size2Double size2Double=Size2Double();
