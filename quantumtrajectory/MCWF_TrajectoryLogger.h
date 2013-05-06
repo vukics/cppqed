@@ -35,18 +35,18 @@ public:
 
   MCWF_Logger(int logLevel, bool isHamiltonian, size_t nJumps);
 
-  void step() const;
+  void step();
 
-  void stepBack(double dp, double    dtDid, double newDtTry, double t, bool logControl) const;
-  void overshot(double dp, double oldDtTry, double newDtTry          , bool logControl) const;
+  void stepBack(double dp, double    dtDid, double newDtTry, double t, bool logControl);
+  void overshot(double dp, double oldDtTry, double newDtTry          , bool logControl);
 
-  void processNorm(double norm) const;
+  void processNorm(double norm);
 
-  void jumpOccured(double t, size_t jumpNo) const;
+  void jumpOccured(double t, size_t jumpNo);
 
-  void logFailedSteps(size_t) const;
+  void logFailedSteps(size_t);
 
-  void hamiltonianCalled() const;
+  void hamiltonianCalled();
 
   std::ostream& onEnd(std::ostream&) const;
   
@@ -65,10 +65,10 @@ private:
   const bool isHamiltonian_;
   const size_t nJumps_;
 
-  mutable size_t nSteps_, nOvershot_, nToleranceOvershot_, nFailedSteps_, nHamiltonianCalls_;
-  mutable double dpMaxOvershoot_, dpToleranceMaxOvershoot_, normMaxDeviation_;
+  size_t nSteps_, nOvershot_, nToleranceOvershot_, nFailedSteps_, nHamiltonianCalls_;
+  double dpMaxOvershoot_, dpToleranceMaxOvershoot_, normMaxDeviation_;
 
-  mutable MCWF_Trajectory traj_;
+  MCWF_Trajectory traj_;
   
 };
 

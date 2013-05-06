@@ -66,7 +66,7 @@ protected:
   
   const QuantumSystemWrapper getQS() const {return qs_;}
 
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {Base:: readState_v(iar) & const_cast<MCWF_Logger &>(logger_); if (qs_.getEx()) tIntPic0_=getTime(); return iar;}
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {Base:: readState_v(iar) & logger_; if (qs_.getEx()) tIntPic0_=getTime(); return iar;}
   cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & logger_;}
 
   std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);}
@@ -86,7 +86,7 @@ private:
 
   bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true);
 
-  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double);
+  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
@@ -97,7 +97,7 @@ private:
 
   const double dpLimit_, overshootTolerance_;
 
-  const MCWF_Logger logger_;
+  mutable MCWF_Logger logger_;
 
 };
 
