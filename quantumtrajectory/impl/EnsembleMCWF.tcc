@@ -60,11 +60,10 @@ template<int RANK>
 std::ostream&
 Base<RANK>::logOnEnd_v(std::ostream& os) const
 {
-  // NEEDS_WORK this is very low style (LoggerList as a list of plain pointers is very low style in itself)
   LoggerList loggerList;
   for (typename Trajectories::const_iterator i=getTrajs().begin(); i!=getTrajs().end(); ++i)
     if (const MCWF_Trajectory<RANK>*const traj=dynamic_cast<const MCWF_Trajectory<RANK>*const>(&(*i)))
-      loggerList.push_back(&traj->getLogger());
+      loggerList.push_back(traj->getLogger());
   
   return displayLog(os,loggerList);
 }

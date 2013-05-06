@@ -1,7 +1,7 @@
 #include "MCWF_TrajectoryLogger.h"
 
 #include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/max_element.hpp>
+//#include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/numeric.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
@@ -9,6 +9,7 @@
 #include <boost/accumulators/statistics/stats.hpp>
 
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 #include <iostream>
 #include <cmath>
@@ -96,6 +97,24 @@ void quantumtrajectory::MCWF_Logger::hamiltonianCalled()
 }
 
 
+namespace { 
+// NEEDS_WORK for some reason, gcc doesn’t like the construct
+// *max_element(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)))
+// The following is a workaround:
+  
+using namespace quantumtrajectory;
+using namespace ensemblemcwf;
+  
+double max_element(const LoggerList& loggerList, boost::function<double(const MCWF_Logger&)> f)
+{
+  double res=0.;
+  for (LoggerList::const_iterator i=loggerList.begin(); i!=loggerList.end(); ++i) res=max(res,f(*i));
+  return res;
+}
+
+}
+
+
 ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerList& loggerList)
 {
   using namespace boost;
@@ -103,13 +122,13 @@ ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerLi
   // cout<<*((loggerList | adaptors::transformed(bind(&MCWF_Logger::dpMaxOvershoot_,_1))).begin());
 
 #define AVERAGE_function(f) accumulate(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)),0.)/loggerList.size()
-#define MAX_function(f)   *max_element(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)))
+#define MAX_function(f) max_element(loggerList,bind(&MCWF_Logger::f,_1)) // *max_element(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)))
   
   os<<"\n# Average number of total steps: "<<AVERAGE_function(nSteps_)<<endl
     <<"\n# On average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
     <<"\n# On average, dpTolerance overshot: "<<AVERAGE_function(nToleranceOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpToleranceMaxOvershoot_)<<endl
     <<"\n# Maximal deviation of norm from 1: "<<MAX_function(normMaxDeviation_)<<endl;
-  if (loggerList.front()->isHamiltonian_)
+  if (loggerList.front().isHamiltonian_)
     os<<"\n# Average number of failed ODE steps: "<<AVERAGE_function(nFailedSteps_)
       <<"\n# Average number of Hamiltonian calls: "<<AVERAGE_function(nHamiltonianCalls_)<<endl;
       
@@ -127,7 +146,7 @@ ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerLi
 
   //fill accumulator 
   for (LoggerList::const_iterator i=loggerList.begin(); i!=loggerList.end(); ++i)
-    for (MCWF_Logger::MCWF_Trajectory::const_iterator j=(*i)->traj_.begin(); j!=(*i)->traj_.end(); ++j)
+    for (MCWF_Logger::MCWF_Trajectory::const_iterator j=i->traj_.begin(); j!=i->traj_.end(); ++j)
       acc(j->first);
  
   typedef iterator_range<std::vector<std::pair<double, double> >::iterator> Histogram;

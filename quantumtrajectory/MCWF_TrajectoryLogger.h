@@ -20,7 +20,7 @@ namespace quantumtrajectory {
 
 namespace ensemblemcwf {
 
-typedef std::list<const MCWF_Logger*> LoggerList;
+typedef std::list<MCWF_Logger> LoggerList;
 
 std::ostream& displayLog(std::ostream&, const LoggerList&);
   
