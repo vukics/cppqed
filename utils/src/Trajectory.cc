@@ -47,7 +47,7 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
       if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
 
       // readViaSStream(traj,stateFile,true);
-      while ( (stateFile.peek(), !stateFile.eof()) ) readViaSStream(traj,stateFile,false);
+      while ( (stateFile.peek(), !stateFile.eof()) ) readViaSStream(traj,stateFile);
       
       return true;
     }
@@ -70,11 +70,10 @@ void writeViaSStream(const Trajectory& traj, ofstream* ofs)
 }
 
 
-void readViaSStream(Trajectory& traj, ifstream& ifs, bool fromEnd)
+void readViaSStream(Trajectory& traj, ifstream& ifs)
 { // scope of buffer
   string buffer;
   streamsize n; ifs>>n; buffer.resize(n);
-  if (fromEnd) ifs.seekg(-n,ios_base::end); 
   ifs.read(&buffer[0],n);
   istringstream iss(buffer,ios_base::binary);
   cpputils::iarchive stateArchive(iss);
