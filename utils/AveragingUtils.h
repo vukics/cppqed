@@ -35,7 +35,10 @@ private:
 
   Base*const do_clone() const {return new ReducedDensityOperator(*this);}
 
+protected:
   const Averages average_v(const LazyDensityOperator&) const;
+
+private:
   void           process_v(Averages&                 ) const {}
 
   const bool offDiagonals_;
@@ -50,13 +53,16 @@ public:
   typedef ReducedDensityOperator<RANK> Base;
   typedef typename Base::Dimensions Dimensions;
   typedef typename Base::Averages Averages;
+  typedef typename Base::LazyDensityOperator LazyDensityOperator;
   
   using Base::getDimensions; using Base::getTotalDimension;
   
   ReducedDensityOperatorNegativity(const std::string& label, const Dimensions& dim)
     : Base(label,dim,true,boost::assign::list_of("negativity")) {}
-  
-  void process_v(Averages&) const;
+
+private:
+  const Averages average_v(const LazyDensityOperator&) const;
+  void           process_v(Averages&                 ) const;
   
 };
 
