@@ -80,9 +80,7 @@ public:
   const DArray1D average(double t, const LazyDensityOperator& matrix) const
   {
     const DArray1D averages(average_v(t,matrix));
-#ifndef   NDEBUG
     if (size_t(averages.size())!=nAvr()) throw AveragesNumberMismatchException(averages.size(),nAvr());
-#endif // NDEBUG
     if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
 
     return averages;
