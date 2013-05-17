@@ -43,14 +43,14 @@ LazyDensityOperator<RANK>::end  () const
 
 
 template<int RANK>
-const TTD_DARRAY(1) deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
+const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
 {
   using mathutils::sqr;
   typedef typename LazyDensityOperator<RANK>::Dimensions Dimensions;
   
   const size_t dim=matrix.getTotalDimension();
   
-  TTD_DARRAY(1) res(offDiagonals ? sqr(dim) : dim);
+  DArray<1> res(offDiagonals ? sqr(dim) : dim);
   
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
   const Iterator etalon(Dimensions(size_t(0)),matrix.getDimensions()-1,cpputils::mii::begin);

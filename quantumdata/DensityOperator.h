@@ -105,7 +105,7 @@ private:
 
 
 template<int RANK>
-void inflate(const TTD_DARRAY(1)&, DensityOperator<RANK>&, bool offDiagonals);
+void inflate(const DArray<1>&, DensityOperator<RANK>&, bool offDiagonals);
 
 
 template<int RANK>

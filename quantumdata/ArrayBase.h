@@ -17,7 +17,7 @@ template<int RANK>
 class ArrayBase : private boost::noncopyable
 {
 protected:
-  typedef TTD_CARRAY(RANK) ArrayLow;
+  typedef CArray<RANK> ArrayLow;
   typedef linalg::CVector CVector;
 
   explicit ArrayBase(const ArrayLow& arrayLow) : arrayLow_(arrayLow) {} // By reference semantics

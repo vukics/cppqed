@@ -18,7 +18,7 @@ void performTransformation(const CMatrix& trafo, const CVector& in, CVector& out
 }
 
 
-void performTransformation(const TTD_CARRAY(4)& trafo, const TTD_CARRAY(2)& in, TTD_CARRAY(2)& out)
+void performTransformation(const CArray<4>& trafo, const CArray<2>& in, CArray<2>& out)
 {
   out=sum(sum(trafo(i,j,k,l)*in(k,l),l),k);
 }

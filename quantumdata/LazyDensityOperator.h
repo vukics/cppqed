@@ -109,12 +109,13 @@ inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const TTD
 
 /// Turns the data of a LazyDensityOperator into a real 1D array
 /**
- * The result is an array starting with the diagonals (real) of the matrix, optionally followed by the off-diagonals (real & imaginary). For this to make sense, the matrix is assumed to be Hermitian.
+ * The result is an array starting with the diagonals (real) of the matrix, optionally followed by the off-diagonals (real & imaginary) of the upper triangle.
+ * For this to make sense, the matrix is assumed to be Hermitian.
  * 
  * \param offDiagonals governs whether the upper triangle of the (multi-)matrix is included in the result
  */
 template<int RANK>
-const TTD_DARRAY(1) deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
+const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
 
 
 } // quantumdata

@@ -67,7 +67,7 @@ public:
   template<typename OTHER>
   StateVector& operator=(const OTHER& other) {operator()()=other; return *this;}
   // This covers a lot of possibilities, including assignment from a StateVectorLow
-  // Can be assigned from anything a TTD_CARRAY(RANK) can be assigned from.
+  // Can be assigned from anything a CArray<RANK> can be assigned from.
 
   // direct product
   template<int RANK2>
