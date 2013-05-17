@@ -22,8 +22,9 @@ struct TinyVectorLengthTraits<blitz::TinyVector<T,LENGTH> > : boost::mpl::int_<L
 
 
 #define TTD_EXTTINY(r) blitz::TinyVector<   size_t,r>
-
 #define TTD_IDXTINY(r) blitz::TinyVector<ptrdiff_t,r>
 
+template <int RANK> using ExtTiny=blitz::TinyVector<   size_t,RANK>;
+template <int RANK> using IdxTiny=blitz::TinyVector<ptrdiff_t,RANK>;
 
 #endif // UTILS_INCLUDE_BLITZTINY_H_INCLUDED

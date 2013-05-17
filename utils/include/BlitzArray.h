@@ -60,9 +60,10 @@ public:
 
 
 #define TTD_DARRAY(r) blitz::Array<double,r>
-
 #define TTD_CARRAY(r) blitz::Array<dcomp ,r>
 // TTD stands for "template typedef"
 
+template <int RANK> using DArray=blitz::Array<double,RANK>;
+template <int RANK> using CArray=blitz::Array<dcomp ,RANK>;
 
 #endif // UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
