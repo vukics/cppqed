@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED
 #define QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED
 
@@ -11,29 +12,47 @@
 namespace mpl=boost::mpl;
 
 
-struct DimensionalityMismatchException : cpputils::Exception {};
+/// Thrown in the case of dimensionality mismatch of constructs over the same Hilbert space
+class DimensionalityMismatchException : cpputils::Exception {};
 
 
+/// Stores and manipulates dimensions of constructs over composite Hilbert spaces of arbitrary arity
+/**
+ * It can be either constant or non-constant depending on the second template parameter.
+ * 
+ * \tparamRANK
+ * \tparam IS_CONST  Governs the constness
+ */
 template<int RANK, bool IS_CONST>
 class DimensionsBookkeeper
 {
 public:
-  static const int                    N_RANK=RANK;
-  static const int DIMESIONS_BOOKKEEPER_RANK=RANK;
-  // This is introduced in order to break ambiguity if a class is derived from another base which features N_RANK;
+  static const int                    N_RANK=RANK; ///< Arity of the Hilbert space
+  static const int DIMESIONS_BOOKKEEPER_RANK=RANK; ///< Ditto (to break ambiguity if a class is derived from another base featuring `N_RANK`).
 
-  typedef TTD_EXTTINY(RANK) Dimensions;
+  typedef TTD_EXTTINY(RANK) Dimensions; ///< The dimensions as a static vector of size N_RANK
 
-  explicit DimensionsBookkeeper(mpl::bool_<IS_CONST> =mpl::false_()) : dimensions_(), totalDimension_() {}
+  /// Constructor usable only in the `IS_CONST=false` case
+  /**
+   * The aim of the dummy argument with a default value – which creates a nonsensical function signature for `IS_CONST=true` – is that 
+   * this constructor only compile for `IS_CONST=false` because it is only in the non-constant case that we allow default construction of the class.
+   * 
+   * Since from a template only such parts are compiled as are actually used, a client can use the class in the case 
+   * `IS_CONST=true` without problems, getting a compile-time error only when trying to default-construct such an object.
+   */
+  explicit DimensionsBookkeeper(mpl::bool_<IS_CONST> =mpl::false_())
+    : dimensions_(), totalDimension_() {}
 
-  explicit DimensionsBookkeeper(const Dimensions& dimensions) : dimensions_(dimensions), totalDimension_(product(dimensions)) {}
+  explicit DimensionsBookkeeper(const Dimensions& dimensions)
+    : dimensions_(dimensions), totalDimension_(product(dimensions)) {} ///< Standard constructor usable also in the `IS_CONST=true` case
 
-  const Dimensions& getDimensions    () const {return     dimensions_;}
-  size_t            getTotalDimension() const {return totalDimension_;}
+  const Dimensions& getDimensions    () const {return     dimensions_;} ///< Get the Dimensions vector
+  size_t            getTotalDimension() const {return totalDimension_;} ///< Get the total dimension of a system of arbitrary arity
 
-  size_t getDimension(mpl::int_<RANK> =mpl::int_<1>()) const {return totalDimension_;} 
+  size_t getDimension(mpl::int_<RANK> =mpl::int_<1>()) const {return totalDimension_;} ///< Get the (single) dimension for a unary system
 
-  void setDimensions(const Dimensions& dimensions) {dimensions_=dimensions; totalDimension_=product(dimensions);}
+  void setDimensions(const Dimensions& dimensions)
+    {dimensions_=dimensions; totalDimension_=product(dimensions);} ///< This will work only in the non-const case
 
 private:
   typename tmptools::ConditionalAddConst<Dimensions,IS_CONST>::type      dimensions_;

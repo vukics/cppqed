@@ -16,3 +16,5 @@ doc
 commit.txt
 testsuitePhysics
 *.kdev4
+latex
+html

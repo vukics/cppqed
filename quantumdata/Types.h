@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef QUANTUMDATA_TYPES_H_INCLUDED
 #define QUANTUMDATA_TYPES_H_INCLUDED
 
@@ -19,6 +20,11 @@ struct Empty {};
 } // details
 
 
+/// Basically only a metafunction defining types for higher-level constructs of arity `RANK`
+/**
+ * \tparamRANK
+ * \tparam B An optional base class for base-class chaining. An empty class (quantumdata::details::Empty) by default
+ */
 template<int RANK, typename B>
 struct Types : B 
 // it's basically just a metafunction

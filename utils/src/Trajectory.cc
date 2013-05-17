@@ -71,6 +71,7 @@ void writeViaSStream(const Trajectory& traj, ofstream* ofs)
 
 
 void readViaSStream(Trajectory& traj, ifstream& ifs, bool fromEnd)
+// Note that seeking to the end does not seem to work on some platforms, perhaps because the sizes of the succesively written buffers are not const. NEEDS_WORK: check this.
 { // scope of buffer
   string buffer;
   streamsize n; ifs>>n; buffer.resize(n);
