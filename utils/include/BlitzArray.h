@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Defines template aliases for real and complex arrays}
 #ifndef   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
 #define   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
 
@@ -63,7 +64,10 @@ public:
 #define TTD_CARRAY(r) blitz::Array<dcomp ,r>
 // TTD stands for "template typedef"
 
+/// An array of doubles of arbitrary arity
 template <int RANK> using DArray=blitz::Array<double,RANK>;
+
+/// A complex array of arbitrary arity
 template <int RANK> using CArray=blitz::Array<dcomp ,RANK>;
 
 #endif // UTILS_INCLUDE_BLITZARRAY_H_INCLUDED

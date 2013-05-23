@@ -1,5 +1,55 @@
 // -*- C++ -*-
 /// \briefFile{definition of blitzplusplus::basi::Iterator together with its helpers}
+
+/** \page multiarrayconcept The multi-array concept
+ * 
+ * ### Synopsis: The state vector as a multi-array
+ * 
+ * First, we introduce basic definitions on the algebra of composite quantum systems, that is, when the state vector of the system
+ * is an element of a Hilbert space which is the direct product of elementary Hilbert spaces 
+ * (by elementary we mean that it cannot be further decomposed as a direct product of more elementary Hilbert spaces):
+ * \f[\HSpace=\bigotimes_i\HSpace_i,\quad\ket\iota\in\HSpace,\quad\ket{\iota_i}\in\HSpace_i,\quad\ket\iota=\bigotimes_i\ket{\iota_i}\equiv\ket{\iota_0,\iota_1,…}\f]
+ * The number of elementary Hilbert spaces (the number of quantum numbers of the system) is referred to throughout as the *rank* or *arity*
+ * (un<em>ary,</em> bin<em>ary,</em> tern<em>ary,</em> quatern<em>ary,</em> etc.) of the system.
+ * 
+ * Via an example we define *state-vector slices*:
+ * \f[\ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}\equiv\sum_{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i\f]
+ * A state-vector slice is defined by the *retained index positions* \f$\avr{1,3,6,7,9}\f$, which define the subsystem, and the <em>“dummy” indices</em> 
+ * \f$(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)\f$. In situations when slicing occurs in the framework, the set of retained index positions 
+ * is an information available at compile time, while the set of dummy indices is an information becoming available only at runtime.
+ * 
+ * Slicing is fully recursive in that a state-vector slice behaves exactly as a state vector, only with a lower rank. It can even be further sliced.
+ * It is in particular true that
+ * \f[\braket\iota\Psi=\braket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}\f]
+ * 
+ * Via an example we define *canonical operator extensions*:
+ * \f[A\equiv\sum_kA_\text{k,3}\otimes A_\text{k,6}\otimes A_\text{k,1}\otimes A_\text{k,9}\otimes A_\text{k,7}\in\Lfrak\lp\HSpace_\text{3}\otimes\HSpace_\text{6}\otimes\HSpace_\text{1}\otimes\HSpace_\text{9}\otimes\HSpace_\text{7}\rp\f]
+ * \f[A^{\avr{3,6,1,9,7}}(\HSpace)\equiv\sum_k\lp\idop_0\otimes A_\text{k,1}\otimes\idop_2\otimes A_\text{k,3}\otimes\idop_4\otimes\idop_5\otimes A_\text{k,6}\otimes A_\text{k,7}\otimes\idop_8\otimes A_\text{k,9}\otimes\idop_{10}…\rp\in\Lfrak(\HSpace)\f]
+ * When the numbers in the angular brackets are permutations of a sequence of ordinals, this is in fact not even an extension,
+ * only a permutation of the underlying elementary Hilbert spaces.
+ * 
+ * Matrix elements of the operator in extended Hilbert spaces can then be calculated by acting with the (possibly permutated) 
+ * original operator on an appropriate vector slice:
+ * \f[\bra\iota A^{\avr{3,6,1,9,7}}(\HSpace)\ket\Psi=\bra{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}A^{\avr{1,2,0,4,3}}\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}\f]
+ * 
+ * 
+ * ### The `Array` class of the Blitz++ library
+ * 
+ * Due to the abovementioned recursiveness, the state vector of a composite quantum system is most conveniently represented as a complex
+ * (dcomp) multi-array. For a definition of the multi-array concept cf. the
+ * [Boost.MultiArray manual](http://www.boost.org/doc/libs/1_53_0/libs/multi_array/doc/reference.html#MultiArray).
+ * 
+ * By virtue of its adequacy for numerics and its efficiency, we have chosen the `Array` class from the [Blitz++ library](http://blitz.sourceforge.net) 
+ * to represent state vectors on the lowest level in the framework.
+ * 
+ * In namespace cpputils, our collection of general-purpose modules, we rely on the template alias CArray, while @ higher levels of the framework,
+ * we use the more intuitive name quantumdata::Types::StateVectorLow.
+ *
+ * \see noteonusingblitz
+ * 
+ */
+
+
 #ifndef UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
 #define UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
 
@@ -19,23 +69,31 @@
 
 #include <list>
 
-#define DEFINE_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
-#include "details/BlitzArraySliceIteratorMacros.h"
 
 
 namespace blitzplusplus {
 
-/// The name of the namespace stands for BlitzArraySliceIterator
+/// The name of the namespace stands for <strong>B</strong>litz<strong>A</strong>rray<strong>S</strong>lice<strong>I</strong>terator
 namespace basi {
+
+
+template <typename V> struct Size : boost::mpl::size<V> {};
+
+template <int RANK, bool IS_CONST> using ConditionalConstCArray=tmptools::ConditionalAddConst<CArray<RANK>,IS_CONST>::type;
+
+template <typename V> using ResCArray=CArray<Size<V>::value>;
+
+template <typename V, bool IS_CONST> using ConditionalConstResCArray=ConditionalConstCArray<Size<V>,IS_CONST>;
+
+template <int RANK, typename V, bool IS_CONST> using ForwardIteratorHelper=boost::forward_iterator_helper<Iterator<RANK,V,IS_CONST>,ConditionalConstResCArray<V,IS_CONST> >;
+
+template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::size>; // note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
 
 
 using cpputils::mii::Begin; using cpputils::mii::End;
 
 
 namespace details {
-
-
-struct EmptyBase {};
 
 
 template<int RANK, typename V> struct ConsistencyChecker
@@ -126,26 +184,55 @@ public:
 
 // template<typename V, bool CONST> Iterator<MPL_SIZE(V),V,CONST>;
 
+namespace details {
 
 template<typename, bool>
-class IteratorBaseTrivial;
+class BaseTrivial;
 
 template<typename, bool>
-class IteratorBaseSpecial;
+class BaseSpecial;
 
 template<int, typename, bool>
-class IteratorBase;
+class Base;
 
+} // details
 
 #define BASE_class boost::mpl::if_c<RANK==1,\
-                                    IteratorBaseTrivial<V,CONST>,\
+                                    details::BaseTrivial<V,CONST>,\
                                     typename boost::mpl::if_c<RANK==MPL_SIZE(V),\
-                                                              IteratorBaseSpecial<V,CONST>,\
-                                                              IteratorBase<RANK,V,CONST>\
+                                                              details::BaseSpecial<V,CONST>,\
+                                                              details::Base<RANK,V,CONST>\
                                                              >::type\
                                    >::type
 
 /// BlitzArraySliceIterator
+/**
+ * \tparam RANK positive integer standing for the number of elementary Hilbert spaces
+ * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$. Example models: tmptools::Vector and `mpl::range_c` from 
+ *           [Boost.MPL](http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/range-c.html). `mpl::size<V>::value` must not be larger than `RANK`.
+ *           `V` must not “contain” negative values, values not smaller than `RANK`, and duplicate values. These are checked for at compile time,
+ *           and any violation is signalled by more or less intelligent compiler errors generated with the help of
+ *           [Boost.MPL's static assertions](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/asserts.html).
+ * \tparam IS_CONST governs the constness of the class
+ * 
+ * To understand the template parameters, cf. also \ref multiarrayconcept.
+ * 
+ * Model of [ForwardIterator](http://www.cplusplus.com/reference/std/iterator/ForwardIterator/). Can be both const and non-const iterator depending on the last template argument.
+ * 
+ * This iterator is implemented in terms of a cpputils::MultiIndexIterator, and hence it can be initialized to either the beginning or the end of the “sequence”.
+ * 
+ * This class is at the absolute heart of the framework as it is indispensable to implement 
+ * - composite quantum systems (Composite and BinarySystem)
+ * - iterations over (multi)matrix rows and columns to get (multi)vectors
+ * - quantumdata::ldo::DiagonalIterator
+ * 
+ * This said, it is never really used directly in the framework, but rather through the maker functions below in standard or
+ * [Boost.Range algorithms](http://www.boost.org/doc/libs/1_48_0/libs/range/doc/html/range/reference/algorithms.html).
+ * 
+ * Quite generally, by iterating through all the combinations of indeces *not* belonging to the given subsystem (dummy indeces) and when dereferenced returning the corresponding slice,
+ * it can be used to implement the action of operators in extended (and/or permutated) Hilbert spaces.
+ *  
+ */
 template<int RANK, typename V, bool CONST>
 class Iterator 
   : public TTD_FORWARD_ITERATOR_HELPER, // The inheritance has to be public here because of types necessary to inherit
@@ -164,7 +251,7 @@ public:
   Iterator& operator++() {Base::increment(); return *this;}
 
   template<bool IS_END>
-  Iterator(CcCA& array, boost::mpl::bool_<IS_END> b) : Base(array,b) {}
+  Iterator(CcCA& array, boost::mpl::bool_<IS_END> isEnd) : Base(array,isEnd) {}
 
 };
 
@@ -177,6 +264,8 @@ public:
 
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
+namespace details {
+
 ///////
 //
 // Base
@@ -185,8 +274,8 @@ public:
 
 
 template<int RANK, typename V, bool CONST>
-class IteratorBase : public Indexer<RANK,V>
-// This inheritance is only to facilitate use in LazyDensityOperatorSliceIterator, and similar situations. The same does not appear necessary for IteratorBaseSpecial
+class Base : public Indexer<RANK,V>
+// This inheritance is only to facilitate use in LazyDensityOperatorSliceIterator, and similar situations. The same does not appear necessary for BaseSpecial
 {
 public:
   typedef TTD_CARRAY(RANK)                            CA   ;
@@ -200,19 +289,17 @@ public:
 
   typedef cpputils::MultiIndexIterator<RANKIDX> Impl;
 
-  typedef Indexer<RANK,V> Base;
-
-  IteratorBase(CcCA&, Begin); // if it's not the end, it's the beginning
-  IteratorBase(CcCA&, End  );
+  Base(CcCA&, Begin); // if it's not the end, it's the beginning
+  Base(CcCA&, End  );
 
   void increment() {++impl_;}
 
-  CcCARes& operator*() const {return Base::index(array_,arrayRes_,*impl_);}
+  CcCARes& operator*() const {return Indexer<RANK,V>::index(array_,arrayRes_,*impl_);}
   // This has to return a reference, cf eg
   // ElementLiovillean::JumpStrategy takes its argument as a non-const
   // reference!!! Or, it has to take a copy there...
 
-  friend bool operator==(const IteratorBase& i1, const IteratorBase& i2) {return i1.impl_==i2.impl_ /* && i1.array_==i2.array_ */;}
+  friend bool operator==(const Base& i1, const Base& i2) {return i1.impl_==i2.impl_ /* && i1.array_==i2.array_ */;}
   // The user has to ensure that the two arrays are actually the same
 
   const Impl& operator()() const {return impl_;}
@@ -243,7 +330,7 @@ class OutOfRange : public cpputils::Exception {};
 
 
 template<typename V, bool CONST>
-class IteratorBaseTrivial
+class BaseTrivial
 {
 public:
   static const int RANK=MPL_SIZE(V);
@@ -251,14 +338,14 @@ public:
   typedef TTD_CARRAY(RANK)                            CA;
   typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA;
 
-  IteratorBaseTrivial(CcCA&, Begin); // if it's not the end, it's the beginning
-  IteratorBaseTrivial(CcCA&, End  );
+  BaseTrivial(CcCA&, Begin); // if it's not the end, it's the beginning
+  BaseTrivial(CcCA&, End  );
 
   void increment() {if (!isEnd_) isEnd_=true; else throw OutOfRange();}
 
   CcCA& operator*() const {if (isEnd_) throw OutOfRange(); return array_;}
 
-  friend bool operator==(const IteratorBaseTrivial& i1, const IteratorBaseTrivial& i2) {return i1.isEnd_==i2.isEnd_;}
+  friend bool operator==(const BaseTrivial& i1, const BaseTrivial& i2) {return i1.isEnd_==i2.isEnd_;}
 
 protected:
   mutable CA array_;
@@ -275,15 +362,17 @@ private:
 //////////////
 
 template<typename V, bool CONST>
-class IteratorBaseSpecial : public IteratorBaseTrivial<V,CONST>
+class BaseSpecial : public BaseTrivial<V,CONST>
 {
 public:
-  typedef typename IteratorBaseTrivial<V,CONST>::CcCA CcCA;
+  typedef typename BaseTrivial<V,CONST>::CcCA CcCA;
   
-  IteratorBaseSpecial(CcCA&, Begin); // if it's not the end, it's the beginning
-  IteratorBaseSpecial(CcCA&, End  );
+  BaseSpecial(CcCA&, Begin); // if it's not the end, it's the beginning
+  BaseSpecial(CcCA&, End  );
 
 };
+
+} // details
 
 } // basi
 
@@ -319,7 +408,7 @@ private:
 
 
 
-
+/// Contains a “fast” version of BlitzArraySliceIterator
 namespace basi_fast {
 
 
@@ -374,9 +463,6 @@ private:
 
 } // blitzplusplus
 
-
-#define UNDEF_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
-#include "details/BlitzArraySliceIteratorMacros.h"
 
 #endif // UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
 

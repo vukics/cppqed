@@ -24,8 +24,6 @@
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
 
 
-#define DEFINE_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
-#include "details/BlitzArraySliceIteratorMacros.h"
 
 namespace blitzplusplus {
 
@@ -76,10 +74,6 @@ FilterOut(const TTD_IDXTINY(RANK)& v)
 }
 
 
-} // details
-
-
-
 ///////////////////////
 //
 // Ctor implementations
@@ -89,16 +83,15 @@ FilterOut(const TTD_IDXTINY(RANK)& v)
 
 template<int RANK, typename V, bool CONST>
 template<bool TAG>
-typename IteratorBase<RANK,V,CONST>::Impl 
-IteratorBase<RANK,V,CONST>::ctorHelper(CcCA& array)
+typename Base<RANK,V,CONST>::Impl 
+Base<RANK,V,CONST>::ctorHelper(CcCA& array)
 {
-  using details::FilterOut;
   return Impl(FilterOut<RANK,V>(array.lbound()),FilterOut<RANK,V>(array.ubound()),boost::mpl::bool_<TAG>());
 }
 
 
 template<int RANK, typename V, bool CONST>
-IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, Begin)
+Base<RANK,V,CONST>::Base(CcCA& array, Begin)
   : array_(), arrayRes_(), impl_(ctorHelper<false>(array))
 {
   array_.reference(array);
@@ -107,7 +100,7 @@ IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, Begin)
 
 
 template<int RANK, typename V, bool CONST>
-IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, End  ) 
+Base<RANK,V,CONST>::Base(CcCA& array, End  ) 
   : array_(), arrayRes_(), impl_(ctorHelper< true>(array))
 {
   // Transposition is probably not necessary since this is already the
@@ -115,32 +108,33 @@ IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, End  )
 }
 
 template<typename V, bool CONST>
-IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA& array, Begin)
+BaseTrivial<V,CONST>::BaseTrivial(CcCA& array, Begin)
   : array_(), isEnd_(false)
 {
   array_.reference(array);
 }
 
 template<typename V, bool CONST>
-IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA&      , End  )
+BaseTrivial<V,CONST>::BaseTrivial(CcCA&      , End  )
   : array_(), isEnd_(true)
 {
 }
 
 template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, Begin)
-  : IteratorBaseTrivial<V,CONST>(array,cpputils::mii::begin)
+BaseSpecial<V,CONST>::BaseSpecial(CcCA& array, Begin)
+  : BaseTrivial<V,CONST>(array,cpputils::mii::begin)
 {
   Transposer<boost::mpl::size<V>::value,V>::transpose(this->array_);
 }
 
 
 template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, End  ) 
-  : IteratorBaseTrivial<V,CONST>(array,cpputils::mii::end)
+BaseSpecial<V,CONST>::BaseSpecial(CcCA& array, End  ) 
+  : BaseTrivial<V,CONST>(array,cpputils::mii::end)
 {
 }
 
+} // details
 
 //////////////////////////
 //
@@ -364,9 +358,6 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 #undef BOOST_PP_FILENAME_1
 #undef BOOST_PP_ITERATION_LIMITS
 
-
-#define UNDEF_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
-#include "details/BlitzArraySliceIteratorMacros.h"
 
 #endif // UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED
 

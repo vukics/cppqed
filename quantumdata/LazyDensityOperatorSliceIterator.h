@@ -16,7 +16,7 @@ namespace mpl=boost::mpl;
 
 namespace quantumdata {
 
-/// Comprises tools related to LazyDensityOperator, like DiagonalIterator
+/// Comprises tools related to <strong>L</strong>azy<strong>D</strong>ensity<strong>O</strong>perator, like DiagonalIterator
 namespace ldo {
   
 /** \page slicinganldo Slicing a LazyDensityOperator
