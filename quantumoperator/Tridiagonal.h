@@ -104,7 +104,7 @@ public:
 
 
   const dcomp average(const quantumdata::LazyDensityOperator<RANK>&, 
-		      const typename quantumdata::LazyDensityOperator<RANK>::Idx&, IntRANK=_1_);
+                      const typename quantumdata::LazyDensityOperator<RANK>::Idx&, IntRANK=_1_);
 
 
   const Diagonals & get           () const {return   diagonals_;}
@@ -229,7 +229,7 @@ std::ostream& operator<<(std::ostream&, const Tridiagonal<RANK>&);
 
 namespace details {
 
-template<int RANK1, int RANK2, bool>
+template<bool, int RANK1, int RANK2>
 const typename Tridiagonal<RANK1+RANK2>::Diagonals
 directDiagonals(const typename Tridiagonal<RANK1>::Diagonals&, const typename Tridiagonal<RANK2>::Diagonals&);
 

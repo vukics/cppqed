@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{definition of blitzplusplus::basi::Iterator together with its helpers}
 #ifndef UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
 #define UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
 
@@ -24,8 +25,11 @@
 
 namespace blitzplusplus {
 
-
+/// The name of the namespace stands for BlitzArraySliceIterator
 namespace basi {
+
+
+using cpputils::mii::Begin; using cpputils::mii::End;
 
 
 namespace details {
@@ -40,18 +44,18 @@ template<int RANK, typename V> struct ConsistencyChecker
 
   typedef typename boost::mpl::sort<V>::type SortedV;
   BOOST_MPL_ASSERT_MSG( 
-		       (
-			boost::mpl::equal<typename boost::mpl::unique<SortedV,boost::is_same<boost::mpl::_1,boost::mpl::_2> >::type,SortedV>::value 
-			), 
-		       BASI_ITERATOR_INCONSISTENT_VECTOR, (V) 
-			);
+                       (
+                        boost::mpl::equal<typename boost::mpl::unique<SortedV,boost::is_same<boost::mpl::_1,boost::mpl::_2> >::type,SortedV>::value 
+                        ), 
+                       BASI_ITERATOR_INCONSISTENT_VECTOR, (V) 
+                        );
   
   BOOST_MPL_ASSERT_MSG(
-		       (
-			boost::mpl::deref<typename boost::mpl::max_element<V>::type>::type::value < RANK
-			),
-		       BASI_ITERATOR_VECTOR_OUT_of_RANGE, (V)
-		       );
+                       (
+                        boost::mpl::deref<typename boost::mpl::max_element<V>::type>::type::value < RANK
+                        ),
+                       BASI_ITERATOR_VECTOR_OUT_of_RANGE, (V)
+                       );
 };
 
 
@@ -102,8 +106,8 @@ public:
   static
   TTD_RES_CARRAY(V)&
   index(TTD_CARRAY(RANK)&,
-	TTD_RES_CARRAY(V)&,
-	const TTD_VEC_IDXTINY(RANK,V)&) {throw TransposerOrIndexerRankTooHighException();}
+        TTD_RES_CARRAY(V)&,
+        const TTD_VEC_IDXTINY(RANK,V)&) {throw TransposerOrIndexerRankTooHighException();}
 
 };
 
@@ -141,6 +145,7 @@ class IteratorBase;
                                                              >::type\
                                    >::type
 
+/// BlitzArraySliceIterator
 template<int RANK, typename V, bool CONST>
 class Iterator 
   : public TTD_FORWARD_ITERATOR_HELPER, // The inheritance has to be public here because of types necessary to inherit
@@ -197,8 +202,8 @@ public:
 
   typedef Indexer<RANK,V> Base;
 
-  IteratorBase(CcCA&, boost::mpl::false_); // if it's not the end, it's the beginning
-  IteratorBase(CcCA&, boost::mpl:: true_);
+  IteratorBase(CcCA&, Begin); // if it's not the end, it's the beginning
+  IteratorBase(CcCA&, End  );
 
   void increment() {++impl_;}
 
@@ -207,9 +212,8 @@ public:
   // ElementLiovillean::JumpStrategy takes its argument as a non-const
   // reference!!! Or, it has to take a copy there...
 
-  friend bool operator==(const IteratorBase& i1, const IteratorBase& i2)
-  {return i1.impl_==i2.impl_ /* && i1.array_==i2.array_ */;}
-  // The user has to take care that the two arrays are actually the same
+  friend bool operator==(const IteratorBase& i1, const IteratorBase& i2) {return i1.impl_==i2.impl_ /* && i1.array_==i2.array_ */;}
+  // The user has to ensure that the two arrays are actually the same
 
   const Impl& operator()() const {return impl_;}
 
@@ -247,8 +251,8 @@ public:
   typedef TTD_CARRAY(RANK)                            CA;
   typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA;
 
-  IteratorBaseTrivial(CcCA&, boost::mpl::false_); // if it's not the end, it's the beginning
-  IteratorBaseTrivial(CcCA&, boost::mpl:: true_);
+  IteratorBaseTrivial(CcCA&, Begin); // if it's not the end, it's the beginning
+  IteratorBaseTrivial(CcCA&, End  );
 
   void increment() {if (!isEnd_) isEnd_=true; else throw OutOfRange();}
 
@@ -276,8 +280,8 @@ class IteratorBaseSpecial : public IteratorBaseTrivial<V,CONST>
 public:
   typedef typename IteratorBaseTrivial<V,CONST>::CcCA CcCA;
   
-  IteratorBaseSpecial(CcCA&, boost::mpl::false_); // if it's not the end, it's the beginning
-  IteratorBaseSpecial(CcCA&, boost::mpl:: true_);
+  IteratorBaseSpecial(CcCA&, Begin); // if it's not the end, it's the beginning
+  IteratorBaseSpecial(CcCA&, End  );
 
 };
 

@@ -19,18 +19,22 @@ namespace mpl=boost::mpl;
 
 
 /// Comprises classes representing the state of composite quantum systems and providing various interfaces to manipulate this data
-/**
- * Some of its most important classes fit into a single class rooted in the virtual interface LazyDensityOperator.
- */
+/** Some of its most important classes fit into a single class rooted in the virtual interface LazyDensityOperator. */
 namespace quantumdata {
 
 
-
+/// The primary tool for performing slice iterations (cf. \ref slicinganldo)
+/**
+ * On higher levels of the framework (cf. eg. BinarySystem, Composite), this function is used exclusively for performing LazyDensityOperator slice iteration.
+ * 
+ * \tparam V a compile-time vector defining the *retained index positions* of the slice
+ * \tparam T an arithmetic type which must be default-constructible
+ * \tparam F a callable type with signature `const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)`. This signature is equivalent to `const T(const LazyDensityOperator<mpl::size<V>::value>&)`.
+ * 
+ */
 template<typename V, typename T, int RANK, typename F>
 const T
-partialTrace(const LazyDensityOperator<RANK>&, F);
-// F must be an object callable with the signature:
-// const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)
+partialTrace(const LazyDensityOperator<RANK>&, F function);
 
 
 /// Common interface for calculating quantum averages
@@ -64,9 +68,7 @@ public:
   typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper
 
   /// The type used for indexing the “rows” and the “columns”.
-  /**
-   * Just an integer (index) if `RANK=1`, otherwise a tiny vector of integers (multi-index).
-   */
+  /** Just an integer (index) if `RANK=1`, otherwise a tiny vector of integers (multi-index). */
   typedef typename mpl::if_c<(RANK==1),int,TTD_IDXTINY(RANK)>::type Idx; 
 
   virtual ~LazyDensityOperator() {}
@@ -75,11 +77,10 @@ public:
 
   double operator()(const Idx& i) const {return real((*this)(i,i));} ///< An inline function for conveniently addressing the diagonal elements
 
- 
+  /// \name Slicing-related functionality
   //@{
     /// Return the DiagonalIterator corresponding to the beginning/end of the sequence of slices defined by `V` 
-    /**
-     * (cf. the section on slicing a LazyDensityOperator).
+    /** Cf. \ref slicinganldo
      * \tparam V Compile-time vector holding the *retained index positions*.
      */
   template<typename V>
@@ -116,6 +117,113 @@ inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const TTD
  */
 template<int RANK>
 const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
+
+
+/** \class LazyDensityOperator
+ * 
+ * \par Semantics
+ * 
+ * - *Unary system*: Assume a mode represented in Fock basis with ladder-operator \f$a\f$. To calculate the quantum expectation value
+ * \f[\avr{a^2}=\Tr{a^2\rho}=\sum_i\sqrt{i(i-1)}\,\rho_{i;i-2},\f] one can write the following function:
+ *   ~~~
+ *   include "LazyDensityOperator.h"
+ *   
+ *   const dcomp calculateASqr(const LazyDensityOperator<1>& matrix)
+ *   {
+ *     dcomp res;
+ *     for (int i=2; i<matrix.getTotalDimension(); ++i) res+=sqrt(i*(i-1))*matrix(i,i-2);
+ *     return res;
+ *   }
+ *   ~~~
+ * 
+ * - *Binary system*: Assume two modes represented in Fock bases with ladder-operators \f$a\f$ and \f$b\f$, respectively.
+ *   To calculate the quantum expectation value\f[\avr{a^\dag b}=\Tr{a^\dag b\rho}=\sum_{i,j}\sqrt{(i+1)j}\,\rho_{(i,j);(i+1,j-1)},\f]
+ *   one can write the following function:
+ *   ~~~ 
+ *   include "LazyDensityOperator.h"
+ * 
+ *   const dcomp calculateADaggerB(const LazyDensityOperator<2>& matrix)
+ *   {
+ *     typedef LazyDensityOperator<2>::Idx Idx;
+ *     const LazyDensityOperator<2>::Dimensions dim(matrix.getDimensions());
+ * 
+ *     dcomp res;
+ *     for (int i=0; i<dim[0]-1; ++i) for (int j=1; j<dim[1]; ++j) res+=sqrt((i+1)*j)*matrix(Idx(i,j),Idx(i+1,j-1));
+ *     return res;
+ *   }
+ *   ~~~
+ * 
+ */
+
+/** \fn template<typename V, typename T, int RANK, typename F> const T partialTrace(const LazyDensityOperator<RANK>&, F function)
+ * 
+ * \par Semantics
+ * 
+ * The function iterates through all the combinations of the dummy indeces, for each slice it takes the value returned by the functor `function`, and accumulates these values.
+ * In the following we give some instructive examples of usage.
+ * 
+ * - *Calculating the full partial density operator of a unary subsystem*: 
+ *   The partial density operator of any unary subsystem of a system of any rank may be calculated as follows (e.g. from a StateVector):
+ *   ~~~
+ *   template<int SUBSYSTEM, int RANK> // for the subsystem indexed by the index SUBSYSTEM
+ *   const DensityOperator<1>
+ *   partialTraceOfUnarySubsystem(const StateVector<RANK>& psi)
+ *   {
+ *     return partialTrace<tmptools::Vector<SUBSYSTEM>,DensityOperator<1> >(psi,densityOperatorize<1>);
+ *   }
+ *   ~~~
+ * 
+ * - *Calculating correlations for two harmonic-oscillator modes*: Assume having the function `calculateADaggerB` as defined @ LazyDensityOperator.
+ *   Then, if these modes are embedded at index positions 3 and 1 (note that the order might be important) in a larger system of arity larger than 3,
+ *   we can write the following function:
+ *   ~~~
+ *   template<int RANK> // RANK>3
+ *   const dcomp
+ *   calculateADaggerB_atPositions3and1(const LazyDensityOperator<RANK>& matrix)
+ *   {
+ *     return partialTrace<tmptools::Vector<3,1>,dcomp>(matrix,calculateADaggerB);
+ *   }
+ *   ~~~
+ *   This will calculate \f$\avr{a^\dag b}\f$ (now \f$b\f$ and \f$a\f$ being the ladder operators of the modes at position 1 and 3, respectively)
+ *   for the partial density operator of the embedded system (but without explicitly calculating this partial density operator).
+ *
+ * - *Accumulating an arbitrary ensemble of quantum averages*: An arbitrary ensemble of real or complex numbers can be stored in a DArray<1> or CArray<1>
+ *   (or even `std::valarray`s), as these types fulfill all the requirements on type `T`. The former was used to define the abstract interface structure::Averaged
+ *   one of its implementations being :class:`Mode`. E.g. a function for a harmonic-oscillator mode calculating \f$\avr{a^\dag a}\f$, \f$\avr{\lp a^\dag a\rp^2}\f$,
+ *   and the real and imaginary parts of \f$\avr{a}\f$, may be defined as
+ *   ~~~
+ *   typedef DArray<1> Averages;
+ *
+ *   const Averages
+ *   calculateModeAverages(const LazyDensityOperator<1>& matrix)
+ *   {
+ *     Averages averages(4); averages=0;
+ *
+ *     for (int n=1; n<int(matrix.getDimension()); n++) {
+ *       double diag=matrix(n);
+ *       averages(0)+=  n*diag;
+ *       averages(1)+=n*n*diag;
+ *
+ *       double sqrtn=sqrt(n);
+ *       dcomp offdiag(matrix(n,n-1));
+ *       averages(2)+=sqrtn*real(offdiag);
+ *       averages(3)+=sqrtn*imag(offdiag);
+ *     }
+ *
+ *     return averages;
+ *
+ *   }
+ *   ~~~
+ *   Then the following function will calculate these averages for a mode embedded in a larger system at index position `MODE_POSITION`:
+ *   ~~~
+ *   template<int RANK, int MODE_POSITION> // for the subsystem indexed by the index MODE_POSITION
+ *   const Averages
+ *   calculateEmbeddedModeAverages(const StateVector<RANK>& psi)
+ *   {
+ *     return partialTrace(psi,calculateModeAverages,tmptools::Vector<MODE_POSITION>(),Averages()); 
+ *   }
+ *   ~~~
+ */
 
 
 } // quantumdata

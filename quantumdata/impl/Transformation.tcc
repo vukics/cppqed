@@ -21,7 +21,7 @@ namespace specializations {
 
 using namespace linalg;
 
-void performTransformation(const CMatrix      & trafo, const CVector      & in, CVector      & out);
+void performTransformation(const CMatrix  & trafo, const CVector  & in, CVector  & out);
 
 void performTransformation(const CArray<4>& trafo, const CArray<2>& in, CArray<2>& out);
 
@@ -69,16 +69,16 @@ struct NotIdentity<Identity<RANK> > : false_
 template<typename TRAFOS>
 struct Algorithm 
   : fold<TRAFOS,
-	 pair<tmptools::Vector<>,int_<0> >,
-	 pair<if_<NotIdentity<mpl::_2>,
-		  push_back<first<mpl::_1>,second<mpl::_1> >,
-		  first<mpl::_1>
-		  >,
-	      plus<second<mpl::_1>,
-		   RankThroughTraits<mpl::_2>
-		   >
-	      >
-	 >
+         pair<tmptools::Vector<>,int_<0> >,
+         pair<if_<NotIdentity<mpl::_2>,
+                  push_back<first<mpl::_1>,second<mpl::_1> >,
+                  first<mpl::_1>
+                  >,
+              plus<second<mpl::_1>,
+                   RankThroughTraits<mpl::_2>
+                   >
+              >
+         >
 {};
 
 
@@ -95,11 +95,11 @@ class Composite
 {
 public:
   static const int N_RANK=boost::mpl::fold<TRAFOS,
-					   boost::mpl::int_<0>,
-					   boost::mpl::plus<boost::mpl::_1,
-							    namehider::RankThroughTraits<boost::mpl::_2>
-							    >
-					   >::type::value;
+                                           boost::mpl::int_<0>,
+                                           boost::mpl::plus<boost::mpl::_1,
+                                                            namehider::RankThroughTraits<boost::mpl::_2>
+                                                            >
+                                           >::type::value;
 
   typedef TRAFOS TrafoTypes;
   

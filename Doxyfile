@@ -670,7 +670,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = utils/include/ quantumdata
+INPUT                  = utils/include/BlitzArray.h utils/include/BlitzArrayExtensions.h utils/include/BlitzArraySliceIterator.h utils/include/BlitzTiny.h utils/include/BlitzTinyExtensions.h utils/include/CMatrix.h utils/include/ComplexArrayExtensions.h utils/include/ComplexExtensions.h utils/include/CVector.h quantumdata
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -716,7 +716,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */details/*
+EXCLUDE_PATTERNS       = */details/* */*Fwd.h
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -1187,7 +1187,7 @@ EXT_LINKS_IN_WINDOW    = NO
 # to manually remove any form_*.png images from the HTML output directory
 # to force them to be regenerated.
 
-FORMULA_FONTSIZE       = 10
+FORMULA_FONTSIZE       = 12
 
 # Use the FORMULA_TRANPARENT tag to determine whether or not the images
 # generated for formulas are transparent PNGs. Transparent PNGs are
@@ -1204,7 +1204,7 @@ FORMULA_TRANSPARENT    = YES
 # output. When enabled you may also need to install MathJax separately and
 # configure the path to it using the MATHJAX_RELPATH option.
 
-USE_MATHJAX            = YES
+USE_MATHJAX            = NO
 
 # When MathJax is enabled you can set the default output format to be used for
 # the MathJax output. Supported types are HTML-CSS, NativeMML (i.e. MathML) and
@@ -1339,7 +1339,7 @@ PAPER_TYPE             = a4
 # The EXTRA_PACKAGES tag can be to specify one or more names of LaTeX
 # packages that should be included in the LaTeX output.
 
-EXTRA_PACKAGES         =
+EXTRA_PACKAGES         = technicalDefinitions amsmath amstext
 
 # The LATEX_HEADER tag can be used to specify a personal LaTeX header for
 # the generated latex document. The header should contain everything until
@@ -1905,6 +1905,6 @@ GENERATE_LEGEND        = YES
 
 DOT_CLEANUP            = YES
 
-ALIASES += tparamRANK="\tparam RANK Arity of the Hilbert space"
+ALIASES += tparamRANK="\tparam RANK arity of the Hilbert space"
 ALIASES += briefFile{1}="\file \n \brief \1"
 ALIASES += briefFileDefault="\briefFile{Defines class of the same name}"

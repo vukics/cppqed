@@ -21,6 +21,8 @@
 
 namespace quantumdata {
 
+
+/// Comprises tools for metric transformations of NonOrthogonalStateVector and NonOrthogonalDensityOperator classes.
 namespace transformation {
 
 

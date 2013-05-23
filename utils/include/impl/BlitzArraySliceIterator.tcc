@@ -98,7 +98,7 @@ IteratorBase<RANK,V,CONST>::ctorHelper(CcCA& array)
 
 
 template<int RANK, typename V, bool CONST>
-IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl::false_)
+IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, Begin)
   : array_(), arrayRes_(), impl_(ctorHelper<false>(array))
 {
   array_.reference(array);
@@ -107,7 +107,7 @@ IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl::false_)
 
 
 template<int RANK, typename V, bool CONST>
-IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl:: true_) 
+IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, End  ) 
   : array_(), arrayRes_(), impl_(ctorHelper< true>(array))
 {
   // Transposition is probably not necessary since this is already the
@@ -115,29 +115,29 @@ IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl:: true_)
 }
 
 template<typename V, bool CONST>
-IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA& array, boost::mpl::false_)
+IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA& array, Begin)
   : array_(), isEnd_(false)
 {
   array_.reference(array);
 }
 
 template<typename V, bool CONST>
-IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA&, boost::mpl::true_)
+IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA&      , End  )
   : array_(), isEnd_(true)
 {
 }
 
 template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl::false_)
-  : IteratorBaseTrivial<V,CONST>(array, boost::mpl::false_())
+IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, Begin)
+  : IteratorBaseTrivial<V,CONST>(array,cpputils::mii::begin)
 {
   Transposer<boost::mpl::size<V>::value,V>::transpose(this->array_);
 }
 
 
 template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl:: true_) 
-  : IteratorBaseTrivial<V,CONST>(array, boost::mpl::true_())
+IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, End  ) 
+  : IteratorBaseTrivial<V,CONST>(array,cpputils::mii::end)
 {
 }
 
@@ -153,11 +153,11 @@ namespace details {
 
 template<int RANK, typename V>
 struct IdxTypes : boost::mpl::fold<tmptools::Ordinals<RANK>,
-				   boost::fusion::vector<>,
-				   boost::mpl::push_back<boost::mpl::_1,
-							 boost::mpl::if_<tmptools::numerical_contains<V,boost::mpl::_2>,blitz::Range,int>
-							 >
-				   >
+                                   boost::fusion::vector<>,
+                                   boost::mpl::push_back<boost::mpl::_1,
+                                                         boost::mpl::if_<tmptools::numerical_contains<V,boost::mpl::_2>,blitz::Range,int>
+                                                         >
+                                   >
 {};
 
 
@@ -225,19 +225,19 @@ using namespace tmptools;
 template<int RANK, typename V>
 struct Algorithm 
   : fold<Ordinals<RANK>,
-	 pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
-	 pair<push_back<mpl::first<mpl::_1>,
-			if_<numerical_contains<V,mpl::_2>,
-			    deref<second<mpl::_1> >,
-			    mpl::_2
-			    >
-			>,
-	      if_<numerical_contains<V,mpl::_2>,
-		  mpl::next<second<mpl::_1> >,
-		  second<mpl::_1>
-		  >
-	      >
-	 >
+         pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
+         pair<push_back<mpl::first<mpl::_1>,
+                        if_<numerical_contains<V,mpl::_2>,
+                            deref<second<mpl::_1> >,
+                            mpl::_2
+                            >
+                        >,
+              if_<numerical_contains<V,mpl::_2>,
+                  mpl::next<second<mpl::_1> >,
+                  second<mpl::_1>
+                  >
+              >
+         >
 {};
 
 } // namehider

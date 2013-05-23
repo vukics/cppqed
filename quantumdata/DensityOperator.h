@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
 #define QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
 
@@ -34,6 +35,18 @@ inline
 double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm();}
 
 
+/// Density operator of arbitrary arity
+/**
+ * Cf. \ref quantumdatahighlevel
+ * 
+ * \tparamRANK
+ * 
+ * The DensityOperator interface is similar to StateVector with obvious differences.
+ * 
+ * \note A DensityOperator <RANK> represents a density operator on a Hilbert space of arity `RANK`. This makes that
+ * the number of its indeces is actually `2*RANK`. This is the reason why it inherits from quantumdata::ArrayBase <2*RANK>.
+ * 
+ */
 template<int RANK>
 class DensityOperator
   : public LazyDensityOperator<RANK>,
@@ -59,32 +72,40 @@ public:
   DensityOperatorBase() : LDO_Base(Dimensions()), ABase(DensityOperatorLow()), matrixView_() {}
   */
 
-  DensityOperator(const DensityOperatorLow&, ByReference);
+  DensityOperator(const DensityOperatorLow&, ByReference); ///< Referencing constructor implemented in terms of blitzplusplus::halfCutTiny
 
   explicit DensityOperator(const Dimensions&, bool init=true);
 
-  explicit DensityOperator(const StateVector<RANK>&);
+  explicit DensityOperator(const StateVector<RANK>& psi); ///< Constructs the class as a dyadic product of `psi` with itself.
 
-  DensityOperator(const DensityOperator&); // By value semantics (deep copy)
+  DensityOperator(const DensityOperator&); ///< By-value copy constructor (deep copy)
 
-  // Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
+  /// Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
   DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho()); return *this;}
 
   template<typename OTHER>
   DensityOperator& operator=(const OTHER& other) {operator()()=other; return *this;}
   
-  // (multi-)matrix style indexing:
+  //@{
+    /// (multi-)matrix style indexing:
   const dcomp& operator()(const Idx& i, const Idx& j) const;
         dcomp& operator()(const Idx& i, const Idx& j) {return const_cast<dcomp&>(static_cast<const DensityOperator&>(*this)(i,j));}
+  //@}
 
+  //@{
+    /// Both functions return the *trace* “norm”, but the latter one also renormalises.
   double   norm() const;
   double renorm()      ;
+  //@}
 
+  //@{
+    /// Returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray.
   const CMatrix matrixView() const {return blitzplusplus::binaryArray(operator()());}
-  CMatrix       matrixView()       {return blitzplusplus::binaryArray(operator()());}
-
-  // naive operations for vector space
-
+        CMatrix matrixView()       {return blitzplusplus::binaryArray(operator()());}
+  //@}
+  
+  /// Naive operations for vector space
+  //@{
   DensityOperator& operator+=(const DensityOperator& rho) {ABase::operator+=(rho); return *this;}
   DensityOperator& operator-=(const DensityOperator& rho) {ABase::operator-=(rho); return *this;}
 
@@ -96,18 +117,20 @@ public:
 
   template<typename OTHER>
   DensityOperator& operator/=(const OTHER& dc) {ABase::operator/=(dc); return *this;}
+  //@}
 
 private:
-  // virtual from LDO_Base
-  const dcomp index(const Idx& i, const Idx& j) const {return operator()(i,j); }
+  const dcomp index(const Idx& i, const Idx& j) const {return operator()(i,j);} ///< This function implements the LazyDensityOperator interface in a trivial element-access way
 
 };
 
 
+/// Performs the opposite of quantumdata::deflate
 template<int RANK>
 void inflate(const DArray<1>&, DensityOperator<RANK>&, bool offDiagonals);
 
 
+/// Creates a DensityOperator as the (deep) copy of the data of a LazyDensityOperator of the same arity
 template<int RANK>
 const DensityOperator<RANK>
 densityOperatorize(const LazyDensityOperator<RANK>&);

@@ -9,8 +9,8 @@
 
 namespace quantumdata {
 
-template<int RANK>
-struct NonOrthogonalDensityOperator/* : DensityOperatorBase<RANK> {
+template<int RANK, typename TRAFO>
+class NonOrthogonalDensityOperator/* : public DensityOperator<RANK>, private linalg::VectorSpace<NonOrthogonalDensityOperator<RANK,TRAFO> > {
 
   typedef StateVectorBase<RANK> Base;
   typedef Base::Impl Impl;
@@ -36,7 +36,7 @@ private:
 
 };
 
-			       */ ;
+*/;
 
 } // quantumdata
 

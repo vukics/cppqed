@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Declares the function calculating the negativity of a partially transposed density operator}
 #ifndef   QUANTUMDATA_NEGPT_H_INCLUDED
 #define   QUANTUMDATA_NEGPT_H_INCLUDED
 
@@ -13,14 +14,25 @@
 
 namespace quantumdata {
 
-// Calculates the negativity of the partial transpose of the density
-// operator of an arbitrarily complex system. Of course it should be
-// regarded as a bipartite system, so that a subsystem has to be
-// specified to be one party of the bipartite.
 
-// V should be a compile-time vector, tipically a tmptools::vector
-// specifying the subsystem
-
+/// Calculates the negativity of the partial transpose of the density operator of an arbitrarily complex system
+/**
+ * The system should of course be regarded as a bipartite system, so that a subsystem has to be specified to be 
+ * one part of the bipartite. The compile-time vector `V` specifies the subsystem.
+ * 
+ * The negativity is calculated as *the sum of the negative eigenvalues* of the partially transposed density operator.
+ * 
+ * \note This definition is equivalent to the original definition 
+ * (cf. G. Vidal and R. F. Werner, *Computable measure of entanglement*, Phys. Rev. A, **65**, 032314, [2002])
+ * up to a sign, because the partially transposed density operator's eigenvalues come in two sorts:
+ * - solitary positive numbers (\f$a_i\f$) adding up to one, and
+ * - pairs of opposite-sign numbers (\f$b_i\f$).
+ * \note Hence
+ * \f[\mathcal{N}(\rho)\equiv\frac{\norm{\rho^{\text{PT}}}_1-1}2=\frac{\sum_i\abs{\rho^{\text{PT}}_{ii}}-1}2=\frac{\sum_ia_i+2\sum_ib_i-1}2=\sum_ib_i.\f]\par
+ * 
+ * \tparamRANK
+ * \tparam V a compile-time vector, tipically a tmptools::Vector, specifying the quantum numbers grouped into one part of the bipartite
+ */
 template<int RANK, typename V>
 double negPT(const DensityOperator<RANK>&, V);
 
@@ -39,9 +51,9 @@ double negPT(const DensityOperator<RANK>&, tmptools::V_Empty)
 
 namespace quantumdata {
 
-// If FLENS is not used, a dummy definition of negPT is provided
-
+/** If FLENS is not used, a dummy definition of negPT is provided. */
 template<int RANK, typename V>
+inline
 double negPT(const DensityOperator<RANK>&, V)
 {
   return 0;
