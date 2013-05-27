@@ -13,6 +13,7 @@
  * (un<em>ary,</em> bin<em>ary,</em> tern<em>ary,</em> quatern<em>ary,</em> etc.) of the system.
  * 
  * Via an example we define *state-vector slices*:
+ * \anchor retainedindexpositionsdefined
  * \f[\ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}\equiv\sum_{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i\f]
  * A state-vector slice is defined by the *retained index positions* \f$\avr{1,3,6,7,9}\f$, which define the subsystem, and the <em>“dummy” indices</em> 
  * \f$(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)\f$. In situations when slicing occurs in the framework, the set of retained index positions 
@@ -79,15 +80,15 @@ namespace basi {
 
 template <typename V> struct Size : boost::mpl::size<V> {};
 
-template <int RANK, bool IS_CONST> using ConditionalConstCArray=tmptools::ConditionalAddConst<CArray<RANK>,IS_CONST>::type;
+template <int RANK, bool IS_CONST> using ConditionalConstCArray=typename tmptools::ConditionalAddConst<CArray<RANK>,IS_CONST>::type;
 
 template <typename V> using ResCArray=CArray<Size<V>::value>;
 
-template <typename V, bool IS_CONST> using ConditionalConstResCArray=ConditionalConstCArray<Size<V>,IS_CONST>;
+template <typename V, bool IS_CONST> using ConditionalConstResCArray=ConditionalConstCArray<Size<V>::value,IS_CONST>;
 
 template <int RANK, typename V, bool IS_CONST> using ForwardIteratorHelper=boost::forward_iterator_helper<Iterator<RANK,V,IS_CONST>,ConditionalConstResCArray<V,IS_CONST> >;
 
-template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::size>; // note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
+template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::value>; // note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
 
 
 using cpputils::mii::Begin; using cpputils::mii::End;
@@ -98,7 +99,7 @@ namespace details {
 
 template<int RANK, typename V> struct ConsistencyChecker
 {
-  BOOST_MPL_ASSERT_MSG( RANK >= MPL_SIZE(V), INDEXER_with_NONPOSITIVE_RANK, () );
+  BOOST_MPL_ASSERT_MSG( RANK >= Size<V>::value, INDEXER_with_NONPOSITIVE_RANK, () );
 
   typedef typename boost::mpl::sort<V>::type SortedV;
   BOOST_MPL_ASSERT_MSG( 
@@ -123,13 +124,13 @@ template<int RANK, int I1, int I2>  struct ConsistencyChecker<RANK,boost::mpl::r
 { BOOST_MPL_ASSERT_MSG( ( I1>=0 && I2<RANK ), BASI_ITERATOR_VECTOR_OUT_of_RANGE, ( boost::mpl::range_c<int,I1,I2> ) ) ; };
 
 template<int RANK, int N, int Nbeg> struct ConsistencyChecker<RANK,tmptools::Range<N,Nbeg> > : private ConsistencyChecker<RANK,boost::mpl::range_c<int,Nbeg,Nbeg+N> > {};
-template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ordinals<N>   > : private ConsistencyChecker<RANK,tmptools::Range<N,0> >             {};
+template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ordinals<N>   > : private ConsistencyChecker<RANK,tmptools::  Range  <N,0>             > {};
 
 
 
 template<int RANK, typename V>
-TTD_VEC_IDXTINY(RANK,V)
-FilterOut(const TTD_IDXTINY(RANK)&);
+const VecIdxTiny<RANK,V>
+filterOut(const IdxTiny<RANK>&);
 
 
 } // details
@@ -151,8 +152,8 @@ class Transposer
 {
 public:
   static 
-  TTD_CARRAY(RANK)&
-  transpose(TTD_CARRAY(RANK)&) {throw TransposerOrIndexerRankTooHighException();}
+  CArray<RANK>&
+  transpose(CArray<RANK>&) {throw TransposerOrIndexerRankTooHighException();}
 
 };
 
@@ -162,10 +163,10 @@ class Indexer : public Transposer<RANK,V>
 {
 public:
   static
-  TTD_RES_CARRAY(V)&
-  index(TTD_CARRAY(RANK)&,
-        TTD_RES_CARRAY(V)&,
-        const TTD_VEC_IDXTINY(RANK,V)&) {throw TransposerOrIndexerRankTooHighException();}
+  ResCArray<V>&
+  index(CArray<RANK>&,
+        ResCArray<V>&,
+        const VecIdxTiny<RANK,V>&) {throw TransposerOrIndexerRankTooHighException();}
 
 };
 
@@ -182,7 +183,7 @@ public:
 // the specialization problem optimal?  Note: this is NOT allowed
 // (specialization depending on a template parameter)
 
-// template<typename V, bool CONST> Iterator<MPL_SIZE(V),V,CONST>;
+// template<typename V, bool IS_CONST> Iterator<Size<V>::value,V,IS_CONST>;
 
 namespace details {
 
@@ -198,17 +199,17 @@ class Base;
 } // details
 
 #define BASE_class boost::mpl::if_c<RANK==1,\
-                                    details::BaseTrivial<V,CONST>,\
-                                    typename boost::mpl::if_c<RANK==MPL_SIZE(V),\
-                                                              details::BaseSpecial<V,CONST>,\
-                                                              details::Base<RANK,V,CONST>\
+                                    details::BaseTrivial<V,IS_CONST>,\
+                                    typename boost::mpl::if_c<RANK==Size<V>::value,\
+                                                              details::BaseSpecial<V,IS_CONST>,\
+                                                              details::Base<RANK,V,IS_CONST>\
                                                              >::type\
                                    >::type
 
 /// BlitzArraySliceIterator
 /**
  * \tparam RANK positive integer standing for the number of elementary Hilbert spaces
- * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$. Example models: tmptools::Vector and `mpl::range_c` from 
+ * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$ \ref retainedindexpositionsdefined "above". Example models: tmptools::Vector and `mpl::range_c` from 
  *           [Boost.MPL](http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/range-c.html). `mpl::size<V>::value` must not be larger than `RANK`.
  *           `V` must not “contain” negative values, values not smaller than `RANK`, and duplicate values. These are checked for at compile time,
  *           and any violation is signalled by more or less intelligent compiler errors generated with the help of
@@ -227,15 +228,15 @@ class Base;
  * - quantumdata::ldo::DiagonalIterator
  * 
  * This said, it is never really used directly in the framework, but rather through the maker functions below in standard or
- * [Boost.Range algorithms](http://www.boost.org/doc/libs/1_48_0/libs/range/doc/html/range/reference/algorithms.html).
+ * [Boost.Range algorithms](http://www.boost.org/doc/libs/1_53_0/libs/range/doc/html/range/reference/algorithms.html).
  * 
  * Quite generally, by iterating through all the combinations of indeces *not* belonging to the given subsystem (dummy indeces) and when dereferenced returning the corresponding slice,
  * it can be used to implement the action of operators in extended (and/or permutated) Hilbert spaces.
  *  
  */
-template<int RANK, typename V, bool CONST>
+template<int RANK, typename V, bool IS_CONST>
 class Iterator 
-  : public TTD_FORWARD_ITERATOR_HELPER, // The inheritance has to be public here because of types necessary to inherit
+  : public ForwardIteratorHelper<RANK,V,IS_CONST>, // The inheritance has to be public here because of types necessary to inherit
     public BASE_class,
     private details::ConsistencyChecker<RANK,V>
 {
@@ -258,7 +259,7 @@ public:
 
 
 #define NS_NAME basi
-#define RETURN_type1(CONST) Iterator<ArrayRankTraits<A>::value,V_S,CONST>
+#define RETURN_type1(IS_CONST) Iterator<ArrayRankTraits<A>::value,V_S,IS_CONST>
 #define ADDITIONAL_PARAMETER
 #define ADDITIONAL_ARGUMENT
 
@@ -273,19 +274,19 @@ namespace details {
 ///////
 
 
-template<int RANK, typename V, bool CONST>
+template<int RANK, typename V, bool IS_CONST>
 class Base : public Indexer<RANK,V>
 // This inheritance is only to facilitate use in LazyDensityOperatorSliceIterator, and similar situations. The same does not appear necessary for BaseSpecial
 {
 public:
-  typedef TTD_CARRAY(RANK)                            CA   ;
-  typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA   ;
-  typedef TTD_RES_CARRAY(V)                           CARes;
-  typedef TTD_CONDITIONAL_CONST_RES_CARRAY(V,CONST) CcCARes;
+  typedef CArray<RANK>                         CA   ;
+  typedef ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
+  typedef ResCArray<V>                         CARes;
+  typedef ConditionalConstResCArray<V,IS_CONST> CcCARes;
 
-  typedef TTD_VEC_IDXTINY(RANK,V) VecIdxTiny;
+  typedef VecIdxTiny<RANK,V> VecIdxTiny;
 
-  static const int RANKIDX=RANK-MPL_SIZE(V);
+  static const int RANKIDX=RANK-Size<V>::value;
 
   typedef cpputils::MultiIndexIterator<RANKIDX> Impl;
 
@@ -329,14 +330,14 @@ private:
 class OutOfRange : public cpputils::Exception {};
 
 
-template<typename V, bool CONST>
+template<typename V, bool IS_CONST>
 class BaseTrivial
 {
 public:
-  static const int RANK=MPL_SIZE(V);
+  static const int RANK=Size<V>::value;
 
-  typedef TTD_CARRAY(RANK)                            CA;
-  typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA;
+  typedef CArray<RANK>                          CA;
+  typedef ConditionalConstCArray<RANK,IS_CONST>  CcCA;
 
   BaseTrivial(CcCA&, Begin); // if it's not the end, it's the beginning
   BaseTrivial(CcCA&, End  );
@@ -361,11 +362,11 @@ private:
 //
 //////////////
 
-template<typename V, bool CONST>
-class BaseSpecial : public BaseTrivial<V,CONST>
+template<typename V, bool IS_CONST>
+class BaseSpecial : public BaseTrivial<V,IS_CONST>
 {
 public:
-  typedef typename BaseTrivial<V,CONST>::CcCA CcCA;
+  typedef typename BaseTrivial<V,IS_CONST>::CcCA CcCA;
   
   BaseSpecial(CcCA&, Begin); // if it's not the end, it's the beginning
   BaseSpecial(CcCA&, End  );
@@ -385,7 +386,7 @@ class SlicesData
 public:
   typedef SlicesData<RANK,V> type;
 
-  typedef TTD_CARRAY(RANK) CArray;
+  typedef CArray<RANK> CArray;
 
   typedef std::list<ptrdiff_t> Impl;
 
@@ -399,10 +400,10 @@ private:
 
   const Impl firstOffsets_;
 
-  const blitz::TinyVector<int      ,MPL_SIZE(V)>  shape_;
-  const blitz::TinyVector<ptrdiff_t,MPL_SIZE(V)> stride_;
+  const blitz::TinyVector<int      ,basi::Size<V>::value>  shape_;
+  const blitz::TinyVector<ptrdiff_t,basi::Size<V>::value> stride_;
 
-  const blitz::GeneralArrayStorage<MPL_SIZE(V)> storage_;
+  const blitz::GeneralArrayStorage<basi::Size<V>::value> storage_;
 
 };
 
@@ -412,14 +413,14 @@ private:
 namespace basi_fast {
 
 
-template<int RANK, typename V, bool CONST>
+template<int RANK, typename V, bool IS_CONST>
 class Iterator 
-  : public TTD_FORWARD_ITERATOR_HELPER
+  : public basi::ForwardIteratorHelper<RANK,V,IS_CONST>
 {
 public:
-  typedef TTD_CONDITIONAL_CONST_CARRAY(RANK,CONST)  CcCA   ;
-  typedef TTD_RES_CARRAY(V)                           CARes;
-  typedef TTD_CONDITIONAL_CONST_RES_CARRAY(V,CONST) CcCARes;
+  typedef basi::ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
+  typedef basi::ResCArray<V>                            CARes;
+  typedef basi::ConditionalConstResCArray<V,IS_CONST> CcCARes;
 
   typedef boost::iterator_range<Iterator> Range;
 
@@ -451,7 +452,7 @@ private:
 
 
 #define NS_NAME basi_fast
-#define RETURN_type1(CONST) Iterator<ArrayRankTraits<A>::value,V_S,CONST>
+#define RETURN_type1(IS_CONST) Iterator<ArrayRankTraits<A>::value,V_S,IS_CONST>
 #define ADDITIONAL_PARAMETER , sd
 #define ADDITIONAL_ARGUMENT  , const SlicesData<ArrayRankTraits<A>::value,V_S>& sd
 

@@ -39,7 +39,7 @@ IdxTiny idx(21,2,4,10,11,3,5,9,23,22,7);
 
 
 typedef TTD_IDXTINY(RANK-mpl::size<V>::value) VecIdxTiny;
-VecIdxTiny filteredIdx(details::FilterOut<RANK,V>(idx));
+VecIdxTiny filteredIdx(details::filterOut<RANK,V>(idx));
 
 
 typedef TTD_DARRAY(11) DArray11;

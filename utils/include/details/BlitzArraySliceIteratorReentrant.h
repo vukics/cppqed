@@ -25,7 +25,7 @@ end  (      A& array ADDITIONAL_ARGUMENT)
 {return RETURN_type1(false)(array ADDITIONAL_PARAMETER, boost::mpl:: true_());}
 
 
-#define RETURN_type2(CONST) boost::iterator_range<RETURN_type1(CONST)>
+#define RETURN_type2(IS_CONST) boost::iterator_range<RETURN_type1(IS_CONST)>
 
 template<typename V_S, typename A>
 inline
