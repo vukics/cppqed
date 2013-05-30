@@ -26,10 +26,10 @@ struct Right : boost::mpl:: true_ {};
 template<int RANK, typename S>
 struct LeftRight 
   : tmptools::Range<RANK,
-		    boost::mpl::if_<S,
-				    boost::mpl::int_<RANK>,
-				    boost::mpl::int_<0>
-				    >::type::value> {};
+                    boost::mpl::if_<S,
+                                    boost::mpl::int_<RANK>,
+                                    boost::mpl::int_<0>
+                                    >::type::value> {};
 // Meaning that
 // V: 0 1 2 3 ... RANK-1       for left and
 // V: RANK RANK+1 ... 2*RANK-1 for right
@@ -46,6 +46,31 @@ struct LeftRight
 #include "details/BlitzArraySliceIteratorReentrant.h"
 
 #undef  TTD_VFMSI
+
+
+template<typename V_S, typename A>
+const basi::Iterator<ArrayRankTraits<A>::value,LeftRight<ArrayRankTraits<A>::value/2,V_S>,true>
+begin(const A& array );
+
+template<typename V_S, typename A>
+const basi::Iterator<ArrayRankTraits<A>::value,LeftRight<ArrayRankTraits<A>::value/2,V_S>,true>
+end (const A& array );
+
+template<typename V_S, typename A>
+const basi::Iterator<ArrayRankTraits<A>::value,LeftRight<ArrayRankTraits<A>::value/2,V_S>,false>
+begin(     A& array );
+
+template<typename V_S, typename A>
+const basi::Iterator<ArrayRankTraits<A>::value,LeftRight<ArrayRankTraits<A>::value/2,V_S>,false>
+end (      A& array );
+
+template<typename V_S, typename A>
+const boost::iterator_range<basi::Iterator<ArrayRankTraits<A>::value,LeftRight<ArrayRankTraits<A>::value/2,V_S>,true> >
+fullRange(const A& array );
+
+template<typename V_S, typename A>
+const boost::iterator_range<basi::Iterator<ArrayRankTraits<A>::value,LeftRight<ArrayRankTraits<A>::value/2,V_S>,false> >
+fullRange(      A& array );
 
 } // vfmsi
 

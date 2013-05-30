@@ -203,12 +203,12 @@ private:
     template<bool IS_END>
     static MII ctorHelper(const DensityOperator<RANK>& rho)
     {
-      using blitzplusplus::basi::details::FilterOut;
+      using blitzplusplus::basi::details::filterOut;
       using blitzplusplus::halfCutTiny;
       
-      return MII(FilterOut<RANK,V>(halfCutTiny(rho().lbound())),
-                FilterOut<RANK,V>(halfCutTiny(rho().ubound())),
-                mpl::bool_<IS_END>());
+      return MII(filterOut<RANK,V>(halfCutTiny(rho().lbound())),
+                 filterOut<RANK,V>(halfCutTiny(rho().ubound())),
+                 mpl::bool_<IS_END>());
     }
 
     void doIncrement() {++mii_;}

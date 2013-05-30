@@ -21,7 +21,7 @@ namespace ldo {
   
 /** \page slicinganldo Slicing a LazyDensityOperator
  * 
- * Analogously to state vectors (Cf. \ref basiSlicing), it is also necessary to slice LazyDensityOperator objects
+ * Analogously to \ref basiSlicing "slicing state vectors", it is also necessary to slice LazyDensityOperator objects
  * because for calculating quantum expectation values of subsystem-observables (e.g. in Composite objects),
  * the partial-trace density operator is needed.
  * 
@@ -52,7 +52,7 @@ namespace ldo {
 
 /// Iterator for slices of a LazyDensityOperator that are diagonal in the dummy indeces
 /**
- * Cf. \ref slicinganldo
+ * Cf. \ref slicinganldo "rationale"
  * 
  * \tparam RANK arity of the full (unsliced) Hilbert space
  * \tparam V Compile-time vector holding the *retained index positions*.

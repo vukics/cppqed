@@ -23,7 +23,7 @@ namespace mpl=boost::mpl;
 namespace quantumdata {
 
 
-/// The primary tool for performing slice iterations (cf. \ref slicinganldo)
+/// The primary tool for performing \ref slicinganldo "slice iterations"
 /**
  * On higher levels of the framework (cf. eg. BinarySystem, Composite), this function is used exclusively for performing LazyDensityOperator slice iteration.
  * 
@@ -80,7 +80,7 @@ public:
   /// \name Slicing-related functionality
   //@{
     /// Return the DiagonalIterator corresponding to the beginning/end of the sequence of slices defined by `V` 
-    /** Cf. \ref slicinganldo
+    /** Cf. \ref slicinganldo "rationale"
      * \tparam V Compile-time vector holding the *retained index positions*.
      */
   template<typename V>
@@ -121,7 +121,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
 
 /** \class LazyDensityOperator
  * 
- * \par Semantics
+ * \Semantics
  * 
  * - *Unary system*: Assume a mode represented in Fock basis with ladder-operator \f$a\f$. To calculate the quantum expectation value
  * \f[\avr{a^2}=\Tr{a^2\rho}=\sum_i\sqrt{i(i-1)}\,\rho_{i;i-2},\f] one can write the following function:
@@ -157,7 +157,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
 
 /** \fn template<typename V, typename T, int RANK, typename F> const T partialTrace(const LazyDensityOperator<RANK>&, F function)
  * 
- * \par Semantics
+ * \Semantics
  * 
  * The function iterates through all the combinations of the dummy indeces, for each slice it takes the value returned by the functor `function`, and accumulates these values.
  * In the following we give some instructive examples of usage.

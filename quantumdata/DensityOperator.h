@@ -37,7 +37,7 @@ double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm
 
 /// Density operator of arbitrary arity
 /**
- * Cf. \ref quantumdatahighlevel
+ * Cf. \ref quantumdatahighlevel "rationale"
  * 
  * \tparamRANK
  * 

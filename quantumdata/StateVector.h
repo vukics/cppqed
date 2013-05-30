@@ -43,7 +43,7 @@ braket(const StateVector<RANK>&, const StateVector<RANK>&);
 
 /// State vector of arbitrary arity
 /**
- * Cf. \ref quantumdatahighlevel
+ * Cf. \ref quantumdatahighlevel "rationale"
  * 
  * \tparamRANK
  * 

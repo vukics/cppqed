@@ -1908,3 +1908,4 @@ DOT_CLEANUP            = YES
 ALIASES += tparamRANK="\tparam RANK arity of the Hilbert space"
 ALIASES += briefFile{1}="\file \n \brief \1"
 ALIASES += briefFileDefault="\briefFile{Defines class of the same name}"
+ALIASES += Semantics="\par Semantics"
