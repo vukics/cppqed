@@ -86,7 +86,7 @@ template <typename V> using ResCArray=CArray<Size<V>::value>;
 
 template <typename V, bool IS_CONST> using ConditionalConstResCArray=ConditionalConstCArray<Size<V>::value,IS_CONST>;
 
-template <int RANK, typename V, bool IS_CONST> using ForwardIteratorHelper=boost::forward_iterator_helper<Iterator<RANK,V,IS_CONST>,ConditionalConstResCArray<V,IS_CONST> >;
+template <typename I, typename V, bool IS_CONST> using ForwardIteratorHelper=boost::forward_iterator_helper<I,ConditionalConstResCArray<V,IS_CONST> >;
 
 template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::value>; // note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
 
@@ -227,16 +227,36 @@ class Base;
  * - iterations over (multi)matrix rows and columns to get (multi)vectors
  * - quantumdata::ldo::DiagonalIterator
  * 
- * This said, it is never really used directly in the framework, but rather through the maker functions below in standard or
+ * This said, it is never really used directly in the framework, but rather through the maker functions
+ * blitzplusplus::basi::begin, blitzplusplus::basi::end, and blitzplusplus::basi::fullRange in standard or
  * [Boost.Range algorithms](http://www.boost.org/doc/libs/1_53_0/libs/range/doc/html/range/reference/algorithms.html).
  * 
  * Quite generally, by iterating through all the combinations of indeces *not* belonging to the given subsystem (dummy indeces) and when dereferenced returning the corresponding slice,
  * it can be used to implement the action of operators in extended (and/or permutated) Hilbert spaces.
- *  
+ * 
+ * \Semantics
+ * 
+ * Sticking to the example \ref retainedindexpositionsdefined "above", assume that the function
+ * ~~~
+ * void actWithA(CArray<5>&);
+ * ~~~
+ * implements the action of the operator \f$A\f$ on a state vector of rank 5. Then the action on the extended Hilbert space can be calculated as
+ * ~~~
+ * void actOnExtended(CArray<11>& psi)
+ * {
+ *   boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<3,6,1,9,7> >(psi),
+ *                   actWithA);
+ * }
+ * ~~~
+ * 
+ * \see blitzplusplus::basi::fullRange and the [`for_each` algorithm of Boost.Range](http://www.boost.org/doc/libs/1_53_0/libs/range/doc/html/range/reference/algorithms/non_mutating/for_each.html).
+ * 
+ * For further basic examples of usage cf. `utils/testsuite/BlitzArraySliceIterator.cc` & `utils/testsuite/BlitzArraySliceIteratorTMP.cc`.
+ * 
  */
 template<int RANK, typename V, bool IS_CONST>
 class Iterator 
-  : public ForwardIteratorHelper<RANK,V,IS_CONST>, // The inheritance has to be public here because of types necessary to inherit
+  : public ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>, // The inheritance has to be public here because of types necessary to inherit
     public BASE_class,
     private details::ConsistencyChecker<RANK,V>
 {
@@ -255,7 +275,6 @@ public:
   Iterator(CcCA& array, boost::mpl::bool_<IS_END> isEnd) : Base(array,isEnd) {}
 
 };
-
 
 
 #define NS_NAME basi
@@ -415,7 +434,7 @@ namespace basi_fast {
 
 template<int RANK, typename V, bool IS_CONST>
 class Iterator 
-  : public basi::ForwardIteratorHelper<RANK,V,IS_CONST>
+  : public basi::ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>
 {
 public:
   typedef basi::ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
@@ -461,6 +480,75 @@ private:
 
 } // basi_fast
 
+
+namespace basi {
+
+/// Iterator to the beginning of the sequence
+//@{
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,true>
+begin(const A& array );
+
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,false>
+begin(      A& array );
+//@}
+
+/// Iterator to the end of the sequence
+//@{
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,true>
+end (const A& array );
+
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,false>
+end (      A& array );
+//@}
+
+/// [Boost.Range](http://www.boost.org/doc/libs/1_53_0/libs/range/doc/html/range/reference/utilities/iterator_range.html)-compliant full range of slice iterators
+/** It corresponds to all the possible combinations of dummy indices (\f$\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\f$…) \ref retainedindexpositionsdefined "above". */
+//@{
+template<typename V, typename A>
+const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,true> >
+fullRange(const A& array );
+
+template<typename V, typename A>
+const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,false> >
+fullRange(      A& array );
+//@}
+
+} // basi
+
+namespace basi_fast {
+
+/// Same as blitzplusplus::basi::begin, blitzplusplus::basi::end, and blitzplusplus::basi::fullRange, respectively, but here they return “fast” Iterator instances.
+//@{
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,true>
+begin(const A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,true>
+end (const A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,false>
+begin(     A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+
+template<typename V, typename A>
+const Iterator<ArrayRankTraits<A>::value,V,false>
+end (      A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+
+template<typename V, typename A>
+const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,true> >
+fullRange(const A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+
+template<typename V, typename A>
+const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,false> >
+fullRange(      A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+//@}
+
+} // basi_fast
 
 } // blitzplusplus
 
