@@ -77,11 +77,7 @@ fullRange(      A& array );
 
 namespace basi {
 
-namespace details {
-
 template<int RANK, typename S> struct ConsistencyChecker<RANK,blitzplusplus::vfmsi::LeftRight<RANK/2,S> > {};
-
-} // details
 
 } // basi
 

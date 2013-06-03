@@ -203,7 +203,7 @@ private:
     template<bool IS_END>
     static MII ctorHelper(const DensityOperator<RANK>& rho)
     {
-      using blitzplusplus::basi::details::filterOut;
+      using blitzplusplus::basi::filterOut;
       using blitzplusplus::halfCutTiny;
       
       return MII(filterOut<RANK,V>(halfCutTiny(rho().lbound())),

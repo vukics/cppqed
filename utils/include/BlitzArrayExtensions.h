@@ -51,7 +51,7 @@ class BinaryArrayOrderingErrorException : public cpputils::Exception {};
  * Violation is detected @ compile time by tmptools::IsEvenAssert.
  * 
  * The same requirement of contiguity an the same warning applies as for unaryArray, and in addition, further assumptions
- * on the storage order must be made: The storage of the two multi-indeces must not be intertwined and must be layed out
+ * on the storage order must be made: The storage of the two multi-indices must not be intertwined and must be layed out
  * in the same way, so that e.g. for `RANK=4`, the member function `array.ordering()` should return an octary tiny vector like:
  * 
  *     <1 3 2 0 | 5 7 6 4>

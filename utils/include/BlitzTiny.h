@@ -15,8 +15,10 @@ namespace blitzplusplus {
 template<typename V>
 struct TinyVectorLengthTraits;
 
+/** \cond */
 template<typename T, int LENGTH>
 struct TinyVectorLengthTraits<blitz::TinyVector<T,LENGTH> > : boost::mpl::int_<LENGTH> {};
+/** \endcond */
 
 
 } // blitzplusplus

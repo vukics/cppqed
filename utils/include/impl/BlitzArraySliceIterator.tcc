@@ -55,6 +55,9 @@ private:
 };
 
 
+} // details
+
+
 template<int RANK, typename V>
 const VecIdxTiny<RANK,V>
 filterOut(const IdxTiny<RANK>& v)
@@ -65,7 +68,7 @@ filterOut(const IdxTiny<RANK>& v)
   VecIdxTiny<RANK,V> res;
 
   {
-    FilterOut<RANK,V> helper(v,res);
+    details::FilterOut<RANK,V> helper(v,res);
     for_each<filter_view<Ordinals<RANK>,not_<numerical_contains<V,_> > > >(helper);
   }
 
@@ -79,6 +82,8 @@ filterOut(const IdxTiny<RANK>& v)
 // Ctor implementations
 //
 ///////////////////////
+
+namespace details {
 
 
 template<int RANK, typename V, bool IS_CONST>
@@ -210,6 +215,8 @@ typename IndexerBase<RANK,V>::Idx IndexerBase<RANK,V>::cache_;
 ////////////////////////////
 
 
+/// [A metaprogramming example]
+
 namespace namehider {
 
 using namespace boost::mpl;
@@ -237,13 +244,11 @@ struct Algorithm
 } // namehider
 
 
-
-
-
 template<int RANK, typename V>
 struct TransposerMeta : boost::mpl::first<typename namehider::Algorithm<RANK,V>::type>
 {};
 
+/// [A metaprogramming example]
 
 } // details
 
@@ -256,7 +261,7 @@ struct TransposerMeta : boost::mpl::first<typename namehider::Algorithm<RANK,V>:
 
 template<int RANK, typename V>
 const RETURN_type
-SlicesData<RANK,V>::ctorHelper(const CArray& array)
+SlicesData<RANK,V>::ctorHelper(const CArray<RANK>& array)
 {
   struct Helper {
     static ptrdiff_t doIt(const basi::ResCArray<V>& slice, const dcomp* dc)
@@ -274,7 +279,7 @@ SlicesData<RANK,V>::ctorHelper(const CArray& array)
 
 
 template<int RANK, typename V>
-SlicesData<RANK,V>::SlicesData(const CArray& array)
+SlicesData<RANK,V>::SlicesData(const CArray<RANK>& array)
   : firstOffsets_(ctorHelper(array)),
     shape_  (basi::begin<V>(array)->shape   ()),
     stride_ (basi::begin<V>(array)->stride  ()),

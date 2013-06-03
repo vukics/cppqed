@@ -21,12 +21,12 @@ namespace ldo {
   
 /** \page slicinganldo Slicing a LazyDensityOperator
  * 
- * Analogously to \ref basiSlicing "slicing state vectors", it is also necessary to slice LazyDensityOperator objects
+ * Analogously to \ref multiarrayconcept "slicing state vectors", it is also necessary to slice LazyDensityOperator objects
  * because for calculating quantum expectation values of subsystem-observables (e.g. in Composite objects),
  * the partial-trace density operator is needed.
  * 
- * For the partial trace, however, only such elements of the full density operator are needed as are diagonal in the indeces *not* belonging
- * to the given subsystem (dummy indeces). This is the reason why the tool performing the iteration is called DiagonalIterator.
+ * For the partial trace, however, only such elements of the full density operator are needed as are diagonal in the indices *not* belonging
+ * to the given subsystem (dummy indices). This is the reason why the tool performing the iteration is called DiagonalIterator.
  *
  * Slicing is fully recursive, a sliced LazyDensityOperator (usually obtained by dereferencing a DiagonalIterator) can be further sliced.
  * 
@@ -50,12 +50,12 @@ namespace ldo {
 #define INPUT_IteratorHelper boost::input_iterator_helper<DiagonalIterator<RANK,V>,const LazyDensityOperator<mpl::size<V>::value> >
 
 
-/// Iterator for slices of a LazyDensityOperator that are diagonal in the dummy indeces
+/// Iterator for slices of a LazyDensityOperator that are diagonal in the dummy indices
 /**
  * Cf. \ref slicinganldo "rationale"
  * 
  * \tparam RANK arity of the full (unsliced) Hilbert space
- * \tparam V Compile-time vector holding the *retained index positions*.
+ * \tparamV
  * 
  * It's inherently a const iterator since LazyDensityOperator is immutable.
  * Models an [InputIterator](http://www.cplusplus.com/reference/std/iterator/InputIterator/), implemented with the help of

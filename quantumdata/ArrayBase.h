@@ -69,7 +69,7 @@ protected:
   /// The entrywise array norm
   /**
    * \f[\norm A _{\text{F}}=\sqrt{\sum_i\,\abs{A_i}^2},\f]
-   * with \f$i\f$ running through all the multi-indeces.
+   * with \f$i\f$ running through all the multi-indices.
    */
   double frobeniusNorm() const {return sqrt(sum(blitzplusplus::sqrAbs(arrayLow_)));}
 

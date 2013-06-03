@@ -27,7 +27,7 @@ namespace quantumdata {
 /**
  * On higher levels of the framework (cf. eg. BinarySystem, Composite), this function is used exclusively for performing LazyDensityOperator slice iteration.
  * 
- * \tparam V a compile-time vector defining the *retained index positions* of the slice
+ * \tparamV
  * \tparam T an arithmetic type which must be default-constructible
  * \tparam F a callable type with signature `const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)`. This signature is equivalent to `const T(const LazyDensityOperator<mpl::size<V>::value>&)`.
  * 
@@ -79,9 +79,9 @@ public:
 
   /// \name Slicing-related functionality
   //@{
-    /// Return the DiagonalIterator corresponding to the beginning/end of the sequence of slices defined by `V` 
+    /// Return the ldo::DiagonalIterator corresponding to the beginning/end of the sequence of slices defined by `V` 
     /** Cf. \ref slicinganldo "rationale"
-     * \tparam V Compile-time vector holding the *retained index positions*.
+     * \tparamV
      */
   template<typename V>
   const ldo::DiagonalIterator<RANK,V> begin() const; 
@@ -159,7 +159,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
  * 
  * \Semantics
  * 
- * The function iterates through all the combinations of the dummy indeces, for each slice it takes the value returned by the functor `function`, and accumulates these values.
+ * The function iterates through all the combinations of the dummy indices, for each slice it takes the value returned by the functor `function`, and accumulates these values.
  * In the following we give some instructive examples of usage.
  * 
  * - *Calculating the full partial density operator of a unary subsystem*: 

@@ -15,17 +15,19 @@
 namespace blitzplusplus {
 
 
+struct ShallowCopy {}; // For referencing constructors
+struct DeepCopy    {}; // For copying     constructors
+
+
 // A wrapper for blitz::Array::rank_; which did change from the CVS (where it used to be called _bz_rank) to the Mercurial version.
 template<typename A>
 struct ArrayRankTraits;
 
+/** \cond */
+
 template<typename T, int RANK>
 struct ArrayRankTraits<blitz::Array<T,RANK> > : boost::mpl::int_<RANK> {};
 
-
-
-struct ShallowCopy {}; // For referencing constructors
-struct DeepCopy    {}; // For copying     constructors
 
 
 // The semantics of the "DeepCopy" of Array is different from blitz::Array in that the storage order is NOT copied but rather a user-specified (by default the C) storage order is applied in the copy. I believe it is more in line with the fact that usually the way we think about the storage in Array is the C way.
@@ -56,6 +58,7 @@ public:
 
 };
 
+/** \endcond */
 
 } // blitzplusplus
 

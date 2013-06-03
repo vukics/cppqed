@@ -86,6 +86,7 @@ struct TensorType : mpl::identity<NonOrthogonalStateVector<SV1::N_RANK+SV2::N_RA
 };
 
 
+/** \cond */
 template<typename SV1, int RANK2>
 struct TensorType<SV1,StateVector<RANK2> > 
   : mpl::identity<NonOrthogonalStateVector<SV1::N_RANK+RANK2,
@@ -102,6 +103,7 @@ struct TensorType<StateVector<RANK1>,SV2>
                                                                             typename SV2::Trafo>::type> >
 {
 };
+/** \endcond */
 
 
 
@@ -157,7 +159,7 @@ operator*(const StateVector<RANK1>& sv1, const NonOrthogonalStateVector<RANK2,TR
  * \f[g_{ij}\equiv\braket{i}{j}\f]
  * is nondiagonal. The contravariant components of a state vector \f$\ket\Psi\f$ are then defined as the expansion coefficients
  * \f[\ket\Psi\equiv\Psi^i\ket{i},\f]
- * where we have adopted the convention that there is summation for indeces appearing twice. In this case one index has to be down, while the other one up, 
+ * where we have adopted the convention that there is summation for indices appearing twice. In this case one index has to be down, while the other one up, 
  * otherwise we have as it were a syntax error. This ensures that the result is independent of the choice of basis, as one would very well expect 
  * e.g. from the trace of an operator. The covariant components are the projections
  * \f[\Psi_i\equiv\braket{i}\Psi.\f]
@@ -169,7 +171,7 @@ operator*(const StateVector<RANK1>& sv1, const NonOrthogonalStateVector<RANK2,TR
  * \f[\ket\Phi\equiv A\ket\Psi=\Psi^jA\ket{j},\f]
  * multiplying from the left by \f$\bra{i}\f$ yields
  * \f[\Phi_i=\bra iA\ket j\Psi^j\equiv A_{ij}\Psi^j.\f]
- * While the definition of the up-indeces matrix of the operator can be read from
+ * While the definition of the up-indices matrix of the operator can be read from
  * \f[\Phi=\Phi^i\ket i\equiv A^{ij}\Psi_j\ket{i}=A^{ij}\braket{j}\Psi\ket{i}=\lp A^{ij}\ket{i}\bra{j}\rp\ket\Psi=A\ket\Psi.\f]
  * 
  * #### Hermitian conjugation

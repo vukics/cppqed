@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFile{definition of blitzplusplus::basi::Iterator together with its helpers}
+/// \briefFile{Definition of blitzplusplus::basi::Iterator together with its helpers}
 
 /** \page multiarrayconcept The multi-array concept
  * 
@@ -77,7 +77,7 @@ namespace blitzplusplus {
 /// The name of the namespace stands for <strong>B</strong>litz<strong>A</strong>rray<strong>S</strong>lice<strong>I</strong>terator
 namespace basi {
 
-
+/// A forwarding metafunction to boost::mpl::size
 template <typename V> struct Size : boost::mpl::size<V> {};
 
 template <int RANK, bool IS_CONST> using ConditionalConstCArray=typename tmptools::ConditionalAddConst<CArray<RANK>,IS_CONST>::type;
@@ -88,15 +88,24 @@ template <typename V, bool IS_CONST> using ConditionalConstResCArray=Conditional
 
 template <typename I, typename V, bool IS_CONST> using ForwardIteratorHelper=boost::forward_iterator_helper<I,ConditionalConstResCArray<V,IS_CONST> >;
 
-template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::value>; // note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
+template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::value>; 
+// note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
 
 
 using cpputils::mii::Begin; using cpputils::mii::End;
 
 
-namespace details {
-
-
+/// Checking the consistency of template arguments for use in slicing
+/** 
+ * Implemented via the static assertion BOOST_MPL_ASSERT_MSG from [Boost.MPL](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/assert.html)
+ * 
+ * - size of `V` must not be larger than `RANK`
+ * - `V` must not contain duplicated elements
+ * - all elements of `V` must be smaller than `RANK`
+ * 
+ * \see \ref specifyingsubsystems
+ * 
+ */
 template<int RANK, typename V> struct ConsistencyChecker
 {
   BOOST_MPL_ASSERT_MSG( RANK >= Size<V>::value, INDEXER_with_NONPOSITIVE_RANK, () );
@@ -118,22 +127,31 @@ template<int RANK, typename V> struct ConsistencyChecker
 };
 
 
-
-// Specializations: boost::mpl::range_c cannot be sorted
+/// Specializations necessary since boost::mpl::range_c cannot be sorted
 template<int RANK, int I1, int I2>  struct ConsistencyChecker<RANK,boost::mpl::range_c<int,I1,I2> >
 { BOOST_MPL_ASSERT_MSG( ( I1>=0 && I2<RANK ), BASI_ITERATOR_VECTOR_OUT_of_RANGE, ( boost::mpl::range_c<int,I1,I2> ) ) ; };
 
+/** \cond */
 template<int RANK, int N, int Nbeg> struct ConsistencyChecker<RANK,tmptools::Range<N,Nbeg> > : private ConsistencyChecker<RANK,boost::mpl::range_c<int,Nbeg,Nbeg+N> > {};
 template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ordinals<N>   > : private ConsistencyChecker<RANK,tmptools::  Range  <N,0>             > {};
+/** \endcond */
 
 
 
+/// Filters out the indeces corresponding to a subsystem
+/**
+ * \tparamRANK
+ * \tparam V compile-time vector specifying the subsystem (cf. \ref specifyingsubsystems)
+ * 
+ * \param idx the indeces to be filtered (of number `RANK`)
+ * 
+ * \return the indeces *not* contained by the subsystem specified by `V` (of number `RANK-Size<V>::value`)
+ * 
+ */
 template<int RANK, typename V>
 const VecIdxTiny<RANK,V>
-filterOut(const IdxTiny<RANK>&);
+filterOut(const IdxTiny<RANK>& idx);
 
-
-} // details
 
 
 /////////////////////////////////
@@ -142,35 +160,107 @@ filterOut(const IdxTiny<RANK>&);
 //
 /////////////////////////////////
 
-// These are just rudimentary definitions, the actual definitions are as partial specializations (cf. details/IndexerImplementationsSpecializations.h)
-// The functions will throw if 
 
+/**
+ * \defgroup helperstoiterator Helpers to BlitzArraySliceIterator
+ * 
+ * Sometimes used on their own as well, so they are exposed in the header file.
+ * 
+ * \tparamRANK \tparamV
+ * 
+ * \pre `Size<V> <= RANK`
+ * 
+ * The technique of using (non-templated) static worker functions of class templates is meant to allow partial specializations, which are not possible for function templates.
+ * 
+ * \internal These are just rudimentary definitions, the actual definitions being partial specializations of Transposer::transpose and Indexer::index along RANK 
+ * (cf. trailing part of `impl/BlitzArraySliceIterator.tcc`) The functions will throw if a partial specialization for the given RANK does not exist. \endinternal
+ * 
+ * \see \ref iteratorimplementation
+ * 
+ * @{
+ */
+
+/// Exception thrown if the partial specialization of Transposer or Indexer for the given RANK does not exist.
+template<int RANK>
 class TransposerOrIndexerRankTooHighException : public cpputils::Exception {};
 
+/// Class performing the “possible permutation” of the retained indices (cf. \ref multiarrayconcept "Synopsis").
 template<int RANK, typename V>
 class Transposer
 {
 public:
+  /// Static worker
+  /**
+   * Transposition corresponding to the "possible permutation" of the retained indices (cf. \ref multiarrayconcept "Synopsis"), which is necessary in order that \f$\avr{1,3,6,7,9}\f$
+   * be the corresponding state vector slice, since this is how it is expected in applications. Cf. Composite for further explanations.
+   * 
+   * \return Simply the reference to the function argument.
+   * 
+   * \par Semantics
+   * ~~~
+   * static const int RANK=11;
+   * 
+   * CArray<RANK> psi;
+   * 
+   * typedef tmptools::Vector<3,6,1,9,7> Vec;
+   * 
+   * Transposer<RANK,Vec>::transpose(psi);
+   * ~~~
+   * is equivalent to ::
+   * ~~~
+   * psi.transposeSelf(0,3,2,6,4,5,1,9,8,7,10);
+   * ~~~
+   * that is, in place of the indices specified by the elements of the compile-time vector `Vec`, the elements of `Vec` are put, but in the *order* specified by `Vec`.
+   */
   static 
   CArray<RANK>&
-  transpose(CArray<RANK>&) {throw TransposerOrIndexerRankTooHighException();}
+  transpose(CArray<RANK>&)
+  {throw TransposerOrIndexerRankTooHighException<RANK>();}
 
 };
 
 
+/// Performs the slicing on an array already transposed by Transposer.
 template<int RANK, typename V>
 class Indexer : public Transposer<RANK,V>
 {
 public:
+  /// Static worker
+  /**
+   * \param array The array to be sliced.
+   * \param resArray The array storing the result.
+   * \param idx Set of dummy indices.
+   * 
+   * \return Reference to resArray
+   * 
+   * \par Semantics
+   * ~~~
+   * static const int RANK=11;
+   * 
+   * CArray<RANK> psi;
+   * 
+   * typedef tmptools::Vector<3,6,1,9,7> Vec;
+   * 
+   * ResCArray<Vec> psiRes;
+   * 
+   * VecIdxTiny<RANK,Vec> idxTiny;
+   * 
+   * Indexer<RANK,Vec>::index(psi,psiRes,idxTiny);
+   * ~~~
+   * is equivalent to
+   * ~~~
+   * const blitz::Range a(blitz::Range::all());
+   * psiRes.reference(psi(0,a,2,a,4,5,a,a,8,a,10));
+   * ~~~
+   */
   static
   ResCArray<V>&
-  index(CArray<RANK>&,
-        ResCArray<V>&,
-        const VecIdxTiny<RANK,V>&) {throw TransposerOrIndexerRankTooHighException();}
+  index(CArray<RANK>& array, ResCArray<V>& resArray, const VecIdxTiny<RANK,V>& idx)
+  {throw TransposerOrIndexerRankTooHighException<RANK>();}
 
 };
 
-
+/** @} */
 
 
 //////////////////////////
@@ -179,10 +269,7 @@ public:
 //
 //////////////////////////
 
-// Think over: is the following solution based on inheritance to solve
-// the specialization problem optimal?  Note: this is NOT allowed
-// (specialization depending on a template parameter)
-
+// Think over: is the following solution based on inheritance to solve the specialization problem optimal?  Note: this is NOT allowed (specialization depending on a template parameter)
 // template<typename V, bool IS_CONST> Iterator<Size<V>::value,V,IS_CONST>;
 
 namespace details {
@@ -209,11 +296,7 @@ class Base;
 /// BlitzArraySliceIterator
 /**
  * \tparam RANK positive integer standing for the number of elementary Hilbert spaces
- * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$ \ref retainedindexpositionsdefined "above". Example models: tmptools::Vector and `mpl::range_c` from 
- *           [Boost.MPL](http://www.boost.org/doc/libs/1_44_0/libs/mpl/doc/refmanual/range-c.html). `mpl::size<V>::value` must not be larger than `RANK`.
- *           `V` must not “contain” negative values, values not smaller than `RANK`, and duplicate values. These are checked for at compile time,
- *           and any violation is signalled by more or less intelligent compiler errors generated with the help of
- *           [Boost.MPL's static assertions](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/asserts.html).
+ * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$ \ref retainedindexpositionsdefined "above". (Cf. \ref specifyingsubsystems)
  * \tparam IS_CONST governs the constness of the class
  * 
  * To understand the template parameters, cf. also \ref multiarrayconcept.
@@ -231,7 +314,7 @@ class Base;
  * blitzplusplus::basi::begin, blitzplusplus::basi::end, and blitzplusplus::basi::fullRange in standard or
  * [Boost.Range algorithms](http://www.boost.org/doc/libs/1_53_0/libs/range/doc/html/range/reference/algorithms.html).
  * 
- * Quite generally, by iterating through all the combinations of indeces *not* belonging to the given subsystem (dummy indeces) and when dereferenced returning the corresponding slice,
+ * Quite generally, by iterating through all the combinations of indices *not* belonging to the given subsystem (dummy indices) and when dereferenced returning the corresponding slice,
  * it can be used to implement the action of operators in extended (and/or permutated) Hilbert spaces.
  * 
  * \Semantics
@@ -249,28 +332,32 @@ class Base;
  * }
  * ~~~
  * 
- * \see blitzplusplus::basi::fullRange and the [`for_each` algorithm of Boost.Range](http://www.boost.org/doc/libs/1_53_0/libs/range/doc/html/range/reference/algorithms/non_mutating/for_each.html).
+ * \see blitzplusplus::basi::fullRange and the `for_each` algorithm of [Boost.Range](http://www.boost.org/doc/libs/1_53_0/libs/range/doc/html/range/reference/algorithms/non_mutating/for_each.html).
  * 
  * For further basic examples of usage cf. `utils/testsuite/BlitzArraySliceIterator.cc` & `utils/testsuite/BlitzArraySliceIteratorTMP.cc`.
+ * 
+ * \see \ref iteratorimplementation
  * 
  */
 template<int RANK, typename V, bool IS_CONST>
 class Iterator 
   : public ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>, // The inheritance has to be public here because of types necessary to inherit
     public BASE_class,
-    private details::ConsistencyChecker<RANK,V>
+    private ConsistencyChecker<RANK,V>
 {
 public:
   typedef typename BASE_class Base;
 
 #undef  BASE_class
 
-  typedef typename Base::CcCA CcCA;
+  typedef typename Base::CcCA CcCA; ///< ConditionalConstCArray
 
-  typedef boost::iterator_range<Iterator> Range;
+  typedef boost::iterator_range<Iterator> Range; ///< Boost.Range-compliant range
 
-  Iterator& operator++() {Base::increment(); return *this;}
+  Iterator& operator++() {Base::increment(); return *this;} ///< For the ForwardIterator concept
 
+  /// Can be initialized either to the beginning or the end of the sequence of dummy-index combinations
+  /** \tparam IS_END governs the end-ness */
   template<bool IS_END>
   Iterator(CcCA& array, boost::mpl::bool_<IS_END> isEnd) : Base(array,isEnd) {}
 
@@ -292,10 +379,9 @@ namespace details {
 //
 ///////
 
-
+/// Generic worker base for Iterator
 template<int RANK, typename V, bool IS_CONST>
-class Base : public Indexer<RANK,V>
-// This inheritance is only to facilitate use in LazyDensityOperatorSliceIterator, and similar situations. The same does not appear necessary for BaseSpecial
+class Base : public Indexer<RANK,V> ///< This inheritance is only to facilitate use in LazyDensityOperatorSliceIterator, and similar situations. The same does not appear necessary for BaseSpecial
 {
 public:
   typedef CArray<RANK>                         CA   ;
@@ -315,9 +401,7 @@ public:
   void increment() {++impl_;}
 
   CcCARes& operator*() const {return Indexer<RANK,V>::index(array_,arrayRes_,*impl_);}
-  // This has to return a reference, cf eg
-  // ElementLiovillean::JumpStrategy takes its argument as a non-const
-  // reference!!! Or, it has to take a copy there...
+  // This has to return a reference, cf eg. ElementLiovillean::JumpStrategy takes its argument as a non-const reference. Or, it has to take a copy there...
 
   friend bool operator==(const Base& i1, const Base& i2) {return i1.impl_==i2.impl_ /* && i1.array_==i2.array_ */;}
   // The user has to ensure that the two arrays are actually the same
@@ -329,9 +413,7 @@ private:
   static Impl ctorHelper(CcCA&);
 
   mutable CA array_;
-  // By value, so that the necessary transposition specified by V can
-  // be readily performed.
-  // In this case, however, neither stored array can ever be const.
+  // By value, so that the necessary transposition specified by V can be readily performed. In this case, however, neither stored array can ever be const.
 
   mutable CARes arrayRes_;
 
@@ -349,13 +431,14 @@ private:
 class OutOfRange : public cpputils::Exception {};
 
 
+/// used in the case when `Size<V> = RANK` and when `RANK = 1`
 template<typename V, bool IS_CONST>
 class BaseTrivial
 {
 public:
   static const int RANK=Size<V>::value;
 
-  typedef CArray<RANK>                          CA;
+  typedef CArray<RANK>                             CA;
   typedef ConditionalConstCArray<RANK,IS_CONST>  CcCA;
 
   BaseTrivial(CcCA&, Begin); // if it's not the end, it's the beginning
@@ -381,6 +464,7 @@ private:
 //
 //////////////
 
+/// used in the case when `Size<V> = RANK`
 template<typename V, bool IS_CONST>
 class BaseSpecial : public BaseTrivial<V,IS_CONST>
 {
@@ -398,24 +482,35 @@ public:
 
 
 
-
+/// Contains data for pre-calculated slices for basi_fast::Iterator
+/**
+ * This is most useful in situations where the same structure of slices is needed for several arrays of the same structure or several times for the same array.
+ * Then, the data necessary for slicing calculated once, can be used for the different arrays.
+ * 
+ * Another positive is the easy implementation of basi_fast::Iterator, which basically only needs to iterate over the data of the different slices.
+ * Depending on the data structure SlicesData::Impl, basi_fast::Iterator can be of different categories. (E.g. bidirectional iterator for a list,
+ * but random-access iterator for a vector.)
+ * 
+ * The drawback is less convenient usage than that of basi::Iterator, since here a separated instance of SlicesData must be stored.
+ * 
+ * \tparamRANK \tparamV
+ * 
+ */
 template<int RANK, typename V>
 class SlicesData
 {
 public:
-  typedef SlicesData<RANK,V> type;
-
-  typedef CArray<RANK> CArray;
-
-  typedef std::list<ptrdiff_t> Impl;
+  typedef std::list<ptrdiff_t> Impl; ///< Data structure for the sequence of slices
 
   friend class basi_fast::Iterator<RANK,V, true>;
   friend class basi_fast::Iterator<RANK,V,false>;
 
-  SlicesData(const CArray&);
+  /// Constructor from a reference array
+  /** \param array reference array showing the structure for which the slicing is envisaged */
+  SlicesData(const CArray<RANK>& array);
 
 private:
-  static const Impl ctorHelper(const CArray&);
+  static const Impl ctorHelper(const CArray<RANK>&);
 
   const Impl firstOffsets_;
 
@@ -431,7 +526,15 @@ private:
 /// Contains a “fast” version of BlitzArraySliceIterator
 namespace basi_fast {
 
-
+/// “Fast” version of basi::Iterator relying on a pre-calculated set of slices stored by SlicesData
+/**
+ * Structure analogous to basi::Iterator.
+ * 
+ * \tparamRANK \tparamV
+ * 
+ * \see SlicesData
+ * 
+ */
 template<int RANK, typename V, bool IS_CONST>
 class Iterator 
   : public basi::ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>
@@ -550,7 +653,102 @@ fullRange(      A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
 
 } // basi_fast
 
+
+namespace basi {
+
+/** \page iteratorimplementation Notes on the implementation of Iterator
+ * 
+ * Transposer and Indexer are implemented in such a way that a partial template specialization is provided for each possible `RANK` (up to BLITZ_ARRAY_LARGEST_RANK), 
+ * and the corresponding code is automatically generated by the [Boost.Preprocessor](http://www.boost.org/doc/libs/1_53_0/libs/preprocessor/doc/index.html) library.
+ * This can be seen in the trailing part of impl/BlitzArraySliceIterator.tcc. To actually see what code is generated, this file needs to be preprocessed.
+ * Issue the following command from the root directory of the distribution:
+ * ~~~{.sh}
+ * g++ -P -E -Iutils/include/ utils/include/impl/BlitzArraySliceIterator.tcc | tail -n286
+ * ~~~
+ * To store and manipulate the heterogenous collection of slicing indeces like `0,a,2,a,4,5,a,a,8,a,10` in Indexer::index, the `vector` class of the 
+ * [Boost.Fusion](http://www.boost.org/doc/libs/1_53_0/libs/fusion/doc/html/index.html) library is used.
+ * 
+ * Iterator is implemented in terms of the above two helper classes. Each Iterator invokes a Transposer::transpose at its construction, and – if `RANK` is larger
+ * than `Size<V>::value` – an Indexer::index @ the point of its dereferencing when the actual slicing occurs.
+ * 
+ * Iterator is a forward iterator, implemented with the help of `forward_iterator_helper` from
+ * [Boost.Operator](http://www.boost.org/doc/libs/1_53_0/libs/utility/operators.htm#iterator). For this to work, we need to define only 3 operations:
+ * -# Comparison for equality
+ * -# Prefix increment
+ * -# Dereferencing
+ * A special implementation is needed when the size of the compile-time vector `V` equals `RANK` because in this case actually no slicing takes place,
+ * only transposition. For this, as at several other places in the framework, we apply conditional inheritance: Iterator inherits from either of two classes 
+ * (details::Base or details::BaseSpecial), the decision being made @ compile time with the help of `boost::mpl::if_c`.
+ * 
+ * The iteration over dummy indeces is implemented with the help of cpputils::MultiIndexIterator.
+ * 
+ * ### A metaprogramming example
+ * 
+ * In the following we analyse a metaprogramming example typical for the framework: how the compile-time vector `0,3,2,6,4,5,1,9,8,7,10`
+ * for the self-transposition in Transposer::transpose is prepared.
+ * 
+ * This is done by the following snippet in `utils/include/impl/BlitzArraySliceIterator.tcc`:
+ * \snippet utils/include/impl/BlitzArraySliceIterator.tcc A metaprogramming example
+ * \par Line 9:
+ * We are using the `fold` metaalgorithm from [Boost.MPL](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/fold.html).
+ * Here, it iterates over the sequence of ordinals (tmptools::Ordinals) between `0` and `RANK-1`.
+ * \par Line 10:
+ * The initial state for the fold algorithm is an empty [compile-time vector of integers](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/vector-c.html)
+ * and the [iterator](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/begin.html) pointing to the first element of the compile-time vector `V`. 
+ * These two are “zipped” into a [compile-time pair](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/pair.html).
+ * At the end, the first element of this pair will hold the result.
+ * \par Lines 11-21
+ * express the forward operation of the fold algorithm in the form of a 
+ * [compile-time lambda expression](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/tutorial/handling-placeholders.html).
+ * After each step, the new state will again be a pair composed of
+ * -# (Lines 11-16:) the vector is [augmented](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/push-back.html) either by the current element in `V`
+ *    pointed to by the iterator (Line 13), or the current ordinal (Line 14), depending on whether `V` tmptools::numerical_contains this ordinal.
+ * -# (Lines 17-20:) the iterator is [advanced](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/next.html) (Line 18) if the same numerical containment
+ *    criterion is met, otherwise it is left untouched for the same element to be considered again (Line 19).
+ *    \note Note that in template metaprogramming, “calling” tmptools::numerical_contains<V,mpl::_2> twice is no waste because the second time no further template 
+ * instantiations are needed, the compiler will use the ones already instantiated the first time.
+ * \par Line 28:
+ * the [first element](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/trivial-metafunctions-summary.html#first) of the resulting pair
+ * of the above algorithm is picked. As it is easy to verify,
+ * ~~~
+ * TransposerMeta<11,tmptools::Vector<3,6,1,9,7> >::type
+ * ~~~
+ * will be an
+ * ~~~
+ * mpl::vector_c<int,0,3,2,6,4,5,1,9,8,7,10>
+ * ~~~  
+ */
+
+/** \page specifyingsubsystems Specifying subsystems
+ * 
+ * Many constructs in the framework require the specification of a subsystem of a multiary quantum system @ compile time. The main example is retained index positions for slicing
+ * (cf. \ref multiarrayconcept). It is the template parameter `V`, a compile-time sequence, that specifies the subsystem.
+ * 
+ * \par Example models
+ * 
+ * tmptools::Vector and `mpl::range_c` from [Boost.MPL](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/range-c.html).
+ * 
+ * \par Preconditions
+ * 
+ * - `Size<V>::value` must not be larger than the arity
+ * - `V` must not “contain”
+ *   - negative values,
+ *   - values not smaller than the arity, and
+ *   - duplicate values.
+ * 
+ * These are checked for @ compile time, and any violation is signalled by more or less intelligent compiler errors generated with the help of
+ * [Boost.MPL's static assertions](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/asserts.html).
+ * 
+ * \see ConsistencyChecker, tmptools::Vector
+ * 
+ */
+
+
+} // basi
+
+
 } // blitzplusplus
+
 
 
 #endif // UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
