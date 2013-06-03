@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// Defines template aliases for `blitz::TinyVector`s used for characterising the size of multi-arrays and indexing them
+/// \briefFile{Defines template aliases for `blitz::TinyVector`s used for characterising the size of multi-arrays and indexing them}
 #ifndef   UTILS_INCLUDE_BLITZTINY_H_INCLUDED
 #define   UTILS_INCLUDE_BLITZTINY_H_INCLUDED
 
@@ -11,7 +11,7 @@
 namespace blitzplusplus {
 
 
-// An indirection for accessing TinyVector's length at compile time.
+/// An indirection for accessing lengths of `blitz::TinyVector` at compile time
 template<typename V>
 struct TinyVectorLengthTraits;
 

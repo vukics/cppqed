@@ -59,7 +59,7 @@ namespace ldo {
  * 
  * It's inherently a const iterator since LazyDensityOperator is immutable.
  * Models an [InputIterator](http://www.cplusplus.com/reference/std/iterator/InputIterator/), implemented with the help of
- * `boost::input_iterator_helper` from [Boost.Operator](http://www.boost.org/doc/libs/1_44_0/libs/utility/operators.htm#iterator>).
+ * \refBoostConstruct{input_iterator_helper,utility/operators.htm#iterator} from Boost.Operator.
  * 
  */
 template<int RANK, typename V>
@@ -100,8 +100,8 @@ public:
   /// Pointer to implementation
   /**
    * We are using the classical inheritance-based pointer-to-implementation technique, together with some compile-time dispatching.
-   * `boost::mpl::eval_if` from [Boost.MPL](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/eval-if.html) here guarantees 
-   * that DI_ImplSpecial gets instantiated only in the special case
+   * \refBoostConstruct{eval_if,mpl/doc/refmanual/eval-if.html} from Boost.MPL here guarantees that `DI_ImplSpecial` gets instantiated
+   * only in the special case
    */
   typedef boost::shared_ptr<typename mpl::eval_if_c<IS_SPECIAL,
                                                     mpl::identity<DI_ImplSpecial>,

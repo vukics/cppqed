@@ -17,7 +17,7 @@ namespace blitzplusplus {
 
 /// Concatenates `tiny1` and `tiny2`
 /**
- * Implemented with the help of the compile-time–runtime facility [boost::mpl::for_each](http://www.boost.org/doc/libs/1_53_0/libs/mpl/doc/refmanual/for-each.html).
+ * Implemented with the help of the compile-time–runtime facility \refBoostConstruct{for_each,mpl/doc/refmanual/for-each.html} from Boost.MPL.
  * 
  * \tparam T1 basic type of one of the operand tiny vectors *and the result*
  * \tparam T2 basic type of the other operand tiny vector. Must be convertible to T1.

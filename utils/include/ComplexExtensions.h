@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Additional helpers for dcomp}
 #ifndef UTILS_INCLUDE_COMPLEXEXTENSIONS_H_INCLUDED
 #define UTILS_INCLUDE_COMPLEXEXTENSIONS_H_INCLUDED
 
@@ -9,9 +10,11 @@
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
+/// Double-precision complex number
+/** Even though it is a type, we name it this way because we would like it to closely resemble built-in types */
 typedef std::complex<double> dcomp;
-// Even though it is a type we name it this way because we would like it to closely resemble built-in types
 
+/// Imaginary unit
 const dcomp DCOMP_I(0,1);
 
 inline bool isNonZero(const dcomp& c) {return bool(real(c)) || bool(imag(c));}

@@ -1,17 +1,17 @@
 #include "CMatrix.h"
 
+
 namespace linalg {
 
-CVector& apply(const CVector& psi, CVector& dpsidt, const CMatrix& M)
+CVector& apply(const CVector& a, CVector& b, const CMatrix& m)
 {
   using namespace blitz::tensor;
-  return dpsidt+=sum(M(i,j)*psi(j),j);
+  return b+=sum(m(i,j)*a(j),j);
 }
 
 
-void
+CMatrix&
 calculateTwoTimesRealPartOfSelf(CMatrix& matrix)
-// Calculates two times the real part of matrix IN PLACE
 {
   long dim=matrix.extent(0);
 
@@ -23,6 +23,8 @@ calculateTwoTimesRealPartOfSelf(CMatrix& matrix)
       matrix(j,i)=conj(matrix(i,j)=matrix(i,j)+conj(matrix(j,i)));
  
   }
+  
+  return matrix;
 
 }
 

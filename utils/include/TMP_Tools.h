@@ -1,15 +1,28 @@
 // -*- C++ -*-
+/// \briefFile{Template metaprogramming tools, extending (and based on) Boost.MPL.}
 #ifndef UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 #define UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 
+/// The largest-rank `blitz::Array` for which the mixed-mode subscripting can be used.
+/**
+ * A value larger than 11 will work only if our own Blitz++ version is used, where the indexing member functions and constructors are
+ * generated through preprocessor metaprogramming.
+ *
+ * For our version of Blitz++, cf. http://sourceforge.net/p/cppqed/blitz/ci/default/tree/
+ * 
+ */
 #ifndef BLITZ_ARRAY_LARGEST_RANK
 #define BLITZ_ARRAY_LARGEST_RANK 11
 #endif // BLITZ_ARRAY_LARGEST_RANK
 
+
+/// Cf. \refBoost{this page,fusion/doc/html/fusion/container/vector.html}
 #ifndef FUSION_MAX_VECTOR_SIZE
 #define FUSION_MAX_VECTOR_SIZE 20
 #endif // FUSION_MAX_VECTOR_SIZE
 
+
+/// Cf. \refBoost{this page,fusion/doc/html/fusion/container/list.html}
 #ifndef FUSION_MAX_LIST_SIZE
 #define FUSION_MAX_LIST_SIZE FUSION_MAX_VECTOR_SIZE
 #endif // FUSION_MAX_LIST_SIZE
@@ -41,6 +54,7 @@
 namespace tmptools {
 
 
+/// Combines \refBoostConstruct{remove_const,type_traits/doc/html/boost_typetraits/reference/remove_const.html} and \refBoostConstruct{remove_reference,type_traits/doc/html/boost_typetraits/reference/remove_reference.html}
 template<typename T>
 struct RemoveConstReference : boost::remove_const<typename boost::remove_reference<T>::type>
 {};
