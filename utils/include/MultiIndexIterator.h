@@ -28,7 +28,7 @@ const End   end  =End  ();
 }
 
 
-#define INPUT_IteratorHelper boost::input_iterator_helper<MultiIndexIterator<RANK>,TTD_IDXTINY(RANK)>
+#define INPUT_IteratorHelper boost::input_iterator_helper<MultiIndexIterator<RANK>,IdxTiny<RANK> >
 
 
 template<int RANK>

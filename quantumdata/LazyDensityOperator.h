@@ -69,7 +69,7 @@ public:
 
   /// The type used for indexing the “rows” and the “columns”.
   /** Just an integer (index) if `RANK=1`, otherwise a tiny vector of integers (multi-index). */
-  typedef typename mpl::if_c<(RANK==1),int,TTD_IDXTINY(RANK)>::type Idx; 
+  typedef typename mpl::if_c<(RANK==1),int,IdxTiny<RANK> >::type Idx; 
 
   virtual ~LazyDensityOperator() {}
 
@@ -102,9 +102,9 @@ private:
 //@{
   /// Converts the index-tiny of size `RANK` to the arity-dependent indexing type of LazyDensityOperator
 template<int RANK>
-inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const TTD_IDXTINY(RANK)& idx) {return idx   ;}
+inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const IdxTiny<RANK>& idx) {return idx   ;}
 
-inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const TTD_IDXTINY(1   )& idx) {return idx[0];}
+inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const IdxTiny<1   >& idx) {return idx[0];}
 //@}
 
 

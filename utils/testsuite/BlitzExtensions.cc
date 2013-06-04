@@ -46,7 +46,7 @@ Randomized::Ptr ran(MakerGSL()(1001));
 
 BOOST_AUTO_TEST_CASE( TwoTimesRealPartOfSelfTest )
 { 
-  TTD_EXTTINY(RA/2) dims(6,4);
+  ExtTiny<RA/2> dims(6,4);
   CAR array(concatenateTinies(dims,dims));
   fillWithRandom(array,ran);
 
@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE( TwoTimesRealPartOfSelfTest )
 
 BOOST_AUTO_TEST_CASE( DoDirectTest )
 {
-  TTD_EXTTINY(RA-1) dims0(4,5,2);
-  TTD_EXTTINY(RA+1) dims1(3,4,2,4,5);
+  ExtTiny<RA-1> dims0(4,5,2);
+  ExtTiny<RA+1> dims1(3,4,2,4,5);
 
   CARM1 am1(dims0);
   CARP1 ap1(dims1);
@@ -108,8 +108,8 @@ BOOST_AUTO_TEST_CASE( DoDirectTest )
 
 BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v acting on only certain indices) in two ways: with tensor and basi
 { 
-  TTD_EXTTINY(5) dims1(3,4,2,6,5);
-  TTD_EXTTINY(3) dims0(dims1(2),dims1(1),dims1(4));
+  ExtTiny<5> dims1(3,4,2,6,5);
+  ExtTiny<3> dims0(dims1(2),dims1(1),dims1(4));
 
   CArray<6> a(concatenateTinies(dims0,dims0));
   CArray<5> v(dims1), vResTensor(dims1), vResBASI(dims1);
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
     CArray<8> temp8(concatenateTinies(
 					  concatenateTinies(
 							    dims0,
-							    TTD_EXTTINY(2)(dims1(0),dims1(3))
+							    ExtTiny<2>(dims1(0),dims1(3))
 							    ),
 					  dims0
 					  ));
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
 
 BOOST_AUTO_TEST_CASE( MatrixProducts ) // VFMSI for matrix products a*rho
 { 
-  TTD_EXTTINY(3) dims0(4,5,2);
+  ExtTiny<3> dims0(4,5,2);
   CArray<6> rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
 
   fillWithRandom(rho,fillWithRandom(a,ran));
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE( MatrixProducts ) // VFMSI for matrix products a*rho
 
 BOOST_AUTO_TEST_CASE( VFMSI_Test ) // VFMSI computing a*rho*adagger (rho Hermitian)
 { 
-  TTD_EXTTINY(3) dims0(4,5,2);
+  ExtTiny<3> dims0(4,5,2);
   CArray<6> rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
   CMatrix matrixView(binaryArray(rho));
 

@@ -186,7 +186,7 @@ private:
     typedef typename BASI::CARes DensityOperatorLowRes;
 
     typedef typename MII::IdxTiny IdxTinyHalf;
-    typedef typename TTD_IDXTINY(2*blitzplusplus::TinyVectorLengthTraits<IdxTinyHalf>::value) IdxTiny;
+    typedef IdxTiny<2*blitzplusplus::TinyVectorLengthTraits<IdxTinyHalf>::value> IdxTiny;
 
     DI_DO_Impl(const DensityOperator<RANK>& rho, Begin)
       : mii_(ctorHelper<false>(rho)), densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()

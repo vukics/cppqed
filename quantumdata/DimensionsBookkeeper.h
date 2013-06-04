@@ -30,7 +30,7 @@ public:
   static const int                    N_RANK=RANK; ///< Arity of the Hilbert space
   static const int DIMESIONS_BOOKKEEPER_RANK=RANK; ///< Ditto (to break ambiguity if a class is derived from another base featuring `N_RANK`).
 
-  typedef TTD_EXTTINY(RANK) Dimensions; ///< The dimensions as a static vector of size N_RANK
+  typedef ExtTiny<RANK> Dimensions; ///< The dimensions as a static vector of size N_RANK
 
   /// Constructor usable only in the `IS_CONST=false` case
   /**

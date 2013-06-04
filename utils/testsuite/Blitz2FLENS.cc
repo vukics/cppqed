@@ -68,7 +68,7 @@ typedef HeMatrixMF<RowMajor>::type HeMatrixRM;
 
 Randomized::Ptr ran(MakerGSL()(1001));
 
-TTD_EXTTINY(RANK) dims(6,4,5);
+ExtTiny<RANK> dims(6,4,5);
 
 
 // RowMajor, C/C++Array

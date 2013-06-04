@@ -34,11 +34,11 @@ typedef details::TransposerMeta<RANK,V>::type TM;
 typedef details::IdxTypes<RANK,V>::type Idx;
 
 
-typedef TTD_IDXTINY(RANK) IdxTiny;
+typedef IdxTiny<RANK> IdxTiny;
 IdxTiny idx(21,2,4,10,11,3,5,9,23,22,7);
 
 
-typedef TTD_IDXTINY(RANK-mpl::size<V>::value) VecIdxTiny;
+typedef IdxTiny<RANK-mpl::size<V>::value> VecIdxTiny;
 VecIdxTiny filteredIdx(details::filterOut<RANK,V>(idx));
 
 
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( ArraySlicingTest )
 
   DArray<5> array5(array11(at_c<1>(v),at_c<2>(v),at_c<3>(v),at_c<4>(v),at_c<5>(v),at_c<6>(v),at_c<7>(v),at_c<8>(v),at_c<9>(v),at_c<10>(v),at_c<11>(v)));
 
-  BOOST_CHECK(all(array5.extent()==TTD_EXTTINY(5)(2,1,4,3,2)));
+  BOOST_CHECK(all(array5.extent()==ExtTiny<5>(2,1,4,3,2)));
 
 }
 

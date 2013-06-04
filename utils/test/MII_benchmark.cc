@@ -8,8 +8,8 @@
 using namespace randomized;
 using namespace std;
 
-typedef TTD_IDXTINY(10) Size    ;
-typedef TTD_IDXTINY( 6) DummyIdx;
+typedef IdxTiny<10> Size    ;
+typedef IdxTiny< 6> DummyIdx;
 typedef cpputils::MultiIndexIterator<6> MII6;
 typedef tmptools::Vector<6,2,5,7> SliceVec;
 typedef blitzplusplus::basi::Indexer<10,SliceVec> Indexer;

@@ -5,7 +5,7 @@
 using namespace cpputils;
 namespace mpl=boost::mpl;
 
-typedef TTD_IDXTINY(3) Idx;
+typedef IdxTiny<3> Idx;
 
 // BOOST_AUTO_TEST_SUITE( test_suite )
 

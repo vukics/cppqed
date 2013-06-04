@@ -24,9 +24,6 @@ struct TinyVectorLengthTraits<blitz::TinyVector<T,LENGTH> > : boost::mpl::int_<L
 } // blitzplusplus
 
 
-#define TTD_EXTTINY(r) blitz::TinyVector<   size_t,r>
-#define TTD_IDXTINY(r) blitz::TinyVector<ptrdiff_t,r>
-
 /// A tiny vector describing extensions of objects of arbitrary arity
 template <int RANK> using ExtTiny=blitz::TinyVector<   size_t,RANK>;
 
