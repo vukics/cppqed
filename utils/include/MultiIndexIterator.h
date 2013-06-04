@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Defines class MultiIndexIterator and a few helpers}
 #ifndef UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED
 #define UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED
 
@@ -11,12 +12,14 @@
 #include <boost/mpl/identity.hpp>
 
 
+/// Namespace comprising otherwise-hard-to-classify generic utilities
 namespace cpputils {
 
 
+/// Helpers to MultiIndexIterator
 namespace mii {
  
-typedef boost::mpl::false_ Begin;
+typedef boost::mpl::false_ Begin; 
 typedef boost::mpl::true_  End  ;
   
 const Begin begin=Begin();
