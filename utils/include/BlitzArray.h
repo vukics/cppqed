@@ -63,10 +63,6 @@ public:
 } // blitzplusplus
 
 
-#define TTD_DARRAY(r) blitz::Array<double,r>
-#define TTD_CARRAY(r) blitz::Array<dcomp ,r>
-// TTD stands for "template typedef"
-
 /// An array of doubles of arbitrary arity
 template <int RANK> using DArray=blitz::Array<double,RANK>;
 

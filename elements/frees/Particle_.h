@@ -98,7 +98,7 @@ public:
 class Spatial
 {
 public:
-  typedef TTD_DARRAY(1) Array;
+  typedef DArray<1> Array;
 
   explicit Spatial(size_t, double deltaK=1);
 

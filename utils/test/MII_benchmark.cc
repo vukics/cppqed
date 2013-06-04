@@ -31,8 +31,8 @@ const size_t nRepeat=
 
 int main()
 {
-  TTD_CARRAY(10) array(size);
-  TTD_CARRAY( 4) arrayRes/*(6,2,5,4)*/;
+  CArray<10> array(size);
+  CArray< 4> arrayRes/*(6,2,5,4)*/;
 
   fillWithRandom(array);
 

@@ -15,10 +15,10 @@ using namespace quantumdata;
 using namespace blitzplusplus;
 
 
-typedef TTD_CARRAY(1) Array1;
-typedef TTD_CARRAY(2) Array2;
-typedef TTD_CARRAY(4) Array4;
-typedef TTD_CARRAY(6) Array6;
+typedef CArray<1> Array1;
+typedef CArray<2> Array2;
+typedef CArray<4> Array4;
+typedef CArray<6> Array6;
 
 typedef transformation::Traits<Array2> Array2Traits;
 typedef transformation::Traits<Array4> Array4Traits;

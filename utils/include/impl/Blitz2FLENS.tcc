@@ -47,7 +47,7 @@ const typename GeMatrixMF<T,SO>::type matrix(blitz::Array<T,TWO_TIMES_RANK>& arr
 
 
 template<StorageOrder SO, int TWO_TIMES_RANK>
-const typename HeMatrixMF<SO>::type hermitianMatrix(TTD_CARRAY(TWO_TIMES_RANK)& array)
+const typename HeMatrixMF<SO>::type hermitianMatrix(CArray<TWO_TIMES_RANK>& array)
 {
   /*static const int RANK=*/tmptools::IsEvenAssert<TWO_TIMES_RANK>();//::value;
 

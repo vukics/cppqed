@@ -37,7 +37,7 @@ private:
 class WignerFunctionKernel
 {
 public:
-  typedef TTD_DARRAY(1) Hermites;
+  typedef DArray<1> Hermites;
   
   WignerFunctionKernel(double x, double y, size_t dim);
 

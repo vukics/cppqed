@@ -27,7 +27,7 @@ typedef structure::Averaged<2> Averaged;
 typedef quantumdata::StateVector<1> StateVector1;
 typedef quantumdata::StateVector<2> StateVector2;
 
-typedef TTD_DARRAY(1) DARRAY;
+typedef DArray<1> DARRAY;
 
 int main(int argc, char* argv[])
 {

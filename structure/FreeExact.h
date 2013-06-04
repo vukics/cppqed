@@ -12,7 +12,7 @@ namespace structure {
 class FreeExact : public Exact<1>
 {
 public:
-  typedef TTD_CARRAY(1) Factors;
+  typedef CArray<1> Factors;
 
 protected:
   explicit FreeExact(size_t dim) : dtDid_(0), factors_(int(dim)) {}

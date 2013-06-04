@@ -42,7 +42,7 @@ typedef TTD_IDXTINY(RANK-mpl::size<V>::value) VecIdxTiny;
 VecIdxTiny filteredIdx(details::filterOut<RANK,V>(idx));
 
 
-typedef TTD_DARRAY(11) DArray11;
+typedef DArray<11> DArray11;
 
 
 namespace {
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE( ArraySlicingTest )
   
   using boost::fusion::at_c;
 
-  TTD_DARRAY(5) array5(array11(at_c<1>(v),at_c<2>(v),at_c<3>(v),at_c<4>(v),at_c<5>(v),at_c<6>(v),at_c<7>(v),at_c<8>(v),at_c<9>(v),at_c<10>(v),at_c<11>(v)));
+  DArray<5> array5(array11(at_c<1>(v),at_c<2>(v),at_c<3>(v),at_c<4>(v),at_c<5>(v),at_c<6>(v),at_c<7>(v),at_c<8>(v),at_c<9>(v),at_c<10>(v),at_c<11>(v)));
 
   BOOST_CHECK(all(array5.extent()==TTD_EXTTINY(5)(2,1,4,3,2)));
 
@@ -134,16 +134,16 @@ BOOST_AUTO_TEST_CASE( ArraySlicingTest )
 
 BOOST_AUTO_TEST_CASE( ExampleFromManual )
 {
-  void actWithA(TTD_CARRAY(5)&);
+  void actWithA(CArray<5>&);
 
   static const int RANK=11;
 
-  TTD_CARRAY(RANK) psi;
+  CArray<RANK> psi;
 
   boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<3,6,1,9,7> >(psi),actWithA);
 }
 
-void actWithA(TTD_CARRAY(5)&) {}
+void actWithA(CArray<5>&) {}
 
 
 
@@ -153,7 +153,7 @@ namespace basi_performance {
 
 const int nRepetition=1;
 
-TTD_CARRAY(11) array1(5,4,5,4,5,4,5,4,5,4,5), array2(array1.shape()), arrayRes(array1.shape()), arrayOrig(array1.shape());
+CArray<11> array1(5,4,5,4,5,4,5,4,5,4,5), array2(array1.shape()), arrayRes(array1.shape()), arrayOrig(array1.shape());
 
 struct Helper
 {
@@ -215,11 +215,11 @@ BOOST_AUTO_TEST_CASE( BASI_Performance )
 
 namespace basi_monitor {
 
-TTD_CARRAY(6) array1(3,2,3,2,3,2), array2(array1.shape());
+CArray<6> array1(3,2,3,2,3,2), array2(array1.shape());
 
 
 template<int RANK>
-void helper(const TTD_CARRAY(RANK)& a1, const TTD_CARRAY(RANK)& a2, const dcomp* dc1, const dcomp* dc2)
+void helper(const CArray<RANK>& a1, const CArray<RANK>& a2, const dcomp* dc1, const dcomp* dc2)
 {
   cout<<a1.zeroOffset()<<' '<<a1.shape()<<' '<<a1.stride()<<' '<<a1.ordering()<<' '<<a1.data()-dc1<<endl<<a2.zeroOffset()<<' '<<a2.shape()<<' '<<a2.stride()<<' '<<a2.ordering()<<' '<<a2.data()-dc2<<endl;
   BOOST_CHECK(all(a1==a2));

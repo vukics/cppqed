@@ -5,8 +5,8 @@
 
 using namespace quantumdata;
 
-typedef TTD_CARRAY(1) Array1;
-typedef TTD_CARRAY(2) Array2;
+typedef CArray<1> Array1;
+typedef CArray<2> Array2;
 typedef NonOrthogonalStateVector<1, Array2> NOSV_Array2;
 typedef transformation::Identity<1> I1;
 typedef NonOrthogonalStateVector<1, I1> NOSV_I1;

@@ -22,10 +22,10 @@ using cpputils::for_each;
 
 const double epsilonCmp=1e-12;
 
-void myFunc(const TTD_CARRAY(6)& aa, const TTD_CARRAY(3)& vv, TTD_CARRAY(3)& ww)
+void myFunc(const CArray<6>& aa, const CArray<3>& vv, CArray<3>& ww)
 {
   using namespace blitz::tensor;
-  TTD_CARRAY(6) temp(aa.shape());
+  CArray<6> temp(aa.shape());
   temp=aa(i,j,k,l,m,n)*vv(l,m,n);
   ww=sum(sum(sum(temp,n),m),l);
 }
@@ -33,11 +33,11 @@ void myFunc(const TTD_CARRAY(6)& aa, const TTD_CARRAY(3)& vv, TTD_CARRAY(3)& ww)
 
 const int RA=4;
 
-typedef TTD_CARRAY(  RA) CAR ;
-typedef TTD_CARRAY(2*RA) CA2R;
+typedef CArray<  RA> CAR ;
+typedef CArray<2*RA> CA2R;
 
-typedef TTD_CARRAY(RA-1) CARM1;
-typedef TTD_CARRAY(RA+1) CARP1;
+typedef CArray<RA-1> CARM1;
+typedef CArray<RA+1> CARP1;
 
 
 Randomized::Ptr ran(MakerGSL()(1001));
@@ -111,14 +111,14 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
   TTD_EXTTINY(5) dims1(3,4,2,6,5);
   TTD_EXTTINY(3) dims0(dims1(2),dims1(1),dims1(4));
 
-  TTD_CARRAY(6) a(concatenateTinies(dims0,dims0));
-  TTD_CARRAY(5) v(dims1), vResTensor(dims1), vResBASI(dims1);
+  CArray<6> a(concatenateTinies(dims0,dims0));
+  CArray<5> v(dims1), vResTensor(dims1), vResBASI(dims1);
 
   fillWithRandom(v,fillWithRandom(a,ran));
 
   {
     using namespace blitz::tensor;
-    TTD_CARRAY(8) temp8(concatenateTinies(
+    CArray<8> temp8(concatenateTinies(
 					  concatenateTinies(
 							    dims0,
 							    TTD_EXTTINY(2)(dims1(0),dims1(3))
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
 					  dims0
 					  ));
     temp8=a(i,j,k,n,o,p)*v(l,o,n,m,p);
-    vResTensor=TTD_CARRAY(5)(sum(sum(sum(temp8,p),o),n)).transpose(3,1,0,4,2);
+    vResTensor=CArray<5>(sum(sum(sum(temp8,p),o),n)).transpose(3,1,0,4,2);
   }
     
   {
@@ -143,15 +143,15 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
 BOOST_AUTO_TEST_CASE( MatrixProducts ) // VFMSI for matrix products a*rho
 { 
   TTD_EXTTINY(3) dims0(4,5,2);
-  TTD_CARRAY(6) rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
+  CArray<6> rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
 
   fillWithRandom(rho,fillWithRandom(a,ran));
 
   {
     using namespace blitz::tensor;
-    TTD_CARRAY(9) temp9(concatenateTinies(rho.shape(),dims0));
+    CArray<9> temp9(concatenateTinies(rho.shape(),dims0));
     temp9=a(i,j,k,o,p,q)*rho(o,p,q,l,m,n);
-    resTensor=TTD_CARRAY(6)(sum(sum(sum(temp9,q),p),o));
+    resTensor=CArray<6>(sum(sum(sum(temp9,q),p),o));
   }
 
   {
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE( MatrixProducts ) // VFMSI for matrix products a*rho
 BOOST_AUTO_TEST_CASE( VFMSI_Test ) // VFMSI computing a*rho*adagger (rho Hermitian)
 { 
   TTD_EXTTINY(3) dims0(4,5,2);
-  TTD_CARRAY(6) rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
+  CArray<6> rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
   CMatrix matrixView(binaryArray(rho));
 
   fillWithRandom(rho,fillWithRandom(a,ran));
@@ -177,9 +177,9 @@ BOOST_AUTO_TEST_CASE( VFMSI_Test ) // VFMSI computing a*rho*adagger (rho Hermiti
   calculateTwoTimesRealPartOfSelf(matrixView);
   {
     using namespace blitz::tensor;
-    TTD_CARRAY(12) temp12(concatenateTinies(rho.shape(),rho.shape()));
+    CArray<12> temp12(concatenateTinies(rho.shape(),rho.shape()));
     temp12=a(i,j,k,o,p,q)*rho(o,p,q,r,s,t)*conj(a(l,m,n,r,s,t));
-    resTensor=TTD_CARRAY(6)(sum(sum(sum(sum(sum(sum(temp12,t),s),r),q),p),o));
+    resTensor=CArray<6>(sum(sum(sum(sum(sum(sum(temp12,t),s),r),q),p),o));
   }
   BOOST_CHECK(!fcmp(1-max(abs(resTensor-hermitianConjugate(resTensor))),1,epsilonCmp));
   {

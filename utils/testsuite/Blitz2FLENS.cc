@@ -53,9 +53,9 @@ const double epsilonCmp=1e-12;
 const int RANK=3;
 
 
-typedef TTD_CARRAY(  RANK) CAR ;
-typedef TTD_DARRAY(  RANK) DAR ;
-typedef TTD_CARRAY(2*RANK) CA2R;
+typedef CArray<  RANK> CAR ;
+typedef DArray<  RANK> DAR ;
+typedef CArray<2*RANK> CA2R;
 
 
 typedef DenseVectorMF<dcomp >::type CDenseVector;
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE( RowMajorTest )
 
   {
     CA2R resTensor(matBlitz.shape());
-    TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
+    CArray<9> temp9(concatenateTinies(matBlitz.shape(),dims));
     {
       using namespace blitz::tensor;
       temp9=matBlitz(i,j,k,o,p,q)*conj(vlBlitz(l,m,n,o,p,q))/vecBlitz(l,m,n);
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE( ColMajorTest )
 
   {
     CA2R resTensor(matBlitz.shape());
-    TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
+    CArray<9> temp9(concatenateTinies(matBlitz.shape(),dims));
     {
       using namespace blitz::tensor;
       temp9=matBlitz(i,j,k,o,p,q)*vrBlitz(o,p,q,l,m,n)/vecBlitz(l,m,n);
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE( HermitianTest )
 
     {
       CA2R resTensor(matBlitz.shape());
-      TTD_CARRAY(9) temp9(concatenateTinies(matBlitz.shape(),dims));
+      CArray<9> temp9(concatenateTinies(matBlitz.shape(),dims));
       {
 	using namespace blitz::tensor;
 	temp9=matBlitz(o,p,q,i,j,k)*a(l,m,n,o,p,q)/vecBlitz2(l,m,n);

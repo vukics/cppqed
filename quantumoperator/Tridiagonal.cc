@@ -14,7 +14,7 @@ const Tridiagonal<1>::Diagonal Tridiagonal<1>::empty=Tridiagonal<1>::Diagonal();
 
 namespace {
 
-bool Compatible(const TTD_CARRAY(1)& a, size_t diffA, const TTD_CARRAY(1)& b, size_t diffB=0)
+bool Compatible(const CArray<1>& a, size_t diffA, const CArray<1>& b, size_t diffB=0)
 {
   if (!a.size() || !b.size() || a.size()-diffA==b.size()-diffB) return true;
   return false;

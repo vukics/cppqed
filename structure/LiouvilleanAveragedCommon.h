@@ -32,7 +32,7 @@ class LiouvilleanAveragedCommon
 public:
   typedef boost::shared_ptr<const LiouvilleanAveragedCommon> Ptr;
 
-  typedef TTD_DARRAY(1) DArray1D;
+  typedef DArray<1> DArray1D;
 
   virtual ~LiouvilleanAveragedCommon() {}
 
