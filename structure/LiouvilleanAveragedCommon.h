@@ -50,13 +50,12 @@ private:
 };
 
 
-#ifndef   NDEBUG
 struct AveragesNumberMismatchException : cpputils::Exception
 {
   AveragesNumberMismatchException(int size, size_t nAvr) {std::cerr<<size<<' '<<nAvr<<std::endl;}
   
 };
-#endif // NDEBUG
+
 
 struct InfiniteDetectedException : cpputils::Exception {};
 
