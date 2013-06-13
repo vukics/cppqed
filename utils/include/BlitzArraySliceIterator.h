@@ -137,14 +137,14 @@ template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ord
 
 
 
-/// Filters out the indeces corresponding to a subsystem
+/// Filters out the indices corresponding to a subsystem
 /**
  * \tparamRANK
  * \tparam V compile-time vector specifying the subsystem (cf. \ref specifyingsubsystems)
  * 
- * \param idx the indeces to be filtered (of number `RANK`)
+ * \param idx the indices to be filtered (of number `RANK`)
  * 
- * \return the indeces *not* contained by the subsystem specified by `V` (of number `RANK-Size<V>::value`)
+ * \return the indices *not* contained by the subsystem specified by `V` (of number `RANK-Size<V>::value`)
  * 
  */
 template<int RANK, typename V>
@@ -664,7 +664,7 @@ namespace basi {
  * ~~~{.sh}
  * g++ -P -E -Iutils/include/ utils/include/impl/BlitzArraySliceIterator.tcc | tail -n286
  * ~~~
- * To store and manipulate the heterogenous collection of slicing indeces like `0,a,2,a,4,5,a,a,8,a,10` in Indexer::index, the `vector` class of the 
+ * To store and manipulate the heterogenous collection of slicing indices like `0,a,2,a,4,5,a,a,8,a,10` in Indexer::index, the `vector` class of the 
  * \refBoost{Boost.Fusion,fusion/doc/html/index.html} library is used.
  * 
  * Iterator is implemented in terms of the above two helper classes. Each Iterator invokes a Transposer::transpose at its construction, and – if `RANK` is larger
@@ -679,7 +679,7 @@ namespace basi {
  * only transposition. For this, as at several other places in the framework, we apply conditional inheritance: Iterator inherits from either of two classes 
  * (details::Base or details::BaseSpecial), the decision being made @ compile time with the help of `boost::mpl::if_c`.
  * 
- * The iteration over dummy indeces is implemented with the help of cpputils::MultiIndexIterator.
+ * The iteration over dummy indices is implemented with the help of cpputils::MultiIndexIterator.
  * 
  * ### A metaprogramming example
  * 

@@ -55,12 +55,12 @@ protected:
   /// \name One-dimensional view of the underlying data
   //@{
     /**
-    * 1d view created on the fly via blitzplusplus::unaryArray.
-    * 
-    * \note This is meant to be used only if the underlying storage is contiguous, which may not be the case since the object may reference arrays of any layout.
-    * In debug mode, a non-contiguous storage is detected by the implementing function blitzplusplus::unaryArray, and an exception of type 
-    * blitzplusplus::NonContiguousStorageException is thrown.
-    */
+     * 1d view created on the fly via blitzplusplus::unaryArray.
+     * 
+     * \note This is meant to be used only if the underlying storage is contiguous, which may not be the case since the object may reference arrays of any layout.
+     * In debug mode, a non-contiguous storage is detected by the implementing function blitzplusplus::unaryArray, and an exception of type 
+     * blitzplusplus::NonContiguousStorageException is thrown.
+     */
   const CVector vectorView() const {return blitzplusplus::unaryArray(arrayLow_);}
   CVector       vectorView()       {return blitzplusplus::unaryArray(arrayLow_);}
   // The usual technique doesn't work here, because `CVector is not a pointer, reference, nor a pointer-to-data-member type'
