@@ -48,8 +48,8 @@ ModeCorrelations::average_v(const LazyDensityOperator& matrix) const
     copy(a1,copy(a0,averages.begin()));
   }
 
-  for (int n=0; n<int(matrix.getDimensions()[0]); n++) for (int m=1; m<int(matrix.getDimensions()[1]); m++) {
-      if(n<int(matrix.getDimensions()[0])-1) {
+  for (int n=0; n<int(matrix.getDimension(0)); n++) for (int m=1; m<int(matrix.getDimension(1)); m++) {
+      if(n<int(matrix.getDimension(0))-1) {
 	dcomp temp=sqrt(m*(n+1))*matrix(Idx(n,m),Idx(n+1,m-1));
 	averages(14)+=real(temp);
 	averages(15)+=imag(temp);
