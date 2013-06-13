@@ -51,8 +51,9 @@ public:
 
   size_t getDimension(mpl::int_<RANK> =mpl::int_<1>()) const {return totalDimension_;} ///< Get the (single) dimension for a unary system
 
-  void setDimensions(const Dimensions& dimensions)
-    {dimensions_=dimensions; totalDimension_=product(dimensions);} ///< This will work only in the non-const case
+  size_t getDimension(size_t i) const {return dimensions_[i];}
+
+  void setDimensions(const Dimensions& dimensions) {dimensions_=dimensions; totalDimension_=product(dimensions);} ///< This will work only in the non-const case
 
 private:
   typename tmptools::ConditionalAddConst<Dimensions,IS_CONST>::type      dimensions_;

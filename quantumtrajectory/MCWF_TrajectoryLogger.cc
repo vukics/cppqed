@@ -144,19 +144,19 @@ ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerLi
 
   accumulator_set<double, features<tag::density> > acc( tag::density::num_bins = 20 , tag::density::cache_size = 1000 );
 
-  //fill accumulator 
+  // fill accumulator
+  size_t total=0;
   for (LoggerList::const_iterator i=loggerList.begin(); i!=loggerList.end(); ++i)
-    for (MCWF_Logger::MCWF_Trajectory::const_iterator j=i->traj_.begin(); j!=i->traj_.end(); ++j)
+    for (MCWF_Logger::MCWF_Trajectory::const_iterator j=i->traj_.begin(); j!=i->traj_.end(); (++j, ++total))
       acc(j->first);
  
   typedef iterator_range<std::vector<std::pair<double, double> >::iterator> Histogram;
   Histogram hist=density(acc);
  
-  size_t total=0;
-  for(Histogram::const_iterator i=hist.begin(); i!=hist.end(); (++i, total+=i->second))
+  for (Histogram::const_iterator i=hist.begin(); i!=hist.end(); ++i)
     os<<"# "<<i->first<<"\t"<<i->second<<endl;
  
-  os<<"\n# Total number of jumps: "<<total<<endl;
+  os<<"\n# Average number of total jumps: "<<total/double(loggerList.size())<<endl;
  
   return os;
 }

@@ -85,6 +85,16 @@ ReducedDensityOperator<RANK>::average_v(const LazyDensityOperator& matrix) const
 
 
 template<int RANK, typename V>
+const typename ReducedDensityOperatorNegativity<RANK,V>::Averages 
+ReducedDensityOperatorNegativity<RANK,V>::average_v(const LazyDensityOperator& matrix) const
+{
+  Averages res(Base::average_v(matrix));
+  res.resize(res.size()+1);
+  return res;
+}
+
+
+template<int RANK, typename V>
 void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) const
 {
   quantumdata::DensityOperator<RANK> rho(getDimensions());

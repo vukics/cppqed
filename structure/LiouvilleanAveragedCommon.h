@@ -50,13 +50,12 @@ private:
 };
 
 
-#ifndef   NDEBUG
 struct AveragesNumberMismatchException : cpputils::Exception
 {
   AveragesNumberMismatchException(int size, size_t nAvr) {std::cerr<<size<<' '<<nAvr<<std::endl;}
   
 };
-#endif // NDEBUG
+
 
 struct InfiniteDetectedException : cpputils::Exception {};
 
@@ -80,9 +79,7 @@ public:
   const DArray1D average(double t, const LazyDensityOperator& matrix) const
   {
     const DArray1D averages(average_v(t,matrix));
-#ifndef   NDEBUG
     if (size_t(averages.size())!=nAvr()) throw AveragesNumberMismatchException(averages.size(),nAvr());
-#endif // NDEBUG
     if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
 
     return averages;

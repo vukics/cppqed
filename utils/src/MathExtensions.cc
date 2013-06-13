@@ -29,5 +29,5 @@ double choose(unsigned n, unsigned m)
 
 bool parity(         long n) {return GSL_IS_ODD(n);}
 bool parity(unsigned long n) {return GSL_IS_ODD(n);}
-  
+
 } // mathutils

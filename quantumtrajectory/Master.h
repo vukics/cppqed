@@ -141,6 +141,8 @@ public:
          const DensityOperatorLow& scaleAbs=DensityOperatorLow())
     : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),pt,negativity)
   {}
+  
+  const DensityOperator& getRho() const {return rho_;}
 
 private:
   using Base::rho_;

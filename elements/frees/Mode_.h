@@ -165,9 +165,6 @@ protected:
 
   Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle);
 
-private:
-  const double kappa_, nTh_;
-
 };
 
 

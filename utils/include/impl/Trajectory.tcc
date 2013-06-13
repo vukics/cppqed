@@ -78,8 +78,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     
   const shared_ptr<ostream> outstream(!outputToFile ?
                                       nonOwningSharedPtr<ostream>(&cout) :
-                                      static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app)));
-  // regulates the deletion policy
+                                      static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   ostream& os=*outstream;
 
