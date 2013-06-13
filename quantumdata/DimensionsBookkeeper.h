@@ -32,6 +32,8 @@ public:
   size_t            getTotalDimension() const {return totalDimension_;}
 
   size_t getDimension(mpl::int_<RANK> =mpl::int_<1>()) const {return totalDimension_;} 
+  
+  size_t getDimension(size_t i) const {return dimensions_[i];}
 
   void setDimensions(const Dimensions& dimensions) {dimensions_=dimensions; totalDimension_=product(dimensions);}
 
