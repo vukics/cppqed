@@ -154,7 +154,7 @@ operator*(const StateVector<RANK1>& sv1, const NonOrthogonalStateVector<RANK2,TR
 
  * ### Formalism
  * 
- * We adopt the so-called covariant-contravariant formalism (see also \cite{artacho91}), which in physics is primarily known from the theory of relativity.
+ * We adopt the so-called covariant-contravariant formalism (cf. e.g. \cite artacho91), which in physics is primarily known from the theory of relativity.
  * Assume we have a basis \f$\lbr\ket{i}\rbr_{i\in\mathbb{N}}\f$, where the basis vectors are nonorthogonal, so that the metric tensor
  * \f[g_{ij}\equiv\braket{i}{j}\f]
  * is nondiagonal. The contravariant components of a state vector \f$\ket\Psi\f$ are then defined as the expansion coefficients
