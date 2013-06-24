@@ -672,7 +672,8 @@ WARN_LOGFILE           =
 
 INPUT                  = utils/include/BlitzArray.h utils/include/BlitzArrayExtensions.h utils/include/BlitzArraySliceIterator.h \
                          utils/include/BlitzTiny.h utils/include/BlitzTinyExtensions.h utils/include/CMatrix.h utils/include/ComplexArrayExtensions.h \
-                         utils/include/ComplexExtensions.h utils/include/CVector.h utils/include/MultiIndexIterator.h utils/include/TMP_Tools.h quantumdata
+                         utils/include/ComplexExtensions.h utils/include/CVector.h utils/include/MultiIndexIterator.h utils/include/TMP_Tools.h \
+                         quantumdata structure quantumtrajectory
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
@@ -732,7 +733,7 @@ EXCLUDE_SYMBOLS        = details
 # directories that contain example code fragments that are included (see
 # the \include command).
 
-EXAMPLE_PATH           = .
+EXAMPLE_PATH           = . examples
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp
