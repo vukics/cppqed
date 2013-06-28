@@ -248,7 +248,9 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
 
 /** \page structurebundleguide Guide on the use of the structure-bundle
  * 
- * ## Implementing a class representing a harmonic-oscillator mode
+ * \note The files referred to in this Section are found in directory `examples` in the distribution. The code examples are expected to compile, cf. `examples/Jamfile`.
+ * 
+ * ## Implementation of a class representing a harmonic-oscillator mode
  * 
  * We demonstrate how to implement an element representing a pumped lossy mode in a truncated Fock space. In the frame rotating with the pump frequency, it is described by the Hamiltonian:
  * \f[H=-\delta a^\dagger a+\lp\eta a^\dagger+\hermConj\rp,\f]
@@ -268,166 +270,97 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * 
  * \see The description of quantumoperator::Tridiagonal
  * 
- * Consider the file `ExampleMode.h` (The files referred to in this Section are found in directory `examples` in the distribution.
- * The code examples are expected to compile, cf. `examples/Jamfile`):
+ * Consider the file `ExampleMode.h`:
  * 
  * \snippet ExampleMode.h basic example mode
  * 
- * \dontinclude ExampleMode.h
- * \skipline #include
- * \until ElementAveraged
+ * This will suffice here. Let us look at the implementations in `ExampleMode.cc`:\dontinclude ExampleMode.cc
+ * \until sqrt(cutoff))),
+ * We construct the Free base with the dimension of the system and the name-value-multiplier tuples for the frequency-like parameters of the system, which in this case are all complex
+ * (cf. the explanation @ DynamicsBase). #FREQS is a macro defined in DynamicsBase.h, which facilitates the creation of lists of such tuples.
+ * \until cutoff))),
+ * We construct the time-independent TridiagonalHamiltonian base. This is greatly facilitated by the algebra and helpers of the quantumoperator::Tridiagonal class.
+ * \warning When implementing the Hamiltonian, not \f$H\f$ itself but \f$\frac Hi\f$ has to supplied!
  * 
- * \skipline using
+ * \until ("photon absorption")),
+ * We construct the ElementLiouvillean base whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
+ * The constructor takes the strategies for calculating the impact of a jump on a free::StateVectorLow, and for calculating the probability from a free::LazyDensityOperator.
+ * These strategy functions are produced from the free-standing helpers in Lines 10-14 above through argument binding.
+ * \until ("imag(\")"))
+ * We construct the ElementAveraged base, with parameters necessary to produce a simple key for quantum averages communicated towards the user.
+ * Here we calculate only three such averages, the expectation value of the number operator, and the real and imaginary parts of that of the ladder operator.
+ * \until }
+ * With the DynamicsBase::getParsStream function we obtain a stream whereon we can write more information about the object that gets communicated towards the user
+ * in that part of the output which summarizes the parameters of the actual run.
+ *
+ * Next, the inherited function Averaged::average_v is implemented:
+ * \skip average_v
+ * \until aJumpProba
+ * the expectation value of the photon number is calculated (where we can reuse our function `aJumpProba`, with unit loss rate).
+ * \until imag(offdiag);
+ * the expectation value of the ladder operator is calculated (real & imaginary parts)
+ * \until }
+ * \until }
+ * 
+ * The implementation of the helpers is also quite straightforward. It may come to a separate file `ExampleModeImpl.cc`:\dontinclude ExampleModeImpl.cc
+ * \until blitz::tensor::i+1.
+ * \warning In situations like this, it is extremely important to write `blitz::tensor::i+1.`, otherwise the `blitz::sqrt` function will operate within the integers,
+ * which is perhaps a shortcoming of the Blitz++ library in this respect.
+ * 
+ * \until const Tridiagonal nop
+ * \until }
+ * 
+ * ### Exploiting interaction picture
+ * 
+ * In many situations, it pays to transfer to interaction picture defined by the first term of the Hamiltonian \f$\HnH\f$ above. The ladder operator in interaction picture is
+ * \f[a\Int(t)=a e^{-zt},\f] so that the Hamiltonian reads \f[H\Int(t)=\lp\eta a^\dagger e^{zt}+\eta^*ae^{-zt}\rp.\f]
+ * 
+ * \see [These notes](http://optics.szfki.kfki.hu/~vukics/Pictures.pdf) on how to treat interaction pictures defined by non-unitary transition operators in a consistent way.
+ * 
+ * In this case, the class representing the element has to be derived from Exact as well, which represents the transformation between the two pictures.
+ * In addition, instead of TridiagonalHamiltonian`<1,false>`, we need to derive from TridiagonalHamiltonian`<1,true>` because the Hamiltonian is now time-dependent.
+ * \note In general usage, the jump and the averages are calculated in the normal picture also in this case (cf. explanation of classes Hamiltonian, Exact, Liouvillean, and Averaged,
+ * and furthermore quantumtrajectory::MCWF_Trajectory). This allows for reusing the same code in both pictures. (Incidentally, here the Liouvillean remains unchanged anyway.)
+ * 
+ * \dontinclude ExampleMode.h
+ * \skip FreeExact
+ * \until PumpedLossyModeIP&);
+ * In the implementation, the only difference from the previous case will be the constructor, because the Hamiltonian now also requires furnishing with frequencies
+ * (cf. quantumoperator::furnishWithFreqs), and the implementation of the virtual function FreeExact::updateU.
+ * 
+ * When “furnished with frequencies”, a quantumoperator::Tridiagonal object will internally take care about the time-dependent phases appearing in \f$a\Int(t)\f$ and \f$H\Int(t)\f$:
+ * \dontinclude ExampleMode.cc
+ * \skip mainDiagonal
+ * \until blitz::tensor::i));
+ * \until }
+ * FreeExact assumes that the operator transforming between the two pictures is diagonal, and the factors to update are simply its diagonal elements.
+ * If this is not the case, Exact has to be used instead.
+ * 
+ * The construction of the object representing the ladder operator furnished with frequencies is also straightforward:\dontinclude ExampleModeImpl.cc
+ * \skip aop(const PumpedLossyModeIP& mode)
+ * \until }
+ * \note Since a lot of the code from the previous case can be reused here, one will usually adopt an inheritence- or class-composition-based solution to implement classes like
+ * `PumpedLossyMode` and `PumpedLossyModeIP` (cf. the actual implementation of a harmonic-oscillator mode in the framework in `elements/frees/Mode.h`).
+ * 
+ * ## Implementing an X-X interaction
+ * 
+ * Let us consider the interaction described by the Hamiltonian \f[H_\text{X-X}=g(a+a^\dagger)(b+b^\dagger).\f]
+ * 
+ * The class implementing this interaction has to be derived from Interaction`<2>` because it is a binary interaction, and TridiagonalHamiltonian`<2,...>`
+ * (note that quantumoperator::Tridiagonal is capable to represent direct products of tridiagonal matrices).
+ * 
+ * The only thing requiring some care is that once we transform some elements into interaction picture, the whole Hamiltonian is transformed, that is,
+ * \f$a\f$ or \f$b\f$ or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type `PumpedLossyModeIP`.
+ * Hence, the Hamiltonian is in fact \f[H_{\text{X-X;I}}(t)=g(ae^{-z_at}+a^\dagger e^{z_at})(be^{-z_bt}+b^\dagger e^{z_bt}).\f]
+ * 
+ * Consider `ExampleInteraction.h`:\dontinclude ExampleInteraction.h
+ * \skip #include
  * \until };
  * 
-  :language: c++
-  :linenos:
-  :lines: 2-5, 7-28
-
-This will suffice here. Let us look at the implementations in :file:`ExampleMode.cc`:
-
-.. literalinclude:: examples/ExampleMode.cc
-  :language: c++
-  :linenos:
-  :lines: 1-56
-
-Lines 18-22:
-  We construct the :class:`~structure::Free` base with the dimension of the system and the tuples for the frequency-like parameters of the system, which in this case are all complex (cf. :ref:`explanation <dynamicsBase>`). The tool from Boost.Assign facilitates the creation of lists of such tuples.
-
-Lines 23-25:
-  We construct the time-independent :class:`~structure::TridiagonalHamiltonian` base. This is greatly facilitated by the algebra and helpers of the :class:`quantumoperator::Tridiagonal` class.
-
-  .. warning::
-
-    When implementing the Hamiltonian, not \f$H\f$ itself but \f$\frac Hi\f$ has to supplied!
-
-Lines 26-30:
-  We construct the :class:`~structure::ElementLiouvillean` base whose second template argument denotes the number of different quantum jumps, which is 2 in this case. The constructor takes the strategies for calculating the impact of a jump on a :type:`~structure::free::StateVectorLow`, and for calculating the probability from a :type:`~structure::free::LazyDensityOperator`. These strategy functions are produced from the free-standing helpers in Lines 10-14 through binding.
-
-Lines 31-32:
-  We construct the :class:`~structure::ElementAveraged` base, with parameters necessary to produce a simple key for quantum averages communicated towards the user. Here we calculate only three such averages, the expectation value of the number operator, and the real and imaginary parts of that of the ladder operator.
-
-Lines 38-55:
-  The inherited function :func:`~structure::Averaged::average` is implemented.
-
-  Line 44:
-    the expectation value of the photon number is calculated (where we can reuse our function ``aJumpProba``, with unit loss rate).
-
-  Lines 49-50:
-    the expectation value of the ladder operator is calculated
-
-
-The implementation of the helpers is also quite straightforward. It may come to a separate file :file:`ExampleModeImpl.cc`:
-
-.. literalinclude:: examples/ExampleModeImpl.cc
-  :language: c++
-  :linenos:
-  :lines: 1-64
-
-.. warning::
-
-  In situations like the one in Line 56, it is extremely important to write ``blitz::tensor::i+1.``, otherwise the ``blitz::sqrt`` function will operate within the integers, which is perhaps a shortcoming of the Blitz++ library in this respect.
-
-
-.. _structureTutorialInteractionPicture:
-
-
-### Exploiting interaction picture
-
-
-In many situations, it pays to transfer to interaction picture defined by the first term of the Hamiltonian :eq:`harmonicOscillatorHamiltonian`. The ladder operator in interaction picture is 
-
-.. math::
-  :label: ladderOperatorInIP
-
-  a\Int(t)=a e^{-zt},
-
-so that the Hamiltonian reads
-
-.. math::
-  :label: HamiltonianInIP
-
-  H\Int(t)=\lp\eta a^\dagger e^{zt}+\eta^*ae^{-zt}\rp
-
-.. seealso:: These `notes <http://optics.szfki.kfki.hu/~vukics/Pictures.pdf>`_ about how to treat interaction pictures defined by non-unitary transition operators in a consistent way.
-
-In this case, the class representing the element has to be derived from :class:`~structure::Exact` as well, which represents the transformation between the two pictures. In addition, instead of :class:`~structure::TridiagonalHamiltonian`\ ``<1,false>``, we need to derive from :class:`~structure::TridiagonalHamiltonian`\ ``<1,true>``, because the Hamiltonian is now time-dependent.
-
-.. note:: 
-
-  In general usage, the jump and the averages are calculated in the normal picture also in this case (cf. explanation of classes :class:`structure::Hamiltonian`, :class:`structure::Exact`, :class:`structure::Liouvillean`, and :class:`structure::Averaged`, and furthermore Sec. :ref:`MCWF_Trajectory`). This allows for reusing the same code in both pictures. (Incidentally, here the Liouvillean remains unchanged anyway.)
-
-
-.. literalinclude:: examples/ExampleMode.h
-  :language: c++
-  :linenos:
-  :lines: 2-11, 30-
-
-
-In the implementation, the only difference from the previous case will be the constructor, because the Hamiltonian now also requires :func:`furnishing with frequencies <quantumoperator::furnishWithFreqs>`, and the implementation of the virtual function :func:`~structure::FreeExact::updateU`.
-
-When "furnished with frequencies", a :class:`quantumoperator::Tridiagonal` object will internally take care about the time-dependent phases appearing in :eq:`ladderOperatorInIP` and :eq:`HamiltonianInIP`.
-
-.. literalinclude:: examples/ExampleMode.cc
-  :language: c++
-  :linenos:
-  :lines: 57-86
-
-:class:`~structure::FreeExact` assumes that the operator transforming between the two pictures is diagonal, and the factors to update are simply its diagonal elements. If this is not the case, :class:`~structure::Exact` has to be used instead.
-
-The construction of the object representing the ladder operator furnished with frequencies is also straightforward:
-
-.. literalinclude:: examples/ExampleModeImpl.cc
-  :language: c++
-  :linenos:
-  :lines: 66-70
-
-.. note::
-
-  Since a lot of the code from the previous case can be reused here, one will usually adopt an inheritence- or class-composition-based solution to implement classes like ``PumpedLossyMode`` and ``PumpedLossyModeIP`` (cf. :ref:`generalElements_Mode`).
-
-
-
-
-*******************************
-Implementing an X-X interaction
-*******************************
-
-Let us consider the interaction described by the Hamiltonian
-
-.. math::
-
-  H_\text{X-X}=g(a+a^\dagger)(b+b^\dagger)
-
-The class implementing this interaction has to be derived from :class:`~structure::Interaction`\ ``<2>`` because it is a binary interaction, and :class:`~structure::TridiagonalHamiltonian`\ ``<2,...>`` (note that :class:`quantumoperator::Tridiagonal` is capable to represent direct products of tridiagonal matrices).
-
-The only thing requiring some care is that once we transform some elements into interaction picture, the whole Hamiltonian is transformed, that is, \f$a\f$ or \f$b\f$ or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type ``PumpedLossyModeIP``. Hence, the Hamiltonian is in fact
-
-.. math::
-  :label: XX_HamiltonianInIP
-
-  H_{\text{X-X;I}}(t)=g(ae^{-z_at}+a^\dagger e^{z_at})(be^{-z_bt}+b^\dagger e^{z_bt}).
-
-Consider :file:`ExampleInteraction.h`:
-
-.. literalinclude:: examples/ExampleInteraction.h
-  :language: c++
-  :linenos:
-  :lines: 2-
-
-:file:`ExampleInteraction.cc` then reads
-
-.. literalinclude:: examples/ExampleInteraction.cc
-  :language: c++
-  :linenos:
-
-As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in   :eq:`XX_HamiltonianInIP`, which result from the use of interaction picture.
-
-
-.. rubric:: Footnotes
-
-.. [#] 
-
+ * `ExampleInteraction.cc` then reads \include ExampleInteraction.cc
+ * As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in \f$H_{\text{X-X;I}}(t)\f$,
+ * which result from the use of interaction picture.
+ *
  */
 
 

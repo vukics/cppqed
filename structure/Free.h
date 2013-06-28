@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile
 #ifndef STRUCTURE_FREE_H_INCLUDED
 #define STRUCTURE_FREE_H_INCLUDED
 
@@ -19,6 +20,7 @@
 namespace structure {
 
 
+/// Contains some typedefs for structures of arity 1 for convenience in defining free systems
 namespace free {
 
 typedef quantumoperator::Tridiagonal<1> Tridiagonal;
@@ -34,16 +36,24 @@ typedef quantumdata::DensityOperator<1> DensityOperator;
 } // free
 
 
+/// In the language of the framework, a free system is a unary system (arity 1, `RANK=1`)
 class Free : public QuantumSystem<1>, public DynamicsBase
 {
 public:
   typedef boost::shared_ptr<const Free> Ptr;
 
-  explicit Free(size_t, const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
+  explicit Free(size_t, const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs()); ///< A single dimension to initialise QuantumSystem`<1>` and the lists of real and complex name-frequency-multiplier tuples for DynamicsBase
 
+  /// \name Implementating inherited virtuals
+  /// Simply connect the pure virtual QuantumSystem::highestFrequency to the implementation DynamicsBase::highestFrequency.
+  /**
+   * An exception to the rule “never redefine an inherited non-virtual function” is taken because these functions are called the same in the two bases of Free,
+   * which would otherwise create ambiguities.
+   */
+  // @{
   double        highestFrequency (                ) const {return  highestFrequency_v(  );}
   std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);}
-  // We take an exception here of the rule "never redefine an inherited non-virtual function" because these functions are called the same in the two bases of Free, which would otherwise create ambiguities.
+  // @}
 
 private:
   double         highestFrequency_v(                ) const {return DynamicsBase::highestFrequency (  );}

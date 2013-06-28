@@ -4,10 +4,7 @@
 #include "TridiagonalHamiltonian.h"
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"
-/// [basic example mode]
-#include "FreeExact.h"
 
-/// [basic example mode]
 using namespace structure;
 using namespace free;
 
@@ -30,6 +27,9 @@ private:
 
 };
 /// [basic example mode]
+
+#include "FreeExact.h"
+// Further inculdes and using directives the same as above
 
 class PumpedLossyModeIP
   : public Free, public FreeExact, public TridiagonalHamiltonian<1,true>, public ElementLiouvillean<1,2>, public ElementAveraged<1>

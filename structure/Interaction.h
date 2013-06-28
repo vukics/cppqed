@@ -17,6 +17,10 @@
 
 #include <boost/bind.hpp>
 
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/algorithm/copy.hpp>
+
+
 #include <boost/iterator/transform_iterator.hpp>
 
 
@@ -34,24 +38,20 @@ public:
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
   explicit Interaction(const Frees& frees,
-		       const    RealFreqs&    realFreqs=   RealFreqs(), 
-		       const ComplexFreqs& complexFreqs=ComplexFreqs())
+                       const    RealFreqs&    realFreqs=   RealFreqs(), 
+                       const ComplexFreqs& complexFreqs=ComplexFreqs())
     : DynamicsBase(realFreqs,complexFreqs), DimensionsBookkeeper<RANK>(extractDimensions(frees)), frees_(frees) {}
 
     
   const Frees& getFrees() const {return frees_;}
 
 private:
-#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(frees.beginend(),boost::bind(&Free::getTotalDimension,_1))
-
   static const Dimensions extractDimensions(const Frees& frees)
   {
     Dimensions res;
-    std::copy(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end),res.begin());
+    boost::copy(frees | boost::adaptors::transformed(boost::bind(&Free::getTotalDimension,_1)), res.begin());
     return res;
   }
-  
-#undef TRANSFORMED_iterator
   
   const Frees frees_;
 

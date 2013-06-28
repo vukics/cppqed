@@ -4,7 +4,7 @@
 
 #include <boost/bind.hpp>
 
-using boost::assign::tuple_list_of; using boost::assign::list_of; using boost::bind;
+using boost::assign::list_of; using boost::bind;
 
 
 void aJump   (StateVectorLow&, double kappa_nPlus1);
@@ -16,10 +16,9 @@ double aDagJumpProba(const LazyDensityOperator&, double kappa_n     );
 
 PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double n, size_t cutoff)
   : Free(cutoff,
-	 RealFreqs(),
-	 tuple_list_of
-	 ("(kappa*(2*n+1),delta)",dcomp(kappa*(2*n+1),delta),cutoff)
-	 ("eta",eta,sqrt(cutoff))),
+         RealFreqs(),
+         FREQS("(kappa*(2*n+1),delta)",dcomp(kappa*(2*n+1),delta),cutoff      )
+              ("eta"                  ,eta                       ,sqrt(cutoff))),
     TridiagonalHamiltonian<1,false>(dcomp(-kappa*(2*n+1),delta)*nop(cutoff)
                                     +
                                     tridiagPlusHC_overI(conj(eta)*aop(cutoff))),
@@ -27,7 +26,7 @@ PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double n
                                            bind(aDagJump,_1,kappa* n   )),
                             JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(n+1)),
                                                       bind(aDagJumpProba,_1,kappa* n   )),
-			    "Mode",list_of("photon loss")("photon absorption")),
+                            "Mode",list_of("photon loss")("photon absorption")),
     ElementAveraged<1>("PumpedLossyMode",
                        list_of("<number operator>")("real(<ladder operator>)")("imag(\")"))
 {
@@ -60,11 +59,9 @@ const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t cutoff);
 
 PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, double n, size_t cutoff)
   : Free(cutoff,
-	 tuple_list_of
-	 ("kappa*(2*n+1)",kappa*(2*n+1),cutoff)
-	 ("delta",delta,1),
-	 tuple_list_of
-	 ("eta",eta,sqrt(cutoff))),
+         FREQS("kappa*(2*n+1)",kappa*(2*n+1),cutoff)
+              ("delta",delta,1),
+         FREQS("eta",eta,sqrt(cutoff))),
     FreeExact(cutoff),
     TridiagonalHamiltonian<1,true>(furnishWithFreqs(tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
                                                     mainDiagonal(dcomp(kappa*(2*n+1),-delta),cutoff))),
