@@ -203,4 +203,12 @@ public:
 };
 
 
+class LossyQbitWithPhaseNoise
+  : public qbit::Exact, public structure::ElementLiouvillean<1,2>, public QbitBase
+{
+public:
+  LossyQbitWithPhaseNoise(const qbit::ParsLossy&, double gamma_parallel);
+  
+};
+
 #endif // ELEMENTS_FREES_QBIT__H_INCLUDED

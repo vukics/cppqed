@@ -59,10 +59,10 @@ const Tridiagonal<RANK> Tridiagonal<RANK>::hermitianConjugate() const
       int res=0;
       // std::cout<<ind<<' ';
       for (int k=RANK-1; k>=0; k--) {
-	int threeToK=int(floor(pow(3.,k)));
-	int ik=int(floor(ind/double(threeToK)));
-	res+=((3-ik)%3)*threeToK;
-	ind-=ik*threeToK;
+        int threeToK=int(floor(pow(3.,k)));
+        int ik=int(floor(ind/double(threeToK)));
+        res+=((3-ik)%3)*threeToK;
+        ind-=ik*threeToK;
       }
       // std::cout<<res<<std::endl;
       return res;
@@ -100,11 +100,11 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
     doIt1(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
     {
       if (from.size()) {
-	if (!to.size()) {
-	  to.resize(from.shape());
-	  to=from;
-	}
-	else to+=from; // This will check for the compatibility of shapes
+        if (!to.size()) {
+          to.resize(from.shape());
+          to=from;
+        }
+        else to+=from; // This will check for the compatibility of shapes
       }
     }
 
@@ -112,11 +112,11 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
     doIt2(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
     {
       if (from.size()) {
-	if (to.size() && all(to!=from)) throw TridiagonalStructureMismatchException();
-	else {
-	  to.resize(from.shape());
-	  to=from;
-	}
+        if (to.size() && all(to!=from)) throw TridiagonalStructureMismatchException();
+        else {
+          to.resize(from.shape());
+          to=from;
+        }
       }
     }
 
@@ -139,7 +139,7 @@ namespace details {
 template<int RANK1, int RANK2, bool MULT> // if not multiply then sum
 const typename Tridiagonal<RANK1+RANK2>::Diagonals
 directDiagonals(const typename Tridiagonal<RANK1>::Diagonals& ds1,
-		const typename Tridiagonal<RANK2>::Diagonals& ds2) 
+                const typename Tridiagonal<RANK2>::Diagonals& ds2) 
 {
   using namespace blitzplusplus; // implies blitz
   using namespace linalg       ;
@@ -177,7 +177,7 @@ Tridiagonal<RANK>& Tridiagonal<RANK>::propagate(double t)
   if (double dt=t-tCurrent_)
     for (int i=1; i<LENGTH; i++)
       if (diagonals_(i).size() && freqs_(i).size())
-	diagonals_(i)*=exp(dt*freqs_(i));
+        diagonals_(i)*=exp(dt*freqs_(i));
   tCurrent_=t;
   return *this;
 }
@@ -219,8 +219,8 @@ void Tridiagonal<RANK>::FillRangesHelper::operator()(ICW)
   
   ranges_(i)(0)=Range(0,ubound_(i));
   ranges_(i)(2)=((
-		  ranges_(i)(1)=Range(0,ubound_(i)-int(k_(i)))
-		  )+int(k_(i)));
+                  ranges_(i)(1)=Range(0,ubound_(i)-int(k_(i)))
+                  )+int(k_(i)));
 
 }
 
@@ -256,28 +256,28 @@ void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt)
 
 template<int RANK> template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
 void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
-				const Ranges& ranges, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+                                const Ranges& ranges, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   static const int step=tmptools::Power<3,REMAINING-1>::value;
 
   using mpl::push_back; using mpl::int_;
 
   doApply<START+0*step,
-	  typename push_back<V_DPSIDT,int_<0> >::type,
-	  typename push_back<V_A     ,int_<0> >::type,
-	  typename push_back<V_PSI   ,int_<0> >::type>
+          typename push_back<V_DPSIDT,int_<0> >::type,
+          typename push_back<V_A     ,int_<0> >::type,
+          typename push_back<V_PSI   ,int_<0> >::type>
     (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
   doApply<START+1*step,
-	  typename push_back<V_DPSIDT,int_<2> >::type,
-	  typename push_back<V_A     ,int_<1> >::type,
-	  typename push_back<V_PSI   ,int_<1> >::type>
+          typename push_back<V_DPSIDT,int_<2> >::type,
+          typename push_back<V_A     ,int_<1> >::type,
+          typename push_back<V_PSI   ,int_<1> >::type>
     (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
   doApply<START+2*step,
-	  typename push_back<V_DPSIDT,int_<1> >::type,
-	  typename push_back<V_A     ,int_<1> >::type,
-	  typename push_back<V_PSI   ,int_<2> >::type>
+          typename push_back<V_DPSIDT,int_<1> >::type,
+          typename push_back<V_A     ,int_<1> >::type,
+          typename push_back<V_PSI   ,int_<2> >::type>
     (int_<REMAINING-1>(),ranges,psi,dpsidt);
 
 }
