@@ -52,7 +52,7 @@ double w(size_t n, double r, size_t k);
  * 
  * \param truncatedDimension if nonzero, this is used as the dimension instead of the actual dimension of `rho`
  * 
- * \todo should refer `rho` only via some traits class to make the code really generic.
+ * \todo Should refer `rho` only via some traits class to make the code really generic.
  * 
  */
 template<typename DensityOperatorFunctor>

@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFile
+/// \briefFileDefault
 #ifndef STRUCTURE_QUANTUMSYSTEM_H_INCLUDED
 #define STRUCTURE_QUANTUMSYSTEM_H_INCLUDED
 

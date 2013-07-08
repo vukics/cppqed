@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFile
+/// \briefFileDefault
 #ifndef STRUCTURE_FREE_H_INCLUDED
 #define STRUCTURE_FREE_H_INCLUDED
 

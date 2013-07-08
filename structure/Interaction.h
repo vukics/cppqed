@@ -1,12 +1,7 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef STRUCTURE_INTERACTION_H_INCLUDED
 #define STRUCTURE_INTERACTION_H_INCLUDED
-
-/*
-  The simplest possible implementation allowing for interaction between frees only. If we are to achieve recursiveness, that is the possibility of nesting composite systems into even more composite ones, we have to allow interaction between composites as well. That is, between QuantumSystems in general.
-
-  For this, Interaction should be even more templated taking compile-time vectors. These specify between which quantum numbers of the subsystems the interaction acts. Obviously, as many compile-time vectors are needed as the number of subsystems.
-*/
 
 #include "InteractionFwd.h"
 
@@ -21,18 +16,27 @@
 #include <boost/range/algorithm/copy.hpp>
 
 
-#include <boost/iterator/transform_iterator.hpp>
-
-
 namespace structure {
 
 
+/// Describes interaction of Free elements
+/**
+ * \tparam RANK Arity of the interaction. (Not greater than the arity of the full system Hilbert space.)
+ * 
+ * \note This is the simplest possible implementation allowing for interaction between frees only. If we are to achieve recursiveness,
+ * i.e. the possibility of nesting composite systems into even more composite ones, we have to allow interaction between composites as well.
+ * That is, between QuantumSystems in general. For this, Interaction should be even more templated taking compile-time vectors.
+ * These specify between which quantum numbers of the subsystems the interaction acts. As many compile-time vectors are needed as the number of subsystems.
+ * 
+ */
 template<int RANK>
 class Interaction : public DynamicsBase, public DimensionsBookkeeper<RANK>
 {
 public:
   typedef boost::shared_ptr<const Interaction> Ptr;
 
+  /// A tiny vector of shared pointers to the Free objects between which the interaction is defined
+  /** \note The order of the Free objects is essential! (Cf. BinarySystem, Composite) */
   typedef blitz::TinyVector<Free::Ptr,RANK> Frees;
 
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
