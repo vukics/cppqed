@@ -28,6 +28,9 @@ namespace structure {
  * That is, between QuantumSystems in general. For this, Interaction should be even more templated taking compile-time vectors.
  * These specify between which quantum numbers of the subsystems the interaction acts. As many compile-time vectors are needed as the number of subsystems.
  * 
+ * No inheritance from QuantumSystem because it does not make sense to simulate such an element as describes an interaction alone.
+ * However, an interaction can have frequency-like parameters, hence the inheritance from DynamicsBase.
+ * 
  */
 template<int RANK>
 class Interaction : public DynamicsBase, public DimensionsBookkeeper<RANK>
