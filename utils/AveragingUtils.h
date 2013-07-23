@@ -70,14 +70,14 @@ private:
 namespace averagingUtils {
   
 
-template<int RANK, bool IS_TD>
-class Collecting : public structure::ClonableElementAveraged<RANK,IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
+class Collecting : public structure::ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
 public:
-  typedef structure::ClonableElementAveraged<RANK,IS_TD> Element;
+  typedef structure::ClonableElementAveraged<RANK,IS_TIME_DEPENDENT> Element;
   typedef boost::ptr_list<Element> Collection;
 
-  typedef structure::ClonableElementAveraged<RANK,IS_TD> Base;
+  typedef structure::ClonableElementAveraged<RANK,IS_TIME_DEPENDENT> Base;
   typedef typename Base::KeyLabels KeyLabels;
 
   typedef structure::AveragedCommon::Averages Averages;
@@ -103,17 +103,17 @@ private:
 
 
 
-template<int RANKFROM, int RANKTO, bool IS_TD>
-class Transferring : public structure::Averaged<RANKFROM,IS_TD>
+template<int RANKFROM, int RANKTO, bool IS_TIME_DEPENDENT>
+class Transferring : public structure::Averaged<RANKFROM,IS_TIME_DEPENDENT>
 // Transfers the calculation of averages to another Averaged class, possibly with different RANK.
 // The LazyDensityOperator for the other class should reference the same data.
 // For a usage example cf. scripts/QbitMode_Matrix.cc
 {
 public:
-  typedef typename structure::Averaged<RANKFROM,IS_TD>::Averages            Averages           ;
-  typedef typename structure::Averaged<RANKFROM,IS_TD>::LazyDensityOperator LazyDensityOperator;
+  typedef typename structure::Averaged<RANKFROM,IS_TIME_DEPENDENT>::Averages            Averages           ;
+  typedef typename structure::Averaged<RANKFROM,IS_TIME_DEPENDENT>::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename structure::Averaged<RANKTO,IS_TD>::Ptr AveragedToPtr;
+  typedef typename structure::Averaged<RANKTO,IS_TIME_DEPENDENT>::Ptr AveragedToPtr;
   typedef quantumdata::LazyDensityOperator<RANKTO> LazyDensityOperatorTo;
 
   Transferring(AveragedToPtr averaged, const LazyDensityOperatorTo& ldo)

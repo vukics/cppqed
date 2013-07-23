@@ -28,16 +28,16 @@ private:
 };
 
 
-template <int RANK, bool IS_TD>
-class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public averagingUtils::Transferring<1,RANK,IS_TD>
+template <int RANK, bool IS_TIME_DEPENDENT>
+class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public averagingUtils::Transferring<1,RANK,IS_TIME_DEPENDENT>
 {
 public:
-  typedef typename structure::Averaged<RANK,IS_TD>::Ptr AveragedPtr;
+  typedef typename structure::Averaged<RANK,IS_TIME_DEPENDENT>::Ptr AveragedPtr;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, AveragedPtr averaged, const LazyDensityOperator& ldo)
-    : TimeIndependentMatrixHamiltonian(matrix), averagingUtils::Transferring<1,RANK,IS_TD>(averaged,ldo) {}
+    : TimeIndependentMatrixHamiltonian(matrix), averagingUtils::Transferring<1,RANK,IS_TIME_DEPENDENT>(averaged,ldo) {}
 
 };
 

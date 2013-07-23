@@ -114,16 +114,16 @@ void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) con
 
 #define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
 
-template<int RANK, bool IS_TD>
-averagingUtils::Collecting<RANK,IS_TD>::Collecting(const Collection& collection)
+template<int RANK, bool IS_TIME_DEPENDENT>
+averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Collecting(const Collection& collection)
   : Base(collection.front().getTitle(),
          cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),KeyLabels())),
     collection_(collection.clone())
 {}
 
 
-template<int RANK, bool IS_TD>
-averagingUtils::Collecting<RANK,IS_TD>::Collecting(const Collecting& collecting)
+template<int RANK, bool IS_TIME_DEPENDENT>
+averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Collecting(const Collecting& collecting)
   : Base(collecting),
     collection_(collecting.collection_.clone())
 {}
@@ -134,9 +134,9 @@ averagingUtils::Collecting<RANK,IS_TD>::Collecting(const Collecting& collecting)
 
 #define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection_.beginend(),boost::bind(&Element::average,_1,t,boost::cref(matrix)))
 
-template<int RANK, bool IS_TD>
-const typename averagingUtils::Collecting<RANK,IS_TD>::Averages
-averagingUtils::Collecting<RANK,IS_TD>::average_v(double t, const LazyDensityOperator& matrix) const
+template<int RANK, bool IS_TIME_DEPENDENT>
+const typename averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Averages
+averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::average_v(double t, const LazyDensityOperator& matrix) const
 {
   Averages res(nAvr()); res=0;
   return cpputils::concatenate(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),res);
@@ -147,9 +147,9 @@ averagingUtils::Collecting<RANK,IS_TD>::average_v(double t, const LazyDensityOpe
 
 
 
-template<int RANK, bool IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
 void
-averagingUtils::Collecting<RANK,IS_TD>::process_v(Averages& avr) const
+averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::process_v(Averages& avr) const
 {
   struct Helper
   {

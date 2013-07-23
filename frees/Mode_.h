@@ -104,16 +104,16 @@ struct Empty {};
 }
 
 
-template<bool IS_TD>
+template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
-  : public structure::TridiagonalHamiltonian<1,IS_TD>,
-    public mpl::if_c<IS_TD,Exact,details::Empty>::type
+  : public structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
+    public mpl::if_c<IS_TIME_DEPENDENT,Exact,details::Empty>::type
 {
 public:
-  typedef structure::TridiagonalHamiltonian<1,IS_TD> Base;
+  typedef structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
-  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t, mpl::bool_<IS_TD> =mpl:: true_()); // works for IS_TD=true
-  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, size_t, mpl::bool_<IS_TD> =mpl::false_()); // works for IS_TD=false
+  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
+  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
   // The trailing dummy argument is there to cause a _compile_time_
   // (and not merely linking time) error in case of misuse
 
