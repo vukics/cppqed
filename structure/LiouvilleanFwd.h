@@ -6,7 +6,7 @@
 namespace structure {
 
 
-template<int, bool IS_TD=true>
+template<int, bool IS_TIME_DEPENDENT=true>
 class Liouvillean;
 
 

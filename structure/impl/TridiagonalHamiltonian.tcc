@@ -15,20 +15,20 @@
 namespace structure {
 
 
-template<int RANK, bool IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
 void 
-details::TDH_Base<RANK,IS_TD>::addContribution_v(double tMinusIntPic0, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+details::TDH_Base<RANK,IS_TIME_DEPENDENT>::addContribution_v(double tMinusIntPic0, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  typename boost::enable_if_c< IS_TD>::type(); ///< Ensuring that the function can be compiled only in the time-dependent case
+  typename boost::enable_if_c< IS_TIME_DEPENDENT>::type(); ///< Ensuring that the function can be compiled only in the time-dependent case
   boost::for_each(hOverIs_,bind(quantumoperator::apply<RANK>,psi,dpsidt,bind(&Tridiagonal::propagate,_1,tMinusIntPic0)));
 }
 
 
-template<int RANK, bool IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
 void 
-details::TDH_Base<RANK,IS_TD>::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+details::TDH_Base<RANK,IS_TIME_DEPENDENT>::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  typename boost::enable_if_c<!IS_TD>::type(); ///< Ensuring that the function can be compiled only in the time-independent case
+  typename boost::enable_if_c<!IS_TIME_DEPENDENT>::type(); ///< Ensuring that the function can be compiled only in the time-independent case
   boost::for_each(hOverIs_,bind(quantumoperator::apply<RANK>,psi,dpsidt,_1));
 }
 

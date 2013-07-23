@@ -5,10 +5,10 @@
 namespace structure {
 
 
-template<int RANK, bool IS_TD=false>
+template<int RANK, bool IS_TIME_DEPENDENT=false>
 class ElementAveraged;
 
-template<int RANK, bool IS_TD=false>
+template<int RANK, bool IS_TIME_DEPENDENT=false>
 class ClonableElementAveraged;
 
 

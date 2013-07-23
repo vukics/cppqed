@@ -78,16 +78,16 @@ private:
 };
 
 
-template<bool IS_TD>
+template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
-  : public structure::TridiagonalHamiltonian<1,IS_TD>,
-    public mpl::if_c<IS_TD,Exact,details::Empty>::type
+  : public structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
+    public mpl::if_c<IS_TIME_DEPENDENT,Exact,details::Empty>::type
 {
 public:
-  typedef structure::TridiagonalHamiltonian<1,IS_TD> Base;
+  typedef structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
   Hamiltonian(const Spatial&, double omrec, double vClass, const ModeFunction&);
-  Hamiltonian(const Spatial&, double omrec, mpl::bool_<IS_TD> =mpl::false_());
+  Hamiltonian(const Spatial&, double omrec, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_());
 
 };
 

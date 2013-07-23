@@ -86,8 +86,8 @@ public:
 
 
 
-template<bool IS_TD>
-class Hamiltonian : public mode::Hamiltonian<IS_TD>
+template<bool IS_TIME_DEPENDENT>
+class Hamiltonian : public mode::Hamiltonian<IS_TIME_DEPENDENT>
 {
 public:
   Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta)

@@ -19,10 +19,10 @@ namespace details {
 
 
 /// TridiagonalHamiltonian base
-template<int RANK, bool IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
 class TDH_Base 
   : public Hamiltonian<RANK,
-                       mpl::if_c<IS_TD,
+                       mpl::if_c<IS_TIME_DEPENDENT,
                                  mpl::integral_c<TimeDependence,ONE_TIME>,
                                  mpl::integral_c<TimeDependence, NO_TIME>
                                  >::type::value
@@ -59,18 +59,18 @@ private:
  * Such a class can be constructed with either a list of quantumoperator::Tridiagonal `<RANK>` objects, or only one such object when the above sum consists of only one term.
  * 
  * \tparamRANK
- * \tparam IS_TD governs time-dependence
+ * \tparam IS_TIME_DEPENDENT governs time-dependence & the composition of the class @ compile time
  * 
- * Implements Hamiltonian<RANK,ONE_TIME> when `IS_TD=true` **OR** Hamiltonian<RANK,NO_TIME>  when `IS_TD=false`
+ * Implements Hamiltonian<RANK,ONE_TIME> when `IS_TIME_DEPENDENT=true` **OR** Hamiltonian<RANK,NO_TIME>  when `IS_TIME_DEPENDENT=false`
  * 
  * \note The present architecture of quantumoperator::Tridiagonal does not allow to cover the case #TWO_TIME.
  *  
  */
-template<int RANK, bool IS_TD> // TD stands for time-dependent: the class is composed at compile-time 
-class TridiagonalHamiltonian : public details::TDH_Base<RANK,IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
+class TridiagonalHamiltonian : public details::TDH_Base<RANK,IS_TIME_DEPENDENT>
 {
 private:
-  typedef details::TDH_Base<RANK,IS_TD> Base;
+  typedef details::TDH_Base<RANK,IS_TIME_DEPENDENT> Base;
 
 public:
   typedef typename Base::Tridiagonal  Tridiagonal ;

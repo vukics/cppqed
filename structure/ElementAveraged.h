@@ -23,8 +23,8 @@ void displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
 //////////////////
 
 
-template<int RANK, bool IS_TD>
-class ElementAveraged : public Averaged<RANK,IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
+class ElementAveraged : public Averaged<RANK,IS_TIME_DEPENDENT>
 {
 public:
   typedef AveragedCommon::Averages Averages;
@@ -47,11 +47,11 @@ private:
 
 
 
-template<int RANK, bool IS_TD>
-class ClonableElementAveraged : public ElementAveraged<RANK,IS_TD>
+template<int RANK, bool IS_TIME_DEPENDENT>
+class ClonableElementAveraged : public ElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
 public:
-  typedef ElementAveraged<RANK,IS_TD> Base;
+  typedef ElementAveraged<RANK,IS_TIME_DEPENDENT> Base;
   typedef typename Base::KeyLabels KeyLabels;
 
   typedef ClonableElementAveraged* ClonedPtr;
@@ -66,8 +66,8 @@ private:
 };
 
 
-template<int RANK, bool IS_TD>
-inline ClonableElementAveraged<RANK,IS_TD>*const new_clone(const ClonableElementAveraged<RANK,IS_TD>& cea)
+template<int RANK, bool IS_TIME_DEPENDENT>
+inline ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>*const new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea)
 {
   return cea.clone();
 }
