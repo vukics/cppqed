@@ -92,7 +92,7 @@ CLASS_HEADER(Exact)
 
   bool isUnitary_v() const;
 
-  void  actWithU_v(double, StateVectorLow&) const;
+  void  actWithU_v(double, StateVectorLow&, double) const;
 
 };
 

@@ -61,7 +61,7 @@ class Empty {};
 } // details
 
 
-class Exact : public structure::FreeExact, private details::Storage
+class Exact : public structure::FreeExact<false>, private details::Storage
 {
 public:
   Exact(const Spatial&, double omrec);
@@ -73,7 +73,7 @@ private:
 
   bool isUnitary_v() const {return true;}
 
-  const Factors factorExponents_;
+  const Diagonal factorExponents_;
 
 };
 

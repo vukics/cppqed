@@ -53,7 +53,7 @@ Exact<NL>::updateU(double dtdid) const
 {
   using namespace std;
   dcomp (*dcompExp)(const dcomp&)=&exp;
-  boost::transform(zIs_,getFactors().begin(),bll::bind(dcompExp,-dtdid*bll::_1));
+  boost::transform(zIs_,getDiagonal().begin(),bll::bind(dcompExp,-dtdid*bll::_1));
 }
 
 

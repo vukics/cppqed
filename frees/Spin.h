@@ -87,7 +87,7 @@ private:
 
 class Spin 
   : public SpinBase,
-    public structure::FreeExact
+    public structure::FreeExact<false>
 {
 public:
 

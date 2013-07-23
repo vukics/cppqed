@@ -46,7 +46,7 @@ Exact::Exact(const dcomp& zI, size_t dim)
 
 void Exact::updateU(double dtdid) const
 {
-  getFactors()=exp(-zI_*(dtdid*blitz::tensor::i));
+  getDiagonal()=exp(-zI_*(dtdid*blitz::tensor::i));
 }
 
 

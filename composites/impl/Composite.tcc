@@ -316,12 +316,12 @@ template<typename VA>
 class composite::Exact<VA>::ActWithU
 {
 public:
-  ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
+  ActWithU(const Frees& frees, double t, StateVectorLow& psi, double t0) : frees_(frees), t_(t), psi_(psi), t0_(t0) {}
 
   template<typename Vec, typename Ex>
   void help(typename Ex::Ptr ex) const
   {
-    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,dtdid_,::_1));
+    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,t_,::_1,t0_));
     // namespace qualification :: is necessary because otherwise :: and mpl:: are equally good matches.
   }
 
@@ -330,16 +330,16 @@ public:
 private:
   const Frees& frees_;
 
-  const double dtdid_;
+  const double t_, t0_;
   StateVectorLow& psi_; 
 
 };
 
 
 template<typename VA>
-void composite::Exact<VA>::actWithU_v(double dtdid, StateVectorLow& psi) const
+void composite::Exact<VA>::actWithU_v(double t, StateVectorLow& psi, double t0) const
 {
-  CALL_composite_worker( ActWithU(frees_,dtdid,psi) ) ;
+  CALL_composite_worker( ActWithU(frees_,t,psi,t0) ) ;
 }
 
 
