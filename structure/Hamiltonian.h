@@ -34,7 +34,7 @@ public:
    */
   void addContribution(double t, ///<[in] the time instant \f$t\f$ for #TWO_TIME dependence
                        const StateVectorLow& psi, ///<[in] the state vector \f$\ket\Psi\f$
-                       StateVectorLow& dpsidt, ///<[in,out] the state vector to be contributed to by \f$\frac{H(t)}i\ket\Psi\f$
+                       StateVectorLow& dpsidt, ///<[in/out] the state vector to be contributed to by \f$\frac{H(t)}i\ket\Psi\f$
                        double tIntPic0 ///<[in] the time instant \f$t_0\f$ for #TWO_TIME dependence
                       ) const
                        {addContribution_v(t,psi,dpsidt,tIntPic0);}

@@ -46,7 +46,7 @@ const Tridiagonal splus(Ptr spin)
   // i=m+s (m is the magnetic quantum number)
   Tridiagonal res(Diagonal(),1,diagonal=sqrt((spin->getTwoS()-i)*(i+1.)));
   // writing "1." is tremendously important here, for converting the whole thing to doubles: otherwise, the sqrt is apparently performed within integers by blitz!!! 
-  if (dynamic_cast<const structure::FreeExact*>(spin.get())) res.furnishWithFreqs(mainDiagonal(spin));
+  if (dynamic_cast<const structure::FreeExact<false>*>(spin.get())) res.furnishWithFreqs(mainDiagonal(spin));
   return res;
 }
 
@@ -127,7 +127,7 @@ void SpinBase::process_v(Averages& averages) const
 
 void Spin::updateU(double dtdid) const
 {
-  Factors& factors(getFactors());
+  Diagonal& factors(getDiagonal());
   for (int i=0; i<factors.size(); i++)
     factors(i)=exp(-dtdid*i*get_z());
 }

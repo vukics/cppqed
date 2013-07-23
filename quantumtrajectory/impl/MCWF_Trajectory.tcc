@@ -93,7 +93,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   double t=getTime();
 
   if (const typename Exact::Ptr ex=qs_.getEx()) {
-    ex->actWithU(getDtDid(),psi_());
+    ex->actWithU(getTime(),psi_(),tIntPic0_);
     tIntPic0_=t;
   }
 

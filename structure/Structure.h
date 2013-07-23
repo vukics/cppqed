@@ -178,7 +178,7 @@ public:
   
   bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
 
-  void actWithU(double t, StateVectorLow& psi) const {if (ex_) ex_->actWithU(t,psi);}
+  void actWithU(double t, StateVectorLow& psi, double t0) const {if (ex_) ex_->actWithU(t,psi,t0);}
 
 
   // Hamiltonian

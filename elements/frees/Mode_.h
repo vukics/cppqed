@@ -79,7 +79,7 @@ const Tridiagonal pumping(const dcomp& eta, size_t dim);
 
 
 
-class Exact : public structure::FreeExact
+class Exact : public structure::FreeExact<false>
 {
 public:
   Exact(const dcomp& zI, size_t);

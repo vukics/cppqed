@@ -95,7 +95,7 @@ Base<RANK>::step_v(double deltaT)
     PROGRESS_TIMER_IN_POINT( getOstream() )
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_());
-    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1));
+    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,tIntPic0_));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);

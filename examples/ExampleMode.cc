@@ -78,7 +78,7 @@ PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, doub
 
 void PumpedLossyModeIP::updateU(double dtDid) const
 {
-  getFactors()=exp(-z_*(dtDid*blitz::tensor::i));
+  getDiagonal()=exp(-z_*(dtDid*blitz::tensor::i));
 }
 
 

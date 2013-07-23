@@ -35,9 +35,9 @@ const Tridiagonal cosNKX (size_t, ptrdiff_t);
 
 namespace {
 
-const Exact::Factors fExpFill(const Spatial& space, double omrec)
+const Exact::Diagonal fExpFill(const Spatial& space, double omrec)
 {
-  return Exact::Factors(-DCOMP_I*omrec*blitz::sqr(space.getK()));
+  return Exact::Diagonal(-DCOMP_I*omrec*blitz::sqr(space.getK()));
 }
 
 } 
@@ -50,7 +50,7 @@ Exact::Exact(const Spatial& space, double omrec)
 
 void Exact::updateU(double dtdid) const
 {
-  getFactors()=exp(factorExponents_*dtdid);
+  getDiagonal()=exp(factorExponents_*dtdid);
 }
  
 

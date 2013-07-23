@@ -170,14 +170,14 @@ bool binary::Exact::isUnitary_v() const
 
 
 
-void binary::Exact::actWithU_v(double dt, StateVectorLow& psi) const
+void binary::Exact::actWithU_v(double t, StateVectorLow& psi, double t0) const
 {
   using namespace blitzplusplus::basi;
 
-  if (const Ex1::Ptr ex=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex,dt,_1));
-  if (const Ex1::Ptr ex=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex,dt,_1));
+  if (const Ex1::Ptr ex=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
+  if (const Ex1::Ptr ex=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
 
-  ia_.actWithU(dt,psi);
+  ia_.actWithU(t,psi,t0);
 
 }
 

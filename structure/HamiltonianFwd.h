@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFile Defines enumeration structure::TimeDependence & the general form of structure::Hamiltonian
+/// \briefFile{Defines enumeration structure::TimeDependence & the general form of structure::Hamiltonian}
 #ifndef   STRUCTURE_HAMILTONIANFWD_H_INCLUDED
 #define   STRUCTURE_HAMILTONIANFWD_H_INCLUDED
 
@@ -8,9 +8,9 @@ namespace structure {
 /// Enumeration of different possibilities for time dependence of Hamiltonians
 /** With \f$t_0\f$ being the time instant where the \link Exact two pictures\endlink coincide: */
 enum TimeDependence {
-  TWO_TIME, ///< \f$H(t,t_0)\f$ – Time-dependent problem + \link Exact exact part\endlink (\f$U(t,t_0)\f$)
-  ONE_TIME, ///< \f$H(t)\f$ – Time-dependent problem, no exact part **OR** \f$H(t-t_0)\f$ – Time-independent problem + \link Exact exact part\endlink (\f$U(t-t_0)\f$)
-  NO_TIME   ///< \f$H(0)\f$ – Time-independent problem, no exact part
+  TWO_TIME, ///< **Case 1** \f$H(t,t_0)\f$ – Time-dependent problem + \link Exact exact part\endlink (\f$U(t,t_0)\f$)
+  ONE_TIME, ///< **Case 2** \f$H(t)\f$ – Time-dependent problem, no exact part **OR Case 3** \f$H(t-t_0)\f$ – Time-independent problem + \link Exact exact part\endlink (\f$U(t-t_0)\f$)
+  NO_TIME   ///< **Case 4** \f$H(0)\f$ – Time-independent problem, no exact part
 };
 
 
