@@ -133,13 +133,13 @@ void aDagJump(StateVectorLow& psi, double kappa)
 }
 
 
-double aJumpProba   (const LazyDensityOperator& matrix, double kappa)
+double aJumpRate   (const LazyDensityOperator& matrix, double kappa)
 {
   return 2.*kappa*photonNumber(matrix);
 }
 
 
-double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
+double aDagJumpRate(const LazyDensityOperator& matrix, double kappa)
 {
   return 2.*kappa*(photonNumber(matrix)+1.);
 }
@@ -151,8 +151,8 @@ double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
 Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
   : Base(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
                         bind(aDagJump,_1,kappa* nTh  )),
-         JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(nTh+1)),
-                                   bind(aDagJumpProba,_1,kappa* nTh  )),
+         JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(nTh+1)),
+                            bind(aDagJumpRate,_1,kappa* nTh  )),
          kT,list_of("excitation loss")("excitation absorption"))
 {
 }
@@ -171,14 +171,14 @@ void Liouvillean<false,true>::doActWithJ(StateVectorLow& psi) const
 
 
 template<>
-double Liouvillean<false,false>::probability(const LazyDensityOperator& matrix) const
+double Liouvillean<false,false>::rate(const LazyDensityOperator& matrix) const
 {
-  return aJumpProba(matrix,kappa_);
+  return aJumpRate(matrix,kappa_);
 }
 
 
 template<>
-double Liouvillean<false,true>::probability(const LazyDensityOperator&) const
+double Liouvillean<false,true>::rate(const LazyDensityOperator&) const
 {
   return -1;
 }
@@ -428,7 +428,7 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
 
 
 
-double PumpedLossyModeIP_NoExact::probability(double, const LazyDensityOperator& m) const
+double PumpedLossyModeIP_NoExact::rate(double, const LazyDensityOperator& m) const
 {
   return mode::photonNumber(m);
 }

@@ -46,12 +46,12 @@ struct RealLevelsMF : mpl::identity<blitz::TinyVector<double,NL> > {};
 struct MultiLevelExactNotImplementedException : public cpputils::Exception {};
 
 template<int NL>
-class Exact : public structure::FreeExact
+class Exact : public structure::FreeExact<false>
 {
 public:
   typedef typename LevelsMF<NL>::type Levels;
 
-  Exact(const Levels& zIs) : FreeExact(NL), zIs_(zIs) {}
+  Exact(const Levels& zIs) : FreeExact<false>(NL), zIs_(zIs) {}
 
   const Levels& get_zIs() const {return zIs_;}
 
@@ -204,24 +204,24 @@ public:
 
 template<int NL, typename VL>
 class Liouvillean : public structure::ElementLiouvillean<1,mpl::size<VL>::value>
-// Note that, at some point, the Fusion sequence VL needs to be converted into a runtime sequence (JumpStrategies & JumpProbabilityStrategies)
+// Note that, at some point, the Fusion sequence VL needs to be converted into a runtime sequence (JumpStrategies & JumpRateStrategies)
 {
 public:
   static const int NLT=mpl::size<VL>::value; // number of lossy transitions
 
   typedef structure::ElementLiouvillean<1,NLT> Base;
   
-  typedef typename Base::JumpStrategies            JumpStrategies           ;
-  typedef typename Base::JumpProbabilityStrategies JumpProbabilityStrategies;
+  typedef typename Base::JumpStrategies     JumpStrategies    ;
+  typedef typename Base::JumpRateStrategies JumpRateStrategies;
 
-  BOOST_STATIC_ASSERT( blitzplusplus::TinyVectorLengthTraits<JumpProbabilityStrategies>::value==NLT );
+  BOOST_STATIC_ASSERT( blitzplusplus::TinyVectorLengthTraits<JumpRateStrategies>::value==NLT );
 
   typedef typename Base::KeyLabels KeyLabels;
 
-  Liouvillean(const VL& gammas) : Base(Liouvillean::fillJS(),Liouvillean::fillJPS(),keyTitle,fillKeyLabels()), gammas_(gammas) {}
+  Liouvillean(const VL& gammas) : Base(Liouvillean::fillJS(),Liouvillean::fillJRS(),keyTitle,fillKeyLabels()), gammas_(gammas) {}
 
-  const JumpStrategies            fillJS () const;
-  const JumpProbabilityStrategies fillJPS() const;
+  const JumpStrategies     fillJS () const;
+  const JumpRateStrategies fillJRS() const;
 
   static const KeyLabels fillKeyLabels();
 
@@ -230,12 +230,12 @@ private:
   void jumpStrategy(StateVectorLow&) const;
 
   template<int>
-  double jumpProbabilityStrategy(const LazyDensityOperator&) const;
+  double jumpRateStrategy(const LazyDensityOperator&) const;
 
-  // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters? This would be needed to fuse fillJS and fillJPS into a template together with the helper classes below
+  // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters? This would be needed to fuse fillJS and fillJRS into a template together with the helper classes below
   
   class  JS_helper;
-  class JPS_helper;
+  class JRS_helper;
 
   class KeyHelper;
 

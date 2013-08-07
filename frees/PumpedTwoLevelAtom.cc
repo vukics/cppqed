@@ -17,7 +17,7 @@ PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
 }
 
 
-double PumpedTwoLevelAtom::probability(const LazyDensityOperator& matrix) const
+double PumpedTwoLevelAtom::rate(const LazyDensityOperator& matrix) const
 {
   return -2.*real(za_)*matrix(1);
 }
