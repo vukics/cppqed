@@ -31,7 +31,7 @@ namespace quantumtrajectory {
 
 /// Implements a single Monte Carlo wave-function trajectory
 /**
- * In the framework, a single \ref mcwftrajectory “Monte Carlo wave-function step” at time \f$t\f$ (at which point, if the system inherits from structure::Exact,
+ * In the framework, a single \ref mcwftrajectory "Monte Carlo wave-function step" at time \f$t\f$ (at which point, if the system inherits from structure::Exact,
  * the Schrödinger- and interaction pictures coincide) is implemented as a sequence of the following stages:
  * -# Coherent time development is applied:
  *   -# If the system time evolution has Hamiltonian part, it is evolved with an adaptive-size step (cf. evolved::Evolved). This takes the system into \f$t+\Delta t\f$.

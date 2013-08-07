@@ -23,7 +23,9 @@ namespace structure {
  * 
  * \see Liouvillean<RANK,true>, Liouvillean<RANK,false> in Liouvillean.h
  * 
- * \note It is always possible to forgo the explicit calculation of certain jump rates because the rate can be calculated also on the basis of  the actWithJ() by the MCWF stepper. The fact that such a fallback is desired can be signalled by setting a negative value for the rate of the given jump (“special jump”).
+ * \note It is always possible to forgo the explicit calculation of certain jump rates because the rate can be calculated also on the basis of the Liouvillean::actWithJ function by the 
+ * \link quantumtrajectory::MCWF_Trajectory MCWF stepper\endlink.
+ * The fact that such a fallback is desired can be signalled by setting a negative value for the rate of the given jump (“special jump”).
  * 
  */
 template<int RANK, bool IS_TIME_DEPENDENT=true>

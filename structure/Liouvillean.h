@@ -32,6 +32,8 @@ public:
   typedef typename Base::DArray1D Rates; ///< The 1D real array for storing the jump rates
 
   virtual ~Liouvillean() {}
+  
+  const Rates rates(double t, const LazyDensityOperator& matrix) const {return Base::average(t,matrix);}
 
   /// Performs the quantum jump operation \f$\ket\Psi\rightarrow J_m(t)\ket\Psi\f$
   void actWithJ(double t,            ///<[in] \f$t\f$
@@ -52,7 +54,7 @@ class Liouvillean<RANK,false> : public Liouvillean<RANK,true>
 public:
   typedef typename Liouvillean<RANK,true>::StateVectorLow      StateVectorLow     ;
   typedef typename Liouvillean<RANK,true>::LazyDensityOperator LazyDensityOperator;
-  typedef typename Liouvillean<RANK,true>::Rates       Rates      ;
+  typedef typename Liouvillean<RANK,true>::Rates               Rates              ;
 
 private:
   void        actWithJ_v(double, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(psi,jumpNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK,true>
@@ -63,6 +65,11 @@ private:
 
 };
 
+
+/** \page specialjump The notion of “special jumps” in the framework
+ * 
+ * 
+ */
 
 
 } // structure

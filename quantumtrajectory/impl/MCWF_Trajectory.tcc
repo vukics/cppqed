@@ -58,7 +58,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 {
   if (psi!=*qs_.getQS()) throw DimensionalityMismatchException();
   if (!getTime()) if(const typename Liouvillean::Ptr li=qs_.getLi()) { // On startup, dpLimit should not be overshot, either.
-    Rates rates(li->average(0.,psi_)); calculateSpecialRates(&rates,0.);
+    Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
     manageTimeStep(rates,getEvolved().get(),false);
   }
 }
@@ -187,13 +187,13 @@ void MCWF_Trajectory<RANK>::step_v(double Dt)
 
   if (const typename Liouvillean::Ptr li=qs_.getLi()) {
 
-    Rates rates(li->average(t,psi_));
+    Rates rates(li->rates(t,psi_));
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
 
     while (manageTimeStep(rates,&evolvedCache)) {
       psi_()=psiCache;
       t=coherentTimeDevelopment(Dt); // the next try
-      rates=li->average(t,psi_);
+      rates=li->rates(t,psi_);
       specialRates=calculateSpecialRates(&rates,t);
     }
 
@@ -222,7 +222,7 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
     }
     os<<"# Alternative jumps: ";
     {
-      const Rates rates(li->average(0,psi_));
+      const Rates rates(li->rates(0,psi_));
       int n=0;
       for (int i=0; i<rates.size(); i++) if (rates(i)<0) {os<<i<<' '; n++;}
       if (!n) os<<"none";
