@@ -421,9 +421,9 @@ private:
 
 
 template<typename VA> template<structure::LiouvilleanAveragedTag LA>
-void composite::Base<VA>::displayKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
+std::ostream& composite::Base<VA>::displayKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
 {
-  worker<Ordinals>(acts,DisplayKey<LA>(frees,os,i));
+  worker<Ordinals>(acts,DisplayKey<LA>(frees,os,i)); return os;
 }
 
 
