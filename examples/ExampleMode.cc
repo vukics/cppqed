@@ -10,8 +10,8 @@ using boost::assign::list_of; using boost::bind;
 void aJump   (StateVectorLow&, double kappa_nPlus1);
 void aDagJump(StateVectorLow&, double kappa_n     );
 
-double aJumpProba   (const LazyDensityOperator&, double kappa_nPlus1);
-double aDagJumpProba(const LazyDensityOperator&, double kappa_n     );
+double aJumpRate   (const LazyDensityOperator&, double kappa_nPlus1);
+double aDagJumpRate(const LazyDensityOperator&, double kappa_n     );
 
 
 PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double n, size_t cutoff)
@@ -24,8 +24,8 @@ PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double n
                                     tridiagPlusHC_overI(conj(eta)*aop(cutoff))),
     ElementLiouvillean<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(n+1)),
                                            bind(aDagJump,_1,kappa* n   )),
-                            JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(n+1)),
-                                                      bind(aDagJumpProba,_1,kappa* n   )),
+                            JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(n+1)),
+                                               bind(aDagJumpRate,_1,kappa* n   )),
                             "Mode",list_of("photon loss")("photon absorption")),
     ElementAveraged<1>("PumpedLossyMode",
                        list_of("<number operator>")("real(<ladder operator>)")("imag(\")"))
@@ -40,7 +40,7 @@ const PumpedLossyMode::Averages PumpedLossyMode::average_v(const LazyDensityOper
 
   averages=0;
 
-  averages(0)=aJumpProba(matrix,1);
+  averages(0)=aJumpRate(matrix,1);
 
   for (int n=1; n<int(matrix.getDimension()); n++) {
     double sqrtn=sqrt(n);
@@ -67,8 +67,8 @@ PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, doub
                                                     mainDiagonal(dcomp(kappa*(2*n+1),-delta),cutoff))),
     ElementLiouvillean<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(n+1)),
                                            bind(aDagJump,_1,kappa* n   )),
-                            JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(n+1)),
-                                                      bind(aDagJumpProba,_1,kappa* n   )),
+                            JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(n+1)),
+                                               bind(aDagJumpRate,_1,kappa* n   )),
                             "Mode",list_of("photon loss")("photon absorption")),
     ElementAveraged<1>("PumpedLossyMode",
                        list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
@@ -88,7 +88,7 @@ const PumpedLossyModeIP::Averages PumpedLossyModeIP::average_v(const LazyDensity
 
   averages=0;
 
-  averages(0)=aJumpProba(matrix,1);
+  averages(0)=aJumpRate(matrix,1);
 
   for (int n=1; n<int(matrix.getDimension()); n++) {
     double sqrtn=sqrt(n);

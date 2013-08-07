@@ -143,4 +143,4 @@ void LossySpin::doActWithJ(structure::free::StateVectorLow& psi) const
 }
 
 
-// double probability(const LazyDensityOperator&) const;
+// double rate(const LazyDensityOperator&) const;

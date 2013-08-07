@@ -148,7 +148,7 @@ protected:
 
 private:
   void   doActWithJ (StateVectorLow&           ) const;
-  double probability(const LazyDensityOperator&) const;
+  double rate       (const LazyDensityOperator&) const;
 
   const double kappa_;
 
@@ -433,7 +433,7 @@ private:
   typedef structure::ElementLiouvillean<1,1,true>::LazyDensityOperator LazyDensityOperator;
 
   void   doActWithJ (double t, StateVectorLow&           ) const;
-  double probability(double t, const LazyDensityOperator&) const;
+  double rate       (double t, const LazyDensityOperator&) const;
 
   const Averages average_v(double t, const LazyDensityOperator&) const;
 

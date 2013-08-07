@@ -36,7 +36,7 @@ protected:
   PumpedTwoLevelAtom(const qbit::ParsPumpedLossy&);
 
 private:
-  double probability(const LazyDensityOperator&) const;
+  double rate(const LazyDensityOperator&) const;
 
   void doActWithJ(StateVectorLow&) const;
 

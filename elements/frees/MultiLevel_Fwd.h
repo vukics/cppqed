@@ -15,7 +15,7 @@ H_elementaryPumping=i*(conj(eta)*sigma-eta*sigmadagger)
 term in the Hamiltonian
 
 If a pair (l,m) is in VL, this means a jump with jump operator
-sigma_lm. This means that the probability of the jump is proportional
+sigma_lm. This means that the rate of the jump is proportional
 to 
 
 <sigmadagger_lm*sigma_lm>=<|m><l|*|l><m|>=<|m><m|>=rho_mm

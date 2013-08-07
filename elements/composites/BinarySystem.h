@@ -112,9 +112,9 @@ CLASS_HEADER(Liouvillean)
 
   void                     actWithJ_v(double, StateVectorLow&, size_t)    const;
 
-  std::ostream&    displayKey_v(std::ostream& os, size_t& i             ) const {return binary::displayKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
-  size_t                 nAvr_v(                                        ) const {return binary::nAvr      <structure::LA_Li>(      free0_,free1_,ia_);}
-  const Probabilities average_v(double t, const LazyDensityOperator& ldo) const {return binary::average   <structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i             ) const {return binary::displayKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
+  size_t              nAvr_v(                                        ) const {return binary::nAvr      <structure::LA_Li>(      free0_,free1_,ia_);}
+  const Rates      average_v(double t, const LazyDensityOperator& ldo) const {return binary::average   <structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
 
 };
 

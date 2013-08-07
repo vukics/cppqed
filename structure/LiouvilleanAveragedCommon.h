@@ -51,7 +51,7 @@ public:
 
   /// Returns the number of calculated quantum averages
   /**
-   * - for a Liouvillean the quantum averages are the jump probabilities
+   * - for a Liouvillean the quantum averages are the jump rates
    * - for an Averaged, they are the quantum averages calculated for display
    */
   size_t nAvr() const {return nAvr_v();}

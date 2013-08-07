@@ -18,7 +18,7 @@ class ExactCommon;
  * This is fulfilled by this class, from which classes describing such systems have to inherit.
  * 
  * E.g. if quantumtrajectory::MCWF_Trajectory sees that the simulated system inherits from Exact, then it will make the coherent part of the evolution in interaction picture,
- * whereupon it transforms back to normal picture, so that all the rest (jump probabilities, eventual jumps, quantum averages) can be calculated in this latter picture.
+ * whereupon it transforms back to normal picture, so that all the rest (jump rates, eventual jumps, quantum averages) can be calculated in this latter picture.
  * This makes that the two pictures coincide before each timestep. (Cf. also the stages described @ quantumtrajectory::MCWF_trajectory.)
  * 
  * The design is very similar to that of Hamiltonian, the general template never being defined.

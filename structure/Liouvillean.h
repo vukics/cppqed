@@ -29,7 +29,7 @@ public:
 
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename Base::DArray1D Probabilities; ///< The 1D real array for storing the jump probabilities
+  typedef typename Base::DArray1D Rates; ///< The 1D real array for storing the jump rates
 
   virtual ~Liouvillean() {}
 
@@ -52,14 +52,14 @@ class Liouvillean<RANK,false> : public Liouvillean<RANK,true>
 public:
   typedef typename Liouvillean<RANK,true>::StateVectorLow      StateVectorLow     ;
   typedef typename Liouvillean<RANK,true>::LazyDensityOperator LazyDensityOperator;
-  typedef typename Liouvillean<RANK,true>::Probabilities       Probabilities      ;
+  typedef typename Liouvillean<RANK,true>::Rates       Rates      ;
 
 private:
-  void                actWithJ_v(double, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(psi,jumpNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK,true>
-  const Probabilities  average_v(double, const LazyDensityOperator&  matrix) const {return average_v(matrix);} ///< Redirects the virtual inherited from LiouvilleanAveragedCommonRanked
+  void        actWithJ_v(double, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(psi,jumpNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK,true>
+  const Rates  average_v(double, const LazyDensityOperator&  matrix) const {return average_v(matrix);} ///< Redirects the virtual inherited from LiouvilleanAveragedCommonRanked
 
-  virtual void                actWithJ_v(StateVectorLow&, size_t   ) const = 0;
-  virtual const Probabilities  average_v(const LazyDensityOperator&) const = 0;
+  virtual void        actWithJ_v(StateVectorLow&, size_t   ) const = 0;
+  virtual const Rates  average_v(const LazyDensityOperator&) const = 0;
 
 };
 

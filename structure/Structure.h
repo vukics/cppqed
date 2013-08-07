@@ -122,14 +122,14 @@ public:
   typedef Averaged     <RANK> Av;
 
   typedef typename QS::Ptr QuantumSystemPtr;
-  typedef typename Ex::Ptr ExactPtr;
-  typedef typename Ha::Ptr HamiltonianPtr;
-  typedef typename Li::Ptr LiouvilleanPtr;
-  typedef typename Av::Ptr AveragedPtr;
+  typedef typename Ex::Ptr         ExactPtr;
+  typedef typename Ha::Ptr   HamiltonianPtr;
+  typedef typename Li::Ptr   LiouvilleanPtr;
+  typedef typename Av::Ptr      AveragedPtr;
 
   typedef typename Ex::StateVectorLow StateVectorLow;
 
-  typedef typename Li::Probabilities       Probabilities      ;
+  typedef typename Li::Rates               Rates              ;
   typedef typename Li::LazyDensityOperator LazyDensityOperator;
 
   typedef typename Av::Averages Averages;
@@ -284,7 +284,7 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * 
  * \until ("photon absorption")),
  * We construct the ElementLiouvillean base whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
- * The constructor takes the strategies for calculating the impact of a jump on a free::StateVectorLow, and for calculating the probability from a free::LazyDensityOperator.
+ * The constructor takes the strategies for calculating the impact of a jump on a free::StateVectorLow, and for calculating the rate from a free::LazyDensityOperator.
  * These strategy functions are produced from the free-standing helpers in Lines 10-14 above through argument binding.
  * \until ("imag(\")"))
  * We construct the ElementAveraged base, with parameters necessary to produce a simple key for quantum averages communicated towards the user.
@@ -295,8 +295,8 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  *
  * Next, the inherited function Averaged::average_v is implemented:
  * \skip average_v
- * \until aJumpProba
- * the expectation value of the photon number is calculated (where we can reuse our function `aJumpProba`, with unit loss rate).
+ * \until aJumpRate
+ * the expectation value of the photon number is calculated (where we can reuse our function `aJumpRate`, with unit loss rate).
  * \until imag(offdiag);
  * the expectation value of the ladder operator is calculated (real & imaginary parts)
  * \until }

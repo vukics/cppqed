@@ -60,31 +60,31 @@ public:
 
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename LiouvilleanAveragedCommon::DArray1D Probabilities;
+  typedef typename LiouvilleanAveragedCommon::DArray1D Rates;
 
   typedef boost::function<void  (COND_ARG(ISTD)       StateVectorLow&     )> JumpStrategy;
-  typedef boost::function<double(COND_ARG(ISTD) const LazyDensityOperator&)> JumpProbabilityStrategy;
+  typedef boost::function<double(COND_ARG(ISTD) const LazyDensityOperator&)> JumpRateStrategy;
 
   typedef blitz::TinyVector<JumpStrategy           ,NOJ> JumpStrategies;
-  typedef blitz::TinyVector<JumpProbabilityStrategy,NOJ> JumpProbabilityStrategies;
+  typedef blitz::TinyVector<JumpRateStrategy,NOJ> JumpRateStrategies;
 
   typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
 
 protected:
-  ElementLiouvillean(const JumpStrategies& jumps, const JumpProbabilityStrategies& jumpProbas, const std::string& keyTitle, const KeyLabels& keyLabels) 
-    : jumps_(jumps), jumpProbas_(jumpProbas), keyPrinter_(keyTitle,keyLabels) {}
+  ElementLiouvillean(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, const KeyLabels& keyLabels) 
+    : jumps_(jumps), jumpRates_(jumpRates), keyPrinter_(keyTitle,keyLabels) {}
 
 private:
   size_t nAvr_v() const {return NOJ;}
 
-  const Probabilities average_v(COND_ARG(ISTD) const LazyDensityOperator&) const;
+  const Rates average_v(COND_ARG(ISTD) const LazyDensityOperator&) const;
 
   void actWithJ_v(COND_ARG_T(ISTD) StateVectorLow& psi, size_t jumpNo) const {jumps_(jumpNo)(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);}
 
   std::ostream& displayKey_v(std::ostream& os, size_t& i) const {return keyPrinter_.displayKey(os,i);}
 
-  const JumpStrategies            jumps_     ;
-  const JumpProbabilityStrategies jumpProbas_;
+  const JumpStrategies     jumps_    ;
+  const JumpRateStrategies jumpRates_;
 
   const cpputils::KeyPrinter keyPrinter_;
 
@@ -102,7 +102,7 @@ public:
 
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename LiouvilleanAveragedCommon::DArray1D Probabilities;
+  typedef typename LiouvilleanAveragedCommon::DArray1D Rates;
 
   typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
 
@@ -113,7 +113,7 @@ protected:
 private:
   size_t nAvr_v() const {return 1;}
 
-  const Probabilities average_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const {Probabilities probas(1); probas(0)=probability(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) matrix); return probas;}
+  const Rates average_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const {Rates rates(1); rates(0)=rate(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) matrix); return rates;}
 
 #ifndef   NDEBUG
   struct ElementLiouvilleanException : cpputils::Exception {};
@@ -132,8 +132,8 @@ private:
 
   std::ostream& displayKey_v(std::ostream& os, size_t& i) const {return keyPrinter_.displayKey(os,i);}
 
-  virtual void   doActWithJ (COND_ARG(ISTD)       StateVectorLow     &) const = 0;
-  virtual double probability(COND_ARG(ISTD) const LazyDensityOperator&) const = 0;
+  virtual void   doActWithJ(COND_ARG(ISTD)       StateVectorLow     &) const = 0;
+  virtual double rate      (COND_ARG(ISTD) const LazyDensityOperator&) const = 0;
 
   const cpputils::KeyPrinter keyPrinter_;
 
@@ -145,12 +145,12 @@ private:
 template<int RANK, int NOJ>
 const LiouvilleanAveragedCommon::DArray1D ElementLiouvillean<RANK,NOJ,ISTD_true_false>::average_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const
 {
-  Probabilities probas(NOJ);
+  Rates rates(NOJ);
   // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
 
-  boost::transform(jumpProbas_,probas.begin(),
-                   bind(&JumpProbabilityStrategy::operator(),_1,BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) boost::cref(matrix)));
-  return probas;
+  boost::transform(jumpRates_,rates.begin(),
+                   bind(&JumpRateStrategy::operator(),_1,BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) boost::cref(matrix)));
+  return rates;
 }
 
 

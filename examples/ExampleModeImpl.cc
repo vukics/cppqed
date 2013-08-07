@@ -29,13 +29,13 @@ double photonNumber(const LazyDensityOperator& matrix)
 }
 
 
-double aJumpProba   (const LazyDensityOperator& matrix, double kappa_nPlus1)
+double aJumpRate   (const LazyDensityOperator& matrix, double kappa_nPlus1)
 {
   return 2.*kappa_nPlus1*photonNumber(matrix);
 }
 
 
-double aDagJumpProba(const LazyDensityOperator& matrix, double kappa_n     )
+double aDagJumpRate(const LazyDensityOperator& matrix, double kappa_n     )
 {
   return 2.*kappa_n*(photonNumber(matrix)+1.);
 }

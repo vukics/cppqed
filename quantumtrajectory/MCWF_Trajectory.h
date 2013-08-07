@@ -40,7 +40,7 @@ namespace quantumtrajectory {
  * -# If the system is *not* Liouvillean, the timestep ends here, reducing to a simple ODE evolution. Otherwise:
  *   -# The rates (probabilities per unit time) corresponding to all jump operators are calculated. If some rates are found negative
  *      (“special jump”, cf. explanation at structure::Liouvillean::probabilities, then \f$J_\text{at}\ket\Psi\f$ is calculated (and tabulated) instead,
- *      and the probability is calculated as \f$\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2\f$.
+ *      and the rate is calculated as \f$\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2\f$.
  *   -# First, it is verified whether the total jump probability is not too big. This is performed on two levels:
  *     -# The total jump rate \f$\delta r\f$ is calculated.
  *     -# If \f$\delta r\delta t>\delta p_\text{limit}'\f$, the step is retraced: both the state vector and the state of the ODE stepper are restored to cached values
@@ -103,7 +103,7 @@ protected:
   
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
-  typedef typename Liouvillean::Probabilities DpOverDtSet;
+  typedef typename Liouvillean::Rates Rates;
 
   void step_v(double); // performs one single adaptive-stepsize MCWF step of specified maximal length
 
@@ -111,12 +111,12 @@ private:
 
   const StateVector& toBeAveraged_v() const {return psi_;} 
 
-  double                coherentTimeDevelopment    (                                double Dt);
-  const IndexSVL_tuples calculateDpOverDtSpecialSet(      DpOverDtSet* dpOverDtSet, double  t) const;
+  double                coherentTimeDevelopment(                    double Dt);
+  const IndexSVL_tuples calculateSpecialRates  (      Rates* rates, double  t) const;
 
-  bool                  manageTimeStep             (const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper*, bool logControl=true);
+  bool                  manageTimeStep             (const Rates& rates, evolved::TimeStepBookkeeper*, bool logControl=true);
 
-  void                  performJump                (const DpOverDtSet&, const IndexSVL_tuples&, double); // LOGICALLY non-const
+  void                  performJump                (const Rates&, const IndexSVL_tuples&, double); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
