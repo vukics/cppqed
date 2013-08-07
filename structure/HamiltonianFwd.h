@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFile{Defines enumeration structure::TimeDependence & the general form of structure::Hamiltonian}
+/// \briefFile{Defines enumeration structure::TimeDependence & forward-declares the general form of structure::Hamiltonian}
 #ifndef   STRUCTURE_HAMILTONIANFWD_H_INCLUDED
 #define   STRUCTURE_HAMILTONIANFWD_H_INCLUDED
 
@@ -14,12 +14,14 @@ enum TimeDependence {
 };
 
 
-/// The interface every system having (possibly non-Hermitian) Hamiltonian must present towards the trajectory drivers
+/// The interface every system having (possibly non-Hermitian) Hamiltonian time-evolution must present towards the trajectory drivers
 /**
  * The most general template is never defined, only its partial specializations in the second parameter.
  * 
  * \tparamRANK
  * \tparam TD Degree of \link TimeDependence time dependence\endlink. The most general (#TWO_TIME) is taken as default.
+ * 
+ * \see Hamiltonian<RANK,TWO_TIME> through Hamiltonian<RANK,NO_TIME> in Hamiltonian.h
  * 
  */
 template<int RANK,TimeDependence TD=TWO_TIME>

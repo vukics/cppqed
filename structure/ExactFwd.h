@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFile{Defines the general form of structure::Exact}
+/// \briefFile{Forward-declares the general form of structure::Exact}
 #ifndef   STRUCTURE_EXACTFWD_H_INCLUDED
 #define   STRUCTURE_EXACTFWD_H_INCLUDED
 
@@ -25,6 +25,9 @@ class ExactCommon;
  * 
  * \tparamRANK
  * \tparam IS_TWO_TIME default `true`, the most general case
+ * 
+ * \see Exact<RANK,true>, Exact<RANK,false> in Exact.h
+ * 
  */
 template<int, bool IS_TWO_TIME=true>
 class Exact;

@@ -18,12 +18,12 @@ cpputils::KeyPrinter::KeyPrinter(const string& keyTitle, const KeyLabels& keyLab
 
 
 
-void cpputils::KeyPrinter::displayKey(ostream& os, size_t& i) const
+ostream& cpputils::KeyPrinter::displayKey(ostream& os, size_t& i) const
 {
   namespace bll=boost::lambda;
 
   os<<"# "<<keyTitle_;
   boost::for_each(keyLabels_,os<<bll::constant("\n# ")<<bll::constant(setw(2))<<bll::var(i)++<<". "<<bll::_1);
-  os<<endl;
+  return os<<endl;
 }
 

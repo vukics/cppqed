@@ -38,8 +38,8 @@ public:
 private: 
   size_t       nAvr_v()                                                   const {return keyPrinter_.length()         ;}
 
-  void      display_v(const Averages& a, std::ostream& os, int precision) const {       displayCommon(a,os,precision);}
-  void   displayKey_v(std::ostream& os, size_t& i)                        const {       keyPrinter_.displayKey(os,i) ;}
+  void             display_v(const Averages& a, std::ostream& os, int precision) const {       displayCommon(a,os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i)                        const {return keyPrinter_.displayKey(os,i) ;}
 
   const cpputils::KeyPrinter keyPrinter_;
 

@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Defines quantumoperator::DirectProduct & helpers}
 #ifndef   QUANTUMOPERATOR_IMPL_SIGMA_TCC_INCLUDED
 #define   QUANTUMOPERATOR_IMPL_SIGMA_TCC_INCLUDED
 

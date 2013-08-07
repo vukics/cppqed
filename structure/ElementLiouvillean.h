@@ -81,7 +81,7 @@ private:
 
   void actWithJ_v(COND_ARG_T(ISTD) StateVectorLow& psi, size_t jumpNo) const {jumps_(jumpNo)(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);}
 
-  void displayKey_v(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i) const {return keyPrinter_.displayKey(os,i);}
 
   const JumpStrategies            jumps_     ;
   const JumpProbabilityStrategies jumpProbas_;
@@ -121,16 +121,16 @@ private:
 
   void actWithJ_v(COND_ARG_T(ISTD) StateVectorLow& psi, size_t 
 #ifndef   NDEBUG
-		  jumpNo
+                  jumpNo
 #endif // NDEBUG
-		  ) const {
+                  ) const {
 #ifndef   NDEBUG
     if (jumpNo) throw ElementLiouvilleanException(); 
 #endif // NDEBUG
     doActWithJ(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);
   }
 
-  void displayKey_v(std::ostream& os, size_t& i) const {keyPrinter_.displayKey(os,i);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i) const {return keyPrinter_.displayKey(os,i);}
 
   virtual void   doActWithJ (COND_ARG(ISTD)       StateVectorLow     &) const = 0;
   virtual double probability(COND_ARG(ISTD) const LazyDensityOperator&) const = 0;
@@ -149,7 +149,7 @@ const LiouvilleanAveragedCommon::DArray1D ElementLiouvillean<RANK,NOJ,ISTD_true_
   // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
 
   boost::transform(jumpProbas_,probas.begin(),
-		   bind(&JumpProbabilityStrategy::operator(),_1,BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) boost::cref(matrix)));
+                   bind(&JumpProbabilityStrategy::operator(),_1,BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) boost::cref(matrix)));
   return probas;
 }
 

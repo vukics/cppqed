@@ -24,8 +24,8 @@ public:
 
   KeyPrinter(const std::string&, const KeyLabels&);
 
-  size_t length    ()                                                    const {return keyLabels_.size();}
-  void   displayKey(std::ostream&, size_t&)                              const;
+  size_t        length    ()                                             const {return keyLabels_.size();}
+  std::ostream& displayKey(std::ostream&, size_t&)                       const;
 
   const std::string& getTitle () const {return keyTitle_ ;}
   const KeyLabels  & getLabels() const {return keyLabels_;}
