@@ -95,8 +95,12 @@ public:
   
   /// Calculates quantum averages & checks post-conditions
   /**
+   * \warning The elements of the returned array must have a linear dependence on `matrix`, in particular, they must be of the form \f$\Tr{\Ob_m\rho},\f$
+   * where \f$\Ob_m\f$ is a set of quantum operators defined on the Hilbert space of the system.
+   * 
    * \throw AveragesNumberMismatchException if postcondition 1. is not met
    * \throw InfiniteDetectedException if postcondition 2. is not met
+   * 
    */
   const DArray1D average(double t, ///< one or more of the operators whose quantum average is calculated, might be time-dependent
                          const LazyDensityOperator& matrix /// the state of the quantum system

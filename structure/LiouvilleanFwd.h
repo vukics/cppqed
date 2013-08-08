@@ -10,7 +10,7 @@ namespace structure {
 /// The interface every system having Liouvillean time-evolution must present towards the trajectory drivers
 /**
  * The time-evolution must be Markovian where the Lindblad form of the Master equation is the most general one possible:
- * \f[\dot\rho=2\real{\frac\HnH{i\hbar}\rho}+\sum_mJ_m\rho J_m^\dagger\f]
+ * \f[\dot\rho=\frac1{i\hbar}\comm{H}\rho+\sum_m\lp J_m\rho J_m^\dag-\frac12\comm{J_m^\dag J_m}{\rho}_+\rp\f]
  * The class represents the set of \f$J_m\f$ operators (Lindblads or quantum jump operators) of arbitrary number,
  * either for Master equation or Monte Carlo wave-function evolution (in the latter case it calculates the jump rates as well).
  * 
@@ -24,8 +24,8 @@ namespace structure {
  * \see Liouvillean<RANK,true>, Liouvillean<RANK,false> in Liouvillean.h
  * 
  * \note It is always possible to forgo the explicit calculation of certain jump rates because the rate can be calculated also on the basis of the Liouvillean::actWithJ function by the 
- * \link quantumtrajectory::MCWF_Trajectory MCWF stepper\endlink.
- * The fact that such a fallback is desired can be signalled by setting a negative value for the rate of the given jump (“special jump”).
+ * \link quantumtrajectory::MCWF_Trajectory MCWF stepper\endlink. The fact that such a fallback is desired can be signalled by setting a negative value for the rate of the given jump 
+ * (“special jump”). \see \ref specialjump
  * 
  */
 template<int RANK, bool IS_TIME_DEPENDENT=true>

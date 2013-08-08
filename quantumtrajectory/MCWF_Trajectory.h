@@ -40,7 +40,7 @@ namespace quantumtrajectory {
  * -# If the system is *not* Liouvillean, the timestep ends here, reducing to a simple ODE evolution. Otherwise:
  *   -# The rates (probabilities per unit time) corresponding to all jump operators are calculated. If some rates are found negative
  *      (“special jump”, cf. explanation at structure::Liouvillean::probabilities, then \f$J_\text{at}\ket\Psi\f$ is calculated (and tabulated) instead,
- *      and the rate is calculated as \f$\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2\f$.
+ *      and the rate is calculated as \f$\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2\f$. \see \ref specialjump
  *   -# First, it is verified whether the total jump probability is not too big. This is performed on two levels:
  *     -# The total jump rate \f$\delta r\f$ is calculated.
  *     -# If \f$\delta r\delta t>\delta p_\text{limit}'\f$, the step is retraced: both the state vector and the state of the ODE stepper are restored to cached values
@@ -143,7 +143,7 @@ private:
  * 
  * The optimal sampling is achieved by evolving the state vector in two steps, one deterministic and one stochastic (quantum jump).
  * Suppose that the Master equation of the system is of the form
- * \f[\dot\rho=\frac1{i\hbar}\comm{H}\rho+\Liou\rho\equiv\frac1{i\hbar}\comm{H}\rho+\sum_m\lp J_m\rho J_m^\dag-\frac12\comm{J_m^\dag J_m}{\rho}_+\rp\equiv\frac1{i\hbar}\comm{\HnH}\rho+\sum_mJ_m\rho J_m^\dag.\f]
+ * \f[\dot\rho=\frac1{i\hbar}\comm{H}\rho+\Liou\rho\equiv\frac1{i\hbar}\comm{H}\rho+\sum_m\lp J_m\rho J_m^\dag-\frac12\comm{J_m^\dag J_m}{\rho}_+\rp\equiv\frac1{i\hbar}\lp\HnH\rho-\rho\HnH^\dagger\rp+\sum_mJ_m\rho J_m^\dag.\f]
  * 
  * the usual form in quantum optics, and, in fact, the most general (so-called Lindblad) form. The non-Hermitian Hamiltonian is defined as \f[\HnH=H-\frac{i\hbar}2\sum_m J^\dag_m J_m.\f]
  * At time \f$t\f$ the system is in a state with normalised state vector \f$\ket{\Psi(t)}\f$. To obtain the state vector at time \f$t+\delta t\f$ up to first order in \f$\delta t\f$:
