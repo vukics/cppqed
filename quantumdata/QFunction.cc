@@ -11,7 +11,7 @@ double quantumdata::details::qFunctionHelper(size_t n, const dcomp& alpha)
     re=pow(alpha, n)/sqrt(factorial<long double>(n));
   }
   else {
-    re=pow((alpha/sqrt(n/2.71828)),n);
+    re=(1./(sqrt(sqrt(2.*3.1415*n))))*pow((alpha/sqrt(n/exp(1.))),n);
   }
 
   return re;
