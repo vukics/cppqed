@@ -44,22 +44,15 @@ const WignerFunctionKernelOld::Hermites fillWithHermite(size_t dim, double x)
 
 }
 
-double detailsw::w (size_t n, double r, size_t k)
+double details::w (size_t n, double r, size_t k)
 {
   const double sqrR=sqr(r);
   return minusOneToThePowerOf(n)/PI*sqrt(factorial<double>(n)/factorial<double>(n+k))*exp(-2*sqrR)*pow(2*r,k)*laguerre(n,k,4*sqrR);
 }
 
-double detailsq::qFunctionHelper(size_t n, const dcomp& alpha)
+double details::qFunctionHelper(size_t n, const dcomp& alpha)
 {
-  if (n<100) {
-    re=pow(alpha, n)/sqrt(factorial<long double>(n));
-  }
-  else {
-    re=(1./(sqrt(sqrt(2.*3.14159265*n))))*pow((alpha/sqrt(n/exp(1.))),n);
-  }
-
-  return re;
+  return n<100 ? pow(alpha, n)/sqrt(factorial<long double>(n)) : 1./(sqrt(sqrt(2.*3.14159265*n))))*pow((alpha/sqrt(n/exp(1.))),n);
 }
 
 

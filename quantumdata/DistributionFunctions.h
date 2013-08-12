@@ -22,20 +22,16 @@ struct ParsFunctionScan {
     
   int &wfCutoff;
   
-  ParsFunctionScan(parameters::ParameterTable& p, const std::string& mod="");
-
   char &ftype;
+
+  ParsFunctionScan(parameters::ParameterTable& p, const std::string& mod="");
 
 };
 
 
-namespace detailsw {
+namespace details {
 
 double w(size_t n, double r, size_t k);
-  
-}
-
-namespace detailsq {
 
 double qFunctionHelper(size_t n, const dcomp& alpha);
   
@@ -88,7 +84,7 @@ double wignerFunction(const DensityOperator& rho, double x, double y, size_t tru
 }
 
 template<typename DensityOperator>
-double qFunction(const DensityOperator& rho, double x, double y)
+double qFunction(const DensityOperator& rho, double x, double y, size_t)
 {
   using namespace mathutils;
 
@@ -144,14 +140,14 @@ double wignerFunctionOld(const DensityOperator& rho, double x, double y, size_t 
 }
 
 
-/// Creates a map of the Wigner function over the region specified by `pwfs` and streams it in a format suitable for gnuplot pm3d maps
+/// Creates a map of the Wigner function over the region specified by `pfs` and streams it in a format suitable for gnuplot pm3d maps
 template<typename DistributionFunctor,typename DensityOperator>
-std::ostream& scanFunction(DistributionFunctor DistributionFunctor, const DensityOperator& rho, std::ostream& os, const ParsFunctionScan& pwfs, const ftype)
+std::ostream& scanFunction(DistributionFunctor distributionFunctor, const DensityOperator& rho, std::ostream& os, const ParsFunctionScan& pfs)
 {
-  if (pwfs.fLimitXUL) pwfs.fLimitXL=-(pwfs.fLimitXU=pwfs.fLimitXUL);
-  if (pwfs.fLimitYUL) pwfs.fLimitYL=-(pwfs.fLimitYU=pwfs.fLimitYUL);
-  for (double x=pwfs.fLimitXL; x<pwfs.fLimitXU; x+=pwfs.wfStep) {
-    for (double y=pwfs.fLimitYL; y<pwfs.fLimitYU; y+=pwfs.wfStep) os<<x<<"\t"<<y<<"\t"<<DistributionFunctor(rho,x,y,pwfs.wfCutoff)<<std::endl;
+  if (pfs.fLimitXUL) pfs.fLimitXL=-(pfs.fLimitXU=pfs.fLimitXUL);
+  if (pfs.fLimitYUL) pfs.fLimitYL=-(pfs.fLimitYU=pfs.fLimitYUL);
+  for (double x=pfs.fLimitXL; x<pfs.fLimitXU; x+=pfs.wfStep) {
+    for (double y=pfs.fLimitYL; y<pfs.fLimitYU; y+=pfs.wfStep) os<<x<<"\t"<<y<<"\t"<<distributionFunctor(rho,x,y,pfs.wfCutoff)<<std::endl;
     os<<std::endl;
   }
   return os;
@@ -159,13 +155,13 @@ std::ostream& scanFunction(DistributionFunctor DistributionFunctor, const Densit
 
 
 template<typename DensityOperator>
-std::ostream& scanFunction(const DensityOperator& rho, std::ostream& os, const ParsFunctionScan& pwfs, const ftype)
+std::ostream& scanFunction(const DensityOperator& rho, std::ostream& os, const ParsFunctionScan& pfs)
 {
   if (ftype=="w") {
-    return scanFunction(wignerFunction<DensityOperator>,rho,os,pwfs);
+    return scanFunction(wignerFunction<DensityOperator>,rho,os,pfs);
   }
   else if (ftype=="q"){
-    return scanFunction(qFunction<DensityOperator>,rho,os,pwfs);  
+    return scanFunction(qFunction<DensityOperator>,rho,os,pfs);  
   }
 }
 

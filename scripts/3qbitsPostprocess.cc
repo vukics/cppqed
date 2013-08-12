@@ -4,6 +4,7 @@
 
 #include "JaynesCummings.h"
 #include "QbitModeCorrelations.h"
+#include "DistributionFunctions.h"
 
 using namespace std;
 
@@ -25,6 +26,8 @@ int main(int argc, char* argv[])
   string& stateFileName=p.add("stateFile","",string());
 
   double& gamma_parallel=p.add("gamma_parallel","gamma_parallel",1.);
+  
+  quantumdata::ParsFunctionScan pfs(p);
 
   // Parameter finalization
   update(p,argc,argv,"--");
@@ -59,5 +62,9 @@ int main(int argc, char* argv[])
     rho+=DensityOperator(traj.getPsi()); count+=1;
   }
   rho/=count;
+  
+  mode::DensityOperator rhomode=reduceDensityOperator<3>(rho);
+  
+  quantumdata::scanFunction(quantumdata::wignerFunction<DensityOperator>,rhomode,cout,pfs);
 
 }
