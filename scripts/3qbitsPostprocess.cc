@@ -6,9 +6,11 @@
 #include "QbitModeCorrelations.h"
 #include "DistributionFunctions.h"
 
+#include "impl/DensityOperator.tcc"
+
 using namespace std;
 
-typedef quantumdata::StateVector<4> StateVector;
+typedef quantumdata::StateVector    <4>     StateVector;
 typedef quantumdata::DensityOperator<4> DensityOperator;
 
 
@@ -63,8 +65,8 @@ int main(int argc, char* argv[])
   }
   rho/=count;
   
-  mode::DensityOperator rhomode=reduceDensityOperator<3>(rho);
+  mode::DensityOperator rhomode=quantumdata::reduce<3>(rho);
   
-  quantumdata::scanFunction(quantumdata::wignerFunction<DensityOperator>,rhomode,cout,pfs);
+  quantumdata::scanFunction(quantumdata::wignerFunction<mode::DensityOperator>,rhomode,cout,pfs);
 
 }

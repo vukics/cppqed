@@ -18,12 +18,10 @@ namespace quantumdata {
 struct ParsFunctionScan {
   
   double
-    &wfLimitXUL, &wfLimitYUL, &wfLimitXL, &wfLimitXU, &wfLimitYL, &wfLimitYU, &wfStep;
+    &fLimitXUL, &fLimitYUL, &fLimitXL, &fLimitXU, &fLimitYL, &fLimitYU, &fStep;
     
-  int &wfCutoff;
+  int &fCutoff;
   
-  char &ftype;
-
   ParsFunctionScan(parameters::ParameterTable& p, const std::string& mod="");
 
 };
@@ -33,7 +31,7 @@ namespace details {
 
 double w(size_t n, double r, size_t k);
 
-double qFunctionHelper(size_t n, const dcomp& alpha);
+dcomp q(size_t n, const dcomp& alpha);
   
 }
 
@@ -62,12 +60,12 @@ double wignerFunction(const DensityOperator& rho, double x, double y, size_t tru
 {
   using namespace mathutils; using boost::math::factorial;
 
-  struct W
+  struct Helper
   {
     static dcomp _(const DensityOperator& rho, size_t dim, double r, size_t k)
     {
       dcomp res(0.);
-      for (size_t n=0; n<dim-k; ++n) res+=detailsw::w(n,r,k)*rho(n+k,n);
+      for (size_t n=0; n<dim-k; ++n) res+=details::w(n,r,k)*rho(n+k,n);
       return res;
     }
   };
@@ -76,9 +74,9 @@ double wignerFunction(const DensityOperator& rho, double x, double y, size_t tru
 
   const size_t dim=truncatedDimension && truncatedDimension<rho.getDimension(0) ? truncatedDimension : rho.getDimension(0);
 
-  double res=real(W::_(rho,dim,r,0));
+  double res=real(Helper::_(rho,dim,r,0));
   
-  for (size_t k=1; k<dim; ++k) res+=2*real(W::_(rho,dim,r,k)*exp(-DCOMP_I*(k*phi)));
+  for (size_t k=1; k<dim; ++k) res+=2*real(Helper::_(rho,dim,r,k)*exp(-DCOMP_I*(k*phi)));
 
   return res;
 }
@@ -93,7 +91,7 @@ double qFunction(const DensityOperator& rho, double x, double y, size_t)
   dcomp qComplex;
   
   for (size_t m=0; m<rho.getDimension(); ++m) for (size_t n=0; n<rho.getDimension(); ++n)
-    qComplex+=details::qFunctionHelper(n,alpha)*details::qFunctionHelper(m,conj(alpha))*rho(m,n);
+    qComplex+=details::q(n,alpha)*details::q(m,conj(alpha))*rho(m,n);
   
   return exp(sqrAbs(alpha))*real(qComplex);
 }
@@ -146,23 +144,11 @@ std::ostream& scanFunction(DistributionFunctor distributionFunctor, const Densit
 {
   if (pfs.fLimitXUL) pfs.fLimitXL=-(pfs.fLimitXU=pfs.fLimitXUL);
   if (pfs.fLimitYUL) pfs.fLimitYL=-(pfs.fLimitYU=pfs.fLimitYUL);
-  for (double x=pfs.fLimitXL; x<pfs.fLimitXU; x+=pfs.wfStep) {
-    for (double y=pfs.fLimitYL; y<pfs.fLimitYU; y+=pfs.wfStep) os<<x<<"\t"<<y<<"\t"<<distributionFunctor(rho,x,y,pfs.wfCutoff)<<std::endl;
+  for (double x=pfs.fLimitXL; x<pfs.fLimitXU; x+=pfs.fStep) {
+    for (double y=pfs.fLimitYL; y<pfs.fLimitYU; y+=pfs.fStep) os<<x<<"\t"<<y<<"\t"<<distributionFunctor(rho,x,y,pfs.fCutoff)<<std::endl;
     os<<std::endl;
   }
   return os;
-}
-
-
-template<typename DensityOperator>
-std::ostream& scanFunction(const DensityOperator& rho, std::ostream& os, const ParsFunctionScan& pfs)
-{
-  if (ftype=="w") {
-    return scanFunction(wignerFunction<DensityOperator>,rho,os,pfs);
-  }
-  else if (ftype=="q"){
-    return scanFunction(qFunction<DensityOperator>,rho,os,pfs);  
-  }
 }
 
 

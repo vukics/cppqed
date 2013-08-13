@@ -15,7 +15,7 @@ using namespace boost::math;
 namespace quantumdata {
 
 
-ParsFunctionScan::ParsFunctionScan(parameters::ParameterTable& p, const std::string& mod, char &ftype)
+ParsFunctionScan::ParsFunctionScan(parameters::ParameterTable& p, const std::string& mod)
   : fLimitXUL(p.addTitle("Distribution function scan",mod).add("fLimitXUL","",2.)),
     fLimitYUL(p.add("fLimitYUL","",2.)),
     fLimitXL(p.add("fLimitXL","",-2.)),
@@ -23,8 +23,7 @@ ParsFunctionScan::ParsFunctionScan(parameters::ParameterTable& p, const std::str
     fLimitYL(p.add("fLimitYL","",-2.)),
     fLimitYU(p.add("fLimitYU","",2.)),
     fStep(p.add("fStep","",.1)),
-    fCutoff(p.add("fCutoff","",100)),
-    ftype(ftype.add("funtiontype","",q)),
+    fCutoff(p.add("fCutoff","",100))
 {}
 
 
@@ -44,15 +43,15 @@ const WignerFunctionKernelOld::Hermites fillWithHermite(size_t dim, double x)
 
 }
 
-double details::w (size_t n, double r, size_t k)
+double details::w(size_t n, double r, size_t k)
 {
   const double sqrR=sqr(r);
   return minusOneToThePowerOf(n)/PI*sqrt(factorial<double>(n)/factorial<double>(n+k))*exp(-2*sqrR)*pow(2*r,k)*laguerre(n,k,4*sqrR);
 }
 
-double details::qFunctionHelper(size_t n, const dcomp& alpha)
+dcomp details::q(size_t n, const dcomp& alpha)
 {
-  return n<100 ? pow(alpha, n)/sqrt(factorial<long double>(n)) : 1./(sqrt(sqrt(2.*3.14159265*n))))*pow((alpha/sqrt(n/exp(1.))),n);
+  return n<max_factorial<long double>::value ? pow(alpha,n)/sqrt(factorial<long double>(n)) : pow(2*n*PI,-.25)*pow(alpha/sqrt(n/EULER),n);
 }
 
 

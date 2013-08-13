@@ -23,6 +23,7 @@ struct FactOverflow  : public cpputils::Exception {};
   
 extern const double PI    ;
 extern const double SQRTPI;
+extern const double EULER ;
   
 int sign(double);
 int fcmp(double, double, double);

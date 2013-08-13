@@ -8,6 +8,7 @@ namespace mathutils {
   
 const double PI(M_PI);
 const double SQRTPI(M_SQRTPI);
+const double EULER(M_E);
 
 int sign(double x) {return GSL_SIGN(x);}
 int fcmp(double x, double y, double eps) {return gsl_fcmp(x,y,eps);}
