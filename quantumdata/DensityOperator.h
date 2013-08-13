@@ -113,6 +113,11 @@ const DensityOperator<RANK>
 densityOperatorize(const LazyDensityOperator<RANK>&);
 
 
+template<int... SUBSYSTEM, int RANK>
+const DensityOperator<mpl::size<tmptools::Vector<SUBSYSTEM...> >::value>
+reduce(const LazyDensityOperator<RANK>&);
+
+
 } // quantumdata
 
 

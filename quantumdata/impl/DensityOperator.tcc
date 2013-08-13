@@ -134,6 +134,15 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 }
 
 
+template<int... SUBSYSTEM, int RANK>
+const DensityOperator<mpl::size<tmptools::Vector<SUBSYSTEM...> >::value>
+reduce(const LazyDensityOperator<RANK>& matrix)
+{
+  static const int RES_ARITY=mpl::size<tmptools::Vector<SUBSYSTEM...> >::value;
+  return partialTrace<tmptools::Vector<SUBSYSTEM...>,DensityOperator<RES_ARITY> >(matrix,densityOperatorize<RES_ARITY>);
+}
+
+
 } // quantumdata
 
 #endif // QUANTUMDATA_IMPL_DENSITYOPERATOR_TCC_INCLUDED
