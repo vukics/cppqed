@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   while ( (stateFile.peek(), !stateFile.eof()) ) {
     trajectory::readViaSStream(traj,stateFile);
     cout<<traj.getTime()<<endl;
-    rho+=DensityOperator(traj.getPsi()); count+=1;
+    traj.getPsi().addTo(rho); count+=1;
   }
   rho/=count;
   
