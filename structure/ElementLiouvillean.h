@@ -1,147 +1,114 @@
 // -*- C++ -*-
-#ifndef ELEMENTLIOUVILLEAN_ISTD_REENTERING
-
+/// \briefFile{Defines the hierarchical partial specializations of structure::Liouvillean}
 #ifndef STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
 #define STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
 
 #include "ElementLiouvilleanFwd.h"
 
 #include "Liouvillean.h"
+#include "ElementLiouvilleanAveragedCommon.h"
 
-#include "KeyPrinter.h"
 #include "Range.h"
-
-#ifndef   NDEBUG
-#include "Exception.h"
-#endif // NDEBUG
 
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
-#include <boost/preprocessor/control/expr_iif.hpp>
-#include <boost/preprocessor/control/iif.hpp>
-#include <boost/preprocessor/punctuation/comma_if.hpp>
 
 namespace structure {
 
 
-#define ELEMENTLIOUVILLEAN_ISTD_REENTERING 0
-#include "ElementLiouvillean.h"
-
-#define ELEMENTLIOUVILLEAN_ISTD_REENTERING 1
-#include "ElementLiouvillean.h"
-
-
-} // structure
-
-
-
-#endif // STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
-
-
-#else  // ELEMENTLIOUVILLEAN_ISTD_REENTERING
-
-
-#define ISTD ELEMENTLIOUVILLEAN_ISTD_REENTERING
-
-#define COND_ARG(IS_TIME_DEPENDENT) BOOST_PP_EXPR_IIF(ISTD,double) BOOST_PP_COMMA_IF(ISTD)
-#define COND_ARG_T(IS_TIME_DEPENDENT) BOOST_PP_EXPR_IIF(ISTD,double t) BOOST_PP_COMMA_IF(ISTD)
-
-#define ISTD_true_false BOOST_PP_IIF(ISTD,true,false)
-
-
-template<int RANK, int NOJ>
-class ElementLiouvillean<RANK,NOJ,ISTD_true_false> : public Liouvillean<RANK,ISTD_true_false>
+template<int RANK, int NOJ, bool IS_TIME_DEPENDENT>
+class ElementLiouvillean : public ElementLiouvilleanAveragedCommon<Liouvillean<RANK,IS_TIME_DEPENDENT> >
 {
+private:
+  typedef Liouvillean<RANK,IS_TIME_DEPENDENT> Base;
+  
 public:
-  typedef Liouvillean<RANK,ISTD_true_false> Base;
-
-  typedef typename Base::     StateVectorLow      StateVectorLow;
+  typedef typename Base::StateVectorLow StateVectorLow;
 
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename LiouvilleanAveragedCommon::DArray1D Rates;
-
-  typedef boost::function<void  (COND_ARG(ISTD)       StateVectorLow&     )> JumpStrategy;
-  typedef boost::function<double(COND_ARG(ISTD) const LazyDensityOperator&)> JumpRateStrategy;
-
-  typedef blitz::TinyVector<JumpStrategy           ,NOJ> JumpStrategies;
-  typedef blitz::TinyVector<JumpRateStrategy,NOJ> JumpRateStrategies;
-
-  typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
+  typedef typename Base::Rates Rates;
 
 protected:
-  ElementLiouvillean(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, const KeyLabels& keyLabels) 
-    : jumps_(jumps), jumpRates_(jumpRates), keyPrinter_(keyTitle,keyLabels) {}
+  template<typename... KeyLabelsPack>
+  ElementLiouvillean(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) 
+    : jumps_(jumps), jumpRates_(jumpRates), keyPrinter_(keyTitle,keyLabelsPack) {}
 
 private:
   size_t nAvr_v() const {return NOJ;}
 
-  const Rates average_v(COND_ARG(ISTD) const LazyDensityOperator&) const;
+  const Rates average_v(double t, const LazyDensityOperator&) const;
+  const Rates average_v(          const LazyDensityOperator&) const;
 
-  void actWithJ_v(COND_ARG_T(ISTD) StateVectorLow& psi, size_t jumpNo) const {jumps_(jumpNo)(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);}
+  void actWithJ_v(double t, StateVectorLow& psi, size_t jumpNo) const;
+  void actWithJ_v(          StateVectorLow& psi, size_t jumpNo) const;
 
-  std::ostream& displayKey_v(std::ostream& os, size_t& i) const {return keyPrinter_.displayKey(os,i);}
+};
 
-  const JumpStrategies     jumps_    ;
-  const JumpRateStrategies jumpRates_;
 
-  const cpputils::KeyPrinter keyPrinter_;
+template<int RANK, bool IS_TIME_DEPENDENT>
+class ElementLiouvillean<RANK,1,IS_TIME_DEPENDENT> : public ElementLiouvilleanAveragedCommon<Liouvillean<RANK,IS_TIME_DEPENDENT> >
+{
+private:
+  typedef ElementLiouvilleanAveragedCommon<Liouvillean<RANK,IS_TIME_DEPENDENT> >
+  
+public:
+  typedef typename Base::StateVectorLow StateVectorLow;
+
+  typedef typename Base::LazyDensityOperator LazyDensityOperator;
+
+  typedef typename Base::Rates Rates;
+  
+protected:
+  ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,1,keyLabel) {}
+  
+private:
+  const Rates average_v(double t, const LazyDensityOperator& matrix) const {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
+
+  void actWithJ_v(double t, StateVectorLow& psi, size_t jumpNo) const {if (jumpNo) throw typename Base::ElementLiouvilleanException(); doActWithJ(t,psi);}
+
+  virtual void doActWithJ(double t, StateVectorLow&) const = 0;
+  
+  virtual double rate(double t, const LazyDensityOperator&) const = 0;
 
 };
 
 
 template<int RANK>
-class ElementLiouvillean<RANK,1,ISTD_true_false> : public Liouvillean<RANK,ISTD_true_false>
-// This specialization can use the virtual-function technique of old
+class ElementLiouvillean<RANK,1,false> : public ElementLiouvilleanOneJump<RANK,false>
 {
+private:
+  typedef ElementLiouvilleanOneJump<RANK,false> Base;
+  
 public:
-  typedef Liouvillean<RANK,ISTD_true_false> Base;
-
-  typedef typename Base::    StateVectorLow     StateVectorLow;
+  typedef typename Base::StateVectorLow StateVectorLow;
 
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename LiouvilleanAveragedCommon::DArray1D Rates;
-
-  typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
-
+  typedef typename Base::Rates Rates;
+  
 protected:
-  ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) 
-    : keyPrinter_(keyTitle,KeyLabels(1,keyLabel)) {}
-
+  ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,keyLabel) {}
+  
 private:
-  size_t nAvr_v() const {return 1;}
+  const Rates average_v(const LazyDensityOperator& matrix) const {Rates rates(1); rates(0)=rate(matrix); return rates;}
 
-  const Rates average_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const {Rates rates(1); rates(0)=rate(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) matrix); return rates;}
+  void actWithJ_v(StateVectorLow& psi, size_t jumpNo) const {if (jumpNo) throw typename Base::ElementLiouvilleanException(); doActWithJ(psi);}
 
-#ifndef   NDEBUG
-  struct ElementLiouvilleanException : cpputils::Exception {};
-#endif // NDEBUG
-
-  void actWithJ_v(COND_ARG_T(ISTD) StateVectorLow& psi, size_t 
-#ifndef   NDEBUG
-                  jumpNo
-#endif // NDEBUG
-                  ) const {
-#ifndef   NDEBUG
-    if (jumpNo) throw ElementLiouvilleanException(); 
-#endif // NDEBUG
-    doActWithJ(BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) psi);
-  }
-
-  std::ostream& displayKey_v(std::ostream& os, size_t& i) const {return keyPrinter_.displayKey(os,i);}
-
-  virtual void   doActWithJ(COND_ARG(ISTD)       StateVectorLow     &) const = 0;
-  virtual double rate      (COND_ARG(ISTD) const LazyDensityOperator&) const = 0;
-
-  const cpputils::KeyPrinter keyPrinter_;
+  virtual void doActWithJ(StateVectorLow&) const = 0;
+  
+  virtual double rate(const LazyDensityOperator&) const = 0;
 
 };
 
+template<int RANK, int NOJ, bool IS_TIME_DEPENDENT>
+void ElementLiouvillean<RANK,NOJ,IS_TIME_DEPENDENT>::actWithJ_v(double t, StateVectorLow& psi, size_t jumpNo) const {typename boost::enable_if_c< IS_TIME_DEPENDENT>::type();/*jumps_(jumpNo)(t,psi);*/}
 
+template<int RANK, int NOJ, bool IS_TIME_DEPENDENT>
+void ElementLiouvillean<RANK,NOJ,IS_TIME_DEPENDENT>::actWithJ_v(          StateVectorLow& psi, size_t jumpNo) const {typename boost::enable_if_c<!IS_TIME_DEPENDENT>::type();/*jumps_(jumpNo)(  psi);*/}
 
-
+/*
 template<int RANK, int NOJ>
 const LiouvilleanAveragedCommon::DArray1D ElementLiouvillean<RANK,NOJ,ISTD_true_false>::average_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const
 {
@@ -152,15 +119,11 @@ const LiouvilleanAveragedCommon::DArray1D ElementLiouvillean<RANK,NOJ,ISTD_true_
                    bind(&JumpRateStrategy::operator(),_1,BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) boost::cref(matrix)));
   return rates;
 }
+*/
+
+} // structure
 
 
-#undef ISTD_true_false
-
-#undef COND_ARG
-#undef COND_ARG_T
+#endif // STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
 
 
-#undef ISTD
-#undef ELEMENTLIOUVILLEAN_ISTD_REENTERING
-
-#endif  // ELEMENTLIOUVILLEAN_ISTD_REENTERING

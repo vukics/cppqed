@@ -10,14 +10,6 @@
 using namespace std;
 
 
-
-cpputils::KeyPrinter::KeyPrinter(const string& keyTitle, const KeyLabels& keyLabels) 
-  : keyTitle_(keyTitle), keyLabels_(keyLabels) 
-{
-}
-
-
-
 ostream& cpputils::KeyPrinter::displayKey(ostream& os, size_t& i) const
 {
   namespace bll=boost::lambda;

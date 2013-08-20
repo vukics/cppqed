@@ -5,8 +5,7 @@
 #include "ElementAveragedFwd.h"
 
 #include "Averaged.h"
-
-#include "KeyPrinter.h"
+#include "ElementLiouvilleanAveragedCommon.h"
 
 
 
@@ -16,32 +15,22 @@ namespace structure {
 void displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
 
 
-//////////////////
-//
-// ElementAveraged
-//
-//////////////////
-
 
 template<int RANK, bool IS_TIME_DEPENDENT>
-class ElementAveraged : public Averaged<RANK,IS_TIME_DEPENDENT>
+class ElementAveraged : public ElementLiouvilleanAveragedCommon<Averaged<RANK,IS_TIME_DEPENDENT> >
 {
+private:
+  typedef ElementLiouvilleanAveragedCommon<Averaged<RANK,IS_TIME_DEPENDENT> > Base;
+  
 public:
   typedef AveragedCommon::Averages Averages;
-  typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
 
-  ElementAveraged(const std::string& keyTitle, const KeyLabels& keyLabels) : keyPrinter_(keyTitle,keyLabels) {}
+protected:
+  template<typename... KeyLabelsPack>
+  ElementAveraged(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack) {}
 
-  const std::string& getTitle () const {return keyPrinter_.getTitle ();}
-  const KeyLabels  & getLabels() const {return keyPrinter_.getLabels();}
-
-private: 
-  size_t       nAvr_v()                                                   const {return keyPrinter_.length()         ;}
-
-  void             display_v(const Averages& a, std::ostream& os, int precision) const {       displayCommon(a,os,precision);}
-  std::ostream& displayKey_v(std::ostream& os, size_t& i)                        const {return keyPrinter_.displayKey(os,i) ;}
-
-  const cpputils::KeyPrinter keyPrinter_;
+private:
+  void display_v(const Averages& a, std::ostream& os, int precision) const {displayCommon(a,os,precision);}
 
 };
 
@@ -50,13 +39,15 @@ private:
 template<int RANK, bool IS_TIME_DEPENDENT>
 class ClonableElementAveraged : public ElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
-public:
+private:
   typedef ElementAveraged<RANK,IS_TIME_DEPENDENT> Base;
-  typedef typename Base::KeyLabels KeyLabels;
 
+protected:
+  template<typename... KeyLabelsPack>
+  ClonableElementAveraged(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack) {}
+
+public:
   typedef ClonableElementAveraged* ClonedPtr;
-
-  ClonableElementAveraged(const std::string& keyTitle, const KeyLabels& keyLabels) : Base(keyTitle,keyLabels) {}
 
   const ClonedPtr clone() const {return do_clone();}
 
@@ -67,7 +58,7 @@ private:
 
 
 template<int RANK, bool IS_TIME_DEPENDENT>
-inline ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>*const new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea)
+inline auto new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea) -> decltype(&cea)
 {
   return cea.clone();
 }
