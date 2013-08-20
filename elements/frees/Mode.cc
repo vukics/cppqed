@@ -18,14 +18,14 @@ using namespace mathutils;
 
 namespace mode {
 
-#define MAKE_redirect return make<Averaged>(p,qmp)
+#define DEFINE_make_by_redirect(AUX) const Ptr make(const BOOST_PP_CAT(Pars,AUX) & p, QM_Picture qmp) {return make<Averaged>(p,qmp);}
 
-const Ptr make(const Pars           & p, QM_Picture qmp) {MAKE_redirect ;}
-const Ptr make(const ParsLossy      & p, QM_Picture qmp) {MAKE_redirect ;}
-const Ptr make(const ParsPumped     & p, QM_Picture qmp) {MAKE_redirect ;}
-const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp) {MAKE_redirect ;}
+DEFINE_make_by_redirect()
+DEFINE_make_by_redirect(Lossy)
+DEFINE_make_by_redirect(Pumped)
+DEFINE_make_by_redirect(PumpedLossy)
 
-#undef MAKE_redirect
+#undef DEFINE_make_by_redirect
 
 
 const Tridiagonal aop(size_t);
