@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   StateVector psi(qbit::init(pq0)*qbit::init(pq1)*qbit::init(pq2)*mode::init(pplm));
   psi.renorm();
   
-  composite::result_of::Make<Act<0,3>,Act<1,3>,Act<2,3> >::type ptr(composite::make(Act<0,3>(jc0),Act<1,3>(jc1),Act<2,3>(jc2)));
+  auto ptr(composite::make(Act<0,3>(jc0),Act<1,3>(jc1),Act<2,3>(jc2)));
   
   quantumtrajectory::TimeAveragingMCWF_Trajectory<4> traj(psi,*ptr,pe,0.);
 
@@ -67,6 +67,6 @@ int main(int argc, char* argv[])
   
   mode::DensityOperator rhomode=quantumdata::reduce<3>(rho);
   
-  quantumdata::scanFunction(quantumdata::wignerFunction<mode::DensityOperator>,rhomode,cout,pfs);
+  quantumdata::scanFunction(quantumdata::qFunction<mode::DensityOperator>,rhomode,cout,pfs);
 
 }

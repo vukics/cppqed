@@ -22,10 +22,9 @@ public:
 
   using Base::getEvolved;
 
-  Simulated(A&, typename Evolved::Derivs, double dtInit, 
-            double, double, 
+  Simulated(A&, typename Evolved::Derivs, double dtInit,
+            double, double,
             const A& scaleAbs,
-            std::ostream&, int,
             const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
   Simulated(A&, typename Evolved::Derivs, double dtInit,

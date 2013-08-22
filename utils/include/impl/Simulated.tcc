@@ -16,8 +16,7 @@ namespace trajectory {
 template<typename A>
 Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit, 
                         double epsRel, double epsAbs,
-                        const A& scaleAbs, 
-                        std::ostream& os, int precision, 
+                        const A& scaleAbs,
                         const evolved::Maker<A>& maker)
   : Base(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,maker)
 {}
