@@ -8,20 +8,55 @@
 #include "Liouvillean.h"
 #include "ElementLiouvilleanAveragedCommon.h"
 
-#include "Range.h"
-
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+#include <boost/mpl/inherit_linearly.hpp>
 
 
 namespace structure {
 
 
+namespace details {
+
+
+template<int RANK, typename JUMP_ORDINAL_ICW, bool IS_TIME_DEPENDENT>
+class Lindblad;
+
+
+template<int RANK, typename JUMP_ORDINAL_ICW>
+class Lindblad<RANK,JUMP_ORDINAL_ICW,true>
+{
+public:
+  static const int JUMP_ORDINAL=JUMP_ORDINAL_ICW::value;
+  
+protected:
+  virtual void doActWithJ(double t, typename quantumdata::Types<RANK>::StateVectorLow&, mpl::int_<JUMP_ORDINAL>) const = 0;
+  
+  virtual double rate(double t, const quantumdata::LazyDensityOperator<RANK>&, mpl::int_<JUMP_ORDINAL>) const = 0;
+  
+};
+
+
+template<int RANK, typename JUMP_ORDINAL_ICW>
+class Lindblad<RANK,JUMP_ORDINAL_ICW,false>
+{
+public:
+  static const int JUMP_ORDINAL=JUMP_ORDINAL_ICW::value;
+  
+protected:
+  virtual void doActWithJ(typename quantumdata::Types<RANK>::StateVectorLow&, mpl::int_<JUMP_ORDINAL>) const = 0;
+  
+  virtual double rate(const quantumdata::LazyDensityOperator<RANK>&, mpl::int_<JUMP_ORDINAL>) const = 0;
+  
+};
+
+} // details
+
+
 template<int RANK, int NOJ, bool IS_TIME_DEPENDENT>
-class ElementLiouvillean : public ElementLiouvilleanAveragedCommon<Liouvillean<RANK,IS_TIME_DEPENDENT> >
+class ElementLiouvillean : public ElementLiouvilleanAveragedCommon<Liouvillean<RANK,IS_TIME_DEPENDENT> >,
+                           private mpl::inherit_linearly<tmptools::Ordinals<NOJ>,mpl::inherit<mpl::_1,details::Lindblad<RANK,_2,IS_TIME_DEPENDENT> > >::type
 {
 private:
-  typedef Liouvillean<RANK,IS_TIME_DEPENDENT> Base;
+  typedef ElementLiouvilleanAveragedCommon<Liouvillean<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
   typedef typename Base::StateVectorLow StateVectorLow;
@@ -29,12 +64,14 @@ public:
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
   typedef typename Base::Rates Rates;
-
+  
+  template<int JUMP_ORDINAL>
+  class JumpNo : mpl::int_<JUMP_ORDINAL> {BOOST_STATIC_ASSERT(JUMP_ORDINAL<NOJ);} // or some enable_if-base solution
+  
 protected:
   template<typename... KeyLabelsPack>
-  ElementLiouvillean(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) 
-    : jumps_(jumps), jumpRates_(jumpRates), keyPrinter_(keyTitle,keyLabelsPack) {}
-
+  ElementLiouvilleanBase(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack) {}
+  
 private:
   size_t nAvr_v() const {return NOJ;}
 
