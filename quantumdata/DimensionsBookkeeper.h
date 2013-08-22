@@ -9,6 +9,8 @@
 #include "TMP_Tools.h"
 #include "BlitzTiny.h"
 
+#include <boost/operators.hpp>
+
 namespace mpl=boost::mpl;
 
 
@@ -24,7 +26,9 @@ class DimensionalityMismatchException : cpputils::Exception {};
  * \tparam IS_CONST  Governs the constness
  */
 template<int RANK, bool IS_CONST>
-class DimensionsBookkeeper
+class DimensionsBookkeeper : private boost::equality_comparable<DimensionsBookkeeper<RANK, IS_CONST>,
+                                     boost::equality_comparable<DimensionsBookkeeper<RANK, IS_CONST>,
+                                                                DimensionsBookkeeper<RANK,!IS_CONST> > >
 {
 public:
   static const int                    N_RANK=RANK; ///< Arity of the Hilbert space
@@ -62,8 +66,7 @@ private:
 };
 
 
-/// \name Dimensionality comparison for types derived from DimensionsBookkeeper
-//@{
+/// \related DimensionsBookkeeper Dimensionality comparison for types derived from DimensionsBookkeeper
 template<int RANK, bool IS_CONST1, bool IS_CONST2>
 inline bool
 operator==(const DimensionsBookkeeper<RANK,IS_CONST1>& d1, const DimensionsBookkeeper<RANK,IS_CONST2>& d2)
@@ -71,12 +74,5 @@ operator==(const DimensionsBookkeeper<RANK,IS_CONST1>& d1, const DimensionsBookk
   return blitz::all(d1.getDimensions()==d2.getDimensions());
 }
 
-template<int RANK, bool IS_CONST1, bool IS_CONST2>
-inline bool
-operator!=(const DimensionsBookkeeper<RANK,IS_CONST1>& d1, const DimensionsBookkeeper<RANK,IS_CONST2>& d2)
-{
-  return !(d1==d2);
-}
-//@}
 
 #endif // QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED

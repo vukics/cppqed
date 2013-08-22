@@ -6,7 +6,7 @@
 
 #include "ComplexExtensions.h"
 
-#include<boost/operators.hpp>
+#include <boost/operators.hpp>
 
 
 namespace linalg {
@@ -19,11 +19,11 @@ struct EmptyBase {};
 
 template<typename T, typename B>
 struct VectorSpace
-  : boost::additive1      <T,        // Abel group
-    boost::multiplicative2<T,double, // Vector space
-    boost::multiplicative2<T,dcomp,  // "
+  : boost::additive1     <T,        // Abel group
+    boost::multiplicative<T,double, // Vector space
+    boost::multiplicative<T,dcomp,  // "
     /*  boost::multipliable1  <T,        // Direct product */
-    boost::equality_comparable1<T> > > > {};
+    boost::equality_comparable<T> > > > {};
 
 
 } // linalg

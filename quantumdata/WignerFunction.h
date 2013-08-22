@@ -9,7 +9,7 @@
 
 #include "ParsFwd.h"
 
-#include "boost/math/special_functions/factorials.hpp"
+#include <boost/math/special_functions/factorials.hpp>
 
 
 namespace quantumdata {

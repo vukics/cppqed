@@ -40,9 +40,23 @@ protected:
         Tridiagonals& getH_OverIs()       {return const_cast<Tridiagonals&>(static_cast<const TDH_Base*>(this)->getH_OverIs());}
 
 private:
+  /// \name Virtuals inherited from Hamiltonian
+  //@{
+    /**
+     * The first implements Hamiltonian<RANK,ONE_TIME> and can be used only when `IS_TIME_DEPENDENT=true`, while the second implements Hamiltonian<RANK,NO_TIME>
+     * and can be used only in the opposite case.
+     * 
+     * \note The technique of providing both functions here depends on that feature of C++ templates that only such parts of a template are instantiated as are actually invoked.
+     * This could not work if Hamiltonian<RANK,NO_TIME> inherited from Hamiltonian<RANK,ONE_TIME> instead of Hamiltonian<RANK,TWO_TIME>, because in that case, both functions
+     * would be implementations of virtual functions and hence (and the first one, in the case of `IS_TIME_DEPENDENT=false` would even silently re-implement the virtual function
+     * inherited from Hamiltonian<RANK,ONE_TIME> through Hamiltonian<RANK,NO_TIME>) *always instantiated*!
+     * 
+     * \see the technique used @ FreeExact & ElementLiouvillean
+     * 
+     */
   void addContribution_v(double, const StateVectorLow&, StateVectorLow&) const;
-  void addContribution_v(const StateVectorLow&, StateVectorLow&) const;
-
+  void addContribution_v(        const StateVectorLow&, StateVectorLow&) const;
+  //@}
   mutable Tridiagonals hOverIs_;
 
 };
