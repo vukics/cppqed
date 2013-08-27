@@ -252,9 +252,6 @@ private:
 ///////////
 
 
-class EmptyBase {};
-
-
 } // multilevel
 
 

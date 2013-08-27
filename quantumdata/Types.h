@@ -3,29 +3,22 @@
 #ifndef QUANTUMDATA_TYPES_H_INCLUDED
 #define QUANTUMDATA_TYPES_H_INCLUDED
 
-#include "TypesFwd.h"
-
 #include "LazyDensityOperatorFwd.h"
 
 #include "BlitzArray.h"
+
+#include <boost/mpl/empty_base.hpp>
 
 
 namespace quantumdata {
 
 
-namespace details {
-
-struct Empty {};
-
-} // details
-
-
 /// Basically only a metafunction defining types for higher-level constructs of arity `RANK`
 /**
  * \tparamRANK
- * \tparam B An optional base class for base-class chaining. An empty class (quantumdata::details::Empty) by default
+ * \tparam B An optional base class for base-class chaining. An empty class (boost::mpl::empty_base) by default
  */
-template<int RANK, typename B>
+template<int RANK, typename B=boost::mpl::empty_base>
 struct Types : B 
 // it's basically just a metafunction
 {

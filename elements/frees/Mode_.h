@@ -97,17 +97,10 @@ private:
 
 
 
-namespace details {
-
-struct Empty {};
-
-}
-
-
 template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
   : public structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
-    public mpl::if_c<IS_TIME_DEPENDENT,Exact,details::Empty>::type
+    public mpl::if_c<IS_TIME_DEPENDENT,Exact,mpl::empty_base>::type
 {
 public:
   typedef structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
@@ -415,6 +408,7 @@ public:
 };
 
 
+/*
 //////////////////////////////////////////////////////////////////////
 // One more to test time-dependent jump and averages 
 //////////////////////////////////////////////////////////////////////
@@ -442,6 +436,6 @@ private:
   const dcomp z_;
 
 };
-
+*/
 
 #endif // ELEMENTS_FREES_MODE__H_INCLUDED
