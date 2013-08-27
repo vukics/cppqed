@@ -6,6 +6,7 @@
 
 #include <list>
 #include <string>
+// #include <utility>
 
 
 namespace cpputils {
@@ -23,7 +24,7 @@ public:
   typedef std::list<std::string> KeyLabels;
 
   template<typename... KeyLabelsPack>
-  KeyPrinter(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyTitle_(keyTitle), keyLabels_(std::forward<KeyLabelsPack>(keyLabelsPack)...) {}
+  KeyPrinter(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyTitle_(keyTitle), keyLabels_(/*std::forward<KeyLabelsPack>(*/keyLabelsPack/*)*/...) {}
 
   size_t        length    ()                       const {return keyLabels_.size();}
   std::ostream& displayKey(std::ostream&, size_t&) const;
