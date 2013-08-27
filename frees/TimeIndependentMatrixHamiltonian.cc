@@ -1,7 +1,7 @@
 #include "TimeIndependentMatrixHamiltonian.h"
 
 
-class MatrixNotSquareException {};
+class MatrixNotSquareException : public cpputils::Exception {};
 
 
 TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix& hamiltonianOverI)
