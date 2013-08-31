@@ -7,6 +7,7 @@
 
 #include "LiouvilleanAveragedCommon.h"
 
+#include "LazyDensityOperator.h"
 #include "StateVector.h"
 
 

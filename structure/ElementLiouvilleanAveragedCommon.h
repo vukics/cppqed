@@ -22,7 +22,9 @@ public:
 
 protected:
   template<typename... KeyLabelsPack>
-  ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyPrinter_(keyTitle,keyLabelsPack) {}
+  ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyPrinter_(keyTitle,keyLabelsPack...) {}
+
+  ElementLiouvilleanAveragedCommon(const std::string& keyTitle, std::initializer_list<std::string> il) : keyPrinter_(keyTitle,il) {}
 
 private:
   size_t nAvr_v() const {return keyPrinter_.length();}

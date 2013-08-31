@@ -8,10 +8,7 @@
 #include "Liouvillean.h"
 #include "ElementLiouvilleanAveragedCommon.h"
 
-#include <boost/function.hpp>
-
-#include <boost/mpl/inherit_linearly.hpp>
-#include <boost/mpl/inherit.hpp>
+#include <boost/mpl/for_each.hpp>
 
 
 namespace structure {
@@ -20,55 +17,54 @@ namespace structure {
 namespace details {
 
 
-template<int RANK, typename JUMP_ORDINAL_ICW, bool IS_TIME_DEPENDENT>
+template<int NOJ>
+class LindbladBase
+{
+protected:
+  /// A tagging class for Lindblad
+  template<int JUMP_ORDINAL, typename OTHER=typename boost::enable_if_c< (JUMP_ORDINAL<NOJ) >::type>
+  class JumpNo : mpl::int_<JUMP_ORDINAL> {};
+
+};
+
+
+template<int RANK, int JUMP_ORDINAL, bool IS_TIME_DEPENDENT, int NOJ=JUMP_ORDINAL+1>
 class Lindblad;
 
-/*
-template<int RANK, typename JUMP_ORDINAL_ICW>
-class Lindblad<RANK,JUMP_ORDINAL_ICW,true>
-{
-public:
-  static const int JUMP_ORDINAL=JUMP_ORDINAL_ICW::value;
-  
-protected:
-  // Type-erasure & non-virtual interface idiom in one:
-  
-  void typeErasedActWithJ(double t, typename quantumdata::Types<RANK>::StateVectorLow& psi) const {doActWithJ(t,psi,mpl::int_<JUMP_ORDINAL>());}
-  
-  double typeErasedRate(double t, const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(t,matrix,mpl::int_<JUMP_ORDINAL>());}
-  
-private:
-  virtual void doActWithJ(double t, typename quantumdata::Types<RANK>::StateVectorLow&, mpl::int_<JUMP_ORDINAL>) const = 0;
-  
-  virtual double rate(double t, const quantumdata::LazyDensityOperator<RANK>&, mpl::int_<JUMP_ORDINAL>) const = 0;
-  
-};
-*/
 
-template<int RANK, typename JUMP_ORDINAL_ICW>
-class Lindblad<RANK,JUMP_ORDINAL_ICW,false>
+template<int RANK, int JUMP_ORDINAL, int NOJ>
+class Lindblad<RANK,JUMP_ORDINAL,false,NOJ> : public mpl::if_c<JUMP_ORDINAL,Lindblad<RANK,JUMP_ORDINAL-1,false,NOJ>,LindbladBase<NOJ> >::type
 {
 public:
-  static const int JUMP_ORDINAL=JUMP_ORDINAL_ICW::value;
+  virtual ~Lindblad () {}
   
-protected:
-  void typeErasedActWithJ(typename quantumdata::Types<RANK>::StateVectorLow& psi) const {doActWithJ(psi,mpl::int_<JUMP_ORDINAL>());}
+  /// Type-erasure & non-virtual interface idiom in one:
+  //@{
+  void typeErasedActWithJ(typename quantumdata::Types<RANK>::StateVectorLow& psi) const {doActWithJ(psi,typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>());}
   
-  double typeErasedRate(const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(matrix,mpl::int_<JUMP_ORDINAL>());}
+  double typeErasedRate(const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(matrix,typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>());}
+  //@}
   
 private:
-  virtual void doActWithJ(typename quantumdata::Types<RANK>::StateVectorLow&, mpl::int_<JUMP_ORDINAL>) const = 0;
+  virtual void doActWithJ(typename quantumdata::Types<RANK>::StateVectorLow&, typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>) const = 0;
   
-  virtual double rate(const quantumdata::LazyDensityOperator<RANK>&, mpl::int_<JUMP_ORDINAL>) const = 0;
+  virtual double rate(const quantumdata::LazyDensityOperator<RANK>&, typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>) const = 0;
   
 };
+
 
 } // details
 
 
+struct ElementLiouvilleanException : cpputils::TaggedException
+{
+  ElementLiouvilleanException(const std::string& tag) : cpputils::TaggedException(tag) {}
+};
+
+  
 template<int RANK, int NOJ>
 class ElementLiouvillean<RANK,NOJ,false> : public ElementLiouvilleanAveragedCommon<Liouvillean<RANK,false> >,
-                                           private mpl::inherit_linearly<tmptools::Ordinals<NOJ>,mpl::inherit<mpl::_2,details::Lindblad<RANK,mpl::_1,false> > >::type
+                                           public details::Lindblad<RANK,NOJ-1,false>
 {
 private:
   typedef ElementLiouvilleanAveragedCommon<Liouvillean<RANK,false> > Base;
@@ -80,30 +76,44 @@ public:
 
   typedef typename Base::Rates Rates;
   
-  template<int JUMP_ORDINAL>
-  class JumpNo : mpl::int_<JUMP_ORDINAL> {BOOST_STATIC_ASSERT(JUMP_ORDINAL<NOJ);}; // or some enable_if-based solution
-  
-  typedef boost::function<void  (      StateVectorLow&     )> JumpStrategy    ;
-  typedef boost::function<double(const LazyDensityOperator&)> JumpRateStrategy;
-
-  typedef blitz::TinyVector<JumpStrategy    ,NOJ> JumpStrategies    ;
-  typedef blitz::TinyVector<JumpRateStrategy,NOJ> JumpRateStrategies;
-
 protected:
   template<typename... KeyLabelsPack>
-  ElementLiouvillean(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack...), jumps_(fillJumpStrategies()), jumpRates_(fillJumpRateStrategies()) {}
+  ElementLiouvillean(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack...) {}
   
+  ElementLiouvillean(const std::string& keyTitle, std::initializer_list<std::string> il) : Base(keyTitle,il) {}
+
 private:
-  const Rates average_v(const LazyDensityOperator&) const;
+  class Average
+  {
+  public:
+    Average(const ElementLiouvillean* ptr, Rates& rates, const LazyDensityOperator& matrix) : ptr_(ptr), rates_(rates), matrix_(matrix) {}
 
-  void actWithJ_v(StateVectorLow& psi, size_t jumpNo) const;
-  
-  const JumpStrategies     fillJumpStrategies    () const;
-  const JumpRateStrategies fillJumpRateStrategies() const;
-  
-  const JumpStrategies     jumps_    ;
-  const JumpRateStrategies jumpRates_;
+    template<typename T> void operator()(T) const {rates_(T::value)=static_cast<const details::Lindblad<RANK,T::value,false,NOJ>*const>(ptr_)->typeErasedRate(matrix_);}
 
+  private:
+    const ElementLiouvillean*const ptr_;
+    Rates& rates_;
+    const LazyDensityOperator& matrix_;    
+  };
+
+  const Rates average_v(const LazyDensityOperator& matrix) const {Rates rates(NOJ); mpl::for_each<tmptools::Ordinals<NOJ> >(Average(this,rates,matrix)); return rates;}
+
+  class ActWithJ
+  {
+  public:
+    ActWithJ(const ElementLiouvillean* ptr, StateVectorLow& psi, size_t jumpNo) : ptr_(ptr), psi_(psi), jumpNo_(jumpNo) {}
+
+    template<typename T>
+    void operator()(T) const {if (T::value==jumpNo_) static_cast<const details::Lindblad<RANK,T::value,false,NOJ>*const>(ptr_)->typeErasedActWithJ(psi_);}
+
+  private:
+    const ElementLiouvillean*const ptr_;
+    StateVectorLow& psi_;
+    const size_t jumpNo_;    
+  };
+
+  void actWithJ_v(StateVectorLow& psi, size_t jumpNo) const {if (jumpNo>=NOJ) throw ElementLiouvilleanException(Base::getTitle()); mpl::for_each<tmptools::Ordinals<NOJ> >(ActWithJ(this,psi,jumpNo));}
+  
 };
 
 
@@ -121,11 +131,6 @@ public:
 
   typedef typename Base::Rates Rates;
   
-  struct ElementLiouvilleanException : cpputils::TaggedException
-  {
-    ElementLiouvilleanException(const std::string& tag) : cpputils::TaggedException(tag) {}
-  };
-  
 protected:
   ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,1,keyLabel) {}
   
@@ -141,18 +146,6 @@ private:
 };
 
 
-/*
-template<int RANK, int NOJ>
-const LiouvilleanAveragedCommon::DArray1D ElementLiouvillean<RANK,NOJ,ISTD_true_false>::average_v(COND_ARG_T(ISTD) const LazyDensityOperator& matrix) const
-{
-  Rates rates(NOJ);
-  // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
-
-  boost::transform(jumpRates_,rates.begin(),
-                   bind(&JumpRateStrategy::operator(),_1,BOOST_PP_EXPR_IIF(ISTD,t) BOOST_PP_COMMA_IF(ISTD) boost::cref(matrix)));
-  return rates;
-}
-*/
 
 } // structure
 

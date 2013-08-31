@@ -4,9 +4,10 @@
 
 #include "KeyPrinterFwd.h"
 
+#include <initializer_list>
 #include <list>
 #include <string>
-// #include <utility>
+#include <utility>
 
 
 namespace cpputils {
@@ -24,7 +25,9 @@ public:
   typedef std::list<std::string> KeyLabels;
 
   template<typename... KeyLabelsPack>
-  KeyPrinter(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyTitle_(keyTitle), keyLabels_(/*std::forward<KeyLabelsPack>(*/keyLabelsPack/*)*/...) {}
+  KeyPrinter(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyTitle_(keyTitle), keyLabels_(std::forward<KeyLabelsPack>(keyLabelsPack)...) {}
+
+  KeyPrinter(const std::string& keyTitle, std::initializer_list<std::string> il) : keyTitle_(keyTitle), keyLabels_(il) {}
 
   size_t        length    ()                       const {return keyLabels_.size();}
   std::ostream& displayKey(std::ostream&, size_t&) const;
