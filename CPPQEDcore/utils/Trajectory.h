@@ -15,6 +15,7 @@
 #include <boost/utility.hpp>
 
 #include <iosfwd>
+#include <string>
 
 
 
@@ -33,9 +34,36 @@ void run(Trajectory &, const ParsRun&);
 template<typename A>
 void run(Adaptive<A>&, const ParsRun&);
 
+struct SerializationMetadata
+{
+  SerializationMetadata()
+    : protocolVersion(0),
+      rank(0),
+      trajectoryType("unspecified")
+  {};
+  int protocolVersion;
+  int rank;
+  std::string trajectoryType;
+
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & trajectoryType;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+};
+
+namespace details
+{
+
+void writeNextArchive(std::ofstream*, const std::ostringstream&);
+void readNextArchive(std::ifstream&, std::istringstream&);
+SerializationMetadata readMeta(std::ifstream& ifs, bool reset);
+
+} // details
 
 void writeViaSStream(const Trajectory&, std::ofstream*);
 void  readViaSStream(      Trajectory&, std::ifstream&);
+SerializationMetadata readMeta(std::ifstream&);
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
@@ -87,6 +115,8 @@ public:
   cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return  readState_v(iar);}
   cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return writeState_v(oar);};
   
+  cpputils::oarchive& writeMeta(cpputils::oarchive& oar)  const {return writeMeta_v(oar);}
+  
   virtual ~Trajectory() {}
 
 private:
@@ -100,6 +130,7 @@ private:
 
   virtual cpputils::iarchive&  readState_v(cpputils::iarchive&)       = 0;
   virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
+  virtual cpputils::oarchive& writeMeta_v (cpputils::oarchive& oar) const {SerializationMetadata meta; return oar & meta;}
 
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
   

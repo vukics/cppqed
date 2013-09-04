@@ -107,6 +107,8 @@ private:
 
   void step_v(double); // performs one single adaptive-stepsize MCWF step of specified maximal length
 
+  cpputils::oarchive& writeMeta_v(cpputils::oarchive& oar) const;
+
   std::ostream& displayParameters_v(std::ostream&) const;
 
   const StateVector& toBeAveraged_v() const {return psi_;} 

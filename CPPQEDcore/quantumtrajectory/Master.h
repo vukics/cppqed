@@ -149,6 +149,7 @@ private:
 
   std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),rho_,os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
+  cpputils::oarchive& writeMeta_v(cpputils::oarchive& oar) const;
 
   const details::DO_Display<RANK,V> doDisplay_;
 

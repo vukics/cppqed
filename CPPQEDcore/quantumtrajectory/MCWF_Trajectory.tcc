@@ -242,6 +242,14 @@ std::ostream& MCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) c
   return qs_.template displayKey<structure::LA_Av>(os,i);
 }
 
+template<int RANK>
+cpputils::oarchive& MCWF_Trajectory<RANK>::writeMeta_v(cpputils::oarchive& oar) const
+{
+  trajectory::SerializationMetadata meta;
+  meta.rank=RANK;
+  meta.trajectoryType="MCWF_Trajectory";
+  return oar & meta;
+}
 
 } // quantumtrajectory
 

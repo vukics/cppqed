@@ -13,6 +13,8 @@ class StoppingCriterionReachedException;
 class TrajectoryFileOpeningException;
 class StateFileOpeningException;
 
+struct SerializationMetadata;
+
 class Trajectory;
 
 template<typename>

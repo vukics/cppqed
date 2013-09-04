@@ -58,24 +58,61 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
 }
 
 
+namespace details {
+  
+void writeNextArchive(ofstream* ofs, const ostringstream &oss)
+{
+  const string& buffer=oss.str();
+  *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
+}
+
+void readNextArchive(ifstream& ifs, istringstream &iss)
+{
+  string buffer;
+  streamsize n; ifs>>n; buffer.resize(n);
+  ifs.read(&buffer[0],n);
+  iss.str(buffer);
+}
+
+SerializationMetadata readMeta(ifstream& ifs, bool reset=false)
+{
+  istringstream meta_iss(ios_base::binary);
+  streampos pos = ifs.tellg();
+  readNextArchive(ifs,meta_iss);
+  if (reset) ifs.seekg(pos);
+  cpputils::iarchive metaArchive(meta_iss);
+  SerializationMetadata meta;
+  metaArchive >> meta;
+  return meta;
+}
+
+} //details
+
+SerializationMetadata readMeta(ifstream& ifs)
+{
+  return details::readMeta(ifs,true);
+}
+
 void writeViaSStream(const Trajectory& traj, ofstream* ofs)
 {
   if (ofs && ofs->is_open()) {
     ostringstream oss(ios_base::binary);
+    ostringstream oss_meta(ios_base::binary);
     cpputils::oarchive stateArchive(oss);
+    cpputils::oarchive metaArchive(oss_meta);
     traj.writeState(stateArchive);
-    const string& buffer=oss.str();
-    *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
+    traj.writeMeta(metaArchive);
+    details::writeNextArchive(ofs,oss_meta);
+    details::writeNextArchive(ofs,oss);
   }
 }
 
 
 void readViaSStream(Trajectory& traj, ifstream& ifs)
-{ // scope of buffer
-  string buffer;
-  streamsize n; ifs>>n; buffer.resize(n);
-  ifs.read(&buffer[0],n);
-  istringstream iss(buffer,ios_base::binary);
+{
+  details::readMeta(ifs);
+  istringstream iss(ios_base::binary);
+  details::readNextArchive(ifs,iss);
   cpputils::iarchive stateArchive(iss);
   traj.readState(stateArchive);
 }

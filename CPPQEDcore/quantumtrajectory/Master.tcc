@@ -176,9 +176,16 @@ void BaseFast<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperato
                      blitzplusplus::basi_fast::begin    (drhodtLow,slicesData_),function);
 }
 
-
-
 } // master
+
+template<int RANK, typename V, bool IS_FAST>
+cpputils::oarchive& Master<RANK,V,IS_FAST>::writeMeta_v(cpputils::oarchive& oar) const
+{
+  trajectory::SerializationMetadata meta;
+  meta.rank=2*RANK;
+  meta.trajectoryType="Master";
+  return oar & meta;
+}
 
 } // quantumtrajectory
 
