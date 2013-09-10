@@ -13,7 +13,6 @@
 #include <boost/bind.hpp>
 
 using namespace std;
-using namespace boost::assign;
 using namespace mathutils;
 using namespace cpputils;
 using namespace fft;
@@ -112,12 +111,7 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::
 
 
 Averaged::Averaged(const Spatial& space)
-  : Base("Particle",
-	 list_of("<P>")
-		("VAR(P)")
-		("<X>")
-		("DEV(X)")
-	 ),
+  : Base("Particle",{"<P>","VAR(P)","<X>","DEV(X)"}),
     space_(space)
 {
 }

@@ -29,7 +29,7 @@ protected:
   template<typename... KeyLabelsPack>
   ElementAveraged(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack...) {}
   
-  ElementAveraged(const std::string& keyTitle, std::initializer_list<std::string> il) : Base(keyTitle,il) {}
+  ElementAveraged(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
 private:
   void display_v(const Averages& a, std::ostream& os, int precision) const {displayCommon(a,os,precision);}
@@ -48,7 +48,7 @@ protected:
   template<typename... KeyLabelsPack>
   ClonableElementAveraged(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack...) {}
 
-  ClonableElementAveraged(const std::string& keyTitle, std::initializer_list<std::string> il) : Base(keyTitle,il) {}
+  ClonableElementAveraged(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
 public:
   typedef ClonableElementAveraged* ClonedPtr;
@@ -62,8 +62,8 @@ private:
 
 
 template<int RANK, bool IS_TIME_DEPENDENT>
-//auto new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea) -> decltype(&cea)
-inline ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>*const new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea)
+inline auto new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea) -> decltype(&cea)
+// inline ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>*const new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea)
 {
   return cea.clone();
 }

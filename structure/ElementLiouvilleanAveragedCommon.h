@@ -15,7 +15,8 @@ template<typename BASE>
 class ElementLiouvilleanAveragedCommon : public BASE
 {
 public:
-  typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
+  typedef cpputils::KeyPrinter::KeyLabels            KeyLabels           ;
+  typedef cpputils::KeyPrinter::KeyLabelsInitializer KeyLabelsInitializer;
   
   const std::string& getTitle () const {return keyPrinter_.getTitle ();}
   const KeyLabels  & getLabels() const {return keyPrinter_.getLabels();}
@@ -24,7 +25,7 @@ protected:
   template<typename... KeyLabelsPack>
   ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyPrinter_(keyTitle,keyLabelsPack...) {}
 
-  ElementLiouvilleanAveragedCommon(const std::string& keyTitle, std::initializer_list<std::string> il) : keyPrinter_(keyTitle,il) {}
+  ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsInitializer il) : keyPrinter_(keyTitle,il) {}
 
 private:
   size_t nAvr_v() const {return keyPrinter_.length();}

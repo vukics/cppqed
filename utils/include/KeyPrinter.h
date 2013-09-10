@@ -12,22 +12,17 @@
 
 namespace cpputils {
 
-////////////////////////
-//
-// ElementAveragedCommon
-//
-////////////////////////
-
 
 class KeyPrinter
 {
 public:
   typedef std::list<std::string> KeyLabels;
+  typedef std::initializer_list<std::string> KeyLabelsInitializer;
 
   template<typename... KeyLabelsPack>
   KeyPrinter(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyTitle_(keyTitle), keyLabels_(std::forward<KeyLabelsPack>(keyLabelsPack)...) {}
 
-  KeyPrinter(const std::string& keyTitle, std::initializer_list<std::string> il) : keyTitle_(keyTitle), keyLabels_(il) {}
+  KeyPrinter(const std::string& keyTitle, KeyLabelsInitializer il) : keyTitle_(keyTitle), keyLabels_(il) {}
 
   size_t        length    ()                       const {return keyLabels_.size();}
   std::ostream& displayKey(std::ostream&, size_t&) const;

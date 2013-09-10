@@ -80,7 +80,7 @@ protected:
   template<typename... KeyLabelsPack>
   ElementLiouvillean(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack...) {}
   
-  ElementLiouvillean(const std::string& keyTitle, std::initializer_list<std::string> il) : Base(keyTitle,il) {}
+  ElementLiouvillean(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
 private:
   class Average
