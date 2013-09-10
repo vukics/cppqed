@@ -160,7 +160,7 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
       static bool p(int i, IndexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
     };
 
-    typename IndexSVL_tuples::const_iterator i(find_if(specialRates,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
+    auto i=find_if(specialRates,bind(&helper::p,--jumpNo,_1)); // See whether it's a special jump
     if (i!=specialRates.end())
       // special jump
       psi_()=i->template get<1>(); // RHS already normalized above

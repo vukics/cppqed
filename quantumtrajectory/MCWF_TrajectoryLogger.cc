@@ -38,7 +38,7 @@ ostream& quantumtrajectory::MCWF_Logger::onEnd(ostream& os) const
         <<"\n# Number of Hamiltonian calls: "<<nHamiltonianCalls_<<endl;
     os<<"\n# MCWF Trajectory:\n";
       
-    for (MCWF_Trajectory::const_iterator i=traj_.begin(); i!=traj_.end(); ++i) os<<"# "<<i->first<<"\t"<<i->second<<std::endl;
+    for (auto i : traj_) os<<"# "<<i.first<<"\t"<<i.second<<std::endl;
     // NEEDS_WORK the lambda expression of old doesn’t work with c++11
     // boost::for_each(traj_,os<<constant("# ")<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
     os<<endl;
@@ -108,7 +108,7 @@ using namespace ensemblemcwf;
 double max_element(const LoggerList& loggerList, boost::function<double(const MCWF_Logger&)> f)
 {
   double res=0.;
-  for (LoggerList::const_iterator i=loggerList.begin(); i!=loggerList.end(); ++i) res=max(res,f(*i));
+  for (auto i : loggerList) res=max(res,f(i));
   return res;
 }
 
@@ -146,15 +146,15 @@ ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerLi
 
   // fill accumulator
   size_t total=0;
-  for (LoggerList::const_iterator i=loggerList.begin(); i!=loggerList.end(); ++i)
-    for (MCWF_Logger::MCWF_Trajectory::const_iterator j=i->traj_.begin(); j!=i->traj_.end(); (++j, ++total))
+  for (auto i : loggerList)
+    for (auto j=i.traj_.begin(); j!=i.traj_.end(); (++j, ++total))
       acc(j->first);
  
   typedef iterator_range<std::vector<std::pair<double, double> >::iterator> Histogram;
   Histogram hist=density(acc);
  
-  for (Histogram::const_iterator i=hist.begin(); i!=hist.end(); ++i)
-    os<<"# "<<i->first<<"\t"<<i->second<<endl;
+  for (auto i : hist)
+    os<<"# "<<i.first<<"\t"<<i.second<<endl;
  
   os<<"\n# Average number of total jumps: "<<total/double(loggerList.size())<<endl;
  

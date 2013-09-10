@@ -72,7 +72,7 @@ Ensemble<T,T_ELEM>::evolve_v(double deltaT)
 
   if (log_) {
     progress_display pd(trajs_.size(),std::cerr);
-    for (typename Impl::iterator i=trajs_.begin(); i!=trajs_.end(); ++i, ++pd) i->evolve(deltaT);
+    for (auto i=trajs_.begin(); i!=trajs_.end(); (++i, ++pd)) i->evolve(deltaT);
   }
   else
     for_each(trajs_,bind(&Trajectory::evolve,_1,deltaT));
@@ -118,7 +118,7 @@ public:
   {
     TBA_Type res(et.getInitializedTBA());
     
-    for (typename Impl::const_iterator i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
+    for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
 
     return res/=size2Double(end-begin);
 

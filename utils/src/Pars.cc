@@ -66,7 +66,7 @@ void versionHelper()
 const ParameterBase&
 ParameterTable::operator[](const string& s) const
 {
-  Impl::const_iterator i=boost::find_if(table_,bind(equal_to<string>(),bind(&ParameterBase::getS,_1),boost::cref(s)));
+  auto i=boost::find_if(table_,bind(equal_to<string>(),bind(&ParameterBase::getS,_1),boost::cref(s)));
 
   if (i==table_.end()) throw UnrecognisedParameterException(s);
   return *i;
