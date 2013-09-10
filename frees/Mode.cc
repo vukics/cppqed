@@ -6,13 +6,11 @@
 
 #include "impl/TridiagonalHamiltonian.tcc"
 
-#include <boost/assign.hpp>
-#include <boost/bind.hpp>
+#include <boost/assign/list_inserter.hpp>
 
 
-using namespace std;
+using std::cout; using std::endl; using std::string;
 using namespace boost;
-using namespace assign;
 using namespace mathutils;
 
 
@@ -124,24 +122,9 @@ void aJump   (StateVectorLow& psi, double kappa)
 }
 
 
-void aDagJump(StateVectorLow& psi, double kappa)
-{
-  double fact=sqrt(2.*kappa);
-  for (int n=psi.ubound(0); n>0; --n)
-    psi(n)=fact*sqrt(n)*psi(n-1);
-  psi(0)=0;
-}
-
-
 double aJumpRate   (const LazyDensityOperator& matrix, double kappa)
 {
   return 2.*kappa*photonNumber(matrix);
-}
-
-
-double aDagJumpRate(const LazyDensityOperator& matrix, double kappa)
-{
-  return 2.*kappa*(photonNumber(matrix)+1.);
 }
 
 
@@ -149,13 +132,37 @@ double aDagJumpRate(const LazyDensityOperator& matrix, double kappa)
 
 
 Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
-  : Base(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
-                        bind(aDagJump,_1,kappa* nTh  )),
-         JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(nTh+1)),
-                            bind(aDagJumpRate,_1,kappa* nTh  )),
-         kT,list_of("excitation loss")("excitation absorption"))
+  : Base(kT,{"excitation loss","excitation absorption"}), kappa_(kappa), nTh_(nTh)
 {
 }
+
+
+void Liouvillean<true>::doActWithJ(StateVectorLow& psi, JumpNo<0>) const
+{
+  aJump(psi,kappa_*(nTh_+1));
+}
+
+
+void Liouvillean<true>::doActWithJ(StateVectorLow& psi, JumpNo<1>) const
+{
+  double fact=sqrt(2.*kappa_*nTh_);
+  for (int n=psi.ubound(0); n>0; --n)
+    psi(n)=fact*sqrt(n)*psi(n-1);
+  psi(0)=0;
+}
+
+
+double Liouvillean<true>::rate(const LazyDensityOperator& matrix, JumpNo<0>) const
+{
+  return aJumpRate(matrix,kappa_*(nTh_+1));
+}
+
+
+double Liouvillean<true>::rate(const LazyDensityOperator& matrix, JumpNo<1>) const
+{
+  return 2.*kappa_*nTh_*(photonNumber(matrix)+1.);
+}
+
 
 template<>
 void Liouvillean<false,false>::doActWithJ(StateVectorLow& psi) const
@@ -195,12 +202,9 @@ namespace {
 
 typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
 
-const KeyLabels Assemble(const KeyLabels& first,
-                         const KeyLabels& middle,
-                         const KeyLabels& last=KeyLabels()
-                         )
+const KeyLabels Assemble(const KeyLabels& first, const KeyLabels& middle, const KeyLabels& last=KeyLabels())
 {
-  KeyLabels res(first); push_back(res).range(middle).range(last);
+  KeyLabels res(first); boost::assign::push_back(res).range(middle).range(last);
   return res;
 }
 
@@ -209,7 +213,7 @@ const KeyLabels Assemble(const KeyLabels& first,
 
 Averaged::Averaged(const KeyLabels& follow, const KeyLabels& precede)
   : Base(keyTitle,
-         Assemble(precede,list_of("<number operator>")("VAR(number operator)")("real(<ladder operator>)")("imag(\")"),follow))
+         Assemble(precede,KeyLabels{"<number operator>","VAR(number operator)","real(<ladder operator>)","imag(\")"},follow))
 {
 }
 
@@ -245,8 +249,7 @@ void Averaged::process_v(Averages& averages) const
 
 
 AveragedQuadratures::AveragedQuadratures(const KeyLabels& follow, const KeyLabels& precede)
-  : Averaged(Assemble(KeyLabels(),list_of("VAR(X)")("VAR(Y)")("COV(X,Y)"),follow),precede)
-    // Last parameter is necessary, otherwise ambiguity with Averaged copy constructor
+  : Averaged(Assemble(KeyLabels{"VAR(X)","VAR(Y)","COV(X,Y)"},follow),precede)
 {
 }
 
@@ -414,13 +417,13 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 
 
-
+/*
 PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
   : ModeBase(p.cutoff),
     structure::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
                                                                mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.cutoff))),
     structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"excitation loss"),
-    structure::ElementAveraged<1,true>(mode::keyTitle,list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
+    structure::ElementAveraged<1,true>(mode::keyTitle,{"<number operator>","real(<ladder operator>)","imag(\")"}),
     z_(p.kappa,-p.delta)
 {
   getParsStream()<<"# Interaction picture, not derived from Exact\n";
@@ -464,3 +467,4 @@ const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(d
   return averages;
 
 }
+*/

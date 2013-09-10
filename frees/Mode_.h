@@ -146,7 +146,7 @@ private:
   const double kappa_;
 
 };
- 
+
 
 template<> 
 class Liouvillean<true >
@@ -157,6 +157,15 @@ protected:
   typedef structure::ElementLiouvillean<1,2> Base;
 
   Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle);
+  
+private:
+  void doActWithJ(StateVectorLow&, JumpNo<0>) const;
+  void doActWithJ(StateVectorLow&, JumpNo<1>) const;
+  
+  double rate(const LazyDensityOperator&, JumpNo<0>) const;
+  double rate(const LazyDensityOperator&, JumpNo<1>) const;
+  
+  const double kappa_, nTh_;
 
 };
 
@@ -407,7 +416,6 @@ public:
   PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
 };
 
-
 /*
 //////////////////////////////////////////////////////////////////////
 // One more to test time-dependent jump and averages 
@@ -431,7 +439,7 @@ private:
 
   const Averages average_v(double t, const LazyDensityOperator&) const;
 
-  void           process_v(Averages&)                  const {}
+  void process_v(Averages&) const {}
 
   const dcomp z_;
 

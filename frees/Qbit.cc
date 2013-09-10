@@ -7,10 +7,7 @@
 #include <boost/make_shared.hpp>
 
 
-using namespace std;
-using namespace boost;
-using namespace assign;
-using namespace mathutils;
+using namespace mathutils; using boost::make_shared;
 
 
 namespace qbit {
@@ -22,8 +19,9 @@ namespace qbit {
 //
 ///////////
 
+
 Averaged::Averaged() 
-  : Base(keyTitle,list_of("rho00")("rho11")("real(rho10=<sigma>)")("imag(\")"))
+  : Base(keyTitle,{"rho00","rho11","real(rho10=<sigma>)","imag(\")"})
 {
 }
 
@@ -162,9 +160,9 @@ Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :
-    return make_shared<PumpedLossyQbit   >(p);
+    return boost::make_shared<PumpedLossyQbit   >(p);
   case QMP_UIP :
-    return make_shared<PumpedLossyQbitUIP>(p);
+    return boost::make_shared<PumpedLossyQbitUIP>(p);
   case QMP_SCH :
     ;
   }

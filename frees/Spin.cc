@@ -84,7 +84,7 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 
 SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double gamma, size_t dim) 
   : Free(spin::decideDimension(twoS,dim),FREQS("omega",omega,1)("gamma",gamma,1)),
-    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), twoS_(twoS), theta_(theta), phi_(phi), omega_(omega), gamma_(gamma), s_(twoS/2.)
+    structure::ElementAveraged<1>("Spin",{"<sz>","<sz^2>","real(<s^+>)","imag(\")","|Psi(dim-1)|^2"}), twoS_(twoS), theta_(theta), phi_(phi), omega_(omega), gamma_(gamma), s_(twoS/2.)
 {
   getParsStream()<<"# Spin "<<s_<<endl;
   getParsStream()<<"# theta="<<theta_<<" phi="<<phi_<<endl;
