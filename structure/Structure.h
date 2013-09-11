@@ -54,9 +54,9 @@ qse(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 
 template<int RANK>
 inline 
-const typename Hamiltonian<RANK,TWO_TIME>::Ptr 
+const typename Hamiltonian<RANK>::Ptr 
 qsh(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
-{return dynamic_pointer_cast<const Hamiltonian<RANK,TWO_TIME> >(quantumSystem);}
+{return dynamic_pointer_cast<const Hamiltonian<RANK> >(quantumSystem);}
 
 template<int RANK>
 inline 
@@ -80,9 +80,9 @@ qse(DynamicsBase::Ptr base)
 
 template<int RANK>
 inline 
-const typename Hamiltonian<RANK,TWO_TIME>::Ptr 
+const typename Hamiltonian<RANK>::Ptr 
 qsh(DynamicsBase::Ptr base)
-{return dynamic_pointer_cast<const Hamiltonian<RANK,TWO_TIME> >(base);}
+{return dynamic_pointer_cast<const Hamiltonian<RANK> >(base);}
 
 template<int RANK>
 inline 

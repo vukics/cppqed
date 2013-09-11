@@ -66,7 +66,7 @@ private:
 ///////////
 
 
-/// The first partial specialization of the general template Averaged for the one-time dependence case (\link TimeDependence Cases 1 & 2\endlink)
+/// The first partial specialization of the general template Averaged for the one-time dependence case (\link TimeDependenceLevel Cases 1 & 2\endlink)
 /** It simply composes LiouvilleanAveragedCommonRanked and AveragedCommon. */
 template<int RANK>
 class Averaged<RANK,true>
@@ -84,7 +84,7 @@ public:
 };
 
 
-/// The second partial specialization of the general template Averaged for the no-time dependence case (\link TimeDependence Cases 3 & 4\endlink)
+/// The second partial specialization of the general template Averaged for the no-time dependence case (\link TimeDependenceLevel Cases 3 & 4\endlink)
 /** Similarly to Liouvillean<RANK,false>, it simply forwards the time-dependent virtual functions to time-independent ones. */
 template<int RANK>
 class Averaged<RANK,false>

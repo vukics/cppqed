@@ -1,10 +1,11 @@
 // -*- C++ -*-
-/// \briefFile{Defines the hierarchical partial specializations of structure::Hamiltonian}
+/// \briefFileDefault
 #ifndef STRUCTURE_HAMILTONIAN_H_INCLUDED
 #define STRUCTURE_HAMILTONIAN_H_INCLUDED
 
 #include "HamiltonianFwd.h"
 
+#include "TimeDependence.h"
 #include "Types.h"
 
 #include <boost/shared_ptr.hpp>
@@ -13,10 +14,21 @@
 namespace structure {
 
 
-/// The first partial specialization of the general template Hamiltonian for the most general degree of \link TimeDependence time dependence\endlink (#TWO_TIME).
+/// The interface every system having (possibly non-Hermitian) Hamiltonian time-evolution must present towards the trajectory drivers
+/**
+ * The most general template is never defined, only its partial specializations in the second parameter.
+ * 
+ * \tparamRANK
+ * \tparam TD Degree of \link TimeDependenceLevel time dependence\endlink. The most general (#TWO_TIME) is taken as default.
+ * 
+ * \see Hamiltonian<RANK,TWO_TIME> through Hamiltonian<RANK,NO_TIME> in Hamiltonian.h
+ * 
+ */
+
+/// The first partial specialization of the general template Hamiltonian for the most general degree of \link TimeDependenceLevel time dependence\endlink (#TWO_TIME).
 /** \tparamRANK */
 template<int RANK>
-class Hamiltonian<RANK,TWO_TIME> : private quantumdata::Types<RANK>
+class Hamiltonian : private quantumdata::Types<RANK>
 {
 public:
   typedef boost::shared_ptr<const Hamiltonian> Ptr;
@@ -49,45 +61,25 @@ private:
 };
 
 
-/// The second partial specialization of the general template Hamiltonian for the middle degree of \link TimeDependence time dependence\endlink (#ONE_TIME).
-template<int RANK>
-class Hamiltonian<RANK,ONE_TIME> : public Hamiltonian<RANK>
+template<int RANK, TimeDependenceLevel TD>
+class HamiltonianTimeDependenceDispatched : public Hamiltonian<RANK>
 {
 public:
   typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow;
+  
+  typedef typename timedependence::Dispatcher<TD>::type TimeDependence;
 
 private:
-  /// The inherited virtual gets implemented by calling a newly defined virtual with only one time parameter
+  /// The inherited virtual gets implemented by calling a newly defined virtual with only one parameter describing different \link timedependence::Dispatcher time dependence levels\endlink
   void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
   {
-    addContribution_v(t-tIntPic0,psi,dpsidt);
+    addContribution_v(TimeDependence(t,tIntPic0),psi,dpsidt);
   }
 
-  /// The newly defined virtual with only one time parameter
-  virtual void addContribution_v(double, const StateVectorLow&, StateVectorLow&) const = 0;
+  /// The newly defined virtual with only one parameter describing different \link timedependence::Dispatcher time dependence levels\endlink
+  virtual void addContribution_v(TimeDependence, const StateVectorLow&, StateVectorLow&) const = 0;
   
 };
-
-
-/// The third partial specialization of the general template Hamiltonian for \link TimeDependence no time dependence\endlink (#NO_TIME).
-template<int RANK>
-class Hamiltonian<RANK,NO_TIME> : public Hamiltonian<RANK>
-{
-public:
-  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow;
-
-private:
-  /// The inherited virtual gets implemented by calling a newly defined virtual with no time parameter
-  void addContribution_v(double, const StateVectorLow& psi, StateVectorLow& dpsidt, double) const 
-  {
-    addContribution_v(psi,dpsidt);
-  }
-
-  /// The newly defined virtual with no time parameter
-  virtual void addContribution_v(const StateVectorLow&, StateVectorLow&) const = 0;
-  
-};
-
 
 
 } // structure

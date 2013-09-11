@@ -21,18 +21,18 @@ namespace details {
 /// TridiagonalHamiltonian base
 template<int RANK, bool IS_TIME_DEPENDENT>
 class TDH_Base 
-  : public Hamiltonian<RANK,
-                       mpl::if_c<IS_TIME_DEPENDENT,
-                                 mpl::integral_c<TimeDependence,ONE_TIME>,
-                                 mpl::integral_c<TimeDependence, NO_TIME>
-                                 >::type::value
-                       >
+  : public HamiltonianTimeDependenceDispatched<RANK,
+                                               mpl::if_c<IS_TIME_DEPENDENT,
+                                                         mpl::integral_c<TimeDependenceLevel,ONE_TIME>,
+                                                         mpl::integral_c<TimeDependenceLevel, NO_TIME>
+                                                         >::type::value
+                                               >
 {
 protected:
   typedef quantumoperator::Tridiagonal<RANK> Tridiagonal ;
   typedef std::list<Tridiagonal>             Tridiagonals;
 
-  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any degree of TimeDependence.
+  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any TimeDependenceLevel.
 
   TDH_Base(const Tridiagonals& hOverIs) : hOverIs_(hOverIs) {}
 
@@ -40,23 +40,19 @@ protected:
         Tridiagonals& getH_OverIs()       {return const_cast<Tridiagonals&>(static_cast<const TDH_Base*>(this)->getH_OverIs());}
 
 private:
-  /// \name Virtuals inherited from Hamiltonian
+  /// \name Virtuals inherited from HamiltonianTimeDependenceDispatched
   //@{
     /**
-     * The first implements Hamiltonian<RANK,ONE_TIME> and can be used only when `IS_TIME_DEPENDENT=true`, while the second implements Hamiltonian<RANK,NO_TIME>
-     * and can be used only in the opposite case.
-     * 
-     * \note The technique of providing both functions here depends on that feature of C++ templates that only such parts of a template are instantiated as are actually invoked.
-     * This could not work if Hamiltonian<RANK,NO_TIME> inherited from Hamiltonian<RANK,ONE_TIME> instead of Hamiltonian<RANK,TWO_TIME>, because in that case, both functions
-     * would be implementations of virtual functions and hence (and the first one, in the case of `IS_TIME_DEPENDENT=false` would even silently re-implement the virtual function
-     * inherited from Hamiltonian<RANK,ONE_TIME> through Hamiltonian<RANK,NO_TIME>) *always instantiated*!
+     * The first implements HamiltonianTimeDependenceDispatched<RANK,ONE_TIME> and can be used only when `IS_TIME_DEPENDENT=true`,
+     * while the second implements HamiltonianTimeDependenceDispatched<RANK,NO_TIME> and can be used only in the opposite case.
      * 
      * \see the technique used @ FreeExact & ElementLiouvillean
      * 
      */
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&) const;
-  void addContribution_v(        const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v(timedependence::OneTime, const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v(timedependence:: NoTime, const StateVectorLow&, StateVectorLow&) const;
   //@}
+
   mutable Tridiagonals hOverIs_;
 
 };

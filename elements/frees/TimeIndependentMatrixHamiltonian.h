@@ -12,7 +12,7 @@
 
 #include "CMatrix.h"
 
-class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::Hamiltonian<1,structure::NO_TIME>
+class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
 {
 public:
   typedef linalg::CMatrix CMatrix;
@@ -21,7 +21,7 @@ public:
   // For safety, the matrix will be copied in.
 
 private:
-  void addContribution_v(const StateVectorLow&, StateVectorLow&) const; 
+  void addContribution_v(structure::timedependence::NoTime, const StateVectorLow&, StateVectorLow&) const; 
 
   const CMatrix hamiltonianOverI_;
 

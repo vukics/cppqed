@@ -11,7 +11,7 @@ class ExactCommon;
 /// The interface every system that needs transformation between two quantum mechanical pictures must present towards the trajectory drivers
 /**
  * Experience shows that even when a system uses interaction picture (which is automatically the case if any of its subsystems does) – that is, part of its dynamics is solved exactly – 
- * it may still want to calculate the jump operators and quantum averages in the normal picture. (cf. Cases 1 & 3 \link TimeDependence above\endlink.)
+ * it may still want to calculate the jump operators and quantum averages in the normal picture. (cf. Cases 1 & 3 \link TimeDependenceLevel above\endlink.)
  * This is useful e.g. to reuse the code written for the non-interaction-picture case.
  * 
  * In this case, the framework has to be provided with some means to transform between the two pictures.

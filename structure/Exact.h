@@ -29,7 +29,7 @@ private:
 
 
 /// The first partial specialization of the general template Exact for the most general, two-time dependence 
-/** This corresponds to \link TimeDependence Case 1\endlink (#TWO_TIME).*/
+/** This corresponds to \link TimeDependenceLevel Case 1\endlink (#TWO_TIME).*/
 template<int RANK>
 class Exact<RANK,true> : public ExactCommon, private quantumdata::Types<RANK> 
 {
@@ -53,7 +53,7 @@ private:
 
 
 /// The second partial specialization of the general template Exact for one-time dependence 
-/** This corresponds to \link TimeDependence Case 3\endlink of the two possibilities for #ONE_TIME. */
+/** This corresponds to \link TimeDependenceLevel Case 3\endlink of the two possibilities for #ONE_TIME. */
 template<int RANK>
 class Exact<RANK,false> : public Exact<RANK,true>
 {

@@ -46,7 +46,7 @@ private:
 
 
 // In Schroedinger picture the Hamiltonian is implemented as a CMatrix
-class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::Hamiltonian<1,structure::NO_TIME>
+class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
 {
 public:
   typedef PumpedTwoLevelAtom Base;
@@ -55,7 +55,7 @@ public:
   PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy&);
   
 private:
-  void addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
+  void addContribution_v(structure::timedependence::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
 
   static const linalg::CMatrix hamiltonianOverI(const dcomp& za, const dcomp& etat);
 

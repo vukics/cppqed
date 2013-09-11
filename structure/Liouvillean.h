@@ -14,7 +14,7 @@
 namespace structure {
 
 
-/// The first partial specialization of the general template Liouvillean for the one-time dependence case (\link TimeDependence Cases 1 & 2\endlink)
+/// The first partial specialization of the general template Liouvillean for the one-time dependence case (\link TimeDependenceLevel Cases 1 & 2\endlink)
 template<int RANK>
 class Liouvillean<RANK,true> : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >
 {
@@ -54,7 +54,7 @@ private:
 };
 
 
-/// The second partial specialization of the general template Liouvillean for the no-time dependence case (\link TimeDependence Cases 3 & 4\endlink)
+/// The second partial specialization of the general template Liouvillean for the no-time dependence case (\link TimeDependenceLevel Cases 3 & 4\endlink)
 template<int RANK>
 class Liouvillean<RANK,false> : public Liouvillean<RANK,true>
 {
