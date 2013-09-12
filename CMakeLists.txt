@@ -77,9 +77,12 @@ endforeach()
 
 # linker on MacOs doesn't like --no-undefined
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined -Wl,--as-needed")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG -std=c++11 -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-deprecated -Wnon-virtual-dtor -Wno-ignored-qualifiers -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args -Wno-overloaded-virtual")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-sign-compare")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11 -DBZ_DEBUG -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-deprecated -Wnon-virtual-dtor -Wno-ignored-qualifiers -Wno-sign-compare")
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-extensions  -Wno-local-type-template-args")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wno-c++11-extensions -Wno-local-type-template-args")
+endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 
 ##################################################
 # Compiler detection
@@ -105,7 +108,7 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 ##################################################
 
 find_package(GSL REQUIRED)
-include_directories(include ${GSL_INCLUDE_DIRS})
+include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${GSL_INCLUDE_DIRS})
 
 # The option SERIALIZATION will be disabled if any of the compoments required for serialization is missing
@@ -128,7 +131,7 @@ else( blitz_SERIALIZATION_FOUND )
   set(ENABLE_SERIALIZATION 0)
 endif( blitz_SERIALIZATION_FOUND )
 
-include_directories( ${blitz_INCLUDE_DIR} )
+include_directories(SYSTEM ${blitz_INCLUDE_DIR} )
 set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIR})
 
 
@@ -146,7 +149,7 @@ else( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library not found.")
   set(ENABLE_SERIALIZATION 0)
 endif( Boost_SERIALIZATION_FOUND )
-include_directories( ${Boost_INCLUDE_DIRS} )
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
 set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 if(Boost_FOUND)
@@ -159,7 +162,7 @@ endif()
 # FLENS
 find_package(flens)
 if( flens_FOUND AND FLENS )
-  include_directories(${flens_INCLUDE_DIRS})
+  include_directories(SYSTEM ${flens_INCLUDE_DIRS})
   set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
   set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
   add_definitions(${flens_DEFINITIONS})
@@ -211,10 +214,6 @@ set_target_properties(${CPPQEDLIB}
 # build all the scripts
 add_subdirectory(scripts)
 
-# add target "fewer_scripts"
-add_custom_target(fewer_scripts)
-add_dependencies(fewer_scripts PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix)
-
 ##################################################
 # Installation
 ##################################################
@@ -265,6 +264,7 @@ install(FILES
   "cmake/Modules/Findflens.cmake"
   "cmake/Modules/Findblitz.cmake"
   "cmake/Modules/LibFindMacros.cmake"
+  "cmake/Modules/PythonSetup.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
  
 # Install the export set for use with the install-tree
