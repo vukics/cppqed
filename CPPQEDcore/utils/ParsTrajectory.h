@@ -54,6 +54,7 @@ struct ParsRun
   double &Dt;
   long &NDt;
   std::string &ofn;
+  std::string &initialFileName;
 
   formdouble::Zero &precision;
 

@@ -16,6 +16,7 @@ ParsRun::ParsRun(parameters::ParameterTable& p, const std::string& mod)
     Dt(p.addMod("Dt",mod,"Timestep between two Displays",.1)),
     NDt(p.addMod("NDt",mod,"Number of steps in Dt mode",0L)),
     ofn(p.addMod<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
+    initialFileName(p.addMod<std::string>("initialFileName",mod,"Trajectory initial file name","")),
     precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision/2))),
     displayInfo(p.addMod("displayInfo",mod,"Whether to display header for trajectories",true)),
     firstStateDisplay(p.addMod("firstStateDisplay",mod,"Displays state vector at startup",true)),

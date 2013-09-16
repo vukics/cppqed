@@ -22,12 +22,12 @@
 namespace trajectory {
 
 
-void run(Trajectory &, double time, double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo, bool firstStateDisplay);
+void run(Trajectory &, double time, double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
 
-void run(Trajectory &, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, int precision, bool displayInfo, bool firstStateDisplay);
+void run(Trajectory &, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
 
 template<typename A>
-void run(Adaptive<A>&, double time, int dc       , unsigned sdf, const std::string& ofn, int precision, bool displayInfo, bool firstStateDisplay);
+void run(Adaptive<A>&, double time, int dc       , unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
 
 void run(Trajectory &, const ParsRun&);
 

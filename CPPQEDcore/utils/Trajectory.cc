@@ -15,8 +15,8 @@ namespace trajectory {
 void run(Trajectory& traj, const ParsRun& p)
 { 
   if (!p.Dt) {cerr<<"Nonzero Dt required!"<<endl; return;}
-  if (p.NDt) run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.precision,p.displayInfo,p.firstStateDisplay);
-  else       run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.precision,p.displayInfo,p.firstStateDisplay);
+  if (p.NDt) run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay);
+  else       run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay);
 }
 
 
@@ -34,8 +34,9 @@ ostream& Trajectory::displayKey(ostream& os) const
 }
 
 
-bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, const string& stateFileName)
+bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, const string& stateFileName, const string& initialFileName)
 {
+  
   if (trajectoryFileName!="") {
 
     ifstream trajectoryFile(trajectoryFileName.c_str());
@@ -52,6 +53,12 @@ bool details::restoreState(Trajectory& traj, const string& trajectoryFileName, c
       return true;
     }
     
+  }
+  
+  if (initialFileName!="") {
+    ifstream initialFile(initialFileName.c_str(), ios_base::binary);
+    if (!initialFile.is_open()) throw StateFileOpeningException(initialFileName);
+    while ( (initialFile.peek(), !initialFile.eof()) ) readViaSStream(traj,initialFile);
   }
   
   return false;
