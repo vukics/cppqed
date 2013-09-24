@@ -60,15 +60,15 @@ qsh(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 
 template<int RANK>
 inline 
-const typename Liouvillean<RANK,true>::Ptr 
+const typename Liouvillean<RANK>::Ptr 
 qsl(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
-{return dynamic_pointer_cast<const Liouvillean<RANK,true> >(quantumSystem);}
+{return dynamic_pointer_cast<const Liouvillean<RANK> >(quantumSystem);}
 
 template<int RANK>
 inline 
-const typename Averaged<RANK,true>::Ptr 
+const typename Averaged<RANK>::Ptr 
 qsa(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
-{return dynamic_pointer_cast<const Averaged<RANK,true> >(quantumSystem);}
+{return dynamic_pointer_cast<const Averaged<RANK> >(quantumSystem);}
 
 
 
@@ -86,15 +86,15 @@ qsh(DynamicsBase::Ptr base)
 
 template<int RANK>
 inline 
-const typename Liouvillean<RANK,true>::Ptr 
+const typename Liouvillean<RANK>::Ptr 
 qsl(DynamicsBase::Ptr base)
-{return dynamic_pointer_cast<const Liouvillean<RANK,true> >(base);}
+{return dynamic_pointer_cast<const Liouvillean<RANK> >(base);}
 
 template<int RANK>
 inline 
-const typename Averaged<RANK,true>::Ptr 
+const typename Averaged<RANK>::Ptr 
 qsa(DynamicsBase::Ptr base)
-{return dynamic_pointer_cast<const Averaged<RANK,true> >(base);}
+{return dynamic_pointer_cast<const Averaged<RANK> >(base);}
 
 
 // Some functions that are used in contexts other than QuantumSystemWrapper are factored out:

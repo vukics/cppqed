@@ -6,6 +6,7 @@
 
 using namespace linalg;
 using namespace std;
+using namespace structure;
 
 
 PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
@@ -17,13 +18,13 @@ PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
 }
 
 
-double PumpedTwoLevelAtom::rate(const LazyDensityOperator& matrix) const
+double PumpedTwoLevelAtom::rate(NoTime, const LazyDensityOperator& matrix) const
 {
   return -2.*real(za_)*matrix(1);
 }
 
 
-void PumpedTwoLevelAtom::doActWithJ(StateVectorLow& psi) const
+void PumpedTwoLevelAtom::doActWithJ(NoTime, StateVectorLow& psi) const
 {
   psi(0)=sqrt(-2.*real(za_))*psi(1);
   psi(1)=0;

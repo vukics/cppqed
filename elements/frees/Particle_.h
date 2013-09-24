@@ -19,7 +19,7 @@
 
 namespace particle {
 
-using namespace structure::free;
+using namespace structure::free; using structure::NoTime;
 
 
 typedef boost::shared_ptr<const ParticleBase> Ptr;
@@ -67,7 +67,7 @@ public:
   using details::Storage::get;
 
 private:
-  void updateU(double) const;
+  void updateU(structure::OneTime) const;
 
   bool isUnitary_v() const {return true;}
 
@@ -133,8 +133,8 @@ public:
   const Spatial& getSpace() const {return space_;}
 
 private:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
   const Spatial space_;
 

@@ -42,9 +42,9 @@ Exact::Exact(const dcomp& zI, size_t dim)
 }
 
 
-void Exact::updateU(double dtdid) const
+void Exact::updateU(Time t) const
 {
-  getDiagonal()=exp(-zI_*(dtdid*blitz::tensor::i));
+  getDiagonal()=exp(-zI_*(double(t)*blitz::tensor::i));
 }
 
 
@@ -137,13 +137,13 @@ Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
 }
 
 
-void Liouvillean<true>::doActWithJ(StateVectorLow& psi, JumpNo<0>) const
+void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<0>) const
 {
   aJump(psi,kappa_*(nTh_+1));
 }
 
 
-void Liouvillean<true>::doActWithJ(StateVectorLow& psi, JumpNo<1>) const
+void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<1>) const
 {
   double fact=sqrt(2.*kappa_*nTh_);
   for (int n=psi.ubound(0); n>0; --n)
@@ -152,40 +152,40 @@ void Liouvillean<true>::doActWithJ(StateVectorLow& psi, JumpNo<1>) const
 }
 
 
-double Liouvillean<true>::rate(const LazyDensityOperator& matrix, JumpNo<0>) const
+double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<0>) const
 {
   return aJumpRate(matrix,kappa_*(nTh_+1));
 }
 
 
-double Liouvillean<true>::rate(const LazyDensityOperator& matrix, JumpNo<1>) const
+double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<1>) const
 {
   return 2.*kappa_*nTh_*(photonNumber(matrix)+1.);
 }
 
 
 template<>
-void Liouvillean<false,false>::doActWithJ(StateVectorLow& psi) const
+void Liouvillean<false,false>::doActWithJ(NoTime, StateVectorLow& psi) const
 {
   aJump(psi,kappa_);
 }
 
 template<>
-void Liouvillean<false,true>::doActWithJ(StateVectorLow& psi) const
+void Liouvillean<false,true >::doActWithJ(NoTime, StateVectorLow& psi) const
 {
   aJump(psi,kappa_);
 }
 
 
 template<>
-double Liouvillean<false,false>::rate(const LazyDensityOperator& matrix) const
+double Liouvillean<false,false>::rate(NoTime, const LazyDensityOperator& matrix) const
 {
   return aJumpRate(matrix,kappa_);
 }
 
 
 template<>
-double Liouvillean<false,true>::rate(const LazyDensityOperator&) const
+double Liouvillean<false,true>::rate(NoTime, const LazyDensityOperator&) const
 {
   return -1;
 }
@@ -218,7 +218,7 @@ Averaged::Averaged(const KeyLabels& follow, const KeyLabels& precede)
 }
 
 
-const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   Averages averages(4);
 
@@ -254,13 +254,13 @@ AveragedQuadratures::AveragedQuadratures(const KeyLabels& follow, const KeyLabel
 }
 
 
-const AveragedQuadratures::Averages AveragedQuadratures::average_v(const LazyDensityOperator& matrix) const
+const AveragedQuadratures::Averages AveragedQuadratures::average_v(NoTime t, const LazyDensityOperator& matrix) const
 {
   Averages averages(7);
 
   averages=0;
 
-  averages(blitz::Range(0,3))=Averaged::average_v(matrix);
+  averages(blitz::Range(0,3))=Averaged::average_v(t,matrix);
 
   for (int n=2; n<int(matrix.getDimension()); n++) {
 
@@ -417,7 +417,6 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 
 
-/*
 PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
   : ModeBase(p.cutoff),
     structure::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
@@ -431,15 +430,15 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
 
 
 
-double PumpedLossyModeIP_NoExact::rate(double, const LazyDensityOperator& m) const
+double PumpedLossyModeIP_NoExact::rate(OneTime, const LazyDensityOperator& m) const
 {
   return mode::photonNumber(m);
 }
 
 
-void PumpedLossyModeIP_NoExact::doActWithJ(double t, StateVectorLow& psi) const
+void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, StateVectorLow& psi) const
 {
-  dcomp fact=sqrt(2.*real(z_))*exp(-z_*t);
+  dcomp fact=sqrt(2.*real(z_))*exp(-z_*double(t));
   int ubound=psi.ubound(0);
   for (int n=0; n<ubound; ++n)
     psi(n)=fact*sqrt(n+1)*psi(n+1);
@@ -448,7 +447,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(double t, StateVectorLow& psi) const
 
 
 
-const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(double t, const LazyDensityOperator& matrix) const
+const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const LazyDensityOperator& matrix) const
 {
   Averages averages(3);
 
@@ -458,7 +457,7 @@ const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(d
 
     averages(0)+=n*exp(-2*real(z_)*n*t)*matrix(n);
 
-    dcomp offdiag(sqrt(n)*matrix(n,n-1)*exp(-(z_+2*(n-1)*real(z_))*t));
+    dcomp offdiag(sqrt(n)*matrix(n,n-1)*exp(-(z_+2*(n-1)*real(z_))*double(t)));
     averages(1)+=real(offdiag);
     averages(2)+=imag(offdiag);
 
@@ -467,4 +466,3 @@ const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(d
   return averages;
 
 }
-*/

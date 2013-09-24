@@ -23,8 +23,8 @@ template<int RANK, bool IS_TIME_DEPENDENT>
 class TDH_Base 
   : public HamiltonianTimeDependenceDispatched<RANK,
                                                mpl::if_c<IS_TIME_DEPENDENT,
-                                                         mpl::integral_c<TimeDependenceLevel,ONE_TIME>,
-                                                         mpl::integral_c<TimeDependenceLevel, NO_TIME>
+                                                         mpl::integral_c<TimeDependence,ONE_TIME>,
+                                                         mpl::integral_c<TimeDependence, NO_TIME>
                                                          >::type::value
                                                >
 {
@@ -32,7 +32,7 @@ protected:
   typedef quantumoperator::Tridiagonal<RANK> Tridiagonal ;
   typedef std::list<Tridiagonal>             Tridiagonals;
 
-  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any TimeDependenceLevel.
+  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any TimeDependence.
 
   TDH_Base(const Tridiagonals& hOverIs) : hOverIs_(hOverIs) {}
 
@@ -49,8 +49,8 @@ private:
      * \see the technique used @ FreeExact & ElementLiouvillean
      * 
      */
-  void addContribution_v(timedependence::OneTime, const StateVectorLow&, StateVectorLow&) const;
-  void addContribution_v(timedependence:: NoTime, const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v(OneTime, const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v( NoTime, const StateVectorLow&, StateVectorLow&) const;
   //@}
 
   mutable Tridiagonals hOverIs_;

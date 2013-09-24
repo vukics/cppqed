@@ -6,6 +6,7 @@
 #include "LiouvilleanFwd.h"
 
 #include "LiouvilleanAveragedCommon.h"
+#include "Time.h"
 
 #include "LazyDensityOperator.h"
 #include "StateVector.h"
@@ -13,10 +14,26 @@
 
 namespace structure {
 
-
-/// The first partial specialization of the general template Liouvillean for the one-time dependence case (\link TimeDependenceLevel Cases 1 & 2\endlink)
+/// The interface every system having Liouvillean time-evolution must present towards the trajectory drivers
+/**
+ * The time-evolution must be Markovian where the Lindblad form of the Master equation is the most general one possible:
+ * \f[\dot\rho=\frac1{i\hbar}\comm{H}\rho+\sum_m\lp J_m\rho J_m^\dag-\frac12\comm{J_m^\dag J_m}{\rho}_+\rp\f]
+ * The class represents the set of \f$J_m\f$ operators (Lindblads or quantum jump operators) of arbitrary number,
+ * either for Master equation or Monte Carlo wave-function evolution (in the latter case it calculates the jump rates as well).
+ * 
+ * \tparamRANK
+ * 
+ * \note No matter how complex the quantum system, the framework always assigns a unique ordinal to each jump corresponding to every subsystem
+ * 
+ * \note It is always possible to forgo the explicit calculation of certain jump rates because the rate can be calculated also on the basis of the Liouvillean::actWithJ function by the 
+ * \link quantumtrajectory::MCWF_Trajectory MCWF stepper\endlink. The fact that such a fallback is desired can be signalled by setting a negative value for the rate of the given jump 
+ * (“special jump”). \see \ref specialjump
+ * 
+ * \see The design is very similar to Exact, but here the choice is not between TwoTime/OneTime dependence, but OneTime/NoTime.
+ * 
+ */
 template<int RANK>
-class Liouvillean<RANK,true> : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >
+class Liouvillean : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >
 {
 public:
   static const int N_RANK=RANK;
@@ -54,21 +71,28 @@ private:
 };
 
 
-/// The second partial specialization of the general template Liouvillean for the no-time dependence case (\link TimeDependenceLevel Cases 3 & 4\endlink)
-template<int RANK>
-class Liouvillean<RANK,false> : public Liouvillean<RANK,true>
+/// Implements the general Liouvillean interface by dispatching the two possible \link time::DispatcherIsTimeDependent time-dependence levels\endlink
+/**
+ * \tparamRANK
+ * \tparam IS_TIME_DEPENDENT describes whether the \f$J_m\f$s are time-dependent. `true`: OneTime – `false`: NoTime
+ * 
+ */
+template<int RANK, bool IS_TIME_DEPENDENT>
+class LiouvilleanTimeDependenceDispatched : public Liouvillean<RANK>
 {
 public:
-  typedef typename Liouvillean<RANK,true>::StateVectorLow      StateVectorLow     ;
-  typedef typename Liouvillean<RANK,true>::LazyDensityOperator LazyDensityOperator;
-  typedef typename Liouvillean<RANK,true>::Rates               Rates              ;
+  typedef typename Liouvillean<RANK>::StateVectorLow      StateVectorLow     ;
+  typedef typename Liouvillean<RANK>::LazyDensityOperator LazyDensityOperator;
+  typedef typename Liouvillean<RANK>::Rates               Rates              ;
+  
+  typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
 
 private:
-  void        actWithJ_v(double, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(psi,jumpNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK,true>
-  const Rates  average_v(double, const LazyDensityOperator&  matrix) const {return average_v(matrix);} ///< Redirects the virtual inherited from LiouvilleanAveragedCommonRanked
+  void        actWithJ_v(double t, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(Time(t),psi,jumpNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK>
+  const Rates  average_v(double t, const LazyDensityOperator&  matrix) const {return average_v(Time(t),matrix);} ///< Redirects the virtual inherited from LiouvilleanAveragedCommonRanked
 
-  virtual void        actWithJ_v(StateVectorLow&, size_t   ) const = 0;
-  virtual const Rates  average_v(const LazyDensityOperator&) const = 0;
+  virtual void        actWithJ_v(Time, StateVectorLow&, size_t   ) const = 0;
+  virtual const Rates  average_v(Time, const LazyDensityOperator&) const = 0;
 
 };
 

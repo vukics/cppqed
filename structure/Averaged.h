@@ -1,10 +1,12 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef STRUCTURE_AVERAGED_H_INCLUDED
 #define STRUCTURE_AVERAGED_H_INCLUDED
 
 #include "AveragedFwd.h"
 
 #include "LiouvilleanAveragedCommon.h"
+#include "Time.h"
 
 #include "Exception.h"
 
@@ -66,11 +68,17 @@ private:
 ///////////
 
 
-/// The first partial specialization of the general template Averaged for the one-time dependence case (\link TimeDependenceLevel Cases 1 & 2\endlink)
-/** It simply composes LiouvilleanAveragedCommonRanked and AveragedCommon. */
+/// The interface every system that calculates and displays quantum averages must present towards the trajectory drivers
+/**
+ * It simply composes LiouvilleanAveragedCommonRanked and AveragedCommon.
+ * 
+ * \tparamRANK
+ * 
+ * \see The design is exactly the same as that of Liouvillean
+ * 
+ */
 template<int RANK>
-class Averaged<RANK,true>
-  : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >,public AveragedCommon
+class Averaged : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >,public AveragedCommon
 {
 public:
   static const int N_RANK=RANK;
@@ -84,20 +92,27 @@ public:
 };
 
 
-/// The second partial specialization of the general template Averaged for the no-time dependence case (\link TimeDependenceLevel Cases 3 & 4\endlink)
-/** Similarly to Liouvillean<RANK,false>, it simply forwards the time-dependent virtual functions to time-independent ones. */
-template<int RANK>
-class Averaged<RANK,false>
-  : public Averaged<RANK,true>
+/// Implements the general Liouvillean interface by dispatching the two possible \link time::DispatcherIsTimeDependent time-dependence levels\endlink
+/**
+ * Similarly to LiouvilleanTimeDependenceDispatched, it simply forwards the time-dependent virtual functions to time-independence-dispatched ones.
+ * 
+ * \tparamRANK
+ * \tparam IS_TIME_DEPENDENT describes whether the observables whose quantum average we want to calculate are time-dependent. `true`: OneTime – `false`: NoTime
+ * 
+ */
+template<int RANK, bool IS_TIME_DEPENDENT>
+class AveragedTimeDependenceDispatched : public Averaged<RANK>
 {
 public:
-  typedef typename Averaged<RANK,true>::Averages            Averages           ;
-  typedef typename Averaged<RANK,true>::LazyDensityOperator LazyDensityOperator;
+  typedef typename Averaged<RANK>::Averages            Averages           ;
+  typedef typename Averaged<RANK>::LazyDensityOperator LazyDensityOperator;
+  
+  typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
 
 private:
-  const Averages average_v(double, const LazyDensityOperator& matrix) const {return average_v(matrix);}
+  const Averages average_v(double t, const LazyDensityOperator& matrix) const {return average_v(Time(t),matrix);}
 
-  virtual const Averages average_v(const LazyDensityOperator&) const = 0;
+  virtual const Averages average_v(Time, const LazyDensityOperator&) const = 0;
 
 };
 

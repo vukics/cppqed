@@ -5,7 +5,7 @@
 
 #include "HamiltonianFwd.h"
 
-#include "TimeDependence.h"
+#include "Time.h"
 #include "Types.h"
 
 #include <boost/shared_ptr.hpp>
@@ -15,17 +15,6 @@ namespace structure {
 
 
 /// The interface every system having (possibly non-Hermitian) Hamiltonian time-evolution must present towards the trajectory drivers
-/**
- * The most general template is never defined, only its partial specializations in the second parameter.
- * 
- * \tparamRANK
- * \tparam TD Degree of \link TimeDependenceLevel time dependence\endlink. The most general (#TWO_TIME) is taken as default.
- * 
- * \see Hamiltonian<RANK,TWO_TIME> through Hamiltonian<RANK,NO_TIME> in Hamiltonian.h
- * 
- */
-
-/// The first partial specialization of the general template Hamiltonian for the most general degree of \link TimeDependenceLevel time dependence\endlink (#TWO_TIME).
 /** \tparamRANK */
 template<int RANK>
 class Hamiltonian : private quantumdata::Types<RANK>
@@ -60,24 +49,29 @@ private:
 
 };
 
-
-template<int RANK, TimeDependenceLevel TD>
+/// Implements the general Hamiltonian interface by dispatching the different \link time::Dispatcher time-dependence levels\endlink
+/**
+ * \tparamRANK
+ * \tparam TD Degree of \link TimeDependence time dependence\endlink.
+ * 
+ */
+template<int RANK, TimeDependence TD>
 class HamiltonianTimeDependenceDispatched : public Hamiltonian<RANK>
 {
 public:
   typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow;
   
-  typedef typename timedependence::Dispatcher<TD>::type TimeDependence;
+  typedef typename time::Dispatcher<TD>::type Time; ///< The actual time-dependence level from the template parameter `TD`
 
 private:
-  /// The inherited virtual gets implemented by calling a newly defined virtual with only one parameter describing different \link timedependence::Dispatcher time dependence levels\endlink
+  /// The inherited virtual gets implemented by calling a newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink
   void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
   {
-    addContribution_v(TimeDependence(t,tIntPic0),psi,dpsidt);
+    addContribution_v(Time(t,tIntPic0),psi,dpsidt);
   }
 
-  /// The newly defined virtual with only one parameter describing different \link timedependence::Dispatcher time dependence levels\endlink
-  virtual void addContribution_v(TimeDependence, const StateVectorLow&, StateVectorLow&) const = 0;
+  /// The newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink
+  virtual void addContribution_v(Time, const StateVectorLow&, StateVectorLow&) const = 0;
   
 };
 

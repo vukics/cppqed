@@ -17,10 +17,10 @@ void displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
 
 
 template<int RANK, bool IS_TIME_DEPENDENT>
-class ElementAveraged : public ElementLiouvilleanAveragedCommon<Averaged<RANK,IS_TIME_DEPENDENT> >
+class ElementAveraged : public ElementLiouvilleanAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
 {
 private:
-  typedef ElementLiouvilleanAveragedCommon<Averaged<RANK,IS_TIME_DEPENDENT> > Base;
+  typedef ElementLiouvilleanAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
   typedef AveragedCommon::Averages Averages;
@@ -62,8 +62,7 @@ private:
 
 
 template<int RANK, bool IS_TIME_DEPENDENT>
-inline auto new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea) -> decltype(&cea)
-// inline ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>*const new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea)
+inline ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>*const new_clone(const ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>& cea)
 {
   return cea.clone();
 }

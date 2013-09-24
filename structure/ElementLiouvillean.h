@@ -29,26 +29,24 @@ protected:
 
 
 template<int RANK, int JUMP_ORDINAL, bool IS_TIME_DEPENDENT, int NOJ=JUMP_ORDINAL+1>
-class Lindblad;
-
-
-template<int RANK, int JUMP_ORDINAL, int NOJ>
-class Lindblad<RANK,JUMP_ORDINAL,false,NOJ> : public mpl::if_c<JUMP_ORDINAL,Lindblad<RANK,JUMP_ORDINAL-1,false,NOJ>,LindbladBase<NOJ> >::type
+class Lindblad : public mpl::if_c<JUMP_ORDINAL,Lindblad<RANK,JUMP_ORDINAL-1,IS_TIME_DEPENDENT,NOJ>,LindbladBase<NOJ> >::type
 {
 public:
   virtual ~Lindblad () {}
+
+  typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
   
   /// Type-erasure & non-virtual interface idiom in one:
   //@{
-  void typeErasedActWithJ(typename quantumdata::Types<RANK>::StateVectorLow& psi) const {doActWithJ(psi,typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>());}
+  void typeErasedActWithJ(Time t, typename quantumdata::Types<RANK>::StateVectorLow& psi) const {doActWithJ(t,psi,typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>());}
   
-  double typeErasedRate(const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(matrix,typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>());}
+  double typeErasedRate(Time t, const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(t,matrix,typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>());}
   //@}
   
 private:
-  virtual void doActWithJ(typename quantumdata::Types<RANK>::StateVectorLow&, typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>) const = 0;
+  virtual void doActWithJ(Time, typename quantumdata::Types<RANK>::StateVectorLow&, typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>) const = 0;
   
-  virtual double rate(const quantumdata::LazyDensityOperator<RANK>&, typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>) const = 0;
+  virtual double rate(Time, const quantumdata::LazyDensityOperator<RANK>&, typename LindbladBase<NOJ>::template JumpNo<JUMP_ORDINAL>) const = 0;
   
 };
 
@@ -62,12 +60,12 @@ struct ElementLiouvilleanException : cpputils::TaggedException
 };
 
   
-template<int RANK, int NOJ>
-class ElementLiouvillean<RANK,NOJ,false> : public ElementLiouvilleanAveragedCommon<Liouvillean<RANK,false> >,
-                                           public details::Lindblad<RANK,NOJ-1,false>
+template<int RANK, int NOJ, bool IS_TIME_DEPENDENT>
+class ElementLiouvillean : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >,
+                           public details::Lindblad<RANK,NOJ-1,false>
 {
 private:
-  typedef ElementLiouvilleanAveragedCommon<Liouvillean<RANK,false> > Base;
+  typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
   typedef typename Base::StateVectorLow StateVectorLow;
@@ -75,6 +73,8 @@ public:
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
   typedef typename Base::Rates Rates;
+  
+  typedef typename Base::Time Time;
   
 protected:
   template<typename... KeyLabelsPack>
@@ -86,43 +86,45 @@ private:
   class Average
   {
   public:
-    Average(const ElementLiouvillean* ptr, Rates& rates, const LazyDensityOperator& matrix) : ptr_(ptr), rates_(rates), matrix_(matrix) {}
+    Average(const ElementLiouvillean* ptr, Rates& rates, Time t, const LazyDensityOperator& matrix) : ptr_(ptr), rates_(rates), t_(t), matrix_(matrix) {}
 
-    template<typename T> void operator()(T) const {rates_(T::value)=static_cast<const details::Lindblad<RANK,T::value,false,NOJ>*const>(ptr_)->typeErasedRate(matrix_);}
+    template<typename T> void operator()(T) const {rates_(T::value)=static_cast<const details::Lindblad<RANK,T::value,false,NOJ>*const>(ptr_)->typeErasedRate(t_,matrix_);}
 
   private:
     const ElementLiouvillean*const ptr_;
     Rates& rates_;
+    const Time t_;
     const LazyDensityOperator& matrix_;    
   };
 
-  const Rates average_v(const LazyDensityOperator& matrix) const {Rates rates(NOJ); mpl::for_each<tmptools::Ordinals<NOJ> >(Average(this,rates,matrix)); return rates;}
+  const Rates average_v(Time t, const LazyDensityOperator& matrix) const {Rates rates(NOJ); mpl::for_each<tmptools::Ordinals<NOJ> >(Average(this,rates,t,matrix)); return rates;}
 
   class ActWithJ
   {
   public:
-    ActWithJ(const ElementLiouvillean* ptr, StateVectorLow& psi, size_t jumpNo) : ptr_(ptr), psi_(psi), jumpNo_(jumpNo) {}
+    ActWithJ(const ElementLiouvillean* ptr, Time t, StateVectorLow& psi, size_t jumpNo) : ptr_(ptr), t_(t), psi_(psi), jumpNo_(jumpNo) {}
 
     template<typename T>
-    void operator()(T) const {if (T::value==jumpNo_) static_cast<const details::Lindblad<RANK,T::value,false,NOJ>*const>(ptr_)->typeErasedActWithJ(psi_);}
+    void operator()(T) const {if (T::value==jumpNo_) static_cast<const details::Lindblad<RANK,T::value,false,NOJ>*const>(ptr_)->typeErasedActWithJ(t_,psi_);}
 
   private:
     const ElementLiouvillean*const ptr_;
+    const Time t_;
     StateVectorLow& psi_;
     const size_t jumpNo_;    
   };
 
-  void actWithJ_v(StateVectorLow& psi, size_t jumpNo) const {if (jumpNo>=NOJ) throw ElementLiouvilleanException(Base::getTitle()); mpl::for_each<tmptools::Ordinals<NOJ> >(ActWithJ(this,psi,jumpNo));}
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t jumpNo) const {if (jumpNo>=NOJ) throw ElementLiouvilleanException(Base::getTitle()); mpl::for_each<tmptools::Ordinals<NOJ> >(ActWithJ(this,t,psi,jumpNo));}
   
 };
 
 
 
-template<int RANK>
-class ElementLiouvillean<RANK,1,false> : public ElementLiouvilleanAveragedCommon<Liouvillean<RANK,false> >
+template<int RANK, bool IS_TIME_DEPENDENT>
+class ElementLiouvillean<RANK,1,IS_TIME_DEPENDENT> : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
 {
 private:
-  typedef ElementLiouvilleanAveragedCommon<Liouvillean<RANK,false> > Base;
+  typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
   typedef typename Base::StateVectorLow StateVectorLow;
@@ -130,18 +132,20 @@ public:
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
   typedef typename Base::Rates Rates;
+
+  typedef typename Base::Time Time;
   
 protected:
   ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,1,keyLabel) {}
   
 private:
-  const Rates average_v(const LazyDensityOperator& matrix) const {Rates rates(1); rates(0)=rate(matrix); return rates;}
+  const Rates average_v(Time t, const LazyDensityOperator& matrix) const {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
 
-  void actWithJ_v(StateVectorLow& psi, size_t jumpNo) const {if (jumpNo) throw ElementLiouvilleanException(Base::getTitle()); doActWithJ(psi);}
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t jumpNo) const {if (jumpNo) throw ElementLiouvilleanException(Base::getTitle()); doActWithJ(t,psi);}
 
-  virtual void doActWithJ(StateVectorLow&) const = 0;
+  virtual void doActWithJ(Time, StateVectorLow&) const = 0;
   
-  virtual double rate(const LazyDensityOperator&) const = 0;
+  virtual double rate(Time, const LazyDensityOperator&) const = 0;
 
 };
 
