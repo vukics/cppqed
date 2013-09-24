@@ -54,7 +54,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     psi_(psi),
     qs_(cpputils::sharedPointerize(sys),Base::noise()),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
-    logger_(p.logLevel,qs_.getHa(),qs_.template nAvr<structure::LA_Li>())
+    logger_(p.logLevel,qs_.getHa()!=0,qs_.template nAvr<structure::LA_Li>())
 {
   if (psi!=*qs_.getQS()) throw DimensionalityMismatchException();
   if (!getTime()) if(const typename Liouvillean::Ptr li=qs_.getLi()) { // On startup, dpLimit should not be overshot, either.
