@@ -9,6 +9,7 @@
 #include "ParsTrajectory.h"
 #include "SmartPtr.h"
 
+#include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
 #include <iomanip>
@@ -76,9 +77,9 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     
   if (timeToReach<=traj.getTime()) return;
     
-  const shared_ptr<ostream> outstream(!outputToFile ?
-                                      nonOwningSharedPtr<ostream>(&cout) :
-                                      static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
+  const boost::shared_ptr<ostream> outstream(!outputToFile ?
+                                             nonOwningSharedPtr<ostream>(&cout) :
+                                             static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   ostream& os=*outstream;
 
@@ -103,7 +104,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Mid section: the actual run
   //////////////////////////////
 
-  const shared_ptr<ofstream> ofs = !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(),ios_base::app);
+  const boost::shared_ptr<ofstream> ofs = !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(),ios_base::app);
 
   try {
 

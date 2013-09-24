@@ -674,7 +674,7 @@ INPUT                  = doc/mainpage.markdown CompilationMacros.h \
                          utils/include/BlitzArray.h utils/include/BlitzArrayExtensions.h utils/include/BlitzArraySliceIterator.h \
                          utils/include/BlitzTiny.h utils/include/BlitzTinyExtensions.h utils/include/CMatrix.h utils/include/ComplexArrayExtensions.h \
                          utils/include/ComplexExtensions.h utils/include/CVector.h utils/include/MultiIndexIterator.h utils/include/TMP_Tools.h \
-                         quantumdata quantumoperator quantumoperator/impl/Sigma.tcc structure structure/ExactFwd.h structure/LiouvilleanFwd.h structure/AveragedFwd.h \
+                         quantumdata quantumoperator quantumoperator/impl/Sigma.tcc structure \
                          quantumtrajectory
 
 # This tag can be used to specify the character encoding of the source files
