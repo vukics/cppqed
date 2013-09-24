@@ -47,9 +47,9 @@ Exact::Exact(const Spatial& space, double omrec)
 {
 }
 
-void Exact::updateU(double dtdid) const
+void Exact::updateU(structure::OneTime t) const
 {
-  getDiagonal()=exp(factorExponents_*dtdid);
+  getDiagonal()=exp(factorExponents_*t);
 }
  
 
@@ -117,7 +117,7 @@ Averaged::Averaged(const Spatial& space)
 }
 
 
-const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   int dim=space_.getDimension();
 

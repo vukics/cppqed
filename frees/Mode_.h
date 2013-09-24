@@ -22,7 +22,7 @@ namespace mode {
 const std::string keyTitle="Mode";
 
 
-using namespace structure::free;
+using namespace structure::free; using structure::NoTime;
 
 typedef boost::shared_ptr<const ModeBase> Ptr;
 
@@ -87,7 +87,7 @@ public:
   const dcomp& get_zI() const {return zI_;}
   
 private:
-  void updateU(double) const;
+  void updateU(Time) const; ///< `Time` is structure::OneTime in this case
 
   bool isUnitary_v() const {return !bool(real(zI_));}
 
@@ -140,8 +140,8 @@ protected:
   // the trailing dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
 
 private:
-  void   doActWithJ (StateVectorLow&           ) const;
-  double rate       (const LazyDensityOperator&) const;
+  void   doActWithJ (NoTime, StateVectorLow&           ) const;
+  double rate       (NoTime, const LazyDensityOperator&) const;
 
   const double kappa_;
 
@@ -159,11 +159,11 @@ protected:
   Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle);
   
 private:
-  void doActWithJ(StateVectorLow&, JumpNo<0>) const;
-  void doActWithJ(StateVectorLow&, JumpNo<1>) const;
+  void doActWithJ(NoTime, StateVectorLow&, JumpNo<0>) const;
+  void doActWithJ(NoTime, StateVectorLow&, JumpNo<1>) const;
   
-  double rate(const LazyDensityOperator&, JumpNo<0>) const;
-  double rate(const LazyDensityOperator&, JumpNo<1>) const;
+  double rate(NoTime, const LazyDensityOperator&, JumpNo<0>) const;
+  double rate(NoTime, const LazyDensityOperator&, JumpNo<1>) const;
   
   const double kappa_, nTh_;
 
@@ -180,8 +180,8 @@ public:
   Averaged(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
 protected:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
 private:
   const ClonedPtr do_clone() const {return new Averaged(*this);}
@@ -195,8 +195,8 @@ public:
   AveragedQuadratures(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
 protected:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
 private:
   const ClonedPtr do_clone() const {return new AveragedQuadratures(*this);}
@@ -214,8 +214,8 @@ public:
   AveragedMonitorCutoff();
 
 private:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
 };
 
@@ -416,7 +416,7 @@ public:
   PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
 };
 
-/*
+
 //////////////////////////////////////////////////////////////////////
 // One more to test time-dependent jump and averages 
 //////////////////////////////////////////////////////////////////////
@@ -431,19 +431,19 @@ public:
   PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy&);
 
 private:
+  typedef structure::OneTime OneTime;
   typedef structure::TridiagonalHamiltonian<1,true>::StateVectorLow StateVectorLow;
   typedef structure::ElementLiouvillean<1,1,true>::LazyDensityOperator LazyDensityOperator;
 
-  void   doActWithJ (double t, StateVectorLow&           ) const;
-  double rate       (double t, const LazyDensityOperator&) const;
+  void   doActWithJ (OneTime, StateVectorLow&           ) const;
+  double rate       (OneTime, const LazyDensityOperator&) const;
 
-  const Averages average_v(double t, const LazyDensityOperator&) const;
+  const Averages average_v(OneTime, const LazyDensityOperator&) const;
 
   void process_v(Averages&) const {}
 
   const dcomp z_;
 
 };
-*/
 
 #endif // ELEMENTS_FREES_MODE__H_INCLUDED

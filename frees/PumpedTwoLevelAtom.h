@@ -36,9 +36,9 @@ protected:
   PumpedTwoLevelAtom(const qbit::ParsPumpedLossy&);
 
 private:
-  double rate(const LazyDensityOperator&) const;
+  double rate(structure::NoTime, const LazyDensityOperator&) const;
 
-  void doActWithJ(StateVectorLow&) const;
+  void doActWithJ(structure::NoTime, StateVectorLow&) const;
 
   const dcomp za_, eta_;
 
@@ -55,7 +55,7 @@ public:
   PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy&);
   
 private:
-  void addContribution_v(structure::timedependence::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
+  void addContribution_v(structure::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
 
   static const linalg::CMatrix hamiltonianOverI(const dcomp& za, const dcomp& etat);
 

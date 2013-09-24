@@ -28,7 +28,7 @@ namespace {
 
 
 const ModeCorrelations::Averages
-ModeCorrelations::average_v(const LazyDensityOperator& matrix) const
+ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
 {
   using quantumdata::partialTrace;
   typedef LazyDensityOperator::Idx Idx;
@@ -48,14 +48,14 @@ ModeCorrelations::average_v(const LazyDensityOperator& matrix) const
 
   for (int n=0; n<int(matrix.getDimension(0)); n++) for (int m=1; m<int(matrix.getDimension(1)); m++) {
       if(n<int(matrix.getDimension(0))-1) {
-	dcomp temp=sqrt(m*(n+1))*matrix(Idx(n,m),Idx(n+1,m-1));
-	averages(14)+=real(temp);
-	averages(15)+=imag(temp);
+        dcomp temp=sqrt(m*(n+1))*matrix(Idx(n,m),Idx(n+1,m-1));
+        averages(14)+=real(temp);
+        averages(15)+=imag(temp);
       }
       if(n>0) {
-	dcomp temp=sqrt(m*n)*matrix(Idx(n,m),Idx(n-1,m-1));
-	averages(16)+=real(temp);
-	averages(17)+=imag(temp);
+        dcomp temp=sqrt(m*n)*matrix(Idx(n,m),Idx(n-1,m-1));
+        averages(16)+=real(temp);
+        averages(17)+=imag(temp);
       }
     }
 

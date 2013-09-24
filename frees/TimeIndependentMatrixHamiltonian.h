@@ -21,7 +21,7 @@ public:
   // For safety, the matrix will be copied in.
 
 private:
-  void addContribution_v(structure::timedependence::NoTime, const StateVectorLow&, StateVectorLow&) const; 
+  void addContribution_v(structure::NoTime, const StateVectorLow&, StateVectorLow&) const; 
 
   const CMatrix hamiltonianOverI_;
 
@@ -31,8 +31,11 @@ private:
 template <int RANK, bool IS_TIME_DEPENDENT>
 class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public averagingUtils::Transferring<1,RANK,IS_TIME_DEPENDENT>
 {
+private:
+  typedef averagingUtils::Transferring<1,RANK,IS_TIME_DEPENDENT> Base;
+  
 public:
-  typedef typename structure::Averaged<RANK,IS_TIME_DEPENDENT>::Ptr AveragedPtr;
+  typedef typename Base::Ptr AveragedPtr;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
