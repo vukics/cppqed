@@ -689,16 +689,14 @@ public:
   template<typename Act>
   result_type operator()(result_type sc, const Act& act)
   {
-    using namespace structure;
-    const DynamicsBase::Ptr ia=act.get();
-    return sc || result_type(qse<Act::N_RANK>(ia),qsh<Act::N_RANK>(ia),qsl<Act::N_RANK>(ia));
+    return sc || result_type(act.getEx()!=0,act.getHa()!=0,act.getLi()!=0);
   }
 
   template<typename T>
   void operator()(T) const
   {
-    const structure::QuantumSystem<1>::Ptr free=frees_(T::value).get();
-    sc_|=result_type(qse(free),qsh(free),qsl(free));
+    const SubSystemFree& free=frees_(T::value);
+    sc_|=result_type(free.getEx()!=0,free.getHa()!=0,free.getLi()!=0);
   }
 
 private:
