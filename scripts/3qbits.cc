@@ -5,6 +5,14 @@
 #include "JaynesCummings.h"
 #include "QbitModeCorrelations.h"
 
+
+const qbit::Ptr dispatch(qbit::ParsLossy p, double gamma_parallel, bool is_UIP)
+{
+  if (is_UIP) return boost::make_shared<LossyQbitWithPhaseNoiseUIP>(p,gamma_parallel);
+  else        return boost::make_shared<LossyQbitWithPhaseNoise   >(p,gamma_parallel);
+}
+
+
 using namespace std;
 
 typedef quantumdata::StateVector<4> StateVector;
@@ -30,9 +38,11 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  const LossyQbitWithPhaseNoise q0(pq0,gamma_parallel), q1(pq1,gamma_parallel), q2(pq2,gamma_parallel);
+  QM_Picture qmp=(pe.evol==EM_MASTER || pe.evol==EM_MASTER_FAST) ? QMP_UIP : QMP_IP;
+  
+  const qbit::Ptr q0=dispatch(pq0,gamma_parallel,qmp==QMP_UIP), q1=dispatch(pq1,gamma_parallel,qmp==QMP_UIP), q2=dispatch(pq2,gamma_parallel,qmp==QMP_UIP);
 
-  const mode::Ptr mode(mode::make<mode::AveragedQuadratures>(pplm,QMP_IP));
+  const mode::Ptr mode(mode::make<mode::AveragedQuadratures>(pplm,qmp));
 
   const jaynescummings::Ptr jc0(jaynescummings::make(q0,mode,pjc0)), jc1(jaynescummings::make(q1,mode,pjc1)),
                             jc2(jaynescummings::make<QbitModeCorrelations>(q2,mode,pjc2));

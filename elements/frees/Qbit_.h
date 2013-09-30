@@ -106,7 +106,15 @@ protected:
   Liouvillean(double gamma) : mode::Liouvillean<false>(gamma,0,keyTitle) {}
 
 };
- 
+
+
+class LiouvilleanPhaseNoise : public structure::ElementLiouvillean<1,2>
+{
+protected:
+  LiouvilleanPhaseNoise(double gamma_perpendicular, double gamma_parallel);
+  
+};
+
 
 } // qbit
 
@@ -204,11 +212,21 @@ public:
 
 
 class LossyQbitWithPhaseNoise
-  : public qbit::Exact, public structure::ElementLiouvillean<1,2>, public QbitBase
+  : public qbit::Exact, public qbit::LiouvilleanPhaseNoise, public QbitBase
 {
 public:
   LossyQbitWithPhaseNoise(const qbit::ParsLossy&, double gamma_parallel);
   
 };
+
+
+class LossyQbitWithPhaseNoiseUIP
+  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+{
+public:
+  LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy&, double gamma_parallel);
+  
+};
+
 
 #endif // ELEMENTS_FREES_QBIT__H_INCLUDED

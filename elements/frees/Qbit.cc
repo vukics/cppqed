@@ -35,6 +35,40 @@ const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) 
 }
 
 
+namespace {
+
+
+void sigmaJump(qbit::StateVectorLow& psi, double gamma_perpendicular)
+{
+  psi(0)=sqrt(2.*gamma_perpendicular)*psi(1);
+  psi(1)=0;
+}
+
+
+void sigma_zJump(qbit::StateVectorLow& psi, double gamma_parallel)
+{
+  double fact=sqrt(2.*gamma_parallel);
+  psi(0)= fact*psi(0);
+  psi(1)=-fact*psi(1);
+}
+
+
+double dummyProba(const qbit::LazyDensityOperator&)
+{
+  return -1;
+}
+
+
+}
+
+
+LiouvilleanPhaseNoise::LiouvilleanPhaseNoise(double gamma_perpendicular, double gamma_parallel) 
+  : structure::ElementLiouvillean<1,2>(JumpStrategies(bind(sigmaJump  ,_1,gamma_perpendicular),
+                                                      bind(sigma_zJump,_1,gamma_parallel)),
+                                       JumpProbabilityStrategies(dummyProba),
+                                       "LossyQbitWithPhaseNoise",list_of("excitation loss")("phase noise"))
+{}
+
 } // qbit
 
 ////////////////
@@ -141,45 +175,25 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
 }
 
 
-namespace {
-
-
-void sigmaJump(qbit::StateVectorLow& psi, double gamma_perpendicular)
-{
-  psi(0)=sqrt(2.*gamma_perpendicular)*psi(1);
-  psi(1)=0;
-}
-
-
-void sigma_zJump(qbit::StateVectorLow& psi, double gamma_parallel)
-{
-  double fact=sqrt(2.*gamma_parallel);
-  psi(0)= fact*psi(0);
-  psi(1)=-fact*psi(1);
-}
-
-
-double dummyProba(const qbit::LazyDensityOperator&)
-{
-  return -1;
-}
-
-
-}
-
-
-
 LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(const qbit::ParsLossy& p, double gamma_parallel)
   : Exact(dcomp(p.gamma,-p.delta)), // gamma_parallel does not contribute to the Hamiltonian
-    structure::ElementLiouvillean<1,2>(JumpStrategies(bind(sigmaJump  ,_1,p.gamma),
-                                                      bind(sigma_zJump,_1,gamma_parallel)),
-                                       JumpProbabilityStrategies(dummyProba),
-                                       "LossyQbitWithPhaseNoise",list_of("excitation loss")("phase noise")),
+    qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
     BASE_init(FREQS("gamma_parallel",gamma_parallel,1),
               FREQS(TUPLE_gammadelta(1)))
 {
   getParsStream()<<"# LossyWithPhaseNoise.\n";
 }
+
+
+LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy& p, double gamma_parallel)
+  : qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),0),
+    qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
+    BASE_init(FREQS("gamma_parallel",gamma_parallel,1),
+              FREQS(TUPLE_gammadelta(1)))
+{
+  getParsStream()<<"# LossyWithPhaseNoise, Unitary interaction picture.\n";
+}
+
 
 #undef  TUPLE_gamma
 #undef  TUPLE_gammadelta
