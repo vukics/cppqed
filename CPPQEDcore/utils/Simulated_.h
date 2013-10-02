@@ -41,6 +41,8 @@ private:
 
   std::ostream& displayParameters_v(std::ostream& os) const {return Base::displayParameters_v(os<<"\n# Simulated.\n");}
 
+  std::string trajectoryID_v() const {return trajectoryID_;}
+  static const char trajectoryID_[];
 };
 
 

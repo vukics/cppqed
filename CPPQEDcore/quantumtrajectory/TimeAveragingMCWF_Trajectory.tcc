@@ -35,5 +35,7 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::logOnEnd_v(
   return Base::logOnEnd_v(os);
 }
 
+template<int RANK>
+const char quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::trajectoryID_[]="TimeAveragingMCWF_Trajectory";
 
 #endif // QUANTUMTRAJECTORY_TIMEAVERAGINGMCWF_TRAJECTORY_TCC_INCLUDED

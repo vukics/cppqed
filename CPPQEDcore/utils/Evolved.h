@@ -77,7 +77,27 @@ private:
 ////////////////////
 
 template<typename A>
-class Evolved : public TimeStepBookkeeper, private boost::noncopyable 
+class EvolvedIO : public TimeStepBookkeeper, private boost::noncopyable
+{
+public:
+  typedef boost::shared_ptr<EvolvedIO>            Ptr;
+  typedef boost::shared_ptr<const EvolvedIO> ConstPtr;
+
+  EvolvedIO(A&, double dtInit, double epsRel, double epsAbs);
+  using TimeStepBookkeeper::operator=;
+
+protected:
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & a_ & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
+  A& a_;
+};
+
+template<typename A>
+class Evolved : public EvolvedIO<A>
 {
 public:
   typedef boost::function<void(double, const A&, A&)> Derivs;
@@ -96,8 +116,8 @@ public:
 
   std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);};
 
-  A      & getA()       {return a_;}
-  A const& getA() const {return a_;}
+  A      & getA()       {return this->a_;}
+  A const& getA() const {return this->a_;}
 
   const Derivs getDerivs() const {return derivs_;}
 
@@ -109,13 +129,6 @@ private:
   virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
   virtual size_t nFailedSteps_v() const = 0;
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
-  friend class boost::serialization::access;
-  template<class Archive>
-  void serialize(Archive& ar, const unsigned int) {ar & a_ & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
-
-  A& a_;
 
   Derivs derivs_;
 

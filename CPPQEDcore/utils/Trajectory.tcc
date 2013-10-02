@@ -122,7 +122,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
             (stateCount || (!continuing && firstStateDisplay))
            ) writeViaSStream(traj,ofs.get()); // traj.writeState(*oarchiveWrapper.oar_);
 
-        traj.display(os,precision); ++stateCount;
+        if (count || !continuing) traj.display(os,precision); ++stateCount;
               
       }
     
@@ -157,13 +157,17 @@ void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std:
 
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
-  : evolved_(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs))
+  : EvolvedPtrBase(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
+    AdaptiveIO<A>(EvolvedPtrBase::member),
+    evolved_(EvolvedPtrBase::member)
 {}
 
 
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, const ParsEvolved& p,         const A& scaleAbs, const evolved::Maker<A>& maker)
-  : evolved_(maker(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs))
+  : EvolvedPtrBase(maker(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs)),
+    AdaptiveIO<A>(EvolvedPtrBase::member),
+    evolved_(EvolvedPtrBase::member)
 {}
 
 
@@ -173,7 +177,22 @@ std::ostream& Adaptive<A>::displayParameters_v(std::ostream& os) const
   return evolved_->displayParameters(os<<std::endl)<<"# Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }
 
+template<typename A>
+cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
+{
+  readArrayState(iar);
+  if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY)
+    readStateMore_v(iar);
+  return iar;
+}
 
+template<typename A>
+cpputils::oarchive&  Adaptive<A>::writeState_v(cpputils::oarchive& oar) const
+{
+  meta_.trajectoryID = trajectoryID(); 
+  writeArrayState(oar); 
+  return writeStateMore_v(oar);
+}
 
 } // trajectory
 

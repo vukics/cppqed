@@ -41,6 +41,8 @@ std::ostream& Simulated<A>::display_v(std::ostream& os, int precision) const
   return os;
 }
 
+template<typename A>
+const char Simulated<A>::trajectoryID_[]="Simulated";
 
 } // trajectory
 

@@ -10,6 +10,9 @@ class NonContiguousStorageException;
 class TimeStepBookkeeper;
 
 template<typename>
+class EvolvedIO;
+
+template<typename>
 class Evolved;
 
 template<typename>

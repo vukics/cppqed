@@ -179,13 +179,8 @@ void BaseFast<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperato
 } // master
 
 template<int RANK, typename V, bool IS_FAST>
-cpputils::oarchive& Master<RANK,V,IS_FAST>::writeMeta_v(cpputils::oarchive& oar) const
-{
-  trajectory::SerializationMetadata meta;
-  meta.rank=2*RANK;
-  meta.trajectoryType="Master";
-  return oar & meta;
-}
+const char Master<RANK,V,IS_FAST>::trajectoryID_[]="Master";
+
 
 } // quantumtrajectory
 

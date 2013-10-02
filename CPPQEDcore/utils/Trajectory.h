@@ -36,19 +36,22 @@ void run(Adaptive<A>&, const ParsRun&);
 
 struct SerializationMetadata
 {
-  SerializationMetadata()
+  SerializationMetadata(std::string id=UNSPECIFIED)
     : protocolVersion(0),
       rank(0),
-      trajectoryType("unspecified")
+      trajectoryID(id)
   {};
   int protocolVersion;
   int rank;
-  std::string trajectoryType;
+  std::string trajectoryID;
+  
+  static const std::string UNSPECIFIED;
+  static const std::string ARRAY_ONLY;
 
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & trajectoryType;}
+  void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & trajectoryID;}
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 };
 
@@ -57,7 +60,6 @@ namespace details
 
 void writeNextArchive(std::ofstream*, const std::ostringstream&);
 void readNextArchive(std::ifstream&, std::istringstream&);
-SerializationMetadata readMeta(std::ifstream& ifs, bool reset);
 
 } // details
 
@@ -115,8 +117,6 @@ public:
   cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return  readState_v(iar);}
   cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return writeState_v(oar);};
   
-  cpputils::oarchive& writeMeta(cpputils::oarchive& oar)  const {return writeMeta_v(oar);}
-  
   virtual ~Trajectory() {}
 
 private:
@@ -128,9 +128,8 @@ private:
   virtual std::ostream& display_v          (std::ostream&, int    ) const = 0;
   virtual std::ostream& displayKey_v       (std::ostream&, size_t&) const = 0;
 
-  virtual cpputils::iarchive&  readState_v(cpputils::iarchive&)       = 0;
+  virtual cpputils::iarchive&  readState_v(cpputils::iarchive&) = 0;
   virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
-  virtual cpputils::oarchive& writeMeta_v (cpputils::oarchive& oar) const {SerializationMetadata meta; return oar & meta;}
 
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
   
@@ -143,20 +142,41 @@ private:
 //
 ///////////
 
+template<typename A>
+class AdaptiveIO
+{
+public:
+  typedef evolved::EvolvedIO<A>   EvolvedIO;
+  AdaptiveIO(typename EvolvedIO::Ptr evolvedIO) 
+    : meta_(SerializationMetadata::ARRAY_ONLY), evolvedIO_(evolvedIO) {};
+
+  cpputils::iarchive&  readArrayState(cpputils::iarchive& iar)       {return iar & meta_ & *evolvedIO_;}
+  cpputils::oarchive& writeArrayState(cpputils::oarchive& oar) const {return oar & meta_ & *evolvedIO_;}
+protected:
+  mutable SerializationMetadata meta_;
+private:
+  typename EvolvedIO::Ptr evolvedIO_;
+};
 
 template<typename A>
-class Adaptive : public virtual Trajectory 
+using EvolvedPtrBASE = boost::base_from_member<typename evolved::Evolved<A>::Ptr>;
+
+template<typename A>
+class Adaptive : private EvolvedPtrBASE<A>, public trajectory::AdaptiveIO<A>, public virtual Trajectory
 {
 public:
   // Some parameter-independent code could still be factored out, but probably very little
   
-  typedef evolved::Evolved<A> Evolved;
+  typedef evolved::Evolved<A>       Evolved;
+  // typedef trajectory::AdaptiveIO<A> AdaptiveIO;
 
   void step(double deltaT) {step_v(deltaT);}
   
   virtual ~Adaptive() {}
 
 protected:
+  using AdaptiveIO<A>::meta_;
+
   Adaptive(A&, typename Evolved::Derivs, double, double, double    , const A&, const evolved::Maker<A>&);
 
   Adaptive(A&, typename Evolved::Derivs, double, const ParsEvolved&, const A&, const evolved::Maker<A>&);
@@ -171,10 +191,17 @@ protected:
 
   std::ostream& displayParameters_v(std::ostream&) const;
 
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return iar & *evolved_;}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return oar & *evolved_;}
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       final;
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const final;
+
+  std::string trajectoryID() const  {return trajectoryID_v();}
 
 private:
+  using AdaptiveIO<A>::readArrayState;
+  using AdaptiveIO<A>::writeArrayState;
+
+  typedef EvolvedPtrBASE<A> EvolvedPtrBase;
+
   double getDtDid_v() const {return evolved_->getDtDid();}
 
   void evolve_v(double deltaT) {evolved::evolve<Adaptive>(*this,deltaT);}
@@ -184,6 +211,11 @@ private:
   virtual void step_v(double deltaT) = 0;
   // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved.
   // (Only Simulated, but neither Master, nor MCWF_Trajectory)
+
+  virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
+  virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
+
+  virtual std::string trajectoryID_v() const = 0;
 
   const Ptr evolved_;
 

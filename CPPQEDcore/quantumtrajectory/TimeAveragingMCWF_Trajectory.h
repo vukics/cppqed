@@ -45,8 +45,8 @@ private:
   
   std::ostream& logOnEnd_v(std::ostream& os) const;
   
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       {return Base:: readState_v(iar) & averages_ & sum_;}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const {return Base::writeState_v(oar) & averages_ & sum_;}
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       {return Base:: readStateMore_v(iar) & averages_ & sum_;}
+  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const {return Base::writeStateMore_v(oar) & averages_ & sum_;}
   
   const double relaxationTime_;
   
@@ -55,6 +55,8 @@ private:
   
   const typename Averaged::Ptr av_;
 
+  std::string trajectoryID_v() const {return trajectoryID_;}
+  static const char trajectoryID_[];
 };
 
 

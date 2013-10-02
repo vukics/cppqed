@@ -18,6 +18,9 @@ struct SerializationMetadata;
 class Trajectory;
 
 template<typename>
+class AdaptiveIO;
+
+template<typename>
 class Adaptive;
 
 } // trajectory

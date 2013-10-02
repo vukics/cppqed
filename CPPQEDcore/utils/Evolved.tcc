@@ -9,19 +9,23 @@
 
 namespace evolved {
 
+template<typename A>
+EvolvedIO<A>::EvolvedIO(A& a, double dtInit, double epsRel, double epsAbs)
+  : TimeStepBookkeeper(dtInit,epsRel,epsAbs), a_(a)
+{}
 
 template<typename A>
 Evolved<A>::Evolved(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs) 
-  : TimeStepBookkeeper(dtInit,epsRel,epsAbs), a_(a), derivs_(derivs)
+  : EvolvedIO<A>(a,dtInit,epsRel,epsAbs), derivs_(derivs)
 {} 
 
 
 template<typename A>
 void Evolved<A>::step(double deltaT)
 {
-  if (mathutils::sign(deltaT)!=mathutils::sign(getDtTry())) {
+  if (mathutils::sign(deltaT)!=mathutils::sign(EvolvedIO<A>::getDtTry())) {
     // Stepping backward
-    setDtTry(-getDtDid());
+    EvolvedIO<A>::setDtTry(-EvolvedIO<A>::getDtDid());
     step_v(deltaT);
   }
   else step_v(deltaT);

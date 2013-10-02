@@ -23,7 +23,6 @@ Stochastic<A,T>::displayParameters_v(std::ostream& os) const
   return Adaptive<A>::displayParameters_v(os)<<"# Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "# No noise.\n");
 }
 
-
 template<typename A, typename T>
 Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
                             double dtInit,

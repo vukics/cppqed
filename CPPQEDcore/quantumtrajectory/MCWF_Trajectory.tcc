@@ -243,13 +243,16 @@ std::ostream& MCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) c
 }
 
 template<int RANK>
-cpputils::oarchive& MCWF_Trajectory<RANK>::writeMeta_v(cpputils::oarchive& oar) const
+cpputils::iarchive&  MCWF_Trajectory<RANK>::readStateMore_v(cpputils::iarchive& iar)
 {
-  trajectory::SerializationMetadata meta;
-  meta.rank=RANK;
-  meta.trajectoryType="MCWF_Trajectory";
-  return oar & meta;
+  Base:: readStateMore_v(iar);
+  iar & logger_; 
+  if (qs_.getEx()) tIntPic0_=getTime(); 
+  return iar;
 }
+
+template<int RANK>
+const char quantumtrajectory::MCWF_Trajectory<RANK>::trajectoryID_[]="MCWF_Trajectory";
 
 } // quantumtrajectory
 
