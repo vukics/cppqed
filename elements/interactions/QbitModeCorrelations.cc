@@ -10,7 +10,7 @@ QbitModeCorrelations::QbitModeCorrelations()
 
 
 const QbitModeCorrelations::Averages
-QbitModeCorrelations::average_v(const LazyDensityOperator& matrix) const
+QbitModeCorrelations::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   typedef LazyDensityOperator::Idx Idx;
 
