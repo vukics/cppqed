@@ -20,12 +20,16 @@ void aDagJump(StateVectorLow& psi, double kappa_n     )
 }
 
 
+namespace {
+
 double photonNumber(const LazyDensityOperator& matrix)
 {
   double res=0;
   for (size_t n=1; n<matrix.getDimension(); ++n)
     res+=n*matrix(n);
   return res;
+}
+
 }
 
 
@@ -41,19 +45,19 @@ double aDagJumpRate(const LazyDensityOperator& matrix, double kappa_n     )
 }
 
 
-const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
-{
-  Tridiagonal::Diagonal res(dim);
-  res=blitz::tensor::i;
-  return res*=z;
-}
-
-
 const Tridiagonal aop(size_t dim)
 {
   typedef Tridiagonal::Diagonal Diagonal;
   Diagonal diagonal(dim-1);
   return Tridiagonal(Diagonal(),1,Diagonal(),diagonal=sqrt(blitz::tensor::i+1.));
+}
+
+
+const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
+{
+  Tridiagonal::Diagonal res(dim);
+  res=blitz::tensor::i;
+  return res*=z;
 }
 
 
@@ -63,8 +67,11 @@ const Tridiagonal nop(size_t dim)
 }
 
 
-const Tridiagonal aop(const PumpedLossyModeIP& mode)
+const Tridiagonal hierarchical::aop(const ModeBase& mode)
 {
   size_t dim=mode.getDimension();
-  return furnishWithFreqs(aop(dim),mainDiagonal(mode.get_z(),dim));
+  if (const PumpedLossyModeIP*const modeIP=dynamic_cast<const PumpedLossyModeIP*>(&mode))
+    return furnishWithFreqs(::aop(dim),mainDiagonal(modeIP->get_z(),dim));
+  else
+    return ::aop(dim);
 }

@@ -282,11 +282,11 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * We construct the time-independent TridiagonalHamiltonian base. This is greatly facilitated by the algebra and helpers of the quantumoperator::Tridiagonal class.
  * \warning When implementing the Hamiltonian, not \f$H\f$ itself but \f$\frac Hi\f$ has to supplied!
  * 
- * \until ("photon absorption")),
- * We construct the ElementLiouvillean base whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
+ * \until ,"photon absorption"}),
+ * We construct the ElementLiouvilleanStrategies base whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
  * The constructor takes the strategies for calculating the impact of a jump on a free::StateVectorLow, and for calculating the rate from a free::LazyDensityOperator.
  * These strategy functions are produced from the free-standing helpers in Lines 10-14 above through argument binding.
- * \until ("imag(\")"))
+ * \until ,"imag(\")"})
  * We construct the ElementAveraged base, with parameters necessary to produce a simple key for quantum averages communicated towards the user.
  * Here we calculate only three such averages, the expectation value of the number operator, and the real and imaginary parts of that of the ladder operator.
  * \until }
@@ -317,28 +317,24 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * 
  * \see [These notes](http://optics.szfki.kfki.hu/~vukics/Pictures.pdf) on how to treat interaction pictures defined by non-unitary transition operators in a consistent way.
  * 
- * In this case, the class representing the element has to be derived from Exact as well, which represents the transformation between the two pictures.
+ * In this case, the class representing the element has to be derived from Exact as well, which provides an interface allowing for the transformation between the two pictures.
  * In addition, instead of TridiagonalHamiltonian`<1,false>`, we need to derive from TridiagonalHamiltonian`<1,true>` because the Hamiltonian is now time-dependent.
  * \note In general usage, the jump and the averages are calculated in the normal picture also in this case (cf. explanation of classes Hamiltonian, Exact, Liouvillean, and Averaged,
  * and furthermore quantumtrajectory::MCWF_Trajectory). This allows for reusing the same code in both pictures. (Incidentally, here the Liouvillean remains unchanged anyway.)
  * 
  * \dontinclude ExampleMode.h
  * \skip FreeExact
- * \until PumpedLossyModeIP&);
+ * \until } // basic
  * In the implementation, the only difference from the previous case will be the constructor, because the Hamiltonian now also requires furnishing with frequencies
  * (cf. quantumoperator::furnishWithFreqs), and the implementation of the virtual function FreeExact::updateU.
  * 
  * When “furnished with frequencies”, a quantumoperator::Tridiagonal object will internally take care about the time-dependent phases appearing in \f$a\Int(t)\f$ and \f$H\Int(t)\f$:
  * \dontinclude ExampleMode.cc
  * \skip mainDiagonal
- * \until blitz::tensor::i));
- * \until }
+ * \until // PumpedLossyModeIP::average_v exactly the same as PumpedLossyMode::average_v above
  * FreeExact assumes that the operator transforming between the two pictures is diagonal, and the factors to update are simply its diagonal elements.
  * If this is not the case, Exact has to be used instead.
  * 
- * The construction of the object representing the ladder operator furnished with frequencies is also straightforward:\dontinclude ExampleModeImpl.cc
- * \skip aop(const PumpedLossyModeIP& mode)
- * \until }
  * \note Since a lot of the code from the previous case can be reused here, one will usually adopt an inheritence- or class-composition-based solution to implement classes like
  * `PumpedLossyMode` and `PumpedLossyModeIP` (cf. the actual implementation of a harmonic-oscillator mode in the framework in `elements/frees/Mode.h`).
  * 
