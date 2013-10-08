@@ -12,7 +12,7 @@
 #include <boost/mpl/identity.hpp>
 
 
-/// Namespace comprising otherwise-hard-to-classify generic utilities
+/// Namespace comprising otherwise hard-to-classify generic utilities
 namespace cpputils {
 
 
@@ -40,11 +40,12 @@ const End   end  =End  ();
 template<int RANK>
 class MultiIndexIterator : public INPUT_IteratorHelper
 {
-public:
+private:
   typedef INPUT_IteratorHelper Base;
   
 #undef INPUT_IteratorHelper
 
+public:
   typedef typename Base::value_type IdxTiny;
   
   /// \name Constructors
