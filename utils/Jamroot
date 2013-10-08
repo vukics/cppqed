@@ -2,8 +2,7 @@
 
 project : usage-requirements
           <enable-boost-linkage>no:<define>DO_NOT_USE_BOOST_SERIALIZATION
-          <cxxflags>"-Wno-c++11-extensions"
-#          <cxxflags>"-std=c++0x"
+          <cxxflags>"-std=c++11 -Wno-c++11-extensions -Wno-overloaded-virtual -DBOOST_RESULT_OF_USE_TR1"
           <include>include 
           <variant>debug:<define>BZ_DEBUG 
           <define>GSL_CBLAS # This is needed so that FLENS use the CBLAS implementation of GSL

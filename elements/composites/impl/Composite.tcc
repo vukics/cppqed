@@ -316,7 +316,7 @@ template<typename VA>
 class composite::Exact<VA>::ActWithU
 {
 public:
-  ActWithU(const Frees& frees, double t, StateVectorLow& psi, double t0) : frees_(frees), t_(t), psi_(psi), t0_(t0) {}
+  ActWithU(const Frees& frees, double t, StateVectorLow& psi, double t0) : frees_(frees), t_(t), t0_(t0), psi_(psi) {}
 
   template<typename Vec, typename Ex>
   void help(typename Ex::Ptr ex) const

@@ -78,7 +78,7 @@ endforeach()
 # linker on MacOs doesn't like --no-undefined
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined -Wl,--as-needed")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG -std=c++11 -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-deprecated -Wnon-virtual-dtor -Wno-ignored-qualifiers -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG -std=c++11 -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-deprecated -Wnon-virtual-dtor -Wno-ignored-qualifiers -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args -Wno-overloaded-virtual")
 
 
 ##################################################
