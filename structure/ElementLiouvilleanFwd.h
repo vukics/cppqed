@@ -10,6 +10,8 @@ template<int RANK, int NOJ=1, bool IS_TIME_DEPENDENT=false> // NOJ stands for th
 // compile time.
 class ElementLiouvillean;
 
+template<int RANK, int NOJ, bool IS_TIME_DEPENDENT=false>
+class ElementLiouvilleanStrategies;
 
 } // structure
 

@@ -8,6 +8,8 @@
 #include "Liouvillean.h"
 #include "ElementLiouvilleanAveragedCommon.h"
 
+#include <boost/function.hpp>
+
 #include <boost/mpl/for_each.hpp>
 
 
@@ -149,6 +151,46 @@ private:
 
 };
 
+
+
+template<int RANK, int NOJ, bool IS_TIME_DEPENDENT>
+class ElementLiouvilleanStrategies : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
+{
+private:
+  typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
+  
+public:
+  typedef typename Base::StateVectorLow StateVectorLow;
+
+  typedef typename Base::LazyDensityOperator LazyDensityOperator;
+
+  typedef typename Base::Rates Rates;
+  
+  typedef typename Base::Time Time;
+
+  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<void  (double,       StateVectorLow&     )>,boost::function<void  (      StateVectorLow&     )> >::type JumpStrategy;
+  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<double(double, const LazyDensityOperator&)>,boost::function<double(const LazyDensityOperator&)> >::type JumpRateStrategy;
+
+  typedef blitz::TinyVector<JumpStrategy    ,NOJ> JumpStrategies;
+  typedef blitz::TinyVector<JumpRateStrategy,NOJ> JumpRateStrategies;
+
+protected:
+  template<typename... KeyLabelsPack>
+  ElementLiouvilleanStrategies(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack)
+    : Base(keyTitle,keyLabelsPack...), jumps_(jumps), jumpRates_(jumpRates) {}
+  
+  ElementLiouvilleanStrategies(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, typename Base::KeyLabelsInitializer il)
+    : Base(keyTitle,il), jumps_(jumps), jumpRates_(jumpRates) {}
+
+private:
+  const Rates average_v(Time t, const LazyDensityOperator& matrix) const;
+
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t jumpNo) const;
+  
+  const JumpStrategies     jumps_    ;
+  const JumpRateStrategies jumpRates_;
+
+};
 
 
 } // structure
