@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 #define STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 
@@ -10,73 +11,49 @@
 
 #include <list>
 
+
 namespace structure {
 
 
 namespace details {
 
 
-template<int RANK>
-class TridiagonalStore
+/// TridiagonalHamiltonian base
+template<int RANK, bool IS_TIME_DEPENDENT>
+class TDH_Base 
+  : public HamiltonianTimeDependenceDispatched<RANK,
+                                               mpl::if_c<IS_TIME_DEPENDENT,
+                                                         mpl::integral_c<TimeDependence,ONE_TIME>,
+                                                         mpl::integral_c<TimeDependence, NO_TIME>
+                                                         >::type::value
+                                               >
 {
 protected:
   typedef quantumoperator::Tridiagonal<RANK> Tridiagonal ;
   typedef std::list<Tridiagonal>             Tridiagonals;
 
-  TridiagonalStore(const Tridiagonals& hOverIs) : hOverIs_(hOverIs) {}
+  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any TimeDependence.
+
+  TDH_Base(const Tridiagonals& hOverIs) : hOverIs_(hOverIs) {}
 
   const Tridiagonals& getH_OverIs() const {return hOverIs_;}
-        Tridiagonals& getH_OverIs()       {return const_cast<Tridiagonals&>(static_cast<const TridiagonalStore*>(this)->getH_OverIs());}
+        Tridiagonals& getH_OverIs()       {return const_cast<Tridiagonals&>(static_cast<const TDH_Base*>(this)->getH_OverIs());}
+
+private:
+  /// \name Virtuals inherited from HamiltonianTimeDependenceDispatched
+  //@{
+    /**
+     * The first implements HamiltonianTimeDependenceDispatched<RANK,ONE_TIME> and can be used only when `IS_TIME_DEPENDENT=true`,
+     * while the second implements HamiltonianTimeDependenceDispatched<RANK,NO_TIME> and can be used only in the opposite case.
+     * 
+     * \see the technique used @ FreeExact & ElementLiouvillean
+     * 
+     */
+  void addContribution_v(OneTime, const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v( NoTime, const StateVectorLow&, StateVectorLow&) const;
+  //@}
 
   mutable Tridiagonals hOverIs_;
-
-};
-
-
-template<int RANK>
-class TDH_True // TridiagonalHamiltonian time-dependent base
-  : public Hamiltonian<RANK,ONE_TIME>, private TridiagonalStore<RANK>
-{
-public:
-  typedef TridiagonalStore<RANK> Base;
-
-  typedef typename Base::Tridiagonal  Tridiagonal;
-  typedef typename Base::Tridiagonals Tridiagonals;
-
-  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow;
-
-  using Base::getH_OverIs;
-
-  TDH_True(const Tridiagonals& hOverIs) : Base(hOverIs) {}
-
-private:
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&) const;
-
-  using Base::hOverIs_;
-
-};
-
-
-template<int RANK>
-class TDH_False // TridiagonalHamiltonian time-independent base
-  : public Hamiltonian<RANK,NO_TIME>, private TridiagonalStore<RANK>
-{
-public:
-  typedef TridiagonalStore<RANK> Base;
-
-  typedef typename Base::Tridiagonal  Tridiagonal ;
-  typedef typename Base::Tridiagonals Tridiagonals;
-
-  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow;
-
-  using Base::getH_OverIs;
-
-  TDH_False(const Tridiagonals& hOverIs) : Base(hOverIs) {}
-
-private:
-  void addContribution_v(const StateVectorLow&, StateVectorLow&) const;
-
-  using Base::hOverIs_;
 
 };
 
@@ -84,20 +61,37 @@ private:
 } // details
 
 
-template<int RANK, bool IS_TD> // TD stands for time-dependent: the class is composed at compile-time 
-class TridiagonalHamiltonian : public mpl::if_c<IS_TD,details::TDH_True<RANK>,details::TDH_False<RANK> >::type
-{
-public:
-  typedef typename mpl::if_c<IS_TD,details::TDH_True<RANK>,details::TDH_False<RANK> >::type Base;
 
+/// Implements the action of a Hamiltonian whose matrix consists of a sum of \link quantumoperator::Tridiagonal tridiagonal matrices\endlink
+/**
+ * \f[H_\text{tridiagonals}(t)=H_0(t)+H_1(t)+H_2(t)+\dots\f] with the \f$H_i(t)\f$s being all described by quantumoperator::Tridiagonal `<RANK>` objects.
+ * 
+ * Such a class can be constructed with either a list of quantumoperator::Tridiagonal `<RANK>` objects, or only one such object when the above sum consists of only one term.
+ * 
+ * \tparamRANK
+ * \tparam IS_TIME_DEPENDENT governs time-dependence & the composition of the class @ compile time
+ * 
+ * Implements Hamiltonian<RANK,ONE_TIME> when `IS_TIME_DEPENDENT=true` **OR** Hamiltonian<RANK,NO_TIME>  when `IS_TIME_DEPENDENT=false`
+ * 
+ * \note The present architecture of quantumoperator::Tridiagonal does not allow to cover the case #TWO_TIME.
+ *  
+ */
+template<int RANK, bool IS_TIME_DEPENDENT>
+class TridiagonalHamiltonian : public details::TDH_Base<RANK,IS_TIME_DEPENDENT>
+{
+private:
+  typedef details::TDH_Base<RANK,IS_TIME_DEPENDENT> Base;
+
+public:
   typedef typename Base::Tridiagonal  Tridiagonal ;
   typedef typename Base::Tridiagonals Tridiagonals;
 
-  TridiagonalHamiltonian(const Tridiagonal & hOverI ) : Base(Tridiagonals(1,hOverI)) {}
-  TridiagonalHamiltonian(const Tridiagonals& hOverIs) : Base(hOverIs) {}
+  TridiagonalHamiltonian(const Tridiagonals& hOverIs) : Base(hOverIs) {} ///< Generic constructor
+  TridiagonalHamiltonian(const Tridiagonal & hOverI ) : Base(Tridiagonals(1,hOverI)) {} ///< \overload
 
 };
 
+#undef BASE_class
 
 } // structure
 

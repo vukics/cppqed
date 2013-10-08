@@ -22,17 +22,49 @@
 namespace quantumoperator {
 
 
-namespace bll=boost::lambda;
+namespace details {
 
+
+template<bool IS_MULTIPLICATION, int RANK1, int RANK2> // if not multiply then sum
+const typename Tridiagonal<RANK1+RANK2>::Diagonals
+directDiagonals(const typename Tridiagonal<RANK1>::Diagonals& ds1,
+                const typename Tridiagonal<RANK2>::Diagonals& ds2) 
+{
+  using namespace blitzplusplus; // implies blitz
+  using namespace linalg       ;
+
+  typedef Tridiagonal<RANK1+RANK2> TridiagonalRes;
+  typedef Tridiagonal<RANK1> Tridiagonal1;
+  typedef Tridiagonal<RANK2> Tridiagonal2;
+
+
+  typename TridiagonalRes::Diagonals res;
+  size_t length=ds2.numElements();
+
+  for (size_t i=0; i<ds1.numElements(); ++i) for (size_t j=0; j<length; ++j) {
+      const typename Tridiagonal1::Diagonal& d1=ds1(i);
+      const typename Tridiagonal2::Diagonal& d2=ds2(j);
+      typename TridiagonalRes::Diagonal& d=res(i*length+j);
+
+      d.reference(doDirect<IS_MULTIPLICATION,RANK1,RANK2>(d1,d2));
+
+    }
+
+  return res;
+
+} // NEEDS_WORK this is now runtime, but (a smaller) part of it could be done compile-time. Ugh. Ouch.
+
+
+} // details
 
 
 template<int RANK> template<int RANK2>
 Tridiagonal<RANK>::Tridiagonal(const Tridiagonal<RANK2>& t1, const Tridiagonal<RANK-RANK2>& t2)
   : Base(blitzplusplus::concatenateTinies(t1.getDimensions(),t2.getDimensions())),
-    diagonals_(blitzplusplus::ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,true>(t1.get(),t2.get())),
+    diagonals_(blitzplusplus::ShallowCopy(),details::directDiagonals<true,RANK2,RANK-RANK2>(t1.get(),t2.get())),
     differences_(blitzplusplus::concatenateTinies(t1.getDifferences(),t2.getDifferences())),
     tCurrent_(t1.getTime()),
-    freqs_(blitzplusplus::ShallowCopy(),details::directDiagonals<RANK2,RANK-RANK2,false>(t1.getFreqs(),t2.getFreqs()))
+    freqs_(blitzplusplus::ShallowCopy(),details::directDiagonals<false,RANK2,RANK-RANK2>(t1.getFreqs(),t2.getFreqs()))
 {
   if (t1.getTime()!=t2.getTime()) throw TridiagonalTimeMismatchException();
 }
@@ -42,7 +74,7 @@ template<int RANK>
 Tridiagonal<RANK>&
 Tridiagonal<RANK>::operator*=(const dcomp& dc)
 {
-  boost::for_each(diagonals_,bll::_1*=dc); 
+  boost::for_each(diagonals_,boost::lambda::_1*=dc); 
   return *this;
 }
 
@@ -129,44 +161,6 @@ Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
   return *this;
 
 }
-
-
-
-namespace details {
-
-
-
-template<int RANK1, int RANK2, bool MULT> // if not multiply then sum
-const typename Tridiagonal<RANK1+RANK2>::Diagonals
-directDiagonals(const typename Tridiagonal<RANK1>::Diagonals& ds1,
-                const typename Tridiagonal<RANK2>::Diagonals& ds2) 
-{
-  using namespace blitzplusplus; // implies blitz
-  using namespace linalg       ;
-
-  typedef Tridiagonal<RANK1+RANK2> TridiagonalRes;
-  typedef Tridiagonal<RANK1> Tridiagonal1;
-  typedef Tridiagonal<RANK2> Tridiagonal2;
-
-
-  typename TridiagonalRes::Diagonals res;
-  size_t length=ds2.numElements();
-
-  for (size_t i=0; i<ds1.numElements(); ++i) for (size_t j=0; j<length; ++j) {
-      const typename Tridiagonal1::Diagonal& d1=ds1(i);
-      const typename Tridiagonal2::Diagonal& d2=ds2(j);
-      typename TridiagonalRes::Diagonal& d=res(i*length+j);
-
-      d.reference(doDirect<MULT>(d1,d2));
-
-    }
-
-  return res;
-
-} // NEEDS_WORK this is now runtime, but (a smaller) part of it could be done compile-time. Ugh. Ouch.
-
-
-} // details
 
 
 

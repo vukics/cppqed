@@ -13,7 +13,6 @@
 #include <boost/bind.hpp>
 
 using namespace std;
-using namespace boost::assign;
 using namespace mathutils;
 using namespace cpputils;
 using namespace fft;
@@ -35,9 +34,9 @@ const Tridiagonal cosNKX (size_t, ptrdiff_t);
 
 namespace {
 
-const Exact::Factors fExpFill(const Spatial& space, double omrec)
+const Exact::Diagonal fExpFill(const Spatial& space, double omrec)
 {
-  return Exact::Factors(-DCOMP_I*omrec*blitz::sqr(space.getK()));
+  return Exact::Diagonal(-DCOMP_I*omrec*blitz::sqr(space.getK()));
 }
 
 } 
@@ -48,9 +47,9 @@ Exact::Exact(const Spatial& space, double omrec)
 {
 }
 
-void Exact::updateU(double dtdid) const
+void Exact::updateU(structure::OneTime t) const
 {
-  getFactors()=exp(factorExponents_*dtdid);
+  getDiagonal()=exp(factorExponents_*t);
 }
  
 
@@ -112,18 +111,13 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::
 
 
 Averaged::Averaged(const Spatial& space)
-  : Base("Particle",
-	 list_of("<P>")
-		("VAR(P)")
-		("<X>")
-		("DEV(X)")
-	 ),
+  : Base("Particle",{"<P>","VAR(P)","<X>","DEV(X)"}),
     space_(space)
 {
 }
 
 
-const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   int dim=space_.getDimension();
 

@@ -12,7 +12,16 @@ utils/test/g1.d
 utils/test/g1me.d
 utils/test/g1pe.d
 utils/test/rt.d
-doc
 commit.txt
 testsuitePhysics
 *.kdev4
+latex
+html
+examples/map1
+examples/map2
+examples/map3
+examples/map4
+examples/map5
+examples/map6
+examples/map7
+examples/map8

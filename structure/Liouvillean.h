@@ -1,36 +1,69 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef STRUCTURE_LIOUVILLEAN_H_INCLUDED
 #define STRUCTURE_LIOUVILLEAN_H_INCLUDED
 
 #include "LiouvilleanFwd.h"
 
 #include "LiouvilleanAveragedCommon.h"
+#include "Time.h"
+
+#include "LazyDensityOperator.h"
+#include "StateVector.h"
 
 
 namespace structure {
 
-
+/// The interface every system having Liouvillean time-evolution must present towards the trajectory drivers
+/**
+ * The time-evolution must be Markovian where the Lindblad form of the Master equation is the most general one possible:
+ * \f[\dot\rho=\frac1{i\hbar}\comm{H}\rho+\sum_m\lp J_m\rho J_m^\dag-\frac12\comm{J_m^\dag J_m}{\rho}_+\rp\f]
+ * The class represents the set of \f$J_m\f$ operators (Lindblads or quantum jump operators) of arbitrary number,
+ * either for Master equation or Monte Carlo wave-function evolution (in the latter case it calculates the jump rates as well).
+ * 
+ * \tparamRANK
+ * 
+ * \note No matter how complex the quantum system, the framework always assigns a unique ordinal to each jump corresponding to every subsystem
+ * 
+ * \note It is always possible to forgo the explicit calculation of certain jump rates because the rate can be calculated also on the basis of the Liouvillean::actWithJ function by the 
+ * \link quantumtrajectory::MCWF_Trajectory MCWF stepper\endlink. The fact that such a fallback is desired can be signalled by setting a negative value for the rate of the given jump 
+ * (“special jump”). \see \ref specialjump
+ * 
+ * \see The design is very similar to Exact, but here the choice is not between TwoTime/OneTime dependence, but OneTime/NoTime.
+ * 
+ */
 template<int RANK>
-class Liouvillean<RANK,true> : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >
+class Liouvillean : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >
 {
 public:
   static const int N_RANK=RANK;
 
   typedef boost::shared_ptr<const Liouvillean> Ptr;
 
+private:
   typedef quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> > Base;
 
+public:
+  typedef quantumdata::StateVector<RANK> StateVector;
+  
   typedef typename Base::    StateVectorLow     StateVectorLow;
   typedef typename Base::DensityOperatorLow DensityOperatorLow;
 
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
+  typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename Base::DArray1D Probabilities;
+  typedef typename Base::DArray1D Rates; ///< The 1D real array for storing the jump rates
 
   virtual ~Liouvillean() {}
+  
+  /// Returns the set of jump rates \f$\bra{\Psi}J_m^\dagger J_m\ket{\Psi},\f$ where the Lindblads are in general time-dependent
+  /** Simply redirects to LiouvilleanAveragedCommonRanked::average, so that this function does not appear in the interface for implementers. */
+  const Rates rates(double t, const StateVector& psi) const {return Base::average(t,psi);}
 
-  void actWithJ(double t, StateVectorLow& psi, size_t jumpNo) const {return actWithJ_v(t,psi,jumpNo);}
-  // jumpNo is the ordinal number of the jump to be performed
+  /// Performs the quantum jump operation \f$\ket\Psi\rightarrow J_m(t)\ket\Psi\f$
+  void actWithJ(double t,            ///<[in] \f$t\f$
+                StateVectorLow& psi, ///<[in/out] \f$\ket\Psi\f$
+                size_t m             ///<[out] \f$m\f$
+               ) const {return actWithJ_v(t,psi,m);}
 
 private:
   virtual void actWithJ_v(double, StateVectorLow&, size_t) const = 0;
@@ -38,24 +71,47 @@ private:
 };
 
 
-
-template<int RANK>
-class Liouvillean<RANK,false> : public Liouvillean<RANK,true>
+/// Implements the general Liouvillean interface by dispatching the two possible \link time::DispatcherIsTimeDependent time-dependence levels\endlink
+/**
+ * \tparamRANK
+ * \tparam IS_TIME_DEPENDENT describes whether the \f$J_m\f$s are time-dependent. `true`: OneTime – `false`: NoTime
+ * 
+ */
+template<int RANK, bool IS_TIME_DEPENDENT>
+class LiouvilleanTimeDependenceDispatched : public Liouvillean<RANK>
 {
 public:
-  typedef typename Liouvillean<RANK,true>::StateVectorLow      StateVectorLow     ;
-  typedef typename Liouvillean<RANK,true>::LazyDensityOperator LazyDensityOperator;
-  typedef typename Liouvillean<RANK,true>::Probabilities       Probabilities      ;
+  typedef typename Liouvillean<RANK>::StateVectorLow      StateVectorLow     ;
+  typedef typename Liouvillean<RANK>::LazyDensityOperator LazyDensityOperator;
+  typedef typename Liouvillean<RANK>::Rates               Rates              ;
+  
+  typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
 
 private:
-  void                actWithJ_v(double, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(psi,jumpNo);}
-  const Probabilities  average_v(double, const LazyDensityOperator&  matrix) const {return average_v(matrix);}
+  void        actWithJ_v(double t, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(Time(t),psi,jumpNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK>
+  const Rates  average_v(double t, const LazyDensityOperator&  matrix) const {return average_v(Time(t),matrix);} ///< Redirects the virtual inherited from LiouvilleanAveragedCommonRanked
 
-  virtual void                actWithJ_v(StateVectorLow&, size_t   ) const = 0;
-  virtual const Probabilities  average_v(const LazyDensityOperator&) const = 0;
+  virtual void        actWithJ_v(Time, StateVectorLow&, size_t   ) const = 0;
+  virtual const Rates  average_v(Time, const LazyDensityOperator&) const = 0;
 
 };
 
+
+/** \page specialjump The notion of “special jumps” in the framework
+ * 
+ * Implementers of Liouvillean (typically, certain free elements) may decide to forgo the explicit calculation of the jump rate corresponding to any of the Lindblad operators,
+ * because the action of the Lindblad on a state vector contains enough information about the jump rate as well. This is signalled by a negative jump rate towards the framework.
+ * 
+ * The motivation for this is usually that the explicit calculation of a given jump rate is cumbersome and error-prone in some cases.
+ * 
+ * The quantumtrajectory::MCWF_trajectory class, when encountering a negative jump rate, will reach for the Liouvillean::actWithJ function to calculate the corresponding rate.
+ * 
+ * Assume that \f$J_m\f$ is the set of Lindblads, and for \f$m=\text{at}\f$ the jump rate is found negative. In this case, \f$\ket{\Psi_\text{at}}=J_\text{at}\ket\Psi\f$ is
+ * calculated and cached by the trajectory driver (cf. quantumtrajectory::MCWF_trajectory::calculateSpecialRates) and the given jump rate is taken as \f$\norm{\ket{\Psi_\text{at}}}^2\f$.
+ * 
+ * \note In certain cases, the use of a special jump can be less efficient than the explicit calculation of the rate.
+ * 
+ */
 
 
 } // structure

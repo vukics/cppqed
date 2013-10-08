@@ -4,28 +4,28 @@
 
 #include "KeyPrinterFwd.h"
 
+#include <initializer_list>
 #include <list>
 #include <string>
+#include <utility>
 
 
 namespace cpputils {
-
-////////////////////////
-//
-// ElementAveragedCommon
-//
-////////////////////////
 
 
 class KeyPrinter
 {
 public:
   typedef std::list<std::string> KeyLabels;
+  typedef std::initializer_list<std::string> KeyLabelsInitializer;
 
-  KeyPrinter(const std::string&, const KeyLabels&);
+  template<typename... KeyLabelsPack>
+  KeyPrinter(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyTitle_(keyTitle), keyLabels_(std::forward<KeyLabelsPack>(keyLabelsPack)...) {}
 
-  size_t length    ()                                                    const {return keyLabels_.size();}
-  void   displayKey(std::ostream&, size_t&)                              const;
+  KeyPrinter(const std::string& keyTitle, KeyLabelsInitializer il) : keyTitle_(keyTitle), keyLabels_(il) {}
+
+  size_t        length    ()                       const {return keyLabels_.size();}
+  std::ostream& displayKey(std::ostream&, size_t&) const;
 
   const std::string& getTitle () const {return keyTitle_ ;}
   const KeyLabels  & getLabels() const {return keyLabels_;}

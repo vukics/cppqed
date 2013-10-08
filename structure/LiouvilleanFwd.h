@@ -6,8 +6,11 @@
 namespace structure {
 
 
-template<int, bool IS_TD=true>
+template<int RANK>
 class Liouvillean;
+
+template<int RANK, bool IS_TIME_DEPENDENT>
+class LiouvilleanTimeDependenceDispatched;
 
 
 } // structure

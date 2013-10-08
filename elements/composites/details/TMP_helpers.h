@@ -2,7 +2,7 @@
 #ifndef   ELEMENTS_COMPOSITES_DETAILS_TMP_HELPERS_H_INCLUDED
 #define   ELEMENTS_COMPOSITES_DETAILS_TMP_HELPERS_H_INCLUDED
 
-#include "TMP_ToolsFwd.h"
+#include "TMP_Tools.h"
 
 #include <boost/fusion/include/fold.hpp>
 #include <boost/mpl/less.hpp>

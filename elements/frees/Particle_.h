@@ -19,7 +19,7 @@
 
 namespace particle {
 
-using namespace structure::free;
+using namespace structure::free; using structure::NoTime;
 
 
 typedef boost::shared_ptr<const ParticleBase> Ptr;
@@ -56,12 +56,10 @@ namespace details {
 
 typedef boost::tuple<const Spatial&, double> Storage;
 
-class Empty {};
-
 } // details
 
 
-class Exact : public structure::FreeExact, private details::Storage
+class Exact : public structure::FreeExact<false>, private details::Storage
 {
 public:
   Exact(const Spatial&, double omrec);
@@ -69,25 +67,25 @@ public:
   using details::Storage::get;
 
 private:
-  void updateU(double) const;
+  void updateU(structure::OneTime) const;
 
   bool isUnitary_v() const {return true;}
 
-  const Factors factorExponents_;
+  const Diagonal factorExponents_;
 
 };
 
 
-template<bool IS_TD>
+template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
-  : public structure::TridiagonalHamiltonian<1,IS_TD>,
-    public mpl::if_c<IS_TD,Exact,details::Empty>::type
+  : public structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
+    public mpl::if_c<IS_TIME_DEPENDENT,Exact,mpl::empty_base>::type
 {
 public:
-  typedef structure::TridiagonalHamiltonian<1,IS_TD> Base;
+  typedef structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
   Hamiltonian(const Spatial&, double omrec, double vClass, const ModeFunction&);
-  Hamiltonian(const Spatial&, double omrec, mpl::bool_<IS_TD> =mpl::false_());
+  Hamiltonian(const Spatial&, double omrec, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_());
 
 };
 
@@ -98,7 +96,7 @@ public:
 class Spatial
 {
 public:
-  typedef TTD_DARRAY(1) Array;
+  typedef DArray<1> Array;
 
   explicit Spatial(size_t, double deltaK=1);
 
@@ -135,8 +133,8 @@ public:
   const Spatial& getSpace() const {return space_;}
 
 private:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
   const Spatial space_;
 

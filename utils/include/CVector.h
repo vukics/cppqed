@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Defines the typedef linalg::CVector}
 #ifndef UTILS_INCLUDE_CVECTOR_H_INCLUDED
 #define UTILS_INCLUDE_CVECTOR_H_INCLUDED
 
@@ -7,8 +8,8 @@
 
 namespace linalg {
 
-
-typedef TTD_CARRAY(1) CVector;
+/// Complex vector
+typedef CArray<1> CVector;
 
 
 } // linalg

@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Defines quantumoperator::DirectProduct & helpers}
 #ifndef   QUANTUMOPERATOR_IMPL_SIGMA_TCC_INCLUDED
 #define   QUANTUMOPERATOR_IMPL_SIGMA_TCC_INCLUDED
 
@@ -7,16 +8,31 @@
 namespace quantumoperator {
 
 
+/// A direct-product clause, representing a germinal expression-template mechanism for direct products of Sigma`<L,R>` instances with `OTHER` types.
+/**
+ * \tparam OTHER The type of the other member of the clause. Models:
+ * -# Another class Sigma`<L1,R1>`
+ * -# A Tridiagonal type
+ * -# Another DirectProduct type (recursivity)
+ * \tparam IS_HEAD Signifies whether Sigma`<L,R>` stands at the head or at the tail of the direct product
+ * 
+ * The class is nicely described by the signature of \ref sigmadirectproducts "these functions".
+ */
 template<int L, int R, typename OTHER, bool IS_HEAD>
 class DirectProduct
 {
 public:
-  static const int N_RANK=OTHER::N_RANK+1;
+  static const int N_RANK=OTHER::N_RANK+1; ///< Reports the rank of the class for recursive usage
 
   typedef typename quantumdata::Types<N_RANK>::StateVectorLow StateVectorLow;
 
-  DirectProduct(const OTHER& other) : other_(other) {}
-
+  DirectProduct(const OTHER& other) : other_(other) {} ///< The object has to store a reference to the `OTHER` object to enable DirectProduct::apply as an operator
+  
+  /// Applies the clause on a state vector `psi`, adding the result to `dpsidt`, analogously to Tridiagonal::apply and structure::Hamiltonian::addContribution
+  /**
+   * It is implemented as taking the partial projection (quantumoperator::partialProject) of the state vectors according to `L` and `R`
+   * (which at this point are converted into runtime data), and calling the `apply` function of the `OTHER` type.
+   */
   void
   apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
   {

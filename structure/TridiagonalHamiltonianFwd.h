@@ -4,7 +4,7 @@
 
 namespace structure {
 
-template<int RANK, bool IS_TD> // TD stands for time-dependent: the class is composed at compile-time 
+template<int RANK, bool IS_TIME_DEPENDENT>
 class TridiagonalHamiltonian;
 
 } // structure

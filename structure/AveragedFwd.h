@@ -6,7 +6,9 @@ namespace structure {
 
 class AveragedCommon;
 
-template<int, bool IS_TD=true> class Averaged;
+template<int> class Averaged;
+
+template<int, bool> class AveragedTimeDependenceDispatched;
 
 } // structure
 

@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE( CWR )
   const CWR_Dir::Configuration c12=dir[12];
   BOOST_CHECK(dir[c12]==12);
 
-  const TTD_IDXTINY(4) idxTiny(2,2,0,1);
+  const IdxTiny<4> idxTiny(2,2,0,1);
   
   const boost::array<size_t,4> idxBoost={{2,2,0,1}};
   BOOST_CHECK(dir[idxBoost]==12);

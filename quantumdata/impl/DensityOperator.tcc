@@ -76,7 +76,7 @@ DensityOperator<RANK>::operator()(const Idx& i, const Idx& j) const
 
 
 template<int RANK>
-void inflate(const TTD_DARRAY(1)& flattened, DensityOperator<RANK>& rho, bool offDiagonals)
+void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDiagonals)
 {
   using mathutils::sqr;
 

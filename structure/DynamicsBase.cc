@@ -23,18 +23,17 @@ DynamicsBase::DynamicsBase(const RealFreqs& realFreqs, const ComplexFreqs& compl
 
 
 
-#define TTD_NAMED_FREQUENCY(T) std::list<boost::tuple<std::string,T,double> >::value_type
-
-
 namespace {
 
-inline double absReal   (const TTD_NAMED_FREQUENCY(double)& p) {return fabs(p.get<1>()*p.get<2>());}
-inline double absComplex(const TTD_NAMED_FREQUENCY(dcomp )& p) {return  abs(p.get<1>()*p.get<2>());}
+template <typename T> using NamedFrequency=typename std::list<boost::tuple<std::string,T,double> >::value_type;
+
+inline double absReal   (const NamedFrequency<double>& p) {return fabs(p.get<1>()*p.get<2>());}
+inline double absComplex(const NamedFrequency<dcomp >& p) {return  abs(p.get<1>()*p.get<2>());}
 
 
 template<typename T>
-bool templateCompare(const typename TTD_NAMED_FREQUENCY(T)& p1, const typename TTD_NAMED_FREQUENCY(T)& p2,
-                     boost::function<double(const typename TTD_NAMED_FREQUENCY(T)&)> f)
+bool templateCompare(const NamedFrequency<T>& p1, const NamedFrequency<T>& p2,
+                     boost::function<double(const NamedFrequency<T>&)> f)
 {
   return f(p1)<f(p2);
 }
@@ -72,8 +71,7 @@ std::ostream& DynamicsBase::displayParameters(ostream& os) const
 namespace {
 
 template<typename T>
-void displayFreq(ostream& os, int precision, const typename TTD_NAMED_FREQUENCY(T)& pair)
-#undef TTD_NAMED_FREQUENCY
+void displayFreq(ostream& os, int precision, const NamedFrequency<T>& pair)
 {
   os<<"# "<<pair.template get<0>()<<"="<<formdouble::zeroWidth(precision)(pair.template get<1>())<<endl;
 }

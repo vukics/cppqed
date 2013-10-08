@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Tools for calculating Wigner functions from density operators}
 #ifndef QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED
 #define QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED
 
@@ -8,7 +9,7 @@
 
 #include "ParsFwd.h"
 
-#include "boost/math/special_functions/factorials.hpp"
+#include <boost/math/special_functions/factorials.hpp>
 
 
 namespace quantumdata {
@@ -37,32 +38,32 @@ dcomp q(size_t n, const dcomp& alpha);
 
 /// Calculates the Wigner function corresponding to a harmonic-oscillator mode density matrix expressed in Fock basis
 /**
- * We use the formula given by Leonhardt (Ulf Leonhardt: *Measuring the Quantum State of Light*. Volume 22 of *Cambridge Studies in Modern Optics,* pages 128–130. Cambridge University Press, 2005.)
- * \f[W[\rho](x,y)=w(r,0)+2\sum_{k=1}^M \real{w(r,k)\,e^{-i\,k\varphi}}\f]
+ * We use the formula given by Leonhardt \cite leonhardt
+ * \f[W[\rho](x,y)=w(r,0)+2\sum_{k=1}^M \real{w(r,k)\,e^{-i\,k\varphi}},\f]
  * with
- * \f[w(r,k)\equiv\sum_{n=0}^{M-k}\left[\frac1\pi(-1)^n\sqrt{\frac{n!}{(n-k)!}}\,e^{-2\,r^2}\lp2\,r\rp^k L_n^k\lp4\,r^2\rp\right]\rho_{n+k,n}\f]
- * the difference of \f$\sqrt{2}\f$ in front of \f$r\f$ comes from our different definition of the quadratures: \f$x=\frac{a+a^\dagger}2,\;y=\frac{a-a^\dagger}{2i}\f$.
+ * \f[w(r,k)\equiv\sum_{n=0}^{M-k}\left[\frac1\pi(-1)^n\sqrt{\frac{n!}{(n-k)!}}\,e^{-2\,r^2}\lp2\,r\rp^k L_n^k\lp4\,r^2\rp\right]\rho_{n+k,n}.\f]
+ * The difference of \f$\sqrt{2}\f$ in front of \f$r\f$ comes from our different definition of the quadratures: \f$x=\frac{a+a^\dagger}2,\;y=\frac{a-a^\dagger}{2i}\f$.
  * The quadratures are recalculated into polar coordinates: \f$x=r\,\cos\lp\varphi\rp\;y=r\,\sin\lp\varphi\rp\f$.
  * 
  * \note The function is wasteful at the moment from several points of view:
  *   - we do not use the recurrence formula (5.114) of the Leonhardt book
  *   - \f$w(r,k)\f$ gets recalculated for each pair of \f$x\;y\f$ leaving unexploited that it depends only on \f$r\f$
  * 
- * \tparam DensityOperator a type modelling a unary density operator
+ * \tparam DensityOperatorFunctor a type modelling a unary density operator
  * 
  * \param truncatedDimension if nonzero, this is used as the dimension instead of the actual dimension of `rho`
  * 
- * \todo should refer `rho` only via some traits class to make the code really generic.
+ * \todo Should refer `rho` only via some traits class to make the code really generic.
  * 
  */
-template<typename DensityOperator>
-double wignerFunction(const DensityOperator& rho, double x, double y, size_t truncatedDimension=0)
+template<typename DensityOperatorFunctor>
+double wignerFunction(const DensityOperatorFunctor& rho, double x, double y, size_t truncatedDimension=0)
 {
   using namespace mathutils; using boost::math::factorial;
 
   struct Helper
   {
-    static dcomp _(const DensityOperator& rho, size_t dim, double r, size_t k)
+    static dcomp _(const DensityOperatorFunctor& rho, size_t dim, double r, size_t k)
     {
       dcomp res(0.);
       for (size_t n=0; n<dim-k; ++n) res+=details::w(n,r,k)*rho(n+k,n);
@@ -100,7 +101,7 @@ double qFunction(const DensityOperator& rho, double x, double y, size_t)
 class WignerFunctionKernelOld
 {
 public:
-  typedef TTD_DARRAY(1) Hermites;
+  typedef DArray<1> Hermites;
   
   WignerFunctionKernelOld(double x, double y, size_t dim);
 
@@ -113,8 +114,8 @@ private:
 
 
 
-template<typename DensityOperator>
-double wignerFunctionOld(const DensityOperator& rho, double x, double y, size_t truncatedDimension=0)
+template<typename DensityOperatorFunctor>
+double wignerFunctionOld(const DensityOperatorFunctor& rho, double x, double y, size_t truncatedDimension=0)
 // NEEDS_WORK should refer rho only via some traits class to make the code really generic.
 {
   using namespace mathutils; using boost::math::factorial;
@@ -152,13 +153,6 @@ std::ostream& scanFunction(DistributionFunctor distributionFunctor, const Densit
 }
 
 
-/*
-template<typename DensityOperator, typename Kernel>
-double wignerFunction(const DensityOperator& rho, const dcomp& alpha, const Kernel&);
-
-+ a bunch of further overloads
-
-*/
 
 }
 

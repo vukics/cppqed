@@ -10,6 +10,8 @@ class ExactCommon;
 template<int>
 class Exact;
 
+template<int,bool>
+class ExactTimeDependenceDispatched;
 
 } // structure
 

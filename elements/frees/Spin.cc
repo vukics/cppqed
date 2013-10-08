@@ -46,7 +46,7 @@ const Tridiagonal splus(Ptr spin)
   // i=m+s (m is the magnetic quantum number)
   Tridiagonal res(Diagonal(),1,diagonal=sqrt((spin->getTwoS()-i)*(i+1.)));
   // writing "1." is tremendously important here, for converting the whole thing to doubles: otherwise, the sqrt is apparently performed within integers by blitz!!! 
-  if (dynamic_cast<const structure::FreeExact*>(spin.get())) res.furnishWithFreqs(mainDiagonal(spin));
+  if (dynamic_cast<const structure::FreeExact<false>*>(spin.get())) res.furnishWithFreqs(mainDiagonal(spin));
   return res;
 }
 
@@ -84,7 +84,7 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 
 SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double gamma, size_t dim) 
   : Free(spin::decideDimension(twoS,dim),FREQS("omega",omega,1)("gamma",gamma,1)),
-    structure::ElementAveraged<1>("Spin",list_of("<sz>")("<sz^2>")("real(<s^+>)")("imag(\")")("|Psi(dim-1)|^2")), twoS_(twoS), theta_(theta), phi_(phi), omega_(omega), gamma_(gamma), s_(twoS/2.)
+    structure::ElementAveraged<1>("Spin",{"<sz>","<sz^2>","real(<s^+>)","imag(\")","|Psi(dim-1)|^2"}), twoS_(twoS), theta_(theta), phi_(phi), omega_(omega), gamma_(gamma), s_(twoS/2.)
 {
   getParsStream()<<"# Spin "<<s_<<endl;
   getParsStream()<<"# theta="<<theta_<<" phi="<<phi_<<endl;
@@ -127,7 +127,7 @@ void SpinBase::process_v(Averages& averages) const
 
 void Spin::updateU(double dtdid) const
 {
-  Factors& factors(getFactors());
+  Diagonal& factors(getDiagonal());
   for (int i=0; i<factors.size(); i++)
     factors(i)=exp(-dtdid*i*get_z());
 }
@@ -143,4 +143,4 @@ void LossySpin::doActWithJ(structure::free::StateVectorLow& psi) const
 }
 
 
-// double probability(const LazyDensityOperator&) const;
+// double rate(const LazyDensityOperator&) const;

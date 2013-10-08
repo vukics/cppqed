@@ -107,7 +107,7 @@ const mode::StateVector e0(mode::fock(2,3)), e1(mode::fock(3,7)), e2(mode::fock(
 
 int specialChecker(const quantumdata::LazyDensityOperator<3>& m, size_t i1, size_t i2, size_t i3)
 {
-  BOOST_CHECK(all(m.getDimensions()==TTD_EXTTINY(3)(i1,i2,i3)));
+  BOOST_CHECK(all(m.getDimensions()==ExtTiny<3>(i1,i2,i3)));
   partialTrace(m,photonNumberRecurse<0>,tmptools::Vector<1,2>(),0.);
   // This is only for checking whether the special implementations are also recursive.
   return 0;

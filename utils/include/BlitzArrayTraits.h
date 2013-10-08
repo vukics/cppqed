@@ -18,58 +18,58 @@ namespace cpputils {
 
 
 template<int n>
-inline bool isStorageContiguous(const TTD_DARRAY(n)& a) {return a.isStorageContiguous();}
+inline bool isStorageContiguous(const DArray<n>& a) {return a.isStorageContiguous();}
 
 
 template<int n>
-inline size_t size(const TTD_DARRAY(n)& a) {return a.size();}
+inline size_t size(const DArray<n>& a) {return a.size();}
 
 
 template<int n>
-inline const double* data(const TTD_DARRAY(n)& a) {return a.size() ? a.data() : 0;}
+inline const double* data(const DArray<n>& a) {return a.size() ? a.data() : 0;}
 
 template<int n>
-inline       double* data(      TTD_DARRAY(n)& a) {return const_cast<double*>(data(static_cast<const TTD_DARRAY(n)&>(a)));}
-
-
-template<int n>
-inline       TTD_DARRAY(n) create(      double* y, const TTD_DARRAY(n)& a) {return TTD_DARRAY(n)(y,a.shape(),blitz::neverDeleteData);}
-
-template<int n>
-inline const TTD_DARRAY(n) create(const double* y, const TTD_DARRAY(n)& a) {return create(const_cast<double*>(y),a);}
+inline       double* data(      DArray<n>& a) {return const_cast<double*>(data(static_cast<const DArray<n>&>(a)));}
 
 
 template<int n>
-inline TTD_DARRAY(n) create(const TTD_DARRAY(n)& a) {return TTD_DARRAY(n)(a.shape());}
+inline       DArray<n> create(      double* y, const DArray<n>& a) {return DArray<n>(y,a.shape(),blitz::neverDeleteData);}
+
+template<int n>
+inline const DArray<n> create(const double* y, const DArray<n>& a) {return create(const_cast<double*>(y),a);}
+
+
+template<int n>
+inline DArray<n> create(const DArray<n>& a) {return DArray<n>(a.shape());}
 
 
 // blitz::Array<dcomp,n>
 
 
 template<int n>
-inline bool isStorageContiguous(const TTD_CARRAY(n)& a) {return a.isStorageContiguous();}
+inline bool isStorageContiguous(const CArray<n>& a) {return a.isStorageContiguous();}
 
 
 template<int n>
-inline size_t size(const TTD_CARRAY(n)& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
+inline size_t size(const CArray<n>& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
 
 
 template<int n>
-inline const double* data(const TTD_CARRAY(n)& a) {return a.size() ? real(a).data() : 0;}
+inline const double* data(const CArray<n>& a) {return a.size() ? real(a).data() : 0;}
 
 template<int n>
-inline       double* data(      TTD_CARRAY(n)& a) {return const_cast<double*>(data(static_cast<const TTD_CARRAY(n)&>(a)));}
-
-
-template<int n>
-inline       TTD_CARRAY(n) create(      double* y, const TTD_CARRAY(n)& a) {return TTD_CARRAY(n)(reinterpret_cast<dcomp*>(y),a.shape(),blitz::neverDeleteData);}
-
-template<int n>
-inline const TTD_CARRAY(n) create(const double* y, const TTD_CARRAY(n)& a) {return create(const_cast<double*>(y),a);}
+inline       double* data(      CArray<n>& a) {return const_cast<double*>(data(static_cast<const CArray<n>&>(a)));}
 
 
 template<int n>
-inline TTD_CARRAY(n) create(const TTD_CARRAY(n)& a) {return TTD_CARRAY(n)(a.shape());}
+inline       CArray<n> create(      double* y, const CArray<n>& a) {return CArray<n>(reinterpret_cast<dcomp*>(y),a.shape(),blitz::neverDeleteData);}
+
+template<int n>
+inline const CArray<n> create(const double* y, const CArray<n>& a) {return create(const_cast<double*>(y),a);}
+
+
+template<int n>
+inline CArray<n> create(const CArray<n>& a) {return CArray<n>(a.shape());}
 
 
 
@@ -80,29 +80,29 @@ inline TTD_CARRAY(n) create(const TTD_CARRAY(n)& a) {return TTD_CARRAY(n)(a.shap
 /////////////////////////
 
 
-inline const double& subscript(const TTD_DARRAY(1)& a, size_t i) {return a(i);}
-inline       double& subscript(      TTD_DARRAY(1)& a, size_t i) {return const_cast<double&>(subscript(static_cast<const TTD_DARRAY(1)&>(a),i));}
+inline const double& subscript(const DArray<1>& a, size_t i) {return a(i);}
+inline       double& subscript(      DArray<1>& a, size_t i) {return const_cast<double&>(subscript(static_cast<const DArray<1>&>(a),i));}
 
-inline size_t subscriptLimit(const TTD_DARRAY(1)& a) {return a.size();}
+inline size_t subscriptLimit(const DArray<1>& a) {return a.size();}
 
 
 template<int n>
-inline const dcomp& subscript(const TTD_CARRAY(n)& a, size_t i) {return *(a.begin()+i);}
+inline const dcomp& subscript(const CArray<n>& a, size_t i) {return *(a.begin()+i);}
 // NEEDS_WORK this is broken since blitz::Array iterators are not random-access
 
 template<int n>
-inline       dcomp& subscript(      TTD_CARRAY(n)& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const TTD_CARRAY(n)&>(a),i));}
+inline       dcomp& subscript(      CArray<n>& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const CArray<n>&>(a),i));}
 
 template<int n>
-inline size_t subscriptLimit(const TTD_CARRAY(n)& a) {return a.size();}
+inline size_t subscriptLimit(const CArray<n>& a) {return a.size();}
 
 
-inline const dcomp& subscript(const TTD_CARRAY(1)& a, size_t i) {return a(i);}
-inline       dcomp& subscript(      TTD_CARRAY(1)& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const TTD_CARRAY(1)&>(a),i));}
+inline const dcomp& subscript(const CArray<1>& a, size_t i) {return a(i);}
+inline       dcomp& subscript(      CArray<1>& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const CArray<1>&>(a),i));}
 
-inline size_t subscriptLimit(const TTD_CARRAY(1)& a) {return a.size();}
+inline size_t subscriptLimit(const CArray<1>& a) {return a.size();}
 
-inline size_t stride(const TTD_CARRAY(1)& a) {return a.stride(0);}
+inline size_t stride(const CArray<1>& a) {return a.stride(0);}
 
 
 } // cpputils

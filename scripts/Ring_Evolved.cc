@@ -7,7 +7,7 @@ using namespace cpputils  ;
 using namespace trajectory;
 using namespace mathutils ;
 
-typedef TTD_CARRAY(1) Array;
+typedef CArray<1> Array;
 
 
 void derivs(double, const Array& b, Array& dbdt,

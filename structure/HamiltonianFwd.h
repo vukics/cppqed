@@ -4,11 +4,7 @@
 
 namespace structure {
 
-
-enum TimeDependence {TWO_TIME, ONE_TIME, NO_TIME};
-
-
-template<int,TimeDependence=TWO_TIME>
+template<int RANK>
 class Hamiltonian;
 
 

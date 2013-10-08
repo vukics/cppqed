@@ -24,8 +24,6 @@
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
 
 
-#define DEFINE_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
-#include "details/BlitzArraySliceIteratorMacros.h"
 
 namespace blitzplusplus {
 
@@ -35,13 +33,13 @@ namespace details {
 
 
 template<int RANK, typename V>
-class VecIdxTinyImpl 
+class FilterOut
 {  
 public:
-  typedef TTD_IDXTINY(RANK)          IdxTiny;
-  typedef TTD_VEC_IDXTINY(RANK,V) VecIdxTiny;
+  typedef IdxTiny   <RANK>      IdxTiny;
+  typedef VecIdxTiny<RANK,V> VecIdxTiny;
 
-  VecIdxTinyImpl(const IdxTiny& from, VecIdxTiny& to) : from_(from), to_(to), curr_(0) {}
+  FilterOut(const IdxTiny& from, VecIdxTiny& to) : from_(from), to_(to), curr_(0) {}
 
   template<typename T>
   void operator()(T) 
@@ -57,27 +55,26 @@ private:
 };
 
 
+} // details
+
+
 template<int RANK, typename V>
-TTD_VEC_IDXTINY(RANK,V)
-FilterOut(const TTD_IDXTINY(RANK)& v)
+const VecIdxTiny<RANK,V>
+filterOut(const IdxTiny<RANK>& v)
 {
   using namespace boost::mpl;
   using namespace tmptools;
 
-  TTD_VEC_IDXTINY(RANK,V) res;
+  VecIdxTiny<RANK,V> res;
 
   {
-    VecIdxTinyImpl<RANK,V> body(v,res);
-    for_each<filter_view<Ordinals<RANK>,not_<numerical_contains<V,_> > > >(body);
+    details::FilterOut<RANK,V> helper(v,res);
+    for_each<filter_view<Ordinals<RANK>,not_<numerical_contains<V,_> > > >(helper);
   }
 
   return res;
 
 }
-
-
-} // details
-
 
 
 ///////////////////////
@@ -86,19 +83,20 @@ FilterOut(const TTD_IDXTINY(RANK)& v)
 //
 ///////////////////////
 
+namespace details {
 
-template<int RANK, typename V, bool CONST>
+
+template<int RANK, typename V, bool IS_CONST>
 template<bool TAG>
-typename IteratorBase<RANK,V,CONST>::Impl 
-IteratorBase<RANK,V,CONST>::ctorHelper(CcCA& array)
+typename Base<RANK,V,IS_CONST>::Impl 
+Base<RANK,V,IS_CONST>::ctorHelper(CcCA& array)
 {
-  using details::FilterOut;
-  return Impl(FilterOut<RANK,V>(array.lbound()),FilterOut<RANK,V>(array.ubound()),boost::mpl::bool_<TAG>());
+  return Impl(filterOut<RANK,V>(array.lbound()),filterOut<RANK,V>(array.ubound()),boost::mpl::bool_<TAG>());
 }
 
 
-template<int RANK, typename V, bool CONST>
-IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl::false_)
+template<int RANK, typename V, bool IS_CONST>
+Base<RANK,V,IS_CONST>::Base(CcCA& array, Begin)
   : array_(), arrayRes_(), impl_(ctorHelper<false>(array))
 {
   array_.reference(array);
@@ -106,41 +104,42 @@ IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl::false_)
 }
 
 
-template<int RANK, typename V, bool CONST>
-IteratorBase<RANK,V,CONST>::IteratorBase(CcCA& array, boost::mpl:: true_) 
+template<int RANK, typename V, bool IS_CONST>
+Base<RANK,V,IS_CONST>::Base(CcCA& array, End  ) 
   : array_(), arrayRes_(), impl_(ctorHelper< true>(array))
 {
   // Transposition is probably not necessary since this is already the
   // end, and is never dereferenced.
 }
 
-template<typename V, bool CONST>
-IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA& array, boost::mpl::false_)
+template<typename V, bool IS_CONST>
+BaseTrivial<V,IS_CONST>::BaseTrivial(CcCA& array, Begin)
   : array_(), isEnd_(false)
 {
   array_.reference(array);
 }
 
-template<typename V, bool CONST>
-IteratorBaseTrivial<V,CONST>::IteratorBaseTrivial(CcCA&, boost::mpl::true_)
+template<typename V, bool IS_CONST>
+BaseTrivial<V,IS_CONST>::BaseTrivial(CcCA&      , End  )
   : array_(), isEnd_(true)
 {
 }
 
-template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl::false_)
-  : IteratorBaseTrivial<V,CONST>(array, boost::mpl::false_())
+template<typename V, bool IS_CONST>
+BaseSpecial<V,IS_CONST>::BaseSpecial(CcCA& array, Begin)
+  : BaseTrivial<V,IS_CONST>(array,cpputils::mii::begin)
 {
   Transposer<boost::mpl::size<V>::value,V>::transpose(this->array_);
 }
 
 
-template<typename V, bool CONST>
-IteratorBaseSpecial<V,CONST>::IteratorBaseSpecial(CcCA& array, boost::mpl:: true_) 
-  : IteratorBaseTrivial<V,CONST>(array, boost::mpl::true_())
+template<typename V, bool IS_CONST>
+BaseSpecial<V,IS_CONST>::BaseSpecial(CcCA& array, End  ) 
+  : BaseTrivial<V,IS_CONST>(array,cpputils::mii::end)
 {
 }
 
+} // details
 
 //////////////////////////
 //
@@ -153,11 +152,11 @@ namespace details {
 
 template<int RANK, typename V>
 struct IdxTypes : boost::mpl::fold<tmptools::Ordinals<RANK>,
-				   boost::fusion::vector<>,
-				   boost::mpl::push_back<boost::mpl::_1,
-							 boost::mpl::if_<tmptools::numerical_contains<V,boost::mpl::_2>,blitz::Range,int>
-							 >
-				   >
+                                   boost::fusion::vector<>,
+                                   boost::mpl::push_back<boost::mpl::_1,
+                                                         boost::mpl::if_<tmptools::numerical_contains<V,boost::mpl::_2>,blitz::Range,int>
+                                                         >
+                                   >
 {};
 
 
@@ -168,7 +167,7 @@ class IndexerBase
 protected:
   typedef typename IdxTypes<RANK,V>::type Idx;
 
-  typedef TTD_VEC_IDXTINY(RANK,V) VecIdxTiny;
+  typedef VecIdxTiny<RANK,V> VecIdxTiny;
 
 private:
   typedef typename VecIdxTiny::const_iterator CI;
@@ -216,6 +215,8 @@ typename IndexerBase<RANK,V>::Idx IndexerBase<RANK,V>::cache_;
 ////////////////////////////
 
 
+/// [A metaprogramming example]
+
 namespace namehider {
 
 using namespace boost::mpl;
@@ -225,31 +226,29 @@ using namespace tmptools;
 template<int RANK, typename V>
 struct Algorithm 
   : fold<Ordinals<RANK>,
-	 pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
-	 pair<push_back<mpl::first<mpl::_1>,
-			if_<numerical_contains<V,mpl::_2>,
-			    deref<second<mpl::_1> >,
-			    mpl::_2
-			    >
-			>,
-	      if_<numerical_contains<V,mpl::_2>,
-		  mpl::next<second<mpl::_1> >,
-		  second<mpl::_1>
-		  >
-	      >
-	 >
+         pair<vector_c<int>,typename boost::mpl::begin<V>::type>,
+         pair<push_back<mpl::first<mpl::_1>,
+                        if_<numerical_contains<V,mpl::_2>,
+                            deref<second<mpl::_1> >,
+                            mpl::_2
+                            >
+                        >,
+              if_<numerical_contains<V,mpl::_2>,
+                  mpl::next<second<mpl::_1> >,
+                  second<mpl::_1>
+                  >
+              >
+         >
 {};
 
 } // namehider
-
-
-
 
 
 template<int RANK, typename V>
 struct TransposerMeta : boost::mpl::first<typename namehider::Algorithm<RANK,V>::type>
 {};
 
+/// [A metaprogramming example]
 
 } // details
 
@@ -262,10 +261,10 @@ struct TransposerMeta : boost::mpl::first<typename namehider::Algorithm<RANK,V>:
 
 template<int RANK, typename V>
 const RETURN_type
-SlicesData<RANK,V>::ctorHelper(const CArray& array)
+SlicesData<RANK,V>::ctorHelper(const CArray<RANK>& array)
 {
   struct Helper {
-    static ptrdiff_t doIt(const TTD_CARRAY(MPL_SIZE(V))& slice, const dcomp* dc)
+    static ptrdiff_t doIt(const basi::ResCArray<V>& slice, const dcomp* dc)
     {
       return slice.data()-dc;
     }
@@ -280,14 +279,14 @@ SlicesData<RANK,V>::ctorHelper(const CArray& array)
 
 
 template<int RANK, typename V>
-SlicesData<RANK,V>::SlicesData(const CArray& array)
+SlicesData<RANK,V>::SlicesData(const CArray<RANK>& array)
   : firstOffsets_(ctorHelper(array)),
     shape_  (basi::begin<V>(array)->shape   ()),
     stride_ (basi::begin<V>(array)->stride  ()),
-    storage_(basi::begin<V>(array)->ordering() ,blitz::TinyVector<bool,MPL_SIZE(V)>(true))
+    storage_(basi::begin<V>(array)->ordering()  ,blitz::TinyVector<bool,basi::Size<V>::value>(true))
 {
-  assert( ( blitz::all(storage_.ascendingFlag()==blitz::TinyVector<bool,MPL_SIZE(V)>(true)) ) );
-  assert( ( blitz::all(array   .base         ()==blitz::TinyVector<int ,       RANK>(0   )) ) );
+  assert( ( blitz::all(storage_.ascendingFlag()==blitz::TinyVector<bool,basi::Size<V>::value>(true)) ) );
+  assert( ( blitz::all(array   .base         ()==blitz::TinyVector<int ,                RANK>(0   )) ) );
 }
 
 
@@ -308,7 +307,7 @@ ITER_DISPATCHER( true_,end  )
 template<int RANK>
 inline
 dcomp*const
-arrayDataDispatcher(const TTD_CARRAY(RANK)& array)
+arrayDataDispatcher(const CArray<RANK>& array)
 {
   return const_cast<dcomp*>(array.data());
 }
@@ -316,7 +315,7 @@ arrayDataDispatcher(const TTD_CARRAY(RANK)& array)
 template<int RANK>
 inline
 dcomp*const
-arrayDataDispatcher(      TTD_CARRAY(RANK)& array)
+arrayDataDispatcher(      CArray<RANK>& array)
 {
   return array.data();
 }
@@ -326,9 +325,9 @@ arrayDataDispatcher(      TTD_CARRAY(RANK)& array)
 } // details
 
 
-template<int RANK, typename V, bool CONST>
+template<int RANK, typename V, bool IS_CONST>
 template<bool IS_END>
-Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesData, boost::mpl::bool_<IS_END> isEnd)
+Iterator<RANK,V,IS_CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesData, boost::mpl::bool_<IS_END> isEnd)
   : iter_(details::iterDispatcher(slicesData.firstOffsets_,isEnd)),
     arrayRes_(),
     arrayData_(details::arrayDataDispatcher(array)),
@@ -365,9 +364,6 @@ Iterator<RANK,V,CONST>::Iterator(CcCA& array, const SlicesData<RANK,V>& slicesDa
 #undef BOOST_PP_ITERATION_LIMITS
 
 
-#define UNDEF_BLITZ_ARRAY_SLICE_ITERATOR_MACROS
-#include "details/BlitzArraySliceIteratorMacros.h"
-
 #endif // UTILS_INCLUDE_IMPL_BLITZARRAYSLICEITERATOR_TCC_INCLUDED
 
 
@@ -386,7 +382,7 @@ template<typename V> struct Transposer<rank,V>
 {
   typedef typename details::TransposerMeta<rank,V>::type TM;
 
-  typedef TTD_CARRAY(rank) Array;
+  typedef CArray<rank> Array;
 
   static Array& transpose(Array& array)
   {
@@ -401,8 +397,8 @@ template<typename V> struct Indexer<rank,V> : Transposer<rank,V>, private detail
 {
   typedef details::IndexerBase<rank,V> Base;
 
-  typedef TTD_CARRAY(rank)  Array   ;
-  typedef TTD_RES_CARRAY(V) ArrayRes;
+  typedef CArray<rank> Array   ;
+  typedef ResCArray<V> ArrayRes;
 
   static ArrayRes& index(Array& array, ArrayRes& arrayRes, const typename Base::VecIdxTiny& idx)
   {

@@ -12,7 +12,7 @@ using namespace mathutils ;
 using namespace parameters;
 
 
-typedef TTD_CARRAY(1) CA1D;
+typedef CArray<1> CA1D;
 typedef evolved::Evolved<CA1D>::Ptr ESP;
 
 /*

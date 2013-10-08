@@ -17,7 +17,7 @@ const size_t seed=1001;
 
 BOOST_AUTO_TEST_CASE( SerializationTest )
 {
-  TTD_DARRAY(1) array(10), arrayInterrupted(10), firstHalf(arrayInterrupted(blitz::Range(0,4))), secondHalf(arrayInterrupted(blitz::Range(5,9)));
+  DArray<1> array(10), arrayInterrupted(10), firstHalf(arrayInterrupted(blitz::Range(0,4))), secondHalf(arrayInterrupted(blitz::Range(5,9)));
   
   fillWithRandom(array,seed);
   

@@ -97,7 +97,7 @@ public:
   typedef typename RBase::Ordinals Ordinals;
   
   template<structure::LiouvilleanAveragedTag>
-  static void displayKeyLA(std::ostream& , size_t&, const Frees&, const VA& acts);
+  static std::ostream& displayKeyLA(std::ostream& , size_t&, const Frees&, const VA& acts);
 
   template<structure::LiouvilleanAveragedTag>
   class DisplayKey;
@@ -129,9 +129,9 @@ private:
 
   // Implementing Av_Base
 
-  void        displayKey_v(std::ostream& os, size_t& i)              const {       displayKeyLA<structure::LA_Av>(os,i, frees_,acts_         );}
-  size_t            nAvr_v()                                         const {return       nAvrLA<structure::LA_Av>(      frees_,acts_         );}
-  const Averages average_v(double t, const LazyDensityOperator& ldo) const {return    averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i)              const {return displayKeyLA<structure::LA_Av>(os,i, frees_,acts_         );}
+  size_t              nAvr_v()                                         const {return       nAvrLA<structure::LA_Av>(      frees_,acts_         );}
+  const Averages   average_v(double t, const LazyDensityOperator& ldo) const {return    averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
   
   void process_v(Averages&)                           const; class Process;
   void display_v(const Averages&, std::ostream&, int) const; class Display;
@@ -170,8 +170,8 @@ protected:
   Exact(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  bool isUnitary_v(                       ) const; class IsUnitary;
-  void  actWithU_v(double, StateVectorLow&) const; class ActWithU ;
+  bool isUnitary_v(                               ) const; class IsUnitary;
+  void  actWithU_v(double, StateVectorLow&, double) const; class ActWithU ;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -219,15 +219,15 @@ private:
 
   typedef tmptools::Ordinals<RANK> Ordinals;
 
-  typedef typename structure::Liouvillean<RANK>::Probabilities Probabilities;
+  typedef typename structure::Liouvillean<RANK>::Rates Rates;
 
 protected:
   Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  void             displayKey_v(std::ostream& os, size_t& i)              const {       Base<VA>::template displayKeyLA<structure::LA_Li>(os,i, frees_,acts_         );}
-  size_t                 nAvr_v()                                         const {return Base<VA>::template       nAvrLA<structure::LA_Li>(      frees_,acts_         );}
-  const Probabilities average_v(double t, const LazyDensityOperator& ldo) const {return Base<VA>::template    averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i)              const {return Base<VA>::template displayKeyLA<structure::LA_Li>(os,i, frees_,acts_         );}
+  size_t              nAvr_v()                                         const {return Base<VA>::template       nAvrLA<structure::LA_Li>(      frees_,acts_         );}
+  const Rates      average_v(double t, const LazyDensityOperator& ldo) const {return Base<VA>::template    averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
   void actWithJ_v(double, StateVectorLow&, size_t) const; class ActWithJ;
 

@@ -1,21 +1,31 @@
 // -*- C++ -*-
+/// \briefFile{Template metaprogramming tools, extending (and based on) Boost.MPL.}
 #ifndef UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 #define UTILS_INCLUDE_TMP_TOOLS_H_INCLUDED
 
+/// The largest-rank `blitz::Array` for which the mixed-mode subscripting can be used.
+/**
+ * A value larger than 11 will work only if our own Blitz++ version is used, where the indexing member functions and constructors are
+ * generated through preprocessor metaprogramming.
+ *
+ * For our version of Blitz++, cf. http://sourceforge.net/p/cppqed/blitz/ci/default/tree/
+ * 
+ */
 #ifndef BLITZ_ARRAY_LARGEST_RANK
 #define BLITZ_ARRAY_LARGEST_RANK 11
 #endif // BLITZ_ARRAY_LARGEST_RANK
 
+
+/// Cf. \refBoost{this page,fusion/doc/html/fusion/container/vector.html}
 #ifndef FUSION_MAX_VECTOR_SIZE
 #define FUSION_MAX_VECTOR_SIZE 20
 #endif // FUSION_MAX_VECTOR_SIZE
 
+
+/// Cf. \refBoost{this page,fusion/doc/html/fusion/container/list.html}
 #ifndef FUSION_MAX_LIST_SIZE
 #define FUSION_MAX_LIST_SIZE FUSION_MAX_VECTOR_SIZE
 #endif // FUSION_MAX_LIST_SIZE
-
-
-#include "TMP_ToolsFwd.h"
 
 #include <boost/type_traits/add_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -38,40 +48,48 @@
 #define DEFINE_INITIALIZE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName=typeName();
 
 
+/// Template metaprogramming tools
 namespace tmptools {
 
 
+/// Combines \refBoostConstruct{remove_const,type_traits/doc/html/boost_typetraits/reference/remove_const.html} and \refBoostConstruct{remove_reference,type_traits/doc/html/boost_typetraits/reference/remove_reference.html}
 template<typename T>
 struct RemoveConstReference : boost::remove_const<typename boost::remove_reference<T>::type>
 {};
 
 
-template<typename T, bool CONST>
+/// Applies \refBoostConstruct{add_const,type_traits/doc/html/boost_typetraits/reference/add_const.html} if `ADD_CONST = true`.
+template<typename T, bool ADD_CONST>
 struct ConditionalAddConst 
-  : boost::mpl::eval_if_c<CONST,boost::add_const<T>,boost::mpl::identity<T> > {};
+  : boost::mpl::eval_if_c<ADD_CONST,boost::add_const<T>,boost::mpl::identity<T> > {};
 
 
-namespace details {
-
-typedef boost::mpl::range_c<int,0,0> emptyRange;
-
-} // details
+/// An integer \refBoostConstruct{range_c,mpl/doc/refmanual/range-c.html} starting with `Nbeg` and having `N` elements (`Nbeg ... Nbeg+N-1`)
+template<unsigned N, int Nbeg> struct Range : boost::mpl::range_c<int,Nbeg,Nbeg+N> {};
 
 
-template<int N, int Nbeg> struct Range : boost::mpl::range_c<int,Nbeg,Nbeg+N>
-{
-  BOOST_MPL_ASSERT_MSG( N >= 0, RANGE_with_NEGATIVE_LENGTH, (boost::mpl::int_<N>) );
-};
-
-
+/// Sequence of ordinals `0 ... N-1` based on Range
 template<int N> struct Ordinals : Range<N,0> {};
 
 
-template<int N1, int N2> struct Power       : boost::mpl::int_<N1*Power<N1,N2-1>::value> {};
+/// Calculates the power \f$N_1^{N_2}\f$ @ compile time
+template<unsigned N1, unsigned N2> struct Power       : boost::mpl::int_<N1*Power<N1,N2-1>::value> {};
 
-template<int N1>         struct Power<N1,0> : boost::mpl::int_<1>                        {};
+/** \cond */
+template<unsigned N1>              struct Power<N1,0> : boost::mpl::int_<1>                        {};
+/** \endcond */
 
 
+/// Determines whether a compile-time sequence “numerically contains” a given value
+/**
+ * \tparam Seq the sequence (presumably containing integers)
+ * \tparam ICW \refBoost{an integral constant wrapper,mpl/doc/refmanual/integral-constant.html}
+ * 
+ * The motivation for this metafunction is that Boost.MPL’s \refBoostConstruct{contains,mpl/doc/refmanual/contains.html} metafunction
+ * looks for the identity of the actual types, and not the numerical equality of the contained values.
+ * 
+ * \see numerical_equal
+ */
 template<typename Seq, typename ICW>
 struct numerical_contains : boost::mpl::not_<boost::is_same<typename boost::mpl::find_if<Seq,
                                                                                          boost::mpl::equal_to<boost::mpl::_,ICW> 
@@ -80,7 +98,7 @@ struct numerical_contains : boost::mpl::not_<boost::is_same<typename boost::mpl:
                                                             >
                                              > {};
 
-
+/// The `_c` version of numerical_contains, which expects a value instead of an integral constant wrapper
 template<typename Seq, typename T, T VALUE>
 struct numerical_contains_c : numerical_contains<Seq,boost::mpl::integral_c<T,VALUE> > {};
 
@@ -94,12 +112,16 @@ struct value_equal : boost::mpl::bool_<T1::value==T2::value>
 } // details
 
 
+/// Determines the numerical equality of two compile-time sequences
+/**
+ * \see numerical_contains for the motivation
+ */
 template<typename Seq1, typename Seq2>
 struct numerical_equal : boost::mpl::equal<Seq1,Seq2,details::value_equal<boost::mpl::_1,boost::mpl::_2> >
 {};
 
 
-
+/// Provokes a compile-time error if `N` is not even, otherwise acts as a Boost.MPL \refBoostConstruct{int_,mpl/doc/refmanual/int.html} integral constant wrapper of `N/2`
 template<int N>
 struct IsEvenAssert : boost::mpl::int_<N/2>
 {
@@ -107,10 +129,15 @@ struct IsEvenAssert : boost::mpl::int_<N/2>
 };
 
 
+/// A compile-time pair of integers
+/**
+ * \tparam IS_EXCLUSIVE governs the exclusivity of the pair, that is, in the case of `IS_EXCLUSIVE=true`, the class provokes a compile-time error if `N1=N2`
+ */
 template<int N1, int N2, bool IS_EXCLUSIVE=true>
 struct pair_c;
 
 
+/** \cond */
 template<int N1, int N2>
 struct pair_c<N1,N2,false>
 {
@@ -161,10 +188,20 @@ struct ArgumentDispatcher : boost::mpl::integral_c<int,V>
 template<template <typename...> class T, typename... Args>
 struct Join : boost::mpl::identity<T<Args...> > 
 {};
+/** \endcond */
 
-
+/// A non-negative compile-time vector
+/**
+ * It is based on and has the same characteristics as Boost.MPL’s \refBoostConstruct{vector,mpl/doc/refmanual/vector.html}.
+ * 
+ * Besides the check for the non-negativity of the elements @ compile time, its main motivation is that syntactic sugar that one can simply write
+ * `tmptools::Vector<2,4,1,...>` instead of `boost::mpl::vector_c<int,2,4,1,...>`, where the superfluity of `int` creates considerable mental friction
+ * 
+ * \tparam V variadic number of integers
+ * 
+ */
 template<int... V> 
-struct Vector : // boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...>
+struct Vector : // boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...> This would be the simple solution, but it’s not accepted by gcc<4.7
   Join<boost::mpl::vector,ArgumentDispatcher<V>...>::type
 {};
 

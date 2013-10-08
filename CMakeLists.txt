@@ -77,8 +77,8 @@ endforeach()
 
 # linker on MacOs doesn't like --no-undefined
 #set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined -Wl,--as-needed")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-deprecated -Wnon-virtual-dtor -Wno-ignored-qualifiers -Wno-sign-compare -Wno-c++11-extensions -Wno-local-type-template-args")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG -std=c++11 -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-deprecated -Wnon-virtual-dtor -Wno-ignored-qualifiers -Wno-c++11-extensions -Wno-sign-compare -Wno-local-type-template-args -Wno-overloaded-virtual")
 
 
 ##################################################
@@ -148,6 +148,13 @@ else( Boost_SERIALIZATION_FOUND )
 endif( Boost_SERIALIZATION_FOUND )
 include_directories( ${Boost_INCLUDE_DIRS} )
 set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+
+if(Boost_FOUND)
+  if(Boost_MAJOR_VERSION EQUAL "1" AND Boost_MINOR_VERSION GREATER "51")
+    add_definitions(-DBOOST_RESULT_OF_USE_TR1) 
+    message(STATUS "added -DBOOST_RESULT_OF_USE_TR1" )
+  endif()
+endif()
 
 # FLENS
 find_package(flens)

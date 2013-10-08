@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Defines template aliases for real and complex arrays}
 #ifndef   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
 #define   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
 
@@ -14,17 +15,19 @@
 namespace blitzplusplus {
 
 
+struct ShallowCopy {}; // For referencing constructors
+struct DeepCopy    {}; // For copying     constructors
+
+
 // A wrapper for blitz::Array::rank_; which did change from the CVS (where it used to be called _bz_rank) to the Mercurial version.
 template<typename A>
 struct ArrayRankTraits;
 
+/** \cond */
+
 template<typename T, int RANK>
 struct ArrayRankTraits<blitz::Array<T,RANK> > : boost::mpl::int_<RANK> {};
 
-
-
-struct ShallowCopy {}; // For referencing constructors
-struct DeepCopy    {}; // For copying     constructors
 
 
 // The semantics of the "DeepCopy" of Array is different from blitz::Array in that the storage order is NOT copied but rather a user-specified (by default the C) storage order is applied in the copy. I believe it is more in line with the fact that usually the way we think about the storage in Array is the C way.
@@ -55,14 +58,15 @@ public:
 
 };
 
+/** \endcond */
 
 } // blitzplusplus
 
 
-#define TTD_DARRAY(r) blitz::Array<double,r>
+/// An array of doubles of arbitrary arity
+template <int RANK> using DArray=blitz::Array<double,RANK>;
 
-#define TTD_CARRAY(r) blitz::Array<dcomp ,r>
-// TTD stands for "template typedef"
-
+/// A complex array of arbitrary arity
+template <int RANK> using CArray=blitz::Array<dcomp ,RANK>;
 
 #endif // UTILS_INCLUDE_BLITZARRAY_H_INCLUDED

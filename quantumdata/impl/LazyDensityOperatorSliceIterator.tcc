@@ -186,7 +186,7 @@ private:
     typedef typename BASI::CARes DensityOperatorLowRes;
 
     typedef typename MII::IdxTiny IdxTinyHalf;
-    typedef typename TTD_IDXTINY(2*blitzplusplus::TinyVectorLengthTraits<IdxTinyHalf>::value) IdxTiny;
+    typedef IdxTiny<2*blitzplusplus::TinyVectorLengthTraits<IdxTinyHalf>::value> IdxTiny;
 
     DI_DO_Impl(const DensityOperator<RANK>& rho, Begin)
       : mii_(ctorHelper<false>(rho)), densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()
@@ -203,12 +203,12 @@ private:
     template<bool IS_END>
     static MII ctorHelper(const DensityOperator<RANK>& rho)
     {
-      using blitzplusplus::basi::details::FilterOut;
+      using blitzplusplus::basi::filterOut;
       using blitzplusplus::halfCutTiny;
       
-      return MII(FilterOut<RANK,V>(halfCutTiny(rho().lbound())),
-                FilterOut<RANK,V>(halfCutTiny(rho().ubound())),
-                mpl::bool_<IS_END>());
+      return MII(filterOut<RANK,V>(halfCutTiny(rho().lbound())),
+                 filterOut<RANK,V>(halfCutTiny(rho().ubound())),
+                 mpl::bool_<IS_END>());
     }
 
     void doIncrement() {++mii_;}

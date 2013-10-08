@@ -40,8 +40,8 @@ using namespace trajectory;
 // #include<cmath>
 // #include<iostream>
 
-typedef TTD_CARRAY(1) CA1D;
-typedef TTD_DARRAY(1) DA1D;
+typedef CArray<1> CA1D;
+typedef DArray<1> DA1D;
 
 void derivs(double tau, const CA1D& yA, CA1D& dydtA, const dcomp& Z)
 {

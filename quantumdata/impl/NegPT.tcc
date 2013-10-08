@@ -45,7 +45,7 @@ double negPT(const DensityOperator<RANK>& rho, V)
 
   DensityOperatorLow rhoDeepPT(rhoShallowPT.shape()); rhoDeepPT=rhoShallowPT;
 
-  TTD_CARRAY(1) eigenValues(rho.getTotalDimension());
+  CArray<1> eigenValues(rho.getTotalDimension());
 
   {
     GeMatrix a(matrix<RowMajor>(rhoDeepPT));

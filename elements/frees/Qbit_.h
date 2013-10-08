@@ -13,6 +13,8 @@
 
 namespace qbit {
 
+using mode::NoTime;
+
 const std::string keyTitle="Qbit";
 
 
@@ -25,8 +27,8 @@ public:
   Averaged();
 
 private:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&                 ) const {}
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&                 ) const {}
 
 };
 
@@ -86,8 +88,8 @@ public:
 
 
 
-template<bool IS_TD>
-class Hamiltonian : public mode::Hamiltonian<IS_TD>
+template<bool IS_TIME_DEPENDENT>
+class Hamiltonian : public mode::Hamiltonian<IS_TIME_DEPENDENT>
 {
 public:
   Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta)
@@ -108,7 +110,7 @@ protected:
 };
 
 
-class LiouvilleanPhaseNoise : public structure::ElementLiouvillean<1,2>
+class LiouvilleanPhaseNoise : public structure::ElementLiouvilleanStrategies<1,2>
 {
 protected:
   LiouvilleanPhaseNoise(double gamma_perpendicular, double gamma_parallel);

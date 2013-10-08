@@ -33,7 +33,7 @@ namespace details {
 template<int TWO_TIMES_RANK>
 inline
 void
-hermitianConjugateSelf(TTD_CARRAY(TWO_TIMES_RANK)& array) 
+hermitianConjugateSelf(CArray<TWO_TIMES_RANK>& array) 
 {
   BOOST_STATIC_ASSERT( tmptools::IsEvenAssert<TWO_TIMES_RANK>::value );
   array=conj(array); 
@@ -43,11 +43,11 @@ hermitianConjugateSelf(TTD_CARRAY(TWO_TIMES_RANK)& array)
 
 template<int TWO_TIMES_RANK>
 inline
-const TTD_CARRAY(TWO_TIMES_RANK)
-hermitianConjugate(const TTD_CARRAY(TWO_TIMES_RANK)& array)
+const CArray<TWO_TIMES_RANK>
+hermitianConjugate(const CArray<TWO_TIMES_RANK>& array)
 {
   BOOST_STATIC_ASSERT( tmptools::IsEvenAssert<TWO_TIMES_RANK>::value );
-  TTD_CARRAY(TWO_TIMES_RANK) res(conj(array));
+  CArray<TWO_TIMES_RANK> res(conj(array));
   details::helpHermitianConjugate(res);
   return res;
 }
@@ -68,11 +68,11 @@ const bool addition=false;
 
 
 template<bool IS_MULTIPLICATION, int RANK1, int RANK2>
-const TTD_CARRAY(RANK1+RANK2)
-doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2)
+const CArray<RANK1+RANK2>
+doDirect(const CArray<RANK1>& array1, const CArray<RANK2>& array2)
 {
   using namespace linalg;
-  TTD_CARRAY(RANK1+RANK2) res(concatenateTinies(array1.shape(),array2.shape()));
+  CArray<RANK1+RANK2> res(concatenateTinies(array1.shape(),array2.shape()));
   if (res.data()) {
     CVector r1array1(unaryArray(array1));
     CVector r1array2(unaryArray(array2));
@@ -100,7 +100,7 @@ doDirect(const TTD_CARRAY(RANK1)& array1, const TTD_CARRAY(RANK2)& array2)
 #define HCH_print(z,m,unused) m ,
 
 inline void 
-helpHermitianConjugate(TTD_CARRAY(ITERT2)& array)
+helpHermitianConjugate(CArray<ITERT2>& array)
 {
   array.transposeSelf(BOOST_PP_REPEAT_FROM_TO(ITER,ITERT2,HCH_print,~) BOOST_PP_ENUM_PARAMS(ITER,));
 }

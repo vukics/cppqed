@@ -2,15 +2,13 @@
 
 #include "ParsQbit.h"
 #include "impl/StateVector.tcc"
+#include "impl/ElementLiouvillean.tcc"
 
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
 
 
-using namespace std;
-using namespace boost;
-using namespace assign;
-using namespace mathutils;
+using namespace mathutils; using boost::make_shared;
 
 
 namespace qbit {
@@ -22,12 +20,13 @@ namespace qbit {
 //
 ///////////
 
+
 Averaged::Averaged() 
-  : Base(keyTitle,list_of("rho00")("rho11")("real(rho10=<sigma>)")("imag(\")"))
+  : Base(keyTitle,{"rho00","rho11","real(rho10=<sigma>)","imag(\")"})
 {
 }
 
-const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   Averages averages(4);
   averages=matrix(0),matrix(1),real(matrix(1,0)),imag(matrix(1,0));
@@ -63,10 +62,10 @@ double dummyProba(const qbit::LazyDensityOperator&)
 
 
 LiouvilleanPhaseNoise::LiouvilleanPhaseNoise(double gamma_perpendicular, double gamma_parallel) 
-  : structure::ElementLiouvillean<1,2>(JumpStrategies(bind(sigmaJump  ,_1,gamma_perpendicular),
-                                                      bind(sigma_zJump,_1,gamma_parallel)),
-                                       JumpProbabilityStrategies(dummyProba),
-                                       "LossyQbitWithPhaseNoise",list_of("excitation loss")("phase noise"))
+  : structure::ElementLiouvilleanStrategies<1,2>(JumpStrategies(bind(sigmaJump  ,_1,gamma_perpendicular),
+                                                                bind(sigma_zJump,_1,gamma_parallel)),
+                                                 JumpRateStrategies(dummyProba),
+                                                 "LossyQbitWithPhaseNoise",{"excitation loss","phase noise"})
 {}
 
 } // qbit
@@ -217,9 +216,9 @@ Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :
-    return make_shared<PumpedLossyQbit   >(p);
+    return boost::make_shared<PumpedLossyQbit   >(p);
   case QMP_UIP :
-    return make_shared<PumpedLossyQbitUIP>(p);
+    return boost::make_shared<PumpedLossyQbitUIP>(p);
   case QMP_SCH :
     ;
   }

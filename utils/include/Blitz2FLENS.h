@@ -48,7 +48,7 @@ const typename GeMatrixMF<T,SO>::type matrix(const blitz::Array<T,TWO_TIMES_RANK
 
 
 template<StorageOrder SO, int TWO_TIMES_RANK>
-const typename HeMatrixMF<SO>::type hermitianMatrix(const TTD_CARRAY(TWO_TIMES_RANK)&);
+const typename HeMatrixMF<SO>::type hermitianMatrix(const CArray<TWO_TIMES_RANK>&);
 
 
 } // blitz2flens

@@ -6,7 +6,8 @@
 
 #include "ParsMCWF_Trajectory.h"
 
-#include "StateVector.h"
+#include "impl/StateVector.tcc"
+
 #include "impl/StochasticTrajectory.tcc"
 #include "Structure.h"
 
@@ -54,12 +55,12 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     psi_(psi),
     qs_(cpputils::sharedPointerize(sys),Base::noise()),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
-    logger_(p.logLevel,qs_.getHa(),qs_.template nAvr<structure::LA_Li>())
+    logger_(p.logLevel,qs_.getHa()!=0,qs_.template nAvr<structure::LA_Li>())
 {
   if (psi!=*qs_.getQS()) throw DimensionalityMismatchException();
   if (!getTime()) if(const typename Liouvillean::Ptr li=qs_.getLi()) { // On startup, dpLimit should not be overshot, either.
-    DpOverDtSet dpOverDtSet(li->average(0.,psi_)); calculateDpOverDtSpecialSet(&dpOverDtSet,0.);
-    manageTimeStep(dpOverDtSet,getEvolved().get(),false);
+    Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
+    manageTimeStep(rates,getEvolved().get(),false);
   }
 }
 
@@ -93,7 +94,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   double t=getTime();
 
   if (const typename Exact::Ptr ex=qs_.getEx()) {
-    ex->actWithU(getDtDid(),psi_());
+    ex->actWithU(getTime(),psi_(),tIntPic0_);
     tIntPic0_=t;
   }
 
@@ -105,39 +106,39 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
 
 template<int RANK>
 const typename MCWF_Trajectory<RANK>::IndexSVL_tuples
-MCWF_Trajectory<RANK>::calculateDpOverDtSpecialSet(DpOverDtSet* dpOverDtSet, double t) const
+MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const
 {
   IndexSVL_tuples res;
-  for (int i=0; i<dpOverDtSet->size(); i++)
-    if ((*dpOverDtSet)(i)<0) {
+  for (int i=0; i<rates->size(); i++)
+    if ((*rates)(i)<0) {
       StateVector psiTemp(psi_);
       qs_.actWithJ(t,psiTemp(),i);
       res.push_back(IndexSVL_tuple(i,psiTemp()));
-      (*dpOverDtSet)(i)=mathutils::sqr(psiTemp.renorm());
+      (*rates)(i)=mathutils::sqr(psiTemp.renorm());
     } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the StateVectorLow in the tuple
   return res;
 }
 
 
 template<int RANK>
-bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolved::TimeStepBookkeeper* evolvedCache, bool logControl)
+bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStepBookkeeper* evolvedCache, bool logControl)
 {
-  const double dpOverDt=boost::accumulate(dpOverDtSet,0.);
+  const double totalRate=boost::accumulate(rates,0.);
   const double dtDid=getDtDid(), dtTry=getDtTry();
 
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
-  if (dpOverDt*dtDid>overshootTolerance_*dpLimit_) {
-    evolvedCache->setDtTry(dpLimit_/dpOverDt);
+  if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
+    evolvedCache->setDtTry(dpLimit_/totalRate);
     (*getEvolved())=*evolvedCache;
-    logger_.stepBack(dpOverDt*dtDid,dtDid,getDtTry(),getTime(),logControl);
+    logger_.stepBack(totalRate*dtDid,dtDid,getDtTry(),getTime(),logControl);
     return true; // Step-back required.
   }
-  else if (dpOverDt*dtTry>dpLimit_) {
-    logger_.overshot(dpOverDt*dtTry,dtTry,getDtTry(),logControl);
+  else if (totalRate*dtTry>dpLimit_) {
+    logger_.overshot(totalRate*dtTry,dtTry,getDtTry(),logControl);
   }
 
   { // dtTry-adjustment for next step:
-    const double liouvilleanSuggestedDtTry=dpLimit_/dpOverDt;
+    const double liouvilleanSuggestedDtTry=dpLimit_/totalRate;
     getEvolved()->setDtTry(qs_.getHa() ? std::min(getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
   }
 
@@ -146,12 +147,12 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const DpOverDtSet& dpOverDtSet, evolv
 
 
 template<int RANK>
-void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const IndexSVL_tuples& dpOverDtSpecialSet, double t)
+void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, double t)
 {
   double random=(*getRandomized())()/getDtDid();
 
   int jumpNo=0;
-  for (; random>0 && jumpNo!=dpOverDtSet.size(); random-=dpOverDtSet(jumpNo++))
+  for (; random>0 && jumpNo!=rates.size(); random-=rates(jumpNo++))
     ;
 
   if(random<0) { // Jump No. jumpNo-1 occurs
@@ -160,14 +161,14 @@ void MCWF_Trajectory<RANK>::performJump(const DpOverDtSet& dpOverDtSet, const In
       static bool p(int i, IndexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
     };
 
-    typename IndexSVL_tuples::const_iterator i(find_if(dpOverDtSpecialSet,bind(&helper::p,--jumpNo,_1))); // See whether it's a special jump
-    if (i!=dpOverDtSpecialSet.end())
+    auto i=find_if(specialRates,bind(&helper::p,--jumpNo,_1)); // See whether it's a special jump
+    if (i!=specialRates.end())
       // special jump
       psi_()=i->template get<1>(); // RHS already normalized above
     else {
       // normal  jump
       qs_.actWithJ(t,psi_(),jumpNo);
-      double normFactor=sqrt(dpOverDtSet(jumpNo));
+      double normFactor=sqrt(rates(jumpNo));
       if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
       psi_()/=normFactor;
     }
@@ -187,18 +188,18 @@ void MCWF_Trajectory<RANK>::step_v(double Dt)
 
   if (const typename Liouvillean::Ptr li=qs_.getLi()) {
 
-    DpOverDtSet dpOverDtSet(li->average(t,psi_));
-    IndexSVL_tuples dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
+    Rates rates(li->rates(t,psi_));
+    IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
 
-    while (manageTimeStep(dpOverDtSet,&evolvedCache)) {
+    while (manageTimeStep(rates,&evolvedCache)) {
       psi_()=psiCache;
       t=coherentTimeDevelopment(Dt); // the next try
-      dpOverDtSet=li->average(t,psi_);
-      dpOverDtSpecialSet=calculateDpOverDtSpecialSet(&dpOverDtSet,t);
+      rates=li->rates(t,psi_);
+      specialRates=calculateSpecialRates(&rates,t);
     }
 
     // Jump
-    performJump(dpOverDtSet,dpOverDtSpecialSet,t);
+    performJump(rates,specialRates,t);
 
   }
 
@@ -222,9 +223,9 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
     }
     os<<"# Alternative jumps: ";
     {
-      const DpOverDtSet dpOverDtSet(li->average(0,psi_));
+      const Rates rates(li->rates(0,psi_));
       int n=0;
-      for (int i=0; i<dpOverDtSet.size(); i++) if (dpOverDtSet(i)<0) {os<<i<<' '; n++;}
+      for (int i=0; i<rates.size(); i++) if (rates(i)<0) {os<<i<<' '; n++;}
       if (!n) os<<"none";
     }
     os<<endl;

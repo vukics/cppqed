@@ -11,12 +11,10 @@ using cpputils::sharedPointerize;
 
 
 ModeCorrelations::ModeCorrelations()
-  : EA_Base(
-	    "ModeCorrelations",
-	    list_of("<a number operator>")("VAR(a number operator)")("real(<a>)")("imag(\")")("<X^2>-<X>^2")("<Y^2>-<Y>^2")("<(XY+YX)/2>-<X><Y>")
-		   ("<b number operator>")("VAR(b number operator)")("real(<b>)")("imag(\")")("<Q^2>-<Q>^2")("<P^2>-<P>^2")("<(QP+PQ)/2>-<Q><P>")
-		   ("<XQ>-<X><Q>")("<XP>-<X><P>")("<YQ>-<Y><Q>")("<YP>-<Y><P>")
-	    ),
+  : EA_Base("ModeCorrelations",{"<a number operator>","VAR(a number operator)","real(<a>)","imag(\")","<X^2>-<X>^2","<Y^2>-<Y>^2","<(XY+YX)/2>-<X><Y>",
+                                "<b number operator>","VAR(b number operator)","real(<b>)","imag(\")","<Q^2>-<Q>^2","<P^2>-<P>^2","<(QP+PQ)/2>-<Q><P>",
+                                "<XQ>-<X><Q>","<XP>-<X><P>","<YQ>-<Y><Q>","<YP>-<Y><P>"}
+           ),
     averagedMode_()
 {
 }
@@ -30,7 +28,7 @@ namespace {
 
 
 const ModeCorrelations::Averages
-ModeCorrelations::average_v(const LazyDensityOperator& matrix) const
+ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
 {
   using quantumdata::partialTrace;
   typedef LazyDensityOperator::Idx Idx;
@@ -50,14 +48,14 @@ ModeCorrelations::average_v(const LazyDensityOperator& matrix) const
 
   for (int n=0; n<int(matrix.getDimension(0)); n++) for (int m=1; m<int(matrix.getDimension(1)); m++) {
       if(n<int(matrix.getDimension(0))-1) {
-	dcomp temp=sqrt(m*(n+1))*matrix(Idx(n,m),Idx(n+1,m-1));
-	averages(14)+=real(temp);
-	averages(15)+=imag(temp);
+        dcomp temp=sqrt(m*(n+1))*matrix(Idx(n,m),Idx(n+1,m-1));
+        averages(14)+=real(temp);
+        averages(15)+=imag(temp);
       }
       if(n>0) {
-	dcomp temp=sqrt(m*n)*matrix(Idx(n,m),Idx(n-1,m-1));
-	averages(16)+=real(temp);
-	averages(17)+=imag(temp);
+        dcomp temp=sqrt(m*n)*matrix(Idx(n,m),Idx(n-1,m-1));
+        averages(16)+=real(temp);
+        averages(17)+=imag(temp);
       }
     }
 

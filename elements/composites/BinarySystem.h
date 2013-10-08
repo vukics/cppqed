@@ -32,7 +32,7 @@ typedef composite::SubSystemsInteraction<2> SSI;
 
 
 template<structure::LiouvilleanAveragedTag>
-void displayKey(std::ostream& , size_t&, const SSF& free0, const SSF& free1, const SSI& ia);
+std::ostream& displayKey(std::ostream&, size_t&, const SSF& free0, const SSF& free1, const SSI& ia);
 
 template<structure::LiouvilleanAveragedTag>
 size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia);
@@ -59,11 +59,11 @@ private:
   double         highestFrequency_v(             ) const;
   std::ostream& displayParameters_v(std::ostream&) const;
 
-  size_t            nAvr_v()                                          const {return binary::nAvr      <structure::LA_Av>(      free0_,free1_,ia_       );}
-  const Averages average_v(double t, const LazyDensityOperator& ldo)  const {return binary::average   <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}
-  void           process_v(Averages&)                                 const;
-  void           display_v(const Averages&, std::ostream&, int)       const;
-  void        displayKey_v(std::ostream& os, size_t& i)               const {       binary::displayKey<structure::LA_Av>(os,i, free0_,free1_,ia_       );}
+  size_t              nAvr_v()                                          const {return binary::nAvr      <structure::LA_Av>(      free0_,free1_,ia_       );}
+  const Averages   average_v(double t, const LazyDensityOperator& ldo)  const {return binary::average   <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}
+  void             process_v(Averages&)                                 const;
+  void             display_v(const Averages&, std::ostream&, int)       const;
+  std::ostream& displayKey_v(std::ostream& os, size_t& i)               const {return binary::displayKey<structure::LA_Av>(os,i, free0_,free1_,ia_       );}
 
   const SSF free0_, free1_;
 
@@ -74,15 +74,15 @@ private:
 
 #define CLASS_HEADER(Class) class Class : public structure::Class<2>
 
-#define CLASS_BODY_PART(Class,Aux) public:				\
-  typedef structure::Class<1> Aux##1;					\
-  typedef structure::Class<2> Aux##2;					\
-									\
+#define CLASS_BODY_PART(Class,Aux) public:                                   \
+  typedef structure::Class<1> Aux##1;                                        \
+  typedef structure::Class<2> Aux##2;                                        \
+                                                                             \
   Class(const SSF& free0, const SSF& free1, const SSI& ia) : free0_(free0), free1_(free1), ia_(ia) {} \
-									\
-private:								\
-  const SSF &free0_, &free1_;						\
-  const SSI &ia_;							\
+                                                                             \
+private:                                                                     \
+  const SSF &free0_, &free1_;                                                \
+  const SSI &ia_;                                                            \
 
 
 
@@ -92,7 +92,7 @@ CLASS_HEADER(Exact)
 
   bool isUnitary_v() const;
 
-  void  actWithU_v(double, StateVectorLow&) const;
+  void  actWithU_v(double, StateVectorLow&, double) const;
 
 };
 
@@ -112,9 +112,9 @@ CLASS_HEADER(Liouvillean)
 
   void                     actWithJ_v(double, StateVectorLow&, size_t)    const;
 
-  void             displayKey_v(std::ostream& os, size_t& i             ) const {       binary::displayKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
-  size_t                 nAvr_v(                                        ) const {return binary::nAvr      <structure::LA_Li>(      free0_,free1_,ia_);}
-  const Probabilities average_v(double t, const LazyDensityOperator& ldo) const {return binary::average   <structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i             ) const {return binary::displayKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
+  size_t              nAvr_v(                                        ) const {return binary::nAvr      <structure::LA_Li>(      free0_,free1_,ia_);}
+  const Rates      average_v(double t, const LazyDensityOperator& ldo) const {return binary::average   <structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
 
 };
 

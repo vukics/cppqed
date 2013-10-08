@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFileDefault
 #ifndef   STRUCTURE_LIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
 #define   STRUCTURE_LIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
 
@@ -14,9 +15,13 @@
 
 namespace structure {
 
+/// Enumeration describing a (compile-time) choice between Liouvillean & Averaged
+enum LiouvilleanAveragedTag {
+  LA_Li, ///< Liouvillean
+  LA_Av  ///< Averaged
+};
 
-enum LiouvilleanAveragedTag {LA_Li, LA_Av};
-
+/// A tagging struct corresponding to LiouvilleanAveragedTag
 template<LiouvilleanAveragedTag>
 struct LiouvilleanAveragedTag_ {LiouvilleanAveragedTag_() {}};
 
@@ -26,30 +31,40 @@ typedef LiouvilleanAveragedTag_<LA_Av> LA_Av_tagType;
 const LA_Li_tagType LA_Li_tag;
 const LA_Av_tagType LA_Av_tag;
 
-  
+
+/// The template-parameter independent part of LiouvilleanAveragedCommonRanked
 class LiouvilleanAveragedCommon
 {
 public:
   typedef boost::shared_ptr<const LiouvilleanAveragedCommon> Ptr;
 
-  typedef TTD_DARRAY(1) DArray1D;
+  typedef DArray<1> DArray1D; ///< A 1D real array storing the quantum averages – even if they are complex, their real & imaginary parts must be stored separately as reals
 
   virtual ~LiouvilleanAveragedCommon() {}
 
-  // For a  Liouvillean, the key is a description of decay channels, for an Averaged, it describes the displayed columns
-  void displayKey(std::ostream& o, size_t& i) const {displayKey_v(o,i);}
+  /// Displays a key (a.k.a. legend)
+  /**
+   * - for a  Liouvillean, the key is a description of decay channels,
+   * - for an Averaged, it describes the displayed columns
+   */
+  std::ostream& displayKey(std::ostream& o, size_t& i) const {return displayKey_v(o,i);}
 
-  // For a Liouvillean, nAvr is the number of jump probabilities
+  /// Returns the number of calculated quantum averages
+  /**
+   * - for a Liouvillean the quantum averages are the jump rates
+   * - for an Averaged, they are the quantum averages calculated for display
+   */
   size_t nAvr() const {return nAvr_v();}
   
 private:
-  virtual void   displayKey_v(std::ostream&, size_t&) const = 0;
-  virtual size_t       nAvr_v(                      ) const = 0;
+  virtual std::ostream& displayKey_v(std::ostream&, size_t&) const = 0;
+  virtual size_t        nAvr_v      (                      ) const = 0;
 
 
 };
 
 
+/// Exception for LiouvilleanAveragedCommonRanked::average
 struct AveragesNumberMismatchException : cpputils::Exception
 {
   AveragesNumberMismatchException(int size, size_t nAvr) {std::cerr<<size<<' '<<nAvr<<std::endl;}
@@ -57,9 +72,12 @@ struct AveragesNumberMismatchException : cpputils::Exception
 };
 
 
+/// Exception for LiouvilleanAveragedCommonRanked::average
 struct InfiniteDetectedException : cpputils::Exception {};
 
 
+/// Common functionality of Liouvillean & Averaged
+/** \tparamRANK */
 template<int RANK>
 class LiouvilleanAveragedCommonRanked : public LiouvilleanAveragedCommon
 {
@@ -75,12 +93,22 @@ public:
   
   using LiouvilleanAveragedCommon::nAvr;
   
-  
-  const DArray1D average(double t, const LazyDensityOperator& matrix) const
+  /// Calculates quantum averages & checks post-conditions
+  /**
+   * \warning The elements of the returned array must have a linear dependence on `matrix`, in particular, they must be of the form \f$\Tr{\Ob_m\rho},\f$
+   * where \f$\Ob_m\f$ is a set of quantum operators defined on the Hilbert space of the system.
+   * 
+   * \throw AveragesNumberMismatchException if postcondition 1. is not met
+   * \throw InfiniteDetectedException if postcondition 2. is not met
+   * 
+   */
+  const DArray1D average(double t, ///< one or more of the operators whose quantum average is calculated, might be time-dependent
+                         const LazyDensityOperator& matrix /// the state of the quantum system
+                        ) const
   {
     const DArray1D averages(average_v(t,matrix));
-    if (size_t(averages.size())!=nAvr()) throw AveragesNumberMismatchException(averages.size(),nAvr());
-    if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException();
+    if (size_t(averages.size())!=nAvr()) throw AveragesNumberMismatchException(averages.size(),nAvr()); /// \post 1.: number of averages must equal LiouvilleanAveragedCommon::nAvr
+    if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException(); /// \post 2.: all quantum averages must be finite
 
     return averages;
   }

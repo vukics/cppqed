@@ -12,7 +12,7 @@ using namespace cpputils  ;
 using namespace trajectory;
 using namespace qbit      ;
 
-typedef TTD_DARRAY(1) Array;
+typedef DArray<1> Array;
 
 void derivs(double, const Array& b, Array& dbdt, const ParsPumpedLossy& p)
 {

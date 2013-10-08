@@ -6,7 +6,7 @@
 using namespace trajectory;
 using namespace mode      ;
 
-typedef TTD_CARRAY(1) Array;
+typedef CArray<1> Array;
 
 void derivs(double t, const Array& b, Array& dbdt, const ParsBichromatic& p)
 {

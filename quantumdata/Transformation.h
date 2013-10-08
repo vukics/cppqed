@@ -21,6 +21,8 @@
 
 namespace quantumdata {
 
+
+/// Comprises tools for metric transformations of NonOrthogonalStateVector and NonOrthogonalDensityOperator classes.
 namespace transformation {
 
 
@@ -65,12 +67,12 @@ struct Traits<Identity<RANK> > : ElementaryTraits<Identity<RANK> >
 // ... Transformations described by (multi)matrices:
 
 template<int TWO_TIMES_RANK>
-struct Traits<TTD_CARRAY(TWO_TIMES_RANK)> : ElementaryTraits<TTD_CARRAY(TWO_TIMES_RANK)>
+struct Traits<CArray<TWO_TIMES_RANK> > : ElementaryTraits<CArray<TWO_TIMES_RANK> >
 {
   static const int N_RANK=TWO_TIMES_RANK/2;
 
   typedef typename Types<N_RANK>::StateVectorLow StateVectorLow;
-  static void transform(const TTD_CARRAY(TWO_TIMES_RANK)& trafo, const StateVectorLow& in, StateVectorLow& out);
+  static void transform(const CArray<TWO_TIMES_RANK>& trafo, const StateVectorLow& in, StateVectorLow& out);
 
 };
 
@@ -78,8 +80,8 @@ struct Traits<TTD_CARRAY(TWO_TIMES_RANK)> : ElementaryTraits<TTD_CARRAY(TWO_TIME
 // ... Transformations described by functions of the appropriate signature:
 
 template<int RANK>
-struct Traits< void(*)(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&) > 
-  : ElementaryTraits< void(*)(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&) >
+struct Traits< void(*)(const CArray<RANK>&, CArray<RANK>&) > 
+  : ElementaryTraits< void(*)(const CArray<RANK>&, CArray<RANK>&) >
 {
   static const int N_RANK=RANK;
 
@@ -96,8 +98,8 @@ struct Traits< void(*)(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&) >
 // ... Transformations described by functors of the appropriate signature:
 
 template<int RANK>
-struct Traits<boost::function<void(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&)> > 
-  : ElementaryTraits<boost::function<void(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&)> >
+struct Traits<boost::function<void(const CArray<RANK>&, CArray<RANK>&)> > 
+  : ElementaryTraits<boost::function<void(const CArray<RANK>&, CArray<RANK>&)> >
 {
   static const int N_RANK=RANK;
 
@@ -105,7 +107,7 @@ struct Traits<boost::function<void(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&)> 
 
   typedef void(*TRAFO)(const StateVectorLow&, StateVectorLow&);
 
-  typedef boost::function<void(const TTD_CARRAY(RANK)&, TTD_CARRAY(RANK)&)> TRAFO;
+  typedef boost::function<void(const CArray<RANK>&, CArray<RANK>&)> TRAFO;
 
   static void transform(TRAFO trafo, const StateVectorLow& in, StateVectorLow& out) {trafo(in,out);}
 

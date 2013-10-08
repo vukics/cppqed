@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
       e.evolve(m.getTime()-e.getTime());
       cout<<m.getTime()<<'\t'<<e.getDtDid()<<'\t';
     }
-    for (vector<size_t>::const_iterator i=sections.begin(); i!=sections.begin()+nSections; ++i) {
+    for (auto i : sections) {
       double avr=0;
       size_t nTrajCurrent=*i;
       for (size_t begin=0; begin<pe.nTraj; begin+=nTrajCurrent)

@@ -69,7 +69,7 @@ AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
 
 
 template<typename Base>
-const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average_v(const LazyDensityOperator& matrix) const
+const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   const Averages averagesFromBase(Base::average_v(matrix));
   Averages averages(averagesFromBase.size()+1);
