@@ -6,7 +6,8 @@
 
 #include "ParsMCWF_Trajectory.h"
 
-#include "StateVector.h"
+#include "impl/StateVector.tcc"
+
 #include "impl/StochasticTrajectory.tcc"
 #include "Structure.h"
 

@@ -4,6 +4,8 @@
 
 #include "StateVector.h"
 
+#include "impl/DensityOperator.tcc"
+
 #include "impl/ComplexArrayExtensions.tcc"
 
 namespace quantumdata {

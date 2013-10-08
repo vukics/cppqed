@@ -139,7 +139,7 @@ public:
   StateVector& operator+=(const StateVector& psi) {ABase::operator+=(psi); return *this;}
   StateVector& operator-=(const StateVector& psi) {ABase::operator-=(psi); return *this;}
 
-  const StateVector operator-() const {return -operator()();}
+  const StateVector operator-() const {StateVector res(this->getDimensions(),false); res()=-this->operator()(); return res;}
   const StateVector operator+() const {return *this;} // deep copy
   //@}
 

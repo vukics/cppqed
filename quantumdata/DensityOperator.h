@@ -109,7 +109,7 @@ public:
   DensityOperator& operator+=(const DensityOperator& rho) {ABase::operator+=(rho); return *this;}
   DensityOperator& operator-=(const DensityOperator& rho) {ABase::operator-=(rho); return *this;}
 
-  const DensityOperator operator-() const {return DensityOperator(-operator()());}
+  const DensityOperator operator-() const {DensityOperator res(this->getDimensions(),false); res()=-this->operator()(); return res;}
   const DensityOperator operator+() const {return *this;}
 
   template<typename OTHER>
