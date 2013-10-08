@@ -316,12 +316,12 @@ template<typename VA>
 class composite::Exact<VA>::ActWithU
 {
 public:
-  ActWithU(const Frees& frees, double dtdid, StateVectorLow& psi) : frees_(frees), dtdid_(dtdid), psi_(psi) {}
+  ActWithU(const Frees& frees, double t, StateVectorLow& psi, double t0) : frees_(frees), t_(t), t0_(t0), psi_(psi) {}
 
   template<typename Vec, typename Ex>
   void help(typename Ex::Ptr ex) const
   {
-    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,dtdid_,::_1));
+    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,t_,::_1,t0_));
     // namespace qualification :: is necessary because otherwise :: and mpl:: are equally good matches.
   }
 
@@ -330,16 +330,16 @@ public:
 private:
   const Frees& frees_;
 
-  const double dtdid_;
+  const double t_, t0_;
   StateVectorLow& psi_; 
 
 };
 
 
 template<typename VA>
-void composite::Exact<VA>::actWithU_v(double dtdid, StateVectorLow& psi) const
+void composite::Exact<VA>::actWithU_v(double t, StateVectorLow& psi, double t0) const
 {
-  CALL_composite_worker( ActWithU(frees_,dtdid,psi) ) ;
+  CALL_composite_worker( ActWithU(frees_,t,psi,t0) ) ;
 }
 
 
@@ -421,9 +421,9 @@ private:
 
 
 template<typename VA> template<structure::LiouvilleanAveragedTag LA>
-void composite::Base<VA>::displayKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
+std::ostream& composite::Base<VA>::displayKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
 {
-  worker<Ordinals>(acts,DisplayKey<LA>(frees,os,i));
+  worker<Ordinals>(acts,DisplayKey<LA>(frees,os,i)); return os;
 }
 
 
@@ -689,16 +689,14 @@ public:
   template<typename Act>
   result_type operator()(result_type sc, const Act& act)
   {
-    using namespace structure;
-    const DynamicsBase::Ptr ia=act.get();
-    return sc || result_type(qse<Act::N_RANK>(ia),qsh<Act::N_RANK>(ia),qsl<Act::N_RANK>(ia));
+    return sc || result_type(act.getEx()!=0,act.getHa()!=0,act.getLi()!=0);
   }
 
   template<typename T>
   void operator()(T) const
   {
-    const structure::QuantumSystem<1>::Ptr free=frees_(T::value).get();
-    sc_|=result_type(qse(free),qsh(free),qsl(free));
+    const SubSystemFree& free=frees_(T::value);
+    sc_|=result_type(free.getEx()!=0,free.getHa()!=0,free.getLi()!=0);
   }
 
 private:

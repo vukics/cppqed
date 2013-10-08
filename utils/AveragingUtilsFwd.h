@@ -8,10 +8,10 @@ class ReducedDensityOperator;
 
 namespace averagingUtils {
   
-template<int, bool IS_TD=false>
+template<int, bool IS_TIME_DEPENDENT=false>
 class Collecting;
 
-template<int, int, bool IS_TD>
+template<int, int, bool IS_TIME_DEPENDENT>
 class Transferring;
 
 } // averagingUtils

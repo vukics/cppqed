@@ -53,7 +53,7 @@ Exact<NL>::updateU(double dtdid) const
 {
   using namespace std;
   dcomp (*dcompExp)(const dcomp&)=&exp;
-  boost::transform(zIs_,getFactors().begin(),bll::bind(dcompExp,-dtdid*bll::_1));
+  boost::transform(zIs_,getDiagonal().begin(),bll::bind(dcompExp,-dtdid*bll::_1));
 }
 
 
@@ -66,11 +66,11 @@ Exact<NL>::isUnitary_v() const
   // using namespace lambda;
 
   return !accumulate(
-		     boost::make_transform_iterator(zIs_.begin(),hasRealPart),
-		     boost::make_transform_iterator(zIs_.end  (),hasRealPart),
-		     false,
-		     bll::_1 || bll::_2 //logical_or<bool>()
-		     );
+                     boost::make_transform_iterator(zIs_.begin(),hasRealPart),
+                     boost::make_transform_iterator(zIs_.end  (),hasRealPart),
+                     false,
+                     bll::_1 || bll::_2 //logical_or<bool>()
+                     );
 }
 
 
@@ -173,7 +173,7 @@ Liouvillean<NL,VL>::jumpStrategy(StateVectorLow& psi) const
 
 template<int NL, typename VL> template<int N>
 double
-Liouvillean<NL,VL>::jumpProbabilityStrategy(const LazyDensityOperator& matrix) const
+Liouvillean<NL,VL>::jumpRateStrategy(const LazyDensityOperator& matrix) const
 {
   typedef typename mpl::at_c<VL, N>::type Decay;
   return 2.*boost::fusion::at_c<N>(gammas_).get()*matrix(Decay::second);
@@ -192,8 +192,8 @@ public:
   void operator()(T) const
   {
     jumpStrategies_(T::value)=bind(&Liouvillean::template jumpStrategy<T::value>,
-				   liouvillean_,
-				   _1);
+                                   liouvillean_,
+                                   _1);
   }
 
 private:
@@ -204,22 +204,22 @@ private:
 
 
 template<int NL, typename VL>
-class Liouvillean<NL,VL>::JPS_helper
+class Liouvillean<NL,VL>::JRS_helper
 {
 public:
-  JPS_helper(JumpProbabilityStrategies& jumpProbabilityStrategies, const Liouvillean* liouvillean)
-    : jumpProbabilityStrategies_(jumpProbabilityStrategies), liouvillean_(liouvillean) {}
+  JRS_helper(JumpRateStrategies& jumpRateStrategies, const Liouvillean* liouvillean)
+    : jumpRateStrategies_(jumpRateStrategies), liouvillean_(liouvillean) {}
 
   template<typename T>
   void operator()(T) const
   {
-    jumpProbabilityStrategies_(T::value)=bind(&Liouvillean::template jumpProbabilityStrategy<T::value>,
-					      liouvillean_,
-					      _1);
+    jumpRateStrategies_(T::value)=bind(&Liouvillean::template jumpRateStrategy<T::value>,
+                                       liouvillean_,
+                                       _1);
   }
 
 private:
-  JumpProbabilityStrategies& jumpProbabilityStrategies_;
+  JumpRateStrategies& jumpRateStrategies_;
   const Liouvillean* liouvillean_;
   
 };
@@ -237,11 +237,11 @@ Liouvillean<NL,VL>::fillJS() const
 
 
 template<int NL, typename VL>
-const typename Liouvillean<NL,VL>::JumpProbabilityStrategies
-Liouvillean<NL,VL>::fillJPS() const
+const typename Liouvillean<NL,VL>::JumpRateStrategies
+Liouvillean<NL,VL>::fillJRS() const
 {
-  typename Liouvillean::JumpProbabilityStrategies res;
-  mpl::for_each<tmptools::Ordinals<NLT> >(JPS_helper(res,this));
+  typename Liouvillean::JumpRateStrategies res;
+  mpl::for_each<tmptools::Ordinals<NLT> >(JRS_helper(res,this));
   return res;
 }
 
@@ -420,94 +420,3 @@ PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const
 
 #endif // ELEMENTS_FREES_IMPL_MULTILEVEL_TCC_INCLUDED
 
-
-
-/*
-namespace multilevel {
-
-
-template<int NL, typename VP>
-inline
-const HamiltonianIP<NL,VP>
-makeHamiltonianIP(const blitz::TinyVector<dcomp,NL>& zSchs, const blitz::TinyVector<dcomp,NL> zIs, const VP& etas
-		  )
-{
-  return HamiltonianIP<NL,VP>(zSchs,zIs,etas);
-}
-
-
-
-template<int NL, typename VP>
-inline
-const HamiltonianSch<NL,VP>
-makeHamiltonianSch(const blitz::TinyVector<dcomp,NL>& zSchs, const VP& etas)
-{
-  return HamiltonianSch<NL,VP>(zSchs,etas);
-}
-
-
-template<int NL, typename VL>
-inline
-const Liouvillean<NL,VL>
-makeLiouvillean(const VL& gammas)
-{
-  return Liouvillean<NL,VL>(gammas);
-}
-
-
-void foo()
-{
-  using namespace boost::fusion;
-
-  makeHamiltonianIP(
-		    LevelsMF<4>::type(dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2)),
-		    LevelsMF<4>::type(dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2)),
-		    make_list(
-			      Pump<3,2>(dcomp(1.,-.2)),
-			      Pump<3,1>(dcomp(1.,-.2))
-			      )
-		    );
-
-  makeHamiltonianSch(
-		     LevelsMF<4>::type(dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2)),
-		     make_list(
-			       Pump<3,2>(dcomp(1.,-.2)),
-			       Pump<3,1>(dcomp(1.,-.2))
-			       )
-		     );
-
-  makeLiouvillean(
-		  make_list(
-			    Decay<3,2>(-.2),
-			    Decay<3,1>(1.)
-			    )
-		  );
-
-}
-
-
-} // multilevel
-
-
-void foo()
-{
-  using namespace boost::fusion;
-  using namespace multilevel;
-
-  makePumpedLossyMultiLevelSch(
-			       LevelsMF<4>::type(dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2),dcomp(1.,-.2)),
-			       make_list(
-					 Pump<3,2>(dcomp(1.,-.2)),
-					 Pump<3,1>(dcomp(1.,-.2))
-					 ),
-			       make_list(
-					 Decay<3,2>(-.2),
-					 Decay<3,1>(1.)
-					 ),
-			       multilevel::EmptyBase<4>()
-			       );
-
-}
-
-  
-*/

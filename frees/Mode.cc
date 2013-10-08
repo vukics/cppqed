@@ -6,26 +6,24 @@
 
 #include "impl/TridiagonalHamiltonian.tcc"
 
-#include <boost/assign.hpp>
-#include <boost/bind.hpp>
+#include <boost/assign/list_inserter.hpp>
 
 
-using namespace std;
+using std::cout; using std::endl; using std::string;
 using namespace boost;
-using namespace assign;
 using namespace mathutils;
 
 
 namespace mode {
 
-#define MAKE_redirect return make<Averaged>(p,qmp)
+#define DEFINE_make_by_redirect(AUX) const Ptr make(const BOOST_PP_CAT(Pars,AUX) & p, QM_Picture qmp) {return make<Averaged>(p,qmp);}
 
-const Ptr make(const Pars           & p, QM_Picture qmp) {MAKE_redirect ;}
-const Ptr make(const ParsLossy      & p, QM_Picture qmp) {MAKE_redirect ;}
-const Ptr make(const ParsPumped     & p, QM_Picture qmp) {MAKE_redirect ;}
-const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp) {MAKE_redirect ;}
+DEFINE_make_by_redirect()
+DEFINE_make_by_redirect(Lossy)
+DEFINE_make_by_redirect(Pumped)
+DEFINE_make_by_redirect(PumpedLossy)
 
-#undef MAKE_redirect
+#undef DEFINE_make_by_redirect
 
 
 const Tridiagonal aop(size_t);
@@ -44,9 +42,9 @@ Exact::Exact(const dcomp& zI, size_t dim)
 }
 
 
-void Exact::updateU(double dtdid) const
+void Exact::updateU(Time t) const
 {
-  getFactors()=exp(-zI_*(dtdid*blitz::tensor::i));
+  getDiagonal()=exp(-zI_*(double(t)*blitz::tensor::i));
 }
 
 
@@ -124,24 +122,9 @@ void aJump   (StateVectorLow& psi, double kappa)
 }
 
 
-void aDagJump(StateVectorLow& psi, double kappa)
-{
-  double fact=sqrt(2.*kappa);
-  for (int n=psi.ubound(0); n>0; --n)
-    psi(n)=fact*sqrt(n)*psi(n-1);
-  psi(0)=0;
-}
-
-
-double aJumpProba   (const LazyDensityOperator& matrix, double kappa)
+double aJumpRate   (const LazyDensityOperator& matrix, double kappa)
 {
   return 2.*kappa*photonNumber(matrix);
-}
-
-
-double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
-{
-  return 2.*kappa*(photonNumber(matrix)+1.);
 }
 
 
@@ -149,36 +132,60 @@ double aDagJumpProba(const LazyDensityOperator& matrix, double kappa)
 
 
 Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
-  : Base(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
-                        bind(aDagJump,_1,kappa* nTh  )),
-         JumpProbabilityStrategies(bind(aJumpProba   ,_1,kappa*(nTh+1)),
-                                   bind(aDagJumpProba,_1,kappa* nTh  )),
-         kT,list_of("excitation loss")("excitation absorption"))
+  : Base(kT,{"excitation loss","excitation absorption"}), kappa_(kappa), nTh_(nTh)
 {
 }
 
+
+void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<0>) const
+{
+  aJump(psi,kappa_*(nTh_+1));
+}
+
+
+void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<1>) const
+{
+  double fact=sqrt(2.*kappa_*nTh_);
+  for (int n=psi.ubound(0); n>0; --n)
+    psi(n)=fact*sqrt(n)*psi(n-1);
+  psi(0)=0;
+}
+
+
+double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<0>) const
+{
+  return aJumpRate(matrix,kappa_*(nTh_+1));
+}
+
+
+double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<1>) const
+{
+  return 2.*kappa_*nTh_*(photonNumber(matrix)+1.);
+}
+
+
 template<>
-void Liouvillean<false,false>::doActWithJ(StateVectorLow& psi) const
+void Liouvillean<false,false>::doActWithJ(NoTime, StateVectorLow& psi) const
 {
   aJump(psi,kappa_);
 }
 
 template<>
-void Liouvillean<false,true>::doActWithJ(StateVectorLow& psi) const
+void Liouvillean<false,true >::doActWithJ(NoTime, StateVectorLow& psi) const
 {
   aJump(psi,kappa_);
 }
 
 
 template<>
-double Liouvillean<false,false>::probability(const LazyDensityOperator& matrix) const
+double Liouvillean<false,false>::rate(NoTime, const LazyDensityOperator& matrix) const
 {
-  return aJumpProba(matrix,kappa_);
+  return aJumpRate(matrix,kappa_);
 }
 
 
 template<>
-double Liouvillean<false,true>::probability(const LazyDensityOperator&) const
+double Liouvillean<false,true>::rate(NoTime, const LazyDensityOperator&) const
 {
   return -1;
 }
@@ -195,12 +202,9 @@ namespace {
 
 typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
 
-const KeyLabels Assemble(const KeyLabels& first,
-                         const KeyLabels& middle,
-                         const KeyLabels& last=KeyLabels()
-                         )
+const KeyLabels Assemble(const KeyLabels& first, const KeyLabels& middle, const KeyLabels& last=KeyLabels())
 {
-  KeyLabels res(first); push_back(res).range(middle).range(last);
+  KeyLabels res(first); boost::assign::push_back(res).range(middle).range(last);
   return res;
 }
 
@@ -209,12 +213,12 @@ const KeyLabels Assemble(const KeyLabels& first,
 
 Averaged::Averaged(const KeyLabels& follow, const KeyLabels& precede)
   : Base(keyTitle,
-         Assemble(precede,list_of("<number operator>")("VAR(number operator)")("real(<ladder operator>)")("imag(\")"),follow))
+         Assemble(precede,KeyLabels{"<number operator>","VAR(number operator)","real(<ladder operator>)","imag(\")"},follow))
 {
 }
 
 
-const Averaged::Averages Averaged::average_v(const LazyDensityOperator& matrix) const
+const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   Averages averages(4);
 
@@ -245,19 +249,18 @@ void Averaged::process_v(Averages& averages) const
 
 
 AveragedQuadratures::AveragedQuadratures(const KeyLabels& follow, const KeyLabels& precede)
-  : Averaged(Assemble(KeyLabels(),list_of("VAR(X)")("VAR(Y)")("COV(X,Y)"),follow),precede)
-    // Last parameter is necessary, otherwise ambiguity with Averaged copy constructor
+  : Averaged(Assemble(KeyLabels{"VAR(X)","VAR(Y)","COV(X,Y)"},follow),precede)
 {
 }
 
 
-const AveragedQuadratures::Averages AveragedQuadratures::average_v(const LazyDensityOperator& matrix) const
+const AveragedQuadratures::Averages AveragedQuadratures::average_v(NoTime t, const LazyDensityOperator& matrix) const
 {
   Averages averages(7);
 
   averages=0;
 
-  averages(blitz::Range(0,3))=Averaged::average_v(matrix);
+  averages(blitz::Range(0,3))=Averaged::average_v(t,matrix);
 
   for (int n=2; n<int(matrix.getDimension()); n++) {
 
@@ -414,13 +417,12 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 
 
-
 PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
   : ModeBase(p.cutoff),
     structure::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
                                                                mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.cutoff))),
     structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"excitation loss"),
-    structure::ElementAveraged<1,true>(mode::keyTitle,list_of("<number operator>")("real(<ladder operator>)")("imag(\")")),
+    structure::ElementAveraged<1,true>(mode::keyTitle,{"<number operator>","real(<ladder operator>)","imag(\")"}),
     z_(p.kappa,-p.delta)
 {
   getParsStream()<<"# Interaction picture, not derived from Exact\n";
@@ -428,15 +430,15 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
 
 
 
-double PumpedLossyModeIP_NoExact::probability(double, const LazyDensityOperator& m) const
+double PumpedLossyModeIP_NoExact::rate(OneTime, const LazyDensityOperator& m) const
 {
   return mode::photonNumber(m);
 }
 
 
-void PumpedLossyModeIP_NoExact::doActWithJ(double t, StateVectorLow& psi) const
+void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, StateVectorLow& psi) const
 {
-  dcomp fact=sqrt(2.*real(z_))*exp(-z_*t);
+  dcomp fact=sqrt(2.*real(z_))*exp(-z_*double(t));
   int ubound=psi.ubound(0);
   for (int n=0; n<ubound; ++n)
     psi(n)=fact*sqrt(n+1)*psi(n+1);
@@ -445,7 +447,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(double t, StateVectorLow& psi) const
 
 
 
-const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(double t, const LazyDensityOperator& matrix) const
+const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const LazyDensityOperator& matrix) const
 {
   Averages averages(3);
 
@@ -455,7 +457,7 @@ const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(d
 
     averages(0)+=n*exp(-2*real(z_)*n*t)*matrix(n);
 
-    dcomp offdiag(sqrt(n)*matrix(n,n-1)*exp(-(z_+2*(n-1)*real(z_))*t));
+    dcomp offdiag(sqrt(n)*matrix(n,n-1)*exp(-(z_+2*(n-1)*real(z_))*double(t)));
     averages(1)+=real(offdiag);
     averages(2)+=imag(offdiag);
 

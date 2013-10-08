@@ -17,8 +17,10 @@
 template<int RANK>
 class ReducedDensityOperator : private DimensionsBookkeeper<RANK>, public structure::ClonableElementAveraged<RANK>
 {
-public:
+private:
   typedef structure::ClonableElementAveraged<RANK> Base;
+
+public:
   typedef typename Base::Averages Averages;
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
   
@@ -31,15 +33,15 @@ public:
   using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension; using Base::nAvr;
   
 private:
-  struct Helper;
+  static const KeyLabels helper(const Dimensions&, bool offDiagonals, const KeyLabels&);
 
   Base*const do_clone() const {return new ReducedDensityOperator(*this);}
 
 protected:
-  const Averages average_v(const LazyDensityOperator&) const;
+  const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
 
 private:
-  void           process_v(Averages&                 ) const {}
+  void           process_v(                   Averages&                 ) const {}
 
   const bool offDiagonals_;
 
@@ -61,28 +63,32 @@ public:
     : Base(label,dim,true,boost::assign::list_of("negativity")) {}
 
 private:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&                 ) const;
+  const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
+  void           process_v(                   Averages&                 ) const;
   
 };
 
 
 namespace averagingUtils {
-  
 
-template<int RANK, bool IS_TD>
-class Collecting : public structure::ClonableElementAveraged<RANK,IS_TD>
+
+template<int RANK, bool IS_TIME_DEPENDENT>
+class Collecting : public structure::ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
+private:
+  typedef structure::ClonableElementAveraged<RANK,IS_TIME_DEPENDENT> Base;
+
 public:
-  typedef structure::ClonableElementAveraged<RANK,IS_TD> Element;
+  typedef Base Element;
   typedef boost::ptr_list<Element> Collection;
 
-  typedef structure::ClonableElementAveraged<RANK,IS_TD> Base;
   typedef typename Base::KeyLabels KeyLabels;
 
   typedef structure::AveragedCommon::Averages Averages;
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
+  typedef typename Base::Time Time;
+  
   Collecting(const Collection&);
   Collecting(const Collecting&);
 
@@ -91,9 +97,7 @@ private:
 
   using Base::nAvr; using Base::getLabels;
 
-  const Averages average_v(double, const LazyDensityOperator&) const;
-
-  const Averages average_v(const LazyDensityOperator& matrix) const {return average_v(0.,matrix);}
+  const Averages average_v(Time, const LazyDensityOperator&) const;
 
   void  process_v(Averages&) const;
 
@@ -103,17 +107,22 @@ private:
 
 
 
-template<int RANKFROM, int RANKTO, bool IS_TD>
-class Transferring : public structure::Averaged<RANKFROM,IS_TD>
+template<int RANKFROM, int RANKTO, bool IS_TIME_DEPENDENT>
+class Transferring : public structure::AveragedTimeDependenceDispatched<RANKFROM,IS_TIME_DEPENDENT>
 // Transfers the calculation of averages to another Averaged class, possibly with different RANK.
 // The LazyDensityOperator for the other class should reference the same data.
 // For a usage example cf. scripts/QbitMode_Matrix.cc
 {
+private:
+  typedef structure::AveragedTimeDependenceDispatched<RANKFROM,IS_TIME_DEPENDENT> Base;
+  
 public:
-  typedef typename structure::Averaged<RANKFROM,IS_TD>::Averages            Averages           ;
-  typedef typename structure::Averaged<RANKFROM,IS_TD>::LazyDensityOperator LazyDensityOperator;
+  typedef typename Base::Averages            Averages           ;
+  typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename structure::Averaged<RANKTO,IS_TD>::Ptr AveragedToPtr;
+  typedef typename Base::Time Time;
+  
+  typedef typename structure::AveragedTimeDependenceDispatched<RANKTO,IS_TIME_DEPENDENT>::Ptr AveragedToPtr;
   typedef quantumdata::LazyDensityOperator<RANKTO> LazyDensityOperatorTo;
 
   Transferring(AveragedToPtr averaged, const LazyDensityOperatorTo& ldo)
@@ -128,8 +137,7 @@ private:
 
   size_t nAvr_v() const {return averaged_->nAvr();}
 
-  const Averages average_v(double time, const LazyDensityOperator&) const {return averaged_->average(time,ldo_);}
-  const Averages average_v(             const LazyDensityOperator&) const {return averaged_->average(     ldo_);}
+  const Averages average_v(Time t, const LazyDensityOperator&) const {return averaged_->average(t,ldo_);}
 
   const AveragedToPtr averaged_;
   const LazyDensityOperatorTo& ldo_;

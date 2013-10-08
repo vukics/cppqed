@@ -1,7 +1,7 @@
 #include "TimeIndependentMatrixHamiltonian.h"
 
 
-class MatrixNotSquareException {};
+class MatrixNotSquareException : public cpputils::Exception {};
 
 
 TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix& hamiltonianOverI)
@@ -13,7 +13,7 @@ TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix
 }
 
 
-void TimeIndependentMatrixHamiltonian::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+void TimeIndependentMatrixHamiltonian::addContribution_v(structure::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   linalg::apply(psi,dpsidt,hamiltonianOverI_);
 }

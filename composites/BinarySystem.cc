@@ -115,12 +115,12 @@ namespace binary {
 // These possibilities get instantiated through compilation, so that explicit instantiation is not necessary here.
   
 template<LiouvilleanAveragedTag LA>
-void displayKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
+std::ostream& displayKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
 {
   os<<"# Binary system\n";
   free0.displayKey<LA>(os,i);
   free1.displayKey<LA>(os,i);
-  ia   .displayKey<LA>(os,i);
+  return ia.displayKey<LA>(os,i);
 }
 
 
@@ -170,14 +170,14 @@ bool binary::Exact::isUnitary_v() const
 
 
 
-void binary::Exact::actWithU_v(double dt, StateVectorLow& psi) const
+void binary::Exact::actWithU_v(double t, StateVectorLow& psi, double t0) const
 {
   using namespace blitzplusplus::basi;
 
-  if (const Ex1::Ptr ex=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex,dt,_1));
-  if (const Ex1::Ptr ex=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex,dt,_1));
+  if (const Ex1::Ptr ex=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
+  if (const Ex1::Ptr ex=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
 
-  ia_.actWithU(dt,psi);
+  ia_.actWithU(t,psi,t0);
 
 }
 

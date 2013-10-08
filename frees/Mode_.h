@@ -22,7 +22,7 @@ namespace mode {
 const std::string keyTitle="Mode";
 
 
-using namespace structure::free;
+using namespace structure::free; using structure::NoTime;
 
 typedef boost::shared_ptr<const ModeBase> Ptr;
 
@@ -79,7 +79,7 @@ const Tridiagonal pumping(const dcomp& eta, size_t dim);
 
 
 
-class Exact : public structure::FreeExact
+class Exact : public structure::FreeExact<false>
 {
 public:
   Exact(const dcomp& zI, size_t);
@@ -87,7 +87,7 @@ public:
   const dcomp& get_zI() const {return zI_;}
   
 private:
-  void updateU(double) const;
+  void updateU(Time) const; ///< `Time` is structure::OneTime in this case
 
   bool isUnitary_v() const {return !bool(real(zI_));}
 
@@ -97,23 +97,16 @@ private:
 
 
 
-namespace details {
-
-struct Empty {};
-
-}
-
-
-template<bool IS_TD>
+template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
-  : public structure::TridiagonalHamiltonian<1,IS_TD>,
-    public mpl::if_c<IS_TD,Exact,details::Empty>::type
+  : public structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
+    public mpl::if_c<IS_TIME_DEPENDENT,Exact,mpl::empty_base>::type
 {
 public:
-  typedef structure::TridiagonalHamiltonian<1,IS_TD> Base;
+  typedef structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
-  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t, mpl::bool_<IS_TD> =mpl:: true_()); // works for IS_TD=true
-  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, size_t, mpl::bool_<IS_TD> =mpl::false_()); // works for IS_TD=false
+  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
+  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
   // The trailing dummy argument is there to cause a _compile_time_
   // (and not merely linking time) error in case of misuse
 
@@ -147,13 +140,13 @@ protected:
   // the trailing dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
 
 private:
-  void   doActWithJ (StateVectorLow&           ) const;
-  double probability(const LazyDensityOperator&) const;
+  void   doActWithJ (NoTime, StateVectorLow&           ) const;
+  double rate       (NoTime, const LazyDensityOperator&) const;
 
   const double kappa_;
 
 };
- 
+
 
 template<> 
 class Liouvillean<true >
@@ -164,6 +157,15 @@ protected:
   typedef structure::ElementLiouvillean<1,2> Base;
 
   Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle);
+  
+private:
+  void doActWithJ(NoTime, StateVectorLow&, JumpNo<0>) const;
+  void doActWithJ(NoTime, StateVectorLow&, JumpNo<1>) const;
+  
+  double rate(NoTime, const LazyDensityOperator&, JumpNo<0>) const;
+  double rate(NoTime, const LazyDensityOperator&, JumpNo<1>) const;
+  
+  const double kappa_, nTh_;
 
 };
 
@@ -178,8 +180,8 @@ public:
   Averaged(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
 protected:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
 private:
   const ClonedPtr do_clone() const {return new Averaged(*this);}
@@ -193,8 +195,8 @@ public:
   AveragedQuadratures(const KeyLabels& follow=KeyLabels(), const KeyLabels& precede=KeyLabels());
 
 protected:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
 private:
   const ClonedPtr do_clone() const {return new AveragedQuadratures(*this);}
@@ -212,8 +214,8 @@ public:
   AveragedMonitorCutoff();
 
 private:
-  const Averages average_v(const LazyDensityOperator&) const;
-  void           process_v(Averages&)                  const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  void           process_v(        Averages&)                  const;
 
 };
 
@@ -429,19 +431,19 @@ public:
   PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy&);
 
 private:
+  typedef structure::OneTime OneTime;
   typedef structure::TridiagonalHamiltonian<1,true>::StateVectorLow StateVectorLow;
   typedef structure::ElementLiouvillean<1,1,true>::LazyDensityOperator LazyDensityOperator;
 
-  void   doActWithJ (double t, StateVectorLow&           ) const;
-  double probability(double t, const LazyDensityOperator&) const;
+  void   doActWithJ (OneTime, StateVectorLow&           ) const;
+  double rate       (OneTime, const LazyDensityOperator&) const;
 
-  const Averages average_v(double t, const LazyDensityOperator&) const;
+  const Averages average_v(OneTime, const LazyDensityOperator&) const;
 
-  void           process_v(Averages&)                  const {}
+  void process_v(Averages&) const {}
 
   const dcomp z_;
 
 };
-
 
 #endif // ELEMENTS_FREES_MODE__H_INCLUDED

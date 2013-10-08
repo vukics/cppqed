@@ -87,7 +87,7 @@ private:
 
 class Spin 
   : public SpinBase,
-    public structure::FreeExact
+    public structure::FreeExact<false>
 {
 public:
 
@@ -130,8 +130,8 @@ public:
   
 private:
   
-  void   doActWithJ (      structure::free::StateVectorLow     &) const;
-  double probability(const structure::free::LazyDensityOperator&) const {return -1.;}
+  void   doActWithJ(      structure::free::StateVectorLow     &) const;
+  double rate      (const structure::free::LazyDensityOperator&) const {return -1.;}
   
 };
 

@@ -12,7 +12,7 @@
 
 #include "CMatrix.h"
 
-class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::Hamiltonian<1,structure::NO_TIME>
+class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
 {
 public:
   typedef linalg::CMatrix CMatrix;
@@ -21,23 +21,26 @@ public:
   // For safety, the matrix will be copied in.
 
 private:
-  void addContribution_v(const StateVectorLow&, StateVectorLow&) const; 
+  void addContribution_v(structure::NoTime, const StateVectorLow&, StateVectorLow&) const; 
 
   const CMatrix hamiltonianOverI_;
 
 };
 
 
-template <int RANK, bool IS_TD>
-class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public averagingUtils::Transferring<1,RANK,IS_TD>
+template <int RANK, bool IS_TIME_DEPENDENT>
+class TimeIndependentMatrixHamiltonianAveraged : public TimeIndependentMatrixHamiltonian, public averagingUtils::Transferring<1,RANK,IS_TIME_DEPENDENT>
 {
+private:
+  typedef averagingUtils::Transferring<1,RANK,IS_TIME_DEPENDENT> Base;
+  
 public:
-  typedef typename structure::Averaged<RANK,IS_TD>::Ptr AveragedPtr;
+  typedef typename Base::Ptr AveragedPtr;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, AveragedPtr averaged, const LazyDensityOperator& ldo)
-    : TimeIndependentMatrixHamiltonian(matrix), averagingUtils::Transferring<1,RANK,IS_TD>(averaged,ldo) {}
+    : TimeIndependentMatrixHamiltonian(matrix), averagingUtils::Transferring<1,RANK,IS_TIME_DEPENDENT>(averaged,ldo) {}
 
 };
 

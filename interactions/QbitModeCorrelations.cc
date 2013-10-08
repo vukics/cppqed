@@ -2,17 +2,9 @@
 
 #include "impl/LazyDensityOperator.tcc"
 
-#include <boost/assign/list_of.hpp>
-
-using namespace boost;
-using namespace assign;
-
 
 QbitModeCorrelations::QbitModeCorrelations()
-  : EA_Base(
-	    "QbitModeCorrelations",
-	    list_of("real(<sigma*adagger>)")("imag(\")")("real(<sigma*a>)")("imag(\")")("real(<sigmaZ*a>)")("imag(\")")
-	    )
+  : EA_Base("QbitModeCorrelations",{"real(<sigma*adagger>","imag(\")"})
 {
 }
 
