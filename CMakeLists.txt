@@ -190,7 +190,7 @@ add_subdirectory(elements)
 include_directories(${ELEMENTS_INCLUDE_DIRS})
 
 # build libC++QEDcore.so
-set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory)
+set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory composites)
 foreach(d ${CORE_SOURCE_DIRS})
   aux_source_directory(${d} CORE_SOURCE_FILES)
   include_directories(${d})
