@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef ELEMENTS_FREES_IMPL_MODE_TCC_INCLUDED
-#define ELEMENTS_FREES_IMPL_MODE_TCC_INCLUDED
+#ifndef ELEMENTS_FREES_MODE_TCC_INCLUDED
+#define ELEMENTS_FREES_MODE_TCC_INCLUDED
 
 #include "Mode_.h"
 
@@ -235,4 +235,4 @@ PumpedLossyModeAlternative<AveragingType>::PumpedLossyModeAlternative(const mode
 #undef  BASE_init
 
 
-#endif // ELEMENTS_FREES_IMPL_MODE_TCC_INCLUDED
+#endif // ELEMENTS_FREES_MODE_TCC_INCLUDED

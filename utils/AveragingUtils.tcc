@@ -1,15 +1,15 @@
-#ifndef   ELEMENTS_UTILS_IMPL_AVERAGINGUTILS_TCC_INCLUDED
-#define   ELEMENTS_UTILS_IMPL_AVERAGINGUTILS_TCC_INCLUDED
+#ifndef   ELEMENTS_UTILS_AVERAGINGUTILS_TCC_INCLUDED
+#define   ELEMENTS_UTILS_AVERAGINGUTILS_TCC_INCLUDED
 
 #include "AveragingUtils.h"
 
-#include "impl/DensityOperator.tcc"
-#include "impl/LazyDensityOperator.tcc"
-#include "impl/NegPT.tcc"
+#include "DensityOperator.tcc"
+#include "LazyDensityOperator.tcc"
+#include "NegPT.tcc"
 
 #include "Algorithm.h"
 #include "MathExtensions.h"
-#include "impl/MultiIndexIterator.tcc"
+#include "MultiIndexIterator.tcc"
 #include "Range.h"
 
 #include <boost/bind.hpp>
@@ -228,4 +228,4 @@ ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, c
 
 */
 
-#endif // ELEMENTS_UTILS_IMPL_AVERAGINGUTILS_TCC_INCLUDED
+#endif // ELEMENTS_UTILS_AVERAGINGUTILS_TCC_INCLUDED

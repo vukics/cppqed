@@ -1,12 +1,12 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_COMPOSITES_IMPL_COMPOSITE_TCC_INCLUDED
-#define   ELEMENTS_COMPOSITES_IMPL_COMPOSITE_TCC_INCLUDED
+#ifndef   ELEMENTS_COMPOSITES_COMPOSITE_TCC_INCLUDED
+#define   ELEMENTS_COMPOSITES_COMPOSITE_TCC_INCLUDED
 
 #include "Composite.h"
 
 #include "Interaction.h"
 
-#include "impl/LazyDensityOperator.tcc"
+#include "LazyDensityOperator.tcc"
 
 #include "Exception.h"
 
@@ -741,4 +741,4 @@ const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
 
 #undef CALL_composite_worker
 
-#endif // ELEMENTS_COMPOSITES_IMPL_COMPOSITE_TCC_INCLUDED
+#endif // ELEMENTS_COMPOSITES_COMPOSITE_TCC_INCLUDED

@@ -1,6 +1,6 @@
 #include "JaynesCummings_.h"
 
-#include "impl/Pars.tcc"
+#include "Pars.tcc"
 
 
 namespace jaynescummings {

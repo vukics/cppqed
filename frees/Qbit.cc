@@ -1,8 +1,8 @@
 #include "Qbit_.h"
 
 #include "ParsQbit.h"
-#include "impl/StateVector.tcc"
-#include "impl/ElementLiouvillean.tcc"
+#include "StateVector.tcc"
+#include "ElementLiouvillean.tcc"
 
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>

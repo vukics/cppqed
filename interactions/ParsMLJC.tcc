@@ -1,8 +1,8 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_INTERACTIONS_IMPL_PARSMLJC_TCC_INCLUDED
-#define   ELEMENTS_INTERACTIONS_IMPL_PARSMLJC_TCC_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_PARSMLJC_TCC_INCLUDED
+#define   ELEMENTS_INTERACTIONS_PARSMLJC_TCC_INCLUDED
 
-#include "impl/Pars.tcc"
+#include "Pars.tcc"
 
 #include <boost/fusion/sequence/io.hpp>
 #include <boost/fusion/include/io.hpp>
@@ -21,4 +21,4 @@ Pars<VC>::Pars(parameters::ParameterTable& p, const std::string& mod)
 } // mljc
 
 
-#endif // ELEMENTS_INTERACTIONS_IMPL_PARSMLJC_TCC_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_PARSMLJC_TCC_INCLUDED

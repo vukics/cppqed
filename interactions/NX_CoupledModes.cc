@@ -1,6 +1,6 @@
 #include "NX_CoupledModes.h"
 
-#include "impl/Tridiagonal.tcc"
+#include "Tridiagonal.tcc"
 
 
 using namespace mode;

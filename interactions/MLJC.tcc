@@ -1,10 +1,10 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_INTERACTIONS_IMPL_MLJC_TCC_INCLUDED
-#define   ELEMENTS_INTERACTIONS_IMPL_MLJC_TCC_INCLUDED
+#ifndef   ELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED
+#define   ELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED
 
 #include "MLJC.h"
 
-#include "impl/MultiLevel.tcc"
+#include "MultiLevel.tcc"
 #include "Sigma.h"
 
 using quantumoperator::Sigma;
@@ -128,4 +128,4 @@ void Base<NL,VC>::addContribution_v(double t, const StateVectorLow& psi, StateVe
 
 } // mljc
 
-#endif // ELEMENTS_INTERACTIONS_IMPL_MLJC_TCC_INCLUDED
+#endif // ELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED
