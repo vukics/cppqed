@@ -1,4 +1,4 @@
-#include "impl/Composite.tcc"
+#include "Composite.tcc"
 
 // Does not compile: (NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR)
 

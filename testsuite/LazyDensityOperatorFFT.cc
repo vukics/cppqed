@@ -1,8 +1,8 @@
 #include "Particle.h"
 #include "TMP_Tools.h"
-#include "impl/DensityOperator.tcc"
-#include "impl/LazyDensityOperator.tcc"
-#include "impl/LazyDensityOperatorFFT.tcc"
+#include "DensityOperator.tcc"
+#include "LazyDensityOperator.tcc"
+#include "LazyDensityOperatorFFT.tcc"
 
 #include <iostream>
 

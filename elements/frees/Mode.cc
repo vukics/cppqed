@@ -1,10 +1,10 @@
-#include "impl/Mode.tcc"
+#include "Mode.tcc"
 
 #include "ParsMode.h"
 
-#include "impl/StateVector.tcc"
+#include "StateVector.tcc"
 
-#include "impl/TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.tcc"
 
 #include <boost/assign/list_inserter.hpp>
 

@@ -1,6 +1,6 @@
 #include "ModeCorrelations.h"
 
-#include "impl/LazyDensityOperator.tcc"
+#include "LazyDensityOperator.tcc"
 #include "Structure.h"
 
 #include "SmartPtr.h"

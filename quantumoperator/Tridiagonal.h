@@ -14,7 +14,7 @@
 #include "LazyDensityOperator.h"
 #include "Types.h"
 
-#include "impl/BlitzTinyOfArrays.tcc"
+#include "BlitzTinyOfArrays.tcc"
 #include "Operators.h"
 
 #include "Exception.h"

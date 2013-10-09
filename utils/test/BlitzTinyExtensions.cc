@@ -1,4 +1,4 @@
-#include "impl/BlitzTinyExtensions.tcc"
+#include "BlitzTinyExtensions.tcc"
 
 #include <blitz/tinyvec2io.cc>
 

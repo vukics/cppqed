@@ -2,7 +2,7 @@
 #include "StateVector.h"
 #include "Types.h"
 
-#include "impl/BlitzArraySliceIterator.tcc"
+#include "BlitzArraySliceIterator.tcc"
 #include "Range.h"
 
 #include <valarray>

@@ -222,12 +222,10 @@ install(TARGETS ${CPPQEDLIB}
 # Install include files in their directory structure
 set(ALL_INCLUDE_DIRS ${CORE_SOURCE_DIRS} ${ELEMENTS_INCLUDE_DIRS})
 foreach(d ${ALL_INCLUDE_DIRS})
-  file(GLOB INC ${d}/*.h)
+  file(GLOB INC ${d}/*.h ${d}/*.tcc)
   file(GLOB DETAILS_INC ${d}/details/*.h)
-  file(GLOB IMPL_INC ${d}/impl/*tcc)
   install(FILES ${INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
   install(FILES ${DETAILS_INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d}/details)
-  install(FILES ${IMPL_INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d}/impl)
   file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
   set(CONF_REL_INCLUDE_DIRS ${CONF_REL_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
 endforeach(d)

@@ -1,4 +1,4 @@
-#include "impl/MultiIndexIterator.tcc"
+#include "MultiIndexIterator.tcc"
 
 #include <boost/lambda/lambda.hpp>
 namespace bll=boost::lambda;

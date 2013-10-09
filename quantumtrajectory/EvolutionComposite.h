@@ -2,7 +2,7 @@
 #ifndef QUANTUMTRAJECTORY_EVOLUTIONCOMPOSITE_H_INCLUDED
 #define QUANTUMTRAJECTORY_EVOLUTIONCOMPOSITE_H_INCLUDED
 
-#include "impl/Composite.tcc"
+#include "Composite.tcc"
 
 #include "Evolution.h"
 

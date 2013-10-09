@@ -1,6 +1,6 @@
 #include "ElementAveraged.h"
 
-#include "impl/FormDouble.tcc"
+#include "FormDouble.tcc"
 #include "Range.h"
 
 #include <boost/lambda/lambda.hpp>

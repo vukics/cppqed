@@ -8,7 +8,7 @@
 
 #include "MathExtensions.h"
 
-#include "impl/ProjectingMCWF_Trajectory.tcc"
+#include "ProjectingMCWF_Trajectory.tcc"
 
 #include<flens/flens.h>
 

@@ -3,10 +3,10 @@
 #define UTILS_INCLUDE_SIMULATED_H_INCLUDED
 
 #include "BlitzArrayTraits.h"
-#include "impl/EvolvedGSL.tcc"
-#include "impl/Simulated.tcc"
+#include "EvolvedGSL.tcc"
+#include "Simulated.tcc"
 
-#include "impl/Pars.tcc"
+#include "Pars.tcc"
 
 using parameters::ParameterTable    ;
 using parameters::update            ;

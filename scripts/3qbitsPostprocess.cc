@@ -6,7 +6,7 @@
 #include "QbitModeCorrelations.h"
 #include "DistributionFunctions.h"
 
-#include "impl/DensityOperator.tcc"
+#include "DensityOperator.tcc"
 
 using namespace std;
 

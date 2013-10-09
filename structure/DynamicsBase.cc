@@ -1,6 +1,6 @@
 #include "DynamicsBase.h"
 
-#include "impl/FormDouble.tcc"
+#include "FormDouble.tcc"
 #include "Range.h"
 
 #include <boost/bind.hpp>

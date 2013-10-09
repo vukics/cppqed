@@ -2,7 +2,7 @@
 
 #include "Mode_.h"
 
-#include "impl/LazyDensityOperator.tcc"
+#include "LazyDensityOperator.tcc"
 #include "StateVector.h"
 
 #include <boost/bind.hpp>

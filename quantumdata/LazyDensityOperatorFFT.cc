@@ -1,8 +1,8 @@
 #include "LazyDensityOperatorFFT.h"
 
 #include "BlitzArrayTraits.h"
-#include "impl/FFT.tcc"
-#include "impl/VectorFromMatrixSliceIterator.tcc"
+#include "FFT.tcc"
+#include "VectorFromMatrixSliceIterator.tcc"
 
 
 using namespace fft; using namespace linalg;

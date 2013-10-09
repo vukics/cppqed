@@ -1,5 +1,5 @@
-#include "impl/ComplexArrayExtensions.tcc"
-#include "impl/VectorFromMatrixSliceIterator.tcc"
+#include "ComplexArrayExtensions.tcc"
+#include "VectorFromMatrixSliceIterator.tcc"
 
 #include "Algorithm.h"
 #include "MathExtensions.h"

@@ -1,4 +1,4 @@
-#include "impl/BlitzArraySliceIterator.tcc"
+#include "BlitzArraySliceIterator.tcc"
 
 #include "Randomized.h"
 

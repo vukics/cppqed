@@ -1,6 +1,6 @@
 #include "ParsMCWF_Trajectory.h"
 
-#include "impl/Pars.tcc"
+#include "Pars.tcc"
 
 
 namespace quantumtrajectory {

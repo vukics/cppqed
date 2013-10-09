@@ -1,4 +1,4 @@
-#include "impl/ComplexArrayExtensions.tcc"
+#include "ComplexArrayExtensions.tcc"
 
 namespace blitzplusplus {
 

@@ -1,7 +1,7 @@
-#include "impl/Trajectory.tcc"
+#include "Trajectory.tcc"
 
 #include "ParsTrajectory.h"
-#include "impl/FormDouble.tcc"
+#include "FormDouble.tcc"
 
 #include <iostream>
 

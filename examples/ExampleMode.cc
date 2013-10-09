@@ -1,6 +1,6 @@
 #include "ExampleMode.h"
 
-#include "impl/ElementLiouvillean.tcc"
+#include "ElementLiouvillean.tcc"
 
 #include <boost/bind.hpp>
 

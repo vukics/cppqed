@@ -5,7 +5,7 @@
 
 #include "StateVector.h"
 
-#include "impl/Pars.tcc"
+#include "Pars.tcc"
 
 using namespace std;
 

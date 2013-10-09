@@ -4,8 +4,8 @@
 #include "PumpedTwoLevelAtom.h"
 #include "Qbit.h"
 
-#include "impl/StateVector.tcc"
-#include "impl/DensityOperator.tcc"
+#include "StateVector.tcc"
+#include "DensityOperator.tcc"
 
 using namespace std       ;
 using namespace cpputils  ;

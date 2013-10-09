@@ -2,19 +2,19 @@
 #ifndef QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 #define QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 
-#include "impl/DensityOperator.tcc"
-#include "impl/EnsembleMCWF.tcc"
-#include "impl/Evolution.tcc"
+#include "DensityOperator.tcc"
+#include "EnsembleMCWF.tcc"
+#include "Evolution.tcc"
 #include "ParsEvolution.h"
-#include "impl/Master.tcc"
-#include "impl/TimeAveragingMCWF_Trajectory.tcc"
+#include "Master.tcc"
+#include "TimeAveragingMCWF_Trajectory.tcc"
 #include "QM_Picture.h"
-#include "impl/StateVector.tcc"
-#include "impl/Tridiagonal.tcc"
+#include "StateVector.tcc"
+#include "Tridiagonal.tcc"
 
 #include "BlitzArrayTraits.h"
-#include "impl/EvolvedGSL.tcc"
-#include "impl/Pars.tcc"
+#include "EvolvedGSL.tcc"
+#include "Pars.tcc"
 
 using parameters::ParameterTable;
 

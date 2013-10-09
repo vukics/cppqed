@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef   UTILS_VECTORFROMMATRIXSLICEITERATOR_TCC_INCLUDED
+#define   UTILS_VECTORFROMMATRIXSLICEITERATOR_TCC_INCLUDED
+
+#include "VectorFromMatrixSliceIterator.h"
+
+#include "BlitzArraySliceIterator.tcc"
+
+#endif // UTILS_VECTORFROMMATRIXSLICEITERATOR_TCC_INCLUDED

@@ -66,7 +66,7 @@ public:
  * if `IS_HEAD=false`. The code is automatically generated for all template-parameter combinations (`RANK` up to #BLITZ_ARRAY_LARGEST_RANK) via preprocessor metaprogramming.
  * Cf. quantumoperator/Sigma.cc
  * ~~~{.sh}
- * g++ -P -E -Iutils/include/ -Iquantumoperator/ -Iquantumdata/ quantumoperator/Sigma.cc | tail -n128
+ * g++ -P -E -Iutils/ -Iquantumoperator/ -Iquantumdata/ quantumoperator/Sigma.cc | tail -n128
  * ~~~
  * 
  * \note It’s better to convert `n` into a runtime variable because then we can use complete specializations of this function. Eventually it has to be converted anyway into an index of `psi`.
