@@ -1,16 +1,19 @@
+# This CMakeLists.txt is not used at the moment, but might serve as a template later
+# for the per-directory include path setup
+
 find_package(GSL REQUIRED)
 
 include_directories(include ${GSL_INCLUDE_DIRS})
 
 #AUX_SOURCE_DIRECTORY(src UTILS_SOURCE_FILES)
-file(GLOB UTILS_SOURCE_FILES RELATIVE .. src/*.cc)
+file(GLOB UTILS_SOURCE_FILES RELATIVE .. *.cc)
 
 # checks if libutils should be linked with FLENS
 IF( FLENS )
   set(UTILS_OPTLIBS ${UTILS_OPTLIBS} ${flens_LIBRARIES})
 ELSE( FLENS )
   # linkage of this will fail without FLENS support
-  LIST(REMOVE_ITEM UTILS_SOURCE_FILES utils/src/DrivenDampedHarmonicOscillator.cc)
+  LIST(REMOVE_ITEM UTILS_SOURCE_FILES utils/DrivenDampedHarmonicOscillator.cc)
 ENDIF( FLENS )
 
 set(UTILS_LIBS ${GSL_LIBRARIES} ${blitz_LIBRARIES})

@@ -186,23 +186,17 @@ endif( ENABLE_SERIALIZATION )
 # Compilation
 ##################################################
 
-# build libutils.so
-# add_subdirectory(utils)
-# add utils/include to include path for all the other components
-file(GLOB UTILS_SOURCE_FILES utils/src/*.cc)
-include_directories(utils/include)
-
 add_subdirectory(elements)
 include_directories(${ELEMENTS_INCLUDE_DIRS})
 
 # build libC++QEDcore.so
-set(CORE_SOURCE_DIRS quantumdata quantumoperator structure quantumtrajectory)
+set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory)
 foreach(d ${CORE_SOURCE_DIRS})
   aux_source_directory(${d} CORE_SOURCE_FILES)
   include_directories(${d})
 endforeach(d)
 set(CPPQEDLIB C++QED-${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
-add_library(${CPPQEDLIB} SHARED ${CORE_SOURCE_FILES} ${ELEMENTS_SOURCE_FILES} ${UTILS_SOURCE_FILES})
+add_library(${CPPQEDLIB} SHARED ${CORE_SOURCE_FILES} ${ELEMENTS_SOURCE_FILES})
 target_link_libraries(${CPPQEDLIB} ${blitz_LIBRARY} ${OPTLIBS} ${GSL_LIBRARIES})
 set_target_properties(${CPPQEDLIB}
 		      PROPERTIES 
@@ -226,7 +220,7 @@ install(TARGETS ${CPPQEDLIB}
 )
 
 # Install include files in their directory structure
-set(ALL_INCLUDE_DIRS ${CORE_SOURCE_DIRS} ${ELEMENTS_INCLUDE_DIRS} utils/include)
+set(ALL_INCLUDE_DIRS ${CORE_SOURCE_DIRS} ${ELEMENTS_INCLUDE_DIRS})
 foreach(d ${ALL_INCLUDE_DIRS})
   file(GLOB INC ${d}/*.h)
   file(GLOB DETAILS_INC ${d}/details/*.h)
