@@ -1,5 +1,5 @@
 
-set(ELEMENTS_SOURCE_DIRS utils frees interactions composites)
+set(ELEMENTS_SOURCE_DIRS utils frees interactions)
 
 foreach(d ${ELEMENTS_SOURCE_DIRS})
   #aux_source_directory(${d} ELEMENTS_SOURCE_FILES)
