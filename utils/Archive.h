@@ -1,6 +1,8 @@
 #ifndef   UTILS_INCLUDE_ARCHIVE_H_INCLUDED
 #define   UTILS_INCLUDE_ARCHIVE_H_INCLUDED
 
+#include "cppqedconfig.h"
+
 #ifdef    DO_NOT_USE_BOOST_SERIALIZATION
 
 #include <cstddef> // std::size_t

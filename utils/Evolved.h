@@ -14,6 +14,8 @@
 
 #include "EvolvedFwd.h"
 
+#include "cppqedconfig.h"
+
 #include <boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>

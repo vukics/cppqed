@@ -4,15 +4,9 @@
 #  flens_FOUND - system has flens
 #  flens_INCLUDE_DIRS - the flens include directories
 #  flens_LIBRARIES - link these to use flens
-#  flens_DEFINITIONS - adds -DGSL_CBLAS if gslcblas is detected
 
 include(LibFindMacros)
 libfind_package(flens CBLAS)
-if(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
-  set(flens_DEFINITIONS "-DGSL_CBLAS")
-else(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
-  set(flens_DEFINITIONS "")
-endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
 
 libfind_pkg_check_modules(flens_PKGCONF flens)
 

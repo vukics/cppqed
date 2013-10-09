@@ -152,12 +152,6 @@ endif( Boost_SERIALIZATION_FOUND )
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
 set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-if(Boost_FOUND)
-  if(Boost_MAJOR_VERSION EQUAL "1" AND Boost_MINOR_VERSION GREATER "51")
-    add_definitions(-DBOOST_RESULT_OF_USE_TR1) 
-    message(STATUS "added -DBOOST_RESULT_OF_USE_TR1" )
-  endif()
-endif()
 
 # FLENS
 find_package(flens)
@@ -165,11 +159,10 @@ if( flens_FOUND AND FLENS )
   include_directories(SYSTEM ${flens_INCLUDE_DIRS})
   set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
   set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
-  add_definitions(${flens_DEFINITIONS})
   set(ENABLE_FLENS 1)
 else( flens_FOUND AND FLENS )
   message(STATUS "Flens library not found or disabled, optional flens support disabled.")
-  add_definitions( -DDO_NOT_USE_FLENS )
+  set(DO_NOT_USE_FLENS ON)
   set(ENABLE_FLENS 0)
 endif( flens_FOUND AND FLENS )
 
@@ -178,13 +171,20 @@ if( ENABLE_SERIALIZATION )
   message(STATUS "Support for binary statevector output enabled.")
   set(OPTLIBS ${OPTLIBS} ${Boost_SERIALIZATION_LIBRARY})
 else( ENABLE_SERIALIZATION )
-  add_definitions( -DDO_NOT_USE_BOOST_SERIALIZATION )
+  set(DO_NOT_USE_BOOST_SERIALIZATION ON)
   message(STATUS "Optional support for binary statevector output disabled.")
 endif( ENABLE_SERIALIZATION )
+
+# Activate compiler definitions
+include(CPPQEDCommonChecks)
+
+# Generate config.h
+configure_file(cppqedconfig.h.in cppqedconfig.h)
 
 ##################################################
 # Compilation
 ##################################################
+include_directories(${PROJECT_BINARY_DIR}) # for cppqedconfig.h
 
 add_subdirectory(elements)
 include_directories(${ELEMENTS_INCLUDE_DIRS})
@@ -229,7 +229,9 @@ foreach(d ${ALL_INCLUDE_DIRS})
   file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
   set(CONF_REL_INCLUDE_DIRS ${CONF_REL_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
 endforeach(d)
-
+install(FILES ${PROJECT_BINARY_DIR}/cppqedconfig.h DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED)
+file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/CPPQED)
+set(CONF_REL_INCLUDE_DIRS ${CONF_REL_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
 
 # Add all targets to the build-tree export set
 export(TARGETS ${CPPQEDLIB}
@@ -256,7 +258,7 @@ install(FILES
   "cmake/Modules/Findflens.cmake"
   "cmake/Modules/Findblitz.cmake"
   "cmake/Modules/LibFindMacros.cmake"
-  "cmake/Modules/PythonSetup.cmake"
+  "cmake/Modules/CPPQEDCommonChecks.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
  
 # Install the export set for use with the install-tree

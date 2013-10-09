@@ -2,6 +2,8 @@
 #ifndef   QUANTUMDATA_NEGPT_TCC_INCLUDED
 #define   QUANTUMDATA_NEGPT_TCC_INCLUDED
 
+#include "cppqedconfig.h"
+
 #include "NegPT.h"
 
 #ifndef DO_NOT_USE_FLENS

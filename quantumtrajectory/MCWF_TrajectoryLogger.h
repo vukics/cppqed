@@ -6,6 +6,8 @@
 
 #include "Archive.h"
 
+#include "cppqedconfig.h"
+
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>

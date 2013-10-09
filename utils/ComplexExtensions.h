@@ -3,6 +3,8 @@
 #ifndef UTILS_INCLUDE_COMPLEXEXTENSIONS_H_INCLUDED
 #define UTILS_INCLUDE_COMPLEXEXTENSIONS_H_INCLUDED
 
+#include "cppqedconfig.h"
+
 #include <complex>
 
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
