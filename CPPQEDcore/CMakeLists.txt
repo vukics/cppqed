@@ -204,10 +204,6 @@ set_target_properties(${CPPQEDLIB}
                       VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
                       SOVERSION ${CPPQED_ABI_MAJOR})
 
-
-# build all the scripts
-add_subdirectory(scripts)
-
 ##################################################
 # Installation
 ##################################################
