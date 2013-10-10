@@ -368,20 +368,10 @@ double photonNumber(const LazyDensityOperator& matrix)
 
 const StateVector coherent(const dcomp& alpha, size_t dim)
 {
-  bool caught=false;
-
   StateVector res(dim,false);
   double norm(exp(-sqr(abs(alpha))/2.));
 
-  for (size_t n=0; n<dim; ++n) {
-    try {
-      dcomp temp(norm*pow(alpha,n)/sqrt(fact(n)));
-      res()(n)=temp;
-    } catch (FactOverflow) {
-      if (!caught) cout<<"# LossyMode beware: Coherent called with too high photon numbers!"<<endl;
-      caught=true;
-    }
-  }
+  for (size_t n=0; n<dim; ++n) res()(n)=norm*coherentElement(n,alpha);
 
   return res;
 

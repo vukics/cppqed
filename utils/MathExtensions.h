@@ -50,6 +50,10 @@ inline int round(double r) {
 inline char minusOneToThePowerOf(unsigned long n) {return parity(n) ? -1 : 1;}
 inline char minusOneToThePowerOf(         long n) {return parity(n) ? -1 : 1;}
 
+
+/// Calculates \f$\alpha^n/\sqrt{n!}\f$ relying on the Stirling formula if n is too large for explicit calculation of factorial
+dcomp coherentElement(unsigned long n, const dcomp& alpha);
+
 } // mathutils
 
 #endif // UTILS_INCLUDE_MATHEXTENSIONS_H_INCLUDED

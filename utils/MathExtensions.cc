@@ -1,8 +1,10 @@
 #include "MathExtensions.h"
 
-#include<gsl/gsl_errno.h>
-#include<gsl/gsl_math.h>
-#include<gsl/gsl_sf.h>
+#include <boost/math/special_functions/factorials.hpp>
+
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_sf.h>
 
 namespace mathutils {
   
@@ -30,5 +32,15 @@ double choose(unsigned n, unsigned m)
 
 bool parity(         long n) {return GSL_IS_ODD(n);}
 bool parity(unsigned long n) {return GSL_IS_ODD(n);}
+
+
+dcomp coherentElement(unsigned long n, const dcomp& alpha)
+{
+  using namespace boost::math;
+  return n ? n<max_factorial<long double>::value ? pow(alpha,n)/sqrt(factorial<long double>(n)) 
+                                                 : pow(2*n*PI,-.25)*pow(alpha/sqrt(n/EULER),n)
+           : 1.;
+}
+
 
 } // mathutils
