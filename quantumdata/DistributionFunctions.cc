@@ -49,11 +49,6 @@ double details::w(size_t n, double r, size_t k)
   return minusOneToThePowerOf(n)/PI*sqrt(factorial<double>(n)/factorial<double>(n+k))*exp(-2*sqrR)*pow(2*r,k)*laguerre(n,k,4*sqrR);
 }
 
-dcomp details::q(size_t n, const dcomp& alpha)
-{
-  return n<max_factorial<long double>::value ? pow(alpha,n)/sqrt(factorial<long double>(n)) : pow(2*n*PI,-.25)*pow(alpha/sqrt(n/EULER),n);
-}
-
 
 WignerFunctionKernelOld::WignerFunctionKernelOld(double x, double y, size_t dim)
   : hermite_m2x_(fillWithHermite(dim,-2*x)), hermite_2y_(fillWithHermite(dim,2*y))

@@ -32,8 +32,6 @@ namespace details {
 
 double w(size_t n, double r, size_t k);
 
-dcomp q(size_t n, const dcomp& alpha);
-  
 }
 
 /// Calculates the Wigner function corresponding to a harmonic-oscillator mode density matrix expressed in Fock basis
@@ -92,7 +90,7 @@ double qFunction(const DensityOperator& rho, double x, double y, size_t)
   dcomp qComplex;
   
   for (size_t m=0; m<rho.getDimension(); ++m) for (size_t n=0; n<rho.getDimension(); ++n)
-    qComplex+=details::q(n,alpha)*details::q(m,conj(alpha))*rho(m,n);
+    qComplex+=coherentElement(n,alpha)*coherentElement(m,conj(alpha))*rho(m,n);
   
   return exp(sqrAbs(alpha))*real(qComplex);
 }

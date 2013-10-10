@@ -153,6 +153,10 @@ public:
   StateVector& operator/=(const OTHER& dc) {ABase::operator/=(dc); return *this;}
   //@}
   
+#ifndef NDEBUG
+  void debug() const {std::cerr<<"Debug: "<<operator()()<<std::endl;}
+#endif // NDEBUG
+  
 private:
   const dcomp index(const Idx& i, const Idx& j) const {return operator()()(i)*conj(operator()()(j));} ///< This function implements the LazyDensityOperator interface in a dyadic-product way.
 
