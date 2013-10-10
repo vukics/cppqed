@@ -1,6 +1,6 @@
 #include "QbitModeCorrelations.h"
 
-#include "impl/LazyDensityOperator.tcc"
+#include "LazyDensityOperator.tcc"
 
 #include <boost/assign/list_of.hpp>
 

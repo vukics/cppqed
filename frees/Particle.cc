@@ -3,8 +3,8 @@
 #include "ParsParticle.h"
 #include "ParticleInitialCondition.h"
 
-#include "impl/LazyDensityOperatorFFT.tcc"
-#include "impl/TridiagonalHamiltonian.tcc"
+#include "LazyDensityOperatorFFT.tcc"
+#include "TridiagonalHamiltonian.tcc"
 
 #include "Hermite.h"
 

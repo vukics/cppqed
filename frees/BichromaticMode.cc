@@ -1,6 +1,6 @@
 #include "BichromaticMode.h"
 
-#include "impl/Pars.tcc"
+#include "Pars.tcc"
 
 mode::ParsBichromatic::ParsBichromatic(parameters::ParameterTable& p, const std::string& mod)
   : Pars(p,mod), ParsPumpedLossy(p,mod),

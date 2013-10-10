@@ -8,7 +8,7 @@
 
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.h"
-#include "impl/Tridiagonal.tcc"
+#include "Tridiagonal.tcc"
 
 #include "Mode_.h"
 #include "Qbit_.h"

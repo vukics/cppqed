@@ -1,10 +1,10 @@
 #include "ParticleTwoModes_.h"
 
-#include "impl/Algorithm.tcc"
-#include "impl/BlitzArraySliceIterator.tcc"
+#include "Algorithm.tcc"
+#include "BlitzArraySliceIterator.tcc"
 #include "MathExtensions.h"
 #include "Range.h"
-#include "impl/Tridiagonal.tcc"
+#include "Tridiagonal.tcc"
 
 
 using namespace std;

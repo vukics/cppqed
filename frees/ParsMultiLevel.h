@@ -38,6 +38,6 @@ std::istream&
 operator>>(std::istream&,       blitz::TinyVector<double,NL>&);
 
 
-#include<impl/ParsMultiLevel.tcc>
+#include<ParsMultiLevel.tcc>
 
 #endif // ELEMENTS_FREES_PARSMULTILEVEL_H_INCLUDED

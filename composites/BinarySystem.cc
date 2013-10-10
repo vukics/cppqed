@@ -2,9 +2,9 @@
 
 #include "Interaction.h"
 
-#include "impl/LazyDensityOperator.tcc"
+#include "LazyDensityOperator.tcc"
 
-#include "impl/Algorithm.tcc"
+#include "Algorithm.tcc"
 #include "BlitzArraySliceIterator.h"
 #include "Range.h"
 

@@ -4,7 +4,7 @@
 
 #include "MLJC.h"
 
-#include "impl/MultiLevel.tcc"
+#include "MultiLevel.tcc"
 #include "Sigma.h"
 
 using quantumoperator::Sigma;

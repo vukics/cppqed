@@ -5,9 +5,9 @@
 #include "Mode_.h"
 
 #include "LazyDensityOperator.h"
-#include "impl/Tridiagonal.tcc"
+#include "Tridiagonal.tcc"
 
-#include "impl/Pars.tcc"
+#include "Pars.tcc"
 
 #include<boost/assign/std/list.hpp>
 

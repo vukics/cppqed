@@ -2,7 +2,7 @@
 
 #include "MathExtensions.h"
 
-#include "impl/TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.tcc"
 
 
 using namespace std;

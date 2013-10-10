@@ -1,7 +1,7 @@
 #include "Qbit_.h"
 
 #include "ParsQbit.h"
-#include "impl/StateVector.tcc"
+#include "StateVector.tcc"
 
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>

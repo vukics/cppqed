@@ -21,7 +21,7 @@ struct Pars
 } // mljc
 
 
-#include<impl/ParsMLJC.tcc>
+#include<ParsMLJC.tcc>
 
 
 #endif // ELEMENTS_INTERACTIONS_PARSMLJC_H_INCLUDED
