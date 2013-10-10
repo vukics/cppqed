@@ -71,18 +71,6 @@ foreach(p LIB BIN INCLUDE CMAKE)
   endif()
 endforeach()
 
-##################################################
-# Flags for release and debug mode
-##################################################
-
-# linker on MacOs doesn't like --no-undefined
-#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined -Wl,--as-needed")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-sign-compare")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11 -DBZ_DEBUG -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-deprecated -Wnon-virtual-dtor -Wno-ignored-qualifiers -Wno-sign-compare")
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++11-extensions  -Wno-local-type-template-args")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wno-c++11-extensions -Wno-local-type-template-args")
-endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 
 ##################################################
 # Compiler detection
@@ -109,7 +97,6 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 
 find_package(GSL REQUIRED)
 include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
-set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${GSL_INCLUDE_DIRS})
 
 # The option SERIALIZATION will be disabled if any of the compoments required for serialization is missing
 option(SERIALIZATION "Boost serialization" ON)
@@ -157,7 +144,6 @@ set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 find_package(flens)
 if( flens_FOUND AND FLENS )
   include_directories(SYSTEM ${flens_INCLUDE_DIRS})
-  set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
   set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
   set(ENABLE_FLENS 1)
 else( flens_FOUND AND FLENS )
@@ -175,8 +161,14 @@ else( ENABLE_SERIALIZATION )
   message(STATUS "Optional support for binary statevector output disabled.")
 endif( ENABLE_SERIALIZATION )
 
-# Activate compiler definitions
+
+##################################################
+# Flags for release and debug mode
+##################################################
+
+# Activate compiler definitions and flags
 include(CPPQEDCommonChecks)
+CPPQED_CXX_FLAGS()
 
 # Generate config.h
 configure_file(cppqedconfig.h.in cppqedconfig.h)
@@ -238,6 +230,7 @@ export(TARGETS ${CPPQEDLIB}
 #export(PACKAGE CPPQED)
  
 # Create a CPPQEDBuildTreeSettings.cmake file for the use from the build tree
+message(STATUS Debug: ${THIRDPARTY_INCLUDE_DIRS})
 configure_file(CPPQEDBuildTreeSettings.cmake.in
   "${PROJECT_BINARY_DIR}/CPPQEDBuildTreeSettings.cmake" @ONLY)
  
