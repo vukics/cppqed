@@ -173,6 +173,20 @@ CPPQED_CXX_FLAGS()
 # Generate config.h
 configure_file(cppqedconfig.h.in cppqedconfig.h)
 
+if(Boost_FOUND)
+  if(Boost_MAJOR_VERSION EQUAL "1" AND Boost_MINOR_VERSION GREATER "51")
+    add_definitions(-DBOOST_RESULT_OF_USE_TR1)
+    set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} -DBOOST_RESULT_OF_USE_TR1)
+    message(STATUS "added -DBOOST_RESULT_OF_USE_TR1" )
+  endif()
+endif()
+
+if(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
+  add_definitions(-DGSL_CBLAS)
+  set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} -DGSL_CBLAS)
+  message(STATUS "added -DGSL_CBLAS" )
+endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
+
 ##################################################
 # Compilation
 ##################################################

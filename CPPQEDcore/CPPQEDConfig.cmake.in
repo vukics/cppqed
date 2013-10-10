@@ -1,8 +1,9 @@
 # - Config file for the CPPQED package
 # It defines the following variables
 #  CPPQED_INCLUDE_DIRS - include directories for CPPQED
+#  CPPQED_THIRDPARTY_INCLUDE_DIRS - include directories for CPPQED
 #  CPPQED_LIBRARIES    - libraries to link against
-#  CPPQED_EXECUTABLE   - the bar executable
+#  CPPQED_DEFINITIONS  - compiler macro definitions needed together with CPPQED
 #  CPPQED_HAS_SERIALIZATION - serialization support enabled
 #  CPPQED_HAS_FLENS    - FLENS support enabled
 
@@ -30,7 +31,9 @@ else()
   endforeach(d)
 endif()
 
-set(CPPQED_INCLUDE_DIRS ${CPPQED_INCLUDE_DIRS} @THIRDPARTY_INCLUDE_DIRS@)
+set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} @THIRDPARTY_INCLUDE_DIRS@)
+
+set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} @CPPQED_DEFINITIONS@)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
 
