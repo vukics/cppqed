@@ -48,8 +48,8 @@ inline bool doDisplay(long count, int displayFreq) {return !(count%displayFreq);
 inline const std::string writeTimestep(int   ) {return " timestep";}
 inline const std::string writeTimestep(double) {return ""         ;}
 
-inline double endTime(long    nDt, double dt, double currentTime=0.) {return nDt*dt+currentTime;}
-inline double endTime(double time, double   , double            =0.) {return time              ;}
+inline double endTime(long    nDt, double dt, double currentTime) {return nDt*dt+currentTime;}
+inline double endTime(double time, double   , double            ) {return time              ;}
 
 }
 
@@ -75,8 +75,8 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   
   const double timeToReach=endTime(length,displayFreq,traj.getTime());
     
-  if (timeToReach<=traj.getTime()) return;
-    
+  if (timeToReach && timeToReach<=traj.getTime()) return;
+
   const boost::shared_ptr<ostream> outstream(!outputToFile ?
                                              nonOwningSharedPtr<ostream>(&cout) :
                                              static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
@@ -99,6 +99,8 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     else
       os<<"# Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
   }
+
+  if (!timeToReach) {traj.display(os,precision); return;}
 
   //////////////////////////////
   // Mid section: the actual run
