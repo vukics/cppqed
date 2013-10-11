@@ -132,8 +132,8 @@ double convert(structure:: NoTime  ) {return 0.;}
 #define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection_.beginend(),boost::bind(&Element::average,_1,details::convert(t),boost::cref(matrix)))
 
 template<int RANK, bool IS_TIME_DEPENDENT>
-const typename averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Averages
-averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::average_v(Time t, const LazyDensityOperator& matrix) const
+auto
+averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::average_v(Time t, const LazyDensityOperator& matrix) const -> const Averages
 {
   Averages res(nAvr()); res=0;
   return cpputils::concatenate(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),res);
@@ -165,6 +165,13 @@ averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::process_v(Averages& avr) con
   for_each(collection_,boost::bind(Helper::doIt,_1,avr,l,u));
 }
 
+
+template<int RANKFROM, int RANKTO, bool IS_TIME_DEPENDENT>
+auto
+averagingUtils::Transferring<RANKFROM,RANKTO,IS_TIME_DEPENDENT>::average_v(Time t, const LazyDensityOperator&) const -> const Averages
+{
+  return averaged_->average(details::convert(t),ldo_);
+}
 
 
 /* The earlier solution fails with the C++11 standard due to a "bug" in Boost.Assign, cf. https://svn.boost.org/trac/boost/ticket/7364

@@ -55,7 +55,7 @@ public:
   std::ostream& display(const Averages& averages, std::ostream& os, int i) const {display_v(averages,os,i); return os;}
 
 private:
-  virtual void process_v(      Averages&                    ) const = 0;
+  virtual void process_v(      Averages&                    ) const {}
   virtual void display_v(const Averages&, std::ostream&, int) const = 0;
 
 };

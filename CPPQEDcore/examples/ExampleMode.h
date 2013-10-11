@@ -26,7 +26,6 @@ public:
 
 private:
   const Averages average_v(NoTime, const LazyDensityOperator&) const;
-  void           process_v(        Averages&)                  const {}
 
 };
 
@@ -55,7 +54,6 @@ private:
   bool isUnitary_v() const {return true;}
 
   const Averages average_v(NoTime, const LazyDensityOperator&) const;
-  void           process_v(        Averages&)                  const {}
 
   const dcomp z_; // Needed for updateU
 
@@ -86,7 +84,6 @@ private:
   double rate(NoTime, const LazyDensityOperator&, JumpNo<1>) const;
   
   const Averages average_v(NoTime, const LazyDensityOperator&) const;
-  void           process_v(        Averages&)                  const {}
 
   const double kappa_, nTh_;
   

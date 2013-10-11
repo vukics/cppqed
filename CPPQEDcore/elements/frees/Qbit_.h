@@ -28,7 +28,6 @@ public:
 
 private:
   const Averages average_v(NoTime, const LazyDensityOperator&) const;
-  void           process_v(        Averages&                 ) const {}
 
 };
 

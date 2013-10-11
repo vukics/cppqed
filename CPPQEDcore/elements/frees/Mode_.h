@@ -440,8 +440,6 @@ private:
 
   const Averages average_v(OneTime, const LazyDensityOperator&) const;
 
-  void process_v(Averages&) const {}
-
   const dcomp z_;
 
 };
