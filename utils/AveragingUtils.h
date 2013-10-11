@@ -127,7 +127,7 @@ public:
     : averaged_(averaged), ldo_(ldo) {}
 
 private:
-  void displayKey_v(std::ostream& os, size_t& n) const {averaged_->displayKey(os,n);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& n) const {return averaged_->displayKey(os,n);}
 
   void process_v(Averages& averages) const {averaged_->process(averages);}
 
@@ -135,7 +135,7 @@ private:
 
   size_t nAvr_v() const {return averaged_->nAvr();}
 
-  const Averages average_v(Time t, const LazyDensityOperator&) const {return averaged_->average(t,ldo_);}
+  const Averages average_v(Time t, const LazyDensityOperator&) const;
 
   const AveragedToPtr averaged_;
   const LazyDensityOperatorTo& ldo_;
