@@ -41,8 +41,6 @@ protected:
   const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
 
 private:
-  void           process_v(                   Averages&                 ) const {}
-
   const bool offDiagonals_;
 
 };
