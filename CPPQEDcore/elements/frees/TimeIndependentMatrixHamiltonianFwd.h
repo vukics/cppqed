@@ -6,7 +6,7 @@ class MatrixNotSquareException;
 
 class TimeIndependentMatrixHamiltonian;
 
-template<int RANK, bool IS_TIME_DEPENDENT>
+template<int RANK>
 class TimeIndependentMatrixHamiltonianAveraged;
 
 
