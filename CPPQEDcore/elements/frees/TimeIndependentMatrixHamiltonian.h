@@ -4,7 +4,7 @@
 
 #include "TimeIndependentMatrixHamiltonianFwd.h"
 
-#include "AveragingUtils.h"
+#include "AveragingUtils.tcc"
 
 #include "Averaged.h"
 #include "Free.h"
