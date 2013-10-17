@@ -1,8 +1,4 @@
-* quantumdata may include only from utils; quantumtrajectory may include quantumdata; structure may include both quantumtrajectory & quantumdata – TridiagonalHamiltonian should rather go to quantumoperator?
-
-* Git Branch & Commit details to be displayed by scripts on call with --version (note, this information must be captured @ compile time, and not simply @ configuration time, that is, the query must be performed by make and not by cmake)
-
-* Think about making Averaged::process not pure virtual, but with a trivial implementation, so that user do not necessarily need to know about this (rather awkward) feature.
+* why does AveragedCommon::display_v not return an ostream& ?
 
 * Make headers self-contained & minimal
 
@@ -48,7 +44,11 @@
 
 # Build system
 
-  * Switch to Config.h architecture (all configuration macros defined here) – CMake is capable of doing this
+* make a stronger connection between scripts and core in cmake, scripts should basically inherit the same compile-configuration as was used for core
+
+* quantumdata may include only from utils; quantumtrajectory may include quantumdata; structure may include both quantumtrajectory & quantumdata – TridiagonalHamiltonian should rather go to quantumoperator?
+
+* Git Branch & Commit details to be displayed by scripts on call with --version (note, this information must be captured @ compile time, and not simply @ configuration time, that is, the query must be performed by make and not by cmake)
 
   
 # New release
