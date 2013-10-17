@@ -92,7 +92,7 @@ double qFunction(const DensityOperator& rho, double x, double y, size_t)
   for (size_t m=0; m<rho.getDimension(); ++m) for (size_t n=0; n<rho.getDimension(); ++n)
     qComplex+=coherentElement(n,alpha)*coherentElement(m,conj(alpha))*rho(m,n);
   
-  return exp(sqrAbs(alpha))*real(qComplex);
+  return exp(-sqrAbs(alpha))*real(qComplex);
 }
   
 
