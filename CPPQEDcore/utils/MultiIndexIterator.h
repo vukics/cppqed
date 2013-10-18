@@ -46,7 +46,7 @@ private:
 #undef INPUT_IteratorHelper
 
 public:
-  typedef typename Base::value_type IdxTiny;
+  typedef typename Base::value_type MultiIndex;
   
   /// \name Constructors
   //@{
@@ -55,10 +55,10 @@ public:
      * \param lbound tiny vector comprising the sequence of lower bounds
      * \param ubound tiny vector comprising the sequence of upper bounds (inclusive!)
      */
-  MultiIndexIterator(const IdxTiny& lbound, const IdxTiny& ubound, mii::Begin)
+  MultiIndexIterator(const MultiIndex& lbound, const MultiIndex& ubound, mii::Begin)
     : lbound_(lbound), ubound_(ubound), idx_(lbound_) {} // if it's not the end, it's the beginning
 
-  MultiIndexIterator(const IdxTiny& lbound, const IdxTiny& ubound, mii::End  )
+  MultiIndexIterator(const MultiIndex& lbound, const MultiIndex& ubound, mii::End  )
     : lbound_(lbound), ubound_(ubound), idx_(ubound_) {operator++();} // the end iterator is in fact beyond the end by one, hence the need for the increment
   //@}
   
@@ -68,8 +68,8 @@ public:
   //@{
   MultiIndexIterator& operator++() {doIt(boost::mpl::int_<RANK-1>()); return *this;}
 
-  const IdxTiny& operator*() const {return idx_;}
-        IdxTiny& operator*()       {return const_cast<IdxTiny&>(static_cast<const MultiIndexIterator*>(this)->operator*());}
+  const MultiIndex& operator*() const {return idx_;}
+        MultiIndex& operator*()       {return const_cast<MultiIndex&>(static_cast<const MultiIndexIterator*>(this)->operator*());}
   //@}
 
   /// Comparison only for the actual values referred to. The user has to take care that the bounds are actually the same!
@@ -90,9 +90,9 @@ private:
   template<int N>
   void doIt(boost::mpl::int_<N>);
 
-  const IdxTiny lbound_, ubound_;
+  const MultiIndex lbound_, ubound_;
 
-  IdxTiny idx_;
+  MultiIndex idx_;
 
 };
 

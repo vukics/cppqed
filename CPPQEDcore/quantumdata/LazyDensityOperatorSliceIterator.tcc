@@ -172,7 +172,7 @@ private:
 
     static const int RANKRES=mpl::size<V>::value;
 
-    typedef DensityOperator<RANKRES>                     DensityOperatorRes        ;
+    typedef DensityOperator<RANKRES>                     DensityOperatorRes   ;
     typedef boost::shared_ptr<const DensityOperatorRes > DensityOperatorResPtr;
 
 
@@ -185,8 +185,8 @@ private:
     typedef typename BASI::CA    DensityOperatorLow   ;
     typedef typename BASI::CARes DensityOperatorLowRes;
 
-    typedef typename MII::IdxTiny IdxTinyHalf;
-    typedef IdxTiny<2*blitzplusplus::TinyVectorLengthTraits<IdxTinyHalf>::value> IdxTiny;
+    typedef typename MII::MultiIndex                                         IdxHalf;
+    typedef IdxTiny<2*blitzplusplus::TinyVectorLengthTraits<IdxHalf>::value> Idx    ;
 
     DI_DO_Impl(const DensityOperator<RANK>& rho, Begin)
       : mii_(ctorHelper<false>(rho)), densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()
@@ -218,8 +218,8 @@ private:
     const LazyDensityOperatorRes& dereference() const
     {
       using namespace blitzplusplus;
-      IdxTinyHalf idxHalf(*mii_);
-      IdxTiny idx(concatenateTinies(idxHalf,idxHalf));
+      IdxHalf idxHalf(*mii_);
+      Idx idx(concatenateTinies(idxHalf,idxHalf));
 
       return *(densityOperatorResPtr_=boost::make_shared<DensityOperatorRes>(BASI::index(densityOperatorLow_,densityOperatorLowRes_,idx),byReference));
 
