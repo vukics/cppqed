@@ -131,7 +131,7 @@ private:
 
   void process_v(Averages& averages) const {averaged_->process(averages);}
 
-  void display_v(const Averages& averages, std::ostream& os, int n) const {averaged_->display(averages,os,n);}
+  std::ostream& display_v(const Averages& averages, std::ostream& os, int n) const {return averaged_->display(averages,os,n);}
 
   size_t nAvr_v() const {return averaged_->nAvr();}
 
