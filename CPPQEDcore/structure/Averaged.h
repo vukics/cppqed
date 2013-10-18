@@ -52,11 +52,11 @@ public:
    * The display format greatly depends on what kind of system is in question (in particular, \link ElementAveraged elementary system\endlink or Composite).
    * 
    */
-  std::ostream& display(const Averages& averages, std::ostream& os, int i) const {display_v(averages,os,i); return os;}
+  std::ostream& display(const Averages& averages, std::ostream& os, int i) const {return display_v(averages,os,i);}
 
 private:
-  virtual void process_v(      Averages&                    ) const {}
-  virtual void display_v(const Averages&, std::ostream&, int) const = 0;
+  virtual void          process_v(      Averages&                    ) const {}
+  virtual std::ostream& display_v(const Averages&, std::ostream&, int) const = 0;
 
 };
 

@@ -1,5 +1,3 @@
-* why does AveragedCommon::display_v not return an ostream& ?
-
 * Make headers self-contained & minimal
 
 * MultiLevel probably severely outdated

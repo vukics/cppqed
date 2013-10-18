@@ -11,7 +11,7 @@ using namespace std;
 
 
 
-void structure::displayCommon(const AveragedCommon::Averages& averages, std::ostream& os, int precision)
+std::ostream& structure::displayCommon(const AveragedCommon::Averages& averages, std::ostream& os, int precision)
 {
   using namespace formdouble;
 
@@ -22,6 +22,6 @@ void structure::displayCommon(const AveragedCommon::Averages& averages, std::ost
     const FormDouble fd(precision);
     boost::for_each(averages,os<<bll::bind(&FormDouble::operator()<double>,&fd,bll::_1));
   }
-
+  return os;
 }
 

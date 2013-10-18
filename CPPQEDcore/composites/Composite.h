@@ -133,8 +133,8 @@ private:
   size_t              nAvr_v()                                         const {return       nAvrLA<structure::LA_Av>(      frees_,acts_         );}
   const Averages   average_v(double t, const LazyDensityOperator& ldo) const {return    averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
   
-  void process_v(Averages&)                           const; class Process;
-  void display_v(const Averages&, std::ostream&, int) const; class Display;
+  void          process_v(Averages&)                           const; class Process;
+  std::ostream& display_v(const Averages&, std::ostream&, int) const; class Display;
 
   const Frees& frees_;
   const VA      acts_;

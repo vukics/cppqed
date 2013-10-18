@@ -85,7 +85,7 @@ void binary::Base::process_v(Averages& averages) const
 }
 
 
-void binary::Base::display_v(const Averages& averages, std::ostream& os, int precision) const
+std::ostream& binary::Base::display_v(const Averages& averages, std::ostream& os, int precision) const
 {
   const Av1::Ptr 
     av0 =free0_.getAv(),
@@ -98,6 +98,8 @@ void binary::Base::display_v(const Averages& averages, std::ostream& os, int pre
   SUCCESSIVE_Ranges(av0,av1,av01) ;
   
 #undef  PROCESS_Range
+
+  return os;
 
 }
 

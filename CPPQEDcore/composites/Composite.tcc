@@ -657,11 +657,12 @@ private:
 
 
 template<typename VA>
-void
+std::ostream&
 composite::Base<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
 {
   ptrdiff_t l=-1, u=0;
   CALL_composite_worker( Display(frees_,avr,os,precision,l,u) ) ;
+  return os;
 }
 
 

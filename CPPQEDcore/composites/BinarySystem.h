@@ -62,7 +62,7 @@ private:
   size_t              nAvr_v()                                          const {return binary::nAvr      <structure::LA_Av>(      free0_,free1_,ia_       );}
   const Averages   average_v(double t, const LazyDensityOperator& ldo)  const {return binary::average   <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}
   void             process_v(Averages&)                                 const;
-  void             display_v(const Averages&, std::ostream&, int)       const;
+  std::ostream&    display_v(const Averages&, std::ostream&, int)       const;
   std::ostream& displayKey_v(std::ostream& os, size_t& i)               const {return binary::displayKey<structure::LA_Av>(os,i, free0_,free1_,ia_       );}
 
   const SSF free0_, free1_;

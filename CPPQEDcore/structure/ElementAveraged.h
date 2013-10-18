@@ -12,7 +12,7 @@
 namespace structure {
 
 
-void displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
+std::ostream& displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
 
 
 
@@ -32,7 +32,7 @@ protected:
   ElementAveraged(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
 private:
-  void display_v(const Averages& a, std::ostream& os, int precision) const {displayCommon(a,os,precision);}
+  std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const {return displayCommon(a,os,precision);}
 
 };
 
