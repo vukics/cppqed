@@ -36,10 +36,10 @@ template<int RANK, typename V>
 class FilterOut
 {  
 public:
-  typedef IdxTiny   <RANK>      IdxTiny;
-  typedef VecIdxTiny<RANK,V> VecIdxTiny;
+  typedef         IdxTiny<RANK>   FromIndex;
+  typedef ttd::VecIdxTiny<RANK,V>   ToIndex;
 
-  FilterOut(const IdxTiny& from, VecIdxTiny& to) : from_(from), to_(to), curr_(0) {}
+  FilterOut(const FromIndex& from, ToIndex& to) : from_(from), to_(to), curr_(0) {}
 
   template<typename T>
   void operator()(T) 
@@ -48,8 +48,8 @@ public:
   }
   
 private:
-  const IdxTiny& from_;
-  VecIdxTiny& to_;
+  const FromIndex& from_;
+  ToIndex& to_;
   unsigned curr_;
 
 };
@@ -59,13 +59,13 @@ private:
 
 
 template<int RANK, typename V>
-const VecIdxTiny<RANK,V>
+const ttd::VecIdxTiny<RANK,V>
 filterOut(const IdxTiny<RANK>& v)
 {
   using namespace boost::mpl;
   using namespace tmptools;
 
-  VecIdxTiny<RANK,V> res;
+  ttd::VecIdxTiny<RANK,V> res;
 
   {
     details::FilterOut<RANK,V> helper(v,res);
@@ -167,7 +167,7 @@ class IndexerBase
 protected:
   typedef typename IdxTypes<RANK,V>::type Idx;
 
-  typedef VecIdxTiny<RANK,V> VecIdxTiny;
+  typedef ttd::VecIdxTiny<RANK,V> VecIdxTiny;
 
 private:
   typedef typename VecIdxTiny::const_iterator CI;
@@ -264,7 +264,7 @@ const RETURN_type
 SlicesData<RANK,V>::ctorHelper(const CArray<RANK>& array)
 {
   struct Helper {
-    static ptrdiff_t doIt(const basi::ResCArray<V>& slice, const dcomp* dc)
+    static ptrdiff_t doIt(const basi::ttd::ResCArray<V>& slice, const dcomp* dc)
     {
       return slice.data()-dc;
     }
@@ -397,8 +397,8 @@ template<typename V> struct Indexer<rank,V> : Transposer<rank,V>, private detail
 {
   typedef details::IndexerBase<rank,V> Base;
 
-  typedef CArray<rank> Array   ;
-  typedef ResCArray<V> ArrayRes;
+  typedef         CArray<rank> Array   ;
+  typedef ttd::ResCArray<V   > ArrayRes;
 
   static ArrayRes& index(Array& array, ArrayRes& arrayRes, const typename Base::VecIdxTiny& idx)
   {

@@ -79,6 +79,9 @@ namespace basi {
 /// A forwarding metafunction to boost::mpl::size
 template <typename V> struct Size : boost::mpl::size<V> {};
 
+/// Contains template aliases for use in BlitzArraySliceIterator.h & BlitzArraySliceIterator.tcc
+namespace ttd {
+
 template <int RANK, bool IS_CONST> using ConditionalConstCArray=typename tmptools::ConditionalAddConst<CArray<RANK>,IS_CONST>::type;
 
 template <typename V> using ResCArray=CArray<Size<V>::value>;
@@ -90,6 +93,7 @@ template <typename I, typename V, bool IS_CONST> using ForwardIteratorHelper=boo
 template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::value>; 
 // note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
 
+}
 
 using cpputils::mii::Begin; using cpputils::mii::End;
 
@@ -148,7 +152,7 @@ template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ord
  * 
  */
 template<int RANK, typename V>
-const VecIdxTiny<RANK,V>
+const ttd::VecIdxTiny<RANK,V>
 filterOut(const IdxTiny<RANK>& idx);
 
 
@@ -240,9 +244,9 @@ public:
    * 
    * typedef tmptools::Vector<3,6,1,9,7> Vec;
    * 
-   * ResCArray<Vec> psiRes;
+   * ttd::ResCArray<Vec> psiRes;
    * 
-   * VecIdxTiny<RANK,Vec> idxTiny;
+   * ttd::VecIdxTiny<RANK,Vec> idxTiny;
    * 
    * Indexer<RANK,Vec>::index(psi,psiRes,idxTiny);
    * ~~~
@@ -253,8 +257,8 @@ public:
    * ~~~
    */
   static
-  ResCArray<V>&
-  index(CArray<RANK>& array, ResCArray<V>& resArray, const VecIdxTiny<RANK,V>& idx)
+  ttd::ResCArray<V>&
+  index(CArray<RANK>& array, ttd::ResCArray<V>& resArray, const ttd::VecIdxTiny<RANK,V>& idx)
   {throw TransposerOrIndexerRankTooHighException<RANK>();}
 
 };
@@ -340,7 +344,7 @@ class Base;
  */
 template<int RANK, typename V, bool IS_CONST>
 class Iterator 
-  : public ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>, // The inheritance has to be public here because of types necessary to inherit
+  : public ttd::ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>, // The inheritance has to be public here because of types necessary to inherit
     public BASE_class,
     private ConsistencyChecker<RANK,V>
 {
@@ -349,7 +353,7 @@ public:
 
 #undef  BASE_class
 
-  typedef typename Base::CcCA CcCA; ///< ConditionalConstCArray
+  typedef typename Base::CcCA CcCA; ///< ttd::ConditionalConstCArray
 
   typedef boost::iterator_range<Iterator> Range; ///< Boost.Range-compliant range
 
@@ -383,12 +387,12 @@ template<int RANK, typename V, bool IS_CONST>
 class Base : public Indexer<RANK,V> ///< This inheritance is only to facilitate use in LazyDensityOperatorSliceIterator, and similar situations. The same does not appear necessary for BaseSpecial
 {
 public:
-  typedef CArray<RANK>                         CA   ;
-  typedef ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
-  typedef ResCArray<V>                         CARes;
-  typedef ConditionalConstResCArray<V,IS_CONST> CcCARes;
+  typedef                      CArray<RANK>            CA   ;
+  typedef ttd::ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
+  typedef ttd::ResCArray<V>                            CARes;
+  typedef ttd::ConditionalConstResCArray<V,IS_CONST> CcCARes;
 
-  typedef VecIdxTiny<RANK,V> VecIdxTiny;
+  typedef ttd::VecIdxTiny<RANK,V> VecIdxTiny;
 
   static const int RANKIDX=RANK-Size<V>::value;
 
@@ -437,8 +441,8 @@ class BaseTrivial
 public:
   static const int RANK=Size<V>::value;
 
-  typedef CArray<RANK>                             CA;
-  typedef ConditionalConstCArray<RANK,IS_CONST>  CcCA;
+  typedef                      CArray<RANK>             CA;
+  typedef ttd::ConditionalConstCArray<RANK,IS_CONST>  CcCA;
 
   BaseTrivial(CcCA&, Begin); // if it's not the end, it's the beginning
   BaseTrivial(CcCA&, End  );
@@ -536,12 +540,12 @@ namespace basi_fast {
  */
 template<int RANK, typename V, bool IS_CONST>
 class Iterator 
-  : public basi::ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>
+  : public basi::ttd::ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>
 {
 public:
-  typedef basi::ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
-  typedef basi::ResCArray<V>                            CARes;
-  typedef basi::ConditionalConstResCArray<V,IS_CONST> CcCARes;
+  typedef basi::ttd::ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
+  typedef basi::ttd::ResCArray<V>                            CARes;
+  typedef basi::ttd::ConditionalConstResCArray<V,IS_CONST> CcCARes;
 
   typedef boost::iterator_range<Iterator> Range;
 
