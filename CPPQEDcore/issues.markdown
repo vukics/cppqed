@@ -1,3 +1,5 @@
+* boost::tuples => std::tuples --- deprecate DynamicsBase::RealFreqs,ComplexFreqs FREQS, etc.
+
 * Make headers self-contained & minimal
 
 * MultiLevel probably severely outdated
@@ -33,10 +35,6 @@
   
   * 4th sub-repository + package for build infrastructure
   
-  * remove composites from elements (they rather belong to core)
-
-  * in utils remove include & src subdirectories – remove impl subdirectories
-
   * cmake should observe structural dependencies (e.g. quantumdata is not allowed to use anything from quantumtrajectory, only the other way round) – can be achieved by specific cmake files in these directories
 
 
@@ -47,6 +45,8 @@
 * quantumdata may include only from utils; quantumtrajectory may include quantumdata; structure may include both quantumtrajectory & quantumdata – TridiagonalHamiltonian should rather go to quantumoperator?
 
 * Git Branch & Commit details to be displayed by scripts on call with --version (note, this information must be captured @ compile time, and not simply @ configuration time, that is, the query must be performed by make and not by cmake)
+
+* Deprecate Boost.Build
 
   
 # New release
