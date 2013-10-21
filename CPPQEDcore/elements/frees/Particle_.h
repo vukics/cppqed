@@ -157,8 +157,7 @@ class ParticleBase
   : public structure::Free, public particle::Averaged
 {
 protected:
-  explicit ParticleBase(size_t fin, 
-			const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
+  explicit ParticleBase(size_t fin, const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF);
 
 };
 

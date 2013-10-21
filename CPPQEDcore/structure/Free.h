@@ -42,7 +42,14 @@ class Free : public QuantumSystem<1>, public DynamicsBase
 public:
   typedef boost::shared_ptr<const Free> Ptr;
 
-  explicit Free(size_t, const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs()); ///< A single dimension to initialise QuantumSystem`<1>` and the lists of real and complex name-frequency-multiplier tuples for DynamicsBase
+  /// A single dimension to initialise QuantumSystem`<1>` and the lists of real and complex name-frequency-multiplier tuples for DynamicsBase
+  explicit Free(size_t dim, const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF) : QuantumSystem<1>(dim), DynamicsBase(realFreqs,complexFreqs) {}
+
+  Free(size_t dim, const ComplexFreqs& complexFreqs) : Free(dim,emptyRF,complexFreqs) {}
+  Free(size_t dim, RealFreqsInitializer rf, ComplexFreqsInitializer cf=ComplexFreqsInitializer()) : Free(dim,RealFreqs(rf),ComplexFreqs(cf)) {}
+  Free(size_t dim, ComplexFreqsInitializer cf) : Free(dim,RealFreqsInitializer(),cf) {}
+  Free(size_t dim, RF rf, CF cf=CF()) : QuantumSystem<1>(dim), DynamicsBase(rf,cf) {}
+  Free(size_t dim, CF cf) : QuantumSystem<1>(dim), DynamicsBase(cf) {}
 
   /// \name Implementating inherited virtuals
   /// Simply connect the pure virtual QuantumSystem::highestFrequency to the implementation DynamicsBase::highestFrequency.
@@ -59,7 +66,7 @@ private:
   double         highestFrequency_v(                ) const {return DynamicsBase::highestFrequency (  );}
   std::ostream& displayParameters_v(std::ostream& os) const {return DynamicsBase::displayParameters(os);}
 
-  std::ostream& displayMoreParameters(std::ostream&) const;
+  std::ostream& displayMoreParameters(std::ostream& os) const {return DynamicsBase::displayMoreParameters(os<<"# Dimension: "<<getDimension()<<std::endl);}
 
 };
 

@@ -9,16 +9,10 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
-#include <boost/tuple/tuple.hpp>
-
-#include <boost/assign/list_of.hpp>
 
 #include <list>
+#include <tuple>
 
-
-/// Macro facilitating the creation of lists of the name-value-multiplier tuples
-/** Cf. \refBoost{the <tt>tuple_list_of</tt> tool from  Boost.Assign,assign/doc/index.html#tuple_list_of} */
-#define FREQS boost::assign::tuple_list_of
 
 
 namespace structure {
@@ -54,12 +48,26 @@ class DynamicsBase : private boost::noncopyable
 public:
   typedef boost::shared_ptr<const DynamicsBase> Ptr;
 
-  typedef std::list<boost::tuple<std::string,double,double> >    RealFreqs; ///< Stores the name-value-multiplier \refBoost{tuples,tuple/doc/tuple_users_guide.html} for real frequency-like parameters
-  typedef std::list<boost::tuple<std::string,dcomp ,double> > ComplexFreqs; ///< same for complex
+  typedef std::tuple<std::string,double,double> RF; ///< name-value-multiplier tuple for a real frequency-like parameter
+  typedef std::tuple<std::string,dcomp ,double> CF; ///< same for complex
+  
+  typedef std::list<RF>    RealFreqs; ///< list of real frequency-like parameters
+  typedef std::list<CF> ComplexFreqs; ///< same for complex
+  
+  typedef std::initializer_list<RF>    RealFreqsInitializer;
+  typedef std::initializer_list<CF> ComplexFreqsInitializer;
 
-  explicit DynamicsBase(const    RealFreqs& =RealFreqs   (), 
-                        const ComplexFreqs& =ComplexFreqs()); ///< Straightforward constructor
-
+  static const    RealFreqs emptyRF;
+  static const ComplexFreqs emptyCF;
+  
+  explicit DynamicsBase(const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF); ///< Straightforward constructor
+  
+  explicit DynamicsBase(const ComplexFreqs& complexFreqs) : DynamicsBase(emptyRF,complexFreqs) {}
+  explicit DynamicsBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf=ComplexFreqsInitializer()) : DynamicsBase(RealFreqs(rf),ComplexFreqs(cf)) {} ///< Constructor with initializer lists
+  explicit DynamicsBase(ComplexFreqsInitializer cf) : DynamicsBase(RealFreqsInitializer(),cf) {}
+  explicit DynamicsBase(RF rf, CF cf=CF()) : DynamicsBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer() : ComplexFreqsInitializer{cf}) {}
+  explicit DynamicsBase(CF cf) : DynamicsBase(ComplexFreqsInitializer{cf}) {}
+  
   double highestFrequency() const; ///< Calculates the fastest timescale of the system from the frequencies stored in the lists
 
   std::ostream& displayParameters(std::ostream&) const; ///< Displays the content of the stored stringstream followed by a call to #displayMoreParameters

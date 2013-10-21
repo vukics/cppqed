@@ -41,7 +41,12 @@ class QbitBase
   : public ModeBase, public qbit::Averaged
 {
 public:
-  QbitBase(const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs());
+  explicit QbitBase(const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF);
+  explicit QbitBase(const ComplexFreqs& complexFreqs) : QbitBase(emptyRF,complexFreqs) {}
+  explicit QbitBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf=ComplexFreqsInitializer()) : QbitBase(RealFreqs(rf),ComplexFreqs(cf)) {}
+  explicit QbitBase(ComplexFreqsInitializer cf) : QbitBase(RealFreqsInitializer(),cf) {}
+  explicit QbitBase(RF rf, CF cf=CF()) : QbitBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer() : ComplexFreqsInitializer{cf}) {}
+  explicit QbitBase(CF cf) : QbitBase(ComplexFreqsInitializer{cf}) {}
 
   virtual ~QbitBase() {}
 

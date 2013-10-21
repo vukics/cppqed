@@ -47,17 +47,14 @@ public:
   BichromaticMode(const mode::ParsBichromatic& p, const AveragingConstructorParameters&... a)
     : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
-      ModeBase(p.cutoff,
-	       FREQS("deltaOther",p.deltaOther,1),
-	       FREQS("(kappa*(2*nTh+1),delta)",conj(get_zI()),1)("eta",get_eta(),sqrt(p.cutoff))("etaOther",p.etaOther,sqrt(p.cutoff))
-	       ),
+      ModeBase(p.cutoff,{RF{"deltaOther",p.deltaOther,1}},{CF{"(kappa*(2*nTh+1),delta)",conj(get_zI()),1},CF{"eta",get_eta(),sqrt(p.cutoff)},CF{"etaOther",p.etaOther,sqrt(p.cutoff)}}),
       AveragingType(a...),
       zI_Other(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.deltaOther)
   {
     mode::Hamiltonian<true>::getH_OverIs().push_back(
-						     furnishWithFreqs(mode::pumping(p.etaOther,getDimension()),
-								      mode::mainDiagonal(zI_Other,getDimension()))
-						     );
+                                                     furnishWithFreqs(mode::pumping(p.etaOther,getDimension()),
+                                                                      mode::mainDiagonal(zI_Other,getDimension()))
+                                                     );
     getParsStream()<<"# Bichromatic pumping."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
   }
 

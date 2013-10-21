@@ -6,7 +6,6 @@
 #include "SmartPtr.h"
 
 using namespace boost;
-using namespace assign;
 using cpputils::sharedPointerize;
 
 

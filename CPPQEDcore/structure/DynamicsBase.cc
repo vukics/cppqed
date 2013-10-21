@@ -15,6 +15,10 @@ using namespace std;
 namespace structure {
 
 
+const DynamicsBase::   RealFreqs DynamicsBase::emptyRF{};
+const DynamicsBase::ComplexFreqs DynamicsBase::emptyCF{};
+
+
 DynamicsBase::DynamicsBase(const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs) 
   : realFreqs_(realFreqs), complexFreqs_(complexFreqs), paramsStream_(std::stringstream::out)
 {
@@ -25,10 +29,10 @@ DynamicsBase::DynamicsBase(const RealFreqs& realFreqs, const ComplexFreqs& compl
 
 namespace {
 
-template <typename T> using NamedFrequency=typename std::list<boost::tuple<std::string,T,double> >::value_type;
+template <typename T> using NamedFrequency=typename std::list<std::tuple<std::string,T,double> >::value_type;
 
-inline double absReal   (const NamedFrequency<double>& p) {return fabs(p.get<1>()*p.get<2>());}
-inline double absComplex(const NamedFrequency<dcomp >& p) {return  abs(p.get<1>()*p.get<2>());}
+inline double absReal   (const NamedFrequency<double>& p) {return fabs(get<1>(p)*get<2>(p));}
+inline double absComplex(const NamedFrequency<dcomp >& p) {return  abs(get<1>(p)*get<2>(p));}
 
 
 template<typename T>
@@ -71,9 +75,9 @@ std::ostream& DynamicsBase::displayParameters(ostream& os) const
 namespace {
 
 template<typename T>
-void displayFreq(ostream& os, int precision, const NamedFrequency<T>& pair)
+void displayFreq(ostream& os, int precision, const NamedFrequency<T>& p)
 {
-  os<<"# "<<pair.template get<0>()<<"="<<formdouble::zeroWidth(precision)(pair.template get<1>())<<endl;
+  os<<"# "<<get<0>(p)<<"="<<formdouble::zeroWidth(precision)(get<1>(p))<<endl;
 }
 
 } // unnamed namespace

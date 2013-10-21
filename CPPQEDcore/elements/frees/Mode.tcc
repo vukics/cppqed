@@ -10,13 +10,13 @@
 namespace mode {
 
 #define TEMPLATE_PARAM_TEMP(temp) temp,AveragingType
-#define SWITCH_helper(name,templateParam)				 \
+#define SWITCH_helper(name,templateParam)                                 \
   using boost::make_shared;                                              \
-  switch (qmp) {							 \
+  switch (qmp) {                                                         \
   case QMP_IP  : return make_shared<name##Mode   <templateParam> >(p,a...); \
   case QMP_UIP : return make_shared<name##ModeUIP<templateParam> >(p,a...); \
-  case QMP_SCH : ;							 \
-  }									 \
+  case QMP_SCH : ;                                                         \
+  }                                                                         \
   return make_shared<name##ModeSch<templateParam> >(p,a...);
 
 
@@ -63,7 +63,7 @@ const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp, const AveragingConstruc
 
 template<typename Base>
 AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
-  : Base(boost::assign::list_of("|Psi(cutoff-1)|^2"),KeyLabels())
+  : Base(KeyLabels(1,"|Psi(cutoff-1)|^2"),KeyLabels())
 {
 }
 
@@ -97,20 +97,16 @@ void AveragedMonitorCutoff<Base>::process_v(Averages& averages) const
 //
 ////////////////
 
-#define BASE_init(R,C) ModeBase(p.cutoff,(R),(C))
-#define BASE_initR(R)  BASE_init((R),ComplexFreqs())
-#define BASE_initC(C)  BASE_init(RealFreqs(),(C))
-
-#define TUPLE_delta(ISIP) "delta",-imag(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),BOOST_PP_IF(ISIP,1,p.cutoff)
-#define TUPLE_eta "eta",get_eta(),sqrt(p.cutoff)
-#define TUPLE_kappadelta(ISIP) "(kappa*(2*nTh+1),delta)",conj(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),BOOST_PP_IF(ISIP,1,p.cutoff)
-#define TUPLE_kappa "kappa*(2*nTh+1)",real(get_zSch()),p.cutoff
+#define TUPLE_delta(ISIP) RF{"delta",-imag(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),BOOST_PP_IF(ISIP,1,p.cutoff)}
+#define TUPLE_eta CF{"eta",get_eta(),sqrt(p.cutoff)}
+#define TUPLE_kappadelta(ISIP) CF{"(kappa*(2*nTh+1),delta)",conj(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),BOOST_PP_IF(ISIP,1,p.cutoff)}
+#define TUPLE_kappa RF{"kappa*(2*nTh+1)",real(get_zSch()),p.cutoff}
 
 
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
 Mode<AveragingType>::Mode(const mode::Pars& p, const AveragingConstructorParameters&... a)
   : mode::Exact(dcomp(0,-p.delta),p.cutoff),
-    BASE_initR(FREQS(TUPLE_delta(1))),
+    ModeBase(p.cutoff,TUPLE_delta(1)),
     AveragingType(a...)
 {}
 
@@ -118,7 +114,7 @@ Mode<AveragingType>::Mode(const mode::Pars& p, const AveragingConstructorParamet
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
 ModeSch<AveragingType>::ModeSch(const mode::Pars& p, const AveragingConstructorParameters&... a) 
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),0,p.cutoff),
-    BASE_initR(FREQS(TUPLE_delta(0))),
+    ModeBase(p.cutoff,TUPLE_delta(0)),
     AveragingType(a...)
 {
   getParsStream()<<"# Schroedinger picture.\n";
@@ -128,7 +124,7 @@ ModeSch<AveragingType>::ModeSch(const mode::Pars& p, const AveragingConstructorP
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
 PumpedMode<AveragingType>::PumpedMode(const mode::ParsPumped& p, const AveragingConstructorParameters&... a)
   : mode::Hamiltonian<true>(0,dcomp(0,-p.delta),p.eta,p.cutoff),
-    BASE_init(FREQS(TUPLE_delta(1)),FREQS(TUPLE_eta)),
+    ModeBase(p.cutoff,TUPLE_delta(1),TUPLE_eta),
     AveragingType(a...)
 {
   getParsStream()<<"# Pumped.\n";
@@ -138,7 +134,7 @@ PumpedMode<AveragingType>::PumpedMode(const mode::ParsPumped& p, const Averaging
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
 PumpedModeSch<AveragingType>::PumpedModeSch(const mode::ParsPumped& p, const AveragingConstructorParameters&... a)
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),p.eta,p.cutoff),
-    BASE_init(FREQS(TUPLE_delta(0)),FREQS(TUPLE_eta)),
+    ModeBase(p.cutoff,TUPLE_delta(0),TUPLE_eta),
     AveragingType(a...)
 {
   getParsStream()<<"# Pumped, Schroedinger picture.\n";
@@ -149,7 +145,7 @@ template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... Avera
 LossyMode<IS_FINITE_TEMP,AveragingType>::LossyMode(const mode::ParsLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.cutoff),
-    BASE_initC(FREQS(TUPLE_kappadelta(1))),
+    ModeBase(p.cutoff,TUPLE_kappadelta(1)),
     AveragingType(a...)
 {
   getParsStream()<<"# Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -160,7 +156,7 @@ template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... Avera
 LossyModeUIP<IS_FINITE_TEMP,AveragingType>::LossyModeUIP(const mode::ParsLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),0,p.cutoff),
-    BASE_initR(FREQS(TUPLE_kappa)(TUPLE_delta(1))),
+    ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)}),
     AveragingType(a...)
 {
   getParsStream()<<"# Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -171,7 +167,7 @@ template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... Avera
 LossyModeSch<IS_FINITE_TEMP,AveragingType>::LossyModeSch(const mode::ParsLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),0,p.cutoff),
-    BASE_initR(FREQS(TUPLE_kappa)(TUPLE_delta(0))),
+    ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(0)}),
     AveragingType(a...)
 {
   getParsStream()<<"# Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -182,7 +178,7 @@ template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... Avera
 PumpedLossyMode<IS_FINITE_TEMP,AveragingType>::PumpedLossyMode(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
-    BASE_initC(FREQS(TUPLE_kappadelta(1))(TUPLE_eta)),
+    ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(a...)
 {
   getParsStream()<<"# PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -193,7 +189,7 @@ template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... Avera
 PumpedLossyModeUIP<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
-    BASE_init(FREQS(TUPLE_kappa)(TUPLE_delta(1)),FREQS(TUPLE_eta)),
+    ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)},{TUPLE_eta}),
     AveragingType(a...)
 {
   getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -204,7 +200,7 @@ template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... Avera
 PumpedLossyModeSch<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
-    BASE_initC(FREQS(TUPLE_kappadelta(0))(TUPLE_eta)),
+    ModeBase(p.cutoff,{TUPLE_kappadelta(0),TUPLE_eta}),
     AveragingType(a...)
 {
   getParsStream()<<"# PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
@@ -218,7 +214,7 @@ template<typename AveragingType> template<typename... AveragingConstructorParame
 PumpedLossyModeAlternative<AveragingType>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<false,true>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(p.kappa,-p.delta),p.eta,p.cutoff),
-    BASE_initC(FREQS(TUPLE_kappadelta(1))(TUPLE_eta)),
+    ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(a...)
 {
   getParsStream()<<"# PumpedLossy---Alternative jumping.\n";
@@ -229,10 +225,6 @@ PumpedLossyModeAlternative<AveragingType>::PumpedLossyModeAlternative(const mode
 #undef  TUPLE_kappadelta
 #undef  TUPLE_eta
 #undef  TUPLE_delta
-
-#undef  BASE_initC
-#undef  BASE_initR
-#undef  BASE_init
 
 
 #endif // ELEMENTS_FREES_MODE_TCC_INCLUDED

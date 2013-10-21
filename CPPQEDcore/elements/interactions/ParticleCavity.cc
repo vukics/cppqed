@@ -44,9 +44,7 @@ const Tridiagonals fillT(mode::Ptr mode, particle::Ptr particle, double uNot, do
 
 
 Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff)
-  : structure::Interaction<2>(Frees(mode,particle),
-			      FREQS("Unot",uNot,mode->getDimension())("etaeff",etaeff,sqrt(mode->getDimension()))
-			      )
+  : structure::Interaction<2>(Frees(mode,particle),{RF{"Unot",uNot,mode->getDimension()},RF{"etaeff",etaeff,sqrt(mode->getDimension())}})
 {
   getParsStream()<<"# Particle-Cavity Interaction\n";
 }
@@ -54,8 +52,7 @@ Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff)
 
 InterferenceBase::InterferenceBase(mode::Ptr mode, particle::Ptr particle, double u, size_t kCav, ModeFunctionType modeCav)
   : MF_Base(modeCav,kCav),
-    structure::Interaction<2>(Frees(mode,particle),
-			      FREQS("u",u,mode->getDimension())),
+    structure::Interaction<2>(Frees(mode,particle),RF{"u",u,mode->getDimension()}),
     TridiagonalHamiltonian(interferic(mode,particle,sqr(u),u,MF_Base::member))
 {
   getParsStream()<<"# Interference term with "<<getMF()<<endl;
