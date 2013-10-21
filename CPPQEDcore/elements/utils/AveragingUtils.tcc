@@ -77,9 +77,9 @@ ReducedDensityOperator<RANK>::average_v(structure::NoTime, const LazyDensityOper
 
 template<int RANK, typename V>
 const typename ReducedDensityOperatorNegativity<RANK,V>::Averages 
-ReducedDensityOperatorNegativity<RANK,V>::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
+ReducedDensityOperatorNegativity<RANK,V>::average_v(structure::NoTime t, const LazyDensityOperator& matrix) const
 {
-  Averages res(Base::average_v(matrix));
+  Averages res(Base::average_v(t,matrix));
   res.resize(res.size()+1);
   return res;
 }
