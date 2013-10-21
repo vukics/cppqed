@@ -7,7 +7,7 @@ using namespace mode;
 
 
 nxcoupledmodes::Base<false>::Base(mode::Ptr m1, mode::Ptr m2, double u)
-  : structure::Interaction<2>(Frees(m1,m2),u ? FREQS("u",u,m1->getDimension()*sqrt(m2->getDimension())) : RealFreqs())
+  : structure::Interaction<2>(Frees(m1,m2),u ? RF{"u",u,m1->getDimension()*sqrt(m2->getDimension())} : RF())
 {
   getParsStream()<<"# N-X coupling between modes\n";
 }

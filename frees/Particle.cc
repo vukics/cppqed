@@ -86,10 +86,10 @@ Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClas
 template<>
 Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
   : Base(
-	 Tridiagonal(mainDiagonal(space,-omrec))
-	 +
-	 hOverI(space.getDimension(),vClass,mf)
-	 )
+         Tridiagonal(mainDiagonal(space,-omrec))
+         +
+         hOverI(space.getDimension(),vClass,mf)
+         )
 {
 }
 
@@ -97,8 +97,8 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClas
 template<>
 Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>)
   : Base(
-	 Tridiagonal(mainDiagonal(space,-omrec))
-	 )
+         Tridiagonal(mainDiagonal(space,-omrec))
+         )
 {
 }
 
@@ -164,7 +164,7 @@ void Averaged::process_v(Averages& averages) const
 using namespace particle;
 
 ParticleBase::ParticleBase(size_t fin, 
-			   const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
+                           const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
   : Free(1<<fin,realFreqs,complexFreqs), Averaged(Spatial(fin))
 {
   getParsStream()<<"# Particle\n";
@@ -178,7 +178,7 @@ typedef structure::DynamicsBase::RealFreqs RealFreqs;
 
 const RealFreqs push_back(RealFreqs realFreqs, double vClass)
 {
-  realFreqs.push_back(boost::make_tuple("vClass",vClass,1.));
+  realFreqs.push_back(make_tuple("vClass",vClass,1.));
   return realFreqs;
 }
 
@@ -187,10 +187,10 @@ const RealFreqs push_back(RealFreqs realFreqs, double vClass)
 
 
 PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunction& mf,
-				       const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
+                                       const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
   : ParticleBase(fin,
-		 push_back(realFreqs,vClass),
-		 complexFreqs), 
+                 push_back(realFreqs,vClass),
+                 complexFreqs), 
     vClass_(vClass), mf_(mf)
 {
   getParsStream()<<"# Pump "<<mf<<endl;
@@ -199,18 +199,14 @@ PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunc
 
 
 Particle::Particle(const Pars& p)
-  : ParticleBase(p.fin,
-		 FREQS("omrec",p.omrec,1<<p.fin)
-		 ),
+  : ParticleBase(p.fin,{RF{"omrec",p.omrec,1<<p.fin}}),
     Exact(getSpace(),p.omrec)
 {
 }
 
 
 ParticleSch::ParticleSch(const Pars& p)
-  : ParticleBase(p.fin,
-		 FREQS("omrec",p.omrec,sqr(1<<p.fin))
-		 ),
+  : ParticleBase(p.fin,{RF{"omrec",p.omrec,sqr(1<<p.fin)}}),
     Hamiltonian<false>(getSpace(),p.omrec)
 {
   getParsStream()<<"# Schroedinger picture.\n";
@@ -219,18 +215,14 @@ ParticleSch::ParticleSch(const Pars& p)
 
 
 PumpedParticle::PumpedParticle(const ParsPumped& p)
-  : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),
-		       FREQS("omrec",p.omrec,1<<p.fin)
-		       ),
+  : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec",p.omrec,1<<p.fin}}),
     Hamiltonian<true>(getSpace(),p.omrec,p.vClass,getMF())
 {
 }
 
 
 PumpedParticleSch::PumpedParticleSch(const ParsPumped& p)
-  : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),
-		       FREQS("omrec" ,p.omrec,sqr(1<<p.fin))
-		       ),
+  : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec" ,p.omrec,sqr(1<<p.fin)}}),
     Hamiltonian<false>(getSpace(),p.omrec,p.vClass,getMF())
 {
   getParsStream()<<"# Schroedinger picture.\n";
@@ -362,8 +354,8 @@ const StateVector wavePacket(const ParsPumped& p, bool kFlag)
 {
   if (p.init.getSig()) return wavePacket(static_cast<const Pars&>(p),kFlag);
   else                 return wavePacket(coherent(p),
-					 Spatial(p.fin),
-					 kFlag);
+                                         Spatial(p.fin),
+                                         kFlag);
 }
 
 
@@ -399,9 +391,9 @@ const StateVector hoState(const ParsPumped& p, bool kFlag)
 {
   if (p.init.getSig()) return hoState(static_cast<const Pars&>(p),kFlag);
   else                 return hoState(p.hoInitn,
-				      coherent(p),
-				      Spatial(p.fin),
-				      kFlag);
+                                      coherent(p),
+                                      Spatial(p.fin),
+                                      kFlag);
 }
 
 

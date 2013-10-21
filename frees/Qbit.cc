@@ -81,24 +81,20 @@ QbitBase::QbitBase(const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
   : ModeBase(2,realFreqs,complexFreqs,qbit::keyTitle), Averaged()
 {}
 
-#define BASE_init(R,C) QbitBase((R),(C))
-#define BASE_initR(R)  BASE_init((R),ComplexFreqs())
-#define BASE_initC(C)  BASE_init(RealFreqs(),(C))
-
-#define TUPLE_delta(ISIP) "delta",-imag(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),1//,BOOST_PP_IF(ISIP,1,p.cutoff)
-#define TUPLE_eta "eta",get_eta(),1//,sqrt(p.cutoff)
-#define TUPLE_gammadelta(ISIP) "(gamma,delta)",conj(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),1//,BOOST_PP_IF(ISIP,1,p.cutoff)
-#define TUPLE_gamma "gamma",real(get_zSch()),1//,p.cutoff
+#define TUPLE_delta(ISIP) RF{"delta",-imag(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),1}
+#define TUPLE_eta CF{"eta",get_eta(),1}
+#define TUPLE_gammadelta(ISIP) CF{"(gamma,delta)",conj(BOOST_PP_IF(ISIP,get_zI,get_zSch)()),1}
+#define TUPLE_gamma RF{"gamma",real(get_zSch()),1}
 
 Qbit::Qbit(const qbit::Pars& p)
   : Exact(dcomp(0,-p.delta)),
-    BASE_initR(FREQS(TUPLE_delta(1)))
+    QbitBase{TUPLE_delta(1)}
 {}
 
 
 QbitSch::QbitSch(const qbit::Pars& p)
   : qbit::Hamiltonian<false>(dcomp(0,-p.delta),0),
-    BASE_initR(FREQS(TUPLE_delta(0)))
+    QbitBase{TUPLE_delta(0)}
 {
   getParsStream()<<"# Schroedinger picture.\n";
 }
@@ -106,7 +102,7 @@ QbitSch::QbitSch(const qbit::Pars& p)
    
 PumpedQbit::PumpedQbit(const qbit::ParsPumped& p)
   : qbit::Hamiltonian<true>(0,dcomp(0,-p.delta),p.eta),
-    BASE_init(FREQS(TUPLE_delta(1)),FREQS(TUPLE_eta))
+    QbitBase(TUPLE_delta(1),TUPLE_eta)
 {
   getParsStream()<<"# Pumped.\n";
 }
@@ -114,7 +110,7 @@ PumpedQbit::PumpedQbit(const qbit::ParsPumped& p)
 
 PumpedQbitSch::PumpedQbitSch(const qbit::ParsPumped& p)
   : qbit::Hamiltonian<false>(dcomp(0,-p.delta),p.eta),
-    BASE_init(FREQS(TUPLE_delta(0)),FREQS(TUPLE_eta))
+    QbitBase(TUPLE_delta(0),TUPLE_eta)
 {
   getParsStream()<<"# Pumped, Schroedinger picture.\n";
 }
@@ -123,7 +119,7 @@ PumpedQbitSch::PumpedQbitSch(const qbit::ParsPumped& p)
 LossyQbit::LossyQbit(const qbit::ParsLossy& p)
   : qbit::Liouvillean(p.gamma),
     Exact(dcomp(p.gamma,-p.delta)),
-    BASE_initC(FREQS(TUPLE_gammadelta(1)))
+    QbitBase{TUPLE_gammadelta(1)}
 {
   getParsStream()<<"# Lossy.\n";
 }
@@ -132,7 +128,7 @@ LossyQbit::LossyQbit(const qbit::ParsLossy& p)
 LossyQbitSch::LossyQbitSch(const qbit::ParsLossy& p)
   : qbit::Liouvillean(p.gamma),
     qbit::Hamiltonian<false>(dcomp(p.gamma,-p.delta),0),
-    BASE_initR(FREQS(TUPLE_gamma)(TUPLE_delta(0)))
+    QbitBase{TUPLE_gamma,TUPLE_delta(0)}
 {
   getParsStream()<<"# Lossy, Schroedinger picture.\n";
 }
@@ -141,7 +137,7 @@ LossyQbitSch::LossyQbitSch(const qbit::ParsLossy& p)
 LossyQbitUIP::LossyQbitUIP(const qbit::ParsLossy& p)
   : qbit::Liouvillean(p.gamma),
     qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),0),
-    BASE_initR(FREQS(TUPLE_gamma)(TUPLE_delta(1)))
+    QbitBase{TUPLE_gamma,TUPLE_delta(1)}
 {
   getParsStream()<<"# Lossy, Unitary interaction picture.\n";
 }
@@ -150,7 +146,7 @@ LossyQbitUIP::LossyQbitUIP(const qbit::ParsLossy& p)
 PumpedLossyQbit::PumpedLossyQbit(const qbit::ParsPumpedLossy& p)
   : qbit::Liouvillean(p.gamma),
     qbit::Hamiltonian<true>(0,dcomp(p.gamma,-p.delta),p.eta),
-    BASE_initC(FREQS(TUPLE_gammadelta(1))(TUPLE_eta))
+    QbitBase{TUPLE_gammadelta(1),TUPLE_eta}
 {
   getParsStream()<<"# PumpedLossy.\n";
 }
@@ -159,7 +155,7 @@ PumpedLossyQbit::PumpedLossyQbit(const qbit::ParsPumpedLossy& p)
 PumpedLossyQbitUIP::PumpedLossyQbitUIP(const qbit::ParsPumpedLossy& p)
   : qbit::Liouvillean(p.gamma),
     qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),p.eta),
-    BASE_init(FREQS(TUPLE_gamma)(TUPLE_delta(1)),FREQS(TUPLE_eta))
+    QbitBase({TUPLE_gamma,TUPLE_delta(1)},{TUPLE_eta})
 {
   getParsStream()<<"# PumpedLossy, Unitary interaction picture.\n";
 }
@@ -168,7 +164,7 @@ PumpedLossyQbitUIP::PumpedLossyQbitUIP(const qbit::ParsPumpedLossy& p)
 PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
   : qbit::Liouvillean(p.gamma),
     qbit::Hamiltonian<false>(dcomp(p.gamma,-p.delta),p.eta),
-    BASE_initC(FREQS(TUPLE_gammadelta(0))(TUPLE_eta))
+    QbitBase{TUPLE_gammadelta(0),TUPLE_eta}
 {
   getParsStream()<<"# PumpedLossy, Schroedinger picture.\n";
 }
@@ -177,8 +173,7 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
 LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(const qbit::ParsLossy& p, double gamma_parallel)
   : Exact(dcomp(p.gamma,-p.delta)), // gamma_parallel does not contribute to the Hamiltonian
     qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
-    BASE_init(FREQS("gamma_parallel",gamma_parallel,1),
-              FREQS(TUPLE_gammadelta(1)))
+    QbitBase(RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1))
 {
   getParsStream()<<"# LossyWithPhaseNoise.\n";
 }
@@ -187,8 +182,7 @@ LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(const qbit::ParsLossy& p, doubl
 LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy& p, double gamma_parallel)
   : qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),0),
     qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
-    BASE_init(FREQS("gamma_parallel",gamma_parallel,1),
-              FREQS(TUPLE_gammadelta(1)))
+    QbitBase(RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1))
 {
   getParsStream()<<"# LossyWithPhaseNoise, Unitary interaction picture.\n";
 }
@@ -198,10 +192,6 @@ LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy& p,
 #undef  TUPLE_gammadelta
 #undef  TUPLE_eta
 #undef  TUPLE_delta
-
-#undef  BASE_initR
-#undef  BASE_initC
-#undef  BASE_init
 
 //////////
 //

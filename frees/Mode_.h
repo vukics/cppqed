@@ -238,8 +238,16 @@ class ModeBase
 {
 public:
   ModeBase(size_t dim,
-	   const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs(),
-	   const std::string& keyTitle=mode::keyTitle);
+           const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF,
+           const std::string& keyTitle=mode::keyTitle);
+
+  ModeBase(size_t dim, const ComplexFreqs& complexFreqs, const std::string& keyTitle=mode::keyTitle) : ModeBase(dim,emptyRF,complexFreqs,keyTitle) {}
+  ModeBase(size_t dim, RealFreqsInitializer rf, ComplexFreqsInitializer cf=ComplexFreqsInitializer(), const std::string& keyTitle=mode::keyTitle)
+    : ModeBase(dim,RealFreqs(rf),ComplexFreqs(cf),keyTitle) {}
+  ModeBase(size_t dim, ComplexFreqsInitializer cf, const std::string& keyTitle=mode::keyTitle) : ModeBase(dim,RealFreqsInitializer(),cf,keyTitle) {}
+  ModeBase(size_t dim, RF rf, CF cf=CF(), const std::string& keyTitle=mode::keyTitle)
+    : ModeBase(dim,RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer() : ComplexFreqsInitializer{cf},keyTitle) {}
+  ModeBase(size_t dim, CF cf, const std::string& keyTitle=mode::keyTitle) : ModeBase(dim,ComplexFreqsInitializer{cf},keyTitle) {}
 
   virtual ~ModeBase() {}
 

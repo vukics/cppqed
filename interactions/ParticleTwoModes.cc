@@ -34,11 +34,11 @@ const dcomp factor(double uNot0, double uNot1, double phi)
 
 
 Base::Base(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part, 
-	   double uNot0, double uNot1, 
-	   const ModeFunction& mf0, const ModeFunction& mf1,
-	   double phi)
+           double uNot0, double uNot1, 
+           const ModeFunction& mf0, const ModeFunction& mf1,
+           double phi)
   : structure::Interaction<3>(Frees(mode0,mode1,part),
-			      FREQS("Unot0",uNot0,sqrt(mode0->getDimension()))("Unot1",uNot1,sqrt(mode1->getDimension()))),
+                              {RF{"Unot0",uNot0,sqrt(mode0->getDimension())},RF{"Unot1",uNot1,sqrt(mode1->getDimension())}}),
     firstH_(factor(uNot0,uNot1,phi)*helper(mode0,mode1,part,mf0)), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(part,mf1).dagger()), secondHT_(secondH_.dagger())
 {

@@ -45,7 +45,7 @@ protected:
 
   template<typename QBIT_SPIN_BASE>
   Base(boost::shared_ptr<const QBIT_SPIN_BASE> qbitspin, mode::Ptr mode, const dcomp& g=0)
-  : IA_Base(Frees(qbitspin,mode),RealFreqs(),FREQS("g",g,sqrt(qbitspin->getDimension()*mode->getDimension())))
+  : IA_Base(Frees(qbitspin,mode),CF{"g",g,sqrt(qbitspin->getDimension()*mode->getDimension())})
   {
     getParsStream()<<"# Jaynes-Cummings interaction\n";
   }
