@@ -62,7 +62,7 @@ private:
 };
 
 
-/// \name Dimensionality comparison for types derived from DimensionsBookkeeper
+/// \related DimensionsBookkeeper Dimensionality comparison for types derived from DimensionsBookkeeper
 //@{
 template<int RANK, bool IS_CONST1, bool IS_CONST2>
 inline bool
