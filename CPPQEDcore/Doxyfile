@@ -319,7 +319,7 @@ INLINE_GROUPED_CLASSES = NO
 # to NO (the default), structs, classes, and unions are shown on a separate
 # page (for HTML and Man pages) or section (for LaTeX and RTF).
 
-INLINE_SIMPLE_STRUCTS  = NO
+INLINE_SIMPLE_STRUCTS  = YES
 
 # When TYPEDEF_HIDES_STRUCT is enabled, a typedef of a struct, union, or enum
 # is documented as struct, union, or enum with the name of the typedef. So
@@ -671,10 +671,10 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = doc/mainpage.markdown CompilationMacros.h \
-                         utils/include/BlitzArray.h utils/include/BlitzArrayExtensions.h utils/include/BlitzArraySliceIterator.h \
-                         utils/include/BlitzTiny.h utils/include/BlitzTinyExtensions.h utils/include/CMatrix.h utils/include/ComplexArrayExtensions.h \
-                         utils/include/ComplexExtensions.h utils/include/CVector.h utils/include/MultiIndexIterator.h utils/include/TMP_Tools.h \
-                         quantumdata quantumoperator quantumoperator/impl/Sigma.tcc structure \
+                         utils/BlitzArray.h utils/BlitzArrayExtensions.h utils/BlitzArraySliceIterator.h \
+                         utils/BlitzTiny.h utils/BlitzTinyExtensions.h utils/CMatrix.h utils/ComplexArrayExtensions.h \
+                         utils/ComplexExtensions.h utils/CVector.h utils/MultiIndexIterator.h utils/TMP_Tools.h \
+                         quantumdata quantumoperator quantumoperator/Sigma.tcc structure \
                          quantumtrajectory
 
 # This tag can be used to specify the character encoding of the source files
