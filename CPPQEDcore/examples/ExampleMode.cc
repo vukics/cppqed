@@ -16,9 +16,10 @@ double aDagJumpRate(const LazyDensityOperator&, double kappa_n     );
 
 basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double n, size_t cutoff)
   : Free(cutoff,
-         RealFreqs(),
-         FREQS("(kappa*(2*n+1),delta)",dcomp(kappa*(2*n+1),delta),     cutoff )
-              ("eta"                  ,eta                       ,sqrt(cutoff))),
+         {
+           CF{"(kappa*(2*n+1),delta)",dcomp(kappa*(2*n+1),delta),     cutoff },
+           CF{"eta"                  ,eta                       ,sqrt(cutoff)}
+         }),
     TridiagonalHamiltonian<1,false>(dcomp(-kappa*(2*n+1),delta)*nop(cutoff)
                                     +
                                     tridiagPlusHC_overI(conj(eta)*aop(cutoff))),
@@ -33,7 +34,7 @@ basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, d
 }
 
 
-const basic::PumpedLossyMode::Averages basic::PumpedLossyMode::average_v(NoTime, const LazyDensityOperator& matrix) const
+auto basic::PumpedLossyMode::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
 {
   Averages averages(3);
 
@@ -58,9 +59,11 @@ const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t cutoff);
 
 basic::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, double n, size_t cutoff)
   : Free(cutoff,
-         FREQS("kappa*(2*n+1)",kappa*(2*n+1),cutoff)
-              ("delta",delta,1),
-         FREQS("eta",eta,sqrt(cutoff))),
+         {
+           RF{"kappa*(2*n+1)",kappa*(2*n+1),cutoff},
+           RF{"delta",delta,1}
+         },
+         CF{"eta",eta,sqrt(cutoff)}),
     FreeExact<false>(cutoff),
     TridiagonalHamiltonian<1,true>(furnishWithFreqs(tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
                                                     mainDiagonal(dcomp(kappa*(2*n+1),-delta),cutoff))),
@@ -81,7 +84,7 @@ void basic::PumpedLossyModeIP::updateU(OneTime dtDid) const
 
 
 // PumpedLossyModeIP::average_v exactly the same as PumpedLossyMode::average_v above
-const basic::PumpedLossyModeIP::Averages basic::PumpedLossyModeIP::average_v(NoTime, const LazyDensityOperator& matrix) const
+auto basic::PumpedLossyModeIP::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
 {
   Averages averages(3);
 
