@@ -63,10 +63,12 @@ public:
   explicit DynamicsBase(const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF); ///< Straightforward constructor
   
   explicit DynamicsBase(const ComplexFreqs& complexFreqs) : DynamicsBase(emptyRF,complexFreqs) {}
-  explicit DynamicsBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf=ComplexFreqsInitializer()) : DynamicsBase(RealFreqs(rf),ComplexFreqs(cf)) {} ///< Constructor with initializer lists
-  explicit DynamicsBase(ComplexFreqsInitializer cf) : DynamicsBase(RealFreqsInitializer(),cf) {}
-  explicit DynamicsBase(RF rf, CF cf=CF()) : DynamicsBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer() : ComplexFreqsInitializer{cf}) {}
+  explicit DynamicsBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : DynamicsBase(RealFreqs(rf),ComplexFreqs(cf)) {} ///< Constructor with initializer lists
+  explicit DynamicsBase(ComplexFreqsInitializer cf) : DynamicsBase({},cf) {}
+  explicit DynamicsBase(RF rf, CF cf=CF()) : DynamicsBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer{} : ComplexFreqsInitializer{cf}) {}
   explicit DynamicsBase(CF cf) : DynamicsBase(ComplexFreqsInitializer{cf}) {}
+  explicit DynamicsBase(RealFreqsInitializer rf, CF cf) : DynamicsBase(rf,{cf}) {}
+  explicit DynamicsBase(RF rf, ComplexFreqsInitializer cf) : DynamicsBase({rf},cf) {}
   
   double highestFrequency() const; ///< Calculates the fastest timescale of the system from the frequencies stored in the lists
 

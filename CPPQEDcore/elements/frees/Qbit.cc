@@ -155,7 +155,7 @@ PumpedLossyQbit::PumpedLossyQbit(const qbit::ParsPumpedLossy& p)
 PumpedLossyQbitUIP::PumpedLossyQbitUIP(const qbit::ParsPumpedLossy& p)
   : qbit::Liouvillean(p.gamma),
     qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),p.eta),
-    QbitBase({TUPLE_gamma,TUPLE_delta(1)},{TUPLE_eta})
+    QbitBase({TUPLE_gamma,TUPLE_delta(1)},TUPLE_eta)
 {
   getParsStream()<<"# PumpedLossy, Unitary interaction picture.\n";
 }
