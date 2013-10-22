@@ -189,7 +189,7 @@ template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... Avera
 PumpedLossyModeUIP<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
-    ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)},{TUPLE_eta}),
+    ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)},TUPLE_eta),
     AveragingType(a...)
 {
   getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);

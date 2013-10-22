@@ -42,15 +42,19 @@ class QbitBase
 {
 public:
   explicit QbitBase(const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF);
+
   explicit QbitBase(const ComplexFreqs& complexFreqs) : QbitBase(emptyRF,complexFreqs) {}
-  explicit QbitBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf=ComplexFreqsInitializer()) : QbitBase(RealFreqs(rf),ComplexFreqs(cf)) {}
-  explicit QbitBase(ComplexFreqsInitializer cf) : QbitBase(RealFreqsInitializer(),cf) {}
-  explicit QbitBase(RF rf, CF cf=CF()) : QbitBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer() : ComplexFreqsInitializer{cf}) {}
+  explicit QbitBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : QbitBase(RealFreqs(rf),ComplexFreqs(cf)) {}
+  explicit QbitBase(ComplexFreqsInitializer cf) : QbitBase({},cf) {}
+  explicit QbitBase(RF rf, CF cf=CF()) : QbitBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer{} : ComplexFreqsInitializer{cf}) {}
   explicit QbitBase(CF cf) : QbitBase(ComplexFreqsInitializer{cf}) {}
+  explicit QbitBase(RealFreqsInitializer rf, CF cf) : QbitBase(rf,{cf}) {}
+  explicit QbitBase(RF rf, ComplexFreqsInitializer cf) : QbitBase({rf},cf) {}
 
   virtual ~QbitBase() {}
 
 };
+
 
 namespace qbit {
 
