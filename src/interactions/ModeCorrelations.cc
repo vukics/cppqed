@@ -24,7 +24,7 @@ ModeCorrelations::ModeCorrelations()
 
 namespace {
 
-#include "details/BinaryHelper.h"
+#include "details_BinaryHelper.h"
 
 }
 

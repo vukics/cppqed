@@ -87,7 +87,7 @@ private:
 #define BIG_ADDITIONAL_TEMPLATE_PARAMETERS      int NL, typename VC,
 #define BIG_ADDITIONAL_TEMPLATE_PARAMETERS_PASS <NL,VC>
 
-#include "details/BinaryInteractionGenerator.h"
+#include "details_BinaryInteractionGenerator.h"
 
 
 #endif // ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED

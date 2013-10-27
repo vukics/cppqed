@@ -28,7 +28,7 @@ public:
 #define BIG_ADDITIONAL_PARAMETERS      , dcomp u, dcomp y
 #define BIG_ADDITIONAL_PARAMETERS_PASS , u, y
 
-#include "details/BinaryInteractionGenerator.h"
+#include "details_BinaryInteractionGenerator.h"
 
 
 
