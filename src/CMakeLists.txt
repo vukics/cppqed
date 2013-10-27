@@ -1,3 +1,4 @@
+include(CMakePackageConfigHelpers)
 
 set(ELEMENTS_SOURCE_DIRS utils frees interactions)
 
@@ -5,7 +6,67 @@ foreach(d ${ELEMENTS_SOURCE_DIRS})
   add_subdirectory(${d})
 endforeach(d)
 
-add_library(C++QEDelements SHARED $<TARGET_OBJECTS:utils_objs> 
-                                  $<TARGET_OBJECTS:frees_objs>
-                                  $<TARGET_OBJECTS:interactions_objs>)
-target_link_libraries(C++QEDelements ${CPPQED_LIBRARIES})
+set(ELEMENTS_CMAKE_SUBDIR "cmake/CPPQEDelements-${CPPQED_ID}")
+set(ELEMENTS_INCLUDE_SUBDIR "CPPQED-${CPPQED_ID}/elements")
+
+gather_includes(ELEMENTS ELEMENTS_SOURCE_DIRS)
+
+set(CMAKE_DEBUG_POSTFIX "_d")
+set(ELEMENTSLIB C++QEDelements-${CPPQED_ID})
+add_library(${ELEMENTSLIB} SHARED
+    ${ELEMENTS_PUBLIC_HEADERS}
+    $<TARGET_OBJECTS:utils_objs> 
+    $<TARGET_OBJECTS:frees_objs>
+    $<TARGET_OBJECTS:interactions_objs>)
+target_link_libraries(${ELEMENTSLIB} PRIVATE ${CPPQED_LIBRARIES})
+set_target_properties(${ELEMENTSLIB} PROPERTIES
+      PUBLIC_HEADER "${ELEMENTS_PUBLIC_HEADERS}"
+      INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
+      VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
+      SOVERSION ${CPPQED_ABI_MAJOR}
+)
+
+install(TARGETS ${ELEMENTSLIB}
+        EXPORT CPPQEDelementsTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${ELEMENTS_INCLUDE_SUBDIR}
+        COMPONENT shlib
+)
+
+# Add all targets to the build-tree export set
+if(DEFINED CPPQED_MONOLITHIC)
+  export(TARGETS ${ELEMENTSLIB} ${CPPQED_LIBRARIES} FILE "${PROJECT_BINARY_DIR}/CPPQEDelementsTargets.cmake")
+else(DEFINED CPPQED_MONOLITHIC)
+  export(TARGETS ${ELEMENTSLIB} FILE "${PROJECT_BINARY_DIR}/CPPQEDelementsTargets.cmake")
+endif(DEFINED CPPQED_MONOLITHIC)
+
+# Create the CPPQEDConfig.cmake
+# ... for the build tree
+foreach(d ${ELEMENTS_SOURCE_DIRS})
+  set(CONF_INCLUDE_DIRS ${CONF_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/src/${d}) 
+endforeach(d)
+configure_package_config_file(CPPQEDelementsConfig.cmake.in "${PROJECT_BINARY_DIR}/CPPQEDelementsConfig.cmake"
+  INSTALL_DESTINATION  "${PROJECT_BINARY_DIR}/CPPQEDelementsConfig.cmake"
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS
+)
+write_basic_package_version_file(${PROJECT_BINARY_DIR}/CPPQEDelementsConfigVersion.cmake 
+  VERSION ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}
+  COMPATIBILITY ExactVersion
+)
+
+# ... and for the installation tree
+set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR}/${ELEMENTS_INCLUDE_SUBDIR})
+configure_package_config_file(CPPQEDelementsConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQEDelementsConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/${ELEMENTS_CMAKE_SUBDIR}"
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS
+)
+
+# Install the CPPQEDConfig.cmake and CPPQEDConfigVersion.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQEDelementsConfig.cmake"
+  "${PROJECT_BINARY_DIR}/CPPQEDelementsConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/${ELEMENTS_CMAKE_SUBDIR}" COMPONENT dev)
+ 
+# Install the export set for use with the install-tree
+install(EXPORT CPPQEDelementsTargets DESTINATION
+  "${CMAKE_INSTALL_LIBDIR}/${ELEMENTS_CMAKE_SUBDIR}" COMPONENT dev)
