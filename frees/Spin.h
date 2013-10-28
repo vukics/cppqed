@@ -75,7 +75,7 @@ public:
 private:
   void process_v(Averages&) const;
 
-  const Averages average_v(const LazyDensityOperator&) const;
+  const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
 
   const size_t twoS_;
 
@@ -97,7 +97,7 @@ public:
   {}
 
 private:
-  void updateU(double) const;
+  void updateU(structure::OneTime) const;
 
   bool isUnitary_v() const {return !getGamma();}
 
