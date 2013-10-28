@@ -16,7 +16,7 @@ using particle::mfNKX;
 using namespace mode;
 
 
-namespace particletwomodes {
+namespace {
 
 
 const quantumoperator::Tridiagonal<3> 
@@ -28,15 +28,18 @@ helper(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part, const ModeFunction&
 
 const dcomp factor(double uNot0, double uNot1, double phi)
 {
-  if (uNot0*uNot1<0) throw UnotsSignDiscrepancy(); 
+  if (uNot0*uNot1<0) throw particletwomodes::UnotsSignDiscrepancy(); 
   return sign(uNot0)*sqrt(uNot0*uNot1)*exp(DCOMP_I*phi)/DCOMP_I;
 }
 
 
-Base::Base(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part, 
-           double uNot0, double uNot1, 
-           const ModeFunction& mf0, const ModeFunction& mf1,
-           double phi)
+}
+
+
+ParticleTwoModes::ParticleTwoModes(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part, 
+                                   double uNot0, double uNot1, 
+                                   const ModeFunction& mf0, const ModeFunction& mf1,
+                                   double phi)
   : structure::Interaction<3>(Frees(mode0,mode1,part),
                               {RF{"Unot0",uNot0,sqrt(mode0->getDimension())},RF{"Unot1",uNot1,sqrt(mode1->getDimension())}}),
     firstH_(factor(uNot0,uNot1,phi)*helper(mode0,mode1,part,mf0)), firstHT_(-firstH_.dagger()),
@@ -47,7 +50,7 @@ Base::Base(mode::Ptr mode0, mode::Ptr mode1, particle::Ptr part,
 
 
 
-void Base::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
 {
   using namespace blitzplusplus;
   using basi::fullRange;
@@ -75,4 +78,3 @@ void Base::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow
 }
 
 
-} // particletwomodes
