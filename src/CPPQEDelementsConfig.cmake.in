@@ -10,7 +10,7 @@ set(CPPQEDELEMENTS_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET @ELEMENTSLIB@)
-  include("CPPQEDelementsTargets.cmake")
+  include("@PACKAGE_CONF_CMAKE_DIR@/CPPQEDelementsTargets.cmake")
 endif()
 
 # This is an IMPORTED target created by CPPQEDelementsTargets.cmake
