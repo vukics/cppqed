@@ -63,17 +63,16 @@ const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp, const AveragingConstruc
 
 template<typename Base>
 AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
-  : Base(KeyLabels(1,"|Psi(cutoff-1)|^2"),KeyLabels())
+  : Base(KeyLabels(1,"|Psi(cutoff-1)|^2"))
 {
 }
 
 
 template<typename Base>
-const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average_v(NoTime, const LazyDensityOperator& matrix) const
+const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average_v(NoTime t, const LazyDensityOperator& matrix) const
 {
-  const Averages averagesFromBase(Base::average_v(matrix));
-  Averages averages(averagesFromBase.size()+1);
-  averages(blitz::Range(0,averages.size()-2))=averagesFromBase;
+  Averages averages(Base::nAvr());
+  averages(blitz::Range(0,averages.size()-2))=Base::average_v(t,matrix);
   averages(averages.size()-1)=matrix(matrix.getDimension()-1);
   return averages;
 }

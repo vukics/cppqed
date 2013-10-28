@@ -92,7 +92,7 @@ SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double g
 
 
 
-const SpinBase::Averages SpinBase::average_v(const LazyDensityOperator& matrix) const
+const SpinBase::Averages SpinBase::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
 {
   Averages averages(5);
 
@@ -125,11 +125,11 @@ void SpinBase::process_v(Averages& averages) const
 }
 
 
-void Spin::updateU(double dtdid) const
+void Spin::updateU(structure::OneTime dtDid) const
 {
   Diagonal& factors(getDiagonal());
   for (int i=0; i<factors.size(); i++)
-    factors(i)=exp(-dtdid*i*get_z());
+    factors(i)=exp(-dtDid*i*get_z());
 }
 
 
