@@ -9,6 +9,7 @@
 #include "Free.h"
 
 #include "BlitzTiny.h"
+#include "SmartPtr.h"
 
 #include <boost/bind.hpp>
 
@@ -42,6 +43,8 @@ public:
   /** \note The order of the Free objects is essential! (Cf. BinarySystem, Composite) */
   typedef blitz::TinyVector<Free::Ptr,RANK> Frees;
 
+  template<typename F> using FreesTemplate=blitz::TinyVector<F,RANK>; ///< `F` must be convertible to Free::Ptr by cpputils::sharedPointerize
+  
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
   explicit Interaction(const Frees& frees,
@@ -58,6 +61,18 @@ public:
   Interaction(const Frees& frees, RF rf, ComplexFreqsInitializer cf) : Interaction(frees,{rf},cf) {}
 
   const Frees& getFrees() const {return frees_;}
+
+protected:
+  class FreesProxy
+  {
+  public:
+    template<typename... Pack>
+    FreesProxy(Pack&&... pack) : frees_(cpputils::sharedPointerize(pack)...) {}
+    
+    operator const Frees&() const {return frees_;}
+    
+    const Frees frees_;
+  };
 
 private:
   static const Dimensions extractDimensions(const Frees& frees)

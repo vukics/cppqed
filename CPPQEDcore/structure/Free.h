@@ -23,15 +23,15 @@ namespace structure {
 /// Contains some typedefs for structures of arity 1 for convenience in defining free systems
 namespace free {
 
-typedef quantumoperator::Tridiagonal<1> Tridiagonal;
+typedef quantumoperator::Tridiagonal<1> Tridiagonal; ///< unary Tridiagonal
 
-typedef quantumdata::Types<1>::    StateVectorLow     StateVectorLow;
-typedef quantumdata::Types<1>::DensityOperatorLow DensityOperatorLow;
+typedef quantumdata::Types<1>::    StateVectorLow     StateVectorLow; ///< unary StateVectorLow
+typedef quantumdata::Types<1>::DensityOperatorLow DensityOperatorLow; ///< unary DensityOperatorFwd
 
-typedef quantumdata::LazyDensityOperator<1> LazyDensityOperator;
+typedef quantumdata::LazyDensityOperator<1> LazyDensityOperator; ///< unary LazyDensityOperator
 
-typedef quantumdata::    StateVector<1>     StateVector;
-typedef quantumdata::DensityOperator<1> DensityOperator;
+typedef quantumdata::    StateVector<1>     StateVector; ///< unary StateVector
+typedef quantumdata::DensityOperator<1> DensityOperator; ///< unary DensityOperator
 
 } // free
 

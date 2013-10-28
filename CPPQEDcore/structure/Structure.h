@@ -248,9 +248,12 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
 
 /** \page structurebundleguide Guide on the use of the structure-bundle
  * 
+ * \tableofcontents
+ * 
  * \note The files referred to in this Section are found in directory `examples` in the distribution. The code examples are expected to compile, cf. `examples/Jamfile`.
  * 
- * ## Implementation of a class representing a harmonic-oscillator mode
+ * Implementation of a class representing a harmonic-oscillator mode {#basicoscillator}
+ * =================================================================
  * 
  * We demonstrate how to implement an element representing a pumped lossy mode in a truncated Fock space. In the frame rotating with the pump frequency, it is described by the Hamiltonian:
  * \f[H=-\delta a^\dagger a+\lp\eta a^\dagger+\hermConj\rp,\f]
@@ -274,20 +277,22 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * 
  * \snippet ExampleMode.h basic example mode
  * 
+ * The NoTime tagging class as a function argument is redundant here, but it needs to be provided.
  * This will suffice here. Let us look at the implementations in `ExampleMode.cc`:\dontinclude ExampleMode.cc
- * \until sqrt(cutoff))),
+ * \until }),
  * We construct the Free base with the dimension of the system and the name-value-multiplier tuples for the frequency-like parameters of the system, which in this case are all complex
- * (cf. the explanation @ DynamicsBase). #FREQS is a macro defined in DynamicsBase.h, which facilitates the creation of lists of such tuples.
+ * (cf. the explanation @ DynamicsBase). We use C++11 initializer lists and the DynamicsBase::CF typedef.
  * \until cutoff))),
  * We construct the time-independent TridiagonalHamiltonian base. This is greatly facilitated by the algebra and helpers of the quantumoperator::Tridiagonal class.
  * \warning When implementing the Hamiltonian, not \f$H\f$ itself but \f$\frac Hi\f$ has to supplied!
  * 
  * \until ,"photon absorption"}),
- * We construct the ElementLiouvilleanStrategies base whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
+ * We construct the ElementLiouvilleanStrategies base, whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
  * The constructor takes the strategies for calculating the impact of a jump on a free::StateVectorLow, and for calculating the rate from a free::LazyDensityOperator.
- * These strategy functions are produced from the free-standing helpers in Lines 10-14 above through argument binding.
+ * These strategy functions are produced from the free-standing helpers in Lines 10-14 above through argument binding. The strategies are followed by a description of
+ * the lossy element and the decay channels. The number of descriptive labels must agree with the number of strategies.
  * \until ,"imag(\")"})
- * We construct the ElementAveraged base, with parameters necessary to produce a simple key for quantum averages communicated towards the user.
+ * We construct the ElementAveraged base, with parameters necessary to produce a simple key of the quantum averages that are communicated towards the user.
  * Here we calculate only three such averages, the expectation value of the number operator, and the real and imaginary parts of that of the ladder operator.
  * \until }
  * With the DynamicsBase::getParsStream function we obtain a stream whereon we can write more information about the object that gets communicated towards the user
@@ -310,7 +315,8 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * \until const Tridiagonal nop
  * \until }
  * 
- * ### Exploiting interaction picture
+ * Exploiting interaction picture {#basicoscillatorip}
+ * ------------------------------
  * 
  * In many situations, it pays to transfer to interaction picture defined by the first term of the Hamiltonian \f$\HnH\f$ above. The ladder operator in interaction picture is
  * \f[a\Int(t)=a e^{-zt},\f] so that the Hamiltonian reads \f[H\Int(t)=\lp\eta a^\dagger e^{zt}+\eta^*ae^{-zt}\rp.\f]
@@ -325,6 +331,9 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * \dontinclude ExampleMode.h
  * \skip FreeExact
  * \until } // basic
+ * The OneTime tagging class at the same time carries the information about the time instant to which the (diagonal) transformation operator has to be updated.
+ * OneTime can be implicitly converted into a double.
+ * 
  * In the implementation, the only difference from the previous case will be the constructor, because the Hamiltonian now also requires furnishing with frequencies
  * (cf. quantumoperator::furnishWithFreqs), and the implementation of the virtual function FreeExact::updateU.
  * 
@@ -336,9 +345,11 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * If this is not the case, Exact has to be used instead.
  * 
  * \note Since a lot of the code from the previous case can be reused here, one will usually adopt an inheritence- or class-composition-based solution to implement classes like
- * `PumpedLossyMode` and `PumpedLossyModeIP` (cf. the actual implementation of a harmonic-oscillator mode in the framework in `elements/frees/Mode.h`).
+ * `PumpedLossyMode` and `PumpedLossyModeIP` (for an inheritance-based solution, cf. below; for one based on class-composition, cf. the actual implementation of a harmonic-oscillator 
+ * mode in the framework in `elements/frees/Mode_.h`).
  * 
- * ## Implementing an X-X interaction
+ * Implementing an X-X interaction {#basicxxinteraction}
+ * ===============================
  * 
  * Let us consider the interaction described by the Hamiltonian \f[H_\text{X-X}=g(a+a^\dagger)(b+b^\dagger).\f]
  * 
@@ -351,9 +362,11 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * 
  * Consider `ExampleInteraction.h`:\dontinclude ExampleInteraction.h
  * \skip #include
- * \until };
+ * \until } // basic
  * 
- * `ExampleInteraction.cc` then reads \include ExampleInteraction.cc
+ * `ExampleInteraction.cc` then reads \dontinclude ExampleInteraction.cc
+ * \skip #include
+ * \until {}
  * As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in \f$H_{\text{X-X;I}}(t)\f$,
  * which result from the use of interaction picture.
  *
