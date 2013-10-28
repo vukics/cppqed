@@ -16,11 +16,20 @@ namespace particletwomodes {
 
 class UnotsSignDiscrepancy : public cpputils::Exception {};
 
+} // particletwomodes
 
-class Base : public structure::Interaction<3>, public structure::Hamiltonian<3>
+
+class ParticleTwoModes : public structure::Interaction<3>, public structure::Hamiltonian<3>
 {
+private:
+  ParticleTwoModes(mode::Ptr, mode::Ptr, particle::Ptr, double uNot0, double uNot1, const ModeFunction&, const ModeFunction&, double);
+
 public:
-  Base(mode::Ptr, mode::Ptr, particle::Ptr, double uNot0, double uNot1, const ModeFunction&, const ModeFunction&, double);
+  template<typename F0, typename F1, typename F2>
+  ParticleTwoModes(const F0& f0, const F1& f1, const F2& f2, 
+                   const particlecavity::ParsAlong& p0, const particlecavity::ParsAlong& p1, double phi=0)
+    : ParticleTwoModes(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f2),
+                       p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
 
 private:
   void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; 
@@ -29,22 +38,6 @@ private:
 
   mutable quantumoperator::Tridiagonal<1> secondH_, secondHT_;
 
-};
-
-
-} // particletwomodes
-
-
-class ParticleTwoModes : public particletwomodes::Base
-{
-public:
-  typedef particletwomodes::Base Base;
-
-  template<typename F0, typename F1, typename F2>
-  ParticleTwoModes(const F0& f0, const F1& f1, const F2& f2, 
-		   const particlecavity::ParsAlong& p0, const particlecavity::ParsAlong& p1, double phi=0)
-    : Base(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f2),
-	   p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
 };
 
 #endif // ELEMENTS_INTERACTIONS_PARTICLETWOMODES__H_INCLUDED
