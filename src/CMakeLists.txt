@@ -1,5 +1,3 @@
-include(CMakePackageConfigHelpers)
-
 set(ELEMENTS_SOURCE_DIRS utils frees interactions)
 set(frees_NEEDS utils)
 set(interactions_NEEDS utils frees)
@@ -13,7 +11,6 @@ set(ELEMENTS_INCLUDE_SUBDIR "CPPQED-${CPPQED_ID}/elements")
 
 gather_includes(ELEMENTS ELEMENTS_SOURCE_DIRS)
 
-set(CMAKE_DEBUG_POSTFIX "_d")
 set(ELEMENTSLIB C++QEDelements-${CPPQED_ID})
 add_library(${ELEMENTSLIB} SHARED ${ELEMENTS_PUBLIC_HEADERS} ${OBJ_TARGETS})
 target_link_libraries(${ELEMENTSLIB} LINK_PRIVATE ${CPPQED_LIBRARIES})
