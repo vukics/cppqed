@@ -1,2 +1,1 @@
-include_directories(../utils)
-create_object_target(frees)
+create_object_target()

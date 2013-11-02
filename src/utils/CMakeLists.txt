@@ -1,1 +1,1 @@
-create_object_target(utils)
+create_object_target()

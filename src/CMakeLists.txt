@@ -1,6 +1,8 @@
 include(CMakePackageConfigHelpers)
 
 set(ELEMENTS_SOURCE_DIRS utils frees interactions)
+set(frees_NEEDS utils)
+set(interactions_NEEDS utils frees)
 
 foreach(d ${ELEMENTS_SOURCE_DIRS})
   add_subdirectory(${d})
