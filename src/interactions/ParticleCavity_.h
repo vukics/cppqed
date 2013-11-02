@@ -42,7 +42,7 @@ protected:
 
 };
 
-
+const Tridiagonal interferic(mode::Ptr mode, particle::Ptr particle, double uNotTimesEtaeff, double uNot, const ModeFunction& mf);
 
 class InterferenceBase
   : private boost::base_from_member<const ModeFunction>, 
