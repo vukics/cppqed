@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8.9)
 
-project(CPPQEDelements)
+project(elements)
 
 ############################################################
 # This section is essential to find the required libraries 
@@ -14,4 +14,8 @@ include(${CPPQED_USE})
 CPPQED_SETUP()
 ############################################################
 
-add_subdirectory(src)
+set(ELEMENTS_SOURCE_DIRS utils frees interactions)
+set(frees_NEEDS utils)
+set(interactions_NEEDS utils frees)
+
+elements_project_template()
