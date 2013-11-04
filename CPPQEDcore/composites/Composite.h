@@ -13,7 +13,7 @@
 
 #include "SubSystem.h"
 
-#include "details/TMP_helpers.h"
+#include "details_TMP_helpers.h"
 
 #include <boost/fusion/container/generation/make_list.hpp>
 

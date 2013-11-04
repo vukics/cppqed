@@ -1,0 +1,7 @@
+// -*- C++ -*-
+#ifndef   UTILS_QM_PICTUREFWD_H_INCLUDED
+#define   UTILS_QM_PICTUREFWD_H_INCLUDED
+
+enum QM_Picture {QMP_IP, QMP_UIP, QMP_SCH};
+
+#endif // UTILS_QM_PICTUREFWD_H_INCLUDED

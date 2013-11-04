@@ -8,7 +8,11 @@
 #include "DensityOperatorFwd.h"
 #include "StateVectorFwd.h"
 
+#ifndef FLAT_INCLUDE
 #include "../quantumoperator/TridiagonalFwd.h"
+#else //FLAT_INCLUDE
+#include "TridiagonalFwd.h"
+#endif //FLAT_INCLUDE
 // Normally, structure is not allowed to depend on quantumoperator, here we make a small exception
 
 #include "DynamicsBase.h"

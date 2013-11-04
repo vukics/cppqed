@@ -42,7 +42,7 @@ template<int RANK, typename S, bool IS_CONST> using Iterator=basi::Iterator<RANK
 #define ADDITIONAL_PARAMETER
 #define ADDITIONAL_ARGUMENT
 
-#include "details/BlitzArraySliceIteratorReentrant.h"
+#include "details_BlitzArraySliceIteratorReentrant.h"
 
 
 template<typename S, typename A>

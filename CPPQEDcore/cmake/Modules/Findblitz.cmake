@@ -30,22 +30,11 @@ set(blitz_PROCESS_INCLUDES blitz_INCLUDE_DIR)
 set(blitz_PROCESS_LIBS blitz_LIBRARY)
 libfind_process(blitz)
 
+file(READ ${blitz_INCLUDE_DIR}/blitz/blitz.h BLITZ_H)
+string(REGEX MATCH BLITZ_ARRAY_LARGEST_RANK blitz_IS_CPPQED_VERSION ${BLITZ_H})
+if(NOT blitz_IS_CPPQED_VERSION)
+  message(FATAL_ERROR "You need the C++QED version of blitz++. The repository is at http://sourceforge.net/p/cppqed/blitz/ci/default/tree/")
+endif(NOT blitz_IS_CPPQED_VERSION)
 
 file(GLOB BZCONFIG ${blitz_INCLUDE_DIR}/blitz/*/bzconfig.h)
-
-if(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
-  # the symbol blitz::paddedArray is new in blitz++-0.10,we check if it exists in the library
-  # if not we might have accidentially picked up an older version of the library.
-  include(CheckCXXSymbolExists)
-  set(CMAKE_REQUIRED_LIBRARIES ${blitz_LIBRARIES})
-  set(CMAKE_REQUIRED_INCLUDES ${blitz_INCLUDE_DIRS})
-  CHECK_CXX_SYMBOL_EXISTS(blitz::paddedArray ${blitz_INCLUDE_DIR}/blitz/array.h blitz_IS_MERCURIAL_VERSION)
-  set(CMAKE_REQUIRED_LIBRARIES)
-  set(CMAKE_REQUIRED_INCLUDES)
-  if(NOT blitz_IS_MERCURIAL_VERSION)
-    set(blitz_LIBRARY)
-    message(FATAL_ERROR "Blitz++ version >= 0.10 (or mercurial checkout) is needed.")
-  endif(NOT blitz_IS_MERCURIAL_VERSION)
-endif(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
-
 CHECK_SYMBOL_EXISTS(BZ_HAVE_BOOST_SERIALIZATION ${BZCONFIG} blitz_SERIALIZATION_FOUND)

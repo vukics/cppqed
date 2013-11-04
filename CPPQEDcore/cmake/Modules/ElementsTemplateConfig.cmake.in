@@ -1,0 +1,18 @@
+# - Config file for the CPPQED package
+# It defines the following variables
+#  CPPQED@PROJECT_NAME@_INCLUDE_DIRS - include directories for CPPQED
+#  CPPQED@PROJECT_NAME@_LIBRARIES    - libraries to link against
+
+@PACKAGE_INIT@
+
+# set_and_check does not work with lists
+set(CPPQED@PROJECT_NAME@_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET @ELEMENTSLIB@)
+  include("@PACKAGE_CONF_CMAKE_DIR@/CPPQED@PROJECT_NAME@Targets.cmake")
+endif()
+
+# This is an IMPORTED target created by CPPQED@PROJECT_NAME@Targets.cmake
+set(CPPQED@PROJECT_NAME@_LIBRARIES @ELEMENTSLIB@)
+set_target_properties(@ELEMENTSLIB@ PROPERTIES MAP_IMPORTED_CONFIG_DEBUG "Debug" MAP_IMPORTED_CONFIG_RELEASE "Release")

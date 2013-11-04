@@ -372,7 +372,7 @@ public:
 #define ADDITIONAL_PARAMETER
 #define ADDITIONAL_ARGUMENT
 
-#include "details/BlitzArraySliceIteratorReentrant.h"
+#include "details_BlitzArraySliceIteratorReentrant.h"
 
 namespace details {
 
@@ -581,7 +581,7 @@ private:
 #define ADDITIONAL_PARAMETER , sd
 #define ADDITIONAL_ARGUMENT  , const SlicesData<ArrayRankTraits<A>::value,V_S>& sd
 
-#include "details/BlitzArraySliceIteratorReentrant.h"
+#include "details_BlitzArraySliceIteratorReentrant.h"
 
 
 } // basi_fast

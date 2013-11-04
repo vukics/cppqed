@@ -20,7 +20,7 @@ using namespace structure;
 
 namespace {
 
-#include "../interactions/details/BinaryHelper.h"
+#include "details_BinaryHelper.h"
 
 }
 

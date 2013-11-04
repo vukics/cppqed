@@ -1,9 +1,12 @@
-cmake_minimum_required (VERSION 2.6.4)
+cmake_minimum_required (VERSION 2.8.9)
+
+project (CPPQEDcore)
+
+get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
+
 include(FeatureSummary)
-
-project (CPPQED)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+include(CPPQEDUse)
 
 ##################################################
 # Version
@@ -16,10 +19,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 # PATCH - should be increased on every snapshot package release, reset on milestone change
 
 set(CPPQED_MAJOR_VERSION 2)
-set(CPPQED_MINOR_VERSION 9)
+set(CPPQED_MINOR_VERSION 99)
 set(CPPQED_PATCH_VERSION 0)
 set(CPPQED_VERSION
   ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
+set(CPPQED_ID ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
 
 
 # Adopt the shared library versioning scheme of libtool
@@ -55,40 +59,23 @@ set(CPPQED_ABI_MICRO ${CPPQED_ABI_REVISION})
 # Installation directories
 ##################################################
 
-# Offer the user the choice of overriding the installation directories
-set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
-set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
-set(INSTALL_INCLUDE_DIR include CACHE PATH
-  "Installation directory for header files")
-set(INSTALL_CMAKE_DIR ${INSTALL_LIB_DIR}/cmake/CPPQED CACHE PATH
-  "Installation directory for CMake files")
- 
-# Make relative paths absolute (needed later on)
-foreach(p LIB BIN INCLUDE CMAKE)
-  set(var INSTALL_${p}_DIR)
-  if(NOT IS_ABSOLUTE "${${var}}")
-    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-  endif()
-endforeach()
-
+set(CPPQED_CMAKE_SUBDIR "cmake/CPPQED-${CPPQED_ID}")
+set(CPPQED_INCLUDE_SUBDIR "CPPQED-${CPPQED_ID}/core")
 
 ##################################################
 # Compiler detection
 ##################################################
+set(G++_MINIMAL 4.7)
+set(CLANG_MINIMAL 3.1)
 
-if (CMAKE_COMPILER_IS_GNUCXX)
-  execute_process (
-    COMMAND ${CMAKE_CXX_COMPILER} --version
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    RESULT_VARIABLE CMAKE_CXX_COMPILER_RESULT
-    OUTPUT_VARIABLE CMAKE_CXX_COMPILER_OUTPUT
-    ERROR_VARIABLE CMAKE_CXX_COMPILER_ERROR
-  )
-  if (CMAKE_CXX_COMPILER_RESULT EQUAL 0)
-    string (REPLACE "\n" " " CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_OUTPUT})
-    set (CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION} CACHE INTERNAL "C++ compiler version")
-  endif (CMAKE_CXX_COMPILER_RESULT EQUAL 0)
-endif (CMAKE_COMPILER_IS_GNUCXX)
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${G++_MINIMAL})
+  message(FATAL_ERROR "GCC g++ version >= ${G++_MINIMAL} needed.")
+endif ()
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${CLANG_MINIMAL})
+  message(FATAL_ERROR "Clang version >= ${CLANG_MINIMAL} needed.")
+endif ()
 
 
 ##################################################
@@ -101,9 +88,9 @@ include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 # The option SERIALIZATION will be disabled if any of the compoments required for serialization is missing
 option(SERIALIZATION "Boost serialization" ON)
 if(SERIALIZATION)
-  set(ENABLE_SERIALIZATION 1)
+  set(CPPQED_HAS_SERIALIZATION 1)
 else(SERIALIZATION)
-  set(ENABLE_SERIALIZATION 0)
+  set(CPPQED_HAS_SERIALIZATION 0)
 endif(SERIALIZATION)
 
 # The option FLENS will be disabled if flens is missing
@@ -115,12 +102,11 @@ if( blitz_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built with serialization support.")
 else( blitz_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built without serialization support. Please configure blitz with --enable-serialization to enable optional binary statevector output.")
-  set(ENABLE_SERIALIZATION 0)
+  set(CPPQED_HAS_SERIALIZATION 0)
 endif( blitz_SERIALIZATION_FOUND )
 
-include_directories(SYSTEM ${blitz_INCLUDE_DIR} )
-set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIR})
-
+include_directories(SYSTEM ${blitz_INCLUDE_DIRS} )
+set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
 
 # Boost
 if(${CMAKE_VERSION} VERSION_LESS "2.8.8")
@@ -134,55 +120,52 @@ if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library found.")
 else( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library not found.")
-  set(ENABLE_SERIALIZATION 0)
+  set(CPPQED_HAS_SERIALIZATION 0)
 endif( Boost_SERIALIZATION_FOUND )
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
-set(THIRDPARTY_INCLUDE_DIRS ${THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 
 # FLENS
 find_package(flens)
 if( flens_FOUND AND FLENS )
   include_directories(SYSTEM ${flens_INCLUDE_DIRS})
-  set(OPTLIBS ${OPTLIBS} ${flens_LIBRARIES})
-  set(ENABLE_FLENS 1)
+  #set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
+  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${flens_LIBRARIES})
+  set(CPPQED_HAS_FLENS 1)
 else( flens_FOUND AND FLENS )
   message(STATUS "Flens library not found or disabled, optional flens support disabled.")
   set(DO_NOT_USE_FLENS ON)
-  set(ENABLE_FLENS 0)
+  set(CPPQED_HAS_FLENS 0)
 endif( flens_FOUND AND FLENS )
 
 # Check if serialization can be enabled, inform user
-if( ENABLE_SERIALIZATION )
+if( CPPQED_HAS_SERIALIZATION )
   message(STATUS "Support for binary statevector output enabled.")
-  set(OPTLIBS ${OPTLIBS} ${Boost_SERIALIZATION_LIBRARY})
-else( ENABLE_SERIALIZATION )
+  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${Boost_SERIALIZATION_LIBRARY})
+else( CPPQED_HAS_SERIALIZATION )
   set(DO_NOT_USE_BOOST_SERIALIZATION ON)
   message(STATUS "Optional support for binary statevector output disabled.")
-endif( ENABLE_SERIALIZATION )
+endif( CPPQED_HAS_SERIALIZATION )
 
+set(PRIVATE_LIBS ${PRIVATE_LIBS} ${GSL_LIBRARIES})
+set(PUBLIC_LIBS ${PUBLIC_LIBS} ${blitz_LIBRARIES})
 
 ##################################################
 # Flags for release and debug mode
 ##################################################
-
-# Activate compiler definitions and flags
-include(CPPQEDCommonChecks)
-CPPQED_CXX_FLAGS()
 
 # Generate config.h
 configure_file(cppqedconfig.h.in cppqedconfig.h)
 
 if(Boost_FOUND)
   if(Boost_MAJOR_VERSION EQUAL "1" AND Boost_MINOR_VERSION GREATER "51")
-    add_definitions(-DBOOST_RESULT_OF_USE_TR1)
     set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} -DBOOST_RESULT_OF_USE_TR1)
     message(STATUS "added -DBOOST_RESULT_OF_USE_TR1" )
   endif()
 endif()
 
 if(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
-  add_definitions(-DGSL_CBLAS)
   set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} -DGSL_CBLAS)
   message(STATUS "added -DGSL_CBLAS" )
 endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
@@ -190,128 +173,118 @@ endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
 ##################################################
 # Compilation
 ##################################################
-include_directories(${PROJECT_BINARY_DIR}) # for cppqedconfig.h
+CPPQED_SETUP()
 
-add_subdirectory(elements)
-include_directories(${ELEMENTS_INCLUDE_DIRS})
+include_directories(${PROJECT_BINARY_DIR}) # for cppqedconfig.h
 
 # build libC++QEDcore.so
 set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory composites)
+set(quantumdata_NEEDS utils)
+set(quantumoperator_NEEDS quantumdata utils)
+set(structure_NEEDS quantumdata utils)
+set(quantumtrajectory_NEEDS structure quantumdata utils)
+set(composites_NEEDS structure quantumdata utils)
 foreach(d ${CORE_SOURCE_DIRS})
-  aux_source_directory(${d} CORE_SOURCE_FILES)
-  include_directories(${d})
+  add_subdirectory(${d})
 endforeach(d)
-set(CPPQEDLIB C++QED-${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
-add_library(${CPPQEDLIB} SHARED ${CORE_SOURCE_FILES} ${ELEMENTS_SOURCE_FILES})
-target_link_libraries(${CPPQEDLIB} ${blitz_LIBRARY} ${OPTLIBS} ${GSL_LIBRARIES})
-set_target_properties(${CPPQEDLIB}
-		      PROPERTIES 
-		      INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib
-                      VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
-                      SOVERSION ${CPPQED_ABI_MAJOR})
+set(CPPQEDLIB C++QED-${CPPQED_ID})
 
+gather_includes(CPPQED CORE_SOURCE_DIRS)
+add_library(${CPPQEDLIB} SHARED ${OBJ_TARGETS} ${CPPQED_PUBLIC_HEADERS} cppqedconfig.h.in)
+set(CPPQED_PUBLIC_HEADERS ${CPPQED_PUBLIC_HEADERS} ${PROJECT_BINARY_DIR}/cppqedconfig.h)
+target_link_libraries(${CPPQEDLIB} LINK_PUBLIC ${PUBLIC_LIBS} LINK_PRIVATE ${PRIVATE_LIBS})
+set_target_properties(${CPPQEDLIB} PROPERTIES
+      PUBLIC_HEADER "${CPPQED_PUBLIC_HEADERS}"
+      INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
+      VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
+      SOVERSION ${CPPQED_ABI_MAJOR}
+)
 ##################################################
 # Installation
 ##################################################
 
-# The other libraries and scripts are installed in their own CMakeLists.txt
 install(TARGETS ${CPPQEDLIB}
-        EXPORT CPPQEDLibraryDepends
-	LIBRARY DESTINATION ${INSTALL_LIB_DIR}
-	COMPONENT shlib
+        EXPORT CPPQEDcoreTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_SUBDIR}
+        COMPONENT shlib
 )
-
-# Install include files in their directory structure
-set(ALL_INCLUDE_DIRS ${CORE_SOURCE_DIRS} ${ELEMENTS_INCLUDE_DIRS})
-foreach(d ${ALL_INCLUDE_DIRS})
-  file(GLOB INC ${d}/*.h ${d}/*.tcc)
-  file(GLOB DETAILS_INC ${d}/details/*.h)
-  install(FILES ${INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
-  install(FILES ${DETAILS_INC} DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED/${d}/details)
-  file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/CPPQED/${d})
-  set(CONF_REL_INCLUDE_DIRS ${CONF_REL_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
-endforeach(d)
-install(FILES ${PROJECT_BINARY_DIR}/cppqedconfig.h DESTINATION ${INSTALL_INCLUDE_DIR}/CPPQED)
-file(RELATIVE_PATH NEW_INCLUDE_DIR ${INSTALL_CMAKE_DIR} ${INSTALL_INCLUDE_DIR}/CPPQED)
-set(CONF_REL_INCLUDE_DIRS ${CONF_REL_INCLUDE_DIRS} ${NEW_INCLUDE_DIR})
 
 # Add all targets to the build-tree export set
 export(TARGETS ${CPPQEDLIB}
-  FILE "${PROJECT_BINARY_DIR}/CPPQEDLibraryDepends.cmake")
- 
-# Export the package for use from the build-tree
-# (this registers the build-tree with a global CMake-registry)
-#export(PACKAGE CPPQED)
- 
-# Create a CPPQEDBuildTreeSettings.cmake file for the use from the build tree
-message(STATUS Debug: ${THIRDPARTY_INCLUDE_DIRS})
-configure_file(CPPQEDBuildTreeSettings.cmake.in
-  "${PROJECT_BINARY_DIR}/CPPQEDBuildTreeSettings.cmake" @ONLY)
- 
-configure_file(CPPQEDConfig.cmake.in
-  "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake" @ONLY)
-configure_file(CPPQEDConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake" @ONLY)
- 
+  FILE "${PROJECT_BINARY_DIR}/CPPQEDcoreTargets.cmake")
+export(PACKAGE CPPQED)
+  
+# Create the CPPQEDConfig.cmake
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${PROJECT_BINARY_DIR}")
+foreach(d ${CORE_SOURCE_DIRS})
+  set(CONF_INCLUDE_DIRS ${CONF_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/${d}) 
+endforeach(d)
+set(CONF_CMAKE_DIR ${PROJECT_BINARY_DIR})
+set(CONF_FLAT_INCLUDE 0)
+configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake"
+  INSTALL_DESTINATION  "${PROJECT_BINARY_DIR}"
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR
+)
+write_basic_package_version_file(${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake 
+  VERSION ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}
+  COMPATIBILITY ExactVersion
+)
+configure_file(cmake/Modules/CPPQEDUse.cmake ${PROJECT_BINARY_DIR}/CPPQEDUse.cmake COPYONLY)
+configure_file(cmake/Modules/ElementsTemplateConfig.cmake.in ${PROJECT_BINARY_DIR}/ElementsTemplateConfig.cmake.in COPYONLY)
+
+# ... and for the installation tree
+set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_SUBDIR})
+set(CONF_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR})
+set(CONF_FLAT_INCLUDE 1)
+configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQEDConfig.cmake"
+  INSTALL_DESTINATION "${CONF_CMAKE_DIR}"
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR
+)
+
 # Install the CPPQEDConfig.cmake and CPPQEDConfigVersion.cmake
 install(FILES
-  "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQEDConfig.cmake"
   "${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake"
-  "cmake/Modules/FindCBLAS.cmake"
-  "cmake/Modules/Findflens.cmake"
-  "cmake/Modules/Findblitz.cmake"
-  "cmake/Modules/LibFindMacros.cmake"
-  "cmake/Modules/CPPQEDCommonChecks.cmake"
-  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+  "${PROJECT_BINARY_DIR}/CPPQEDUse.cmake"
+  "${PROJECT_BINARY_DIR}/ElementsTemplateConfig.cmake.in"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR}" COMPONENT dev)
  
 # Install the export set for use with the install-tree
-install(EXPORT CPPQEDLibraryDepends DESTINATION
-  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+install(EXPORT CPPQEDcoreTargets DESTINATION
+  "${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR}" COMPONENT dev)
 
-  
-SET(CPACK_GENERATOR "DEB")
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Raimar Sandner") #required
-SET(CPACK_PACKAGE_CONTACT "vukics.andras@wigner.mta.hu")
-SET(CPACK_PACKAGE_VERSION_MAJOR "${CPPQED_MAJOR_VERSION}")
-SET(CPACK_PACKAGE_VERSION_MINOR "${CPPQED_MINOR_VERSION}")
-#SET(CPACK_PACKAGE_VERSION_PATCH "${PATCH_VERSION}")
-SET(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${CPPQED_VERSION}")
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${CPPQED_VERSION}")
- 
-INCLUDE(CPack)
   
 ##################################################
 # Summary of enabled/disabled features
-# (requires cmake >= 2.8.9)
 ##################################################
 
-if(${CMAKE_VERSION} VERSION_GREATER "2.8.8")
-  set_package_properties(PkgConfig PROPERTIES URL "http://pkgconfig.freedesktop.org/wiki"
-                                 DESCRIPTION "Package config system that manages compile/link flags"
-                                 TYPE OPTIONAL
-                                 PURPOSE "Assists cmake in finding libraries.")
-  set_package_properties(blitz PROPERTIES  URL "http://sf.net/projects/blitz/"
-                                 DESCRIPTION "High-performance C++ vector mathematics library"
-                                 TYPE REQUIRED
-                                 PURPOSE "Multi-Array implementation used in the framework.")
-  set_package_properties(flens PROPERTIES URL "http://www.mathematik.uni-ulm.de/~lehn/FLENS/"
-                                 DESCRIPTION "Flexible Library for Efficient Numerical Solutions."
-                                 TYPE OPTIONAL
-                                 PURPOSE "With FLENS the partial transpose of the density operator can be calculated.")
-  set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
-                                 DESCRIPTION "Collection of portable C++ source libraries."
-                                 TYPE REQUIRED
-                                 PURPOSE "Advanced template metaprogramming and preprocessor algorithms.")
-  set_package_properties(GSL PROPERTIES URL "http://www.gnu.org/software/gsl/"
-                                 DESCRIPTION "GNU Scientific Library"
-                                 TYPE REQUIRED
-                                 PURPOSE "Used as implementation of an ODE solver and random number generator.")
-  set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
-                                 DESCRIPTION "C library for Basic Linear Algebra Subprograms"
-                                 TYPE OPTIONAL
-                                 PURPOSE "Needed for GSL.")
-  add_feature_info("FLENS" ENABLE_FLENS "compile framework with FLENS support.")
-  add_feature_info(Serialization ENABLE_SERIALIZATION "needed for binary statevector output." )
-  feature_summary( WHAT ALL )
-endif(${CMAKE_VERSION} VERSION_GREATER "2.8.8")
+set_package_properties(PkgConfig PROPERTIES URL "http://pkgconfig.freedesktop.org/wiki"
+                                DESCRIPTION "Package config system that manages compile/link flags"
+                                TYPE OPTIONAL
+                                PURPOSE "Assists cmake in finding libraries.")
+set_package_properties(blitz PROPERTIES  URL "http://sf.net/projects/blitz/"
+                                DESCRIPTION "High-performance C++ vector mathematics library"
+                                TYPE REQUIRED
+                                PURPOSE "Multi-Array implementation used in the framework.")
+set_package_properties(flens PROPERTIES URL "http://www.mathematik.uni-ulm.de/~lehn/FLENS/"
+                                DESCRIPTION "Flexible Library for Efficient Numerical Solutions."
+                                TYPE OPTIONAL
+                                PURPOSE "With FLENS the partial transpose of the density operator can be calculated.")
+set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
+                                DESCRIPTION "Collection of portable C++ source libraries."
+                                TYPE REQUIRED
+                                PURPOSE "Advanced template metaprogramming and preprocessor algorithms.")
+set_package_properties(GSL PROPERTIES URL "http://www.gnu.org/software/gsl/"
+                                DESCRIPTION "GNU Scientific Library"
+                                TYPE REQUIRED
+                                PURPOSE "Used as implementation of an ODE solver and random number generator.")
+set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
+                                DESCRIPTION "C library for Basic Linear Algebra Subprograms"
+                                TYPE OPTIONAL
+                                PURPOSE "Needed for GSL.")
+add_feature_info("FLENS" CPPQED_HAS_FLENS "compile framework with FLENS support.")
+add_feature_info(Serialization CPPQED_HAS_SERIALIZATION "needed for binary statevector output." )
+feature_summary( WHAT ALL )
 add_subdirectory(examples)

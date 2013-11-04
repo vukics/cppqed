@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef   INTERACTIONS_PARTICLETWOMODES_H_INCLUDED
+#define   INTERACTIONS_PARTICLETWOMODES_H_INCLUDED
+
+#include "ParticleTwoModes_.h"
+
+#include "ParticleCavity.h"
+
+#endif // INTERACTIONS_PARTICLETWOMODES_H_INCLUDED

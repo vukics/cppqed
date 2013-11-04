@@ -160,7 +160,7 @@ struct IdxTypes : boost::mpl::fold<tmptools::Ordinals<RANK>,
 {};
 
 
-// This class serves as private base for Indexer, cf. details/IndexerImplementationsSpecializations.h
+// This class serves as private base for Indexer, cf. details_IndexerImplementationsSpecializations.h
 template<int RANK, typename V>
 class IndexerBase
 {

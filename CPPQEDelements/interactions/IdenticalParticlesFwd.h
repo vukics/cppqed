@@ -1,0 +1,10 @@
+// -*- C++ -*-
+#ifndef   INTERACTIONS_IDENTICALPARTICLESFWD_H_INCLUDED
+#define   INTERACTIONS_IDENTICALPARTICLESFWD_H_INCLUDED
+
+
+template<int NP> // number of particles
+class IdenticalParticles;
+
+
+#endif // INTERACTIONS_IDENTICALPARTICLESFWD_H_INCLUDED

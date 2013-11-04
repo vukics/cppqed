@@ -1,19 +1,18 @@
-cmake_minimum_required (VERSION 2.6.4)
+cmake_minimum_required (VERSION 2.8.9)
 
-project(CPPQEDscripts)
+project(scripts)
 
 ############################################################
 # This section is essential to find the required libraries 
 # and include files
-find_package(CPPQED 2.8 REQUIRED)
-include(CPPQEDCommonChecks)
-CPPQED_CXX_FLAGS()
-include_directories(${CPPQED_INCLUDE_DIRS})
-include_directories(SYSTEM ${CPPQED_THIRDPARTY_INCLUDE_DIRS})
-add_definitions(${CPPQED_DEFINITIONS})
+if(NOT DEFINED CPPQED_MONOLITHIC)
+  find_package(CPPQED 2.99 REQUIRED)
+else(NOT DEFINED CPPQED_MONOLITHIC)
+  include(${CPPQED_BINARY_DIR}/CPPQEDcore/CPPQEDConfig.cmake)
+endif(NOT DEFINED CPPQED_MONOLITHIC)
+include(${CPPQED_USE})
 ############################################################
 
-message(STATUS FLENS: ${CPPQED_HAS_FLENS})
-message(STATUS Serialization: ${CPPQED_HAS_SERIALIZATION})
-
-add_subdirectory(src)
+set(NEED_FLENS GeneralDickeImaginaryEvolution)
+set(EXCLUDE_SCRIPTS Ca40InCavity Ca40InCavityWithPhonons CavityRaman MLJC NX_coupledModesElim PumpedLossyModeRegression Raman Spin)
+scripts_project()
