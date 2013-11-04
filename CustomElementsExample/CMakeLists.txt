@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 2.8.9)
 
+# The project name must be unique and cannot be "elements".
+# This is ne name by which we refer to the library in scripts projects.
 project(elements_custom_example)
 
 ############################################################
