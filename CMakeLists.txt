@@ -1,25 +1,22 @@
+cmake_minimum_required (VERSION 2.8.9)
+
+project(elements)
+
+############################################################
+# This section is essential to find the required libraries 
+# and include files
+if(NOT DEFINED CPPQED_MONOLITHIC)
+  find_package(CPPQED 2.9 REQUIRED)
+else(NOT DEFINED CPPQED_MONOLITHIC)
+  include(${CPPQED_BINARY_DIR}/CPPQEDcore/CPPQEDConfig.cmake)
+endif(NOT DEFINED CPPQED_MONOLITHIC)
+include(${CPPQED_USE})
+############################################################
 
 set(ELEMENTS_SOURCE_DIRS utils frees interactions)
+set(frees_NEEDS utils)
+set(interactions_NEEDS utils frees)
 
-foreach(d ${ELEMENTS_SOURCE_DIRS})
-  #aux_source_directory(${d} ELEMENTS_SOURCE_FILES)
-  file(GLOB SOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} ${d}/*.cc)
-  set(ELEMENTS_SOURCE_FILES ${ELEMENTS_SOURCE_FILES} ${SOURCE_FILES})
-  set(ELEMENTS_INCLUDE_DIRS ${ELEMENTS_INCLUDE_DIRS} elements/${d})
-endforeach(d)
-include_directories(${ELEMENTS_SOURCE_DIRS})
-# define ELEMENTS_INCLUDE_DIRS in parent scope, so that it is accessible to scripts
-set(ELEMENTS_INCLUDE_DIRS ${ELEMENTS_INCLUDE_DIRS} PARENT_SCOPE)
-set(ELEMENTS_SOURCE_FILES ${ELEMENTS_SOURCE_FILES} PARENT_SCOPE)
-
-#add_library(C++QEDel SHARED ${ELEMENTS_SOURCE_FILES})
-#target_link_libraries(C++QEDel C++QEDcore)
-#set_target_properties(C++QEDel
-#		      PROPERTIES INSTALL_NAME_DIR ${CMAKE_INSTALL_PREFIX}/lib
-#                      VERSION ${CPPQED_VERSION}
-#                      SOVERSION 1)
-
-#install(TARGETS C++QEDel
-#        EXPORT CPPQEDLibraryDepends
-#	LIBRARY DESTINATION ${INSTALL_LIB_DIR}
-#	COMPONENT shlib)
+# This tells the elements_project macro that the project name 'elements' is ok
+set(ORIGINAL_ELEMENTS_PROJECT 1)
+elements_project()

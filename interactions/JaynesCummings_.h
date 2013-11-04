@@ -78,7 +78,7 @@ protected:
 #define BIG_ADDITIONAL_TEMPLATE_PARAMETERS      bool IS_HA,
 #define BIG_ADDITIONAL_TEMPLATE_PARAMETERS_PASS <IS_HA>
 
-#include "details/BinaryInteractionGenerator.h"
+#include "details_BinaryInteractionGenerator.h"
 
 
 namespace jaynescummings {
