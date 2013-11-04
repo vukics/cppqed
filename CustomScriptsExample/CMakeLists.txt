@@ -9,6 +9,8 @@ find_package(CPPQED 2.9 REQUIRED)
 include(${CPPQED_USE})
 ############################################################
 
+# All *.cc files in the toplevel directory will be picked up.
+
 # scripts_project(elements_project1 elements_project2 ...)
 # will link to elements_project1, elements_project2 etc
 # Note that CPPQEDelements is used automatically
