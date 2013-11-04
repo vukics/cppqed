@@ -9,6 +9,18 @@ find_package(CPPQED 2.9 REQUIRED)
 include(${CPPQED_USE})
 ############################################################
 
+# Define all source directories and their include dependencies, e.g.:
+#
+# set(ELEMENTS_SOURCE_DIRS utils frees interactions)
+# set(frees_NEEDS utils)
+# set(interactions_NEEDS utils frees)
+#
+# Put a CMakeLists.txt file in each subdirectory with the single line
+# create_object_target()
+
+
+# In this simple example, there is only one subdirectory and hence no dependencies
 set(ELEMENTS_SOURCE_DIRS interactions)
 
+# all the magic happens here
 elements_project()
