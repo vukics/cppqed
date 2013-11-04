@@ -11,11 +11,11 @@ else(NOT DEFINED CPPQED_MONOLITHIC)
   include(${CPPQED_BINARY_DIR}/CPPQEDcore/CPPQEDConfig.cmake)
 endif(NOT DEFINED CPPQED_MONOLITHIC)
 include(${CPPQED_USE})
-CPPQED_SETUP()
 ############################################################
 
 set(ELEMENTS_SOURCE_DIRS utils frees interactions)
 set(frees_NEEDS utils)
 set(interactions_NEEDS utils frees)
 
-elements_project_template()
+set(ORIGINAL_ELEMENTS_PROJECT 1)
+elements_project()
