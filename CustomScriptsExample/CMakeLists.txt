@@ -9,5 +9,7 @@ find_package(CPPQED 2.9 REQUIRED)
 include(${CPPQED_USE})
 ############################################################
 
-set(scripts_custom_example_ELEMENTS elements_custom_example)
-scripts_project()
+# scripts_project(elements_project1 elements_project2 ...)
+# will link to elements_project1, elements_project2 etc
+# Note that CPPQEDelements is used automatically
+scripts_project(elements_custom_example)
