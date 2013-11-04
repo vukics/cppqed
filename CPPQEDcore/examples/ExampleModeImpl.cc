@@ -67,11 +67,12 @@ const Tridiagonal nop(size_t dim)
 }
 
 
-const Tridiagonal hierarchical::aop(const ModeBase& mode)
+const Tridiagonal aop(const hierarchical::ModeBase& mode)
 {
+  using namespace hierarchical;
   size_t dim=mode.getDimension();
   if (const PumpedLossyModeIP*const modeIP=dynamic_cast<const PumpedLossyModeIP*>(&mode))
-    return furnishWithFreqs(::aop(dim),mainDiagonal(modeIP->get_z(),dim));
+    return furnishWithFreqs(aop(dim),mainDiagonal(modeIP->get_z(),dim));
   else
-    return ::aop(dim);
+    return aop(dim);
 }

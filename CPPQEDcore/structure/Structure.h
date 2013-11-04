@@ -258,18 +258,18 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * We demonstrate how to implement an element representing a pumped lossy mode in a truncated Fock space. In the frame rotating with the pump frequency, it is described by the Hamiltonian:
  * \f[H=-\delta a^\dagger a+\lp\eta a^\dagger+\hermConj\rp,\f]
  * where \f$\delta\f$ is the detuning between the oscillator and the pump frequencies. The Liouvillean:
- * \f[\Liou\rho=\kappa\lp(n+1)\lp2a\rho a^\dagger-\comm{a^\dagger a}{\rho}_+\rp+n\lp2a^\dagger\rho a-\comm{a\,a^\dagger}{\rho}_+\rp\rp\f]
+ * \f[\Liou\rho=\kappa\lp(n_\text{Th}+1)\lp2a\rho a^\dagger-\comm{a^\dagger a}{\rho}_+\rp+n_\text{Th}\lp2a^\dagger\rho a-\comm{a\,a^\dagger}{\rho}_+\rp\rp\f]
  * The frequency-like parameters are \f$\delta\f$, \f$\kappa\f$, and \f$\eta\f$, representing the mode frequency, loss rate, and pumping Rabi frequency, respectively.
  * A dimensionless parameter is \f$n\f$ (the average number of thermal photons in the heat bath) and the cutoff of the Fock space.
  * 
- * Using the notation of Sec. \ref mcwftrajectory "Description of the MCWF method" \f[J_0=\sqrt{2\kappa(n+1)}a,\quad J_1=\sqrt{2\kappa n}a^\dagger.\f]
+ * Using the notation of Sec. \ref mcwftrajectory "Description of the MCWF method" \f[J_0=\sqrt{2\kappa(n_\text{Th}+1)}a,\quad J_1=\sqrt{2\kappa n_\text{Th}}a^\dagger.\f]
  * The non-Hermitian Hamiltonian for the Monte Carlo wave-function method reads:
- * \f[\HnH=\lp-\delta-i\kappa(2n+1)\rp a^\dagger a+\lp\eta a^\dagger+\hermConj\rp\equiv-iz\,a^\dagger a+\lp\eta a^\dagger+\hermConj\rp,\f]
- * where we have introduced the complex frequency \f[z\equiv\kappa(2n+1)-i\delta.\f]
+ * \f[\HnH=\lp-\delta-i\kappa(2n_\text{Th}+1)\rp a^\dagger a+\lp\eta a^\dagger+\hermConj\rp\equiv-iz\,a^\dagger a+\lp\eta a^\dagger+\hermConj\rp,\f]
+ * where we have introduced the complex frequency \f[z\equiv\kappa(2n_\text{Th}+1)-i\delta.\f]
  * 
  * The element has to be represented by a class which inherits publicly from the necessary classes in the structure namespace.
  * In this simple case, it is basically two helper functions returning quantumoperator::Tridiagonal instances, a constructor, and two virtual functions inherited from
- * structure::ElementAveraged that have to be written.
+ * ElementAveraged that have to be written.
  * 
  * \see The description of quantumoperator::Tridiagonal
  * 
@@ -277,7 +277,8 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * 
  * \snippet ExampleMode.h basic example mode
  * 
- * The NoTime tagging class as a function argument is redundant here, but it needs to be provided.
+ * Though the NoTime tagging class as a function argument creates some redundancy, it is necessary because of the design of the structure-bundle.
+ * 
  * This will suffice here. Let us look at the implementations in `ExampleMode.cc`:\dontinclude ExampleMode.cc
  * \until }),
  * We construct the Free base with the dimension of the system and the name-value-multiplier tuples for the frequency-like parameters of the system, which in this case are all complex
@@ -342,10 +343,10 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * \skip mainDiagonal
  * \until // PumpedLossyModeIP::average_v exactly the same as PumpedLossyMode::average_v above
  * FreeExact assumes that the operator transforming between the two pictures is diagonal, and the factors to update are simply its diagonal elements.
- * If this is not the case, Exact has to be used instead.
+ * If this is not the case, Exact has to be used instead. Here, since there are also real frequency-like parameters, we have to use DynamicsBase::RF as well.
  * 
  * \note Since a lot of the code from the previous case can be reused here, one will usually adopt an inheritence- or class-composition-based solution to implement classes like
- * `PumpedLossyMode` and `PumpedLossyModeIP` (for an inheritance-based solution, cf. below; for one based on class-composition, cf. the actual implementation of a harmonic-oscillator 
+ * `PumpedLossyMode` and `PumpedLossyModeIP` (for an inheritance-based solution, cf. \ref hierarchicaloscillator "below"; for one based on class-composition, cf. the actual implementation of a harmonic-oscillator 
  * mode in the framework in `elements/frees/Mode_.h`).
  * 
  * Implementing an X-X interaction {#basicxxinteraction}
@@ -357,7 +358,7 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * (note that quantumoperator::Tridiagonal is capable to represent direct products of tridiagonal matrices).
  * 
  * The only thing requiring some care is that once we transform some elements into interaction picture, the whole Hamiltonian is transformed, that is,
- * \f$a\f$ or \f$b\f$ or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type `PumpedLossyModeIP`.
+ * \f$a\f$ or \f$b\f$ or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type `PumpedLossyMode`.
  * Hence, the Hamiltonian is in fact \f[H_{\text{X-X;I}}(t)=g(ae^{-z_at}+a^\dagger e^{z_at})(be^{-z_bt}+b^\dagger e^{z_bt}).\f]
  * 
  * Consider `ExampleInteraction.h`:\dontinclude ExampleInteraction.h
@@ -369,7 +370,59 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * \until {}
  * As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in \f$H_{\text{X-X;I}}(t)\f$,
  * which result from the use of interaction picture.
+ * 
+ * The free elements are stored as shared pointers in the interaction element, and it is the task of FreesProxy to turn the constant references supplied to the constructor into (non-owning)
+ * shared pointers. Of course, the free elements have to live in a larger scope than the interaction, otherwise we may run into trouble with dangling pointers.
  *
+ * 
+ * Using class inheritance {#hierarchicaloscillator}
+ * =======================
+ * 
+ * For an inheritance-based solution, it pays to define a base class collecting all the common services. Consider the following snippet from `ExampleMode.h`: \dontinclude ExampleMode.h
+ * \skip namespace hierarchical {
+ * \until } // hierarchical
+ * Here, instead of ElementLiouvilleanStrategies, we can rather use ElementLiouvillean, which has as many virtual functions `doActWithJ` and `rate` as there 
+ * are jumps (indicated by the second template argument), distinguished by the tagging classes LindbladBase::JumpNo. It results in a compile-time error to instantiate such
+ * a class with an argument not smaller than the number of jumps (since the numbering of jumps begins with 0). Via this solution we can get around the awkwardness of specifying
+ * the jump and rate strategies for ElementLiouvilleanStrategies, while retaining a way of controlling the number of Lindblads @ compile time.
+ * 
+ * Deriving from `ModeBase`, the definition of `PumpedLossyMode` is trivial, while for `PumpedLossyModeIP`, we have to define the virtual functions inherited from FreeExact:
+ * \skip namespace hierarchical {
+ * \until } // hierarchical
+ * 
+ * \note The correct treatment of frequency-like parameters would require more care in this case, since `ModeBase` does not know about `delta` & `eta`
+ * 
+ * The implementations come in `ExampleMode.cc`: \dontinclude ExampleMode.cc
+ * \skip hierarchical::
+ * \until // ModeBase::average_v exactly the same as PumpedLossyMode::average_v above
+ * and the derived classes:
+ * \skip hierarchical::PumpedLossyMode
+ * \until // PumpedLossyModeIP::updateU exactly the same as above
+ * 
+ * We may define a function using runtime-dispatching for a ladder operator either furnished or not furnished with frequencies, depending on the actual type. 
+ * It should be implemented via dynamic casting: \dontinclude ExampleModeImpl.cc
+ * \skip aop(const hierarchical::ModeBase&
+ * \until }
+ * 
+ * Interaction element in the inheritance-based design {#hierarchicalinteraction}
+ * ---------------------------------------------------
+ * 
+ * Based on the above design of the mode-element and the dispatching ladder-operator function, we may define an interaction element that works correctly with either free element,
+ * if the constructor expects arguments of type `ModeBase`: \dontinclude ExampleInteraction.h
+ * \skip namespace hierarchical {
+ * \until } // hierarchical
+ * 
+ * The implementation is formally equivalent to the previous: \dontinclude ExampleInteraction.cc
+ * \skip hierarchical::
+ * \until {}
+ * 
+ * \warning Here, it would cause a hard-to-detect physical error to use TridiagonalHamiltonian`<2,false>` instead of TridiagonalHamiltonian`<2,true>`, because in the former case,
+ * the time update of the binary tridiagonal would not occur even with `PumpedLossyModeIP`
+ * 
+ * Other uses of interaction elements {#otherusesofinteraction}
+ * ==================================
+ * 
+ * 
  */
 
 

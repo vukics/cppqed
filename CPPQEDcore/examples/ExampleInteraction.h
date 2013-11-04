@@ -1,6 +1,8 @@
 // -*- C++ -*-
 #include "ExampleMode.h"
+
 #include "Interaction.h"
+#include "TridiagonalHamiltonian.tcc"
 
 
 namespace basic {

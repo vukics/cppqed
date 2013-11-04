@@ -9,8 +9,8 @@ using namespace structure;
 using namespace free;
 
 
-const Tridiagonal aop(size_t);
-const Tridiagonal nop(size_t);
+const Tridiagonal aop(size_t dim); // ladder operator of the given dimension
+const Tridiagonal nop(size_t dim); // number operator "
 
 
 namespace basic {
@@ -29,7 +29,10 @@ private:
 
 };
 
-} //basic
+
+} // basic
+
+inline const Tridiagonal aop(const basic::PumpedLossyMode& mode) {return aop(mode.getDimension());} // just for convenience
 
 /// [basic example mode]
 
@@ -63,9 +66,9 @@ private:
 } // basic
 
 
-
 namespace hierarchical {
 
+// All inculdes and using directives the same as above
 
 class ModeBase : public Free, public ElementLiouvillean<1,2>, public ElementAveraged<1>
 {
@@ -85,25 +88,30 @@ private:
   
   const Averages average_v(NoTime, const LazyDensityOperator&) const;
 
-  const double kappa_, nTh_;
+  const double kappa_, nTh_; // needed for calculating jumps & rates 
   
 };
+
+} // hierarchical
+
+
+namespace hierarchical {
 
 
 class PumpedLossyMode
   : public ModeBase, public TridiagonalHamiltonian<1,false>
 {
 public:
-  PumpedLossyMode(double delta, double kappa, dcomp eta, double n, size_t cutoff);
+  PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
 };
 
 
 class PumpedLossyModeIP
-  : public ModeBase, public TridiagonalHamiltonian<1,true >
+  : public ModeBase, public FreeExact<false>, public TridiagonalHamiltonian<1,true >
 {
 public:
-  PumpedLossyModeIP(double delta, double kappa, dcomp eta, double n, size_t cutoff);
+  PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
   const dcomp get_z() const {return z_;}
 
@@ -117,6 +125,7 @@ private:
 };
 
 
-const Tridiagonal aop(const ModeBase& mode);
-
 } // hierarchical
+
+
+const Tridiagonal aop(const hierarchical::ModeBase& mode);
