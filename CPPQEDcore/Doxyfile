@@ -670,7 +670,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = doc/structureGuide.markdown CompilationMacros.h \
+INPUT                  = doc/structureGuide.markdown doc/multiarrayConcept.markdown doc/mcwfMethod.markdown doc/nonorthogonalFormalism.markdown CompilationMacros.h \
                          utils/BlitzArray.h utils/BlitzArrayExtensions.h utils/BlitzArraySliceIterator.h \
                          utils/BlitzTiny.h utils/BlitzTinyExtensions.h utils/CMatrix.h utils/ComplexArrayExtensions.h \
                          utils/ComplexExtensions.h utils/CVector.h utils/MultiIndexIterator.h utils/TMP_Tools.h \

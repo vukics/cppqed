@@ -51,7 +51,7 @@ Here we calculate only three such averages, the expectation value of the number 
 \until }
 With the DynamicsBase::getParsStream function we obtain a stream whereon we can write more information about the object that gets communicated towards the user
 in that part of the output which summarizes the parameters of the actual run.
- *
+
 Next, the inherited function Averaged::average_v is implemented:
 \skip average_v
 \until aJumpRate
@@ -126,7 +126,7 @@ which result from the use of interaction picture.
 
 The free elements are stored as shared pointers in the interaction element, and it is the task of FreesProxy to turn the constant references supplied to the constructor into (non-owning)
 shared pointers. Of course, the free elements have to live in a larger scope than the interaction, otherwise we may run into trouble with dangling pointers.
- *
+
 
 Using class inheritance {#hierarchicaloscillator}
 =======================

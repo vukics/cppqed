@@ -215,8 +215,6 @@ typename IndexerBase<RANK,V>::Idx IndexerBase<RANK,V>::cache_;
 ////////////////////////////
 
 
-/// [A metaprogramming example]
-
 namespace namehider {
 
 using namespace boost::mpl;
@@ -248,7 +246,6 @@ template<int RANK, typename V>
 struct TransposerMeta : boost::mpl::first<typename namehider::Algorithm<RANK,V>::type>
 {};
 
-/// [A metaprogramming example]
 
 } // details
 
