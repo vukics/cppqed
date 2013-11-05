@@ -346,7 +346,7 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * If this is not the case, Exact has to be used instead. Here, since there are also real frequency-like parameters, we have to use DynamicsBase::RF as well.
  * 
  * \note Since a lot of the code from the previous case can be reused here, one will usually adopt an inheritence- or class-composition-based solution to implement classes like
- * `PumpedLossyMode` and `PumpedLossyModeIP` (for an inheritance-based solution, cf. \ref hierarchicaloscillator "below"; for one based on class-composition, cf. the actual implementation of a harmonic-oscillator 
+ * `PumpedLossyMode` and `PumpedLossyModeIP` (for an inheritance-based solution, cf. [below](#hierarchicaloscillator); for one based on class-composition, cf. the actual implementation of a harmonic-oscillator 
  * mode in the framework in `elements/frees/Mode_.h`).
  * 
  * Implementing an X-X interaction {#basicxxinteraction}
@@ -417,12 +417,35 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * \until {}
  * 
  * \warning Here, it would cause a hard-to-detect physical error to use TridiagonalHamiltonian`<2,false>` instead of TridiagonalHamiltonian`<2,true>`, because in the former case,
- * the time update of the binary tridiagonal would not occur even with `PumpedLossyModeIP`
+ * the time update of the binary tridiagonal would not occur even with `PumpedLossyModeIP`.
  * 
  * Other uses of interaction elements {#otherusesofinteraction}
  * ==================================
  * 
+ * In the language of the framework, every element that operates on more than one quantum numbers is an *interaction*.
  * 
+ * Hence, if we need for instance an element calculating correlations between two free subsystems (or, two quantum numbers in general), it has to be derived from Interaction 
+ * because only an interaction element has a chance to access more than quantum numbers.
+ * 
+ * Assume we need an element calculating the dynamics of an X-X interaction between two modes as [above](#basicxxinteraction), but it also lets the user monitor the correlations 
+ * \f$\avr{XQ},\;\avr{XP}\;\avr{YQ},\f$ and \f$\avr{YP}\f$ between the modes, where \f$X,\;Y\f$ and \f$Q,\;P\f$ are the quadratures of the two modes, respectively. The element can be
+ * derived from the former interaction element in the [inheritance-based design](#hierarchicalinteraction): \dontinclude ExampleInteraction.h
+ * \skip namespace hierarchical {
+ * \skip } // hierarchical
+ * \skip namespace hierarchical {
+ * \until } // hierarchical
+ * Since now we need to operate on two quantum numbers to calculate the quantum averages, we derived from ElementAveraged`<2>`, which operates on a binary quantumdata::LazyDensityOperator.
+ * The implementation of the averaging function may read \dontinclude ExampleInteraction.cc
+ * \skip InteractionX_X_Correlations
+ * \until averages(3)
+ * \until }
+ * \until }
+ * at this point, the `averages` array contains the real and imaginary parts of \f$\avr{a^\dagger b}\f$ and \f$\avr{a b},\f$ respectively. Note that a quantumdata::LazyDensityOperator of
+ * arity higher than one can be indexed via the auxiliary quantumdata::LazyDensityOperator::Idx type which represents a multi-index of the corresponding arity (and reduces to a single integer
+ * in the unary case).
+ * 
+ * Now the desired set of quantum averages can be obtained via linear operations:
+ * \until }
  */
 
 
