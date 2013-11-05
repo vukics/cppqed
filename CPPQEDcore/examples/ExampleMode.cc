@@ -18,7 +18,7 @@ basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, d
   : Free(cutoff,
          {
            CF{"(kappa*(2*nTh+1),delta)",dcomp(kappa*(2*nTh+1),delta),     cutoff },
-           CF{"eta"                  ,eta                           ,sqrt(cutoff)}
+           CF{"eta"                    ,eta                         ,sqrt(cutoff)}
          }),
     TridiagonalHamiltonian<1,false>(dcomp(-kappa*(2*nTh+1),delta)*nop(cutoff)
                                     +

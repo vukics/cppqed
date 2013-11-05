@@ -1,8 +1,11 @@
 #include "ExampleInteraction.h"
 
-int main()
+#include "BinarySystem.h"
+#include "Evolution.h"
+
+int main(int argc, char* argv[])
 {
-  {
+  { // basic
   {
     basic::PumpedLossyModeIP mode(1,1,DCOMP_I,1,10);
   }
@@ -13,15 +16,28 @@ int main()
   basic::InteractionX_X(m0,m1,2.);
   }
   
-  {
+  { // hierarchical
   {
     hierarchical::PumpedLossyMode mode(1,1,DCOMP_I,1,10);
   }
 
   hierarchical::PumpedLossyModeIP m0(1,1,DCOMP_I,1,10);
-  hierarchical::PumpedLossyMode   m1(1,1,DCOMP_I,1,10);
+  hierarchical::PumpedLossyMode   m1(1,1,DCOMP_I,1,20);
   
-  hierarchical::InteractionX_X(m0,m1,2.);
+  hierarchical::InteractionX_X i(m0,m1,2.);
+  hierarchical::InteractionX_X_Correlations ii(m0,m1,2.);
+  
+  ParameterTable p;
+
+  ParsEvolution pe(p); // Driver Parameters
+
+  update(p,argc,argv,"--");
+
+  typedef quantumdata::StateVector<2> StateVector;
+  StateVector psi(StateVector::Dimensions(10,20)); psi()(0,0)=1;
+  
+  evolve<tmptools::Vector<0> >(psi,binary::make(ii),pe);
+
   }
   
 }
