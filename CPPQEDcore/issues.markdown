@@ -29,20 +29,20 @@
 
 # Code organization + packaging
 
-  * hierarchical: core <- elements <- scripts ==> git sub-repositories (hierarchy within elements: frees <- interactions)
+  * DONE hierarchical: core <- elements <- scripts ==> git sub-repositories (hierarchy within elements: frees <- interactions)
   
   * ubuntu packages should also reflect this three-fold structure (separate dev & bin, dev depends on lower-level dev & bin, bin depends only on lower-level bin)
   
-  * 4th sub-repository + package for build infrastructure
+  * Not needed, incorporated into core. (4th sub-repository + package for build infrastructure)
   
-  * cmake should observe structural dependencies (e.g. quantumdata is not allowed to use anything from quantumtrajectory, only the other way round) – can be achieved by specific cmake files in these directories
+  * DONE cmake should observe structural dependencies (e.g. quantumdata is not allowed to use anything from quantumtrajectory, only the other way round) – can be achieved by specific cmake files in these directories
 
 
 # Build system
 
-* make a stronger connection between scripts and core in cmake, scripts should basically inherit the same compile-configuration as was used for core
+* DONE make a stronger connection between scripts and core in cmake, scripts should basically inherit the same compile-configuration as was used for core
 
-* quantumdata may include only from utils; quantumtrajectory may include quantumdata; structure may include both quantumtrajectory & quantumdata – TridiagonalHamiltonian should rather go to quantumoperator?
+* DONE quantumdata may include only from utils; quantumtrajectory may include quantumdata; structure may include both quantumtrajectory & quantumdata – TridiagonalHamiltonian should rather go to quantumoperator?
 
 * Git Branch & Commit details to be displayed by scripts on call with --version (note, this information must be captured @ compile time, and not simply @ configuration time, that is, the query must be performed by make and not by cmake)
 
