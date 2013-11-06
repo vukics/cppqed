@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_FREES_PARTICLE__H_INCLUDED
-#define   ELEMENTS_FREES_PARTICLE__H_INCLUDED
+#ifndef   FREES_PARTICLE__H_INCLUDED
+#define   FREES_PARTICLE__H_INCLUDED
 
 #include "Particle_Fwd.h"
 
@@ -215,4 +215,4 @@ public:
 };
 
 
-#endif // ELEMENTS_FREES_PARTICLE__H_INCLUDED
+#endif // FREES_PARTICLE__H_INCLUDED

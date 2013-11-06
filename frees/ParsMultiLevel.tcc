@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_FREES_PARSMULTILEVEL_TCC_INCLUDED
-#define   ELEMENTS_FREES_PARSMULTILEVEL_TCC_INCLUDED
+#ifndef   FREES_PARSMULTILEVEL_TCC_INCLUDED
+#define   FREES_PARSMULTILEVEL_TCC_INCLUDED
 
 #include "Pars.tcc"
 
@@ -67,4 +67,4 @@ operator>>(std::istream& is,       blitz::TinyVector<double,NL>& x)
 }
 
 
-#endif // ELEMENTS_FREES_PARSMULTILEVEL_TCC_INCLUDED
+#endif // FREES_PARSMULTILEVEL_TCC_INCLUDED

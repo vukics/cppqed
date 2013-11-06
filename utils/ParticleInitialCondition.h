@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_UTILS_PARTICLEINITIALCONDITION_H_INCLUDED
-#define   ELEMENTS_UTILS_PARTICLEINITIALCONDITION_H_INCLUDED
+#ifndef   UTILS_PARTICLEINITIALCONDITION_H_INCLUDED
+#define   UTILS_PARTICLEINITIALCONDITION_H_INCLUDED
 
 #include<boost/tuple/tuple_io.hpp>
 
@@ -37,4 +37,4 @@ inline std::istream& operator>>(std::istream& is,       InitialCondition& ic) {r
 } // particle
 
 
-#endif // ELEMENTS_UTILS_PARTICLEINITIALCONDITION_H_INCLUDED
+#endif // UTILS_PARTICLEINITIALCONDITION_H_INCLUDED

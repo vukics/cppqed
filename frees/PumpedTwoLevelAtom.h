@@ -6,8 +6,8 @@
 // here. The corresponding driver is PTLA_C++QED. Better
 // implementation based on class composition is found in Qbit_.h
 
-#ifndef ELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
-#define ELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
+#ifndef FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
+#define FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
 
 #include "PumpedTwoLevelAtomFwd.h"
 
@@ -63,4 +63,4 @@ private:
 
 };
 
-#endif // ELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
+#endif // FREES_PUMPEDTWOLEVELATOM_H_INCLUDED

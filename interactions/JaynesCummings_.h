@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef ELEMENTS_INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED
-#define ELEMENTS_INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED
+#ifndef INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED
+#define INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED
 
 // #include<boost/type_traits/is_base_of.hpp>
 
@@ -102,4 +102,4 @@ const Ptr make(const F1& f1, const F2& f2, const dcomp& g)
 } // jaynescummings
 
 
-#endif // ELEMENTS_INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED
+#endif // INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED

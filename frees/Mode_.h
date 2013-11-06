@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef ELEMENTS_FREES_MODE__H_INCLUDED
-#define ELEMENTS_FREES_MODE__H_INCLUDED
+#ifndef FREES_MODE__H_INCLUDED
+#define FREES_MODE__H_INCLUDED
 
 #include "Mode_Fwd.h"
 
@@ -454,4 +454,4 @@ private:
 
 };
 
-#endif // ELEMENTS_FREES_MODE__H_INCLUDED
+#endif // FREES_MODE__H_INCLUDED

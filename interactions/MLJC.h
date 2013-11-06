@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED
-#define   ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED
+#ifndef   INTERACTIONS_MLJC_H_INCLUDED
+#define   INTERACTIONS_MLJC_H_INCLUDED
 
 #include "MLJCFwd.h"
 
@@ -90,4 +90,4 @@ private:
 #include "details_BinaryInteractionGenerator.h"
 
 
-#endif // ELEMENTS_INTERACTIONS_MLJC_H_INCLUDED
+#endif // INTERACTIONS_MLJC_H_INCLUDED

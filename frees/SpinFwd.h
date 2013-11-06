@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_FREES_SPINFWD_H_INCLUDED
-#define   ELEMENTS_FREES_SPINFWD_H_INCLUDED
+#ifndef   FREES_SPINFWD_H_INCLUDED
+#define   FREES_SPINFWD_H_INCLUDED
 
 // Implements the following Hamiltonian: 
 // (omega-i*gamma)*S_z
@@ -17,4 +17,4 @@ class SpinBase;
 class Spin   ;
 class SpinSch;
 
-#endif // ELEMENTS_FREES_SPINFWD_H_INCLUDED
+#endif // FREES_SPINFWD_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_FREES_MULTILEVEL_FWD_H_INCLUDED
-#define   ELEMENTS_FREES_MULTILEVEL_FWD_H_INCLUDED
+#ifndef   FREES_MULTILEVEL_FWD_H_INCLUDED
+#define   FREES_MULTILEVEL_FWD_H_INCLUDED
 
 #include "AveragingUtilsFwd.h"
 
@@ -95,4 +95,4 @@ struct ParsPumpedLossy;
 } // multilevel
 
 
-#endif // ELEMENTS_FREES_MULTILEVEL_FWD_H_INCLUDED
+#endif // FREES_MULTILEVEL_FWD_H_INCLUDED

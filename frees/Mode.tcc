@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef ELEMENTS_FREES_MODE_TCC_INCLUDED
-#define ELEMENTS_FREES_MODE_TCC_INCLUDED
+#ifndef FREES_MODE_TCC_INCLUDED
+#define FREES_MODE_TCC_INCLUDED
 
 #include "Mode_.h"
 
@@ -226,4 +226,4 @@ PumpedLossyModeAlternative<AveragingType>::PumpedLossyModeAlternative(const mode
 #undef  TUPLE_delta
 
 
-#endif // ELEMENTS_FREES_MODE_TCC_INCLUDED
+#endif // FREES_MODE_TCC_INCLUDED

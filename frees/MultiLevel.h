@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_FREES_MULTILEVEL_H_INCLUDED
-#define   ELEMENTS_FREES_MULTILEVEL_H_INCLUDED
+#ifndef   FREES_MULTILEVEL_H_INCLUDED
+#define   FREES_MULTILEVEL_H_INCLUDED
 
 #include "MLJC.tcc"
 #include "MultiLevel.tcc"
@@ -8,4 +8,4 @@
 #include "ParsMultiLevel.h"
 #include "Sigma.tcc"
 
-#endif // ELEMENTS_FREES_MULTILEVEL_H_INCLUDED
+#endif // FREES_MULTILEVEL_H_INCLUDED

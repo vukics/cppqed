@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_FREES_PARSMULTILEVEL_H_INCLUDED
-#define   ELEMENTS_FREES_PARSMULTILEVEL_H_INCLUDED
+#ifndef   FREES_PARSMULTILEVEL_H_INCLUDED
+#define   FREES_PARSMULTILEVEL_H_INCLUDED
 
 #include "MultiLevel_Fwd.h"
 
@@ -40,4 +40,4 @@ operator>>(std::istream&,       blitz::TinyVector<double,NL>&);
 
 #include<ParsMultiLevel.tcc>
 
-#endif // ELEMENTS_FREES_PARSMULTILEVEL_H_INCLUDED
+#endif // FREES_PARSMULTILEVEL_H_INCLUDED
