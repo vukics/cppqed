@@ -33,7 +33,7 @@ class MCWF_Logger
 {
 public:
   typedef std::list<std::pair<double,size_t> > MCWF_Trajectory;
-  // Stores <time instant, jumpNo> pairs
+  // Stores <time instant, lindbladNo> pairs
 
   MCWF_Logger(int logLevel, bool isHamiltonian, size_t nJumps);
 
@@ -44,7 +44,7 @@ public:
 
   void processNorm(double norm);
 
-  void jumpOccured(double t, size_t jumpNo);
+  void jumpOccured(double t, size_t lindbladNo);
 
   void logFailedSteps(size_t);
 

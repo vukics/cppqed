@@ -137,13 +137,13 @@ Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
 }
 
 
-void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<0>) const
+void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const
 {
   aJump(psi,kappa_*(nTh_+1));
 }
 
 
-void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<1>) const
+void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const
 {
   double fact=sqrt(2.*kappa_*nTh_);
   for (int n=psi.ubound(0); n>0; --n)
@@ -152,13 +152,13 @@ void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<1>) const
 }
 
 
-double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<0>) const
+double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const
 {
   return aJumpRate(matrix,kappa_*(nTh_+1));
 }
 
 
-double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<1>) const
+double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const
 {
   return 2.*kappa_*nTh_*(photonNumber(matrix)+1.);
 }

@@ -113,22 +113,22 @@ hierarchical::ModeBase::ModeBase(double kappa, double nTh, size_t cutoff)
 {}
 
 
-void hierarchical::ModeBase::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<0>) const
+void hierarchical::ModeBase::doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const
 {
   aJump(psi,kappa_*(nTh_+1));
 }
 
-void hierarchical::ModeBase::doActWithJ(NoTime, StateVectorLow& psi, JumpNo<1>) const
+void hierarchical::ModeBase::doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const
 {
   aDagJump(psi,kappa_*nTh_);
 }
 
-double hierarchical::ModeBase::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<0>) const
+double hierarchical::ModeBase::rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const
 {
   return aJumpRate(matrix,kappa_*(nTh_+1));
 }
 
-double hierarchical::ModeBase::rate(NoTime, const LazyDensityOperator& matrix, JumpNo<1>) const
+double hierarchical::ModeBase::rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const
 {
   return aDagJumpRate(matrix,kappa_*nTh_);
 }

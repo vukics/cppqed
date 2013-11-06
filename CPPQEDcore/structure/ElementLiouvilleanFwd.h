@@ -4,13 +4,11 @@
 
 namespace structure {
 
-template<int RANK, int NOJ=1, bool IS_TIME_DEPENDENT=false> // NOJ stands for the number of jumps
-// Note that even an elementary system can have several possible
-// jumps. Eg direction of recoil for atoms. This should be known at
-// compile time.
+template<int RANK, int NLINDBLADS=1, bool IS_TIME_DEPENDENT=false> // NLINDBLADS stands for the number of Lindblads
+// Note that even an elementary system can have several possible jumps. Eg direction of recoil for atoms. This should be known at compile time.
 class ElementLiouvillean;
 
-template<int RANK, int NOJ, bool IS_TIME_DEPENDENT=false>
+template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT=false>
 class ElementLiouvilleanStrategies;
 
 } // structure

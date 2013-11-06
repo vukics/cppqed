@@ -151,29 +151,29 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
 {
   double random=(*getRandomized())()/getDtDid();
 
-  int jumpNo=0;
-  for (; random>0 && jumpNo!=rates.size(); random-=rates(jumpNo++))
+  int lindbladNo=0;
+  for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))
     ;
 
-  if(random<0) { // Jump No. jumpNo-1 occurs
+  if(random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
     struct helper
     {
       static bool p(int i, IndexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
     };
 
-    auto i=find_if(specialRates,bind(&helper::p,--jumpNo,_1)); // See whether it's a special jump
+    auto i=find_if(specialRates,bind(&helper::p,--lindbladNo,_1)); // See whether it's a special jump
     if (i!=specialRates.end())
       // special jump
       psi_()=i->template get<1>(); // RHS already normalized above
     else {
       // normal  jump
-      qs_.actWithJ(t,psi_(),jumpNo);
-      double normFactor=sqrt(rates(jumpNo));
+      qs_.actWithJ(t,psi_(),lindbladNo);
+      double normFactor=sqrt(rates(lindbladNo));
       if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
       psi_()/=normFactor;
     }
 
-    logger_.jumpOccured(t,jumpNo);
+    logger_.jumpOccured(t,lindbladNo);
   }
 }
 
@@ -221,7 +221,7 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
       size_t i=0;
       li->displayKey(os,i);
     }
-    os<<"# Alternative jumps: ";
+    os<<"# Alternative Lindblads: ";
     {
       const Rates rates(li->rates(0,psi_));
       int n=0;

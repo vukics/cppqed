@@ -88,7 +88,7 @@ public:
   typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
 
 private:
-  void        actWithJ_v(double t, StateVectorLow& psi, size_t jumpNo) const {actWithJ_v(Time(t),psi,jumpNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK>
+  void        actWithJ_v(double t, StateVectorLow& psi, size_t lindbladNo) const {actWithJ_v(Time(t),psi,lindbladNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK>
   const Rates  average_v(double t, const LazyDensityOperator&  matrix) const {return average_v(Time(t),matrix);} ///< Redirects the virtual inherited from LiouvilleanAveragedCommonRanked
 
   virtual void        actWithJ_v(Time, StateVectorLow&, size_t   ) const = 0;

@@ -80,11 +80,11 @@ protected:
   ModeBase(double kappa, double nTh, size_t cutoff);
   
 private:
-  void doActWithJ(NoTime, StateVectorLow&, JumpNo<0>) const;
-  void doActWithJ(NoTime, StateVectorLow&, JumpNo<1>) const;
+  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<0>) const;
+  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<1>) const;
   
-  double rate(NoTime, const LazyDensityOperator&, JumpNo<0>) const;
-  double rate(NoTime, const LazyDensityOperator&, JumpNo<1>) const;
+  double rate(NoTime, const LazyDensityOperator&, LindbladNo<0>) const;
+  double rate(NoTime, const LazyDensityOperator&, LindbladNo<1>) const;
   
   const Averages average_v(NoTime, const LazyDensityOperator&) const;
 

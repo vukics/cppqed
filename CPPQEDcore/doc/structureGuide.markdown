@@ -30,7 +30,8 @@ Consider the file `ExampleMode.h`:
 
 \snippet ExampleMode.h basic example mode
 
-Though the NoTime tagging class as a function argument creates some redundancy, it is necessary because of the design of the structure-bundle.
+Though the NoTime tagging class as a function argument creates some redundancy, it is necessary because of the design of the structure-bundle. Note that ElementLiouvilleanStrategies
+(like ElementLiouvillean) assumes that the number of Lindblads is known @ compile time, as is the case here. If this is not the case, Liouvillean has to be used instead.
 
 This will suffice here. Let us look at the implementations in `ExampleMode.cc`:\dontinclude ExampleMode.cc
 \until }),
@@ -135,8 +136,8 @@ For an inheritance-based solution, it pays to define a base class collecting all
 \skip namespace hierarchical {
 \until } // hierarchical
 Here, instead of ElementLiouvilleanStrategies, we can rather use ElementLiouvillean, which has as many virtual functions `doActWithJ` and `rate` as there 
-are jumps (indicated by the second template argument), distinguished by the tagging classes LindbladBase::JumpNo. It results in a compile-time error to instantiate such
-a class with an argument not smaller than the number of jumps (since the numbering of jumps begins with 0). Via this solution we can get around the awkwardness of specifying
+are jumps (indicated by the second template argument), distinguished by the tagging classes lindblad::Base::LindbladNo. It results in a compile-time error to instantiate such
+a class with an argument not smaller than the number of Lindblads (since the numbering of jumps begins with 0). Via this solution we can get around the awkwardness of specifying
 the jump and rate strategies for ElementLiouvilleanStrategies, while retaining a way of controlling the number of Lindblads @ compile time.
 
 Deriving from `ModeBase`, the definition of `PumpedLossyMode` is trivial, while for `PumpedLossyModeIP`, we have to define the virtual functions inherited from FreeExact:

@@ -75,11 +75,11 @@ void quantumtrajectory::MCWF_Logger::processNorm(double norm)
 }
 
 
-void quantumtrajectory::MCWF_Logger::jumpOccured(double t, size_t jumpNo)
+void quantumtrajectory::MCWF_Logger::jumpOccured(double t, size_t lindbladNo)
 {
-  traj_.push_back(make_pair(t,jumpNo));
+  traj_.push_back(make_pair(t,lindbladNo));
   if (logLevel_>1)
-    cerr<<"# Jump No. "<<jumpNo<<" at time "<<t<<endl;
+    cerr<<"# Jump No. "<<lindbladNo<<" at time "<<t<<endl;
 }
 
 

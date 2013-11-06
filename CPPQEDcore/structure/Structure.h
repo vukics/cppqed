@@ -188,7 +188,7 @@ public:
 
   // Liouvillean
   
-  void actWithJ(double t, StateVectorLow& psi, size_t jumpNo) const {if (li_) li_->actWithJ(t,psi,jumpNo);}
+  void actWithJ(double t, StateVectorLow& psi, size_t lindbladNo) const {if (li_) li_->actWithJ(t,psi,lindbladNo);}
 
   
   // Averaged
