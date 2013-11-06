@@ -159,11 +159,11 @@ protected:
   Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle);
   
 private:
-  void doActWithJ(NoTime, StateVectorLow&, JumpNo<0>) const;
-  void doActWithJ(NoTime, StateVectorLow&, JumpNo<1>) const;
+  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<0>) const;
+  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<1>) const;
   
-  double rate(NoTime, const LazyDensityOperator&, JumpNo<0>) const;
-  double rate(NoTime, const LazyDensityOperator&, JumpNo<1>) const;
+  double rate(NoTime, const LazyDensityOperator&, LindbladNo<0>) const;
+  double rate(NoTime, const LazyDensityOperator&, LindbladNo<1>) const;
   
   const double kappa_, nTh_;
 
