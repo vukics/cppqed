@@ -549,7 +549,7 @@ GENERATE_DEPRECATEDLIST= YES
 # documentation sections, marked by \if section-label ... \endif
 # and \cond section-label ... \endcond blocks.
 
-ENABLED_SECTIONS       =
+ENABLED_SECTIONS       = IMPLEMENTOR
 
 # The MAX_INITIALIZER_LINES tag determines the maximum number of lines
 # the initial value of a variable or macro consists of for it to appear in
@@ -670,7 +670,8 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = doc/structureGuide.markdown doc/multiarrayConcept.markdown doc/mcwfMethod.markdown doc/nonorthogonalFormalism.markdown CompilationMacros.h \
+INPUT                  = issues.markdown doc/structureGuide.markdown doc/multiarrayConcept.markdown doc/mcwfMethod.markdown doc/nonorthogonalFormalism.markdown \
+                         CompilationMacros.h \
                          utils/BlitzArray.h utils/BlitzArrayExtensions.h utils/BlitzArraySliceIterator.h \
                          utils/BlitzTiny.h utils/BlitzTinyExtensions.h utils/CMatrix.h utils/ComplexArrayExtensions.h \
                          utils/ComplexExtensions.h utils/CVector.h utils/MultiIndexIterator.h utils/TMP_Tools.h \

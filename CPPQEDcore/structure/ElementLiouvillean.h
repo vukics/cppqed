@@ -33,20 +33,29 @@ protected:
 };
 
 
-/// Class defining the virtual functions corresponding to a single Lindblad
-/** … and all the Lindblads with lesser index, since the class uses base-class chaining. At the bottom of the chain sits Base`<NLINDBLADS>` */
+/// Class defining the virtual functions corresponding to a single Lindblad…
+/**
+ * … and all the Lindblads with lesser index, since the class uses base-class chaining. At the bottom of the chain sits Base`<NLINDBLADS>`
+ * 
+ * \tparamRANK
+ * \tparam LINDBLAD_ORDINAL the index of the given Lindblad
+ * \tparam IS_TIME_DEPENDENT governs time dependence
+ * \tparam NLINDBLADS the total number of Lindblads
+ * 
+ * In the case of the _::typeErasedActWithJ and _::typeErasedRate functions, the simultaneous use of the type-erasure & non-virtual interface idioms is notable
+ * 
+ */
 template<int RANK, int LINDBLAD_ORDINAL, bool IS_TIME_DEPENDENT, int NLINDBLADS=LINDBLAD_ORDINAL+1>
 class _ : public mpl::if_c<LINDBLAD_ORDINAL,_<RANK,LINDBLAD_ORDINAL-1,IS_TIME_DEPENDENT,NLINDBLADS>,Base<NLINDBLADS> >::type
 {
 public:
   typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
   
-  /// Type-erasure & non-virtual interface idiom in one
-  //@{
+  /// calls the virtual doActWithJ for the given LINDBLAD_ORDINAL
   void typeErasedActWithJ(Time t, typename quantumdata::Types<RANK>::StateVectorLow& psi) const {doActWithJ(t,psi,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
   
+  /// calls the virtual rate for the given LINDBLAD_ORDINAL
   double typeErasedRate(Time t, const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(t,matrix,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
-  //@}
   
 private:
   virtual void doActWithJ(Time, typename quantumdata::Types<RANK>::StateVectorLow&, typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>) const = 0;
@@ -59,12 +68,27 @@ private:
 } // lindblad
 
 
+/// Thrown if the Lindblad index is not smaller than the total number of Lindblads
 struct ElementLiouvilleanException : cpputils::TaggedException
 {
   ElementLiouvilleanException(const std::string& tag) : cpputils::TaggedException(tag) {}
 };
 
-  
+
+/// An implementation of Liouvillean for the case when the number of Lindblads is known @ compile time (which is very often the case with elements)…
+/**
+ * … if this is not the case, Liouvillean has to be used.
+ * 
+ * The class relies on lindblad::_ to declare a pair of purely virtual functions `doActWithJ` and `rate` for each Lindblad between 0 and NLINDBLADS-1.
+ * The virtuals `average_v` and `actWithJ_v` inherited from Liouvillean are defined in terms of these purely virtual functions.
+ * 
+ * \tparamRANK
+ * \tparam NLINDBLADS the total number of Lindblads
+ * \tparam IS_TIME_DEPENDENT governs time dependence
+ * 
+ * \see Sec. \ref hierarchicaloscillator of the structure-bundle guide for an example of usage 
+ * 
+ */
 template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
 class ElementLiouvillean : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >,
                            public lindblad::_<RANK,NLINDBLADS-1,false>
@@ -125,6 +149,14 @@ private:
 
 
 
+/// A specialization of ElementLiouvillean for the case of a single Lindblad 
+/**
+ * Here, the tagging class lindblad::_::LindbladNo is not needed for the signature of the pure virtuals in the implementer’s interface.
+ * 
+ * \tparamRANK
+ * \tparam IS_TIME_DEPENDENT governs time dependence
+ * 
+ */
 template<int RANK, bool IS_TIME_DEPENDENT>
 class ElementLiouvillean<RANK,1,IS_TIME_DEPENDENT> : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
 {
@@ -155,7 +187,14 @@ private:
 };
 
 
-
+/// Besides ElementLiouvillean, this is another solution based on the strategy idiom to control the number of Lindblads @ compile time
+/**
+ * \tparamRANK
+ * \tparam NLINDBLADS the total number of Lindblads
+ * \tparam IS_TIME_DEPENDENT governs time dependence
+ * 
+ * \see Sec. \ref basicoscillator of the structure-bundle guide for an example of usage 
+ */
 template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
 class ElementLiouvilleanStrategies : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
 {
@@ -171,10 +210,15 @@ public:
   
   typedef typename Base::Time Time;
 
+  /// Strategy functional for acting with a given Lindblad operator (= performing a given jump) on a state
+  /** The actual signature of the functional is decided on the basis of IS_TIME_DEPENDENT using the compile-time *if*-construct \refBoostConstruct{if_c,mpl/doc/refmanual/if-c.html}. */
   typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<void  (double,       StateVectorLow&     )>,boost::function<void  (      StateVectorLow&     )> >::type JumpStrategy;
+  /// Strategy functional for calculating from a state the jump rate corresponding to a given Lindblad
   typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<double(double, const LazyDensityOperator&)>,boost::function<double(const LazyDensityOperator&)> >::type JumpRateStrategy;
 
+  /// Tiny vector of length NLINDBLADS containing the #JumpStrategy instances
   typedef blitz::TinyVector<JumpStrategy    ,NLINDBLADS> JumpStrategies;
+  /// Tiny vector of length NLINDBLADS containing the #JumpRateStrategy instances
   typedef blitz::TinyVector<JumpRateStrategy,NLINDBLADS> JumpRateStrategies;
 
 protected:
