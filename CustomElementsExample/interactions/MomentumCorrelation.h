@@ -1,5 +1,5 @@
-#ifndef MOMENTUMCORRELATION_H
-#define MOMENTUMCORRELATION_H
+#ifndef INTERACTIONS_MOMENTUMCORRELATION_H_INCLUDED
+#define INTERACTIONS_MOMENTUMCORRELATION_H_INCLUDED
 
 #include "ElementAveraged.h"
 #include "Interaction.h"
@@ -38,4 +38,4 @@ protected:
 #include "details_BinaryInteractionGenerator.h"
 
 
-#endif // MOMENTUMCORRELATION_H
+#endif // INTERACTIONS_MOMENTUMCORRELATION_H_INCLUDED
