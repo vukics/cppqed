@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_CONVERSIONS_H_INCLUDED
-#define   UTILS_INCLUDE_CONVERSIONS_H_INCLUDED
+#ifndef   UTILS_CONVERSIONS_H_INCLUDED
+#define   UTILS_CONVERSIONS_H_INCLUDED
 
 #include "ConversionsFwd.h"
 
@@ -145,4 +145,4 @@ typedef boost::numeric::converter<double,
 
 const Size2Double size2Double=Size2Double();
 
-#endif // UTILS_INCLUDE_CONVERSIONS_H_INCLUDED
+#endif // UTILS_CONVERSIONS_H_INCLUDED

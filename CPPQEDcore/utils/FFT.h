@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_FFT_H_INCLUDED
-#define   UTILS_INCLUDE_FFT_H_INCLUDED
+#ifndef   UTILS_FFT_H_INCLUDED
+#define   UTILS_FFT_H_INCLUDED
 
 #include "FFTFwd.h"
 
@@ -27,4 +27,4 @@ inline const Direction reverse(Direction dir) {return dir==DIR_KX ? DIR_XK : DIR
 
 } // fft
 
-#endif // UTILS_INCLUDE_FFT_H_INCLUDED
+#endif // UTILS_FFT_H_INCLUDED

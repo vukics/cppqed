@@ -9,8 +9,8 @@
   The design is such that Ensemble is recursive: an Ensemble can act as an element in a larger Ensemble.
 
 */
-#ifndef UTILS_INCLUDE_STOCHASTICTRAJECTORY_H_INCLUDED
-#define UTILS_INCLUDE_STOCHASTICTRAJECTORY_H_INCLUDED
+#ifndef UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
+#define UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
 
 #include "StochasticTrajectoryFwd.h"
@@ -209,4 +209,4 @@ public:
 } // trajectory
 
 
-#endif // UTILS_INCLUDE_STOCHASTICTRAJECTORY_H_INCLUDED
+#endif // UTILS_STOCHASTICTRAJECTORY_H_INCLUDED

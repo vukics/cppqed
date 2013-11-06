@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef UTILS_INCLUDE_OPERATORS_H_INCLUDED
-#define UTILS_INCLUDE_OPERATORS_H_INCLUDED
+#ifndef UTILS_OPERATORS_H_INCLUDED
+#define UTILS_OPERATORS_H_INCLUDED
 
 #include "ComplexExtensions.h"
 
@@ -23,4 +23,4 @@ struct VectorSpace
 
 } // linalg
 
-#endif // UTILS_INCLUDE_OPERATORS_H_INCLUDED
+#endif // UTILS_OPERATORS_H_INCLUDED

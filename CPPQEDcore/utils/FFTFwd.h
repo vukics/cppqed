@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_FFTFWD_H_INCLUDED
-#define   UTILS_INCLUDE_FFTFWD_H_INCLUDED
+#ifndef   UTILS_FFTFWD_H_INCLUDED
+#define   UTILS_FFTFWD_H_INCLUDED
 
 namespace fft {
 
@@ -10,4 +10,4 @@ struct FFT_Exception;
 
 } // fft
 
-#endif // UTILS_INCLUDE_FFTFWD_H_INCLUDED
+#endif // UTILS_FFTFWD_H_INCLUDED

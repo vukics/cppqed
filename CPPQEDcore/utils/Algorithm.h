@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_ALGORITHM_H_INCLUDED
-#define   UTILS_INCLUDE_ALGORITHM_H_INCLUDED
+#ifndef   UTILS_ALGORITHM_H_INCLUDED
+#define   UTILS_ALGORITHM_H_INCLUDED
 
 #include <boost/bind.hpp>
 
@@ -82,4 +82,4 @@ concatenate(const SeqOfSeqs& sOs, Out& out)
 } // cpputils
 
 
-#endif // UTILS_INCLUDE_ALGORITHM_H_INCLUDED
+#endif // UTILS_ALGORITHM_H_INCLUDED

@@ -1,8 +1,8 @@
 // -*- C++ -*-
 #if !BOOST_PP_IS_ITERATING
 
-#ifndef   ELEMENTS_COMPOSITES_COMPOSITE_H_INCLUDED
-#define   ELEMENTS_COMPOSITES_COMPOSITE_H_INCLUDED
+#ifndef   COMPOSITES_COMPOSITE_H_INCLUDED
+#define   COMPOSITES_COMPOSITE_H_INCLUDED
 
 #include "CompositeFwd.h"
 
@@ -343,7 +343,7 @@ struct Make : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENU
 
 #undef DEFAULT_print
 
-#endif // ELEMENTS_COMPOSITES_COMPOSITE_H_INCLUDED
+#endif // COMPOSITES_COMPOSITE_H_INCLUDED
 
 
 #else  // BOOST_PP_IS_ITERATING

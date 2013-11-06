@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED
-#define UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED
+#ifndef UTILS_BLITZARRAYTRAITS_H_INCLUDED
+#define UTILS_BLITZARRAYTRAITS_H_INCLUDED
 
 #include "BlitzArray.h"
 
@@ -107,4 +107,4 @@ inline size_t stride(const CArray<1>& a) {return a.stride(0);}
 
 } // cpputils
 
-#endif // UTILS_INCLUDE_BLITZARRAYTRAITS_H_INCLUDED
+#endif // UTILS_BLITZARRAYTRAITS_H_INCLUDED

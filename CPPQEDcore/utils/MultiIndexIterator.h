@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines class MultiIndexIterator and a few helpers}
-#ifndef UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED
-#define UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED
+#ifndef UTILS_MULTIINDEXITERATOR_H_INCLUDED
+#define UTILS_MULTIINDEXITERATOR_H_INCLUDED
 
 #include "MultiIndexIteratorFwd.h"
 
@@ -101,4 +101,4 @@ private:
 
 
 
-#endif // UTILS_INCLUDE_MULTIINDEXITERATOR_H_INCLUDED
+#endif // UTILS_MULTIINDEXITERATOR_H_INCLUDED

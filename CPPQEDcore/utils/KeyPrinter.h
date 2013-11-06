@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_KEYPRINTER_H_INCLUDED
-#define   UTILS_INCLUDE_KEYPRINTER_H_INCLUDED
+#ifndef   UTILS_KEYPRINTER_H_INCLUDED
+#define   UTILS_KEYPRINTER_H_INCLUDED
 
 #include "KeyPrinterFwd.h"
 
@@ -38,4 +38,4 @@ private:
 
 } // cpputils
 
-#endif // UTILS_INCLUDE_KEYPRINTER_H_INCLUDED
+#endif // UTILS_KEYPRINTER_H_INCLUDED

@@ -1,5 +1,5 @@
-#ifndef   UTILS_INCLUDE_ARCHIVE_H_INCLUDED
-#define   UTILS_INCLUDE_ARCHIVE_H_INCLUDED
+#ifndef   UTILS_ARCHIVE_H_INCLUDED
+#define   UTILS_ARCHIVE_H_INCLUDED
 
 #include "cppqedconfig.h"
 
@@ -72,4 +72,4 @@ typedef boost::archive::binary_oarchive oarchive;
 
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
-#endif // UTILS_INCLUDE_ARCHIVE_H_INCLUDED
+#endif // UTILS_ARCHIVE_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_PARSFWD_H_INCLUDED
-#define   UTILS_INCLUDE_PARSFWD_H_INCLUDED
+#ifndef   UTILS_PARSFWD_H_INCLUDED
+#define   UTILS_PARSFWD_H_INCLUDED
 
 #include<string>
 
@@ -24,4 +24,4 @@ struct TitleLine {};
 } // parameters
 
 
-#endif // UTILS_INCLUDE_PARSFWD_H_INCLUDED
+#endif // UTILS_PARSFWD_H_INCLUDED

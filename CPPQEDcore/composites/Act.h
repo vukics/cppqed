@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_COMPOSITES_ACT_H_INCLUDED
-#define   ELEMENTS_COMPOSITES_ACT_H_INCLUDED
+#ifndef   COMPOSITES_ACT_H_INCLUDED
+#define   COMPOSITES_ACT_H_INCLUDED
 
 #include "SubSystem.h"
 
@@ -30,4 +30,4 @@ public:
 #undef  BASE_class1
 
 
-#endif // ELEMENTS_COMPOSITES_ACT_H_INCLUDED
+#endif // COMPOSITES_ACT_H_INCLUDED

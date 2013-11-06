@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Definition of blitzplusplus::basi::Iterator together with its helpers}
-#ifndef UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
-#define UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
+#ifndef UTILS_BLITZARRAYSLICEITERATOR_H_INCLUDED
+#define UTILS_BLITZARRAYSLICEITERATOR_H_INCLUDED
 
 #include "BlitzArraySliceIteratorFwd.h"
 
@@ -711,6 +711,6 @@ namespace basi {
 
 
 
-#endif // UTILS_INCLUDE_BLITZARRAYSLICEITERATOR_H_INCLUDED
+#endif // UTILS_BLITZARRAYSLICEITERATOR_H_INCLUDED
 
 

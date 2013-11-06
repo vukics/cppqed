@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_SMARTPTR_H_INCLUDED
-#define   UTILS_INCLUDE_SMARTPTR_H_INCLUDED
+#ifndef   UTILS_SMARTPTR_H_INCLUDED
+#define   UTILS_SMARTPTR_H_INCLUDED
 
 #include <boost/shared_ptr.hpp>
 
@@ -40,4 +40,4 @@ const boost::shared_ptr<T> sharedPointerize(                  T* t) {return nonO
 } // cpputils
 
 
-#endif // UTILS_INCLUDE_SMARTPTR_H_INCLUDED
+#endif // UTILS_SMARTPTR_H_INCLUDED

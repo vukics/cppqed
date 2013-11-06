@@ -8,8 +8,8 @@
 
 */
 
-#ifndef UTILS_INCLUDE_MATHEXTENSIONS_H_INCLUDED
-#define UTILS_INCLUDE_MATHEXTENSIONS_H_INCLUDED
+#ifndef UTILS_MATHEXTENSIONS_H_INCLUDED
+#define UTILS_MATHEXTENSIONS_H_INCLUDED
 
 #include "MathExtensionsFwd.h"
 
@@ -56,4 +56,4 @@ dcomp coherentElement(unsigned long n, const dcomp& alpha);
 
 } // mathutils
 
-#endif // UTILS_INCLUDE_MATHEXTENSIONS_H_INCLUDED
+#endif // UTILS_MATHEXTENSIONS_H_INCLUDED

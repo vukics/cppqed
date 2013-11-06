@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines template aliases for `blitz::TinyVector`s used for characterising the size of multi-arrays and indexing them}
-#ifndef   UTILS_INCLUDE_BLITZTINY_H_INCLUDED
-#define   UTILS_INCLUDE_BLITZTINY_H_INCLUDED
+#ifndef   UTILS_BLITZTINY_H_INCLUDED
+#define   UTILS_BLITZTINY_H_INCLUDED
 
 #include <blitz/array.h>
 
@@ -30,4 +30,4 @@ template <int RANK> using ExtTiny=blitz::TinyVector<   size_t,RANK>;
 /// A tiny vector used for indexing of objects of arbitrary arity
 template <int RANK> using IdxTiny=blitz::TinyVector<ptrdiff_t,RANK>;
 
-#endif // UTILS_INCLUDE_BLITZTINY_H_INCLUDED
+#endif // UTILS_BLITZTINY_H_INCLUDED

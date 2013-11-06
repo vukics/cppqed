@@ -3,8 +3,8 @@
 // This is manifested in the abstract function Display.
 // Consider copying (cloning) of Trajectories
 
-#ifndef UTILS_INCLUDE_TRAJECTORY_H_INCLUDED
-#define UTILS_INCLUDE_TRAJECTORY_H_INCLUDED
+#ifndef UTILS_TRAJECTORY_H_INCLUDED
+#define UTILS_TRAJECTORY_H_INCLUDED
 
 #include "TrajectoryFwd.h"
 
@@ -225,4 +225,4 @@ private:
 } // trajectory
 
 
-#endif // UTILS_INCLUDE_TRAJECTORY_H_INCLUDED
+#endif // UTILS_TRAJECTORY_H_INCLUDED

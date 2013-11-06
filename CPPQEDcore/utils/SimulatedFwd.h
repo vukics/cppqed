@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_SIMULATEDFWD_H_INCLUDED
-#define   UTILS_INCLUDE_SIMULATEDFWD_H_INCLUDED
+#ifndef   UTILS_SIMULATEDFWD_H_INCLUDED
+#define   UTILS_SIMULATEDFWD_H_INCLUDED
 
 namespace trajectory {
 
@@ -9,4 +9,4 @@ class Simulated;
 
 } // trajectory
 
-#endif // UTILS_INCLUDE_SIMULATEDFWD_H_INCLUDED
+#endif // UTILS_SIMULATEDFWD_H_INCLUDED

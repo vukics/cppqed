@@ -154,4 +154,4 @@ std::ostream& scanFunction(DistributionFunctor distributionFunctor, const Densit
 
 }
 
-#endif // QUANTUMDATA_WIGNERFUNCTION_H_INCLUDED
+#endif // QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED

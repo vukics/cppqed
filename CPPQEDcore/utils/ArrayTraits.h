@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_ARRAYTRAITS_H_INCLUDED
-#define   UTILS_INCLUDE_ARRAYTRAITS_H_INCLUDED
+#ifndef   UTILS_ARRAYTRAITS_H_INCLUDED
+#define   UTILS_ARRAYTRAITS_H_INCLUDED
 
 namespace cpputils {
 
@@ -59,4 +59,4 @@ size_t subscriptLimit(const A& a);
 } // cpputils
 
 
-#endif // UTILS_INCLUDE_ARRAYTRAITS_H_INCLUDED
+#endif // UTILS_ARRAYTRAITS_H_INCLUDED

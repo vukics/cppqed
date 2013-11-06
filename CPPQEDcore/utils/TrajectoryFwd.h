@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_INCLUDE_TRAJECTORYFWD_H_INCLUDED
-#define   UTILS_INCLUDE_TRAJECTORYFWD_H_INCLUDED
+#ifndef   UTILS_TRAJECTORYFWD_H_INCLUDED
+#define   UTILS_TRAJECTORYFWD_H_INCLUDED
 
 
 namespace trajectory {
@@ -25,4 +25,4 @@ class Adaptive;
 
 } // trajectory
 
-#endif // UTILS_INCLUDE_TRAJECTORYFWD_H_INCLUDED
+#endif // UTILS_TRAJECTORYFWD_H_INCLUDED

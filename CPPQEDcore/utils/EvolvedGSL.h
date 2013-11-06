@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef UTILS_INCLUDE_EVOLVEDGSL_H_INCLUDED
-#define UTILS_INCLUDE_EVOLVEDGSL_H_INCLUDED
+#ifndef UTILS_EVOLVEDGSL_H_INCLUDED
+#define UTILS_EVOLVEDGSL_H_INCLUDED
 
 #include "Exception.h"
 
@@ -46,4 +46,4 @@ extern const int onSuccess;
 } // evolved
 
 
-#endif // UTILS_INCLUDE_EVOLVEDGSL_H_INCLUDED
+#endif // UTILS_EVOLVEDGSL_H_INCLUDED

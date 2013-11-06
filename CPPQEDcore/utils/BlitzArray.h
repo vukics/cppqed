@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines template aliases for real and complex arrays}
-#ifndef   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
-#define   UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
+#ifndef   UTILS_BLITZARRAY_H_INCLUDED
+#define   UTILS_BLITZARRAY_H_INCLUDED
 
 #include "ComplexExtensions.h"
 
@@ -69,4 +69,4 @@ template <int RANK> using DArray=blitz::Array<double,RANK>;
 /// A complex array of arbitrary arity
 template <int RANK> using CArray=blitz::Array<dcomp ,RANK>;
 
-#endif // UTILS_INCLUDE_BLITZARRAY_H_INCLUDED
+#endif // UTILS_BLITZARRAY_H_INCLUDED

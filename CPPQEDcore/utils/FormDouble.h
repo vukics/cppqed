@@ -6,8 +6,8 @@
   Named FormDouble here, since it is only issues pertaining to the display of doubles that are treated. formdouble::Bound should be able to deal with everything consisting only doubles (eg dcomp).
 */
 
-#ifndef UTILS_INCLUDE_FORMDOUBLE_H_INCLUDED
-#define UTILS_INCLUDE_FORMDOUBLE_H_INCLUDED
+#ifndef UTILS_FORMDOUBLE_H_INCLUDED
+#define UTILS_FORMDOUBLE_H_INCLUDED
 
 #include "FormDoubleFwd.h"
 
@@ -128,4 +128,4 @@ private:
 } // parameters
 
 
-#endif // UTILS_INCLUDE_FORMDOUBLE_H_INCLUDED
+#endif // UTILS_FORMDOUBLE_H_INCLUDED

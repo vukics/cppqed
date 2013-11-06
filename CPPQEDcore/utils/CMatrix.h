@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{defines the typedef linalg::CMatrix and some helpers}
-#ifndef UTILS_INCLUDE_CMATRIX_H_INCLUDED
-#define UTILS_INCLUDE_CMATRIX_H_INCLUDED
+#ifndef UTILS_CMATRIX_H_INCLUDED
+#define UTILS_CMATRIX_H_INCLUDED
 
 #include "CVector.h"
 
@@ -29,4 +29,4 @@ calculateTwoTimesRealPartOfSelf(CMatrix&);
 
 } // linalg
 
-#endif // UTILS_INCLUDE_CMATRIX_H_INCLUDED
+#endif // UTILS_CMATRIX_H_INCLUDED

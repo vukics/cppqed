@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   ELEMENTS_COMPOSITES_COMPOSITE_TCC_INCLUDED
-#define   ELEMENTS_COMPOSITES_COMPOSITE_TCC_INCLUDED
+#ifndef   COMPOSITES_COMPOSITE_TCC_INCLUDED
+#define   COMPOSITES_COMPOSITE_TCC_INCLUDED
 
 #include "Composite.h"
 
@@ -742,4 +742,4 @@ const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
 
 #undef CALL_composite_worker
 
-#endif // ELEMENTS_COMPOSITES_COMPOSITE_TCC_INCLUDED
+#endif // COMPOSITES_COMPOSITE_TCC_INCLUDED
