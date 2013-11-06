@@ -1,6 +1,7 @@
 #include "ExampleMode.h"
 
 #include "ElementLiouvillean.tcc"
+#include "Tridiagonal.tcc"
 
 #include <boost/bind.hpp>
 

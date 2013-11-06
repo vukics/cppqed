@@ -1,7 +1,17 @@
 #include "ExampleInteraction.h"
 
 #include "BinarySystem.h"
-#include "Evolution.h"
+#include "EnsembleMCWF.tcc"
+#include "Evolution.tcc"
+#include "Master.tcc"
+#include "ParsEvolution.h"
+
+#include "BlitzArrayTraits.h"
+#include "EvolvedGSL.tcc"
+#include "Pars.tcc"
+
+
+using namespace parameters;
 
 int main(int argc, char* argv[])
 {
