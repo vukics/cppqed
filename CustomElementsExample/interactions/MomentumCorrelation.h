@@ -14,7 +14,7 @@ public:
   MomentumCorrelation(particle::Ptr, particle::Ptr);
   
 private:
-  const Averages average_v(const LazyDensityOperator&) const;
+  const Averages average_v(Time t, const LazyDensityOperator&) const;
   void           process_v(Averages&)                  const {}
 };
 

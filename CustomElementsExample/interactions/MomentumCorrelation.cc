@@ -5,10 +5,10 @@ using namespace boost::assign;
 
 MomentumCorrelation::MomentumCorrelation(particle::Ptr p0, particle::Ptr p1) :
   structure::Interaction<2>(Frees(p0,p1),RealFreqs(),ComplexFreqs()),
-  EA_Base("MomentumCorrelation",list_of("<P1P2>"))
+  EA_Base("MomentumCorrelation",{"<P1P2>"})
 {}
 
-const MomentumCorrelation::Averages MomentumCorrelation::average_v(const LazyDensityOperator& matrix) const
+const MomentumCorrelation::Averages MomentumCorrelation::average_v(Time t, const LazyDensityOperator& matrix) const
 {
   typedef LazyDensityOperator::Idx Idx;
   
