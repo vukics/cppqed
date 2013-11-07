@@ -4,12 +4,16 @@
 #include "ParticleCavity.h"
 #include "ParticleCavity_InterferenceWorkaround.h"
 #include "MomentumCorrelation.h"
+#include "Version.h"
+
+#include "component_versions.h"
 
 using namespace quantumdata;
 using namespace particlecavity_interferenceworkaround;
 
 int main(int argc, char **argv)
 {
+    updateVersionstring(cppqed_component_versions());
     ParameterTable p;
 
     ParsEvolution pe(p);                // Driver parameters
