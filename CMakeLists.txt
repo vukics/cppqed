@@ -6,4 +6,8 @@ set(CPPQED_MONOLITHIC 1)
 
 add_subdirectory(CPPQEDcore)
 add_subdirectory(CPPQEDelements)
-add_subdirectory(CPPQEDscripts)
+
+option(COMPILE_SCRIPTS "Compile the example scripts" On)
+if(COMPILE_SCRIPTS)
+  add_subdirectory(CPPQEDscripts)
+endif()
