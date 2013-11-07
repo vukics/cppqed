@@ -3,8 +3,9 @@
 
 using namespace boost::assign;
 
-MomentumCorrelation::MomentumCorrelation() :
-   EA_Base("MomentumCorrelation",list_of("<P1P2>"))
+MomentumCorrelation::MomentumCorrelation(particle::Ptr p0, particle::Ptr p1) :
+  structure::Interaction<2>(Frees(p0,p1),RealFreqs(),ComplexFreqs()),
+  EA_Base("MomentumCorrelation",list_of("<P1P2>"))
 {}
 
 const MomentumCorrelation::Averages MomentumCorrelation::average_v(const LazyDensityOperator& matrix) const
@@ -22,13 +23,3 @@ const MomentumCorrelation::Averages MomentumCorrelation::average_v(const LazyDen
     }
   return averages;
 }
-
-namespace momentumcorrelationinteraction {
-
-Base::Base(particle::Ptr p1, particle::Ptr p2): 
-   IA_Base(Frees(p1,p2),RealFreqs(),ComplexFreqs())
-{
-
-}
-
-} // momentumcorrelationinteraction
