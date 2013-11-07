@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     
     ParticleAlongCavity particlecavity(myMode,myParticle,ppci,0);
     Interference interference(myMode,myParticle,pi);
-    MomentumCorrelationInteraction<MomentumCorrelation> mci(myParticle,myParticle);
+    MomentumCorrelation mci(myParticle,myParticle);
     
     StateVector<1> stateParticle1(particle::init(ppp1));
     StateVector<1> stateParticle2(particle::init(ppp2));
