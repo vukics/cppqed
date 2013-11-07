@@ -8,7 +8,7 @@ project(elements)
 if(NOT DEFINED CPPQED_MONOLITHIC)
   find_package(CPPQED 2.99 REQUIRED)
 else(NOT DEFINED CPPQED_MONOLITHIC)
-  include(${CPPQEDcore_BINARY_DIR}/CPPQEDConfig.cmake)
+  include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
 endif(NOT DEFINED CPPQED_MONOLITHIC)
 include(${CPPQED_USE})
 ############################################################
