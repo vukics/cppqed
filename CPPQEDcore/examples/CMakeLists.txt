@@ -1,4 +1,4 @@
-include(${CPPQEDcore_BINARY_DIR}/CPPQEDConfig.cmake)
+include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
 CPPQED_SETUP()
 message(STATUS Debug: ${CPPQED_INCLUDE_DIRS})
 add_executable(ExampleModeMain ExampleModeMain.cc ExampleMode.cc ExampleModeImpl.cc ExampleInteraction.cc)
