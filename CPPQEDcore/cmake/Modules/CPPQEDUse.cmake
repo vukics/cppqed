@@ -217,6 +217,7 @@ macro(scripts_project)
       set(SCRIPTNAMES ${SCRIPTNAMES} ${SCRIPT})
       add_executable(${SCRIPT} ${s} $<TARGET_OBJECTS:versions_obj>)
       target_link_libraries(${SCRIPT} ${CPPQED_LIBRARIES} ${ALL_ELEMENTS_LIBRARIES})
+      set_target_properties(${SCRIPT} PROPERTIES DEBUG_POSTFIX _d)
       install(TARGETS ${SCRIPT}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
     endif()

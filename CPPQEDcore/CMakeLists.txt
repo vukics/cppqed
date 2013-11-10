@@ -24,7 +24,9 @@ set(CPPQED_PATCH_VERSION 2)
 set(CPPQED_VERSION
   ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
 set(CPPQED_ID ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
-
+if(CPPQED_MONOLITHIC)
+  set(CPPQED_ID ${CPPQED_ID} PARENT_SCOPE)
+endif()
 
 # Adopt the shared library versioning scheme of libtool
 # CURRENT  - the current ABI version
