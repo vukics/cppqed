@@ -182,7 +182,7 @@ LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(const qbit::ParsLossy& p, doubl
 LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy& p, double gamma_parallel)
   : qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),0),
     qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
-    QbitBase(RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1))
+    QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
   getParsStream()<<"# LossyWithPhaseNoise, Unitary interaction picture.\n";
 }
