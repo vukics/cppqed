@@ -1,7 +1,7 @@
 #ifndef   UTILS_ARCHIVE_H_INCLUDED
 #define   UTILS_ARCHIVE_H_INCLUDED
 
-#include "cppqedconfig.h"
+#include "core_config.h"
 
 #ifdef    DO_NOT_USE_BOOST_SERIALIZATION
 

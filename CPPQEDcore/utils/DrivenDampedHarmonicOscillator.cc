@@ -1,4 +1,4 @@
-#include "cppqedconfig.h"
+#include "core_config.h"
 
 #ifndef   DO_NOT_USE_FLENS
 

@@ -2,7 +2,7 @@
 #ifndef   QUANTUMDATA_NEGPT_TCC_INCLUDED
 #define   QUANTUMDATA_NEGPT_TCC_INCLUDED
 
-#include "cppqedconfig.h"
+#include "core_config.h"
 
 #include "NegPT.h"
 

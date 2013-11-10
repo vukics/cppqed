@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8.9)
 
-project (CPPQEDcore)
+project (core)
 
 get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
@@ -20,7 +20,7 @@ include(CPPQEDUse)
 
 set(CPPQED_MAJOR_VERSION 2)
 set(CPPQED_MINOR_VERSION 99)
-set(CPPQED_PATCH_VERSION 1)
+set(CPPQED_PATCH_VERSION 2)
 set(CPPQED_VERSION
   ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
 set(CPPQED_ID ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
@@ -105,7 +105,6 @@ else( blitz_SERIALIZATION_FOUND )
   set(CPPQED_HAS_SERIALIZATION 0)
 endif( blitz_SERIALIZATION_FOUND )
 
-include_directories(SYSTEM ${blitz_INCLUDE_DIRS} )
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
 
 # Boost
@@ -122,7 +121,6 @@ else( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library not found.")
   set(CPPQED_HAS_SERIALIZATION 0)
 endif( Boost_SERIALIZATION_FOUND )
-include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 
@@ -156,7 +154,7 @@ set(PUBLIC_LIBS ${PUBLIC_LIBS} ${blitz_LIBRARIES})
 ##################################################
 
 # Generate config.h
-configure_file(cppqedconfig.h.in cppqedconfig.h)
+configure_file(${CPPQED_CMAKE_MODULE_PATH}/config.h.in ${PROJECT_NAME}_config.h)
 
 if(Boost_FOUND)
   if(Boost_MAJOR_VERSION EQUAL "1" AND Boost_MINOR_VERSION GREATER "51")
@@ -175,7 +173,12 @@ endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
 ##################################################
 CPPQED_SETUP()
 
-include_directories(${PROJECT_BINARY_DIR}) # for cppqedconfig.h
+get_git_head_revision(REFSPEC CONF_GIT_SHA1)
+set(CONF_VERSION ${CPPQED_VERSION})
+configure_file("${CPPQED_CMAKE_MODULE_PATH}/version.cc.in" "${PROJECT_NAME}_version.cc" @ONLY)
+configure_file("${CPPQED_CMAKE_MODULE_PATH}/version.h.in" "${PROJECT_NAME}_version.h" @ONLY)
+
+include_directories(${PROJECT_BINARY_DIR}) # for generated config files
 
 # build libC++QEDcore.so
 set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory composites)
@@ -189,12 +192,17 @@ foreach(d ${CORE_SOURCE_DIRS})
 endforeach(d)
 set(CPPQEDLIB C++QED-${CPPQED_ID})
 
-gather_includes(CPPQED CORE_SOURCE_DIRS)
-add_library(${CPPQEDLIB} SHARED ${OBJ_TARGETS} ${CPPQED_PUBLIC_HEADERS} cppqedconfig.h.in)
-set(CPPQED_PUBLIC_HEADERS ${CPPQED_PUBLIC_HEADERS} ${PROJECT_BINARY_DIR}/cppqedconfig.h)
+gather_includes(CORE_SOURCE_DIRS)
+set(GENERATED_SOURCE  ${CPPQED_CMAKE_MODULE_PATH}/config.h.in
+                      ${CPPQED_CMAKE_MODULE_PATH}/version.h.in
+                      ${CPPQED_CMAKE_MODULE_PATH}/version.cc.in
+)
+add_library(${CPPQEDLIB} 
+    SHARED  ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc 
+            ${OBJ_TARGETS} ${core_PUBLIC_HEADERS} ${GENERATED_SOURCE})
 target_link_libraries(${CPPQEDLIB} LINK_PUBLIC ${PUBLIC_LIBS} LINK_PRIVATE ${PRIVATE_LIBS})
 set_target_properties(${CPPQEDLIB} PROPERTIES
-      PUBLIC_HEADER "${CPPQED_PUBLIC_HEADERS}"
+      PUBLIC_HEADER "${core_PUBLIC_HEADERS}"
       INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
       VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
       SOVERSION ${CPPQED_ABI_MAJOR}
@@ -231,8 +239,11 @@ write_basic_package_version_file(${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake
   VERSION ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}
   COMPATIBILITY ExactVersion
 )
-configure_file(cmake/Modules/CPPQEDUse.cmake ${PROJECT_BINARY_DIR}/CPPQEDUse.cmake COPYONLY)
-configure_file(cmake/Modules/ElementsTemplateConfig.cmake.in ${PROJECT_BINARY_DIR}/ElementsTemplateConfig.cmake.in COPYONLY)
+foreach(c CPPQEDUse.cmake ElementsTemplateConfig.cmake.in 
+          GetGitRevisionDescription.cmake GetGitRevisionDescription.cmake.in 
+          version.cc.in version.h.in component_versions.cc.in component_versions.h.in)
+  configure_file(cmake/Modules/${c} ${PROJECT_BINARY_DIR}/${c} COPYONLY)
+endforeach()
 
 # ... and for the installation tree
 set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_SUBDIR})
@@ -249,6 +260,12 @@ install(FILES
   "${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake"
   "${PROJECT_BINARY_DIR}/CPPQEDUse.cmake"
   "${PROJECT_BINARY_DIR}/ElementsTemplateConfig.cmake.in"
+  "${PROJECT_BINARY_DIR}/GetGitRevisionDescription.cmake"
+  "${PROJECT_BINARY_DIR}/GetGitRevisionDescription.cmake.in"
+  "${PROJECT_BINARY_DIR}/version.h.in"
+  "${PROJECT_BINARY_DIR}/version.cc.in"
+  "${PROJECT_BINARY_DIR}/component_versions.h.in"
+  "${PROJECT_BINARY_DIR}/component_versions.cc.in"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR}" COMPONENT dev)
  
 # Install the export set for use with the install-tree

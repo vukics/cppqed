@@ -14,7 +14,9 @@
 
 #include "EvolvedFwd.h"
 
-#include "cppqedconfig.h"
+#include "core_config.h"
+
+#include "Version.h"
 
 #include <boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
 #include <boost/function.hpp>   // instead of std::tr1::function
@@ -114,7 +116,7 @@ public:
   // Takes a single adaptive step of maximum length deltaT    
   void step(double deltaT);
 
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);};
+  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os<<versionHelper());};
 
   A      & getA()       {return this->a_;}
   A const& getA() const {return this->a_;}

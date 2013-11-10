@@ -1,0 +1,13 @@
+#ifndef @PROJECT_NAME@_VERSION_H_INCLUDED
+#define @PROJECT_NAME@_VERSION_H_INCLUDED
+
+extern const char g_CPPQED@PROJECT_NAME@_GIT_SHA1[];
+extern const char g_CPPQED@PROJECT_NAME@_VERSION[];
+
+#include <string>
+
+using namespace std;
+
+string cppqed_@PROJECT_NAME@_version();
+
+#endif // @PROJECT_NAME@_VERSION_H_INCLUDED

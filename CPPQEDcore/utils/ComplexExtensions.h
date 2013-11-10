@@ -3,7 +3,7 @@
 #ifndef UTILS_COMPLEXEXTENSIONS_H_INCLUDED
 #define UTILS_COMPLEXEXTENSIONS_H_INCLUDED
 
-#include "cppqedconfig.h"
+#include "core_config.h"
 
 #include <complex>
 

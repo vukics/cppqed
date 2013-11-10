@@ -8,7 +8,7 @@
 #include "Exception.h"
 #include "Range.h"
 
-#include "cppqedconfig.h"
+#include "core_config.h"
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>

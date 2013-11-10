@@ -4,12 +4,9 @@
 
 #include "BooleanNegatedProxy.h"
 
-#include <blitz/bzconfig.h>
-
-#include <gsl/gsl_version.h>
+#include "Version.h"
 
 #include <boost/bind.hpp>
-#include <boost/version.hpp>
 
 #include <boost/preprocessor/stringize.hpp>
 
@@ -43,25 +40,7 @@ const string errorMessage(const string& sc)
 {
   return "\nSee "+sc+"help for a list of parameters\nSupply all parameters with "+sc+" prefix\n\n";
 }
-
-void versionHelper()
-{
-  string versionString="C++QED Version 2 Milestone 9";
-  {
-    ifstream file((string(BOOST_PP_STRINGIZE(TOP_LEVEL_DIRECTORY))+string("/.bzr/branch/last-revision")).c_str());
-    if (file.is_open()) {
-      versionString="Revision #";
-      char temp[256];
-      file.getline(temp,256);
-      versionString+=string(temp);
-    }
-  }
-
-  cout<<endl<<versionString<<"\nAndras Vukics, vukics@users.sourceforge.net\n\nCompiled with\nBoost library collection : Version "<<string(BOOST_LIB_VERSION).replace(1,1,".")<<"\nGnu Scientific Library   : Version "<<GSL_VERSION<<"\nBlitz++ numerical library: Config date: "<<BZ__config_date<<endl<<endl;
-}
-
-}
-
+} // private namespace
 
 const ParameterBase&
 ParameterTable::operator[](const string& s) const
@@ -118,7 +97,7 @@ void update(ParameterTable& table, int argc, char* argv[], const string& sc)
       table.printList(); exit(0);
     }
     if (temp=="version") {
-      versionHelper(); exit(0);
+      cerr << versionHelper(); exit(0);
     }
     else
       try {

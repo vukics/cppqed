@@ -1,0 +1,15 @@
+#include "@PROJECT_NAME@_version.h"
+
+#define CPPQED@PROJECT_NAME@_GIT_SHA1 "@CONF_GIT_SHA1@"
+#define CPPQED@PROJECT_NAME@_VERSION  "@CONF_VERSION@"
+
+extern const char g_CPPQED@PROJECT_NAME@_GIT_SHA1[] = CPPQED@PROJECT_NAME@_GIT_SHA1;
+extern const char g_CPPQED@PROJECT_NAME@_VERSION[]  = CPPQED@PROJECT_NAME@_VERSION;
+
+std::string cppqed_@PROJECT_NAME@_version()
+{
+  return  ("@PROJECT_NAME@" == string("core")
+            ? string("C++QED@PROJECT_NAME@ Version ") + string(g_CPPQED@PROJECT_NAME@_VERSION) + ", "
+            : "")
+          + string("@PROJECT_NAME@ git commit: " + string(g_CPPQED@PROJECT_NAME@_GIT_SHA1) + "\n");
+}

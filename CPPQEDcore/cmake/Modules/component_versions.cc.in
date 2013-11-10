@@ -1,0 +1,6 @@
+#include "component_versions.h"
+
+std::string cppqed_component_versions()
+{
+  return @CONF_COMPONENT_VERSIONS@;
+}

@@ -7,14 +7,19 @@ MACRO(CPPQED_CXX_FLAGS)
   endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 ENDMACRO(CPPQED_CXX_FLAGS)
 
-# This function populates the variable ${namespace}_PUBLIC_HEADERS with all the
+# This function populates the variable ${PROJECT_NAME}_PUBLIC_HEADERS with all the
 # headers in the list ${source_dirs}
-function(gather_includes namespace source_dirs)
+function(gather_includes source_dirs)
   foreach(d ${${source_dirs}})
     file(GLOB INC ${d}/*.h ${d}/*.tcc)
-    set(${namespace}_PUBLIC_HEADERS ${${namespace}_PUBLIC_HEADERS} ${INC})
+    set(${PROJECT_NAME}_PUBLIC_HEADERS ${${PROJECT_NAME}_PUBLIC_HEADERS} ${INC})
   endforeach(d)
-  set(${namespace}_PUBLIC_HEADERS ${${namespace}_PUBLIC_HEADERS} PARENT_SCOPE)
+  foreach(GENERATED_HEADER ${PROJECT_NAME}_config.h ${PROJECT_NAME}_version.h component_versions.h)
+    if(EXISTS ${PROJECT_BINARY_DIR}/${GENERATED_HEADER})
+      set(${PROJECT_NAME}_PUBLIC_HEADERS ${${PROJECT_NAME}_PUBLIC_HEADERS} ${PROJECT_BINARY_DIR}/${GENERATED_HEADER})
+    endif()
+  endforeach()
+  set(${PROJECT_NAME}_PUBLIC_HEADERS ${${PROJECT_NAME}_PUBLIC_HEADERS} PARENT_SCOPE)
 endfunction()
 
 # This macro creates a target ${PROJECT_NAME}_${name}_objs where ${name} is the current
@@ -35,6 +40,11 @@ endmacro()
 macro(CPPQED_SETUP)
   include(GNUInstallDirs)
   include(CMakePackageConfigHelpers)
+  if(DEFINED CPPQED_CMAKE_DIR)
+    include(${CPPQED_CMAKE_DIR}/GetGitRevisionDescription.cmake)
+  else()
+    include(GetGitRevisionDescription)
+  endif()
 
   set(CMAKE_DEBUG_POSTFIX "_d")
 
@@ -77,6 +87,8 @@ macro(elements_project)
 
   CPPQED_SETUP()
 
+  generate_version_files()
+
   foreach(d ${ELEMENTS_SOURCE_DIRS})
     add_subdirectory(${d})
   endforeach(d)
@@ -84,14 +96,14 @@ macro(elements_project)
   set(ELEMENTS_CMAKE_SUBDIR "cmake/CPPQED${PROJECT_NAME}-${CPPQED_ID}")
   set(ELEMENTS_INCLUDE_SUBDIR "CPPQED-${CPPQED_ID}/${PROJECT_NAME}")
 
-  gather_includes(ELEMENTS ELEMENTS_SOURCE_DIRS)
+  gather_includes(ELEMENTS_SOURCE_DIRS)
 
   set(ELEMENTSLIB C++QED${PROJECT_NAME}-${CPPQED_ID})
-  add_library(${ELEMENTSLIB} SHARED ${ELEMENTS_PUBLIC_HEADERS} ${OBJ_TARGETS})
+  add_library(${ELEMENTSLIB} SHARED ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc ${${PROJECT_NAME}_PUBLIC_HEADERS} ${OBJ_TARGETS})
   target_link_libraries(${ELEMENTSLIB} LINK_PRIVATE ${CPPQED_LIBRARIES} ${CPPQEDELEMENTS_LIBRARIES})
 
   set_target_properties(${ELEMENTSLIB} PROPERTIES
-        PUBLIC_HEADER "${ELEMENTS_PUBLIC_HEADERS}"
+        PUBLIC_HEADER "${${PROJECT_NAME}_PUBLIC_HEADERS}"
         INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
         VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
         SOVERSION ${CPPQED_ABI_MAJOR}
@@ -117,6 +129,7 @@ macro(elements_project)
 
   # Create the CPPQEDConfig.cmake
   # ... for the build tree
+  set(CONF_INCLUDE_DIRS ${PROJECT_BINARY_DIR})
   foreach(d ${ELEMENTS_SOURCE_DIRS})
     set(CONF_INCLUDE_DIRS ${CONF_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/${d}) 
   endforeach(d)
@@ -150,6 +163,13 @@ macro(elements_project)
 
 endmacro()
 
+function(generate_version_files)
+  get_git_head_revision(REFSPEC CONF_GIT_SHA1)
+  set(CONF_VERSION ${CPPQED_VERSION})
+  configure_file("${CPPQED_CMAKE_DIR}/version.cc.in" "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc" @ONLY)
+  configure_file("${CPPQED_CMAKE_DIR}/version.h.in" "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.h" @ONLY)
+endfunction()
+
 macro(scripts_project)
   # find CPPQED elements project
   if(NOT DEFINED CPPQED_MONOLITHIC)
@@ -160,14 +180,32 @@ macro(scripts_project)
   include_directories(${CPPQEDelements_INCLUDE_DIRS})
   set(ALL_ELEMENTS_LIBRARIES ${CPPQEDelements_LIBRARIES})
 
+  include_directories(${PROJECT_BINARY_DIR})
+
   CPPQED_SETUP()
+
+  generate_version_files()
+
+  set(CONF_COMPONENT_VERSIONS "\"# \"+cppqed_core_version()+\"# \"+cppqed_elements_version()")
+  set(CONF_COMPONENT_VERSIONS_INCLUDES "#include \"core_version.h\"\n#include \"elements_version.h\"\n")
 
   # find additional elements projects
   foreach(elements ${ARGV})
     find_package(CPPQED${elements} ${CPPQED_ID} REQUIRED)
     set(ALL_ELEMENTS_LIBRARIES ${ALL_ELEMENTS_LIBRARIES} ${CPPQED${elements}_LIBRARIES})
     include_directories(${CPPQED${elements}_INCLUDE_DIRS})
+    set(CONF_COMPONENT_VERSIONS_INCLUDES "${CONF_COMPONENT_VERSIONS_INCLUDES}#include \"${elements}_version.h\"\n")
+    set(CONF_COMPONENT_VERSIONS "${CONF_COMPONENT_VERSIONS}+\"# \"+cppqed_${elements}_version()")
   endforeach()
+
+  set(CONF_COMPONENT_VERSIONS_INCLUDES "${CONF_COMPONENT_VERSIONS_INCLUDES}#include \"${PROJECT_NAME}_version.h\"")
+  set(CONF_COMPONENT_VERSIONS "${CONF_COMPONENT_VERSIONS}+\"# \"+cppqed_${PROJECT_NAME}_version()")
+
+  configure_file(${CPPQED_CMAKE_DIR}/component_versions.cc.in ${PROJECT_BINARY_DIR}/component_versions.cc @ONLY)
+  configure_file(${CPPQED_CMAKE_DIR}/component_versions.h.in ${PROJECT_BINARY_DIR}/component_versions.h @ONLY)
+
+  add_library(versions_obj OBJECT ${PROJECT_BINARY_DIR}/component_versions.cc ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc)
+  set_target_properties(versions_obj PROPERTIES POSITION_INDEPENDENT_CODE On)
 
   # create all scripts targets
   file(GLOB SCRIPTS . *.cc)
@@ -177,7 +215,7 @@ macro(scripts_project)
     list(FIND EXCLUDE_SCRIPTS ${SCRIPT} EX)
     if(EX EQUAL -1 AND (CPPQED_HAS_FLENS OR F EQUAL -1))
       set(SCRIPTNAMES ${SCRIPTNAMES} ${SCRIPT})
-      add_executable(${SCRIPT} ${s})
+      add_executable(${SCRIPT} ${s} $<TARGET_OBJECTS:versions_obj>)
       target_link_libraries(${SCRIPT} ${CPPQED_LIBRARIES} ${ALL_ELEMENTS_LIBRARIES})
       install(TARGETS ${SCRIPT}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
