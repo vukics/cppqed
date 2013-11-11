@@ -2,6 +2,12 @@ Issues
 ======
 
 * \b DONE boost::tuples => std::tuples --- deprecate DynamicsBase::RealFreqs,ComplexFreqs FREQS, etc.
+* (re)consider use of Boost.Math instead of GSL throughout
+
+* (re)consider use of Boost.MultiArray instead of Blitz
+
+* define Ptr types outside classes as template aliases eg QuantumSystem::Ptr => QuantumSystemPtr
+
 
 * Make headers self-contained & minimal
 
