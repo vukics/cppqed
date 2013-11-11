@@ -28,15 +28,15 @@ const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVecto
 
 template<typename V, int RANK>
 void evolve(quantumdata::StateVector<RANK>&, typename structure::QuantumSystem<RANK>::Ptr,
-	    const ParsEvolution&);
+            const ParsEvolution&);
 
 
 
 template<int RANK>
 inline
 void evolve(quantumdata::StateVector<RANK>& psi,
-	    typename structure::QuantumSystem<RANK>::Ptr sys,
-	    const ParsEvolution& p)
+            typename structure::QuantumSystem<RANK>::Ptr sys,
+            const ParsEvolution& p)
 {
   evolve<tmptools::V_Empty>(psi,sys,p);
 }
@@ -44,8 +44,8 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 template<typename V, int RANK>
 inline
 void evolve(quantumdata::StateVector<RANK>& psi,
-	    const structure::QuantumSystem<RANK>& sys,
-	    const ParsEvolution& p)
+            const structure::QuantumSystem<RANK>& sys,
+            const ParsEvolution& p)
 {
   evolve<V>(psi,cpputils::sharedPointerize(sys),p);
 }
@@ -54,13 +54,21 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 template<int RANK>
 inline
 void evolve(quantumdata::StateVector<RANK>& psi,
-	    const structure::QuantumSystem<RANK>& sys,
-	    const ParsEvolution& p)
+            const structure::QuantumSystem<RANK>& sys,
+            const ParsEvolution& p)
 {
   evolve<tmptools::V_Empty>(psi,cpputils::sharedPointerize(sys),p);
 }
 
 
-// C++11: use default template argument tmptools::V_Empty to fuse the last two functions
+template<int V0, int... V_REST, typename SV, typename SYS>
+inline
+void evolve(SV& psi,
+            const SYS& sys,
+            const ParsEvolution& p)
+{
+  evolve<tmptools::Vector<V0,V_REST...> >(psi,sys,p);
+}
+
 
 #endif // QUANTUMTRAJECTORY_EVOLUTION__H_INCLUDED
