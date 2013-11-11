@@ -50,7 +50,7 @@ macro(CPPQED_SETUP)
 
   cppqed_cxx_flags()
 
-  set(${CMAKE_CXX_FLAGS_DEBUG} "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DBZ_DEBUG")
   add_definitions(${CPPQED_DEFINITIONS})
 
   # use, i.e. don't skip the full RPATH for the build tree
@@ -175,7 +175,7 @@ macro(scripts_project)
   if(NOT DEFINED CPPQED_MONOLITHIC)
     find_package(CPPQEDelements ${CPPQED_ID} REQUIRED)
   else(NOT DEFINED CPPQED_MONOLITHIC)
-    include(${CPPQED_BINARY_DIR}/CPPQEDelements/CPPQEDelementsConfig.cmake)
+    include(${elements_BINARY_DIR}/CPPQEDelementsConfig.cmake)
   endif(NOT DEFINED CPPQED_MONOLITHIC)
   include_directories(${CPPQEDelements_INCLUDE_DIRS})
   set(ALL_ELEMENTS_LIBRARIES ${CPPQEDelements_LIBRARIES})
