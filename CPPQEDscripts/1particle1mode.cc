@@ -91,33 +91,6 @@ int main(int argc, char* argv[])
   psi.renorm();
 
 
-  evolve<tmptools::Vector<0> >(psi,binary::make(*particlecavityBase),pe);
-
-
-  /*
-  BinarySystem system(*particlecavityBase);
-
-  DensityOperator rho(system.getDimensions(),false); rho()=0;
-
-  for (int i=0; i<1; i++) psi.addTo(rho); rho/=1.;
-
-  // cerr<<negPT(rho,tmptools::Vector<0>())<<endl;
-
-    {
-    using namespace structure;
-
-    AveragedCommon::Averages averages(Averaged<2>::average(rho,&system));
-
-    AveragedCommon::process(averages,&system);
-
-    cout<<averages<<endl;
-  }
-
-  quantumtrajectory::EnsembleMCWF<2,tmptools::Vector<0> > traj(psi,system,pe);
-
-  traj.display();
-  
-  */
-
+  evolve<0>(psi,binary::make(*particlecavityBase),pe);
 
 }

@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   
 /*  
 
-evolve<tmptools::Vector<0> >(psi,binary::make(jc),pe);
+evolve<0>(psi,binary::make(jc),pe);
 
 */
 

@@ -26,19 +26,19 @@ int main(int argc, char* argv[])
   mode    ::Ptr minus(make(pmM,QMP_IP));
 
   quantumdata::StateVector<3> psi(init(pp)*
-				  init(pmP)*
-				  init(pmM));
+                                  init(pmP)*
+                                  init(pmM));
 
   ParticleAlongCavity pacP(plus ,part,ppcP);
   ParticleAlongCavity pacM(minus,part,ppcM);
   ParticleTwoModes ptm(plus,minus,part,ppcP,ppcM);
 
-  evolve(psi,
-	 composite::make(	         
-			 Act<1,0>  (pacP),
-			 Act<2,0>  (pacM),
-			 Act<1,2,0>(ptm)
-					 ),
-	 pe);
+  evolve<0>(psi,
+            composite::make(
+                            Act<1,0>  (pacP),
+                            Act<2,0>  (pacM),
+                            Act<1,2,0>(ptm)
+                            ),
+            pe);
 
 }

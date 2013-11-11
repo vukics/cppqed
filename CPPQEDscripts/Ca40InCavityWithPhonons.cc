@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 
   MLJC<NL,      Couplings> ia02(atomInner,cavityMode,pmljc           );
 
-  evolve<tmptools::Vector<0> >
+  evolve<0>
     (psi,
      composite::make(Act<0,1>(ia01),Act<0,2>(ia02)),
      pe);

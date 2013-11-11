@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
   StateVector2 psi(psiMode*psiSpin);
 
-  evolve<tmptools::Vector<0> >
+  evolve<0>
     (psi,
      binary::make(GeneralDicke<>(mode::make<mode::AveragedMonitorCutoff<mode::AveragedQuadratures> >(pplm,qmp),spin,u,y)),
      pe);

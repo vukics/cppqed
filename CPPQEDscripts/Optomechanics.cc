@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   StateVector2 psi(init(pA)*init(pB));
   psi.renorm();
 
-  evolve<tmptools::Vector<0> >
+  evolve<0>
     (psi,
      binary::make(nxcoupledmodes::make<ModeCorrelations>(make<DoNotAverage>(pA,qmp),
 							 make<DoNotAverage>(pB,qmp),
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 
   // Another way which works:
   /*
-  evolve<tmptools::Vector<0> >
+  evolve<0>
     (psi,
      binary::make(nxcoupledmodes::make<ModeCorrelations>(Mode<DoNotAverage>(pA),
 							 Mode<DoNotAverage>(pB),
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   NX_CoupledModes<ModeCorrelations> nx(Mode<DoNotAverage>(pA),Mode<DoNotAverage>(pB),-sqrt(2)*u);
   // Here, it doesn't matter whether the interaction is created with or without its maker.
 
-  evolve<tmptools::Vector<0> >
+  evolve<0>
     (psi,
      binary::make(nx),
      pe);
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
   NX_CoupledModes<ModeCorrelations> nx(m1,m2,-sqrt(2)*u);
 
-  evolve<tmptools::Vector<0> >
+  evolve<0>
     (psi,
      binary::make(nx),
      pe);

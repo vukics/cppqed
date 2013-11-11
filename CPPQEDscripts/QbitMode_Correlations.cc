@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
   */
   psi.renorm();
 
-  evolve<tmptools::Vector<0> >(psi,binary::make(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc)),pe);
+  evolve<0>(psi,binary::make(jaynescummings::make<QbitModeCorrelations>(qbit,mode,pjc)),pe);
 
 
 

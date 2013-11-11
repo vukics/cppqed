@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
 
     evolve(traj,pe);
 
-    // evolve(psi,BinarySystem(GeneralDicke(mode.get(),&spin,u,y)),pe,tmptools::Vector<0>());
+    // evolve<0>(psi,BinarySystem(GeneralDicke(mode.get(),&spin,u,y)),pe);
 
   }
 
