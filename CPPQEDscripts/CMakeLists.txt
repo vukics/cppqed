@@ -14,7 +14,7 @@ include(${CPPQED_USE})
 ############################################################
 
 set(NEED_FLENS GeneralDickeImaginaryEvolution)
-set(EXCLUDE_SCRIPTS Ca40InCavity Ca40InCavityWithPhonons CavityRaman MLJC NX_coupledModesElim PumpedLossyModeRegression Raman Spin)
+set(EXCLUDE_SCRIPTS GeneralDickeImaginaryEvolution Ca40InCavity Ca40InCavityWithPhonons CavityRaman MLJC NX_coupledModesElim PumpedLossyModeRegression Raman Spin)
 scripts_project()
 
 # add target "fewer_scripts"
