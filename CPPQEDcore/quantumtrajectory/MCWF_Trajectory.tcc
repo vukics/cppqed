@@ -44,7 +44,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
                                        const ParsMCWF& p,
                                        const StateVectorLow& scaleAbs
                                        )
-  : Base(psi(),
+  : Base(psi.getArray(),
          bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
          trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),
          scaleAbs,
@@ -94,7 +94,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   double t=getTime();
 
   if (const typename Exact::Ptr ex=qs_.getEx()) {
-    ex->actWithU(getTime(),psi_(),tIntPic0_);
+    ex->actWithU(getTime(),psi_.getArray(),tIntPic0_);
     tIntPic0_=t;
   }
 
@@ -112,8 +112,8 @@ MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const
   for (int i=0; i<rates->size(); i++)
     if ((*rates)(i)<0) {
       StateVector psiTemp(psi_);
-      qs_.actWithJ(t,psiTemp(),i);
-      res.push_back(IndexSVL_tuple(i,psiTemp()));
+      qs_.actWithJ(t,psiTemp.getArray(),i);
+      res.push_back(IndexSVL_tuple(i,psiTemp.getArray()));
       (*rates)(i)=mathutils::sqr(psiTemp.renorm());
     } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the StateVectorLow in the tuple
   return res;
@@ -164,13 +164,13 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
     auto i=find_if(specialRates,bind(&helper::p,--lindbladNo,_1)); // See whether it's a special jump
     if (i!=specialRates.end())
       // special jump
-      psi_()=i->template get<1>(); // RHS already normalized above
+      psi_=i->template get<1>(); // RHS already normalized above
     else {
       // normal  jump
-      qs_.actWithJ(t,psi_(),lindbladNo);
+      qs_.actWithJ(t,psi_.getArray(),lindbladNo);
       double normFactor=sqrt(rates(lindbladNo));
       if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
-      psi_()/=normFactor;
+      psi_/=normFactor;
     }
 
     logger_.jumpOccured(t,lindbladNo);
@@ -181,7 +181,7 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
 template<int RANK>
 void MCWF_Trajectory<RANK>::step_v(double Dt)
 {
-  const StateVectorLow psiCache(psi_().copy());
+  const StateVector psiCache(psi_);
   evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.
 
   double t=coherentTimeDevelopment(Dt);
@@ -192,7 +192,7 @@ void MCWF_Trajectory<RANK>::step_v(double Dt)
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
 
     while (manageTimeStep(rates,&evolvedCache)) {
-      psi_()=psiCache;
+      psi_=psiCache;
       t=coherentTimeDevelopment(Dt); // the next try
       rates=li->rates(t,psi_);
       specialRates=calculateSpecialRates(&rates,t);

@@ -74,7 +74,7 @@ private:
   static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs);
 
   
-  const typename Ensemble::TBA_Type getInitializedTBA_v() const {rho_()=0; return rho_;}
+  const typename Ensemble::TBA_Type getInitializedTBA_v() const {rho_=0; return rho_;}
 
   mutable quantumdata::DensityOperator<RANK> rho_;
 

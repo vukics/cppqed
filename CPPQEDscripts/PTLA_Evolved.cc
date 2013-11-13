@@ -53,9 +53,9 @@ int main(int argc, char* argv[])
     quantumdata::DensityOperator<1> rho(qbit::init(pp2la));
 
     zxy=
-      2*real(rho()(0,0))-1,
-      2*real(rho()(0,1))  ,
-     -2*imag(rho()(0,1))  ;
+      2*real(rho(0,0))-1,
+      2*real(rho(0,1))  ,
+     -2*imag(rho(0,1))  ;
   }
 
   Simulated<Array> S(zxy,bind(derivs,_1,_2,_3,pp2la),dtinit,Array(),pt);

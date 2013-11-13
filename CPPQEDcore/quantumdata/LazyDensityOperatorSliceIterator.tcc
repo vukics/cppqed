@@ -67,12 +67,12 @@ public:
     typedef DensityOperator<RANK> DO;
 
     if      (const SV*const sV=dynamic_cast<const SV*>(&ldo)) {
-      typename SV::StateVectorLow temp(sV->operator()()); 
+      typename SV::StateVectorLow temp(sV->getArray());
       // We do not want to transpose that StateVectorLow which is the storage of sV.
       return make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
     }
     else if (const DO*const dO=dynamic_cast<const DO*>(&ldo)) {
-      typename DO::DensityOperatorLow temp(dO->operator()());
+      typename DO::DensityOperatorLow temp(dO->getArray());
       return make_shared<DO>(Transposer<2*RANK,typename details::ExtendV<RANK,V>::type>::transpose(temp),byReference);
     }
     else throw NoSuchImplementation();
@@ -147,7 +147,7 @@ private:
     typedef typename Base::LazyDensityOperatorRes LazyDensityOperatorRes;
 
     template<bool IS_END>
-    DI_SV_Impl(const StateVector<RANK>& psi, mpl::bool_<IS_END> tag) : impl_(psi(),tag), stateVectorResPtr_() {}
+    DI_SV_Impl(const StateVector<RANK>& psi, mpl::bool_<IS_END> tag) : impl_(psi.getArray(),tag), stateVectorResPtr_() {}
 
   private:
     void doIncrement() {++impl_;}
@@ -191,7 +191,7 @@ private:
     DI_DO_Impl(const DensityOperator<RANK>& rho, Begin)
       : mii_(ctorHelper<false>(rho)), densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()
     {
-      densityOperatorLow_.reference(rho());
+      densityOperatorLow_.reference(rho.getArray());
       BASI::transpose(densityOperatorLow_);
     }
 
@@ -206,8 +206,8 @@ private:
       using blitzplusplus::basi::filterOut;
       using blitzplusplus::halfCutTiny;
       
-      return MII(filterOut<RANK,V>(halfCutTiny(rho().lbound())),
-                 filterOut<RANK,V>(halfCutTiny(rho().ubound())),
+      return MII(filterOut<RANK,V>(halfCutTiny(rho.getArray().lbound())),
+                 filterOut<RANK,V>(halfCutTiny(rho.getArray().ubound())),
                  mpl::bool_<IS_END>());
     }
 

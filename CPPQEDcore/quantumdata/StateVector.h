@@ -71,7 +71,7 @@ public:
 
   typedef typename LDO_Base::Idx Idx;
 
-  using LDO_Base::getTotalDimension; using ABase::operator(); using ABase::vectorView;
+  using LDO_Base::getTotalDimension; using ABase::vectorView; using ABase::getArray;
 
   /// \name Construction, assignment
   //@{
@@ -98,7 +98,7 @@ public:
   
     /// Assignment with by-value semantics.
     /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
-  StateVector& operator=(const StateVector& sv) {ABase::operator=(sv()); return *this;}
+  StateVector& operator=(const StateVector& sv) {ABase::operator=(sv.getArray()); return *this;}
 
     /// Mixed-mode assignment with by-value semantics
     /**
@@ -108,9 +108,20 @@ public:
     * \tparam OTHER the “other” type in mixed mode
     */
   template<typename OTHER>
-  StateVector& operator=(const OTHER& other) {operator()()=other; return *this;}
+  StateVector& operator=(const OTHER& other) {getArray()=other; return *this;}
   //@}
   
+  /// \name Subscripting
+  /** \tparam ...SubscriptPack expected as all integers of number RANK-1 (checked @ compile time) */
+  //@{
+  template<typename... SubscriptPack>
+  const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const;
+
+  template<typename... SubscriptPack>
+  dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const StateVector*>(this)->operator()(s0,subscriptPack...));}
+  //@}
+
+
   /// \name Metric
   //@{
     /// Both functions return the norm \f$\norm\Psi\f$, but the latter one also renormalises
@@ -139,7 +150,7 @@ public:
   StateVector& operator+=(const StateVector& psi) {ABase::operator+=(psi); return *this;}
   StateVector& operator-=(const StateVector& psi) {ABase::operator-=(psi); return *this;}
 
-  const StateVector operator-() const {StateVector res(this->getDimensions(),false); res()=-this->operator()(); return res;}
+  const StateVector operator-() const {StateVector res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;}
   const StateVector operator+() const {return *this;} // deep copy
   //@}
 
@@ -154,11 +165,11 @@ public:
   //@}
   
 #ifndef NDEBUG
-  void debug() const {std::cerr<<"Debug: "<<operator()()<<std::endl;}
+  void debug() const {std::cerr<<"Debug: "<<getArray()<<std::endl;}
 #endif // NDEBUG
   
 private:
-  const dcomp index(const Idx& i, const Idx& j) const {return operator()()(i)*conj(operator()()(j));} ///< This function implements the LazyDensityOperator interface in a dyadic-product way.
+  const dcomp index(const Idx& i, const Idx& j) const {return getArray()(i)*conj(getArray()(j));} ///< This function implements the LazyDensityOperator interface in a dyadic-product way.
 
 };
 

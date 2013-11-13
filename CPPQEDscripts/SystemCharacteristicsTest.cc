@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
   
   system->displayParameters(cout);
   
-  qs.addContribution(0,psi(),psiv(),0);
+  qs.addContribution(0,psi.getArray(),psiv.getArray(),0);
   
   qs.displayCharacteristics(cout)<<endl;
   

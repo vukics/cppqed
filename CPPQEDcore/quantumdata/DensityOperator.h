@@ -65,7 +65,7 @@ public:
 
   typedef linalg::CMatrix CMatrix;
 
-  using ABase::operator(); using ABase::frobeniusNorm;
+  using ABase::frobeniusNorm; using ABase::getArray; 
 
   /*
   DensityOperator() : Base() {}
@@ -81,10 +81,10 @@ public:
   DensityOperator(const DensityOperator&); ///< By-value copy constructor (deep copy)
 
   /// Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
-  DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho()); return *this;}
+  DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho.getArray()); return *this;}
 
   template<typename OTHER>
-  DensityOperator& operator=(const OTHER& other) {operator()()=other; return *this;}
+  DensityOperator& operator=(const OTHER& other) {getArray()=other; return *this;}
   
   //@{
     /// (multi-)matrix style indexing:
@@ -100,8 +100,8 @@ public:
 
   //@{
     /// Returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray.
-  const CMatrix matrixView() const {return blitzplusplus::binaryArray(operator()());}
-        CMatrix matrixView()       {return blitzplusplus::binaryArray(operator()());}
+  const CMatrix matrixView() const {return blitzplusplus::binaryArray(getArray());}
+        CMatrix matrixView()       {return blitzplusplus::binaryArray(getArray());}
   //@}
   
   /// Naive operations for vector space
@@ -109,7 +109,7 @@ public:
   DensityOperator& operator+=(const DensityOperator& rho) {ABase::operator+=(rho); return *this;}
   DensityOperator& operator-=(const DensityOperator& rho) {ABase::operator-=(rho); return *this;}
 
-  const DensityOperator operator-() const {DensityOperator res(this->getDimensions(),false); res()=-this->operator()(); return res;}
+  const DensityOperator operator-() const {DensityOperator res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;}
   const DensityOperator operator+() const {return *this;}
 
   template<typename OTHER>

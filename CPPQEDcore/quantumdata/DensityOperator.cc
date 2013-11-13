@@ -7,7 +7,7 @@ inline
 const dcomp 
 DensityOperator<1>::index(const Idx& i, const Idx& j) const
 {
-  return operator()()(i,j);
+  return getArray()(i,j);
 }
 
 } // quantumdata

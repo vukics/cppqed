@@ -29,7 +29,7 @@ Base<RANK>::Base(DensityOperator& rho,
                  const master::Pars& p,
                  const DensityOperatorLow& scaleAbs
                  )
-  : Adaptive(rho(),
+  : Adaptive(rho.getArray(),
              bind(&Base<RANK>::derivs,this,_1,_2,_3),
              trajectory::initialTimeStep(qs->highestFrequency()),
              p,
@@ -94,7 +94,7 @@ Base<RANK>::step_v(double deltaT)
   if (const typename Exact::Ptr ex=qs_.getEx()) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     using namespace blitzplusplus;
-    DensityOperatorLow rhoLow(rho_());
+    DensityOperatorLow rhoLow(rho_.getArray());
     UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,tIntPic0_));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 

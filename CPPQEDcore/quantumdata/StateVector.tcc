@@ -16,13 +16,13 @@ StateVector<RANK>::StateVector(const Dimensions& dimensions, bool init)
   : LDO_Base(dimensions),
     ABase(StateVectorLow(dimensions))
 {
-  if (init) operator()()=0;
+  if (init) *this=0;
 }
 
 
 template<int RANK>
 StateVector<RANK>::StateVector(const StateVector& sv) 
-  : LDO_Base(sv.getDimensions()), ABase(sv().copy())
+  : LDO_Base(sv.getDimensions()), ABase(sv.getArray().copy())
 {
 }
 
@@ -30,17 +30,24 @@ StateVector<RANK>::StateVector(const StateVector& sv)
 template<int RANK> template<int RANK2>
 StateVector<RANK>::StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)
   : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
-    ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK2,RANK-RANK2>(psi1(),psi2()))
+    ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK2,RANK-RANK2>(psi1.getArray(),psi2.getArray()))
 {
 }
 
 
+template<int RANK> template<typename... SubscriptPack>
+const dcomp& StateVector<RANK>::operator()(int s0, SubscriptPack... subscriptPack) const
+{
+  static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for StateVector." );
+  return getArray()(s0,subscriptPack...);
+}
+
+
 template<int RANK>
-const typename StateVector<RANK>::DensityOperatorLow 
-StateVector<RANK>::dyad(const StateVector& sv) const 
+auto StateVector<RANK>::dyad(const StateVector& sv) const -> const DensityOperatorLow
 {
   using namespace blitzplusplus;
-  return doDirect<dodirect::multiplication,RANK,RANK>(operator()(),StateVectorLow(conj(sv())));
+  return doDirect<dodirect::multiplication,RANK,RANK>(getArray(),StateVectorLow(conj(sv.getArray())));
 }
 
 

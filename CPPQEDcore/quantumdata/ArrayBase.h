@@ -33,14 +33,14 @@ protected:
   
   /// \name The underlying ArrayLow
   //@{
-  const ArrayLow& operator()() const {return arrayLow_;}
-  ArrayLow& operator()() {return const_cast<ArrayLow&>(static_cast<const ArrayBase&>(*this)());}
+  const ArrayLow& getArray() const {return arrayLow_;}
+        ArrayLow& getArray()       {return const_cast<ArrayLow&>(static_cast<const ArrayBase*>(this)->getArray());}
   //@}
   
   /// \name Naive vector-space operations
   //@{
-  void operator+=(const ArrayBase& arrayBase) {arrayLow_+=arrayBase();}
-  void operator-=(const ArrayBase& arrayBase) {arrayLow_-=arrayBase();}
+  void operator+=(const ArrayBase& arrayBase) {arrayLow_+=arrayBase.arrayLow_;}
+  void operator-=(const ArrayBase& arrayBase) {arrayLow_-=arrayBase.arrayLow_;}
   //@}
   
   /// \name Naive vector-space operations allowing also for mixed-mode arithmetic

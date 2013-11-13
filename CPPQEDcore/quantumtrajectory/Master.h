@@ -96,7 +96,7 @@ public:
   typedef typename Base<RANK>::DensityOperatorLow DensityOperatorLow;
 
   BaseFast(DensityOperator& rho, typename QuantumSystem::Ptr sys, const Pars& p, const DensityOperatorLow& scaleAbs=DensityOperatorLow())
-    : Base<RANK>(rho,sys,p,scaleAbs), slicesData_(rho()) {}
+    : Base<RANK>(rho,sys,p,scaleAbs), slicesData_(rho.getArray()) {}
 
 private:
   typedef typename Base<RANK>:: UnaryFunction  UnaryFunction;

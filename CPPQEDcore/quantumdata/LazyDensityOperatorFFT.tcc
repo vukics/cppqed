@@ -31,7 +31,7 @@ public:
 
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
-    boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<IDX> >((*psi_)()),
+    boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<IDX> >(psi_->getArray()),
                     boost::bind(static_cast<void(*)(linalg::CVector&, fft::Direction)>(&quantumdata::ffTransform),_1,dir_));
   }
 
@@ -52,7 +52,7 @@ public:
 
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
-    boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<IDX,IDX+RANK> >((*rho_)()),
+    boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho_->getArray()),
                     boost::bind(static_cast<void(*)(linalg::CMatrix&, fft::Direction)>(&quantumdata::ffTransform),_1,dir_));
   }
   

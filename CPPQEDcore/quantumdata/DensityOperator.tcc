@@ -39,14 +39,14 @@ DensityOperator<RANK>::DensityOperator(const Dimensions& dimensions, bool init)
   : LDO_Base(dimensions),
     ABase(DensityOperatorLow(blitzplusplus::concatenateTinies(dimensions,dimensions)))
 {
-  if (init) ABase::operator()()=0;
+  if (init) *this=0;
 }
 
 
 template<int RANK>
 DensityOperator<RANK>::DensityOperator(const DensityOperator& rho) 
   : LDO_Base(rho.getDimensions()),
-    ABase(rho().copy())
+    ABase(rho.getArray().copy())
 {}
 
 
@@ -69,7 +69,7 @@ template<int RANK>
 const dcomp&
 DensityOperator<RANK>::operator()(const Idx& i, const Idx& j) const
 {
-  return operator()()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
+  return getArray()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
   // We have to explicitly indicate the template parameters for concatenateTinies here, otherwise when RANK=1, that is, Idx is int, the compiler cannot find the function. This is despite TinyVector<int,1> has an implicit constructor from int, because implicit type conversions are NEVER considered for template parameter deduction (for further details see EffC++ 3rd edition item 46.)
 }
 

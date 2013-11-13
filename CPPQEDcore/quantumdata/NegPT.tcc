@@ -41,7 +41,7 @@ double negPT(const DensityOperator<RANK>& rho, V)
 
   typedef GeMatrixMF<dcomp,RowMajor>::type GeMatrix;
 
-  DensityOperatorLow rhoShallowPT(rho());
+  DensityOperatorLow rhoShallowPT(rho.getArray());
 
   blitzplusplus::basi::Transposer<2*RANK,ExtendedV>::transpose(rhoShallowPT);
 

@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   update(p,argc,argv,"--");
 
   typedef quantumdata::StateVector<2> StateVector;
-  StateVector psi(StateVector::Dimensions(10,20)); psi()(0,0)=1;
+  StateVector psi(StateVector::Dimensions(10,20)); psi(0,0)=1;
   
   evolve<tmptools::Vector<0> >(psi,binary::make(ii),pe);
 

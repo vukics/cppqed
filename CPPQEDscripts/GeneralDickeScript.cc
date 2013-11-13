@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
   StateVector1 psiMode(mode::init(pplm)), psiSpin(spin.getDimension());
 
-  psiSpin()(0)=1; psiSpin.renorm();
+  psiSpin.getArray()(0)=1; psiSpin.renorm();
 
   StateVector2 psi(psiMode*psiSpin);
 
