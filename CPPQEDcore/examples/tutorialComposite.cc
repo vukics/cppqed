@@ -23,12 +23,12 @@ int main(int argc, char* argv[])
 
   quantumdata::StateVector<3> psi(wavePacket(pp)*init(pmP)*init(pmM));
 
-  evolve(psi,
-         composite::make(         
-			 Act<1,0>  (ParticleAlongCavity(plus ,part,ppcP)),
-			 Act<2,0>  (ParticleAlongCavity(minus,part,ppcM)),
-			 Act<1,2,0>(ParticleTwoModes(plus,minus,part,ppcP,ppcM))
-			 ),
-         pe);
+  evolve<0>(psi,
+            composite::make(
+                            Act<1,0>  (ParticleAlongCavity(plus ,part,ppcP)),
+                            Act<2,0>  (ParticleAlongCavity(minus,part,ppcM)),
+                            Act<1,2,0>(ParticleTwoModes(plus,minus,part,ppcP,ppcM))
+                            ),
+            pe);
 
 }
