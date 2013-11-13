@@ -214,7 +214,7 @@ public:
   typedef typename Base::JumpStrategies     JumpStrategies    ;
   typedef typename Base::JumpRateStrategies JumpRateStrategies;
 
-  BOOST_STATIC_ASSERT( blitzplusplus::TinyVectorLengthTraits<JumpRateStrategies>::value==NLT );
+  static_assert( blitzplusplus::TinyVectorLengthTraits<JumpRateStrategies>::value==NLT , "Jump number inconsistent." );
 
   typedef typename Base::KeyLabels KeyLabels;
 
