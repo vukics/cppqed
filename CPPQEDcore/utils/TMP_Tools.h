@@ -130,14 +130,11 @@ struct IsEvenAssert : boost::mpl::int_<N/2>
 
 
 /// A compile-time pair of integers
-/**
- * \tparam IS_EXCLUSIVE governs the exclusivity of the pair, that is, in the case of `IS_EXCLUSIVE=true`, the class provokes a compile-time error if `N1=N2`
- */
+/** \tparam IS_EXCLUSIVE governs the exclusivity of the pair, that is, in the case of `IS_EXCLUSIVE=true`, the class provokes a compile-time error if `N1=N2` */
 template<int N1, int N2, bool IS_EXCLUSIVE=true>
 struct pair_c;
 
 
-/** \cond */
 template<int N1, int N2>
 struct pair_c<N1,N2,false>
 {
@@ -184,12 +181,6 @@ struct ArgumentDispatcher : boost::mpl::integral_c<int,V>
 };
 
 
-// Workaround for gcc <4.7 http://stackoverflow.com/a/11297765
-template<template <typename...> class T, typename... Args>
-struct Join : boost::mpl::identity<T<Args...> > 
-{};
-/** \endcond */
-
 /// A non-negative compile-time vector
 /**
  * It is based on and has the same characteristics as Boost.MPL’s \refBoostConstruct{vector,mpl/doc/refmanual/vector.html}.
@@ -201,9 +192,7 @@ struct Join : boost::mpl::identity<T<Args...> >
  * 
  */
 template<int... V> 
-struct Vector : // boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...> This would be the simple solution, but it’s not accepted by gcc<4.7
-  Join<boost::mpl::vector,ArgumentDispatcher<V>...>::type
-{};
+struct Vector : boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...> {};
 
 
 typedef Vector<> V_Empty;

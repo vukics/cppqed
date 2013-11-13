@@ -61,7 +61,7 @@ using cpputils::mii::Begin; using cpputils::mii::End;
  */
 template<int RANK, typename V> struct ConsistencyChecker
 {
-  BOOST_MPL_ASSERT_MSG( RANK >= Size<V>::value, INDEXER_with_NONPOSITIVE_RANK, () );
+  static_assert( RANK >= Size<V>::value , "Indexer with nonpositive RANK." );
 
   typedef typename boost::mpl::sort<V>::type SortedV;
   BOOST_MPL_ASSERT_MSG( 

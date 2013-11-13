@@ -274,7 +274,7 @@ public:
   static const int RANK=composite::MaxRank<VA>::value+1;
 
   // Compile-time sanity check
-  BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (mpl::void_) );
+  BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (composite::CheckMeta<RANK,VA>) );
 
 private:
   using Base::getFrees; using Base::getActs ;
