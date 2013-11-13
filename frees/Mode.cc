@@ -371,7 +371,7 @@ const StateVector coherent(const dcomp& alpha, size_t dim)
   StateVector res(dim,false);
   double norm(exp(-sqr(abs(alpha))/2.));
 
-  for (size_t n=0; n<dim; ++n) res()(n)=norm*coherentElement(n,alpha);
+  for (size_t n=0; n<dim; ++n) res(n)=norm*coherentElement(n,alpha);
 
   return res;
 
@@ -382,7 +382,7 @@ const StateVector fock(size_t n, size_t dim, double phase) throw(PrepError)
 {
   if (n>=dim) throw PrepError();
   StateVector res(dim);
-  res()(n)=exp(DCOMP_I*phase);
+  res(n)=exp(DCOMP_I*phase);
   return res;
 }
 
