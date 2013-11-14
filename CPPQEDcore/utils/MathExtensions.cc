@@ -30,10 +30,6 @@ double choose(unsigned n, unsigned m)
   return gsl_sf_choose(n,m);
 }
 
-bool parity(         long n) {return GSL_IS_ODD(n);}
-bool parity(unsigned long n) {return GSL_IS_ODD(n);}
-
-
 dcomp coherentElement(unsigned long n, const dcomp& alpha)
 {
   using namespace boost::math;

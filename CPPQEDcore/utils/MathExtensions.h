@@ -37,8 +37,8 @@ double sqrAbs(const dcomp&);
 double fact  (unsigned          ) throw(FactOverflow);
 double choose(unsigned, unsigned);
 
-bool parity(         long);
-bool parity(unsigned long);
+template<typename T>
+bool parity(T n) { return n & 1;}
 // even --- false, odd --- true;
 
 
@@ -46,9 +46,8 @@ inline int round(double r) {
   return (r>0) ? floor(r+0.5) : ceil(r-0.5);
 }
 
-
-inline char minusOneToThePowerOf(unsigned long n) {return parity(n) ? -1 : 1;}
-inline char minusOneToThePowerOf(         long n) {return parity(n) ? -1 : 1;}
+template<typename T>
+char minusOneToThePowerOf(T n) {return parity(n) ? -1 : 1;}
 
 
 /// Calculates \f$\alpha^n/\sqrt{n!}\f$ relying on the Stirling formula if n is too large for explicit calculation of factorial
