@@ -195,12 +195,12 @@ BOOST_AUTO_TEST_CASE( HermitianTest )
       CA2R resTensor(matBlitz.shape());
       CArray<9> temp9(concatenateTinies(matBlitz.shape(),dims));
       {
-	using namespace blitz::tensor;
-	temp9=matBlitz(o,p,q,i,j,k)*a(l,m,n,o,p,q)/vecBlitz2(l,m,n);
-	resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
-	  
-	BOOST_CHECK(!fcmp(1-max(abs(a.transpose(3,4,5,0,1,2)-resTensor)),1,epsilonCmp));
-	  
+        using namespace blitz::tensor;
+        temp9=matBlitz(o,p,q,i,j,k)*a(l,m,n,o,p,q)/vecBlitz2(l,m,n);
+        resTensor=CA2R(sum(sum(sum(temp9,q),p),o));
+          
+        BOOST_CHECK(!fcmp(1-max(abs(a.transpose(3,4,5,0,1,2)-resTensor)),1,epsilonCmp));
+          
       }
 
     }

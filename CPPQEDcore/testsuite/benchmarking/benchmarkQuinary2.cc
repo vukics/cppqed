@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
 
   const Composite<composite::result_of::make_vector<Act<0,2>,Act<0,1,2,3,4> >::type>
     sys(makeComposite(Act<0,2>(ia),
-		      Act<0,1,2,3,4>(dummy)
-				     ));
+                      Act<0,1,2,3,4>(dummy)
+                                     ));
 
   benchmark(sys,ia,tmptools::Vector<0,2>());
 

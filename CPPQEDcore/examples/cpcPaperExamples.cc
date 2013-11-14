@@ -71,7 +71,7 @@ void Hamiltonian
 void composeWithA ( typename quantumdata::Types<5>::StateVectorLow & rho )
 {
   boost::for_each ( BASI_Range< Vector<0,1,2,3,4> > ( rho ) , 
-		    actWithA ) ;
+                    actWithA ) ;
 }
 
 

@@ -43,10 +43,10 @@ int main(int argc, char* argv[])
   CA1R y(2); y=yinit,dydtinit;
 
   Simulated<CA1R> S(y,
-		    bind(derivs,_1,_2,_3,omega,gamma),
-		    .1/max(1.,max(omega,gamma)),
-		    CA1R(),
-		    pt);
+                    bind(derivs,_1,_2,_3,omega,gamma),
+                    .1/max(1.,max(omega,gamma)),
+                    CA1R(),
+                    pt);
 
   evolve(S,pt);
 

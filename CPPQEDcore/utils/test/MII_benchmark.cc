@@ -54,7 +54,7 @@ int main()
     boost::progress_timer t;
     for (size_t count=0; count<nRepeat; ++count) {
       for (MII6 i=begin; i!=end; ++i)
-	res=Indexer::index(array,arrayRes,*i)(1,2,4,3);
+        res=Indexer::index(array,arrayRes,*i)(1,2,4,3);
     }
   }
 
@@ -72,7 +72,7 @@ int main()
     boost::progress_timer t;
     for (size_t count=0; count<nRepeat; ++count) {
       for (BASI i=begin; i!=end; ++i)
-	res=(*i)(2,1,4,3);
+        res=(*i)(2,1,4,3);
     }
   }
 
@@ -92,7 +92,7 @@ int main()
     boost::progress_timer t;
     for (size_t count=0; count<nRepeat; ++count) {
       for (BASI_FAST i=begin; i!=end; ++i)
-	res=(*i)(2,1,4,3);
+        res=(*i)(2,1,4,3);
     }
   }
 

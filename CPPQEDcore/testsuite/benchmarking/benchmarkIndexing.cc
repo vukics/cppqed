@@ -81,10 +81,10 @@ int main()
     {
       boost::progress_timer t;
       for (size_t count=0; count<nRepeat; ++count)
-	for (int j=1; j<16; ++j) {
-	  // target(13,4,11,j,12,source(11,6,10,j+1,11));
-	  d+=target(13,4,11,j-1,12);
-	}
+        for (int j=1; j<16; ++j) {
+          // target(13,4,11,j,12,source(11,6,10,j+1,11));
+          d+=target(13,4,11,j-1,12);
+        }
     }
   }
   { // Blitz++
@@ -94,10 +94,10 @@ int main()
     {
       boost::progress_timer t;
       for (size_t count=0; count<nRepeat; ++count)
-	for (int j=1; j<16; ++j) {
-	  // target(13,4,11,j,12)=source(11,6,10,j+1,11);
-	  d+=target(13,4,11,j-1,12);
-	}
+        for (int j=1; j<16; ++j) {
+          // target(13,4,11,j,12)=source(11,6,10,j+1,11);
+          d+=target(13,4,11,j-1,12);
+        }
       
     }
   }

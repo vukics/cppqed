@@ -45,10 +45,10 @@ int main(int argc, char* argv[])
   DA1R y(4); y=yinit.real(),yinit.imag(),dydtinit.real(),dydtinit.imag();
 
   Simulated<DA1R> S(y,
-		    bind(derivs,_1,_2,_3,omega,gamma),
-		    .1/max(1.,max(omega,gamma)),
-		    DA1R(),
-		    pt);
+                    bind(derivs,_1,_2,_3,omega,gamma),
+                    .1/max(1.,max(omega,gamma)),
+                    DA1R(),
+                    pt);
 
   evolve(S,pt);
 

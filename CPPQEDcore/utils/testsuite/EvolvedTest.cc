@@ -93,8 +93,8 @@ BOOST_AUTO_TEST_CASE( ComparisonToExactSolution )
       double time;
       line>>time;
       dcomp 
-	calculated(exp(exp(Z*time))),
-	read;
+        calculated(exp(exp(Z*time))),
+        read;
       line>>time>>read; // eat the timestep first
       diff+=abs(read-calculated); sum+=(abs(read)+abs(calculated))/2.;
     }

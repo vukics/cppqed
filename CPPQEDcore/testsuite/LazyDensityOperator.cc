@@ -62,9 +62,9 @@ BOOST_AUTO_TEST_CASE( RANK_TWO )
   quantumdata::StateVector<2> psii(d23*d12-d12*d22); double norm=psii.renorm();
 
   BOOST_CHECK(!fcmp((sqrAbs(beta1)+sqrAbs(beta2)-2.*std::real(braket(d23,d12)*braket(d12,d22)*conj(beta1)*beta2))/sqr(norm),
-		    photonNumberRecurse<1>(psii),
-		    eps)
-	      );
+                    photonNumberRecurse<1>(psii),
+                    eps)
+              );
 
 
   // The most stringent test for the whole of a partial-trace density operator:

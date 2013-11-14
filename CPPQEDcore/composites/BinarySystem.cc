@@ -274,8 +274,8 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
     free1=ia->getFrees()(1);
 
   return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(ia),
-			       qsh(free0) || qsh(free1) || qsh<2>(ia),
-			       qsl(free0) || qsl(free1) || qsl<2>(ia));
+                               qsh(free0) || qsh(free1) || qsh<2>(ia),
+                               qsl(free0) || qsl(free1) || qsl<2>(ia));
 }
 
 }

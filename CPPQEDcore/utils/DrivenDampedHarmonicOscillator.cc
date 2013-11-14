@@ -58,9 +58,9 @@ public:
   DDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0)
     : std::pair<dcomp,dcomp>(-gamma+sqrt(dcomp(mathutils::sqr(gamma)-1)),-gamma-sqrt(dcomp(mathutils::sqr(gamma)-1))),
       DrivenDampedHarmonicOscillator(gamma,omega,
-				     makeMatrix(      exp(first*tInit),       exp(second*tInit),
-						first*exp(first*tInit),second*exp(second*tInit) ),
-				     ampTI,ampDerivTI,tInit),
+                                     makeMatrix(      exp(first*tInit),       exp(second*tInit),
+                                                first*exp(first*tInit),second*exp(second*tInit) ),
+                                     ampTI,ampDerivTI,tInit),
       omega1_(first), omega2_(second) {}
 
   const dcomp amp     (double t) const {return         exp(omega1_*t)*a_(1)+        exp(omega2_*t)*a_(2)+               c(t);}
@@ -77,9 +77,9 @@ class DDHO_Critical : public DrivenDampedHarmonicOscillator
 public:
   DDHO_Critical(double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0)
     : DrivenDampedHarmonicOscillator(1.,omega,
-				     makeMatrix( exp(-tInit),  tInit   *exp(-tInit),
-						-exp(-tInit),-(tInit-1)*exp(-tInit)),
-				     ampTI,ampDerivTI,tInit)
+                                     makeMatrix( exp(-tInit),  tInit   *exp(-tInit),
+                                                -exp(-tInit),-(tInit-1)*exp(-tInit)),
+                                     ampTI,ampDerivTI,tInit)
   {}
 
   const dcomp amp     (double t) const {return  exp(-t)*a_(1)+ t   *exp(-t)*a_(2)+               c(t);}

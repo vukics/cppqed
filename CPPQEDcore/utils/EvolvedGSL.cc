@@ -69,7 +69,7 @@ Impl::~Impl()
 
 
 ImplPtr createImpl(void* self, size_t size, int (*derivs)(double, const double*, double*, void*),
-		   double epsRel, double epsAbs, const double* scaleAbs, SteppingFunction sf)
+                   double epsRel, double epsAbs, const double* scaleAbs, SteppingFunction sf)
 {
   return boost::make_shared<Impl>(self,size,derivs,epsRel,epsAbs,scaleAbs,sf);
 }

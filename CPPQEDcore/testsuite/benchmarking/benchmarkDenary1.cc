@@ -26,7 +26,7 @@ int main(int, char**)
 
   const Composite<composite::result_of::make_vector<Act<0,1,2,3,4,5,6,7,8,9> >::type>
     sys(makeComposite(Act<0,1,2,3,4,5,6,7,8,9>(Interaction<10>(Interaction<10>::Frees(&mode0,&mode0,&modeH,&mode0,&mode0,
-										      &mode0,&mode0,&mode0,&mode0,&mode0)))));
+                                                                                      &mode0,&mode0,&mode0,&mode0,&mode0)))));
   
   benchmark(sys,modeH,Vector<2>());
 

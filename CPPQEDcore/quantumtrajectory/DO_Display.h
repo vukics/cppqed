@@ -34,11 +34,11 @@ public:
   typedef typename structure::Averaged<RANK>::Ptr AveragedPtr;
 
   DO_Display(
-	     AveragedPtr,
-	     const ParsEvolved&,
-	     bool negativity,
-	     size_t equalCount=10
-	     ) throw(DimensionalityMismatchException);
+             AveragedPtr,
+             const ParsEvolved&,
+             bool negativity,
+             size_t equalCount=10
+             ) throw(DimensionalityMismatchException);
 
   virtual ~DO_Display() {}
 

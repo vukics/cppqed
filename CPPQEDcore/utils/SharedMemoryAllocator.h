@@ -58,16 +58,16 @@ public:
     std::cerr<<"Allocation: ptrToData_="<<ptrToData_<<std::endl;
     if (ptrToData_==0)
       {
-	// print message and allocate memory with global new
-	pointer ret=(pointer)(::operator new(num*sizeof(T)));
-	std::cerr<<"allocate "<<num<<" element(s) of size "<<sizeof(T)<<" allocated at: "<<(void*)ret<<std::endl;
-	return ret;
+        // print message and allocate memory with global new
+        pointer ret=(pointer)(::operator new(num*sizeof(T)));
+        std::cerr<<"allocate "<<num<<" element(s) of size "<<sizeof(T)<<" allocated at: "<<(void*)ret<<std::endl;
+        return ret;
       }
     else
       {
-	std::cerr << "Allocation: data passed"<<std::endl;
-	if (num!=size_) ERROR!!!
-	pointer ret=ptrToData_;
+        std::cerr << "Allocation: data passed"<<std::endl;
+        if (num!=size_) ERROR!!!
+        pointer ret=ptrToData_;
       }
   }
     
@@ -77,14 +77,14 @@ public:
     std::cerr<<"Initialization: ptrToData_="<<ptrToData_<<std::endl;
     if (ptrToData_==0)
       {
-	// initialize memory with placement new
-	std::cerr << "Initialization"<<std::endl;
-	new((void*)p)T(value);
+        // initialize memory with placement new
+        std::cerr << "Initialization"<<std::endl;
+        new((void*)p)T(value);
       }
     else
       {
-	std::cerr << "Initialization: data passed"<<std::endl;
-	p=ptrToData_; //in fact not necessary
+        std::cerr << "Initialization: data passed"<<std::endl;
+        p=ptrToData_; //in fact not necessary
       }
   }
     
@@ -94,12 +94,12 @@ public:
     std::cerr<<"Destroy: ptrToData_="<<ptrToData_<<std::endl;
     if (ptrToData_==0)
       {
-	// destroy objects by calling their destructor
-	p->~T();
+        // destroy objects by calling their destructor
+        p->~T();
       }
     else
       {
-	std::cerr << "Destroy: data passed"<<std::endl;
+        std::cerr << "Destroy: data passed"<<std::endl;
       }
   }
     
@@ -109,14 +109,14 @@ public:
     std::cerr<<"Deallocate: ptrToData_="<<ptrToData_<<std::endl;
     if (ptrToData_==0)
       {
-	// print message and deallocate memory with global delete
-	std::cerr<<"deallocate "<<num<<" element(s) of size "<<sizeof(T)<<" at: "<<(void*)p<<std::endl;
-	::operator delete((void*)p);
+        // print message and deallocate memory with global delete
+        std::cerr<<"deallocate "<<num<<" element(s) of size "<<sizeof(T)<<" at: "<<(void*)p<<std::endl;
+        ::operator delete((void*)p);
       }
     else
       {
-	std::cerr << "Deallocate: data passed"<<std::endl;
-	p=0;
+        std::cerr << "Deallocate: data passed"<<std::endl;
+        p=0;
       }
   }
 

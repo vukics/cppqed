@@ -73,8 +73,8 @@ int main()
       x=space.x(i), space.x(j);
       k=space.k(i), space.k(j);
       double 
-	xAx   =DEVector(x-x0)*DEVector(A   *DEVector(x-x0)), 
-	kAinvk=DEVector(k-k0)*DEVector(Ainv*DEVector(k-k0));
+        xAx   =DEVector(x-x0)*DEVector(A   *DEVector(x-x0)), 
+        kAinvk=DEVector(k-k0)*DEVector(Ainv*DEVector(k-k0));
 
       psi (i,j)=exp(-xAx      +DCOMP_I*(k0*x));
       psiK(i,j)=exp(-kAinvk/4.-DCOMP_I*(x0*k));

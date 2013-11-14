@@ -29,11 +29,11 @@ struct InnerCheck : fold<VA,false_,or_<numerical_contains<mpl::_2,ICW>,mpl::_1> 
 template<int RANK, typename VA>
 struct Algorithm
   : fold<Ordinals<RANK>,
-	 true_,
-	 and_<mpl::_1,
-	      InnerCheck<VA,mpl::_2>
-	      >
-	 > 
+         true_,
+         and_<mpl::_1,
+              InnerCheck<VA,mpl::_2>
+              >
+         > 
 {};
 
 

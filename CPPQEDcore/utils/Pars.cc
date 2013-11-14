@@ -101,15 +101,15 @@ void update(ParameterTable& table, int argc, char* argv[], const string& sc)
     }
     else
       try {
-	table[temp].read(line);
-	if (line.fail()) {
-	  cerr<<"\nParameter \""<<temp<<"\" supplied with incorrect syntax"<<errorMessage(sc);
-	  abort();
-	}
+        table[temp].read(line);
+        if (line.fail()) {
+          cerr<<"\nParameter \""<<temp<<"\" supplied with incorrect syntax"<<errorMessage(sc);
+          abort();
+        }
       }
       catch (const UnrecognisedParameterException& urp) {
-	cerr<<"\nProblem in command line around \""<<urp.getName()<<'\"'<<errorMessage(sc);
-	abort();
+        cerr<<"\nProblem in command line around \""<<urp.getName()<<'\"'<<errorMessage(sc);
+        abort();
       }
   }
 }

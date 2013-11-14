@@ -119,12 +119,12 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
   {
     using namespace blitz::tensor;
     CArray<8> temp8(concatenateTinies(
-					  concatenateTinies(
-							    dims0,
-							    ExtTiny<2>(dims1(0),dims1(3))
-							    ),
-					  dims0
-					  ));
+                                          concatenateTinies(
+                                                            dims0,
+                                                            ExtTiny<2>(dims1(0),dims1(3))
+                                                            ),
+                                          dims0
+                                          ));
     temp8=a(i,j,k,n,o,p)*v(l,o,n,m,p);
     vResTensor=CArray<5>(sum(sum(sum(temp8,p),o),n)).transpose(3,1,0,4,2);
   }
