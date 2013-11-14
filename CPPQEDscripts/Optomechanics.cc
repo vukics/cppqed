@@ -36,8 +36,8 @@ int main(int argc, char* argv[])
   evolve<0>
     (psi,
      binary::make(nxcoupledmodes::make<ModeCorrelations>(make<DoNotAverage>(pA,qmp),
-							 make<DoNotAverage>(pB,qmp),
-							 -sqrt(2)*u)),
+                                                         make<DoNotAverage>(pB,qmp),
+                                                         -sqrt(2)*u)),
      pe);
 
 
@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
   evolve<0>
     (psi,
      binary::make(nxcoupledmodes::make<ModeCorrelations>(Mode<DoNotAverage>(pA),
-							 Mode<DoNotAverage>(pB),
-							 -sqrt(2)*u)),
+                                                         Mode<DoNotAverage>(pB),
+                                                         -sqrt(2)*u)),
      pe);
   */
 
