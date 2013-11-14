@@ -172,7 +172,7 @@ public:
 
 protected:
   PumpedParticleBase(size_t fin, double vClass, const ModeFunction&,
-		     const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
+                     const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
 
 private:
   const double       vClass_;
