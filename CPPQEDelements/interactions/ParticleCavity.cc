@@ -65,7 +65,7 @@ POC_Base::POC_Base(mode::Ptr mode, particle::PtrPumped particle, double uNot)
     TridiagonalHamiltonian(interferic(mode,particle,uNot*particle->getV_Class(),uNot,particle->getMF()))
 {
   getParsStream()<<"# Particle moving orthogonal to cavity\n"; /* photons/(particle number)^2="
-								  <<uNot*particle->getV_Class()/sqrAbs(mode->getComplexFreqs(""))<<std::endl; */
+                                                                  <<uNot*particle->getV_Class()/sqrAbs(mode->getComplexFreqs(""))<<std::endl; */
 }
 
 
