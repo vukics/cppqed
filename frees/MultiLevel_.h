@@ -25,7 +25,7 @@ namespace multilevel {
 const std::string keyTitle="MultiLevel";
 
 
-using namespace structure::free;
+using namespace structure::freesystem;
 
 
 template<int NL>

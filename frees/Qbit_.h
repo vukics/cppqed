@@ -58,7 +58,7 @@ public:
 
 namespace qbit {
 
-using namespace structure::free;
+using namespace structure::freesystem;
 
 typedef boost::shared_ptr<const QbitBase> Ptr;
 

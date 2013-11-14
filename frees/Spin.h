@@ -19,7 +19,7 @@
 
 namespace spin {
 
-using namespace structure::free;
+using namespace structure::freesystem;
 
 
 typedef boost::shared_ptr<const SpinBase> Ptr;
@@ -130,8 +130,8 @@ public:
   
 private:
   
-  void   doActWithJ(      structure::free::StateVectorLow     &) const;
-  double rate      (const structure::free::LazyDensityOperator&) const {return -1.;}
+  void   doActWithJ(      structure::freesystem::StateVectorLow     &) const;
+  double rate      (const structure::freesystem::LazyDensityOperator&) const {return -1.;}
   
 };
 
