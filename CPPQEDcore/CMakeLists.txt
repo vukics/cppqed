@@ -209,6 +209,15 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
       VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
       SOVERSION ${CPPQED_ABI_MAJOR}
 )
+
+##################################################
+# Compile examples
+##################################################
+option(EXAMPLES "Boost serialization" ON)
+if(EXAMPLES)
+  add_subdirectory(examples)
+endif(EXAMPLES)
+
 ##################################################
 # Installation
 ##################################################
@@ -306,4 +315,3 @@ set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
 add_feature_info("FLENS" CPPQED_HAS_FLENS "compile framework with FLENS support.")
 add_feature_info(Serialization CPPQED_HAS_SERIALIZATION "needed for binary statevector output." )
 feature_summary( WHAT ALL )
-add_subdirectory(examples)
