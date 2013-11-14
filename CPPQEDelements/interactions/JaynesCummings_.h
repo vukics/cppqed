@@ -33,8 +33,8 @@ struct Pars
 
 };
 
-const structure::free::Tridiagonal sigmaop(qbit::Ptr);
-const structure::free::Tridiagonal sigmaop(spin::Ptr);
+const structure::freesystem::Tridiagonal sigmaop(qbit::Ptr);
+const structure::freesystem::Tridiagonal sigmaop(spin::Ptr);
 
 
 template<>

@@ -6,7 +6,7 @@
 #include "ElementAveraged.h"
 
 using namespace structure;
-using namespace free;
+using namespace freesystem;
 
 
 const Tridiagonal aop(size_t dim); // ladder operator of the given dimension

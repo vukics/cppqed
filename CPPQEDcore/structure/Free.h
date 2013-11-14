@@ -25,7 +25,8 @@ namespace structure {
 
 
 /// Contains some typedefs for structures of arity 1 for convenience in defining free systems
-namespace free {
+/** \note The namespace was earlier called `free`, which in some situations created clashes with the global function of the same name declared in cstdlib */
+namespace freesystem {
 
 typedef quantumoperator::Tridiagonal<1> Tridiagonal; ///< unary Tridiagonal
 
@@ -37,7 +38,7 @@ typedef quantumdata::LazyDensityOperator<1> LazyDensityOperator; ///< unary Lazy
 typedef quantumdata::    StateVector<1>     StateVector; ///< unary StateVector
 typedef quantumdata::DensityOperator<1> DensityOperator; ///< unary DensityOperator
 
-} // free
+} // freesystem
 
 
 /// In the language of the framework, a free system is a unary system (arity 1, `RANK=1`)

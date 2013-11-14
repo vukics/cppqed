@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
   LossySpin spin(ps);
   
-  structure::free::StateVector psi(spin.getDimensions());
+  structure::freesystem::StateVector psi(spin.getDimensions());
 
   psi()(psi().ubound(0))=1;
   

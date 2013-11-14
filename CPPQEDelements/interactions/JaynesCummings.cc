@@ -11,10 +11,10 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 {}
 
 
-const structure::free::Tridiagonal sigmaop(qbit::Ptr qbit) {return qbit::sigmaop(qbit);}
+const structure::freesystem::Tridiagonal sigmaop(qbit::Ptr qbit) {return qbit::sigmaop(qbit);}
 
 
-const structure::free::Tridiagonal sigmaop(spin::Ptr spin) {return spin::sminus(spin);}
+const structure::freesystem::Tridiagonal sigmaop(spin::Ptr spin) {return spin::sminus(spin);}
 
 
 } // jaynescummings

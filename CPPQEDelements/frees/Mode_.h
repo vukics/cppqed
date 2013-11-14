@@ -22,7 +22,7 @@ namespace mode {
 const std::string keyTitle="Mode";
 
 
-using namespace structure::free; using structure::NoTime;
+using namespace structure::freesystem; using structure::NoTime;
 
 typedef boost::shared_ptr<const ModeBase> Ptr;
 
