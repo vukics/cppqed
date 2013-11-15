@@ -276,7 +276,7 @@ install(EXPORT CPPQEDcoreTargets DESTINATION
   "${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR}" COMPONENT dev)
 
 ##################################################
-# Compile examples
+# Compile extras
 ##################################################
 option(EXAMPLES "Boost serialization" ON)
 if(EXAMPLES)
@@ -312,5 +312,5 @@ set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
                                 TYPE OPTIONAL
                                 PURPOSE "Needed for GSL.")
 add_feature_info("FLENS" CPPQED_HAS_FLENS "compile framework with FLENS support.")
-add_feature_info(Serialization CPPQED_HAS_SERIALIZATION "needed for binary statevector output." )
+add_feature_info("Serialization" CPPQED_HAS_SERIALIZATION "needed for binary statevector output." )
 feature_summary( WHAT ALL )
