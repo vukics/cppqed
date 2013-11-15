@@ -1,0 +1,22 @@
+#include "PythonExtension.h"
+#include "exportfunctions.h"
+
+#include <boost/preprocessor/cat.hpp>
+#include <boost/preprocessor/seq/for_each.hpp>
+
+using namespace boost::python;
+namespace pythonext {
+
+#define EXPORT_MACRO(r,type,elem) type elem();
+
+// Declaration of export helper functions
+
+BOOST_PP_SEQ_FOR_EACH(EXPORT_MACRO, void, PY_EXPORT_HELPER_SEQUENCE)
+  
+BOOST_PYTHON_MODULE(@PACKAGENAME@)
+{
+  // calling the export helper functions
+  BOOST_PP_SEQ_FOR_EACH(EXPORT_MACRO, , PY_EXPORT_HELPER_SEQUENCE)
+}
+
+} // pythonext
