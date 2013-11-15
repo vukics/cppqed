@@ -1,5 +1,5 @@
 #include "ExampleMode.h"
-
+#include "Tridiagonal.tcc"
 
 void aJump   (StateVectorLow& psi, double kappa_nPlus1)
 {
