@@ -211,14 +211,6 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
 )
 
 ##################################################
-# Compile examples
-##################################################
-option(EXAMPLES "Boost serialization" ON)
-if(EXAMPLES)
-  add_subdirectory(examples)
-endif(EXAMPLES)
-
-##################################################
 # Installation
 ##################################################
 
@@ -283,7 +275,14 @@ install(FILES
 install(EXPORT CPPQEDcoreTargets DESTINATION
   "${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR}" COMPONENT dev)
 
-  
+##################################################
+# Compile examples
+##################################################
+option(EXAMPLES "Boost serialization" ON)
+if(EXAMPLES)
+  add_subdirectory(examples)
+endif(EXAMPLES)
+
 ##################################################
 # Summary of enabled/disabled features
 ##################################################
