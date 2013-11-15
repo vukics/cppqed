@@ -20,7 +20,7 @@ include(CPPQEDUse)
 
 set(CPPQED_MAJOR_VERSION 2)
 set(CPPQED_MINOR_VERSION 99)
-set(CPPQED_PATCH_VERSION 5)
+set(CPPQED_PATCH_VERSION 7)
 set(CPPQED_VERSION
   ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
 set(CPPQED_ID ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
@@ -211,6 +211,24 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
 )
 
 ##################################################
+# Documentation
+##################################################
+
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/doc/technicalDefinitions.sty ${PROJECT_BINARY_DIR} COPYONLY)
+  add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen"
+  )
+  install(DIRECTORY ${PROJECT_BINARY_DIR}/html 
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/CPPQED-${CPPQED_ID}
+          OPTIONAL
+  )
+endif()
+
+##################################################
 # Installation
 ##################################################
 
@@ -311,6 +329,10 @@ set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
                                 DESCRIPTION "C library for Basic Linear Algebra Subprograms"
                                 TYPE OPTIONAL
                                 PURPOSE "Needed for GSL.")
+set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
+                                DESCRIPTION "Generate documentation from source code"
+                                TYPE OPTIONAL
+                                PURPOSE "Generation of API documentation.")
 add_feature_info("FLENS" CPPQED_HAS_FLENS "compile framework with FLENS support.")
 add_feature_info("Serialization" CPPQED_HAS_SERIALIZATION "needed for binary statevector output." )
 feature_summary( WHAT ALL )
