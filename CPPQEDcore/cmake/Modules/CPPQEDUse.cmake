@@ -125,7 +125,11 @@ macro(elements_project)
   else(DEFINED CPPQED_MONOLITHIC)
     export(TARGETS ${ELEMENTSLIB} FILE "${PROJECT_BINARY_DIR}/CPPQED${PROJECT_NAME}Targets.cmake")
   endif(DEFINED CPPQED_MONOLITHIC)
-  export(PACKAGE CPPQED${PROJECT_NAME})
+
+  option(REGISTRY "Register build trees in the cmake registry so that other projects can find them." ON)
+  if(REGISTRY)
+    export(PACKAGE CPPQED${PROJECT_NAME})
+  endif(REGISTRY)
 
   # Create the CPPQEDConfig.cmake
   # ... for the build tree

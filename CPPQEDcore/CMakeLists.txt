@@ -242,8 +242,12 @@ install(TARGETS ${CPPQEDLIB}
 # Add all targets to the build-tree export set
 export(TARGETS ${CPPQEDLIB}
   FILE "${PROJECT_BINARY_DIR}/CPPQEDcoreTargets.cmake")
-export(PACKAGE CPPQED)
-  
+
+option(REGISTRY "Register build trees in the cmake registry so that other projects can find them." ON)
+if(REGISTRY)
+  export(PACKAGE CPPQED)
+endif(REGISTRY)
+
 # Create the CPPQEDConfig.cmake
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${PROJECT_BINARY_DIR}")
