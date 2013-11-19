@@ -43,7 +43,7 @@ IF(UNIX)
 	MESSAGE(STATUS "Python interpreter is: ${PYTHON_EXECUTABLE}")
 	# Now we must establish if the installation dir for Python modules is named 'site-packages' (as usual)
 	# or 'dist-packages' (apparently Ubuntu 9.04 or maybe Python 2.6, it's not clear).
-        EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/python_packages_dir.py
+        EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/helpers/python_packages_dir.py
 		OUTPUT_VARIABLE PY_PACKAGES_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 	MESSAGE(STATUS "Python packages dir is: ${PY_PACKAGES_DIR}")
 	# SuckOSX suckages.

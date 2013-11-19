@@ -4,13 +4,21 @@ project(cpypyqed)
 
 include(FeatureSummary)
 
-find_package(CPPQED-2.9)
-find_package(Boost COMPONENTS python)
+get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
+
+find_package(CPPQED 2.99 REQUIRED)
+include(${CPPQED_USE})
+find_package(Boost REQUIRED COMPONENTS python)
 find_package(PythonInterp 2 REQUIRED)
 find_package(PythonLibs 2 REQUIRED)
 
 include(PythonSetup)
 CPPQED_SETUP()
+
+include_directories(${PYTHON_INCLUDE_DIRS})
+
+SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON_LIBRARY})
 
 option(PYIO  "Python I/O" ON)
 if(PYIO)
@@ -24,15 +32,13 @@ find_package(Numpy)
 if( NOT NUMPY_FOUND )
   message(STATUS "Numpy not found, python I/O disabled.")
   set(ENABLE_PYTHON_IO Off)
+else()
+  include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS})
 endif( NOT NUMPY_FOUND )
 # Check if python I/O module can be built, inform user
 if ( ENABLE_PYTHON_IO )
   message(STATUS "Python input/output enabled.")
 endif( ENABLE_PYTHON_IO )
-
-include_directories(${PYTHON_INCLUDE_DIRS})
-
-SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON_LIBRARY})
 
 set(CPYPYQED_INSTALL_PATH ${PYTHON_MODULES_PATH}/cpypyqed)
 
@@ -102,7 +108,10 @@ foreach(file __init__.py)
   install(FILES ${file} DESTINATION ${CPYPYQED_INSTALL_PATH})
 endforeach(file)
 
-
+set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
+                                DESCRIPTION "Collection of portable C++ source libraries."
+                                TYPE REQUIRED
+                                PURPOSE "Python wrapper library for C++ libraries.")
 set_package_properties(PythonLibs PROPERTIES URL "http://www.python.org/"
                                 DESCRIPTION "General-purpose, high-level programming language."
                                 TYPE OPTIONAL
