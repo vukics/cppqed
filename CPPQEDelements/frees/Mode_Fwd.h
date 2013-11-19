@@ -49,7 +49,7 @@ struct ParsPumped;
 struct ParsLossy;
 struct ParsPumpedLossy;
 
-struct PrepError;
+struct FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState;
 
 } // mode
 

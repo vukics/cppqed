@@ -378,9 +378,9 @@ const StateVector coherent(const dcomp& alpha, size_t dim)
 }
 
 
-const StateVector fock(size_t n, size_t dim, double phase) throw(PrepError)
+const StateVector fock(size_t n, size_t dim, double phase)
 {
-  if (n>=dim) throw PrepError();
+  if (n>=dim) throw FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState();
   StateVector res(dim);
   res(n)=exp(DCOMP_I*phase);
   return res;
