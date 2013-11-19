@@ -32,10 +32,10 @@ const Tridiagonal nop(Ptr);
 inline const Tridiagonal xop(Ptr mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
 // inline const Tridiagonal yop(mode::Ptr) {return ...}
 
-struct PrepError : public cpputils::Exception {};
+struct FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState : public cpputils::Exception {};
 
 const StateVector coherent(const dcomp&, size_t);
-const StateVector fock(size_t n, size_t dim, double phase=0) throw(PrepError);
+const StateVector fock(size_t n, size_t dim, double phase=0);
 const StateVector init(const Pars&);
 
 
