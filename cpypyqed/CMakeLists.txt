@@ -1,10 +1,38 @@
+cmake_minimum_required (VERSION 2.8.9)
+
+project(cpypyqed)
+
+include(FeatureSummary)
+
+find_package(CPPQED-2.9)
+find_package(Boost COMPONENTS python)
+find_package(PythonInterp 2 REQUIRED)
+find_package(PythonLibs 2 REQUIRED)
+
 include(PythonSetup)
-include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
 CPPQED_SETUP()
+
+option(PYIO  "Python I/O" ON)
+if(PYIO)
+  set(ENABLE_PYTHON_IO On)
+else(PYIO)
+  set(ENABLE_PYTHON_IO Off)
+endif(PYIO)
+
+# Numpy
+find_package(Numpy)
+if( NOT NUMPY_FOUND )
+  message(STATUS "Numpy not found, python I/O disabled.")
+  set(ENABLE_PYTHON_IO Off)
+endif( NOT NUMPY_FOUND )
+# Check if python I/O module can be built, inform user
+if ( ENABLE_PYTHON_IO )
+  message(STATUS "Python input/output enabled.")
+endif( ENABLE_PYTHON_IO )
 
 include_directories(${PYTHON_INCLUDE_DIRS})
 
-SET(MANDATORY_LIBRARIES ${CPPQEDLIB} ${Boost_PYTHON_LIBRARY})
+SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON_LIBRARY})
 
 set(CPYPYQED_INSTALL_PATH ${PYTHON_MODULES_PATH}/cpypyqed)
 
@@ -47,16 +75,16 @@ MACRO(PYTHON_SUBPACKAGE PACKAGE)
   endforeach(s)
   
 
-  configure_file(../details/config.h.in config.h @ONLY)
-  configure_file(../details/exportfunctions.h.in exportfunctions.h @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/helpers/config.h.in config.h @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/helpers/exportfunctions.h.in exportfunctions.h @ONLY)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-  configure_file(../details/build_module.cc.in build${PACKAGENAME}.cc @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/helpers/build_module.cc.in build${PACKAGENAME}.cc @ONLY)
 
   add_library(${PACKAGENAME} SHARED build${PACKAGENAME}.cc ${PY_SOURCE_FILES} ${ARGN})
   PYTHON_CPPMODULE(${PACKAGE})
 
-  configure_file(../details/__init__.py.in __init__.py @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/helpers/__init__.py.in __init__.py @ONLY)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/__init__.py DESTINATION ${CPYPYQED_INSTALL_PATH}/${PACKAGE})
 ENDMACRO(PYTHON_SUBPACKAGE)
 
@@ -67,10 +95,23 @@ add_custom_target(cpypyqed)
 # build python io module
 if(ENABLE_PYTHON_IO)
   add_subdirectory(io)
-  add_dependencies(cpypyqed _io)
 endif()
 
 foreach(file __init__.py)
   configure_file(${file} ${file} COPYONLY)
   install(FILES ${file} DESTINATION ${CPYPYQED_INSTALL_PATH})
 endforeach(file)
+
+
+set_package_properties(PythonLibs PROPERTIES URL "http://www.python.org/"
+                                DESCRIPTION "General-purpose, high-level programming language."
+                                TYPE OPTIONAL
+                                PURPOSE "Access C++QED functionality through Python (work in progress, incomplete).")
+set_package_properties(Numpy PROPERTIES URL "http://www.numpy.org/"
+                                DESCRIPTION "NumPy is the fundamental package for scientific computing with Python"
+                                TYPE OPTIONAL
+                                PURPOSE "Data input/output with Python.")
+
+add_feature_info("Python input/output" ENABLE_PYTHON_IO "Python C++QED input/output module.")
+
+feature_summary( WHAT ALL )
