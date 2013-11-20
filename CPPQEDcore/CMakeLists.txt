@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.9)
 
 project (core)
 
-get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
+set(CPPQED_CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
 
 include(FeatureSummary)
