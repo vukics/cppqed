@@ -6,6 +6,7 @@
 
 #include "MathExtensions.h"
 
+#include <boost/make_shared.hpp>
 
 namespace evolved {
 
@@ -19,6 +20,11 @@ Evolved<A>::Evolved(A& a, Derivs derivs, double dtInit, double epsRel, double ep
   : EvolvedIO<A>(a,dtInit,epsRel,epsAbs), derivs_(derivs)
 {} 
 
+template<typename A>
+typename EvolvedIO<A>::Ptr makeIO(A& a)
+{
+  return boost::make_shared<EvolvedIO<A>, A &>(a,0,0,0);
+}
 
 template<typename A>
 void Evolved<A>::step(double deltaT)

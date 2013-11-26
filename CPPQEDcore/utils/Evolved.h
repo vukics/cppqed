@@ -99,6 +99,9 @@ protected:
 };
 
 template<typename A>
+typename EvolvedIO<A>::Ptr makeIO(A &a);
+
+template<typename A>
 class Evolved : public EvolvedIO<A>
 {
 public:

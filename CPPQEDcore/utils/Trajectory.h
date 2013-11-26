@@ -150,12 +150,18 @@ public:
   AdaptiveIO(typename EvolvedIO::Ptr evolvedIO) 
     : meta_(SerializationMetadata::ARRAY_ONLY), evolvedIO_(evolvedIO) {};
 
+  typedef typename EvolvedIO::ConstPtr ConstPtr;
+  typedef typename EvolvedIO::Ptr Ptr;
+
+  const ConstPtr getEvolvedIO() const {return ConstPtr(evolvedIO_);}
+  const      Ptr getEvolvedIO()       {return          evolvedIO_ ;}
+
   cpputils::iarchive&  readArrayState(cpputils::iarchive& iar)       {return iar & meta_ & *evolvedIO_;}
   cpputils::oarchive& writeArrayState(cpputils::oarchive& oar) const {return oar & meta_ & *evolvedIO_;}
 protected:
   mutable SerializationMetadata meta_;
 private:
-  typename EvolvedIO::Ptr evolvedIO_;
+  Ptr evolvedIO_;
 };
 
 template<typename A>
