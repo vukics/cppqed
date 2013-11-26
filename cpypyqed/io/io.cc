@@ -39,11 +39,7 @@ object doRead(std::ifstream &ifs)
     states.append(arr.copy());
     times.append(traj.getEvolvedIO()->getTime());
   }
-  object last_state = states.pop();
-  object last_time = times.pop();
-  result.append(make_tuple(states,times));
-  result.append(make_tuple(last_state,last_time));
-  return result;
+  return make_tuple(states,times);
 }
 
 template<int RANK>
