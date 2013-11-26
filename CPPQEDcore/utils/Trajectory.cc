@@ -95,25 +95,6 @@ SerializationMetadata readMeta(ifstream& ifs)
   return meta;
 }
 
-void writeViaSStream(const Trajectory& traj, ofstream* ofs)
-{
-  if (ofs && ofs->is_open()) {
-    ostringstream oss(ios_base::binary);
-    cpputils::oarchive stateArchive(oss);
-    traj.writeState(stateArchive);
-    details::writeNextArchive(ofs,oss);
-  }
-}
-
-
-void readViaSStream(Trajectory& traj, ifstream& ifs)
-{
-  istringstream iss(ios_base::binary);
-  details::readNextArchive(ifs,iss);
-  cpputils::iarchive stateArchive(iss);
-  traj.readState(stateArchive);
-}
-
 const std::string SerializationMetadata::UNSPECIFIED = "Unspecified";
 const std::string SerializationMetadata::ARRAY_ONLY  = "ArrayOnly";
 

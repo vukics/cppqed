@@ -27,6 +27,25 @@ void run(Adaptive<A>& traj, const ParsRun& p)
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
 }
 
+template<typename T>
+void writeViaSStream(const T& traj, std::ofstream* ofs)
+{
+  if (ofs && ofs->is_open()) {
+    std::ostringstream oss(std::ios_base::binary);
+    cpputils::oarchive stateArchive(oss);
+    traj.writeState(stateArchive);
+    details::writeNextArchive(ofs,oss);
+  }
+}
+
+template<typename T>
+void readViaSStream(T& traj, std::ifstream& ifs)
+{
+  std::istringstream iss(std::ios_base::binary);
+  details::readNextArchive(ifs,iss);
+  cpputils::iarchive stateArchive(iss);
+  traj.readState(stateArchive);
+}
 
 namespace details {
 
@@ -180,7 +199,7 @@ std::ostream& Adaptive<A>::displayParameters_v(std::ostream& os) const
 template<typename A>
 cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
 {
-  readArrayState(iar);
+  AdaptiveIO<A>::readState(iar);
   if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY)
     readStateMore_v(iar);
   return iar;
@@ -190,7 +209,7 @@ template<typename A>
 cpputils::oarchive&  Adaptive<A>::writeState_v(cpputils::oarchive& oar) const
 {
   meta_.trajectoryID = trajectoryID(); 
-  writeArrayState(oar); 
+  AdaptiveIO<A>::writeState(oar);
   return writeStateMore_v(oar);
 }
 

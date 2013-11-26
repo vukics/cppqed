@@ -63,8 +63,10 @@ void readNextArchive(std::ifstream&, std::istringstream&);
 
 } // details
 
-void writeViaSStream(const Trajectory&, std::ofstream*);
-void  readViaSStream(      Trajectory&, std::ifstream&);
+template<typename T>
+void writeViaSStream(const T&, std::ofstream*);
+template<typename T>
+void  readViaSStream(      T&, std::ifstream&);
 SerializationMetadata readMeta(std::ifstream&);
 
 
@@ -156,8 +158,8 @@ public:
   const ConstPtr getEvolvedIO() const {return ConstPtr(evolvedIO_);}
   const      Ptr getEvolvedIO()       {return          evolvedIO_ ;}
 
-  cpputils::iarchive&  readArrayState(cpputils::iarchive& iar)       {return iar & meta_ & *evolvedIO_;}
-  cpputils::oarchive& writeArrayState(cpputils::oarchive& oar) const {return oar & meta_ & *evolvedIO_;}
+  cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return iar & meta_ & *evolvedIO_;}
+  cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return oar & meta_ & *evolvedIO_;}
 protected:
   mutable SerializationMetadata meta_;
 private:
@@ -172,7 +174,10 @@ class Adaptive : private EvolvedPtrBASE<A>, public trajectory::AdaptiveIO<A>, pu
 {
 public:
   // Some parameter-independent code could still be factored out, but probably very little
-  
+
+  using Trajectory::readState;
+  using Trajectory::writeState;
+
   typedef evolved::Evolved<A>       Evolved;
   // typedef trajectory::AdaptiveIO<A> AdaptiveIO;
 
@@ -203,8 +208,6 @@ protected:
   std::string trajectoryID() const  {return trajectoryID_v();}
 
 private:
-  using AdaptiveIO<A>::readArrayState;
-  using AdaptiveIO<A>::writeArrayState;
 
   typedef EvolvedPtrBASE<A> EvolvedPtrBase;
 
