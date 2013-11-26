@@ -1,7 +1,7 @@
 // -*- C++ -*-
-#include "EvolvedGSL.h"
+#include "Evolved.h"
 #include "PythonExtension.h"
-#include "Simulated.h"
+#include "Trajectory.tcc"
 #include "Types.h"
 
 #include <blitz/tinyvec2.h>
@@ -18,26 +18,17 @@ using namespace boost::python;
 
 namespace pythonext {
 
-template<int RANK>
-class DummyTrajectory : public Simulated<CArray<RANK>>
-{
-public:
-  DummyTrajectory(CArray<RANK>& a):Simulated<CArray<RANK>>(a,typename Simulated<CArray<RANK>>::Evolved::Derivs(),1,0,0,CArray<RANK>()) {}
-private:
-  cpputils::oarchive& writeMeta_v (cpputils::oarchive& oar) const {SerializationMetadata meta; meta.rank=RANK; meta.trajectoryType=SerializationMetadata::DUMMY; oar & meta;}
-};
-
 namespace {
 
 template<int RANK>
 object doRead(std::ifstream &ifs)
-{  
+{
   list states;
   list times;
   list result;
   CArray<RANK> a(1);
   a=0;
-  DummyTrajectory<RANK> traj(a);
+  AdaptiveIO<CArray<RANK>> traj(evolved::makeIO(a));
   while ( (ifs.peek(), !ifs.eof()) ) {
     trajectory::readViaSStream(traj,ifs);
     npy_intp dims[RANK];
@@ -46,7 +37,7 @@ object doRead(std::ifstream &ifs)
     handle<> h( pyObj );
     numeric::array arr( h );
     states.append(arr.copy());
-    times.append(traj.getEvolved()->getTime());
+    times.append(traj.getEvolvedIO()->getTime());
   }
   object last_state = states.pop();
   object last_time = times.pop();
@@ -62,7 +53,7 @@ void doWrite(std::ofstream *ofs, const PyArrayObject *a)
   blitz::TinyVector<int,RANK> shape;
   for (int i=0; i<RANK; i++) shape[i]=dims[i];
   CArray<RANK>  blitz_a = CArray<RANK>(static_cast<dcomp *>(PyArray_DATA(a)), shape, blitz::duplicateData);
-  DummyTrajectory<RANK> traj(blitz_a);
+  AdaptiveIO<CArray<RANK>> traj(evolved::makeIO(blitz_a));
   trajectory::writeViaSStream(traj,ofs);
 }
 
@@ -94,10 +85,10 @@ object read(str filename)
 
   trajectory::SerializationMetadata meta = trajectory::readMeta(ifs);
   
-  if (!(meta.trajectoryType=="Master"||meta.trajectoryType=="MCWF_Trajectory"||meta.trajectoryType=="Dummy") ){
-    PyErr_SetString(PyExc_NotImplementedError, (meta.trajectoryType+std::string(": not implemented")).c_str());
-    throw_error_already_set();
-  }
+//   if (!(meta.trajectoryType=="Master"||meta.trajectoryType=="MCWF_Trajectory"||meta.trajectoryType=="Dummy") ){
+//     PyErr_SetString(PyExc_NotImplementedError, (meta.trajectoryType+std::string(": not implemented")).c_str());
+//     throw_error_already_set();
+//   }
   throw_rank(meta.rank);
   
   list result;
@@ -140,7 +131,7 @@ void export_io()
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
     .def_readonly("rank",            &trajectory::SerializationMetadata::rank)
-    .def_readonly("trajectoryType",  &trajectory::SerializationMetadata::trajectoryType);
+    .def_readonly("trajectoryID",    &trajectory::SerializationMetadata::trajectoryID);
 }
 
 } // pythonext
