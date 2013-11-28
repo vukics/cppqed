@@ -79,7 +79,7 @@ MACRO(PYTHON_SUBPACKAGE PACKAGE)
   endforeach(s)
   
 
-  configure_file(${PROJECT_SOURCE_DIR}/helpers/config.h.in config.h @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/helpers/config.h.in cpypyqed_config.h @ONLY)
   configure_file(${PROJECT_SOURCE_DIR}/helpers/exportfunctions.h.in exportfunctions.h @ONLY)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -88,8 +88,6 @@ MACRO(PYTHON_SUBPACKAGE PACKAGE)
   add_library(${PACKAGENAME} SHARED build${PACKAGENAME}.cc ${PY_SOURCE_FILES} ${ARGN})
   PYTHON_CPPMODULE(${PACKAGE})
 
-  configure_file(${PROJECT_SOURCE_DIR}/helpers/__init__.py.in __init__.py @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/__init__.py DESTINATION ${CPYPYQED_INSTALL_PATH}/${PACKAGE})
 ENDMACRO(PYTHON_SUBPACKAGE)
 
 include_directories(include)
