@@ -50,7 +50,7 @@ object doRead(std::ifstream &ifs)
 }
 
 template<int RANK>
-void doWrite(std::ofstream *ofs, const PyArrayObject *a)
+void doWrite(std::ofstream *ofs, PyArrayObject *a)
 {
   npy_intp *dims=PyArray_DIMS(a);
   blitz::TinyVector<int,RANK> shape;
@@ -112,7 +112,7 @@ void write(const numeric::array &array, str filename)
   std::ofstream ofs(f.c_str(),std::ios_base::binary|std::ios_base::trunc);
   throw_file(ofs,f);
 
-  const PyArrayObject *a = reinterpret_cast<const PyArrayObject *>(array.ptr());
+  PyArrayObject *a = reinterpret_cast<PyArrayObject *>(array.ptr());
   int rank=PyArray_NDIM(a);
   throw_rank(rank);
 
