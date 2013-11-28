@@ -68,8 +68,6 @@ MACRO(PYTHON_SUBPACKAGE PACKAGE)
 
   foreach(s ${PY_SOURCE_FILES})
     file( STRINGS ${s} EXPORT_HELPER_LINE REGEX "[ ]*void[ ]+export_" )
-    #get_filename_component(ITEM ${s} NAME_WE)
-    #set(SEQUENCE ${SEQUENCE}\(${ITEM}\))
     string(REGEX REPLACE ".*(export_.*)\\(.*" "\\1" EXPORT_HELPER "${EXPORT_HELPER_LINE}"  )
     set(EXPORT_HELPERS ${EXPORT_HELPERS} ${EXPORT_HELPER})
   endforeach(s)
