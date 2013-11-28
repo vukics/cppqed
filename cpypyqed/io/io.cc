@@ -1,6 +1,9 @@
 // -*- C++ -*-
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+
 #include "Evolved.h"
 #include "PythonExtension.h"
+#include "BlitzArrayTraits.h"
 #include "Trajectory.tcc"
 #include "Types.h"
 
