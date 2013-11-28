@@ -2,6 +2,10 @@ cmake_minimum_required (VERSION 2.8.9)
 
 project(cpypyqed)
 
+# stuff should be built inside a "cpypyqed" subdirectory, so that we can
+# easily import the build tree in python for testing
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${PROJECT_NAME})
+
 include(FeatureSummary)
 
 get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
@@ -47,15 +51,14 @@ set_property(CACHE PYTHON_MAX_RANK PROPERTY STRINGS 1 2 3 4 5 6 7 8 9 10 11 12)
 
 # Macro used for each module to select the correct extension according to the OS
 MACRO(PYTHON_CPPMODULE arg1)
-  SET_TARGET_PROPERTIES(_${arg1} PROPERTIES PREFIX "" DEBUG_POSTFIX "")
+  SET_TARGET_PROPERTIES(${arg1} PROPERTIES PREFIX "" DEBUG_POSTFIX "")
   IF(PYDEXTENSION)
-    SET_TARGET_PROPERTIES(_${arg1} PROPERTIES SUFFIX ".pyd")
+    SET_TARGET_PROPERTIES(${arg1} PROPERTIES SUFFIX ".pyd")
   ELSEIF(SOEXTENSION)
-    SET_TARGET_PROPERTIES(_${arg1} PROPERTIES SUFFIX ".so")
+    SET_TARGET_PROPERTIES(${arg1} PROPERTIES SUFFIX ".so")
   ENDIF(PYDEXTENSION)
-  TARGET_LINK_LIBRARIES(_${arg1} ${MANDATORY_LIBRARIES} ${PYTHON_LIBRARIES})
-  #STRING(REGEX REPLACE "^_" "" DIR_ARG ${arg1})
-  INSTALL(TARGETS _${arg1}
+  TARGET_LINK_LIBRARIES(${arg1} ${MANDATORY_LIBRARIES} ${PYTHON_LIBRARIES})
+  INSTALL(TARGETS ${arg1}
                 RUNTIME DESTINATION ${CPYPYQED_INSTALL_PATH}/${arg1}
                 LIBRARY DESTINATION ${CPYPYQED_INSTALL_PATH}/${arg1}
   )
@@ -63,7 +66,7 @@ ENDMACRO(PYTHON_CPPMODULE)
 
 # Macro used for sub-package creation
 MACRO(PYTHON_SUBPACKAGE PACKAGE)
-  SET(PACKAGENAME _${PACKAGE})
+  SET(PACKAGENAME ${PACKAGE})
   AUX_SOURCE_DIRECTORY(. PY_SOURCE_FILES)
 
   foreach(s ${PY_SOURCE_FILES})
@@ -100,7 +103,7 @@ if(ENABLE_PYTHON_IO)
 endif()
 
 foreach(file __init__.py)
-  configure_file(${file} ${file} COPYONLY)
+  configure_file(${file} ${LIBRARY_OUTPUT_PATH}/${file} COPYONLY)
   install(FILES ${file} DESTINATION ${CPYPYQED_INSTALL_PATH})
 endforeach(file)
 
