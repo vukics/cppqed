@@ -80,9 +80,7 @@ MACRO(PYTHON_SUBPACKAGE PACKAGE)
   foreach(s ${EXPORT_HELPERS})
     set(EXPORT_HELPER_SEQUENCE ${EXPORT_HELPER_SEQUENCE}\(${s}\))
   endforeach(s)
-  
 
-  configure_file(${PROJECT_SOURCE_DIR}/helpers/config.h.in cpypyqed_config.h @ONLY)
   configure_file(${PROJECT_SOURCE_DIR}/helpers/exportfunctions.h.in exportfunctions.h @ONLY)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -93,7 +91,10 @@ MACRO(PYTHON_SUBPACKAGE PACKAGE)
 
 ENDMACRO(PYTHON_SUBPACKAGE)
 
+configure_file(${PROJECT_SOURCE_DIR}/helpers/config.h.in ${PROJECT_BINARY_DIR}/cpypyqed_config.h @ONLY)
+
 include_directories(include)
+include_directories(${PROJECT_BINARY_DIR})
 
 add_custom_target(cpypyqed)
 
