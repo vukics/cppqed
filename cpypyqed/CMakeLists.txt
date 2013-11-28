@@ -20,7 +20,7 @@ find_package(PythonLibs 2 REQUIRED)
 include(PythonSetup)
 CPPQED_SETUP()
 
-include_directories(${PYTHON_INCLUDE_DIRS})
+include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON_LIBRARY})
 
