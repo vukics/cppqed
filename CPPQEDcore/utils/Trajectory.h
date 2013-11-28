@@ -36,9 +36,9 @@ void run(Adaptive<A>&, const ParsRun&);
 
 struct SerializationMetadata
 {
-  SerializationMetadata(std::string id=UNSPECIFIED)
+  SerializationMetadata(std::string id=UNSPECIFIED, int r=0)
     : protocolVersion(0),
-      rank(0),
+      rank(r),
       trajectoryID(id)
   {};
   int protocolVersion;
@@ -149,8 +149,7 @@ class AdaptiveIO
 {
 public:
   typedef evolved::EvolvedIO<A>   EvolvedIO;
-  AdaptiveIO(typename EvolvedIO::Ptr evolvedIO) 
-    : meta_(SerializationMetadata::ARRAY_ONLY), evolvedIO_(evolvedIO) {};
+  AdaptiveIO(typename EvolvedIO::Ptr evolvedIO);
 
   typedef typename EvolvedIO::ConstPtr ConstPtr;
   typedef typename EvolvedIO::Ptr Ptr;

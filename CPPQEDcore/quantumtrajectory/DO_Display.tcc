@@ -19,7 +19,8 @@ namespace quantumtrajectory {
 
 namespace details {
 
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 template<int RANK, typename V>
 DO_Display<RANK,V>::DO_Display(AveragedPtr av,
                                const ParsEvolved& p,
@@ -32,7 +33,7 @@ DO_Display<RANK,V>::DO_Display(AveragedPtr av,
     equalCount_(equalCount)
 {
 }
-
+#pragma GCC diagnostic pop
 
 
 template<int RANK, typename V>

@@ -2,6 +2,8 @@
 #ifndef QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 #define QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 
+#include "BlitzArrayTraits.h"
+
 #include "DensityOperator.tcc"
 #include "EnsembleMCWF.tcc"
 #include "Evolution.tcc"
@@ -12,7 +14,6 @@
 #include "StateVector.tcc"
 #include "Tridiagonal.tcc"
 
-#include "BlitzArrayTraits.h"
 #include "EvolvedGSL.tcc"
 #include "Pars.tcc"
 

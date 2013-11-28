@@ -88,6 +88,9 @@ public:
   EvolvedIO(A&, double dtInit, double epsRel, double epsAbs);
   using TimeStepBookkeeper::operator=;
 
+  A      & getA()       {return this->a_;}
+  A const& getA() const {return this->a_;}
+
 protected:
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
@@ -113,6 +116,7 @@ public:
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
   using TimeStepBookkeeper::operator=;
+  using EvolvedIO<A>::getA;
 
   virtual ~Evolved() {}
 
@@ -120,9 +124,6 @@ public:
   void step(double deltaT);
 
   std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os<<versionHelper());};
-
-  A      & getA()       {return this->a_;}
-  A const& getA() const {return this->a_;}
 
   const Derivs getDerivs() const {return derivs_;}
 

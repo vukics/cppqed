@@ -3,6 +3,7 @@
 #define UTILS_BLITZARRAYTRAITS_H_INCLUDED
 
 #include "BlitzArray.h"
+#include <boost/iterator/iterator_concepts.hpp>
 
 
 namespace cpputils {
@@ -23,6 +24,13 @@ inline bool isStorageContiguous(const DArray<n>& a) {return a.isStorageContiguou
 
 template<int n>
 inline size_t size(const DArray<n>& a) {return a.size();}
+
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+template<int n>
+inline size_t rank(const DArray<n>& a) {return n;} // The parameter a is actually only needed for template argument deduction.
+#pragma GCC diagnostic pop
 
 
 template<int n>
@@ -52,6 +60,13 @@ inline bool isStorageContiguous(const CArray<n>& a) {return a.isStorageContiguou
 
 template<int n>
 inline size_t size(const CArray<n>& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
+
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+template<int n>
+inline size_t rank(const CArray<n>& a) {return n;} // The parameter a is actually only needed for template argument deduction.
+#pragma GCC diagnostic pop
 
 
 template<int n>

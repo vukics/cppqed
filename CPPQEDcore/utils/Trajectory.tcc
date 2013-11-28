@@ -172,6 +172,9 @@ void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std:
 {details::run(traj,time,dc    ,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay);}
 
 
+template<typename A>
+AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
+  : meta_(SerializationMetadata::ARRAY_ONLY, cpputils::rank(evolvedIO->getA())), evolvedIO_(evolvedIO) {};
 
 
 template<typename A>

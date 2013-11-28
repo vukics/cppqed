@@ -1,12 +1,12 @@
 #include "ExampleInteraction.h"
 
 #include "BinarySystem.h"
+#include "BlitzArrayTraits.h"
 #include "EnsembleMCWF.tcc"
 #include "Evolution.tcc"
 #include "Master.tcc"
 #include "ParsEvolution.h"
 
-#include "BlitzArrayTraits.h"
 #include "EvolvedGSL.tcc"
 #include "Pars.tcc"
 

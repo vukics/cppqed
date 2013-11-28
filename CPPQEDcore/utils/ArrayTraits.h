@@ -21,6 +21,14 @@ size_t size(const A& a);
 
 
 template<typename A>
+size_t rank();
+
+
+template<typename A>
+inline size_t rank(const A& a) {return rank<A>();};
+
+
+template<typename A>
 const double* data(const A& a);
 
 template<typename A>
