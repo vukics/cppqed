@@ -4,6 +4,10 @@
 #include "Trajectory.tcc"
 #include "Types.h"
 
+#if PYTHON_MAX_RANK > BLITZ_ARRAY_LARGEST_RANK
+#define BLITZ_ARRAY_LARGEST_RANK PYTHON_MAX_RANK
+#endif
+
 #include <blitz/tinyvec2.h>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
