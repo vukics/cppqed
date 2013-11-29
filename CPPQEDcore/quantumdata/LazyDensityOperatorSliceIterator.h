@@ -35,7 +35,7 @@ namespace ldo {
  * Difficulty: LazyDensityOperator is an abstract interface, and the organization of its data (and hence the actual procedure of slicing)
  * varies along implementations.
  * 
- * ![Inheritance diagram](../diagrams/ldoDiagonalIterator.png)
+ * \image html ldoDiagonalIterator.png
  * 
  * Implemented using a classical inheritance-based strategy idiom, together with both compile-time and run-time implementation selection
  * (similarly to blitzplusplus::basi::Iterator, a special implementation (DiagonalIterator::DI_ImplSpecial) is needed when the size

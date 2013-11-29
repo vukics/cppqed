@@ -29,7 +29,7 @@
  * by the heavy use of templates, partial specializations, and conditional inheritance. The broken lines signifying that the inheritance is not direct, due to some classes in between,
  * which can be considered implementation details.
  * 
- * ![Inheritance diagram](../diagrams/structure.png)
+ * \image html structure.png
  * 
  * We have also indicated how classes representing elementary free subsystems (Mode) and interactions (JaynesCummings), and those representing composite systems (BinarySystem and Composite)
  * fit into the hierarchy.
