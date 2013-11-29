@@ -33,8 +33,8 @@ double choose(unsigned n, unsigned m)
 dcomp coherentElement(unsigned long n, const dcomp& alpha)
 {
   using namespace boost::math;
-  return n ? n<max_factorial<long double>::value ? pow(alpha,n)/sqrt(factorial<long double>(n)) 
-                                                 : pow(2*n*PI,-.25)*pow(alpha/sqrt(n/EULER),n)
+  return n ? n<max_factorial<double>::value ? pow(alpha,n)/sqrt(factorial<double>(n)) 
+                                            : pow(2*n*PI,-.25)*pow(alpha/sqrt(n/EULER),n)
            : 1.;
 }
 

@@ -47,7 +47,7 @@ PROJECT_BRIEF          = "a framework for simulating open quantum dynamics"
 # exceed 55 pixels and the maximum width should not exceed 200 pixels.
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           =
+PROJECT_LOGO           = @CMAKE_CURRENT_SOURCE_DIR@/doc/logoCppQED.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
@@ -685,6 +685,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/issues.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexArrayExtensions.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexExtensions.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/CVector.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/utils/MathExtensions.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/MultiIndexIterator.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/TMP_Tools.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/quantumdata \
@@ -771,7 +772,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = diagrams
+IMAGE_PATH             = @CMAKE_CURRENT_SOURCE_DIR@/doc
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -1931,7 +1932,7 @@ ALIASES += tparamV="\tparam V compile-time vector holding the *retained index po
 ALIASES += briefFile{1}="\file \n \brief \1"
 ALIASES += briefFileDefault="\briefFile{Defines class of the same name}"
 ALIASES += Semantics="\par Semantics"
-ALIASES += refBoost{2}="[\1](http://www.boost.org/doc/libs/1_53_0/libs/\2)"
+ALIASES += refBoost{2}="[\1](http://www.boost.org/doc/libs/1_55_0/libs/\2)"
 ALIASES += refBoostConstruct{2}="\refBoost{<tt>\1</tt>,\2}"
 ALIASES += refStdCpp{2}="[\1](http://www.cplusplus.com/reference/\2)"
 ALIASES += refStdCppConstruct{2}="\refStdCpp{<tt>\1</tt>,\2}"

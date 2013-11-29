@@ -1,13 +1,6 @@
 // -*- C++ -*-
-/*
-  Wrapper functions for mathematical functions taken from libraries,
-  and several other mathematical functions.
-
-  The principal aim of Math.h and the corresponding Math.cc is to
-  localize dependence on GSL.
-
-*/
-
+/// \briefFile{Defines wrapper functions for mathematical functions taken from libraries, and several other mathematical functions}
+/** The principal aim of Math.h and the corresponding Math.cc is to localize dependence on GSL. */
 #ifndef UTILS_MATHEXTENSIONS_H_INCLUDED
 #define UTILS_MATHEXTENSIONS_H_INCLUDED
 
@@ -50,7 +43,14 @@ template<typename T>
 char minusOneToThePowerOf(T n) {return parity(n) ? -1 : 1;}
 
 
-/// Calculates \f$\alpha^n/\sqrt{n!}\f$ relying on the Stirling formula if n is too large for explicit calculation of factorial
+/// Calculates \f$\alpha^n/\sqrt{n!}\f$ relying on the Stirling formula if \f$n\f$ is too large for explicit calculation of factorial
+/**
+ * The point of switching is determined by \refBoostConstruct{boost::math::max_factorial,math/doc/html/math_toolkit/factorials/sf_factorial.html}.
+ *
+ * The Stirling formula is a very good approximation already for moderate \f$n\f$ values:
+ * \image html differencesInCoherentElements.svg
+ *
+ */
 dcomp coherentElement(unsigned long n, const dcomp& alpha);
 
 } // mathutils

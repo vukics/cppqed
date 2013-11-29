@@ -1,0 +1,21 @@
+import matplotlib
+matplotlib.use('SVG')
+from matplotlib.pyplot import *
+import numpy
+rc('text', usetex=True)
+rc('font', family='serif')
+data=numpy.loadtxt("differencesInCoherentElements.d")
+#subplot(2,1,1)
+#figure(1, figsize=(6,4))
+plot( data[:,0], data[:,5], linewidth=3 )
+yscale('log')
+xlim(0,120)
+ylim(5e-5,.05)
+xlabel(r'$n$', fontsize=18)
+ylabel(r'log(difference)', fontsize=16)
+suptitle(r'Relative Difference between $\frac{1}{\sqrt{n!}}$ and $(2n\pi)^{-\frac{1}{4}}\left(\frac{e}{n}\right)^{\frac{n}{2}}$', fontsize=16)
+grid()
+#subplots_adjust(top=0.8)
+#tight_layout()
+#show()
+savefig('differencesInCoherentElements')
