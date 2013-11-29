@@ -11,7 +11,7 @@ using namespace std;
 
 
 
-std::ostream& structure::displayCommon(const AveragedCommon::Averages& averages, std::ostream& os, int precision)
+std::ostream& structure::details::displayCommon(const AveragedCommon::Averages& averages, std::ostream& os, int precision)
 {
   using namespace formdouble;
 

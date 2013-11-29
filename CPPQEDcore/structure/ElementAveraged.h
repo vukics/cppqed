@@ -1,4 +1,5 @@
 // -*- C++ -*-
+/// \briefFile{Defines structure::ElementAveraged & structure::ClonableElementAveraged}
 #ifndef STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
 #define STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
 
@@ -12,10 +13,24 @@
 namespace structure {
 
 
+namespace details {
+
 std::ostream& displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
 
+} // details
 
-
+/// An implementation of Averaged for the case when the number of quantum arevages is known @ compile time (which is very often the case with elements)…
+/**
+ * … if this is not the case, Averaged has to be used instead (even for elements).
+ *
+ * \tparamRANK
+ * \tparam IS_TIME_DEPENDENT governs time dependence
+ *
+ * Implements AveragedCommon::display in such a way that the averages stemming from the given element are displayed in a nicely tabulated format
+ *
+ * \see Sec. \ref basicoscillator of the structure-bundle guide for an example of usage
+ *
+ */
 template<int RANK, bool IS_TIME_DEPENDENT>
 class ElementAveraged : public ElementLiouvilleanAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
 {
@@ -26,18 +41,25 @@ public:
   typedef AveragedCommon::Averages Averages;
 
 protected:
+  /**
+   * \name Constructors
+   * The number of KeyLabel arguments in the constructors determines the number of calculated averages.
+   */
+  /// @{
   template<typename... KeyLabelsPack>
   ElementAveraged(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack...) {}
   
   ElementAveraged(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
+  /// @}
 
 private:
-  std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const {return displayCommon(a,os,precision);}
+  std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const {return details::displayCommon(a,os,precision);}
 
 };
 
 
 
+/// Besides being an ElementAveraged, it models the \refBoost{Clonable concept,ptr_container/doc/reference.html#the-clonable-concept}
 template<int RANK, bool IS_TIME_DEPENDENT>
 class ClonableElementAveraged : public ElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
