@@ -158,9 +158,7 @@ public:
                        IntRANK=_1_);
 
     /// Copy constructor with deep-copy semantics
-  Tridiagonal(const Tridiagonal& tridiag) 
-    : Base(tridiag), diagonals_(blitzplusplus::DeepCopy(),tridiag.diagonals_), differences_(tridiag.differences_), tCurrent_(tridiag.tCurrent_), 
-      freqs_(blitzplusplus::DeepCopy(),tridiag.freqs_) {}
+  Tridiagonal(const Tridiagonal& tridiag) : Tridiagonal(tridiag,tridiag.diagonals_,tridiag.differences_,tridiag.tCurrent_,tridiag.freqs_) {}
 
     /// Constructs the object as the direct product of two Tridiagonal matrices.
     /**
@@ -227,7 +225,7 @@ public:
 
   /// \name Getters
   //@{
-  const Diagonals & get           () const {return   diagonals_;}
+  const Diagonals & get           () const {return   diagonals_;} ///< returns the diagonals
   const Dimensions& getDifferences() const {return differences_;}
 
   double            getTime       () const {return    tCurrent_;}
@@ -238,11 +236,10 @@ public:
 
   /// \name Algebra
   //@{
-    /// Naively implemented, could be templated if need arises. Frequencies untouched.
-  Tridiagonal& operator*=(const dcomp& dc);
-  Tridiagonal& operator/=(const dcomp& dc) {(*this)*=1./dc; return *this;}
-  Tridiagonal& operator*=(double d) {(*this)*=dcomp(d,0); return *this;}
-  Tridiagonal& operator/=(double d) {(*this)*=1./dcomp(d,0); return *this;} 
+  Tridiagonal& operator*=(const dcomp& dc); ///< Naively implemented, could be templated if need arises – Frequencies untouched.
+  Tridiagonal& operator/=(const dcomp& dc) {(*this)*=1./dc; return *this;} ///< ”
+  Tridiagonal& operator*=(double d) {(*this)*=dcomp(d,0); return *this;} ///< ”
+  Tridiagonal& operator/=(double d) {(*this)*=1./dcomp(d,0); return *this;} ///< ”
 
   // void           hermitianConjugateSelf();
     /// Returns a newly constructed object, which is the Hermitian conjugate of `this`.
