@@ -42,12 +42,12 @@ public:
 
 protected:
   /// \name Constructors
-  /// @{
+  //@{
   template<typename... KeyLabelsPack>
   ElementAveraged(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : Base(keyTitle,keyLabelsPack...) {} ///< The number of KeyLabel arguments in the constructors determines the number of calculated averages.
   
   ElementAveraged(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {} ///< ”
-  /// @}
+  //@}
 
 private:
   std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const {return details::displayCommon(a,os,precision);}

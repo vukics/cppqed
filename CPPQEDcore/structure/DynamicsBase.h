@@ -85,7 +85,7 @@ protected:
   //@{
      RealFreqs&    getRealFreqs() {return    realFreqs_;}
   ComplexFreqs& getComplexFreqs() {return complexFreqs_;}
-  //@}  
+  //@}
 private:
   RealFreqs       realFreqs_;
   ComplexFreqs complexFreqs_;
