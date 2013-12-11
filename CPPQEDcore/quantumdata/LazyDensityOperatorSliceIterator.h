@@ -84,12 +84,11 @@ public:
   
   /// \name Necessary members of an input iterator
   //@{
-    /// Immediately delegated to the implementation
-  DiagonalIterator& operator++() {impl_->doIncrement(); return *this;}
+  DiagonalIterator& operator++() {impl_->doIncrement(); return *this;} ///< Immediately delegated to the implementation
 
-  const LazyDensityOperatorRes& operator*() const {return impl_->dereference();}
+  const LazyDensityOperatorRes& operator*() const {return impl_->dereference();} ///< ”
   
-  bool operator==(const DiagonalIterator& other) const {return impl_->isEqualTo(*other.impl_);}
+  bool operator==(const DiagonalIterator& other) const {return impl_->isEqualTo(*other.impl_);} ///< ”
   //@}
   
   static const bool IS_SPECIAL=(RANK==mpl::size<V>::value); ///< Signifies whether the special implementation is needed

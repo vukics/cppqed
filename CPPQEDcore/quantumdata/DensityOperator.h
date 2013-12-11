@@ -86,25 +86,25 @@ public:
   template<typename OTHER>
   DensityOperator& operator=(const OTHER& other) {getArray()=other; return *this;}
   
+  /// \name (Multi-)matrix style indexing
   //@{
-    /// (multi-)matrix style indexing:
   const dcomp& operator()(const Idx& i, const Idx& j) const;
         dcomp& operator()(const Idx& i, const Idx& j) {return const_cast<dcomp&>(static_cast<const DensityOperator&>(*this)(i,j));}
   //@}
 
+  /// \name Norm
   //@{
-    /// Both functions return the *trace* “norm”, but the latter one also renormalises.
-  double   norm() const;
-  double renorm()      ;
+  double   norm() const; ///< returns the *trace* “norm”
+  double renorm()      ; ///< ” and also renormalises
   //@}
 
+  /// \name Matrix view
   //@{
-    /// Returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray.
-  const CMatrix matrixView() const {return blitzplusplus::binaryArray(getArray());}
-        CMatrix matrixView()       {return blitzplusplus::binaryArray(getArray());}
+  const CMatrix matrixView() const {return blitzplusplus::binaryArray(getArray());} ///< returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray
+        CMatrix matrixView()       {return blitzplusplus::binaryArray(getArray());} ///< ”
   //@}
   
-  /// Naive operations for vector space
+  /// \name Naive operations for vector space
   //@{
   DensityOperator& operator+=(const DensityOperator& rho) {ABase::operator+=(rho); return *this;}
   DensityOperator& operator-=(const DensityOperator& rho) {ABase::operator-=(rho); return *this;}

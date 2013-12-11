@@ -42,15 +42,10 @@ protected:
 private:
   /// \name Virtuals inherited from HamiltonianTimeDependenceDispatched
   //@{
-    /**
-     * The first implements HamiltonianTimeDependenceDispatched<RANK,ONE_TIME> and can be used only when `IS_TIME_DEPENDENT=true`,
-     * while the second implements HamiltonianTimeDependenceDispatched<RANK,NO_TIME> and can be used only in the opposite case.
-     * 
-     * \see the technique used @ FreeExact & ElementLiouvillean
-     * 
-     */
   void addContribution_v(OneTime, const StateVectorLow&, StateVectorLow&) const;
+  ///< implements HamiltonianTimeDependenceDispatched<RANK,ONE_TIME> and can be used only when `IS_TIME_DEPENDENT=true`. \see the technique used @ FreeExact & ElementLiouvillean
   void addContribution_v( NoTime, const StateVectorLow&, StateVectorLow&) const;
+  ///< implements HamiltonianTimeDependenceDispatched<RANK,NO_TIME> and can be used only in the opposite case.
   //@}
 
   mutable Tridiagonals hOverIs_;

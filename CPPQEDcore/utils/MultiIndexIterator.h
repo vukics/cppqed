@@ -50,16 +50,14 @@ public:
   
   /// \name Constructors
   //@{
-    /// Initialization either to the beginning or the end of the sequence (which is in fact beyond the end by one)
-    /**
-     * \param lbound tiny vector comprising the sequence of lower bounds
-     * \param ubound tiny vector comprising the sequence of upper bounds (inclusive!)
-     */
-  MultiIndexIterator(const MultiIndex& lbound, const MultiIndex& ubound, mii::Begin)
+    /// Initialization to the beginning of the sequence
+  MultiIndexIterator(const MultiIndex& lbound, ///< tiny vector comprising the sequence of lower bounds
+                     const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
+                     mii::Begin)
     : lbound_(lbound), ubound_(ubound), idx_(lbound_) {} // if it's not the end, it's the beginning
 
   MultiIndexIterator(const MultiIndex& lbound, const MultiIndex& ubound, mii::End  )
-    : lbound_(lbound), ubound_(ubound), idx_(ubound_) {operator++();} // the end iterator is in fact beyond the end by one, hence the need for the increment
+    : lbound_(lbound), ubound_(ubound), idx_(ubound_) {operator++();} ///< ” to the end of the sequence (which is in fact beyond the end by one)
   //@}
   
   MultiIndexIterator& operator=(const MultiIndexIterator& other) {idx_=other.idx_; return *this;}

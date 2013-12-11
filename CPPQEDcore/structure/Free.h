@@ -59,14 +59,14 @@ public:
   Free(size_t dim, RF rf, ComplexFreqsInitializer cf) : Free(dim,{rf},cf) {}
 
   /// \name Implementating inherited virtuals
-  /// Simply connect the pure virtual QuantumSystem::highestFrequency to the implementation DynamicsBase::highestFrequency.
+  // @{
+  /// Simply connects the pure virtual QuantumSystem::highestFrequency to the implementation DynamicsBase::highestFrequency.
   /**
    * An exception to the rule “never redefine an inherited non-virtual function” is taken because these functions are called the same in the two bases of Free,
    * which would otherwise create ambiguities.
    */
-  // @{
   double        highestFrequency (                ) const {return  highestFrequency_v(  );}
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);}
+  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);} ///< ”
   // @}
 
 private:

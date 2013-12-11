@@ -133,8 +133,8 @@ class QuantumSystemWrapper
 public:
   static const int N_RANK=RANK;
   
-  /** \name Wrapped types
-   *  @{ */
+  /// \name Wrapped types
+  /// @{
   typedef QuantumSystem<RANK> QS;
   typedef Exact        <RANK> Ex;
   typedef Hamiltonian  <RANK> Ha;
@@ -142,8 +142,8 @@ public:
   typedef Averaged     <RANK> Av;
   /// @}
 
-  /** \name Pointers to wrapped types
-   *  @{ */
+  /// \name Pointers to wrapped types
+  /// @{
   typedef typename QS::Ptr QuantumSystemPtr;
   typedef typename Ex::Ptr         ExactPtr;
   typedef typename Ha::Ptr   HamiltonianPtr;
@@ -151,8 +151,8 @@ public:
   typedef typename Av::Ptr      AveragedPtr;
   /// @}
 
-  /** \name Necessary types from wrapped types for definition of member-function signatures
-   *  @{ */
+  /// \name Necessary types from wrapped types for definition of member-function signatures
+  /// @{
   typedef typename Ex::StateVectorLow StateVectorLow;
 
   typedef typename Li::Rates               Rates              ;
@@ -161,27 +161,27 @@ public:
   typedef typename Av::Averages Averages;
   /// @}
 
-  /// Constructor from DynamicsBase
+  /// \name Constructors
+  /// @{
   explicit QuantumSystemWrapper(DynamicsBase::Ptr qs)
     : qs_(dynamic_pointer_cast<const QuantumSystem<RANK> >(qs)),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
       li_(qsl<RANK>(qs)),
       av_(qsa<RANK>(qs))
-  {}
+  {} ///< Constructor from DynamicsBase
 
-  /// Constructor from QuantumSystem
   explicit QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy)
     : qs_(qs),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
       li_(isNoisy ? qsl<RANK>(qs) : LiouvilleanPtr()),
       av_(qsa<RANK>(qs))
-  {}
+  {} ///< Constructor from QuantumSystem
+  /// @}
 
-
-  /** \name Getters
-   *  @{ */
+  /// \name Getters
+  /// @{
   const QuantumSystemPtr getQS() const {return qs_;}
   const ExactPtr         getEx() const {return ex_;} 
   const HamiltonianPtr   getHa() const {return ha_;}
@@ -212,36 +212,36 @@ public:
   std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"# System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
 
 
-  /** \name Forwarded members from Exact
-   *  @{ */
+  /// \name Forwarded members from Exact
+  /// @{
   bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
 
   void actWithU(double t, StateVectorLow& psi, double t0) const {if (ex_) ex_->actWithU(t,psi,t0);}
   /// @}
 
 
-  /** \name Forwarded member from Hamiltonian
-   *  @{ */
+  /// \name Forwarded member from Hamiltonian
+  /// @{
   void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const {if (ha_) ha_->addContribution(t,psi,dpsidt,tIntPic0);}
   /// @}
 
 
-  /** \name Forwarded member from Liouvillean
-   *  @{ */
+  /// \name Forwarded member from Liouvillean
+  /// @{
   void actWithJ(double t, StateVectorLow& psi, size_t lindbladNo) const {if (li_) li_->actWithJ(t,psi,lindbladNo);}
   /// @}
 
   
-  /** \name Forwarded members from Averaged
-   *  @{ */
+  /// \name Forwarded members from Averaged
+  /// @{
   void process(Averages& averages) const {if (av_) av_->process(averages);}
 
   std::ostream& display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const {return structure::display(av_,t,matrix,os,precision);}
   /// @}
 
 
-  /** \name Forwarded members from LiouvilleanAveragedCommon
-   *  @{ */
+  /// \name Forwarded members from LiouvilleanAveragedCommon
+  /// @{
   template<LiouvilleanAveragedTag LA>
   size_t nAvr() const {const L_or_A_Ptr ptr=getLA(LiouvilleanAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
 

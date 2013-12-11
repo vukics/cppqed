@@ -112,30 +112,29 @@ public:
   //@}
   
   /// \name Subscripting
-  /** \tparam ...SubscriptPack expected as all integers of number RANK-1 (checked @ compile time) */
   //@{
   template<typename... SubscriptPack>
-  const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const;
+  const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const; ///< Multi-array style subscription. \tparam ...SubscriptPack expected as all integers of number RANK-1 (checked @ compile time)
 
   template<typename... SubscriptPack>
-  dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const StateVector*>(this)->operator()(s0,subscriptPack...));}
+  dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const StateVector*>(this)->operator()(s0,subscriptPack...));} ///< ”
   //@}
 
 
   /// \name Metric
   //@{
-    /// Both functions return the norm \f$\norm\Psi\f$, but the latter one also renormalises
+    /// Returns the norm \f$\norm\Psi\f$
     /** Implemented in terms of ArrayBase::frobeniusNorm. */
   double   norm() const {return ABase::frobeniusNorm();}
-  double renorm()                                     ;
+  double renorm()                                     ; ///< ” and also renormalises
   //@}
   
   /// \name Dyad
   //@{
-    /// Both functions form a dyad, the second one with the object itself
+    /// Forms a dyad with the argument
     /** This is a rather expensive operation, implemented in terms of blitzplusplus::doDirect. */
   const DensityOperatorLow dyad(const StateVector&) const;
-  const DensityOperatorLow dyad(                  ) const {return dyad(*this);}
+  const DensityOperatorLow dyad(                  ) const {return dyad(*this);} ///< dyad with the object itself
   //@}
 
   /// Adds a dyad of the present object to `densityOperator`
@@ -150,15 +149,14 @@ public:
   StateVector& operator+=(const StateVector& psi) {ABase::operator+=(psi); return *this;}
   StateVector& operator-=(const StateVector& psi) {ABase::operator-=(psi); return *this;}
 
-  const StateVector operator-() const {StateVector res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;}
-  const StateVector operator+() const {return *this;} // deep copy
+  const StateVector operator-() const {StateVector res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;} ///< involves a deep-copy
+  const StateVector operator+() const {return *this;} ///< simply deep copy
   //@}
 
   /// \name Naive vector-space operations allowing also for mixed-mode arithmetics
   //@{
-    /** \tparam OTHER the “other” type in mixed mode */
   template<typename OTHER>
-  StateVector& operator*=(const OTHER& dc) {ABase::operator*=(dc); return *this;}
+  StateVector& operator*=(const OTHER& dc) {ABase::operator*=(dc); return *this;} ///< \tparam OTHER the “other” type in mixed mode
 
   template<typename OTHER>
   StateVector& operator/=(const OTHER& dc) {ABase::operator/=(dc); return *this;}

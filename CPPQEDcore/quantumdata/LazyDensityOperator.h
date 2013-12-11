@@ -79,7 +79,7 @@ public:
 
   /// \name Slicing-related functionality
   //@{
-    /// Return the ldo::DiagonalIterator corresponding to the beginning/end of the sequence of slices defined by `V` 
+    /// Return the ldo::DiagonalIterator corresponding to the beginning of the sequence of slices defined by `V`
     /** Cf. \ref slicinganldo "rationale"
      * \tparamV
      */
@@ -87,7 +87,7 @@ public:
   const ldo::DiagonalIterator<RANK,V> begin() const; 
 
   template<typename V>
-  const ldo::DiagonalIterator<RANK,V> end  () const;
+  const ldo::DiagonalIterator<RANK,V> end  () const; ///< ” for the end
   //@}
   
 protected:
@@ -99,13 +99,12 @@ private:
 };
 
 
-//@{
-  /// Converts the index-tiny of size `RANK` to the arity-dependent indexing type of LazyDensityOperator
+/// \related LazyDensityOperator Converts the index-tiny of size `RANK` to the arity-dependent indexing type of LazyDensityOperator
 template<int RANK>
 inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const IdxTiny<RANK>& idx) {return idx   ;}
 
+/// \related LazyDensityOperator ” for `RANK=1`
 inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const IdxTiny<1   >& idx) {return idx[0];}
-//@}
 
 
 /// Turns the data of a LazyDensityOperator into a real 1D array
