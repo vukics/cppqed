@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
   System system(composite::make(Act<0,2>(jc1),Act<1,2>(jc2)));
   
-  structure::QuantumSystemWrapper<3,true> qs(system);
+  structure::QuantumSystemWrapper<3,true> qs(system, true);
   
   system->displayParameters(cout);
   

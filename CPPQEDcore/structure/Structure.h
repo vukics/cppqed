@@ -171,7 +171,7 @@ public:
   {}
 
   /// Constructor from QuantumSystem
-  explicit QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy=true)
+  explicit QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy)
     : qs_(qs),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
