@@ -67,8 +67,8 @@ public:
   explicit DynamicsBase(ComplexFreqsInitializer cf) : DynamicsBase({},cf) {}
   explicit DynamicsBase(RF rf, CF cf=CF()) : DynamicsBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer{} : ComplexFreqsInitializer{cf}) {}
   explicit DynamicsBase(CF cf) : DynamicsBase(ComplexFreqsInitializer{cf}) {}
-  explicit DynamicsBase(RealFreqsInitializer rf, CF cf) : DynamicsBase(rf,{cf}) {}
-  explicit DynamicsBase(RF rf, ComplexFreqsInitializer cf) : DynamicsBase({rf},cf) {}
+           DynamicsBase(RealFreqsInitializer rf, CF cf) : DynamicsBase(rf,{cf}) {}
+           DynamicsBase(RF rf, ComplexFreqsInitializer cf) : DynamicsBase({rf},cf) {}
   
   double highestFrequency() const; ///< Calculates the fastest timescale of the system from the frequencies stored in the lists
 
