@@ -11,6 +11,7 @@
 #define BLITZ_ARRAY_LARGEST_RANK PYTHON_MAX_RANK
 #endif
 
+#include <algorithm>
 #include <blitz/tinyvec2.h>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
@@ -29,18 +30,19 @@ namespace pythonext {
 namespace {
 
 template<int RANK>
-object doRead(std::ifstream &ifs)
+object doRead(std::ifstream &ifs, const SerializationMetadata &meta)
 {
   list states;
   list times;
   list result;
-  CArray<RANK> a(1);
-  a=0;
+  ExtTiny<RANK> size;
+  npy_intp dims[RANK];
+  std::copy(meta.dimensions.begin(),meta.dimensions.end(),size.begin());
+  std::copy(meta.dimensions.begin(),meta.dimensions.end(),dims);
+  CArray<RANK> a(size);
   AdaptiveIO<CArray<RANK>> traj(evolved::makeIO(a));
   while ( (ifs.peek(), !ifs.eof()) ) {
     trajectory::readViaSStream(traj,ifs);
-    npy_intp dims[RANK];
-    for (int i=0;i<RANK;i++) dims[i]=a.extent(i);
     PyObject * pyObj = PyArray_SimpleNewFromData(RANK, dims, NPY_CDOUBLE,a.dataFirst());
     handle<> h( pyObj );
     numeric::array arr( h );
@@ -89,17 +91,13 @@ object read(str filename)
 
   trajectory::SerializationMetadata meta = trajectory::readMeta(ifs);
   
-//   if (!(meta.trajectoryType=="Master"||meta.trajectoryType=="MCWF_Trajectory"||meta.trajectoryType=="Dummy") ){
-//     PyErr_SetString(PyExc_NotImplementedError, (meta.trajectoryType+std::string(": not implemented")).c_str());
-//     throw_error_already_set();
-//   }
   throw_rank(meta.rank);
   
   list result;
   result.append(meta);
   switch (meta.rank) {
     #define BOOST_PP_LOCAL_MACRO(n) \
-      case n: result.extend(doRead<n>(ifs)); break;
+      case n: result.extend(doRead<n>(ifs, meta)); break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
   }
