@@ -198,6 +198,7 @@ protected:
   const      Ptr getEvolved()       {return          evolved_ ;}
 
   double getDtTry() const {return evolved_->getDtTry();}
+  void resetInitialDtTry() {resetInitialDtTry_v();}
 
   std::ostream& displayParameters_v(std::ostream&) const;
 
@@ -220,12 +221,16 @@ private:
   // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved.
   // (Only Simulated, but neither Master, nor MCWF_Trajectory)
 
+  virtual void resetInitialDtTry_v() {evolved_->setDtTry(dtInit_);}
+
   virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
   virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
 
   virtual std::string trajectoryID_v() const = 0;
 
   const Ptr evolved_;
+
+  const double dtInit_;
 
 };
 

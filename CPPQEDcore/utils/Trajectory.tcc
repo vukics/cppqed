@@ -181,7 +181,8 @@ template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
   : EvolvedPtrBase(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
     AdaptiveIO<A>(EvolvedPtrBase::member),
-    evolved_(EvolvedPtrBase::member)
+    evolved_(EvolvedPtrBase::member),
+    dtInit_(dtInit)
 {}
 
 
@@ -189,7 +190,8 @@ template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, const ParsEvolved& p,         const A& scaleAbs, const evolved::Maker<A>& maker)
   : EvolvedPtrBase(maker(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs)),
     AdaptiveIO<A>(EvolvedPtrBase::member),
-    evolved_(EvolvedPtrBase::member)
+    evolved_(EvolvedPtrBase::member),
+    dtInit_(dtInit)
 {}
 
 
@@ -205,6 +207,8 @@ cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
   AdaptiveIO<A>::readState(iar);
   if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY)
     readStateMore_v(iar);
+  if (getDtTry()==0)
+    resetInitialDtTry();
   return iar;
 }
 
