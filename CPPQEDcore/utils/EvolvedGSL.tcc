@@ -39,11 +39,11 @@ public:
 
   using Base::getA; using Base::getTime; using Base::getDtTry;
 
-  _(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorretionFactor)
+  _(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorrectionFactor)
     : Base(a,derivs,dtInit,epsRel,epsAbs),
       pImpl_(details::createImpl(this,cpputils::size(getA()),auxFunction,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
       sf_(sf),
-      nextDtTryCorretionFactor_(nextDtTryCorretionFactor)
+      nextDtTryCorrectionFactor_(nextDtTryCorrectionFactor)
   {
     if (!cpputils::isStorageContiguous(a)) throw (NonContiguousStorageException());
   }
@@ -71,11 +71,11 @@ private:
     double
       time=getTime(),
       dtTry=getDtTry(),
-      nextDtTry=( fabs(deltaT)<fabs(dtTry/nextDtTryCorretionFactor_) ? dtTry : 0. );
+      nextDtTry=( fabs(deltaT)<fabs(dtTry/nextDtTryCorrectionFactor_) ? dtTry : 0. );
 
     apply(pImpl_,&time,time+deltaT,&dtTry,cpputils::data(getA()));
 
-    Base::update(time, nextDtTry ? nextDtTry/nextDtTryCorretionFactor_ : dtTry );
+    Base::update(time, nextDtTry ? nextDtTry/nextDtTryCorrectionFactor_ : dtTry );
 
   }
 
@@ -84,7 +84,7 @@ private:
   const details::ImplPtr pImpl_;
 
   const SteppingFunction sf_;
-  const double nextDtTryCorretionFactor_;
+  const double nextDtTryCorrectionFactor_;
 
 };
 
@@ -101,7 +101,7 @@ const typename Maker<A>::Ptr MakerGSL<A>::operator()(
                                                      const A& scaleAbs
                                                      ) const
 {
-  return boost::make_shared<_,A&>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_);
+  return boost::make_shared<_,A&>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorrectionFactor_);
 }
 
 

@@ -28,7 +28,7 @@ ParsEvolved::ParsEvolved(parameters::ParameterTable& p, const std::string& mod)
   : epsRel(p.addTitle("Evolved",mod).addMod("eps"   ,mod,"ODE stepper relative precision",epsRelDefault)),
     epsAbs(p.addMod("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
     sf(p.addMod("steppingFunction",mod,"Stepping function for EvolvedGSL",evolved::SF_RKCK)),
-    nextDtTryCorretionFactor(p.addMod("nextDtTryCorretionFactor",mod,"Avoiding the tiny-next-timestep-to-try effect at the end of time intervals",100.))
+    nextDtTryCorrectionFactor(p.addMod("nextDtTryCorrectionFactor",mod,"Avoiding the tiny-next-timestep-to-try effect at the end of time intervals",100.))
 {}
 
 

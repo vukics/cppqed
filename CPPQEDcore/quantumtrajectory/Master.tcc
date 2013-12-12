@@ -35,7 +35,7 @@ Base<RANK>::Base(DensityOperator& rho,
              structure::initialTimeStep<RANK>(qs),
              p,
              scaleAbs,
-             evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorretionFactor)),
+             evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
     rho_(rho),
     tIntPic0_(0),
     qs_(qs,true)

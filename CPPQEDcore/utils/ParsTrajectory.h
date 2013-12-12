@@ -40,7 +40,7 @@ struct ParsEvolved
   double &epsRel, &epsAbs;
 
   evolved::SteppingFunction& sf;
-  double &nextDtTryCorretionFactor;
+  double &nextDtTryCorrectionFactor;
   
   ParsEvolved(parameters::ParameterTable&, const std::string& mod="");
   

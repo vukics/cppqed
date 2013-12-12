@@ -22,13 +22,13 @@ public:
   typedef typename Maker<A>::Ptr Ptr;
   typedef typename Maker<A>::Derivs   Derivs  ;
 
-  MakerGSL(SteppingFunction sf=SF_RKCK, double nextDtTryCorretionFactor=100.) : sf_(sf), nextDtTryCorretionFactor_(nextDtTryCorretionFactor) {}
+  MakerGSL(SteppingFunction sf=SF_RKCK, double nextDtTryCorrectionFactor=100.) : sf_(sf), nextDtTryCorrectionFactor_(nextDtTryCorrectionFactor) {}
 
   const Ptr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
 
 private:
   const SteppingFunction sf_;
-  const double nextDtTryCorretionFactor_;
+  const double nextDtTryCorrectionFactor_;
   
 };
 

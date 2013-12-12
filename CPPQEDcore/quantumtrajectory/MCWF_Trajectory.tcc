@@ -50,7 +50,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
          structure::initialTimeStep<RANK>(cpputils::sharedPointerize(sys)),
          scaleAbs,
          p,
-         evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorretionFactor),
+         evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorrectionFactor),
          randomized::MakerGSL()),
     tIntPic0_(0),
     psi_(psi),
