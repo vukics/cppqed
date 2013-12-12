@@ -28,8 +28,9 @@ size_t extractFailedSteps(ImplPtr);
 } // details
 
 
+/// The class that actually implements the Evolved interface
 template<typename A>
-class MakerGSL<A>::GSL : public Evolved<A> 
+class MakerGSL<A>::_: public Evolved<A>
 {
 public:
   typedef Evolved<A> Base;
@@ -38,7 +39,7 @@ public:
 
   using Base::getA; using Base::getTime; using Base::getDtTry;
 
-  GSL(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorretionFactor)
+  _(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorretionFactor)
     : Base(a,derivs,dtInit,epsRel,epsAbs),
       pImpl_(details::createImpl(this,cpputils::size(getA()),auxFunction,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
       sf_(sf),
@@ -55,7 +56,7 @@ private:
   {
     using namespace cpputils;
     
-    GSL* e=static_cast<GSL*>(aux);
+    _* e=static_cast<_*>(aux);
 
     const A    yInterfaceA(create(y   ,e->getA()));
           A dydtInterfaceA(create(dydt,e->getA()));
@@ -100,7 +101,7 @@ const typename Maker<A>::Ptr MakerGSL<A>::operator()(
                                                      const A& scaleAbs
                                                      ) const
 {
-  return boost::make_shared<GSL, A& >(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_);
+  return boost::make_shared<_,A&>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorretionFactor_);
 }
 
 

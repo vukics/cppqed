@@ -17,7 +17,7 @@ template<typename A>
 class MakerGSL : public Maker<A>
 {
 public:
-  class GSL;
+  class _;
   
   typedef typename Maker<A>::Ptr Ptr;
   typedef typename Maker<A>::Derivs   Derivs  ;
