@@ -1,14 +1,5 @@
 // -*- C++ -*-
-/*
-
-  Evolved is intended as a common interface for (adaptive stepsize) ODE drivers. It takes the Array it operates on as template parameter. A given Array can be adapted to the form expected by Evolved by a suitable specialization of ArrayMemoryTraits.
-
-  The Array which is actually "Evolved" is by no means owned by Evolved (meaning that it is not deallocated when an Evolved is destructed).
-
-  Note that the function calculating the derivative cannot be processed as metadata: Indeed, usually it's a functor, which incorporates additional data obtained at run-time.
-
-*/
-
+/// \briefFileDefault
 #ifndef UTILS_EVOLVED_H_INCLUDED
 #define UTILS_EVOLVED_H_INCLUDED
 
@@ -27,36 +18,73 @@
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
+/// Comprises everything related to ODE adaptive evolution
 namespace evolved {
 
-  
+
+/// Enumeration for different stepping-function types, for i/o operations
+/**
+ * At the moment, Runge-Kutta Cash-Karp (4,5) and Runge-Kutta Prince-Dormand (8,9) are defined, cf. http://www.gnu.org/software/gsl/manual/html_node/Stepping-Functions.html
+ */
 enum SteppingFunction {SF_RKCK, SF_RK8PD};
 
+/// \name I/O operations for SteppingFunction
+//@{
 std::ostream& operator<<(std::ostream&, SteppingFunction);
 std::istream& operator>>(std::istream&, SteppingFunction&);
+//@}
 
 
+/// Bookkeeps the timestep-data of Evolved
+/**
+ * Very rarely used in itself, for the most part it can be considered as a template-parameter independent base of Evolved.
+ *
+ * The timestep-regulation policy of adaptive-stepsize drivers is that for the step in hand they perform a timestep of *at most* `dtTry`. Thereupon, they report the performed timestep
+ * (this is `dtDid`), and suggest a stepsize *for the next step to try*, which can be larger than *dtDid* (this will be the new value of `dtTry` after the step). Hence, the step can
+ * diminish in the actual step, but can grow only in the next step.
+ *
+ * Timestep is regulated by two parameters, `epsRel` limiting the (element-wise) relative precision, and `epsAbs` the absolute precision. In general, it can be said that anything below
+ * `epsAbs` in absolute value should be considered numerical trash.
+ *
+ * ODE steppers must be supplied with a sensible value for the initial timestep to try in the first step.
+ *
+ */
 class TimeStepBookkeeper
 {
 public:
+  /// \name Actual time getter/setter
+  //@{
   double getTime(        ) const {return t_;}
   void   setTime(double t)       {t_=t;}
+  //@}
 
-  double getDtDid() const {return dtDid_;}
+  double getDtDid() const {return dtDid_;} ///< returns the last performed timestep
 
-  double getDtTry(            ) const {return dtTry_;}
+  double getDtTry(            ) const {return dtTry_;} ///< returns the timestep to try in the next step
+
+  /// Sets the timestep to try in the next step
+  /**
+   * This should be used if there is some factor besides the normal ODE evolution that may modify the timestep (e.g. a quantum jump in a Monte Carlo wave-function evolution).
+   * For the most part, this will be a timestep *decrease*.
+   */
   void   setDtTry(double dtTry)       {dtTry_=dtTry;}
 
-  double getEpsRel() const {return epsRel_;}
-  double getEpsAbs() const {return epsAbs_;}
+  /// \name Getters of precision parameters
+  //@{
+  double getEpsRel() const {return epsRel_;} ///< relative precision
+  double getEpsAbs() const {return epsAbs_;} ///< absolute precision
+  //@}
 
   void update(double t, double dtTry);
-  void setDtDid(double dtDid) {dtDid_=dtDid;}
 
-  TimeStepBookkeeper& operator=(const TimeStepBookkeeper&);
+  TimeStepBookkeeper& operator=(const TimeStepBookkeeper&); ///< straightforward assignment operator that avoids self-assignment
 
 protected:
-  TimeStepBookkeeper(double dtInit, double epsRel, double epsAbs);
+  /// straightforward constructor
+  TimeStepBookkeeper(double dtInit, ///< the initial timestep to try in the first step
+                     double epsRel, ///< relative precision
+                     double epsAbs  ///< absolute precision
+                    );
 
 private:
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
@@ -72,12 +100,21 @@ private:
 };
 
 
-////////////////////
-//
-// Evolved interface
-//
-////////////////////
-
+/// A common interface for (adaptive stepsize) ODE drivers
+/**
+ * It takes the array type it operates on as template parameter. A given array type can be adapted to the form expected by Evolved by suitable specializations of „memory traits” functions.
+ * (cf. ArrayTraits.h, for an implementation for `blitz::Array` cf. BlitzArrayTraits.h)
+ *
+ * The array which is actually "evolved" is not owned by Evolved.
+ *
+ * The class uses the strategy idiom for calculating the time derivative. The use of [<tt>boost::function</tt>](http://www.boost.org/doc/libs/1_55_0/doc/html/function.html)
+ * assures that a rather wide range of entities will be accepted as strategy functor.
+ *
+ * \tparam A the array type
+ *
+ * \see MakerGSL::_
+ *
+ */
 template<typename A>
 class EvolvedIO : public TimeStepBookkeeper, private boost::noncopyable
 {
@@ -108,11 +145,12 @@ template<typename A>
 class Evolved : public EvolvedIO<A>
 {
 public:
-  typedef boost::function<void(double, const A&, A&)> Derivs;
+  typedef boost::function<void(double, const A&, A&)> Derivs; ///< the strategy functor to calculate time derivative at a given time (3rd argument for output)
 
   typedef boost::shared_ptr<      Evolved>      Ptr;
   typedef boost::shared_ptr<const Evolved> ConstPtr;
   
+  /// straightforward constructor \see TimeStepBookkeeper::TimeStepBookkeeper()
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
   using TimeStepBookkeeper::operator=;
@@ -120,15 +158,18 @@ public:
 
   virtual ~Evolved() {}
 
-  // Takes a single adaptive step of maximum length deltaT    
-  void step(double deltaT);
+  /// takes a single adaptive step
+  void step(double deltaT ///< *maximum* length of the timestep
+            );
 
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os<<versionHelper());};
+  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os<<versionHelper());} ///< delegates to private virtual
 
+  /// \name Getters
+  //@{
   const Derivs getDerivs() const {return derivs_;}
+  //@}
 
-  // Number of failed steps in the last timestep
-  size_t nFailedSteps() const {return nFailedSteps_v();}
+  size_t nFailedSteps() const {return nFailedSteps_v();} ///< number of failed steps in the last timestep (delegates to pure virtual)
 
 private:
   virtual void step_v(double deltaT) = 0;
@@ -141,27 +182,26 @@ private:
 };
 
 
-
+/// \name Generic evolution functions
+//@{
+/// evolves for exactly time `deltaT`
+/** \tparam E type of the object to evolve. Implicit interface assumed: member function named step with signature `...(double)` */
 template<typename E>
 void evolve(E&, double deltaT);
-// evolves for exactly deltaT
 
 
+/// evolves up to exactly time `t` \copydetails evolve
 template<typename E>
 void evolveTo(E& e, double t)
-// evolves to a given time t
 {
   evolve(e,t-e.getTime());
 }
+//@}
 
 
 
-////////////////
-//
-// factory class
-//
-////////////////
-
+/// Factory class for Evolved types
+/** \tparam A the array type for Evolved */
 template<typename A>
 class Maker
 {

@@ -1,3 +1,4 @@
+/// \briefFile{Implementations of the traits functions declared in ArrayTraits.h for `blitz::Array`}
 // -*- C++ -*-
 #ifndef UTILS_BLITZARRAYTRAITS_H_INCLUDED
 #define UTILS_BLITZARRAYTRAITS_H_INCLUDED
@@ -8,14 +9,9 @@
 
 namespace cpputils {
 
-/////////////////////////
-//
-// „Memory traits”
-//
-/////////////////////////
 
-
-// blitz::Array<double,n>
+/// \name `blitz::Array` memory traits for `blitz::Array<double,n>`
+//@{
 
 
 template<int n>
@@ -49,10 +45,11 @@ inline const DArray<n> create(const double* y, const DArray<n>& a) {return creat
 
 template<int n>
 inline DArray<n> create(const DArray<n>& a) {return DArray<n>(a.shape());}
+//@}
 
 
-// blitz::Array<dcomp,n>
-
+/// \name `blitz::Array` memory traits for `blitz::Array<dcomp,n>`
+//@{
 
 template<int n>
 inline bool isStorageContiguous(const CArray<n>& a) {return a.isStorageContiguous();}
@@ -85,31 +82,17 @@ inline const CArray<n> create(const double* y, const CArray<n>& a) {return creat
 
 template<int n>
 inline CArray<n> create(const CArray<n>& a) {return CArray<n>(a.shape());}
+//@}
 
 
 
-/////////////////////////
-//
-// „Traversal traits”
-//
-/////////////////////////
-
+/// \name `blitz::Array` traversal traits for unary double and complex arrays
+//@{
 
 inline const double& subscript(const DArray<1>& a, size_t i) {return a(i);}
 inline       double& subscript(      DArray<1>& a, size_t i) {return const_cast<double&>(subscript(static_cast<const DArray<1>&>(a),i));}
 
 inline size_t subscriptLimit(const DArray<1>& a) {return a.size();}
-
-
-template<int n>
-inline const dcomp& subscript(const CArray<n>& a, size_t i) {return *(a.begin()+i);}
-// NEEDS_WORK this is broken since blitz::Array iterators are not random-access
-
-template<int n>
-inline       dcomp& subscript(      CArray<n>& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const CArray<n>&>(a),i));}
-
-template<int n>
-inline size_t subscriptLimit(const CArray<n>& a) {return a.size();}
 
 
 inline const dcomp& subscript(const CArray<1>& a, size_t i) {return a(i);}
@@ -118,7 +101,25 @@ inline       dcomp& subscript(      CArray<1>& a, size_t i) {return const_cast<d
 inline size_t subscriptLimit(const CArray<1>& a) {return a.size();}
 
 inline size_t stride(const CArray<1>& a) {return a.stride(0);}
+//@}
 
+
+
+/// \name `blitz::Array` traversal traits for unary double and complex arrays
+//@{
+/**
+ * \note this is broken since `blitz::Array` iterators are not random-access
+ * \todo fix this
+ */
+template<int n>
+inline const dcomp& subscript(const CArray<n>& a, size_t i) {return *(a.begin()+i);}
+
+template<int n>
+inline       dcomp& subscript(      CArray<n>& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const CArray<n>&>(a),i));}
+
+template<int n>
+inline size_t subscriptLimit(const CArray<n>& a) {return a.size();}
+//@}
 
 } // cpputils
 
