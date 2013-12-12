@@ -176,6 +176,14 @@ template<typename A>
 AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
   : meta_(SerializationMetadata::ARRAY_ONLY, cpputils::rank(evolvedIO->getA())), evolvedIO_(evolvedIO) {};
 
+template<typename A>
+cpputils::iarchive& AdaptiveIO<A>::readState(cpputils::iarchive& iar)
+{
+  iar & meta_;
+  if(meta_.rank!=cpputils::rank(evolvedIO_->getA()))
+    throw RankMismatchException();
+  return iar & *evolvedIO_;
+}
 
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)

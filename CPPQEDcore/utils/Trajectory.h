@@ -72,6 +72,11 @@ SerializationMetadata readMeta(std::ifstream&);
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
 
+/// Raised when the rank of a trajectory we try to read in from file does not match
+class RankMismatchException : public cpputils::Exception {};
+
+/// Raised when the trajectory type we try to read in from file does not match.
+class TrajectoryMismatchException : public cpputils::Exception {};
 
 class TrajectoryFileOpeningException : public cpputils::TaggedException
 {
@@ -157,7 +162,7 @@ public:
   const ConstPtr getEvolvedIO() const {return ConstPtr(evolvedIO_);}
   const      Ptr getEvolvedIO()       {return          evolvedIO_ ;}
 
-  cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return iar & meta_ & *evolvedIO_;}
+  cpputils::iarchive&  readState(cpputils::iarchive& iar);
   cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return oar & meta_ & *evolvedIO_;}
 protected:
   mutable SerializationMetadata meta_;
