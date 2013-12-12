@@ -5,7 +5,7 @@
 
 #include "BlitzArray.h"
 #include <boost/iterator/iterator_concepts.hpp>
-
+#include <vector>
 
 namespace cpputils {
 
@@ -20,6 +20,10 @@ inline bool isStorageContiguous(const DArray<n>& a) {return a.isStorageContiguou
 
 template<int n>
 inline size_t size(const DArray<n>& a) {return a.size();}
+
+
+template<int n>
+inline std::vector<size_t> dimensions(const DArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
 
 
 #pragma GCC diagnostic push
@@ -58,6 +62,9 @@ inline bool isStorageContiguous(const CArray<n>& a) {return a.isStorageContiguou
 template<int n>
 inline size_t size(const CArray<n>& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
 
+
+template<int n>
+inline std::vector<size_t> dimensions(const CArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"

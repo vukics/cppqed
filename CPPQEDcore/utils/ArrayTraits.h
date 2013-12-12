@@ -3,6 +3,8 @@
 #ifndef   UTILS_ARRAYTRAITS_H_INCLUDED
 #define   UTILS_ARRAYTRAITS_H_INCLUDED
 
+#include <vector>
+
 namespace cpputils {
 
 
@@ -18,6 +20,8 @@ bool isStorageContiguous(const A& a);
 template<typename A>
 size_t size(const A& a);
 
+template<typename A>
+std::vector<size_t> dimensions(const A& a);
 
 template<typename A>
 size_t rank();
