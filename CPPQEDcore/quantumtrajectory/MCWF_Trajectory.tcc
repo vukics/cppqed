@@ -8,6 +8,7 @@
 
 #include "StateVector.tcc"
 
+#include "QuantumSystem.h"
 #include "StochasticTrajectory.tcc"
 #include "Structure.h"
 
@@ -46,7 +47,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
                                        )
   : Base(psi.getArray(),
          bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
-         trajectory::initialTimeStep(cpputils::sharedPointerize(sys)->highestFrequency()),
+         structure::initialTimeStep<RANK>(cpputils::sharedPointerize(sys)),
          scaleAbs,
          p,
          evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorretionFactor),
