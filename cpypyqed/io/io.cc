@@ -15,10 +15,11 @@
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
+#include <boost/python/exception_translator.hpp>
 #include <numpy/ndarrayobject.h>
 #include <fstream>
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace trajectory;
 using namespace boost::python;
@@ -124,16 +125,24 @@ void write(const numeric::array &array, str filename)
   }
 }
 
+void pyDimensionsMismatchException(const trajectory::DimensionsMismatchException &)
+{
+  PyErr_SetString(PyExc_RuntimeError, "dimensions mismatch");
+}
+
 void export_io()
 {
   import_array();
   numeric::array::set_module_and_type("numpy", "ndarray");
   def("read", read);
   def("write", write);
+
+  register_exception_translator<trajectory::DimensionsMismatchException>(&pyDimensionsMismatchException);
   
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
     .def_readonly("rank",            &trajectory::SerializationMetadata::rank)
+    .def_readonly("dimensions",      &trajectory::SerializationMetadata::dimensions)
     .def_readonly("trajectoryID",    &trajectory::SerializationMetadata::trajectoryID);
 }
 
