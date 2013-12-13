@@ -53,7 +53,7 @@ namespace details {
 namespace runTraits {
 
 inline bool doContinue(const Trajectory& traj, double time, long      ) {return traj.getTime()<time;}
-inline bool doContinue(const Trajectory&     , long length, long count) {return count<length       ;}
+inline bool doContinue(const Trajectory&     , long length, long count) {return count<=length      ;}
 
 inline void advance(Trajectory & traj, long       , double deltaT) {traj.evolve(deltaT);}
 inline void advance(Trajectory & traj, double time, double deltaT) {traj.evolve(std::min(deltaT,time-traj.getTime()));}
@@ -126,22 +126,31 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   //////////////////////////////
 
   const boost::shared_ptr<ofstream> ofs = !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(),ios_base::app);
+  bool stateSaved=false, evsDisplayed=false;
 
   try {
 
     for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
 
-      if (count) advance(traj,length,displayFreq);
+      if (count) {
+        advance(traj,length,displayFreq);
+        stateSaved=evsDisplayed=false;
+      }
       
-      if (!count || doDisplay(count,displayFreq)) {
+      if ((!count || doDisplay(count,displayFreq)) && (count || !continuing)) {
       
         if (
             stateDisplayFreq && 
             !(stateCount%stateDisplayFreq) && 
-            (stateCount || (!continuing && firstStateDisplay))
-           ) writeViaSStream(traj,ofs.get()); // traj.writeState(*oarchiveWrapper.oar_);
+            (stateCount || firstStateDisplay)
+           )
+        {
+          writeViaSStream(traj,ofs.get());
+          stateSaved=true;
+        }
 
         if (count || !continuing) traj.display(os,precision); ++stateCount;
+        evsDisplayed=true;
               
       }
     
@@ -154,7 +163,8 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   //////////////////////////////////////////
   
   traj.logOnEnd(os);
-  writeViaSStream(traj,ofs.get()); //if (oarchiveWrapper.oar_) traj.writeState(*oarchiveWrapper.oar_);
+  if (!evsDisplayed) traj.display(os,precision);
+  if (!stateSaved)   writeViaSStream(traj,ofs.get());
   
 }
 
