@@ -9,6 +9,7 @@ set(CPPQED_MONOLITHIC 1)
 
 add_subdirectory(CPPQEDcore)
 add_subdirectory(CPPQEDelements)
+add_subdirectory(cpypyqed)
 
 option(COMPILE_SCRIPTS "Compile the example scripts" On)
 if(COMPILE_SCRIPTS)
