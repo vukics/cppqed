@@ -3,9 +3,12 @@
 
 #include "Evolved.h"
 #include "PythonExtension.h"
-#include "BlitzArrayTraits.h"
-#include "Trajectory.tcc"
+
 #include "Types.h"
+
+#include "BlitzArrayTraits.h"
+#include "BlitzTiny.h"
+#include "Trajectory.tcc"
 
 #if PYTHON_MAX_RANK > BLITZ_ARRAY_LARGEST_RANK
 #define BLITZ_ARRAY_LARGEST_RANK PYTHON_MAX_RANK
@@ -17,6 +20,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
 #include <boost/python/exception_translator.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <numpy/ndarrayobject.h>
 #include <fstream>
 #include <iostream>
@@ -123,6 +127,9 @@ void write(const numeric::array &array, str filename)
   }
 }
 
+
+typedef std::vector<size_t> DimList;
+
 void pyDimensionsMismatchException(const trajectory::DimensionsMismatchException &)
 {
   PyErr_SetString(PyExc_RuntimeError, "dimensions mismatch");
@@ -136,6 +143,9 @@ void export_io()
   def("write", write);
 
   register_exception_translator<trajectory::DimensionsMismatchException>(&pyDimensionsMismatchException);
+
+  class_<DimList>("DimList")
+    .def(vector_indexing_suite<DimList>() );
   
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
