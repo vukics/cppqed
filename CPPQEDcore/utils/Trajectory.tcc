@@ -235,8 +235,11 @@ template<typename A>
 cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
 {
   AdaptiveIO<A>::readState(iar);
-  if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY)
+  if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY) {
+    if(meta_.trajectoryID != trajectoryID())
+      throw TrajectoryMismatchException();
     readStateMore_v(iar);
+  }
   if (getDtTry()==0)
     resetInitialDtTry();
   return iar;
