@@ -80,14 +80,14 @@ Issues
   * auto keyword => new for syntax
   * rvalue references
   * new initialization syntax + initialization lists
+  * delegating constructors 4.7,3.0
   
   => This sets the compiler requirement to g++ >= 4.7 ; clang++ >= 3.1
 
   * To be adopted
   
-    * delegating constructors 4.7,3.0
     * inherited constructors 4.8,3.3
-    * (rvalue references for StateVectorLow&)
+    * (rvalue references for StateVectorLow& in e.g. Hamiltonian::addContribution 3rd argument – move constructor for blitz::Array would be needed?)
     * initialization of static constants within the class
     * forward-declared enums 4.6,3.1
     * Non-static data member initializers
