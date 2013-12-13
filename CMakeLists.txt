@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8.9)
 project (CPPQED)
 
+enable_testing()
+
 include(GNUInstallDirs)
 
 set(CPPQED_MONOLITHIC 1)
@@ -20,3 +22,4 @@ install(DIRECTORY CustomElementsExample CustomScriptsExample
         PATTERN *.kdev* EXCLUDE
         PATTERN build* EXCLUDE
 )
+add_subdirectory(Testing)
