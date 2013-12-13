@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <numeric> // for accumulate
 
 namespace trajectory {
 
@@ -192,8 +193,19 @@ cpputils::iarchive& AdaptiveIO<A>::readState(cpputils::iarchive& iar)
   iar & meta_;
   if(meta_.rank!=cpputils::rank(evolvedIO_->getA()))
     throw RankMismatchException();
-  return iar & *evolvedIO_;
+  std::vector<size_t> dims = cpputils::dimensions(evolvedIO_->getA());
+  iar & *evolvedIO_;
+  if (std::accumulate(dims.begin(),dims.end(),0)>0 && dims != cpputils::dimensions(evolvedIO_->getA()))
+    throw DimensionsMismatchException();
+  return iar;
 }
+
+template<typename A>
+cpputils::oarchive& AdaptiveIO<A>::writeState(cpputils::oarchive& oar) const
+{
+  return oar & meta_ & *evolvedIO_;
+}
+
 
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)

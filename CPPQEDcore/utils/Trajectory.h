@@ -75,6 +75,9 @@ class StoppingCriterionReachedException : public cpputils::Exception {};
 /// Raised when the rank of a trajectory we try to read in from file does not match
 class RankMismatchException : public cpputils::Exception {};
 
+/// Raised when the dimensions of a trajectory state we try to read in from file does not match
+class DimensionsMismatchException : public cpputils::Exception {};
+
 /// Raised when the trajectory type we try to read in from file does not match.
 class TrajectoryMismatchException : public cpputils::Exception {};
 
@@ -162,8 +165,19 @@ public:
   const ConstPtr getEvolvedIO() const {return ConstPtr(evolvedIO_);}
   const      Ptr getEvolvedIO()       {return          evolvedIO_ ;}
 
+  /// Read in the EvolvedIO from a cpputils::iarchive.
+  /***
+   * Two conformity checks are performed for to the array we try to read in:
+   * * whether the rank matches (throws RankMismatchException if not)
+   * * whether the dimensions match (throws DimensionsMismatchException if not)
+   * The dimensions check can be circumvented by setting all dimensions of the
+   * array contained in this EvolvedIO class to 0. This is done for example
+   * in the python I/O interface, because when reading in a state in python we
+   * generally have no idea about the dimensions.
+   **/
   cpputils::iarchive&  readState(cpputils::iarchive& iar);
-  cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return oar & meta_ & *evolvedIO_;}
+  /// Write the EvolvedIO to a cpputils::oarchive
+  cpputils::oarchive& writeState(cpputils::oarchive& oar) const;
 protected:
   mutable SerializationMetadata meta_;
 private:

@@ -26,11 +26,8 @@ template<int n>
 inline std::vector<size_t> dimensions(const DArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
 
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 template<int n>
-inline size_t rank(const DArray<n>& a) {return n;} // The parameter a is actually only needed for template argument deduction.
-#pragma GCC diagnostic pop
+inline size_t rank(const DArray<n>&) {return n;} // The parameter a is actually only needed for template argument deduction.
 
 
 template<int n>
@@ -66,11 +63,9 @@ inline size_t size(const CArray<n>& a) {return a.size()<<1;} // The size of the 
 template<int n>
 inline std::vector<size_t> dimensions(const CArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 template<int n>
-inline size_t rank(const CArray<n>& a) {return n;} // The parameter a is actually only needed for template argument deduction.
-#pragma GCC diagnostic pop
+inline size_t rank(const CArray<n>&) {return n;} // The parameter is actually only needed for template argument deduction.
 
 
 template<int n>
