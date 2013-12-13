@@ -20,7 +20,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
 #include <boost/python/exception_translator.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <numpy/ndarrayobject.h>
 #include <fstream>
 #include <iostream>
@@ -128,8 +127,6 @@ void write(const numeric::array &array, str filename)
 }
 
 
-typedef std::vector<size_t> DimList;
-
 void pyDimensionsMismatchException(const trajectory::DimensionsMismatchException &)
 {
   PyErr_SetString(PyExc_RuntimeError, "dimensions mismatch");
@@ -144,13 +141,10 @@ void export_io()
 
   register_exception_translator<trajectory::DimensionsMismatchException>(&pyDimensionsMismatchException);
 
-  class_<DimList>("DimList")
-    .def(vector_indexing_suite<DimList>() );
   
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
     .def_readonly("rank",            &trajectory::SerializationMetadata::rank)
-    .def_readonly("dimensions",      &trajectory::SerializationMetadata::dimensions)
     .def_readonly("trajectoryID",    &trajectory::SerializationMetadata::trajectoryID);
 }
 
