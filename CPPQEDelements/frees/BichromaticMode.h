@@ -22,7 +22,7 @@ struct ParsBichromatic : ParsPumpedLossy
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsBichromatic& p, QM_Picture qmp, const AveragingConstructorParameters&... a)
+const Ptr make(const ParsBichromatic& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
 {
   using boost::make_shared;
   if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsPumpedLossy&>(p),qmp,a...);
@@ -44,11 +44,11 @@ class BichromaticMode
 {
 public:
   template<typename... AveragingConstructorParameters>
-  BichromaticMode(const mode::ParsBichromatic& p, const AveragingConstructorParameters&... a)
+  BichromaticMode(const mode::ParsBichromatic& p, AveragingConstructorParameters&&... a)
     : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
       ModeBase(p.cutoff,RF{"deltaOther",p.deltaOther,1},{CF{"(kappa*(2*nTh+1),delta)",conj(get_zI()),1},CF{"eta",get_eta(),sqrt(p.cutoff)},CF{"etaOther",p.etaOther,sqrt(p.cutoff)}},"Bichromatic mode"),
-      AveragingType(a...),
+      AveragingType(std::forward<AveragingConstructorParameters>(a)...),
       zI_Other(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.deltaOther)
   {
     mode::Hamiltonian<true>::getH_OverIs().push_back(

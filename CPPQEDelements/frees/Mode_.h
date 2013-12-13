@@ -40,16 +40,16 @@ const StateVector init(const Pars&);
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const Pars           &, QM_Picture, const AveragingConstructorParameters&... );
+const Ptr make(const Pars           &, QM_Picture, AveragingConstructorParameters&&... );
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsLossy      &, QM_Picture, const AveragingConstructorParameters&... );
+const Ptr make(const ParsLossy      &, QM_Picture, AveragingConstructorParameters&&... );
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsPumped     &, QM_Picture, const AveragingConstructorParameters&... );
+const Ptr make(const ParsPumped     &, QM_Picture, AveragingConstructorParameters&&... );
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsPumpedLossy&, QM_Picture, const AveragingConstructorParameters&... );
+const Ptr make(const ParsPumpedLossy&, QM_Picture, AveragingConstructorParameters&&... );
 
 
 const Ptr make(const Pars           &, QM_Picture);
@@ -266,7 +266,7 @@ class Mode
 {
 public:
   template<typename... AveragingConstructorParameters>
-  Mode(const mode::Pars&, const AveragingConstructorParameters&... );
+  Mode(const mode::Pars&, AveragingConstructorParameters&&... );
 };
 
 
@@ -275,7 +275,7 @@ struct ModeUIP : Mode<AveragingType>
 // in this case the uip and ip coincide, 
 {
   template<typename... AveragingConstructorParameters>
-  ModeUIP(const mode::Pars& p, const AveragingConstructorParameters&... a) : Mode<AveragingType>(p,a...) {}
+  ModeUIP(const mode::Pars& p, AveragingConstructorParameters&&... a) : Mode<AveragingType>(p,a...) {}
 };
 
 
@@ -290,7 +290,7 @@ class ModeSch
 {
 public:
   template<typename... AveragingConstructorParameters>
-  ModeSch(const mode::Pars&, const AveragingConstructorParameters&... );
+  ModeSch(const mode::Pars&, AveragingConstructorParameters&&... );
 };
 
 
@@ -304,7 +304,7 @@ class PumpedMode
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedMode(const mode::ParsPumped&, const AveragingConstructorParameters&... );
+  PumpedMode(const mode::ParsPumped&, AveragingConstructorParameters&&... );
 };
 
 
@@ -312,7 +312,7 @@ template<typename AveragingType>
 struct PumpedModeUIP : PumpedMode<AveragingType>
 {
   template<typename... AveragingConstructorParameters>
-  PumpedModeUIP(const mode::ParsPumped& p, const AveragingConstructorParameters&... a) : PumpedMode<AveragingType>(p,a...) {}
+  PumpedModeUIP(const mode::ParsPumped& p, AveragingConstructorParameters&&... a) : PumpedMode<AveragingType>(p,a...) {}
 };
 
 
@@ -326,7 +326,7 @@ class PumpedModeSch
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedModeSch(const mode::ParsPumped&, const AveragingConstructorParameters&... );
+  PumpedModeSch(const mode::ParsPumped&, AveragingConstructorParameters&&... );
 };
 
 
@@ -340,7 +340,7 @@ class LossyMode
 {
 public:
   template<typename... AveragingConstructorParameters>
-  LossyMode(const mode::ParsLossy&, const AveragingConstructorParameters&... );
+  LossyMode(const mode::ParsLossy&, AveragingConstructorParameters&&... );
 
 };
 
@@ -354,7 +354,7 @@ class LossyModeUIP
 {
 public:
   template<typename... AveragingConstructorParameters>
-  LossyModeUIP(const mode::ParsLossy&, const AveragingConstructorParameters&... );
+  LossyModeUIP(const mode::ParsLossy&, AveragingConstructorParameters&&... );
 
 };
 
@@ -368,7 +368,7 @@ class LossyModeSch
 {
 public:
   template<typename... AveragingConstructorParameters>
-  LossyModeSch(const mode::ParsLossy&, const AveragingConstructorParameters&... );
+  LossyModeSch(const mode::ParsLossy&, AveragingConstructorParameters&&... );
 
 };
 
@@ -383,7 +383,7 @@ class PumpedLossyMode
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyMode(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
+  PumpedLossyMode(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
 };
 
 /////
@@ -396,7 +396,7 @@ class PumpedLossyModeUIP
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
+  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
 };
 
 /////
@@ -409,7 +409,7 @@ class PumpedLossyModeSch
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyModeSch(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
+  PumpedLossyModeSch(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
 };
 
 
@@ -423,7 +423,7 @@ class PumpedLossyModeAlternative
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, const AveragingConstructorParameters&... );
+  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
 };
 
 

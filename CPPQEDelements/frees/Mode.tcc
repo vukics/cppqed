@@ -21,14 +21,14 @@ namespace mode {
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters >
-const Ptr make(const Pars& p, QM_Picture qmp, const AveragingConstructorParameters&... a)
+const Ptr make(const Pars& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
 {
   SWITCH_helper( ,AveragingType)
 }
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters >
-const Ptr make(const ParsLossy& p, QM_Picture qmp, const AveragingConstructorParameters&... a)
+const Ptr make(const ParsLossy& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
 {
   if (!p.kappa) return make<AveragingType>(static_cast<const Pars&>(p),qmp,a...);
   else {
@@ -39,7 +39,7 @@ const Ptr make(const ParsLossy& p, QM_Picture qmp, const AveragingConstructorPar
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters >
-const Ptr make(const ParsPumped& p, QM_Picture qmp, const AveragingConstructorParameters&... a)
+const Ptr make(const ParsPumped& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
 {
   if (!isNonZero(p.eta)) return make<AveragingType>(static_cast<const Pars&>(p),qmp,a...);
   else { SWITCH_helper(Pumped,AveragingType) }
@@ -47,7 +47,7 @@ const Ptr make(const ParsPumped& p, QM_Picture qmp, const AveragingConstructorPa
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters >
-const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp, const AveragingConstructorParameters&... a)
+const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
 {
   if      (!p.kappa)          return make<AveragingType>(static_cast<const ParsPumped&>(p),qmp,a...);
   else if (!isNonZero(p.eta)) return make<AveragingType>(static_cast<const ParsLossy &>(p),qmp,a...);
@@ -103,104 +103,104 @@ void AveragedMonitorCutoff<Base>::process_v(Averages& averages) const
 
 
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
-Mode<AveragingType>::Mode(const mode::Pars& p, const AveragingConstructorParameters&... a)
+Mode<AveragingType>::Mode(const mode::Pars& p, AveragingConstructorParameters&&... a)
   : mode::Exact(dcomp(0,-p.delta),p.cutoff),
     ModeBase(p.cutoff,TUPLE_delta(1)),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {}
 
 
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
-ModeSch<AveragingType>::ModeSch(const mode::Pars& p, const AveragingConstructorParameters&... a) 
+ModeSch<AveragingType>::ModeSch(const mode::Pars& p, AveragingConstructorParameters&&... a)
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),0,p.cutoff),
     ModeBase(p.cutoff,TUPLE_delta(0)),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# Schroedinger picture.\n";
 }
 
 
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedMode<AveragingType>::PumpedMode(const mode::ParsPumped& p, const AveragingConstructorParameters&... a)
+PumpedMode<AveragingType>::PumpedMode(const mode::ParsPumped& p, AveragingConstructorParameters&&... a)
   : mode::Hamiltonian<true>(0,dcomp(0,-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,TUPLE_delta(1),TUPLE_eta),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# Pumped.\n";
 }
 
 
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedModeSch<AveragingType>::PumpedModeSch(const mode::ParsPumped& p, const AveragingConstructorParameters&... a)
+PumpedModeSch<AveragingType>::PumpedModeSch(const mode::ParsPumped& p, AveragingConstructorParameters&&... a)
   : mode::Hamiltonian<false>(dcomp(0,-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,TUPLE_delta(0),TUPLE_eta),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# Pumped, Schroedinger picture.\n";
 }
 
 
 template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-LossyMode<IS_FINITE_TEMP,AveragingType>::LossyMode(const mode::ParsLossy& p, const AveragingConstructorParameters&... a)
+LossyMode<IS_FINITE_TEMP,AveragingType>::LossyMode(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.cutoff),
     ModeBase(p.cutoff,TUPLE_kappadelta(1)),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-LossyModeUIP<IS_FINITE_TEMP,AveragingType>::LossyModeUIP(const mode::ParsLossy& p, const AveragingConstructorParameters&... a)
+LossyModeUIP<IS_FINITE_TEMP,AveragingType>::LossyModeUIP(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),0,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)}),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-LossyModeSch<IS_FINITE_TEMP,AveragingType>::LossyModeSch(const mode::ParsLossy& p, const AveragingConstructorParameters&... a)
+LossyModeSch<IS_FINITE_TEMP,AveragingType>::LossyModeSch(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),0,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(0)}),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyMode<IS_FINITE_TEMP,AveragingType>::PumpedLossyMode(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
+PumpedLossyMode<IS_FINITE_TEMP,AveragingType>::PumpedLossyMode(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyModeUIP<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
+PumpedLossyModeUIP<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)},TUPLE_eta),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
 template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyModeSch<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
+PumpedLossyModeSch<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(0),TUPLE_eta}),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
@@ -210,11 +210,11 @@ PumpedLossyModeSch<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeSch(const mode:
 
 
 template<typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyModeAlternative<AveragingType>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, const AveragingConstructorParameters&... a)
+PumpedLossyModeAlternative<AveragingType>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<false,true>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(p.kappa,-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# PumpedLossy---Alternative jumping.\n";
 }
