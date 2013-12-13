@@ -408,11 +408,11 @@ complexFreqs(const blitz::TinyVector<dcomp,NL>& levels, const VP& etas)
 
 
 template<int NL, typename VP, typename VL, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const RealLevels& deltas, const VP& etas, const VL& gammas, const AveragingConstructorParameters&... a)
+PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const RealLevels& deltas, const VP& etas, const VL& gammas, AveragingConstructorParameters&&... a)
   : Hamiltonian(multilevel::decayingLevels(deltas,gammas),etas),
     Liouvillean(gammas),
     Base(multilevel::filterReal(get_zSchs()),multilevel::complexFreqs(get_zSchs(),etas)),
-    AveragingType(a...)
+    AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   getParsStream()<<"# Schroedinger picture.\n";
 }

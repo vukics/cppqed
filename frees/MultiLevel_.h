@@ -306,7 +306,7 @@ public:
   using Base::getParsStream;
 
   template<typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, const AveragingConstructorParameters&...);
+  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, AveragingConstructorParameters&&...);
 
 };
 
@@ -325,7 +325,7 @@ makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas,
                    // const typename RealLevelsMF<NL>::type&
                    // here, the compiler cannot deduce NL anymore
                    const VP& etas, const VL& gammas,
-                   const AveragingConstructorParameters&... a)
+                   AveragingConstructorParameters&&... a)
 {
   return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType> >(deltas,etas,gammas,a...);
 }
@@ -334,7 +334,7 @@ makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas,
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 inline
 RETURN_type
-makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const AveragingConstructorParameters&... a)
+makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
 {
   return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,a...);
 }
