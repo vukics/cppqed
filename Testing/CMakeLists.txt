@@ -1,4 +1,14 @@
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/output")
-add_test(NAME 1particle1mode
-         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/output"
-         COMMAND 1particle1mode --dc 0 --Dt 0.05 --NDt 3 --cutoff 5 )
+project(testing)
+
+include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
+include(${CPPQED_USE})
+
+find_package(PythonInterp 2 REQUIRED)
+
+configure_file(testdriver.conf.in testdriver.conf)
+
+set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py)
+
+add_test(NAME testdriver
+         WORKING_DIRECTORY ${testing_BINARY_DIR}
+         COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT} )

@@ -1,0 +1,6 @@
+[Scripts]
+precision=6
+epsAps=1e-12
+
+[Setup]
+modulepath=@cpypyqed_BINARY_DIR@
