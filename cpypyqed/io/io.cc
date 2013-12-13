@@ -33,20 +33,21 @@ namespace pythonext {
 namespace {
 
 template<int RANK>
-object doRead(std::ifstream &ifs, const SerializationMetadata &meta)
+object doRead(std::ifstream &ifs)
 {
   list states;
   list times;
   list result;
-  ExtTiny<RANK> size;
-  npy_intp dims[RANK];
-  std::copy(meta.dimensions.begin(),meta.dimensions.end(),size.begin());
-  std::copy(meta.dimensions.begin(),meta.dimensions.end(),dims);
-  CArray<RANK> a(size);
+  ExtTiny<RANK> dims;
+  dims=0;
+  CArray<RANK> a(dims);
   AdaptiveIO<CArray<RANK>> traj(evolved::makeIO(a));
   while ( (ifs.peek(), !ifs.eof()) ) {
     trajectory::readViaSStream(traj,ifs);
-    PyObject * pyObj = PyArray_SimpleNewFromData(RANK, dims, NPY_CDOUBLE,a.dataFirst());
+    npy_intp npy_dims[RANK];
+    dims = a.extent();
+    std::copy(dims.begin(),dims.end(), npy_dims);
+    PyObject * pyObj = PyArray_SimpleNewFromData(RANK, npy_dims, NPY_CDOUBLE,a.dataFirst());
     handle<> h( pyObj );
     numeric::array arr( h );
     states.append(arr.copy());
@@ -100,7 +101,7 @@ object read(str filename)
   result.append(meta);
   switch (meta.rank) {
     #define BOOST_PP_LOCAL_MACRO(n) \
-      case n: result.extend(doRead<n>(ifs, meta)); break;
+      case n: result.extend(doRead<n>(ifs)); break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
   }
@@ -132,6 +133,11 @@ void pyDimensionsMismatchException(const trajectory::DimensionsMismatchException
   PyErr_SetString(PyExc_RuntimeError, "dimensions mismatch");
 }
 
+void pyRankMismatchException(const trajectory::RankMismatchException &)
+{
+  PyErr_SetString(PyExc_RuntimeError, "rank mismatch");
+}
+
 void export_io()
 {
   import_array();
@@ -140,7 +146,7 @@ void export_io()
   def("write", write);
 
   register_exception_translator<trajectory::DimensionsMismatchException>(&pyDimensionsMismatchException);
-
+  register_exception_translator<trajectory::RankMismatchException>      (&pyRankMismatchException);
   
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
