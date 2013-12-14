@@ -7,6 +7,8 @@ find_package(PythonInterp 2 REQUIRED)
 
 configure_file(testdriver.conf.in testdriver.conf)
 
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -V)
+
 set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py)
 
 add_test(NAME testdriver
