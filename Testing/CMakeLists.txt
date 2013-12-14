@@ -14,7 +14,8 @@ set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py)
 add_test(NAME testdriver
          COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT} )
 
-add_test( NAME run_1paritcle1mode
+set(TESTNAME run_1particle1mode_dc)
+add_test( NAME ${TESTNAME}
           COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --testname=run_1paritcle1mode --testclass=Runner --script=$<TARGET_FILE:1particle1mode>
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:1particle1mode>
 )
