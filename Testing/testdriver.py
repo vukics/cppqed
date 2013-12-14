@@ -28,17 +28,26 @@ def rm_f(filename):
     if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
       raise # re-raise exception if a diff
 
-class OutputManager(object):
+class OptionsManager(object):
   def __init__(self, options, cp):
     self.options,self.cp = options,cp
-    self.outputdir = cp.get('Setup','outputdir')
-    mkdir_p(self.outputdir)
-    self.script = options.script
-    if not self.script: sys.exit('--script missing')
     self.test = options.test
     if not self.test: sys.exit('--test missing')
     self.section = self.test
-    self.runmodes = self.cp.get(self.section, 'modes').split(',')
+    if self.cp.has_option(self.section,'import'):
+      for item in self.cp.items(self.cp.get(self.section,'import')):
+        if not self.cp.has_option(self.section,item[0]):
+          self.cp.set(self.section, *item)
+
+
+class OutputManager(OptionsManager):
+  def __init__(self, *args, **kwargs):
+    OptionsManager.__init__(self, *args, **kwargs)
+    self.outputdir = self.cp.get('Setup','outputdir')
+    mkdir_p(self.outputdir)
+    self.script = self.options.script
+    if not self.script: sys.exit('--script missing')
+    self.runmodes = self.cp.get(self.section, 'runmodes').split(',')
 
   def output(self, runmode):
     return os.path.join(self.outputdir, self.test+'_'+runmode)
@@ -62,8 +71,8 @@ class Runner(OutputManager):
       ret = subprocess.call(command)
       if not ret==0: sys.exit(ret)
 
-  def _extend_opts(self, options, section, option):
-    if self.cp.has_option(section, option):
+  def _extend_opts(self, options, section, option_prefix):
+    for option in [ item[0] for item in self.cp.items(section) if item[0].startswith(option_prefix)]:
       options.extend(self.cp.get(section,option).split())
 
   def _build_commandline(self, runmode):

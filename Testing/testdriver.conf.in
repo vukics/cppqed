@@ -6,7 +6,11 @@ modulepath=@cpypyqed_BINARY_DIR@
 outputdir=output
 
 [run_1particle1mode_dc]
-modes=single,ensemble,master
+runmodes=single,ensemble,master
 opts=--T 0.1 --cutoff 3 --fin 3
 ensemble=--nTraj 10
 master=--T 0.03
+
+[run_1particle1mode_dt]
+import=run_1particle1mode_dc
+opts1=--dc 0 --Dt 0.01
