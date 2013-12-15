@@ -158,13 +158,13 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     }
 
   } catch (const StoppingCriterionReachedException& except) {os<<"\n# Stopping criterion has been reached"<<endl;}
+  if (!evsDisplayed) traj.display(os,precision);
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
   traj.logOnEnd(os);
-  if (!evsDisplayed) traj.display(os,precision);
   if (!stateSaved)   writeViaSStream(traj,ofs.get());
   
 }
