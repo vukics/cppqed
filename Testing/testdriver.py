@@ -63,9 +63,9 @@ class OutputManager(OptionsManager):
 # The test classes
 
 class Runner(OutputManager):
-  def run(self):
+  def run(self, clean=True):
     for runmode in self.runmodes:
-      self.clean(runmode)
+      if clean: self.clean(runmode)
       command = self._build_commandline(runmode)
       logging.debug(subprocess.list2cmdline(command))
       ret = subprocess.call(command)
