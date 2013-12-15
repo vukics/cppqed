@@ -21,9 +21,11 @@ Evolved<A>::Evolved(A& a, Derivs derivs, double dtInit, double epsRel, double ep
 {} 
 
 template<typename A>
-typename EvolvedIO<A>::Ptr makeIO(A& a)
+typename EvolvedIO<A>::Ptr makeIO(A& a, double time)
 {
-  return boost::make_shared<EvolvedIO<A>, A &>(a,0,0,0);
+  typename EvolvedIO<A>::Ptr res = boost::make_shared<EvolvedIO<A>, A &>(a,0,0,0);
+  res->setTime(time);
+  return res;
 }
 
 template<typename A>
