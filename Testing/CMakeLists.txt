@@ -8,21 +8,14 @@ find_package(PythonInterp 2 REQUIRED)
 configure_file(testdriver.conf.in testdriver.conf)
 
 add_custom_target(check
-                  COMMAND ${CMAKE_CTEST_COMMAND} -V
-                  DEPENDS 1particle1mode
+                  DEPENDS check_run testdriver.conf.in
 )
 
-set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py)
+set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf)
+
+# Testing the testdriver itself
 
 add_test(NAME testdriver
          COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT} )
 
-set(TESTNAME run_1particle1mode_dc)
-add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:1particle1mode>
-)
-
-set(TESTNAME run_1particle1mode_dt)
-add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:1particle1mode>
-)
+add_subdirectory(run)

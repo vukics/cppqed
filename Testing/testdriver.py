@@ -88,15 +88,19 @@ class Runner(OutputManager):
 def main():
   op = OptionParser()
   cp = ConfigParser.SafeConfigParser()
-  cp.read('testdriver.conf')
-  sys.path.append(cp.get('Setup','modulepath'))
-  import cpypyqed.io as cppio
 
   op.add_option("--test")
   op.add_option("--testclass")
   op.add_option("--script")
 
   (options,args) = op.parse_args()
+
+  if len(args) != 1:
+    op.error("incorrect number of arguments")
+
+  cp.read(args[0])
+  sys.path.append(cp.get('Setup','modulepath'))
+  import cpypyqed.io as cppio
 
   if options.testclass:
     constructor = globals()[options.testclass]
