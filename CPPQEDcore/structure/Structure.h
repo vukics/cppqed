@@ -105,12 +105,12 @@ qsa(DynamicsBase::Ptr base)
 // Some functions that are used in contexts other than QuantumSystemWrapper are factored out:
 
 
-/// \related QuantumSystemWrapper If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::display in succession; otherwise a no-op.
+/// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::display in succession; otherwise a no-op. \related QuantumSystemWrapper
 template<int RANK>
 std::ostream& display(boost::shared_ptr<const Averaged<RANK> >, double, const quantumdata::LazyDensityOperator<RANK>&, std::ostream&, int);
 
 
-/// \related QuantumSystemWrapper If the first argument is a valid pointer, it calles LiouvilleanAveragedCommon Averaged::average; otherwise a no-op (returning an empty array)
+/// If the first argument is a valid pointer, it calles LiouvilleanAveragedCommon Averaged::average; otherwise a no-op (returning an empty array) \related QuantumSystemWrapper
 template<int RANK>
 const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr, double, const quantumdata::LazyDensityOperator<RANK>&);
 

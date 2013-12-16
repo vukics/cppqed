@@ -62,7 +62,7 @@ private:
 };
 
 
-/// \related DimensionsBookkeeper dimensionality comparison for types derived from DimensionsBookkeeper
+/// dimensionality comparison for types derived from DimensionsBookkeeper \related DimensionsBookkeeper
 template<int RANK, bool IS_CONST1, bool IS_CONST2>
 inline bool
 operator==(const DimensionsBookkeeper<RANK,IS_CONST1>& d1, const DimensionsBookkeeper<RANK,IS_CONST2>& d2)
@@ -70,7 +70,7 @@ operator==(const DimensionsBookkeeper<RANK,IS_CONST1>& d1, const DimensionsBookk
   return blitz::all(d1.getDimensions()==d2.getDimensions());
 }
 
-/// \related DimensionsBookkeeper dimensionality comparison for types derived from DimensionsBookkeeper
+/// dimensionality comparison for types derived from DimensionsBookkeeper \related DimensionsBookkeeper
 template<int RANK, bool IS_CONST1, bool IS_CONST2>
 inline bool
 operator!=(const DimensionsBookkeeper<RANK,IS_CONST1>& d1, const DimensionsBookkeeper<RANK,IS_CONST2>& d2)

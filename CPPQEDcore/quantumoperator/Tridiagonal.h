@@ -32,7 +32,7 @@ struct TridiagonalTimeMismatchException      : public cpputils::Exception {};
 namespace quantumoperator {
 
 
-/// A free-standing version of Tridiagonal::apply
+/// A free-standing version of Tridiagonal::apply \related Tridiagonal
 template<int RANK>
 inline
 void
@@ -40,7 +40,7 @@ apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename qua
       const Tridiagonal<RANK>&);
 
 
-/// Same as Tridiagonal::furnishWithFreqs, but returns a copy of its first argument furnished with frequencies
+/// Same as Tridiagonal::furnishWithFreqs, but returns a copy of its first argument furnished with frequencies \related Tridiagonal
 template<int RANK>
 const Tridiagonal<RANK>
 furnishWithFreqs(const Tridiagonal<RANK>& tridiag,                        ///< Tridiagonal whose copy is to be furnished with frequencies
@@ -48,8 +48,10 @@ furnishWithFreqs(const Tridiagonal<RANK>& tridiag,                        ///< T
                 );
 
 
-const Tridiagonal<1> zero    (size_t); ///< Unary zero operator as a Tridiagonal
-const Tridiagonal<1> identity(size_t); ///< Unary identity operator as a Tridiagonal
+/// Unary zero operator as a Tridiagonal \related Tridiagonal
+const Tridiagonal<1> zero    (size_t);
+/// Unary identity operator as a Tridiagonal \related Tridiagonal
+const Tridiagonal<1> identity(size_t);
 
 
 //////////////
@@ -328,7 +330,7 @@ apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename qua
 }
 
 
-/// Direct product
+/// Direct product \related Tridiagonal
 template<int RANK1, int RANK2>
 inline
 const Tridiagonal<RANK1+RANK2>
@@ -338,28 +340,28 @@ operator*(const Tridiagonal<RANK1>& t1, const Tridiagonal<RANK2>& t2)
 }
 
 
-/// Returns the anti-Hermitian operator \f$T-T^\dagger\f$
+/// Returns the anti-Hermitian operator \f$T-T^\dagger\f$ \related Tridiagonal
 template<int RANK>
 inline 
 const Tridiagonal<RANK>
 tridiagMinusHC     (const Tridiagonal<RANK>& tridiag) {return tridiag-tridiag.hermitianConjugate();}
 
 
-/// Returns the Hermitian operator \f$T+T^\dagger\f$
+/// Returns the Hermitian operator \f$T+T^\dagger\f$ \related Tridiagonal
 template<int RANK>
 inline 
 const Tridiagonal<RANK>
 tridiagPlusHC      (const Tridiagonal<RANK>& tridiag) {return tridiag+tridiag.hermitianConjugate();}
 
 
-/// Returns the anti-Hermitian operator \f$(T+T^\dagger)/i\f$
+/// Returns the anti-Hermitian operator \f$(T+T^\dagger)/i\f$ \related Tridiagonal
 template<int RANK>
 inline 
 const Tridiagonal<RANK>
 tridiagPlusHC_overI(const Tridiagonal<RANK>& tridiag) {return tridiagPlusHC(tridiag)/DCOMP_I;}
 
 
-
+/// \related Tridiagonal
 template<int RANK>
 std::ostream& operator<<(std::ostream&, const Tridiagonal<RANK>&);
 

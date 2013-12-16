@@ -99,11 +99,11 @@ private:
 };
 
 
-/// \related LazyDensityOperator Converts the index-tiny of size `RANK` to the arity-dependent indexing type of LazyDensityOperator
+/// Converts the index-tiny of size `RANK` to the arity-dependent indexing type of LazyDensityOperator \related LazyDensityOperator
 template<int RANK>
 inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const IdxTiny<RANK>& idx) {return idx   ;}
 
-/// \related LazyDensityOperator ” for `RANK=1`
+/// ” for `RANK=1` \related LazyDensityOperator
 inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const IdxTiny<1   >& idx) {return idx[0];}
 
 
