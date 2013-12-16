@@ -51,7 +51,7 @@ object doRead(std::ifstream &ifs, NPY_TYPES npy_dtype)
     handle<> h( pyObj );
     numeric::array arr( h );
     states.append(arr.copy());
-    times.append(traj.getEvolvedIO()->getTime());
+    times.append(traj.getTime());
   }
   return make_tuple(states,times);
 }

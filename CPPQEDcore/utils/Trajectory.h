@@ -154,30 +154,31 @@ public:
   typedef evolved::EvolvedIO<A>   EvolvedIO;
   AdaptiveIO(typename EvolvedIO::Ptr evolvedIO);
 
-  typedef typename EvolvedIO::ConstPtr ConstPtr;
-  typedef typename EvolvedIO::Ptr Ptr;
-
-  const ConstPtr getEvolvedIO() const {return ConstPtr(evolvedIO_);}
-  const      Ptr getEvolvedIO()       {return          evolvedIO_ ;}
-
   /// Read in the EvolvedIO from a cpputils::iarchive.
-  /***
+  /**
    * Two conformity checks are performed for to the array we try to read in:
-   * * whether the rank matches (throws RankMismatchException if not)
-   * * whether the dimensions match (throws DimensionsMismatchException if not)
+   * - whether the rank matches (throws RankMismatchException if not)
+   * - whether the dimensions match (throws DimensionsMismatchException if not)
    * The dimensions check can be circumvented by setting the trajectoryID to
    * SerializationMetadata::ArrayOnly in the EvolvedIO's metadata. This is done for example
    * in the python I/O interface, because when reading in a state in python we
    * generally have no idea about the dimensions.
-   **/
+   */
   cpputils::iarchive&  readState(cpputils::iarchive& iar);
   /// Write the EvolvedIO to a cpputils::oarchive
   cpputils::oarchive& writeState(cpputils::oarchive& oar) const;
+
+  /// Returns the time of the underlying EvolvedIO
+  double getTime() const {return evolvedIO_->getTime();}
+
 protected:
   mutable SerializationMetadata meta_;
+
 private:
-  Ptr evolvedIO_;
+  const typename EvolvedIO::Ptr evolvedIO_;
+
 };
+
 
 template<typename A>
 using EvolvedPtrBASE = boost::base_from_member<typename evolved::Evolved<A>::Ptr>;
@@ -190,6 +191,7 @@ public:
 
   using Trajectory::readState;
   using Trajectory::writeState;
+  using Trajectory::getTime;
 
   typedef evolved::Evolved<A>       Evolved;
   // typedef trajectory::AdaptiveIO<A> AdaptiveIO;
