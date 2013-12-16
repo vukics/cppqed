@@ -1,0 +1,67 @@
+
+# C++QEDcore Version 2.99.7, core git commit: e21b96a19300bbf7aa11cbc18d6a4799191ffaf3
+
+# Andras Vukics, vukics@users.sourceforge.net
+
+# Compiled with
+# Boost library collection : Version 1.55
+# Gnu Scientific Library   : Version 1.15
+# Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
+
+# EvolvedGSL implementation, stepping function: rkck
+# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+# Solving Master equation.
+
+# Binary System
+# Dimensions: (3,8). Total: 24
+
+# Subsystem Nr. 0
+# Mode
+# PumpedLossy, Unitary interaction picture.
+# Dimension: 3
+# kappa*(2*nTh+1)=10
+# delta=-10
+# eta=(10,0)
+
+# Subsystem Nr. 1
+# Particle
+# Spatial Degree of Freedom finesse=3 xMax=3.14159 deltaX=0.785398 kMax=4 deltaK=1
+# Pump (Sin 1)
+# Dimension: 8
+# omrec=1
+# vClass=-10
+
+# 0 - 1 - Interaction
+# Particle-Cavity Interaction
+# Particle moving orthogonal to cavity
+# Unot=-1
+# etaeff=-10
+
+# System characteristics: Interaction picture, Hamiltonian evolution, Liouvillean evolution, calculates Averages.
+# Decay channels:
+# Binary system
+# Mode
+#  0. excitation loss
+
+# Key to data:
+# Trajectory
+#  1. time
+#  2. dtDid
+# Binary system
+# Mode
+#  3. <number operator>
+#  4. VAR(number operator)
+#  5. real(<ladder operator>)
+#  6. imag(")
+# Particle
+#  7. <P>
+#  8. VAR(P)
+#  9. <X>
+# 10. DEV(X)
+
+# Run Trajectory up to time 0.03 -- Display period: 0.01
+
+0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
+0.01         0.00666667   	0.00978313    0.00978267    0.0946913     -0.0278155    	-0.499268     5.23879       -1.57065      0.0435684     
+0.02         0.01         	0.0354506     0.0354265     0.18194       -0.0465787    	-0.497621     5.21218       -1.57046      0.0577803     
+0.03         0.01         	0.0724463     0.0722323     0.265583      -0.0371667    	-0.496027     5.18205       -1.56964      0.0661392     

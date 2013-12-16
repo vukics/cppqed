@@ -1,0 +1,156 @@
+# Ensemble of 3 trajectories.
+
+# C++QEDcore Version 2.99.7, core git commit: e21b96a19300bbf7aa11cbc18d6a4799191ffaf3
+
+# Andras Vukics, vukics@users.sourceforge.net
+
+# Compiled with
+# Boost library collection : Version 1.55
+# Gnu Scientific Library   : Version 1.15
+# Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
+
+# EvolvedGSL implementation, stepping function: rkck
+# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+# Stochastic Trajectory Parameters: seed=1001
+# MCWF Trajectory Parameters: dpLimit=0.1 (overshoot tolerance factor)=10
+
+# Composite
+# Dimensions: (2,2,2,3). Total: 24
+# Subsystem Nr. 0
+# Qbit
+# LossyWithPhaseNoise.
+# Dimension: 2
+# gamma_parallel=1
+# (gamma,delta)=(10,-10)
+
+# Subsystem Nr. 1
+# Qbit
+# LossyWithPhaseNoise.
+# Dimension: 2
+# gamma_parallel=1
+# (gamma,delta)=(10,-10)
+
+# Subsystem Nr. 2
+# Qbit
+# LossyWithPhaseNoise.
+# Dimension: 2
+# gamma_parallel=1
+# (gamma,delta)=(10,-10)
+
+# Subsystem Nr. 3
+# Mode
+# PumpedLossy.
+# Dimension: 3
+# (kappa*(2*nTh+1),delta)=(10,-10)
+# eta=(10,0)
+
+# 0 - 3 - Interaction
+# Jaynes-Cummings interaction
+# g=(1,0)
+
+# 1 - 3 - Interaction
+# Jaynes-Cummings interaction
+# g=(1,0)
+
+# 2 - 3 - Interaction
+# Jaynes-Cummings interaction
+# g=(1,0)
+
+# System characteristics: Interaction picture, Hamiltonian evolution, Liouvillean evolution, calculates Averages.
+# Decay channels:
+# LossyQbitWithPhaseNoise
+#  0. excitation loss
+#  1. phase noise
+# LossyQbitWithPhaseNoise
+#  2. excitation loss
+#  3. phase noise
+# LossyQbitWithPhaseNoise
+#  4. excitation loss
+#  5. phase noise
+# Mode
+#  6. excitation loss
+# Alternative Lindblads: 0 1 2 3 4 5 
+
+# Key to data:
+# Trajectory
+#  1. time
+#  2. dtDid
+# Qbit
+#  3. rho00
+#  4. rho11
+#  5. real(rho10=<sigma>)
+#  6. imag(")
+# Qbit
+#  7. rho00
+#  8. rho11
+#  9. real(rho10=<sigma>)
+# 10. imag(")
+# Qbit
+# 11. rho00
+# 12. rho11
+# 13. real(rho10=<sigma>)
+# 14. imag(")
+# Mode
+# 15. <number operator>
+# 16. VAR(number operator)
+# 17. real(<ladder operator>)
+# 18. imag(")
+# 19. VAR(X)
+# 20. VAR(Y)
+# 21. COV(X,Y)
+# QbitModeCorrelations
+# 22. real(<sigma*adagger>
+# 23. imag(")
+# 24. real(<sigma*a>)
+# 25. imag(")
+# 26. real(<sigmaZ*a>)
+# 27. imag(")
+
+# Run Trajectory up to time 0.1 -- Display period: 0.01
+
+0            0            	1             0             0             0             	1             0             0             0             	1             0             0             0             	0             0             0             0             0.5           0.5           0             	0             0             0             0             0             0             
+0.01         0.0042265    	1             2.1878e-07    -0.000466715  3.08989e-05   	1             2.1878e-07    -0.000466715  3.08989e-05   	1             2.1878e-07    -0.000466715  3.08989e-05   	0.00904743    0.00904707    0.0950011     -0.00467461   0.499941      0.50006       4.64119e-06   	-4.44838e-05  7.53741e-07   -4.40814e-05  5.10632e-06   -0.0475005    0.00233731    
+0.02         0.01         	0.999997      3.0628e-06    -0.00173496   0.000228758   	0.999997      3.0628e-06    -0.00173496   0.000228758   	0.999997      3.0628e-06    -0.00173496   0.000228758   	0.0327341     0.0327181     0.180033      -0.0174597    0.499271      0.500764      0.000113138   	-0.000316425  1.08971e-05   -0.000305712  7.09869e-05   -0.0900159    0.00872981    
+0.03         0.01         	0.999986      1.35632e-05   -0.0036121    0.000713328   	0.999986      1.35632e-05   -0.0036121    0.000713328   	0.999986      1.35632e-05   -0.0036121    0.000713328   	0.0665978     0.0664705     0.255168      -0.0366356    0.497242      0.503048      0.00064776    	-0.000948817  4.97776e-05   -0.000881128  0.0003105     -0.127581     0.0183173     
+0.04         0.01         	0.999963      3.74851e-05   -0.00591634   0.00155974    	0.999963      3.74851e-05   -0.00591634   0.00155974    	0.999963      3.74851e-05   -0.00591634   0.00155974    	0.107021      0.106519      0.320538      -0.060664     0.493627      0.507566      0.00204487    	-0.00199631   0.000141693   -0.00175866   0.000844208   -0.160257     0.0303297     
+0.05         0.01         	0.99992       8.00014e-05   -0.00848077   0.0028058     	0.99992       8.00014e-05   -0.00848077   0.0028058     	0.99992       8.00014e-05   -0.00848077   0.0028058     	0.151111      0.149761      0.376386      -0.0881852    0.488846      0.51449       0.00465864    	-0.00345736   0.000310912   -0.00285194   0.00176678    -0.188164     0.0440856     
+0.06         0.01         	0.999855      0.000144969   -0.0111565    0.00445868    	0.999855      0.000144969   -0.0111565    0.00445868    	0.999855      0.000144969   -0.0111565    0.00445868    	0.196593      0.193733      0.423098      -0.118014     0.483725      0.523583      0.00864476    	-0.00529207   0.000578163   -0.0040317    0.00313081    -0.21149      0.0589897     
+0.07         0.01         	0.999765      0.000234624   -0.0138149    0.00650109    	0.999765      0.000234624   -0.0138149    0.00650109    	0.999765      0.000234624   -0.0138149    0.00650109    	0.241721      0.236565      0.461208      -0.149128     0.479176      0.534361      0.0139493     	-0.00743655   0.000958409   -0.00515245   0.00494227    -0.2305       0.0745291     
+0.08         0.000782128  	0.99965       0.000349547   -0.0163486    0.0088966     	0.99965       0.000349547   -0.0163486    0.0088966     	0.99965       0.000349547   -0.0163486    0.0088966     	0.285194      0.2769        0.491383      -0.180663     0.475952      0.546244      0.0203682     	-0.0098143    0.00145976    -0.00607308   0.00716325    -0.245527     0.0902676     
+0.09         0.00608936   	0.999511      0.000488823   -0.0186724    0.0115946     	0.999511      0.000488823   -0.0186724    0.0115946     	0.999511      0.000488823   -0.0186724    0.0115946     	0.326091      0.313811      0.514401      -0.211893     0.474508      0.55866       0.0276344     	-0.0123452    0.00208331    -0.00667208   0.00971887    -0.256961     0.10584       
+0.1          0.0020326    	0.99935       0.000650303   -0.0207235    0.0145346     	0.99935       0.000650303   -0.0207235    0.0145346     	0.99935       0.000650303   -0.0207235    0.0145346     	0.363806      0.346708      0.531121      -0.242227     0.474977      0.571109      0.0355004     	-0.0149522    0.00282374    -0.00685793   0.0125067     -0.265232     0.12095       
+0.1          1.38778e-17  	0.99935       0.000650303   -0.0207235    0.0145346     	0.99935       0.000650303   -0.0207235    0.0145346     	0.99935       0.000650303   -0.0207235    0.0145346     	0.363806      0.346708      0.531121      -0.242227     0.474977      0.571109      0.0355004     	-0.0149522    0.00282374    -0.00685793   0.0125067     -0.265232     0.12095       
+
+# Average number of total steps: 15
+
+# On average, dpLimit overshot: 13 times, maximal overshoot: 0.301691
+# On average, dpTolerance overshot: 0 times, maximal overshoot: 0
+
+# Maximal deviation of norm from 1: 0.0269648
+
+# Average number of failed ODE steps: 0
+# Average number of Hamiltonian calls: 105
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+# 0	-nan
+
+# Average number of total jumps: 0

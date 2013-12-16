@@ -8,7 +8,7 @@ find_package(PythonInterp 2 REQUIRED)
 configure_file(testdriver.conf.in testdriver.conf)
 
 add_custom_target(check
-                  DEPENDS check_run testdriver.conf.in
+                  DEPENDS check_run testdriver.conf.in cpypyqed
 )
 
 set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf)

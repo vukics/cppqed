@@ -1,0 +1,33 @@
+
+# Simulated.
+
+# C++QEDcore Version 2.99.7, core git commit: e21b96a19300bbf7aa11cbc18d6a4799191ffaf3
+
+# Andras Vukics, vukics@users.sourceforge.net
+
+# Compiled with
+# Boost library collection : Version 1.55
+# Gnu Scientific Library   : Version 1.15
+# Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
+
+# EvolvedGSL implementation, stepping function: rkck
+# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+
+# Key to data:
+# Trajectory
+#  1. time
+#  2. dtDid
+
+# Run Trajectory up to time 1 -- Display period: 0.1
+
+0            0            1              0              -0             
+0.1          0.00290445   0.602265       -0.674182      0.336897       
+0.2          0.0297906    0.55288        -0.512764      0.49167        
+0.3          0.0274029    0.608238       -0.476183      0.484828       
+0.4          0.00995742   0.611398       -0.488507      0.484437       
+0.5          0.0537639    0.609027       -0.488785      0.487451       
+0.6          0.0337044    0.609555       -0.487722      0.487815       
+0.7          0.0182543    0.609779       -0.487769      0.487758       
+0.8          0.00872855   0.609755       -0.487819      0.48779        
+0.9          0.0563573    0.609751       -0.487807      0.487804       
+1            0.1          0.609756       -0.487804      0.487805       

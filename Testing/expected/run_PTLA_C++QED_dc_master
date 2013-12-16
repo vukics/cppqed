@@ -1,0 +1,40 @@
+
+# C++QEDcore Version 2.99.7, core git commit: e21b96a19300bbf7aa11cbc18d6a4799191ffaf3
+
+# Andras Vukics, vukics@users.sourceforge.net
+
+# Compiled with
+# Boost library collection : Version 1.55
+# Gnu Scientific Library   : Version 1.15
+# Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
+
+# EvolvedGSL implementation, stepping function: rkck
+# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+# Solving Master equation.
+
+# Pumped Two-Level Atom
+# Schroedinger picture.
+# Dimension: 2
+# (gamma,deltaA)=(10,-10)
+# eta=(8,0)
+
+# System characteristics: Hamiltonian evolution, Liouvillean evolution, calculates Averages.
+# Decay channels:
+# Pumped Two-Level Atom
+#  0. atomic decay
+
+# Key to data:
+# Trajectory
+#  1. time
+#  2. dtDid
+# Qbit
+#  3. rho00
+#  4. rho11
+#  5. real(rho10=<sigma>)
+#  6. imag(")
+
+# Run Trajectory up to time 1 -- Display period: 10 timestep
+
+0            0            	1             0             0             0             
+0.291278     0.0422345    	0.803051      0.196949      -0.237629     0.242831      
+1            0.0822169    	0.804878      0.195122      -0.243903     0.243902      

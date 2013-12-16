@@ -4,10 +4,12 @@ opts=--precision 6 --epsAbs 1e-5 --logLevel 2
 [Setup]
 modulepath=@cpypyqed_BINARY_DIR@
 outputdir=output
+expecteddir=@testing_SOURCE_DIR@/expected
 
 [run_PTLA_C++QED_dc]
 runmodes=single,ensemble,master
-opts=--etat 8 --sdf 5
+opts=--etat 8 --sdf 3
+ensemble=--nTraj 3
 
 [run_PTLA_C++QED_dt]
 import=run_PTLA_C++QED_dc
@@ -30,9 +32,9 @@ opts1=--dc 0 --Dt 0.1 --NDt 10
 
 [run_1particle1mode_dc]
 runmodes=single,ensemble,master
-opts=--cutoff 3 --fin 3 --eta 10 --sdf 5
+opts=--cutoff 3 --fin 3 --eta 10 --sdf 3
 opts_timing=--dc 1 --T 0.1
-ensemble=--nTraj 10
+ensemble=--nTraj 3
 master=--T 0.03
 
 [run_1particle1mode_dt]
@@ -46,9 +48,9 @@ master=--NDt 3
 
 [run_3qbits_dc]
 runmodes=single,ensemble,master
-opts=--eta 10 --sdf 5
+opts=--eta 10 --cutoff 3 --sdf 3
 opts_timing=--T 0.1 --dc 1 
-ensemble=--nTraj 10
+ensemble=--nTraj 3
 master=--T 0.0002
 
 [run_3qbits_dt]
