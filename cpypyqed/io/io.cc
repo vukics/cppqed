@@ -32,22 +32,22 @@ namespace pythonext {
 
 namespace {
 
-template<int RANK>
-object doRead(std::ifstream &ifs)
+template<typename A, int RANK>
+object doRead(std::ifstream &ifs, NPY_TYPES npy_dtype)
 {
   list states;
   list times;
   list result;
   ExtTiny<RANK> dims;
   dims=0;
-  CArray<RANK> a(dims);
-  AdaptiveIO<CArray<RANK>> traj(evolved::makeIO(a));
+  A a(dims);
+  AdaptiveIO<A> traj(evolved::makeIO(a));
   while ( (ifs.peek(), !ifs.eof()) ) {
     trajectory::readViaSStream(traj,ifs);
     npy_intp npy_dims[RANK];
     dims = a.extent();
     std::copy(dims.begin(),dims.end(), npy_dims);
-    PyObject * pyObj = PyArray_SimpleNewFromData(RANK, npy_dims, NPY_CDOUBLE,a.dataFirst());
+    PyObject * pyObj = PyArray_SimpleNewFromData(RANK, npy_dims, npy_dtype, a.dataFirst());
     handle<> h( pyObj );
     numeric::array arr( h );
     states.append(arr.copy());
@@ -56,14 +56,14 @@ object doRead(std::ifstream &ifs)
   return make_tuple(states,times);
 }
 
-template<int RANK>
-void doWrite(std::ofstream *ofs, PyArrayObject *a)
+template<typename A, typename dtype, int RANK>
+void doWrite(std::ofstream *ofs, PyArrayObject *a, double time)
 {
   npy_intp *dims=PyArray_DIMS(a);
   blitz::TinyVector<int,RANK> shape;
   for (int i=0; i<RANK; i++) shape[i]=dims[i];
-  CArray<RANK>  blitz_a = CArray<RANK>(static_cast<dcomp *>(PyArray_DATA(a)), shape, blitz::duplicateData);
-  AdaptiveIO<CArray<RANK>> traj(evolved::makeIO(blitz_a));
+  A  blitz_a = A(static_cast<dtype *>(PyArray_DATA(a)), shape, blitz::duplicateData);
+  AdaptiveIO<A> traj(evolved::makeIO(blitz_a, time));
   trajectory::writeViaSStream(traj,ofs);
 }
 
@@ -84,6 +84,14 @@ void throw_rank(int r)
   }
 }
 
+void throw_type(std::string typeID)
+{
+  if(typeID!="CArray" && typeID!="DArray") {
+    PyErr_SetString(PyExc_NotImplementedError, (typeID+": import of this data type not implemented.").c_str());
+    throw_error_already_set();
+  }
+}
+
 }
 
 object read(str filename) 
@@ -96,12 +104,17 @@ object read(str filename)
   trajectory::SerializationMetadata meta = trajectory::readMeta(ifs);
   
   throw_rank(meta.rank);
-  
+  throw_type(meta.typeID);
+
   list result;
   result.append(meta);
+
   switch (meta.rank) {
     #define BOOST_PP_LOCAL_MACRO(n) \
-      case n: result.extend(doRead<n>(ifs)); break;
+      case n: \
+        if(meta.typeID=="CArray") result.extend(doRead<CArray<n>,n>(ifs,NPY_CDOUBLE)); \
+        if(meta.typeID=="DArray") result.extend(doRead<DArray<n>,n>(ifs,NPY_DOUBLE));  \
+        break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
   }
@@ -109,7 +122,7 @@ object read(str filename)
   return result;
 }
 
-void write(const numeric::array &array, str filename)
+void write(str filename, const numeric::array &array, double time)
 {
   std::string f = extract<std::string>(filename);
   std::ofstream ofs(f.c_str(),std::ios_base::binary|std::ios_base::trunc);
@@ -118,10 +131,14 @@ void write(const numeric::array &array, str filename)
   PyArrayObject *a = reinterpret_cast<PyArrayObject *>(array.ptr());
   int rank=PyArray_NDIM(a);
   throw_rank(rank);
-
   switch (rank) {
-    #define BOOST_PP_LOCAL_MACRO(n)               \
-      case n: doWrite<n>(&ofs,a); break;
+    #define BOOST_PP_LOCAL_MACRO(n)                 \
+      case n:                                       \
+        if(PyArray_TYPE(a)==NPY_DOUBLE)            \
+          doWrite<DArray<n>,double,n>(&ofs,a,time); \
+        if(PyArray_TYPE(a)==NPY_CDOUBLE)           \
+          doWrite<CArray<n>,dcomp,n>(&ofs,a,time);  \
+        break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
   }
