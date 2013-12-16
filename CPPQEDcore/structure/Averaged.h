@@ -51,8 +51,10 @@ public:
    * 
    * The display format greatly depends on what kind of system is in question (in particular, \link ElementAveraged elementary system\endlink or Composite).
    * 
+   * \todo The precision argument is obsolete after rev. #04265ae452d5760bd93445a74c47885c68cdeddf since precision might be propagated just via FormDouble::overallPrecision throughout the whole framework.
+   *
    */
-  std::ostream& display(const Averages& averages, std::ostream& os, int i) const {return display_v(averages,os,i);}
+  std::ostream& display(const Averages& averages, std::ostream& os, int precision) const {return display_v(averages,os,precision);}
 
 private:
   virtual void          process_v(      Averages&                    ) const {}
@@ -78,7 +80,7 @@ private:
  * 
  */
 template<int RANK>
-class Averaged : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >,public AveragedCommon
+class Averaged : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >, public AveragedCommon
 {
 public:
   static const int N_RANK=RANK;

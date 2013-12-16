@@ -291,6 +291,12 @@ class Base;
  * 
  * \see \ref iteratorimplementation
  * 
+ * \todo Implement a default version of Iterator for the case when neither slicing nor transposition is necessary, that is when `V` is equivalent to a range<0,RANK-1>.
+ * This will require further compile-time implementation selection.
+ *
+ * \todo Refine the iterator category according to the \refBoost{New-Style Iterator concepts,iterator/doc/index.html#new-style-iterators}.
+ * The point is that a multi-array is not a container of slices, so Iterator is definitely not a standard iterator. It seems rather like a proxy iterator.
+ *
  */
 template<int RANK, typename V, bool IS_CONST>
 class Iterator 

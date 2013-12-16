@@ -15,7 +15,13 @@ namespace structure {
 
 
 /// The interface every system having (possibly non-Hermitian) Hamiltonian time-evolution must present towards the trajectory drivers
-/** \tparamRANK */
+/**
+ * \tparamRANK
+ *
+ * \todo Hamiltonian should be able not only to add its contribution to a state vector, but simply return its contribution.
+ * In Hamiltonian::addContribution, somehow signal to the function whether it has to add or replace, because replacement could be also useful in some contexts.
+ *
+ */
 template<int RANK>
 class Hamiltonian : private quantumdata::Types<RANK>
 {
