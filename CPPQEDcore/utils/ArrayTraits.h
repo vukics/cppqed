@@ -3,6 +3,7 @@
 #ifndef   UTILS_ARRAYTRAITS_H_INCLUDED
 #define   UTILS_ARRAYTRAITS_H_INCLUDED
 
+#include <string>
 #include <vector>
 
 namespace cpputils {
@@ -30,6 +31,10 @@ size_t rank();
 template<typename A>
 inline size_t rank(const A& a) {return rank<A>();};
 
+
+
+template<typename A>
+std::string typeID(const A& a);
 
 
 template<typename A>

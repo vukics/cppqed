@@ -36,13 +36,15 @@ void run(Adaptive<A>&, const ParsRun&);
 
 struct SerializationMetadata
 {
-  SerializationMetadata(std::string id=UNSPECIFIED, int r=0)
+  SerializationMetadata(std::string type=UNSPECIFIED, std::string id=UNSPECIFIED, int r=0)
     : protocolVersion(0),
       rank(r),
+      typeID(type),
       trajectoryID(id)
   {};
   int protocolVersion;
   int rank;
+  std::string typeID;
   std::string trajectoryID;
   
   static const std::string UNSPECIFIED;
@@ -51,7 +53,7 @@ struct SerializationMetadata
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & trajectoryID;}
+  void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & typeID & trajectoryID;}
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 };
 
@@ -170,8 +172,8 @@ public:
    * Two conformity checks are performed for to the array we try to read in:
    * * whether the rank matches (throws RankMismatchException if not)
    * * whether the dimensions match (throws DimensionsMismatchException if not)
-   * The dimensions check can be circumvented by setting all dimensions of the
-   * array contained in this EvolvedIO class to 0. This is done for example
+   * The dimensions check can be circumvented by setting the trajectoryID to
+   * SerializationMetadata::ArrayOnly in the EvolvedIO's metadata. This is done for example
    * in the python I/O interface, because when reading in a state in python we
    * generally have no idea about the dimensions.
    **/

@@ -5,6 +5,7 @@
 
 #include "BlitzArray.h"
 #include <boost/iterator/iterator_concepts.hpp>
+#include <string>
 #include <vector>
 
 namespace cpputils {
@@ -28,6 +29,10 @@ inline std::vector<size_t> dimensions(const DArray<n>& a) {return std::vector<si
 
 template<int n>
 inline size_t rank(const DArray<n>&) {return n;} // The parameter a is actually only needed for template argument deduction.
+
+
+template<int n>
+inline std::string typeID(const DArray<n>&) {return "DArray";};
 
 
 template<int n>
@@ -66,6 +71,10 @@ inline std::vector<size_t> dimensions(const CArray<n>& a) {return std::vector<si
 
 template<int n>
 inline size_t rank(const CArray<n>&) {return n;} // The parameter is actually only needed for template argument deduction.
+
+
+template<int n>
+inline std::string typeID(const CArray<n>&) {return "CArray";}
 
 
 template<int n>

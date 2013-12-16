@@ -185,18 +185,23 @@ void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std:
 
 template<typename A>
 AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
-  : meta_(SerializationMetadata::ARRAY_ONLY, cpputils::rank(evolvedIO->getA())), evolvedIO_(evolvedIO) {};
+  : meta_(cpputils::typeID(evolvedIO->getA()),
+          SerializationMetadata::ARRAY_ONLY,
+          cpputils::rank(evolvedIO->getA())),
+    evolvedIO_(evolvedIO)
+{};
 
 template<typename A>
 cpputils::iarchive& AdaptiveIO<A>::readState(cpputils::iarchive& iar)
 {
+  bool dimension_check = meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY;
   iar & meta_;
   if(meta_.rank!=cpputils::rank(evolvedIO_->getA()))
     throw RankMismatchException();
   std::vector<size_t> dims = cpputils::dimensions(evolvedIO_->getA());
   iar & *evolvedIO_;
-  if (std::accumulate(dims.begin(),dims.end(),0)>0 && dims != cpputils::dimensions(evolvedIO_->getA()))
-    throw DimensionsMismatchException();
+  if (dimension_check && dims != cpputils::dimensions(evolvedIO_->getA()))
+      throw DimensionsMismatchException();
   return iar;
 }
 
