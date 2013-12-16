@@ -28,6 +28,15 @@ void run(Adaptive<A>& traj, const ParsRun& p)
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
 }
 
+
+namespace details {
+
+void writeNextArchive(std::ofstream*, const std::ostringstream&);
+void readNextArchive(std::ifstream&, std::istringstream&);
+
+} // details
+
+
 template<typename T>
 void writeViaSStream(const T& traj, std::ofstream* ofs)
 {
@@ -71,7 +80,7 @@ inline const std::string writeTimestep(double) {return ""         ;}
 inline double endTime(long    nDt, double dt, double currentTime) {return nDt*dt+currentTime;}
 inline double endTime(double time, double   , double            ) {return time              ;}
 
-}
+} // runTraits
 
 
 bool restoreState(Trajectory&, const std::string&, const std::string&, const std::string&);

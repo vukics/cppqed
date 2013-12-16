@@ -57,13 +57,6 @@ struct SerializationMetadata
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 };
 
-namespace details
-{
-
-void writeNextArchive(std::ofstream*, const std::ostringstream&);
-void readNextArchive(std::ifstream&, std::istringstream&);
-
-} // details
 
 template<typename T>
 void writeViaSStream(const T&, std::ofstream*);
