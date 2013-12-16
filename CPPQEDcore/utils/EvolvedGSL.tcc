@@ -1,3 +1,4 @@
+/// \briefFile{Implementation of MakerGSL::_}
 // -*- C++ -*-
 #ifndef   UTILS_EVOLVEDGSL_TCC_INCLUDED
 #define   UTILS_EVOLVEDGSL_TCC_INCLUDED
@@ -15,9 +16,8 @@
 namespace evolved {
 
   
-namespace details  {
-
-// Two indirections needed because cannot declare member functions for Impl here
+namespace details { // We declare indirections here because at this point we cannot yet declare member functions for Impl
+                    // (as Impl at this point is forward-declared only, and will be defined only in EvolvedGSL.cc according to the rationale that the framework’s header files must not contain GSL headers).
 
 ImplPtr createImpl(void*, size_t, int(double,const double*,double*,void*), double, double, const double*, SteppingFunction);
 
@@ -29,6 +29,12 @@ size_t extractFailedSteps(ImplPtr);
 
 
 /// The class that actually implements the Evolved interface
+/**
+ * It bridges the low-level \GSL and higher levels that work with the array type `A`. For this, it has to connect in a bi-directional way the array type `A` with C-arrays used by \GSL,
+ * which is performed by the functions in ArrayTraits.h.
+ *
+ * \todo Migrate to gsl_odeiv2
+ */
 template<typename A>
 class MakerGSL<A>::_: public Evolved<A>
 {
@@ -39,6 +45,7 @@ public:
 
   using Base::getA; using Base::getTime; using Base::getDtTry;
 
+  /** \see MakerGSL::MakerGSL() for an explanation of the role of `nextDtTryCorrectionFactor` */
   _(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorrectionFactor)
     : Base(a,derivs,dtInit,epsRel,epsAbs),
       pImpl_(details::createImpl(this,cpputils::size(getA()),auxFunction,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
@@ -92,14 +99,14 @@ private:
 
 
 template<typename A>
-const typename Maker<A>::Ptr MakerGSL<A>::operator()(
-                                                     A& a,
-                                                     Derivs derivs,
-                                                     double dtInit,
-                                                     double epsRel,
-                                                     double epsAbs,
-                                                     const A& scaleAbs
-                                                     ) const
+auto MakerGSL<A>::make(
+                       A& a,
+                       Derivs derivs,
+                       double dtInit,
+                       double epsRel,
+                       double epsAbs,
+                       const A& scaleAbs
+                      ) const -> const Ptr
 {
   return boost::make_shared<_,A&>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorrectionFactor_);
 }

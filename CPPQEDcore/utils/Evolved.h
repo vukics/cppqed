@@ -18,7 +18,7 @@
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
-/// Comprises everything related to ODE adaptive evolution
+/// Comprises utilities related to ODE adaptive evolution
 namespace evolved {
 
 
@@ -113,6 +113,8 @@ private:
  * \tparam A the array type
  *
  * \see MakerGSL::_
+ *
+ * \todo Think about using a shared pointer instead of plain reference for referencing the array
  *
  */
 template<typename A>
@@ -209,10 +211,16 @@ public:
   typedef typename Evolved<A>::Ptr Ptr;
   typedef typename Evolved<A>::Derivs   Derivs  ;
   
-  virtual const Ptr operator()(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const = 0;
+  /// The factory member function expecting the most generic set of parameters
+  const Ptr operator()(A& array, Derivs derivs, double dtInit, double epsRel, double epsAbs,
+                       const A& scaleAbs ///< this parameter is basically an element-wise mask for stepsize control – for an explanation cf. [<tt>gsl_odeiv_control_scaled_new</tt>](http://www.gnu.org/software/gsl/manual/html_node/Adaptive-Step_002dsize-Control.html#Adaptive-Step_002dsize-Control)
+                      ) const {return make(array,derivs,dtInit,epsRel,epsAbs,scaleAbs);}
 
   virtual ~Maker() {}
   
+private:
+  virtual const Ptr make(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const = 0;
+
 };
 
 

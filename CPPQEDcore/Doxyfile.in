@@ -226,7 +226,8 @@ ALIASES                = "tparamRANK=\tparam RANK arity of the Hilbert space" \
                          "refBoost{2}=[\1](http://www.boost.org/doc/libs/1_55_0/libs/\2)" \
                          "refBoostConstruct{2}=\refBoost{<tt>\1</tt>,\2}" \
                          "refStdCpp{2}=[\1](http://www.cplusplus.com/reference/\2)" \
-                         "refStdCppConstruct{2}=\refStdCpp{<tt>\1</tt>,\2}"
+                         "refStdCppConstruct{2}=\refStdCpp{<tt>\1</tt>,\2}" \
+                         "GSL=[GSL](http://www.gnu.org/software/gsl/)"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -759,6 +760,8 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/issues.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexExtensions.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/CVector.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/Evolved.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/utils/EvolvedGSL.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/utils/EvolvedGSL.tcc \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/MathExtensions.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/MultiIndexIterator.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/TMP_Tools.h \
@@ -817,7 +820,8 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */*Fwd.h
+EXCLUDE_PATTERNS       = */*Fwd.h \
+                         *.cc
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
