@@ -12,8 +12,6 @@
 #include "Exception.h"
 #include "Evolved.h"
 
-#include <boost/utility.hpp>
-
 #include <iosfwd>
 #include <string>
 
@@ -153,9 +151,13 @@ private:
 template<typename A>
 class AdaptiveIO
 {
+private:
+  typedef evolved::EvolvedIO<A> EvolvedIO;
+
+  typedef typename EvolvedIO::Ptr Ptr;
+
 public:
-  typedef evolved::EvolvedIO<A>   EvolvedIO;
-  AdaptiveIO(typename EvolvedIO::Ptr evolvedIO);
+  AdaptiveIO(Ptr);
 
   /// Read in the EvolvedIO from a cpputils::iarchive.
   /**
@@ -175,29 +177,24 @@ public:
   double getTime() const {return evolvedIO_->getTime();}
 
 protected:
+  const Ptr getEvolvedIO() const {return evolvedIO_;} ///< note: not the same const-correctness as in Adaptive
+
   mutable SerializationMetadata meta_;
 
 private:
-  const typename EvolvedIO::Ptr evolvedIO_;
+  const Ptr evolvedIO_;
 
 };
 
 
 template<typename A>
-using EvolvedPtrBASE = boost::base_from_member<typename evolved::Evolved<A>::Ptr>;
-
-template<typename A>
-class Adaptive : private EvolvedPtrBASE<A>, public trajectory::AdaptiveIO<A>, public virtual Trajectory
+class Adaptive : public trajectory::AdaptiveIO<A>, public virtual Trajectory
 {
 public:
-  // Some parameter-independent code could still be factored out, but probably very little
+  // needed to break ambiguity with identically named functions in AdaptiveIO
+  using Trajectory::readState; using Trajectory::writeState; using Trajectory::getTime;
 
-  using Trajectory::readState;
-  using Trajectory::writeState;
-  using Trajectory::getTime;
-
-  typedef evolved::Evolved<A>       Evolved;
-  // typedef trajectory::AdaptiveIO<A> AdaptiveIO;
+  typedef evolved::Evolved<A> Evolved;
 
   void step(double deltaT) {step_v(deltaT);}
   
@@ -211,13 +208,13 @@ protected:
   Adaptive(A&, typename Evolved::Derivs, double, const ParsEvolved&, const A&, const evolved::Maker<A>&);
 
   typedef typename Evolved::ConstPtr ConstPtr;
-  typedef typename Evolved::Ptr Ptr;
+  typedef typename Evolved::     Ptr      Ptr;
   
   const ConstPtr getEvolved() const {return ConstPtr(evolved_);}
   const      Ptr getEvolved()       {return          evolved_ ;}
 
   double getDtTry() const {return evolved_->getDtTry();}
-  void resetInitialDtTry() {resetInitialDtTry_v();}
+  void resetInitialDtTry() {evolved_->setDtTry(dtInit_);}
 
   std::ostream& displayParameters_v(std::ostream&) const;
 
@@ -227,8 +224,7 @@ protected:
   const std::string trajectoryID() const  {return trajectoryID_v();}
 
 private:
-
-  typedef EvolvedPtrBASE<A> EvolvedPtrBase;
+  using AdaptiveIO<A>::getEvolvedIO;
 
   double getDtDid_v() const {return evolved_->getDtDid();}
 
@@ -237,10 +233,6 @@ private:
   double getTime_v() const {return evolved_->getTime();}
 
   virtual void step_v(double deltaT) = 0;
-  // Prefer purely virtual functions, so that there is no danger of forgetting to override them. Very few examples anyway for a trajectory wanting to perform only a step of Evolved.
-  // (Only Simulated, but neither Master, nor MCWF_Trajectory)
-
-  virtual void resetInitialDtTry_v() {evolved_->setDtTry(dtInit_);}
 
   virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
   virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}

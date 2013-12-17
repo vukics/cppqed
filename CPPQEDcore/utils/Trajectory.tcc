@@ -224,20 +224,15 @@ cpputils::oarchive& AdaptiveIO<A>::writeState(cpputils::oarchive& oar) const
 
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
-  : EvolvedPtrBase(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
-    AdaptiveIO<A>(EvolvedPtrBase::member),
-    evolved_(EvolvedPtrBase::member),
+  : AdaptiveIO<A>(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
+    evolved_(boost::dynamic_pointer_cast<Evolved>(getEvolvedIO())),
     dtInit_(dtInit)
 {}
 
 
 template<typename A>
-Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, const ParsEvolved& p,         const A& scaleAbs, const evolved::Maker<A>& maker)
-  : EvolvedPtrBase(maker(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs)),
-    AdaptiveIO<A>(EvolvedPtrBase::member),
-    evolved_(EvolvedPtrBase::member),
-    dtInit_(dtInit)
-{}
+Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, const ParsEvolved& p, const A& scaleAbs, const evolved::Maker<A>& maker)
+  : Adaptive(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs,maker) {}
 
 
 template<typename A>

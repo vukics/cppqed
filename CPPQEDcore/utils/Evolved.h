@@ -130,7 +130,9 @@ public:
   A      & getA()       {return this->a_;}
   A const& getA() const {return this->a_;}
 
-protected:
+  virtual ~EvolvedIO() {} ///< necessary in order that EvolvedIO be polymorphic
+
+private:
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
