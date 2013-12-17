@@ -62,3 +62,9 @@ master=--Dt 0.0001 --T 0.0002
 import=run_3qbits_dc
 opts_timing=--dc 0 --Dt 0.01 --NDt 10
 master=--Dt 0.0001 --NDt 2
+
+[continue_1particle1mode_ndt]
+runmodes=single,ensemble,master
+opts=--cutoff 3 --fin 3 --eta 10 --nTraj 5 --dc 0 --Dt 0.01 --NDt 10
+firstrun=
+secondrun=
