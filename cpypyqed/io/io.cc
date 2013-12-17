@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <blitz/tinyvec2.h>
-#include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
 #include <boost/python/exception_translator.hpp>
