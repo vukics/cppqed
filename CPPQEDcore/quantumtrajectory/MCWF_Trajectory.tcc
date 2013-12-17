@@ -251,8 +251,6 @@ cpputils::iarchive&  MCWF_Trajectory<RANK>::readStateMore_v(cpputils::iarchive& 
   return iar;
 }
 
-template<int RANK>
-const char quantumtrajectory::MCWF_Trajectory<RANK>::trajectoryID_[]="MCWF_Trajectory";
 
 } // quantumtrajectory
 

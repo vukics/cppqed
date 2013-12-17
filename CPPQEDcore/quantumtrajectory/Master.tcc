@@ -178,9 +178,6 @@ void BaseFast<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperato
 
 } // master
 
-template<int RANK, typename V, bool IS_FAST>
-const char Master<RANK,V,IS_FAST>::trajectoryID_[]="Master";
-
 
 } // quantumtrajectory
 

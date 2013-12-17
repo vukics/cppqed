@@ -149,8 +149,8 @@ private:
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
   const details::DO_Display<RANK,V> doDisplay_;
 
-  std::string trajectoryID_v() const {return trajectoryID_;}
-  static const char trajectoryID_[];
+  const std::string trajectoryID_v() const {return "Master";}
+
 };
 
 

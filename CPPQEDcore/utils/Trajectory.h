@@ -42,19 +42,22 @@ struct SerializationMetadata
       typeID(type),
       trajectoryID(id)
   {};
+
   int protocolVersion;
   int rank;
   std::string typeID;
   std::string trajectoryID;
-  
+
   static const std::string UNSPECIFIED;
   static const std::string ARRAY_ONLY;
 
+private:
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & typeID & trajectoryID;}
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
+
 };
 
 
@@ -221,7 +224,7 @@ protected:
   cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       final;
   cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const final;
 
-  std::string trajectoryID() const  {return trajectoryID_v();}
+  const std::string trajectoryID() const  {return trajectoryID_v();}
 
 private:
 
@@ -242,7 +245,7 @@ private:
   virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
   virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
 
-  virtual std::string trajectoryID_v() const = 0;
+  virtual const std::string trajectoryID_v() const = 0;
 
   const Ptr evolved_;
 

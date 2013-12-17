@@ -129,8 +129,8 @@ private:
 
   mutable MCWF_Logger logger_;
 
-  std::string trajectoryID_v() const {return trajectoryID_;}
-  static const char trajectoryID_[];
+  const std::string trajectoryID_v() const {return "MCWF_Trajectory";}
+
 };
 
 
