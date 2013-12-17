@@ -106,9 +106,16 @@ class Verifier(OutputManager):
     r = qed.load_statevector(res)
     e = qed.load_statevector(exp)
     if not (np.allclose(r,e) and np.allclose(r.time,e.time)):
-      self.differ(res,exp)
+      self._differ(res,exp)
     else:
       self._equiv(res,exp)
+
+class Continuer(Runner):
+  def run(self):
+    self.cp.set(self.test,'opts_thisrun',self.cp.get(self.test,'firstrun'))
+    Runner.run(self)
+    self.cp.set(self.test,'opts_thisrun',self.cp.get(self.test,'secondrun'))
+    Runner.run(self,clean=False)
 
 def main():
   op = OptionParser()
