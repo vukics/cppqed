@@ -4,9 +4,7 @@
 
 #include "MasterFwd.h"
 
-#include "ExactFwd.h"
-#include "HamiltonianFwd.h"
-#include "LiouvilleanFwd.h"
+#include "Structure.h"
 
 #include "DO_Display.h"
 #include "Types.h"

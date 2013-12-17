@@ -4,8 +4,7 @@
 
 #include "Master.h"
 
-#include "QuantumSystem.h"
-#include "Structure.h"
+#include "QuantumTrajectory.h"
 
 #include "MathExtensions.h"
 
@@ -32,7 +31,7 @@ Base<RANK>::Base(DensityOperator& rho,
                  )
   : Adaptive(rho.getArray(),
              bind(&Base<RANK>::derivs,this,_1,_2,_3),
-             structure::initialTimeStep<RANK>(qs),
+             initialTimeStep<RANK>(qs),
              p,
              scaleAbs,
              evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),

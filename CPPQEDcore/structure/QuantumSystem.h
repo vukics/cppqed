@@ -7,9 +7,8 @@
 
 #include "DimensionsBookkeeper.h"
 
-#include "Trajectory.h"
-
 #include <boost/shared_ptr.hpp>
+
 
 namespace structure {
 
@@ -48,11 +47,6 @@ private:
 
 };
 
-template<int RANK>
-inline double initialTimeStep(typename QuantumSystem<RANK>::Ptr qs)
-{
-  return trajectory::initialTimeStep(qs->highestFrequency());
-}
 
 } // structure
 
