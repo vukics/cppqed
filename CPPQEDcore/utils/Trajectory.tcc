@@ -1,10 +1,11 @@
 // -*- C++ -*-
+// Note that some ArrayTraits file declaring the used traits templates must be included *before* inclusion of this file.
+// If the traits are also instantiated after inclusion of this file, then the ArrayTraits file included beforehand must also contain the traits *definitions*.
 #ifndef   UTILS_TRAJECTORY_TCC_INCLUDED
 #define   UTILS_TRAJECTORY_TCC_INCLUDED
 
 #include "Trajectory.h"
 
-#include "ArrayTraits.h"
 #include "Evolved.tcc"
 #include "FormDouble.h"
 #include "ParsTrajectory.h"

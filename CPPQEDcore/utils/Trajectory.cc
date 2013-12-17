@@ -1,3 +1,4 @@
+#include "ArrayTraits.h"
 #include "Trajectory.tcc"
 
 #include "ParsTrajectory.h"

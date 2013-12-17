@@ -1,13 +1,12 @@
 /// \briefFile{Implementation of MakerGSL::_}
 // -*- C++ -*-
+// Note that some ArrayTraits file declaring the used traits templates must be included *before* inclusion of this file.
+// If the traits are also instantiated after inclusion of this file, then the ArrayTraits file included beforehand must also contain the traits *definitions*.
 #ifndef   UTILS_EVOLVEDGSL_TCC_INCLUDED
 #define   UTILS_EVOLVEDGSL_TCC_INCLUDED
 
 #include "EvolvedGSL.h"
 
-// #include "ArrayTraits.h"
-// If we include this here, without having the system see also the necessary overload-specializations, then we get an error at linking time because the general definition is never found.
-// Instead, we rely on inclusion-order dependence: the necessary overload-declarations must be included before EvolvedGSL.tcc
 #include "Evolved.tcc"
 
 #include <boost/make_shared.hpp>
