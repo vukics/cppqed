@@ -1,6 +1,4 @@
 // -*- C++ -*-
-// Note that some ArrayTraits file declaring the used traits templates must be included *before* inclusion of this file.
-// If the traits are also instantiated after inclusion of this file, then the ArrayTraits file included beforehand must also contain the traits *definitions*.
 #ifndef   UTILS_TRAJECTORY_TCC_INCLUDED
 #define   UTILS_TRAJECTORY_TCC_INCLUDED
 
@@ -196,7 +194,7 @@ void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std:
 
 template<typename A>
 AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
-  : meta_(cpputils::typeID(evolvedIO->getA()),
+  : meta_(cpputils::TypeID<A>::value,
           SerializationMetadata::ARRAY_ONLY,
           cpputils::Rank<A>::value),
     evolvedIO_(evolvedIO)

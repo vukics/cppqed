@@ -13,7 +13,7 @@ template<typename A>
 struct Rank;
 
 template<typename A>
-const std::string typeID(const A& a);
+struct TypeID;
 
 /// \name Array memory traits
 //@{

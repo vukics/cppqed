@@ -15,9 +15,27 @@ namespace cpputils {
 template<typename Numtype, int RANK>
 struct Rank<blitz::Array<Numtype,RANK> > : boost::mpl::int_<RANK> {};
 
+template<int RANK>
+struct TypeID<DArray<RANK> >
+{
+  static const std::string value;
+};
+
+template<int RANK>
+const std::string TypeID<DArray<RANK> >::value="DArray";
+
+
+template<int RANK>
+struct TypeID<CArray<RANK> >
+{
+  static const std::string value;
+};
+
+template<int RANK>
+const std::string TypeID<CArray<RANK> >::value="CArray";
+
 /// \name `blitz::Array` memory traits for `blitz::Array<double,n>`
 //@{
-
 
 template<int n>
 inline bool isStorageContiguous(const DArray<n>& a) {return a.isStorageContiguous();}
@@ -29,10 +47,6 @@ inline size_t size(const DArray<n>& a) {return a.size();}
 
 template<int n>
 inline std::vector<size_t> dimensions(const DArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
-
-
-template<int n>
-inline const std::string typeID(const DArray<n>&) {return "DArray";};
 
 
 template<int n>
@@ -67,10 +81,6 @@ inline size_t size(const CArray<n>& a) {return a.size()<<1;} // The size of the 
 
 template<int n>
 inline std::vector<size_t> dimensions(const CArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
-
-
-template<int n>
-inline const std::string typeID(const CArray<n>&) {return "CArray";}
 
 
 template<int n>
