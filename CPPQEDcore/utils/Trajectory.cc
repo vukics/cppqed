@@ -1,4 +1,3 @@
-#include "BlitzArrayTraits.h"
 #include "Trajectory.tcc"
 
 #include "ParsTrajectory.h"

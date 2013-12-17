@@ -4,8 +4,9 @@
 
 #include "Trajectory.h"
 
-#include "FormDouble.h"
+#include "ArrayTraits.h"
 #include "Evolved.tcc"
+#include "FormDouble.h"
 #include "ParsTrajectory.h"
 #include "SmartPtr.h"
 
@@ -196,7 +197,7 @@ template<typename A>
 AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
   : meta_(cpputils::typeID(evolvedIO->getA()),
           SerializationMetadata::ARRAY_ONLY,
-          cpputils::rank(evolvedIO->getA())),
+          cpputils::Rank<A>::value),
     evolvedIO_(evolvedIO)
 {};
 
@@ -205,7 +206,7 @@ cpputils::iarchive& AdaptiveIO<A>::readState(cpputils::iarchive& iar)
 {
   bool dimension_check = meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY;
   iar & meta_;
-  if(meta_.rank!=cpputils::rank(evolvedIO_->getA()))
+  if (meta_.rank!=cpputils::Rank<A>::value)
     throw RankMismatchException();
   std::vector<size_t> dims = cpputils::dimensions(evolvedIO_->getA());
   iar & *evolvedIO_;

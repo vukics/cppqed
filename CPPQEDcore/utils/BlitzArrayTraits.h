@@ -3,13 +3,17 @@
 #ifndef UTILS_BLITZARRAYTRAITS_H_INCLUDED
 #define UTILS_BLITZARRAYTRAITS_H_INCLUDED
 
+#include "ArrayTraits.h"
 #include "BlitzArray.h"
-#include <boost/iterator/iterator_concepts.hpp>
-#include <string>
-#include <vector>
+
+#include <boost/mpl/int.hpp>
+
 
 namespace cpputils {
 
+
+template<typename Numtype, int RANK>
+struct Rank<blitz::Array<Numtype,RANK> > : boost::mpl::int_<RANK> {};
 
 /// \name `blitz::Array` memory traits for `blitz::Array<double,n>`
 //@{
@@ -28,11 +32,7 @@ inline std::vector<size_t> dimensions(const DArray<n>& a) {return std::vector<si
 
 
 template<int n>
-inline size_t rank(const DArray<n>&) {return n;} // The parameter a is actually only needed for template argument deduction.
-
-
-template<int n>
-inline std::string typeID(const DArray<n>&) {return "DArray";};
+inline const std::string typeID(const DArray<n>&) {return "DArray";};
 
 
 template<int n>
@@ -70,11 +70,7 @@ inline std::vector<size_t> dimensions(const CArray<n>& a) {return std::vector<si
 
 
 template<int n>
-inline size_t rank(const CArray<n>&) {return n;} // The parameter is actually only needed for template argument deduction.
-
-
-template<int n>
-inline std::string typeID(const CArray<n>&) {return "CArray";}
+inline const std::string typeID(const CArray<n>&) {return "CArray";}
 
 
 template<int n>

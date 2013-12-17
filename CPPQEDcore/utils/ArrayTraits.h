@@ -9,9 +9,16 @@
 namespace cpputils {
 
 
+template<typename A>
+struct Rank;
+
+template<typename A>
+const std::string typeID(const A& a);
 
 /// \name Array memory traits
 //@{
+
+
 
 
 template<typename A>
@@ -24,17 +31,6 @@ size_t size(const A& a);
 template<typename A>
 std::vector<size_t> dimensions(const A& a);
 
-template<typename A>
-size_t rank();
-
-
-template<typename A>
-inline size_t rank(const A& a) {return rank<A>();};
-
-
-
-template<typename A>
-std::string typeID(const A& a);
 
 
 template<typename A>
@@ -77,9 +73,9 @@ template<typename A>
 
 template<typename A>
 size_t subscriptLimit(const A& a);
-  
+
 //@}
-  
+
 } // cpputils
 
 
