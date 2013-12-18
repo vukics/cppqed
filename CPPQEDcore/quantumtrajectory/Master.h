@@ -63,6 +63,8 @@ protected:
 
   const typename Averaged::Ptr getAv() const {return qs_.getAv();}
 
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar);
+
 private:
   void              step_v(double);
 

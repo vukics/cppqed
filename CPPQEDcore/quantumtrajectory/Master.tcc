@@ -84,6 +84,15 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
 
 template<int RANK>
+cpputils::iarchive&
+Base<RANK>::readStateMore_v(cpputils::iarchive& iar)
+{
+  Adaptive:: readStateMore_v(iar);
+  if (qs_.getEx()) tIntPic0_=getTime();
+  return iar;
+}
+
+template<int RANK>
 void 
 Base<RANK>::step_v(double deltaT)
 {

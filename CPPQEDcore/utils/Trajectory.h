@@ -223,6 +223,9 @@ protected:
 
   const std::string trajectoryID() const  {return trajectoryID_v();}
 
+  virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
+  virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
+
 private:
   using AdaptiveIO<A>::getEvolvedIO;
 
@@ -233,9 +236,6 @@ private:
   double getTime_v() const {return evolved_->getTime();}
 
   virtual void step_v(double deltaT) = 0;
-
-  virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
-  virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
 
   virtual const std::string trajectoryID_v() const = 0;
 
