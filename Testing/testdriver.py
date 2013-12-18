@@ -84,7 +84,7 @@ class Runner(OutputManager):
       if not ret==0: sys.exit(ret)
 
   def _extend_opts(self, options, section, option_prefix):
-    for option in [ item[0] for item in self.cp.items(section) if item[0].startswith(option_prefix)]:
+    for option in sorted([ item[0] for item in self.cp.items(section) if item[0].startswith(option_prefix)]):
       options.extend(self.cp.get(section,option).split())
 
   def _build_commandline(self, runmode):
