@@ -70,26 +70,3 @@ Issues
   * make SerializationMetaData a data member of trajectory::Trajectory, then, the virtual interface can be as it was before (no writeMeta & no extra argument for readState is needed)
   
   * Rationale: each archive is self-contained, so that it contains its own metadata. Then, the state files can eventually even be split into several archives, each containing a single self-contained state.
-  
-
-# C++11 features currently used:
-
-  * variadic templates – variadic parameter lists
-  * template aliases
-  * new function declaration syntax
-  * auto keyword => new for syntax
-  * rvalue references
-  * new initialization syntax + initialization lists
-  * delegating constructors 4.7,3.0
-  
-  => This sets the compiler requirement to g++ >= 4.7 ; clang++ >= 3.1
-
-  * To be adopted
-  
-    * inherited constructors 4.8,3.3
-    * (rvalue references for StateVectorLow& in e.g. Hamiltonian::addContribution 3rd argument – move constructor for blitz::Array would be needed?)
-    * initialization of static constants within the class
-    * forward-declared enums 4.6,3.1
-    * Non-static data member initializers
-    * lambda 4.5,3.1
-    * decltype 4.8,2.9
