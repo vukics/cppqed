@@ -122,7 +122,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 
   if (displayInfo) {
     if (!continuing)
-      traj.displayKey(traj.displayParameters(os)<<endl<<"# Key to data:"<<endl)
+      traj.displayParameters(os)
         <<endl<<"# Run Trajectory up to time "<<timeToReach
         <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
     else

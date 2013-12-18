@@ -28,10 +28,10 @@ ostream& Trajectory::display(ostream& os, int precision) const
 }
 
 
-ostream& Trajectory::displayKey(ostream& os) const
+ostream& Trajectory::displayParameters(ostream& os) const
 {
   size_t i=3;
-  return displayKey_v( os<<"# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
+  return displayKey_v(displayParameters_v(os)<<endl<<"# Key to data:\n# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
 }
 
 

@@ -108,15 +108,14 @@ class Trajectory : private boost::noncopyable
 {
 public:
   std::ostream& display   (std::ostream&, int) const;
-  std::ostream& displayKey(std::ostream&     ) const;
 
   void evolve(double deltaT) {evolve_v(deltaT);} // A step of exactly deltaT
 
   double getTime() const {return getTime_v();}
 
   double getDtDid() const {return getDtDid_v();}
+  std::ostream& displayParameters(std::ostream& os) const;
 
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);}
   
   std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);}
   
