@@ -146,24 +146,23 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
         advance(traj,length,displayFreq);
         stateSaved=evsDisplayed=false;
       }
-      
-      if ((!count || doDisplay(count,displayFreq)) && (count || !continuing)) {
-      
+
+      if (!count || doDisplay(count,displayFreq)) {
+
         if (
             stateDisplayFreq && 
             !(stateCount%stateDisplayFreq) && 
-            (stateCount || firstStateDisplay)
+            (stateCount || (firstStateDisplay && !continuing))
            )
         {
           writeViaSStream(traj,ofs.get());
           stateSaved=true;
         }
+        ++stateCount;
 
-        if (count || !continuing) traj.display(os,precision); ++stateCount;
+        if (count || !continuing) traj.display(os,precision);
         evsDisplayed=true;
-              
       }
-    
     }
 
   } catch (const StoppingCriterionReachedException& except) {os<<"\n# Stopping criterion has been reached"<<endl;}
