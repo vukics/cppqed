@@ -100,19 +100,11 @@ private:
 };
 
 
-/// A common interface for (adaptive stepsize) ODE drivers
+/// Class for serialization of Evolved states
 /**
- * It takes the array type it operates on as template parameter. A given array type can be adapted to the form expected by Evolved by suitable specializations of „memory traits” functions.
- * (cf. ArrayTraits.h, for an implementation for `blitz::Array` cf. BlitzArrayTraits.h)
- *
- * The array which is actually "evolved" is not owned by Evolved.
- *
- * The class uses the strategy idiom for calculating the time derivative. The use of [<tt>boost::function</tt>](http://www.boost.org/doc/libs/1_55_0/doc/html/function.html)
- * assures that a rather wide range of entities will be accepted as strategy functor.
+ * \see trajectory::AdaptiveIO
  *
  * \tparam A the array type
- *
- * \see MakerGSL::_
  *
  * \todo Think about using a shared pointer instead of plain reference for referencing the array
  *
@@ -124,7 +116,9 @@ public:
   typedef boost::shared_ptr<EvolvedIO>            Ptr;
   typedef boost::shared_ptr<const EvolvedIO> ConstPtr;
 
+  /// straightforward constructor \see TimeStepBookkeeper::TimeStepBookkeeper()
   EvolvedIO(A&, double dtInit, double epsRel, double epsAbs);
+
   using TimeStepBookkeeper::operator=;
 
   A      & getA()       {return this->a_;}
@@ -140,11 +134,26 @@ private:
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
   A& a_;
+
 };
 
-template<typename A>
-typename EvolvedIO<A>::Ptr makeIO(A &a, double t=0);
 
+
+/// A common interface for (adaptive stepsize) ODE drivers
+/**
+ * It takes the array type it operates on as template parameter. A given array type can be adapted to the form expected by Evolved by suitable specializations of „memory traits” functions.
+ * (cf. ArrayTraits.h, for an implementation for `blitz::Array` cf. BlitzArrayTraits.h)
+ *
+ * The array which is actually "evolved" is not owned by Evolved.
+ *
+ * The class uses the strategy idiom for calculating the time derivative. The use of [<tt>boost::function</tt>](http://www.boost.org/doc/libs/1_55_0/doc/html/function.html)
+ * assures that a rather wide range of entities will be accepted as strategy functor.
+ *
+ * \tparam A the array type
+ *
+ * \see MakerGSL::_
+ *
+ */
 template<typename A>
 class Evolved : public EvolvedIO<A>
 {
@@ -154,7 +163,7 @@ public:
   typedef boost::shared_ptr<      Evolved>      Ptr;
   typedef boost::shared_ptr<const Evolved> ConstPtr;
   
-  /// straightforward constructor \see TimeStepBookkeeper::TimeStepBookkeeper()
+  /// straightforward constructor \see EvolvedIO::EvolvedIO()
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
 
   using TimeStepBookkeeper::operator=;
@@ -168,7 +177,7 @@ public:
 
   std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os<<versionHelper());} ///< delegates to private virtual
 
-  /// \name Getters
+  /// \name Getter
   //@{
   const Derivs getDerivs() const {return derivs_;}
   //@}
@@ -211,7 +220,7 @@ class Maker
 {
 public:
   typedef typename Evolved<A>::Ptr Ptr;
-  typedef typename Evolved<A>::Derivs   Derivs  ;
+  typedef typename Evolved<A>::Derivs Derivs;
   
   /// The factory member function expecting the most generic set of parameters
   const Ptr operator()(A& array, Derivs derivs, double dtInit, double epsRel, double epsAbs,
