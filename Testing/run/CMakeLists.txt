@@ -1,11 +1,8 @@
-add_custom_target(check_run
-                  COMMAND ${CMAKE_CTEST_COMMAND} -V
-                  DEPENDS 1particle1mode PTLA_C++QED PTLA_Evolved 3qbits
-)
+testdir(run 1particle1mode PTLA_C++QED PTLA_Evolved 3qbits)
 
 # PTLA_C++QED as a representative of simulating a free
 
-set(TESTNAME run_PTLA_C++QED_dc)
+declaretest(run_PTLA_CPPQED_dc)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PTLA_C++QED>)
 add_test( NAME verify_${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}

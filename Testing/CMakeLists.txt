@@ -7,16 +7,21 @@ find_package(PythonInterp 2 REQUIRED)
 
 configure_file(testdriver.conf.in testdriver.conf)
 
-add_custom_target(check
-                  DEPENDS cpypyqed check_run check_continue testdriver.conf.in
-)
+add_custom_target(check DEPENDS io check_run check_continue testdriver.conf.in)
 
-set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf)
+macro(testdir dir)
+  set(TESTSDEPEND ${ARGN})
+  add_custom_target(check_${dir}
+                  COMMAND ${CMAKE_CTEST_COMMAND} -V
+                  DEPENDS ${TESTSDEPEND}
+  )
+  set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf ${CMAKE_CURRENT_LIST_DIR}/testdriver.conf)
+endmacro()
 
-# Testing the testdriver itself
-
-add_test(NAME testdriver
-         COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT} )
+macro(declaretest name)
+  set(TESTNAME ${name})
+  add_custom_target(${name} COMMAND ${CMAKE_CTEST_COMMAND} -V -R "^${name}$" DEPENDS ${TESTSDEPEND})
+endmacro()
 
 add_subdirectory(run)
 add_subdirectory(continue)

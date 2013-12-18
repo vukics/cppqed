@@ -102,13 +102,13 @@ class Verifier(OutputManager):
   def _equiv(self,res,exp):
     logging.debug("{} and {} are equivalent.".format(res,exp))
   def _verify_ev(self,res,exp):
-    if not np.allclose(self._load_sv(res),self._load_state(exp)):
+    if not np.allclose(self._load_sv(res),self._load_sv(exp)):
       self._differ(res,exp)
     else:
       self._equiv(res,exp)
   def _verify_state(self,res,exp):
-    r_state,r_time = self._load_state(res)
-    e_state,e_time = self._load_state(exp)
+    _,r_state,r_time = self._load_state(res)
+    _,e_state,e_time = self._load_state(exp)
     if not (np.allclose(r_state,e_state) and np.allclose(r_time,e_time)):
       self._differ(res,exp)
     else:
@@ -131,10 +131,7 @@ def main():
 
   (options,args) = op.parse_args()
 
-  if len(args) != 1:
-    op.error("incorrect number of arguments")
-
-  cp.read(args[0])
+  cp.read(args)
   sys.path.append(cp.get('Setup','modulepath'))
   # we can only load pycppqed after we know where to look for the cpypyqed module
   global cpypyqed
