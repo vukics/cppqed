@@ -93,19 +93,23 @@ class Verifier(OutputManager):
       statefile = self.state_output(runmode)
       self._verify_ev(svfile,os.path.join(self.expecteddir,os.path.basename(svfile)))
       self._verify_state(statefile,os.path.join(self.expecteddir,os.path.basename(statefile)))
+  def _load_sv(self,fname):
+    return np.genfromtxt(fname)
+  def _load_state(self,fname):
+    return cpypyqed.io.read(fname)
   def _differ(self,res,exp):
     sys.exit("Error: {} and {} differ.".format(res,exp))
   def _equiv(self,res,exp):
     logging.debug("{} and {} are equivalent.".format(res,exp))
   def _verify_ev(self,res,exp):
-    if not np.allclose(qed.load_cppqed(res),qed.load_cppqed(exp)):
+    if not np.allclose(self._load_sv(res),self._load_state(exp)):
       self._differ(res,exp)
     else:
       self._equiv(res,exp)
   def _verify_state(self,res,exp):
-    r = qed.load_statevector(res)
-    e = qed.load_statevector(exp)
-    if not (np.allclose(r,e) and np.allclose(r.time,e.time)):
+    r_state,r_time = self._load_state(res)
+    e_state,e_time = self._load_state(exp)
+    if not (np.allclose(r_state,e_state) and np.allclose(r_time,e_time)):
       self._differ(res,exp)
     else:
       self._equiv(res,exp)
@@ -133,9 +137,9 @@ def main():
   cp.read(args[0])
   sys.path.append(cp.get('Setup','modulepath'))
   # we can only load pycppqed after we know where to look for the cpypyqed module
-  global qed
-  import pycppqed as qed
-  logging.info("Taking cpypyqed from {}".format(qed.io.ciobin.__file__))
+  global cpypyqed
+  import cpypyqed.io
+  logging.info("Taking cpypyqed from {}".format(cpypyqed.io.__file__))
 
   if options.testclass:
     constructor = globals()[options.testclass]
