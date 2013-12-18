@@ -1,8 +1,5 @@
+/// \briefFile{Defines the basic classes of the trajectory-bundle}
 // -*- C++ -*-
-// Adaptive is more than Evolved only in that it takes into account the need for communicating towards the user from time to time during Evolution.
-// This is manifested in the abstract function Display.
-// Consider copying (cloning) of Trajectories
-
 #ifndef UTILS_TRAJECTORY_H_INCLUDED
 #define UTILS_TRAJECTORY_H_INCLUDED
 
@@ -16,11 +13,40 @@
 #include <string>
 
 
-
+/// The trajectory-bundle
 namespace trajectory {
 
 
-void run(Trajectory &, double time, double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
+/// Running in deltaT mode (displays in equal time intervals) for a certain time \related Trajectory
+/**
+ * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
+ *
+ * A Trajectory can
+ * - be \link Trajectory::evolve evolved\endlink (propagated in time by given time intervals)
+ * - \link Trajectory::readState perform i/o of its entire state\endlink, that is, a bunch of information necessary for resuming a Trajectory from a certain time instant
+ * - \link Trajectory::display display relevant physical and numerical information\endlink about its actual state at any time (e.g. a set of quantum averages in the case of a quantum trajectory)
+ *
+ * \note While the entire state can be huge (e.g. the state vector or density operator in the case of a quantum trajectory) the relevant information in an actual numerical experiment
+ * is usually much less (a set of quantum averages that doesn’t entirely define the state).
+ *
+ * Furthermore, a Trajectory can
+ * - provide information about its \link Trajectory::getTime time\endlink and \link Trajectory::getDtDid last performed timestep\endlink
+ * - \link Trajectory::displayParameters print a header\endlink summarizing its physical and numerical parameters together with a key to the set of relevant physical information displayed during the run
+ * - \link Trajectory::logOnEnd print a log\endlink at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
+ *
+ * \todo Consider taking Trajectory by rvalue reference
+ *
+ */
+void run(Trajectory & trajectory, ///< the trajectory to run
+         double time, ///< end time
+         double deltaT, ///< time interval between two \link Trajectory::display displays\endlink
+         unsigned sdf, ///< number of \link Trajectory::display displays\endlink between two \link Trajectory::writeState state displays\endlink
+         const std::string& ofn, ///< name of the output file for \link Trajectory::display displays\endlink — if empty, display to standard output; \link Trajectory::writeState state displays\endlink into file named `ofn.state`
+         const std::string& initialFileName, ///< name of file containing initial condition state for the run
+         int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
+         bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
+         bool firstStateDisplay ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
+        );
 
 void run(Trajectory &, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
 
@@ -31,6 +57,8 @@ void run(Trajectory &, const ParsRun&);
 
 template<typename A>
 void run(Adaptive<A>&, const ParsRun&);
+
+
 
 struct SerializationMetadata
 {
@@ -97,31 +125,41 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
 // A heuristic determination of the inital timestep from the highest frequency of a physical system.
 
 
-/////////////
-//
-// Trajectory
-//
-/////////////
 
-
+/// The base class of the trajectory-bundle condensing the quintessential characteristics of any trajectory
+/**
+ * \see run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) which manifests all the principal functionalities of this class
+ *
+ * The i/o of the entire state is performed via \refBoost{Boost.Serialization,serialization}, and is disabled if this library is not installed
+ *
+ * \todo Consider the possibility of cloning Trajectories
+ */
 class Trajectory : private boost::noncopyable
 {
 public:
-  std::ostream& display   (std::ostream&, int) const;
+  /// Propagation for a time interval of exactly deltaT
+  void evolve(double deltaT) {evolve_v(deltaT);}
 
-  void evolve(double deltaT) {evolve_v(deltaT);} // A step of exactly deltaT
+  /// Displays a limited set of relevant physical and numerical information about the actual state of Trajectory at the actual time instant
+  std::ostream& display(std::ostream&, int precision ///< the precision (number of digits) of display
+                       ) const;
 
-  double getTime() const {return getTime_v();}
+  /// \name Getters
+  //@{
+  double getTime() const {return getTime_v();} ///< actual time instant
+  double getDtDid() const {return getDtDid_v();} ///< last perfomed timestep
+  //@}
 
-  double getDtDid() const {return getDtDid_v();}
-  std::ostream& displayParameters(std::ostream& os) const;
+  std::ostream& displayParameters(std::ostream& os) const; ///< print header
 
-  
-  std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);}
-  
-  cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return  readState_v(iar);}
-  cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return writeState_v(oar);};
-  
+  std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);} ///< print a log at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
+
+  /// \name Entire state i/o
+  //@{
+  cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return  readState_v(iar);} ///< read from an archive
+  cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return writeState_v(oar);} ///< write to an archive
+  //@}
+
   virtual ~Trajectory() {}
 
 private:
@@ -186,6 +224,7 @@ private:
 };
 
 
+/// Adaptive is more than Evolved only in that it takes into account the need for communicating towards the user from time to time during propagation
 template<typename A>
 class Adaptive : public trajectory::AdaptiveIO<A>, public virtual Trajectory
 {
