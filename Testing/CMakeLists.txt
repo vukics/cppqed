@@ -1,5 +1,9 @@
 project(testing)
 
+# Please avoid any special characters in test names (+,^,.,etc.)
+# The ctest command might interpret them as regular expressions
+
+
 include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
 include(${CPPQED_USE})
 

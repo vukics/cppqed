@@ -34,11 +34,20 @@ class OptionsManager(object):
     self.options,self.cp = options,cp
     self.test = options.test
     if not self.test: sys.exit('--test missing')
-    if self.cp.has_option(self.test,'import'):
-      for item in self.cp.items(self.cp.get(self.test,'import')):
+
+    # if the current section has the key 'import=othersection', import all keys from 'othersection'
+    # if they are not present already
+    import_section=self.get_option('import')
+    if import_section:
+      for item in self.cp.items(import_section):
         if not self.cp.has_option(self.test,item[0]):
           self.cp.set(self.test, *item)
 
+  def get_option(self, name, default=None):
+    if self.cp.has_option(self.test,name):
+      return self.cp.get(self.test,name)
+    else:
+      return default
 
 class OutputManager(OptionsManager):
   def __init__(self, *args, **kwargs):
@@ -48,24 +57,26 @@ class OutputManager(OptionsManager):
     mkdir_p(self.outputdir)
     self.script = self.options.script
     if not self.script: sys.exit('--script missing')
-    self.runmodes = self.cp.get(self.test, 'runmodes').split(',')
 
-  def output(self, runmode):
-    return os.path.join(self.outputdir, self.test+'_'+runmode)
+  def runmodes(self,section=None):
+    if section is None: section=self.test
+    return self.cp.get(section, 'runmodes').split(',')
 
-  def state_output(self, runmode):
-    return self.output(runmode)+'.state'
+  def output(self, runmode, section=None, statefile=False):
+    if section is None: section=self.test
+    output = os.path.join(self.outputdir, section+'_'+runmode)
+    if statefile: output+=".state"
+    return output
 
   def clean(self, runmode):
-    for file in (self.output(runmode),self.state_output(runmode)):
-      rm_f(file)
-
+    rm_f(self.output(runmode))
+    rm_f(self.output(runmode,statefile=True))
 
 # The test classes
 
 class Runner(OutputManager):
   def run(self, clean=True):
-    for runmode in self.runmodes:
+    for runmode in self.runmodes():
       if clean: self.clean(runmode)
       command = self._build_commandline(runmode)
       logging.debug(subprocess.list2cmdline(command))
@@ -87,32 +98,55 @@ class Runner(OutputManager):
     return result
 
 class Verifier(OutputManager):
+  def __init__(self,*args,**kwargs):
+    OutputManager.__init__(self,*args,**kwargs)
+    self.thisSection  = self.get_option('this',default=self.test)
+    self.otherSection = self.get_option('other')
+
   def run(self):
-    for runmode in self.runmodes:
-      svfile = self.output(runmode)
-      statefile = self.state_output(runmode)
-      self._verify_ev(svfile,os.path.join(self.expecteddir,os.path.basename(svfile)))
-      self._verify_state(statefile,os.path.join(self.expecteddir,os.path.basename(statefile)))
+    mode=self.get_option('verify')
+    if mode is None or mode=='full':
+      self._verify_full()
+    elif mode=='outcome':
+      self._verify_outcome()
+  def _verify_full(self):
+    for runmode in self.runmodes(section=self.thisSection):
+      self._verify_ev(self._thisOutput(runmode),self._otherOutput(runmode))
+      self._verify_state(self._thisOutput(runmode,statefile=True),self._otherOutput(runmode,statefile=True))
+  def _thisOutput(self,runmode,statefile=False):
+    return self.output(runmode,section=self.thisSection,statefile=statefile)
+  def _otherOutput(self,runmode,statefile=False):
+    if self.otherSection is None:
+      return os.path.join(self.expecteddir,os.path.basename(self._thisOutput(runmode,statefile)))
+    else:
+      return self.output(runmode,section=self.otherSection,statefile=statefile)
   def _load_sv(self,fname):
     return np.genfromtxt(fname)
   def _load_state(self,fname):
     return cpypyqed.io.read(fname)
-  def _differ(self,res,exp):
-    sys.exit("Error: {} and {} differ.".format(res,exp))
-  def _equiv(self,res,exp):
-    logging.debug("{} and {} are equivalent.".format(res,exp))
-  def _verify_ev(self,res,exp):
-    if not np.allclose(self._load_sv(res),self._load_sv(exp)):
-      self._differ(res,exp)
-    else:
-      self._equiv(res,exp)
-  def _verify_state(self,res,exp):
-    _,r_state,r_time = self._load_state(res)
-    _,e_state,e_time = self._load_state(exp)
-    if not (np.allclose(r_state,e_state) and np.allclose(r_time,e_time)):
-      self._differ(res,exp)
-    else:
-      self._equiv(res,exp)
+  def _differ(self,this,other):
+    sys.exit("Error: {} and {} differ.".format(this,other))
+  def _equiv(self,this,other):
+    logging.debug("{} and {} are equivalent.".format(this,other))
+  def _verify_ev(self,this,other):
+    if not np.allclose(self._load_sv(this),self._load_sv(other)): self._differ(this,other)
+    else: self._equiv(this,other)
+  def _verify_state(self,this,other):
+    _,r_state,r_time = self._load_state(this)
+    _,e_state,e_time = self._load_state(other)
+    if not (np.allclose(r_state,e_state) and np.allclose(r_time,e_time)): self._differ(this,other)
+    else: self._equiv(this,other)
+  def _verify_outcome(self,this,other):
+    _,r_state,r_time=self._load_state(this)
+    _,e_state,e_time=self._load_state(other)
+    if not (np.allclose(r_state[-1],e_state[-1]) and np.allclose(r_time[-1],e_time[-1])):
+      self._differ(this,other)
+    else: self._equiv(this,other)
+
+class VerifiedRunner(Runner,Verifier):
+  def run(self):
+    Runner.run(self)
+    Verifier.run(self)
 
 class Continuer(Runner):
   def run(self):
