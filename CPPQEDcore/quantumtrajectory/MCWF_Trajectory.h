@@ -7,6 +7,7 @@
 #include "StateVectorFwd.h"
 
 #include "MCWF_TrajectoryLogger.h"
+#include "QuantumTrajectory.h"
 #include "Structure.h"
 
 #include "StochasticTrajectory.h"
@@ -59,7 +60,7 @@ namespace quantumtrajectory {
  */
 
 template<int RANK>
-class MCWF_Trajectory : public BASE_class
+class MCWF_Trajectory : public QuantumTrajectory<RANK,BASE_class>
 {
 public:
   typedef structure::Exact        <RANK> Exact      ;
@@ -71,8 +72,7 @@ public:
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
-  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
-
+  typedef quantumtrajectory::QuantumTrajectory<RANK,BASE_class> QuantumTrajectory;
   typedef BASE_class Base;
 
 #undef  BASE_class
@@ -93,8 +93,8 @@ public:
 protected:
   std::ostream&    display_v(std::ostream&, int    ) const;
   std::ostream& displayKey_v(std::ostream&, size_t&) const;
-  
-  const QuantumSystemWrapper getQS() const {return qs_;}
+
+  using QuantumTrajectory::getQSW;
 
   cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar);
   cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const {return Base::writeStateMore_v(oar) & logger_;}
@@ -119,11 +119,7 @@ private:
   void                  performJump                (const Rates&, const IndexSVL_tuples&, double); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
-  mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
-
   StateVector& psi_;
-
-  const QuantumSystemWrapper qs_;
 
   const double dpLimit_, overshootTolerance_;
 

@@ -7,6 +7,7 @@
 #include "Structure.h"
 
 #include "DO_Display.h"
+#include "QuantumTrajectory.h"
 #include "Types.h"
 
 #include "Exception.h"
@@ -31,7 +32,7 @@ struct NoLiouvillean : cpputils::Exception {};
 
 
 template<int RANK>
-class Base : public trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow>
+class Base : public QuantumTrajectory<RANK, trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow> >
 {
 public:
   typedef structure::QuantumSystem<RANK> QuantumSystem;
@@ -45,10 +46,10 @@ public:
 
   typedef trajectory::Adaptive<DensityOperatorLow> Adaptive;
 
+  typedef quantumtrajectory::QuantumTrajectory<RANK, Adaptive> QuantumTrajectory;
+
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
   
-  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
-
   using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime;
 
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
@@ -61,9 +62,9 @@ protected:
 
   DensityOperator& rho_;
 
-  const typename Averaged::Ptr getAv() const {return qs_.getAv();}
+  using QuantumTrajectory::getQSW;
 
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar);
+  const typename Averaged::Ptr getAv() const {return getQSW().getAv();}
 
 private:
   void              step_v(double);
@@ -74,13 +75,6 @@ private:
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
 
   virtual const std::string addToParameterDisplay() const {return "";}
-
-  // ****************
-  // *** Data members
-
-  mutable double tIntPic0_; // The time instant of the beginning of the current time step.
-
-  const QuantumSystemWrapper qs_;
 
 };
 

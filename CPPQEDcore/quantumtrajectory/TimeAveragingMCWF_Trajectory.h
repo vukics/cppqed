@@ -23,7 +23,7 @@ public:
   
   typedef typename Averaged::Averages Averages;
   
-  using Base::getQS; using Base::getDtDid; using Base::getTime; using Base::getPsi;
+  using Base::getQSW; using Base::getDtDid; using Base::getTime; using Base::getPsi;
   
   template<typename SYS>
   TimeAveragingMCWF_Trajectory(
@@ -33,7 +33,7 @@ public:
                                double relaxationTime,
                                const StateVectorLow& scaleAbs=StateVectorLow()
                                )
-    : MCWF_Trajectory<RANK>(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQS().template nAvr<structure::LA_Av>()), sum_(0), av_(getQS().getAv())
+    : MCWF_Trajectory<RANK>(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQSW().template nAvr<structure::LA_Av>()), sum_(0), av_(getQSW().getAv())
     {
       averages_=0.;
     }

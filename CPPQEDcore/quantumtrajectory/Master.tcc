@@ -29,21 +29,20 @@ Base<RANK>::Base(DensityOperator& rho,
                  const master::Pars& p,
                  const DensityOperatorLow& scaleAbs
                  )
-  : Adaptive(rho.getArray(),
+  : QuantumTrajectory(qs,true,
+             rho.getArray(),
              bind(&Base<RANK>::derivs,this,_1,_2,_3),
              initialTimeStep<RANK>(qs),
              p,
              scaleAbs,
              evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
-    rho_(rho),
-    tIntPic0_(0),
-    qs_(qs,true)
+    rho_(rho)
 {
-  if (!qs_.isUnitary()) throw master::NonUnitaryIP();
+  if (!getQSW().isUnitary()) throw master::NonUnitaryIP();
   // If the interaction picture is non-unitary, the density matrix in IP is non-Hermitian. This cannot be allowed here because then the calculation of the Hamiltonian part of the dynamics as implemented below would fail.
   // if (!li_) throw master::NoLiouvillean();
 
-  if (rho!=*qs_.getQS()) throw DimensionalityMismatchException();
+  if (rho!=*getQSW().getQS()) throw DimensionalityMismatchException();
 
 }
 
@@ -55,7 +54,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   PROGRESS_TIMER_IN_POINT(getOstream());
 
-  binaryIter(rhoLow,drhodtLow,bind(&QuantumSystemWrapper::addContribution,qs_,t,_1,_2,tIntPic0_));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,this->tIntPic0_));
 
   PROGRESS_TIMER_OUT_POINT("Hamiltonian");
 
@@ -69,10 +68,10 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
   // Now act with the reset operator --- implement this in terms of
   // the individual jumps by iteration and addition
 
-  for (size_t i=0; i<qs_.template nAvr<structure::LA_Li>(); i++) {
+  for (size_t i=0; i<getQSW().template nAvr<structure::LA_Li>(); i++) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     DensityOperatorLow rhotemp(rhoLow.copy());
-    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,qs_.getLi(),t,_1,i));
+    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,getQSW().getLi(),t,_1,i));
     unaryIter(rhotemp,functionLi);
     blitzplusplus::hermitianConjugateSelf(rhotemp);
     unaryIter(rhotemp,functionLi);
@@ -80,16 +79,6 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
     PROGRESS_TIMER_OUT_POINT("Liouvillean")
   }
 
-}
-
-
-template<int RANK>
-cpputils::iarchive&
-Base<RANK>::readStateMore_v(cpputils::iarchive& iar)
-{
-  Adaptive:: readStateMore_v(iar);
-  if (qs_.getEx()) tIntPic0_=getTime();
-  return iar;
 }
 
 template<int RANK>
@@ -100,11 +89,11 @@ Base<RANK>::step_v(double deltaT)
   getEvolved()->step(deltaT);
   PROGRESS_TIMER_OUT_POINT("Evolved step total")
     ;
-  if (const typename Exact::Ptr ex=qs_.getEx()) {
+  if (const typename Exact::Ptr ex=getQSW().getEx()) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_.getArray());
-    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,tIntPic0_));
+    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,this->tIntPic0_));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);
@@ -113,7 +102,7 @@ Base<RANK>::step_v(double deltaT)
     PROGRESS_TIMER_OUT_POINT("Exact")
   }
 
-  tIntPic0_=getTime();
+  this->tIntPic0_=getTime();
 
 
   // The following "smoothing" of rho_ has proven to be necessary for the algorithm to remain stable:
@@ -138,10 +127,10 @@ template<int RANK>
 std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
-  
-  qs_.displayCharacteristics( qs_.getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
 
-  if (const typename Liouvillean::Ptr li=qs_.getLi()) {
+  getQSW().displayCharacteristics( getQSW().getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
+
+  if (const typename Liouvillean::Ptr li=getQSW().getLi()) {
     os<<"# Decay channels:\n";
     {
       size_t i=0;
