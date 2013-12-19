@@ -11,7 +11,7 @@ find_package(PythonInterp 2 REQUIRED)
 
 configure_file(testdriver.conf.in testdriver.conf)
 
-add_custom_target(check DEPENDS io check_run check_continue testdriver.conf.in)
+add_custom_target(check DEPENDS io check_run check_continue check_boost testdriver.conf.in)
 
 macro(testdir dir)
   set(TESTSDEPEND ${ARGN})
@@ -29,3 +29,5 @@ endmacro()
 
 add_subdirectory(run)
 add_subdirectory(continue)
+add_subdirectory(compilefail)
+add_subdirectory(boost)
