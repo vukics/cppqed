@@ -252,7 +252,6 @@ protected:
   const      Ptr getEvolved()       {return          evolved_ ;}
 
   double getDtTry() const {return evolved_->getDtTry();}
-  void resetInitialDtTry() {evolved_->setDtTry(dtInit_);}
 
   std::ostream& displayParameters_v(std::ostream&) const;
 
@@ -265,7 +264,6 @@ protected:
   virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
 
 private:
-  using AdaptiveIO<A>::getEvolvedIO;
 
   double getDtDid_v() const {return evolved_->getDtDid();}
 

@@ -223,7 +223,7 @@ cpputils::oarchive& AdaptiveIO<A>::writeState(cpputils::oarchive& oar) const
 template<typename A>
 Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
   : AdaptiveIO<A>(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
-    evolved_(boost::dynamic_pointer_cast<Evolved>(getEvolvedIO())),
+    evolved_(boost::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())),
     dtInit_(dtInit)
 {}
 
@@ -249,7 +249,7 @@ cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
     readStateMore_v(iar);
   }
   if (getDtTry()==0)
-    resetInitialDtTry();
+    evolved_->setDtTry(dtInit_); // reset cached initial dtTry
   return iar;
 }
 
