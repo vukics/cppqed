@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
      -2*imag(rho(0,1))  ;
   }
 
-  Simulated<Array> S(zxy,bind(derivs,_1,_2,_3,pp2la),dtinit,Array(),pt);
+  Simulated<Array> S(zxy,bind(derivs,_1,_2,_3,pp2la),dtinit,pt);
   
   run(S,pt);
   

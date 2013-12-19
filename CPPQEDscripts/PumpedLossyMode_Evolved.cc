@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   
   alpha=pplm.minit;
 
-  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pplm),dtinit,Array(),pt);
+  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pplm),dtinit,pt);
   
   run(S,pt);
   

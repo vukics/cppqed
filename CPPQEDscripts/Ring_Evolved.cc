@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
   Array alpha(2); alpha=pmP.minit,pmM.minit;
 
-  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pp,pmP,pmM,ppcP,ppcM),1e-6,Array(),pe);
+  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pp,pmP,pmM,ppcP,ppcM),1e-6,pe);
 
   run(S,pr);
 

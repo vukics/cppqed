@@ -66,12 +66,12 @@ struct ParsRun
 
 };
 
-/*
+
 struct Pars : ParsRun, ParsEvolved
 {
   Pars(parameters::ParameterTable& p, const std::string& mod="") : ParsRun(p,mod), ParsEvolved(p,mod) {}
 };
-*/
+
 
 } // trajectory
 

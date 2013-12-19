@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   
   alpha=pplm.minit,pplqb.qbitInit;
 
-  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pplm,pplqb,pjc.g),dtinit,Array(),pt);
+  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pplm,pplqb,pjc.g),dtinit,pt);
 
   run(S,pt);
 

@@ -4,14 +4,17 @@
 
 #include "SimulatedFwd.h"
 
-#include "EvolvedFwd.h"
-
+#include "ParsTrajectory.h"
 #include "Trajectory.h"
 
 
 namespace trajectory {
 
 
+/**
+ * Example usage: \include HarmonicOscillatorComplex.cc
+ * \todo Provide optional key printing
+ */
 template<typename A> 
 class Simulated : public Adaptive<A>
 {
@@ -24,13 +27,13 @@ public:
 
   Simulated(A&, typename Evolved::Derivs, double dtInit,
             double, double,
-            const A& scaleAbs,
+            const A& scaleAbs=A(),
             const evolved::Maker<A>& =evolved::MakerGSL<A>());
 
-  Simulated(A&, typename Evolved::Derivs, double dtInit,
-            const A& scaleAbs,
-            const ParsEvolved&,
-            const evolved::Maker<A>& =evolved::MakerGSL<A>());
+  Simulated(A& array, typename Evolved::Derivs derivs, double dtInit,
+            const ParsEvolved& pe,
+            const A& scaleAbs=A(),
+            const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 private:
   void step_v(double deltaT) {getEvolved()->step(deltaT);}

@@ -22,15 +22,6 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 {}
 
 
-template<typename A> 
-Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
-                        const A& scaleAbs,
-                        const ParsEvolved& p,
-                        const evolved::Maker<A>& maker)
-  : Base(y,derivs,dtInit,p,scaleAbs,maker)
-{}
-
-
 template<typename A>
 std::ostream& Simulated<A>::display_v(std::ostream& os, int precision) const
 {

@@ -8,8 +8,11 @@
 
 #include "Pars.tcc"
 
-using parameters::ParameterTable    ;
-using parameters::update            ;
+using parameters::ParameterTable;
+using parameters::update        ;
 using parameters::NamedException;
+
+using trajectory::Simulated;
+using trajectory::Pars     ;
 
 #endif // UTILS_SIMULATED_H_INCLUDED

@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     sigma=real(rho(1,0)),imag(rho(1,0));
   }
 
-  Simulated<Array> S(sigma,bind(derivs,_1,_2,_3,pp2la),dtinit,Array(),pt);
+  Simulated<Array> S(sigma,bind(derivs,_1,_2,_3,pp2la),dtinit,pt);
   
   run(S,pt);
 
