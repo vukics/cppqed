@@ -102,7 +102,7 @@ macro(elements_project)
 
   set(ELEMENTSLIB C++QED${PROJECT_NAME}-${CPPQED_ID})
   add_library(${ELEMENTSLIB} SHARED ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc ${${PROJECT_NAME}_PUBLIC_HEADERS} ${OBJ_TARGETS})
-  target_link_libraries(${ELEMENTSLIB} LINK_PRIVATE ${CPPQED_LIBRARIES} ${CPPQEDELEMENTS_LIBRARIES})
+  target_link_libraries(${ELEMENTSLIB} LINK_PRIVATE ${CPPQED_LIBRARIES} ${CPPQEDelements_LIBRARIES})
 
   set_target_properties(${ELEMENTSLIB} PROPERTIES
         PUBLIC_HEADER "${${PROJECT_NAME}_PUBLIC_HEADERS}"
@@ -210,8 +210,8 @@ macro(scripts_project)
   configure_file(${CPPQED_CMAKE_DIR}/component_versions.cc.in ${PROJECT_BINARY_DIR}/component_versions.cc @ONLY)
   configure_file(${CPPQED_CMAKE_DIR}/component_versions.h.in ${PROJECT_BINARY_DIR}/component_versions.h @ONLY)
 
-  add_library(versions_obj OBJECT ${PROJECT_BINARY_DIR}/component_versions.cc ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc)
-  set_target_properties(versions_obj PROPERTIES POSITION_INDEPENDENT_CODE On)
+  add_library(${PROJECT_NAME}_versions_obj OBJECT ${PROJECT_BINARY_DIR}/component_versions.cc ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc)
+  set_target_properties(${PROJECT_NAME}_versions_obj PROPERTIES POSITION_INDEPENDENT_CODE On)
 
   # create all scripts targets
   file(GLOB SCRIPTS . *.cc)
@@ -222,7 +222,7 @@ macro(scripts_project)
     list(FIND EXCLUDE_FROM_ALL_SCRIPTS ${SCRIPT} NOT_ALL)
     if( (EX EQUAL -1) AND (CPPQED_HAS_FLENS OR (F EQUAL -1)) )
       set(SCRIPTNAMES ${SCRIPTNAMES} ${SCRIPT})
-      add_executable(${SCRIPT} ${s} $<TARGET_OBJECTS:versions_obj>)
+      add_executable(${SCRIPT} ${s} $<TARGET_OBJECTS:${PROJECT_NAME}_versions_obj>)
       target_link_libraries(${SCRIPT} ${CPPQED_LIBRARIES} ${ALL_ELEMENTS_LIBRARIES})
       set_target_properties(${SCRIPT} PROPERTIES DEBUG_POSTFIX _d)
       if(NOT_ALL EQUAL -1)
@@ -234,6 +234,6 @@ macro(scripts_project)
     endif()
   endforeach(s)
   # add target "scripts"
-  add_custom_target(scripts)
-  add_dependencies(scripts ${SCRIPTNAMES})
+  add_custom_target(${PROJECT_NAME}_all)
+  add_dependencies(${PROJECT_NAME}_all ${SCRIPTNAMES})
 endmacro()
