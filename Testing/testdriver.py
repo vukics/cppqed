@@ -43,11 +43,12 @@ class OptionsManager(object):
         if not self.cp.has_option(self.test,item[0]):
           self.cp.set(self.test, *item)
 
-  def get_option(self, name, default=None):
+  def get_option(self, name, default=None, required=False):
     if self.cp.has_option(self.test,name):
       return self.cp.get(self.test,name)
     else:
-      return default
+      if not required: return default
+      else: sys.exit("Error: required option {} not found in section {}.".format(name,self.test))
 
 class OutputManager(OptionsManager):
   def __init__(self, *args, **kwargs):
@@ -150,18 +151,31 @@ class VerifiedRunner(Runner,Verifier):
 
 class Continuer(Runner):
   def run(self):
-    self.cp.set(self.test,'opts_thisrun',self.cp.get(self.test,'firstrun'))
+    self.cp.set(self.test,'opts_thisrun',self.get_option('firstrun',default=''))
     Runner.run(self)
-    self.cp.set(self.test,'opts_thisrun',self.cp.get(self.test,'secondrun'))
+    self.cp.set(self.test,'opts_thisrun',self.get_option('secondrun',default=''))
     Runner.run(self,clean=False)
+
+class CompileFail(OptionsManager):
+  def run(self):
+    error=self.options.error
+    command=['make',self.options.script]
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (std,err) = p.communicate()
+    returncode = p.returncode
+    if returncode == 0:
+      sys.exit("Compilation was successfull, but failure was expected.")
+    if not error in err:
+      sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
 
 def main():
   op = OptionParser()
   cp = ConfigParser.SafeConfigParser()
 
-  op.add_option("--test")
-  op.add_option("--testclass")
-  op.add_option("--script")
+  op.add_option("--test", help="the name of the test, and the name of the section in the config file")
+  op.add_option("--testclass", help="the name of the testclass to use, must implement run()")
+  op.add_option("--script", help="the script to run or the target to compile")
+  op.add_option("--error", metavar='STRING', help="string to expect in the compilation failure for CompileFail class")
 
   (options,args) = op.parse_args()
 
