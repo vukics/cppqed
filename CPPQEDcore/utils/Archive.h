@@ -14,9 +14,10 @@
 namespace cpputils {
 
 //////////////////////////////////////////////////////////////
-// class trivial_(i/o)archive 
-// cf. http://www.boost.org/doc/libs/1_53_0/libs/serialization/doc/archive_reference.html#trivial
 
+
+/// Trivial iarchive disabling serialization
+/** \see \refBoost{Boost.Serialization,serialization/doc/archive_reference.html#trivial} */
 class trivial_iarchive {
 public:
   typedef boost::mpl::bool_<false> is_saving; 
@@ -35,6 +36,8 @@ public:
 };
 
 
+/// Trivial oarchive disabling serialization
+/** \copydetails trivial_iarchive */
 class trivial_oarchive {
 public:
   typedef boost::mpl::bool_<true> is_saving; 
@@ -53,8 +56,8 @@ public:
 };
 
 
-typedef trivial_iarchive iarchive;
-typedef trivial_oarchive oarchive;
+typedef trivial_iarchive iarchive; ///< delegated to trivial_iarchive
+typedef trivial_oarchive oarchive; ///< delegated to trivial_oarchive
 
 } // cpputils
 
@@ -65,8 +68,8 @@ typedef trivial_oarchive oarchive;
 
 namespace cpputils {
 
-typedef boost::archive::binary_iarchive iarchive;
-typedef boost::archive::binary_oarchive oarchive;
+typedef boost::archive::binary_iarchive iarchive; ///< delegated to \refBoost{Boost.Serialization,serialization}
+typedef boost::archive::binary_oarchive oarchive; ///< \copydoc iarchive
 
 } // cpputils
 
