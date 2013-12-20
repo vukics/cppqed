@@ -113,11 +113,11 @@ public:
 
   Parameter(const std::string& s, const std::string& d, const formdouble::Zero& v) : Base(s,d,v), v_() {}
 
-  void read(std::istream& is) {Base::read(is); FormDouble::overallPrecision=getReference();}
+  void read(std::istream& is) {Base::read(is); FormDouble::overallPrecision=get();}
 
-  const formdouble::Zero& getReference() const {return v_=formdouble::Zero(Base::getReference());}
+  const formdouble::Zero& get() const {return v_=formdouble::Zero(Base::get());}
 
-  formdouble::Zero& getReference() {return const_cast<formdouble::Zero&>(static_cast<const Parameter*>(this)->getReference());}
+  formdouble::Zero& get() {return const_cast<formdouble::Zero&>(static_cast<const Parameter*>(this)->get());}
 
 private:
   mutable formdouble::Zero v_; // Just a buffer, the actual value is stored in Base

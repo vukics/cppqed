@@ -36,9 +36,10 @@ ParameterTable::add(const std::string& s, const std::string& d, const T& v)
     smwidth_=max(smwidth_,s.length());
     tmwidth_=max(tmwidth_,min(strlen(typeid(T).name()),maxTypeLabelLength));
     dmwidth_=max(dmwidth_,d.length());
-    return pptr->getReference();
+    return pptr->get();
   }
 }
+
 
 
 } // parameters
