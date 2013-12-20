@@ -12,9 +12,11 @@ set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
 set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 add_subdirectory(cpypyqed)
-add_subdirectory(CustomElementsExample)
-set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
-add_subdirectory(CustomScriptsExample)
+
+# Disabled CustomExample compilation by default for now, add it as a test later
+# add_subdirectory(CustomElementsExample)
+# set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
+# add_subdirectory(CustomScriptsExample)
 
 option(COMPILE_SCRIPTS "Compile the example scripts" On)
 if(COMPILE_SCRIPTS)
