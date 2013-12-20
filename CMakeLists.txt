@@ -5,11 +5,7 @@ project(elements)
 ############################################################
 # This section is essential to find the required libraries 
 # and include files
-if(NOT DEFINED CPPQED_MONOLITHIC)
-  find_package(CPPQED 2.99 REQUIRED)
-else(NOT DEFINED CPPQED_MONOLITHIC)
-  include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
-endif(NOT DEFINED CPPQED_MONOLITHIC)
+find_package(CPPQED 2.99 REQUIRED)
 include(${CPPQED_USE})
 ############################################################
 
