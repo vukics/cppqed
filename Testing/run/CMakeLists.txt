@@ -1,4 +1,4 @@
-testdir(run 1particle1mode PTLA_C++QED PTLA_Evolved 3qbits)
+testdir(run 1particle1mode PTLA_C++QED PTLA_Evolved Ring)
 
 # PTLA_C++QED as a representative of simulating a free
 
@@ -40,16 +40,16 @@ declaretest(run_1particle1mode_ndt)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:1particle1mode>)
 
-# 3qbits as a representative of simulating a composite
+# Ring as a representative of simulating a composite
 
-declaretest(run_3qbits_dc)
+declaretest(run_Ring_dc)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:3qbits>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:Ring>)
 
-declaretest(run_3qbits_dt)
+declaretest(run_Ring_dt)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:3qbits>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:Ring>)
 
-declaretest(run_3qbits_ndt)
+declaretest(run_Ring_ndt)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:3qbits>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:Ring>)
