@@ -34,6 +34,8 @@ namespace trajectory {
  * - \link Trajectory::displayParameters print a header\endlink summarizing its physical and numerical parameters together with a key to the set of relevant physical information displayed during the run
  * - \link Trajectory::logOnEnd print a log\endlink at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
  *
+ * \see Simulated for a full generic implementation of Trajectory together with a small tutorial
+ * 
  * \todo Consider taking Trajectory by rvalue reference
  *
  */
@@ -48,18 +50,63 @@ void run(Trajectory & trajectory, ///< the trajectory to run
          bool firstStateDisplay ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
         );
 
-void run(Trajectory &, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
 
+/// Same as \link run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) above\endlink but runs for a certain number of time intervals deltaT \related Trajectory
+/**
+ * <b>Rationale:</b> This version of `run` exists to avoid the eventual tiny timestep at the end of the run that might occur with
+ * \link run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) the above version\endlink.
+ * This is because e.g. in the case of `deltaT=0.1`, `time=1`, adding up `0.1` ten times numerically does not result in exactly `1`.
+ * 
+ * For a demonstration, compare the output of
+ *
+ *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --T 1
+ *
+ * with
+ *
+ *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --NDt 10
+ *
+ */
+void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt*deltaT
+         double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
+
+
+/// Another version of \link run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) `run`\endlink for running in dc-mode \related Adaptive
+/**
+ * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Trajectory::step single adaptive timestep\endlink, it is possible to count the
+ * individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each display. Hence, we get denser displays in time when the timestep is small,
+ * that is, when the important things are happening in the dynamics.
+ * 
+ */
 template<typename A>
-void run(Adaptive<A>&, double time, int dc       , unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
+void run(Adaptive<A>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
+         unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
 
-void run(Trajectory &, const ParsRun&);
 
+/// Dispatcher \related Trajectory
+/**
+ * Runs
+ * - run(Trajectory&, long, double, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.NDt` is nonzero and
+ * - run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) otherwise
+ * 
+ * \note This means that ParsRun::NDt takes precedence over ParsRun::T
+ *
+ */
+void run(Trajectory &, const ParsRun& p);
+
+
+/// Dispatcher \related Adaptive
+/**
+ * - Runs run(Adaptive&, double, int, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.dc` is nonzero (dc-mode)
+ * - delegates to run(Trajectory&, const ParsRun& p) otherwise (deltaT-mode)
+ * 
+ * \note This means that ParsRun::dc takes precedence over ParsRun::Dt
+ * 
+ */
 template<typename A>
 void run(Adaptive<A>&, const ParsRun&);
 
 
-
+/// Aggregate of information about a trajectory-state archive \see AdaptiveIO
 struct SerializationMetadata
 {
   SerializationMetadata(std::string type=UNSPECIFIED, std::string id=UNSPECIFIED, int r=0)
@@ -91,7 +138,7 @@ template<typename T>
 void writeViaSStream(const T&, std::ofstream*);
 template<typename T>
 void  readViaSStream(      T&, std::ifstream&);
-SerializationMetadata readMeta(std::ifstream&);
+SerializationMetadata readMeta(std::ifstream&); ///< Needed separately for the Python i/o
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
@@ -185,6 +232,8 @@ private:
 //
 ///////////
 
+/// Corresponds to evolved::EvolvedIO, adding the capability of state serialization involving a SerializationMetadata instant
+/** This class exists for the sake of Python I/O */
 template<typename A>
 class AdaptiveIO
 {
@@ -201,10 +250,9 @@ public:
    * Two conformity checks are performed for to the array we try to read in:
    * - whether the rank matches (throws RankMismatchException if not)
    * - whether the dimensions match (throws DimensionsMismatchException if not)
-   * The dimensions check can be circumvented by setting the trajectoryID to
-   * SerializationMetadata::ArrayOnly in the EvolvedIO's metadata. This is done for example
-   * in the python I/O interface, because when reading in a state in python we
-   * generally have no idea about the dimensions.
+   * The dimensions check can be circumvented by setting the trajectoryID to SerializationMetadata::ArrayOnly in the EvolvedIO's metadata. This is done for example in the python I/O interface, 
+   * because when reading in a state in python we generally have no idea about the dimensions.
+   * 
    */
   cpputils::iarchive&  readState(cpputils::iarchive& iar);
   /// Write the EvolvedIO to a cpputils::oarchive
@@ -224,7 +272,8 @@ private:
 };
 
 
-/// Adaptive is more than Evolved only in that it takes into account the need for communicating towards the user from time to time during propagation
+/// Adaptive is basically an evolved::Evolved wrapped into the Trajectory interface
+/** The class stores an evolved::Evolved instance by shared pointer */
 template<typename A>
 class Adaptive : public trajectory::AdaptiveIO<A>, public virtual Trajectory
 {
@@ -234,36 +283,43 @@ public:
 
   typedef evolved::Evolved<A> Evolved;
 
-  void step(double deltaT) {step_v(deltaT);}
+  /// corresponding to Evolved::step, it takes a single adaptive step
+  /** It does not delegate directly to Evolved::step, as usually trajectories need to do more for a step than just propagating the ODE: instead, it is kept purely virtual */
+  void step(double deltaT ///< *maximum* length of the timestep
+           ) {step_v(deltaT);}
   
   virtual ~Adaptive() {}
 
 protected:
   using AdaptiveIO<A>::meta_;
 
+  /// Constructor taking the same parameters as needed to operate \link evolved::Maker::operator()() evolved::Maker\endlink
   Adaptive(A&, typename Evolved::Derivs, double, double, double    , const A&, const evolved::Maker<A>&);
 
+  /** \overload Adaptive(A&, typename Evolved::Derivs, double, double, double, const A&, const evolved::Maker<A>&) */
   Adaptive(A&, typename Evolved::Derivs, double, const ParsEvolved&, const A&, const evolved::Maker<A>&);
 
   typedef typename Evolved::ConstPtr ConstPtr;
   typedef typename Evolved::     Ptr      Ptr;
   
+  /// \name Getters
+  //@{
   const ConstPtr getEvolved() const {return ConstPtr(evolved_);}
   const      Ptr getEvolved()       {return          evolved_ ;}
 
   double getDtTry() const {return evolved_->getDtTry();}
+  //@}
+  
+  const std::string trajectoryID() const  {return trajectoryID_v();}
 
   std::ostream& displayParameters_v(std::ostream&) const;
-
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       final;
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const final;
-
-  const std::string trajectoryID() const  {return trajectoryID_v();}
 
   virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
   virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
 
 private:
+  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       final;
+  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const final;
 
   double getDtDid_v() const {return evolved_->getDtDid();}
 
