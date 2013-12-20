@@ -8,9 +8,12 @@ include(GNUInstallDirs)
 set(CPPQED_MONOLITHIC 1)
 
 add_subdirectory(CPPQEDcore)
+set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
+set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 add_subdirectory(cpypyqed)
 add_subdirectory(CustomElementsExample)
+set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
 add_subdirectory(CustomScriptsExample)
 
 option(COMPILE_SCRIPTS "Compile the example scripts" On)

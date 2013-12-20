@@ -178,11 +178,7 @@ endfunction()
 
 macro(scripts_project)
   # find CPPQED elements project
-  if(NOT DEFINED CPPQED_MONOLITHIC)
-    find_package(CPPQEDelements ${CPPQED_ID} REQUIRED)
-  else(NOT DEFINED CPPQED_MONOLITHIC)
-    include(${elements_BINARY_DIR}/CPPQEDelementsConfig.cmake)
-  endif(NOT DEFINED CPPQED_MONOLITHIC)
+  find_package(CPPQEDelements ${CPPQED_ID} REQUIRED)
   include_directories(${CPPQEDelements_INCLUDE_DIRS})
   set(ALL_ELEMENTS_LIBRARIES ${CPPQEDelements_LIBRARIES})
 
