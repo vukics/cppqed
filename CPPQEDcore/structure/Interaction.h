@@ -63,6 +63,7 @@ public:
   const Frees& getFrees() const {return frees_;}
 
 protected:
+  /// Shared-pointerizes the elements passed as Frees. \todo How to shared-pointerize an rvalue reference?
   class FreesProxy
   {
   public:
@@ -71,6 +72,7 @@ protected:
     
     operator const Frees&() const {return frees_;}
     
+  private:
     const Frees frees_;
   };
 

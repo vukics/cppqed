@@ -32,7 +32,7 @@ size_t extractFailedSteps(ImplPtr);
  * It bridges the low-level \GSL and higher levels that work with the array type `A`. For this, it has to connect in a bi-directional way the array type `A` with C-arrays used by \GSL,
  * which is performed by the functions in ArrayTraits.h.
  *
- * \todo Migrate to gsl_odeiv2
+ * \todo Migrate to gsl_odeiv2 (although, it’s not clear what has changed there)
  */
 template<typename A>
 class MakerGSL<A>::_: public Evolved<A>

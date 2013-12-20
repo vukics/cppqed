@@ -51,7 +51,7 @@ public:
    * 
    * The display format greatly depends on what kind of system is in question (in particular, \link ElementAveraged elementary system\endlink or Composite).
    * 
-   * \todo The precision argument is obsolete after rev. #04265ae452d5760bd93445a74c47885c68cdeddf since precision might be propagated just via FormDouble::overallPrecision throughout the whole framework.
+   * \todo The precision argument is obsolete after rev. #04265ae since precision might be propagated just via FormDouble::overallPrecision throughout the whole framework.
    *
    */
   std::ostream& display(const Averages& averages, std::ostream& os, int precision) const {return display_v(averages,os,precision);}

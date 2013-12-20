@@ -50,6 +50,8 @@ braket(const StateVector<RANK>&, const StateVector<RANK>&);
  * The inheritance of StateVector from linalg::VectorSpace provides for a lot of free-standing helpers describing vector-space algebra.
  * These are all naively based on the arithmetic member functions like StateVector::operator+=, StateVector::operator*=, etc.
  * 
+ * \todo provide a move constructor
+ * 
  */
 template<int RANK>
 class StateVector 

@@ -17,7 +17,7 @@ for_each(In first, In last, In2 first2, BinOp op)
 {
   while (first!=last) op(*first++,*first2++);
   return op;
-} // NEEDS_WORK does BOOST.zip_iterator obsolate this?
+} // NEEDS_WORK does BOOST.zip_iterator obsolete this?
 
 
 template<typename In, typename T, typename UnOp>

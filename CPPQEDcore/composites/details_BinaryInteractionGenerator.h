@@ -1,3 +1,4 @@
+/// \briefFile{A „preprocessor factory” to binary interactions} \todo Should be moved to repository Elements
 // -*- C++ -*-
 #ifndef   COMPOSITES_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED
 #define   COMPOSITES_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED

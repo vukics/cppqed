@@ -1,4 +1,4 @@
-/// \briefFile{Implementations of the traits functions declared in ArrayTraits.h for `blitz::Array`}
+/// \briefFile{Implementations of the traits functions declared in ArrayTraits.h for `blitz::Array`} \todo Much of this file is superfluous as many components can be formulated generally for all `blitz::Array` types
 // -*- C++ -*-
 #ifndef UTILS_BLITZARRAYTRAITS_H_INCLUDED
 #define UTILS_BLITZARRAYTRAITS_H_INCLUDED

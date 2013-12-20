@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFileDefault
+/// \briefFileDefault \todo Should be moved to repository Elements
 #ifndef STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 #define STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 
