@@ -34,14 +34,6 @@ parameters::AttemptedRecreationOfParameterException::AttemptedRecreationOfParame
 namespace parameters {
 
 
-namespace {
-
-const string errorMessage(const string& sc)
-{
-  return "\nSee "+sc+"help for a list of parameters\nSupply all parameters with "+sc+" prefix\n\n";
-}
-} // private namespace
-
 const ParameterBase&
 ParameterTable::operator[](const string& s) const
 {
@@ -60,11 +52,70 @@ void ParameterTable::printList() const
 }
 
 
+///////////////////////////////////
+//
+// Boolean Parameter Specialization
+//
+///////////////////////////////////
+
+
+template<>
+void Parameter<bool>::print_v(size_t smw, size_t tmw, size_t dmw) const
+{
+  using namespace std;
+  cout<<setw(smw+3)<<left<<getS()
+      <<setw(tmw+3)<<left<<"switch"
+      <<setw(dmw+3)<<left<<getD()<<v_<<endl;
+}
+
+
+template<>
+void Parameter<bool>::read_v(std::istream&)
+{
+  v_=true;
+}
+
+
+template<>
+void Parameter<cpputils::BooleanNegatedProxy>::read_v(std::istream&)
+{
+  v_=true;
+}
+
+
 bool& ParameterTable::add(const std::string& s, const std::string& d, bool v)
 {
   bool& res=add<bool>(s,d,v);
   add("no_"+s,d,cpputils::BooleanNegatedProxy(res));
   return res;
+}
+
+
+////////////////////////////
+//
+// TitleLine specializations
+//
+////////////////////////////
+
+namespace {
+
+// A tagging class for introducing dummy parameters into the Table, which simply create a newline and a title at the listing.
+struct TitleLine {}; 
+
+}
+
+template<>
+void Parameter<TitleLine>::print_v(size_t, size_t, size_t) const
+{
+  using namespace std;
+  cout<<endl<<"*** "<<getS()<<endl;
+}
+
+
+template<>
+void Parameter<TitleLine>::read_v(std::istream&)
+{
+  throw UnrecognisedParameterException(getS());
 }
 
 
@@ -80,6 +131,10 @@ ParameterTable& ParameterTable::addTitle(const std::string& s, const std::string
 
 void update(ParameterTable& table, int argc, char* argv[], const string& sc)
 {
+  struct ErrorMessage {
+    static const string _(const string& sc) {return "\nSee "+sc+"help for a list of parameters\nSupply all parameters with "+sc+" prefix\n\n";}
+  };
+
   if (argc<2) return;
 
   iostream& line=table.getStream();
@@ -89,7 +144,7 @@ void update(ParameterTable& table, int argc, char* argv[], const string& sc)
   size_t scl=sc.length();
   while (line>>temp) {
     if (string(temp,0,scl)!=sc) {
-      cerr<<"\nSyntax error in command line around \""<<temp<<"\""<<errorMessage(sc);
+      cerr<<"\nSyntax error in command line around \""<<temp<<"\""<<ErrorMessage::_(sc);
       abort();
     }
     temp=string(temp,scl,temp.length()-scl);
@@ -103,59 +158,17 @@ void update(ParameterTable& table, int argc, char* argv[], const string& sc)
       try {
         table[temp].read(line);
         if (line.fail()) {
-          cerr<<"\nParameter \""<<temp<<"\" supplied with incorrect syntax"<<errorMessage(sc);
+          cerr<<"\nParameter \""<<temp<<"\" supplied with incorrect syntax"<<ErrorMessage::_(sc);
           abort();
         }
       }
       catch (const UnrecognisedParameterException& urp) {
-        cerr<<"\nProblem in command line around \""<<urp.getName()<<'\"'<<errorMessage(sc);
+        cerr<<"\nProblem in command line around \""<<urp.getName()<<'\"'<<ErrorMessage::_(sc);
         abort();
       }
   }
 }
 
-
-
-
-
-
-template<>
-void Parameter<bool>::print(size_t smw, size_t tmw, size_t dmw) const
-{
-  using namespace std;
-  cout<<setw(smw+3)<<left<<getS()
-      <<setw(tmw+3)<<left<<"switch"
-      <<setw(dmw+3)<<left<<getD()<<v_<<endl;
-}
-
-
-template<>
-void Parameter<bool>::read(std::istream&)
-{
-  v_=true;
-}
-
-
-template<>
-void Parameter<cpputils::BooleanNegatedProxy>::read(std::istream&)
-{
-  v_=true;
-}
-
-
-template<>
-void Parameter<TitleLine>::print(size_t, size_t, size_t) const
-{
-  using namespace std;
-  cout<<endl<<"*** "<<getS()<<endl;
-}
-
-
-template<>
-void Parameter<TitleLine>::read(std::istream&)
-{
-  throw UnrecognisedParameterException(getS());
-}
 
 
 } // parameters

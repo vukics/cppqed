@@ -743,6 +743,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/issues.markdown \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/userGuide.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/structureGuide.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/multiarrayConcept.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/mcwfMethod.markdown \
@@ -766,6 +767,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/issues.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/EvolvedGSL.tcc \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/MathExtensions.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/MultiIndexIterator.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Pars.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/Simulated_.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/TMP_Tools.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/Trajectory.h \

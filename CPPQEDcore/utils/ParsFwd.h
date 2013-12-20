@@ -17,9 +17,6 @@ class Parameter;
 
 class ParameterTable;
 
-struct TitleLine {}; 
-// A tagging class for introducing dummy parameters into the Table, which simply create a newline and a title at the listing.
-
 
 } // parameters
 

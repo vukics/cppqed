@@ -14,7 +14,7 @@ namespace parameters {
 
 template<typename T>
 void
-Parameter<T>::print(size_t smw, size_t tmw, size_t dmw) const
+Parameter<T>::print_v(size_t smw, size_t tmw, size_t dmw) const
 {
   using namespace std;
   const string name(typeid(T).name());
