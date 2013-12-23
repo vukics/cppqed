@@ -12,12 +12,14 @@ class py_evolved{};
 class py_structure{};
 class py_quantumdata{};
 class py_parameters{};
+class py_quantumtrajectory{};
 
 extern boost::python::object trajectoryNameSpace;
 extern boost::python::object evolvedNameSpace;
 extern boost::python::object structureNameSpace;
 extern boost::python::object quantumdataNameSpace;
 extern boost::python::object parametersNameSpace;
+extern boost::python::object quantumtrajectoryNameSpace;
 
 } // pythonext
 
