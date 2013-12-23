@@ -21,7 +21,7 @@ PARS_GETTER_SETTER(bool, ParsStochastic, noise)
 PARS_GETTER_SETTER(size_t, ParsStochastic, nTraj)
 
 
-void export_ParsTrajectory_ParsStochasticTrajectory()
+void export_15_ParsStochasticTrajectory()
 {
   scope namespaceScope = trajectoryNameSpace;
   class_<ParsStochastic, bases<ParsEvolved> >

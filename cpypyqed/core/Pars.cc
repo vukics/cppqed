@@ -19,7 +19,7 @@ void update(parameters::ParameterTable &p, list args, str s=str("--")){
 }
 
 
-void export_Pars()
+void export_05_Pars()
 {
   scope namespaceScope = parametersNameSpace;
   class_<parameters::ParameterTable,boost::noncopyable>("ParameterTable")

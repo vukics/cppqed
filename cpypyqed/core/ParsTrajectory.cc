@@ -33,7 +33,7 @@ PARS_GETTER_SETTER(double, ParsEvolved, epsAbs)
 PARS_GETTER_SETTER(evolved::SteppingFunction, ParsEvolved, sf)
 PARS_GETTER_SETTER(double, ParsEvolved, nextDtTryCorrectionFactor)
 
-void export_ParsTrajectory()
+void export_10_ParsTrajectory()
 {
   {
     scope namespaceScope = evolvedNameSpace;
