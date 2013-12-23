@@ -102,6 +102,7 @@ add_custom_target(cpypyqed)
 if(ENABLE_PYTHON_IO)
   add_subdirectory(io)
 endif()
+add_subdirectory(core)
 
 foreach(file __init__.py)
   configure_file(${file} ${LIBRARY_OUTPUT_PATH}/${file} COPYONLY)
