@@ -46,8 +46,8 @@ endif( ENABLE_PYTHON_IO )
 
 set(CPYPYQED_INSTALL_PATH ${PYTHON_MODULES_PATH}/cpypyqed)
 
-set(PYTHON_MAX_RANK 11 CACHE STRING "Pre-instantiate template classes up to this rank in Python bindings.")
-set_property(CACHE PYTHON_MAX_RANK PROPERTY STRINGS 1 2 3 4 5 6 7 8 9 10 11 12)
+set(PYTHON_MAX_RANK 5 CACHE STRING "Pre-instantiate template classes up to this rank in Python bindings.")
+set_property(CACHE PYTHON_MAX_RANK PROPERTY STRINGS 1 2 3 4 5 6 7)
 
 # Macro used for each module to select the correct extension according to the OS
 MACRO(PYTHON_CPPMODULE arg1)
