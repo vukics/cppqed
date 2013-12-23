@@ -1,6 +1,7 @@
 // -*- C++ -*-
 
 #include "PythonExtension.h"
+#include "Namespaces.h"
 
 #include <StateVector.tcc>
 
@@ -22,6 +23,8 @@ void export_StateVector()
 {
 
   // TODO: add some useful constructors, e.g. allow to initialize a StateVector from a numpy array
+
+  scope namespaceScope = quantumdataNameSpace;
 
 #define DECL_DIRECT_PRODUCTS(z,r2,data) .def(self * other< StateVector<BOOST_PP_ADD(r2,1)> >())
 #define BOOST_PP_LOCAL_MACRO(n) class_<StateVector<n> >(BOOST_PP_STRINGIZE(BOOST_PP_CAT(StateVector, n)), no_init) \

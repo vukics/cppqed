@@ -1,6 +1,7 @@
 // -*- C++ -*-
 
 #include "PythonExtension.h"
+#include "Namespaces.h"
 
 #include "QuantumSystem.h"
 
@@ -18,6 +19,7 @@ namespace pythonext {
 
 void export_QuantumSystem(){
 
+  scope namespaceScope = structureNameSpace;
 #define QUANTUMSYSTEM_INSTANTIATIONS(z,r,data) \
   class_<QuantumSystem<r>, boost::noncopyable >(BOOST_PP_STRINGIZE(BOOST_PP_CAT(QuantumSystem,r)), no_init) \
     .def("highestFrequency",&QuantumSystem<r>::highestFrequency) \

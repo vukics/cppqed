@@ -1,5 +1,6 @@
 // -*- C++ -*-
 #include "PythonExtension.h"
+#include "Namespaces.h"
 
 #include "Pars.h"
 
@@ -20,6 +21,7 @@ void update(parameters::ParameterTable &p, list args, str s=str("--")){
 
 void export_Pars()
 {
+  scope namespaceScope = parametersNameSpace;
   class_<parameters::ParameterTable,boost::noncopyable>("ParameterTable")
     .def("printList", &parameters::ParameterTable::printList)
     ;
