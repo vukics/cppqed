@@ -1,0 +1,6 @@
+find_package(CPPQEDelements 2.99 REQUIRED)
+include_directories(${CPPQEDelements_INCLUDE_DIRS})
+SET(MANDATORY_LIBRARIES ${CPPQEDelements_LIBRARIES} ${MANDATORY_LIBRARIES})
+
+PYTHON_SUBPACKAGE(elements)
+
