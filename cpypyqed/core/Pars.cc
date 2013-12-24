@@ -25,7 +25,7 @@ void export_05_Pars()
   class_<parameters::ParameterTable,boost::noncopyable>("ParameterTable")
     .def("printList", &parameters::ParameterTable::printList)
     ;
-  def("update",update);
+  def("update",update); parametersNameSpace.staticmethod("update");
 }
 
 } // pythonext
