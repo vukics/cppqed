@@ -5,12 +5,12 @@ using namespace boost::python;
 
 namespace pythonext {
 
-object trajectoryNameSpace        = class_<py_trajectory>        ("trajectory");
-object evolvedNameSpace           = class_<py_evolved>           ("evolved");
-object structureNameSpace         = class_<py_structure>         ("structure");
-object quantumdataNameSpace       = class_<py_quantumdata>       ("quantumdata");
-object parametersNameSpace        = class_<py_parameters>        ("paramters");
-object quantumtrajectoryNameSpace = class_<py_quantumtrajectory> ("quantumtrajectory");
+class_<py_trajectory>         trajectoryNameSpace("trajectory");
+class_<py_evolved>            evolvedNameSpace("evolved");
+class_<py_structure>          structureNameSpace("structure");
+class_<py_quantumdata>        quantumdataNameSpace("quantumdata");
+class_<py_parameters>         parametersNameSpace("paramters");
+class_<py_quantumtrajectory>  quantumtrajectoryNameSpace("quantumtrajectory");
 
 void export_0Namespaces()
 {
