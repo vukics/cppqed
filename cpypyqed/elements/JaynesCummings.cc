@@ -28,25 +28,28 @@ const jaynescummings::Ptr jc_make(const qbit::Ptr& q, const mode::Ptr& m)
 
 void export_JaynesCummings()
 {
-  scope namespaceScope = jaynescummingsNameSpace;
-  class_<Pars>
-    (
-      "Pars",
+
+  class_<Base<false>, boost::noncopyable> ("JaynesCummingsBase", no_init);
+  {
+    scope namespaceScope = jaynescummingsNameSpace;
+    class_<Pars>
+      (
+        "Pars",
       init<parameters::ParameterTable&, optional<const std::string&> >()
-        [with_custodian_and_ward<1, 2>()]
-    )
-    .PARS_PROPERTY(g)
-  ;
-  class_<Base<false>, boost::noncopyable> ("Base", no_init);
-  register_ptr_to_python< jaynescummings::Ptr >();
-  implicitly_convertible<boost::shared_ptr<Base<false>>,jaynescummings::Ptr>();
+      [with_custodian_and_ward<1, 2>()]
+      )
+      .PARS_PROPERTY(g)
+    ;
+    register_ptr_to_python< jaynescummings::Ptr >();
+    implicitly_convertible<boost::shared_ptr<Base<false>>,jaynescummings::Ptr>();
 
-  def("make", jaynescummings::make<qbit::Ptr, mode::Ptr>,
-      with_custodian_and_ward_postcall<0,1,with_custodian_and_ward_postcall<0,2,with_custodian_and_ward_postcall<0,3>>>());
-  jaynescummingsNameSpace.staticmethod("make");
+    def("make", jaynescummings::make<qbit::Ptr, mode::Ptr>,
+        with_custodian_and_ward_postcall<0,1,with_custodian_and_ward_postcall<0,2,with_custodian_and_ward_postcall<0,3>>>());
+    jaynescummingsNameSpace.staticmethod("make");
 
-  implicitly_convertible<Pars, dcomp>();
-  implicitly_convertible<boost::shared_ptr<Base<false>>, boost::shared_ptr<const structure::Interaction<2>>>();
+    implicitly_convertible<Pars, dcomp>();
+    implicitly_convertible<boost::shared_ptr<Base<false>>, boost::shared_ptr<const structure::Interaction<2>>>();
+  }
 }
 
 } // pythonext
