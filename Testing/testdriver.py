@@ -180,7 +180,7 @@ def main():
   (options,args) = op.parse_args()
 
   cp.read(args)
-  sys.path.append(cp.get('Setup','modulepath'))
+  sys.path.insert(0,cp.get('Setup','modulepath'))
   # we can only load pycppqed after we know where to look for the cpypyqed module
   global cpypyqed
   import cpypyqed.io
