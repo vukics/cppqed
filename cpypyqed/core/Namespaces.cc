@@ -11,6 +11,7 @@ class_<py_structure>          structureNameSpace("structure");
 class_<py_quantumdata>        quantumdataNameSpace("quantumdata");
 class_<py_parameters>         parametersNameSpace("paramters");
 class_<py_quantumtrajectory>  quantumtrajectoryNameSpace("quantumtrajectory");
+class_<py_binary>             binaryNameSpace("binary");
 
 void export_0Namespaces()
 {
@@ -21,6 +22,7 @@ void export_0Namespaces()
   current.attr("quantumdata")       = quantumdataNameSpace;
   current.attr("parameters")        = parametersNameSpace;
   current.attr("quantumtrajectory") = quantumtrajectoryNameSpace;
+  current.attr("binary")            = binaryNameSpace;
 }
 
 } // pythonext

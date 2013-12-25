@@ -9,6 +9,7 @@ class_<py_particle>       particleNameSpace("particle");
 class_<py_qbit>           qbitNameSpace("qbit");
 class_<py_mode>           modeNameSpace("mode");
 class_<py_particlecavity> particlecavityNameSpace("particlecavity");
+class_<py_jaynescummings> jaynescummingsNameSpace("jaynescummings");
 
 void export_0Namespaces()
 {
@@ -17,6 +18,7 @@ void export_0Namespaces()
   current.attr("qbit")           = qbitNameSpace;
   current.attr("mode")           = modeNameSpace;
   current.attr("particlecavity") = particlecavityNameSpace;
+  current.attr("jaynescummings") = jaynescummingsNameSpace;
 }
 
 } // pythonext
