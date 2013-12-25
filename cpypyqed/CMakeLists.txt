@@ -36,8 +36,6 @@ find_package(Numpy)
 if( NOT NUMPY_FOUND )
   message(STATUS "Numpy not found, python I/O disabled.")
   set(ENABLE_PYTHON_IO Off)
-else()
-  include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS})
 endif( NOT NUMPY_FOUND )
 # Check if python I/O module can be built, inform user
 if ( ENABLE_PYTHON_IO )
