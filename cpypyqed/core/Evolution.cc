@@ -56,7 +56,7 @@ void export_25_Evolution()
 
 #define EVOLVE_INSTANTIATIONS(z,r,data) \
   def("evolve", (void (*)(StateVector<r>&, const QuantumSystem<r>&, const ParsEvolution&)) &evolve);
-BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_MAX_RANK,1), EVOLVE_INSTANTIATIONS, data)
+BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), EVOLVE_INSTANTIATIONS, data)
 
 }
 

@@ -77,8 +77,11 @@ void throw_file(const T &s, const std::string &f)
 
 void throw_rank(int r)
 {
+  using std::string;
+  using boost::lexical_cast;
   if (r>PYTHON_MAX_RANK){
-    PyErr_SetString(PyExc_NotImplementedError, (boost::lexical_cast<std::string>(r)+std::string(">PYTHON_MAX_RANK.")).c_str());
+    PyErr_SetString(PyExc_NotImplementedError,
+                    (lexical_cast<string>(r)+string(">PYTHON_MAX_RANK=")+lexical_cast<string>(PYTHON_MAX_RANK)).c_str());
     throw_error_already_set();
   }
 }

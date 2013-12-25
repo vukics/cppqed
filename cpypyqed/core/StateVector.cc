@@ -35,8 +35,8 @@ void export_StateVector()
   .def(self / dcomp()) \
   .def("norm", &StateVector<n>::norm) \
   .def("renorm", &StateVector<n>::renorm) \
-  BOOST_PP_REPEAT(BOOST_PP_SUB(PYTHON_MAX_RANK,n), DECL_DIRECT_PRODUCTS, n) ;
-#define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
+  BOOST_PP_REPEAT(BOOST_PP_SUB(PYTHON_HALF_RANK,n), DECL_DIRECT_PRODUCTS, n) ;
+#define BOOST_PP_LOCAL_LIMITS (1, PYTHON_HALF_RANK)
 #include BOOST_PP_LOCAL_ITERATE()
 
 }
