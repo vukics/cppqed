@@ -32,7 +32,7 @@ const StateVector (*ho2)(const ParsPumped&, bool) = &particle::hoState;
 void export_Particle()
 {
   class_<ParticleBase, boost::noncopyable>("ParticleBase", no_init);
-  class_<PumpedParticleBase, boost::noncopyable>("PumpedParticleBase", no_init);
+  class_<PumpedParticleBase, bases<ParticleBase>,boost::noncopyable>("PumpedParticleBase", no_init);
 
   {
     scope namespaceScope = particleNameSpace;
