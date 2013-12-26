@@ -43,6 +43,8 @@ void export_Particle()
       with_custodian_and_ward_postcall<0,1>()
     );
     particleNameSpace.staticmethod("make");
+    def("makePumped", &particle::makePumped, with_custodian_and_ward_postcall<0,1>());
+    particleNameSpace.staticmethod("makePumped");
     register_ptr_to_python< particle::Ptr >();
     register_ptr_to_python< particle::PtrPumped >();
     implicitly_convertible<boost::shared_ptr<ParticleBase>,particle::Ptr>();
