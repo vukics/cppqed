@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 2.8.9)
+
+project(cpypyqed_ondemand)
+
+find_package(CPPQED 2.99 REQUIRED)
+include(${{CPPQED_USE}})
+
+find_package(PythonLibs 2 REQUIRED)
+include_directories(${{PYTHON_INCLUDE_DIRS}})
+
+find_package(Boost REQUIRED python)
+
+CPPQED_SETUP()
+
+add_library({modulename} SHARED {sourcefile})
+set_target_properties({modulename} PROPERTIES PREFIX "" DEBUG_POSTFIX "")
+set_target_properties({modulename} PROPERTIES SUFFIX ".so")
+target_link_libraries({modulename} ${{CPPQED_LIBRARIES}} ${{Boost_PYTHON_LIBRARY}} ${{PYTHON_LIBRARIES}})

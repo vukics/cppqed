@@ -103,7 +103,9 @@ endif()
 add_subdirectory(core)
 add_subdirectory(elements)
 
-foreach(file __init__.py)
+foreach(file __init__.py compilation/ActTemplate.cc compilation/CompositeTemplate.cc
+                         compilation/composite.py compilation/ondemand.py compilation/__init__.py
+                         compilation/CMakeListsTemplate.txt)
   configure_file(${file} ${LIBRARY_OUTPUT_PATH}/${file} COPYONLY)
   install(FILES ${file} DESTINATION ${CPYPYQED_INSTALL_PATH})
 endforeach(file)
