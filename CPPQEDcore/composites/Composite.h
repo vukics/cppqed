@@ -86,9 +86,11 @@ public:
   static const int RANK=MaxRank<VA>::value+1;
 
   // Public types
+  typedef VA Acts;
+
   typedef RankedBase<RANK>          RBase  ;
   typedef structure::Averaged<RANK> Av_Base;
-  
+
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   typedef typename Av_Base::Averages Averages  ;
