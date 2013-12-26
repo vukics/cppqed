@@ -12,7 +12,7 @@ using namespace boost::python;
 using quantumdata::StateVector;
 
 namespace pythonext {
-  
+
 void export_Qbit()
 {
   class_<QbitBase, boost::noncopyable>("QbitBase",no_init);
