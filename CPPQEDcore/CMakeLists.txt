@@ -109,13 +109,9 @@ endif( blitz_SERIALIZATION_FOUND )
 
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
 
-# Boost
-if(${CMAKE_VERSION} VERSION_LESS "2.8.8")
-  find_package(Boost REQUIRED)
-  find_package(Boost COMPONENTS serialization)
-else(${CMAKE_VERSION} VERSION_LESS "2.8.8")
-  find_package(Boost REQUIRED OPTIONAL_COMPONENTS serialization)
-endif(${CMAKE_VERSION} VERSION_LESS "2.8.8")
+# Boost (OPTIONAL_COMPONENTS does not work with Boost find_package)
+find_package(Boost REQUIRED)
+find_package(Boost QUIET COMPONENTS serialization)
 
 if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library found.")
