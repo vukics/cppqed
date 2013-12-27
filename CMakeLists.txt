@@ -11,7 +11,11 @@ add_subdirectory(CPPQEDcore)
 set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
 set(CPPQEDelements_DIR ${elements_BINARY_DIR})
-add_subdirectory(cpypyqed)
+
+find_package(Boost QUIET COMPONENTS python)
+if(Boost_PYTHON_FOUND)
+  add_subdirectory(cpypyqed)
+endif()
 
 # Disabled CustomExample compilation by default for now, add it as a test later
 # add_subdirectory(CustomElementsExample)
