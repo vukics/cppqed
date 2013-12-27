@@ -14,7 +14,7 @@ using composite::result_of::Make;
 namespace pythonext {{
 
 namespace {{
-typedef Make<Act<0,1>,Act<0,2> >::type ThisCompositeConstPtr;
+typedef Make<{actlist} >::type ThisCompositeConstPtr;
 typedef boost::remove_const<ThisCompositeConstPtr::element_type>::type ThisComposite;
 static const int RANK=composite::MaxRank<ThisComposite::Acts>::type::value+1;
 
