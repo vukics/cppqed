@@ -11,8 +11,9 @@ ppc = particlecavity.ParsOrthogonal(p)
 
 parameters.update(p,sys.argv,'--')
 
-myMode     = mode.make(pm,QMP.IP)
-myParticle = particle.makePumped(pp,QMP.IP)
+qmp = QMP.UIP if pe.evol == EM.MASTER or pe.evol == EM.MASTER_FAST else QMP.IP
+myMode     = mode.make(pm,qmp)
+myParticle = particle.makePumped(pp,qmp)
 
 poc = ParticleOrthogonalToCavity(myMode,myParticle,ppc)
 

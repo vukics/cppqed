@@ -37,11 +37,11 @@ PARS_GETTER_SETTER(bool, ParsEvolution, negativity)
 
 void export_25_Evolution()
 {
-  enum_<EvolutionMode>("EvolutionMode")
-    .value("EM_SINGLE",      EM_SINGLE)
-    .value("EM_ENSEMBLE",    EM_ENSEMBLE)
-    .value("EM_MASTER",      EM_MASTER)
-    .value("EM_MASTER_FAST", EM_MASTER_FAST)
+  enum_<EvolutionMode>("EM")
+    .value("SINGLE",      EM_SINGLE)
+    .value("ENSEMBLE",    EM_ENSEMBLE)
+    .value("MASTER",      EM_MASTER)
+    .value("MASTER_FAST", EM_MASTER_FAST)
   ;
   class_<ParsEvolution, bases<ParsRun,ParsMCWF> >
     (
