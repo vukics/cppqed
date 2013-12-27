@@ -47,6 +47,19 @@ macro(CPPQED_SETUP)
     include(GetGitRevisionDescription)
   endif()
 
+  # guard against bad build-type strings
+
+  if (NOT CMAKE_BUILD_TYPE)
+    message(WARNING "Build type not set, default is \"Release\".")
+    set(CMAKE_BUILD_TYPE "Release")
+  endif()
+
+  string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_tolower)
+  if(   NOT cmake_build_type_tolower STREQUAL "debug"
+    AND NOT cmake_build_type_tolower STREQUAL "release")
+    message(FATAL_ERROR "Unknown build type \"${CMAKE_BUILD_TYPE}\". Allowed values are Debug and Release (case-insensitive).")
+  endif()
+
   set(CMAKE_DEBUG_POSTFIX "_d")
 
   cppqed_cxx_flags()
