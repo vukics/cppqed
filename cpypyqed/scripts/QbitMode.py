@@ -11,7 +11,7 @@ pjc=jaynescummings.Pars(p)
 
 parameters.update(p,sys.argv,'--')
 
-qmp = QMP.UIP if pe.evol == EM_MASTER or pe.evol == EM_MASTER_FAST else QMP.IP
+qmp = QMP.UIP if pe.evol == EM.MASTER or pe.evol == EM.MASTER_FAST else QMP.IP
 m=mode.make(pm,qmp)
 q=qbit.make(pq,qmp)
 jc=jaynescummings.make(q,m,pjc)
