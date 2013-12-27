@@ -8,6 +8,8 @@ import tempfile
 import subprocess
 import shutil
 
+from cpypyqed_config import cppqed_build_type,cppqed_module_suffix
+
 def mkdir_p(path):
     """http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
     """
@@ -32,7 +34,7 @@ class OnDemand(object):
         self.basename = basename
         self.classid = classid
         self.classname = self.basename+self.classid
-        self.modulename = self.classname
+        self.modulename = self.classname+cppqed_module_suffix
         self.sourcefile = self.modulename + ".cc"
         self.library = self.modulename+".so"
         if makerfunction:
@@ -80,7 +82,8 @@ class OnDemand(object):
             f.write(cmake)
         with open(self.logfile, "w") as log:
             print("Configuring the build project for {}, please stand by...".format(self.classname))
-            ret = subprocess.call(args=('cmake','.'),cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
+            opts=("-DCMAKE_BUILD_TYPE=Debug",) if cppqed_build_type=="debug" else ("-DCMAKE_BUILD_TYPE=Release",)
+            ret = subprocess.call(args=('cmake','.')+opts,cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
             self._check_return_value(ret, errormsg="Error: cmake failed")
             print("Building {}, please stand by...".format(self.classname))
             ret = subprocess.call(args=('make',),cwd=builddir,stdout=log,stderr=subprocess.STDOUT)

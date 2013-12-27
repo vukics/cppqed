@@ -2,10 +2,6 @@ cmake_minimum_required (VERSION 2.8.9)
 
 project(cpypyqed)
 
-# stuff should be built inside a "cpypyqed" subdirectory, so that we can
-# easily import the build tree in python for testing
-set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/${PROJECT_NAME})
-
 include(FeatureSummary)
 
 get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
@@ -42,14 +38,18 @@ if ( ENABLE_PYTHON_IO )
   message(STATUS "Python input/output enabled.")
 endif( ENABLE_PYTHON_IO )
 
-set(CPYPYQED_INSTALL_PATH ${PYTHON_MODULES_PATH}/cpypyqed)
+set(CPYPYQED_INSTALL_PATH_RELEASE ${PYTHON_MODULES_PATH}/cpypyqed)
+set(CPYPYQED_INSTALL_PATH_DEBUG ${PYTHON_MODULES_PATH}/cpypyqed_d)
 
 set(PYTHON_MAX_RANK 8 CACHE STRING "Pre-instantiate template classes up to this rank in Python bindings.")
 set_property(CACHE PYTHON_MAX_RANK PROPERTY STRINGS 2 4 6 8 10)
 
 # Macro used for each module to select the correct extension according to the OS
 MACRO(PYTHON_CPPMODULE arg1)
-  SET_TARGET_PROPERTIES(${arg1} PROPERTIES PREFIX "" DEBUG_POSTFIX "")
+  SET_TARGET_PROPERTIES(${arg1} PROPERTIES
+    PREFIX ""
+    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
+    LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_d)
   IF(PYDEXTENSION)
     SET_TARGET_PROPERTIES(${arg1} PROPERTIES SUFFIX ".pyd")
   ELSEIF(SOEXTENSION)
@@ -57,8 +57,14 @@ MACRO(PYTHON_CPPMODULE arg1)
   ENDIF(PYDEXTENSION)
   TARGET_LINK_LIBRARIES(${arg1} ${MANDATORY_LIBRARIES} ${PYTHON_LIBRARIES})
   INSTALL(TARGETS ${arg1}
-                RUNTIME DESTINATION ${CPYPYQED_INSTALL_PATH}
-                LIBRARY DESTINATION ${CPYPYQED_INSTALL_PATH}
+                RUNTIME DESTINATION ${CPYPYQED_INSTALL_PATH_RELEASE}
+                LIBRARY DESTINATION ${CPYPYQED_INSTALL_PATH_RELEASE}
+                CONFIGURATIONS Release
+  )
+  INSTALL(TARGETS ${arg1}
+                RUNTIME DESTINATION ${CPYPYQED_INSTALL_PATH_DEBUG}
+                LIBRARY DESTINATION ${CPYPYQED_INSTALL_PATH_DEBUG}
+                CONFIGURATIONS Debug
   )
 ENDMACRO(PYTHON_CPPMODULE)
 
@@ -103,11 +109,20 @@ endif()
 add_subdirectory(core)
 add_subdirectory(elements)
 
-foreach(file __init__.py compilation/ActTemplate.cc compilation/CompositeTemplate.cc
-                         compilation/composite.py compilation/ondemand.py compilation/__init__.py
-                         compilation/CMakeListsTemplate.txt)
-  configure_file(${file} ${LIBRARY_OUTPUT_PATH}/${file} COPYONLY)
-  install(FILES ${file} DESTINATION ${CPYPYQED_INSTALL_PATH})
+foreach(file __init__.py compilation/cpypyqed_config.py
+             compilation/ActTemplate.cc compilation/CompositeTemplate.cc
+             compilation/composite.py compilation/ondemand.py compilation/__init__.py
+             compilation/CMakeListsTemplate.txt)
+  set(DEBUG_SUFFIX "")
+  set(CONF "release")
+  configure_file(${file} ${PROJECT_NAME}/${file} @ONLY)
+  set(DEBUG_SUFFIX "_d")
+  set(CONF "debug")
+  configure_file(${file} ${PROJECT_NAME}_d/${file} @ONLY)
+  install(FILES ${file} DESTINATION ${CPYPYQED_INSTALL_PATH_RELEASE} CONFIGURATIONS Release)
+  install(FILES ${file} DESTINATION ${CPYPYQED_INSTALL_PATH_DEBUG}   CONFIGURATIONS Debug)
+  unset(DEBUG_SUFFIX)
+  unset(CONF)
 endforeach(file)
 
 set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
