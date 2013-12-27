@@ -65,8 +65,10 @@ class OnDemand(object):
             thisClass = self.import_class(self.fullclass)
         return thisClass(*args,**kwargs) 
 
-    def _check_return_value(self,ret):
-        if not ret==0: raise(RuntimeError("Could not compile the on-demand python module. Refer to "+self.logfile+" for error messages."))
+    def _check_return_value(self,ret, errormsg=None):
+        if not ret==0:
+          if errormsg: sys.stderr.write(errormsg)
+          raise(RuntimeError("Could not compile the on-demand python module. Refer to "+self.logfile+" for error messages."))
 
     def build(self):
         builddir = tempfile.mkdtemp(dir=self.dir)
@@ -77,10 +79,12 @@ class OnDemand(object):
         with open(os.path.join(builddir,"CMakeLists.txt"),"w") as f:
             f.write(cmake)
         with open(self.logfile, "w") as log:
+            print("Configuring the build project for {}, please stand by...".format(self.classname))
             ret = subprocess.call(args=('cmake','.'),cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
-            self._check_return_value(ret)
+            self._check_return_value(ret, errormsg="Error: cmake failed")
+            print("Building {}, please stand by...".format(self.classname))
             ret = subprocess.call(args=('make',),cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
-            self._check_return_value(ret)
+            self._check_return_value(ret, errormsg="Error: make failed")
         shutil.copy(os.path.join(builddir,self.library),self.modulepath)
         shutil.rmtree(builddir, ignore_errors=True)
 
