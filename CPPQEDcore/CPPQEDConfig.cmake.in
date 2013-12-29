@@ -6,6 +6,7 @@
 #  CPPQED_DEFINITIONS  - compiler macro definitions needed together with CPPQED
 #  CPPQED_HAS_SERIALIZATION - serialization support enabled
 #  CPPQED_HAS_FLENS    - FLENS support enabled
+#  CPPQED_CORE_GIT     - Core git commit sha1
 #  CPPQED_USE          - CMAKE related stuff to use this package
 
 @PACKAGE_INIT@
@@ -23,6 +24,8 @@ set(CPPQED_ABI_MICRO @CPPQED_ABI_MICRO@)
 
 set(CPPQED_HAS_SERIALIZATION @CPPQED_HAS_SERIALIZATION@)
 set(CPPQED_HAS_FLENS @CPPQED_HAS_FLENS@)
+
+set(CPPQED_CORE_GIT @CONF_GIT_SHA1@)
 
 # set_and_check does not work with lists
 set(CPPQED_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
