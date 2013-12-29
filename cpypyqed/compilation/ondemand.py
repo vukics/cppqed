@@ -9,6 +9,11 @@ import subprocess
 import shutil
 
 from cpypyqed_config import cppqed_build_type,cppqed_module_suffix
+if cppqed_build_type=="release":
+  from ..core import core_git
+else:
+  from ..core_d import core_git
+
 
 def mkdir_p(path):
     """http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
@@ -37,11 +42,11 @@ class OnDemand(object):
         self.modulename = self.classname+cppqed_module_suffix
         self.sourcefile = self.modulename + ".cc"
         self.library = self.modulename+".so"
+        self.fullclass = self.packagename+"."+self.modulename+"."+self.classname
         if makerfunction:
-            self.fullclass = self.packagename+"."+self.modulename+"."+makerfunction
+          self.makerfunction = self.packagename+"."+self.modulename+"."+makerfunction
         else:
-            self.fullclass = self.packagename+"."+self.modulename+"."+self.classname
-        self.makerfunction = makerfunction
+          self.makerfunction = None
         if not sys.path.count(self.dir):
             sys.path.insert(0,self.dir)
         mkdir_p(self.modulepath)
@@ -61,10 +66,16 @@ class OnDemand(object):
         return getattr(module,classname)
 
     def maker(self,*args,**kwargs):
-        try: thisClass = self.import_class(self.fullclass)
+        try:
+          thisClass = self.import_class(self.fullclass)
         except ImportError:
-            self.build()
-            thisClass = self.import_class(self.fullclass)
+          self.build()
+          thisClass = self.import_class(self.fullclass)
+        if not thisClass.core_git == core_git:
+          os.remove(os.path.join(self.modulepath,self.library))
+          sys.exit("Error: {} was compiled with different library version, removing.\nPlease restart the script.\n".format(self.fullclass))
+        if self.makerfunction:
+            thisClass = self.import_class(self.makerfunction)
         return thisClass(*args,**kwargs) 
 
     def _check_return_value(self,ret, errormsg=None):

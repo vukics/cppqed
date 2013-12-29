@@ -8,6 +8,8 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/shared_ptr.hpp>
 
+#define CPPQED_CORE_GIT "@CPPQED_CORE_GIT@"
+
 using namespace boost::python;
 using composite::result_of::Make;
 
@@ -23,7 +25,8 @@ const ThisCompositeConstPtr (*ptrToMake)({const_act_arguments}) = &composite::ma
 
 BOOST_PYTHON_MODULE({modulename})
 {{
-  class_<ThisComposite,bases<structure::QuantumSystem<RANK> > >("{classname}",no_init);
+  object obj=class_<ThisComposite,bases<structure::QuantumSystem<RANK> > >("{classname}",no_init);
+  obj.attr("core_git") = std::string(CPPQED_CORE_GIT);
   def("compositeMake",  ptrToMake,
     {custodian_and_wards}
   );
