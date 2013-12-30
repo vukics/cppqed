@@ -758,6 +758,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/issues.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArrayTraits.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTiny.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTinyExtensions.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BooleanNegatedProxy.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/CMatrix.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexArrayExtensions.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexExtensions.h \
