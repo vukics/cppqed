@@ -1,4 +1,4 @@
-testdir(cpypyqed 2particles1mode)
+testdir(cpypyqed 2particles1mode QbitMode_C++QED)
 
 set(ONDEMAND ${PROJECT_BINARY_DIR}/ondemand_temp)
 
@@ -17,3 +17,13 @@ declaretest(verify_2particles1mode_dc)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=Verifier)
 set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "cppqed_2particles1mode_dc;cpypyqed_2particles1mode_dc")
+
+declaretest(cpypyqed_QbitMode_dc)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/QbitMode.py
+            --cpypyqed_builddir=${ONDEMAND})
+
+declaretest(cppqed_QbitMode_dc)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:QbitMode_C++QED>)
+set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "cpypyqed_QbitMode_dc")
