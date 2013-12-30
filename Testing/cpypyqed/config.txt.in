@@ -1,0 +1,2 @@
+[Setup]
+cppqed_dir=@core_BINARY_DIR@

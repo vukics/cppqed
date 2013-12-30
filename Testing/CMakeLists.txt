@@ -12,6 +12,7 @@ find_package(PythonInterp 2 REQUIRED)
 configure_file(testdriver.conf.in testdriver.conf)
 
 add_custom_target(check DEPENDS io check_compilefail check_run check_continue check_boost testdriver.conf.in)
+add_custom_target(check_full DEPENDS check check_cpypyqed)
 
 macro(testdir dir)
   set(TESTSDEPEND ${ARGN})
@@ -19,7 +20,7 @@ macro(testdir dir)
                   COMMAND ${CMAKE_CTEST_COMMAND} -V
                   DEPENDS ${TESTSDEPEND}
   )
-  set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf ${CMAKE_CURRENT_LIST_DIR}/testdriver.conf)
+  set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf ${CMAKE_CURRENT_LIST_DIR}/testdriver.conf --configuration=$<CONFIGURATION>)
 endmacro()
 
 macro(declaretest name)
@@ -31,3 +32,4 @@ add_subdirectory(run)
 add_subdirectory(continue)
 add_subdirectory(compilefail)
 add_subdirectory(boost)
+add_subdirectory(cpypyqed)
