@@ -159,12 +159,20 @@ class VerifiedRunner(Runner,Verifier):
     Runner.run(self)
     Verifier.run(self)
 
-class Continuer(Runner):
-  def run(self):
-    self.cp.set(self.test,'opts_thisrun',self.get_option('firstrun',default=''))
-    Runner.run(self)
-    self.cp.set(self.test,'opts_thisrun',self.get_option('secondrun',default=''))
-    Runner.run(self,clean=False)
+def ContinueFactory(base,*args,**kwargs):
+  class GenericContinuer(base):
+    def run(self):
+      self.cp.set(self.test,'opts_thisrun',self.get_option('firstrun',default=''))
+      base.run(self)
+      self.cp.set(self.test,'opts_thisrun',self.get_option('secondrun',default=''))
+      base.run(self,clean=False)
+  return GenericContinuer(*args,**kwargs)
+
+def Continuer(*args,**kwargs):
+  return ContinueFactory(Runner,*args,**kwargs)
+
+def PythonContinuer(*args,**kwargs):
+  return ContinueFactory(PythonRunner,*args,**kwargs)
 
 class CompileFail(OptionsManager):
   def run(self):
