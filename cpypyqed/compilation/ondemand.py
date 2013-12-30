@@ -31,7 +31,8 @@ class OnDemand(object):
 
     def __init__(self, basename, classid, makerfunction=None):
         self.config = ConfigParser.SafeConfigParser(
-                        dict(delete_temp='True',cmake_opts='',compiler=''))
+                        dict(delete_temp='True',cmake_opts='',compiler='',
+                             cppqed_dir='',cppqed_dir_release='',cppqed_dir_debug=''))
         self.dir = os.path.expanduser(cpypyqed_builddir)
         self.configfile = os.path.join(self.dir,"config.txt")
         self.config.read(self.configfile)
@@ -100,11 +101,17 @@ class OnDemand(object):
               print("Configuring the build project for {}, please stand by...".format(self.classname))
               opts=self.config.get('Setup','cmake_opts').split()
               compiler=self.config.get('Setup','compiler')
+              cppqed_dir=os.path.expanduser(self.config.get('Setup','cppqed_dir'))
               if compiler: opts.append('-DCMAKE_CXX_COMPILER={}'.format(compiler))
               if cppqed_build_type=="debug":
                 opts.append("-DCMAKE_BUILD_TYPE=Debug")
+                cppqed_dir_debug=os.path.expanduser(self.config.get('Setup','cppqed_dir_debug'))
+                if cppqed_dir_debug: cppqed_dir=cppqed_dir_debug
               elif cppqed_build_type=="release":
                 opts.append("-DCMAKE_BUILD_TYPE=Release")
+                cppqed_dir_release=os.path.expanduser(self.config.get('Setup','cppqed_dir_release'))
+                if cppqed_dir_release: cppqed_dir=cppqed_dir_release
+              if cppqed_dir: opts.append('-DCPPQED_DIR={}'.format(cppqed_dir))
               ret = subprocess.call(args=['cmake','.']+opts,cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
               self._check_return_value(ret, errormsg="Error: cmake failed")
               print("Building {}, please stand by...".format(self.classname))
