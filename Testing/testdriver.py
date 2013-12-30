@@ -6,6 +6,7 @@ import os
 import errno
 import subprocess
 import numpy as np
+import shutil
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -76,20 +77,21 @@ class OutputManager(OptionsManager):
 # The test classes
 
 class Runner(OutputManager):
-  def run(self, clean=True):
+  def run(self, clean=True, extra_opts=None, *args, **kwargs):
     for runmode in self.runmodes():
       if clean: self.clean(runmode)
-      command = self._build_commandline(runmode)
+      command = self._build_commandline(runmode,extra_opts)
       logging.debug(subprocess.list2cmdline(command))
-      ret = subprocess.call(command)
+      ret = subprocess.call(command, *args, **kwargs)
       if not ret==0: sys.exit(ret)
 
   def _extend_opts(self, options, section, option_prefix):
     for option in sorted([ item[0] for item in self.cp.items(section) if item[0].startswith(option_prefix)]):
       options.extend(self.cp.get(section,option).split())
 
-  def _build_commandline(self, runmode):
+  def _build_commandline(self, runmode, extra_opts=None):
     result = [self.options.script]
+    if extra_opts: result+=extra_opts
     self._extend_opts(result, 'Scripts','opts')
     self._extend_opts(result, self.test,'opts')
     self._extend_opts(result, self.test,runmode)
@@ -97,6 +99,16 @@ class Runner(OutputManager):
     result.extend(('--evol',runmode))
     result.extend(('--o',self.output(runmode)))
     return result
+
+class PythonRunner(Runner):
+  def run(self, clean=True):
+    cpypyqed_builddir = self.options.cpypyqed_builddir
+    env = os.environ.copy()
+    if cpypyqed_builddir:
+      env['CPYPYQED_BUILDDIR']=cpypyqed_builddir
+      if clean: shutil.rmtree(os.path.join(cpypyqed_builddir,'cppqedmodules'),ignore_errors=True)
+    extra_opts = [] if self.options.configuration.lower()=="release" else ['--debug']
+    Runner.run(self,clean=clean,env=env,extra_opts=extra_opts)
 
 class Verifier(OutputManager):
   def __init__(self,*args,**kwargs):
@@ -124,7 +136,7 @@ class Verifier(OutputManager):
   def _load_sv(self,fname):
     return np.genfromtxt(fname)
   def _load_state(self,fname):
-    return cpypyqed.io.read(fname)
+    return io.read(fname)
   def _differ(self,this,other):
     sys.exit("Error: {} and {} differ.".format(this,other))
   def _equiv(self,this,other):
@@ -175,6 +187,8 @@ def main():
   op.add_option("--test", help="the name of the test, and the name of the section in the config file")
   op.add_option("--testclass", help="the name of the testclass to use, must implement run()")
   op.add_option("--script", help="the script to run or the target to compile")
+  op.add_option("--configuration", help="debug or release")
+  op.add_option("--cpypyqed_builddir", help="directory for on-demand module compilation")
   op.add_option("--error", metavar='STRING', help="string to expect in the compilation failure for CompileFail class")
 
   (options,args) = op.parse_args()
@@ -182,9 +196,12 @@ def main():
   cp.read(args)
   sys.path.insert(0,cp.get('Setup','modulepath'))
   # we can only load pycppqed after we know where to look for the cpypyqed module
-  global cpypyqed
-  import cpypyqed.io
-  logging.info("Taking cpypyqed from {}".format(cpypyqed.io.__file__))
+  global io
+  if options.configuration.lower()=="release":
+    import cpypyqed.io as io
+  elif options.configuration.lower()=="debug":
+    import cpypyqed_d.io_d as io
+  logging.info("Taking cpypyqed from {}".format(io.__file__))
 
   if options.testclass:
     constructor = globals()[options.testclass]
