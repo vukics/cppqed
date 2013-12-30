@@ -14,6 +14,8 @@ if cppqed_build_type=="release":
 else:
   from ..core_d import core_git
 
+# The compilation directory can be customized by changing ondemand.cpypyqed_builddir
+cpypyqed_builddir = "~/.cpypyqed"
 
 def mkdir_p(path):
     """http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
@@ -28,9 +30,11 @@ def mkdir_p(path):
 class OnDemand(object):
 
     def __init__(self, basename, classid, makerfunction=None):
-        self.config = ConfigParser.RawConfigParser()
-        self.dir = os.path.expanduser("~/.cpypyqed")
+        self.config = ConfigParser.SafeConfigParser(
+                        dict(delete_temp='True',cmake_opts='',compiler=''))
+        self.dir = os.path.expanduser(cpypyqed_builddir)
         self.configfile = os.path.join(self.dir,"config.txt")
+        self.config.read(self.configfile)
         self.logfile = os.path.join(self.dir,"build.log")
         self.cpypyqeddir = os.path.dirname(__file__)
         self.cmaketemplate = os.path.join(self.cpypyqeddir,"CMakeListsTemplate.txt")
@@ -85,22 +89,31 @@ class OnDemand(object):
 
     def build(self):
         builddir = tempfile.mkdtemp(dir=self.dir)
-        self.generate_source(builddir)
-        with open(self.cmaketemplate) as f:
-            cmake = f.read()
-        cmake = cmake.format(modulename=self.modulename, sourcefile=self.sourcefile)
-        with open(os.path.join(builddir,"CMakeLists.txt"),"w") as f:
-            f.write(cmake)
-        with open(self.logfile, "w") as log:
-            print("Configuring the build project for {}, please stand by...".format(self.classname))
-            opts=("-DCMAKE_BUILD_TYPE=Debug",) if cppqed_build_type=="debug" else ("-DCMAKE_BUILD_TYPE=Release",)
-            ret = subprocess.call(args=('cmake','.')+opts,cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
-            self._check_return_value(ret, errormsg="Error: cmake failed")
-            print("Building {}, please stand by...".format(self.classname))
-            ret = subprocess.call(args=('make',),cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
-            self._check_return_value(ret, errormsg="Error: make failed")
-        shutil.copy(os.path.join(builddir,self.library),self.modulepath)
-        shutil.rmtree(builddir, ignore_errors=True)
+        try:
+          self.generate_source(builddir)
+          with open(self.cmaketemplate) as f:
+              cmake = f.read()
+          cmake = cmake.format(modulename=self.modulename, sourcefile=self.sourcefile)
+          with open(os.path.join(builddir,"CMakeLists.txt"),"w") as f:
+              f.write(cmake)
+          with open(self.logfile, "w") as log:
+              print("Configuring the build project for {}, please stand by...".format(self.classname))
+              opts=self.config.get('Setup','cmake_opts').split()
+              compiler=self.config.get('Setup','compiler')
+              if compiler: opts.append('-DCMAKE_CXX_COMPILER={}'.format(compiler))
+              if cppqed_build_type=="debug":
+                opts.append("-DCMAKE_BUILD_TYPE=Debug")
+              elif cppqed_build_type=="release":
+                opts.append("-DCMAKE_BUILD_TYPE=Release")
+              ret = subprocess.call(args=['cmake','.']+opts,cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
+              self._check_return_value(ret, errormsg="Error: cmake failed")
+              print("Building {}, please stand by...".format(self.classname))
+              ret = subprocess.call(args=('make',),cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
+              self._check_return_value(ret, errormsg="Error: make failed")
+          shutil.copy(os.path.join(builddir,self.library),self.modulepath)
+        finally:
+          if self.config.getboolean('Setup','delete_temp'):
+            shutil.rmtree(builddir, ignore_errors=True)
 
     def generate_source(self, builddir):
         pass
