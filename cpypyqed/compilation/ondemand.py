@@ -33,7 +33,11 @@ class OnDemand(object):
         self.config = ConfigParser.SafeConfigParser(
                         dict(delete_temp='True',cmake_opts='',compiler='',
                              cppqed_dir='',cppqed_dir_release='',cppqed_dir_debug=''))
+        if not self.config.has_section("Setup"):
+          self.config.add_section("Setup")
         self.dir = os.path.expanduser(cpypyqed_builddir)
+        if os.environ.has_key('CPYPYQED_BUILDDIR'):
+          self.dir = os.path.expanduser(os.environ['CPYPYQED_BUILDDIR'])
         self.configfile = os.path.join(self.dir,"config.txt")
         self.config.read(self.configfile)
         self.logfile = os.path.join(self.dir,"build.log")
