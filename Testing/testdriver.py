@@ -57,8 +57,6 @@ class OutputManager(OptionsManager):
     self.outputdir   = self.cp.get('Setup','outputdir')
     self.expecteddir = self.cp.get('Setup','expecteddir')
     mkdir_p(self.outputdir)
-    self.script = self.options.script
-    if not self.script: sys.exit('--script missing')
 
   def runmodes(self,section=None):
     if section is None: section=self.test
