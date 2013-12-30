@@ -1,7 +1,11 @@
 #!/bin/env python2
 
-from cpypyqed import *
 import sys
+if '--debug' in sys.argv:
+    from cpypyqed_d import *
+    sys.argv.remove('--debug')
+else:
+    from cpypyqed import *
 
 p = parameters.ParameterTable()
 pm=mode.ParsPumpedLossy(p)
