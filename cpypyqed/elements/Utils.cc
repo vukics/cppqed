@@ -24,13 +24,14 @@ void export_utils()
     .value("UIP", QMP_UIP)
     .value("SCH", QMP_SCH)
   ;
+  def("isComplex", &isComplex);
   {
     scope namespaceScope = particleNameSpace;
     class_<particle::InitialCondition>("InitialCondition", init<double, double, double, optional<bool> >())
-      .add_property("getX0", &particle::InitialCondition::getX0)
-      .add_property("getK0", &particle::InitialCondition::getK0)
-      .add_property("getSig", &particle::InitialCondition::getSig)
-      .add_property("isInK", &particle::InitialCondition::isInK)
+      .def("getX0", &particle::InitialCondition::getX0)
+      .def("getK0", &particle::InitialCondition::getK0)
+      .def("getSig", &particle::InitialCondition::getSig)
+      .def("isInK", &particle::InitialCondition::isInK)
     ;
   }
 }
