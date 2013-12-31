@@ -101,10 +101,12 @@ class Runner(OutputManager):
 class PythonRunner(Runner):
   def run(self, clean=True):
     cpypyqed_builddir = self.options.cpypyqed_builddir
+    cpypyqed_config   = self.options.cpypyqed_config
     env = os.environ.copy()
     if cpypyqed_builddir:
       env['CPYPYQED_BUILDDIR']=cpypyqed_builddir
       if clean: shutil.rmtree(os.path.join(cpypyqed_builddir,'cppqedmodules'),ignore_errors=True)
+    if cpypyqed_config: env['CPYPYQED_CONFIG']=cpypyqed_config
     extra_opts = [] if self.options.configuration.lower()=="release" else ['--debug']
     Runner.run(self,clean=clean,env=env,extra_opts=extra_opts)
 
@@ -195,6 +197,7 @@ def main():
   op.add_option("--script", help="the script to run or the target to compile")
   op.add_option("--configuration", help="debug or release")
   op.add_option("--cpypyqed_builddir", help="directory for on-demand module compilation")
+  op.add_option("--cpypyqed_config", help="configure file for on-demand module compilation")
   op.add_option("--error", metavar='STRING', help="string to expect in the compilation failure for CompileFail class")
 
   (options,args) = op.parse_args()
