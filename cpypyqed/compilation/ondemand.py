@@ -38,8 +38,10 @@ class OnDemand(object):
         self.dir = os.path.expanduser(cpypyqed_builddir)
         if os.environ.has_key('CPYPYQED_BUILDDIR'):
           self.dir = os.path.expanduser(os.environ['CPYPYQED_BUILDDIR'])
-        self.configfile = os.path.join(self.dir,"config.txt")
-        self.config.read(self.configfile)
+        self.configfiles = [os.path.join(self.dir,"config.txt")]
+        if os.environ.has_key('CPYPYQED_CONFIG'):
+          self.configfiles.append(os.path.expanduser(os.environ['CPYPYQED_CONFIG']))
+        self.config.read(self.configfiles)
         self.logfile = os.path.join(self.dir,"build.log")
         self.cpypyqeddir = os.path.dirname(__file__)
         self.cmaketemplate = os.path.join(self.cpypyqeddir,"CMakeListsTemplate.txt")
