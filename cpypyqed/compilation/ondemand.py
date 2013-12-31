@@ -93,7 +93,9 @@ class OnDemand(object):
           raise(RuntimeError("Could not compile the on-demand python module. Refer to "+self.logfile+" for error messages."))
 
     def build(self):
-        builddir = tempfile.mkdtemp(dir=self.dir)
+        builddir = os.path.join(self.dir,self.modulename)
+        shutil.rmtree(builddir,ignore_errors=True)
+        mkdir_p(builddir)
         try:
           self.generate_source(builddir)
           with open(self.cmaketemplate) as f:
