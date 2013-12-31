@@ -1,9 +1,14 @@
 #!/bin/env python2
 
 import sys
-if '--debug' in sys.argv:
+import argparse
+
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--debug', action='store_true')
+(args,remaining)=parser.parse_known_args(sys.argv)
+
+if vars(args)['debug']:
     from cpypyqed_d import *
-    sys.argv.remove('--debug')
 else:
     from cpypyqed import *
 
@@ -13,7 +18,7 @@ pp = particle.ParsPumped(p)
 pm = mode.ParsPumpedLossy(p)
 ppc = particlecavity.ParsOrthogonal(p)
 
-parameters.update(p,sys.argv,'--')
+parameters.update(p,remaining,'--')
 
 qmp = QMP.UIP if pe.evol == EM.MASTER or pe.evol == EM.MASTER_FAST else QMP.IP
 myMode     = mode.make(pm,qmp)
