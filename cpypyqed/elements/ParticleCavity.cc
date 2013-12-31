@@ -20,9 +20,13 @@ void export_ParticleCavity()
   class_<ParticleAlongCavity, bases<structure::Interaction<2> >, boost::noncopyable >
     (
       "ParticleAlongCavity",
-      init<const ModeBase&, const ParticleBase&, const ParsAlong& >()
+      init<const ModeBase&, const ParticleBase&, const ParsAlong&>()
         [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()]
     )
+    .def(init<const ModeBase&, const ParticleBase&, const ParsAlong&, double>()
+        [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()])
+    .def(init<const ModeBase&, const PumpedParticleBase&, const ParsAlong&>()
+        [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()])
   ;
   class_<ParticleOrthogonalToCavity, bases<structure::Interaction<2> >, boost::noncopyable >
     (
