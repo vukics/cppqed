@@ -161,7 +161,7 @@ private:
 
 template<int NL, typename VP>
 class HamiltonianSch 
-  : public structure::Hamiltonian<1,structure::NO_TIME>
+  : public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
 {
 public:
   static const int NPT=mpl::size<VP>::value; // number of pumped transitions
@@ -173,7 +173,7 @@ public:
   const Levels& get_zSchs() const {return zSchs_;}
 
 private:
-  void addContribution_v(const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v(structure::NoTime, const StateVectorLow&, StateVectorLow&) const;
 
 
   const Levels zSchs_;
@@ -203,13 +203,13 @@ public:
 
 
 template<int NL, typename VL>
-class Liouvillean : public structure::ElementLiouvillean<1,mpl::size<VL>::value>
+class Liouvillean : public structure::ElementLiouvilleanStrategies<1,mpl::size<VL>::value>
 // Note that, at some point, the Fusion sequence VL needs to be converted into a runtime sequence (JumpStrategies & JumpRateStrategies)
 {
 public:
   static const int NLT=mpl::size<VL>::value; // number of lossy transitions
 
-  typedef structure::ElementLiouvillean<1,NLT> Base;
+  typedef structure::ElementLiouvilleanStrategies<1,NLT> Base;
   
   typedef typename Base::JumpStrategies     JumpStrategies    ;
   typedef typename Base::JumpRateStrategies JumpRateStrategies;

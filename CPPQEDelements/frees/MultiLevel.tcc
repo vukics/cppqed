@@ -143,7 +143,7 @@ private:
 
 template<int NL, typename VP>
 void
-HamiltonianSch<NL,VP>::addContribution_v(const StateVectorLow& psi, StateVectorLow& dpsidt) const
+HamiltonianSch<NL,VP>::addContribution_v(structure::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using namespace details;
   mpl::for_each<tmptools::Ordinals<NL> >(ElementaryLevel<NL>(psi,dpsidt,zSchs_));
@@ -342,7 +342,7 @@ filterReal(const blitz::TinyVector<dcomp,NL>& levels)
     if (!hasRealPart(levels(i))) {
       stringstream tag(stringstream::out);
       tag<<"delta"<<i;
-      res.push_back(boost::make_tuple(tag.str(),-imag(levels(i)),1.));
+      res.push_back(make_tuple(tag.str(),-imag(levels(i)),1.));
     }
   return res;
 }
@@ -362,7 +362,7 @@ struct ElementaryComplexFreqs
 
     stringstream tag(stringstream::out);
     tag<<label_<<P::first<<P::second;
-    cf_.push_back(boost::make_tuple(tag.str(),eta.get(),1.));
+    cf_.push_back(make_tuple(tag.str(),eta.get(),1.));
   }
 
 private:
@@ -387,7 +387,7 @@ complexFreqs(const blitz::TinyVector<dcomp,NL>& levels, const VP& etas)
     if (hasRealPart(levels(i))) {
       stringstream tag(stringstream::out);
       tag<<"(gamma"<<i<<",-delta"<<i<<")";
-      res.push_back(boost::make_tuple(tag.str(),levels(i),1.));
+      res.push_back(make_tuple(tag.str(),levels(i),1.));
     }
   for_each(etas,ElementaryComplexFreqs(res,"eta"));
   return res;
