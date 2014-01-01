@@ -2,8 +2,6 @@
 #include "Mode.h"
 #include "MultiLevel.h"
 
-#include "StateVector.h"
-
 #include <boost/fusion/sequence/intrinsic/at.hpp>
 
 
@@ -79,7 +77,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  multilevel::StateVector psiML(NL); psiML()=0; psiML()(1)=1;
+  multilevel::StateVector psiML(NL); psiML(1)=1;
 
   StateVector psi(psiML*mode::init(pplm));
 

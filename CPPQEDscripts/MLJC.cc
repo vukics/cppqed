@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  multilevel::StateVector psiML(NL); psiML()(0)=1;
+  multilevel::StateVector psiML(NL); psiML(0)=1;
 
   StateVector psi(psiML*mode::init(pplm));
 

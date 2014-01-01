@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  multilevel::StateVector psiML(NL); psiML()(0)=1; psiML()(1)=1; 
+  multilevel::StateVector psiML(NL); psiML(0)=1; psiML(1)=1; 
 
   StateVector psi(psiML*mode::init(pplm)); psi.renorm();
 
