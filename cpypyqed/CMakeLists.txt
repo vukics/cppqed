@@ -107,6 +107,7 @@ endif()
 add_subdirectory(core)
 add_subdirectory(elements)
 
+add_custom_target(cpypyqed DEPENDS io core elements)
 
 function(cpypyqed_file file config)
   string(TOLOWER ${config} CONF)
