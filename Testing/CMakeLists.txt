@@ -11,11 +11,11 @@ find_package(PythonInterp 2 REQUIRED)
 
 configure_file(testdriver.conf.in testdriver.conf)
 
-add_custom_target(check DEPENDS io check_compilefail check_run check_continue check_boost testdriver.conf.in)
+add_custom_target(check DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
 add_custom_target(check_full DEPENDS check check_cpypyqed)
 
 macro(testdir dir)
-  set(TESTSDEPEND io ${ARGN})
+  set(TESTSDEPEND cpypyqed ${ARGN})
   add_custom_target(check_${dir}
                   COMMAND ${CMAKE_CTEST_COMMAND} -V
                   DEPENDS ${TESTSDEPEND}
