@@ -100,8 +100,6 @@ configure_file(${PROJECT_SOURCE_DIR}/helpers/config.h.in ${PROJECT_BINARY_DIR}/c
 include_directories(include)
 include_directories(${PROJECT_BINARY_DIR})
 
-add_custom_target(cpypyqed)
-
 # build python io module
 if(ENABLE_PYTHON_IO)
   add_subdirectory(io)
