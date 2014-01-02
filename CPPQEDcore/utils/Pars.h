@@ -91,9 +91,11 @@ public:
   void print(size_t smw, size_t tmw, size_t dmw) const {print_v(smw,tmw,dmw);}
   void read(std::istream& is) {read_v(is);}
 
+protected:
+  virtual void  read_v(std::istream&)                = 0;
+
 private:
   virtual void print_v(size_t, size_t, size_t) const = 0;
-  virtual void  read_v(std::istream&)                = 0;
 
   const std::string s_; // as appearing in command line
   const std::string d_; // short description
@@ -118,9 +120,11 @@ public:
   void read(std::istream& is) {is>>v_;}
 
 
+protected:
+  void read_v(std::istream& is) {is>>v_;}
+
 private:
   void print_v(size_t smw, size_t tmw, size_t dmw) const;
-  void read_v(std::istream& is) {is>>v_;}
   
   T v_;
   
