@@ -16,3 +16,21 @@ set(interactions_NEEDS utils frees)
 # This tells the elements_project macro that the project name 'elements' is ok
 set(ORIGINAL_ELEMENTS_PROJECT 1)
 elements_project()
+
+##################################################
+# Documentation
+##################################################
+
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/doc/technicalDefinitions.sty ${PROJECT_BINARY_DIR} COPYONLY)
+  add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen"
+  )
+  install(DIRECTORY ${PROJECT_BINARY_DIR}/html 
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/CPPQED-${CPPQED_ID}
+          OPTIONAL
+  )
+endif()
