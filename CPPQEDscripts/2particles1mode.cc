@@ -15,8 +15,8 @@ int main(int argc, char* argv[])
   
   update(p,argc,argv,"--");
 
-  LossyMode<>    mode(pm); // Free0
-  PumpedParticle part(pp); // Free1,2 - only one instant
+  PumpedLossyMode<> mode(pm); // Free0
+  PumpedParticle    part(pp); // Free1,2 - only one instant
 
   ParticleOrthogonalToCavity act(mode,part,ppc); // only one instant
 
