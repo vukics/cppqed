@@ -106,13 +106,13 @@ private:
 
 class SpinSch
   : public SpinBase,
-    public structure::TridiagonalHamiltonian<1,false>
+    public quantumoperator::TridiagonalHamiltonian<1,false>
 {
 public:
 
   SpinSch(const spin::Pars& p) 
     : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim),
-      structure::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(cpputils::nonOwningConstSharedPtr(this)))
+      quantumoperator::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(cpputils::nonOwningConstSharedPtr(this)))
   {
     getParsStream()<<"# Schrodinger picture."<<std::endl;
   }

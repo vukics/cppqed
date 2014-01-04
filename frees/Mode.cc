@@ -409,7 +409,7 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
   : ModeBase(p.cutoff),
-    structure::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
+    quantumoperator::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
                                                                mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.cutoff))),
     structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"excitation loss"),
     structure::ElementAveraged<1,true>(mode::keyTitle,{"<number operator>","real(<ladder operator>)","imag(\")"}),

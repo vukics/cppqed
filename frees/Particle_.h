@@ -78,11 +78,11 @@ private:
 
 template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
-  : public structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
+  : public quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
     public mpl::if_c<IS_TIME_DEPENDENT,Exact,mpl::empty_base>::type
 {
 public:
-  typedef structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
+  typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
   Hamiltonian(const Spatial&, double omrec, double vClass, const ModeFunction&);
   Hamiltonian(const Spatial&, double omrec, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_());
