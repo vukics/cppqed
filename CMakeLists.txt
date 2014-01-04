@@ -24,7 +24,7 @@ elements_project()
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
   configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in ${PROJECT_BINARY_DIR}/Doxyfile @ONLY)
-  configure_file(${PROJECT_SOURCE_DIR}/doc/technicalDefinitions.sty ${PROJECT_BINARY_DIR} COPYONLY)
+  configure_file(/home/vukics/work/cppqed/doc/technicalDefinitions.sty ${PROJECT_BINARY_DIR} COPYONLY)
   add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     COMMENT "Generating API documentation with Doxygen"

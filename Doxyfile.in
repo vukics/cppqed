@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "C++QEDCore"
+PROJECT_NAME           = "C++QEDElements"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -44,14 +44,14 @@ PROJECT_NUMBER         = "v2 Milestone 9"
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "a framework for simulating open quantum dynamics – core"
+PROJECT_BRIEF          = "a framework for simulating open quantum dynamics – generic elements"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is included in
 # the documentation. The maximum height of the logo should not exceed 55 pixels
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           = @CMAKE_CURRENT_SOURCE_DIR@/doc/logoCppQED.png
+PROJECT_LOGO           = /home/vukics/work/cppqed/doc/logoCppQED.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -367,7 +367,7 @@ INLINE_GROUPED_CLASSES = NO
 # Man pages) or section (for LaTeX and RTF).
 # The default value is: NO.
 
-INLINE_SIMPLE_STRUCTS  = YES
+INLINE_SIMPLE_STRUCTS  = NO
 
 # When TYPEDEF_HIDES_STRUCT tag is enabled, a typedef of a struct, union, or
 # enum is documented as struct, union, or enum with the name of the typedef. So
@@ -742,41 +742,8 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/issues.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/userGuide.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/structureGuide.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/multiarrayConcept.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/mcwfMethod.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/nonorthogonalFormalism.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/rationale.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/CompilationMacros.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Archive.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ArrayTraits.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArray.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArrayExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArraySliceIterator.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArrayTraits.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTiny.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTinyExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BooleanNegatedProxy.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/CMatrix.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexArrayExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/CVector.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Evolved.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/EvolvedGSL.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/EvolvedGSL.tcc \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/MathExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/MultiIndexIterator.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Pars.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Simulated_.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/TMP_Tools.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Trajectory.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/quantumdata \
-                         @CMAKE_CURRENT_SOURCE_DIR@/quantumoperator \
-                         @CMAKE_CURRENT_SOURCE_DIR@/quantumoperator/Sigma.tcc \
-                         @CMAKE_CURRENT_SOURCE_DIR@/structure \
-                         @CMAKE_CURRENT_SOURCE_DIR@/quantumtrajectory
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode_.h
+
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1627,7 +1594,7 @@ PAPER_TYPE             = a4
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-EXTRA_PACKAGES         = @CMAKE_CURRENT_SOURCE_DIR@/doc/technicalDefinitions.sty \
+EXTRA_PACKAGES         = /home/vukics/work/cppqed/doc/technicalDefinitions \
                          amsmath \
                          amssymb
 
@@ -2010,13 +1977,13 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               =
+TAGFILES               = /home/vukics/work/cppqed/build/core.tag=/home/vukics/work/cppqed/build/html
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to
 # external documentation" for more information about the usage of tag files.
 
-GENERATE_TAGFILE       = core.tag
+GENERATE_TAGFILE       =
 
 # If the ALLEXTERNALS tag is set to YES all external class will be listed in the
 # class index. If set to NO only the inherited external classes will be listed.
