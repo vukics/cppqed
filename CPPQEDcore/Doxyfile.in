@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "C++QED"
+PROJECT_NAME           = "C++QEDCore"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -44,7 +44,7 @@ PROJECT_NUMBER         = "v2 Milestone 9"
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "a framework for simulating open quantum dynamics"
+PROJECT_BRIEF          = "a framework for simulating open quantum dynamics – core"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is included in
 # the documentation. The maximum height of the logo should not exceed 55 pixels
@@ -367,7 +367,7 @@ INLINE_GROUPED_CLASSES = NO
 # Man pages) or section (for LaTeX and RTF).
 # The default value is: NO.
 
-INLINE_SIMPLE_STRUCTS  = YES
+INLINE_SIMPLE_STRUCTS  = NO
 
 # When TYPEDEF_HIDES_STRUCT tag is enabled, a typedef of a struct, union, or
 # enum is documented as struct, union, or enum with the name of the typedef. So
@@ -1627,7 +1627,7 @@ PAPER_TYPE             = a4
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-EXTRA_PACKAGES         = ../technicalDefinitions \
+EXTRA_PACKAGES         = @CMAKE_CURRENT_SOURCE_DIR@/doc/technicalDefinitions \
                          amsmath \
                          amssymb
 
@@ -1662,7 +1662,7 @@ LATEX_FOOTER           =
 # markers available.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-LATEX_EXTRA_FILES      = technicalDefinitions.sty
+LATEX_EXTRA_FILES      =
 
 # If the PDF_HYPERLINKS tag is set to YES, the LaTeX that is generated is
 # prepared for conversion to PDF (using ps2pdf or pdflatex). The PDF file will
@@ -2016,7 +2016,7 @@ TAGFILES               =
 # tag file that is based on the input files it reads. See section "Linking to
 # external documentation" for more information about the usage of tag files.
 
-GENERATE_TAGFILE       =
+GENERATE_TAGFILE       = core.tag
 
 # If the ALLEXTERNALS tag is set to YES all external class will be listed in the
 # class index. If set to NO only the inherited external classes will be listed.
