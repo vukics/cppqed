@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+r"""This module provides the infrastructure to instantiate and build C++QED wrapper classes on demand.
+The main class to implementing this functionality is :class:`OnDemand`.
+"""
+
 import ConfigParser
 import os
 import sys
@@ -18,7 +22,11 @@ else:
 cpypyqed_builddir = "~/.cpypyqed"
 
 def mkdir_p(path):
-    """http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
+    """Equivalent of `mkdir -p`.
+
+    http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
+
+    :param str path: The directory to create.
     """
     try:
         os.makedirs(path)
@@ -28,6 +36,24 @@ def mkdir_p(path):
         else: raise
 
 class OnDemand(object):
+    r"""This class serves as a base to classes which need to be compiled on the fly in cpypyqed.
+
+    This is needed for class templates which cannot be pre-instantiated at cpypyqed compile time
+    because there are too many possibilities of template parameters. A typical example is the class
+    :core:`Composite`.
+
+    Classes deriving from :class:`OnDemand` need to implement :meth:`generate_source`.
+
+    :param str basename: The descriptive name of the underlying class
+    :param str classid: An id which encodes the template parameters needed to instantiate the C++ class
+    :param makerfunction: Use this makerfunction instead of the class constructor to create an instances of the
+      underlying class (default None)
+    :type makerfunction: function or None
+    """
+
+    cpypyqeddir=None
+    r"""This will be set to the directory where the C++ source templates are found,
+    typically used in the implementation of :meth:`generate_source`."""
 
     def __init__(self, basename, classid, makerfunction=None):
         self.config = ConfigParser.SafeConfigParser(
@@ -64,7 +90,7 @@ class OnDemand(object):
         f = open(os.path.join(self.modulepath,"__init__.py"),"w")
         f.close()
 
-    def import_class(self,s):
+    def _import_class(self,s):
         r"""Import a class specified by the string s.
 
         :param s: The name of the class to import, e.g. 'mypackage.mymodule.myclass'
@@ -77,16 +103,21 @@ class OnDemand(object):
         return getattr(module,classname)
 
     def maker(self,*args,**kwargs):
+        r"""Returns an instance of the underlying class represented by this :class:`OnDemand` object.
+        The arguments of this function are passed through to the constructor of the underlying class.
+        If the on-demand module holding the class has not been built yet or the C++QED library version
+        does not fit, the module is compiled on the fly.
+        """
         try:
-          thisClass = self.import_class(self.fullclass)
+          thisClass = self._import_class(self.fullclass)
         except ImportError:
-          self.build()
-          thisClass = self.import_class(self.fullclass)
+          self._build()
+          thisClass = self._import_class(self.fullclass)
         if not thisClass.core_git == core_git:
           os.remove(os.path.join(self.modulepath,self.library))
           sys.exit("Error: {} was compiled with different library version, removing.\nPlease restart the script.\n".format(self.fullclass))
         if self.makerfunction:
-            thisClass = self.import_class(self.makerfunction)
+            thisClass = self._import_class(self.makerfunction)
         return thisClass(*args,**kwargs) 
 
     def _check_return_value(self,ret, errormsg=None):
@@ -94,7 +125,9 @@ class OnDemand(object):
           if errormsg: sys.stderr.write(errormsg)
           raise(RuntimeError("Could not compile the on-demand python module. Refer to "+self.logfile+" for error messages."))
 
-    def build(self):
+    def _build(self):
+        r"""Build the module holding the underlying class.
+        """
         builddir = os.path.join(self.dir,self.modulename)
         shutil.rmtree(builddir,ignore_errors=True)
         mkdir_p(builddir)
@@ -131,5 +164,13 @@ class OnDemand(object):
             shutil.rmtree(builddir, ignore_errors=True)
 
     def generate_source(self, builddir):
+        r"""This creates the C++ source file of the python module. It is a stub and has to be implmented by
+        deriving classes.
+
+        Implementations have to save the result to `builddir`. They can access template files in the directory
+        :attr:`cpypyqeddir`.
+
+        :param str builddir: The directory where the module is going to be built. The result has to be saved here.
+        """
         pass
 

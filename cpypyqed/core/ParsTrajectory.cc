@@ -37,9 +37,9 @@ void export_10_ParsTrajectory()
 {
   {
     scope namespaceScope = evolvedNameSpace;
-    enum_<evolved::SteppingFunction>("SteppingFunction")
-      .value("SF_RK8PD",  evolved::SF_RK8PD)
-      .value("SF_RKCK",   evolved::SF_RKCK)
+    enum_<evolved::SteppingFunction>("SF", "Wrapper of :core:`evolved::SteppingFunction`")
+      .value("RK8PD",  evolved::SF_RK8PD)
+      .value("RKCK",   evolved::SF_RKCK)
     ;
   }
 
@@ -48,6 +48,7 @@ void export_10_ParsTrajectory()
     class_<ParsRun>
       (
         "ParsRun",
+        "Wrapper of :core:`trajectory::ParsRun`",
         init<parameters::ParameterTable&, optional<const string&> >()
           [with_custodian_and_ward<1,2>()]
       )
@@ -64,6 +65,7 @@ void export_10_ParsTrajectory()
     class_<ParsEvolved>
       (
         "ParsEvolved",
+        "Wrapper of :core:`trajectory::ParsEvolved`",
         init<parameters::ParameterTable&, optional<const string&> >()
           [with_custodian_and_ward<1,2>()]
       )

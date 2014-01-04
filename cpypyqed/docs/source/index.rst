@@ -11,29 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-:mod:`cpypyqed_d.core_d`
-========================
-
-.. automodule:: cpypyqed_d
-  :members:
-  :undoc-members:
-
-.. automodule:: cpypyqed_d.core_d
-  :members:
-  :undoc-members:
-
-.. automodule:: cpypyqed_d.elements_d
-  :members:
-  :undoc-members:
-
-.. automodule:: cpypyqed_d.compilation.ondemand
-  :members:
-  :undoc-members:
-
-.. automodule:: cpypyqed_d.compilation.composite
-  :members:
-  :undoc-members:
-
+   userguide
+   reference
 
 Indices and tables
 ==================

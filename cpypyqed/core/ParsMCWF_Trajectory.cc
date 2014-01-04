@@ -23,7 +23,12 @@ PARS_GETTER_SETTER(int,      ParsMCWF, logLevel)
 void export_20_ParsMCWF_Trajectory()
 {
   scope namespaceScope = quantumtrajectoryNameSpace;
-  class_<ParsMCWF, bases<ParsStochastic> >("ParsMCWF",init<parameters::ParameterTable&, optional<const std::string&> >())
+  class_<ParsMCWF, bases<ParsStochastic> >
+    (
+      "ParsMCWF",
+      "Wrapper of :core:`quantumtrajectory::ParsMCWF`",
+      init<parameters::ParameterTable&, optional<const std::string&> >()
+    )
     .PARS_PROPERTY(dpLimit)
     .PARS_PROPERTY(overshootTolerance)
     .PARS_PROPERTY(logLevel)

@@ -21,7 +21,9 @@ void export_QuantumSystem(){
 
   scope namespaceScope = structureNameSpace;
 #define QUANTUMSYSTEM_INSTANTIATIONS(z,r,data) \
-  class_<QuantumSystem<r>, boost::noncopyable >(BOOST_PP_STRINGIZE(BOOST_PP_CAT(QuantumSystem,r)), no_init) \
+  class_<QuantumSystem<r>, boost::noncopyable >(BOOST_PP_STRINGIZE(BOOST_PP_CAT(QuantumSystem,r)),\
+                                                "Instantiation of :core:`structure::QuantumSystem` with RANK="#r,\
+                                                no_init) \
     .def("highestFrequency",&QuantumSystem<r>::highestFrequency) \
   ;
 BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), QUANTUMSYSTEM_INSTANTIATIONS, data)

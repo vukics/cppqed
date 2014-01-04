@@ -21,8 +21,9 @@ void export_QuantumSystem_BinarySystem()
 {
   {
     scope namespaceScope = binaryNameSpace;
-    class_<binary::Base, bases<QuantumSystem<2> >, boost::noncopyable >("Base", no_init);
-    def("make", binary::doMake,
+    class_<binary::Base, bases<QuantumSystem<2> >, boost::noncopyable >
+      ("Base", "Wrapper of :core:`binary::Base`", no_init);
+    def("make", binary::doMake, "Wrapper of :core:`binary::make`",
         with_custodian_and_ward_postcall<0, 1>()
     );
     binaryNameSpace.staticmethod("make");
@@ -40,7 +41,7 @@ void export_QuantumSystem_BinarySystem()
               ,BOOST_PP_SEQ_ELEM(1,b)) \
             ,_) \
           ,BOOST_PP_SEQ_ELEM(2,b)) \
-        ),no_init);
+        ), "Instantiation of :core:`BinarySystem` with template parameters " BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(0,b)) "," BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(1,b)) "," BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(2,b)),no_init);
 BOOST_PP_SEQ_FOR_EACH_PRODUCT(BINARYSYSTEM_INSTANTIATIONS, (BOOLS)(BOOLS)(BOOLS))
 
   register_ptr_to_python<boost::shared_ptr<binary::Base const> >();

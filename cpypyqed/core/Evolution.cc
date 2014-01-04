@@ -37,7 +37,7 @@ PARS_GETTER_SETTER(bool, ParsEvolution, negativity)
 
 void export_25_Evolution()
 {
-  enum_<EvolutionMode>("EM")
+  enum_<EvolutionMode>("EM", "Wrapper of :core:`EvolutionMode`")
     .value("SINGLE",      EM_SINGLE)
     .value("ENSEMBLE",    EM_ENSEMBLE)
     .value("MASTER",      EM_MASTER)
@@ -45,7 +45,7 @@ void export_25_Evolution()
   ;
   class_<ParsEvolution, bases<ParsRun,ParsMCWF> >
     (
-      "ParsEvolution",
+      "ParsEvolution", "Wrapper of :core:`ParsEvolution`",
       init<parameters::ParameterTable&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
@@ -55,7 +55,7 @@ void export_25_Evolution()
 
 
 #define EVOLVE_INSTANTIATIONS(z,r,data) \
-  def("evolve", (void (*)(StateVector<r>&, const QuantumSystem<r>&, const ParsEvolution&)) &evolve);
+  def("evolve", (void (*)(StateVector<r>&, const QuantumSystem<r>&, const ParsEvolution&)) &evolve, "Wrapper of :core:`evolve` with RANK="#r);
 BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), EVOLVE_INSTANTIATIONS, data)
 
 }
