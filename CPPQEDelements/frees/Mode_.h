@@ -99,11 +99,11 @@ private:
 
 template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
-  : public structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
+  : public quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
     public mpl::if_c<IS_TIME_DEPENDENT,Exact,mpl::empty_base>::type
 {
 public:
-  typedef structure::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
+  typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
   Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
   Hamiltonian(const dcomp& zSch,                  const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
@@ -433,7 +433,7 @@ public:
 
 class PumpedLossyModeIP_NoExact
   : public ModeBase,
-    public structure::TridiagonalHamiltonian<1,true>, 
+    public quantumoperator::TridiagonalHamiltonian<1,true>, 
     public structure::ElementLiouvillean<1,1,true>,
     public structure::ElementAveraged<1,true>
 {
@@ -442,7 +442,7 @@ public:
 
 private:
   typedef structure::OneTime OneTime;
-  typedef structure::TridiagonalHamiltonian<1,true>::StateVectorLow StateVectorLow;
+  typedef quantumoperator::TridiagonalHamiltonian<1,true>::StateVectorLow StateVectorLow;
   typedef structure::ElementLiouvillean<1,1,true>::LazyDensityOperator LazyDensityOperator;
 
   void   doActWithJ (OneTime, StateVectorLow&           ) const;

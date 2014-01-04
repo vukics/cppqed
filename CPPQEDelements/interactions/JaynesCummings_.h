@@ -54,10 +54,10 @@ protected:
 
 
 template<>
-class Base<true> : public Base<false>, public structure::TridiagonalHamiltonian<2,true>
+class Base<true> : public Base<false>, public quantumoperator::TridiagonalHamiltonian<2,true>
 {
 protected:
-  typedef structure::TridiagonalHamiltonian<2,true> TDH_Base;
+  typedef quantumoperator::TridiagonalHamiltonian<2,true> TDH_Base;
 
   template<typename QBIT_SPIN_BASE>
   Base(boost::shared_ptr<const QBIT_SPIN_BASE> qbitspin, mode::Ptr mode, const dcomp& g)

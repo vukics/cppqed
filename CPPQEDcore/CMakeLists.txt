@@ -181,7 +181,7 @@ include_directories(${PROJECT_BINARY_DIR}) # for generated config files
 # build libC++QEDcore.so
 set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory composites)
 set(quantumdata_NEEDS utils)
-set(quantumoperator_NEEDS quantumdata utils)
+set(quantumoperator_NEEDS quantumdata structure utils)
 set(structure_NEEDS quantumdata utils)
 set(quantumtrajectory_NEEDS structure quantumdata utils)
 set(composites_NEEDS structure quantumdata utils)

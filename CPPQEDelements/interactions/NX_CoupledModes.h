@@ -25,7 +25,7 @@ public:
 };
 
 template<>
-class Base<true> : public Base<false>, public structure::TridiagonalHamiltonian<2,true>
+class Base<true> : public Base<false>, public quantumoperator::TridiagonalHamiltonian<2,true>
 {
 public:
   Base(mode::Ptr, mode::Ptr, double u);

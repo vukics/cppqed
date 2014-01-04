@@ -1,11 +1,13 @@
 // -*- C++ -*-
 /// [basic example mode]
 #include "Free.h"
-#include "TridiagonalHamiltonian.h"
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"
 
+#include "TridiagonalHamiltonian.h"
+
 using namespace structure;
+using quantumoperator::TridiagonalHamiltonian;
 using namespace freesystem;
 
 

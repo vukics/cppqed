@@ -27,7 +27,7 @@ struct UnotEtaeffSignDiscrepancy : public cpputils::Exception {};
 typedef quantumoperator::Tridiagonal<2> Tridiagonal;
 
 
-typedef structure::TridiagonalHamiltonian<2,true> TridiagonalHamiltonian;
+typedef quantumoperator::TridiagonalHamiltonian<2,true> TridiagonalHamiltonian;
 
 
 typedef TridiagonalHamiltonian::Tridiagonals Tridiagonals;

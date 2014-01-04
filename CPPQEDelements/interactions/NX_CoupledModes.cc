@@ -14,6 +14,6 @@ nxcoupledmodes::Base<false>::Base(mode::Ptr m1, mode::Ptr m2, double u)
 
 
 nxcoupledmodes::Base<true >::Base(mode::Ptr m1, mode::Ptr m2, double u)
-  : Base<false>(m1,m2,u), structure::TridiagonalHamiltonian<2,true>(u*nop(m1)*xop(m2)/DCOMP_I)
+  : Base<false>(m1,m2,u), quantumoperator::TridiagonalHamiltonian<2,true>(u*nop(m1)*xop(m2)/DCOMP_I)
 {
 }

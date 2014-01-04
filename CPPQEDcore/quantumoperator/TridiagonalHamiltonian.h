@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFileDefault \todo Should be moved to repository Elements
-#ifndef STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
-#define STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
+#ifndef QUANTUMOPERATOR_TRIDIAGONALHAMILTONIAN_H_INCLUDED
+#define QUANTUMOPERATOR_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 
 #include "TridiagonalHamiltonianFwd.h"
 
@@ -12,11 +12,12 @@
 #include <list>
 
 
-namespace structure {
+namespace quantumoperator {
 
 
 namespace details {
 
+using namespace structure;
 
 /// TridiagonalHamiltonian base
 template<int RANK, bool IS_TIME_DEPENDENT>
@@ -29,7 +30,7 @@ class TDH_Base
                                                >
 {
 protected:
-  typedef quantumoperator::Tridiagonal<RANK> Tridiagonal ;
+  typedef quantumoperator::Tridiagonal<RANK> Tridiagonal;
   typedef std::list<Tridiagonal>             Tridiagonals;
 
   typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any TimeDependence.
@@ -57,18 +58,18 @@ private:
 
 
 
-/// Implements the action of a Hamiltonian whose matrix consists of a sum of \link quantumoperator::Tridiagonal tridiagonal matrices\endlink
+/// Implements the action of a Hamiltonian whose matrix consists of a sum of \link Tridiagonal tridiagonal matrices\endlink
 /**
- * \f[H_\text{tridiagonals}(t)=H_0(t)+H_1(t)+H_2(t)+\dots\f] with the \f$H_i(t)\f$s being all described by quantumoperator::Tridiagonal `<RANK>` objects.
+ * \f[H_\text{tridiagonals}(t)=H_0(t)+H_1(t)+H_2(t)+\dots\f] with the \f$H_i(t)\f$s being all described by Tridiagonal `<RANK>` objects.
  * 
- * Such a class can be constructed with either a list of quantumoperator::Tridiagonal `<RANK>` objects, or only one such object when the above sum consists of only one term.
+ * Such a class can be constructed with either a list of Tridiagonal `<RANK>` objects, or only one such object when the above sum consists of only one term.
  * 
  * \tparamRANK
  * \tparam IS_TIME_DEPENDENT governs time-dependence & the composition of the class @ compile time
  * 
  * Implements Hamiltonian<RANK,ONE_TIME> when `IS_TIME_DEPENDENT=true` **OR** Hamiltonian<RANK,NO_TIME>  when `IS_TIME_DEPENDENT=false`
  * 
- * \note The present architecture of quantumoperator::Tridiagonal does not allow to cover the case #TWO_TIME.
+ * \note The present architecture of Tridiagonal does not allow to cover the case #TWO_TIME.
  *  
  */
 template<int RANK, bool IS_TIME_DEPENDENT>
@@ -88,7 +89,7 @@ public:
 
 #undef BASE_class
 
-} // structure
+} // quantumoperator
 
 
-#endif // STRUCTURE_TRIDIAGONALHAMILTONIAN_H_INCLUDED
+#endif // QUANTUMOPERATOR_TRIDIAGONALHAMILTONIAN_H_INCLUDED
