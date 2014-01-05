@@ -8,6 +8,9 @@
 #  CPPQED_HAS_FLENS    - FLENS support enabled
 #  CPPQED_CORE_GIT     - Core git commit sha1
 #  CPPQED_USE          - CMAKE related stuff to use this package
+#  CPPQED_DOXYGEN_DIR  - Doxygen directory
+#  CPPQED_DOXYGEN_TAG  - Doxygen tagfile
+#  CPPQED_DOC_INSTALL_DIR - Top level documentation directory for the cppqed framework
 
 @PACKAGE_INIT@
 
@@ -40,6 +43,10 @@ endif(@CONF_FLAT_INCLUDE@)
 
 set_and_check(CPPQED_CMAKE_DIR @PACKAGE_CONF_CMAKE_DIR@)
 set_and_check(CPPQED_USE @PACKAGE_CONF_CMAKE_DIR@/CPPQEDUse.cmake)
+
+set(CPPQED_DOXYGEN_DIR @PACKAGE_CONF_DOC_DIR@)
+set(CPPQED_DOXYGEN_TAG @PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag)
+set(CPPQED_DOC_INSTALL_DIR @PACKAGE_DOC_INSTALL_DIR@)
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET @CPPQEDLIB@)

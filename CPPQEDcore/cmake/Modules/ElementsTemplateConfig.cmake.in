@@ -3,6 +3,8 @@
 #  CPPQED@PROJECT_NAME@_INCLUDE_DIRS - include directories for CPPQED
 #  CPPQED@PROJECT_NAME@_LIBRARIES    - libraries to link against
 #  CPPQED@PROJECT_NAME@_SHA1         - SHA1 of the current git commit
+#  CPPQED@PROJECT_NAME@_DOXYGEN_DIR  - Doxygen directory
+#  CPPQED@PROJECT_NAME@_DOXYGEN_TAGFILE - Doxygen tagfile
 
 @PACKAGE_INIT@
 
@@ -10,6 +12,9 @@ set(CPPQED@PROJECT_NAME@_SHA1 @CONF_GIT_SHA1@)
 
 # set_and_check does not work with lists
 set(CPPQED@PROJECT_NAME@_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
+
+set(CPPQED@PROJECT_NAME@_DOXYGEN_DIR @PACKAGE_CONF_DOC_DIR@/html)
+set(CPPQED@PROJECT_NAME@_DOXYGEN_TAGFILE @PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag)
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET @ELEMENTSLIB@)
