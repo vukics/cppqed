@@ -17,6 +17,8 @@ if(Boost_PYTHON_FOUND)
   add_subdirectory(cpypyqed)
 endif()
 
+add_custom_target(doc DEPENDS core_doc elements_doc)
+
 # Disabled CustomExample compilation by default for now, add it as a test later
 # add_subdirectory(CustomElementsExample)
 # set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
