@@ -51,14 +51,14 @@ PROJECT_BRIEF          = "a framework for simulating open quantum dynamics – g
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           = /home/vukics/work/cppqed/doc/logoCppQED.png
+PROJECT_LOGO           = @CPPQED_RELATIVE_DOXYGEN_DIR@/logoCppQED.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       =
+OUTPUT_DIRECTORY       = @CONF_DOC_DIR@
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -142,7 +142,7 @@ FULL_PATH_NAMES        = YES
 # will be relative from the directory where doxygen is started.
 # This tag requires that the tag FULL_PATH_NAMES is set to YES.
 
-STRIP_FROM_PATH        =
+STRIP_FROM_PATH        = @PROJECT_SOURCE_DIR@
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
@@ -1594,7 +1594,7 @@ PAPER_TYPE             = a4
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-EXTRA_PACKAGES         = /home/vukics/work/cppqed/doc/technicalDefinitions \
+EXTRA_PACKAGES         = @CPPQED_RELATIVE_DOXYGEN_DIR@/technicalDefinitions \
                          amsmath \
                          amssymb
 
@@ -1977,7 +1977,7 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               = /home/vukics/work/cppqed/build/core.tag=/home/vukics/work/cppqed/build/html
+TAGFILES               = @CPPQED_RELATIVE_DOXYGEN_TAG@=@CPPQED_RELATIVE_DOXYGEN_DIR@/html
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to
