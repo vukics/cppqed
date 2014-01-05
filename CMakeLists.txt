@@ -28,7 +28,7 @@ if(COMPILE_SCRIPTS)
 endif()
 
 install(DIRECTORY CustomElementsExample CustomScriptsExample
-        DESTINATION ${CMAKE_INSTALL_DOCDIR}-${CPPQED_ID}
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}
         PATTERN .git* EXCLUDE
         PATTERN .bzr EXCLUDE
         PATTERN *.kdev* EXCLUDE
