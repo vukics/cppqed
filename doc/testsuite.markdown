@@ -2,7 +2,7 @@
 
 \tableofcontents
 
-# Short user guide  {#shortguide}
+# Running the test suite  {#testsuite_running}
 
 After [cloning](#cloning) the C++QED repository, there are several ways to run the test suite
 fully or partially.
