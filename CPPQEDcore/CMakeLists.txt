@@ -223,8 +223,8 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     WORKING_DIRECTORY ${CONF_DOC_DIR}
     COMMENT "Generating API documentation with Doxygen"
   )
-  install(DIRECTORY ${CONF_DOC_DIR}
-          DESTINATION ${DOC_INSTALL_DIR}
+  install(DIRECTORY ${CONF_DOC_DIR}/html
+          DESTINATION ${DOC_INSTALL_DIR}/${PROJECT_NAME}
           OPTIONAL
   )
 endif()
