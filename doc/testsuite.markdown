@@ -50,6 +50,37 @@ tests depending on other tests will be run in the right order. Running `ctest` d
 support, because individual tests are run in parallel, making this the fastest method. Verbose output from
 tests can be enabled by the `-V` switch.
 
+# Test suite layout {#testsuite_layout}
+
+## The `cmake` part
+
+Tests are grouped into sub-directories of `Testing`. To add a new directory, the `CMakeLists.txt` has to include
+the statement
+
+    testdir(<dirname> [dependency1 dependency2 ...])
+
+Among other things, this will create the `check_<dirname>` target. The optional dependencies are `cmake` targets
+which are required to be built before all of the tests in this directory can be run. For example, if one of the tests
+requires `1particle1mode` one has to add `1particle1mode` to the dependencies.
+
+To add a new test, one has to call **delcaretest**, **add_test** and optionally **set_tests_properties**.
+Here is an example how to add a new test in the `CMakeLists.txt`:
+
+    declaretest(<unique test name>)
+    add_test(NAME ${TESTNAME} COMMAND <command with parameters>)
+    # the following line is optional, adds a dependency:
+    set_tests_properties(${TESTNAME} PROPERTIES DEPENDS <some other test>)
+
+The command can be anything which indicates success by a return value of 0, typically this will be the
+[Python](#testsuite_python) or boost test driver. The variable `${TESTNAME}` is set to the current test
+name by `declaretest`.
+
+## The Python part {#testsuite_python}
+
+The Python script **testdriver.py** can serve as a command to `add_test`, the syntax is:
+
+    add_test(NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT} <parameters>)
+
 # Cloning the C++QED repository {#cloning}
 
 The test suite is available in the Development branch of the C++QED repository, which
