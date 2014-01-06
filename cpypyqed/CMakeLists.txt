@@ -137,6 +137,36 @@ foreach(file __init__.py compilation/cpypyqed_config.py
   endif()
 endforeach(file)
 
+##################################################
+# Documentation
+##################################################
+
+find_package(Doxygen)
+
+if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
+  set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
+  file(MAKE_DIRECTORY ${CONF_DOC_DIR})
+  file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CPPQED_DOXYGEN_TAG})
+  get_filename_component(CPPQED_RELATIVE_DOXYGEN_DIR ${CPPQED_RELATIVE_DOXYGEN_TAG} DIRECTORY)
+  set(CPPQED_RELATIVE_DOXYGEN_DIR ../${CPPQED_RELATIVE_DOXYGEN_DIR})
+  configure_file(${PROJECT_SOURCE_DIR}/docs/conf.py.in ${CONF_DOC_DIR}/conf.py @ONLY)
+  foreach(AUXFILE index.rst Makefile reference.rst userguide.rst)
+    configure_file(${PROJECT_SOURCE_DIR}/docs/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
+  endforeach()
+  add_custom_target(${PROJECT_NAME}_doc make html
+    WORKING_DIRECTORY ${CONF_DOC_DIR}
+    COMMENT "Generating API documentation with sphinx"
+  )
+  if(CPPQED_MONOLITHIC)
+    add_dependencies(${PROJECT_NAME}_doc core_doc)
+    install(DIRECTORY ${CONF_DOC_DIR}/html
+          DESTINATION ${CPPQED_DOC_INSTALL_DIR}/${PROJECT_NAME}
+          OPTIONAL
+    )
+  endif()
+endif()
+
+
 set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
                                 DESCRIPTION "Collection of portable C++ source libraries."
                                 TYPE REQUIRED
