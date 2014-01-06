@@ -212,7 +212,9 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
 
 find_package(Doxygen)
 set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
-set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
+if(NOT DEFINED DOC_INSTALL_DIR) # otherwise it is defined in the super-repository
+  set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
+endif()
 if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
   file(MAKE_DIRECTORY ${CONF_DOC_DIR})
   configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in ${CONF_DOC_DIR}/Doxyfile @ONLY)
