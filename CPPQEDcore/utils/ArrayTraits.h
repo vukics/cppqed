@@ -15,6 +15,9 @@ struct Rank;
 template<typename A>
 struct TypeID;
 
+template<typename A>
+struct ElementType;
+
 /// \name Array memory traits
 //@{
 
