@@ -42,8 +42,7 @@ Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
                             const ParsStochastic& p,
                             const evolved::Maker<A>& makerE,
                             const randomized::Maker& makerR)
-  : Adaptive<A>(y,derivs,dtInit,p,scaleAbs,makerE),
-    seed_(p.seed), isNoisy_(p.noise), randomized_(makerR(p.seed)) {}
+  : Stochastic(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs,makerE,p.seed,p.noise,makerR) {}
 
 
 
