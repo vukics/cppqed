@@ -36,8 +36,8 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
   )
   if(CPPQED_MONOLITHIC)
     add_dependencies(${PROJECT_NAME}_doc core_doc)
-    install(DIRECTORY ${CONF_DOC_DIR}
-          DESTINATION ${CPPQED_DOC_INSTALL_DIR}
+    install(DIRECTORY ${CONF_DOC_DIR}/html
+          DESTINATION ${CPPQED_DOC_INSTALL_DIR}/${PROJECT_NAME}
           OPTIONAL
     )
   endif()
