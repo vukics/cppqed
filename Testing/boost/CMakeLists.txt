@@ -5,7 +5,9 @@ CPPQED_SETUP()
 include(${elements_BINARY_DIR}/CPPQEDelementsConfig.cmake)
 include_directories(${CPPQEDelements_INCLUDE_DIRS})
 
-add_executable(tester main.cc LazyDensityOperatorFFT.cc)
+set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc)
+
+add_executable(tester main.cc ${BOOST_TEST_SOURCES})
 target_link_libraries(tester ${CPPQED_LIBRARIES} ${CPPQEDelements_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 testdir(boost tester)
