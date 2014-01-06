@@ -103,29 +103,31 @@ private:
 ///////////
 
 
-namespace details {
+namespace ensemble {
 
+/// A base-class to Ensemble with customized behaviour according to the type of `T`
 template<typename T>
-class EnsembleBase {};
+class Base {};
 
 
+/// Specialization for reference types
 template<typename T>
-class EnsembleBase<T&>
+class Base<T&>
 {
 public:
-  typedef T& TBA_Type;
+  typedef T& ToBeAveragedType;
 
-  const TBA_Type getInitializedTBA() const {return getInitializedTBA_v();}
+  const ToBeAveragedType getInitializedToBeAveraged() const {return getInitializedToBeAveraged_v();}
 
-  virtual ~EnsembleBase() {}
+  virtual ~Base() {}
 
 private:
-  virtual const TBA_Type getInitializedTBA_v() const = 0;
+  virtual const ToBeAveragedType getInitializedToBeAveraged_v() const = 0;
   
 };
 
 
-}
+} // ensemble
 
 /*
   
@@ -139,15 +141,15 @@ private:
 
 
 template<typename T, typename T_ELEM>
-class Ensemble : public Averageable<T>, public details::EnsembleBase<T>
+class Ensemble : public Averageable<T>, public ensemble::Base<T>
 {
 public:
   typedef Averageable<T     > Base;
   typedef Averageable<T_ELEM> Elem;
 
-  typedef T TBA_Type;
+  typedef T ToBeAveragedType;
 
-  const TBA_Type averageInRange(size_t begin, size_t n) const;
+  const ToBeAveragedType averageInRange(size_t begin, size_t n) const;
   // Averages only in a range begin..begin+n-1. Earlier, this was called toBeAveraged, too, but it is not good to redefine an inherited non-virtual function.
 
   virtual ~Ensemble() {}
@@ -181,7 +183,7 @@ private:
   double getDtDid_v() const;
   // An average of getDtDid()-s from individual trajectories.
 
-  const TBA_Type toBeAveraged_v() const {return averageInRange(0,trajs_.size());}
+  const ToBeAveragedType toBeAveraged_v() const {return averageInRange(0,trajs_.size());}
 
   Impl trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
@@ -191,21 +193,26 @@ private:
 
 
 
-// Implementation of the traits class for the most commonly used case:
+namespace ensemble {
 
+
+
+// Implementation of the traits class for the most commonly used case:
 template<typename T, typename T_ELEM>
-class EnsembleTraits
+class Traits
 {
 public:
-  typedef Ensemble<T,T_ELEM> ET;
+  typedef Ensemble<T,T_ELEM> EnsembleType;
 
-  typedef typename ET::Elem     Elem    ;
-  typedef typename ET::Impl     Impl    ;
-  typedef typename ET::TBA_Type TBA_Type;
+  typedef typename EnsembleType::Elem             Elem            ;
+  typedef typename EnsembleType::Impl             Impl            ;
+  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
 
-  static const TBA_Type averageInRange(typename Impl::const_iterator, typename Impl::const_iterator, const ET&);
+  static const ToBeAveragedType averageInRange(typename Impl::const_iterator, typename Impl::const_iterator, const EnsembleType&);
 
 };
+
+} // ensemble
 
 
 } // trajectory

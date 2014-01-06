@@ -13,9 +13,12 @@ class Averageable;
 template<typename T, typename T_ELEM=T>
 class Ensemble;
 
-template<typename T, typename T_ELEM>
-class EnsembleTraits;
+namespace ensemble {
 
+template<typename T, typename T_ELEM>
+class Traits;
+
+}
 
 template<typename A, typename T> 
 class Stochastic;

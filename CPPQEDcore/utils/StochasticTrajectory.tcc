@@ -23,6 +23,7 @@ Stochastic<A,T>::displayParameters_v(std::ostream& os) const
   return Adaptive<A>::displayParameters_v(os)<<"# Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "# No noise.\n");
 }
 
+
 template<typename A, typename T>
 Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
                             double dtInit,
@@ -80,10 +81,10 @@ Ensemble<T,T_ELEM>::evolve_v(double deltaT)
 
 
 template<typename T, typename T_ELEM>
-const typename Ensemble<T,T_ELEM>::TBA_Type
-Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const
+auto
+Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const ToBeAveragedType
 {
-  return EnsembleTraits<T,T_ELEM>::averageInRange(trajs_.begin()+begin,trajs_.begin()+(begin+n),*this);
+  return ensemble::Traits<T,T_ELEM>::averageInRange(trajs_.begin()+begin,trajs_.begin()+(begin+n),*this);
 
 }
 
@@ -93,28 +94,29 @@ Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const
 // Implementation of the traits class for the most commonly used case:
 
 template<typename T, typename T_ELEM>
-const typename EnsembleTraits<T,T_ELEM>::TBA_Type 
-EnsembleTraits<T,T_ELEM>::averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const ET&)
+auto
+ensemble::Traits<T,T_ELEM>::averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType&) -> const ToBeAveragedType
 {
   return T(cpputils::accumulate(++begin,end,begin->toBeAveraged(),bind(&Elem::toBeAveraged,_1),cpputils::plus<T>())/size2Double(end-begin));
 }
 
 
-// A tentative specialization for the case when TBA_Type is a reference, it has a member function getInitializedTBA, and T_ELEM has a member function addTo
+namespace ensemble {
+// A tentative specialization for the case when ToBeAveragedType is a reference, it has a member function getInitializedToBeAveraged, and T_ELEM has a member function addTo
 
 template<typename T, typename T_ELEM>
-class EnsembleTraits<T&,T_ELEM>
+class Traits<T&,T_ELEM>
 {
 public:
-  typedef Ensemble<T&,T_ELEM> ET;
+  typedef Ensemble<T&,T_ELEM> EnsembleType;
 
-  typedef typename ET::Elem     Elem    ;
-  typedef typename ET::Impl     Impl    ;
-  typedef typename ET::TBA_Type TBA_Type;
+  typedef typename EnsembleType::Elem             Elem            ;
+  typedef typename EnsembleType::Impl             Impl            ;
+  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
 
-  static const TBA_Type averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const ET& et)
+  static const ToBeAveragedType averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType& et)
   {
-    TBA_Type res(et.getInitializedTBA());
+    ToBeAveragedType res(et.getInitializedToBeAveraged());
     
     for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
 
@@ -125,6 +127,8 @@ public:
 
 };
 
+
+} // ensemble
 
 
 } // trajectory
