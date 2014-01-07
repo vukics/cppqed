@@ -1,3 +1,4 @@
+/// \briefFile{The mode-bundle convenience header}
 // -*- C++ -*-
 #ifndef   FREES_MODE_H_INCLUDED
 #define   FREES_MODE_H_INCLUDED
