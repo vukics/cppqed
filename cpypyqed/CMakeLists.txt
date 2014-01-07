@@ -149,9 +149,9 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
   file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CPPQED_DOXYGEN_TAG})
   get_filename_component(CPPQED_RELATIVE_DOXYGEN_DIR ${CPPQED_RELATIVE_DOXYGEN_TAG} DIRECTORY)
   set(CPPQED_RELATIVE_DOXYGEN_DIR ../${CPPQED_RELATIVE_DOXYGEN_DIR})
-  configure_file(${PROJECT_SOURCE_DIR}/docs/conf.py.in ${CONF_DOC_DIR}/conf.py @ONLY)
+  configure_file(${PROJECT_SOURCE_DIR}/doc/conf.py.in ${CONF_DOC_DIR}/conf.py @ONLY)
   foreach(AUXFILE index.rst Makefile reference.rst userguide.rst)
-    configure_file(${PROJECT_SOURCE_DIR}/docs/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
+    configure_file(${PROJECT_SOURCE_DIR}/doc/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
   endforeach()
   add_custom_target(${PROJECT_NAME}_doc make html
     WORKING_DIRECTORY ${CONF_DOC_DIR}
