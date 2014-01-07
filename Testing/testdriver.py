@@ -204,7 +204,7 @@ def main():
 
   cp.read(args)
   sys.path.insert(0,cp.get('Setup','modulepath'))
-  # we can only load pycppqed after we know where to look for the cpypyqed module
+  # we can only load the io module after we know where to look for the cpypyqed package
   global io
   if options.configuration.lower()=="release":
     import cpypyqed.io as io
