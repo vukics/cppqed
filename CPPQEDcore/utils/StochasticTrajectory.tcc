@@ -91,44 +91,13 @@ Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const ToBeAv
 
 
 
-// Implementation of the traits class for the most commonly used case:
-
+// Naive generic implementation of the traits class
 template<typename T, typename T_ELEM>
 auto
 ensemble::Traits<T,T_ELEM>::averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType&) -> const ToBeAveragedType
 {
   return T(cpputils::accumulate(++begin,end,begin->toBeAveraged(),bind(&Elem::toBeAveraged,_1),cpputils::plus<T>())/size2Double(end-begin));
 }
-
-
-namespace ensemble {
-// A tentative specialization for the case when ToBeAveragedType is a reference, it has a member function getInitializedToBeAveraged, and T_ELEM has a member function addTo
-
-template<typename T, typename T_ELEM>
-class Traits<T&,T_ELEM>
-{
-public:
-  typedef Ensemble<T&,T_ELEM> EnsembleType;
-
-  typedef typename EnsembleType::Elem             Elem            ;
-  typedef typename EnsembleType::Impl             Impl            ;
-  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
-
-  static const ToBeAveragedType averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType& et)
-  {
-    ToBeAveragedType res(et.getInitializedToBeAveraged());
-    
-    for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
-
-    return res/=size2Double(end-begin);
-
-  }
-
-
-};
-
-
-} // ensemble
 
 
 } // trajectory

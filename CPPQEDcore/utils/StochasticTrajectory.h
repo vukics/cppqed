@@ -103,29 +103,12 @@ private:
 ///////////
 
 
+/// Contains important helpers to Ensemble
 namespace ensemble {
 
 /// A base-class to Ensemble with customized behaviour according to the type of `T`
 template<typename T>
 class Base {};
-
-
-/// Specialization for reference types
-template<typename T>
-class Base<T&>
-{
-public:
-  typedef T& ToBeAveragedType;
-
-  const ToBeAveragedType getInitializedToBeAveraged() const {return getInitializedToBeAveraged_v();}
-
-  virtual ~Base() {}
-
-private:
-  virtual const ToBeAveragedType getInitializedToBeAveraged_v() const = 0;
-  
-};
-
 
 } // ensemble
 
@@ -195,9 +178,14 @@ private:
 
 namespace ensemble {
 
-
-
-// Implementation of the traits class for the most commonly used case:
+/// %Traits class governing how to average up several `T_ELEM` types into a `T` type in the most efficient way (which is usually not with the naive addition operator)
+/**
+ * A generic (naive) implementation is provided for the traits class
+ * 
+ * \tparam T the to-be-averaged type of the ensemble
+ * \tparam T_ELEM the to-be-averaged type of the underlying Averageable instances
+ * 
+ */
 template<typename T, typename T_ELEM>
 class Traits
 {

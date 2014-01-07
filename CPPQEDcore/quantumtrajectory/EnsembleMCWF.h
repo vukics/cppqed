@@ -74,7 +74,7 @@ private:
   static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs);
 
   
-  const typename Ensemble::ToBeAveragedType getInitializedToBeAveraged_v() const {rho_=0; return rho_;}
+  quantumdata::DensityOperator<RANK>& getInitializedDO_v() const {rho_=0; return rho_;}
 
   mutable quantumdata::DensityOperator<RANK> rho_;
 

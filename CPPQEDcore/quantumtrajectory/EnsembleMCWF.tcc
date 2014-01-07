@@ -8,6 +8,48 @@
 #include "ParsMCWF_Trajectory.h"
 
 
+namespace trajectory { namespace ensemble {
+
+
+template<int RANK>
+class Base<quantumdata::DensityOperator<RANK>&>
+{
+public:
+  quantumdata::DensityOperator<RANK>& getInitializedDO() const {return getInitializedDO_v();}
+
+private:
+  virtual quantumdata::DensityOperator<RANK>& getInitializedDO_v() const = 0;
+  
+};
+
+
+template<int RANK>
+class Traits<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&>
+{
+public:
+  typedef Ensemble<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&> EnsembleType;
+
+  typedef typename EnsembleType::Elem             Elem            ;
+  typedef typename EnsembleType::Impl             Impl            ;
+  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
+
+  static const ToBeAveragedType averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType& et)
+  {
+    ToBeAveragedType res(et.getInitializedDO());
+    
+    for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
+
+    return res/=size2Double(end-begin);
+
+  }
+
+
+};
+
+ 
+} } // trajectory::ensemble
+
+
 namespace quantumtrajectory {
 
 
