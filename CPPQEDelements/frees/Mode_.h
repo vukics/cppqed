@@ -1,3 +1,4 @@
+/// \briefFile{Defines the mode-bundle (tackling the dynamics of a single harmonic-oscillator mode)}
 // -*- C++ -*-
 #ifndef FREES_MODE__H_INCLUDED
 #define FREES_MODE__H_INCLUDED
@@ -17,6 +18,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+/// Contains helpers for the mode-bundle
 namespace mode {
 
 const std::string keyTitle="Mode";
