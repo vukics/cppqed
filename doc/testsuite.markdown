@@ -69,7 +69,7 @@ project has to be re-configured with cmake.
 
 ## The Python test driver {#testsuite_python}
 
-To add a new test, one has to call **delcaretest**, **add_test** and optionally **set_tests_properties**.
+To add a new test, one has to call **declaretest**, **add_test** and optionally **set_tests_properties**.
 Here is an example how to add a new test in the `CMakeLists.txt`:
 
     declaretest(<unique test name>)
