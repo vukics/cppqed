@@ -40,6 +40,8 @@ public:
    * This latter is so often missed, that we emphasize it again (although we know that it will still be missed from time to time):
    * \warning When implementing the Hamiltonian, not \f$H\f$ itself but \f$\frac Hi\f$ has to supplied!
    * 
+   * \todo 3rd argument should be passed by rvalue reference — move constructor for `blitz::Array` needed for this?
+   *
    */
   void addContribution(double t, ///<[in] the time instant \f$t\f$ for #TWO_TIME dependence
                        const StateVectorLow& psi, ///<[in] the state vector \f$\ket\Psi\f$

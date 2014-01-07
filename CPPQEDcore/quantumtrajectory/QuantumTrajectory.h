@@ -1,3 +1,4 @@
+/// \briefFile{Defines quantumtrajectory::initialTimeStep()}
 // -*- C++ -*-
 #ifndef QUANTUMTRAJECTORY_QUANTUMTRAJECTORY_H_INCLUDED
 #define QUANTUMTRAJECTORY_QUANTUMTRAJECTORY_H_INCLUDED
