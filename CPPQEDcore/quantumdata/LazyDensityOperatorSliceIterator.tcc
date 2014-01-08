@@ -8,10 +8,8 @@
 #include "LazyDensityOperator.h"
 #include "StateVector.h"
 
-#include "Algorithm.h"
 #include "BlitzArraySliceIterator.tcc"
 #include "BlitzTinyExtensions.tcc"
-#include "Functional.h"
 
 #include <boost/make_shared.hpp>
 

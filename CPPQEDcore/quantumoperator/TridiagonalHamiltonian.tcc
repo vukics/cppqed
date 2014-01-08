@@ -4,7 +4,6 @@
 
 #include "TridiagonalHamiltonian.h"
 
-#include "Algorithm.h"
 #include "Tridiagonal.tcc"
 
 #include <boost/range/algorithm/for_each.hpp>

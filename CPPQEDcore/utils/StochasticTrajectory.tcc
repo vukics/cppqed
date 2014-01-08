@@ -4,13 +4,13 @@
 
 #include "StochasticTrajectory.h"
 
-#include "Algorithm.h"
 #include "Conversions.h"
-#include "Functional.h"
 #include "ParsStochasticTrajectory.h"
 #include "Trajectory.tcc"
 
 #include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/numeric.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 #include <boost/progress.hpp>
 
@@ -61,7 +61,7 @@ template<typename T, typename T_ELEM>
 double
 Ensemble<T,T_ELEM>::getDtDid_v() const
 {
-  return cpputils::accumulate(trajs_.begin(),trajs_.end(),0.,bind(&Trajectory::getDtDid,_1))/size2Double(trajs_.size());
+  return accumulate(trajs_ | boost::adaptors::transformed(bind(&Trajectory::getDtDid,_1)) ,0.)/size2Double(trajs_.size());
 }
 
 
@@ -98,7 +98,8 @@ template<typename T, typename T_ELEM>
 auto
 ensemble::Traits<T,T_ELEM>::averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType&) -> const ToBeAveragedType
 {
-  return T(cpputils::accumulate(++begin,end,begin->toBeAveraged(),bind(&Elem::toBeAveraged,_1),cpputils::plus<T>())/size2Double(end-begin));
+  using namespace boost;
+  return accumulate(make_iterator_range(++begin,end) | adaptors::transformed(bind(&Elem::toBeAveraged,_1)),begin->toBeAveraged())/size2Double(end-begin);
 }
 
 

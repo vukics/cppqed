@@ -6,7 +6,6 @@
 
 #include "Types.h"
 
-#include "Algorithm.h"
 #include "CMatrix.h"
 #include "BlitzArraySliceIterator.h"
 

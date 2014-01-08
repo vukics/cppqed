@@ -8,6 +8,8 @@
 
 #include "Pars.tcc"
 
+#include <boost/bind.hpp>
+
 using parameters::ParameterTable;
 using parameters::update        ;
 using parameters::NamedException;

@@ -1,73 +1,49 @@
+/// \briefFile{Generic algorithms not found in either STL or Boost}
 // -*- C++ -*-
 #ifndef   UTILS_ALGORITHM_H_INCLUDED
 #define   UTILS_ALGORITHM_H_INCLUDED
 
-#include <boost/bind.hpp>
-
-#include <functional>
-#include <numeric>
+#include <boost/range/numeric.hpp>
 
 
 namespace cpputils {
 
 
-template<typename In, typename T, typename UnOp>
-T
-accumulate(In first, In last, T init, UnOp op)
-{
-  return std::accumulate(first,last,init,bind(std::plus<T>(),_1,bind(op,_2)));
-}
-
-template<typename In, typename T, typename UnOp, typename BinOp>
-T
-accumulate(In first, In last, T init, UnOp op, BinOp binOp)
-{
-  return std::accumulate(first,last,init,bind(binOp,_1,bind(op,_2)));
-}
-
-
-
-namespace details {
-
-template<typename Iter, typename T>
-inline
-const Iter
-concatenateHelper(Iter iter, const T& t)
-{
-  return std::copy(t.begin(),t.end(),iter);
-}
-
-} // details
-
-
-template<typename SeqOfSeqs_In, typename Out_Iterator>
+/// Fills a container by output iterator with concatenated values taken subsequently from the input sequences. \note Concatenation can be expressed as accumulation
+template<typename SeqOfSeqs, typename Out_Iterator>
 const Out_Iterator
-concatenate(SeqOfSeqs_In begin, SeqOfSeqs_In end, Out_Iterator out)
+concatenateViaIterator(const SeqOfSeqs& sOs, ///<[in] the sequence containing the input sequences
+                       Out_Iterator out)
 {
-  return std::accumulate(begin,end,out,details::concatenateHelper<Out_Iterator,typename SeqOfSeqs_In::value_type>); 
-  // concatenation is accumulation (!)
+  struct Helper
+  {
+    static const Out_Iterator _(Out_Iterator iter, const typename SeqOfSeqs::value_type& t) {return std::copy(t.begin(),t.end(),iter);}
+  };
+  
+  return boost::accumulate(sOs,out,Helper::_);
 }
 
 
-template<typename SeqOfSeqs, typename Out>
-const Out
-concatenateGrow(const SeqOfSeqs& sOs, Out empty)
-// Filling an empty container with concatenated values
-{
-  concatenate(sOs.begin(),sOs.end(),std::back_inserter(empty));
-  return empty;
-}
-
-
+/// Fills a container of the necessary size with concatenated values taken subsequently from the input sequences
 template<typename SeqOfSeqs, typename Out>
 const Out&
-concatenate(const SeqOfSeqs& sOs, Out& out)
-// Filling a container of the necessary size with concatenated values
+concatenate(const SeqOfSeqs& sOs, ///<[in] the sequence containing the input sequences
+            Out&& out)
 {
-  concatenate(sOs.begin(),sOs.end(),out.begin());
+  concatenateViaIterator(sOs,out.begin());
   return out;
 }
 
+
+/// Fills an *empty* (default-constructed) container with concatenated values taken subsequently from the input sequences
+template<typename Out, typename SeqOfSeqs>
+const Out
+concatenateGrow(const SeqOfSeqs& sOs)
+{
+  Out empty;
+  concatenateViaIterator(sOs,std::back_inserter(empty));
+  return empty;
+}
 
 
 } // cpputils

@@ -6,24 +6,21 @@
 
 #include "LazyDensityOperatorSliceIterator.tcc"
 
+#include <boost/range/numeric.hpp>
+#include <boost/range/adaptor/transformed.hpp>
+
+
 namespace quantumdata {
 
 template<typename V, typename T, int RANK, typename F>
 const T
 partialTrace(const LazyDensityOperator<RANK>& matrix, F function)
 {
-  ldo::DiagonalIterator<RANK,V> begin(matrix.template begin<V>());
-  T init(function(*begin));
+  auto begin(matrix.template begin<V>());
+  T init(function(*begin)); // we take a way around default constructing T, so that the implicit interface is less stringently defined
 
-  using namespace cpputils;
-  return T(
-           accumulate(++begin,
-                      matrix.template end<V>(),
-                      init,
-                      function,
-                      cpputils::plus<T>()
-                      )
-           );
+  using namespace boost;
+  return accumulate(make_iterator_range(++begin,matrix.template end<V>()) | adaptors::transformed(function) , init );
 }
 
 

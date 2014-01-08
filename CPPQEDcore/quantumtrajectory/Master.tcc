@@ -8,7 +8,6 @@
 
 #include "MathExtensions.h"
 
-#include "Algorithm.h"
 #include "BlitzArraySliceIterator.tcc"
 #include "ComplexArrayExtensions.h"
 
