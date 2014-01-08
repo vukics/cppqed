@@ -106,7 +106,7 @@ void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) con
 template<int RANK, bool IS_TIME_DEPENDENT>
 averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Collecting(const Collection& collection)
   : Base(collection.front().getTitle(),
-         cpputils::concatenateGrow( collection | boost::adaptors::transformed(bind(&Element::getLabels,_1)) , KeyLabels())),
+         cpputils::concatenateGrow<KeyLabels>( collection | boost::adaptors::transformed(bind(&Element::getLabels,_1)) )),
     collection_(collection.clone())
 {}
 
