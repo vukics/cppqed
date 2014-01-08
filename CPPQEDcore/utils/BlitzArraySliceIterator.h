@@ -646,7 +646,7 @@ namespace basi {
  * In the following we analyse a metaprogramming example typical for the framework: how the compile-time vector `0,3,2,6,4,5,1,9,8,7,10`
  * for the self-transposition in Transposer::transpose is prepared.
  * 
- * This is done by the following snippet in `utils/BlitzArraySliceIterator.tcc`: \dontinclude utils/BlitzArraySliceIterator.tcc
+ * This is done by the following snippet in `utils/BlitzArraySliceIterator.tcc`: \dontinclude BlitzArraySliceIterator.tcc
  * \skip namespace namehider {
  * \until fold
  * We are using the \refBoostConstruct{fold,mpl/doc/refmanual/fold.html} metaalgorithm from Boost.MPL.
