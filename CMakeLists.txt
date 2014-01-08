@@ -42,25 +42,6 @@ add_subdirectory(Testing)
 # Documentation
 ##################################################
 
-find_package(Doxygen)
+include(${PROJECT_SOURCE_DIR}/CPPQEDcore/cmake/Modules/CPPQEDUse.cmake)
 
-if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
-  if(CPPQED_MONOLITHIC)
-    set(DOXYGEN_HEADER_FILE ${cppqed_SOURCE_DIR}/doc/header.html)
-    set(DOXYGEN_CSS_FILE ${cppqed_SOURCE_DIR}/doc/stylesheet.css)
-  endif()
-  set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
-  file(MAKE_DIRECTORY ${CONF_DOC_DIR})
-  file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CONF_DOC_DIR}/core/core.tag)
-  get_filename_component(CPPQED_RELATIVE_DOXYGEN_DIR ${CPPQED_RELATIVE_DOXYGEN_TAG} PATH)
-  configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${CONF_DOC_DIR}/Doxyfile @ONLY)
-  add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CONF_DOC_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CONF_DOC_DIR}
-    COMMENT "Generating APIs documentation with Doxygen"
-    DEPENDS core_doc elements_doc
-  )
-  install(DIRECTORY ${CONF_DOC_DIR}/html
-        DESTINATION ${DOC_INSTALL_DIR}
-        OPTIONAL
-  )
-endif()
+cppqed_documentation("" core_doc elements_doc)
