@@ -1,3 +1,4 @@
+/// \briefFile{Defines i/oarchive types depending on the #DO_NOT_USE_BOOST_SERIALIZATION macro}
 #ifndef   UTILS_ARCHIVE_H_INCLUDED
 #define   UTILS_ARCHIVE_H_INCLUDED
 
