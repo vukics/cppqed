@@ -51,7 +51,7 @@ PROJECT_BRIEF          = "a framework for simulating open quantum dynamics"
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           = @CPPQED_RELATIVE_DOXYGEN_DIR@/logoCppQED.png
+PROJECT_LOGO           = ../@CPPQED_RELATIVE_DOXYGEN_DIR@/logoCppQED.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -671,7 +671,7 @@ LAYOUT_FILE            =
 # search path. Do not use file names with spaces, bibtex cannot handle them. See
 # also \cite for info how to create references.
 
-CITE_BIB_FILES         = @CMAKE_CURRENT_SOURCE_DIR@/doc/cqed.bib
+CITE_BIB_FILES         = @PROJECT_SOURCE_DIR@/doc/cqed.bib
 
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -1038,7 +1038,7 @@ HTML_FILE_EXTENSION    = .html
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_HEADER            =
+HTML_HEADER            = @DOXYGEN_HEADER_FILE@
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
 # generated HTML page. If the tag is left blank doxygen will generate a standard
@@ -1071,7 +1071,7 @@ HTML_STYLESHEET        =
 # see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  =
+HTML_EXTRA_STYLESHEET  = @DOXYGEN_CSS_FILE@
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
