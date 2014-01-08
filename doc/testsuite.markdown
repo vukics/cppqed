@@ -80,17 +80,14 @@ Here is an example how to add a new test in the `CMakeLists.txt`:
 The variable `${TESTNAME}` is set to the current test name by `declaretest`. This will call the
 Python script **testdriver.py** as test driver. The variable `${TESTSCRIPT}` points to `testdriver.py`
 and already adds some needed parameters to pass in the build configuration (debug or release) and the
-configuration file. The `<parameters>` are:
+configuration file. The required `<parameters>` are:
 
 * `--test=TEST` (required): the name of the test, usually passed in as `--test=${TESTNAME}`. This name also defines
 the section in the configuration file.
-* `--testclass=TESTCLASS` (required): the name of the python class which defines the mode of operation of the
-test driver
-* `--script=SCRIPT`: the script to run by the test driver or the target to compile. Typically passed in for example as
-`--script=$<TARGET_FILE:1particle1mode>` which will be evaluated by cmake to the full path of either `1particle1mode`
-(release configuration) or `1particle1mode_d` (debug configuration).
-* `--error=ERROR`: only needed for the `CompileFail` testclass. The test will be considered successful if `ERROR`
-is found in the output.
+* `--testclass=TESTCLASS` (required): the name of the [python class](#testsuite_py_classes) which defines the mode
+of operation of the test driver
+
+The other parameters depend on the used test class and are documented together with the classes.
 
 ### Configuration files {#testsuite_py_configuration}
 
@@ -123,15 +120,22 @@ options from the base class can be used in the derived one.
 #### OutputManager
 
 This cannot be used as a test class directly, but it serves as base to other test classes.
-Configuration options:
+Configuration file keys:
 
     # List of run modes to use for this test
     runmodes=single,ensemble,master
 
+
+Command line parameters of the test driver:
+
+* `--script=SCRIPT`: the script to run by the test driver. Typically passed in for example as
+`--script=$<TARGET_FILE:1particle1mode>` which will be evaluated by cmake to the full path of either `1particle1mode`
+(release configuration) or `1particle1mode_d` (debug configuration).
+
 #### Runner (derives from OutputManager)
 
 Runs a script and succeeds if the script does.
-Configuration options:
+Configuration file keys:
 
     # The options used for running the scripts, multiple keys can be given if they match opts*
     opts=--etat 8 --sdf 3
@@ -147,7 +151,7 @@ Configuration options:
 #### Verifier (derives from OutputManager)
 
 Verifies the output of a script 'this' to an expected output or the output of some other test run 'other'.
-By default, 'this' is the current test. Configuration options:
+By default, 'this' is the current test. Configuration file keys:
 
     # Verify that both trajectories are exactly equal (default if this key is missing)
     verify=full
@@ -170,7 +174,7 @@ Combines the functionality of `Runner` and `Verifier` to a single test.
 #### Continuer (derives from Runner)
 
 Runs a script, then continues the trajectory. Succeeds if both runs do. Use `Verifier` to compare the outcome
-to another test or an expected output. Configuration options:
+to another test or an expected output. Configuration file keys:
 
     # Options for the first run and the second run, respectively
     firstrun=...
@@ -181,7 +185,14 @@ to another test or an expected output. Configuration options:
 This test succeeds if the compilation of a target fails in an expected way. For this test class, the
 `--script=SCRIPT` parameter is not the path to a binary but a cmake target. The expected failure message
 is passed to the test driver by the `--error=ERROR` command line parameter. The cmake targets which should
-fail to compile are typically defined in `Testing/compilefail`.
+fail to compile are typically defined in `Testing/compilefail` and should be defined with `EXCLUDE_FROM_ALL`
+for obvious reasons.
+
+Command line parameters for the test driver:
+
+* `--script=TARGET`: the cmake target to compile
+* `--error=ERROR`: The test will be considered successful if `ERROR` is found in the output.
+
 
 ## The boost test driver {#testsuite_boost}
 
