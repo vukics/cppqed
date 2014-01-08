@@ -217,7 +217,7 @@ contains the whole framework. It can be cloned for read-write access with
 
     $ git clone --recursive -b Development ssh://<username>@git.code.sf.net/p/cppqed/cppqed C++QED
 
-where <username> is the SourceForge user name. Note that the git submodules are cloned from read-only
+where \<username\> is the SourceForge user name. Note that the git submodules are cloned from read-only
 URLs, in each submodule you have to set the URL to a read-write one, for example:
 
     $ cd C++QED/CPPQEDcore
