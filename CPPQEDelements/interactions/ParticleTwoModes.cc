@@ -1,9 +1,7 @@
 #include "ParticleTwoModes_.h"
 
-#include "Algorithm.h"
 #include "BlitzArraySliceIterator.tcc"
 #include "MathExtensions.h"
-#include "Range.h"
 #include "Tridiagonal.tcc"
 
 
@@ -67,12 +65,12 @@ void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, St
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstH_);
-    cpputils::for_each(fullRange<V2>(dpsidtTemp),basi::begin<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondH_));
+    boost::for_each(fullRange<V2>(dpsidtTemp),fullRange<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondH_));
   }
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstHT_);
-    cpputils::for_each(fullRange<V2>(dpsidtTemp),basi::begin<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
+    boost::for_each(fullRange<V2>(dpsidtTemp),fullRange<V2>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
   }
 
 }

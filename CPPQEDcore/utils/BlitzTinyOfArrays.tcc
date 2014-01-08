@@ -4,9 +4,8 @@
 
 #include "BlitzTinyOfArrays.h"
 
-#include "Range.h"
-
-#include<boost/lambda/lambda.hpp>
+#include <boost/range/algorithm/for_each.hpp>
+#include <boost/lambda/lambda.hpp>
 
 
 

@@ -32,7 +32,7 @@ calculateMatrix(const T& hamiltonian, double t=0, double tIntPic0=0)
   for (int row=0; row<dim; ++row) {
     psi1D(row)=1;
     for (int col=0; col<dim; ++col) {
-      if (const structure::Hamiltonian<RANK>*const ha=dynamic_cast<const structure::Hamiltonian<RANK>*>(&hamiltonian)) 
+      if (const auto ha=dynamic_cast<const structure::Hamiltonian<RANK>*>(&hamiltonian)) 
         ha->addContribution(t,psi.getArray(),dpsidt.getArray(),tIntPic0);
       res(col,row)=DCOMP_I*dpsidt1D(col); 
       // note that addContribution is meant to calculate Hamiltonian over DCOMP_I, which we correct here

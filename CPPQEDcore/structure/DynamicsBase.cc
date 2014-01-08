@@ -1,7 +1,8 @@
 #include "DynamicsBase.h"
 
 #include "FormDouble.tcc"
-#include "Range.h"
+
+#include <boost/range/algorithm.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>

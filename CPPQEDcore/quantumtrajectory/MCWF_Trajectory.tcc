@@ -15,6 +15,7 @@
 #include "SmartPtr.h"
 
 #include <boost/range/numeric.hpp>
+#include <boost/range/algorithm/find_if.hpp>
 
 
 namespace quantumtrajectory {
@@ -28,7 +29,7 @@ namespace quantumtrajectory {
 template<int RANK>
 void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  if (const typename Hamiltonian::Ptr ha=getQSW().getHa()) {
+  if (const auto ha=getQSW().getHa()) {
     dpsidt=0;
 
     ha->addContribution(t,psi,dpsidt,this->tIntPic0_);
@@ -57,7 +58,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     logger_(p.logLevel,getQSW().getHa()!=0,getQSW().template nAvr<structure::LA_Li>())
 {
   if (psi!=*getQSW().getQS()) throw DimensionalityMismatchException();
-  if (!getTime()) if(const typename Liouvillean::Ptr li=getQSW().getLi()) { // On startup, dpLimit should not be overshot, either.
+  if (!getTime()) if(const auto li=getQSW().getLi()) { // On startup, dpLimit should not be overshot, either.
     Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
     manageTimeStep(rates,getEvolved().get(),false);
   }
@@ -92,7 +93,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   
   double t=getTime();
 
-  if (const typename Exact::Ptr ex=getQSW().getEx()) {
+  if (const auto ex=getQSW().getEx()) {
     ex->actWithU(getTime(),psi_.getArray(),this->tIntPic0_);
     this->tIntPic0_=t;
   }
@@ -185,7 +186,7 @@ void MCWF_Trajectory<RANK>::step_v(double Dt)
 
   double t=coherentTimeDevelopment(Dt);
 
-  if (const typename Liouvillean::Ptr li=getQSW().getLi()) {
+  if (const auto li=getQSW().getLi()) {
 
     Rates rates(li->rates(t,psi_));
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
@@ -214,7 +215,7 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
   
   getQSW().displayCharacteristics(getQSW().getQS()->displayParameters(Base::displayParameters_v(os)<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
 
-  if (const typename Liouvillean::Ptr li=getQSW().getLi()) {
+  if (const auto li=getQSW().getLi()) {
     os<<"# Decay channels:\n";
     {
       size_t i=0;

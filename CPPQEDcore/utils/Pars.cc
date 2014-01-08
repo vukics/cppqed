@@ -1,10 +1,10 @@
 #include "Pars.tcc"
 
-#include "Range.h"
-
 #include "BooleanNegatedProxy.h"
 
 #include "Version.h"
+
+#include <boost/range/algorithm.hpp>
 
 #include <boost/bind.hpp>
 

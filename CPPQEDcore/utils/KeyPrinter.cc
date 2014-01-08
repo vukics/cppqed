@@ -1,6 +1,6 @@
 #include "KeyPrinter.h"
 
-#include "Range.h"
+#include <boost/range/algorithm/for_each.hpp>
 
 #include <boost/lambda/lambda.hpp>
 

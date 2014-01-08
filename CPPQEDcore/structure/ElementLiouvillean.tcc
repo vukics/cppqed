@@ -5,7 +5,9 @@
 
 #include "ElementLiouvillean.h"
 
-#include "Range.h"
+#include <boost/range/algorithm/transform.hpp>
+
+#include <boost/bind.hpp>
 
 
 namespace structure { namespace details {

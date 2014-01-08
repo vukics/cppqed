@@ -10,11 +10,11 @@
 #include "Algorithm.h"
 #include "MathExtensions.h"
 #include "MultiIndexIterator.tcc"
-#include "Range.h"
+
 
 #include <boost/bind.hpp>
-#include <boost/assign/std.hpp>
-#include <boost/iterator/transform_iterator.hpp>
+
+#include <boost/range/adaptor/transformed.hpp>
 
 #include <algorithm>
 
@@ -103,12 +103,10 @@ void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) con
 }
 
 
-#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection.beginend(),boost::bind(&Element::getLabels,_1))
-
 template<int RANK, bool IS_TIME_DEPENDENT>
 averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Collecting(const Collection& collection)
   : Base(collection.front().getTitle(),
-         cpputils::concatenateGrow(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),KeyLabels())),
+         cpputils::concatenateGrow<KeyLabels>( collection | boost::adaptors::transformed(bind(&Element::getLabels,_1)) )),
     collection_(collection.clone())
 {}
 
@@ -119,8 +117,6 @@ averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Collecting(const Collecting&
     collection_(collecting.collection_.clone())
 {}
 
-#undef TRANSFORMED_iterator
-
 
 namespace averagingUtils { namespace details {
 
@@ -129,19 +125,15 @@ double convert(structure:: NoTime  ) {return 0.;}
 
 } } // averagingUtils::details
 
-#define TRANSFORMED_iterator(beginend) boost::make_transform_iterator(collection_.beginend(),boost::bind(&Element::average,_1,details::convert(t),boost::cref(matrix)))
 
 template<int RANK, bool IS_TIME_DEPENDENT>
 auto
 averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::average_v(Time t, const LazyDensityOperator& matrix) const -> const Averages
 {
   Averages res(nAvr()); res=0;
-  return cpputils::concatenate(make_iterator_range(TRANSFORMED_iterator(begin),TRANSFORMED_iterator(end)),res);
+  return cpputils::concatenate( collection_ | boost::adaptors::transformed(bind(&Element::average,_1,details::convert(t),boost::cref(matrix))) , res);
 
 }
-
-#undef TRANSFORMED_iterator
-
 
 
 template<int RANK, bool IS_TIME_DEPENDENT>

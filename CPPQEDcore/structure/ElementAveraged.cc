@@ -1,7 +1,8 @@
 #include "ElementAveraged.h"
 
 #include "FormDouble.tcc"
-#include "Range.h"
+
+#include <boost/range/algorithm/for_each.hpp>
 
 #include <boost/lambda/lambda.hpp>
 #include <boost/lambda/bind.hpp>

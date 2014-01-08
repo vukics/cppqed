@@ -9,7 +9,6 @@
 #include "Algorithm.h"
 #include "CMatrix.h"
 #include "BlitzArraySliceIterator.h"
-#include "Range.h"
 
 #include <boost/fusion/container/vector.hpp>
 #include <boost/fusion/algorithm/transformation/join.hpp>

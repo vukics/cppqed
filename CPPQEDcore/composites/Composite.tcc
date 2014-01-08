@@ -11,12 +11,14 @@
 #include "Exception.h"
 
 #include "Algorithm.h"
-#include "Range.h"
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/algorithm/iteration/fold.hpp>
 
 #include <boost/mpl/for_each.hpp>
+
+#include <boost/range/algorithm/max_element.hpp>
+#include <boost/range/algorithm/for_each.hpp>
 
 #include <boost/bind.hpp>
 
@@ -94,7 +96,7 @@ public:
     {
       static const int idx=T::value;
       if (frees_(idx).get()) {
-	if (frees_(idx).get()!=act_.get()->getFrees()(i_)) throw CompositeConsistencyException(idx,i_);
+        if (frees_(idx).get()!=act_.get()->getFrees()(i_)) throw CompositeConsistencyException(idx,i_);
       }
       else frees_(idx)=SubSystemFree(act_.get()->getFrees()(i_));
       i_++;
@@ -360,9 +362,7 @@ public:
   void help(typename Ha::Ptr ha) const
   {
     if (ha) 
-      cpputils::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),
-			 blitzplusplus::basi::begin<Vec>(dpsidt_),
-			 boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,tIntPic0_)); 
+      for_each(blitzplusplus::basi::fullRange<Vec>(psi_),blitzplusplus::basi::fullRange<Vec>(dpsidt_),boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,tIntPic0_)); 
   }
 
   ACTS_FREES_operator(Ha);
@@ -540,8 +540,8 @@ public:
     if (!flag_ && li) {
       size_t n=li->nAvr();
       if (ordoJump_<n) {
-	boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
-	flag_=true;
+        boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
+        flag_=true;
       }
       ordoJump_-=n;  
     }

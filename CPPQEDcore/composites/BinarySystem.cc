@@ -6,9 +6,11 @@
 
 #include "Algorithm.h"
 #include "BlitzArraySliceIterator.h"
-#include "Range.h"
 
 #include "BlitzTiny.h"
+
+#include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/algorithm_ext/for_each.hpp>
 
 #include <boost/make_shared.hpp>
 
@@ -23,10 +25,6 @@ namespace {
 #include "details_BinaryHelper.h"
 
 }
-
-
-using cpputils::for_each;
-using boost   ::for_each;
 
 
 //////////
@@ -176,8 +174,8 @@ void binary::Exact::actWithU_v(double t, StateVectorLow& psi, double t0) const
 {
   using namespace blitzplusplus::basi;
 
-  if (const Ex1::Ptr ex=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
-  if (const Ex1::Ptr ex=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
+  if (const auto ex=free0_.getEx()) for_each(fullRange<V0>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
+  if (const auto ex=free1_.getEx()) for_each(fullRange<V1>(psi),bind(&Ex1::actWithU,ex,t,_1,t0));
 
   ia_.actWithU(t,psi,t0);
 
@@ -195,8 +193,8 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
 {
   using namespace blitzplusplus; using basi::fullRange;
 
-  if (const Ha1::Ptr ha=free0_.getHa()) for_each(fullRange<V0>(psi),basi::begin<V0>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,tIntPic0));
-  if (const Ha1::Ptr ha=free1_.getHa()) for_each(fullRange<V1>(psi),basi::begin<V1>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,tIntPic0));
+  if (const auto ha=free0_.getHa()) for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,tIntPic0));
+  if (const auto ha=free1_.getHa()) for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,tIntPic0));
 
   ia_.addContribution(t,psi,dpsidt,tIntPic0);
 

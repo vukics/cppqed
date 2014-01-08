@@ -4,6 +4,8 @@
 #include "FFT.tcc"
 #include "VectorFromMatrixSliceIterator.tcc"
 
+#include <boost/range/algorithm/for_each.hpp>
+
 
 using namespace fft; using namespace linalg;
 
@@ -50,7 +52,7 @@ void quantumdata::ffTransform(linalg::CVector& psi, fft::Direction dir)
 
 void quantumdata::ffTransform(linalg::CMatrix& rho, fft::Direction dir)
 {
-  using namespace blitzplusplus::vfmsi; using boost::for_each;
+  using namespace blitzplusplus::vfmsi;
 
   for_each(fullRange<Left >(rho),bind(&ffTransformCV,_1,        dir ));
   for_each(fullRange<Right>(rho),bind(&ffTransformCV,_1,reverse(dir)));

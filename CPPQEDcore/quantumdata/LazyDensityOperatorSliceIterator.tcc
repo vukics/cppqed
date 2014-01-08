@@ -66,12 +66,12 @@ public:
     typedef StateVector    <RANK> SV;
     typedef DensityOperator<RANK> DO;
 
-    if      (const SV*const sV=dynamic_cast<const SV*>(&ldo)) {
+    if      (const auto sV=dynamic_cast<const SV*>(&ldo)) {
       typename SV::StateVectorLow temp(sV->getArray());
       // We do not want to transpose that StateVectorLow which is the storage of sV.
       return make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
     }
-    else if (const DO*const dO=dynamic_cast<const DO*>(&ldo)) {
+    else if (const auto dO=dynamic_cast<const DO*>(&ldo)) {
       typename DO::DensityOperatorLow temp(dO->getArray());
       return make_shared<DO>(Transposer<2*RANK,typename details::ExtendV<RANK,V>::type>::transpose(temp),byReference);
     }
@@ -242,9 +242,9 @@ public:
 
     static const mpl::bool_<IS_END> isEnd=mpl::bool_<IS_END>();
 
-    if      (const StateVector    <RANK>*const stateVector    =dynamic_cast<const StateVector    <RANK>*>(&ldo))
+    if      (const auto stateVector    =dynamic_cast<const StateVector    <RANK>*>(&ldo))
       return make_shared<DI_SV_Impl>(*stateVector    ,isEnd);
-    else if (const DensityOperator<RANK>*const densityOperator=dynamic_cast<const DensityOperator<RANK>*>(&ldo))
+    else if (const auto densityOperator=dynamic_cast<const DensityOperator<RANK>*>(&ldo))
       return make_shared<DI_DO_Impl>(*densityOperator,isEnd);
     else throw NoSuchImplementation();
     

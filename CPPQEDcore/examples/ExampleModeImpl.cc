@@ -71,7 +71,7 @@ const Tridiagonal aop(const hierarchical::ModeBase& mode)
 {
   using namespace hierarchical;
   size_t dim=mode.getDimension();
-  if (const PumpedLossyModeIP*const modeIP=dynamic_cast<const PumpedLossyModeIP*>(&mode))
+  if (const auto modeIP=dynamic_cast<const PumpedLossyModeIP*>(&mode))
     return furnishWithFreqs(aop(dim),mainDiagonal(modeIP->get_z(),dim));
   else
     return aop(dim);

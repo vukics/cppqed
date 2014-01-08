@@ -104,7 +104,7 @@ Base<RANK>::logOnEnd_v(std::ostream& os) const
 {
   LoggerList loggerList;
   for (typename Trajectories::const_iterator i=getTrajs().begin(); i!=getTrajs().end(); ++i)
-    if (auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*const>(&(*i)))
+    if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&(*i)))
       loggerList.push_back(traj->getLogger());
   
   return displayLog(os,loggerList);

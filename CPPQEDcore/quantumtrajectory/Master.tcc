@@ -11,11 +11,11 @@
 #include "Algorithm.h"
 #include "BlitzArraySliceIterator.tcc"
 #include "ComplexArrayExtensions.h"
-#include "Range.h"
 
 // #define USE_BOOST_PROGRESS_TIMER_PROFILING
 #include "Profiling.h"
 
+#include <boost/range/algorithm_ext/for_each.hpp>
 
 namespace quantumtrajectory {
 
@@ -89,7 +89,7 @@ Base<RANK>::step_v(double deltaT)
   getEvolved()->step(deltaT);
   PROGRESS_TIMER_OUT_POINT("Evolved step total")
     ;
-  if (const typename Exact::Ptr ex=getQSW().getEx()) {
+  if (const auto ex=getQSW().getEx()) {
     PROGRESS_TIMER_IN_POINT( getOstream() )
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_.getArray());
@@ -130,7 +130,7 @@ std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
 
   getQSW().displayCharacteristics( getQSW().getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
 
-  if (const typename Liouvillean::Ptr li=getQSW().getLi()) {
+  if (const auto li=getQSW().getLi()) {
     os<<"# Decay channels:\n";
     {
       size_t i=0;
@@ -156,22 +156,22 @@ template<int RANK>
 void Base<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
 {
   using namespace blitzplusplus::vfmsi;
-  cpputils::for_each(fullRange<Left>(rhoLow),begin<Left>(drhodtLow),function);
+  for_each(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow),function);
 }
 
 
 template<int RANK>
 void BaseFast<RANK>::unaryIter(DensityOperatorLow& rhoLow, UnaryFunction function) const
 {
-  boost::for_each(blitzplusplus::basi_fast::fullRange(rhoLow,slicesData_),function);
+  for_each(blitzplusplus::basi_fast::fullRange(rhoLow,slicesData_),function);
 }
 
 
 template<int RANK>
 void BaseFast<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
 {
-  cpputils::for_each(blitzplusplus::basi_fast::fullRange(   rhoLow,slicesData_),
-                     blitzplusplus::basi_fast::begin    (drhodtLow,slicesData_),function);
+  for_each(blitzplusplus::basi_fast::fullRange(   rhoLow,slicesData_),
+           blitzplusplus::basi_fast::fullRange(drhodtLow,slicesData_),function);
 }
 
 } // master

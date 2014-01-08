@@ -290,7 +290,7 @@ const Tridiagonal expINKX(particle::Ptr particle, ptrdiff_t nK)
 {
   size_t dim=particle->getDimension();
   Tridiagonal res(expINKX(dim,nK));
-  if (const particle::Exact* exact=dynamic_cast<const particle::Exact*>(particle.get())) res.furnishWithFreqs(mainDiagonal(exact->get<0>(),exact->get<1>()));
+  if (const auto exact=dynamic_cast<const particle::Exact*>(particle.get())) res.furnishWithFreqs(mainDiagonal(exact->get<0>(),exact->get<1>()));
   return res;
 }
 
@@ -399,7 +399,7 @@ const StateVector hoState(const ParsPumped& p, bool kFlag)
 
 const StateVector init(const Pars& p)
 {
-  if (const ParsPumped* pp=dynamic_cast<const ParsPumped*>(&p))
+  if (const auto pp=dynamic_cast<const ParsPumped*>(&p))
     return p.hoInitn<0 ? wavePacket(*pp) : hoState(*pp);
   else
     return p.hoInitn<0 ? wavePacket( p ) : hoState( p );

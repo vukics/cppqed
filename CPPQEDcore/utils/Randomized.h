@@ -8,9 +8,10 @@
 #include "ArrayTraits.h"
 #include "ComplexExtensions.h"
 #include "Exception.h"
-#include "Range.h"
 
 #include "core_config.h"
+
+#include <boost/range/algorithm/generate.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>

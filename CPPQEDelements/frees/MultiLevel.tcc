@@ -6,25 +6,23 @@
 
 #include "ElementLiouvillean.tcc"
 
-#include<boost/assign/list_inserter.hpp>
-
-#include<boost/lambda/bind.hpp>
-#include<boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 namespace bll=boost::lambda;
 
-#include<boost/iterator/transform_iterator.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
-#include<boost/fusion/sequence/intrinsic/at_c.hpp>
+#include <boost/fusion/sequence/intrinsic/at_c.hpp>
 // #include<boost/fusion/container/generation/make_list.hpp>
-#include<boost/fusion/container/generation/make_vector.hpp>
-#include<boost/fusion/algorithm/iteration/for_each.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
 
-#include<boost/fusion/mpl/at.hpp>
+#include <boost/fusion/mpl/at.hpp>
 
-#include<boost/mpl/for_each.hpp>
+#include <boost/mpl/for_each.hpp>
 
-#include<algorithm>
-#include<numeric>
+#include <algorithm>
+#include <numeric>
 
 
 namespace multilevel {
@@ -67,12 +65,7 @@ Exact<NL>::isUnitary_v() const
   // using namespace boost::lambda;
   // using namespace lambda;
 
-  return !accumulate(
-                     boost::make_transform_iterator(zIs_.begin(),hasRealPart),
-                     boost::make_transform_iterator(zIs_.end  (),hasRealPart),
-                     false,
-                     bll::_1 || bll::_2 //logical_or<bool>()
-                     );
+  return !accumulate(zIs_.begin() | boost::adaptors::transformed(hasRealPart),false,bll::_1 || bll::_2);
 }
 
 
@@ -360,7 +353,6 @@ struct ElementaryComplexFreqs
   void operator()(const P& eta) const
   {
     using namespace std;
-    using boost::assign::insert;
 
     stringstream tag(stringstream::out);
     tag<<label_<<P::first<<P::second;
@@ -383,7 +375,7 @@ const RETURN_type
 complexFreqs(const blitz::TinyVector<dcomp,NL>& levels, const VP& etas)
 {
   using namespace std;
-  using boost::assign::insert;
+
   RETURN_type res;
   for (int i=0; i<NL; i++)
     if (hasRealPart(levels(i))) {

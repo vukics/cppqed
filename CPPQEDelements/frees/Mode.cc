@@ -337,7 +337,7 @@ const Tridiagonal aop(Ptr mode)
 {
   size_t dim=mode->getDimension();
   Tridiagonal res(aop(dim));
-  if (const mode::Exact* exact=dynamic_cast<const mode::Exact*>(mode.get())) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
+  if (const auto exact=dynamic_cast<const mode::Exact*>(mode.get())) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
   return res;
 }
 
