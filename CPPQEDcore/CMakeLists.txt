@@ -210,30 +210,7 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
 # Documentation
 ##################################################
 
-find_package(Doxygen)
-set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
-if(NOT DEFINED DOC_INSTALL_DIR) # otherwise it is defined in the super-repository
-  set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
-endif()
-if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
-  if(CPPQED_MONOLITHIC)
-    set(DOXYGEN_HEADER_FILE ${cppqed_SOURCE_DIR}/doc/header.html)
-    set(DOXYGEN_CSS_FILE ${cppqed_SOURCE_DIR}/doc/stylesheet.css)
-  endif()
-  file(MAKE_DIRECTORY ${CONF_DOC_DIR})
-  configure_file(${PROJECT_SOURCE_DIR}/Doxyfile.in ${CONF_DOC_DIR}/Doxyfile @ONLY)
-  foreach(AUXFILE doc/technicalDefinitions.sty doc/logoCppQED.png doc/cqed.bib)
-    configure_file(${PROJECT_SOURCE_DIR}/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
-  endforeach()
-  add_custom_target(${PROJECT_NAME}_doc ${DOXYGEN_EXECUTABLE} ${CONF_DOC_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CONF_DOC_DIR}
-    COMMENT "Generating API documentation with Doxygen"
-  )
-  install(DIRECTORY ${CONF_DOC_DIR}/html
-          DESTINATION ${DOC_INSTALL_DIR}/${PROJECT_NAME}
-          OPTIONAL
-  )
-endif()
+cppqed_documentation("core_")
 
 ##################################################
 # Installation
