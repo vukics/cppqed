@@ -4,14 +4,14 @@
 
 using std::max;
 
-typedef blitz::Array<dcomp,1> CA1R;
+typedef blitz::Array<dcomp,1> Array;
 
 /*
   y(0) y
   y(1) dy/dt
 */
 
-void derivs(double tau, const CA1R& y, CA1R& dydt, double omega, double gamma)
+void derivs(double tau, const Array& y, Array& dydt, double omega, double gamma)
 {
   dydt(0)=y(1);
   dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
@@ -34,12 +34,12 @@ int main(int argc, char* argv[])
   update(pt,argc,argv,"--");
 
   // Initial condition
-  CA1R y(2); y=yinit,dydtinit;
+  Array y(2); y=yinit,dydtinit;
 
-  Simulated<CA1R> S(y,
-                    bind(derivs,_1,_2,_3,omega,gamma),
-                    .1/max(1.,max(omega,gamma)),
-                    p);
+  Simulated<Array> S(y,
+                     bind(derivs,_1,_2,_3,omega,gamma),
+                     .1/max(1.,max(omega,gamma)),
+                     p);
 
   run(S,p);
 

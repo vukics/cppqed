@@ -1,3 +1,4 @@
+/// \briefFileDefault
 // -*- C++ -*-
 #ifndef UTILS_SIMULATED__H_INCLUDED
 #define UTILS_SIMULATED__H_INCLUDED
@@ -10,9 +11,15 @@
 
 namespace trajectory {
 
-
+/// Class fully implementing the Adaptive interface by displaying (and serializing) the whole content of the evolved array
 /**
- * Example usage: \include HarmonicOscillatorComplex.cc
+ * Meant for all cases when simple ODE evolution is desired with intermittent displays
+ * 
+ * <b>Example usage:</b> simulation of a complex driven damped harmonic oscillator mode described by the ODE \f[\ddot{y}+2\gamma\,\dot{y}+y=e^{i\,\omega t},\f]
+ * where \f$\gamma\f$ is the damping rate and \f$\omega\f$ the driving frequency, and the timescale has been chosen such that the eigenfrequency is 1.
+ * 
+ * \include HarmonicOscillatorComplex.cc
+ * 
  * \todo Provide optional key printing
  */
 template<typename A> 
