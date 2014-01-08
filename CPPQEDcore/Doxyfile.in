@@ -751,34 +751,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/nonorthogonalFormalism.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/rationale.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/CompilationMacros.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Archive.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ArrayTraits.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArray.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArrayExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArraySliceIterator.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzArrayTraits.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTiny.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTinyExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BooleanNegatedProxy.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/CMatrix.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexArrayExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ComplexExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/CVector.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Evolved.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Evolved.tcc \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/EvolvedGSL.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/EvolvedGSL.tcc \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Exception.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/MathExtensions.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/MultiIndexIterator.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Pars.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ParsTrajectory.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/ParsStochasticTrajectory.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Randomized.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Simulated_.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/StochasticTrajectory.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/TMP_Tools.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/Trajectory.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/utils \
                          @CMAKE_CURRENT_SOURCE_DIR@/quantumdata \
                          @CMAKE_CURRENT_SOURCE_DIR@/quantumoperator \
                          @CMAKE_CURRENT_SOURCE_DIR@/quantumoperator/Sigma.tcc \
@@ -853,6 +826,7 @@ EXCLUDE_SYMBOLS        = details
 # command).
 
 EXAMPLE_PATH           = . \
+                         @CMAKE_CURRENT_SOURCE_DIR@/utils \
                          @CMAKE_CURRENT_SOURCE_DIR@/examples
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
