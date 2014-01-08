@@ -19,6 +19,7 @@
 
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/algorithm_ext/for_each.hpp>
 
 #include <boost/bind.hpp>
 
