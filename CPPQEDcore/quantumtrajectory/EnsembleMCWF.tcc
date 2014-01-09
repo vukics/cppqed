@@ -8,48 +8,6 @@
 #include "ParsMCWF_Trajectory.h"
 
 
-namespace trajectory { namespace ensemble {
-
-
-template<int RANK>
-class Base<quantumdata::DensityOperator<RANK>&>
-{
-public:
-  quantumdata::DensityOperator<RANK>& getInitializedDO() const {return getInitializedDO_v();}
-
-private:
-  virtual quantumdata::DensityOperator<RANK>& getInitializedDO_v() const = 0;
-  
-};
-
-
-template<int RANK>
-class Traits<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&>
-{
-public:
-  typedef Ensemble<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&> EnsembleType;
-
-  typedef typename EnsembleType::Elem             Elem            ;
-  typedef typename EnsembleType::Impl             Impl            ;
-  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
-
-  static const ToBeAveragedType averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType& et)
-  {
-    ToBeAveragedType res(et.getInitializedDO());
-    
-    for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
-
-    return res/=size2Double(end-begin);
-
-  }
-
-
-};
-
- 
-} } // trajectory::ensemble
-
-
 namespace quantumtrajectory {
 
 
@@ -57,8 +15,8 @@ namespace ensemblemcwf {
 
 
 template<int RANK>
-std::auto_ptr<typename Base<RANK>::StateVectors>
-Base<RANK>::stateVectors(const StateVector& psi, size_t nTraj)
+auto
+Base<RANK>::stateVectors(const StateVector& psi, size_t nTraj) -> std::auto_ptr<StateVectors>
 {
   StateVectors res;
   for (size_t i=0; i<nTraj; ++i)
@@ -70,8 +28,8 @@ Base<RANK>::stateVectors(const StateVector& psi, size_t nTraj)
 
 
 template<int RANK>
-std::auto_ptr<typename Base<RANK>::Trajectories>
-Base<RANK>::trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs)
+auto
+Base<RANK>::trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs) -> std::auto_ptr<Trajectories>
 {
   Trajectories res;
 
@@ -103,7 +61,7 @@ std::ostream&
 Base<RANK>::logOnEnd_v(std::ostream& os) const
 {
   LoggerList loggerList;
-  for (typename Trajectories::const_iterator i=getTrajs().begin(); i!=getTrajs().end(); ++i)
+  for (typename Trajectories::const_iterator i=getTrajectories().begin(); i!=getTrajectories().end(); ++i)
     if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&(*i)))
       loggerList.push_back(traj->getLogger());
   

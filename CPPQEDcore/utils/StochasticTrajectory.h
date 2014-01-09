@@ -96,12 +96,6 @@ private:
 };
 
 
-///////////
-//
-// Ensemble
-//
-///////////
-
 
 /// Contains important helpers to Ensemble
 namespace ensemble {
@@ -112,46 +106,62 @@ class Base {};
 
 } // ensemble
 
-/*
-  
-  The implicit interface:
-  
-      reference case : T_ELEM must be addable to T via an addTo function.
-
-  non-reference case : T must be constructible from a T_ELEM
-
-*/
 
 
+/// An ensemble of Averageable trajectories providing services for ensemble averaging
+/**
+ * The design is recursive: since Ensemble itself inherits from Averageable, it can act as an element in a larger Ensemble.
+ * 
+ * The elements do not need to have the same type, they only need to have a common Averageable type as a base.
+ * 
+ * \tparam T The type condensing the quantities to be averaged for Ensemble in its function as an Averageable
+ * \tparam T_ELEM Same for the Averageable%s 
+ * 
+ * At the level of Ensemble, no implicit interface is assumed for `T` and `T_ELEM` since Ensemble treats variables of these types only via ensemble::Traits.
+ * It is important that the way the averaged `T` will be calculated from the sequence of `T_ELEM`%s can be tailored
+ * because it might happen that the application cannot afford to store temporaries of `T` (for such an example, cf. quantumtrajectory::EnsembleMCWF)
+ * 
+ */
 template<typename T, typename T_ELEM>
 class Ensemble : public Averageable<T>, public ensemble::Base<T>
 {
-public:
+private:
   typedef Averageable<T     > Base;
+  
+public:
   typedef Averageable<T_ELEM> Elem;
 
+  /// The storage of the element trajectories is through a \refBoost{pointer-vector,ptr_container/doc/ptr_vector.html}
+  /** This correctly handles the elements’s eventual polymorphy and allows for random access to individual trajectories (cf. averageInRange()) */
+  typedef boost::ptr_vector<Elem> Impl;
+  
   typedef T ToBeAveragedType;
 
+  /// Averages only in a range `begin..begin+n-1`
+  /** It could be called `toBeAveraged` as well, but it is not good to redefine an \link Averageable::toBeAveraged inherited non-virtual function\endlink. */
   const ToBeAveragedType averageInRange(size_t begin, size_t n) const;
-  // Averages only in a range begin..begin+n-1. Earlier, this was called toBeAveraged, too, but it is not good to redefine an inherited non-virtual function.
 
   virtual ~Ensemble() {}
-
-  typedef boost::ptr_vector<Elem> Impl;
-  // We use a vector in order that individual trajectories are addressed more easily.
-
-  const Impl& getTrajs() const {return trajs_;}
 
 protected:
   typedef std::auto_ptr<Impl> Ptr;
   
-  Ensemble(Ptr trajs, bool log) : trajs_(trajs), log_(log) {}
+  /// Generic constructor
+  Ensemble(Ptr trajs, ///< the sequence of elements owned by the `ptr_vector`
+           bool displayProgress ///< when true, a \refBoost{display of progress,timer/doc/index.html} through the element trajectories will show up on `cerr` at each step of time evolution
+          ) : trajs_(trajs), displayProgress_(displayProgress) {}
+
+  /// Getter
+  const Impl& getTrajectories() const {return trajs_;}
 
 #define FOR_EACH_function(f) for_each(trajs_,bind(&Elem::f,_1,boost::ref(ios))); return ios;
   
+  /// \name Serialization
+  //@{
   cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       {FOR_EACH_function( readState)}
   cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const {FOR_EACH_function(writeState)}
-
+  //@}
+  
 private:
   std::ostream& logOnEnd_v(std::ostream& ios) const {FOR_EACH_function(logOnEnd)}
 
@@ -170,20 +180,20 @@ private:
 
   Impl trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
-  const bool log_;
+  const bool displayProgress_;
 
 };
-
 
 
 namespace ensemble {
 
 /// %Traits class governing how to average up several `T_ELEM` types into a `T` type in the most efficient way (which is usually not with the naive addition operator)
 /**
- * A generic (naive) implementation is provided for the traits class
- * 
  * \tparam T the to-be-averaged type of the ensemble
  * \tparam T_ELEM the to-be-averaged type of the underlying Averageable instances
+ * 
+ * A generic (naive) implementation is provided for the traits class right away.
+ * It assumes that `T_ELEM` is additive and dividable by a double, and that it can be converted into a `T`.
  * 
  */
 template<typename T, typename T_ELEM>

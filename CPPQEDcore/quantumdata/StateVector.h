@@ -142,7 +142,7 @@ public:
   /// Adds a dyad of the present object to `densityOperator`
   /**
    * This is done without actually forming the dyad in memory (so that this is not implemented in terms of StateVector::dyad).
-   * This is important in situations when an average density operator is needed from an ensemble of state vectors, an example being quantumtrajectory::EnsembleMCWF.
+   * This is important in situations when an average density operator is needed from an ensemble of state vectors, an example being quantumtrajectory::EnsembleMCWF. 
    */
   void addTo(DensityOperator<RANK>& densityOperator) const;
 

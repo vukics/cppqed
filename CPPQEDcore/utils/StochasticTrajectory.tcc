@@ -71,7 +71,7 @@ Ensemble<T,T_ELEM>::evolve_v(double deltaT)
 {
   using namespace boost;
 
-  if (log_) {
+  if (displayProgress_) {
     progress_display pd(trajs_.size(),std::cerr);
     for (auto i=trajs_.begin(); i!=trajs_.end(); (++i, ++pd)) i->evolve(deltaT);
   }

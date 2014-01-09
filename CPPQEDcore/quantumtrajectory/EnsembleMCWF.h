@@ -65,7 +65,7 @@ protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
-  using Ensemble::getTrajs;
+  using Ensemble::getTrajectories;
   
   std::ostream& logOnEnd_v(std::ostream& os) const;
   
@@ -128,6 +128,50 @@ private:
 
 
 } // quantumtrajectory
+
+
+
+namespace trajectory { namespace ensemble {
+
+
+template<int RANK>
+class Base<quantumdata::DensityOperator<RANK>&>
+{
+public:
+  quantumdata::DensityOperator<RANK>& getInitializedDO() const {return getInitializedDO_v();}
+
+private:
+  virtual quantumdata::DensityOperator<RANK>& getInitializedDO_v() const = 0;
+  
+};
+
+
+template<int RANK>
+class Traits<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&>
+{
+public:
+  typedef Ensemble<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&> EnsembleType;
+
+  typedef typename EnsembleType::Elem             Elem            ;
+  typedef typename EnsembleType::Impl             Impl            ;
+  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
+
+  /// assumes that quantumdata::StateVector features a member quantumdata::StateVector::addTo()
+  static const ToBeAveragedType averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType& et)
+  {
+    ToBeAveragedType res(et.getInitializedDO());
+    
+    for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
+
+    return res/=size2Double(end-begin);
+
+  }
+
+
+};
+
+ 
+} } // trajectory::ensemble
 
 
 #endif // QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
