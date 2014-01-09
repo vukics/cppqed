@@ -78,7 +78,7 @@ namespace {
 template<typename T>
 void displayFreq(ostream& os, int precision, const NamedFrequency<T>& p)
 {
-  os<<"# "<<get<0>(p)<<"="<<formdouble::zeroWidth(precision)(get<1>(p))<<endl;
+  os<<"# "<<get<0>(p)<<"="<<formdouble::zeroAdditional(precision)(get<1>(p))<<endl;
 }
 
 } // unnamed namespace

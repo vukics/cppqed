@@ -68,7 +68,7 @@ struct ParsRun
   long &NDt; ///< number of deltaT intervals in \link run(Trajectory&, long, double, unsigned, const std::string&, const std::string&, int, bool, bool) deltaT-mode\endlink
   std::string &ofn, &initialFileName;
 
-  formdouble::Zero &precision;
+  formdouble::Zero &precision; ///< the overall precision of trajectory display \see FormDouble::overallPrecision
 
   bool &displayInfo, &firstStateDisplay;
 

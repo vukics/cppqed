@@ -1,11 +1,4 @@
-// -*- C++ -*-
-/*
-  Collecting to one place all the issues of the formatting of doubles, necessary for output in various places.
-  The idea is from Stroustrup's The C++ Programming Language (special edition) 21.4.6.3.
-
-  Named FormDouble here, since it is only issues pertaining to the display of doubles that are treated. formdouble::Bound should be able to deal with everything consisting only doubles (eg dcomp).
-*/
-
+/// \briefFileDefault
 #ifndef UTILS_FORMDOUBLE_H_INCLUDED
 #define UTILS_FORMDOUBLE_H_INCLUDED
 
@@ -17,30 +10,58 @@
 #include <iosfwd>
 
 
+/// Comprises tools related to FormDouble
+/**
+ * The aim of this module is to collect to one place all the issues of the formatting of doubles, necessary for output in various places.
+ * The idea is from \cite stroustrup 21.4.6.3.
+ * 
+ * Named FormDouble here, since it is only issues pertaining to the display of doubles that are treated.
+ */
 namespace formdouble {
 
+/// Output of a Bound value according to the corresponding FormDouble \related Bound
 template<typename T>
 std::ostream& operator<<(std::ostream&, const Bound<T>&);
 
 } // formdouble
 
 
+/// Class representing formatting options for output (stearming) of doubles
+/**
+ * It handles two characteristics, the \refStdCpp{precision,iomanip/setprecision} (number of digits) and \refStdCpp{width,iomanip/setw} of the output,
+ * where the latter can also be left calculated automatically by FormDouble::FormDouble(int)
+ */
 class FormDouble 
 {
 public:
-  static const int defaultPrecision;
+  static const int defaultPrecision; ///< Ultimate default precision for streaming doubles for the whole framework
+  
+  /// Generic overall precision accessible throughout the framework
+  /** 
+   * Can be set by reading in *any* variable of class FormDouble from the command line through the \link parameters parameter-bundle\endlink. 
+   * \see parameters::Parameter<formdouble::Zero>, and trajectory::ParsRun::precision, where the overallPrecision is set by the \link trajectory\endlink-bundle
+   */
   static       int overallPrecision;
 
-  explicit FormDouble(int precision);
-  // Calculates an appropriate width from the maximal possible width of a number of the given precision in the representation of the given machine.
+  /// \name Constructors
+  //@{
+  /// Generic constructor
   FormDouble(int precision, int width) : precision_(precision), width_(width) {}
-
+  
+  /// Constructor calculating an appropriate width from the maximal possible width of a number of the given precision in the representation of the given machine.
+  explicit FormDouble(int precision);
+  //@}
+  
+  /// Binds a value of a double-based type (e.g. double, dcomp, `std::vector<double>`, etc.) to the present instant
   template<typename T>
   const formdouble::Bound<T> operator()(const T&) const;
 
+  /// \name Getters
+  //@{
   int getPrecision() const {return precision_;}
   int getWidth    () const {return     width_;}
-
+  //@}
+  
 private:
   int precision_;
   int width_;
@@ -51,10 +72,11 @@ private:
 
 namespace formdouble {
 
-
+/// If `precision` is larger than FormDouble::defaultPrecision, returns `precision`, otherwise the default \retated FormDouble
 inline int actualPrecision(int precision) {return std::max(FormDouble::defaultPrecision,precision);}
 
-
+/// Essentially a compound of a FormDouble and a value of some double-based type (e.g. double, dcomp, `std::vector<double>`, etc.)
+/** formdouble::Bound should be able to deal with everything consisting only of doubles (eg dcomp). */
 template<typename T>
 class Bound 
 {
@@ -67,32 +89,33 @@ public:
 };
 
 
-int widthPositive(int precision);
-int widthAny     (int precision);
+int widthPositive(int precision); ///< The maximal width in characters of a *positive* number streamed with the given `precision` \retated FormDouble
+int widthAny     (int precision); ///< The maximal width in characters of any (positive or negative) number streamed with the given `precision` \retated FormDouble
 
 
-// Generic values:
-inline const FormDouble low () {return FormDouble(FormDouble::defaultPrecision/2);}
-inline const FormDouble high() {return FormDouble(FormDouble::defaultPrecision  );}
+inline const FormDouble low () {return FormDouble(FormDouble::defaultPrecision/2);} ///< Generic “low” precision (`FormDouble::defaultPrecision/2`) \related FormDouble
+inline const FormDouble high() {return FormDouble(FormDouble::defaultPrecision  );} ///< Generic “high” precision (`FormDouble::defaultPrecision`) \related FormDouble
 
 
-// The following exhibit at least the defaultPrecision:
-inline const FormDouble positive (int precision) // positive-only quantities, such as time
+inline const FormDouble positive      (int precision) ///< FormDouble with at least FormDouble::defaultPrecision for positive-only quantities, such as time \related FormDouble
 {return FormDouble(actualPrecision(precision),widthPositive(actualPrecision(precision)));}
 
-inline const FormDouble zeroWidth(int precision) // without additional width
+inline const FormDouble zeroAdditional(int precision) ///< FormDouble with at least FormDouble::defaultPrecision and without additional width (padding) \related FormDouble
 {return FormDouble(actualPrecision(precision),0);}
 
 
-
+/// A dummy FormDouble used mainly for setting/getting the overallPrecision \see trajectory::ParsRun::precision.
+/** Implicitely corvertible to/from an int */
 class Zero : public FormDouble
 {
 public:
   Zero() : FormDouble(FormDouble::defaultPrecision) {}
+  
+  /// Implicit conversion from int possible.
   Zero(int precision) : FormDouble(precision,0) {}
-  // Implicit conversion from int possible.
-
-  operator double() const {return getPrecision();}
+  
+  /// returns the precision in the style of implicit conversion
+  operator int() const {return getPrecision();}
 
 };
 
@@ -105,6 +128,7 @@ public:
 namespace parameters {
 
 
+/// Specialization which enables the setting of formdouble::FormDouble::overallPrecision in a read operation
 template<>
 class Parameter<formdouble::Zero> : public Parameter<int>
 {

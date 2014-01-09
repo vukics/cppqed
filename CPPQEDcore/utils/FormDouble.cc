@@ -14,7 +14,8 @@ using namespace std;
 
 /*
 
-  It is easy to see that the output width is at most (maximal number of exponential digits) + precision + 5 characters (together with the trailing space necessary to separate from the next field). Eg with (maximal number of exponential digits)=3, precision=3 :
+  It is easy to see that the output width is at most (maximal number of exponential digits) + precision + 5 characters (together with the trailing space necessary to separate from the next field).
+  Eg with (maximal number of exponential digits)=3, precision=3 :
   |-1.23e-456 | => 11 characters
   |-0.0000123 |
 
@@ -41,7 +42,7 @@ int formdouble::widthAny     (int precision)
 
 
 FormDouble::FormDouble(int precision) 
-  : precision_(precision), width_(formdouble::widthAny(precision))
+  : FormDouble(precision,formdouble::widthAny(precision))
 {
 }
 
