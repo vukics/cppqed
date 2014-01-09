@@ -742,8 +742,9 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown       \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/testsuite.markdown
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown        \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/testsuite.markdown   \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/buildsystem.markdown \
 
 
 # This tag can be used to specify the character encoding of the source files
