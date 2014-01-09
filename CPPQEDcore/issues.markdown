@@ -11,7 +11,7 @@ Issues
 
 * Make headers self-contained & minimal
 
-* MultiLevel probably severely outdated
+* \b DONE MultiLevel probably severely outdated
   
 
 # Code organization + packaging
@@ -31,7 +31,7 @@ Issues
 
 * \b DONE quantumdata may include only from utils; quantumtrajectory may include quantumdata; structure may include both quantumtrajectory & quantumdata – TridiagonalHamiltonian should rather go to quantumoperator?
 
-* Git Branch & Commit details to be displayed by scripts on call with --version (note, this information must be captured @ compile time, and not simply @ configuration time, that is, the query must be performed by make and not by cmake)
+* \b DONE Git Branch & Commit details to be displayed by scripts on call with --version (note, this information must be captured @ compile time, and not simply @ configuration time, that is, the query must be performed by make and not by cmake)
 
 * Deprecate Boost.Build
 
@@ -41,10 +41,12 @@ Issues
   * Documentation
   
     * Finish basic API documentation (doxygen branch)
-    * Update structure-bundle documentation (highlight c++11 features – give a name, link, etc.)
+    * \b DONE Update structure-bundle documentation (highlight c++11 features – give a name, link, etc.)
     * User guide
       * trajectory-state serialization
-      * trajectory logging
+      * trajectory logging (especially EnsembleMCWF)
+      * time averaging
+      * version information
       * (heavier use of smart pointers)
     * Installation ???
     
