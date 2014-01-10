@@ -24,9 +24,6 @@ set(CPPQED_PATCH_VERSION 9)
 set(CPPQED_VERSION
   ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION})
 set(CPPQED_ID ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION})
-if(CPPQED_MONOLITHIC)
-  set(CPPQED_ID ${CPPQED_ID} PARENT_SCOPE)
-endif()
 
 # Adopt the shared library versioning scheme of libtool
 # CURRENT  - the current ABI version
@@ -56,7 +53,13 @@ set(CPPQED_ABI_REVISION 0)
 math(EXPR CPPQED_ABI_MAJOR ${CPPQED_ABI_CURRENT}-${CPPQED_ABI_AGE})
 set(CPPQED_ABI_MINOR ${CPPQED_ABI_AGE})
 set(CPPQED_ABI_MICRO ${CPPQED_ABI_REVISION})
-  
+
+if(CPPQED_MONOLITHIC)
+  set(CPPQED_VERSION ${CPPQED_VERSION} PARENT_SCOPE)
+  set(CPPQED_ID ${CPPQED_ID} PARENT_SCOPE)
+  set(CPPQED_ABI_MAJOR ${CPPQED_ABI_MAJOR} PARENT_SCOPE)
+endif()
+
 ##################################################
 # Installation directories
 ##################################################
