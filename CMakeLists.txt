@@ -49,10 +49,10 @@ cppqed_documentation("" core_doc elements_doc)
 
 ##################################################
 # Debian build
-# if the directory debian exists, configure the
+# if the directory debianbuild exists, configure the
 # debian package build
 ##################################################
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/debian)
-  add_subdirectory(debian)
+if(EXISTS ${PROJECT_SOURCE_DIR}/debianbuild)
+  add_subdirectory(debianbuild)
 endif()

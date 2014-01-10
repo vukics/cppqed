@@ -3,4 +3,4 @@ html
 *.kdev4
 *.orig
 *~
-debian
+debianbuild
