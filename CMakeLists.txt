@@ -45,3 +45,14 @@ add_subdirectory(Testing)
 include(${PROJECT_SOURCE_DIR}/CPPQEDcore/cmake/Modules/CPPQEDUse.cmake)
 
 cppqed_documentation("" core_doc elements_doc)
+
+
+##################################################
+# Debian build
+# if the directory debian exists, configure the
+# debian package build
+##################################################
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/debian)
+  add_subdirectory(debian)
+endif()
