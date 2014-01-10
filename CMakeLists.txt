@@ -44,7 +44,7 @@ add_subdirectory(Testing)
 
 include(${PROJECT_SOURCE_DIR}/CPPQEDcore/cmake/Modules/CPPQEDUse.cmake)
 
-cppqed_documentation("" core_doc elements_doc)
+cppqed_documentation("" core_doc elements_doc cpypyqed_doc)
 
 
 ##################################################
