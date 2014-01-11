@@ -14,8 +14,9 @@ set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
 set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 
+option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
 find_package(Boost QUIET COMPONENTS python)
-if(Boost_PYTHON_FOUND)
+if(Boost_PYTHON_FOUND AND COMPILE_CPYPYQED)
   add_subdirectory(cpypyqed)
 endif()
 
