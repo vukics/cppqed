@@ -251,7 +251,7 @@ endmacro()
 
 macro(cppqed_documentation target_prefix)
   set(doc_depends ${ARGN})
-  find_package(Doxygen)
+  find_package(Doxygen QUIET)
 
   set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
 
