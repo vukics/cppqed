@@ -16,6 +16,9 @@ of tests. Example usage:
     # Run the full test suite
     $ make check
 
+    # Run a subset of the test suite which runs faster (no on-demand compilation tests)
+    $ make check_fast
+
     # Perform the tests of the "continue" directory
     $ make check_continue
 
