@@ -51,7 +51,7 @@ PROJECT_BRIEF          = "a framework for simulating open quantum dynamics – g
 # and the maximum width should not exceed 200 pixels. Doxygen will copy the logo
 # to the output directory.
 
-PROJECT_LOGO           = ../@CPPQED_RELATIVE_DOXYGEN_DIR@/html/logoCppQED.png
+PROJECT_LOGO           = @CMAKE_CURRENT_SOURCE_DIR@/doc/logoCppQED.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -1977,7 +1977,7 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               = @CPPQED_RELATIVE_DOXYGEN_TAG@=../@CPPQED_RELATIVE_DOXYGEN_DIR@/html
+TAGFILES               = @TAGFILES@
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to

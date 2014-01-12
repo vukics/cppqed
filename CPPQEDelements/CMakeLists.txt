@@ -21,4 +21,4 @@ elements_project()
 # Documentation
 ##################################################
 
-cppqed_documentation("elements_" core_doc)
+cppqed_documentation("elements_" ${CPPQED_DOXYGEN_TAG} core_doc)

@@ -37,7 +37,9 @@ macro(create_object_target)
   set(OBJ_TARGETS ${OBJ_TARGETS} "\$<TARGET_OBJECTS:${PROJECT_NAME}_${name}_objs>" PARENT_SCOPE)
 endmacro()
 
-message(STATUS "Using CPPQED_SETUP macro from ${CMAKE_CURRENT_LIST_DIR}")
+if(NOT ${CPPQED_MONOLITHIC})
+  message(STATUS "Using CPPQED_SETUP macro from ${CMAKE_CURRENT_LIST_DIR}")
+endif()
 macro(CPPQED_SETUP)
   include(GNUInstallDirs)
   include(CMakePackageConfigHelpers)
@@ -166,7 +168,6 @@ macro(elements_project)
   # ... and for the installation tree
   set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR}/${ELEMENTS_INCLUDE_SUBDIR})
   set(CONF_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/${ELEMENTS_CMAKE_SUBDIR})
-  set(CONF_DOC_DIR ${CPPQED_DOC_INSTALL_DIR}/${PROJECT_NAME})
   configure_package_config_file(${CPPQED_CMAKE_DIR}/ElementsTemplateConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQED${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION "${CONF_CMAKE_DIR}"
     PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR
@@ -249,22 +250,28 @@ macro(scripts_project)
   add_dependencies(${PROJECT_NAME}_all ${SCRIPTNAMES})
 endmacro()
 
-macro(cppqed_documentation target_prefix)
-  set(doc_depends ${ARGN})
-  find_package(Doxygen QUIET)
+macro(cppqed_documentation target_prefix tagfiles_arg)
 
+  find_package(Doxygen QUIET)
+  set(tagfiles ${tagfiles_arg})
   set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
 
   set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
 
   if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
+    set(doc_depends ${ARGN})
     if(CPPQED_MONOLITHIC)
       set(DOXYGEN_HEADER_FILE ${cppqed_SOURCE_DIR}/doc/header.html)
       set(DOXYGEN_CSS_FILE ${cppqed_SOURCE_DIR}/doc/stylesheet.css)
     endif()
     file(MAKE_DIRECTORY ${CONF_DOC_DIR})
-    file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CONF_DOC_DIR}/core/core.tag)
-    get_filename_component(CPPQED_RELATIVE_DOXYGEN_DIR ${CPPQED_RELATIVE_DOXYGEN_TAG} PATH)
+    while(tagfiles)
+      list(GET tagfiles 0 tagfile)
+      list(REMOVE_AT tagfiles 0)
+      file(RELATIVE_PATH relative_tagfile ${CONF_DOC_DIR} ${tagfile})
+      get_filename_component(relative_location ${relative_tagfile} PATH)
+      set(TAGFILES "${TAGFILES} ${relative_tagfile}=../${relative_location}/html")
+    endwhile()
     configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${CONF_DOC_DIR}/Doxyfile @ONLY)
     add_custom_target(${target_prefix}doc ${DOXYGEN_EXECUTABLE} ${CONF_DOC_DIR}/Doxyfile
       WORKING_DIRECTORY ${CONF_DOC_DIR}

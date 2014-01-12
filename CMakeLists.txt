@@ -7,8 +7,6 @@ include(GNUInstallDirs)
 
 set(CPPQED_MONOLITHIC 1)
 
-set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
-
 add_subdirectory(CPPQEDcore)
 set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
@@ -30,6 +28,18 @@ if(COMPILE_SCRIPTS)
   add_subdirectory(CPPQEDscripts)
 endif()
 
+add_subdirectory(Testing)
+
+##################################################
+# Documentation
+##################################################
+
+include(${core_SOURCE_DIR}/cmake/Modules/CPPQEDUse.cmake)
+cppqed_documentation("cppqed_" "${CMAKE_BINARY_DIR}/doc/core/core.tag" core_doc)
+
+add_custom_target(doc)
+add_dependencies(doc cppqed_doc core_doc elements_doc cpypyqed_doc)
+
 install(DIRECTORY CustomElementsExample CustomScriptsExample
         DESTINATION ${DOC_INSTALL_DIR}
         PATTERN .git* EXCLUDE
@@ -37,16 +47,6 @@ install(DIRECTORY CustomElementsExample CustomScriptsExample
         PATTERN *.kdev* EXCLUDE
         PATTERN build* EXCLUDE
 )
-add_subdirectory(Testing)
-
-##################################################
-# Documentation
-##################################################
-
-include(${PROJECT_SOURCE_DIR}/CPPQEDcore/cmake/Modules/CPPQEDUse.cmake)
-
-cppqed_documentation("" core_doc elements_doc cpypyqed_doc)
-
 
 ##################################################
 # Debian build

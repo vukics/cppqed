@@ -213,7 +213,7 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
 # Documentation
 ##################################################
 
-cppqed_documentation("core_")
+cppqed_documentation(core_ "")
 
 ##################################################
 # Installation
@@ -245,7 +245,7 @@ set(CONF_CMAKE_DIR ${PROJECT_BINARY_DIR})
 set(CONF_FLAT_INCLUDE 0)
 configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake"
   INSTALL_DESTINATION  "${PROJECT_BINARY_DIR}"
-  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR DOC_INSTALL_DIR
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR
 )
 write_basic_package_version_file(${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake 
   VERSION ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}
@@ -264,7 +264,7 @@ set(CONF_FLAT_INCLUDE 1)
 set(CONF_DOC_DIR ${DOC_INSTALL_DIR}/${PROJECT_NAME})
 configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQEDConfig.cmake"
   INSTALL_DESTINATION "${CONF_CMAKE_DIR}"
-  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR DOC_INSTALL_DIR
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR
 )
 
 # Install the CPPQEDConfig.cmake and CPPQEDConfigVersion.cmake
