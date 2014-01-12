@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFile{Defines tentative base classes for the exception classes of the framework \todo Rationalize & uniformize the exceptions throughout}
 #ifndef UTILS_EXCEPTION_H_INCLUDED
 #define UTILS_EXCEPTION_H_INCLUDED
 
@@ -8,16 +8,19 @@
 
 namespace cpputils {
 
+/// The class that is (meant to be, at least) the base of all exceptions in the framework
+/**
+ * \note It is extremely inconvenient to derive from \refStdCppContruct{std::exception,exception/exception}, as this class defines `virtual ~exception() throw();`
+ * so that each and every derived class also has to define its destructor in such a way. (Of course, this is just the point of `std::exception`, but here 
+ * we do not strive for exception safety anyway as an exception usually means the end of the application.
+ */
 struct Exception // : public std::exception
-// It is extremely inconvenient to derive from std::exception, as this class defines
-// virtual ~exception() throw();
-// so that each and every derived class also has to define its destructor in such a way.
-// Here, we do not strive for exception safety anyway.
 {
   virtual ~Exception() /* throw() */ {}
 };
 
 
+/// Class reporting also the \link cpputils::TaggedException::what() „what-ness”\endlink of the exception
 class TaggedException : public Exception
 {
 public:

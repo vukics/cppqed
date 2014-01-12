@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFile{Some converters along the lines of \refBoost{Boost.NumericConversion,numeric/conversion/doc/html/index.html}} \todo Update & see why it is not much used in the framework
 #ifndef   UTILS_CONVERSIONS_H_INCLUDED
 #define   UTILS_CONVERSIONS_H_INCLUDED
 

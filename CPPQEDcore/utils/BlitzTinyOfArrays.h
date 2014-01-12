@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFile{Defines blitzplusplus::TinyOfArrays}
 #if !BOOST_PP_IS_ITERATING
 
 #ifndef UTILS_BLITZTINYOFARRAYS_H_INCLUDED
@@ -22,6 +22,7 @@ bool operator==(const TinyOfArrays<T,RANK,LENGTH>&, const TinyOfArrays<T,RANK,LE
 
 #define BASE_class blitz::TinyVector<blitz::Array<T,RANK>,LENGTH>
 
+/// Adresses the problem discussed in [this thread](http://sourceforge.net/mailarchive/message.php?msg_id=20017905).
 template<typename T, int RANK, int LENGTH>
 class TinyOfArrays : public BASE_class, private boost::equality_comparable<TinyOfArrays<T,RANK,LENGTH> >
 {
@@ -30,11 +31,11 @@ public:
 
 #undef  BASE_class
 
-  typedef typename Base::T_numtype       T_numtype;
-  typedef typename Base::T_vector        T_vector;
-  typedef typename Base::T_iterator      T_iterator;
-  typedef typename Base::iterator        iterator;
-  typedef typename Base::const_iterator  const_iterator;
+  typedef typename Base::T_numtype      T_numtype;
+  typedef typename Base::T_vector       T_vector;
+  typedef typename Base::T_iterator     T_iterator;
+  typedef typename Base::iterator       iterator;
+  typedef typename Base::const_iterator const_iterator;
   
   using Base::operator=;
 
