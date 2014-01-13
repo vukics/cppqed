@@ -254,7 +254,6 @@ macro(cppqed_documentation target_prefix tagfiles_arg)
 
   find_package(Doxygen QUIET)
   set(tagfiles ${tagfiles_arg})
-  set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
 
   set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
 
@@ -278,10 +277,12 @@ macro(cppqed_documentation target_prefix tagfiles_arg)
       COMMENT "Generating APIs documentation with Doxygen"
       DEPENDS ${doc_depends}
     )
-    install(DIRECTORY ${CONF_DOC_DIR}/html
-          DESTINATION ${DOC_INSTALL_DIR}/${PROJECT_NAME}
-          OPTIONAL
-    )
+    if(CPPQED_MONOLITHIC)
+      install(DIRECTORY ${CONF_DOC_DIR}/html
+            DESTINATION ${CPPQED_DOC_DIR}/${PROJECT_NAME}
+            OPTIONAL
+      )
+    endif()
   endif()
 endmacro()
 

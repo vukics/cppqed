@@ -7,6 +7,8 @@ include(GNUInstallDirs)
 
 set(CPPQED_MONOLITHIC 1)
 
+set(CPPQED_DOC_DIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID})
+
 add_subdirectory(CPPQEDcore)
 set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
@@ -41,7 +43,7 @@ add_custom_target(doc)
 add_dependencies(doc cppqed_doc core_doc elements_doc cpypyqed_doc)
 
 install(DIRECTORY CustomElementsExample CustomScriptsExample
-        DESTINATION ${DOC_INSTALL_DIR}
+        DESTINATION ${CPPQED_DOC_DIR}
         PATTERN .git* EXCLUDE
         PATTERN .bzr EXCLUDE
         PATTERN *.kdev* EXCLUDE
