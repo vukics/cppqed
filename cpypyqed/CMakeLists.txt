@@ -143,9 +143,10 @@ endforeach(file)
 ##################################################
 
 find_package(Doxygen)
+find_package(Sphinx)
 find_python_module(sphinxcontrib.doxylink)
 
-if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND PY_SPHINXCONTRIB_DOXYLINK)
+if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_EXECUTABLE AND PY_SPHINXCONTRIB_DOXYLINK)
   set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
   file(MAKE_DIRECTORY ${CONF_DOC_DIR})
   file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CPPQED_DOXYGEN_TAG})
@@ -155,18 +156,30 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND PY_SPHINXCONTRIB_DOXYLINK)
   if(CPPQED_MONOLITHIC)
     configure_file(${PROJECT_SOURCE_DIR}/doc/layout.html.in ${CONF_DOC_DIR}/_templates/layout.html @ONLY)
   endif()
-  foreach(AUXFILE index.rst Makefile reference.rst userguide.rst)
+  foreach(AUXFILE index.rst reference.rst userguide.rst)
     configure_file(${PROJECT_SOURCE_DIR}/doc/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
   endforeach()
-  add_custom_target(${PROJECT_NAME}_doc make html
-    WORKING_DIRECTORY ${CONF_DOC_DIR}
-    COMMENT "Generating API documentation with sphinx"
-    DEPENDS doc/conf.py.in
+  # Sphinx cache with pickled ReST documents
+  set(SPHINX_CACHE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_doctrees")
+  # HTML output directory
+  set(SPHINX_HTML_DIR "${CONF_DOC_DIR}/html")
+
+  add_custom_target(${PROJECT_NAME}_doc
+      ${SPHINX_EXECUTABLE}
+          -q -b html
+          -c "${CONF_DOC_DIR}"
+          -d "${SPHINX_CACHE_DIR}"
+          "${CONF_DOC_DIR}"
+          "${SPHINX_HTML_DIR}"
+      WORKING_DIRECTORY ${CONF_DOC_DIR}
+      COMMENT "Building HTML documentation with Sphinx"
+      DEPENDS doc/conf.py.in
   )
+  add_dependencies(${PROJECT_NAME}_doc cpypyqed)
   if(CPPQED_MONOLITHIC)
-    add_dependencies(${PROJECT_NAME}_doc core_doc elements_doc cpypyqed)
+    add_dependencies(${PROJECT_NAME}_doc core_doc elements_doc)
     install(DIRECTORY ${CONF_DOC_DIR}/html
-          DESTINATION ${CPPQED_DOC_INSTALL_DIR}/${PROJECT_NAME}
+          DESTINATION ${CPPQED_DOC_DIR}/${PROJECT_NAME}
           OPTIONAL
     )
   endif()
