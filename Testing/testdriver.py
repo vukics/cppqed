@@ -107,7 +107,7 @@ class PythonRunner(Runner):
       env['CPYPYQED_BUILDDIR']=cpypyqed_builddir
       if clean: shutil.rmtree(os.path.join(cpypyqed_builddir,'cppqedmodules'),ignore_errors=True)
     if cpypyqed_config: env['CPYPYQED_CONFIG']=cpypyqed_config
-    env['PYTHONPATH']=cp.get('Setup','modulepath')
+    env['PYTHONPATH']=self.cp.get('Setup','modulepath')
     extra_opts = [] if self.options.configuration.lower()=="release" else ['--debug']
     Runner.run(self,clean=clean,env=env,extra_opts=extra_opts)
 
