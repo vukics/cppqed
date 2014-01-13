@@ -89,7 +89,7 @@ process can be fine tuned:
 Note that without this feature, state files cannot be written to or read from disk.
 * `-DFLENS=Off`: disable `FLENS` support, even if the library is detected.
 * `-DREGISTRY=Off`: don't write information about the build trees to the
-[cmake package registry](http://www.cmake.org/Wiki/CMake/Tutorials/Package_Registry).
+[cmake package registry][cmake-registry].
 * `-DEXAMPLES=Off`: con't compile some examples in the C++QEDcore repository.
 
 ### How Cmake finds the C++QED components ###
@@ -108,11 +108,27 @@ from the repositories C++QEDcore, C++QEDelements etc.).
 If `make install` was called for C++QEDcore and the installation prefix is a standard system path
 (e.g. `/usr`, `/usr/local`), then other sub-projects will find the core libraries automatically. If the libraries
 are installed to a non-system prefix (e.g. `~/local`), this prefix can be added to the search path in
-other sub-projects by calling Cmake with `-DCMAKE_PREFIX_PATH=~/local`.
+other sub-projects by calling Cmake with `-DCMAKE_PREFIX_PATH=~/local`. The same is true for C++QEDelements.
 
-#### Libraries 
+#### Libraries are not installed ####
+
+It is possible to use C++QED libraries directly from the build directory where they were compiled. Libraries from
+build directories are even found automatically most of the time, because these build directories are registered
+in the [Cmake registry][cmake-registry]. You can override those locations by giving hints to Cmake where to
+find the build directories:
+
+* `-DCPPQED_DIR=<path>`: override path to the build directory of the core component
+* `-DCPPQEDelements_DIR=<path>`: override path to the build directory of the elements component
+* `-DCPPQEDcustomelements_DIR=<path>`: override path to a custom elements project named `customelements`
+
+This is useful if you are using several build directories for different build configurations (Release/Debug).
+In such a case, or if the libraries are intended to be installed with `make install`, you might consider to
+call CMake with `-DREGISTRY=Off` in order to not write information about build directories to the registry,
+which might interfere with the installed libraries.
+
+\note
+To clear the CMake registry, just delete `~/.cmake/packages` or individual directories there. Before running
+Cmake again, also remove the `CMakeCache.txt` in the build directory to erase the cached locations.
 
 
-
-
-
+[cmake-registry]: http://www.cmake.org/Wiki/CMake/Tutorials/Package_Registry
