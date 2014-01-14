@@ -327,4 +327,6 @@ set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
                                 PURPOSE "Generation of API documentation.")
 add_feature_info("FLENS" CPPQED_HAS_FLENS "compile framework with FLENS support.")
 add_feature_info("Serialization" CPPQED_HAS_SERIALIZATION "needed for binary statevector output." )
-feature_summary( WHAT ALL )
+if(NOT ${CPPQED_MONOLITHIC})
+  feature_summary( WHAT ALL )
+endif()

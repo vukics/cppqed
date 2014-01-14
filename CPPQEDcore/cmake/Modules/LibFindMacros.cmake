@@ -22,7 +22,7 @@ macro (libfind_pkg_check_modules PREFIX PKGNAME)
     include(UsePkgConfig)
     pkgconfig(${PKGNAME} ${PREFIX}_INCLUDE_DIRS ${PREFIX}_LIBRARY_DIRS ${PREFIX}_LDFLAGS ${PREFIX}_CFLAGS)
   else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-    find_package(PkgConfig)
+    find_package(PkgConfig QUIET)
     if (PKG_CONFIG_FOUND)
       # for cmake > 2.8.2 use QUIET mode for pkg_check_modules
       if(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "8" AND CMAKE_PATCH_VERSION GREATER "2")
