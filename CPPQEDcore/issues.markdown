@@ -1,13 +1,15 @@
 Issues
 ======
 
-* \b DONE boost::tuples => std::tuples --- deprecate DynamicsBase::RealFreqs,ComplexFreqs FREQS, etc.
+* remove too special elements and scripts from CPPQEDelements and CPPQEDscripts into the custom repositories
+
 * (re)consider use of Boost.Math instead of GSL throughout
 
 * (re)consider use of Boost.MultiArray instead of Blitz
 
 * define Ptr types outside classes as template aliases eg QuantumSystem::Ptr => QuantumSystemPtr
 
+* \b DONE boost::tuples => std::tuples --- deprecate DynamicsBase::RealFreqs,ComplexFreqs FREQS, etc.
 
 * Make headers self-contained & minimal
 
