@@ -59,3 +59,5 @@ install(DIRECTORY CustomElementsExample CustomScriptsExample
 if(EXISTS ${PROJECT_SOURCE_DIR}/debianbuild)
   add_subdirectory(debianbuild)
 endif()
+
+feature_summary( WHAT ALL )
