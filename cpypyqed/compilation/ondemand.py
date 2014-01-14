@@ -11,6 +11,9 @@ import errno
 import tempfile
 import subprocess
 import shutil
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
 
 from cpypyqed_config import cppqed_build_type,cppqed_module_suffix
 if cppqed_build_type.lower()=="release":
@@ -146,6 +149,7 @@ class OnDemand(object):
               compiler=self.config.get('Setup','compiler')
               cppqed_dir=os.path.expanduser(self.config.get('Setup','cppqed_dir'))
               if compiler: opts.append('-DCMAKE_CXX_COMPILER={}'.format(compiler))
+              logging.debug("Configuring for build type {}.".format(cppqed_build_type))
               if cppqed_build_type=="debug":
                 opts.append("-DCMAKE_BUILD_TYPE=Debug")
                 cppqed_dir_debug=os.path.expanduser(self.config.get('Setup','cppqed_dir_debug'))
@@ -154,7 +158,10 @@ class OnDemand(object):
                 opts.append("-DCMAKE_BUILD_TYPE=Release")
                 cppqed_dir_release=os.path.expanduser(self.config.get('Setup','cppqed_dir_release'))
                 if cppqed_dir_release: cppqed_dir=cppqed_dir_release
+              else:
+                raise(NotImplementedError("Unknown build type {}.".format(cppqed_build_type)))
               if cppqed_dir: opts.append('-DCPPQED_DIR={}'.format(cppqed_dir))
+              logging.debug(subprocess.list2cmdline(['cmake','.']+opts))
               ret = subprocess.call(args=['cmake','.']+opts,cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
               self._check_return_value(ret, errormsg="Error: cmake failed")
               print("Building {}, please stand by...".format(self.classname))

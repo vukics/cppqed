@@ -1,2 +1,2 @@
-cppqed_build_type="@CONF@"
-cppqed_module_suffix="@DEBUG_SUFFIX@"
+cppqed_build_type="@CONF@".lower()
+cppqed_module_suffix="@DEBUG_SUFFIX@".lower()
