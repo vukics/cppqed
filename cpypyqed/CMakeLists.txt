@@ -107,7 +107,7 @@ endif()
 add_subdirectory(core)
 add_subdirectory(elements)
 
-add_custom_target(cpypyqed DEPENDS io core elements)
+add_custom_target(cpypyqed ALL DEPENDS io core elements)
 
 set(INPUTS __init__.py compilation/cpypyqed_config.py compilation/ActTemplate.cc
            compilation/CompositeTemplate.cc compilation/composite.py compilation/ondemand.py
@@ -212,4 +212,6 @@ set_package_properties(Doxylink PROPERTIES URL "https://pypi.python.org/pypi/sph
 
 add_feature_info("Python input/output" ENABLE_PYTHON_IO "Python C++QED input/output module.")
 
-feature_summary( WHAT ALL )
+if(NOT CPPQED_MONOLITHIC)
+  feature_summary( WHAT ALL )
+endif()
