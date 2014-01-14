@@ -1,5 +1,7 @@
 # The cmake build system # {#cppqed_cmake}
 
+\tableofcontents
+
 This page describes the C++QED build system. [CMake](http://www.cmake.org/) is a
 cross-platform build system which checks the system for the location of required
 and optional dependencies and enables/disables features based on what is found.
@@ -11,9 +13,9 @@ and furthermore offers easy integration into popular IDE‘s, e.g.
 
 C++QED requires `cmake` version 2.8.9 or later.
 
-# Building the framework #
+# Building the framework {#cmake_building}
 
-## Short user guide ##
+## Short user guide {#cmake_short_guide}
 
 This section is for the impatient, it describes the minimal steps to build the
 framework. If `cmake` cannot find installed requirements or if you wish to fine-tune
@@ -59,7 +61,7 @@ script, it is possible to call
 
     make <script-name-without-extension>
 
-## Fine tuning the build process ##
+## Fine tuning the build process {#cmake_fine_tuning}
 
 If CMake fails to locate a dependency, it will inform the user about the
 disabled feature or fail if the library was required. If some libraries are
