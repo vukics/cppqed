@@ -21,7 +21,7 @@
 # 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 # We need the Python interpreter to figure out Python's version in SuckOSX.
-find_package(PythonInterp)
+find_package(PythonInterp 2.7 REQUIRED)
 
 # Python libraries
 MESSAGE(STATUS "Python libraries: " "${PYTHON_LIBRARIES}")
