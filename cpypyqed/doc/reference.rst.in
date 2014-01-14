@@ -7,36 +7,36 @@ cpypyqed Reference
 :mod:`Namespaces`
 ========================
 
-.. automodule:: cpypyqed_d
+.. automodule:: @MODULE_NAME@
   :members:
   :undoc-members:
 
-:mod:`core_d`
+:mod:`core@DEBUG_SUFFIX@`
 =============
-.. automodule:: cpypyqed_d.core_d
+.. automodule:: @MODULE_NAME@.core@DEBUG_SUFFIX@
   :members:
   :undoc-members:
 
-:mod:`elements_d`
+:mod:`elements@DEBUG_SUFFIX@`
 =================
 
-.. automodule:: cpypyqed_d.elements_d
+.. automodule:: @MODULE_NAME@.elements@DEBUG_SUFFIX@
   :members:
   :undoc-members:
 
 :mod:`compilation.ondemand`
 ======================================
 
-.. automodule:: cpypyqed_d.compilation.ondemand
+.. automodule:: @MODULE_NAME@.compilation.ondemand
   :members:
   :undoc-members:
 
-.. autoattribute:: cpypyqed_d.compilation.ondemand.OnDemand.cpypyqeddir
+.. autoattribute:: @MODULE_NAME@.compilation.ondemand.OnDemand.cpypyqeddir
 
 :mod:`compilation.composite`
 =======================================
-.. automodule:: cpypyqed_d.compilation.composite
+.. automodule:: @MODULE_NAME@.compilation.composite
   :members: makeComposite, Composite
   :undoc-members:
 
-.. autoclass:: cpypyqed_d.compilation.composite.Act(int, [int,...])
+.. autoclass:: @MODULE_NAME@.compilation.composite.Act(int, [int,...])

@@ -38,11 +38,11 @@ if ( ENABLE_PYTHON_IO )
   message(STATUS "Python input/output enabled.")
 endif( ENABLE_PYTHON_IO )
 
-set(CPYPYQED_INSTALL_PATH_RELEASE ${PYTHON_MODULES_PATH}/cpypyqed)
-set(CPYPYQED_INSTALL_PATH_DEBUG ${PYTHON_MODULES_PATH}/cpypyqed_d)
-
 set(PYTHON_MAX_RANK 8 CACHE STRING "Pre-instantiate template classes up to this rank in Python bindings.")
 set_property(CACHE PYTHON_MAX_RANK PROPERTY STRINGS 2 4 6 8 10)
+
+set(CPYPYQED_INSTALL_PATH_RELEASE ${PYTHON_MODULES_PATH}/cpypyqed)
+set(CPYPYQED_INSTALL_PATH_DEBUG ${PYTHON_MODULES_PATH}/cpypyqed_d)
 
 # Macro used for each module to select the correct extension according to the OS
 MACRO(PYTHON_CPPMODULE arg1)
@@ -109,33 +109,30 @@ add_subdirectory(elements)
 
 add_custom_target(cpypyqed DEPENDS io core elements)
 
-function(cpypyqed_file file config)
-  string(TOLOWER ${config} CONF)
-  get_filename_component(DIR ${file} PATH)
-  if(CONF STREQUAL "debug")
-    set(DEBUG_SUFFIX "_d")
-    set(DEST ${CPYPYQED_INSTALL_PATH_DEBUG})
-  elseif(CONF STREQUAL "release")
-    set(DEBUG_SUFFIX "")
-    set(DEST ${CPYPYQED_INSTALL_PATH_RELEASE})
-  endif()
-  configure_file(${file} ${PROJECT_NAME}${DEBUG_SUFFIX}/${file} @ONLY)
-  install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}${DEBUG_SUFFIX}/${file}
-          DESTINATION ${DEST}/${DIR} CONFIGURATIONS ${conf})
-endfunction()
+set(INPUTS __init__.py compilation/cpypyqed_config.py compilation/ActTemplate.cc
+           compilation/CompositeTemplate.cc compilation/composite.py compilation/ondemand.py
+           compilation/__init__.py compilation/CMakeListsTemplate.txt)
 
-foreach(file __init__.py compilation/cpypyqed_config.py
-             compilation/ActTemplate.cc compilation/CompositeTemplate.cc
-             compilation/composite.py compilation/ondemand.py compilation/__init__.py
-             compilation/CMakeListsTemplate.txt)
-  if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-    string(TOLOWER "${CMAKE_BUILD_TYPE}" CONF)
-    cpypyqed_file(${file} ${CONF})
-  else()
-    cpypyqed_file(${file} Release)
-    cpypyqed_file(${file} Debug)
-  endif()
-endforeach(file)
+foreach(file ${INPUTS})
+  add_custom_command(TARGET cpypyqed PRE_BUILD
+    COMMAND ${CMAKE_COMMAND}
+      -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/${file}
+      -DOUTPUT=${PROJECT_NAME}$<$<CONFIG:Debug>:_d>/${file}
+      -DDEBUG_SUFFIX="$<$<CONFIG:Debug>:_d>"
+      -DCONF=$<CONFIGURATION>
+      -DCPPQED_CORE_GIT=${CPPQED_CORE_GIT}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
+  )
+  get_filename_component(DIR ${file} PATH)
+  install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}/${file}
+          DESTINATION ${CPYPYQED_INSTALL_PATH_RELEASE}/${DIR}
+          CONFIGURATIONS Release
+  )
+  install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_d/${file}
+          DESTINATION ${CPYPYQED_INSTALL_PATH_DEBUG}/${DIR}
+          CONFIGURATIONS Debug
+  )
+endforeach()
 
 
 ##################################################
@@ -156,14 +153,13 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_EXECUTABLE AND PY_SPHINXCONTRI
   if(CPPQED_MONOLITHIC)
     configure_file(${PROJECT_SOURCE_DIR}/doc/layout.html.in ${CONF_DOC_DIR}/_templates/layout.html @ONLY)
   endif()
-  foreach(AUXFILE index.rst reference.rst userguide.rst)
+  foreach(AUXFILE index.rst userguide.rst)
     configure_file(${PROJECT_SOURCE_DIR}/doc/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
   endforeach()
   # Sphinx cache with pickled ReST documents
   set(SPHINX_CACHE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_doctrees")
   # HTML output directory
   set(SPHINX_HTML_DIR "${CONF_DOC_DIR}/html")
-
   add_custom_target(${PROJECT_NAME}_doc
       ${SPHINX_EXECUTABLE}
           -q -b html
@@ -174,6 +170,14 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_EXECUTABLE AND PY_SPHINXCONTRI
       WORKING_DIRECTORY ${CONF_DOC_DIR}
       COMMENT "Building HTML documentation with Sphinx"
       DEPENDS doc/conf.py.in
+  )
+  add_custom_command(TARGET ${PROJECT_NAME}_doc PRE_BUILD
+                     COMMAND ${CMAKE_COMMAND}
+                        -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/doc/reference.rst.in
+                        -DOUTPUT=${CONF_DOC_DIR}/reference.rst
+                        -DMODULE_NAME=${PROJECT_NAME}$<$<CONFIG:Debug>:_d>
+                        -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
+                     VERBATIM
   )
   add_dependencies(${PROJECT_NAME}_doc cpypyqed)
   if(CPPQED_MONOLITHIC)

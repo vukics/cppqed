@@ -13,10 +13,12 @@ import subprocess
 import shutil
 
 from cpypyqed_config import cppqed_build_type,cppqed_module_suffix
-if cppqed_build_type=="release":
+if cppqed_build_type.lower()=="release":
   from ..core import core_git
-else:
+elif cppqed_build_type.lower()=="debug":
   from ..core_d import core_git
+else:
+  raise ImportError("Unknown build configuration {}.".format(cppqed_build_type))
 
 # The compilation directory can be customized by changing ondemand.cpypyqed_builddir
 cpypyqed_builddir = "~/.cpypyqed"
