@@ -141,9 +141,9 @@ endforeach()
 
 find_package(Doxygen)
 find_package(Sphinx)
-find_python_module(sphinxcontrib.doxylink)
+find_package(Doxylink)
 
-if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_EXECUTABLE AND PY_SPHINXCONTRIB_DOXYLINK)
+if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
   set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
   file(MAKE_DIRECTORY ${CONF_DOC_DIR})
   file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CPPQED_DOXYGEN_TAG})
@@ -202,6 +202,13 @@ set_package_properties(Numpy PROPERTIES URL "http://www.numpy.org/"
                                 DESCRIPTION "NumPy is the fundamental package for scientific computing with Python"
                                 TYPE OPTIONAL
                                 PURPOSE "Data input/output with Python.")
+set_package_properties(Sphinx PROPERTIES URL "http://sphinx-doc.org/"
+                                DESCRIPTION "Sphinx is a documentation generator which converts reStructuredText files into HTML websites"
+                                TYPE OPTIONAL
+                                PURPOSE "Sphinx is needed to build the cpypyqed documentation.")
+set_package_properties(Doxylink PROPERTIES URL "https://pypi.python.org/pypi/sphinxcontrib-doxylink"
+                                DESCRIPTION "Doxylink is a Sphinx extension to link to external Doxygen API documentation."
+                                PURPOSE "Needed to link to the rest of the C++QED in the cpypyqed documentation.")
 
 add_feature_info("Python input/output" ENABLE_PYTHON_IO "Python C++QED input/output module.")
 
