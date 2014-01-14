@@ -7,7 +7,7 @@ project(testing)
 include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
 include(${CPPQED_USE})
 
-find_package(PythonInterp 2 REQUIRED)
+find_package(PythonInterp 2.7 REQUIRED)
 
 configure_file(testdriver.conf.in testdriver.conf)
 
