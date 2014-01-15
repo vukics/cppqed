@@ -160,6 +160,14 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
   set(SPHINX_CACHE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_doctrees")
   # HTML output directory
   set(SPHINX_HTML_DIR "${CONF_DOC_DIR}/html")
+  add_custom_command(OUTPUT ${CONF_DOC_DIR}/reference.rst
+                     COMMAND ${CMAKE_COMMAND}
+                        -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/doc/reference.rst.in
+                        -DOUTPUT=${CONF_DOC_DIR}/reference.rst
+                        -DMODULE_NAME=${PROJECT_NAME}$<$<CONFIG:Debug>:_d>
+                        -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
+                     DEPENDS generate.cmake doc/reference.rst.in
+  )
   add_custom_target(${PROJECT_NAME}_doc
       ${SPHINX_EXECUTABLE}
           -q -b html
@@ -169,15 +177,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
           "${SPHINX_HTML_DIR}"
       WORKING_DIRECTORY ${CONF_DOC_DIR}
       COMMENT "Building HTML documentation with Sphinx"
-      DEPENDS doc/conf.py.in
-  )
-  add_custom_command(TARGET ${PROJECT_NAME}_doc PRE_BUILD
-                     COMMAND ${CMAKE_COMMAND}
-                        -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/doc/reference.rst.in
-                        -DOUTPUT=${CONF_DOC_DIR}/reference.rst
-                        -DMODULE_NAME=${PROJECT_NAME}$<$<CONFIG:Debug>:_d>
-                        -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
-                     VERBATIM
+      DEPENDS ${CONF_DOC_DIR}/reference.rst
   )
   add_dependencies(${PROJECT_NAME}_doc cpypyqed)
   if(CPPQED_MONOLITHIC)
