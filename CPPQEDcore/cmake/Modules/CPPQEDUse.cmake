@@ -1,14 +1,40 @@
+#! \defgroup CMake
+#! \brief Documentation of CMake internals, directed ad build system developers only.
 
-MACRO(CPPQED_CXX_FLAGS)
+#! \file CPPQEDUse.cmake
+#! \brief Macros and functions which help to build C++QED projects.
+
+#! \addtogroup CMake
+#!  @{
+
+#! \defgroup CPPQEDUse
+#! \brief Macros and functions which help to build C++QED projects.
+
+#! @}
+
+#! \addtogroup CPPQEDUse
+#!  @{
+
+#! \brief Set common compiler flags for C++QED projects.
+#!
+#! \return This function adds flags to the `CMAKE_CXX_FLAGS` and the
+#! `CMAKE_CXX_FLAGS_DEBUG` variables.
+#!
+#! This macro sets `-std=c++11` and otherwise only affects warnings. In Debug mode, warnings are enabled.
+#! It is automatically called in CPPQED_SETUP().
+macro(cppqed_cxx_flags)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual")
   if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-local-type-template-args")
   endif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-ENDMACRO(CPPQED_CXX_FLAGS)
+endmacro(cppqed_cxx_flags)
 
-# This function populates the variable ${PROJECT_NAME}_PUBLIC_HEADERS with all the
-# headers in the list ${source_dirs}
+#! \brief Generate a list of all header files in the current project.
+#! \param source_dirs <var-name> Variable name of a list containing all source directories (e.g. `SOURCE_DIRS`, not `${SOURCE_DIRS}`)
+#! \return This function sets the variable `${PROJECT_NAME}_PUBLIC_HEADERS`.
+#!
+#! Typically the output of this function is used in the `PUBLIC_HEADER` property of libraries and install targets.
 function(gather_includes source_dirs)
   foreach(d ${${source_dirs}})
     file(GLOB INC ${d}/*.h ${d}/*.tcc)
@@ -22,9 +48,17 @@ function(gather_includes source_dirs)
   set(${PROJECT_NAME}_PUBLIC_HEADERS ${${PROJECT_NAME}_PUBLIC_HEADERS} PARENT_SCOPE)
 endfunction()
 
-# This macro creates a target ${PROJECT_NAME}_${name}_objs where ${name} is the current
-# subdirectory and populates it with all source files in this directory. It then adds this 
-# target to the parent scope variable ${OBJ_TARGETS}.
+
+#! \brief Gather all source files in the current directory and create an object target.
+#! \return This macro sets the variable `OBJ_TARGETS`, which can be used as
+#!    source for library targets.
+#!
+#! This macro creates a target `${PROJECT_NAME}_${name}_objs` where `${name}` is the current
+#! subdirectory and populates it with all source files in this directory. It then adds this
+#! target to the parent scope variable `OBJ_TARGETS`.
+#!
+#! The macro processes the list `${name}_NEEDS`. This list contains the name of all the other
+#! subdirectories (relative to the top level) from which this subdirectory may include header files.
 macro(create_object_target)
   get_filename_component(name ${CMAKE_CURRENT_LIST_DIR} NAME)
   include_directories(${CMAKE_CURRENT_LIST_DIR})
@@ -40,6 +74,29 @@ endmacro()
 if(NOT ${CPPQED_MONOLITHIC})
   message(STATUS "Using CPPQED_SETUP macro from ${CMAKE_CURRENT_LIST_DIR}")
 endif()
+
+#! \brief Initialize a C++QED project.
+#!
+#! Typical usage:
+#!
+#!     find_package(CPPQED 2.99 REQUIRED)
+#!     include(${CPPQED_USE})
+#!     CPPQED_SETUP()
+#!
+#! This macro makes sure all C++QED sub-projects are initialized in the same way.
+#! Installation directories are handled by `GNUInstallDirs`, which is automatically included here.
+#! The following actions are performed:
+#!
+#! - Sets the build type to Release if none was specified with `-DCMAKE_BUILD_TYPE`. If an unknown
+#!  build type is encountered this will result in an error.
+#! - Sets appropriate compiler flags by calling cppqed_cxx_flags() and adding `-DBZ_DEBUG` as
+#!  flag in debug mode.
+#! - Adds C++QED core include directories and third-party include directories (boost, blitz etc.)
+#!  to the include path.
+#! - Handles the libraries rpath: When building, add the full rpath into the libraries which is needed
+#!  to find all dependencies (also outside the build tree). When installing the libraries, keep only those
+#!  paths which are not system paths. See [here](http://www.cmake.org/Wiki/CMake_RPATH_handling) for more
+#!  information.
 macro(CPPQED_SETUP)
   include(GNUInstallDirs)
   include(CMakePackageConfigHelpers)
@@ -91,6 +148,36 @@ macro(CPPQED_SETUP)
 
 endmacro()
 
+#! \brief Initialize an elements project.
+#!
+#! This macro expects `ELEMENTS_SOURCE_DIRS` to be set to a list of source directories. Include dependencies between
+#! subdirectories can be established by setting `<subdir>_NEEDS` variables.
+#!
+#! It is used for both the original C++QED elements project and custom element projects. The name of a custom
+#! elements project may not be "elements", this is checked here. The following actions are performed:
+#!
+#! - Find C++QED core, and additionally for custom element projects find C++QED elements and add them as dependencies.
+#! - Generate version information to compile into the libraries, see generate_version_files() for details.
+#! - Process all subdirectories listed in `ELEMENTS_SOURCE_DIRS`. The `CMakeLists.txt` file in the subdirectories should
+#!  only have a single call to create_object_target().
+#! - Create the library target `C++QED${PROJECT_NAME}-${CPPQED_ID}`,  e.g. `C++QEDelements-2.99` and link to all dependencies.
+#! - The version and SONAME is the same as for the C++QED core library.
+#! - Create an install target to install the libraries and the headers.
+#! - Generate an appropriate `CPPQED${PROJECT_NAME}ConfigVersion.cmake` and `CPPQED${PROJECT_NAME}Config.cmake` file, which
+#!  ensure that other projects can find the current library by calling, e.g. `find_package(CPPQEDelements)`. Two versions of these
+#!  files are generated, one suitable for the build tree and one which is getting installed along with the library.
+#!
+#! Typical usage in a custom elements project:
+#!
+#!     project(elements_custom)
+#!     find_package(CPPQED 2.99 REQUIRED)
+#!     include(${CPPQED_USE})
+#!
+#!     set(ELEMENTS_SOURCE_DIRS utils frees interactions)
+#!     set(frees_NEEDS utils)
+#!     set(interactions_NEEDS utils frees)
+#!
+#!     elements_project()
 macro(elements_project)
   if(${PROJECT_NAME} STREQUAL elements)
     if(NOT DEFINED ORIGINAL_ELEMENTS_PROJECT)
@@ -178,13 +265,25 @@ macro(elements_project)
     "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQED${PROJECT_NAME}Config.cmake"
     "${PROJECT_BINARY_DIR}/CPPQED${PROJECT_NAME}ConfigVersion.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/${ELEMENTS_CMAKE_SUBDIR}" COMPONENT dev)
-  
+
   # Install the export set for use with the install-tree
   install(EXPORT CPPQED${PROJECT_NAME}Targets DESTINATION
     "${CMAKE_INSTALL_LIBDIR}/${ELEMENTS_CMAKE_SUBDIR}" COMPONENT dev)
 
 endmacro()
 
+#! \brief Generate C++ source code containing version information as global variables.
+#!
+#! This extracts the current git commit hash by using get_git_head_revision(), and generates two files
+#! `${PROJECT_NAME}_version.cc` and `${PROJECT_NAME}_version.h`. For example, with a project `elements`, clients including
+#! `elements_version.h` have access to these global entities:
+#!
+#! - `char[] g_CPPQEDelements_GIT_SHA1`: the git commit hash value
+#! - `char[] g_CPPQEDelements_VERSION[]`: the project version
+#! - `string cppqed_@PROJECT_NAME@_version()`: a function returning both theses values in a human readable format.
+#!
+#! Generated projects (c.f. elements_project() and scripts_project()) automatically call this
+#! function and link in the generated source file.
 function(generate_version_files)
   get_git_head_revision(REFSPEC CONF_GIT_SHA1)
   set(CONF_VERSION ${CPPQED_VERSION})
@@ -192,6 +291,23 @@ function(generate_version_files)
   configure_file("${CPPQED_CMAKE_DIR}/version.h.in" "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.h" @ONLY)
 endfunction()
 
+#! \brief Initialize a scripts project.
+#!
+#! \param ELEMENTS_PROJECT <proj_name> (optional) Scripts depend on this custom elements project (C++QED elements project does
+#!                                     not need to be supplied here). Repeat for several custom elements projects.
+#!
+#! Scripts which reside in the top level project directory and have a `.cc` extension are picked up for compilation. The following
+#! actions are performed:
+#!
+#! - Find C++QED core, elements all custom element projects passed into the macro and set them up as dependencies.
+#! - Generate version information for the scripts project, see generate_version_files() for details.
+#! - Gather version informations from all C++QED dependencies (core, elements and custom element projects) and compile them in a
+#!  generated source file `component_versions.cc`. Scripts including the header file `component_versions.h` have access to the function
+#!  `std::string cppqed_component_versions()`, which returns the version information of all used components in a human readable form.
+#! - Create a target for every script found. If the script (without file extension) is listed in the list `EXCLUDE_FROM_ALL_SCRIPTS`,
+#!  this script will not be built automatically.
+#! - Exclude all scripts listed in `NEED_FLENS` (without file extension) from compilation, if the current C++QED library does not support FLENS.
+#! - Create a target `${PROJECT_NAME}_all` which compiles all scripts.
 macro(scripts_project)
   # find CPPQED elements project
   find_package(CPPQEDelements ${CPPQED_ID} REQUIRED)
@@ -250,10 +366,25 @@ macro(scripts_project)
   add_dependencies(${PROJECT_NAME}_all ${SCRIPTNAMES})
 endmacro()
 
-macro(cppqed_documentation target_prefix tagfiles_arg)
+#! \brief Generate a doxygen documentation target for the current project.
+#!
+#! \param target_prefix The name of the documentation target will be ${target_prefix}_doc
+#! \param tagfiles A list with full paths to doxygen tagfiles of other projects.
+#! \param dependencies (optional) All remaining arguments will be treated as targets
+#!  this document target should depend on.
+#! \return `CONF_DOC_DIR`, this variable is set to `${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME}`
+#!
+#! If doxygen or dot is not found on the system, this macro does nothing except to set `CONF_DOC_DIR`.
+#! Otherwise it sets the variable `TAGFILES` to a list which can be used in the TAGFILES option of a
+#! Doxyfile. The HTML location corresponding to each tagfile is expected in a html subdirectory of the
+#! directory where the tagfile resides. All paths will be converted to relative paths so that the
+#! resulting documentation can be relocated.
+#!
+#! The template `doc/Doxyfile` will be copied to `CONF_DOC_DIR`, expanding all @-variables within.
+macro(cppqed_documentation target_prefix tagfiles)
 
   find_package(Doxygen QUIET)
-  set(tagfiles ${tagfiles_arg})
+  set(tagfiles ${tagfiles})
 
   set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
 
@@ -285,3 +416,5 @@ macro(cppqed_documentation target_prefix tagfiles_arg)
     endif()
   endif()
 endmacro()
+
+#! @}
