@@ -36,11 +36,17 @@ add_subdirectory(Testing)
 # Documentation
 ##################################################
 
-include(${core_SOURCE_DIR}/cmake/Modules/CPPQEDUse.cmake)
-cppqed_documentation("cppqed_" "${CMAKE_BINARY_DIR}/doc/core/core.tag" core_doc)
-
-add_custom_target(doc)
-add_dependencies(doc cppqed_doc core_doc elements_doc cpypyqed_doc)
+find_package(Doxygen QUIET)
+if(DOXYGEN_FOUND)
+  include(${core_SOURCE_DIR}/cmake/Modules/CPPQEDUse.cmake)
+  add_executable(CMakeDoxygenFilter doc/CMakeDoxygenFilter.cpp)
+  set_target_properties(CMakeDoxygenFilter PROPERTIES COMPILE_FLAGS -DUSE_NAMESPACE=CMake)
+  set(CMakeDoxygenFilter_EXECUTABLE "${CMAKE_CURRENT_BINARY_DIR}/CMakeDoxygenFilter${CMAKE_EXECUTABLE_SUFFIX}")
+  cppqed_documentation("cppqed_" "${CMAKE_BINARY_DIR}/doc/core/core.tag" core_doc)
+  add_dependencies(cppqed_doc CMakeDoxygenFilter)
+  add_custom_target(doc)
+  add_dependencies(doc cppqed_doc core_doc elements_doc cpypyqed_doc)
+endif()
 
 install(DIRECTORY CustomElementsExample CustomScriptsExample
         DESTINATION ${CPPQED_DOC_DIR}
