@@ -160,7 +160,9 @@ double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, Lindbl
 
 double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const
 {
-  return 2.*kappa_*nTh_*(photonNumber(matrix)+1.);
+  double norm=0;
+  for (size_t n=0; n<matrix.getDimension(); ++n) norm+=matrix(n);
+  return 2.*kappa_*nTh_*(photonNumber(matrix)+norm);
 }
 
 
