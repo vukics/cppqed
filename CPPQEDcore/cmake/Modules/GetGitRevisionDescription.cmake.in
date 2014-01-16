@@ -13,6 +13,10 @@
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
+#! \file
+#! \ingroup Helpers
+#! \brief Helper file for GetGitRevisionDescription.cmake.
+
 set(HEAD_HASH)
 
 file(READ "@HEAD_FILE@" HEAD_CONTENTS LIMIT 1024)

@@ -1,25 +1,12 @@
-# - Returns a version string from Git
-#
-# These functions force a re-configure on each git commit so that you can
-# trust the values of the variables in your build system.
-#
-#  get_git_head_revision(<refspecvar> <hashvar> [<additional arguments to git describe> ...])
-#
-# Returns the refspec and sha hash of the current head revision
-#
-#  git_describe(<var> [<additional arguments to git describe> ...])
-#
-# Returns the results of git describe on the source tree, and adjusting
-# the output so that it tests false if an error occurs.
-#
-#  git_get_exact_tag(<var> [<additional arguments to git describe> ...])
-#
-# Returns the results of git describe --exact-match on the source tree,
-# and adjusting the output so that it tests false if there was no exact
-# matching tag.
-#
-# Requires CMake 2.6 or newer (uses the 'function' command)
-#
+#! \file
+#! \ingroup Helpers
+#! \brief Returns a version string from Git
+#!
+#! These functions force a re-configure on each git commit so that you can
+#! trust the values of the variables in your build system.
+#!
+#! Requires %CMake 2.6 or newer (uses the 'function' command)
+
 # Original Author:
 # 2009-2010 Ryan Pavlik <rpavlik@iastate.edu> <abiryan@ryand.net>
 # http://academic.cleardefinition.com
@@ -39,6 +26,18 @@ set(__get_git_revision_description YES)
 # to find the path to this module rather than the path to a calling list file
 get_filename_component(_gitdescmoddir ${CMAKE_CURRENT_LIST_FILE} PATH)
 
+#! \brief Returns the refspec and sha hash of the current head revision
+#! \ingroup Helpers
+#! \param _refspecvar The refspec is returned in this variable.
+#! \param _hashvar The sha hash is returned in this variable.
+#!
+#! Additional arguments are passed through to `git describe`.
+#!
+#! If the file `.bzr/branch/last-revision` exists, both `_refspecvar` and
+#! `_hashvar` are set to this hash value. In the automated debian builds, C++QED
+#! is built from bazaar branches which are converted from git repositories. The
+#! information about the git commit are preserved in the file `last-revision` and
+#! made available to the build system this way.
 function(get_git_head_revision _refspecvar _hashvar)
   # Ubuntu packages use bzr branches cloned from git. If .bzr exists, try to extract
   # the git commit from this directory. This does not run cmake automatically if the
@@ -91,6 +90,11 @@ function(get_git_head_revision _refspecvar _hashvar)
   set(${_hashvar} "${HEAD_HASH}" PARENT_SCOPE)
 endfunction()
 
+#! \brief Returns the results of `git describe` on the source tree.
+#! \ingroup Helpers
+#! \param _var The result variable.
+#!
+#! The output is adjusted so that it tests false if an error occurs.
 function(git_describe _var)
   if(NOT GIT_FOUND)
     find_package(Git QUIET)
@@ -127,6 +131,12 @@ function(git_describe _var)
   set(${_var} "${out}" PARENT_SCOPE)
 endfunction()
 
+#! \brief Returns the results of `git describe --exact-match` on the source tree.
+#! \ingroup Helpers
+#! \param _var The result variable.
+#!
+#! The output is adjusted so that it tests false if there was no exact
+#! matching tag.
 function(git_get_exact_tag _var)
   git_describe(out --exact-match ${ARGN})
   set(${_var} "${out}" PARENT_SCOPE)

@@ -1,10 +1,3 @@
-# - Find CBLAS
-# Find the native CBLAS headers and libraries.
-#
-#  CBLAS_LIBRARIES    - List of libraries when using cblas.
-#  CBLAS_INCLUDE_DIRS - List of include directories
-#  CBLAS_FOUND        - True if cblas found.
-#
 # Copyright 2009-2011 The VOTCA Development Team (http://www.votca.org)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+#! \file
+#! \ingroup FindPackage
+#! \brief Find CBLAS
+#!
+#! Find the native CBLAS headers and libraries.
+#!
+#! - `CBLAS_LIBRARIES`    - List of libraries when using cblas.
+#! - `CBLAS_INCLUDE_DIRS` - List of include directories
+#! - `CBLAS_FOUND`        - True if cblas found.
+#!
+#! Cblas can be provided by libblas (Ubuntu), cblas or gslcblas, it will be searched for in
+#! this order.
+
 include(LibFindMacros)
 
 libfind_pkg_check_modules(CBLAS_PKGCONF cblas)
@@ -44,11 +51,9 @@ set(CBLAS_HINT_PATH $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 $ENV{UIBK_GSL_LIB})
 # Check if libblas provides cblas (Ubuntu)
 find_library(BLAS_LIBRARY NAMES blas PATHS ${CBLAS_HINT_PATH})
 if(BLAS_LIBRARY)
-  if(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
-    include(CheckSymbolExists)
-    set(CMAKE_REQUIRED_LIBRARIES ${BLAS_LIBRARY})
-    check_symbol_exists(cblas_scopy "cblas.h" BLAS_HAS_CBLAS)
-  endif(${CMAKE_VERSION} VERSION_GREATER "2.8.5")
+  include(CheckSymbolExists)
+  set(CMAKE_REQUIRED_LIBRARIES ${BLAS_LIBRARY})
+  check_symbol_exists(cblas_scopy "cblas.h" BLAS_HAS_CBLAS)
 endif(BLAS_LIBRARY)
 
 set(CBLAS_CANDIDATES cblas gslcblas)

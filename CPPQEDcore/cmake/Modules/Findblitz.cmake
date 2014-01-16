@@ -1,10 +1,17 @@
-# - Try to find blitz
-# Once done, this will define
-#
-#  blitz_FOUND - system has blitz
-#  blitz_INCLUDE_DIRS - the blitz include directories
-#  blitz_LIBRARIES - link these to use blitz
-#  blitz_SERIALIZATION_FOUND - true if blitz was configured with --enable-serialization
+
+#! \file
+#! \ingroup FindPackage
+#! \brief Try to find blitz.
+#!
+#! Once done, this will define
+#!
+#! - `blitz_FOUND`: system has blitz
+#! - `blitz_INCLUDE_DIRS`: the blitz include directories
+#! - `blitz_LIBRARIES`: link these to use blitz
+#! - `blitz_SERIALIZATION_FOUND`: true if blitz was configured with `--enable-serialization`
+#!
+#! Not that blitz will only be considered found if it is the [C++QED patched version](http://sourceforge.net/p/cppqed/blitz/ci/default/tree/).
+#! This is checked by looking if it has `BLITZ_ARRAY_LARGEST_RANK`.
 
 include(LibFindMacros)
 include(CheckIncludeFiles)

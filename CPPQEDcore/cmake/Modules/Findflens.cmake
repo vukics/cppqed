@@ -1,9 +1,12 @@
-# - Try to find flens
-# Once done, this will define
-#
-#  flens_FOUND - system has flens
-#  flens_INCLUDE_DIRS - the flens include directories
-#  flens_LIBRARIES - link these to use flens
+#! \file
+#! \ingroup FindPackage
+#! \brief Try to find flens
+#!
+#! Once done, this will define
+#!
+#! - `flens_FOUND` - system has flens
+#! - `flens_INCLUDE_DIRS` - the flens include directories
+#! - `flens_LIBRARIES` - link these to use flens
 
 include(LibFindMacros)
 libfind_package(flens CBLAS)

@@ -1,16 +1,6 @@
-#! \defgroup CMake CMake
-#! \brief Documentation of CMake internals, directed ad build system developers only.
 
 #! \file CPPQEDUse.cmake
 #! \brief Macros and functions which help to build C++QED projects.
-
-#! \addtogroup CMake
-#!  @{
-
-#! \defgroup CPPQEDUse
-#! \brief Macros and functions which help to build C++QED projects.
-
-#! @}
 
 #! \addtogroup CPPQEDUse
 #!  @{
@@ -90,7 +80,7 @@ endif()
 #! - Sets the build type to Release if none was specified with `-DCMAKE_BUILD_TYPE`. If an unknown
 #!  build type is encountered this will result in an error.
 #! - Sets appropriate compiler flags by calling cppqed_cxx_flags() and adding `-DBZ_DEBUG` as
-#!  flag in debug mode.
+#!  flag in debug mode, adding ::CPPQED_DEFINITIONS to compiler flags.
 #! - Adds C++QED core include directories and third-party include directories (boost, blitz etc.)
 #!  to the include path.
 #! - Handles the libraries rpath: When building, add the full rpath into the libraries which is needed

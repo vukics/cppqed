@@ -1,15 +1,3 @@
-#! \addtogroup CMake
-#!  @{
-
-#! \defgroup Config CMake config files
-#! \brief CMake config files export targets and variables so that other projects can use them.
-
-#! @}
-
-#! \defgroup CPPQEDConfig
-#! \ingroup Config
-#! \brief Export targets and variables for the core component.
-
 #! \addtogroup CPPQEDConfig
 #! @{
 
@@ -38,7 +26,8 @@ set(CPPQED_PATCH_VERSION @CPPQED_PATCH_VERSION@)
 set(CPPQED_VERSION @CPPQED_VERSION@)
 set(CPPQED_ID @CPPQED_ID@)
 set(CPPQED_HASH @HASH@)
-set(CPPQED_ABI_MAJOR @CPPQED_ABI_MAJOR@)
+#! \brief
+set(CPPQED_ABI_MAJOR "@CPPQED_ABI_MAJOR@")
 set(CPPQED_ABI_MINOR @CPPQED_ABI_MINOR@)
 set(CPPQED_ABI_MICRO @CPPQED_ABI_MICRO@)
 
@@ -60,25 +49,37 @@ set(CPPQED_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
 #!   clients because of templates)
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS "@PACKAGE_CPPQED_THIRDPARTY_INCLUDE_DIRS@")
 
-set(CPPQED_DEFINITIONS @CPPQED_DEFINITIONS@)
+#! Compiler definitions which should be set when using this core library (automatically set in CPPQED_SETUP())
+set(CPPQED_DEFINITIONS "@CPPQED_DEFINITIONS@")
 if(@CONF_FLAT_INCLUDE@)
   set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DFLAT_INCLUDE")
 endif(@CONF_FLAT_INCLUDE@)
 
+#! Directory for CMake module files and auxiliary files
+set_and_check(CPPQED_CMAKE_DIR "@PACKAGE_CONF_CMAKE_DIR@")
+#! Path of the CPPQEDUse.cmake file, defining auxiliary functions and macros.
+set_and_check(CPPQED_USE "@PACKAGE_CONF_CMAKE_DIR@/CPPQEDUse.cmake")
 
-set_and_check(CPPQED_CMAKE_DIR @PACKAGE_CONF_CMAKE_DIR@)
-set_and_check(CPPQED_USE @PACKAGE_CONF_CMAKE_DIR@/CPPQEDUse.cmake)
-
-set(CPPQED_DOXYGEN_DIR @PACKAGE_CONF_DOC_DIR@)
-set(CPPQED_DOXYGEN_TAG @PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag)
+#! Path of the Doxygen documentation
+set(CPPQED_DOXYGEN_DIR "@PACKAGE_CONF_DOC_DIR@")
+#! Path of the Doxygen `core.tag` file
+set(CPPQED_DOXYGEN_TAG "@PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET @CPPQEDLIB@)
   include("@PACKAGE_CONF_CMAKE_DIR@/CPPQEDcoreTargets.cmake")
 endif()
 
-# This is an IMPORTED target created by CPPQEDcoreTargets.cmake
-set(CPPQED_LIBRARIES @CPPQEDLIB@)
+#! \brief This is the target name which must be used to link to the C++QED core library.
+#!
+#! This is an IMPORTED target created by the file CPPQEDcoreTargets.cmake.
+#!
+#! When the target is imported, the two properties `MAP_IMPORTED_CONFIG_DEBUG` and
+#! `MAP_IMPORTED_CONFIG_RELEASE` are set to "Debug" and "Release", respectively.
+#! This has the effect that the library can only be used with the exact corresponding
+#! build configurations. If for example a project with debug configuration tries to link against
+#! the core library in release configuration, this will be an error at link time.
+set(CPPQED_LIBRARIES "@CPPQEDLIB@")
 set_target_properties(@CPPQEDLIB@ PROPERTIES MAP_IMPORTED_CONFIG_DEBUG "Debug" MAP_IMPORTED_CONFIG_RELEASE "Release")
 
 #! @}

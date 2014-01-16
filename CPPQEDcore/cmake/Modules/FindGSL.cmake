@@ -1,10 +1,3 @@
-# - Find gsl
-# Find the native GSL headers and libraries.
-#
-# GSL_INCLUDE_DIRS - where to find gsl/gsl_linalg.h, etc.
-# GSL_LIBRARIES - List of libraries when using gsl.
-# GSL_FOUND - True if gsl found.
-#
 # Copyright 2009-2011 The VOTCA Development Team (http://www.votca.org)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+#! \file
+#! \ingroup FindPackage
+#! \brief Find GSL.
+#!
+#! Find the native GSL headers and libraries.
+#!
+#! - `GSL_INCLUDE_DIRS` - where to find gsl/gsl_linalg.h, etc.
+#! - `GSL_LIBRARIES` - List of libraries when using gsl.
+#! - `GSL_FOUND` - True if gsl found.
+#!
 
 include(LibFindMacros)
 libfind_package(GSL CBLAS)

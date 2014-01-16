@@ -1,3 +1,7 @@
+#! \file
+#! \ingroup Helpers
+#! \brief Improved versions of %CMake's `find_package`
+
 # Works the same as find_package, but forwards the "REQUIRED" and "QUIET" arguments
 # used for the current package. For this to work, the first parameter must be the
 # prefix of the current package, then the prefix of the new package etc, which are
@@ -82,23 +86,4 @@ macro (libfind_process PREFIX)
   endif (NOT ${PREFIX}_FOUND)
 endmacro (libfind_process)
 
-macro(libfind_library PREFIX basename)
-  set(TMP "")
-  if(MSVC80)
-    set(TMP -vc80)
-  endif(MSVC80)
-  if(MSVC90)
-    set(TMP -vc90)
-  endif(MSVC90)
-  set(${PREFIX}_LIBNAMES ${basename}${TMP})
-  if(${ARGC} GREATER 2)
-    set(${PREFIX}_LIBNAMES ${basename}${TMP}-${ARGV2})
-    string(REGEX REPLACE "\\." "_" TMP ${${PREFIX}_LIBNAMES})
-    set(${PREFIX}_LIBNAMES ${${PREFIX}_LIBNAMES} ${TMP})
-  endif(${ARGC} GREATER 2)
-  find_library(${PREFIX}_LIBRARY
-    NAMES ${${PREFIX}_LIBNAMES}
-    PATHS ${${PREFIX}_PKGCONF_LIBRARY_DIRS}
-  )
-endmacro(libfind_library)
 
