@@ -1,4 +1,4 @@
-#! \defgroup CMake
+#! \defgroup CMake CMake
 #! \brief Documentation of CMake internals, directed ad build system developers only.
 
 #! \file CPPQEDUse.cmake
@@ -293,7 +293,7 @@ endfunction()
 
 #! \brief Initialize a scripts project.
 #!
-#! \param ELEMENTS_PROJECT <proj_name> (optional) Scripts depend on this custom elements project (C++QED elements project does
+#! \param ELEMENTS_PROJECT `<proj_name>` (optional) Scripts depend on this custom elements project (C++QED elements project does
 #!                                     not need to be supplied here). Repeat for several custom elements projects.
 #!
 #! Scripts which reside in the top level project directory and have a `.cc` extension are picked up for compilation. The following

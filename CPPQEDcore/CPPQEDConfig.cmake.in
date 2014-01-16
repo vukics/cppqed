@@ -1,3 +1,21 @@
+#! \addtogroup CMake
+#!  @{
+
+#! \defgroup Config CMake config files
+#! \brief CMake config files export targets and variables so that other projects can use them.
+
+#! @}
+
+#! \defgroup CPPQEDConfig
+#! \ingroup Config
+#! \brief Export targets and variables for the core component.
+
+#! \addtogroup CPPQEDConfig
+#! @{
+
+#! \file
+#! \brief Export targets and variables for the core component.
+
 # - Config file for the CPPQED package
 # It defines the following variables
 #  CPPQED_INCLUDE_DIRS - include directories for CPPQED
@@ -13,8 +31,8 @@
 
 @PACKAGE_INIT@
 
-# Version
-set(CPPQED_MAJOR_VERSION @CPPQED_MAJOR_VERSION@)
+#! \brief
+set(CPPQED_MAJOR_VERSION "@CPPQED_MAJOR_VERSION@")
 set(CPPQED_MINOR_VERSION @CPPQED_MINOR_VERSION@)
 set(CPPQED_PATCH_VERSION @CPPQED_PATCH_VERSION@)
 set(CPPQED_VERSION @CPPQED_VERSION@)
@@ -24,14 +42,22 @@ set(CPPQED_ABI_MAJOR @CPPQED_ABI_MAJOR@)
 set(CPPQED_ABI_MINOR @CPPQED_ABI_MINOR@)
 set(CPPQED_ABI_MICRO @CPPQED_ABI_MICRO@)
 
-set(CPPQED_HAS_SERIALIZATION @CPPQED_HAS_SERIALIZATION@)
-set(CPPQED_HAS_FLENS @CPPQED_HAS_FLENS@)
 
-set(CPPQED_CORE_GIT @CONF_GIT_SHA1@)
+#! Indicates whether C++QED is compiled with boost serialization support
+set(CPPQED_HAS_SERIALIZATION "@CPPQED_HAS_SERIALIZATION@")
+#! Indicates whether FLENS support is compiled in.
+set(CPPQED_HAS_FLENS "@CPPQED_HAS_FLENS@")
+
+#! Core git commit sha1 hash value
+set(CPPQED_CORE_GIT "@CONF_GIT_SHA1@")
 
 # set_and_check does not work with lists
+
+#! A list of all C++QED core subdirectories which contain header files
 set(CPPQED_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
 
+#! \brief A list of all directories with header files C++QED depends on (even at compile time of other
+#!   clients because of templates)
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS "@PACKAGE_CPPQED_THIRDPARTY_INCLUDE_DIRS@")
 
 set(CPPQED_DEFINITIONS @CPPQED_DEFINITIONS@)
@@ -54,3 +80,5 @@ endif()
 # This is an IMPORTED target created by CPPQEDcoreTargets.cmake
 set(CPPQED_LIBRARIES @CPPQEDLIB@)
 set_target_properties(@CPPQEDLIB@ PROPERTIES MAP_IMPORTED_CONFIG_DEBUG "Debug" MAP_IMPORTED_CONFIG_RELEASE "Release")
+
+#! @}
