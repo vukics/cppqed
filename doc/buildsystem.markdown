@@ -11,14 +11,14 @@ and furthermore offers easy integration into popular IDE‘s, e.g.
 [kdevelop](http://www.kdevelop.org/) or
 [Xcode](http://developer.apple.com/xcode/).
 
-C++QED requires `cmake` version 2.8.9 or later.
+C++QED requires CMake version 2.8.9 or later.
 
 # Building the framework {#cmake_building}
 
 ## Short user guide {#cmake_short_guide}
 
 This section is for the impatient, it describes the minimal steps to build the
-framework. If `cmake` cannot find installed requirements or if you wish to fine-tune
+framework. If CMake cannot find installed requirements or if you wish to fine-tune
 the build system, please also read the following sections.
 
 Under the top level C++QED directory (the monolithic clone of all project components),
@@ -26,7 +26,7 @@ create a build directory (e.g. `build`)
 
     mkdir build; cd build
 
-Next, configure the build system by invoking `cmake`
+Next, configure the build system by invoking CMake
 
     cmake -DCMAKE_BUILD_TYPE=<type> ..
 
@@ -79,7 +79,7 @@ checks are performed, you have to delete the file `CMakeCache.txt` before callin
 By default, calling `make install` will install everything to the system directory
 `/usr/local`. You can change this prefix by adding the option `-DCMAKE_INSTALL_PREFIX=<install path>`.
 
-### Variables which influence the build process ###
+### Variables which influence the build process ### {#cmake_build_defines}
 
 There are a couple of CMake options defined by C++QED itself, by which the build
 process can be fine tuned:
@@ -94,7 +94,7 @@ Note that without this feature, state files cannot be written to or read from di
 [cmake package registry][cmake-registry].
 * `-DEXAMPLES=Off`: con't compile some examples in the C++QEDcore repository.
 
-### How Cmake finds the C++QED components ###
+### How Cmake finds the C++QED components ### {#cmake_find_components}
 
 The C++QED framework is organized in several sub-projects (core,elements,scripts,cpypyqed). For every component,
 Cmake has to figure out where the needed libraries are located. For example, the elements component needs
@@ -132,5 +132,23 @@ which might interfere with the installed libraries.
 To clear the CMake registry, just delete `~/.cmake/packages` or individual directories there. Before running
 Cmake again, also remove the `CMakeCache.txt` in the build directory to erase the cached locations.
 
+# Building the documentation {#cmake_documentation}
+
+The main target for building the documentation is `doc`. To build or rebuild only parts of the documentation,
+the targets `<component>_doc` exist, where `<componenet>` is one of
+
+- `cppqed`: Overall C++QED documentation, build system, test suite.
+- `core`: C++QED core API
+- `elements`: C++QED elements API
+- `cpypyqed`: Python wrapper documentation (in Sphinx)
+
+The targets mentioned above are only available if `doxygen` and `dot` is installed on the system. The
+`cpypyqed` documentation additionally depends on [Sphinx](http://sphinx-doc.org/) and the
+[doxylink](https://pypi.python.org/pypi/sphinxcontrib-doxylink) extension.
+
+The documentation can only be installed if the project is built in monolithic mode. In this case the
+destination directory is set to `/usr/share/doc/cppqed-doc-${CPPQED_ID}. In standalone mode the documentation
+can still be built (it resides in `${CMAKE_BINARY_DIRECTORY}/doc`) and also inter-project links should work,
+however the documentation cannot be moved to another place and thus cannot be installed system wide.
 
 [cmake-registry]: http://www.cmake.org/Wiki/CMake/Tutorials/Package_Registry

@@ -501,7 +501,7 @@ CASE_SENSE_NAMES       = YES
 # scope will be hidden.
 # The default value is: NO.
 
-HIDE_SCOPE_NAMES       = NO
+HIDE_SCOPE_NAMES       = YES
 
 # If the SHOW_INCLUDE_FILES tag is set to YES then doxygen will put a list of
 # the files that are included by a file in the documentation of that file.
@@ -745,8 +745,10 @@ WARN_LOGFILE           =
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown        \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/testsuite.markdown   \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/buildsystem.markdown \
-                         @core_SOURCE_DIR@/cmake/Modules
-
+                         @CMAKE_CURRENT_SOURCE_DIR@                          \
+                         @core_SOURCE_DIR@/cmake/Modules                     \
+                         @core_SOURCE_DIR@/CMakeLists.cmake                  \
+                         @core_SOURCE_DIR@/CPPQEDConfig.cmake.in
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -766,13 +768,13 @@ INPUT_ENCODING         = UTF-8
 # *.md, *.mm, *.dox, *.py, *.f90, *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf,
 # *.qsf, *.as and *.js.
 
-FILE_PATTERNS          = *.cmake *.h
+FILE_PATTERNS          = *.cmake*
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
 # The default value is: NO.
 
-RECURSIVE              = YES
+RECURSIVE              = NO
 
 # The EXCLUDE tag can be used to specify files and/or directories that should be
 # excluded from the INPUT source files. This way you can easily exclude a
@@ -797,8 +799,7 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */*Fwd.h \
-                         *.cc
+EXCLUDE_PATTERNS       =
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -809,14 +810,14 @@ EXCLUDE_PATTERNS       = */*Fwd.h \
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = details
+EXCLUDE_SYMBOLS        =
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include
 # command).
 
 EXAMPLE_PATH           = . \
-                         @CMAKE_CURRENT_SOURCE_DIR@/examples
+                         @CMAKE_CURRENT_SOURCE_DIR@
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -862,7 +863,7 @@ INPUT_FILTER           =
 # filters are used. If the FILTER_PATTERNS tag is empty or if none of the
 # patterns match the file name, INPUT_FILTER is applied.
 
-FILTER_PATTERNS        = *.cmake=@CMakeDoxygenFilter_EXECUTABLE@
+FILTER_PATTERNS        = *.cmake*=@CMakeDoxygenFilter_EXECUTABLE@
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER ) will also be used to filter the input files that are used for
