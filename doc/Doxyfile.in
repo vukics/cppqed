@@ -745,6 +745,7 @@ WARN_LOGFILE           =
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown        \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/testsuite.markdown   \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/buildsystem.markdown \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/groups.dox           \
                          @CMAKE_CURRENT_SOURCE_DIR@                          \
                          @core_SOURCE_DIR@/cmake/Modules                     \
                          @core_SOURCE_DIR@/CMakeLists.cmake                  \

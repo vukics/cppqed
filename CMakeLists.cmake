@@ -1,14 +1,3 @@
-#! \namespace CMake
-#! CMake
-
-#! \addtogroup CMake
-#!  @{
-
-#! \defgroup Main CMakeLists
-#! \brief Documentation of main build files.
-
-#! @}
-
 #! \addtogroup Main
 #! @{
 

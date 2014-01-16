@@ -112,7 +112,7 @@ public:
         _identifier += _lastChar;
       }
 
-      if (_identifier == "set")
+      if (_identifier == "set" || _identifier == "set_and_check")
         return TOK_SET;
       if (_identifier == "option")
         return TOK_OPTION;

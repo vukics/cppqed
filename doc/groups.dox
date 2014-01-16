@@ -1,0 +1,29 @@
+/// \namespace CMake
+/// CMake
+
+/// \defgroup CMakeReference CMake
+/// \brief Documentation of %CMake internals, directed ad build system developers only.
+
+/// \defgroup CPPQEDUse
+/// \ingroup CMakeReference
+/// \brief Macros and functions which help to build C++QED projects.
+
+/// \defgroup Main CMakeLists
+/// \ingroup CMakeReference
+/// \brief Documentation of main build files.
+
+/// \defgroup Config CMake config files
+/// \ingroup CMakeReference
+/// \brief %CMake config files export targets and variables so that other projects can use them.
+
+/// \defgroup FindPackage
+/// \ingroup CMakeReference
+/// \brief Additional module files to find specific libraries.
+
+/// \defgroup Helpers
+/// \ingroup CMakeReference
+/// \brief Additional helper functions.
+
+/// \defgroup CPPQEDConfig
+/// \ingroup Config
+/// \brief Export targets and variables for the core component.
