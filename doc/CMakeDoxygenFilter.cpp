@@ -84,6 +84,7 @@ public:
     TOK_FUNCTION = -5, TOK_ENDFUNCTION = -6,
     TOK_DOXYGEN_COMMENT = -7,
     TOK_SET = -8,
+    TOK_OPTION = -9,
     TOK_STRING_LITERAL = -100,
     TOK_NUMBER_LITERAL = -102,
 
@@ -113,6 +114,8 @@ public:
 
       if (_identifier == "set")
         return TOK_SET;
+      if (_identifier == "option")
+        return TOK_OPTION;
       if (_identifier == "function")
         return TOK_FUNCTION;
       if (_identifier == "macro")
@@ -281,14 +284,14 @@ public:
     }
   }
 
-  void handleSet()
+  void handleSet(int token)
   {
     // SET(var ...) following a documentation block is assumed to be a variable declaration.
     if (_lastToken != CMakeLexer::TOK_DOXYGEN_COMMENT)
     {
       // No comment block before
       nextToken();
-    } else if(!parseSet())
+    } else if(!parseSet(token))
     {
       // skip token for error recovery
       nextToken();
@@ -354,7 +357,7 @@ private:
     return true;
   }
 
-  bool parseSet()
+  bool parseSet(int token)
   {
     if (nextToken() != '(')
     {
@@ -370,7 +373,10 @@ private:
       return false;
     }
 
-    _os << "CMAKE_VARIABLE " << variableName;
+    if (token == CMakeLexer::TOK_SET)
+      _os << "CMAKE_VARIABLE " << variableName;
+    if (token == CMakeLexer::TOK_OPTION)
+      _os << "CMAKE_OPTION " << variableName;
 
     nextToken();
     while ((curToken() == CMakeLexer::TOK_IDENTIFIER)
@@ -474,7 +480,10 @@ int main(int argc, char** argv)
         parser.handleFunction();
         break;
       case CMakeLexer::TOK_SET:
-        parser.handleSet();
+        parser.handleSet(CMakeLexer::TOK_SET);
+        break;
+      case CMakeLexer::TOK_OPTION:
+        parser.handleSet(CMakeLexer::TOK_OPTION);
         break;
       case CMakeLexer::TOK_DOXYGEN_COMMENT:
         parser.handleDoxygenComment();
