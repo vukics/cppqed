@@ -28,7 +28,10 @@
 
 include(LibFindMacros)
 
-libfind_pkg_check_modules(CBLAS_PKGCONF cblas)
+if (UNIX)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(CBLAS_PKGCONF cblas)
+endif()
 
 if (NOT CBLAS_FOUND)
 
@@ -44,7 +47,7 @@ foreach(NEW_CBLAS_LIB ${CBLAS_PKGCONF_LIBRARIES})
   set(CBLAS_LIBRARY ${CBLAS_LIBRARY} ${LIB_${NEW_CBLAS_LIB}})
 endforeach(NEW_CBLAS_LIB)
 
-else(CBLAS_PKGCONFI_FOUND)
+else(CBLAS_PKGCONF_FOUND)
 
 set(CBLAS_HINT_PATH $ENV{CBLASDIR}/lib $ENV{CBLASDIR}/lib64 $ENV{UIBK_GSL_LIB})
 

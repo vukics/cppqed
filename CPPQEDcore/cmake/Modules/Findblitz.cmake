@@ -17,7 +17,10 @@ include(LibFindMacros)
 include(CheckIncludeFiles)
 include(CheckSymbolExists)
 
-libfind_pkg_check_modules(blitz_PKGCONF blitz)
+if (UNIX)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(blitz_PKGCONF blitz)
+endif()
 
 # Include dir
 find_path(blitz_INCLUDE_DIR

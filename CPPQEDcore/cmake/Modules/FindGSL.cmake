@@ -27,7 +27,10 @@
 include(LibFindMacros)
 libfind_package(GSL CBLAS)
 
-libfind_pkg_check_modules(GSL_PKGCONF gsl)
+if (UNIX)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(GSL_PKGCONF gsl)
+endif()
 
 find_path(GSL_INCLUDE_DIR gsl/gsl_linalg.h HINTS ${GSL_PKGCONF_INCLUDE_DIRS} $ENV{UIBK_GSL_INC})
 find_library(GSL_LIBRARY NAMES gsl HINTS ${GSL_PKGCONF_LIBRARY_DIRS} $ENV{UIBK_GSL_LIB})

@@ -2,10 +2,11 @@
 #! \ingroup Helpers
 #! \brief Improved versions of %CMake's `find_package`
 
-# Works the same as find_package, but forwards the "REQUIRED" and "QUIET" arguments
-# used for the current package. For this to work, the first parameter must be the
-# prefix of the current package, then the prefix of the new package etc, which are
-# passed to find_package.
+#! \brief Works the same as `find_package`, but forwards the "REQUIRED" and "QUIET" arguments
+#!   used for the current package.
+#!
+#! For this to work, the first parameter must be the prefix of the current package, then the
+#! prefix of the new package etc, which are passed to `find_package`.
 macro (libfind_package PREFIX)
   set (LIBFIND_PACKAGE_ARGS ${ARGN})
   if (${PREFIX}_FIND_QUIETLY)
@@ -17,33 +18,14 @@ macro (libfind_package PREFIX)
   find_package(${LIBFIND_PACKAGE_ARGS})
 endmacro (libfind_package)
 
-# CMake developers made the UsePkgConfig system deprecated in the same release (2.6)
-# where they added pkg_check_modules. Consequently I need to support both in my scripts
-# to avoid those deprecated warnings. Here's a helper that does just that.
-# Works identically to pkg_check_modules, except that no checks are needed prior to use.
-macro (libfind_pkg_check_modules PREFIX PKGNAME)
-  if (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-    include(UsePkgConfig)
-    pkgconfig(${PKGNAME} ${PREFIX}_INCLUDE_DIRS ${PREFIX}_LIBRARY_DIRS ${PREFIX}_LDFLAGS ${PREFIX}_CFLAGS)
-  else (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-    find_package(PkgConfig QUIET)
-    if (PKG_CONFIG_FOUND)
-      # for cmake > 2.8.2 use QUIET mode for pkg_check_modules
-      if(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "8" AND CMAKE_PATCH_VERSION GREATER "2")
-        pkg_check_modules(${PREFIX} QUIET ${PKGNAME})
-      else(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "8" AND CMAKE_PATCH_VERSION GREATER "2")
-        pkg_check_modules(${PREFIX} ${PKGNAME})
-      endif(CMAKE_MAJOR_VERSION MATCHES "2" AND CMAKE_MINOR_VERSION MATCHES "8" AND CMAKE_PATCH_VERSION GREATER "2")
-    endif (PKG_CONFIG_FOUND)
-  endif (${CMAKE_MAJOR_VERSION} EQUAL 2 AND ${CMAKE_MINOR_VERSION} EQUAL 4)
-endmacro (libfind_pkg_check_modules)
 
-# Do the final processing once the paths have been detected.
-# If include dirs are needed, ${PREFIX}_PROCESS_INCLUDES should be set to contain
-# all the variables, each of which contain one include directory.
-# Ditto for ${PREFIX}_PROCESS_LIBS and library files.
-# Will set ${PREFIX}_FOUND, ${PREFIX}_INCLUDE_DIRS and ${PREFIX}_LIBRARIES.
-# Also handles errors in case library detection was required, etc.
+#! \brief Do the final processing once the paths have been detected.
+#!
+#! If include dirs are needed, `${PREFIX}_PROCESS_INCLUDES` should be set to contain
+#! all the variables, each of which contain one include directory.
+#! Ditto for `${PREFIX}_PROCESS_LIBS` and library files.
+#! Will set `${PREFIX}_FOUND`, `${PREFIX}_INCLUDE_DIRS` and `${PREFIX}_LIBRARIES`.
+#! Also handles errors in case library detection was required, etc.
 macro (libfind_process PREFIX)
   # Skip processing if already processed during this run
   if (NOT ${PREFIX}_FOUND)

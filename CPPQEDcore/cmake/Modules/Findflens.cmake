@@ -11,7 +11,10 @@
 include(LibFindMacros)
 libfind_package(flens CBLAS)
 
-libfind_pkg_check_modules(flens_PKGCONF flens)
+if (UNIX)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(flens_PKGCONF flens)
+endif()
 
 # Include dir
 find_path(flens_INCLUDE_DIR
