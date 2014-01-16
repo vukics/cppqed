@@ -2,6 +2,7 @@
 #! \ingroup Helpers
 #! \brief Improved versions of %CMake's `find_package`
 
+#! \ingroup Helpers
 #! \brief Works the same as `find_package`, but forwards the "REQUIRED" and "QUIET" arguments
 #!   used for the current package.
 #!
@@ -19,6 +20,7 @@ macro (libfind_package PREFIX)
 endmacro (libfind_package)
 
 
+#! \ingroup Helpers
 #! \brief Do the final processing once the paths have been detected.
 #!
 #! If include dirs are needed, `${PREFIX}_PROCESS_INCLUDES` should be set to contain

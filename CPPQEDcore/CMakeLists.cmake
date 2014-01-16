@@ -32,16 +32,16 @@ include(CPPQEDUse)
 #! @{
 
 #! MAJOR - the grand version of C++QED, as in v2
-set(CPPQED_MAJOR_VERSION 2)
+set(CPPQED_VERSION_MAJOR 2)
 #! MINOR - the milestone release, as in v2m9
-set(CPPQED_MINOR_VERSION 99)
+set(CPPQED_VERSION_MINOR 99)
 #! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_PATCH_VERSION 10)
+set(CPPQED_VERSION_PATCH 10)
 #! Full C++QED version
 set(CPPQED_VERSION
-  "${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}.${CPPQED_PATCH_VERSION}")
+  "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
 #! MAJOR.MINOR, at the moment mainly distinguishes stable (2.9) from development (2.99)
-set(CPPQED_ID "${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}")
+set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 
 #! @}
 
@@ -284,7 +284,7 @@ configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}/CPPQE
   PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR
 )
 write_basic_package_version_file(${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake 
-  VERSION ${CPPQED_MAJOR_VERSION}.${CPPQED_MINOR_VERSION}
+  VERSION ${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}
   COMPATIBILITY ExactVersion
 )
 foreach(c CPPQEDUse.cmake ElementsTemplateConfig.cmake.in 
