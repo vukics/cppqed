@@ -33,7 +33,7 @@ protected:
   Diagonal& getDiagonal() const {return diagonal_;}
 
 private:
-  void actWithU_v(Time t, StateVectorLow& psi) const {if (t!=t_) {updateU(t_=t);} psi*=getDiagonal();} ///< Implements Exact<1,true >
+  void actWithU_v(Time t, StateVectorLow& psi) const final {if (t!=t_) {updateU(t_=t);} psi*=getDiagonal();} ///< Implements Exact<1,true >
   
   virtual void updateU(Time) const = 0; ///< Updates diagonals to the given \f$t\f$ & \f$t_0\f$
   

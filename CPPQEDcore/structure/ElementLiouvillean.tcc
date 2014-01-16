@@ -48,7 +48,7 @@ inline void performJump(OneTime t, typename ElementLiouvilleanStrategies<RANK,NL
 
 
 template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
-auto structure::ElementLiouvilleanStrategies<RANK,NLINDBLADS,IS_TIME_DEPENDENT>::average_v(Time t, const LazyDensityOperator& matrix) const -> const Rates
+auto structure::ElementLiouvilleanStrategies<RANK,NLINDBLADS,IS_TIME_DEPENDENT>::rates_v(Time t, const LazyDensityOperator& matrix) const -> const Rates
 {
   Rates rates(NLINDBLADS); // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
 

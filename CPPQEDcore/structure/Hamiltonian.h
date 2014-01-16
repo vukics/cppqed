@@ -73,7 +73,7 @@ public:
 
 private:
   /// The inherited virtual gets implemented by calling a newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink
-  void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+  void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const final
   {
     addContribution_v(Time(t,tIntPic0),psi,dpsidt);
   }

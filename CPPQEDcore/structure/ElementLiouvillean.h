@@ -126,7 +126,7 @@ private:
     const LazyDensityOperator& matrix_;    
   };
 
-  const Rates average_v(Time t, const LazyDensityOperator& matrix) const {Rates rates(NLINDBLADS); mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(Average(this,rates,t,matrix)); return rates;}
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final {Rates rates(NLINDBLADS); mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(Average(this,rates,t,matrix)); return rates;}
 
   class ActWithJ
   {
@@ -143,7 +143,7 @@ private:
     const size_t lindbladNo_;
   };
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const {if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle()); mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(ActWithJ(this,t,psi,lindbladNo));}
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final {if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle()); mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(ActWithJ(this,t,psi,lindbladNo));}
   
 };
 
@@ -176,9 +176,9 @@ protected:
   ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,1,keyLabel) {}
   
 private:
-  const Rates average_v(Time t, const LazyDensityOperator& matrix) const {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const {if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle()); doActWithJ(t,psi);}
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final {if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle()); doActWithJ(t,psi);}
 
   virtual void doActWithJ(Time, StateVectorLow&) const = 0;
   
@@ -230,9 +230,9 @@ protected:
     : Base(keyTitle,il), jumps_(jumps), jumpRates_(jumpRates) {}
 
 private:
-  const Rates average_v(Time t, const LazyDensityOperator& matrix) const;
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final;
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const;
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final;
   
   const JumpStrategies     jumps_    ;
   const JumpRateStrategies jumpRates_;

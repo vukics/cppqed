@@ -65,15 +65,15 @@ public:
    * An exception to the rule “never redefine an inherited non-virtual function” is taken because these functions are called the same in the two bases of Free,
    * which would otherwise create ambiguities.
    */
-  double        highestFrequency (                ) const {return  highestFrequency_v(  );}
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);} ///< ”
+  double        highestFrequency (                ) const {return QuantumSystem<1>:: highestFrequency(  );}
+  std::ostream& displayParameters(std::ostream& os) const {return QuantumSystem<1>::displayParameters(os);} ///< ”
   //@}
 
 private:
-  double         highestFrequency_v(                ) const {return DynamicsBase::highestFrequency (  );}
-  std::ostream& displayParameters_v(std::ostream& os) const {return DynamicsBase::displayParameters(os);}
+  double         highestFrequency_v(                ) const final {return DynamicsBase::highestFrequency (  );}
+  std::ostream& displayParameters_v(std::ostream& os) const final {return DynamicsBase::displayParameters(os);}
 
-  std::ostream& displayMoreParameters(std::ostream& os) const {return DynamicsBase::displayMoreParameters(os<<"# Dimension: "<<getDimension()<<std::endl);}
+  std::ostream& displayMoreParameters(std::ostream& os) const final {return DynamicsBase::displayMoreParameters(os<<"# Dimension: "<<getDimension()<<std::endl);}
 
 };
 

@@ -28,9 +28,9 @@ protected:
   ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsInitializer il) : keyPrinter_(keyTitle,il) {}
 
 private:
-  size_t nAvr_v() const {return keyPrinter_.length();}
+  size_t nAvr_v() const final {return keyPrinter_.length();}
 
-  std::ostream& displayKey_v(std::ostream& os, size_t& i) const {return keyPrinter_.displayKey(os,i);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i) const final {return keyPrinter_.displayKey(os,i);}
 
   const cpputils::KeyPrinter keyPrinter_;
 

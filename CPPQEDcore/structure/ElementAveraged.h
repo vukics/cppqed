@@ -50,7 +50,7 @@ protected:
   //@}
 
 private:
-  std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const {return details::displayCommon(a,os,precision);}
+  std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const final {return details::displayCommon(a,os,precision);}
 
 };
 
