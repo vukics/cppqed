@@ -30,7 +30,7 @@ include(LibFindMacros)
 
 if (UNIX)
   find_package(PkgConfig QUIET)
-  pkg_check_modules(CBLAS_PKGCONF cblas)
+  pkg_check_modules(CBLAS_PKGCONF QUIET cblas)
 endif()
 
 if (NOT CBLAS_FOUND)

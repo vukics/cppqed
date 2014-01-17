@@ -29,7 +29,7 @@ libfind_package(GSL CBLAS)
 
 if (UNIX)
   find_package(PkgConfig QUIET)
-  pkg_check_modules(GSL_PKGCONF gsl)
+  pkg_check_modules(GSL_PKGCONF QUIET gsl)
 endif()
 
 find_path(GSL_INCLUDE_DIR gsl/gsl_linalg.h HINTS ${GSL_PKGCONF_INCLUDE_DIRS} $ENV{UIBK_GSL_INC})

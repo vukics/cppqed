@@ -19,7 +19,7 @@ include(CheckSymbolExists)
 
 if (UNIX)
   find_package(PkgConfig QUIET)
-  pkg_check_modules(blitz_PKGCONF blitz)
+  pkg_check_modules(blitz_PKGCONF QUIET blitz)
 endif()
 
 # Include dir

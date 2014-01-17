@@ -13,7 +13,7 @@ libfind_package(flens CBLAS)
 
 if (UNIX)
   find_package(PkgConfig QUIET)
-  pkg_check_modules(flens_PKGCONF flens)
+  pkg_check_modules(flens_PKGCONF QUIET flens)
 endif()
 
 # Include dir
