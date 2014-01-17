@@ -104,12 +104,13 @@ public:
       _lastChar = getChar();
     }
 
-    if (isalpha(_lastChar) || _lastChar == '_')
+    if (isalpha(_lastChar) || _lastChar == '_' || _lastChar == '@')
     {
       _identifier = _lastChar;
-      while (isalnum(_lastChar = getChar()) || _lastChar == '-' || _lastChar == '_')
+      while (isalnum(_lastChar = getChar()) || _lastChar == '-' || _lastChar == '_' || _lastChar == '@')
       {
-        _identifier += _lastChar;
+        if (_lastChar != '@')
+          _identifier += _lastChar;
       }
 
       if (_identifier == "set" || _identifier == "set_and_check")
