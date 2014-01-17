@@ -207,9 +207,9 @@ add_dependencies(cpypyqed io core elements)
 #! This section also takes care to install the additional package files to the system
 #! (both for Debug and Release configuration).
 
-set(INPUTS __init__.py compilation/cpypyqed_config.py compilation/ActTemplate.cc
-           compilation/CompositeTemplate.cc compilation/composite.py compilation/ondemand.py
-           compilation/__init__.py compilation/CMakeListsTemplate.txt)
+set(INPUTS "__init__.py" "compilation/cpypyqed_config.py" "compilation/ActTemplate.cc"
+           "compilation/CompositeTemplate.cc" "compilation/composite.py" "compilation/ondemand.py"
+           "compilation/__init__.py" "compilation/CMakeListsTemplate.txt")
 
 foreach(file ${INPUTS})
   add_custom_command(TARGET cpypyqed PRE_BUILD
