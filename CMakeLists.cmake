@@ -12,6 +12,8 @@
 #! file sets the variables `CPPQED_DIR` and `CPPQEDelements_DIR`
 #! (c.f. \ref cmake_find_components "how CMake finds components") to the build directories of this monolithic build,
 #! so that the right subprojects are found even if C++QED is installed or other build directories are registered.
+#!
+#! This CMakeLists file has the following structure:
 
 #! @}
 
@@ -36,6 +38,16 @@ set(CPPQED_MONOLITHIC 1)
 set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
 
 #! @}
+
+#! \file
+#! <!--#########################################################-->
+#! ### Compilation of the components
+#! <!--#########################################################-->
+#!
+#! Compile the components core, elements, scripts (optional) and cpypyqed (optional)
+#! by adding their sub-directories.
+#!
+#! Also include the test suite.
 
 add_subdirectory(CPPQEDcore)
 set(CPPQED_DIR ${core_BINARY_DIR})
@@ -63,9 +75,19 @@ endif()
 
 add_subdirectory(Testing)
 
-##################################################
-# Documentation
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Documentation
+#! <!--#########################################################-->
+#!
+#! This section builds the Doxygen documentation (if Doxygen is found) and furthermore
+#! installs the example projects "CustomElementsExample" and "CustomScriptsExample" to
+#! the system.
+#!
+#! For the Doxygen documentation, the filter [CMakeDoxygenFilter](https://github.com/saschazelzer/CMakeDoxygenFilter),
+#! is compiled, which allows to document %CMake in Doxygen. The overall C++QED documentation
+#! is generated with cppqed_documentation(), and a target "doc" for the full documentation is created,
+#! which depends on all the component documentation targets.
 
 find_package(Doxygen QUIET)
 if(DOXYGEN_FOUND)
@@ -86,11 +108,17 @@ install(DIRECTORY CustomElementsExample CustomScriptsExample
         PATTERN build* EXCLUDE
 )
 
-##################################################
-# Debian build
-# if the directory debianbuild exists, configure the
-# debian package build
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Debian build
+#! <!--#########################################################-->
+#!
+#! This adds the sub-directory "debianbuild" if it exists. If not this section is silently ignored.
+#! The directory "debianbuild" is not part of the C++QED project. One can put a special
+#! [repository](https://ge-c705.uibk.ac.at/cppqed/debian) here, which will then generate debian
+#! directories for building source packages. This guarantees that debian packages have the right
+#! version numbers and soversion in their package names, and also helps to maintain packages for different
+#! distributions without code duplication.
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/debianbuild)
   add_subdirectory(debianbuild)

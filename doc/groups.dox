@@ -16,9 +16,9 @@
 /// \ingroup CMakeReference
 /// \brief %CMake config files export targets and variables so that other projects can use them.
 
-/// \defgroup FindPackage
+/// \defgroup FindPackage FindPackage modules
 /// \ingroup CMakeReference
-/// \brief Additional module files to find specific libraries.
+/// \brief Additional custom module files to find specific libraries.
 
 /// \defgroup Helpers
 /// \ingroup CMakeReference
