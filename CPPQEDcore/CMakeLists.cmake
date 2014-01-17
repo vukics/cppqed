@@ -1,17 +1,13 @@
-#! \addtogroup Main
-#! @{
 
-#! \file CPPQEDcore/CMakeLists.cmake
-#! \brief Top level CMake file for the C++QED core component.
-
-#! @}
+#! \ingroup Main
+#! \file
+#! \brief Top level CMake file for the C++QED core component. The file has the following structure:
 
 cmake_minimum_required (VERSION 2.8.9)
 
 project (core)
 
 #! \name Project variables
-#! These variables are used in the subprojects.
 #! @{
 
 #! \brief Path to additional CMake modules.
@@ -23,10 +19,17 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
 include(FeatureSummary)
 include(CPPQEDUse)
 
-##################################################
-# Version
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Version management
+#! <!--#########################################################-->
+#!
+#! Set the major, minor and patch version of C++QED (c.f. \ref versioning). The major and minor
+#! versions end up in the library names of all components. In this section,
+#! also the ABI version of the library is set (c.f. \ref ABI).
 
+
+#! \anchor versioning
 #! \name Version variables
 #! Versioning scheme
 #! @{
@@ -45,6 +48,7 @@ set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 
 #! @}
 
+#! \anchor ABI
 #! \name ABI versioning scheme
 #!
 #! Adopt the shared library versioning scheme of libtool
@@ -96,16 +100,32 @@ if(CPPQED_MONOLITHIC)
   set(CPPQED_ABI_MAJOR ${CPPQED_ABI_MAJOR} PARENT_SCOPE)
 endif()
 
-##################################################
-# Installation directories
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Installation directories
+#! <!--#########################################################-->
+#!
+#! This controls into which sub-directories to put %CMake config files
+#! and include files when installing.
 
+#! \name Project variables
+#! @{
+
+#! Sub-directory of `CMAKE_INSTALL_LIBDIR` into which %CMake files are installed.
 set(CPPQED_CMAKE_SUBDIR "cmake/CPPQED-${CPPQED_ID}")
+#! Sub-directory of `CMAKE_INSTALL_INCLUDEDIR` into which header files are installed.
 set(CPPQED_INCLUDE_SUBDIR "CPPQED-${CPPQED_ID}/core")
 
-##################################################
-# Compiler detection
-##################################################
+#! @}
+
+
+#! \file
+#! <!--#########################################################-->
+#! ### Compiler detection
+#! <!--#########################################################-->
+#!
+#! At the moment g++ >= 4.7 and Clang >= 3.1 is needed for C++11 features.
+
 set(G++_MINIMAL 4.7)
 set(CLANG_MINIMAL 3.1)
 
@@ -118,24 +138,46 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang AND ${CMAKE_CXX_COMPILER_VERSION} VE
   message(FATAL_ERROR "Clang version >= ${CLANG_MINIMAL} needed.")
 endif ()
 
+#! \file
+#! <!--#########################################################-->
+#! ### Library detection
+#! <!--#########################################################-->
+#!
+#! In this section we look for required and optional dependencies.
 
-##################################################
-# Library detection
-##################################################
+#! \name Project variables
+#! @{
+
+#! \brief Dependency libraries of C++QED core which should become direct dependencies of clients of core.
+#!
+#! Obviously this has to include all libraries which contain templates.
+set(PUBLIC_LIBS)
+#! \brief Dependency libraries of C++QED core which are invisible to clients of core.
+#!
+#! Only libraries which are linked in to core completely (e.g. GSL) can be added to this set. Template
+#! libraries have to become direct dependencies of clients using core.
+set(PRIVATE_LIBS)
+
+#! @}
 
 find_package(GSL REQUIRED)
 include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 
-# The option SERIALIZATION will be disabled if any of the compoments required for serialization is missing
+#! \name Project options
+#! @{
+
+#! Switch for boost serialization.
 option(SERIALIZATION "Boost serialization" ON)
 if(SERIALIZATION)
-  set(CPPQED_HAS_SERIALIZATION 1)
+  set(CPPQED_SERIALIZATION_FOUND 1)
 else(SERIALIZATION)
-  set(CPPQED_HAS_SERIALIZATION 0)
+  set(CPPQED_SERIALIZATION_FOUND 0)
 endif(SERIALIZATION)
 
-# The option FLENS will be disabled if flens is missing
+#! Switch for FLENS support.
 option(FLENS "FLENS support" ON)
+
+#! @}
 
 # blitz
 find_package(blitz REQUIRED)
@@ -143,10 +185,10 @@ if( blitz_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built with serialization support.")
 else( blitz_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built without serialization support. Please configure blitz with --enable-serialization to enable optional binary statevector output.")
-  set(CPPQED_HAS_SERIALIZATION 0)
+  set(CPPQED_SERIALIZATION_FOUND 0)
 endif( blitz_SERIALIZATION_FOUND )
 
-set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
+set(CPPQED_THIRDPARTY_INCLUDE_DIRS "${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS}")
 
 # Boost (OPTIONAL_COMPONENTS does not work with Boost find_package)
 find_package(Boost REQUIRED)
@@ -156,7 +198,7 @@ if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library found.")
 else( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library not found.")
-  set(CPPQED_HAS_SERIALIZATION 0)
+  set(CPPQED_SERIALIZATION_FOUND 0)
 endif( Boost_SERIALIZATION_FOUND )
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
@@ -167,28 +209,40 @@ if( flens_FOUND AND FLENS )
   include_directories(SYSTEM ${flens_INCLUDE_DIRS})
   set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
   set(PUBLIC_LIBS ${PUBLIC_LIBS} ${flens_LIBRARIES})
-  set(CPPQED_HAS_FLENS 1)
+  set(CPPQED_FLENS_FOUND 1)
 else( flens_FOUND AND FLENS )
   message(STATUS "Flens library not found or disabled, optional flens support disabled.")
   set(DO_NOT_USE_FLENS ON)
-  set(CPPQED_HAS_FLENS 0)
+  set(CPPQED_FLENS_FOUND 0)
 endif( flens_FOUND AND FLENS )
 
 # Check if serialization can be enabled, inform user
-if( CPPQED_HAS_SERIALIZATION )
+if( CPPQED_SERIALIZATION_FOUND )
   message(STATUS "Support for binary statevector output enabled.")
   set(PUBLIC_LIBS ${PUBLIC_LIBS} ${Boost_SERIALIZATION_LIBRARY})
-else( CPPQED_HAS_SERIALIZATION )
+else( CPPQED_SERIALIZATION_FOUND )
   set(DO_NOT_USE_BOOST_SERIALIZATION ON)
   message(STATUS "Optional support for binary statevector output disabled.")
-endif( CPPQED_HAS_SERIALIZATION )
+endif( CPPQED_SERIALIZATION_FOUND )
 
 set(PRIVATE_LIBS ${PRIVATE_LIBS} ${GSL_LIBRARIES})
 set(PUBLIC_LIBS ${PUBLIC_LIBS} ${blitz_LIBRARIES})
 
-##################################################
-# Flags for release and debug mode
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Compiler definitions and `config.h`
+#! <!--#########################################################-->
+#!
+#! In this section a `config.h` file is generated and saved in the build directory.
+#! This header files contains preprocessor macros indicating whether FLENS and
+#! boost serialization is available. C++QED source files can then conditionally
+#! compile code that depends on these features. The `config.h` file only has to
+#! be included where it is needed, which is an advantage over using `-D` compiler flags
+#! (less code has to be recompiled).
+#!
+#! Also in this section, the flags `-DBOOST_RESULT_OF_USE_TR1` and `-DGSL_CBLAS` are
+#! set globally if needed. Note that compiler warnings are set as part of CPPQED_SETUP(),
+#! which is called in the next section.
 
 # Generate config.h
 configure_file(${CPPQED_CMAKE_MODULE_PATH}/config.h.in ${PROJECT_NAME}_config.h)
@@ -205,15 +259,23 @@ if(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
   message(STATUS "added -DGSL_CBLAS" )
 endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
 
-##################################################
-# Compilation
-##################################################
+
+#! \file
+#! <!--#########################################################-->
+#! ### Compilation
+#! <!--#########################################################-->
+#!
+#! This does some initial setup (c.f. CPPQED_SETUP() and generate_version_files()) and then builds
+#! the source files in the various sub-directories. This is done by trivial `CMakeLists.txt` files
+#! which only contain calls to create_object_target(). This function also handles the include
+#! dependencies between directories.
+#!
+#! Then the core library is linked and some properties like VERSION and SOVERSION are set.
+#! All header files are registered for installation with the help of the function gather_includes().
+
 CPPQED_SETUP()
 
-get_git_head_revision(REFSPEC CONF_GIT_SHA1)
-set(CONF_VERSION ${CPPQED_VERSION})
-configure_file("${CPPQED_CMAKE_MODULE_PATH}/version.cc.in" "${PROJECT_NAME}_version.cc" @ONLY)
-configure_file("${CPPQED_CMAKE_MODULE_PATH}/version.h.in" "${PROJECT_NAME}_version.h" @ONLY)
+generate_version_files()
 
 include_directories(${PROJECT_BINARY_DIR}) # for generated config files
 
@@ -245,15 +307,23 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
       SOVERSION ${CPPQED_ABI_MAJOR}
 )
 
-##################################################
-# Documentation
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Documentation
+#! <!--#########################################################-->
+#!
+#! Call to cppqed_documentation().
 
 cppqed_documentation(core_ "")
 
-##################################################
-# Installation
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Installation
+#! <!--#########################################################-->
+#!
+#! This section has two tasks: prepare the build tree so that it can be found by
+#! other projects which have C++QED core as a dependency, and to install all required
+#! files to the system.
 
 install(TARGETS ${CPPQEDLIB}
         EXPORT CPPQEDcoreTargets
@@ -266,7 +336,12 @@ install(TARGETS ${CPPQEDLIB}
 export(TARGETS ${CPPQEDLIB}
   FILE "${PROJECT_BINARY_DIR}/CPPQEDcoreTargets.cmake")
 
+#! \name Project options
+#! @{
+#
+#! Enable or disable %CMake registry (c.f. \ref cmake_find_components).
 option(REGISTRY "Register build trees in the cmake registry so that other projects can find them." ON)
+#! @}
 if(REGISTRY)
   export(PACKAGE CPPQED)
 endif(REGISTRY)
@@ -321,17 +396,31 @@ install(FILES
 install(EXPORT CPPQEDcoreTargets DESTINATION
   "${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR}" COMPONENT dev)
 
-##################################################
-# Compile extras
-##################################################
+
+#! \file
+#! <!--#########################################################-->
+#! ### Compile extras
+#! <!--#########################################################-->
+#!
+#! Compile the example code documented \ref structurebundleguide "here".
+
+#! \name Project options
+#! @{
+#
+#! \brief Switch compilation of some example code which demonstrates how to code frees and interactions
+#!   (c.f. the \ref structurebundleguide "structure bundle guide").
 option(EXAMPLES "Compile examples" ON)
+#! @}
 if(EXAMPLES)
   add_subdirectory(examples)
 endif(EXAMPLES)
 
-##################################################
-# Summary of enabled/disabled features
-##################################################
+#! \file
+#! <!--#########################################################-->
+#! ### Summary of enabled/disabled features
+#! <!--#########################################################-->
+#!
+#! Display some nice summary of which components have been found and which not.
 
 set_package_properties(PkgConfig PROPERTIES URL "http://pkgconfig.freedesktop.org/wiki"
                                 DESCRIPTION "Package config system that manages compile/link flags"
@@ -361,8 +450,8 @@ set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
                                 DESCRIPTION "Generate documentation from source code"
                                 TYPE OPTIONAL
                                 PURPOSE "Generation of API documentation.")
-add_feature_info("FLENS" CPPQED_HAS_FLENS "compile framework with FLENS support.")
-add_feature_info("Serialization" CPPQED_HAS_SERIALIZATION "needed for binary statevector output." )
+add_feature_info("FLENS" CPPQED_FLENS_FOUND "compile framework with FLENS support.")
+add_feature_info("Serialization" CPPQED_SERIALIZATION_FOUND "needed for binary statevector output." )
 if(NOT ${CPPQED_MONOLITHIC})
   feature_summary( WHAT ALL )
 endif()

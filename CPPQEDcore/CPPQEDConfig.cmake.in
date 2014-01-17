@@ -4,38 +4,26 @@
 #! \file
 #! \brief Export targets and variables for the core component.
 
-# - Config file for the CPPQED package
-# It defines the following variables
-#  CPPQED_INCLUDE_DIRS - include directories for CPPQED
-#  CPPQED_THIRDPARTY_INCLUDE_DIRS - include directories for CPPQED
-#  CPPQED_LIBRARIES    - libraries to link against
-#  CPPQED_DEFINITIONS  - compiler macro definitions needed together with CPPQED
-#  CPPQED_HAS_SERIALIZATION - serialization support enabled
-#  CPPQED_HAS_FLENS    - FLENS support enabled
-#  CPPQED_CORE_GIT     - Core git commit sha1
-#  CPPQED_USE          - CMAKE related stuff to use this package
-#  CPPQED_DOXYGEN_DIR  - Doxygen directory
-#  CPPQED_DOXYGEN_TAG  - Doxygen tagfile
-
 @PACKAGE_INIT@
 
 #! \brief
 set(CPPQED_VERSION_MAJOR "@CPPQED_VERSION_MAJOR@")
-set(CPPQED_VERSION_MINOR @CPPQED_VERSION_MINOR@)
-set(CPPQED_VERSION_PATCH @CPPQED_VERSION_PATCH@)
-set(CPPQED_VERSION @CPPQED_VERSION@)
-set(CPPQED_ID @CPPQED_ID@)
-set(CPPQED_HASH @HASH@)
+set(CPPQED_VERSION_MINOR "@CPPQED_VERSION_MINOR@")
+set(CPPQED_VERSION_PATCH "@CPPQED_VERSION_PATCH@")
+set(CPPQED_VERSION "@CPPQED_VERSION@")
+set(CPPQED_ID "@CPPQED_ID@")
 #! \brief
 set(CPPQED_ABI_MAJOR "@CPPQED_ABI_MAJOR@")
-set(CPPQED_ABI_MINOR @CPPQED_ABI_MINOR@)
-set(CPPQED_ABI_MICRO @CPPQED_ABI_MICRO@)
+#! \brief
+set(CPPQED_ABI_MINOR "@CPPQED_ABI_MINOR@")
+#! \brief
+set(CPPQED_ABI_MICRO "@CPPQED_ABI_MICRO@")
 
 
 #! Indicates whether C++QED is compiled with boost serialization support
-set(CPPQED_HAS_SERIALIZATION "@CPPQED_HAS_SERIALIZATION@")
+set(CPPQED_SERIALIZATION_FOUND "@CPPQED_SERIALIZATION_FOUND@")
 #! Indicates whether FLENS support is compiled in.
-set(CPPQED_HAS_FLENS "@CPPQED_HAS_FLENS@")
+set(CPPQED_FLENS_FOUND "@CPPQED_FLENS_FOUND@")
 
 #! Core git commit sha1 hash value
 set(CPPQED_CORE_GIT "@CONF_GIT_SHA1@")
