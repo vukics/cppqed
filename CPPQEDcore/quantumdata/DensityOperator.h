@@ -122,7 +122,9 @@ public:
   //@}
 
 private:
-  const dcomp index(const Idx& i, const Idx& j) const {return operator()(i,j);} ///< This function implements the LazyDensityOperator interface in a trivial element-access way
+  const dcomp index(const Idx& i, const Idx& j) const override {return operator()(i,j);} ///< This function implements the LazyDensityOperator interface in a trivial element-access way
+
+  double trace_v() const override {return norm();} ///< A straightforward implementation of a LazyDensityOperator virtual
 
 };
 

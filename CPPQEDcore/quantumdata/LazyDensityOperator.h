@@ -77,6 +77,8 @@ public:
 
   double operator()(const Idx& i) const {return real((*this)(i,i));} ///< An inline function for conveniently addressing the diagonal elements
 
+  double trace() const {return trace_v();} ///< Returns the trace (redirected to a pure virtual)
+  
   /// \name Slicing-related functionality
   //@{
     /// Return the ldo::DiagonalIterator corresponding to the beginning of the sequence of slices defined by `V`
@@ -95,6 +97,8 @@ protected:
 
 private:
   virtual const dcomp index(const Idx& i, const Idx& j) const = 0;
+  
+  virtual double trace_v() const = 0;
 
 };
 

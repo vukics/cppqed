@@ -51,16 +51,23 @@ DensityOperator<RANK>::DensityOperator(const DensityOperator& rho)
 
 
 
+template<int RANK>
+double
+DensityOperator<RANK>::norm() const
+{
+  using blitz::tensor::i;
+  const linalg::CMatrix m(matrixView());
+  return real(sum(m(i,i)));
+}
+
 
 template<int RANK>
 double
 DensityOperator<RANK>::renorm()
 {
-  using blitz::tensor::i;
-  linalg::CMatrix m(matrixView());
-  double res=real(sum(m(i,i)));
-  m/=res;
-  return res;
+  double trace=norm();
+  *this/=trace;
+  return trace;
 }
 
 

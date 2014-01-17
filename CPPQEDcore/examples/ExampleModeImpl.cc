@@ -41,7 +41,7 @@ double aJumpRate   (const LazyDensityOperator& matrix, double kappa_nPlus1)
 
 double aDagJumpRate(const LazyDensityOperator& matrix, double kappa_n     )
 {
-  return 2.*kappa_n*(photonNumber(matrix)+1.);
+  return 2.*kappa_n*(photonNumber(matrix)+matrix.trace());
 }
 
 

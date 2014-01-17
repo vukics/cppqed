@@ -169,8 +169,10 @@ public:
 #endif // NDEBUG
   
 private:
-  const dcomp index(const Idx& i, const Idx& j) const {return getArray()(i)*conj(getArray()(j));} ///< This function implements the LazyDensityOperator interface in a dyadic-product way.
-
+  const dcomp index(const Idx& i, const Idx& j) const override {return getArray()(i)*conj(getArray()(j));} ///< This function implements the LazyDensityOperator interface in a dyadic-product way.
+  
+  double trace_v() const override {return norm();} ///< A straightforward implementation of a LazyDensityOperator virtual
+  
 };
 
 
