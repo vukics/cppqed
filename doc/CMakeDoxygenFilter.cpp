@@ -24,6 +24,8 @@
 
 #include <assert.h>
 
+static std::string filename="";
+
 //--------------------------------------
 // Utilitiy classes and functions
 //--------------------------------------
@@ -315,7 +317,7 @@ private:
 
   void printError(const char* str)
   {
-    std::cerr << "Error: " << str << " (at line " << _lexer.curLine() << ", col " << _lexer.curCol() << ")";
+    std::cerr << filename << ": Error: " << str << " (at line " << _lexer.curLine() << ", col " << _lexer.curCol() << ")";
   }
 
   bool parseMacro()
@@ -429,7 +431,7 @@ private:
 
     if (curToken() != ')')
     {
-      printError("Missing expected ')'");
+      printError("Missing expected ')'\n");
     }
     else
     {
@@ -459,6 +461,7 @@ int main(int argc, char** argv)
 
   for (int i = 1; i < argc; ++i)
   { 
+    filename = argv[i];
     std::ifstream ifs(argv[i]);
     std::ostream& os = std::cout;
 
