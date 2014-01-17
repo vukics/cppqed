@@ -263,6 +263,7 @@ macro(elements_project)
 endmacro()
 
 #! \brief Generate C++ source code containing version information as global variables.
+#! \return This function sets `CONF_GIT_SHA1` and `CONF_VERSION` (c.f. get_git_head_revision()).
 #!
 #! This extracts the current git commit hash by using get_git_head_revision(), and generates two files
 #! `${PROJECT_NAME}_version.cc` and `${PROJECT_NAME}_version.h`. For example, with a project `elements`, clients including
@@ -284,6 +285,8 @@ function(generate_version_files)
   endif()
   configure_file("${_dir}/version.cc.in" "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.cc" @ONLY)
   configure_file("${_dir}/version.h.in" "${PROJECT_BINARY_DIR}/${PROJECT_NAME}_version.h" @ONLY)
+  set(CONF_GIT_SHA1 ${CONF_GIT_SHA1} PARENT_SCOPE)
+  set(CONF_VERSION ${CONF_VERSION} PARENT_SCOPE)
 endfunction()
 
 #! \brief Initialize a scripts project.
