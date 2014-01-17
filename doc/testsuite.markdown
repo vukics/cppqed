@@ -25,9 +25,10 @@ of tests. Example usage:
     # Perform only a single test by name
     $ make fail_CompositeError2
 
-Success is indicated by the make target completing without errors. Parallelization is possible to
-a limited extent by running `make -jN <target>`. Only the different make targets, not the individual tests
-will be run in parallel. This method is suited best for usage from within kdevelop, for example while
+Success is indicated by the make target completing without errors. Parallelization is supported by passing
+`-DTEST_PARALLEL=N` to %CMake when configuring the project, where `N` is the number of tests which should be
+run in parallel. Verbose test output can be switched by the %CMake option `-DTEST_VERBOSE=ON/OFF`.
+This method is suited best for usage from within kdevelop, for example while
 debugging some feature one can add the relevant test to the build sequence and just hit F8, which will
 recompile the dependencies and run the test.
 
@@ -49,9 +50,9 @@ directly. Example usage:
     $ ctest -j2 -R run_
 
 Again there is no dependency checking, the framework has to be built in full before calling `ctest`. However,
-tests depending on other tests will be run in the right order. Running `ctest` directly has the best parallelization
-support, because individual tests are run in parallel, making this the fastest method. Verbose output from
-tests can be enabled by the `-V` switch.
+tests depending on other tests will be run in the right order. The advantage over the `check` targets is that you have
+better control over the ctest parameters. For example you can pass a regular expression to `-R` to determine which
+tests should be run.
 
 # Test suite layout {#testsuite_layout}
 
