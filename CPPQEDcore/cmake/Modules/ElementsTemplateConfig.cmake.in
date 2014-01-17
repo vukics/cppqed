@@ -1,26 +1,39 @@
-# - Config file for the CPPQED package
-# It defines the following variables
-#  CPPQED@PROJECT_NAME@_INCLUDE_DIRS - include directories for CPPQED
-#  CPPQED@PROJECT_NAME@_LIBRARIES    - libraries to link against
-#  CPPQED@PROJECT_NAME@_SHA1         - SHA1 of the current git commit
-#  CPPQED@PROJECT_NAME@_DOXYGEN_DIR  - Doxygen directory
-#  CPPQED@PROJECT_NAME@_DOXYGEN_TAGFILE - Doxygen tagfile
+#! \addtogroup CPPQEDelementsConfig
+#! @{
+
+#! \file
+#! \brief Export targets and variables for the elements component or custom elements projects.
 
 @PACKAGE_INIT@
 
-set(CPPQED@PROJECT_NAME@_SHA1 @CONF_GIT_SHA1@)
+#! The git commit sha1 hash value for the current elements project.
+set(CPPQED@PROJECT_NAME@_SHA1 "@CONF_GIT_SHA1@")
 
 # set_and_check does not work with lists
+
+#! A list of all sub-directories of the current elements project which contain header files
 set(CPPQED@PROJECT_NAME@_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
 
-set(CPPQED@PROJECT_NAME@_DOXYGEN_DIR @PACKAGE_CONF_DOC_DIR@/html)
-set(CPPQED@PROJECT_NAME@_DOXYGEN_TAGFILE @PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag)
+#! Path of the Doxygen documentation
+set(CPPQED@PROJECT_NAME@_DOXYGEN_DIR "@PACKAGE_CONF_DOC_DIR@/html")
+#! Path of the Doxygen `<project_name>.tag` file
+set(CPPQED@PROJECT_NAME@_DOXYGEN_TAGFILE "@PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET @ELEMENTSLIB@)
   include("@PACKAGE_CONF_CMAKE_DIR@/CPPQED@PROJECT_NAME@Targets.cmake")
 endif()
 
-# This is an IMPORTED target created by CPPQED@PROJECT_NAME@Targets.cmake
-set(CPPQED@PROJECT_NAME@_LIBRARIES @ELEMENTSLIB@)
+#! \brief This is the target name which must be used to link to the current elements library.
+#!
+#! This is an IMPORTED target created by the automatically generated file `CPPQED${PROJECT_NAME}Targets.cmake`.
+#!
+#! When the target is imported, the two properties `MAP_IMPORTED_CONFIG_DEBUG` and
+#! `MAP_IMPORTED_CONFIG_RELEASE` are set to "Debug" and "Release", respectively.
+#! This has the effect that the library can only be used with the exact corresponding
+#! build configurations. If for example a project with debug configuration tries to link against
+#! the elements library in release configuration, this will be an error at link time.
+set(CPPQED@PROJECT_NAME@_LIBRARIES "@ELEMENTSLIB@")
 set_target_properties(@ELEMENTSLIB@ PROPERTIES MAP_IMPORTED_CONFIG_DEBUG "Debug" MAP_IMPORTED_CONFIG_RELEASE "Release")
+
+#! @}

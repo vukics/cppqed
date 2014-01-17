@@ -60,7 +60,7 @@ endif()
 
 #! \brief This is the target name which must be used to link to the C++QED core library.
 #!
-#! This is an IMPORTED target created by the file CPPQEDcoreTargets.cmake.
+#! This is an IMPORTED target created by the automatically generated file CPPQEDcoreTargets.cmake.
 #!
 #! When the target is imported, the two properties `MAP_IMPORTED_CONFIG_DEBUG` and
 #! `MAP_IMPORTED_CONFIG_RELEASE` are set to "Debug" and "Release", respectively.

@@ -1,7 +1,7 @@
 
 #! \file
 #! \ingroup FindPackage
-#! \brief Try to find blitz.
+#! \brief Find blitz++.
 #!
 #! Once done, this will define
 #!

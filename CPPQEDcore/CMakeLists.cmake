@@ -1,7 +1,9 @@
 
 #! \ingroup Main
 #! \file
-#! \brief Top level CMake file for the C++QED core component. The file has the following structure:
+#! \brief Top level %CMake file for the C++QED core component.
+#!
+#! The file has the following structure:
 
 cmake_minimum_required (VERSION 2.8.9)
 

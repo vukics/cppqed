@@ -1,6 +1,6 @@
 #! \file
 #! \ingroup FindPackage
-#! \brief Try to find flens
+#! \brief Find FLENS.
 #!
 #! Once done, this will define
 #!
