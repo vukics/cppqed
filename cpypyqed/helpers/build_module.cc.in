@@ -14,9 +14,9 @@ namespace pythonext {
 BOOST_PP_SEQ_FOR_EACH(EXPORT_MACRO, void, PY_EXPORT_HELPER_SEQUENCE)
 
 #ifndef NDEBUG
-BOOST_PYTHON_MODULE(@PACKAGENAME@_d)
+BOOST_PYTHON_MODULE(@modulename@_d)
 #else
-BOOST_PYTHON_MODULE(@PACKAGENAME@)
+BOOST_PYTHON_MODULE(@modulename@)
 #endif
 {
   // calling the export helper functions

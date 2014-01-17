@@ -1,1 +1,1 @@
-PYTHON_SUBPACKAGE(core)
+python_submodule(core)

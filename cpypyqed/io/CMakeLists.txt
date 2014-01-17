@@ -1,3 +1,3 @@
 include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS})
 
-PYTHON_SUBPACKAGE(io)
+python_submodule(io)
