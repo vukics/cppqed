@@ -2,7 +2,7 @@
 /// CMake
 
 /// \defgroup CMakeReference CMake
-/// \brief Documentation of %CMake internals, directed ad build system developers only.
+/// \brief Documentation of %CMake internals, directed at build system developers.
 
 /// \defgroup CPPQEDUse
 /// \ingroup CMakeReference

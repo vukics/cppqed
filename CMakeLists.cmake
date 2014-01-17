@@ -54,8 +54,7 @@ set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
 set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 
-#! \name CMake options
-#! These options can be switched with `-D<OPTION>=(ON|OFF)` when calling CMake.
+#! \name Project options
 #! @{
 
 #! This CMake option determines if the Python modules should be compiled.

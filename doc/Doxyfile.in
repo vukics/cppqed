@@ -749,7 +749,10 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown        \
                          @CMAKE_CURRENT_SOURCE_DIR@                          \
                          @core_SOURCE_DIR@/cmake/Modules                     \
                          @core_SOURCE_DIR@/CMakeLists.cmake                  \
-                         @core_SOURCE_DIR@/CPPQEDConfig.cmake.in
+                         @core_SOURCE_DIR@/CPPQEDConfig.cmake.in             \
+                         @elements_SOURCE_DIR@/CMakeLists.cmake              \
+                         @scripts_SOURCE_DIR@/CMakeLists.cmake               \
+                         @cpypyqed_SOURCE_DIR@/CMakeLists.cmake
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
