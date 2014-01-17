@@ -57,14 +57,14 @@ set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 #! \name Project options
 #! @{
 
-#! This CMake option determines if the Python modules should be compiled.
+#! This %CMake option determines if the Python modules should be compiled.
 option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
 find_package(Boost QUIET COMPONENTS python)
 if(Boost_PYTHON_FOUND AND COMPILE_CPYPYQED)
   add_subdirectory(cpypyqed)
 endif()
 
-#! \brief This CMake option determines if the scripts should be compiled as part
+#! \brief This %CMake option determines if the scripts should be compiled as part
 #!    of the monolithic build.
 option(COMPILE_SCRIPTS "Compile the example scripts" On)
 #! @}

@@ -94,6 +94,9 @@ Note that without this feature, state files cannot be written to or read from di
 [cmake package registry][cmake-registry].
 * `-DEXAMPLES=Off`: con't compile some examples in the C++QEDcore repository.
 
+See also the (possibly more complete) list of %CMake options in the CMake namespace ("Project options"), which is generated from the project
+build system documentation.
+
 ### How Cmake finds the C++QED components ### {#cmake_find_components}
 
 The C++QED framework is organized in several sub-projects (core,elements,scripts,cpypyqed). For every component,
