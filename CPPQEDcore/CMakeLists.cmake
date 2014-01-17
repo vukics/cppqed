@@ -128,11 +128,11 @@ set(CPPQED_INCLUDE_SUBDIR "CPPQED-${CPPQED_ID}/core")
 #!
 #! At the moment g++ >= 4.7 and Clang >= 3.1 is needed for C++11 features.
 
-set(G++_MINIMAL 4.7)
+set(GCC_MINIMAL 4.7)
 set(CLANG_MINIMAL 3.1)
 
 
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${G++_MINIMAL})
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${GCC_MINIMAL})
   message(FATAL_ERROR "GCC g++ version >= ${G++_MINIMAL} needed.")
 endif ()
 
