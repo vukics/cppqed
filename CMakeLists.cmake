@@ -2,7 +2,7 @@
 #! @{
 
 #! \file
-#! \brief Top level CMake file controlling monolithic builds.
+#! \brief Top level %CMake file controlling monolithic builds.
 #!
 #! In monolithic builds, the paths to the subprojects (`CPPQEDcore`, `CPPQEDelements`, `CPPQEDscripts`, `cpypyqed`)
 #! are known. All these components are built with calls to `add_subdirectory` from within this file. The subprojects

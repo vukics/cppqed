@@ -27,3 +27,11 @@
 /// \defgroup CPPQEDConfig
 /// \ingroup Config
 /// \brief Export targets and variables for the core component.
+
+/// \defgroup CPPQEDelementsConfig
+/// \ingroup Config
+/// \brief Export targets and variables for the elements component.
+///
+/// Note that this is a template which is being used both for the regular and for custom elements
+/// projects. In this documentation, all variables which contain `PROJECT_NAME` have to be considered
+/// with `PROJECT_NAME` properly replaced, e.g. `CPPQEDelements_LIBRARIES` etc.
