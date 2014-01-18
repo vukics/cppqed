@@ -1,4 +1,5 @@
-# Test suite {#testsuite}
+Test suite {#testsuite}
+==========
 
 \tableofcontents
 
@@ -73,7 +74,7 @@ project has to be re-configured with cmake.
 
 ## The Python test driver {#testsuite_python}
 
-To add a new test, one has to call **declaretest**, **add_test** and optionally **set_tests_properties**.
+To add a new test, one has to call declaretest(), add_test() and optionally **set_tests_properties**.
 Here is an example how to add a new test in the `CMakeLists.txt`:
 
     declaretest(<unique test name>)
@@ -81,7 +82,7 @@ Here is an example how to add a new test in the `CMakeLists.txt`:
     # the following line is optional, adds a dependency:
     set_tests_properties(${TESTNAME} PROPERTIES DEPENDS <some other test>)
 
-The variable `${TESTNAME}` is set to the current test name by `declaretest`. This will call the
+The variable `${TESTNAME}` is set to the current test name by declaretest(). This will call the
 Python script **testdriver.py** as test driver. The variable `${TESTSCRIPT}` points to `testdriver.py`
 and already adds some needed parameters to pass in the build configuration (debug or release) and the
 configuration file. The required `<parameters>` are:
@@ -91,19 +92,21 @@ the section in the configuration file.
 * `--testclass=TESTCLASS` (required): the name of the [python class](#testsuite_py_classes) which defines the mode
 of operation of the test driver
 
-The other parameters depend on the used test class and are documented together with the classes.
+The other parameters depend on the used test class and are documented \ref TestclassOptions "here".
 
 ### Configuration files {#testsuite_py_configuration}
 
 The Python test driver reads in a global configuration file (**Testing/testdriver.conf.in**, pre-processed by cmake) and
-a per-directory configuration file (**testdriver.conf**). In the `[Scripts]` section of the global configuration file,
-one can define options which will be in effect for all scripts:
+a per-directory configuration file (**testdriver.conf**). The `[Setup]` section of the global configuration file,
+defines global behavior. For example, one can set command line options which should be used for all scripts:
 
-    [Scripts]
+    [Setup]
     opts=--precision 6 --epsAbs 1e-5 --logLevel 2
 
+See \ref SetupKeys "this list" for all recognized keys in this section.
+
 In the per-directory configuration files, there is a section for every test name. The available configuration keys
-of the sections depend on the used test class and are documented [there](#testsuite_py_classes).
+of the sections depend on the used test class and are documented \ref TestclassKeys "here".
 One can import the options from another section by an `import` statement:
 
     [run_PTLA_CPPQED_dc]
@@ -117,86 +120,13 @@ Note that configuration keys which are also defined in the current section will 
 
 ### Test classes {#testsuite_py_classes}
 
-This section documents all the available test classes, which can be used with the
-`--testclass=TESTCLASS` parameter. Some classes inherit from others, in this case the configuration
-options from the base class can be used in the derived one.
+The Python test driver defines a group of test classes. Each class represents a mode of operation, and
+multiple tests can use the same test class. A test class is chosen with the `--testclass=TESTCLASS` parameter.
+Some test classes inherit from others, in this case the configuration file keys and command line options from
+the base class are valid in the derived one.
 
-#### OutputManager
-
-This cannot be used as a test class directly, but it serves as base to other test classes.
-Configuration file keys:
-
-    # List of run modes to use for this test
-    runmodes=single,ensemble,master
-
-
-Command line parameters of the test driver:
-
-* `--script=SCRIPT`: the script to run by the test driver. Typically passed in for example as
-`--script=$<TARGET_FILE:1particle1mode>` which will be evaluated by cmake to the full path of either `1particle1mode`
-(release configuration) or `1particle1mode_d` (debug configuration).
-
-#### Runner (derives from OutputManager)
-
-Runs a script and succeeds if the script does.
-Configuration file keys:
-
-    # The options used for running the scripts, multiple keys can be given if they match opts*
-    opts=--etat 8 --sdf 3
-    opts1=--dc 0 --Dt 0.1 --NDt 10
-
-    # The options which are additionally added for the specified run mode
-    # multiple keys can be given if they match <runmode>*
-    single=...
-    ensemble=...
-    master=...
-
-
-#### Verifier (derives from OutputManager)
-
-Verifies the output of a script 'this' to an expected output or the output of some other test run 'other'.
-By default, 'this' is the current test. Configuration file keys:
-
-    # Verify that both trajectories are exactly equal (default if this key is missing)
-    verify=full
-    # OR verify that the last outcome of the simulation is equal (e.g. timesteps may differ)
-    verify=outcome
-
-    # Testname of 'this', by default the current test if missing
-    this=some_test
-    # Testname of 'other', by default the results from the directory of expected results
-    other=some_other_test
-
-If `this=some_test` is specified, it is probably also a good idea to `import=some_test` to keep
-the runmodes in sync. The directory of expected results is `Testing/expected`, it is kept
-under version control so that changes in the output of the scripts are noticed.
-
-#### VerifiedRunner (derives from Runner, Verifier)
-
-Combines the functionality of `Runner` and `Verifier` to a single test.
-
-#### Continuer (derives from Runner)
-
-Runs a script, then continues the trajectory. Succeeds if both runs do. Use `Verifier` to compare the outcome
-to another test or an expected output. Configuration file keys:
-
-    # Options for the first run and the second run, respectively
-    firstrun=...
-    secondrun=...
-
-#### CompileFail
-
-This test succeeds if the compilation of a target fails in an expected way. For this test class, the
-`--script=SCRIPT` parameter is not the path to a binary but a cmake target. The expected failure message
-is passed to the test driver by the `--error=ERROR` command line parameter. The cmake targets which should
-fail to compile are typically defined in `Testing/compilefail` and should be defined with `EXCLUDE_FROM_ALL`
-for obvious reasons.
-
-Command line parameters for the test driver:
-
-* `--script=TARGET`: the cmake target to compile
-* `--error=ERROR`: The test will be considered successful if `ERROR` is found in the output.
-
+\ref Testclasses "This" is a list of all available test classes, together with their recognized
+command line options and configuration file keys.
 
 ## The boost test driver {#testsuite_boost}
 
@@ -232,7 +162,7 @@ contains the whole framework. It can be cloned for read-write access with
 
     $ git clone --recursive -b Development ssh://<username>@git.code.sf.net/p/cppqed/cppqed C++QED
 
-where \<username\> is the SourceForge user name. Note that the git submodules are cloned from read-only
+where `<username>` is the SourceForge user name. Note that the git submodules are cloned from read-only
 URLs, in each submodule you have to set the URL to a read-write one, for example:
 
     $ cd C++QED/CPPQEDcore

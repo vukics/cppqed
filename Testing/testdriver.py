@@ -1,3 +1,11 @@
+## @package testdriver
+# This is the Python testdriver for the \ref testsuite.
+#
+# It is intended to be used with the CMake CTest utility.
+# When called with the parameter `--testclass=<TESTCLASS>`, it calls the `run`
+# method of the specified runner class. Success of a test is indicated by the
+# return value 0.
+
 import logging
 from optparse import OptionParser
 import ConfigParser
@@ -10,10 +18,14 @@ import shutil
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
 
-# helpers
+## @name Helper functions
+# @{
+
+## Create a directory with parent directories.
+# @param path The path to create.
+#
+# From this [stackoverflow question](http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python)
 def mkdir_p(path):
-  """http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python
-  """
   try:
     os.makedirs(path)
   except OSError, exc:
@@ -21,23 +33,59 @@ def mkdir_p(path):
       pass
     else: raise
 
+## Remove a file without error if it doesn't exist.
+# @param filename The file to delete.
+#
+# From this [stackoverflow question](http://stackoverflow.com/a/10840586)
 def rm_f(filename):
-  """http://stackoverflow.com/a/10840586
-  """
   try:
     os.remove(filename)
   except OSError as e: # this would be "except OSError, e:" before Python 2.6
     if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
       raise # re-raise exception if a diff
 
+## @}
+
+## @defgroup TestclassHelpers Helpers
+# @ingroup Testclasses
+# \brief Helper base classes to test classes.
+# These classes cannot be used as a test class directly, but serve as base to other test classes
+# and define some \ref TestclassKeys "configuration file keys" and \ref TestclassOptions "command line options".
+
 class OptionsManager(object):
+  """!
+  @ingroup TestclassHelpers
+  \brief Stores command line options and configuration file keys.
+
+  Each OptionsManager instance has its own section in the configuration file, named after
+  the current test name (OptionsManager::test). If the current section has the key
+  `import=othersection`, import all keys from `othersection` if they are not present already
+  (doesn't work recursively).
+
+  \ref OptionsManager_options "Command line" options this class understands.
+  """
+
+  ## @addtogroup TestclassOptions
+  #
+  # @anchor OptionsManager_options
+  # ## OptionsManager command line options
+  # * `--test=<testname>`: The name of the test. This defines the section in the configuration file
+  #     and also ends up in output files etc.
+
   def __init__(self, options, cp):
-    self.options,self.cp = options,cp
+    """!
+    @param options optparse.Values: object holding all the command line options.
+    @param cp ConfigParser: ConfigParser instance holding all configuration file keys.
+    """
+
+    ## optparse.Values: command line options
+    self.options = options
+    ## ConfigParser: configuration file keys
+    self.cp = cp
+    ## The name of the current test
     self.test = options.test
     if not self.test: sys.exit('--test missing')
 
-    # if the current section has the key 'import=othersection', import all keys from 'othersection'
-    # if they are not present already
     import_section=self.get_option('import')
     if import_section:
       for item in self.cp.items(import_section):
@@ -45,6 +93,15 @@ class OptionsManager(object):
           self.cp.set(self.test, *item)
 
   def get_option(self, name, default=None, required=False):
+    """!
+    Get configuration file keys in a safe way.
+    \param name Name of the key.
+    \param default Default value to return if key does not exist.
+    \param required Fail if True and key does not exist.
+    \return The value to the key.
+
+    This methods looks up the key `name` in the section name OptionsManager::test.
+    """
     if self.cp.has_option(self.test,name):
       return self.cp.get(self.test,name)
     else:
@@ -52,36 +109,115 @@ class OptionsManager(object):
       else: sys.exit("Error: required option {} not found in section {}.".format(name,self.test))
 
 class OutputManager(OptionsManager):
+  """!
+  @ingroup TestclassHelpers
+  \brief Manages output files for different run modes.
+
+  \ref OutputManager_keys "Configuration file keys" this class understands.
+  """
+
+  ## @addtogroup SetupKeys
+  #
+  # * `outuptdir`: All output files end up here.
+  # * `expecteddir`: Where to look for pre-run simulations to compare test runs to.
+
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor OutputManager_keys
+  # ## OutputManager configuration file keys
+  # * `runmodes`: comma separated list of runmodes (single, master ensemble)
+
+
   def __init__(self, *args, **kwargs):
+    """!
+    Arguments are passed through to OptionsManager.
+    """
     OptionsManager.__init__(self, *args, **kwargs)
+    ## All output files end up here.
     self.outputdir   = self.cp.get('Setup','outputdir')
+    ## Where to look for pre-run simulations to compare test runs to.
     self.expecteddir = self.cp.get('Setup','expecteddir')
     mkdir_p(self.outputdir)
 
   def runmodes(self,section=None):
+    """!
+    Return runmodes.
+    \param section (optional) String: Where to look up the runmodes, take current test section if not specified.
+    \return A list of runmodes in this section.
+    """
     if section is None: section=self.test
     return self.cp.get(section, 'runmodes').split(',')
 
   def output(self, runmode, section=None, statefile=False):
+    """!
+    The name of the output file for a given runmode.
+    \param runmode String: The runmode for which the filename should be generated.
+    \param section (optional) String: Output file name for which section, current test section if left empty.
+    \param statefile (optional) Boolean: By default generate the file name for a trajectory file. If set to true
+      generate the file name for a state file.
+    \return Full path including OutputManager::outputdir.
+    """
     if section is None: section=self.test
     output = os.path.join(self.outputdir, section+'_'+runmode)
     if statefile: output+=".state"
     return output
 
   def clean(self, runmode):
+    """!
+    Delete the trajectory file and state file for a given runmode.
+    \param runmode String: The runmode for which output files should be deleted.
+    """
     rm_f(self.output(runmode))
     rm_f(self.output(runmode,statefile=True))
+
 
 # The test classes
 
 class Runner(OutputManager):
+  """!
+  @ingroup Testclasses
+  Runs a script repeatedly for all declared runmodes and succeeds if the scripts do.
+
+  \ref Runner_keys "Configuration file keys" this class understands.
+  """
   def run(self, clean=True, extra_opts=None, *args, **kwargs):
+    """!
+    The method to run the test.
+    \param clean (optional) `Boolean`: Whether to remove old output before running the test.
+    \param extra_opts (optional) `List`: Additional command line options appended to the script call.
+    \param args passed through to `subprocess.call`
+    \param kwargs passed through to `subprocess.call`
+
+    This method terminates the test driver with a return value equal to that of the script call
+    if one of the scripts fail.
+    """
     for runmode in self.runmodes():
       if clean: self.clean(runmode)
       command = self._build_commandline(runmode,extra_opts)
       logging.debug(subprocess.list2cmdline(command))
       ret = subprocess.call(command, *args, **kwargs)
       if not ret==0: sys.exit(ret)
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor Runner_keys
+  # ## Runner configuration file keys
+  # * `opts*`: The command line options used for running the script, multiple keys matching `opts*` can be given
+  # * `single*`, `master*`, `ensemble*`: Additional options for the specific runmodes. Multiple keys
+  #     matching `<runmode>*` can be given.
+  #
+  # Example usage:
+  #
+  #     # The options used for running the scripts, multiple keys can be given if they match opts*
+  #     opts=--etat 8 --sdf 3
+  #     opts1=--dc 0 --Dt 0.1 --NDt 10
+  #
+  #     # runmode specific options
+  #     single=...
+  #     single1=...
+  #     ensemble=...
+  #     master=...
 
   def _extend_opts(self, options, section, option_prefix):
     for option in sorted([ item[0] for item in self.cp.items(section) if item[0].startswith(option_prefix)]):
@@ -90,7 +226,12 @@ class Runner(OutputManager):
   def _build_commandline(self, runmode, extra_opts=None):
     result = [self.options.script]
     if extra_opts: result+=extra_opts
-    self._extend_opts(result, 'Scripts','opts')
+
+    ## @addtogroup SetupKeys
+    #
+    # * `opts`: Script command line options added to all scripts
+
+    self._extend_opts(result, 'Setup','opts')
     self._extend_opts(result, self.test,'opts')
     self._extend_opts(result, self.test,runmode)
 
@@ -99,7 +240,31 @@ class Runner(OutputManager):
     return result
 
 class PythonRunner(Runner):
-  def run(self, clean=True):
+  """!
+  @ingroup Testclasses
+  Runs a cpypyqed script repeatedly for all declared runmodes and succeeds if the scripts do.
+
+  \ref PythonRunner_options "Configuration file keys" this class understands.
+  """
+
+  ## @addtogroup TestclassOptions
+  #
+  # @anchor PythonRunner_options
+  # ## PythonRunner command line options
+  # * `--cpypyqed_builddir=<dir>`: Directory for on-demand compilation
+  # * `--cpypyqed_config=<config-file>`: Configuration file for on-demand compilation
+
+  def run(self, clean=True, extra_opts=None, *args, **kwargs):
+    """!
+    The method to run the test.
+    \param clean (optional) `Boolean`: Whether to remove old output before running the test.
+    \param extra_opts (optional) `List`: Additional command line options appended to the script call.
+    \param args passed through to Runner.run()
+    \param kwargs passed through to Runner.run()
+
+    This method terminates the test driver with a return value equal to that of the script call
+    if one of the scripts fail.
+    """
     cpypyqed_builddir = self.options.cpypyqed_builddir
     cpypyqed_config   = self.options.cpypyqed_config
     env = os.environ.copy()
@@ -113,12 +278,41 @@ class PythonRunner(Runner):
     Runner.run(self,clean=clean,extra_opts=extra_opts,env=env,*args,**kwargs)
 
 class Verifier(OutputManager):
+  """!
+  @ingroup Testclasses
+  Verifies the output of a script 'this' to an expected output or the output of some other test run 'other'
+  """
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor Verifier_keys
+  # ## Verifier configuration file keys
+  # The Verifier compares some test 'this' to another test 'other'.
+  # * `this`: Test name of 'this', by default the current test if missing
+  # * `other`: Testname of 'other', by default the results from the directory of expected results
+  #     (OutputManager::expecteddir)
+  # * `verify`: Verify that both trajectories are exactly equal (default if this key is missing or
+  #     `verify=full`), or verify that the last outcome of the simulation is equal, e.g. timesteps may differ
+  #     (`verify=outcome`)
+  #
+  # If `this=some_test` is specified, it is probably also a good idea to `import=some_test` to keep
+  # the runmodes in sync. Currently the directory of expected results is `Testing/expected`, it is kept
+  # under version control so that changes in the output of the scripts are noticed.
+
+
   def __init__(self,*args,**kwargs):
+    """!
+    \param args passed through to OutputManager
+    \param kwargs passed through to OutputManager
+    """
     OutputManager.__init__(self,*args,**kwargs)
     self.thisSection  = self.get_option('this',default=self.test)
     self.otherSection = self.get_option('other')
 
   def run(self):
+    """!
+    Run the test.
+    """
     mode=self.get_option('verify')
     if mode is None or mode=='full':
       self._verify_full()
@@ -159,18 +353,41 @@ class Verifier(OutputManager):
     else: self._equiv(this,other)
 
 class VerifiedRunner(Runner,Verifier):
+  """!
+  @ingroup Testclasses
+  Combines the functionality of Runner and Verifier to a single test.
+  """
+
   def run(self):
+    """!
+    Run the test.
+    """
     Runner.run(self)
     Verifier.run(self)
 
-def ContinueFactory(base,*args,**kwargs):
-  class GenericContinuer(base):
-    def run(self):
-      self.cp.set(self.test,'opts_thisrun',self.get_option('firstrun',default=''))
-      base.run(self)
-      self.cp.set(self.test,'opts_thisrun',self.get_option('secondrun',default=''))
-      base.run(self,clean=False)
-  return GenericContinuer(*args,**kwargs)
+class GenericContinuer(OptionsManager):
+  """!
+  @ingroup TestclassHelpers
+  This class hosts continued_run(), which will run and then continue a script.
+  """
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor GenericContinuer_keys
+  # ## GenericContinuer configuration file keys
+  # * `firstrun`: script options for the first run
+  # * `secondrun`: script options for the second run
+
+  def continued_run(self, runfn, *args, **kwargs):
+    """!
+    Run, then continue a script.
+    \param runfn Function: The run function to call.
+    \param args passed through to `runfn`
+    \param kwargs passed through to `runfn`
+    """
+    runfn(self, extra_opts=self.get_option('firstrun',default='').split(), *args, **kwargs)
+    runfn(self, clean=False, extra_opts=self.get_option('secondrun',default='').split(), *args, **kwargs)
+
 class Continuer(Runner, GenericContinuer):
   """!
   @ingroup Testclasses
@@ -212,7 +429,29 @@ class PythonContinuer(PythonRunner, GenericContinuer):
     GenericContinuer.continued_run(self, PythonRunner.run, *args, **kwargs)
 
 class CompileFail(OptionsManager):
+  """!
+  @ingroup Testclasses
+  This test succeeds if the compilation of a target fails in an expected way.
+
+  \ref CompileFail_options "Command line options" this class understands.
+  """
+
+  ## @addtogroup SetupKeys
+  #
+  # * `cmake`: Path of the cmake executable
+  # * `builddir`: Top-level build directory
+
+  ## @addtogroup TestclassOptions
+  #
+  # @anchor CompileFail_options
+  # ## CompileFail command line options
+  # * `--script`: The name of the target to compile.
+  # * `--error`: The error message which is expected in the output.
+
   def run(self):
+    """!
+    Runs the test.
+    """
     error=self.options.error
     cmake=self.cp.get('Setup','cmake')
     builddir=self.cp.get('Setup','builddir')
@@ -227,6 +466,12 @@ class CompileFail(OptionsManager):
       sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
 
 def main():
+  """!
+  \brief Main function of the Python test driver.
+
+  Command line options are defined here. It is responsible of loading the right `cpypyqed` module
+  (release or debug) as well as instantiating and running the test class.
+  """
   op = OptionParser()
   cp = ConfigParser.SafeConfigParser()
 

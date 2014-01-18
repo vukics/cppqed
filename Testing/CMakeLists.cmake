@@ -43,6 +43,7 @@ if(TEST_VERBOSE)
 endif()
 
 #! \brief Initialize a sub-directory of the test suite.
+#! \ingroup Helpers
 #! \param dir The sub-directory name.
 #! \return `TESTSCRIPT` - set to the command by which to call the Python test driver.
 #!
@@ -60,6 +61,7 @@ macro(testdir dir)
 endmacro()
 
 #! \brief Declare a new test.
+#! \ingroup Helpers
 #! \param name Name of the test. Avoid any special characters (+,\,$ etc), which might be mis-interpreted in a regular expression.
 #! \return `TESTNAME` - holds the name of the test.
 #!

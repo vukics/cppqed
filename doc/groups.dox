@@ -35,3 +35,22 @@
 /// Note that this is a template which is being used both for the regular and for custom elements
 /// projects. In this documentation, all variables which contain `PROJECT_NAME` have to be considered
 /// with `PROJECT_NAME` properly replaced, e.g. `CPPQEDelements_LIBRARIES` etc.
+
+/// \defgroup Testsuite Test suite
+/// \brief Reference documentation of the test suite components.
+
+/// \defgroup Testclasses Test classes
+/// \ingroup Testsuite
+/// \brief Test classes of the Python testdriver, which define the mode of operation.
+
+/// \addtogroup TestclassOptions Command line options
+/// \ingroup Testclasses
+/// \brief Collected command line options of all test classes
+
+/// \addtogroup TestclassKeys Configuration file keys
+/// \ingroup Testclasses
+/// \brief Collected configuration file keys of all test classes
+
+/// \addtogroup SetupKeys Configuration file Setup section
+/// \ingroup Testsuite
+/// \brief Configuration file keys in the `[Setup]` category, configuring global behavior.
