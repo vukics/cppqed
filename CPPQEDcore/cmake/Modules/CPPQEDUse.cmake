@@ -381,7 +381,7 @@ endmacro()
 #! The template `doc/Doxyfile` will be copied to `CONF_DOC_DIR`, expanding all @-variables within.
 macro(cppqed_documentation target_prefix tagfiles)
 
-  find_package(Doxygen QUIET)
+  find_package(Doxygen 1.8 QUIET)
   set(tagfiles ${tagfiles})
 
   set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
