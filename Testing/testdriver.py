@@ -108,8 +108,9 @@ class PythonRunner(Runner):
       if clean: shutil.rmtree(os.path.join(cpypyqed_builddir,'cppqedmodules'),ignore_errors=True)
     if cpypyqed_config: env['CPYPYQED_CONFIG']=cpypyqed_config
     env['PYTHONPATH']=self.cp.get('Setup','modulepath')
-    extra_opts = [] if self.options.configuration.lower()=="release" else ['--debug']
-    Runner.run(self,clean=clean,env=env,extra_opts=extra_opts)
+    if extra_opts is None: extra_opts = []
+    if self.options.configuration.lower()=="debug": extra_opts += ['--debug']
+    Runner.run(self,clean=clean,extra_opts=extra_opts,env=env,*args,**kwargs)
 
 class Verifier(OutputManager):
   def __init__(self,*args,**kwargs):
@@ -170,23 +171,59 @@ def ContinueFactory(base,*args,**kwargs):
       self.cp.set(self.test,'opts_thisrun',self.get_option('secondrun',default=''))
       base.run(self,clean=False)
   return GenericContinuer(*args,**kwargs)
+class Continuer(Runner, GenericContinuer):
+  """!
+  @ingroup Testclasses
+  GenericContinuer version of Runner.
 
-def Continuer(*args,**kwargs):
-  return ContinueFactory(Runner,*args,**kwargs)
+  \ref GEnericContinuer_keys "Configuration file keys" this class understands.
+  """
 
-def PythonContinuer(*args,**kwargs):
-  return ContinueFactory(PythonRunner,*args,**kwargs)
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor Continuer
+  # ## Continuer configuration file keys
+  # See \ref GenericContinuer_keys "GenericContinuer keys".
+
+  def run(self, *args, **kwargs):
+    """!
+    Delegates to GenericContinuer::continued_run().
+    """
+    GenericContinuer.continued_run(self, Runner.run, *args, **kwargs)
+
+class PythonContinuer(PythonRunner, GenericContinuer):
+  """!
+  @ingroup Testclasses
+  GenericContinuer version of PythonRunner.
+
+  \ref GEnericContinuer_keys "Configuration file keys" this class understands.
+  """
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor PythonContinuer
+  # ## PythonContinuer configuration file keys
+  # See \ref GenericContinuer_keys "GenericContinuer keys".
+
+  def run(self, *args, **kwargs):
+    """!
+    Delegates to GenericContiuer::continued_run().
+    """
+    GenericContinuer.continued_run(self, PythonRunner.run, *args, **kwargs)
 
 class CompileFail(OptionsManager):
   def run(self):
     error=self.options.error
-    command=['make',self.options.script]
+    cmake=self.cp.get('Setup','cmake')
+    builddir=self.cp.get('Setup','builddir')
+    command=[cmake,'--build',builddir,'--target',self.options.script]
+    logging.debug(subprocess.list2cmdline(command))
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (std,err) = p.communicate()
     returncode = p.returncode
     if returncode == 0:
       sys.exit("Compilation was successfull, but failure was expected.")
-    if not error in err:
+    if not error in std:
       sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
 
 def main():
@@ -203,6 +240,7 @@ def main():
 
   (options,args) = op.parse_args()
 
+  if len(args)==0: op.error("Need configuration file(s) as argument(s).")
   cp.read(args)
   sys.path.insert(0,cp.get('Setup','modulepath'))
   # we can only load the io module after we know where to look for the cpypyqed package

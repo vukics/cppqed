@@ -1,7 +1,7 @@
-[Scripts]
-opts=--precision 6 --epsAbs 1e-5 --logLevel 2
-
 [Setup]
+opts=--precision 6 --epsAbs 1e-5 --logLevel 2
 modulepath=@cpypyqed_BINARY_DIR@
 outputdir=output
 expecteddir=@testing_SOURCE_DIR@/expected
+cmake=@CMAKE_COMMAND@
+builddir=@CMAKE_BINARY_DIR@
