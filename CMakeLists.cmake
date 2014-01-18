@@ -61,6 +61,7 @@ set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
 find_package(Boost QUIET COMPONENTS python)
 if(Boost_PYTHON_FOUND AND COMPILE_CPYPYQED)
+  set(ENABLE_CPYPYQED 1)
   add_subdirectory(cpypyqed)
 endif()
 
@@ -88,7 +89,7 @@ add_subdirectory(Testing)
 #! is generated with cppqed_documentation(), and a target "doc" for the full documentation is created,
 #! which depends on all the component documentation targets.
 
-find_package(Doxygen QUIET)
+find_package(Doxygen 1.8)
 if(DOXYGEN_FOUND)
   include(${core_SOURCE_DIR}/cmake/Modules/CPPQEDUse.cmake)
   add_executable(CMakeDoxygenFilter doc/CMakeDoxygenFilter.cpp)
@@ -123,4 +124,5 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/debianbuild)
   add_subdirectory(debianbuild)
 endif()
 
+add_feature_info("cpypyqed" ENABLE_CPYPYQED "Python part of C++QED (wrapper and input/output).")
 feature_summary( WHAT ALL )
