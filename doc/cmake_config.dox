@@ -1,0 +1,82 @@
+/*!
+\addtogroup Config
+
+# ProjectConfig.cmake file concept
+
+%Cmake can export library targets, which other projects can import and use (both external or sub-projects).
+For this to work, a special file `ProjectConfig.cmake` (in our case for example `CPPQEDConfig.cmake`) has to
+be \ref cmake_config_create "created", so that it can be loaded by %CMake's
+[find_package() command](http://www.cmake.org/cmake/help/v2.8.12/cmake.html#command:find_package).
+
+Imported library targets cannot be built by the importing project. However, they can be used for linking
+and are included in dependency checks, i.e. if the imported library changes targets using them are
+re-linked.
+
+Typically, besides announcing targets to the importing project, the `ProjectConfig.cmake` also
+defines a couple of variables, e.g. where to find the header files, which compile flags to use,
+which features of the library are available etc.
+
+It is also possible to create two versions of the `ProjectConfig.cmake` file: one to be used with
+the build tree and one which gets installed along with the library. In order that importing
+projects can find the build tree version, the build tree has to be recorded in
+%CMakes [package registry](http://www.cmake.org/Wiki/CMake/Tutorials/Package_Registry), or the importing
+project has to be configured with `-DProject_DIR`. The installed version of `ProjectConfig.cmake`
+is found automatically if the install prefix points to a system directory, otherwise one can
+configure the importing project with `-DCMAKE_PREFIX_PATH`.
+
+One has to make sure, when creating the two versions of `ProjectConfig.cmake`, that the variables
+propagated within are pointing to the right paths, respectively (e.g. include directory paths).
+
+Together with the config file, typically a version file `ProjectConfigVersion.cmake` is created.
+The version file tells `find_package()` whether this library is compatible with the version
+requested by `find_package()`. In C++QED, only the major and minor part of the version is recorded
+(2.9 for the master branch and 2.99 for the development branch), and only an exact match is allowed,
+because master and development branch are incompatible to each other.
+
+# Creating config files {#cmake_config_create}
+
+In C++QED, `ProjectConfig.cmake` files are created for the core and elements components, and used in
+every sub-project which depends on core or elements. The former is named `CPPQEDConfig.cmake`, and the
+latter is called `CPPQEDelementsConfig.cmake`. For each custom elements project, a config file
+`CPPQED<elementprojectname>Config.cmake` is created automatically by elements_project().
+
+The creation of the project config files goes along the lines of
+[this tutorial](http://www.cmake.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file), with
+two exceptions: The `ProjectConfigVersion.cmake` file is created without a template by calling
+[write_basic_package_version_file()][configure_package], and we make use of
+[configure_package_config_file()][configure_package], which helps making the resulting package relocatable.
+
+To sum it up, these are the main steps. After writing a `ProjectConfig.cmake.in` template which includes the
+file `<export-name>.cmake` form the directory `${CONF_CMAKE_DIR}`, in the main `CMakeLists.txt` one has to:
+
+- `install(TARGETS ... EXPORT <export-name> ...`:
+    This signature of [install()][cmake_install]
+    registers the mentioned target (library) to belong to an export set `<export-name>`.
+- `install(EXPORT <export-name> ...)`:
+    This signature of [install()][cmake_install]
+    generates and installs a %Cmake script which describes where to find the exported targets.
+    This will be called `<export-name>.cmake`, it is included in the `ProjectConfig.cmake` file.
+- `export(TARGETS ... FILE ...)`:
+    This [command](http://www.cmake.org/cmake/help/v2.8.12/cmake.html#command:export) is the equivalent
+    of `install(EXPORT ...)` for the build tree. If one selects the same target as in
+    `install(TARGETS ...)` and chooses `<export-name>.cmake` as file name, one can write a template
+    for `ProjectConfig.cmake` which works in both situations, installed and in build-tree.
+- Generate the `ProjectConfig.cmake` from its template in the build tree. Set configure variables to their appropriate
+    values for the build tree (most importantly set `CONF_CMAKE_DIR` to the build tree) and call
+    [configure_package_config_file()][configure_package] with the
+    destination set to the build directory `${PROJECT_BINARY_DIR}`.
+- Generate the version file in the build tree with a call to [write_basic_package_version_file()][configure_package].
+- Generate the `ProjectConfig.cmake` from its template for the installation. Set configure variables to their
+    appropriate values for the installed package (most importantly set `CONF_CMAKE_DIR` to the directory where
+    our cmake files end up in the install directory) and again call
+    [configure_package_config_file()][configure_package],
+    this time with the destination set to a sub-directory of the build tree (we use
+    `${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}`).
+- Install the `ProjectConfig.cmake` from `${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}` and the
+    `ProjectConfigVersion.cmake` from the build directory to the system.
+
+
+[cmake_install]: http://www.cmake.org/cmake/help/v2.8.12/cmake.html#command:install
+[configure_package]: http://www.cmake.org/cmake/help/v2.8.12/cmake.html#module:CMakePackageConfigHelpers
+
+*/
