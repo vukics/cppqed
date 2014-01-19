@@ -156,6 +156,7 @@ endmacro()
 #! - Generate an appropriate `CPPQED${PROJECT_NAME}ConfigVersion.cmake` and `CPPQED${PROJECT_NAME}Config.cmake` file, which
 #!  ensure that other projects can find the current library by calling, e.g. `find_package(CPPQEDelements)`. Two versions of these
 #!  files are generated, one suitable for the build tree and one which is getting installed along with the library.
+#!  For details, see \ref Config "this" page.
 #!
 #! Typical usage in a custom elements project:
 #!
