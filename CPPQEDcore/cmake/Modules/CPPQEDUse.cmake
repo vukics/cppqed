@@ -385,6 +385,12 @@ macro(cppqed_documentation target_prefix tagfiles)
   find_package(Doxygen 1.8 QUIET)
   set(tagfiles ${tagfiles})
 
+  #! \brief Install directory of the Doxygen documentation.
+  #!
+  #! Note that doxygen documentation can only be installed in monolithic builds. This
+  #! variable is set in cppqed_documentation().
+  set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
+
   set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
 
   if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
