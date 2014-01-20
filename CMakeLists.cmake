@@ -31,12 +31,6 @@ include(GNUInstallDirs)
 #! \brief Other subprojects use this variable to determine if this is a monolithic build
 set(CPPQED_MONOLITHIC 1)
 
-#! \brief Install directory of the Doxygen documentation.
-#!
-#! Note that doxygen documentation can only be installed in monolithic builds. This
-#! variable is used in cppqed_documentation().
-set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
-
 #! @}
 
 #! \file
@@ -82,7 +76,7 @@ add_subdirectory(Testing)
 #!
 #! This section builds the Doxygen documentation (if Doxygen is found) and furthermore
 #! installs the example projects "CustomElementsExample" and "CustomScriptsExample" to
-#! the system.
+#! the system. The install location \ref CMake::CPPQED_DOC_DIR "CPPQED_DOC_DIR" is set in cppqed_documentation().
 #!
 #! For the Doxygen documentation, the filter [CMakeDoxygenFilter](https://github.com/saschazelzer/CMakeDoxygenFilter),
 #! is compiled, which allows to document %CMake in Doxygen. The overall C++QED documentation
