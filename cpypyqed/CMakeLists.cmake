@@ -261,7 +261,7 @@ endforeach()
 #! target is named `cpypyqed_doc`. In monolithic mode, the resulting html
 #! directory is installed to the system.
 
-find_package(Doxygen)
+find_package(Doxygen 1.8)
 find_package(Sphinx)
 find_package(Doxylink)
 
