@@ -102,6 +102,15 @@ if(CPPQED_MONOLITHIC)
   set(CPPQED_ABI_MAJOR ${CPPQED_ABI_MAJOR} PARENT_SCOPE)
 endif()
 
+#! \name Project options
+#! @{
+
+#! Override the git sha commit information with this value. Used in automated builds
+#! where git is not available.
+set(GIT_SHA_OVERRIDE "" CACHE STRING "Override the git sha version information.")
+
+#! @}
+
 #! \file
 #! <!--#########################################################-->
 #! ### Installation directories

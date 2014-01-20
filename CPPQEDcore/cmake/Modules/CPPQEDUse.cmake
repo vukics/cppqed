@@ -382,7 +382,7 @@ endmacro()
 #! The template `doc/Doxyfile` will be copied to `CONF_DOC_DIR`, expanding all @-variables within.
 macro(cppqed_documentation target_prefix tagfiles)
 
-  find_package(Doxygen 1.8 QUIET)
+  find_package(Doxygen 1.8)
   set(tagfiles ${tagfiles})
 
   #! \brief Install directory of the Doxygen documentation.

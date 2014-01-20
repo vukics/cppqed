@@ -33,20 +33,13 @@ get_filename_component(_gitdescmoddir ${CMAKE_CURRENT_LIST_FILE} PATH)
 #!
 #! Additional arguments are passed through to `git describe`.
 #!
-#! If the file `.bzr/branch/last-revision` exists, both `_refspecvar` and
-#! `_hashvar` are set to this hash value. In the automated debian builds, C++QED
-#! is built from bazaar branches which are converted from git repositories. The
-#! information about the git commit are preserved in the file `last-revision` and
-#! made available to the build system this way.
+#! If the variable \ref CMake::GIT_SHA_OVERRIDE "GIT_SHA_OVERRIDE" is defined, both `_refspecvar` and
+#! `_hashvar` are set to this value. This is used to set something meaningful
+#! in automated Debian builds, where the git repository is not available.
 function(get_git_head_revision _refspecvar _hashvar)
-  # Ubuntu packages use bzr branches cloned from git. If .bzr exists, try to extract
-  # the git commit from this directory. This does not run cmake automatically if the
-  # last-revision file changes.
-  if(EXISTS ${PROJECT_SOURCE_DIR}/.bzr/branch/last-revision)
-    file(READ ${PROJECT_SOURCE_DIR}/.bzr/branch/last-revision bzr_branch)
-    string(REGEX REPLACE ".*:(.*)\n$" "\\1" HEAD_HASH ${bzr_branch})
-    set(${_refspecvar} "${HEAD_HASH}" PARENT_SCOPE)
-    set(${_hashvar} "${HEAD_HASH}" PARENT_SCOPE)
+  if(GIT_SHA_OVERRIDE)
+    set(${_refspecvar} "${GIT_SHA_OVERRIDE}" PARENT_SCOPE)
+    set(${_hashvar} "${GIT_SHA_OVERRIDE}" PARENT_SCOPE)
     return()
   endif()
 
