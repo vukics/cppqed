@@ -428,12 +428,16 @@ class PythonContinuer(PythonRunner, GenericContinuer):
     """
     GenericContinuer.continued_run(self, PythonRunner.run, *args, **kwargs)
 
-class CompileFail(OptionsManager):
+class CompileTarget(OptionsManager):
   """!
   @ingroup Testclasses
-  This test succeeds if the compilation of a target fails in an expected way.
+  \brief This test tries to compile a %CMake target.
 
-  \ref CompileFail_options "Command line options" this class understands.
+  If the `--error` option is not given,
+  the test succeeds if the target can be compiled, otherwise the test succeeds if the
+  compilation fails and the string specified together with `--error` is found.
+
+  \ref CompileTarget_options "Command line options" this class understands.
   """
 
   ## @addtogroup SetupKeys
@@ -443,10 +447,10 @@ class CompileFail(OptionsManager):
 
   ## @addtogroup TestclassOptions
   #
-  # @anchor CompileFail_options
-  # ## CompileFail command line options
+  # @anchor CompileTarget_options
+  # ## CompileTarget command line options
   # * `--script`: The name of the target to compile.
-  # * `--error`: The error message which is expected in the output.
+  # * `--error`: The error message which is expected in the output in "failure" mode
 
   def run(self):
     """!
@@ -460,10 +464,14 @@ class CompileFail(OptionsManager):
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (std,err) = p.communicate()
     returncode = p.returncode
-    if returncode == 0:
-      sys.exit("Compilation was successfull, but failure was expected.")
-    if not error in std:
-      sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
+    if error:
+      if returncode == 0:
+        sys.exit("Compilation was successfull, but failure was expected.")
+      if not error in std:
+        sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
+    else:
+      if returncode != 0:
+        sys.exit("Compilation of {} failed.".format(self.script))
 
 def main():
   """!
@@ -481,7 +489,7 @@ def main():
   op.add_option("--configuration", help="debug or release")
   op.add_option("--cpypyqed_builddir", help="directory for on-demand module compilation")
   op.add_option("--cpypyqed_config", help="configure file for on-demand module compilation")
-  op.add_option("--error", metavar='STRING', help="string to expect in the compilation failure for CompileFail class")
+  op.add_option("--error", metavar='STRING', help="expect error for CompileTarget class, look for STRING in output")
 
   (options,args) = op.parse_args()
 
