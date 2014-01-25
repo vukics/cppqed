@@ -444,34 +444,49 @@ class CompileTarget(OptionsManager):
   #
   # * `cmake`: Path of the cmake executable
   # * `builddir`: Top-level build directory
+  # * `
 
   ## @addtogroup TestclassOptions
   #
   # @anchor CompileTarget_options
   # ## CompileTarget command line options
   # * `--script`: The name of the target to compile.
-  # * `--error`: The error message which is expected in the output in "failure" mode
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor CompileTarget_keys
+  # ## CompileTarget configuration file keys
+  # * `error`: Turn on "failure mode". The error message which is expected in the output.
+  # * `dependencies`: Space separated list of dependencies to compile first. These are
+  #     always required to succeed, independent of the presence of `error`.
 
   def run(self):
     """!
     Runs the test.
     """
-    error=self.options.error
+    error=self.get_option('error')
     cmake=self.cp.get('Setup','cmake')
     builddir=self.cp.get('Setup','builddir')
-    command=[cmake,'--build',builddir,'--target',self.options.script]
-    logging.debug(subprocess.list2cmdline(command))
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    command=[cmake,'--build',builddir,'--target']
+    dependencies=self.get_option('dependencies',default="").split()
+    for dep in dependencies:
+      logging.debug(subprocess.list2cmdline(command+[dep]))
+      p = subprocess.Popen(command+[dep], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+      (std,err) = p.communicate()
+      if not p.returncode==0:
+        sys.exit("Compilation of dependency {} for {} failed.".format(dep,self.options.script))
+    logging.debug(subprocess.list2cmdline(command+[self.options.script]))
+    p = subprocess.Popen(command+[self.options.script], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (std,err) = p.communicate()
     returncode = p.returncode
-    if error:
+    if error is None:
+      if returncode != 0:
+        sys.exit("Compilation of {} failed.".format(self.options.script))
+    else:
       if returncode == 0:
-        sys.exit("Compilation was successfull, but failure was expected.")
+        sys.exit("Compilation was successful, but failure was expected.")
       if not error in std:
         sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
-    else:
-      if returncode != 0:
-        sys.exit("Compilation of {} failed.".format(self.script))
 
 def main():
   """!
@@ -489,7 +504,6 @@ def main():
   op.add_option("--configuration", help="debug or release")
   op.add_option("--cpypyqed_builddir", help="directory for on-demand module compilation")
   op.add_option("--cpypyqed_config", help="configure file for on-demand module compilation")
-  op.add_option("--error", metavar='STRING', help="expect error for CompileTarget class, look for STRING in output")
 
   (options,args) = op.parse_args()
 
