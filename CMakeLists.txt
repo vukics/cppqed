@@ -41,7 +41,11 @@ set(CPPQED_MONOLITHIC 1)
 #! Compile the components core, elements, scripts (optional) and cpypyqed (optional)
 #! by adding their sub-directories.
 #!
-#! Also include the test suite.
+#! This section also includes the test suite and defines some more targets needed in the test suite:
+#! `clean-customelements` and `clean-customscripts` cleans only the directories
+#! `CustomElementsExample` and `CustomScriptsExample`, respectively. These two directories are
+#! added with `EXCLUDE_FROM_ALL`, they are compiled as part of a test to keep them in sync with the
+#! rest of the framework.
 
 add_subdirectory(CPPQEDcore)
 set(CPPQED_DIR ${core_BINARY_DIR})
@@ -68,6 +72,15 @@ if(COMPILE_SCRIPTS)
 endif()
 
 add_subdirectory(Testing)
+
+add_subdirectory(CustomElementsExample EXCLUDE_FROM_ALL)
+add_custom_target(clean-customelements
+                    COMMAND ${CMAKE_BUILD_TOOL} clean
+                    WORKING_DIRECTORY ${elements_custom_example_BINARY_DIR})
+add_subdirectory(CustomScriptsExample EXCLUDE_FROM_ALL)
+add_custom_target(clean-customscripts
+                    COMMAND ${CMAKE_BUILD_TOOL} clean
+                    WORKING_DIRECTORY ${scripts_custom_example_BINARY_DIR})
 
 #! \file
 #! <!--#########################################################-->
