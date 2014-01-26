@@ -74,6 +74,7 @@ endif()
 add_subdirectory(Testing)
 
 add_subdirectory(CustomElementsExample EXCLUDE_FROM_ALL)
+set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
 add_custom_target(clean-customelements
                     COMMAND ${CMAKE_BUILD_TOOL} clean
                     WORKING_DIRECTORY ${elements_custom_example_BINARY_DIR})
