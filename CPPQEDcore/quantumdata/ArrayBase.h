@@ -9,6 +9,8 @@
 #include "CMatrix.h"
 #include "ComplexArrayExtensions.h"
 
+#include <boost/utility.hpp>
+
 
 namespace quantumdata {
 

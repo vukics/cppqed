@@ -5,7 +5,7 @@
 
 #include "BlitzArraySliceIteratorFwd.h"
 
-#include "BlitzArray.h"
+#include "BlitzArrayTraits.h"
 #include "MultiIndexIterator.h"
 #include "TMP_Tools.h"
 
@@ -22,6 +22,10 @@
 
 
 namespace blitzplusplus {
+
+
+using cpputils::Rank;
+
 
 /// The name of the namespace stands for <strong>B</strong>litz<strong>A</strong>rray<strong>S</strong>lice<strong>I</strong>terator
 namespace basi {
@@ -324,7 +328,7 @@ public:
 
 
 #define NS_NAME basi
-#define RETURN_type1(IS_CONST) Iterator<ArrayRankTraits<A>::value,V_S,IS_CONST>
+#define RETURN_type1(IS_CONST) Iterator<Rank<A>::value,V_S,IS_CONST>
 #define ADDITIONAL_PARAMETER
 #define ADDITIONAL_ARGUMENT
 
@@ -533,9 +537,9 @@ private:
 
 
 #define NS_NAME basi_fast
-#define RETURN_type1(IS_CONST) Iterator<ArrayRankTraits<A>::value,V_S,IS_CONST>
+#define RETURN_type1(IS_CONST) Iterator<Rank<A>::value,V_S,IS_CONST>
 #define ADDITIONAL_PARAMETER , sd
-#define ADDITIONAL_ARGUMENT  , const SlicesData<ArrayRankTraits<A>::value,V_S>& sd
+#define ADDITIONAL_ARGUMENT  , const SlicesData<Rank<A>::value,V_S>& sd
 
 #include "details_BlitzArraySliceIteratorReentrant.h"
 
@@ -548,22 +552,22 @@ namespace basi {
 /// Iterator to the beginning of the sequence
 //@{
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,true>
+const Iterator<Rank<A>::value,V,true>
 begin(const A& array );
 
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,false>
+const Iterator<Rank<A>::value,V,false>
 begin(      A& array );
 //@}
 
 /// Iterator to the end of the sequence
 //@{
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,true>
+const Iterator<Rank<A>::value,V,true>
 end (const A& array );
 
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,false>
+const Iterator<Rank<A>::value,V,false>
 end (      A& array );
 //@}
 
@@ -571,11 +575,11 @@ end (      A& array );
 /** It corresponds to all the possible combinations of dummy indices (\f$\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\f$…) \ref retainedindexpositionsdefined "above". */
 //@{
 template<typename V, typename A>
-const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,true> >
+const boost::iterator_range<Iterator<Rank<A>::value,V,true> >
 fullRange(const A& array );
 
 template<typename V, typename A>
-const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,false> >
+const boost::iterator_range<Iterator<Rank<A>::value,V,false> >
 fullRange(      A& array );
 //@}
 
@@ -586,28 +590,28 @@ namespace basi_fast {
 /// Same as blitzplusplus::basi::begin, blitzplusplus::basi::end, and blitzplusplus::basi::fullRange, respectively, but here they return “fast” Iterator instances.
 //@{
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,true>
-begin(const A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+const Iterator<Rank<A>::value,V,true>
+begin(const A& array , const SlicesData<Rank<A>::value,V>& sd);
 
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,true>
-end (const A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+const Iterator<Rank<A>::value,V,true>
+end (const A& array , const SlicesData<Rank<A>::value,V>& sd);
 
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,false>
-begin(     A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+const Iterator<Rank<A>::value,V,false>
+begin(     A& array , const SlicesData<Rank<A>::value,V>& sd);
 
 template<typename V, typename A>
-const Iterator<ArrayRankTraits<A>::value,V,false>
-end (      A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+const Iterator<Rank<A>::value,V,false>
+end (      A& array , const SlicesData<Rank<A>::value,V>& sd);
 
 template<typename V, typename A>
-const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,true> >
-fullRange(const A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+const boost::iterator_range<Iterator<Rank<A>::value,V,true> >
+fullRange(const A& array , const SlicesData<Rank<A>::value,V>& sd);
 
 template<typename V, typename A>
-const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,V,false> >
-fullRange(      A& array , const SlicesData<ArrayRankTraits<A>::value,V>& sd);
+const boost::iterator_range<Iterator<Rank<A>::value,V,false> >
+fullRange(      A& array , const SlicesData<Rank<A>::value,V>& sd);
 //@}
 
 } // basi_fast

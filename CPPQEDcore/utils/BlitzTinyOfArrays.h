@@ -16,6 +16,10 @@
 namespace blitzplusplus {
 
 
+struct ShallowCopy {}; // For referencing constructors
+struct DeepCopy    {}; // For copying     constructors
+
+
 template<typename T, int RANK, int LENGTH>
 bool operator==(const TinyOfArrays<T,RANK,LENGTH>&, const TinyOfArrays<T,RANK,LENGTH>&);
 
@@ -38,7 +42,6 @@ public:
   typedef typename Base::const_iterator const_iterator;
   
   using Base::operator=;
-
 
   // In all the constructors the base is implicitly default constructed
 

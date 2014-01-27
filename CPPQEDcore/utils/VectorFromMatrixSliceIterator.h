@@ -38,7 +38,7 @@ struct LeftRight
 template<int RANK, typename S, bool IS_CONST> using Iterator=basi::Iterator<RANK,LeftRight<RANK/2,S>,IS_CONST>;
 
 #define NS_NAME vfmsi
-#define RETURN_type1(IS_CONST) Iterator<ArrayRankTraits<A>::value,V_S,IS_CONST>
+#define RETURN_type1(IS_CONST) Iterator<Rank<A>::value,V_S,IS_CONST>
 #define ADDITIONAL_PARAMETER
 #define ADDITIONAL_ARGUMENT
 
@@ -46,27 +46,27 @@ template<int RANK, typename S, bool IS_CONST> using Iterator=basi::Iterator<RANK
 
 
 template<typename S, typename A>
-const Iterator<ArrayRankTraits<A>::value,S,true>
+const Iterator<Rank<A>::value,S,true>
 begin(const A& array );
 
 template<typename S, typename A>
-const Iterator<ArrayRankTraits<A>::value,S,true>
+const Iterator<Rank<A>::value,S,true>
 end (const A& array );
 
 template<typename S, typename A>
-const Iterator<ArrayRankTraits<A>::value,S,false>
+const Iterator<Rank<A>::value,S,false>
 begin(     A& array );
 
 template<typename S, typename A>
-const Iterator<ArrayRankTraits<A>::value,S,false>
+const Iterator<Rank<A>::value,S,false>
 end (      A& array );
 
 template<typename S, typename A>
-const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,S,true> >
+const boost::iterator_range<Iterator<Rank<A>::value,S,true> >
 fullRange(const A& array );
 
 template<typename S, typename A>
-const boost::iterator_range<Iterator<ArrayRankTraits<A>::value,S,false> >
+const boost::iterator_range<Iterator<Rank<A>::value,S,false> >
 fullRange(      A& array );
 
 } // vfmsi
