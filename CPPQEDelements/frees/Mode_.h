@@ -132,6 +132,14 @@ private:
 template<bool IS_FINITE_TEMP, bool IS_ALTERNATIVE=false> class Liouvillean;
 
 
+namespace details {
+
+void aJump   (StateVectorLow&, double);
+void aDagJump(StateVectorLow&, double);
+  
+} // details
+
+
 template<bool IS_ALTERNATIVE> 
 class Liouvillean<false,IS_ALTERNATIVE> 
   : protected boost::mpl::false_, // Tagging for the isFiniteTemp... functions
@@ -139,10 +147,10 @@ class Liouvillean<false,IS_ALTERNATIVE>
 {
 protected:
   Liouvillean(double kappa, double=0, const std::string& kT=keyTitle) : structure::ElementLiouvillean<1,1>(kT,"excitation loss"), kappa_(kappa) {}
-  // the trailing dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
+  // the second dummy argument is there only to have the same form for the ctor as in the IS_FINITE_TEMP=true case
 
 private:
-  void   doActWithJ (NoTime, StateVectorLow&           ) const;
+  void   doActWithJ (NoTime, StateVectorLow& psi       ) const {details::aJump(psi,kappa_);}
   double rate       (NoTime, const LazyDensityOperator&) const;
 
   const double kappa_;
@@ -150,24 +158,43 @@ private:
 };
 
 
-template<> 
-class Liouvillean<true >
-  : protected boost::mpl::true_,
+namespace details {
+
+class LiouvilleanFiniteTemperatureBase
+{
+protected:
+  LiouvilleanFiniteTemperatureBase(double kappa, double nTh) : kappa_(kappa), nTh_(nTh) {}
+  
+  double rate0(const LazyDensityOperator&, boost::mpl::false_) const;
+  double rate1(const LazyDensityOperator&, boost::mpl::false_) const;
+  double rate0(const LazyDensityOperator&, boost::mpl:: true_) const {return -1.;}
+  double rate1(const LazyDensityOperator&, boost::mpl:: true_) const {return -1.;}
+  
+  const double kappa_, nTh_;
+
+};
+
+} // details
+
+
+template<bool IS_ALTERNATIVE> 
+class Liouvillean<true ,IS_ALTERNATIVE>
+  : private details::LiouvilleanFiniteTemperatureBase,
+    protected boost::mpl::true_,
     public structure::ElementLiouvillean<1,2>
 {
 protected:
   typedef structure::ElementLiouvillean<1,2> Base;
 
-  Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle);
+  Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle)
+    : details::LiouvilleanFiniteTemperatureBase(kappa,nTh), Base(kT,{"excitation loss","excitation absorption"}) {}
   
 private:
-  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<0>) const;
-  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<1>) const;
+  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const {details::   aJump(psi,kappa_*(nTh_+1));}
+  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const {details::aDagJump(psi,kappa_* nTh_   );}
   
-  double rate(NoTime, const LazyDensityOperator&, LindbladNo<0>) const;
-  double rate(NoTime, const LazyDensityOperator&, LindbladNo<1>) const;
-  
-  const double kappa_, nTh_;
+  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const {return rate0(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
+  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const {return rate1(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
 
 };
 
@@ -419,9 +446,9 @@ public:
 // One more to help testing the alternative jumping in MCWF_Trajectory
 //////////////////////////////////////////////////////////////////////
 
-template<typename AveragingType=mode::Averaged>
+template<bool IS_FINITE_TEMP, typename AveragingType=mode::Averaged>
 class PumpedLossyModeAlternative 
-  : public mode::Liouvillean<false,true>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
+  : public mode::Liouvillean<IS_FINITE_TEMP,true>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>

@@ -109,10 +109,7 @@ Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, size_t dim,
 //
 //////////////
 
-namespace {
-
-
-void aJump   (StateVectorLow& psi, double kappa)
+void details::aJump   (StateVectorLow& psi, double kappa) // kappa is kappa*(nTh+1) when the temperature is finite
 {
   double fact=sqrt(2.*kappa);
   int ubound=psi.ubound(0);
@@ -121,6 +118,17 @@ void aJump   (StateVectorLow& psi, double kappa)
   psi(ubound)=0;
 }
 
+void details::aDagJump(StateVectorLow& psi, double kappa) // kappa is kappa* nTh    when the temperature is finite
+{
+  double fact=sqrt(2.*kappa);
+  for (int n=psi.ubound(0); n>0; --n)
+    psi(n)=fact*sqrt(n)*psi(n-1);
+  psi(0)=0;
+}
+
+
+namespace {
+
 
 double aJumpRate   (const LazyDensityOperator& matrix, double kappa)
 {
@@ -128,52 +136,18 @@ double aJumpRate   (const LazyDensityOperator& matrix, double kappa)
 }
 
 
+  
 }
 
 
-Liouvillean<true >::Liouvillean(double kappa, double nTh, const std::string& kT)
-  : Base(kT,{"excitation loss","excitation absorption"}), kappa_(kappa), nTh_(nTh)
-{
-}
-
-
-void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const
-{
-  aJump(psi,kappa_*(nTh_+1));
-}
-
-
-void Liouvillean<true>::doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const
-{
-  double fact=sqrt(2.*kappa_*nTh_);
-  for (int n=psi.ubound(0); n>0; --n)
-    psi(n)=fact*sqrt(n)*psi(n-1);
-  psi(0)=0;
-}
-
-
-double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const
+double details::LiouvilleanFiniteTemperatureBase::rate0(const LazyDensityOperator& matrix, boost::mpl::false_) const
 {
   return aJumpRate(matrix,kappa_*(nTh_+1));
 }
 
-
-double Liouvillean<true>::rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const
+double details::LiouvilleanFiniteTemperatureBase::rate1(const LazyDensityOperator& matrix, boost::mpl::false_) const
 {
   return 2.*kappa_*nTh_*(photonNumber(matrix)+matrix.trace());
-}
-
-
-template<>
-void Liouvillean<false,false>::doActWithJ(NoTime, StateVectorLow& psi) const
-{
-  aJump(psi,kappa_);
-}
-
-template<>
-void Liouvillean<false,true >::doActWithJ(NoTime, StateVectorLow& psi) const
-{
-  aJump(psi,kappa_);
 }
 
 

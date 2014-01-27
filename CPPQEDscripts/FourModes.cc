@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   PumpedLossyMode<> 
     m0(pm0), m2(pm2);
 
-  PumpedLossyModeAlternative<>
+  PumpedLossyModeAlternative<false>
     m1(pm1), m3(pm3);
 
   DummyQuaternary dq(nonOwningConstSharedPtr(&m0),nonOwningConstSharedPtr(&m1),nonOwningConstSharedPtr(&m2),nonOwningConstSharedPtr(&m3));

@@ -209,9 +209,9 @@ PumpedLossyModeSch<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeSch(const mode:
 //////////////////////////////////////////////
 
 
-template<typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyModeAlternative<AveragingType>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<false,true>(p.kappa,p.nTh), 
+template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
+PumpedLossyModeAlternative<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<IS_FINITE_TEMP,true>(p.kappa,p.nTh), 
     mode::Hamiltonian<true>(0,dcomp(p.kappa,-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
