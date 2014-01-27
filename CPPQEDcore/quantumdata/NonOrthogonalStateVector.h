@@ -86,7 +86,7 @@ struct TensorType : mpl::identity<NonOrthogonalStateVector<SV1::N_RANK+SV2::N_RA
 };
 
 
-/** \cond */
+/** \cond SPECIALIZATION */
 template<typename SV1, int RANK2>
 struct TensorType<SV1,StateVector<RANK2> > 
   : mpl::identity<NonOrthogonalStateVector<SV1::N_RANK+RANK2,

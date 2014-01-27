@@ -75,7 +75,7 @@ template<int N> struct Ordinals : Range<N,0> {};
 /// Calculates the power \f$N_1^{N_2}\f$ @ compile time
 template<unsigned N1, unsigned N2> struct Power       : boost::mpl::int_<N1*Power<N1,N2-1>::value> {};
 
-/** \cond */
+/** \cond SPECIALIZATION */
 template<unsigned N1>              struct Power<N1,0> : boost::mpl::int_<1>                        {};
 /** \endcond */
 
