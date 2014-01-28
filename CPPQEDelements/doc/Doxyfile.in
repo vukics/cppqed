@@ -742,7 +742,8 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode_.h
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode_.h
 
 
 # This tag can be used to specify the character encoding of the source files
