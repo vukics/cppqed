@@ -7,7 +7,7 @@
 #include "CMatrix.h"
 #include "Exception.h"
 
-#include "FFTFwd.h"
+#include "FFT.h"
 
 #include "StateVector.h"
 

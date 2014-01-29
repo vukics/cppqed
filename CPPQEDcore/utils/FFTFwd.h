@@ -4,7 +4,6 @@
 
 namespace fft {
 
-enum Direction {DIR_XK, DIR_KX};
 
 struct FFT_Exception;
 

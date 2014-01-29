@@ -9,7 +9,7 @@
 namespace fft {
 
 template<typename A>
-void transform(A& a, Direction dir) throw(FFT_Exception)
+void transform(A& a, Direction dir)
 {
   details::transform(cpputils::data(a),cpputils::stride(a),cpputils::subscriptLimit(a),dir);
 }
