@@ -1,3 +1,4 @@
+/// \briefFile{Convenience header for straightforward usage of the trajectory::Simulated class for classical simulations}
 // -*- C++ -*-
 #ifndef UTILS_SIMULATED_H_INCLUDED
 #define UTILS_SIMULATED_H_INCLUDED

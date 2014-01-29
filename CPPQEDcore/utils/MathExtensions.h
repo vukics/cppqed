@@ -1,6 +1,8 @@
 // -*- C++ -*-
-/// \briefFile{Defines wrapper functions for mathematical functions taken from libraries, and several other mathematical functions}
-/** The principal aim of Math.h and the corresponding Math.cc is to localize dependence on GSL. */
+/** \file
+ * \brief Defines wrapper functions for mathematical functions taken from libraries, and several other mathematical functions.
+ * \details The principal aim of this arrangement is to localize dependence on GSL. In particular, GSL headers may be included only in .cc files.
+ */
 #ifndef UTILS_MATHEXTENSIONS_H_INCLUDED
 #define UTILS_MATHEXTENSIONS_H_INCLUDED
 
@@ -10,6 +12,7 @@
 #include "Exception.h"
 
 
+/// Comprises wrapper functions for mathematical functions taken from libraries (Boost.Math, GSL), and several other mathematical functions.
 namespace mathutils {
 
 struct FactOverflow  : public cpputils::Exception {};

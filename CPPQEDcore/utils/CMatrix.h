@@ -6,7 +6,7 @@
 #include "CVector.h"
 
 
-/// Contains utilities for linear-algebra.
+/// Contains utilities for linear algebra.
 namespace linalg {
 
 /// Complex matrix

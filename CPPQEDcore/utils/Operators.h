@@ -1,3 +1,4 @@
+/// \briefFile{Extensions built on top of \refBoost{Boost.Operator,utility/operators.htm}.}
 // -*- C++ -*-
 #ifndef UTILS_OPERATORS_H_INCLUDED
 #define UTILS_OPERATORS_H_INCLUDED
@@ -12,6 +13,14 @@
 namespace linalg {
 
 
+/// Operator aggregate for a complex vector space built on top of \refBoost{Boost.Operator,utility/operators.htm}.
+/**
+ * Comprises an Abel group and a complex outer product + comparison for equality
+ * 
+ * \note the real outer product must also be specified as there is no implicit conversion from `double` to dcomp
+ * 
+ * \tparam T the vector type
+ */
 template<typename T, typename B=boost::mpl::empty_base>
 struct VectorSpace
   : boost::additive1     <T,        // Abel group
