@@ -47,7 +47,9 @@ public:
    * - for a  Liouvillean, the key is a description of decay channels,
    * - for an Averaged, it describes the displayed columns
    */
-  std::ostream& displayKey(std::ostream& o, size_t& i) const {return displayKey_v(o,i);}
+  std::ostream& displayKey(std::ostream& o,
+                           size_t& i ///< the ordinal number where the key of the present element begins
+                          ) const {return displayKey_v(o,i);}
 
   /// Returns the number of calculated quantum averages
   /**

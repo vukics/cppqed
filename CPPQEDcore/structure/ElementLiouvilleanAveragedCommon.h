@@ -11,6 +11,10 @@
 namespace structure {
 
 
+/// Implements LiouvilleanAveragedCommon::displayKey and LiouvilleanAveragedCommon::nAvr with the help of a cpputils::KeyPrinter
+/**
+ * The number of averages is taken simply to be the \link cpputils::KeyPrinter::length length of the key\endlink
+ */
 template<typename BASE>
 class ElementLiouvilleanAveragedCommon : public BASE
 {
@@ -18,13 +22,15 @@ public:
   typedef cpputils::KeyPrinter::KeyLabels            KeyLabels           ;
   typedef cpputils::KeyPrinter::KeyLabelsInitializer KeyLabelsInitializer;
   
-  const std::string& getTitle () const {return keyPrinter_.getTitle ();}
-  const KeyLabels  & getLabels() const {return keyPrinter_.getLabels();}
+  const std::string& getTitle () const {return keyPrinter_.getTitle ();} ///< redirect to cpputils::KeyPrinter
+  const KeyLabels  & getLabels() const {return keyPrinter_.getLabels();} ///< \copydoc getTitle
 
 protected:
+  /// \copydoc getTitle
   template<typename... KeyLabelsPack>
   ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyPrinter_(keyTitle,keyLabelsPack...) {}
 
+  /// \copydoc getTitle
   ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsInitializer il) : keyPrinter_(keyTitle,il) {}
 
 private:
