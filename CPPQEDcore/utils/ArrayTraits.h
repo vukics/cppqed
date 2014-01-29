@@ -9,12 +9,15 @@
 namespace cpputils {
 
 
+/// template metafunction for the rank (arity) of the multi-array `A`
 template<typename A>
 struct Rank;
 
+/// template metafunction providing an identifier string for the multi-array `A`
 template<typename A>
 struct TypeID;
 
+/// template metafunction returning (by convention, as a member typedef `type`) the type of elements of the multi-array `A`
 template<typename A>
 struct ElementType;
 

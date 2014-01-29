@@ -12,6 +12,8 @@
 namespace cpputils {
 
 
+/** \cond SPECIALIZATION */
+
 template<typename Numtype, int RANK>
 struct Rank<blitz::Array<Numtype,RANK> > : boost::mpl::int_<RANK> {};
 
@@ -33,6 +35,8 @@ struct TypeID<CArray<RANK> >
 
 template<int RANK>
 const std::string TypeID<CArray<RANK> >::value="CArray";
+
+/** \endcond */
 
 /// \name `blitz::Array` memory traits for `blitz::Array<double,n>`
 //@{
@@ -65,6 +69,7 @@ inline const DArray<n> create(const double* y, const DArray<n>& a) {return creat
 
 template<int n>
 inline DArray<n> create(const DArray<n>& a) {return DArray<n>(a.shape());}
+
 //@}
 
 

@@ -134,7 +134,7 @@ struct IsEvenAssert : boost::mpl::int_<N/2>
 template<int N1, int N2, bool IS_EXCLUSIVE=true>
 struct pair_c;
 
-
+/// A non-exclusive pair_c that allows the members to be equal
 template<int N1, int N2>
 struct pair_c<N1,N2,false>
 {
@@ -143,11 +143,13 @@ struct pair_c<N1,N2,false>
   static const int first =N1;
   static const int second=N2;
   
+  /** \cond FORTESTING */
   template<int MIN, int MAX>
   struct SanityCheck
   {
     BOOST_MPL_ASSERT_MSG( (N1>=MIN && N2>=MIN && N1<=MAX && N2<=MAX) , PAIR_C_SANITY_CHECK_FAILED , (SanityCheck) );
   };
+  /** \endcond */
 
 };
 
@@ -160,6 +162,7 @@ template<int N1, int N2>
 const int pair_c<N1,N2,false>::second;
 
 
+/// An exclusive pair_c that provokes a compile-time error if the members are equal
 template<int N1, int N2>
 struct pair_c<N1,N2,true> : pair_c<N1,N2,false> 
 {
@@ -174,12 +177,15 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
 ////////////////////////////////////////////
 
 
+namespace details {
+
 template<int V>
 struct ArgumentDispatcher : boost::mpl::integral_c<int,V>
 {
   BOOST_MPL_ASSERT_MSG( V>=0 , NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR, (boost::mpl::int_<V>) );
 };
 
+} // details
 
 /// A non-negative compile-time vector
 /**
@@ -192,7 +198,7 @@ struct ArgumentDispatcher : boost::mpl::integral_c<int,V>
  * 
  */
 template<int... V> 
-struct Vector : boost::mpl::vector_c<int,ArgumentDispatcher<V>::value...> {};
+struct Vector : boost::mpl::vector_c<int,details::ArgumentDispatcher<V>::value...> {};
 
 
 typedef Vector<> V_Empty;

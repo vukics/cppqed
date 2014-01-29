@@ -60,7 +60,8 @@ struct LeftRight
  */
 template<int RANK, typename S, bool IS_CONST> using Iterator=basi::Iterator<RANK,LeftRight<RANK/2,S>,IS_CONST>;
 
-
+/// \name Makers for Iterator
+//@{
 /// Same as begin but here it returns an Iterator instance
 template<typename S, typename A>
 const Iterator<Rank<A>::value,S,false>
@@ -85,6 +86,7 @@ fullRange(const A& array );
 template<typename S, typename A>
 const boost::iterator_range<Iterator<Rank<A>::value,S,false> >
 fullRange(      A& array );
+//@}
 
 
 #define NS_NAME vfmsi
