@@ -8,3 +8,6 @@ target_link_libraries(HarmonicOscillatorComplex ${CPPQED_LIBRARIES})
 
 add_executable(CoherentElementTest CoherentElementTest.cc)
 target_link_libraries(CoherentElementTest ${CPPQED_LIBRARIES})
+
+add_library(ExampleObjects SHARED cpcPaperExamples.cc)
+target_link_libraries(ExampleObjects ${CPPQED_LIBRARIES})

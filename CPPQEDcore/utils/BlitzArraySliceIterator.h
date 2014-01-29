@@ -11,6 +11,7 @@
 
 #include "Exception.h"
 
+#include <boost/mpl/size.hpp>
 #include <boost/mpl/sort.hpp>
 #include <boost/mpl/unique.hpp>
 #include <boost/mpl/max_element.hpp>
@@ -549,70 +550,75 @@ private:
 
 namespace basi {
 
-/// Iterator to the beginning of the sequence
-//@{
+/// Iterator to the beginning of the (non-const) sequence \related Iterator
+/** \tparam V the retained index positions \tparam A array type taken itself as a parameter to ease template-parameter inference \return non-const Iterator */
+template<typename V, typename A>
+const Iterator<Rank<A>::value,V,false>
+begin(      A& array );
+
+/// ” for the end \related Iterator
+template<typename V, typename A>
+const Iterator<Rank<A>::value,V,false>
+end  (      A& array );
+
+/// Iterator to the beginning of the (const) sequence \related Iterator
+/** \tparam V the retained index positions \tparam A array type taken itself as a parameter to ease template-parameter inference \return const Iterator */
 template<typename V, typename A>
 const Iterator<Rank<A>::value,V,true>
 begin(const A& array );
 
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,false>
-begin(      A& array );
-//@}
-
-/// Iterator to the end of the sequence
-//@{
+/// “ for the end \related Iterator
 template<typename V, typename A>
 const Iterator<Rank<A>::value,V,true>
-end (const A& array );
+end  (const A& array );
 
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,false>
-end (      A& array );
-//@}
-
-/// \refBoost{Boost.Range,range/doc/html/range/reference/utilities/iterator_range.html}-compliant full range of slice iterators
-/** It corresponds to all the possible combinations of dummy indices (\f$\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\f$…) \ref retainedindexpositionsdefined "above". */
-//@{
-template<typename V, typename A>
-const boost::iterator_range<Iterator<Rank<A>::value,V,true> >
-fullRange(const A& array );
-
+/// \refBoost{Boost.Range,range/doc/html/range/reference/utilities/iterator_range.html}-compliant full range of slice iterators \related Iterator
+/**
+ * It corresponds to all the possible combinations of dummy indices (\f$\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\f$…) \ref retainedindexpositionsdefined "above".
+ * \tparam V the retained index positions \tparam A array type taken itself as a parameter to ease template-parameter inference 
+ */
 template<typename V, typename A>
 const boost::iterator_range<Iterator<Rank<A>::value,V,false> >
 fullRange(      A& array );
-//@}
+
+/// ” const version \related Iterator
+template<typename V, typename A>
+const boost::iterator_range<Iterator<Rank<A>::value,V,true> >
+fullRange(const A& array );
 
 } // basi
 
 namespace basi_fast {
 
-/// Same as blitzplusplus::basi::begin, blitzplusplus::basi::end, and blitzplusplus::basi::fullRange, respectively, but here they return “fast” Iterator instances.
-//@{
+/// Same as ::begin but here it returns a “fast” Iterator instance \related Iterator
+template<typename V, typename A>
+const Iterator<Rank<A>::value,V,false>
+begin(      A& array , const SlicesData<Rank<A>::value,V>& sd);
+
+/// ” \related Iterator
 template<typename V, typename A>
 const Iterator<Rank<A>::value,V,true>
 begin(const A& array , const SlicesData<Rank<A>::value,V>& sd);
 
+/// Same as ::end but here it returns a “fast” Iterator instance \related Iterator
+template<typename V, typename A>
+const Iterator<Rank<A>::value,V,false>
+end  (      A& array , const SlicesData<Rank<A>::value,V>& sd);
+
+/// ” \related Iterator
 template<typename V, typename A>
 const Iterator<Rank<A>::value,V,true>
-end (const A& array , const SlicesData<Rank<A>::value,V>& sd);
+end  (const A& array , const SlicesData<Rank<A>::value,V>& sd);
 
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,false>
-begin(     A& array , const SlicesData<Rank<A>::value,V>& sd);
-
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,false>
-end (      A& array , const SlicesData<Rank<A>::value,V>& sd);
-
+/// Same as ::fullRange but here it returns an iterator range of “fast” Iterator instances \related Iterator
 template<typename V, typename A>
 const boost::iterator_range<Iterator<Rank<A>::value,V,true> >
 fullRange(const A& array , const SlicesData<Rank<A>::value,V>& sd);
 
+/// ” \related Iterator
 template<typename V, typename A>
 const boost::iterator_range<Iterator<Rank<A>::value,V,false> >
 fullRange(      A& array , const SlicesData<Rank<A>::value,V>& sd);
-//@}
 
 } // basi_fast
 
