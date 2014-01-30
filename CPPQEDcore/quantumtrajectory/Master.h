@@ -133,7 +133,7 @@ public:
   template<typename SYS>
   Master(DensityOperator& rho, const SYS& sys, const master::Pars& pt, bool negativity,
          const DensityOperatorLow& scaleAbs=DensityOperatorLow())
-    : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),pt,negativity)
+    : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),negativity)
   {}
   
   const DensityOperator& getRho() const {return rho_;}
@@ -143,7 +143,7 @@ private:
 
   std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),rho_,os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
-  const details::DO_Display<RANK,V> doDisplay_;
+  const display_densityoperator::_<RANK,V> doDisplay_;
 
   const std::string trajectoryID_v() const {return "Master";}
 

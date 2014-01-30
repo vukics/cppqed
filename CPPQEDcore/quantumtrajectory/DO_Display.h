@@ -2,30 +2,18 @@
 #ifndef QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
 #define QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
 
-#include "DensityOperatorFwd.h"
-#include "DO_DisplayFwd.h"
+#include "DensityOperator.h"
 
-#include "DimensionsBookkeeper.h"
-
-#include "AveragedFwd.h"
-#include "QuantumSystemFwd.h"
-
-#include "Trajectory.h"
-
-// #include "NegPT.h"
+#include "Averaged.h"
 
 
 namespace quantumtrajectory {
 
-
-namespace details {
-
-
-using namespace trajectory;
+namespace display_densityoperator {
 
 
 template<int RANK, typename V>
-class DO_Display 
+class _
 {
 public:
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
@@ -33,16 +21,9 @@ public:
   typedef          structure::Averaged<RANK>      Averaged   ;
   typedef typename structure::Averaged<RANK>::Ptr AveragedPtr;
 
-  DO_Display(
-             AveragedPtr,
-             const ParsEvolved&,
-             bool negativity,
-             size_t equalCount=10
-             ) throw(DimensionalityMismatchException);
+  _(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}
 
-  virtual ~DO_Display() {}
-
-  std::ostream& display   (double t, const DensityOperator&, std::ostream&, int precision) const throw(StoppingCriterionReachedException);
+  std::ostream& display   (double t, const DensityOperator&, std::ostream&, int precision) const;
   std::ostream& displayKey(std::ostream&, size_t&) const;
 
 private:
@@ -50,17 +31,10 @@ private:
 
   const bool negativity_;
 
-  // Helpers for autoStopping
-  const double autoStop_;
-
-  mutable double lastCrit_;
-  mutable size_t equalCount_;
-
-
 };
 
 
-} // details
+} // display_densityoperator
 
 
 } // quantumtrajectory

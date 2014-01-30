@@ -97,7 +97,7 @@ public:
 
 #undef  BASE_class
 
-  typedef details::DO_Display<RANK,V> DO_Display;
+  typedef display_densityoperator::_<RANK,V> DO_Display;
 
   typedef typename Base::StateVectorLow StateVectorLow; 
 
@@ -116,7 +116,7 @@ public:
                bool negativity,
                const StateVectorLow& scaleAbs=StateVectorLow()
                )
-    : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),p,negativity) {}
+    : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),negativity) {}
 
 private:
   std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
