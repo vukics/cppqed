@@ -256,7 +256,7 @@ cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
 template<typename A>
 cpputils::oarchive&  Adaptive<A>::writeState_v(cpputils::oarchive& oar) const
 {
-  meta_.trajectoryID = trajectoryID(); 
+  meta_.trajectoryID = trajectoryID(); // it is set here rather than @ construction as it is not good to call virtual functions @ construction
   AdaptiveIO<A>::writeState(oar);
   return writeStateMore_v(oar);
 }

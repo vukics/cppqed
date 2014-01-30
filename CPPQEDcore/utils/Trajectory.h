@@ -310,22 +310,25 @@ protected:
   double getDtTry() const {return evolved_->getDtTry();}
   //@}
   
+  /// redirected to a pure virtual, this is needed for \link SerializationMetadata serialization of trajectory metadata\endlink
   const std::string trajectoryID() const  {return trajectoryID_v();}
 
-  std::ostream& displayParameters_v(std::ostream&) const;
+  std::ostream& displayParameters_v(std::ostream&) const override;
 
-  virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;}
-  virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;}
+  virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;} ///< hook into Trajectory::readState
+  virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;} ///< hook into Trajectory::writeState
 
 private:
+  /// calls AdaptiveIO::readState, checks post-conditions in metadata, calls readStateMore_v, and finally sets `dtTry` in `evolved_`
   cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       final;
+  /// calls AdaptiveIO::writeState followed by writeStateMore_v
   cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const final;
 
-  double getDtDid_v() const {return evolved_->getDtDid();}
+  double getDtDid_v() const final {return evolved_->getDtDid();}
 
-  void evolve_v(double deltaT) {evolved::evolve<Adaptive>(*this,deltaT);}
+  void evolve_v(double deltaT) final {evolved::evolve<Adaptive>(*this,deltaT);}
 
-  double getTime_v() const {return evolved_->getTime();}
+  double getTime_v() const final {return evolved_->getTime();}
 
   virtual void step_v(double deltaT) = 0;
 
