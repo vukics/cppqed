@@ -1,3 +1,4 @@
+/// \briefFile{Defines display_densityoperator::_}
 // -*- C++ -*-
 #ifndef QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
 #define QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
@@ -9,9 +10,21 @@
 
 namespace quantumtrajectory {
 
+/// Contains display_densityoperator::_
 namespace display_densityoperator {
 
 
+/// Wraps functionality concerning display on the basis of density operators common to Master & EnsembleMCWF
+/**
+ * This comprises
+ * - keeping a structure::Averaged instant and calling structure::Averaged::display
+ * - performing \link quantumdata::negPT negativity calculation\endlink if needed
+ * - extending key with negativity when needed
+ * 
+ * \tparamRANK
+ * \tparam V has the same function as the template parameter `V` in quantumdata::negPT
+ * 
+ */
 template<int RANK, typename V>
 class _
 {

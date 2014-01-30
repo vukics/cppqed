@@ -24,9 +24,8 @@ namespace quantumdata {
  * 
  * The negativity is calculated as *the sum of the negative eigenvalues* of the partially transposed density operator.
  * 
- * \note This definition is equivalent to the original definition 
- * (cf. G. Vidal and R. F. Werner, *Computable measure of entanglement*, Phys. Rev. A, **65**, 032314, [2002])
- * up to a sign, because the partially transposed density operator's eigenvalues come in two sorts:
+ * \note This definition is equivalent to the original definition \cite vidal02 up to a sign,
+ * because the partially transposed density operator's eigenvalues come in two sorts:
  * - solitary positive numbers (\f$a_i\f$) adding up to one, and
  * - pairs of opposite-sign numbers (\f$b_i\f$).
  * \note Hence
