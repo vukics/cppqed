@@ -56,7 +56,7 @@ public:
 private:
   void updateU(OneTime) const;
 
-  bool isUnitary_v() const {return true;}
+  bool applicableInMaster_v() const {return true;}
 
   const Averages average_v(NoTime, const LazyDensityOperator&) const;
 
@@ -120,7 +120,7 @@ public:
 private:
   void updateU(OneTime) const;
 
-  bool isUnitary_v() const {return true;}
+  bool applicableInMaster_v() const {return true;}
 
   const dcomp z_; // Needed for updateU
 

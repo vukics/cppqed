@@ -69,7 +69,7 @@ public:
 private:
   void updateU(structure::OneTime) const;
 
-  bool isUnitary_v() const {return true;}
+  bool applicableInMaster_v() const {return true;}
 
   const Diagonal factorExponents_;
 

@@ -9,7 +9,7 @@ namespace quantumtrajectory {
 
 namespace master {
 
-struct NonUnitaryIP ;
+struct SystemNotApplicable ;
 struct NoLiouvillean;
 
 template<int RANK>

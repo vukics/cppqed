@@ -37,7 +37,7 @@ Base<RANK>::Base(DensityOperator& rho,
              evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
     rho_(rho)
 {
-  if (!getQSW().isUnitary()) throw master::NonUnitaryIP();
+  if (!getQSW().applicableInMaster()) throw master::SystemNotApplicable();
   // If the interaction picture is non-unitary, the density matrix in IP is non-Hermitian. This cannot be allowed here because then the calculation of the Hamiltonian part of the dynamics as implemented below would fail.
   // if (!li_) throw master::NoLiouvillean();
 

@@ -90,7 +90,7 @@ CLASS_HEADER(Exact)
 {
   CLASS_BODY_PART(Exact,Ex)
 
-  bool isUnitary_v() const;
+  bool applicableInMaster_v() const;
 
   void  actWithU_v(double, StateVectorLow&, double) const;
 

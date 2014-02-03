@@ -21,10 +21,14 @@ public:
 
   virtual ~ExactCommon() {}
 
-  bool isUnitary() const {return isUnitary_v();} ///< Describes whether the interaction picture is unitary
+  /// Describes whether the system fulfills the requirement to be used in Master-equation evolution
+  /**
+   * \see \ref masterequationlimitations of the Master-equation driver
+   */
+  bool applicableInMaster() const {return applicableInMaster_v();}
 
 private:
-  virtual bool isUnitary_v() const = 0;
+  virtual bool applicableInMaster_v() const = 0;
 
 };
 

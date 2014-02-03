@@ -1,3 +1,4 @@
+/// \briefFileDefault
 // -*- C++ -*-
 #ifndef QUANTUMTRAJECTORY_MASTER_H_INCLUDED
 #define QUANTUMTRAJECTORY_MASTER_H_INCLUDED
@@ -27,8 +28,8 @@ namespace master {
 typedef trajectory::ParsEvolved Pars;
 
 
-struct NonUnitaryIP  : cpputils::Exception {};
-struct NoLiouvillean : cpputils::Exception {};
+struct SystemNotApplicable  : cpputils::Exception {};
+struct NoLiouvillean        : cpputils::Exception {};
 
 
 template<int RANK>
@@ -113,7 +114,15 @@ private:
 
 #define BASE_class boost::mpl::if_c<IS_FAST,master::BaseFast<RANK>,master::Base<RANK> >::type
 
-
+/// An \link trajectory::Adaptive Adaptive\endlink trajectory class representing Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
+/**
+ * Cf. \ref masterequation.
+ *
+ * \tparam RANK arity of the Hilbert space
+ * \tparam V has the same function as the template parameter `V` in display_densityoperator::_, which class is used here for displaying the evolved density operator
+ * \tparam IS_FAST the class will use either blitzplusplus::basi::Iterator or blitzplusplus::basi_fast::Iterator to perform the multi-matrix multiplications, depending on this template argument
+ * 
+ */
 template<int RANK, typename V, bool IS_FAST>
 class Master : public BASE_class
 {

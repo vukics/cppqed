@@ -276,13 +276,13 @@ public:
   template<typename Act>
   bool operator()(bool s, const Act& act)
   {
-    return s && act.isUnitary();
+    return s && act.applicableInMaster();
   }
 
   template<typename T>
   void operator()(T) const
   {
-    isIt_&=frees_(T::value).isUnitary();
+    isIt_&=frees_(T::value).applicableInMaster();
   }
 
 private:
@@ -295,7 +295,7 @@ private:
 
 
 template<typename VA>
-bool composite::Exact<VA>::isUnitary_v() const
+bool composite::Exact<VA>::applicableInMaster_v() const
 {
   bool res=true;
   {

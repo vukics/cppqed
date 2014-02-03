@@ -91,7 +91,7 @@ public:
 private:
   void updateU(Time) const; ///< `Time` is structure::OneTime in this case
 
-  bool isUnitary_v() const {return !bool(real(zI_));}
+  bool applicableInMaster_v() const {return !bool(real(zI_));}
 
   const dcomp zI_;
 

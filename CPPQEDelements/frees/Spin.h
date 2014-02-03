@@ -99,7 +99,7 @@ public:
 private:
   void updateU(structure::OneTime) const;
 
-  bool isUnitary_v() const {return !getGamma();}
+  bool applicableInMaster_v() const {return !getGamma();}
 
 };
 

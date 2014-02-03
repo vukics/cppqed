@@ -748,6 +748,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/structureGuide.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/multiarrayConcept.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/mcwfMethod.markdown \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/master.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/nonorthogonalFormalism.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/rationale.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/CompilationMacros.h \

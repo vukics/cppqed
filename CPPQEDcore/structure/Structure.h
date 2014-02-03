@@ -214,7 +214,7 @@ public:
 
   /// \name Forwarded members from Exact
   //@{
-  bool isUnitary() const {return ex_ ? ex_->isUnitary() : true;}
+  bool applicableInMaster() const {return ex_ ? ex_->applicableInMaster() : true;}
 
   void actWithU(double t, StateVectorLow& psi, double t0) const {if (ex_) ex_->actWithU(t,psi,t0);}
   //@}

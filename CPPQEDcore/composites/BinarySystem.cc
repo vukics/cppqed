@@ -163,9 +163,9 @@ const Base::Averages average(double t, const Base::LazyDensityOperator& ldo, con
 
 
 
-bool binary::Exact::isUnitary_v() const
+bool binary::Exact::applicableInMaster_v() const
 {
-  return free0_.isUnitary() && free1_.isUnitary() && ia_.isUnitary();
+  return free0_.applicableInMaster() && free1_.applicableInMaster() && ia_.applicableInMaster();
 }
 
 

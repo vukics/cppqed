@@ -172,8 +172,8 @@ protected:
   Exact(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  bool isUnitary_v(                               ) const; class IsUnitary;
-  void  actWithU_v(double, StateVectorLow&, double) const; class ActWithU ;
+  bool applicableInMaster_v(                     ) const; class IsUnitary;
+  void actWithU_v(double, StateVectorLow&, double) const; class ActWithU ;
 
   const Frees& frees_;
   const VA   &  acts_;
