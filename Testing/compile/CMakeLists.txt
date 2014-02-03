@@ -6,3 +6,6 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
 declaretest(test_CustomScriptsExample)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=CompileTarget --script=scripts_custom_example_all)
+declaretest(test_scripts_all_target)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=CompileTarget --script=scripts_all)
