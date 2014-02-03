@@ -1,4 +1,12 @@
-find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost QUIET COMPONENTS unit_test_framework)
+add_feature_info("Boost unit test framework"
+                 Boost_UNIT_TEST_FRAMEWORK_FOUND
+                 "Part of the test suite." )
+
+if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
+  message(WARNING "No boost unit test framework found. Disabling boost tests, testing suite is not complete.")
+  return()
+endif()
 
 CPPQED_SETUP()
 
