@@ -43,3 +43,11 @@ This shows that the \link quantumtrajectory::Master Master driver\endlink will o
 because structure::Liouvillean::actWithJ calculates the latter, while quantumtrajectory::Master expects the former.
 
 \see structure::ExactCommon::applicableInMaster
+
+An example {#masterequationlimitationsexample}
+----------
+
+The requirement for the applicability of the quantumtrajectory::Master driver might seem formidable, but the situation is actually not so bad.
+First of all, the problem does not arise at all for systems that do not inherit from structure::Exact.
+
+Consider a harmonic-oscillator mode in some rotating frame, as in \ref basicoscillatorip "this Section". Here, the transformation operator reads \f$T=e^{-z\,a^\dag a\,t}\f$, and the transformed jump operators: \f$a^T=e^{-zt},\;\lp a^T\rp^\dag=\lp a^\dag\rp^T=e^{-z^*t}\f$, which makes that in the case of a purely imaginary \f$z\f$, which is the case for a purely *rotating* (and not shrinking) frame, the requirement is fulfilled.

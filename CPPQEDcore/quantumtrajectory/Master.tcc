@@ -11,9 +11,6 @@
 #include "BlitzArraySliceIterator.tcc"
 #include "ComplexArrayExtensions.h"
 
-// #define USE_BOOST_PROGRESS_TIMER_PROFILING
-#include "Profiling.h"
-
 #include <boost/range/algorithm_ext/for_each.hpp>
 
 namespace quantumtrajectory {
@@ -38,9 +35,6 @@ Base<RANK>::Base(DensityOperator& rho,
     rho_(rho)
 {
   if (!getQSW().applicableInMaster()) throw master::SystemNotApplicable();
-  // If the interaction picture is non-unitary, the density matrix in IP is non-Hermitian. This cannot be allowed here because then the calculation of the Hamiltonian part of the dynamics as implemented below would fail.
-  // if (!li_) throw master::NoLiouvillean();
-
   if (rho!=*getQSW().getQS()) throw DimensionalityMismatchException();
 
 }
@@ -51,31 +45,23 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 {
   drhodtLow=0;
 
-  PROGRESS_TIMER_IN_POINT(getOstream());
-
   binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,this->tIntPic0_));
 
-  PROGRESS_TIMER_OUT_POINT("Hamiltonian");
-
   {
-    PROGRESS_TIMER_IN_POINT(getOstream())
     linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
     linalg::calculateTwoTimesRealPartOfSelf(drhodtMatrixView);
-    PROGRESS_TIMER_OUT_POINT("RealPartOfSelf")
   }
 
   // Now act with the reset operator --- implement this in terms of
   // the individual jumps by iteration and addition
 
   for (size_t i=0; i<getQSW().template nAvr<structure::LA_Li>(); i++) {
-    PROGRESS_TIMER_IN_POINT( getOstream() )
     DensityOperatorLow rhotemp(rhoLow.copy());
     UnaryFunction functionLi(bind(&Liouvillean::actWithJ,getQSW().getLi(),t,_1,i));
     unaryIter(rhotemp,functionLi);
     blitzplusplus::hermitianConjugateSelf(rhotemp);
     unaryIter(rhotemp,functionLi);
     drhodtLow+=rhotemp;
-    PROGRESS_TIMER_OUT_POINT("Liouvillean")
   }
 
 }
@@ -84,12 +70,8 @@ template<int RANK>
 void 
 Base<RANK>::step_v(double deltaT)
 {
-  PROGRESS_TIMER_IN_POINT( getOstream() )
   getEvolved()->step(deltaT);
-  PROGRESS_TIMER_OUT_POINT("Evolved step total")
-    ;
   if (const auto ex=getQSW().getEx()) {
-    PROGRESS_TIMER_IN_POINT( getOstream() )
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_.getArray());
     UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,this->tIntPic0_));
@@ -98,7 +80,6 @@ Base<RANK>::step_v(double deltaT)
     hermitianConjugateSelf(rhoLow);
     unaryIter(rhoLow,functionEx);
     rhoLow=conj(rhoLow);
-    PROGRESS_TIMER_OUT_POINT("Exact")
   }
 
   this->tIntPic0_=getTime();
@@ -107,8 +88,6 @@ Base<RANK>::step_v(double deltaT)
   // The following "smoothing" of rho_ has proven to be necessary for the algorithm to remain stable:
   // We make the approximately Hermitian and normalized rho_ exactly so.
 
-  PROGRESS_TIMER_IN_POINT( getOstream() ) ;
-
   {
     linalg::CMatrix m(rho_.matrixView());
     linalg::calculateTwoTimesRealPartOfSelf(m); 
@@ -116,8 +95,6 @@ Base<RANK>::step_v(double deltaT)
   }
 
   rho_.renorm();
-
-  PROGRESS_TIMER_OUT_POINT("Smoothing")
 
 }
 

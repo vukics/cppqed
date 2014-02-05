@@ -28,10 +28,14 @@ namespace master {
 typedef trajectory::ParsEvolved Pars;
 
 
-struct SystemNotApplicable  : cpputils::Exception {};
-struct NoLiouvillean        : cpputils::Exception {};
+/// Thrown if the system is not applicable in Master-equation evolution
+/**
+ * \see structure::ExactCommon::applicableInMaster, \ref masterequationlimitations
+ */
+struct SystemNotApplicable : cpputils::Exception {};
 
 
+/// The actual working base of Master in the case when blitzplusplus::basi::Iterator is used for implementing multi-matrix multiplications \tparamRANK
 template<int RANK>
 class Base : public QuantumTrajectory<RANK, trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow> >
 {
@@ -40,7 +44,7 @@ public:
   typedef structure::Exact        <RANK> Exact        ;
   typedef structure::Hamiltonian  <RANK> Hamiltonian  ;
   typedef structure::Liouvillean  <RANK> Liouvillean  ;
-  typedef structure::Averaged     <RANK> Averaged   ;
+  typedef structure::Averaged     <RANK> Averaged     ;
 
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
   typedef typename quantumdata::Types<RANK>::    StateVectorLow     StateVectorLow;
@@ -55,6 +59,7 @@ public:
 
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
+  /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
 
 protected:
@@ -68,9 +73,9 @@ protected:
   const typename Averaged::Ptr getAv() const {return getQSW().getAv();}
 
 private:
-  void              step_v(double);
+  void step_v(double) final;
 
-  std::ostream& displayParameters_v(std::ostream&) const;
+  std::ostream& displayParameters_v(std::ostream&) const override;
 
   virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
@@ -80,6 +85,8 @@ private:
 };
 
 
+
+/// The actual working base of Master in the case when blitzplusplus::basi_fast::Iterator is used for implementing multi-matrix multiplications \tparamRANK
 template<int RANK>
 class BaseFast : public Base<RANK>
 {
@@ -97,10 +104,10 @@ private:
   typedef typename Base<RANK>:: UnaryFunction  UnaryFunction;
   typedef typename Base<RANK>::BinaryFunction BinaryFunction;
 
-  void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
-  void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
+  void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const final;
+  void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const final;
 
-  const std::string addToParameterDisplay() const {return " Fast Iteration.";}
+  const std::string addToParameterDisplay() const final {return " Fast Iteration.";}
 
   const blitzplusplus::SlicesData<2*RANK,blitzplusplus::vfmsi::LeftRight<RANK,blitzplusplus::vfmsi::Left> > slicesData_;
 
@@ -139,9 +146,15 @@ public:
 
   using Base::getTime; using Base::getAv;
 
+  /// Templated constructor
+  /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
   template<typename SYS>
-  Master(DensityOperator& rho, const SYS& sys, const master::Pars& pt, bool negativity,
-         const DensityOperatorLow& scaleAbs=DensityOperatorLow())
+  Master(DensityOperator& rho, ///< the density operator to be evolved
+         const SYS& sys, ///< object representing the quantum system
+         const master::Pars& pt, ///< parameters of the evolution
+         bool negativity, ///< governs whether entanglement should be calculated, cf. quantumdata::negPT
+         const DensityOperatorLow& scaleAbs=DensityOperatorLow() ///< has the same role as in evolved::Maker::operator()
+        )
     : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),negativity)
   {}
   
@@ -150,11 +163,12 @@ public:
 private:
   using Base::rho_;
 
-  std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),rho_,os,precision);}
-  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
-  const display_densityoperator::_<RANK,V> doDisplay_;
+  std::ostream& display_v   (std::ostream& os, int precision) const override {return doDisplay_.display   (getTime(),rho_,os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const override {return doDisplay_.displayKey(os,i);}
 
-  const std::string trajectoryID_v() const {return "Master";}
+  const std::string trajectoryID_v() const override {return "Master";}
+  
+  const display_densityoperator::_<RANK,V> doDisplay_;
 
 };
 

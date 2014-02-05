@@ -9,8 +9,8 @@ namespace quantumtrajectory {
 
 namespace master {
 
-struct SystemNotApplicable ;
-struct NoLiouvillean;
+struct SystemNotApplicable;
+
 
 template<int RANK>
 class Base;
