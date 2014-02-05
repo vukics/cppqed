@@ -43,15 +43,15 @@ public:
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 private:
-  void step_v(double deltaT) {getEvolved()->step(deltaT);}
+  void step_v(double deltaT) final {getEvolved()->step(deltaT);}
 
-  std::ostream& display_v(std::ostream&, int) const;
+  std::ostream& display_v(std::ostream&, int) const final;
   
-  std::ostream& displayKey_v(std::ostream& os, size_t&) const {return os;}
+  std::ostream& displayKey_v(std::ostream& os, size_t&) const final {return os;}
 
-  std::ostream& displayParameters_v(std::ostream& os) const {return Base::displayParameters_v(os<<"\n# Simulated.\n");}
+  std::ostream& displayParameters_v(std::ostream& os) const final {return Base::displayParameters_v(os<<"\n# Simulated.\n");}
 
-  const std::string trajectoryID_v() const {return "Simulated";}
+  const std::string trajectoryID_v() const final {return "Simulated";}
 
 };
 

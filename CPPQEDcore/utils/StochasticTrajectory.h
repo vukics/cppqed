@@ -79,12 +79,12 @@ protected:
   bool                isNoisy      () const {return isNoisy_   ;}
   //@}
   
-  std::ostream& displayParameters_v(std::ostream&) const;
+  std::ostream& displayParameters_v(std::ostream&) const override;
   
   /// \name Serialization
   //@{
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       {return iar & *randomized_;}
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const {return oar & *randomized_;}
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return iar & *randomized_;}
+  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return oar & *randomized_;}
   //@}
   
 private:
@@ -158,25 +158,25 @@ protected:
   
   /// \name Serialization
   //@{
-  cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       {FOR_EACH_function( readState)}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const {FOR_EACH_function(writeState)}
+  cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       final {FOR_EACH_function( readState)}
+  cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const final {FOR_EACH_function(writeState)}
   //@}
   
 private:
-  std::ostream& logOnEnd_v(std::ostream& ios) const {FOR_EACH_function(logOnEnd)}
+  std::ostream& logOnEnd_v(std::ostream& ios) const override {FOR_EACH_function(logOnEnd)}
 
 #undef FOR_EACH_function
   
-  void evolve_v(double deltaT);
+  void evolve_v(double deltaT) final;
 
-  double getTime_v() const {return trajs_.front().getTime();}
+  double getTime_v() const final {return trajs_.front().getTime();}
 
-  std::ostream& displayParameters_v(std::ostream&) const;
+  std::ostream& displayParameters_v(std::ostream&) const final;
 
-  double getDtDid_v() const;
+  double getDtDid_v() const final;
   // An average of getDtDid()-s from individual trajectories.
 
-  const ToBeAveragedType toBeAveraged_v() const {return averageInRange(0,trajs_.size());}
+  const ToBeAveragedType toBeAveraged_v() const final {return averageInRange(0,trajs_.size());}
 
   Impl trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
