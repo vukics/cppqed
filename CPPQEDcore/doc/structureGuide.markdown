@@ -1,5 +1,12 @@
-Guide on the use of the structure-bundle {#structurebundleguide}
-========================================
+Level-2 interface of C++QED – implementing new physical elements {#structurebundleguide}
+================================================================
+
+This Guide describes the use of the set of tools in C++QED aimed at the implementation of new elements representing elementary \link structure::Free free physical systems\endlink 
+and \link structure::Interaction their interactions\endlink. These tools are found in two namespaces:
+* #structure: this namespace comprises classes wherefrom all elements must be derived to present the necessary interfaces to trajectory drivers (cf. the #quantumtrajectory namespace)
+* #quantumoperator: here, such operator classes are found that represent special operator structures ubiquitous in atomic, molecular, and optical physics.
+
+This set of tools constitutes the Level-2 interface of C++QED, below Level-1, which is the interface for writing scripts from already available elements (cf. \ref userguide).
 
 \tableofcontents
 
@@ -22,7 +29,7 @@ where we have introduced the complex frequency \f[z\equiv\kappa(2n_\text{Th}+1)-
 
 The element has to be represented by a class which inherits publicly from the necessary classes in the structure namespace.
 In this simple case, it is basically two helper functions returning quantumoperator::Tridiagonal instances, a constructor, and two virtual functions inherited from
-ElementAveraged that have to be written.
+structure::ElementAveraged that have to be written.
 
 \see The description of quantumoperator::Tridiagonal
 
@@ -30,30 +37,30 @@ Consider the file `ExampleMode.h`:
 
 \snippet ExampleMode.h basic example mode
 
-Though the NoTime tagging class as a function argument creates some redundancy, it is necessary because of the design of the structure-bundle. Note that ElementLiouvilleanStrategies
-(like ElementLiouvillean) assumes that the number of Lindblads is known @ compile time, as is the case here. If this is not the case, Liouvillean has to be used instead.
+Though the structure::NoTime tagging class as a function argument creates some redundancy, it is necessary because of the design of the structure-bundle. Note that structure::ElementLiouvilleanStrategies
+(like structure::ElementLiouvillean) assumes that the number of Lindblads is known @ compile time, as is the case here. If this is not the case, structure::Liouvillean has to be used instead.
 
 This will suffice here. Let us look at the implementations in `ExampleMode.cc`:\dontinclude ExampleMode.cc
 \until }),
-We construct the Free base with the dimension of the system and the name-value-multiplier tuples for the frequency-like parameters of the system, which in this case are all complex
-(cf. the explanation @ DynamicsBase). We use C++11 initializer lists and the DynamicsBase::CF typedef.
+We construct the structure::Free base with the dimension of the system and the name-value-multiplier tuples for the frequency-like parameters of the system, which in this case are all complex
+(cf. the explanation @ structure::DynamicsBase). We use C++11 initializer lists and the structure::DynamicsBase::CF typedef.
 \until cutoff))),
-We construct the time-independent TridiagonalHamiltonian base. This is greatly facilitated by the algebra and helpers of the quantumoperator::Tridiagonal class.
+We construct the time-independent quantumoperator::TridiagonalHamiltonian base. This is greatly facilitated by the algebra and helpers of the quantumoperator::Tridiagonal class.
 \warning When implementing the Hamiltonian, not \f$H\f$ itself but \f$\frac Hi\f$ has to supplied!
 
 \until ,"photon absorption"}),
-We construct the ElementLiouvilleanStrategies base, whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
-The constructor takes the strategies for calculating the impact of a jump on a free::StateVectorLow, and for calculating the rate from a free::LazyDensityOperator.
+We construct the structure::ElementLiouvilleanStrategies base, whose second template argument denotes the number of different quantum jumps, which is 2 in this case.
+The constructor takes the strategies for calculating the impact of a jump on a structure::freesystem::StateVectorLow, and for calculating the rate from a structure::freesystem::LazyDensityOperator.
 These strategy functions are produced from the free-standing helpers in Lines 10-14 above through argument binding. The strategies are followed by a description of
 the lossy element and the decay channels. The number of descriptive labels must agree with the number of strategies.
 \until ,"imag(\")"})
-We construct the ElementAveraged base, with parameters necessary to produce a simple key of the quantum averages that are communicated towards the user.
+We construct the structure::ElementAveraged base, with parameters necessary to produce a simple key of the quantum averages that are communicated towards the user.
 Here we calculate only three such averages, the expectation value of the number operator, and the real and imaginary parts of that of the ladder operator.
 \until }
-With the DynamicsBase::getParsStream function we obtain a stream whereon we can write more information about the object that gets communicated towards the user
+With the structure::DynamicsBase::getParsStream function we obtain a stream whereon we can write more information about the object that gets communicated towards the user
 in that part of the output which summarizes the parameters of the actual run.
 
-Next, the inherited function Averaged::average_v is implemented:
+Next, the inherited function structure::Averaged::average is implemented (according to the non-virtual interface idiom, its virtual counterpart is called `average_v`):
 \skip average_v
 \until aJumpRate
 the expectation value of the photon number is calculated (where we can reuse our function `aJumpRate`, with unit loss rate).
@@ -78,26 +85,29 @@ In many situations, it pays to transfer to interaction picture defined by the fi
 
 \see [These notes](http://optics.szfki.kfki.hu/~vukics/Pictures.pdf) on how to treat interaction pictures defined by non-unitary transition operators in a consistent way.
 
-In this case, the class representing the element has to be derived from Exact as well, which provides an interface allowing for the transformation between the two pictures.
-In addition, instead of TridiagonalHamiltonian`<1,false>`, we need to derive from TridiagonalHamiltonian`<1,true>` because the Hamiltonian is now time-dependent.
-\note In general usage, the jump and the averages are calculated in the normal picture also in this case (cf. explanation of classes Hamiltonian, Exact, Liouvillean, and Averaged,
-and furthermore quantumtrajectory::MCWF_Trajectory). This allows for reusing the same code in both pictures. (Incidentally, here the Liouvillean remains unchanged anyway.)
+In this case, the class representing the element has to be derived from structure::Exact as well, which provides an interface allowing for the transformation between the two pictures.
+In addition, instead of quantumoperator::TridiagonalHamiltonian `<1,false>`, we need to derive from quantumoperator::TridiagonalHamiltonian `<1,true>` because the Hamiltonian is now time-dependent.
+\note In general usage, the jump and the averages are calculated in the normal picture also in this case (cf. explanation of classes structure::Hamiltonian, structure::Exact,
+structure::Liouvillean, and structure::Averaged, and furthermore quantumtrajectory::MCWF_Trajectory). This allows for reusing the same code in both pictures.
+(Incidentally, here the Liouvillean remains unchanged anyway.)
 
 \dontinclude ExampleMode.h
 \skip FreeExact
 \until } // basic
-The OneTime tagging class at the same time carries the information about the time instant to which the (diagonal) transformation operator has to be updated.
-OneTime can be implicitly converted into a double.
+The structure::OneTime tagging class at the same time carries the information about the time instant to which the (diagonal) transformation operator has to be updated.
+structure::OneTime can be implicitly converted into a double.
 
 In the implementation, the only difference from the previous case will be the constructor, because the Hamiltonian now also requires furnishing with frequencies
-(cf. quantumoperator::furnishWithFreqs), and the implementation of the virtual function FreeExact::updateU.
+(cf. quantumoperator::furnishWithFreqs), and the implementation of the virtual function structure::FreeExact::updateU.
+
+\note In connection with the structure::Exact::applicableInMaster virtual function implemented here, cf. also \ref masterequationlimitations "this note".
 
 When “furnished with frequencies”, a quantumoperator::Tridiagonal object will internally take care about the time-dependent phases appearing in \f$a\Int(t)\f$ and \f$H\Int(t)\f$:
 \dontinclude ExampleMode.cc
 \skip mainDiagonal
 \until // PumpedLossyModeIP::average_v exactly the same as PumpedLossyMode::average_v above
-FreeExact assumes that the operator transforming between the two pictures is diagonal, and the factors to update are simply its diagonal elements.
-If this is not the case, Exact has to be used instead. Here, since there are also real frequency-like parameters, we have to use DynamicsBase::RF as well.
+structure::FreeExact assumes that the operator transforming between the two pictures is diagonal, and the factors to update are simply its diagonal elements.
+If this is not the case, Exact has to be used instead. Here, since there are also real frequency-like parameters, we have to use structure::DynamicsBase::RF as well.
 
 \note Since a lot of the code from the previous case can be reused here, one will usually adopt an inheritence- or class-composition-based solution to implement classes like
 `PumpedLossyMode` and `PumpedLossyModeIP` (for an inheritance-based solution, cf. [below](#hierarchicaloscillator); for one based on class-composition, cf. the actual implementation of a harmonic-oscillator 
@@ -108,8 +118,8 @@ Implementing an X-X interaction {#basicxxinteraction}
 
 Let us consider the interaction described by the Hamiltonian \f[H_\text{X-X}=g(a+a^\dagger)(b+b^\dagger).\f]
 
-The class implementing this interaction has to be derived from Interaction`<2>` because it is a binary interaction, and TridiagonalHamiltonian`<2,...>`
-(note that quantumoperator::Tridiagonal is capable to represent direct products of tridiagonal matrices).
+The class implementing this interaction has to be derived from structure::Interaction `<2>` because it is a binary interaction, and quantumoperator::TridiagonalHamiltonian `<2,...>`
+(note that quantumoperator::Tridiagonal is capable to represent direct products of tridiagonal matrices in the case of `RANK>1`).
 
 The only thing requiring some care is that once we transform some elements into interaction picture, the whole Hamiltonian is transformed, that is,
 \f$a\f$ or \f$b\f$ or both may be in interaction picture. Here, for the sake of simplicity, we assume that both constituents are of the type `PumpedLossyMode`.
@@ -125,7 +135,7 @@ Consider `ExampleInteraction.h`:\dontinclude ExampleInteraction.h
 As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in \f$H_{\text{X-X;I}}(t)\f$,
 which result from the use of interaction picture.
 
-The free elements are stored as shared pointers in the interaction element, and it is the task of FreesProxy to turn the constant references supplied to the constructor into (non-owning)
+The free elements are stored as shared pointers in the interaction element, and it is the task of structure::Interaction::FreesProxy to turn the constant references supplied to the constructor into (non-owning)
 shared pointers. Of course, the free elements have to live in a larger scope than the interaction, otherwise we may run into trouble with dangling pointers.
 
 
@@ -135,12 +145,12 @@ Using class inheritance {#hierarchicaloscillator}
 For an inheritance-based solution, it pays to define a base class collecting all the common services. Consider the following snippet from `ExampleMode.h`: \dontinclude ExampleMode.h
 \skip namespace hierarchical {
 \until } // hierarchical
-Here, instead of ElementLiouvilleanStrategies, we can rather use ElementLiouvillean, which has as many virtual functions `doActWithJ` and `rate` as there 
-are jumps (indicated by the second template argument), distinguished by the tagging classes lindblad::Base::LindbladNo. It results in a compile-time error to instantiate such
+Here, instead of structure::ElementLiouvilleanStrategies, we can rather use structure::ElementLiouvillean, which has as many virtual functions `doActWithJ` and `rate` as there 
+are jumps (indicated by the second template argument), distinguished by the tagging classes structure::lindblad::Base::LindbladNo. It results in a compile-time error to instantiate such
 a class with an argument not smaller than the number of Lindblads (since the numbering of jumps begins with 0). Via this solution we can get around the awkwardness of specifying
-the jump and rate strategies for ElementLiouvilleanStrategies, while retaining a way of controlling the number of Lindblads @ compile time.
+the jump and rate strategies for structure::ElementLiouvilleanStrategies, while retaining a way of controlling the number of Lindblads @ compile time.
 
-Deriving from `ModeBase`, the definition of `PumpedLossyMode` is trivial, while for `PumpedLossyModeIP`, we have to define the virtual functions inherited from FreeExact:
+Deriving from `ModeBase`, the definition of `PumpedLossyMode` is trivial, while for `PumpedLossyModeIP`, we have to define the virtual functions inherited from structure::FreeExact:
 \skip namespace hierarchical {
 \until } // hierarchical
 
@@ -170,7 +180,7 @@ The implementation is formally equivalent to the previous: \dontinclude ExampleI
 \skip hierarchical::
 \until {}
 
-\warning Here, it would cause a hard-to-detect physical error to use TridiagonalHamiltonian`<2,false>` instead of TridiagonalHamiltonian`<2,true>`, because in the former case,
+\warning Here, it would cause a hard-to-detect physical error to use quantumoperator::TridiagonalHamiltonian `<2,false>` instead of quantumoperator::TridiagonalHamiltonian `<2,true>`, because in the former case,
 the time update of the binary tridiagonal would not occur even with `PumpedLossyModeIP`.
 
 Other uses of interaction elements {#otherusesofinteraction}
@@ -188,7 +198,7 @@ derived from the former interaction element in the [inheritance-based design](#h
 \skip } // hierarchical
 \skip namespace hierarchical {
 \until } // hierarchical
-Since now we need to operate on two quantum numbers to calculate the quantum averages, we derived from ElementAveraged`<2>`, which operates on a binary quantumdata::LazyDensityOperator.
+Since now we need to operate on two quantum numbers to calculate the quantum averages, we derived from structure::ElementAveraged `<2>`, which operates on a binary quantumdata::LazyDensityOperator.
 The implementation of the averaging function may read \dontinclude ExampleInteraction.cc
 \skip InteractionX_X_Correlations
 \until averages(3)
