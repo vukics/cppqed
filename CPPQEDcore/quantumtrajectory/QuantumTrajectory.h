@@ -46,6 +46,10 @@ protected:
 
   mutable double tIntPic0_ ; // The time instant of the beginning of the current time step.
 
+  /// Check the dimensions of the stored quantum system against `construct` \tparam CONSTRUCT typically either a quantumdata::StateVector (as in MCWF_Trajectory) or a quantumdata::DensityOperator (as in Master)
+  template<typename CONSTRUCT>
+  void checkDimension(const CONSTRUCT& construct) const {if (construct!=*qs_.getQS()) throw DimensionalityMismatchException();}
+  
 private:
   const QuantumSystemWrapper qs_;
 

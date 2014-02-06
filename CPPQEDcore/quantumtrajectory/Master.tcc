@@ -26,16 +26,16 @@ Base<RANK>::Base(DensityOperator& rho,
                  const DensityOperatorLow& scaleAbs
                  )
   : QuantumTrajectory(qs,true,
-             rho.getArray(),
-             bind(&Base<RANK>::derivs,this,_1,_2,_3),
-             initialTimeStep<RANK>(qs),
-             p,
-             scaleAbs,
-             evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
+                      rho.getArray(),
+                      bind(&Base<RANK>::derivs,this,_1,_2,_3),
+                      initialTimeStep<RANK>(qs),
+                      p,
+                      scaleAbs,
+                      evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
     rho_(rho)
 {
   if (!getQSW().applicableInMaster()) throw master::SystemNotApplicable();
-  if (rho!=*getQSW().getQS()) throw DimensionalityMismatchException();
+  QuantumTrajectory::checkDimension(rho);
 
 }
 

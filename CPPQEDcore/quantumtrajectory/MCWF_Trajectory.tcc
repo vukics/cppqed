@@ -57,7 +57,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     logger_(p.logLevel,getQSW().getHa()!=0,getQSW().template nAvr<structure::LA_Li>())
 {
-  if (psi!=*getQSW().getQS()) throw DimensionalityMismatchException();
+  QuantumTrajectory::checkDimension(psi);
   if (!getTime()) if(const auto li=getQSW().getLi()) { // On startup, dpLimit should not be overshot, either.
     Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
     manageTimeStep(rates,getEvolved().get(),false);
