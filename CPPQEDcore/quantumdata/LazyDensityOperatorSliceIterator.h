@@ -21,6 +21,8 @@ namespace ldo {
   
 /** \page slicinganldo Slicing a LazyDensityOperator
  * 
+ * \tableofcontents
+ * 
  * Analogously to \ref multiarrayconcept "slicing state vectors", it is also necessary to slice LazyDensityOperator objects
  * because for calculating quantum expectation values of subsystem-observables (e.g. in Composite objects),
  * the partial-trace density operator is needed.
@@ -30,7 +32,8 @@ namespace ldo {
  *
  * Slicing is fully recursive, a sliced LazyDensityOperator (usually obtained by dereferencing a DiagonalIterator) can be further sliced.
  * 
- * ### Notes on implementation
+ * Notes on implementation {#slicinganldoimplementation}
+ * =======================
  * 
  * Difficulty: LazyDensityOperator is an abstract interface, and the organization of its data (and hence the actual procedure of slicing)
  * varies along implementations.

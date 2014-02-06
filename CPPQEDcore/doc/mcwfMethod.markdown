@@ -11,7 +11,8 @@ The optimal sampling is achieved by evolving the state vector in two steps, one 
 Suppose that the Master equation of the system is of the form
 \f[\dot\rho=\frac1{i\hbar}\comm{H}\rho+\Liou\rho\equiv\frac1{i\hbar}\comm{H}\rho+\sum_m\lp J_m\rho J_m^\dag-\frac12\comm{J_m^\dag J_m}{\rho}_+\rp\equiv\frac1{i\hbar}\lp\HnH\rho-\rho\HnH^\dagger\rp+\sum_mJ_m\rho J_m^\dag.\f]
 
-the usual form in quantum optics, and, in fact, the most general (so-called Lindblad) form. The non-Hermitian Hamiltonian is defined as \f[\HnH=H-\frac{i\hbar}2\sum_m J^\dag_m J_m.\f]
+This is the usual form in quantum optics, and, in fact, the most general (so-called Lindblad) form.
+The non-Hermitian Hamiltonian is defined as \f[\HnH=H-\frac{i\hbar}2\sum_m J^\dag_m J_m.\f]
 At time \f$t\f$ the system is in a state with normalised state vector \f$\ket{\Psi(t)}\f$. To obtain the state vector at time \f$t+\delta t\f$ up to first order in \f$\delta t\f$:
 -# The state vector is evolved according to the nonunitary dynamics \f[i\hbar\frac{d\ket{\Psi}}{dt}=\HnH\ket{\Psi}\f] to obtain (up to first order in \f$\delta t\f$) 
 \f[\ket{\Psi_{\text{nH}}(t+\delta t)}=\lp1-\frac{i\HnH\,\delta t}\hbar\rp \ket{\Psi(t)}.\f]
