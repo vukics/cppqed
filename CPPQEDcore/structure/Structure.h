@@ -43,31 +43,28 @@ typedef blitz::TinyVector<bool,3> SystemCharacteristics;
 using boost::dynamic_pointer_cast;
 
 
-/**
- * \defgroup dynamiccastingfunctions Dynamic-casting functions from QuantumSystem or DynamicsBase
- *
- * These functions rely on \refBoostConstruct{dynamic_pointer_cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to perform dynamic casting of shared pointerés.
- *
- * @{
- */
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Exact \related QuantumSystem
 template<int RANK>
 inline 
 const typename Exact<RANK>::Ptr 
 qse(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Exact<RANK> >(quantumSystem);}
 
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Hamiltonian \related QuantumSystem
 template<int RANK>
 inline 
 const typename Hamiltonian<RANK>::Ptr 
 qsh(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Hamiltonian<RANK> >(quantumSystem);}
 
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Liouvillean \related QuantumSystem
 template<int RANK>
 inline 
 const typename Liouvillean<RANK>::Ptr 
 qsl(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Liouvillean<RANK> >(quantumSystem);}
 
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Averaged \related QuantumSystem
 template<int RANK>
 inline 
 const typename Averaged<RANK>::Ptr 
@@ -75,32 +72,35 @@ qsa(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Averaged<RANK> >(quantumSystem);}
 
 
-
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Exact \related DynamicsBase
 template<int RANK>
 inline 
 const typename Exact<RANK>::Ptr 
 qse(DynamicsBase::Ptr base)
 {return dynamic_pointer_cast<const Exact<RANK> >(base);}
 
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Hamiltonian \related DynamicsBase
 template<int RANK>
 inline 
 const typename Hamiltonian<RANK>::Ptr 
 qsh(DynamicsBase::Ptr base)
 {return dynamic_pointer_cast<const Hamiltonian<RANK> >(base);}
 
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Liouvillean \related DynamicsBase
 template<int RANK>
 inline 
 const typename Liouvillean<RANK>::Ptr 
 qsl(DynamicsBase::Ptr base)
 {return dynamic_pointer_cast<const Liouvillean<RANK> >(base);}
 
+/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Averaged \related DynamicsBase
 template<int RANK>
 inline 
 const typename Averaged<RANK>::Ptr 
 qsa(DynamicsBase::Ptr base)
 {return dynamic_pointer_cast<const Averaged<RANK> >(base);}
 
-//@}
+
 
 // Some functions that are used in contexts other than QuantumSystemWrapper are factored out:
 

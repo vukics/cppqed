@@ -10,26 +10,37 @@
 
 namespace quantumoperator {
 
+/// Direct-product operator for Sigma \related Sigma
 /**
- * \defgroup sigmadirectproducts Direct-product operators for Sigma
+ * Together with its overloads, this operator aptly demonstrates the use of DirectProduct and the meaning of its template parameters.
  * 
- * These operators aptly demonstrate the use of DirectProduct and the meaning of its template parameters.
+ * Mixing (by composition from the right) version.
  * 
- * @{
+ * \tparam OTHER the other operator type to mix with
+ * 
  */
 template<int L, int R, typename OTHER>
 const DirectProduct<L,R,OTHER,true >
 operator*(const Sigma<L,R>&, const OTHER&);
 
+
+/// Direct-product operator for Sigma \related Sigma
+/**
+ * Together with its overloads, this operator aptly demonstrates the use of DirectProduct and the meaning of its template parameters.
+ * 
+ * Mixing (by composition from the left) version.
+ * 
+ * \tparam OTHER the other operator type to mix with
+ * 
+ */
 template<int L, int R, typename OTHER>
 const DirectProduct<L,R,OTHER,false>
 operator*(const OTHER&, const Sigma<L,R>&);
 
+/// Direct-product operator for Sigma \related Sigma Homogeneous (non-mixing) version.
 template<int L1, int R1, int L2, int R2>
 const DirectProduct<L1,R1,Sigma<L2,R2>,true>
 operator*(const Sigma<L1,R1>&, const Sigma<L2,R2>&);
-
-//@}
 
 
 /// Stateless class implementing the unary quantumoperator \f$\ket{L}\bra{R}\f$.
