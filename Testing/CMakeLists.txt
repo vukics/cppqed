@@ -25,8 +25,8 @@ find_package(PythonInterp 2.7 REQUIRED)
 
 configure_file(testdriver.conf.in testdriver.conf)
 
-add_custom_target(check_fast DEPENDS check_compile check_compilefail check_run check_continue check_boost testdriver.conf.in)
-add_custom_target(check DEPENDS check_fast check_cpypyqed)
+add_custom_target(check_fast DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
+add_custom_target(check DEPENDS check_fast check_compile check_cpypyqed)
 
 #! \name Project options
 #! @{
