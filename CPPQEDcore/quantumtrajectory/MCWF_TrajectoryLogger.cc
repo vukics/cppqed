@@ -55,7 +55,7 @@ void quantumtrajectory::MCWF_Logger::stepBack(double dp, double dtDid, double ne
   ++nToleranceOvershot_;
   if (logControl) dpToleranceMaxOvershoot_=max(dpToleranceMaxOvershoot_,dp);
   if (logLevel_>2)
-    cerr<<"# dpTolerance overshot: "<<dp<<" stepping back to "<<t<<" timestep decreased: "<<dtDid<<" => "<<newDtTry<<endl;
+    cout<<"# dpTolerance overshot: "<<dp<<" stepping back to "<<t<<" timestep decreased: "<<dtDid<<" => "<<newDtTry<<endl;
 }
 
 
@@ -64,7 +64,7 @@ void quantumtrajectory::MCWF_Logger::overshot(double dp, double oldDtTry, double
   ++nOvershot_;
   if (logControl) dpMaxOvershoot_=max(dpMaxOvershoot_,dp);
   if (logLevel_>2)
-    cerr<<"# dpLimit overshot: "<<dp<<" timestep decreased: "<<oldDtTry<<" => "<<newDtTry<<endl;
+    cout<<"# dpLimit overshot: "<<dp<<" timestep decreased: "<<oldDtTry<<" => "<<newDtTry<<endl;
 }
 
 
@@ -79,7 +79,7 @@ void quantumtrajectory::MCWF_Logger::jumpOccured(double t, size_t lindbladNo)
 {
   traj_.push_back(make_pair(t,lindbladNo));
   if (logLevel_>1)
-    cerr<<"# Jump No. "<<lindbladNo<<" at time "<<t<<endl;
+    cout<<"# Jump No. "<<lindbladNo<<" at time "<<t<<endl;
 }
 
 
@@ -87,7 +87,7 @@ void quantumtrajectory::MCWF_Logger::logFailedSteps(size_t n)
 {
   nFailedSteps_+=n;
   if (logLevel_>3)
-    cerr<<"# Number of failed steps in this timestep: "<<n<<endl;
+    cout<<"# Number of failed steps in this timestep: "<<n<<endl;
 }
 
 
