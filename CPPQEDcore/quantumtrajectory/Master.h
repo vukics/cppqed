@@ -150,8 +150,8 @@ public:
   Master(DensityOperator& rho, ///< the density operator to be evolved
          const SYS& sys, ///< object representing the quantum system
          const master::Pars& pt, ///< parameters of the evolution
-         bool negativity, ///< governs whether entanglement should be calculated, cf. quantumdata::negPT
-         const DensityOperatorLow& scaleAbs=DensityOperatorLow() ///< has the same role as in evolved::Maker::operator()
+         bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
+         const DensityOperatorLow& scaleAbs=DensityOperatorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
         )
     : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),negativity)
   {}

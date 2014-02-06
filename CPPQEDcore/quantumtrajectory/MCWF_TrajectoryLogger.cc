@@ -18,8 +18,8 @@
 using namespace std;
 
 
-quantumtrajectory::MCWF_Logger::MCWF_Logger(int logLevel, bool isHamiltonian, size_t nJumps)
-  : logLevel_(logLevel), isHamiltonian_(isHamiltonian), nJumps_(nJumps),
+quantumtrajectory::MCWF_Logger::MCWF_Logger(int logLevel, bool isHamiltonian, size_t nLindblads)
+  : logLevel_(logLevel), isHamiltonian_(isHamiltonian), nLindblads_(nLindblads),
     nSteps_(), nOvershot_(), nToleranceOvershot_(), nFailedSteps_(), nHamiltonianCalls_(),
     dpMaxOvershoot_(), dpToleranceMaxOvershoot_(), normMaxDeviation_(),
     traj_()
@@ -137,7 +137,7 @@ ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerLi
       
   using namespace accumulators;
   
-  /* The different kind of jumps should be collected into different histograms
+  /* The different kinds of jumps should be collected into different histograms
   typedef vector<accumulator_set<double, features<tag::density> > > acc;
   typedef vector<iterator_range<std::vector<std::pair<double, double> >::iterator > > histogram_type;
   */

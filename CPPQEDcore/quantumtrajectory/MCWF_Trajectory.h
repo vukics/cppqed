@@ -80,7 +80,11 @@ protected:
 public:
   /// Templated constructor with the same idea as Master::Master
   template<typename SYS>
-  MCWF_Trajectory(StateVector& psi, const SYS& sys, const ParsMCWF&, const StateVectorLow& =StateVectorLow());
+  MCWF_Trajectory(StateVector& psi, ///< the state vector to be evolved
+                  const SYS& sys, ///< object representing the quantum system
+                  const ParsMCWF& p, ///< parameters of the evolution
+                  const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in Master::Master
+                 );
 
   /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
   /** Implemented via structure::Hamiltonian::addContribution */
