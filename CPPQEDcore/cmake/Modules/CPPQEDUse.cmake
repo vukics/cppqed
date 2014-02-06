@@ -306,7 +306,7 @@ endfunction()
 #! - Create a target for every script found. If the script (without file extension) is listed in the list `EXCLUDE_FROM_ALL_SCRIPTS`,
 #!  this script will not be built automatically.
 #! - Exclude all scripts listed in `NEED_FLENS` (without file extension) from compilation, if the current C++QED library does not support FLENS.
-#! - Create a target `${PROJECT_NAME}_all` which compiles all scripts.
+#! - Create a target `${PROJECT_NAME}_all` which compiles all scripts not listed in `EXCLUDE_FROM_ALL_SCRIPTS`.
 macro(scripts_project)
   # find CPPQED elements project
   find_package(CPPQEDelements ${CPPQED_ID} REQUIRED)
@@ -348,11 +348,11 @@ macro(scripts_project)
     list(FIND EXCLUDE_SCRIPTS ${SCRIPT} EX)
     list(FIND EXCLUDE_FROM_ALL_SCRIPTS ${SCRIPT} NOT_ALL)
     if( (EX EQUAL -1) AND (CPPQED_SERIALIZATION_FOUND OR (F EQUAL -1)) )
-      set(SCRIPTNAMES ${SCRIPTNAMES} ${SCRIPT})
       add_executable(${SCRIPT} ${s} $<TARGET_OBJECTS:${PROJECT_NAME}_versions_obj>)
       target_link_libraries(${SCRIPT} ${CPPQED_LIBRARIES} ${ALL_ELEMENTS_LIBRARIES})
       set_target_properties(${SCRIPT} PROPERTIES DEBUG_POSTFIX _d)
       if(NOT_ALL EQUAL -1)
+        set(SCRIPTNAMES ${SCRIPTNAMES} ${SCRIPT})
         install(TARGETS ${SCRIPT}
                 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
       else()
