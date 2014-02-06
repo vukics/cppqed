@@ -168,9 +168,8 @@ public:
 };
 
 
+/// A heuristic determination of the inital timestep from the highest frequency of a physical system.
 inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFrequency);}
-// A heuristic determination of the inital timestep from the highest frequency of a physical system.
-
 
 
 /// The base class of the trajectory-bundle condensing the quintessential characteristics of any trajectory
