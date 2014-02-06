@@ -189,14 +189,14 @@ void binary::Exact::actWithU_v(double t, StateVectorLow& psi, double t0) const
 /////////////////
 
 
-void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
 {
   using namespace blitzplusplus; using basi::fullRange;
 
-  if (const auto ha=free0_.getHa()) for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,tIntPic0));
-  if (const auto ha=free1_.getHa()) for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,tIntPic0));
+  if (const auto ha=free0_.getHa()) for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,t0));
+  if (const auto ha=free1_.getHa()) for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,t0));
 
-  ia_.addContribution(t,psi,dpsidt,tIntPic0);
+  ia_.addContribution(t,psi,dpsidt,t0);
 
 }
 

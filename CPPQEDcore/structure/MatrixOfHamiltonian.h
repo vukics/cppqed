@@ -8,7 +8,7 @@
 
 template<typename T> // T should model both Hamiltonian and DimensionsBookkeeper
 const linalg::CMatrix
-calculateMatrix(const T& hamiltonian, double t=0, double tIntPic0=0)
+calculateMatrix(const T& hamiltonian, double t=0, double t0=0)
 {
   using namespace linalg;
 
@@ -33,7 +33,7 @@ calculateMatrix(const T& hamiltonian, double t=0, double tIntPic0=0)
     psi1D(row)=1;
     for (int col=0; col<dim; ++col) {
       if (const auto ha=dynamic_cast<const structure::Hamiltonian<RANK>*>(&hamiltonian)) 
-        ha->addContribution(t,psi.getArray(),dpsidt.getArray(),tIntPic0);
+        ha->addContribution(t,psi.getArray(),dpsidt.getArray(),t0);
       res(col,row)=DCOMP_I*dpsidt1D(col); 
       // note that addContribution is meant to calculate Hamiltonian over DCOMP_I, which we correct here
       dpsidt=0;

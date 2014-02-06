@@ -45,7 +45,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 {
   drhodtLow=0;
 
-  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,this->tIntPic0_));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,getT0()));
 
   {
     linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
@@ -74,7 +74,7 @@ Base<RANK>::step_v(double deltaT)
   if (const auto ex=getQSW().getEx()) {
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_.getArray());
-    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,this->tIntPic0_));
+    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,getT0()));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);
@@ -82,7 +82,7 @@ Base<RANK>::step_v(double deltaT)
     rhoLow=conj(rhoLow);
   }
 
-  this->tIntPic0_=getTime();
+  QuantumTrajectory::setT0();
 
 
   // The following "smoothing" of rho_ has proven to be necessary for the algorithm to remain stable:

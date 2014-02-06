@@ -32,7 +32,7 @@ public:
 
   /// Adds the Hamiltonian contribution \f$\frac{H(t)}i\ket\Psi\f$ of the given (sub)system to `dpsidt`
   /**
-   * The assumption is that the time when the Schrödinger picture and interaction picture (if any) coincide is `tIntPic0`. There are two important points to note:
+   * The assumption is that the time when the Schrödinger picture and interaction picture (if any) coincide is `t0`. There are two important points to note:
    * -# The contribution has to be *added* to `dpsidt` instead of `dpsidt` being *replaced*. 
    * This is because when the given system is embedded in a larger system, other (sub)systems may also contribute.
    * -# The function has to calculate the effect of \f$\frac{H(t)}i\f$ and not merely \f$H\f$, since it is the former which determines the derivative of the state vector.
@@ -46,9 +46,9 @@ public:
   void addContribution(double t, ///<[in] the time instant \f$t\f$ for #TWO_TIME dependence
                        const StateVectorLow& psi, ///<[in] the state vector \f$\ket\Psi\f$
                        StateVectorLow& dpsidt, ///<[in/out] the state vector to be contributed to by \f$\frac{H(t)}i\ket\Psi\f$
-                       double tIntPic0 ///<[in] the time instant \f$t_0\f$ for #TWO_TIME dependence
+                       double t0 ///<[in] the time instant \f$t_0\f$ for #TWO_TIME dependence
                       ) const
-                       {addContribution_v(t,psi,dpsidt,tIntPic0);}
+                       {addContribution_v(t,psi,dpsidt,t0);}
 
   virtual ~Hamiltonian() {}
 
@@ -73,9 +73,9 @@ public:
 
 private:
   /// The inherited virtual gets implemented by calling a newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink
-  void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const final
+  void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const final
   {
-    addContribution_v(Time(t,tIntPic0),psi,dpsidt);
+    addContribution_v(Time(t,t0),psi,dpsidt);
   }
 
   /// The newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink

@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFileDefault
 #ifndef QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
 #define QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
 
@@ -16,15 +16,6 @@
 
 
 namespace quantumtrajectory {
-
-
-///////////////////////////////////////
-//
-// Monte Carlo wave-function trajectory
-//
-///////////////////////////////////////
-
-// NEEDS_WORK factor out template-parameter independent code
 
 
 #define BASE_class trajectory::Stochastic<typename quantumdata::Types<RANK>::StateVectorLow, const quantumdata::StateVector<RANK>&>
@@ -46,8 +37,8 @@ namespace quantumtrajectory {
  *     -# The total jump rate \f$\delta r\f$ is calculated.
  *     -# If \f$\delta r\delta t>\delta p_\text{limit}'\f$, the step is retraced: both the state vector and the state of the ODE stepper are restored to cached values
  *        at the beginning of the timestep, and phase I. is performed anew with a smaller stepsize \f$\delta p_\text{limit}/\delta r\f$. 
- *        With this, we ensure that \f$\delta p_\text{limit}\f$ is likely not to be overshot in the next try.
- *        \note It is assumed that \f$\delta p_\text{limit}'>\delta p_\text{limit}\f$, their ratio being a parameter of the MCWF stepper.
+ *        With this, we ensure that \f$\delta p_\text{limit}\f$ (the parameter ParsMCWF::dpLimit) is likely not to be overshot in the next try.
+ *        \note It is assumed that \f$\delta p_\text{limit}'>\delta p_\text{limit}\f$, their ratio being a parameter (ParsMCWF::overshootTolerance) of the MCWF stepper.
  *     -# If just \f$\delta r\delta t_\text{next}>\delta p_\text{limit}\f$ (where \f$\Delta t_\text{next}\f$ is a guess for the next timestep given by the ODE stepper),
  *        the coherent step is accepted, but the timestep to try next is modified, to reduce the likeliness of overshoot: \f$\delta t_\text{next}\longrightarrow\delta p_\text{limit}/\delta r\f$.
  *     \see The discussion at Sec. \ref anadaptivemcwfmethod "An adaptive MCWF method".
@@ -57,6 +48,9 @@ namespace quantumtrajectory {
  * \note In phase 2.b.ii, another approach would be not to trace back the whole step, but make a coherent step *backwards* to an intermediate time instant found by linear interpolation.
  * This has several drawbacks, however, the most significant being that in the ODE stepper, it is not clear what to take as the timestep to try at the point when the direction of time is reversed.
  * (Although in evolved::Evolved it is simply taken to be the timestep done in the last step…)
+ * 
+ * \todo factor out template-parameter independent code
+ * 
  */
 
 template<int RANK>
@@ -77,29 +71,40 @@ public:
 
 #undef  BASE_class
 
+private:
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-  using Base::getEvolved; using Base::getRandomized; using Base::getDtDid; using Base::getDtTry; using Base::getTime;
+protected:
+  using Base::getEvolved; using Base::getRandomized; using Base::getDtDid; using Base::getDtTry; using Base::getTime; using QuantumTrajectory::getT0;
 
+public:
+  /// Templated constructor with the same idea as Master::Master
   template<typename SYS>
   MCWF_Trajectory(StateVector& psi, const SYS& sys, const ParsMCWF&, const StateVectorLow& =StateVectorLow());
 
+  /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
+  /** Implemented via structure::Hamiltonian::addContribution */
   void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
+  /// \name Getters
+  //@{
   const StateVector& getPsi() const {return psi_;} 
 
   const MCWF_Logger& getLogger() const {return logger_;}
+  //@}
   
 protected:
-  std::ostream&    display_v(std::ostream&, int    ) const;
-  std::ostream& displayKey_v(std::ostream&, size_t&) const;
+  std::ostream&    display_v(std::ostream&, int    ) const; ///< Forwards to structure::Averaged::display
+  std::ostream& displayKey_v(std::ostream&, size_t&) const; ///< Forwards to structure::Averaged::displayKey
 
   using QuantumTrajectory::getQSW;
 
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar);
+  /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes MCWF_Logger state
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar) {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
+  /// Forwards to Base::writeStateMore_v + serializes MCWF_Logger state
   cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const {return Base::writeStateMore_v(oar) & logger_;}
 
-  std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);}
+  std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);} ///< calls MCWF_Logger::onEnd
   
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;

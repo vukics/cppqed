@@ -54,21 +54,19 @@ public:
   typedef quantumtrajectory::QuantumTrajectory<RANK, Adaptive> QuantumTrajectory;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
-  
-  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime;
-
-  Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
   /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
 
 protected:
+  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime; using QuantumTrajectory::getQSW; using QuantumTrajectory::getT0;
+
+  Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
+
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
   typedef boost::function<void(const StateVectorLow&, StateVectorLow&)> BinaryFunction;
 
   DensityOperator& rho_;
-
-  using QuantumTrajectory::getQSW;
 
   const typename Averaged::Ptr getAv() const {return getQSW().getAv();}
 

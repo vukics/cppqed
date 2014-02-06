@@ -65,8 +65,8 @@ public:
   /// Describes the operation which transforms from interaction picture to the normal picture: \f$\ket{\Psi(t)}\rightarrow U(t,t_0)\ket{\Psi}\f$
   void actWithU(double t, ///<[in] \f$t\f$
                 StateVectorLow& psi, ///<[in/out] \f$\ket{\Psi}\f$
-                double tIntPic0 ///<[in] \f$t_0\f$
-               ) const {return actWithU_v(t,psi,tIntPic0);} 
+                double t0 ///<[in] \f$t_0\f$
+               ) const {return actWithU_v(t,psi,t0);} 
 
 private:
   virtual void actWithU_v(double, StateVectorLow&, double) const = 0;
@@ -89,7 +89,7 @@ public:
   typedef typename time::DispatcherIsTwoTime<IS_TWO_TIME>::type Time;
   
 private:
-  void actWithU_v(double t, StateVectorLow& psi, double tIntPic0) const final {actWithU_v(Time(t,tIntPic0),psi);}
+  void actWithU_v(double t, StateVectorLow& psi, double t0) const final {actWithU_v(Time(t,t0),psi);}
 
   virtual void actWithU_v(Time, StateVectorLow& psi) const = 0;
 

@@ -32,7 +32,7 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
   if (const auto ha=getQSW().getHa()) {
     dpsidt=0;
 
-    ha->addContribution(t,psi,dpsidt,this->tIntPic0_);
+    ha->addContribution(t,psi,dpsidt,getT0());
     logger_.hamiltonianCalled();
   }
 }
@@ -94,8 +94,8 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   double t=getTime();
 
   if (const auto ex=getQSW().getEx()) {
-    ex->actWithU(getTime(),psi_.getArray(),this->tIntPic0_);
-    this->tIntPic0_=t;
+    ex->actWithU(getTime(),psi_.getArray(),getT0());
+    QuantumTrajectory::setT0(t);
   }
 
   logger_.processNorm(psi_.renorm());
@@ -105,8 +105,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
 
 
 template<int RANK>
-const typename MCWF_Trajectory<RANK>::IndexSVL_tuples
-MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const
+auto MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const -> const IndexSVL_tuples
 {
   IndexSVL_tuples res;
   for (int i=0; i<rates->size(); i++)
@@ -240,14 +239,6 @@ template<int RANK>
 std::ostream& MCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) const
 {
   return getQSW().template displayKey<structure::LA_Av>(os,i);
-}
-
-template<int RANK>
-cpputils::iarchive&  MCWF_Trajectory<RANK>::readStateMore_v(cpputils::iarchive& iar)
-{
-  QuantumTrajectory:: readStateMore_v(iar);
-  iar & logger_; 
-  return iar;
 }
 
 

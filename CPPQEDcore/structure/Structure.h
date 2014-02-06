@@ -222,7 +222,7 @@ public:
 
   /// \name Forwarded member from Hamiltonian
   //@{
-  void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const {if (ha_) ha_->addContribution(t,psi,dpsidt,tIntPic0);}
+  void addContribution(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const {if (ha_) ha_->addContribution(t,psi,dpsidt,t0);}
   //@}
 
 

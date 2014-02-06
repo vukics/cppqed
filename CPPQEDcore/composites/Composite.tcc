@@ -356,14 +356,14 @@ template<typename VA>
 class composite::Hamiltonian<VA>::AddContribution
 {
 public:
-  AddContribution(const Frees& frees, double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) 
-    : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), tIntPic0_(tIntPic0) {}
+  AddContribution(const Frees& frees, double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) 
+    : frees_(frees), t_(t), psi_(psi), dpsidt_(dpsidt), t0_(t0) {}
 
   template<typename Vec, typename Ha>
   void help(typename Ha::Ptr ha) const
   {
     if (ha) 
-      for_each(blitzplusplus::basi::fullRange<Vec>(psi_),blitzplusplus::basi::fullRange<Vec>(dpsidt_),boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,tIntPic0_)); 
+      for_each(blitzplusplus::basi::fullRange<Vec>(psi_),blitzplusplus::basi::fullRange<Vec>(dpsidt_),boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,t0_)); 
   }
 
   ACTS_FREES_operator(Ha);
@@ -374,15 +374,15 @@ private:
   const double t_;
   const StateVectorLow& psi_; 
   StateVectorLow& dpsidt_; 
-  const double tIntPic0_;
+  const double t0_;
 
 };
 
 
 template<typename VA>
-void composite::Hamiltonian<VA>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void composite::Hamiltonian<VA>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
 {
-  CALL_composite_worker( AddContribution(frees_,t,psi,dpsidt,tIntPic0) ) ;
+  CALL_composite_worker( AddContribution(frees_,t,psi,dpsidt,t0) ) ;
 }
 
 

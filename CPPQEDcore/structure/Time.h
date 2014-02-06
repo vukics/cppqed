@@ -14,7 +14,7 @@ namespace structure {
 
 
 /// Enumeration of different possibilities for time dependence of Hamiltonians
-/** With \f$t_0\f$ being the time instant where the \link Exact two pictures\endlink coincide: */
+/** With \f$t_0\f$ being the time instant where the \link Exact two pictures\endlink coincide (cf. quantumtrajectory::QuantumTrajectory::getT0): */
 enum TimeDependence {
   TWO_TIME, ///< **Case 1** \f$H(t,t_0)\f$ – Time-dependent problem + \link Exact exact part\endlink (\f$U(t,t_0)\f$)
   ONE_TIME, ///< **Case 2** \f$H(t)\f$ – Time-dependent problem, no exact part **OR Case 3** \f$H(t-t_0)\f$ – Time-independent problem + \link Exact exact part\endlink (\f$U(t-t_0)\f$)
@@ -26,7 +26,7 @@ enum TimeDependence {
 class TwoTime : private boost::equality_comparable<TwoTime>
 {
 public:
-  TwoTime(double t, double tIntPic0) : t_(t), t0_(tIntPic0) {}
+  TwoTime(double t, double t0) : t_(t), t0_(t0) {}
   
   double getT () const {return t_ ;}
   double getT0() const {return t0_;}
@@ -42,7 +42,7 @@ private:
 class OneTime : private boost::equality_comparable<OneTime>
 {
 public:
-  explicit OneTime(double t, double tIntPic0=0) : deltaT_(t-tIntPic0) {}
+  explicit OneTime(double t, double t0=0) : deltaT_(t-t0) {}
 
   operator double() const {return deltaT_;}
 
