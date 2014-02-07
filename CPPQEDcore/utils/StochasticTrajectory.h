@@ -108,8 +108,12 @@ class Base {};
 
 
 
-/// An ensemble of Averageable trajectories providing services for ensemble averaging
+/// An ensemble of Averageable trajectories providing services for ensemble averaging and evolving the element trajectories serially
 /**
+ * \note Time averaging does not use stepsize-weighting, as experience has shown that this leads to worse convergence (similarly to quantumtrajectory::TimeAveragingMCWF_Trajectory).
+ * 
+ * \todo Stepsize-weighting could eventually be enabled as an option by a switch
+ * 
  * The design is recursive: since Ensemble itself inherits from Averageable, it can act as an element in a larger Ensemble.
  * 
  * The elements do not need to have the same type, they only need to have a common Averageable type as a base.
