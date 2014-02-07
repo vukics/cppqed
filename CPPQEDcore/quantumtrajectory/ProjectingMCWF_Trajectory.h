@@ -37,8 +37,8 @@ public:
   {}
 
 private:
-  std::ostream&    display_v(std::ostream&, int    ) const;
-  std::ostream& displayKey_v(std::ostream&, size_t&) const;
+  std::ostream&    display_v(std::ostream&, int    ) const override;
+  std::ostream& displayKey_v(std::ostream&, size_t&) const override;
 
   const linalg::CMatrix help() const;
 

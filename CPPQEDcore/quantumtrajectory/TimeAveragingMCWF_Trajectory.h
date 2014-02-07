@@ -41,21 +41,21 @@ public:
   const Averages getAverages() const {return averages_;}
   
 private:
-  std::ostream& display_v(std::ostream&, int) const;
+  std::ostream& display_v(std::ostream&, int) const override;
   
-  std::ostream& logOnEnd_v(std::ostream& os) const;
+  std::ostream& logOnEnd_v(std::ostream& os) const override;
   
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       {return Base:: readStateMore_v(iar) & averages_ & sum_;}
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const {return Base::writeStateMore_v(oar) & averages_ & sum_;}
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return Base:: readStateMore_v(iar) & averages_ & sum_;}
+  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & averages_ & sum_;}
   
+  const std::string trajectoryID_v() const override {return "TimeAveragingMCWF_Trajectory";}
+
   const double relaxationTime_;
   
   mutable Averages averages_;
   mutable long sum_;
   
   const typename Averaged::Ptr av_;
-
-  const std::string trajectoryID_v() const {return "TimeAveragingMCWF_Trajectory";}
 
 };
 

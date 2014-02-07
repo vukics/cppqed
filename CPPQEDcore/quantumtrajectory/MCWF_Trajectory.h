@@ -98,27 +98,29 @@ public:
   //@}
   
 protected:
-  std::ostream&    display_v(std::ostream&, int    ) const; ///< Forwards to structure::Averaged::display
-  std::ostream& displayKey_v(std::ostream&, size_t&) const; ///< Forwards to structure::Averaged::displayKey
+  std::ostream&    display_v(std::ostream&, int    ) const override; ///< Forwards to structure::Averaged::display
+  std::ostream& displayKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::displayKey
 
   using QuantumTrajectory::getQSW;
 
   /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes MCWF_Logger state
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar) {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar) override {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
   /// Forwards to Base::writeStateMore_v + serializes MCWF_Logger state
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const {return Base::writeStateMore_v(oar) & logger_;}
+  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & logger_;}
 
-  std::ostream& logOnEnd_v(std::ostream& os) const {return logger_.onEnd(os);} ///< calls MCWF_Logger::onEnd
+  std::ostream& logOnEnd_v(std::ostream& os) const override {return logger_.onEnd(os);} ///< calls MCWF_Logger::onEnd
   
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Rates Rates;
 
-  void step_v(double); // performs one single adaptive-stepsize MCWF step of specified maximal length
+  void step_v(double) override; // performs one single adaptive-stepsize MCWF step of specified maximal length
 
-  std::ostream& displayParameters_v(std::ostream&) const;
+  std::ostream& displayParameters_v(std::ostream&) const override;
 
-  const StateVector& toBeAveraged_v() const {return psi_;} 
+  const StateVector& toBeAveraged_v() const override {return psi_;} 
+
+  const std::string trajectoryID_v() const override {return "MCWF_Trajectory";}
 
   double                coherentTimeDevelopment(                    double Dt);
   const IndexSVL_tuples calculateSpecialRates  (      Rates* rates, double  t) const;
@@ -133,8 +135,6 @@ private:
   const double dpLimit_, overshootTolerance_;
 
   mutable MCWF_Logger logger_;
-
-  const std::string trajectoryID_v() const {return "MCWF_Trajectory";}
 
 };
 
