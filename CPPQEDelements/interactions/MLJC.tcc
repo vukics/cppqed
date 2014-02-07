@@ -120,9 +120,9 @@ private:
 
 
 template<int NL, typename VC>
-void Base<NL,VC>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void Base<NL,VC>::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
 {
-  boost::fusion::for_each(mds_,ElementaryCoupling(t-tIntPic0,psi,dpsidt));
+  boost::fusion::for_each(mds_,ElementaryCoupling(t-t0,psi,dpsidt));
 } 
 
 

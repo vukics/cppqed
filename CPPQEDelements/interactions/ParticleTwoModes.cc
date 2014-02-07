@@ -48,7 +48,7 @@ ParticleTwoModes::ParticleTwoModes(mode::Ptr mode0, mode::Ptr mode1, particle::P
 
 
 
-void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double tIntPic0) const
+void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
 {
   using namespace blitzplusplus;
   using basi::fullRange;
@@ -56,7 +56,7 @@ void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, St
   typedef tmptools::Vector<2> V2;
 
   {
-    double dt=t-tIntPic0;
+    double dt=t-t0;
     firstH_ .propagate(dt); firstHT_. propagate(dt);
     secondH_.propagate(dt); secondHT_.propagate(dt);
   }
