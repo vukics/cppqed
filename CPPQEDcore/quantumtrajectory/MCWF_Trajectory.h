@@ -45,6 +45,8 @@ namespace quantumtrajectory {
  *   -# After a successful coherent step resulting in an acceptable \f$\delta r\f$, the possible occurence of a quantum jump is considered:
  *      It is randomly decided which (if any) of the jumps to perform. If it is found to be a special jump, then the tabulated \f$J_\text{at}\ket\Psi\f$ is taken.
  * 
+ * \tparamRANK
+ * 
  * \note In phase 2.b.ii, another approach would be not to trace back the whole step, but make a coherent step *backwards* to an intermediate time instant found by linear interpolation.
  * This has several drawbacks, however, the most significant being that in the ODE stepper, it is not clear what to take as the timestep to try at the point when the direction of time is reversed.
  * (Although in evolved::Evolved it is simply taken to be the timestep done in the last step…)
@@ -66,12 +68,12 @@ public:
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
+private:
   typedef quantumtrajectory::QuantumTrajectory<RANK,BASE_class> QuantumTrajectory;
   typedef BASE_class Base;
 
 #undef  BASE_class
 
-private:
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
 protected:
