@@ -122,9 +122,11 @@ private:
 /// An \link trajectory::Adaptive Adaptive\endlink trajectory class representing Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
 /**
  * Cf. \ref masterequation.
+
+ * \note The ODE driver underlying this class needs to store several (typically 6–7, this depends on the chosen driver) density-operator instants.
  *
  * \tparam RANK arity of the Hilbert space
- * \tparam V has the same function as the template parameter `V` in display_densityoperator::_, which class is used here for displaying the evolved density operator
+ * \tparam V has the same function as the template parameter `V` in display_densityoperator::_, which class is used here for deriving quantum averages to display from the evolved density operator
  * \tparam IS_FAST the class will use either blitzplusplus::basi::Iterator or blitzplusplus::basi_fast::Iterator to perform the multi-matrix multiplications, depending on this template argument
  * 
  */

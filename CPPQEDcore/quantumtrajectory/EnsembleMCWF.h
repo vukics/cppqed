@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFileDefault
 #ifndef QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 #define QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 
@@ -21,6 +21,7 @@ namespace quantumtrajectory {
 ////////////////////////////////
 
 
+/// Contains helpers related to EnsembleMCWF
 namespace ensemblemcwf {
 
 
@@ -28,53 +29,57 @@ namespace ensemblemcwf {
 
 #define BASE_class trajectory::Ensemble< quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>& >
 
+/// Less templatized base for EnsembleMCWF \tparamRANK
 template<int RANK>
 class Base
   : private boost::base_from_member<STATE_VECTORS(RANK) >,
     public BASE_class
 {
-public:
+private:
   typedef STATE_VECTORS(RANK) StateVectors;
 
 #undef  STATE_VECTORS
 
-  typedef boost::base_from_member<StateVectors> StateVectorsBase;
-
+protected:
   typedef BASE_class Ensemble;
 
 #undef  BASE_class
 
-  typedef MCWF_Trajectory<RANK> Adaptive;
+private:
+  typedef typename Ensemble::Impl Trajectories;
 
-  typedef typename Adaptive::StateVector    StateVector   ;
-  typedef typename Adaptive::StateVectorLow StateVectorLow; 
+  typedef boost::base_from_member<StateVectors> StateVectorsBase;
+
+  typedef MCWF_Trajectory<RANK> Single;
+
+public:
+  typedef typename Single::StateVector    StateVector   ;
+  typedef typename Single::StateVectorLow StateVectorLow; 
 
   typedef typename structure::QuantumSystem<RANK>::Ptr QuantumSystemPtr;
 
-  typedef typename Ensemble::Impl Trajectories;
-
-
+protected:
+  /// Straightforward constructor
   Base(
-       const StateVector&,
-       QuantumSystemPtr,
-       const ParsMCWF&,
+       const StateVector& psi, ///< the (pure-state) initial condition
+       QuantumSystemPtr sys, ///< the structure::QuantumSystem to be simulated
+       const ParsMCWF& p, ///< parameters of the simulation (contains \link ParsMCWF::nTraj the number of trajectories\endlink)
        const StateVectorLow& =StateVectorLow()
        );
 
-protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
   using Ensemble::getTrajectories;
   
-  std::ostream& logOnEnd_v(std::ostream& os) const;
+  std::ostream& logOnEnd_v(std::ostream& os) const final;
   
   // static helpers to constructor
   static std::auto_ptr<StateVectors> stateVectors(const StateVector& psi, size_t nTraj);
   static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs);
 
   
-  quantumdata::DensityOperator<RANK>& getInitializedDO_v() const {rho_=0; return rho_;}
+  quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
 
   mutable quantumdata::DensityOperator<RANK> rho_;
 
@@ -86,19 +91,35 @@ private:
 } // ensemblemcwf
 
 
-#define BASE_class ensemblemcwf::Base<RANK>
-
-
+/// Derived from trajectory::Ensemble `<` quantumdata::DensityOperator `<RANK>& , const` quantumdata::StateVector `<RANK>& >`, it implements an ensemble of \link MCWF_Trajectory MCWF trajectories\endlink started from a pure-state initial condition
+/**
+ * The class overrides trajectory::Trajectory::display in such a way that at the time instant of display,
+ * the ensemble-averaged density operator of the system gets assembled from the stochastic state vectors of the element \link MCWF_Trajectory MCWF trajectories\endlink as
+ * \f[\rho_{\text{ensemble}}(t)=\frac1{\text{\scriptsize number of trajectories}}\sum_{i\in\{\text{set of trajectories}\}}\ket{\Psi_i(t)}\bra{\Psi_i(t)}.\f]
+ * 
+ * \note This is done via the quantumdata::StateVector::addTo function, so that always at most *one single* full density operator needs to be stored in memory.
+ * This makes that this class can be used for systems of larger dimensionality than Master, whose underlying ODE driver needs to store several (typically 6–7) density-operator instants.
+ * 
+ * The set of state vectors and the element \link MCWF_Trajectory MCWF trajectories\endlink are *owned* by the class.
+ * 
+ * \note The class obviously does not inherit from trajectory::Adaptive (a single adaptive timestep would in general result in different stepsizes for the element trajectories),
+ * so that it can be used only in \link trajectory::run deltaT-mode\endlink.
+ * 
+ * \tparam RANK arity of the Hilbert space
+ * \tparam V has the same function as the template parameter `V` in display_densityoperator::_, which class is used here for deriving quantum averages to display from the assembled density operator
+ * 
+ * \todo An additional constructor could be added to initialize the ensemble by a full density operator, which could be appropriately sampled.
+ * 
+ */
 template<int RANK, typename V>
-class EnsembleMCWF : public BASE_class
+class EnsembleMCWF : public ensemblemcwf::Base<RANK>
 {
-public:
-  typedef BASE_class Base;
-
-#undef  BASE_class
+private:
+  typedef ensemblemcwf::Base<RANK> Base;
 
   typedef display_densityoperator::_<RANK,V> DO_Display;
 
+public:
   typedef typename Base::StateVectorLow StateVectorLow; 
 
   typedef typename Base::Ensemble Ensemble;
@@ -108,19 +129,21 @@ public:
 
   using Base::getQS; using Base::getTime; using Base::toBeAveraged;
 
+  /// Templated constructor with the same idea as Master::Master
+  /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
   template<typename SYS>
   EnsembleMCWF(
-               const StateVector& psi,
-               const SYS& sys,
-               const ParsMCWF& p,
-               bool negativity,
-               const StateVectorLow& scaleAbs=StateVectorLow()
+               const StateVector& psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
+               const SYS& sys, ///< object representing the quantum system to be simulated
+               const ParsMCWF& p, ///< parameters of the simulation (contains \link ParsMCWF::nTraj the number of trajectories\endlink)
+               bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
+               const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
                )
     : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),negativity) {}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
-  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const {return doDisplay_.displayKey(os,i);}
+  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
 
@@ -129,7 +152,7 @@ private:
 
 } // quantumtrajectory
 
-
+/** \cond SPECIALIZATION */
 
 namespace trajectory { namespace ensemble {
 
@@ -138,10 +161,10 @@ template<int RANK>
 class Base<quantumdata::DensityOperator<RANK>&>
 {
 public:
-  quantumdata::DensityOperator<RANK>& getInitializedDO() const {return getInitializedDO_v();}
+  quantumdata::DensityOperator<RANK>& getInitializedDensityOperator() const {return getInitializedDensityOperator_v();}
 
 private:
-  virtual quantumdata::DensityOperator<RANK>& getInitializedDO_v() const = 0;
+  virtual quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const = 0;
   
 };
 
@@ -159,7 +182,7 @@ public:
   /// assumes that quantumdata::StateVector features a member quantumdata::StateVector::addTo()
   static const ToBeAveragedType averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType& et)
   {
-    ToBeAveragedType res(et.getInitializedDO());
+    ToBeAveragedType res(et.getInitializedDensityOperator());
     
     for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
 
@@ -173,5 +196,6 @@ public:
  
 } } // trajectory::ensemble
 
+/** \endcond */
 
 #endif // QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED

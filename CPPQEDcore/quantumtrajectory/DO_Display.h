@@ -14,7 +14,7 @@ namespace quantumtrajectory {
 namespace display_densityoperator {
 
 
-/// Wraps functionality concerning display on the basis of density operators common to Master & EnsembleMCWF
+/// Wraps common functionality of Master & EnsembleMCWF concerning display of quantum averages on the basis of density operators
 /**
  * This comprises
  * - keeping a structure::Averaged instant and calling structure::Averaged::display

@@ -81,6 +81,7 @@ protected:
 
 public:
   /// Templated constructor with the same idea as Master::Master
+  /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
   template<typename SYS>
   MCWF_Trajectory(StateVector& psi, ///< the state vector to be evolved
                   const SYS& sys, ///< object representing the quantum system
