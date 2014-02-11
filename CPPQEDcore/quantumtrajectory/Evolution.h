@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFile{Convenience header collecting to one place most of the components of C++QED core needed for writing scripts (basically, the core part of the Level-1 interface)}
 #ifndef QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 #define QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 
@@ -7,7 +7,6 @@
 #include "DensityOperator.tcc"
 #include "EnsembleMCWF.tcc"
 #include "Evolution.tcc"
-#include "ParsEvolution.h"
 #include "Master.tcc"
 #include "TimeAveragingMCWF_Trajectory.tcc"
 #include "QM_Picture.h"

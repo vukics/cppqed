@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// Highest level driver functions for quantum trajectories
 #ifndef QUANTUMTRAJECTORY_EVOLUTION__H_INCLUDED
 #define QUANTUMTRAJECTORY_EVOLUTION__H_INCLUDED
 
@@ -6,6 +6,7 @@
 
 #include "StateVectorFwd.h"
 #include "MCWF_TrajectoryFwd.h"
+#include "ParsMCWF_Trajectory.h"
 #include "QuantumSystemFwd.h"
 
 #include "SmartPtr.h"
@@ -18,8 +19,22 @@
 using namespace quantumtrajectory;
 
 
+enum EvolutionMode {/*EM_CONVERGENCE,*/ EM_SINGLE, EM_ENSEMBLE, EM_MASTER, EM_MASTER_FAST};
+// covergence runs a comparison between ensemble & single
+
 std::ostream& operator<<(std::ostream&, EvolutionMode );
 std::istream& operator>>(std::istream&, EvolutionMode&);
+
+
+struct ParsEvolution : public trajectory::ParsRun, public ParsMCWF {
+
+  EvolutionMode &evol;
+  bool &negativity, &timeAverage;
+  double &relaxationTime;
+
+  ParsEvolution(parameters::ParameterTable& p, const std::string& mod="");
+
+};
 
 
 template<int RANK, typename SYS>
