@@ -58,9 +58,11 @@ public:
   /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
 
-protected:
-  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime; using QuantumTrajectory::getQSW; using QuantumTrajectory::getT0;
+  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime;
 
+protected:
+  using QuantumTrajectory::getQSW; using QuantumTrajectory::getT0;
+  
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
