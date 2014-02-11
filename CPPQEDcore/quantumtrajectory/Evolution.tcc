@@ -30,9 +30,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
   case EM_SINGLE: {
 
-    // This solution is rather lame, but the makeMCWF function as implemented below does not work for some reason
-    if (pe.timeAverage) {TimeAveragingMCWF_Trajectory<RANK> traj(psi,sys,pe,pe.relaxationTime); run(traj,pe);}
-    else {MCWF_Trajectory<RANK> traj(psi,sys,pe); run(traj,pe);}
+    trajectory::run(*makeMCWF(psi,sys,pe),pe);
 
     break;
 
@@ -44,7 +42,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
     EnsembleMCWF<RANK,V>
       traj(psi,sys,pe,pe.negativity);
 
-    run(traj,pe);
+    trajectory::run(traj,pe);
 
     break;
 
@@ -78,28 +76,6 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
   }
 
-    /*
-  case EM_CONVERGENCE: {
-    DensityOperator rho(psi);
-    EnsembleMCWF EM(psi,sys,pe);
-    Master M(rho,sys,pe);
-
-    M.o()<<"# Comparing the results of"<<endl<<endl;
-    EM.Parameters();
-    M.o()<<endl<<"# With those of"<<endl<<endl;
-    M.Parameters();
-
-    M.o()<<"# Displaying in every "<<pe.Dt<<endl<<endl;
-
-    M.Display();
-    while (M()<pe.T) {
-      M.evolve (min(pe.Dt,pe.T-M ())); 
-      M.Display();
-      EM.evolve(min(pe.Dt,pe.T-EM()));
-      M.o()<<"# "<<FrobeniusNorm(EM.ToBeAveraged()-rho)<<endl;      
-      }
-  }
-    */
   }
   
 }
