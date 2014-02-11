@@ -11,7 +11,7 @@
 
 template<int RANK>
 auto
-quantumtrajectory::mcwf::ensemble::Base<RANK>::stateVectors(const StateVector& psi, size_t nTraj) -> std::auto_ptr<StateVectors>
+quantumtrajectory::ensemble::Base<RANK>::stateVectors(const StateVector& psi, size_t nTraj) -> std::auto_ptr<StateVectors>
 {
   StateVectors res;
   for (size_t i=0; i<nTraj; ++i)
@@ -24,7 +24,7 @@ quantumtrajectory::mcwf::ensemble::Base<RANK>::stateVectors(const StateVector& p
 
 template<int RANK>
 auto
-quantumtrajectory::mcwf::ensemble::Base<RANK>::trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs) -> std::auto_ptr<Trajectories>
+quantumtrajectory::ensemble::Base<RANK>::trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs) -> std::auto_ptr<Trajectories>
 {
   Trajectories res;
 
@@ -38,12 +38,12 @@ quantumtrajectory::mcwf::ensemble::Base<RANK>::trajectories(StateVectors& psis, 
 
 
 template<int RANK>
-quantumtrajectory::mcwf::ensemble::Base<RANK>::Base(
-                                                    const StateVector& psi,
-                                                    QuantumSystemPtr qs,
-                                                    const Pars& p,
-                                                    const StateVectorLow& scaleAbs
-                                                    )
+quantumtrajectory::ensemble::Base<RANK>::Base(
+                                              const StateVector& psi,
+                                              QuantumSystemPtr qs,
+                                              const Pars& p,
+                                              const StateVectorLow& scaleAbs
+                                              )
   : StateVectorsBase(stateVectors(psi,p.nTraj)),
     Ensemble(trajectories(StateVectorsBase::member,qs,p,scaleAbs),p.logLevel<0),
     rho_(psi.getDimensions(),false), qs_(qs)
@@ -53,7 +53,7 @@ quantumtrajectory::mcwf::ensemble::Base<RANK>::Base(
 
 template<int RANK>
 std::ostream&
-quantumtrajectory::mcwf::ensemble::Base<RANK>::logOnEnd_v(std::ostream& os) const
+quantumtrajectory::ensemble::Base<RANK>::logOnEnd_v(std::ostream& os) const
 {
   LoggerList loggerList;
   for (typename Trajectories::const_iterator i=getTrajectories().begin(); i!=getTrajectories().end(); ++i)

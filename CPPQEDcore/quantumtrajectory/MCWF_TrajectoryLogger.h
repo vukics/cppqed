@@ -19,10 +19,10 @@
 
 namespace quantumtrajectory {
 
-namespace mcwf {
-
 /// Auxiliary tools to EnsembleMCWF
 namespace ensemble {
+
+using namespace mcwf;
 
 typedef std::list<Logger> LoggerList;
 
@@ -32,6 +32,8 @@ std::ostream& displayLog(std::ostream&, const LoggerList&);
   
 } // ensemble
 
+
+namespace mcwf {
 
 /// Essentially an aggregate of data fields for logging during a MCWF_Trajectory run.
 /**

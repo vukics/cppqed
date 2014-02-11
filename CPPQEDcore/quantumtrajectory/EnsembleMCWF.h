@@ -14,11 +14,9 @@
 namespace quantumtrajectory {
 
 
-namespace mcwf {
-
-
 namespace ensemble {
 
+using namespace mcwf;
 
 #define STATE_VECTORS(r) boost::ptr_vector<quantumdata::StateVector<r> >
 
@@ -82,7 +80,7 @@ private:
 
 };
 
-} } // mcwf::ensemble
+} // ensemble
 
 
 /// Derived from trajectory::Ensemble `<` quantumdata::DensityOperator `<RANK>& , const` quantumdata::StateVector `<RANK>& >`, it implements an ensemble of \link MCWF_Trajectory MCWF trajectories\endlink started from a pure-state initial condition
@@ -106,10 +104,10 @@ private:
  * 
  */
 template<int RANK, typename V>
-class EnsembleMCWF : public mcwf::ensemble::Base<RANK>
+class EnsembleMCWF : public ensemble::Base<RANK>
 {
 private:
-  typedef mcwf::ensemble::Base<RANK> Base;
+  typedef ensemble::Base<RANK> Base;
 
   typedef display_densityoperator::_<RANK,V> DO_Display;
 

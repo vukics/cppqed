@@ -190,7 +190,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
  *   This will calculate \f$\avr{a^\dag b}\f$ (now \f$b\f$ and \f$a\f$ being the ladder operators of the modes at position 1 and 3, respectively)
  *   for the partial density operator of the embedded system (but without explicitly calculating this partial density operator).
  *
- * - *Accumulating an arbitrary ensemble of quantum averages*: An arbitrary ensemble of real or complex numbers can be stored in a DArray<1> or CArray<1>
+ * - *Accumulating an arbitrary set of quantum averages*: An arbitrary set of real or complex numbers can be stored in a DArray<1> or CArray<1>
  *   (or even `std::valarray`s), as these types fulfill all the requirements on type `T`. The former was used to define the abstract interface structure::Averaged
  *   one of its implementations being :class:`Mode`. E.g. a function for a harmonic-oscillator mode calculating \f$\avr{a^\dag a}\f$, \f$\avr{\lp a^\dag a\rp^2}\f$,
  *   and the real and imaginary parts of \f$\avr{a}\f$, may be defined as

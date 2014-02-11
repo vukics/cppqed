@@ -103,7 +103,7 @@ namespace {
 // The following is a workaround:
   
 using namespace quantumtrajectory;
-using namespace mcwf::ensemble;
+using namespace ensemble;
   
 double max_element(const LoggerList& loggerList, boost::function<double(const mcwf::Logger&)> f)
 {
@@ -115,7 +115,7 @@ double max_element(const LoggerList& loggerList, boost::function<double(const mc
 }
 
 
-ostream& quantumtrajectory::mcwf::ensemble::displayLog(ostream& os, const LoggerList& loggerList)
+ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& loggerList)
 {
   using namespace boost;
   
