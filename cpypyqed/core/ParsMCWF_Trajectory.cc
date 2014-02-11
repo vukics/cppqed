@@ -10,23 +10,22 @@
 
 using namespace boost::python;
 
-using quantumtrajectory::ParsMCWF;
 using trajectory::ParsStochastic;
 using std::string;
 
 namespace pythonext {
 
-PARS_GETTER_SETTER(double,   ParsMCWF, dpLimit)
-PARS_GETTER_SETTER(double,   ParsMCWF, overshootTolerance)
-PARS_GETTER_SETTER(int,      ParsMCWF, logLevel)
+PARS_GETTER_SETTER(double,   quantumtrajectory::mcwf::Pars, dpLimit)
+PARS_GETTER_SETTER(double,   quantumtrajectory::mcwf::Pars, overshootTolerance)
+PARS_GETTER_SETTER(int,      quantumtrajectory::mcwf::Pars, logLevel)
 
 void export_20_ParsMCWF_Trajectory()
 {
   scope namespaceScope = quantumtrajectoryNameSpace;
-  class_<ParsMCWF, bases<ParsStochastic> >
+  class_<quantumtrajectory::mcwf::Pars, bases<ParsStochastic> >
     (
       "ParsMCWF",
-      "Wrapper of :core:`quantumtrajectory::ParsMCWF`",
+      "Wrapper of :core:`quantumtrajectory::mcwf::Pars`",
       init<parameters::ParameterTable&, optional<const std::string&> >()
     )
     .PARS_PROPERTY(dpLimit)

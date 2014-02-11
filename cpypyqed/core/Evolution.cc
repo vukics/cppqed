@@ -15,7 +15,6 @@
 #include "EnsembleMCWF.tcc"
 #include "Evolution.tcc"
 #include "Master.tcc"
-#include "ParsEvolution.h"
 #include "ParsMCWF_Trajectory.h"
 
 #include <boost/preprocessor/arithmetic/add.hpp>
@@ -23,7 +22,6 @@
 
 using namespace boost::python;
 
-using quantumtrajectory::ParsMCWF;
 using trajectory::ParsRun;
 using quantumdata::StateVector;
 using structure::QuantumSystem;
@@ -43,7 +41,7 @@ void export_25_Evolution()
     .value("MASTER",      EM_MASTER)
     .value("MASTER_FAST", EM_MASTER_FAST)
   ;
-  class_<ParsEvolution, bases<ParsRun,ParsMCWF> >
+  class_<ParsEvolution, bases<ParsRun,quantumtrajectory::mcwf::Pars> >
     (
       "ParsEvolution", "Wrapper of :core:`ParsEvolution`",
       init<parameters::ParameterTable&, optional<const std::string&> >()
