@@ -18,7 +18,7 @@
 using namespace std;
 
 
-quantumtrajectory::MCWF_Logger::MCWF_Logger(int logLevel, bool isHamiltonian, size_t nLindblads)
+quantumtrajectory::mcwf::Logger::Logger(int logLevel, bool isHamiltonian, size_t nLindblads)
   : logLevel_(logLevel), isHamiltonian_(isHamiltonian), nLindblads_(nLindblads),
     nSteps_(), nOvershot_(), nToleranceOvershot_(), nFailedSteps_(), nHamiltonianCalls_(),
     dpMaxOvershoot_(), dpToleranceMaxOvershoot_(), normMaxDeviation_(),
@@ -26,7 +26,7 @@ quantumtrajectory::MCWF_Logger::MCWF_Logger(int logLevel, bool isHamiltonian, si
 {}
 
 
-ostream& quantumtrajectory::MCWF_Logger::onEnd(ostream& os) const
+ostream& quantumtrajectory::mcwf::Logger::onEnd(ostream& os) const
 {
   if (logLevel_) {
     os<<"\n# Total number of steps: "<<nSteps_<<endl
@@ -47,10 +47,10 @@ ostream& quantumtrajectory::MCWF_Logger::onEnd(ostream& os) const
 }
 
 
-void quantumtrajectory::MCWF_Logger::step() {++nSteps_;}
+void quantumtrajectory::mcwf::Logger::step() {++nSteps_;}
 
 
-void quantumtrajectory::MCWF_Logger::stepBack(double dp, double dtDid, double newDtTry, double t, bool logControl)
+void quantumtrajectory::mcwf::Logger::stepBack(double dp, double dtDid, double newDtTry, double t, bool logControl)
 {
   ++nToleranceOvershot_;
   if (logControl) dpToleranceMaxOvershoot_=max(dpToleranceMaxOvershoot_,dp);
@@ -59,7 +59,7 @@ void quantumtrajectory::MCWF_Logger::stepBack(double dp, double dtDid, double ne
 }
 
 
-void quantumtrajectory::MCWF_Logger::overshot(double dp, double oldDtTry, double newDtTry, bool logControl)
+void quantumtrajectory::mcwf::Logger::overshot(double dp, double oldDtTry, double newDtTry, bool logControl)
 {
   ++nOvershot_;
   if (logControl) dpMaxOvershoot_=max(dpMaxOvershoot_,dp);
@@ -68,14 +68,14 @@ void quantumtrajectory::MCWF_Logger::overshot(double dp, double oldDtTry, double
 }
 
 
-void quantumtrajectory::MCWF_Logger::processNorm(double norm)
+void quantumtrajectory::mcwf::Logger::processNorm(double norm)
 {
   normMaxDeviation_=max(normMaxDeviation_,fabs(1-norm));
   // NEEDS_WORK this should be somehow weighed by the timestep
 }
 
 
-void quantumtrajectory::MCWF_Logger::jumpOccured(double t, size_t lindbladNo)
+void quantumtrajectory::mcwf::Logger::jumpOccured(double t, size_t lindbladNo)
 {
   traj_.push_back(make_pair(t,lindbladNo));
   if (logLevel_>1)
@@ -83,7 +83,7 @@ void quantumtrajectory::MCWF_Logger::jumpOccured(double t, size_t lindbladNo)
 }
 
 
-void quantumtrajectory::MCWF_Logger::logFailedSteps(size_t n)
+void quantumtrajectory::mcwf::Logger::logFailedSteps(size_t n)
 {
   nFailedSteps_+=n;
   if (logLevel_>3)
@@ -91,7 +91,7 @@ void quantumtrajectory::MCWF_Logger::logFailedSteps(size_t n)
 }
 
 
-void quantumtrajectory::MCWF_Logger::hamiltonianCalled()
+void quantumtrajectory::mcwf::Logger::hamiltonianCalled()
 {
   nHamiltonianCalls_++;
 }
@@ -99,13 +99,13 @@ void quantumtrajectory::MCWF_Logger::hamiltonianCalled()
 
 namespace { 
 // NEEDS_WORK for some reason, gcc doesn’t like the construct
-// *max_element(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)))
+// *max_element(loggerList | adaptors::transformed(bind(&Logger::f,_1)))
 // The following is a workaround:
   
 using namespace quantumtrajectory;
-using namespace ensemblemcwf;
+using namespace mcwf::ensemble;
   
-double max_element(const LoggerList& loggerList, boost::function<double(const MCWF_Logger&)> f)
+double max_element(const LoggerList& loggerList, boost::function<double(const mcwf::Logger&)> f)
 {
   double res=0.;
   for (auto i : loggerList) res=max(res,f(i));
@@ -115,14 +115,14 @@ double max_element(const LoggerList& loggerList, boost::function<double(const MC
 }
 
 
-ostream& quantumtrajectory::ensemblemcwf::displayLog(ostream& os, const LoggerList& loggerList)
+ostream& quantumtrajectory::mcwf::ensemble::displayLog(ostream& os, const LoggerList& loggerList)
 {
   using namespace boost;
   
-  // cout<<*((loggerList | adaptors::transformed(bind(&MCWF_Logger::dpMaxOvershoot_,_1))).begin());
+  // cout<<*((loggerList | adaptors::transformed(bind(&Logger::dpMaxOvershoot_,_1))).begin());
 
-#define AVERAGE_function(f) accumulate(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)),0.)/loggerList.size()
-#define MAX_function(f) max_element(loggerList,bind(&MCWF_Logger::f,_1)) // *max_element(loggerList | adaptors::transformed(bind(&MCWF_Logger::f,_1)))
+#define AVERAGE_function(f) accumulate(loggerList | adaptors::transformed(bind(&Logger::f,_1)),0.)/loggerList.size()
+#define MAX_function(f) max_element(loggerList,bind(&Logger::f,_1)) // *max_element(loggerList | adaptors::transformed(bind(&Logger::f,_1)))
   
   os<<"\n# Average number of total steps: "<<AVERAGE_function(nSteps_)<<endl
     <<"\n# On average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)

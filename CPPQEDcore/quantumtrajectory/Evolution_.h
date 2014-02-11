@@ -33,7 +33,7 @@ std::istream& operator>>(std::istream&, EvolutionMode&); ///< input streaming fo
 
 /// Aggregate of parameters pertaining to the highest level drived functions for quantum trajectories
 /** \copydetails trajectory::ParsRun */
-struct ParsEvolution : public trajectory::ParsRun, public ParsMCWF {
+struct ParsEvolution : public trajectory::ParsRun, public mcwf::Pars {
 
   EvolutionMode &evol; ///< the mode of evolution
   bool

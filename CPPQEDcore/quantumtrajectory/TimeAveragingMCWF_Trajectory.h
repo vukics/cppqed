@@ -54,7 +54,7 @@ public:
   TimeAveragingMCWF_Trajectory(
                                StateVector& psi,
                                const SYS& sys,
-                               const ParsMCWF& p,
+                               const mcwf::Pars& p,
                                double relaxationTime, ///< relaxation time after which the time averaging starts
                                const StateVectorLow& scaleAbs=StateVectorLow()
                                )

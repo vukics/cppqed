@@ -42,7 +42,7 @@ template<int RANK> template<typename SYS>
 MCWF_Trajectory<RANK>::MCWF_Trajectory(
                                        StateVector& psi,
                                        const SYS& sys,
-                                       const ParsMCWF& p,
+                                       const mcwf::Pars& p,
                                        const StateVectorLow& scaleAbs
                                        )
   : QuantumTrajectory(cpputils::sharedPointerize(sys),p.noise,

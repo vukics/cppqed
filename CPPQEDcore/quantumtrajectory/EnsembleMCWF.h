@@ -14,15 +14,10 @@
 namespace quantumtrajectory {
 
 
-////////////////////////////////
-//
-// Ensemble of MCWF trajectories
-//
-////////////////////////////////
+namespace mcwf {
 
 
-/// Contains helpers related to EnsembleMCWF
-namespace ensemblemcwf {
+namespace ensemble {
 
 
 #define STATE_VECTORS(r) boost::ptr_vector<quantumdata::StateVector<r> >
@@ -63,7 +58,7 @@ protected:
   Base(
        const StateVector& psi, ///< the (pure-state) initial condition
        QuantumSystemPtr sys, ///< the structure::QuantumSystem to be simulated
-       const ParsMCWF& p, ///< parameters of the simulation (contains \link ParsMCWF::nTraj the number of trajectories\endlink)
+       const Pars& p, ///< parameters of the simulation (contains \link Pars::nTraj the number of trajectories\endlink)
        const StateVectorLow& =StateVectorLow()
        );
 
@@ -76,7 +71,7 @@ private:
   
   // static helpers to constructor
   static std::auto_ptr<StateVectors> stateVectors(const StateVector& psi, size_t nTraj);
-  static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const ParsMCWF& p, const StateVectorLow& scaleAbs);
+  static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs);
 
   
   quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
@@ -87,8 +82,7 @@ private:
 
 };
 
-
-} // ensemblemcwf
+} } // mcwf::ensemble
 
 
 /// Derived from trajectory::Ensemble `<` quantumdata::DensityOperator `<RANK>& , const` quantumdata::StateVector `<RANK>& >`, it implements an ensemble of \link MCWF_Trajectory MCWF trajectories\endlink started from a pure-state initial condition
@@ -112,10 +106,10 @@ private:
  * 
  */
 template<int RANK, typename V>
-class EnsembleMCWF : public ensemblemcwf::Base<RANK>
+class EnsembleMCWF : public mcwf::ensemble::Base<RANK>
 {
 private:
-  typedef ensemblemcwf::Base<RANK> Base;
+  typedef mcwf::ensemble::Base<RANK> Base;
 
   typedef display_densityoperator::_<RANK,V> DO_Display;
 
@@ -135,7 +129,7 @@ public:
   EnsembleMCWF(
                const StateVector& psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
                const SYS& sys, ///< object representing the quantum system to be simulated
-               const ParsMCWF& p, ///< parameters of the simulation (contains \link ParsMCWF::nTraj the number of trajectories\endlink)
+               const mcwf::Pars& p, ///< parameters of the simulation (contains \link mcwf::Pars::nTraj the number of trajectories\endlink)
                bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
                const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
                )

@@ -37,8 +37,8 @@ namespace quantumtrajectory {
  *     -# The total jump rate \f$\delta r\f$ is calculated.
  *     -# If \f$\delta r\delta t>\delta p_\text{limit}'\f$, the step is retraced: both the state vector and the state of the ODE stepper are restored to cached values
  *        at the beginning of the timestep, and phase I. is performed anew with a smaller stepsize \f$\delta p_\text{limit}/\delta r\f$. 
- *        With this, we ensure that \f$\delta p_\text{limit}\f$ (the parameter ParsMCWF::dpLimit) is likely not to be overshot in the next try.
- *        \note It is assumed that \f$\delta p_\text{limit}'>\delta p_\text{limit}\f$, their ratio being a parameter (ParsMCWF::overshootTolerance) of the MCWF stepper.
+ *        With this, we ensure that \f$\delta p_\text{limit}\f$ (the parameter mcwf::Pars::dpLimit) is likely not to be overshot in the next try.
+ *        \note It is assumed that \f$\delta p_\text{limit}'>\delta p_\text{limit}\f$, their ratio being a parameter (mcwf::Pars::overshootTolerance) of the MCWF stepper.
  *     -# If just \f$\delta r\delta t_\text{next}>\delta p_\text{limit}\f$ (where \f$\Delta t_\text{next}\f$ is a guess for the next timestep given by the ODE stepper),
  *        the coherent step is accepted, but the timestep to try next is modified, to reduce the likeliness of overshoot: \f$\delta t_\text{next}\longrightarrow\delta p_\text{limit}/\delta r\f$.
  *     \see The discussion at Sec. \ref anadaptivemcwfmethod "An adaptive MCWF method".
@@ -85,7 +85,7 @@ public:
   template<typename SYS>
   MCWF_Trajectory(StateVector& psi, ///< the state vector to be evolved
                   const SYS& sys, ///< object representing the quantum system
-                  const ParsMCWF& p, ///< parameters of the evolution
+                  const mcwf::Pars& p, ///< parameters of the evolution
                   const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in Master::Master
                  );
 
@@ -97,7 +97,7 @@ public:
   //@{
   const StateVector& getPsi() const {return psi_;} 
 
-  const MCWF_Logger& getLogger() const {return logger_;}
+  const mcwf::Logger& getLogger() const {return logger_;}
   //@}
   
 protected:
@@ -106,12 +106,12 @@ protected:
 
   using QuantumTrajectory::getQSW;
 
-  /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes MCWF_Logger state
+  /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes mcwf::Logger state
   cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar) override {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
-  /// Forwards to Base::writeStateMore_v + serializes MCWF_Logger state
+  /// Forwards to Base::writeStateMore_v + serializes mcwf::Logger state
   cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & logger_;}
 
-  std::ostream& logOnEnd_v(std::ostream& os) const override {return logger_.onEnd(os);} ///< calls MCWF_Logger::onEnd
+  std::ostream& logOnEnd_v(std::ostream& os) const override {return logger_.onEnd(os);} ///< calls mcwf::Logger::onEnd
   
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
@@ -137,7 +137,7 @@ private:
 
   const double dpLimit_, overshootTolerance_;
 
-  mutable MCWF_Logger logger_;
+  mutable mcwf::Logger logger_;
 
 };
 

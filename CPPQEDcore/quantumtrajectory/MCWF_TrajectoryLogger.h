@@ -19,22 +19,23 @@
 
 namespace quantumtrajectory {
 
+namespace mcwf {
 
 /// Auxiliary tools to EnsembleMCWF
-namespace ensemblemcwf {
+namespace ensemble {
 
-typedef std::list<MCWF_Logger> LoggerList;
+typedef std::list<Logger> LoggerList;
 
 /// Called by EnsembleMCWF::logOnEnd, in displays a time histogram of total jumps
 /** \todo The different kinds of jumps should be collected into different histograms */
 std::ostream& displayLog(std::ostream&, const LoggerList&);
   
-} // ensemblemcwf
+} // ensemble
 
 
 /// Essentially an aggregate of data fields for logging during a MCWF_Trajectory run.
 /**
- * Different log levels are to be supplied as the first parameter to MCWF_Logger::MCWF_Logger, and mean the following:
+ * Different log levels are to be supplied as the first parameter to Logger::Logger, and mean the following:
  * 
  * logLevel | effect
  * -------- | ------
@@ -45,13 +46,13 @@ std::ostream& displayLog(std::ostream&, const LoggerList&);
  * >3       | Reporting number of failed ODE steps in the given step of the trajectory evolution.
  * 
  */
-class MCWF_Logger
+class Logger
 {
 public:
   typedef std::list<std::pair<double,size_t> > MCWF_Trajectory; ///< Stores <time instant, lindbladNo> pairs, that is, the complete stochastic MCWF trajectory (the rest is deterministic)
 
   /// Straightforward constructor
-  MCWF_Logger(int logLevel, ///< governs amount of log output during trajectory display
+  Logger(int logLevel, ///< governs amount of log output during trajectory display
               bool isHamiltonian, ///< some log information (logFailedSteps & hamiltonianCalled) makes sense only if the simulated system is derived from structure::Hamiltonian
               size_t nLindblads ///< number of Lindblad operators
              );
@@ -80,7 +81,7 @@ private:
                                                       & traj_;}
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
-  friend std::ostream& ensemblemcwf::displayLog(std::ostream&, const ensemblemcwf::LoggerList&);
+  friend std::ostream& ensemble::displayLog(std::ostream&, const ensemble::LoggerList&);
   
   const int logLevel_;
   const bool isHamiltonian_;
@@ -94,7 +95,7 @@ private:
 };
 
 
-} // quantumtrajectory
+} } // quantumtrajectory::mcwf
 
 
 #endif // QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED

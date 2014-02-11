@@ -5,9 +5,13 @@
 
 namespace quantumtrajectory {
 
-class MCWF_Logger;
+namespace mcwf {
 
-struct ParsMCWF;
+class Logger;
+
+struct Pars;
+
+} // mcwf
 
 template<int RANK>
 class MCWF_Trajectory;

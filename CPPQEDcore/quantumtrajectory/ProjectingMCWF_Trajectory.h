@@ -43,7 +43,7 @@ public:
                             StateVector& psi,
                             const Basis& basis, ///< the set of reference states to compare the MCWF-evolved state vector against
                             const SYS& sys,
-                            const ParsMCWF& p,
+                            const mcwf::Pars& p,
                             const StateVectorLow& scaleAbs=StateVectorLow()
                             )
     : Base(psi,sys,p,scaleAbs), basis_(basis), metricTensor_uu_(help())
