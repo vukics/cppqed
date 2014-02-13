@@ -5,9 +5,7 @@
 
 #include "SmartPtr.h"
 
-#include <boost/mpl/empty_base.hpp>
-
-typedef boost::mpl::empty_base EmptyAveragingBaseForInteractions;
+struct EmptyAveragingBaseForInteractions {};
 
 #endif // COMPOSITES_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED
 

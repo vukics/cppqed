@@ -7,18 +7,18 @@
 
 #include "BlitzArray.h"
 
-#include <boost/mpl/empty_base.hpp>
-
 
 namespace quantumdata {
 
 
+namespace details { struct EmptyBase {}; }
+
 /// Basically only a metafunction defining types for higher-level constructs of arity `RANK`
 /**
  * \tparamRANK
- * \tparam B An optional base class for base-class chaining. An empty class (boost::mpl::empty_base) by default
+ * \tparam B An optional base class for base-class chaining. An empty class by default
  */
-template<int RANK, typename B=boost::mpl::empty_base>
+template<int RANK, typename B=details::EmptyBase>
 struct Types : B 
 // it's basically just a metafunction
 {

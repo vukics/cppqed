@@ -98,11 +98,12 @@ private:
 };
 
 
+namespace details { struct EmptyBase {}; }
 
 template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
   : public quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
-    public mpl::if_c<IS_TIME_DEPENDENT,Exact,mpl::empty_base>::type
+    public mpl::if_c<IS_TIME_DEPENDENT,Exact,details::EmptyBase>::type
 {
 public:
   typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;

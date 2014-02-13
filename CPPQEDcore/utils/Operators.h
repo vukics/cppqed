@@ -7,11 +7,10 @@
 
 #include <boost/operators.hpp>
 
-#include <boost/mpl/empty_base.hpp>
-
 
 namespace linalg {
 
+namespace details { struct EmptyBase {}; }
 
 /// Operator aggregate for a complex vector space built on top of \refBoost{Boost.Operator,utility/operators.htm}.
 /**
@@ -21,7 +20,7 @@ namespace linalg {
  * 
  * \tparam T the vector type
  */
-template<typename T, typename B=boost::mpl::empty_base>
+template<typename T, typename B=details::EmptyBase>
 struct VectorSpace
   : boost::additive1     <T,        // Abel group
     boost::multiplicative<T,double, // Vector space
