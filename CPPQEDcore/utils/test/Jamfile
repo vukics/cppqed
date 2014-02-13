@@ -1,6 +1,0 @@
-for local ccfile in [ glob *.cc : HarmonicOscillatorExact.cc ]
-{
-	exe $(ccfile:B) : $(ccfile) : <library>..//utilslib <library>..//blitz ;
-}
-
-exe HarmonicOscillatorExact : HarmonicOscillatorExact.cc ../src/DrivenDampedHarmonicOscillator.cc : <library>..//utilslib <library>..//flens ;

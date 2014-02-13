@@ -1,4 +1,0 @@
-for local ccfile in [ glob *.cc ]
-{
-	obj $(ccfile:B).o : $(ccfile) ..//utilslib : : : <include>. ;
-}
