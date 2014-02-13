@@ -107,6 +107,11 @@ void run(Adaptive<A>&, const ParsRun&);
 
 
 /// Aggregate of information about a trajectory-state archive \see AdaptiveIO
+/**
+ * \par Rationale
+ * Each archive is self-contained, so that it contains its own metadata.
+ * Then, the state files can eventually even be split into several archives, each containing a single self-contained state.
+ */
 struct SerializationMetadata
 {
   SerializationMetadata(std::string type=UNSPECIFIED, std::string id=UNSPECIFIED, int r=0)

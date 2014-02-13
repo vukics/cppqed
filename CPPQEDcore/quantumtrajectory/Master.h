@@ -22,6 +22,7 @@
 namespace quantumtrajectory {
 
 
+/// Auxiliary tools to Master
 namespace master {
 
 
