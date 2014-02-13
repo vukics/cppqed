@@ -5,30 +5,30 @@
 #include<iostream>
 
 
-std::ostream& operator<<(std::ostream& os, EvolutionMode em)
+std::ostream& evolution::operator<<(std::ostream& os, Method em)
 {
   switch (em) {
-    // case EM_CONVERGENCE: return os<<"convergence";
-  case EM_SINGLE      : return os<<"single"      ;
-  case EM_ENSEMBLE    : return os<<"ensemble"    ;
-  case EM_MASTER      : return os<<"master"      ;
-  case EM_MASTER_FAST :        os<<"master_fast" ;
+    // case CONVERGENCE: return os<<"convergence";
+  case SINGLE      : return os<<"single"      ;
+  case ENSEMBLE    : return os<<"ensemble"    ;
+  case MASTER      : return os<<"master"      ;
+  case MASTER_FAST :        os<<"master_fast" ;
   }
   return os;
 }
 
 
-std::istream& operator>>(std::istream& is, EvolutionMode& em) 
+std::istream& evolution::operator>>(std::istream& is, Method& em) 
 {
-  EvolutionMode emtemp=EM_MASTER_FAST;
+  Method emtemp=MASTER_FAST;
   std::string s;
 
   is>>s;
-  /*if      (s=="convergence") emtemp=EM_CONVERGENCE;
+  /*if      (s=="convergence") emtemp=CONVERGENCE;
     else*/ 
-  if      (s=="single"     ) emtemp=EM_SINGLE     ;
-  else if (s=="ensemble"   ) emtemp=EM_ENSEMBLE   ;
-  else if (s=="master"     ) emtemp=EM_MASTER     ;
+  if      (s=="single"     ) emtemp=SINGLE     ;
+  else if (s=="ensemble"   ) emtemp=ENSEMBLE   ;
+  else if (s=="master"     ) emtemp=MASTER     ;
   else if (s!="master_fast") 
     is.clear(std::ios_base::badbit);
 
@@ -37,10 +37,10 @@ std::istream& operator>>(std::istream& is, EvolutionMode& em)
 }
 
 
-ParsEvolution::ParsEvolution(parameters::ParameterTable& p, const std::string& mod) 
+evolution::Pars::Pars(parameters::ParameterTable& p, const std::string& mod) 
   : ParsRun(p,mod),
     mcwf::Pars(p,mod),
-    evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master, master_fast)",EM_SINGLE)),
+    evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master, master_fast)",SINGLE)),
     negativity(p.addMod("negativity",mod,"Calculates negativity in ensemble & master",false)),
     timeAverage(p.addMod("timeAverage",mod,"Calculates time averages in MCWF trajectory",false)),
     relaxationTime(p.addMod("relaxationTime",mod,"Relaxation time for time averaging",0.))

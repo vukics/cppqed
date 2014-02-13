@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
   qbit::ParsLossy pq0(p,"0"), pq1(p,"1"), pq2(p,"2");
   mode::ParsPumpedLossy pplm (p);
   jaynescummings::Pars  pjc0(p,"0"), pjc1(p,"1"), pjc2(p,"2");

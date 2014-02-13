@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsEvolution pt(p);
+  evolution::Pars pt(p);
   ParsPumpedLossy pp2la(p); 
 
   // Parameter finalization

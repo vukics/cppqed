@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
   ParsBichromatic pplm(p); 
 
   bool
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
+  if (pe.evol==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
   if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));

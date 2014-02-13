@@ -6,10 +6,10 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsEvolution pe(p);         // Driver parameters
+  evolution::Pars pe(p);       // Driver parameters
   mode::ParsPumpedLossy pm(p); // Mode parameters
 
-  pe.evol=EM_MASTER;
+  pe.evol=evolution::MASTER;
   pm.cutoff=30;
   // ... other default values may follow
 

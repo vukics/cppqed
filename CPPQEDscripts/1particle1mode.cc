@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 
   int& conf=p.add("1p1mconf","System configuration code for 1particle1mode",1);
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
   mode::ParsPumpedLossy pplm(p); // (Pumped) Cavity
   particle::ParsPumped ppp(p); // Pumped Particle
   particlecavity::ParsAlong ppci(p); // Particle Cavity Interaction
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  if ((pe.evol==EM_MASTER || pe.evol==EM_MASTER_FAST /* || pe.evol==EM_convergence */) && qmp==QMP_IP) qmp=QMP_UIP;
+  if ((pe.evol==evolution::MASTER || pe.evol==evolution::MASTER_FAST) && qmp==QMP_IP) qmp=QMP_UIP;
 
   if (conf!=1) pplm.delta-=ppci.uNot/(isComplex(ppci.modeCav) ? 1. : 2.);
 

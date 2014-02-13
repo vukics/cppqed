@@ -12,6 +12,7 @@ class_<py_quantumdata>        quantumdataNameSpace("quantumdata", "The :core:`qu
 class_<py_parameters>         parametersNameSpace("parameters", "The :core:`parameters` namespace");
 class_<py_quantumtrajectory>  quantumtrajectoryNameSpace("quantumtrajectory", "The :core:`quantumtrajectory` namespace");
 class_<py_binary>             binaryNameSpace("binary", "The :core:`binary` namespace");
+class_<py_evolution>          evolutionNameSpace("evolution", "The :core:`evolution` namespace");
 
 void export_0Namespaces()
 {
@@ -23,6 +24,7 @@ void export_0Namespaces()
   current.attr("parameters")        = parametersNameSpace;
   current.attr("quantumtrajectory") = quantumtrajectoryNameSpace;
   current.attr("binary")            = binaryNameSpace;
+  current.attr("evolution")         = evolutionNameSpace;
 }
 
 } // pythonext

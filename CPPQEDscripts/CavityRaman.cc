@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
   mljc::Pars<Couplings> pmljc(p);
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
 
   // Parameter finalization
   update(p,argc,argv,"--");

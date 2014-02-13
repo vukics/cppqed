@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
   pplm.delta=deltaG-deltaEta;
 
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
 
   // Parameter finalization
   update(p,argc,argv,"--");

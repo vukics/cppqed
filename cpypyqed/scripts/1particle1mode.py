@@ -17,7 +17,7 @@ else:
 conf = vars(args)['1p1mconf']
 
 p  = parameters.ParameterTable()
-pe = ParsEvolution(p)
+pe = evolution.Pars(p)
 
 pplm = mode.ParsPumpedLossy(p)
 ppp  = particle.ParsPumped(p)
@@ -25,7 +25,7 @@ ppci = particlecavity.ParsAlong(p)
 
 parameters.update(p,remaining,'--')
 
-qmp = QMP.UIP if pe.evol == EM.MASTER or pe.evol == EM.MASTER_FAST else QMP.IP
+qmp = QMP.UIP if pe.evol == evolution.Method.MASTER or pe.evol == evolution.Method.MASTER_FAST else QMP.IP
 
 if not conf==1: pplm.delta-=ppci.uNot/(1. if isComplex(ppci.modeCav) else 2.)
 

@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 
   ParsPumpedLossy<NL,Pumps,Decays> pml(p);
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
 
   pml.etas=make_vector(dcomp(30,40),dcomp(-60,40));
   pml.gammas=make_vector(10,5);

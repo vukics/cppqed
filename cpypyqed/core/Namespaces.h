@@ -14,6 +14,7 @@ class py_quantumdata{};
 class py_parameters{};
 class py_quantumtrajectory{};
 class py_binary{};
+class py_evolution{};
 
 extern boost::python::class_<py_trajectory>        trajectoryNameSpace;
 extern boost::python::class_<py_evolved>           evolvedNameSpace;
@@ -22,6 +23,7 @@ extern boost::python::class_<py_quantumdata>       quantumdataNameSpace;
 extern boost::python::class_<py_parameters>        parametersNameSpace;
 extern boost::python::class_<py_quantumtrajectory> quantumtrajectoryNameSpace;
 extern boost::python::class_<py_binary>            binaryNameSpace;
+extern boost::python::class_<py_evolution>         evolutionNameSpace;
 
 } // pythonext
 

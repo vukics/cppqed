@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
   ParsPumpedLossy pplm1(p,"1"), pplm2(p,"2");
 
   string

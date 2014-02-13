@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ParsEvolution pe   (p); // Driver Parameters
+  evolution::Pars pe   (p); // Driver Parameters
   ParsPumped    ppart(p); 
 
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
@@ -21,8 +21,6 @@ int main(int argc, char* argv[])
   update(p,argc,argv,"--");
   
   // ****** ****** ****** ****** ****** ******
-
-  // if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   Ptr part(make(ppart,qmp));
 

@@ -12,15 +12,15 @@ if vars(args)['debug']:
 else:
     from cpypyqed import *
 
-p = parameters.ParameterTable()
+p=parameters.ParameterTable()
 pm=mode.ParsPumpedLossy(p)
 pq=qbit.ParsPumpedLossy(p)
-pe=ParsEvolution(p)
+pe=evolution.Pars(p)
 pjc=jaynescummings.Pars(p)
 
 parameters.update(p,remaining,'--')
 
-qmp = QMP.UIP if pe.evol == EM.MASTER or pe.evol == EM.MASTER_FAST else QMP.IP
+qmp = QMP.UIP if pe.evol == evolution.Method.MASTER or pe.evol == evolution.Method.MASTER_FAST else QMP.IP
 m=mode.make(pm,qmp)
 q=qbit.make(pq,qmp)
 jc=jaynescummings.make(q,m,pjc)

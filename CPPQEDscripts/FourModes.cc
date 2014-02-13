@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsEvolution pe(p);
+  evolution::Pars pe(p);
 
   mode::ParsPumpedLossy pm0(p,"0");
   mode::ParsPumpedLossy pm1(p,"1");

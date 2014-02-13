@@ -2,6 +2,10 @@
 #ifndef   QUANTUMTRAJECTORY_EVOLUTION_FWD_H_INCLUDED
 #define   QUANTUMTRAJECTORY_EVOLUTION_FWD_H_INCLUDED
 
-struct ParsEvolution;
+namespace evolution {
+  
+struct Pars;
+
+} // evolution
 
 #endif // QUANTUMTRAJECTORY_EVOLUTION_FWD_H_INCLUDED

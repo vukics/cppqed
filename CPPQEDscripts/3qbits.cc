@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
   qbit::ParsLossy pq0(p,"0"), pq1(p,"1"), pq2(p,"2");
   mode::ParsPumpedLossy pplm (p);
   jaynescummings::Pars  pjc0(p,"0"), pjc1(p,"1"), pjc2(p,"2");
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  QM_Picture qmp=(pe.evol==EM_MASTER || pe.evol==EM_MASTER_FAST) ? QMP_UIP : QMP_IP;
+  QM_Picture qmp=(pe.evol==evolution::MASTER || pe.evol==evolution::MASTER_FAST) ? QMP_UIP : QMP_IP;
   
   const qbit::Ptr q0=dispatch(pq0,gamma_parallel,qmp==QMP_UIP), q1=dispatch(pq1,gamma_parallel,qmp==QMP_UIP), q2=dispatch(pq2,gamma_parallel,qmp==QMP_UIP);
 

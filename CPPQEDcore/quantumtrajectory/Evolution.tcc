@@ -21,14 +21,14 @@
 template<typename V, int RANK>
 void evolve(quantumdata::StateVector<RANK>& psi,
             typename structure::QuantumSystem<RANK>::Ptr sys,
-            const ParsEvolution& pe)
+            const evolution::Pars& pe)
 {
-  using namespace std;
+  using namespace std; using namespace evolution;
 
   switch (pe.evol) {
 
 
-  case EM_SINGLE: {
+  case SINGLE: {
 
     trajectory::run(*makeMCWF(psi,sys,pe),pe);
 
@@ -37,7 +37,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
   }
 
 
-  case EM_ENSEMBLE: {
+  case ENSEMBLE: {
 
     EnsembleMCWF<RANK,V>
       traj(psi,sys,pe,pe.negativity);
@@ -49,7 +49,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
   }
 
 
-  case EM_MASTER: {
+  case MASTER: {
 
     quantumdata::DensityOperator<RANK> rho(psi);
 
@@ -63,7 +63,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
   }
 
 
-  case EM_MASTER_FAST: {
+  case MASTER_FAST: {
 
     quantumdata::DensityOperator<RANK> rho(psi);
 
@@ -83,7 +83,7 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
 // For some reason, this does not compile:
 template<int RANK, typename SYS>
-const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const ParsEvolution& pe)
+const boost::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const evolution::Pars& pe)
 {
   if (pe.timeAverage) return boost::make_shared<TimeAveragingMCWF_Trajectory<RANK> >(psi,sys,pe,pe.relaxationTime);
   else                return boost::make_shared<             MCWF_Trajectory<RANK> >(psi,sys,pe                  );

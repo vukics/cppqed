@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ParsEvolution pt(p);
+  evolution::Pars pt(p);
 
   qbit::ParsPumpedLossy pplqb(p); 
   mode::ParsPumpedLossy pplm (p); 

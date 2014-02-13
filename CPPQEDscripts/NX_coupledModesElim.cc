@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsEvolution pe   (p); // Driver Parameters
+  evolution::Pars pe   (p); // Driver Parameters
   ParsPumped    ppart(p); 
 
   mode::ParsPumpedLossy pmode(p);
@@ -68,8 +68,6 @@ int main(int argc, char* argv[])
   update(p,argc,argv,"--");
   
   // ****** ****** ****** ****** ****** ******
-
-  // if (pe.evol==EM_MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   NX_coupledModesElim system(ppart,pmode,u);
 

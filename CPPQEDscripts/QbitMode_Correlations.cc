@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
   qbit::ParsPumpedLossy pplqb(p); 
   mode::ParsPumpedLossy pplm (p); 
   jaynescummings::Pars  pjc  (p); 
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  if ((pe.evol==EM_MASTER /* || pe.evol==EM_convergence */) && qmp==QMP_IP) qmp=QMP_UIP;
+  if (pe.evol==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   qbit::Ptr qbit(qbit::make(pplqb,qmp));
   mode::Ptr mode(mode::make(pplm ,qmp));

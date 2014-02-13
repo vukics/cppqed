@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ParsEvolution pe(p); // Driver Parameters
+  evolution::Pars pe(p); // Driver Parameters
 
   mode::ParsPumpedLossy pplqb1(p,"1");
   mode::ParsPumpedLossy pplqb2(p,"2");
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  if ((pe.evol==EM_MASTER /* || pe.evol==EM_convergence */) && qmp==QMP_IP) qmp=QMP_UIP;
+  if (pe.evol==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   mode::Ptr mode1(mode::make(pplqb1,qmp)), mode2(mode::make(pplqb2,qmp));
   mode::Ptr mode (mode::make(pplm  ,qmp));

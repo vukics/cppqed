@@ -19,40 +19,45 @@
 using namespace quantumtrajectory;
 
 
-/// Mode of evolution for a quantum system
-enum EvolutionMode {
-  EM_SINGLE, ///< single \link quantumtrajectory::MCWF_Trajectory MCWF trajectory\endlink
-  EM_ENSEMBLE, ///< \link quantumtrajectory::EnsembleMCWF ensemble\endlink of MCWF trajectories
-  EM_MASTER, ///< Master equation with \link quantumtrajectory::master::Base normal iteration\endlink
-  EM_MASTER_FAST ///< Master equation with \link quantumtrajectory::master::BaseFast “fast” iteration\endlink
+/// Auxiliary tools for the evolve functions
+namespace evolution {
+
+/// Method of evolution for a quantum system
+enum Method {
+  SINGLE, ///< single \link quantumtrajectory::MCWF_Trajectory MCWF trajectory\endlink
+  ENSEMBLE, ///< \link quantumtrajectory::EnsembleMCWF ensemble\endlink of MCWF trajectories
+  MASTER, ///< Master equation with \link quantumtrajectory::master::Base normal iteration\endlink
+  MASTER_FAST ///< Master equation with \link quantumtrajectory::master::BaseFast “fast” iteration\endlink
 };
 
-std::ostream& operator<<(std::ostream&, EvolutionMode ); ///< output streaming for EvolutionMode
-std::istream& operator>>(std::istream&, EvolutionMode&); ///< input streaming for EvolutionMode
+std::ostream& operator<<(std::ostream&, Method ); ///< output streaming for Method
+std::istream& operator>>(std::istream&, Method&); ///< input streaming for Method
 
 
-/// Aggregate of parameters pertaining to the highest level drived functions for quantum trajectories
+/// Aggregate of parameters pertaining to the highest level driver functions for quantum trajectories
 /** \copydetails trajectory::ParsRun */
-struct ParsEvolution : public trajectory::ParsRun, public mcwf::Pars {
+struct Pars : public trajectory::ParsRun, public mcwf::Pars {
 
-  EvolutionMode &evol; ///< the mode of evolution
+  Method &evol; ///< the method of evolution
   bool
-    &negativity, ///< governs whether entanglement should be calculated in the case of #EM_ENSEMBLE, #EM_MASTER, and #EM_MASTER_FAST, cf. quantumtrajectory::display_densityoperator::_, quantumdata::negPT
-    &timeAverage; ///< governs whether in the case of #EM_SINGLE, time averaging should be performed (by using quantumtrajectory::TimeAveragingMCWF_Trajectory instead of quantumtrajectory::MCWF_Trajectory)
+    &negativity, ///< governs whether entanglement should be calculated in the case of #ENSEMBLE, #MASTER, and #MASTER_FAST, cf. quantumtrajectory::display_densityoperator::_, quantumdata::negPT
+    &timeAverage; ///< governs whether in the case of #SINGLE, time averaging should be performed (by using quantumtrajectory::TimeAveragingMCWF_Trajectory instead of quantumtrajectory::MCWF_Trajectory)
   double &relaxationTime; ///< the relaxation time in the case when time averaging is desired
 
-  ParsEvolution(parameters::ParameterTable& p, const std::string& mod="");
+  Pars(parameters::ParameterTable& p, const std::string& mod="");
 
 };
 
 
-/// Dispatcher returning a quantumtrajectory::MCWF_Trajectory or quantumtrajectory::TimeAveragingMCWF_Trajectory instant, depending on the last argument (cf. ParsEvolution::timeAverage)
+/// Dispatcher returning a quantumtrajectory::MCWF_Trajectory or quantumtrajectory::TimeAveragingMCWF_Trajectory instant, depending on the last argument (cf. Pars::timeAverage)
 /**
  * \tparamRANK
  * \tparam SYS the object representing the quantum system to be simulated (similar idea as in quantumtrajectory::Master::Master)
  */
 template<int RANK, typename SYS>
-const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const ParsEvolution&);
+const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const Pars&);
+
+} // evolution
 
 
 /// The prototype function to evolve a quantumtrajectory from a pure state-vector initial condition
@@ -66,7 +71,7 @@ const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVecto
 template<typename V, int RANK>
 void evolve(quantumdata::StateVector<RANK>& psi, ///<[in/out] pure state-vector initial condition
             typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-            const ParsEvolution& p ///<[in] parameters of the evolution
+            const evolution::Pars& p ///<[in] parameters of the evolution
            );
 
 
@@ -76,7 +81,7 @@ template<int RANK>
 inline
 void evolve(quantumdata::StateVector<RANK>& psi,
             typename structure::QuantumSystem<RANK>::Ptr sys,
-            const ParsEvolution& p)
+            const evolution::Pars& p)
 {
   evolve<tmptools::V_Empty>(psi,sys,p);
 }
@@ -88,7 +93,7 @@ template<typename V, int RANK>
 inline
 void evolve(quantumdata::StateVector<RANK>& psi,
             const structure::QuantumSystem<RANK>& sys,
-            const ParsEvolution& p)
+            const evolution::Pars& p)
 {
   evolve<V>(psi,cpputils::sharedPointerize(sys),p);
 }
@@ -100,7 +105,7 @@ template<int RANK>
 inline
 void evolve(quantumdata::StateVector<RANK>& psi,
             const structure::QuantumSystem<RANK>& sys,
-            const ParsEvolution& p)
+            const evolution::Pars& p)
 {
   evolve<tmptools::V_Empty>(psi,cpputils::sharedPointerize(sys),p);
 }
@@ -122,7 +127,7 @@ template<int V0, int... V_REST, typename SV, typename SYS>
 inline
 void evolve(SV& psi,
             const SYS& sys,
-            const ParsEvolution& p)
+            const evolution::Pars& p)
 {
   evolve<tmptools::Vector<V0,V_REST...> >(psi,sys,p);
 }

@@ -13,14 +13,14 @@ else:
     from cpypyqed import *
 
 p = parameters.ParameterTable()
-pe = ParsEvolution(p)
+pe = evolution.Pars(p)
 pp = particle.ParsPumped(p)
 pm = mode.ParsPumpedLossy(p)
 ppc = particlecavity.ParsOrthogonal(p)
 
 parameters.update(p,remaining,'--')
 
-qmp = QMP.UIP if pe.evol == EM.MASTER or pe.evol == EM.MASTER_FAST else QMP.IP
+qmp = QMP.UIP if pe.evol == evolution.Method.MASTER or pe.evol == evolution.Method.MASTER_FAST else QMP.IP
 myMode     = mode.make(pm,qmp)
 myParticle = particle.makePumped(pp,qmp)
 

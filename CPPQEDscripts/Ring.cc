@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  ParsEvolution pe(p);
+  evolution::Pars pe(p);
   particle::Pars pp(p);
   mode::ParsPumpedLossy pmP(p,"P");
   mode::ParsPumpedLossy pmM(p,"M");
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   pmP.delta-=ppcP.uNot/(isComplex(ppcP.modeCav) ? 1. : 2.);
   pmM.delta-=ppcM.uNot/(isComplex(ppcM.modeCav) ? 1. : 2.);
 
-  QM_Picture qmp=(pe.evol==EM_MASTER || pe.evol==EM_MASTER_FAST) ? QMP_UIP : QMP_IP;
+  QM_Picture qmp=(pe.evol==evolution::MASTER || pe.evol==evolution::MASTER_FAST) ? QMP_UIP : QMP_IP;
   particle::Ptr part (make(pp ,qmp));
   mode    ::Ptr plus (make(pmP,qmp));
   mode    ::Ptr minus(make(pmM,qmp));

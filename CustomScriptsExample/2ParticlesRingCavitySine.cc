@@ -16,22 +16,22 @@ int main(int argc, char **argv)
     updateVersionstring(cppqed_component_versions());
     ParameterTable p;
 
-    ParsEvolution pe(p);                // Driver parameters
+    evolution::Pars pe(p);              // Driver parameters
     mode::ParsLossy plm(p);             // Lossy mode (cosine)
-    particle::ParsPumped ppp1(p,"1");        // Pumped particle 1 (sine)
-    particle::ParsPumped ppp2(p,"2");       // Pumped particle 2
+    particle::ParsPumped ppp1(p,"1");   // Pumped particle 1 (sine)
+    particle::ParsPumped ppp2(p,"2");   // Pumped particle 2
     particlecavity::ParsAlong ppci(p);  // Particle-Cavity interaction
-    ParsInterference pi(p);             //Interference term
+    ParsInterference pi(p);             // Interference term
     
     bool &bosons = p.add("bosons", "Particle are bosons", false);
     bool &fermions = p.add("fermions", "Particles are fermions", false);
     
     double &alphasquare = p.add("alphasquare", "Coherent state of pumped cavity mode (has to be real)", 1.);
     QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
-    pe.evol = EM_SINGLE;
+    pe.evol = evolution::SINGLE;
     
     update(p,argc,argv,"--");
-    if (pe.evol == EM_MASTER && qmp != QMP_UIP) qmp = QMP_UIP;
+    if (pe.evol == evolution::MASTER && qmp != QMP_UIP) qmp = QMP_UIP;
     
     // Parameters, take U0 as configuration parameter and update V0 and Delta accordingly
     
