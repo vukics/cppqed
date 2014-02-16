@@ -85,6 +85,24 @@ add_custom_target(clean-customscripts
 
 #! \file
 #! <!--#########################################################-->
+#! ### Source package
+#! <!--#########################################################-->
+#!
+#! Create source tar ball with CPack for publication on sourceforge.
+
+set(CPACK_PACKAGE_VERSION_MAJOR ${CPPQED_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${CPPQED_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${CPPQED_VERSION_PATCH})
+
+set(CPACK_GENERATOR TGZ)
+
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "cppqed-${CPPQED_VERSION}" CACHE INTERNAL "tarball basename")
+set(CPACK_SOURCE_IGNORE_FILES "~$" "/build/" "\\\\.kdev4.*" "\\\\.git.*" ".*orig$")
+
+include(CPack)
+
+#! \file
+#! <!--#########################################################-->
 #! ### Documentation
 #! <!--#########################################################-->
 #!
