@@ -20,8 +20,8 @@
 
 
 template<int RANK>
-const typename ReducedDensityOperator<RANK>::KeyLabels
-ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent)
+auto
+ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) -> const KeyLabels
 {
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
   using std::stringstream;
@@ -52,6 +52,8 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
         res.push_back(ss.str());
       }
   }
+
+  res.insert(res.end(),subsequent.begin(),subsequent.end());
 
   return res;
 
