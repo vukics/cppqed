@@ -130,8 +130,8 @@ public:
   
 private:
   
-  void   doActWithJ(      structure::freesystem::StateVectorLow     &) const;
-  double rate      (const structure::freesystem::LazyDensityOperator&) const {return -1.;}
+  void   doActWithJ(structure::NoTime,       structure::freesystem::StateVectorLow     &) const;
+  double rate      (structure::NoTime, const structure::freesystem::LazyDensityOperator&) const {return -1.;}
   
 };
 

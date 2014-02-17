@@ -133,7 +133,7 @@ void Spin::updateU(structure::OneTime dtDid) const
 }
 
 
-void LossySpin::doActWithJ(structure::freesystem::StateVectorLow& psi) const
+void LossySpin::doActWithJ(structure::NoTime, structure::freesystem::StateVectorLow& psi) const
 {
   double fact=sqrt(2.*getGamma());
   int ubound=psi.ubound(0);
