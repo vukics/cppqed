@@ -281,6 +281,8 @@ class Verifier(OutputManager):
   """!
   @ingroup Testclasses
   Verifies the output of a script 'this' to an expected output or the output of some other test run 'other'
+
+  \ref Verifier_keys "Configuration file keys" this class understands.
   """
 
   ## @addtogroup TestclassKeys
