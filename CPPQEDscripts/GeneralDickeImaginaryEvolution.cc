@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 
     StateVector1 psiMode(mode::init(plm)), psiSpin(spin.getDimension());
 
-    psiSpin()(0)=1; psiSpin()(1)=1;
+    psiSpin(0)=1; psiSpin(1)=1;
 
     StateVector2 psi(psiMode*psiSpin);
 
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
       using namespace boost;
       namespace bll=lambda;
 
-      ostream& os=traj.getOstream();
+      ostream& os=cout;
 
       for (pair<MCWF::Basis::const_iterator,DARRAY::const_iterator> i(eigenStates.begin(),eigenValues.begin()); 
            i.first!=eigenStates.end();
@@ -146,15 +146,11 @@ int main(int argc, char* argv[])
 
     }
 
-    evolve(traj,pe);
+    run(traj,pe);
 
     // evolve<0>(psi,BinarySystem(GeneralDicke(mode.get(),&spin,u,y)),pe);
 
   }
-
-
-
-
 
 }
 

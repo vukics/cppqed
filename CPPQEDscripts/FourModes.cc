@@ -18,10 +18,11 @@ int main(int argc, char* argv[])
 
   evolution::Pars pe(p);
 
-  mode::ParsPumpedLossy pm0(p,"0");
-  mode::ParsPumpedLossy pm1(p,"1");
-  mode::ParsPumpedLossy pm2(p,"2");
-  mode::ParsPumpedLossy pm3(p,"3");
+  mode::ParsPumpedLossy
+    pm0(p,"0"),
+    pm1(p,"1"),
+    pm2(p,"2"),
+    pm3(p,"3");
 
   update(p,argc,argv,"--");
 
