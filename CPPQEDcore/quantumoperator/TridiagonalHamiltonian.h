@@ -1,5 +1,5 @@
 // -*- C++ -*-
-/// \briefFileDefault \todo Should be moved to repository Elements
+/// \briefFileDefault
 #ifndef QUANTUMOPERATOR_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 #define QUANTUMOPERATOR_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 
