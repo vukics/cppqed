@@ -177,6 +177,8 @@ public:
 
 };
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 /// Performs the slicing on an array already transposed by Transposer.
 template<int RANK, typename V>
@@ -185,10 +187,6 @@ class Indexer : public Transposer<RANK,V>
 public:
   /// Static worker
   /**
-   * \param array The array to be sliced.
-   * \param resArray The array storing the result.
-   * \param idx Set of dummy indices.
-   * 
    * \return Reference to resArray
    * 
    * \par Semantics
@@ -213,10 +211,15 @@ public:
    */
   static
   ttd::ResCArray<V>&
-  index(CArray<RANK>& array, ttd::ResCArray<V>& resArray, const ttd::VecIdxTiny<RANK,V>& idx)
+  index(CArray<RANK>& array, ///< The array to be sliced
+        ttd::ResCArray<V>& resArray, ///< The array storing the result
+        const ttd::VecIdxTiny<RANK,V>& idx ///< Set of dummy indices
+       )
   {throw TransposerOrIndexerRankTooHighException<RANK>();}
 
 };
+
+#pragma GCC diagnostic pop
 
 /** @} */
 
