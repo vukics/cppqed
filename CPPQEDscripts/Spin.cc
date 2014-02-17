@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
   
   structure::freesystem::StateVector psi(spin.getDimensions());
 
-  psi()(psi().ubound(0))=1;
+  psi(psi.getArray().ubound(0))=1;
   
   evolve(psi,spin,pe);
 
