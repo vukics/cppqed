@@ -288,6 +288,7 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
                         -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/doc/reference.rst.in
                         -DOUTPUT=${CONF_DOC_DIR}/reference.rst
                         -DMODULE_NAME=${PROJECT_NAME}$<$<CONFIG:Debug>:_d>
+                        -DDEBUG_SUFFIX="$<$<CONFIG:Debug>:_d>"
                         -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
                      DEPENDS generate.cmake doc/reference.rst.in
   )
