@@ -74,7 +74,7 @@ Base<RANK>::step_v(double deltaT)
   if (const auto ex=getQSW().getEx()) {
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_.getArray());
-    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getDtDid(),_1,getT0()));
+    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getTime(),_1,getT0()));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);
