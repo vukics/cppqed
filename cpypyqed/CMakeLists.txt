@@ -330,7 +330,11 @@ set_package_properties(PythonLibs PROPERTIES URL "http://www.python.org/"
 set_package_properties(Numpy PROPERTIES URL "http://www.numpy.org/"
                                 DESCRIPTION "NumPy is the fundamental package for scientific computing with Python"
                                 TYPE OPTIONAL
-                                PURPOSE "Data input/output with Python.")
+                                PURPOSE "Data input/output with Python, testsuite.")
+set_package_properties(Scipy PROPERTIES URL "http://www.scipy.org/"
+                                DESCRIPTION "SciPy is a Python-based ecosystem of open-source software for mathematics, science, and engineering."
+                                TYPE OPTIONAL
+                                PURPOSE "The testsuite depends on this.")
 set_package_properties(Sphinx PROPERTIES URL "http://sphinx-doc.org/"
                                 DESCRIPTION "Sphinx is a documentation generator which converts reStructuredText files into HTML websites"
                                 TYPE OPTIONAL
