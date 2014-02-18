@@ -15,6 +15,19 @@ import errno
 import subprocess
 import numpy as np
 import shutil
+import scipy.interpolate
+from scipy.integrate import quadrature
+
+try:
+  import matplotlib
+  matplotlib.use('Agg')
+  import matplotlib.pyplot as plt
+  from matplotlib.backends.backend_pdf import PdfPages
+  from matplotlib.font_manager import FontProperties
+
+  plot=True
+except ImportError:
+  plot=False
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
 
@@ -514,7 +527,40 @@ class CompileTarget(OptionsManager):
       if not error in std:
         sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
 
-class Comparer(OutputManager):
+class Plotter(OutputManager):
+  def run(self):
+    pass
+  def _plot(self):
+    return plot and not self.get_option('pdf') is None
+  def start_pdf(self):
+    if not self._plot(): return
+    self.pdf = PdfPages(os.path.join(self.outputdir,self.get_option('pdf')))
+  def close_pdf(self):
+    if not self._plot(): return
+    self.pdf.close()
+  def finish_plot(self):
+    if not self._plot(): return
+    self.pdf.savefig()
+    plt.close()
+  def figureLegendRight(self,ylabel,title):
+    if not self._plot(): return
+    f = plt.figure(figsize=(11.6,8.2))
+    f.add_axes([0.09, 0.1, 0.6, 0.75])
+    plt.title(title)
+    plt.ylabel(ylabel)
+    plt.xlabel('t')
+  def place_legend(self):
+    if not self._plot(): return
+    fontP = FontProperties()
+    fontP.set_size('small')
+    leg=plt.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.,prop = fontP)
+    llines=leg.get_lines()
+    plt.setp(llines, linewidth=1.5)
+  def plot(self,time,data,**kwargs):
+    if not self._plot(): return
+    plt.plot(time,data,**kwargs)
+
+class Comparer(Plotter):
   """!
   @ingroup Testclasses
   Compares several trajectories to a reference trajectory by using function interpolation.
@@ -538,16 +584,23 @@ class Comparer(OutputManager):
     reference_data=self._get_data(reference,reference_runmode)
     timeArray=reference_data[:,0]
     failure=False
+    self.start_pdf()
     for n,idx in enumerate(self._get_columns(reference,reference_runmode)):
+      self.figureLegendRight(ylabel='value '+str(n+1), title=self.test)
+      self.plot(timeArray,reference_data[:,idx],label=os.path.basename(self.output(reference_runmode,reference)))
       for traj in trajectories:
         for runmode in self.runmodes(section=traj):
           data=self._get_data(section=traj,runmode=runmode)
           i,j=idx,self._get_columns(traj,runmode)[n]
+          self.plot(timeArray,data[:,j],label=os.path.basename(self.output(runmode,traj)))
           logging.debug("Evaluating {}, column {} (value number {}).".format(self.output(runmode=runmode,section=traj),j,n+1))
           eps=float(self.get_option('epsilon_'+runmode,section=traj,required=True).split(',')[n])
           if not self._regressionArrays(reference_data[:,i],data[:,j],timeArray,eps):
             logging.debug("====== FAILED ======")
             failure=True
+      self.place_legend()
+      self.finish_plot()
+    self.close_pdf()
     if failure:
       sys.exit(-1)
 
@@ -572,7 +625,6 @@ class Comparer(OutputManager):
 
   def _regressionArrays(self, a1, a2, timeArray, eps) :
     return self._regression(self._interpolate(timeArray,a1),self._interpolate(timeArray,a2),timeArray,eps)
-
 
 def main():
   """!
