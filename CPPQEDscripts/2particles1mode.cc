@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
   
   evolve(psi,
          composite::make(
-                         Act<0,1>(act),Act<0,2>(act),
-                         Act<1,2>(IdenticalParticles<2>(part))
+                         _<0,1>(act),_<0,2>(act),
+                         _<1,2>(IdenticalParticles<2>(part))
                          ),
          pe);
 }

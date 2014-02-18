@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
 
   evolve(psi,
          composite::make(
-                         Act<0,1,2,3>(dq)
-                                         ),
+                         _<0,1,2,3>(dq)
+                        ),
          pe);
 
 

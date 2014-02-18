@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 
   evolve<0>
     (psi,
-     composite::make(Act<0,1>(ia01),Act<0,2>(ia02)),
+     composite::make(_<0,1>(ia01),_<0,2>(ia02)),
      pe);
 
 

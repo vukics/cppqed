@@ -36,9 +36,9 @@ int main(int argc, char* argv[])
 
   evolve<0>(psi,
             composite::make(
-                            Act<1,0>  (pacP),
-                            Act<2,0>  (pacM),
-                            Act<1,2,0>(ptm)
+                            _<1,0>  (pacP),
+                            _<2,0>  (pacM),
+                            _<1,2,0>(ptm)
                             ),
             pe);
 
