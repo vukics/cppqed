@@ -66,7 +66,7 @@ class OptionsManager(object):
   Each OptionsManager instance has its own section in the configuration file, named after
   the current test name (OptionsManager::test). If the current section has the key
   `import=othersection`, import all keys from `othersection` if they are not present already
-  (doesn't work recursively).
+  (works recursively).
 
   \ref OptionsManager_options "Command line" options this class understands.
   """
@@ -91,28 +91,33 @@ class OptionsManager(object):
     ## The name of the current test
     self.test = options.test
     if not self.test: sys.exit('--test missing')
+    self._import_section()
 
-    import_section=self.get_option('import')
+  def _import_section(self,section=None):
+    import_section=self.get_option('import',section=section)
     if import_section:
+      self._import_section(section=import_section) # import recursively
       for item in self.cp.items(import_section):
         if not self.cp.has_option(self.test,item[0]):
           self.cp.set(self.test, *item)
 
-  def get_option(self, name, default=None, required=False):
+  def get_option(self, name, default=None, required=False, section=None):
     """!
     Get configuration file keys in a safe way.
     \param name Name of the key.
     \param default Default value to return if key does not exist.
     \param required Fail if True and key does not exist.
+    \param section The section name to look in, defaults to OptionsManager::test if None.
     \return The value to the key.
 
     This methods looks up the key `name` in the section name OptionsManager::test.
     """
-    if self.cp.has_option(self.test,name):
-      return self.cp.get(self.test,name)
+    if section is None: section=self.test
+    if self.cp.has_option(section,name):
+      return self.cp.get(section,name)
     else:
       if not required: return default
-      else: sys.exit("Error: required option {} not found in section {}.".format(name,self.test))
+      else: sys.exit("Error: required option {} not found in section {}.".format(name,section))
 
 class OutputManager(OptionsManager):
   """!
