@@ -165,7 +165,10 @@ class OutputManager(OptionsManager):
     \return Full path including OutputManager::outputdir.
     """
     if section is None: section=self.test
-    output = os.path.join(self.outputdir, section+'_'+runmode)
+    if runmode == "generic":
+      output = os.path.join(self.outputdir, section)
+    else:
+      output = os.path.join(self.outputdir, section+'_'+runmode)
     if statefile: output+=".state"
     return output
 
@@ -241,7 +244,7 @@ class Runner(OutputManager):
     self._extend_opts(result, self.test,'opts')
     self._extend_opts(result, self.test,runmode)
 
-    result.extend(('--evol',runmode))
+    if not runmode=="generic": result.extend(('--evol',runmode))
     result.extend(('--o',self.output(runmode)))
     return result
 
