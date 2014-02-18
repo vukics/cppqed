@@ -52,6 +52,18 @@ def load_sv(fname):
 
 ## @}
 
+def id_postprocess(input):
+  return input
+
+def PTLA_postprocess(input):
+  result=np.zeros((input.shape[0],6))
+  result[:,[0,1]]=input[:,[0,1]]
+  result[:,2]=(1+input[:,2])/2
+  result[:,3]=(1-input[:,2])/2
+  result[:,4]=input[:,3]/2
+  result[:,5]=input[:,4]/2
+  return result
+
 ## @defgroup TestclassHelpers Helpers
 # @ingroup Testclasses
 # \brief Helper base classes to test classes.
@@ -91,15 +103,16 @@ class OptionsManager(object):
     ## The name of the current test
     self.test = options.test
     if not self.test: sys.exit('--test missing')
-    self._import_section()
 
   def _import_section(self,section=None):
-    import_section=self.get_option('import',section=section)
-    if import_section:
+    if section is None: section = self.test
+    if self.cp.has_option(section,'import'):
+      import_section=self.cp.get(section,'import')
       self._import_section(section=import_section) # import recursively
       for item in self.cp.items(import_section):
-        if not self.cp.has_option(self.test,item[0]):
-          self.cp.set(self.test, *item)
+        if not self.cp.has_option(section,item[0]):
+          self.cp.set(section, *item)
+      self.cp.remove_option(section,'import')
 
   def get_option(self, name, default=None, required=False, section=None):
     """!
@@ -113,11 +126,12 @@ class OptionsManager(object):
     This methods looks up the key `name` in the section name OptionsManager::test.
     """
     if section is None: section=self.test
+    self._import_section(section=section)
     if self.cp.has_option(section,name):
       return self.cp.get(section,name)
     else:
       if not required: return default
-      else: sys.exit("Error: required option {} not found in section {}.".format(name,section))
+      else: sys.exit("Error: required option \"{}\" not found in section {}.".format(name,section))
 
 class OutputManager(OptionsManager):
   """!
@@ -158,7 +172,7 @@ class OutputManager(OptionsManager):
     \return A list of runmodes in this section.
     """
     if section is None: section=self.test
-    return self.cp.get(section, 'runmodes').split(',')
+    return self.get_option('runmodes', section=section, default='generic').split(',')
 
   def output(self, runmode, section=None, statefile=False):
     """!
@@ -499,6 +513,66 @@ class CompileTarget(OptionsManager):
         sys.exit("Compilation was successful, but failure was expected.")
       if not error in std:
         sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
+
+class Comparer(OutputManager):
+  """!
+  @ingroup Testclasses
+  Compares several trajectories to a reference trajectory by using function interpolation.
+
+  \ref Comparer_keys "Configuration file keys" this class understands.
+  """
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor Comparer_keys
+  # ## Comparer configuration file keys
+  #
+
+  def run(self):
+    """!
+    Runs the test.
+    """
+    trajectories=self.get_option('trajectories',required=True).split(',')
+    reference=self.get_option('reference',required=True)
+    reference_runmode=self.runmodes(section=reference)[0]
+    reference_data=self._get_data(reference,reference_runmode)
+    timeArray=reference_data[:,0]
+    failure=False
+    for n,idx in enumerate(self._get_columns(reference,reference_runmode)):
+      for traj in trajectories:
+        for runmode in self.runmodes(section=traj):
+          data=self._get_data(section=traj,runmode=runmode)
+          i,j=idx,self._get_columns(traj,runmode)[n]
+          logging.debug("Evaluating {}, column {} (value number {}).".format(self.output(runmode=runmode,section=traj),j,n+1))
+          eps=float(self.get_option('epsilon_'+runmode,section=traj,required=True).split(',')[n])
+          if not self._regressionArrays(reference_data[:,i],data[:,j],timeArray,eps):
+            logging.debug("====== FAILED ======")
+            failure=True
+    if failure:
+      sys.exit(-1)
+
+  def _get_columns(self,section,runmode):
+    return map(int,self.get_option('columns',section=section,required=True).split(','))
+
+  def _get_data(self,section,runmode):
+    fname=self.get_option('postprocess',section=section)
+    if fname=="" or fname is None: fname = 'id_postprocess'
+    postprocess=globals()[fname]
+    return postprocess(load_sv(self.output(runmode=runmode,section=section)))
+
+  def _interpolate(self,timeArray,array):
+    return scipy.interpolate.interp1d(timeArray,array)
+
+  def _regression(self, f1, f2, timeArray, eps) :
+    t0=timeArray[ 0]
+    t1=timeArray[-1]
+    res=quadrature(lambda t : (f1(t)-f2(t))**2,t0,t1,maxiter=100)[0]
+    logging.debug("Quadrature: {}, epsilon: {}".format(res,eps))
+    return res<eps
+
+  def _regressionArrays(self, a1, a2, timeArray, eps) :
+    return self._regression(self._interpolate(timeArray,a1),self._interpolate(timeArray,a2),timeArray,eps)
+
 
 def main():
   """!
