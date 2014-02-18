@@ -6,4 +6,6 @@
 
 #include "Evolution.h"
 
+using composite::_;
+
 #endif // QUANTUMTRAJECTORY_EVOLUTIONCOMPOSITE_H_INCLUDED

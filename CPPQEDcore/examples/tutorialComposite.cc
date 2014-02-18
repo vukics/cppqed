@@ -25,9 +25,9 @@ int main(int argc, char* argv[])
 
   evolve<0>(psi,
             composite::make(
-                            Act<1,0>  (ParticleAlongCavity(plus ,part,ppcP)),
-                            Act<2,0>  (ParticleAlongCavity(minus,part,ppcM)),
-                            Act<1,2,0>(ParticleTwoModes(plus,minus,part,ppcP,ppcM))
+                            _<1,0>  (ParticleAlongCavity(plus ,part,ppcP)),
+                            _<2,0>  (ParticleAlongCavity(minus,part,ppcM)),
+                            _<1,2,0>(ParticleTwoModes(plus,minus,part,ppcP,ppcM))
                             ),
             pe);
 

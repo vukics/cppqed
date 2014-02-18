@@ -314,7 +314,7 @@ namespace result_of {
 
 namespace mpl=boost::mpl;
 
-typedef Act<> DefaultArgument;
+typedef _<> DefaultArgument;
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI, BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 

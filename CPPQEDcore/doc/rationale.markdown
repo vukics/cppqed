@@ -325,4 +325,4 @@ The difficulty is the construction, because `blitz::Array` provides an immense n
 * Passing dcomp by reference is slightly faster if no optimizaton is used, but if the function is `inline`d, there is no difference.
 
 * In structure::Interaction, it would be an interesting possibility to supply the type of the base class plugs as a compile-time vector (e.g. JaynesCummings could be derived from structure::Interaction`<mpl::vector<QbitBase,ModeBase> >`).
-Then, Composite could do much more static sanity checks. The problem with this is that in this case these would appear in Act as well and creep into the user interface, but this could be perhaps avoided somehow?
+Then, Composite could do much more static sanity checks. The problem with this is that in this case these would appear in composite::_ as well and creep into the user interface, but this could be perhaps avoided somehow?

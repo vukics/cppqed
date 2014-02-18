@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFile{Defines the helper class composite::_}
 #ifndef   COMPOSITES_ACT_H_INCLUDED
 #define   COMPOSITES_ACT_H_INCLUDED
 
@@ -10,24 +10,34 @@
 #include <boost/mpl/size.hpp>
 
 
-#define BASE_class1 tmptools::Vector<V...>
-#define BASE_class2 composite::SubSystemsInteraction<mpl::size<BASE_class1>::value>
+/// Auxiliary tools to Composite
+namespace composite {
+
+
+#define BASE_class SubSystemsInteraction<mpl::size<tmptools::Vector<V...> >::value>
 
 template<int... V>
-class Act
-  : public BASE_class1,
-    public BASE_class2
+class _
+  : public tmptools::Vector<V...>,
+    public BASE_class
 {
 public:
-  typedef BASE_class1 Vector;
+  typedef tmptools::Vector<V...> Vector;
 
   template<typename IA>
-  explicit Act(const IA& ia) : BASE_class2(cpputils::sharedPointerize(ia)) {}
+  explicit _(const IA& ia) : BASE_class(cpputils::sharedPointerize(ia)) {}
 
 };
 
-#undef  BASE_class2
-#undef  BASE_class1
+#undef  BASE_class
+
+
+}
+
+
+/// Template alias for backward compatibility
+template<int... V>
+using Act = composite::_<V...>;
 
 
 #endif // COMPOSITES_ACT_H_INCLUDED
