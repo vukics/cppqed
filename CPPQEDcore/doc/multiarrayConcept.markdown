@@ -13,8 +13,10 @@ is an element of a Hilbert space which is the direct product of elementary Hilbe
 The number of elementary Hilbert spaces (the number of quantum numbers of the system) is referred to throughout as the *rank* or *arity*
 (un<em>ary,</em> bin<em>ary,</em> tern<em>ary,</em> quatern<em>ary,</em> etc.) of the system.
 
+State-vector slices {#retainedindexpositionsdefined}
+-------------------
+
 Via an example we define *state-vector slices*:
-\anchor retainedindexpositionsdefined
 \f[\ket\Psi\equiv\sum_\iota\Psi_\iota\ket\iota\in\HSpace,\quad\ket{\Psi^{\avr{1,3,6,7,9}}(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)}\equiv\sum_{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\Psi_{\iota}\ket{\iota_1,\iota_3,\iota_6,\iota_7,\iota_9}\in\bigotimes_{i=1,3,6,7,9}\HSpace_i\f]
 A state-vector slice is defined by the *retained index positions* \f$\avr{1,3,6,7,9}\f$, which define the subsystem, and the <em>“dummy” indices</em> 
 \f$(\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},…)\f$. In situations when slicing occurs in the framework, the set of retained index positions 

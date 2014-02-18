@@ -257,7 +257,7 @@ class Base;
 /// BlitzArraySliceIterator
 /**
  * \tparam RANK positive integer standing for the number of elementary Hilbert spaces
- * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$ \ref retainedindexpositionsdefined "above". (Cf. \ref specifyingsubsystems)
+ * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$ \ref retainedindexpositionsdefined "here". (Cf. \ref specifyingsubsystems)
  * \tparam IS_CONST governs the constness of the class
  * 
  * To understand the template parameters, cf. also \ref multiarrayconcept.
@@ -280,7 +280,7 @@ class Base;
  * 
  * \Semantics
  * 
- * Sticking to the example \ref retainedindexpositionsdefined "above", assume that the function
+ * Sticking to the example \ref retainedindexpositionsdefined "here", assume that the function
  * ~~~
  * void actWithA(CArray<5>&);
  * ~~~
@@ -577,7 +577,7 @@ end  (const A& array );
 
 /// \refBoost{Boost.Range,range/doc/html/range/reference/utilities/iterator_range.html}-compliant full range of slice iterators \related Iterator
 /**
- * It corresponds to all the possible combinations of dummy indices (\f$\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\f$…) \ref retainedindexpositionsdefined "above".
+ * It corresponds to all the possible combinations of dummy indices (\f$\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\f$…) \ref retainedindexpositionsdefined "here".
  * \tparam V the retained index positions \tparam A array type taken itself as a parameter to ease template-parameter inference 
  */
 template<typename V, typename A>
