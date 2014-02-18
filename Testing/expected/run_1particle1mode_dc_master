@@ -1,11 +1,11 @@
 
-# C++QEDcore Version 2.99.7, core git commit: e21b96a19300bbf7aa11cbc18d6a4799191ffaf3
+# C++QEDcore Version 2.99.11, core git commit: a5f3bc0e10627f07154181fad38209c692b59cc8
 
 # Andras Vukics, vukics@users.sourceforge.net
 
 # Compiled with
 # Boost library collection : Version 1.55
-# Gnu Scientific Library   : Version 1.15
+# Gnu Scientific Library   : Version 1.16
 # Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
 
 # EvolvedGSL implementation, stepping function: rkck
@@ -63,5 +63,5 @@
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
 0.00333333   0.00333333   	0.001162      0.001162      0.0326275     -0.00961266   	-0.499917     5.24872       -1.57077      0.0200818     
-0.0199369    0.0166036    	0.0351984     0.0351734     0.176875      -0.061126     	-0.497171     5.20708       -1.57004      0.102346      
-0.03         0.0100631    	0.0721674     0.071955      0.262749      -0.0509918    	-0.494219     5.16149       -1.57006      0.0755878     
+0.0199369    0.0166036    	0.0351984     0.0351734     0.17474       -0.0669868    	-0.497171     5.20708       -1.56975      0.119092      
+0.03         0.0100631    	0.0720145     0.0718031     0.244995      -0.107062     	-0.493778     5.15643       -1.56852      0.178173      
