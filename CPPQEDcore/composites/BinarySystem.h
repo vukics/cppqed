@@ -23,13 +23,13 @@ typedef structure::Interaction<2> Interaction; ///< Binary interaction
  * (the two \link structure::Free free systems\endlink and the #Interaction): whether they derive from structure::Exact, structure::Hamiltonian, structure::Liouvillean.
  * If any of the components derive from structure::Exact, then the whole BinarySystem has to derive from structure::Exact, and so on.
  */
-const Ptr make(Interaction::Ptr);
+const Ptr doMake(Interaction::Ptr);
 
 /// Templatized maker function relying on cpputils::sharedPointerize to delegate to make()
 template<typename IA>
 const Ptr make(const IA& ia)
 {
-  return make(cpputils::sharedPointerize(ia));
+  return doMake(cpputils::sharedPointerize(ia));
 }
 
 

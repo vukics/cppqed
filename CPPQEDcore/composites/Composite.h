@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFileDefault
 #if !BOOST_PP_IS_ITERATING
 
 #ifndef   COMPOSITES_COMPOSITE_H_INCLUDED

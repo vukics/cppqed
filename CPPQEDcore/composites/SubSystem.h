@@ -1,4 +1,4 @@
-// -*- C++ -*-
+/// \briefFile{Defines composite::SubSystemFree and composite::SubSystemsInteraction}
 #ifndef COMPOSITES_SUBSYSTEM_H_INCLUDED
 #define COMPOSITES_SUBSYSTEM_H_INCLUDED
 
