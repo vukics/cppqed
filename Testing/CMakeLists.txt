@@ -21,7 +21,14 @@ project(testing)
 include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
 include(${CPPQED_USE})
 
-find_package(PythonInterp 2.7 REQUIRED)
+find_package(PythonInterp 2.7)
+find_package(Numpy)
+find_package(Scipy)
+
+if(NOT ( PYTHONINTERP_FOUND AND NUMPY_FOUND AND SCIPY_FOUND  ) )
+  message(WARNING "Disabling testsuite, not all Python components are available")
+  return()
+endif()
 
 configure_file(testdriver.conf.in testdriver.conf)
 
