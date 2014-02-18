@@ -282,7 +282,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 #define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
-const binary::Ptr binary::doMake(Interaction::Ptr ia)
+const binary::Ptr binary::make(Interaction::Ptr ia)
 {
   if      DISPATCHER(true ,true ,true ) ;
   else if DISPATCHER(true ,true ,false) ;
