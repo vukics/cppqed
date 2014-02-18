@@ -44,6 +44,12 @@ def rm_f(filename):
     if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
       raise # re-raise exception if a diff
 
+## Loads a trajectory file.
+# \param fname File name to load from.
+# \return array Numpy array.
+def load_sv(fname):
+  return np.genfromtxt(fname)
+
 ## @}
 
 ## @defgroup TestclassHelpers Helpers
@@ -331,25 +337,21 @@ class Verifier(OutputManager):
       return os.path.join(self.expecteddir,os.path.basename(self._thisOutput(runmode,statefile)))
     else:
       return self.output(runmode,section=self.otherSection,statefile=statefile)
-  def _load_sv(self,fname):
-    return np.genfromtxt(fname)
-  def _load_state(self,fname):
-    return io.read(fname)
   def _differ(self,this,other):
     sys.exit("Error: {} and {} differ.".format(this,other))
   def _equiv(self,this,other):
     logging.debug("{} and {} are equivalent.".format(this,other))
   def _verify_ev(self,this,other):
-    if not np.allclose(self._load_sv(this),self._load_sv(other)): self._differ(this,other)
+    if not np.allclose(load_sv(this),load_sv(other)): self._differ(this,other)
     else: self._equiv(this,other)
   def _verify_state(self,this,other):
-    _,r_state,r_time = self._load_state(this)
-    _,e_state,e_time = self._load_state(other)
+    _,r_state,r_time = io.read(this)
+    _,e_state,e_time = io.read(other)
     if not (np.allclose(r_state,e_state) and np.allclose(r_time,e_time)): self._differ(this,other)
     else: self._equiv(this,other)
   def _verify_outcome(self,this,other):
-    _,r_state,r_time=self._load_state(this)
-    _,e_state,e_time=self._load_state(other)
+    _,r_state,r_time=io.read(this)
+    _,e_state,e_time=io.read(other)
     if not (np.allclose(r_state[-1],e_state[-1]) and np.allclose(r_time[-1],e_time[-1])):
       self._differ(this,other)
     else: self._equiv(this,other)
