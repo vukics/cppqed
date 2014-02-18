@@ -1,5 +1,5 @@
 [Setup]
-opts=--precision 6 --epsAbs 1e-5 --logLevel 2
+opts=--precision 6 --logLevel 2
 modulepath=@cpypyqed_BINARY_DIR@
 outputdir=output
 expecteddir=@testing_SOURCE_DIR@/expected
