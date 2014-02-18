@@ -40,3 +40,9 @@ cpypyqed Reference
   :undoc-members:
 
 .. autoclass:: @MODULE_NAME@.compilation.composite.Act(int, [int,...])
+
+:mod:`io@DEBUG_SUFFIX@`
+=========================
+.. automodule:: @MODULE_NAME@.io@DEBUG_SUFFIX@
+  :members:
+  :undoc-members:

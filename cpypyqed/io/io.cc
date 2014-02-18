@@ -161,12 +161,26 @@ void export_io()
 {
   import_array();
   numeric::array::set_module_and_type("numpy", "ndarray");
-  def("read", read);
-  def("write", write);
+  def("read", read,
+R"doc(Read in a state vector file.
+
+:param str fname: The input filename.
+:returns: A tuple of the form :samp:`(meta, states, times)`.)doc",
+  arg("fname")
+  );
+
+  def("write", write,
+R"doc(Write a state vector file.
+
+:param str fname: The output filename.
+:param ndarray a: The array to write.
+:param double t: The time.)doc",
+  (arg("fname"),"a", "t")
+  );
 
   register_exception_translator<trajectory::DimensionsMismatchException>(&pyDimensionsMismatchException);
   register_exception_translator<trajectory::RankMismatchException>      (&pyRankMismatchException);
-  
+
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
     .def_readonly("rank",            &trajectory::SerializationMetadata::rank)
