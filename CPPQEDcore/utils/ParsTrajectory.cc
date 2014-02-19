@@ -7,7 +7,7 @@ namespace trajectory {
 
 
 const double ParsEvolved::epsRelDefault=1e-6;
-const double ParsEvolved::epsAbsDefault=1e-30;
+const double ParsEvolved::epsAbsDefault=1e-12;
 
 
 ParsRun::ParsRun(parameters::ParameterTable& p, const std::string& mod)
@@ -17,7 +17,7 @@ ParsRun::ParsRun(parameters::ParameterTable& p, const std::string& mod)
     NDt(p.addMod("NDt",mod,"Number of steps in Dt mode",0L)),
     ofn(p.addMod<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
     initialFileName(p.addMod<std::string>("initialFileName",mod,"Trajectory initial file name","")),
-    precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision/2))),
+    precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision))),
     displayInfo(p.addMod("displayInfo",mod,"Whether to display header for trajectories",true)),
     firstStateDisplay(p.addMod("firstStateDisplay",mod,"Displays state vector at startup",true)),
     sdf(p.addMod("sdf",mod,"State output frequency",0u))
