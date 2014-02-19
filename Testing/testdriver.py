@@ -60,8 +60,13 @@ def rm_f(filename):
 ## Loads a trajectory file.
 # \param fname File name to load from.
 # \return array Numpy array.
-def load_sv(fname):
-  return np.genfromtxt(fname)
+def load_sv(fname, format=None):
+  if format is None: return np.genfromtxt(fname)
+
+  floatingReString=r'([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)'
+  complexReString =r'\(\s*'+floatingReString+'\s*,\s*'+floatingReString+'\s*\)'
+
+  return np.fromregex(fname,format.replace(r'+',r'\s*').replace('f',floatingReString).replace('c',complexReString),np.float)
 
 ## @}
 
@@ -123,7 +128,7 @@ class OptionsManager(object):
       import_section=self.cp.get(section,'import')
       self._import_section(section=import_section) # import recursively
       for item in self.cp.items(import_section):
-        if not self.cp.has_option(section,item[0]):
+        if not self.cp.has_option(section,item[0]) and not item[0].endswith('_local'):
           self.cp.set(section, *item)
       self.cp.remove_option(section,'import')
 
@@ -605,13 +610,14 @@ class Comparer(Plotter):
       sys.exit(-1)
 
   def _get_columns(self,section,runmode):
-    return map(int,self.get_option('columns',section=section,required=True).split(','))
+    return map(int,self.get_option('columns_'+self.test,section=section,required=True).split(','))
 
   def _get_data(self,section,runmode):
-    fname=self.get_option('postprocess',section=section)
+    fname=self.get_option('postprocess_local',section=section)
+    format=self.get_option('format_local',section=section)
     if fname=="" or fname is None: fname = 'id_postprocess'
     postprocess=globals()[fname]
-    return postprocess(load_sv(self.output(runmode=runmode,section=section)))
+    return postprocess(load_sv(self.output(runmode=runmode,section=section),format=format))
 
   def _interpolate(self,timeArray,array):
     return scipy.interpolate.interp1d(timeArray,array)
