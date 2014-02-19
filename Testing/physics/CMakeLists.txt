@@ -1,4 +1,5 @@
-testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED PumpedLossyQbit PTLA_EvolvedHL)
+testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED PumpedLossyQbit PTLA_EvolvedHL
+                PumpedLossyMode_C++QED PumpedLossyMode_Evolved)
 
 # Scripts needed for PTLA comparison
 
@@ -56,3 +57,24 @@ set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_PTLAHL_Evolved;ph_PTLAHL_Si")
 add_custom_target(check_PTLAHL COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_PTLAHL_Evolved\\|ph_PTLAHL_Si\\|compare_PTLAHL")
+
+# Scripts needed for PLM comparison
+
+declaretest(ph_PLM_Evolved)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_Evolved>)
+
+declaretest(ph_PLM_CPPQED)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+
+declaretest(ph_PLM_CPPQEDsch)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+
+declaretest(ph_PLM_CPPQEDuip)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+
+add_custom_target(check_PLM COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_PLM_Evolved\\|ph_PLM_CPPQED\\|ph_PLM_CPPQEDsch\\|ph_PLM_CPPQEDuip\\|ph_QbitMode_CPPQED\\|ph_QbitMode_CPPQEDsch")
