@@ -76,5 +76,18 @@ declaretest(ph_PLM_CPPQEDuip)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
 
+declaretest(compare_PLM)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Comparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_PLM_CPPQED;ph_PLM_CPPQEDsch;ph_PLM_CPPQEDuip;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch")
 add_custom_target(check_PLM COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
-                  -R "ph_PLM_Evolved\\|ph_PLM_CPPQED\\|ph_PLM_CPPQEDsch\\|ph_PLM_CPPQEDuip\\|ph_QbitMode_CPPQED\\|ph_QbitMode_CPPQEDsch")
+                  -R "ph_PLM_CPPQED\\|ph_PLM_CPPQEDsch\\|ph_PLM_CPPQEDuip\\|ph_QbitMode_CPPQED\\|ph_QbitMode_CPPQEDsch\\|compare_PLM")
+
+declaretest(compare_PLM_Ev)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Comparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_PLM_Evolved;ph_PLM_CPPQEDsch;ph_PLM_CPPQEDuip;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch")
+add_custom_target(check_PLM_Ev COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_PLM_Evolved\\|ph_PLM_CPPQEDsch\\|ph_PLM_CPPQEDuip\\|ph_QbitMode_CPPQED\\|ph_QbitMode_CPPQEDsch")

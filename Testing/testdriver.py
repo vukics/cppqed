@@ -82,6 +82,14 @@ def PTLA_postprocess(input):
   result[:,5]=input[:,4]/2
   return result
 
+def PLM_Evolved_postprocess(input):
+  result=np.zeros((input.shape[0],5))
+  result[:,[0,1]]=input[:,[0,1]]
+  result[:,2]=input[:,2]**2+input[:,3]**2
+  result[:,3]=input[:,2]
+  result[:,4]=input[:,3]
+  return result
+
 ## @defgroup TestclassHelpers Helpers
 # @ingroup Testclasses
 # \brief Helper base classes to test classes.
@@ -595,11 +603,15 @@ class Comparer(Plotter):
       self.plot(timeArray,reference_data[:,idx],label=os.path.basename(self.output(reference_runmode,reference)))
       for traj in trajectories:
         for runmode in self.runmodes(section=traj):
+          filter_runmode=self.get_option('runmodes_'+self.test,section=traj)
+          if not filter_runmode is None:
+            if not runmode in filter_runmode.split(','):
+              continue
           data=self._get_data(section=traj,runmode=runmode)
           i,j=idx,self._get_columns(traj,runmode)[n]
           self.plot(timeArray,data[:,j],label=os.path.basename(self.output(runmode,traj)))
           logging.debug("Evaluating {}, column {} (value number {}).".format(self.output(runmode=runmode,section=traj),j,n+1))
-          eps=float(self.get_option('epsilon_'+runmode,section=traj,required=True).split(',')[n])
+          eps=float(self.get_option('epsilon_'+runmode+'_'+self.test,section=traj,required=True).split(',')[n])
           if not self._regressionArrays(reference_data[:,i],data[:,j],timeArray,eps):
             logging.debug("====== FAILED ======")
             failure=True
@@ -615,9 +627,14 @@ class Comparer(Plotter):
   def _get_data(self,section,runmode):
     fname=self.get_option('postprocess_local',section=section)
     format=self.get_option('format_local',section=section)
+    length=self.get_option('length_'+self.test,section=section)
     if fname=="" or fname is None: fname = 'id_postprocess'
     postprocess=globals()[fname]
-    return postprocess(load_sv(self.output(runmode=runmode,section=section),format=format))
+    result=postprocess(load_sv(self.output(runmode=runmode,section=section),format=format))
+    if not length is None:
+      return result[:int(length)]
+    else:
+      return result
 
   def _interpolate(self,timeArray,array):
     return scipy.interpolate.interp1d(timeArray,array)
