@@ -15,9 +15,9 @@
    version="1.1"
    inkscape:version="0.48.4 r9939"
    sodipodi:docname="ProjectLayout.svg"
-   inkscape:export-filename="/tmp/ProjectLayout.png"
-   inkscape:export-xdpi="300.01669"
-   inkscape:export-ydpi="300.01669">
+   inkscape:export-filename="ProjectLayout.png"
+   inkscape:export-xdpi="60.036156"
+   inkscape:export-ydpi="60.036156">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -29,7 +29,7 @@
      inkscape:cx="607.02663"
      inkscape:cy="564.75342"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1749"
      inkscape:window-height="1060"
@@ -333,7 +333,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -373,7 +373,7 @@
          y="335.33282"
          x="858.04651"
          id="tspan4461"
-         sodipodi:role="line">Corest</tspan></text>
+         sodipodi:role="line">Very Core</tspan></text>
     <rect
        transform="matrix(0.49187898,0,0,1.4906269,18.171214,313.70029)"
        ry="13.417175"
