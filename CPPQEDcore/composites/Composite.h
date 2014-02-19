@@ -1,6 +1,4 @@
 /// \briefFileDefault
-#if !BOOST_PP_IS_ITERATING
-
 #ifndef   COMPOSITES_COMPOSITE_H_INCLUDED
 #define   COMPOSITES_COMPOSITE_H_INCLUDED
 
@@ -16,10 +14,6 @@
 #include "details_TMP_helpers.h"
 
 #include <boost/fusion/container/generation/make_list.hpp>
-
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/enum_trailing.hpp>
-#include <boost/preprocessor/arithmetic/sub.hpp>
 
 
 namespace composite {
@@ -85,6 +79,11 @@ public:
   // The calculated RANK
   static const int RANK=MaxRank<VA>::value+1;
 
+private:
+  // Compile-time sanity check
+  BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (composite::CheckMeta<RANK,VA>) );
+
+public:
   // Public types
   typedef VA Acts;
 
@@ -273,10 +272,7 @@ public:
   typedef typename composite::Base<VA>::Frees Frees;
   
   // The calculated RANK
-  static const int RANK=composite::MaxRank<VA>::value+1;
-
-  // Compile-time sanity check
-  BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (composite::CheckMeta<RANK,VA>) );
+  static const int RANK=Base::RANK;
 
 private:
   using Base::getFrees; using Base::getActs ;
@@ -312,83 +308,27 @@ namespace composite {
 namespace result_of {
 
 
-namespace mpl=boost::mpl;
-
-typedef _<> DefaultArgument;
-
-
-template<bool IS_EX, bool IS_HA, bool IS_LI, BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
-struct MakeConcrete : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type, IS_EX, IS_HA, IS_LI> >
-{};
+template<bool IS_EX, bool IS_HA, bool IS_LI, typename... Acts>
+struct MakeConcrete : boost::mpl::identity<Composite<typename make_list<Acts...>::type, IS_EX, IS_HA, IS_LI> > {};
 
 
-template<BOOST_PP_ENUM_BINARY_PARAMS(FUSION_MAX_VECTOR_SIZE,typename A,=DefaultArgument BOOST_PP_INTERCEPT)> 
-struct Make : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENUM_PARAMS(FUSION_MAX_VECTOR_SIZE,A)>::type>::Ptr>
-{};
+template<typename... Acts>
+struct Make : boost::mpl::identity<typename Base<typename make_list<Acts...>::type>::Ptr> {};
 
 
 
 } // result_of
 
-} // composite
 
-
-#define DEFAULT_print(z, n, data) DefaultArgument
-
-#define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,1) )
-#define BOOST_PP_FILENAME_1 "Composite.h"
-
-#include BOOST_PP_ITERATE()
-
-#undef BOOST_PP_FILENAME_1
-#undef BOOST_PP_ITERATION_LIMITS
-
-#undef DEFAULT_print
-
-#endif // COMPOSITES_COMPOSITE_H_INCLUDED
-
-
-#else  // BOOST_PP_IS_ITERATING
-
-#define ITER BOOST_PP_ITERATION()
-
-namespace composite {
-
-
-namespace result_of {
-
-
-template<bool IS_EX, bool IS_HA, bool IS_LI, BOOST_PP_ENUM_PARAMS(ITER,typename A)>
-struct MakeConcrete<IS_EX, IS_HA, IS_LI, BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
-  : boost::mpl::identity<Composite<typename make_list<BOOST_PP_ENUM_PARAMS(ITER,A) >::type, IS_EX, IS_HA, IS_LI> >
-{};
-
-
-template<BOOST_PP_ENUM_PARAMS(ITER,typename A)>
-struct Make<BOOST_PP_ENUM_PARAMS(ITER,A) BOOST_PP_ENUM_TRAILING(BOOST_PP_SUB(FUSION_MAX_VECTOR_SIZE,ITER),DEFAULT_print,~) >
-  : boost::mpl::identity<typename Base<typename make_list<BOOST_PP_ENUM_PARAMS(ITER,A) >::type>::Ptr>
-{};
-
-
-} // result_of
-
-
-#define RETURN_type typename result_of::Make<BOOST_PP_ENUM_PARAMS(ITER,A) >::type
-
-template<BOOST_PP_ENUM_PARAMS(ITER,typename A)> 
-const RETURN_type
-make(BOOST_PP_ENUM_BINARY_PARAMS(ITER,const A,& act) )
+template<typename... Acts>
+const typename result_of::Make<Acts...>::type
+make(const Acts&... acts)
 {
-  return doMake(make_list(BOOST_PP_ENUM_PARAMS(ITER,act)));
+  return doMake(make_list(acts...));
 }
 
-#undef  RETURN_type
-
 
 } // composite
 
 
-#undef  ITER
-
-
-#endif // BOOST_PP_IS_ITERATING
+#endif // COMPOSITES_COMPOSITE_H_INCLUDED
