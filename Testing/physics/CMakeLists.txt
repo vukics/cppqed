@@ -1,4 +1,4 @@
-testdir(physics QbitMode_C++QED)
+testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED)
 
 declaretest(run_PTLA_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
