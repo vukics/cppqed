@@ -15,9 +15,9 @@
    version="1.1"
    inkscape:version="0.48.4 r9939"
    sodipodi:docname="ProjectLayout.svg"
-   inkscape:export-filename="/tmp/ProjectLayout.png"
-   inkscape:export-xdpi="300.01669"
-   inkscape:export-ydpi="300.01669">
+   inkscape:export-filename="ProjectLayout.png"
+   inkscape:export-xdpi="60.036156"
+   inkscape:export-ydpi="60.036156">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -26,10 +26,10 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="0.62333144"
-     inkscape:cx="414.51268"
+     inkscape:cx="799.54059"
      inkscape:cy="500.5821"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1749"
      inkscape:window-height="1060"
@@ -333,7 +333,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -365,7 +365,7 @@
        transform="matrix(1.0113005,0,0,1.1181418,20.195064,-52.805128)" />
     <text
        xml:space="preserve"
-       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#d38d5f;fill-opacity:1;stroke:none;display:inline;font-family:Charlemagne Std;-inkscape-font-specification:Charlemagne Std;opacity:0.21313311"
+       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;opacity:0.21313309;fill:#d38d5f;fill-opacity:1;stroke:none;display:inline;font-family:Charlemagne Std;-inkscape-font-specification:Charlemagne Std"
        x="858.04651"
        y="335.33282"
        id="text4039"
@@ -373,7 +373,7 @@
          y="335.33282"
          x="858.04651"
          id="tspan4461"
-         sodipodi:role="line">Corest</tspan></text>
+         sodipodi:role="line">Very Core</tspan></text>
     <rect
        transform="matrix(0.49187898,0,0,1.4906269,18.171214,313.70029)"
        ry="13.417175"
@@ -719,7 +719,7 @@
        inkscape:connection-end="#g4035"
        inkscape:connection-end-point="d4"
        id="path6220"
-       style="fill:none;stroke:#483737;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:url(#Arrow2Mstart0);opacity:0.21313311"
+       style="opacity:0.21313309;fill:none;stroke:#483737;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:url(#Arrow2Mstart0)"
        d="m 328,430.36218 0,82"
        inkscape:connector-type="polyline"
        inkscape:connector-curvature="0" />
