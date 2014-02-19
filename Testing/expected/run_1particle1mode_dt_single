@@ -1,17 +1,17 @@
 
-# C++QEDcore Version 2.99.7, core git commit: e21b96a19300bbf7aa11cbc18d6a4799191ffaf3
+# C++QEDcore Version 2.99.11, core git commit: d8f2c9e3a4a4d65ff61a327331d14ef42ff3b2ef
 
 # Andras Vukics, vukics@users.sourceforge.net
 
 # Compiled with
 # Boost library collection : Version 1.55
-# Gnu Scientific Library   : Version 1.15
+# Gnu Scientific Library   : Version 1.16
 # Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
 
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
 # Stochastic Trajectory Parameters: seed=1001
-# MCWF Trajectory Parameters: dpLimit=0.1 (overshoot tolerance factor)=10
+# MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Binary System
 # Dimensions: (3,8). Total: 24
@@ -66,24 +66,24 @@
 0.01         0.0042265    	0.00978315    0.00978274    0.0937119     -0.0309558    	-0.499268     5.23886       -1.57052      0.0600198     
 0.02         0.01         	0.0354014     0.0353818     0.175228      -0.0672311    	-0.497144     5.20714       -1.56975      0.11944       
 0.03         0.01         	0.072038      0.07188       0.245088      -0.107093     	-0.493736     5.15698       -1.56853      0.17829       
-0.04         0.01         	0.115784      0.115158      0.303825      -0.149009     	-0.489154     5.0901        -1.56691      0.236568      
-0.05         0.01         	0.163503      0.161818      0.352026      -0.191657     	-0.483515     5.00789       -1.56492      0.294241      
-0.06         0.01         	0.21272       0.209151      0.390382      -0.233938     	-0.47695      4.91159       -1.5626       0.351252      
-0.07         0.01         	0.261524      0.25509       0.419697      -0.274965     	-0.469599     4.8024        -1.55998      0.40752       
-0.08         0.01         	0.308482      0.298131      0.440882      -0.314048     	-0.461621     4.68154       -1.5571       0.462951      
-0.09         0.01         	0.352568      0.337239      0.454938      -0.35068      	-0.453184     4.55035       -1.55397      0.517437      
-0.1          0.01         	0.39311       0.371753      0.462929      -0.384514     	-0.44447      4.41034       -1.55061      0.570864      
+0.04         0.00305922   	0.115784      0.115158      0.303825      -0.149009     	-0.489154     5.0901        -1.56691      0.236568      
+0.05         0.00200681   	0.163503      0.161818      0.352026      -0.191657     	-0.483515     5.00789       -1.56492      0.294241      
+0.06         0.00154051   	0.21272       0.209151      0.390382      -0.233938     	-0.47695      4.91159       -1.5626       0.351252      
+0.07         0.00125861   	0.261524      0.25509       0.419697      -0.274965     	-0.469599     4.8024        -1.55998      0.40752       
+0.08         0.0010256    	0.308482      0.298131      0.440882      -0.314048     	-0.461621     4.68154       -1.5571       0.462951      
+0.09         0.000788227  	0.352569      0.337239      0.454938      -0.35068      	-0.453184     4.55035       -1.55397      0.517437      
+0.1          0.000523792  	0.39311       0.371753      0.462929      -0.384514     	-0.44447      4.41034       -1.55061      0.570864      
 0.1          1.38778e-17  	0.39311       0.371753      0.462929      -0.384514     	-0.44447      4.41034       -1.55061      0.570864      
 
-# Total number of steps: 12
+# Total number of steps: 40
 
-# dpLimit overshot: 5 times, maximal overshoot: 0.19972
+# dpLimit overshot: 37 times, maximal overshoot: 0.058757
 # dpTolerance overshot: 0 times, maximal overshoot: 0
 
-# Maximal deviation of norm from 1: 0.0366278
+# Maximal deviation of norm from 1: 0.00600005
 
 # Failed ODE steps: 0
-# Number of Hamiltonian calls: 84
+# Number of Hamiltonian calls: 280
 
 # MCWF Trajectory:
 
