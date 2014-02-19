@@ -743,6 +743,8 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown        \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/introduction.markdown \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/userGuide.markdown   \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/testsuite.markdown   \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/buildsystem.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/groups.dox           \
@@ -1605,7 +1607,7 @@ PAPER_TYPE             = a4
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-EXTRA_PACKAGES         = @CPPQED_RELATIVE_DOXYGEN_DIR@/technicalDefinitions \
+EXTRA_PACKAGES         = @CMAKE_CURRENT_SOURCE_DIR@/doc/technicalDefinitions \
                          amsmath \
                          amssymb
 
