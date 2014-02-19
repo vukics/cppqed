@@ -24,7 +24,7 @@ enable_testing()
 
 include(GNUInstallDirs)
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${cppqed_SOURCE_DIR}/cmake/Modules" "${cpypyqed_SOURCE_DIR}/cmake/Modules")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/CPPQEDcore/cmake/Modules" "${CMAKE_SOURCE_DIR}/cpypyqed/cmake/Modules")
 
 #! \name Project variables
 #! These variables are used in the subprojects.
