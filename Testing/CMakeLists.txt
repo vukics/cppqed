@@ -75,7 +75,7 @@ endmacro()
 #! Besides setting `TESTNAME`, this macro adds a new target `name` which runs the specific test alone.
 macro(declaretest name)
   set(TESTNAME ${name})
-  add_custom_target(${name} COMMAND ${CMAKE_CTEST_COMMAND} -V -R "^${name}$" DEPENDS ${TESTSDEPEND})
+  add_custom_target(${name} COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} -R "^${name}$" DEPENDS ${TESTSDEPEND})
 endmacro()
 
 #! \file
