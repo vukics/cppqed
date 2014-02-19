@@ -1,4 +1,4 @@
-testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED)
+testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED PumpedLossyQbit)
 
 declaretest(ph_PTLA_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -16,8 +16,20 @@ declaretest(ph_QbitMode_CPPQEDsch)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
 
+declaretest(ph_PLQ_CPPQEDuip)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyQbit>)
+
+declaretest(ph_PLQ_CPPQEDsch)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyQbit>)
+
+declaretest(ph_PLQ_CPPQED)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyQbit>)
+
 declaretest(compare_PTLA)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=Comparer)
 set_tests_properties(${TESTNAME} PROPERTIES
-  DEPENDS "ph_PTLA_Evolved;ph_PTLA_CPPQED;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch")
+  DEPENDS "ph_PTLA_Evolved;ph_PTLA_CPPQED;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch;ph_PLQ_CPPQEDuip;ph_PLQ_CPPQEDsch;ph_PLQ_CPPQED")
