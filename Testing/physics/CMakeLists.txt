@@ -1,7 +1,7 @@
 testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED PumpedLossyQbit PTLA_EvolvedHL
-                PumpedLossyMode_C++QED PumpedLossyMode_Evolved)
+                PumpedLossyMode_C++QED PumpedLossyMode_Evolved QbitMode_Matrix QbitMode_Evolved)
 
-# Scripts needed for PTLA comparison
+# Scripts needed for PTLA testcase
 
 declaretest(ph_PTLA_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -40,7 +40,7 @@ set_tests_properties(${TESTNAME} PROPERTIES
 add_custom_target(check_PTLA COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_PTLA_Evolved\\|ph_PTLA_CPPQED\\|ph_QbitMode_CPPQED\\|ph_QbitMode_CPPQEDsch\\|ph_PLQ_CPPQEDuip\\|ph_PLQ_CPPQEDsch\\|ph_PLQ_CPPQED\\|compare_PTLA" DEPENDS ${TESTSDEPEND})
 
-# Scripts needed for PTLAHL comparison
+# Scripts needed for PTLAHL testcase
 
 declaretest(ph_PTLAHL_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -58,7 +58,7 @@ set_tests_properties(${TESTNAME} PROPERTIES
 add_custom_target(check_PTLAHL COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_PTLAHL_Evolved\\|ph_PTLAHL_Si\\|compare_PTLAHL")
 
-# Scripts needed for PLM comparison
+# Scripts needed for PLM testcase
 
 declaretest(ph_PLM_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -93,7 +93,7 @@ add_custom_target(check_PLM_Ev COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST
                   -R "ph_PLM_Evolved\\|ph_PLM_CPPQEDsch\\|ph_PLM_CPPQEDuip\\|ph_QbitMode_CPPQED\\|ph_QbitMode_CPPQEDsch")
 
 
-# Scripts needed for Decay comparison
+# Scripts needed for Decay testcase
 
 declaretest(ph_Decay)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -118,3 +118,42 @@ set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_Decay;ph_DecayFock")
 add_custom_target(check_DecayMode COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_Decay\\|ph_DecayFock\\|compare_DecayMode")
+
+
+# Scripts needed for QMJ_Int testcase
+
+declaretest(ph_QMJ_Int_Ev)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_Evolved>)
+
+declaretest(ph_QMJ_Int_Matrix)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_Matrix>)
+
+declaretest(ph_QMJ_Int)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+
+declaretest(ph_QMJ_IntSch)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+
+declaretest(ph_QMJ_IntUIP)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+
+declaretest(compare_QMJ_Int)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Comparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_QMJ_Int_Matrix;ph_QMJ_Int;ph_QMJ_IntSch;ph_QMJ_IntUIP")
+add_custom_target(check_QMJ_Int COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_QMJ_Int_Matrix\\|ph_QMJ_Int\\|ph_QMJ_IntSch\\|ph_QMJ_IntUIP\\|compare_QMJ_Int\\|compare_QMJ_Int")
+
+declaretest(compare_QMJ_Int_Ev)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Comparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_QMJ_Int_Ev;ph_QMJ_Int;ph_QMJ_IntSch")
+add_custom_target(check_QMJ_Int_Ev COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_QMJ_Int_Ev\\|ph_QMJ_Int\\|ph_QMJ_IntSch\\|compare_QMJ_Int_Ev")
