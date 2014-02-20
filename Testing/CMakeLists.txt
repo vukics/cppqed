@@ -43,7 +43,7 @@ set(TEST_PARALLEL 1 CACHE STRING "Number of parallel test jobs for the test suit
 set_property(CACHE TEST_PARALLEL PROPERTY STRINGS 1 2 3 4 5 6 7 8 9 10)
 set(CTEST_J "-j${TEST_PARALLEL}")
 #! Switch verbose test output.
-option(TEST_VERBOSE "Verbose output in test suite." ON)
+option(TEST_VERBOSE "Verbose output in test suite." Off)
 #! @}
 if(TEST_VERBOSE)
   set(CTEST_V "-V")
