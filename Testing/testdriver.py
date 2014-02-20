@@ -622,7 +622,7 @@ class Comparer(Plotter):
       sys.exit(-1)
 
   def _filter_runmodes(self, section):
-    filter_runmodes=self.get_option('runmodes_'+self.test,section=section)
+    filter_runmodes=self.get_option('runmodes_'+self.test+'_local',section=section)
     if not filter_runmodes is None: filter_runmodes=filter_runmodes.split(',')
     for mode in self.runmodes(section=section):
       if not filter_runmodes is None and not mode in filter_runmodes: continue
