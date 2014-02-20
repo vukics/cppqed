@@ -19,11 +19,15 @@
 
 
 template<typename V, int RANK>
-void evolve(quantumdata::StateVector<RANK>& psi,
-            typename structure::QuantumSystem<RANK>::Ptr sys,
-            const evolution::Pars& pe)
+const typename quantumdata::LazyDensityOperator<RANK>::Ptr
+evolve(quantumdata::StateVector<RANK>& psi,
+       typename structure::QuantumSystem<RANK>::Ptr sys,
+       const evolution::Pars& pe)
 {
   using namespace std; using namespace evolution;
+
+  typedef quantumdata::StateVector    <RANK> SV;
+  typedef quantumdata::DensityOperator<RANK> DO;
 
   switch (pe.evol) {
 
@@ -32,7 +36,9 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
     trajectory::run(*makeMCWF(psi,sys,pe),pe);
 
-    break;
+    const SV psi_res(psi); // deep copy
+
+    return boost::make_shared<SV>(psi_res);
 
   }
 
@@ -44,40 +50,41 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 
     trajectory::run(traj,pe);
 
-    break;
+    const DO rho(traj.toBeAveraged()); // deep copy
+    return boost::make_shared<DO>(rho);
 
   }
 
 
   case MASTER: {
 
-    quantumdata::DensityOperator<RANK> rho(psi);
+    DO rho(psi);
 
     Master<RANK,V>
       traj(rho,sys,pe,pe.negativity);
 
     trajectory::run(traj,pe);
-    
-    break;
+
+    return boost::make_shared<DO>(rho);
 
   }
 
 
   case MASTER_FAST: {
 
-    quantumdata::DensityOperator<RANK> rho(psi);
+    DO rho(psi);
 
     Master<RANK,V,true>
       traj(rho,sys,pe,pe.negativity);
 
     trajectory::run(traj,pe);
 
-    break;
+    return boost::make_shared<DO>(rho);
 
   }
 
   }
-  
+  return typename quantumdata::LazyDensityOperator<RANK>::Ptr();
 }
 
 

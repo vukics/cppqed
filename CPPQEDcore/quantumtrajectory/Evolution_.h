@@ -4,6 +4,7 @@
 
 #include "Evolution_Fwd.h"
 
+#include "LazyDensityOperator.h"
 #include "StateVectorFwd.h"
 #include "MCWF_TrajectoryFwd.h"
 #include "ParsMCWF_Trajectory.h"
@@ -66,24 +67,30 @@ const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVecto
  * 
  * \tparam V has the same function as the template parameter `V` in quantumdata::negPT (cannot be inferred)
  * \tparamRANK (inferred from the 1st function argument)
- * 
+ *
+ * \return the final state of the evolution as a quantumdata::LazyDensityOperator
+ * (for evolution::SINGLE this will be a *copy* of the evolved \link quantumdata::StateVector state vector\endlink,
+ * while for evolution::MASTER and evolution::ENSEMBLE a \link quantumdata::DensityOperator density operator\endlink)
+ *
  */
 template<typename V, int RANK>
-void evolve(quantumdata::StateVector<RANK>& psi, ///<[in/out] pure state-vector initial condition
-            typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-            const evolution::Pars& p ///<[in] parameters of the evolution
-           );
+const typename quantumdata::LazyDensityOperator<RANK>::Ptr
+evolve(quantumdata::StateVector<RANK>& psi, ///<[in/out] pure state-vector initial condition
+       typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
+       const evolution::Pars& p ///<[in] parameters of the evolution
+       );
 
 
 /** \cond SPECIALIZATION */
-/// Same as the above, but withou entanglement-calculation (`V=tmptools::V_Empty`)
+/// Same as the above, but without entanglement-calculation (`V=tmptools::V_Empty`)
 template<int RANK>
 inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-            typename structure::QuantumSystem<RANK>::Ptr sys,
-            const evolution::Pars& p)
+const typename quantumdata::LazyDensityOperator<RANK>::Ptr
+evolve(quantumdata::StateVector<RANK>& psi,
+       typename structure::QuantumSystem<RANK>::Ptr sys,
+       const evolution::Pars& p)
 {
-  evolve<tmptools::V_Empty>(psi,sys,p);
+  return evolve<tmptools::V_Empty>(psi,sys,p);
 }
 /** \endcond */
 
@@ -91,11 +98,12 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 /// \overload
 template<typename V, int RANK>
 inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-            const structure::QuantumSystem<RANK>& sys,
-            const evolution::Pars& p)
+const typename quantumdata::LazyDensityOperator<RANK>::Ptr
+evolve(quantumdata::StateVector<RANK>& psi,
+       const structure::QuantumSystem<RANK>& sys,
+       const evolution::Pars& p)
 {
-  evolve<V>(psi,cpputils::sharedPointerize(sys),p);
+  return evolve<V>(psi,cpputils::sharedPointerize(sys),p);
 }
 
 
@@ -103,11 +111,12 @@ void evolve(quantumdata::StateVector<RANK>& psi,
 /// Same as the above, but withou entanglement-calculation (`V=tmptools::V_Empty`)
 template<int RANK>
 inline
-void evolve(quantumdata::StateVector<RANK>& psi,
-            const structure::QuantumSystem<RANK>& sys,
-            const evolution::Pars& p)
+const typename quantumdata::LazyDensityOperator<RANK>::Ptr
+evolve(quantumdata::StateVector<RANK>& psi,
+       const structure::QuantumSystem<RANK>& sys,
+       const evolution::Pars& p)
 {
-  evolve<tmptools::V_Empty>(psi,cpputils::sharedPointerize(sys),p);
+  return evolve<tmptools::V_Empty>(psi,cpputils::sharedPointerize(sys),p);
 }
 /** \endcond */
 
@@ -125,11 +134,12 @@ void evolve(quantumdata::StateVector<RANK>& psi,
  */
 template<int V0, int... V_REST, typename SV, typename SYS>
 inline
-void evolve(SV& psi,
-            const SYS& sys,
-            const evolution::Pars& p)
+const typename quantumdata::LazyDensityOperator<SV::N_RANK>::Ptr
+evolve(SV& psi,
+       const SYS& sys,
+       const evolution::Pars& p)
 {
-  evolve<tmptools::Vector<V0,V_REST...> >(psi,sys,p);
+  return evolve<tmptools::Vector<V0,V_REST...> >(psi,sys,p);
 }
 
 

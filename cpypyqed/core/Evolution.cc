@@ -2,6 +2,7 @@
 
 #include "PythonExtension.h"
 #include "Namespaces.h"
+#include "blitz2numpy.tcc"
 
 #include "ParsPropertyMacros.h"
 
@@ -12,7 +13,9 @@
 
 #include "QuantumSystem.h"
 
+#include "DensityOperator.h"
 #include "StateVector.tcc"
+#include "LazyDensityOperator.tcc"
 
 #include "EnsembleMCWF.tcc"
 #include "Evolution.tcc"
@@ -34,10 +37,37 @@ namespace pythonext {
 PARS_GETTER_SETTER(Method, Pars, evol)
 PARS_GETTER_SETTER(bool, Pars, negativity)
 
+template<int RANK>
+object py_evolve(quantumdata::StateVector<RANK>& psi,
+              typename structure::QuantumSystem<RANK>::Ptr sys,
+              const evolution::Pars& p)
+{
+  using namespace quantumdata;
+
+  typedef StateVector        <RANK> SV;
+  typedef DensityOperator    <RANK> DO;
+  typedef LazyDensityOperator<RANK> LDO;
+
+  typename LDO::Ptr result = evolve(psi,sys,p);
+  if (boost::shared_ptr<const SV> s = boost::dynamic_pointer_cast<const SV>(result)) {
+    return arrayToNumpy<CArray<RANK>,RANK>(s->getArray());
+  }
+  else if(boost::shared_ptr<const DO> d = boost::dynamic_pointer_cast<const DO>(result)) {
+    return arrayToNumpy<CArray<2*RANK>,2*RANK>(d->getArray());
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "Result type of evolve not implemented in Python.");
+    throw_error_already_set();
+  }
+  // this should be never reached
+  return object();
+}
 
 
 void export_25_Evolution()
 {
+  import_array();
+  numeric::array::set_module_and_type("numpy", "ndarray");
   {
     scope namespaceScope = evolutionNameSpace;
     enum_<Method>("Method", "Wrapper of :core:`evolution::Method`")
@@ -58,7 +88,7 @@ void export_25_Evolution()
   }
 
 #define EVOLVE_INSTANTIATIONS(z,r,data) \
-  def("evolve", (void (*)(StateVector<r>&, const QuantumSystem<r>&, const Pars&)) &evolve, "Wrapper of :core:`evolve` with RANK="#r);
+  def("evolve", &py_evolve<r>, "Wrapper of :core:`evolve` with RANK="#r);
 BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), EVOLVE_INSTANTIATIONS, data)
 
 }
