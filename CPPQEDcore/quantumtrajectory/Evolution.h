@@ -21,13 +21,6 @@ using parameters::ParameterTable;
 
 /**
 
-\page userGuide C++QEDv2 User Guide
-
-\par Abstract
-<b>This guide is meant to allow for understanding and using the framework on the highest level, that is, for building simulations out of the already existing modules and elementary systems as building blocks.</b>
-
-\tableofcontents
-
 Synopsis
 --------
 
