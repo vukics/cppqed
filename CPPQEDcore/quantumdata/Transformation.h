@@ -77,6 +77,7 @@ struct Traits<CArray<TWO_TIMES_RANK> > : ElementaryTraits<CArray<TWO_TIMES_RANK>
 
 // ... Transformations described by functions of the appropriate signature:
 
+/** \todo For quantumdata::transformation::Traits default implementation should pertain to a function(object). Probably not very easy to implement, though… */
 template<int RANK>
 struct Traits< void(*)(const CArray<RANK>&, CArray<RANK>&) > 
   : ElementaryTraits< void(*)(const CArray<RANK>&, CArray<RANK>&) >

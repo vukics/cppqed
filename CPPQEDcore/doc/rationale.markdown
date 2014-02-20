@@ -145,6 +145,10 @@ These (if not really meant to be used), can emit a runtime error, when called. C
 
 * In the factory idiom, encapsulate derived classes in makers (even maker functions). \see evolved::MakerGSL::_
 
+* Watch out when to use boost::mpl::if_ and boost::mpl::eval_if \todo clarify their use throughout
+
+* Concept checking for template parameters that accept very restricted set of types. Where templates are such that they accept only a very restricted set of types, this should be checked for. Examples are blitzplusplus::basi::Iterator%'s `V` parameter or Composite%'s `VA`. An implementation could be that these types are derived from some tag class and then a static assertion with the help of is_base_of could be performed. Another solution can be Boost.ConceptChecking
+
 
 C++11 features currently used {#cppelevenfeatures}
 -----------------------------
