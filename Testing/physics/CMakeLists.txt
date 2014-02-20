@@ -102,3 +102,19 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
 declaretest(ph_DecayFock)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+
+declaretest(compare_DecayQB)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=FunctionComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_Decay;ph_DecayFock")
+add_custom_target(check_DecayQB COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_Decay\\|ph_DecayFock\\|compare_DecayQB")
+
+declaretest(compare_DecayMode)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=FunctionComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_Decay;ph_DecayFock")
+add_custom_target(check_DecayMode COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_Decay\\|ph_DecayFock\\|compare_DecayMode")
