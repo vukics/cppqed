@@ -15,8 +15,10 @@ import errno
 import subprocess
 import numpy as np
 import shutil
+import ast
 import scipy.interpolate
 from scipy.integrate import quadrature
+from scipy import exp
 
 try:
   import matplotlib
@@ -69,9 +71,6 @@ def load_sv(fname, format=None):
   return np.fromregex(fname,format.replace(r'+',r'\s*').replace('f',floatingReString).replace('c',complexReString),np.float)
 
 ## @}
-
-def id_postprocess(input):
-  return input
 
 def PTLA_postprocess(input):
   result=np.zeros((input.shape[0],6))
@@ -608,7 +607,7 @@ class Comparer(Plotter):
           self.figureLegendRight(ylabel='value '+str(n+1), title=self.test, n=n)
 
           data,timeArray,data_label=self._get_data(section=traj,runmode=runmode,n=n)
-          reference,_,reference_label=self._get_reference(section=traj,runmode=runmode,n=n)
+          reference,reference_label=self._get_reference(section=traj,runmode=runmode,n=n)
           if not reference_plotted.has_key((reference_label,n)):
             self.plot(timeArray,reference(timeArray),label=reference_label)
             reference_plotted[(reference_label,n)]=True
@@ -638,15 +637,17 @@ class Comparer(Plotter):
   def _get_reference(self,section,runmode,n):
     reference=self.get_option('reference',required=True)
     reference_runmode=self.runmodes(section=reference)[0]
-    return self._get_data(section=reference,runmode=reference_runmode,n=n)
+    result=self._get_data(section=reference,runmode=reference_runmode,n=n)
+    return result[0],result[2]
 
   def _get_data(self,section,runmode,n):
     fname=self.get_option('postprocess_local',section=section)
     format=self.get_option('format_local',section=section)
     length=self.get_option('length_'+self.test,section=section)
-    if fname=="" or fname is None: fname = 'id_postprocess'
-    postprocess=globals()[fname]
+    start=self.get_option('start_'+self.test,section=section)
+    postprocess=globals()[fname] if not fname is None else lambda x: x
     result=postprocess(load_sv(self.output(runmode=runmode,section=section),format=format))
+    if not start is None:  result=result[int(start):]
     if not length is None: result=result[:int(length)]
     timeArray = result[:,0]
     data = result[:,self._get_columns(section,runmode)[n]]
@@ -661,6 +662,19 @@ class Comparer(Plotter):
     res=quadrature(lambda t : (f1(t)-f2(t))**2,t0,t1,maxiter=100)[0]
     logging.debug("Quadrature: {}, epsilon: {}".format(res,eps))
     return res<eps
+
+def exponential(a,l):
+  def fn(t):
+    return a*exp(-l*t)
+  return fn,"{}*exp(-{}*t)".format(a,l)
+
+class FunctionComparer(Comparer):
+  def _get_reference(self, section, runmode, n):
+    reference = globals()[self.get_option('reference_function', required=True)]
+    parameters=self.get_option('parameters_'+self.test, section=section)
+    parameters=() if parameters is None else ast.literal_eval(parameters)
+    if type(parameters)==list:parameters=parameters[n]
+    return reference(*parameters)
 
 def main():
   """!
