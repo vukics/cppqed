@@ -550,14 +550,21 @@ class Plotter(OutputManager):
     self.pdf = PdfPages(os.path.join(self.outputdir,self.get_option('pdf')))
   def close_pdf(self):
     if not self._plot(): return
+    for n in plt.get_fignums():
+      plt.figure(num=n)
+      self.place_legend()
+      self.finish_plot()
     self.pdf.close()
   def finish_plot(self):
     if not self._plot(): return
     self.pdf.savefig()
     plt.close()
-  def figureLegendRight(self,ylabel,title):
+  def figureLegendRight(self,ylabel,title,n):
     if not self._plot(): return
-    f = plt.figure(figsize=(11.6,8.2))
+    if n in plt.get_fignums():
+      plt.figure(num=n)
+      return
+    f = plt.figure(num=n,figsize=(11.6,8.2))
     f.add_axes([0.09, 0.1, 0.6, 0.75])
     plt.title(title)
     plt.ylabel(ylabel)
@@ -592,49 +599,58 @@ class Comparer(Plotter):
     Runs the test.
     """
     trajectories=self.get_option('trajectories',required=True).split(',')
-    reference=self.get_option('reference',required=True)
-    reference_runmode=self.runmodes(section=reference)[0]
-    reference_data=self._get_data(reference,reference_runmode)
-    timeArray=reference_data[:,0]
     failure=False
     self.start_pdf()
-    for n,idx in enumerate(self._get_columns(reference,reference_runmode)):
-      self.figureLegendRight(ylabel='value '+str(n+1), title=self.test)
-      self.plot(timeArray,reference_data[:,idx],label=os.path.basename(self.output(reference_runmode,reference)))
-      for traj in trajectories:
-        for runmode in self.runmodes(section=traj):
-          filter_runmode=self.get_option('runmodes_'+self.test,section=traj)
-          if not filter_runmode is None:
-            if not runmode in filter_runmode.split(','):
-              continue
-          data=self._get_data(section=traj,runmode=runmode)
-          i,j=idx,self._get_columns(traj,runmode)[n]
-          self.plot(timeArray,data[:,j],label=os.path.basename(self.output(runmode,traj)))
-          logging.debug("Evaluating {}, column {} (value number {}).".format(self.output(runmode=runmode,section=traj),j,n+1))
-          eps=float(self.get_option('epsilon_'+runmode+'_'+self.test,section=traj,required=True).split(',')[n])
-          if not self._regressionArrays(reference_data[:,i],data[:,j],timeArray,eps):
+    reference_plotted=dict()
+    for traj in trajectories:
+      for runmode in self._filter_runmodes(section=traj):
+        for n in range(len(self._get_columns(traj,runmode))):
+          self.figureLegendRight(ylabel='value '+str(n+1), title=self.test, n=n)
+
+          data,timeArray,data_label=self._get_data(section=traj,runmode=runmode,n=n)
+          reference,_,reference_label=self._get_reference(section=traj,runmode=runmode,n=n)
+          if not reference_plotted.has_key((reference_label,n)):
+            self.plot(timeArray,reference(timeArray),label=reference_label)
+            reference_plotted[(reference_label,n)]=True
+          self.plot(timeArray,data(timeArray),label=data_label)
+          logging.debug("Evaluating {}, value number {}.".format(data_label,n+1))
+          eps=self._get_eps(runmode, traj, n)
+          if not self._regression(reference,data,timeArray,eps):
             logging.debug("====== FAILED ======")
             failure=True
-      self.place_legend()
-      self.finish_plot()
     self.close_pdf()
     if failure:
       sys.exit(-1)
 
+  def _filter_runmodes(self, section):
+    filter_runmodes=self.get_option('runmodes_'+self.test,section=section)
+    if not filter_runmodes is None: filter_runmodes=filter_runmodes.split(',')
+    for mode in self.runmodes(section=section):
+      if not filter_runmodes is None and not mode in filter_runmodes: continue
+      yield(mode)
+
+  def _get_eps(self, runmode, section, n):
+    return float(self.get_option('epsilon_'+runmode+'_'+self.test,section=section,required=True).split(',')[n])
+
   def _get_columns(self,section,runmode):
     return map(int,self.get_option('columns_'+self.test,section=section,required=True).split(','))
 
-  def _get_data(self,section,runmode):
+  def _get_reference(self,section,runmode,n):
+    reference=self.get_option('reference',required=True)
+    reference_runmode=self.runmodes(section=reference)[0]
+    return self._get_data(section=reference,runmode=reference_runmode,n=n)
+
+  def _get_data(self,section,runmode,n):
     fname=self.get_option('postprocess_local',section=section)
     format=self.get_option('format_local',section=section)
     length=self.get_option('length_'+self.test,section=section)
     if fname=="" or fname is None: fname = 'id_postprocess'
     postprocess=globals()[fname]
     result=postprocess(load_sv(self.output(runmode=runmode,section=section),format=format))
-    if not length is None:
-      return result[:int(length)]
-    else:
-      return result
+    if not length is None: result=result[:int(length)]
+    timeArray = result[:,0]
+    data = result[:,self._get_columns(section,runmode)[n]]
+    return self._interpolate(timeArray,data),timeArray,os.path.basename(self.output(runmode,section))
 
   def _interpolate(self,timeArray,array):
     return scipy.interpolate.interp1d(timeArray,array)
@@ -645,9 +661,6 @@ class Comparer(Plotter):
     res=quadrature(lambda t : (f1(t)-f2(t))**2,t0,t1,maxiter=100)[0]
     logging.debug("Quadrature: {}, epsilon: {}".format(res,eps))
     return res<eps
-
-  def _regressionArrays(self, a1, a2, timeArray, eps) :
-    return self._regression(self._interpolate(timeArray,a1),self._interpolate(timeArray,a2),timeArray,eps)
 
 def main():
   """!
