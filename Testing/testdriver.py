@@ -199,6 +199,13 @@ class OutputManager(OptionsManager):
     if section is None: section=self.test
     return self.get_option('runmodes', section=section, default='generic').split(',')
 
+  def _filter_runmodes(self, section):
+    filter_runmodes=self.get_option('runmodes_'+self.test+'_local',section=section)
+    if not filter_runmodes is None: filter_runmodes=filter_runmodes.split(',')
+    for mode in self.runmodes(section=section):
+      if not filter_runmodes is None and not mode in filter_runmodes: continue
+      yield(mode)
+
   def output(self, runmode, section=None, statefile=False):
     """!
     The name of the output file for a given runmode.
@@ -579,7 +586,37 @@ class Plotter(OutputManager):
     if not self._plot(): return
     plt.plot(time,data,**kwargs)
 
-class Comparer(Plotter):
+
+def final_temperature(nTh):
+  def fn(states):
+    state=states[-1]
+    n=np.arange(state.shape[0],dtype=float)
+    expected_rho=np.diag(nTh**n/(1.+4)**(n+1))
+    return np.sqrt(np.sum(np.abs(state-expected_rho)**2))
+  return fn
+
+class StateComparer(OutputManager):
+  def run(self):
+    trajectories=self.get_option('trajectories',required=True).split(',')
+    function=globals()[self.get_option('function',required=True)]
+    arguments=ast.literal_eval(self.get_option('arguments'))
+    if arguments is None: arguments=[]
+    failure=False
+    for traj in trajectories:
+      for runmode in self._filter_runmodes(section=traj):
+        statefile=self.output(runmode=runmode,section=traj,statefile=True)
+        _,states,_=io.read(statefile)
+        logging.debug("Evaluating {}.".format(os.path.basename(statefile)))
+        eps=float(self.get_option('epsilon_'+runmode+'_'+self.test,section=traj,required=True))
+        value=function(*arguments)(states)
+        logging.debug("Value: {}, epsilon: {}".format(value,eps))
+        if not value<eps:
+          failure=True
+          logging.debug("====== FAILED ======")
+    if failure: sys.exit(-1)
+
+
+class TrajectoryComparer(Plotter):
   """!
   @ingroup Testclasses
   Compares several trajectories to a reference trajectory by using function interpolation.
@@ -621,13 +658,6 @@ class Comparer(Plotter):
     if failure:
       sys.exit(-1)
 
-  def _filter_runmodes(self, section):
-    filter_runmodes=self.get_option('runmodes_'+self.test+'_local',section=section)
-    if not filter_runmodes is None: filter_runmodes=filter_runmodes.split(',')
-    for mode in self.runmodes(section=section):
-      if not filter_runmodes is None and not mode in filter_runmodes: continue
-      yield(mode)
-
   def _get_eps(self, runmode, section, n):
     return float(self.get_option('epsilon_'+runmode+'_'+self.test,section=section,required=True).split(',')[n])
 
@@ -668,7 +698,7 @@ def exponential(a,l):
     return a*exp(-l*t)
   return fn,"{}*exp(-{}*t)".format(a,l)
 
-class FunctionComparer(Comparer):
+class FunctionComparer(TrajectoryComparer):
   def _get_reference(self, section, runmode, n):
     reference = globals()[self.get_option('reference_function', required=True)]
     parameters=self.get_option('parameters_'+self.test, section=section)
