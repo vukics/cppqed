@@ -33,7 +33,7 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
 
 declaretest(compare_PTLA)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Comparer)
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_PTLA_Evolved;ph_PTLA_CPPQED;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch;ph_PLQ_CPPQEDuip;ph_PLQ_CPPQEDsch;ph_PLQ_CPPQED")
 
@@ -52,7 +52,7 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
 
 declaretest(compare_PTLAHL)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Comparer)
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_PTLAHL_Evolved;ph_PTLAHL_Si")
 add_custom_target(check_PTLAHL COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
@@ -78,7 +78,7 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
 
 declaretest(compare_PLM)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Comparer)
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_PLM_CPPQED;ph_PLM_CPPQEDsch;ph_PLM_CPPQEDuip;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch")
 add_custom_target(check_PLM COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
@@ -86,7 +86,7 @@ add_custom_target(check_PLM COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
 
 declaretest(compare_PLM_Ev)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Comparer)
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_PLM_Evolved;ph_PLM_CPPQEDsch;ph_PLM_CPPQEDuip;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch")
 add_custom_target(check_PLM_Ev COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
@@ -144,7 +144,7 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
 
 declaretest(compare_QMJ_Int)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Comparer)
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_QMJ_Int_Matrix;ph_QMJ_Int;ph_QMJ_IntSch;ph_QMJ_IntUIP")
 add_custom_target(check_QMJ_Int COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
@@ -152,8 +152,30 @@ add_custom_target(check_QMJ_Int COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTES
 
 declaretest(compare_QMJ_Int_Ev)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Comparer)
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_QMJ_Int_Ev;ph_QMJ_Int;ph_QMJ_IntSch")
 add_custom_target(check_QMJ_Int_Ev COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_QMJ_Int_Ev\\|ph_QMJ_Int\\|ph_QMJ_IntSch\\|compare_QMJ_Int_Ev")
+
+# Scripts needed for PLM_FT testcase
+
+declaretest(ph_PLM_FT)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+
+declaretest(compare_PLM_FT)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_PLM_FT")
+add_custom_target(check_PLM_FT COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_PLM_FT\\|${TESTNAME}")
+
+declaretest(compare_PLM_Rho)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=StateComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_PLM_Rho")
+add_custom_target(check_PLM_Rho COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_PLM_FT\\|${TESTNAME}")
