@@ -91,3 +91,14 @@ set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_PLM_Evolved;ph_PLM_CPPQEDsch;ph_PLM_CPPQEDuip;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch")
 add_custom_target(check_PLM_Ev COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_PLM_Evolved\\|ph_PLM_CPPQEDsch\\|ph_PLM_CPPQEDuip\\|ph_QbitMode_CPPQED\\|ph_QbitMode_CPPQEDsch")
+
+
+# Scripts needed for Decay comparison
+
+declaretest(ph_Decay)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+
+declaretest(ph_DecayFock)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
