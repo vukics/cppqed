@@ -254,6 +254,61 @@ public:
 
 #define BASE_class(Aux,Class) mpl::if_c<IS_##Aux,composite::Class<VA>,composite::EmptyBase<composite::Class<VA> > >::type
 
+/// Class representing a full-fledged composite quantum system defined by a network of \link composite::_ interactions\endlink
+/**
+ * Assume a system composed of harmonic-oscillator modes and particle motional degrees of freedom layed out in the following way – cf. \ref userguide,
+ * the layout means which free-system quantum number corresponds to which index of the multi-array:
+ * (Free No. 0) mode (1) motional (2) mode (3) motional (4) mode (5) motional (6) mode (7) motional.
+ *
+ * Assume further an interaction which couples two modes and two motional degrees of freedom.
+ * As a physical example, one might think about two resonator modes with orthogonal axes, and a polarizable particle moving in these two dimensions
+ * (the rest of the system can be another particle, and two more modes of the same resonators).
+ * Then, the particle may absorb a photon from one mode and suffer recoil in this direction, and emit the photon into the other mode,
+ * suffering recoil in that direction as well. Assume that the function
+ *
+ *     void TwoModesParticle2D_Hamiltonian(const StateVector<4>&, StateVector<4>&);
+ *
+ * implements this Hamiltonian. In the composite system, this is how we can act with this Hamiltonian between e.g. the indices (4) (0) (7) (1):
+ *
+ *     void Hamiltonian(const StateVector<8>& psi, StateVector<8>& dpsidt)
+ *     {
+ *       for_each(BASI_Range<Vector<4,0,7,1> >(psi),
+ *                begin<Vector<4,0,7,1> >(dpsidt),
+ *                TwoModesParticle2D_Hamiltonian);
+ *     }
+ *
+ * \note the names in this code snippet are approximative
+ *
+ * It is the task of Composite to systematically keep track of the subsystems and perform the calculations on the necessary slices.
+ *
+ * Consistency checks for Composite at compile time come on three levels:
+ *
+ * 1. Composite itself only checks whether all the quantum numbers are addressed by a composite::_ instant. So this is e.g. not allowed:
+ *
+ *        composite::result_of::Make<composite::_<0,1>,composite::_<0,2>,composite::_<0,3>,composite::_<3,2,5,1> >::type
+ *
+ *    because 4 is not addressed and hence the Composite object has no way to figure out what kind of structure::Free object is there.
+ *
+ * 2. The instantiated \link blitzplusplus::basi::Iterator slice iterators\endlink do some further checks for each composite::_ instant individually:
+ *   - the total arity must be greater than or equal to the arity of composite::_
+ *   - composite::_ must not “contain” duplicated “elements” (e.g. composite::_<3,2,3,1> not allowed)
+ *   - each element in composite::_ must be smaller than the total arity
+ *
+ * 3. Finally, tmptools::Vector checks for the non-negativity of each element (as it is supposed to be a non-negative compile-time vector).
+ *
+ * \note The last condition incidentally makes that the three checks performed under 2. by the \link blitzplusplus::basi::Iterator slice interators\endlink
+ * for each composite::_ are redundant (the first condition follows from the last two plus the nonnegativity of tmptools::Vector).
+ * However, these checks are still necessary for the slice iterators
+ * because they accept classes other than tmptools::Vector for the specification of retained index positions.
+ *
+ * This is followed by a check at runtime, when the actual elements become available, whether the legs of the composite::_ objects are consistent among each other.
+ * Cf. composite::FillFrees::Inner::operator().
+ *
+ * \tparam VA should model a \refBoost{Boost.Fusion list,fusion/doc/html/fusion/container/list.html} of composite::_ objects
+ * \tparam IS_EX governs whether the class should inherit from composite::Exact
+ * \tparam IS_HA governs whether the class should inherit from composite::Hamiltonian
+ * \tparam IS_LI governs whether the class should inherit from composite::Liouvillean
+ */
 template<typename VA, bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
 // VA should model a fusion sequence of Acts
 class Composite
