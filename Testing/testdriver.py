@@ -599,8 +599,8 @@ class StateComparer(OutputManager):
   def run(self):
     trajectories=self.get_option('trajectories',required=True).split(',')
     function=globals()[self.get_option('function',required=True)]
-    arguments=ast.literal_eval(self.get_option('arguments'))
-    if arguments is None: arguments=[]
+    parameters=ast.literal_eval(self.get_option('parameters'))
+    if parameters is None: parameters=[]
     failure=False
     for traj in trajectories:
       for runmode in self._filter_runmodes(section=traj):
@@ -608,7 +608,7 @@ class StateComparer(OutputManager):
         _,states,_=io.read(statefile)
         logging.debug("Evaluating {}.".format(os.path.basename(statefile)))
         eps=float(self.get_option('epsilon_'+runmode+'_'+self.test,section=traj,required=True))
-        value=function(*arguments)(states)
+        value=function(*parameters)(states)
         logging.debug("Value: {}, epsilon: {}".format(value,eps))
         if not value<eps:
           failure=True
@@ -697,6 +697,16 @@ def exponential(a,l):
   def fn(t):
     return a*exp(-l*t)
   return fn,"{}*exp(-{}*t)".format(a,l)
+
+def FreeParticleX(x0,p0):
+  def fn(t):
+    return x0+2*p0*t
+  return fn, "{}+2*{}*t".format(x0,p0)
+
+def FreeParticleVarX(dx0,dp0):
+  def fn(t):
+    return (dx0+4.*dp0*t**2)**.5
+  return fn, "({}+(4*{}*t)^2)^0.5"
 
 class FunctionComparer(TrajectoryComparer):
   def _get_reference(self, section, runmode, n):

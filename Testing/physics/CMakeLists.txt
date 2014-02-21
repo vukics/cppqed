@@ -1,5 +1,6 @@
 testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED PumpedLossyQbit PTLA_EvolvedHL
-                PumpedLossyMode_C++QED PumpedLossyMode_Evolved QbitMode_Matrix QbitMode_Evolved)
+                PumpedLossyMode_C++QED PumpedLossyMode_Evolved QbitMode_Matrix QbitMode_Evolved
+                SingleParticle)
 
 # Scripts needed for PTLA testcase
 
@@ -179,3 +180,27 @@ set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_PLM_Rho")
 add_custom_target(check_PLM_Rho COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_PLM_FT\\|${TESTNAME}")
+
+# Scripts needed for FreePart testcase
+
+declaretest(ph_FreeParticle)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:SingleParticle>)
+
+declaretest(ph_FreeParticleSch)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:SingleParticle>)
+
+declaretest(compare_Free_X)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=FunctionComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_FreeParticle;ph_FreeParticleSch")
+
+declaretest(compare_Free_VarX)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=FunctionComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_FreeParticle;ph_FreeParticleSch")
+add_custom_target(check_Free COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_FreeParticle\\|ph_FreeParticleSch\\|compare_Free_X\\|compare_Free_VarX")
