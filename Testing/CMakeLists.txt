@@ -34,6 +34,7 @@ configure_file(testdriver.conf.in testdriver.conf)
 
 add_custom_target(check_fast DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
 add_custom_target(check DEPENDS check_fast check_compile check_cpypyqed)
+add_custom_target(check_full DEPENDS check_physics check)
 
 #! \name Project options
 #! @{

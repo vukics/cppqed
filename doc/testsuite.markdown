@@ -15,9 +15,12 @@ They will run all tests with verbose output and offer the possibility to run fin
 of tests. Example usage:
 
     # Run the full test suite
-    $ make check
+    $ make check_full
 
-    # Run a subset of the test suite which runs faster (no on-demand compilation tests)
+    # Run the physics test suite
+    $ make check_physics
+
+    # Run a subset of the test suite which runs faster (no on-demand compilation tests, no physics test suite)
     $ make check_fast
 
     # Perform the tests of the "continue" directory
