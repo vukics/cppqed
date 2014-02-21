@@ -637,7 +637,7 @@ class StateComparer(OutputManager):
   # * `trajectories`: List of comma-separated trajectories which should be tested.
   # * `function`: A meta-function which should return the actual test function. The actual test function
   #     should accept the state array and return some epsilon value (the measure of the test).
-  # * `arguments`: List or tuple of function parameters passed to the meta function.
+  # * `parameters`: Tuple of function parameters passed to the meta function.
   #
   # The following configuration keys are read from the 'target'-sections.
   # * `runmodes_<test>`: For the compare test <test>, only use these runmodes.
