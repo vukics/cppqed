@@ -103,7 +103,7 @@ class OptionsManager(object):
   Each OptionsManager instance has its own section in the configuration file, named after
   the current test name (OptionsManager::test). If the current section has the key
   `import=othersection`, import all keys from `othersection` if they are not present already
-  (works recursively).
+  (works recursively). Values which end in `_local` are never imported.
 
   \ref OptionsManager_options "Command line" options this class understands.
   """
@@ -547,25 +547,46 @@ class CompileTarget(OptionsManager):
         sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
 
 class Plotter(OutputManager):
-  def run(self):
-    pass
+  """!
+  \brief This is a helper class which helps with plotting functions to a pdf file.
+
+  If the global variable `plot` is False, all functions are a no-op.
+  """
+
   def _plot(self):
     return plot and not self.get_option('pdf') is None
   def start_pdf(self):
+    """!
+    \brief Initialize a new pdf file.
+
+    The file is read from the configuration key `pdf`.
+    """
     if not self._plot(): return
     self.pdf = PdfPages(os.path.join(self.outputdir,self.get_option('pdf')))
   def close_pdf(self):
+    """!
+    \brief Saves the pdf file to disc after all plots are finished.
+    """
     if not self._plot(): return
     for n in plt.get_fignums():
       plt.figure(num=n)
-      self.place_legend()
+      self._place_legend()
       self.finish_plot()
     self.pdf.close()
   def finish_plot(self):
+    """!
+    \brief Adds the current plot to the pdf file.
+    """
     if not self._plot(): return
     self.pdf.savefig()
     plt.close()
   def figureLegendRight(self,ylabel,title,n):
+    """!
+    \brief Creates a new plot with figure legend right of the plot.
+    \param ylabel The label of the y axis.
+    \param title The title of the plot
+    \param n The value number.
+    """
     if not self._plot(): return
     if n in plt.get_fignums():
       plt.figure(num=n)
@@ -575,7 +596,7 @@ class Plotter(OutputManager):
     plt.title(title)
     plt.ylabel(ylabel)
     plt.xlabel('t')
-  def place_legend(self):
+  def _place_legend(self):
     if not self._plot(): return
     fontP = FontProperties()
     fontP.set_size('small')
@@ -583,6 +604,12 @@ class Plotter(OutputManager):
     llines=leg.get_lines()
     plt.setp(llines, linewidth=1.5)
   def plot(self,time,data,**kwargs):
+    """!
+    \brief Wraps matplotlibs plot function.
+    \param time An array of time values.
+    \param data An array of data values.
+    \param **kwargs These are passed to `matplotlib.plot`.
+    """
     if not self._plot(): return
     plt.plot(time,data,**kwargs)
 
@@ -596,6 +623,26 @@ def final_temperature(nTh):
   return fn
 
 class StateComparer(OutputManager):
+  """!
+  @ingroup Testclasses
+  Tests final states of several trajectories by applying a given function.
+
+  \ref StateComparer_keys "Configuration file keys" this class understands.
+  """
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor StateComparer_keys
+  # ## StateComparer configuration file keys
+  # * `trajectories`: List of comma-separated trajectories which should be tested.
+  # * `function`: A meta-function which should return the actual test function. The actual test function
+  #     should accept the state array and return some epsilon value (the measure of the test).
+  # * `arguments`: List or tuple of function parameters passed to the meta function.
+  #
+  # The following configuration keys are read from the 'target'-sections.
+  # * `runmodes_<test>`: For the compare test <test>, only use these runmodes.
+  # * `epsilon_<runmode>_<test>`: Acceptable deviation for the given runmode and comparison test.
+
   def run(self):
     trajectories=self.get_option('trajectories',required=True).split(',')
     function=globals()[self.get_option('function',required=True)]
@@ -621,14 +668,27 @@ class TrajectoryComparer(Plotter):
   @ingroup Testclasses
   Compares several trajectories to a reference trajectory by using function interpolation.
 
-  \ref Comparer_keys "Configuration file keys" this class understands.
+  \ref TrajectoryComparer_keys "Configuration file keys" this class understands.
   """
 
   ## @addtogroup TestclassKeys
   #
-  # @anchor Comparer_keys
-  # ## Comparer configuration file keys
+  # @anchor TrajectoryComparer_keys
+  # ## TrajectoryComparer configuration file keys
+  # * `pdf`: Save plots to this pdf file.
+  # * `reference`: Section of reference trajectory
+  # * `trajectories`: List of comma-separated trajectories which should be compared to the reference.
   #
+  # The following configuration keys are read from the 'target'-sections.
+  # * `runmodes_<test>`: For the compare test <test>, only use these runmodes.
+  # * `columns_<test>`: Use these columns of the output files for the comparison.
+  # * `epsilon_<runmode>_<test>`: List of acceptable deviations for the given runmode and comparison test.
+  # * `postprocess_local`: Name of a global function which expects the data array as input and postprocesses the data.
+  # * `format_local`: specifies which columns are floats (`f`) and which are complex numbers (`c`). Example:
+  #     "f+f+c+c" will result in 6 columns, the two complex number columns are split into real and imaginary parts.
+  # * `start_<test>`: The first row of the data lines to consider for the comparison test `<test>`.
+  # * `length_<test>`: How many lines of data to consider for the comparison test `<test>`.
+
 
   def run(self):
     """!
@@ -709,6 +769,23 @@ def FreeParticleVarX(dx0,dp0):
   return fn, "({}+(4*{}*t)^2)^0.5"
 
 class FunctionComparer(TrajectoryComparer):
+  """!
+  @ingroup Testclasses
+  Compares several trajectories to a reference function by using function interpolation.
+
+  \ref FunctionComparer_keys "Configuration file keys" this class understands.
+  """
+
+  ## @addtogroup TestclassKeys
+  #
+  # @anchor FunctionComparer_keys
+  # ## FunctionComparer configuration file keys
+  # * `reference_function`: Name of a global function, which should return a tuple of a unary function and a label used in plots.
+  #
+  # The following configuration keys are read from the 'target'-sections.
+  # * `paramters_<test>`: List of tuples or single tuple which are passed to the reference function.
+  #     Example: `[(1,5,3),(2,2,1)]` or `(1,5,3)`. If this is a list, each entry corresponds to a column of the data file,
+  #     otherwise the same parameters are used for all columns.
   def _get_reference(self, section, runmode, n):
     reference = globals()[self.get_option('reference_function', required=True)]
     parameters=self.get_option('parameters_'+self.test, section=section)
