@@ -1,6 +1,6 @@
 testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED PumpedLossyQbit PTLA_EvolvedHL
                 PumpedLossyMode_C++QED PumpedLossyMode_Evolved QbitMode_Matrix QbitMode_Evolved
-                SingleParticle)
+                SingleParticle Ring)
 
 # Scripts needed for PTLA testcase
 
@@ -204,3 +204,48 @@ set_tests_properties(${TESTNAME} PROPERTIES
   DEPENDS "ph_FreeParticle;ph_FreeParticleSch")
 add_custom_target(check_Free COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_FreeParticle\\|ph_FreeParticleSch\\|compare_Free_X\\|compare_Free_VarX")
+
+# Scripts needed for Ring testcase
+
+declaretest(ph_Ring)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:Ring>)
+
+declaretest(ph_Ring_Ev)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:Ring_Evolved>)
+
+declaretest(ph_RingSC)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:Ring>)
+
+declaretest(ph_RingSC_Ev)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:Ring_Evolved>)
+
+declaretest(ph_RingS2S)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:Ring>)
+
+declaretest(ph_RingS2S_Ev)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:Ring_Evolved>)
+
+declaretest(compare_Ring)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_Ring_Ev;ph_Ring")
+declaretest(compare_RingSC)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_RingSC_Ev;ph_RingSC")
+declaretest(compare_RingS2S)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=TrajectoryComparer)
+set_tests_properties(${TESTNAME} PROPERTIES
+  DEPENDS "ph_RingS2S_Ev;ph_RingS2S")
+
+add_custom_target(check_Ring COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                  -R "ph_Ring\\|ph_Ring_Ev\\|ph_RingSC\\|ph_RingSC_EV\\|ph_RingS2S\\|ph_RingS2S_Ev\\compare_Ring\\|compare_RingSC\\|compare_RingS2S")
