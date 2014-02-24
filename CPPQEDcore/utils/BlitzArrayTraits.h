@@ -38,6 +38,7 @@ const std::string TypeID<CArray<RANK> >::value="CArray";
 
 /** \endcond */
 
+
 /// \name `blitz::Array` memory traits for `blitz::Array<double,n>`
 //@{
 
