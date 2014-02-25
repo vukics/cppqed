@@ -45,6 +45,7 @@ struct RealLevelsMF : mpl::identity<blitz::TinyVector<double,NL> > {};
 
 struct MultiLevelExactNotImplementedException : public cpputils::Exception {};
 
+/** \todo MultiLevel Exact not fully implemented, cf. the late 'shift' function. Maybe it's easier with something similar to Tridiagonal::freqs_ in Sigma */
 template<int NL>
 class Exact : public structure::FreeExact<false>
 {

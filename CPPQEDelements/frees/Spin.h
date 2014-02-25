@@ -52,6 +52,7 @@ struct Pars
 } // spin
 
 
+/** \todo Implement some spherical-coordinates class and use it here */
 class SpinBase
   : public structure::Free, 
     public structure::ElementAveraged<1>
