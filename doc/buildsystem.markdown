@@ -150,7 +150,7 @@ The targets mentioned above are only available if `doxygen` and `dot` is install
 [doxylink](https://pypi.python.org/pypi/sphinxcontrib-doxylink) extension.
 
 The documentation can only be installed if the project is built in monolithic mode. In this case the
-destination directory is set to `/usr/share/doc/cppqed-doc-${CPPQED_ID}. In standalone mode the documentation
+destination directory is set to `/usr/share/doc/cppqed-doc-${CPPQED_ID}`. In standalone mode the documentation
 can still be built (it resides in `${CMAKE_BINARY_DIRECTORY}/doc`) and also inter-project links should work,
 however the documentation cannot be moved to another place and thus cannot be installed system wide.
 

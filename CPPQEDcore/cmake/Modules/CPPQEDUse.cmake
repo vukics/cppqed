@@ -303,8 +303,8 @@ endfunction()
 #! - Gather version informations from all C++QED dependencies (core, elements and custom element projects) and compile them in a
 #!  generated source file `component_versions.cc`. Scripts including the header file `component_versions.h` have access to the function
 #!  `std::string cppqed_component_versions()`, which returns the version information of all used components in a human readable form.
-#! - Create a target for every script found. If the script (without file extension) is listed in the list `EXCLUDE_FROM_ALL_SCRIPTS`,
-#!  this script will not be built automatically.
+#! - Create a target for every script found. If the script (without file extension) is listed in
+#!   `EXCLUDE_FROM_ALL_SCRIPTS`, this script will not be built automatically. If it is listed in `EXCLUDE_SCRIPTS`, no target will be created.
 #! - Exclude all scripts listed in `NEED_FLENS` (without file extension) from compilation, if the current C++QED library does not support FLENS.
 #! - Create a target `${PROJECT_NAME}_all` which compiles all scripts not listed in `EXCLUDE_FROM_ALL_SCRIPTS`.
 macro(scripts_project)
