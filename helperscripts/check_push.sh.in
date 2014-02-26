@@ -7,13 +7,17 @@ CURRENT_ID=$(git rev-parse HEAD)
   && echo "Please commit all local changes" \
   && exit 1
 
+echo "Trying to compile the project."
+@CMAKE_COMMAND@ --build @CMAKE_BINARY_DIR@ -- -j@TEST_PARALLEL@ || exit 1
+
 for rev in $(git rev-list @{u}.. | tac); do
   git checkout $rev
-  echo "Trying to compile the project."
-  @CMAKE_COMMAND@ --build @CMAKE_BINARY_DIR@ -- -j@TEST_PARALLEL@ || exit 1
   if [[ $rev == $CURRENT_ID ]]; then
     echo "Running 'make check'."
     @CMAKE_COMMAND@ --build @CMAKE_BINARY_DIR@ --target check || exit 1
+  else
+    echo "Trying to compile the project."
+    @CMAKE_COMMAND@ --build @CMAKE_BINARY_DIR@ -- -j@TEST_PARALLEL@ || exit 1
   fi
 done
 
