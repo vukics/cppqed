@@ -113,12 +113,9 @@ public:
             const std::string& d, ///< parameter description (to be listed in help)
             const T& v ///< parameter default value
            ) : ParameterBase(s,d), v_(v) {}
+
   const T& get() const {return v_;}
         T& get()       {return const_cast<T&>(static_cast<const Parameter*>(this)->get());}
-  
-  void print(size_t smw, size_t tmw, size_t dmw) const;
-  void read(std::istream& is) {is>>v_;}
-
 
 protected:
   void read_v(std::istream& is) {is>>v_;}
