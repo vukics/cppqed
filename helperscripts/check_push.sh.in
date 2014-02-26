@@ -1,0 +1,21 @@
+#!/bin/bash
+
+CURRENT=$(git rev-parse --abbrev-ref HEAD)
+CURRENT_ID=$(git rev-parse HEAD)
+
+[[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] \
+  && echo "Please commit all local changes" \
+  && exit 1
+
+for rev in $(git rev-list @{u}.. | tac); do
+  git checkout $rev
+  if [[ $rev == $CURRENT_ID ]]; then
+    echo "Running 'make check'."
+    cmake --build @CMAKE_BINARY_DIR@ --target check || exit 1
+  else
+    echo "Trying to compile the project."
+    cmake --build @CMAKE_BINARY_DIR@ || exit 1
+  fi
+done
+
+git checkout $CURRENT

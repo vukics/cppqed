@@ -31,10 +31,18 @@ if(NOT ( PYTHONINTERP_FOUND AND NUMPY_FOUND AND SCIPY_FOUND  ) )
 endif()
 
 configure_file(testdriver.conf.in testdriver.conf)
+configure_file(${CMAKE_SOURCE_DIR}/helperscripts/check_push.sh.in ${CMAKE_BINARY_DIR}/check_push.sh @ONLY)
+
+#! \file
+#! <!--#########################################################-->
+#! ### Convenience custom targets
+#! <!--#########################################################-->
+#!
 
 add_custom_target(check_fast DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
 add_custom_target(check DEPENDS check_fast check_compile check_cpypyqed)
 add_custom_target(check_full DEPENDS check_physics check)
+add_custom_target(check_push COMMAND ${CMAKE_BINARY_DIR}/check_push.sh)
 
 #! \name Project options
 #! @{

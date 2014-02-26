@@ -20,6 +20,9 @@ of tests. Example usage:
     # Run the physics test suite
     $ make check_physics
 
+    # Run the test suite without the physics test suite
+    $ make check
+
     # Run a subset of the test suite which runs faster (no on-demand compilation tests, no physics test suite)
     $ make check_fast
 
@@ -28,6 +31,9 @@ of tests. Example usage:
 
     # Perform only a single test by name
     $ make fail_CompositeError2
+
+    # Go back through each not yet pushed commit and try to compile, then run 'make check' on the most current commit.
+    $ make check_push
 
 Success is indicated by the make target completing without errors. Parallelization is supported by passing
 `-DTEST_PARALLEL=N` to %CMake when configuring the project, where `N` is the number of tests which should be
