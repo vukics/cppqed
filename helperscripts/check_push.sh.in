@@ -9,12 +9,11 @@ CURRENT_ID=$(git rev-parse HEAD)
 
 for rev in $(git rev-list @{u}.. | tac); do
   git checkout $rev
+  echo "Trying to compile the project."
+  @CMAKE_COMMAND@ --build @CMAKE_BINARY_DIR@ -- -j@TEST_PARALLEL@ || exit 1
   if [[ $rev == $CURRENT_ID ]]; then
     echo "Running 'make check'."
-    cmake --build @CMAKE_BINARY_DIR@ --target check || exit 1
-  else
-    echo "Trying to compile the project."
-    cmake --build @CMAKE_BINARY_DIR@ || exit 1
+    @CMAKE_COMMAND@ --build @CMAKE_BINARY_DIR@ --target check || exit 1
   fi
 done
 
