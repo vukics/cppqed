@@ -1,9 +1,9 @@
 /// \briefFile{The mode-bundle convenience header}
 // -*- C++ -*-
-#ifndef   FREES_MODE_H_INCLUDED
-#define   FREES_MODE_H_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_MODE_H_INCLUDED
+#define   CPPQEDELEMENTS_FREES_MODE_H_INCLUDED
 
 #include "Mode.tcc"
 #include "ParsMode.h"
 
-#endif // FREES_MODE_H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_MODE_H_INCLUDED

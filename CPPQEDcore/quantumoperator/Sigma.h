@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFileDefault
-#ifndef   QUANTUMOPERATOR_SIGMA_H_INCLUDED
-#define   QUANTUMOPERATOR_SIGMA_H_INCLUDED
+#ifndef   CPPQEDCORE_QUANTUMOPERATOR_SIGMA_H_INCLUDED
+#define   CPPQEDCORE_QUANTUMOPERATOR_SIGMA_H_INCLUDED
 
 #include "SigmaFwd.h"
 
@@ -88,4 +88,4 @@ partialProject(const typename quantumdata::Types<RANK>::StateVectorLow& psi, int
 
 } // quantumoperator
 
-#endif // QUANTUMOPERATOR_SIGMA_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMOPERATOR_SIGMA_H_INCLUDED

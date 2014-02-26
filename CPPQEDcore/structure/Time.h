@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines tools related to the description of different time-dependence levels}
-#ifndef   STRUCTURE_TIME_H_INCLUDED
-#define   STRUCTURE_TIME_H_INCLUDED
+#ifndef   CPPQEDCORE_STRUCTURE_TIME_H_INCLUDED
+#define   CPPQEDCORE_STRUCTURE_TIME_H_INCLUDED
 
 #include "TimeFwd.h"
 
@@ -93,4 +93,4 @@ struct DispatcherIsTwoTime : boost::mpl::if_c<IS_TWO_TIME,TwoTime,OneTime>
 
 } // structure
 
-#endif // STRUCTURE_TIME_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_TIME_H_INCLUDED

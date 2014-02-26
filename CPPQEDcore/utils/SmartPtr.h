@@ -1,7 +1,7 @@
 /// \briefFile{Tools for creating non-owning shared pointers}
 // -*- C++ -*-
-#ifndef   UTILS_SMARTPTR_H_INCLUDED
-#define   UTILS_SMARTPTR_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_SMARTPTR_H_INCLUDED
+#define   CPPQEDCORE_UTILS_SMARTPTR_H_INCLUDED
 
 #include <boost/shared_ptr.hpp>
 
@@ -62,4 +62,4 @@ const boost::shared_ptr<T> sharedPointerize(                  T* t) {return nonO
 } // cpputils
 
 
-#endif // UTILS_SMARTPTR_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_SMARTPTR_H_INCLUDED

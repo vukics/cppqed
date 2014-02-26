@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines structure::ElementAveraged & structure::ClonableElementAveraged}
-#ifndef STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
-#define STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
+#ifndef CPPQEDCORE_STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
+#define CPPQEDCORE_STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
 
 #include "ElementAveragedFwd.h"
 
@@ -90,4 +90,4 @@ inline ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>*const new_clone(const Clo
 } // structure
 
 
-#endif // STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_ELEMENTAVERAGED_H_INCLUDED

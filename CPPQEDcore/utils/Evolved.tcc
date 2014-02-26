@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_EVOLVED_TCC_INCLUDED
-#define   UTILS_EVOLVED_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_EVOLVED_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_EVOLVED_TCC_INCLUDED
 
 #include "Evolved.h"
 
@@ -52,4 +52,4 @@ void evolve(E& e, double deltaT)
 
 } // evolved
 
-#endif // UTILS_EVOLVED_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_EVOLVED_TCC_INCLUDED

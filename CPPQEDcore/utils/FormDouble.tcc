@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_FORMDOUBLE_TCC_INCLUDED
-#define   UTILS_FORMDOUBLE_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_FORMDOUBLE_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_FORMDOUBLE_TCC_INCLUDED
 
 #include "FormDouble.h"
 
@@ -27,4 +27,4 @@ const formdouble::Bound<T> FormDouble::operator()(const T& v) const
 }
 
 
-#endif // UTILS_FORMDOUBLE_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_FORMDOUBLE_TCC_INCLUDED

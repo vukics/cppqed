@@ -1,7 +1,7 @@
 /// \briefFile{Defines parameter aggergates to Trajectory.h}
 // -*- C++ -*-
-#ifndef UTILS_PARSTRAJECTORY_H_INCLUDED
-#define UTILS_PARSTRAJECTORY_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
+#define CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
 
 #include "TrajectoryFwd.h"
 
@@ -88,4 +88,4 @@ struct Pars : ParsRun, ParsEvolved
 
 } // trajectory
 
-#endif // UTILS_PARSTRAJECTORY_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED

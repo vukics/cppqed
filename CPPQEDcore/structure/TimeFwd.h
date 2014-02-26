@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   STRUCTURE_TIMEFWD_H_INCLUDED
-#define   STRUCTURE_TIMEFWD_H_INCLUDED
+#ifndef   CPPQEDCORE_STRUCTURE_TIMEFWD_H_INCLUDED
+#define   CPPQEDCORE_STRUCTURE_TIMEFWD_H_INCLUDED
 
 namespace structure {
 
@@ -15,4 +15,4 @@ namespace time {
 
 } // structure
 
-#endif // STRUCTURE_TIMEFWD_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_TIMEFWD_H_INCLUDED

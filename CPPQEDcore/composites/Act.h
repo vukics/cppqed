@@ -1,6 +1,6 @@
 /// \briefFile{Defines the helper class composite::_}
-#ifndef   COMPOSITES_ACT_H_INCLUDED
-#define   COMPOSITES_ACT_H_INCLUDED
+#ifndef   CPPQEDCORE_COMPOSITES_ACT_H_INCLUDED
+#define   CPPQEDCORE_COMPOSITES_ACT_H_INCLUDED
 
 #include "SubSystem.h"
 
@@ -50,4 +50,4 @@ template<int... V>
 using Act = composite::_<V...>;
 
 
-#endif // COMPOSITES_ACT_H_INCLUDED
+#endif // CPPQEDCORE_COMPOSITES_ACT_H_INCLUDED

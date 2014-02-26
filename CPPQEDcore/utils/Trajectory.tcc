@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_TRAJECTORY_TCC_INCLUDED
-#define   UTILS_TRAJECTORY_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_TRAJECTORY_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_TRAJECTORY_TCC_INCLUDED
 
 #include "Trajectory.h"
 
@@ -263,4 +263,4 @@ cpputils::oarchive&  Adaptive<A>::writeState_v(cpputils::oarchive& oar) const
 
 } // trajectory
 
-#endif // UTILS_TRAJECTORY_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_TRAJECTORY_TCC_INCLUDED

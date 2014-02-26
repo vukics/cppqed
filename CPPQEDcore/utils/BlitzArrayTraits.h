@@ -1,7 +1,7 @@
 /// \briefFile{Implementations of the traits functions declared in ArrayTraits.h for `blitz::Array`} \todo Much of this file is superfluous as many components can be formulated generally for all `blitz::Array` types
 // -*- C++ -*-
-#ifndef UTILS_BLITZARRAYTRAITS_H_INCLUDED
-#define UTILS_BLITZARRAYTRAITS_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_BLITZARRAYTRAITS_H_INCLUDED
+#define CPPQEDCORE_UTILS_BLITZARRAYTRAITS_H_INCLUDED
 
 #include "ArrayTraits.h"
 #include "BlitzArray.h"
@@ -146,4 +146,4 @@ inline size_t subscriptLimit(const CArray<n>& a) {return a.size();}
 
 } // cpputils
 
-#endif // UTILS_BLITZARRAYTRAITS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_BLITZARRAYTRAITS_H_INCLUDED

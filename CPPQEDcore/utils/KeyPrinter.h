@@ -1,7 +1,7 @@
 /// \briefFileDefault
 // -*- C++ -*-
-#ifndef   UTILS_KEYPRINTER_H_INCLUDED
-#define   UTILS_KEYPRINTER_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_KEYPRINTER_H_INCLUDED
+#define   CPPQEDCORE_UTILS_KEYPRINTER_H_INCLUDED
 
 #include "KeyPrinterFwd.h"
 
@@ -50,4 +50,4 @@ private:
 
 } // cpputils
 
-#endif // UTILS_KEYPRINTER_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_KEYPRINTER_H_INCLUDED

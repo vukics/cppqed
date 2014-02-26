@@ -2,8 +2,8 @@
 // -*- C++ -*-
 // Note that some ArrayTraits file declaring the used traits templates must be included *before* inclusion of this file.
 // If the traits are also instantiated after inclusion of this file, then the ArrayTraits file included beforehand must also contain the traits *definitions*.
-#ifndef   UTILS_EVOLVEDGSL_TCC_INCLUDED
-#define   UTILS_EVOLVEDGSL_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_EVOLVEDGSL_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_EVOLVEDGSL_TCC_INCLUDED
 
 #include "EvolvedGSL.h"
 
@@ -114,4 +114,4 @@ auto MakerGSL<A>::make(
 
 } // evolved
 
-#endif // UTILS_EVOLVEDGSL_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_EVOLVEDGSL_TCC_INCLUDED

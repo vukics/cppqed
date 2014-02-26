@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Additional helpers for dcomp}
-#ifndef UTILS_COMPLEXEXTENSIONS_H_INCLUDED
-#define UTILS_COMPLEXEXTENSIONS_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_COMPLEXEXTENSIONS_H_INCLUDED
+#define CPPQEDCORE_UTILS_COMPLEXEXTENSIONS_H_INCLUDED
 
 #include "core_config.h"
 
@@ -27,4 +27,4 @@ inline bool hasImagPart(const dcomp& c) {return bool(imag(c));}
 inline bool  absCompare(const dcomp& c1, const dcomp& c2) {return  abs(c1)< abs(c2);}
 inline bool realCompare(const dcomp& c1, const dcomp& c2) {return real(c1)<real(c2);}
 
-#endif // UTILS_COMPLEXEXTENSIONS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_COMPLEXEXTENSIONS_H_INCLUDED

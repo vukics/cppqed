@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FREES_PARSQBIT_H_INCLUDED
-#define   FREES_PARSQBIT_H_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_PARSQBIT_H_INCLUDED
+#define   CPPQEDELEMENTS_FREES_PARSQBIT_H_INCLUDED
 
 #include "Qbit_Fwd.h"
 
@@ -47,4 +47,4 @@ struct ParsPumpedLossy : ParsPumped, ParsLossy
 
 } // qbit
 
-#endif // FREES_PARSQBIT_H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_PARSQBIT_H_INCLUDED

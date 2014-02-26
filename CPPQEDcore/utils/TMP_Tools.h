@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Template metaprogramming tools, extending (and based on) Boost.MPL.}
-#ifndef UTILS_TMP_TOOLS_H_INCLUDED
-#define UTILS_TMP_TOOLS_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_TMP_TOOLS_H_INCLUDED
+#define CPPQEDCORE_UTILS_TMP_TOOLS_H_INCLUDED
 
 /// The largest-rank `blitz::Array` for which the mixed-mode subscripting can be used.
 /**
@@ -208,4 +208,4 @@ typedef Vector<> V_Empty;
 
 
 
-#endif // UTILS_TMP_TOOLS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_TMP_TOOLS_H_INCLUDED

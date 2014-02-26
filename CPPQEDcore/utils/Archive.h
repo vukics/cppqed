@@ -1,6 +1,6 @@
 /// \briefFile{Defines i/oarchive types depending on the #DO_NOT_USE_BOOST_SERIALIZATION macro}
-#ifndef   UTILS_ARCHIVE_H_INCLUDED
-#define   UTILS_ARCHIVE_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
+#define   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 
 #include "core_config.h"
 
@@ -76,4 +76,4 @@ typedef boost::archive::binary_oarchive oarchive; ///< \copydoc iarchive
 
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
-#endif // UTILS_ARCHIVE_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED

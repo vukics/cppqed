@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_FFT_TCC_INCLUDED
-#define   UTILS_FFT_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_FFT_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_FFT_TCC_INCLUDED
 
 #include "FFT.h"
 // #include "ArrayTraits.h"
@@ -17,4 +17,4 @@ void transform(A& a, Direction dir)
 
 } // fft
 
-#endif // UTILS_FFT_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_FFT_TCC_INCLUDED

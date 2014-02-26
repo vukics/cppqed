@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFileDefault
-#ifndef QUANTUMDATA_TYPES_H_INCLUDED
-#define QUANTUMDATA_TYPES_H_INCLUDED
+#ifndef CPPQEDCORE_QUANTUMDATA_TYPES_H_INCLUDED
+#define CPPQEDCORE_QUANTUMDATA_TYPES_H_INCLUDED
 
 #include "LazyDensityOperatorFwd.h"
 
@@ -29,4 +29,4 @@ struct Types : B
 
 } // quantumdata
 
-#endif // QUANTUMDATA_TYPES_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMDATA_TYPES_H_INCLUDED

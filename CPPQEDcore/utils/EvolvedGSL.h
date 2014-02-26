@@ -1,7 +1,7 @@
 /// \briefFile{Defines evolved::MakerGSL, which incorporates the actual \GSL-based implementation of evolved::Evolved}
 // -*- C++ -*-
-#ifndef UTILS_EVOLVEDGSL_H_INCLUDED
-#define UTILS_EVOLVEDGSL_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_EVOLVEDGSL_H_INCLUDED
+#define CPPQEDCORE_UTILS_EVOLVEDGSL_H_INCLUDED
 
 #include "Exception.h"
 
@@ -56,4 +56,4 @@ extern const int onSuccess;
 } // evolved
 
 
-#endif // UTILS_EVOLVEDGSL_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_EVOLVEDGSL_H_INCLUDED

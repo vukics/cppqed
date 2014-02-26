@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FREES_BICHROMATICMODE_H_INCLUDED
-#define   FREES_BICHROMATICMODE_H_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED
+#define   CPPQEDELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED
 
 #include "BichromaticModeFwd.h"
 
@@ -69,4 +69,4 @@ template class BichromaticMode<true>;
 template class BichromaticMode<false>;
 
 
-#endif // FREES_BICHROMATICMODE_H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_PARSFWD_H_INCLUDED
-#define   UTILS_PARSFWD_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_PARSFWD_H_INCLUDED
+#define   CPPQEDCORE_UTILS_PARSFWD_H_INCLUDED
 
 #include<string>
 
@@ -21,4 +21,4 @@ class ParameterTable;
 } // parameters
 
 
-#endif // UTILS_PARSFWD_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_PARSFWD_H_INCLUDED

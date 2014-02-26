@@ -4,8 +4,8 @@
 // (-delta-i*kappa)*adagger*a+i*(eta*adagger-h.c.)
 // with the usual Liouvillean
 
-#ifndef   FREES_MODE_FWD_H_INCLUDED
-#define   FREES_MODE_FWD_H_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_MODE_FWD_H_INCLUDED
+#define   CPPQEDELEMENTS_FREES_MODE_FWD_H_INCLUDED
 
 
 namespace mode {
@@ -53,4 +53,4 @@ struct FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState;
 
 } // mode
 
-#endif // FREES_MODE_FWD_H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_MODE_FWD_H_INCLUDED

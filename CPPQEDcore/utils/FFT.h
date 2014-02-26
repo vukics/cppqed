@@ -1,7 +1,7 @@
 /// \briefFile{Fast Fourier transformation}
 // -*- C++ -*-
-#ifndef   UTILS_FFT_H_INCLUDED
-#define   UTILS_FFT_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_FFT_H_INCLUDED
+#define   CPPQEDCORE_UTILS_FFT_H_INCLUDED
 
 #include "FFTFwd.h"
 
@@ -50,4 +50,4 @@ inline const Direction reverse(Direction dir) {return dir==DIR_KX ? DIR_XK : DIR
 
 } // fft
 
-#endif // UTILS_FFT_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_FFT_H_INCLUDED

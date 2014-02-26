@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef FREES_QBIT__H_INCLUDED
-#define FREES_QBIT__H_INCLUDED
+#ifndef CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED
+#define CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED
 
 #include "Qbit_Fwd.h"
 
@@ -239,4 +239,4 @@ public:
 };
 
 
-#endif // FREES_QBIT__H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED

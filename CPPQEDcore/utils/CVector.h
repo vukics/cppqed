@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines the typedef linalg::CVector}
-#ifndef UTILS_CVECTOR_H_INCLUDED
-#define UTILS_CVECTOR_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_CVECTOR_H_INCLUDED
+#define CPPQEDCORE_UTILS_CVECTOR_H_INCLUDED
 
 #include "BlitzArray.h"
 
@@ -14,4 +14,4 @@ typedef CArray<1> CVector;
 
 } // linalg
 
-#endif // UTILS_CVECTOR_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_CVECTOR_H_INCLUDED

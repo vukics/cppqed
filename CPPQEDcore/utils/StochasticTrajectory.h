@@ -1,7 +1,7 @@
 /// \briefFile{Defines classes related to stochastic evolution}
 // -*- C++ -*-
-#ifndef UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
-#define UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
+#define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
 
 #include "StochasticTrajectoryFwd.h"
@@ -220,4 +220,4 @@ public:
 } // trajectory
 
 
-#endif // UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED

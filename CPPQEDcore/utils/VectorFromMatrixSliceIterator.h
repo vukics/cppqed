@@ -1,7 +1,7 @@
 /// \briefFile{Tools for adapting blitzplusplus::basi::Iterator%s to iteration over rows or columns of (multi)matrices}
 // -*- C++ -*-
-#ifndef UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
-#define UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
+#define CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 
 #include "VectorFromMatrixSliceIteratorFwd.h"
 
@@ -113,4 +113,4 @@ template<int RANK, typename S> struct ConsistencyChecker<RANK,blitzplusplus::vfm
 } // blitzplusplus
 
 
-#endif // UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED

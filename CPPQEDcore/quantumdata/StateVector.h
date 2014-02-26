@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFileDefault
-#ifndef QUANTUMDATA_STATEVECTOR_H_INCLUDED
-#define QUANTUMDATA_STATEVECTOR_H_INCLUDED
+#ifndef CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
+#define CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
 
 #include "StateVectorFwd.h"
 
@@ -187,4 +187,4 @@ operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
 
 } // quantumdata
 
-#endif // QUANTUMDATA_STATEVECTOR_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED

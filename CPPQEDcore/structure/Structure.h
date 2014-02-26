@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines structur::QuantumSystemWrapper}
-#ifndef STRUCTURE_STRUCTURE_H_INCLUDED
-#define STRUCTURE_STRUCTURE_H_INCLUDED
+#ifndef CPPQEDCORE_STRUCTURE_STRUCTURE_H_INCLUDED
+#define CPPQEDCORE_STRUCTURE_STRUCTURE_H_INCLUDED
 
 #include "StructureFwd.h"
 
@@ -293,4 +293,4 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
 
 
 
-#endif // STRUCTURE_STRUCTURE_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_STRUCTURE_H_INCLUDED

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines the hierarchical partial specializations of structure::ElementLiouvillean}
-#ifndef STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
-#define STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
+#ifndef CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
+#define CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
 
 #include "ElementLiouvillean.h"
 
@@ -66,6 +66,6 @@ void structure::ElementLiouvilleanStrategies<RANK,NLINDBLADS,IS_TIME_DEPENDENT>:
 }
 
 
-#endif // STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
 
 

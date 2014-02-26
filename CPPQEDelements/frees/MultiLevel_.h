@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FREES_MULTILEVEL__H_INCLUDED
-#define   FREES_MULTILEVEL__H_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
+#define   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
 
 #include "MultiLevel_Fwd.h"
 
@@ -363,4 +363,4 @@ makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const std::st
 } // multilevel
 
 
-#endif // FREES_MULTILEVEL__H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED

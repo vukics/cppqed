@@ -3,8 +3,8 @@
  * \brief Defines wrapper functions for mathematical functions taken from libraries, and several other mathematical functions.
  * \details The principal aim of this arrangement is to localize dependence on GSL. In particular, GSL headers may be included only in .cc files.
  */
-#ifndef UTILS_MATHEXTENSIONS_H_INCLUDED
-#define UTILS_MATHEXTENSIONS_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_MATHEXTENSIONS_H_INCLUDED
+#define CPPQEDCORE_UTILS_MATHEXTENSIONS_H_INCLUDED
 
 #include "MathExtensionsFwd.h"
 
@@ -58,4 +58,4 @@ dcomp coherentElement(unsigned long n, const dcomp& alpha);
 
 } // mathutils
 
-#endif // UTILS_MATHEXTENSIONS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_MATHEXTENSIONS_H_INCLUDED

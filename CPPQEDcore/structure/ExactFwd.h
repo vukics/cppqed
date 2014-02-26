@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   STRUCTURE_EXACTFWD_H_INCLUDED
-#define   STRUCTURE_EXACTFWD_H_INCLUDED
+#ifndef   CPPQEDCORE_STRUCTURE_EXACTFWD_H_INCLUDED
+#define   CPPQEDCORE_STRUCTURE_EXACTFWD_H_INCLUDED
 
 namespace structure {
 
@@ -15,4 +15,4 @@ class ExactTimeDependenceDispatched;
 
 } // structure
 
-#endif // STRUCTURE_EXACTFWD_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_EXACTFWD_H_INCLUDED

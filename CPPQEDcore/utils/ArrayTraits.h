@@ -1,7 +1,7 @@
 /// \briefFile{Declarations of traits functions for adapting array types to generic functions}
 // -*- C++ -*-
-#ifndef   UTILS_ARRAYTRAITS_H_INCLUDED
-#define   UTILS_ARRAYTRAITS_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
+#define   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
 
 #include <string>
 #include <vector>
@@ -84,4 +84,4 @@ size_t subscriptLimit(const A& a);
 } // cpputils
 
 
-#endif // UTILS_ARRAYTRAITS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED

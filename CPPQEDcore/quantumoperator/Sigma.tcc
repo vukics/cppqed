@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Defines quantumoperator::DirectProduct & helpers}
-#ifndef   QUANTUMOPERATOR_SIGMA_TCC_INCLUDED
-#define   QUANTUMOPERATOR_SIGMA_TCC_INCLUDED
+#ifndef   CPPQEDCORE_QUANTUMOPERATOR_SIGMA_TCC_INCLUDED
+#define   CPPQEDCORE_QUANTUMOPERATOR_SIGMA_TCC_INCLUDED
 
 #include "Sigma.h"
 
@@ -71,4 +71,4 @@ operator*(const Sigma<L1,R1>&, const Sigma<L2,R2>& sigma)
 
 } // quantumoperator
 
-#endif // QUANTUMOPERATOR_SIGMA_TCC_INCLUDED
+#endif // CPPQEDCORE_QUANTUMOPERATOR_SIGMA_TCC_INCLUDED

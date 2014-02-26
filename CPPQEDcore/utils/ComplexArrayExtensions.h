@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Helpers for complex `blitz::Array`s, e.g. Hermitian conjugation of multi-matrices}
-#ifndef   UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED
-#define   UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED
+#define   CPPQEDCORE_UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED
 
 #include "BlitzArray.h"
 #include "CMatrix.h"
@@ -47,4 +47,4 @@ doDirect(const CArray<RANK1>&, const CArray<RANK2>&);
 } // blitzplusplus
 
 
-#endif // UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED

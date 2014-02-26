@@ -1,7 +1,7 @@
 /// \briefFile{Randomized & related}
 // -*- C++ -*-
-#ifndef UTILS_RANDOMIZED_H_INCLUDED
-#define UTILS_RANDOMIZED_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED
+#define CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED
 
 #include "RandomizedFwd.h"
 
@@ -148,4 +148,4 @@ const Randomized::Ptr fillWithRandom(A& data, unsigned long seed=1001ul, const M
 
 } // randomized
 
-#endif // UTILS_RANDOMIZED_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED

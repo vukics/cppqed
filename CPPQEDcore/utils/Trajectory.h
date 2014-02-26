@@ -1,7 +1,7 @@
 /// \briefFile{Defines the basic classes of the trajectory-bundle}
 // -*- C++ -*-
-#ifndef UTILS_TRAJECTORY_H_INCLUDED
-#define UTILS_TRAJECTORY_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED
+#define CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED
 
 #include "TrajectoryFwd.h"
 
@@ -348,4 +348,4 @@ private:
 } // trajectory
 
 
-#endif // UTILS_TRAJECTORY_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED

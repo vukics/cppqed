@@ -1,7 +1,7 @@
 /// \briefFileDefault
 // -*- C++ -*-
-#ifndef UTILS_SIMULATED__H_INCLUDED
-#define UTILS_SIMULATED__H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
+#define CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
 
 #include "SimulatedFwd.h"
 
@@ -59,4 +59,4 @@ private:
 } // trajectory
 
 
-#endif // UTILS_SIMULATED__H_INCLUDED
+#endif // CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED

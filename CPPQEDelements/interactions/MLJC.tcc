@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   INTERACTIONS_MLJC_TCC_INCLUDED
-#define   INTERACTIONS_MLJC_TCC_INCLUDED
+#ifndef   CPPQEDELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED
+#define   CPPQEDELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED
 
 #include "MLJC.h"
 
@@ -128,4 +128,4 @@ void Base<NL,VC>::addContribution_v(double t, const StateVectorLow& psi, StateVe
 
 } // mljc
 
-#endif // INTERACTIONS_MLJC_TCC_INCLUDED
+#endif // CPPQEDELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED

@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED
-#define   INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED
+#ifndef   CPPQEDELEMENTS_INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED
+#define   CPPQEDELEMENTS_INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED
 
 namespace jaynescummings {
 
@@ -14,4 +14,4 @@ class Base;
 // class JaynesCummings;
 // Here it is not good to forward declare the class because of the default template parameter
 
-#endif // INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED
+#endif // CPPQEDELEMENTS_INTERACTIONS_JAYNESCUMMINGSFWD_H_INCLUDED

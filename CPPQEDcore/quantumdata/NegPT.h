@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Declares the function calculating the negativity of a partially transposed density operator}
-#ifndef   QUANTUMDATA_NEGPT_H_INCLUDED
-#define   QUANTUMDATA_NEGPT_H_INCLUDED
+#ifndef   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
+#define   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
 
 #include "core_config.h"
 
@@ -68,4 +68,4 @@ double negPT(const DensityOperator<RANK>&, V)
 #endif // DO_NOT_USE_FLENS
 
 
-#endif // QUANTUMDATA_NEGPT_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED

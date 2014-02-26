@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_SIMULATED_TCC_INCLUDED
-#define   UTILS_SIMULATED_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_SIMULATED_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_SIMULATED_TCC_INCLUDED
 
 #include "Simulated_.h"
 
@@ -35,4 +35,4 @@ std::ostream& Simulated<A>::display_v(std::ostream& os, int precision) const
 
 } // trajectory
 
-#endif // UTILS_SIMULATED_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_SIMULATED_TCC_INCLUDED

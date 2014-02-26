@@ -1,7 +1,7 @@
 /// \briefFile{Convenience header for straightforward usage of the trajectory::Simulated class for classical simulations}
 // -*- C++ -*-
-#ifndef UTILS_SIMULATED_H_INCLUDED
-#define UTILS_SIMULATED_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED
+#define CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED
 
 #include "BlitzArrayTraits.h"
 #include "EvolvedGSL.tcc"
@@ -18,4 +18,4 @@ using parameters::NamedException;
 using trajectory::Simulated;
 using trajectory::Pars     ;
 
-#endif // UTILS_SIMULATED_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED

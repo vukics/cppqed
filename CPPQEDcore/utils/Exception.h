@@ -1,6 +1,6 @@
 /// \briefFile{Defines tentative base classes for the exception classes of the framework \todo Rationalize & uniformize the exceptions throughout}
-#ifndef UTILS_EXCEPTION_H_INCLUDED
-#define UTILS_EXCEPTION_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_EXCEPTION_H_INCLUDED
+#define CPPQEDCORE_UTILS_EXCEPTION_H_INCLUDED
 
 #include "ExceptionFwd.h"
 
@@ -40,4 +40,4 @@ private:
 
 }
 
-#endif // UTILS_EXCEPTION_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_EXCEPTION_H_INCLUDED

@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFileDefault
-#ifndef UTILS_EVOLVED_H_INCLUDED
-#define UTILS_EVOLVED_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
+#define CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 
 #include "EvolvedFwd.h"
 
@@ -239,4 +239,4 @@ private:
 } // evolved
 
 
-#endif // UTILS_EVOLVED_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED

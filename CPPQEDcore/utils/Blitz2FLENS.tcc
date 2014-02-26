@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_BLITZ2FLENS_TCC_INCLUDED
-#define   UTILS_BLITZ2FLENS_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_BLITZ2FLENS_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_BLITZ2FLENS_TCC_INCLUDED
 
 #include "Blitz2FLENS.h"
 
@@ -71,4 +71,4 @@ const typename HeMatrixMF<SO>::type hermitianMatrix(CArray<TWO_TIMES_RANK>& arra
 } // blitz2flens
 
 
-#endif // UTILS_BLITZ2FLENS_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_BLITZ2FLENS_TCC_INCLUDED

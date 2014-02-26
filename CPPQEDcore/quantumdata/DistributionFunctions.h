@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Tools for calculating Wigner functions from density operators}
-#ifndef QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED
-#define QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED
+#ifndef CPPQEDCORE_QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED
+#define CPPQEDCORE_QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED
 
 #include "BlitzArray.h"
 #include "ComplexExtensions.h"
@@ -154,4 +154,4 @@ std::ostream& scanFunction(DistributionFunctor distributionFunctor, const Densit
 
 }
 
-#endif // QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMDATA_DISTRIBUTIONFUNCTIONS_H_INCLUDED

@@ -1,7 +1,7 @@
 /// \briefFile{The parameter-bundle}
 // -*- C++ -*-
-#ifndef UTILS_PARS_H_INCLUDED
-#define UTILS_PARS_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_PARS_H_INCLUDED
+#define CPPQEDCORE_UTILS_PARS_H_INCLUDED
 
 #include "ParsFwd.h"
 
@@ -221,4 +221,4 @@ private:
 } // parameters
 
 
-#endif // UTILS_PARS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_PARS_H_INCLUDED

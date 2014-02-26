@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFile{Declares extensions for creating vector & matrix views of `blitz::Array`s}
-#ifndef   UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
-#define   UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
+#define   CPPQEDCORE_UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
 
 #include "Exception.h"
 
@@ -70,4 +70,4 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array);
 } // blitzplusplus
 
 
-#endif // UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED

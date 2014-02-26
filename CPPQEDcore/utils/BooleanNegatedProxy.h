@@ -1,7 +1,7 @@
 /// \briefFileDefault
 // -*- C++ -*-
-#ifndef   UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED
-#define   UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED
+#define   CPPQEDCORE_UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED
 
 #include "BooleanNegatedProxyFwd.h"
 
@@ -38,4 +38,4 @@ std::istream& operator>>(std::istream&, BooleanNegatedProxy&);
 
 } // cpputils
 
-#endif // UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED

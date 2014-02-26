@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   STRUCTURE_AVERAGEDFWD_H_INCLUDED
-#define   STRUCTURE_AVERAGEDFWD_H_INCLUDED
+#ifndef   CPPQEDCORE_STRUCTURE_AVERAGEDFWD_H_INCLUDED
+#define   CPPQEDCORE_STRUCTURE_AVERAGEDFWD_H_INCLUDED
 
 namespace structure {
 
@@ -13,4 +13,4 @@ template<int, bool> class AveragedTimeDependenceDispatched;
 } // structure
 
 
-#endif // STRUCTURE_AVERAGEDFWD_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_AVERAGEDFWD_H_INCLUDED

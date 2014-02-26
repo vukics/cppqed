@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFileDefault
-#ifndef STRUCTURE_EXACT_H_INCLUDED
-#define STRUCTURE_EXACT_H_INCLUDED
+#ifndef CPPQEDCORE_STRUCTURE_EXACT_H_INCLUDED
+#define CPPQEDCORE_STRUCTURE_EXACT_H_INCLUDED
 
 #include "ExactFwd.h"
 
@@ -98,4 +98,4 @@ private:
 
 } // structure
 
-#endif // STRUCTURE_EXACT_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_EXACT_H_INCLUDED

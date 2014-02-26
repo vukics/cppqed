@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   UTILS_PARS_TCC_INCLUDED
-#define   UTILS_PARS_TCC_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_PARS_TCC_INCLUDED
+#define   CPPQEDCORE_UTILS_PARS_TCC_INCLUDED
 
 #include "Pars.h"
 
@@ -44,4 +44,4 @@ ParameterTable::add(const std::string& s, const std::string& d, const T& v)
 
 } // parameters
 
-#endif // UTILS_PARS_TCC_INCLUDED
+#endif // CPPQEDCORE_UTILS_PARS_TCC_INCLUDED

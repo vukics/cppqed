@@ -1,7 +1,7 @@
 /// \briefFile{Extensions built on top of \refBoost{Boost.Operator,utility/operators.htm}.}
 // -*- C++ -*-
-#ifndef UTILS_OPERATORS_H_INCLUDED
-#define UTILS_OPERATORS_H_INCLUDED
+#ifndef CPPQEDCORE_UTILS_OPERATORS_H_INCLUDED
+#define CPPQEDCORE_UTILS_OPERATORS_H_INCLUDED
 
 #include "ComplexExtensions.h"
 
@@ -31,4 +31,4 @@ struct VectorSpace
 
 } // linalg
 
-#endif // UTILS_OPERATORS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_OPERATORS_H_INCLUDED

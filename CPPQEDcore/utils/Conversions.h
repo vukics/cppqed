@@ -1,6 +1,6 @@
 /// \briefFile{Some converters along the lines of \refBoost{Boost.NumericConversion,numeric/conversion/doc/html/index.html}} \todo Update & see why it is not much used in the framework
-#ifndef   UTILS_CONVERSIONS_H_INCLUDED
-#define   UTILS_CONVERSIONS_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_CONVERSIONS_H_INCLUDED
+#define   CPPQEDCORE_UTILS_CONVERSIONS_H_INCLUDED
 
 #include "ConversionsFwd.h"
 
@@ -145,4 +145,4 @@ typedef boost::numeric::converter<double,
 
 const Size2Double size2Double=Size2Double();
 
-#endif // UTILS_CONVERSIONS_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_CONVERSIONS_H_INCLUDED

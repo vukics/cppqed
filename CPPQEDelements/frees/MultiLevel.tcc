@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FREES_MULTILEVEL_TCC_INCLUDED
-#define   FREES_MULTILEVEL_TCC_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL_TCC_INCLUDED
+#define   CPPQEDELEMENTS_FREES_MULTILEVEL_TCC_INCLUDED
 
 #include "MultiLevel_.h"
 
@@ -412,5 +412,5 @@ PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const
 }
 
 
-#endif // FREES_MULTILEVEL_TCC_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_MULTILEVEL_TCC_INCLUDED
 

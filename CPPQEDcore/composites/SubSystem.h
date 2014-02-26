@@ -1,6 +1,6 @@
 /// \briefFile{Defines composite::SubSystemFree and composite::SubSystemsInteraction}
-#ifndef COMPOSITES_SUBSYSTEM_H_INCLUDED
-#define COMPOSITES_SUBSYSTEM_H_INCLUDED
+#ifndef CPPQEDCORE_COMPOSITES_SUBSYSTEM_H_INCLUDED
+#define CPPQEDCORE_COMPOSITES_SUBSYSTEM_H_INCLUDED
 
 #include "SubSystemFwd.h"
 
@@ -50,4 +50,4 @@ private:
 } // composite
 
 
-#endif // COMPOSITES_SUBSYSTEM_H_INCLUDED
+#endif // CPPQEDCORE_COMPOSITES_SUBSYSTEM_H_INCLUDED

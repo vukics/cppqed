@@ -1,7 +1,7 @@
 /// \briefFile{Generic algorithms not found in either STL or Boost}
 // -*- C++ -*-
-#ifndef   UTILS_ALGORITHM_H_INCLUDED
-#define   UTILS_ALGORITHM_H_INCLUDED
+#ifndef   CPPQEDCORE_UTILS_ALGORITHM_H_INCLUDED
+#define   CPPQEDCORE_UTILS_ALGORITHM_H_INCLUDED
 
 #include <boost/range/numeric.hpp>
 
@@ -49,4 +49,4 @@ concatenateGrow(const SeqOfSeqs& sOs)
 } // cpputils
 
 
-#endif // UTILS_ALGORITHM_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_ALGORITHM_H_INCLUDED

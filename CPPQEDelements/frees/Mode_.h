@@ -1,7 +1,7 @@
 /// \briefFile{Defines the mode-bundle (tackling the dynamics of a single harmonic-oscillator mode)}
 // -*- C++ -*-
-#ifndef FREES_MODE__H_INCLUDED
-#define FREES_MODE__H_INCLUDED
+#ifndef CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
+#define CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
 
 #include "Mode_Fwd.h"
 
@@ -484,4 +484,4 @@ private:
 
 };
 
-#endif // FREES_MODE__H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_MODE__H_INCLUDED

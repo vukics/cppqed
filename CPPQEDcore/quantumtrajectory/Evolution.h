@@ -1,6 +1,6 @@
 /// \briefFile{Convenience header collecting to one place most of the components of C++QED core needed for writing scripts (basically, the core part of the Level-1 interface)}
-#ifndef QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
-#define QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
+#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
+#define CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 
 #include "BlitzArrayTraits.h"
 
@@ -444,5 +444,5 @@ Evolution parameters:
 
 */
 
-#endif // QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 

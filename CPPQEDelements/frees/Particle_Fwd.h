@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FREES_PARTICLE_FWD_H_INCLUDED
-#define   FREES_PARTICLE_FWD_H_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_PARTICLE_FWD_H_INCLUDED
+#define   CPPQEDELEMENTS_FREES_PARTICLE_FWD_H_INCLUDED
 
 class ParticleBase;
 class PumpedParticleBase;
@@ -21,4 +21,4 @@ class InitialCondition;
 } // particle
 
 
-#endif // FREES_PARTICLE_FWD_H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_PARTICLE_FWD_H_INCLUDED

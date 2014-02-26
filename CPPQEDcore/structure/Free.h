@@ -1,7 +1,7 @@
 // -*- C++ -*-
 /// \briefFileDefault
-#ifndef STRUCTURE_FREE_H_INCLUDED
-#define STRUCTURE_FREE_H_INCLUDED
+#ifndef CPPQEDCORE_STRUCTURE_FREE_H_INCLUDED
+#define CPPQEDCORE_STRUCTURE_FREE_H_INCLUDED
 
 #include "FreeFwd.h"
 
@@ -80,4 +80,4 @@ private:
 
 } // structure
 
-#endif // STRUCTURE_FREE_H_INCLUDED
+#endif // CPPQEDCORE_STRUCTURE_FREE_H_INCLUDED

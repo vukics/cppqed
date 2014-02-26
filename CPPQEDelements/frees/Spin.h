@@ -1,6 +1,6 @@
 // -*- C++ -*-
-#ifndef   FREES_SPIN_H_INCLUDED
-#define   FREES_SPIN_H_INCLUDED
+#ifndef   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
+#define   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
 
 #include "SpinFwd.h"
 
@@ -136,4 +136,4 @@ private:
 };
 
 
-#endif // FREES_SPIN_H_INCLUDED
+#endif // CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
