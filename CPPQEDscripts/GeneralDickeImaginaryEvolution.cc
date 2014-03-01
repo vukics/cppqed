@@ -12,8 +12,6 @@
 
 #include<flens/flens.h>
 
-#include<boost/lambda/bind.hpp>
-
 
 using namespace std;
 using namespace linalg;
@@ -134,7 +132,6 @@ int main(int argc, char* argv[])
 
     if (!noEigenStates) {
       using namespace boost;
-      namespace bll=lambda;
 
       ostream& os=cout;
 

@@ -23,9 +23,6 @@
 
 #include <boost/bind.hpp>
 
-#include <boost/lambda/lambda.hpp>
-namespace bll=boost::lambda;
-
 #include <algorithm>
 #include <list>
 
