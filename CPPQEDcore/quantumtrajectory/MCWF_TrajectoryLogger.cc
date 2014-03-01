@@ -1,7 +1,7 @@
 #include "MCWF_TrajectoryLogger.h"
 
 #include <boost/range/adaptor/transformed.hpp>
-//#include <boost/range/algorithm/max_element.hpp>
+#include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/numeric.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
@@ -97,33 +97,14 @@ void quantumtrajectory::mcwf::Logger::hamiltonianCalled()
 }
 
 
-namespace { 
-// NEEDS_WORK for some reason, gcc doesn’t like the construct
-// *max_element(loggerList | adaptors::transformed(bind(&Logger::f,_1)))
-// The following is a workaround:
-  
-using namespace quantumtrajectory;
-using namespace ensemble;
-  
-double max_element(const LoggerList& loggerList, boost::function<double(const mcwf::Logger&)> f)
-{
-  double res=0.;
-  for (auto i : loggerList) res=max(res,f(i));
-  return res;
-}
 
-}
-
-
-ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& loggerList)
+ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& loggerList, size_t nBins, size_t nJumpsPerBin)
 {
   using namespace boost;
-  
-  // cout<<*((loggerList | adaptors::transformed(bind(&Logger::dpMaxOvershoot_,_1))).begin());
 
 #define AVERAGE_function(f) accumulate(loggerList | adaptors::transformed(bind(&Logger::f,_1)),0.)/loggerList.size()
-#define MAX_function(f) max_element(loggerList,bind(&Logger::f,_1)) // *max_element(loggerList | adaptors::transformed(bind(&Logger::f,_1)))
-  
+#define MAX_function(f) max_element(loggerList, bind(std::less<double>(),bind(&Logger::f,_1),bind(&Logger::f,_2)) )->f
+
   os<<"\n# Average number of total steps: "<<AVERAGE_function(nSteps_)<<endl
     <<"\n# On average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
     <<"\n# On average, dpTolerance overshot: "<<AVERAGE_function(nToleranceOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpToleranceMaxOvershoot_)<<endl
@@ -137,26 +118,27 @@ ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& 
       
   using namespace accumulators;
   
-  /* The different kinds of jumps should be collected into different histograms
-  typedef vector<accumulator_set<double, features<tag::density> > > acc;
-  typedef vector<iterator_range<std::vector<std::pair<double, double> >::iterator > > histogram_type;
-  */
+  size_t nTotalJumps=accumulate(loggerList | adaptors::transformed( bind(&Logger::MCWF_Trajectory::size,bind(&Logger::traj_,_1)) ) ,0);
 
-  accumulator_set<double, features<tag::density> > acc( tag::density::num_bins = 20 , tag::density::cache_size = 1000 );
+  // Heuristic: if nBins is not given (0), then the number of bins is determined such that the bins contain nJumpsPerBin samples on average
+  if (!nBins && nTotalJumps<2*nJumpsPerBin) {
+    os<<"\n# Too few jumps for a histogram\n";
+  }
+  else {
+    size_t actualNumberOfBins=nBins ? nBins : nTotalJumps/nJumpsPerBin;
+    accumulator_set<double, features<tag::density> > acc( tag::density::num_bins = actualNumberOfBins , tag::density::cache_size = nTotalJumps );
 
-  // fill accumulator
-  size_t total=0;
-  for (auto i : loggerList)
-    for (auto j=i.traj_.begin(); j!=i.traj_.end(); (++j, ++total))
-      acc(j->first);
+    // fill accumulator
+    for (auto i : loggerList) for (auto j : i.traj_) acc(j.first);
+
+    const iterator_range<std::vector<std::pair<double, double> >::iterator> histogram=density(acc);
+
+    os<<"\n# Histogram of jumps. Number of bins="<<actualNumberOfBins+2<<endl;
+    for (auto i : histogram)
+      os<<"# "<<i.first<<"\t"<<i.second<<endl;
+  }
  
-  typedef iterator_range<std::vector<std::pair<double, double> >::iterator> Histogram;
-  Histogram hist=density(acc);
- 
-  for (auto i : hist)
-    os<<"# "<<i.first<<"\t"<<i.second<<endl;
- 
-  os<<"\n# Average number of total jumps: "<<total/double(loggerList.size())<<endl;
+  os<<"\n# Average number of total jumps: "<<nTotalJumps/double(loggerList.size())<<endl;
  
   return os;
 }

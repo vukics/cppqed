@@ -26,9 +26,9 @@ using namespace mcwf;
 
 typedef std::list<Logger> LoggerList;
 
-/// Called by EnsembleMCWF::logOnEnd, in displays a time histogram of total jumps
+/// Called by EnsembleMCWF::logOnEnd, it displays a time histogram of total jumps
 /** \todo The different kinds of jumps should be collected into different histograms */
-std::ostream& displayLog(std::ostream&, const LoggerList&);
+std::ostream& displayLog(std::ostream&, const LoggerList&, size_t nBins, size_t nJumpsPerBin);
   
 } // ensemble
 
@@ -83,7 +83,7 @@ private:
                                                       & traj_;}
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
-  friend std::ostream& ensemble::displayLog(std::ostream&, const ensemble::LoggerList&);
+  friend std::ostream& ensemble::displayLog(std::ostream&, const ensemble::LoggerList&, size_t, size_t);
   
   const int logLevel_;
   const bool isHamiltonian_;

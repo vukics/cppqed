@@ -46,7 +46,7 @@ quantumtrajectory::ensemble::Base<RANK>::Base(
                                               )
   : StateVectorsBase(stateVectors(psi,p.nTraj)),
     Ensemble(trajectories(StateVectorsBase::member,qs,p,scaleAbs),p.logLevel<0),
-    rho_(psi.getDimensions(),false), qs_(qs)
+    rho_(psi.getDimensions(),false), qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
 {
 }
 
@@ -60,7 +60,7 @@ quantumtrajectory::ensemble::Base<RANK>::logOnEnd_v(std::ostream& os) const
     if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&(*i)))
       loggerList.push_back(traj->getLogger());
   
-  return displayLog(os,loggerList);
+  return displayLog(os,loggerList,nBins_,nJumpsPerBin_);
 }
 
 

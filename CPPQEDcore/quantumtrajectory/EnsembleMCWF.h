@@ -78,6 +78,8 @@ private:
 
   const QuantumSystemPtr qs_;
 
+  const size_t nBins_, nJumpsPerBin_;
+
 };
 
 } // ensemble
