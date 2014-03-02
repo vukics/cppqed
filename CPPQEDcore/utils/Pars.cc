@@ -135,10 +135,11 @@ void update(ParameterTable& table, int argc, char* argv[], const string& sc)
     static const string _(const string& sc) {return "\nSee "+sc+"help for a list of parameters\nSupply all parameters with "+sc+" prefix\n\n";}
   };
 
-  if (argc<2) return;
-
   iostream& line=table.getStream();
-  for (int i=1; i<argc; ++i) line<<' '<<argv[i];
+  for (char** i=argv+1;  i<argv+argc; ++i) line<<' '<<*i;
+  table.setParsedCommandLine(string(*argv)+table.getStream().str());
+
+  if (argc<2) return;
 
   string temp;
   size_t scl=sc.length();

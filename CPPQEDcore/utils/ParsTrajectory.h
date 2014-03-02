@@ -7,7 +7,7 @@
 
 #include "Evolved.h"
 #include "FormDoubleFwd.h"
-#include "ParsFwd.h"
+#include "Pars.h"
 
 
 namespace trajectory {
@@ -75,6 +75,12 @@ struct ParsRun
   unsigned &sdf;
   
   ParsRun(parameters::ParameterTable&, const std::string& mod="");
+
+  /// Corresponds to parameters::ParameterTable::getParsedCommandLine
+  const std::string getParsedCommandLine() const {return *parsedCommandLine_;}
+
+private:
+  const parameters::ParameterTable::ParsedCommandLine parsedCommandLine_;
 
 };
 

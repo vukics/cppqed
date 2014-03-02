@@ -23,7 +23,7 @@ namespace trajectory {
 template<typename A>
 void run(Adaptive<A>& traj, const ParsRun& p)
 {
-  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay);
+  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine());
   else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
 }
@@ -87,7 +87,8 @@ bool restoreState(Trajectory&, const std::string&, const std::string&, const std
 
 
 template<typename T, typename L, typename D>
-void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay)
+void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         const std::string& parsedCommandLine)
 {
   using namespace std; using namespace boost; using namespace runTraits; using namespace cpputils;
 
@@ -121,10 +122,12 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   ///////////////////////
 
   if (displayInfo) {
-    if (!continuing)
+    if (!continuing) {
+      if (parsedCommandLine!="") os<<"# "<<parsedCommandLine<<endl;
       traj.displayParameters(os)
         <<endl<<"# Run Trajectory up to time "<<timeToReach
         <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
+    }
     else
       os<<"# Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
   }
@@ -180,15 +183,18 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 } // details
 
 
-void run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay)
-{details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay);}
+void run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         const std::string& parsedCommandLine)
+{details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine);}
 
-void run(Trajectory & traj, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay)
-{details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay);}
+void run(Trajectory & traj, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         const std::string& parsedCommandLine)
+{details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine);}
 
 template<typename A>
-void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay)
-{details::run(traj,time,dc    ,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay);}
+void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         const std::string& parsedCommandLine)
+{details::run(traj,time,dc    ,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine);}
 
 
 template<typename A>

@@ -133,7 +133,9 @@ private:
 class ParameterTable
 {
 public:
-  ParameterTable() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), stream_() {} // tmwidth_ cf bool!
+  typedef std::shared_ptr<std::string> ParsedCommandLine; ///< Type for passing the \link getParsedCommandLine parsed command line\endlink throughout the framework
+
+  ParameterTable() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), stream_(), parsedCommandLine_(std::make_shared<std::string>("")) {} // tmwidth_ cf bool!
 
   /// \name Subscription
   //@{
@@ -190,7 +192,7 @@ public:
     return add(s+mod,d,v);
   }
 
-  /// This adds a dummy “parameter” whose only effect is to cause a newline and a title to be printed for grouping parameters belonging to different modules
+  /// This adds a dummy “parameter” whose only effect is to cause a newline and a title to be printed for grouping parameters belonging to different modules in parameter \link printList listing\endlink
   ParameterTable& addTitle(const std::string& s, const std::string& mod="");
   //@}
   
@@ -198,8 +200,14 @@ public:
   /** Invoked by update() if the switch `--help` is found in the command line */
   void printList() const;
   
-  /// The stream whereon parameter i/o occurs (an intermediary \refStdCppConstruct{stringstream,sstream/stringstream/}) is exposed in order that i/o manipulators can be applied
-  std::iostream& getStream() {return stream_;}
+  /// The stream whereon parameter i/o occurs (an intermediary \refStdCppConstruct{stringstream,sstream/stringstream}) is exposed in order that i/o manipulators can be applied
+  std::stringstream& getStream() {return stream_;}
+
+  /// Getter for the full command line set by the update() function
+  const ParsedCommandLine getParsedCommandLine(                    ) const {return  parsedCommandLine_;}
+
+  /// Setter for the full command line used by the update() function
+  void                    setParsedCommandLine(const std::string& s)       {        *parsedCommandLine_=s;}
 
 private:
   typedef boost::ptr_list<ParameterBase> Impl;
@@ -211,7 +219,9 @@ private:
   size_t dmwidth_; // maximal width of d_ entries
 
   std::stringstream stream_;
-  
+
+  ParsedCommandLine parsedCommandLine_;
+
 };
 
 

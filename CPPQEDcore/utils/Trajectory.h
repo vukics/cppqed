@@ -47,7 +47,8 @@ void run(Trajectory & trajectory, ///< the trajectory to run
          const std::string& initialFileName, ///< name of file containing initial condition state for the run
          int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
          bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
-         bool firstStateDisplay ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
+         bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
+         const std::string& parsedCommandLine
         );
 
 
@@ -67,7 +68,8 @@ void run(Trajectory & trajectory, ///< the trajectory to run
  *
  */
 void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt*deltaT
-         double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
+         double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         const std::string& parsedCommandLine);
 
 
 /// Another version of \link run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) `run`\endlink for running in dc-mode \related Adaptive
@@ -79,7 +81,8 @@ void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt
  */
 template<typename A>
 void run(Adaptive<A>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
-         unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay);
+         unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         const std::string& parsedCommandLine);
 
 
 /// Dispatcher \related Trajectory

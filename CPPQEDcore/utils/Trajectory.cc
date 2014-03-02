@@ -16,8 +16,8 @@ namespace trajectory {
 void run(Trajectory& traj, const ParsRun& p)
 { 
   if (!p.Dt) {cerr<<"Nonzero Dt required!"<<endl; return;}
-  if (p.NDt) run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay);
-  else       run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay);
+  if (p.NDt) run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine());
+  else       run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine());
 }
 
 
