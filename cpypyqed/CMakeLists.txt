@@ -27,36 +27,16 @@ include(${CPPQED_USE})
 find_package(Boost QUIET REQUIRED COMPONENTS python)
 find_package(PythonInterp 2.7 REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED)
+find_package(Numpy REQUIRED)
 
 include(PythonSetup)
 CPPQED_SETUP()
 
+include_directories(${CPPQED_INCLUDE_DIRS})
+include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS})
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON_LIBRARY})
-
-#! \name Project options
-#! @{
-
-#! Switch to enable/disable the Python input output module.
-option(PYIO  "Python I/O" ON)
-#! @}
-if(PYIO)
-  set(ENABLE_PYTHON_IO On)
-else(PYIO)
-  set(ENABLE_PYTHON_IO Off)
-endif(PYIO)
-
-# Numpy
-find_package(Numpy)
-if( NOT NUMPY_FOUND )
-  message(STATUS "Numpy not found, python I/O disabled.")
-  set(ENABLE_PYTHON_IO Off)
-endif( NOT NUMPY_FOUND )
-# Check if python I/O module can be built, inform user
-if ( ENABLE_PYTHON_IO )
-  message(STATUS "Python input/output enabled.")
-endif( ENABLE_PYTHON_IO )
 
 #! \file
 #! <!--#########################################################-->
@@ -353,8 +333,6 @@ set_package_properties(Sphinx PROPERTIES URL "http://sphinx-doc.org/"
 set_package_properties(Doxylink PROPERTIES URL "https://pypi.python.org/pypi/sphinxcontrib-doxylink"
                                 DESCRIPTION "Doxylink is a Sphinx extension to link to external Doxygen API documentation."
                                 PURPOSE "Needed to link to the rest of the C++QED in the cpypyqed documentation.")
-
-add_feature_info("Python input/output" ENABLE_PYTHON_IO "Python C++QED input/output module.")
 
 if(NOT CPPQED_MONOLITHIC)
   feature_summary( WHAT ALL )
