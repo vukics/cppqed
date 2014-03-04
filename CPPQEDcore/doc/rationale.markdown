@@ -29,7 +29,7 @@ Instead, the shift of frequencies, when required at all, should be performed on 
 \todo Consider switching to \refBoost{Boost.MultiArray,multi_array}. This would also provide const views which are not present in Blitz++.
 
 * All non-trivial numerics should be performed by [GSL](http://www.gnu.org/software/gsl/) with bindings developed in `utils`.
-Alternative implementations are possible, consider in particular [Boost.Math](http://www.boost.org/doc/libs/?view=category_Math).
+\todo Alternative implementations are possible, consider in particular [Boost.Math](http://www.boost.org/doc/libs/?view=category_Math).
 
   Basic linear algebra should be tackled using the Blitz++ operators, while more involved ones using [FLENS/LAPACK](http://flens.sourceforge.net/‎). \todo Consider switching to [Eigen](http://eigen.tuxfamily.org/).
 

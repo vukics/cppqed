@@ -743,8 +743,6 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/issues.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/doc/userGuide.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/structureGuide.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/multiarrayConcept.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/mcwfMethod.markdown \

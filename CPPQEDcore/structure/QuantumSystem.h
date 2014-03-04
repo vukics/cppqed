@@ -24,7 +24,9 @@ template<int RANK>
 class QuantumSystem : public DimensionsBookkeeper<RANK>
 {
 public:
-  typedef boost::shared_ptr<const QuantumSystem> Ptr; ///< Many of the basic template classes in the framework act as template metafunctions returning a shared pointer to their own type
+  /// Many of the basic template classes in the framework act as template metafunctions returning a shared pointer to their own type
+  /** \todo define Ptr types outside classes as template aliases eg QuantumSystem::Ptr => QuantumSystemPtr */
+  typedef boost::shared_ptr<const QuantumSystem> Ptr;
   
 private:
   typedef DimensionsBookkeeper<RANK> Base;
