@@ -15,14 +15,10 @@ int main(int argc, char* argv[])
   evolution::Pars pe(p); // Driver Parameters
   ParsPumpedLossy pplqb(p); 
 
-  QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
-
   // Parameter finalization
-  update(p,argc,argv,"--");
+  QM_Picture& qmp=updateWithPicture(p,argc,argv);
   
   // ****** ****** ****** ****** ****** ******
-
-  if (pe.evol==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   Ptr qbit(make(pplqb,qmp));
 

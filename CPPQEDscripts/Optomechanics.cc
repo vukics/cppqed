@@ -23,10 +23,8 @@ int main(int argc, char* argv[])
 
   double& u=p.addTitle("Optomechanics","").add("u","N-Q coupling",1.);
 
-  QM_Picture& qmp=p.add("picture","QM_Picture for particle (IP=UIP or Sch) and field (IP, UIP, or Sch)",QMP_UIP);
-
   // Parameter finalization
-  update(p,argc,argv,"--");
+  QM_Picture& qmp=updateWithPicture(p,argc,argv);
   
   // ****** ****** ****** ****** ****** ******
 

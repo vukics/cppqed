@@ -26,14 +26,10 @@ int main(int argc, char* argv[])
     &doDisplay=p.add("doDisplay","Display diagonal elements of density operator",false),
     &doOffDiag=p.add("doOffDiag","Display offdiagonal elements of density operator",false);
 
-  QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
-
   // Parameter finalization
-  update(p,argc,argv,"--");
+  QM_Picture& qmp=updateWithPicture(p,argc,argv);
   
   // ****** ****** ****** ****** ****** ******
-
-  if (pe.evol==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
   if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));

@@ -24,17 +24,12 @@ int main(int argc, char* argv[])
   particle::ParsPumped ppp(p); // Pumped Particle
   particlecavity::ParsAlong ppci(p); // Particle Cavity Interaction
 
-  QM_Picture& qmp=p.add("picture","QM_Picture for particle (IP=UIP or Sch) and field (IP, UIP, or Sch)",QMP_IP);
-  // Should be used only out of curiosity (or testing, of course).
-
   dcomp& superposition=p.add("superposition","Particle initial condition |0>+|2>",dcomp(0,0));
 
   // Parameter finalization
-  update(p,argc,argv,"--");
+  QM_Picture& qmp=updateWithPicture(p,argc,argv);
   
   // ****** ****** ****** ****** ****** ******
-
-  if ((pe.evol==evolution::MASTER || pe.evol==evolution::MASTER_FAST) && qmp==QMP_IP) qmp=QMP_UIP;
 
   if (conf!=1) pplm.delta-=ppci.uNot/(isComplex(ppci.modeCav) ? 1. : 2.);
 

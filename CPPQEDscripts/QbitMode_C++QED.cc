@@ -21,14 +21,10 @@ int main(int argc, char* argv[])
   mode::ParsPumpedLossy pplm (p); 
   jaynescummings::Pars  pjc  (p); 
 
-  QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
-
   // Parameter finalization
-  update(p,argc,argv,"--");
+  QM_Picture& qmp=updateWithPicture(p,argc,argv);
   
   // ****** ****** ****** ****** ****** ******
-
-  if (pe.evol==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
 
   qbit::Ptr qbit(qbit::make(pplqb,qmp));
   mode::Ptr mode(mode::make(pplm ,qmp/*,structure::averaged::ReducedDensityOperator("Mode",pplm.cutoff,true)*/));

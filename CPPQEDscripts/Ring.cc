@@ -16,12 +16,11 @@ int main(int argc, char* argv[])
 
   ppcP.modeCav=MFT_PLUS; ppcM.modeCav=MFT_MINUS; 
 
-  update(p,argc,argv,"--");
+  QM_Picture& qmp=updateWithPicture(p,argc,argv);
 
   pmP.delta-=ppcP.uNot/(isComplex(ppcP.modeCav) ? 1. : 2.);
   pmM.delta-=ppcM.uNot/(isComplex(ppcM.modeCav) ? 1. : 2.);
 
-  QM_Picture qmp=(pe.evol==evolution::MASTER || pe.evol==evolution::MASTER_FAST) ? QMP_UIP : QMP_IP;
   particle::Ptr part (make(pp ,qmp));
   mode    ::Ptr plus (make(pmP,qmp));
   mode    ::Ptr minus(make(pmM,qmp));

@@ -19,6 +19,19 @@
 using parameters::ParameterTable;
 
 
+/// Convenience version of parameters::update meant to tackle the problem described in Sec. \ref masterequationlimitations
+QM_Picture& updateWithPicture(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
+{
+  QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
+  update(p,argc,argv,prefix);
+  try {
+    const evolution::Method method=dynamic_cast<const parameters::Parameter<evolution::Method>&>(p["evol"]).get();
+    if ((method==evolution::MASTER || method==evolution::MASTER_FAST) && qmp==QMP_IP) qmp=QMP_UIP;
+  } catch (const parameters::UnrecognisedParameterException&) {}
+  return qmp;
+}
+
+
 /**
 
 Synopsis
