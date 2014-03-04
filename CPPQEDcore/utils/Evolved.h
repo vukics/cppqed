@@ -15,6 +15,7 @@
 
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/split_member.hpp>
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
 
@@ -127,10 +128,23 @@ public:
   virtual ~EvolvedIO() {} ///< necessary in order that EvolvedIO be polymorphic
 
 private:
+
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
+
+  /// The serialization of A by reference leads to memory leak (for not completely understood reasons),
+  /** hence we adopt serialization by a temporary, which necessitates splitting save/load. */
   friend class boost::serialization::access;
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int) {ar & a_ & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
+  void save(Archive& ar, const unsigned int) const
+  {A temp(a_); ar & temp & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
+
+  friend class boost::serialization::access;
+  template<class Archive>
+  void load(Archive& ar, const unsigned int)
+  {A temp; ar & temp & boost::serialization::base_object<TimeStepBookkeeper>(*this); a_.reference(temp);}
+
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
+
 #endif // DO_NOT_USE_BOOST_SERIALIZATION
 
   A& a_;
