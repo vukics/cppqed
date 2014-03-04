@@ -16,3 +16,23 @@ Documentation {#mainpagedocumentation}
 Those interested in the background and fundamental design principles of the framework should read the
 
 \ref userguideintroduction
+
+For a quick start on writing and running driver programs („scripts”) for actual physical simulations read the
+
+\ref userguide
+
+A table of generic elements provided out-of-the-box:
+
+\ref genericelements
+
+Installation of the framework:
+
+\ref installationguide
+
+For learning how to implement new physical systems („elements”) read the
+
+\ref structurebundleguide
+
+Walkthrough for the API documentation:
+
+…

@@ -1,6 +1,13 @@
 User Guide – the level-1 interface to C++QEDv2 {#userguide}
 ==============================================
 
+* User guide
+  * trajectory-state serialization
+  * trajectory logging (especially EnsembleMCWF)
+  * time averaging
+  * version information
+  * (heavier use of smart pointers)
+
 \par Abstract
 This Guide allows for understanding and using the framework on the highest level, that is, for building simulations out of the already existing modules and elementary systems as building blocks. These modules constitute the level-1 interface to C++QED, while the \ref structurebundleguide "level-2 interface" allows for the implementation of new elementary physical systems.
 

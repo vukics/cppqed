@@ -1,6 +1,9 @@
 Introduction {#userguideintroduction}
 ============
 
+\par Abstract
+This guide gives a bird’s eye view of the background, history, and physical, computational, and design concepts of C++QED.
+
 \tableofcontents
 
 C++QED is a framework for simulating open quantum dynamics in general. It addresses the following problem: somebody who writes simulation code for a single quantum particle, mode, or spin today; tomorrow will want to simulate two or ten such systems interacting with each other. They want to reuse the code written for the single-system case, but this turns out to be rather difficult for naively written code, due to the algebraic structure of quantum mechanics. C++QED facilitates this task, providing a framework for representing elementary physical systems (particle motional degrees of freedom, harmonic oscillator modes, spins, etc.) in such a way that they can immediately be used as constituents of composite systems as well. Dynamical simulations of such systems can be performed with a set of tools provided by the framework.
