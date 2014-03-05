@@ -7,8 +7,6 @@
 
 #include "core_config.h"
 
-#include "Version.h"
-
 #include <boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
@@ -138,7 +136,6 @@ private:
   void save(Archive& ar, const unsigned int) const
   {A temp(a_); ar & temp & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
 
-  friend class boost::serialization::access;
   template<class Archive>
   void load(Archive& ar, const unsigned int)
   {A temp; ar & temp & boost::serialization::base_object<TimeStepBookkeeper>(*this); a_.reference(temp);}
@@ -189,7 +186,7 @@ public:
   void step(double deltaT ///< *maximum* length of the timestep
             );
 
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os<<versionHelper());} ///< delegates to private virtual
+  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);} ///< delegates to private virtual
 
   /// \name Getter
   //@{

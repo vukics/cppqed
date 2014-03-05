@@ -8,6 +8,7 @@
 #include "FormDouble.h"
 #include "ParsTrajectory.h"
 #include "SmartPtr.h"
+#include "Version.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -123,8 +124,8 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 
   if (displayInfo) {
     if (!continuing) {
-      if (parsedCommandLine!="") os<<"# "<<parsedCommandLine<<endl;
-      traj.displayParameters(os)
+      if (parsedCommandLine!="") os<<"# "<<parsedCommandLine<<endl<<endl;
+      traj.displayParameters(os<<versionHelper())
         <<endl<<"# Run Trajectory up to time "<<timeToReach
         <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
     }
@@ -242,7 +243,7 @@ Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, cons
 template<typename A>
 std::ostream& Adaptive<A>::displayParameters_v(std::ostream& os) const 
 {
-  return evolved_->displayParameters(os<<std::endl)<<"# Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
+  return evolved_->displayParameters(os)<<"# Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }
 
 template<typename A>

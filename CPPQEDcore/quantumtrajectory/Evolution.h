@@ -16,7 +16,17 @@
 #include "EvolvedGSL.tcc"
 #include "Pars.tcc"
 
-using parameters::ParameterTable;
+#include "component_versions.h"
+
+
+class ParameterTable : public parameters::ParameterTable {};
+
+
+void update(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
+{
+  updateVersionstring(cppqed_component_versions());
+  parameters::update(p,argc,argv,prefix);
+}
 
 
 /// Convenience version of parameters::update meant to tackle the problem described in Sec. \ref masterequationlimitations

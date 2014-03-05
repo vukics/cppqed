@@ -4,16 +4,13 @@
 #include "ParticleCavity.h"
 #include "ParticleCavity_InterferenceWorkaround.h"
 #include "MomentumCorrelation.h"
-#include "Version.h"
 
-#include "component_versions.h"
 
 using namespace quantumdata;
 using namespace particlecavity_interferenceworkaround;
 
 int main(int argc, char **argv)
 {
-    updateVersionstring(cppqed_component_versions());
     ParameterTable p;
 
     evolution::Pars pe(p);              // Driver parameters
@@ -27,11 +24,9 @@ int main(int argc, char **argv)
     bool &fermions = p.add("fermions", "Particles are fermions", false);
     
     double &alphasquare = p.add("alphasquare", "Coherent state of pumped cavity mode (has to be real)", 1.);
-    QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
     pe.evol = evolution::SINGLE;
     
-    update(p,argc,argv,"--");
-    if (pe.evol == evolution::MASTER && qmp != QMP_UIP) qmp = QMP_UIP;
+    QM_Picture& qmp=updateWithPicture(p,argc,argv);
     
     // Parameters, take U0 as configuration parameter and update V0 and Delta accordingly
     
@@ -62,4 +57,6 @@ int main(int argc, char **argv)
     
     evolve(psi,composite::make(Act<0,1>(particlecavity),Act<0,2>(particlecavity),
                                Act<0,1>(interference),Act<0,2>(interference),Act<1,2>(mci)),pe);
+
+
 }
