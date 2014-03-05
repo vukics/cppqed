@@ -10,6 +10,8 @@
 #include "BlitzTiny.h"
 #include "Trajectory.tcc"
 
+#include "blitz2numpy.tcc"
+
 #if PYTHON_MAX_RANK > BLITZ_ARRAY_LARGEST_RANK
 #define BLITZ_ARRAY_LARGEST_RANK PYTHON_MAX_RANK
 #endif
@@ -32,7 +34,7 @@ namespace pythonext {
 namespace {
 
 template<typename A, int RANK>
-object doRead(std::ifstream &ifs, NPY_TYPES npy_dtype)
+object doRead(std::ifstream &ifs)
 {
   list states;
   list times;
@@ -43,13 +45,7 @@ object doRead(std::ifstream &ifs, NPY_TYPES npy_dtype)
   AdaptiveIO<A> traj(evolved::makeIO(a));
   while ( (ifs.peek(), !ifs.eof()) ) {
     trajectory::readViaSStream(traj,ifs);
-    npy_intp npy_dims[RANK];
-    dims = a.extent();
-    std::copy(dims.begin(),dims.end(), npy_dims);
-    PyObject * pyObj = PyArray_SimpleNewFromData(RANK, npy_dims, npy_dtype, a.dataFirst());
-    handle<> h( pyObj );
-    numeric::array arr( h );
-    states.append(arr.copy());
+    states.append(arrayToNumpy<A,RANK>(a));
     times.append(traj.getTime());
   }
   return make_tuple(states,times);
@@ -114,8 +110,8 @@ object read(str filename)
   switch (meta.rank) {
     #define BOOST_PP_LOCAL_MACRO(n) \
       case n: \
-        if(meta.typeID=="CArray") result.extend(doRead<CArray<n>,n>(ifs,NPY_CDOUBLE)); \
-        if(meta.typeID=="DArray") result.extend(doRead<DArray<n>,n>(ifs,NPY_DOUBLE));  \
+        if(meta.typeID=="CArray") result.extend(doRead<CArray<n>,n>(ifs)); \
+        if(meta.typeID=="DArray") result.extend(doRead<DArray<n>,n>(ifs));  \
         break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
