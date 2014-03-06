@@ -35,6 +35,7 @@ find_package(Numpy REQUIRED)
 
 include(PythonSetup)
 CPPQED_SETUP()
+include_directories(${CPPQED_INCLUDE_DIRS})
 
 include_directories(${CPPQED_INCLUDE_DIRS})
 include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS})
