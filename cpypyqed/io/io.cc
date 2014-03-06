@@ -33,6 +33,15 @@ namespace pythonext {
 
 namespace {
 
+const PyArrayObject * numeric_np(const numeric::array &arr)
+{
+  if(!PyArray_Check(arr.ptr())){
+    PyErr_SetString(PyExc_ValueError, "expected a PyArrayObject");
+    throw_error_already_set();
+  }
+  return reinterpret_cast<const PyArrayObject *>(arr.ptr());
+}
+
 template<typename A, int RANK>
 object doRead(std::ifstream &ifs)
 {
@@ -52,12 +61,9 @@ object doRead(std::ifstream &ifs)
 }
 
 template<typename A, typename dtype, int RANK>
-void doWrite(std::ofstream *ofs, PyArrayObject *a, double time)
+void doWrite(std::ofstream *ofs, const numeric::array &a, double time)
 {
-  npy_intp *dims=PyArray_DIMS(a);
-  blitz::TinyVector<int,RANK> shape;
-  for (int i=0; i<RANK; i++) shape[i]=dims[i];
-  A  blitz_a = A(static_cast<dtype *>(PyArray_DATA(a)), shape, blitz::duplicateData);
+  A  blitz_a = numpyToArray<dtype,RANK>(a);
   AdaptiveIO<A> traj(evolved::makeIO(blitz_a, time));
   trajectory::writeViaSStream(traj,ofs);
 }
@@ -100,7 +106,7 @@ object read(str filename)
   throw_file(ifs,f);
 
   trajectory::SerializationMetadata meta = trajectory::readMeta(ifs);
-  
+
   throw_rank(meta.rank);
   throw_type(meta.typeID);
 
@@ -126,16 +132,15 @@ void write(str filename, const numeric::array &array, double time)
   std::ofstream ofs(f.c_str(),std::ios_base::binary|std::ios_base::trunc);
   throw_file(ofs,f);
 
-  PyArrayObject *a = reinterpret_cast<PyArrayObject *>(array.ptr());
-  int rank=PyArray_NDIM(a);
-  throw_rank(rank);
-  switch (rank) {
+  int r=PyArray_NDIM(numeric_np(array));
+  throw_rank(r);
+  switch (r) {
     #define BOOST_PP_LOCAL_MACRO(n)                 \
       case n:                                       \
-        if(PyArray_TYPE(a)==NPY_DOUBLE)            \
-          doWrite<DArray<n>,double,n>(&ofs,a,time); \
-        if(PyArray_TYPE(a)==NPY_CDOUBLE)           \
-          doWrite<CArray<n>,dcomp,n>(&ofs,a,time);  \
+        if(PyArray_TYPE(numeric_np(array))==NPY_DOUBLE)  \
+          doWrite<DArray<n>,double,n>(&ofs,array,time);  \
+        if(PyArray_TYPE(numeric_np(array))==NPY_CDOUBLE) \
+          doWrite<CArray<n>,dcomp,n>(&ofs,array,time);   \
         break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
