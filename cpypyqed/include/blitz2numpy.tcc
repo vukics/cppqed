@@ -15,7 +15,6 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/lexical_cast.hpp>
 #include <numpy/ndarrayobject.h>
-#include <numpy/ndarraytypes.h>
 
 namespace pythonext {
 
@@ -33,6 +32,7 @@ NPY_TYPES npy_type(const A&)
 }
 
 } // anonymous namespace
+
 
 template<typename A, int RANK>
 boost::python::object arrayToNumpy(const A &a)

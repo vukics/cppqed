@@ -11,6 +11,7 @@
 #include "Trajectory.tcc"
 
 #include "blitz2numpy.tcc"
+#include "utils.h"
 
 #if PYTHON_MAX_RANK > BLITZ_ARRAY_LARGEST_RANK
 #define BLITZ_ARRAY_LARGEST_RANK PYTHON_MAX_RANK
@@ -32,15 +33,6 @@ using namespace boost::python;
 namespace pythonext {
 
 namespace {
-
-const PyArrayObject * numeric_np(const numeric::array &arr)
-{
-  if(!PyArray_Check(arr.ptr())){
-    PyErr_SetString(PyExc_ValueError, "expected a PyArrayObject");
-    throw_error_already_set();
-  }
-  return reinterpret_cast<const PyArrayObject *>(arr.ptr());
-}
 
 template<typename A, int RANK>
 object doRead(std::ifstream &ifs)

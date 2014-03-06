@@ -3,6 +3,7 @@
 #include "PythonExtension.h"
 #include "Namespaces.h"
 #include "blitz2numpy.tcc"
+#include "utils.h"
 
 #include "ParsPropertyMacros.h"
 
