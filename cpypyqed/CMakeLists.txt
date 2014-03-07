@@ -233,7 +233,7 @@ endforeach()
 #! ### Documentation
 #! <!--#########################################################-->
 #!
-#! Find Doxygen, Sphinx and Doxylinnk. If all these components are found,
+#! Find Doxygen, Sphinx and Doxylink. If all these components are found,
 #! build the documentation. Sphinx has the advantage that it actually loads
 #! the modules with a python interpreter and looks at the docstrings.
 #! Otherwise it would be very cumbersome to document a boost python module,
