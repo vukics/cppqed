@@ -67,7 +67,7 @@ public:
 
   typedef linalg::CMatrix CMatrix;
 
-  using ABase::frobeniusNorm; using ABase::getArray; 
+  using ABase::frobeniusNorm; using ABase::getArray;
 
   /*
   DensityOperator() : Base() {}

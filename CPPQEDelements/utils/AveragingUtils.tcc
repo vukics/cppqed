@@ -65,7 +65,7 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
 template<int RANK>
 ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
   DimensionsBookkeeper<RANK>(dim),
-  Base(label,helper(getDimensions(),offDiagonals,subsequent)),
+  Base(label,helper(this->getDimensions(),offDiagonals,subsequent)),
   offDiagonals_(offDiagonals)
 {
 }
@@ -92,9 +92,9 @@ ReducedDensityOperatorNegativity<RANK,V>::average_v(structure::NoTime t, const L
 template<int RANK, typename V>
 void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) const
 {
-  quantumdata::DensityOperator<RANK> rho(getDimensions());
+  quantumdata::DensityOperator<RANK> rho(this->getDimensions());
   linalg::CMatrix matrix(rho.matrixView()); // references the same data
-  const size_t dim=getTotalDimension();
+  const size_t dim=this->getTotalDimension();
   
   {
     int idx=0;  
@@ -134,7 +134,7 @@ template<int RANK, bool IS_TIME_DEPENDENT>
 auto
 averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::average_v(Time t, const LazyDensityOperator& matrix) const -> const Averages
 {
-  Averages res(nAvr()); res=0;
+  Averages res(this->nAvr()); res=0;
   return cpputils::concatenate( collection_ | boost::adaptors::transformed(bind(&Element::average,_1,details::convert(t),boost::cref(matrix))) , res);
 
 }

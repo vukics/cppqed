@@ -405,10 +405,10 @@ template<int NL, typename VP, typename VL, typename AveragingType> template<type
 PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const RealLevels& deltas, const VP& etas, const VL& gammas, AveragingConstructorParameters&&... a)
   : Hamiltonian(multilevel::decayingLevels(deltas,gammas),etas),
     Liouvillean(gammas),
-    Base(multilevel::filterReal(get_zSchs()),multilevel::complexFreqs(get_zSchs(),etas)),
+    Base(multilevel::filterReal(this->get_zSchs()),multilevel::complexFreqs(this->get_zSchs(),etas)),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# Schroedinger picture.\n";
+  this->getParsStream()<<"# Schroedinger picture.\n";
 }
 
 

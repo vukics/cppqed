@@ -70,7 +70,7 @@ StateVector<RANK>::addTo(DensityOperator<RANK>& rho) const
 
   const CVector& vector(vectorView());
 
-  int dim(getTotalDimension());
+  int dim(this->getTotalDimension());
 
   for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=vector(i)*conj(vector(j));
 

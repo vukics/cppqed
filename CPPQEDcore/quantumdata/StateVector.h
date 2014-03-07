@@ -65,7 +65,7 @@ public:
   typedef LazyDensityOperator<RANK> LDO_Base;
   typedef ArrayBase          <RANK>    ABase;
 
-  typedef typename LDO_Base::Dimensions         Dimensions        ;
+  typedef typename LDO_Base::Dimensions Dimensions;
 
   typedef typename ABase::ArrayLow StateVectorLow;
 
@@ -73,7 +73,7 @@ public:
 
   typedef typename LDO_Base::Idx Idx;
 
-  using LDO_Base::getTotalDimension; using ABase::vectorView; using ABase::getArray;
+  using ABase::vectorView; using ABase::getArray;
 
   /// \name Construction, assignment
   //@{

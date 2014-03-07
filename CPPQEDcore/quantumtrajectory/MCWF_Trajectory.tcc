@@ -32,7 +32,7 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
   if (const auto ha=getQSW().getHa()) {
     dpsidt=0;
 
-    ha->addContribution(t,psi,dpsidt,getT0());
+    ha->addContribution(t,psi,dpsidt,this->getT0());
     logger_.hamiltonianCalled();
   }
 }
@@ -94,7 +94,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   double t=getTime();
 
   if (const auto ex=getQSW().getEx()) {
-    ex->actWithU(getTime(),psi_.getArray(),getT0());
+    ex->actWithU(getTime(),psi_.getArray(),this->getT0());
     QuantumTrajectory::setT0(t);
   }
 
@@ -123,7 +123,7 @@ template<int RANK>
 bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStepBookkeeper* evolvedCache, bool logControl)
 {
   const double totalRate=boost::accumulate(rates,0.);
-  const double dtDid=getDtDid(), dtTry=getDtTry();
+  const double dtDid=this->getDtDid(), dtTry=getDtTry();
 
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
   if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
@@ -148,7 +148,7 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStep
 template<int RANK>
 void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, double t)
 {
-  double random=(*getRandomized())()/getDtDid();
+  double random=this->getRandomized()->operator()()/this->getDtDid();
 
   int lindbladNo=0;
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))

@@ -59,11 +59,9 @@ public:
   /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
 
-  using Adaptive::getEvolved; using Adaptive::getDtDid; using Adaptive::getTime;
-
 protected:
-  using QuantumTrajectory::getQSW; using QuantumTrajectory::getT0;
-  
+  using QuantumTrajectory::getQSW;
+
   Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
@@ -147,8 +145,6 @@ public:
 
   typedef typename Base::DensityOperator DensityOperator;
 
-  using Base::getTime; using Base::getAv;
-
   /// Templated constructor
   /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
   template<typename SYS>
@@ -158,15 +154,13 @@ public:
          bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
          const DensityOperatorLow& scaleAbs=DensityOperatorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
         )
-    : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(getAv(),negativity)
+    : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(this->getAv(),negativity)
   {}
   
-  const DensityOperator& getRho() const {return rho_;}
+  const DensityOperator& getRho() const {return this->rho_;}
 
 private:
-  using Base::rho_;
-
-  std::ostream& display_v   (std::ostream& os, int precision) const override {return doDisplay_.display   (getTime(),rho_,os,precision);}
+  std::ostream& display_v   (std::ostream& os, int precision) const override {return doDisplay_.display   (this->getTime(),this->rho_,os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const override {return doDisplay_.displayKey(os,i);}
 
   const std::string trajectoryID_v() const override {return "Master";}

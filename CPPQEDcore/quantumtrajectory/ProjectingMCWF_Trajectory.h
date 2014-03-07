@@ -32,8 +32,6 @@ private:
   typedef typename Base::StateVector    StateVector   ;
   typedef typename Base::StateVectorLow StateVectorLow;
 
-  using Base::getPsi;
-
 public:
   typedef boost::ptr_vector<StateVector> Basis; ///< The set of reference states to compare againts is stored as a \refBoostConstruct{ptr_vector,ptr_container/doc/ptr_vector.html}
 

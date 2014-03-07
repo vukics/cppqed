@@ -26,7 +26,7 @@ template<typename A>
 std::ostream& Simulated<A>::display_v(std::ostream& os, int precision) const
 {
   using namespace cpputils;
-  const A& a=getEvolved()->getA();
+  const A& a=this->getEvolved()->getA();
   for (size_t i=0; i<subscriptLimit(a); i++)
     os<<FormDouble(precision)(subscript(a,i))<<' ';
   return os;

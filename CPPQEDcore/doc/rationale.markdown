@@ -56,6 +56,8 @@ Implementation rationales {#implementationrationales}
 
 General robust style + Effective C++ + Exceptional C++
 
+* When refering to names in templatized base classes, prefer the `this->` style instead of the `using` style (cf. Item 43 in \cite meyers) – use the latter only when the name in question is needed many times (introduce the `using` declaration to the same access level as the original)
+
 * Be aware that \refStdCppConstruct{assert,cassert/assert} works only in debug mode (probably a macro switches it off in `NDEBUG`). It will not even evaluate its argument in `NDEBUG` mode!
 
 * Note that function template partial specializations are not allowed, but the same effect can almost always be achieved by function template *overloads*.

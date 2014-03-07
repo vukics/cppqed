@@ -11,8 +11,8 @@ template<int RANK>
 std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) const
 {
   if (av_) {
-    Averages averagesNow(av_->average(getTime(),getPsi()));
-    if (getTime()>relaxationTime_) {
+    Averages averagesNow(av_->average(this->getTime(),this->getPsi()));
+    if (this->getTime()>relaxationTime_) {
       averages_ = ( averages_*sum_ + averagesNow )/(sum_+1) ;
       ++sum_;
     }

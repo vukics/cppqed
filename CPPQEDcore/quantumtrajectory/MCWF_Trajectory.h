@@ -76,9 +76,6 @@ private:
 
   typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-protected:
-  using Base::getEvolved; using Base::getRandomized; using Base::getDtDid; using Base::getDtTry; using Base::getTime; using QuantumTrajectory::getT0;
-
 public:
   /// Templated constructor with the same idea as Master::Master
   /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
@@ -100,11 +97,13 @@ public:
   const mcwf::Logger& getLogger() const {return logger_;}
   //@}
   
+  using Base::getTime;
+
 protected:
+  using Base::getEvolved; using Base::getDtTry; using QuantumTrajectory::getQSW;
+
   std::ostream&    display_v(std::ostream&, int    ) const override; ///< Forwards to structure::Averaged::display
   std::ostream& displayKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::displayKey
-
-  using QuantumTrajectory::getQSW;
 
   /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes mcwf::Logger state
   cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar) override {return QuantumTrajectory::readStateMore_v(iar) & logger_;}

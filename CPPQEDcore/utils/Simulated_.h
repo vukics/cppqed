@@ -30,8 +30,6 @@ public:
 
   typedef evolved::Evolved<A> Evolved;
 
-  using Base::getEvolved;
-
   Simulated(A&, typename Evolved::Derivs, double dtInit,
             double, double,
             const A& scaleAbs=A(),
@@ -43,7 +41,7 @@ public:
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 private:
-  void step_v(double deltaT) final {getEvolved()->step(deltaT);}
+  void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}
 
   std::ostream& display_v(std::ostream&, int) const final;
   

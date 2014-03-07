@@ -45,7 +45,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 {
   drhodtLow=0;
 
-  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,getT0()));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,this->getT0()));
 
   {
     linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
@@ -70,11 +70,11 @@ template<int RANK>
 void 
 Base<RANK>::step_v(double deltaT)
 {
-  getEvolved()->step(deltaT);
+  this->getEvolved()->step(deltaT);
   if (const auto ex=getQSW().getEx()) {
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_.getArray());
-    UnaryFunction functionEx(bind(&Exact::actWithU,ex,getTime(),_1,getT0()));
+    UnaryFunction functionEx(bind(&Exact::actWithU,ex,this->getTime(),_1,this->getT0()));
     unaryIter(rhoLow,functionEx);
     // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);

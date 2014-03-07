@@ -56,8 +56,8 @@ std::ostream&
 quantumtrajectory::ensemble::Base<RANK>::logOnEnd_v(std::ostream& os) const
 {
   LoggerList loggerList;
-  for (typename Trajectories::const_iterator i=getTrajectories().begin(); i!=getTrajectories().end(); ++i)
-    if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&(*i)))
+  for (auto& i : this->getTrajectories())
+    if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&i))
       loggerList.push_back(traj->getLogger());
   
   return displayLog(os,loggerList,nBins_,nJumpsPerBin_);

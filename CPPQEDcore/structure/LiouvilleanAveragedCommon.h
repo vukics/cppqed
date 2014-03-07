@@ -92,9 +92,6 @@ public:
 
   virtual ~LiouvilleanAveragedCommonRanked() {}
 
-  
-  using LiouvilleanAveragedCommon::nAvr;
-  
   /// Calculates quantum averages & checks post-conditions
   /**
    * \warning The elements of the returned array must have a linear dependence on `matrix`, in particular, they must be of the form \f$\Tr{\Ob_m\rho},\f$

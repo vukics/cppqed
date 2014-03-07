@@ -51,7 +51,7 @@ ProjectingMCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) cons
 {
   using namespace formdouble;
 
-  const StateVector& psi=getPsi();
+  const StateVector& psi=this->getPsi();
   const FormDouble fd(precision);
   
   Base::display_v(os,precision);

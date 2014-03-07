@@ -39,8 +39,6 @@ class TimeAveragingMCWF_Trajectory : public MCWF_Trajectory<RANK>
 private:
   typedef MCWF_Trajectory<RANK> Base;
   
-  using Base::getQSW; using Base::getDtDid; using Base::getTime; using Base::getPsi;
-  
 public:
   typedef typename Base::StateVector    StateVector   ;
   typedef typename Base::StateVectorLow StateVectorLow;
@@ -58,7 +56,7 @@ public:
                                double relaxationTime, ///< relaxation time after which the time averaging starts
                                const StateVectorLow& scaleAbs=StateVectorLow()
                                )
-    : Base(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(getQSW().template nAvr<structure::LA_Av>()), sum_(0), av_(getQSW().getAv())
+    : Base(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(this->getQSW().template nAvr<structure::LA_Av>()), sum_(0), av_(this->getQSW().getAv())
     {
       averages_=0.;
     }

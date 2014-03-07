@@ -30,8 +30,6 @@ public:
   
   ReducedDensityOperator(const std::string&, const Dimensions&, bool offDiagonals=false, const KeyLabels& =KeyLabels());
 
-  using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension; using Base::nAvr;
-  
 private:
   static const KeyLabels helper(const Dimensions&, bool offDiagonals, const KeyLabels&);
 
@@ -54,8 +52,6 @@ public:
   typedef typename Base::Dimensions Dimensions;
   typedef typename Base::Averages Averages;
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
-  
-  using Base::getDimensions; using Base::getTotalDimension;
   
   ReducedDensityOperatorNegativity(const std::string& label, const Dimensions& dim)
     : Base(label,dim,true,boost::assign::list_of("negativity")) {}
@@ -92,8 +88,6 @@ public:
 
 private:
   Base*const do_clone() const {return new Collecting(*this);}
-
-  using Base::nAvr; using Base::getLabels;
 
   const Averages average_v(Time, const LazyDensityOperator&) const;
 

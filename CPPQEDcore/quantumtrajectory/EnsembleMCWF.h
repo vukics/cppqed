@@ -63,8 +63,6 @@ protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
-  using Ensemble::getTrajectories;
-  
   std::ostream& logOnEnd_v(std::ostream& os) const final;
   
   // static helpers to constructor
@@ -121,8 +119,6 @@ public:
   typedef typename Base      ::    StateVector     StateVector;
   typedef typename DO_Display::DensityOperator DensityOperator;
 
-  using Base::getQS; using Base::getTime; using Base::toBeAveraged;
-
   /// Templated constructor with the same idea as Master::Master
   /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
   template<typename SYS>
@@ -133,10 +129,10 @@ public:
                bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
                const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
                )
-    : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(getQS()),negativity) {}
+    : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (getTime(),toBeAveraged(),os,precision);}
+  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->toBeAveraged(),os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;

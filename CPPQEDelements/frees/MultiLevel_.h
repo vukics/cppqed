@@ -303,9 +303,6 @@ public:
 
   typedef typename Base::Ptr Ptr;
 
-  using Hamiltonian::get_zSchs;
-  using Base::getParsStream;
-
   template<typename... AveragingConstructorParameters>
   PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, AveragingConstructorParameters&&...);
 

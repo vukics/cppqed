@@ -34,8 +34,6 @@ private:
 public:
   typedef typename Base::Dimensions Dimensions;
 
-  using Base::getDimensions;
-
   explicit QuantumSystem(const Dimensions& dimensions) : Base(dimensions) {} ///< Construction from a set of Dimensions
 
   virtual ~QuantumSystem() {}

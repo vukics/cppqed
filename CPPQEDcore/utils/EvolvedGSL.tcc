@@ -42,12 +42,10 @@ public:
 
   typedef typename Base::Derivs Derivs;
 
-  using Base::getA; using Base::getTime; using Base::getDtTry;
-
   /** \see MakerGSL::MakerGSL() for an explanation of the role of `nextDtTryCorrectionFactor` */
   _(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorrectionFactor)
     : Base(a,derivs,dtInit,epsRel,epsAbs),
-      pImpl_(details::createImpl(this,cpputils::size(getA()),auxFunction,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
+      pImpl_(details::createImpl(this,cpputils::size(this->getA()),auxFunction,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
       sf_(sf),
       nextDtTryCorrectionFactor_(nextDtTryCorrectionFactor)
   {
@@ -75,11 +73,11 @@ private:
   void step_v(double deltaT)
   {
     double
-      time=getTime(),
-      dtTry=getDtTry(),
+      time=this->getTime(),
+      dtTry=this->getDtTry(),
       nextDtTry=( fabs(deltaT)<fabs(dtTry/nextDtTryCorrectionFactor_) ? dtTry : 0. );
 
-    apply(pImpl_,&time,time+deltaT,&dtTry,cpputils::data(getA()));
+    apply(pImpl_,&time,time+deltaT,&dtTry,cpputils::data(this->getA()));
 
     Base::update(time, nextDtTry ? nextDtTry/nextDtTryCorrectionFactor_ : dtTry );
 
