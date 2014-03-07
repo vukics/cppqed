@@ -64,6 +64,18 @@ object py_evolve(quantumdata::StateVector<RANK>& psi,
   return object();
 }
 
+template<int RANK>
+object py_evolve(const numeric::array &array,
+                 typename structure::QuantumSystem<RANK>::Ptr sys,
+                 const evolution::Pars &p)
+{
+  CArray<RANK> a;
+  a.resize(numeric_shape<RANK>(array));
+  a = numpyToArray<dcomp,RANK>(array);
+  StateVector<RANK> psi(a,quantumdata::ByReference());
+  return py_evolve(psi,sys,p);
+}
+
 
 void export_25_Evolution()
 {

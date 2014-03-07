@@ -11,7 +11,7 @@
 
 namespace pythonext {
 
-const PyArrayObject * numeric_np(const boost::python::numeric::array &arr);
+const PyArrayObject * numeric_np(const boost::python::numeric::array &arr, size_t rank=0);
 
 } //pythonext
 

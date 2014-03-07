@@ -124,14 +124,16 @@ void write(str filename, const numeric::array &array, double time)
   std::ofstream ofs(f.c_str(),std::ios_base::binary|std::ios_base::trunc);
   throw_file(ofs,f);
 
-  int r=PyArray_NDIM(numeric_np(array));
+  const PyArrayObject * np_array = numeric_np(array);
+
+  int r=PyArray_NDIM(np_array);
   throw_rank(r);
   switch (r) {
     #define BOOST_PP_LOCAL_MACRO(n)                 \
       case n:                                       \
-        if(PyArray_TYPE(numeric_np(array))==NPY_DOUBLE)  \
+        if(PyArray_TYPE(np_array)==NPY_DOUBLE)  \
           doWrite<DArray<n>,double,n>(&ofs,array,time);  \
-        if(PyArray_TYPE(numeric_np(array))==NPY_CDOUBLE) \
+        if(PyArray_TYPE(np_array)==NPY_CDOUBLE) \
           doWrite<CArray<n>,dcomp,n>(&ofs,array,time);   \
         break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
