@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
   // psi(qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff));
   psi.renorm();
 
-  evolve<0>(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);
+  evolve(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);
 
 
 

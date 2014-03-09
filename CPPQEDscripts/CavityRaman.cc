@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
   MLJC<NL,Couplings> mljc(multilevel::makePumpedLossySch(pml,"Lambda atom"),mode,pmljc);
 
-  evolve<0>(psi,binary::make(mljc),pe);
+  evolve(psi,binary::make(mljc),pe);
 
 
 
