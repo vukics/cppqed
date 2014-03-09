@@ -8,6 +8,7 @@
 #include "MCWF_Trajectory.h"
 #include "DensityOperator.h"
 
+#include "Conversions.h"
 #include "SmartPtr.h"
 
 

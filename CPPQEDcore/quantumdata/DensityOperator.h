@@ -56,6 +56,8 @@ class DensityOperator
     private linalg::VectorSpace<DensityOperator<RANK> >
 {
 public:
+  static const int N_RANK=RANK;
+
   typedef LazyDensityOperator<  RANK> LDO_Base;
   typedef ArrayBase          <2*RANK>    ABase;
 

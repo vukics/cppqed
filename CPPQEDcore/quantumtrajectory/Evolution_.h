@@ -5,6 +5,7 @@
 #include "Evolution_Fwd.h"
 
 #include "LazyDensityOperator.h"
+#include "DensityOperatorFwd.h"
 #include "StateVectorFwd.h"
 #include "MCWF_TrajectoryFwd.h"
 #include "ParsMCWF_Trajectory.h"
@@ -61,7 +62,7 @@ const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVecto
 } // evolution
 
 
-/// The prototype function to evolve a quantumtrajectory from a pure state-vector initial condition
+/// The prototype function to evolve a quantumtrajectory from a pure StateVector initial condition
 /**
  * Basically a dispatcher invoking trajectory::run, with the difference that it also creates and stores the necessary \link #quantumtrajectory quantum trajectory\endlink
  * 
@@ -81,65 +82,34 @@ evolve(quantumdata::StateVector<RANK>& psi, ///<[in/out] pure state-vector initi
        );
 
 
-/** \cond SPECIALIZATION */
-/// Same as the above, but without entanglement-calculation (`V=tmptools::V_Empty`)
-template<int RANK>
-inline
-const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(quantumdata::StateVector<RANK>& psi,
-       typename structure::QuantumSystem<RANK>::Ptr sys,
-       const evolution::Pars& p)
-{
-  return evolve<tmptools::V_Empty>(psi,sys,p);
-}
-/** \endcond */
-
-
-/// \overload
+/// The prototype function to evolve a Master trajectory from a DensityOperator initial condition
 template<typename V, int RANK>
-inline
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(quantumdata::StateVector<RANK>& psi,
-       const structure::QuantumSystem<RANK>& sys,
-       const evolution::Pars& p)
-{
-  return evolve<V>(psi,cpputils::sharedPointerize(sys),p);
-}
-
-
-/** \cond SPECIALIZATION */
-/// Same as the above, but withou entanglement-calculation (`V=tmptools::V_Empty`)
-template<int RANK>
-inline
-const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(quantumdata::StateVector<RANK>& psi,
-       const structure::QuantumSystem<RANK>& sys,
-       const evolution::Pars& p)
-{
-  return evolve<tmptools::V_Empty>(psi,cpputils::sharedPointerize(sys),p);
-}
-/** \endcond */
+evolve(quantumdata::DensityOperator<RANK>& rho, ///<[in/out] density operator initial condition
+       typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
+       const evolution::Pars& p ///<[in] parameters of the evolution
+       );
 
 
 /// \overload
 /**
- * Added only for the syntactic sugar of being able to write
- * 
+ * Adds also the syntactic sugar of being able to write
+ *
  *     evolve<2,0,4>(psi,sys,p)
- * 
+ *
  * instead of
- * 
+ *
  *     evolve<tmptools::Vector<2,0,4> >(psi,sys,p)
- * 
+ *
  */
-template<int V0, int... V_REST, typename SV, typename SYS>
+template<int... V, typename SV_OR_DO, typename SYS>
 inline
-const typename quantumdata::LazyDensityOperator<SV::N_RANK>::Ptr
-evolve(SV& psi,
+const typename quantumdata::LazyDensityOperator<SV_OR_DO::N_RANK>::Ptr
+evolve(SV_OR_DO& initial,
        const SYS& sys,
        const evolution::Pars& p)
 {
-  return evolve<tmptools::Vector<V0,V_REST...> >(psi,sys,p);
+  return evolve<tmptools::Vector<V...> >(initial,cpputils::sharedPointerize(sys),p);
 }
 
 

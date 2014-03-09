@@ -4,18 +4,33 @@
 
 #include "Evolution_.h"
 
-#include "DO_Display.tcc"
-#include "EnsembleMCWF.h"
-#include "Master.h"
+#include "EnsembleMCWF.tcc"
+#include "Master.tcc"
 #include "TimeAveragingMCWF_Trajectory.tcc"
 
 #include "Trajectory.tcc"
 
 #include <boost/make_shared.hpp>
 
-#include <iostream>
-#include <string>
 
+template<typename V, int RANK>
+const typename quantumdata::LazyDensityOperator<RANK>::Ptr
+evolve(quantumdata::DensityOperator<RANK>& rho,
+       typename structure::QuantumSystem<RANK>::Ptr sys,
+       const evolution::Pars& pe)
+{
+  if (pe.evol==evolution::MASTER_FAST) {
+    Master<RANK,V,true> traj(rho,sys,pe,pe.negativity);
+    trajectory::run(traj,pe);
+  }
+  else {
+    Master<RANK,V> traj(rho,sys,pe,pe.negativity);
+    trajectory::run(traj,pe);
+  }
+
+  return boost::make_shared<quantumdata::DensityOperator<RANK> >(rho); // deep copy
+
+}
 
 
 template<typename V, int RANK>
@@ -24,71 +39,26 @@ evolve(quantumdata::StateVector<RANK>& psi,
        typename structure::QuantumSystem<RANK>::Ptr sys,
        const evolution::Pars& pe)
 {
-  using namespace std; using namespace evolution;
-
   typedef quantumdata::StateVector    <RANK> SV;
   typedef quantumdata::DensityOperator<RANK> DO;
 
-  switch (pe.evol) {
-
-
-  case SINGLE: {
-
+  if      (pe.evol==evolution::SINGLE) {
     trajectory::run(*makeMCWF(psi,sys,pe),pe);
-
-    const SV psi_res(psi); // deep copy
-
-    return boost::make_shared<SV>(psi_res);
-
+    return boost::make_shared<SV>(psi); // deep copy
   }
-
-
-  case ENSEMBLE: {
-
-    EnsembleMCWF<RANK,V>
-      traj(psi,sys,pe,pe.negativity);
-
+  else if (pe.evol==evolution::ENSEMBLE) {
+    EnsembleMCWF<RANK,V> traj(psi,sys,pe,pe.negativity);
     trajectory::run(traj,pe);
-
-    const DO rho(traj.toBeAveraged()); // deep copy
-    return boost::make_shared<DO>(rho);
-
+    return boost::make_shared<DO>(traj.toBeAveraged()); // deep copy
   }
-
-
-  case MASTER: {
-
+  else {
     DO rho(psi);
-
-    Master<RANK,V>
-      traj(rho,sys,pe,pe.negativity);
-
-    trajectory::run(traj,pe);
-
-    return boost::make_shared<DO>(rho);
-
+    return evolve<V>(rho,sys,pe);
   }
 
-
-  case MASTER_FAST: {
-
-    DO rho(psi);
-
-    Master<RANK,V,true>
-      traj(rho,sys,pe,pe.negativity);
-
-    trajectory::run(traj,pe);
-
-    return boost::make_shared<DO>(rho);
-
-  }
-
-  }
-  return typename quantumdata::LazyDensityOperator<RANK>::Ptr();
 }
 
 
-// For some reason, this does not compile:
 template<int RANK, typename SYS>
 const boost::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const evolution::Pars& pe)
 {

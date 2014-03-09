@@ -4,6 +4,7 @@
 
 #include "EnsembleMCWF.h"
 
+#include "DO_Display.tcc"
 #include "MCWF_Trajectory.tcc"
 #include "ParsMCWF_Trajectory.h"
 
