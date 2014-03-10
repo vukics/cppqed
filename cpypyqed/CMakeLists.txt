@@ -144,7 +144,7 @@ macro(python_submodule modulename)
 
   configure_file(${PROJECT_SOURCE_DIR}/helpers/build_module.cc.in build${modulename}.cc @ONLY)
 
-  add_library(${modulename} SHARED build${modulename}.cc ${PY_SOURCE_FILES} $<TARGET_OBJECTS:utils_obj> ${ARGN})
+  add_library(${modulename} SHARED build${modulename}.cc ${PY_SOURCE_FILES} ${ARGN})
   add_dependencies(${modulename} cpypyqed_setup)
   python_cppmodule(${modulename})
 
@@ -159,9 +159,6 @@ endmacro()
 
 include_directories(include)
 include_directories(${PROJECT_BINARY_DIR})
-
-add_library(utils_obj OBJECT utils/utils.cc)
-set_target_properties(utils_obj PROPERTIES POSITION_INDEPENDENT_CODE On)
 
 add_custom_target(cpypyqed_setup)
 

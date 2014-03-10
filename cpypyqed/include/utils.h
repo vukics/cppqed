@@ -7,11 +7,23 @@
 
 #include "PythonExtension.h"
 
-#include <numpy/ndarrayobject.h>
+#include <numpy/arrayobject.h>
 
 namespace pythonext {
 
-const PyArrayObject * numeric_np(const boost::python::numeric::array &arr, size_t rank=0);
+inline const PyArrayObject * numeric_np(const boost::python::numeric::array &arr, size_t rank=0)
+{
+  if(!PyArray_Check(arr.ptr())){
+    PyErr_SetString(PyExc_ValueError, "expected a PyArrayObject");
+    boost::python::throw_error_already_set();
+  }
+  PyArrayObject *result = reinterpret_cast<PyArrayObject *>(arr.ptr()); // cannot be const because of NPY API weirdness
+  if(rank && rank!=PyArray_NDIM(result)) {
+    PyErr_SetString(PyExc_RuntimeError, (std::string("Expected an array with rank ")+boost::lexical_cast<std::string>(rank)).c_str());
+    boost::python::throw_error_already_set();
+  }
+  return result;
+}
 
 } //pythonext
 

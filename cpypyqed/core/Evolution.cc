@@ -1,7 +1,6 @@
 // -*- C++ -*-
 
-#include "PythonExtension.h"
-#include "Namespaces.h"
+#include "Core.h"
 #include "blitz2numpy.tcc"
 #include "utils.h"
 
@@ -79,8 +78,6 @@ object py_evolve(const numeric::array &array,
 
 void export_25_Evolution()
 {
-  import_array();
-  numeric::array::set_module_and_type("numpy", "ndarray");
   {
     scope namespaceScope = evolutionNameSpace;
     enum_<Method>("Method", "Wrapper of :core:`evolution::Method`")
