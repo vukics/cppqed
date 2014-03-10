@@ -86,11 +86,7 @@ BOOST_STATIC_ASSERT((
 
 
 
-namespace tmptools {
-
-template struct pair_c<23,23,false>;
-
-} // tmptools
+template struct tmptools::pair_c<23,23,false>;
 
 template struct P_23_42::SanityCheck<21,45>;
 
