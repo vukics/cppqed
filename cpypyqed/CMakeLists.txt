@@ -202,7 +202,8 @@ add_custom_command(TARGET cpypyqed_setup PRE_BUILD
 
 set(INPUTS "__init__.py" "compilation/cpypyqed_config.py" "compilation/ActTemplate.cc"
            "compilation/CompositeTemplate.cc" "compilation/composite.py" "compilation/ondemand.py"
-           "compilation/__init__.py" "compilation/CMakeListsTemplate.txt")
+           "compilation/__init__.py" "compilation/CMakeListsTemplate.txt" "pycppqed/__init__.py"
+           "pycppqed/statevector.py" "pycppqed/expvalues.py" "pycppqed/utils.py")
 
 foreach(file ${INPUTS})
   add_custom_command(TARGET cpypyqed PRE_BUILD
