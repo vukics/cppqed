@@ -28,3 +28,4 @@ jc=jaynescummings.make(q,m,pjc)
 psi = (qbit.init(pq)**mode.init(pm)).normalize()
 
 evolve(psi, binary.make(jc), pe)
+

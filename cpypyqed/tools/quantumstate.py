@@ -17,7 +17,41 @@ try:
 except NameError:
     from sets import Set as set
 
-class StateVector(numpy.ndarray):
+class QuantumState(numpy.ndarray):
+  def __new__(cls, data, time=None,**kwargs):
+    array = numpy.array(data, **kwargs)
+    array = numpy.asarray(array).view(cls)
+    if time is not None:
+        array.time = time
+    elif hasattr(data, "time"):
+        array.time = data.time
+    return array
+  def __array_finalize__(self, obj):
+    self.time = getattr(obj, "time", 0)
+
+  def __str__(self):
+    return numpy.ndarray.__str__(numpy.asarray(self))
+
+  def __repr__(self):
+    return numpy.ndarray.__repr__(numpy.asarray(self))
+
+  def __unicode__(self):
+    return numpy.ndarray.__unicode__(numpy.asarray(self))
+
+class DensityOperator(QuantumState):
+  def __new__(cls, data, **kwargs):
+    array = QuantumState(data, **kwargs)
+    array = numpy.asarray(array).view(cls)
+    return array
+
+  def __array_finalize__(self, obj):
+    ndim=len(obj.shape)
+    if not ndim % 2 == 0:
+      raise ValueError("The number of dimension must be even for a density operator.")
+    self.dimensions = obj.shape[:ndim/2]
+    self.time = getattr(obj, "time", 0)
+
+class StateVector(QuantumState):
     r"""
     A class representing a quantum mechanical state vector in a specific basis.
 
@@ -53,7 +87,7 @@ class StateVector(numpy.ndarray):
 
         >>> sv1 = StateVector((1,2,3))
         >>> sv2 = StateVector((3,4,0), norm=True)
-        >>> sv = sv1 ^ sv2
+        >>> sv = sv1 ** sv2
         >>> print sv
         StateVector(3 x 3)
         >>> print repr(sv)
@@ -61,26 +95,19 @@ class StateVector(numpy.ndarray):
                [ 1.2,  1.6,  0. ],
                [ 1.8,  2.4,  0. ]])
 
-    The tensor product is abbreviated by the "^" operator. But be aware that
-    this operator follows the built-in operator precedence - that means "+",
-    "*" etc. have **higher** precedence!
+    The tensor product is abbreviated by the "**" operator.
     """
-    def __new__(cls, data, time=None, norm=False, basis=None, **kwargs):
-        array = numpy.array(data, **kwargs)
+    def __new__(cls, data, norm=False, basis=None, **kwargs):
+        array = QuantumState(data, **kwargs)
         if norm:
             array = normalize(array)
         array = numpy.asarray(array).view(cls)
-        if time is not None:
-            array.time = time
-        elif hasattr(data, "time"):
-            array.time = data.time
         if basis is not None:
             array.basis = basis
         return array
 
     def __array_finalize__(self, obj):
         self.dimensions = obj.shape
-        self.time = getattr(obj, "time", 0)
         self.basis = getattr(obj, "basis", None)
 
     def __str__(self):
@@ -135,7 +162,7 @@ class StateVector(numpy.ndarray):
             >>> sv2 = StateVector((1,2,3), norm=True)
             >>> sv3 = StateVector((1,2,3,4,5), norm=True)
             >>> sv4 = StateVector((1,2,3,4,5,6), norm=True)
-            >>> sv = sv1^sv2^sv3^sv4
+            >>> sv = sv1**sv2**sv3**sv4
             >>> print sv
             StateVector(2 x 3 x 5 x 6)
             >>> print sv.reduce((2,3))
@@ -173,7 +200,7 @@ class StateVector(numpy.ndarray):
         *Usage*
             >>> sv1 = StateVector((0,1,2,1,0), norm=True)
             >>> sv2 = StateVector((1,0,1), norm=True)
-            >>> sv = sv1^sv2
+            >>> sv = sv1**sv2
             >>> sqtensor = sv.reducesquare(1)
 
         *Arguments*
@@ -283,7 +310,7 @@ class StateVector(numpy.ndarray):
         if indices is not None:
             A = self.reducesquare(_conjugate_indices(indices, self.ndim))
         else:
-            A = self^self.conjugate()
+            A = self**self.conjugate()
         length = A.ndim
         index = range(0, length, 2) + range(1, length, 2)
         if multi:
@@ -363,10 +390,8 @@ class StateVector(numpy.ndarray):
             * *array*
                 Some kind of array (E.g. StateVector, numpy.array, list, ...).
 
-        As abbreviation ``sv1^sv2`` can be written instead of
-        ``sv1.outer(sv2)``. But be aware that the operator precedence of ``^``
-        follows the python rules - that means ``sv1 ^ sv2 + sv3`` is the same
-        as ``sv1 ^ (sv2 + sv3)``.
+        As abbreviation ``sv1**sv2`` can be written instead of
+        ``sv1.outer(sv2)``.
         """
         return StateVector(numpy.multiply.outer(self, array))
 
