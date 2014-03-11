@@ -83,8 +83,6 @@ set_property(CACHE PYTHON_MAX_RANK PROPERTY STRINGS 2 4 6 8 10)
 set(CPYPYQED_INSTALL_PATH_RELEASE ${PYTHON_MODULES_PATH}/cpypyqed)
 set(CPYPYQED_INSTALL_PATH_DEBUG ${PYTHON_MODULES_PATH}/cpypyqed_d)
 
-configure_file(${PROJECT_SOURCE_DIR}/helpers/config.h.in ${PROJECT_BINARY_DIR}/cpypyqed_config.h @ONLY)
-
 #! \file
 #! <!--#########################################################-->
 #! ### Helper macros
@@ -162,6 +160,7 @@ macro(python_submodule modulename)
   configure_file(${PROJECT_SOURCE_DIR}/helpers/build_module.cc.in build${modulename}.cc @ONLY)
 
   add_library(${modulename} SHARED build${modulename}.cc ${PY_SOURCE_FILES} ${ARGN})
+  add_dependencies(${modulename} cpypyqed_setup)
   python_cppmodule(${modulename})
 
 endmacro()
@@ -176,6 +175,8 @@ endmacro()
 include_directories(include)
 include_directories(${PROJECT_BINARY_DIR})
 
+add_custom_target(cpypyqed_setup)
+
 if(ENABLE_PYTHON_IO)
   add_subdirectory(io)
 endif()
@@ -184,6 +185,15 @@ add_subdirectory(elements)
 
 add_custom_target(cpypyqed ALL)
 add_dependencies(cpypyqed io core elements)
+
+add_custom_command(TARGET cpypyqed_setup PRE_BUILD
+    COMMAND ${CMAKE_COMMAND}
+      -DINPUT=${PROJECT_SOURCE_DIR}/helpers/config.h.in
+      -DOUTPUT=cpypyqed_config.h
+      -DDEBUG_SUFFIX="$<$<CONFIG:Debug>:_d>"
+      -DPYTHON_MAX_RANK=${PYTHON_MAX_RANK}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
+  )
 
 #! \file
 #! <!--#########################################################-->
