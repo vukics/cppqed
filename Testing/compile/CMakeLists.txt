@@ -18,6 +18,6 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
 declaretest(test_TMP_ToolsCompile)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=CompileTarget --script=TMP_ToolsCompile)
-declaretest(test_BlitzArraySliceIteratorTMP_Compile)
-add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=CompileTarget --script=BlitzArraySliceIteratorTMP_Compile)
+#declaretest(test_BlitzArraySliceIteratorTMP_Compile)
+#add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+#            --test=${TESTNAME} --testclass=CompileTarget --script=BlitzArraySliceIteratorTMP_Compile)
