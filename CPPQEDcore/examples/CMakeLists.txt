@@ -10,3 +10,12 @@ add_executable(CoherentElementTest CoherentElementTest.cc)
 target_link_libraries(CoherentElementTest ${CPPQED_LIBRARIES})
 
 add_library(ExampleObjects OBJECT cpcPaperExamples.cc)
+
+foreach(target ExampleModeMain HarmonicOscillatorComplex CoherentElementTest ExampleObjects)
+  if(BUNDLED_BLITZ)
+    add_dependencies(${target} cppqed-blitz)
+  endif()
+  if(BUNDLED_FLENS)
+    add_dependencies(${target} flens)
+  endif()
+endforeach()
