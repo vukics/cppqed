@@ -398,7 +398,7 @@ class StateVector(QuantumState):
     def __pow__(self, other):
       if type(other)==type(self):
         return self.outer(other)
-      else:
+      elif type(other)==int:
         return numpy.ndarray.__pow__(self,other)
 
 
