@@ -37,6 +37,80 @@ set(CPPQED_MONOLITHIC 1)
 
 #! \file
 #! <!--#########################################################-->
+#! ### Compilation of dependencies
+#! <!--#########################################################-->
+#!
+#! This is a convenience feature to download and compile some selected
+#! dependencies automatically. It uses %CMake's
+#! [ExternalProject](http://www.cmake.org/cmake/help/v2.8.12/cmake.html#module:ExternalProject).
+#!
+#! We use a trick to install the bundled libraries. If the bundled version of a library is used,
+#! we link it privately (\ref CMake::PRIVATE_LIBS instead of \ref CMake::PUBLIC_LIBS). Then
+#! we add the library manually to `CPPQED_LIBRARIES` in CPPQEDConfig.cmake.in, with the correct
+#! location for the build tree and installed tree, respectively.
+
+#! If this option is set, %CMake downloads and compiles the blitz++ dependency automatically.
+option(BUNDLED_BLITZ "Download and compile blitz++ automatically" Off)
+
+if(BUNDLED_BLITZ)
+  include(ExternalProject)
+
+  find_package(Boost QUIET COMPONENTS serialization)
+  if(Boost_SERIALIZATION_FOUND)
+    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-serialization)
+    set(blitz_SERIALIZATION_FOUND On)
+  endif()
+
+  if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
+    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-64bit)
+  else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
+    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8)
+  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+
+  ExternalProject_Add(
+    cppqed-blitz
+    HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
+    UPDATE_COMMAND ""
+    PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
+    CONFIGURE_COMMAND autoreconf -fiv <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure ${BLITZ_CONFIG_OPTIONS} --enable-shared --prefix=<INSTALL_DIR> --with-pic
+    BUILD_COMMAND make lib
+  )
+  ExternalProject_Get_Property(cppqed-blitz install_dir)
+  set(blitz_INCLUDE_DIRS ${install_dir}/include)
+  set(blitz_LIBRARIES ${install_dir}/lib/libblitzcppqed.so)
+  set(BUNDLED_BLITZ_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libblitzcppqed.so)
+  set(blitz_FOUND 1)
+endif()
+
+#! If this option is set, %CMake downloads and compiles the optional FLENS dependency automatically.
+option(BUNDLED_FLENS "Download and compile FLENS automatically" Off)
+
+if(BUNDLED_FLENS)
+  include(ExternalProject)
+  find_package(LAPACK REQUIRED)
+  string (REPLACE ";" " " LAPACK_LIBRARIES_STRING "${LAPACK_LIBRARIES}")
+  configure_file(${CMAKE_SOURCE_DIR}/misc/flens-make.sh.in flens-make.sh @ONLY)
+  ExternalProject_Add(
+    flens
+    CVS_REPOSITORY :pserver:anonymous:@flens.cvs.sourceforge.net:/cvsroot/flens
+    CVS_MODULE FLENS-lite
+    UPDATE_COMMAND ""
+    BUILD_IN_SOURCE 1
+    PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/flens-cvs-20131115.patch
+          COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/flens_rename_library.patch
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/config.ubuntu <SOURCE_DIR>/config
+    BUILD_COMMAND ${CMAKE_BINARY_DIR}/flens-make.sh <INSTALL_DIR>
+    INSTALL_COMMAND make install PREFIX=<INSTALL_DIR>
+  )
+  ExternalProject_Get_Property(flens install_dir)
+  set(flens_INCLUDE_DIRS ${install_dir}/include)
+  set(flens_LIBRARIES ${install_dir}/lib/libflenscppqed.so)
+  set(BUNDLED_FLENS_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libflenscppqed.so)
+  set(flens_FOUND 1)
+endif()
+
+#! \file
+#! <!--#########################################################-->
 #! ### Compilation of the components
 #! <!--#########################################################-->
 #!
@@ -59,14 +133,15 @@ set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 
 #! This %CMake option determines if the Python modules should be compiled.
 option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
-find_package(Boost QUIET COMPONENTS python)
 find_package(PythonInterp QUIET 2.7 REQUIRED)
 find_package(PythonLibs QUIET 2.7 REQUIRED)
 find_package(Numpy REQUIRED)
-if(Boost_PYTHON_FOUND AND PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND NUMPY_FOUND AND COMPILE_CPYPYQED)
-  set(ENABLE_CPYPYQED 1)
-  add_subdirectory(cpypyqed)
+find_package(Boost QUIET COMPONENTS python)
+if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND NUMPY_FOUND AND Boost_PYTHON_FOUND AND COMPILE_CPYPYQED)
+  set(ENABLE_CPYPYQED "On")
 endif()
+add_subdirectory(cpypyqed)
+
 
 #! \brief This %CMake option determines if the scripts should be compiled as part
 #!    of the monolithic build.
@@ -87,6 +162,37 @@ add_subdirectory(CustomScriptsExample EXCLUDE_FROM_ALL)
 add_custom_target(clean-customscripts
                     COMMAND ${CMAKE_BUILD_TOOL} clean
                     WORKING_DIRECTORY ${scripts_custom_example_BINARY_DIR})
+
+#! \file
+#! <!--#########################################################-->
+#! ### Installation of dependencies
+#! <!--#########################################################-->
+#!
+#! If blitz and flens are compiled as external projects, install them as well. Libraries
+#! and header files are installed into the same locations as CPPQEDcore, this way it is
+#! ensured they are found.
+
+set(BUNDLED_HEADERS "${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_DIR}/bundled")
+
+if(BUNDLED_BLITZ)
+  ExternalProject_Get_Property(cppqed-blitz install_dir)
+  file(GLOB blitz_libs ${install_dir}/lib/*.so*)
+  install(FILES ${blitz_libs}
+          PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+          DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(DIRECTORY ${install_dir}/include/blitz ${install_dir}/include/random
+          DESTINATION ${BUNDLED_HEADERS})
+endif()
+
+if(BUNDLED_FLENS)
+  ExternalProject_Get_Property(flens install_dir)
+  file(GLOB flens_libs ${install_dir}/lib/*.so*)
+  install(FILES ${flens_libs}
+          PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+          DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(DIRECTORY ${install_dir}/include/flens
+          DESTINATION ${BUNDLED_HEADERS})
+endif()
 
 #! \file
 #! <!--#########################################################-->

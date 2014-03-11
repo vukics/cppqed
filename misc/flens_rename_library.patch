@@ -1,0 +1,24 @@
+diff -ruN flens/flens/Makefile flens.patched/flens/Makefile
+--- flens/flens/Makefile	2014-03-02 15:20:45.553299530 +0100
++++ flens.patched/flens/Makefile	2014-03-02 15:20:31.660020381 +0100
+@@ -4,7 +4,7 @@
+ 
+ include ../Makefile.common
+ 
+-DYLIB   = libflens.$(DYLIB_EXT)
++DYLIB   = libflenscppqed.$(DYLIB_EXT)
+ DYLIBMAJOR = $(DYLIB).$(MAJORVERSION)
+ DYLIBFULL = $(DYLIB).$(MAJORVERSION).$(MINORVERSION)
+ LDEXTRAFLAGS = -Wl,-soname,$(DYLIBMAJOR)
+diff -ruN flens/Makefile flens.patched/Makefile
+--- flens/Makefile	2014-03-02 15:25:28.785528254 +0100
++++ flens.patched/Makefile	2014-03-02 15:25:14.775582893 +0100
+@@ -19,7 +19,7 @@
+ install:
+ 	$(MKDIR) $(PREFIX)/lib
+ 	$(MKDIR) $(PREFIX)/include/flens/
+-	cp -d libflens.$(DYLIB_EXT)* $(PREFIX)/lib
++	cp -d libflenscppqed.$(DYLIB_EXT)* $(PREFIX)/lib
+ 	cp flens/*.h flens/*.tcc $(PREFIX)/include/flens/
+ 
+ uninstall:

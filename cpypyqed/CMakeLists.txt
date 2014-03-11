@@ -11,6 +11,10 @@ project(cpypyqed)
 
 include(FeatureSummary)
 
+if(CPPQED_MONOLITHIC AND NOT ENABLE_CPYPYQED)
+  return()
+endif()
+
 #! \file
 #! <!--#########################################################-->
 #! ### Dependencies
@@ -157,9 +161,7 @@ include_directories(${PROJECT_BINARY_DIR})
 
 add_custom_target(cpypyqed_setup)
 
-if(ENABLE_PYTHON_IO)
-  add_subdirectory(io)
-endif()
+add_subdirectory(io)
 add_subdirectory(core)
 add_subdirectory(elements)
 

@@ -67,7 +67,7 @@ endif()
 #! This has the effect that the library can only be used with the exact corresponding
 #! build configurations. If for example a project with debug configuration tries to link against
 #! the core library in release configuration, this will be an error at link time.
-set(CPPQED_LIBRARIES "@CPPQEDLIB@")
+set(CPPQED_LIBRARIES "@CPPQEDLIB@" @PACKAGE_CONF_SPECIAL_LIBRARIES@)
 set_target_properties(@CPPQEDLIB@ PROPERTIES MAP_IMPORTED_CONFIG_DEBUG "Debug" MAP_IMPORTED_CONFIG_RELEASE "Release")
 
 #! @}

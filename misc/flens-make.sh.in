@@ -1,0 +1,3 @@
+#!/bin/bash
+
+make PREFIX=$1 LAPACK_LIBS="@LAPACK_LIBRARIES_STRING@"
