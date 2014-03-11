@@ -2,8 +2,8 @@ testdir(compile)
 
 CPPQED_SETUP()
 
-add_library(TMP_ToolsCompile OBJECT TMP_ToolsCompile.cc)
-add_library(BlitzArraySliceIteratorTMP_Compile OBJECT BlitzArraySliceIteratorTMP_Compile.cc)
+add_library(TMP_ToolsCompile OBJECT EXCLUDE_FROM_ALL TMP_ToolsCompile.cc)
+add_library(BlitzArraySliceIteratorTMP_Compile OBJECT EXCLUDE_FROM_ALL BlitzArraySliceIteratorTMP_Compile.cc)
 
 declaretest(test_CustomElementsExample)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
