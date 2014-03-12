@@ -125,21 +125,21 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStep
   const double totalRate=boost::accumulate(rates,0.);
   const double dtDid=this->getDtDid(), dtTry=getDtTry();
 
+  const double liouvilleanSuggestedDtTry=dpLimit_/totalRate;
+
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
   if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
-    evolvedCache->setDtTry(dpLimit_/totalRate);
+    evolvedCache->setDtTry(liouvilleanSuggestedDtTry);
     (*getEvolved())=*evolvedCache;
     logger_.stepBack(totalRate*dtDid,dtDid,getDtTry(),getTime(),logControl);
     return true; // Step-back required.
   }
   else if (totalRate*dtTry>dpLimit_) {
-    logger_.overshot(totalRate*dtTry,dtTry,getDtTry(),logControl);
+    logger_.overshot(totalRate*dtTry,dtTry,liouvilleanSuggestedDtTry,logControl);
   }
 
-  { // dtTry-adjustment for next step:
-    const double liouvilleanSuggestedDtTry=dpLimit_/totalRate;
-    getEvolved()->setDtTry(getQSW().getHa() ? std::min(getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
-  }
+  // dtTry-adjustment for next step:
+  getEvolved()->setDtTry(getQSW().getHa() ? std::min(getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
 
   return false; // Step-back not required.
 }
