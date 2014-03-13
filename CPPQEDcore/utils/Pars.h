@@ -129,7 +129,7 @@ private:
 
 
 /// The parameter table according to which the command line will be parsed by update()
-/** \see \ref userguidescriptselementaryparameters in the \ref userguide */
+/** \see \ref userguideelementaryparameters in the \ref userguide */
 class ParameterTable
 {
 public:
@@ -186,7 +186,7 @@ public:
   bool& add(const std::string& s, const std::string& d, bool v);
 
   /// Adds the parameter with a modifier suffix – useful when many parameters are distinguished only by suffixes (e.g. numerical suffix)
-  /** \see  \ref userguidescriptsmorecomplexring "This" and \ref userguidescriptsmorecomplexmultiparticle "this" section of the \ref userguide */
+  /** \see  \ref userguidemorecomplexring "This" and \ref userguidemorecomplexmultiparticle "this" section of the \ref userguide */
   template<typename T> T& addMod(const std::string& s, const std::string& mod, const std::string& d, const T& v)
   {
     return add(s+mod,d,v);

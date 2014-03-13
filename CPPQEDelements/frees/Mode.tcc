@@ -140,9 +140,9 @@ PumpedModeSch<AveragingType>::PumpedModeSch(const mode::ParsPumped& p, Averaging
 }
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-LossyMode<IS_FINITE_TEMP,AveragingType>::LossyMode(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
+template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
+LossyMode<TEMPERATURE,AveragingType>::LossyMode(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
     mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.cutoff),
     ModeBase(p.cutoff,TUPLE_kappadelta(1)),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
@@ -151,9 +151,9 @@ LossyMode<IS_FINITE_TEMP,AveragingType>::LossyMode(const mode::ParsLossy& p, Ave
 }
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-LossyModeUIP<IS_FINITE_TEMP,AveragingType>::LossyModeUIP(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
+template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
+LossyModeUIP<TEMPERATURE,AveragingType>::LossyModeUIP(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),0,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
@@ -162,9 +162,9 @@ LossyModeUIP<IS_FINITE_TEMP,AveragingType>::LossyModeUIP(const mode::ParsLossy& 
 }
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-LossyModeSch<IS_FINITE_TEMP,AveragingType>::LossyModeSch(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
+template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
+LossyModeSch<TEMPERATURE,AveragingType>::LossyModeSch(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),0,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(0)}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
@@ -173,9 +173,9 @@ LossyModeSch<IS_FINITE_TEMP,AveragingType>::LossyModeSch(const mode::ParsLossy& 
 }
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyMode<IS_FINITE_TEMP,AveragingType>::PumpedLossyMode(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
+template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
+PumpedLossyMode<TEMPERATURE,AveragingType>::PumpedLossyMode(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
@@ -184,9 +184,9 @@ PumpedLossyMode<IS_FINITE_TEMP,AveragingType>::PumpedLossyMode(const mode::ParsP
 }
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyModeUIP<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
+template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
+PumpedLossyModeUIP<TEMPERATURE,AveragingType>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)},TUPLE_eta),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
@@ -195,9 +195,9 @@ PumpedLossyModeUIP<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeUIP(const mode:
 }
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyModeSch<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh), 
+template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
+PumpedLossyModeSch<TEMPERATURE,AveragingType>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
     mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(0),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
@@ -209,9 +209,9 @@ PumpedLossyModeSch<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeSch(const mode:
 //////////////////////////////////////////////
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyModeAlternative<IS_FINITE_TEMP,AveragingType>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
-  : mode::Liouvillean<IS_FINITE_TEMP,true>(p.kappa,p.nTh), 
+template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
+PumpedLossyModeAlternative<TEMPERATURE,AveragingType>::PumpedLossyModeAlternative(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
+  : mode::Liouvillean<TEMPERATURE,true>(p.kappa,p.nTh),
     mode::Hamiltonian<true>(0,dcomp(p.kappa,-p.delta),p.eta,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)

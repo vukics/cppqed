@@ -227,7 +227,10 @@ ALIASES                = "tparamRANK=\tparam RANK arity of the Hilbert space" \
                          "refBoostConstruct{2}=\refBoost{<tt>\1</tt>,\2}" \
                          "refStdCpp{2}=[\1](http://www.cplusplus.com/reference/\2)" \
                          "refStdCppConstruct{2}=\refStdCpp{<tt>\1</tt>,\2}" \
-                         "GSL=[GSL](http://www.gnu.org/software/gsl/)"
+                         "GSL=[GSL](http://www.gnu.org/software/gsl/)" \
+                         "coreMainPage=../../core/html/index.html" \
+                         "elementsMainPage=../../elements/html/index.html" \
+                         "cpypyqedMainPage=../../cpypyqed/html/index.html"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -748,8 +751,10 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown        \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/installationGuide.markdown   \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/testsuite.markdown   \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/buildsystem.markdown \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/glossary.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/groups.dox           \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/cmake_config.dox     \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/Doxygen.h            \
                          @CMAKE_CURRENT_SOURCE_DIR@                          \
                          @CMAKE_CURRENT_SOURCE_DIR@/Testing                  \
                          @core_SOURCE_DIR@/cmake/Modules                     \
@@ -758,6 +763,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown        \
                          @elements_SOURCE_DIR@/CMakeLists.cmake              \
                          @scripts_SOURCE_DIR@/CMakeLists.cmake               \
                          @cpypyqed_SOURCE_DIR@/CMakeLists.cmake              \
+                         @CMAKE_CURRENT_SOURCE_DIR@/CPPQEDscripts            \
 
 
 # This tag can be used to specify the character encoding of the source files
@@ -827,7 +833,8 @@ EXCLUDE_SYMBOLS        =
 # command).
 
 EXAMPLE_PATH           = . \
-                         @CMAKE_CURRENT_SOURCE_DIR@
+                         @CMAKE_CURRENT_SOURCE_DIR@ \
+                         @CMAKE_CURRENT_SOURCE_DIR@/CPPQEDscripts
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -1608,7 +1615,7 @@ PAPER_TYPE             = a4
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-EXTRA_PACKAGES         = @CMAKE_CURRENT_SOURCE_DIR@/doc/technicalDefinitions \
+EXTRA_PACKAGES         = @core_SOURCE_DIR@/doc/technicalDefinitions \
                          amsmath \
                          amssymb
 

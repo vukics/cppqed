@@ -1,3 +1,4 @@
+/// \briefFile{Defines the qbit-bundle (tackling the dynamics of a single qbit)}
 // -*- C++ -*-
 #ifndef CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED
 #define CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED

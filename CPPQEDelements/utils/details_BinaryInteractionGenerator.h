@@ -1,4 +1,4 @@
-/// \briefFile{A „preprocessor factory” to binary interactions}
+/// \briefFile{A “preprocessor factory” to binary interactions}
 // -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_UTILS_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED
 #define   CPPQEDELEMENTS_UTILS_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED

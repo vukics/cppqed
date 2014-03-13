@@ -1,3 +1,4 @@
+/// \briefFile{Particle-bundle convenience header}
 // -*- C++ -*-
 #ifndef CPPQEDELEMENTS_FREES_PARTICLE_H_INCLUDED
 #define CPPQEDELEMENTS_FREES_PARTICLE_H_INCLUDED

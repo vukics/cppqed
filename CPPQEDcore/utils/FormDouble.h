@@ -72,7 +72,7 @@ private:
 
 namespace formdouble {
 
-/// If `precision` is larger than FormDouble::defaultPrecision, returns `precision`, otherwise the default \retated FormDouble
+/// If `precision` is larger than FormDouble::defaultPrecision, returns `precision`, otherwise the default \related FormDouble
 inline int actualPrecision(int precision) {return std::max(FormDouble::defaultPrecision,precision);}
 
 /// Essentially a compound of a FormDouble and a value of some double-based type (e.g. double, dcomp, `std::vector<double>`, etc.)
@@ -89,8 +89,8 @@ public:
 };
 
 
-int widthPositive(int precision); ///< The maximal width in characters of a *positive* number streamed with the given `precision` \retated FormDouble
-int widthAny     (int precision); ///< The maximal width in characters of any (positive or negative) number streamed with the given `precision` \retated FormDouble
+int widthPositive(int precision); ///< The maximal width in characters of a *positive* number streamed with the given `precision` \related FormDouble
+int widthAny     (int precision); ///< The maximal width in characters of any (positive or negative) number streamed with the given `precision` \related FormDouble
 
 
 inline const FormDouble low () {return FormDouble(FormDouble::defaultPrecision/2);} ///< Generic “low” precision (`FormDouble::defaultPrecision/2`) \related FormDouble

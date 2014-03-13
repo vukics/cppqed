@@ -1,5 +1,5 @@
-Level-2 interface of C++QED – implementing new physical elements {#structurebundleguide}
-================================================================
+Implementing new physical elements – the level-2 interface of C++QED {#structurebundleguide}
+====================================================================
 
 This Guide describes the use of the set of tools in C++QED aimed at the implementation of new elements representing elementary \link structure::Free free physical systems\endlink 
 and \link structure::Interaction their interactions\endlink. These tools are found in two namespaces:

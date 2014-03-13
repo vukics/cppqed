@@ -75,7 +75,7 @@ protected:
 #define BIG_CLASS_NAME                          JaynesCummings
 #define BIG_ADDITIONAL_PARAMETERS               , const dcomp& g
 #define BIG_ADDITIONAL_PARAMETERS_PASS          ,g
-#define BIG_ADDITIONAL_TEMPLATE_PARAMETERS      bool IS_HA,
+#define BIG_ADDITIONAL_TEMPLATE_PARAMETERS      bool IS_HA=true,
 #define BIG_ADDITIONAL_TEMPLATE_PARAMETERS_PASS <IS_HA>
 
 #include "details_BinaryInteractionGenerator.h"

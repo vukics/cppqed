@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
   pm.cutoff=30;
   // ... other default values may follow
 
-  update(p,argc,argv,"--"); // Parsing the command line
+  update(p,argc,argv); // Parsing the command line
 
   // ****** ****** ****** ****** ****** ******
 

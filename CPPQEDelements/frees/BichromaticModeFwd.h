@@ -4,7 +4,7 @@
 
 #include "Mode_Fwd.h"
 
-template<bool IS_FINITE_TEMP=false, typename A=mode::Averaged>
+template<bool TEMPERATURE=false, typename A=mode::Averaged>
 class BichromaticMode;
 
 #endif // CPPQEDELEMENTS_FREES_BICHROMATICMODEFWD_H_INCLUDED

@@ -14,8 +14,8 @@ namespace fft {
 
 /// direction of FFT
 enum Direction {
-  DIR_XK, ///< „forward” from x- to k-space (by convention)
-  DIR_KX  ///< „backward” from k- to x-space
+  DIR_XK, ///< “forward” from x- to k-space (by convention)
+  DIR_KX  ///< “backward” from k- to x-space
 };
 
 

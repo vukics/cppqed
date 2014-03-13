@@ -14,7 +14,7 @@
 namespace cpputils {
 
 
-/// Stores and prints a „key” (a.k.a. legend) to data, that is, an explanation to each element of a certain range of data
+/// Stores and prints a “key” (a.k.a. legend) to data, that is, an explanation to each element of a certain range of data
 /**
  * The key is composed of a title and a list of labels
  * 

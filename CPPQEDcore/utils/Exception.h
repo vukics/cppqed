@@ -20,7 +20,7 @@ struct Exception // : public std::exception
 };
 
 
-/// Class reporting also the \link cpputils::TaggedException::what() „what-ness”\endlink of the exception
+/// Class reporting also the \link cpputils::TaggedException::what() “what-ness”\endlink of the exception
 class TaggedException : public Exception
 {
 public:

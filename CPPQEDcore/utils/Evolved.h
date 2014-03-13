@@ -152,7 +152,7 @@ private:
 
 /// A common interface for (adaptive stepsize) ODE drivers
 /**
- * It takes the array type it operates on as template parameter. A given array type can be adapted to the form expected by Evolved by suitable specializations of „memory traits” functions.
+ * It takes the array type it operates on as template parameter. A given array type can be adapted to the form expected by Evolved by suitable specializations of “memory traits” functions.
  * (cf. ArrayTraits.h, for an implementation for `blitz::Array` cf. BlitzArrayTraits.h)
  *
  * The array which is actually "evolved" is not owned by Evolved.

@@ -32,13 +32,13 @@ template<typename AveragingType=mode::Averaged> class PumpedModeSch;
 
 // When not lossy, IP and UIP coincides
 
-template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class LossyMode;
-template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class LossyModeSch;
-template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class LossyModeUIP;
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged> class LossyMode;
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged> class LossyModeSch;
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged> class LossyModeUIP;
 
-template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class PumpedLossyMode;
-template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class PumpedLossyModeSch;
-template<bool IS_FINITE_TEMP=false, typename AveragingType=mode::Averaged> class PumpedLossyModeUIP;
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged> class PumpedLossyMode;
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged> class PumpedLossyModeSch;
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged> class PumpedLossyModeUIP;
 
 
 

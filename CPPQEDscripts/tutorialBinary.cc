@@ -16,9 +16,9 @@ int main(int argc, char* argv[])
 
   quantumdata::StateVector<2> psi(init(pq)*init(pm));
   evolve(psi,
-         binary::make(JaynesCummings<>(make(pq,QMP_IP),
-                                       make(pm,QMP_IP),
-                                       pjc)),
+         binary::make(jaynescummings::make(make(pq,QMP_IP),
+                                           make(pm,QMP_IP),
+                                           pjc)),
          pe);
 
 }

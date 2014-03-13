@@ -1,3 +1,4 @@
+/// \briefFile{Defines the particle-bundle}
 // -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_FREES_PARTICLE__H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_PARTICLE__H_INCLUDED
@@ -175,7 +176,7 @@ public:
 
 protected:
   PumpedParticleBase(size_t fin, double vClass, const ModeFunction&,
-                     const RealFreqs& =RealFreqs(), const ComplexFreqs& =ComplexFreqs());
+                     const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF);
 
 private:
   const double       vClass_;

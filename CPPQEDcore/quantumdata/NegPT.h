@@ -19,6 +19,8 @@ namespace quantumdata {
 
 /// Calculates the negativity of the partial transpose of the density operator of an arbitrarily complex system
 /**
+ * \see \cite vidal02
+ *
  * The system should of course be regarded as a bipartite system, so that a subsystem has to be specified to be 
  * one part of the bipartite. The compile-time vector `V` specifies the subsystem.
  * 

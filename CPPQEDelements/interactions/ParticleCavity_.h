@@ -58,29 +58,6 @@ public:
 };
 
 
-class POC_Base 
-  : public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
-{
-public:
-  POC_Base(mode::Ptr, particle::PtrPumped, double uNot);
-
-};
-
-
-class PAC_Base 
-  : private boost::base_from_member<const ModeFunction>,
-    public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
-{
-public:
-  typedef boost::base_from_member<const ModeFunction> MF_Base;
-
-  const ModeFunction& getMF() const {return MF_Base::member;}
-
-  PAC_Base(mode::Ptr, particle::Ptr, double uNot, size_t kCav, ModeFunctionType, double etaeff);
-
-};
-
-
 } // particlecavity
 
 
@@ -97,40 +74,48 @@ public:
 */
 
 class ParticleOrthogonalToCavity 
-  : public particlecavity::POC_Base
+  : public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
 {
 public:
-  typedef particlecavity::POC_Base Base;
-
   template<typename MODE, typename PUMPED_PART>
   ParticleOrthogonalToCavity(const MODE& mode, const PUMPED_PART& part, const particlecavity::ParsOrthogonal& p)
-    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot) {}
+    : ParticleOrthogonalToCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot) {}
+
+private:
+  ParticleOrthogonalToCavity(mode::Ptr, particle::PtrPumped, double uNot);
 
 };
 
 
 
 class ParticleAlongCavity 
-  : public particlecavity::PAC_Base
+  : private boost::base_from_member<const ModeFunction>,
+    public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
 {
+private:
+  typedef boost::base_from_member<const ModeFunction> MF_Base;
+
 public:
-  typedef particlecavity::PAC_Base Base;
+  const ModeFunction& getMF() const {return MF_Base::member;}
 
   template<typename MODE, typename PART>
   ParticleAlongCavity(const MODE& mode, const PART& part, const particlecavity::ParsAlong& p, double etaeff=0)
-    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,etaeff) {}
+    : ParticleAlongCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,etaeff) {}
 
   // The following two describe the case when there is an additional fixed standing wave ALONG the cavity, in which case PUMPEDPART must be derived from PumpedParticleBase
   // We write two constructors to avoid ambiguity with the previous one
 
   template<typename MODE>
   ParticleAlongCavity(const MODE& mode, const PumpedParticleBase& part, const particlecavity::ParsAlong& p)
-    : Base(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,part.getV_Class()) {}
+    : ParticleAlongCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot,p.kCav,p.modeCav,part.getV_Class()) {}
 
   template<typename MODE>
   ParticleAlongCavity(const MODE& mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
-    : Base(cpputils::sharedPointerize(mode),part,p.uNot,p.kCav,p.modeCav,part->getV_Class()) {}
+    : ParticleAlongCavity(cpputils::sharedPointerize(mode),part,p.uNot,p.kCav,p.modeCav,part->getV_Class()) {}
 
+private:
+
+  ParticleAlongCavity(mode::Ptr, particle::Ptr, double uNot, size_t kCav, ModeFunctionType, double etaeff);
 
 };
 

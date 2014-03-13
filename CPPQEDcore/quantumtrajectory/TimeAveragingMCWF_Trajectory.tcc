@@ -28,7 +28,7 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::logOnEnd_v(
 {
   if (av_) {
     Averages endValues(averages_.copy());
-    // process would „corrupt” the averages_, which would be incorrectly saved afterwards by writeState_v, therefore we process a copy instead
+    // process would “corrupt” the averages_, which would be incorrectly saved afterwards by writeState_v, therefore we process a copy instead
     av_->process(endValues);
     av_->display(endValues,os<<"# Time averages after relaxation time "<<relaxationTime_<<std::endl<<"#",FormDouble::overallPrecision)<<std::endl;
   }

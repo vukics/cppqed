@@ -1,3 +1,4 @@
+/// \briefFile{Defines the spin-bundle}
 // -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
@@ -15,7 +16,6 @@
 
 
 // A general Spin yet incomplete
-// Note: jump is not yet implemented, only "Hamiltonian" decay.
 
 namespace spin {
 
@@ -70,8 +70,7 @@ public:
   double getOmega() const {return omega_;}
   double getGamma() const {return gamma_;}
 
-  const dcomp get_z() const {return dcomp(gamma_,omega_);}
-  // This plays analogous role as Z in Mode
+  const dcomp get_z() const {return dcomp(gamma_,omega_);} ///< This plays analogous role to \f$z\f$ in Mode
 
 private:
   void process_v(Averages&) const;
@@ -84,7 +83,7 @@ private:
 
 };
 
-// NOTE if p.gamma is nonzero, Spin & SpinSch will contain the „Hamiltonian” part of the loss!
+// NOTE if p.gamma is nonzero, Spin & SpinSch will contain the “Hamiltonian” part of the loss!
 
 class Spin 
   : public SpinBase,

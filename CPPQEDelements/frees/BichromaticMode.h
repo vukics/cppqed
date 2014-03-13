@@ -36,16 +36,16 @@ const Ptr make(const ParsBichromatic& p, QM_Picture qmp, AveragingConstructorPar
 } //mode
 
 
-template<bool IS_FINITE_TEMP, typename AveragingType>
+template<bool TEMPERATURE, typename AveragingType>
 class BichromaticMode
-  : public mode::Liouvillean<IS_FINITE_TEMP>,
+  : public mode::Liouvillean<TEMPERATURE>,
     public mode::Hamiltonian<true>,
     public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
   BichromaticMode(const mode::ParsBichromatic& p, AveragingConstructorParameters&&... a)
-    : mode::Liouvillean<IS_FINITE_TEMP>(p.kappa,p.nTh),
+    : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.cutoff),
       ModeBase(p.cutoff,RF{"deltaOther",p.deltaOther,1},{CF{"(kappa*(2*nTh+1),delta)",conj(get_zI()),1},CF{"eta",get_eta(),sqrt(p.cutoff)},CF{"etaOther",p.etaOther,sqrt(p.cutoff)}},"Bichromatic mode"),
       AveragingType(std::forward<AveragingConstructorParameters>(a)...),
@@ -55,7 +55,7 @@ public:
                                                      furnishWithFreqs(mode::pumping(p.etaOther,getDimension()),
                                                                       mode::mainDiagonal(zI_Other,getDimension()))
                                                      );
-    getParsStream()<<"# Bichromatic pumping."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<IS_FINITE_TEMP>());
+    getParsStream()<<"# Bichromatic pumping."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<TEMPERATURE>());
   }
 
 private:

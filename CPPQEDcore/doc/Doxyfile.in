@@ -749,7 +749,7 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/master.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/nonorthogonalFormalism.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/rationale.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/CompilationMacros.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/Doxygen.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils \
                          @CMAKE_CURRENT_SOURCE_DIR@/quantumdata \
                          @CMAKE_CURRENT_SOURCE_DIR@/quantumoperator \

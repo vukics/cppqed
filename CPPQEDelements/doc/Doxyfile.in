@@ -744,8 +744,13 @@ WARN_LOGFILE           =
 
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/genericElements.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode_.h
-
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode_.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Qbit.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Qbit_.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Spin.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Particle.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Particle_.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1596,7 +1601,7 @@ PAPER_TYPE             = a4
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-EXTRA_PACKAGES         = @CPPQED_RELATIVE_DOXYGEN_DIR@/technicalDefinitions \
+EXTRA_PACKAGES         = @CMAKE_CURRENT_SOURCE_DIR@/doc/technicalDefinitions \
                          amsmath \
                          amssymb
 
@@ -1985,7 +1990,7 @@ TAGFILES               = @TAGFILES@
 # tag file that is based on the input files it reads. See section "Linking to
 # external documentation" for more information about the usage of tag files.
 
-GENERATE_TAGFILE       =
+GENERATE_TAGFILE       = @PROJECT_NAME@.tag
 
 # If the ALLEXTERNALS tag is set to YES all external class will be listed in the
 # class index. If set to NO only the inherited external classes will be listed.
