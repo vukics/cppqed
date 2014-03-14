@@ -17,6 +17,7 @@ project(elements)
 # and include files
 find_package(CPPQED 2.99 REQUIRED)
 include(${CPPQED_USE})
+include_directories(${CPPQED_INCLUDE_DIRS})
 ############################################################
 
 set(ELEMENTS_SOURCE_DIRS utils frees interactions)
