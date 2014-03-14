@@ -18,6 +18,19 @@ except NameError:
     from sets import Set as set
 
 class QuantumState(numpy.ndarray):
+  r"""This is the base class for :class:`StateVector` and :class:`DensityOperator`.
+  It inherits from `numpy.ndarray`.
+
+  :param numpy.ndarray data: Anything a numpy.ndarray can beconstructed from.
+  :param double time: (optional) A number defining the point of time when this state vector was
+      reached. (Default is 0)
+
+  Any other argument that a numpy array takes. E.g. ``copy=False`` can
+  be used so that the QuantumState shares the data storage with the given numpy array.
+
+  Most useful is maybe the tensor product '**' which lets you easily calculate
+  state vectors for combined systems.
+  """
   def __new__(cls, data, time=None,**kwargs):
     array = numpy.array(data, **kwargs)
     array = numpy.asarray(array).view(cls)
@@ -39,6 +52,9 @@ class QuantumState(numpy.ndarray):
     return numpy.ndarray.__unicode__(numpy.asarray(self))
 
 class DensityOperator(QuantumState):
+  r"""
+  A class representing a quantum mechanical density operator.
+  """
   def __new__(cls, data, **kwargs):
     array = QuantumState(data, **kwargs)
     array = numpy.asarray(array).view(cls)
@@ -53,7 +69,7 @@ class DensityOperator(QuantumState):
 
 class StateVector(QuantumState):
     r"""
-    A class representing a quantum mechanical state vector in a specific basis.
+    A class representing a quantum mechanical state.
 
     *Usage*
         >>> sv = StateVector((1, 3, 7, 2), time=0.2, norm=True)
@@ -97,18 +113,15 @@ class StateVector(QuantumState):
 
     The tensor product is abbreviated by the "**" operator.
     """
-    def __new__(cls, data, norm=False, basis=None, **kwargs):
+    def __new__(cls, data, norm=False,  **kwargs):
         array = QuantumState(data, **kwargs)
         if norm:
             array = normalize(array)
         array = numpy.asarray(array).view(cls)
-        if basis is not None:
-            array.basis = basis
         return array
 
     def __array_finalize__(self, obj):
         self.dimensions = obj.shape
-        self.basis = getattr(obj, "basis", None)
 
     def __str__(self):
         clsname = self.__class__.__name__
@@ -441,21 +454,12 @@ class StateVectorTrajectory(numpy.ndarray):
             array.time = time
         svs = [None]*array.shape[0]
         for i, entry in enumerate(array):
-            if hasattr(data[i], "basis"):
-                basis = data[i].basis
-            else:
-                basis = None
-            svs[i] = StateVector(entry, time=array.time[i], basis=basis, copy=True)
+            svs[i] = StateVector(entry, time=array.time[i], copy=True)
         array.statevectors = svs
         return array
 
     def __array_finalize__(self, obj):
         self.dimensions = obj.shape[1:]
-
-    def __str__(self):
-        clsname = self.__class__.__name__
-        dims = " x ".join(map(str, self.dimensions))
-        return "%s(%s x (%s))" % (clsname, self.shape[0], dims)
 
     def map(self, func, svt=True):
         """
@@ -549,16 +553,6 @@ class StateVectorTrajectory(numpy.ndarray):
         evs = numpy.array(evs).swapaxes(0,1)
         return expvalues.ExpectationValueCollection(
                             evs, self.time, titles, copy=False)
-
-    def animate(self, x=None, y=None, re=False, im=False, abs=True):
-        """
-        Create an interactive animation of this StateVectorTrajectory.
-
-        For more information look into the docstring of
-        :meth:`pycppqed.animation.animate_statevector`.
-        """
-        from pycppqed.animation import animate_statevector
-        return animate_statevector(self, x, y, re, im, abs)
 
 
 def norm(array):
