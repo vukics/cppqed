@@ -820,7 +820,7 @@ def main():
   if options.configuration.lower()=="release":
     import cpypyqed.io as io
   elif options.configuration.lower()=="debug":
-    import cpypyqed_d.io_d as io
+    import cpypyqed.io_d as io
   logging.info("Taking cpypyqed from {}".format(io.__file__))
 
   if options.testclass:

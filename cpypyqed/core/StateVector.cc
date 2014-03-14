@@ -7,7 +7,6 @@
 #include "DensityOperator.tcc"
 
 #include <boost/preprocessor/iteration/local.hpp>
-#include <boost/preprocessor/stringize.hpp>
 
 #include <boost/python/import.hpp>
 
@@ -23,7 +22,7 @@ struct SV_to_python
 {
   static PyObject* convert(const StateVector<RANK> &s)
   {
-    object qs = import(BOOST_PP_STRINGIZE(BOOST_PP_CAT(cpypyqed, DEBUG_SUFFIX)) ".tools.quantumstate");
+    object qs = import("cpypyqed.tools.quantumstate");
     object StateVector = qs.attr("StateVector");
     return boost::python::incref(StateVector(arrayToNumpy<CArray<RANK>,RANK>(s.getArray())).ptr());
   }
@@ -34,7 +33,7 @@ struct DO_to_python
 {
   static PyObject* convert(const DensityOperator<RANK> &d)
   {
-    object qs = import(BOOST_PP_STRINGIZE(BOOST_PP_CAT(cpypyqed, DEBUG_SUFFIX)) ".tools.quantumstate");
+    object qs = import("cpypyqed.tools.quantumstate");
     object DensityOperator = qs.attr("DensityOperator");
     return boost::python::incref(DensityOperator(arrayToNumpy<CArray<2*RANK>,2*RANK>(d.getArray())).ptr());
   }

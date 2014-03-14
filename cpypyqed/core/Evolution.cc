@@ -47,7 +47,7 @@ object py_evolve(const numeric::array &array,
 {
   using namespace quantumdata;
 
-  object qs = import(BOOST_PP_STRINGIZE(BOOST_PP_CAT(cpypyqed, DEBUG_SUFFIX)) ".tools.quantumstate");
+  object qs = import("cpypyqed.tools.quantumstate");
   object py_SV = qs.attr("StateVector");
   object py_DO = qs.attr("DensityOperator");
 

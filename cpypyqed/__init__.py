@@ -1,9 +1,16 @@
 import sys
+import cpypyqed.config
 
-try:
-  from core@DEBUG_SUFFIX@ import *
-  from elements@DEBUG_SUFFIX@ import *
-  from compilation.composite import *
-except ImportError as e:
-  ie = ImportError(e.message+ ". Maybe the wrong build type? This is cpypyqed configured for @CONF@.\n")
-  raise ie
+if '--debug' in sys.argv:
+  from .debug import *
+  sys.argv.remove('--debug')
+else:
+  try:
+    from core import *
+    from elements import *
+    cpypyqed.config.build_type="release"
+    cpypyqed.config.module_suffix=""
+    from compilation.composite import *
+
+  except ImportError as e:
+    from .debug import *

@@ -21,13 +21,13 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-from cpypyqed_config import cppqed_build_type,cppqed_module_suffix
-if cppqed_build_type.lower()=="release":
+import cpypyqed.config
+if cpypyqed.config.build_type.lower()=="release":
   from ..core import core_git
-elif cppqed_build_type.lower()=="debug":
+elif cpypyqed.config.build_type.lower()=="debug":
   from ..core_d import core_git
 else:
-  raise ImportError("Unknown build configuration {}.".format(cppqed_build_type))
+  raise ImportError("Unknown build configuration {}.".format(build_type))
 
 # The compilation directory can be customized by changing ondemand.cpypyqed_builddir
 cpypyqed_builddir = "~/.cpypyqed"
@@ -87,7 +87,7 @@ class OnDemand(object):
         self.basename = basename
         self.classid = classid
         self.classname = self.basename+self.classid
-        self.modulename = self.classname+cppqed_module_suffix
+        self.modulename = self.classname+cpypyqed.config.module_suffix
         self.sourcefile = self.modulename + ".cc"
         self.library = self.modulename+".so"
         self.fullclass = self.packagename+"."+self.modulename+"."+self.classname
@@ -155,12 +155,12 @@ class OnDemand(object):
               compiler=self.config.get('Setup','compiler')
               cppqed_dir=os.path.expanduser(self.config.get('Setup','cppqed_dir'))
               if compiler: opts.append('-DCMAKE_CXX_COMPILER={}'.format(compiler))
-              logger.debug("Configuring for build type {}.".format(cppqed_build_type))
-              if cppqed_build_type=="debug":
+              logger.debug("Configuring for build type {}.".format(cpypyqed.config.build_type))
+              if cpypyqed.config.build_type=="debug":
                 opts.append("-DCMAKE_BUILD_TYPE=Debug")
                 cppqed_dir_debug=os.path.expanduser(self.config.get('Setup','cppqed_dir_debug'))
                 if cppqed_dir_debug: cppqed_dir=cppqed_dir_debug
-              elif cppqed_build_type=="release":
+              elif cpypyqed.config.build_type=="release":
                 opts.append("-DCMAKE_BUILD_TYPE=Release")
                 cppqed_dir_release=os.path.expanduser(self.config.get('Setup','cppqed_dir_release'))
                 if cppqed_dir_release: cppqed_dir=cppqed_dir_release

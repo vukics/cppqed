@@ -87,10 +87,13 @@ Loading cpypyqed
 Because cmake allows different build configurations, there are two versions of cpypyqed:
 
   * :samp:`import cpypyqed` or :samp:`from cpypyqed import *` for release mode
-  * :samp:`import cpypyqed_d` or :samp:`from cpypyqed_d import *` for debug mode
+  * :samp:`import cpypyqed.debug` or :samp:`from cpypyqed.debug import *` for debug mode
 
-If you know that your script only will run in either debug or release mode, you can chose the import
-line that fits your needs. However, if you want to choose between debug and release mode upon calling the script,
+If one or both of these import statements succeed depend on which configurations are installed.
+
+Note that importing :samp:`cpypyqed` will fall back to the debug version if the release version is not found,
+so this should work in both cases. Use :samp:`cpypyqed.debug` to force the debug version.
+If you want to choose between debug and release mode upon calling the script,
 here is one possibility with :py:mod:`argparse`::
 
   import sys
@@ -101,7 +104,7 @@ here is one possibility with :py:mod:`argparse`::
   (args,remaining)=parser.parse_known_args(sys.argv)
 
   if vars(args)['debug']:
-      from cpypyqed_d import *
+      from cpypyqed.debug import *
   else:
       from cpypyqed import *
 
@@ -132,7 +135,7 @@ in the script :file:`1particle1mode.py`::
   (args,remaining)=parser.parse_known_args(sys.argv)
 
   if vars(args)['debug']:
-      from cpypyqed_d import *
+      from cpypyqed.debug import *
   else:
       from cpypyqed import *
 

@@ -65,8 +65,7 @@ set(PYTHON_MAX_RANK 8 CACHE STRING "Pre-instantiate template classes up to this 
 #! @}
 set_property(CACHE PYTHON_MAX_RANK PROPERTY STRINGS 2 4 6 8 10)
 
-set(CPYPYQED_INSTALL_PATH_RELEASE ${PYTHON_MODULES_PATH}/cpypyqed)
-set(CPYPYQED_INSTALL_PATH_DEBUG ${PYTHON_MODULES_PATH}/cpypyqed_d)
+set(CPYPYQED_INSTALL_PATH ${PYTHON_MODULES_PATH}/cpypyqed)
 
 #! \file
 #! <!--#########################################################-->
@@ -84,8 +83,7 @@ set(CPYPYQED_INSTALL_PATH_DEBUG ${PYTHON_MODULES_PATH}/cpypyqed_d)
 macro(python_cppmodule modulename)
   SET_TARGET_PROPERTIES(${modulename} PROPERTIES
     PREFIX ""
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}
-    LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_d)
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${PROJECT_NAME})
   IF(PYDEXTENSION)
     SET_TARGET_PROPERTIES(${modulename} PROPERTIES SUFFIX ".pyd")
   ELSEIF(SOEXTENSION)
@@ -93,14 +91,8 @@ macro(python_cppmodule modulename)
   ENDIF(PYDEXTENSION)
   TARGET_LINK_LIBRARIES(${modulename} ${MANDATORY_LIBRARIES} ${PYTHON_LIBRARIES})
   INSTALL(TARGETS ${modulename}
-                RUNTIME DESTINATION ${CPYPYQED_INSTALL_PATH_RELEASE}
-                LIBRARY DESTINATION ${CPYPYQED_INSTALL_PATH_RELEASE}
-                CONFIGURATIONS Release
-  )
-  INSTALL(TARGETS ${modulename}
-                RUNTIME DESTINATION ${CPYPYQED_INSTALL_PATH_DEBUG}
-                LIBRARY DESTINATION ${CPYPYQED_INSTALL_PATH_DEBUG}
-                CONFIGURATIONS Debug
+                RUNTIME DESTINATION ${CPYPYQED_INSTALL_PATH}
+                LIBRARY DESTINATION ${CPYPYQED_INSTALL_PATH}
   )
 endmacro()
 
@@ -174,6 +166,7 @@ add_custom_command(TARGET cpypyqed_setup PRE_BUILD
       -DINPUT=${PROJECT_SOURCE_DIR}/helpers/config.h.in
       -DOUTPUT=cpypyqed_config.h
       -DDEBUG_SUFFIX="$<$<CONFIG:Debug>:_d>"
+      -DPACKAGE_NAME="cpypyqed$<$<CONFIG:Debug>:.debug>"
       -DPYTHON_MAX_RANK=${PYTHON_MAX_RANK}
     -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
   )
@@ -184,8 +177,7 @@ add_custom_command(TARGET cpypyqed_setup PRE_BUILD
 #! <!--#########################################################-->
 #!
 #! Copy all the files which are needed for the final Python package
-#! to the build directory. The package name is either `cpypyqed` (Release mode)
-#! or `cpypyqed_d` (Debug mode). Because it is possible that the
+#! to the build directory. The package name is either `cpypyqed`. Because it is possible that the
 #! build configuration is only available at build time (e.g. Mac OS X, XCode),
 #! not at configure time, we cannot use `configure_file` directly.
 #!
@@ -194,15 +186,14 @@ add_custom_command(TARGET cpypyqed_setup PRE_BUILD
 #! For this, `add_custom_command` is used to set up a pre-dependency for the
 #! `cpypyqed` target. All variables which should be available for substitution
 #! have to be passed in by `add_custom_command` with `-D` defines. In the custom
-#! command we can make use of the %CMake generator expression `$<$<CONFIG:Debug>:_d>`,
+#! command we can make use of the %CMake generator expression, e.g. `$<$<CONFIG:Debug>:_d>`,
 #! which expands to `_d` in Debug mode and does nothing in Release mode.
 #!
-#! This section also takes care to install the additional package files to the system
-#! (both for Debug and Release configuration).
+#! This section also takes care to install the additional package files to the system.
 
-set(INPUTS "__init__.py" "compilation/cpypyqed_config.py" "compilation/ActTemplate.cc"
+set(INPUTS "__init__.py" "config.py" "compilation/ActTemplate.cc"
            "compilation/CompositeTemplate.cc" "compilation/composite.py" "compilation/ondemand.py"
-           "compilation/__init__.py" "compilation/CMakeListsTemplate.txt" "tools/__init__.py"
+           "compilation/__init__.py" "compilation/CMakeListsTemplate.txt" "debug/__init__.py" "tools/__init__.py" 
            "tools/quantumstate.py" "tools/expvalues.py" "tools/utils.py" "tools/initialconditions.py"
            "tools/test_statevector.py")
 
@@ -210,7 +201,7 @@ foreach(file ${INPUTS})
   add_custom_command(TARGET cpypyqed PRE_BUILD
     COMMAND ${CMAKE_COMMAND}
       -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/${file}
-      -DOUTPUT=${PROJECT_NAME}$<$<CONFIG:Debug>:_d>/${file}
+      -DOUTPUT=${PROJECT_NAME}/${file}
       -DDEBUG_SUFFIX="$<$<CONFIG:Debug>:_d>"
       -DCONF=$<CONFIGURATION>
       -DCPPQED_CORE_GIT=${CPPQED_CORE_GIT}
@@ -218,12 +209,7 @@ foreach(file ${INPUTS})
   )
   get_filename_component(DIR ${file} PATH)
   install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}/${file}
-          DESTINATION ${CPYPYQED_INSTALL_PATH_RELEASE}/${DIR}
-          CONFIGURATIONS Release
-  )
-  install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}_d/${file}
-          DESTINATION ${CPYPYQED_INSTALL_PATH_DEBUG}/${DIR}
-          CONFIGURATIONS Debug
+          DESTINATION ${CPYPYQED_INSTALL_PATH}/${DIR}
   )
 endforeach()
 

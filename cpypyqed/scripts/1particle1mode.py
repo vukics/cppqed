@@ -2,18 +2,12 @@
 
 import sys
 import argparse
+from cpypyqed import *
 
 parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--debug', action='store_true')
 parser.add_argument('--1p1mconf', help="System configuration code for 1particle1mode",
                     type=int,default=1)
 (args,remaining)=parser.parse_known_args(sys.argv)
-
-if vars(args)['debug']:
-    from cpypyqed_d import *
-else:
-    from cpypyqed import *
-
 conf = vars(args)['1p1mconf']
 
 p  = parameters.ParameterTable()
