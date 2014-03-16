@@ -54,10 +54,21 @@ public:
   MultiIndexIterator(const MultiIndex& lbound, ///< tiny vector comprising the sequence of lower bounds
                      const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
                      mii::Begin)
-    : lbound_(lbound), ubound_(ubound), idx_(lbound_) {} // if it's not the end, it's the beginning
+    : lbound_(lbound), ubound_(ubound), idx_(lbound_) {}
 
   MultiIndexIterator(const MultiIndex& lbound, const MultiIndex& ubound, mii::End  )
     : lbound_(lbound), ubound_(ubound), idx_(ubound_) {operator++();} ///< ” to the end of the sequence (which is in fact beyond the end by one)
+
+    /// \overload
+    /** `lbound` is all-zero */
+  MultiIndexIterator(const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
+                     mii::Begin b)
+    : MultiIndexIterator(MultiIndex(size_t(0)),ubound,b) {}
+
+    /// \overload
+    /** `lbound` is all-zero */
+  MultiIndexIterator(const MultiIndex& ubound, mii::End e)
+    : MultiIndexIterator(MultiIndex(size_t(0)),ubound,e) {}
   //@}
   
   MultiIndexIterator& operator=(const MultiIndexIterator& other) {idx_=other.idx_; return *this;}

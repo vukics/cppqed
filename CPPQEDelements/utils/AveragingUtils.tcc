@@ -29,7 +29,7 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
   using std::stringstream;
 
   KeyLabels res;
-  Iterator i(Dimensions(size_t(0)),dim-1,cpputils::mii::begin);
+  Iterator i(dim-1,cpputils::mii::begin);
 
   // Diagonals
   for (; i!=i.getEnd(); ++i) {
@@ -65,7 +65,7 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
 template<int RANK>
 ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
   DimensionsBookkeeper<RANK>(dim),
-  Base(label,helper(this->getDimensions(),offDiagonals,subsequent)),
+  Base(label,helper(getDimensions(),offDiagonals,subsequent)),
   offDiagonals_(offDiagonals)
 {
 }
@@ -92,9 +92,9 @@ ReducedDensityOperatorNegativity<RANK,V>::average_v(structure::NoTime t, const L
 template<int RANK, typename V>
 void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) const
 {
-  quantumdata::DensityOperator<RANK> rho(this->getDimensions());
+  quantumdata::DensityOperator<RANK> rho(getDimensions());
   linalg::CMatrix matrix(rho.matrixView()); // references the same data
-  const size_t dim=this->getTotalDimension();
+  const size_t dim=getTotalDimension();
   
   {
     int idx=0;  

@@ -28,6 +28,8 @@ public:
   
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
+  using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension;
+
   ReducedDensityOperator(const std::string&, const Dimensions&, bool offDiagonals=false, const KeyLabels& =KeyLabels());
 
 private:
@@ -52,6 +54,8 @@ public:
   typedef typename Base::Dimensions Dimensions;
   typedef typename Base::Averages Averages;
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
+  
+  using Base::getDimensions; using Base::getTotalDimension;
   
   ReducedDensityOperatorNegativity(const std::string& label, const Dimensions& dim)
     : Base(label,dim,true,boost::assign::list_of("negativity")) {}

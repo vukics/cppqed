@@ -90,7 +90,7 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
   const size_t dim=rho.getTotalDimension();
   
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(typename DensityOperator<RANK>::Dimensions(size_t(0)),rho.getDimensions()-1,cpputils::mii::begin);
+  const Iterator etalon(rho.getDimensions()-1,cpputils::mii::begin);
   
   size_t idx=0;
 
@@ -122,7 +122,7 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
   DensityOperator<RANK> res(matrix.getDimension());
   
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(typename DensityOperator<RANK>::Dimensions(size_t(0)),matrix.getDimensions()-1,cpputils::mii::begin);
+  const Iterator etalon(matrix.getDimensions()-1,cpputils::mii::begin);
   
   typedef typename DensityOperator<RANK>::Idx Idx;
   

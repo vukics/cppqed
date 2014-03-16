@@ -47,6 +47,7 @@ public:
   
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
+  /// \todo Why not a variadic constructor here, taking a pack of Free instances?
   explicit Interaction(const Frees& frees,
                        const    RealFreqs&    realFreqs=emptyRF, 
                        const ComplexFreqs& complexFreqs=emptyCF)

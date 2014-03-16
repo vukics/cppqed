@@ -50,7 +50,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
   DArray<1> res(offDiagonals ? sqr(dim) : dim);
   
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(Dimensions(size_t(0)),matrix.getDimensions()-1,cpputils::mii::begin);
+  const Iterator etalon(matrix.getDimensions()-1,cpputils::mii::begin);
   
   size_t idx=0;
 
