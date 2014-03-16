@@ -1,13 +1,12 @@
 """
-This module provides an implementation for state vectors.
+This module provides an implementation for state vectors and density operators.
+These two classes are not direct wrappings of their C++QED counterparts to make them
+behave more pythonic. In fact, both these classes are derived from `numpy.ndarray`.
 
 The relevant classes are:
     * :class:`StateVector`
+    * :class:`DensityOperator`
     * :class:`StateVectorTrajectory`
-
-The :class:`StateVector` represents a state vector at a specific point of time
-while the :class:`StateVectorTrajectory` represents a state vector at different
-points of time.
 """
 
 import numpy
@@ -39,6 +38,7 @@ class QuantumState(numpy.ndarray):
     elif hasattr(data, "time"):
         array.time = data.time
     return array
+
   def __array_finalize__(self, obj):
     self.time = getattr(obj, "time", 0)
 
@@ -51,25 +51,68 @@ class QuantumState(numpy.ndarray):
   def __unicode__(self):
     return numpy.ndarray.__unicode__(numpy.asarray(self))
 
+  def _fft_helper(self, axes=None, inverse=False):
+    r"""
+    Helper function for fft and ifft which performs the actual transformation.
+    """
+    f = numpy.fft
+    norm = numpy.sqrt(numpy.prod(numpy.array(self.shape)[axes]))
+    if inverse:
+      transform=f.ifftn
+    else:
+      transform=f.fftn
+      norm=1/norm
+    array = f.fftshift(transform(f.ifftshift(self, axes=axes), axes=axes), axes=axes)*norm
+    return StateVector(array, time=self.time)
+
 class DensityOperator(QuantumState):
   r"""
-  A class representing a quantum mechanical density operator.
+  A class representing a quantum mechanical density operator. :core2:`quantumdata::DensityOperator` is
+  automatically converted to this, but it is not a one to one wrapper.
   """
-  def __new__(cls, data, **kwargs):
-    array = QuantumState(data, **kwargs)
-    array = numpy.asarray(array).view(cls)
+  def __new__(cls, data, time=None, **kwargs):
+    array = QuantumState.__new__(cls, data, time, **kwargs)
     return array
 
   def __array_finalize__(self, obj):
-    ndim=len(obj.shape)
+    QuantumState.__array_finalize__(self,obj)
+    ndim=len(self.shape)
     if not ndim % 2 == 0:
       raise ValueError("The number of dimension must be even for a density operator.")
-    self.dimensions = obj.shape[:ndim/2]
-    self.time = getattr(obj, "time", 0)
+    self.dimensions = self.shape[:ndim/2]
+    if not self.shape[:ndim/2]==self.shape[ndim/2:]:
+      raise ValueError("The created object is not a valid density operator, dimensions mismatch.")
+
+  def fft(self, subsystems=None):
+    r"""
+    Return a DensityOperator where the given subsystems are Fourier transformed.
+    This is the transformation position space -> momentum space.
+
+    *Usage*
+        >>> sv = StateVector((0,1,1.7,2,1.7,1,0), norm=True)
+        >>> print sv.fft()
+        StateVector(7)
+
+    :param axis:
+            (optional)
+            Sequence of ints, axes over which the fft is done. (Default is all)
+    """
+    return self._fft_helper(axes=axes,inverse=False)
+
+  def ifft(self, axes=None):
+    r"""
+    Return a StateVector where the given axes are inversely Fourier transformed.
+    This is the transformation momentum space -> position space.
+
+    See :func:`StateVector.fft` for details.
+    """
+    return self._fft_helper(axes=axes,inverse=True)
+
 
 class StateVector(QuantumState):
     r"""
-    A class representing a quantum mechanical state.
+    A class representing a quantum mechanical state. :core2:`quantumdata::StateVector` is
+    automatically converted to this, but it is not a one to one wrapper.
 
     *Usage*
         >>> sv = StateVector((1, 3, 7, 2), time=0.2, norm=True)
@@ -81,20 +124,19 @@ class StateVector(QuantumState):
                [ 4,  5,  6,  7],
                [ 8,  9, 10, 11]])
 
-    *Arguments*
-        * *data*
+    :param data:
             Anything that can be used to create a numpy array, e.g. a nested
             tuple or another numpy array.
 
-        * *time* (optional)
+    :param double time: (optional)
             A number defining the point of time when this state vector was
             reached. (Default is 0)
 
-        * *norm* (optional)
+    :param bool norm: (optional)
             If set True the StateVector will be automatically normalized.
             (Default is False)
 
-        * Any other argument that a numpy array takes. E.g. ``copy=False`` can
+    :param \*\*kwargs: Any other argument that a numpy array takes. E.g. ``copy=False`` can
           be used so that the StateVector shares the data storage with the
           given numpy array.
 
@@ -113,14 +155,14 @@ class StateVector(QuantumState):
 
     The tensor product is abbreviated by the "**" operator.
     """
-    def __new__(cls, data, norm=False,  **kwargs):
-        array = QuantumState(data, **kwargs)
+    def __new__(cls, data, time=None, norm=False, **kwargs):
+        array = QuantumState.__new__(cls, data, time, **kwargs)
         if norm:
             array = normalize(array)
-        array = numpy.asarray(array).view(cls)
         return array
 
     def __array_finalize__(self, obj):
+        QuantumState.__array_finalize__(self,obj)
         self.dimensions = obj.shape
 
     def __str__(self):
@@ -160,12 +202,11 @@ class StateVector(QuantumState):
             >>> rsv = sv.reduce(1)
             >>> rsv = sv.reduce((1,2))
 
-        *Arguments*
-            * *indices*
+        :parameter indices:
                 An integer or a list of integers specifying over which
                 subspaces should be summated.
 
-            * *norm* (optional)
+        :parameter bool norm: (optional)
                 If set True the resulting StateVector will be renormalized.
 
         Reducing means nothing else then summing up over all given indices.
@@ -216,8 +257,7 @@ class StateVector(QuantumState):
             >>> sv = sv1**sv2
             >>> sqtensor = sv.reducesquare(1)
 
-        *Arguments*
-            * *indices*
+        :parameter indices:
                 An integer or a list of integers specifying over which
                 subsystems should be summed up.
 
@@ -250,8 +290,7 @@ class StateVector(QuantumState):
             >>> print sv.fft()
             StateVector(7)
 
-        *Arguments*
-            * *axis* (optional)
+        :parameter axis: (optional)
                 Sequence of ints, axes over which the fft is done. (Default is all)
         """
         return self._fft_helper(axes=axes,inverse=False)
@@ -264,20 +303,6 @@ class StateVector(QuantumState):
         See :func:`StateVector.fft` for details.
         """
         return self._fft_helper(axes=axes,inverse=True)
-
-    def _fft_helper(self, axes=None, inverse=False):
-        r"""
-        Helper function for fft and ifft which performs the actual transformation.
-        """
-        f = numpy.fft
-        norm = numpy.sqrt(numpy.prod(numpy.array(self.shape)[axes]))
-        if inverse:
-            transform=f.ifftn
-        else:
-            transform=f.fftn
-            norm=1/norm
-        array = f.fftshift(transform(f.ifftshift(self, axes=axes), axes=axes), axes=axes)*norm
-        return StateVector(array, time=self.time)
 
     def expvalue(self, operator, indices=None, title=None, multi=False):
         r"""
@@ -294,16 +319,15 @@ class StateVector(QuantumState):
             >>> print sv.expvalue(a)
             0.6
 
-        *Arguments*
-            * *operator*
+        :parameter operator:
                 A tensor representing an arbitrary operator in the
                 basis of the StateVector.
 
-            * *indices* (optional)
+        :parameter indices: (optional)
                 Specifies which subsystems should be taken. If None is given
                 the whole system is used.
 
-            * *multi* (optional)
+        :parameter bool multi: (optional)
                 If multi is True it is assumed that a list of operators is
                 given. (Default is False)
 
@@ -344,16 +368,15 @@ class StateVector(QuantumState):
             >>> print sv.diagexpvalue(a)
             2.45454545455
 
-        *Arguments*
-            * *operator*
+        :parameter operator:
                 The diagonal elements of a tensor representing an arbitrary
                 diagonal operator in the basis of the StateVector.
 
-            * *indices* (optional)
+        :parameter indices: (optional)
                 Specifies which subsystems should be taken. If None is given
                 the whole system is used.
 
-            * *multi* (optional)
+        :parameter bool multi: (optional)
                 If multi is True it is assumed that a list of operators is
                 given. (Default is False)
 
@@ -384,6 +407,15 @@ class StateVector(QuantumState):
         else:
             return (A*operator).sum()
 
+    def dyad(self):
+      r"""
+      Calculate the dyadic product with itself.
+
+      :returns: The DensityOperator :math:`| \Psi \rangle \langle \Psi |`.
+      """
+      return DensityOperator(self**numpy.conjugate(self), time=self.time)
+
+
     def outer(self, array):
         r"""
         Return the outer product between this and the given StateVector.
@@ -399,8 +431,7 @@ class StateVector(QuantumState):
                    [ 1.34164079,  1.78885438],
                    [ 2.68328157,  3.57770876]])
 
-        *Arguments*
-            * *array*
+        :param array:
                 Some kind of array (E.g. StateVector, numpy.array, list, ...).
 
         As abbreviation ``sv1**sv2`` can be written instead of
@@ -419,27 +450,19 @@ class StateVectorTrajectory(numpy.ndarray):
     """
     A class holding StateVectors for different points of time.
 
-    *Usage*
-        >>> import numpy as np
-        >>> X = np.linspace(-0.5, 0.5, 100)
-        >>> svs = [pycppqed.gaussian(x) for x in X]
-        >>> svtraj = StateVectorTrajectory(svs)
-        >>> print svtraj
-        StateVectorTrajectory(100 x (64))
-
-    *Arguments*
-        * *data*
+    :param data:
             Some nested structure which holds state vector like arrays for
             different points of time.
 
-        * *time* (optional)
+    :param double time: (optional)
             An array which specifies the point of time for every state
             vector. This array must have as many entries as there are state
             vectors.
 
-        * Any other argument that a numpy array takes. E.g. ``copy=False`` can
-          be used so that the StateVectorTrajectory shares the data storage
-          with the given numpy array.
+    :param \*\*kwargs:
+            Any other argument that a numpy array takes. E.g. ``copy=False`` can
+            be used so that the StateVectorTrajectory shares the data storage
+            with the given numpy array.
 
     Most methods are simple mapped to all single StateVectors. For more
     documentation regarding these methods look into the docstrings of the
@@ -468,11 +491,10 @@ class StateVectorTrajectory(numpy.ndarray):
         *Usage*
             >>> norm = svt.map(lambda sv:sv.norm())
 
-        *Arguments*
-            * *func*
+        :paramter func:
                 Function that takes a StateVector as argument.
 
-            * *svt* (optional)
+        :parameter bool svt: (optional)
                 If svt is True, the return value will be an instance of
                 StateVectorTrajectory.
         """
@@ -520,9 +542,8 @@ class StateVectorTrajectory(numpy.ndarray):
         """
         Calculate the expectation value of the operator for all StateVectors.
 
-        *Returns*
-            *evtraj*
-                An :class:`pycppqed.expvalues.ExpectationValuesTrajectory`
+        :returns:
+                An :class:`.expvalues.ExpectationValuesTrajectory`
                 instance.
 
         See also: :meth:`StateVector.expvalue`
@@ -539,9 +560,8 @@ class StateVectorTrajectory(numpy.ndarray):
         """
         Calculate the expectation value of the diagonal operator for all SVs.
 
-        *Returns*
-            *evtraj*
-                An :class:`pycppqed.expvalues.ExpectationValuesTrajectory`
+        :returns:
+                An :class:`.expvalues.ExpectationValuesTrajectory`
                 instance.
 
         See also: :meth:`StateVector.diagexpvalue`

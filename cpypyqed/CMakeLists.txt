@@ -203,7 +203,8 @@ add_custom_command(TARGET cpypyqed_setup PRE_BUILD
 set(INPUTS "__init__.py" "compilation/cpypyqed_config.py" "compilation/ActTemplate.cc"
            "compilation/CompositeTemplate.cc" "compilation/composite.py" "compilation/ondemand.py"
            "compilation/__init__.py" "compilation/CMakeListsTemplate.txt" "tools/__init__.py"
-           "tools/quantumstate.py" "tools/expvalues.py" "tools/utils.py")
+           "tools/quantumstate.py" "tools/expvalues.py" "tools/utils.py" "tools/initialconditions.py"
+           "tools/test_statevector.py")
 
 foreach(file ${INPUTS})
   add_custom_command(TARGET cpypyqed PRE_BUILD
@@ -265,12 +266,11 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
   file(MAKE_DIRECTORY ${CONF_DOC_DIR})
   file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CPPQED_DOXYGEN_TAG})
   get_filename_component(CPPQED_RELATIVE_DOXYGEN_DIR ${CPPQED_RELATIVE_DOXYGEN_TAG} PATH)
-  set(CPPQED_RELATIVE_DOXYGEN_DIR ../${CPPQED_RELATIVE_DOXYGEN_DIR})
   configure_file(${PROJECT_SOURCE_DIR}/doc/conf.py.in ${CONF_DOC_DIR}/conf.py @ONLY)
   if(CPPQED_MONOLITHIC)
     configure_file(${PROJECT_SOURCE_DIR}/doc/layout.html.in ${CONF_DOC_DIR}/_templates/layout.html @ONLY)
   endif()
-  foreach(AUXFILE index.rst userguide.rst)
+  foreach(AUXFILE index.rst userguide.rst tools.rst)
     configure_file(${PROJECT_SOURCE_DIR}/doc/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
   endforeach()
   # Sphinx cache with pickled ReST documents
@@ -281,7 +281,6 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
                      COMMAND ${CMAKE_COMMAND}
                         -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/doc/reference.rst.in
                         -DOUTPUT=${CONF_DOC_DIR}/reference.rst
-                        -DMODULE_NAME=${PROJECT_NAME}$<$<CONFIG:Debug>:_d>
                         -DDEBUG_SUFFIX="$<$<CONFIG:Debug>:_d>"
                         -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
                      DEPENDS generate.cmake doc/reference.rst.in

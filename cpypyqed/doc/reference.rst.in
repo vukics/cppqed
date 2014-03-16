@@ -7,42 +7,42 @@ cpypyqed Reference
 :mod:`Namespaces`
 ========================
 
-.. automodule:: @MODULE_NAME@
+.. automodule:: cpypyqed
   :members:
   :undoc-members:
 
 :mod:`core@DEBUG_SUFFIX@`
 =============
-.. automodule:: @MODULE_NAME@.core@DEBUG_SUFFIX@
+.. automodule:: cpypyqed.core@DEBUG_SUFFIX@
   :members:
   :undoc-members:
 
 :mod:`elements@DEBUG_SUFFIX@`
 =================
 
-.. automodule:: @MODULE_NAME@.elements@DEBUG_SUFFIX@
+.. automodule:: cpypyqed.elements@DEBUG_SUFFIX@
   :members:
   :undoc-members:
 
 :mod:`compilation.ondemand`
 ======================================
 
-.. automodule:: @MODULE_NAME@.compilation.ondemand
+.. automodule:: cpypyqed.compilation.ondemand
   :members:
   :undoc-members:
 
-.. autoattribute:: @MODULE_NAME@.compilation.ondemand.OnDemand.cpypyqeddir
+.. autoattribute:: cpypyqed.compilation.ondemand.OnDemand.cpypyqeddir
 
 :mod:`compilation.composite`
 =======================================
-.. automodule:: @MODULE_NAME@.compilation.composite
+.. automodule:: cpypyqed.compilation.composite
   :members: makeComposite, Composite
   :undoc-members:
 
-.. autoclass:: @MODULE_NAME@.compilation.composite.Act(int, [int,...])
+.. autoclass:: cpypyqed.compilation.composite.Act(int, [int,...])
 
 :mod:`io@DEBUG_SUFFIX@`
 =========================
-.. automodule:: @MODULE_NAME@.io@DEBUG_SUFFIX@
+.. automodule:: cpypyqed.io@DEBUG_SUFFIX@
   :members:
   :undoc-members:
