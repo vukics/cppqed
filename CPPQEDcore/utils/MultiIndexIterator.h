@@ -47,7 +47,8 @@ private:
 
 public:
   typedef typename Base::value_type MultiIndex;
-  
+  typedef typename MultiIndex::T_numtype SingleIndex;
+
   /// \name Constructors
   //@{
     /// Initialization to the beginning of the sequence
@@ -63,12 +64,12 @@ public:
     /** `lbound` is all-zero */
   MultiIndexIterator(const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
                      mii::Begin b)
-    : MultiIndexIterator(MultiIndex(size_t(0)),ubound,b) {}
+    : MultiIndexIterator(MultiIndex(SingleIndex(0)),ubound,b) {}
 
     /// \overload
     /** `lbound` is all-zero */
   MultiIndexIterator(const MultiIndex& ubound, mii::End e)
-    : MultiIndexIterator(MultiIndex(size_t(0)),ubound,e) {}
+    : MultiIndexIterator(MultiIndex(SingleIndex(0)),ubound,e) {}
   //@}
   
   MultiIndexIterator& operator=(const MultiIndexIterator& other) {idx_=other.idx_; return *this;}

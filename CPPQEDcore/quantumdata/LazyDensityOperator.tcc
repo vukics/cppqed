@@ -43,7 +43,6 @@ template<int RANK>
 const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
 {
   using mathutils::sqr;
-  typedef typename LazyDensityOperator<RANK>::Dimensions Dimensions;
   
   const size_t dim=matrix.getTotalDimension();
   
