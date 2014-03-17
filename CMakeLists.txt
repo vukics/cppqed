@@ -72,7 +72,7 @@ if(BUNDLED_BLITZ)
     HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
     UPDATE_COMMAND ""
     PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
-    CONFIGURE_COMMAND autoreconf -fiv <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure ${BLITZ_CONFIG_OPTIONS} --enable-shared --prefix=<INSTALL_DIR> --with-pic
+    CONFIGURE_COMMAND autoreconf -fiv <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure CXX=${CMAKE_CXX_COMPILER} ${BLITZ_CONFIG_OPTIONS} --enable-shared --prefix=<INSTALL_DIR> --with-pic
     BUILD_COMMAND make lib
   )
   ExternalProject_Get_Property(cppqed-blitz install_dir)
