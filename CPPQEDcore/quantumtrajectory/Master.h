@@ -73,7 +73,7 @@ protected:
   const typename Averaged::Ptr getAv() const {return getQSW().getAv();}
 
 private:
-  void step_v(double) final;
+  virtual void step_v(double) final;
 
   std::ostream& displayParameters_v(std::ostream&) const override;
 
@@ -104,10 +104,10 @@ private:
   typedef typename Base<RANK>:: UnaryFunction  UnaryFunction;
   typedef typename Base<RANK>::BinaryFunction BinaryFunction;
 
-  void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const final;
-  void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const final;
+  virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const final;
+  virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const final;
 
-  const std::string addToParameterDisplay() const final {return " Fast Iteration.";}
+  virtual const std::string addToParameterDisplay() const final {return " Fast Iteration.";}
 
   const blitzplusplus::SlicesData<2*RANK,blitzplusplus::vfmsi::LeftRight<RANK,blitzplusplus::vfmsi::Left> > slicesData_;
 

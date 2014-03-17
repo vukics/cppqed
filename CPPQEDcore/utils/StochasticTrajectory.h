@@ -163,8 +163,8 @@ protected:
   
   /// \name Serialization
   //@{
-  cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       final {FOR_EACH_function( readState)}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const final {FOR_EACH_function(writeState)}
+  virtual cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       final {FOR_EACH_function( readState)}
+  virtual cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const final {FOR_EACH_function(writeState)}
   //@}
   
 private:
@@ -172,16 +172,16 @@ private:
 
 #undef FOR_EACH_function
   
-  void evolve_v(double deltaT) final;
+  virtual void evolve_v(double deltaT) final;
 
-  double getTime_v() const final {return trajs_.front().getTime();}
+  virtual double getTime_v() const final {return trajs_.front().getTime();}
 
-  std::ostream& displayParameters_v(std::ostream&) const final;
+  virtual std::ostream& displayParameters_v(std::ostream&) const final;
 
-  double getDtDid_v() const final;
+  virtual double getDtDid_v() const final;
   // An average of getDtDid()-s from individual trajectories.
 
-  const ToBeAveragedType toBeAveraged_v() const final {return averageInRange(0,trajs_.size());}
+  virtual const ToBeAveragedType toBeAveraged_v() const final {return averageInRange(0,trajs_.size());}
 
   Impl trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
