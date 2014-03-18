@@ -177,7 +177,7 @@ declaretest(compare_PLM_Rho)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=StateComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
-  DEPENDS "ph_PLM_Rho")
+  DEPENDS "ph_PLM_FT")
 add_custom_target(check_PLM_Rho COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   -R "ph_PLM_FT\\|${TESTNAME}")
 
