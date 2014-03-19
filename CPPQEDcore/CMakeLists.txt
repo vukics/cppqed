@@ -216,7 +216,7 @@ else( blitz_SERIALIZATION_FOUND )
 endif( blitz_SERIALIZATION_FOUND )
 
 # Boost (OPTIONAL_COMPONENTS does not work with Boost find_package)
-find_package(Boost REQUIRED)
+find_package(Boost 1.46.0 REQUIRED)
 find_package(Boost QUIET COMPONENTS serialization)
 
 if( Boost_SERIALIZATION_FOUND )
