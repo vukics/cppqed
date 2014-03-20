@@ -2,4 +2,4 @@
 
 // Explicit instantiation should not compile:
 
-template struct tmptools::IsEvenAssert<31>;
+template struct tmptools::AssertEvenAndDivideBy2<31>;

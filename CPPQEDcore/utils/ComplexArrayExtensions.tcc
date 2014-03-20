@@ -35,7 +35,7 @@ inline
 void
 hermitianConjugateSelf(CArray<TWO_TIMES_RANK>& array) 
 {
-  static_assert( tmptools::IsEvenAssert<TWO_TIMES_RANK>::value , "Odd total RANK for hermitian conjugation." );
+  static_assert( tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value , "Odd total RANK for hermitian conjugation." );
   array=conj(array); 
   details::helpHermitianConjugate(array);
 }
@@ -46,7 +46,7 @@ inline
 const CArray<TWO_TIMES_RANK>
 hermitianConjugate(const CArray<TWO_TIMES_RANK>& array)
 {
-  static_assert( tmptools::IsEvenAssert<TWO_TIMES_RANK>::value , "Odd total RANK for hermitian conjugation." );
+  static_assert( tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value , "Odd total RANK for hermitian conjugation." );
   CArray<TWO_TIMES_RANK> res(conj(array));
   details::helpHermitianConjugate(res);
   return res;

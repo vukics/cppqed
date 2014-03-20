@@ -123,7 +123,7 @@ struct numerical_equal : boost::mpl::equal<Seq1,Seq2,details::value_equal<boost:
 
 /// Provokes a compile-time error if `N` is not even, otherwise acts as a Boost.MPL \refBoostConstruct{int_,mpl/doc/refmanual/int.html} integral constant wrapper of `N/2`
 template<int N>
-struct IsEvenAssert : boost::mpl::int_<N/2>
+struct AssertEvenAndDivideBy2 : boost::mpl::int_<N/2>
 {
   BOOST_MPL_ASSERT_MSG( (2*(N/2)==N) , ARGUMENT_NOT_EVEN, (boost::mpl::int_<N>) );
 };

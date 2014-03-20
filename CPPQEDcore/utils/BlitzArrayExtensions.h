@@ -48,7 +48,7 @@ class BinaryArrayOrderingErrorException : public cpputils::Exception {};
 
 /// Returns a binary view of `array`. `TWO_TIMES_RANK` must be an even number
 /**
- * Violation is detected @ compile time by tmptools::IsEvenAssert.
+ * Violation is detected @ compile time by tmptools::AssertEvenAndDivideBy2.
  * 
  * The same requirement of contiguity an the same warning applies as for unaryArray, and in addition, further assumptions
  * on the storage order must be made: The storage of the two multi-indices must not be intertwined and must be layed out

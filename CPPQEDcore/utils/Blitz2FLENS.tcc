@@ -29,7 +29,7 @@ const typename DenseVectorMF<T>::type vector(blitz::Array<T,RANK>& array)
 template<StorageOrder SO, typename T, int TWO_TIMES_RANK>
 const typename GeMatrixMF<T,SO>::type matrix(blitz::Array<T,TWO_TIMES_RANK>& array)
 {
-  /*static const int RANK=*/tmptools::IsEvenAssert<TWO_TIMES_RANK>();//::value;
+  /*static const int RANK=*/tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();//::value;
 
   using namespace flens;
   typedef typename GeMatrixMF<T,SO>::type GeMatrix       ;
@@ -49,7 +49,7 @@ const typename GeMatrixMF<T,SO>::type matrix(blitz::Array<T,TWO_TIMES_RANK>& arr
 template<StorageOrder SO, int TWO_TIMES_RANK>
 const typename HeMatrixMF<SO>::type hermitianMatrix(CArray<TWO_TIMES_RANK>& array)
 {
-  /*static const int RANK=*/tmptools::IsEvenAssert<TWO_TIMES_RANK>();//::value;
+  /*static const int RANK=*/tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();//::value;
 
   using namespace flens;
   using namespace blitzplusplus;

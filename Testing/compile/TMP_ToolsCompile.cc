@@ -57,7 +57,7 @@ BOOST_STATIC_ASSERT((
 
 
 BOOST_STATIC_ASSERT((
-                     IsEvenAssert<22>::value==11
+                     AssertEvenAndDivideBy2<22>::value==11
                      ));
 
 

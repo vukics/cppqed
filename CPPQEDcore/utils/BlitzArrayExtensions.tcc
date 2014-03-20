@@ -37,7 +37,7 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
 #ifndef   NDEBUG
   if (!array.isStorageContiguous()) throw (NonContiguousStorageException());
 
-  static const int RANK=tmptools::IsEvenAssert<TWO_TIMES_RANK>::value;
+  static const int RANK=tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value;
 
   {
     const blitz::TinyVector<int,TWO_TIMES_RANK>& ordering=array.ordering();
