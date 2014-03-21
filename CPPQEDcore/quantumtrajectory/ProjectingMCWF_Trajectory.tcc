@@ -7,7 +7,7 @@
 
 #include "MCWF_Trajectory.tcc"
 
-#include "Blitz2FLENS.h"
+#include "Blitz2FLENS.tcc"
 
 
 namespace quantumtrajectory {
@@ -27,17 +27,17 @@ ProjectingMCWF_Trajectory<RANK>::help() const
       res(j,i)=conj(res(i,j)=braket(basis_[i],basis_[j]));
   }
 
-  // now we have the dd components of the metric, and we have to
-  // invert it to get the uu components:
+  // now we have the dd components of the metric, and we have to invert it to get the uu components:
   if (dim) {
     using namespace blitz2flens;
-    typedef GeMatrixMF<dcomp,RowMajor>::type GeMatrix;
+
+    typedef GeMatrixOf<dcomp,RowMajor> GeMatrix;
 
     GeMatrix a(matrix<RowMajor>(res));
-    DenseVector<Array<int> > pivots(dim);
+    flens::DenseVector<flens::Array<int> > pivots(dim);
     
-    trf(a,pivots);
-    tri(a,pivots);
+    flens::lapack::trf(a,pivots);
+    flens::lapack::tri(a,pivots);
   }
 
   return res;

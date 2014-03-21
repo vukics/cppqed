@@ -3,6 +3,11 @@
 #define   CPPQEDCORE_UTILS_BLITZ2FLENS_H_INCLUDED
 
 #include "BlitzArray.h"
+#include "TMP_Tools.h"
+
+#ifndef USE_CXXLAPACK
+#define USE_CXXLAPACK
+#endif // USE_CXXLAPACK
 
 #include <flens/flens.h>
 
@@ -15,40 +20,33 @@ namespace mpl=boost::mpl;
 namespace blitz2flens {
 
 
-using namespace flens;
+using flens::StorageOrder; using flens::RowMajor; using flens::ColMajor;
 
 
 template<typename T>
-struct DenseVectorMF : mpl::identity<DenseVector<ArrayView<T> > > 
-{
-  typedef ArrayView<T> View;
-};
-
+using DenseVectorOf=flens::DenseVector<flens::ArrayView<T> >;
 
 template<typename T, StorageOrder SO>
-struct GeMatrixMF : mpl::identity<GeMatrix<FullStorageView<T,SO> > >
-{
-  typedef FullStorageView<T,SO> View;
-};
+using GeMatrixOf=flens::GeMatrix<flens::FullStorageView<T,SO> >;
 
 template<StorageOrder SO>
-struct HeMatrixMF : mpl::identity<HeMatrix<FullStorageView<dcomp,SO> > >
-{
-  typedef FullStorageView<dcomp,SO> View;
-};
+using HeMatrixOf=flens::HeMatrix<flens::FullStorageView<dcomp,SO> >;
 
 
 template<typename T, int RANK>
-const typename DenseVectorMF<T>::type vector(const blitz::Array<T,          RANK>&);
+const DenseVectorOf<T> vector(const blitz::Array<T,          RANK>&);
 
 
 template<StorageOrder SO, typename T, int TWO_TIMES_RANK>
-const typename GeMatrixMF<T,SO>::type matrix(const blitz::Array<T,TWO_TIMES_RANK>&);
-
+const GeMatrixOf<T,SO> matrix(const blitz::Array<T,TWO_TIMES_RANK>&);
 
 
 template<StorageOrder SO, int TWO_TIMES_RANK>
-const typename HeMatrixMF<SO>::type hermitianMatrix(const CArray<TWO_TIMES_RANK>&);
+const HeMatrixOf<SO> hermitianMatrix(const CArray<TWO_TIMES_RANK>&);
+
+
+template<int TWO_TIMES_RANK>
+const CArray<tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value> ev(CArray<TWO_TIMES_RANK>);
 
 
 } // blitz2flens

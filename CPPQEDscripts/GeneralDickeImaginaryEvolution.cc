@@ -86,12 +86,11 @@ int main(int argc, char* argv[])
     assert(!mathutils::fcmp(1-max(abs(hamiltonian.copy()-blitzplusplus::hermitianConjugate(hamiltonian))),1,1e-12));
 
     {
-      typedef HeMatrixMF<RowMajor>::type HeMatrix;
-      HeMatrix a(hermitianMatrix<RowMajor>(eigenVectors));
+      HeMatrixOf<RowMajor> a(hermitianMatrix<RowMajor>(eigenVectors));
 
-      DenseVectorMF<double>::type v(blitz2flens::vector(eigenValues));
+      DenseVectorOf<double> v(blitz2flens::vector(eigenValues));
     
-      ev(true,a,v);
+      flens::lapack::ev(true,a,v);
     }
 
     for (int i=0; i<dim; i++) {
