@@ -15,9 +15,6 @@ foreach(target ExampleModeMain HarmonicOscillatorComplex CoherentElementTest Exa
   if(BUNDLED_BLITZ)
     add_dependencies(${target} cppqed-blitz)
   endif()
-  if(BUNDLED_FLENS)
-    add_dependencies(${target} flens)
-  endif()
 endforeach()
 
 add_custom_target(core_examples_main_targets)
