@@ -61,6 +61,8 @@ if(BUNDLED_BLITZ)
     set(blitz_SERIALIZATION_FOUND On)
   endif()
 
+  string(REGEX REPLACE "/include" "" local_boost_root ${Boost_INCLUDE_DIR})
+
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
     set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-64bit)
   else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
@@ -72,13 +74,13 @@ if(BUNDLED_BLITZ)
     HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
     UPDATE_COMMAND ""
     PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
-    CONFIGURE_COMMAND autoreconf -fiv <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure CXX=${CMAKE_CXX_COMPILER} ${BLITZ_CONFIG_OPTIONS} --enable-shared --prefix=<INSTALL_DIR> --with-pic
+    CONFIGURE_COMMAND autoreconf -fiv <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure CXX=${CMAKE_CXX_COMPILER} ${BLITZ_CONFIG_OPTIONS} --with-boost=${local_boost_root} --enable-shared --prefix=<INSTALL_DIR> --with-pic
     BUILD_COMMAND make lib
   )
   ExternalProject_Get_Property(cppqed-blitz install_dir)
   set(blitz_INCLUDE_DIRS ${install_dir}/include)
-  set(blitz_LIBRARIES ${install_dir}/lib/libblitzcppqed.so)
-  set(BUNDLED_BLITZ_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libblitzcppqed.so)
+  set(blitz_LIBRARIES ${install_dir}/lib/libblitzcppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set(BUNDLED_BLITZ_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libblitzcppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
   set(blitz_FOUND 1)
 endif()
 
@@ -104,8 +106,8 @@ if(BUNDLED_FLENS)
   )
   ExternalProject_Get_Property(flens install_dir)
   set(flens_INCLUDE_DIRS ${install_dir}/include)
-  set(flens_LIBRARIES ${install_dir}/lib/libflenscppqed.so)
-  set(BUNDLED_FLENS_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libflenscppqed.so)
+  set(flens_LIBRARIES ${install_dir}/lib/libflenscppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set(BUNDLED_FLENS_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libflenscppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
   set(flens_FOUND 1)
 endif()
 
