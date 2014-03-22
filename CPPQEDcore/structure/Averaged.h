@@ -6,7 +6,7 @@
 #include "AveragedFwd.h"
 
 #include "LiouvilleanAveragedCommon.h"
-#include "Time.h"
+#include "TimeDependence.h"
 
 #include "Exception.h"
 

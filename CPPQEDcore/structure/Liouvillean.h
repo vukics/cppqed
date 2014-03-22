@@ -6,7 +6,7 @@
 #include "LiouvilleanFwd.h"
 
 #include "LiouvilleanAveragedCommon.h"
-#include "Time.h"
+#include "TimeDependence.h"
 
 #include "LazyDensityOperator.h"
 #include "StateVector.h"

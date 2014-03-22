@@ -5,7 +5,7 @@
 
 #include "HamiltonianFwd.h"
 
-#include "Time.h"
+#include "TimeDependence.h"
 #include "Types.h"
 
 #include <boost/shared_ptr.hpp>
