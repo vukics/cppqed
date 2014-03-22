@@ -61,6 +61,38 @@ public:
   Interaction(const Frees& frees, RealFreqsInitializer rf, CF cf) : Interaction(frees,rf,{cf}) {}
   Interaction(const Frees& frees, RF rf, ComplexFreqsInitializer cf) : Interaction(frees,{rf},cf) {}
 
+  template<typename F0, typename F1, typename... F_REST, typename RF_type, typename CF_type>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF)
+    :  Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),realFreqs,complexFreqs) {}
+
+  template<typename F0, typename F1, typename... F_REST>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, const ComplexFreqs& complexFreqs) : Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),
+                                                                                                    complexFreqs) {}
+
+  template<typename F0, typename F1, typename... F_REST>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),
+                                                                                                                          rf,cf) {}
+
+  template<typename F0, typename F1, typename... F_REST>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, ComplexFreqsInitializer cf) : Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),
+                                                                                              cf) {}
+
+  template<typename F0, typename F1, typename... F_REST>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, RF rf, CF cf=CF()) : Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),
+                                                                                     rf,cf) {}
+
+  template<typename F0, typename F1, typename... F_REST>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, CF cf) : Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),
+                                                                         cf) {}
+
+  template<typename F0, typename F1, typename... F_REST>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, RealFreqsInitializer rf, CF cf) : Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),
+                                                                                                  rf,cf) {}
+
+  template<typename F0, typename F1, typename... F_REST>
+  Interaction(F0&& f0, F1&& f1, F_REST&&... f_rest, RF rf, ComplexFreqsInitializer cf) : Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f_rest)...),
+                                                                                                     rf,cf) {}
+
   const Frees& getFrees() const {return frees_;}
 
 protected:
