@@ -46,7 +46,7 @@ nonOwningConstSharedPtr(T* t ///< the object to be wrapped into the shared-point
 }
 
 
-/// Part of a bundle of functions providing a unified interface to wrap objects into the shared-pointer interface, it simply returns its argument.
+/// Part of a bundle of functions providing a unified interface to wrap objects into the shared-pointer interface, it simply returns its argument. \todo How to shared-pointerize an rvalue reference?
 template<typename T>
 const boost::shared_ptr<T> sharedPointerize(boost::shared_ptr<T> t) {return                     t ;}
 

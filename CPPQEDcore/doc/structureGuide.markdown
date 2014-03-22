@@ -135,8 +135,7 @@ Consider `ExampleInteraction.h`:\dontinclude ExampleInteraction.h
 As we see, the Hamiltonian can be written in a rather straightforward way, and it internally takes care about the time-dependent phases appearing in \f$H_{\text{X-X;I}}(t)\f$,
 which result from the use of interaction picture.
 
-The free elements are stored as shared pointers in the interaction element, and it is the task of structure::Interaction::FreesProxy to turn the constant references supplied to the constructor into (non-owning)
-shared pointers. Of course, the free elements have to live in a larger scope than the interaction, otherwise we may run into trouble with dangling pointers.
+The free elements are stored as shared pointers in the interaction element, and the constant references supplied to the constructor are turned into (non-owning) shared pointers (cf. cpputils::sharedPointerize). Of course, the free elements have to live in a larger scope than the interaction, otherwise we may run into trouble with dangling pointers.
 
 
 Using class inheritance {#hierarchicaloscillator}
