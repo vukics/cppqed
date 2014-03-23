@@ -47,7 +47,6 @@ public:
   
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
-  /// \todo Why not a variadic constructor here, taking a pack of Free instances?
   explicit Interaction(const Frees& frees,
                        const    RealFreqs&    realFreqs=emptyRF, 
                        const ComplexFreqs& complexFreqs=emptyCF)
@@ -61,10 +60,14 @@ public:
   Interaction(const Frees& frees, RealFreqsInitializer rf, CF cf) : Interaction(frees,rf,{cf}) {}
   Interaction(const Frees& frees, RF rf, ComplexFreqsInitializer cf) : Interaction(frees,{rf},cf) {}
 
+  template<typename F0, typename F1, typename... RCF_type>
+  Interaction(const F0& f0, const F1& f1,  const RCF_type&... realAndComplexFreqs)
+    :  Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1)),realAndComplexFreqs...) {}
+
   const Frees& getFrees() const {return frees_;}
 
 protected:
-  /// Shared-pointerizes the elements passed as Frees. \todo How to shared-pointerize an rvalue reference?
+  /// Shared-pointerizes the elements passed as Frees. \note Variadic arguments do not interact well with initializer lists, cf. the failure of commit #956781a9
   class FreesProxy
   {
   public:
