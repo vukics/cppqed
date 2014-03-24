@@ -15,6 +15,9 @@ set_tests_properties(${TESTNAME} PROPERTIES DEPENDS test_CustomElementsExample)
 declaretest(test_scripts_all_target)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=CompileTarget --script=scripts_all)
+declaretest(test_core_examples_main_targets)
+add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
+            --test=${TESTNAME} --testclass=CompileTarget --script=core_examples_main_targets)
 declaretest(test_TMP_ToolsCompile)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=CompileTarget --script=TMP_ToolsCompile)

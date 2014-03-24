@@ -461,16 +461,7 @@ install(EXPORT CPPQEDcoreTargets DESTINATION
 #!
 #! Compile the example code documented \ref structurebundleguide "here".
 
-#! \name Project options
-#! @{
-#
-#! \brief Switch compilation of some example code which demonstrates how to code frees and interactions
-#!   (c.f. the \ref structurebundleguide "structure bundle guide").
-option(EXAMPLES "Compile examples" ON)
-#! @}
-if(EXAMPLES)
-  add_subdirectory(examples)
-endif(EXAMPLES)
+add_subdirectory(examples)
 
 #! \file
 #! <!--#########################################################-->

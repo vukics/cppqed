@@ -45,7 +45,7 @@ auto basic::PumpedLossyMode::average_v(NoTime, const LazyDensityOperator& matrix
 
   for (int n=1; n<int(matrix.getDimension()); n++) {
     double sqrtn=sqrt(n);
-    dcomp offdiag(matrix(n,n-1));
+    dcomp offdiag(matrix(n)(n-1));
     averages(1)+=sqrtn*real(offdiag);
     averages(2)+=sqrtn*imag(offdiag);
   }
@@ -95,7 +95,7 @@ auto basic::PumpedLossyModeIP::average_v(NoTime, const LazyDensityOperator& matr
 
   for (int n=1; n<int(matrix.getDimension()); n++) {
     double sqrtn=sqrt(n);
-    dcomp offdiag(matrix(n,n-1));
+    dcomp offdiag(matrix(n)(n-1));
     averages(1)+=sqrtn*real(offdiag);
     averages(2)+=sqrtn*imag(offdiag);
   }
@@ -144,7 +144,7 @@ auto hierarchical::ModeBase::average_v (NoTime, const hierarchical::ModeBase::La
 
   for (int n=1; n<int(matrix.getDimension()); n++) {
     double sqrtn=sqrt(n);
-    dcomp offdiag(matrix(n,n-1));
+    dcomp offdiag(matrix(n)(n-1));
     averages(1)+=sqrtn*real(offdiag);
     averages(2)+=sqrtn*imag(offdiag);
   }

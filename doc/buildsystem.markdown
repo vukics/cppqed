@@ -92,7 +92,6 @@ Note that without this feature, state files cannot be written to or read from di
 * `-DFLENS=Off`: disable `FLENS` support, even if the library is detected.
 * `-DREGISTRY=Off`: don't write information about the build trees to the
 [cmake package registry][cmake-registry].
-* `-DEXAMPLES=Off`: con't compile some examples in the C++QEDcore repository.
 
 See also the (possibly more complete) list of %CMake options in the CMake namespace ("Project options"), which is generated from the project
 build system documentation.

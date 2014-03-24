@@ -19,3 +19,6 @@ foreach(target ExampleModeMain HarmonicOscillatorComplex CoherentElementTest Exa
     add_dependencies(${target} flens)
   endif()
 endforeach()
+
+add_custom_target(core_examples_main_targets)
+add_dependencies(core_examples_main_targets ExampleModeMain HarmonicOscillatorComplex CoherentElementTest)
