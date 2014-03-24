@@ -31,8 +31,7 @@ ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix
 {
   using quantumdata::partialTrace;
 
-  Averages averages(18);
-  averages=0;
+  auto averages(initializedAverages());
 
   {
     const Averaged1::Ptr p(sharedPointerize(averagedMode_));

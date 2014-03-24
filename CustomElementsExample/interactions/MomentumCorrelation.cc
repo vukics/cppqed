@@ -10,8 +10,7 @@ MomentumCorrelation::MomentumCorrelation(particle::Ptr p0, particle::Ptr p1) :
 
 const MomentumCorrelation::Averages MomentumCorrelation::average_v(Time t, const LazyDensityOperator& matrix) const
 {
-  Averages averages(1);
-  averages=0;
+  auto averages(initializedAverages());
   double diag,temp;
   size_t dim1 = matrix.getDimensions()[0];
   size_t dim2 = matrix.getDimensions()[1];

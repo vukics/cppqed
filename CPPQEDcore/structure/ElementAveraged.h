@@ -49,6 +49,8 @@ protected:
   ElementAveraged(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {} ///< ”
   //@}
 
+  const Averages initializedAverages() const {Averages res(this->nAvr()); res=0.; return res;}
+
 private:
   std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const final {return details::displayCommon(a,os,precision);}
 

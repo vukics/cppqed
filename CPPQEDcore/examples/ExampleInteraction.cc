@@ -20,8 +20,7 @@ hierarchical::InteractionX_X::InteractionX_X(const ModeBase& m0, const ModeBase&
 
 auto hierarchical::InteractionX_X_Correlations::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
 {
-  Averages averages(4);
-  averages=0;
+  auto averages(initializedAverages());
 
   for (int n=0; n<int(matrix.getDimension(0)); n++) for (int m=1; m<int(matrix.getDimension(1)); m++) {
       if(n<int(matrix.getDimension(0))-1) {

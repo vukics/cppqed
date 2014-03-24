@@ -94,9 +94,7 @@ SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double g
 
 const SpinBase::Averages SpinBase::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
 {
-  Averages averages(5);
-
-  averages=0;
+  auto averages(initializedAverages());
 
   for (int n=0; n<matrix.getDimension(); n++) {
 

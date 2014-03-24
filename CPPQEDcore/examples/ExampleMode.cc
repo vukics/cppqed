@@ -37,9 +37,7 @@ basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, d
 
 auto basic::PumpedLossyMode::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
 {
-  Averages averages(3);
-
-  averages=0;
+  auto averages(initializedAverages());
 
   averages(0)=aJumpRate(matrix,1);
 
@@ -87,9 +85,7 @@ void basic::PumpedLossyModeIP::updateU(OneTime dtDid) const
 // PumpedLossyModeIP::average_v exactly the same as PumpedLossyMode::average_v above
 auto basic::PumpedLossyModeIP::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
 {
-  Averages averages(3);
-
-  averages=0;
+  auto averages(initializedAverages());
 
   averages(0)=aJumpRate(matrix,1);
 
@@ -136,9 +132,7 @@ double hierarchical::ModeBase::rate(NoTime, const LazyDensityOperator& matrix, L
 // ModeBase::average_v exactly the same as PumpedLossyMode::average_v above
 auto hierarchical::ModeBase::average_v (NoTime, const hierarchical::ModeBase::LazyDensityOperator& matrix) const -> const Averages
 {
-  Averages averages(3);
-
-  averages=0;
+  auto averages(initializedAverages());
 
   averages(0)=aJumpRate(matrix,1);
 

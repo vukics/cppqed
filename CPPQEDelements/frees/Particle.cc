@@ -121,8 +121,7 @@ const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& 
 {
   int dim=space_.getDimension();
 
-  Averages averages(4);
-  averages=0;
+  auto averages(initializedAverages());
   
   const LazyDensityOperator::Ptr matrixX(quantumdata::ffTransform<tmptools::Vector<0> >(matrix,DIR_KX));
   

@@ -12,8 +12,7 @@ QbitModeCorrelations::QbitModeCorrelations()
 const QbitModeCorrelations::Averages
 QbitModeCorrelations::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
-  Averages averages(6);
-  averages=0;
+  auto averages(initializedAverages());
 
   for (int n=0; n<int(matrix.getDimension(1))-1; n++) {
     dcomp temp=sqrt(n+1)*matrix(1,n)(0,n+1);
