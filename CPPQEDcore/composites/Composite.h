@@ -81,7 +81,7 @@ public:
 
 private:
   // Compile-time sanity check
-  BOOST_MPL_ASSERT_MSG( ( composite::CheckMeta<RANK,VA>::type::value == true ), COMPOSITE_not_CONSISTENT, (composite::CheckMeta<RANK,VA>) );
+  static_assert( composite::CheckMeta<RANK,VA>::type::value == true , "Composite not consistent" );
 
 public:
   // Public types

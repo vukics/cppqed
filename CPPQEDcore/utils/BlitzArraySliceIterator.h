@@ -54,9 +54,7 @@ using cpputils::mii::Begin; using cpputils::mii::End;
 
 
 /// Checking the consistency of template arguments for use in slicing
-/** 
- * Implemented via the static assertion \refBoostConstruct{BOOST_MPL_ASSERT_MSG,mpl/doc/refmanual/assert.html} from Boost.MPL.
- * 
+/**
  * - size of `V` must not be larger than `RANK`
  * - `V` must not contain duplicated elements
  * - all elements of `V` must be smaller than `RANK`
@@ -69,25 +67,13 @@ template<int RANK, typename V> struct ConsistencyChecker
   static_assert( RANK >= Size<V>::value , "Indexer with nonpositive RANK." );
 
   typedef typename boost::mpl::sort<V>::type SortedV;
-  BOOST_MPL_ASSERT_MSG( 
-                       (
-                        boost::mpl::equal<typename boost::mpl::unique<SortedV,boost::is_same<boost::mpl::_1,boost::mpl::_2> >::type,SortedV>::value 
-                        ), 
-                       BASI_ITERATOR_INCONSISTENT_VECTOR, (V) 
-                        );
-  
-  BOOST_MPL_ASSERT_MSG(
-                       (
-                        boost::mpl::deref<typename boost::mpl::max_element<V>::type>::type::value < RANK
-                        ),
-                       BASI_ITERATOR_VECTOR_OUT_of_RANGE, (V)
-                       );
+  static_assert( boost::mpl::equal<typename boost::mpl::unique<SortedV,boost::is_same<boost::mpl::_1,boost::mpl::_2> >::type,SortedV>::value , "basi::Iterator inconsistent vector" );
+  static_assert( boost::mpl::deref<typename boost::mpl::max_element<V>::type>::type::value < RANK , "basi::Iterator vector out of range" );
 };
 
 
-/// Specializations necessary since boost::mpl::range_c cannot be sorted
-template<int RANK, int I1, int I2>  struct ConsistencyChecker<RANK,boost::mpl::range_c<int,I1,I2> >
-{ BOOST_MPL_ASSERT_MSG( ( I1>=0 && I2<RANK ), BASI_ITERATOR_VECTOR_OUT_of_RANGE, ( boost::mpl::range_c<int,I1,I2> ) ) ; };
+/// Specialization necessary since boost::mpl::range_c cannot be sorted
+template<int RANK, int I1, int I2>  struct ConsistencyChecker<RANK,boost::mpl::range_c<int,I1,I2> > { static_assert( I1>=0 && I2<RANK , "basi::Iterator vector out of range" ); };
 
 /** \cond SPECIALIZATION */
 template<int RANK, int N, int Nbeg> struct ConsistencyChecker<RANK,tmptools::Range<N,Nbeg> > : private ConsistencyChecker<RANK,boost::mpl::range_c<int,Nbeg,Nbeg+N> > {};

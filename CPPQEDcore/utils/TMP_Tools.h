@@ -41,8 +41,6 @@
 #include <boost/mpl/find_if.hpp>
 #include <boost/mpl/equal.hpp>
 
-#include <boost/mpl/assert.hpp>
-
 #define DEFINE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName;
 
 #define DEFINE_INITIALIZE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName=typeName();
@@ -125,7 +123,7 @@ struct numerical_equal : boost::mpl::equal<Seq1,Seq2,details::value_equal<boost:
 template<int N>
 struct AssertEvenAndDivideBy2 : boost::mpl::int_<N/2>
 {
-  BOOST_MPL_ASSERT_MSG( (2*(N/2)==N) , ARGUMENT_NOT_EVEN, (boost::mpl::int_<N>) );
+  static_assert( 2*(N/2)==N , "Argument not even" );
 };
 
 
@@ -147,7 +145,7 @@ struct pair_c<N1,N2,false>
   template<int MIN, int MAX>
   struct SanityCheck
   {
-    BOOST_MPL_ASSERT_MSG( (N1>=MIN && N2>=MIN && N1<=MAX && N2<=MAX) , PAIR_C_SANITY_CHECK_FAILED , (SanityCheck) );
+    static_assert( N1>=MIN && N2>=MIN && N1<=MAX && N2<=MAX , "pair_c sanity check failed" );
   };
   /** \endcond */
 
@@ -166,7 +164,7 @@ const int pair_c<N1,N2,false>::second;
 template<int N1, int N2>
 struct pair_c<N1,N2,true> : pair_c<N1,N2,false> 
 {
-  BOOST_MPL_ASSERT_MSG( (N1!=N2) , PAIR_C_with_EQUAL_ELEMENTS , (pair_c) );  
+  static_assert( N1!=N2 , "pair_c with equal elements" );
 };
 
 
@@ -182,7 +180,7 @@ namespace details {
 template<int V>
 struct ArgumentDispatcher : boost::mpl::integral_c<int,V>
 {
-  BOOST_MPL_ASSERT_MSG( V>=0 , NEGATIVE_ELEMENT_in_NONNEGATIVE_VECTOR, (boost::mpl::int_<V>) );
+  static_assert( V>=0 , "Negative element in nonnegative vector" );
 };
 
 } // details
