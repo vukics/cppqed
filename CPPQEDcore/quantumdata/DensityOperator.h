@@ -87,11 +87,49 @@ public:
 
   template<typename OTHER>
   DensityOperator& operator=(const OTHER& other) {getArray()=other; return *this;}
-  
+
+private:
+  class IndexerProxy
+  {
+  public:
+    IndexerProxy(const DensityOperator* rho, const Idx& firstIndex) : rho_(rho), firstIndex_(firstIndex) {}
+
+    template<typename... SubscriptPack>
+    IndexerProxy(const DensityOperator* rho, int s0, SubscriptPack... subscriptPack) : IndexerProxy(rho,Idx(s0,subscriptPack...))
+    {static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for DensityOperator." );}
+
+    const dcomp& operator()(const Idx& secondIndex) const {return rho_->indexWithTiny(firstIndex_,secondIndex);}
+          dcomp& operator()(const Idx& secondIndex)       {return const_cast<dcomp&>(static_cast<const IndexerProxy&>(*this)(secondIndex));}
+
+    template<typename... SubscriptPack>
+    const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const
+    {
+      static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for DensityOperator::IndexerProxy." );
+      return operator()(Idx(s0,subscriptPack...));
+    }
+
+    template<typename... SubscriptPack>
+          dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const IndexerProxy&>(*this)(s0,subscriptPack...));}
+
+  private:
+    const DensityOperator*const rho_;
+    const Idx firstIndex_;
+
+  };
+
+  friend class IndexerProxy;
+
+public:
   /// \name (Multi-)matrix style indexing
   //@{
-  const dcomp& operator()(const Idx& i, const Idx& j) const;
-        dcomp& operator()(const Idx& i, const Idx& j) {return const_cast<dcomp&>(static_cast<const DensityOperator&>(*this)(i,j));}
+  const IndexerProxy operator()(const Idx& firstIndex) const {return IndexerProxy(this,firstIndex);}
+        IndexerProxy operator()(const Idx& firstIndex)       {return IndexerProxy(this,firstIndex);}
+
+  template<typename... SubscriptPack>
+  const IndexerProxy operator()(int s0, SubscriptPack... subscriptPack) const {return IndexerProxy(this,s0,subscriptPack...);}
+
+  template<typename... SubscriptPack>
+        IndexerProxy operator()(int s0, SubscriptPack... subscriptPack)       {return IndexerProxy(this,s0,subscriptPack...);}
   //@}
 
   /// \name Norm
@@ -122,7 +160,9 @@ public:
   //@}
 
 private:
-  const dcomp index(const Idx& i, const Idx& j) const override {return operator()(i,j);} ///< This function implements the LazyDensityOperator interface in a trivial element-access way
+  const dcomp& indexWithTiny(const Idx&, const Idx&) const; ///< Used for implementing operator() and the index function below.
+
+  const dcomp index(const Idx& i, const Idx& j) const override {return indexWithTiny(i,j);} ///< This function implements the LazyDensityOperator interface in a trivial element-access way
 
   double trace_v() const override {return norm();} ///< A straightforward implementation of a LazyDensityOperator virtual
 

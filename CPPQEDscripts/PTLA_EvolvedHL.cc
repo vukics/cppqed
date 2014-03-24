@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
   {
     quantumdata::DensityOperator<1> rho(qbit::init(pp2la));
 
-    sigma=real(rho(1,0)),imag(rho(1,0));
+    sigma=real(rho(1)(0)),imag(rho(1)(0));
   }
 
   Simulated<Array> S(sigma,bind(derivs,_1,_2,_3,pp2la),dtinit,pt);

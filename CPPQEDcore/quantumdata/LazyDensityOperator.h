@@ -67,15 +67,60 @@ public:
 
   typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper
 
-  /// The type used for indexing the “rows” and the “columns”.
-  /** Just an integer (index) if `RANK=1`, otherwise a tiny vector of integers (multi-index). */
-  typedef typename mpl::if_c<(RANK==1),int,IdxTiny<RANK> >::type Idx; 
+  typedef IdxTiny<RANK> Idx; ///< The type used for indexing the “rows” and the “columns”: a tiny vector of integers (multi-index)
 
   virtual ~LazyDensityOperator() {}
 
-  const dcomp operator()(const Idx& i, const Idx& j) const {return index(i,j);} ///< The indexing function calling a purely virtual function according to the non-virtual interface idiom
+private:
+  class IndexerProxy
+  {
+  public:
+    IndexerProxy(const LazyDensityOperator* ldo, const Idx& firstIndex) : ldo_(ldo), firstIndex_(firstIndex) {}
 
-  double operator()(const Idx& i) const {return real((*this)(i,i));} ///< An inline function for conveniently addressing the diagonal elements
+    const dcomp operator()(const Idx& secondIndex) const {return ldo_->index(firstIndex_,secondIndex);}
+
+    template<typename... SubscriptPack>
+    const dcomp operator()(int s0, SubscriptPack... subscriptPack) const
+    {
+      static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for LazyDensityOperator::IndexerProxy." );
+      return operator()(Idx(s0,subscriptPack...));
+    }
+
+    operator double() const {return real(ldo_->index(firstIndex_,firstIndex_));}
+
+  private:
+    const LazyDensityOperator*const ldo_;
+    const Idx firstIndex_;
+
+  };
+
+  friend class IndexerProxy;
+
+public:
+  /// Multi-matrix style indexing via Idx type
+  const IndexerProxy operator()(const Idx& firstIndex) const {return IndexerProxy(this,firstIndex);}
+
+  /// Multi-matrix style indexing via packs of integers
+  /**
+   * This allows for the very convenient indexing syntax (e.g. a ternary LazyDensityOperator `matrix` indexed by multi-indeces `i` and `j`):
+   *
+   *     matrix(i0,i1,i2)(j0,j1,j2)
+   *
+   * while
+   *
+   *     matrix(i0,i1,i2)
+   *
+   * returns a proxy implicitly convertible to a `double`, giving the diagonal element corresponding to the multi-index `i`
+   *
+   * \note The number of indeces in the multi-index is checked @ compile time.
+   *
+   */
+  template<typename... SubscriptPack>
+  const IndexerProxy operator()(int s0, SubscriptPack... subscriptPack) const
+  {
+    static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for LazyDensityOperator." );
+    return operator()(Idx(s0,subscriptPack...));
+  }
 
   double trace() const {return trace_v();} ///< Returns the trace (redirected to a pure virtual)
   
@@ -101,14 +146,6 @@ private:
   virtual double trace_v() const = 0;
 
 };
-
-
-/// Converts the index-tiny of size `RANK` to the arity-dependent indexing type of LazyDensityOperator \related LazyDensityOperator
-template<int RANK>
-inline const typename LazyDensityOperator<RANK>::Idx dispatchLDO_index(const IdxTiny<RANK>& idx) {return idx   ;}
-
-/// ” for `RANK=1` \related LazyDensityOperator
-inline const          LazyDensityOperator<1   >::Idx dispatchLDO_index(const IdxTiny<1   >& idx) {return idx[0];}
 
 
 /// Turns the data of a LazyDensityOperator into a real 1D array
@@ -147,11 +184,10 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
  * 
  *   const dcomp calculateADaggerB(const LazyDensityOperator<2>& matrix)
  *   {
- *     typedef LazyDensityOperator<2>::Idx Idx;
  *     const LazyDensityOperator<2>::Dimensions dim(matrix.getDimensions());
  * 
  *     dcomp res;
- *     for (int i=0; i<dim[0]-1; ++i) for (int j=1; j<dim[1]; ++j) res+=sqrt((i+1)*j)*matrix(Idx(i,j),Idx(i+1,j-1));
+ *     for (int i=0; i<dim[0]-1; ++i) for (int j=1; j<dim[1]; ++j) res+=sqrt((i+1)*j)*matrix(i,j)(i+1,j-1);
  *     return res;
  *   }
  *   ~~~

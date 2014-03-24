@@ -10,8 +10,6 @@ MomentumCorrelation::MomentumCorrelation(particle::Ptr p0, particle::Ptr p1) :
 
 const MomentumCorrelation::Averages MomentumCorrelation::average_v(Time t, const LazyDensityOperator& matrix) const
 {
-  typedef LazyDensityOperator::Idx Idx;
-  
   Averages averages(1);
   averages=0;
   double diag,temp;
@@ -19,7 +17,7 @@ const MomentumCorrelation::Averages MomentumCorrelation::average_v(Time t, const
   size_t dim2 = matrix.getDimensions()[1];
   for (int n=0; n < dim1; n++)
     for (int m=0; m < dim2;m++) {
-      averages(0)+=(-(dim1/2.)+n)*(-(dim2/2.)+m)*matrix(Idx(n,m));
+      averages(0)+=(-(dim1/2.)+n)*(-(dim2/2.)+m)*matrix(n,m);
     }
   return averages;
 }

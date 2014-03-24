@@ -38,13 +38,12 @@ calculateASqr(const LazyDensityOperator<1>& m)
 const complex
 calculateADaggerB(const LazyDensityOperator<2>& m)
 {
-  typedef LazyDensityOperator<2>::Idx Idx; 
   // The index type is a blitz::TinyVector<ptrdiff_t,2>
   const LazyDensityOperator<2>::Dimensions dim(m.getDimensions());
 
   complex res;
   for (int i=0; i<dim[0]-1; ++i) for (int j=1; j<dim[1]; ++j)
-    res+=sqrt((i+1)*j)*matrix(Idx(i,j),Idx(i+1,j-1));
+    res+=sqrt((i+1)*j)*matrix(i,j)(i+1,j-1);
   return res;
 }
 

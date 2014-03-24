@@ -204,7 +204,7 @@ const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& 
     averages(0)+=  n*diag;
     averages(1)+=n*n*diag;
 
-    dcomp offdiag(sqrt(n)*matrix(n,n-1));
+    dcomp offdiag(sqrt(n)*matrix(n)(n-1));
     averages(2)+=real(offdiag);
     averages(3)+=imag(offdiag);
 
@@ -238,7 +238,7 @@ const AveragedQuadratures::Averages AveragedQuadratures::average_v(NoTime t, con
 
   for (int n=2; n<int(matrix.getDimension()); n++) {
 
-    dcomp  offdiag(sqrt(n*(n-1.))*matrix(n,n-2));
+    dcomp  offdiag(sqrt(n*(n-1.))*matrix(n)(n-2));
     averages(4)+=real(offdiag);
     averages(5)+=imag(offdiag);
 
@@ -421,7 +421,7 @@ const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(O
 
     averages(0)+=n*exp(-2*real(z_)*n*t)*matrix(n);
 
-    dcomp offdiag(sqrt(n)*matrix(n,n-1)*exp(-(z_+2*(n-1)*real(z_))*double(t)));
+    dcomp offdiag(sqrt(n)*matrix(n)(n-1)*exp(-(z_+2*(n-1)*real(z_))*double(t)));
     averages(1)+=real(offdiag);
     averages(2)+=imag(offdiag);
 

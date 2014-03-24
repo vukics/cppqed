@@ -105,7 +105,7 @@ const SpinBase::Averages SpinBase::average_v(structure::NoTime, const LazyDensit
     averages(1)+=mathutils::sqr(n-s_)*diag;
 
     if (n<matrix.getDimension()-1) {
-      dcomp temp(sqrt((twoS_-n)*(n+1))*matrix(n,n+1));
+      dcomp temp(sqrt((twoS_-n)*(n+1))*matrix(n)(n+1));
       averages(2)+=real(temp);
       averages(3)+=imag(temp);
     }

@@ -64,7 +64,7 @@ double wignerFunction(const DensityOperatorFunctor& rho, double x, double y, siz
     static dcomp _(const DensityOperatorFunctor& rho, size_t dim, double r, size_t k)
     {
       dcomp res(0.);
-      for (size_t n=0; n<dim-k; ++n) res+=details::w(n,r,k)*rho(n+k,n);
+      for (size_t n=0; n<dim-k; ++n) res+=details::w(n,r,k)*rho(n+k)(n);
       return res;
     }
   };
@@ -90,7 +90,7 @@ double qFunction(const DensityOperator& rho, double x, double y, size_t)
   dcomp qComplex;
   
   for (size_t m=0; m<rho.getDimension(); ++m) for (size_t n=0; n<rho.getDimension(); ++n)
-    qComplex+=coherentElement(n,alpha)*coherentElement(m,conj(alpha))*rho(m,n);
+    qComplex+=coherentElement(n,alpha)*coherentElement(m,conj(alpha))*rho(m)(n);
   
   return exp(-sqrAbs(alpha))*real(qComplex);
 }

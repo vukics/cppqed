@@ -72,12 +72,11 @@ DensityOperator<RANK>::renorm()
 
 
 
-template<int RANK> 
+template<int RANK>
 const dcomp&
-DensityOperator<RANK>::operator()(const Idx& i, const Idx& j) const
+DensityOperator<RANK>::indexWithTiny(const Idx& i, const Idx& j) const
 {
-  return getArray()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
-  // We have to explicitly indicate the template parameters for concatenateTinies here, otherwise when RANK=1, that is, Idx is int, the compiler cannot find the function. This is despite TinyVector<int,1> has an implicit constructor from int, because implicit type conversions are NEVER considered for template parameter deduction (for further details see EffC++ 3rd edition item 46.)
+  return getArray()(blitzplusplus::concatenateTinies(i,j));
 }
 
 
@@ -94,24 +93,18 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
   
   size_t idx=0;
 
-  typedef typename DensityOperator<RANK>::Idx Idx;
   // Diagonal
-  for (Iterator i(etalon); idx<dim; ++i) {
-    const Idx ii(dispatchLDO_index(*i));
-    rho(ii,ii)=flattened(idx++);
-  }
+  for (Iterator i(etalon); idx<dim; ++i)
+    rho(*i)(*i)=flattened(idx++);
   
   // OffDiagonal
   if (offDiagonals)
-    for (Iterator i(etalon); idx<mathutils::sqr(dim); ++i) {
-      const Idx ii(dispatchLDO_index(*i));
+    for (Iterator i(etalon); idx<mathutils::sqr(dim); ++i)
       for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j, idx+=2) {
-        const Idx jj(dispatchLDO_index(*j));
-        dcomp matrixElement(rho(ii,jj)=dcomp(flattened(idx),flattened(idx+1)));
-        rho(jj,ii)=conj(matrixElement);
+        dcomp matrixElement(rho(*i)(*j)=dcomp(flattened(idx),flattened(idx+1)));
+        rho(*j)(*i)=conj(matrixElement);
       }
-    }
-  
+
 }
 
 
@@ -124,15 +117,11 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
   const Iterator etalon(matrix.getDimensions()-1,cpputils::mii::begin);
   
-  typedef typename DensityOperator<RANK>::Idx Idx;
-  
   for (Iterator i(etalon); i!=etalon.getEnd(); ++i) {
-    const Idx ii(dispatchLDO_index(*i));
-    res(ii,ii)=matrix(ii);
+    res(*i)(*i)=matrix(*i);
     for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
-      const Idx jj(dispatchLDO_index(*j));
-      dcomp matrixElement(res(ii,jj)=matrix(ii,jj));
-      res(jj,ii)=conj(matrixElement);
+      dcomp matrixElement(res(*i)(*j)=matrix(*i)(*j));
+      res(*j)(*i)=conj(matrixElement);
     }
   }
 

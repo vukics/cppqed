@@ -54,12 +54,12 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
   size_t idx=0;
 
   for (Iterator i(etalon); idx<dim; ++i)
-    res(idx++)=matrix(dispatchLDO_index(*i));
+    res(idx++)=matrix(*i);
   
   if (offDiagonals)
     for (Iterator i(etalon); idx<sqr(dim); ++i)
       for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
-        dcomp matrixElement(matrix(dispatchLDO_index(*i),dispatchLDO_index(*j)));
+        dcomp matrixElement(matrix(*i)(*j));
         res(idx++)=real(matrixElement);
         res(idx++)=imag(matrixElement);
       }

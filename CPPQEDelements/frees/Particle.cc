@@ -134,7 +134,7 @@ const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& 
   }
 
   for (int i=0; i<dim; i++) {
-    double diag=real(matrixX->operator()(i,i));
+    double diag=matrixX->operator()(i);
     averages(2)+=    space_.x(i) *diag; 
     averages(3)+=sqr(space_.x(i))*diag;      
   }

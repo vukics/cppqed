@@ -203,9 +203,7 @@ The implementation of the averaging function may read \dontinclude ExampleIntera
 \until averages(3)
 \until }
 \until }
-at this point, the `averages` array contains the real and imaginary parts of \f$\avr{a^\dagger b}\f$ and \f$\avr{a b},\f$ respectively. Note that a quantumdata::LazyDensityOperator of
-arity higher than one can be indexed via the auxiliary quantumdata::LazyDensityOperator::Idx type which represents a multi-index of the corresponding arity (and reduces to a single integer
-in the unary case).
+at this point, the `averages` array contains the real and imaginary parts of \f$\avr{a^\dagger b}\f$ and \f$\avr{a b},\f$ respectively.
 
 Now the desired set of quantum averages can be obtained via linear operations:
 \until }
