@@ -92,7 +92,6 @@ if(BUNDLED_FLENS)
   ExternalProject_Add(
     flens
     GIT_REPOSITORY git://git.code.sf.net/p/cppqed/FLENS
-    GIT_TAG public
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
     BUILD_COMMAND
     INSTALL_COMMAND make install
