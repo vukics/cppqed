@@ -90,7 +90,8 @@ int main(int argc, char* argv[])
 
       DenseVectorOf<double> v(blitz2flens::vector(eigenValues));
     
-      flens::lapack::ev(true,a,v);
+      // Hermitian eigenvalues are apparently not implemented in FLENS-LAPACK at the moment – should be replaced by generic complex eigenvalues
+      // flens::lapack::ev(true,a,v);
     }
 
     for (int i=0; i<dim; i++) {

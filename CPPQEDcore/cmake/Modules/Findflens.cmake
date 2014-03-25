@@ -14,7 +14,7 @@ endif()
 
 # Include dir
 find_path(flens_INCLUDE_DIR
-  NAMES flens/flens.h
+  NAMES flens/flens.cxx
   PATHS ${flens_PKGCONF_INCLUDE_DIRS}
 )
 
