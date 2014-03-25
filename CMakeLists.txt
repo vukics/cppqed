@@ -89,25 +89,15 @@ option(BUNDLED_FLENS "Download and compile FLENS automatically" Off)
 
 if(BUNDLED_FLENS)
   include(ExternalProject)
-  find_package(LAPACK REQUIRED)
-  string (REPLACE ";" " " LAPACK_LIBRARIES_STRING "${LAPACK_LIBRARIES}")
-  configure_file(${CMAKE_SOURCE_DIR}/misc/flens-make.sh.in flens-make.sh @ONLY)
   ExternalProject_Add(
     flens
-    CVS_REPOSITORY :pserver:anonymous:@flens.cvs.sourceforge.net:/cvsroot/flens
-    CVS_MODULE FLENS-lite
-    UPDATE_COMMAND ""
-    BUILD_IN_SOURCE 1
-    PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/flens-cvs-20131115.patch
-          COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/flens_rename_library.patch
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/config.ubuntu <SOURCE_DIR>/config
-    BUILD_COMMAND ${CMAKE_BINARY_DIR}/flens-make.sh <INSTALL_DIR>
-    INSTALL_COMMAND make install PREFIX=<INSTALL_DIR>
+    GIT_REPOSITORY git://git.code.sf.net/p/cppqed/FLENS
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
+    BUILD_COMMAND
+    INSTALL_COMMAND make install
   )
   ExternalProject_Get_Property(flens install_dir)
   set(flens_INCLUDE_DIRS ${install_dir}/include)
-  set(flens_LIBRARIES ${install_dir}/lib/libflenscppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
-  set(BUNDLED_FLENS_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libflenscppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
   set(flens_FOUND 1)
 endif()
 
@@ -188,10 +178,6 @@ endif()
 
 if(BUNDLED_FLENS)
   ExternalProject_Get_Property(flens install_dir)
-  file(GLOB flens_libs ${install_dir}/lib/*.so*)
-  install(FILES ${flens_libs}
-          PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-          DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install(DIRECTORY ${install_dir}/include/flens
           DESTINATION ${BUNDLED_HEADERS})
 endif()

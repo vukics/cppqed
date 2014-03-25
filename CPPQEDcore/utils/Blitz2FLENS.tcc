@@ -4,36 +4,36 @@
 
 #include "Blitz2FLENS.h"
 
-#include "TMP_Tools.h"
-
 #include "BlitzTinyExtensions.tcc"
+
+#include <flens/flens.cxx>
 
 
 namespace blitz2flens {
 
 
 template<typename T, int RANK>
-const typename DenseVectorMF<T>::type vector(blitz::Array<T,RANK>& array)
+const DenseVectorOf<T> vector(blitz::Array<T,RANK>& array)
 {
-  typedef typename DenseVectorMF<T>::type DenseVector;
-  typedef typename DenseVectorMF<T>::View ArrayView  ;
+  typedef DenseVectorOf<T> DenseVector;
+  
+  typedef typename DenseVector::Engine ArrayView;
 
   assert(array.isStorageContiguous());
-  // NEEDS_WORK more assertions are needed to ensure that the data
-  // will indeed be interpreted in the correct way by FLENS
+  // NEEDS_WORK more assertions are needed to ensure that the data will indeed be interpreted in the correct way by FLENS
 
-  return DenseVector(ArrayView(array.dataFirst(),array.dataFirst(),array.size(),1,0));
+  return DenseVector(ArrayView(array.size(),array.dataFirst()));
 }
 
 
 template<StorageOrder SO, typename T, int TWO_TIMES_RANK>
-const typename GeMatrixMF<T,SO>::type matrix(blitz::Array<T,TWO_TIMES_RANK>& array)
+const GeMatrixOf<T,SO> matrix(blitz::Array<T,TWO_TIMES_RANK>& array)
 {
-  /*static const int RANK=*/tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();//::value;
+  tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();
 
-  using namespace flens;
-  typedef typename GeMatrixMF<T,SO>::type GeMatrix       ;
-  typedef typename GeMatrixMF<T,SO>::View FullStorageView;
+  typedef GeMatrixOf<T,SO> GeMatrix;
+  
+  typedef typename GeMatrix::Engine FullStorageView;
 
   assert(!array.size() || array.isStorageContiguous());
   // NEEDS_WORK assert(SO==RowMajor && ) ordering!!!
@@ -41,30 +41,50 @@ const typename GeMatrixMF<T,SO>::type matrix(blitz::Array<T,TWO_TIMES_RANK>& arr
   size_t dim=product(blitzplusplus::halfCutTiny(array.extent()));
   // halfCutTiny will throw if the dimensions are not the same
 
-  return GeMatrix(FullStorageView(array.dataFirst(),array.dataFirst(),dim,dim,dim,0,0));
+  return GeMatrix(FullStorageView(dim,dim,array.dataFirst(),dim));
 
 }
 
 
 template<StorageOrder SO, int TWO_TIMES_RANK>
-const typename HeMatrixMF<SO>::type hermitianMatrix(CArray<TWO_TIMES_RANK>& array)
+const HeMatrixOf<SO> hermitianMatrix(CArray<TWO_TIMES_RANK>& array)
 {
-  /*static const int RANK=*/tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();//::value;
+  tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();
 
-  using namespace flens;
-  using namespace blitzplusplus;
+  typedef HeMatrixOf<SO> HeMatrix;
 
-  typedef typename HeMatrixMF<SO>::type HeMatrix       ;
-  typedef typename HeMatrixMF<SO>::View FullStorageView;
+  typedef typename HeMatrixOf<SO>::Engine FullStorageView;
 
   assert(!array.size() || array.isStorageContiguous());
   // NEEDS_WORK assert(SO==RowMajor && ) ordering!!!
 
-  size_t dim=product(halfCutTiny(array.extent()));
+  size_t dim=product(blitzplusplus::halfCutTiny(array.extent()));
   // halfCutTiny will throw if the dimensions are not the same
 
-  return HeMatrix(FullStorageView(array.dataFirst(),array.dataFirst(),dim,dim,dim,0,0),Upper);
+  return HeMatrix(FullStorageView(dim,dim,array.dataFirst(),dim,0,0),flens::Upper);
 
+}
+
+
+template<int TWO_TIMES_RANK>
+const CArray<tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value> ev(CArray<TWO_TIMES_RANK> m)
+{
+  using namespace flens;
+  GeMatrixOf<dcomp,ColMajor> a(matrix<ColMajor>(m));
+
+  CArray<tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value> res(blitzplusplus::halfCutTiny(m.extent())); ///< The eigenvalues as Blitz++ array
+
+  DenseVector<ArrayView<dcomp> >
+    v(vector(res)); ///< The eigenvalues as FLENS array
+
+  DenseVector<Array<dcomp> >
+    work(flens::lapack::ev_wsq(false,false,a).second); ///< Workaround for flens::lapack::ev with temporary workspaces
+
+  DenseVector<Array<double> > rwork(2*res.size());
+
+  lapack::ev(false,false,a,v,a,a,work,rwork);
+
+  return res;
 }
 
 

@@ -1,11 +1,11 @@
 #include "core_config.h"
 
 #ifndef   DO_NOT_USE_FLENS
-
-
 #include "DrivenDampedHarmonicOscillator.h"
 
 #include "MathExtensions.h"
+
+#include <flens/flens.cxx>
 
 #include <boost/make_shared.hpp>
 
@@ -25,8 +25,8 @@ const DrivenDampedHarmonicOscillator::Vector DrivenDampedHarmonicOscillator::cal
   {
     using namespace flens;
     DenseVector<Array<int> > pivots(2);
-    trf(m,pivots);
-    tri(m,pivots);
+    lapack::trf(m,pivots);
+    lapack::tri(m,pivots);
   }
 
   return m*rhs;
@@ -96,6 +96,5 @@ const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivT
   else
     return boost::make_shared<DDHO>(gamma,omega,ampTI,ampDerivTI,tInit);
 }
-
 
 #endif // DO_NOT_USE_FLENS

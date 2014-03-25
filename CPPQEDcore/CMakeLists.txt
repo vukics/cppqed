@@ -235,11 +235,9 @@ endif()
 if( flens_FOUND AND FLENS )
   include_directories(SYSTEM ${flens_INCLUDE_DIRS})
   if(BUNDLED_FLENS)
-    set(PRIVATE_LIBS ${PRIVATE_LIBS} ${flens_LIBRARIES})
     include_directories(SYSTEM ${flens_INCLUDE_DIRS})
     message(STATUS "Using bundled flens from ${flens_LIBRARIES}.")
   else()
-    set(PUBLIC_LIBS ${PUBLIC_LIBS} ${flens_LIBRARIES})
     set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
   endif()
   set(CPPQED_FLENS_FOUND 1)
@@ -272,9 +270,8 @@ set(PRIVATE_LIBS ${PRIVATE_LIBS} ${GSL_LIBRARIES})
 #! be included where it is needed, which is an advantage over using `-D` compiler flags
 #! (less code has to be recompiled).
 #!
-#! Also in this section, the flags `-DBOOST_RESULT_OF_USE_TR1` and `-DGSL_CBLAS` are
-#! set globally if needed. Note that compiler warnings are set as part of CPPQED_SETUP(),
-#! which is called in the next section.
+#! Also in this section, the flag `-DBOOST_RESULT_OF_USE_TR1` is set globally if needed.
+#! Note that compiler warnings are set as part of CPPQED_SETUP(), which is called in the next section.
 
 # Generate config.h
 configure_file(${CPPQED_CMAKE_MODULE_PATH}/config.h.in ${PROJECT_NAME}_config.h)
@@ -285,11 +282,6 @@ if(Boost_FOUND)
     message(STATUS "added -DBOOST_RESULT_OF_USE_TR1" )
   endif()
 endif()
-
-if(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
-  set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} -DGSL_CBLAS)
-  message(STATUS "added -DGSL_CBLAS" )
-endif(CBLAS_FOUND AND "${CBLAS_LIBRARIES}" MATCHES "gslcblas")
 
 
 #! \file
@@ -478,10 +470,10 @@ set_package_properties(blitz PROPERTIES  URL "http://sf.net/projects/blitz/"
                                 DESCRIPTION "High-performance C++ vector mathematics library"
                                 TYPE REQUIRED
                                 PURPOSE "Multi-Array implementation used in the framework.")
-set_package_properties(flens PROPERTIES URL "http://www.mathematik.uni-ulm.de/~lehn/FLENS/"
+set_package_properties(flens PROPERTIES URL "http://flens.sourceforge.net"
                                 DESCRIPTION "Flexible Library for Efficient Numerical Solutions."
                                 TYPE OPTIONAL
-                                PURPOSE "With FLENS the partial transpose of the density operator can be calculated.")
+                                PURPOSE "With FLENS the negativity of the partially transposed density operator can be calculated.")
 set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
                                 DESCRIPTION "Collection of portable C++ source libraries."
                                 TYPE REQUIRED
@@ -490,10 +482,6 @@ set_package_properties(GSL PROPERTIES URL "http://www.gnu.org/software/gsl/"
                                 DESCRIPTION "GNU Scientific Library"
                                 TYPE REQUIRED
                                 PURPOSE "Used as implementation of an ODE solver and random number generator.")
-set_package_properties(CBLAS PROPERTIES URL "http://math-atlas.sourceforge.net/"
-                                DESCRIPTION "C library for Basic Linear Algebra Subprograms"
-                                TYPE OPTIONAL
-                                PURPOSE "Needed for GSL.")
 set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
                                 DESCRIPTION "Generate documentation from source code"
                                 TYPE OPTIONAL

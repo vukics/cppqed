@@ -58,9 +58,9 @@ namespace quantumdata {
 /** If FLENS is not used, a dummy definition of negPT is provided. */
 template<int RANK, typename V>
 inline
-double negPT(const DensityOperator<RANK>&, V)
+std::string negPT(const DensityOperator<RANK>&, V)
 {
-  return 0;
+  return "n/a";
 }
 
 
