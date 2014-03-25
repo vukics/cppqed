@@ -1,43 +1,55 @@
 // -*- C++ -*-
 
-#include "PythonExtension.h"
-#include "Namespaces.h"
+#include "Core.h"
+#include "blitz2numpy.tcc"
 
-#include <StateVector.tcc>
+#include "StateVector.tcc"
+#include "DensityOperator.tcc"
 
-#include <boost/preprocessor/arithmetic/add.hpp>
-#include <boost/preprocessor/arithmetic/sub.hpp>
-#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/stringize.hpp>
+
+#include <boost/python/import.hpp>
 
 using namespace boost::python;
 
-using quantumdata::StateVector;
-
-
 namespace pythonext{
 
-void export_StateVector()
+using quantumdata::StateVector;
+using quantumdata::DensityOperator;
+
+template<int RANK>
+struct SV_to_python
+{
+  static PyObject* convert(const StateVector<RANK> &s)
+  {
+    object qs = import(BOOST_PP_STRINGIZE(BOOST_PP_CAT(cpypyqed, DEBUG_SUFFIX)) ".tools.quantumstate");
+    object StateVector = qs.attr("StateVector");
+    return boost::python::incref(StateVector(arrayToNumpy<CArray<RANK>,RANK>(s.getArray())).ptr());
+  }
+};
+
+template<int RANK>
+struct DO_to_python
+{
+  static PyObject* convert(const DensityOperator<RANK> &d)
+  {
+    object qs = import(BOOST_PP_STRINGIZE(BOOST_PP_CAT(cpypyqed, DEBUG_SUFFIX)) ".tools.quantumstate");
+    object DensityOperator = qs.attr("DensityOperator");
+    return boost::python::incref(DensityOperator(arrayToNumpy<CArray<2*RANK>,2*RANK>(d.getArray())).ptr());
+  }
+};
+
+void export_22_StateVector()
 {
 
-  // TODO: add some useful constructors, e.g. allow to initialize a StateVector from a numpy array
-
-  scope namespaceScope = quantumdataNameSpace;
-
-#define DECL_DIRECT_PRODUCTS(z,r2,data) .def(self * other< StateVector<BOOST_PP_ADD(r2,1)> >())
-#define BOOST_PP_LOCAL_MACRO(n) class_<StateVector<n> >(BOOST_PP_STRINGIZE(BOOST_PP_CAT(StateVector, n)), \
-     "Instantiation of :core:`quantumdata::StateVector` with RANK="#n, no_init \
-   ) \
-  .def(self + self) \
-  .def(self - self) \
-  .def(self * dcomp()) \
-  .def(dcomp() * self) \
-  .def(self / dcomp()) \
-  .def("norm", &StateVector<n>::norm) \
-  .def("renorm", &StateVector<n>::renorm) \
-  BOOST_PP_REPEAT(BOOST_PP_SUB(PYTHON_HALF_RANK,n), DECL_DIRECT_PRODUCTS, n) ;
+#define BOOST_PP_LOCAL_MACRO(n) \
+  to_python_converter<StateVector<n>, SV_to_python<n>>(); \
+  to_python_converter<DensityOperator<n>, DO_to_python<n>>(); \
+  register_ptr_to_python<boost::shared_ptr<const StateVector<n>>>(); \
+  implicitly_convertible<boost::shared_ptr<StateVector<n>>, boost::shared_ptr<const StateVector<n>>>(); \
+  register_ptr_to_python<boost::shared_ptr<const DensityOperator<n>>>(); \
+  implicitly_convertible<boost::shared_ptr<DensityOperator<n>>, boost::shared_ptr<const DensityOperator<n>>>();
 #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_HALF_RANK)
 #include BOOST_PP_LOCAL_ITERATE()
 

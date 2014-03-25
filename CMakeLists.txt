@@ -125,12 +125,14 @@ set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 
 #! This %CMake option determines if the Python modules should be compiled.
 option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
-find_package(PythonInterp QUIET 2.7 REQUIRED)
-find_package(PythonLibs QUIET 2.7 REQUIRED)
-find_package(Numpy REQUIRED)
 find_package(Boost QUIET COMPONENTS python)
-if(PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND AND NUMPY_FOUND AND Boost_PYTHON_FOUND AND COMPILE_CPYPYQED)
-  set(ENABLE_CPYPYQED "On")
+find_package(PythonLibs 2.7 QUIET)
+find_package(PythonInterp 2.7 QUIET)
+find_package(Numpy QUIET)
+
+# For some rease kdevelop does not recognize PYTHONLIBS_FOUND, use PYTHON_INCLUDE_DIRS instead
+if(Boost_PYTHON_FOUND AND PYTHONINTERP_FOUND AND PYTHON_INCLUDE_DIRS AND NUMPY_FOUND AND COMPILE_CPYPYQED)
+  set(ENABLE_CPYPYQED 1)
 endif()
 add_subdirectory(cpypyqed)
 

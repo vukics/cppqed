@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   StateVector2 psi(init(pA)*init(pB));
   psi.renorm();
 
-  evolve<0>
+  evolve
     (psi,
      binary::make(nxcoupledmodes::make<ModeCorrelations>(make<DoNotAverage>(pA,qmp),
                                                          make<DoNotAverage>(pB,qmp),

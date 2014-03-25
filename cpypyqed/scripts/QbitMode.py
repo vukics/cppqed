@@ -25,7 +25,7 @@ m=mode.make(pm,qmp)
 q=qbit.make(pq,qmp)
 jc=jaynescummings.make(q,m,pjc)
 
-psi = (qbit.init(pq)*mode.init(pm))
-psi.renorm()
+psi = (qbit.init(pq)**mode.init(pm)).normalize()
 
 evolve(psi, binary.make(jc), pe)
+

@@ -26,7 +26,7 @@ myParticle = particle.makePumped(pp,qmp)
 
 poc = ParticleOrthogonalToCavity(myMode,myParticle,ppc)
 
-psi = mode.init(pm)*particle.init(pp)*particle.init(pp)
+psi = (mode.init(pm)**particle.init(pp)**particle.init(pp)).normalize()
 
 c = makeComposite({(0,2):poc,(0,1):poc})
 

@@ -1,7 +1,6 @@
 // -*- C++ -*-
 
-#include "PythonExtension.h"
-#include "Namespaces.h"
+#include "Core.h"
 
 #include "QuantumSystem.h"
 
@@ -25,7 +24,9 @@ void export_QuantumSystem(){
                                                 "Instantiation of :core:`structure::QuantumSystem` with RANK="#r,\
                                                 no_init) \
     .def("highestFrequency",&QuantumSystem<r>::highestFrequency) \
-  ;
+  ; \
+  register_ptr_to_python<QuantumSystem<r>::Ptr>(); \
+  implicitly_convertible<boost::shared_ptr<QuantumSystem<r>>, QuantumSystem<r>::Ptr>();
 BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), QUANTUMSYSTEM_INSTANTIATIONS, data)
 
 }

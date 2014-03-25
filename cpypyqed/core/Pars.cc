@@ -1,6 +1,5 @@
 // -*- C++ -*-
-#include "PythonExtension.h"
-#include "Namespaces.h"
+#include "Core.h"
 
 #include "Pars.h"
 

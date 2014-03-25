@@ -48,8 +48,7 @@ elif conf==4:
 else:
   sys.exit("Configuration not recognized!")
 
-psi = mode.init(pplm)*particle.init(ppp)
-psi.renorm()
+psi = (mode.init(pplm)**particle.init(ppp)).normalize()
 
 evolve(psi, binary.make(particleCavityBase), pe)
 

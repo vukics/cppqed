@@ -51,7 +51,7 @@ class OnDemand(object):
 
     This is needed for class templates which cannot be pre-instantiated at cpypyqed compile time
     because there are too many possibilities of template parameters. A typical example is the class
-    :core:`Composite`.
+    :core2:`Composite`.
 
     Classes deriving from :class:`OnDemand` need to implement :meth:`generate_source`.
 

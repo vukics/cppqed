@@ -15,7 +15,7 @@ namespace pythonext {
 
 void export_Qbit()
 {
-  class_<QbitBase, boost::noncopyable>("QbitBase",no_init);
+  class_<QbitBase, bases<structure::QuantumSystem<1>>, boost::noncopyable>("QbitBase",no_init);
   {
     scope namespaceScope = qbitNameSpace;
     def("make", qbit::make, with_custodian_and_ward_postcall<0,1>());

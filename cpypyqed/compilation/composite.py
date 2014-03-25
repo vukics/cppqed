@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-r"""This module is the wrapper for the C++QED :core:`composite` bundle.
+r"""This module is the wrapper for the C++QED :core2:`composite` bundle.
 
 Typically the enduser only has to call the convenience maker function :func:`makeComposite`.
 """
@@ -10,7 +10,7 @@ import os
 
 def makeComposite(acts):
     r"""makeComposite(acts) -> Composite<VA> :
-    Wrapper of the C++QED function :core:`composite::make` with a modified signature better suited for Python.
+    Wrapper of the C++QED function :core2:`composite::make` with a modified signature better suited for Python.
 
     This function takes a dictionary where the keys describe an :class:`Act` object and
     values are :class:`InteractionN <.structure.Interaction2>`-objects (with N the rank of
@@ -24,13 +24,13 @@ def makeComposite(acts):
         >>> c = makeComposite({(0,2):poc,(0,1):poc})
 
     :param dict acts: A dictionary holding the subsystem tuples as keys and the interaction objects as values.
-    :returns: A wrapped C++QED :core:`Composite`-object, compiled on demand if necessary.
+    :returns: A wrapped C++QED :core2:`Composite`-object, compiled on demand if necessary.
     :rtype: :samp:`Composite<VA>`
     """
     return Composite(acts).maker()
 
 class Composite(OnDemand):
-    r"""A :class:`.OnDemand`-class wrapping the C++QED class :core:`Composite`.
+    r"""A :class:`.OnDemand`-class wrapping the C++QED class :core2:`Composite`.
 
     The constructor takes a dictionary where the keys describe an :class:`Act` object and
     values are :class:`InteractionN <.structure.Interaction2>`-objects (with N the rank of
@@ -72,7 +72,7 @@ class Composite(OnDemand):
         r"""Overriding :meth:`.OnDemand.generate_source`
 
         This takes care of creating the proper source file to compile a boost.Python module, which holds
-        the correct C++QED :core:`Composite` class.
+        the correct C++QED :core2:`Composite` class.
         """
         with open(os.path.join(self.cpypyqeddir,"CompositeTemplate.cc")) as f:
             composite_template = f.read().format(actlist=self._make_actlist(),
@@ -86,9 +86,9 @@ class Composite(OnDemand):
     def maker(self):
         r"""Overriding :meth:`.OnDemand.maker`
 
-        This function compiles and creates the needed C++QED :core:`Act`-objects on demand and passes them to
-        :meth:`.OnDemand.maker`, where they are passed into :core:`composite::make` to create the right
-        :core:`Composite` object.
+        This function compiles and creates the needed C++QED :core2:`Act`-objects on demand and passes them to
+        :meth:`.OnDemand.maker`, where they are passed into :core2:`composite::make` to create the right
+        :core2:`Composite` object.
         """
         args=[]
         for i in self.actslist:
@@ -96,7 +96,7 @@ class Composite(OnDemand):
         return OnDemand.maker(self,*args)
 
 class Act(OnDemand):
-    r"""A :class:`.OnDemand`-class wrapping the C++QED class :core:`Act`.
+    r"""A :class:`.OnDemand`-class wrapping the C++QED class :core2:`Act`.
 
     The template parameters denoting the involved subsystems are given as constructor arguments to this class.
     The interaction which this object should hold has to be passed in as an argument to :meth:`.OnDemand.maker`.
