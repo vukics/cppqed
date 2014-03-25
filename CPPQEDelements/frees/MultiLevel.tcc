@@ -22,9 +22,6 @@ namespace bll=boost::lambda;
 
 #include <boost/mpl/for_each.hpp>
 
-#include <algorithm>
-#include <numeric>
-
 
 namespace multilevel {
 
@@ -52,7 +49,6 @@ template<int NL>
 void
 Exact<NL>::updateU(double dtdid) const
 {
-  using namespace std;
   dcomp (*dcompExp)(const dcomp&)=&exp;
   boost::transform(zIs_,getDiagonal().begin(),bll::bind(dcompExp,-dtdid*bll::_1));
 }
@@ -62,11 +58,7 @@ template<int NL>
 bool 
 Exact<NL>::applicableInMaster_v() const
 {
-  using namespace std  ;
-  // using namespace boost::lambda;
-  // using namespace lambda;
-
-  return !accumulate(zIs_.begin() | boost::adaptors::transformed(hasRealPart),false,bll::_1 || bll::_2);
+  return !accumulate(zIs_.begin() | boost::adaptors::transformed(hasRealPart),false,std::logical_or<bool>());
 }
 
 
