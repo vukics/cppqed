@@ -14,26 +14,23 @@
 #include "component_versions.h"
 
 
+/// Introduces ParameterTable into the global namespace to break ambiguity between update and parameters::update
 class ParameterTable : public parameters::ParameterTable {};
 
 
+/// Convenience version of parameters::update that includes the highest-level version information
+/** \note This cannot be put into an implementation file because then an incorrect `component_versions.h` file would be picked up */
 void update(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
 {
   updateVersionstring(cppqed_component_versions());
   parameters::update(p,argc,argv,prefix);
 }
 
-
-/// Convenience version of parameters::update meant to tackle the problem described in Sec. \ref masterequationlimitations
+/// Convenience version of picture::updateWithPicture that includes the highest-level version information
 QM_Picture& updateWithPicture(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
 {
-  QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
-  update(p,argc,argv,prefix);
-  try {
-    const evolution::Method method=dynamic_cast<const parameters::Parameter<evolution::Method>&>(p["evol"]).get();
-    if ((method==evolution::MASTER || method==evolution::MASTER_FAST) && qmp==QMP_IP) qmp=QMP_UIP;
-  } catch (const parameters::UnrecognisedParameterException&) {}
-  return qmp;
+  updateVersionstring(cppqed_component_versions());
+  return picture::updateWithPicture(p,argc,argv,prefix);
 }
 
 

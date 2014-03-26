@@ -29,7 +29,7 @@ void export_05_Pars()
     ;
   docOpts.disable_cpp_signatures();
   def("update",update,
-R"doc(Wrapper of :core:`parameters::ParameterTable::update`. Note that the signature differs a little bit
+R"doc(Wrapper of :core:`parameters::update`. Note that the signature differs a little bit
 compared to the C++ version, it is not necessary to pass in the argument list length.
 
 :param p: The :class:`ParameterTable`
