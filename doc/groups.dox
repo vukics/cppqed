@@ -4,7 +4,7 @@
 /// \defgroup CMakeReference CMake
 /// \brief Documentation of %CMake internals, directed at build system developers.
 
-/// \defgroup CPPQEDUse
+/// \defgroup CPPQEDUse C++QED use
 /// \ingroup CMakeReference
 /// \brief Macros and functions which help to build C++QED projects.
 
@@ -20,15 +20,15 @@
 /// \ingroup CMakeReference
 /// \brief Additional custom module files to find specific libraries.
 
-/// \defgroup Helpers
+/// \defgroup Helpers Helpers
 /// \ingroup CMakeReference
 /// \brief Additional helper functions.
 
-/// \defgroup CPPQEDConfig
+/// \defgroup CPPQEDConfig C++QED config
 /// \ingroup Config
 /// \brief Export targets and variables for the core component.
 
-/// \defgroup CPPQEDelementsConfig
+/// \defgroup CPPQEDelementsConfig C++QED elements config
 /// \ingroup Config
 /// \brief Export targets and variables for the elements component.
 ///

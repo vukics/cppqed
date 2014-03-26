@@ -43,7 +43,7 @@ double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm
  * 
  * The DensityOperator interface is similar to StateVector with obvious differences.
  * 
- * \note A DensityOperator <RANK> represents a density operator on a Hilbert space of arity `RANK`. This makes that
+ * \note A DensityOperator `<RANK>` represents a density operator on a Hilbert space of arity `RANK`. This makes that
  * the number of its indices is actually `2*RANK`. This is the reason why it inherits from quantumdata::ArrayBase <2*RANK>.
  * 
  * \todo provide a move constructor

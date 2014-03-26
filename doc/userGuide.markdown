@@ -127,7 +127,7 @@ mode::StateVector is just another name for a unary quantumdata::StateVector, and
 
 \skipline evolve
 
-The function #evolve is a dispatcher for different evolution methods and the different versions of trajectory::run. So with this, the evolution mode can be changed from the command line, e.g. depending on the dimension of the problem – while for low dimension we may use Master equation, for larger dimension we may need to switch to an ensemble of quantum trajectories. The possibilities are:
+The function #evolve is a dispatcher for different evolution methods and the different versions of trajectory::Trajectory::run. So with this, the evolution mode can be changed from the command line, e.g. depending on the dimension of the problem – while for low dimension we may use Master equation, for larger dimension we may need to switch to an ensemble of quantum trajectories. The possibilities are:
 
 - `--evol master` \link quantumtrajectory::Master Full Master equation\endlink
 
@@ -145,7 +145,7 @@ An example command line then looks like:
 
     PumpedLossyModeScript --eps 1e-12 --dc 100 --deltaC -10 --cutoff 20 --eta "(2,-1)" ...
 
-\note There are some parameters that are “stronger” than others. E.g. if `--dc` is nonzero, then always the dc-mode trajectory::run function will be selected by the #evolve function above, regardless of the value of `--Dt`. The latter will only be considered if `--dc` is zero because in this case the deltaT-mode trajectory::run function will be selected. There is a similar relationship between `--minitFock` and `--minit`: the former will always override the latter.
+\note There are some parameters that are “stronger” than others. E.g. if `--dc` is nonzero, then always the \ref glossarydcmode "dc-mode" trajectory::Adaptive::run function will be selected by the #evolve function above, regardless of the value of `--Dt`. The latter will only be considered if `--dc` is zero because in this case the \ref glossarydtmode "deltaT-mode" trajectory::Trajectory::run function will be selected. There is a similar relationship between `--minitFock` and `--minit`: the former will always override the latter.
 
 Example: a binary system {#userguidebinary}
 ========================
@@ -250,7 +250,7 @@ The actual C++ type of a Composite object returned by such an invocation of comp
 
 A full-fledged script in the terse way may read as:
 
-\dontinclude tutorialComposite.cc
+\dontinclude tutorialCompositeRing.cc
 \until pe);
 \skip }
 \skip ptm
@@ -272,11 +272,9 @@ Consider two identical pumped \ref genericelementsfreesparticle "particles" movi
 
 \image html NetworkSelforg.png "Layout of composite system in the two-particle example"
 
-The kernel of the corresponding script reads:
+The corresponding script reads:
 
-\dontinclude tutorialComposite.cc
-\skip LossyMode<>
-\until pe);
+\include tutorialCompositeMultiparticle.cc
 
 The element IdenticalParticles has no dynamical role, it can be used to calculate and display characteristics of the quantum state of the two-particle subsystem.
 

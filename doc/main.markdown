@@ -11,14 +11,15 @@ The framework is very sensitive to performance, which can be increased by physic
 
 - The use of adaptive-stepsize methods for evolving ordinary differential equations.
 
-- Judicious use of memory. The guideline is: If it is necessary to copy something, ask first whether it is *really* necessary.
+- Judicious use of memory. Guideline: if it is necessary to copy something, ask first whether it is *really* necessary.
 
 
-[The SourceForge.net project summary page](http://sourceforge.net/projects/cppqed/).
+[<strong>The SourceForge.net project summary page</strong>](http://sourceforge.net/projects/cppqed/).
 
 \tableofcontents
 
-\note This is a free open-source project, the only thing the developers ask is to please cite **both** our \ref mainpagepublications "papers" in publications where C++QED has any role, as this is the only way for us to obtain credit for this work.
+\note C++QED is a free open-source project, the only thing the developers ask is to please cite **both** our \ref mainpagepublications "papers" in publications where C++QED has any role, as this is the only way for us to obtain credit for this work.
+
 
 Documentation {#mainpagedocumentation}
 =============
@@ -26,8 +27,11 @@ Documentation {#mainpagedocumentation}
 \par Background and fundamental design principles
 \ref userguideintroduction
 
-\par A quick start on writing and running actual physical simulations
+\par A quick start on writing and running actual physical simulations in C++
 \ref userguide
+
+\par The Python frontend to the framework
+[CpypyQED](\cpypyqedMainPage)
 
 \par The out-of-the-box physical elements
 \ref genericelements
@@ -36,10 +40,14 @@ Documentation {#mainpagedocumentation}
 \ref installationguide
 
 \par How to implement new physical systems
- \ref structurebundleguide
+\ref structurebundleguide
 
 \par Walkthrough for the API documentation
 …
+
+\par Some technical terms used throughout the documentation
+\ref glossary
+
 
 Download {#mainpagedownload}
 ========
@@ -57,7 +65,6 @@ Download {#mainpagedownload}
 \note This online documentation is meant to reflect the development version, but delays compared to the actual state are possible. The released packages include the corresponding documentation.
 
 
-
 Support {#mainpagesupport}
 =======
 
@@ -66,6 +73,15 @@ Support {#mainpagesupport}
 - [tracker system](http://sourceforge.net/p/cppqed/_list/tickets/)
 
 We offer full support for the framework both in terms of writing and testing new elements and scripts on demand from the quantum optics community, and of advising with the use of the existing software in the framework or with the development of new software (elements, scripts, time-evolution drivers). In the first case we may require to become co-author in the publications stemming from the work.
+
+
+Developers {#mainpagedevelopers}
+==========
+
+C++QED has been originally conceived and created by [András Vukics](http://optics.szfki.kfki.hu/Vukics/Vukics), who developed v1 between 2006–2008, and has developed and maintained v2 since 2008.
+
+[Raimar Sandner](http://www.uibk.ac.at/th-physik/people/staffdb/660275.xml) joined the project in early 2012, and has since made substantial contributions. The [CpypyQED](\cpypyqedMainPage) Python frontend to C++QED is his work. He contributed the elaborate \ref cppqed_cmake "build system" and \ref testsuite "testsuite" of the framework. In addition, he made many important contributions in the design and implementation of the C++ codebase, such as the \ref userguideiotrajectorystate "trajectory-state input/output" feature. He is the maintainer of the Debian and AUR packages.
+
 
 Publications {#mainpagepublications}
 ============
@@ -91,6 +107,6 @@ Links {#mainpagelinks}
 Acknowledgement {#mainpageacknowledgement}
 ===============
 
-First of all, we acknowledge the developers of Boost for making C++ an even more powerful language than it originally was. Without the Boost libraries, the framework could not have been achieved by a single person.
+First of all, we acknowledge the developers of Boost for making C++ an even more powerful language than it originally was. Without the Boost libraries, the framework could not have taken form.
 
 We would like to thank the developers of GSL, LAPACK, Blitz++, and FLENS for their effort, without which scientific computing in C++ in general, and the present framework in particular would not look as nice as it looks today.

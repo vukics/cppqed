@@ -35,3 +35,17 @@ script {#glossaryscript}
 High-level C++ program assembling the modules necessary for a given problem domain. E.g. specification of a particular physical system and of what to do with it – how to simulate it. It uses the framework as a library.
 
 \see \ref userguide, directory `CPPQEDscripts`
+
+dc-mode {#glossarydcmode}
+=======
+
+The trajectory is run in such a way that a fixed number (`dc`) of adaptive steps are performed between two displays.
+
+\see \ref userguideelementarygenericparameters \ref glossarydtmode trajectory::Adaptive::run
+
+deltaT-mode {#glossarydtmode}
+===========
+
+The trajectory is run in such a way that a fixed timestep (`deltaT`) is performed between two displays.
+
+\see \ref glossarydcmode trajectory::Trajectory::run

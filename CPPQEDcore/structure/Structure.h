@@ -29,6 +29,8 @@
  * 
  * We have also indicated how classes representing elementary free subsystems (Mode) and interactions (JaynesCummings), and those representing composite systems (BinarySystem and Composite)
  * fit into the hierarchy.
+ *
+ * \note This figure is slightly outdated, but still represents the basic idea
  * 
  * These modules in the hierarchy provide a lot of services for implementing new elements in the framework. For examples on how to optimally use these services, 
  * \ref structurebundleguide "the structure-bundle guide".

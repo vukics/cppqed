@@ -67,9 +67,9 @@ private:
  * \tparamRANK
  * \tparam IS_TIME_DEPENDENT governs time-dependence & the composition of the class @ compile time
  * 
- * Implements Hamiltonian<RANK,ONE_TIME> when `IS_TIME_DEPENDENT=true` **OR** Hamiltonian<RANK,NO_TIME>  when `IS_TIME_DEPENDENT=false`
+ * Implements Hamiltonian `<RANK,ONE_TIME>` when `IS_TIME_DEPENDENT=true` **OR** Hamiltonian `<RANK,NO_TIME>`  when `IS_TIME_DEPENDENT=false`
  * 
- * \note The present architecture of Tridiagonal does not allow to cover the case #TWO_TIME.
+ * \note The present architecture of Tridiagonal does not allow to cover the case structure::TWO_TIME.
  *  
  */
 template<int RANK, bool IS_TIME_DEPENDENT>

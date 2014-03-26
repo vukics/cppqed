@@ -10,7 +10,7 @@ namespace cpputils {
 
 /// The class that is (meant to be, at least) the base of all exceptions in the framework
 /**
- * \note It is extremely inconvenient to derive from \refStdCppContruct{std::exception,exception/exception}, as this class defines `virtual ~exception() throw();`
+ * \note It is extremely inconvenient to derive from \refStdCppConstruct{std::exception,exception/exception}, as this class defines `virtual ~exception() throw();`
  * so that each and every derived class also has to define its destructor in such a way. (Of course, this is just the point of `std::exception`, but here 
  * we do not strive for exception safety anyway as an exception usually means the end of the application.
  */
@@ -20,7 +20,7 @@ struct Exception // : public std::exception
 };
 
 
-/// Class reporting also the \link cpputils::TaggedException::what() “what-ness”\endlink of the exception
+/// Class reporting also the \link cpputils::TaggedException::what “what-ness”\endlink of the exception
 class TaggedException : public Exception
 {
 public:
@@ -30,6 +30,7 @@ public:
 
   const std::string getTag() const {return tag_;}
 
+  /// Returns the short description
   const char* what() const throw() {return tag_.c_str();}
 
 private:

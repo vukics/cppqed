@@ -52,10 +52,10 @@ void run(Trajectory & trajectory, ///< the trajectory to run
         );
 
 
-/// Same as \link run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) above\endlink but runs for a certain number of time intervals deltaT \related Trajectory
+/// Same as \link Trajectory::run above\endlink but runs for a certain number of time intervals deltaT \related Trajectory
 /**
  * <b>Rationale:</b> This version of `run` exists to avoid the eventual tiny timestep at the end of the run that might occur with
- * \link run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) the above version\endlink.
+ * \link Trajectory::run the above version\endlink.
  * This is because e.g. in the case of `deltaT=0.1`, `time=1`, adding up `0.1` ten times numerically does not result in exactly `1`.
  * 
  * For a demonstration, compare the output of
@@ -72,9 +72,9 @@ void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt
          const std::string& parsedCommandLine);
 
 
-/// Another version of \link run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) `run`\endlink for running in dc-mode \related Adaptive
+/// Another version of \link Trajectory::run `run`\endlink for running in dc-mode \related Adaptive
 /**
- * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Trajectory::step single adaptive timestep\endlink, it is possible to count the
+ * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Adaptive::step single adaptive timestep\endlink, it is possible to count the
  * individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each display. Hence, we get denser displays in time when the timestep is small,
  * that is, when the important things are happening in the dynamics.
  * 
@@ -300,7 +300,7 @@ public:
 protected:
   using AdaptiveIO<A>::meta_;
 
-  /// Constructor taking the same parameters as needed to operate \link evolved::Maker::operator()() evolved::Maker\endlink
+  /// Constructor taking the same parameters as needed to operate evolved::Maker
   Adaptive(A&, typename Evolved::Derivs, double, double, double    , const A&, const evolved::Maker<A>&);
 
   /** \overload Adaptive(A&, typename Evolved::Derivs, double, double, double, const A&, const evolved::Maker<A>&) */

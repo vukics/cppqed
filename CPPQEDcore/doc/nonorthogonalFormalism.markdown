@@ -49,6 +49,6 @@ while \f${\rho_i}^j\f$ and \f${\rho^i}_j\f$ have unit conserved trace.
 
 This means that e.g. the quantumtrajectory::Master driver has to use either \f$\rho_{ij}\f$ or \f$\rho^{ij}\f$
 (by convention, it uses the latter, which also means that quantumtrajectory::MCWF_Trajectory uses \f$\Psi^i\f$)
-to be able to calculate the evolution using the real part as in \Eqref{eq:Master-MCWF} (otherwise, it is not the real part which appears there).
+to be able to calculate the evolution using the real part as in \ref masterequation (otherwise, it is not the real part which appears there).
 On the other hand, for all normalizations one index has to be pulled, and this (at least in the case of density operators)
 has to be done in place to avoid excessive copying, which also means that the index has to be pulled back again afterwards.

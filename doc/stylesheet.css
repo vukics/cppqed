@@ -8,5 +8,33 @@
 }
 
 code {
-  background-color:#CCFFFF;
+  background-color:#DDFFEE;
+}
+
+pre.fragment, div.fragment {
+  background-color:#F5FFFA;
+}
+
+h1 {
+  font-size: 180%;
+}
+
+h2 {
+  font-size: 160%;
+}
+
+h3 {
+  font-size: 140%;
+}
+
+h4 {
+  font-size: 120%;
+}
+
+h5 {
+  font-size: 110%;
+}
+
+#projectlogo {
+  padding-bottom: 5px;
 }

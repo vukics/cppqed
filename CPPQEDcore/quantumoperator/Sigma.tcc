@@ -16,7 +16,7 @@ namespace quantumoperator {
  * -# Another DirectProduct type (recursivity)
  * \tparam IS_HEAD Signifies whether Sigma`<L,R>` stands at the head or at the tail of the direct product
  * 
- * The class is nicely described by the signature of \ref sigmadirectproducts "these functions".
+ * The class is nicely described by the signature of the related `operator*` operators
  */
 template<int L, int R, typename OTHER, bool IS_HEAD>
 class DirectProduct

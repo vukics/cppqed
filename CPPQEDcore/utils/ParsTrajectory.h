@@ -37,7 +37,7 @@ namespace trajectory {
 struct ParsEvolved
 {
   static const double epsRelDefault; ///< The ultimate default of \link ParsEvolved::epsRel epsRel\endlink in the framework
-  static const double epsAbsDefault; ///< ” for \link PrasEvolved::epsAbs epsAbs\endlink
+  static const double epsAbsDefault; ///< ” for \link ParsEvolved::epsAbs epsAbs\endlink
 
   double
     &epsRel, ///< relative precision of ODE stepping (cf. evolved::TimeStepBookkeeper)
@@ -65,7 +65,7 @@ struct ParsRun
   double &T; ///< endtime of the run
   int &dc;
   double &Dt;
-  long &NDt; ///< number of deltaT intervals in \link run(Trajectory&, long, double, unsigned, const std::string&, const std::string&, int, bool, bool) deltaT-mode\endlink
+  long &NDt; ///< number of deltaT intervals in \link trajectory::Trajectory::run deltaT-mode\endlink
   std::string &ofn, &initialFileName;
 
   formdouble::Zero &precision; ///< the overall precision of trajectory display \see FormDouble::overallPrecision

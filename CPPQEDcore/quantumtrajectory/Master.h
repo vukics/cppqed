@@ -122,7 +122,7 @@ private:
 
 /// An \link trajectory::Adaptive Adaptive\endlink trajectory class representing Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
 /**
- * Cf. \ref masterequation.
+ * \see \ref masterequation.
 
  * \note The ODE driver underlying this class needs to store several (typically 6–7, this depends on the chosen driver) density-operator instants.
  *

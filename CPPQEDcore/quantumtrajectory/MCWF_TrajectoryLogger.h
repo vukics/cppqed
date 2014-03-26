@@ -61,8 +61,8 @@ public:
 
   void step(); ///< registers an MCWF step
 
-  void stepBack(double dp, double    dtDid, double newDtTry, double t, bool logControl); ///< registers a step-back upon \link ParsMCWF::overshootTolerance tolerance-overshoot\endlink
-  void overshot(double dp, double oldDtTry, double newDtTry          , bool logControl); ///< registers a \link ParsMCWF::dpLimit dpLimit\endlink overshoot
+  void stepBack(double dp, double    dtDid, double newDtTry, double t, bool logControl); ///< registers a step-back upon \link mcwf::Pars::overshootTolerance tolerance-overshoot\endlink
+  void overshot(double dp, double oldDtTry, double newDtTry          , bool logControl); ///< registers a \link mcwf::Pars::dpLimit dpLimit\endlink overshoot
 
   void processNorm(double norm); ///< bookkeeps maximal deviation of the stochastic state vector from norm 1
 

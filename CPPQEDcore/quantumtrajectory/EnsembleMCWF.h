@@ -96,7 +96,7 @@ private:
  * The set of state vectors and the element \link MCWF_Trajectory MCWF trajectories\endlink are *owned* by the class.
  * 
  * \note The class obviously does not inherit from trajectory::Adaptive (a single adaptive timestep would in general result in different stepsizes for the element trajectories),
- * so that it can be used only in \link trajectory::run deltaT-mode\endlink.
+ * so that it can be used only in \link trajectory::Trajectory::run deltaT-mode\endlink.
  * 
  * \tparam RANK arity of the Hilbert space
  * \tparam V has the same function as the template parameter `V` in display_densityoperator::_, which class is used here for deriving quantum averages to display from the assembled density operator

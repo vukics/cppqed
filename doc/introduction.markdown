@@ -27,8 +27,8 @@ Basic specification {#userguidebasicspecification}
 ===================
 
 The framework provides building blocks (refered to as \ref glossaryelement "“elements”") for \ref glossarycomposite quantum systems, which come in two types:
-1. \ref glossaryelementfree elementary free subsystems\endlink, where “free” means that the system has only one quantum number;
-2. \ref glossaryelementinteraction interactions\endlink between such free systems.
+1. \ref glossaryelementfree "elementary free subsystems", where “free” means that the system has only one quantum number;
+2. \ref glossaryelementinteraction "interactions" between such free systems.
 
 The representation of composites was designed in such a way that recursivity is possible in their definition: a composite system can act as a building block for an even more composite system. (As yet, no working example of this possibility has been implemented; but e.g. we may think about systems composed of several atoms with both external and internal degrees of freedom.)
 
@@ -99,7 +99,7 @@ The “very core” is composed of the following namespaces:
 * #structure: In this namespace such interfaces are defined as quantum systems must or may present towards time-evolution drivers (or other clients). E.g. every system *must* be derived from the abstract interface class structure::QuantumSystem to be usable with the \link #quantumtrajectory time-evolution drivers\endlink. A system *may* derive e.g. from structure::Hamiltonian, if its dynamics has a Hamiltonian part.
 * #quantumtrajectory: Here, the time-evolution drivers are defined.
 
-Within [“core”](\coreMainPage), a separate tract is constituted by the #quantumoperator namespace, which defines classes for representing special operator structures to facilitate the \structurebundleguide "implementation of new elements". At present, \link quantumoperator::Tridiagonal tridiagonal\endlink and \link quantumoperator::Sigma sparse\endlink matrices are implemented: this covers most of the problems we have come across in quantum optics so far.
+Within [“core”](\coreMainPage), a separate tract is constituted by the #quantumoperator namespace, which defines classes for representing special operator structures to facilitate the \ref structurebundleguide "implementation of new elements". At present, \link quantumoperator::Tridiagonal tridiagonal\endlink and \link quantumoperator::Sigma sparse\endlink matrices are implemented: this covers most of the problems we have come across in quantum optics so far.
 
 Composites belong to [“core”](\coreMainPage) as they represent the most fundamental design concept of the framework. They are at the moment BinarySystem and Composite.
 
