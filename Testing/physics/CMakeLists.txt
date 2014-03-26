@@ -1,6 +1,4 @@
-testdir(physics PTLA_Evolved PTLA_C++QED QbitMode_C++QED PumpedLossyQbit PTLA_EvolvedHL
-                PumpedLossyMode_C++QED PumpedLossyMode_Evolved QbitMode_Matrix QbitMode_Evolved
-                SingleParticle Ring)
+testdir(physics fewer_scripts)
 
 # Scripts needed for PTLA testcase
 
