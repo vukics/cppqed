@@ -117,7 +117,9 @@ The mode::Ptr is a smart pointer to this type, so that it can “store” either
 
 \see \ref masterequationlimitations "This description" and structure::Exact::applicableInMaster
 
-What we are telling the maker function in the same line is that the picture should be unitary interaction picture. Alternatively, we could add this as a parameter as well, which can be achieved by replacing `update` with `QM_Picture& qmp=updateWithPicture(p,argc,argv);`
+What we are telling the maker function in the same line is that the picture should be unitary interaction picture. Alternatively, we could add this as a parameter as well, which can be achieved by replacing `update` with
+
+    QM_Picture& qmp=updateWithPicture(p,argc,argv);
 
 ###Initial condition, evolution### {#userguideelementaryinitalconditionevolution}
 

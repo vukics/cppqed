@@ -15,11 +15,11 @@ int main(int argc, char* argv[])
 
   ppcP.modeCav=MFT_PLUS; ppcM.modeCav=MFT_MINUS; 
 
-  update(p,argc,argv,"--");
+  auto qmp=updateWithPicture(p,argc,argv,"--");
 
-  particle::Ptr part (make(pp ,QMP_IP));
-  mode    ::Ptr plus (make(pmP,QMP_IP));
-  mode    ::Ptr minus(make(pmM,QMP_IP));
+  particle::Ptr part (make(pp ,qmp));
+  mode    ::Ptr plus (make(pmP,qmp));
+  mode    ::Ptr minus(make(pmM,qmp));
 
   quantumdata::StateVector<3> psi(wavePacket(pp)*init(pmP)*init(pmM));
 

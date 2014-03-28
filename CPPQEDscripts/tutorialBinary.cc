@@ -12,12 +12,12 @@ int main(int argc, char* argv[])
   mode::ParsPumpedLossy pm(p);
   jaynescummings::Pars pjc(p);
 
-  update(p,argc,argv,"--"); // Parsing the command line
+  auto qmp=updateWithPicture(p,argc,argv,"--"); // Parsing the command line
 
   quantumdata::StateVector<2> psi(init(pq)*init(pm));
   evolve(psi,
-         binary::make(jaynescummings::make(make(pq,QMP_IP),
-                                           make(pm,QMP_IP),
+         binary::make(jaynescummings::make(make(pq,qmp),
+                                           make(pm,qmp),
                                            pjc)),
          pe);
 
