@@ -24,6 +24,8 @@ The framework is very sensitive to performance, which can be increased by physic
 Documentation {#mainpagedocumentation}
 =============
 
+[Click here for the Milestone 9 documentation](http://cppqed.sourceforge.net/oldSphinx/)
+
 \par Background and fundamental design principles
 \ref userguideintroduction
 
@@ -52,11 +54,13 @@ Documentation {#mainpagedocumentation}
 Download {#mainpagedownload}
 ========
 
+[Click here for the Milestone 9 downloads](http://cppqed.sourceforge.net/oldSphinx/#download)
+
 - Milestone 10 released packages
 
-  - SourceForge file releases
-  - Debian packages
-  - AUR package
+  - SourceForge file releases (coming soon!)
+  - Debian packages (coming soon!)
+  - AUR package (coming soon!)
 
 - The Git version:
 
