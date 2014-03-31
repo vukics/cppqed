@@ -13,7 +13,7 @@ pjc=jaynescummings.Pars(p)
 
 qmp=updateWithPicture(p,sys.argv,'--')
 
-evolve((qbit.init(pq)**mode.init(pm)).normalize(),
+evolve(qbit.init(pq)**mode.init(pm),
        binary.make( jaynescummings.make( qbit.make(pq,qmp),
                                          mode.make(pm,qmp),
                                          pjc ) ),

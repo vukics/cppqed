@@ -144,3 +144,43 @@ in the script :file:`1particle1mode.py`::
   ...
 
   parameters.update(p,remaining,'--')
+
+Example scripts
+===============
+
+These Python scripts correspond to the examples presented in the `User Guide for the C++ interface <../../cppqed/html/userguide.html>`_
+
+The single-harmonic-oscillator-mode example
+-------------------------------------------
+
+Corresponds to `this C++ script <../../cppqed/html/userguide.html#userguideelementaryparameters>`_
+
+.. literalinclude:: /../../../cpypyqed/scripts/tutorialMode.py
+  :language: python
+  :linenos:
+
+The binary-system example
+-------------------------
+
+Corresponds to `this C++ script <../../cppqed/html/userguide.html#userguidebinaryfullfledged>`_
+
+.. literalinclude:: /../../../cpypyqed/scripts/tutorialBinary.py
+  :language: python
+  :linenos:
+
+Composite examples
+------------------
+
+Ring cavity
+^^^^^^^^^^^
+
+Corresponds to `this C++ script <../../cppqed/html/userguide.html#userguidemorecomplexringfullfledged>`_
+
+.. literalinclude:: /../../../cpypyqed/scripts/tutorialCompositeRing.py
+  :language: python
+  :linenos:
+
+Multi-particle example
+^^^^^^^^^^^^^^^^^^^^^^
+
+…

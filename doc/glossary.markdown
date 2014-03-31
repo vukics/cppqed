@@ -41,11 +41,11 @@ dc-mode {#glossarydcmode}
 
 The trajectory is run in such a way that a fixed number (`dc`) of adaptive steps are performed between two displays.
 
-\see \ref userguideelementarygenericparameters \ref glossarydtmode trajectory::Adaptive::run
+\see \ref userguideelementarygenericparameters, \ref glossarydtmode, trajectory::Adaptive::run
 
 deltaT-mode {#glossarydtmode}
 ===========
 
 The trajectory is run in such a way that a fixed timestep (`deltaT`) is performed between two displays.
 
-\see \ref glossarydcmode trajectory::Trajectory::run
+\see \ref glossarydcmode, trajectory::Trajectory::run

@@ -23,7 +23,7 @@ part=particle.make(pp ,qmp)
 plus =   mode.make(pmP,qmp)
 minus=   mode.make(pmM,qmp)
 
-evolve((particle.wavePacket(pp)**mode.init(pmP)**mode.init(pmM)).normalize(),
+evolve(particle.wavePacket(pp)**mode.init(pmP)**mode.init(pmM),
        makeComposite({(1,0):ParticleAlongCavity(plus ,part,ppcP),
                       (2,0):ParticleAlongCavity(minus,part,ppcM),
                       (1,2,0):ParticleTwoModes(plus,minus,part,ppcP,ppcM)}),

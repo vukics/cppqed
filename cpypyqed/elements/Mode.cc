@@ -23,7 +23,7 @@ const mode::Ptr (*make4)(const mode::ParsPumpedLossy&, QM_Picture) = &mode::make
 void export_Mode()
 {
 
-  class_<ModeBase, boost::noncopyable>("ModeBase",no_init);
+  class_<ModeBase, bases<structure::QuantumSystem<1>>, boost::noncopyable>("ModeBase",no_init);
 
   {
     scope namespaceScope = modeNameSpace;

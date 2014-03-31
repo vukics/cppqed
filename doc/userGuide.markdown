@@ -76,7 +76,10 @@ A full-fledged script {#userguideelementaryparameters}
 
 In the above, the necessary parameters must be previously defined somewhere. Parameters can come from several sources, but the most useful alternative is to have sensible defaults for all parameters, and to be able to override each of them separately in the command line when actually executing the \ref glossaryscript with a given set of parameters. This allows for a fine-grained control over what we want to accept as default and what we want to override, and the command line never gets crowded by those parameters for which the default is fine.
 
-This possibility is indeed supported by the framework. Consider the following program: \include tutorialMode.cc \see The \link parameters parameter-bundle\endlink
+This possibility is indeed supported by the framework. Consider the following program:
+\include tutorialMode.cc
+[<strong>The corresponding script in Python</strong>](../../cpypyqed/html/userguide.html#the-single-harmonic-oscillator-mode-example)
+\see The \link parameters parameter-bundle\endlink
 
 This is a full-fledged script, so if you copy this into directory `CustomScriptsExample` as `temp.cc`, it will compile. Don't forget to re-run `cmake` in order to pick up the new script and call `make temp` in the build directory. (In fact, the script is already there in `CPPQEDscripts` as `tutorialMode.cc`.)
 
@@ -195,6 +198,7 @@ A full-fledged script for a binary system {#userguidebinaryfullfledged}
 If the system is not to be used for anything else, just for being \link evolve evolved\endlink, we can avoid having to invent all these redundant names like `qbit`, `mode`, `act`, `system`, `trajectory`, and create everything in place. In this case a full-fledged script can be as terse as (cf. `CPPQEDscripts/tutorialBinary.cc`):
 
 \include tutorialBinary.cc
+[<strong>The corresponding script in Python</strong>](../../cpypyqed/html/userguide.html#the-binary-system-example)
 
 Here qbit::make will dispatch exactly \ref genericelementsfreesqbit "the same possibilities" that we have seen for the mode above.
 
@@ -250,6 +254,8 @@ The actual C++ type of a Composite object returned by such an invocation of comp
 
 \note We can use the `auto` keyword to let the compiler figure out the type returned by composite::make, if we need to store the object in a variable.
 
+\anchor userguidemorecomplexringfullfledged
+
 A full-fledged script in the terse way may read as:
 
 \dontinclude tutorialCompositeRing.cc
@@ -258,6 +264,8 @@ A full-fledged script in the terse way may read as:
 \skip ptm
 \skip }
 \until }
+
+[<strong>The corresponding script in Python</strong>](../../cpypyqed/html/userguide.html#ring-cavity)
 
 A notable additional feature as compared to previous examples is that since now we have two modes in the system, we somehow have to differentiate between their parameters in the command line. This is achieved by the `"P"` and `"M"` modifiers added to the constructors of `Pars...` objects, so that e.g. instead of `--cutoff` we now have the separate options `--cutoffP` and `--cutoffM`.
 
@@ -389,11 +397,11 @@ git or release version information about the framework and underlying libraries
 Trajectory parameters
 ---------------------
 
-\par `--T <double>`
-simulated time
+\par `--T <double>`, `--NDt <long>`
+simulated time / number of steps in \ref glossarydtmode "deltaT-mode" – when nonzero, the latter is used in deltaT-mode
 
 \par `--dc <int>, --Dt <double>`
-output frequency in number of ODE steps or in time, respectively – when nonzero, the former is used, cf. \ref userguideelementaryproofofprinciplerun
+output frequency \ref glossarydcmode "in number of ODE steps" or \ref glossarydtmode "in time", respectively – when nonzero, the former is used, cf. \ref userguideelementaryproofofprinciplerun
 
 \par `--o <filename>`
 output file, cf. \ref userguideiointofile
