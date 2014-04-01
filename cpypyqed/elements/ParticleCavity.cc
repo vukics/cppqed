@@ -2,12 +2,10 @@
 
 #include "PythonExtension.h"
 
-#include "ParticleCavity_.h"
+#include "ParticleTwoModes.h"
 
 #include "ParsParticleCavity.h"
-#include "Mode_.h"
 #include "Pars.h"
-#include "Particle_.h"
 
 using namespace boost::python;
 
@@ -33,6 +31,13 @@ void export_ParticleCavity()
       "ParticleOrthogonalToCavity",
       init<const ModeBase&, const PumpedParticleBase&, const ParsOrthogonal& >()
         [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()]
+    )
+  ;
+  class_<ParticleTwoModes, bases<structure::Interaction<3> >, boost::noncopyable >
+    (
+      "ParticleTwoModes",
+      init<const ModeBase&, const ModeBase&, const ParticleBase&, const ParsAlong&, const ParsAlong& >()
+        [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4, with_custodian_and_ward<1,5, with_custodian_and_ward<1,6> > > > >()]
     )
   ;
 }
