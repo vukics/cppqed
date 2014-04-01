@@ -92,25 +92,8 @@ Because cmake allows different build configurations, there are two versions of c
 If one or both of these import statements succeed depend on which configurations are installed.
 
 Note that importing :samp:`cpypyqed` will fall back to the debug version if the release version is not found,
-so this should work in both cases. Use :samp:`cpypyqed.debug` to force the debug version.
-If you want to choose between debug and release mode upon calling the script,
-here is one possibility with :py:mod:`argparse`::
-
-  import sys
-  import argparse
-
-  parser = argparse.ArgumentParser(add_help=False)
-  parser.add_argument('--debug', action='store_true')
-  (args,remaining)=parser.parse_known_args(sys.argv)
-
-  if vars(args)['debug']:
-      from cpypyqed.debug import *
-  else:
-      from cpypyqed import *
-
-This will look for the command line argument :samp:`--debug` and load :samp:`cpypyqed_d` instead of :samp:`cpypyqed`
-if it finds it. All the other command line arguments are stored in :samp:`remaining` for further inspection later.
-This is the method all the example scripts of the cpypyqed package use.
+so this should work in both cases. Use :samp:`cpypyqed.debug` or call the script with `--debug` to force the debug
+version (note that `--debug` is removed from the comand line when importing `cpypyqed.debug`).
 
 Command line arguments
 ======================
@@ -127,17 +110,12 @@ in the script :file:`1particle1mode.py`::
 
   import sys
   import argparse
+  from cpypyqed import *
 
   parser = argparse.ArgumentParser(add_help=False)
-  parser.add_argument('--debug', action='store_true')
   parser.add_argument('--1p1mconf', help="System configuration code for 1particle1mode",
                       type=int,default=1)
   (args,remaining)=parser.parse_known_args(sys.argv)
-
-  if vars(args)['debug']:
-      from cpypyqed.debug import *
-  else:
-      from cpypyqed import *
 
   conf = vars(args)['1p1mconf']
 
