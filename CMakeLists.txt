@@ -74,6 +74,10 @@ if(BUNDLED_BLITZ)
     message(FATAL_ERROR "Program autoreconf not found, needed to compile blitz.")
   endif()
   get_filename_component(AUTOTOOLS_PATH ${autoreconf} DIRECTORY)
+
+  if(XCODE)
+    set(AUTORECONF_NO_OUTPUT "&>/dev/null")
+  endif()
   configure_file(misc/blitz-make.sh.in ${PROJECT_BINARY_DIR}/blitz-make.sh @ONLY)
 
   ExternalProject_Add(
