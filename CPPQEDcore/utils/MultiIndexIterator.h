@@ -28,7 +28,7 @@ const End   end  =End  ();
 }
 
 
-#define INPUT_IteratorHelper boost::input_iterator_helper<MultiIndexIterator<RANK>,IdxTiny<RANK> >
+#define FORWARD_IteratorHelper boost::forward_iterator_helper<MultiIndexIterator<RANK>,IdxTiny<RANK> >
 
 /// An iterator over all possible combinations of indices (a number of integers) between certain bounds.
 /**
@@ -38,12 +38,12 @@ const End   end  =End  ();
  * 
  */
 template<int RANK>
-class MultiIndexIterator : public INPUT_IteratorHelper
+class MultiIndexIterator : public FORWARD_IteratorHelper
 {
 private:
-  typedef INPUT_IteratorHelper Base;
+  typedef FORWARD_IteratorHelper Base;
   
-#undef INPUT_IteratorHelper
+#undef FORWARD_IteratorHelper
 
 public:
   typedef typename Base::value_type MultiIndex;

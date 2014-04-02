@@ -1,6 +1,6 @@
 #include "ParsParticleCavity_InterferenceWorkaround.h"
 
-#include "Pars.h"
+#include "Pars.tcc"
 
 namespace particlecavity_interferenceworkaround {
 

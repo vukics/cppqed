@@ -1,6 +1,7 @@
 // -*- C++ -*-
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
+#include <iostream>
 #include "Evolved.h"
 #include "PythonExtension.h"
 
@@ -24,7 +25,6 @@
 #include <boost/python/exception_translator.hpp>
 #include <numpy/ndarrayobject.h>
 #include <fstream>
-#include <iostream>
 #include <string>
 
 using namespace trajectory;

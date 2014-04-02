@@ -4,6 +4,8 @@
 
 #include "Mode_.h"
 
+#include "TridiagonalHamiltonian.tcc"
+
 #include <boost/make_shared.hpp>
 
 
