@@ -57,24 +57,31 @@ if(BUNDLED_BLITZ)
 
   find_package(Boost QUIET COMPONENTS serialization)
   if(Boost_SERIALIZATION_FOUND)
-    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-serialization)
+    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-serialization ")
     set(blitz_SERIALIZATION_FOUND On)
   endif()
 
   string(REGEX REPLACE "/include" "" local_boost_root ${Boost_INCLUDE_DIR})
 
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
-    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-64bit)
+    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-64bit ")
   else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
-    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8)
+    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8 ")
   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+
+  find_program(autoreconf autoreconf)
+  if(NOT autoreconf)
+    message(FATAL_ERROR "Program autoreconf not found, needed to compile blitz.")
+  endif()
+  get_filename_component(AUTOTOOLS_PATH ${autoreconf} DIRECTORY)
+  configure_file(misc/blitz-make.sh.in ${PROJECT_BINARY_DIR}/blitz-make.sh @ONLY)
 
   ExternalProject_Add(
     cppqed-blitz
     HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
     UPDATE_COMMAND ""
     PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
-    CONFIGURE_COMMAND autoreconf -fiv <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure CXX=${CMAKE_CXX_COMPILER} ${BLITZ_CONFIG_OPTIONS} --with-boost=${local_boost_root} --enable-shared --prefix=<INSTALL_DIR> --with-pic
+    CONFIGURE_COMMAND ${PROJECT_BINARY_DIR}/blitz-make.sh <SOURCE_DIR> <INSTALL_DIR>
     BUILD_COMMAND make lib
   )
   ExternalProject_Get_Property(cppqed-blitz install_dir)
