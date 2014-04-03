@@ -77,12 +77,7 @@ const CArray<tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value> ev(CArray<
   DenseVector<ArrayView<dcomp> >
     v(vector(res)); ///< The eigenvalues as FLENS array
 
-  DenseVector<Array<dcomp> >
-    work(flens::lapack::ev_wsq(false,false,a).second); ///< Workaround for flens::lapack::ev with temporary workspaces
-
-  DenseVector<Array<double> > rwork(2*res.size());
-
-  lapack::ev(false,false,a,v,a,a,work,rwork);
+  lapack::ev(false,false,a,v,a,a);
 
   return res;
 }
