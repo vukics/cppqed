@@ -1,3 +1,4 @@
+// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Sigma.h"
 
 #include "Mode_.h"

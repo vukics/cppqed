@@ -1,3 +1,5 @@
+# Copyright Raimar Sandner 2012–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+
 testdir(cpypyqed 1particle1mode 2particles1mode QbitMode_C++QED)
 
 set(ONDEMAND ${PROJECT_BINARY_DIR}/ondemand_temp)

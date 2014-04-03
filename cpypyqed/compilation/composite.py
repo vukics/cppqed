@@ -1,3 +1,4 @@
+# Copyright Raimar Sandner 2012-2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 # -*- coding: utf-8 -*-
 
 r"""This module is the wrapper for the C++QED :core2:`composite` bundle.

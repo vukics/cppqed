@@ -1,3 +1,4 @@
+// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines the mode-bundle (tackling the dynamics of a single harmonic-oscillator mode)}
 // -*- C++ -*-
 #ifndef CPPQEDELEMENTS_FREES_MODE__H_INCLUDED

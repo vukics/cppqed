@@ -1,3 +1,5 @@
+# Copyright Raimar Sandner 2012–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+
 find_package(Boost QUIET COMPONENTS unit_test_framework)
 add_feature_info("Boost unit test framework"
                  Boost_UNIT_TEST_FRAMEWORK_FOUND
