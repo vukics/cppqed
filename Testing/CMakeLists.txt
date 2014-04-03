@@ -39,10 +39,12 @@ configure_file(${CMAKE_SOURCE_DIR}/helperscripts/check_push.sh.in ${CMAKE_BINARY
 #! <!--#########################################################-->
 #!
 
-add_custom_target(check_fast DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
-add_custom_target(check DEPENDS check_fast check_compile check_cpypyqed)
-add_custom_target(check_full DEPENDS check_physics check)
-add_custom_target(check_push COMMAND ${CMAKE_BINARY_DIR}/check_push.sh)
+if(NOT XCODE)
+  add_custom_target(check_fast DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
+  add_custom_target(check DEPENDS check_fast check_compile check_cpypyqed)
+  add_custom_target(check_full DEPENDS check_physics check)
+  add_custom_target(check_push COMMAND ${CMAKE_BINARY_DIR}/check_push.sh)
+endif()
 
 #! \name Project options
 #! @{
@@ -69,10 +71,12 @@ endif()
 #! adds some command line parameters: the configuration files and the build configuration.
 macro(testdir dir)
   set(TESTSDEPEND cpypyqed ${ARGN})
-  add_custom_target(check_${dir}
+  if(NOT XCODE)
+    add_custom_target(check_${dir}
                   COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
                   DEPENDS ${TESTSDEPEND}
-  )
+    )
+  endif()
   set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf ${CMAKE_CURRENT_LIST_DIR}/testdriver.conf --configuration=$<CONFIGURATION>)
 endmacro()
 
@@ -84,7 +88,9 @@ endmacro()
 #! Besides setting `TESTNAME`, this macro adds a new target `name` which runs the specific test alone.
 macro(declaretest name)
   set(TESTNAME ${name})
-  add_custom_target(${name} COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} -R "^${name}$" DEPENDS ${TESTSDEPEND})
+  if(NOT XCODE)
+    add_custom_target(${name} COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} -R "^${name}$" DEPENDS ${TESTSDEPEND})
+  endif()
 endmacro()
 
 #! \file

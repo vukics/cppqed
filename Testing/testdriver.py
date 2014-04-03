@@ -241,11 +241,12 @@ class Runner(OutputManager):
 
   \ref Runner_keys "Configuration file keys" this class understands.
   """
-  def run(self, clean=True, extra_opts=None, *args, **kwargs):
+  def run(self, clean=True, extra_opts=None, interpreter=None, *args, **kwargs):
     """!
     The method to run the test.
     \param clean (optional) `Boolean`: Whether to remove old output before running the test.
     \param extra_opts (optional) `List`: Additional command line options appended to the script call.
+    \param interpreter (optional) `str`: Interpreter to run the command through, e.g. `python`.
     \param args passed through to `subprocess.call`
     \param kwargs passed through to `subprocess.call`
 
@@ -254,7 +255,7 @@ class Runner(OutputManager):
     """
     for runmode in self.runmodes():
       if clean: self.clean(runmode)
-      command = self._build_commandline(runmode,extra_opts)
+      command = self._build_commandline(runmode,extra_opts,interpreter)
       logging.debug(subprocess.list2cmdline(command))
       ret = subprocess.call(command, *args, **kwargs)
       if not ret==0: sys.exit(ret)
@@ -283,8 +284,9 @@ class Runner(OutputManager):
     for option in sorted([ item[0] for item in self.cp.items(section) if item[0].startswith(option_prefix)]):
       options.extend(self.cp.get(section,option).split())
 
-  def _build_commandline(self, runmode, extra_opts=None):
-    result = [self.options.script]
+  def _build_commandline(self, runmode, extra_opts=None, interpreter=None):
+    result = [interpreter] if not interpreter is None else []
+    result.append(self.options.script)
     if extra_opts: result+=extra_opts
 
     ## @addtogroup SetupKeys
@@ -335,7 +337,7 @@ class PythonRunner(Runner):
     env['PYTHONPATH']=self.cp.get('Setup','modulepath')
     if extra_opts is None: extra_opts = []
     if self.options.configuration.lower()=="debug": extra_opts += ['--debug']
-    Runner.run(self,clean=clean,extra_opts=extra_opts,env=env,*args,**kwargs)
+    Runner.run(self,clean=clean,extra_opts=extra_opts,interpreter=sys.executable,env=env,*args,**kwargs)
 
 class Verifier(OutputManager):
   """!

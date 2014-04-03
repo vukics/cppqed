@@ -57,24 +57,35 @@ if(BUNDLED_BLITZ)
 
   find_package(Boost QUIET COMPONENTS serialization)
   if(Boost_SERIALIZATION_FOUND)
-    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-serialization)
+    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-serialization ")
     set(blitz_SERIALIZATION_FOUND On)
   endif()
 
   string(REGEX REPLACE "/include" "" local_boost_root ${Boost_INCLUDE_DIR})
 
   if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
-    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-64bit)
+    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-64bit ")
   else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
-    set(BLITZ_CONFIG_OPTIONS ${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8)
+    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8 ")
   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+
+  find_program(autoreconf autoreconf)
+  if(NOT autoreconf)
+    message(FATAL_ERROR "Program autoreconf not found, needed to compile blitz.")
+  endif()
+  get_filename_component(AUTOTOOLS_PATH ${autoreconf} DIRECTORY)
+
+  if(XCODE)
+    set(AUTORECONF_NO_OUTPUT "&>/dev/null")
+  endif()
+  configure_file(misc/blitz-make.sh.in ${PROJECT_BINARY_DIR}/blitz-make.sh @ONLY)
 
   ExternalProject_Add(
     cppqed-blitz
     HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
     UPDATE_COMMAND ""
     PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
-    CONFIGURE_COMMAND autoreconf -fiv <SOURCE_DIR> COMMAND <SOURCE_DIR>/configure CXX=${CMAKE_CXX_COMPILER} ${BLITZ_CONFIG_OPTIONS} --with-boost=${local_boost_root} --enable-shared --prefix=<INSTALL_DIR> --with-pic
+    CONFIGURE_COMMAND ${PROJECT_BINARY_DIR}/blitz-make.sh <SOURCE_DIR> <INSTALL_DIR>
     BUILD_COMMAND make lib
   )
   ExternalProject_Get_Property(cppqed-blitz install_dir)
@@ -110,12 +121,6 @@ endif()
 #!
 #! Compile the components core, elements, scripts (optional) and cpypyqed (optional)
 #! by adding their sub-directories.
-#!
-#! This section also includes the test suite and defines some more targets needed in the test suite:
-#! `clean-customelements` and `clean-customscripts` cleans only the directories
-#! `CustomElementsExample` and `CustomScriptsExample`, respectively. These two directories are
-#! added with `EXCLUDE_FROM_ALL`, they are compiled as part of a test to keep them in sync with the
-#! rest of the framework.
 
 add_subdirectory(CPPQEDcore)
 set(CPPQED_DIR ${core_BINARY_DIR})
@@ -149,15 +154,14 @@ endif()
 
 add_subdirectory(Testing)
 
-add_subdirectory(CustomElementsExample EXCLUDE_FROM_ALL)
-set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
-add_custom_target(clean-customelements
-                    COMMAND ${CMAKE_BUILD_TOOL} clean
-                    WORKING_DIRECTORY ${elements_custom_example_BINARY_DIR})
-add_subdirectory(CustomScriptsExample EXCLUDE_FROM_ALL)
-add_custom_target(clean-customscripts
-                    COMMAND ${CMAKE_BUILD_TOOL} clean
-                    WORKING_DIRECTORY ${scripts_custom_example_BINARY_DIR})
+# The EXCLUDE_FROM_ALL target makes Xcode scip the subdirectory entirely
+if(XCODE)
+  add_subdirectory(CustomElementsExample)
+  add_subdirectory(CustomScriptsExample)
+else()
+  add_subdirectory(CustomElementsExample EXCLUDE_FROM_ALL)
+  add_subdirectory(CustomScriptsExample EXCLUDE_FROM_ALL)
+endif()
 
 #! \file
 #! <!--#########################################################-->

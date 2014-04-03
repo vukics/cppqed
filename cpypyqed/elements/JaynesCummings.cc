@@ -4,7 +4,7 @@
 #include "Namespaces.h"
 
 #include "JaynesCummings_.h"
-#include "Mode_.h"
+#include "Mode.tcc"
 #include "Pars.h"
 #include "Qbit_.h"
 
