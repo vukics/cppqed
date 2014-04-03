@@ -39,11 +39,6 @@
 #============================================================================
 
 # Finding NumPy involves calling the Python interpreter
-if(NumPy_FIND_REQUIRED)
-find_package(PythonInterp 2.6 REQUIRED)
-else()
-find_package(PythonInterp 2.6)
-endif()
 
 if(NOT PYTHONINTERP_FOUND)
 set(NUMPY_FOUND FALSE)
