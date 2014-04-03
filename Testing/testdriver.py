@@ -158,7 +158,7 @@ class OptionsManager(object):
       return self.cp.get(section,name)
     else:
       if not required: return default
-      else: sys.exit("Error: required option \"{}\" not found in section {}.".format(name,section))
+      else: sys.exit("Error: required option \"{0}\" not found in section {1}.".format(name,section))
 
 class OutputManager(OptionsManager):
   """!
@@ -396,9 +396,9 @@ class Verifier(OutputManager):
     else:
       return self.output(runmode,section=self.otherSection,statefile=statefile)
   def _differ(self,this,other):
-    sys.exit("Error: {} and {} differ.".format(this,other))
+    sys.exit("Error: {0} and {1} differ.".format(this,other))
   def _equiv(self,this,other):
-    logging.debug("{} and {} are equivalent.".format(this,other))
+    logging.debug("{0} and {1} are equivalent.".format(this,other))
   def _verify_ev(self,this,other):
     if not np.allclose(load_sv(this),load_sv(other)): self._differ(this,other)
     else: self._equiv(this,other)
@@ -536,19 +536,19 @@ class CompileTarget(OptionsManager):
       p = subprocess.Popen(command+[dep], stdout=subprocess.PIPE,stderr=subprocess.PIPE)
       (std,err) = p.communicate()
       if not p.returncode==0:
-        sys.exit("Compilation of dependency {} for {} failed.".format(dep,self.options.script))
+        sys.exit("Compilation of dependency {0} for {1} failed.".format(dep,self.options.script))
     logging.debug(subprocess.list2cmdline(command+[self.options.script]))
     p = subprocess.Popen(command+[self.options.script], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (std,err) = p.communicate()
     returncode = p.returncode
     if error is None:
       if returncode != 0:
-        sys.exit("Compilation of {} failed.".format(self.options.script))
+        sys.exit("Compilation of {0} failed.".format(self.options.script))
     else:
       if returncode == 0:
         sys.exit("Compilation was successful, but failure was expected.")
       if not error in std:
-        sys.exit("Compilation failed as expected, but {} was not found in the error message.".format(error))
+        sys.exit("Compilation failed as expected, but {0} was not found in the error message.".format(error))
 
 class Plotter(OutputManager):
   """!
@@ -657,10 +657,10 @@ class StateComparer(OutputManager):
       for runmode in self._filter_runmodes(section=traj):
         statefile=self.output(runmode=runmode,section=traj,statefile=True)
         _,states,_=io.read(statefile)
-        logging.debug("Evaluating {}.".format(os.path.basename(statefile)))
+        logging.debug("Evaluating {0}.".format(os.path.basename(statefile)))
         eps=float(self.get_option('epsilon_'+runmode+'_'+self.test,section=traj,required=True))
         value=function(*parameters)(states)
-        logging.debug("Value: {}, epsilon: {}".format(value,eps))
+        logging.debug("Value: {0}, epsilon: {1}".format(value,eps))
         if not value<eps:
           failure=True
           logging.debug("====== FAILED ======")
@@ -713,7 +713,7 @@ class TrajectoryComparer(Plotter):
             self.plot(timeArray,reference(timeArray),label=reference_label)
             reference_plotted[(reference_label,n)]=True
           self.plot(timeArray,data(timeArray),label=data_label)
-          logging.debug("Evaluating {}, value number {}.".format(data_label,n+1))
+          logging.debug("Evaluating {0}, value number {1}.".format(data_label,n+1))
           eps=self._get_eps(runmode, traj, n)
           if not self._regression(reference,data,timeArray,eps):
             logging.debug("====== FAILED ======")
@@ -754,23 +754,23 @@ class TrajectoryComparer(Plotter):
     t0=timeArray[ 0]
     t1=timeArray[-1]
     res=quadrature(lambda t : (f1(t)-f2(t))**2,t0,t1,maxiter=100)[0]
-    logging.debug("Quadrature: {}, epsilon: {}".format(res,eps))
+    logging.debug("Quadrature: {0}, epsilon: {1}".format(res,eps))
     return res<eps
 
 def exponential(a,l):
   def fn(t):
     return a*exp(-l*t)
-  return fn,"{}*exp(-{}*t)".format(a,l)
+  return fn,"{0}*exp(-{1}*t)".format(a,l)
 
 def FreeParticleX(x0,p0):
   def fn(t):
     return x0+2*p0*t
-  return fn, "{}+2*{}*t".format(x0,p0)
+  return fn, "{0}+2*{1}*t".format(x0,p0)
 
 def FreeParticleVarX(dx0,dp0):
   def fn(t):
     return (dx0+4.*dp0*t**2)**.5
-  return fn, "({}+(4*{}*t)^2)^0.5"
+  return fn, "({0}+(4*{1}*t)^2)^0.5"
 
 class FunctionComparer(TrajectoryComparer):
   """!
@@ -825,7 +825,7 @@ def main():
     import cpypyqed.io as io
   elif options.configuration.lower()=="debug":
     import cpypyqed.io_d as io
-  logging.info("Taking cpypyqed from {}".format(io.__file__))
+  logging.info("Taking cpypyqed from {0}".format(io.__file__))
 
   if options.testclass:
     constructor = globals()[options.testclass]

@@ -69,9 +69,9 @@ class Composite(OnDemand):
     def _make_custodian_and_wards(self, depth=1):
         if depth>len(self.actslist): return ""
         if depth == 1:
-          return "with_custodian_and_ward_postcall<0,1{}>()".format(self._make_custodian_and_wards(depth+1))
+          return "with_custodian_and_ward_postcall<0,1{0}>()".format(self._make_custodian_and_wards(depth+1))
         else:
-          return ",with_custodian_and_ward_postcall<0,{}{}>".format(depth,self._make_custodian_and_wards(depth+1))
+          return ",with_custodian_and_ward_postcall<0,{0}{1}>".format(depth,self._make_custodian_and_wards(depth+1))
 
     def generate_source(self,builddir):
         r"""Overriding :meth:`.OnDemand.generate_source`

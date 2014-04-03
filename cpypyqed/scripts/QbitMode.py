@@ -3,8 +3,6 @@
 import sys
 from cpypyqed import *
 
-import argparse
-
 p=parameters.ParameterTable()
 pm=mode.ParsPumpedLossy(p)
 pq=qbit.ParsPumpedLossy(p)

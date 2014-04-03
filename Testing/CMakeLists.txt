@@ -23,7 +23,7 @@ project(testing)
 include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
 include(${CPPQED_USE})
 
-find_package(PythonInterp 2.7)
+find_package(PythonInterp 2.6)
 find_package(Numpy)
 find_package(Scipy)
 

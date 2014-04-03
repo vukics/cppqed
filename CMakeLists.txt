@@ -135,8 +135,8 @@ set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 #! This %CMake option determines if the Python modules should be compiled.
 option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
 find_package(Boost QUIET COMPONENTS python)
-find_package(PythonLibs 2.7 QUIET)
-find_package(PythonInterp 2.7 QUIET)
+find_package(PythonLibs 2.6 QUIET)
+find_package(PythonInterp 2.6 QUIET)
 find_package(Numpy QUIET)
 
 # For some rease kdevelop does not recognize PYTHONLIBS_FOUND, use PYTHON_INCLUDE_DIRS instead
@@ -157,6 +157,7 @@ endif()
 add_subdirectory(Testing)
 
 # The EXCLUDE_FROM_ALL target makes Xcode scip the subdirectory entirely
+set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
 if(XCODE)
   add_subdirectory(CustomElementsExample)
   add_subdirectory(CustomScriptsExample)

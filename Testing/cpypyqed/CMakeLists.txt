@@ -28,9 +28,19 @@ add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:QbitMode_C++QED>)
 set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "cpypyqed_QbitMode_dc")
 
+# Python 2.6 does not have argparse, we have to use the version which works
+# around this: 1particle1mode_without_argparse.py
+
+if(PYTHON_VERSION_STRING VERSION_LESS 2.7)
+  set(1particle1mode 1particle1mode_without_argparse.py)
+else()
+  set(1particle1mode 1particle1mode.py)
+endif()
+
+
 declaretest(cpypyqed_1particle1mode_conf1)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/1particle1mode.py
+            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/${1particle1mode}
             --cpypyqed_builddir=${ONDEMAND}/${TESTNAME} --cpypyqed_config=${CPYPYQED_CONFIG})
 declaretest(cppqed_1particle1mode_conf1)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -39,7 +49,7 @@ set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "cpypyqed_1particle1mode_con
 
 declaretest(cpypyqed_1particle1mode_conf2)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/1particle1mode.py
+            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/${1particle1mode}
             --cpypyqed_builddir=${ONDEMAND}/${TESTNAME} --cpypyqed_config=${CPYPYQED_CONFIG})
 declaretest(cppqed_1particle1mode_conf2)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -48,7 +58,7 @@ set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "cpypyqed_1particle1mode_con
 
 declaretest(cpypyqed_1particle1mode_conf3)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/1particle1mode.py
+            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/${1particle1mode}
             --cpypyqed_builddir=${ONDEMAND}/${TESTNAME} --cpypyqed_config=${CPYPYQED_CONFIG})
 declaretest(cppqed_1particle1mode_conf3)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
@@ -57,7 +67,7 @@ set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "cpypyqed_1particle1mode_con
 
 declaretest(cpypyqed_1particle1mode_conf4)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/1particle1mode.py
+            --test=${TESTNAME} --testclass=PythonRunner --script=${cpypyqed_SOURCE_DIR}/scripts/${1particle1mode}
             --cpypyqed_builddir=${ONDEMAND}/${TESTNAME} --cpypyqed_config=${CPYPYQED_CONFIG})
 declaretest(cppqed_1particle1mode_conf4)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}

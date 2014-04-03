@@ -28,7 +28,7 @@ if cpypyqed.config.build_type.lower()=="release":
 elif cpypyqed.config.build_type.lower()=="debug":
   from ..core_d import core_git
 else:
-  raise ImportError("Unknown build configuration {}.".format(build_type))
+  raise ImportError("Unknown build configuration {0}.".format(build_type))
 
 # The compilation directory can be customized by changing ondemand.cpypyqed_builddir
 cpypyqed_builddir = "~/.cpypyqed"
@@ -127,7 +127,7 @@ class OnDemand(object):
           thisClass = self._import_class(self.fullclass)
         if not thisClass.core_git == core_git:
           os.remove(os.path.join(self.modulepath,self.library))
-          sys.exit("Error: {} was compiled with different library version, removing.\nPlease restart the script.\n".format(self.fullclass))
+          sys.exit("Error: {0} was compiled with different library version, removing.\nPlease restart the script.\n".format(self.fullclass))
         if self.makerfunction:
             thisClass = self._import_class(self.makerfunction)
         return thisClass(*args,**kwargs) 
@@ -147,16 +147,17 @@ class OnDemand(object):
           self.generate_source(builddir)
           with open(self.cmaketemplate) as f:
               cmake = f.read()
-          cmake = cmake.format(modulename=self.modulename, sourcefile=self.sourcefile)
+          cmake = cmake.format(modulename=self.modulename, sourcefile=self.sourcefile,
+                               major=sys.version_info[0], minor=sys.version_info[1], micro=sys.version_info[2])
           with open(os.path.join(builddir,"CMakeLists.txt"),"w") as f:
               f.write(cmake)
           with open(self.logfile, "w") as log:
-              print("Configuring the build project for {}, please stand by...".format(self.classname))
+              print("Configuring the build project for {0}, please stand by...".format(self.classname))
               opts=self.config.get('Setup','cmake_opts').split()
               compiler=self.config.get('Setup','compiler')
               cppqed_dir=os.path.expanduser(self.config.get('Setup','cppqed_dir'))
-              if compiler: opts.append('-DCMAKE_CXX_COMPILER={}'.format(compiler))
-              logger.debug("Configuring for build type {}.".format(cpypyqed.config.build_type))
+              if compiler: opts.append('-DCMAKE_CXX_COMPILER={0}'.format(compiler))
+              logger.debug("Configuring for build type {0}.".format(cpypyqed.config.build_type))
               if cpypyqed.config.build_type=="debug":
                 opts.append("-DCMAKE_BUILD_TYPE=Debug")
                 cppqed_dir_debug=os.path.expanduser(self.config.get('Setup','cppqed_dir_debug'))
@@ -166,12 +167,12 @@ class OnDemand(object):
                 cppqed_dir_release=os.path.expanduser(self.config.get('Setup','cppqed_dir_release'))
                 if cppqed_dir_release: cppqed_dir=cppqed_dir_release
               else:
-                raise(NotImplementedError("Unknown build type {}.".format(cppqed_build_type)))
-              if cppqed_dir: opts.append('-DCPPQED_DIR={}'.format(cppqed_dir))
+                raise(NotImplementedError("Unknown build type {0}.".format(cppqed_build_type)))
+              if cppqed_dir: opts.append('-DCPPQED_DIR={0}'.format(cppqed_dir))
               logger.debug(subprocess.list2cmdline(['cmake','.']+opts))
               ret = subprocess.call(args=['cmake','.']+opts,cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
               self._check_return_value(ret, errormsg="Error: cmake failed")
-              print("Building {}, please stand by...".format(self.classname))
+              print("Building {0}, please stand by...".format(self.classname))
               ret = subprocess.call(args=('make',),cwd=builddir,stdout=log,stderr=subprocess.STDOUT)
               self._check_return_value(ret, errormsg="Error: make failed")
           shutil.copy(os.path.join(builddir,self.library),self.modulepath)
