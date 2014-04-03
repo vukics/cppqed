@@ -1,3 +1,4 @@
+// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Tools for adapting blitzplusplus::basi::Iterator%s to iteration over rows or columns of (multi)matrices}
 // -*- C++ -*-
 #ifndef CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
