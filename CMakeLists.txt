@@ -87,6 +87,7 @@ if(BUNDLED_BLITZ)
     HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
     UPDATE_COMMAND ""
     PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
+	  COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch
     CONFIGURE_COMMAND ${PROJECT_BINARY_DIR}/blitz-make.sh <SOURCE_DIR> <INSTALL_DIR>
     BUILD_COMMAND make lib
   )
