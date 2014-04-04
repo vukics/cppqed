@@ -25,7 +25,8 @@
 #!
 
 include(LibFindMacros)
-libfind_package(GSL CBLAS)
+# use gslcblas for now
+#libfind_package(GSL CBLAS)
 
 if (UNIX)
   find_package(PkgConfig QUIET)
@@ -34,9 +35,10 @@ endif()
 
 find_path(GSL_INCLUDE_DIR gsl/gsl_linalg.h HINTS ${GSL_PKGCONF_INCLUDE_DIRS} $ENV{UIBK_GSL_INC})
 find_library(GSL_LIBRARY NAMES gsl HINTS ${GSL_PKGCONF_LIBRARY_DIRS} $ENV{UIBK_GSL_LIB})
+find_library(GSLCBLAS_LIBRARY NAMES gslcblas HINTS ${GSL_PKGCONF_LIBRARY_DIRS} $ENV{UIBK_GSL_LIB})
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(GSL_PROCESS_INCLUDES GSL_INCLUDE_DIR CBLAS_INCLUDE_DIRS)
-set(GSL_PROCESS_LIBS GSL_LIBRARY CBLAS_LIBRARIES)
+set(GSL_PROCESS_INCLUDES GSL_INCLUDE_DIR)
+set(GSL_PROCESS_LIBS GSL_LIBRARY GSLCBLAS_LIBRARY)
 libfind_process(GSL)
