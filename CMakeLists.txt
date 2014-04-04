@@ -87,6 +87,7 @@ if(BUNDLED_BLITZ)
     HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
     UPDATE_COMMAND ""
     PATCH_COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
+	  COMMAND patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch
     CONFIGURE_COMMAND ${PROJECT_BINARY_DIR}/blitz-make.sh <SOURCE_DIR> <INSTALL_DIR>
     BUILD_COMMAND make lib
   )
@@ -135,11 +136,16 @@ set(CPPQEDelements_DIR ${elements_BINARY_DIR})
 #! This %CMake option determines if the Python modules should be compiled.
 option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
 find_package(Boost QUIET COMPONENTS python)
-find_package(PythonLibs 2.7 QUIET)
-find_package(PythonInterp 2.7 QUIET)
+find_package(PythonInterp 2 QUIET)
+if(${PYTHON_VERSION_STRING} VERSION_LESS 2.6)
+  message(WARNING "Python2 >=2.6 needed, disabling cpypyqed and testsuite.")
+  set(PYTHONINTERP_FOUND 0)
+else()
+  find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
+endif()
 find_package(Numpy QUIET)
 
-# For some rease kdevelop does not recognize PYTHONLIBS_FOUND, use PYTHON_INCLUDE_DIRS instead
+# For some reason kdevelop does not recognize PYTHONLIBS_FOUND, use PYTHON_INCLUDE_DIRS instead
 if(Boost_PYTHON_FOUND AND PYTHONINTERP_FOUND AND PYTHON_INCLUDE_DIRS AND NUMPY_FOUND AND COMPILE_CPYPYQED)
   set(ENABLE_CPYPYQED 1)
 endif()
@@ -159,9 +165,11 @@ add_subdirectory(Testing)
 # The EXCLUDE_FROM_ALL target makes Xcode scip the subdirectory entirely
 if(XCODE)
   add_subdirectory(CustomElementsExample)
+  set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
   add_subdirectory(CustomScriptsExample)
 else()
   add_subdirectory(CustomElementsExample EXCLUDE_FROM_ALL)
+  set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
   add_subdirectory(CustomScriptsExample EXCLUDE_FROM_ALL)
 endif()
 

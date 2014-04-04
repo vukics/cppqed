@@ -31,8 +31,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
 find_package(CPPQED 2.99 REQUIRED)
 include(${CPPQED_USE})
 find_package(Boost QUIET REQUIRED COMPONENTS python)
-find_package(PythonInterp 2.7 REQUIRED)
-find_package(PythonLibs 2.7 REQUIRED)
+find_package(PythonInterp 2.6 REQUIRED)
+find_package(PythonLibs 2.6 REQUIRED)
 find_package(Numpy REQUIRED)
 
 include(PythonSetup)
@@ -199,7 +199,7 @@ set(INPUTS "__init__.py" "config.py" "compilation/ActTemplate.cc"
            "compilation/CompositeTemplate.cc" "compilation/composite.py" "compilation/ondemand.py"
            "compilation/__init__.py" "compilation/CMakeListsTemplate.txt" "debug/__init__.py" "tools/__init__.py" 
            "tools/quantumstate.py" "tools/expvalues.py" "tools/utils.py" "tools/initialconditions.py"
-           "tools/test_statevector.py")
+           "tools/test_statevector.py" "tools/passthrough.py")
 
 foreach(file ${INPUTS})
   add_custom_command(TARGET cpypyqed PRE_BUILD
