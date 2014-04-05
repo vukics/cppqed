@@ -35,6 +35,13 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/CPPQEDcore/cma
 #! \brief Other subprojects use this variable to determine if this is a monolithic build
 set(CPPQED_MONOLITHIC 1)
 
+set(cppqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cppqed)
+set(core_DOC_DIR ${CMAKE_BINARY_DIR}/doc/core)
+set(core_DOXYGEN_TAG ${cppqed_DOC_DIR}/core.tag)
+set(elements_DOC_DIR ${CMAKE_BINARY_DIR}/doc/elements)
+set(elements_DOXYGEN_TAG ${cppqed_DOC_DIR}/elements.tag)
+set(cpypyqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cpypyqed)
+
 #! @}
 
 #! \file
@@ -129,6 +136,11 @@ add_subdirectory(CPPQEDcore)
 set(CPPQED_DIR ${core_BINARY_DIR})
 add_subdirectory(CPPQEDelements)
 set(CPPQEDelements_DIR ${elements_BINARY_DIR})
+
+#! \brief Install directory of the Doxygen documentation.
+#!
+#! Note that doxygen documentation can only be built and installed in monolithic builds.
+set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
 
 #! \name Project options
 #! @{
@@ -225,13 +237,12 @@ include(CPack)
 #!
 #! This section builds the Doxygen documentation (if Doxygen is found) and furthermore
 #! installs the example projects "CustomElementsExample" and "CustomScriptsExample" to
-#! the system. The install location \ref CMake::CPPQED_DOC_DIR "CPPQED_DOC_DIR" is set in cppqed_documentation().
+#! the system. The install location is \ref CMake::CPPQED_DOC_DIR "CPPQED_DOC_DIR".
 #!
 #! For the Doxygen documentation, the filter [CMakeDoxygenFilter](https://github.com/saschazelzer/CMakeDoxygenFilter),
 #! is compiled, which allows to document %CMake in Doxygen. The overall C++QED documentation
 #! is generated with cppqed_documentation(), and a target "doc" for the full documentation is created,
 #! which depends on all the component documentation targets.
-
 
 include(${core_SOURCE_DIR}/cmake/Modules/CPPQEDUse.cmake)
 add_executable(CMakeDoxygenFilter doc/CMakeDoxygenFilter.cpp)

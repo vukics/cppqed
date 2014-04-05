@@ -16,11 +16,6 @@ set(CPPQED@PROJECT_NAME@_SHA1 "@CONF_GIT_SHA1@")
 #! A list of all sub-directories of the current elements project which contain header files
 set(CPPQED@PROJECT_NAME@_INCLUDE_DIRS "@PACKAGE_CONF_INCLUDE_DIRS@")
 
-#! Path of the Doxygen documentation
-set(CPPQED@PROJECT_NAME@_DOXYGEN_DIR "@PACKAGE_CONF_DOC_DIR@/html")
-#! Path of the Doxygen `<project_name>.tag` file
-set(CPPQED@PROJECT_NAME@_DOXYGEN_TAGFILE "@PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag")
-
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET @ELEMENTSLIB@)
   include("@PACKAGE_CONF_CMAKE_DIR@/CPPQED@PROJECT_NAME@Targets.cmake")

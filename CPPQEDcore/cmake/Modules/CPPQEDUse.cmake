@@ -243,10 +243,9 @@ macro(elements_project)
     set(CONF_INCLUDE_DIRS ${CONF_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/${d}) 
   endforeach(d)
   set(CONF_CMAKE_DIR ${PROJECT_BINARY_DIR})
-  set(CONF_DOC_DIR ${PROJECT_BINARY_DIR})
   configure_package_config_file(${CPPQED_CMAKE_DIR}/ElementsTemplateConfig.cmake.in "${PROJECT_BINARY_DIR}/CPPQED${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION  "${PROJECT_BINARY_DIR}"
-    PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR
+    PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR
   )
   write_basic_package_version_file(${PROJECT_BINARY_DIR}/CPPQED${PROJECT_NAME}ConfigVersion.cmake 
     VERSION ${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}
@@ -258,7 +257,7 @@ macro(elements_project)
   set(CONF_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/${ELEMENTS_CMAKE_SUBDIR})
   configure_package_config_file(${CPPQED_CMAKE_DIR}/ElementsTemplateConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQED${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION "${CONF_CMAKE_DIR}"
-    PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR
+    PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR
   )
 
   # Install the CPPQEDConfig.cmake and CPPQEDConfigVersion.cmake
@@ -388,54 +387,42 @@ endmacro()
 #! \param tagfiles A list with full paths to doxygen tagfiles of other projects.
 #! \param dependencies (optional) All remaining arguments will be treated as targets
 #!  this document target should depend on.
-#! \return `CONF_DOC_DIR`, this variable is set to `${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME}`
 #!
-#! If doxygen or dot is not found on the system, this macro does nothing except to set `CONF_DOC_DIR`.
+#! If doxygen or dot is not found on the system, this macro does nothing.
 #! Otherwise it sets the variable `TAGFILES` to a list which can be used in the TAGFILES option of a
 #! Doxyfile. The HTML location corresponding to each tagfile is expected in a html subdirectory of the
 #! directory where the tagfile resides. All paths will be converted to relative paths so that the
 #! resulting documentation can be relocated.
 #!
-#! The template `doc/Doxyfile` will be copied to `CONF_DOC_DIR`, expanding all @-variables within.
+#! The template `doc/Doxyfile` will be copied to `${PROJECT_NAME}_DOC_DIR`, expanding all @-variables within.
 macro(cppqed_documentation target_prefix tagfiles)
 
   find_package(Doxygen 1.8)
   set(tagfiles ${tagfiles})
 
-  #! \brief Install directory of the Doxygen documentation.
-  #!
-  #! Note that doxygen documentation can only be installed in monolithic builds. This
-  #! variable is set in cppqed_documentation().
-  set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
-
-  set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
-
   if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     set(doc_depends ${ARGN})
-    if(CPPQED_MONOLITHIC)
-      set(DOXYGEN_HEADER_FILE ${cppqed_SOURCE_DIR}/doc/header.html)
-      set(DOXYGEN_CSS_FILE ${cppqed_SOURCE_DIR}/doc/stylesheet.css)
-    endif()
-    file(MAKE_DIRECTORY ${CONF_DOC_DIR})
+    set(DOXYGEN_HEADER_FILE ${cppqed_SOURCE_DIR}/doc/header.html)
+    set(DOXYGEN_CSS_FILE ${cppqed_SOURCE_DIR}/doc/stylesheet.css)
+    file(MAKE_DIRECTORY ${${PROJECT_NAME}_DOC_DIR})
     while(tagfiles)
       list(GET tagfiles 0 tagfile)
       list(REMOVE_AT tagfiles 0)
-      file(RELATIVE_PATH relative_tagfile ${CONF_DOC_DIR} ${tagfile})
+      file(RELATIVE_PATH relative_tagfile ${${PROJECT_NAME}_DOC_DIR} ${tagfile})
       get_filename_component(relative_location ${relative_tagfile} PATH)
       set(TAGFILES "${TAGFILES} ${relative_tagfile}=../${relative_location}/html")
     endwhile()
-    configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${CONF_DOC_DIR}/Doxyfile @ONLY)
-    add_custom_target(${target_prefix}doc ${DOXYGEN_EXECUTABLE} ${CONF_DOC_DIR}/Doxyfile
-      WORKING_DIRECTORY ${CONF_DOC_DIR}
+    set(local_doc_dir ${${PROJECT_NAME}_DOC_DIR})
+    configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in ${${PROJECT_NAME}_DOC_DIR}/Doxyfile @ONLY)
+    add_custom_target(${target_prefix}doc ${DOXYGEN_EXECUTABLE} ${${PROJECT_NAME}_DOC_DIR}/Doxyfile
+      WORKING_DIRECTORY ${${PROJECT_NAME}_DOC_DIR}
       COMMENT "Generating APIs documentation with Doxygen"
       DEPENDS ${doc_depends}
     )
-    if(CPPQED_MONOLITHIC)
-      install(DIRECTORY ${CONF_DOC_DIR}/html
-            DESTINATION ${CPPQED_DOC_DIR}/${PROJECT_NAME}
-            OPTIONAL
-      )
-    endif()
+    install(DIRECTORY ${${PROJECT_NAME}_DOC_DIR}/html
+          DESTINATION ${CPPQED_DOC_DIR}/${PROJECT_NAME}
+          OPTIONAL
+    )
   endif()
 endmacro()
 
