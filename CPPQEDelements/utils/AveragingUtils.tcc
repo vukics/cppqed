@@ -27,14 +27,14 @@ auto
 ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) -> const KeyLabels
 {
   typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  using std::stringstream;
+  using std::ostringstream;
 
   KeyLabels res;
   Iterator i(dim-1,cpputils::mii::begin);
 
   // Diagonals
   for (; i!=i.getEnd(); ++i) {
-    stringstream ss(stringstream::out);
+    ostringstream ss;
     ss<<"rho_"<<*i<<';'<<*i;
     res.push_back(ss.str());
   }
@@ -45,12 +45,12 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
   for (i.setToBegin(); i!=i.getEnd(); ++i) 
     for (Iterator j(std::next(i)); j!=j.getEnd(); ++j) {
       {
-        stringstream ss(stringstream::out);
+        ostringstream ss;
         ss<<"real["<<"rho_"<<*i<<','<<*j<<']';
         res.push_back(ss.str());
       }
       {
-        stringstream ss(stringstream::out);
+        ostringstream ss;
         ss<<"imag["<<"rho_"<<*i<<','<<*j<<']';
         res.push_back(ss.str());
       }

@@ -253,7 +253,7 @@ public:
   void operator()(T)
   {
     using namespace std;
-    stringstream slate(stringstream::out);
+    ostringstream slate;
     slate<<"Jump "<<T::second<<" -> "<<T::first;
     keyLabels_.push_back(slate.str());
   }
@@ -336,7 +336,7 @@ filterReal(const blitz::TinyVector<dcomp,NL>& levels)
   structure::DynamicsBase::RealFreqs res;
   for (int i=0; i<NL; i++)
     if (!hasRealPart(levels(i))) {
-      stringstream tag(stringstream::out);
+      ostringstream tag;
       tag<<"delta"<<i;
       res.push_back(make_tuple(tag.str(),-imag(levels(i)),1.));
     }
@@ -355,7 +355,7 @@ struct ElementaryComplexFreqs
   {
     using namespace std;
 
-    stringstream tag(stringstream::out);
+    ostringstream tag;
     tag<<label_<<P::first<<P::second;
     cf_.push_back(make_tuple(tag.str(),eta.get(),1.));
   }
@@ -380,7 +380,7 @@ complexFreqs(const blitz::TinyVector<dcomp,NL>& levels, const VP& etas)
   RETURN_type res;
   for (int i=0; i<NL; i++)
     if (hasRealPart(levels(i))) {
-      stringstream tag(stringstream::out);
+      ostringstream tag;
       tag<<"(gamma"<<i<<",-delta"<<i<<")";
       res.push_back(make_tuple(tag.str(),levels(i),1.));
     }
