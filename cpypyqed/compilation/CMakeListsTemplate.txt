@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.9)
 
 project(cpypyqed_ondemand)
 
-find_package(CPPQED 2.99 REQUIRED)
+find_package(CPPQED 2.10 REQUIRED)
 include(${{CPPQED_USE}})
 
 find_package(PythonLibs 2 REQUIRED)

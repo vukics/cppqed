@@ -79,7 +79,7 @@ endif()
 #!
 #! Typical usage:
 #!
-#!     find_package(CPPQED 2.99 REQUIRED)
+#!     find_package(CPPQED 2.10 REQUIRED)
 #!     include(${CPPQED_USE})
 #!     CPPQED_SETUP()
 #!
@@ -160,7 +160,7 @@ endmacro()
 #! - Generate version information to compile into the libraries, see generate_version_files() for details.
 #! - Process all subdirectories listed in `ELEMENTS_SOURCE_DIRS`. The `CMakeLists.txt` file in the subdirectories should
 #!  only have a single call to create_object_target().
-#! - Create the library target `C++QED${PROJECT_NAME}-${CPPQED_ID}`,  e.g. `C++QEDelements-2.99` and link to all dependencies.
+#! - Create the library target `C++QED${PROJECT_NAME}-${CPPQED_ID}`,  e.g. `C++QEDelements-2.10` and link to all dependencies.
 #! - The version and SONAME is the same as for the C++QED core library.
 #! - Create an install target to install the libraries and the headers.
 #! - Generate an appropriate `CPPQED${PROJECT_NAME}ConfigVersion.cmake` and `CPPQED${PROJECT_NAME}Config.cmake` file, which
@@ -171,7 +171,7 @@ endmacro()
 #! Typical usage in a custom elements project:
 #!
 #!     project(elements_custom)
-#!     find_package(CPPQED 2.99 REQUIRED)
+#!     find_package(CPPQED 2.10 REQUIRED)
 #!     include(${CPPQED_USE})
 #!
 #!     set(ELEMENTS_SOURCE_DIRS utils frees interactions)

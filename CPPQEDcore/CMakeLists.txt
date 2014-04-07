@@ -39,13 +39,13 @@ include(CPPQEDUse)
 #! MAJOR - the grand version of C++QED, as in v2
 set(CPPQED_VERSION_MAJOR 2)
 #! MINOR - the milestone release, as in v2m9
-set(CPPQED_VERSION_MINOR 99)
+set(CPPQED_VERSION_MINOR 10)
 #! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_VERSION_PATCH 12)
+set(CPPQED_VERSION_PATCH ~rc1)
 #! Full C++QED version
 set(CPPQED_VERSION
   "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
-#! MAJOR.MINOR, at the moment mainly distinguishes stable (2.9) from development (2.99)
+#! MAJOR.MINOR, at the moment mainly distinguishes stable (2.10) from development (2.99)
 set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 
 #! @}
@@ -81,7 +81,7 @@ set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 #! @{
 
 #! The current ABI version
-set(CPPQED_ABI_CURRENT 2)
+set(CPPQED_ABI_CURRENT 0)
 #! number of ersions backwards that CURRENT is compatible with
 set(CPPQED_ABI_AGE 0)
 #! Patch revision
