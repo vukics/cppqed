@@ -32,4 +32,6 @@ elements_project()
 # Documentation
 ##################################################
 
-cppqed_documentation("elements_" ${CPPQED_DOXYGEN_TAG} core_doc)
+if(CPPQED_MONOLITHIC)
+  cppqed_documentation("elements_" ${core_DOXYGEN_TAG} core_doc)
+endif()

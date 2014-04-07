@@ -48,11 +48,6 @@ set_and_check(CPPQED_CMAKE_DIR "@PACKAGE_CONF_CMAKE_DIR@")
 #! Path of the CPPQEDUse.cmake file, defining auxiliary functions and macros.
 set_and_check(CPPQED_USE "@PACKAGE_CONF_CMAKE_DIR@/CPPQEDUse.cmake")
 
-#! Path of the Doxygen documentation
-set(CPPQED_DOXYGEN_DIR "@PACKAGE_CONF_DOC_DIR@")
-#! Path of the Doxygen `core.tag` file
-set(CPPQED_DOXYGEN_TAG "@PACKAGE_CONF_DOC_DIR@/@PROJECT_NAME@.tag")
-
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET @CPPQEDLIB@)
   include("@PACKAGE_CONF_CMAKE_DIR@/CPPQEDcoreTargets.cmake")

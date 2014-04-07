@@ -65,14 +65,14 @@ protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
-  std::ostream& logOnEnd_v(std::ostream& os) const final;
+  virtual std::ostream& logOnEnd_v(std::ostream& os) const final;
   
   // static helpers to constructor
   static std::auto_ptr<StateVectors> stateVectors(const StateVector& psi, size_t nTraj);
   static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs);
 
   
-  quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
+  virtual quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
 
   mutable quantumdata::DensityOperator<RANK> rho_;
 
@@ -134,8 +134,8 @@ public:
     : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->toBeAveraged(),os,precision);}
-  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
+  virtual std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->toBeAveraged(),os,precision);}
+  virtual std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
 

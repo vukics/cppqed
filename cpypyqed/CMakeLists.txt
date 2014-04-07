@@ -250,27 +250,26 @@ find_package(Doxygen 1.8)
 find_package(Sphinx)
 find_package(Doxylink)
 
-if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
+if(CPPQED_MONOLITHIC AND DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
   set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
-  set(CONF_DOC_DIR ${CMAKE_BINARY_DIR}/doc/${PROJECT_NAME})
-  file(MAKE_DIRECTORY ${CONF_DOC_DIR})
-  file(RELATIVE_PATH CPPQED_RELATIVE_DOXYGEN_TAG ${CONF_DOC_DIR} ${CPPQED_DOXYGEN_TAG})
-  get_filename_component(CPPQED_RELATIVE_DOXYGEN_DIR ${CPPQED_RELATIVE_DOXYGEN_TAG} PATH)
-  configure_file(${PROJECT_SOURCE_DIR}/doc/conf.py.in ${CONF_DOC_DIR}/conf.py @ONLY)
+  file(MAKE_DIRECTORY ${${PROJECT_NAME}_DOC_DIR})
+  file(RELATIVE_PATH core_RELATIVE_DOXYGEN_TAG ${${PROJECT_NAME}_DOC_DIR} ${core_DOXYGEN_TAG})
+  get_filename_component(core_RELATIVE_DOXYGEN_DIR ${core_RELATIVE_DOXYGEN_TAG} PATH)
+  configure_file(${PROJECT_SOURCE_DIR}/doc/conf.py.in ${${PROJECT_NAME}_DOC_DIR}/conf.py @ONLY)
   if(CPPQED_MONOLITHIC)
-    configure_file(${PROJECT_SOURCE_DIR}/doc/layout.html.in ${CONF_DOC_DIR}/_templates/layout.html @ONLY)
+    configure_file(${PROJECT_SOURCE_DIR}/doc/layout.html.in ${${PROJECT_NAME}_DOC_DIR}/_templates/layout.html @ONLY)
   endif()
   foreach(AUXFILE index.rst userguide.rst tools.rst)
-    configure_file(${PROJECT_SOURCE_DIR}/doc/${AUXFILE} ${CONF_DOC_DIR} COPYONLY)
+    configure_file(${PROJECT_SOURCE_DIR}/doc/${AUXFILE} ${${PROJECT_NAME}_DOC_DIR} COPYONLY)
   endforeach()
   # Sphinx cache with pickled ReST documents
   set(SPHINX_CACHE_DIR "${CMAKE_CURRENT_BINARY_DIR}/_doctrees")
   # HTML output directory
-  set(SPHINX_HTML_DIR "${CONF_DOC_DIR}/html")
-  add_custom_command(OUTPUT ${CONF_DOC_DIR}/reference.rst
+  set(SPHINX_HTML_DIR "${${PROJECT_NAME}_DOC_DIR}/html")
+  add_custom_command(OUTPUT ${${PROJECT_NAME}_DOC_DIR}/reference.rst
                      COMMAND ${CMAKE_COMMAND}
                         -DINPUT=${CMAKE_CURRENT_SOURCE_DIR}/doc/reference.rst.in
-                        -DOUTPUT=${CONF_DOC_DIR}/reference.rst
+                        -DOUTPUT=${${PROJECT_NAME}_DOC_DIR}/reference.rst
                         -DDEBUG_SUFFIX="$<$<CONFIG:Debug>:_d>"
                         -P ${CMAKE_CURRENT_SOURCE_DIR}/generate.cmake
                      DEPENDS generate.cmake doc/reference.rst.in
@@ -278,18 +277,18 @@ if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND AND SPHINX_FOUND AND DOXYLINK_FOUND)
   add_custom_target(${PROJECT_NAME}_doc
       ${SPHINX_EXECUTABLE}
           -q -b html
-          -c "${CONF_DOC_DIR}"
+          -c "${${PROJECT_NAME}_DOC_DIR}"
           -d "${SPHINX_CACHE_DIR}"
-          "${CONF_DOC_DIR}"
+          "${${PROJECT_NAME}_DOC_DIR}"
           "${SPHINX_HTML_DIR}"
-      WORKING_DIRECTORY ${CONF_DOC_DIR}
+      WORKING_DIRECTORY ${${PROJECT_NAME}_DOC_DIR}
       COMMENT "Building HTML documentation with Sphinx"
-      DEPENDS ${CONF_DOC_DIR}/reference.rst
+      DEPENDS ${${PROJECT_NAME}_DOC_DIR}/reference.rst
   )
   add_dependencies(${PROJECT_NAME}_doc cpypyqed)
   if(CPPQED_MONOLITHIC)
     add_dependencies(${PROJECT_NAME}_doc core_doc elements_doc)
-    install(DIRECTORY ${CONF_DOC_DIR}/html
+    install(DIRECTORY ${${PROJECT_NAME}_DOC_DIR}/html
           DESTINATION ${CPPQED_DOC_DIR}/${PROJECT_NAME}
           OPTIONAL
     )

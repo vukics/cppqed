@@ -66,6 +66,8 @@ tests should be run.
 
 # Test suite layout {#testsuite_layout}
 
+This section is only relevant to developers who want to incorporate new tests or modify existing ones.
+
 ## The `cmake` part
 
 Tests are grouped into sub-directories of `Testing`. To add a new directory, the `CMakeLists.txt` has to include
@@ -163,18 +165,3 @@ to `BOOST_TESTS`:
     ...
 
 Afterwards, the new test will be integrated into the test suite.
-
-# Cloning the C++QED repository {#cloning}
-
-The test suite is available in the Development branch of the C++QED repository, which
-contains the whole framework. It can be cloned for read-write access with
-
-    $ git clone --recursive -b Development ssh://<username>@git.code.sf.net/p/cppqed/cppqed C++QED
-
-where `<username>` is the SourceForge user name. Note that the git submodules are cloned from read-only
-URLs, in each submodule you have to set the URL to a read-write one, for example:
-
-    $ cd C++QED/CPPQEDcore
-    $ git remote set-url origin ssh://<username>@git.code.sf.net/p/cppqed/cppqed_core
-
-and likewise for the other submodules.

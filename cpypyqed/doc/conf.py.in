@@ -246,6 +246,6 @@ texinfo_documents = [
 intersphinx_mapping = {'python':('http://docs.python.org/2.7/', None)}
 
 doxylink = {
-        'core' : ('@CPPQED_RELATIVE_DOXYGEN_TAG@', '../@CPPQED_RELATIVE_DOXYGEN_DIR@/html'),
-        'core2' : ('@CPPQED_RELATIVE_DOXYGEN_TAG@', '@CPPQED_RELATIVE_DOXYGEN_DIR@/html')
+        'core' : ('@core_RELATIVE_DOXYGEN_TAG@', '../@core_RELATIVE_DOXYGEN_DIR@/html'),
+        'core2' : ('@core_RELATIVE_DOXYGEN_TAG@', '@core_RELATIVE_DOXYGEN_DIR@/html')
 }

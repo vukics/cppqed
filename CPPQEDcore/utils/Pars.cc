@@ -98,7 +98,15 @@ bool& ParameterTable::add(const std::string& s, const std::string& d, bool v)
 //
 ////////////////////////////
 
+// intel compiler bug
+// http://software.intel.com/en-us/forums/topic/507538
+#ifdef __INTEL_COMPILER
+namespace anonymous {}
+using namespace anonymous;
+namespace anonymous {
+#else
 namespace {
+#endif
 
 // A tagging class for introducing dummy parameters into the Table, which simply create a newline and a title at the listing.
 struct TitleLine {}; 

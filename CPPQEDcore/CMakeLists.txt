@@ -41,7 +41,7 @@ set(CPPQED_VERSION_MAJOR 2)
 #! MINOR - the milestone release, as in v2m9
 set(CPPQED_VERSION_MINOR 99)
 #! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_VERSION_PATCH 11)
+set(CPPQED_VERSION_PATCH 12)
 #! Full C++QED version
 set(CPPQED_VERSION
   "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
@@ -81,7 +81,7 @@ set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 #! @{
 
 #! The current ABI version
-set(CPPQED_ABI_CURRENT 1)
+set(CPPQED_ABI_CURRENT 2)
 #! number of ersions backwards that CURRENT is compatible with
 set(CPPQED_ABI_AGE 0)
 #! Patch revision
@@ -338,7 +338,9 @@ set_target_properties(${CPPQEDLIB} PROPERTIES
 #!
 #! Call to cppqed_documentation().
 
-cppqed_documentation(core_ "")
+if(CPPQED_MONOLITHIC)
+  cppqed_documentation(core_ "")
+endif()
 
 #! \file
 #! <!--#########################################################-->
@@ -390,7 +392,7 @@ set(CONF_CMAKE_DIR ${PROJECT_BINARY_DIR})
 set(CONF_FLAT_INCLUDE 0)
 configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake"
   INSTALL_DESTINATION  "${PROJECT_BINARY_DIR}"
-  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR CONF_SPECIAL_LIBRARIES
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_SPECIAL_LIBRARIES
 )
 write_basic_package_version_file(${PROJECT_BINARY_DIR}/CPPQEDConfigVersion.cmake 
   VERSION ${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}
@@ -406,7 +408,6 @@ endforeach()
 set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_SUBDIR})
 set(CONF_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR})
 set(CONF_FLAT_INCLUDE 1)
-set(CONF_DOC_DIR ${DOC_INSTALL_DIR}/${PROJECT_NAME})
 if(BUNDLED_BLITZ OR BUNDLED_FLENS)
   set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${BUNDLED_HEADERS})
 endif()
@@ -424,7 +425,7 @@ if(FLENS AND flens_FOUND)
 endif()
 configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQEDConfig.cmake"
   INSTALL_DESTINATION "${CONF_CMAKE_DIR}"
-  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_DOC_DIR CONF_SPECIAL_LIBRARIES
+  PATH_VARS CONF_INCLUDE_DIRS CPPQED_THIRDPARTY_INCLUDE_DIRS CONF_CMAKE_DIR CONF_SPECIAL_LIBRARIES
 )
 
 # Install the CPPQEDConfig.cmake and CPPQEDConfigVersion.cmake

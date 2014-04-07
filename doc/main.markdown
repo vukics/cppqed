@@ -26,6 +26,9 @@ Documentation {#mainpagedocumentation}
 
 [Click here for the Milestone 9 documentation](http://cppqed.sourceforge.net/oldSphinx/)
 
+\par Installation of the framework
+\ref installationguide
+
 \par Background and fundamental design principles
 \ref userguideintroduction
 
@@ -37,9 +40,6 @@ Documentation {#mainpagedocumentation}
 
 \par The out-of-the-box physical elements
 \ref genericelements
-
-\par Installation of the framework
-\ref installationguide
 
 \par How to implement new physical systems
 \ref structurebundleguide

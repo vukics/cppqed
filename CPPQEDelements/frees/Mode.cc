@@ -231,7 +231,7 @@ const AveragedQuadratures::Averages AveragedQuadratures::average_v(NoTime t, con
 {
   auto averages(initializedAverages());
 
-  averages(blitz::Range(0,3))=Averaged::average_v(t,matrix);
+  averages(blitz::Range(0,3))=Averaged::average_v(t,matrix)(blitz::Range(0,3));
 
   for (int n=2; n<int(matrix.getDimension()); n++) {
 

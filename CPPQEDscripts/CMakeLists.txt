@@ -23,6 +23,7 @@ set(NEED_FLENS GeneralDickeImaginaryEvolution)
 # Exclude 4qbits scripts form the "all" target for now, as they take much memory to compile, which can
 # cause excessive swapping when building things in parallel. Also, they are suspected to cause random g++ crashes 
 # set(EXCLUDE_FROM_ALL_SCRIPTS 4qbits 4qbitsWF 3qbits 3qbitsPostprocess)
+set(EXCLUDE_SCRIPTS Ca40InCavityWithPhonons CavityRaman)
 scripts_project()
 
 # add target "fewer_scripts"
