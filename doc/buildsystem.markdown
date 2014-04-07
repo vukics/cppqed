@@ -11,7 +11,7 @@ and furthermore offers easy integration into popular IDE‘s, e.g.
 [kdevelop](http://www.kdevelop.org/) or
 [Xcode](http://developer.apple.com/xcode/).
 
-C++QED requires CMake version 2.8.9 or later.
+C++QED requires %CMake version 2.8.9 or later.
 
 Building the framework {#cmake_building}
 ======================
@@ -20,7 +20,7 @@ Short user guide {#cmake_short_guide}
 ----------------
 
 This section is for the impatient, it describes the minimal steps to build the
-framework. If CMake cannot find installed requirements or if you wish to fine-tune
+framework. If %CMake cannot find installed requirements or if you wish to fine-tune
 the build system, please also read the following sections.
 
 Under the top level C++QED directory (the monolithic clone of all project components),
@@ -28,7 +28,7 @@ create a build directory (e.g. `build`)
 
     mkdir build; cd build
 
-Next, configure the build system by invoking CMake
+Next, configure the build system by invoking %CMake
 
     cmake -DCMAKE_BUILD_TYPE=<type> ..
 
@@ -66,7 +66,7 @@ script, it is possible to call
 Fine tuning the build process {#cmake_fine_tuning}
 -----------------------------
 
-If CMake fails to locate a dependency, it will inform the user about the
+If %CMake fails to locate a dependency, it will inform the user about the
 disabled feature or fail if the library was required. If some libraries are
 installed in non-standard locations, the user has to specify the directory with
 `-DCMAKE_PREFIX_PATH="/some/path;/some/other/path"`. This will look for libraries
@@ -76,7 +76,7 @@ additional library paths and include paths separately with `-DCMAKE_LIBRARY_PATH
 and `-DCMAKE_INCLUDE_PATH=`.
 
 \note
-CMake caches all detected library locations. If you want to be sure that the library
+%CMake caches all detected library locations. If you want to be sure that the library
 checks are performed, you have to delete the file `CMakeCache.txt` before calling `cmake` again.
 
 By default, calling `make install` will install everything to the system directory
@@ -84,7 +84,7 @@ By default, calling `make install` will install everything to the system directo
 
 ### Variables which influence the build process ### {#cmake_build_defines}
 
-There are a couple of CMake options defined by C++QED itself, by which the build
+There are a couple of %CMake options defined by C++QED itself, by which the build
 process can be fine tuned:
 
 * `-DCOMPILE_SCRIPTS=Off`: don't compile the example scripts
@@ -102,7 +102,7 @@ build system documentation.
 ### How Cmake finds the C++QED components ### {#cmake_find_components}
 
 The C++QED framework is organized in several sub-projects (core,elements,scripts,cpypyqed). For every component,
-Cmake has to figure out where the needed libraries are located. For example, the elements component needs
+%Cmake has to figure out where the needed libraries are located. For example, the elements component needs
 the libraries from core, the scripts and cpypyqed need the libraries from elements and core.
 
 In the monolithic project layout (clone from the C++QED repository), all the component libraries are found
@@ -115,13 +115,13 @@ from the repositories C++QEDcore, C++QEDelements etc.).
 If `make install` was called for C++QEDcore and the installation prefix is a standard system path
 (e.g. `/usr`, `/usr/local`), then other sub-projects will find the core libraries automatically. If the libraries
 are installed to a non-system prefix (e.g. `~/local`), this prefix can be added to the search path in
-other sub-projects by calling Cmake with `-DCMAKE_PREFIX_PATH=~/local`. The same is true for C++QEDelements.
+other sub-projects by calling %CMake with `-DCMAKE_PREFIX_PATH=~/local`. The same is true for C++QEDelements.
 
 #### Libraries are not installed ####
 
 It is possible to use C++QED libraries directly from the build directory where they were compiled. Libraries from
 build directories are even found automatically most of the time, because these build directories are registered
-in the [Cmake registry][cmake-registry]. You can override those locations by giving hints to Cmake where to
+in the [Cmake registry][cmake-registry]. You can override those locations by giving hints to %CMake where to
 find the build directories:
 
 * `-DCPPQED_DIR=<path>`: override path to the build directory of the core component
@@ -130,12 +130,12 @@ find the build directories:
 
 This is useful if you are using several build directories for different build configurations (Release/Debug).
 In such a case, or if the libraries are intended to be installed with `make install`, you might consider to
-call CMake with `-DREGISTRY=Off` in order to not write information about build directories to the registry,
+call %CMake with `-DREGISTRY=Off` in order to not write information about build directories to the registry,
 which might interfere with the installed libraries.
 
 \note
-To clear the CMake registry, just delete `~/.cmake/packages` or individual directories there. Before running
-Cmake again, also remove the `CMakeCache.txt` in the build directory to erase the cached locations.
+To clear the %CMake registry, just delete `~/.cmake/packages` or individual directories there. Before running
+%CMake again, also remove the `CMakeCache.txt` in the build directory to erase the cached locations.
 
 Building the documentation {#cmake_documentation}
 ==========================
