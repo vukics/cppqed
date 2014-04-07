@@ -147,8 +147,7 @@ class OnDemand(object):
           self.generate_source(builddir)
           with open(self.cmaketemplate) as f:
               cmake = f.read()
-          cmake = cmake.format(modulename=self.modulename, sourcefile=self.sourcefile,
-                               major=sys.version_info[0], minor=sys.version_info[1], micro=sys.version_info[2])
+          cmake = cmake.format(modulename=self.modulename, sourcefile=self.sourcefile)
           with open(os.path.join(builddir,"CMakeLists.txt"),"w") as f:
               f.write(cmake)
           with open(self.logfile, "w") as log:
