@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export PATH=@AUTOTOOLS_PATH@:$PATH
+export PATH=$PATH:@AUTOTOOLS_PATH@
 autoreconf -fiv $1 @AUTORECONF_NO_OUTPUT@
-$1/configure CXX=@CMAKE_CXX_COMPILER@ @BLITZ_CONFIG_OPTIONS@ --with-boost=@local_boost_root@ --enable-shared --prefix=$2 --with-pic
+$1/configure CXX=@CMAKE_CXX_COMPILER@ @BLITZ_CONFIG_OPTIONS@ --with-boost=@local_boost_root@ --with-boost-libdir=@Boost_LIBRARY_DIR@ --enable-shared --prefix=$2 --with-pic
