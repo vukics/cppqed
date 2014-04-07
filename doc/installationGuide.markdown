@@ -121,7 +121,7 @@ If your compiler is too old, the following commands will install gcc-4.8.2 to `$
     make -j$NPROC
     make install
 
-The compilation might take a long time.
+The compilation might take a long time. Note that you probably also have to compile Boost and GSL with the new compiler to have binary compatible libraries.
 
 #### %CMake
 
@@ -134,8 +134,6 @@ If your %CMake version is too old, the following commands will install cmake-2.8
     ./bootstrap --prefix=$PREFIX
     make -j$NPROC
     make install
-
-Note that you probably also have to compile Boost and GSL with the new compiler to have binary compatible libraries.
 
 #### Python (optional, but needed for test suite)
 
@@ -230,6 +228,12 @@ parameter.
 Maximum efficiency is achieved only if the build system is configured with
 
     cmake -DCMAKE_BUILD_TYPE=Release ..
+
+\warning If you are using a non-system compiler, you have to specify the full path to
+the compiler in the %CMake call. For example, if you installed `gcc` following the guide
+above, you should add
+
+    -DCMAKE_CXX_COMPILER=$(which g++)
 
 To build and install the framework, type
 
