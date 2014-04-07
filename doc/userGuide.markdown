@@ -18,6 +18,22 @@ In this section, the examples are taken from the field of (moving-particle) cavi
 
 \see \ref genericelements and \cite vukics07a for more information about the appearing physical elements
 
+In order to experiment on your own, you need a %CMake project which holds the scripts you write. The easiest approach is to copy the directory `CustomScriptsExample` to some other location and start with that. In the project directory, create a build directory `build` and configure the project:
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+
+Every time you add a new script source file, you have to run `cmake` again so that it will be picked up by the build system. To build all scripts, call
+
+    make
+
+or to build only a specific script, call
+
+    make <scriptname>
+
+You can also open your new scripts project in an Integrated Development Environment (IDE), see \ref cmake_ide "here" for details.
+
 An elementary example {#userguideelementary}
 =====================
 
