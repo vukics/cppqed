@@ -37,9 +37,9 @@ set(CPPQED_MONOLITHIC 1)
 
 set(cppqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cppqed)
 set(core_DOC_DIR ${CMAKE_BINARY_DIR}/doc/core)
-set(core_DOXYGEN_TAG ${cppqed_DOC_DIR}/core.tag)
+set(core_DOXYGEN_TAG ${core_DOC_DIR}/core.tag)
 set(elements_DOC_DIR ${CMAKE_BINARY_DIR}/doc/elements)
-set(elements_DOXYGEN_TAG ${cppqed_DOC_DIR}/elements.tag)
+set(elements_DOXYGEN_TAG ${elements_DOC_DIR}/elements.tag)
 set(cpypyqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cpypyqed)
 
 #! @}
