@@ -184,8 +184,10 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
         }
         ++stateCount;
 
-        evsDisplayed=true;
-        if (count || !continuing) displayAndAutostopHandler->display(os,precision);
+        if (count || !continuing) {
+          evsDisplayed=true;
+          displayAndAutostopHandler->display(os,precision);
+        }
       }
     }
 
