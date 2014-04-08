@@ -63,7 +63,7 @@ class QuantumState(numpy.ndarray):
       transform=f.fftn
       norm=1/norm
     array = f.fftshift(transform(f.ifftshift(self, axes=axes), axes=axes), axes=axes)*norm
-    return StateVector(array, time=self.time)
+    return type(self)(array, time=self.time)
 
 class DensityOperator(QuantumState):
   r"""
@@ -88,25 +88,26 @@ class DensityOperator(QuantumState):
     Return a DensityOperator where the given subsystems are Fourier transformed.
     This is the transformation position space -> momentum space.
 
-    *Usage*
-        >>> sv = StateVector((0,1,1.7,2,1.7,1,0), norm=True)
-        >>> print sv.fft()
-        StateVector(7)
-
-    :param axis:
+    :param subsystems:
             (optional)
-            Sequence of ints, axes over which the fft is done. (Default is all)
+            Sequence of ints, subsystems over which the fft is done. (Default is all)
     """
-    return self._fft_helper(axes=axes,inverse=False)
+    ndim=len(self.shape)
+    if subsystems is None: subsystems = range(ndim/2)
+    return self._fft_helper(axes=subsystems,inverse=False)._fft_helper(axes=ndim/2+numpy.array(subsystems),inverse=True)
 
-  def ifft(self, axes=None):
+  def ifft(self, subsystems=None):
     r"""
-    Return a StateVector where the given axes are inversely Fourier transformed.
+    Return a DensityOperator where the given subsystems are inversely Fourier transformed.
     This is the transformation momentum space -> position space.
 
-    See :func:`StateVector.fft` for details.
+    :param subsystems:
+            (optional)
+            Sequence of ints, subsystems over which the ifft is done. (Default is all)
     """
-    return self._fft_helper(axes=axes,inverse=True)
+    ndim=len(self.shape)
+    if subsystems is None: subsystems = range(ndim/2)
+    return self._fft_helper(axes=subsystems,inverse=True)._fft_helper(axes=ndim/2+numpy.array(subsystems),inverse=False)
 
 
 class StateVector(QuantumState):
