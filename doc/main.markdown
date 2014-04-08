@@ -59,8 +59,8 @@ Download {#mainpagedownload}
 - Milestone 10 released packages
 
   - SourceForge file releases (coming soon!)
-  - Debian packages (coming soon!)
-  - AUR package (coming soon!)
+  - \ref installationguidequickstart "Ubuntu packages"
+  - \ref installationguidequickstart "AUR package"
 
 - The Git version:
 

@@ -3,10 +3,10 @@ Installation guide {#installationguide}
 
 # Quick start: Installation from packages (Ubuntu, Arch Linux) {#installationguidequickstart}
 
-Binary packages have been prepared for Arch Linux and [Ubuntu](http://www.launchpad.net/~raimar-sandner/cppqed),
+Binary packages have been prepared for Arch Linux and [Ubuntu](https://launchpad.net/~raimar-sandner/+archive/cppqed-development),
 which might also work on Debian (not tested).  Installation from binary packages is recommended for users
-who want to try C++QED or use it exclusively on its highest level, i.e. writing
-scripts which use elements and interactions already implemented in C++QED. If
+who want to try C++QED or use it exclusively on its \ref userguide "highest level", i.e. writing
+scripts which use \ref genericelements "elements and interactions" already implemented in C++QED. If
 you are not using Ubuntu or want to develop your own elements and interactions
 you have to install C++QED from \ref installationguidefromsource "source".
 
@@ -16,7 +16,7 @@ All packages are compiled for Ubuntu Precise (12.04 LTS) and Saucy (13.10). You 
 
     $ sudo add-apt-repository ppa:raimar-sandner/cppqed-development
     $ sudo apt-get update
-    $ sudo apt-get install libcppqedelements-2.10-dev cppqedscripts python-cpypyqed
+    $ sudo apt-get install libcppqedelements-2.10-dev cppqedscripts-2.10 python-cpypyqed-2.10
 
 For the daily builds:
 
@@ -24,9 +24,11 @@ For the daily builds:
     $ sudo apt-get update
     $ sudo apt-get install libcppqedelements-daily-dev cppqedscripts python-cpypyqed
 
-The current documentation can be installed with
+The current documentation can be installed (Ubuntu Saucy only) with
 
-    $ sudo apt-get install cppqed-doc
+    $ sudo apt-get install cppqed-doc-2.10
+    # or
+    $ sudo apt-get install cppqed-doc-daily
 
 ### Arch
 
@@ -154,7 +156,7 @@ Call `canopy` for the first time, choose an environment directory and agree to s
 
 #### Boost
 
-If your Boost version is too old, if you installed Canopy Python above or if you have installed a new compiler, you need to compile Boost. The following commands will install boost-1.55.0 to `$PREFIX`:
+If your Boost version is too old or if you installed Canopy Python above, you need to compile Boost. The following commands will install boost-1.55.0 to `$PREFIX`:
 
     cd $BUILDDIR
     wget http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.bz2/download -O boost_1_55_0.tar.bz2
@@ -177,7 +179,7 @@ In both cases, continue with
 
 #### GSL
 
-If your GSL version is too old or you installed a new compiler, compile GSL manually. The following commands will install gsl-1.16 to `$PREFIX`:
+If your GSL version is too old, compile GSL manually. The following commands will install gsl-1.16 to `$PREFIX`:
 
     cd $BUILDDIR
     wget ftp://ftp.gnu.org/gnu/gsl/gsl-1.16.tar.gz
@@ -352,26 +354,31 @@ Under Mac OS X the ``-G Xcode`` generator will create a project which can be ope
 
 # Mac OS X {#installationguidemacos}
 
-Compilation of C++QED under Mac OS X is straightforward once you have installed the developoment toolchain and the prerequisite libraries (tested under Mac Os X Mavericks).
+Compilation of C++QED under Mac OS X 10.9 is straightforward once you have installed XCode and the prerequisite libraries. If you do not intend to use XCode for development, it is sufficient to install only the development command line tools.
 
-## Development Toolchain
-
-The toolchain can be obtained from the [Apple Developer site] (https://developer.apple.com/downloads) (you need to register an Apple ID).
+XCode can be obtained from the [Apple Developer site] (https://developer.apple.com/downloads) (you need to register an Apple ID).
 
 ## Prerequisite Libraries
 
 The easiest way to satisfy the dependencies is to use [Homebrew] (http://mxcl.github.com/homebrew), a package manager for Mac Os X.
+Unfortunately Boost cannot be compiled with Homebrew and Apple's Clang compiler in Mac Os X 10.8. It might still be possible to install a different compiler and succeed, but this is not tested.
+
 
 1. Install [Homebrew](http://mxcl.github.com/homebrew) and don't forget to run `brew update` afterwards.
 
-2. Install GSL, %CMake, Mercurial and Git:
+2. Install prerequisites:
 
-    brew install gsl cmake mercurial git
+       brew install libtool autoconf automake gsl cmake mercurial
 
-3. Install boost:
+3. Install Boost (this works in Mac Os X 10.9 but not 10.8):
 
-    brew install boost --with-c++11
+       brew install boost --c++11
 
-If you want to use the Python parts of C++QED (testsuite and Python wrapper), you also need NumPy and Scipy for Mac Os X. After installing the required libraries, continue \ref cppqed_cmake "as usual" building the project with %CMake.
+4. If you want to use the Python parts of C++QED (testsuite and Python wrapper), you also need NumPy and Scipy for Mac Os X:
+
+       brew tap Homebrew/python
+       brew install scipy
+
+If you installed Scipy, follow the instructions to add `/usr/local/lib/python2.7/site-packages` to your `PYTHONPATH`. After installing the required libraries, continue \ref cppqed_cmake "as usual" building the project with %CMake.
 
 [cmake-registry]: http://www.cmake.org/Wiki/CMake/Tutorials/Package_Registry

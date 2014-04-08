@@ -22,7 +22,9 @@ In order to experiment on your own, you need a %CMake project which holds the sc
 
     mkdir build
     cd build
-    cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+For the build type, choose the one that fits the configuration of the framework. If you installed C++QED from Ubuntu packages, you can use both `Debug` and `Release` here.
 
 Every time you add a new script source file, you have to run `cmake` again so that it will be picked up by the build system. To build all scripts, call
 

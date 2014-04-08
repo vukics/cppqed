@@ -8,6 +8,8 @@ Test suite {#testsuite}
 After [cloning](#cloning) the C++QED repository, there are several ways to run the test suite
 fully or partially.
 
+\note The test suite is only active on 64bit systems.
+
 ### `make check*` targets
 
 Make targets have the advantage that they build everything the tests depend on automatically.
@@ -63,6 +65,8 @@ Again there is no dependency checking, the framework has to be built in full bef
 tests depending on other tests will be run in the right order. The advantage over the `check` targets is that you have
 better control over the ctest parameters. For example you can pass a regular expression to `-R` to determine which
 tests should be run.
+
+\note For multi-configuration %CMake generators like XCode, the make targets are disabled. Use `ctest` from the command line instead and pass the correct configuration, e.g. `ctest -C Release ...`.
 
 # Test suite layout {#testsuite_layout}
 
