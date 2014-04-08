@@ -378,6 +378,14 @@ It is also possible to damp out trajectory states during the run. The frequency 
 
 \note Trajectory state i/o can be handled by the [Python interface](\cpypyqedMainPage) as well.
 
+Automatic stopping upon reaching steady state {#userguideioautostopping}
+---------------------------------------------
+
+All trajectories can be configured to automatically stop upon reaching steady state. This is most useful for trajectories that do normally relax to a steady state like \link quantumtrajectory::Master Master equation\endlink and \link quantumtrajectory::EnsembleMCWF ensemble of MCWF trajectories\endlink. Automatic stopping happens on the basis of the displayed characteristics of trajectories, and can be configured by two parameters, `--autoStopEpsilon <double>` and `--autoStopRepetition <int>`. Automatic stopping occurs when the line just displayed has a relative deviation less than `autoStopEpsilon` from the average calculated from the last displayed lines numbering `autoStopRepetition`. (The first column which is time is omitted.)
+
+Putting `autoStopRepetition` to zero means turning off this feature.
+
+
 Assessing entanglement {#userguideentanglement}
 ======================
 
@@ -433,6 +441,9 @@ state display frequency, cf. \ref userguideiotrajectorystate
 
 \par `--eps <double>, --epsAbs <double>`
 ODE stepper relative and absolute precision, cf. evolved::TimeStepBookkeeper
+
+\par `--autoStopEpsilon <double>, --autoStopRepetition <int>`
+govern \ref userguideioautostopping "the automatic stopping feature"
 
 \see trajectory::Trajectory and trajectory::Adaptive
 
