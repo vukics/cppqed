@@ -119,7 +119,7 @@ If your compiler is too old, the following commands will install gcc-4.8.2 to `$
     cd ..
     mkdir gcc-4.8.2-build
     cd gcc-4.8.2-build
-    $PWD/../gcc-4.8.2/configure --prefix=$PREFIX --enable-languages=c,c++ --disable-multilib --libdir=$PREFIX/lib64
+    $PWD/../gcc-4.8.2/configure --prefix=$PREFIX --enable-languages=c,c++ --disable-multilib
     make -j$NPROC
     make install
 
