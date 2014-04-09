@@ -25,15 +25,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.62333144"
-     inkscape:cx="607.02663"
-     inkscape:cy="564.75342"
+     inkscape:zoom="0.74981173"
+     inkscape:cx="1041.9352"
+     inkscape:cy="595.86174"
      inkscape:document-units="px"
      inkscape:current-layer="layer2"
      showgrid="false"
      inkscape:window-width="1749"
      inkscape:window-height="1060"
-     inkscape:window-x="134"
+     inkscape:window-x="133"
      inkscape:window-y="-3"
      inkscape:window-maximized="1"
      showborder="false"
@@ -428,11 +428,11 @@
          sodipodi:role="line"
          id="tspan4608"
          x="255.84891"
-         y="1032.3896">git</tspan><tspan
+         y="1032.3896">logical</tspan><tspan
          sodipodi:role="line"
          id="tspan4610"
          x="255.84891"
-         y="1067.337">repository</tspan></text>
+         y="1067.337">module</tspan></text>
     <rect
        style="opacity:0.221;fill:#ffccaa;fill-opacity:1;fill-rule:nonzero;stroke:#552200;stroke-width:5.35861969000000027;stroke-miterlimit:4;stroke-dasharray:none;display:inline;filter:url(#filter3857)"
        id="rect4612"
