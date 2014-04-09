@@ -40,7 +40,7 @@ namespace structure {
  * "eta",eta,sqrt(cutoff)
  * ~~~
  * 
- * The class also stores an \refStdCppConstruct{std::stringstream,sstream/stringstream/} object, on which the constructor of any client (derived element class) can write its parameters,
+ * The class also stores an \refStdCppConstruct{std::ostringstream,sstream/ostringstream/} object, on which the constructor of any client (derived element class) can write its parameters,
  * and these will in turn be displayed when QuantumSystem::displayParameters is called for the system. Cf. \ref structurebundleguide "the structure-bundle guide".
  * 
  */
@@ -73,12 +73,12 @@ public:
   
   double highestFrequency() const; ///< Calculates the fastest timescale of the system from the frequencies stored in the lists
 
-  std::ostream& displayParameters(std::ostream&) const; ///< Displays the content of the stored stringstream followed by a call to #displayMoreParameters
+  std::ostream& displayParameters(std::ostream&) const; ///< Displays the content of the stored ostringstream followed by a call to #displayMoreParameters
 
   virtual ~DynamicsBase() {}
 
 protected:
-  std::stringstream& getParsStream() {return paramsStream_;} ///< The stored `std::stringstream` object, for constructors of clients to write parameters on
+  std::ostringstream& getParsStream() {return paramsStream_;} ///< The stored `std::ostringstream` object, for constructors of clients to write parameters on
   
   virtual std::ostream& displayMoreParameters(std::ostream&) const; ///< In its default implementation, displayes the frequency-like parameters of the system in a nice format together with their names
 
@@ -91,7 +91,7 @@ private:
   RealFreqs       realFreqs_;
   ComplexFreqs complexFreqs_;
 
-  std::stringstream paramsStream_;
+  std::ostringstream paramsStream_;
 
 };
 

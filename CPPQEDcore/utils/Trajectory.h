@@ -49,6 +49,8 @@ void run(Trajectory & trajectory, ///< the trajectory to run
          int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
          bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
          bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
+         double autoStopEpsilon, ///< relative precision for autostopping
+         unsigned autoStopRepetition, ///< number of displayed lines repeated within relative precision before autostopping – 0 means no autostopping
          const std::string& parsedCommandLine
         );
 
@@ -70,7 +72,7 @@ void run(Trajectory & trajectory, ///< the trajectory to run
  */
 void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt*deltaT
          double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         const std::string& parsedCommandLine);
+         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
 
 
 /// Another version of \link Trajectory::run `run`\endlink for running in dc-mode \related Adaptive
@@ -83,7 +85,7 @@ void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt
 template<typename A>
 void run(Adaptive<A>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
          unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         const std::string& parsedCommandLine);
+         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
 
 
 /// Dispatcher \related Trajectory

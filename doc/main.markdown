@@ -59,12 +59,12 @@ Download {#mainpagedownload}
 - Milestone 10 released packages
 
   - SourceForge file releases (coming soon!)
-  - Debian packages (coming soon!)
-  - AUR package (coming soon!)
+  - \ref installationguidequickstart "Ubuntu packages"
+  - \ref installationguidequickstart "AUR package"
 
 - The Git version:
 
-      git clone git://git.code.sf.net/p/cppqed/monolithic <directory name>
+      git clone git://git.code.sf.net/p/cppqed/cppqed <directory name>
 
 \note This online documentation is meant to reflect the development version, but delays compared to the actual state are possible. The released packages include the corresponding documentation.
 

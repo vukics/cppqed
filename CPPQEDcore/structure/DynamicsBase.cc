@@ -22,7 +22,7 @@ const DynamicsBase::ComplexFreqs DynamicsBase::emptyCF{};
 
 
 DynamicsBase::DynamicsBase(const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs) 
-  : realFreqs_(realFreqs), complexFreqs_(complexFreqs), paramsStream_(std::stringstream::out)
+  : realFreqs_(realFreqs), complexFreqs_(complexFreqs), paramsStream_()
 {
   paramsStream_.precision(formdouble::actualPrecision(FormDouble::overallPrecision));
 }

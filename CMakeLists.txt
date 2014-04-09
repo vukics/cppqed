@@ -37,9 +37,9 @@ set(CPPQED_MONOLITHIC 1)
 
 set(cppqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cppqed)
 set(core_DOC_DIR ${CMAKE_BINARY_DIR}/doc/core)
-set(core_DOXYGEN_TAG ${cppqed_DOC_DIR}/core.tag)
+set(core_DOXYGEN_TAG ${core_DOC_DIR}/core.tag)
 set(elements_DOC_DIR ${CMAKE_BINARY_DIR}/doc/elements)
-set(elements_DOXYGEN_TAG ${cppqed_DOC_DIR}/elements.tag)
+set(elements_DOXYGEN_TAG ${elements_DOC_DIR}/elements.tag)
 set(cpypyqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cpypyqed)
 
 #! @}
@@ -113,7 +113,8 @@ if(BUNDLED_FLENS)
   ExternalProject_Add(
     flens
     GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git
-    GIT_TAG public
+    # Bug in HEAD
+    GIT_TAG "846b5a3"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
     BUILD_COMMAND
@@ -156,6 +157,23 @@ else()
   find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
 endif()
 find_package(Numpy QUIET)
+
+# Canopy workaround: the python interpreter is found, but not the libs and include dirs
+if(PYTHONINTERP_FOUND AND NOT PYTHONLIBS_FOUND)
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}-config" "--includes"
+    OUTPUT_VARIABLE _PYTHON_CONFIG_INCLUDES
+    RESULT_VARIABLE _PYTHON_CONFIG_SUCCESS)
+  if(_PYTHON_CONFIG_SUCCESS MATCHES 0)
+    string(REGEX REPLACE "-I(.*) .*" "\\1" PYTHON_INCLUDE_DIR ${_PYTHON_CONFIG_INCLUDES})
+    get_filename_component(_PYTHON_BASE ${PYTHON_INCLUDE_DIR} DIRECTORY)
+    get_filename_component(_PYTHON_BASE ${_PYTHON_BASE} DIRECTORY)
+    set(PYTHON_LIBRARY ${_PYTHON_BASE}/lib/libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    message(STATUS "Trying to find python library at ${PYTHON_LIBRARY}")
+    message(STATUS "Trying to find python includes at ${PYTHON_INCLUDE_DIR}")
+    find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
+  endif()
+endif()
+
 
 # For some reason kdevelop does not recognize PYTHONLIBS_FOUND, use PYTHON_INCLUDE_DIRS instead
 if(Boost_PYTHON_FOUND AND PYTHONINTERP_FOUND AND PYTHON_INCLUDE_DIRS AND NUMPY_FOUND AND COMPILE_CPYPYQED)

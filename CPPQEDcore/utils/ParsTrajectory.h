@@ -74,6 +74,10 @@ struct ParsRun
   bool &displayInfo, &firstStateDisplay;
 
   unsigned &sdf;
+
+  double &autoStopEpsilon;
+
+  unsigned &autoStopRepetition;
   
   ParsRun(parameters::ParameterTable&, const std::string& mod="");
 

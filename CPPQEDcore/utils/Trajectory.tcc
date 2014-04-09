@@ -19,19 +19,17 @@
 #include <fstream>
 #include <numeric> // for accumulate
 
-namespace trajectory {
-
 
 template<typename A>
-void run(Adaptive<A>& traj, const ParsRun& p)
+void trajectory::run(Adaptive<A>& traj, const ParsRun& p)
 {
-  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine());
+  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.autoStopEpsilon,p.autoStopRepetition,p.getParsedCommandLine());
   else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
   else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
 }
 
 
-namespace details {
+namespace trajectory { namespace details {
 
 void writeNextArchive(std::ofstream*, const std::ostringstream&);
 void readNextArchive(std::ifstream&, std::istringstream&);
@@ -85,12 +83,28 @@ inline double endTime(double time, double   , double            ) {return time  
 } // runTraits
 
 
+class DisplayAndAutostopHandler
+{
+public:
+  typedef std::shared_ptr<const DisplayAndAutostopHandler> Ptr;
+
+  DisplayAndAutostopHandler(const Trajectory& traj) : traj_(traj) {}
+
+  virtual std::ostream& display(std::ostream& os, int precision) const; // const {return traj_.display(os);}
+
+protected:
+  const Trajectory& traj_;
+
+};
+
+const DisplayAndAutostopHandler::Ptr makeDisplayAndAutostopHandler(const Trajectory&, double autoStopEpsilon, unsigned autoStopRepetition);
+
 bool restoreState(Trajectory&, const std::string&, const std::string&, const std::string&);
 
 
 template<typename T, typename L, typename D>
 void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         const std::string& parsedCommandLine)
+         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
 {
   using namespace std; using namespace boost; using namespace runTraits; using namespace cpputils;
 
@@ -141,9 +155,14 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   //////////////////////////////
 
   const boost::shared_ptr<ofstream> ofs = !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(),ios_base::app);
-  bool stateSaved=false, evsDisplayed=false;
+
+  bool
+    stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory
+    evsDisplayed=false; // signifies whether the expectation values have already been displayed ”
 
   try {
+
+    auto displayAndAutostopHandler(makeDisplayAndAutostopHandler(traj,autoStopEpsilon,autoStopRepetition));
 
     for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
 
@@ -165,12 +184,14 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
         }
         ++stateCount;
 
-        if (count || !continuing) traj.display(os,precision);
-        evsDisplayed=true;
+        if (count || !continuing) {
+          evsDisplayed=true;
+          displayAndAutostopHandler->display(os,precision);
+        }
       }
     }
 
-  } catch (const StoppingCriterionReachedException& except) {os<<"\n# Stopping criterion has been reached"<<endl;}
+  } catch (const StoppingCriterionReachedException& except) {os<<"# Stopping criterion has been reached"<<endl;}
   if (!evsDisplayed) traj.display(os,precision);
 
   //////////////////////////////////////////
@@ -182,25 +203,18 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   
 }
 
-} // details
-
-
-void run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         const std::string& parsedCommandLine)
-{details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine);}
-
-void run(Trajectory & traj, long   nDt , double deltaT, unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         const std::string& parsedCommandLine)
-{details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine);}
-
-template<typename A>
-void run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         const std::string& parsedCommandLine)
-{details::run(traj,time,dc    ,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine);}
+} } // trajectory::details
 
 
 template<typename A>
-AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
+void trajectory::run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
+                     bool displayInfo, bool firstStateDisplay,
+                     double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
+{details::run(traj,time,dc    ,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,autoStopEpsilon,autoStopRepetition,parsedCommandLine);}
+
+
+template<typename A>
+trajectory::AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
   : meta_(cpputils::TypeID<A>::value,
           SerializationMetadata::ARRAY_ONLY,
           cpputils::Rank<A>::value),
@@ -208,7 +222,7 @@ AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
 {};
 
 template<typename A>
-cpputils::iarchive& AdaptiveIO<A>::readState(cpputils::iarchive& iar)
+cpputils::iarchive& trajectory::AdaptiveIO<A>::readState(cpputils::iarchive& iar)
 {
   bool dimension_check = meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY;
   iar & meta_;
@@ -222,14 +236,14 @@ cpputils::iarchive& AdaptiveIO<A>::readState(cpputils::iarchive& iar)
 }
 
 template<typename A>
-cpputils::oarchive& AdaptiveIO<A>::writeState(cpputils::oarchive& oar) const
+cpputils::oarchive& trajectory::AdaptiveIO<A>::writeState(cpputils::oarchive& oar) const
 {
   return oar & meta_ & *evolvedIO_;
 }
 
 
 template<typename A>
-Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
+trajectory::Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
   : AdaptiveIO<A>(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
     evolved_(boost::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())),
     dtInit_(dtInit)
@@ -237,18 +251,18 @@ Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, doub
 
 
 template<typename A>
-Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, const ParsEvolved& p, const A& scaleAbs, const evolved::Maker<A>& maker)
+trajectory::Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, const ParsEvolved& p, const A& scaleAbs, const evolved::Maker<A>& maker)
   : Adaptive(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs,maker) {}
 
 
 template<typename A>
-std::ostream& Adaptive<A>::displayParameters_v(std::ostream& os) const 
+std::ostream& trajectory::Adaptive<A>::displayParameters_v(std::ostream& os) const
 {
   return evolved_->displayParameters(os)<<"# Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }
 
 template<typename A>
-cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
+cpputils::iarchive& trajectory::Adaptive<A>::readState_v(cpputils::iarchive& iar)
 {
   AdaptiveIO<A>::readState(iar);
   if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY) {
@@ -262,13 +276,12 @@ cpputils::iarchive&  Adaptive<A>::readState_v(cpputils::iarchive& iar)
 }
 
 template<typename A>
-cpputils::oarchive&  Adaptive<A>::writeState_v(cpputils::oarchive& oar) const
+cpputils::oarchive& trajectory::Adaptive<A>::writeState_v(cpputils::oarchive& oar) const
 {
   meta_.trajectoryID = trajectoryID(); // it is set here rather than @ construction as it is not good to call virtual functions @ construction
   AdaptiveIO<A>::writeState(oar);
   return writeStateMore_v(oar);
 }
 
-} // trajectory
 
 #endif // CPPQEDCORE_UTILS_TRAJECTORY_TCC_INCLUDED

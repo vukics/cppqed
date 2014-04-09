@@ -22,6 +22,8 @@ ParsRun::ParsRun(parameters::ParameterTable& p, const std::string& mod)
     displayInfo(p.addMod("displayInfo",mod,"Whether to display header for trajectories",true)),
     firstStateDisplay(p.addMod("firstStateDisplay",mod,"Displays trajectory state at startup",true)),
     sdf(p.addMod("sdf",mod,"State output frequency",0u)),
+    autoStopEpsilon(p.addMod("autoStopEpsilon",mod,"Relative precision for autostopping",ParsEvolved::epsRelDefault)),
+    autoStopRepetition(p.addMod("autoStopRepetition",mod,"Number of displayed lines repeated within relative precision before autostopping",0u)),
     parsedCommandLine_(p.getParsedCommandLine())
 {}
 

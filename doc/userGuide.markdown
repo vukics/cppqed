@@ -18,6 +18,24 @@ In this section, the examples are taken from the field of (moving-particle) cavi
 
 \see \ref genericelements and \cite vukics07a for more information about the appearing physical elements
 
+In order to experiment on your own, you need a %CMake project which holds the scripts you write. The easiest approach is to copy the directory `CustomScriptsExample` to some other location and start with that. In the project directory, create a build directory `build` and configure the project:
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+For the build type, choose the one that fits the configuration of the framework. If you installed C++QED from Ubuntu packages, you can use both `Debug` and `Release` here.
+
+Every time you add a new script source file, you have to run `cmake` again so that it will be picked up by the build system. To build all scripts, call
+
+    make
+
+or to build only a specific script, call
+
+    make <scriptname>
+
+You can also open your new scripts project in an Integrated Development Environment (IDE), see \ref cmake_ide "here" for details.
+
 An elementary example {#userguideelementary}
 =====================
 
@@ -362,6 +380,14 @@ It is also possible to damp out trajectory states during the run. The frequency 
 
 \note Trajectory state i/o can be handled by the [Python interface](\cpypyqedMainPage) as well.
 
+Automatic stopping upon reaching steady state {#userguideioautostopping}
+---------------------------------------------
+
+All trajectories can be configured to automatically stop upon reaching steady state. This is most useful for trajectories that do normally relax to a steady state like \link quantumtrajectory::Master Master equation\endlink and \link quantumtrajectory::EnsembleMCWF ensemble of MCWF trajectories\endlink. Automatic stopping happens on the basis of the displayed characteristics of trajectories, and can be configured by two parameters, `--autoStopEpsilon <double>` and `--autoStopRepetition <int>`. Automatic stopping occurs when the line just displayed has a relative deviation less than `autoStopEpsilon` from the average calculated from the last displayed lines numbering `autoStopRepetition`. (The first column which is time is omitted.)
+
+Putting `autoStopRepetition` to zero means turning off this feature.
+
+
 Assessing entanglement {#userguideentanglement}
 ======================
 
@@ -417,6 +443,9 @@ state display frequency, cf. \ref userguideiotrajectorystate
 
 \par `--eps <double>, --epsAbs <double>`
 ODE stepper relative and absolute precision, cf. evolved::TimeStepBookkeeper
+
+\par `--autoStopEpsilon <double>, --autoStopRepetition <int>`
+govern \ref userguideioautostopping "the automatic stopping feature"
 
 \see trajectory::Trajectory and trajectory::Adaptive
 
