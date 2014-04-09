@@ -101,11 +101,17 @@ Each requirement can be installed manually. The following sections give a hint h
     export BUILDDIR=$HOME/build
     export PREFIX=$HOME/local
     export PATH=$PREFIX/bin:$PATH
-    export LD_LIBRARY_PATH=$PREFIX/lib:$PREFIX/lib64:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$PREFIX/lib64:$LD_LIBRARY_PATH
     export CMAKE_PREFIX_PATH=$PREFIX
     export NPROC=4
 
 The environment variable `$NPROC` refers to the number of cores on your system (adjust appropriately), we will use that to speed up compilation.
+
+Because some packages install libraries to `$PREFIX/lib`, some to `$PREFIX/lib64`, we make some preparations in `$PREFIX`:
+
+    mkdir -p $PREFIX/lib64
+    cd $PREFIX
+    ln -s lib64 lib
 
 #### Compiler
 
@@ -123,7 +129,10 @@ If your compiler is too old, the following commands will install gcc-4.8.2 to `$
     make -j$NPROC
     make install
 
-The compilation might take a long time. Note that you probably also have to compile Boost and GSL with the new compiler to have binary compatible libraries.
+The compilation might take a long time. To use the new compiler, add the following to your `~/.bash_profile`:
+
+    export CXX=$PREFIX/bin/g++
+    export CC=$PREFIX/bin/gcc
 
 #### %CMake
 
@@ -230,12 +239,6 @@ parameter.
 Maximum efficiency is achieved only if the build system is configured with
 
     cmake -DCMAKE_BUILD_TYPE=Release ..
-
-\warning If you are using a non-system compiler, you have to specify the full path to
-the compiler in the %CMake call. For example, if you installed `gcc` following the guide
-above, you should add
-
-    -DCMAKE_CXX_COMPILER=$(which g++)
 
 To build and install the framework, type
 
