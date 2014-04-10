@@ -41,7 +41,7 @@ set(CPPQED_VERSION_MAJOR 2)
 #! MINOR - the milestone release, as in v2m9
 set(CPPQED_VERSION_MINOR 10)
 #! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_VERSION_PATCH ~rc3)
+set(CPPQED_VERSION_PATCH 0)
 #! Full C++QED version
 set(CPPQED_VERSION
   "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
