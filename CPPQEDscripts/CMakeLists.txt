@@ -13,7 +13,7 @@ project(scripts)
 ############################################################
 # This section is essential to find the required libraries 
 # and include files
-find_package(CPPQED 2.99 REQUIRED)
+find_package(CPPQED 2.100 REQUIRED)
 include(${CPPQED_USE})
 ############################################################
 

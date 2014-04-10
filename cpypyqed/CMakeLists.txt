@@ -28,7 +28,7 @@ endif()
 get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
 
-find_package(CPPQED 2.99 REQUIRED)
+find_package(CPPQED 2.100 REQUIRED)
 include(${CPPQED_USE})
 find_package(Boost QUIET REQUIRED COMPONENTS python)
 find_package(PythonInterp 2.6 REQUIRED)
