@@ -81,7 +81,7 @@ set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 #! @{
 
 #! The current ABI version
-set(CPPQED_ABI_CURRENT 0)
+set(CPPQED_ABI_CURRENT 1)
 #! number of ersions backwards that CURRENT is compatible with
 set(CPPQED_ABI_AGE 0)
 #! Patch revision
