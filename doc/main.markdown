@@ -56,7 +56,7 @@ Download {#mainpagedownload}
 
 - Milestone 10 released packages
 
-  - SourceForge file releases (coming soon!)
+  - [SourceForge file releases](http://sourceforge.net/projects/cppqed/files/C%2B%2BQED/v2m10)
   - \ref installationguidequickstart "Ubuntu packages"
   - \ref installationguidequickstart "AUR package"
 
