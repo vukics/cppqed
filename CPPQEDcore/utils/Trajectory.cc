@@ -7,7 +7,7 @@
 #include "FormDouble.tcc"
 
 #include <iostream>
-#include <deque>
+#include <list>
 
 
 using namespace std;
@@ -162,7 +162,7 @@ auto trajectory::details::makeDisplayAndAutostopHandler(const Trajectory& traj, 
     const double autoStopEpsilon_;
     const unsigned autoStopRepetition_;
 
-    mutable std::deque<Averages> queue_;
+    mutable std::list<Averages> queue_;
     mutable Averages averages_;
 
   };
