@@ -11,6 +11,7 @@
 
 #include "TMP_Tools.h"
 
+#include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 
 using namespace std;
@@ -19,11 +20,6 @@ using namespace cpputils;
 using namespace fft;
 
 using boost::make_shared;
-
-
-namespace particle {
-
-const Tridiagonal cosNKX (size_t, ptrdiff_t);
 
 
 ////////
@@ -35,20 +31,20 @@ const Tridiagonal cosNKX (size_t, ptrdiff_t);
 
 namespace {
 
-const Exact::Diagonal fExpFill(const Spatial& space, double omrec)
+const particle::Exact::Diagonal fExpFill(const particle::Spatial& space, double omrec)
 {
-  return Exact::Diagonal(-DCOMP_I*omrec*blitz::sqr(space.getK()));
+  return particle::Exact::Diagonal(-DCOMP_I*omrec*blitz::sqr(space.getK()));
 }
 
 } 
 
 
-Exact::Exact(const Spatial& space, double omrec)
+particle::Exact::Exact(const Spatial& space, double omrec)
   : FreeExact(space.getDimension()), details::Storage(space,omrec), factorExponents_(fExpFill(space,omrec))
 {
 }
 
-void Exact::updateU(structure::OneTime t) const
+void particle::Exact::updateU(structure::OneTime t) const
 {
   getDiagonal()=exp(factorExponents_*t);
 }
@@ -63,29 +59,52 @@ void Exact::updateU(structure::OneTime t) const
 
 namespace {
 
-const Tridiagonal hOverI(size_t dim, double vClass, const ModeFunction& mf)
+const particle::Tridiagonal expINKX(size_t dim, ptrdiff_t nK)
 {
-  return (vClass && !isComplex(mf.get<0>())) ? vClass*(mf.get<0>()==MFT_SIN ? -1 : 1)*cosNKX(dim,mf.get<1>()<<1)/(2.*DCOMP_I) : Tridiagonal();
+  using particle::Tridiagonal;
+
+  typedef Tridiagonal::Diagonal Diag;
+
+  ptrdiff_t D=dim-(nK>0 ? nK : -nK);
+  if (D<0) return Tridiagonal();
+
+  Diag temp(D); temp=1;
+  if (nK>0) return Tridiagonal(Diag(),nK,temp);
+  else if (nK==0) return Tridiagonal(temp);
+  return Tridiagonal(Diag(),-nK,Diag(),temp);
 }
 
 
-const Tridiagonal::Diagonal mainDiagonal(const Spatial& space, double omrec)
+const particle::Tridiagonal cosNKX(size_t dim, ptrdiff_t nK)
 {
-  return Tridiagonal::Diagonal(DCOMP_I*omrec*blitz::sqr(space.getK()));
+  return (expINKX(dim,nK)+expINKX(dim,-nK))/2.;
 }
+
+
+const particle::Tridiagonal hOverI(size_t dim, double vClass, const ModeFunction& mf)
+{
+  return (vClass && !isComplex(mf.get<0>())) ? vClass*(mf.get<0>()==MFT_SIN ? -1 : 1)*cosNKX(dim,mf.get<1>()<<1)/(2.*DCOMP_I) : particle::Tridiagonal();
+}
+
+
+const particle::Tridiagonal::Diagonal mainDiagonal(const particle::Spatial& space, double omrec)
+{
+  return particle::Tridiagonal::Diagonal(DCOMP_I*omrec*blitz::sqr(space.getK()));
+}
+
 
 } 
 
 
 template<>
-Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
+particle::Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
   : Base(furnishWithFreqs(hOverI(space.getDimension(),vClass,mf),mainDiagonal(space,omrec))), Exact(space,omrec)
 {
 }
 
 
 template<>
-Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
+particle::Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
   : Base(
          Tridiagonal(mainDiagonal(space,-omrec))
          +
@@ -96,7 +115,7 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClas
 
 
 template<>
-Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>)
+particle::Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>)
   : Base(
          Tridiagonal(mainDiagonal(space,-omrec))
          )
@@ -111,14 +130,14 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::
 ///////////
 
 
-Averaged::Averaged(const Spatial& space)
+particle::Averaged::Averaged(const Spatial& space)
   : Base("Particle",{"<P>","VAR(P)","<X>","DEV(X)"}),
     space_(space)
 {
 }
 
 
-const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
+auto particle::Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
 {
   int dim=space_.getDimension();
 
@@ -144,14 +163,11 @@ const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& 
 
 
 
-void Averaged::process_v(Averages& averages) const
+void particle::Averaged::process_v(Averages& averages) const
 {
   averages(1)-=sqr(averages(0));
   averages(3)=sqrt(averages(3)-sqr(averages(2)));
 }
-
-
-} // particle
 
 
 
@@ -161,36 +177,20 @@ void Averaged::process_v(Averages& averages) const
 //
 ////////////////
 
-using namespace particle;
-
 ParticleBase::ParticleBase(size_t fin, 
                            const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
-  : Free(1<<fin,realFreqs,complexFreqs), Averaged(Spatial(fin))
+  : Free(1<<fin,realFreqs,complexFreqs), Averaged(particle::Spatial(fin))
 {
   getParsStream()<<"# Particle\n";
   getSpace().header(getParsStream());
 }
 
 
-namespace {
-
-typedef structure::DynamicsBase::RealFreqs RealFreqs;
-
-const RealFreqs push_back(RealFreqs realFreqs, double vClass)
-{
-  realFreqs.push_back(make_tuple("vClass",vClass,1.));
-  return realFreqs;
-}
-
-} 
-
-
-
 PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunction& mf,
                                        const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
   : ParticleBase(fin,
-                 push_back(realFreqs,vClass),
-                 complexFreqs), 
+                 boost::assign::list_of(*realFreqs.begin()).range(next(realFreqs.begin()),realFreqs.end())(make_tuple("vClass",vClass,1.)),
+                 complexFreqs),
     vClass_(vClass), mf_(mf)
 {
   getParsStream()<<"# Pump "<<mf<<endl;
@@ -198,14 +198,14 @@ PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunc
 
 
 
-Particle::Particle(const Pars& p)
+Particle::Particle(const particle::Pars& p)
   : ParticleBase(p.fin,{RF{"omrec",p.omrec,1<<p.fin}}),
     Exact(getSpace(),p.omrec)
 {
 }
 
 
-ParticleSch::ParticleSch(const Pars& p)
+ParticleSch::ParticleSch(const particle::Pars& p)
   : ParticleBase(p.fin,{RF{"omrec",p.omrec,sqr(1<<p.fin)}}),
     Hamiltonian<false>(getSpace(),p.omrec)
 {
@@ -214,14 +214,14 @@ ParticleSch::ParticleSch(const Pars& p)
 
 
 
-PumpedParticle::PumpedParticle(const ParsPumped& p)
+PumpedParticle::PumpedParticle(const particle::ParsPumped& p)
   : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec",p.omrec,1<<p.fin}}),
     Hamiltonian<true>(getSpace(),p.omrec,p.vClass,getMF())
 {
 }
 
 
-PumpedParticleSch::PumpedParticleSch(const ParsPumped& p)
+PumpedParticleSch::PumpedParticleSch(const particle::ParsPumped& p)
   : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec" ,p.omrec,sqr(1<<p.fin)}}),
     Hamiltonian<false>(getSpace(),p.omrec,p.vClass,getMF())
 {
@@ -236,11 +236,9 @@ PumpedParticleSch::PumpedParticleSch(const ParsPumped& p)
 //////////
 
 
-namespace particle {
-
-
-
 namespace {
+
+using particle::Spatial;
 
 const Spatial::Array fill(size_t fin, double d, double m)
 {
@@ -251,7 +249,7 @@ const Spatial::Array fill(size_t fin, double d, double m)
 } 
 
 
-Spatial::Spatial(size_t fin, double deltaK)
+particle::Spatial::Spatial(size_t fin, double deltaK)
   : fin_(fin),
     xMax_(PI/deltaK), deltaX_(2*xMax_/(1<<fin)), kMax_(PI/deltaX_), deltaK_(deltaK),
     x_(fill(fin,deltaX_,xMax_)), k_(fill(fin,deltaK_,kMax_))
@@ -259,43 +257,23 @@ Spatial::Spatial(size_t fin, double deltaK)
 }
 
 
-void Spatial::header(std::ostream& os) const
+void particle::Spatial::header(std::ostream& os) const
 {
   os<<"# Spatial Degree of Freedom finesse="<<fin_<<" xMax="<<xMax_<<" deltaX="<<deltaX_<<" kMax="<<kMax_<<" deltaK="<<deltaK_<<std::endl;
 }
 
 
 
-const Tridiagonal expINKX(size_t dim, ptrdiff_t nK)
-{
-  typedef Tridiagonal::Diagonal Diag;
-
-  ptrdiff_t D=dim-(nK>0 ? nK : -nK);
-  if (D<0) return Tridiagonal();
-  
-  Diag temp(D); temp=1;
-  if (nK>0) return Tridiagonal(Diag(),nK,temp);
-  else if (nK==0) return Tridiagonal(temp);
-  return Tridiagonal(Diag(),-nK,Diag(),temp);
-}
-
-
-const Tridiagonal cosNKX(size_t dim, ptrdiff_t nK)
-{
-  return (expINKX(dim,nK)+expINKX(dim,-nK))/2.;
-}
-
-
-const Tridiagonal expINKX(particle::Ptr particle, ptrdiff_t nK)
+auto particle::expINKX(particle::Ptr particle, ptrdiff_t nK) -> const Tridiagonal
 {
   size_t dim=particle->getDimension();
-  Tridiagonal res(expINKX(dim,nK));
+  Tridiagonal res(::expINKX(dim,nK));
   if (const auto exact=dynamic_cast<const particle::Exact*>(particle.get())) res.furnishWithFreqs(mainDiagonal(exact->get<0>(),exact->get<1>()));
   return res;
 }
 
 
-const Tridiagonal mfNKX(particle::Ptr particle, const ModeFunction& modeFunction)
+auto particle::mfNKX(particle::Ptr particle, const ModeFunction& modeFunction) -> const Tridiagonal
 {
   ModeFunctionType mf(modeFunction.get<0>());
   ptrdiff_t        nK(modeFunction.get<1>());
@@ -316,7 +294,7 @@ const Tridiagonal mfNKX_AbsSqr(ModeFunctionType mf, size_t dim, ptrdiff_t K)
 }
 */
 
-const StateVector wavePacket(const InitialCondition& init, const Spatial& space, bool kFlag)
+auto particle::wavePacket(const InitialCondition& init, const Spatial& space, bool kFlag) -> const StateVector
 {
   double 
     offset1=PI*init.getX0(),
@@ -338,19 +316,22 @@ const StateVector wavePacket(const InitialCondition& init, const Spatial& space,
 }
 
 
-const StateVector wavePacket(const Pars& p, bool kFlag)
+auto particle::wavePacket(const Pars& p, bool kFlag) -> const StateVector
 {
   return wavePacket(p.init,Spatial(p.fin),kFlag);
 }
 
 
-const InitialCondition coherent(const ParsPumped& p)
+namespace {
+
+const particle::InitialCondition coherent(const particle::ParsPumped& p)
 {
-  return InitialCondition(p.init.getX0(),p.init.getK0(),pow(p.omrec/fabs(p.vClass),.25)/sqrt(2),false);
+  return particle::InitialCondition(p.init.getX0(),p.init.getK0(),pow(p.omrec/fabs(p.vClass),.25)/sqrt(2),false);
 }
 
+}
 
-const StateVector wavePacket(const ParsPumped& p, bool kFlag)
+auto particle::wavePacket(const ParsPumped& p, bool kFlag) -> const StateVector
 {
   if (p.init.getSig()) return wavePacket(static_cast<const Pars&>(p),kFlag);
   else                 return wavePacket(coherent(p),
@@ -359,8 +340,10 @@ const StateVector wavePacket(const ParsPumped& p, bool kFlag)
 }
 
 
-const StateVector hoState(size_t n, const InitialCondition& init, const Spatial& space, bool kFlag)
+auto particle::hoState(int n, const InitialCondition& init, const Spatial& space, bool kFlag) -> const StateVector
 {
+  if (n<0) n=0;
+
   double kx0(PI*init.getX0());
 
   size_t dim=space.getDimension();
@@ -381,13 +364,13 @@ const StateVector hoState(size_t n, const InitialCondition& init, const Spatial&
 }
 
 
-const StateVector hoState(const Pars      & p, bool kFlag)
+auto particle::hoState(const Pars      & p, bool kFlag) -> const StateVector
 {
   return hoState(p.hoInitn,p.init,Spatial(p.fin),kFlag);
 }
 
 
-const StateVector hoState(const ParsPumped& p, bool kFlag)
+auto particle::hoState(const ParsPumped& p, bool kFlag) -> const StateVector
 {
   if (p.init.getSig()) return hoState(static_cast<const Pars&>(p),kFlag);
   else                 return hoState(p.hoInitn,
@@ -397,7 +380,7 @@ const StateVector hoState(const ParsPumped& p, bool kFlag)
 }
 
 
-const StateVector init(const Pars& p)
+auto particle::init(const Pars& p) -> const StateVector
 {
   if (const auto pp=dynamic_cast<const ParsPumped*>(&p))
     return p.hoInitn<0 ? wavePacket(*pp) : hoState(*pp);
@@ -408,19 +391,19 @@ const StateVector init(const Pars& p)
 
 
 
-Ptr make(const Pars& p, QM_Picture qmp)
+particle::Ptr particle::make(const Pars& p, QM_Picture qmp)
 {
   return qmp==QMP_SCH ? Ptr(make_shared<ParticleSch>(p)) : Ptr(make_shared<Particle>(p));
 }
 
 
-PtrPumped makePumped(const ParsPumped& p, QM_Picture qmp)
+particle::PtrPumped particle::makePumped(const ParsPumped& p, QM_Picture qmp)
 {
   return qmp==QMP_SCH ? PtrPumped(make_shared<PumpedParticleSch>(p)) : PtrPumped(make_shared<PumpedParticle>(p));
 }
 
 
-Ptr make(const ParsPumped& p, QM_Picture qmp)
+particle::Ptr particle::make(const ParsPumped& p, QM_Picture qmp)
 {
   if (p.vClass)
     return makePumped(p,qmp);
@@ -428,6 +411,3 @@ Ptr make(const ParsPumped& p, QM_Picture qmp)
     return make(static_cast<const Pars&>(p),qmp);
 
 }
-
-
-} // particle

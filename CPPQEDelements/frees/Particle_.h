@@ -42,7 +42,7 @@ const StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag
 const StateVector wavePacket(const Pars      &,                       bool kFlag=true);
 const StateVector wavePacket(const ParsPumped&,                       bool kFlag=true);
 
-const StateVector hoState(size_t n, const InitialCondition&, const Spatial&, bool kFlag=true/*, bool exactRenorm=true*/);
+const StateVector hoState(int n, const InitialCondition&, const Spatial&, bool kFlag=true/*, bool exactRenorm=true*/);
 const StateVector hoState(const Pars      &,                                 bool Kflag=true);
 const StateVector hoState(const ParsPumped&,                                 bool Kflag=true);
 
