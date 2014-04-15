@@ -94,14 +94,6 @@ public:
 
 };
 
-template<>
-Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf);
-
-template<>
-Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf);
-
-template<>
-Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>);
 
 // Spatial is a tool to facilitate state vector representations in both X and K space, where the two are canonically conjugate operators, so that [X,K]=i, and hence the two representations are linked with ffTransform.
 

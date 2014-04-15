@@ -96,15 +96,17 @@ const particle::Tridiagonal::Diagonal mainDiagonal(const particle::Spatial& spac
 } 
 
 
+namespace particle { // open it for the partial specializations
+
 template<>
-particle::Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
+Hamiltonian<true >::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
   : Base(furnishWithFreqs(hOverI(space.getDimension(),vClass,mf),mainDiagonal(space,omrec))), Exact(space,omrec)
 {
 }
 
 
 template<>
-particle::Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
+Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClass, const ModeFunction& mf)
   : Base(
          Tridiagonal(mainDiagonal(space,-omrec))
          +
@@ -115,13 +117,14 @@ particle::Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, do
 
 
 template<>
-particle::Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>)
+Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>)
   : Base(
          Tridiagonal(mainDiagonal(space,-omrec))
          )
 {
 }
 
+} // particle
 
 ///////////
 //
