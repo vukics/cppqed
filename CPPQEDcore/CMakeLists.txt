@@ -41,7 +41,7 @@ set(CPPQED_VERSION_MAJOR 2)
 #! MINOR - the milestone release, as in v2m10
 set(CPPQED_VERSION_MINOR 100)
 #! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_VERSION_PATCH 0)
+set(CPPQED_VERSION_PATCH 1)
 #! Full C++QED version
 set(CPPQED_VERSION
   "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
@@ -81,8 +81,8 @@ set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 #! @{
 
 #! The current ABI version
-set(CPPQED_ABI_CURRENT 1)
-#! number of ersions backwards that CURRENT is compatible with
+set(CPPQED_ABI_CURRENT 2)
+#! number of Versions backwards that CURRENT is compatible with
 set(CPPQED_ABI_AGE 0)
 #! Patch revision
 set(CPPQED_ABI_REVISION 0)
