@@ -270,6 +270,7 @@ cppqed_documentation("cppqed_" "${CMAKE_BINARY_DIR}/doc/core/core.tag;${CMAKE_BI
 if(DOXYGEN_FOUND)
   add_custom_target(doc)
   add_dependencies(doc cppqed_doc core_doc elements_doc cpypyqed_doc)
+  configure_file(doc/index.html ${CMAKE_BINARY_DIR}/doc COPYONLY)
 endif()
 
 install(DIRECTORY CustomElementsExample CustomScriptsExample
