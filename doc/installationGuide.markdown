@@ -30,6 +30,26 @@ The current documentation can be installed (Ubuntu Saucy only) with
     # or
     $ sudo apt-get install cppqed-doc-daily
 
+Here is an overview of the available packages and what they install (the exact version numbers may change over time).
+
+| Package | Description |
+|---------|-------------|
+| `cppqedscripts-2.10` | Installs the compiled example scripts to `/usr/bin` and their sourcecode for inspection to `/usr/share/doc/cppqedscripts-2.10/examples/`.|
+| `cppqedscripts-debug-2.10` | Installs the example scripts compiled in debug mode to `/usr/bin`. This is a separate package because they need a lot of disc space.|
+| `libcppqedcore-2.10-2` | Installs the core library to `/usr/lib/x86_64-linux-gnu`. |
+| `libcppqedcore-2.10-dev` | Installs the core header files to `/usr/include/CPPQED-2.10` and cmake auxilliary files to `/usr/lib/x86_64-linux-gnu/cmake`. It also Installs example projects for custom elements and scripts to `/usr/share/doc/libcppqedcore-2.10-dev/examples` which can be copied and used as starting point for own projects|
+| `libcppqedelements-2.10-2` | Installs the elements library to `/usr/lib/x86_64-linux-gnu`.|
+| `libcppqedelements-2.10-dev` | Installs the elements header files to `/usr/include/CPPQED-2.10`.|
+| `python-cpypyqed-2.10` | Installs the Python wrapper for C++QED to `/usr/lib/python2.7/dist-packages/cpypyqed`. Example scripts which demonstrate how to use the wrapper are installed in `/usr/share/doc/python-cpypyqed-2.10/examples`.|
+| `cppqed-doc-2.10` | (Only Ubuntu >= 13.10) Installs the documentation, also online [here](http://cppqed.sourceforge.net).|
+
+You can uninstall our packages by calling
+
+    $ sudo apt-get purge libcppqedelements-2.10-dev cppqedscripts-2.10 python-cpypyqed-2.10
+    $ sudo apt-get autoremove
+    $ sudo apt-add-repository --remove ppa:raimar-sandner/cppqed-development
+    $ sudo apt-get update
+
 ### Arch
 
 The C++QED package is in the [Arch User Repository (AUR)](https://aur.archlinux.org/packages/cppqed-git), you can install it for example with the `yaourt` package manager (`pacman` alternative which can install from AUR):
