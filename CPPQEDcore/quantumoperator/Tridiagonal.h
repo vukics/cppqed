@@ -150,7 +150,7 @@ public:
      * \note It is a dilemma whether the parameter `k` should be considered a compile-time or a runtime parameter.
      * In the majority of cases it is known already an compile time (e.g. ladder operators, angular momentum operators, etc.).
      * The reason why it is treated as a runtime parameter is spatial degrees of freedom. There, operators like \f$sin(kx)\f$, \f$cos(kx)\f$, etc.,
-     * are also tridiagonal in momentum space, and we wanted to have to possibility of specifying \f$k\f$ at runtime.
+     * are also tridiagonal in momentum space, and we wanted to have the possibility of specifying \f$k\f$ at runtime.
      *
      */
   explicit Tridiagonal(const Diagonal& zero=empty,  ///< corresponds to \f$\alpha^{(0)}\f$
