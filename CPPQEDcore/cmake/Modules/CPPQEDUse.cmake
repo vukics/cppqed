@@ -386,7 +386,9 @@ macro(scripts_project)
   endforeach(s)
   # add target "scripts"
   add_custom_target(${PROJECT_NAME}_all)
-  add_dependencies(${PROJECT_NAME}_all ${SCRIPTNAMES})
+  if(SCRIPTNAMES)
+    add_dependencies(${PROJECT_NAME}_all ${SCRIPTNAMES})
+  endif()
 endmacro()
 
 #! \brief Generate a doxygen documentation target for the current project.
