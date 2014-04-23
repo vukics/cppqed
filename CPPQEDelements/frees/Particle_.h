@@ -13,6 +13,7 @@
 
 #include "ModeFunction.h"
 #include "ElementAveraged.h"
+#include "Exception.h"
 #include "Free.h"
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
@@ -28,6 +29,7 @@ typedef boost::shared_ptr<const ParticleBase> Ptr;
 
 typedef boost::shared_ptr<const PumpedParticleBase> PtrPumped;
 
+struct NotATridiagonal : public cpputils::Exception {};
 
 const Tridiagonal expINKX(particle::Ptr, ptrdiff_t);
 
@@ -36,6 +38,16 @@ inline const Tridiagonal cosNKX(particle::Ptr particle, ptrdiff_t nK) {return (e
 
 const Tridiagonal mfNKX       (particle::Ptr, const ModeFunction&);
 const Tridiagonal mfNKX_AbsSqr(particle::Ptr, const ModeFunction&);
+
+/// Returns the composition of two mode functions for the special case that this composition is a Tridiagonal.
+/**
+ * Given two mode functions \f$f(nk_1 x)\f$ and \f$g(nk_2 x)\f$, this functions returns the composition
+ * \f[f^\ast(nk_1 x)g(nk_2 x)\f]
+ * if this result can be represented as a Tridiagonal, i.e. if \f$|nk_1|=|nk_2|\f$. Otherwise the exception NotATridiagonal is thrown.
+ */
+const Tridiagonal mfComposition(particle::Ptr particle,                 ///< Determines the dimension of the result.
+                                const ModeFunction& modeFunction1,      ///< \f$f(nkx)\f$ above
+                                const ModeFunction& modeFunction2);     ///< \f$g(nkx)\f$ above
 
 
 const StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag=true);
