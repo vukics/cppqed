@@ -52,16 +52,6 @@ particlecavity::Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, 
 }
 
 
-particlecavity::InterferenceBase::InterferenceBase(mode::Ptr mode, particle::Ptr particle, double u, size_t kCav, ModeFunctionType modeCav)
-  : MF_Base(modeCav,kCav),
-    structure::Interaction<2>(Frees(mode,particle),RF{"u",u,mode->getDimension()}),
-    TridiagonalHamiltonian(interferic(mode,particle,sqr(u),u,MF_Base::member))
-{
-  getParsStream()<<"# Interference term with "<<getMF()<<endl;
-}
-
-
-
 ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot)
   : particlecavity::Base(mode,particle,uNot,particle->getV_Class()),
     TridiagonalHamiltonian(particlecavity::interferic(mode,particle,uNot*particle->getV_Class(),uNot,particle->getMF()))

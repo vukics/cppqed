@@ -45,34 +45,8 @@ protected:
 
 const Tridiagonal interferic(mode::Ptr mode, particle::Ptr particle, double uNotTimesEtaeff, double uNot, const ModeFunction& mf);
 
-class InterferenceBase
-  : private boost::base_from_member<const ModeFunction>, 
-    public structure::Interaction<2>, public particlecavity::TridiagonalHamiltonian
-{
-public:
-  typedef boost::base_from_member<const ModeFunction> MF_Base;
-
-  const ModeFunction& getMF() const {return MF_Base::member;}
-
-  InterferenceBase(mode::Ptr, particle::Ptr, double u, size_t kCav, ModeFunctionType);
-
-};
-
-
 } // particlecavity
 
-
-/*
-class Interference
-  : public particlecavity::InterferenceBase
-{
-public:
-  typedef particlecavity::InterferenceBase Base;
-
-  Interference()
-
-};
-*/
 
 class ParticleOrthogonalToCavity 
   : public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
