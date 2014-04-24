@@ -358,6 +358,7 @@ macro(scripts_project)
 
   # create all scripts targets
   file(GLOB SCRIPTS . *.cc)
+  set(EXCLUDE_FROM_ALL_SCRIPTS ${EXCLUDE_FROM_ALL_SCRIPTS} ${CPPQED_EXCLUDE_SCRIPTS})
   foreach(s ${SCRIPTS})
     get_filename_component(SCRIPT ${s} NAME_WE)
     list(FIND NEED_FLENS ${SCRIPT} F)
