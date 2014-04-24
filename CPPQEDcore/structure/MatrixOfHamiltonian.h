@@ -3,7 +3,7 @@
 #ifndef   CPPQEDCORE_STRUCTURE_MATRIXOFHAMILTONIAN_H_INCLUDED
 #define   CPPQEDCORE_STRUCTURE_MATRIXOFHAMILTONIAN_H_INCLUDED
 
-#include "StateVector.h"
+#include "StateVector.tcc"
 
 // NEEDS_WORK the input of hamiltonian should be sharedPointerized here, in which case RANK could be extracted through a traits class
 
