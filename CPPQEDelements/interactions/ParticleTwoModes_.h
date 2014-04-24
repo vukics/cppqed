@@ -33,11 +33,17 @@ public:
                        p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
 
 private:
+  typedef quantumoperator::TridiagonalHamiltonian<3,true> TridiagonalHamiltonian;
+  typedef TridiagonalHamiltonian::Tridiagonals            Tridiagonals;
+
   void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; 
 
   mutable quantumoperator::Tridiagonal<3> firstH_, firstHT_;
 
   mutable quantumoperator::Tridiagonal<1> secondH_, secondHT_;
+
+  const bool isSpecialH_;
+  mutable TridiagonalHamiltonian specialH_;
 
 };
 
