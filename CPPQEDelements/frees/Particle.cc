@@ -297,8 +297,9 @@ auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFun
   ptrdiff_t        nK1(modeFunction1.get<1>());
   ptrdiff_t        nK2(modeFunction2.get<1>());
   ptrdiff_t        nK(abs(nK1));
-  double           sign1 = mf1==MFT_SIN && nK1<0 ? -1. : 1;
-  double           sign2 = mf2==MFT_SIN && nK2<0 ? -1. : 1;
+  ptrdiff_t        sign1 = mf1==MFT_SIN && nK1<0 ? -1 : 1;
+  ptrdiff_t        sign2 = mf2==MFT_SIN && nK2<0 ? -1 : 1;
+  ptrdiff_t        sign  = sign1*sign2;
 
   if (abs(nK1) != abs(nK2)) throw NotATridiagonal();
 
@@ -314,13 +315,13 @@ auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFun
   MFPair mfs(mf1,mf2);
 
   if (mfs == MFPair(MFT_SIN,MFT_SIN)){
-    return sign1*sign2* 1./2. * (id-cosNKX(particle,2*nK));
+    return sign * (id-cosNKX(particle,2*nK)) / 2.;
   }
   if (mfs == MFPair(MFT_COS,MFT_COS)){
-    return 1./2. * (id+cosNKX(particle,2*nK));
+    return (id+cosNKX(particle,2*nK)) / 2.;
   }
   if (mfs == MFPair(MFT_SIN,MFT_COS) || mfs == MFPair(MFT_COS,MFT_SIN)){
-    return sign1 * sign2 * 1./2. * sinNKX(particle,2*nK);
+    return sign * sinNKX(particle,2*nK) / 2.;
   }
   if (mfs == MFPair(MFT_PLUS,MFT_PLUS) || mfs == MFPair(MFT_MINUS,MFT_MINUS)){
     return id;
@@ -332,19 +333,19 @@ auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFun
     return expINKX(particle,2*nK);
   }
   if (mfs == MFPair(MFT_PLUS,MFT_SIN) || mfs == MFPair(MFT_SIN,MFT_MINUS)) {
-    return sign1*sign2* DCOMP_I/2. * (expINKX(particle, -2*nK)-id);
+    return sign * (expINKX(particle, -2*nK)-id) * DCOMP_I/2.;
   }
   if (mfs == MFPair(MFT_PLUS,MFT_COS) || mfs == MFPair(MFT_COS,MFT_MINUS)) {
-    return 1./2. * (id + expINKX(particle,-2*nK));
+    return (id + expINKX(particle,-2*nK)) / 2.;
   }
   if (mfs == MFPair(MFT_MINUS,MFT_COS) || mfs == MFPair(MFT_COS,MFT_PLUS)) {
-    return 1./2. * (id + expINKX(particle, 2*nK));
+    return (id + expINKX(particle, 2*nK)) / 2.;
   }
   if (!(mfs == MFPair(MFT_MINUS,MFT_SIN) || mfs == MFPair(MFT_SIN,MFT_PLUS))) {
     // this should never be reached
     throw Exception();
   }
-  return -sign1*sign2* DCOMP_I/2. * (expINKX(particle,2*nK)-id);
+  return -sign * (expINKX(particle,2*nK)-id) * DCOMP_I/2.;
 }
 
 /*
