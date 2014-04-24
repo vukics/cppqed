@@ -77,7 +77,7 @@ template<int RANK>
 const dcomp&
 DensityOperator<RANK>::indexWithTiny(const Idx& i, const Idx& j) const
 {
-  return getArray()(blitzplusplus::concatenateTinies(i,j));
+  return getArray()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
 }
 
 
