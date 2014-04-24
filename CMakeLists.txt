@@ -185,6 +185,10 @@ add_subdirectory(cpypyqed)
 #! \brief This %CMake option determines if the scripts should be compiled as part
 #!    of the monolithic build.
 option(COMPILE_SCRIPTS "Compile the example scripts" On)
+
+#! \brief This %CMake configuration variable lets users exclude scripts from the ALL target. These
+#!    scripts can still be compiled by directly calling their target.
+set(CPPQED_EXCLUDE_SCRIPTS "" CACHE STRING "Exclude from the ALL target")
 #! @}
 if(COMPILE_SCRIPTS)
   add_subdirectory(CPPQEDscripts)
