@@ -131,7 +131,7 @@ Because some packages install libraries to `$PREFIX/lib`, some to `$PREFIX/lib64
 
     mkdir -p $PREFIX/lib64
     cd $PREFIX
-    ln -s lib64 lib
+    ln -s lib lib64
 
 #### Compiler
 
