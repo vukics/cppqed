@@ -221,6 +221,9 @@ set(BUNDLED_HEADERS "${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_DIR}/bundled")
 if(BUNDLED_BLITZ)
   ExternalProject_Get_Property(cppqed-blitz install_dir)
   file(GLOB blitz_libs ${install_dir}/lib/*.so*)
+  set(blitz_libs ${install_dir}/lib/libblitzcppqed.so
+                 ${install_dir}/lib/libblitzcppqed.so.0
+                 ${install_dir}/lib/libblitzcppqed.so.0.0.0)
   install(FILES ${blitz_libs}
           PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
           DESTINATION ${CMAKE_INSTALL_LIBDIR})
