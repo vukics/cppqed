@@ -40,7 +40,7 @@ const particlecavity::Tridiagonals fillT(mode::Ptr mode, particle::Ptr particle,
 
 auto particlecavity::interferic(mode::Ptr mode, particle::Ptr particle, double uNotTimesEtaeff, double uNot, const ModeFunction& mf) -> const Tridiagonal
 {
-  if (uNotTimesEtaeff>=0) return sign(uNot)*sqrt(uNotTimesEtaeff)*tridiagPlusHC_overI(aop(mode).dagger()*mfNKX(particle,mf));
+  if (uNotTimesEtaeff>=0) return sign(uNot)*sqrt(uNotTimesEtaeff)*tridiagPlusHC_overI(aop(mode)*mfNKX(particle,mf));
   else                    throw UnotEtaeffSignDiscrepancy();
 }
 
