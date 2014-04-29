@@ -48,6 +48,10 @@ Documentation {#mainpagedocumentation}
 \par Some technical terms used throughout the documentation
 \ref glossary
 
+\note This online documentation reflects the `master` branch of the git version, which is basically equivalent to released packages.
+
+[Click here for the documentation of the Development branch](http://cppqed.sourceforge.net/Development/)
+
 [Click here for the Milestone 9 documentation](http://cppqed.sourceforge.net/oldSphinx/)
 
 
@@ -63,8 +67,6 @@ Download {#mainpagedownload}
 - The Git version:
 
       git clone git://git.code.sf.net/p/cppqed/cppqed <directory name>
-
-\note This online documentation is meant to reflect the development version, but delays compared to the actual state are possible. The released packages include the corresponding documentation.
 
 [Click here for the Milestone 9 downloads](http://cppqed.sourceforge.net/oldSphinx/#download)
 
