@@ -37,12 +37,7 @@ void export_Particle()
 
   {
     scope namespaceScope = particleNameSpace;
-    def("make", (particle::Ptr (*)(const Pars&, QM_Picture)) &particle::make,
-      with_custodian_and_ward_postcall<0,1>()
-    );
-    def("make", (particle::Ptr (*)(const ParsPumped&, QM_Picture)) &particle::make,
-      with_custodian_and_ward_postcall<0,1>()
-    );
+    def("make", &particle::make, with_custodian_and_ward_postcall<0,1>());
     particleNameSpace.staticmethod("make");
     def("makePumped", &particle::makePumped, with_custodian_and_ward_postcall<0,1>());
     particleNameSpace.staticmethod("makePumped");
