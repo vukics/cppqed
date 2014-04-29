@@ -1,15 +1,15 @@
 # /net/bozon/c705283/Packages/cppqed/build/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --1p1mconf 2 --dc 1 --T 0.1 --T 0.03 --evol master --o output/run_1particle1mode_ndt_conf2_master
 
-# C++QEDcore Version 2.100.1, core git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
-# elements git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
-# scripts git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
+# C++QEDcore Version 2.100.2, core git commit: 833d4e1acc91a37a4602fbc39e33eaff5a2a4dc4
+# elements git commit: 833d4e1acc91a37a4602fbc39e33eaff5a2a4dc4
+# scripts git commit: 833d4e1acc91a37a4602fbc39e33eaff5a2a4dc4
 
 # Andras Vukics, vukics@users.sourceforge.net
 
 # Compiled with
 # Boost library collection : Version 1.55
 # Gnu Scientific Library   : Version 1.13
-# Blitz++ numerical library: Config date: Thu Apr 17 13:44:27 CEST 2014
+# Blitz++ numerical library: Config date: Tue Apr 29 12:57:12 CEST 2014
 
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
@@ -29,16 +29,14 @@
 # Subsystem Nr. 1
 # Particle
 # Spatial Degree of Freedom finesse=3 xMax=3.14159 deltaX=0.785398 kMax=4 deltaK=1
-# Pump (Sin 1)
 # Dimension: 8
 # omrec=1
-# vClass=-10
 
 # 0 - 1 - Interaction
 # Particle-Cavity Interaction
 # Particle moving along cavity with (Sin 1)
 # Unot=-1
-# etaeff=-10
+# etaeff=-3.16228
 
 # System characteristics: Interaction picture, Hamiltonian evolution, Liouvillean evolution, calculates Averages.
 # Decay channels:
@@ -65,6 +63,6 @@
 # Run Trajectory up to time 0.03 -- Display period: 1 timestep
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
-0.00333333   0.00333333   	0.00116202    0.00116202    0.032642      -0.00956542   	-0.499917     5.24872       -1.57077      0.0200825     
-0.0199264    0.0165931    	0.0351845     0.0351595     0.175276      -0.0654904    	-0.497173     5.20715       -1.56975      0.11907       
-0.03         0.0100736    	0.0721047     0.0718929     0.246481      -0.10407      	-0.493762     5.15632       -1.56851      0.178278      
+0.00333333   0.00333333   	0.00116202    0.00116202    0.032642      -0.00956539   	-0.5          5.24997       -1.57076      0.018197      
+0.0199976    0.0166643    	0.0354115     0.0353861     0.175819      -0.0657496    	-0.500132     5.25074       -1.56959      0.107468      
+0.03         0.0100024    	0.072106      0.0718945     0.246483      -0.104053     	-0.500412     5.25363       -1.56807      0.159939      
