@@ -19,8 +19,7 @@ int main(int argc, char **argv)
     particle::ParsPumped ppp1(p,"1");   // Pumped particle 1 (sine)
     particle::ParsPumped ppp2(p,"2");   // Pumped particle 2
     particlecavity::ParsAlong ppci(p);  // Particle-Cavity interaction
-    ParsInterference pi(p);             // Interference term
-    
+
     bool &bosons = p.add("bosons", "Particle are bosons", false);
     bool &fermions = p.add("fermions", "Particles are fermions", false);
     
@@ -31,15 +30,14 @@ int main(int argc, char **argv)
     
     // Parameters, take U0 as configuration parameter and update V0 and Delta accordingly
     
+    ppci.modeCav = MFT_COS;
     ppp1.vClass = ppp2.vClass = ppci.uNot * alphasquare;
     plm.delta -= ppci.uNot;
-    pi.uInterference = ppci.uNot*sqrt(alphasquare)/2.;
-    
-    particle::Ptr myParticle(particle::make(ppp1,qmp));
+
+    particle::PtrPumped myParticle(particle::makePumped(ppp1,qmp));
     mode::Ptr myMode(mode::make(plm,qmp));
     
-    ParticleAlongCavity particlecavity(myMode,myParticle,ppci,0);
-    Interference interference(myMode,myParticle,pi);
+    ParticleAlongCavity particlecavity(myMode,myParticle,ppci);
     MomentumCorrelation mci(myParticle,myParticle);
     
     StateVector<1> stateParticle1(particle::init(ppp1));
@@ -57,7 +55,7 @@ int main(int argc, char **argv)
     StateVector<3> psi(mode::init(plm)*stateParticles);
     
     evolve(psi,composite::make(Act<0,1>(particlecavity),Act<0,2>(particlecavity),
-                               Act<0,1>(interference),Act<0,2>(interference),Act<1,2>(mci)),pe);
+                               Act<1,2>(mci)),pe);
 
 
 }

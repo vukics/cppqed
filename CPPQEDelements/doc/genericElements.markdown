@@ -89,8 +89,15 @@ All the operators are automatically taken in interaction picture, if the underly
 | NX_CoupledModes | Mode – Mode | \f$u\,a^\dagger a\lp b+b^\dagger\rp\f$ | n/a |
 | QbitModeCorrelations | Qbit – Mode | n/a | \f$\real{\avr{\sigma a^\dagger}},\;\imag{\avr{\sigma a^\dagger}},\;\real{\avr{\sigma a}},\;\imag{\avr{\sigma a}},\;\real{\avr{\sigma_z a}},\;\imag{\avr{\sigma_z a}}\f$ |
 | ModeCorrelations | Mode – Mode | n/a | covariances of the modes’ quadratures |
-| ParticleOrthogonalToCavity | Mode – PumpedParticle | \f$\text{sign}\{U_0\}\sqrt{U_0\vclass}\lp a^\dagger m(x)+\hermConj\rp\f$ | n/a |
-| ParticleAlongCavity | Mode – (Pumped)Particle | \f$U_0\abs{m(x)}^2 a^\dagger a+\text{sign}\{U_0\}\sqrt{U_0\vclass}\lp a^\dagger m(x)+\hermConj\rp\f$ | n/a |
+
+The classes ParticleOrthogonalToCavity and ParticleAlongCavity come with several constructors which implement slightly different versions of these interactions. If passed in `particlecavity::ParsAlongGenericPump` or `particlecavity::ParsOrthogonalGenericPump`, the effective driving of the cavity \f$\etaeff\f$ is taken as parameter from this class. If passed in `particlecavity::ParsAlong` or `particlecavity::ParsOrthogonal`, the parameter \f$\etaeff\f$ is derived from the pump of the particle \f$\vclass\f$ instead by the relation \f$\etaeff=\text{sign}\{U_0\}\sqrt{U_0\vclass}\f$. In this scenario, \f$\vclass\f$ is either taken from the particle if it is a pumped particle, or it is passed into the constructor directly for the case of particle pump orthogonal to the particle motion.
+
+| Class name | Free elements | Hamiltonian | Displayed characteristics |
+| ---------- | ------------- | ----------- | ------------------------- |
+| ParticleOrthogonalToCavity | Mode – PumpedParticle | \f$\etaeff\lp a^\dagger m(x)+\hermConj\rp\f$ | n/a |
+| ParticleAlongCavity | Mode – Particle (pump orthogonal to cavity)| \f$U_0\abs{m(x)}^2 a^\dagger a+\etaeff\lp a^\dagger m(x)^\ast+\hermConj\rp\f$ | n/a |
+| ParticleAlongCavity | Mode – PumpedParticle (pump along cavity with mode function \f$m'(x)\f$)| \f$U_0\abs{m(x)}^2 a^\dagger a+\etaeff\lp a^\dagger m(x)^\ast m'(x)+\hermConj\rp\f$ | n/a |
 | ParticleTwoModes | Mode – Mode – Particle | \f$\sqrt{U_{01}U_{02}}\lp m_1(x)m_2(x)\,a_1^\dagger a_2+\hermConj\rp\f$ | n/a |
 
-\see [This issue](http://sourceforge.net/p/cppqed/bugs/1/)
+\note In the term \f$\abs{m(x)}^2\f$, constant terms are dropped. That means this term is not present for the complex mode functions \f$\exp(\pm ikx)\f$, and for \f$\text{sin}(kx)\f$ (\f$\text{cos}(kx)\f$), this term is
+\f$-(+)\text{cos}(2kx)/2\f$. The constant term can be added manually by shifting the cavity frequency accordingly, as done in the script `1particle1mode` and others.

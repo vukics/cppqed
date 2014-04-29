@@ -1,8 +1,8 @@
 # /net/bozon/c705283/Packages/cppqed/build/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --1p1mconf 3 --dc 1 --T 0.1 --T 0.03 --evol master --o output/run_1particle1mode_ndt_conf3_master
 
-# C++QEDcore Version 2.100.1, core git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
-# elements git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
-# scripts git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
+# C++QEDcore Version 2.100.1, core git commit: 2cf146dabde007fd03a0033ecb6facab599a1795
+# elements git commit: 2cf146dabde007fd03a0033ecb6facab599a1795
+# scripts git commit: 2cf146dabde007fd03a0033ecb6facab599a1795
 
 # Andras Vukics, vukics@users.sourceforge.net
 
@@ -36,9 +36,9 @@
 
 # 0 - 1 - Interaction
 # Particle-Cavity Interaction
-# Particle moving along cavity with (Sin 1)
+# Particle with (Sin 1) pump moving along cavity with (Sin 1)
 # Unot=-1
-# etaeff=-10
+# etaeff=-3.16228
 
 # System characteristics: Interaction picture, Hamiltonian evolution, Liouvillean evolution, calculates Averages.
 # Decay channels:
@@ -65,6 +65,6 @@
 # Run Trajectory up to time 0.03 -- Display period: 1 timestep
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
-0.00333333   0.00333333   	0.00116202    0.00116202    0.032642      -0.00956542   	-0.499917     5.24872       -1.57077      0.0200825     
-0.0199264    0.0165931    	0.0351845     0.0351595     0.175276      -0.0654904    	-0.497173     5.20715       -1.56975      0.11907       
-0.03         0.0100736    	0.0721047     0.0718929     0.246481      -0.10407      	-0.493762     5.15632       -1.56851      0.178278      
+0.00333333   0.00333333   	0.00116407    0.00116406    0.0329983     0.00857195    	-0.499915     5.2487        -1.57077      0.0199588     
+0.0199756    0.0166423    	0.0359758     0.0359488     0.186454      0.0336011     	-0.49679      5.20037       -1.5698       0.120562      
+0.03         0.0100244    	0.0732202     0.0729965     0.267461      0.0365461     	-0.492569     5.13461       -1.5687       0.181497      

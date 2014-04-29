@@ -4,6 +4,7 @@
 #include "BlitzArraySliceIterator.tcc"
 #include "MathExtensions.h"
 #include "Tridiagonal.tcc"
+#include "TridiagonalHamiltonian.tcc"
 
 
 using namespace std;
@@ -11,9 +12,10 @@ using namespace std;
 using namespace mathutils;
 
 using particle::mfNKX;
+using particle::mfComposition;
+using quantumoperator::identity;
 
 using namespace mode;
-
 
 namespace {
 
@@ -21,7 +23,7 @@ namespace {
 const dcomp factor(double uNot0, double uNot1, double phi)
 {
   if (uNot0*uNot1<0) throw particletwomodes::UnotsSignDiscrepancy(); 
-  return sign(uNot0)*sqrt(uNot0*uNot1)*exp(DCOMP_I*phi)/DCOMP_I;
+  return sign(uNot0)*sqrt(uNot0*uNot1)*exp(DCOMP_I*phi);
 }
 
 
@@ -34,8 +36,10 @@ ParticleTwoModes::ParticleTwoModes(mode::Ptr mode0, mode::Ptr mode1, particle::P
                                    double phi)
   : structure::Interaction<3>(Frees(mode0,mode1,part),
                               {RF{"Unot0",uNot0,sqrt(mode0->getDimension())},RF{"Unot1",uNot1,sqrt(mode1->getDimension())}}),
-    firstH_(factor(uNot0,uNot1,phi)*aop(mode0)*aop(mode1).dagger()*mfNKX(part,mf0)), firstHT_(-firstH_.dagger()),
-    secondH_(mfNKX(part,mf1).dagger()), secondHT_(secondH_.dagger())
+                              firstH_(factor(uNot0,uNot1,phi)*aop(mode0)*aop(mode1).dagger()*mfNKX(part,mf0)/DCOMP_I), firstHT_(-firstH_.dagger()),
+    secondH_(mfNKX(part,mf1).dagger()), secondHT_(secondH_.dagger()),
+    isSpecialH_(abs(mf0.get<1>())==abs(mf1.get<1>())),
+    specialH_(isSpecialH_ ? Tridiagonals{quantumoperator::tridiagPlusHC_overI( factor(uNot0,uNot1,phi)*aop(mode0).dagger()*aop(mode1)*mfComposition(part,mf0,mf1) )}: Tridiagonals{})
 {
   getParsStream()<<"# ParticleTwoModes\n# phi="<<phi<<endl;
 }
@@ -44,6 +48,11 @@ ParticleTwoModes::ParticleTwoModes(mode::Ptr mode0, mode::Ptr mode1, particle::P
 
 void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
 {
+  if (isSpecialH_){
+    specialH_.addContribution(t,psi,dpsidt,t0);
+    return;
+  }
+
   using namespace blitzplusplus;
   using basi::fullRange;
 

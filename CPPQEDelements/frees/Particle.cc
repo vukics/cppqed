@@ -13,6 +13,7 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
+#include <utility>
 
 using namespace std;
 using namespace mathutils;
@@ -287,6 +288,64 @@ auto particle::mfNKX(particle::Ptr particle, const ModeFunction& modeFunction) -
   case MFT_MINUS:                            ;
   }
   return expINKX(particle,-nK);
+}
+
+auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFunction1, const ModeFunction& modeFunction2) -> const Tridiagonal
+{
+  ModeFunctionType mf1(modeFunction1.get<0>());
+  ModeFunctionType mf2(modeFunction2.get<0>());
+  ptrdiff_t        nK1(modeFunction1.get<1>());
+  ptrdiff_t        nK2(modeFunction2.get<1>());
+  ptrdiff_t        nK(abs(nK1));
+  ptrdiff_t        sign1 = mf1==MFT_SIN && nK1<0 ? -1 : 1;
+  ptrdiff_t        sign2 = mf2==MFT_SIN && nK2<0 ? -1 : 1;
+  ptrdiff_t        sign  = sign1*sign2;
+
+  if (abs(nK1) != abs(nK2)) throw NotATridiagonal();
+
+  if (mf1==MFT_PLUS  && nK1<0) { mf1=MFT_MINUS; nK1*=-1; }
+  if (mf1==MFT_MINUS && nK1<0) { mf1=MFT_PLUS;  nK1*=-1; }
+  if (mf2==MFT_PLUS  && nK2<0) { mf2=MFT_MINUS; nK2*=-1; }
+  if (mf2==MFT_MINUS && nK2<0) { mf2=MFT_PLUS;  nK2*=-1; }
+
+  Tridiagonal id(quantumoperator::identity(particle->getSpace().getDimension()));
+
+  typedef pair<ModeFunctionType,ModeFunctionType> MFPair;
+
+  MFPair mfs(mf1,mf2);
+
+  if (mfs == MFPair(MFT_SIN,MFT_SIN)){
+    return sign * (id-cosNKX(particle,2*nK)) / 2.;
+  }
+  if (mfs == MFPair(MFT_COS,MFT_COS)){
+    return (id+cosNKX(particle,2*nK)) / 2.;
+  }
+  if (mfs == MFPair(MFT_SIN,MFT_COS) || mfs == MFPair(MFT_COS,MFT_SIN)){
+    return sign * sinNKX(particle,2*nK) / 2.;
+  }
+  if (mfs == MFPair(MFT_PLUS,MFT_PLUS) || mfs == MFPair(MFT_MINUS,MFT_MINUS)){
+    return id;
+  }
+  if (mfs == MFPair(MFT_PLUS,MFT_MINUS)){
+    return expINKX(particle,-2*nK);
+  }
+  if (mfs == MFPair(MFT_MINUS,MFT_PLUS)){
+    return expINKX(particle,2*nK);
+  }
+  if (mfs == MFPair(MFT_PLUS,MFT_SIN) || mfs == MFPair(MFT_SIN,MFT_MINUS)) {
+    return sign * (expINKX(particle, -2*nK)-id) * DCOMP_I/2.;
+  }
+  if (mfs == MFPair(MFT_PLUS,MFT_COS) || mfs == MFPair(MFT_COS,MFT_MINUS)) {
+    return (id + expINKX(particle,-2*nK)) / 2.;
+  }
+  if (mfs == MFPair(MFT_MINUS,MFT_COS) || mfs == MFPair(MFT_COS,MFT_PLUS)) {
+    return (id + expINKX(particle, 2*nK)) / 2.;
+  }
+  if (!(mfs == MFPair(MFT_MINUS,MFT_SIN) || mfs == MFPair(MFT_SIN,MFT_PLUS))) {
+    // this should never be reached
+    throw Exception();
+  }
+  return -sign * (expINKX(particle,2*nK)-id) * DCOMP_I/2.;
 }
 
 /*

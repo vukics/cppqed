@@ -1,8 +1,8 @@
 # /net/bozon/c705283/Packages/cppqed/build/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --1p1mconf 3 --dc 1 --T 0.1 --nTraj 3 --evol ensemble --o output/run_1particle1mode_ndt_conf3_ensemble
 
-# C++QEDcore Version 2.100.1, core git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
-# elements git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
-# scripts git commit: f87e7b57860fb7b6a34f1dbd1af4ce90a5b6293c
+# C++QEDcore Version 2.100.1, core git commit: 2cf146dabde007fd03a0033ecb6facab599a1795
+# elements git commit: 2cf146dabde007fd03a0033ecb6facab599a1795
+# scripts git commit: 2cf146dabde007fd03a0033ecb6facab599a1795
 
 # Andras Vukics, vukics@users.sourceforge.net
 
@@ -37,9 +37,9 @@
 
 # 0 - 1 - Interaction
 # Particle-Cavity Interaction
-# Particle moving along cavity with (Sin 1)
+# Particle with (Sin 1) pump moving along cavity with (Sin 1)
 # Unot=-1
-# etaeff=-10
+# etaeff=-3.16228
 
 # System characteristics: Interaction picture, Hamiltonian evolution, Liouvillean evolution, calculates Averages.
 # Decay channels:
@@ -83,14 +83,14 @@
 # Run Trajectory up to time 0.1 -- Display period: 0.1
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
-0.1          0.000495921  	0.397081      0.351494      0.474518      -0.371597     	-0.444871     4.43568       -1.54957      0.564377      
+0.1          0.000763418  	0.399477      0.353304      0.597591      -0.091791     	-0.41786      3.93857       -1.56167      0.579562      
 
 # Average number of total steps: 34.6667
 
-# On average, dpLimit overshot: 33.6667 times, maximal overshoot: 0.0579008
+# On average, dpLimit overshot: 33.6667 times, maximal overshoot: 0.057819
 # On average, dpTolerance overshot: 0 times, maximal overshoot: 0
 
-# Maximal deviation of norm from 1: 0.00710471
+# Maximal deviation of norm from 1: 0.0077279
 
 # Average number of failed ODE steps: 0
 # Average number of Hamiltonian calls: 242.667
