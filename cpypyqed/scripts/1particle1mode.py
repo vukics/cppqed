@@ -26,7 +26,7 @@ myParticle = particle.make(ppp,qmp)
 myPumpedParticle = particle.makePumped(ppp,qmp)
 
 if conf==1:
-  particleCavityBase = ParticleOrthogonalToCavity(myMode,myParticle,ppci)
+  particleCavityBase = ParticleOrthogonalToCavity(myMode,myPumpedParticle,ppci)
 elif conf==2:
   if not abs(pplm.eta) and not ppp.vClass:
     sys.exit("No driving in the system!")

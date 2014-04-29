@@ -60,8 +60,7 @@ const StateVector hoState(const ParsPumped&,                                 boo
 
 const StateVector init(const Pars&);
 
-Ptr make(const Pars      &, QM_Picture);
-Ptr make(const ParsPumped&, QM_Picture);
+Ptr make(const Pars&, QM_Picture);
 
 PtrPumped makePumped(const ParsPumped&, QM_Picture);
 

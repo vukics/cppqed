@@ -463,13 +463,3 @@ particle::PtrPumped particle::makePumped(const ParsPumped& p, QM_Picture qmp)
 {
   return qmp==QMP_SCH ? PtrPumped(make_shared<PumpedParticleSch>(p)) : PtrPumped(make_shared<PumpedParticle>(p));
 }
-
-
-particle::Ptr particle::make(const ParsPumped& p, QM_Picture qmp)
-{
-  if (p.vClass)
-    return makePumped(p,qmp);
-  else
-    return make(static_cast<const Pars&>(p),qmp);
-
-}
