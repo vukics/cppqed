@@ -116,11 +116,16 @@ option(BUNDLED_FLENS "Download and compile FLENS automatically" Off)
 
 if(BUNDLED_FLENS)
   include(ExternalProject)
+
+  if(EXISTS ${CMAKE_SOURCE_DIR}/external/flens)
+    set(FLENS_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/flens/. <SOURCE_DIR>/)
+  else()
+    set(FLENS_SOURCE GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git GIT_TAG "846b5a3")
+  endif()
+
   ExternalProject_Add(
     flens
-    GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git
-    # Bug in HEAD
-    GIT_TAG "846b5a3"
+    ${FLENS_SOURCE}
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
     BUILD_COMMAND
