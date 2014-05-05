@@ -89,9 +89,15 @@ if(BUNDLED_BLITZ)
   endif()
   configure_file(misc/blitz-make.sh.in ${PROJECT_BINARY_DIR}/blitz-make.sh @ONLY)
 
+  if(EXISTS ${CMAKE_SOURCE_DIR}/external/blitz)
+    set(BLITZ_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/blitz/. <SOURCE_DIR>/)
+  else()
+    set(BLITZ_SOURCE HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz)
+  endif()
+
   ExternalProject_Add(
     cppqed-blitz
-    HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
+    ${BLITZ_SOURCE}
     UPDATE_COMMAND ""
     PATCH_COMMAND patch --dry-run -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch | grep "previously applied" || patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
           COMMAND patch --dry-run -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch | grep "previously applied" || patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch

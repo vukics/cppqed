@@ -4,4 +4,5 @@ html
 *.orig
 *~
 debianbuild
+external
 .DS_Store
