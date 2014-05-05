@@ -93,8 +93,8 @@ if(BUNDLED_BLITZ)
     cppqed-blitz
     HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz
     UPDATE_COMMAND ""
-    PATCH_COMMAND patch -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
-          COMMAND patch -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch
+    PATCH_COMMAND patch --dry-run -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch | grep "previously applied" || patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
+          COMMAND patch --dry-run -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch | grep "previously applied" || patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch
     CONFIGURE_COMMAND ${PROJECT_BINARY_DIR}/blitz-make.sh <SOURCE_DIR> <INSTALL_DIR>
     BUILD_COMMAND make lib
   )
