@@ -18,7 +18,7 @@ The framework is very sensitive to performance, which can be increased by physic
 
 \tableofcontents
 
-\note C++QED is a free open-source project, the only thing the developers ask is to please cite **both** our \ref mainpagepublications "papers" in publications where C++QED has any role, as this is the only way for us to obtain credit for this work.
+\note C++QED is a free open-source project, the only thing the developers ask is to please cite **all three** of our \ref mainpagepublications "papers" in publications where C++QED has any role, as this is the only way for us to obtain credit for this work.
 
 
 Documentation {#mainpagedocumentation}
@@ -91,6 +91,8 @@ C++QED has been originally conceived and created by [András Vukics](http://opti
 
 Publications {#mainpagepublications}
 ============
+
+- Raimar Sandner, András Vukics. *C++QEDv2 Milestone 10: A C++/Python application-programming framework for simulating open quantum dynamics.* **Comp. Phys. Comm.**, 185(9):2380–2382, 2014. [(link)](http://www.sciencedirect.com/science/article/pii/S0010465514001349)
 
 - András Vukics. *C++QEDv2: The multi-array concept and compile-time algorithms in the definition of composite quantum systems.* **Comp. Phys. Comm.**, 183(6):1381–1396, 2012. [(link)](http://www.sciencedirect.com/science/article/pii/S0010465512000562)
 
