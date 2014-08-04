@@ -5,6 +5,7 @@ import cpypyqed.config
 
 from ..core_d import *
 from ..elements_d import *
+from ..io_d import *
 cpypyqed.config.build_type="debug"
 cpypyqed.config.module_suffix="_d"
 from ..compilation.composite import *
