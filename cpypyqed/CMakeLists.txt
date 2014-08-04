@@ -27,12 +27,15 @@ endif()
 
 get_filename_component(CPPQED_CMAKE_MODULE_PATH "cmake/Modules" ABSOLUTE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
+message(STATUS "Debug: ${PYTHON_EXECUTABLE}")
 
 find_package(CPPQED 2.100 REQUIRED)
 include(${CPPQED_USE})
-find_package(Boost QUIET REQUIRED COMPONENTS python)
-find_package(PythonInterp 2.6 REQUIRED)
+if(NOT PYTHONINTERP_FOUND)
+  find_package(PythonInterp 2.6 REQUIRED)
+endif()
 find_package(PythonLibs 2.6 REQUIRED)
+find_package(Boost QUIET REQUIRED COMPONENTS python)
 find_package(Numpy REQUIRED)
 
 include(PythonSetup)
@@ -181,7 +184,7 @@ add_custom_command(TARGET cpypyqed_setup PRE_BUILD
 #! <!--#########################################################-->
 #!
 #! Copy all the files which are needed for the final Python package
-#! to the build directory. The package name is either `cpypyqed`. Because it is possible that the
+#! to the build directory. The package name is `cpypyqed`. Because it is possible that the
 #! build configuration is only available at build time (e.g. Mac OS X, XCode),
 #! not at configure time, we cannot use `configure_file` directly.
 #!
