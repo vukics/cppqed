@@ -30,6 +30,11 @@ if(NOT ( PYTHONINTERP_FOUND AND NUMPY_FOUND AND SCIPY_FOUND  ) )
   return()
 endif()
 
+if(NOT COMPILE_SCRIPTS)
+  message(WARNING "Disabling testsuite, scripts are not compiled.")
+  return()
+endif()
+
 configure_file(testdriver.conf.in testdriver.conf)
 configure_file(${CMAKE_SOURCE_DIR}/helperscripts/check_push.sh.in ${CMAKE_BINARY_DIR}/check_push.sh @ONLY)
 
