@@ -120,7 +120,7 @@ if(BUNDLED_FLENS)
   if(EXISTS ${CMAKE_SOURCE_DIR}/external/flens)
     set(FLENS_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/flens/. <SOURCE_DIR>/)
   else()
-    set(FLENS_SOURCE GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git GIT_TAG "846b5a3")
+    set(FLENS_SOURCE GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git GIT_TAG "757834a")
   endif()
 
   ExternalProject_Add(
