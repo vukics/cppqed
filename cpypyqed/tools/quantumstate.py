@@ -32,7 +32,7 @@ class QuantumState(numpy.ndarray):
   """
   def __new__(cls, data, time=None,**kwargs):
     array = numpy.array(data, **kwargs)
-    array = numpy.asarray(array).view(cls)
+    array = numpy.asarray(array,dtype=numpy.complex128).view(cls)
     if time is not None:
         array.time = time
     elif hasattr(data, "time"):
