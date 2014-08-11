@@ -170,7 +170,7 @@ If your %CMake version is too old, the following commands will install cmake-2.8
 
 If your Python version is too old, the following commands will install the Enthought Python Distribution "Canopy" to `$PREFIX`:
 
-    wget https://www.enthought.com/downloads/canopy/rh5-64/free/ -O canopy.sh
+    wget https://store.enthought.com/downloads/canopy/rh5/64/free/ -O canopy.sh
     chmod a+x canopy.sh
     ./canopy.sh
 
