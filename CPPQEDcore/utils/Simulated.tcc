@@ -26,10 +26,12 @@ Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
 template<typename A>
 std::ostream& Simulated<A>::display_v(std::ostream& os, int precision) const
 {
+  displayPreHook();
   using namespace cpputils;
   const A& a=this->getEvolved()->getA();
   for (size_t i=0; i<subscriptLimit(a); i++)
     os<<FormDouble(precision)(subscript(a,i))<<' ';
+  displayPostHook();
   return os;
 }
 

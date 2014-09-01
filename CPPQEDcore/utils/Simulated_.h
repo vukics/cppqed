@@ -42,6 +42,9 @@ public:
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 private:
+  virtual void displayPreHook () const {}
+  virtual void displayPostHook() const {}
+
   virtual void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}
 
   virtual std::ostream& display_v(std::ostream&, int) const final;
