@@ -25,11 +25,10 @@ struct ParsBichromatic : ParsPumpedLossy
 template<typename AveragingType, typename... AveragingConstructorParameters>
 const Ptr make(const ParsBichromatic& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
 {
-  using boost::make_shared;
   if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsPumpedLossy&>(p),qmp,a...);
   else {
-    if (p.nTh) {return make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
-    else       {return make_shared<BichromaticMode<false,AveragingType> >(p,a...);}
+    if (p.nTh) {return boost::make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
+    else       {return boost::make_shared<BichromaticMode<false,AveragingType> >(p,a...);}
   }
 }
 

@@ -11,7 +11,6 @@
 #include "SmartPtr.h"
 #include "Version.h"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
 #include <iomanip>
@@ -106,7 +105,7 @@ template<typename T, typename L, typename D>
 void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
          double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
 {
-  using namespace std; using namespace boost; using namespace runTraits; using namespace cpputils;
+  using namespace std; using namespace runTraits; using namespace cpputils;
 
   ////////////////////////////////////////////////
   // Determining i/o streams, eventual state input
@@ -125,7 +124,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 
   const boost::shared_ptr<ostream> outstream(!outputToFile ?
                                              nonOwningSharedPtr<ostream>(&cout) :
-                                             static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
+                                             static_pointer_cast<ostream>(boost::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   ostream& os=*outstream;
 
@@ -154,7 +153,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Mid section: the actual run
   //////////////////////////////
 
-  const boost::shared_ptr<ofstream> ofs = !outputToFile ? make_shared<ofstream>() : make_shared<ofstream>(stateFileName.c_str(),ios_base::app);
+  const boost::shared_ptr<ofstream> ofs = !outputToFile ? boost::make_shared<ofstream>() : boost::make_shared<ofstream>(stateFileName.c_str(),ios_base::app);
 
   bool
     stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory

@@ -60,7 +60,6 @@ public:
   const LDO_Ptr dispatch(const LDO& ldo)
   {
     using blitzplusplus::basi::Transposer;
-    using boost::make_shared;
 
     typedef StateVector    <RANK> SV;
     typedef DensityOperator<RANK> DO;
@@ -68,11 +67,11 @@ public:
     if      (const auto sV=dynamic_cast<const SV*>(&ldo)) {
       typename SV::StateVectorLow temp(sV->getArray());
       // We do not want to transpose that StateVectorLow which is the storage of sV.
-      return make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
+      return boost::make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
     }
     else if (const auto dO=dynamic_cast<const DO*>(&ldo)) {
       typename DO::DensityOperatorLow temp(dO->getArray());
-      return make_shared<DO>(Transposer<2*RANK,typename details::ExtendV<RANK,V>::type>::transpose(temp),byReference);
+      return boost::make_shared<DO>(Transposer<2*RANK,typename details::ExtendV<RANK,V>::type>::transpose(temp),byReference);
     }
     else throw NoSuchImplementation();
   }
