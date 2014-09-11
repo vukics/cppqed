@@ -19,7 +19,6 @@ using namespace mathutils;
 using namespace cpputils;
 using namespace fft;
 
-using boost::make_shared;
 
 
 ////////
@@ -393,11 +392,11 @@ auto particle::init(const Pars& p) -> const StateVector
 
 particle::Ptr particle::make(const Pars& p, QM_Picture qmp)
 {
-  return qmp==QMP_SCH ? Ptr(make_shared<ParticleSch>(p)) : Ptr(make_shared<Particle>(p));
+  return qmp==QMP_SCH ? Ptr(boost::make_shared<ParticleSch>(p)) : Ptr(boost::make_shared<Particle>(p));
 }
 
 
 particle::PtrPumped particle::makePumped(const ParsPumped& p, QM_Picture qmp)
 {
-  return qmp==QMP_SCH ? PtrPumped(make_shared<PumpedParticleSch>(p)) : PtrPumped(make_shared<PumpedParticle>(p));
+  return qmp==QMP_SCH ? PtrPumped(boost::make_shared<PumpedParticleSch>(p)) : PtrPumped(boost::make_shared<PumpedParticle>(p));
 }
