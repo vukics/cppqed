@@ -205,22 +205,22 @@ public:
 
 
 template<int NL, typename VL>
-class Liouvillean : public structure::ElementLiouvilleanStrategies<1,mpl::size<VL>::value>
+class Liouvillean : public structure::ElementLiouvilleanStrategies<1,mpl::size<VL>::value+NL>
 // Note that, at some point, the Fusion sequence VL needs to be converted into a runtime sequence (JumpStrategies & JumpRateStrategies)
 {
 public:
   static const int NLT=mpl::size<VL>::value; // number of lossy transitions
 
-  typedef structure::ElementLiouvilleanStrategies<1,NLT> Base;
+  typedef structure::ElementLiouvilleanStrategies<1,NLT+NL> Base;
   
   typedef typename Base::JumpStrategies     JumpStrategies    ;
   typedef typename Base::JumpRateStrategies JumpRateStrategies;
 
-  static_assert( blitzplusplus::TinyVectorLengthTraits<JumpRateStrategies>::value==NLT , "Jump number inconsistent." );
+  static_assert( blitzplusplus::TinyVectorLengthTraits<JumpRateStrategies>::value==NLT+NL , "Jump number inconsistent." );
 
   typedef typename Base::KeyLabels KeyLabels;
 
-  Liouvillean(const VL& gammas) : Base(Liouvillean::fillJS(),Liouvillean::fillJRS(),keyTitle,fillKeyLabels()), gammas_(gammas) {}
+  Liouvillean(const VL& gammas, double gamma_parallel) : Base(Liouvillean::fillJS(),Liouvillean::fillJRS(),keyTitle,fillKeyLabels()), gammas_(gammas), gamma_parallel_(gamma_parallel) {}
 
   const JumpStrategies     fillJS () const;
   const JumpRateStrategies fillJRS() const;
@@ -235,7 +235,10 @@ private:
   double jumpRateStrategy(const LazyDensityOperator&) const;
 
   // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters? This would be needed to fuse fillJS and fillJRS into a template together with the helper classes below
-  
+
+  void   flipStrategy(StateVectorLow& psi, size_t i) const {psi*=sqrt(2.*gamma_parallel_); psi(i)*=-1.;}
+  double flipRateStrategy(const LazyDensityOperator&) const {return 2*gamma_parallel_;} // Being a member is somewhat superfluous here
+
   class  JS_helper;
   class JRS_helper;
 
@@ -243,15 +246,9 @@ private:
 
   const VL gammas_;
 
+  const double gamma_parallel_;
+
 };
-
-
-
-///////////
-//
-// Averaged
-//
-///////////
 
 
 } // multilevel
@@ -305,7 +302,7 @@ public:
   typedef typename Base::Ptr Ptr;
 
   template<typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, AveragingConstructorParameters&&...);
+  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, double gamma_parallel, AveragingConstructorParameters&&...);
 
 };
 
@@ -323,10 +320,10 @@ makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas,
                    // note that, understandably, if we write
                    // const typename RealLevelsMF<NL>::type&
                    // here, the compiler cannot deduce NL anymore
-                   const VP& etas, const VL& gammas,
+                   const VP& etas, const VL& gammas, double gamma_parallel,
                    AveragingConstructorParameters&&... a)
 {
-  return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType> >(deltas,etas,gammas,a...);
+  return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
 }
 
 
@@ -335,16 +332,16 @@ inline
 RETURN_type
 makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
 {
-  return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,a...);
+  return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel,a...);
 }
 
 
 template<int NL, typename VP, typename VL>
 inline
 RETURN_type
-makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas, const VP& etas, const VL& gammas, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas, const VP& etas, const VL& gammas, double gamma_parallel, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
 {
-  return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,keyTitle,NL,offDiagonals);
+  return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
 }
 
 

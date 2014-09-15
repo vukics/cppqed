@@ -16,7 +16,8 @@ template<int NL, typename VP, typename VL>
 ParsPumpedLossy<NL,VP,VL>::ParsPumpedLossy(parameters::ParameterTable& p, const std::string& mod)
   : deltas(p.addTitle("PumpedLossyMultiLevel",mod).addMod("deltas",mod,"MultiLevel detunings vector",Levels())),
     etas(p.addMod("etas",mod,"MultiLevel pumps vector",VP())),
-    gammas(p.addMod("gammas",mod,"MultiLevel decays vector",VL()))
+    gammas(p.addMod("gammas",mod,"MultiLevel decays vector",VL())),
+    gamma_parallel(p.addMod("gamma_parallel",mod,"Phase flip rate",0.))
 {
   using namespace boost::fusion;
 

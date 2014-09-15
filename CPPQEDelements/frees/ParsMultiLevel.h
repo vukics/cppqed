@@ -21,6 +21,7 @@ struct ParsPumpedLossy
   Levels& deltas;
   VP& etas;
   VL& gammas;
+  double& gamma_parallel;
 
   ParsPumpedLossy(parameters::ParameterTable&, const std::string& ="");
 

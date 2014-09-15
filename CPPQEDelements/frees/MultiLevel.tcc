@@ -215,21 +215,25 @@ private:
 
 
 template<int NL, typename VL>
-const typename Liouvillean<NL,VL>::JumpStrategies
-Liouvillean<NL,VL>::fillJS() const
+auto
+Liouvillean<NL,VL>::fillJS() const ->  const JumpStrategies
 {
   typename Liouvillean::JumpStrategies res;
   mpl::for_each<tmptools::Ordinals<NLT> >(JS_helper(res,this));
+  for (int i=0; i<NL; ++i) // For the moment simply implemented as a runtime loop
+    res(NLT+i)=bind(&Liouvillean::flipStrategy,this,_1,i);
   return res;
 }
 
 
 template<int NL, typename VL>
-const typename Liouvillean<NL,VL>::JumpRateStrategies
-Liouvillean<NL,VL>::fillJRS() const
+auto
+Liouvillean<NL,VL>::fillJRS() const -> const JumpRateStrategies
 {
   typename Liouvillean::JumpRateStrategies res;
   mpl::for_each<tmptools::Ordinals<NLT> >(JRS_helper(res,this));
+  for (int i=0; i<NL; ++i) // For the moment simply implemented as a runtime loop
+    res(NLT+i)=bind(&Liouvillean::flipRateStrategy,this,_1);
   return res;
 }
 
@@ -262,15 +266,13 @@ Liouvillean<NL,VL>::fillKeyLabels()
 {
   typename Liouvillean::KeyLabels res;
   mpl::for_each<VL>(KeyHelper(res));
+  for (int i=0; i<NL; ++i) { // For the moment simply implemented as a runtime loop
+    ostringstream slate;
+    slate<<"Phase flip for level "<<i;
+    res.push_back(slate.str());
+  }
   return res;
 }
-
-///////////
-//
-// 
-//
-///////////
-
 
 
 //////////
@@ -322,7 +324,7 @@ decayingLevels(const blitz::TinyVector<double,NL>& deltas, const VL& gammas)
 
 template<int NL>
 const structure::DynamicsBase::RealFreqs
-filterReal(const blitz::TinyVector<dcomp,NL>& levels)
+filterReal(const blitz::TinyVector<dcomp,NL>& levels, double gamma_parallel)
 {
   using namespace std;
   structure::DynamicsBase::RealFreqs res;
@@ -332,6 +334,7 @@ filterReal(const blitz::TinyVector<dcomp,NL>& levels)
       tag<<"delta"<<i;
       res.push_back(make_tuple(tag.str(),-imag(levels(i)),1.));
     }
+  res.push_back(make_tuple("gamma_parallel",gamma_parallel,1.));
   return res;
 }
 
@@ -395,10 +398,10 @@ complexFreqs(const blitz::TinyVector<dcomp,NL>& levels, const VP& etas)
 
 
 template<int NL, typename VP, typename VL, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const RealLevels& deltas, const VP& etas, const VL& gammas, AveragingConstructorParameters&&... a)
+PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const RealLevels& deltas, const VP& etas, const VL& gammas, double gamma_parallel, AveragingConstructorParameters&&... a)
   : Hamiltonian(multilevel::decayingLevels(deltas,gammas),etas),
-    Liouvillean(gammas),
-    Base(multilevel::filterReal(this->get_zSchs()),multilevel::complexFreqs(this->get_zSchs(),etas)),
+    Liouvillean(gammas,gamma_parallel),
+    Base(multilevel::filterReal(this->get_zSchs(),gamma_parallel),multilevel::complexFreqs(this->get_zSchs(),etas)),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
   this->getParsStream()<<"# Schroedinger picture.\n";
