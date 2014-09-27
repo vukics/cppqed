@@ -31,8 +31,7 @@ class QuantumState(numpy.ndarray):
   state vectors for combined systems.
   """
   def __new__(cls, data, time=None,**kwargs):
-    array = numpy.array(data, **kwargs)
-    array = numpy.asarray(array,dtype=numpy.complex128).view(cls)
+    array = numpy.asarray(data,dtype=numpy.complex128).view(cls)
     if time is not None:
         array.time = time
     elif hasattr(data, "time"):
@@ -40,16 +39,14 @@ class QuantumState(numpy.ndarray):
     return array
 
   def __array_finalize__(self, obj):
+    if obj is None: return
     self.time = getattr(obj, "time", 0)
 
-  def __str__(self):
-    return numpy.ndarray.__str__(numpy.asarray(self))
-
-  def __repr__(self):
-    return numpy.ndarray.__repr__(numpy.asarray(self))
-
-  def __unicode__(self):
-    return numpy.ndarray.__unicode__(numpy.asarray(self))
+  def __array_wrap__(self, obj):
+    if obj.shape == ():
+      return obj[()]    # if ufunc output is scalar, return it
+    else:
+      return numpy.ndarray.__array_wrap__(self, obj)
 
   def _fft_helper(self, axes=None, inverse=False):
     r"""
@@ -70,18 +67,37 @@ class DensityOperator(QuantumState):
   A class representing a quantum mechanical density operator. :core2:`quantumdata::DensityOperator` is
   automatically converted to this, but it is not a one to one wrapper.
   """
-  def __new__(cls, data, time=None, **kwargs):
-    array = QuantumState.__new__(cls, data, time, **kwargs)
+  def __new__(cls, data, time=None, strict=True, **kwargs):
+    array = super(DensityOperator,cls).__new__(cls, data, time, **kwargs)
+    array.strict = strict
     return array
 
   def __array_finalize__(self, obj):
-    QuantumState.__array_finalize__(self,obj)
+    super(DensityOperator,self).__array_finalize__(obj)
+    if obj is None: return
+    else: self.strict = getattr(obj, 'strict', True)
+    if not self.strict: return
     ndim=len(self.shape)
     if not ndim % 2 == 0:
       raise ValueError("The number of dimension must be even for a density operator.")
-    self.dimensions = self.shape[:ndim/2]
     if not self.shape[:ndim/2]==self.shape[ndim/2:]:
       raise ValueError("The created object is not a valid density operator, dimensions mismatch.")
+    self.dimensions = self.shape[:ndim/2]
+
+
+  def __getitem__(self,arg):
+    return numpy.asarray(self).__getitem__(arg)
+  def __setitem__(self,key,value):
+    raise TypeError("__setitem__ not supported For DensityOperator, convert to numpy.ndarray first.")
+  def __delitem__(self,arg):
+    raise TypeError("__delitem__ not supported For DensityOperator, convert to numpy.ndarray first.")
+
+  def __repr__(self):
+    return super(DensityOperator, DensityOperator(self,strict=False)).__repr__()
+  def __str__(self):
+    return super(DensityOperator, DensityOperator(self,strict=False)).__str__()
+  def __unicode__(self):
+    return super(DensityOperator, DensityOperator(self,strict=False)).__unicode__()
 
   def fft(self, subsystems=None):
     r"""
@@ -157,18 +173,14 @@ class StateVector(QuantumState):
     The tensor product is abbreviated by the "**" operator.
     """
     def __new__(cls, data, time=None, norm=False, **kwargs):
-        array = QuantumState.__new__(cls, data, time, **kwargs)
+        array = super(StateVector,cls).__new__(cls,data, time, **kwargs)
         if norm:
             array = normalize(array)
         return array
 
     def __array_finalize__(self, obj):
-        QuantumState.__array_finalize__(self,obj)
+        super(StateVector,self).__array_finalize__(obj)
         self.dimensions = obj.shape
-
-    def __str__(self):
-        clsname = self.__class__.__name__
-        return "%s(%s)" % (clsname, " x ".join(map(str, self.dimensions)))
 
     def norm(self):
         r"""
@@ -580,7 +592,7 @@ def norm(array):
     """
     Return the norm of the array.
     """
-    return numpy.sqrt((array*array.conj()).sum())
+    return numpy.real(numpy.sqrt((array*array.conj()).sum()))[()]
 
 def normalize(array):
     """
@@ -611,8 +623,10 @@ def _conjugate_indices(indices, ndim):
     """
     Return all numbers from 0 to ndim which are not in indices.
     """
-    if isinstance(indices, int):
-        indices = (indices,)
+    indices = set(indices,) if isinstance(indices, int) else set(indices)
+    dims = set(range(ndim))
+    if indices.difference(dims):
+        raise IndexError("Index or indices out of bound: {}".format(list(indices.difference(dims))))
     return set(range(ndim)).difference(indices)
 
 def _sorted_list(iterable, reverse=False):
