@@ -547,8 +547,10 @@ class CompileTarget(OptionsManager):
     else:
       if returncode == 0:
         sys.exit("Compilation was successful, but failure was expected.")
-      if not error in std:
-        sys.exit("Compilation failed as expected, but {0} was not found in the error message.".format(error))
+      if (not error in std) and (not error in err):
+        logging.debug(std)
+        logging.debug(err)
+        sys.exit("Compilation failed as expected, but \"{0}\" was not found in the error message.".format(error))
 
 class Plotter(OutputManager):
   """!
