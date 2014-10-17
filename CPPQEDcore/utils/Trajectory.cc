@@ -88,6 +88,24 @@ boost::shared_ptr<istream> trajectory::openStateFileReading(const std::string &f
 #endif // DO_NOT_USE_BOOST_COMPRESSION
 }
 
+boost::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &filename, const ios_base::openmode mode)
+{
+#ifdef DO_NOT_USE_BOOST_COMPRESSION
+  boost::shared_ptr<ofstream> ofs = boost::make_shared<ofstream>(filename, mode);
+  if (!ofs->is_open()) throw StateFileOpeningException(filename);
+  return ofs;
+#else
+  using namespace boost::iostreams;
+  boost::shared_ptr<filtering_ostream> out = boost::make_shared<filtering_ostream>();
+  file_sink file(filename, mode);
+  if (!file.is_open()) throw StateFileOpeningException(filename);
+  if (isbz2(filename))
+    out->push(bzip2_compressor());
+  out->push(file);
+  return out;
+#endif // DO_NOT_USE_BOOST_COMPRESSION
+}
+
 bool trajectory::details::restoreState(Trajectory& traj, const string& trajectoryFileName, const string& stateFileName, const string& initialFileName)
 {
 
@@ -97,7 +115,7 @@ bool trajectory::details::restoreState(Trajectory& traj, const string& trajector
 
     if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
       boost::shared_ptr<istream> stateFile = openStateFileReading(stateFileName);
-      while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,*stateFile);
+      while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,stateFile.get());
       return true;
     }
 
@@ -105,29 +123,29 @@ bool trajectory::details::restoreState(Trajectory& traj, const string& trajector
 
   if (initialFileName!="") {
     boost::shared_ptr<istream> initialFile = openStateFileReading(initialFileName);
-    while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,*initialFile);
+    while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,initialFile.get());
   }
 
   return false;
 }
 
 
-void trajectory::details::writeNextArchive(ofstream* ofs, const ostringstream &oss)
+void trajectory::details::writeNextArchive(ostream* ofs, const ostringstream &oss)
 {
   const string& buffer=oss.str();
   *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
 }
 
-void trajectory::details::readNextArchive(istream& ifs, istringstream &iss)
+void trajectory::details::readNextArchive(istream* ifs, istringstream &iss)
 {
   string buffer;
-  streamsize n; ifs>>n; buffer.resize(n);
-  ifs.read(&buffer[0],n);
+  streamsize n; *ifs>>n; buffer.resize(n);
+  ifs->read(&buffer[0],n);
   iss.str(buffer);
 }
 
 
-auto trajectory::readMeta(istream& ifs) -> SerializationMetadata
+auto trajectory::readMeta(istream* ifs) -> SerializationMetadata
 {
   istringstream iss(ios_base::binary);
   details::readNextArchive(ifs,iss);

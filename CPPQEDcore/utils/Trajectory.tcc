@@ -30,16 +30,16 @@ void trajectory::run(Adaptive<A>& traj, const ParsRun& p)
 
 namespace trajectory { namespace details {
 
-void writeNextArchive(std::ofstream*, const std::ostringstream&);
-void readNextArchive(std::istream&, std::istringstream&);
+void writeNextArchive(std::ostream*, const std::ostringstream&);
+void readNextArchive(std::istream*, std::istringstream&);
 
 } // details
 
 
 template<typename T>
-void writeViaSStream(const T& traj, std::ofstream* ofs)
+void writeViaSStream(const T& traj, std::ostream* ofs)
 {
-  if (ofs && ofs->is_open()) {
+  if (ofs) {
     std::ostringstream oss(std::ios_base::binary);
     cpputils::oarchive stateArchive(oss);
     traj.writeState(stateArchive);
@@ -48,7 +48,7 @@ void writeViaSStream(const T& traj, std::ofstream* ofs)
 }
 
 template<typename T>
-void readViaSStream(T& traj, std::istream& ifs)
+void readViaSStream(T& traj, std::istream* ifs)
 {
   std::istringstream iss(std::ios_base::binary);
   details::readNextArchive(ifs,iss);
@@ -154,7 +154,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Mid section: the actual run
   //////////////////////////////
 
-  const boost::shared_ptr<ofstream> ofs = !outputToFile ? boost::make_shared<ofstream>() : boost::make_shared<ofstream>(stateFileName.c_str(),ios_base::app);
+  const boost::shared_ptr<ostream> ofs = !outputToFile ? boost::make_shared<ofstream>() : openStateFileWriting(stateFileName);
 
   bool
     stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory

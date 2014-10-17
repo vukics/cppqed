@@ -145,7 +145,7 @@ private:
 
 };
 
-/// Opens a file with the given filename and returns an associated std::istream object.
+/// Opens a file with the given filename for reading and returns an associated std::istream object.
 /**
  * If C++QED is compiled with compression support (boost iostreams library needed), then
  * the statefile can be in bzip2-format, the returned istream will handle this automatically.
@@ -154,11 +154,21 @@ private:
  */
 boost::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
 
+/// Opens a file with the given filename for writing (appending) and returns an associated std::ostream object.
+/**
+ * If C++QED is compiled with compression support (boost iostreams library needed), then
+ * the statefile can be in bzip2-format, the returned ostream will handle this automatically.
+ * If the file does not yet exist, bzip2 is used if supported.
+ *
+ * If the file cannot be opened, StateFileOpeningException is raised.
+ */
+boost::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app | std::ios_base::binary);
+
 template<typename T>
-void writeViaSStream(const T&, std::ofstream*);
+void writeViaSStream(const T&, std::ostream*);
 template<typename T>
-void  readViaSStream(      T&, std::istream&);
-SerializationMetadata readMeta(std::istream&); ///< Needed separately for the Python i/o
+void  readViaSStream(      T&, std::istream*);
+SerializationMetadata readMeta(std::istream*); ///< Needed separately for the Python i/o
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};
