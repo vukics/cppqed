@@ -155,6 +155,11 @@ void pyRankMismatchException(const trajectory::RankMismatchException &)
   PyErr_SetString(PyExc_RuntimeError, "rank mismatch");
 }
 
+void pyStateFileOpeningException(const trajectory::StateFileOpeningException &e)
+{
+  PyErr_SetString(PyExc_IOError, (std::string("Could not open ")+e.getTag()).c_str());
+}
+
 void export_io()
 {
   import_array();
@@ -178,6 +183,7 @@ R"doc(Write a state vector file.
 
   register_exception_translator<trajectory::DimensionsMismatchException>(&pyDimensionsMismatchException);
   register_exception_translator<trajectory::RankMismatchException>      (&pyRankMismatchException);
+  register_exception_translator<trajectory::StateFileOpeningException>  (&pyStateFileOpeningException);
 
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
