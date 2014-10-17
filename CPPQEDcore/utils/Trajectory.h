@@ -12,6 +12,7 @@
 
 #include <iosfwd>
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 
 /// The trajectory-bundle
@@ -144,12 +145,20 @@ private:
 
 };
 
+/// Opens a file with the given filename and returns an associated std::istream object.
+/**
+ * If C++QED is compiled with compression support (boost iostreams library needed), then
+ * the statefile can be in bzip2-format, the returned istream will handle this automatically.
+ *
+ * If the file cannot be opened, StateFileOpeningException is raised.
+ */
+boost::shared_ptr<std::streambuf> openStateFile(const std::string &filename, std::ifstream &ifs);
 
 template<typename T>
 void writeViaSStream(const T&, std::ofstream*);
 template<typename T>
-void  readViaSStream(      T&, std::ifstream&);
-SerializationMetadata readMeta(std::ifstream&); ///< Needed separately for the Python i/o
+void  readViaSStream(      T&, std::istream&);
+SerializationMetadata readMeta(std::istream&); ///< Needed separately for the Python i/o
 
 
 class StoppingCriterionReachedException : public cpputils::Exception {};

@@ -193,6 +193,14 @@ else(SERIALIZATION)
   set(CPPQED_SERIALIZATION_FOUND 0)
 endif(SERIALIZATION)
 
+#! Switch for boost bzip2 support
+option(COMPRESSION "Boost bzip2 support" ON)
+if(COMPRESSION)
+  set(CPPQED_COMPRESSION_FOUND 1)
+else(COMPRESSION)
+  set(CPPQED_COMPRESSION_FOUND 0)
+endif(COMPRESSION)
+
 #! Switch for FLENS support.
 option(FLENS "FLENS support" ON)
 
@@ -219,7 +227,7 @@ endif( blitz_SERIALIZATION_FOUND )
 # if an old boost version is installed, then FindBoost fails if Boost_NO_BOOST_CMAKE is not set
 set(Boost_NO_BOOST_CMAKE 1)
 find_package(Boost 1.46.0 REQUIRED)
-find_package(Boost QUIET COMPONENTS serialization)
+find_package(Boost QUIET COMPONENTS serialization iostreams)
 
 if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library found.")
@@ -227,6 +235,12 @@ else( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library not found.")
   set(CPPQED_SERIALIZATION_FOUND 0)
 endif( Boost_SERIALIZATION_FOUND )
+if( Boost_IOSTREAMS_FOUND )
+  message(STATUS "Boost iostreams library found.")
+else( Boost_IOSTREAMS_FOUND )
+  message(STATUS "Boost iostreams library not found.")
+  set(CPPQED_COMPRESSION_FOUND 0)
+endif( Boost_IOSTREAMS_FOUND )
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 
@@ -257,6 +271,15 @@ else( CPPQED_SERIALIZATION_FOUND )
   set(DO_NOT_USE_BOOST_SERIALIZATION ON)
   message(STATUS "Optional support for binary statevector output disabled.")
 endif( CPPQED_SERIALIZATION_FOUND )
+
+# Check if compression can be enabled, inform user
+if( CPPQED_COMPRESSION_FOUND )
+  message(STATUS "Support for binary statevector compression enabled.")
+  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${Boost_IOSTREAMS_LIBRARY})
+else( CPPQED_COMPRESSION_FOUND )
+  set(DO_NOT_USE_BOOST_COMPRESSION ON)
+  message(STATUS "Optional support for binary statevector compression disabled.")
+endif( CPPQED_COMPRESSION_FOUND )
 
 # Doxygen
 find_package(Doxygen 1.8)
@@ -495,6 +518,7 @@ set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
                                 PURPOSE "Generation of API documentation. Note that you also need the graphviz package to build the documentation.")
 add_feature_info("FLENS" CPPQED_FLENS_FOUND "compile framework with FLENS support.")
 add_feature_info("Serialization" CPPQED_SERIALIZATION_FOUND "needed for binary statevector output." )
+add_feature_info("Compression" CPPQED_COMPRESSION_FOUND "bzip2 compression of binary statevectors.")
 if(NOT ${CPPQED_MONOLITHIC})
   feature_summary( WHAT ALL )
 endif()

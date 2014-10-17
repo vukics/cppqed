@@ -31,7 +31,7 @@ void trajectory::run(Adaptive<A>& traj, const ParsRun& p)
 namespace trajectory { namespace details {
 
 void writeNextArchive(std::ofstream*, const std::ostringstream&);
-void readNextArchive(std::ifstream&, std::istringstream&);
+void readNextArchive(std::istream&, std::istringstream&);
 
 } // details
 
@@ -48,7 +48,7 @@ void writeViaSStream(const T& traj, std::ofstream* ofs)
 }
 
 template<typename T>
-void readViaSStream(T& traj, std::ifstream& ifs)
+void readViaSStream(T& traj, std::istream& ifs)
 {
   std::istringstream iss(std::ios_base::binary);
   details::readNextArchive(ifs,iss);

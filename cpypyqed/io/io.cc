@@ -36,7 +36,7 @@ namespace pythonext {
 namespace {
 
 template<typename A, int RANK>
-object doRead(std::ifstream &ifs)
+object doRead(std::istream &ifs)
 {
   list states;
   list times;
@@ -95,13 +95,23 @@ object read(str filename)
 {
   std::string f = extract<std::string>(filename);
 
-  std::ifstream ifs(f.c_str(),std::ios_base::binary);
-  throw_file(ifs,f);
-
-  trajectory::SerializationMetadata meta = trajectory::readMeta(ifs);
+  trajectory::SerializationMetadata meta;
+  {
+    std::ifstream ifs(f.c_str(),std::ios_base::binary);
+    throw_file(ifs,f);
+    ifs.close();
+    boost::shared_ptr<std::streambuf> buf = trajectory::openStateFile(f,ifs);
+    std::istream is(buf.get());
+    meta = trajectory::readMeta(is);
+    ifs.close();
+  }
 
   throw_rank(meta.rank);
   throw_type(meta.typeID);
+
+  std::ifstream ifs;
+  boost::shared_ptr<std::streambuf> buf = trajectory::openStateFile(f,ifs);
+  std::istream is(buf.get());
 
   list result;
   result.append(meta);
@@ -109,8 +119,8 @@ object read(str filename)
   switch (meta.rank) {
     #define BOOST_PP_LOCAL_MACRO(n) \
       case n: \
-        if(meta.typeID=="CArray") result.extend(doRead<CArray<n>,n>(ifs)); \
-        if(meta.typeID=="DArray") result.extend(doRead<DArray<n>,n>(ifs));  \
+        if(meta.typeID=="CArray") result.extend(doRead<CArray<n>,n>(is)); \
+        if(meta.typeID=="DArray") result.extend(doRead<DArray<n>,n>(is));  \
         break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
