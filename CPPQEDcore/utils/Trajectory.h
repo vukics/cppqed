@@ -152,7 +152,7 @@ private:
  *
  * If the file cannot be opened, StateFileOpeningException is raised.
  */
-boost::shared_ptr<std::streambuf> openStateFile(const std::string &filename, std::ifstream &ifs);
+boost::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
 
 template<typename T>
 void writeViaSStream(const T&, std::ofstream*);
