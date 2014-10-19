@@ -30,7 +30,7 @@ bool isbz2(const std::string filename)
   using namespace std;
   ifstream file(filename, ios_base::in | ios_base::binary);
   if (file.peek() == ifstream::traits_type::eof())
-    return true;
+    return false;
   string header; header.resize(3);
   file.read(&header[0],3);
   file.close();
@@ -99,8 +99,14 @@ boost::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &f
   boost::shared_ptr<filtering_ostream> out = boost::make_shared<filtering_ostream>();
   file_sink file(filename, mode);
   if (!file.is_open()) throw StateFileOpeningException(filename);
-  if (isbz2(filename))
+  if (isbz2(filename)) {
+    std::cerr << "Appending to compressed state files is not supported because of a boost bug." << std::endl;
+    throw StateFileOpeningException(filename);
+    // Appending to compressed state files does not work because of a bug in boost when handling multi-stream bz2 files.
+    // The files can be written just fine, but cannot be read in afterwards. Hopefully this gets solved.
+    // https://svn.boost.org/trac/boost/ticket/9749 might be related, but the proposed patch does not work.
     out->push(bzip2_compressor());
+  }
   out->push(file);
   return out;
 #endif // DO_NOT_USE_BOOST_COMPRESSION
