@@ -85,9 +85,9 @@ namespace details {
 template<int NL>
 struct ElementaryLevel
 {
-  typedef typename LevelsMF<NL>::type Levels;
+  typedef Levels<NL> L;
 
-  ElementaryLevel(const StateVectorLow& psi, StateVectorLow& dpsidt, const Levels& zs) : psi_(psi), dpsidt_(dpsidt), zs_(zs) {}
+  ElementaryLevel(const StateVectorLow& psi, StateVectorLow& dpsidt, const L& zs) : psi_(psi), dpsidt_(dpsidt), zs_(zs) {}
 
   template<typename T>
   void operator()(T) const
@@ -98,7 +98,7 @@ struct ElementaryLevel
 private:
   const StateVectorLow& psi_;
   StateVectorLow& dpsidt_;
-  const Levels& zs_;
+  const L& zs_;
   
 };
 
@@ -288,9 +288,9 @@ template<int NL>
 struct ElementaryDL
 {
 
-  typedef blitz::TinyVector<dcomp,NL> Levels;
+  typedef Levels<NL> L;
 
-  ElementaryDL(Levels& levels) : levels_(levels) {}
+  ElementaryDL(L& levels) : levels_(levels) {}
 
   template<typename P>
   void operator()(const P& gamma) const
@@ -299,7 +299,7 @@ struct ElementaryDL
   }
 
 private:
-  Levels& levels_;
+  L& levels_;
   
 };
 
@@ -311,7 +311,7 @@ private:
 
 template<int NL, typename VL>
 const RETURN_type
-decayingLevels(const blitz::TinyVector<double,NL>& deltas, const VL& gammas)
+decayingLevels(const RealLevels<NL>& deltas, const VL& gammas)
 {
   RETURN_type res(deltas);
   res*=-DCOMP_I;
@@ -324,7 +324,7 @@ decayingLevels(const blitz::TinyVector<double,NL>& deltas, const VL& gammas)
 
 template<int NL>
 const structure::DynamicsBase::RealFreqs
-filterReal(const blitz::TinyVector<dcomp,NL>& levels, double gamma_parallel)
+filterReal(const Levels<NL>& levels, double gamma_parallel)
 {
   using namespace std;
   structure::DynamicsBase::RealFreqs res;
@@ -368,7 +368,7 @@ private:
 
 template<int NL, typename VP>
 const RETURN_type
-complexFreqs(const blitz::TinyVector<dcomp,NL>& levels, const VP& etas)
+complexFreqs(const Levels<NL>& levels, const VP& etas)
 {
   using namespace std;
 

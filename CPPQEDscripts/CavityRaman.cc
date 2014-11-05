@@ -12,8 +12,6 @@ const int NL=3;
 using multilevel::result_of::make_vector;
 using multilevel::Pump; using multilevel::Decay;
 
-typedef multilevel::RealLevelsMF<NL>::type Levels;
-
 typedef make_vector<Pump <0,2>            >::type Pumps;
 typedef make_vector<Decay<0,2>,Decay<1,2> >::type Decays;
 

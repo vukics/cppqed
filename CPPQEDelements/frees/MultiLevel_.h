@@ -30,13 +30,11 @@ const std::string keyTitle="MultiLevel";
 
 using namespace structure::freesystem;
 
+/// Type for storing complex level energies (the \f$z_i\f$s \ref multilevelelements "here") \tparam NL number of levels
+template<int NL> using Levels = blitz::TinyVector<dcomp,NL>;
 
-template<int NL>
-struct LevelsMF : mpl::identity<blitz::TinyVector<dcomp,NL> > {};
-
-
-template<int NL>
-struct RealLevelsMF : mpl::identity<blitz::TinyVector<double,NL> > {};
+/// Type for storing level energies (the \f$\delta_i\f$s \ref multilevelelements "here") \tparam NL number of levels
+template<int NL> using RealLevels = blitz::TinyVector<double,NL>;
 
 
 
@@ -53,18 +51,18 @@ template<int NL>
 class Exact : public structure::FreeExact<false>
 {
 public:
-  typedef typename LevelsMF<NL>::type Levels;
+  typedef Levels<NL> L;
 
-  Exact(const Levels& zIs) : FreeExact<false>(NL), zIs_(zIs) {}
+  Exact(const L& zIs) : FreeExact<false>(NL), zIs_(zIs) {}
 
-  const Levels& get_zIs() const {return zIs_;}
+  const L& get_zIs() const {return zIs_;}
 
 private:
   void updateU(double) const;
 
   bool applicableInMaster_v() const;
 
-  const Levels zIs_;
+  const L zIs_;
 
 };
 
@@ -81,7 +79,8 @@ template<typename T>
 class Storage
 {
 public:
-  Storage(const T& value) : value_(value) {}
+  Storage(const T& value) : value_(value) {} //< Deliberately not explicit
+  Storage() : value_() {}
 
   const T& get() const {return value_;}
   void set(const T& value) {value_=value;}
@@ -96,7 +95,8 @@ template<>
 class Storage<double>
 {
 public:
-  Storage(double value) : value_(value) {}
+  Storage(double value) : value_(value) {} //< Deliberately not explicit
+  Storage() : value_() {}
 
   double get() const {return value_;}
   void set(double value) {value_=value;}
@@ -131,10 +131,7 @@ template<int I, int J>
 class Pump : public Storage<dcomp>, public tmptools::pair_c<I,J>
 {
 public:
-  typedef Storage<dcomp> Base;
-
-  Pump(const dcomp& value) : Base(value) {}
-  Pump() : Base(dcomp()) {}
+  using Storage<dcomp>::Storage;
 
 };
 
@@ -147,16 +144,16 @@ class HamiltonianIP
 public:
   static const int NPT=mpl::size<VP>::value; // number of pumped transitions
 
-  typedef typename Exact<NL>::Levels Levels;
+  typedef typename Exact<NL>::L L;
 
-  HamiltonianIP(const Levels& zSchs, const Levels& zIs, const VP& etas)
+  HamiltonianIP(const L& zSchs, const L& zIs, const VP& etas)
     : Exact<NL>(zIs), zSchs_(zSchs), etas_(etas) {}
 
 private:
   void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
 
-  const Levels zSchs_;
+  const L zSchs_;
 
   const VP etas_;
 
@@ -170,17 +167,17 @@ class HamiltonianSch
 public:
   static const int NPT=mpl::size<VP>::value; // number of pumped transitions
 
-  typedef typename LevelsMF<NL>::type Levels;
+  typedef Levels<NL> L;
 
-  HamiltonianSch(const Levels& zSchs, const VP& etas) : zSchs_(zSchs), etas_(etas) {}
+  HamiltonianSch(const L& zSchs, const VP& etas) : zSchs_(zSchs), etas_(etas) {}
 
-  const Levels& get_zSchs() const {return zSchs_;}
+  const L& get_zSchs() const {return zSchs_;}
 
 private:
   void addContribution_v(structure::NoTime, const StateVectorLow&, StateVectorLow&) const;
 
 
-  const Levels zSchs_;
+  const L zSchs_;
 
   const VP etas_;
 
@@ -199,10 +196,7 @@ template<int I, int J>
 class Decay : public Storage<double>, public tmptools::pair_c<I,J>
 {
 public:
-  typedef Storage<double> Base;
-
-  Decay(double value) : Base(value) {}
-  Decay() : Base(0) {}
+  using Storage<double>::Storage;
 
 };
 
@@ -301,11 +295,11 @@ class PumpedLossyMultiLevelSch
   // The ordering becomes important here
 {
 public:
-  typedef typename multilevel::    LevelsMF<NL>::type     Levels;
-  typedef typename multilevel::RealLevelsMF<NL>::type RealLevels;
+  typedef multilevel::    Levels<NL>     Levels;
+  typedef multilevel::RealLevels<NL> RealLevels;
 
   typedef multilevel::HamiltonianSch<NL,VP> Hamiltonian;
-  typedef multilevel::Liouvillean<NL,VL> Liouvillean;
+  typedef multilevel::Liouvillean   <NL,VL> Liouvillean;
   typedef MultiLevelBase<NL> Base;
 
   typedef typename Base::Ptr Ptr;
@@ -325,10 +319,7 @@ namespace multilevel {
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 inline
 RETURN_type
-makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas,
-                   // note that, understandably, if we write
-                   // const typename RealLevelsMF<NL>::type&
-                   // here, the compiler cannot deduce NL anymore
+makePumpedLossySch(const RealLevels<NL>& deltas,
                    const VP& etas, const VL& gammas, double gamma_parallel,
                    AveragingConstructorParameters&&... a)
 {
@@ -348,7 +339,7 @@ makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingCons
 template<int NL, typename VP, typename VL>
 inline
 RETURN_type
-makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas, const VP& etas, const VL& gammas, double gamma_parallel, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+makePumpedLossySch(const RealLevels<NL>& deltas, const VP& etas, const VL& gammas, double gamma_parallel, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
 {
   return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
 }

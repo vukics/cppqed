@@ -8,8 +8,6 @@ using namespace multilevel;
 
 const int NL=3; // NL stands for "Number of Levels"
 
-typedef RealLevelsMF<NL>::type Levels;
-
 typedef multilevel::result_of::make_vector<Pump <0,2>,Pump <1,2> >::type Pumps;
 
 typedef multilevel::result_of::make_vector<Decay<0,2>,Decay<1,2> >::type Decays;
@@ -28,7 +26,7 @@ int main(int argc, char* argv[])
   pml.etas=make_vector(dcomp(30,40),dcomp(-60,40));
   pml.gammas=make_vector(10,5);
 
-  pml.deltas=Levels(0,0,-1e5);
+  pml.deltas=RealLevels<3>(0,0,-1e5);
 
   // Parameter finalization
   update(p,argc,argv,"--");
