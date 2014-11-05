@@ -1,3 +1,4 @@
+/// \briefFile{Defines free elements of the \ref multilevelbundle "MultiLevel bundle" }
 // Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 // -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
@@ -20,6 +21,7 @@
 #include <boost/shared_ptr.hpp>
 
 
+/// Contains helpers for the \ref multilevelbundle "MultiLevel bundle"
 namespace multilevel {
 
 
@@ -124,9 +126,9 @@ std::istream& operator>>(std::istream& is,       Storage<T>& s)
 }
 
 
-
-template<int N1, int N2>
-class Pump : public Storage<dcomp>, public tmptools::pair_c<N1,N2>
+/// Class representing an elementary pump term (an \f$\eta_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
+template<int I, int J>
+class Pump : public Storage<dcomp>, public tmptools::pair_c<I,J>
 {
 public:
   typedef Storage<dcomp> Base;
@@ -192,8 +194,9 @@ private:
 //////////////
 
 
-template<int N1, int N2>
-class Decay : public Storage<double>, public tmptools::pair_c<N1,N2>
+/// Class representing an elementary decay term (a \f$\gamma_{ij}\f$ \ref multilevelelements "here") with a compile-time pair \f$i,j\f$ and a runtime real value
+template<int I, int J>
+class Decay : public Storage<double>, public tmptools::pair_c<I,J>
 {
 public:
   typedef Storage<double> Base;
@@ -284,6 +287,14 @@ public:
 };
 
 
+/// Implements a free multi-level system with driving and loss \see \ref multilevelbundle
+/**
+ * \tparam NL number of levels
+ * \tparam VP fusion vector of multilevel::Pump types representing all the pump terms (the sequence of \f$\eta_{ij}\f$s \ref multilevelactualHamiltonian "here") in the system
+ * \tparam VL fusion vector of multilevel::Decay types representing all the decays (the sequence of \f$\gamma_{ij}\f$s \ref multilevelelements "here") of the system
+ *
+ * \todo some static sanity checks of `VP` and `VL` in view of `NL` should be done
+ */
 template<int NL, typename VP, typename VL, typename AveragingType>
 class PumpedLossyMultiLevelSch 
   : public multilevel::HamiltonianSch<NL,VP>,
@@ -293,8 +304,6 @@ class PumpedLossyMultiLevelSch
   // The ordering becomes important here
 {
 public:
-  // NEEDS_WORK some static sanity checks of VP and VL in view of NL should be done
-
   typedef typename multilevel::    LevelsMF<NL>::type     Levels;
   typedef typename multilevel::RealLevelsMF<NL>::type RealLevels;
 
@@ -315,7 +324,7 @@ namespace multilevel {
 
 #define RETURN_type typename MultiLevelBase<NL>::Ptr
 
-
+/// Maker function for PumpedLossyMultiLevelSch
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 inline
 RETURN_type
@@ -329,7 +338,7 @@ makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas,
   return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType> >(deltas,etas,gammas,a...);
 }
 
-
+/// \overload
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 inline
 RETURN_type
@@ -338,7 +347,7 @@ makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingCons
   return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,a...);
 }
 
-
+/// \overload
 template<int NL, typename VP, typename VL>
 inline
 RETURN_type
@@ -347,7 +356,7 @@ makePumpedLossySch(const blitz::TinyVector<double,NL>& deltas, const VP& etas, c
   return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,keyTitle,NL,offDiagonals);
 }
 
-
+/// \overload
 template<int NL, typename VP, typename VL>
 inline
 RETURN_type

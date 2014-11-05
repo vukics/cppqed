@@ -75,6 +75,11 @@ Here, \f$m(x)\f$ is the mode function of the pump, which can be \f$\sin(Kx),\;\c
 
 \note Simulation of moving particles is inherently hard, since the Schrödinger equation is a partial differential equation, and we inevitably have to deal with both position and momentum representations, which are linked by \link fft Fourier transformation\endlink. In quantum optics, however, the particles are mostly moving in potentials created by electromagnetic fields, mainly standing and running waves. In this case we can stay in momentum space during the whole time evolution. A strange consequence is that in numerical physics the harmonic oscillator seems to be hard, while the cosine potential is easy.
 
+PumpedLossyMultiLevelSch {#genericelementsfreesmultilevel}
+------------------------
+
+\see \ref multilevelbundle
+
 Interactions {#genericelementsinteractions}
 ============
 
@@ -94,3 +99,10 @@ All the operators are automatically taken in interaction picture, if the underly
 | ParticleTwoModes | Mode – Mode – Particle | \f$\sqrt{U_{01}U_{02}}\lp m_1(x)m_2(x)\,a_1^\dagger a_2+\hermConj\rp\f$ | n/a |
 
 \see [This issue](http://sourceforge.net/p/cppqed/bugs/1/)
+
+MLJC {#genericelementsinteractionsmultilevel}
+----
+
+<b>m</b>ulti-<b>l</b>evel <b>J</b>aynes-<b>C</b>ummings
+
+\see \ref multilevelbundle

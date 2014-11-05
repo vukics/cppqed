@@ -671,7 +671,7 @@ LAYOUT_FILE            =
 # search path. Do not use file names with spaces, bibtex cannot handle them. See
 # also \cite for info how to create references.
 
-CITE_BIB_FILES         = @CMAKE_CURRENT_SOURCE_DIR@/doc/cqed.bib
+CITE_BIB_FILES         = @core_SOURCE_DIR@/doc/cqed.bib
 
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -744,6 +744,7 @@ WARN_LOGFILE           =
 
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/genericElements.markdown \
+                         @CMAKE_CURRENT_SOURCE_DIR@/doc/multiLevelBundle.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode_.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/frees/Qbit.h \
@@ -751,6 +752,9 @@ INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/frees/Spin.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/frees/Particle.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/frees/Particle_.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/MultiLevel.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/frees/MultiLevel_.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/interactions/MLJC.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/
 
 # This tag can be used to specify the character encoding of the source files
