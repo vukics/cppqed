@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Defines the mode-bundle (tackling the dynamics of a single harmonic-oscillator mode)}
+/// \briefFile{Defines the \ref genericelementsfreesmode bundle (tackling the dynamics of a single harmonic-oscillator mode)}
 // -*- C++ -*-
 #ifndef CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
 #define CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
@@ -19,7 +19,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-/// Contains helpers for the mode-bundle
+/// Contains helpers for the \ref genericelementsfreesmode bundle
 namespace mode {
 
 const std::string keyTitle="Mode";

@@ -1,3 +1,4 @@
+/// \briefFile{Defines interaction elements of the \ref multilevelbundle "MultiLevel bundle" }
 // Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 // -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_MLJC_H_INCLUDED
@@ -13,6 +14,7 @@
 #include <boost/fusion/algorithm/transformation/transform.hpp>
 
 
+/// Class representing an elementary coupling term (a \f$g_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
 template<int N1, int N2>
 class Coupling : public multilevel::Storage<dcomp>, public tmptools::pair_c<N1,N2>
 {
@@ -80,6 +82,7 @@ private:
 } // mljc
 
 
+/** \cond */
 
 #define BIG_NAMESPACE_NAME                      mljc
 #define BIG_CLASS_NAME                          MLJC
@@ -90,5 +93,6 @@ private:
 
 #include "details_BinaryInteractionGenerator.h"
 
+/** \endcond */
 
 #endif // CPPQEDELEMENTS_INTERACTIONS_MLJC_H_INCLUDED

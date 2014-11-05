@@ -27,7 +27,7 @@ void export_15_ParsStochasticTrajectory()
   class_<ParsStochastic, bases<ParsEvolved> >
     (
       "ParsStochastic",
-      "Wrapper of :core:`trajectory::ParsStochasticTrajectory`",
+      "Wrapper of :core:`trajectory::ParsStochastic`",
       init<parameters::ParameterTable&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )

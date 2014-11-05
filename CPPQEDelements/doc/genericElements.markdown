@@ -75,6 +75,11 @@ Here, \f$m(x)\f$ is the mode function of the pump, which can be \f$\sin(Kx),\;\c
 
 \note Simulation of moving particles is inherently hard, since the Schrödinger equation is a partial differential equation, and we inevitably have to deal with both position and momentum representations, which are linked by \link fft Fourier transformation\endlink. In quantum optics, however, the particles are mostly moving in potentials created by electromagnetic fields, mainly standing and running waves. In this case we can stay in momentum space during the whole time evolution. A strange consequence is that in numerical physics the harmonic oscillator seems to be hard, while the cosine potential is easy.
 
+PumpedLossyMultiLevelSch {#genericelementsfreesmultilevel}
+------------------------
+
+\see \ref multilevelbundle
+
 Interactions {#genericelementsinteractions}
 ============
 
@@ -101,3 +106,10 @@ The classes ParticleOrthogonalToCavity and ParticleAlongCavity come with several
 
 \note In the term \f$\abs{m(x)}^2\f$, constant terms are dropped. That means this term is not present for the complex mode functions \f$\exp(\pm ikx)\f$, and for \f$\text{sin}(kx)\f$ (\f$\text{cos}(kx)\f$), this term is
 \f$-(+)\text{cos}(2kx)/2\f$. The constant term can be added manually by shifting the cavity frequency accordingly, as done in the script `1particle1mode` and others.
+
+MLJC {#genericelementsinteractionsmultilevel}
+----
+
+<b>m</b>ulti-<b>l</b>evel <b>J</b>aynes-<b>C</b>ummings
+
+\see \ref multilevelbundle
