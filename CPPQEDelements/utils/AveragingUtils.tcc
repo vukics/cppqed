@@ -103,7 +103,13 @@ void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) con
     for (int i=0; i<dim; ++i) for (int j=i+1; j<dim; ++j, idx+=2) matrix(j,i)=conj(matrix(i,j)=dcomp(averages(idx),averages(idx+1)));
   }
   
-  averages(averages.size()-1)=quantumdata::negPT(rho,V());
+  averages(averages.size()-1)=
+#ifndef   DO_NOT_USE_FLENS
+    quantumdata::negPT(rho,V())
+#else  // DO_NOT_USE_FLENS
+    0
+#endif // DO_NOT_USE_FLENS
+    ;
   
 }
 
