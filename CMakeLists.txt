@@ -114,7 +114,7 @@ if(BUNDLED_FLENS)
     flens
     GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git
     # Bug in HEAD
-    GIT_TAG "846b5a3"
+    GIT_TAG "757834a"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
     BUILD_COMMAND
