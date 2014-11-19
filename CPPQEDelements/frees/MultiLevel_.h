@@ -79,8 +79,7 @@ template<typename T>
 class Storage
 {
 public:
-  Storage(const T& value) : value_(value) {} //< Deliberately not explicit
-  Storage() : value_() {}
+  Storage(const T& value) : value_(value) {}
 
   const T& get() const {return value_;}
   void set(const T& value) {value_=value;}
@@ -95,8 +94,7 @@ template<>
 class Storage<double>
 {
 public:
-  Storage(double value) : value_(value) {} //< Deliberately not explicit
-  Storage() : value_() {}
+  Storage(double value) : value_(value) {}
 
   double get() const {return value_;}
   void set(double value) {value_=value;}
@@ -131,7 +129,10 @@ template<int I, int J>
 class Pump : public Storage<dcomp>, public tmptools::pair_c<I,J>
 {
 public:
-  using Storage<dcomp>::Storage;
+  typedef Storage<dcomp> Base;
+
+  Pump(const dcomp& value) : Base(value) {}
+  Pump() : Base(dcomp()) {}
 
 };
 
@@ -196,7 +197,10 @@ template<int I, int J>
 class Decay : public Storage<double>, public tmptools::pair_c<I,J>
 {
 public:
-  using Storage<double>::Storage;
+  typedef Storage<double> Base;
+
+  Decay(double value) : Base(value) {}
+  Decay() : Base(0) {}
 
 };
 

@@ -19,8 +19,10 @@ template<int I, int J>
 class Coupling : public multilevel::Storage<dcomp>, public tmptools::pair_c<I,J>
 {
 public:
-  using multilevel::Storage<dcomp>::Storage;
+  typedef multilevel::Storage<dcomp> Base;
 
+  Coupling(const dcomp& value) : Base(value) {}
+  Coupling() : Base(dcomp()) {}
 };
 
 
