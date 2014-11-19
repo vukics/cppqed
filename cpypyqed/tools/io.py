@@ -38,10 +38,43 @@ def load_statevector(filename):
 
   :param filename:
           Path to the C++QED state vector file that should be loaded.
-          :class:`IOError` is raised if the required `cpypyqed.io` module is not
-          available.
   :rtype: quantumstate.StateVectorTrajectory
   """
   states, times = read(filename)[1:]
   return quantumstate.StateVectorTrajectory(states,times)
 
+def evs_header(filename):
+  """
+  Load the header of a C++QED trajectory file from the given location. The file
+  can be bzip2-compressed if the bz2 module is available.
+
+  *Usage*
+      >>> header = evs_header("ring.sv")
+
+  :param filename:
+          Path to the C++QED state vector file that should be loaded.
+          :class:`IOError` is raised if the required `cpypyqed.io` module is not
+          available.
+  :rtype: string
+  """
+  if filename.endswith("bz2"):
+    try:
+      import bz2
+    except ImportError:
+      raise IOError("{filename} is compressed, but the bz2 python module could not be loaded.".format(filename=filename))
+    f = bz2.BZ2File(filename)
+  else:
+    f = open(filename)
+
+  result=""
+  notDone=True
+  while notDone:
+    try:
+      line = f.next()
+    except StopIteration:
+      break
+    if line.strip(" \n") and not line.startswith("#"):
+      notDone=False
+    else:
+      result+=line
+  return result
