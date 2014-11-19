@@ -65,7 +65,7 @@ public:
   
   explicit DynamicsBase(const ComplexFreqs& complexFreqs) : DynamicsBase(emptyRF,complexFreqs) {}
   explicit DynamicsBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : DynamicsBase(RealFreqs(rf),ComplexFreqs(cf)) {} ///< Constructor with initializer lists
-  explicit DynamicsBase(ComplexFreqsInitializer cf) : DynamicsBase(RealFreqsInitializer(),cf) {}
+  explicit DynamicsBase(ComplexFreqsInitializer cf) : DynamicsBase({},cf) {}
   explicit DynamicsBase(RF rf, CF cf=CF()) : DynamicsBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer{} : ComplexFreqsInitializer{cf}) {}
   explicit DynamicsBase(CF cf) : DynamicsBase(ComplexFreqsInitializer{cf}) {}
            DynamicsBase(RealFreqsInitializer rf, CF cf) : DynamicsBase(rf,{cf}) {}
@@ -95,38 +95,6 @@ private:
 
 };
 
-/*
-// not parsed correctly by doxygen 1.8.5
-class X
-{
-public:
-  typedef std::initializer_list<double> DoublesInitializer;
-  typedef std::initializer_list<int   >    IntsInitializer;
-
-  X(DoublesInitializer d, IntsInitializer i={}) : d_(d), i_(i) {}
-  X(IntsInitializer i) : X({},i) {}
-
-private:
-  const std::list<double> d_;
-  const std::list<int   > i_;
-};
-
-
-// parsed correctly by doxygen 1.8.5
-class Y
-{
-public:
-  typedef std::initializer_list<double> DoublesInitializer;
-  typedef std::initializer_list<int   >    IntsInitializer;
-
-  Y(DoublesInitializer d, IntsInitializer i={}) : d_(d), i_(i) {}
-  Y(IntsInitializer i) : Y(DoublesInitializer(),i) {}
-
-private:
-  const std::list<double> d_;
-  const std::list<int   > i_;
-};
-*/
 
 } // structure
 

@@ -55,7 +55,7 @@ public:
 
   Interaction(const Frees& frees, const ComplexFreqs& complexFreqs) : Interaction(frees,emptyRF,complexFreqs) {}
   Interaction(const Frees& frees, RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : Interaction(frees,RealFreqs(rf),ComplexFreqs(cf)) {}
-  Interaction(const Frees& frees, ComplexFreqsInitializer cf) : Interaction(frees,RealFreqsInitializer(),cf) {}
+  Interaction(const Frees& frees, ComplexFreqsInitializer cf) : Interaction(frees,{},cf) {}
   Interaction(const Frees& frees, RF rf, CF cf=CF()) : Interaction(frees,RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer{} : ComplexFreqsInitializer{cf}) {}
   Interaction(const Frees& frees, CF cf) : Interaction(frees,ComplexFreqsInitializer{cf}) {}
   Interaction(const Frees& frees, RealFreqsInitializer rf, CF cf) : Interaction(frees,rf,{cf}) {}

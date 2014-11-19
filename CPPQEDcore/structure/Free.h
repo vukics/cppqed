@@ -53,7 +53,7 @@ public:
 
   Free(size_t dim, const ComplexFreqs& complexFreqs) : Free(dim,emptyRF,complexFreqs) {}
   Free(size_t dim, RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : Free(dim,RealFreqs(rf),ComplexFreqs(cf)) {}
-  Free(size_t dim, ComplexFreqsInitializer cf) : Free(dim,RealFreqsInitializer(),cf) {}
+  Free(size_t dim, ComplexFreqsInitializer cf) : Free(dim,{},cf) {}
   Free(size_t dim, RF rf, CF cf=CF()) : QuantumSystem<1>(dim), DynamicsBase(rf,cf) {}
   Free(size_t dim, CF cf) : QuantumSystem<1>(dim), DynamicsBase(cf) {}
   Free(size_t dim, RealFreqsInitializer rf, CF cf) : Free(dim,rf,{cf}) {}
