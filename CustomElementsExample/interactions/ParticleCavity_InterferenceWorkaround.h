@@ -25,13 +25,8 @@ struct UnotEtaeffSignDiscrepancy : public cpputils::Exception {};
 
 
 
-typedef quantumoperator::Tridiagonal<2> Tridiagonal;
-
-
 typedef quantumoperator::TridiagonalHamiltonian<2,true> TridiagonalHamiltonian;
 
-
-typedef TridiagonalHamiltonian::Tridiagonals Tridiagonals;
 
 class InterferenceBase
   : private boost::base_from_member<const ModeFunction>, 

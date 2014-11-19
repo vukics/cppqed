@@ -43,7 +43,7 @@ apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename qua
 
 /// Same as Tridiagonal::furnishWithFreqs, but returns a copy of its first argument furnished with frequencies \related Tridiagonal
 template<int RANK>
-const Tridiagonal<RANK>
+Tridiagonal<RANK>
 furnishWithFreqs(const Tridiagonal<RANK>& tridiag,                        ///< Tridiagonal whose copy is to be furnished with frequencies
                  const typename Tridiagonal<RANK>::Diagonal& mainDiagonal ///< main diagonal determining the frequencies to be used for furnishing
                 );
@@ -334,7 +334,7 @@ apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename qua
 /// Direct product \related Tridiagonal
 template<int RANK1, int RANK2>
 inline
-const Tridiagonal<RANK1+RANK2>
+Tridiagonal<RANK1+RANK2>
 operator*(const Tridiagonal<RANK1>& t1, const Tridiagonal<RANK2>& t2)
 {
   return Tridiagonal<RANK1+RANK2>(t1,t2);
@@ -344,21 +344,21 @@ operator*(const Tridiagonal<RANK1>& t1, const Tridiagonal<RANK2>& t2)
 /// Returns the anti-Hermitian operator \f$T-T^\dagger\f$ \related Tridiagonal
 template<int RANK>
 inline 
-const Tridiagonal<RANK>
+Tridiagonal<RANK>
 tridiagMinusHC     (const Tridiagonal<RANK>& tridiag) {return tridiag-tridiag.hermitianConjugate();}
 
 
 /// Returns the Hermitian operator \f$T+T^\dagger\f$ \related Tridiagonal
 template<int RANK>
 inline 
-const Tridiagonal<RANK>
+Tridiagonal<RANK>
 tridiagPlusHC      (const Tridiagonal<RANK>& tridiag) {return tridiag+tridiag.hermitianConjugate();}
 
 
 /// Returns the anti-Hermitian operator \f$(T+T^\dagger)/i\f$ \related Tridiagonal
 template<int RANK>
 inline 
-const Tridiagonal<RANK>
+Tridiagonal<RANK>
 tridiagPlusHC_overI(const Tridiagonal<RANK>& tridiag) {return tridiagPlusHC(tridiag)/DCOMP_I;}
 
 

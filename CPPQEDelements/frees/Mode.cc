@@ -73,9 +73,8 @@ const Tridiagonal pumping(const dcomp& eta, size_t dim)
 namespace {
 
 
-const Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
-// Here we use runtime dispatching because runtime dispatching will
-// anyway happen at the latest in some maker function.
+Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
+// Here we use runtime dispatching because runtime dispatching will anyway happen at the latest in some maker function.
 {
   bool isPumped=isNonZero(eta);
   if (isNonZero(z)) {

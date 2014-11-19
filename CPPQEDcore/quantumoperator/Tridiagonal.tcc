@@ -179,7 +179,7 @@ Tridiagonal<RANK>& Tridiagonal<RANK>::propagate(double t)
 
 
 template<int RANK>
-const Tridiagonal<RANK>
+Tridiagonal<RANK>
 furnishWithFreqs(const Tridiagonal<RANK>& tridiag, const typename Tridiagonal<RANK>::Diagonal& mainDiagonal)
 {
   Tridiagonal<RANK> res(tridiag);

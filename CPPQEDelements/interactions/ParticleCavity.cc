@@ -32,7 +32,7 @@ const particlecavity::Tridiagonals dispersive(mode::Ptr mode, particle::Ptr part
   return res;
 }
 
-const particlecavity::Tridiagonal interfericOneModeFN(mode::Ptr mode, particle::Ptr particle, double etaeff, const ModeFunction& mf)
+particlecavity::Tridiagonal interfericOneModeFN(mode::Ptr mode, particle::Ptr particle, double etaeff, const ModeFunction& mf)
 {
   return etaeff*tridiagPlusHC_overI(aop(mode)*mfNKX(particle,mf));
 }

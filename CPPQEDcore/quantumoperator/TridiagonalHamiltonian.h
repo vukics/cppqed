@@ -36,7 +36,8 @@ protected:
 
   typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any TimeDependence.
 
-  TDH_Base(const Tridiagonals& hOverIs) : hOverIs_(hOverIs) {}
+  template<typename... ArgumentPack>
+  TDH_Base(ArgumentPack&&... a) : hOverIs_(a...) {}
 
   const Tridiagonals& getH_OverIs() const {return hOverIs_;}
         Tridiagonals& getH_OverIs()       {return const_cast<Tridiagonals&>(static_cast<const TDH_Base*>(this)->getH_OverIs());}
@@ -83,8 +84,10 @@ public:
   typedef typename Base::Tridiagonal  Tridiagonal ;
   typedef typename Base::Tridiagonals Tridiagonals;
 
-  TridiagonalHamiltonian(const Tridiagonals& hOverIs) : Base(hOverIs) {} ///< Generic constructor
-  TridiagonalHamiltonian(const Tridiagonal & hOverI ) : Base(Tridiagonals(1,hOverI)) {} ///< \overload
+  template<typename... ArgumentPack>
+  TridiagonalHamiltonian(ArgumentPack&&... a) : Base(a...) {} ///< Generic constructor
+
+  TridiagonalHamiltonian(Tridiagonal&& hOverI ) : TridiagonalHamiltonian(1,hOverI) {} ///< \overload
 
 };
 
