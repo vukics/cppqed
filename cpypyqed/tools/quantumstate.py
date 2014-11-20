@@ -6,7 +6,6 @@ behave more pythonic. In fact, both these classes are derived from `numpy.ndarra
 The relevant classes are:
     * :class:`StateVector`
     * :class:`DensityOperator`
-    * :class:`StateVectorTrajectory`
 """
 
 import numpy
@@ -455,138 +454,8 @@ class StateVector(QuantumState):
     def __pow__(self, other):
       if type(other)==type(self):
         return self.outer(other)
-      elif type(other)==int:
+      else:
         return numpy.ndarray.__pow__(self,other)
-
-
-class StateVectorTrajectory(numpy.ndarray):
-    """
-    A class holding StateVectors for different points of time.
-
-    :param data:
-            Some nested structure which holds state vector like arrays for
-            different points of time.
-
-    :param double time: (optional)
-            An array which specifies the point of time for every state
-            vector. This array must have as many entries as there are state
-            vectors.
-
-    :param \*\*kwargs:
-            Any other argument that a numpy array takes. E.g. ``copy=False`` can
-            be used so that the StateVectorTrajectory shares the data storage
-            with the given numpy array.
-
-    Most methods are simple mapped to all single StateVectors. For more
-    documentation regarding these methods look into the docstrings of the
-    corresponding :class:`StateVector` methods.
-    """
-    def __new__(cls, data, time=None, **kwargs):
-        array = numpy.array(data, **kwargs)
-        array = numpy.asarray(array).view(cls)
-        if time is None:
-            array.time = numpy.array([sv.time for sv in data])
-        else:
-            array.time = time
-        svs = [None]*array.shape[0]
-        for i, entry in enumerate(array):
-            svs[i] = StateVector(entry, time=array.time[i], copy=True)
-        array.statevectors = svs
-        return array
-
-    def __array_finalize__(self, obj):
-        self.dimensions = obj.shape[1:]
-
-    def map(self, func, svt=True):
-        """
-        Apply the given function to every single StateVector.
-
-        *Usage*
-            >>> norm = svt.map(lambda sv:sv.norm())
-
-        :paramter func:
-                Function that takes a StateVector as argument.
-
-        :parameter bool svt: (optional)
-                If svt is True, the return value will be an instance of
-                StateVectorTrajectory.
-        """
-        svs = [None]*self.shape[0]
-        for i, sv in enumerate(self.statevectors):
-            svs[i] = func(sv)
-        if svt:
-            return StateVectorTrajectory(svs)
-        else:
-            return svs
-
-    def norm(self):
-        """
-        Return a list of norms for every single StateVector.
-
-        See also: :meth:`StateVector.norm`
-        """
-        return self.map(lambda sv:sv.norm(), False)
-
-    def normalize(self):
-        """
-        Return a StateVectorTrajectory where all StateVectors are normalized.
-
-        See also: :meth:`StateVector.normalize`
-        """
-        return self.map(lambda sv:sv.normalize())
-
-    def reduce(self, indices, norm=True):
-        """
-        Return a StateVectorTrajectory where all StateVectors are reduced.
-
-        See also: :meth:`StateVector.reduce`
-        """
-        return self.map(lambda sv:sv.reduce(indices, norm=norm))
-
-    def fft(self, axis=0):
-        """
-        Return a StateVectorTrajectory whith Fourier transformed StateVectors.
-
-        See also: :meth:`StateVector.fft`
-        """
-        return self.map(lambda sv:sv.fft(axis))
-
-    def expvalue(self, operator, indices=None, multi=False, titles=None):
-        """
-        Calculate the expectation value of the operator for all StateVectors.
-
-        :returns:
-                An :class:`.expvalues.ExpectationValuesTrajectory`
-                instance.
-
-        See also: :meth:`StateVector.expvalue`
-        """
-        evs = self.map(lambda sv:sv.expvalue(operator, indices, multi=multi),
-                       False)
-        if not multi:
-            return expvalues.ExpectationValueTrajectory(evs, self.time, titles)
-        evs = numpy.array(evs).swapaxes(0,1)
-        return expvalues.ExpectationValueCollection(
-                            evs, self.time, titles, copy=False)
-
-    def diagexpvalue(self, operator, indices=None, multi=False, titles=None):
-        """
-        Calculate the expectation value of the diagonal operator for all SVs.
-
-        :returns:
-                An :class:`.expvalues.ExpectationValuesTrajectory`
-                instance.
-
-        See also: :meth:`StateVector.diagexpvalue`
-        """
-        evs = self.map(lambda sv:sv.diagexpvalue(operator, indices,
-                            multi=multi), False)
-        if not multi:
-            return expvalues.ExpectationValueTrajectory(evs, self.time, titles)
-        evs = numpy.array(evs).swapaxes(0,1)
-        return expvalues.ExpectationValueCollection(
-                            evs, self.time, titles, copy=False)
-
 
 def norm(array):
     """

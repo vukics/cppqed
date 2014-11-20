@@ -92,34 +92,10 @@ class StateVectorTestCase(unittest.TestCase):
         self.assertEqual(len(sv_new), 10)
 
 
-class StateVectorTrajectoryTestCase(unittest.TestCase):
-    def sv(self, t, points=16):
-        X = numpy.linspace(-numpy.pi, numpy.pi, points)
-        return quantumstate.StateVector(numpy.sin(X)*numpy.exp(-t), time=t)
-
-    def test_creation(self):
-        t = numpy.linspace(0,5,20)
-        sv = quantumstate.StateVectorTrajectory(map(self.sv, t))
-        self.assertEqual(sv.shape, (20,16))
-
-    def test_diagexpvalue(self):
-        t = numpy.linspace(0,5,20)
-        sv = quantumstate.StateVectorTrajectory(map(self.sv, t))
-        X = numpy.arange(16)
-        ev = sv.diagexpvalue(X)
-        self.assert_(isinstance(ev, expvalues.ExpectationValueTrajectory))
-        self.assertEqual(ev.shape, (20,))
-
-        ev = sv.diagexpvalue((X,X+2), multi=True)
-        self.assert_(isinstance(ev, expvalues.ExpectationValueCollection))
-        self.assertEqual(ev.shape, (2,20))
-
-
 def suite():
     load = unittest.defaultTestLoader.loadTestsFromTestCase
     suite = unittest.TestSuite([
-            load(StateVectorTestCase),
-            load(StateVectorTrajectoryTestCase)
+            load(StateVectorTestCase)
             ])
     return suite
 
