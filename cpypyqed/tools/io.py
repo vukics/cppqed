@@ -32,16 +32,32 @@ def load_evs(filename, maxevs=None):
 def load_statevector(filename):
   """
   Load a C++QED state vector file from the given location.
+  Returns a tuple with a list of state vectors and a list of times.
 
   *Usage*
-      >>> sv = load_statevector("ring.sv")
+      >>> svs,times = load_statevector("ring.sv")
 
   :param filename:
           Path to the C++QED state vector file that should be loaded.
-  :rtype: quantumstate.StateVectorTrajectory
+  :rtype: tuple
   """
-  states, times = read(filename)[1:]
-  return quantumstate.StateVectorTrajectory(states,times)
+  svs,times = read(filename)[1:]
+  return [quantumstate.StateVector(sv[0],time=sv[1]) for sv in zip(svs,times)],times
+
+def load_densityoperator(filename):
+  """
+  Load a C++QED state vector file from the given location.
+  Returns a tuple with a list of densityoperators and a list of times.
+
+  *Usage*
+      >>> svs,times = load_statevector("ring.sv")
+
+  :param filename:
+          Path to the C++QED state vector file that should be loaded.
+  :rtype: tuple
+  """
+  svs,times = read(filename)[1:]
+  return [quantumstate.DensityOperator(sv[0],time=sv[1]) for sv in zip(svs,times)],times
 
 def evs_header(filename):
   """
