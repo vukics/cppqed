@@ -29,6 +29,7 @@ using namespace structure::freesystem; using structure::NoTime;
 
 typedef boost::shared_ptr<const ModeBase> Ptr;
 
+const Tridiagonal aop(size_t dim);
 const Tridiagonal aop(Ptr);
 const Tridiagonal nop(Ptr);
 
@@ -122,8 +123,7 @@ public:
 
   Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
   Hamiltonian(const dcomp& zSch,                  const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
-  // The trailing dummy argument is there to cause a _compile_time_
-  // (and not merely linking time) error in case of misuse
+  // The trailing dummy argument is there to cause a _compile_time_ (and not merely linking time) error in case of misuse
 
 protected:
   const dcomp& get_zSch() const {return zSch_;}
@@ -132,9 +132,9 @@ protected:
   const dcomp& get_eta() const {return eta_;}
 
 private:
-  const dcomp zSch_,
-  // z_=kappa_-I*delta_ --- zSch_ is the part appearing in the
-  // tridiagonal hamiltonian, zI_ is appearing in the frequencies.
+  const dcomp
+    zSch_,
+  // z_=kappa_-I*delta_ --- zSch_ is the part appearing in the tridiagonal Hamiltonian, zI_ is appearing in the frequencies.
     eta_;
   const size_t dim_;
 

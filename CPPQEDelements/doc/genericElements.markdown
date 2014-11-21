@@ -28,6 +28,9 @@ A single harmonic-oscillator mode that might be driven and interact with a reser
 | PumpedLossyMode | \f$i\lp\eta a^\dagger\,e^{z\,t}-\eta^* a\,e^{-z\,t}\rp\f$ | = LossyMode | ” | ” |
 | PumpedLossyModeUIP | LossyModeUIP + PumpedMode | = Mode | ” | ” |
 | PumpedLossyModeSch | LossyModeUIP + PumpedModeSch | n/a | ” | ” |
+| HomodynedMode | ModeSch or PumpedModeSch | n/a | \f$J_\pm=A_\text{homodyne}+\sqrt{2\kappa\begin{Bmatrix}n_\text{Th}+1\\n_\text{Th}\end{Bmatrix}}\;\begin{Bmatrix}a\\a^\dagger\end{Bmatrix}\f$ | ” |
+
+\note HomodynedMode has the same Liouvillean as LossyMode, only in a different unravelling, so that the trajectories are different
 
 Qbit {#genericelementsfreesqbit}
 ----
