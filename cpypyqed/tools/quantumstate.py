@@ -451,6 +451,25 @@ class StateVector(QuantumState):
         """
         return StateVector(numpy.multiply.outer(self, array))
 
+    def actwith(self,operatorlist,dims):
+      r"""
+      Act with a list of operators on the given dimensions of the state.
+
+      :param operatorlist:
+        The list of operators
+      :param dims:
+        List of dimensions on which to act with the operators (must be the same length as `operators`)
+      :returns:
+        The new quantumstate
+      """
+
+      assert len(operatorlist) == len(dims)
+      einsum_args=tuple(i for sub in [(o,[2*d,2*d+1]) for o,d in zip(operatorlist,dims)] for i in sub)
+      out_dims=range(0,self.ndim*2,2)
+      for d in dims: out_dims[d]+=1
+      einsum_args+=(self,out_dims)
+      return numpy.einsum(*einsum_args)
+
     def __pow__(self, other):
       if type(other)==type(self):
         return self.outer(other)
