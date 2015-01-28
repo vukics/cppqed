@@ -4,6 +4,8 @@ This module provides convenient methods for creating initial conditions.
 At the moment the following initial conditions are implemented:
     * :func:`gaussian`
     * :func:`coherent`
+    * :func:`fock`
+    * :func:`momentum_eigen`
 """
 
 import numpy
