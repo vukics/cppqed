@@ -202,7 +202,7 @@ set(INPUTS "__init__.py" "config.py" "compilation/ActTemplate.cc"
            "compilation/CompositeTemplate.cc" "compilation/composite.py" "compilation/ondemand.py"
            "compilation/__init__.py" "compilation/CMakeListsTemplate.txt" "debug/__init__.py" "tools/__init__.py" 
            "tools/quantumstate.py" "tools/expvalues.py" "tools/utils.py" "tools/initialconditions.py" "tools/io.py"
-           "tools/test_statevector.py" "tools/passthrough.py")
+           "tools/test_statevector.py" "tools/passthrough.py" "tools/operators.py")
 
 foreach(file ${INPUTS})
   add_custom_command(TARGET cpypyqed PRE_BUILD
