@@ -468,7 +468,7 @@ class StateVector(QuantumState):
       out_dims=range(0,self.ndim*2,2)
       for d in dims: out_dims[d]+=1
       einsum_args+=(self,out_dims)
-      return numpy.einsum(*einsum_args)
+      return StateVector(numpy.einsum(*einsum_args),time=self.time)
 
     def __pow__(self, other):
       if type(other)==type(self):
