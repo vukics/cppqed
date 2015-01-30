@@ -74,7 +74,7 @@ if(PYTHONINTERP_FOUND)
         list(GET _SCIPY_VERSION_LIST 1 SCIPY_VERSION_MINOR)
         list(GET _SCIPY_VERSION_LIST 2 SCIPY_VERSION_PATCH)
         math(EXPR SCIPY_VERSION_DECIMAL
-            "(${SCIPY_VERSION_MAJOR} * 10000) + (${SCIPY_VERSION_MINOR} * 100) + ${SCIPY_VERSION_PATCH}")
+            "(${SCIPY_VERSION_MAJOR} * 10000) + (${SCIPY_VERSION_MINOR} * 100)")
 
         find_package_message(SciPy
             "Found SciPy: version \"${SCIPY_VERSION}\" ${SCIPY_INCLUDE_DIRS}"
