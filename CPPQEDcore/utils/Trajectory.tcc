@@ -96,6 +96,7 @@ protected:
 
 };
 
+/** \todo The present design doesn’t provide real modularity, for this we would need a maker class for DisplayAndAutostopHandler. */
 const DisplayAndAutostopHandler::Ptr makeDisplayAndAutostopHandler(const Trajectory&, double autoStopEpsilon, unsigned autoStopRepetition);
 
 bool restoreState(Trajectory&, const std::string&, const std::string&, const std::string&);

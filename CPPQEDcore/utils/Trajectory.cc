@@ -133,7 +133,7 @@ auto trajectory::details::makeDisplayAndAutostopHandler(const Trajectory& traj, 
         iss.str(oss.str());
       }
 
-      { double t; iss>>t; } // eat time
+      { double t, dtDid; iss>>t>>dtDid; } // eat time and dtDid
 
       if (!averages_.size()) { // This means that no display has yet occured: the number of averages must be determined
         size_t size(0);
