@@ -238,7 +238,7 @@ private:
   // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters? This would be needed to fuse fillJS and fillJRS into a template together with the helper classes below
 
   void   flipStrategy(StateVectorLow& psi, size_t i) const {psi*=sqrt(2.*gamma_parallel_); psi(i)*=-1.;}
-  double flipRateStrategy(const LazyDensityOperator&) const {return 2*gamma_parallel_;} // Being a member is somewhat superfluous here
+  double flipRateStrategy(const LazyDensityOperator&) const {return -1;} // Being a member is somewhat superfluous here
 
   class  JS_helper;
   class JRS_helper;
