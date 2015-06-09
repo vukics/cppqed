@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2015. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines i/oarchive types depending on the #DO_NOT_USE_BOOST_SERIALIZATION macro}
 #ifndef   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
