@@ -115,9 +115,8 @@ if(BUNDLED_FLENS)
   include(ExternalProject)
   ExternalProject_Add(
     flens
-    GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git
-    # Bug in HEAD
-    GIT_TAG "757834a"
+    GIT_REPOSITORY https://github.com/PiQuer/FLENS.git
+    GIT_TAG "public"
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
     BUILD_COMMAND
