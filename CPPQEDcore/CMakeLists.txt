@@ -256,6 +256,13 @@ else( CPPQED_SERIALIZATION_FOUND )
   message(STATUS "Optional support for binary statevector output disabled.")
 endif( CPPQED_SERIALIZATION_FOUND )
 
+# Doxygen
+find_package(Doxygen 1.8)
+if(DOXYGEN_FOUND AND NOT DOXYGEN_DOT_FOUND)
+    set(DOXYGEN_FOUND 0)
+    message(STATUS "graphviz is needed to build the documentation, disabling Doxylink")
+endif()
+
 set(PRIVATE_LIBS ${PRIVATE_LIBS} ${GSL_LIBRARIES})
 
 #! \file
@@ -482,9 +489,9 @@ set_package_properties(GSL PROPERTIES URL "http://www.gnu.org/software/gsl/"
                                 TYPE REQUIRED
                                 PURPOSE "Used as implementation of an ODE solver and random number generator.")
 set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
-                                DESCRIPTION "Generate documentation from source code"
+                                DESCRIPTION "Generate documentation from source code."
                                 TYPE OPTIONAL
-                                PURPOSE "Generation of API documentation.")
+                                PURPOSE "Generation of API documentation. Note that you also need the graphviz package to build the documentation.")
 add_feature_info("FLENS" CPPQED_FLENS_FOUND "compile framework with FLENS support.")
 add_feature_info("Serialization" CPPQED_SERIALIZATION_FOUND "needed for binary statevector output." )
 if(NOT ${CPPQED_MONOLITHIC})

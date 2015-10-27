@@ -405,7 +405,6 @@ endmacro()
 #! The template `doc/Doxyfile` will be copied to `${PROJECT_NAME}_DOC_DIR`, expanding all @-variables within.
 macro(cppqed_documentation target_prefix tagfiles)
 
-  find_package(Doxygen 1.8)
   set(tagfiles ${tagfiles})
 
   if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
