@@ -48,9 +48,9 @@ Documentation {#mainpagedocumentation}
 \par Some technical terms used throughout the documentation
 \ref glossary
 
-\note This version of the online documentation reflects the `Development` branch of the git version, but delays compared to the actual state are possible.
+\note This online documentation reflects the `master` branch of the git version, which is basically equivalent to released packages.
 
-[Click here for the documentation of the master branch & released packages](http://cppqed.sourceforge.net/)
+[Click here for the documentation of the Development branch](http://cppqed.sourceforge.net/Development/)
 
 [Click here for the Milestone 9 documentation](http://cppqed.sourceforge.net/oldSphinx/)
 

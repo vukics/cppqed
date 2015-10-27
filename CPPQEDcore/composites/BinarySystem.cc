@@ -123,6 +123,8 @@ std::ostream& displayKey(std::ostream& os, size_t& i, const SSF& free0, const SS
   free1.displayKey<LA>(os,i);
   return ia.displayKey<LA>(os,i);
 }
+template std::ostream& displayKey<LA_Li>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
+template std::ostream& displayKey<LA_Av>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
 
 
 template<LiouvilleanAveragedTag LA>
@@ -130,6 +132,8 @@ size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia)
 {
   return free0.nAvr<LA>() + free1.nAvr<LA>() + ia.nAvr<LA>();
 }
+template size_t nAvr< LA_Li >(const SSF& free0, const SSF& free1, const SSI& ia); // explicit instantiation
+template size_t nAvr< LA_Av >(const SSF& free0, const SSF& free1, const SSI& ia); // explicit instantiation
 
 
 template<LiouvilleanAveragedTag LA>
