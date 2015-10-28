@@ -149,7 +149,12 @@ public:
   virtual ~Ensemble() {}
 
 protected:
+  // static helpers to constructor
+  // boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   typedef std::auto_ptr<Impl> Ptr;
+#pragma GCC diagnostic pop
   
   /// Generic constructor
   Ensemble(Ptr trajs, ///< the sequence of elements owned by the `ptr_vector`

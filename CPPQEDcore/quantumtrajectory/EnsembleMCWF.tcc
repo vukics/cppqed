@@ -10,7 +10,9 @@
 #include "ParsMCWF_Trajectory.h"
 
 
-
+// boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 template<int RANK>
 auto
 quantumtrajectory::ensemble::Base<RANK>::stateVectors(const StateVector& psi, size_t nTraj) -> std::auto_ptr<StateVectors>
@@ -22,7 +24,6 @@ quantumtrajectory::ensemble::Base<RANK>::stateVectors(const StateVector& psi, si
   
   return res.release();
 }
-
 
 template<int RANK>
 auto
@@ -37,6 +38,7 @@ quantumtrajectory::ensemble::Base<RANK>::trajectories(StateVectors& psis, Quantu
 
   return res.release();
 }
+#pragma GCC diagnostic pop
 
 
 template<int RANK>

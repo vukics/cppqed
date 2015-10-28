@@ -68,8 +68,12 @@ private:
   virtual std::ostream& logOnEnd_v(std::ostream& os) const final;
   
   // static helpers to constructor
+  // boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   static std::auto_ptr<StateVectors> stateVectors(const StateVector& psi, size_t nTraj);
   static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs);
+#pragma GCC diagnostic pop
 
   
   virtual quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
