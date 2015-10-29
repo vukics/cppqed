@@ -44,6 +44,33 @@ set(cpypyqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cpypyqed)
 
 #! @}
 
+find_package(Boost QUIET COMPONENTS python)
+find_package(PythonInterp 2 QUIET)
+if(${PYTHON_VERSION_STRING} VERSION_LESS 2.6)
+  message(WARNING "Python2 >=2.6 needed, disabling cpypyqed and testsuite.")
+  set(PYTHONINTERP_FOUND 0)
+else()
+  find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
+endif()
+find_package(Numpy QUIET)
+
+# Canopy workaround: the python interpreter is found, but not the libs and include dirs
+if(PYTHONINTERP_FOUND AND NOT PYTHONLIBS_FOUND)
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}-config" "--includes"
+    OUTPUT_VARIABLE _PYTHON_CONFIG_INCLUDES
+    RESULT_VARIABLE _PYTHON_CONFIG_SUCCESS)
+  if(_PYTHON_CONFIG_SUCCESS MATCHES 0)
+    string(REGEX REPLACE "-I(.*) .*" "\\1" PYTHON_INCLUDE_DIR ${_PYTHON_CONFIG_INCLUDES})
+    get_filename_component(_PYTHON_BASE ${PYTHON_INCLUDE_DIR} DIRECTORY)
+    get_filename_component(_PYTHON_BASE ${_PYTHON_BASE} DIRECTORY)
+    set(PYTHON_LIBRARY ${_PYTHON_BASE}/lib/libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    message(STATUS "Trying to find python library at ${PYTHON_LIBRARY}")
+    message(STATUS "Trying to find python includes at ${PYTHON_INCLUDE_DIR}")
+    find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
+  endif()
+endif()
+
+
 #! \file
 #! <!--#########################################################-->
 #! ### Compilation of dependencies
@@ -162,32 +189,6 @@ set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
 
 #! This %CMake option determines if the Python modules should be compiled.
 option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
-find_package(Boost QUIET COMPONENTS python)
-find_package(PythonInterp 2 QUIET)
-if(${PYTHON_VERSION_STRING} VERSION_LESS 2.6)
-  message(WARNING "Python2 >=2.6 needed, disabling cpypyqed and testsuite.")
-  set(PYTHONINTERP_FOUND 0)
-else()
-  find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
-endif()
-find_package(Numpy QUIET)
-
-# Canopy workaround: the python interpreter is found, but not the libs and include dirs
-if(PYTHONINTERP_FOUND AND NOT PYTHONLIBS_FOUND)
-  execute_process(COMMAND "${PYTHON_EXECUTABLE}-config" "--includes"
-    OUTPUT_VARIABLE _PYTHON_CONFIG_INCLUDES
-    RESULT_VARIABLE _PYTHON_CONFIG_SUCCESS)
-  if(_PYTHON_CONFIG_SUCCESS MATCHES 0)
-    string(REGEX REPLACE "-I(.*) .*" "\\1" PYTHON_INCLUDE_DIR ${_PYTHON_CONFIG_INCLUDES})
-    get_filename_component(_PYTHON_BASE ${PYTHON_INCLUDE_DIR} DIRECTORY)
-    get_filename_component(_PYTHON_BASE ${_PYTHON_BASE} DIRECTORY)
-    set(PYTHON_LIBRARY ${_PYTHON_BASE}/lib/libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}${CMAKE_SHARED_LIBRARY_SUFFIX})
-    message(STATUS "Trying to find python library at ${PYTHON_LIBRARY}")
-    message(STATUS "Trying to find python includes at ${PYTHON_INCLUDE_DIR}")
-    find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
-  endif()
-endif()
-
 
 # For some reason kdevelop does not recognize PYTHONLIBS_FOUND, use PYTHON_INCLUDE_DIRS instead
 if(Boost_PYTHON_FOUND AND PYTHONINTERP_FOUND AND PYTHON_INCLUDE_DIRS AND NUMPY_FOUND AND COMPILE_CPYPYQED)
