@@ -216,6 +216,8 @@ else( blitz_SERIALIZATION_FOUND )
 endif( blitz_SERIALIZATION_FOUND )
 
 # Boost (OPTIONAL_COMPONENTS does not work with Boost find_package)
+# if an old boost version is installed, then FindBoost fails if Boost_NO_BOOST_CMAKE is not set
+set(Boost_NO_BOOST_CMAKE 1)
 find_package(Boost 1.46.0 REQUIRED)
 find_package(Boost QUIET COMPONENTS serialization)
 
