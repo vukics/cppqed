@@ -20,13 +20,6 @@ namespace pythonext{
 
 PARS_GETTER_SETTER(dcomp, Pars, g)
 
-namespace {
-const jaynescummings::Ptr jc_make(const qbit::Ptr& q, const mode::Ptr& m)
-{
-  return jaynescummings::make(q,m,1);
-}
-}
-
 void export_JaynesCummings()
 {
 
