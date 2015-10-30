@@ -23,6 +23,10 @@ BOOST_PYTHON_MODULE({modulename})
      init<const {act}::InteractionPtr::element_type&>()
         [with_custodian_and_ward<1,2>()]
     )
+    // We need both type of constructors, those expecting an const Interaction& and those
+    // expecting an InteractionPtr for interactions which have been implemented with a maker function
+    // (eg JaynesCummings)
+    .def(init<{act}::InteractionPtr>()[with_custodian_and_ward<1,2>()])
   ;
   obj.attr("core_git") = std::string(CPPQED_CORE_GIT);
 
