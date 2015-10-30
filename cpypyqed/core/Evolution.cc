@@ -73,7 +73,7 @@ object py_evolve(const numeric::array &array,
     result = evolve(rho,sys,p);
   }
   else {
-    PyErr_SetString(PyExc_ValueError, "Expected array of rank" BOOST_PP_STRINGIZE(RANK) " or " BOOST_PP_STRINGIZE(2*RANK) ".");
+    PyErr_SetString(PyExc_ValueError, (std::string("Expected array of rank ") + std::to_string(RANK) + std::string(" or ") + std::to_string(2*RANK) + std::string(".")).c_str());
     throw_error_already_set();
   }
 
