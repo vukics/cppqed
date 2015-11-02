@@ -207,13 +207,31 @@ Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :
+    if (p.gamma==0 && std::abs(p.eta)==0)
+      return boost::make_shared<Qbit            >(p);
+    if (p.gamma==0)
+      return boost::make_shared<PumpedQbit      >(p);
+    if (std::abs(p.eta)==0)
+      return boost::make_shared<LossyQbit       >(p);
     return boost::make_shared<PumpedLossyQbit   >(p);
   case QMP_UIP :
+    if (p.gamma==0 && std::abs(p.eta)==0)
+      return boost::make_shared<QbitUIP         >(p);
+    if (p.gamma==0)
+      return boost::make_shared<PumpedQbitUIP   >(p);
+    if (std::abs(p.eta)==0)
+      return boost::make_shared<LossyQbitUIP    >(p);
     return boost::make_shared<PumpedLossyQbitUIP>(p);
   case QMP_SCH :
     ;
   }
-  return make_shared<PumpedLossyQbitSch>(p);
+  if (p.gamma==0 && std::abs(p.eta)==0)
+    return boost::make_shared<QbitSch         >(p);
+  if (p.gamma==0)
+    return boost::make_shared<PumpedQbitSch   >(p);
+  if (std::abs(p.eta)==0)
+    return boost::make_shared<LossyQbitSch    >(p);
+  return boost::make_shared<PumpedLossyQbitSch>(p);
 }
 
 
