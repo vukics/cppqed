@@ -2,7 +2,7 @@
 // -*- C++ -*-
 
 #include "Act.h"
-#include "Interaction.h"
+#include "InteractionFwd.h"
 
 #include <string>
 
