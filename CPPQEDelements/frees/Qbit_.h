@@ -240,5 +240,18 @@ public:
   
 };
 
+class PumpedLossyQbitWithPhaseNoise
+  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+{
+public:
+  PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossy&, double gamma_parallel);
+};
+
+class PumpedLossyQbitWithPhaseNoiseUIP
+  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+{
+public:
+  PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossy&, double gamma_parallel);
+};
 
 #endif // CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED
