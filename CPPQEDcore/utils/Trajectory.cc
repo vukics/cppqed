@@ -104,7 +104,8 @@ boost::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &f
     throw StateFileOpeningException(filename);
     // Appending to compressed state files does not work because of a bug in boost when handling multi-stream bz2 files.
     // The files can be written just fine, but cannot be read in afterwards. Hopefully this gets solved.
-    // https://svn.boost.org/trac/boost/ticket/9749 might be related, but the proposed patch does not work.
+    // The patch in https://svn.boost.org/trac/boost/ticket/9749 actually does fix the problem.
+    // See also: http://stackoverflow.com/q/32870991/1132850
     out->push(bzip2_compressor());
   }
   out->push(file);
