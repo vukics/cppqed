@@ -25,6 +25,7 @@
 #include <boost/fusion/algorithm/iteration/fold.hpp>
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
 
+#include <boost/preprocessor/repetition/enum.hpp>
 
 
 namespace blitzplusplus {
