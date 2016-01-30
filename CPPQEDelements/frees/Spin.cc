@@ -132,12 +132,12 @@ void Spin::updateU(structure::OneTime dtDid) const
 }
 
 
-void LossySpin::doActWithJ(structure::NoTime, structure::freesystem::StateVectorLow& psi) const
+void spin::Liouvillean::doActWithJ(structure::NoTime, structure::freesystem::StateVectorLow& psi) const
 {
-  double fact=sqrt(2.*getGamma());
+  double fact=sqrt(2.*gamma_);
   int ubound=psi.ubound(0);
   for (int n=0; n<ubound; ++n)
-    psi(n)=fact*sqrt((n+1)*(getTwoS()-n))*psi(n+1);
+    psi(n)=fact*sqrt((n+1)*(twoS_-n))*psi(n+1);
   psi(ubound)=0;
 }
 

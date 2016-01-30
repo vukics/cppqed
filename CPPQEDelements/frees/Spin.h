@@ -50,6 +50,22 @@ struct Pars
 };
 
 
+class Liouvillean
+  : public structure::ElementLiouvillean<1,1,false>
+{
+protected:
+  Liouvillean(size_t twoS, double gamma) : structure::ElementLiouvillean<1,1,false>("Spin","S-"), twoS_(twoS), gamma_(gamma) {}
+  
+private:
+  void   doActWithJ(structure::NoTime,       structure::freesystem::StateVectorLow     &) const ;
+  double rate      (structure::NoTime, const structure::freesystem::LazyDensityOperator&) const {return -1.;}
+
+  const size_t twoS_;
+  const double gamma_;
+  
+};
+
+
 } // spin
 
 
@@ -123,16 +139,22 @@ public:
 
 class LossySpin
   : public Spin,
-    public structure::ElementLiouvillean<1,1,false>
+    public spin::Liouvillean
 {
 public:
   
-  LossySpin(const spin::Pars& p) : Spin(p), structure::ElementLiouvillean<1,1,false>("Spin","S-") {}
+  LossySpin(const spin::Pars& p) : Spin(p), spin::Liouvillean(p.twoS,p.gamma) {}
   
-private:
+};
+
+
+class LossySpinWithout // without Hamiltonian evolution, that is, a zero-frequency spin
+  : public SpinBase,
+    public spin::Liouvillean
+{
+public:
   
-  void   doActWithJ(structure::NoTime,       structure::freesystem::StateVectorLow     &) const;
-  double rate      (structure::NoTime, const structure::freesystem::LazyDensityOperator&) const {return -1.;}
+  LossySpinWithout(const spin::Pars& p) : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim), spin::Liouvillean(p.twoS,p.gamma) {}
   
 };
 
