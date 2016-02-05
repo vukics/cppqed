@@ -142,4 +142,10 @@ void spin::Liouvillean::doActWithJ(structure::NoTime, structure::freesystem::Sta
 }
 
 
-// double rate(const LazyDensityOperator&) const;
+double spin::Liouvillean::rate(structure::NoTime, const structure::freesystem::LazyDensityOperator& matrix) const
+{
+  double res=0;
+  for (size_t n=1; n<matrix.getDimension(); ++n)
+    res+=2.*gamma_*n*(twoS_-n+1)*matrix(n);
+  return res;
+}

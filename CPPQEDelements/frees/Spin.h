@@ -58,7 +58,7 @@ protected:
   
 private:
   void   doActWithJ(structure::NoTime,       structure::freesystem::StateVectorLow     &) const ;
-  double rate      (structure::NoTime, const structure::freesystem::LazyDensityOperator&) const {return -1.;}
+  double rate      (structure::NoTime, const structure::freesystem::LazyDensityOperator& matrix) const ; // {return -1.;}
 
   const size_t twoS_;
   const double gamma_;
