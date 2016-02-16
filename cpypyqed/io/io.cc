@@ -36,7 +36,7 @@ namespace pythonext {
 namespace {
 
 template<typename A, int RANK>
-object doRead(std::ifstream &ifs)
+object doRead(std::istream *ifs)
 {
   list states;
   list times;
@@ -45,7 +45,7 @@ object doRead(std::ifstream &ifs)
   dims=0;
   A a(dims);
   AdaptiveIO<A> traj(evolved::makeIO(a));
-  while ( (ifs.peek(), !ifs.eof()) ) {
+  while ( (ifs->peek(), !ifs->eof()) ) {
     trajectory::readViaSStream(traj,ifs);
     states.append(arrayToNumpy<A,RANK>(a));
     times.append(traj.getTime());
@@ -54,20 +54,11 @@ object doRead(std::ifstream &ifs)
 }
 
 template<typename A, typename dtype, int RANK>
-void doWrite(std::ofstream *ofs, const numeric::array &a, double time)
+void doWrite(std::ostream *ofs, const numeric::array &a, double time)
 {
   A  blitz_a = numpyToArray<dtype,RANK>(a);
   AdaptiveIO<A> traj(evolved::makeIO(blitz_a, time));
   trajectory::writeViaSStream(traj,ofs);
-}
-
-template<typename T>
-void throw_file(const T &s, const std::string &f)
-{
-  if (!s.is_open()){
-    PyErr_SetString(PyExc_IOError, (std::string("Could not open ")+f).c_str());
-    throw_error_already_set();
-  }
 }
 
 void throw_rank(int r)
@@ -95,13 +86,16 @@ object read(str filename)
 {
   std::string f = extract<std::string>(filename);
 
-  std::ifstream ifs(f.c_str(),std::ios_base::binary);
-  throw_file(ifs,f);
-
-  trajectory::SerializationMetadata meta = trajectory::readMeta(ifs);
+  trajectory::SerializationMetadata meta;
+  {
+    boost::shared_ptr<std::istream> is = trajectory::openStateFileReading(f);
+    meta = trajectory::readMeta(is.get());
+  }
 
   throw_rank(meta.rank);
   throw_type(meta.typeID);
+
+  boost::shared_ptr<std::istream> is = trajectory::openStateFileReading(f);
 
   list result;
   result.append(meta);
@@ -109,21 +103,19 @@ object read(str filename)
   switch (meta.rank) {
     #define BOOST_PP_LOCAL_MACRO(n) \
       case n: \
-        if(meta.typeID=="CArray") result.extend(doRead<CArray<n>,n>(ifs)); \
-        if(meta.typeID=="DArray") result.extend(doRead<DArray<n>,n>(ifs));  \
+        if(meta.typeID=="CArray") result.extend(doRead<CArray<n>,n>(is.get())); \
+        if(meta.typeID=="DArray") result.extend(doRead<DArray<n>,n>(is.get()));  \
         break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
   }
-  ifs.close();
   return result;
 }
 
 void write(str filename, const numeric::array &array, double time)
 {
   std::string f = extract<std::string>(filename);
-  std::ofstream ofs(f.c_str(),std::ios_base::binary|std::ios_base::trunc);
-  throw_file(ofs,f);
+  boost::shared_ptr<std::ostream> ofs = trajectory::openStateFileWriting(f,std::ios_base::trunc | std::ios_base::binary);
 
   const PyArrayObject * np_array = numeric_np(array);
 
@@ -133,9 +125,9 @@ void write(str filename, const numeric::array &array, double time)
     #define BOOST_PP_LOCAL_MACRO(n)                 \
       case n:                                       \
         if(PyArray_TYPE(np_array)==NPY_DOUBLE)  \
-          doWrite<DArray<n>,double,n>(&ofs,array,time);  \
+          doWrite<DArray<n>,double,n>(ofs.get(),array,time);  \
         if(PyArray_TYPE(np_array)==NPY_CDOUBLE) \
-          doWrite<CArray<n>,dcomp,n>(&ofs,array,time);   \
+          doWrite<CArray<n>,dcomp,n>(ofs.get(),array,time);   \
         break;
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
@@ -151,6 +143,11 @@ void pyDimensionsMismatchException(const trajectory::DimensionsMismatchException
 void pyRankMismatchException(const trajectory::RankMismatchException &)
 {
   PyErr_SetString(PyExc_RuntimeError, "rank mismatch");
+}
+
+void pyStateFileOpeningException(const trajectory::StateFileOpeningException &e)
+{
+  PyErr_SetString(PyExc_IOError, (std::string("Could not open ")+e.getTag()).c_str());
 }
 
 void export_io()
@@ -176,6 +173,7 @@ R"doc(Write a state vector file.
 
   register_exception_translator<trajectory::DimensionsMismatchException>(&pyDimensionsMismatchException);
   register_exception_translator<trajectory::RankMismatchException>      (&pyRankMismatchException);
+  register_exception_translator<trajectory::StateFileOpeningException>  (&pyStateFileOpeningException);
 
   class_<trajectory::SerializationMetadata>("SerializationMetadata")
     .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)

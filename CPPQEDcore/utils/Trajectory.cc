@@ -2,16 +2,42 @@
 #include "ArrayTraits.h"
 #include "BlitzArray.h"
 #include "Trajectory.tcc"
+#include "SmartPtr.h"
 
 #include "ParsTrajectory.h"
 #include "FormDouble.tcc"
 
+#include "core_config.h"
+
+#ifndef DO_NOT_USE_BOOST_COMPRESSION
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/device/file.hpp>
+#endif // DO_NOT_USE_BOOST_COMPRESSION
+#include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <iostream>
 #include <list>
 
 
 using namespace std;
 
+
+namespace {
+
+bool isbz2(const std::string filename)
+{
+  using namespace std;
+  ifstream file(filename, ios_base::in | ios_base::binary);
+  if (file.peek() == ifstream::traits_type::eof())
+    return false;
+  string header; header.resize(3);
+  file.read(&header[0],3);
+  file.close();
+  return header=="BZh";
+}
+
+}
 
 void trajectory::run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
                      bool displayInfo, bool firstStateDisplay,
@@ -44,59 +70,92 @@ ostream& trajectory::Trajectory::displayParameters(ostream& os) const
   return displayKey_v(displayParameters_v(os)<<endl<<"# Key to data:\n# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
 }
 
+boost::shared_ptr<istream> trajectory::openStateFileReading(const std::string &filename)
+{
+#ifdef DO_NOT_USE_BOOST_COMPRESSION
+  boost::shared_ptr<ifstream> ifs = boost::make_shared<ifstream>(filename, ios_base::in | ios_base::binary);
+  if (!ifs->is_open()) throw StateFileOpeningException(filename);
+  return ifs;
+#else
+  using namespace boost::iostreams;
+  boost::shared_ptr<filtering_istream> in = boost::make_shared<filtering_istream>();
+  file_source file(filename, std::ios_base::in | std::ios_base::binary);
+  if (!file.is_open()) throw StateFileOpeningException(filename);
+  if (isbz2(filename))
+    in->push(bzip2_decompressor());
+  in->push(file);
+  return in;
+#endif // DO_NOT_USE_BOOST_COMPRESSION
+}
+
+boost::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &filename, const ios_base::openmode mode)
+{
+#ifdef DO_NOT_USE_BOOST_COMPRESSION
+  boost::shared_ptr<ofstream> ofs = boost::make_shared<ofstream>(filename, mode);
+  if (!ofs->is_open()) throw StateFileOpeningException(filename);
+  return ofs;
+#else
+  using namespace boost::iostreams;
+  boost::shared_ptr<filtering_ostream> out = boost::make_shared<filtering_ostream>();
+  file_sink file(filename, mode);
+  if (!file.is_open()) throw StateFileOpeningException(filename);
+  if (isbz2(filename)) {
+    std::cerr << "Appending to compressed state files is not supported because of a boost bug." << std::endl;
+    throw StateFileOpeningException(filename);
+    // Appending to compressed state files does not work because of a bug in boost when handling multi-stream bz2 files.
+    // The files can be written just fine, but cannot be read in afterwards. Hopefully this gets solved.
+    // The patch in https://svn.boost.org/trac/boost/ticket/9749 actually does fix the problem.
+    // See also: http://stackoverflow.com/q/32870991/1132850
+    out->push(bzip2_compressor());
+  }
+  out->push(file);
+  return out;
+#endif // DO_NOT_USE_BOOST_COMPRESSION
+}
 
 bool trajectory::details::restoreState(Trajectory& traj, const string& trajectoryFileName, const string& stateFileName, const string& initialFileName)
 {
-  
+
   if (trajectoryFileName!="") {
 
     ifstream trajectoryFile(trajectoryFileName.c_str());
 
     if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
-      
-      ifstream stateFile(stateFileName.c_str()/*, ios_base::binary*/);// stateFile.exceptions(ifstream::eofbit);
-      
-      if (!stateFile.is_open()) throw StateFileOpeningException(stateFileName);
-
-      // readViaSStream(traj,stateFile,true);
-      while ( (stateFile.peek(), !stateFile.eof()) ) readViaSStream(traj,stateFile);
-      
+      boost::shared_ptr<istream> stateFile = openStateFileReading(stateFileName);
+      while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,stateFile.get());
       return true;
     }
-    
+
   }
-  
+
   if (initialFileName!="") {
-    ifstream initialFile(initialFileName.c_str(), ios_base::binary);
-    if (!initialFile.is_open()) throw StateFileOpeningException(initialFileName);
-    while ( (initialFile.peek(), !initialFile.eof()) ) readViaSStream(traj,initialFile);
+    boost::shared_ptr<istream> initialFile = openStateFileReading(initialFileName);
+    while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,initialFile.get());
   }
-  
+
   return false;
 }
 
 
-void trajectory::details::writeNextArchive(ofstream* ofs, const ostringstream &oss)
+void trajectory::details::writeNextArchive(ostream* ofs, const ostringstream &oss)
 {
   const string& buffer=oss.str();
   *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
 }
 
-void trajectory::details::readNextArchive(ifstream& ifs, istringstream &iss)
+void trajectory::details::readNextArchive(istream* ifs, istringstream &iss)
 {
   string buffer;
-  streamsize n; ifs>>n; buffer.resize(n);
-  ifs.read(&buffer[0],n);
+  streamsize n; *ifs>>n; buffer.resize(n);
+  ifs->read(&buffer[0],n);
   iss.str(buffer);
 }
 
 
-auto trajectory::readMeta(ifstream& ifs) -> SerializationMetadata
+auto trajectory::readMeta(istream* ifs) -> SerializationMetadata
 {
   istringstream iss(ios_base::binary);
-  streampos pos = ifs.tellg();
   details::readNextArchive(ifs,iss);
-  ifs.seekg(pos);
   cpputils::iarchive archive(iss);
   SerializationMetadata meta;
   archive >> meta;
