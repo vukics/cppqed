@@ -11,6 +11,17 @@ if build_type=="debug":
 else:
   from ..io import read
 
+def _open_file(filename):
+  if filename.endswith("bz2"):
+    try:
+      import bz2
+    except ImportError:
+      raise IOError("{filename} is compressed, but the bz2 python module could not be loaded.".format(filename=filename))
+    f = bz2.BZ2File(filename)
+  else:
+    f = open(filename)
+  return f
+
 def load_evs(filename, maxevs=None):
   r"""
   Load a trajectory file into an :class:`.expvalues.ExpectationValueCollection`.
@@ -73,14 +84,8 @@ def evs_header(filename):
           available.
   :rtype: string
   """
-  if filename.endswith("bz2"):
-    try:
-      import bz2
-    except ImportError:
-      raise IOError("{filename} is compressed, but the bz2 python module could not be loaded.".format(filename=filename))
-    f = bz2.BZ2File(filename)
-  else:
-    f = open(filename)
+
+  f=_open_file(filename)
 
   result=""
   notDone=True
@@ -94,3 +99,29 @@ def evs_header(filename):
     else:
       result+=line
   return result
+
+def load_jumps(filename):
+  """
+  Load the jump times from a  C++QED trajectory file. The file
+  can be bzip2-compressed if the bz2 module is available. Returns a
+  two-dimensional :class:`np.ndarray` where the first column is the time
+  and the second column is the dissipation channel.
+
+  *Usage*
+      >>> jumps = load_jumps("ring.out.1001.bz2")
+      >>> # every jump of decay channel 1
+      >>> print(jumps[jumps[:,1]==1,0])
+      array([ 3.24715])
+
+  :param filename:
+          Path to the C++QED trajectory file from which the jumps should be loaded.
+  :rtype: np.ndarray
+  """
+
+  f=_open_file(filename)
+
+  for num, line in enumerate(f, 1):
+    if '# MCWF Trajectory:' in line:
+      f.close()
+      return np.loadtxt(filename,skiprows=num,comments='',usecols=(1,2))
+  return None
