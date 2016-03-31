@@ -118,3 +118,27 @@ Acknowledgement {#mainpageacknowledgement}
 First of all, we acknowledge the developers of Boost for making C++ an even more powerful language than it originally was. Without the Boost libraries, the framework could not have taken form.
 
 We would like to thank the developers of GSL, LAPACK, Blitz++, and FLENS for their effort, without which scientific computing in C++ in general, and the present framework in particular would not look as nice as it looks today.
+
+Publications using/citing C++QED {#mainpagepublicationsusingcppqed}
+================================
+
+* Winterauer D J et al. *Phys. Rev. A* **91**:053829 (2015)
+* Dombi A et al. *Eur. Phys. J. D* **69**:60 (2015)
+* Gevorgyan T V. *J. Contemp. Phys.–Armen. Acad. Sci.* **50**:44 (2015)
+* Wiśniewska J, Sawerwain M. In Kindratenko V (ed.): *Numerical Computations with GPUs*, Springer, 2014
+* Dombi A et al. *J. Phys. B* **46**:224010 (2013)
+* Sandner R M et al. *EPL* **104**:43001 (2013)
+* Fang Z et al. *Opt. Commun.* **306**:83 (2013)
+* Ritsch H et al. *Rev. Mod. Phys.* **85**:553 (2013)
+* Dalla Torre E G et al. *Phys. Rev. A* **87**:023831 (2013)
+* Shahinyan A R *J. Contemp. Phys.–Armen. Acad. Sci.* **48**:21 (2013)
+* Niedenzu W et al. *J. Phys. B* **45**:245501 (2012)
+* Krämer S, Ritsch H *AIP Conference Proceedings* **1475**:137 (2012)
+* Konya G et al. *Phys. Rev. A* **86**:013641. (2012)
+* Nagy D et al. *Phys. Rev. A* **84**:043637 (2011)
+* Niedenzu W et al. *Phys. Rev. A* **82**:043605 (2010)
+* Fang Z et al. *Phys. Rev. A* **82**:015601 (2010)
+* Schulze R J et al. *Phys. Rev. A* **81**:063820 (2010)
+* Li P B et al. *Eur. Phys. J. D* **55**:205 (2009)
+* Vukics A et al. *Phys. Rev. A* **79**:013828 (2009)
+* Maschler C et al. *Eur. Phys. J. D* **46**:545 (2008)
