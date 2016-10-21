@@ -1,4 +1,4 @@
-// Copyright Raimar Sandner 2012–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright Raimar Sandner 2012–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "MomentumCorrelation.h"
 #include <boost/assign.hpp>
 

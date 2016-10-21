@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /*
 
   let x, k, x0, k0 be 2D vectors and A a real, orthogonal, positive definite matrix

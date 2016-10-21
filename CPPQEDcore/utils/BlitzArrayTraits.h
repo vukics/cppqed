@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Implementations of the traits functions declared in ArrayTraits.h for `blitz::Array`} \todo Much of this file is superfluous as many components can be formulated generally for all `blitz::Array` types
 // -*- C++ -*-
 #ifndef CPPQEDCORE_UTILS_BLITZARRAYTRAITS_H_INCLUDED

@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 // -*- C++ -*-
 /// \briefFile{Collecting the macros and for compilation configuration to one place for documentation with doxygen + documents directories. This file is never included in the framework.}
 
