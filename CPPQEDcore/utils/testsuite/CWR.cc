@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Combinatorics.h"
 #define BOOST_TEST_MODULE CWR test
 #include <boost/test/unit_test.hpp>

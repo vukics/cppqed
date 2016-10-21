@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2015. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "EvolutionBinary.h"
 
 #include "Mode.h"
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
   mode::Ptr mode(mode::make(pplm,QMP_IP));
 
-  MLJC<NL,Couplings> mljc(multilevel::makePumpedLossySch(pml,"Lambda atom"),mode,pmljc);
+  MLJC<NL,Couplings> mljc(multilevel::makePumpedLossySch(pml,"Lambda atom",true),mode,pmljc);
 
   evolve(psi,binary::make(mljc),pe);
 

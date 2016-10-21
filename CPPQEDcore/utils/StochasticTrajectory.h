@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2015. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines classes related to stochastic evolution}
 // -*- C++ -*-
 #ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED

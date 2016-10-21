@@ -24,7 +24,7 @@ set(NEED_FLENS GeneralDickeImaginaryEvolution)
 # variable:
 # set(EXCLUDE_FROM_ALL_SCRIPTS 6qbits)
 
-set(EXCLUDE_SCRIPTS Ca40InCavityWithPhonons CavityRaman)
+set(EXCLUDE_SCRIPTS Ca40InCavityWithPhonons)
 scripts_project()
 
 # add target "fewer_scripts"

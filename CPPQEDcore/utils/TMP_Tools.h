@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2015. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 // -*- C++ -*-
 /// \briefFile{Template metaprogramming tools, extending (and based on) Boost.MPL.}
 #ifndef CPPQEDCORE_UTILS_TMP_TOOLS_H_INCLUDED
