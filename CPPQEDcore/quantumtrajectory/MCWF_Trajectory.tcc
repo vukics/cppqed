@@ -34,7 +34,6 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
     dpsidt=0;
 
     ha->addContribution(t,psi,dpsidt,this->getT0());
-    logger_.hamiltonianCalled();
   }
 }
 
@@ -56,7 +55,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
          randomized::MakerGSL()),
     psi_(psi),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
-    logger_(p.logLevel,getQSW().getHa()!=0,getQSW().template nAvr<structure::LA_Li>())
+    logger_(p.logLevel,getQSW().template nAvr<structure::LA_Li>())
 {
   QuantumTrajectory::checkDimension(psi);
   if (!getTime()) if(const auto li=getQSW().getLi()) { // On startup, dpLimit should not be overshot, either.
@@ -81,7 +80,6 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
 {
   if (getQSW().getHa()) {
     getEvolved()->step(Dt);
-    logger_.logFailedSteps(getEvolved()->nFailedSteps());
   }
   else {
     double stepToDo=getQSW().getLi() ? std::min(getDtTry(),Dt) : Dt; // Cf. tracker #3482771
@@ -132,11 +130,11 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStep
   if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
     evolvedCache->setDtTry(liouvilleanSuggestedDtTry);
     (*getEvolved())=*evolvedCache;
-    logger_.stepBack(totalRate*dtDid,dtDid,getDtTry(),getTime(),logControl);
+    logger_.stepBack(this->getLogStreamDuringRun(),totalRate*dtDid,dtDid,getDtTry(),getTime(),logControl);
     return true; // Step-back required.
   }
   else if (totalRate*dtTry>dpLimit_) {
-    logger_.overshot(totalRate*dtTry,dtTry,liouvilleanSuggestedDtTry,logControl);
+    logger_.overshot(this->getLogStreamDuringRun(),totalRate*dtTry,dtTry,liouvilleanSuggestedDtTry,logControl);
   }
 
   // dtTry-adjustment for next step:
@@ -173,7 +171,7 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
       psi_/=normFactor;
     }
 
-    logger_.jumpOccured(t,lindbladNo);
+    logger_.jumpOccured(this->getLogStreamDuringRun(),t,lindbladNo);
   }
 }
 

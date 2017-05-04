@@ -61,7 +61,8 @@ private:
 protected:
   /// \name Constructors
   //@{
-  Stochastic(A&, typename Evolved::Derivs, double dtInit, 
+  Stochastic(A&, typename Evolved::Derivs, double dtInit,
+             int logLevel,
              double epsRel, double epsAbs, const A& scaleAbs, 
              const evolved::Maker<A>&,
              unsigned long seed,

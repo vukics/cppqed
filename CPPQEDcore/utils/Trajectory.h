@@ -9,6 +9,7 @@
 #include "Archive.h"
 #include "Exception.h"
 #include "Evolved.h"
+#include "SmartPtr.h"
 
 #include <iosfwd>
 #include <string>
@@ -238,6 +239,11 @@ public:
 
   virtual ~Trajectory() {}
 
+  void setLogStreamDuringRun(boost::shared_ptr<std::ostream> os) const {logStreamDuringRun_=os;}
+  
+protected:
+  std::ostream& getLogStreamDuringRun() const {return *logStreamDuringRun_;}
+  
 private:
   virtual void            evolve_v(double)       = 0; // A step of exactly deltaT
   virtual double         getTime_v()       const = 0;
@@ -251,6 +257,8 @@ private:
   virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
 
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
+  
+  mutable boost::shared_ptr<std::ostream> logStreamDuringRun_=cpputils::nonOwningSharedPtr<std::ostream>(&std::cout);
   
 };
 
@@ -301,6 +309,7 @@ private:
 };
 
 
+
 /// Adaptive is basically an evolved::Evolved wrapped into the Trajectory interface
 /** The class stores an evolved::Evolved instance by shared pointer */
 template<typename A>
@@ -315,22 +324,24 @@ public:
   /// corresponding to Evolved::step, it takes a single adaptive step
   /** It does not delegate directly to Evolved::step, as usually trajectories need to do more for a step than just propagating the ODE: instead, it is kept purely virtual */
   void step(double deltaT ///< *maximum* length of the timestep
-           ) {step_v(deltaT);}
+           );
   
   virtual ~Adaptive() {}
 
 protected:
   using AdaptiveIO<A>::meta_;
 
+  typedef typename Evolved::Derivs Derivs;
+  
   /// Constructor taking the same parameters as needed to operate evolved::Maker
-  Adaptive(A&, typename Evolved::Derivs, double, double, double    , const A&, const evolved::Maker<A>&);
+  Adaptive(A&, Derivs, double, int, double, double, const A&, const evolved::Maker<A>&);
 
-  /** \overload Adaptive(A&, typename Evolved::Derivs, double, double, double, const A&, const evolved::Maker<A>&) */
-  Adaptive(A&, typename Evolved::Derivs, double, const ParsEvolved&, const A&, const evolved::Maker<A>&);
+  /** \overload Adaptive(A&, Derivs, double, double, double, const A&, const evolved::Maker<A>&) */
+  Adaptive(A&, Derivs, double, const ParsEvolved&,  const A&, const evolved::Maker<A>&);
 
   typedef typename Evolved::ConstPtr ConstPtr;
   typedef typename Evolved::     Ptr      Ptr;
-  
+
   /// \name Getters
   //@{
   const ConstPtr getEvolved() const {return ConstPtr(evolved_);}
@@ -362,10 +373,16 @@ private:
   virtual void step_v(double deltaT) = 0;
 
   virtual const std::string trajectoryID_v() const = 0;
+  
+  std::ostream& logOnEnd_v(std::ostream& os) const final {if (logLevel_) evolved_->logOnEnd(os); return logMoreOnEnd_v(os);}
 
+  virtual std::ostream& logMoreOnEnd_v(std::ostream& os) const {return os;} ///< hook into Trajectory::logOnEnd
+  
   const Ptr evolved_;
 
   const double dtInit_;
+  
+  const int logLevel_;
 
 };
 

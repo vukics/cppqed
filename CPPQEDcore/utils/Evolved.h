@@ -100,6 +100,35 @@ private:
 };
 
 
+/// Template-parameter independent base class taking care of logging
+class LoggingBase
+{
+public:
+  LoggingBase() : nDerivsCalls_(), nSteps_(), nFailedSteps_() {}
+  
+  size_t nDerivsCalls() const {return nDerivsCalls_;}
+  size_t nSteps      () const {return nSteps_      ;}
+  size_t nFailedSteps() const {return nFailedSteps_;}
+
+  void registerDerivsCall () const {++nDerivsCalls_;}
+  void registerStep       ()       {++nSteps_      ;}
+  void registerFailedSteps(size_t failedStepsLast) {nFailedSteps_+=failedStepsLast;}
+  
+  std::ostream& logOnEnd(std::ostream& os) const;
+
+private:
+#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+  friend class boost::serialization::access;
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & nDerivsCalls_ & nSteps_ & nFailedSteps_;}
+#endif // DO_NOT_USE_BOOST_SERIALIZATION
+
+  mutable size_t nDerivsCalls_;
+  size_t nSteps_, nFailedSteps_;
+
+};
+
+
 /// Class for serialization of Evolved states
 /**
  * \see trajectory::AdaptiveIO
@@ -110,7 +139,7 @@ private:
  *
  */
 template<typename A>
-class EvolvedIO : public TimeStepBookkeeper, private boost::noncopyable
+class EvolvedIO : public TimeStepBookkeeper, public LoggingBase, private boost::noncopyable
 {
 public:
   typedef boost::shared_ptr<EvolvedIO>            Ptr;
@@ -135,11 +164,11 @@ private:
   friend class boost::serialization::access;
   template<class Archive>
   void save(Archive& ar, const unsigned int) const
-  {A temp(a_); ar & temp & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
+  {A temp(a_); ar & temp & boost::serialization::base_object<LoggingBase>(*this) & boost::serialization::base_object<TimeStepBookkeeper>(*this);}
 
   template<class Archive>
   void load(Archive& ar, const unsigned int)
-  {A temp; ar & temp & boost::serialization::base_object<TimeStepBookkeeper>(*this); a_.reference(temp);}
+  {A temp; ar & temp & boost::serialization::base_object<LoggingBase>(*this) & boost::serialization::base_object<TimeStepBookkeeper>(*this); a_.reference(temp);}
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -189,20 +218,22 @@ public:
 
   std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);} ///< delegates to private virtual
 
+  /// Wrapper around the derivatives that registers the number of calls
+  void countedDerivs(double t, const A& y, A& dydt) const {derivs_(t,y,dydt); this->registerDerivsCall();}
+
   /// \name Getter
   //@{
-  const Derivs getDerivs() const {return derivs_;}
+  const Derivs getDerivs() const {return countedDerivs_;}
   //@}
 
-  size_t nFailedSteps() const {return nFailedSteps_v();} ///< number of failed steps in the last timestep (delegates to pure virtual)
-
+  size_t nFailedStepsLast() const {return nFailedStepsLast_v();} ///< number of failed steps in the last timestep (delegates to pure virtual)
+  
 private:
   virtual void step_v(double deltaT) = 0;
   virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
-  virtual size_t nFailedSteps_v() const = 0;
+  virtual size_t nFailedStepsLast_v() const = 0;
 
-
-  Derivs derivs_;
+  const Derivs derivs_, countedDerivs_;
 
 };
 

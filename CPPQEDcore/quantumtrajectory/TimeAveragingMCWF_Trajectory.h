@@ -67,7 +67,7 @@ public:
 private:
   std::ostream& display_v(std::ostream&, int) const override;
   
-  std::ostream& logOnEnd_v(std::ostream& os) const override;
+  std::ostream& logMoreOnEnd_v(std::ostream& os) const override;
   
   cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return Base:: readStateMore_v(iar) & averages_ & sum_;}
   cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & averages_ & sum_;}

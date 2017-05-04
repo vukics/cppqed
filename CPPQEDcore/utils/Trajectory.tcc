@@ -8,7 +8,6 @@
 #include "Evolved.tcc"
 #include "FormDouble.h"
 #include "ParsTrajectory.h"
-#include "SmartPtr.h"
 #include "Version.h"
 
 #include <boost/make_shared.hpp>
@@ -127,6 +126,8 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
                                              nonOwningSharedPtr<ostream>(&cout) :
                                              static_pointer_cast<ostream>(boost::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
+  traj.setLogStreamDuringRun(outstream);
+  
   ostream& os=*outstream;
 
   if (os.fail()) throw TrajectoryFileOpeningException(trajectoryFileName);
@@ -243,16 +244,16 @@ cpputils::oarchive& trajectory::AdaptiveIO<A>::writeState(cpputils::oarchive& oa
 
 
 template<typename A>
-trajectory::Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
+trajectory::Adaptive<A>::Adaptive(A& y, Derivs derivs, double dtInit, int logLevel, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
   : AdaptiveIO<A>(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
     evolved_(boost::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())),
-    dtInit_(dtInit)
+    dtInit_(dtInit), logLevel_(logLevel)
 {}
 
 
 template<typename A>
-trajectory::Adaptive<A>::Adaptive(A& y, typename Evolved::Derivs derivs, double dtInit, const ParsEvolved& p, const A& scaleAbs, const evolved::Maker<A>& maker)
-  : Adaptive(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs,maker) {}
+trajectory::Adaptive<A>::Adaptive(A& y, Derivs derivs, double dtInit, const ParsEvolved& p, const A& scaleAbs, const evolved::Maker<A>& maker)
+  : Adaptive(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,maker) {}
 
 
 template<typename A>
@@ -282,6 +283,16 @@ cpputils::oarchive& trajectory::Adaptive<A>::writeState_v(cpputils::oarchive& oa
   AdaptiveIO<A>::writeState(oar);
   return writeStateMore_v(oar);
 }
+
+
+template<typename A>
+void trajectory::Adaptive<A>::step(double deltaT)
+{
+  step_v(deltaT);
+  if (logLevel_>3)
+    this->getLogStreamDuringRun()<<"# Number of failed steps in this timestep: "<<evolved_->nFailedStepsLast()<<std::endl;
+}
+
 
 
 #endif // CPPQEDCORE_UTILS_TRAJECTORY_TCC_INCLUDED

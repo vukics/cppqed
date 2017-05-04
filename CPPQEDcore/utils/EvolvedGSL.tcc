@@ -84,7 +84,7 @@ private:
 
   }
 
-  size_t nFailedSteps_v() const {return extractFailedSteps(pImpl_);}
+  size_t nFailedStepsLast_v() const {return extractFailedSteps(pImpl_);}
 
   const details::ImplPtr pImpl_;
 

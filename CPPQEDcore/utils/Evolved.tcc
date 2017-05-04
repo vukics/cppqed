@@ -8,17 +8,19 @@
 #include "MathExtensions.h"
 
 #include <boost/make_shared.hpp>
+#include <boost/bind.hpp>
+
 
 namespace evolved {
 
 template<typename A>
 EvolvedIO<A>::EvolvedIO(A& a, double dtInit, double epsRel, double epsAbs)
-  : TimeStepBookkeeper(dtInit,epsRel,epsAbs), a_(a)
+  : TimeStepBookkeeper(dtInit,epsRel,epsAbs), LoggingBase(), a_(a)
 {}
 
 template<typename A>
 Evolved<A>::Evolved(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs) 
-  : EvolvedIO<A>(a,dtInit,epsRel,epsAbs), derivs_(derivs)
+  : EvolvedIO<A>(a,dtInit,epsRel,epsAbs), derivs_(derivs), countedDerivs_(boost::bind(&Evolved::countedDerivs,this,_1,_2,_3))
 {} 
 
 template<typename A>
@@ -34,12 +36,13 @@ void Evolved<A>::step(double deltaT)
 {
   if (mathutils::sign(deltaT)!=mathutils::sign(EvolvedIO<A>::getDtTry())) {
     // Stepping backward
-    EvolvedIO<A>::setDtTry(-EvolvedIO<A>::getDtDid());
+    this->setDtTry(-EvolvedIO<A>::getDtDid());
     step_v(deltaT);
   }
   else step_v(deltaT);
+  this->registerStep();
+  this->registerFailedSteps(nFailedStepsLast_v());
 }
-
 
 
 template<typename E>

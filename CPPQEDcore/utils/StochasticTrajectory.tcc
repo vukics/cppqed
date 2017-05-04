@@ -30,12 +30,13 @@ Stochastic<A,T>::displayParameters_v(std::ostream& os) const
 template<typename A, typename T>
 Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
                             double dtInit,
+                            int logLevel,
                             double epsRel, double epsAbs, const A& scaleAbs,
                             const evolved::Maker<A>& makerE,
                             unsigned long seed,
                             bool n,
                             const randomized::Maker& makerR)
-  : Adaptive<A>(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,makerE),
+  : Adaptive<A>(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE),
     seed_(seed), isNoisy_(n), randomized_(makerR(seed)) {}
 
 
@@ -46,7 +47,7 @@ Stochastic<A,T>::Stochastic(A& y, typename Evolved::Derivs derivs,
                             const ParsStochastic& p,
                             const evolved::Maker<A>& makerE,
                             const randomized::Maker& makerR)
-  : Stochastic(y,derivs,dtInit,p.epsRel,p.epsAbs,scaleAbs,makerE,p.seed,p.noise,makerR) {}
+  : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.seed,p.noise,makerR) {}
 
 
 

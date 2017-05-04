@@ -47,6 +47,8 @@ struct ParsEvolved
   evolved::SteppingFunction& sf; ///< \link evolved::SteppingFunction stepping-function type\endlink
   double &nextDtTryCorrectionFactor; ///< cf. evolved::MakerGSL::MakerGSL()
   
+  int &logLevel; ///< governs how much logging information is displayed during a Trajectory run \see quantumtrajectory::mcwf::Logger for a usecase
+  
   /// All `%Pars…` classes are constructed taking a parameters::ParameterTable, to register the parameters on
   /** 
    * This occurs via the parameters::ParameterTable::addMod member function returning a reference to the registered parameter wherewith the public attributes

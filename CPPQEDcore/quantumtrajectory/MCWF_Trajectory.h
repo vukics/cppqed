@@ -111,7 +111,7 @@ protected:
   /// Forwards to Base::writeStateMore_v + serializes mcwf::Logger state
   cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & logger_;}
 
-  std::ostream& logOnEnd_v(std::ostream& os) const override {return logger_.onEnd(os);} ///< calls mcwf::Logger::onEnd
+  std::ostream& logMoreOnEnd_v(std::ostream& os) const override {return logger_.onEnd(os);} ///< calls mcwf::Logger::onEnd
   
 private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;

@@ -25,7 +25,7 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::display_v(s
 
 
 template<int RANK>
-std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::logOnEnd_v(std::ostream& os) const
+std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::logMoreOnEnd_v(std::ostream& os) const
 {
   if (av_) {
     Averages endValues(averages_.copy());
@@ -33,7 +33,7 @@ std::ostream& quantumtrajectory::TimeAveragingMCWF_Trajectory<RANK>::logOnEnd_v(
     av_->process(endValues);
     av_->display(endValues,os<<"# Time averages after relaxation time "<<relaxationTime_<<std::endl<<"#",FormDouble::overallPrecision)<<std::endl;
   }
-  return Base::logOnEnd_v(os);
+  return Base::logMoreOnEnd_v(os);
 }
 
 
