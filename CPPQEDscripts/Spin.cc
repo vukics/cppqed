@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  LossySpin spin(ps);
+  LossySpinSch spin(ps);
   
   structure::freesystem::StateVector psi(spin.getDimensions());
 

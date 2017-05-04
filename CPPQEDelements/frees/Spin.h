@@ -148,13 +148,13 @@ public:
 };
 
 
-class LossySpinWithout // without Hamiltonian evolution, that is, a zero-frequency spin
-  : public SpinBase,
+class LossySpinSch
+  : public SpinSch,
     public spin::Liouvillean
 {
 public:
   
-  LossySpinWithout(const spin::Pars& p) : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim), spin::Liouvillean(p.twoS,p.gamma) {}
+  LossySpinSch(const spin::Pars& p) : SpinSch(p), spin::Liouvillean(p.twoS,p.gamma) {}
   
 };
 
