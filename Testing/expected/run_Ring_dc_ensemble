@@ -1,14 +1,17 @@
-# Ensemble of 3 trajectories.
+# /home/vukics/work/cppqed/build/CPPQEDscripts/Ring --epsAbs 1e-5 --etaM 10 --etaP 10 --cutoffM 3 --cutoffP 3 --fin 3 --sdf 3 --T 0.1 --dc 1 --nTraj 3 --evol ensemble --o output/run_Ring_dc_ensemble
 
-# C++QEDcore Version 2.99.11, core git commit: bba9fdfa335a775772f95cb5b2b8b27ee4c0b542
+# C++QEDcore Version 2.100.4, core git commit: db2fc5efe1770d6627787e83a89a44bcca800950
+# elements git commit: db2fc5efe1770d6627787e83a89a44bcca800950
+# scripts git commit: db2fc5efe1770d6627787e83a89a44bcca800950
 
 # Andras Vukics, vukics@users.sourceforge.net
 
 # Compiled with
-# Boost library collection : Version 1.55
-# Gnu Scientific Library   : Version 1.16
-# Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
+# Boost library collection : Version 1.62
+# Gnu Scientific Library   : Version 2.3
+# Blitz++ numerical library: Config date: Sat Jun 13 11:30:49 CEST 2015
 
+# Ensemble of 3 trajectories.
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
 # Stochastic Trajectory Parameters: seed=1001
@@ -114,29 +117,6 @@
 
 # Maximal deviation of norm from 1: 0.00882479
 
-# Average number of failed ODE steps: 0
-# Average number of Hamiltonian calls: 448
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
-# 0	0
+# Too few jumps for a histogram
 
 # Average number of total jumps: 0.333333

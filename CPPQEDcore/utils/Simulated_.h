@@ -32,6 +32,7 @@ public:
   typedef evolved::Evolved<A> Evolved;
 
   Simulated(A&, typename Evolved::Derivs, double dtInit,
+            int logLevel,
             double, double,
             const A& scaleAbs=A(),
             const evolved::Maker<A>& =evolved::MakerGSL<A>());
@@ -39,7 +40,7 @@ public:
   Simulated(A& array, typename Evolved::Derivs derivs, double dtInit,
             const ParsEvolved& pe,
             const A& scaleAbs=A(),
-            const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
+            const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 private:
   virtual void displayPreHook () const {}

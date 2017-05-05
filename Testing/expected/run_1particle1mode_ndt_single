@@ -1,12 +1,15 @@
+# /home/vukics/work/cppqed/build/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --dc 0 --Dt 0.01 --NDt 10 --evol single --o output/run_1particle1mode_ndt_single
 
-# C++QEDcore Version 2.99.11, core git commit: d8f2c9e3a4a4d65ff61a327331d14ef42ff3b2ef
+# C++QEDcore Version 2.100.4, core git commit: db2fc5efe1770d6627787e83a89a44bcca800950
+# elements git commit: db2fc5efe1770d6627787e83a89a44bcca800950
+# scripts git commit: db2fc5efe1770d6627787e83a89a44bcca800950
 
 # Andras Vukics, vukics@users.sourceforge.net
 
 # Compiled with
-# Boost library collection : Version 1.55
-# Gnu Scientific Library   : Version 1.16
-# Blitz++ numerical library: Config date: Sat Nov 16 17:04:24 CET 2013
+# Boost library collection : Version 1.62
+# Gnu Scientific Library   : Version 2.3
+# Blitz++ numerical library: Config date: Sat Jun 13 11:30:49 CEST 2015
 
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
@@ -35,7 +38,7 @@
 # Particle-Cavity Interaction
 # Particle moving orthogonal to cavity
 # Unot=-1
-# etaeff=-10
+# etaeff=-3.16228
 
 # System characteristics: Interaction picture, Hamiltonian evolution, Liouvillean evolution, calculates Averages.
 # Decay channels:
@@ -73,16 +76,3 @@
 0.08         0.0010256    	0.308482      0.298131      0.440882      -0.314048     	-0.461621     4.68154       -1.5571       0.462951      
 0.09         0.000788227  	0.352569      0.337239      0.454938      -0.35068      	-0.453184     4.55035       -1.55397      0.517437      
 0.1          0.000523792  	0.39311       0.371753      0.462929      -0.384514     	-0.44447      4.41034       -1.55061      0.570864      
-
-# Total number of steps: 39
-
-# dpLimit overshot: 37 times, maximal overshoot: 0.058757
-# dpTolerance overshot: 0 times, maximal overshoot: 0
-
-# Maximal deviation of norm from 1: 0.00600005
-
-# Failed ODE steps: 0
-# Number of Hamiltonian calls: 273
-
-# MCWF Trajectory:
-

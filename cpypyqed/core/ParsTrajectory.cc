@@ -32,6 +32,7 @@ PARS_GETTER_SETTER(double, ParsEvolved, epsRel)
 PARS_GETTER_SETTER(double, ParsEvolved, epsAbs)
 PARS_GETTER_SETTER(evolved::SteppingFunction, ParsEvolved, sf)
 PARS_GETTER_SETTER(double, ParsEvolved, nextDtTryCorrectionFactor)
+PARS_GETTER_SETTER(int, ParsEvolved, logLevel)
 
 void export_10_ParsTrajectory()
 {
@@ -73,6 +74,7 @@ void export_10_ParsTrajectory()
       .PARS_PROPERTY(epsAbs)
       .PARS_PROPERTY(sf)
       .PARS_PROPERTY(nextDtTryCorrectionFactor)
+      .PARS_PROPERTY(logLevel)
     ;
   }
 }

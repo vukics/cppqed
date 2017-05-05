@@ -15,11 +15,12 @@ namespace trajectory {
 
 
 template<typename A>
-Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit, 
+Simulated<A>::Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
+                        int logLevel,
                         double epsRel, double epsAbs,
                         const A& scaleAbs,
                         const evolved::Maker<A>& maker)
-  : Base(y,derivs,dtInit,epsRel,epsAbs,scaleAbs,maker)
+  : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,maker)
 {}
 
 
