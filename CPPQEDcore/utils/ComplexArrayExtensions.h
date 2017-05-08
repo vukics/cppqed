@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 // -*- C++ -*-
 /// \briefFile{Helpers for complex `blitz::Array`s, e.g. Hermitian conjugation of multi-matrices}
 #ifndef   CPPQEDCORE_UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED

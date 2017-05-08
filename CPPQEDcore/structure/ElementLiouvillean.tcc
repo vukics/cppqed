@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 // -*- C++ -*-
 /// \briefFile{Defines the hierarchical partial specializations of structure::ElementLiouvillean}
 #ifndef CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
