@@ -1,4 +1,4 @@
-// Copyright Raimar Sandner 2012–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright Raimar Sandner 2012–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Particle.h"
 #include "TMP_Tools.h"
 #include "DensityOperator.tcc"

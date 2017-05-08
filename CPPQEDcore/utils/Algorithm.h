@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Generic algorithms not found in either STL or Boost}
 // -*- C++ -*-
 #ifndef   CPPQEDCORE_UTILS_ALGORITHM_H_INCLUDED

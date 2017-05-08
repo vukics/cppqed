@@ -1,5 +1,5 @@
 /// \briefFile{Defines free elements of the \ref multilevelbundle "MultiLevel bundle" }
-// Copyright András Vukics 2006–2016. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 // -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
