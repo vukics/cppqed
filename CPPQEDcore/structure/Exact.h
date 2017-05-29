@@ -90,7 +90,7 @@ public:
   typedef typename time::DispatcherIsTwoTime<IS_TWO_TIME>::type Time;
   
 private:
-  virtual void actWithU_v(double t, StateVectorLow& psi, double t0) const final {actWithU_v(Time(t,t0),psi);}
+  void actWithU_v(double t, StateVectorLow& psi, double t0) const final {actWithU_v(Time(t,t0),psi);}
 
   virtual void actWithU_v(Time, StateVectorLow& psi) const = 0;
 

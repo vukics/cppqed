@@ -65,7 +65,7 @@ protected:
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
-  virtual std::ostream& logOnEnd_v(std::ostream& os) const final;
+  std::ostream& logOnEnd_v(std::ostream& os) const final;
   
   // static helpers to constructor
   // boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
@@ -76,7 +76,7 @@ private:
 #pragma GCC diagnostic pop
 
   
-  virtual quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
+  quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
 
   mutable quantumdata::DensityOperator<RANK> rho_;
 
@@ -138,8 +138,8 @@ public:
     : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
-  virtual std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->toBeAveraged(),os,precision);}
-  virtual std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
+  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->toBeAveraged(),os,precision);}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
 

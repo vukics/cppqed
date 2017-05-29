@@ -233,7 +233,7 @@ ALIASES                = "tparamRANK=\tparam RANK arity of the Hilbert space" \
                          "briefFile{1}=\file \n \brief \1" \
                          "briefFileDefault=\briefFile{Defines class of the same name}" \
                          "Semantics=\par Semantics" \
-                         "refBoost{2}=[\1](http://www.boost.org/doc/libs/1_55_0/libs/\2)" \
+                         "refBoost{2}=[\1](http://www.boost.org/doc/libs/1_64_0/libs/\2)" \
                          "refBoostConstruct{2}=\refBoost{<tt>\1</tt>,\2}" \
                          "refStdCpp{2}=[\1](http://www.cplusplus.com/reference/\2)" \
                          "refStdCppConstruct{2}=\refStdCpp{<tt>\1</tt>,\2}" \

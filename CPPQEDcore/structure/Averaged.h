@@ -113,7 +113,7 @@ public:
   typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
 
 private:
-  virtual const Averages average_v(double t, const LazyDensityOperator& matrix) const final {return average_v(Time(t),matrix);}
+  const Averages average_v(double t, const LazyDensityOperator& matrix) const final {return average_v(Time(t),matrix);}
 
   virtual const Averages average_v(Time, const LazyDensityOperator&) const = 0;
 

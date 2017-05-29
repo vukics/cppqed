@@ -53,7 +53,7 @@ protected:
   const Averages initializedAverages() const {Averages res(this->nAvr()); res=0.; return res;}
 
 private:
-  virtual std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const final {return details::displayCommon(a,os,precision);}
+  std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const final {return details::displayCommon(a,os,precision);}
 
 };
 

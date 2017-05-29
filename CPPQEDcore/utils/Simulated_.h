@@ -46,15 +46,15 @@ private:
   virtual void displayPreHook () const {}
   virtual void displayPostHook() const {}
 
-  virtual void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}
+  void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}
 
-  virtual std::ostream& display_v(std::ostream&, int) const final;
+  std::ostream& display_v(std::ostream&, int) const final;
   
-  virtual std::ostream& displayKey_v(std::ostream& os, size_t&) const final {return os;}
+  std::ostream& displayKey_v(std::ostream& os, size_t&) const final {return os;}
 
-  virtual std::ostream& displayParameters_v(std::ostream& os) const final {return Base::displayParameters_v(os<<"\n# Simulated.\n");}
+  std::ostream& displayParameters_v(std::ostream& os) const final {return Base::displayParameters_v(os<<"\n# Simulated.\n");}
 
-  virtual const std::string trajectoryID_v() const final {return "Simulated";}
+  const std::string trajectoryID_v() const final {return "Simulated";}
 
 };
 

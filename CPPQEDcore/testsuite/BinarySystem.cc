@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
   evolve(psi,system,pe);
 
-  } catch (parameters::NamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
+  } catch (const parameters::NamedException& pne) {cerr<<"Pars named error: "<<pne.getName()<<endl;}
 
 
 }
