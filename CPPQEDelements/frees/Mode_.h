@@ -148,11 +148,13 @@ namespace details {
 
 void aJump   (StateVectorLow&, double);
 void aDagJump(StateVectorLow&, double);
-  
+
+void aSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double);
+
 } // details
 
 
-template<bool IS_ALTERNATIVE> 
+template<bool IS_ALTERNATIVE>
 class Liouvillean<false,IS_ALTERNATIVE> 
   : protected boost::mpl::false_, // Tagging for the isFiniteTemp... functions
     public structure::ElementLiouvillean<1,1>
@@ -162,9 +164,11 @@ protected:
   // the second dummy argument is there only to have the same form for the ctor as in the TEMPERATURE=true case
 
 private:
-  void   doActWithJ (NoTime, StateVectorLow& psi       ) const {details::aJump(psi,kappa_);}
-  double rate       (NoTime, const LazyDensityOperator&) const;
+  void   doActWithJ (NoTime, StateVectorLow& psi       ) const override {details::aJump(psi,kappa_);}
+  double rate       (NoTime, const LazyDensityOperator&) const override;
 
+  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt) const override {details::aSuperoperator(rho,drhodt,kappa_);}
+  
   const double kappa_;
 
 };
