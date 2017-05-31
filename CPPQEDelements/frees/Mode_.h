@@ -149,7 +149,8 @@ namespace details {
 void aJump   (StateVectorLow&, double);
 void aDagJump(StateVectorLow&, double);
 
-void aSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double);
+void aSuperoperator   (const DensityOperatorLow&, DensityOperatorLow&, double);
+void aDagSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double);
 
 } // details
 
@@ -206,11 +207,14 @@ protected:
     : details::LiouvilleanFiniteTemperatureBase(kappa,nTh), Base(kT,{"excitation loss","excitation absorption"}) {}
   
 private:
-  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const {details::   aJump(psi,kappa_*(nTh_+1));}
-  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const {details::aDagJump(psi,kappa_* nTh_   );}
+  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const override {details::   aJump(psi,kappa_*(nTh_+1));}
+  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const override {details::aDagJump(psi,kappa_* nTh_   );}
   
-  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const {return rate0(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
-  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const {return rate1(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
+  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const override {return rate0(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
+  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const override {return rate1(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
+
+  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladNo<0>) const override {details::   aSuperoperator(rho,drhodt,kappa_*(nTh_+1));}
+  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladNo<1>) const override {details::aDagSuperoperator(rho,drhodt,kappa_* nTh_   );}
 
 };
 
