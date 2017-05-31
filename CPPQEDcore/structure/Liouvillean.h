@@ -14,6 +14,13 @@
 
 namespace structure {
 
+struct SuperoperatorNotImplementedException : cpputils::Exception
+{
+  explicit SuperoperatorNotImplementedException(size_t m) : m_(m) {}
+  
+  size_t m_;
+};
+
 /// The interface every system having Liouvillean time-evolution must present towards the trajectory drivers
 /**
  * The time-evolution must be Markovian where the Lindblad form of the Master equation is the most general one possible:
@@ -39,7 +46,7 @@ public:
   static const int N_RANK=RANK;
 
   typedef boost::shared_ptr<const Liouvillean> Ptr;
-
+  
 private:
   typedef quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> > Base;
 
@@ -65,8 +72,16 @@ public:
                 size_t m             ///<[out] \f$m\f$
                ) const {return actWithJ_v(t,psi,m);}
 
+  /// Calculates \f$\Lcal\rho=J_m(t)\rho J_m(t)^\dagger\f$ and adds it to `drhodt`
+  void actWithSuperoperator(double t,                      ///<[in] time
+                            const DensityOperatorLow& rho, ///<[in] density operator
+                            DensityOperatorLow& drhodt,    ///<[in/out] density operator
+                            size_t m                       ///<[in] ordinal of jump operator
+                           ) const {actWithSuperoperator_v(t,rho,drhodt,m);}
+
 private:
   virtual void actWithJ_v(double, StateVectorLow&, size_t) const = 0;
+  virtual void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t m) const {throw SuperoperatorNotImplementedException(m);}
 
 };
 
@@ -82,6 +97,7 @@ class LiouvilleanTimeDependenceDispatched : public Liouvillean<RANK>
 {
 public:
   typedef typename Liouvillean<RANK>::StateVectorLow      StateVectorLow     ;
+  typedef typename Liouvillean<RANK>::DensityOperatorLow  DensityOperatorLow ;
   typedef typename Liouvillean<RANK>::LazyDensityOperator LazyDensityOperator;
   typedef typename Liouvillean<RANK>::Rates               Rates              ;
   
@@ -91,8 +107,12 @@ private:
   void         actWithJ_v(double t, StateVectorLow& psi, size_t lindbladNo) const final {actWithJ_v(Time(t),psi,lindbladNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK>
   const Rates   average_v(double t, const LazyDensityOperator&  matrix) const final {return rates_v(Time(t),matrix);} ///< Redirects the virtual inherited from LiouvilleanAveragedCommonRanked
 
+  void actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t m) const final {actWithSuperoperator_v(Time(t),rho,drhodt,m);}
+  
   virtual void        actWithJ_v(Time, StateVectorLow&, size_t   ) const = 0;
   virtual const Rates    rates_v(Time, const LazyDensityOperator&) const = 0;
+
+  virtual void actWithSuperoperator_v(Time, const DensityOperatorLow&, DensityOperatorLow&, size_t m) const {throw SuperoperatorNotImplementedException(m);}
 
 };
 

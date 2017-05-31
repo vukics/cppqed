@@ -12,36 +12,54 @@
 
 namespace structure { namespace details {
 
-template<int RANK, int NLINDBLADS>
+template<int RANK>
 inline
-const boost::function<double(typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,false>::JumpRateStrategy)>
-convert( NoTime  , const typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,false>::LazyDensityOperator& matrix)
+const boost::function<double(typename ElementLiouvilleanStrategiesBase<RANK,false>::JumpRateStrategy)>
+convert( NoTime  , const typename ElementLiouvilleanStrategiesBase<RANK,false>::LazyDensityOperator& matrix)
 {
-  return boost::bind(&ElementLiouvilleanStrategies<RANK,NLINDBLADS,false>::JumpRateStrategy::operator(),_1  ,boost::cref(matrix));
+  return boost::bind(&ElementLiouvilleanStrategiesBase<RANK,false>::JumpRateStrategy::operator(),_1  ,boost::cref(matrix));
 }
 
 
-template<int RANK, int NLINDBLADS>
+template<int RANK>
 inline
-const boost::function<double(typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,true >::JumpRateStrategy)>
-convert(OneTime t, const typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,true >::LazyDensityOperator& matrix)
+const boost::function<double(typename ElementLiouvilleanStrategiesBase<RANK,true >::JumpRateStrategy)>
+convert(OneTime t, const typename ElementLiouvilleanStrategiesBase<RANK,true >::LazyDensityOperator& matrix)
 {
-  return boost::bind(&ElementLiouvilleanStrategies<RANK,NLINDBLADS,true >::JumpRateStrategy::operator(),_1,t,boost::cref(matrix));
+  return boost::bind(&ElementLiouvilleanStrategiesBase<RANK,true >::JumpRateStrategy::operator(),_1,t,boost::cref(matrix));
 }
 
 
-template<int RANK, int NLINDBLADS>
-inline void performJump( NoTime  , typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,false>::StateVectorLow& psi, typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,false>::JumpStrategy jump)
+template<int RANK>
+inline void performJump( NoTime  , typename ElementLiouvilleanStrategiesBase<RANK,false>::StateVectorLow& psi, typename ElementLiouvilleanStrategiesBase<RANK,false>::JumpStrategy jump)
 {
   jump(  psi);
 }
   
 
-template<int RANK, int NLINDBLADS>
-inline void performJump(OneTime t, typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,true >::StateVectorLow& psi, typename ElementLiouvilleanStrategies<RANK,NLINDBLADS,true >::JumpStrategy jump)
+template<int RANK>
+inline void performJump(OneTime t, typename ElementLiouvilleanStrategiesBase<RANK,true >::StateVectorLow& psi, typename ElementLiouvilleanStrategiesBase<RANK,true >::JumpStrategy jump)
 {
   jump(t,psi);
 }
+
+
+template<int RANK>
+inline void performSuperoperation(NoTime,
+                                  const typename ElementLiouvilleanStrategiesBase<RANK,false>::DensityOperatorLow& rho,
+                                  typename ElementLiouvilleanStrategiesBase<RANK,false>::DensityOperatorLow& drhodt,
+                                  typename ElementLiouvilleanStrategiesBase<RANK,false>::SuperoperatorStrategy f
+                                 )
+{f(rho,drhodt);}
+
+
+template<int RANK>
+inline void performSuperoperation(OneTime t,
+                                  const typename ElementLiouvilleanStrategiesBase<RANK,true>::DensityOperatorLow& rho,
+                                  typename ElementLiouvilleanStrategiesBase<RANK,true>::DensityOperatorLow& drhodt,
+                                  typename ElementLiouvilleanStrategiesBase<RANK,true>::SuperoperatorStrategy f
+                                 )
+{f(t,rho,drhodt);}
 
 
 } } // structure::details
@@ -52,7 +70,7 @@ auto structure::ElementLiouvilleanStrategies<RANK,NLINDBLADS,IS_TIME_DEPENDENT>:
 {
   Rates rates(NLINDBLADS); // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
 
-  boost::transform(jumpRates_,rates.begin(),details::convert<RANK,NLINDBLADS>(t,matrix));
+  boost::transform(jumpRates_,rates.begin(),details::convert<RANK>(t,matrix));
   
   return rates;
   
@@ -62,9 +80,16 @@ auto structure::ElementLiouvilleanStrategies<RANK,NLINDBLADS,IS_TIME_DEPENDENT>:
 template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
 void structure::ElementLiouvilleanStrategies<RANK,NLINDBLADS,IS_TIME_DEPENDENT>::actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const
 {
-  details::performJump<RANK,NLINDBLADS>(t,psi,jumps_(lindbladNo));
+  details::performJump<RANK>(t,psi,jumps_(lindbladNo));
 }
 
+
+template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
+void structure::ElementLiouvilleanStrategies<RANK,NLINDBLADS,IS_TIME_DEPENDENT>::actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const
+{
+  if (superoperatorStrategies_(lindbladNo).empty()) throw SuperoperatorNotImplementedException(lindbladNo);
+  details::performSuperoperation<RANK>(t,rho,drhodt,superoperatorStrategies_(lindbladNo));
+}
 
 #endif // CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_TCC_INCLUDED
 

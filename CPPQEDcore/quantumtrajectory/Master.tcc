@@ -53,16 +53,19 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
     linalg::calculateTwoTimesRealPartOfSelf(drhodtMatrixView);
   }
 
-  // Now act with the reset operator --- implement this in terms of
-  // the individual jumps by iteration and addition
+  // Now act with the reset operator --- implement this in terms of the individual jumps by iteration and addition
 
   for (size_t i=0; i<getQSW().template nAvr<structure::LA_Li>(); i++) {
-    DensityOperatorLow rhotemp(rhoLow.copy());
-    UnaryFunction functionLi(bind(&Liouvillean::actWithJ,getQSW().getLi(),t,_1,i));
-    unaryIter(rhotemp,functionLi);
-    blitzplusplus::hermitianConjugateSelf(rhotemp);
-    unaryIter(rhotemp,functionLi);
-    drhodtLow+=rhotemp;
+    try {
+      getQSW().getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
+    } catch (const structure::SuperoperatorNotImplementedException&) {
+      DensityOperatorLow rhotemp(rhoLow.copy());
+      UnaryFunction functionLi(bind(&Liouvillean::actWithJ,getQSW().getLi(),t,_1,i));
+      unaryIter(rhotemp,functionLi);
+      blitzplusplus::hermitianConjugateSelf(rhotemp);
+      unaryIter(rhotemp,functionLi);
+      drhodtLow+=rhotemp;
+    }
   }
 
 }
@@ -77,7 +80,6 @@ Base<RANK>::step_v(double deltaT)
     DensityOperatorLow rhoLow(rho_.getArray());
     UnaryFunction functionEx(bind(&Exact::actWithU,ex,this->getTime(),_1,this->getT0()));
     unaryIter(rhoLow,functionEx);
-    // rhoLow=hermitianConjugate(rhoLow) 
     hermitianConjugateSelf(rhoLow);
     unaryIter(rhoLow,functionEx);
     rhoLow=conj(rhoLow);
@@ -113,6 +115,20 @@ std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
       size_t i=0;
       li->displayKey(os,i);
     }
+    os<<"# Explicit superoperator calculations: ";
+    DensityOperator rhotemp(rho_.getDimensions());
+    {
+      int n=0;
+      for (int i=0; i<li->nAvr(); ++i)
+        try {
+          li->actWithSuperoperator(0,rho_.getArray(),rhotemp.getArray(),i);
+          os<<i<<' '; ++n;
+        }
+        catch (const structure::SuperoperatorNotImplementedException&) {}
+      if (!n) os<<"none";
+    }
+    os<<endl;
+
   }
   
   return os;
