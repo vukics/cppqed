@@ -211,6 +211,9 @@ private:
 template<int RANK, typename V>
 typename IndexerBase<RANK,V>::Idx IndexerBase<RANK,V>::cache_;
 
+template<int RANK, typename V>
+const typename IndexerBase<RANK,V>::Helper IndexerBase<RANK,V>::helper_;
+
 ////////////////////////////
 //
 // Transpose Implementations

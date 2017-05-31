@@ -103,7 +103,7 @@ ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::Ptr particle,
 ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
   : MF_Base(modeCav,kCav),
     particlecavity::Base(mode,particle,uNot,etaeff),
-    isSpecialH_(abs(kCav)==abs(particle->getMF().get<1>())),
+    isSpecialH_(kCav==particle->getMF().get<1>()),
     tridiagonalH_(fillTTwoModeFN(mode,particle,uNot,etaeff,MF_Base::member,isSpecialH_)),
     firstH_(etaeff*aop(mode)*mfNKX(particle,MF_Base::member)/DCOMP_I), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(particle,particle->getMF()).dagger()), secondHT_(secondH_.dagger())

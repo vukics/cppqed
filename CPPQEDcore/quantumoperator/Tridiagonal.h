@@ -320,6 +320,12 @@ private:
 };
 
 
+template<int RANK>
+const mpl::int_<1> Tridiagonal<RANK>::_1_;
+
+template<int RANK>
+const typename Tridiagonal<RANK>::Diagonal Tridiagonal<RANK>::empty;
+
 
 template<int RANK>
 inline
