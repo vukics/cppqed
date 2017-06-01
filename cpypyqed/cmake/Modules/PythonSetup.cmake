@@ -22,7 +22,7 @@
 
 # We need the Python interpreter to figure out Python's version in SuckOSX.
 if(NOT PYTHONINTERP_FOUND)
-  find_package(PythonInterp 2.6 REQUIRED)
+  find_package(PythonInterp 3.5 REQUIRED)
 endif()
 
 # Python libraries

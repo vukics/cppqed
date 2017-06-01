@@ -151,7 +151,7 @@ void pyStateFileOpeningException(const trajectory::StateFileOpeningException &e)
 
 void export_io()
 {
-  import_array();
+  import_array1();
   numeric::array::set_module_and_type("numpy", "ndarray");
   def("read", read,
 R"doc(Read in a state vector file.

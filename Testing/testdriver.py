@@ -10,7 +10,7 @@
 
 import logging
 from optparse import OptionParser
-import ConfigParser
+import configparser
 import sys
 import os
 import errno
@@ -45,8 +45,8 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(mes
 def mkdir_p(path):
   try:
     os.makedirs(path)
-  except OSError, exc:
-    if exc.errno == errno.EEXIST:
+  except (OSError, exc) as e :
+    if e[1].errno == errno.EEXIST:
       pass
     else: raise
 
@@ -807,7 +807,7 @@ def main():
   (release or debug) as well as instantiating and running the test class.
   """
   op = OptionParser()
-  cp = ConfigParser.SafeConfigParser()
+  cp = configparser.SafeConfigParser()
 
   op.add_option("--test", help="the name of the test, and the name of the section in the config file")
   op.add_option("--testclass", help="the name of the testclass to use, must implement run()")

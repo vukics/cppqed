@@ -7,7 +7,7 @@ project(cpypyqed_ondemand)
 find_package(CPPQED 2.100 REQUIRED)
 include(${{CPPQED_USE}})
 
-find_package(PythonLibs 2 REQUIRED)
+find_package(PythonLibs 3 REQUIRED)
 include_directories(${{PYTHON_INCLUDE_DIRS}})
 
 set(Boost_NO_BOOST_CMAKE 1)
