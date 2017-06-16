@@ -20,7 +20,7 @@ double sqr(double x) {return gsl_pow_2(x);}
 
 double sqrAbs(const dcomp& x) {return sqr(real(x))+sqr(imag(x));} // saves the sqrt
 
-double fact(unsigned n) throw(FactOverflow)
+double fact(unsigned n)
 {
   if (n>GSL_SF_FACT_NMAX) throw FactOverflow();
   return gsl_sf_fact(n);

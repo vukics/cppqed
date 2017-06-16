@@ -31,7 +31,7 @@ double sqr(double x);
 
 double sqrAbs(const dcomp&);
 
-double fact  (unsigned          ) throw(FactOverflow);
+double fact  (unsigned          );
 double choose(unsigned, unsigned);
 
 template<typename T>
