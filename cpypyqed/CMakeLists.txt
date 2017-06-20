@@ -46,7 +46,7 @@ include_directories(${CPPQED_INCLUDE_DIRS})
 include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS})
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
-SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON_LIBRARY})
+SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON3_LIBRARY})
 
 #! \file
 #! <!--#########################################################-->
