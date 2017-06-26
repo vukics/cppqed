@@ -30,15 +30,15 @@ quantumtrajectory::mcwf::Logger::Logger(int logLevel, size_t nLindblads)
 ostream& quantumtrajectory::mcwf::Logger::onEnd(ostream& os) const
 {
   if (logLevel_) {
-    os<<"\n# Total number of MCWF steps: "<<nMCWF_steps_<<endl
-      <<"\n# dpLimit overshot: "<<nOvershot_<<" times, maximal overshoot: "<<dpMaxOvershoot_
-      <<"\n# dpTolerance overshot: "<<nToleranceOvershot_<<" times, maximal overshoot: "<<dpToleranceMaxOvershoot_<<endl
-      <<"\n# Maximal deviation of norm from 1: "<<normMaxDeviation_<<endl
-      <<"\n# MCWF Trajectory:\n";
+    os<<"\nTotal number of MCWF steps: "<<nMCWF_steps_<<endl
+      <<"\ndpLimit overshot: "<<nOvershot_<<" times, maximal overshoot: "<<dpMaxOvershoot_
+      <<"\ndpTolerance overshot: "<<nToleranceOvershot_<<" times, maximal overshoot: "<<dpToleranceMaxOvershoot_<<endl
+      <<"\nMaximal deviation of norm from 1: "<<normMaxDeviation_<<endl
+      <<"\nMCWF Trajectory:\n";
       
-    for (auto i : traj_) os<<"# "<<i.first<<"\t"<<i.second<<std::endl;
+    for (auto i : traj_) os<<i.first<<"\t"<<i.second<<std::endl;
     // NEEDS_WORK the lambda expression of old doesn’t work with c++11
-    // boost::for_each(traj_,os<<constant("# ")<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
+    // boost::for_each(traj_,os<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
     os<<endl;
   }
   return os;
@@ -53,7 +53,7 @@ void quantumtrajectory::mcwf::Logger::stepBack(ostream& os, double dp, double dt
   ++nToleranceOvershot_;
   if (logControl) dpToleranceMaxOvershoot_=max(dpToleranceMaxOvershoot_,dp);
   if (logLevel_>2)
-    os<<"# dpTolerance overshot: "<<dp<<" stepping back to "<<t<<" timestep decreased: "<<dtDid<<" => "<<newDtTry<<endl;
+    os<<"dpTolerance overshot: "<<dp<<" stepping back to "<<t<<" timestep decreased: "<<dtDid<<" => "<<newDtTry<<endl;
 }
 
 
@@ -62,7 +62,7 @@ void quantumtrajectory::mcwf::Logger::overshot(ostream& os, double dp, double ol
   ++nOvershot_;
   if (logControl) dpMaxOvershoot_=max(dpMaxOvershoot_,dp);
   if (logLevel_>2)
-    os<<"# dpLimit overshot: "<<dp<<" timestep decreased: "<<oldDtTry<<" => "<<newDtTry<<endl;
+    os<<"dpLimit overshot: "<<dp<<" timestep decreased: "<<oldDtTry<<" => "<<newDtTry<<endl;
 }
 
 
@@ -77,7 +77,7 @@ void quantumtrajectory::mcwf::Logger::jumpOccured(ostream& os, double t, size_t 
 {
   traj_.push_back(make_pair(t,lindbladNo));
   if (logLevel_>1)
-    os<<"# Jump No. "<<lindbladNo<<" at time "<<t<<endl;
+    os<<"Jump No. "<<lindbladNo<<" at time "<<t<<endl;
 }
 
 
@@ -89,11 +89,11 @@ ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& 
 #define AVERAGE_function(f) accumulate(loggerList | adaptors::transformed(bind(&Logger::f,_1)),0.)/loggerList.size()
 #define MAX_function(f) max_element(loggerList, bind(std::less<double>(),bind(&Logger::f,_1),bind(&Logger::f,_2)) )->f
 
-  os<<"\n# Average number of total steps: "<<AVERAGE_function(nMCWF_steps_)<<endl
-    <<"\n# On average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
-    <<"\n# On average, dpTolerance overshot: "<<AVERAGE_function(nToleranceOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpToleranceMaxOvershoot_)<<endl
-    <<"\n# Maximal deviation of norm from 1: "<<MAX_function(normMaxDeviation_)<<endl;
-/* NEEDS_WORK: this was before factoring out logging to Evolved/Adaptive, so it could be restored on some more fundamental level:  if (loggerList.front().isHamiltonian_) os<<"\n# Average number of failed ODE steps: "<<AVERAGE_function(nFailedSteps_)<<"\n# Average number of Hamiltonian calls:"<<AVERAGE_function(nHamiltonianCalls_)<<endl;*/
+  os<<"\nAverage number of total steps: "<<AVERAGE_function(nMCWF_steps_)<<endl
+    <<"\nOn average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
+    <<"\nOn average, dpTolerance overshot: "<<AVERAGE_function(nToleranceOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpToleranceMaxOvershoot_)<<endl
+    <<"\nMaximal deviation of norm from 1: "<<MAX_function(normMaxDeviation_)<<endl;
+/* NEEDS_WORK: this was before factoring out logging to Evolved/Adaptive, so it could be restored on some more fundamental level:  if (loggerList.front().isHamiltonian_) os<<"\nAverage number of failed ODE steps: "<<AVERAGE_function(nFailedSteps_)<<"\nAverage number of Hamiltonian calls:"<<AVERAGE_function(nHamiltonianCalls_)<<endl;*/
       
 #undef  MAX_function
 #undef  AVERAGE_function
@@ -104,7 +104,7 @@ ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& 
 
   // Heuristic: if nBins is not given (0), then the number of bins is determined such that the bins contain nJumpsPerBin samples on average
   if (!nBins && nTotalJumps<2*nJumpsPerBin) {
-    os<<"\n# Too few jumps for a histogram\n";
+    os<<"\nToo few jumps for a histogram\n";
   }
   else {
     size_t actualNumberOfBins=nBins ? nBins : nTotalJumps/nJumpsPerBin;
@@ -115,12 +115,12 @@ ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& 
 
     const iterator_range<std::vector<std::pair<double, double> >::iterator> histogram=density(acc);
 
-    os<<"\n# Histogram of jumps. Number of bins="<<actualNumberOfBins+2<<endl;
+    os<<"\nHistogram of jumps. Number of bins="<<actualNumberOfBins+2<<endl;
     for (auto i : histogram)
-      os<<"# "<<i.first<<"\t"<<i.second<<endl;
+      os<<i.first<<"\t"<<i.second<<endl;
   }
  
-  os<<"\n# Average number of total jumps: "<<nTotalJumps/double(loggerList.size())<<endl;
+  os<<"\nAverage number of total jumps: "<<nTotalJumps/double(loggerList.size())<<endl;
  
   return os;
 }

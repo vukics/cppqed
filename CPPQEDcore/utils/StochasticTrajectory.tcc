@@ -23,7 +23,7 @@ template<typename A, typename T>
 std::ostream&
 Stochastic<A,T>::displayParameters_v(std::ostream& os) const
 {
-  return Adaptive<A>::displayParameters_v(os)<<"# Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "# No noise.\n");
+  return Adaptive<A>::displayParameters_v(os)<<"Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
 }
 
 
@@ -55,7 +55,7 @@ template<typename T, typename T_ELEM>
 std::ostream&
 Ensemble<T,T_ELEM>::displayParameters_v(std::ostream& os) const
 {
-  return trajs_.front().displayParameters( os<<"# Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );
+  return trajs_.front().displayParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );
 }
 
 

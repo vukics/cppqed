@@ -33,7 +33,7 @@ basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, d
                                       "Mode",{"photon loss","photon absorption"}),
     ElementAveraged<1>("PumpedLossyMode",{"<number operator>","real(<ladder operator>)","imag(\")"})
 {
-  getParsStream()<<"# Pumped lossy mode";
+  getParsStream()<<"Pumped lossy mode";
 }
 
 

@@ -10,7 +10,7 @@ TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix
     hamiltonianOverI_(hamiltonianOverI.copy())
 {
   if (hamiltonianOverI_.extent(0)!=hamiltonianOverI_.extent(1)) throw MatrixNotSquareException();
-  getParsStream()<<"# Time-independent matrix Hamiltonian"<<std::endl;
+  getParsStream()<<"Time-independent matrix Hamiltonian"<<std::endl;
 }
 
 

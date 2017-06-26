@@ -15,7 +15,7 @@ PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
     Base("Pumped Two-Level Atom","atomic decay"),
     za_(-pp2la.gamma,pp2la.delta), eta_(pp2la.eta)
 {
-  getParsStream()<<"# Pumped Two-Level Atom\n";
+  getParsStream()<<"Pumped Two-Level Atom\n";
 }
 
 
@@ -35,7 +35,7 @@ void PumpedTwoLevelAtom::doActWithJ(NoTime, StateVectorLow& psi) const
 PumpedTwoLevelAtomSch::PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy& pp2la)
   : Base(pp2la), hamiltonianOverI_(hamiltonianOverI(getZa(),pp2la.eta)) 
 {
-  getParsStream()<<"# Schroedinger picture.\n"; 
+  getParsStream()<<"Schroedinger picture.\n"; 
 }
 
 

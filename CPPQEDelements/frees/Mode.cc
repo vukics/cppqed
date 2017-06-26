@@ -371,7 +371,7 @@ const StateVector init(const Pars& p)
 ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs, const string& keyTitle)
     : Free(dim,realFreqs,complexFreqs)
 {
-  getParsStream()<<"# "<<keyTitle<<endl;
+  getParsStream()<<keyTitle<<endl;
 }
 
 
@@ -385,7 +385,7 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
     structure::ElementAveraged<1,true>(mode::keyTitle,{"<number operator>","real(<ladder operator>)","imag(\")"}),
     z_(p.kappa,-p.delta)
 {
-  getParsStream()<<"# Interaction picture, not derived from Exact\n";
+  getParsStream()<<"Interaction picture, not derived from Exact\n";
 }
 
 

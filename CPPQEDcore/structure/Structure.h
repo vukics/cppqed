@@ -212,7 +212,7 @@ public:
   //@}
 
   /// Displays the dynamical characteristics of the system
-  std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"# System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
+  std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
 
 
   /// \name Forwarded members from Exact

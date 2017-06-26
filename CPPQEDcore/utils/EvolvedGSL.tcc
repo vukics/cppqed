@@ -53,7 +53,7 @@ public:
     if (!cpputils::isStorageContiguous(a)) throw (NonContiguousStorageException());
   }
 
-  std::ostream& displayParameters_v(std::ostream& os) const {return os<<"# EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
+  std::ostream& displayParameters_v(std::ostream& os) const {return os<<"EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}
 
 private:
 

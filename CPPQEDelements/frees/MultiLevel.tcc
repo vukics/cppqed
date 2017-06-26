@@ -404,7 +404,7 @@ PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const
     Base(multilevel::filterReal(this->get_zSchs(),gamma_parallel),multilevel::complexFreqs(this->get_zSchs(),etas)),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  this->getParsStream()<<"# Schroedinger picture.\n";
+  this->getParsStream()<<"Schroedinger picture.\n";
 }
 
 

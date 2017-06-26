@@ -211,15 +211,15 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
   
-  getQSW().displayCharacteristics(getQSW().getQS()->displayParameters(Base::displayParameters_v(os)<<"# MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
+  getQSW().displayCharacteristics(getQSW().getQS()->displayParameters(Base::displayParameters_v(os)<<"MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
 
   if (const auto li=getQSW().getLi()) {
-    os<<"# Decay channels:\n";
+    os<<"Decay channels:\n";
     {
       size_t i=0;
       li->displayKey(os,i);
     }
-    os<<"# Alternative Lindblads: ";
+    os<<"Alternative Lindblads: ";
     {
       const Rates rates(li->rates(0,psi_));
       int n=0;

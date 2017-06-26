@@ -10,7 +10,7 @@ using namespace mode;
 nxcoupledmodes::Base<false>::Base(mode::Ptr m1, mode::Ptr m2, double u)
   : structure::Interaction<2>(Frees(m1,m2),RF{"u",u,m1->getDimension()*sqrt(m2->getDimension())})
 {
-  getParsStream()<<"# N-X coupling between modes\n";
+  getParsStream()<<"N-X coupling between modes\n";
 }
 
 

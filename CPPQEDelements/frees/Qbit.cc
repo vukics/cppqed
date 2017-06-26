@@ -97,7 +97,7 @@ QbitSch::QbitSch(const qbit::Pars& p)
   : qbit::Hamiltonian<false>(dcomp(0,-p.delta),0),
     QbitBase{TUPLE_delta(0)}
 {
-  getParsStream()<<"# Schroedinger picture.\n";
+  getParsStream()<<"Schroedinger picture.\n";
 }
 
    
@@ -105,7 +105,7 @@ PumpedQbit::PumpedQbit(const qbit::ParsPumped& p)
   : qbit::Hamiltonian<true>(0,dcomp(0,-p.delta),p.eta),
     QbitBase(TUPLE_delta(1),TUPLE_eta)
 {
-  getParsStream()<<"# Pumped.\n";
+  getParsStream()<<"Pumped.\n";
 }
 
 
@@ -113,7 +113,7 @@ PumpedQbitSch::PumpedQbitSch(const qbit::ParsPumped& p)
   : qbit::Hamiltonian<false>(dcomp(0,-p.delta),p.eta),
     QbitBase(TUPLE_delta(0),TUPLE_eta)
 {
-  getParsStream()<<"# Pumped, Schroedinger picture.\n";
+  getParsStream()<<"Pumped, Schroedinger picture.\n";
 }
 
 
@@ -122,7 +122,7 @@ LossyQbit::LossyQbit(const qbit::ParsLossy& p)
     Exact(dcomp(p.gamma,-p.delta)),
     QbitBase{TUPLE_gammadelta(1)}
 {
-  getParsStream()<<"# Lossy.\n";
+  getParsStream()<<"Lossy.\n";
 }
 
 
@@ -131,7 +131,7 @@ LossyQbitSch::LossyQbitSch(const qbit::ParsLossy& p)
     qbit::Hamiltonian<false>(dcomp(p.gamma,-p.delta),0),
     QbitBase{TUPLE_gamma,TUPLE_delta(0)}
 {
-  getParsStream()<<"# Lossy, Schroedinger picture.\n";
+  getParsStream()<<"Lossy, Schroedinger picture.\n";
 }
 
 
@@ -140,7 +140,7 @@ LossyQbitUIP::LossyQbitUIP(const qbit::ParsLossy& p)
     qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),0),
     QbitBase{TUPLE_gamma,TUPLE_delta(1)}
 {
-  getParsStream()<<"# Lossy, Unitary interaction picture.\n";
+  getParsStream()<<"Lossy, Unitary interaction picture.\n";
 }
 
 
@@ -149,7 +149,7 @@ PumpedLossyQbit::PumpedLossyQbit(const qbit::ParsPumpedLossy& p)
     qbit::Hamiltonian<true>(0,dcomp(p.gamma,-p.delta),p.eta),
     QbitBase{TUPLE_gammadelta(1),TUPLE_eta}
 {
-  getParsStream()<<"# PumpedLossy.\n";
+  getParsStream()<<"PumpedLossy.\n";
 }
 
 
@@ -158,7 +158,7 @@ PumpedLossyQbitUIP::PumpedLossyQbitUIP(const qbit::ParsPumpedLossy& p)
     qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),p.eta),
     QbitBase({TUPLE_gamma,TUPLE_delta(1)},TUPLE_eta)
 {
-  getParsStream()<<"# PumpedLossy, Unitary interaction picture.\n";
+  getParsStream()<<"PumpedLossy, Unitary interaction picture.\n";
 }
 
 
@@ -167,7 +167,7 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
     qbit::Hamiltonian<false>(dcomp(p.gamma,-p.delta),p.eta),
     QbitBase{TUPLE_gammadelta(0),TUPLE_eta}
 {
-  getParsStream()<<"# PumpedLossy, Schroedinger picture.\n";
+  getParsStream()<<"PumpedLossy, Schroedinger picture.\n";
 }
 
 
@@ -176,7 +176,7 @@ LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(const qbit::ParsLossy& p, doubl
     qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
     QbitBase(RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1))
 {
-  getParsStream()<<"# LossyWithPhaseNoise.\n";
+  getParsStream()<<"LossyWithPhaseNoise.\n";
 }
 
 
@@ -185,7 +185,7 @@ LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy& p,
     qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
     QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
-  getParsStream()<<"# LossyWithPhaseNoise, Unitary interaction picture.\n";
+  getParsStream()<<"LossyWithPhaseNoise, Unitary interaction picture.\n";
 }
 
 PumpedLossyQbitWithPhaseNoise::PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossy& p, double gamma_parallel)
@@ -193,7 +193,7 @@ PumpedLossyQbitWithPhaseNoise::PumpedLossyQbitWithPhaseNoise(const qbit::ParsPum
     qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
     QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1),TUPLE_eta}
 {
-  getParsStream()<<"# PumpedLossyWithPhaseNoise.\n";
+  getParsStream()<<"PumpedLossyWithPhaseNoise.\n";
 }
 
 PumpedLossyQbitWithPhaseNoiseUIP::PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossy& p, double gamma_parallel)
@@ -201,7 +201,7 @@ PumpedLossyQbitWithPhaseNoiseUIP::PumpedLossyQbitWithPhaseNoiseUIP(const qbit::P
     qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
     QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
-  getParsStream()<<"# PumpedLossyWithPhaseNoise, Unitary interaction picture.\n";
+  getParsStream()<<"PumpedLossyWithPhaseNoise, Unitary interaction picture.\n";
 }
 
 #undef  TUPLE_gamma

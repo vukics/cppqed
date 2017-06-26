@@ -131,7 +131,7 @@ public:
     : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim),
       quantumoperator::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(cpputils::nonOwningConstSharedPtr(this)))
   {
-    getParsStream()<<"# Schrodinger picture."<<std::endl;
+    getParsStream()<<"Schrodinger picture."<<std::endl;
   }
 
 };

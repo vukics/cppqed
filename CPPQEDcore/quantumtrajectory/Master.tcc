@@ -106,10 +106,10 @@ std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
 
-  getQSW().displayCharacteristics( getQSW().getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"# Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
+  getQSW().displayCharacteristics( getQSW().getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
 
   if (const auto li=getQSW().getLi()) {
-    os<<"# Decay channels:\n";
+    os<<"Decay channels:\n";
     {
       size_t i=0;
       li->displayKey(os,i);
