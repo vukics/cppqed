@@ -60,7 +60,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
   QuantumTrajectory::checkDimension(psi);
   if (!getTime()) if(const auto li=getQSW().getLi()) { // On startup, dpLimit should not be overshot, either.
     Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
-    manageTimeStep(rates,getEvolved().get(),false);
+    manageTimeStep(rates,getEvolved().get(),false,true);
   }
 }
 
@@ -119,7 +119,7 @@ auto MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const 
 
 
 template<int RANK>
-bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStepBookkeeper* evolvedCache, bool logControl)
+bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStepBookkeeper* evolvedCache, bool logControl, bool calledFromCtor)
 {
   const double totalRate=boost::accumulate(rates,0.);
   const double dtDid=this->getDtDid(), dtTry=getDtTry();
@@ -130,10 +130,10 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStep
   if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
     evolvedCache->setDtTry(liouvilleanSuggestedDtTry);
     (*getEvolved())=*evolvedCache;
-    logger_.stepBack(this->getLogStreamDuringRun(),totalRate*dtDid,dtDid,getDtTry(),getTime(),logControl);
+    if (!calledFromCtor) logger_.stepBack(this->getLogStreamDuringRun(),totalRate*dtDid,dtDid,getDtTry(),getTime(),logControl);
     return true; // Step-back required.
   }
-  else if (totalRate*dtTry>dpLimit_) {
+  else if (!calledFromCtor && totalRate*dtTry>dpLimit_) {
     logger_.overshot(this->getLogStreamDuringRun(),totalRate*dtTry,dtTry,liouvilleanSuggestedDtTry,logControl);
   }
 

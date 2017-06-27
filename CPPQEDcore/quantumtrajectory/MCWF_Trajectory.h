@@ -128,7 +128,7 @@ private:
   double                coherentTimeDevelopment(                    double Dt);
   const IndexSVL_tuples calculateSpecialRates  (      Rates* rates, double  t) const;
 
-  bool                  manageTimeStep             (const Rates& rates, evolved::TimeStepBookkeeper*, bool logControl=true);
+  bool                  manageTimeStep             (const Rates& rates, evolved::TimeStepBookkeeper*, bool logControl=true, bool calledFromCtor=false);
 
   void                  performJump                (const Rates&, const IndexSVL_tuples&, double); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
