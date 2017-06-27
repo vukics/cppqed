@@ -208,8 +208,8 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  traj.logOnEnd(CommentingStream(os));
-  if (!stateSaved)   writeViaSStream(traj,ofs.get());
+  {CommentingStream temp(os); traj.logOnEnd(temp);}
+  if (!stateSaved) writeViaSStream(traj,ofs.get());
   
 }
 
@@ -217,10 +217,10 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 
 
 template<typename A>
-void trajectory::run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
+void trajectory::run(Adaptive<A>& traj, double time, int dc, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
                      bool displayInfo, bool firstStateDisplay,
                      double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
-{details::run(traj,time,dc    ,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,autoStopEpsilon,autoStopRepetition,parsedCommandLine);}
+{details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,autoStopEpsilon,autoStopRepetition,parsedCommandLine);}
 
 
 template<typename A>

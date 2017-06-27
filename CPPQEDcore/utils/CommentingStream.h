@@ -419,6 +419,9 @@ class CommentingStream : public boost::iostreams::filtering_ostream
 {
 public:
   explicit CommentingStream(std::ostream& os) {push(details::CommentingFilter()); push(os);}
+  
+  cpputils::CommentingStream& operator=(std::ostream& newOstream) {reset(); push(details::CommentingFilter()); push(newOstream); return *this;}
+
 };
 
 

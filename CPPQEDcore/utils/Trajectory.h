@@ -7,6 +7,7 @@
 #include "TrajectoryFwd.h"
 
 #include "Archive.h"
+#include "CommentingStream.h"
 #include "Exception.h"
 #include "Evolved.h"
 #include "SmartPtr.h"
@@ -214,6 +215,8 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
 class Trajectory : private boost::noncopyable
 {
 public:
+  class CommentingStreamUnsetException : public cpputils::Exception {};
+  
   /// Propagation for a time interval of exactly deltaT
   void evolve(double deltaT) {evolve_v(deltaT);}
 
@@ -239,10 +242,11 @@ public:
 
   virtual ~Trajectory() {}
 
-  void setLogStreamDuringRun(boost::shared_ptr<std::ostream> os) const {logStreamDuringRun_=os;}
-  
+  void setLogStreamDuringRun(boost::shared_ptr<std::ostream> os) {commentingStream_.set=true; commentingStream_.p=os; commentingStream_.s=*os;}
+
 protected:
-  std::ostream& getLogStreamDuringRun() const {return *logStreamDuringRun_;}
+  /// The stream hence obtained must always be flushed before anything else gets to write on the same underlying stream (e.g. with `std::endl`)
+  std::ostream& getLogStreamDuringRun() const {if (!commentingStream_.set) throw CommentingStreamUnsetException(); return commentingStream_.s;}
   
 private:
   virtual void            evolve_v(double)       = 0; // A step of exactly deltaT
@@ -257,9 +261,13 @@ private:
   virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
 
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
-  
-  mutable boost::shared_ptr<std::ostream> logStreamDuringRun_=cpputils::nonOwningSharedPtr<std::ostream>(&std::cout);
-  
+
+  struct {
+    bool set{false};
+    boost::shared_ptr<std::ostream> p;
+    mutable cpputils::CommentingStream s{std::cout};
+  } commentingStream_;
+
 };
 
 
