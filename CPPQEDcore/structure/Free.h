@@ -74,7 +74,7 @@ private:
   double         highestFrequency_v(                ) const final {return DynamicsBase::highestFrequency (  );}
   std::ostream& displayParameters_v(std::ostream& os) const final {return DynamicsBase::displayParameters(os);}
 
-  std::ostream& displayMoreParameters(std::ostream& os) const final {return DynamicsBase::displayMoreParameters(os<<"# Dimension: "<<getDimension()<<std::endl);}
+  std::ostream& displayMoreParameters(std::ostream& os) const final {return DynamicsBase::displayMoreParameters(os<<"Dimension: "<<getDimension()<<std::endl);}
 
 };
 

@@ -274,7 +274,7 @@ public:
   MultiLevelBase(const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs())
     : structure::Free(NL,realFreqs,complexFreqs)
   {
-    getParsStream()<<"# "<<multilevel::keyTitle<<std::endl;
+    getParsStream()<<multilevel::keyTitle<<std::endl;
   }
 
   virtual ~MultiLevelBase() {}

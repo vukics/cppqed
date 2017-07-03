@@ -15,8 +15,8 @@ ostream& cpputils::KeyPrinter::displayKey(ostream& os, size_t& i) const
 {
   namespace bll=boost::lambda;
 
-  os<<"# "<<keyTitle_;
-  boost::for_each(keyLabels_,os<<bll::constant("\n# ")<<bll::constant(setw(2))<<bll::var(i)++<<". "<<bll::_1);
+  os<<keyTitle_;
+  boost::for_each(keyLabels_,os<<bll::constant("\n")<<bll::constant(setw(2))<<bll::var(i)++<<". "<<bll::_1);
   return os<<endl;
 }
 

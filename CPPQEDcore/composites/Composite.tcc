@@ -210,7 +210,6 @@ public:
   template<typename Act>
   void operator()(const Act& act) const
   {
-    os_<<"# ";
     mpl::for_each<Act>(Inner<Act>(act,os_));
     os_<<"Interaction\n";
     act.get()->displayParameters(os_);
@@ -220,7 +219,7 @@ public:
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    os_<<"# Subsystem Nr. "<<IDX<<std::endl;
+    os_<<"Subsystem Nr. "<<IDX<<std::endl;
     frees_(IDX).get()->displayParameters(os_);
   }
   
@@ -236,7 +235,7 @@ private:
 template<typename VA>
 std::ostream& composite::Base<VA>::displayParameters_v(std::ostream& os) const
 {
-  os<<"# Composite\n# Dimensions: "<<RBase::getDimensions()<<". Total: "<<RBase::getTotalDimension()<<std::endl;
+  os<<"Composite\nDimensions: "<<RBase::getDimensions()<<". Total: "<<RBase::getTotalDimension()<<std::endl;
   CALL_composite_worker( DisplayParameters(frees_,os) ) ;
   return os;
 }

@@ -16,7 +16,7 @@ std::ostream&
 quantumtrajectory::display_densityoperator::_<RANK,V>::displayKey(std::ostream& os, size_t& i) const 
 {
   if (av_) av_->displayKey(os,i); 
-  if (negativity_) os<<"# Trajectory\n# "<<i<<". negativity"<<std::endl;
+  if (negativity_) os<<"Trajectory\n"<<i<<". negativity"<<std::endl;
   return os;
 }
 

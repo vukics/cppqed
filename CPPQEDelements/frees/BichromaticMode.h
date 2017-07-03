@@ -55,7 +55,7 @@ public:
                                                      furnishWithFreqs(mode::pumping(p.etaOther,getDimension()),
                                                                       mode::mainDiagonal(zI_Other,getDimension()))
                                                      );
-    getParsStream()<<"# Bichromatic pumping."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<TEMPERATURE>());
+    getParsStream()<<"Bichromatic pumping."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<TEMPERATURE>());
   }
 
 private:

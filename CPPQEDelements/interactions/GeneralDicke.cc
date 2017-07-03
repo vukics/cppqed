@@ -16,6 +16,6 @@ generaldicke::Base::Base(mode::Ptr mode, spin::Ptr spin, dcomp u, dcomp y)
                                    +
                                     y*(aop(mode).dagger()+aop(mode))*sx(spin))/DCOMP_I)
 {
-  getParsStream()<<"# General Dicke interaction\n";
+  getParsStream()<<"General Dicke interaction\n";
   // getParsStream()<<sx(spin->getDimension()-1)<<std::endl;
 }

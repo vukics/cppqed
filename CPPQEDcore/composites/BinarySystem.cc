@@ -52,10 +52,10 @@ double binary::Base::highestFrequency_v() const
 std::ostream& binary::Base::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
-  os<<"# Binary System\n# Dimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<endl<<endl
-    <<"# Subsystem Nr. 0\n";     free0_.get()->displayParameters(os);
-  os<<"# Subsystem Nr. 1\n";     free1_.get()->displayParameters(os);
-  os<<"# 0 - 1 - Interaction\n";
+  os<<"Binary System\nDimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()
+    <<"\n\nSubsystem Nr. 0\n";     free0_.get()->displayParameters(os);
+  os<<    "Subsystem Nr. 1\n";     free1_.get()->displayParameters(os);
+  os<<"0 - 1 - Interaction\n";
   return ia_.get()->displayParameters(os);
 }
 
@@ -118,7 +118,7 @@ namespace binary {
 template<LiouvilleanAveragedTag LA>
 std::ostream& displayKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
 {
-  os<<"# Binary system\n";
+  os<<"Binary system\n";
   free0.displayKey<LA>(os,i);
   free1.displayKey<LA>(os,i);
   return ia.displayKey<LA>(os,i);

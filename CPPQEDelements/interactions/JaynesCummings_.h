@@ -48,7 +48,7 @@ protected:
   Base(boost::shared_ptr<const QBIT_SPIN_BASE> qbitspin, mode::Ptr mode, const dcomp& g=0)
   : IA_Base(Frees(qbitspin,mode),CF{"g",g,sqrt(qbitspin->getDimension()*mode->getDimension())})
   {
-    getParsStream()<<"# Jaynes-Cummings interaction\n";
+    getParsStream()<<"Jaynes-Cummings interaction\n";
   }
 
 };

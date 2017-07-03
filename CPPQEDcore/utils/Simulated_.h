@@ -52,7 +52,7 @@ private:
   
   std::ostream& displayKey_v(std::ostream& os, size_t&) const final {return os;}
 
-  std::ostream& displayParameters_v(std::ostream& os) const final {return Base::displayParameters_v(os<<"\n# Simulated.\n");}
+  std::ostream& displayParameters_v(std::ostream& os) const final {return Base::displayParameters_v(os<<"\nSimulated.\n");}
 
   const std::string trajectoryID_v() const final {return "Simulated";}
 

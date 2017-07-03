@@ -5,6 +5,7 @@
 
 #include "Trajectory.h"
 
+#include "CommentingStream.h"
 #include "Evolved.tcc"
 #include "FormDouble.h"
 #include "ParsTrajectory.h"
@@ -138,17 +139,25 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Writing introduction
   ///////////////////////
 
+  {
+  
+  CommentingStream commentingStream(os);
+  
+  // auto & commentingStream=os;
+    
   if (displayInfo) {
     if (!continuing) {
-      if (parsedCommandLine!="") os<<"# "<<parsedCommandLine<<endl<<endl;
-      traj.displayParameters(os<<versionHelper())
-        <<endl<<"# Run Trajectory up to time "<<timeToReach
+      if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
+      traj.displayParameters(commentingStream<<versionHelper())
+        <<endl<<"Run Trajectory up to time "<<timeToReach
         <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
     }
     else
-      os<<"# Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
+      commentingStream<<"Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
   }
 
+  }
+  
   if (!timeToReach) {traj.display(os,precision); return;}
 
   //////////////////////////////
@@ -192,15 +201,15 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
       }
     }
 
-  } catch (const StoppingCriterionReachedException& except) {os<<"# Stopping criterion has been reached"<<endl;}
+  } catch (const StoppingCriterionReachedException& except) {CommentingStream(os)<<"Stopping criterion has been reached"<<endl;}
   if (!evsDisplayed) traj.display(os,precision);
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  traj.logOnEnd(os);
-  if (!stateSaved)   writeViaSStream(traj,ofs.get());
+  {CommentingStream temp(os); traj.logOnEnd(temp);}
+  if (!stateSaved) writeViaSStream(traj,ofs.get());
   
 }
 
@@ -208,10 +217,10 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 
 
 template<typename A>
-void trajectory::run(Adaptive<A>& traj, double time, int    dc    , unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
+void trajectory::run(Adaptive<A>& traj, double time, int dc, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
                      bool displayInfo, bool firstStateDisplay,
                      double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
-{details::run(traj,time,dc    ,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,autoStopEpsilon,autoStopRepetition,parsedCommandLine);}
+{details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,autoStopEpsilon,autoStopRepetition,parsedCommandLine);}
 
 
 template<typename A>
@@ -259,7 +268,7 @@ trajectory::Adaptive<A>::Adaptive(A& y, Derivs derivs, double dtInit, const Pars
 template<typename A>
 std::ostream& trajectory::Adaptive<A>::displayParameters_v(std::ostream& os) const
 {
-  return evolved_->displayParameters(os)<<"# Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
+  return evolved_->displayParameters(os)<<"Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }
 
 template<typename A>
@@ -290,7 +299,7 @@ void trajectory::Adaptive<A>::step(double deltaT)
 {
   step_v(deltaT);
   if (logLevel_>3)
-    this->getLogStreamDuringRun()<<"# Number of failed steps in this timestep: "<<evolved_->nFailedStepsLast()<<std::endl;
+    this->getLogStreamDuringRun()<<"Number of failed steps in this timestep: "<<evolved_->nFailedStepsLast()<<std::endl;
 }
 
 

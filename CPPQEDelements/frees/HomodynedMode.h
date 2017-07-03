@@ -78,7 +78,7 @@ public:
                "Homodyned mode"),
       AveragingType(std::forward<AveragingConstructorParameters>(a)...)
   {
-    getParsStream()<<"# Homodyne detection.\n";
+    getParsStream()<<"Homodyne detection.\n";
   }
 
 };

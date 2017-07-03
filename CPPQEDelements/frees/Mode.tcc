@@ -118,7 +118,7 @@ ModeSch<AveragingType>::ModeSch(const mode::Pars& p, AveragingConstructorParamet
     ModeBase(p.cutoff,TUPLE_delta(0)),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# Schroedinger picture.\n";
+  getParsStream()<<"Schroedinger picture.\n";
 }
 
 
@@ -128,7 +128,7 @@ PumpedMode<AveragingType>::PumpedMode(const mode::ParsPumped& p, AveragingConstr
     ModeBase(p.cutoff,TUPLE_delta(1),TUPLE_eta),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# Pumped.\n";
+  getParsStream()<<"Pumped.\n";
 }
 
 
@@ -138,7 +138,7 @@ PumpedModeSch<AveragingType>::PumpedModeSch(const mode::ParsPumped& p, Averaging
     ModeBase(p.cutoff,TUPLE_delta(0),TUPLE_eta),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# Pumped, Schroedinger picture.\n";
+  getParsStream()<<"Pumped, Schroedinger picture.\n";
 }
 
 
@@ -149,7 +149,7 @@ LossyMode<TEMPERATURE,AveragingType>::LossyMode(const mode::ParsLossy& p, Averag
     ModeBase(p.cutoff,TUPLE_kappadelta(1)),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
@@ -160,7 +160,7 @@ LossyModeUIP<TEMPERATURE,AveragingType>::LossyModeUIP(const mode::ParsLossy& p, 
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
@@ -171,7 +171,7 @@ LossyModeSch<TEMPERATURE,AveragingType>::LossyModeSch(const mode::ParsLossy& p, 
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(0)}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
@@ -182,7 +182,7 @@ PumpedLossyMode<TEMPERATURE,AveragingType>::PumpedLossyMode(const mode::ParsPump
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
@@ -193,7 +193,7 @@ PumpedLossyModeUIP<TEMPERATURE,AveragingType>::PumpedLossyModeUIP(const mode::Pa
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)},TUPLE_eta),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
@@ -204,7 +204,7 @@ PumpedLossyModeSch<TEMPERATURE,AveragingType>::PumpedLossyModeSch(const mode::Pa
     ModeBase(p.cutoff,{TUPLE_kappadelta(0),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
 }
 
 
@@ -218,7 +218,7 @@ PumpedLossyModeAlternative<TEMPERATURE,AveragingType>::PumpedLossyModeAlternativ
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"# PumpedLossy---Alternative jumping.\n";
+  getParsStream()<<"PumpedLossy---Alternative jumping.\n";
 }
 
 

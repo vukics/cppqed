@@ -335,7 +335,7 @@ macro(scripts_project)
 
   generate_version_files()
 
-  set(CONF_COMPONENT_VERSIONS "\"# \"+cppqed_core_version()+\"# \"+cppqed_elements_version()")
+  set(CONF_COMPONENT_VERSIONS "cppqed_core_version()+cppqed_elements_version()")
   set(CONF_COMPONENT_VERSIONS_INCLUDES "#include \"core_version.h\"\n#include \"elements_version.h\"\n")
 
   # find additional elements projects
@@ -344,11 +344,11 @@ macro(scripts_project)
     set(ALL_ELEMENTS_LIBRARIES ${ALL_ELEMENTS_LIBRARIES} ${CPPQED${elements}_LIBRARIES})
     include_directories(${CPPQED${elements}_INCLUDE_DIRS})
     set(CONF_COMPONENT_VERSIONS_INCLUDES "${CONF_COMPONENT_VERSIONS_INCLUDES}#include \"${elements}_version.h\"\n")
-    set(CONF_COMPONENT_VERSIONS "${CONF_COMPONENT_VERSIONS}+\"# \"+cppqed_${elements}_version()")
+    set(CONF_COMPONENT_VERSIONS "${CONF_COMPONENT_VERSIONS}+cppqed_${elements}_version()")
   endforeach()
 
   set(CONF_COMPONENT_VERSIONS_INCLUDES "${CONF_COMPONENT_VERSIONS_INCLUDES}#include \"${PROJECT_NAME}_version.h\"")
-  set(CONF_COMPONENT_VERSIONS "${CONF_COMPONENT_VERSIONS}+\"# \"+cppqed_${PROJECT_NAME}_version()")
+  set(CONF_COMPONENT_VERSIONS "${CONF_COMPONENT_VERSIONS}+cppqed_${PROJECT_NAME}_version()")
 
   configure_file(${CPPQED_CMAKE_DIR}/component_versions.cc.in ${PROJECT_BINARY_DIR}/component_versions.cc @ONLY)
   configure_file(${CPPQED_CMAKE_DIR}/component_versions.h.in ${PROJECT_BINARY_DIR}/component_versions.h @ONLY)

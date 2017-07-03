@@ -59,9 +59,9 @@ istream& operator>>(istream& is, SteppingFunction& sf)
 std::ostream& LoggingBase::logOnEnd(std::ostream& os) const
 {
   return
-  os<<"\n# Total number of ODE steps: "<<nSteps_
-    <<"\n# Number of failed ODE steps: "<<nFailedSteps_
-    <<"\n# Number of calls of function calculating RHS for ODE: "<<nDerivsCalls_<<std::endl;
+  os<<"\nTotal number of ODE steps: "<<nSteps_
+    <<"\nNumber of failed ODE steps: "<<nFailedSteps_
+    <<"\nNumber of calls of function calculating RHS for ODE: "<<nDerivsCalls_<<std::endl;
 }
 
 } // evolved

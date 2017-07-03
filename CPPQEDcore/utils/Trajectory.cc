@@ -67,7 +67,7 @@ ostream& trajectory::Trajectory::display(ostream& os, int precision) const
 ostream& trajectory::Trajectory::displayParameters(ostream& os) const
 {
   size_t i=3;
-  return displayKey_v(displayParameters_v(os)<<endl<<"# Key to data:\n# Trajectory\n#  1. time\n#  2. dtDid\n" , i);
+  return displayKey_v(displayParameters_v(os)<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n" , i);
 }
 
 boost::shared_ptr<istream> trajectory::openStateFileReading(const std::string &filename)

@@ -70,7 +70,7 @@ Base<NL,VC>::Base(MultiLevelPtr ml, mode::Ptr mode, const VC& gs)
 			      complexFreqs(gs)), 
     mds_(boost::fusion::transform(gs,CouplingToModeDynamics(ml,mode)))
 {
-  getParsStream()<<"# Multi-Level Jaynes-Cummings\n";
+  getParsStream()<<"Multi-Level Jaynes-Cummings\n";
 }
 
 

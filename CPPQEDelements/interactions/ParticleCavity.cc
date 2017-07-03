@@ -67,7 +67,7 @@ const particlecavity::Tridiagonals fillTTwoModeFN(mode::Ptr mode, particle::PtrP
 particlecavity::Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff)
   : structure::Interaction<2>(Frees(mode,particle),{RF{"Unot",uNot,mode->getDimension()},RF{"etaeff",etaeff,sqrt(mode->getDimension())}})
 {
-  getParsStream()<<"# Particle-Cavity Interaction\n";
+  getParsStream()<<"Particle-Cavity Interaction\n";
 }
 
 ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot)
@@ -78,7 +78,7 @@ ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle:
   : particlecavity::Base(mode,particle,uNot,etaeff),
     TridiagonalHamiltonian(interfericOneModeFN(mode,particle,etaeff,particle->getMF()))
 {
-  getParsStream()<<"# Particle moving orthogonal to cavity\n"; /* photons/(particle number)^2="
+  getParsStream()<<"Particle moving orthogonal to cavity\n"; /* photons/(particle number)^2="
                                                                   <<uNot*particle->getV_Class()/sqrAbs(mode->getComplexFreqs(""))<<std::endl; */
 }
 
@@ -97,7 +97,7 @@ ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::Ptr particle,
     firstH_(quantumoperator::identity(0)*quantumoperator::identity(0)),firstHT_(firstH_),    // not used
     secondH_(quantumoperator::identity(0)),secondHT_(secondH_)  // not used
 {
-  getParsStream()<<"# Particle moving along cavity with "<<getMF()<<endl;
+  getParsStream()<<"Particle moving along cavity with "<<getMF()<<endl;
 }
 
 ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
@@ -108,7 +108,7 @@ ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped par
     firstH_(etaeff*aop(mode)*mfNKX(particle,MF_Base::member)/DCOMP_I), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(particle,particle->getMF()).dagger()), secondHT_(secondH_.dagger())
 {
-  getParsStream()<<"# Particle with "<< particle->getMF() <<" pump moving along cavity with "<<getMF()<<endl;
+  getParsStream()<<"Particle with "<< particle->getMF() <<" pump moving along cavity with "<<getMF()<<endl;
 }
 
 void ParticleAlongCavity::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const

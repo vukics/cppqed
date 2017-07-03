@@ -184,7 +184,7 @@ ParticleBase::ParticleBase(size_t fin,
                            const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
   : Free(1<<fin,realFreqs,complexFreqs), Averaged(particle::Spatial(fin))
 {
-  getParsStream()<<"# Particle\n";
+  getParsStream()<<"Particle\n";
   getSpace().header(getParsStream());
 }
 
@@ -196,7 +196,7 @@ PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunc
                  complexFreqs),
     vClass_(vClass), mf_(mf)
 {
-  getParsStream()<<"# Pump "<<mf<<endl;
+  getParsStream()<<"Pump "<<mf<<endl;
 }
 
 
@@ -212,7 +212,7 @@ ParticleSch::ParticleSch(const particle::Pars& p)
   : ParticleBase(p.fin,{RF{"omrec",p.omrec,sqr(1<<p.fin)}}),
     Hamiltonian<false>(getSpace(),p.omrec)
 {
-  getParsStream()<<"# Schroedinger picture.\n";
+  getParsStream()<<"Schroedinger picture.\n";
 }
 
 
@@ -228,7 +228,7 @@ PumpedParticleSch::PumpedParticleSch(const particle::ParsPumped& p)
   : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec" ,p.omrec,sqr(1<<p.fin)}}),
     Hamiltonian<false>(getSpace(),p.omrec,p.vClass,getMF())
 {
-  getParsStream()<<"# Schroedinger picture.\n";
+  getParsStream()<<"Schroedinger picture.\n";
 }
 
 
@@ -262,7 +262,7 @@ particle::Spatial::Spatial(size_t fin, double deltaK)
 
 void particle::Spatial::header(std::ostream& os) const
 {
-  os<<"# Spatial Degree of Freedom finesse="<<fin_<<" xMax="<<xMax_<<" deltaX="<<deltaX_<<" kMax="<<kMax_<<" deltaK="<<deltaK_<<std::endl;
+  os<<"Spatial Degree of Freedom finesse="<<fin_<<" xMax="<<xMax_<<" deltaX="<<deltaX_<<" kMax="<<kMax_<<" deltaK="<<deltaK_<<std::endl;
 }
 
 
