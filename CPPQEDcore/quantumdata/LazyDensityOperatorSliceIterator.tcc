@@ -23,23 +23,6 @@ using namespace cpputils::mii;
 
 class NoSuchImplementation : public cpputils::Exception {};
 
-namespace details {
-
-
-template<int RANK, typename V>
-struct ExtendV : mpl::fold<V,
-                           V,
-                           mpl::push_back<mpl::_1,
-                                          mpl::plus<mpl::_2,
-                                                    mpl::int_<RANK>
-                                                    >
-                                          >
-                           >
-{};
-
-
-} // details
-
 
 template<int RANK, typename V>
 class DiagonalIterator<RANK,V>::DI_ImplSpecial
@@ -70,7 +53,7 @@ public:
     }
     else if (const auto dO=dynamic_cast<const DO*>(&ldo)) {
       typename DO::DensityOperatorLow temp(dO->getArray());
-      return boost::make_shared<DO>(Transposer<2*RANK,typename details::ExtendV<RANK,V>::type>::transpose(temp),byReference);
+      return boost::make_shared<DO>(Transposer<2*RANK,typename tmptools::ExtendVector<RANK,V>::type>::transpose(temp),byReference);
     }
     else throw NoSuchImplementation();
   }
@@ -175,7 +158,7 @@ private:
 
     typedef typename Base::LazyDensityOperatorRes LazyDensityOperatorRes;
 
-    typedef typename details::ExtendV<RANK,V>::type ExtendedV;
+    typedef typename tmptools::ExtendVector<RANK,V>::type ExtendedV;
     
     typedef blitzplusplus::basi::Iterator<2*RANK,ExtendedV,true> BASI;
 

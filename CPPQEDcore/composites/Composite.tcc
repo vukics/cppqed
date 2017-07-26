@@ -565,6 +565,50 @@ void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_
 }
 
 
+template<typename VA>
+class composite::Liouvillean<VA>::ActWithSuperoperator
+{
+public:
+  ActWithSuperoperator(const Frees& frees, double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t& ordoJump, bool& flag)
+    : frees_(frees), t_(t), rho_(rho), drhodt_(drhodt), ordoJump_(ordoJump), flag_(flag) {}
+
+  template<typename Vec, typename Li>
+  void help(typename Li::Ptr li) const
+  {
+    if (!flag_ && li) {
+      size_t n=li->nAvr();
+      if (ordoJump_<n) {
+        for_each(blitzplusplus::basi::fullRange<typename tmptools::ExtendVector<RANK,Vec>::type>(rho_),
+                 blitzplusplus::basi::fullRange<typename tmptools::ExtendVector<RANK,Vec>::type>(drhodt_),
+                 boost::bind(&Li::actWithSuperoperator,li,t_,::_1,::_2,ordoJump_));
+        flag_=true;
+      }
+      ordoJump_-=n;  
+    }
+  }
+
+  ACTS_FREES_operator(Li);
+  
+private:
+  const Frees& frees_;
+
+  const double t_;
+  const DensityOperatorLow& rho_;
+  DensityOperatorLow& drhodt_;
+  size_t& ordoJump_;
+  bool& flag_;
+
+};
+
+
+template<typename VA>
+void composite::Liouvillean<VA>::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t ordoJump) const
+{
+  bool flag=false;
+  CALL_composite_worker( ActWithSuperoperator(frees_,t,rho,drhodt,ordoJump,flag) ) ;
+}
+
+
 ///////////
 //
 // Averaged

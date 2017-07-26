@@ -12,8 +12,7 @@
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/mpl/for_each.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/mpl/vector.hpp>
+
 
 namespace quantumdata {
 
