@@ -1,6 +1,5 @@
 /// \briefFile{Defines free elements of the \ref multilevelbundle "MultiLevel bundle" }
 // Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-// -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
 
@@ -15,6 +14,8 @@
 #include "Free.h"
 #include "FreeExact.h"
 #include "Hamiltonian.h"
+
+#include "primitive.hpp"
 
 #include <boost/fusion/mpl/size.hpp>
 
@@ -75,64 +76,14 @@ private:
 //////////////
 
 
-template<typename T>
-class Storage
-{
-public:
-  Storage(const T& value) : value_(value) {}
-
-  const T& get() const {return value_;}
-  void set(const T& value) {value_=value;}
-
-private:
-  T value_;
-
-};
-
-
-template<>
-class Storage<double>
-{
-public:
-  Storage(double value) : value_(value) {}
-
-  double get() const {return value_;}
-  void set(double value) {value_=value;}
-
-private:
-  double value_;
-
-};
-
-
-
-template<typename T>
-inline
-std::ostream& operator<<(std::ostream& os, const Storage<T>& s)
-{
-  return os<<s.get();
-}
-
-
-template<typename T>
-inline
-std::istream& operator>>(std::istream& is,       Storage<T>& s)
-{
-  T temp; is>>temp;
-  s.set(temp);
-  return is;
-}
-
+using cpputils::primitive;
 
 /// Class representing an elementary pump term (an \f$\eta_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
 template<int I, int J>
-class Pump : public Storage<dcomp>, public tmptools::pair_c<I,J>
+class Pump : public primitive<dcomp>, public tmptools::pair_c<I,J>
 {
 public:
-  typedef Storage<dcomp> Base;
-
-  Pump(const dcomp& value) : Base(value) {}
-  Pump() : Base(dcomp()) {}
+  using primitive<dcomp>::primitive;
 
 };
 
@@ -194,13 +145,10 @@ private:
 
 /// Class representing an elementary decay term (a \f$\gamma_{ij}\f$ \ref multilevelelements "here") with a compile-time pair \f$i,j\f$ and a runtime real value
 template<int I, int J>
-class Decay : public Storage<double>, public tmptools::pair_c<I,J>
+class Decay : public primitive<double>, public tmptools::pair_c<I,J>
 {
 public:
-  typedef Storage<double> Base;
-
-  Decay(double value) : Base(value) {}
-  Decay() : Base(0) {}
+  using primitive<double>::primitive;
 
 };
 

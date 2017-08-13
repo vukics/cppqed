@@ -70,8 +70,6 @@ This is the Hamiltonian that can be implemented by the elements in the MultiLeve
 
 \note The bundle is designed in such a way that a set of drivings (\f$\eta_{ij}\f$), couplings to harmonic-oscillator modes (\f$g_{ij}\f$), and decays (\f$\gamma_{ij}\f$) can be defined *at compile time* as lists of pairs of \f$i\f$ and \f$j\f$ levels. From these lists, the framework assembles the Hamiltonian of the system *at compile time* to a form corresponding to the last one above, and the Lindblad operators as a set of operators like above. Then, the values of parameters like \f$\eta_{ij}\f$, \f$g_{ij}\f$, and \f$\gamma_{ij}\f$ for all the pairs such defined can be specified at runtime. The rationale of this arrangement is that such pairs of levels as are never expected to be driven or coupled (or lossy), will not pollute the Hamiltonian with terms which would turn out to be zero at runtime. (Or, if the pair is not specified in the list of decays, it will not be considered when trying for quantum jumps.)
 
-\todo Describe phase noise.
-
 Examples {#multilevelexamples}
 ========
 

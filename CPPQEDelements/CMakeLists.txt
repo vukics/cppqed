@@ -8,9 +8,13 @@
 #! generate the library, and cppqed_documentation() to generate the documentation.
 
 
-cmake_minimum_required (VERSION 2.8.9)
+cmake_minimum_required (VERSION 3.1)
 
 project(elements)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 ############################################################
 # This section is essential to find the required libraries 

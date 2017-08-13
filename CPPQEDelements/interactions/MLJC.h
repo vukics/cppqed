@@ -16,13 +16,11 @@
 
 /// Class representing an elementary coupling term (a \f$g_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
 template<int I, int J>
-class Coupling : public multilevel::Storage<dcomp>, public tmptools::pair_c<I,J>
+class Coupling : public cpputils::primitive<dcomp>, public tmptools::pair_c<I,J>
 {
 public:
-  typedef multilevel::Storage<dcomp> Base;
+  using cpputils::primitive<dcomp>::primitive;
 
-  Coupling(const dcomp& value) : Base(value) {}
-  Coupling() : Base(dcomp()) {}
 };
 
 

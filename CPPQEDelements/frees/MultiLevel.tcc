@@ -1,5 +1,4 @@
 // Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-// -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL_TCC_INCLUDED
 #define   CPPQEDELEMENTS_FREES_MULTILEVEL_TCC_INCLUDED
 
@@ -261,8 +260,8 @@ private:
 
 
 template<int NL, typename VL>
-const typename Liouvillean<NL,VL>::KeyLabels
-Liouvillean<NL,VL>::fillKeyLabels()
+auto
+Liouvillean<NL,VL>::fillKeyLabels() -> const KeyLabels
 {
   typename Liouvillean::KeyLabels res;
   mpl::for_each<VL>(KeyHelper(res));
@@ -307,23 +306,19 @@ private:
 } // details
 
 
-#define RETURN_type blitz::TinyVector<dcomp,NL>
-
 template<int NL, typename VL>
-const RETURN_type
+const auto
 decayingLevels(const RealLevels<NL>& deltas, const VL& gammas)
 {
-  RETURN_type res(deltas);
+  blitz::TinyVector<dcomp,NL> res(deltas);
   res*=-DCOMP_I;
   for_each(gammas,details::ElementaryDL<NL>(res));
   return res;
 }
 
-#undef  RETURN_type
-
 
 template<int NL>
-const structure::DynamicsBase::RealFreqs
+const auto
 filterReal(const Levels<NL>& levels, double gamma_parallel)
 {
   using namespace std;
@@ -363,16 +358,13 @@ private:
 
 
 
-#define RETURN_type structure::DynamicsBase::ComplexFreqs
-
-
 template<int NL, typename VP>
-const RETURN_type
+const auto
 complexFreqs(const Levels<NL>& levels, const VP& etas)
 {
   using namespace std;
 
-  RETURN_type res;
+  structure::DynamicsBase::ComplexFreqs res;
   for (int i=0; i<NL; i++)
     if (hasRealPart(levels(i))) {
       ostringstream tag;
@@ -383,8 +375,6 @@ complexFreqs(const Levels<NL>& levels, const VP& etas)
   return res;
 }
 
-
-#undef  RETURN_type
 
 
 } // multilevel
