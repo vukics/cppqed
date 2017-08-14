@@ -1,5 +1,4 @@
 // Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-// -*- C++ -*-
 /// \briefFile{Defines class MultiIndexIterator and a few helpers}
 #ifndef CPPQEDCORE_UTILS_MULTIINDEXITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_MULTIINDEXITERATOR_H_INCLUDED

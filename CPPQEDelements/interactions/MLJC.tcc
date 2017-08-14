@@ -1,5 +1,4 @@
 // Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-// -*- C++ -*-
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_MLJC_TCC_INCLUDED
 
