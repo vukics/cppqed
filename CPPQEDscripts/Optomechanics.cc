@@ -3,7 +3,7 @@
 #include "Mode.h"
 
 #include "ModeCorrelations.h"
-#include "NX_CoupledModes.h"
+#include "CoupledModes.h"
 
 
 using namespace std;
@@ -34,9 +34,9 @@ int main(int argc, char* argv[])
 
   evolve
     (psi,
-     binary::make(nxcoupledmodes::make<ModeCorrelations>(make<DoNotAverage>(pA,qmp),
-                                                         make<DoNotAverage>(pB,qmp),
-                                                         -sqrt(2)*u)),
+     binary::make(coupledmodes::make<coupledmodes::CM_NX,ModeCorrelations>(make<DoNotAverage>(pA,qmp),
+                                                                           make<DoNotAverage>(pB,qmp),
+                                                                           -sqrt(2)*u)),
      pe);
 
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   /*
   evolve<0>
     (psi,
-     binary::make(nxcoupledmodes::make<ModeCorrelations>(Mode<DoNotAverage>(pA),
+     binary::make(coupledmodes::make<ModeCorrelations>(Mode<DoNotAverage>(pA),
                                                          Mode<DoNotAverage>(pB),
                                                          -sqrt(2)*u)),
      pe);
