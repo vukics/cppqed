@@ -3,18 +3,17 @@
 
 #include "BooleanNegatedProxy.h"
 
+#include "IO_Manip.h"
 #include "Version.h"
 
 #include <boost/range/algorithm.hpp>
 
 #include <boost/bind.hpp>
 
-#include <boost/preprocessor/stringize.hpp>
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-
+#include <sstream>
 
 
 using namespace std;
@@ -43,6 +42,13 @@ ParameterTable::operator[](const string& s) const
   if (i==table_.end()) throw UnrecognisedParameterException(s);
   return *i;
 }
+
+
+ParameterTable::ParameterTable() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), parsedCommandLine_(std::make_shared<std::string>("")) // tmwidth_ cf bool!
+{
+  IO_Manipulator::_(cout);
+  IO_Manipulator::_(cerr);
+} 
 
 
 void ParameterTable::printList() const
@@ -138,26 +144,26 @@ ParameterTable& ParameterTable::addTitle(const std::string& s, const std::string
 }
 
 
-void update(ParameterTable& table, int argc, char* argv[], const string& sc)
+void update(ParameterTable& table, int argc, char* argv[], const string& prefix)
 {
   struct ErrorMessage {
-    static const string _(const string& sc) {return "\nSee "+sc+"help for a list of parameters\nSupply all parameters with "+sc+" prefix\n\n";}
+    static const string _(const string& prefix) {return "\nSee "+prefix+"help for a list of parameters\nSupply all parameters with "+prefix+" prefix\n\n";}
   };
 
-  iostream& line=table.getStream();
+  std::stringstream line; IO_Manipulator::_(line);
   for (char** i=argv+1;  i<argv+argc; ++i) line<<' '<<*i;
-  table.setParsedCommandLine(string(*argv)+table.getStream().str());
+  table.setParsedCommandLine(string(*argv)+line.str());
 
   if (argc<2) return;
 
   string temp;
-  size_t scl=sc.length();
+  size_t prefixl=prefix.length();
   while (line>>temp) {
-    if (string(temp,0,scl)!=sc) {
-      cerr<<"\nSyntax error in command line around \""<<temp<<"\""<<ErrorMessage::_(sc);
+    if (string(temp,0,prefixl)!=prefix) {
+      cerr<<"\nSyntax error in command line around \""<<temp<<"\""<<ErrorMessage::_(prefix);
       abort();
     }
-    temp=string(temp,scl,temp.length()-scl);
+    temp=string(temp,prefixl,temp.length()-prefixl);
     if (temp=="help") {
       table.printList(); exit(0);
     }
@@ -168,12 +174,12 @@ void update(ParameterTable& table, int argc, char* argv[], const string& sc)
       try {
         table[temp].read(line);
         if (line.fail()) {
-          cerr<<"\nParameter \""<<temp<<"\" supplied with incorrect syntax"<<ErrorMessage::_(sc);
+          cerr<<"\nParameter \""<<temp<<"\" supplied with incorrect syntax"<<ErrorMessage::_(prefix);
           abort();
         }
       }
       catch (const UnrecognisedParameterException& urp) {
-        cerr<<"\nProblem in command line around \""<<urp.getName()<<'\"'<<ErrorMessage::_(sc);
+        cerr<<"\nProblem in command line around \""<<urp.getName()<<'\"'<<ErrorMessage::_(prefix);
         abort();
       }
   }

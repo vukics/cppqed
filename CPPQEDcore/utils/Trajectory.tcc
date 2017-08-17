@@ -7,6 +7,7 @@
 #include "CommentingStream.h"
 #include "Evolved.tcc"
 #include "FormDouble.h"
+#include "IO_Manip.h"
 #include "ParsTrajectory.h"
 #include "Version.h"
 
@@ -126,12 +127,11 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
                                              nonOwningSharedPtr<ostream>(&cout) :
                                              static_pointer_cast<ostream>(boost::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
+  if (outstream->fail()) throw TrajectoryFileOpeningException(trajectoryFileName);
   traj.setLogStreamDuringRun(outstream);
   
   ostream& os=*outstream;
-
-  if (os.fail()) throw TrajectoryFileOpeningException(trajectoryFileName);
- 
+  IO_Manipulator::_(os);
   os<<setprecision(formdouble::actualPrecision(precision));
   
   ///////////////////////

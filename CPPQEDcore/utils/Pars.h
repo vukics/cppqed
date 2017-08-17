@@ -11,7 +11,6 @@
 #include <boost/ptr_container/ptr_list.hpp>
 
 #include <string>
-#include <sstream>
 
 
 /// The parameter-bundle
@@ -21,7 +20,6 @@ const size_t maxTypeLabelLength=24;
 
 
 /// The function parsing the command line and putting the parameters into the ParameterTable \related ParameterTable
-/** \todo Somehow echo the whole command line into the output file – difficulty: the parameter-bundle has no knowledge about the output file */
 void update(ParameterTable& p,
             int argc, ///< number of words in the command line
             char* argv[], ///< content of the command line word by word
@@ -135,7 +133,7 @@ class ParameterTable
 public:
   typedef std::shared_ptr<std::string> ParsedCommandLine; ///< Type for passing the \link getParsedCommandLine parsed command line\endlink throughout the framework
 
-  ParameterTable() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), stream_(), parsedCommandLine_(std::make_shared<std::string>("")) {} // tmwidth_ cf bool!
+  ParameterTable();
 
   /// \name Subscription
   //@{
@@ -200,9 +198,6 @@ public:
   /** Invoked by update() if the switch `--help` is found in the command line */
   void printList() const;
   
-  /// The stream whereon parameter i/o occurs (an intermediary \refStdCppConstruct{stringstream,sstream/stringstream}) is exposed in order that i/o manipulators can be applied
-  std::stringstream& getStream() {return stream_;}
-
   /// Getter for the full command line set by the update() function
   const ParsedCommandLine getParsedCommandLine(                    ) const {return  parsedCommandLine_;}
 
@@ -217,8 +212,6 @@ private:
   size_t smwidth_; // maximal width of s_ entries
   size_t tmwidth_; // maximal width of typeIDs
   size_t dmwidth_; // maximal width of d_ entries
-
-  std::stringstream stream_;
 
   ParsedCommandLine parsedCommandLine_;
 

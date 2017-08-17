@@ -45,12 +45,12 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
     for (Iterator j(std::next(i)); j!=j.getEnd(); ++j) {
       {
         ostringstream ss;
-        ss<<"real["<<"rho_"<<*i<<','<<*j<<']';
+        ss<<"real["<<"rho_"<<*i<<';'<<*j<<']';
         res.push_back(ss.str());
       }
       {
         ostringstream ss;
-        ss<<"imag["<<"rho_"<<*i<<','<<*j<<']';
+        ss<<"imag["<<"rho_"<<*i<<';'<<*j<<']';
         res.push_back(ss.str());
       }
   }
