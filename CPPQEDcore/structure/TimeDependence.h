@@ -69,24 +69,21 @@ namespace time {
 
 /// Metafunction dispatching the three classes TwoTime, OneTime, & NoTime according to the template parameter `TD`
 template<TimeDependence TD>
-struct Dispatcher : boost::mpl::if_c<TD==TWO_TIME,TwoTime,
-                                     typename boost::mpl::if_c<TD==ONE_TIME,OneTime,NoTime>::type
-                                     >
-{};
+using Dispatcher = boost::mpl::if_c<TD==TWO_TIME,TwoTime,
+                                    typename boost::mpl::if_c<TD==ONE_TIME,OneTime,NoTime>::type
+                                    >;
 
 
 /// Metafunction dispatching two OneTime & NoTime according to the template parameter `IS_TIME_DEPENDENT`
 /** \see LiouvilleanTimeDependenceDispatched for a paradigmatic example of usage */
 template<bool IS_TIME_DEPENDENT>
-struct DispatcherIsTimeDependent : boost::mpl::if_c<IS_TIME_DEPENDENT,OneTime,NoTime>
-{};
+using DispatcherIsTimeDependent = boost::mpl::if_c<IS_TIME_DEPENDENT,OneTime,NoTime>;
 
 
 /// Metafunction dispatching two TwoTime & OneTime according to the template parameter `IS_TWO_TIME`
 /** \see ExactTimeDependenceDispatched for a paradigmatic example of usage */
 template<bool IS_TWO_TIME>
-struct DispatcherIsTwoTime : boost::mpl::if_c<IS_TWO_TIME,TwoTime,OneTime>
-{};
+using DispatcherIsTwoTime = boost::mpl::if_c<IS_TWO_TIME,TwoTime,OneTime>;
 
 } // time
 

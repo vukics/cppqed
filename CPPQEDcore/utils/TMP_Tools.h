@@ -119,6 +119,11 @@ struct numerical_equal : boost::mpl::equal<Seq1,Seq2,details::value_equal<boost:
 {};
 
 
+template<bool COND, int TRUE_VALUE, int FALSE_VALUE> using integral_if_c = boost::mpl::if_c<COND,boost::mpl::int_<TRUE_VALUE>,boost::mpl::int_<FALSE_VALUE> >;
+
+template<typename COND, int TRUE_VALUE, int FALSE_VALUE> using integral_if = integral_if_c<COND::value,TRUE_VALUE,FALSE_VALUE>;
+
+
 /// Provokes a compile-time error if `N` is not even, otherwise acts as a Boost.MPL \refBoostConstruct{int_,mpl/doc/refmanual/int.html} integral constant wrapper of `N/2`
 template<int N>
 struct AssertEvenAndDivideBy2 : boost::mpl::int_<N/2>

@@ -45,10 +45,7 @@ struct Right : boost::mpl:: true_ {}; ///< Indicates composition from right
 template<int RANK, typename S>
 struct LeftRight 
   : tmptools::Range<RANK,
-                    boost::mpl::if_<S,
-                                    boost::mpl::int_<RANK>,
-                                    boost::mpl::int_<0>
-                                    >::type::value> {};
+                    tmptools::integral_if<S,RANK,0>::type::value> {};
 
 
 /// Template alias

@@ -6,3 +6,4 @@ html
 debianbuild
 external
 .DS_Store
+*.kdev*
