@@ -29,13 +29,7 @@ namespace multilevel {
 const std::string keyTitle="MultiLevel";
 
 
-using namespace structure::freesystem;
-
-/// Type for storing complex level energies (the \f$z_i\f$s \ref multilevelelements "here") \tparam NL number of levels
-template<int NL> using Levels = blitz::TinyVector<dcomp,NL>;
-
-/// Type for storing level energies (the \f$\delta_i\f$s \ref multilevelelements "here") \tparam NL number of levels
-template<int NL> using RealLevels = blitz::TinyVector<double,NL>;
+using namespace structure::freesystem; using structure::NoTime;
 
 
 
@@ -52,7 +46,7 @@ template<int NL>
 class Exact : public structure::FreeExact<false>
 {
 public:
-  typedef Levels<NL> L;
+  typedef ComplexPerLevel<NL> L;
 
   Exact(const L& zIs) : FreeExact<false>(NL), zIs_(zIs) {}
 
@@ -119,14 +113,14 @@ class HamiltonianSch
 public:
   static const int NPT=mpl::size<VP>::value; // number of pumped transitions
 
-  typedef Levels<NL> L;
+  typedef ComplexPerLevel<NL> L;
 
   HamiltonianSch(const L& zSchs, const VP& etas) : zSchs_(zSchs), etas_(etas) {}
 
   const L& get_zSchs() const {return zSchs_;}
 
 private:
-  void addContribution_v(structure::NoTime, const StateVectorLow&, StateVectorLow&) const;
+  void addContribution_v(NoTime, const StateVectorLow&, StateVectorLow&) const;
 
 
   const L zSchs_;
@@ -153,50 +147,100 @@ public:
 };
 
 
-template<int NL, typename VL>
-class Liouvillean : public structure::ElementLiouvilleanStrategies<1,mpl::size<VL>::value+NL>
-// Note that, at some point, the Fusion sequence VL needs to be converted into a runtime sequence (JumpStrategies & JumpRateStrategies)
+template<int NL, typename VL, bool IS_DIFFUSIVE, int ORDO>
+class LiouvilleanRadiative : public LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO-1>
 {
-public:
-  static const int NLT=mpl::size<VL>::value; // number of lossy transitions
-
-  typedef structure::ElementLiouvilleanStrategies<1,NLT+NL> Base;
-  
-  typedef typename Base::JumpStrategies     JumpStrategies    ;
-  typedef typename Base::JumpRateStrategies JumpRateStrategies;
-
-  static_assert( blitzplusplus::TinyVectorLengthTraits<JumpRateStrategies>::value==NLT+NL , "Jump number inconsistent." );
-
-  typedef typename Base::KeyLabels KeyLabels;
-
-  Liouvillean(const VL& gammas, double gamma_parallel) : Base(Liouvillean::fillJS(),Liouvillean::fillJRS(),keyTitle,fillKeyLabels()), gammas_(gammas), gamma_parallel_(gamma_parallel) {}
-
-  const JumpStrategies     fillJS () const;
-  const JumpRateStrategies fillJRS() const;
-
-  static const KeyLabels fillKeyLabels();
-
 private:
-  template<int>
-  void jumpStrategy(StateVectorLow&) const;
+  typedef LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO-1> Base;
+  
+protected:
+  using Base::Base; using Base::NRT; using Base::gammas_;
+  
+  typedef typename Base::template LindbladNo<ORDO> LindbladOrdo; // shouldn’t be named LindbladNo, as then it would be confused with the LindbladNo in the direct base, 
+                                                                 // which is not a template
+  
+private:
+  void doActWithJ(NoTime, StateVectorLow&, LindbladOrdo) const;
+  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const;
 
-  template<int>
-  double jumpRateStrategy(const LazyDensityOperator&) const;
+};
 
-  // NEED_TO_UNDERSTAND can member TEMPLATES be passed as template parameters? This would be needed to fuse fillJS and fillJRS into a template together with the helper classes below
 
-  void   flipStrategy(StateVectorLow& psi, size_t i) const {psi*=sqrt(2.*gamma_parallel_); psi(i)*=-1.;}
-  double flipRateStrategy(const LazyDensityOperator&) const {return -1;} // Being a member is somewhat superfluous here
+template<int NL, typename VL, int ORDO>
+class LiouvilleanDiffusive : public LiouvilleanDiffusive<NL,VL,ORDO-1>
+{
+private:
+  typedef LiouvilleanDiffusive<NL,VL,ORDO-1> Base;
+  
+protected:
+  using Base::Base; using Base::NRT; using Base::gamma_parallel_;
+  
+  typedef typename Base::template LindbladNo<NRT+ORDO> LindbladOrdo;
+  
+private:
+  void doActWithJ(NoTime, StateVectorLow& psi, LindbladOrdo) const {psi*=sqrt(2.*gamma_parallel_); psi(ORDO)*=-1.;}
+  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const {return -1;}
 
-  class  JS_helper;
-  class JRS_helper;
+};
 
-  class KeyHelper;
+
+template<int NL, typename VL, bool IS_DIFFUSIVE>
+class LiouvilleanBase;
+
+
+// With ORDO=-1, these don’t correspond to valid jumps, they are here merely to store data:
+#define BASE_class mpl::if_c<IS_DIFFUSIVE,LiouvilleanDiffusive<NL,VL,NL-1>,LiouvilleanBase<NL,VL,false> >::type
+template<int NL, typename VL, bool IS_DIFFUSIVE>
+class LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,-1> : public BASE_class
+{
+protected:
+  LiouvilleanRadiative(const VL& gammas, double gamma_parallel) : BASE_class(gamma_parallel), gammas_(gammas) {}
+#undef BASE_class
 
   const VL gammas_;
+};
 
+
+template<int NL, typename VL>
+class LiouvilleanDiffusive<NL,VL,-1> : public LiouvilleanBase<NL,VL,true>
+{
+protected:
+  LiouvilleanDiffusive(double gamma_parallel) : gamma_parallel_(gamma_parallel) {}
+  
   const double gamma_parallel_;
+};
 
+
+#define BASE_class structure::ElementLiouvillean<1, mpl::size<VL>::value + tmptools::integral_if_c<IS_DIFFUSIVE,NL,0>::type::value >
+template<int NL, typename VL, bool IS_DIFFUSIVE>
+class LiouvilleanBase : public BASE_class // takes care of key composition
+{
+private:
+  typedef BASE_class Base;
+#undef BASE_class
+  class KeyHelper;
+  typedef typename Base::KeyLabels KeyLabels;
+  static const KeyLabels fillKeyLabels();
+  
+protected:
+  static const int NRT=mpl::size<VL>::value; // number of transitions with radiative loss
+
+  LiouvilleanBase() : Base(keyTitle,fillKeyLabels()) {}
+  LiouvilleanBase(double) : LiouvilleanBase() {}
+  
+};
+
+
+#define BASE_class LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,mpl::size<VL>::value-1>
+template<int NL, typename VL, bool IS_DIFFUSIVE>
+class Liouvillean : public BASE_class
+{
+private:
+  typedef BASE_class Base;
+#undef BASE_class
+  
+protected:
+  using Base::Base;
 };
 
 
@@ -238,26 +282,26 @@ public:
  *
  * \todo some static sanity checks of `VP` and `VL` in view of `NL` should be done
  */
-template<int NL, typename VP, typename VL, typename AveragingType>
+template<int NL, typename VP, typename VL, bool IS_DIFFUSIVE, typename AveragingType>
 class PumpedLossyMultiLevelSch 
   : public multilevel::HamiltonianSch<NL,VP>,
-    public multilevel::Liouvillean<NL,VL>,
+    public multilevel::Liouvillean<NL,VL,IS_DIFFUSIVE>,
     public MultiLevelBase<NL>,
     public AveragingType
   // The ordering becomes important here
 {
 public:
-  typedef multilevel::    Levels<NL>     Levels;
-  typedef multilevel::RealLevels<NL> RealLevels;
+  typedef multilevel::ComplexPerLevel<NL> ComplexPerLevel;
+  typedef multilevel::   RealPerLevel<NL>    RealPerLevel;
 
-  typedef multilevel::HamiltonianSch<NL,VP> Hamiltonian;
-  typedef multilevel::Liouvillean   <NL,VL> Liouvillean;
+  typedef multilevel::HamiltonianSch<NL,VP>              Hamiltonian;
+  typedef multilevel::Liouvillean   <NL,VL,IS_DIFFUSIVE> Liouvillean;
   typedef MultiLevelBase<NL> Base;
 
   typedef typename Base::Ptr Ptr;
 
   template<typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealLevels&, const VP&, const VL&, double gamma_parallel, AveragingConstructorParameters&&...);
+  PumpedLossyMultiLevelSch(const RealPerLevel&, const VP&, const VL&, double gamma_parallel, AveragingConstructorParameters&&...);
 
 };
 
@@ -271,11 +315,12 @@ namespace multilevel {
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 inline
 RETURN_type
-makePumpedLossySch(const RealLevels<NL>& deltas,
+makePumpedLossySch(const RealPerLevel<NL>& deltas,
                    const VP& etas, const VL& gammas, double gamma_parallel,
                    AveragingConstructorParameters&&... a)
 {
-  return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
+  if (gamma_parallel) return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
+  else                return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
 }
 
 /// \overload
@@ -291,7 +336,7 @@ makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingCons
 template<int NL, typename VP, typename VL>
 inline
 RETURN_type
-makePumpedLossySch(const RealLevels<NL>& deltas, const VP& etas, const VL& gammas, double gamma_parallel, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+makePumpedLossySch(const RealPerLevel<NL>& deltas, const VP& etas, const VL& gammas, double gamma_parallel, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
 {
   return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
 }

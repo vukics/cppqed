@@ -65,8 +65,8 @@ complexFreqs(const VP& etas)
 template<int NL, typename VC>
 Base<NL,VC>::Base(MultiLevelPtr ml, mode::Ptr mode, const VC& gs) 
   : structure::Interaction<2>(Frees(ml,mode),
-			      structure::DynamicsBase::RealFreqs(),
-			      complexFreqs(gs)), 
+                              structure::DynamicsBase::RealFreqs(),
+                              complexFreqs(gs)), 
     mds_(boost::fusion::transform(gs,CouplingToModeDynamics(ml,mode)))
 {
   getParsStream()<<"Multi-Level Jaynes-Cummings\n";

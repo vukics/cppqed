@@ -84,7 +84,7 @@ namespace details {
 template<int NL>
 struct ElementaryLevel
 {
-  typedef Levels<NL> L;
+  typedef ComplexPerLevel<NL> L;
 
   ElementaryLevel(const StateVectorLow& psi, StateVectorLow& dpsidt, const L& zs) : psi_(psi), dpsidt_(dpsidt), zs_(zs) {}
 
@@ -130,7 +130,7 @@ private:
 
 template<int NL, typename VP>
 void
-HamiltonianSch<NL,VP>::addContribution_v(structure::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+HamiltonianSch<NL,VP>::addContribution_v(NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using namespace details;
   mpl::for_each<tmptools::Ordinals<NL> >(ElementaryLevel<NL>(psi,dpsidt,zSchs_));
@@ -145,101 +145,29 @@ HamiltonianSch<NL,VP>::addContribution_v(structure::NoTime, const StateVectorLow
 //////////////
 
 
-template<int NL, typename VL> template<int N>
-void 
-Liouvillean<NL,VL>::jumpStrategy(StateVectorLow& psi) const
+template<int NL, typename VL, bool IS_DIFFUSIVE, int ORDO>
+void
+LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO>::doActWithJ(NoTime, StateVectorLow& psi, LindbladOrdo) const
 {
-  typedef typename mpl::at_c<VL, N>::type Decay;
+  typedef typename mpl::at_c<VL,ORDO>::type Decay;
   typename Decay::template SanityCheck<0,NL-1>();
-  dcomp temp(sqrt(2.*boost::fusion::at_c<N>(gammas_).get())*psi(Decay::second));
+  dcomp temp(sqrt(2.*boost::fusion::at_c<ORDO>(gammas_).get())*psi(Decay::second));
   psi=0;
   psi(Decay::first)=temp;
-
 }
 
 
-template<int NL, typename VL> template<int N>
+template<int NL, typename VL, bool IS_DIFFUSIVE, int ORDO>
 double
-Liouvillean<NL,VL>::jumpRateStrategy(const LazyDensityOperator& matrix) const
+LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO>::rate(NoTime, const LazyDensityOperator& matrix, LindbladOrdo) const
 {
-  typedef typename mpl::at_c<VL, N>::type Decay;
-  return 2.*boost::fusion::at_c<N>(gammas_).get()*matrix(Decay::second);
+  typedef typename mpl::at_c<VL,ORDO>::type Decay;
+  return 2.*boost::fusion::at_c<ORDO>(gammas_).get()*matrix(Decay::second);
 }
 
 
-
-template<int NL, typename VL>
-class Liouvillean<NL,VL>::JS_helper
-{
-public:
-  JS_helper(JumpStrategies& jumpStrategies, const Liouvillean* liouvillean)
-    : jumpStrategies_(jumpStrategies), liouvillean_(liouvillean) {}
-
-  template<typename T>
-  void operator()(T) const
-  {
-    jumpStrategies_(T::value)=bind(&Liouvillean::template jumpStrategy<T::value>,
-                                   liouvillean_,
-                                   _1);
-  }
-
-private:
-  JumpStrategies& jumpStrategies_;
-  const Liouvillean* liouvillean_;
-  
-};
-
-
-template<int NL, typename VL>
-class Liouvillean<NL,VL>::JRS_helper
-{
-public:
-  JRS_helper(JumpRateStrategies& jumpRateStrategies, const Liouvillean* liouvillean)
-    : jumpRateStrategies_(jumpRateStrategies), liouvillean_(liouvillean) {}
-
-  template<typename T>
-  void operator()(T) const
-  {
-    jumpRateStrategies_(T::value)=bind(&Liouvillean::template jumpRateStrategy<T::value>,
-                                       liouvillean_,
-                                       _1);
-  }
-
-private:
-  JumpRateStrategies& jumpRateStrategies_;
-  const Liouvillean* liouvillean_;
-  
-};
-
-
-
-template<int NL, typename VL>
-auto
-Liouvillean<NL,VL>::fillJS() const ->  const JumpStrategies
-{
-  typename Liouvillean::JumpStrategies res;
-  mpl::for_each<tmptools::Ordinals<NLT> >(JS_helper(res,this));
-  for (int i=0; i<NL; ++i) // For the moment simply implemented as a runtime loop
-    res(NLT+i)=bind(&Liouvillean::flipStrategy,this,_1,i);
-  return res;
-}
-
-
-template<int NL, typename VL>
-auto
-Liouvillean<NL,VL>::fillJRS() const -> const JumpRateStrategies
-{
-  typename Liouvillean::JumpRateStrategies res;
-  mpl::for_each<tmptools::Ordinals<NLT> >(JRS_helper(res,this));
-  for (int i=0; i<NL; ++i) // For the moment simply implemented as a runtime loop
-    res(NLT+i)=bind(&Liouvillean::flipRateStrategy,this,_1);
-  return res;
-}
-
-
-
-template<int NL, typename VL>
-class Liouvillean<NL,VL>::KeyHelper
+template<int NL, typename VL, bool IS_DIFFUSIVE>
+class LiouvilleanBase<NL,VL,IS_DIFFUSIVE>::KeyHelper
 {
 public:
   KeyHelper(KeyLabels& keyLabels) : keyLabels_(keyLabels) {}
@@ -259,20 +187,19 @@ private:
 };
 
 
-template<int NL, typename VL>
+template<int NL, typename VL, bool IS_DIFFUSIVE>
 auto
-Liouvillean<NL,VL>::fillKeyLabels() -> const KeyLabels
+LiouvilleanBase<NL,VL,IS_DIFFUSIVE>::fillKeyLabels() -> const KeyLabels
 {
-  typename Liouvillean::KeyLabels res;
+  KeyLabels res;
   mpl::for_each<VL>(KeyHelper(res));
-  for (int i=0; i<NL; ++i) { // For the moment simply implemented as a runtime loop
+  if (IS_DIFFUSIVE) for (int i=0; i<NL; ++i) { // For the moment simply implemented as a runtime loop (dirty but simple)
     ostringstream slate;
     slate<<"Phase flip for level "<<i;
     res.push_back(slate.str());
   }
   return res;
 }
-
 
 //////////
 //
@@ -287,7 +214,7 @@ template<int NL>
 struct ElementaryDL
 {
 
-  typedef Levels<NL> L;
+  typedef ComplexPerLevel<NL> L;
 
   ElementaryDL(L& levels) : levels_(levels) {}
 
@@ -308,7 +235,7 @@ private:
 
 template<int NL, typename VL>
 const auto
-decayingLevels(const RealLevels<NL>& deltas, const VL& gammas)
+decayingLevels(const RealPerLevel<NL>& deltas, const VL& gammas)
 {
   blitz::TinyVector<dcomp,NL> res(deltas);
   res*=-DCOMP_I;
@@ -319,7 +246,7 @@ decayingLevels(const RealLevels<NL>& deltas, const VL& gammas)
 
 template<int NL>
 const auto
-filterReal(const Levels<NL>& levels, double gamma_parallel)
+filterReal(const ComplexPerLevel<NL>& levels, double gamma_parallel)
 {
   using namespace std;
   structure::DynamicsBase::RealFreqs res;
@@ -360,7 +287,7 @@ private:
 
 template<int NL, typename VP>
 const auto
-complexFreqs(const Levels<NL>& levels, const VP& etas)
+complexFreqs(const ComplexPerLevel<NL>& levels, const VP& etas)
 {
   using namespace std;
 
@@ -387,8 +314,8 @@ complexFreqs(const Levels<NL>& levels, const VP& etas)
 ////////////////
 
 
-template<int NL, typename VP, typename VL, typename AveragingType> template<typename... AveragingConstructorParameters>
-PumpedLossyMultiLevelSch<NL,VP,VL,AveragingType>::PumpedLossyMultiLevelSch(const RealLevels& deltas, const VP& etas, const VL& gammas, double gamma_parallel, AveragingConstructorParameters&&... a)
+template<int NL, typename VP, typename VL, bool IS_DIFFUSIVE, typename AveragingType> template<typename... AveragingConstructorParameters>
+PumpedLossyMultiLevelSch<NL,VP,VL,IS_DIFFUSIVE,AveragingType>::PumpedLossyMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, double gamma_parallel, AveragingConstructorParameters&&... a)
   : Hamiltonian(multilevel::decayingLevels(deltas,gammas),etas),
     Liouvillean(gammas,gamma_parallel),
     Base(multilevel::filterReal(this->get_zSchs(),gamma_parallel),multilevel::complexFreqs(this->get_zSchs(),etas)),

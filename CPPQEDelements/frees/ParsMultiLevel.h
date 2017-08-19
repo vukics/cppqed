@@ -11,13 +11,17 @@
 
 namespace multilevel {
 
+/// Type for storing complex level energies (the \f$z_i\f$s \ref multilevelelements "here") \tparam NL number of levels
+template<int NL> using ComplexPerLevel = blitz::TinyVector<dcomp,NL>;
+
+/// Type for storing level energies (the \f$\delta_i\f$s \ref multilevelelements "here") \tparam NL number of levels
+template<int NL> using RealPerLevel = blitz::TinyVector<double,NL>;
+
 
 template<int NL, typename VP, typename VL>
 struct ParsPumpedLossy
 {
-  typedef blitz::TinyVector<double,NL> Levels;
-
-  Levels& deltas;
+  RealPerLevel<NL>& deltas;
   VP& etas;
   VL& gammas;
   double& gamma_parallel;
@@ -29,16 +33,5 @@ struct ParsPumpedLossy
 
 } // multilevel
 
-
-template<int NL>
-std::ostream&
-operator<<(std::ostream&, const blitz::TinyVector<double,NL>&);
-
-template<int NL>
-std::istream&
-operator>>(std::istream&,       blitz::TinyVector<double,NL>&);
-
-
-#include<ParsMultiLevel.tcc>
 
 #endif // CPPQEDELEMENTS_FREES_PARSMULTILEVEL_H_INCLUDED

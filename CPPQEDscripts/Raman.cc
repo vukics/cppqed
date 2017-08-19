@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   pml.etas=make_vector(dcomp(30,40),dcomp(-60,40));
   pml.gammas=make_vector(10,5);
 
-  pml.deltas=RealLevels<3>(0,0,-1e5);
+  pml.deltas=RealPerLevel<3>(0,0,-1e5);
 
   // Parameter finalization
   update(p,argc,argv,"--");
