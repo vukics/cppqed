@@ -166,6 +166,31 @@ LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO>::rate(NoTime, const LazyDensityOpe
 }
 
 
+template<int NL, typename VL, bool IS_DIFFUSIVE, int ORDO>
+void
+LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO>::doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladOrdo) const
+{
+  typedef typename mpl::at_c<VL,ORDO>::type Decay;
+  drhodt(Decay::first,Decay::first)+=2.*boost::fusion::at_c<ORDO>(gammas_).get()*rho(Decay::second,Decay::second);
+}
+
+
+// The trick is that this single function takes care of the superoperator of the phase diffusion of all the levels,
+// which are highly degenerate, and easily treated in their sum over all the levels
+template<>
+void
+details::doReallyActWithSuperoperator<0>(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double gamma_parallel)
+{
+  for (int m=0; m<rho.ubound(0); ++m) {
+    drhodt(m,m)+=2*gamma_parallel*rho(m,m);
+    for (int n=m+1; n<rho.ubound(1); ++n) {
+      drhodt(m,n)-=6*gamma_parallel*rho(m,n);
+      drhodt(n,m)-=6*gamma_parallel*rho(n,m);
+    }
+  }
+}
+
+
 template<int NL, typename VL, bool IS_DIFFUSIVE>
 class LiouvilleanBase<NL,VL,IS_DIFFUSIVE>::KeyHelper
 {

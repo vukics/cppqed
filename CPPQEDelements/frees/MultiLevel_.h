@@ -160,11 +160,19 @@ protected:
                                                                  // which is not a template
   
 private:
-  void doActWithJ(NoTime, StateVectorLow&, LindbladOrdo) const;
-  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const;
+  void doActWithJ(NoTime, StateVectorLow&, LindbladOrdo) const override;
+  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const override;
+  void doActWithSuperoperator(NoTime, const DensityOperatorLow&, DensityOperatorLow&, LindbladOrdo) const override;
 
 };
 
+
+namespace details {
+
+template<int ORDO>
+void doReallyActWithSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double) {} // trivial implementation for ORDO\neq0
+
+} // details
 
 template<int NL, typename VL, int ORDO>
 class LiouvilleanDiffusive : public LiouvilleanDiffusive<NL,VL,ORDO-1>
@@ -178,8 +186,9 @@ protected:
   typedef typename Base::template LindbladNo<NRT+ORDO> LindbladOrdo;
   
 private:
-  void doActWithJ(NoTime, StateVectorLow& psi, LindbladOrdo) const {psi*=sqrt(2.*gamma_parallel_); psi(ORDO)*=-1.;}
-  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const {return -1;}
+  void doActWithJ(NoTime, StateVectorLow& psi, LindbladOrdo) const override {psi*=sqrt(2.*gamma_parallel_); psi(ORDO)*=-1.;}
+  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const override {return -1;}
+  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladOrdo) const override {details::doReallyActWithSuperoperator<ORDO>(rho,drhodt,gamma_parallel_);}
 
 };
 
@@ -208,6 +217,7 @@ protected:
   LiouvilleanDiffusive(double gamma_parallel) : gamma_parallel_(gamma_parallel) {}
   
   const double gamma_parallel_;
+  
 };
 
 
