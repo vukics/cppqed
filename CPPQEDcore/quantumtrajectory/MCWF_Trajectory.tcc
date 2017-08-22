@@ -222,7 +222,7 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
     {
       const Rates rates(li->rates(0,psi_));
       int n=0;
-      for (int i=0; i<rates.size(); i++) if (rates(i)<0) {os<<i<<' '; n++;}
+      for (int i=0; i<rates.size(); ++i) if (rates(i)<0) {os<<i<<' '; ++n;}
       if (!n) os<<"none";
     }
     os<<endl;

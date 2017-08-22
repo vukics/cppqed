@@ -216,6 +216,7 @@ private:
   typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+  typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
@@ -227,11 +228,12 @@ protected:
   Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  std::ostream& displayKey_v(std::ostream& os, size_t& i)              const {return Base<VA>::template displayKeyLA<structure::LA_Li>(os,i, frees_,acts_         );}
-  size_t              nAvr_v()                                         const {return Base<VA>::template       nAvrLA<structure::LA_Li>(      frees_,acts_         );}
-  const Rates      average_v(double t, const LazyDensityOperator& ldo) const {return Base<VA>::template    averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
+  std::ostream& displayKey_v(std::ostream& os, size_t& i)              const override {return Base<VA>::template displayKeyLA<structure::LA_Li>(os,i, frees_,acts_         );}
+  size_t              nAvr_v()                                         const override {return Base<VA>::template       nAvrLA<structure::LA_Li>(      frees_,acts_         );}
+  const Rates      average_v(double t, const LazyDensityOperator& ldo) const override {return Base<VA>::template    averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
-  void actWithJ_v(double, StateVectorLow&, size_t) const; class ActWithJ;
+  void actWithJ_v(double, StateVectorLow&, size_t) const override; class ActWithJ;
+  void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override; class ActWithSuperoperator;
 
   const Frees& frees_;
   const VA   &  acts_;

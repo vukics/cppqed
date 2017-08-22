@@ -240,6 +240,35 @@ void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) co
 }
 
 
+void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t i) const
+{
+  typedef tmptools::Vector<0,2> V0;
+  typedef tmptools::Vector<1,3> V1;
+
+  using namespace blitzplusplus::basi;
+
+  const Li1::Ptr
+    li0 =free0_.getLi(),
+    li1 =free1_.getLi();
+
+  size_t n=free0_.nAvr<LA_Li>();
+  if (li0 && i<n) {
+    for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),bind(&Li1::actWithSuperoperator,li0,t,_1,_2,i));
+    return;
+  }
+
+  i-=n;  
+  if (li1 && i<(n=free1_.nAvr<LA_Li>())) {
+    for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),bind(&Li1::actWithSuperoperator,li1,t,_1,_2,i));
+    return;
+  }
+
+  i-=n;
+  if (i<ia_.nAvr<LA_Li>())
+    ia_.actWithSuperoperator(t,rho,drhodt,i);
+
+}
+
 
 //////////////////
 //              //

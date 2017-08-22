@@ -40,6 +40,10 @@
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/find_if.hpp>
 #include <boost/mpl/equal.hpp>
+#include <boost/mpl/fold.hpp>
+#include <boost/mpl/plus.hpp>
+#include <boost/mpl/push_back.hpp>
+
 
 #define DEFINE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName;
 
@@ -205,6 +209,20 @@ struct Vector : boost::mpl::vector_c<int,details::ArgumentDispatcher<V>::value..
 
 
 typedef Vector<> V_Empty;
+
+
+
+template<int RANK, typename V>
+struct ExtendVector : boost::mpl::fold<V,
+                                       V,
+                                       boost::mpl::push_back<boost::mpl::_1,
+                                                             boost::mpl::plus<boost::mpl::_2,
+                                                                              boost::mpl::int_<RANK>
+                                                                             >
+                                                            >
+                                      >
+{};
+
 
 
 } // tmptools

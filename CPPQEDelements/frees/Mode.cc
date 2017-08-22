@@ -126,6 +126,19 @@ void details::aDagJump(StateVectorLow& psi, double kappa) // kappa is kappa* nTh
   psi(0)=0;
 }
 
+void details::aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double kappa)
+{
+  for (int m=0; m<rho.ubound(0); ++m)
+    for (int n=0; n<rho.ubound(1); ++n)
+      drhodt(m,n)+=2*kappa*sqrt((m+1)*(n+1))*rho(m+1,n+1);
+}
+
+void details::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double kappa)
+{
+  for (int m=1; m<=rho.ubound(0); ++m)
+    for (int n=1; n<=rho.ubound(1); ++n)
+      drhodt(m,n)+=2*kappa*sqrt(m*n)*rho(m-1,n-1);
+}
 
 namespace {
 

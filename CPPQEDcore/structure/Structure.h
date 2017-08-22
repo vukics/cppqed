@@ -160,6 +160,8 @@ public:
   typedef typename Li::Rates               Rates              ;
   typedef typename Li::LazyDensityOperator LazyDensityOperator;
 
+  typedef typename Li::DensityOperatorLow DensityOperatorLow;
+  
   typedef typename Av::Averages Averages;
   //@}
 
@@ -231,6 +233,7 @@ public:
   /// \name Forwarded member from Liouvillean
   //@{
   void actWithJ(double t, StateVectorLow& psi, size_t lindbladNo) const {if (li_) li_->actWithJ(t,psi,lindbladNo);}
+  void actWithSuperoperator(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const {if (li_) li_->actWithSuperoperator(t,rho,drhodt,lindbladNo);}
   //@}
 
   

@@ -56,11 +56,22 @@ public:
   
   /// calls the virtual rate for the given LINDBLAD_ORDINAL
   double typeErasedRate(Time t, const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(t,matrix,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
-  
+
+  void typeErasedActWithSuperoperator(Time t,
+                                      const typename quantumdata::Types<RANK>::DensityOperatorLow& rho,
+                                      typename quantumdata::Types<RANK>::DensityOperatorLow& drhodt
+                                     ) const {return doActWithSuperoperator(t,rho,drhodt,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
+
 private:
   virtual void doActWithJ(Time, typename quantumdata::Types<RANK>::StateVectorLow&, typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>) const = 0;
   
   virtual double rate(Time, const quantumdata::LazyDensityOperator<RANK>&, typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>) const = 0;
+
+  virtual void doActWithSuperoperator(Time,
+                                      const typename quantumdata::Types<RANK>::DensityOperatorLow&,
+                                      typename quantumdata::Types<RANK>::DensityOperatorLow&,
+                                      typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>
+                                    ) const {throw SuperoperatorNotImplementedException(LINDBLAD_ORDINAL);}
   
 };
 
@@ -97,13 +108,8 @@ private:
   typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
-  typedef typename Base::StateVectorLow StateVectorLow;
-
-  typedef typename Base::LazyDensityOperator LazyDensityOperator;
-
-  typedef typename Base::Rates Rates;
-  
-  typedef typename Base::Time Time;
+#define TYPE_DEFINITION_FORWARD typedef typename Base::StateVectorLow StateVectorLow; typedef typename Base::DensityOperatorLow DensityOperatorLow; typedef typename Base::LazyDensityOperator LazyDensityOperator; typedef typename Base::Rates Rates; typedef typename Base::Time Time;  
+  TYPE_DEFINITION_FORWARD
   
 protected:
   template<typename... KeyLabelsPack>
@@ -112,39 +118,59 @@ protected:
   ElementLiouvillean(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
 private:
-  class Average
+  struct Average
   {
-  public:
-    Average(const ElementLiouvillean* ptr, Rates& rates, Time t, const LazyDensityOperator& matrix) : ptr_(ptr), rates_(rates), t_(t), matrix_(matrix) {}
+    template<typename T>
+    void operator()(T) const {rates_(T::value)=static_cast<const lindblad::_<RANK,T::value,false,NLINDBLADS>*const>(ptr_)->typeErasedRate(t_,matrix_);}
 
-    template<typename T> void operator()(T) const {rates_(T::value)=static_cast<const lindblad::_<RANK,T::value,false,NLINDBLADS>*const>(ptr_)->typeErasedRate(t_,matrix_);}
-
-  private:
     const ElementLiouvillean*const ptr_;
     Rates& rates_;
     const Time t_;
     const LazyDensityOperator& matrix_;    
   };
 
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final {Rates rates(NLINDBLADS); mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(Average(this,rates,t,matrix)); return rates;}
-
-  class ActWithJ
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final
   {
-  public:
-    ActWithJ(const ElementLiouvillean* ptr, Time t, StateVectorLow& psi, size_t lindbladNo) : ptr_(ptr), t_(t), psi_(psi), lindbladNo_(lindbladNo) {}
+    Rates rates(NLINDBLADS);
+    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(Average{this,rates,t,matrix});
+    return rates;
+  }
 
+  struct ActWithJ
+  {
     template<typename T>
     void operator()(T) const {if (T::value==lindbladNo_) static_cast<const lindblad::_<RANK,T::value,false,NLINDBLADS>*const>(ptr_)->typeErasedActWithJ(t_,psi_);}
 
-  private:
     const ElementLiouvillean*const ptr_;
     const Time t_;
     StateVectorLow& psi_;
     const size_t lindbladNo_;
   };
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final {if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle()); mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(ActWithJ(this,t,psi,lindbladNo));}
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final
+  {
+    if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
+    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(ActWithJ{this,t,psi,lindbladNo});
+  }
   
+  struct ActWithSuperoperator
+  {
+    template<typename T>
+    void operator()(T) const {if (T::value==lindbladNo_) static_cast<const lindblad::_<RANK,T::value,false,NLINDBLADS>*const>(ptr_)->typeErasedActWithSuperoperator(t_,rho_,drhodt_);}
+
+    const ElementLiouvillean*const ptr_;
+    const Time t_;
+    const DensityOperatorLow& rho_;
+    DensityOperatorLow& drhodt_;
+    const size_t lindbladNo_;
+  };
+
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final
+  {
+    if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
+    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(ActWithSuperoperator{this,t,rho,drhodt,lindbladNo});    
+  }
+
 };
 
 
@@ -164,13 +190,7 @@ private:
   typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
-  typedef typename Base::StateVectorLow StateVectorLow;
-
-  typedef typename Base::LazyDensityOperator LazyDensityOperator;
-
-  typedef typename Base::Rates Rates;
-
-  typedef typename Base::Time Time;
+  TYPE_DEFINITION_FORWARD
   
 protected:
   ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,1,keyLabel) {}
@@ -178,15 +198,52 @@ protected:
 private:
   const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final {if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle()); doActWithJ(t,psi);}
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final
+  {
+    if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle());
+    doActWithJ(t,psi);
+  }
 
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final
+  {
+    if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle());
+    doActWithSuperoperator(t,rho,drhodt);
+  }
+  
   virtual void doActWithJ(Time, StateVectorLow&) const = 0;
   
   virtual double rate(Time, const LazyDensityOperator&) const = 0;
 
+  virtual void doActWithSuperoperator(Time, const DensityOperatorLow&, DensityOperatorLow&) const {throw SuperoperatorNotImplementedException(0);}
+
 };
 
 
+/// Simply a less templated base to ElementLiouvilleanStrategies defininig the strategy funcional types
+template<int RANK, bool IS_TIME_DEPENDENT>
+class ElementLiouvilleanStrategiesBase : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
+{
+private:
+  typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
+
+protected:
+  using Base::Base; // inherit constructor
+  
+public:
+  TYPE_DEFINITION_FORWARD
+
+  /// Strategy functional for acting with a given Lindblad operator (= performing a given jump) on a state
+  /** The actual signature of the functional is decided on the basis of IS_TIME_DEPENDENT using the compile-time *if*-construct \refBoostConstruct{if_c,mpl/doc/refmanual/if-c.html}. */
+  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<void  (double,       StateVectorLow&     )>,boost::function<void  (      StateVectorLow&     )> >::type JumpStrategy;
+  /// Strategy functional for calculating from a state the jump rate corresponding to a given Lindblad
+  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<double(double, const LazyDensityOperator&)>,boost::function<double(const LazyDensityOperator&)> >::type JumpRateStrategy;
+  
+  typedef typename mpl::if_c<IS_TIME_DEPENDENT,
+                            boost::function<void(double, const DensityOperatorLow&, DensityOperatorLow&)>,
+                            boost::function<void(        const DensityOperatorLow&, DensityOperatorLow&)> >::type SuperoperatorStrategy;
+};
+
+  
 /// Besides ElementLiouvillean, this is another solution based on the strategy idiom to control the number of Lindblads @ compile time
 /**
  * \tparamRANK
@@ -196,30 +253,25 @@ private:
  * \see Sec. \ref basicoscillator of the structure-bundle guide for an example of usage 
  */
 template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
-class ElementLiouvilleanStrategies : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
+class ElementLiouvilleanStrategies : public ElementLiouvilleanStrategiesBase<RANK,IS_TIME_DEPENDENT>
 {
 private:
-  typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
+  typedef ElementLiouvilleanStrategiesBase<RANK,IS_TIME_DEPENDENT> Base;
   
 public:
-  typedef typename Base::StateVectorLow StateVectorLow;
+  TYPE_DEFINITION_FORWARD
+#undef TYPE_DEFINITION_FORWARD
 
-  typedef typename Base::LazyDensityOperator LazyDensityOperator;
-
-  typedef typename Base::Rates Rates;
-  
-  typedef typename Base::Time Time;
-
-  /// Strategy functional for acting with a given Lindblad operator (= performing a given jump) on a state
-  /** The actual signature of the functional is decided on the basis of IS_TIME_DEPENDENT using the compile-time *if*-construct \refBoostConstruct{if_c,mpl/doc/refmanual/if-c.html}. */
-  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<void  (double,       StateVectorLow&     )>,boost::function<void  (      StateVectorLow&     )> >::type JumpStrategy;
-  /// Strategy functional for calculating from a state the jump rate corresponding to a given Lindblad
-  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<double(double, const LazyDensityOperator&)>,boost::function<double(const LazyDensityOperator&)> >::type JumpRateStrategy;
+  typedef typename Base::JumpStrategy JumpStrategy;
+  typedef typename Base::JumpRateStrategy JumpRateStrategy;
+  typedef typename Base::SuperoperatorStrategy SuperoperatorStrategy;
 
   /// Tiny vector of length NLINDBLADS containing the #JumpStrategy instances
   typedef blitz::TinyVector<JumpStrategy    ,NLINDBLADS> JumpStrategies;
   /// Tiny vector of length NLINDBLADS containing the #JumpRateStrategy instances
   typedef blitz::TinyVector<JumpRateStrategy,NLINDBLADS> JumpRateStrategies;
+
+  typedef blitz::TinyVector<SuperoperatorStrategy,NLINDBLADS> SuperoperatorStrategies;
 
 protected:
   template<typename... KeyLabelsPack>
@@ -233,9 +285,13 @@ private:
   const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final;
 
   void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final;
+
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final;
   
   const JumpStrategies     jumps_    ;
   const JumpRateStrategies jumpRates_;
+  
+  SuperoperatorStrategies superoperatorStrategies_;
 
 };
 
