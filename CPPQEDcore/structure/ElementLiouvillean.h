@@ -46,7 +46,7 @@ protected:
  * 
  */
 template<int RANK, int LINDBLAD_ORDINAL, bool IS_TIME_DEPENDENT, int NLINDBLADS=LINDBLAD_ORDINAL+1>
-class _ : public mpl::if_c<LINDBLAD_ORDINAL,_<RANK,LINDBLAD_ORDINAL-1,IS_TIME_DEPENDENT,NLINDBLADS>,Base<NLINDBLADS> >::type
+class _ : public mpl::if_c< (LINDBLAD_ORDINAL>0) ,_<RANK,LINDBLAD_ORDINAL-1,IS_TIME_DEPENDENT,NLINDBLADS>,Base<NLINDBLADS> >::type
 {
 public:
   typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
