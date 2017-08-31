@@ -10,10 +10,9 @@ std::ostream& evolution::operator<<(std::ostream& os, Method em)
 {
   switch (em) {
     // case CONVERGENCE: return os<<"convergence";
-  case SINGLE      : return os<<"single"      ;
-  case ENSEMBLE    : return os<<"ensemble"    ;
-  case MASTER      : return os<<"master"      ;
-  case MASTER_FAST :        os<<"master_fast" ;
+  case SINGLE   : return os<<"single"  ;
+  case ENSEMBLE : return os<<"ensemble";
+  case MASTER   :        os<<"master"  ;
   }
   return os;
 }
@@ -21,16 +20,15 @@ std::ostream& evolution::operator<<(std::ostream& os, Method em)
 
 std::istream& evolution::operator>>(std::istream& is, Method& em) 
 {
-  Method emtemp=MASTER_FAST;
+  Method emtemp=MASTER;
   std::string s;
 
   is>>s;
   /*if      (s=="convergence") emtemp=CONVERGENCE;
     else*/ 
-  if      (s=="single"     ) emtemp=SINGLE     ;
-  else if (s=="ensemble"   ) emtemp=ENSEMBLE   ;
-  else if (s=="master"     ) emtemp=MASTER     ;
-  else if (s!="master_fast") 
+  if      (s=="single"  ) emtemp=SINGLE     ;
+  else if (s=="ensemble") emtemp=ENSEMBLE   ;
+  else if (s!="master") 
     is.clear(std::ios_base::badbit);
 
   if (is) em=emtemp;
@@ -41,7 +39,7 @@ std::istream& evolution::operator>>(std::istream& is, Method& em)
 evolution::Pars::Pars(parameters::ParameterTable& p, const std::string& mod) 
   : ParsRun(p,mod),
     mcwf::Pars(p,mod),
-    evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master, master_fast)",SINGLE)),
+    evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master)",SINGLE)),
     negativity(p.addMod("negativity",mod,"Calculates negativity in ensemble & master",false)),
     timeAverage(p.addMod("timeAverage",mod,"Calculates time averages in MCWF trajectory",false)),
     relaxationTime(p.addMod("relaxationTime",mod,"Relaxation time for time averaging",0.))

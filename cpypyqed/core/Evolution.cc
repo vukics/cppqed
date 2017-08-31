@@ -95,10 +95,9 @@ void export_25_Evolution()
   {
     scope namespaceScope = evolutionNameSpace;
     enum_<Method>("Method", "Wrapper of :core:`evolution::Method`")
-      .value("SINGLE",      SINGLE)
-      .value("ENSEMBLE",    ENSEMBLE)
-      .value("MASTER",      MASTER)
-      .value("MASTER_FAST", MASTER_FAST)
+      .value("SINGLE",   SINGLE)
+      .value("ENSEMBLE", ENSEMBLE)
+      .value("MASTER",   MASTER)
     ;
     class_<Pars, bases<ParsRun,quantumtrajectory::mcwf::Pars> >
       (

@@ -11,7 +11,7 @@ pjc=jaynescummings.Pars(p)
 
 qmp = updateWithPicture(p,sys.argv,'--')
 
-qmp = QMP.UIP if pe.evol == evolution.Method.MASTER or pe.evol == evolution.Method.MASTER_FAST else QMP.IP
+qmp = QMP.UIP if pe.evol == evolution.Method.MASTER else QMP.IP
 m=mode.make(pm,qmp)
 q=qbit.make(pq,qmp)
 jc=jaynescummings.make(q,m,pjc)

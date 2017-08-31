@@ -19,14 +19,8 @@ evolve(quantumdata::DensityOperator<RANK>& rho,
        typename structure::QuantumSystem<RANK>::Ptr sys,
        const evolution::Pars& pe)
 {
-  if (pe.evol==evolution::MASTER_FAST) {
-    Master<RANK,V,true> traj(rho,sys,pe,pe.negativity);
-    trajectory::run(traj,pe);
-  }
-  else {
-    Master<RANK,V> traj(rho,sys,pe,pe.negativity);
-    trajectory::run(traj,pe);
-  }
+  Master<RANK,V> traj(rho,sys,pe,pe.negativity);
+  trajectory::run(traj,pe);
 
   return boost::make_shared<quantumdata::DensityOperator<RANK> >(rho); // deep copy
 

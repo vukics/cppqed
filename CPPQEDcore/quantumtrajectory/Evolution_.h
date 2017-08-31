@@ -29,8 +29,7 @@ namespace evolution {
 enum Method {
   SINGLE, ///< single \link quantumtrajectory::MCWF_Trajectory MCWF trajectory\endlink
   ENSEMBLE, ///< \link quantumtrajectory::EnsembleMCWF ensemble\endlink of MCWF trajectories
-  MASTER, ///< Master equation with \link quantumtrajectory::master::Base normal iteration\endlink
-  MASTER_FAST ///< Master equation with \link quantumtrajectory::master::BaseFast “fast” iteration\endlink
+  MASTER ///< Master equation with \link quantumtrajectory::master::Base normal iteration\endlink
 };
 
 std::ostream& operator<<(std::ostream&, Method ); ///< output streaming for Method
@@ -43,7 +42,7 @@ struct Pars : public trajectory::ParsRun, public mcwf::Pars {
 
   Method &evol; ///< the method of evolution
   bool
-    &negativity, ///< governs whether entanglement should be calculated in the case of #ENSEMBLE, #MASTER, and #MASTER_FAST, cf. quantumtrajectory::display_densityoperator::_, quantumdata::negPT
+    &negativity, ///< governs whether entanglement should be calculated in the case of #ENSEMBLE and #MASTER, cf. quantumtrajectory::display_densityoperator::_, quantumdata::negPT
     &timeAverage; ///< governs whether in the case of #SINGLE, time averaging should be performed (by using quantumtrajectory::TimeAveragingMCWF_Trajectory instead of quantumtrajectory::MCWF_Trajectory)
   double &relaxationTime; ///< the relaxation time in the case when time averaging is desired
 

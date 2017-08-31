@@ -43,7 +43,7 @@ QM_Picture& updateWithPicture(parameters::ParameterTable& p, int argc, char* arg
   parameters::update(p,argc,argv,prefix);
   try {
     const evolution::Method method=dynamic_cast<const parameters::Parameter<evolution::Method>&>(p["evol"]).get();
-    if ((method==evolution::MASTER || method==evolution::MASTER_FAST) && qmp==QMP_IP) qmp=QMP_UIP;
+    if (method==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
   } catch (const parameters::UnrecognisedParameterException&) {}
   return qmp;
 }
