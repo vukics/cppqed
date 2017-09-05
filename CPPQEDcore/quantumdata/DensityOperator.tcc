@@ -50,6 +50,12 @@ DensityOperator<RANK>::DensityOperator(const DensityOperator& rho)
 {}
 
 
+template<int RANK>
+DensityOperator<RANK>::DensityOperator(DensityOperator&& rho) 
+  : LDO_Base(rho.getDimensions()),
+    ABase(rho.getArray())
+{}
+
 
 template<int RANK>
 double

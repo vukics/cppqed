@@ -89,6 +89,12 @@ public:
   explicit StateVector(const Dimensions&, bool init=true); ///< Constructs the class with a newly allocated chunk of memory, which is initialized only if `init` is `true`.
 
   StateVector(const StateVector&); ///< Copy constructor using by value semantics, that is, deep copy.
+  
+    ///< Move constructor using the original reference semantics of blitz::Array 
+    /**
+     * \note It doesn’t touch its argument, as there seems to be no efficient way to invalidate that one
+     */
+  StateVector(StateVector&&);
 
     /// Constructs the class as the direct product of `psi1` and `psi2`, whose arities add up to `RANK`.
     /**

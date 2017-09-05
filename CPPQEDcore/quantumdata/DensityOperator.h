@@ -84,6 +84,8 @@ public:
 
   DensityOperator(const DensityOperator&); ///< By-value copy constructor (deep copy)
 
+  DensityOperator(DensityOperator&&); ///< Move constructor (shallow copy)
+
   /// Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
   DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho.getArray()); return *this;}
 

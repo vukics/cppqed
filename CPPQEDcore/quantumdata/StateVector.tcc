@@ -27,6 +27,13 @@ StateVector<RANK>::StateVector(const StateVector& sv)
 }
 
 
+template<int RANK>
+StateVector<RANK>::StateVector(StateVector&& sv) 
+  : LDO_Base(sv.getDimensions()), ABase(sv.getArray())
+{
+}
+
+
 template<int RANK> template<int RANK2>
 StateVector<RANK>::StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)
   : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
