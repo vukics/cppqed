@@ -41,7 +41,7 @@ protected:
 #undef  BASE_class
 
 private:
-  typedef typename Ensemble::Impl Trajectories;
+  typedef typename Ensemble::Trajectories Trajectories;
 
   typedef boost::base_from_member<StateVectors> StateVectorsBase;
 
@@ -138,7 +138,7 @@ public:
     : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->toBeAveraged(),os,precision);}
+  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->averaged(),os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
@@ -171,16 +171,16 @@ class Traits<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector
 public:
   typedef Ensemble<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&> EnsembleType;
 
-  typedef typename EnsembleType::Elem             Elem            ;
-  typedef typename EnsembleType::Impl             Impl            ;
-  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
+  typedef typename EnsembleType::Elem         Elem        ;
+  typedef typename EnsembleType::Trajectories Trajectories;
+  typedef typename EnsembleType::Averaged     Averaged    ;
 
   /// assumes that quantumdata::StateVector features a member quantumdata::StateVector::addTo()
-  static const ToBeAveragedType averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType& et)
+  static const Averaged averageInRange(typename Trajectories::const_iterator begin, typename Trajectories::const_iterator end, const EnsembleType& et)
   {
-    ToBeAveragedType res(et.getInitializedDensityOperator());
+    Averaged res(et.getInitializedDensityOperator());
     
-    for (auto i=begin; i!=end; i++) i->toBeAveraged().addTo(res);
+    for (auto i=begin; i!=end; i++) i->averaged().addTo(res);
 
     return res/=size2Double(end-begin);
 

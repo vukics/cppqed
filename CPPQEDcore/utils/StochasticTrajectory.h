@@ -34,10 +34,10 @@ class Averageable : public virtual Trajectory
 public:
   virtual ~Averageable() {}
 
-  const T toBeAveraged() const {return toBeAveraged_v();} ///< returns the set of quantities condensed in a variable of type `T` that are “to be averaged”
+  const T averaged() const {return averaged_v();} ///< returns the set of quantities condensed in a variable of type `T` that are “to be averaged”
 
 private:
-  virtual const T toBeAveraged_v() const = 0;
+  virtual const T averaged_v() const = 0;
 
 };
 
@@ -138,13 +138,13 @@ public:
 
   /// The storage of the element trajectories is through a \refBoost{pointer-vector,ptr_container/doc/ptr_vector.html}
   /** This correctly handles the elements’s eventual polymorphy and allows for random access to individual trajectories (cf. averageInRange()) */
-  typedef boost::ptr_vector<Elem> Impl;
+  typedef boost::ptr_vector<Elem> Trajectories;
   
-  typedef T ToBeAveragedType;
+  typedef T Averaged;
 
   /// Averages only in a range `begin..begin+n-1`
-  /** It could be called `toBeAveraged` as well, but it is not good to redefine an \link Averageable::toBeAveraged inherited non-virtual function\endlink. */
-  const ToBeAveragedType averageInRange(size_t begin, size_t n) const;
+  /** It could be called `averaged` as well, but it is not good to redefine an \link Averageable::averaged inherited non-virtual function\endlink. */
+  const Averaged averageInRange(size_t begin, size_t n) const;
 
   virtual ~Ensemble() {}
 
@@ -153,7 +153,7 @@ protected:
   // boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  typedef std::auto_ptr<Impl> Ptr;
+  typedef std::auto_ptr<Trajectories> Ptr;
 #pragma GCC diagnostic pop
   
   /// Generic constructor
@@ -162,7 +162,7 @@ protected:
           ) : trajs_(trajs), displayProgress_(displayProgress) {}
 
   /// Getter
-  const Impl& getTrajectories() const {return trajs_;}
+  const Trajectories& getTrajectories() const {return trajs_;}
 
 #define FOR_EACH_function(f) for_each(trajs_,bind(&Elem::f,_1,boost::ref(ios))); return ios;
   
@@ -186,9 +186,9 @@ private:
   double getDtDid_v() const final;
   // An average of getDtDid()-s from individual trajectories.
 
-  const ToBeAveragedType toBeAveraged_v() const final {return averageInRange(0,trajs_.size());}
+  const Averaged averaged_v() const final {return averageInRange(0,trajs_.size());}
 
-  Impl trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
+  Trajectories trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
   const bool displayProgress_;
 
@@ -199,8 +199,8 @@ namespace ensemble {
 
 /// %Traits class governing how to average up several `T_ELEM` types into a `T` type in the most efficient way (which is usually not with the naive addition operator)
 /**
- * \tparam T the to-be-averaged type of the ensemble
- * \tparam T_ELEM the to-be-averaged type of the underlying Averageable instances
+ * \tparam T the averaged type of the ensemble
+ * \tparam T_ELEM the averaged type of the underlying Averageable instances
  * 
  * A generic (naive) implementation is provided for the traits class right away.
  * It assumes that `T_ELEM` is additive and dividable by a double, and that it can be converted into a `T`.
@@ -212,11 +212,11 @@ class Traits
 public:
   typedef Ensemble<T,T_ELEM> EnsembleType;
 
-  typedef typename EnsembleType::Elem             Elem            ;
-  typedef typename EnsembleType::Impl             Impl            ;
-  typedef typename EnsembleType::ToBeAveragedType ToBeAveragedType;
+  typedef typename EnsembleType::Elem     Elem    ;
+  typedef typename EnsembleType::Impl     Impl    ;
+  typedef typename EnsembleType::Averaged Averaged;
 
-  static const ToBeAveragedType averageInRange(typename Impl::const_iterator, typename Impl::const_iterator, const EnsembleType&);
+  static const Averaged averageInRange(typename Impl::const_iterator, typename Impl::const_iterator, const EnsembleType&);
 
 };
 

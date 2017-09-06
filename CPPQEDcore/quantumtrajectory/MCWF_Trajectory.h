@@ -121,7 +121,7 @@ private:
 
   std::ostream& displayParameters_v(std::ostream&) const override;
 
-  const StateVector& toBeAveraged_v() const override {return psi_;} 
+  const StateVector& averaged_v() const override {return psi_;} 
 
   const std::string trajectoryID_v() const override {return "MCWF_Trajectory";}
 

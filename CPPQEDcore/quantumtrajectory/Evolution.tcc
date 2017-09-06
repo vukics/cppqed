@@ -43,7 +43,7 @@ evolve(quantumdata::StateVector<RANK>& psi,
   else if (pe.evol==evolution::ENSEMBLE) {
     EnsembleMCWF<RANK,V> traj(psi,sys,pe,pe.negativity);
     trajectory::run(traj,pe);
-    return boost::make_shared<DO>(traj.toBeAveraged()); // deep copy
+    return boost::make_shared<DO>(traj.averaged()); // deep copy
   }
   else {
     DO rho(psi);
