@@ -69,17 +69,17 @@ StateVector<RANK>::renorm()
 
 template<int RANK>
 void 
-StateVector<RANK>::addTo(DensityOperator<RANK>& rho) const
+StateVector<RANK>::addTo(DensityOperator<RANK>& rho, double weight) const
 {
   using namespace linalg;
 
   CMatrix matrix(rho.matrixView());
 
-  const CVector& vector(vectorView());
+  CVector vector(vectorView());
 
   int dim(this->getTotalDimension());
 
-  for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=vector(i)*conj(vector(j));
+  for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
 
 }
 

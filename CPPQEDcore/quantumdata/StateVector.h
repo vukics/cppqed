@@ -150,7 +150,7 @@ public:
    * This is done without actually forming the dyad in memory (so that this is not implemented in terms of StateVector::dyad).
    * This is important in situations when an average density operator is needed from an ensemble of state vectors, an example being quantumtrajectory::EnsembleMCWF. 
    */
-  void addTo(DensityOperator<RANK>& densityOperator) const;
+  void addTo(DensityOperator<RANK>& densityOperator, double weight=1.) const;
 
   /// \name Naive vector-space operations
   //@{
