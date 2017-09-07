@@ -16,6 +16,19 @@
 namespace trajectory {
 
 
+/// Contains important helpers for averaging (over time or ensemble)
+namespace averaging {
+
+/// Whereby a type T can safely and efficiently be passed around (for storage, function parameter/return, ect.)
+/**
+ * by default, the handle type is the same as the type itself (for types that can be passed around by value)
+ */
+template<typename T>
+struct HandleType : mpl::identity<T> {};
+
+} // averaging
+
+
 /// The very general concept of an averageable trajectory
 /**
  * Besides being a Trajectory, it can report a certain set of quantities, which are to be averaged either
@@ -34,10 +47,12 @@ class Averageable : public virtual Trajectory
 public:
   virtual ~Averageable() {}
 
-  const T averaged() const {return averaged_v();} ///< returns the set of quantities condensed in a variable of type `T` that are “to be averaged”
+  typedef typename averaging::HandleType<T>::type AveragedHandle;
+  
+  const AveragedHandle averaged() const {return averaged_v();} ///< returns the set of quantities condensed in a variable of type `T` that are “to be averaged”
 
 private:
-  virtual const T averaged_v() const = 0;
+  virtual const AveragedHandle averaged_v() const = 0;
 
 };
 
@@ -98,17 +113,6 @@ private:
 
 
 
-/// Contains important helpers to Ensemble
-namespace ensemble {
-
-/// A base-class to Ensemble with customized behaviour according to the type of `T`
-template<typename T>
-class Base {};
-
-} // ensemble
-
-
-
 /// An ensemble of Averageable trajectories providing services for ensemble averaging and evolving the element trajectories serially
 /**
  * \note Time averaging does not use stepsize-weighting, as experience has shown that this leads to worse convergence (similarly to quantumtrajectory::TimeAveragingMCWF_Trajectory).
@@ -128,7 +132,7 @@ class Base {};
  * 
  */
 template<typename T, typename T_ELEM>
-class Ensemble : public Averageable<T>, public ensemble::Base<T>
+class Ensemble : public Averageable<T>
 {
 private:
   typedef Averageable<T     > Base;
@@ -141,10 +145,12 @@ public:
   typedef boost::ptr_vector<Elem> Trajectories;
   
   typedef T Averaged;
+  
+  typedef typename averaging::HandleType<T>::type AveragedHandle;
 
   /// Averages only in a range `begin..begin+n-1`
   /** It could be called `averaged` as well, but it is not good to redefine an \link Averageable::averaged inherited non-virtual function\endlink. */
-  const Averaged averageInRange(size_t begin, size_t n) const;
+  const AveragedHandle averageInRange(size_t begin, size_t n) const;
 
   virtual ~Ensemble() {}
 
@@ -183,10 +189,9 @@ private:
 
   std::ostream& displayParameters_v(std::ostream&) const final;
 
-  double getDtDid_v() const final;
-  // An average of getDtDid()-s from individual trajectories.
+  double getDtDid_v() const final; // An average of getDtDid()-s from individual trajectories.
 
-  const Averaged averaged_v() const final {return averageInRange(0,trajs_.size());}
+  const AveragedHandle averaged_v() const final {return averageInRange(0,trajs_.size());}
 
   Trajectories trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
 
@@ -195,32 +200,28 @@ private:
 };
 
 
-namespace ensemble {
+namespace averaging {
 
-/// %Traits class governing how to average up several `T_ELEM` types into a `T` type in the most efficient way (which is usually not with the naive addition operator)
+
+/// Governs how to average up several `T_ELEM` types into a `T` type in the most efficient way (which is usually not with the naive addition operator)
 /**
  * \tparam T the averaged type of the ensemble
  * \tparam T_ELEM the averaged type of the underlying Averageable instances
  * 
- * A generic (naive) implementation is provided for the traits class right away.
- * It assumes that `T_ELEM` is additive and dividable by a double, and that it can be converted into a `T`.
+ * A generic (naive) implementation is provided for the traits class right away, assuming that `T_ELEM` is additive and dividable by a double, and that it can be converted into a `T`.
+ * 
+ * \note The wrapper-class solution is necessary here as the function parameter types cannot be inferred due to heavy type-dependence
  * 
  */
 template<typename T, typename T_ELEM>
-class Traits
+struct AverageTrajectoriesInRange
 {
-public:
-  typedef Ensemble<T,T_ELEM> EnsembleType;
-
-  typedef typename EnsembleType::Elem     Elem    ;
-  typedef typename EnsembleType::Impl     Impl    ;
-  typedef typename EnsembleType::Averaged Averaged;
-
-  static const Averaged averageInRange(typename Impl::const_iterator, typename Impl::const_iterator, const EnsembleType&);
-
+  typedef typename Ensemble<T,T_ELEM>::Trajectories::const_iterator CI;
+  static const typename HandleType<T>::type _(CI begin, CI end);
 };
 
-} // ensemble
+
+} // averaging
 
 
 } // trajectory

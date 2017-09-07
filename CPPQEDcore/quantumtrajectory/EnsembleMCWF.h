@@ -22,7 +22,7 @@ using namespace mcwf;
 
 #define STATE_VECTORS(r) boost::ptr_vector<quantumdata::StateVector<r> >
 
-#define BASE_class trajectory::Ensemble< quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>& >
+#define BASE_class trajectory::Ensemble< quantumdata::DensityOperator<RANK> , quantumdata::StateVector<RANK> >
 
 /// Less templatized base for EnsembleMCWF \tparamRANK
 template<int RANK>
@@ -75,11 +75,6 @@ private:
   static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs);
 #pragma GCC diagnostic pop
 
-  
-  quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const final {rho_=0; return rho_;}
-
-  mutable quantumdata::DensityOperator<RANK> rho_;
-
   const QuantumSystemPtr qs_;
 
   const size_t nBins_, nJumpsPerBin_;
@@ -89,7 +84,7 @@ private:
 } // ensemble
 
 
-/// Derived from trajectory::Ensemble `<` quantumdata::DensityOperator `<RANK>& , const` quantumdata::StateVector `<RANK>& >`, it implements an ensemble of \link MCWF_Trajectory MCWF trajectories\endlink started from a pure-state initial condition
+/// Derived from trajectory::Ensemble `<` quantumdata::DensityOperator `<RANK> , ` quantumdata::StateVector `<RANK> >`, it implements an ensemble of \link MCWF_Trajectory MCWF trajectories\endlink started from a pure-state initial condition
 /**
  * The class overrides trajectory::Trajectory::display in such a way that at the time instant of display,
  * the ensemble-averaged density operator of the system gets assembled from the stochastic state vectors of the element \link MCWF_Trajectory MCWF trajectories\endlink as
@@ -138,7 +133,7 @@ public:
     : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),this->averaged(),os,precision);}
+  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),*this->averaged(),os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
@@ -150,47 +145,33 @@ private:
 
 /** \cond SPECIALIZATION */
 
-namespace trajectory { namespace ensemble {
+namespace trajectory { namespace averaging {
 
 
 template<int RANK>
-class Base<quantumdata::DensityOperator<RANK>&>
-{
-public:
-  quantumdata::DensityOperator<RANK>& getInitializedDensityOperator() const {return getInitializedDensityOperator_v();}
-
-private:
-  virtual quantumdata::DensityOperator<RANK>& getInitializedDensityOperator_v() const = 0;
-  
-};
+struct HandleType<quantumdata::DensityOperator<RANK> > : mpl::identity<boost::shared_ptr<quantumdata::DensityOperator<RANK> > > {};
 
 
 template<int RANK>
-class Traits<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&>
+struct AverageTrajectoriesInRange<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >
 {
-public:
-  typedef Ensemble<quantumdata::DensityOperator<RANK>&, const quantumdata::StateVector<RANK>&> EnsembleType;
-
-  typedef typename EnsembleType::Elem         Elem        ;
-  typedef typename EnsembleType::Trajectories Trajectories;
-  typedef typename EnsembleType::Averaged     Averaged    ;
-
-  /// assumes that quantumdata::StateVector features a member quantumdata::StateVector::addTo()
-  static const Averaged averageInRange(typename Trajectories::const_iterator begin, typename Trajectories::const_iterator end, const EnsembleType& et)
+  static const auto
+  _(typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator begin,
+    typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator end  )
   {
-    Averaged res(et.getInitializedDensityOperator());
-    
-    for (auto i=begin; i!=end; i++) i->averaged().addTo(res);
+    auto res(boost::make_shared<quantumdata::DensityOperator<RANK> >(*begin->averaged()));
+      
+    for (auto i=begin+1; i<end; i++) i->averaged()->addTo(*res);
 
-    return res/=size2Double(end-begin);
+    *res/=size2Double(end-begin);
+    return res;
 
   }
-
 
 };
 
  
-} } // trajectory::ensemble
+} } // trajectory::averaging
 
 /** \endcond */
 

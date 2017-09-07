@@ -16,10 +16,18 @@
 #include <boost/tuple/tuple.hpp>
 
 
+namespace trajectory { namespace averaging {
+
+template<int RANK>
+struct HandleType<quantumdata::StateVector<RANK> > : mpl::identity<boost::shared_ptr<quantumdata::StateVector<RANK> > > {};
+
+} } // trajectory::averaging
+
+
 namespace quantumtrajectory {
 
 
-#define BASE_class trajectory::Stochastic<typename quantumdata::Types<RANK>::StateVectorLow, const quantumdata::StateVector<RANK>&>
+#define BASE_class trajectory::Stochastic<typename quantumdata::Types<RANK>::StateVectorLow, quantumdata::StateVector<RANK> >
 
 
 /// Implements a single Monte Carlo wave-function trajectory
@@ -121,7 +129,7 @@ private:
 
   std::ostream& displayParameters_v(std::ostream&) const override;
 
-  const StateVector& averaged_v() const override {return psi_;} 
+  const typename Base::AveragedHandle averaged_v() const override {return cpputils::nonOwningSharedPtr(&psi_);}
 
   const std::string trajectoryID_v() const override {return "MCWF_Trajectory";}
 

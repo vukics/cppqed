@@ -85,22 +85,21 @@ Ensemble<T,T_ELEM>::evolve_v(double deltaT)
 
 template<typename T, typename T_ELEM>
 auto
-Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const Averaged
+Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const AveragedHandle
 {
-  return ensemble::Traits<T,T_ELEM>::averageInRange(trajs_.begin()+begin,trajs_.begin()+(begin+n),*this);
-
+  return averaging::AverageTrajectoriesInRange<T,T_ELEM>::_(trajs_.begin()+begin,trajs_.begin()+(begin+n));
 }
 
 
 
 
-// Naive generic implementation of the traits class
+// Naive generic implementation
 template<typename T, typename T_ELEM>
-auto
-ensemble::Traits<T,T_ELEM>::averageInRange(typename Impl::const_iterator begin, typename Impl::const_iterator end, const EnsembleType&) -> const Averaged
+const typename averaging::HandleType<T>::type
+averaging::AverageTrajectoriesInRange<T,T_ELEM>::_(CI begin, CI end)
 {
   using namespace boost;
-  return accumulate(make_iterator_range(++begin,end) | adaptors::transformed(bind(&Elem::averaged,_1)),begin->averaged())/size2Double(end-begin);
+  return accumulate(make_iterator_range(++begin,end) | adaptors::transformed(bind(&Ensemble<T,T_ELEM>::Elem::averaged,_1)),begin->averaged())/size2Double(end-begin);
 }
 
 

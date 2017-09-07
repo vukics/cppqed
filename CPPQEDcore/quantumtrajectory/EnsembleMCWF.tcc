@@ -49,7 +49,7 @@ quantumtrajectory::ensemble::Base<RANK>::Base(
                                               )
   : StateVectorsBase(stateVectors(psi,p.nTraj)),
     Ensemble(trajectories(StateVectorsBase::member,qs,p,scaleAbs),p.logLevel<0),
-    rho_(psi.getDimensions(),false), qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
+    qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
 {
 }
 
