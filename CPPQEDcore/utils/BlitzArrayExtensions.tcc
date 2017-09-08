@@ -28,6 +28,14 @@ unaryArray(const blitz::Array<T,RANK>& array)
 }
 
 
+template<typename T>
+inline const blitz::Array<T,1>
+unaryArray(const blitz::Array<T,1>& array)
+{
+  return array;
+}
+
+
 template<typename T, int TWO_TIMES_RANK>
 const blitz::Array<T,2>
 binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
@@ -51,6 +59,14 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
   int size=long2Int(product(halfCutTiny(array.shape())));
   // apparently, the product is a long
   return blitz::Array<T,2>(const_cast<T*>(array.data()),shape(size,size),neverDeleteData);
+}
+
+
+template<typename T>
+inline const blitz::Array<T,2>
+binaryArray(const blitz::Array<T,2>& array)
+{
+  return array;
 }
 
 

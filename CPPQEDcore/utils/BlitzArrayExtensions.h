@@ -41,6 +41,8 @@ class NonContiguousStorageException : public cpputils::Exception {};
  * \tparam T the type the array is based on
  * \tparam RANK the arity of the vector space
  * 
+ * \note In case of `RANK=1`, however, the input array is returned
+ * 
  */
 template<typename T, int RANK>
 const blitz::Array<T,1>
@@ -62,6 +64,8 @@ class BinaryArrayOrderingErrorException : public cpputils::Exception {};
  *     <1 3 2 0 | 5 7 6 4>
  * 
  * Violation is detected at runtime, and an exception of type BinaryArrayOrderingErrorException is thrown.
+ * 
+ * \note In case of `RANK=2`, however, the input array is returned
  * 
  * \tparam T the type the array is based on
  * \tparam TWO_TIMES_RANK `2*RANK`, `RANK` being the arity of the vector space
