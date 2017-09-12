@@ -23,7 +23,6 @@ int main(int argc, char* argv[])
   ParsHomodyned<ParsPumpedLossy> pplm(p);
 
   bool
-    &alternative=p.add("alternative","Alternative mode",false),
     &doDisplay=p.add("doDisplay","Display diagonal elements of density operator",false),
     &doOffDiag=p.add("doOffDiag","Display offdiagonal elements of density operator",false);
 
