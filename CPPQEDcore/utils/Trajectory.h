@@ -84,8 +84,8 @@ void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt
  * that is, when the important things are happening in the dynamics.
  * 
  */
-template<typename A>
-void run(Adaptive<A>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
+template<typename A, typename BASE>
+void run(Adaptive<A,BASE>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
          unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
          double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
 
@@ -110,8 +110,8 @@ void run(Trajectory &, const ParsRun& p);
  * \note This means that ParsRun::dc takes precedence over ParsRun::Dt
  * 
  */
-template<typename A>
-void run(Adaptive<A>&, const ParsRun&);
+template<typename A, typename BASE>
+void run(Adaptive<A,BASE>&, const ParsRun&);
 
 
 /// Aggregate of information about a trajectory-state archive \see AdaptiveIO
@@ -317,13 +317,17 @@ private:
 
 
 /// Adaptive is basically an evolved::Evolved wrapped into the Trajectory interface
-/** The class stores an evolved::Evolved instance by shared pointer */
-template<typename A>
-class Adaptive : public trajectory::AdaptiveIO<A>, public virtual Trajectory
+/** The class stores an evolved::Evolved instance by shared pointer
+ * 
+ * \tparam BASE either Trajectory or Averageable (cf. StochasticTrajectory.h)
+ * 
+ */
+template<typename A, typename BASE>
+class Adaptive : public trajectory::AdaptiveIO<A>, public BASE
 {
 public:
   // needed to break ambiguity with identically named functions in AdaptiveIO
-  using Trajectory::readState; using Trajectory::writeState; using Trajectory::getTime;
+  using BASE::readState; using BASE::writeState; using BASE::getTime;
 
   typedef evolved::Evolved<A> Evolved;
 
@@ -340,10 +344,8 @@ protected:
   typedef typename Evolved::Derivs Derivs;
   
   /// Constructor taking the same parameters as needed to operate evolved::Maker
-  Adaptive(A&, Derivs, double, int, double, double, const A&, const evolved::Maker<A>&);
-
-  /** \overload Adaptive(A&, Derivs, double, double, double, const A&, const evolved::Maker<A>&) */
-  Adaptive(A&, Derivs, double, const ParsEvolved&,  const A&, const evolved::Maker<A>&);
+  template<typename... BaseInitializationPack>
+  Adaptive(A&, Derivs, double, int, double, double, const A&, const evolved::Maker<A>&, BaseInitializationPack&&...);
 
   typedef typename Evolved::ConstPtr ConstPtr;
   typedef typename Evolved::     Ptr      Ptr;

@@ -38,7 +38,7 @@ struct SystemNotApplicable : cpputils::Exception {};
 
 /// The actual working base of Master in the case when blitzplusplus::basi::Iterator is used for implementing multi-matrix multiplications \tparamRANK
 template<int RANK>
-class Base : public QuantumTrajectory<RANK, trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow> >
+class Base : public QuantumTrajectory<RANK, trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow,trajectory::Trajectory> >
 {
 public:
   typedef structure::QuantumSystem<RANK> QuantumSystem;
@@ -50,7 +50,7 @@ public:
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
   typedef typename quantumdata::Types<RANK>::    StateVectorLow     StateVectorLow;
 
-  typedef trajectory::Adaptive<DensityOperatorLow> Adaptive;
+  typedef trajectory::Adaptive<DensityOperatorLow,trajectory::Trajectory> Adaptive;
 
   typedef quantumtrajectory::QuantumTrajectory<RANK, Adaptive> QuantumTrajectory;
 

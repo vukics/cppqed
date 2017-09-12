@@ -23,10 +23,10 @@ namespace trajectory {
  * \todo Provide optional key printing
  */
 template<typename A> 
-class Simulated : public Adaptive<A>
+class Simulated : public Adaptive<A,Trajectory>
 {
 public:
-  typedef Adaptive<A> Base;
+  typedef Adaptive<A,Trajectory> Base;
 
   typedef evolved::Evolved<A> Evolved;
 

@@ -19,8 +19,8 @@
 #include <numeric> // for accumulate
 
 
-template<typename A>
-void trajectory::run(Adaptive<A>& traj, const ParsRun& p)
+template<typename A, typename BASE>
+void trajectory::run(Adaptive<A,BASE>& traj, const ParsRun& p)
 {
   if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.autoStopEpsilon,p.autoStopRepetition,p.getParsedCommandLine());
   else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
@@ -67,8 +67,8 @@ inline bool doContinue(const Trajectory&     , long length, long count) {return 
 inline void advance(Trajectory & traj, long       , double deltaT) {traj.evolve(deltaT);}
 inline void advance(Trajectory & traj, double time, double deltaT) {traj.evolve(std::min(deltaT,time-traj.getTime()));}
 
-template<typename A>
-inline void advance(Adaptive<A>& traj, double time, int          ) {traj.step(time-traj.getTime());}
+template<typename A, typename BASE>
+inline void advance(Adaptive<A,BASE>& traj, double time, int) {traj.step(time-traj.getTime());}
 
 inline bool doDisplay(long      , double         ) {return true;}
 inline bool doDisplay(long count, int displayFreq) {return !(count%displayFreq);}
@@ -215,8 +215,8 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 } } // trajectory::details
 
 
-template<typename A>
-void trajectory::run(Adaptive<A>& traj, double time, int dc, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
+template<typename A, typename BASE>
+void trajectory::run(Adaptive<A,BASE>& traj, double time, int dc, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
                      bool displayInfo, bool firstStateDisplay,
                      double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
 {details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,autoStopEpsilon,autoStopRepetition,parsedCommandLine);}
@@ -251,27 +251,24 @@ cpputils::oarchive& trajectory::AdaptiveIO<A>::writeState(cpputils::oarchive& oa
 }
 
 
-template<typename A>
-trajectory::Adaptive<A>::Adaptive(A& y, Derivs derivs, double dtInit, int logLevel, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker)
+template<typename A, typename BASE> template<typename... BaseInitializationPack>
+trajectory::Adaptive<A,BASE>::Adaptive(A& y, Derivs derivs, double dtInit, int logLevel, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker,
+                                       BaseInitializationPack&&... bip)
   : AdaptiveIO<A>(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
+    BASE(std::forward<BaseInitializationPack>(bip)...),
     evolved_(boost::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())),
     dtInit_(dtInit), logLevel_(logLevel)
 {}
 
 
-template<typename A>
-trajectory::Adaptive<A>::Adaptive(A& y, Derivs derivs, double dtInit, const ParsEvolved& p, const A& scaleAbs, const evolved::Maker<A>& maker)
-  : Adaptive(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,maker) {}
-
-
-template<typename A>
-std::ostream& trajectory::Adaptive<A>::displayParameters_v(std::ostream& os) const
+template<typename A, typename BASE>
+std::ostream& trajectory::Adaptive<A,BASE>::displayParameters_v(std::ostream& os) const
 {
   return evolved_->displayParameters(os)<<"Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }
 
-template<typename A>
-cpputils::iarchive& trajectory::Adaptive<A>::readState_v(cpputils::iarchive& iar)
+template<typename A, typename BASE>
+cpputils::iarchive& trajectory::Adaptive<A,BASE>::readState_v(cpputils::iarchive& iar)
 {
   AdaptiveIO<A>::readState(iar);
   if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY) {
@@ -284,8 +281,8 @@ cpputils::iarchive& trajectory::Adaptive<A>::readState_v(cpputils::iarchive& iar
   return iar;
 }
 
-template<typename A>
-cpputils::oarchive& trajectory::Adaptive<A>::writeState_v(cpputils::oarchive& oar) const
+template<typename A, typename BASE>
+cpputils::oarchive& trajectory::Adaptive<A,BASE>::writeState_v(cpputils::oarchive& oar) const
 {
   meta_.trajectoryID = trajectoryID(); // it is set here rather than @ construction as it is not good to call virtual functions @ construction
   AdaptiveIO<A>::writeState(oar);
@@ -293,8 +290,8 @@ cpputils::oarchive& trajectory::Adaptive<A>::writeState_v(cpputils::oarchive& oa
 }
 
 
-template<typename A>
-void trajectory::Adaptive<A>::step(double deltaT)
+template<typename A, typename BASE>
+void trajectory::Adaptive<A,BASE>::step(double deltaT)
 {
   step_v(deltaT);
   if (logLevel_>3)

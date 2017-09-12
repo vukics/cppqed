@@ -30,7 +30,7 @@ Base<RANK>::Base(DensityOperator& rho,
                       rho.getArray(),
                       bind(&Base<RANK>::derivs,this,_1,_2,_3),
                       initialTimeStep<RANK>(qs),
-                      p,
+                      p.logLevel,p.epsRel,p.epsAbs,
                       scaleAbs,
                       evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
     rho_(rho)

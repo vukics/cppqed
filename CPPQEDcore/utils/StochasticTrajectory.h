@@ -42,7 +42,7 @@ struct HandleType : mpl::identity<T> {};
  * 
  */
 template<typename T> 
-class Averageable : public virtual Trajectory
+class Averageable : public Trajectory
 {
 public:
   virtual ~Averageable() {}
@@ -60,13 +60,13 @@ private:
 /// Represents a trajectory that has both adaptive ODE evolution and noise
 /** In the language of the framework, this means that the class simply connects Adaptive and Averageable while storing a randomized::Randomized instant for the convenience of derived classes. */
 template<typename A, typename T>
-class Stochastic : public Adaptive<A>, public Averageable<T>
+class Stochastic : public Adaptive<A,Averageable<T>>
 {
 public:
   virtual ~Stochastic() {}
 
 private:
-  typedef Adaptive<A> Base;
+  typedef Adaptive<A,Averageable<T>> Base;
 
   typedef typename Base::Evolved Evolved;
 

@@ -20,7 +20,7 @@ class Trajectory;
 template<typename>
 class AdaptiveIO;
 
-template<typename>
+template<typename, typename BASE>
 class Adaptive;
 
 } // trajectory
