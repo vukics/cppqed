@@ -211,7 +211,7 @@ template<int RANK, typename V>
 typename IndexerBase<RANK,V>::Idx IndexerBase<RANK,V>::cache_;
 
 template<int RANK, typename V>
-const typename IndexerBase<RANK,V>::Helper IndexerBase<RANK,V>::helper_;
+const typename IndexerBase<RANK,V>::Helper IndexerBase<RANK,V>::helper_=typename IndexerBase<RANK,V>::Helper();
 
 ////////////////////////////
 //

@@ -175,11 +175,13 @@ LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO>::doActWithSuperoperator(NoTime, co
 }
 
 
+namespace details {
+
 // The trick is that this single function takes care of the superoperator of the phase diffusion of all the levels,
 // which are highly degenerate, and easily treated in their sum over all the levels
 template<>
 void
-details::doReallyActWithSuperoperator<0>(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double gamma_parallel)
+doReallyActWithSuperoperator<0>(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double gamma_parallel)
 {
   for (int m=0; m<rho.ubound(0); ++m) {
     drhodt(m,m)+=2*gamma_parallel*rho(m,m);
@@ -190,6 +192,7 @@ details::doReallyActWithSuperoperator<0>(const DensityOperatorLow& rho, DensityO
   }
 }
 
+}
 
 template<int NL, typename VL, bool IS_DIFFUSIVE>
 class LiouvilleanBase<NL,VL,IS_DIFFUSIVE>::KeyHelper
