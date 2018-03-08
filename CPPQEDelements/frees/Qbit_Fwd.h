@@ -22,9 +22,18 @@ class PumpedLossyQbitUIP;
 namespace qbit {
 
 struct Pars;
+
 struct ParsPumped;
+
+template <typename BASE=Pars>
 struct ParsLossy;
-struct ParsPumpedLossy;
+
+typedef ParsLossy<ParsPumped> ParsPumpedLossy;
+
+template <typename BASE=ParsLossy<>>
+struct ParsLossyPhaseNoise;
+
+typedef ParsLossyPhaseNoise<ParsPumpedLossy> ParsPumpedLossyPhaseNoise;
 
 // struct PrepError;
 

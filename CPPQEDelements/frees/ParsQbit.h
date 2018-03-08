@@ -21,7 +21,7 @@ struct Pars
 };
 
 
-struct ParsPumped : virtual Pars 
+struct ParsPumped : Pars
 {
   dcomp& eta;
 
@@ -30,7 +30,8 @@ struct ParsPumped : virtual Pars
 };
 
 
-struct ParsLossy : virtual Pars
+template <typename BASE>
+struct ParsLossy : BASE
 {
   double &gamma;
 
@@ -39,9 +40,13 @@ struct ParsLossy : virtual Pars
 };
 
 
-struct ParsPumpedLossy : ParsPumped, ParsLossy
+template <typename BASE>
+struct ParsLossyPhaseNoise : BASE
 {
-  ParsPumpedLossy(parameters::ParameterTable&, const std::string& ="");
+  double &gamma_parallel;
+  
+  ParsLossyPhaseNoise(parameters::ParameterTable&, const std::string& ="");
+  
 };
 
 

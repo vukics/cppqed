@@ -18,7 +18,9 @@ void export_Qbit()
   class_<QbitBase, bases<structure::QuantumSystem<1>>, boost::noncopyable>("QbitBase",no_init);
   {
     scope namespaceScope = qbitNameSpace;
-    def("make", qbit::make, with_custodian_and_ward_postcall<0,1>());
+    // resolve the overload of qbit::make with static_cast
+    def("make", static_cast< qbit::Ptr(*)(const qbit::ParsPumpedLossy          &, QM_Picture)>(qbit::make), with_custodian_and_ward_postcall<0,1>());
+    def("make", static_cast< qbit::Ptr(*)(const qbit::ParsPumpedLossyPhaseNoise&, QM_Picture)>(qbit::make), with_custodian_and_ward_postcall<0,1>());
     qbitNameSpace.staticmethod("make");
     register_ptr_to_python< qbit::Ptr >();
     implicitly_convertible<boost::shared_ptr<QbitBase>,qbit::Ptr>();

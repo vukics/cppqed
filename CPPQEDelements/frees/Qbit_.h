@@ -85,6 +85,7 @@ inline const StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 Ptr make(const ParsPumpedLossy&, QM_Picture);
 
+Ptr make(const ParsPumpedLossyPhaseNoise&, QM_Picture);
 
 
 
@@ -178,7 +179,11 @@ class LossyQbit
   : public qbit::Liouvillean, public qbit::Exact, public QbitBase
 {
 public:
-  LossyQbit(const qbit::ParsLossy&);
+  LossyQbit(double, double);
+
+  template<typename BASE>
+  LossyQbit(const qbit::ParsLossy<BASE>& p) : LossyQbit(p.delta,p.gamma) {}
+  
 };
 
 
@@ -186,7 +191,10 @@ class LossyQbitSch
   : public qbit::Liouvillean, public qbit::Hamiltonian<false>, public QbitBase
 {
 public:
-  LossyQbitSch(const qbit::ParsLossy&);
+  LossyQbitSch(double, double);
+  
+  template<typename BASE>
+  LossyQbitSch(const qbit::ParsLossy<BASE>& p) : LossyQbitSch(p.delta,p.gamma) {}
 };
 
 
@@ -194,7 +202,10 @@ class LossyQbitUIP
   : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
-  LossyQbitUIP(const qbit::ParsLossy&);
+  LossyQbitUIP(double, double);
+
+  template<typename BASE>
+  LossyQbitUIP(const qbit::ParsLossy<BASE>& p) : LossyQbitUIP(p.delta,p.gamma) {}
 };
 
 
@@ -202,7 +213,7 @@ class PumpedLossyQbit
   : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
-  PumpedLossyQbit(const qbit::ParsPumpedLossy&);
+  PumpedLossyQbit(const qbit::ParsPumpedLossy& p);
 };
 
 
@@ -226,7 +237,10 @@ class LossyQbitWithPhaseNoise
   : public qbit::Exact, public qbit::LiouvilleanPhaseNoise, public QbitBase
 {
 public:
-  LossyQbitWithPhaseNoise(const qbit::ParsLossy&, double gamma_parallel);
+  LossyQbitWithPhaseNoise(double, double, double);
+
+  template<typename BASE>
+  LossyQbitWithPhaseNoise(const qbit::ParsLossyPhaseNoise<BASE>& p) : LossyQbitWithPhaseNoise(p.delta,p.gamma,p.gamma_parallel) {}
   
 };
 
@@ -235,7 +249,10 @@ class LossyQbitWithPhaseNoiseUIP
   : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
 {
 public:
-  LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy&, double gamma_parallel);
+  LossyQbitWithPhaseNoiseUIP(double, double, double);
+
+  template<typename BASE>
+  LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossyPhaseNoise<BASE>& p) : LossyQbitWithPhaseNoiseUIP(p.delta,p.gamma,p.gamma_parallel) {}
   
 };
 
@@ -243,14 +260,14 @@ class PumpedLossyQbitWithPhaseNoise
   : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
 {
 public:
-  PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossy&, double gamma_parallel);
+  PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossyPhaseNoise&);
 };
 
 class PumpedLossyQbitWithPhaseNoiseUIP
   : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
 {
 public:
-  PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossy&, double gamma_parallel);
+  PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossyPhaseNoise&);
 };
 
 #endif // CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED

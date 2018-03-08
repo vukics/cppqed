@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Qbit_.h"
 
-#include "ParsQbit.h"
+#include "ParsQbit.tcc"
 #include "StateVector.tcc"
 #include "ElementLiouvillean.tcc"
 
@@ -48,8 +48,7 @@ void sigmaJump(qbit::StateVectorLow& psi, double gamma_perpendicular)
 void sigma_zJump(qbit::StateVectorLow& psi, double gamma_parallel)
 {
   double fact=sqrt(2.*gamma_parallel);
-  psi(0)= fact*psi(0);
-  psi(1)=-fact*psi(1);
+  psi(0)*= fact; psi(1)*=-fact;
 }
 
 
@@ -117,27 +116,27 @@ PumpedQbitSch::PumpedQbitSch(const qbit::ParsPumped& p)
 }
 
 
-LossyQbit::LossyQbit(const qbit::ParsLossy& p)
-  : qbit::Liouvillean(p.gamma),
-    Exact(dcomp(p.gamma,-p.delta)),
+LossyQbit::LossyQbit(double delta, double gamma)
+  : qbit::Liouvillean(gamma),
+    Exact(dcomp(gamma,-delta)),
     QbitBase{TUPLE_gammadelta(1)}
 {
   getParsStream()<<"Lossy.\n";
 }
 
 
-LossyQbitSch::LossyQbitSch(const qbit::ParsLossy& p)
-  : qbit::Liouvillean(p.gamma),
-    qbit::Hamiltonian<false>(dcomp(p.gamma,-p.delta),0),
+LossyQbitSch::LossyQbitSch(double delta, double gamma)
+  : qbit::Liouvillean(gamma),
+    qbit::Hamiltonian<false>(dcomp(gamma,-delta),0),
     QbitBase{TUPLE_gamma,TUPLE_delta(0)}
 {
   getParsStream()<<"Lossy, Schroedinger picture.\n";
 }
 
 
-LossyQbitUIP::LossyQbitUIP(const qbit::ParsLossy& p)
-  : qbit::Liouvillean(p.gamma),
-    qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),0),
+LossyQbitUIP::LossyQbitUIP(double delta, double gamma)
+  : qbit::Liouvillean(gamma),
+    qbit::Hamiltonian<true>(dcomp(gamma,0),dcomp(0,-delta),0),
     QbitBase{TUPLE_gamma,TUPLE_delta(1)}
 {
   getParsStream()<<"Lossy, Unitary interaction picture.\n";
@@ -171,35 +170,35 @@ PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
 }
 
 
-LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(const qbit::ParsLossy& p, double gamma_parallel)
-  : Exact(dcomp(p.gamma,-p.delta)), // gamma_parallel does not contribute to the Hamiltonian
-    qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
+LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(double delta, double gamma, double gamma_parallel)
+  : Exact(dcomp(gamma,-delta)), // gamma_parallel does not contribute to the Hamiltonian
+    qbit::LiouvilleanPhaseNoise(gamma,gamma_parallel),
     QbitBase(RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1))
 {
   getParsStream()<<"LossyWithPhaseNoise.\n";
 }
 
 
-LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossy& p, double gamma_parallel)
-  : qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),0),
-    qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
+LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(double delta, double gamma, double gamma_parallel)
+  : qbit::Hamiltonian<true>(dcomp(gamma,0),dcomp(0,-delta),0),
+    qbit::LiouvilleanPhaseNoise(gamma,gamma_parallel),
     QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
   getParsStream()<<"LossyWithPhaseNoise, Unitary interaction picture.\n";
 }
 
-PumpedLossyQbitWithPhaseNoise::PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossy& p, double gamma_parallel)
+PumpedLossyQbitWithPhaseNoise::PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossyPhaseNoise& p)
   : qbit::Hamiltonian<true>(0,dcomp(p.gamma,-p.delta),p.eta),
-    qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
-    QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1),TUPLE_eta}
+    qbit::LiouvilleanPhaseNoise(p.gamma,p.gamma_parallel),
+    QbitBase{RF{"gamma_parallel",p.gamma_parallel,1},TUPLE_gammadelta(1),TUPLE_eta}
 {
   getParsStream()<<"PumpedLossyWithPhaseNoise.\n";
 }
 
-PumpedLossyQbitWithPhaseNoiseUIP::PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossy& p, double gamma_parallel)
+PumpedLossyQbitWithPhaseNoiseUIP::PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossyPhaseNoise& p)
   : qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),p.eta),
-    qbit::LiouvilleanPhaseNoise(p.gamma,gamma_parallel),
-    QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
+    qbit::LiouvilleanPhaseNoise(p.gamma,p.gamma_parallel),
+    QbitBase{RF{"gamma_parallel",p.gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
   getParsStream()<<"PumpedLossyWithPhaseNoise, Unitary interaction picture.\n";
 }
@@ -247,6 +246,26 @@ Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
   if (std::abs(p.eta)==0)
     return boost::make_shared<LossyQbitSch    >(p);
   return boost::make_shared<PumpedLossyQbitSch>(p);
+}
+
+
+Ptr make(const ParsPumpedLossyPhaseNoise& p, QM_Picture qmp)
+{
+  if (p.gamma_parallel) {
+    if (qmp==QMP_UIP) {
+      if (std::abs(p.eta))
+        return boost::make_shared<PumpedLossyQbitWithPhaseNoiseUIP>(p);
+      else
+        return boost::make_shared<      LossyQbitWithPhaseNoiseUIP>(p);
+    }
+    else {
+      if (std::abs(p.eta))
+        return boost::make_shared<PumpedLossyQbitWithPhaseNoise>(p);
+      else
+        return boost::make_shared<      LossyQbitWithPhaseNoise>(p);
+    }
+  }
+  return make(static_cast<const ParsPumpedLossy&>(p),qmp);
 }
 
 

@@ -4,6 +4,6 @@
 #define CPPQEDELEMENTS_FREES_QBIT_H_INCLUDED
 
 #include "Qbit_.h"
-#include "ParsQbit.h"
+#include "ParsQbit.tcc"
 
 #endif // CPPQEDELEMENTS_FREES_QBIT_H_INCLUDED

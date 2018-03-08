@@ -15,15 +15,18 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars pe(p); // Driver Parameters
-  ParsPumpedLossy pp2la(p); 
+  ParsPumpedLossyPhaseNoise pp2la(p);
+  
+  auto& fullImpl=p.addTitle("Script specific").add("fullImpl","Implement with Qbit (instead of PumpedTwoLevelAtomSch)",false);
 
   // Parameter finalization
-  update(p,argc,argv,"--");
+  QM_Picture& qmp=updateWithPicture(p,argc,argv);
   
   // ****** ****** ****** ****** ****** ******
 
-  PumpedTwoLevelAtomSch atom(pp2la);
-
+  structure::Free::Ptr atom(fullImpl ? boost::static_pointer_cast<const structure::Free>(make(pp2la,qmp)) : 
+                                       boost::static_pointer_cast<const structure::Free>(boost::make_shared<const PumpedTwoLevelAtomSch>(pp2la)));
+  
   StateVector psi(init(pp2la));
 
   evolve(psi,atom,pe);
