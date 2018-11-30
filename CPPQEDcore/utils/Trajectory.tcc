@@ -141,6 +141,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   {
   
   CommentingStream commentingStream(os);
+  commentingStream<<setprecision(formdouble::actualPrecision(precision));
   
   // auto & commentingStream=os;
     
@@ -207,7 +208,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  {CommentingStream temp(os); traj.logOnEnd(temp);}
+  {CommentingStream temp(os); temp<<setprecision(formdouble::actualPrecision(precision)); traj.logOnEnd(temp);}
   if (!stateSaved) writeViaSStream(traj,ofs.get());
   
 }
