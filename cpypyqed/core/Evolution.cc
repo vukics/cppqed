@@ -43,7 +43,7 @@ PARS_GETTER_SETTER(bool, Pars, negativity)
 template<int RANK>
 object py_evolve(const numeric::array &array,
               typename structure::QuantumSystem<RANK>::Ptr sys,
-              const evolution::Pars& p)
+              const evolution::Pars<>& p)
 {
   using namespace quantumdata;
 
@@ -113,7 +113,7 @@ void export_25_Evolution()
 
   // In the docstring of these wrapper functions: working around a bug in doxylink which strips 'struct' from the 'structure' namespace
 #define EVOLVE_INSTANTIATIONS(z,r,data) \
-  def("evolve", (object(*)(const numeric::array &array,typename QuantumSystem<r>::Ptr,const evolution::Pars&))&py_evolve<r>, "Wrapper of :core:`evolve <Evolution_.h::evolve(quantumdata::StateVector< RANK >&, const ure::QuantumSystem< RANK >&, const evolution::Pars&)>` with RANK="#r ".");
+  def("evolve", (object(*)(const numeric::array &array,typename QuantumSystem<r>::Ptr,const evolution::Pars<>&))&py_evolve<r>, "Wrapper of :core:`evolve <Evolution_.h::evolve(quantumdata::StateVector< RANK >&, const ure::QuantumSystem< RANK >&, const evolution::Pars<>&)>` with RANK="#r ".");
 BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), EVOLVE_INSTANTIATIONS, data)
 
 }

@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  evolution::Pars pe(p); 
+  evolution::Pars<> pe(p); 
 
   qbit::ParsPumpedLossy pq(p);
   mode::ParsPumpedLossy pm(p);

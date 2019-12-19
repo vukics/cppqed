@@ -38,7 +38,8 @@ std::istream& operator>>(std::istream&, Method&); ///< input streaming for Metho
 
 /// Aggregate of parameters pertaining to the highest level driver functions for quantum trajectories
 /** \copydetails trajectory::ParsRun */
-struct Pars : public trajectory::ParsRun, public mcwf::Pars {
+template <typename Base=mcwf::Pars>
+struct Pars : public trajectory::ParsRun, public Base {
 
   Method &evol; ///< the method of evolution
   bool
@@ -57,7 +58,7 @@ struct Pars : public trajectory::ParsRun, public mcwf::Pars {
  * \tparam SYS the object representing the quantum system to be simulated (similar idea as in quantumtrajectory::Master::Master)
  */
 template<int RANK, typename SYS>
-const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const Pars&);
+const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const Pars<>&);
 
 } // evolution
 
@@ -78,7 +79,7 @@ template<typename V, int RANK>
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
 evolve(quantumdata::StateVector<RANK>& psi, ///<[in/out] pure state-vector initial condition
        typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-       const evolution::Pars& p ///<[in] parameters of the evolution
+       const evolution::Pars<>& p ///<[in] parameters of the evolution
        );
 
 
@@ -87,7 +88,7 @@ template<typename V, int RANK>
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
 evolve(quantumdata::DensityOperator<RANK>& rho, ///<[in/out] density operator initial condition
        typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-       const evolution::Pars& p ///<[in] parameters of the evolution
+       const evolution::Pars<>& p ///<[in] parameters of the evolution
        );
 
 
@@ -107,7 +108,7 @@ inline
 const typename quantumdata::LazyDensityOperator<SV_OR_DO::N_RANK>::Ptr
 evolve(SV_OR_DO& initial,
        const SYS& sys,
-       const evolution::Pars& p)
+       const evolution::Pars<>& p)
 {
   return evolve<tmptools::Vector<V...> >(initial,cpputils::sharedPointerize(sys),p);
 }

@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  evolution::Pars pt(p);
+  evolution::Pars<> pt(p);
   ParsBichromatic pplm(p); 
 
   // Parameter finalization

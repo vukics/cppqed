@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  evolution::Pars pe   (p); // Driver Parameters
+  evolution::Pars<> pe   (p); // Driver Parameters
   ParsPumped    ppart(p); 
 
   // Parameter finalization

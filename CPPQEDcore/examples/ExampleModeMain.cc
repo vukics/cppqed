@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  evolution::Pars pe(p); // Driver Parameters
+  evolution::Pars<> pe(p); // Driver Parameters
 
   update(p,argc,argv,"--");
 

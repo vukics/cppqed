@@ -13,7 +13,7 @@ inline
 const typename quantumdata::LazyDensityOperator<SV_OR_DO::N_RANK>::Ptr
 evolve(SV_OR_DO& initial,
        binary::Ptr sys,
-       const evolution::Pars& p)
+       const evolution::Pars<>& p)
 {
   return evolve<tmptools::Vector<0> >(initial,sys,p);
 }

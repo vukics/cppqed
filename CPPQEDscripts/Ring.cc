@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  evolution::Pars pe(p);
+  evolution::Pars<> pe(p);
   particle::Pars pp(p);
   mode::ParsPumpedLossy pmP(p,"P");
   mode::ParsPumpedLossy pmM(p,"M");

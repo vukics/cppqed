@@ -17,7 +17,7 @@ template<typename V, int RANK>
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
 evolve(quantumdata::DensityOperator<RANK>& rho,
        typename structure::QuantumSystem<RANK>::Ptr sys,
-       const evolution::Pars& pe)
+       const evolution::Pars<>& pe)
 {
   Master<RANK,V> traj(rho,sys,pe,pe.negativity);
   trajectory::run(traj,pe);
@@ -31,7 +31,7 @@ template<typename V, int RANK>
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
 evolve(quantumdata::StateVector<RANK>& psi,
        typename structure::QuantumSystem<RANK>::Ptr sys,
-       const evolution::Pars& pe)
+       const evolution::Pars<>& pe)
 {
   typedef quantumdata::StateVector    <RANK> SV;
   typedef quantumdata::DensityOperator<RANK> DO;
@@ -54,11 +54,22 @@ evolve(quantumdata::StateVector<RANK>& psi,
 
 
 template<int RANK, typename SYS>
-const boost::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const evolution::Pars& pe)
+const boost::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const evolution::Pars<>& pe)
 {
   if (pe.timeAverage) return boost::make_shared<TimeAveragingMCWF_Trajectory<RANK> >(psi,sys,pe,pe.relaxationTime);
   else                return boost::make_shared<             MCWF_Trajectory<RANK> >(psi,sys,pe                  );
 }
+
+
+template<typename Base>
+evolution::Pars<Base>::Pars(parameters::ParameterTable& p, const std::string& mod) 
+  : ParsRun(p,mod),
+    Base(p,mod),
+    evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master)",SINGLE)),
+    negativity(p.addMod("negativity",mod,"Calculates negativity in ensemble & master",false)),
+    timeAverage(p.addMod("timeAverage",mod,"Calculates time averages in MCWF trajectory",false)),
+    relaxationTime(p.addMod("relaxationTime",mod,"Relaxation time for time averaging",0.))
+{}
 
 
 #endif // CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION_TCC_INCLUDED

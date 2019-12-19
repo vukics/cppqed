@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  evolution::Pars pe(p);
+  evolution::Pars<> pe(p);
   particle::ParsPumped  pp(p);
   mode::ParsPumpedLossy pm(p);
   particlecavity::ParsOrthogonal ppc(p);

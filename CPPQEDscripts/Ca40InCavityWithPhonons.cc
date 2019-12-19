@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     &phononCutoff=pActual.add("phononCutoff","Phonon mode cutoff",20u),
     &cavityCutoff=pActual.add("cavityCutoff","Cavity mode cutoff",3u);
 
-  evolution::Pars pe(pActual); // Driver Parameters
+  evolution::Pars<> pe(pActual); // Driver Parameters
 
   // Parameter finalization
   update(pActual,argc,argv,"--");

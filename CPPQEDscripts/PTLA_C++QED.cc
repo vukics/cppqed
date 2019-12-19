@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  evolution::Pars pe(p); // Driver Parameters
+  evolution::Pars<> pe(p); // Driver Parameters
   ParsPumpedLossyPhaseNoise pp2la(p);
   
   auto& fullImpl=p.addTitle("Script specific").add("fullImpl","Implement with Qbit (instead of PumpedTwoLevelAtomSch)",false);

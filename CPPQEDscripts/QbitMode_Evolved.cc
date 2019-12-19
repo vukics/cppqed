@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  evolution::Pars pt(p);
+  evolution::Pars<> pt(p);
 
   qbit::ParsPumpedLossy pplqb(p); 
   mode::ParsPumpedLossy pplm (p); 

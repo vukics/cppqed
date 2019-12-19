@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  evolution::Pars pe(p);       // Driver parameters
+  evolution::Pars<> pe(p);       // Driver parameters
   mode::ParsPumpedLossy pm(p); // Mode parameters
 
   pe.evol=evolution::MASTER;

@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 {
     ParameterTable p;
 
-    evolution::Pars pe(p);              // Driver parameters
+    evolution::Pars<> pe(p);              // Driver parameters
     mode::ParsLossy plm(p);             // Lossy mode (cosine)
     particle::ParsPumped ppp1(p,"1");   // Pumped particle 1 (sine)
     particle::ParsPumped ppp2(p,"2");   // Pumped particle 2

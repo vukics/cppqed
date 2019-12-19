@@ -4,6 +4,7 @@
 
 namespace evolution {
   
+template <typename Base>
 struct Pars;
 
 } // evolution
