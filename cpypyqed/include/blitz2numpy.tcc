@@ -1,4 +1,4 @@
-// Copyright Raimar Sandner 2012–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 #ifndef CPYPYQED_INCLUDE_BLITZ2NUMPY_TCC_INCLUDED
 #define CPYPYQED_INCLUDE_BLITZ2NUMPY_TCC_INCLUDED

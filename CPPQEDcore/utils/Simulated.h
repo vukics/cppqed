@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Convenience header for straightforward usage of the trajectory::Simulated class for classical simulations}
 #ifndef CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED
 #define CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED

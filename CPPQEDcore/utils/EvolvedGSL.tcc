@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Implementation of MakerGSL::_}
 // Note that some ArrayTraits file declaring the used traits templates must be included *before* inclusion of this file.
 // If the traits are also instantiated after inclusion of this file, then the ArrayTraits file included beforehand must also contain the traits *definitions*.

@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2017. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines parameter aggergates to Trajectory.h}
 #ifndef CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
