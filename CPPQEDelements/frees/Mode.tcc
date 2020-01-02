@@ -72,8 +72,7 @@ AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
 template<typename Base>
 const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>::average_v(NoTime t, const LazyDensityOperator& matrix) const
 {
-  auto averages(this->initializedAverages());
-  averages(blitz::Range(0,averages.size()-2))=Base::average_v(t,matrix);
+  auto averages{Base::average_v(t,matrix)}; // This is already of the correct size, since nAvr knows about the size updated by the derived class
   averages(averages.size()-1)=matrix(matrix.getDimension()-1);
   return averages;
 }
