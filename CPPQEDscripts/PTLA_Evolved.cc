@@ -1,12 +1,15 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "Evolution_.h"
-#include "Simulated.h"
+#include "BlitzArrayTraits.h"
+
+#include "Evolution.tcc"
 
 #include "PumpedTwoLevelAtom.h"
 #include "Qbit.h"
 
 #include "StateVector.tcc"
 #include "DensityOperator.tcc"
+
+#include "Simulated.h"
 
 using namespace std       ;
 using namespace cpputils  ;
