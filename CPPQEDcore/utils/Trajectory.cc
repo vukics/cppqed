@@ -17,7 +17,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <iostream>
-#include <list>
+#include <queue>
 
 
 using namespace std;
@@ -207,11 +207,11 @@ auto trajectory::details::makeDisplayAndAutostopHandler(const Trajectory& traj, 
         if (queue_.size()==autoStopRepetition_) {
           if (max(abs(averages_-newItem)/(abs(averages_)+abs(newItem)))<autoStopEpsilon_) throw StoppingCriterionReachedException();
           averages_=averages_+(newItem-queue_.front())/autoStopRepetition_; // update the averages set for next step
-          queue_.pop_front(); // remove obsolate first element of the queue
+          queue_.pop(); // remove obsolate first element of the queue
         }
         else averages_=(queue_.size()*averages_+newItem)/(queue_.size()+1); // build the initial averages set to compare against
 
-        queue_.push_back(newItem); // place the new item to the back of the queue
+        queue_.push(newItem); // place the new item to the back of the queue
 
       }
 
@@ -221,7 +221,7 @@ auto trajectory::details::makeDisplayAndAutostopHandler(const Trajectory& traj, 
     const double autoStopEpsilon_;
     const unsigned autoStopRepetition_;
 
-    mutable std::list<Averages> queue_;
+    mutable std::queue<Averages> queue_;
     mutable Averages averages_;
 
   };
