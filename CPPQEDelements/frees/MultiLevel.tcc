@@ -282,9 +282,9 @@ filterReal(const ComplexPerLevel<NL>& levels, double gamma_parallel)
     if (!hasRealPart(levels(i))) {
       ostringstream tag;
       tag<<"delta"<<i;
-      res.push_back(make_tuple(tag.str(),-imag(levels(i)),1.));
+      res.push_back({tag.str(),-imag(levels(i)),1.});
     }
-  res.push_back(make_tuple("gamma_parallel",gamma_parallel,1.));
+  res.push_back({"gamma_parallel",gamma_parallel,1.});
   return res;
 }
 
@@ -302,7 +302,7 @@ struct ElementaryComplexFreqs
 
     ostringstream tag;
     tag<<label_<<P::first<<P::second;
-    cf_.push_back(make_tuple(tag.str(),eta.get(),1.));
+    cf_.push_back({tag.str(),eta.get(),1.});
   }
 
 private:
@@ -324,7 +324,7 @@ complexFreqs(const ComplexPerLevel<NL>& levels, const VP& etas)
     if (hasRealPart(levels(i))) {
       ostringstream tag;
       tag<<"(gamma"<<i<<",-delta"<<i<<")";
-      res.push_back(make_tuple(tag.str(),levels(i),1.));
+      res.push_back({tag.str(),levels(i),1.});
     }
   for_each(etas,ElementaryComplexFreqs(res,"eta"));
   return res;

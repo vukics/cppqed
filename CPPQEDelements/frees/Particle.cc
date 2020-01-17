@@ -192,7 +192,7 @@ ParticleBase::ParticleBase(size_t fin,
 PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunction& mf,
                                        const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
   : ParticleBase(fin,
-                 boost::assign::list_of(*realFreqs.begin()).range(next(realFreqs.begin()),realFreqs.end())(make_tuple("vClass",vClass,1.)),
+                 boost::assign::list_of(*realFreqs.begin()).range(next(realFreqs.begin()),realFreqs.end())({"vClass",vClass,1.}),
                  complexFreqs),
     vClass_(vClass), mf_(mf)
 {
