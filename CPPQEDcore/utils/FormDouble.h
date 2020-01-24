@@ -17,6 +17,9 @@
  * The idea is from \cite stroustrup 21.4.6.3.
  * 
  * Named FormDouble here, since it is only issues pertaining to the display of doubles that are treated.
+ * 
+ * \todo This whole solution is somewhat arcane, look for a more standard way of doing this (what about \refBoost{Boost.Lexical_cast,lexical_cast} ?)
+ * 
  */
 namespace formdouble {
 

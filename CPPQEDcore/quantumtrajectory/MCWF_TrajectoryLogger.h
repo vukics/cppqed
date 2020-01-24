@@ -70,6 +70,8 @@ public:
 
   std::ostream& onEnd(std::ostream&) const; ///< displays summary log information at the end (called by MCWF_Trajectory::logOnEnd_v)
   
+  const MCWF_Trajectory& getTrajectory() const {return traj_;}
+  
 private:
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
   friend class boost::serialization::access;

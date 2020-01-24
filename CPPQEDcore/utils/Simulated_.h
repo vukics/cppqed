@@ -41,14 +41,12 @@ public:
             const A& scaleAbs=A(),
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
+protected:
+  std::ostream& display_v(std::ostream&, int) const override;
+  
 private:
-  virtual void displayPreHook () const {}
-  virtual void displayPostHook() const {}
-
   void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}
 
-  std::ostream& display_v(std::ostream&, int) const final;
-  
   std::ostream& displayKey_v(std::ostream& os, size_t&) const final {return os;}
 
   std::ostream& displayParameters_v(std::ostream& os) const final {return Base::displayParameters_v(os<<"\nSimulated.\n");}
