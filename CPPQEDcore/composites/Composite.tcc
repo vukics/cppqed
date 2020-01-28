@@ -74,12 +74,10 @@ void worker(const VA& acts, const H& helper)
 bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
 
 
-template<int RANK>
+template<typename Frees>
 class FillFrees
 {
 public:
-  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
-
   FillFrees(Frees& frees) : frees_(frees) {}
 
   
@@ -93,10 +91,10 @@ public:
     void operator()(T)
     {
       static const int idx=T::value;
-      if (frees_(idx).get()) {
-        if (frees_(idx).get()!=act_.get()->getFrees()(i_)) throw CompositeConsistencyException(idx,i_);
+      if (frees_[idx].get()) {
+        if (frees_[idx].get()!=act_.get()->getFrees()(i_)) throw CompositeConsistencyException(idx,i_);
       }
-      else frees_(idx)=SubSystemFree(act_.get()->getFrees()(i_));
+      else frees_[idx]=SubSystemFree(act_.get()->getFrees()(i_));
       i_++;
     }
 
@@ -125,7 +123,7 @@ template<int RANK>
 class FillDimensions
 {
 public:
-  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
+  typedef std::array<SubSystemFree,RANK> Frees;
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
 
   FillDimensions(const Frees& frees, Dimensions& dims) : frees_(frees), dims_(dims) {}
@@ -133,7 +131,7 @@ public:
   template<typename T>
   void operator()(T) const
   {
-    dims_(T::value)=frees_(T::value).get()->getDimension();
+    dims_(T::value)=frees_[T::value].get()->getDimension();
   }
 
 private:
@@ -145,30 +143,22 @@ private:
 
 } // composite
 
-#define RETURN_type typename composite::Base<VA>::Frees
-
 template<typename VA>
-const RETURN_type
-composite::fillFrees(const VA& acts)
+auto composite::fillFrees(const VA& acts)
 {
-  RETURN_type res; res=SubSystemFree();
-  boost::fusion::for_each(acts,FillFrees<blitzplusplus::TinyVectorLengthTraits<RETURN_type>::value>(res));
+  typename composite::Base<VA>::Frees res; res.fill(SubSystemFree());
+  boost::fusion::for_each(acts,FillFrees<decltype(res)>(res));
   return res;
 }
 
-#undef  RETURN_type
-#define RETURN_type typename composite::RankedBase<RANK>::Dimensions
 
 template<int RANK>
-const RETURN_type
-composite::RankedBase<RANK>::fillDimensions(const Frees& frees)
+auto composite::RankedBase<RANK>::fillDimensions(const Frees& frees)
 {
-  RETURN_type res;
+  typename composite::RankedBase<RANK>::Dimensions res;
   mpl::for_each<Ordinals>(FillDimensions<RANK>(frees,res));
   return res;
 }
-
-#undef  RETURN_type
 
 
 
@@ -219,7 +209,7 @@ public:
   void operator()(mpl::integral_c<int,IDX>) const
   {
     os_<<"Subsystem Nr. "<<IDX<<std::endl;
-    frees_(IDX).get()->displayParameters(os_);
+    frees_[IDX].get()->displayParameters(os_);
   }
   
 private:
@@ -278,7 +268,7 @@ public:
   template<typename T>
   void operator()(T) const
   {
-    isIt_&=frees_(T::value).applicableInMaster();
+    isIt_&=frees_[T::value].applicableInMaster();
   }
 
 private:
@@ -307,7 +297,7 @@ bool composite::Exact<VA>::applicableInMaster_v() const
 #define VEC_free tmptools::Vector<IDX>,
 #define ACTS_FREES_operator(CL) \
 template<typename Act> void operator()(const Act& act          ) const {help<VEC_act  typename Act::CL            >(act        .get##CL());} \
-template<int IDX     > void operator()(mpl::integral_c<int,IDX>) const {help<VEC_free composite::SubSystemFree::CL>(frees_(IDX).get##CL());}
+template<int IDX     > void operator()(mpl::integral_c<int,IDX>) const {help<VEC_free composite::SubSystemFree::CL>(frees_[IDX].get##CL());}
 
 
 
@@ -405,7 +395,7 @@ public:
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    frees_(IDX).template displayKey<LA>(os_,i_);
+    frees_[IDX].template displayKey<LA>(os_,i_);
   }
 
 private:
@@ -441,7 +431,7 @@ public:
   template<typename T>
   void operator()(T) const
   {
-    num_+=frees_(T::value).template nAvr<LA>();
+    num_+=frees_[T::value].template nAvr<LA>();
   }
 
 private:
@@ -486,7 +476,7 @@ public:
   template<int IDX>
   void operator()(mpl::integral_c<int,IDX>) const
   {
-    help<tmptools::Vector<IDX>,1>(frees_(IDX).getLA(structure::LiouvilleanAveragedTag_<LA>()));
+    help<tmptools::Vector<IDX>,1>(frees_[IDX].getLA(structure::LiouvilleanAveragedTag_<LA>()));
   }
 
 private:
@@ -501,8 +491,8 @@ private:
 
 
 template<typename VA> template<structure::LiouvilleanAveragedTag LA>
-const typename composite::Base<VA>::Averages
-composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr)
+auto
+composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr) -> const Averages
 {
   std::list<Averages> seqAverages(RANK+mpl::size<VA>::value);
 
@@ -737,7 +727,7 @@ public:
   template<typename T>
   void operator()(T) const
   {
-    const SubSystemFree& free=frees_(T::value);
+    const SubSystemFree& free=frees_[T::value];
     sc_|=result_type(free.getEx()!=0,free.getHa()!=0,free.getLi()!=0);
   }
 

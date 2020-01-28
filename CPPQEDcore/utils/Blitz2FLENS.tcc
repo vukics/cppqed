@@ -12,7 +12,7 @@
 namespace blitz2flens {
 
 
-template<typename T, int RANK>
+template<typename T, size_t RANK>
 const DenseVectorOf<T> vector(blitz::Array<T,RANK>& array)
 {
   typedef DenseVectorOf<T> DenseVector;
@@ -26,7 +26,7 @@ const DenseVectorOf<T> vector(blitz::Array<T,RANK>& array)
 }
 
 
-template<StorageOrder SO, typename T, int TWO_TIMES_RANK>
+template<StorageOrder SO, typename T, size_t TWO_TIMES_RANK>
 const GeMatrixOf<T,SO> matrix(blitz::Array<T,TWO_TIMES_RANK>& array)
 {
   tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();
@@ -46,7 +46,7 @@ const GeMatrixOf<T,SO> matrix(blitz::Array<T,TWO_TIMES_RANK>& array)
 }
 
 
-template<StorageOrder SO, int TWO_TIMES_RANK>
+template<StorageOrder SO, size_t TWO_TIMES_RANK>
 const HeMatrixOf<SO> hermitianMatrix(CArray<TWO_TIMES_RANK>& array)
 {
   tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>();
@@ -66,7 +66,7 @@ const HeMatrixOf<SO> hermitianMatrix(CArray<TWO_TIMES_RANK>& array)
 }
 
 
-template<int TWO_TIMES_RANK>
+template<size_t TWO_TIMES_RANK>
 const CArray<tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value> ev(CArray<TWO_TIMES_RANK> m)
 {
   using namespace flens;

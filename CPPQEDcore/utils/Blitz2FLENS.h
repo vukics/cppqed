@@ -13,9 +13,6 @@
 
 #include <blitz/array.h>
 
-#include <boost/mpl/identity.hpp>
-namespace mpl=boost::mpl;
-
 
 namespace blitz2flens {
 
@@ -33,19 +30,19 @@ template<StorageOrder SO>
 using HeMatrixOf=flens::HeMatrix<flens::FullStorageView<dcomp,SO> >;
 
 
-template<typename T, int RANK>
+template<typename T, size_t RANK>
 const DenseVectorOf<T> vector(const blitz::Array<T,          RANK>&);
 
 
-template<StorageOrder SO, typename T, int TWO_TIMES_RANK>
+template<StorageOrder SO, typename T, size_t TWO_TIMES_RANK>
 const GeMatrixOf<T,SO> matrix(const blitz::Array<T,TWO_TIMES_RANK>&);
 
 
-template<StorageOrder SO, int TWO_TIMES_RANK>
+template<StorageOrder SO, size_t TWO_TIMES_RANK>
 const HeMatrixOf<SO> hermitianMatrix(const CArray<TWO_TIMES_RANK>&);
 
 
-template<int TWO_TIMES_RANK>
+template<size_t TWO_TIMES_RANK>
 const CArray<tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value> ev(CArray<TWO_TIMES_RANK>);
 
 

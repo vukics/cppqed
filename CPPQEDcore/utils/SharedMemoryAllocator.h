@@ -26,13 +26,13 @@ class SharedMemoryAllocator
 {
 public:
   // type definitions
-  typedef       T        value_type;
-  typedef       T*       pointer;
-  typedef const T*       const_pointer;
-  typedef       T&       reference;
-  typedef const T&       const_reference;
-  typedef std::size_t    size_type;
-  typedef std::ptrdiff_t difference_type;
+  typedef       T   value_type;
+  typedef       T*  pointer;
+  typedef const T*  const_pointer;
+  typedef       T&  reference;
+  typedef const T&  const_reference;
+  typedef size_t    size_type;
+  typedef ptrdiff_t difference_type;
     
   // rebind SharedMemoryAllocator to type U
   template<class U>
@@ -50,7 +50,7 @@ public:
   ~SharedMemoryAllocator() throw() {}
     
   // return maximum number of elements that can be allocated
-  size_type max_size () const throw() {return std::numeric_limits<std::size_t>::max() / sizeof(T);}
+  size_type max_size () const throw() {return std::numeric_limits<size_t>::max() / sizeof(T);}
     
   // allocate but do not initialize num elements of type T
   pointer allocate (size_type num, const void* =0)

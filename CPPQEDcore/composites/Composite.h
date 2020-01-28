@@ -16,6 +16,7 @@
 
 #include <boost/fusion/container/generation/make_list.hpp>
 
+#include <array>
 
 namespace composite {
 
@@ -44,7 +45,7 @@ public:
 
   typedef boost::shared_ptr<const RankedBase<RANK> > Ptr;
 
-  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
+  typedef std::array<SubSystemFree,RANK> Frees;
 
   typedef structure::QuantumSystem<RANK> QS_Base;
 
@@ -54,7 +55,7 @@ public:
 
 private:
   // Constructor helper
-  static const Dimensions fillDimensions(const Frees&);
+  static auto fillDimensions(const Frees&);
 
 protected:
   explicit RankedBase(const Frees& frees)
@@ -146,7 +147,7 @@ private:
 
 // Constructor helper
 template<typename VA>
-const typename Base<VA>::Frees fillFrees(const VA& acts);
+auto fillFrees(const VA& acts);
 
 
 
@@ -162,7 +163,7 @@ class Exact
 private:
   static const int RANK=MaxRank<VA>::value+1;
 
-  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
+  typedef std::array<SubSystemFree,RANK> Frees;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
@@ -188,7 +189,7 @@ class Hamiltonian
 private:
   static const int RANK=MaxRank<VA>::value+1;
 
-  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
+  typedef std::array<SubSystemFree,RANK> Frees;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 
@@ -213,7 +214,7 @@ class Liouvillean
 private:
   static const int RANK=MaxRank<VA>::value+1;
 
-  typedef blitz::TinyVector<SubSystemFree,RANK> Frees;
+  typedef std::array<SubSystemFree,RANK> Frees;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
@@ -246,7 +247,7 @@ class EmptyBase
 {
 public:
   template<typename VA>
-  EmptyBase(const blitz::TinyVector<SubSystemFree,MaxRank<VA>::value+1>&, const VA&) {}
+  EmptyBase(const std::array<SubSystemFree,MaxRank<VA>::value+1>&, const VA&) {}
   
 };
 
@@ -336,20 +337,16 @@ private:
   using Base::getFrees; using Base::getActs ;
   
 public:
-  // Constructor
-  explicit Composite(const VA& acts)
-    : Base(composite::fillFrees(acts),acts),
-      ExactBase      (getFrees(),getActs()),
-      HamiltonianBase(getFrees(),getActs()),
-      LiouvilleanBase(getFrees(),getActs()) {}
-      
-// private:
   Composite(const Frees& frees, const VA& acts)
     : Base(frees ,acts),
       ExactBase      (getFrees(),getActs()),
       HamiltonianBase(getFrees(),getActs()),
       LiouvilleanBase(getFrees(),getActs()) {}
-  
+
+  // Constructor
+  explicit Composite(const VA& acts)
+    : Composite(composite::fillFrees(acts),acts) {}
+
   friend const typename composite::Base<VA>::Ptr composite::doMake<VA>(const VA&);
 
   // Note that Frees and Acts are stored by value in Base
@@ -379,8 +376,7 @@ struct Make : boost::mpl::identity<typename Base<typename make_list<Acts...>::ty
 
 
 template<typename... Acts>
-const typename result_of::Make<Acts...>::type
-make(const Acts&... acts)
+auto make(const Acts&... acts)
 {
   return doMake(make_list(acts...));
 }

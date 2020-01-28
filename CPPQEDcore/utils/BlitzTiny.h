@@ -5,25 +5,6 @@
 
 #include <blitz/array.h>
 
-#include <boost/mpl/int.hpp>
-
-
-namespace blitzplusplus {
-
-
-/// An indirection for accessing lengths of `blitz::TinyVector` at compile time
-template<typename V>
-struct TinyVectorLengthTraits;
-
-/** \cond SPECIALIZATION */
-template<typename T, int LENGTH>
-struct TinyVectorLengthTraits<blitz::TinyVector<T,LENGTH> > : boost::mpl::int_<LENGTH> {};
-/** \endcond */
-
-
-} // blitzplusplus
-
-
 /// A tiny vector describing extensions of objects of arbitrary arity
 template <int RANK> using ExtTiny=blitz::TinyVector<   size_t,RANK>;
 

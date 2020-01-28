@@ -15,12 +15,7 @@ const Out_Iterator
 concatenateViaIterator(const SeqOfSeqs& sOs, ///<[in] the sequence containing the input sequences
                        Out_Iterator out)
 {
-  struct Helper
-  {
-    static const Out_Iterator _(Out_Iterator iter, const typename SeqOfSeqs::value_type& t) {return std::copy(t.begin(),t.end(),iter);}
-  };
-  
-  return boost::accumulate(sOs,out,Helper::_);
+  return boost::accumulate(sOs,out, [](auto iter, const auto& t){return std::copy(t.begin(),t.end(),iter);});
 }
 
 
@@ -28,7 +23,7 @@ concatenateViaIterator(const SeqOfSeqs& sOs, ///<[in] the sequence containing th
 template<typename SeqOfSeqs, typename Out>
 const Out&
 concatenate(const SeqOfSeqs& sOs, ///<[in] the sequence containing the input sequences
-            Out&& out)
+            Out& out)
 {
   concatenateViaIterator(sOs,out.begin());
   return out;

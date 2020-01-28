@@ -46,7 +46,7 @@ struct ci_char_traits : public std::char_traits<char>
   static bool gt(char c1, char c2)
   { return toupper(c1) >  toupper(c2); }
 
-  static int compare(const char* s1, const char* s2, std::size_t n)
+  static int compare(const char* s1, const char* s2, size_t n)
   {
     while (n-- > 0)
     {

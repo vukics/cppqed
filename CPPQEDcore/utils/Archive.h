@@ -7,54 +7,56 @@
 
 #ifdef    DO_NOT_USE_BOOST_SERIALIZATION
 
-#include <cstddef> // std::size_t
+#include <cstddef> // size_t
 #include <iosfwd>
 
-#include <boost/mpl/bool.hpp>
+#include <boost/hana/bool.hpp>
 
 
 namespace cpputils {
 
 //////////////////////////////////////////////////////////////
 
+class trivial_archive_base {
+public:
+  typedef boost::hana::false_ is_saving ;
+  typedef boost::hana:: true_ is_loading;
+
+  template<class T> void register_type(){}
+  
+};
 
 /// Trivial iarchive disabling serialization
 /** \see \refBoost{Boost.Serialization,serialization/doc/archive_reference.html#trivial} */
-class trivial_iarchive {
+class trivial_iarchive : public trivial_archive_base {
 public:
-  typedef boost::mpl::bool_<false> is_saving; 
-  typedef boost::mpl::bool_<true> is_loading;
   
   trivial_iarchive(std::istream&) {}
   
-  template<class T> void register_type(){}
   template<class T> trivial_iarchive & operator>>(const T & ){
       return *this;
   }
   template<class T> trivial_iarchive & operator&(const T & t){
       return *this >> t;
   }
-  void load_binary(void *, std::size_t){};
+  void load_binary(void *, size_t){};
 };
 
 
 /// Trivial oarchive disabling serialization
 /** \copydetails trivial_iarchive */
-class trivial_oarchive {
+class trivial_oarchive : public trivial_archive_base {
 public:
-  typedef boost::mpl::bool_<true> is_saving; 
-  typedef boost::mpl::bool_<false> is_loading;
 
   trivial_oarchive(std::ostream&) {}
 
-  template<class T> void register_type(){}
   template<class T> trivial_oarchive & operator<<(const T & ){
       return *this;
   }
   template<class T> trivial_oarchive & operator&(const T & t){
       return *this << t;
   }
-  void save_binary(void *, std::size_t){};
+  void save_binary(void *, size_t){};
 };
 
 
