@@ -13,8 +13,7 @@
 
 #include "StochasticTrajectory.h"
 
-#include <boost/tuple/tuple.hpp>
-
+#include <tuple>
 
 namespace trajectory { namespace averaging {
 
@@ -83,7 +82,7 @@ private:
 
 #undef  BASE_class
 
-  typedef boost::tuple<int,StateVectorLow> IndexSVL_tuple;
+  typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
 
 public:
   /// Templated constructor with the same idea as Master::Master

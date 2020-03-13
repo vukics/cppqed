@@ -271,7 +271,7 @@ auto particle::expINKX(particle::Ptr particle, ptrdiff_t nK) -> const Tridiagona
 {
   size_t dim=particle->getDimension();
   Tridiagonal res(::expINKX(dim,nK));
-  if (const auto exact=dynamic_cast<const particle::Exact*>(particle.get())) res.furnishWithFreqs(mainDiagonal(exact->get<0>(),exact->get<1>()));
+  if (const auto exact=dynamic_cast<const particle::Exact*>(particle.get())) res.furnishWithFreqs(mainDiagonal(get<0>(*exact),get<1>(*exact)));
   return res;
 }
 

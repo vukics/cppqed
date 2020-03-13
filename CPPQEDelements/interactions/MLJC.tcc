@@ -19,10 +19,6 @@ using quantumoperator::Sigma;
 namespace mljc {
 
 
-// #define BASE_class boost::tuple<const Frequencies,Tridiagonal,Tridiagonal>
-
-// Unfortunately, cannot use boost::tuple here since it does not support mutable  
-
 template<int NL, typename VC> template<int N1, int N2>
 struct Base<NL,VC>::ModeDynamics : public tmptools::pair_c<N1,N2>
 {
