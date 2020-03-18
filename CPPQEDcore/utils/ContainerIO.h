@@ -22,8 +22,9 @@
 #include <cstddef>
 #include <iterator>
 #include <memory>
-#include <ostream>
+#include <iostream>
 #include <set>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <unordered_set>
@@ -75,24 +76,24 @@ public:
 }  // namespace detail
 
 
-// Holds the delimiter values for a specific character type
+// Holds the delimiter values as a string type
 
-template <typename TChar>
+template <typename String>
 struct delimiters_values
 {
-  using char_type = TChar;
-  const char_type * prefix;
-  const char_type * delimiter;
-  const char_type * postfix;
+  using string_type = String;
+  String prefix;
+  String delimiter;
+  String postfix;
 };
 
 
 // Defines the delimiter values for a specific container and character type
 
-template <typename T, typename TChar>
+template <typename T, typename String>
 struct delimiters
 {
-  using type = delimiters_values<TChar>;
+  using type = delimiters_values<String>;
   static const type values; 
 };
 
@@ -102,13 +103,14 @@ struct delimiters
 // be customized by specializing the nested template.
 
 template <typename T,
-          typename TChar = char,
-          typename TCharTraits = ::std::char_traits<TChar>,
-          typename TDelimiters = delimiters<T, TChar>>
+          typename String = ::std::string,
+          typename TDelimiters = delimiters<T, String>>
 struct write_container_helper
 {
   using delimiters_type = TDelimiters;
-  using ostream_type = std::basic_ostream<TChar, TCharTraits>;
+  using traits_type = typename String::traits_type;
+  using   char_type = typename String:: value_type;
+  using ostream_type = std::basic_ostream<char_type,traits_type>;
 
   template <typename U>
   struct writer
@@ -124,7 +126,7 @@ struct write_container_helper
           
           if (++it == the_end) break;
           
-          if (delimiters_type::values.delimiter != NULL) stream << delimiters_type::values.delimiter;
+          if (!delimiters_type::values.delimiter.empty()) stream << delimiters_type::values.delimiter;
         }
       }
     }
@@ -134,11 +136,11 @@ struct write_container_helper
 
   inline void operator()(ostream_type & stream) const
   {
-    if (delimiters_type::values.prefix != NULL) stream << delimiters_type::values.prefix;
+    if (!delimiters_type::values.prefix.empty()) stream << delimiters_type::values.prefix;
 
     writer<T>::write_body(container_, stream);
 
-    if (delimiters_type::values.postfix != NULL) stream << delimiters_type::values.postfix;
+    if (!delimiters_type::values.postfix.empty()) stream << delimiters_type::values.postfix;
   }
 
 private:
@@ -149,14 +151,26 @@ private:
 // Functor to read containers.
 
 template <typename T,
-          typename TChar = char,
-          typename TCharTraits = ::std::char_traits<TChar>,
-          typename TDelimiters = delimiters<T, TChar>>
+          typename String = ::std::string,
+          typename TDelimiters = delimiters<T, String>>
 struct read_container_helper
 {
   using delimiters_type = TDelimiters;
-  using istream_type = std::basic_istream<TChar, TCharTraits>;
+  using traits_type = typename String::traits_type;
+  using   char_type = typename String:: value_type;
+  using istream_type = std::basic_istream<char_type,traits_type>;
 
+private:
+  static void eatDelimiter(istream_type & stream, const String& delim)
+  {
+    for (auto sc : delim) { // TODO: some liberality with whitespaces could be introduced
+      char_type c{stream.get()};
+      // std::cerr<<sc<<" "<<c<<" "<<stream.bad()<<std::endl;
+      if (c != sc) stream.clear(istream_type::badbit);
+    }
+  }
+  
+public:
   template <typename U>
   struct reader
   {
@@ -171,11 +185,7 @@ struct read_container_helper
           
           if (++it == the_end) break;
           
-          if (delimiters_type::values.delimiter != NULL) { // try to eat delimiter
-            TChar c;
-            stream >> c;
-            if (c!=delimiters_type::values.delimiter) stream.clear(istream_type::badbit);
-          }
+          eatDelimiter(stream,delimiters_type::values.delimiter);
         }
       }
     }
@@ -183,25 +193,13 @@ struct read_container_helper
 
   read_container_helper(T & container) : container_(container) {}
 
-private:
-  void callOperatorHelper(istream_type & stream, const TChar* delim) const
-  {
-    if (delim != NULL) {
-      TChar c;
-      stream >> c;
-      if (c!=delim) stream.clear(istream_type::badbit);
-    }
-  }
-  
-public:
-  
   void operator()(istream_type & stream)
   {
-    callOperatorHelper(stream,delimiters_type::values.prefix);
+    eatDelimiter(stream,delimiters_type::values.prefix);
 
     reader<T>::read_body(container_, stream);
 
-    callOperatorHelper(stream,delimiters_type::values.postfix);
+    eatDelimiter(stream,delimiters_type::values.postfix);
   }
 
 private:
@@ -212,28 +210,28 @@ private:
 
 // Specialization for pairs
 
-template <typename T, typename TChar, typename TCharTraits, typename TDelimiters>
+template <typename T, typename String, typename TDelimiters>
 template <typename T1, typename T2>
-struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<std::pair<T1, T2>>
+struct write_container_helper<T, String, TDelimiters>::writer<std::pair<T1, T2>>
 {
-  using ostream_type = typename write_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
+  using ostream_type = typename write_container_helper<T,String,TDelimiters>::ostream_type;
 
   static void write_body(const std::pair<T1, T2> & c, ostream_type & stream)
   {
     stream << c.first;
-    if (write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL)
-        stream << write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
+    const auto delim{write_container_helper<T,String,TDelimiters>::delimiters_type::values.delimiter};
+    if (!delim.empty()) stream << delim;
     stream << c.second;
   }
 };
 
 // Specialization for tuples
 
-template <typename T, typename TChar, typename TCharTraits, typename TDelimiters>
+template <typename T, typename String, typename TDelimiters>
 template <typename ...Args>
-struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<std::tuple<Args...>>
+struct write_container_helper<T, String, TDelimiters>::writer<std::tuple<Args...>>
 {
-  using ostream_type = typename write_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
+  using ostream_type = typename write_container_helper<T, String, TDelimiters>::ostream_type;
   using element_type = std::tuple<Args...>;
 
   template <std::size_t I> struct Int { };
@@ -255,8 +253,8 @@ struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<std::t
   template <std::size_t N>
   static void tuple_write(const element_type & c, ostream_type & stream, Int<N>)
   {
-    if (write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL)
-      stream << write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
+    const auto delim{write_container_helper<T, String, TDelimiters>::delimiters_type::values.delimiter};
+    if (!delim.empty()) stream << delim;
 
     stream << std::get<N>(c);
 
@@ -267,11 +265,11 @@ struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<std::t
 
 // Specialization for hana::tuple
 
-template <typename T, typename TChar, typename TCharTraits, typename TDelimiters>
+template <typename T, typename String, typename TDelimiters>
 template <typename ...Args>
-struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<boost::hana::tuple<Args...>>
+struct write_container_helper<T, String, TDelimiters>::writer<boost::hana::tuple<Args...>>
 {
-  using ostream_type = typename write_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
+  using ostream_type = typename write_container_helper<T, String, TDelimiters>::ostream_type;
   using element_type = boost::hana::tuple<Args...>;
 
   static void write_body(const element_type & c, ostream_type & stream)
@@ -279,7 +277,8 @@ struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<boost:
     unsigned i=0;
     
     boost::hana::for_each(c, [&](const auto& member) {
-      if (i && write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL) stream << write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
+      const auto delim{write_container_helper<T, String, TDelimiters>::delimiters_type::values.delimiter};
+      if (i && !delim.empty()) stream << delim;
       ++i;
       stream << member ;
     });
@@ -290,8 +289,9 @@ struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<boost:
 
 // Prints a write_container_helper to the specified stream.
 
-template<typename T, typename TChar, typename TCharTraits, typename TDelimiters>
-inline std::basic_ostream<TChar, TCharTraits> & operator<<(std::basic_ostream<TChar, TCharTraits> & stream, const write_container_helper<T, TChar, TCharTraits, TDelimiters> & helper)
+template<typename T, typename String, typename TDelimiters>
+inline auto &
+operator<<(std::basic_ostream<typename String::value_type,typename String::traits_type> & stream, const write_container_helper<T, String, TDelimiters> & helper)
 {
   helper(stream);
   return stream;
@@ -299,8 +299,9 @@ inline std::basic_ostream<TChar, TCharTraits> & operator<<(std::basic_ostream<TC
 
 // reads a read_container_helper from the specified stream.
 
-template<typename T, typename TChar, typename TCharTraits, typename TDelimiters>
-inline std::basic_istream<TChar, TCharTraits> & operator>>(std::basic_istream<TChar, TCharTraits> & stream, read_container_helper<T, TChar, TCharTraits, TDelimiters> & helper)
+template<typename T, typename String, typename TDelimiters>
+inline auto &
+operator>>(std::basic_istream<typename String::value_type,typename String::traits_type> & stream, read_container_helper<T, String, TDelimiters> & helper)
 {
   helper(stream);
   return stream;
@@ -340,74 +341,74 @@ struct is_container<boost::hana::tuple<Args...>> : std::true_type { };
 
 // Default delimiters
 
-template <typename T> struct delimiters<T, char> { static const delimiters_values<char> values; };
-template <typename T> const delimiters_values<char> delimiters<T, char>::values = { "[", ", ", "]" };
-template <typename T> struct delimiters<T, wchar_t> { static const delimiters_values<wchar_t> values; };
-template <typename T> const delimiters_values<wchar_t> delimiters<T, wchar_t>::values = { L"[", L", ", L"]" };
+template <typename T> struct delimiters<T, ::std::string> { static const delimiters_values<::std::string> values; };
+template <typename T> const delimiters_values<::std::string> delimiters<T, ::std::string>::values = { "[", ", ", "]" };
+template <typename T> struct delimiters<T, ::std::wstring> { static const delimiters_values<::std::wstring> values; };
+template <typename T> const delimiters_values<::std::wstring> delimiters<T, ::std::wstring>::values = { L"[", L", ", L"]" };
 
 
 // Delimiters for (multi)set and unordered_(multi)set
 
 template <typename T, typename TComp, typename TAllocator>
-struct delimiters< ::std::set<T, TComp, TAllocator>, char> { static const delimiters_values<char> values; };
+struct delimiters< ::std::set<T, TComp, TAllocator>, ::std::string> { static const delimiters_values<::std::string> values; };
 
 template <typename T, typename TComp, typename TAllocator>
-const delimiters_values<char> delimiters< ::std::set<T, TComp, TAllocator>, char>::values = { "{", ", ", "}" };
+const delimiters_values<::std::string> delimiters< ::std::set<T, TComp, TAllocator>, ::std::string>::values = { "{", ", ", "}" };
 
 template <typename T, typename TComp, typename TAllocator>
-struct delimiters< ::std::set<T, TComp, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };
+struct delimiters< ::std::set<T, TComp, TAllocator>, ::std::wstring> { static const delimiters_values<::std::wstring> values; };
 
 template <typename T, typename TComp, typename TAllocator>
-const delimiters_values<wchar_t> delimiters< ::std::set<T, TComp, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };
+const delimiters_values<::std::wstring> delimiters< ::std::set<T, TComp, TAllocator>, ::std::wstring>::values = { L"{", L", ", L"}" };
 
 template <typename T, typename TComp, typename TAllocator>
-struct delimiters< ::std::multiset<T, TComp, TAllocator>, char> { static const delimiters_values<char> values; };
+struct delimiters< ::std::multiset<T, TComp, TAllocator>, ::std::string> { static const delimiters_values<::std::string> values; };
 
 template <typename T, typename TComp, typename TAllocator>
-const delimiters_values<char> delimiters< ::std::multiset<T, TComp, TAllocator>, char>::values = { "{", ", ", "}" };
+const delimiters_values<::std::string> delimiters< ::std::multiset<T, TComp, TAllocator>, ::std::string>::values = { "{", ", ", "}" };
 
 template <typename T, typename TComp, typename TAllocator>
-struct delimiters< ::std::multiset<T, TComp, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };
+struct delimiters< ::std::multiset<T, TComp, TAllocator>, ::std::wstring> { static const delimiters_values<::std::wstring> values; };
 
 template <typename T, typename TComp, typename TAllocator>
-const delimiters_values<wchar_t> delimiters< ::std::multiset<T, TComp, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };
+const delimiters_values<::std::wstring> delimiters< ::std::multiset<T, TComp, TAllocator>, ::std::wstring>::values = { L"{", L", ", L"}" };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, char> { static const delimiters_values<char> values; };
+struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, ::std::string> { static const delimiters_values<::std::string> values; };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-const delimiters_values<char> delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, char>::values = { "{", ", ", "}" };
+const delimiters_values<::std::string> delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, ::std::string>::values = { "{", ", ", "}" };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };
+struct delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, ::std::wstring> { static const delimiters_values<::std::wstring> values; };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-const delimiters_values<wchar_t> delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };
+const delimiters_values<::std::wstring> delimiters< ::std::unordered_set<T, THash, TEqual, TAllocator>, ::std::wstring>::values = { L"{", L", ", L"}" };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, char> { static const delimiters_values<char> values; };
+struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, ::std::string> { static const delimiters_values<::std::string> values; };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-const delimiters_values<char> delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, char>::values = { "{", ", ", "}" };
+const delimiters_values<::std::string> delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, ::std::string>::values = { "{", ", ", "}" };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, wchar_t> { static const delimiters_values<wchar_t> values; };
+struct delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, ::std::wstring> { static const delimiters_values<::std::wstring> values; };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-const delimiters_values<wchar_t> delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, wchar_t>::values = { L"{", L", ", L"}" };
+const delimiters_values<::std::wstring> delimiters< ::std::unordered_multiset<T, THash, TEqual, TAllocator>, ::std::wstring>::values = { L"{", L", ", L"}" };
 
 
 // Delimiters for pair and tuple
 
-template <typename T1, typename T2> struct delimiters<std::pair<T1, T2>, char> { static const delimiters_values<char> values; };
-template <typename T1, typename T2> const delimiters_values<char> delimiters<std::pair<T1, T2>, char>::values = { "(", ", ", ")" };
-template <typename T1, typename T2> struct delimiters< ::std::pair<T1, T2>, wchar_t> { static const delimiters_values<wchar_t> values; };
-template <typename T1, typename T2> const delimiters_values<wchar_t> delimiters< ::std::pair<T1, T2>, wchar_t>::values = { L"(", L", ", L")" };
+template <typename T1, typename T2> struct delimiters<std::pair<T1, T2>, ::std::string> { static const delimiters_values<::std::string> values; };
+template <typename T1, typename T2> const delimiters_values<::std::string> delimiters<std::pair<T1, T2>, ::std::string>::values = { "(", ", ", ")" };
+template <typename T1, typename T2> struct delimiters< ::std::pair<T1, T2>, ::std::wstring> { static const delimiters_values<::std::wstring> values; };
+template <typename T1, typename T2> const delimiters_values<::std::wstring> delimiters< ::std::pair<T1, T2>, ::std::wstring>::values = { L"(", L", ", L")" };
 
-template <typename ...Args> struct delimiters<std::tuple<Args...>, char> { static const delimiters_values<char> values; };
-template <typename ...Args> const delimiters_values<char> delimiters<std::tuple<Args...>, char>::values = { "(", ", ", ")" };
-template <typename ...Args> struct delimiters< ::std::tuple<Args...>, wchar_t> { static const delimiters_values<wchar_t> values; };
-template <typename ...Args> const delimiters_values<wchar_t> delimiters< ::std::tuple<Args...>, wchar_t>::values = { L"(", L", ", L")" };
+template <typename ...Args> struct delimiters<std::tuple<Args...>, ::std::string> { static const delimiters_values<::std::string> values; };
+template <typename ...Args> const delimiters_values<::std::string> delimiters<std::tuple<Args...>, ::std::string>::values = { "(", ", ", ")" };
+template <typename ...Args> struct delimiters< ::std::tuple<Args...>, ::std::wstring> { static const delimiters_values<::std::wstring> values; };
+template <typename ...Args> const delimiters_values<::std::wstring> delimiters< ::std::tuple<Args...>, ::std::wstring>::values = { L"(", L", ", L")" };
 
 
 // Type-erasing helper class for easy use of custom delimiters.
@@ -428,12 +429,12 @@ struct custom_delims_wrapper : custom_delims_base
 
   std::ostream & stream(std::ostream & s)
   {
-    return s << write_container_helper<T, char, std::char_traits<char>, Delims>(t);
+    return s << write_container_helper<T, ::std::string, Delims>(t);
   }
 
   std::wostream & stream(std::wostream & s)
   {
-    return s << write_container_helper<T, wchar_t, std::char_traits<wchar_t>, Delims>(t);
+    return s << write_container_helper<T, ::std::wstring, Delims>(t);
   }
 
 private:
@@ -450,7 +451,7 @@ struct custom_delims
 };
 
 template <typename TChar, typename TCharTraits, typename Delims>
-inline std::basic_ostream<TChar, TCharTraits> & operator<<(std::basic_ostream<TChar, TCharTraits> & s, const custom_delims<Delims> & p)
+inline auto & operator<<(std::basic_ostream<TChar, TCharTraits> & s, const custom_delims<Delims> & p)
 {
   return p.base->stream(s);
 }
@@ -530,14 +531,14 @@ template<typename T, typename TChar, typename TCharTraits>
 inline typename enable_if< ::container_io::is_container<T>::value, basic_ostream<TChar, TCharTraits> &>::type
 operator<<(basic_ostream<TChar, TCharTraits> & stream, const T & container)
 {
-  return stream << ::container_io::write_container_helper<T, TChar, TCharTraits>(container);
+  return stream << ::container_io::write_container_helper<T, basic_string<TChar,TCharTraits>>(container);
 }
 
 template<typename T, typename TChar, typename TCharTraits>
 inline typename enable_if< ::container_io::is_container<T>::value, basic_istream<TChar, TCharTraits> &>::type
 operator>>(basic_istream<TChar, TCharTraits> & stream, T & container)
 {
-  auto c{::container_io::read_container_helper<T, TChar, TCharTraits>(container)};
+  auto c{::container_io::read_container_helper<T, basic_string<TChar,TCharTraits>>(container)};
   return stream >> c;
 }
 
@@ -553,7 +554,7 @@ template<typename TChar, typename TCharTraits, typename ...Args>
 inline auto &
 operator<<(::std::basic_ostream<TChar, TCharTraits> & stream, const boost::hana::tuple<Args...> & container)
 {
-  return stream << ::container_io::write_container_helper<boost::hana::tuple<Args...>, TChar, TCharTraits>(container);
+  return stream << ::container_io::write_container_helper<boost::hana::tuple<Args...>, ::std::basic_string<TChar,TCharTraits>>(container);
 }
 
 } } // boost::hana
