@@ -1,3 +1,7 @@
+// Copyright András Vukics 2020
+// Extending the original work of Louis Delacroix with operator>> + boost::hana::tuple
+// Code retrieved from https://github.com/louisdx/cxx-prettyprint on 13/03/2020
+
 //          Copyright Louis Delacroix 2010 - 2014.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -7,10 +11,6 @@
 //
 // Usage:
 // Include this header, and operator<< will "just work".
-
-// Copyright András Vukics 2020
-// Extending the original work of Louis Delacroix with operator>> + boost::hana::tuple
-// Code retrieved from https://github.com/louisdx/cxx-prettyprint on 13/03/2020
 
 
 #ifndef CONTAINER_IO_H_INCLUDED
@@ -29,6 +29,7 @@
 #include <unordered_set>
 #include <utility>
 #include <valarray>
+#include <vector>
 
 namespace container_io {
 
@@ -96,29 +97,26 @@ struct delimiters
 };
 
 
-// Functor to print containers. You can use this directly if you want
-// to specificy a non-default delimiters type. The printing logic can
+// Functor to write containers. You can use this directly if you want
+// to specificy a non-default delimiters type. The writing logic can
 // be customized by specializing the nested template.
 
 template <typename T,
           typename TChar = char,
           typename TCharTraits = ::std::char_traits<TChar>,
           typename TDelimiters = delimiters<T, TChar>>
-struct print_container_helper
+struct write_container_helper
 {
   using delimiters_type = TDelimiters;
   using ostream_type = std::basic_ostream<TChar, TCharTraits>;
 
   template <typename U>
-  struct printer
+  struct writer
   {
-    static void print_body(const U & c, ostream_type & stream)
+    static void write_body(const U & c, ostream_type & stream)
     {
-      using std::begin;
-      using std::end;
-
-      auto it = begin(c);
-      const auto the_end = end(c);
+      auto it = std::begin(c);
+      const auto the_end = std::end(c);
 
       if (it != the_end) {
         for ( ; ; ) {
@@ -132,13 +130,13 @@ struct print_container_helper
     }
   };
 
-  print_container_helper(const T & container) : container_(container) {}
+  write_container_helper(const T & container) : container_(container) {}
 
   inline void operator()(ostream_type & stream) const
   {
     if (delimiters_type::values.prefix != NULL) stream << delimiters_type::values.prefix;
 
-    printer<T>::print_body(container_, stream);
+    writer<T>::write_body(container_, stream);
 
     if (delimiters_type::values.postfix != NULL) stream << delimiters_type::values.postfix;
   }
@@ -147,19 +145,84 @@ private:
   const T & container_;
 };
 
+
+// Functor to read containers.
+
+template <typename T,
+          typename TChar = char,
+          typename TCharTraits = ::std::char_traits<TChar>,
+          typename TDelimiters = delimiters<T, TChar>>
+struct read_container_helper
+{
+  using delimiters_type = TDelimiters;
+  using istream_type = std::basic_istream<TChar, TCharTraits>;
+
+  template <typename U>
+  struct reader
+  {
+    static void read_body(U & c, istream_type & stream)
+    {
+      auto it = std::begin(c);
+      const auto the_end = std::end(c);
+
+      if (it != the_end) {
+        for ( ; ; ) {
+          stream >> *it;
+          
+          if (++it == the_end) break;
+          
+          if (delimiters_type::values.delimiter != NULL) { // try to eat delimiter
+            TChar c;
+            stream >> c;
+            if (c!=delimiters_type::values.delimiter) stream.clear(istream_type::badbit);
+          }
+        }
+      }
+    }
+  };
+
+  read_container_helper(T & container) : container_(container) {}
+
+private:
+  void callOperatorHelper(istream_type & stream, const TChar* delim) const
+  {
+    if (delim != NULL) {
+      TChar c;
+      stream >> c;
+      if (c!=delim) stream.clear(istream_type::badbit);
+    }
+  }
+  
+public:
+  
+  void operator()(istream_type & stream)
+  {
+    callOperatorHelper(stream,delimiters_type::values.prefix);
+
+    reader<T>::read_body(container_, stream);
+
+    callOperatorHelper(stream,delimiters_type::values.postfix);
+  }
+
+private:
+  // What kind of reference to store here?
+  T & container_;
+};
+
+
 // Specialization for pairs
 
 template <typename T, typename TChar, typename TCharTraits, typename TDelimiters>
 template <typename T1, typename T2>
-struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<std::pair<T1, T2>>
+struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<std::pair<T1, T2>>
 {
-  using ostream_type = typename print_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
+  using ostream_type = typename write_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
 
-  static void print_body(const std::pair<T1, T2> & c, ostream_type & stream)
+  static void write_body(const std::pair<T1, T2> & c, ostream_type & stream)
   {
     stream << c.first;
-    if (print_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL)
-        stream << print_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
+    if (write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL)
+        stream << write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
     stream << c.second;
   }
 };
@@ -168,36 +231,36 @@ struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<std::
 
 template <typename T, typename TChar, typename TCharTraits, typename TDelimiters>
 template <typename ...Args>
-struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<std::tuple<Args...>>
+struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<std::tuple<Args...>>
 {
-  using ostream_type = typename print_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
+  using ostream_type = typename write_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
   using element_type = std::tuple<Args...>;
 
   template <std::size_t I> struct Int { };
 
-  static void print_body(const element_type & c, ostream_type & stream)
+  static void write_body(const element_type & c, ostream_type & stream)
   {
-    tuple_print(c, stream, Int<0>());
+    tuple_write(c, stream, Int<0>());
   }
 
-  static void tuple_print(const element_type &, ostream_type &, Int<sizeof...(Args)>) {}
+  static void tuple_write(const element_type &, ostream_type &, Int<sizeof...(Args)>) {}
 
-  static void tuple_print(const element_type & c, ostream_type & stream,
+  static void tuple_write(const element_type & c, ostream_type & stream,
                           typename std::conditional<sizeof...(Args) != 0, Int<0>, std::nullptr_t>::type)
   {
     stream << std::get<0>(c);
-    tuple_print(c, stream, Int<1>());
+    tuple_write(c, stream, Int<1>());
   }
 
   template <std::size_t N>
-  static void tuple_print(const element_type & c, ostream_type & stream, Int<N>)
+  static void tuple_write(const element_type & c, ostream_type & stream, Int<N>)
   {
-    if (print_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL)
-      stream << print_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
+    if (write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL)
+      stream << write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
 
     stream << std::get<N>(c);
 
-    tuple_print(c, stream, Int<N + 1>());
+    tuple_write(c, stream, Int<N + 1>());
   }
 };
 
@@ -206,17 +269,17 @@ struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<std::
 
 template <typename T, typename TChar, typename TCharTraits, typename TDelimiters>
 template <typename ...Args>
-struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<boost::hana::tuple<Args...>>
+struct write_container_helper<T, TChar, TCharTraits, TDelimiters>::writer<boost::hana::tuple<Args...>>
 {
-  using ostream_type = typename print_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
+  using ostream_type = typename write_container_helper<T, TChar, TCharTraits, TDelimiters>::ostream_type;
   using element_type = boost::hana::tuple<Args...>;
 
-  static void print_body(const element_type & c, ostream_type & stream)
+  static void write_body(const element_type & c, ostream_type & stream)
   {
     unsigned i=0;
     
     boost::hana::for_each(c, [&](const auto& member) {
-      if (i && print_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL) stream << print_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
+      if (i && write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter != NULL) stream << write_container_helper<T, TChar, TCharTraits, TDelimiters>::delimiters_type::values.delimiter;
       ++i;
       stream << member ;
     });
@@ -225,10 +288,19 @@ struct print_container_helper<T, TChar, TCharTraits, TDelimiters>::printer<boost
 };
 
 
-// Prints a print_container_helper to the specified stream.
+// Prints a write_container_helper to the specified stream.
 
 template<typename T, typename TChar, typename TCharTraits, typename TDelimiters>
-inline std::basic_ostream<TChar, TCharTraits> & operator<<(std::basic_ostream<TChar, TCharTraits> & stream, const print_container_helper<T, TChar, TCharTraits, TDelimiters> & helper)
+inline std::basic_ostream<TChar, TCharTraits> & operator<<(std::basic_ostream<TChar, TCharTraits> & stream, const write_container_helper<T, TChar, TCharTraits, TDelimiters> & helper)
+{
+  helper(stream);
+  return stream;
+}
+
+// reads a read_container_helper from the specified stream.
+
+template<typename T, typename TChar, typename TCharTraits, typename TDelimiters>
+inline std::basic_istream<TChar, TCharTraits> & operator>>(std::basic_istream<TChar, TCharTraits> & stream, read_container_helper<T, TChar, TCharTraits, TDelimiters> & helper)
 {
   helper(stream);
   return stream;
@@ -248,6 +320,10 @@ struct is_container<T[N]> : std::true_type { };
 
 template <std::size_t N>
 struct is_container<char[N]> : std::false_type { };
+
+template <typename T>
+struct is_container<std::vector<T>> : std::true_type { };
+// TODO: this of course should not be necessary, but the sfinae-based solution above doesn’t seem to work in the non-const container case (which is the case when reading from istream)
 
 template <typename T>
 struct is_container<std::valarray<T>> : std::true_type { };
@@ -352,12 +428,12 @@ struct custom_delims_wrapper : custom_delims_base
 
   std::ostream & stream(std::ostream & s)
   {
-    return s << print_container_helper<T, char, std::char_traits<char>, Delims>(t);
+    return s << write_container_helper<T, char, std::char_traits<char>, Delims>(t);
   }
 
   std::wostream & stream(std::wostream & s)
   {
-    return s << print_container_helper<T, wchar_t, std::char_traits<wchar_t>, Delims>(t);
+    return s << write_container_helper<T, wchar_t, std::char_traits<wchar_t>, Delims>(t);
   }
 
 private:
@@ -381,7 +457,7 @@ inline std::basic_ostream<TChar, TCharTraits> & operator<<(std::basic_ostream<TC
 
 
 // A wrapper for a C-style array given as pointer-plus-size.
-// Usage: std::cout << pretty_print_array(arr, n) << std::endl;
+// Usage: std::cout << write_array(arr, n) << std::endl;
 
 template<typename T>
 struct array_wrapper_n
@@ -400,10 +476,10 @@ private:
 
 
 // A wrapper for hash-table based containers that offer local iterators to each bucket.
-// Usage: std::cout << bucket_print(m, 4) << std::endl;  (Prints bucket 5 of container m.)
+// Usage: std::cout << bucket_write(m, 4) << std::endl;  (Prints bucket 5 of container m.)
 
 template <typename T>
-struct bucket_print_wrapper
+struct bucket_write_wrapper
 {
   typedef typename T::const_local_iterator const_iterator;
   typedef typename T::size_type size_type;
@@ -418,7 +494,7 @@ struct bucket_print_wrapper
     return m_map.cend(n);
   }
 
-  bucket_print_wrapper(const T & m, size_type bucket) : m_map(m), n(bucket) { }
+  bucket_write_wrapper(const T & m, size_type bucket) : m_map(m), n(bucket) { }
 
 private:
   const T & m_map;
@@ -431,15 +507,15 @@ private:
 // Global accessor functions for the convenience wrappers
 
 template<typename T>
-inline container_io::array_wrapper_n<T> pretty_print_array(const T * const a, size_t n)
+inline container_io::array_wrapper_n<T> write_array(const T * const a, size_t n)
 {
   return container_io::array_wrapper_n<T>(a, n);
 }
 
-template <typename T> container_io::bucket_print_wrapper<T>
-bucket_print(const T & m, typename T::size_type n)
+template <typename T> container_io::bucket_write_wrapper<T>
+bucket_write(const T & m, typename T::size_type n)
 {
-  return container_io::bucket_print_wrapper<T>(m, n);
+  return container_io::bucket_write_wrapper<T>(m, n);
 }
 
 
@@ -454,7 +530,15 @@ template<typename T, typename TChar, typename TCharTraits>
 inline typename enable_if< ::container_io::is_container<T>::value, basic_ostream<TChar, TCharTraits> &>::type
 operator<<(basic_ostream<TChar, TCharTraits> & stream, const T & container)
 {
-  return stream << ::container_io::print_container_helper<T, TChar, TCharTraits>(container);
+  return stream << ::container_io::write_container_helper<T, TChar, TCharTraits>(container);
+}
+
+template<typename T, typename TChar, typename TCharTraits>
+inline typename enable_if< ::container_io::is_container<T>::value, basic_istream<TChar, TCharTraits> &>::type
+operator>>(basic_istream<TChar, TCharTraits> & stream, T & container)
+{
+  auto c{::container_io::read_container_helper<T, TChar, TCharTraits>(container)};
+  return stream >> c;
 }
 
 } // std
@@ -469,7 +553,7 @@ template<typename TChar, typename TCharTraits, typename ...Args>
 inline auto &
 operator<<(::std::basic_ostream<TChar, TCharTraits> & stream, const boost::hana::tuple<Args...> & container)
 {
-  return stream << ::container_io::print_container_helper<boost::hana::tuple<Args...>, TChar, TCharTraits>(container);
+  return stream << ::container_io::write_container_helper<boost::hana::tuple<Args...>, TChar, TCharTraits>(container);
 }
 
 } } // boost::hana
