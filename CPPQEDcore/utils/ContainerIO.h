@@ -55,16 +55,46 @@ public:
 };
 
 template <typename T>
+struct has_iterator : private sfinae_base
+{
+private:
+  template <typename C> static yes & test(typename C::iterator*);
+  template <typename C> static no  & test(...);
+public:
+  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
+  using type =  T;
+};
+
+template <typename T>
 struct has_begin_end : private sfinae_base
 {
 private:
   template <typename C>
-  static yes & f(typename std::enable_if<std::is_same<decltype(static_cast<typename C::const_iterator(C::*)() const>(&C::begin)),typename C::const_iterator(C::*)() const>::value>::type *);
+  static yes & f(typename std::enable_if<std::is_same<decltype(static_cast<typename C::iterator(C::*)()>(&C::begin)),typename C::iterator(C::*)()>::value>::type *);
 
   template <typename C> static no & f(...);
 
   template <typename C>
-  static yes & g(typename std::enable_if<std::is_same<decltype(static_cast<typename C::const_iterator(C::*)() const>(&C::end)),typename C::const_iterator(C::*)() const>::value, void>::type*);
+  static yes & g(typename std::enable_if<std::is_same<decltype(static_cast<typename C::iterator(C::*)()>(&C::end)),typename C::iterator(C::*)()>::value>::type *);
+
+  template <typename C> static no & g(...);
+
+public:
+  static bool const beg_value = sizeof(f<T>(nullptr)) == sizeof(yes);
+  static bool const end_value = sizeof(g<T>(nullptr)) == sizeof(yes);
+};
+
+template <typename T>
+struct has_cbegin_cend : private sfinae_base
+{
+private:
+  template <typename C>
+  static yes & f(typename std::enable_if<std::is_same<decltype(static_cast<typename C::const_iterator(C::*)() const>(&C::cbegin)),typename C::const_iterator(C::*)() const>::value>::type *);
+
+  template <typename C> static no & f(...);
+
+  template <typename C>
+  static yes & g(typename std::enable_if<std::is_same<decltype(static_cast<typename C::const_iterator(C::*)() const>(&C::cend)),typename C::const_iterator(C::*)() const>::value>::type *);
 
   template <typename C> static no & g(...);
 
@@ -312,19 +342,15 @@ operator>>(std::basic_istream<typename String::value_type,typename String::trait
 
 template <typename T>
 struct is_container : public std::integral_constant<bool,
-                                                    detail::has_const_iterator<T>::value &&
-                                                    detail::has_begin_end<T>::beg_value  &&
-                                                    detail::has_begin_end<T>::end_value> { };
+                                                    (detail::has_const_iterator<T>::value && detail::has_cbegin_cend<T>::beg_value && detail::has_cbegin_cend<T>::end_value) ||
+                                                    (detail::has_iterator<T>::value && detail::has_begin_end<T>::beg_value && detail::has_begin_end<T>::end_value)
+                                                    > { };
 
 template <typename T, std::size_t N>
 struct is_container<T[N]> : std::true_type { };
 
 template <std::size_t N>
 struct is_container<char[N]> : std::false_type { };
-
-template <typename T>
-struct is_container<std::vector<T>> : std::true_type { };
-// TODO: this of course should not be necessary, but the sfinae-based solution above doesn’t seem to work in the non-const container case (which is the case when reading from istream)
 
 template <typename T>
 struct is_container<std::valarray<T>> : std::true_type { };
@@ -467,8 +493,10 @@ struct array_wrapper_n
   typedef T value_type;
 
   array_wrapper_n(const T * const a, size_t n) : _array(a), _n(n) { }
-  inline const_iterator begin() const { return _array; }
-  inline const_iterator end() const { return _array + _n; }
+  inline const_iterator cbegin() const { return _array; }
+  inline const_iterator cend() const { return _array + _n; }
+  inline const_iterator begin() const { return cbegin(); }
+  inline const_iterator end() const { return cend(); }
 
 private:
   const T * const _array;
@@ -485,16 +513,19 @@ struct bucket_write_wrapper
   typedef typename T::const_local_iterator const_iterator;
   typedef typename T::size_type size_type;
 
-  const_iterator begin() const
+  const_iterator cbegin() const
   {
     return m_map.cbegin(n);
   }
 
-  const_iterator end() const
+  const_iterator cend() const
   {
     return m_map.cend(n);
   }
 
+  inline const_iterator begin() const { return cbegin(); }
+  inline const_iterator end() const { return cend(); }
+  
   bucket_write_wrapper(const T & m, size_type bucket) : m_map(m), n(bucket) { }
 
 private:
