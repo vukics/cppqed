@@ -32,9 +32,38 @@
 #include <valarray>
 #include <vector>
 
+#include <algorithm> 
+#include <locale>
+#include <utility>
+
 namespace container_io {
 
 namespace detail {
+
+// Trimming implemented from here: https://stackoverflow.com/a/217605/1171157
+  
+// trim from start (in place)
+static inline auto ltrim(std::string s) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+    return !std::isspace(ch);
+  }));
+  return s;
+}
+
+// trim from end (in place)
+static inline auto rtrim(std::string s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+    return !std::isspace(ch);
+  }).base(), s.end());
+  return s;
+}
+
+// trim from both ends (in place)
+static inline auto trim(std::string s) {
+  return ltrim(rtrim((s)));
+}
+
+
 // SFINAE type trait to detect whether T::const_iterator exists.
 
 struct sfinae_base
@@ -128,9 +157,7 @@ struct delimiters
 };
 
 
-// Functor to write containers. You can use this directly if you want
-// to specificy a non-default delimiters type. The writing logic can
-// be customized by specializing the nested template.
+// Functor to write containers. You can use this directly if you want to specificy a non-default delimiters type. The writing logic can be customized by specializing the nested template.
 
 template <typename T,
           typename String = ::std::string,
@@ -191,11 +218,15 @@ struct read_container_helper
   using istream_type = std::basic_istream<char_type,traits_type>;
 
 private:
-  static void eatDelimiter(istream_type & stream, const String& delim)
+  static void eatDelimiter(istream_type & stream, String delim)
+  // There is some liberality with whitespaces
   {
-    for (auto sc : delim) { // TODO: some liberality with whitespaces could be introduced
+    auto trimmedDelim{detail::trim(std::move(delim))};
+    
+    for (; std::isspace(stream.peek()); stream.get()) ; // drop whitespaces from the beginning of the stream as well
+  
+    for (auto sc : trimmedDelim) {
       char_type c{stream.get()};
-      // std::cerr<<sc<<" "<<c<<" "<<stream.bad()<<std::endl;
       if (c != sc) stream.clear(istream_type::badbit);
     }
   }
