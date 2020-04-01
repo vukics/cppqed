@@ -16,8 +16,10 @@
 #ifndef CONTAINER_IO_H_INCLUDED
 #define CONTAINER_IO_H_INCLUDED
 
-#include <boost/hana/tuple.hpp>
+#include <boost/hana/if.hpp>
 #include <boost/hana/for_each.hpp>
+#include <boost/hana/traits.hpp>
+#include <boost/hana/tuple.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -36,11 +38,13 @@
 #include <locale>
 #include <utility>
 
+namespace hana=boost::hana;
+
 namespace container_io {
 
 namespace detail {
 
-// Trimming implemented from here: https://stackoverflow.com/a/217605/1171157
+// Trimming implemented from here: https://stackoverflow.com/a/217605/1171157 in a simplified way
   
 // trim from start (in place)
 static inline auto ltrim(std::string s) {
@@ -156,192 +160,153 @@ struct delimiters
   static const type values; 
 };
 
+// Functor to read/write containers. You can use this directly if you want to specificy a non-default delimiters type.
+// The writing logic can be customized by specializing the nested template.
 
-// Functor to write containers. You can use this directly if you want to specificy a non-default delimiters type. The writing logic can be customized by specializing the nested template.
-
-template <typename T,
+template <bool IS_OUT,
+          typename T,
           typename String = ::std::string,
           typename TDelimiters = delimiters<T, String>>
-struct write_container_helper
+struct container_io_helper
 {
   using delimiters_type = TDelimiters;
+  
   using traits_type = typename String::traits_type;
   using   char_type = typename String:: value_type;
-  using ostream_type = std::basic_ostream<char_type,traits_type>;
+  
+  static const auto constexpr is_out = hana::bool_c<IS_OUT==true>;
+  using stream_type = typename decltype(hana::if_(is_out,
+                                                  hana::type_c<std::basic_ostream<char_type,traits_type>>,
+                                                  hana::type_c<std::basic_istream<char_type,traits_type>>))::type;
 
-  template <typename U>
-  struct writer
+  using container_store_type = typename decltype(hana::if_(is_out,hana::traits::add_const(hana::type_c<T>),hana::type_c<T>))::type;
+
+  template<typename ELEM>
+  static void atomic(stream_type& s, ELEM& e)
   {
-    static void write_body(const U & c, ostream_type & stream)
+    hana::if_(is_out,
+              [](auto& s, const auto& i) { s<<i; },
+              [](auto& s,       auto& i) { s>>i; }
+             )(s,e);
+  }
+  
+  template<typename S> // The nested template here is necessary because of the type-erasure mechanism for custom-delimiter specification below
+  static void handleDelimiter(stream_type&, S);
+  
+  template <typename U> // The nested template here is necessary because of the type-erasure mechanism for custom-delimiter specification below
+  struct io
+  {
+    static void io_body(typename decltype(hana::if_(is_out,
+                                                    hana::traits::add_const(hana::type_c<U>),
+                                                    hana::type_c<U>))::type & c, 
+                        stream_type & stream)
     {
       auto it = std::begin(c);
       const auto the_end = std::end(c);
 
       if (it != the_end) {
         for ( ; ; ) {
-          stream << *it;
+          atomic(stream,*it);
           
           if (++it == the_end) break;
           
-          if (!delimiters_type::values.delimiter.empty()) stream << delimiters_type::values.delimiter;
+          handleDelimiter(stream,delimiters_type::values.delimiter);
+          // if (!delimiters_type::values.delimiter.empty()) stream << delimiters_type::values.delimiter;
         }
       }
     }
   };
 
-  write_container_helper(const T & container) : container_(container) {}
+  container_io_helper(container_store_type & container) : container_(container) {}
 
-  inline void operator()(ostream_type & stream) const
+  inline void operator()(stream_type & stream) const
   {
-    if (!delimiters_type::values.prefix.empty()) stream << delimiters_type::values.prefix;
+    handleDelimiter(stream,delimiters_type::values.prefix);
 
-    writer<T>::write_body(container_, stream);
+    io<T>::io_body(container_, stream);
 
-    if (!delimiters_type::values.postfix.empty()) stream << delimiters_type::values.postfix;
+    handleDelimiter(stream,delimiters_type::values.postfix);
   }
 
 private:
-  const T & container_;
+  container_store_type & container_;
+  
 };
 
 
-// Functor to read containers.
-
-template <typename T,
-          typename String = ::std::string,
-          typename TDelimiters = delimiters<T, String>>
-struct read_container_helper
-{
-  using delimiters_type = TDelimiters;
-  using traits_type = typename String::traits_type;
-  using   char_type = typename String:: value_type;
-  using istream_type = std::basic_istream<char_type,traits_type>;
-
-private:
-  static void eatDelimiter(istream_type & stream, String delim)
-  // There is some liberality with whitespaces
-  {
-    auto trimmedDelim{detail::trim(std::move(delim))};
-    
-    for (; std::isspace(stream.peek()); stream.get()) ; // drop whitespaces from the beginning of the stream as well
+//   static void eatDelimiter(istream_type & stream, String delim)
+//   // There is some liberality with whitespaces
+//   {
+//     auto trimmedDelim{detail::trim(std::move(delim))};
+//     
+//     for (; std::isspace(stream.peek()); stream.get()) ; // drop whitespaces from the beginning of the stream as well
+//   
+//     for (auto sc : trimmedDelim) {
+//       char_type c{stream.get()};
+//       if (c != sc) stream.clear(istream_type::badbit);
+//     }
+//   }
   
-    for (auto sc : trimmedDelim) {
-      char_type c{stream.get()};
-      if (c != sc) stream.clear(istream_type::badbit);
-    }
-  }
-  
-public:
-  template <typename U>
-  struct reader
-  {
-    static void read_body(U & c, istream_type & stream)
-    {
-      auto it = std::begin(c);
-      const auto the_end = std::end(c);
-
-      if (it != the_end) {
-        for ( ; ; ) {
-          stream >> *it;
-          
-          if (++it == the_end) break;
-          
-          eatDelimiter(stream,delimiters_type::values.delimiter);
-        }
-      }
-    }
-  };
-
-  read_container_helper(T & container) : container_(container) {}
-
-  void operator()(istream_type & stream)
-  {
-    eatDelimiter(stream,delimiters_type::values.prefix);
-
-    reader<T>::read_body(container_, stream);
-
-    eatDelimiter(stream,delimiters_type::values.postfix);
-  }
-
-private:
-  // What kind of reference to store here?
-  T & container_;
-};
 
 
 // Specialization for pairs
 
-template <typename T, typename String, typename TDelimiters>
+template <bool IS_OUT, typename T, typename String, typename TDelimiters>
 template <typename T1, typename T2>
-struct write_container_helper<T, String, TDelimiters>::writer<std::pair<T1, T2>>
+struct container_io_helper<IS_OUT, T, String, TDelimiters>::io<std::pair<T1, T2>>
 {
-  using ostream_type = typename write_container_helper<T,String,TDelimiters>::ostream_type;
-
-  static void write_body(const std::pair<T1, T2> & c, ostream_type & stream)
+  using container_type_here = typename decltype(hana::if_(is_out,hana::traits::add_const(hana::type_c<std::pair<T1, T2>>),hana::type_c<std::pair<T1, T2>>))::type;
+  
+  static void io_body(container_type_here & c, stream_type & stream)
   {
-    stream << c.first;
-    const auto delim{write_container_helper<T,String,TDelimiters>::delimiters_type::values.delimiter};
-    if (!delim.empty()) stream << delim;
-    stream << c.second;
+    atomic(stream,c.first);
+    handleDelimiter(stream,delimiters_type::values.delimiter);
+    atomic(stream,c.second);
   }
 };
 
 // Specialization for tuples
 
-template <typename T, typename String, typename TDelimiters>
+template <bool IS_OUT, typename T, typename String, typename TDelimiters>
 template <typename ...Args>
-struct write_container_helper<T, String, TDelimiters>::writer<std::tuple<Args...>>
+struct container_io_helper<IS_OUT, T, String, TDelimiters>::io<std::tuple<Args...>>
 {
-  using ostream_type = typename write_container_helper<T, String, TDelimiters>::ostream_type;
-  using element_type = std::tuple<Args...>;
+  using container_type_here = typename decltype(hana::if_(is_out,hana::traits::add_const(hana::type_c<std::tuple<Args...>>),hana::type_c<std::tuple<Args...>>))::type;
 
-  template <std::size_t I> struct Int { };
-
-  static void write_body(const element_type & c, ostream_type & stream)
+  template <size_t N>
+  static void tuple_io(container_type_here & c, stream_type & stream)
   {
-    tuple_write(c, stream, Int<0>());
+    if constexpr (N!=sizeof...(Args)) {
+      if constexpr (N) {handleDelimiter(stream,delimiters_type::values.delimiter);}
+      atomic(stream,std::get<N>(c));
+      tuple_io<N+1>(c, stream);
+    }
+  }
+  
+  static void io_body(container_type_here & c, stream_type & stream)
+  {
+    tuple_io<0>(c, stream);
   }
 
-  static void tuple_write(const element_type &, ostream_type &, Int<sizeof...(Args)>) {}
-
-  static void tuple_write(const element_type & c, ostream_type & stream,
-                          typename std::conditional<sizeof...(Args) != 0, Int<0>, std::nullptr_t>::type)
-  {
-    stream << std::get<0>(c);
-    tuple_write(c, stream, Int<1>());
-  }
-
-  template <std::size_t N>
-  static void tuple_write(const element_type & c, ostream_type & stream, Int<N>)
-  {
-    const auto delim{write_container_helper<T, String, TDelimiters>::delimiters_type::values.delimiter};
-    if (!delim.empty()) stream << delim;
-
-    stream << std::get<N>(c);
-
-    tuple_write(c, stream, Int<N + 1>());
-  }
 };
 
 
 // Specialization for hana::tuple
 
-template <typename T, typename String, typename TDelimiters>
+template <bool IS_OUT, typename T, typename String, typename TDelimiters>
 template <typename ...Args>
-struct write_container_helper<T, String, TDelimiters>::writer<boost::hana::tuple<Args...>>
+struct container_io_helper<IS_OUT, T, String, TDelimiters>::io<hana::tuple<Args...>>
 {
-  using ostream_type = typename write_container_helper<T, String, TDelimiters>::ostream_type;
-  using element_type = boost::hana::tuple<Args...>;
+  using container_type_here = typename decltype(hana::if_(is_out,hana::traits::add_const(hana::type_c<hana::tuple<Args...>>),hana::type_c<hana::tuple<Args...>>))::type;
 
-  static void write_body(const element_type & c, ostream_type & stream)
+  static void io_body(container_type_here & c, stream_type & stream)
   {
     unsigned i=0;
     
-    boost::hana::for_each(c, [&](const auto& member) {
-      const auto delim{write_container_helper<T, String, TDelimiters>::delimiters_type::values.delimiter};
-      if (i && !delim.empty()) stream << delim;
+    hana::for_each(c, [&](auto& member) {
+      if (i) handleDelimiter(stream,delimiters_type::values.delimiter);
       ++i;
-      stream << member ;
+      atomic(stream,member);
     });
   }
 
@@ -352,7 +317,7 @@ struct write_container_helper<T, String, TDelimiters>::writer<boost::hana::tuple
 
 template<typename T, typename String, typename TDelimiters>
 inline auto &
-operator<<(std::basic_ostream<typename String::value_type,typename String::traits_type> & stream, const write_container_helper<T, String, TDelimiters> & helper)
+operator<<(std::basic_ostream<typename String::value_type,typename String::traits_type> & stream, const container_io_helper<true, T, String, TDelimiters> & helper)
 {
   helper(stream);
   return stream;
@@ -362,7 +327,7 @@ operator<<(std::basic_ostream<typename String::value_type,typename String::trait
 
 template<typename T, typename String, typename TDelimiters>
 inline auto &
-operator>>(std::basic_istream<typename String::value_type,typename String::traits_type> & stream, read_container_helper<T, String, TDelimiters> & helper)
+operator>>(std::basic_istream<typename String::value_type,typename String::traits_type> & stream, container_io_helper<false, T, String, TDelimiters> & helper)
 {
   helper(stream);
   return stream;
@@ -393,7 +358,7 @@ template <typename ...Args>
 struct is_container<std::tuple<Args...>> : std::true_type { };
 
 template <typename ...Args>
-struct is_container<boost::hana::tuple<Args...>> : std::true_type { };
+struct is_container<hana::tuple<Args...>> : std::true_type { };
 
 
 // Default delimiters
@@ -486,12 +451,12 @@ struct custom_delims_wrapper : custom_delims_base
 
   std::ostream & stream(std::ostream & s)
   {
-    return s << write_container_helper<T, ::std::string, Delims>(t);
+    return s << container_io_helper<true, T, ::std::string, Delims>(t);
   }
 
   std::wostream & stream(std::wostream & s)
   {
-    return s << write_container_helper<T, ::std::wstring, Delims>(t);
+    return s << container_io_helper<true, T, ::std::wstring, Delims>(t);
   }
 
 private:
@@ -593,14 +558,14 @@ template<typename T, typename TChar, typename TCharTraits>
 inline typename enable_if< ::container_io::is_container<T>::value, basic_ostream<TChar, TCharTraits> &>::type
 operator<<(basic_ostream<TChar, TCharTraits> & stream, const T & container)
 {
-  return stream << ::container_io::write_container_helper<T, basic_string<TChar,TCharTraits>>(container);
+  return stream << ::container_io::container_io_helper<true,T, basic_string<TChar,TCharTraits>>(container);
 }
 
 template<typename T, typename TChar, typename TCharTraits>
 inline typename enable_if< ::container_io::is_container<T>::value, basic_istream<TChar, TCharTraits> &>::type
 operator>>(basic_istream<TChar, TCharTraits> & stream, T & container)
 {
-  auto c{::container_io::read_container_helper<T, basic_string<TChar,TCharTraits>>(container)};
+  auto c{::container_io::container_io_helper<false, T, basic_string<TChar,TCharTraits>>(container)};
   return stream >> c;
 }
 
@@ -614,12 +579,20 @@ namespace boost { namespace hana
 
 template<typename TChar, typename TCharTraits, typename ...Args>
 inline auto &
-operator<<(::std::basic_ostream<TChar, TCharTraits> & stream, const boost::hana::tuple<Args...> & container)
+operator<<(::std::basic_ostream<TChar, TCharTraits> & stream, const hana::tuple<Args...> & container)
 {
-  return stream << ::container_io::write_container_helper<boost::hana::tuple<Args...>, ::std::basic_string<TChar,TCharTraits>>(container);
+  return stream << ::container_io::container_io_helper<true, hana::tuple<Args...>, ::std::basic_string<TChar,TCharTraits>>(container);
 }
 
-} } // boost::hana
+template<typename TChar, typename TCharTraits, typename ...Args>
+inline auto &
+operator>>(::std::basic_istream<TChar, TCharTraits> & stream, hana::tuple<Args...> & container)
+{
+  auto c{::container_io::container_io_helper<false, hana::tuple<Args...>, ::std::basic_string<TChar,TCharTraits>>(container)};
+  return stream >> c;
+}
+
+} } // hana
 
 
 /*
