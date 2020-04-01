@@ -16,10 +16,7 @@
 #ifndef CONTAINER_IO_H_INCLUDED
 #define CONTAINER_IO_H_INCLUDED
 
-#include <boost/hana/if.hpp>
-#include <boost/hana/for_each.hpp>
-#include <boost/hana/traits.hpp>
-#include <boost/hana/tuple.hpp>
+#include <boost/hana.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -46,7 +43,6 @@ namespace detail {
 
 // Trimming implemented from here: https://stackoverflow.com/a/217605/1171157 in a simplified way
   
-// trim from start (in place)
 static inline auto ltrim(std::string s) {
   s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
     return !std::isspace(ch);
@@ -54,7 +50,6 @@ static inline auto ltrim(std::string s) {
   return s;
 }
 
-// trim from end (in place)
 static inline auto rtrim(std::string s) {
   s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
     return !std::isspace(ch);
@@ -62,79 +57,20 @@ static inline auto rtrim(std::string s) {
   return s;
 }
 
-// trim from both ends (in place)
 static inline auto trim(std::string s) {
   return ltrim(rtrim((s)));
 }
 
 
-// SFINAE type trait to detect whether T::const_iterator exists.
+auto       has_iterator = hana::is_valid([](auto t) -> hana::type<typename decltype(t)::type::      iterator> { });
+auto has_const_iterator = hana::is_valid([](auto t) -> hana::type<typename decltype(t)::type::const_iterator> { });
 
-struct sfinae_base
-{
-  using yes = char;
-  using no  = yes[2];
-};
+auto has_begin = hana::is_valid( [](auto t) -> decltype( (void)hana::traits::declval(t).begin() ) { });
+auto has_end = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).end() ) { });
 
-template <typename T>
-struct has_const_iterator : private sfinae_base
-{
-private:
-  template <typename C> static yes & test(typename C::const_iterator*);
-  template <typename C> static no  & test(...);
-public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-  using type =  T;
-};
+auto has_cbegin = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).cbegin() ) { });
+auto has_cend = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).cend() ) { });
 
-template <typename T>
-struct has_iterator : private sfinae_base
-{
-private:
-  template <typename C> static yes & test(typename C::iterator*);
-  template <typename C> static no  & test(...);
-public:
-  static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
-  using type =  T;
-};
-
-template <typename T>
-struct has_begin_end : private sfinae_base
-{
-private:
-  template <typename C>
-  static yes & f(typename std::enable_if<std::is_same<decltype(static_cast<typename C::iterator(C::*)()>(&C::begin)),typename C::iterator(C::*)()>::value>::type *);
-
-  template <typename C> static no & f(...);
-
-  template <typename C>
-  static yes & g(typename std::enable_if<std::is_same<decltype(static_cast<typename C::iterator(C::*)()>(&C::end)),typename C::iterator(C::*)()>::value>::type *);
-
-  template <typename C> static no & g(...);
-
-public:
-  static bool const beg_value = sizeof(f<T>(nullptr)) == sizeof(yes);
-  static bool const end_value = sizeof(g<T>(nullptr)) == sizeof(yes);
-};
-
-template <typename T>
-struct has_cbegin_cend : private sfinae_base
-{
-private:
-  template <typename C>
-  static yes & f(typename std::enable_if<std::is_same<decltype(static_cast<typename C::const_iterator(C::*)() const>(&C::cbegin)),typename C::const_iterator(C::*)() const>::value>::type *);
-
-  template <typename C> static no & f(...);
-
-  template <typename C>
-  static yes & g(typename std::enable_if<std::is_same<decltype(static_cast<typename C::const_iterator(C::*)() const>(&C::cend)),typename C::const_iterator(C::*)() const>::value>::type *);
-
-  template <typename C> static no & g(...);
-
-public:
-  static bool const beg_value = sizeof(f<T>(nullptr)) == sizeof(yes);
-  static bool const end_value = sizeof(g<T>(nullptr)) == sizeof(yes);
-};
 
 }  // namespace detail
 
@@ -277,7 +213,7 @@ struct container_io_helper<IS_OUT, T, String, TDelimiters>::io<std::tuple<Args..
   static void tuple_io(container_type_here & c, stream_type & stream)
   {
     if constexpr (N!=sizeof...(Args)) {
-      if constexpr (N) {handleDelimiter(stream,delimiters_type::values.delimiter);}
+      if constexpr (N!=0) {handleDelimiter(stream,delimiters_type::values.delimiter);}
       atomic(stream,std::get<N>(c));
       tuple_io<N+1>(c, stream);
     }
@@ -338,8 +274,8 @@ operator>>(std::basic_istream<typename String::value_type,typename String::trait
 
 template <typename T>
 struct is_container : public std::integral_constant<bool,
-                                                    (detail::has_const_iterator<T>::value && detail::has_cbegin_cend<T>::beg_value && detail::has_cbegin_cend<T>::end_value) ||
-                                                    (detail::has_iterator<T>::value && detail::has_begin_end<T>::beg_value && detail::has_begin_end<T>::end_value)
+                                                    (detail::has_const_iterator(hana::type_c<T>) && detail::has_cbegin(hana::type_c<T>) && detail::has_cend(hana::type_c<T>)) ||
+                                                    (detail::has_iterator(hana::type_c<T>) && detail::has_begin(hana::type_c<T>) && detail::has_end(hana::type_c<T>))
                                                     > { };
 
 template <typename T, std::size_t N>
