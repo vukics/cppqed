@@ -9,8 +9,6 @@
 
 #include "Pars.h"
 
-#include <boost/make_shared.hpp>
-
 
 namespace mode {
 
@@ -34,7 +32,7 @@ template<typename AveragingType, typename BASE, typename... AveragingConstructor
 const Ptr make(const ParsHomodyned<BASE>& p, AveragingConstructorParameters&&... a)
 {
   if (!isNonZero(p.homodyneAmplitude)) return make<AveragingType>(static_cast<const BASE&>(p),QMP_SCH,a...);
-  else return boost::make_shared<HomodynedMode<AveragingType> >(p,a...);
+  else return std::make_shared<HomodynedMode<AveragingType> >(p,a...);
 }
 
 

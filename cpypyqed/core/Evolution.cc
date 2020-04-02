@@ -76,10 +76,10 @@ object py_evolve(const numeric::array &array,
     throw_error_already_set();
   }
 
-  if (boost::shared_ptr<const SV> s = boost::dynamic_pointer_cast<const SV>(result)) {
+  if (std::shared_ptr<const SV> s = std::dynamic_pointer_cast<const SV>(result)) {
     return py_SV(*s);
   }
-  else if(boost::shared_ptr<const DO> d = boost::dynamic_pointer_cast<const DO>(result)) {
+  else if(std::shared_ptr<const DO> d = std::dynamic_pointer_cast<const DO>(result)) {
     return py_DO(*d);
   }
   else {

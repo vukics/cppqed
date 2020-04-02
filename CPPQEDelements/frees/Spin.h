@@ -22,7 +22,7 @@ namespace spin {
 using namespace structure::freesystem;
 
 
-typedef boost::shared_ptr<const SpinBase> Ptr;
+typedef std::shared_ptr<const SpinBase> Ptr;
 
 
 const Tridiagonal splus(Ptr);

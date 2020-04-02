@@ -10,8 +10,6 @@
 
 #include "Trajectory.tcc"
 
-#include <boost/make_shared.hpp>
-
 
 template<typename V, int RANK>
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
@@ -22,7 +20,7 @@ evolve(quantumdata::DensityOperator<RANK>& rho,
   Master<RANK,V> traj(rho,sys,pe,pe.negativity);
   trajectory::run(traj,pe);
 
-  return boost::make_shared<quantumdata::DensityOperator<RANK> >(rho); // deep copy
+  return std::make_shared<quantumdata::DensityOperator<RANK> >(rho); // deep copy
 
 }
 
@@ -38,7 +36,7 @@ evolve(quantumdata::StateVector<RANK>& psi,
 
   if      (pe.evol==evolution::SINGLE) {
     trajectory::run(*makeMCWF(psi,sys,pe),pe);
-    return boost::make_shared<SV>(psi); // deep copy
+    return std::make_shared<SV>(psi); // deep copy
   }
   else if (pe.evol==evolution::ENSEMBLE) {
     EnsembleMCWF<RANK,V> traj(psi,sys,pe,pe.negativity);
@@ -54,10 +52,10 @@ evolve(quantumdata::StateVector<RANK>& psi,
 
 
 template<int RANK, typename SYS>
-const boost::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const evolution::Pars<>& pe)
+const std::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const evolution::Pars<>& pe)
 {
-  if (pe.timeAverage) return boost::make_shared<TimeAveragingMCWF_Trajectory<RANK> >(psi,sys,pe,pe.relaxationTime);
-  else                return boost::make_shared<             MCWF_Trajectory<RANK> >(psi,sys,pe                  );
+  if (pe.timeAverage) return std::make_shared<TimeAveragingMCWF_Trajectory<RANK> >(psi,sys,pe,pe.relaxationTime);
+  else                return std::make_shared<             MCWF_Trajectory<RANK> >(psi,sys,pe                  );
 }
 
 

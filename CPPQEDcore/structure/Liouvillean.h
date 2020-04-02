@@ -45,7 +45,7 @@ class Liouvillean : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRank
 public:
   static const int N_RANK=RANK;
 
-  typedef boost::shared_ptr<const Liouvillean> Ptr;
+  typedef std::shared_ptr<const Liouvillean> Ptr;
   
 private:
   typedef quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> > Base;

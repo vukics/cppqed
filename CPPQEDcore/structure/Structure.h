@@ -42,35 +42,35 @@ namespace structure {
 typedef blitz::TinyVector<bool,3> SystemCharacteristics;
 
 
-using boost::dynamic_pointer_cast;
+using std::dynamic_pointer_cast;
 
 
 /// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Exact \related QuantumSystem
 template<int RANK>
 inline 
 const typename Exact<RANK>::Ptr 
-qse(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
+qse(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Exact<RANK> >(quantumSystem);}
 
 /// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Hamiltonian \related QuantumSystem
 template<int RANK>
 inline 
 const typename Hamiltonian<RANK>::Ptr 
-qsh(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
+qsh(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Hamiltonian<RANK> >(quantumSystem);}
 
 /// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Liouvillean \related QuantumSystem
 template<int RANK>
 inline 
 const typename Liouvillean<RANK>::Ptr 
-qsl(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
+qsl(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Liouvillean<RANK> >(quantumSystem);}
 
 /// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Averaged \related QuantumSystem
 template<int RANK>
 inline 
 const typename Averaged<RANK>::Ptr 
-qsa(boost::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
+qsa(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
 {return dynamic_pointer_cast<const Averaged<RANK> >(quantumSystem);}
 
 
@@ -109,7 +109,7 @@ qsa(DynamicsBase::Ptr base)
 
 /// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::display in succession; otherwise a no-op. \related QuantumSystemWrapper
 template<int RANK>
-std::ostream& display(boost::shared_ptr<const Averaged<RANK> >, double, const quantumdata::LazyDensityOperator<RANK>&, std::ostream&, int);
+std::ostream& display(std::shared_ptr<const Averaged<RANK> >, double, const quantumdata::LazyDensityOperator<RANK>&, std::ostream&, int);
 
 
 /// If the first argument is a valid pointer, it calles LiouvilleanAveragedCommon Averaged::average; otherwise a no-op (returning an empty array) \related QuantumSystemWrapper
@@ -272,7 +272,7 @@ private:
 
 
 template<int RANK>
-std::ostream& display(boost::shared_ptr<const Averaged<RANK> > av,
+std::ostream& display(std::shared_ptr<const Averaged<RANK> > av,
                       double t,
                       const quantumdata::LazyDensityOperator<RANK>& matrix,
                       std::ostream& os,

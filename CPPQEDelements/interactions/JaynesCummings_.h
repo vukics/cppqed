@@ -16,12 +16,10 @@
 
 #include "ParsFwd.h"
 
-#include <boost/make_shared.hpp>
-
 
 namespace jaynescummings {
 
-typedef boost::shared_ptr<const Base<false> > Ptr;
+typedef std::shared_ptr<const Base<false> > Ptr;
 
 struct Pars
 {
@@ -44,7 +42,7 @@ protected:
   typedef structure::Interaction<2> IA_Base;
 
   template<typename QBIT_SPIN_BASE>
-  Base(boost::shared_ptr<const QBIT_SPIN_BASE> qbitspin, mode::Ptr mode, const dcomp& g=0)
+  Base(std::shared_ptr<const QBIT_SPIN_BASE> qbitspin, mode::Ptr mode, const dcomp& g=0)
   : IA_Base(Frees(qbitspin,mode),CF{"g",g,sqrt(qbitspin->getDimension()*mode->getDimension())})
   {
     getParsStream()<<"Jaynes-Cummings interaction\n";
@@ -60,7 +58,7 @@ protected:
   typedef quantumoperator::TridiagonalHamiltonian<2,true> TDH_Base;
 
   template<typename QBIT_SPIN_BASE>
-  Base(boost::shared_ptr<const QBIT_SPIN_BASE> qbitspin, mode::Ptr mode, const dcomp& g)
+  Base(std::shared_ptr<const QBIT_SPIN_BASE> qbitspin, mode::Ptr mode, const dcomp& g)
   : Base<false>(qbitspin,mode,g),
     TDH_Base(tridiagMinusHC(conj(g)*jaynescummings::sigmaop(qbitspin)*mode::aop(mode).dagger()))
   {}
@@ -87,8 +85,8 @@ namespace jaynescummings {
 template<typename A, typename F1, typename F2, typename... AveragingConstructorParameters>
 const Ptr make(const F1& f1, const F2& f2, const dcomp& g, AveragingConstructorParameters&&... a)
 {
-  if (isNonZero(g)) return boost::make_shared<JaynesCummings<true ,A> >(f1,f2,g ,a...);
-  else              return boost::make_shared<JaynesCummings<false,A> >(f1,f2,0.,a...);
+  if (isNonZero(g)) return std::make_shared<JaynesCummings<true ,A> >(f1,f2,g ,a...);
+  else              return std::make_shared<JaynesCummings<false,A> >(f1,f2,0.,a...);
 }
 
 

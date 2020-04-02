@@ -58,7 +58,7 @@ struct Pars : public trajectory::ParsRun, public Base {
  * \tparam SYS the object representing the quantum system to be simulated (similar idea as in quantumtrajectory::Master::Master)
  */
 template<int RANK, typename SYS>
-const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const Pars<>&);
+const std::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const Pars<>&);
 
 } // evolution
 

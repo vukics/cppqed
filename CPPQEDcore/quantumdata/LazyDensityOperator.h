@@ -10,10 +10,9 @@
 #include "BlitzArray.h"
 #include "ComplexExtensions.h"
 
-#include <boost/shared_ptr.hpp>
-
 #include <boost/mpl/if.hpp>
 
+#include <memory>
 
 namespace mpl=boost::mpl;
 
@@ -61,7 +60,7 @@ class LazyDensityOperator
   : public DimensionsBookkeeper<RANK,true>
 {
 public:
-  typedef boost::shared_ptr<const LazyDensityOperator> Ptr; ///< Many class templates in the framework define shared pointers to their own types, in a template-metafunction like manner
+  typedef std::shared_ptr<const LazyDensityOperator> Ptr; ///< Many class templates in the framework define shared pointers to their own types, in a template-metafunction like manner
   
   typedef DimensionsBookkeeper<RANK,true> Base;
 

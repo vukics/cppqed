@@ -43,7 +43,7 @@ void export_QuantumSystem_BinarySystem()
         ), "Instantiation of :core:`BinarySystem` with template parameters " BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(0,b)) "," BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(1,b)) "," BOOST_PP_STRINGIZE(BOOST_PP_SEQ_ELEM(2,b)),no_init);
 BOOST_PP_SEQ_FOR_EACH_PRODUCT(BINARYSYSTEM_INSTANTIATIONS, (BOOLS)(BOOLS)(BOOLS))
 
-  register_ptr_to_python<boost::shared_ptr<binary::Base const> >();
+  register_ptr_to_python<std::shared_ptr<binary::Base const> >();
 }
 
 } //pythonext

@@ -19,10 +19,8 @@
 
 #include <flens/flens.h>
 
-#include <boost/shared_ptr.hpp>
 
-
-typedef boost::shared_ptr<DrivenDampedHarmonicOscillator> DDHO_Ptr;
+typedef std::shared_ptr<DrivenDampedHarmonicOscillator> DDHO_Ptr;
 
 const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
 

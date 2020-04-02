@@ -6,10 +6,9 @@
 #include "ElementLiouvillean.tcc"
 
 #include <boost/bind.hpp>
-#include <boost/make_shared.hpp>
 
 
-using namespace mathutils; using boost::make_shared;
+using namespace mathutils; using std::make_shared;
 
 
 namespace qbit {
@@ -222,30 +221,30 @@ Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
   switch (qmp) {
   case QMP_IP  :
     if (p.gamma==0 && std::abs(p.eta)==0)
-      return boost::make_shared<Qbit            >(p);
+      return std::make_shared<Qbit            >(p);
     if (p.gamma==0)
-      return boost::make_shared<PumpedQbit      >(p);
+      return std::make_shared<PumpedQbit      >(p);
     if (std::abs(p.eta)==0)
-      return boost::make_shared<LossyQbit       >(p);
-    return boost::make_shared<PumpedLossyQbit   >(p);
+      return std::make_shared<LossyQbit       >(p);
+    return std::make_shared<PumpedLossyQbit   >(p);
   case QMP_UIP :
     if (p.gamma==0 && std::abs(p.eta)==0)
-      return boost::make_shared<QbitUIP         >(p);
+      return std::make_shared<QbitUIP         >(p);
     if (p.gamma==0)
-      return boost::make_shared<PumpedQbitUIP   >(p);
+      return std::make_shared<PumpedQbitUIP   >(p);
     if (std::abs(p.eta)==0)
-      return boost::make_shared<LossyQbitUIP    >(p);
-    return boost::make_shared<PumpedLossyQbitUIP>(p);
+      return std::make_shared<LossyQbitUIP    >(p);
+    return std::make_shared<PumpedLossyQbitUIP>(p);
   case QMP_SCH :
     ;
   }
   if (p.gamma==0 && std::abs(p.eta)==0)
-    return boost::make_shared<QbitSch         >(p);
+    return std::make_shared<QbitSch         >(p);
   if (p.gamma==0)
-    return boost::make_shared<PumpedQbitSch   >(p);
+    return std::make_shared<PumpedQbitSch   >(p);
   if (std::abs(p.eta)==0)
-    return boost::make_shared<LossyQbitSch    >(p);
-  return boost::make_shared<PumpedLossyQbitSch>(p);
+    return std::make_shared<LossyQbitSch    >(p);
+  return std::make_shared<PumpedLossyQbitSch>(p);
 }
 
 
@@ -254,15 +253,15 @@ Ptr make(const ParsPumpedLossyPhaseNoise& p, QM_Picture qmp)
   if (p.gamma_parallel) {
     if (qmp==QMP_UIP) {
       if (std::abs(p.eta))
-        return boost::make_shared<PumpedLossyQbitWithPhaseNoiseUIP>(p);
+        return std::make_shared<PumpedLossyQbitWithPhaseNoiseUIP>(p);
       else
-        return boost::make_shared<      LossyQbitWithPhaseNoiseUIP>(p);
+        return std::make_shared<      LossyQbitWithPhaseNoiseUIP>(p);
     }
     else {
       if (std::abs(p.eta))
-        return boost::make_shared<PumpedLossyQbitWithPhaseNoise>(p);
+        return std::make_shared<PumpedLossyQbitWithPhaseNoise>(p);
       else
-        return boost::make_shared<      LossyQbitWithPhaseNoise>(p);
+        return std::make_shared<      LossyQbitWithPhaseNoise>(p);
     }
   }
   return make(static_cast<const ParsPumpedLossy&>(p),qmp);

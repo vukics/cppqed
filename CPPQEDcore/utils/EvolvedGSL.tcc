@@ -9,8 +9,6 @@
 
 #include "Evolved.tcc"
 
-#include <boost/make_shared.hpp>
-
 
 namespace evolved {
 
@@ -105,7 +103,7 @@ auto MakerGSL<A>::make(
                        const A& scaleAbs
                       ) const -> const Ptr
 {
-  return boost::make_shared<_,A&>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorrectionFactor_);
+  return std::make_shared<_,A&>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorrectionFactor_);
 }
 
 

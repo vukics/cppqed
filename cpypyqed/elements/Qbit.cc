@@ -23,7 +23,7 @@ void export_Qbit()
     def("make", static_cast< qbit::Ptr(*)(const qbit::ParsPumpedLossyPhaseNoise&, QM_Picture)>(qbit::make), with_custodian_and_ward_postcall<0,1>());
     qbitNameSpace.staticmethod("make");
     register_ptr_to_python< qbit::Ptr >();
-    implicitly_convertible<boost::shared_ptr<QbitBase>,qbit::Ptr>();
+    implicitly_convertible<std::shared_ptr<QbitBase>,qbit::Ptr>();
 
     def("state0", qbit::state0); qbitNameSpace.staticmethod("state0");
     def("state1", qbit::state1); qbitNameSpace.staticmethod("state1");

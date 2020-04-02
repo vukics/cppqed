@@ -18,7 +18,7 @@
 namespace trajectory { namespace averaging {
 
 template<int RANK>
-struct HandleType<quantumdata::StateVector<RANK> > : mpl::identity<boost::shared_ptr<quantumdata::StateVector<RANK> > > {};
+struct HandleType<quantumdata::StateVector<RANK> > : mpl::identity<std::shared_ptr<quantumdata::StateVector<RANK> > > {};
 
 } } // trajectory::averaging
 

@@ -462,7 +462,7 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, int SS_RANK>
-  void help(boost::shared_ptr<const structure::LiouvilleanAveragedCommonRanked<SS_RANK> > av) const
+  void help(std::shared_ptr<const structure::LiouvilleanAveragedCommonRanked<SS_RANK> > av) const
   {
     iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,boost::bind(structure::average<SS_RANK>,av,t_,::_1)));
   }
@@ -741,7 +741,7 @@ private:
 } // composite
 
 
-#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
+#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics(EX,HA,LI))) return std::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
 
 template<typename VA>
 const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
@@ -765,7 +765,7 @@ const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
   else if DISPATCHER(false,true ,true ) ;
   else if DISPATCHER(false,true ,false) ;
   else if DISPATCHER(false,false,true ) ;
-  else return boost::make_shared<Composite<VA,false,false,false> >(frees,acts);
+  else return std::make_shared<Composite<VA,false,false,false> >(frees,acts);
 }
 
 

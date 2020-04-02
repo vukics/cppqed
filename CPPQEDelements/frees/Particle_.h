@@ -17,8 +17,6 @@
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
 
-#include <boost/shared_ptr.hpp>
-
 #include <tuple>
 
 namespace particle {
@@ -26,9 +24,9 @@ namespace particle {
 using namespace structure::freesystem; using structure::NoTime;
 
 
-typedef boost::shared_ptr<const ParticleBase> Ptr;
+typedef std::shared_ptr<const ParticleBase> Ptr;
 
-typedef boost::shared_ptr<const PumpedParticleBase> PtrPumped;
+typedef std::shared_ptr<const PumpedParticleBase> PtrPumped;
 
 struct NotATridiagonal : public cpputils::Exception {};
 

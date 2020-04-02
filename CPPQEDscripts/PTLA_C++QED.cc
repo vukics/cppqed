@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  structure::Free::Ptr atom(fullImpl ? boost::static_pointer_cast<const structure::Free>(make(pp2la,qmp)) : 
-                                       boost::static_pointer_cast<const structure::Free>(boost::make_shared<const PumpedTwoLevelAtomSch>(pp2la)));
+  structure::Free::Ptr atom(fullImpl ? std::static_pointer_cast<const structure::Free>(make(pp2la,qmp)) : 
+                                       std::static_pointer_cast<const structure::Free>(std::make_shared<const PumpedTwoLevelAtomSch>(pp2la)));
   
   StateVector psi(init(pp2la));
 

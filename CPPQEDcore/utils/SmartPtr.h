@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_SMARTPTR_H_INCLUDED
 #define   CPPQEDCORE_UTILS_SMARTPTR_H_INCLUDED
 
-#include <boost/shared_ptr.hpp>
-
 
 namespace cpputils {
 
@@ -28,35 +26,35 @@ inline void nullDelete (T*) {}
  * 
  */
 template<typename T>
-const boost::shared_ptr<T>
+const std::shared_ptr<T>
 nonOwningSharedPtr(T* t ///< the object to be wrapped into the shared-pointer interface
                   )
 {
-  return boost::shared_ptr<T>(t,details::nullDelete<T>);
+  return std::shared_ptr<T>(t,details::nullDelete<T>);
 }
 
 
 /// Returns a “non-owning” shared pointer to const that doesn’t do anything on deletion \copydetails nonOwningSharedPtr
 template<typename T>
-const boost::shared_ptr<const T>
+const std::shared_ptr<const T>
 nonOwningConstSharedPtr(T* t ///< the object to be wrapped into the shared-pointer-to-const interface
                        )
 {
-  return boost::shared_ptr<const T>(t,details::nullDelete<T>);
+  return std::shared_ptr<const T>(t,details::nullDelete<T>);
 }
 
 
 /// Part of a bundle of functions providing a unified interface to wrap objects into the shared-pointer interface, it simply returns its argument. \todo How to shared-pointerize an rvalue reference?
 template<typename T>
-const boost::shared_ptr<T> sharedPointerize(boost::shared_ptr<T> t) {return                     t ;}
+const std::shared_ptr<T> sharedPointerize(std::shared_ptr<T> t) {return                     t ;}
 
 /// Part of a bundle of functions providing a unified interface to wrap objects into the shared-pointer interface, it returns a \link nonOwningSharedPtr non-owning shared pointer\endlink to its argument.
 template<typename T>
-const boost::shared_ptr<T> sharedPointerize(                  T& t) {return nonOwningSharedPtr(&t);}
+const std::shared_ptr<T> sharedPointerize(                  T& t) {return nonOwningSharedPtr(&t);}
 
 /// Part of a bundle of functions providing a unified interface to wrap objects into the shared-pointer interface, it returns a \link nonOwningSharedPtr non-owning shared pointer\endlink to its argument.
 template<typename T>
-const boost::shared_ptr<T> sharedPointerize(                  T* t) {return nonOwningSharedPtr( t);}
+const std::shared_ptr<T> sharedPointerize(                  T* t) {return nonOwningSharedPtr( t);}
 
 
 } // cpputils

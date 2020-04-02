@@ -14,7 +14,7 @@
 /// Auxiliary tools for BinarySystem
 namespace binary {
 
-typedef boost::shared_ptr<const Base> Ptr; ///< Convenience typedef
+typedef std::shared_ptr<const Base> Ptr; ///< Convenience typedef
 
 typedef structure::Interaction<2> Interaction; ///< Binary interaction
 

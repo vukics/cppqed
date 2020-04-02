@@ -8,13 +8,11 @@
 
 #include "Interaction.h"
 
-#include <boost/make_shared.hpp>
-
 
 namespace coupledmodes {
 
 
-typedef boost::shared_ptr<const Base<false> > Ptr;
+typedef std::shared_ptr<const Base<false> > Ptr;
 
 template<>
 class Base<false> : public structure::Interaction<2>
@@ -54,8 +52,8 @@ namespace coupledmodes {
 template<Coupling C, typename A, typename F1, typename F2>
 const Ptr make(const F1& f1, const F2& f2, dcomp u, const A& =A())
 {
-  if (abs(u)) return boost::make_shared<CoupledModes<true ,C    ,A> >(f1,f2,u);
-  else        return boost::make_shared<CoupledModes<false,CM_NX,A> >(f1,f2,0);
+  if (abs(u)) return std::make_shared<CoupledModes<true ,C    ,A> >(f1,f2,u);
+  else        return std::make_shared<CoupledModes<false,CM_NX,A> >(f1,f2,0);
 }
 
 

@@ -8,8 +8,6 @@
 #include "TimeDependence.h"
 #include "Types.h"
 
-#include <boost/shared_ptr.hpp>
-
 namespace structure {
 
 
@@ -17,7 +15,7 @@ namespace structure {
 class ExactCommon
 {
 public:
-  typedef boost::shared_ptr<const ExactCommon> Ptr;
+  typedef std::shared_ptr<const ExactCommon> Ptr;
 
   virtual ~ExactCommon() {}
 
@@ -56,7 +54,7 @@ template<int RANK>
 class Exact : public ExactCommon, private quantumdata::Types<RANK> 
 {
 public:
-  typedef boost::shared_ptr<const Exact> Ptr;
+  typedef std::shared_ptr<const Exact> Ptr;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 

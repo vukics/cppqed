@@ -42,8 +42,8 @@ void export_Particle()
     particleNameSpace.staticmethod("makePumped");
     register_ptr_to_python< particle::Ptr >();
     register_ptr_to_python< particle::PtrPumped >();
-    implicitly_convertible<boost::shared_ptr<ParticleBase>,particle::Ptr>();
-    implicitly_convertible<boost::shared_ptr<PumpedParticleBase>,particle::PtrPumped>();
+    implicitly_convertible<std::shared_ptr<ParticleBase>,particle::Ptr>();
+    implicitly_convertible<std::shared_ptr<PumpedParticleBase>,particle::PtrPumped>();
 
     def("wavePacket", wp1, wp_overloads());
     def("wavePacket", wp2, wp_overloads());

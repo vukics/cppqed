@@ -19,7 +19,6 @@
 
 #include <boost/fusion/mpl/size.hpp>
 
-#include <boost/shared_ptr.hpp>
 
 
 /// Contains helpers for the \ref multilevelbundle "MultiLevel bundle"
@@ -269,7 +268,7 @@ class MultiLevelBase
   : public structure::Free
 {
 public:
-  typedef boost::shared_ptr<const MultiLevelBase> Ptr;
+  typedef std::shared_ptr<const MultiLevelBase> Ptr;
 
   using structure::Free::getParsStream;
 
@@ -329,8 +328,8 @@ makePumpedLossySch(const RealPerLevel<NL>& deltas,
                    const VP& etas, const VL& gammas, double gamma_parallel,
                    AveragingConstructorParameters&&... a)
 {
-  if (gamma_parallel) return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
-  else                return boost::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
+  if (gamma_parallel) return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
+  else                return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
 }
 
 /// \overload

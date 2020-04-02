@@ -19,7 +19,6 @@
 #include "QuantumSystem.h"
 #include "Types.h"
 
-#include <boost/shared_ptr.hpp>
 
 namespace structure {
 
@@ -45,7 +44,7 @@ typedef quantumdata::DensityOperator<1> DensityOperator; ///< unary DensityOpera
 class Free : public QuantumSystem<1>, public DynamicsBase
 {
 public:
-  typedef boost::shared_ptr<const Free> Ptr;
+  typedef std::shared_ptr<const Free> Ptr;
 
   /// A single dimension to initialise QuantumSystem`<1>` and the lists of real and complex name-frequency-multiplier tuples for DynamicsBase
   explicit Free(size_t dim, const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF) : QuantumSystem<1>(dim), DynamicsBase(realFreqs,complexFreqs) {}

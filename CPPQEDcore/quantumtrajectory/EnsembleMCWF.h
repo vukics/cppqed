@@ -149,7 +149,7 @@ namespace trajectory { namespace averaging {
 
 
 template<int RANK>
-struct HandleType<quantumdata::DensityOperator<RANK> > : mpl::identity<boost::shared_ptr<quantumdata::DensityOperator<RANK> > > {};
+struct HandleType<quantumdata::DensityOperator<RANK> > : mpl::identity<std::shared_ptr<quantumdata::DensityOperator<RANK> > > {};
 
 
 template<int RANK>
@@ -159,7 +159,7 @@ struct AverageTrajectoriesInRange<quantumdata::DensityOperator<RANK>,quantumdata
   _(typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator begin,
     typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator end  )
   {
-    auto res(boost::make_shared<quantumdata::DensityOperator<RANK> >(*begin->averaged()));
+    auto res(std::make_shared<quantumdata::DensityOperator<RANK> >(*begin->averaged()));
       
     for (auto i=begin+1; i<end; i++) i->averaged()->addTo(*res);
 

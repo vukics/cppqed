@@ -7,10 +7,10 @@
 
 #include "ComplexExtensions.h"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 #include <list>
+#include <memory>
 #include <tuple>
 
 
@@ -46,7 +46,7 @@ namespace structure {
 class DynamicsBase : private boost::noncopyable
 {
 public:
-  typedef boost::shared_ptr<const DynamicsBase> Ptr;
+  typedef std::shared_ptr<const DynamicsBase> Ptr;
 
   typedef std::tuple<std::string,double,double> RF; ///< name-value-multiplier tuple for a real frequency-like parameter
   typedef std::tuple<std::string,dcomp ,double> CF; ///< same for complex

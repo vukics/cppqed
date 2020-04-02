@@ -4,8 +4,6 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_odeiv.h>
 
-#include <boost/make_shared.hpp>
-
 
 namespace evolved {
 
@@ -72,7 +70,7 @@ Impl::~Impl()
 ImplPtr createImpl(void* self, size_t size, int (*derivs)(double, const double*, double*, void*),
                    double epsRel, double epsAbs, const double* scaleAbs, SteppingFunction sf)
 {
-  return boost::make_shared<Impl>(self,size,derivs,epsRel,epsAbs,scaleAbs,sf);
+  return std::make_shared<Impl>(self,size,derivs,epsRel,epsAbs,scaleAbs,sf);
 }
 
 

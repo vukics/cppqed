@@ -61,7 +61,7 @@ namespace qbit {
 
 using namespace structure::freesystem;
 
-typedef boost::shared_ptr<const QbitBase> Ptr;
+typedef std::shared_ptr<const QbitBase> Ptr;
 
 inline const Tridiagonal sigmaop(Ptr qbit) {return mode::aop(qbit);}
 

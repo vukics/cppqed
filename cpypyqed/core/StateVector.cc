@@ -45,10 +45,10 @@ void export_22_StateVector()
 #define BOOST_PP_LOCAL_MACRO(n) \
   to_python_converter<StateVector<n>, SV_to_python<n>>(); \
   to_python_converter<DensityOperator<n>, DO_to_python<n>>(); \
-  register_ptr_to_python<boost::shared_ptr<const StateVector<n>>>(); \
-  implicitly_convertible<boost::shared_ptr<StateVector<n>>, boost::shared_ptr<const StateVector<n>>>(); \
-  register_ptr_to_python<boost::shared_ptr<const DensityOperator<n>>>(); \
-  implicitly_convertible<boost::shared_ptr<DensityOperator<n>>, boost::shared_ptr<const DensityOperator<n>>>();
+  register_ptr_to_python<std::shared_ptr<const StateVector<n>>>(); \
+  implicitly_convertible<std::shared_ptr<StateVector<n>>, std::shared_ptr<const StateVector<n>>>(); \
+  register_ptr_to_python<std::shared_ptr<const DensityOperator<n>>>(); \
+  implicitly_convertible<std::shared_ptr<DensityOperator<n>>, std::shared_ptr<const DensityOperator<n>>>();
 #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_HALF_RANK)
 #include BOOST_PP_LOCAL_ITERATE()
 

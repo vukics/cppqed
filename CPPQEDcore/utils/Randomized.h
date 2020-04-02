@@ -14,7 +14,6 @@
 #include <boost/range/algorithm/generate.hpp>
 
 #include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 #ifndef DO_NOT_USE_BOOST_SERIALIZATION
@@ -42,7 +41,7 @@ public:
 class Randomized : private boost::noncopyable
 {
 public:
-  typedef boost::shared_ptr<Randomized> Ptr;
+  typedef std::shared_ptr<Randomized> Ptr;
 
   virtual ~Randomized() {}
 

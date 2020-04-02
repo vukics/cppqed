@@ -6,7 +6,6 @@
 
 #include <boost/python.hpp>
 #include <boost/type_traits/remove_const.hpp>
-#include <boost/shared_ptr.hpp>
 
 #define CPPQED_CORE_GIT "@CPPQED_CORE_GIT@"
 

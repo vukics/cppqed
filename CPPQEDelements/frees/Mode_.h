@@ -16,7 +16,6 @@
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
 
-#include <boost/shared_ptr.hpp>
 
 /// Contains helpers for the \ref genericelementsfreesmode bundle
 namespace mode {
@@ -26,7 +25,7 @@ const std::string keyTitle="Mode";
 
 using namespace structure::freesystem; using structure::NoTime;
 
-typedef boost::shared_ptr<const ModeBase> Ptr;
+typedef std::shared_ptr<const ModeBase> Ptr;
 
 const Tridiagonal aop(size_t dim);
 const Tridiagonal aop(Ptr);

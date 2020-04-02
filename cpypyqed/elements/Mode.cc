@@ -33,7 +33,7 @@ void export_Mode()
     def("make", make4, with_custodian_and_ward_postcall<0, 1>());
     modeNameSpace.staticmethod("make");
     register_ptr_to_python< mode::Ptr >();
-    implicitly_convertible<boost::shared_ptr<ModeBase>, mode::Ptr>();
+    implicitly_convertible<std::shared_ptr<ModeBase>, mode::Ptr>();
 
     def("coherent", mode::coherent); modeNameSpace.staticmethod("coherent");
     def("fock", mode::fock);         modeNameSpace.staticmethod("fock");

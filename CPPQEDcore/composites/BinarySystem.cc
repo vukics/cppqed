@@ -13,8 +13,6 @@
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 
-#include <boost/make_shared.hpp>
-
 
 using composite::SubSystemFree;
 
@@ -313,7 +311,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 }
 
 
-#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<BinarySystem<EX,HA,LI> >(ia)
+#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
 const binary::Ptr binary::doMake(Interaction::Ptr ia)
@@ -325,7 +323,7 @@ const binary::Ptr binary::doMake(Interaction::Ptr ia)
   else if DISPATCHER(false,true ,true ) ;
   else if DISPATCHER(false,true ,false) ;
   else if DISPATCHER(false,false,true ) ;
-  else return boost::make_shared<BinarySystem<false,false,false> >(ia);
+  else return std::make_shared<BinarySystem<false,false,false> >(ia);
 }
 
 

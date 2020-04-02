@@ -37,7 +37,7 @@ template<int RANK>
 class Interaction : public DynamicsBase, public DimensionsBookkeeper<RANK>
 {
 public:
-  typedef boost::shared_ptr<const Interaction> Ptr;
+  typedef std::shared_ptr<const Interaction> Ptr;
 
   /// A tiny vector of shared pointers to the Free objects between which the interaction is defined
   /** \note The order of the Free objects is essential! (Cf. BinarySystem, Composite) */
