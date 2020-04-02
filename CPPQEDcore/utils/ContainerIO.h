@@ -120,10 +120,10 @@ struct container_io_helper
   template<typename ELEM>
   static void atomic(stream_type& s, ELEM& e)
   {
-    hana::if_(is_out,
-              [](auto& s, const auto& i) { s<<i; },
-              [](auto& s,       auto& i) { s>>i; }
-             )(s,e);
+    if constexpr (IS_OUT)
+      s<<e;
+    else
+      s>>e;
   }
   
   template<typename S> // The nested template here is necessary because of the type-erasure mechanism for custom-delimiter specification below
