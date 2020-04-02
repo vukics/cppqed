@@ -127,7 +127,22 @@ struct container_io_helper
   }
   
   template<typename S> // The nested template here is necessary because of the type-erasure mechanism for custom-delimiter specification below
-  static void handleDelimiter(stream_type&, S);
+  static void handleDelimiter(stream_type& stream, S delim)
+  {
+    if constexpr (IS_OUT) {
+      if (!delim.empty()) stream << delim;
+    }
+    else { // There is some liberality with whitespaces
+      auto trimmedDelim{detail::trim(delim)};
+
+      for (; std::isspace(stream.peek()); stream.get()) ; // drop whitespaces from the beginning of the stream as well
+
+      for (auto sc : trimmedDelim) {
+        char_type c=stream.get();
+        if (c != sc) stream.clear(stream_type::badbit);
+      }
+    }
+  }
   
   template <typename U> // The nested template here is necessary because of the type-erasure mechanism for custom-delimiter specification below
   struct io
@@ -147,7 +162,6 @@ struct container_io_helper
           if (++it == the_end) break;
           
           handleDelimiter(stream,delimiters_type::values.delimiter);
-          // if (!delimiters_type::values.delimiter.empty()) stream << delimiters_type::values.delimiter;
         }
       }
     }
@@ -167,22 +181,7 @@ struct container_io_helper
 private:
   container_store_type & container_;
   
-};
-
-
-//   static void eatDelimiter(istream_type & stream, String delim)
-//   // There is some liberality with whitespaces
-//   {
-//     auto trimmedDelim{detail::trim(std::move(delim))};
-//     
-//     for (; std::isspace(stream.peek()); stream.get()) ; // drop whitespaces from the beginning of the stream as well
-//   
-//     for (auto sc : trimmedDelim) {
-//       char_type c{stream.get()};
-//       if (c != sc) stream.clear(istream_type::badbit);
-//     }
-//   }
-  
+};  
 
 
 // Specialization for pairs
