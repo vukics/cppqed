@@ -148,20 +148,15 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
 {
   double random=this->getRandomized()->operator()()/this->getDtDid();
 
-  int lindbladNo=0;
+  int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))
     ;
 
   if(random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
-    struct helper
-    {
-      static bool p(int i, IndexSVL_tuple j) {return i==j.template get<0>();} // NEEDS_WORK how to express this with lambda?
-    };
-
-    auto i=find_if(specialRates,bind(&helper::p,--lindbladNo,_1)); // See whether it's a special jump
+    --lindbladNo; auto i=boost::find_if(specialRates,[lindbladNo](const IndexSVL_tuple& j){return lindbladNo==get<0>(j);});
     if (i!=specialRates.end())
       // special jump
-      psi_=i->template get<1>(); // RHS already normalized above
+      psi_=get<1>(*i); // RHS already normalized above
     else {
       // normal  jump
       getQSW().actWithJ(t,psi_.getArray(),lindbladNo);

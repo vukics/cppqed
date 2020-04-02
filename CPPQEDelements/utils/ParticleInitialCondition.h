@@ -2,7 +2,9 @@
 #ifndef   CPPQEDELEMENTS_UTILS_PARTICLEINITIALCONDITION_H_INCLUDED
 #define   CPPQEDELEMENTS_UTILS_PARTICLEINITIALCONDITION_H_INCLUDED
 
-#include<boost/tuple/tuple_io.hpp>
+#include "ContainerIO.h"
+
+#include <tuple>
 
 
 namespace particle {
@@ -10,14 +12,14 @@ namespace particle {
 class InitialCondition
 {
 public:
-  typedef boost::tuple<double,double,double,bool> Impl;
+  typedef std::tuple<double,double,double,bool> Impl;
 
   InitialCondition(double x0, double k0, double sig, bool isItInK=false) : impl_(x0,k0,sig,isItInK) {}
 
-  double getX0 () const {return impl_.get<0>();}
-  double getK0 () const {return impl_.get<1>();}
-  double getSig() const {return impl_.get<2>();}
-  bool   isInK () const {return impl_.get<3>();}
+  double getX0 () const {return std::get<0>(impl_);}
+  double getK0 () const {return std::get<1>(impl_);}
+  double getSig() const {return std::get<2>(impl_);}
+  bool   isInK () const {return std::get<3>(impl_);}
 
   const Impl& get() const {return impl_;}
   

@@ -4,6 +4,7 @@
 #include "TridiagonalHamiltonian.tcc"
 
 #include "BlitzArraySliceIterator.tcc"
+#include "ContainerIO.h"
 #include "MathExtensions.h"
 
 using namespace std;
@@ -27,8 +28,8 @@ double etaEff(double uNot, double vClass)
 const particlecavity::Tridiagonals dispersive(mode::Ptr mode, particle::Ptr particle, double uNot, const ModeFunction& mf)
 {
   particlecavity::Tridiagonals res;
-  if (uNot && !isComplex(mf.get<0>()))
-    res.push_back(uNot*nop(mode)*(mf.get<0>()==MFT_SIN ? -1 : 1)*cosNKX(particle,mf.get<1>()<<1)/(2.*DCOMP_I));
+  if (uNot && !isComplex(get<0>(mf)))
+    res.push_back(uNot*nop(mode)*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(particle,get<1>(mf)<<1)/(2.*DCOMP_I));
   return res;
 }
 
@@ -103,7 +104,7 @@ ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::Ptr particle,
 ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
   : MF_Base(modeCav,kCav),
     particlecavity::Base(mode,particle,uNot,etaeff),
-    isSpecialH_(kCav==abs(particle->getMF().get<1>())),
+    isSpecialH_(kCav==abs(get<1>(particle->getMF()))),
     tridiagonalH_(fillTTwoModeFN(mode,particle,uNot,etaeff,MF_Base::member,isSpecialH_)),
     firstH_(etaeff*aop(mode)*mfNKX(particle,MF_Base::member)/DCOMP_I), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(particle,particle->getMF()).dagger()), secondHT_(secondH_.dagger())

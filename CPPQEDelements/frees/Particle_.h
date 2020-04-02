@@ -19,6 +19,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <tuple>
+
 namespace particle {
 
 using namespace structure::freesystem; using structure::NoTime;
@@ -66,17 +68,15 @@ PtrPumped makePumped(const ParsPumped&, QM_Picture);
 
 namespace details {
 
-typedef boost::tuple<const Spatial&, double> Storage;
+typedef std::tuple<const Spatial&, double> Storage;
 
 } // details
 
 
-class Exact : public structure::FreeExact<false>, private details::Storage
+class Exact : public structure::FreeExact<false>, public details::Storage
 {
 public:
   Exact(const Spatial&, double omrec);
-
-  using details::Storage::get;
 
 private:
   void updateU(structure::OneTime) const;

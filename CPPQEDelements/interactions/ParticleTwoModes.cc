@@ -38,7 +38,7 @@ ParticleTwoModes::ParticleTwoModes(mode::Ptr mode0, mode::Ptr mode1, particle::P
                               {RF{"Unot0",uNot0,sqrt(mode0->getDimension())},RF{"Unot1",uNot1,sqrt(mode1->getDimension())}}),
                               firstH_(factor(uNot0,uNot1,phi)*aop(mode0)*aop(mode1).dagger()*mfNKX(part,mf0)/DCOMP_I), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(part,mf1).dagger()), secondHT_(secondH_.dagger()),
-    isSpecialH_(abs(mf0.get<1>())==abs(mf1.get<1>())),
+    isSpecialH_(abs(get<1>(mf0))==abs(get<1>(mf1))),
     specialH_(isSpecialH_ ? Tridiagonals{quantumoperator::tridiagPlusHC_overI( factor(uNot0,uNot1,phi)*aop(mode0).dagger()*aop(mode1)*mfComposition(part,mf0,mf1) )}: Tridiagonals{})
 {
   getParsStream()<<"ParticleTwoModes\nphi="<<phi<<endl;
