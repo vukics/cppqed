@@ -49,9 +49,9 @@ set(cpypyqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cpypyqed)
 #! @}
 
 find_package(Boost QUIET COMPONENTS python)
-find_package(PythonInterp 2 QUIET)
-if(${PYTHON_VERSION_STRING} VERSION_LESS 2.6)
-  message(WARNING "Python2 >=2.6 needed, disabling cpypyqed and testsuite.")
+find_package(PythonInterp 3 QUIET)
+if(${PYTHON_VERSION_STRING} VERSION_LESS 3.5)
+  message(WARNING "Python >=3.5 needed, disabling cpypyqed and testsuite.")
   set(PYTHONINTERP_FOUND 0)
 else()
   find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)

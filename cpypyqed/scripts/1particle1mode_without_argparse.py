@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # the argparse module is only available for Python >= 2.7, this is a version with optparse instead
 

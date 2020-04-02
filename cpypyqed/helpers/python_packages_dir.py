@@ -2,4 +2,4 @@
 
 import distutils.sysconfig
 
-print distutils.sysconfig.get_python_lib()
+print(distutils.sysconfig.get_python_lib())
