@@ -73,7 +73,7 @@ typedef std::tuple<const Spatial&, double> Storage;
 } // details
 
 
-class Exact : public structure::FreeExact<false>, private details::Storage
+class Exact : public structure::FreeExact<false>, public details::Storage
 {
 public:
   Exact(const Spatial&, double omrec);

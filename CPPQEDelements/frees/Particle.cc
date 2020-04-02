@@ -83,7 +83,7 @@ const particle::Tridiagonal cosNKX(size_t dim, ptrdiff_t nK)
 
 const particle::Tridiagonal hOverI(size_t dim, double vClass, const ModeFunction& mf)
 {
-  return (vClass && !isComplex(mf.get<0>())) ? vClass*(mf.get<0>()==MFT_SIN ? -1 : 1)*cosNKX(dim,mf.get<1>()<<1)/(2.*DCOMP_I) : particle::Tridiagonal();
+  return (vClass && !isComplex(get<0>(mf))) ? vClass*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(dim,get<1>(mf)<<1)/(2.*DCOMP_I) : particle::Tridiagonal();
 }
 
 
@@ -278,8 +278,8 @@ auto particle::expINKX(particle::Ptr particle, ptrdiff_t nK) -> const Tridiagona
 
 auto particle::mfNKX(particle::Ptr particle, const ModeFunction& modeFunction) -> const Tridiagonal
 {
-  ModeFunctionType mf(modeFunction.get<0>());
-  ptrdiff_t        nK(modeFunction.get<1>());
+  ModeFunctionType mf(get<0>(modeFunction));
+  ptrdiff_t        nK(get<1>(modeFunction));
   switch (mf) {
   case MFT_SIN  : return sinNKX (particle,nK);
   case MFT_COS  : return cosNKX (particle,nK);
@@ -291,10 +291,10 @@ auto particle::mfNKX(particle::Ptr particle, const ModeFunction& modeFunction) -
 
 auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFunction1, const ModeFunction& modeFunction2) -> const Tridiagonal
 {
-  ModeFunctionType mf1(modeFunction1.get<0>());
-  ModeFunctionType mf2(modeFunction2.get<0>());
-  ptrdiff_t        nK1(modeFunction1.get<1>());
-  ptrdiff_t        nK2(modeFunction2.get<1>());
+  ModeFunctionType mf1(get<0>(modeFunction1));
+  ModeFunctionType mf2(get<0>(modeFunction2));
+  ptrdiff_t        nK1(get<1>(modeFunction1));
+  ptrdiff_t        nK2(get<1>(modeFunction2));
   ptrdiff_t        nK(abs(nK1));
   ptrdiff_t        sign1 = mf1==MFT_SIN && nK1<0 ? -1 : 1;
   ptrdiff_t        sign2 = mf2==MFT_SIN && nK2<0 ? -1 : 1;
