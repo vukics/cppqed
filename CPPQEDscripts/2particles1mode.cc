@@ -16,10 +16,10 @@ int main(int argc, char* argv[])
   
   update(p,argc,argv,"--");
 
-  PumpedLossyMode<> mode(pm); // Free0
-  PumpedParticle    part(pp); // Free1,2 - only one instant
+  const auto mode{mode::make(pm)}; // Free0
+  const auto part{particle::make(pp)}; // Free1,2 - only one instant
 
-  ParticleOrthogonalToCavity act(mode,part,ppc); // only one instant
+  const auto act{std::make_shared<const ParticleOrthogonalToCavity>(mode,part,ppc)}; // only one instant
 
   quantumdata::StateVector<3> psi(init(pm)*init(pp)*init(pp));
   

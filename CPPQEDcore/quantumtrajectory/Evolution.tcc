@@ -13,21 +13,21 @@
 
 template<typename V, int RANK>
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(quantumdata::DensityOperator<RANK>& rho,
+evolve(std::shared_ptr<quantumdata::DensityOperator<RANK>> rho,
        typename structure::QuantumSystem<RANK>::Ptr sys,
        const evolution::Pars<>& pe)
 {
   Master<RANK,V> traj(rho,sys,pe,pe.negativity);
   trajectory::run(traj,pe);
 
-  return std::make_shared<quantumdata::DensityOperator<RANK> >(rho); // deep copy
+  return std::make_shared<quantumdata::DensityOperator<RANK> >(*rho); // deep copy
 
 }
 
 
 template<typename V, int RANK>
 const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(quantumdata::StateVector<RANK>& psi,
+evolve(std::shared_ptr<quantumdata::StateVector<RANK>> psi,
        typename structure::QuantumSystem<RANK>::Ptr sys,
        const evolution::Pars<>& pe)
 {
@@ -36,7 +36,7 @@ evolve(quantumdata::StateVector<RANK>& psi,
 
   if      (pe.evol==evolution::SINGLE) {
     trajectory::run(*makeMCWF(psi,sys,pe),pe);
-    return std::make_shared<SV>(psi); // deep copy
+    return std::make_shared<SV>(*psi); // deep copy
   }
   else if (pe.evol==evolution::ENSEMBLE) {
     EnsembleMCWF<RANK,V> traj(psi,sys,pe,pe.negativity);
@@ -44,15 +44,16 @@ evolve(quantumdata::StateVector<RANK>& psi,
     return traj.averaged();
   }
   else {
-    DO rho(psi);
-    return evolve<V>(rho,sys,pe);
+    return evolve<V>(std::make_shared<DO>(*psi),sys,pe);
   }
 
 }
 
 
-template<int RANK, typename SYS>
-const std::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(quantumdata::StateVector<RANK>& psi, const SYS& sys, const evolution::Pars<>& pe)
+template<int RANK>
+const std::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(std::shared_ptr<quantumdata::StateVector<RANK>> psi, 
+                                                                  typename structure::QuantumSystem<RANK>::Ptr sys, 
+                                                                  const evolution::Pars<>& pe)
 {
   if (pe.timeAverage) return std::make_shared<TimeAveragingMCWF_Trajectory<RANK> >(psi,sys,pe,pe.relaxationTime);
   else                return std::make_shared<             MCWF_Trajectory<RANK> >(psi,sys,pe                  );

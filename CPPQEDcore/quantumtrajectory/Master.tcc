@@ -21,13 +21,13 @@ namespace master {
 
 
 template<int RANK>
-Base<RANK>::Base(DensityOperator& rho,
+Base<RANK>::Base(DO_Ptr rho,
                  typename QuantumSystem::Ptr qs,
                  const master::Pars& p,
                  const DensityOperatorLow& scaleAbs
                  )
   : QuantumTrajectory(qs,true,
-                      rho.getArray(),
+                      rho->getArray(),
                       bind(&Base<RANK>::derivs,this,_1,_2,_3),
                       initialTimeStep<RANK>(qs),
                       p.logLevel,p.epsRel,p.epsAbs,
@@ -77,7 +77,7 @@ Base<RANK>::step_v(double deltaT)
   this->getEvolved()->step(deltaT);
   if (const auto ex=getQSW().getEx()) {
     using namespace blitzplusplus;
-    DensityOperatorLow rhoLow(rho_.getArray());
+    DensityOperatorLow rhoLow(rho_->getArray());
     UnaryFunction functionEx(bind(&Exact::actWithU,ex,this->getTime(),_1,this->getT0()));
     unaryIter(rhoLow,functionEx);
     hermitianConjugateSelf(rhoLow);
@@ -92,12 +92,12 @@ Base<RANK>::step_v(double deltaT)
   // We make the approximately Hermitian and normalized rho_ exactly so.
 
   {
-    linalg::CMatrix m(rho_.matrixView());
+    linalg::CMatrix m(rho_->matrixView());
     linalg::calculateTwoTimesRealPartOfSelf(m); 
     // here we get two times of what is desired, but it is anyway renormalized in the next step
   }
 
-  rho_.renorm();
+  rho_->renorm();
 
 }
 
@@ -116,12 +116,12 @@ std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
       li->displayKey(os,i);
     }
     os<<"Explicit superoperator calculations: ";
-    DensityOperator rhotemp(rho_.getDimensions());
+    DensityOperator rhotemp(rho_->getDimensions());
     {
       int n=0;
       for (int i=0; i<li->nAvr(); ++i)
         try {
-          li->actWithSuperoperator(0,rho_.getArray(),rhotemp.getArray(),i);
+          li->actWithSuperoperator(0,rho_->getArray(),rhotemp.getArray(),i);
           os<<i<<' '; ++n;
         }
         catch (const structure::SuperoperatorNotImplementedException&) {}

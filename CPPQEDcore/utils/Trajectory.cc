@@ -2,7 +2,6 @@
 #include "ArrayTraits.h"
 #include "BlitzArray.h"
 #include "Trajectory.tcc"
-#include "SmartPtr.h"
 
 #include "ParsTrajectory.h"
 #include "FormDouble.tcc"

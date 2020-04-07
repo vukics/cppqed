@@ -10,6 +10,7 @@
 
 #include "BlitzTiny.h"
 
+#include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 
@@ -314,7 +315,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 #define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
-const binary::Ptr binary::doMake(Interaction::Ptr ia)
+const binary::Ptr binary::make(Interaction::Ptr ia)
 {
   if      DISPATCHER(true ,true ,true ) ;
   else if DISPATCHER(true ,true ,false) ;

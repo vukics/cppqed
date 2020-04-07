@@ -3,8 +3,6 @@
 #ifndef   CPPQEDELEMENTS_UTILS_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED
 #define   CPPQEDELEMENTS_UTILS_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED
 
-#include "SmartPtr.h"
-
 struct EmptyAveragingBaseForInteractions {};
 
 #endif // CPPQEDELEMENTS_UTILS_DETAILS_BINARYINTERACTIONGENERATOR_H_INCLUDED
@@ -36,8 +34,8 @@ class BIG_CLASS_NAME : public BASE_class, public AveragingType
 public:
 
   template<typename F1, typename F2, typename... AveragingConstructorParameters>
-  BIG_CLASS_NAME(const F1& f1, const F2& f2 BIG_ADDITIONAL_PARAMETERS , AveragingConstructorParameters&&... a)
-    : BASE_class(cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f2) BIG_ADDITIONAL_PARAMETERS_PASS),
+  BIG_CLASS_NAME(F1 f1, F2 f2 BIG_ADDITIONAL_PARAMETERS , AveragingConstructorParameters&&... a)
+    : BASE_class(f1,f2 BIG_ADDITIONAL_PARAMETERS_PASS),
       AveragingType(std::forward<AveragingConstructorParameters>(a)...)
   {}
 

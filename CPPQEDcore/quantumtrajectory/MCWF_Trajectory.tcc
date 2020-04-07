@@ -12,7 +12,6 @@
 #include "StochasticTrajectory.tcc"
 
 #include "FormDouble.tcc"
-#include "SmartPtr.h"
 
 #include <boost/range/numeric.hpp>
 #include <boost/range/algorithm/find_if.hpp>
@@ -37,17 +36,17 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
 }
 
 
-template<int RANK> template<typename SYS>
+template<int RANK>
 MCWF_Trajectory<RANK>::MCWF_Trajectory(
-                                       StateVector& psi,
-                                       const SYS& sys,
+                                       SV_Ptr psi,
+                                       typename structure::QuantumSystem<RANK>::Ptr sys,
                                        const mcwf::Pars& p,
                                        const StateVectorLow& scaleAbs
                                        )
-  : QuantumTrajectory(cpputils::sharedPointerize(sys),p.noise,
-         psi.getArray(),
+  : QuantumTrajectory(sys,p.noise,
+         psi->getArray(),
          bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
-         initialTimeStep<RANK>(cpputils::sharedPointerize(sys)),
+         initialTimeStep<RANK>(sys),
          scaleAbs,
          p,
          evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorrectionFactor),
@@ -58,7 +57,7 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 {
   QuantumTrajectory::checkDimension(psi);
   if (!getTime()) if(const auto li=getQSW().getLi()) { // On startup, dpLimit should not be overshot, either.
-    Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
+    Rates rates(li->rates(0.,*psi_)); calculateSpecialRates(&rates,0.);
     manageTimeStep(rates,getEvolved().get(),false);
   }
 }
@@ -69,7 +68,7 @@ std::ostream& MCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) 
 {
   using namespace std;
 
-  return getQSW().display(getTime(),psi_,os,precision);
+  return getQSW().display(getTime(),*psi_,os,precision);
 
 }
 
@@ -92,11 +91,11 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   double t=getTime();
 
   if (const auto ex=getQSW().getEx()) {
-    ex->actWithU(getTime(),psi_.getArray(),this->getT0());
+    ex->actWithU(getTime(),psi_->getArray(),this->getT0());
     QuantumTrajectory::setT0(t);
   }
 
-  logger_.processNorm(psi_.renorm());
+  logger_.processNorm(psi_->renorm());
 
   return t;
 }
@@ -108,7 +107,7 @@ auto MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const 
   IndexSVL_tuples res;
   for (int i=0; i<rates->size(); i++)
     if ((*rates)(i)<0) {
-      StateVector psiTemp(psi_);
+      StateVector psiTemp(*psi_);
       getQSW().actWithJ(t,psiTemp.getArray(),i);
       res.push_back(IndexSVL_tuple(i,psiTemp.getArray()));
       (*rates)(i)=mathutils::sqr(psiTemp.renorm());
@@ -156,13 +155,13 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
     --lindbladNo; auto i=boost::find_if(specialRates,[=](const IndexSVL_tuple& j){return lindbladNo==get<0>(j);});
     if (i!=specialRates.end())
       // special jump
-      psi_=get<1>(*i); // RHS already normalized above
+      *psi_=get<1>(*i); // RHS already normalized above
     else {
       // normal  jump
-      getQSW().actWithJ(t,psi_.getArray(),lindbladNo);
+      getQSW().actWithJ(t,psi_->getArray(),lindbladNo);
       double normFactor=sqrt(rates(lindbladNo));
       if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
-      psi_/=normFactor;
+      *psi_/=normFactor;
     }
 
     logger_.jumpOccured(this->getLogStreamDuringRun(),t,lindbladNo);
@@ -173,20 +172,20 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
 template<int RANK>
 void MCWF_Trajectory<RANK>::step_v(double Dt)
 {
-  const StateVector psiCache(psi_);
+  const StateVector psiCache(*psi_);
   evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.
 
   double t=coherentTimeDevelopment(Dt);
 
   if (const auto li=getQSW().getLi()) {
 
-    Rates rates(li->rates(t,psi_));
+    Rates rates(li->rates(t,*psi_));
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
 
     while (manageTimeStep(rates,&evolvedCache)) {
-      psi_=psiCache;
+      *psi_=psiCache;
       t=coherentTimeDevelopment(Dt); // the next try
-      rates=li->rates(t,psi_);
+      rates=li->rates(t,*psi_);
       specialRates=calculateSpecialRates(&rates,t);
     }
 
@@ -215,7 +214,7 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
     }
     os<<"Alternative Lindblads: ";
     {
-      const Rates rates(li->rates(0,psi_));
+      const Rates rates(li->rates(0,*psi_));
       int n=0;
       for (int i=0; i<rates.size(); ++i) if (rates(i)<0) {os<<i<<' '; ++n;}
       if (!n) os<<"none";

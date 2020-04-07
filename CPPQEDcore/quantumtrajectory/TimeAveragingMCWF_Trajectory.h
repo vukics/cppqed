@@ -43,16 +43,17 @@ private:
 public:
   typedef typename Base::StateVector    StateVector   ;
   typedef typename Base::StateVectorLow StateVectorLow;
+
+  typedef typename Base::SV_Ptr SV_Ptr;
   
   typedef typename Base::Averaged Averaged;
   
   typedef typename Averaged::Averages Averages;
 
   /// The signature is identical to MCWF_Trajectory::MCWF_Trajectory, but the relaxation time must be supplied as well.
-  template<typename SYS>
   TimeAveragingMCWF_Trajectory(
-                               StateVector& psi,
-                               const SYS& sys,
+                               SV_Ptr psi,
+                               typename structure::QuantumSystem<RANK>::Ptr sys,
                                const mcwf::Pars& p,
                                double relaxationTime, ///< relaxation time after which the time averaging starts
                                const StateVectorLow& scaleAbs=StateVectorLow()

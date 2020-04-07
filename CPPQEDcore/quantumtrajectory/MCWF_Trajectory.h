@@ -73,6 +73,7 @@ public:
   typedef structure::Averaged     <RANK> Averaged   ;
 
   typedef quantumdata::StateVector<RANK> StateVector;
+  typedef std::shared_ptr<StateVector> SV_Ptr;
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
@@ -86,10 +87,8 @@ private:
 
 public:
   /// Templated constructor with the same idea as Master::Master
-  /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
-  template<typename SYS>
-  MCWF_Trajectory(StateVector& psi, ///< the state vector to be evolved
-                  const SYS& sys, ///< object representing the quantum system
+  MCWF_Trajectory(SV_Ptr psi, ///< the state vector to be evolved
+                  typename structure::QuantumSystem<RANK>::Ptr sys, ///< object representing the quantum system
                   const mcwf::Pars& p, ///< parameters of the evolution
                   const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in Master::Master
                  );
@@ -100,7 +99,7 @@ public:
 
   /// \name Getters
   //@{
-  const StateVector& getPsi() const {return psi_;} 
+  const SV_Ptr getPsi() const {return psi_;} 
 
   const mcwf::Logger& getLogger() const {return logger_;}
   //@}
@@ -128,7 +127,7 @@ private:
 
   std::ostream& displayParameters_v(std::ostream&) const override;
 
-  const typename Base::AveragedHandle averaged_v() const override {return cpputils::nonOwningSharedPtr(&psi_);}
+  const typename Base::AveragedHandle averaged_v() const override {return psi_;}
 
   const std::string trajectoryID_v() const override {return "MCWF_Trajectory";}
 
@@ -140,7 +139,7 @@ private:
   void                  performJump                (const Rates&, const IndexSVL_tuples&, double); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
-  StateVector& psi_;
+  const SV_Ptr psi_;
 
   const double dpLimit_, overshootTolerance_;
 

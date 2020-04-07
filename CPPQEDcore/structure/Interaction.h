@@ -9,13 +9,8 @@
 #include "Free.h"
 
 #include "BlitzTiny.h"
-#include "SmartPtr.h"
 
-#include <boost/bind.hpp>
-
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/algorithm/copy.hpp>
-
+#include <algorithm>
 
 namespace structure {
 
@@ -43,8 +38,6 @@ public:
   /** \note The order of the Free objects is essential! (Cf. BinarySystem, Composite) */
   typedef blitz::TinyVector<Free::Ptr,RANK> Frees;
 
-  template<typename F> using FreesTemplate=blitz::TinyVector<F,RANK>; ///< `F` must be convertible to Free::Ptr by cpputils::sharedPointerize
-  
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
   explicit Interaction(const Frees& frees,
@@ -60,31 +53,17 @@ public:
   Interaction(const Frees& frees, RealFreqsInitializer rf, CF cf) : Interaction(frees,rf,{cf}) {}
   Interaction(const Frees& frees, RF rf, ComplexFreqsInitializer cf) : Interaction(frees,{rf},cf) {}
 
-  template<typename F0, typename F1, typename... RCF_type>
-  Interaction(const F0& f0, const F1& f1,  const RCF_type&... realAndComplexFreqs)
-    :  Interaction(Frees(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1)),realAndComplexFreqs...) {}
+  template<typename... RCF_type>
+  Interaction(Free::Ptr f0, Free::Ptr f1,  const RCF_type&... realAndComplexFreqs)
+    :  Interaction(Frees(f0,f1),realAndComplexFreqs...) {}
 
   const Frees& getFrees() const {return frees_;}
-
-protected:
-  /// Shared-pointerizes the elements passed as Frees. \note Variadic arguments do not interact well with initializer lists, cf. the failure of commit #956781a9
-  class FreesProxy
-  {
-  public:
-    template<typename... Pack>
-    FreesProxy(Pack&&... pack) : frees_(cpputils::sharedPointerize(pack)...) {}
-    
-    operator const Frees&() const {return frees_;}
-    
-  private:
-    const Frees frees_;
-  };
 
 private:
   static const Dimensions extractDimensions(const Frees& frees)
   {
     Dimensions res;
-    boost::copy(frees | boost::adaptors::transformed(boost::bind(&Free::getTotalDimension,_1)), res.begin());
+    std::transform(frees.begin(),frees.end(),res.begin(),[](auto f){return f->getTotalDimension();});
     return res;
   }
   

@@ -10,7 +10,6 @@
 #include "DensityOperator.h"
 
 #include "Conversions.h"
-#include "SmartPtr.h"
 
 
 namespace quantumtrajectory {
@@ -20,21 +19,13 @@ namespace ensemble {
 
 using namespace mcwf;
 
-#define STATE_VECTORS(r) boost::ptr_vector<quantumdata::StateVector<r> >
-
 #define BASE_class trajectory::Ensemble< quantumdata::DensityOperator<RANK> , quantumdata::StateVector<RANK> >
 
 /// Less templatized base for EnsembleMCWF \tparamRANK
 template<int RANK>
 class Base
-  : private boost::base_from_member<STATE_VECTORS(RANK) >,
-    public BASE_class
+  : public BASE_class
 {
-private:
-  typedef STATE_VECTORS(RANK) StateVectors;
-
-#undef  STATE_VECTORS
-
 protected:
   typedef BASE_class Ensemble;
 
@@ -42,8 +33,6 @@ protected:
 
 private:
   typedef typename Ensemble::Trajectories Trajectories;
-
-  typedef boost::base_from_member<StateVectors> StateVectorsBase;
 
   typedef MCWF_Trajectory<RANK> Single;
 
@@ -56,7 +45,7 @@ public:
 protected:
   /// Straightforward constructor
   Base(
-       const StateVector& psi, ///< the (pure-state) initial condition
+       std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition
        QuantumSystemPtr sys, ///< the structure::QuantumSystem to be simulated
        const Pars& p, ///< parameters of the simulation (contains \link Pars::nTraj the number of trajectories\endlink)
        const StateVectorLow& =StateVectorLow()
@@ -68,12 +57,7 @@ private:
   std::ostream& logOnEnd_v(std::ostream& os) const final;
   
   // static helpers to constructor
-  // boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  static std::auto_ptr<StateVectors> stateVectors(const StateVector& psi, size_t nTraj);
-  static std::auto_ptr<Trajectories> trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs);
-#pragma GCC diagnostic pop
+  static std::unique_ptr<Trajectories> trajectories(std::shared_ptr<const StateVector> psi, size_t nTraj, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs);
 
   const QuantumSystemPtr qs_;
 
@@ -121,16 +105,14 @@ public:
   typedef typename DO_Display::DensityOperator DensityOperator;
 
   /// Templated constructor with the same idea as Master::Master
-  /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
-  template<typename SYS>
   EnsembleMCWF(
-               const StateVector& psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
-               const SYS& sys, ///< object representing the quantum system to be simulated
+               std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
+               typename structure::QuantumSystem<RANK>::Ptr sys, ///< represents the quantum system to be simulated
                const mcwf::Pars& p, ///< parameters of the simulation (contains \link mcwf::Pars::nTraj the number of trajectories\endlink)
                bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
                const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
                )
-    : Base(psi,cpputils::sharedPointerize(sys),p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
+    : Base(psi,sys,p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
   std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),*this->averaged(),os,precision);}
@@ -155,9 +137,9 @@ struct HandleType<quantumdata::DensityOperator<RANK> > : mpl::identity<std::shar
 template<int RANK>
 struct AverageTrajectoriesInRange<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >
 {
-  static const auto
-  _(typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator begin,
-    typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator end  )
+  typedef typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator CI;
+  
+  static const auto _(CI begin, CI end)
   {
     auto res(std::make_shared<quantumdata::DensityOperator<RANK> >(*begin->averaged()));
       

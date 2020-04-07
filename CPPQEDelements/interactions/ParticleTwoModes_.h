@@ -9,7 +9,6 @@
 #include "TridiagonalHamiltonian.h"
 
 #include "Exception.h"
-#include "SmartPtr.h"
 
 
 namespace particletwomodes {
@@ -25,11 +24,9 @@ private:
   ParticleTwoModes(mode::Ptr, mode::Ptr, particle::Ptr, double uNot0, double uNot1, const ModeFunction&, const ModeFunction&, double);
 
 public:
-  template<typename F0, typename F1, typename F2>
-  ParticleTwoModes(const F0& f0, const F1& f1, const F2& f2, 
+  ParticleTwoModes(mode::Ptr m0, mode::Ptr m1, particle::Ptr p,
                    const particlecavity::ParsAlong& p0, const particlecavity::ParsAlong& p1, double phi=0)
-    : ParticleTwoModes(cpputils::sharedPointerize(f0),cpputils::sharedPointerize(f1),cpputils::sharedPointerize(f2),
-                       p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
+    : ParticleTwoModes(m0,m1,p,p0.uNot,p1.uNot,ModeFunction(p0.modeCav,p0.kCav),ModeFunction(p1.modeCav,p1.kCav),phi) {}
 
 private:
   typedef quantumoperator::TridiagonalHamiltonian<3,true> TridiagonalHamiltonian;

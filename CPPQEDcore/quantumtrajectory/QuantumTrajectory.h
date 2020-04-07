@@ -64,9 +64,12 @@ protected:
   /// \copybrief getT0 Sets to the current time.
   void setT0() const {t0_=BASE::getTime();}
 
-  /// Check the dimensions of the stored quantum system against `construct` \tparam CONSTRUCT typically either a quantumdata::StateVector (as in MCWF_Trajectory) or a quantumdata::DensityOperator (as in Master)
+  /// Check the dimensions of the stored quantum system against `construct`
+  /**
+   * \tparam CONSTRUCT typically either shared_ptr to a quantumdata::StateVector (as in MCWF_Trajectory) or a quantumdata::DensityOperator (as in Master)
+   */
   template<typename CONSTRUCT>
-  void checkDimension(const CONSTRUCT& construct) const {if (construct!=*qs_.getQS()) throw DimensionalityMismatchException();}
+  void checkDimension(CONSTRUCT&& c) const {if (*c!=*qs_.getQS()) throw DimensionalityMismatchException();}
   
 private:
   mutable double t0_;

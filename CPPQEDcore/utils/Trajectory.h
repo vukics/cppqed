@@ -9,7 +9,6 @@
 #include "CommentingStream.h"
 #include "Exception.h"
 #include "Evolved.h"
-#include "SmartPtr.h"
 
 #include <iosfwd>
 #include <string>

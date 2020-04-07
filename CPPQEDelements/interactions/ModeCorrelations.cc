@@ -4,10 +4,9 @@
 #include "LazyDensityOperator.tcc"
 #include "Structure.h"
 
-#include "SmartPtr.h"
+#include <boost/range/algorithm/copy.hpp>
 
 using namespace boost;
-using cpputils::sharedPointerize;
 
 
 ModeCorrelations::ModeCorrelations()
@@ -35,11 +34,11 @@ ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix
   auto averages(initializedAverages());
 
   {
-    const Averaged1::Ptr p(sharedPointerize(averagedMode_));
-
+    const auto fun{bind(&structure::LiouvilleanAveragedCommonRanked<1>::average,averagedMode_,0,_1)};
+    
     const Averages 
-      a0(partialTrace<V0,Averages>(matrix,bind(structure::average<1>,p,0,_1))),
-      a1(partialTrace<V1,Averages>(matrix,bind(structure::average<1>,p,0,_1)));
+      a0(partialTrace<V0,Averages>(matrix,fun)),
+      a1(partialTrace<V1,Averages>(matrix,fun));
 
     copy(a1,copy(a0,averages.begin()));
   }

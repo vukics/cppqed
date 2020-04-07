@@ -83,7 +83,7 @@ namespace jaynescummings {
 
 
 template<typename A, typename F1, typename F2, typename... AveragingConstructorParameters>
-const Ptr make(const F1& f1, const F2& f2, const dcomp& g, AveragingConstructorParameters&&... a)
+const Ptr make(F1 f1, F2 f2, const dcomp& g, AveragingConstructorParameters&&... a)
 {
   if (isNonZero(g)) return std::make_shared<JaynesCummings<true ,A> >(f1,f2,g ,a...);
   else              return std::make_shared<JaynesCummings<false,A> >(f1,f2,0.,a...);
@@ -91,7 +91,7 @@ const Ptr make(const F1& f1, const F2& f2, const dcomp& g, AveragingConstructorP
 
 
 template<typename F1, typename F2>
-const Ptr make(const F1& f1, const F2& f2, const dcomp& g)
+const Ptr make(F1 f1, F2 f2, const dcomp& g)
 {
   return make<EmptyAveragingBaseForInteractions>(f1,f2,g);  
 }

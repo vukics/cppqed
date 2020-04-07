@@ -12,7 +12,6 @@
 #include "TridiagonalHamiltonian.h"
 
 #include "ParsFwd.h"
-#include "SmartPtr.h"
 
 
 // A general Spin yet incomplete
@@ -71,7 +70,8 @@ private:
 /** \todo Implement some spherical-coordinates class and use it here */
 class SpinBase
   : public structure::Free, 
-    public structure::ElementAveraged<1>
+    public structure::ElementAveraged<1>,
+    protected std::enable_shared_from_this<SpinBase>
 {
 public:
   typedef structure::ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
@@ -128,7 +128,7 @@ public:
 
   SpinSch(const spin::Pars& p) 
     : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim),
-      quantumoperator::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(cpputils::nonOwningConstSharedPtr(this)))
+      quantumoperator::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(shared_from_this()))
   {
     getParsStream()<<"Schrodinger picture."<<std::endl;
   }

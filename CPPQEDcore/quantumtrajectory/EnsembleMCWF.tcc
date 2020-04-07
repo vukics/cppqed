@@ -9,46 +9,29 @@
 #include "ParsMCWF_Trajectory.h"
 
 
-// boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 template<int RANK>
 auto
-quantumtrajectory::ensemble::Base<RANK>::stateVectors(const StateVector& psi, size_t nTraj) -> std::auto_ptr<StateVectors>
-{
-  StateVectors res;
-  for (size_t i=0; i<nTraj; ++i)
-    res.push_back(new StateVector(psi));
-  // Here trying to use lambda will be much less efficient
-  
-  return res.release();
-}
-
-template<int RANK>
-auto
-quantumtrajectory::ensemble::Base<RANK>::trajectories(StateVectors& psis, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs) -> std::auto_ptr<Trajectories>
+quantumtrajectory::ensemble::Base<RANK>::trajectories(std::shared_ptr<const StateVector> psi, size_t nTraj, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs) -> std::unique_ptr<Trajectories>
 {
   Trajectories res;
 
   p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
 
-  for (auto i=psis.begin(); i!=psis.end(); (++i, ++p.seed))
-    res.push_back(new MCWF_Trajectory<RANK>(*i,qs,p,scaleAbs));
+  for (size_t i=0; i<nTraj; (++i, ++p.seed) ) 
+    res.push_back(new MCWF_Trajectory<RANK>(std::make_shared<StateVector>(*psi),qs,p,scaleAbs));
 
   return res.release();
 }
-#pragma GCC diagnostic pop
 
 
 template<int RANK>
 quantumtrajectory::ensemble::Base<RANK>::Base(
-                                              const StateVector& psi,
+                                              std::shared_ptr<const StateVector> psi,
                                               QuantumSystemPtr qs,
                                               const Pars& p,
                                               const StateVectorLow& scaleAbs
                                               )
-  : StateVectorsBase(stateVectors(psi,p.nTraj)),
-    Ensemble(trajectories(StateVectorsBase::member,qs,p,scaleAbs),p.logLevel<0),
+  : Ensemble(trajectories(psi,p.nTraj,qs,p,scaleAbs),p.logLevel<0),
     qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
 {
 }

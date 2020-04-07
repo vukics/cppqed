@@ -35,16 +35,12 @@ int main(int argc, char* argv[])
   mode::StateVector psiMode(pplm.cutoff);
   psiMode=(mode::fock(0,pplm.cutoff,mathutils::PI/2.)+mode::fock(1,pplm.cutoff)+mode::fock(2,pplm.cutoff,-mathutils::PI/2.))/sqrt(3.);
   */
-  StateVector psi(qbit::init(pplqb)*mode::init(pplm));
+  const auto psi{std::make_shared<StateVector>(qbit::init(pplqb)*mode::init(pplm))};
   // entangled state: 
   // psi=qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff);
-  psi.renorm();
+  psi->renorm();
 
   evolve(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);
-
-
-
-
 
 
 }
