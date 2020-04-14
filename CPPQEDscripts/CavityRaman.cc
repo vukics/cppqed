@@ -41,15 +41,9 @@ int main(int argc, char* argv[])
 
   multilevel::StateVector psiML(NL); psiML(0)=1; psiML(1)=1; 
 
-  StateVector psi(psiML*mode::init(pplm)); psi.renorm();
+  const auto psi{std::make_shared<StateVector>(psiML*mode::init(pplm))}; psi->renorm();
 
-  mode::Ptr mode(mode::make(pplm,QMP_IP));
-
-  MLJC<NL,Couplings> mljc(multilevel::makePumpedLossySch(pml,"Lambda atom",true),mode,pmljc);
-
-  evolve(psi,binary::make(mljc),pe);
-
-
+  evolve(psi,binary::make(std::make_shared<MLJC<NL,Couplings>>(multilevel::makePumpedLossySch(pml,"Lambda atom",true),mode::make(pplm,QMP_IP),pmljc)),pe);
 
 }
 

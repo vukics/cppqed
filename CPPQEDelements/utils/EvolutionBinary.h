@@ -10,8 +10,8 @@
 
 template<typename SV_OR_DO>
 inline
-const typename quantumdata::LazyDensityOperator<SV_OR_DO::N_RANK>::Ptr
-evolve(SV_OR_DO& initial,
+const auto
+evolve(SV_OR_DO initial,
        binary::Ptr sys,
        const evolution::Pars<>& p)
 {

@@ -20,11 +20,11 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  LossySpinSch spin(ps);
+  const auto spin{std::make_shared<LossySpinSch>(ps)};
   
-  structure::freesystem::StateVector psi(spin.getDimensions());
+  const auto psi{std::make_shared<structure::freesystem::StateVector>(spin->getDimensions())};
 
-  psi(psi.getArray().ubound(0))=1;
+  (*psi)(psi->getArray().ubound(0))=1;
   
   evolve(psi,spin,pe);
 

@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
   if (!ppart.init.getSig() && !ppart.vClass) {cerr<<"Incorrect initial condition"<<endl; abort();}
 
-  StateVector psi(init(ppart));
+  const auto psi{std::make_shared<StateVector>(init(ppart))};
 
   evolve(psi,part,pe);
 

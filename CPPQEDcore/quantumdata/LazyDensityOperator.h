@@ -57,7 +57,8 @@ partialTrace(const LazyDensityOperator<RANK>&, F function);
  */
 template<int RANK> 
 class LazyDensityOperator 
-  : public DimensionsBookkeeper<RANK,true>
+  : public DimensionsBookkeeper<RANK,true>,
+    std::enable_shared_from_this<const LazyDensityOperator<RANK>>
 {
 public:
   typedef std::shared_ptr<const LazyDensityOperator> Ptr; ///< Many class templates in the framework define shared pointers to their own types, in a template-metafunction like manner

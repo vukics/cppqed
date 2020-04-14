@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  StateVector2 psi(init(pA)*init(pB));
-  psi.renorm();
+  const auto psi{std::make_shared<StateVector2>(init(pA)*init(pB))};
+  psi->renorm();
 
   evolve
     (psi,

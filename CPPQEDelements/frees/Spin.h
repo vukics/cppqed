@@ -71,7 +71,7 @@ private:
 class SpinBase
   : public structure::Free, 
     public structure::ElementAveraged<1>,
-    protected std::enable_shared_from_this<SpinBase>
+    public std::enable_shared_from_this<const SpinBase>
 {
 public:
   typedef structure::ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;

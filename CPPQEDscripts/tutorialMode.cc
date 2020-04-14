@@ -18,10 +18,6 @@ int main(int argc, char* argv[])
 
   // ****** ****** ****** ****** ****** ******
 
-  mode::Ptr mode(make(pm,QMP_UIP));
-
-  mode::StateVector psi(init(pm));
-
-  evolve(psi,mode,pe);
+  evolve(std::make_shared<mode::StateVector>(init(pm)),make(pm,QMP_UIP),pe);
 
 }

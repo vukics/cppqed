@@ -21,17 +21,12 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  Ptr qbit(make(pplqb,qmp));
-
-  StateVector psi(init(pplqb));
   /*
   StateVector psi(state0()()+state1()());
   psi.renorm();
   */
-  evolve(psi,qbit,pe);
-
-
-
+  
+  evolve(std::make_shared<StateVector>(init(pplqb)),make(pplqb,qmp),pe);
 
 }
 

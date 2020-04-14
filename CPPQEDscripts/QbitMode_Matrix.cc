@@ -44,11 +44,12 @@ int main(int argc, char* argv[])
   binary::Ptr system2(binary::make(jaynescummings::make(qbit::make(pplqb,qmp),mode::make(pplm ,qmp),pjc)));
 
   StateVector2 psi2(qbit::init(pplqb)*mode::init(pplm)); psi2.renorm();
-  StateVector1 psi1(psi2.vectorView(),quantumdata::byReference); // Now psi1 and psi2 referece the same data.
+  
+  const CMatrix hamiltonianOverI(calculateMatrix(*system2)/DCOMP_I);
 
-  const CMatrix hamiltonian(calculateMatrix(*system2));
-
-  evolve(psi1,TimeIndependentMatrixHamiltonianAveraged<2>(CMatrix(hamiltonian/DCOMP_I),system2,psi2),pe);
+  evolve(std::make_shared<StateVector1>(psi2.vectorView(),quantumdata::byReference), // Here, this references the same data as psi2
+         std::make_shared<TimeIndependentMatrixHamiltonianAveraged<2>>(hamiltonianOverI,system2,psi2),
+         pe);
 
 
 }

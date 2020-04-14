@@ -2,16 +2,9 @@
 #include "EvolutionComposite.h"
 #include "Mode.h"
 
-#include "SmartPtr.h"
+using Interaction=structure::Interaction<4>;
+using Frees=Interaction::Frees;
 
-using cpputils::nonOwningConstSharedPtr;
-
-
-struct DummyQuaternary : structure::Interaction<4>
-{
-  DummyQuaternary(mode::Ptr m0, mode::Ptr m1, mode::Ptr m2, mode::Ptr m3) 
-    : structure::Interaction<4>(Frees(m0,m1,m2,m3)) {}
-};
 
 int main(int argc, char* argv[])
 {
@@ -27,20 +20,14 @@ int main(int argc, char* argv[])
 
   update(p,argc,argv,"--");
 
-  PumpedLossyMode<> 
-    m0(pm0), m2(pm2);
-
-  PumpedLossyModeAlternative<false>
-    m1(pm1), m3(pm3);
-
-  DummyQuaternary dq(nonOwningConstSharedPtr(&m0),nonOwningConstSharedPtr(&m1),nonOwningConstSharedPtr(&m2),nonOwningConstSharedPtr(&m3));
-
-  quantumdata::StateVector<4> psi(init(pm0)*init(pm1)*init(pm2)*init(pm3));
-
+  auto psi{std::make_shared<quantumdata::StateVector<4>>(init(pm0)*init(pm1)*init(pm2)*init(pm3))};
 
   evolve(psi,
          composite::make(
-                         _<0,1,2,3>(dq)
+                         _<0,1,2,3>(std::make_shared<Interaction>(Frees(std::make_shared<PumpedLossyMode<>>(pm0),
+                                                                        std::make_shared<PumpedLossyModeAlternative<false>>(pm1),
+                                                                        std::make_shared<PumpedLossyMode<>>(pm2),
+                                                                        std::make_shared<PumpedLossyModeAlternative<false>>(pm3))))
                         ),
          pe);
 
