@@ -35,8 +35,8 @@ namespace {
 
 
 binary::Base::Base(Interaction::Ptr ia)
-  : QuantumSystem<2>(Dimensions(ia->getFrees()(0)->getDimension(),ia->getFrees()(1)->getDimension())),
-    free0_(ia->getFrees()(0)), free1_(ia->getFrees()(1)), ia_(ia)
+  : QuantumSystem<2>(Dimensions(ia->getFrees()[0]->getDimension(),ia->getFrees()[1]->getDimension())),
+    free0_(ia->getFrees()[0]), free1_(ia->getFrees()[1]), ia_(ia)
 {
 } 
 
@@ -301,8 +301,8 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
   using namespace structure;
   
   const QuantumSystem<1>::Ptr
-    free0=ia->getFrees()(0),
-    free1=ia->getFrees()(1);
+    free0=ia->getFrees()[0],
+    free1=ia->getFrees()[1];
 
   return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(ia),
                                qsh(free0) || qsh(free1) || qsh<2>(ia),

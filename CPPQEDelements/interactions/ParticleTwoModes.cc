@@ -34,7 +34,7 @@ ParticleTwoModes::ParticleTwoModes(mode::Ptr mode0, mode::Ptr mode1, particle::P
                                    double uNot0, double uNot1, 
                                    const ModeFunction& mf0, const ModeFunction& mf1,
                                    double phi)
-  : structure::Interaction<3>(Frees(mode0,mode1,part),
+  : structure::Interaction<3>({mode0,mode1,part},
                               {RF{"Unot0",uNot0,sqrt(mode0->getDimension())},RF{"Unot1",uNot1,sqrt(mode1->getDimension())}}),
                               firstH_(factor(uNot0,uNot1,phi)*aop(mode0)*aop(mode1).dagger()*mfNKX(part,mf0)/DCOMP_I), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(part,mf1).dagger()), secondHT_(secondH_.dagger()),

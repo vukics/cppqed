@@ -3,7 +3,6 @@
 #include "Mode.h"
 
 using Interaction=structure::Interaction<4>;
-using Frees=Interaction::Frees;
 
 
 int main(int argc, char* argv[])
@@ -24,10 +23,10 @@ int main(int argc, char* argv[])
 
   evolve(psi,
          composite::make(
-                         _<0,1,2,3>(std::make_shared<Interaction>(Frees(std::make_shared<PumpedLossyMode<>>(pm0),
-                                                                        std::make_shared<PumpedLossyModeAlternative<false>>(pm1),
-                                                                        std::make_shared<PumpedLossyMode<>>(pm2),
-                                                                        std::make_shared<PumpedLossyModeAlternative<false>>(pm3))))
+                         _<0,1,2,3>(std::make_shared<Interaction>({std::make_shared<PumpedLossyMode<>>(pm0),
+                                                                   std::make_shared<PumpedLossyModeAlternative<false>>(pm1),
+                                                                   std::make_shared<PumpedLossyMode<>>(pm2),
+                                                                   std::make_shared<PumpedLossyModeAlternative<false>>(pm3)}))
                         ),
          pe);
 

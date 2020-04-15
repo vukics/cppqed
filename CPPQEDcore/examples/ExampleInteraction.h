@@ -11,7 +11,7 @@ class InteractionX_X
   : public Interaction<2>, public TridiagonalHamiltonian<2,false>
 {
 public:
-  InteractionX_X(const PumpedLossyMode&, const PumpedLossyMode&, double g);
+  InteractionX_X(std::shared_ptr<PumpedLossyMode>, std::shared_ptr<PumpedLossyMode>, double g);
 
 };
 
@@ -24,7 +24,7 @@ class InteractionX_X
   : public Interaction<2>, public TridiagonalHamiltonian<2,true>
 {
 public:
-  InteractionX_X(const ModeBase&, const ModeBase&, double g);
+  InteractionX_X(ModeBase::Ptr, ModeBase::Ptr, double g);
 
 };
 
@@ -36,7 +36,7 @@ namespace hierarchical {
 class InteractionX_X_Correlations : public InteractionX_X, public ElementAveraged<2>
 {
 public:
-  InteractionX_X_Correlations(const ModeBase& m0, const ModeBase& m1, double g)
+  InteractionX_X_Correlations(ModeBase::Ptr m0, ModeBase::Ptr m1, double g)
     : InteractionX_X(m0,m1,g),
       ElementAveraged<2>("ModeCorrelations",{"<XQ>","<XP>","<YQ>","<YP>"})
   {}

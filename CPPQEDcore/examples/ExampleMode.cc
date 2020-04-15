@@ -18,7 +18,7 @@ double aDagJumpRate(const LazyDensityOperator&, double kappa_n     );
 
 
 basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
-  : Free(cutoff,
+  : Free(cutoff,{},
          {
            CF{"(kappa*(2*nTh+1),delta)",dcomp(kappa*(2*nTh+1),delta),     cutoff },
            CF{"eta"                    ,eta                         ,sqrt(cutoff)}
@@ -64,7 +64,7 @@ basic::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp et
            RF{"kappa*(2*nTh+1)",kappa*(2*nTh+1),cutoff},
            RF{"delta",delta,1}
          },
-         CF{"eta",eta,sqrt(cutoff)}),
+         {CF{"eta",eta,sqrt(cutoff)}}),
     FreeExact<false>(cutoff),
     TridiagonalHamiltonian<1,true>(furnishWithFreqs(tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
                                                     mainDiagonal(dcomp(kappa*(2*nTh+1),-delta),cutoff))),
@@ -104,7 +104,7 @@ auto basic::PumpedLossyModeIP::average_v(NoTime, const LazyDensityOperator& matr
 
 
 hierarchical::ModeBase::ModeBase(double kappa, double nTh, size_t cutoff)
-  : Free(cutoff,RF{"kappa*(2*nTh+1)",kappa*(2*nTh+1),cutoff}),
+  : Free(cutoff,{RF{"kappa*(2*nTh+1)",kappa*(2*nTh+1),cutoff}}),
     ElementLiouvillean<1,2>("Mode",{"photon loss","photon absorption"}),
     ElementAveraged<1>("PumpedLossyMode",{"<number operator>","real(<ladder operator>)","imag(\")"}),
     kappa_(kappa), nTh_(nTh)

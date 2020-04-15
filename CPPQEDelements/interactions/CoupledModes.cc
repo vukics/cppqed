@@ -11,7 +11,7 @@ using namespace quantumoperator;
 namespace coupledmodes {
 
 Base<false>::Base(mode::Ptr m1, mode::Ptr m2, dcomp u)
-  : structure::Interaction<2>(Frees(m1,m2),CF{"u",u,m1->getDimension()*sqrt(m2->getDimension())})
+  : structure::Interaction<2>({m1,m2},{},{CF{"u",u,m1->getDimension()*sqrt(m2->getDimension())}})
 {
   if (!abs(u)) getParsStream()<<"Dummy coupling between modes\n";
 }

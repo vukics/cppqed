@@ -92,9 +92,9 @@ public:
     {
       static const int idx=T::value;
       if (frees_[idx].get()) {
-        if (frees_[idx].get()!=act_.get()->getFrees()(i_)) throw CompositeConsistencyException(idx,i_);
+        if (frees_[idx].get()!=act_.get()->getFrees()[i_]) throw CompositeConsistencyException(idx,i_);
       }
-      else frees_[idx]=SubSystemFree(act_.get()->getFrees()(i_));
+      else frees_[idx]=SubSystemFree(act_.get()->getFrees()[i_]);
       i_++;
     }
 

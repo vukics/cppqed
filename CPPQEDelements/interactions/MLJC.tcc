@@ -43,26 +43,19 @@ struct Base<NL,VC>::ModeDynamics : public tmptools::pair_c<N1,N2>
 //////////////
 
 
-#define RETURN_type structure::DynamicsBase::ComplexFreqs
-
 template<typename VP>
-const RETURN_type
+const auto
 complexFreqs(const VP& etas)
 {
-  using namespace std;
-  RETURN_type res;
+  structure::DynamicsBase::ComplexFreqs res;
   for_each(etas,multilevel::ElementaryComplexFreqs(res,"g"));
   return res;
 }
 
-#undef  RETURN_type
-
 
 template<int NL, typename VC>
 Base<NL,VC>::Base(MultiLevelPtr ml, mode::Ptr mode, const VC& gs) 
-  : structure::Interaction<2>(Frees(ml,mode),
-                              structure::DynamicsBase::RealFreqs(),
-                              complexFreqs(gs)), 
+  : structure::Interaction<2>({ml,mode},{},complexFreqs(gs)),
     mds_(boost::fusion::transform(gs,CouplingToModeDynamics(ml,mode)))
 {
   getParsStream()<<"Multi-Level Jaynes-Cummings\n";

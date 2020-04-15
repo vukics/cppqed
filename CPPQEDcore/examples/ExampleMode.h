@@ -75,6 +75,8 @@ namespace hierarchical {
 class ModeBase : public Free, public ElementLiouvillean<1,2>, public ElementAveraged<1>
 {
 public:
+  typedef std::shared_ptr<ModeBase> Ptr;
+  
   typedef ElementLiouvillean<1,2>::StateVectorLow StateVectorLow     ;
   typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
 

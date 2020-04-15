@@ -36,7 +36,7 @@ public:
 
   /// A tiny vector of shared pointers to the Free objects between which the interaction is defined
   /** \note The order of the Free objects is essential! (Cf. BinarySystem, Composite) */
-  typedef blitz::TinyVector<Free::Ptr,RANK> Frees;
+  typedef std::array<Free::Ptr,RANK> Frees;
 
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
@@ -44,18 +44,6 @@ public:
                        const    RealFreqs&    realFreqs=emptyRF, 
                        const ComplexFreqs& complexFreqs=emptyCF)
     : DynamicsBase(realFreqs,complexFreqs), DimensionsBookkeeper<RANK>(extractDimensions(frees)), frees_(frees) {}
-
-  Interaction(const Frees& frees, const ComplexFreqs& complexFreqs) : Interaction(frees,emptyRF,complexFreqs) {}
-  Interaction(const Frees& frees, RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : Interaction(frees,RealFreqs(rf),ComplexFreqs(cf)) {}
-  Interaction(const Frees& frees, ComplexFreqsInitializer cf) : Interaction(frees,{},cf) {}
-  Interaction(const Frees& frees, RF rf, CF cf=CF()) : Interaction(frees,RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer{} : ComplexFreqsInitializer{cf}) {}
-  Interaction(const Frees& frees, CF cf) : Interaction(frees,ComplexFreqsInitializer{cf}) {}
-  Interaction(const Frees& frees, RealFreqsInitializer rf, CF cf) : Interaction(frees,rf,{cf}) {}
-  Interaction(const Frees& frees, RF rf, ComplexFreqsInitializer cf) : Interaction(frees,{rf},cf) {}
-
-  template<typename... RCF_type>
-  Interaction(Free::Ptr f0, Free::Ptr f1,  const RCF_type&... realAndComplexFreqs)
-    :  Interaction(Frees(f0,f1),realAndComplexFreqs...) {}
 
   const Frees& getFrees() const {return frees_;}
 

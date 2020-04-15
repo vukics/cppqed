@@ -17,7 +17,9 @@ public:
   typedef structure::Interaction<NP> Base;
   typedef typename Base::Frees Particles;
 
-  IdenticalParticles(particle::Ptr       part) : Base(part,part) {}
+  static const auto fill(particle::Ptr part) {Particles res; res.fill(part); return res;}
+  
+  IdenticalParticles(particle::Ptr part) : Base(fill(part)) {}
 
 };
 
