@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
   Ptr mode(make<Collecting>(pplm,collection));
 
-  evolve(std::make_shared<StateVector>(mode::init(pplm)),mode,pe);
+  evolve(mode::init(pplm),mode,pe);
 
 }
 

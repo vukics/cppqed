@@ -24,15 +24,10 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  structure::Free::Ptr atom(fullImpl ? std::static_pointer_cast<const structure::Free>(make(pp2la,qmp)) : 
-                                       std::static_pointer_cast<const structure::Free>(std::make_shared<const PumpedTwoLevelAtomSch>(pp2la)));
-  
-  const auto psi{std::make_shared<StateVector>(init(pp2la))};
-
-  evolve(psi,atom,pe);
-
-
-
+  evolve(init(pp2la),
+         fullImpl ? std::static_pointer_cast<const structure::Free>(make(pp2la,qmp)) : 
+                    std::static_pointer_cast<const structure::Free>(std::make_shared<const PumpedTwoLevelAtomSch>(pp2la)),
+         pe);
 
 }
 

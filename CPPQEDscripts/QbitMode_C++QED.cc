@@ -27,20 +27,19 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  qbit::Ptr qbit(qbit::make(pplqb,qmp));
-  mode::Ptr mode(mode::make(pplm ,qmp/*,structure::averaged::ReducedDensityOperator("Mode",pplm.cutoff,true)*/));
-
-  // BinarySystem system(jc);
   /*
   mode::StateVector psiMode(pplm.cutoff);
   psiMode=(mode::fock(0,pplm.cutoff,mathutils::PI/2.)+mode::fock(1,pplm.cutoff)+mode::fock(2,pplm.cutoff,-mathutils::PI/2.))/sqrt(3.);
   */
-  const auto psi{std::make_shared<StateVector>(qbit::init(pplqb)*mode::init(pplm))};
   // entangled state: 
   // psi=qbit::state0()*mode::fock(1,pplm.cutoff)+qbit::state1()*mode::fock(0,pplm.cutoff);
-  psi->renorm();
+  // psi.renorm();
 
-  evolve(psi,binary::make(jaynescummings::make(qbit,mode,pjc)),pe);
+  evolve(qbit::init(pplqb)*mode::init(pplm),
+         binary::make(jaynescummings::make(qbit::make(pplqb,qmp),
+                                           mode::make(pplm ,qmp/*,structure::averaged::ReducedDensityOperator("Mode",pplm.cutoff,true)*/),
+                                           pjc)),
+         pe);
 
 
 }

@@ -11,11 +11,11 @@
 template<typename SV_OR_DO>
 inline
 const auto
-evolve(SV_OR_DO initial,
+evolve(SV_OR_DO&& initial,
        binary::Ptr sys,
        const evolution::Pars<>& p)
 {
-  return evolve<tmptools::Vector<0> >(initial,sys,p);
+  return evolve<0>(std::forward<SV_OR_DO>(initial),sys,p);
 }
 
 

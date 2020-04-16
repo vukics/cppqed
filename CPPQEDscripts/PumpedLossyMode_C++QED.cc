@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
   if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));
 
-  evolve(std::make_shared<StateVector>(mode::init(pplm)),(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make<Collecting>(pplm,qmp,collection)),pe);
+  evolve(mode::init(pplm),(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make<Collecting>(pplm,qmp,collection)),pe);
 
 }
 

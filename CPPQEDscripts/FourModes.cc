@@ -19,14 +19,12 @@ int main(int argc, char* argv[])
 
   update(p,argc,argv,"--");
 
-  auto psi{std::make_shared<quantumdata::StateVector<4>>(init(pm0)*init(pm1)*init(pm2)*init(pm3))};
-
-  evolve(psi,
+  evolve(init(pm0)*init(pm1)*init(pm2)*init(pm3),
          composite::make(
-                         _<0,1,2,3>(std::make_shared<Interaction>({std::make_shared<PumpedLossyMode<>>(pm0),
-                                                                   std::make_shared<PumpedLossyModeAlternative<false>>(pm1),
-                                                                   std::make_shared<PumpedLossyMode<>>(pm2),
-                                                                   std::make_shared<PumpedLossyModeAlternative<false>>(pm3)}))
+                         _<0,1,2,3>(std::make_shared<Interaction>(Interaction::Frees{std::make_shared<PumpedLossyMode<>>(pm0),
+                                                                                     std::make_shared<PumpedLossyModeAlternative<false>>(pm1),
+                                                                                     std::make_shared<PumpedLossyMode<>>(pm2),
+                                                                                     std::make_shared<PumpedLossyModeAlternative<false>>(pm3)}))
                         ),
          pe);
 

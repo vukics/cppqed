@@ -15,14 +15,12 @@ int main(int argc, char* argv[])
 
   update(p,argc,argv,"--");
 
-  const auto mode{std::make_shared<LossyMode<>>(pm)}; // Free0
-  const auto part{std::make_shared<PumpedParticle>(pp)}; // Free1,2 – only one instant
+  auto mode{std::make_shared<LossyMode<>>(pm)}; // Free0
+  auto part{std::make_shared<PumpedParticle>(pp)}; // Free1,2 – only one instant
 
-  const auto act{std::make_shared<ParticleOrthogonalToCavity>(mode,part,ppc)}; // only one instant
+  auto act{std::make_shared<ParticleOrthogonalToCavity>(mode,part,ppc)}; // only one instant
 
-  const auto psi{std::make_shared<quantumdata::StateVector<3>>(init(pm)*hoState(pp)*hoState(pp))};
-
-  evolve(psi,
+  evolve(init(pm)*hoState(pp)*hoState(pp),
          composite::make(
                          _<0,1>(act),
                          _<0,2>(act),

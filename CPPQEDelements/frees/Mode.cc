@@ -349,7 +349,7 @@ double photonNumber(const LazyDensityOperator& matrix)
 }
 
 
-const StateVector coherent(const dcomp& alpha, size_t dim)
+StateVector coherent(const dcomp& alpha, size_t dim)
 {
   StateVector res(dim,false);
   double norm(exp(-sqr(abs(alpha))/2.));
@@ -361,7 +361,7 @@ const StateVector coherent(const dcomp& alpha, size_t dim)
 }
 
 
-const StateVector fock(size_t n, size_t dim, double phase)
+StateVector fock(size_t n, size_t dim, double phase)
 {
   if (n>=dim) throw FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState();
   StateVector res(dim);
@@ -370,7 +370,7 @@ const StateVector fock(size_t n, size_t dim, double phase)
 }
 
 
-const StateVector init(const Pars& p)
+StateVector init(const Pars& p)
 {
   return p.minitFock ? fock(p.minitFock,p.cutoff) : coherent(p.minit,p.cutoff);
 }

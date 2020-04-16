@@ -12,39 +12,36 @@
 
 
 template<typename V, int RANK>
-const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(std::shared_ptr<quantumdata::DensityOperator<RANK>> rho,
-       typename structure::QuantumSystem<RANK>::Ptr sys,
-       const evolution::Pars<>& pe)
+const evolution::LDO_Ptr<RANK>
+evolution::_(std::shared_ptr<quantumdata::DensityOperator<RANK>> rhoPtr,
+             typename structure::QuantumSystem<RANK>::Ptr sys,
+             const evolution::Pars<>& pe)
 {
-  Master<RANK,V> traj(rho,sys,pe,pe.negativity);
+  Master<RANK,V> traj(rhoPtr,sys,pe,pe.negativity);
   trajectory::run(traj,pe);
 
-  return std::make_shared<quantumdata::DensityOperator<RANK> >(*rho); // deep copy
+  return rhoPtr;
 
 }
 
 
 template<typename V, int RANK>
-const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(std::shared_ptr<quantumdata::StateVector<RANK>> psi,
-       typename structure::QuantumSystem<RANK>::Ptr sys,
-       const evolution::Pars<>& pe)
+const evolution::LDO_Ptr<RANK>
+evolution::_(std::shared_ptr<quantumdata::StateVector<RANK>> psiPtr,
+             typename structure::QuantumSystem<RANK>::Ptr sys,
+             const evolution::Pars<>& pe)
 {
-  typedef quantumdata::StateVector    <RANK> SV;
-  typedef quantumdata::DensityOperator<RANK> DO;
-
   if      (pe.evol==evolution::SINGLE) {
-    trajectory::run(*makeMCWF(psi,sys,pe),pe);
-    return std::make_shared<SV>(*psi); // deep copy
+    trajectory::run(*makeMCWF(psiPtr,sys,pe),pe);
+    return psiPtr;
   }
   else if (pe.evol==evolution::ENSEMBLE) {
-    EnsembleMCWF<RANK,V> traj(psi,sys,pe,pe.negativity);
+    EnsembleMCWF<RANK,V> traj(psiPtr,sys,pe,pe.negativity);
     trajectory::run(traj,pe);
     return traj.averaged();
   }
   else {
-    return evolve<V>(std::make_shared<DO>(*psi),sys,pe);
+    return _<V>(std::make_shared<quantumdata::DensityOperator<RANK>>(*psiPtr),sys,pe);
   }
 
 }

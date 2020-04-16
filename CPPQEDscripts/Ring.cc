@@ -26,9 +26,7 @@ int main(int argc, char* argv[])
   mode    ::Ptr plus (make(pmP,qmp));
   mode    ::Ptr minus(make(pmM,qmp));
 
-  const auto psi{std::make_shared<quantumdata::StateVector<3>>(init(pp)*init(pmP)*init(pmM))};
-
-  evolve<0>(psi,
+  evolve<0>(init(pp)*init(pmP)*init(pmM),
             composite::make(
                             _<1,0>  (std::make_shared<ParticleAlongCavity>(plus ,part,ppcP)),
                             _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),

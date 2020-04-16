@@ -15,9 +15,7 @@ int main(int argc, char* argv[])
 
   auto qmp=updateWithPicture(p,argc,argv,"--"); // Parsing the command line
 
-  const auto psi{std::make_shared<quantumdata::StateVector<2>>(init(pq)*init(pm))};
-  
-  evolve(psi,
+  evolve(init(pq)*init(pm),
          binary::make(jaynescummings::make(make(pq,qmp),
                                            make(pm,qmp),
                                            pjc)),

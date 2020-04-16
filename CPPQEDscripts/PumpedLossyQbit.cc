@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   psi.renorm();
   */
   
-  evolve(std::make_shared<StateVector>(init(pplqb)),make(pplqb,qmp),pe);
+  evolve(init(pplqb),make(pplqb,qmp),pe);
 
 }
 

@@ -22,9 +22,9 @@ int main(int argc, char* argv[])
 
   const auto spin{std::make_shared<LossySpinSch>(ps)};
   
-  const auto psi{std::make_shared<structure::freesystem::StateVector>(spin->getDimensions())};
+  structure::freesystem::StateVector psi{spin->getDimensions()};
 
-  (*psi)(psi->getArray().ubound(0))=1;
+  psi(psi.getArray().ubound(0))=1;
   
   evolve(psi,spin,pe);
 

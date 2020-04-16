@@ -77,10 +77,10 @@ inline double saturation(const StateVectorLow& psi) {return mode::photonNumber(p
 inline double saturation(const LazyDensityOperator& m) {return mode::photonNumber(m);}
 
 
-inline const StateVector state0() {return mode::fock(0,2);}
-inline const StateVector state1() {return mode::fock(1,2);}
-const StateVector init(const dcomp& psi1);
-inline const StateVector init(const Pars& p) {return init(p.qbitInit);}
+inline StateVector state0() {return mode::fock(0,2);}
+inline StateVector state1() {return mode::fock(1,2);}
+StateVector init(const dcomp& psi1);
+inline StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
 Ptr make(const ParsPumpedLossy&, QM_Picture);

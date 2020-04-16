@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
     particlecavityBase.reset(new ParticleAlongCavity(mode,pumpedparticle,ppci,0));
     break;
   default:
-    cerr<<"Configuration not recognized!"<<endl; 
+    cerr<<"Configuration not recognized!"<<endl;
     return 1;
   }
 
@@ -83,9 +83,7 @@ int main(int argc, char* argv[])
     init(ppp)
     ;
 
-  auto psi{std::make_shared<StateVector>(init(pplm)*psiPart)};
-  
-  psi->renorm();
+  StateVector psi=init(pplm)*psiPart; psi.renorm();
 
 
   evolve(psi,binary::make(particlecavityBase),pe);

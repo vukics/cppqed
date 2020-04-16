@@ -42,14 +42,14 @@ struct FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState : public
  *
  * \note The user has to take care that `alpha` is not too large for the given `cutoff` (rule of thumb: `cutoff>|alpha|^2`)
  */
-const StateVector coherent(const dcomp& alpha, ///< amplitude
-                           size_t cutoff ///< cutoff
-                          );
+StateVector coherent(const dcomp& alpha, ///< amplitude
+                     size_t cutoff ///< cutoff
+                     );
 
-const StateVector fock(size_t n, size_t dim, double phase=0);
+StateVector fock(size_t n, size_t dim, double phase=0);
 
 /// Dispatcher for initial condition
-const StateVector init(const Pars&);
+StateVector init(const Pars&);
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters>

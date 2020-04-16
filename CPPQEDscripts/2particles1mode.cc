@@ -21,9 +21,7 @@ int main(int argc, char* argv[])
 
   auto act{std::make_shared<const ParticleOrthogonalToCavity>(mode,part,ppc)}; // only one instant
 
-  auto psi{std::make_shared<quantumdata::StateVector<3>>(init(pm)*init(pp)*init(pp))};
-  
-  evolve(psi,
+  evolve(init(pm)*init(pp)*init(pp),
          composite::make(
                          _<0,1>(act),_<0,2>(act),
                          _<1,2>(std::make_shared<IdenticalParticles<2>>(part))

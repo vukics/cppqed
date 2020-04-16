@@ -31,7 +31,7 @@ namespace quantumdata {
 /// Creates the direct product, relying on the direct-product constructor
 template<int RANK1, int RANK2>
 inline
-const StateVector<RANK1+RANK2>
+StateVector<RANK1+RANK2>
 operator*(const StateVector<RANK1>&, const StateVector<RANK2>&);
 
 
@@ -157,8 +157,8 @@ public:
   StateVector& operator+=(const StateVector& psi) {ABase::operator+=(psi); return *this;}
   StateVector& operator-=(const StateVector& psi) {ABase::operator-=(psi); return *this;}
 
-  const StateVector operator-() const {StateVector res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;} ///< involves a deep-copy
-  const StateVector operator+() const {return *this;} ///< simply deep copy
+  StateVector operator-() const {StateVector res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;} ///< involves a deep-copy
+  StateVector operator+() const {return *this;} ///< simply deep copy
   //@}
 
   /// \name Naive vector-space operations allowing also for mixed-mode arithmetics
@@ -184,7 +184,7 @@ private:
 
 template<int RANK1, int RANK2>
 inline
-const StateVector<RANK1+RANK2>
+StateVector<RANK1+RANK2>
 operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
 {
   return StateVector<RANK1+RANK2>(t1,t2);
