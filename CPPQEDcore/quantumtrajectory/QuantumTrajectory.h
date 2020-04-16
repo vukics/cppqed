@@ -30,21 +30,19 @@ inline double initialTimeStep(typename structure::QuantumSystem<RANK>::Ptr qs)
  * \tparam BASE practically either a trajectory::Adaptive (for Master) or a trajectory::Stochastic (for MCWF_Trajectory)
  */
 template<int RANK, typename BASE>
-class QuantumTrajectory : public BASE
+class QuantumTrajectory : public BASE, public structure::QuantumSystemWrapper<RANK,true>
 {
 protected:
-  typedef structure::QuantumSystemWrapper<RANK,true> QuantumSystemWrapper;
-
   /// Constructor forwarding to `BASE` and QuantumSystemWrapper
   template<typename... ArgumentPack>
   QuantumTrajectory(typename structure::QuantumSystem<RANK>::Ptr qs, bool isNoisy, ArgumentPack&&... argumentPack) 
-    : BASE(std::forward<ArgumentPack>(argumentPack)...), t0_(0), qs_(qs, isNoisy) {};
-
-  const QuantumSystemWrapper getQSW() const {return qs_;}
+    : BASE(std::forward<ArgumentPack>(argumentPack)...),
+      structure::QuantumSystemWrapper<RANK,true>(qs,isNoisy),
+      t0_(0) {};
 
   /// Forwards to `BASE`, but also sets \link getT0 `t0`\endlink
   cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar) override
-    { BASE::readStateMore_v(iar); if (getQSW().getEx()) setT0(); return iar; }
+    { BASE::readStateMore_v(iar); if (this->getEx()) setT0(); return iar; }
 
   /// The time instant of the beginning of the current time step
   /**
@@ -69,11 +67,10 @@ protected:
    * \tparam CONSTRUCT typically either shared_ptr to a quantumdata::StateVector (as in MCWF_Trajectory) or a quantumdata::DensityOperator (as in Master)
    */
   template<typename CONSTRUCT>
-  void checkDimension(CONSTRUCT&& c) const {if (*c!=*qs_.getQS()) throw DimensionalityMismatchException();}
+  void checkDimension(CONSTRUCT&& c) const {if (*c!=*(this->getQS())) throw DimensionalityMismatchException();}
   
 private:
   mutable double t0_;
-  const QuantumSystemWrapper qs_;
 
 };
 

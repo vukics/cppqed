@@ -28,7 +28,7 @@ namespace quantumtrajectory {
 template<int RANK>
 void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  if (const auto ha=getQSW().getHa()) {
+  if (const auto ha=this->getHa()) {
     dpsidt=0;
 
     ha->addContribution(t,psi,dpsidt,this->getT0());
@@ -53,10 +53,10 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
          randomized::MakerGSL()),
     psi_(psi),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
-    logger_(p.logLevel,getQSW().template nAvr<structure::LA_Li>())
+    logger_(p.logLevel,this->template nAvr<structure::LA_Li>())
 {
   QuantumTrajectory::checkDimension(psi);
-  if (!getTime()) if(const auto li=getQSW().getLi()) { // On startup, dpLimit should not be overshot, either.
+  if (!getTime()) if(const auto li=this->getLi()) { // On startup, dpLimit should not be overshot, either.
     Rates rates(li->rates(0.,*psi_)); calculateSpecialRates(&rates,0.);
     manageTimeStep(rates,getEvolved().get(),false);
   }
@@ -68,7 +68,7 @@ std::ostream& MCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) 
 {
   using namespace std;
 
-  return getQSW().display(getTime(),*psi_,os,precision);
+  return structure::QuantumSystemWrapper<RANK,true>::display(getTime(),*psi_,os,precision);
 
 }
 
@@ -76,11 +76,11 @@ std::ostream& MCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) 
 template<int RANK>
 double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
 {
-  if (getQSW().getHa()) {
+  if (this->getHa()) {
     getEvolved()->step(Dt);
   }
   else {
-    double stepToDo=getQSW().getLi() ? std::min(getDtTry(),Dt) : Dt; // Cf. tracker #3482771
+    double stepToDo=this->getLi() ? std::min(getDtTry(),Dt) : Dt; // Cf. tracker #3482771
     getEvolved()->update(getTime()+stepToDo,getDtTry());
   }
   // This defines three levels:
@@ -90,7 +90,7 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
   
   double t=getTime();
 
-  if (const auto ex=getQSW().getEx()) {
+  if (const auto ex=this->getEx()) {
     ex->actWithU(getTime(),psi_->getArray(),this->getT0());
     QuantumTrajectory::setT0(t);
   }
@@ -108,7 +108,7 @@ auto MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const 
   for (int i=0; i<rates->size(); i++)
     if ((*rates)(i)<0) {
       StateVector psiTemp(*psi_);
-      getQSW().actWithJ(t,psiTemp.getArray(),i);
+      this->actWithJ(t,psiTemp.getArray(),i);
       res.push_back(IndexSVL_tuple(i,psiTemp.getArray()));
       (*rates)(i)=mathutils::sqr(psiTemp.renorm());
     } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the StateVectorLow in the tuple
@@ -136,7 +136,7 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStep
   }
 
   // dtTry-adjustment for next step:
-  getEvolved()->setDtTry(getQSW().getHa() ? std::min(getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
+  getEvolved()->setDtTry(this->getHa() ? std::min(getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
 
   return false; // Step-back not required.
 }
@@ -158,7 +158,7 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
       *psi_=get<1>(*i); // RHS already normalized above
     else {
       // normal  jump
-      getQSW().actWithJ(t,psi_->getArray(),lindbladNo);
+      this->actWithJ(t,psi_->getArray(),lindbladNo);
       double normFactor=sqrt(rates(lindbladNo));
       if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
       *psi_/=normFactor;
@@ -177,7 +177,7 @@ void MCWF_Trajectory<RANK>::step_v(double Dt)
 
   double t=coherentTimeDevelopment(Dt);
 
-  if (const auto li=getQSW().getLi()) {
+  if (const auto li=this->getLi()) {
 
     Rates rates(li->rates(t,*psi_));
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
@@ -204,9 +204,9 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
   
-  getQSW().displayCharacteristics(getQSW().getQS()->displayParameters(Base::displayParameters_v(os)<<"MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
+  this->displayCharacteristics(this->getQS()->displayParameters(Base::displayParameters_v(os)<<"MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
 
-  if (const auto li=getQSW().getLi()) {
+  if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";
     {
       size_t i=0;
@@ -230,7 +230,7 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
 template<int RANK>
 std::ostream& MCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) const
 {
-  return getQSW().template displayKey<structure::LA_Av>(os,i);
+  return this->template displayKey<structure::LA_Av>(os,i);
 }
 
 

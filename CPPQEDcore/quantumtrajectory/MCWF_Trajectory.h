@@ -107,7 +107,7 @@ public:
   using Base::getTime;
 
 protected:
-  using Base::getEvolved; using Base::getDtTry; using QuantumTrajectory::getQSW;
+  using Base::getEvolved; using Base::getDtTry;
 
   std::ostream&    display_v(std::ostream&, int    ) const override; ///< Forwards to structure::Averaged::display
   std::ostream& displayKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::displayKey

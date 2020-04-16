@@ -58,7 +58,7 @@ public:
                                double relaxationTime, ///< relaxation time after which the time averaging starts
                                const StateVectorLow& scaleAbs=StateVectorLow()
                                )
-    : Base(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(this->getQSW().template nAvr<structure::LA_Av>()), sum_(0), av_(this->getQSW().getAv())
+    : Base(psi,sys,p,scaleAbs), relaxationTime_(relaxationTime), averages_(this->template nAvr<structure::LA_Av>()), sum_(0), av_(this->getAv())
     {
       averages_=0.;
     }

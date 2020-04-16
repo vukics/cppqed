@@ -126,7 +126,7 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
  * - negative, it forwards the member functions of the given class as no-ops.
  *
  * \tparamRANK
- * \tparam IS_CONST governs const-ness
+ * \tparam IS_CONST governs const-ness (non-const necessary for assignment)
  *
  */
 template<int RANK, bool IS_CONST> 
@@ -186,17 +186,11 @@ public:
 
   /// \name Getters
   //@{
-  const QuantumSystemPtr getQS() const {return qs_;}
-  const ExactPtr         getEx() const {return ex_;} 
-  const HamiltonianPtr   getHa() const {return ha_;}
-  const LiouvilleanPtr   getLi() const {return li_;} 
-  const AveragedPtr      getAv() const {return av_;}  
-
-  QuantumSystemPtr getQS() {return qs_;}
-  ExactPtr         getEx() {return ex_;} 
-  HamiltonianPtr   getHa() {return ha_;}
-  LiouvilleanPtr   getLi() {return li_;} 
-  AveragedPtr      getAv() {return av_;}  
+  QuantumSystemPtr getQS() const {return qs_;}
+  ExactPtr         getEx() const {return ex_;} 
+  HamiltonianPtr   getHa() const {return ha_;}
+  LiouvilleanPtr   getLi() const {return li_;} 
+  AveragedPtr      getAv() const {return av_;}  
   //@}
 
 private:

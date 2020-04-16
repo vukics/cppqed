@@ -35,7 +35,7 @@ Base<RANK>::Base(DO_Ptr rho,
                       evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
     rho_(rho)
 {
-  if (!getQSW().applicableInMaster()) throw master::SystemNotApplicable();
+  if (!this->applicableInMaster()) throw master::SystemNotApplicable();
   QuantumTrajectory::checkDimension(rho);
 
 }
@@ -46,7 +46,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 {
   drhodtLow=0;
 
-  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,this->getT0()));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,this,t,_1,_2,this->getT0()));
 
   {
     linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
@@ -55,12 +55,12 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   // Now act with the reset operator --- implement this in terms of the individual jumps by iteration and addition
 
-  for (size_t i=0; i<getQSW().template nAvr<structure::LA_Li>(); i++) {
+  for (size_t i=0; i<this->template nAvr<structure::LA_Li>(); i++) {
     try {
-      getQSW().getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
+      this->getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
     } catch (const structure::SuperoperatorNotImplementedException&) {
       DensityOperatorLow rhotemp(rhoLow.copy());
-      UnaryFunction functionLi(bind(&Liouvillean::actWithJ,getQSW().getLi(),t,_1,i));
+      UnaryFunction functionLi(bind(&Liouvillean::actWithJ,this->getLi(),t,_1,i));
       unaryIter(rhotemp,functionLi);
       blitzplusplus::hermitianConjugateSelf(rhotemp);
       unaryIter(rhotemp,functionLi);
@@ -75,7 +75,7 @@ void
 Base<RANK>::step_v(double deltaT)
 {
   this->getEvolved()->step(deltaT);
-  if (const auto ex=getQSW().getEx()) {
+  if (const auto ex=this->getEx()) {
     using namespace blitzplusplus;
     DensityOperatorLow rhoLow(rho_->getArray());
     UnaryFunction functionEx(bind(&Exact::actWithU,ex,this->getTime(),_1,this->getT0()));
@@ -107,9 +107,9 @@ std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
 
-  getQSW().displayCharacteristics( getQSW().getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
+  this->displayCharacteristics( this->getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
 
-  if (const auto li=getQSW().getLi()) {
+  if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";
     {
       size_t i=0;

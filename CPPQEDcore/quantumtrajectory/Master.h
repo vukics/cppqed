@@ -60,16 +60,12 @@ public:
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
 
 protected:
-  using QuantumTrajectory::getQSW;
-
   Base(DO_Ptr, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
   typedef boost::function<void(const StateVectorLow&, StateVectorLow&)> BinaryFunction;
 
   const DO_Ptr rho_;
-
-  const typename Averaged::Ptr getAv() const {return getQSW().getAv();}
 
 private:
   void step_v(double) final;
