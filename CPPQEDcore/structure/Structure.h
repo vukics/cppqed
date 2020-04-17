@@ -13,6 +13,7 @@
 #include "Liouvillean.h"
 #include "Averaged.h"
 
+#include <xtensor/xfixed.hpp>
 
 /// Comprises modules for describing quantum systems.
 /** 
@@ -39,69 +40,35 @@
 namespace structure {
 
 
-typedef blitz::TinyVector<bool,3> SystemCharacteristics;
+typedef xt::xtensor_fixed<bool,xt::xshape<3>> SystemCharacteristics;
 
 
 using std::dynamic_pointer_cast;
 
 
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Exact \related QuantumSystem
-template<int RANK>
-inline 
-const typename Exact<RANK>::Ptr 
-qse(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
-{return dynamic_pointer_cast<const Exact<RANK> >(quantumSystem);}
+/// Dynamic cast to a shared pointer to Exact
+template<int RANK, typename T>
+inline auto
+qse(std::shared_ptr<const T> t)
+{return dynamic_pointer_cast<const Exact<RANK> >(t);}
 
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Hamiltonian \related QuantumSystem
-template<int RANK>
-inline 
-const typename Hamiltonian<RANK>::Ptr 
-qsh(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
-{return dynamic_pointer_cast<const Hamiltonian<RANK> >(quantumSystem);}
+/// Dynamic cast to a shared pointer to Hamiltonian
+template<int RANK, typename T>
+inline auto
+qsh(std::shared_ptr<const T> t)
+{return dynamic_pointer_cast<const Hamiltonian<RANK> >(t);}
 
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Liouvillean \related QuantumSystem
-template<int RANK>
-inline 
-const typename Liouvillean<RANK>::Ptr 
-qsl(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
-{return dynamic_pointer_cast<const Liouvillean<RANK> >(quantumSystem);}
+/// Dynamic cast to a shared pointer to Liouvillean
+template<int RANK, typename T>
+inline auto
+qsl(std::shared_ptr<const T> t)
+{return dynamic_pointer_cast<const Liouvillean<RANK> >(t);}
 
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Averaged \related QuantumSystem
-template<int RANK>
-inline 
-const typename Averaged<RANK>::Ptr 
-qsa(std::shared_ptr<const QuantumSystem<RANK> > quantumSystem)
-{return dynamic_pointer_cast<const Averaged<RANK> >(quantumSystem);}
-
-
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Exact \related DynamicsBase
-template<int RANK>
-inline 
-const typename Exact<RANK>::Ptr 
-qse(DynamicsBase::Ptr base)
-{return dynamic_pointer_cast<const Exact<RANK> >(base);}
-
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Hamiltonian \related DynamicsBase
-template<int RANK>
-inline 
-const typename Hamiltonian<RANK>::Ptr 
-qsh(DynamicsBase::Ptr base)
-{return dynamic_pointer_cast<const Hamiltonian<RANK> >(base);}
-
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Liouvillean \related DynamicsBase
-template<int RANK>
-inline 
-const typename Liouvillean<RANK>::Ptr 
-qsl(DynamicsBase::Ptr base)
-{return dynamic_pointer_cast<const Liouvillean<RANK> >(base);}
-
-/// \refBoost{Dynamic cast,smart_ptr/shared_ptr.htm#dynamic_pointer_cast} to a shared pointer to Averaged \related DynamicsBase
-template<int RANK>
-inline 
-const typename Averaged<RANK>::Ptr 
-qsa(DynamicsBase::Ptr base)
-{return dynamic_pointer_cast<const Averaged<RANK> >(base);}
-
+/// Dynamic cast to a shared pointer to Averaged
+template<int RANK, typename T>
+inline auto
+qsa(std::shared_ptr<const T> t)
+{return dynamic_pointer_cast<const Averaged<RANK> >(t);}
 
 
 // Some functions that are used in contexts other than QuantumSystemWrapper are factored out:

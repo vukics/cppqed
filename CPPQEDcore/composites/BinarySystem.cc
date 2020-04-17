@@ -304,15 +304,15 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
     free0=ia->getFrees()[0],
     free1=ia->getFrees()[1];
 
-  return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(ia),
-                               qsh(free0) || qsh(free1) || qsh<2>(ia),
-                               qsl(free0) || qsl(free1) || qsl<2>(ia));
+  return SystemCharacteristics{qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
+                               qsh<1>(free0) || qsh<1>(free1) || qsh<2>(ia),
+                               qsl<1>(free0) || qsl<1>(free1) || qsl<2>(ia)};
 }
 
 }
 
 
-#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
+#define DISPATCHER(EX,HA,LI) (querySystemCharacteristics(ia)==SystemCharacteristics{EX,HA,LI}) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
 const binary::Ptr binary::make(Interaction::Ptr ia)

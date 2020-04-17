@@ -721,14 +721,14 @@ public:
   template<typename Act>
   result_type operator()(result_type sc, const Act& act)
   {
-    return sc || result_type(act.getEx()!=0,act.getHa()!=0,act.getLi()!=0);
+    return sc || result_type{act.getEx()!=0,act.getHa()!=0,act.getLi()!=0};
   }
 
   template<typename T>
   void operator()(T) const
   {
     const SubSystemFree& free=frees_[T::value];
-    sc_|=result_type(free.getEx()!=0,free.getHa()!=0,free.getLi()!=0);
+    sc_|=result_type{free.getEx()!=0,free.getHa()!=0,free.getLi()!=0};
   }
 
 private:
@@ -741,7 +741,7 @@ private:
 } // composite
 
 
-#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics(EX,HA,LI))) return std::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
+#define DISPATCHER(EX,HA,LI) (systemCharacteristics==SystemCharacteristics{EX,HA,LI}) return std::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
 
 template<typename VA>
 const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
@@ -750,7 +750,7 @@ const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
   
   const typename Base<VA>::Frees frees(fillFrees(acts));
 
-  SystemCharacteristics systemCharacteristics(false,false,false);
+  SystemCharacteristics systemCharacteristics{false,false,false};
   
   {
     const composite::QuerySystemCharacteristics<VA> helper(frees,systemCharacteristics);
