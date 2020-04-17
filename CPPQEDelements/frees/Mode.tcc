@@ -6,19 +6,17 @@
 
 #include "TridiagonalHamiltonian.tcc"
 
-#include <boost/make_shared.hpp>
-
 
 namespace mode {
 
 #define TEMPLATE_PARAM_TEMP(temp) temp,AveragingType
 #define SWITCH_helper(name,templateParam)                                 \
   switch (qmp) {                                                         \
-    case QMP_IP  : return boost::make_shared<name##Mode   <templateParam> >(p,a...); \
-    case QMP_UIP : return boost::make_shared<name##ModeUIP<templateParam> >(p,a...); \
+    case QMP_IP  : return std::make_shared<name##Mode   <templateParam> >(p,a...); \
+    case QMP_UIP : return std::make_shared<name##ModeUIP<templateParam> >(p,a...); \
   case QMP_SCH : ;                                                         \
   }                                                                         \
-  return boost::make_shared<name##ModeSch<templateParam> >(p,a...);
+  return std::make_shared<name##ModeSch<templateParam> >(p,a...);
 
 
 template<typename AveragingType, typename... AveragingConstructorParameters >

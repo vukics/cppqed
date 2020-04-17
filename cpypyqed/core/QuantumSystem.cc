@@ -26,7 +26,7 @@ void export_QuantumSystem(){
     .def("highestFrequency",&QuantumSystem<r>::highestFrequency) \
   ; \
   register_ptr_to_python<QuantumSystem<r>::Ptr>(); \
-  implicitly_convertible<boost::shared_ptr<QuantumSystem<r>>, QuantumSystem<r>::Ptr>();
+  implicitly_convertible<std::shared_ptr<QuantumSystem<r>>, QuantumSystem<r>::Ptr>();
 BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), QUANTUMSYSTEM_INSTANTIATIONS, data)
 
 }

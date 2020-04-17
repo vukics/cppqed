@@ -36,12 +36,7 @@ int main(int argc, char* argv[])
 
   Ptr mode(make<Collecting>(pplm,collection));
 
-  StateVector psi(mode::init(pplm));
-
-  evolve(psi,mode,pe);
-
-
-
+  evolve(mode::init(pplm),mode,pe);
 
 }
 

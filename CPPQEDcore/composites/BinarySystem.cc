@@ -10,10 +10,9 @@
 
 #include "BlitzTiny.h"
 
+#include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
-
-#include <boost/make_shared.hpp>
 
 
 using composite::SubSystemFree;
@@ -36,8 +35,8 @@ namespace {
 
 
 binary::Base::Base(Interaction::Ptr ia)
-  : QuantumSystem<2>(Dimensions(ia->getFrees()(0)->getDimension(),ia->getFrees()(1)->getDimension())),
-    free0_(ia->getFrees()(0)), free1_(ia->getFrees()(1)), ia_(ia)
+  : QuantumSystem<2>(Dimensions(ia->getFrees()[0]->getDimension(),ia->getFrees()[1]->getDimension())),
+    free0_(ia->getFrees()[0]), free1_(ia->getFrees()[1]), ia_(ia)
 {
 } 
 
@@ -302,21 +301,21 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
   using namespace structure;
   
   const QuantumSystem<1>::Ptr
-    free0=ia->getFrees()(0),
-    free1=ia->getFrees()(1);
+    free0=ia->getFrees()[0],
+    free1=ia->getFrees()[1];
 
-  return SystemCharacteristics(qse(free0) || qse(free1) || qse<2>(ia),
-                               qsh(free0) || qsh(free1) || qsh<2>(ia),
-                               qsl(free0) || qsl(free1) || qsl<2>(ia));
+  return SystemCharacteristics{qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
+                               qsh<1>(free0) || qsh<1>(free1) || qsh<2>(ia),
+                               qsl<1>(free0) || qsl<1>(free1) || qsl<2>(ia)};
 }
 
 }
 
 
-#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<BinarySystem<EX,HA,LI> >(ia)
+#define DISPATCHER(EX,HA,LI) (querySystemCharacteristics(ia)==SystemCharacteristics{EX,HA,LI}) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
-const binary::Ptr binary::doMake(Interaction::Ptr ia)
+const binary::Ptr binary::make(Interaction::Ptr ia)
 {
   if      DISPATCHER(true ,true ,true ) ;
   else if DISPATCHER(true ,true ,false) ;
@@ -325,7 +324,7 @@ const binary::Ptr binary::doMake(Interaction::Ptr ia)
   else if DISPATCHER(false,true ,true ) ;
   else if DISPATCHER(false,true ,false) ;
   else if DISPATCHER(false,false,true ) ;
-  else return boost::make_shared<BinarySystem<false,false,false> >(ia);
+  else return std::make_shared<BinarySystem<false,false,false> >(ia);
 }
 
 

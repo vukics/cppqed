@@ -8,13 +8,11 @@
 #include "QuantumSystem.h"
 #include "SubSystem.h"
 
-#include "SmartPtr.h"
-
 
 /// Auxiliary tools for BinarySystem
 namespace binary {
 
-typedef boost::shared_ptr<const Base> Ptr; ///< Convenience typedef
+typedef std::shared_ptr<const Base> Ptr; ///< Convenience typedef
 
 typedef structure::Interaction<2> Interaction; ///< Binary interaction
 
@@ -24,14 +22,7 @@ typedef structure::Interaction<2> Interaction; ///< Binary interaction
  * (the two \link structure::Free free systems\endlink and the #Interaction): whether they derive from structure::Exact, structure::Hamiltonian, structure::Liouvillean.
  * If any of the components derive from structure::Exact, then the whole BinarySystem has to derive from structure::Exact, and so on.
  */
-const Ptr doMake(Interaction::Ptr);
-
-/// Templatized maker function relying on cpputils::sharedPointerize to delegate to make()
-template<typename IA>
-const Ptr make(const IA& ia)
-{
-  return doMake(cpputils::sharedPointerize(ia));
-}
+const Ptr make(Interaction::Ptr);
 
 
 typedef composite::SubSystemFree            SSF; ///< Convenience typedef

@@ -41,11 +41,12 @@ int main(int argc, char* argv[])
 
   particle::PtrPumped pumpedparticle(makePumped(ppp,qmp));
 
-  particlecavity::Base* particlecavityBase;
+  std::shared_ptr<particlecavity::Base> particlecavityBase;
+  
   switch (conf) {
   case 1:
     // Pumped particle moving orthogonal to (pumped) cavity
-    particlecavityBase=new ParticleOrthogonalToCavity(mode,pumpedparticle,ppci);
+    particlecavityBase.reset(new ParticleOrthogonalToCavity(mode,pumpedparticle,ppci));
     break;
   case 2:
     // (Pumped) particle moving along cavity. 
@@ -53,21 +54,21 @@ int main(int argc, char* argv[])
     // Cavity pumped + atom scatters from atomic pump into cavity.
     if (!abs(pplm.eta) && !ppp.vClass) {cerr<<"No driving in the system!"<<endl; return 1;}
     if (!ppp.init.getSig()) {cerr<<"No initial spread specified!"<<endl; return 1;}
-    particlecavityBase=new ParticleAlongCavity(mode,particle,ppci,ppp.vClass);
+    particlecavityBase.reset(new ParticleAlongCavity(mode,particle,ppci,ppp.vClass));
     break;
   case 3:
     // Pumped particle moving along cavity. 
     // Atomic pump aligned along cavity -> atomic moves in additional classical potential. 
     // Cavity pumped + atom scatters from atomic pump into cavity.
-    particlecavityBase=new ParticleAlongCavity(mode,pumpedparticle,ppci);
+    particlecavityBase.reset(new ParticleAlongCavity(mode,pumpedparticle,ppci));
     break;
   case 4:
     // Same as case 3, but atom doesn't scatter from atomic pump to cavity.
     // -> Atomic pump merely a classical potential.
-    particlecavityBase=new ParticleAlongCavity(mode,pumpedparticle,ppci,0);
+    particlecavityBase.reset(new ParticleAlongCavity(mode,pumpedparticle,ppci,0));
     break;
   default:
-    cerr<<"Configuration not recognized!"<<endl; 
+    cerr<<"Configuration not recognized!"<<endl;
     return 1;
   }
 
@@ -82,11 +83,9 @@ int main(int argc, char* argv[])
     init(ppp)
     ;
 
-  StateVector psi=init(pplm)*psiPart;
-  
-  psi.renorm();
+  StateVector psi=init(pplm)*psiPart; psi.renorm();
 
 
-  evolve(psi,binary::make(*particlecavityBase),pe);
+  evolve(psi,binary::make(particlecavityBase),pe);
 
 }

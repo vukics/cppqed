@@ -12,8 +12,6 @@
 #include "StateVector.h"
 
 #include <boost/mpl/integral_c.hpp>
-#include <boost/shared_ptr.hpp>
-
 
 namespace quantumdata {
 
@@ -26,7 +24,7 @@ struct LazyDensityOperatorFFT_NotImplementedException : cpputils::Exception {};
 
 
 template<typename V, int RANK>
-const boost::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDensityOperator<RANK>&, fft::Direction);
+const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDensityOperator<RANK>&, fft::Direction);
 
 
 } // quantumdata

@@ -11,7 +11,8 @@
 #include "BlitzArrayExtensions.h"
 #include "Exception.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
+
 
 namespace structure {
 
@@ -36,7 +37,7 @@ const LA_Av_tagType LA_Av_tag;
 class LiouvilleanAveragedCommon
 {
 public:
-  typedef boost::shared_ptr<const LiouvilleanAveragedCommon> Ptr;
+  typedef std::shared_ptr<const LiouvilleanAveragedCommon> Ptr;
 
   typedef DArray<1> DArray1D; ///< A 1D real array storing the quantum averages – even if they are complex, their real & imaginary parts must be stored separately as reals
 
@@ -84,7 +85,7 @@ template<int RANK>
 class LiouvilleanAveragedCommonRanked : public LiouvilleanAveragedCommon
 {
 public:
-  typedef boost::shared_ptr<const LiouvilleanAveragedCommonRanked> Ptr;
+  typedef std::shared_ptr<const LiouvilleanAveragedCommonRanked> Ptr;
   
   typedef typename LiouvilleanAveragedCommon::DArray1D DArray1D;
 

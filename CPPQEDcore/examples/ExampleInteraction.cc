@@ -1,20 +1,20 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "ExampleInteraction.h"
 
-basic::InteractionX_X::InteractionX_X(const PumpedLossyMode& m0, const PumpedLossyMode& m1, double g)
-  : Interaction<2>(m0,m1,RF{"g",g,sqrt(m0.getDimension()*m1.getDimension())}),
+basic::InteractionX_X::InteractionX_X(std::shared_ptr<PumpedLossyMode> m0, std::shared_ptr<PumpedLossyMode> m1, double g)
+  : Interaction<2>({m0,m1},{RF{"g",g,sqrt(m0->getDimension()*m1->getDimension())}}),
     TridiagonalHamiltonian<2,false>(g*
-                                    (aop(m0)+aop(m0).dagger())*
-                                    (aop(m1)+aop(m1).dagger())
+                                    (aop(*m0)+aop(*m0).dagger())*
+                                    (aop(*m1)+aop(*m1).dagger())
                                     )
 {}
 
 
-hierarchical::InteractionX_X::InteractionX_X(const ModeBase& m0, const ModeBase& m1, double g)
-  : Interaction<2>(m0,m1,RF{"g",g,sqrt(m0.getDimension()*m1.getDimension())}),
+hierarchical::InteractionX_X::InteractionX_X(ModeBase::Ptr m0, ModeBase::Ptr m1, double g)
+  : Interaction<2>({m0,m1},{RF{"g",g,sqrt(m0->getDimension()*m1->getDimension())}}),
     TridiagonalHamiltonian<2,true>(g*
-                                   (aop(m0)+aop(m0).dagger())*
-                                   (aop(m1)+aop(m1).dagger())
+                                   (aop(*m0)+aop(*m0).dagger())*
+                                   (aop(*m1)+aop(*m1).dagger())
                                    )
 {}
 

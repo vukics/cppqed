@@ -8,8 +8,6 @@
 
 #include <flens/flens.cxx>
 
-#include <boost/make_shared.hpp>
-
 
 
 const dcomp DrivenDampedHarmonicOscillator::c(double t) const
@@ -93,9 +91,9 @@ public:
 const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit)
 {
   if (gamma==1.)
-    return boost::make_shared<DDHO_Critical>(omega,ampTI,ampDerivTI,tInit);
+    return std::make_shared<DDHO_Critical>(omega,ampTI,ampDerivTI,tInit);
   else
-    return boost::make_shared<DDHO>(gamma,omega,ampTI,ampDerivTI,tInit);
+    return std::make_shared<DDHO>(gamma,omega,ampTI,ampDerivTI,tInit);
 }
 
 #endif // DO_NOT_USE_FLENS

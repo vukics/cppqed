@@ -26,19 +26,11 @@ int main(int argc, char* argv[])
   mode    ::Ptr plus (make(pmP,qmp));
   mode    ::Ptr minus(make(pmM,qmp));
 
-  quantumdata::StateVector<3> psi(init(pp)*
-                                  init(pmP)*
-                                  init(pmM));
-
-  ParticleAlongCavity pacP(plus ,part,ppcP);
-  ParticleAlongCavity pacM(minus,part,ppcM);
-  ParticleTwoModes ptm(plus,minus,part,ppcP,ppcM);
-
-  evolve<0>(psi,
+  evolve<0>(init(pp)*init(pmP)*init(pmM),
             composite::make(
-                            _<1,0>  (pacP),
-                            _<2,0>  (pacM),
-                            _<1,2,0>(ptm)
+                            _<1,0>  (std::make_shared<ParticleAlongCavity>(plus ,part,ppcP)),
+                            _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),
+                            _<1,2,0>(std::make_shared<ParticleTwoModes>(plus,minus,part,ppcP,ppcM))
                             ),
             pe);
 

@@ -34,14 +34,14 @@ void export_JaynesCummings()
       .PARS_PROPERTY(g)
     ;
     register_ptr_to_python< jaynescummings::Ptr >();
-    implicitly_convertible<boost::shared_ptr<Base<false>>,jaynescummings::Ptr>();
+    implicitly_convertible<std::shared_ptr<Base<false>>,jaynescummings::Ptr>();
 
     def("make", jaynescummings::make<qbit::Ptr, mode::Ptr>,
         with_custodian_and_ward_postcall<0,1,with_custodian_and_ward_postcall<0,2,with_custodian_and_ward_postcall<0,3>>>());
     jaynescummingsNameSpace.staticmethod("make");
 
     implicitly_convertible<Pars, dcomp>();
-    implicitly_convertible<boost::shared_ptr<Base<false>>, boost::shared_ptr<const structure::Interaction<2>>>();
+    implicitly_convertible<std::shared_ptr<Base<false>>, std::shared_ptr<const structure::Interaction<2>>>();
   }
 }
 

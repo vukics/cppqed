@@ -43,7 +43,7 @@ class RankedBase : public structure::QuantumSystem<N_RANK>
 public:
   static const int RANK=N_RANK;
 
-  typedef boost::shared_ptr<const RankedBase<RANK> > Ptr;
+  typedef std::shared_ptr<const RankedBase<RANK> > Ptr;
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
@@ -76,7 +76,7 @@ class Base
     public structure::Averaged<MaxRank<VA>::value+1>
 {
 public:
-  typedef boost::shared_ptr<const Base<VA> > Ptr;
+  typedef std::shared_ptr<const Base<VA> > Ptr;
   
   // The calculated RANK
   static const int RANK=MaxRank<VA>::value+1;

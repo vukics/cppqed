@@ -21,13 +21,13 @@ namespace master {
 
 
 template<int RANK>
-Base<RANK>::Base(DensityOperator& rho,
+Base<RANK>::Base(DO_Ptr rho,
                  typename QuantumSystem::Ptr qs,
                  const master::Pars& p,
                  const DensityOperatorLow& scaleAbs
                  )
   : QuantumTrajectory(qs,true,
-                      rho.getArray(),
+                      rho->getArray(),
                       bind(&Base<RANK>::derivs,this,_1,_2,_3),
                       initialTimeStep<RANK>(qs),
                       p.logLevel,p.epsRel,p.epsAbs,
@@ -35,7 +35,7 @@ Base<RANK>::Base(DensityOperator& rho,
                       evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
     rho_(rho)
 {
-  if (!getQSW().applicableInMaster()) throw master::SystemNotApplicable();
+  if (!this->applicableInMaster()) throw master::SystemNotApplicable();
   QuantumTrajectory::checkDimension(rho);
 
 }
@@ -46,7 +46,7 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 {
   drhodtLow=0;
 
-  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,getQSW(),t,_1,_2,this->getT0()));
+  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,this,t,_1,_2,this->getT0()));
 
   {
     linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
@@ -55,12 +55,12 @@ void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOpera
 
   // Now act with the reset operator --- implement this in terms of the individual jumps by iteration and addition
 
-  for (size_t i=0; i<getQSW().template nAvr<structure::LA_Li>(); i++) {
+  for (size_t i=0; i<this->template nAvr<structure::LA_Li>(); i++) {
     try {
-      getQSW().getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
+      this->getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
     } catch (const structure::SuperoperatorNotImplementedException&) {
       DensityOperatorLow rhotemp(rhoLow.copy());
-      UnaryFunction functionLi(bind(&Liouvillean::actWithJ,getQSW().getLi(),t,_1,i));
+      UnaryFunction functionLi(bind(&Liouvillean::actWithJ,this->getLi(),t,_1,i));
       unaryIter(rhotemp,functionLi);
       blitzplusplus::hermitianConjugateSelf(rhotemp);
       unaryIter(rhotemp,functionLi);
@@ -75,9 +75,9 @@ void
 Base<RANK>::step_v(double deltaT)
 {
   this->getEvolved()->step(deltaT);
-  if (const auto ex=getQSW().getEx()) {
+  if (const auto ex=this->getEx()) {
     using namespace blitzplusplus;
-    DensityOperatorLow rhoLow(rho_.getArray());
+    DensityOperatorLow rhoLow(rho_->getArray());
     UnaryFunction functionEx(bind(&Exact::actWithU,ex,this->getTime(),_1,this->getT0()));
     unaryIter(rhoLow,functionEx);
     hermitianConjugateSelf(rhoLow);
@@ -92,12 +92,12 @@ Base<RANK>::step_v(double deltaT)
   // We make the approximately Hermitian and normalized rho_ exactly so.
 
   {
-    linalg::CMatrix m(rho_.matrixView());
+    linalg::CMatrix m(rho_->matrixView());
     linalg::calculateTwoTimesRealPartOfSelf(m); 
     // here we get two times of what is desired, but it is anyway renormalized in the next step
   }
 
-  rho_.renorm();
+  rho_->renorm();
 
 }
 
@@ -107,21 +107,21 @@ std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
 {
   using namespace std;
 
-  getQSW().displayCharacteristics( getQSW().getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
+  this->displayCharacteristics( this->getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
 
-  if (const auto li=getQSW().getLi()) {
+  if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";
     {
       size_t i=0;
       li->displayKey(os,i);
     }
     os<<"Explicit superoperator calculations: ";
-    DensityOperator rhotemp(rho_.getDimensions());
+    DensityOperator rhotemp(rho_->getDimensions());
     {
       int n=0;
       for (int i=0; i<li->nAvr(); ++i)
         try {
-          li->actWithSuperoperator(0,rho_.getArray(),rhotemp.getArray(),i);
+          li->actWithSuperoperator(0,rho_->getArray(),rhotemp.getArray(),i);
           os<<i<<' '; ++n;
         }
         catch (const structure::SuperoperatorNotImplementedException&) {}

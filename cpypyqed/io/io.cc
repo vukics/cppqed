@@ -87,14 +87,14 @@ object read(str filename)
 
   trajectory::SerializationMetadata meta;
   {
-    boost::shared_ptr<std::istream> is = trajectory::openStateFileReading(f);
+    std::shared_ptr<std::istream> is = trajectory::openStateFileReading(f);
     meta = trajectory::readMeta(is.get());
   }
 
   throw_rank(meta.rank);
   throw_type(meta.typeID);
 
-  boost::shared_ptr<std::istream> is = trajectory::openStateFileReading(f);
+  std::shared_ptr<std::istream> is = trajectory::openStateFileReading(f);
 
   list result;
   result.append(meta);
@@ -114,7 +114,7 @@ object read(str filename)
 void write(str filename, const numeric::array &array, double time)
 {
   std::string f = extract<std::string>(filename);
-  boost::shared_ptr<std::ostream> ofs = trajectory::openStateFileWriting(f,std::ios_base::trunc | std::ios_base::binary);
+  std::shared_ptr<std::ostream> ofs = trajectory::openStateFileWriting(f,std::ios_base::trunc | std::ios_base::binary);
 
   const PyArrayObject * np_array = numeric_np(array);
 

@@ -9,11 +9,9 @@
 #include "CommentingStream.h"
 #include "Exception.h"
 #include "Evolved.h"
-#include "SmartPtr.h"
 
 #include <iosfwd>
 #include <string>
-#include <boost/shared_ptr.hpp>
 
 
 /// The trajectory-bundle
@@ -153,7 +151,7 @@ private:
  *
  * If the file cannot be opened, StateFileOpeningException is raised.
  */
-boost::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
+std::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
 
 /// Opens a file with the given filename for writing (appending) and returns an associated std::ostream object.
 /**
@@ -163,7 +161,7 @@ boost::shared_ptr<std::istream> openStateFileReading(const std::string &filename
  *
  * If the file cannot be opened, StateFileOpeningException is raised.
  */
-boost::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app | std::ios_base::binary);
+std::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app | std::ios_base::binary);
 
 template<typename T>
 void writeViaSStream(const T&, std::ostream*);
@@ -241,7 +239,7 @@ public:
 
   virtual ~Trajectory() {}
 
-  void setLogStreamDuringRun(boost::shared_ptr<std::ostream> os) {commentingStream_.p=os; commentingStream_.s=*os;}
+  void setLogStreamDuringRun(std::shared_ptr<std::ostream> os) {commentingStream_.p=os; commentingStream_.s=*os;}
 
 protected:
   /// The stream hence obtained must always be flushed (e.g. with `std::endl`) before anything else gets to write on the same underlying stream
@@ -262,7 +260,7 @@ private:
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
 
   struct {
-    boost::shared_ptr<std::ostream> p;
+    std::shared_ptr<std::ostream> p;
     mutable cpputils::CommentingStream s{std::clog};
   } commentingStream_;
 

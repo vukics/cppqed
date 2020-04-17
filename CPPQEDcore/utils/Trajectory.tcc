@@ -11,8 +11,6 @@
 #include "ParsTrajectory.h"
 #include "Version.h"
 
-#include <boost/make_shared.hpp>
-
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -102,6 +100,10 @@ const DisplayAndAutostopHandler::Ptr makeDisplayAndAutostopHandler(const Traject
 bool restoreState(Trajectory&, const std::string&, const std::string&, const std::string&);
 
 
+template<typename T>
+inline void nullDelete (T*) {}
+
+
 template<typename T, typename L, typename D>
 void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
          double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
@@ -123,9 +125,9 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     
   if (timeToReach && timeToReach<=traj.getTime()) return;
 
-  const boost::shared_ptr<ostream> outstream(!outputToFile ?
-                                             nonOwningSharedPtr<ostream>(&cout) :
-                                             static_pointer_cast<ostream>(boost::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
+  const std::shared_ptr<ostream> outstream(!outputToFile ?
+                                           std::shared_ptr<ostream>(&cout,details::nullDelete<ostream>) : // since cout is a system-wide object, this should be safe
+                                           static_pointer_cast<ostream>(std::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   if (outstream->fail()) throw TrajectoryFileOpeningException(trajectoryFileName);
   traj.setLogStreamDuringRun(outstream);
@@ -164,7 +166,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   // Mid section: the actual run
   //////////////////////////////
 
-  const boost::shared_ptr<ostream> ofs = !outputToFile ? boost::make_shared<ofstream>() : openStateFileWriting(stateFileName);
+  const std::shared_ptr<ostream> ofs = !outputToFile ? std::make_shared<ofstream>() : openStateFileWriting(stateFileName);
 
   bool
     stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory
@@ -257,7 +259,7 @@ trajectory::Adaptive<A,BASE>::Adaptive(A& y, Derivs derivs, double dtInit, int l
                                        BaseInitializationPack&&... bip)
   : AdaptiveIO<A>(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
     BASE(std::forward<BaseInitializationPack>(bip)...),
-    evolved_(boost::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())),
+    evolved_(std::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())),
     dtInit_(dtInit), logLevel_(logLevel)
 {}
 

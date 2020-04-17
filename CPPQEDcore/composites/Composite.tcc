@@ -92,9 +92,9 @@ public:
     {
       static const int idx=T::value;
       if (frees_[idx].get()) {
-        if (frees_[idx].get()!=act_.get()->getFrees()(i_)) throw CompositeConsistencyException(idx,i_);
+        if (frees_[idx].get()!=act_.get()->getFrees()[i_]) throw CompositeConsistencyException(idx,i_);
       }
-      else frees_[idx]=SubSystemFree(act_.get()->getFrees()(i_));
+      else frees_[idx]=SubSystemFree(act_.get()->getFrees()[i_]);
       i_++;
     }
 
@@ -462,7 +462,7 @@ public:
     : frees_(frees), t_(t), ldo_(ldo), iter_(iter) {}
 
   template<typename Vec, int SS_RANK>
-  void help(boost::shared_ptr<const structure::LiouvilleanAveragedCommonRanked<SS_RANK> > av) const
+  void help(std::shared_ptr<const structure::LiouvilleanAveragedCommonRanked<SS_RANK> > av) const
   {
     iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,boost::bind(structure::average<SS_RANK>,av,t_,::_1)));
   }
@@ -721,14 +721,14 @@ public:
   template<typename Act>
   result_type operator()(result_type sc, const Act& act)
   {
-    return sc || result_type(act.getEx()!=0,act.getHa()!=0,act.getLi()!=0);
+    return sc || result_type{act.getEx()!=0,act.getHa()!=0,act.getLi()!=0};
   }
 
   template<typename T>
   void operator()(T) const
   {
     const SubSystemFree& free=frees_[T::value];
-    sc_|=result_type(free.getEx()!=0,free.getHa()!=0,free.getLi()!=0);
+    sc_|=result_type{free.getEx()!=0,free.getHa()!=0,free.getLi()!=0};
   }
 
 private:
@@ -741,7 +741,7 @@ private:
 } // composite
 
 
-#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics(EX,HA,LI))) return boost::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
+#define DISPATCHER(EX,HA,LI) (systemCharacteristics==SystemCharacteristics{EX,HA,LI}) return std::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
 
 template<typename VA>
 const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
@@ -750,7 +750,7 @@ const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
   
   const typename Base<VA>::Frees frees(fillFrees(acts));
 
-  SystemCharacteristics systemCharacteristics(false,false,false);
+  SystemCharacteristics systemCharacteristics{false,false,false};
   
   {
     const composite::QuerySystemCharacteristics<VA> helper(frees,systemCharacteristics);
@@ -765,7 +765,7 @@ const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)
   else if DISPATCHER(false,true ,true ) ;
   else if DISPATCHER(false,true ,false) ;
   else if DISPATCHER(false,false,true ) ;
-  else return boost::make_shared<Composite<VA,false,false,false> >(frees,acts);
+  else return std::make_shared<Composite<VA,false,false,false> >(frees,acts);
 }
 
 

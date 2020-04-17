@@ -25,9 +25,7 @@ int main(int argc, char* argv[])
 
   if (!ppart.init.getSig() && !ppart.vClass) {cerr<<"Incorrect initial condition"<<endl; abort();}
 
-  StateVector psi(init(ppart));
-
-  evolve(psi,part,pe);
+  evolve(init(ppart),part,pe);
 
 
 }

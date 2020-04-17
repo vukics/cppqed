@@ -20,10 +20,7 @@ int main(int argc, char* argv[])
     basic::PumpedLossyModeIP mode(1,1,DCOMP_I,1,10);
   }
 
-  basic::PumpedLossyMode m0(1,1,DCOMP_I,1,10), 
-                         m1(1,1,DCOMP_I,1,10);
-  
-  basic::InteractionX_X(m0,m1,2.);
+  basic::InteractionX_X(std::make_shared<basic::PumpedLossyMode>(1,1,DCOMP_I,1,10),std::make_shared<basic::PumpedLossyMode>(1,1,DCOMP_I,1,10),2.);
   }
   
   { // hierarchical
@@ -31,11 +28,10 @@ int main(int argc, char* argv[])
     hierarchical::PumpedLossyMode mode(1,1,DCOMP_I,1,10);
   }
 
-  hierarchical::PumpedLossyModeIP m0(1,1,DCOMP_I,1,10);
-  hierarchical::PumpedLossyMode   m1(1,1,DCOMP_I,1,20);
+  auto m0{std::make_shared<hierarchical::PumpedLossyModeIP>(1,1,DCOMP_I,1,10)};
+  auto m1{std::make_shared<hierarchical::PumpedLossyMode  >(1,1,DCOMP_I,1,20)};
   
   hierarchical::InteractionX_X i(m0,m1,2.);
-  hierarchical::InteractionX_X_Correlations ii(m0,m1,2.);
   
   ParameterTable p;
 
@@ -46,7 +42,7 @@ int main(int argc, char* argv[])
   typedef quantumdata::StateVector<2> StateVector;
   StateVector psi(StateVector::Dimensions(10,20)); psi(0,0)=1;
   
-  evolve<tmptools::Vector<0> >(psi,binary::make(ii),pe);
+  evolve<tmptools::Vector<0> >(std::make_shared<StateVector>(psi),binary::make(std::make_shared<hierarchical::InteractionX_X_Correlations>(m0,m1,2.)),pe);
 
   }
   

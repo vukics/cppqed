@@ -29,8 +29,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  StateVector2 psi(init(pA)*init(pB));
-  psi.renorm();
+  auto psi{init(pA)*init(pB)}; psi.renorm();
 
   evolve
     (psi,

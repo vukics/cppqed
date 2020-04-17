@@ -12,7 +12,6 @@
 #include "TridiagonalHamiltonian.h"
 
 #include "ParsFwd.h"
-#include "SmartPtr.h"
 
 
 // A general Spin yet incomplete
@@ -22,20 +21,32 @@ namespace spin {
 using namespace structure::freesystem;
 
 
-typedef boost::shared_ptr<const SpinBase> Ptr;
+typedef std::shared_ptr<const SpinBase> Ptr;
 
 
-const Tridiagonal splus(Ptr);
+Tridiagonal splus(size_t dim, size_t twoS, const dcomp& z, bool isExact);
 
-inline const Tridiagonal sminus(Ptr spin) {return splus(spin).dagger();}
-
-inline const Tridiagonal sx(Ptr spin) {return (splus(spin)+sminus(spin))/2;}
-inline const Tridiagonal sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
-
-const Tridiagonal sn(Ptr);
+inline auto sminus(size_t dim, size_t twoS, const dcomp& z, bool isExact) {return splus(dim,twoS,z,isExact).dagger();}
+inline auto sx(size_t dim, size_t twoS, const dcomp& z, bool isExact) {return (splus(dim,twoS,z,isExact)+sminus(dim,twoS,z,isExact))/2;}
+inline auto sy(size_t dim, size_t twoS, const dcomp& z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*DCOMP_I);}
 
 
-const Tridiagonal sz(Ptr);
+Tridiagonal splus(Ptr spin);
+
+inline auto sminus(Ptr spin) {return splus(spin).dagger();}
+inline auto sx(Ptr spin) {return (splus(spin)+sminus(spin))/2;}
+inline auto sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
+
+Tridiagonal sz(size_t dim, size_t twoS);
+
+Tridiagonal sz(Ptr spin);
+
+inline auto sn(size_t dim, size_t twoS, const dcomp& z, bool isExact, double theta, double phi)
+{
+  return sin(theta)*(cos(phi)*sx(dim,twoS,z,isExact)+sin(phi)*sy(dim,twoS,z,isExact))+cos(theta)*sz(dim,twoS);
+}
+
+Tridiagonal sn(Ptr);
 
 
 struct Pars
@@ -128,7 +139,7 @@ public:
 
   SpinSch(const spin::Pars& p) 
     : SpinBase(p.twoS,p.theta,p.phi,p.omega,p.gamma,p.dim),
-      quantumoperator::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(cpputils::nonOwningConstSharedPtr(this)))
+      quantumoperator::TridiagonalHamiltonian<1,false>(-get_z()*spin::sn(getDimension(),p.twoS,get_z(),false,p.theta,p.phi))
   {
     getParsStream()<<"Schrodinger picture."<<std::endl;
   }

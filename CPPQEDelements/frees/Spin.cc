@@ -32,40 +32,42 @@ size_t decideDimension(size_t twoS, size_t dim)
 }
 
 
-const Diagonal mainDiagonal(Ptr spin)
+Diagonal mainDiagonal(size_t dim, size_t twoS, const dcomp& z)
 {
-  Diagonal diagonal(spin->getDimension());
-  diagonal=blitz::tensor::i-spin->getTwoS()/2.;
-  return Diagonal(spin->get_z()*diagonal);
+  Diagonal diagonal(dim);
+  diagonal=blitz::tensor::i-twoS/2.;
+  return Diagonal(z*diagonal);
 }
 
 
-const Tridiagonal splus(Ptr spin)
+Tridiagonal splus(size_t dim, size_t twoS, const dcomp& z, bool isExact)
 {
-  Diagonal diagonal(spin->getDimension()-1);
+  Diagonal diagonal(dim-1);
   using blitz::tensor::i;
   // i=m+s (m is the magnetic quantum number)
-  Tridiagonal res(Diagonal(),1,diagonal=sqrt((spin->getTwoS()-i)*(i+1.)));
+  Tridiagonal res(Diagonal(),1,diagonal=sqrt((twoS-i)*(i+1.)));
   // writing "1." is tremendously important here, for converting the whole thing to doubles: otherwise, the sqrt is apparently performed within integers by blitz!!! 
-  if (dynamic_cast<const structure::FreeExact<false>*>(spin.get())) res.furnishWithFreqs(mainDiagonal(spin));
+  if (isExact) res.furnishWithFreqs(mainDiagonal(dim,twoS,z));
   return res;
 }
 
 
-const Tridiagonal sn(Ptr spin)
+Tridiagonal sn(Ptr spin)
 {
-  const double theta=spin->getTheta(), phi=spin->getPhi();
-  return sin(theta)*(cos(phi)*sx(spin)+sin(phi)*sy(spin))+cos(theta)*sz(spin);
+  return sn(spin->getDimension(),spin->getTwoS(),spin->get_z(),bool(dynamic_pointer_cast<const structure::FreeExact<false>>(spin)),spin->getTheta(),spin->getPhi());
 } 
 
 
-
-const Tridiagonal sz(Ptr spin)
+Tridiagonal sz(size_t dim, size_t twoS)
 {
-  Diagonal diagonal(spin->getDimension());
-  return Tridiagonal(diagonal=blitz::tensor::i-spin->getTwoS()/2.);
+  Diagonal diagonal(dim);
+  return Tridiagonal(diagonal=blitz::tensor::i-twoS/2.);
 }
 
+Tridiagonal sz(Ptr spin) {return sz(spin->getDimension(),spin->getTwoS());}
+
+
+Tridiagonal splus(Ptr spin) {return splus(spin->getDimension(),spin->getTwoS(),spin->get_z(),bool(dynamic_pointer_cast<const structure::FreeExact<false>>(spin)));}
 
 
 

@@ -13,7 +13,6 @@
 #include "Particle_.h"
 
 #include "Exception.h"
-#include "SmartPtr.h"
 
 #include <boost/utility.hpp>
 
@@ -49,9 +48,8 @@ class ParticleOrthogonalToCavity
   : public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
 {
 public:
-  template<typename MODE, typename PUMPED_PART>
-  ParticleOrthogonalToCavity(const MODE& mode, const PUMPED_PART& part, const particlecavity::ParsOrthogonal& p)
-    : ParticleOrthogonalToCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part),p.uNot) {}
+  ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsOrthogonal& p)
+    : ParticleOrthogonalToCavity(mode,part,p.uNot) {}
 
 private:
   ParticleOrthogonalToCavity(mode::Ptr, particle::PtrPumped, double uNot);
@@ -72,32 +70,22 @@ private:
 public:
   const ModeFunction& getMF() const {return MF_Base::member;}
 
-  template<typename MODE, typename PART>
-  ParticleAlongCavity(const MODE& mode, const PART& part, const particlecavity::ParsAlong& p, double vClass=0)
-    : ParticleAlongCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part), p, vClass, ThePrivateOne()) {}
+  template<typename PART>
+  ParticleAlongCavity(mode::Ptr mode, PART part, const particlecavity::ParsAlong& p, double vClass=0)
+    : ParticleAlongCavity(mode,part, p, vClass, ThePrivateOne()) {}
 
-  template<typename MODE, typename PART>
-  ParticleAlongCavity(const MODE& mode, const PART& part, const particlecavity::ParsAlongGenericPump& p)
-    : ParticleAlongCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part), p.uNot, p.kCav, p.modeCav, p.etaeff) {}
+  template<typename PART>
+  ParticleAlongCavity(mode::Ptr mode, PART part, const particlecavity::ParsAlongGenericPump& p)
+    : ParticleAlongCavity(mode,part, p.uNot, p.kCav, p.modeCav, p.etaeff) {}
 
   // The following two describe the case when there is an additional fixed standing wave ALONG the cavity, in which case the particle must be derived from PumpedParticleBase
   // The particle type is not a template parameter to avoid ambiguity with the previous constructors
 
-  template<typename MODE>
-  ParticleAlongCavity(const MODE& mode, const PumpedParticleBase& part, const particlecavity::ParsAlong& p)
-    : ParticleAlongCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part), p, ThePrivateOne()) {}
+  ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
+    : ParticleAlongCavity(mode, part, p, ThePrivateOne()) {}
 
-  template<typename MODE>
-    ParticleAlongCavity(const MODE& mode, const PumpedParticleBase& part, const particlecavity::ParsAlongGenericPump& p)
-    : ParticleAlongCavity(cpputils::sharedPointerize(mode),cpputils::sharedPointerize(part), p.uNot, p.kCav, p.modeCav, p.etaeff) {}
-
-  template<typename MODE>
-  ParticleAlongCavity(const MODE& mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
-    : ParticleAlongCavity(cpputils::sharedPointerize(mode), part, p, ThePrivateOne()) {}
-
-  template<typename MODE>
-    ParticleAlongCavity(const MODE& mode, particle::PtrPumped part, const particlecavity::ParsAlongGenericPump& p)
-    : ParticleAlongCavity(cpputils::sharedPointerize(mode),part, p.uNot, p.kCav, p.modeCav, p.etaeff) {}
+  ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsAlongGenericPump& p)
+    : ParticleAlongCavity(mode,part, p.uNot, p.kCav, p.modeCav, p.etaeff) {}
 
 private:
 

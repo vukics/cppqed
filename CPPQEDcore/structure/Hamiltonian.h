@@ -8,8 +8,6 @@
 #include "TimeDependence.h"
 #include "Types.h"
 
-#include <boost/shared_ptr.hpp>
-
 
 namespace structure {
 
@@ -26,7 +24,7 @@ template<int RANK>
 class Hamiltonian : private quantumdata::Types<RANK>
 {
 public:
-  typedef boost::shared_ptr<const Hamiltonian> Ptr;
+  typedef std::shared_ptr<const Hamiltonian> Ptr;
 
   typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
 

@@ -2,7 +2,6 @@
 #include "ArrayTraits.h"
 #include "BlitzArray.h"
 #include "Trajectory.tcc"
-#include "SmartPtr.h"
 
 #include "ParsTrajectory.h"
 #include "FormDouble.tcc"
@@ -14,8 +13,6 @@
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/device/file.hpp>
 #endif // DO_NOT_USE_BOOST_COMPRESSION
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <iostream>
 #include <queue>
 
@@ -70,15 +67,15 @@ ostream& trajectory::Trajectory::displayParameters(ostream& os) const
   return displayKey_v(displayParameters_v(os)<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n" , i);
 }
 
-boost::shared_ptr<istream> trajectory::openStateFileReading(const std::string &filename)
+std::shared_ptr<istream> trajectory::openStateFileReading(const std::string &filename)
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
-  boost::shared_ptr<ifstream> ifs = boost::make_shared<ifstream>(filename, ios_base::in | ios_base::binary);
+  std::shared_ptr<ifstream> ifs = std::make_shared<ifstream>(filename, ios_base::in | ios_base::binary);
   if (!ifs->is_open()) throw StateFileOpeningException(filename);
   return ifs;
 #else
   using namespace boost::iostreams;
-  boost::shared_ptr<filtering_istream> in = boost::make_shared<filtering_istream>();
+  std::shared_ptr<filtering_istream> in = std::make_shared<filtering_istream>();
   file_source file(filename, std::ios_base::in | std::ios_base::binary);
   if (!file.is_open()) throw StateFileOpeningException(filename);
   if (isbz2(filename))
@@ -88,15 +85,15 @@ boost::shared_ptr<istream> trajectory::openStateFileReading(const std::string &f
 #endif // DO_NOT_USE_BOOST_COMPRESSION
 }
 
-boost::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &filename, const ios_base::openmode mode)
+std::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &filename, const ios_base::openmode mode)
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
-  boost::shared_ptr<ofstream> ofs = boost::make_shared<ofstream>(filename, mode);
+  std::shared_ptr<ofstream> ofs = std::make_shared<ofstream>(filename, mode);
   if (!ofs->is_open()) throw StateFileOpeningException(filename);
   return ofs;
 #else
   using namespace boost::iostreams;
-  boost::shared_ptr<filtering_ostream> out = boost::make_shared<filtering_ostream>();
+  std::shared_ptr<filtering_ostream> out = std::make_shared<filtering_ostream>();
   file_sink file(filename, mode);
   if (!file.is_open()) throw StateFileOpeningException(filename);
   if (isbz2(filename)) {
@@ -121,7 +118,7 @@ bool trajectory::details::restoreState(Trajectory& traj, const string& trajector
     ifstream trajectoryFile(trajectoryFileName.c_str());
 
     if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
-      boost::shared_ptr<istream> stateFile = openStateFileReading(stateFileName);
+      std::shared_ptr<istream> stateFile = openStateFileReading(stateFileName);
       while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,stateFile.get());
       return true;
     }
@@ -129,7 +126,7 @@ bool trajectory::details::restoreState(Trajectory& traj, const string& trajector
   }
 
   if (initialFileName!="") {
-    boost::shared_ptr<istream> initialFile = openStateFileReading(initialFileName);
+    std::shared_ptr<istream> initialFile = openStateFileReading(initialFileName);
     while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,initialFile.get());
   }
 

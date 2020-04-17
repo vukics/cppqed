@@ -12,7 +12,6 @@
 #include "ParsMCWF_Trajectory.h"
 #include "QuantumSystemFwd.h"
 
-#include "SmartPtr.h"
 #include "TMP_Tools.h"
 
 #include <iosfwd>
@@ -55,10 +54,22 @@ struct Pars : public trajectory::ParsRun, public Base {
 /// Dispatcher returning a quantumtrajectory::MCWF_Trajectory or quantumtrajectory::TimeAveragingMCWF_Trajectory instant, depending on the last argument (cf. Pars::timeAverage)
 /**
  * \tparamRANK
- * \tparam SYS the object representing the quantum system to be simulated (similar idea as in quantumtrajectory::Master::Master)
  */
-template<int RANK, typename SYS>
-const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVector<RANK>&, const SYS&, const Pars<>&);
+template<int RANK>
+const std::shared_ptr<MCWF_Trajectory<RANK>> makeMCWF(std::shared_ptr<quantumdata::StateVector<RANK>>,
+                                                      typename structure::QuantumSystem<RANK>::Ptr,
+                                                      const Pars<>&);
+
+template<int RANK>
+using LDO_Ptr=typename quantumdata::LazyDensityOperator<RANK>::Ptr;
+
+template<typename V, int RANK>
+const LDO_Ptr<RANK>
+_(std::shared_ptr<quantumdata::StateVector<RANK>>, typename structure::QuantumSystem<RANK>::Ptr, const evolution::Pars<>& p);
+
+template<typename V, int RANK>
+const LDO_Ptr<RANK>
+_(std::shared_ptr<quantumdata::DensityOperator<RANK>>, typename structure::QuantumSystem<RANK>::Ptr, const evolution::Pars<>& p);
 
 } // evolution
 
@@ -76,20 +87,41 @@ const boost::shared_ptr<MCWF_Trajectory<RANK> > makeMCWF(quantumdata::StateVecto
  *
  */
 template<typename V, int RANK>
-const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(quantumdata::StateVector<RANK>& psi, ///<[in/out] pure state-vector initial condition
+const auto
+evolve(quantumdata::StateVector<RANK>&& psi, ///<[in/out] pure state-vector initial condition
        typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
        const evolution::Pars<>& p ///<[in] parameters of the evolution
-       );
+       )
+{
+  return evolution::_<V>(std::make_shared<quantumdata::StateVector<RANK>>(std::move(psi)),sys,p);
+}
+
+
+/// \overload
+template<typename V, int RANK>
+const auto
+evolve(quantumdata::StateVector<RANK>& psi, typename structure::QuantumSystem<RANK>::Ptr sys, const evolution::Pars<>& p)
+{
+  return evolution::_<V>(std::make_shared<quantumdata::StateVector<RANK>>(psi.getArray(),quantumdata::byReference),sys,p);
+}
 
 
 /// The prototype function to evolve a Master trajectory from a DensityOperator initial condition
 template<typename V, int RANK>
-const typename quantumdata::LazyDensityOperator<RANK>::Ptr
-evolve(quantumdata::DensityOperator<RANK>& rho, ///<[in/out] density operator initial condition
+const auto
+evolve(quantumdata::DensityOperator<RANK>&& rho, ///<[in/out] density operator initial condition
        typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
        const evolution::Pars<>& p ///<[in] parameters of the evolution
        );
+
+
+/// \overload
+template<typename V, int RANK>
+const auto
+evolve(quantumdata::DensityOperator<RANK>& rho, typename structure::QuantumSystem<RANK>::Ptr sys, const evolution::Pars<>& p)
+{
+  return evolution::_<V>(std::make_shared<quantumdata::DensityOperator<RANK>>(rho.getArray(),quantumdata::byReference),sys,p);
+}
 
 
 /// \overload
@@ -105,12 +137,12 @@ evolve(quantumdata::DensityOperator<RANK>& rho, ///<[in/out] density operator in
  */
 template<int... V, typename SV_OR_DO, typename SYS>
 inline
-const typename quantumdata::LazyDensityOperator<SV_OR_DO::N_RANK>::Ptr
-evolve(SV_OR_DO& initial,
-       const SYS& sys,
+const auto
+evolve(SV_OR_DO&& initial,
+       SYS sys,
        const evolution::Pars<>& p)
 {
-  return evolve<tmptools::Vector<V...> >(initial,cpputils::sharedPointerize(sys),p);
+  return evolve<tmptools::Vector<V...>>(std::forward<SV_OR_DO>(initial),sys,p);
 }
 
 

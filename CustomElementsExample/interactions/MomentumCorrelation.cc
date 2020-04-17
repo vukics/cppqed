@@ -5,7 +5,7 @@
 using namespace boost::assign;
 
 MomentumCorrelation::MomentumCorrelation(particle::Ptr p0, particle::Ptr p1) :
-  structure::Interaction<2>(Frees(p0,p1),RealFreqs(),ComplexFreqs()),
+  structure::Interaction<2>({p0,p1},{},{}),
   EA_Base("MomentumCorrelation",{"<P1P2>"})
 {}
 

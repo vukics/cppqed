@@ -47,7 +47,7 @@ namespace details {
 
 class Impl;
 
-typedef boost::shared_ptr<Impl> ImplPtr;
+typedef std::shared_ptr<Impl> ImplPtr;
 
 extern const int onSuccess;
 

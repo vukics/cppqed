@@ -7,7 +7,6 @@
 
 #include "core_config.h"
 
-#include <boost/shared_ptr.hpp> // instead of std::tr1::shared_ptr
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
 
@@ -141,8 +140,8 @@ template<typename A>
 class EvolvedIO : public TimeStepBookkeeper, public LoggingBase, private boost::noncopyable
 {
 public:
-  typedef boost::shared_ptr<EvolvedIO>            Ptr;
-  typedef boost::shared_ptr<const EvolvedIO> ConstPtr;
+  typedef std::shared_ptr<EvolvedIO>            Ptr;
+  typedef std::shared_ptr<const EvolvedIO> ConstPtr;
 
   /// straightforward constructor \see TimeStepBookkeeper::TimeStepBookkeeper()
   EvolvedIO(A&, double dtInit, double epsRel, double epsAbs);
@@ -200,8 +199,8 @@ class Evolved : public EvolvedIO<A>
 public:
   typedef boost::function<void(double, const A&, A&)> Derivs; ///< the strategy functor to calculate time derivative at a given time (3rd argument for output)
 
-  typedef boost::shared_ptr<      Evolved>      Ptr;
-  typedef boost::shared_ptr<const Evolved> ConstPtr;
+  typedef std::shared_ptr<      Evolved>      Ptr;
+  typedef std::shared_ptr<const Evolved> ConstPtr;
   
   /// straightforward constructor \see EvolvedIO::EvolvedIO()
   Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);

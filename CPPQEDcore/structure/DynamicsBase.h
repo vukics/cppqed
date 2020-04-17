@@ -7,10 +7,10 @@
 
 #include "ComplexExtensions.h"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/utility.hpp>
 
 #include <list>
+#include <memory>
 #include <tuple>
 
 
@@ -46,7 +46,7 @@ namespace structure {
 class DynamicsBase : private boost::noncopyable
 {
 public:
-  typedef boost::shared_ptr<const DynamicsBase> Ptr;
+  typedef std::shared_ptr<const DynamicsBase> Ptr;
 
   typedef std::tuple<std::string,double,double> RF; ///< name-value-multiplier tuple for a real frequency-like parameter
   typedef std::tuple<std::string,dcomp ,double> CF; ///< same for complex
@@ -61,14 +61,6 @@ public:
   static const ComplexFreqs emptyCF;
   
   explicit DynamicsBase(const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF); ///< Straightforward constructor
-  
-  explicit DynamicsBase(const ComplexFreqs& complexFreqs) : DynamicsBase(emptyRF,complexFreqs) {}
-  explicit DynamicsBase(RealFreqsInitializer rf, ComplexFreqsInitializer cf={}) : DynamicsBase(RealFreqs(rf),ComplexFreqs(cf)) {} ///< Constructor with initializer lists
-  explicit DynamicsBase(ComplexFreqsInitializer cf) : DynamicsBase({},cf) {}
-  explicit DynamicsBase(RF rf, CF cf=CF()) : DynamicsBase(RealFreqsInitializer{rf}, cf==CF() ? ComplexFreqsInitializer{} : ComplexFreqsInitializer{cf}) {}
-  explicit DynamicsBase(CF cf) : DynamicsBase(ComplexFreqsInitializer{cf}) {}
-           DynamicsBase(RealFreqsInitializer rf, CF cf) : DynamicsBase(rf,{cf}) {}
-           DynamicsBase(RF rf, ComplexFreqsInitializer cf) : DynamicsBase({rf},cf) {}
   
   double highestFrequency() const; ///< Calculates the fastest timescale of the system from the frequencies stored in the lists
 

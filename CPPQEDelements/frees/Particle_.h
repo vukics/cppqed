@@ -17,8 +17,6 @@
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
 
-#include <boost/shared_ptr.hpp>
-
 #include <tuple>
 
 namespace particle {
@@ -26,9 +24,9 @@ namespace particle {
 using namespace structure::freesystem; using structure::NoTime;
 
 
-typedef boost::shared_ptr<const ParticleBase> Ptr;
+typedef std::shared_ptr<const ParticleBase> Ptr;
 
-typedef boost::shared_ptr<const PumpedParticleBase> PtrPumped;
+typedef std::shared_ptr<const PumpedParticleBase> PtrPumped;
 
 struct NotATridiagonal : public cpputils::Exception {};
 
@@ -51,15 +49,15 @@ const Tridiagonal mfComposition(particle::Ptr particle,                 ///< Det
                                 const ModeFunction& modeFunction2);     ///< \f$g(nkx)\f$ above
 
 
-const StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag=true);
-const StateVector wavePacket(const Pars      &,                       bool kFlag=true);
-const StateVector wavePacket(const ParsPumped&,                       bool kFlag=true);
+StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag=true);
+StateVector wavePacket(const Pars      &,                       bool kFlag=true);
+StateVector wavePacket(const ParsPumped&,                       bool kFlag=true);
 
-const StateVector hoState(int n, const InitialCondition&, const Spatial&, bool kFlag=true/*, bool exactRenorm=true*/);
-const StateVector hoState(const Pars      &,                                 bool Kflag=true);
-const StateVector hoState(const ParsPumped&,                                 bool Kflag=true);
+StateVector hoState(int n, const InitialCondition&, const Spatial&, bool kFlag=true/*, bool exactRenorm=true*/);
+StateVector hoState(const Pars      &,                                 bool Kflag=true);
+StateVector hoState(const ParsPumped&,                                 bool Kflag=true);
 
-const StateVector init(const Pars&);
+StateVector init(const Pars&);
 
 Ptr make(const Pars&, QM_Picture);
 

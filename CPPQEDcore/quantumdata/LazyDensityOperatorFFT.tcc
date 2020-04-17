@@ -10,7 +10,6 @@
 #include "TMP_Tools.h"
 
 #include <boost/range/algorithm/for_each.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/mpl/for_each.hpp>
 
 
@@ -24,7 +23,7 @@ template<int RANK>
 class fftWorkerSV
 {
 public:
-  typedef boost::shared_ptr<StateVector<RANK> > SV;
+  typedef std::shared_ptr<StateVector<RANK> > SV;
 
   fftWorkerSV(SV psi, fft::Direction dir) : psi_(psi), dir_(dir) {};
 
@@ -45,7 +44,7 @@ template<int RANK>
 class fftWorkerDO
 {
 public:
-  typedef boost::shared_ptr<DensityOperator<RANK> > DO;
+  typedef std::shared_ptr<DensityOperator<RANK> > DO;
   
   fftWorkerDO(DO rho, fft::Direction dir) : rho_(rho), dir_(dir) {};
 
@@ -66,18 +65,18 @@ private:
   
   
 template<typename V, int RANK>
-const boost::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDensityOperator<RANK>& matrix, fft::Direction dir)
+const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDensityOperator<RANK>& matrix, fft::Direction dir)
 {
   typedef StateVector    <RANK> SV;
   typedef DensityOperator<RANK> DO;
   
   if      (const auto psi=dynamic_cast<const SV*>(&matrix) ) {
-    const boost::shared_ptr<SV> res(boost::make_shared<SV>(*psi));
+    const std::shared_ptr<SV> res(std::make_shared<SV>(*psi));
     boost::mpl::for_each<V>(details::fftWorkerSV<RANK>(res,dir));
     return res;
   }
   else if (const auto rho=dynamic_cast<const DO*>(&matrix) ) {
-    const boost::shared_ptr<DO> res(boost::make_shared<DO>(*rho));
+    const std::shared_ptr<DO> res(std::make_shared<DO>(*rho));
     boost::mpl::for_each<V>(details::fftWorkerDO<RANK>(res,dir));
     return res;
   }

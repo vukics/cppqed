@@ -27,7 +27,7 @@ namespace structure {
 class AveragedCommon
 {
 public:
-  typedef boost::shared_ptr<const AveragedCommon> Ptr;
+  typedef std::shared_ptr<const AveragedCommon> Ptr;
 
   typedef LiouvilleanAveragedCommon::DArray1D Averages; ///< The 1D real array storing the calculated quantum averages (perhaps in real-imaginary pairs if a given average is complex).
 
@@ -85,7 +85,7 @@ class Averaged : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<
 public:
   static const int N_RANK=RANK;
 
-  typedef boost::shared_ptr<const Averaged> Ptr;
+  typedef std::shared_ptr<const Averaged> Ptr;
 
   typedef AveragedCommon::Averages Averages;
 

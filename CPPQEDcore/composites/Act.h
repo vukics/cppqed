@@ -5,17 +5,14 @@
 
 #include "SubSystem.h"
 
-#include "SmartPtr.h"
 #include "TMP_Tools.h"
-
-#include <boost/mpl/size.hpp>
 
 
 /// Auxiliary tools to Composite
 namespace composite {
 
 
-#define BASE_class SubSystemsInteraction<mpl::size<tmptools::Vector<V...> >::value>
+#define BASE_class SubSystemsInteraction<sizeof...(V)>
 
 /// Helper class to Composite
 /**
@@ -35,8 +32,7 @@ class _
 public:
   typedef tmptools::Vector<V...> Vector;
 
-  template<typename IA>
-  explicit _(const IA& ia) : BASE_class(cpputils::sharedPointerize(ia)) {}
+  explicit _(typename structure::Interaction<sizeof...(V)>::Ptr ia) : BASE_class(ia) {}
 
 };
 

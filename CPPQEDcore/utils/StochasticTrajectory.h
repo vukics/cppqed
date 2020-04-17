@@ -156,16 +156,12 @@ public:
 
 protected:
   // static helpers to constructor
-  // boost ptr_vector expects an auto_ptr in its interface, so we suppress the warning about auto_ptr being deprecated
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  typedef std::auto_ptr<Trajectories> Ptr;
-#pragma GCC diagnostic pop
+  typedef std::unique_ptr<Trajectories> Ptr;
   
   /// Generic constructor
-  Ensemble(Ptr trajs, ///< the sequence of elements owned by the `ptr_vector`
+  Ensemble(Ptr&& trajs, ///< the sequence of elements owned by the `ptr_vector`
            bool displayProgress ///< when true, a \refBoost{display of progress,timer/doc/index.html} through the element trajectories will show up on `cerr` at each step of time evolution
-          ) : trajs_(trajs), displayProgress_(displayProgress) {}
+          ) : trajs_(std::move(trajs)), displayProgress_(displayProgress) {}
 
   /// Getter
   const Trajectories& getTrajectories() const {return trajs_;}

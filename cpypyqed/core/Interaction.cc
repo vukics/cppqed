@@ -15,9 +15,9 @@ void export_Interaction() {
   class_<Interaction<2>, boost::noncopyable >("Interaction2", "Instantiation of :core:`structure::Interaction` with RANK=2", no_init);
   class_<Interaction<3>, boost::noncopyable >("Interaction3", "Instantiation of :core:`structure::Interaction` with RANK=3", no_init);
   register_ptr_to_python<Interaction<2>::Ptr>();
-  implicitly_convertible<boost::shared_ptr<Interaction<2>>, Interaction<2>::Ptr>();
+  implicitly_convertible<std::shared_ptr<Interaction<2>>, Interaction<2>::Ptr>();
   register_ptr_to_python<Interaction<3>::Ptr>();
-  implicitly_convertible<boost::shared_ptr<Interaction<3>>, Interaction<3>::Ptr>();
+  implicitly_convertible<std::shared_ptr<Interaction<3>>, Interaction<3>::Ptr>();
 }
 
 

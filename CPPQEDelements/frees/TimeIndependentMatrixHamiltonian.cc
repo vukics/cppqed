@@ -6,7 +6,7 @@ class MatrixNotSquareException : public cpputils::Exception {};
 
 
 TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix& hamiltonianOverI)
-  : structure::Free(hamiltonianOverI.extent(0),RF{"Largest frequency",max(abs(hamiltonianOverI)),1.}),
+  : structure::Free(hamiltonianOverI.extent(0),{RF{"Largest frequency",max(abs(hamiltonianOverI)),1.}}),
     hamiltonianOverI_(hamiltonianOverI.copy())
 {
   if (hamiltonianOverI_.extent(0)!=hamiltonianOverI_.extent(1)) throw MatrixNotSquareException();

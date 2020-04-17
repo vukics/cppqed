@@ -44,10 +44,8 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  PumpedLossyQbitSch   qbit(pplqb);
-  PumpedLossyModeSch<> mode(pplm);
-
-  double dtinit=.1/binary::make(jaynescummings::make(qbit,mode,pjc))->highestFrequency();
+  
+  double dtinit=.1/binary::make(jaynescummings::make(std::make_shared<const PumpedLossyQbitSch>(pplqb),std::make_shared<const PumpedLossyModeSch<>>(pplm),pjc))->highestFrequency();
 
   Array alpha(2);
   

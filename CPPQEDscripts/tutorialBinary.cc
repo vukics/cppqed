@@ -15,8 +15,7 @@ int main(int argc, char* argv[])
 
   auto qmp=updateWithPicture(p,argc,argv,"--"); // Parsing the command line
 
-  quantumdata::StateVector<2> psi(init(pq)*init(pm));
-  evolve(psi,
+  evolve(init(pq)*init(pm),
          binary::make(jaynescummings::make(make(pq,qmp),
                                            make(pm,qmp),
                                            pjc)),

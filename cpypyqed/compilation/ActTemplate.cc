@@ -6,7 +6,6 @@
 #include <string>
 
 #include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
 
 #define CPPQED_CORE_GIT "@CPPQED_CORE_GIT@"
 

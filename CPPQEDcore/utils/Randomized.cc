@@ -3,8 +3,6 @@
 
 #include "Randomized.h"
 
-#include <boost/make_shared.hpp>
-
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
@@ -35,7 +33,7 @@ public:
   ~RandomizedGSL() {}
   
 private:
-  typedef boost::shared_ptr<gsl_rng> Impl;
+  typedef std::shared_ptr<gsl_rng> Impl;
   
   double doSample() {return gsl_rng_uniform(ranGen_.get());}
 
@@ -61,7 +59,7 @@ private:
 
 const Randomized::Ptr MakerGSL::operator()(unsigned long seed) const
 {
-  return boost::make_shared<RandomizedGSL>(seed);
+  return std::make_shared<RandomizedGSL>(seed);
 }
 
 

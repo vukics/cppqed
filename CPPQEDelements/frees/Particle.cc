@@ -355,7 +355,7 @@ const Tridiagonal mfNKX_AbsSqr(ModeFunctionType mf, size_t dim, ptrdiff_t K)
 }
 */
 
-auto particle::wavePacket(const InitialCondition& init, const Spatial& space, bool kFlag) -> const StateVector
+auto particle::wavePacket(const InitialCondition& init, const Spatial& space, bool kFlag) -> StateVector
 {
   double 
     offset1=PI*init.getX0(),
@@ -377,7 +377,7 @@ auto particle::wavePacket(const InitialCondition& init, const Spatial& space, bo
 }
 
 
-auto particle::wavePacket(const Pars& p, bool kFlag) -> const StateVector
+auto particle::wavePacket(const Pars& p, bool kFlag) -> StateVector
 {
   return wavePacket(p.init,Spatial(p.fin),kFlag);
 }
@@ -392,7 +392,7 @@ const particle::InitialCondition coherent(const particle::ParsPumped& p)
 
 }
 
-auto particle::wavePacket(const ParsPumped& p, bool kFlag) -> const StateVector
+auto particle::wavePacket(const ParsPumped& p, bool kFlag) -> StateVector
 {
   if (p.init.getSig()) return wavePacket(static_cast<const Pars&>(p),kFlag);
   else                 return wavePacket(coherent(p),
@@ -401,7 +401,7 @@ auto particle::wavePacket(const ParsPumped& p, bool kFlag) -> const StateVector
 }
 
 
-auto particle::hoState(int n, const InitialCondition& init, const Spatial& space, bool kFlag) -> const StateVector
+auto particle::hoState(int n, const InitialCondition& init, const Spatial& space, bool kFlag) -> StateVector
 {
   if (n<0) n=0;
 
@@ -425,13 +425,13 @@ auto particle::hoState(int n, const InitialCondition& init, const Spatial& space
 }
 
 
-auto particle::hoState(const Pars      & p, bool kFlag) -> const StateVector
+auto particle::hoState(const Pars      & p, bool kFlag) -> StateVector
 {
   return hoState(p.hoInitn,p.init,Spatial(p.fin),kFlag);
 }
 
 
-auto particle::hoState(const ParsPumped& p, bool kFlag) -> const StateVector
+auto particle::hoState(const ParsPumped& p, bool kFlag) -> StateVector
 {
   if (p.init.getSig()) return hoState(static_cast<const Pars&>(p),kFlag);
   else                 return hoState(p.hoInitn,
@@ -441,7 +441,7 @@ auto particle::hoState(const ParsPumped& p, bool kFlag) -> const StateVector
 }
 
 
-auto particle::init(const Pars& p) -> const StateVector
+auto particle::init(const Pars& p) -> StateVector
 {
   if (const auto pp=dynamic_cast<const ParsPumped*>(&p))
     return p.hoInitn<0 ? wavePacket(*pp) : hoState(*pp);
@@ -454,11 +454,11 @@ auto particle::init(const Pars& p) -> const StateVector
 
 particle::Ptr particle::make(const Pars& p, QM_Picture qmp)
 {
-  return qmp==QMP_SCH ? Ptr(boost::make_shared<ParticleSch>(p)) : Ptr(boost::make_shared<Particle>(p));
+  return qmp==QMP_SCH ? Ptr(std::make_shared<ParticleSch>(p)) : Ptr(std::make_shared<Particle>(p));
 }
 
 
 particle::PtrPumped particle::makePumped(const ParsPumped& p, QM_Picture qmp)
 {
-  return qmp==QMP_SCH ? PtrPumped(boost::make_shared<PumpedParticleSch>(p)) : PtrPumped(boost::make_shared<PumpedParticle>(p));
+  return qmp==QMP_SCH ? PtrPumped(std::make_shared<PumpedParticleSch>(p)) : PtrPumped(std::make_shared<PumpedParticle>(p));
 }

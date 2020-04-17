@@ -6,7 +6,6 @@
 #include "LazyDensityOperatorFwd.h"
 
 #include <boost/operators.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <boost/mpl/size.hpp>
 
@@ -105,7 +104,7 @@ public:
    * \refBoostConstruct{eval_if,mpl/doc/refmanual/eval-if.html} from Boost.MPL here guarantees that `DI_ImplSpecial` gets instantiated
    * only in the special case
    */
-  typedef boost::shared_ptr<typename mpl::eval_if_c<IS_SPECIAL,
+  typedef std::shared_ptr<typename mpl::eval_if_c<IS_SPECIAL,
                                                     mpl::identity<DI_ImplSpecial>,
                                                     mpl::identity<DI_Impl       > 
                                                     >::type

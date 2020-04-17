@@ -12,7 +12,6 @@
 #include "Types.h"
 
 #include "Exception.h"
-#include "SmartPtr.h"
 #include "VectorFromMatrixSliceIterator.h"
 
 #include <boost/function.hpp>
@@ -55,21 +54,18 @@ public:
   typedef quantumtrajectory::QuantumTrajectory<RANK, Adaptive> QuantumTrajectory;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
+  typedef std::shared_ptr<DensityOperator> DO_Ptr;
 
   /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
   void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
 
 protected:
-  using QuantumTrajectory::getQSW;
-
-  Base(DensityOperator&, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
+  Base(DO_Ptr, typename QuantumSystem::Ptr, const Pars&, const DensityOperatorLow& =DensityOperatorLow());
 
   typedef boost::function<void(                       StateVectorLow&)>  UnaryFunction;
   typedef boost::function<void(const StateVectorLow&, StateVectorLow&)> BinaryFunction;
 
-  DensityOperator& rho_;
-
-  const typename Averaged::Ptr getAv() const {return getQSW().getAv();}
+  const DO_Ptr rho_;
 
 private:
   void step_v(double) final;
@@ -93,10 +89,11 @@ public:
   typedef typename Base<RANK>::QuantumSystem QuantumSystem;
 
   typedef typename Base<RANK>::DensityOperator DensityOperator;
-
+  typedef std::shared_ptr<DensityOperator> DO_Ptr;
+  
   typedef typename Base<RANK>::DensityOperatorLow DensityOperatorLow;
 
-  BaseFast(DensityOperator& rho, typename QuantumSystem::Ptr sys, const Pars& p, const DensityOperatorLow& scaleAbs=DensityOperatorLow())
+  BaseFast(DO_Ptr rho, typename QuantumSystem::Ptr sys, const Pars& p, const DensityOperatorLow& scaleAbs=DensityOperatorLow())
     : Base<RANK>(rho,sys,p,scaleAbs), slicesData_(rho.getArray()) {}
 
 private:
@@ -144,23 +141,22 @@ public:
   typedef typename Base::DensityOperatorLow DensityOperatorLow; 
 
   typedef typename Base::DensityOperator DensityOperator;
+  typedef std::shared_ptr<DensityOperator> DO_Ptr;
 
   /// Templated constructor
-  /** \tparam SYS the physical system – can be any type convertible to structure::QuantumSystem::Ptr via cpputils::sharedPointerize */
-  template<typename SYS>
-  Master(DensityOperator& rho, ///< the density operator to be evolved
-         const SYS& sys, ///< object representing the quantum system
+  Master(DO_Ptr rho, ///< the density operator to be evolved
+         typename QuantumSystem::Ptr sys, ///< object representing the quantum system
          const master::Pars& pt, ///< parameters of the evolution
          bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
          const DensityOperatorLow& scaleAbs=DensityOperatorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
         )
-    : Base(rho,cpputils::sharedPointerize(sys),pt,scaleAbs), doDisplay_(this->getAv(),negativity)
+    : Base(rho,sys,pt,scaleAbs), doDisplay_(this->getAv(),negativity)
   {}
   
-  const DensityOperator& getRho() const {return this->rho_;}
+  const DO_Ptr getRho() const {return this->rho_;}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const override {return doDisplay_.display   (this->getTime(),this->rho_,os,precision);}
+  std::ostream& display_v   (std::ostream& os, int precision) const override {return doDisplay_.display   (this->getTime(),*this->rho_,os,precision);}
   std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const override {return doDisplay_.displayKey(os,i);}
 
   const std::string trajectoryID_v() const override {return "Master";}

@@ -11,8 +11,6 @@
 #include "BlitzArraySliceIterator.tcc"
 #include "BlitzTinyExtensions.tcc"
 
-#include <boost/make_shared.hpp>
-
 
 namespace quantumdata {
 
@@ -29,7 +27,7 @@ class DiagonalIterator<RANK,V>::DI_ImplSpecial
 {
 public:
   typedef LazyDensityOperator<RANK>    LDO    ;
-  typedef boost::shared_ptr<const LDO> LDO_Ptr;
+  typedef std::shared_ptr<const LDO> LDO_Ptr;
 
   class OutOfRange : public cpputils::Exception {};
 
@@ -49,11 +47,11 @@ public:
     if      (const auto sV=dynamic_cast<const SV*>(&ldo)) {
       typename SV::StateVectorLow temp(sV->getArray());
       // We do not want to transpose that StateVectorLow which is the storage of sV.
-      return boost::make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
+      return std::make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
     }
     else if (const auto dO=dynamic_cast<const DO*>(&ldo)) {
       typename DO::DensityOperatorLow temp(dO->getArray());
-      return boost::make_shared<DO>(Transposer<2*RANK,typename tmptools::ExtendVector<RANK,V>::type>::transpose(temp),byReference);
+      return std::make_shared<DO>(Transposer<2*RANK,typename tmptools::ExtendVector<RANK,V>::type>::transpose(temp),byReference);
     }
     else throw NoSuchImplementation();
   }
@@ -122,7 +120,7 @@ private:
     typedef typename Base::MII  MII ;
 
     typedef StateVector<mpl::size<V>::value>        StateVectorRes   ;
-    typedef boost::shared_ptr<const StateVectorRes> StateVectorResPtr;
+    typedef std::shared_ptr<const StateVectorRes> StateVectorResPtr;
 
     typedef typename Base::LazyDensityOperatorRes LazyDensityOperatorRes;
 
@@ -153,7 +151,7 @@ private:
     static const int RANKRES=mpl::size<V>::value;
 
     typedef DensityOperator<RANKRES>                     DensityOperatorRes   ;
-    typedef boost::shared_ptr<const DensityOperatorRes > DensityOperatorResPtr;
+    typedef std::shared_ptr<const DensityOperatorRes > DensityOperatorResPtr;
 
 
     typedef typename Base::LazyDensityOperatorRes LazyDensityOperatorRes;
@@ -194,7 +192,7 @@ private:
 
     const LazyDensityOperatorRes& dereference() const
     {
-      return *(densityOperatorResPtr_=boost::make_shared<DensityOperatorRes>(BASI::index(densityOperatorLow_,
+      return *(densityOperatorResPtr_=std::make_shared<DensityOperatorRes>(BASI::index(densityOperatorLow_,
                                                                                          densityOperatorLowRes_,
                                                                                          blitzplusplus::concatenateTinies(*mii_,*mii_)),
                                                                              byReference));
@@ -213,7 +211,7 @@ public:
   template<bool IS_END>
   static typename DiagonalIterator<RANK,V>::Impl doIt(const LazyDensityOperator<RANK>& ldo)
   {
-    using boost::make_shared;
+    using std::make_shared;
 
     static const mpl::bool_<IS_END> isEnd=mpl::bool_<IS_END>();
 
@@ -234,7 +232,7 @@ public:
   template <bool IS_END>
   static typename DiagonalIterator<RANK,V>::Impl doIt(const LazyDensityOperator<RANK>& ldo)
   {
-    return boost::make_shared<typename DiagonalIterator<RANK,V>::DI_ImplSpecial>(ldo,mpl::bool_<IS_END>());
+    return std::make_shared<typename DiagonalIterator<RANK,V>::DI_ImplSpecial>(ldo,mpl::bool_<IS_END>());
   }
   
 };  

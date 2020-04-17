@@ -22,39 +22,31 @@ int main(int argc, char* argv[])
   mode    ::Ptr plus (make(pmP,qmp));
   mode    ::Ptr minus(make(pmM,qmp));
 
-  quantumdata::StateVector<3> psi(wavePacket(pp)*init(pmP)*init(pmM));
-
-  evolve<0>(psi,
+  evolve<0>(wavePacket(pp)*init(pmP)*init(pmM),
             composite::make(
-                            _<1,0>  (ParticleAlongCavity(plus ,part,ppcP)),
-                            _<2,0>  (ParticleAlongCavity(minus,part,ppcM)),
-                            _<1,2,0>(ParticleTwoModes(plus,minus,part,ppcP,ppcM))
+                            _<1,0>  (std::make_shared<ParticleAlongCavity>(plus ,part,ppcP)),
+                            _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),
+                            _<1,2,0>(std::make_shared<ParticleTwoModes>(plus,minus,part,ppcP,ppcM))
                             ),
             pe);
 
   {
-  ParticleAlongCavity pac1(plus ,part,ppcP), pac2(minus,part,ppcM);
-  ParticleTwoModes ptm(plus,minus,part,ppcP,ppcM);
-
   const composite::result_of::Make<_<1,0>,_<2,0>,_<1,2,0> >::type
     system=composite::make(
-                           _<1,0>  (pac1),
-                           _<2,0>  (pac2),
-                           _<1,2,0>(ptm));
+                           _<1,0>  (std::make_shared<ParticleAlongCavity>(plus ,part,ppcP)),
+                           _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),
+                           _<1,2,0>(std::make_shared<ParticleTwoModes>(plus,minus,part,ppcP,ppcM)));
 
   system->displayParameters(std::cout);
-}
+  }
   {
-  ParticleAlongCavity pac1(plus ,part,ppcP), pac2(minus,part,ppcM);
-  ParticleTwoModes ptm(plus,minus,part,ppcP,ppcM);
-
   const auto
     system=composite::make(
-                           _<1,0>  (pac1),
-                           _<2,0>  (pac2),
-                           _<1,2,0>(ptm));
+                           _<1,0>  (std::make_shared<ParticleAlongCavity>(plus ,part,ppcP)),
+                           _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),
+                           _<1,2,0>(std::make_shared<ParticleTwoModes>(plus,minus,part,ppcP,ppcM)));
 
   system->displayParameters(std::cout);
-}
+  }
 
 }

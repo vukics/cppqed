@@ -7,8 +7,6 @@
 #include "Mode_.h"
 #include "TridiagonalHamiltonian.tcc"
 
-#include <boost/make_shared.hpp>
-
 
 namespace mode {
 
@@ -26,8 +24,8 @@ const Ptr make(const ParsBichromatic& p, QM_Picture qmp, AveragingConstructorPar
 {
   if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsPumpedLossy&>(p),qmp,a...);
   else {
-    if (p.nTh) {return boost::make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
-    else       {return boost::make_shared<BichromaticMode<false,AveragingType> >(p,a...);}
+    if (p.nTh) {return std::make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
+    else       {return std::make_shared<BichromaticMode<false,AveragingType> >(p,a...);}
   }
 }
 
