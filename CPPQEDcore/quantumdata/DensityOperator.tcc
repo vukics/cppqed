@@ -5,7 +5,7 @@
 #include "DensityOperator.h"
 
 #include "BlitzArrayExtensions.tcc"
-#include "MultiIndexIterator.tcc"
+#include "MultiIndexIterator.h"
 
 
 namespace quantumdata {

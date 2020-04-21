@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_UTILS_MULTIINDEXITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_MULTIINDEXITERATOR_H_INCLUDED
 
-#include "MultiIndexIteratorFwd.h"
+#include "MultiIndexIterator.h"
 
 #include "BlitzTiny.h"
 
@@ -76,7 +76,7 @@ public:
   
   /// \name InputIterator operations
   //@{
-  MultiIndexIterator& operator++() {doIt(boost::mpl::int_<RANK-1>()); return *this;}
+  MultiIndexIterator& operator++() {doIt<RANK-1>(); return *this;}
 
   const MultiIndex& operator*() const {return idx_;}
         MultiIndex& operator*()       {return const_cast<MultiIndex&>(static_cast<const MultiIndexIterator*>(this)->operator*());}
@@ -95,10 +95,18 @@ public:
   //@}
   
 private:
-  void doIt(boost::mpl::int_<0>);
-
   template<int N>
-  void doIt(boost::mpl::int_<N>);
+  void doIt()
+  {
+    if (idx_(N)==ubound_(N)) {idx_(N)=lbound_(N); doIt<N-1>();}
+    else idx_(N)++;
+  }
+
+  template<>
+  void doIt<0>()
+  {
+    idx_(0)++; // This will of course eventually put the iterator into an illegal state when idx(0)>ubound(0), but this is how every (unchecked) iterator works.
+  }
 
   const MultiIndex lbound_, ubound_;
 

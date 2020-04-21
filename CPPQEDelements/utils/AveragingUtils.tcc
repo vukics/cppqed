@@ -11,7 +11,7 @@
 
 #include "Algorithm.h"
 #include "MathExtensions.h"
-#include "MultiIndexIterator.tcc"
+#include "MultiIndexIterator.h"
 
 
 #include <boost/bind.hpp>

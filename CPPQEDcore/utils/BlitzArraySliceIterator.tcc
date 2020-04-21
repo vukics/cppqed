@@ -6,7 +6,7 @@
 
 #include "BlitzArraySliceIterator.h"
 
-#include "MultiIndexIterator.tcc"
+#include "MultiIndexIterator.h"
 
 #include <boost/range/algorithm/transform.hpp>
 
