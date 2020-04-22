@@ -6,7 +6,7 @@
 
 #include "StateVector.h"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 using namespace std;
 

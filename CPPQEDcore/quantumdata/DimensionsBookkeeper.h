@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED
 
-#include "DimensionsBookkeeperFwd.h"
-
 #include "Exception.h"
 #include "TMP_Tools.h"
 #include "BlitzTiny.h"

@@ -5,8 +5,6 @@
 #include "LazyDensityOperatorFFT.h"
 
 #include "BlitzArraySliceIterator.tcc"
-#include "DensityOperator.tcc"
-#include "StateVector.tcc"
 #include "TMP_Tools.h"
 
 #include <boost/range/algorithm/for_each.hpp>

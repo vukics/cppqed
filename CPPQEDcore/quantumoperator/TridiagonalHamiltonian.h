@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_QUANTUMOPERATOR_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 #define CPPQEDCORE_QUANTUMOPERATOR_TRIDIAGONALHAMILTONIAN_H_INCLUDED
 
-#include "TridiagonalHamiltonianFwd.h"
-
 #include "Hamiltonian.h"
 
 #include "Tridiagonal.h"

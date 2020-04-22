@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "BichromaticMode.h"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 mode::ParsBichromatic::ParsBichromatic(parameters::ParameterTable& p, const std::string& mod)
   : Pars(p,mod), ParsPumpedLossy(p,mod),

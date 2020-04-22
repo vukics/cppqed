@@ -3,8 +3,6 @@
 #ifndef CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED
 #define CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED
 
-#include "Qbit_Fwd.h"
-
 #include "ParsQbit.h"
 
 #include "Mode_.h"

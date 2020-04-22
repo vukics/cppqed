@@ -3,12 +3,10 @@
 #ifndef   CPPQEDELEMENTS_FREES_PARTICLE__H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_PARTICLE__H_INCLUDED
 
-#include "Particle_Fwd.h"
-
 #include "ParsParticle.h"
 
-#include "QM_PictureFwd.h"
-#include "StateVectorFwd.h"
+#include "QM_Picture.h"
+#include "StateVector.h"
 
 #include "ModeFunction.h"
 #include "ElementAveraged.h"
@@ -19,7 +17,41 @@
 
 #include <tuple>
 
+class ParticleBase;
+class PumpedParticleBase;
+
 namespace particle {
+
+// Spatial is a tool to facilitate state vector representations in both X and K space, where the two are canonically conjugate operators, so that [X,K]=i, and hence the two representations are linked with ffTransform.
+
+class Spatial
+{
+public:
+  typedef DArray<1> Array;
+
+  explicit Spatial(size_t, double deltaK=1);
+
+  size_t getFinesse  () const {return fin_;}
+  size_t getDimension() const {return x_.size();}
+
+  // x and k space coordinates, respectively
+  double x(size_t i) const {return x_(i);}
+  double k(size_t i) const {return k_(i);} 
+
+  const Array& getX() const {return x_;}
+  const Array& getK() const {return k_;}
+
+  void header(std::ostream&) const;
+
+private:
+  const size_t fin_; // = log2 (number of dimensions)
+
+  const double xMax_, deltaX_, kMax_, deltaK_;
+
+  const Array x_, k_; 
+
+};
+
 
 using namespace structure::freesystem; using structure::NoTime;
 
@@ -102,36 +134,6 @@ public:
 
 };
 
-
-// Spatial is a tool to facilitate state vector representations in both X and K space, where the two are canonically conjugate operators, so that [X,K]=i, and hence the two representations are linked with ffTransform.
-
-class Spatial
-{
-public:
-  typedef DArray<1> Array;
-
-  explicit Spatial(size_t, double deltaK=1);
-
-  size_t getFinesse  () const {return fin_;}
-  size_t getDimension() const {return x_.size();}
-
-  // x and k space coordinates, respectively
-  double x(size_t i) const {return x_(i);}
-  double k(size_t i) const {return k_(i);} 
-
-  const Array& getX() const {return x_;}
-  const Array& getK() const {return k_;}
-
-  void header(std::ostream&) const;
-
-private:
-  const size_t fin_; // = log2 (number of dimensions)
-
-  const double xMax_, deltaX_, kMax_, deltaK_;
-
-  const Array x_, k_; 
-
-};
 
 
 class Averaged

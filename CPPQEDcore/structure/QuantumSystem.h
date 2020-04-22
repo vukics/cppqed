@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_QUANTUMSYSTEM_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_QUANTUMSYSTEM_H_INCLUDED
 
-#include "QuantumSystemFwd.h"
-
 #include "DimensionsBookkeeper.h"
 
 #include <memory>
@@ -21,7 +19,7 @@ namespace structure {
  * \note The class features the non-virtual interface idiom, which is ubiquitous in the framework.
  */
 template<int RANK>
-class QuantumSystem : public DimensionsBookkeeper<RANK>
+class QuantumSystem : public DimensionsBookkeeper<RANK,true>
 {
 public:
   /// Many of the basic template classes in the framework act as template metafunctions returning a shared pointer to their own type
@@ -29,7 +27,7 @@ public:
   typedef std::shared_ptr<const QuantumSystem> Ptr;
   
 private:
-  typedef DimensionsBookkeeper<RANK> Base;
+  typedef DimensionsBookkeeper<RANK,true> Base;
 
 public:
   typedef typename Base::Dimensions Dimensions;

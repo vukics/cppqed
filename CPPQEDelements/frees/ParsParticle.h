@@ -2,9 +2,8 @@
 #ifndef   CPPQEDELEMENTS_FREES_PARSPARTICLE_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_PARSPARTICLE_H_INCLUDED
 
-#include "Particle_Fwd.h"
-
 #include "ModeFunction.h"
+#include "ParticleInitialCondition.h"
 
 #include "ParsFwd.h"
 

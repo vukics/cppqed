@@ -3,8 +3,8 @@
 
 #include "Evolution.tcc"
 
-#include "StateVector.tcc"
-#include "DensityOperator.tcc"
+#include "StateVector.h"
+#include "DensityOperator.h"
 #include "PumpedTwoLevelAtom.h"
 #include "Qbit.h"
 

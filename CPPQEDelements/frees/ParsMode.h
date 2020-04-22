@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_FREES_PARSMODE_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_PARSMODE_H_INCLUDED
 
-#include "Mode_Fwd.h"
-
 #include "ParsFwd.h"
 
 #include "ComplexExtensions.h"

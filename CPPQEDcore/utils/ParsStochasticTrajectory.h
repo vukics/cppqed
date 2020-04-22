@@ -3,9 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_PARSSTOCHASTICTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_PARSSTOCHASTICTRAJECTORY_H_INCLUDED
 
-
-#include "StochasticTrajectoryFwd.h"
-
 #include "ParsTrajectory.h"
 
 

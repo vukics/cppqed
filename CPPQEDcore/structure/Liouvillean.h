@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_LIOUVILLEAN_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_LIOUVILLEAN_H_INCLUDED
 
-#include "LiouvilleanFwd.h"
-
 #include "LiouvilleanAveragedCommon.h"
 #include "TimeDependence.h"
 

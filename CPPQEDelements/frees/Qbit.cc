@@ -1,8 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Qbit_.h"
 
-#include "ParsQbit.tcc"
-#include "StateVector.tcc"
+#include "ParsQbit.h"
 #include "ElementLiouvillean.tcc"
 
 #include <boost/bind.hpp>

@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 
-#include "EnsembleMCWFFwd.h"
-
 #include "DO_Display.h"
 #include "MCWF_Trajectory.h"
 #include "DensityOperator.h"
@@ -88,7 +86,7 @@ private:
  * \todo An additional constructor could be added to initialize the ensemble by a full density operator, which could be appropriately sampled.
  * 
  */
-template<int RANK, typename V>
+template<int RANK, typename V=tmptools::V_Empty>
 class EnsembleMCWF : public ensemble::Base<RANK>
 {
 private:

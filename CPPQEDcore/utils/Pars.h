@@ -3,28 +3,21 @@
 #ifndef CPPQEDCORE_UTILS_PARS_H_INCLUDED
 #define CPPQEDCORE_UTILS_PARS_H_INCLUDED
 
-#include "ParsFwd.h"
-
 #include "BooleanNegatedProxy.h"
 #include "Exception.h"
 
 #include <boost/ptr_container/ptr_list.hpp>
 
+#include <iostream>
+#include <iomanip>
 #include <string>
+#include <typeinfo>
 
 
 /// The parameter-bundle
 namespace parameters {
 
 const size_t maxTypeLabelLength=24;
-
-
-/// The function parsing the command line and putting the parameters into the ParameterTable \related ParameterTable
-void update(ParameterTable& p,
-            int argc, ///< number of words in the command line
-            char* argv[], ///< content of the command line word by word
-            const std::string& prefix="--" ///< prefix of parameters in the command line
-           );
 
 
 //////////////////
@@ -119,7 +112,14 @@ protected:
   void read_v(std::istream& is) {is>>v_;}
 
 private:
-  void print_v(size_t smw, size_t tmw, size_t dmw) const;
+  void print_v(size_t smw, size_t tmw, size_t dmw) const
+  {
+    using namespace std;
+    const string name(typeid(T).name());
+    cout<<setw(smw+3)<<left<<getS()
+        <<setw(tmw+3)<<left<<(name.size()>maxTypeLabelLength-3 ? name.substr(0,maxTypeLabelLength-3)+"..." : name)
+        <<setw(dmw+3)<<left<<getD()<<v_<<endl;
+  }
   
   T v_;
   
@@ -169,11 +169,23 @@ public:
    * \see e.g. the implementation of trajectory::ParsEvolved::ParsEvolved()
    * 
    */
-  template<typename T> T& add(const std::string& s, ///< parameter name (as appears in command line)
-                              const std::string& d, ///< parameter description (to be listed in help)
-                              const T& v ///< parameter default value
-                             );
-  
+  template<typename T> 
+  T& add(const std::string& s, ///< parameter name (as appears in command line)
+         const std::string& d, ///< parameter description (to be listed in help)
+         const T& v ///< parameter default value
+        )
+  {
+    using namespace std;
+    try {(*this)[s]; throw AttemptedRecreationOfParameterException(s);}
+    catch (UnrecognisedParameterException) {
+      Parameter<T>* pptr=new Parameter<T>(s,d,v);
+      table_.push_back(pptr);
+      smwidth_=max(smwidth_,s.length());
+      tmwidth_=max(tmwidth_,min(strlen(typeid(T).name()),maxTypeLabelLength));
+      dmwidth_=max(dmwidth_,d.length());
+      return pptr->get();
+    }
+  }
   
   /// Overload of add(const std::string &, const std::string &, const T &) for boolean
   /**
@@ -216,6 +228,14 @@ private:
   ParsedCommandLine parsedCommandLine_;
 
 };
+
+
+/// The function parsing the command line and putting the parameters into the ParameterTable \related ParameterTable
+void update(ParameterTable& p,
+            int argc, ///< number of words in the command line
+            char* argv[], ///< content of the command line word by word
+            const std::string& prefix="--" ///< prefix of parameters in the command line
+           );
 
 
 } // parameters

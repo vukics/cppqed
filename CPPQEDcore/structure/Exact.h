@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_EXACT_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_EXACT_H_INCLUDED
 
-#include "ExactFwd.h"
-
 #include "TimeDependence.h"
 #include "Types.h"
 

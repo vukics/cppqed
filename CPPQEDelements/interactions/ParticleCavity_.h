@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_PARTICLECAVITY__H_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_PARTICLECAVITY__H_INCLUDED
 
-#include "ParticleCavityFwd.h"
-
 #include "ParsParticleCavity.h"
 
 #include "Interaction.h"

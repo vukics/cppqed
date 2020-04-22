@@ -3,18 +3,7 @@
 #ifndef CPPQEDCORE_STRUCTURE_FREE_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_FREE_H_INCLUDED
 
-#include "FreeFwd.h"
-
-#include "DensityOperatorFwd.h"
-#include "StateVectorFwd.h"
-
-#ifndef FLAT_INCLUDE
-#include "../quantumoperator/TridiagonalFwd.h"
-#else //FLAT_INCLUDE
-#include "TridiagonalFwd.h"
-#endif //FLAT_INCLUDE
-// Normally, structure is not allowed to depend on quantumoperator, here we make a small exception
-
+#include "DensityOperator.h"
 #include "DynamicsBase.h"
 #include "QuantumSystem.h"
 #include "Types.h"
@@ -26,8 +15,6 @@ namespace structure {
 /// Contains some typedefs for structures of arity 1 for convenience in defining free systems
 /** \note The namespace was earlier called `free`, which in some situations created clashes with the global function of the same name declared in cstdlib */
 namespace freesystem {
-
-typedef quantumoperator::Tridiagonal<1> Tridiagonal; ///< unary Tridiagonal
 
 typedef quantumdata::Types<1>::    StateVectorLow     StateVectorLow; ///< unary StateVectorLow
 typedef quantumdata::Types<1>::DensityOperatorLow DensityOperatorLow; ///< unary DensityOperatorFwd

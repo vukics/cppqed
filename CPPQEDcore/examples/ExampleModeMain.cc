@@ -8,7 +8,7 @@
 #include "Master.tcc"
 
 #include "EvolvedGSL.tcc"
-#include "Pars.tcc"
+#include "Pars.h"
 
 
 using namespace parameters;

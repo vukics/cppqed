@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_TYPES_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_TYPES_H_INCLUDED
 
-#include "LazyDensityOperatorFwd.h"
-
 #include "BlitzArray.h"
 
 

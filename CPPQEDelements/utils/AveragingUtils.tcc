@@ -5,8 +5,8 @@
 
 #include "AveragingUtils.h"
 
-#include "DensityOperator.tcc"
-#include "LazyDensityOperator.tcc"
+#include "DensityOperator.h"
+#include "LazyDensityOperator.h"
 #include "NegPT.tcc"
 
 #include "Algorithm.h"
@@ -64,7 +64,7 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
 
 template<int RANK>
 ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
-  DimensionsBookkeeper<RANK>(dim),
+  DimensionsBookkeeper<RANK,true>(dim),
   Base(label,helper(getDimensions(),offDiagonals,subsequent)),
   offDiagonals_(offDiagonals)
 {
@@ -228,7 +228,7 @@ private:
 
 template<int RANK>
 ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
-  DimensionsBookkeeper<RANK>(dim),
+  DimensionsBookkeeper<RANK,true>(dim),
   Base(label,boost::assign::repeat_fun((offDiagonals ? mathutils::sqr(getTotalDimension()) : getTotalDimension())-1,
                                        Helper(getDimensions())).range(subsequent)),
   offDiagonals_(offDiagonals)

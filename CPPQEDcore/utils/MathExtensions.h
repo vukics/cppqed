@@ -6,8 +6,6 @@
 #ifndef CPPQEDCORE_UTILS_MATHEXTENSIONS_H_INCLUDED
 #define CPPQEDCORE_UTILS_MATHEXTENSIONS_H_INCLUDED
 
-#include "MathExtensionsFwd.h"
-
 #include "ComplexExtensions.h"
 #include "Exception.h"
 

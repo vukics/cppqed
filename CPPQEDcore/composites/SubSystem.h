@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_COMPOSITES_SUBSYSTEM_H_INCLUDED
 #define CPPQEDCORE_COMPOSITES_SUBSYSTEM_H_INCLUDED
 
-#include "SubSystemFwd.h"
-
 #include "Free.h"
 #include "Interaction.h"
 

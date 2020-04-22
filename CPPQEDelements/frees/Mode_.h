@@ -3,12 +3,10 @@
 #ifndef CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
 #define CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
 
-#include "Mode_Fwd.h"
-
 #include "ParsMode.h" // for the user interface
 
-#include "QM_PictureFwd.h"
-#include "StateVectorFwd.h"
+#include "QM_Picture.h"
+#include "StateVector.h"
 
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"
@@ -17,8 +15,14 @@
 #include "TridiagonalHamiltonian.h"
 
 
+class ModeBase;
+
 /// Contains helpers for the \ref genericelementsfreesmode bundle
 namespace mode {
+
+
+struct DoNotAverage {};
+
 
 const std::string keyTitle="Mode";
 
@@ -252,7 +256,7 @@ private:
 };
 
 
-template<typename Base>
+template<typename Base=Averaged>
 class AveragedMonitorCutoff : public Base
 {
 public:
@@ -307,7 +311,7 @@ public:
 /////
 
 /// Implements a free mode, that is, \f$H=-\delta\,a^\dagger a\f$ in a fully exact way, that is \f$\ket{\Psi(t)}=e^{i\delta\,t\,a^\dagger a}\ket{\Psi(0)}\f$ \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<typename AveragingType>
+template<typename AveragingType=mode::Averaged>
 class Mode 
   : public mode::Exact, public ModeBase, public AveragingType
 {
@@ -320,7 +324,7 @@ public:
 /** \cond */
 
 /// This is provided only for convenient use in maker functions. In this case unitary and “full” interaction picture coincide
-template<typename AveragingType>
+template<typename AveragingType=mode::Averaged>
 struct ModeUIP : Mode<AveragingType>
 {
   template<typename... AveragingConstructorParameters>
@@ -334,7 +338,7 @@ struct ModeUIP : Mode<AveragingType>
 /////
 
 /// Same as Mode, but without exact propagation \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<typename AveragingType>
+template<typename AveragingType=mode::Averaged>
 class ModeSch
   : public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
@@ -349,7 +353,7 @@ public:
 /////
 
 /// Implements a pumped mode, that is \f$H=-\delta\,a^\dagger a+i\lp\eta a^\dagger-\hermConj\rp\f$ in interaction picture defined by the first term \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<typename AveragingType>
+template<typename AveragingType=mode::Averaged>
 class PumpedMode 
   : public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
@@ -361,7 +365,7 @@ public:
 
 /** \cond */
 
-template<typename AveragingType>
+template<typename AveragingType=mode::Averaged>
 struct PumpedModeUIP : PumpedMode<AveragingType>
 {
   template<typename... AveragingConstructorParameters>
@@ -375,7 +379,7 @@ struct PumpedModeUIP : PumpedMode<AveragingType>
 /////
 
 /// Same as PumpedMode, without exact propagation \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<typename AveragingType>
+template<typename AveragingType=mode::Averaged>
 class PumpedModeSch
   : public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
@@ -391,7 +395,7 @@ public:
 
 /// Implements a mode damped with rate \f$\kappa\f$, that is \f$H=\lp-\delta-i\kappa\rp a^\dagger a\f$, in a fully exact way, that is \f$\ket{\Psi(t)}=e^{-z\,t\,a^\dagger a}\ket{\Psi(0)}\f$, and \f$\Liou\rho=2\kappa\lp(n_\text{Th}+1)\,a\rho a^\dagger+n_\text{Th}\,a^\dagger\rho a\rp\f$ \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 /** \tparam TEMPERATURE governs whether the possibility of finite temperature is considered */
-template<bool TEMPERATURE, typename AveragingType>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class LossyMode 
   : public mode::Liouvillean<TEMPERATURE>, public mode::Exact, public ModeBase, public AveragingType
 {
@@ -406,7 +410,7 @@ public:
 /////
 
 /// Same as LossyMode, but in unitary interaction picture, defined only by the \f$-\delta\,a^\dagger a\f$ part of the Hamiltonian \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<bool TEMPERATURE, typename AveragingType>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class LossyModeUIP 
   : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
@@ -421,7 +425,7 @@ public:
 /////
 
 /// Same as LossyMode, but in Schrödinger picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<bool TEMPERATURE, typename AveragingType>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class LossyModeSch 
   : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
@@ -437,7 +441,7 @@ public:
 /////
 
 /// Combines LossyMode with pumping in full (non-unitary) interaction picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<bool TEMPERATURE, typename AveragingType>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyMode 
   : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
@@ -451,7 +455,7 @@ public:
 /////
 
 /// Combines LossyModeUIP and PumpedMode \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<bool TEMPERATURE, typename AveragingType>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyModeUIP 
   : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
@@ -465,7 +469,7 @@ public:
 /////
 
 /// Combines LossyModeSch and PumpedModeSch \see \ref genericelementsfreesmode "Summary of the various Mode classes"
-template<bool TEMPERATURE, typename AveragingType>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyModeSch
   : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
@@ -479,7 +483,7 @@ public:
 // One more to help testing the alternative jumping in MCWF_Trajectory
 //////////////////////////////////////////////////////////////////////
 
-template<bool TEMPERATURE, typename AveragingType=mode::Averaged>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyModeAlternative 
   : public mode::Liouvillean<TEMPERATURE,true>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {

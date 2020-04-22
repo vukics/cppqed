@@ -2,8 +2,6 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATORFFT_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATORFFT_H_INCLUDED
 
-#include "LazyDensityOperatorFwd.h"
-
 #include "CMatrix.h"
 #include "Exception.h"
 

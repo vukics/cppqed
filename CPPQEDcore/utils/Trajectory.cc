@@ -4,7 +4,7 @@
 #include "Trajectory.tcc"
 
 #include "ParsTrajectory.h"
-#include "FormDouble.tcc"
+#include "FormDouble.h"
 
 #include "core_config.h"
 
@@ -176,7 +176,7 @@ auto trajectory::details::makeDisplayAndAutostopHandler(const Trajectory& traj, 
   private:
     typedef DArray<1> Averages;
 
-    std::ostream& display(std::ostream& os, int precision) const
+    std::ostream& display(std::ostream& os, int precision) const override
     {
       istringstream iss;
 

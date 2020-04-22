@@ -3,8 +3,7 @@
 #ifndef CPPQEDCORE_COMPOSITES_BINARYSYSTEM_H_INCLUDED
 #define CPPQEDCORE_COMPOSITES_BINARYSYSTEM_H_INCLUDED
 
-#include "BinarySystemFwd.h"
-
+#include "LazyDensityOperator.h"
 #include "QuantumSystem.h"
 #include "SubSystem.h"
 
@@ -12,17 +11,7 @@
 /// Auxiliary tools for BinarySystem
 namespace binary {
 
-typedef std::shared_ptr<const Base> Ptr; ///< Convenience typedef
-
 typedef structure::Interaction<2> Interaction; ///< Binary interaction
-
-/// Maker function for BinarySystem
-/**
- * Uses runtime dispatching to select the suitable class-composed BinarySystem on the basis of the characteristics of the components
- * (the two \link structure::Free free systems\endlink and the #Interaction): whether they derive from structure::Exact, structure::Hamiltonian, structure::Liouvillean.
- * If any of the components derive from structure::Exact, then the whole BinarySystem has to derive from structure::Exact, and so on.
- */
-const Ptr make(Interaction::Ptr);
 
 
 typedef composite::SubSystemFree            SSF; ///< Convenience typedef
@@ -91,6 +80,16 @@ private:
   const SSI ia_;
   
 };
+
+typedef std::shared_ptr<const Base> Ptr; ///< Convenience typedef
+
+/// Maker function for BinarySystem
+/**
+ * Uses runtime dispatching to select the suitable class-composed BinarySystem on the basis of the characteristics of the components
+ * (the two \link structure::Free free systems\endlink and the #Interaction): whether they derive from structure::Exact, structure::Hamiltonian, structure::Liouvillean.
+ * If any of the components derive from structure::Exact, then the whole BinarySystem has to derive from structure::Exact, and so on.
+ */
+const Ptr make(Interaction::Ptr);
 
 
 #define CLASS_HEADER(Class) class Class : public structure::Class<2>

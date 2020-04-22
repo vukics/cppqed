@@ -6,7 +6,7 @@
 
 // #include "ArrayTraits.h"
 // The same note applies as with EvolvedGSL.tcc
-#include "FormDouble.tcc"
+#include "FormDouble.h"
 #include "Trajectory.tcc"
 
 

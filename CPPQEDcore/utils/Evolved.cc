@@ -10,6 +10,10 @@ TimeStepBookkeeper::TimeStepBookkeeper(double dtInit, double epsRel, double epsA
   : t_(0), dtTry_(dtInit), dtDid_(0), epsRel_(epsRel), epsAbs_(epsAbs) 
 {}
 
+TimeStepBookkeeper::TimeStepBookkeeper(const TimeStepBookkeeper& t)
+  : t_(t.t_), dtTry_(t.dtTry_), dtDid_(t.dtDid_), epsRel_(t.epsRel_), epsAbs_(t.epsAbs_) 
+{}
+
 
 void TimeStepBookkeeper::update(double t, double dtTry)
 {

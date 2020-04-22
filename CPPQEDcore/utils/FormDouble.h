@@ -3,29 +3,17 @@
 #ifndef CPPQEDCORE_UTILS_FORMDOUBLE_H_INCLUDED
 #define CPPQEDCORE_UTILS_FORMDOUBLE_H_INCLUDED
 
-#include "FormDoubleFwd.h"
-
 #include "Pars.h"
 
 #include <algorithm>
 #include <iosfwd>
+#include <sstream>
 
 
-/// Comprises tools related to FormDouble
-/**
- * The aim of this module is to collect to one place all the issues of the formatting of doubles, necessary for output in various places.
- * The idea is from \cite stroustrup 21.4.6.3.
- * 
- * Named FormDouble here, since it is only issues pertaining to the display of doubles that are treated.
- * 
- * \todo This whole solution is somewhat arcane, look for a more standard way of doing this (what about \refBoost{Boost.Lexical_cast,lexical_cast} ?)
- * 
- */
 namespace formdouble {
 
-/// Output of a Bound value according to the corresponding FormDouble \related Bound
 template<typename T>
-std::ostream& operator<<(std::ostream&, const Bound<T>&);
+class Bound;
 
 } // formdouble
 
@@ -58,7 +46,7 @@ public:
   
   /// Binds a value of a double-based type (e.g. double, dcomp, `std::vector<double>`, etc.) to the present instant
   template<typename T>
-  const formdouble::Bound<T> operator()(const T&) const;
+  inline auto operator()(const T& v) const {return formdouble::Bound<T>(*this,v);}
 
   /// \name Getters
   //@{
@@ -74,6 +62,16 @@ private:
 
 
 
+/// Comprises tools related to FormDouble
+/**
+ * The aim of this module is to collect to one place all the issues of the formatting of doubles, necessary for output in various places.
+ * The idea is from \cite stroustrup 21.4.6.3.
+ * 
+ * Named FormDouble here, since it is only issues pertaining to the display of doubles that are treated.
+ * 
+ * \todo This whole solution is somewhat arcane, look for a more standard way of doing this (what about \refBoost{Boost.Lexical_cast,lexical_cast} ?)
+ * 
+ */
 namespace formdouble {
 
 /// If `precision` is larger than FormDouble::defaultPrecision, returns `precision`, otherwise the default \related FormDouble
@@ -91,6 +89,20 @@ public:
   const T& val;
 
 };
+
+
+/// Output of a Bound value according to the corresponding FormDouble \related Bound
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const Bound<T>& bf)
+{
+  using namespace std;
+  ostringstream s; // intermediate stringstream taken so that the manips don't affect the NEXT output
+  s.precision(bf.f.getPrecision());
+  s.width(bf.f.getWidth());
+  s.setf(ios_base::left,ios_base::adjustfield);
+  s<<bf.val;
+  return os<<s.str();
+}
 
 
 int widthPositive(int precision); ///< The maximal width in characters of a *positive* number streamed with the given `precision` \related FormDouble

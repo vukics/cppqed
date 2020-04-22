@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
 #define   CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
 
-#include "CompositeFwd.h"
-
 #include "Act.h"
 
 #include "BlitzArraySliceIterator.h"

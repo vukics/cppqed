@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED
 
-#include "BichromaticModeFwd.h"
-
 #include "Mode_.h"
 #include "TridiagonalHamiltonian.tcc"
 
@@ -18,22 +16,10 @@ struct ParsBichromatic : ParsPumpedLossy
   ParsBichromatic(parameters::ParameterTable&, const std::string& ="");
 };
 
-
-template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsBichromatic& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
-{
-  if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsPumpedLossy&>(p),qmp,a...);
-  else {
-    if (p.nTh) {return std::make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
-    else       {return std::make_shared<BichromaticMode<false,AveragingType> >(p,a...);}
-  }
-}
+} // mode
 
 
-} //mode
-
-
-template<bool TEMPERATURE, typename AveragingType>
+template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class BichromaticMode
   : public mode::Liouvillean<TEMPERATURE>,
     public mode::Hamiltonian<true>,
@@ -60,6 +46,22 @@ private:
 
 };
 
+
+namespace mode {
+
+
+template<typename AveragingType, typename... AveragingConstructorParameters>
+const Ptr make(const ParsBichromatic& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
+{
+  if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsPumpedLossy&>(p),qmp,a...);
+  else {
+    if (p.nTh) {return std::make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
+    else       {return std::make_shared<BichromaticMode<false,AveragingType> >(p,a...);}
+  }
+}
+
+
+} //mode
 
 
 template class BichromaticMode<true>;

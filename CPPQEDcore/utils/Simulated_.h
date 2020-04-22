@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
 #define CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
 
-#include "SimulatedFwd.h"
-
 #include "ParsTrajectory.h"
 #include "Trajectory.h"
 

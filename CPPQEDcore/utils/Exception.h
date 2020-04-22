@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_EXCEPTION_H_INCLUDED
 #define CPPQEDCORE_UTILS_EXCEPTION_H_INCLUDED
 
-#include "ExceptionFwd.h"
-
 #include <string>
 
 namespace cpputils {

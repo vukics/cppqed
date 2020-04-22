@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 #define CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 
-#include "EvolvedFwd.h"
-
 #include "core_config.h"
 
 #include <boost/function.hpp>   // instead of std::tr1::function
@@ -75,6 +73,7 @@ public:
 
   void update(double t, double dtTry);
 
+  TimeStepBookkeeper(const TimeStepBookkeeper&);
   TimeStepBookkeeper& operator=(const TimeStepBookkeeper&); ///< straightforward assignment operator that avoids self-assignment
 
 protected:

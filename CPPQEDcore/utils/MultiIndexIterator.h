@@ -72,7 +72,7 @@ public:
     : MultiIndexIterator(MultiIndex(SingleIndex(0)),ubound,e) {}
   //@}
   
-  MultiIndexIterator& operator=(const MultiIndexIterator& other) {idx_=other.idx_; return *this;}
+  MultiIndexIterator& operator=(const MultiIndexIterator&) = delete; // {idx_=other.idx_; return *this;}
   
   /// \name InputIterator operations
   //@{

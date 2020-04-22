@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_FFT_H_INCLUDED
 #define   CPPQEDCORE_UTILS_FFT_H_INCLUDED
 
-#include "FFTFwd.h"
-
 #include "Exception.h"
 
 #include <cstddef>

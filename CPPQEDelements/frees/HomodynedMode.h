@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_FREES_HOMODYNEDMODE_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_HOMODYNEDMODE_H_INCLUDED
 
-#include "HomodynedModeFwd.h"
-
 #include "Mode_.h"
 #include "TridiagonalHamiltonian.tcc"
 
@@ -12,7 +10,7 @@
 
 namespace mode {
 
-
+  
 template<typename BASE>
 struct ParsHomodyned : BASE // BASE either ParsLossy or ParsPumpedLossy
 {
@@ -25,16 +23,6 @@ struct ParsHomodyned : BASE // BASE either ParsLossy or ParsPumpedLossy
       homodyneAmplitude(p.addMod("homodyneAmplitude",mod,"homodyneAmplitude",dcomp(0))) {}
 
 };
-
-
-
-template<typename AveragingType, typename BASE, typename... AveragingConstructorParameters>
-const Ptr make(const ParsHomodyned<BASE>& p, AveragingConstructorParameters&&... a)
-{
-  if (!isNonZero(p.homodyneAmplitude)) return make<AveragingType>(static_cast<const BASE&>(p),QMP_SCH,a...);
-  else return std::make_shared<HomodynedMode<AveragingType> >(p,a...);
-}
-
 
 
 class HomodynedBase
@@ -64,7 +52,7 @@ private:
 } // mode
 
 
-template<typename AveragingType>
+template<typename AveragingType=mode::Averaged>
 class HomodynedMode : public mode::HomodynedBase, public ModeBase, public AveragingType
 {
 public:
@@ -80,5 +68,17 @@ public:
 
 };
 
+
+namespace mode {
+
+
+template<typename AveragingType, typename BASE, typename... AveragingConstructorParameters>
+const Ptr make(const ParsHomodyned<BASE>& p, AveragingConstructorParameters&&... a)
+{
+  if (!isNonZero(p.homodyneAmplitude)) return make<AveragingType>(static_cast<const BASE&>(p),QMP_SCH,a...);
+  else return std::make_shared<HomodynedMode<AveragingType> >(p,a...);
+}
+
+} // mode
 
 #endif // CPPQEDELEMENTS_FREES_HOMODYNEDMODE_H_INCLUDED

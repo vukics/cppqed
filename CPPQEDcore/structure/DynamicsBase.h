@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_DYNAMICSBASE_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_DYNAMICSBASE_H_INCLUDED
 
-#include "DynamicsBaseFwd.h"
-
 #include "ComplexExtensions.h"
 
 #include <boost/utility.hpp>

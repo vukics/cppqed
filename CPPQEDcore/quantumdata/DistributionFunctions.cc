@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "DistributionFunctions.h"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 #include <boost/math/special_functions/binomial.hpp>
 #include <boost/math/special_functions/hermite.hpp>

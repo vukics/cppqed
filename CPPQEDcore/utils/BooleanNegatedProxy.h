@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED
 #define   CPPQEDCORE_UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED
 
-#include "BooleanNegatedProxyFwd.h"
-
 #include <iosfwd>
 
 namespace cpputils {
@@ -20,6 +18,7 @@ public:
   /// Implicit conversion to boolean
   operator bool() const {return !v_;}
   
+  BooleanNegatedProxy(const BooleanNegatedProxy& other) : v_(other.v_) {}
   BooleanNegatedProxy& operator=(const BooleanNegatedProxy& other) {v_=other.v_; return *this;}
   
   BooleanNegatedProxy& operator=(bool v) {v_=!v; return *this;}

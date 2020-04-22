@@ -8,8 +8,6 @@
 #define   QUANTUMOPERATOR_TRIDIAGONAL_MAX_RANK BLITZ_ARRAY_LARGEST_RANK
 #endif // QUANTUMOPERATOR_TRIDIAGONAL_MAX_RANK
 
-#include "TridiagonalFwd.h"
-
 #include "DimensionsBookkeeper.h"
 #include "LazyDensityOperator.h"
 #include "Types.h"
@@ -31,27 +29,6 @@ struct TridiagonalTimeMismatchException      : public cpputils::Exception {};
 /// Comprises modules representing operators of special structure (tridiagonal, sparse) over Hilbert spaces of arbitrary arity
 namespace quantumoperator {
 
-
-/// A free-standing version of Tridiagonal::apply \related Tridiagonal
-template<int RANK>
-inline
-void
-apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename quantumdata::Types<RANK>::StateVectorLow& dpsidt,
-      const Tridiagonal<RANK>&);
-
-
-/// Same as Tridiagonal::furnishWithFreqs, but returns a copy of its first argument furnished with frequencies \related Tridiagonal
-template<int RANK>
-Tridiagonal<RANK>
-furnishWithFreqs(const Tridiagonal<RANK>& tridiag,                        ///< Tridiagonal whose copy is to be furnished with frequencies
-                 const typename Tridiagonal<RANK>::Diagonal& mainDiagonal ///< main diagonal determining the frequencies to be used for furnishing
-                );
-
-
-/// Unary zero operator as a Tridiagonal \related Tridiagonal
-const Tridiagonal<1> zero    (size_t);
-/// Unary identity operator as a Tridiagonal \related Tridiagonal
-const Tridiagonal<1> identity(size_t);
 
 
 //////////////
@@ -100,7 +77,7 @@ const Tridiagonal<1> identity(size_t);
  */
 template<int RANK> 
 class Tridiagonal 
-  : public DimensionsBookkeeper<RANK>, 
+  : public DimensionsBookkeeper<RANK,true>, 
     private linalg::VectorSpace<Tridiagonal<RANK> >
 {
 public:
@@ -112,7 +89,7 @@ public:
   typedef typename Diagonals::T_numtype Diagonal; ///< A unary complex blitz array
 
 private:
-  typedef DimensionsBookkeeper<RANK> Base;
+  typedef DimensionsBookkeeper<RANK,true> Base;
   
 public:
   typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper
@@ -319,21 +296,36 @@ private:
 };
 
 
+/// A free-standing version of Tridiagonal::apply \related Tridiagonal
+template<int RANK>
+inline void
+apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename quantumdata::Types<RANK>::StateVectorLow& dpsidt, const Tridiagonal<RANK>& tridiag)
+{
+  tridiag.apply(psi,dpsidt);
+}
+
+
+/// Same as Tridiagonal::furnishWithFreqs, but returns a copy of its first argument furnished with frequencies \related Tridiagonal
+template<int RANK>
+Tridiagonal<RANK>
+furnishWithFreqs(const Tridiagonal<RANK>& tridiag,                        ///< Tridiagonal whose copy is to be furnished with frequencies
+                 const typename Tridiagonal<RANK>::Diagonal& mainDiagonal ///< main diagonal determining the frequencies to be used for furnishing
+                );
+
+
+/// Unary zero operator as a Tridiagonal \related Tridiagonal
+const Tridiagonal<1> zero    (size_t);
+/// Unary identity operator as a Tridiagonal \related Tridiagonal
+const Tridiagonal<1> identity(size_t);
+
+
+
 template<int RANK>
 const mpl::int_<1> Tridiagonal<RANK>::_1_=mpl::int_<1>();
 
 template<int RANK>
 const typename Tridiagonal<RANK>::Diagonal Tridiagonal<RANK>::empty;
 
-
-template<int RANK>
-inline
-void
-apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename quantumdata::Types<RANK>::StateVectorLow& dpsidt,
-      const Tridiagonal<RANK>& tridiag)
-{
-  tridiag.apply(psi,dpsidt);
-}
 
 
 /// Direct product \related Tridiagonal
@@ -373,6 +365,9 @@ std::ostream& operator<<(std::ostream&, const Tridiagonal<RANK>&);
 
 
 } // quantumoperator
+
+
+namespace structure { namespace freesystem { using Tridiagonal=quantumoperator::Tridiagonal<1>; } }
 
 
 #endif // CPPQEDCORE_QUANTUMOPERATOR_TRIDIAGONAL_H_INCLUDED

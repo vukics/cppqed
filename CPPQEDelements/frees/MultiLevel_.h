@@ -3,8 +3,6 @@
 #ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_MULTILEVEL__H_INCLUDED
 
-#include "MultiLevel_Fwd.h"
-
 #include "ParsMultiLevel.h"
 
 #include "AveragingUtils.tcc"
@@ -18,6 +16,24 @@
 #include "primitive.hpp"
 
 #include <boost/fusion/mpl/size.hpp>
+
+/*
+
+Convention is the following: an (l,m) pair in VP (or VL) below means a sigma_lm=|l><m|
+
+This yields an 
+
+H_elementaryPumping=i*(conj(eta)*sigma-eta*sigmadagger)
+
+term in the Hamiltonian
+
+If a pair (l,m) is in VL, this means a jump with jump operator
+sigma_lm. This means that the rate of the jump is proportional
+to 
+
+<sigmadagger_lm*sigma_lm>=<|m><l|*|l><m|>=<|m><m|>=rho_mm
+
+*/
 
 
 
@@ -291,7 +307,7 @@ public:
  *
  * \todo some static sanity checks of `VP` and `VL` in view of `NL` should be done
  */
-template<int NL, typename VP, typename VL, bool IS_DIFFUSIVE, typename AveragingType>
+template<int NL, typename VP, typename VL, bool IS_DIFFUSIVE, typename AveragingType=ReducedDensityOperator<1>>
 class PumpedLossyMultiLevelSch 
   : public multilevel::HamiltonianSch<NL,VP>,
     public multilevel::Liouvillean<NL,VL,IS_DIFFUSIVE>,
@@ -313,6 +329,10 @@ public:
   PumpedLossyMultiLevelSch(const RealPerLevel&, const VP&, const VL&, double gamma_parallel, AveragingConstructorParameters&&...);
 
 };
+// VP is a compile-time container of pairs, specifying which
+// transitions are pumped It should model a Boost.Fusion sequence,
+// which stores the pairs for compile-time use and the pump Rabi
+// frequencies for run-time use.
 
 
 

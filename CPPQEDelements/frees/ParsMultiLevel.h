@@ -2,9 +2,7 @@
 #ifndef   CPPQEDELEMENTS_FREES_PARSMULTILEVEL_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_PARSMULTILEVEL_H_INCLUDED
 
-#include "MultiLevel_Fwd.h"
-
-#include "ParsFwd.h"
+#include "Pars.h"
 
 #include "BlitzTiny.h"
 
@@ -26,7 +24,14 @@ struct ParsPumpedLossy
   VL& gammas;
   double& gamma_parallel;
 
-  ParsPumpedLossy(parameters::ParameterTable&, const std::string& ="");
+  ParsPumpedLossy(parameters::ParameterTable& p, const std::string& mod="")
+    : deltas(p.addTitle("PumpedLossyMultiLevel",mod).addMod("deltas",mod,"MultiLevel detunings vector",RealPerLevel<NL>())),
+      etas(p.addMod("etas",mod,"MultiLevel pumps vector",VP())),
+      gammas(p.addMod("gammas",mod,"MultiLevel decays vector",VL())),
+      gamma_parallel(p.addMod("gamma_parallel",mod,"Phase flip rate",0.))
+  {
+    deltas=0;
+  }
 
 };
 

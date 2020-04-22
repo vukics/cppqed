@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_PARTICLETWOMODES__H_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_PARTICLETWOMODES__H_INCLUDED
 
-#include "ParticleTwoModesFwd.h"
-
 #include "ParticleCavity_.h"
 
 #include "TridiagonalHamiltonian.h"

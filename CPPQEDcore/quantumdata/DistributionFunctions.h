@@ -6,7 +6,6 @@
 #include "BlitzArray.h"
 #include "ComplexExtensions.h"
 #include "MathExtensions.h"
-
 #include "ParsFwd.h"
 
 #include <boost/math/special_functions/factorials.hpp>

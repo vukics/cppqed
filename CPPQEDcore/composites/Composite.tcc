@@ -6,7 +6,7 @@
 
 #include "Interaction.h"
 
-#include "LazyDensityOperator.tcc"
+#include "LazyDensityOperator.h"
 
 #include "Exception.h"
 
@@ -124,7 +124,7 @@ class FillDimensions
 {
 public:
   typedef std::array<SubSystemFree,RANK> Frees;
-  typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
+  typedef typename DimensionsBookkeeper<RANK,true>::Dimensions Dimensions;
 
   FillDimensions(const Frees& frees, Dimensions& dims) : frees_(frees), dims_(dims) {}
 

@@ -2,8 +2,6 @@
 #ifndef CPPQEDCORE_UTILS_FUZZYDOUBLE_H_INCLUDED
 #define CPPQEDCORE_UTILS_FUZZYDOUBLE_H_INCLUDED
 
-#include "FuzzyDoubleFwd.h"
-
 #include<boost/operators.hpp>
 
 namespace cpputils {

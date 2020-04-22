@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_IDENTICALPARTICLES_H_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_IDENTICALPARTICLES_H_INCLUDED
 
-#include "IdenticalParticlesFwd.h"
-
 #include "Particle_.h"
 
 #include "Interaction.h"

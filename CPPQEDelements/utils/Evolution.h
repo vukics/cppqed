@@ -10,7 +10,7 @@
 #include "Tridiagonal.tcc"
 
 #include "EvolvedGSL.tcc"
-#include "Pars.tcc"
+#include "Pars.h"
 
 #include "component_versions.h"
 

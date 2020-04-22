@@ -2,9 +2,7 @@
 #ifndef   CPPQEDELEMENTS_FREES_PARSQBIT_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_PARSQBIT_H_INCLUDED
 
-#include "Qbit_Fwd.h"
-
-#include "ParsFwd.h"
+#include "Pars.h"
 
 #include "ComplexExtensions.h"
 
@@ -16,8 +14,10 @@ struct Pars
   dcomp &qbitInit;
   double &delta;
 
-  Pars(parameters::ParameterTable&, const std::string& ="");
-
+  Pars(parameters::ParameterTable& p, const std::string& mod="")
+    : qbitInit(p.addTitle("Qbit",mod).addMod("qbitInit",mod,"Qbit initial condition excited",dcomp(0.))),
+      delta(p.addMod("deltaA",mod,"Qbit detuning",-10.)) {}
+      
 };
 
 
@@ -25,29 +25,37 @@ struct ParsPumped : Pars
 {
   dcomp& eta;
 
-  ParsPumped(parameters::ParameterTable&, const std::string& ="");
+  ParsPumped(parameters::ParameterTable& p, const std::string& mod="")
+    : Pars(p,mod), eta(p.addTitle("PumpedQbit",mod).addMod("etat",mod,"Qbit pump",dcomp(0.))) {}
 
 };
 
 
-template <typename BASE>
+template <typename BASE=Pars>
 struct ParsLossy : BASE
 {
   double &gamma;
 
-  ParsLossy(parameters::ParameterTable&, const std::string& ="");
-
+  ParsLossy(parameters::ParameterTable& p, const std::string& mod="")
+    : BASE(p,mod), gamma(p.addTitle("LossyQbit",mod).addMod("gamma",mod,"Qbit decay rate",fabs(BASE::delta))) {}
 };
 
 
-template <typename BASE>
+typedef ParsLossy<ParsPumped> ParsPumpedLossy;
+
+
+template <typename BASE=ParsLossy<>>
 struct ParsLossyPhaseNoise : BASE
 {
   double &gamma_parallel;
   
-  ParsLossyPhaseNoise(parameters::ParameterTable&, const std::string& ="");
+  ParsLossyPhaseNoise(parameters::ParameterTable& p, const std::string& mod="")
+    : BASE(p,mod), gamma_parallel(p.addMod("gamma_parallel",mod,"Qbit phase flip rate",0.)) {}
   
 };
+
+
+typedef ParsLossyPhaseNoise<ParsPumpedLossy> ParsPumpedLossyPhaseNoise;
 
 
 } // qbit

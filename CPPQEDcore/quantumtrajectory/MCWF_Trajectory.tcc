@@ -6,12 +6,13 @@
 
 #include "ParsMCWF_Trajectory.h"
 
-#include "StateVector.tcc"
+#include "StateVector.h"
 
+#include "EvolvedGSL.tcc"
 #include "QuantumTrajectory.h"
 #include "StochasticTrajectory.tcc"
 
-#include "FormDouble.tcc"
+#include "FormDouble.h"
 
 #include <boost/range/numeric.hpp>
 #include <boost/range/algorithm/find_if.hpp>

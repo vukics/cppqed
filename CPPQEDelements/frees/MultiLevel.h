@@ -6,7 +6,7 @@
 #include "MLJC.tcc"
 #include "MultiLevel.tcc"
 #include "ParsMLJC.h"
-#include "ParsMultiLevel.tcc"
-#include "Sigma.tcc"
+#include "ParsMultiLevel.h"
+#include "Sigma.h"
 
 #endif // CPPQEDELEMENTS_FREES_MULTILEVEL_H_INCLUDED

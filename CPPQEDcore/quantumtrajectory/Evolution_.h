@@ -3,14 +3,12 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION__H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION__H_INCLUDED
 
-#include "Evolution_Fwd.h"
-
 #include "LazyDensityOperator.h"
-#include "DensityOperatorFwd.h"
-#include "StateVectorFwd.h"
-#include "MCWF_TrajectoryFwd.h"
+#include "DensityOperator.h"
+#include "StateVector.h"
+#include "MCWF_Trajectory.h"
 #include "ParsMCWF_Trajectory.h"
-#include "QuantumSystemFwd.h"
+#include "QuantumSystem.h"
 
 #include "TMP_Tools.h"
 

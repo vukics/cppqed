@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_HAMILTONIAN_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_HAMILTONIAN_H_INCLUDED
 
-#include "HamiltonianFwd.h"
-
 #include "TimeDependence.h"
 #include "Types.h"
 

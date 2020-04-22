@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
 
-#include "ElementAveragedFwd.h"
-
 #include "Averaged.h"
 #include "ElementLiouvilleanAveragedCommon.h"
 
@@ -31,7 +29,7 @@ std::ostream& displayCommon(const AveragedCommon::Averages&, std::ostream&, int)
  * \see Sec. \ref basicoscillator of the structure-bundle guide for an example of usage
  *
  */
-template<int RANK, bool IS_TIME_DEPENDENT>
+template<int RANK, bool IS_TIME_DEPENDENT=false>
 class ElementAveraged : public ElementLiouvilleanAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
 {
 private:
@@ -59,7 +57,7 @@ private:
 
 
 /// Besides being an ElementAveraged, it models the \refBoost{Clonable concept,ptr_container/doc/reference.html#the-clonable-concept}
-template<int RANK, bool IS_TIME_DEPENDENT>
+template<int RANK, bool IS_TIME_DEPENDENT=false>
 class ClonableElementAveraged : public ElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
 private:

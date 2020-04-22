@@ -3,11 +3,9 @@
 #ifndef CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
 
-#include "TrajectoryFwd.h"
-
 #include "Evolved.h"
-#include "FormDoubleFwd.h"
-#include "Pars.h"
+#include "FormDouble.h"
+#include "ParsFwd.h"
 
 
 namespace trajectory {

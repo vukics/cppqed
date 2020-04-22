@@ -3,8 +3,7 @@
 #ifndef   CPPQEDCORE_STRUCTURE_LIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
 #define   CPPQEDCORE_STRUCTURE_LIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
 
-#include "LiouvilleanAveragedCommonFwd.h"
-
+#include "LazyDensityOperator.h"
 #include "Types.h"
 
 #include "BlitzArray.h"

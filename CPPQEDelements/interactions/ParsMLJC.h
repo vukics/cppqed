@@ -2,9 +2,10 @@
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_PARSMLJC_H_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_PARSMLJC_H_INCLUDED
 
-#include "MLJCFwd.h"
+#include "Pars.h"
 
-#include "ParsFwd.h"
+#include <boost/fusion/sequence/io.hpp>
+#include <boost/fusion/include/io.hpp>
 
 
 namespace mljc {
@@ -14,14 +15,13 @@ struct Pars
 {
   VC& gs;
 
-  Pars(parameters::ParameterTable&, const std::string& ="");
+  Pars(parameters::ParameterTable& p, const std::string& mod="") : gs(p.addTitle("MultiLevelJaynesCummings",mod).addMod("gs",mod,"Multi-Level Jaynes-Cummings couplings",VC()))
+  {}
 
 };
 
 } // mljc
 
-
-#include<ParsMLJC.tcc>
 
 
 #endif // CPPQEDELEMENTS_INTERACTIONS_PARSMLJC_H_INCLUDED

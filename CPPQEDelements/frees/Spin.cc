@@ -8,7 +8,7 @@
 #include "LazyDensityOperator.h"
 #include "Tridiagonal.tcc"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 #include<boost/assign/std/list.hpp>
 

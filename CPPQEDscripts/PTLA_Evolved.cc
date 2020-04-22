@@ -6,8 +6,8 @@
 #include "PumpedTwoLevelAtom.h"
 #include "Qbit.h"
 
-#include "StateVector.tcc"
-#include "DensityOperator.tcc"
+#include "StateVector.h"
+#include "DensityOperator.h"
 
 #include "Simulated.h"
 

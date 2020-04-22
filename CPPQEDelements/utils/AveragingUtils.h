@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_UTILS_AVERAGINGUTILS_H_INCLUDED
 #define   CPPQEDELEMENTS_UTILS_AVERAGINGUTILS_H_INCLUDED
 
-#include "AveragingUtilsFwd.h"
-
 #include "ElementAveraged.h"
 
 #include "DimensionsBookkeeper.h"
@@ -15,7 +13,7 @@
 
 
 template<int RANK>
-class ReducedDensityOperator : private DimensionsBookkeeper<RANK>, public structure::ClonableElementAveraged<RANK>
+class ReducedDensityOperator : private DimensionsBookkeeper<RANK,true>, public structure::ClonableElementAveraged<RANK>
 {
 private:
   typedef structure::ClonableElementAveraged<RANK> Base;
@@ -26,9 +24,9 @@ public:
   
   typedef typename Base::KeyLabels KeyLabels;
   
-  typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
+  typedef typename DimensionsBookkeeper<RANK,true>::Dimensions Dimensions;
   
-  using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension;
+  using DimensionsBookkeeper<RANK,true>::getDimensions; using DimensionsBookkeeper<RANK,true>::getTotalDimension;
 
   ReducedDensityOperator(const std::string&, const Dimensions&, bool offDiagonals=false, const KeyLabels& =KeyLabels());
 
@@ -70,7 +68,7 @@ private:
 namespace averagingUtils {
 
 
-template<int RANK, bool IS_TIME_DEPENDENT>
+template<int RANK, bool IS_TIME_DEPENDENT=false>
 class Collecting : public structure::ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
 private:
@@ -103,7 +101,7 @@ private:
 
 
 
-template<int RANKFROM, int RANKTO, bool IS_TIME_DEPENDENT>
+template<int RANKFROM, int RANKTO, bool IS_TIME_DEPENDENT=false>
 class Transferring : public structure::AveragedTimeDependenceDispatched<RANKFROM,IS_TIME_DEPENDENT>
 // Transfers the calculation of averages to another Averaged class, possibly with different RANK.
 // The LazyDensityOperator for the other class should reference the same data.

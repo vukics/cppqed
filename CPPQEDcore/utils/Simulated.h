@@ -7,7 +7,7 @@
 #include "EvolvedGSL.tcc"
 #include "Simulated.tcc"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 #include <boost/bind.hpp>
 

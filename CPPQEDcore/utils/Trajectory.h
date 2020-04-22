@@ -3,12 +3,11 @@
 #ifndef CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED
 
-#include "TrajectoryFwd.h"
-
 #include "Archive.h"
 #include "CommentingStream.h"
 #include "Exception.h"
 #include "Evolved.h"
+#include "ParsTrajectory.h"
 
 #include <iosfwd>
 #include <string>
@@ -16,101 +15,6 @@
 
 /// The trajectory-bundle
 namespace trajectory {
-
-
-/// Running in deltaT mode (displays in equal time intervals) for a certain time \related Trajectory
-/**
- * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
- *
- * A Trajectory can
- * - be \link Trajectory::evolve evolved\endlink (propagated in time by given time intervals)
- * - \link Trajectory::readState perform i/o of its entire state\endlink, that is, a bunch of information necessary for resuming a Trajectory from a certain time instant
- * - \link Trajectory::display display relevant physical and numerical information\endlink about its actual state at any time (e.g. a set of quantum averages in the case of a quantum trajectory)
- *
- * \note While the entire state can be huge (e.g. the state vector or density operator in the case of a quantum trajectory) the relevant information in an actual numerical experiment
- * is usually much less (a set of quantum averages that doesn’t entirely define the state).
- *
- * Furthermore, a Trajectory can
- * - provide information about its \link Trajectory::getTime time\endlink and \link Trajectory::getDtDid last performed timestep\endlink
- * - \link Trajectory::displayParameters print a header\endlink summarizing its physical and numerical parameters together with a key to the set of relevant physical information displayed during the run
- * - \link Trajectory::logOnEnd print a log\endlink at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
- *
- * \see Simulated for a full generic implementation of Trajectory together with a small tutorial
- * 
- * \todo Consider taking Trajectory by rvalue reference
- *
- */
-void run(Trajectory & trajectory, ///< the trajectory to run
-         double time, ///< end time
-         double deltaT, ///< time interval between two \link Trajectory::display displays\endlink
-         unsigned sdf, ///< number of \link Trajectory::display displays\endlink between two \link Trajectory::writeState state displays\endlink
-         const std::string& ofn, ///< name of the output file for \link Trajectory::display displays\endlink — if empty, display to standard output; \link Trajectory::writeState state displays\endlink into file named `ofn.state`
-         const std::string& initialFileName, ///< name of file containing initial condition state for the run
-         int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
-         bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
-         bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
-         double autoStopEpsilon, ///< relative precision for autostopping
-         unsigned autoStopRepetition, ///< number of displayed lines repeated within relative precision before autostopping – 0 means no autostopping
-         const std::string& parsedCommandLine
-        );
-
-
-/// Same as \link Trajectory::run above\endlink but runs for a certain number of time intervals deltaT \related Trajectory
-/**
- * <b>Rationale:</b> This version of `run` exists to avoid the eventual tiny timestep at the end of the run that might occur with
- * \link Trajectory::run the above version\endlink.
- * This is because e.g. in the case of `deltaT=0.1`, `time=1`, adding up `0.1` ten times numerically does not result in exactly `1`.
- * 
- * For a demonstration, compare the output of
- *
- *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --T 1
- *
- * with
- *
- *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --NDt 10
- *
- */
-void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt*deltaT
-         double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
-
-
-/// Another version of \link Trajectory::run `run`\endlink for running in dc-mode \related Adaptive
-/**
- * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Adaptive::step single adaptive timestep\endlink, it is possible to count the
- * individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each display. Hence, we get denser displays in time when the timestep is small,
- * that is, when the important things are happening in the dynamics.
- * 
- */
-template<typename A, typename BASE>
-void run(Adaptive<A,BASE>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
-         unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
-
-
-/// Dispatcher \related Trajectory
-/**
- * Runs
- * - run(Trajectory&, long, double, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.NDt` is nonzero and
- * - run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) otherwise
- * 
- * \note This means that ParsRun::NDt takes precedence over ParsRun::T
- *
- */
-void run(Trajectory &, const ParsRun& p);
-
-
-/// Dispatcher \related Adaptive
-/**
- * - Runs run(Adaptive&, double, int, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.dc` is nonzero (dc-mode)
- * - delegates to run(Trajectory&, const ParsRun& p) otherwise (deltaT-mode)
- * 
- * \note This means that ParsRun::dc takes precedence over ParsRun::Dt
- * 
- */
-template<typename A, typename BASE>
-void run(Adaptive<A,BASE>&, const ParsRun&);
-
 
 /// Aggregate of information about a trajectory-state archive \see AdaptiveIO
 /**
@@ -391,6 +295,100 @@ private:
   const int logLevel_;
 
 };
+
+
+/// Running in deltaT mode (displays in equal time intervals) for a certain time \related Trajectory
+/**
+ * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
+ *
+ * A Trajectory can
+ * - be \link Trajectory::evolve evolved\endlink (propagated in time by given time intervals)
+ * - \link Trajectory::readState perform i/o of its entire state\endlink, that is, a bunch of information necessary for resuming a Trajectory from a certain time instant
+ * - \link Trajectory::display display relevant physical and numerical information\endlink about its actual state at any time (e.g. a set of quantum averages in the case of a quantum trajectory)
+ *
+ * \note While the entire state can be huge (e.g. the state vector or density operator in the case of a quantum trajectory) the relevant information in an actual numerical experiment
+ * is usually much less (a set of quantum averages that doesn’t entirely define the state).
+ *
+ * Furthermore, a Trajectory can
+ * - provide information about its \link Trajectory::getTime time\endlink and \link Trajectory::getDtDid last performed timestep\endlink
+ * - \link Trajectory::displayParameters print a header\endlink summarizing its physical and numerical parameters together with a key to the set of relevant physical information displayed during the run
+ * - \link Trajectory::logOnEnd print a log\endlink at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
+ *
+ * \see Simulated for a full generic implementation of Trajectory together with a small tutorial
+ * 
+ * \todo Consider taking Trajectory by rvalue reference
+ *
+ */
+void run(Trajectory & trajectory, ///< the trajectory to run
+         double time, ///< end time
+         double deltaT, ///< time interval between two \link Trajectory::display displays\endlink
+         unsigned sdf, ///< number of \link Trajectory::display displays\endlink between two \link Trajectory::writeState state displays\endlink
+         const std::string& ofn, ///< name of the output file for \link Trajectory::display displays\endlink — if empty, display to standard output; \link Trajectory::writeState state displays\endlink into file named `ofn.state`
+         const std::string& initialFileName, ///< name of file containing initial condition state for the run
+         int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
+         bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
+         bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
+         double autoStopEpsilon, ///< relative precision for autostopping
+         unsigned autoStopRepetition, ///< number of displayed lines repeated within relative precision before autostopping – 0 means no autostopping
+         const std::string& parsedCommandLine
+        );
+
+
+/// Same as \link Trajectory::run above\endlink but runs for a certain number of time intervals deltaT \related Trajectory
+/**
+ * <b>Rationale:</b> This version of `run` exists to avoid the eventual tiny timestep at the end of the run that might occur with
+ * \link Trajectory::run the above version\endlink.
+ * This is because e.g. in the case of `deltaT=0.1`, `time=1`, adding up `0.1` ten times numerically does not result in exactly `1`.
+ * 
+ * For a demonstration, compare the output of
+ *
+ *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --T 1
+ *
+ * with
+ *
+ *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --NDt 10
+ *
+ */
+void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt*deltaT
+         double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
+
+
+/// Another version of \link Trajectory::run `run`\endlink for running in dc-mode \related Adaptive
+/**
+ * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Adaptive::step single adaptive timestep\endlink, it is possible to count the
+ * individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each display. Hence, we get denser displays in time when the timestep is small,
+ * that is, when the important things are happening in the dynamics.
+ * 
+ */
+template<typename A, typename BASE>
+void run(Adaptive<A,BASE>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
+         unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
+
+
+/// Dispatcher \related Trajectory
+/**
+ * Runs
+ * - run(Trajectory&, long, double, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.NDt` is nonzero and
+ * - run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) otherwise
+ * 
+ * \note This means that ParsRun::NDt takes precedence over ParsRun::T
+ *
+ */
+void run(Trajectory &, const ParsRun& p);
+
+
+/// Dispatcher \related Adaptive
+/**
+ * - Runs run(Adaptive&, double, int, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.dc` is nonzero (dc-mode)
+ * - delegates to run(Trajectory&, const ParsRun& p) otherwise (deltaT-mode)
+ * 
+ * \note This means that ParsRun::dc takes precedence over ParsRun::Dt
+ * 
+ */
+template<typename A, typename BASE>
+void run(Adaptive<A,BASE>&, const ParsRun&);
 
 
 } // trajectory

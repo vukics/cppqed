@@ -3,7 +3,7 @@
 
 #include "Evolution_.h"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 #include<iostream>
 

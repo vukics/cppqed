@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_STRUCTURE_TIME_H_INCLUDED
 #define   CPPQEDCORE_STRUCTURE_TIME_H_INCLUDED
 
-#include "TimeFwd.h"
-
 #include <boost/operators.hpp>
 
 #include <boost/mpl/if.hpp>

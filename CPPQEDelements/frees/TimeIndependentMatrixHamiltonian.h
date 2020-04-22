@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_FREES_TIMEINDEPENDENTMATRIXHAMILTONIAN_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_TIMEINDEPENDENTMATRIXHAMILTONIAN_H_INCLUDED
 
-#include "TimeIndependentMatrixHamiltonianFwd.h"
-
 #include "AveragingUtils.tcc"
 
 #include "Averaged.h"

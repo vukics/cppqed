@@ -2,10 +2,6 @@
 #ifndef CPPQEDELEMENTS_INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED
 #define CPPQEDELEMENTS_INTERACTIONS_JAYNESCUMMINGS__H_INCLUDED
 
-// #include<boost/type_traits/is_base_of.hpp>
-
-#include "JaynesCummingsFwd.h"
-
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.h"
 #include "Tridiagonal.tcc"
@@ -14,12 +10,10 @@
 #include "Qbit_.h"
 #include "Spin.h"
 
-#include "ParsFwd.h"
+#include "Pars.h"
 
 
 namespace jaynescummings {
-
-typedef std::shared_ptr<const Base<false> > Ptr;
 
 struct Pars
 {
@@ -33,6 +27,9 @@ struct Pars
 
 const structure::freesystem::Tridiagonal sigmaop(qbit::Ptr);
 const structure::freesystem::Tridiagonal sigmaop(spin::Ptr);
+
+
+template<bool> class Base;
 
 
 template<>
@@ -49,6 +46,9 @@ protected:
   }
 
 };
+
+
+typedef std::shared_ptr<const Base<false> > Ptr;
 
 
 template<>

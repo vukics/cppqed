@@ -3,18 +3,21 @@
 #ifndef   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
 
-#include "SpinFwd.h"
-
 #include "ElementLiouvillean.h"
 #include "ElementAveraged.h"
 #include "Free.h"
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
 
-#include "ParsFwd.h"
+#include "Pars.h"
 
+
+class SpinBase;
 
 // A general Spin yet incomplete
+// Implements the following Hamiltonian: 
+// (omega-i*gamma)*S_z
+// with the usual Liouvillean
 
 namespace spin {
 
@@ -22,7 +25,6 @@ using namespace structure::freesystem;
 
 
 typedef std::shared_ptr<const SpinBase> Ptr;
-
 
 Tridiagonal splus(size_t dim, size_t twoS, const dcomp& z, bool isExact);
 

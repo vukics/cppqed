@@ -2,8 +2,6 @@
 #ifndef   CPPQEDCORE_UTILS_COMBINATORICS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_COMBINATORICS_H_INCLUDED
 
-#include "CombinatoricsFwd.h"
-
 #include "Exception.h"
 
 #include <blitz/array.h>

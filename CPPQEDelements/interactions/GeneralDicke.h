@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_GENERALDICKE_H_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_GENERALDICKE_H_INCLUDED
 
-#include "GeneralDickeFwd.h"
-
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.h"
 

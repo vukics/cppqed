@@ -89,6 +89,8 @@ public:
 
   virtual std::ostream& display(std::ostream& os, int precision) const; // const {return traj_.display(os);}
 
+  virtual ~DisplayAndAutostopHandler() {}
+  
 protected:
   const Trajectory& traj_;
 

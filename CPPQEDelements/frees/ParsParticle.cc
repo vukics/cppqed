@@ -3,7 +3,7 @@
 
 #include "ParticleInitialCondition.h"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 
 namespace particle {

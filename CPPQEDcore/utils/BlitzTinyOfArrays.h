@@ -5,8 +5,6 @@
 #ifndef CPPQEDCORE_UTILS_BLITZTINYOFARRAYS_H_INCLUDED
 #define CPPQEDCORE_UTILS_BLITZTINYOFARRAYS_H_INCLUDED
 
-#include "BlitzTinyOfArraysFwd.h"
-
 #include "BlitzArray.h"
 
 #include <boost/preprocessor/iteration/iterate.hpp>
@@ -19,10 +17,6 @@ namespace blitzplusplus {
 
 struct ShallowCopy {}; // For referencing constructors
 struct DeepCopy    {}; // For copying     constructors
-
-
-template<typename T, int RANK, int LENGTH>
-bool operator==(const TinyOfArrays<T,RANK,LENGTH>&, const TinyOfArrays<T,RANK,LENGTH>&);
 
 
 #define BASE_class blitz::TinyVector<blitz::Array<T,RANK>,LENGTH>
@@ -70,6 +64,10 @@ public:
 
 
 };
+
+
+template<typename T, int RANK, int LENGTH>
+bool operator==(const TinyOfArrays<T,RANK,LENGTH>&, const TinyOfArrays<T,RANK,LENGTH>&);
 
 
 

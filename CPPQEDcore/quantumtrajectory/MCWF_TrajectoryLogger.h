@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED
 
-#include "MCWF_TrajectoryFwd.h"
-
 #include "Archive.h"
 
 #include "core_config.h"
@@ -20,11 +18,18 @@
 
 namespace quantumtrajectory {
 
+  
+namespace mcwf {
+
+class Logger;
+
+} // mcwf
+
 /// Auxiliary tools to EnsembleMCWF
 namespace ensemble {
 
 using namespace mcwf;
-
+  
 typedef std::list<Logger> LoggerList;
 
 /// Called by EnsembleMCWF::logOnEnd, it displays a time histogram of total jumps

@@ -3,19 +3,19 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
 
-#include "StateVectorFwd.h"
-
-#include "DensityOperatorFwd.h"
+#include "QuantumDataCommon.h"
 
 #include "ArrayBase.h"
 #include "DimensionsBookkeeper.h"
 #include "LazyDensityOperator.h"
 #include "Types.h"
 
+#include "ComplexArrayExtensions.tcc"
 #include "Operators.h"
 
 
 namespace quantumdata {
+
 
 /** \page quantumdatahighlevel High-level data structures
  * 
@@ -27,18 +27,6 @@ namespace quantumdata {
  * - As implementations of the LazyDensityOperator interface.
  * 
  */
-
-/// Creates the direct product, relying on the direct-product constructor
-template<int RANK1, int RANK2>
-inline
-StateVector<RANK1+RANK2>
-operator*(const StateVector<RANK1>&, const StateVector<RANK2>&);
-
-
-/// Calculates the inner product, relying on StateVector::vectorView
-template<int RANK>
-const dcomp
-braket(const StateVector<RANK>&, const StateVector<RANK>&);
 
 
 /// State vector of arbitrary arity
@@ -86,15 +74,17 @@ public:
     */
   StateVector(const StateVectorLow& psi, ByReference) : LDO_Base(psi.shape()), ABase(psi) {}
 
-  explicit StateVector(const Dimensions&, bool init=true); ///< Constructs the class with a newly allocated chunk of memory, which is initialized only if `init` is `true`.
+  explicit StateVector(const Dimensions& dimensions, bool init=true) ///< Constructs the class with a newly allocated chunk of memory, which is initialized only if `init` is `true`.
+    : LDO_Base(dimensions), ABase(StateVectorLow(dimensions)) {if (init) *this=0;}
 
-  StateVector(const StateVector&); ///< Copy constructor using by value semantics, that is, deep copy.
-  
-    ///< Move constructor using the original reference semantics of blitz::Array 
+  StateVector(const StateVector& sv) ///< Copy constructor using by value semantics, that is, deep copy.
+    : LDO_Base(sv.getDimensions()), ABase(sv.getArray().copy()) {}
+
+    ///  Move constructor using the original reference semantics of blitz::Array 
     /**
      * \note It doesn’t touch its argument, as there seems to be no efficient way to invalidate that one
      */
-  StateVector(StateVector&&);
+  StateVector(StateVector&& sv) : LDO_Base(sv.getDimensions()), ABase(sv.getArray()) {}
 
     /// Constructs the class as the direct product of `psi1` and `psi2`, whose arities add up to `RANK`.
     /**
@@ -102,7 +92,9 @@ public:
     * \tparam RANK2 the arity of one of the operands
     */
   template<int RANK2>
-  StateVector(const StateVector<RANK2>&, const StateVector<RANK-RANK2>&);
+  StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)
+    : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
+      ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK2,RANK-RANK2>(psi1.getArray(),psi2.getArray())) {}
   
     /// Assignment with by-value semantics.
     /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
@@ -122,8 +114,12 @@ public:
   /// \name Subscripting
   //@{
   template<typename... SubscriptPack>
-  const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const; ///< Multi-array style subscription. \tparam ...SubscriptPack expected as all integers of number RANK-1 (checked @ compile time)
-
+  const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const ///< Multi-array style subscription. \tparam ...SubscriptPack expected as all integers of number RANK-1 (checked @ compile time)
+  {
+    static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for StateVector." );
+    return getArray()(s0,subscriptPack...);
+  }
+  
   template<typename... SubscriptPack>
   dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const StateVector*>(this)->operator()(s0,subscriptPack...));} ///< ”
   //@}
@@ -134,14 +130,23 @@ public:
     /// Returns the norm \f$\norm\Psi\f$
     /** Implemented in terms of ArrayBase::frobeniusNorm. */
   double   norm() const {return ABase::frobeniusNorm();}
-  double renorm()                                     ; ///< ” and also renormalises
+  double renorm() ///< ” and also renormalises
+  {
+    double res=norm();
+    operator/=(res);
+    return res;
+  }
   //@}
   
   /// \name Dyad
   //@{
     /// Forms a dyad with the argument
     /** This is a rather expensive operation, implemented in terms of blitzplusplus::doDirect. */
-  const DensityOperatorLow dyad(const StateVector&) const;
+  inline auto dyad(const StateVector& sv) const
+  {
+    return blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK,RANK>(getArray(),StateVectorLow(conj(sv.getArray())));
+  }
+
   const DensityOperatorLow dyad(                  ) const {return dyad(*this);} ///< dyad with the object itself
   //@}
 
@@ -150,7 +155,14 @@ public:
    * This is done without actually forming the dyad in memory (so that this is not implemented in terms of StateVector::dyad).
    * This is important in situations when an average density operator is needed from an ensemble of state vectors, an example being quantumtrajectory::EnsembleMCWF. 
    */
-  void addTo(DensityOperator<RANK>& densityOperator, double weight=1.) const;
+  void addTo(DensityOperator<RANK>& rho, double weight=1.) const
+  {
+    using namespace linalg;
+    CMatrix matrix(rho.matrixView());
+    CVector vector(vectorView());
+    int dim(this->getTotalDimension());
+    for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
+  }
 
   /// \name Naive vector-space operations
   //@{
@@ -182,12 +194,22 @@ private:
 };
 
 
+/// Creates the direct product, relying on the direct-product constructor
 template<int RANK1, int RANK2>
-inline
-StateVector<RANK1+RANK2>
-operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
+inline auto operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
 {
   return StateVector<RANK1+RANK2>(t1,t2);
+}
+
+
+/// Calculates the inner product, relying on StateVector::vectorView
+template<int RANK>
+dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
+{
+  using blitz::tensor::i;
+  linalg::CVector temp(psi1.getTotalDimension());
+  temp=conj(psi1.vectorView()(i))*psi2.vectorView()(i);
+  return sum(temp);
 }
 
 

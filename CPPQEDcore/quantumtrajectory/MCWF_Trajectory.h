@@ -3,11 +3,10 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
 
-#include "MCWF_TrajectoryFwd.h"
-
-#include "StateVectorFwd.h"
+#include "StateVector.h"
 
 #include "MCWF_TrajectoryLogger.h"
+#include "ParsMCWF_Trajectory.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 

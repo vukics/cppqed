@@ -3,8 +3,6 @@
 
 #include "ParsMode.h"
 
-#include "StateVector.tcc"
-
 #include "TridiagonalHamiltonian.tcc"
 
 #include <boost/assign/list_inserter.hpp>

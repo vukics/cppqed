@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED
 #define CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED
 
-#include "RandomizedFwd.h"
-
 #include "ArrayTraits.h"
 #include "ComplexExtensions.h"
 #include "Exception.h"

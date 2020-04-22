@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_CONVERSIONS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_CONVERSIONS_H_INCLUDED
 
-#include "ConversionsFwd.h"
-
 #include <boost/mpl/identity.hpp>
 
 #include <boost/numeric/conversion/converter.hpp>

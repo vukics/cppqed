@@ -3,8 +3,6 @@
 
 #include "Interaction.h"
 
-#include "LazyDensityOperator.tcc"
-
 #include "Algorithm.h"
 #include "BlitzArraySliceIterator.h"
 

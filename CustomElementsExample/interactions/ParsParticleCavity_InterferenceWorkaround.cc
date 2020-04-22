@@ -1,7 +1,7 @@
 // Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "ParsParticleCavity_InterferenceWorkaround.h"
 
-#include "Pars.tcc"
+#include "Pars.h"
 
 namespace particlecavity_interferenceworkaround {
 

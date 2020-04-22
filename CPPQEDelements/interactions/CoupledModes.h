@@ -2,14 +2,23 @@
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_COUPLEDMODES_H_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_COUPLEDMODES_H_INCLUDED
 
-#include "CoupledModesFwd.h"
-
 #include "Mode_.h"
 
 #include "Interaction.h"
 
 
 namespace coupledmodes {
+
+
+enum Coupling {
+  CM_NX,
+  CM_XX,
+  CM_XX_RWA
+};
+
+
+template<bool IS_HA, Coupling C=CM_NX>
+class Base;
 
 
 typedef std::shared_ptr<const Base<false> > Ptr;

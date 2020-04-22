@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_BLITZARRAYSLICEITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_BLITZARRAYSLICEITERATOR_H_INCLUDED
 
-#include "BlitzArraySliceIteratorFwd.h"
-
 #include "BlitzArrayTraits.h"
 #include "MultiIndexIterator.h"
 #include "TMP_Tools.h"
@@ -434,109 +432,6 @@ public:
 } // basi
 
 
-
-/// Contains data for pre-calculated slices for basi_fast::Iterator
-/**
- * This is most useful in situations where the same structure of slices is needed for several arrays of the same structure or several times for the same array.
- * Then, the data necessary for slicing calculated once, can be used for the different arrays.
- * 
- * Another positive is the easy implementation of basi_fast::Iterator, which basically only needs to iterate over the data of the different slices.
- * Depending on the data structure SlicesData::Impl, basi_fast::Iterator can be of different categories. (E.g. bidirectional iterator for a list,
- * but random-access iterator for a vector.)
- * 
- * The drawback is less convenient usage than that of basi::Iterator, since here a separated instance of SlicesData must be stored.
- * 
- * \tparamRANK \tparamV
- * 
- */
-template<int RANK, typename V>
-class SlicesData
-{
-public:
-  typedef std::list<ptrdiff_t> Impl; ///< Data structure for the sequence of slices
-
-  friend class basi_fast::Iterator<RANK,V, true>;
-  friend class basi_fast::Iterator<RANK,V,false>;
-
-  /// Constructor from a reference array
-  /** \param array reference array showing the structure for which the slicing is envisaged */
-  SlicesData(const CArray<RANK>& array);
-
-private:
-  static const Impl ctorHelper(const CArray<RANK>&);
-
-  const Impl firstOffsets_;
-
-  const blitz::TinyVector<int      ,basi::Size<V>::value>  shape_;
-  const blitz::TinyVector<ptrdiff_t,basi::Size<V>::value> stride_;
-
-  const blitz::GeneralArrayStorage<basi::Size<V>::value> storage_;
-
-};
-
-
-
-/// Contains a “fast” version of BlitzArraySliceIterator
-namespace basi_fast {
-
-/// “Fast” version of basi::Iterator relying on a pre-calculated set of slices stored by SlicesData
-/**
- * Structure analogous to basi::Iterator.
- * 
- * \tparamRANK \tparamV
- * 
- * \see SlicesData
- * 
- */
-template<int RANK, typename V, bool IS_CONST>
-class Iterator 
-  : public basi::ttd::ForwardIteratorHelper<Iterator<RANK,V,IS_CONST>,V,IS_CONST>
-{
-public:
-  typedef basi::ttd::ConditionalConstCArray<RANK,IS_CONST> CcCA   ;
-  typedef basi::ttd::ResCArray<V>                            CARes;
-  typedef basi::ttd::ConditionalConstResCArray<V,IS_CONST> CcCARes;
-
-  typedef boost::iterator_range<Iterator> Range;
-
-  Iterator& operator++() {++iter_; return *this;}
-
-  CcCARes& operator*() const 
-  {
-    arrayRes_.reference(CARes(arrayData_+*iter_,slicesData_.shape_,slicesData_.stride_,blitz::neverDeleteData,slicesData_.storage_));
-    return arrayRes_;
-  }
-
-  friend bool operator==(const Iterator& i1, const Iterator& i2) {return i1.iter_==i2.iter_;}
-
-  template<bool IS_END>
-  Iterator(CcCA& array, const SlicesData<RANK,V>&, boost::mpl::bool_<IS_END> b);
-
-private:
-  typename SlicesData<RANK,V>::Impl::const_iterator iter_;
-
-  mutable CARes arrayRes_;
-
-  dcomp*const arrayData_;
-  // This can be non_const because the constructor and the dereferencing operator will anyway ensure const-correctness
-
-  const SlicesData<RANK,V>& slicesData_;
-
-};
-
-
-
-#define NS_NAME basi_fast
-#define RETURN_type1(IS_CONST) Iterator<Rank<A>::value,V_S,IS_CONST>
-#define ADDITIONAL_PARAMETER , sd
-#define ADDITIONAL_ARGUMENT  , const SlicesData<Rank<A>::value,V_S>& sd
-
-#include "details_BlitzArraySliceIteratorReentrant.h"
-
-
-} // basi_fast
-
-
 namespace basi {
 
 /// Iterator to the beginning of the (non-const) sequence \related Iterator
@@ -576,40 +471,6 @@ const boost::iterator_range<Iterator<Rank<A>::value,V,true> >
 fullRange(const A& array );
 
 } // basi
-
-namespace basi_fast {
-
-/// Same as ::begin but here it returns a “fast” Iterator instance \related Iterator
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,false>
-begin(      A& array , const SlicesData<Rank<A>::value,V>& sd);
-
-/// ” \related Iterator
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,true>
-begin(const A& array , const SlicesData<Rank<A>::value,V>& sd);
-
-/// Same as ::end but here it returns a “fast” Iterator instance \related Iterator
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,false>
-end  (      A& array , const SlicesData<Rank<A>::value,V>& sd);
-
-/// ” \related Iterator
-template<typename V, typename A>
-const Iterator<Rank<A>::value,V,true>
-end  (const A& array , const SlicesData<Rank<A>::value,V>& sd);
-
-/// Same as ::fullRange but here it returns an iterator range of “fast” Iterator instances \related Iterator
-template<typename V, typename A>
-const boost::iterator_range<Iterator<Rank<A>::value,V,true> >
-fullRange(const A& array , const SlicesData<Rank<A>::value,V>& sd);
-
-/// ” \related Iterator
-template<typename V, typename A>
-const boost::iterator_range<Iterator<Rank<A>::value,V,false> >
-fullRange(      A& array , const SlicesData<Rank<A>::value,V>& sd);
-
-} // basi_fast
 
 
 namespace basi {

@@ -2,8 +2,6 @@
 #ifndef   CPPQEDELEMENTS_INTERACTIONS_MODECORRELATIONS_H_INCLUDED
 #define   CPPQEDELEMENTS_INTERACTIONS_MODECORRELATIONS_H_INCLUDED
 
-#include "ModeCorrelationsFwd.h"
-
 #include "Mode_.h"
 
 #include "ElementAveraged.h"

@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_H_INCLUDED
 
-#include "MasterFwd.h"
-
 #include "Structure.h"
 
 #include "DO_Display.h"
@@ -81,41 +79,9 @@ private:
 
 
 
-/// The actual working base of Master in the case when blitzplusplus::basi_fast::Iterator is used for implementing multi-matrix multiplications \tparamRANK
-template<int RANK>
-class BaseFast : public Base<RANK>
-{
-public:
-  typedef typename Base<RANK>::QuantumSystem QuantumSystem;
-
-  typedef typename Base<RANK>::DensityOperator DensityOperator;
-  typedef std::shared_ptr<DensityOperator> DO_Ptr;
-  
-  typedef typename Base<RANK>::DensityOperatorLow DensityOperatorLow;
-
-  BaseFast(DO_Ptr rho, typename QuantumSystem::Ptr sys, const Pars& p, const DensityOperatorLow& scaleAbs=DensityOperatorLow())
-    : Base<RANK>(rho,sys,p,scaleAbs), slicesData_(rho.getArray()) {}
-
-private:
-  typedef typename Base<RANK>:: UnaryFunction  UnaryFunction;
-  typedef typename Base<RANK>::BinaryFunction BinaryFunction;
-
-  void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const final;
-  void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const final;
-
-  const std::string addToParameterDisplay() const final {return " Fast Iteration.";}
-
-  const blitzplusplus::SlicesData<2*RANK,blitzplusplus::vfmsi::LeftRight<RANK,blitzplusplus::vfmsi::Left> > slicesData_;
-
-};
-
-
-
 } // master
 
 
-
-#define BASE_class boost::mpl::if_c<IS_FAST,master::BaseFast<RANK>,master::Base<RANK> >::type
 
 /// An \link trajectory::Adaptive Adaptive\endlink trajectory class representing Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
 /**
@@ -128,13 +94,11 @@ private:
  * \tparam IS_FAST the class will use either blitzplusplus::basi::Iterator or blitzplusplus::basi_fast::Iterator to perform the multi-matrix multiplications, depending on this template argument
  * 
  */
-template<int RANK, typename V, bool IS_FAST>
-class Master : public BASE_class
+template<int RANK, typename V=tmptools::V_Empty>
+class Master : public master::Base<RANK>
 {
 public:
-  typedef typename BASE_class Base;
-
-#undef  BASE_class
+  typedef master::Base<RANK> Base;
 
   typedef typename Base::QuantumSystem QuantumSystem;
 

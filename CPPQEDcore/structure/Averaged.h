@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_AVERAGED_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_AVERAGED_H_INCLUDED
 
-#include "AveragedFwd.h"
-
 #include "LiouvilleanAveragedCommon.h"
 #include "TimeDependence.h"
 

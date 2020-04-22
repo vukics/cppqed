@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_STRUCTURE_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_STRUCTURE_H_INCLUDED
 
-#include "StructureFwd.h"
-
 #include "QuantumSystem.h"
 #include "DynamicsBase.h"
 

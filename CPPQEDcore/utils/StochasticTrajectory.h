@@ -3,12 +3,9 @@
 #ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
-
-#include "StochasticTrajectoryFwd.h"
-
-#include "Trajectory.h"
+#include "ParsStochasticTrajectory.h"
 #include "Randomized.h"
-
+#include "Trajectory.h"
 
 #include <boost/ptr_container/ptr_vector.hpp>
 
@@ -131,7 +128,7 @@ private:
  * because it might happen that the application cannot afford to store temporaries of `T` (for such an example, cf. quantumtrajectory::EnsembleMCWF)
  * 
  */
-template<typename T, typename T_ELEM>
+template<typename T, typename T_ELEM=T>
 class Ensemble : public Averageable<T>
 {
 private:

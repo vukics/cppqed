@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_QUANTUMDATA_ARRAYBASE_H_INCLUDED
 #define   CPPQEDCORE_QUANTUMDATA_ARRAYBASE_H_INCLUDED
 
-#include "ArrayBaseFwd.h"
-
 #include "BlitzArrayExtensions.h"
 #include "CMatrix.h"
 #include "ComplexArrayExtensions.h"

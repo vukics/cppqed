@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 
-#include "VectorFromMatrixSliceIteratorFwd.h"
-
 #include "BlitzArraySliceIterator.h"
 
 

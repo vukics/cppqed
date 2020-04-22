@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
 
-#include "ElementLiouvilleanFwd.h"
-
 #include "Liouvillean.h"
 #include "ElementLiouvilleanAveragedCommon.h"
 
@@ -100,7 +98,7 @@ struct ElementLiouvilleanException : cpputils::TaggedException
  * \see Sec. \ref hierarchicaloscillator of the structure-bundle guide for an example of usage 
  * 
  */
-template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
+template<int RANK, int NLINDBLADS=1, bool IS_TIME_DEPENDENT=false>
 class ElementLiouvillean : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >,
                            public lindblad::_<RANK,NLINDBLADS-1,false>
 {
@@ -252,7 +250,7 @@ public:
  * 
  * \see Sec. \ref basicoscillator of the structure-bundle guide for an example of usage 
  */
-template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT>
+template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT=false>
 class ElementLiouvilleanStrategies : public ElementLiouvilleanStrategiesBase<RANK,IS_TIME_DEPENDENT>
 {
 private:

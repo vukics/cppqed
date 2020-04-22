@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_KEYPRINTER_H_INCLUDED
 #define   CPPQEDCORE_UTILS_KEYPRINTER_H_INCLUDED
 
-#include "KeyPrinterFwd.h"
-
 #include <initializer_list>
 #include <list>
 #include <string>

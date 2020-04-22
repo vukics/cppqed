@@ -2,8 +2,6 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_TRANSFORMATION_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_TRANSFORMATION_H_INCLUDED
 
-#include "TransformationFwd.h"
-
 #include "Types.h"
 
 #include "CMatrix.h"
@@ -30,6 +28,8 @@ struct Identity
 };
 
 
+template<typename TRAFO>
+struct Traits;
 
 
 // Special Traits:

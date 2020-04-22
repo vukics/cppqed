@@ -3,14 +3,24 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
 
-#include "LazyDensityOperatorFwd.h"
+#include "QuantumDataCommon.h"
 
 #include "DimensionsBookkeeper.h"
 
 #include "BlitzArray.h"
+#include "BlitzArraySliceIterator.tcc"
+#include "BlitzTinyExtensions.h"
 #include "ComplexExtensions.h"
+#include "MathExtensions.h"
+#include "MultiIndexIterator.h"
 
+#include <boost/operators.hpp>
+
+#include <boost/mpl/size.hpp>
 #include <boost/mpl/if.hpp>
+
+#include <boost/range/numeric.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 #include <memory>
 
@@ -20,20 +30,6 @@ namespace mpl=boost::mpl;
 /// Comprises classes representing the state of composite quantum systems and providing various interfaces to manipulate this data
 /** Some of its most important classes fit into a single class rooted in the virtual interface LazyDensityOperator. */
 namespace quantumdata {
-
-
-/// The primary tool for performing \ref slicinganldo "slice iterations"
-/**
- * On higher levels of the framework (cf. eg. BinarySystem, Composite), this function is used exclusively for performing LazyDensityOperator slice iteration.
- * 
- * \tparamV
- * \tparam T an arithmetic type which must be default-constructible
- * \tparam F a callable type with signature `const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)`. This signature is equivalent to `const T(const LazyDensityOperator<mpl::size<V>::value>&)`.
- * 
- */
-template<typename V, typename T, int RANK, typename F>
-const T
-partialTrace(const LazyDensityOperator<RANK>&, F function);
 
 
 /// Common interface for calculating quantum averages
@@ -94,8 +90,6 @@ private:
 
   };
 
-  friend class IndexerProxy;
-
 public:
   /// Multi-matrix style indexing via Idx type
   const IndexerProxy operator()(const Idx& firstIndex) const {return IndexerProxy(this,firstIndex);}
@@ -116,7 +110,7 @@ public:
    *
    */
   template<typename... SubscriptPack>
-  const IndexerProxy operator()(int s0, SubscriptPack... subscriptPack) const
+  const auto operator()(int s0, SubscriptPack... subscriptPack) const
   {
     static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for LazyDensityOperator." );
     return operator()(Idx(s0,subscriptPack...));
@@ -131,10 +125,16 @@ public:
      * \tparamV
      */
   template<typename V>
-  const ldo::DiagonalIterator<RANK,V> begin() const; 
+  inline auto begin() const
+  {
+    return DiagonalIterator<V>(*this,mpl::false_());
+  }
 
   template<typename V>
-  const ldo::DiagonalIterator<RANK,V> end  () const; ///< ” for the end
+  inline auto end  () const ///< ” for the end
+  {
+    return DiagonalIterator<V>(*this,mpl:: true_());
+  }
   //@}
   
 protected:
@@ -144,8 +144,44 @@ private:
   virtual const dcomp index(const Idx& i, const Idx& j) const = 0;
   
   virtual double trace_v() const = 0;
+  
+  /// Iterator for slices of a LazyDensityOperator that are diagonal in the dummy indices
+  /**
+  * Cf. \ref slicinganldo "rationale"
+  * 
+  * \tparamV
+  * 
+  * It's inherently a const iterator since LazyDensityOperator is immutable.
+  * Models an [InputIterator](http://www.cplusplus.com/reference/std/iterator/InputIterator/), implemented with the help of
+  * \refBoostConstruct{input_iterator_helper,utility/operators.htm#iterator} from Boost.Operator.
+  * 
+  */
+  template<typename V>
+  class DiagonalIterator;
+ 
 
 };
+
+
+/// The primary tool for performing \ref slicinganldo "slice iterations"
+/**
+ * On higher levels of the framework (cf. eg. BinarySystem, Composite), this function is used exclusively for performing LazyDensityOperator slice iteration.
+ * 
+ * \tparamV
+ * \tparam T an arithmetic type which must be default-constructible
+ * \tparam F a callable type with signature `const T(const typename ldo::DiagonalIterator<RANK,V>::value_type&)`. This signature is equivalent to `const T(const LazyDensityOperator<mpl::size<V>::value>&)`.
+ * 
+ */
+template<typename V, typename T, int RANK, typename F>
+const T
+partialTrace(const LazyDensityOperator<RANK>& matrix, F function)
+{
+  auto begin(matrix.template begin<V>());
+  T init(function(*begin)); // we take a way around default constructing T, so that the implicit interface is less stringently defined
+
+  using namespace boost;
+  return accumulate(make_iterator_range(++begin,matrix.template end<V>()) | adaptors::transformed(function) , init );
+}
 
 
 /// Turns the data of a LazyDensityOperator into a real 1D array
@@ -156,7 +192,33 @@ private:
  * \param offDiagonals governs whether the upper triangle of the (multi-)matrix is included in the result
  */
 template<int RANK>
-const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
+const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
+{
+  using mathutils::sqr;
+  
+  const size_t dim=matrix.getTotalDimension();
+  
+  DArray<1> res(offDiagonals ? sqr(dim) : dim);
+  
+  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(matrix.getDimensions()-1,cpputils::mii::begin);
+  
+  size_t idx=0;
+
+  for (Iterator i(etalon); idx<dim; ++i)
+    res(idx++)=matrix(*i);
+  
+  if (offDiagonals)
+    for (Iterator i(etalon); idx<sqr(dim); ++i)
+      for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j) {
+        dcomp matrixElement(matrix(*i)(*j));
+        res(idx++)=real(matrixElement);
+        res(idx++)=imag(matrixElement);
+      }
+
+  return res;
+
+}
 
 
 /** \class LazyDensityOperator
@@ -266,5 +328,262 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>&, bool offDiagonals);
 
 
 } // quantumdata
+
+/** \page slicinganldo Slicing a LazyDensityOperator
+ * 
+ * \tableofcontents
+ * 
+ * Analogously to \ref multiarrayconcept "slicing state vectors", it is also necessary to slice LazyDensityOperator objects
+ * because for calculating quantum expectation values of subsystem-observables (e.g. in Composite objects),
+ * the partial-trace density operator is needed.
+ * 
+ * For the partial trace, however, only such elements of the full density operator are needed as are diagonal in the indices *not* belonging
+ * to the given subsystem (dummy indices). This is the reason why the tool performing the iteration is called DiagonalIterator.
+ *
+ * Slicing is fully recursive, a sliced LazyDensityOperator (usually obtained by dereferencing a DiagonalIterator) can be further sliced.
+ * 
+ * Notes on implementation {#slicinganldoimplementation}
+ * =======================
+ * 
+ * Difficulty: LazyDensityOperator is an abstract interface, and the organization of its data (and hence the actual procedure of slicing)
+ * varies along implementations.
+ * 
+ * \image html ldoDiagonalIterator.png
+ * 
+ * Implemented using a classical inheritance-based strategy idiom, together with both compile-time and run-time implementation selection
+ * (similarly to blitzplusplus::basi::Iterator, a special implementation (DiagonalIterator::DI_ImplSpecial) is needed when the size
+ * of the compile-time vector `V` equals `RANK`).
+ * 
+ * The run-time polymorphy of LazyDensityOperator necessitates run-time implementation selection.
+ * This happens when the actual implementation (`DI_SV_Impl` or `DI_DO_Impl`, or their non-orthogonal counterparts) is chosen 
+ * depending on whether the given LazyDensityOperator is a StateVector or a DensityOperator (or their non-orthogonal counterparts).
+ * 
+ */
+
+
+#define INPUT_IteratorHelper boost::input_iterator_helper<DiagonalIterator<V>,const LazyDensityOperator<mpl::size<V>::value> >
+
+template<int RANK> template<typename V>
+class quantumdata::LazyDensityOperator<RANK>::DiagonalIterator
+  : public INPUT_IteratorHelper 
+{
+private:
+  typedef INPUT_IteratorHelper Base;
+
+#undef INPUT_IteratorHelper
+
+  typedef typename Base::value_type LazyDensityOperatorRes; ///< Equivalent to `const LazyDensityOperator<mpl::size<V>::value>`
+
+public:
+  static const bool IS_SPECIAL=(RANK==mpl::size<V>::value); ///< Signifies whether the special implementation is needed
+
+  /// Constructor
+  /**
+  * Similarly to blitzplusplus::basi::Iterator, it can be initialised either to the beginning or to the end of the sequence.
+  * \tparam IS_END governs the end-ness
+  */
+  template<bool IS_END>
+  DiagonalIterator(const LazyDensityOperator& ldo, mpl::bool_<IS_END>) : impl_(makeImpl<IS_END>(ldo,mpl::bool_<IS_SPECIAL>())) {}
+  
+  /// \name Necessary members of an input iterator
+  //@{
+  DiagonalIterator& operator++() {impl_->doIncrement(); return *this;} ///< Immediately delegated to the implementation
+
+  const LazyDensityOperatorRes& operator*() const {return impl_->dereference();} ///< ”
+  
+  bool operator==(const DiagonalIterator& other) const {return impl_->isEqualTo(*other.impl_);} ///< ”
+  //@}
+  
+  class NoSuchImplementation : public cpputils::Exception {};
+  
+  class DI_ImplSpecial ///< Special implementation in the case `RANK=mpl::size<V>::value`
+  {
+  public:
+    typedef LazyDensityOperator LDO;
+    typedef std::shared_ptr<const LDO> LDO_Ptr;
+
+    class OutOfRange : public cpputils::Exception {};
+
+    DI_ImplSpecial(const LDO&    , cpputils::mii::End  ) : ldoPtr_()             , isEnd_( true) {}
+    // In this case, the Ptr is never actually touched
+
+    DI_ImplSpecial(const LDO& ldo, cpputils::mii::Begin) : ldoPtr_(dispatch(ldo)), isEnd_(false) {}
+
+
+    const LDO_Ptr dispatch(const LDO& ldo)
+    {
+      using blitzplusplus::basi::Transposer;
+
+      typedef StateVector    <RANK> SV;
+      typedef DensityOperator<RANK> DO;
+
+      if      (const auto sV=dynamic_cast<const SV*>(&ldo)) {
+        typename SV::StateVectorLow temp(sV->getArray());
+        // We do not want to transpose that StateVectorLow which is the storage of sV.
+        return std::make_shared<SV>(Transposer<RANK,V>::transpose(temp),byReference);
+      }
+      else if (const auto dO=dynamic_cast<const DO*>(&ldo)) {
+        typename DO::DensityOperatorLow temp(dO->getArray());
+        return std::make_shared<DO>(Transposer<2*RANK,typename tmptools::ExtendVector<RANK,V>::type>::transpose(temp),byReference);
+      }
+      else throw NoSuchImplementation();
+    }
+
+    bool isEqualTo(const DI_ImplSpecial& other) const {return isEnd_==other.isEnd_;}
+
+    void doIncrement() {if (!isEnd_) isEnd_=true; else throw OutOfRange();}
+
+    const LDO& dereference() const {if (isEnd_) throw OutOfRange(); return *ldoPtr_;}
+
+  private:
+    mutable LDO_Ptr ldoPtr_;
+
+    bool isEnd_;
+
+  };
+
+  class DI_Impl ///< Base class for non-special implementations
+  {
+  public:
+    typedef blitzplusplus::basi::Iterator<RANK,V,true> BASI;
+    typedef typename BASI::Impl MII;
+
+    typedef typename DiagonalIterator::LazyDensityOperatorRes LazyDensityOperatorRes;
+
+    bool isEqualTo(const DI_Impl& other) const {return getMII()==other.getMII();}
+
+    virtual void doIncrement() = 0;
+    virtual const LazyDensityOperatorRes& dereference() const = 0;
+
+    virtual ~DI_Impl() {}
+
+  private:
+    virtual const MII& getMII() const = 0;
+
+  };
+
+  /// Pointer to implementation
+  /**
+  * We are using the classical inheritance-based pointer-to-implementation technique, together with some compile-time dispatching.
+  * \refBoostConstruct{eval_if,mpl/doc/refmanual/eval-if.html} from Boost.MPL here guarantees that `DI_ImplSpecial` gets instantiated
+  * only in the special case
+  */
+  typedef std::shared_ptr<typename mpl::eval_if_c<IS_SPECIAL,
+                                                  mpl::identity<DI_ImplSpecial>,
+                                                  mpl::identity<DI_Impl       > 
+                                                  >::type
+                          > Impl;
+
+private:
+  Impl impl_;
+
+  class DI_SV_Impl : public DI_Impl
+  {
+  public:
+    typedef typename DI_Impl::BASI BASI;
+    typedef typename DI_Impl::MII MII;
+
+    typedef StateVector<mpl::size<V>::value> StateVectorRes;
+
+    template<bool IS_END>
+    DI_SV_Impl(const StateVector<RANK>& psi, mpl::bool_<IS_END> tag) : basi_(psi.getArray(),tag), stateVectorResPtr_() {}
+
+  private:
+    void doIncrement() {++basi_;}
+
+    const MII& getMII() const {return basi_();}
+
+    const LazyDensityOperatorRes& dereference() const {stateVectorResPtr_.reset(new StateVectorRes(*basi_,byReference)); return *stateVectorResPtr_;}
+
+    BASI basi_;
+
+    mutable std::shared_ptr<const StateVectorRes> stateVectorResPtr_;
+
+  };
+
+  
+  class DI_DO_Impl : public DI_Impl
+  {
+  public:
+    typedef typename DI_Impl::MII MII;
+    
+    static const int RANKRES=mpl::size<V>::value;
+
+    typedef DensityOperator<RANKRES> DensityOperatorRes;
+
+    typedef typename tmptools::ExtendVector<RANK,V>::type ExtendedV;
+    
+    typedef blitzplusplus::basi::Iterator<2*RANK,ExtendedV,true> BASI;
+
+    typedef typename BASI::CA    DensityOperatorLow   ;
+    typedef typename BASI::CARes DensityOperatorLowRes;
+ 
+    DI_DO_Impl(const DensityOperator<RANK>& rho, cpputils::mii::Begin)
+      : mii_(ctorHelper<false>(rho)), densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()
+    {
+      densityOperatorLow_.reference(rho.getArray());
+      BASI::transpose(densityOperatorLow_);
+    }
+
+    DI_DO_Impl(const DensityOperator<RANK>& rho, cpputils::mii::End  )
+      : mii_(ctorHelper< true>(rho)), densityOperatorLow_(), densityOperatorLowRes_(), densityOperatorResPtr_()    
+    {}
+    
+  private:
+    template<bool IS_END>
+    static MII ctorHelper(const DensityOperator<RANK>& rho)
+    {
+      using blitzplusplus::basi::filterOut;
+      using blitzplusplus::halfCutTiny;
+      
+      return MII(filterOut<RANK,V>(halfCutTiny(rho.getArray().lbound())),
+                 filterOut<RANK,V>(halfCutTiny(rho.getArray().ubound())),
+                 mpl::bool_<IS_END>());
+    }
+
+    void doIncrement() {++mii_;}
+
+    const MII& getMII() const {return mii_;}
+
+    const LazyDensityOperatorRes& dereference() const
+    {
+      return *(densityOperatorResPtr_=std::make_shared<DensityOperatorRes>(BASI::index(densityOperatorLow_,
+                                                                                       densityOperatorLowRes_,
+                                                                                       blitzplusplus::concatenateTinies(*mii_,*mii_)),
+                                                                           byReference));
+    }
+
+    MII mii_;
+
+    mutable DensityOperatorLow    densityOperatorLow_   ; 
+    mutable DensityOperatorLowRes densityOperatorLowRes_;
+
+    mutable std::shared_ptr<const DensityOperatorRes> densityOperatorResPtr_; 
+
+  };
+
+  
+  template <bool IS_END>
+  static auto makeImpl(const LazyDensityOperator& ldo, mpl::true_)
+  {
+    return std::make_shared<DI_ImplSpecial>(ldo,mpl::bool_<IS_END>());
+  }
+  
+  template <bool IS_END>
+  static std::shared_ptr<DI_Impl> makeImpl(const LazyDensityOperator& ldo, mpl::false_)
+  {
+    static const auto isEnd{mpl::bool_<IS_END>()};
+
+    if      (const auto stateVector    =dynamic_cast<const StateVector    <RANK>*>(&ldo))
+      return std::make_shared<DI_SV_Impl>(*stateVector    ,isEnd);
+    else if (const auto densityOperator=dynamic_cast<const DensityOperator<RANK>*>(&ldo))
+      return std::make_shared<DI_DO_Impl>(*densityOperator,isEnd);
+    else throw NoSuchImplementation();
+  }
+  
+};
+
+
+
 
 #endif // CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED

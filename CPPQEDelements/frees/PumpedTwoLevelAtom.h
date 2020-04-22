@@ -9,8 +9,6 @@
 #ifndef CPPQEDELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
 #define CPPQEDELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
 
-#include "PumpedTwoLevelAtomFwd.h"
-
 #include "Qbit_.h"
 
 #include "ElementLiouvillean.h"

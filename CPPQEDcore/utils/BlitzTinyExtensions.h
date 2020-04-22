@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_BLITZTINYEXTENSIONS_H_INCLUDED
 #define CPPQEDCORE_UTILS_BLITZTINYEXTENSIONS_H_INCLUDED
 
-#include "BlitzTinyExtensionsFwd.h"
-
 #ifndef   NDEBUG
 #include "Exception.h"
 #endif // NDEBUG
