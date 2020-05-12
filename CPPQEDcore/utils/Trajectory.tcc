@@ -8,7 +8,6 @@
 #include "Evolved.tcc"
 #include "FormDouble.h"
 #include "IO_Manip.h"
-#include "ParsTrajectory.h"
 #include "Version.h"
 
 #include <iomanip>
@@ -16,14 +15,6 @@
 #include <fstream>
 #include <numeric> // for accumulate
 
-
-template<typename A, typename BASE>
-void trajectory::run(Adaptive<A,BASE>& traj, const ParsRun& p)
-{
-  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.autoStopEpsilon,p.autoStopRepetition,p.getParsedCommandLine());
-  else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
-  else std::cerr<<"Nonzero dc OR Dt required!"<<std::endl;
-}
 
 
 namespace trajectory { namespace details {

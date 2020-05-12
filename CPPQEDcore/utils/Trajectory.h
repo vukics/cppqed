@@ -74,6 +74,8 @@ void  readViaSStream(      T&, std::istream*);
 SerializationMetadata readMeta(std::istream*); ///< Needed separately for the Python i/o
 
 
+class NonZero_dcOrDtRequiredException : public cpputils::Exception {};
+
 class StoppingCriterionReachedException : public cpputils::Exception {};
 
 /// Raised when the rank of a trajectory we try to read in from file does not match
@@ -388,7 +390,12 @@ void run(Trajectory &, const ParsRun& p);
  * 
  */
 template<typename A, typename BASE>
-void run(Adaptive<A,BASE>&, const ParsRun&);
+void run(Adaptive<A,BASE>& traj, const ParsRun& p)
+{
+  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.autoStopEpsilon,p.autoStopRepetition,p.getParsedCommandLine());
+  else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
+  else throw NonZero_dcOrDtRequiredException();
+}
 
 
 } // trajectory
