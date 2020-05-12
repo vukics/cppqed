@@ -153,10 +153,10 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
     ;
 
   if(random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
-    --lindbladNo; auto i=boost::find_if(specialRates,[=](const IndexSVL_tuple& j){return lindbladNo==get<0>(j);});
+    --lindbladNo; auto i=boost::find_if(specialRates,[=](const IndexSVL_tuple& j){return lindbladNo==std::get<0>(j);});
     if (i!=specialRates.end())
       // special jump
-      *psi_=get<1>(*i); // RHS already normalized above
+      *psi_=std::get<1>(*i); // RHS already normalized above
     else {
       // normal  jump
       this->actWithJ(t,psi_->getArray(),lindbladNo);

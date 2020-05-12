@@ -98,14 +98,11 @@ private:
   template<int N>
   void doIt()
   {
-    if (idx_(N)==ubound_(N)) {idx_(N)=lbound_(N); doIt<N-1>();}
-    else idx_(N)++;
-  }
-
-  template<>
-  void doIt<0>()
-  {
-    idx_(0)++; // This will of course eventually put the iterator into an illegal state when idx(0)>ubound(0), but this is how every (unchecked) iterator works.
+    if constexpr (N!=0) {
+      if (idx_(N)==ubound_(N)) {idx_(N)=lbound_(N); doIt<N-1>();}
+      else idx_(N)++;
+    }
+    else idx_(0)++; // This will of course eventually put the iterator into an illegal state when idx(0)>ubound(0), but this is how every (unchecked) iterator works.
   }
 
   const MultiIndex lbound_, ubound_;

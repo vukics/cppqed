@@ -5,9 +5,6 @@
 
 #include <boost/range/algorithm/for_each.hpp>
 
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
-
 
 using namespace std;
 
@@ -17,12 +14,10 @@ std::ostream& structure::details::displayCommon(const AveragedCommon::Averages& 
 {
   using namespace formdouble;
 
-  namespace bll=boost::lambda;
-
   os<<'\t';
   {
     const FormDouble fd(precision);
-    boost::for_each(averages,os<<bll::bind(&FormDouble::operator()<double>,&fd,bll::_1));
+    boost::for_each(averages,[&](double v){os<<fd(v);});
   }
   return os;
 }
