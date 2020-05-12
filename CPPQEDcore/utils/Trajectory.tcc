@@ -11,6 +11,7 @@
 #include "ParsTrajectory.h"
 #include "Version.h"
 
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -174,10 +175,15 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory
     evsDisplayed=false; // signifies whether the expectation values have already been displayed ”
 
+  auto startInstant=chrono::steady_clock::now();
+  auto endInstant=chrono::steady_clock::now();
+  
   try {
 
     auto displayAndAutostopHandler(makeDisplayAndAutostopHandler(traj,autoStopEpsilon,autoStopRepetition));
 
+    startInstant=chrono::steady_clock::now();
+    
     for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
 
       if (count) {
@@ -204,15 +210,24 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
         }
       }
     }
+    
+    endInstant=chrono::steady_clock::now();
 
-  } catch (const StoppingCriterionReachedException& except) {CommentingStream(os)<<"Stopping criterion has been reached"<<endl;}
+  } catch (const StoppingCriterionReachedException& except) {
+    if (endInstant<startInstant) endInstant=chrono::steady_clock::now();
+    CommentingStream(os)<<"Stopping criterion has been reached"<<endl;    
+  }
   if (!evsDisplayed) traj.display(os,precision);
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  {CommentingStream temp(os); temp<<setprecision(formdouble::actualPrecision(precision)); traj.logOnEnd(temp);}
+  {
+    CommentingStream temp(os);
+    temp<<setprecision(formdouble::actualPrecision(precision))
+        <<"Duration of main loop (us): "<<std::chrono::duration_cast<std::chrono::microseconds>(endInstant-startInstant).count()<<std::endl;
+    traj.logOnEnd(temp);}
   if (!stateSaved) writeViaSStream(traj,ofs.get());
   
 }
