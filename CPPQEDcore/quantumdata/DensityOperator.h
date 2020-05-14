@@ -119,6 +119,25 @@ public:
         IndexerProxy operator()(int s0, SubscriptPack... subscriptPack)       {return IndexerProxy(this,s0,subscriptPack...);}
   //@}
 
+  /// \name LazyDensityOperator diagonal iteration
+  //@{
+  template<typename... SubscriptPack>
+  auto diagonalSliceIndex(SubscriptPack&&... subscriptPack) const
+  {
+    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for DensityOperator." );
+#define SLICE_EXPR getArray()(std::forward<SubscriptPack>(subscriptPack)...,std::forward<SubscriptPack>(subscriptPack)...)
+    return DensityOperator<cpputils::Rank<decltype(SLICE_EXPR)>::value/2>(SLICE_EXPR,byReference);
+#undef  SLICE_EXPR
+  }
+  
+  template<typename... SubscriptPack>
+  void transposeSelf(SubscriptPack... subscriptPack)
+  {
+    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
+    getArray().transposeSelf(subscriptPack...,(subscriptPack+RANK)...);
+  }
+  //@}
+  
   /// \name Norm
   //@{
   double norm() const ///< returns the trace norm

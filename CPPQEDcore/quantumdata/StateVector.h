@@ -108,7 +108,25 @@ public:
   dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const StateVector*>(this)->operator()(s0,subscriptPack...));} ///< ”
   //@}
 
-
+  /// \name LazyDensityOperator diagonal iteration
+  //@{
+  template<typename... SubscriptPack>
+  auto sliceIndex(SubscriptPack&&... subscriptPack) const
+  {
+    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
+#define SLICE_EXPR getArray()(std::forward<SubscriptPack>(subscriptPack)...)
+    return StateVector<cpputils::Rank<decltype(SLICE_EXPR)>::value>(SLICE_EXPR,byReference);
+#undef  SLICE_EXPR
+  }
+  
+  template<typename... SubscriptPack>
+  void transposeSelf(SubscriptPack... subscriptPack)
+  {
+    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
+    getArray().transposeSelf(subscriptPack...);
+  }
+  //@}
+  
   /// \name Metric
   //@{
     /// Returns the norm \f$\norm\Psi\f$
