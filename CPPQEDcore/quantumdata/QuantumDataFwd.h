@@ -4,8 +4,6 @@
 
 namespace quantumdata {
 
-struct ByReference {}; const ByReference byReference=ByReference();
-
 template<int>
 class StateVector;
 

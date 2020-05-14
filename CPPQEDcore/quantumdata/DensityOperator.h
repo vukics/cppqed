@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
 
-#include "QuantumDataCommon.h"
+#include "QuantumDataFwd.h"
 
 #include "ArrayBase.h"
 #include "DimensionsBookkeeper.h"
@@ -12,21 +12,9 @@
 
 #include "BlitzArrayExtensions.tcc"
 #include "MultiIndexIterator.h"
-#include "Operators.h"
 
 
 namespace quantumdata {
-
-
-template<int RANK1, int RANK2>
-inline
-const DensityOperator<RANK1+RANK2>
-operator*(const DensityOperator<RANK1>&, const DensityOperator<RANK2>&);
-
-
-template<int RANK>
-inline
-double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm();}
 
 
 /// Density operator of arbitrary arity
@@ -37,33 +25,30 @@ double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm
  * 
  * The DensityOperator interface is similar to StateVector with obvious differences.
  * 
- * \note A DensityOperator `<RANK>` represents a density operator on a Hilbert space of arity `RANK`. This makes that
- * the number of its indices is actually `2*RANK`. This is the reason why it inherits from quantumdata::ArrayBase <2*RANK>.
- * 
- * \todo provide a move constructor
+ * \note A DensityOperator `<RANK>` represents a density operator on a Hilbert space of arity `RANK`. This makes that the number of its indices is actually `2*RANK`.
  * 
  */
 template<int RANK>
 class DensityOperator
   : public LazyDensityOperator<RANK>,
-    private ArrayBase<2*RANK>,
-    private linalg::VectorSpace<DensityOperator<RANK> >
+    public ArrayBase<DensityOperator<RANK>>
 {
 public:
   static const int N_RANK=RANK;
-
+  
   typedef LazyDensityOperator<  RANK> LDO_Base;
-  typedef ArrayBase          <2*RANK>    ABase;
+  
+  typedef ArrayBase<DensityOperator<RANK>> ABase;
 
   typedef typename LDO_Base::Dimensions Dimensions;
 
   typedef typename LDO_Base::Idx Idx;
 
-  typedef typename ABase::ArrayLow DensityOperatorLow;
+  using DensityOperatorLow=typename ABase::ArrayLow;
 
   typedef linalg::CMatrix CMatrix;
 
-  using ABase::frobeniusNorm; using ABase::getArray;
+  using ABase::frobeniusNorm; using ABase::getArray; using ABase::operator=;
 
   /*
   DensityOperator() : Base() {}
@@ -87,12 +72,8 @@ public:
   DensityOperator(DensityOperator&& rho) ///< Move constructor (shallow copy)
     : LDO_Base(rho.getDimensions()), ABase(rho.getArray()) {}
 
-
   /// Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
   DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho.getArray()); return *this;}
-
-  template<typename OTHER>
-  DensityOperator& operator=(const OTHER& other) {getArray()=other; return *this;}
 
 private:
   class IndexerProxy
@@ -102,7 +83,7 @@ private:
 
     template<typename... SubscriptPack>
     IndexerProxy(const DensityOperator* rho, int s0, SubscriptPack... subscriptPack) : IndexerProxy(rho,Idx(s0,subscriptPack...))
-    {static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for DensityOperator." );}
+    {static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for DensityOperator." );}
 
     const dcomp& operator()(const Idx& secondIndex) const {return rho_->indexWithTiny(firstIndex_,secondIndex);}
           dcomp& operator()(const Idx& secondIndex)       {return const_cast<dcomp&>(static_cast<const IndexerProxy&>(*this)(secondIndex));}
@@ -110,7 +91,7 @@ private:
     template<typename... SubscriptPack>
     const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const
     {
-      static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for DensityOperator::IndexerProxy." );
+      static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for DensityOperator." );
       return operator()(Idx(s0,subscriptPack...));
     }
 
@@ -140,7 +121,7 @@ public:
 
   /// \name Norm
   //@{
-  double norm() const ///< returns the *trace* “norm”
+  double norm() const ///< returns the trace norm
   {
     using blitz::tensor::i;
     const linalg::CMatrix m(matrixView());
@@ -157,25 +138,9 @@ public:
 
   /// \name Matrix view
   //@{
-  const CMatrix matrixView() const {return blitzplusplus::binaryArray(getArray());} ///< returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray
-        CMatrix matrixView()       {return blitzplusplus::binaryArray(getArray());} ///< ”
+  auto matrixView() const {return blitzplusplus::binaryArray(getArray());} ///< returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray
   //@}
   
-  /// \name Naive operations for vector space
-  //@{
-  DensityOperator& operator+=(const DensityOperator& rho) {ABase::operator+=(rho); return *this;}
-  DensityOperator& operator-=(const DensityOperator& rho) {ABase::operator-=(rho); return *this;}
-
-  const DensityOperator operator-() const {DensityOperator res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;}
-  const DensityOperator operator+() const {return *this;}
-
-  template<typename OTHER>
-  DensityOperator& operator*=(const OTHER& dc) {ABase::operator*=(dc); return *this;}
-
-  template<typename OTHER>
-  DensityOperator& operator/=(const OTHER& dc) {ABase::operator/=(dc); return *this;}
-  //@}
-
 private:
   const dcomp& indexWithTiny(const Idx& i, const Idx& j) const ///< Used for implementing operator() and the index function below.
   {
@@ -187,6 +152,17 @@ private:
   double trace_v() const override {return norm();} ///< A straightforward implementation of a LazyDensityOperator virtual
 
 };
+
+
+template<int RANK1, int RANK2>
+inline
+const DensityOperator<RANK1+RANK2>
+operator*(const DensityOperator<RANK1>&, const DensityOperator<RANK2>&);
+
+
+template<int RANK>
+inline
+double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm();}
 
 
 /// Performs the opposite of quantumdata::deflate
@@ -256,6 +232,8 @@ dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
   return DensityOperator<RANK>(sv1.dyad(sv2),byReference);
 }
 
+
+template <int RANK> struct ArrayRank<DensityOperator<RANK>> {static const int value=2*RANK;};
 
 } // quantumdata
 

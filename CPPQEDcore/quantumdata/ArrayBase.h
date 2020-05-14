@@ -6,30 +6,42 @@
 #include "BlitzArrayExtensions.h"
 #include "CMatrix.h"
 #include "ComplexArrayExtensions.h"
+#include "Operators.h"
 
 #include <boost/utility.hpp>
 
 
 namespace quantumdata {
 
+struct ByReference {}; const ByReference byReference{};
+
+template<typename>
+struct ArrayRank;
 
 /// Comprises the common functionalities of StateVector and DensityOperator.
-template<int RANK>
-class ArrayBase : private boost::noncopyable
+template<typename Derived>
+class ArrayBase : private boost::noncopyable, private linalg::VectorSpace<Derived>
 {
 protected:
-  typedef CArray<RANK> ArrayLow; ///< The underlying storage
+  typedef CArray<ArrayRank<Derived>::value> ArrayLow; ///< The underlying storage
   typedef linalg::CVector CVector;
 
   explicit ArrayBase(const ArrayLow& arrayLow) : arrayLow_(arrayLow) {} ///< By-reference semantics (basically the copy of a `blitz::Array`). Apart from this, copying is not possible.
 
+  ArrayBase(ArrayBase&& array) : arrayLow_(std::move(array)) {}
+  
   virtual ~ArrayBase() {}
 
-  /// Assignment with by-value semantics (like the assignment of a `blitz::Array`).
+public:
+  /// Mixed-mode assignment with by-value semantics
   /**
-   * Default assignment synthetised by the compiler ditto.
-   */ 
-  ArrayBase& operator=(const ArrayLow& arrayLow ) {arrayLow_=arrayLow; return *this;}
+  * The standard assignment and the templated assignment together cover a lot of possibilities, including also assignment from a StateVectorLow,
+  * but for example also from a DArray<RANK>, or just a const c-number. (Can be assigned from anything a CArray<RANK> can be assigned from.)
+  * 
+  * \tparam OTHER the “other” type in mixed mode
+  */
+  template <typename OTHER>
+  Derived& operator=(const OTHER& other) {arrayLow_=other; return static_cast<Derived&>(*this);}
   
   /// \name The underlying ArrayLow
   //@{
@@ -39,19 +51,23 @@ protected:
   
   /// \name Naive vector-space operations
   //@{
-  void operator+=(const ArrayBase& arrayBase) {arrayLow_+=arrayBase.arrayLow_;}
-  void operator-=(const ArrayBase& arrayBase) {arrayLow_-=arrayBase.arrayLow_;}
+  Derived& operator+=(const ArrayBase& arrayBase) {arrayLow_+=arrayBase.arrayLow_; return static_cast<Derived&>(*this);}
+  Derived& operator-=(const ArrayBase& arrayBase) {arrayLow_-=arrayBase.arrayLow_; return static_cast<Derived&>(*this);}
+
+  Derived operator-() const {Derived res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;} ///< involves a deep-copy
+  Derived operator+() const {return *this;} ///< simply deep copy
   //@}
-  
-  /// \name Naive vector-space operations allowing also for mixed-mode arithmetic
+
+  /// \name Naive vector-space operations allowing also for mixed-mode arithmetics
   //@{
   template<typename OTHER>
-  void operator*=(const OTHER& dc) {arrayLow_*=dc;}
+  Derived& operator*=(const OTHER& dc) {arrayLow_*=dc; return static_cast<Derived&>(*this);} ///< \tparam OTHER the “other” type in mixed mode
 
   template<typename OTHER>
-  void operator/=(const OTHER& dc) {arrayLow_/=dc;}
+  Derived& operator/=(const OTHER& dc) {arrayLow_/=dc; return static_cast<Derived&>(*this);}
   //@}
 
+protected:
   /// \name One-dimensional view of the underlying data
   //@{
     /// 1d view created on the fly via blitzplusplus::unaryArray.
@@ -60,9 +76,7 @@ protected:
       * In debug mode, a non-contiguous storage is detected by the implementing function blitzplusplus::unaryArray, and an exception of type 
       * blitzplusplus::NonContiguousStorageException is thrown.
       */
-  const CVector vectorView() const {return blitzplusplus::unaryArray(arrayLow_);}
-        CVector vectorView()       {return blitzplusplus::unaryArray(arrayLow_);} ///< ”
-  // The usual technique of defining the non-const in terms of the const doesn't work here, because `CVector is not a pointer, reference, nor a pointer-to-data-member type'
+  auto vectorView() const {return blitzplusplus::unaryArray(arrayLow_);}
   //@}
 
   /// The entrywise array norm

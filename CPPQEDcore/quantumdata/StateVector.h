@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
 
-#include "QuantumDataCommon.h"
+#include "QuantumDataFwd.h"
 
 #include "ArrayBase.h"
 #include "DimensionsBookkeeper.h"
@@ -11,7 +11,6 @@
 #include "Types.h"
 
 #include "ComplexArrayExtensions.tcc"
-#include "Operators.h"
 
 
 namespace quantumdata {
@@ -38,31 +37,27 @@ namespace quantumdata {
  * The inheritance of StateVector from linalg::VectorSpace provides for a lot of free-standing helpers describing vector-space algebra.
  * These are all naively based on the arithmetic member functions like StateVector::operator+=, StateVector::operator*=, etc.
  * 
- * \todo provide a move constructor
- * 
  */
 template<int RANK>
 class StateVector 
   : public LazyDensityOperator<RANK>, 
-    private ArrayBase<RANK>,
-    private linalg::VectorSpace<StateVector<RANK> >
+    public ArrayBase<StateVector<RANK>>
 {
 public:
   static const int N_RANK=RANK;
 
   typedef LazyDensityOperator<RANK> LDO_Base;
-  typedef ArrayBase          <RANK>    ABase;
+  
+  typedef ArrayBase<StateVector<RANK>> ABase;
 
   typedef typename LDO_Base::Dimensions Dimensions;
 
-  typedef typename ABase::ArrayLow StateVectorLow;
-
-  typedef typename Types<RANK>::DensityOperatorLow DensityOperatorLow;
+  using StateVectorLow=typename ABase::ArrayLow ;
 
   typedef typename LDO_Base::Idx Idx;
 
-  using ABase::vectorView; using ABase::getArray;
-
+  using ABase::getArray; using ABase::vectorView; using ABase::operator=;
+  
   /// \name Construction, assignment
   //@{
     /// Constructs the class in such a way that the underlying data reference the same data as `psi`.
@@ -95,22 +90,11 @@ public:
   StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)
     : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
       ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK2,RANK-RANK2>(psi1.getArray(),psi2.getArray())) {}
-  
-    /// Assignment with by-value semantics.
-    /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
-  StateVector& operator=(const StateVector& sv) {ABase::operator=(sv.getArray()); return *this;}
 
-    /// Mixed-mode assignment with by-value semantics
-    /**
-    * The standard assignment and the templated assignment together cover a lot of possibilities, including also assignment from a StateVectorLow,
-    * but for example also from a DArray<RANK>, or just a const c-number. (Can be assigned from anything a CArray<RANK> can be assigned from.)
-    * 
-    * \tparam OTHER the “other” type in mixed mode
-    */
-  template<typename OTHER>
-  StateVector& operator=(const OTHER& other) {getArray()=other; return *this;}
-  //@}
-  
+  /// Assignment with by-value semantics.
+  /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
+  StateVector& operator=(const StateVector& sv) {ABase::operator=(sv.getArray()); return *this;}
+ 
   /// \name Subscripting
   //@{
   template<typename... SubscriptPack>
@@ -130,10 +114,11 @@ public:
     /// Returns the norm \f$\norm\Psi\f$
     /** Implemented in terms of ArrayBase::frobeniusNorm. */
   double   norm() const {return ABase::frobeniusNorm();}
+  
   double renorm() ///< ” and also renormalises
   {
     double res=norm();
-    operator/=(res);
+    this->operator/=(res);
     return res;
   }
   //@}
@@ -147,7 +132,7 @@ public:
     return blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK,RANK>(getArray(),StateVectorLow(conj(sv.getArray())));
   }
 
-  const DensityOperatorLow dyad(                  ) const {return dyad(*this);} ///< dyad with the object itself
+  auto dyad() const {return dyad(*this);} ///< dyad with the object itself
   //@}
 
   /// Adds a dyad of the present object to `densityOperator`
@@ -164,24 +149,6 @@ public:
     for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
   }
 
-  /// \name Naive vector-space operations
-  //@{
-  StateVector& operator+=(const StateVector& psi) {ABase::operator+=(psi); return *this;}
-  StateVector& operator-=(const StateVector& psi) {ABase::operator-=(psi); return *this;}
-
-  StateVector operator-() const {StateVector res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;} ///< involves a deep-copy
-  StateVector operator+() const {return *this;} ///< simply deep copy
-  //@}
-
-  /// \name Naive vector-space operations allowing also for mixed-mode arithmetics
-  //@{
-  template<typename OTHER>
-  StateVector& operator*=(const OTHER& dc) {ABase::operator*=(dc); return *this;} ///< \tparam OTHER the “other” type in mixed mode
-
-  template<typename OTHER>
-  StateVector& operator/=(const OTHER& dc) {ABase::operator/=(dc); return *this;}
-  //@}
-  
 #ifndef NDEBUG
   void debug() const {std::cerr<<"Debug: "<<getArray()<<std::endl;}
 #endif // NDEBUG
@@ -211,6 +178,9 @@ dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
   temp=conj(psi1.vectorView()(i))*psi2.vectorView()(i);
   return sum(temp);
 }
+
+
+template <int RANK> struct ArrayRank<StateVector<RANK>> {static const int value=RANK;};
 
 
 } // quantumdata

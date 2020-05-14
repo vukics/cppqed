@@ -3,7 +3,8 @@
 #ifndef CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
 
-#include "QuantumDataCommon.h"
+#include "ArrayBase.h" // for ByReference
+#include "QuantumDataFwd.h"
 
 #include "DimensionsBookkeeper.h"
 
@@ -112,7 +113,7 @@ public:
   template<typename... SubscriptPack>
   const auto operator()(int s0, SubscriptPack... subscriptPack) const
   {
-    static_assert( mpl::size<mpl::vector<SubscriptPack...> >::value==RANK-1 , "Incorrect number of subscripts for LazyDensityOperator." );
+    static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for LazyDensityOperator." );
     return operator()(Idx(s0,subscriptPack...));
   }
 
