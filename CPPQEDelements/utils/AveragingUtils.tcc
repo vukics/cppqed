@@ -64,7 +64,7 @@ ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, c
 
 template<int RANK>
 ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) :
-  DimensionsBookkeeper<RANK,true>(dim),
+  DimensionsBookkeeper<RANK>(dim),
   Base(label,helper(getDimensions(),offDiagonals,subsequent)),
   offDiagonals_(offDiagonals)
 {
