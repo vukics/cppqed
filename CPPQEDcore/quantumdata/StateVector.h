@@ -91,6 +91,8 @@ public:
     : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
       ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK2,RANK-RANK2>(psi1.getArray(),psi2.getArray())) {}
 
+  StateVector() : LDO_Base(Dimensions{size_t(0)}), ABase() {}
+  
   /// Assignment with by-value semantics.
   /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
   StateVector& operator=(const StateVector& sv) {ABase::operator=(sv.getArray()); return *this;}
@@ -166,6 +168,11 @@ public:
     int dim(this->getTotalDimension());
     for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
   }
+  
+  void reference(const StateVector& other) {getArray().reference(other.getArray()); this->setDimensions(other.getDimensions());}
+  
+  auto lbound() const {return getArray().lbound();}
+  auto ubound() const {return getArray().ubound();}
 
 #ifndef NDEBUG
   void debug() const {std::cerr<<"Debug: "<<getArray()<<std::endl;}
@@ -200,6 +207,12 @@ dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 
 template <int RANK> struct ArrayRank<StateVector<RANK>> {static const int value=RANK;};
 
+
+template<int RANK, typename ... SubscriptPack>
+auto subscript(const quantumdata::StateVector<RANK>& psi, SubscriptPack&&... subscriptPack) ///< for use in cpputils::SliceIterator
+{
+  return psi.sliceIndex(std::forward<SubscriptPack>(subscriptPack)...);
+}
 
 } // quantumdata
 

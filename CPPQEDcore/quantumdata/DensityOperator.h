@@ -71,6 +71,8 @@ public:
 
   DensityOperator(DensityOperator&& rho) ///< Move constructor (shallow copy)
     : LDO_Base(rho.getDimensions()), ABase(rho.getArray()) {}
+    
+  DensityOperator() : LDO_Base(Dimensions{size_t(0)}), ABase() {}
 
   /// Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
   DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho.getArray()); return *this;}
@@ -159,7 +161,12 @@ public:
   //@{
   auto matrixView() const {return blitzplusplus::binaryArray(getArray());} ///< returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray
   //@}
-  
+
+  void reference(const DensityOperator& other) {getArray().reference(other.getArray()); this->setDimensions(other.getDimensions());}
+
+  auto lbound() const {return blitzplusplus::halfCutTiny(getArray().lbound());}
+  auto ubound() const {return blitzplusplus::halfCutTiny(getArray().ubound());}
+
 private:
   const dcomp& indexWithTiny(const Idx& i, const Idx& j) const ///< Used for implementing operator() and the index function below.
   {
@@ -236,10 +243,10 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 
 
 template<int... SUBSYSTEM, int RANK>
-const DensityOperator<mpl::size<tmptools::Vector<SUBSYSTEM...> >::value>
+const DensityOperator<sizeof...(SUBSYSTEM)>
 reduce(const LazyDensityOperator<RANK>& matrix)
 {
-  static const int RES_ARITY=mpl::size<tmptools::Vector<SUBSYSTEM...> >::value;
+  static const int RES_ARITY=sizeof...(SUBSYSTEM);
   return partialTrace<tmptools::Vector<SUBSYSTEM...>,DensityOperator<RES_ARITY> >(matrix,densityOperatorize<RES_ARITY>);
 }
 
@@ -254,7 +261,13 @@ dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
 
 template <int RANK> struct ArrayRank<DensityOperator<RANK>> {static const int value=2*RANK;};
 
-} // quantumdata
 
+template<int RANK, typename ... SubscriptPack>
+auto subscript(const quantumdata::DensityOperator<RANK>& rho, SubscriptPack&&... subscriptPack) ///< for use in cpputils::SliceIterator
+{
+  return rho.diagonalSliceIndex(std::forward<SubscriptPack>(subscriptPack)...);
+}
+
+} // quantumdata
 
 #endif // CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
