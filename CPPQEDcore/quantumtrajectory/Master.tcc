@@ -149,7 +149,7 @@ template<int RANK>
 void Base<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
 {
   using namespace blitzplusplus::vfmsi;
-  for_each(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow),function);
+  boost::for_each(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow),function);
 }
 
 
