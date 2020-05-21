@@ -47,29 +47,21 @@ private:
 
 public:
   typedef typename Base::value_type MultiIndex;
-  typedef typename MultiIndex::T_numtype SingleIndex;
 
   /// \name Constructors
   //@{
-    /// Initialization to the beginning of the sequence
+  template <bool IS_END>
   MultiIndexIterator(const MultiIndex& lbound, ///< tiny vector comprising the sequence of lower bounds
                      const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
-                     mii::Begin)
-    : lbound_(lbound), ubound_(ubound), idx_(lbound_) {}
-
-  MultiIndexIterator(const MultiIndex& lbound, const MultiIndex& ubound, mii::End  )
-    : lbound_(lbound), ubound_(ubound), idx_(ubound_) {operator++();} ///< ” to the end of the sequence (which is in fact beyond the end by one)
+                     boost::mpl::bool_<IS_END>)
+    : lbound_(lbound), ubound_(ubound), idx_(IS_END ? ubound_ : lbound_) {if constexpr (IS_END) operator++();}
 
     /// \overload
     /** `lbound` is all-zero */
+  template <bool IS_END>
   MultiIndexIterator(const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
-                     mii::Begin b)
-    : MultiIndexIterator(MultiIndex(SingleIndex(0)),ubound,b) {}
-
-    /// \overload
-    /** `lbound` is all-zero */
-  MultiIndexIterator(const MultiIndex& ubound, mii::End e)
-    : MultiIndexIterator(MultiIndex(SingleIndex(0)),ubound,e) {}
+                     boost::mpl::bool_<IS_END> t)
+    : MultiIndexIterator(MultiIndex(typename MultiIndex::T_numtype{0}),ubound,t) {}
   //@}
   
   MultiIndexIterator& operator=(const MultiIndexIterator&) = delete; // {idx_=other.idx_; return *this;}
