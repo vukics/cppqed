@@ -10,6 +10,7 @@
 
 #include <boost/mpl/for_each.hpp>
 
+namespace mpl=boost::mpl;
 
 namespace structure {
 

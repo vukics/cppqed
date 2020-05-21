@@ -19,7 +19,6 @@
 
 #include "Types.h"
 
-#include "BlitzArrayTraits.h"
 #include "FFT.h"
 // #include "MathExtensions.h"
 #include "VectorFromMatrixSliceIterator.h"

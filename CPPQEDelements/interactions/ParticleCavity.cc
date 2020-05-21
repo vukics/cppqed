@@ -3,9 +3,9 @@
 
 #include "TridiagonalHamiltonian.tcc"
 
-#include "BlitzArraySliceIterator.tcc"
 #include "ContainerIO.h"
 #include "MathExtensions.h"
+#include "SliceIterator.tcc"
 
 using namespace std;
 using namespace mathutils;

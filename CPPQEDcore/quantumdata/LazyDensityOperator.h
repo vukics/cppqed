@@ -9,10 +9,10 @@
 #include "DimensionsBookkeeper.h"
 
 #include "BlitzArray.h"
-#include "BlitzArraySliceIterator.tcc"
 #include "BlitzTinyExtensions.h"
 #include "ComplexExtensions.h"
 #include "MathExtensions.h"
+#include "SliceIterator.tcc"
 #include "MultiIndexIterator.h"
 
 #include <boost/operators.hpp>

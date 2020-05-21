@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED
 
-#include "BlitzArrayTraits.h"
-
 #include "Evolution.tcc"
 #include "QM_Picture.h"
 #include "Tridiagonal.tcc"

@@ -9,7 +9,7 @@
 
 #include "MathExtensions.h"
 
-#include "BlitzArraySliceIterator.tcc"
+#include "VectorFromMatrixSliceIterator.h"
 #include "ComplexArrayExtensions.h"
 
 #include <boost/range/algorithm_ext/for_each.hpp>

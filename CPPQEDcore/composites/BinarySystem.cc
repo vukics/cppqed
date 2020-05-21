@@ -4,7 +4,7 @@
 #include "Interaction.h"
 
 #include "Algorithm.h"
-#include "BlitzArraySliceIterator.h"
+#include "SliceIterator.tcc"
 
 #include "BlitzTiny.h"
 

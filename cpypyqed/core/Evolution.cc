@@ -6,8 +6,6 @@
 
 #include "ParsPropertyMacros.h"
 
-#include "BlitzArrayTraits.h"
-
 #include "EvolvedGSL.tcc"
 #include "Pars.h"
 

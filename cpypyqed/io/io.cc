@@ -7,7 +7,6 @@
 
 #include "Types.h"
 
-#include "BlitzArrayTraits.h"
 #include "BlitzTiny.h"
 #include "Trajectory.tcc"
 

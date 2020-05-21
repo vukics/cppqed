@@ -5,12 +5,11 @@
 #include "Composite.h"
 
 #include "Interaction.h"
-
 #include "LazyDensityOperator.h"
 
-#include "Exception.h"
-
 #include "Algorithm.h"
+#include "Exception.h"
+#include "SliceIterator.tcc"
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/algorithm/iteration/fold.hpp>
@@ -58,7 +57,11 @@ void worker(const VA& acts, const H& helper)
   mpl::for_each<Ordinals>(helper);
   boost::fusion::for_each(acts,helper);
 
-  // IMPORTANT NOTICE!!! Both mpl::for_each and boost::fusion::for_each stores the helper BY VALUE. So, what happens is that the initial helper is COPIED to both, so the changes made during mpl::for_each in those members of the helper which are stored BY VALUE in H, will be "undone" at startup of boost::fusion::for_each. Ergo, there MUST NOT BE such members. (There can be const members stored by value though, of course.) ... How about static members then?
+  /* IMPORTANT NOTICE!!! Both mpl::for_each and boost::fusion::for_each stores the helper BY VALUE.
+   * So, what happens is that the initial helper is COPIED to both, so the changes made during mpl::for_each in those members of the helper which are stored BY VALUE in H, 
+   * will be "undone" at startup of boost::fusion::for_each. Ergo, there MUST NOT BE such members. 
+   * (There can be const members stored by value though, of course.) ... How about static members then?
+   */
 
 }
 
@@ -71,7 +74,7 @@ void worker(const VA& acts, const H& helper)
 
 
 
-bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2);
+inline bool compareFreesFrequency(const SubSystemFree& ssf1, const SubSystemFree& ssf2) {return ssf1.get()->highestFrequency() < ssf2.get()->highestFrequency();}
 
 
 template<typename Frees>

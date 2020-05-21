@@ -5,7 +5,7 @@
 #include "Types.h"
 
 #include "CMatrix.h"
-#include "BlitzArraySliceIterator.h"
+#include "SliceIterator.h"
 
 #include <boost/fusion/container/vector.hpp>
 #include <boost/fusion/algorithm/transformation/join.hpp>

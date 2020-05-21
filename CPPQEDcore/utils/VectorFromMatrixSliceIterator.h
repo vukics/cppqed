@@ -3,7 +3,8 @@
 #ifndef CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 
-#include "BlitzArraySliceIterator.h"
+#include "BlitzArray.h"
+#include "SliceIterator.tcc"
 
 
 namespace blitzplusplus {
@@ -11,7 +12,7 @@ namespace blitzplusplus {
 
 /// The name of the namespace stands for <strong>V</strong>ector<strong>F</strong>rom<strong>M</strong>atrix<strong>S</strong>lice<strong>I</strong>terator
 /**
- * It comprises tools for adapting basi::Iterator%s to iteration over rows or columns of (multi)matrices
+ * It comprises tools for adapting cpputils::SliceIterator%s to iteration over rows or columns of (multi)matrices
  * 
  * \par Semantics
  * Consider the following piece of code:
