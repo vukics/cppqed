@@ -34,11 +34,11 @@ ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix
   auto averages(initializedAverages());
 
   {
-    const auto fun{bind(&structure::LiouvilleanAveragedCommonRanked<1>::average,averagedMode_,0,_1)};
+    auto fun=[&](const auto& psiS){return averagedMode_.average(0,psiS);};
     
     const Averages 
-      a0(partialTrace<V0,Averages>(matrix,fun)),
-      a1(partialTrace<V1,Averages>(matrix,fun));
+      a0{partialTrace<V0>(matrix,fun)},
+      a1{partialTrace<V1>(matrix,fun)};
 
     copy(a1,copy(a0,averages.begin()));
   }
