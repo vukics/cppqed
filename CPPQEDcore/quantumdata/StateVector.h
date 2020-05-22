@@ -79,7 +79,7 @@ public:
     /**
      * \note It doesn’t touch its argument, as there seems to be no efficient way to invalidate that one
      */
-  StateVector(StateVector&& sv) : LDO_Base(sv.getDimensions()), ABase(sv.getArray()) {}
+  StateVector(StateVector&& sv) : LDO_Base(sv.getDimensions()), ABase(std::move(sv.getArray())) {}
 
     /// Constructs the class as the direct product of `psi1` and `psi2`, whose arities add up to `RANK`.
     /**
@@ -113,10 +113,10 @@ public:
   /// \name LazyDensityOperator diagonal iteration
   //@{
   template<typename... SubscriptPack>
-  auto sliceIndex(SubscriptPack&&... subscriptPack) const
+  auto sliceIndex(const SubscriptPack&... subscriptPack) const
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
-#define SLICE_EXPR getArray()(std::forward<SubscriptPack>(subscriptPack)...)
+#define SLICE_EXPR getArray()(subscriptPack...)
     return StateVector<cpputils::Rank<decltype(SLICE_EXPR)>::value>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
@@ -209,9 +209,9 @@ template <int RANK> struct ArrayRank<StateVector<RANK>> {static const int value=
 
 
 template<int RANK, typename ... SubscriptPack>
-auto subscript(const quantumdata::StateVector<RANK>& psi, SubscriptPack&&... subscriptPack) ///< for use in cpputils::SliceIterator
+auto subscript(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cpputils::SliceIterator
 {
-  return psi.sliceIndex(std::forward<SubscriptPack>(subscriptPack)...);
+  return psi.sliceIndex(subscriptPack...);
 }
 
 } // quantumdata

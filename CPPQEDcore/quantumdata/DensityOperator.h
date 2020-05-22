@@ -70,7 +70,7 @@ public:
 
 
   DensityOperator(DensityOperator&& rho) ///< Move constructor (shallow copy)
-    : LDO_Base(rho.getDimensions()), ABase(rho.getArray()) {}
+    : LDO_Base(rho.getDimensions()), ABase(std::move(rho.getArray())) {}
     
   DensityOperator() : LDO_Base(Dimensions{size_t(0)}), ABase() {}
 
@@ -124,10 +124,10 @@ public:
   /// \name LazyDensityOperator diagonal iteration
   //@{
   template<typename... SubscriptPack>
-  auto diagonalSliceIndex(SubscriptPack&&... subscriptPack) const
+  auto diagonalSliceIndex(const SubscriptPack&... subscriptPack) const
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for DensityOperator." );
-#define SLICE_EXPR getArray()(std::forward<SubscriptPack>(subscriptPack)...,std::forward<SubscriptPack>(subscriptPack)...)
+#define SLICE_EXPR getArray()(subscriptPack...,subscriptPack...)
     return DensityOperator<cpputils::Rank<decltype(SLICE_EXPR)>::value/2>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
@@ -263,9 +263,9 @@ template <int RANK> struct ArrayRank<DensityOperator<RANK>> {static const int va
 
 
 template<int RANK, typename ... SubscriptPack>
-auto subscript(const quantumdata::DensityOperator<RANK>& rho, SubscriptPack&&... subscriptPack) ///< for use in cpputils::SliceIterator
+auto subscript(const quantumdata::DensityOperator<RANK>& rho, const SubscriptPack&... subscriptPack) ///< for use in cpputils::SliceIterator
 {
-  return rho.diagonalSliceIndex(std::forward<SubscriptPack>(subscriptPack)...);
+  return rho.diagonalSliceIndex(subscriptPack...);
 }
 
 } // quantumdata

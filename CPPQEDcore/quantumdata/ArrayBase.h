@@ -30,7 +30,9 @@ protected:
   
   explicit ArrayBase(const ArrayLow& arrayLow) : arrayLow_(arrayLow) {} ///< By-reference semantics (basically the copy of a `blitz::Array`). Apart from this, copying is not possible.
 
-  ArrayBase(ArrayBase&& array) : arrayLow_(std::move(array)) {}
+  ArrayBase(ArrayLow&& array) : arrayLow_(std::move(array)) {}
+  
+  ArrayBase(ArrayBase&& array) : ArrayBase(std::move(array.getArray())) {}
   
   virtual ~ArrayBase() {}
 

@@ -130,7 +130,7 @@ auto partialTrace(const MATRIX<RANK>& matrix, F&& function)
   return std::accumulate(++begin,
                          cpputils::sliceiterator::end<V,MATRIX>(matrix),
                          function(*begin),
-                         [=/*f{std::move(function)}*/](auto&& res, const auto& slice){std::cerr<<res<<function(slice)<<std::endl; return res+function(slice);}
+                         [f{std::move(function)}](const auto& res, const auto& slice){std::cerr<<res<<f(slice)<<std::endl; return res+f(slice);}
                         );
 }
 
@@ -146,13 +146,13 @@ struct LazyDensityOperatorPartialTraceNotImplementedException : cpputils::Except
  */
 template<typename V, int RANK, typename F>
 auto
-partialTrace(const LazyDensityOperator<RANK>& matrix, F function)
+partialTrace(const LazyDensityOperator<RANK>& matrix, F&& function)
 {
   typedef StateVector    <RANK> SV;
   typedef DensityOperator<RANK> DO;
   
-  if      (auto psi=dynamic_cast<const SV*>(&matrix) ) return partialTrace<V,StateVector    >(*psi,function);
-  else if (auto rho=dynamic_cast<const DO*>(&matrix) ) return partialTrace<V,DensityOperator>(*rho,function);
+  if      (auto psi=dynamic_cast<const SV*>(&matrix) ) return partialTrace<V,StateVector    >(*psi,std::move(function));
+  else if (auto rho=dynamic_cast<const DO*>(&matrix) ) return partialTrace<V,DensityOperator>(*rho,std::move(function));
   else throw LazyDensityOperatorPartialTraceNotImplementedException();
 }
 
