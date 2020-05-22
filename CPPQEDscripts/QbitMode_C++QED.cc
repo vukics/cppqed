@@ -3,8 +3,6 @@
 
 #include "JaynesCummings.h"
 
-#include "MatrixOfHamiltonian.h"
-
 
 using namespace std;
 

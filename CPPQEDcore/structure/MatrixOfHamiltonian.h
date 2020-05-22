@@ -12,8 +12,8 @@ calculateMatrix(const T& hamiltonian, double t=0, double t0=0)
 {
   using namespace linalg;
 
-  static const int RANK=T::DIMESIONS_BOOKKEEPER_RANK;
-  typedef typename quantumdata::StateVector<RANK> StateVector;
+  static const int RANK=T::DimensionsBookkeeper::N_RANK;
+  typedef quantumdata::StateVector<RANK> StateVector;
 
   const int dim=hamiltonian.getTotalDimension();
 

@@ -127,7 +127,7 @@ class FillDimensions
 {
 public:
   typedef std::array<SubSystemFree,RANK> Frees;
-  typedef typename DimensionsBookkeeper<RANK,true>::Dimensions Dimensions;
+  typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
 
   FillDimensions(const Frees& frees, Dimensions& dims) : frees_(frees), dims_(dims) {}
 
@@ -313,7 +313,7 @@ public:
   template<typename Vec, typename Ex>
   void help(typename Ex::Ptr ex) const
   {
-    if (ex) boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,t_,::_1,t0_));
+    if (ex) boost::for_each(cpputils::sliceiterator::fullRange<Vec>(psi_),boost::bind(&Ex::actWithU,ex,t_,::_1,t0_));
     // namespace qualification :: is necessary because otherwise :: and mpl:: are equally good matches.
   }
 
@@ -352,7 +352,7 @@ public:
   void help(typename Ha::Ptr ha) const
   {
     if (ha) 
-      for_each(blitzplusplus::basi::fullRange<Vec>(psi_),blitzplusplus::basi::fullRange<Vec>(dpsidt_),boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,t0_)); 
+      boost::for_each(cpputils::sliceiterator::fullRange<Vec>(psi_),cpputils::sliceiterator::fullRange<Vec>(dpsidt_),boost::bind(&Ha::addContribution,ha,t_,::_1,::_2,t0_)); 
   }
 
   ACTS_FREES_operator(Ha);
@@ -467,7 +467,7 @@ public:
   template<typename Vec, int SS_RANK>
   void help(std::shared_ptr<const structure::LiouvilleanAveragedCommonRanked<SS_RANK> > av) const
   {
-    iter_++->reference(quantumdata::partialTrace<Vec,Averages>(ldo_,boost::bind(structure::average<SS_RANK>,av,t_,::_1)));
+    iter_++->reference(quantumdata::partialTrace<Vec>(ldo_,boost::bind(structure::average<SS_RANK>,av,t_,::_1)));
   }
 
   template<typename Act>
@@ -530,7 +530,7 @@ public:
     if (!flag_ && li) {
       size_t n=li->nAvr();
       if (ordoJump_<n) {
-        boost::for_each(blitzplusplus::basi::fullRange<Vec>(psi_),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
+        boost::for_each(cpputils::sliceiterator::fullRange<Vec>(psi_),boost::bind(&Li::actWithJ,li,t_,::_1,ordoJump_));
         flag_=true;
       }
       ordoJump_-=n;  
@@ -571,9 +571,9 @@ public:
     if (!flag_ && li) {
       size_t n=li->nAvr();
       if (ordoJump_<n) {
-        for_each(blitzplusplus::basi::fullRange<typename tmptools::ExtendVector<RANK,Vec>::type>(rho_),
-                 blitzplusplus::basi::fullRange<typename tmptools::ExtendVector<RANK,Vec>::type>(drhodt_),
-                 boost::bind(&Li::actWithSuperoperator,li,t_,::_1,::_2,ordoJump_));
+        boost::for_each(cpputils::sliceiterator::fullRange<typename tmptools::ExtendVector<RANK,Vec>::type>(rho_),
+                        cpputils::sliceiterator::fullRange<typename tmptools::ExtendVector<RANK,Vec>::type>(drhodt_),
+                        boost::bind(&Li::actWithSuperoperator,li,t_,::_1,::_2,ordoJump_));
         flag_=true;
       }
       ordoJump_-=n;  
