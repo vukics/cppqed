@@ -126,6 +126,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
     getArray().transposeSelf(subscriptPack...);
+    this->setDimensions(getArray().shape());
   }
   //@}
   

@@ -137,6 +137,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
     getArray().transposeSelf(subscriptPack...,(subscriptPack+RANK)...);
+    this->setDimensions(blitzplusplus::halfCutTiny(getArray().shape()));
   }
   //@}
   

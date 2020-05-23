@@ -93,7 +93,6 @@ std::ostream& display(std::shared_ptr<const Averaged<RANK> > av,
 template<int RANK>
 const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
 {
-  std::cerr<<bool(ptr)<<" "<<matrix.getDimensions()<<" "<<ptr->average(t,matrix)<<std::endl;
   return ptr ? ptr->average(t,matrix) : LiouvilleanAveragedCommon::DArray1D();
 }
 

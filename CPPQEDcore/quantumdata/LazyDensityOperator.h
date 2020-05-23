@@ -125,12 +125,12 @@ auto partialTrace(const MATRIX<RANK>& matrix, F&& function)
 {
   auto begin{cpputils::sliceiterator::begin<V,MATRIX>(matrix)};
 
-  std::cerr<<function(*begin)<<std::endl;
-  
+  auto init{function(*begin)};
+
   return std::accumulate(++begin,
                          cpputils::sliceiterator::end<V,MATRIX>(matrix),
-                         function(*begin),
-                         [f{std::move(function)}](const auto& res, const auto& slice){std::cerr<<res<<f(slice)<<std::endl; return res+f(slice);}
+                         init,
+                         [f{std::move(function)}](const auto& res, const auto& slice){return decltype(init){res+f(slice)};}
                         );
 }
 
