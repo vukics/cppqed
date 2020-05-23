@@ -11,8 +11,6 @@
 #include "Liouvillean.h"
 #include "Averaged.h"
 
-#include <xtensor/xfixed.hpp>
-
 /// Comprises modules for describing quantum systems.
 /** 
  * Among them the most important is QuantumSystem, which is an abstract interface every system has to provide to be usable with quantum trajectories like quantumtrajectory::MCWF_Trajectory 
@@ -38,7 +36,7 @@
 namespace structure {
 
 
-typedef xt::xtensor_fixed<bool,xt::xshape<3>> SystemCharacteristics;
+typedef blitz::TinyVector<bool,3> SystemCharacteristics;
 
 
 using std::dynamic_pointer_cast;

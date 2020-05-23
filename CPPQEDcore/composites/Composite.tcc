@@ -744,7 +744,7 @@ private:
 } // composite
 
 
-#define DISPATCHER(EX,HA,LI) (systemCharacteristics==SystemCharacteristics{EX,HA,LI}) return std::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
+#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics{EX,HA,LI})) return std::make_shared<Composite<VA,EX,HA,LI> >(frees,acts)
 
 template<typename VA>
 const typename composite::Base<VA>::Ptr composite::doMake(const VA& acts)

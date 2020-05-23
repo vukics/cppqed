@@ -310,7 +310,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 }
 
 
-#define DISPATCHER(EX,HA,LI) (querySystemCharacteristics(ia)==SystemCharacteristics{EX,HA,LI}) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
+#define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics{EX,HA,LI})) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
 const binary::Ptr binary::make(Interaction::Ptr ia)
