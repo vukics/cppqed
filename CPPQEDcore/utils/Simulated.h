@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED
 #define CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED
 
-#include "BlitzArrayTraits.h"
+#include "BlitzArray.h"
 #include "EvolvedGSL.tcc"
 #include "Simulated.tcc"
 

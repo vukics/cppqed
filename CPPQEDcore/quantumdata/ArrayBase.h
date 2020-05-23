@@ -26,9 +26,13 @@ protected:
   typedef CArray<ArrayRank<Derived>::value> ArrayLow; ///< The underlying storage
   typedef linalg::CVector CVector;
 
+  ArrayBase() : arrayLow_(0) {}
+  
   explicit ArrayBase(const ArrayLow& arrayLow) : arrayLow_(arrayLow) {} ///< By-reference semantics (basically the copy of a `blitz::Array`). Apart from this, copying is not possible.
 
-  ArrayBase(ArrayBase&& array) : arrayLow_(std::move(array)) {}
+  ArrayBase(ArrayLow&& array) : arrayLow_(array) {}
+  
+  ArrayBase(ArrayBase&& array) : ArrayBase(std::move(array.getArray())) {}
   
   virtual ~ArrayBase() {}
 
@@ -93,7 +97,6 @@ private:
 
 
 } // quantumdata
-
 
 
 #endif // CPPQEDCORE_QUANTUMDATA_ARRAYBASE_H_INCLUDED

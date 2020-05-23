@@ -5,7 +5,7 @@
 
 #include "Act.h"
 
-#include "BlitzArraySliceIterator.h"
+#include "SliceIterator.h"
 // This is included at this point mainly to pull in necessary TMP tools
 
 #include "SubSystem.h"

@@ -3,7 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
 
-#include <string>
 #include <vector>
 
 namespace cpputils {

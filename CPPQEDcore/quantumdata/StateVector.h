@@ -79,7 +79,7 @@ public:
     /**
      * \note It doesn’t touch its argument, as there seems to be no efficient way to invalidate that one
      */
-  StateVector(StateVector&& sv) : LDO_Base(sv.getDimensions()), ABase(sv.getArray()) {}
+  StateVector(StateVector&& sv) : LDO_Base(sv.getDimensions()), ABase(std::move(sv.getArray())) {}
 
     /// Constructs the class as the direct product of `psi1` and `psi2`, whose arities add up to `RANK`.
     /**
@@ -91,6 +91,8 @@ public:
     : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
       ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK2,RANK-RANK2>(psi1.getArray(),psi2.getArray())) {}
 
+  StateVector() : LDO_Base(Dimensions{size_t(0)}), ABase() {}
+  
   /// Assignment with by-value semantics.
   /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
   StateVector& operator=(const StateVector& sv) {ABase::operator=(sv.getArray()); return *this;}
@@ -111,10 +113,10 @@ public:
   /// \name LazyDensityOperator diagonal iteration
   //@{
   template<typename... SubscriptPack>
-  auto sliceIndex(SubscriptPack&&... subscriptPack) const
+  auto sliceIndex(const SubscriptPack&... subscriptPack) const
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
-#define SLICE_EXPR getArray()(std::forward<SubscriptPack>(subscriptPack)...)
+#define SLICE_EXPR getArray()(subscriptPack...)
     return StateVector<cpputils::Rank<decltype(SLICE_EXPR)>::value>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
@@ -124,6 +126,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
     getArray().transposeSelf(subscriptPack...);
+    this->setDimensions(getArray().shape());
   }
   //@}
   
@@ -166,6 +169,11 @@ public:
     int dim(this->getTotalDimension());
     for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
   }
+  
+  void reference(const StateVector& other) {getArray().reference(other.getArray()); this->setDimensions(other.getDimensions());}
+  
+  auto lbound() const {return getArray().lbound();}
+  auto ubound() const {return getArray().ubound();}
 
 #ifndef NDEBUG
   void debug() const {std::cerr<<"Debug: "<<getArray()<<std::endl;}
@@ -200,6 +208,12 @@ dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 
 template <int RANK> struct ArrayRank<StateVector<RANK>> {static const int value=RANK;};
 
+
+template<int RANK, typename ... SubscriptPack>
+auto subscript(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cpputils::SliceIterator
+{
+  return psi.sliceIndex(subscriptPack...);
+}
 
 } // quantumdata
 

@@ -9,6 +9,11 @@
 
 #include <boost/ptr_container/ptr_vector.hpp>
 
+#include <boost/mpl/identity.hpp>
+
+
+namespace mpl=boost::mpl;
+
 
 namespace trajectory {
 

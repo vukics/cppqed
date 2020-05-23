@@ -7,6 +7,7 @@
 #include "QuantumSystem.h"
 #include "SubSystem.h"
 
+namespace mpl=boost::mpl;
 
 /// Auxiliary tools for BinarySystem
 namespace binary {

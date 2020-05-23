@@ -27,7 +27,7 @@ namespace structure {
  * 
  */
 template<int RANK>
-class Interaction : public DynamicsBase, public DimensionsBookkeeper<RANK,true>
+class Interaction : public DynamicsBase, public DimensionsBookkeeper<RANK>
 {
 public:
   typedef std::shared_ptr<const Interaction> Ptr;
@@ -36,12 +36,12 @@ public:
   /** \note The order of the Free objects is essential! (Cf. BinarySystem, Composite) */
   typedef std::array<Free::Ptr,RANK> Frees;
 
-  typedef typename DimensionsBookkeeper<RANK,true>::Dimensions Dimensions;
+  typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
   explicit Interaction(const Frees& frees,
                        const    RealFreqs&    realFreqs=emptyRF, 
                        const ComplexFreqs& complexFreqs=emptyCF)
-    : DynamicsBase(realFreqs,complexFreqs), DimensionsBookkeeper<RANK,true>(extractDimensions(frees)), frees_(frees) {}
+    : DynamicsBase(realFreqs,complexFreqs), DimensionsBookkeeper<RANK>(extractDimensions(frees)), frees_(frees) {}
 
   const Frees& getFrees() const {return frees_;}
 

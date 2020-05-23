@@ -74,12 +74,27 @@ qsa(std::shared_ptr<const T> t)
 
 /// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::display in succession; otherwise a no-op. \related QuantumSystemWrapper
 template<int RANK>
-std::ostream& display(std::shared_ptr<const Averaged<RANK> >, double, const quantumdata::LazyDensityOperator<RANK>&, std::ostream&, int);
+std::ostream& display(std::shared_ptr<const Averaged<RANK> > av,
+                      double t,
+                      const quantumdata::LazyDensityOperator<RANK>& matrix,
+                      std::ostream& os,
+                      int precision)
+{
+  if (av) {
+    typename Averaged<RANK>::Averages averages(av->average(t,matrix));
+    av->process(averages);
+    av->display(averages,os,precision);
+  }
+  return os;
+}
 
 
 /// If the first argument is a valid pointer, it calles LiouvilleanAveragedCommon Averaged::average; otherwise a no-op (returning an empty array) \related QuantumSystemWrapper
 template<int RANK>
-const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr, double, const quantumdata::LazyDensityOperator<RANK>&);
+const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
+{
+  return ptr ? ptr->average(t,matrix) : LiouvilleanAveragedCommon::DArray1D();
+}
 
 
 /// A wrapper for Exact, Hamiltonian, Liouvillean, and Averaged
@@ -228,29 +243,6 @@ private:
   
 };
 
-
-
-template<int RANK>
-std::ostream& display(std::shared_ptr<const Averaged<RANK> > av,
-                      double t,
-                      const quantumdata::LazyDensityOperator<RANK>& matrix,
-                      std::ostream& os,
-                      int precision)
-{
-  if (av) {
-    typename Averaged<RANK>::Averages averages(av->average(t,matrix));
-    av->process(averages);
-    av->display(averages,os,precision);
-  }
-  return os;
-}
-
-
-template<int RANK>
-const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
-{
-  return ptr ? ptr->average(t,matrix) : LiouvilleanAveragedCommon::DArray1D();
-}
 
 
 } // structure

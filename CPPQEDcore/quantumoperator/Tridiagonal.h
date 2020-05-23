@@ -17,6 +17,10 @@
 
 #include "Exception.h"
 
+#include <boost/mpl/int.hpp>
+
+
+namespace mpl=boost::mpl;
 
 
 // Stencils???
@@ -77,7 +81,7 @@ namespace quantumoperator {
  */
 template<int RANK> 
 class Tridiagonal 
-  : public DimensionsBookkeeper<RANK,true>, 
+  : public DimensionsBookkeeper<RANK>, 
     private linalg::VectorSpace<Tridiagonal<RANK> >
 {
 public:
@@ -89,7 +93,7 @@ public:
   typedef typename Diagonals::T_numtype Diagonal; ///< A unary complex blitz array
 
 private:
-  typedef DimensionsBookkeeper<RANK,true> Base;
+  typedef DimensionsBookkeeper<RANK> Base;
   
 public:
   typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper

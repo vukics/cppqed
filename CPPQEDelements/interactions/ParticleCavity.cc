@@ -3,9 +3,9 @@
 
 #include "TridiagonalHamiltonian.tcc"
 
-#include "BlitzArraySliceIterator.tcc"
 #include "ContainerIO.h"
 #include "MathExtensions.h"
+#include "SliceIterator.tcc"
 
 using namespace std;
 using namespace mathutils;
@@ -118,8 +118,7 @@ void ParticleAlongCavity::addContribution_v(double t, const StateVectorLow& psi,
 
   if (isSpecialH_) return;
 
-  using namespace blitzplusplus;
-  using basi::fullRange;
+  using cpputils::sliceiterator::fullRange;
 
   typedef tmptools::Vector<1> V1;
 
@@ -133,11 +132,11 @@ void ParticleAlongCavity::addContribution_v(double t, const StateVectorLow& psi,
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstH_);
-    boost::for_each(fullRange<V1>(dpsidtTemp),fullRange<V1>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondH_));
+    boost::for_each(fullRange<V1>(dpsidtTemp),fullRange<V1>(dpsidt),[&](const auto& p1, auto& p2){secondH_ .apply(p1,p2);});
   }
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstHT_);
-    boost::for_each(fullRange<V1>(dpsidtTemp),fullRange<V1>(dpsidt),bind(quantumoperator::apply<1>,_1,_2,secondHT_));
+    boost::for_each(fullRange<V1>(dpsidtTemp),fullRange<V1>(dpsidt),[&](const auto& p1, auto& p2){secondHT_.apply(p1,p2);});
   }
 }

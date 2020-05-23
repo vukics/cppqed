@@ -19,7 +19,7 @@ namespace structure {
  * \note The class features the non-virtual interface idiom, which is ubiquitous in the framework.
  */
 template<int RANK>
-class QuantumSystem : public DimensionsBookkeeper<RANK,true>
+class QuantumSystem : public DimensionsBookkeeper<RANK>
 {
 public:
   /// Many of the basic template classes in the framework act as template metafunctions returning a shared pointer to their own type
@@ -27,7 +27,7 @@ public:
   typedef std::shared_ptr<const QuantumSystem> Ptr;
   
 private:
-  typedef DimensionsBookkeeper<RANK,true> Base;
+  typedef DimensionsBookkeeper<RANK> Base;
 
 public:
   typedef typename Base::Dimensions Dimensions;

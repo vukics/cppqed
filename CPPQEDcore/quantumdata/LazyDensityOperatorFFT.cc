@@ -1,9 +1,8 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "LazyDensityOperatorFFT.h"
 
-#include "BlitzArrayTraits.h"
 #include "FFT.tcc"
-#include "VectorFromMatrixSliceIterator.tcc"
+#include "VectorFromMatrixSliceIterator.h"
 
 #include <boost/range/algorithm/for_each.hpp>
 
@@ -44,19 +43,19 @@ void ffTransformCV(CVector& psi, Direction dir)
 }
 
 
-void quantumdata::ffTransform(linalg::CVector& psi, fft::Direction dir)
+void quantumdata::ffTransform(CVector& psi, fft::Direction dir)
 {
   ffTransformCV(psi,dir);
 }
 
 
 
-void quantumdata::ffTransform(linalg::CMatrix& rho, fft::Direction dir)
+void quantumdata::ffTransform(CMatrix& rho, fft::Direction dir)
 {
   using namespace blitzplusplus::vfmsi;
 
-  for_each(fullRange<Left >(rho),bind(&ffTransformCV,_1,        dir ));
-  for_each(fullRange<Right>(rho),bind(&ffTransformCV,_1,reverse(dir)));
+  for(auto& v : fullRange<Left >(rho)) ffTransformCV(v,dir);
+  for(auto& v : fullRange<Right>(rho)) ffTransformCV(v,reverse(dir));
 
 }
 

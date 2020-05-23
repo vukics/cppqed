@@ -4,7 +4,7 @@
 #include "ParsParticle.h"
 #include "ParticleInitialCondition.h"
 
-#include "LazyDensityOperatorFFT.tcc"
+#include "LazyDensityOperatorFFT.h"
 #include "TridiagonalHamiltonian.tcc"
 
 #include <boost/math/special_functions/hermite.hpp>

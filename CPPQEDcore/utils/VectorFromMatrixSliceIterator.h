@@ -3,7 +3,8 @@
 #ifndef CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 
-#include "BlitzArraySliceIterator.h"
+#include "BlitzArray.h"
+#include "SliceIterator.tcc"
 
 
 namespace blitzplusplus {
@@ -11,7 +12,7 @@ namespace blitzplusplus {
 
 /// The name of the namespace stands for <strong>V</strong>ector<strong>F</strong>rom<strong>M</strong>atrix<strong>S</strong>lice<strong>I</strong>terator
 /**
- * It comprises tools for adapting basi::Iterator%s to iteration over rows or columns of (multi)matrices
+ * It comprises tools for adapting cpputils::SliceIterator%s to iteration over rows or columns of (multi)matrices
  * 
  * \par Semantics
  * Consider the following piece of code:
@@ -50,62 +51,42 @@ struct LeftRight
 /**
  * \tparam RANK the arity of the multivectors resulting from the slicing (the rows/colunms of the multimatrix of total arity `2*RANK`)
  * \tparam S should be either Left or Right
- * \tparam IS_CONST governs constness
  * 
  */
-template<int RANK, typename S, bool IS_CONST> using Iterator=basi::Iterator<RANK,LeftRight<RANK/2,S>,IS_CONST>;
+template<int RANK, typename S> using Iterator=cpputils::SliceIterator<CArray,RANK,LeftRight<RANK/2,S>>;
 
 /// \name Makers for Iterator
 //@{
 /// Same as begin but here it returns an Iterator instance
 template<typename S, typename A>
-const Iterator<Rank<A>::value,S,false>
-begin(     A& array );
+auto
+begin(const A& array ) {return Iterator<cpputils::Rank<A>::value,S>(array,cpputils::sliceiterator::Begin{});}
 
 template<typename S, typename A>
-const Iterator<Rank<A>::value,S,false>
-end  (     A& array );
+auto
+end  (const A& array ) {return Iterator<cpputils::Rank<A>::value,S>(array,cpputils::sliceiterator::End{});}
 
 template<typename S, typename A>
-const Iterator<Rank<A>::value,S,true>
-begin(const A& array );
-
-template<typename S, typename A>
-const Iterator<Rank<A>::value,S,true>
-end  (const A& array );
-
-template<typename S, typename A>
-const boost::iterator_range<Iterator<Rank<A>::value,S,true> >
-fullRange(const A& array );
-
-template<typename S, typename A>
-const boost::iterator_range<Iterator<Rank<A>::value,S,false> >
-fullRange(      A& array );
+auto
+fullRange(const A& array ) {return boost::iterator_range<Iterator<cpputils::Rank<A>::value,S> >(begin<S>(array),end<S>(array));}
 //@}
-
-
-#define NS_NAME vfmsi
-#define RETURN_type1(IS_CONST) Iterator<Rank<A>::value,V_S,IS_CONST>
-#define ADDITIONAL_PARAMETER
-#define ADDITIONAL_ARGUMENT
-
-#include "details_BlitzArraySliceIteratorReentrant.h"
 
 
 } // vfmsi
 
+} // blitzplusplus
+
 
 /** \cond SPECIALIZATION */
 
-namespace basi {
+namespace cpputils { namespace sliceiterator {
 
 template<int RANK, typename S> struct ConsistencyChecker<RANK,blitzplusplus::vfmsi::LeftRight<RANK/2,S> > {};
 
-} // basi
+} } // cpputils::sliceiterator
 
 /** \endcond */
 
-} // blitzplusplus
 
 
 #endif // CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED

@@ -13,7 +13,7 @@
 
 
 template<int RANK>
-class ReducedDensityOperator : private DimensionsBookkeeper<RANK,true>, public structure::ClonableElementAveraged<RANK>
+class ReducedDensityOperator : private DimensionsBookkeeper<RANK>, public structure::ClonableElementAveraged<RANK>
 {
 private:
   typedef structure::ClonableElementAveraged<RANK> Base;
@@ -24,9 +24,9 @@ public:
   
   typedef typename Base::KeyLabels KeyLabels;
   
-  typedef typename DimensionsBookkeeper<RANK,true>::Dimensions Dimensions;
+  typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
-  using DimensionsBookkeeper<RANK,true>::getDimensions; using DimensionsBookkeeper<RANK,true>::getTotalDimension;
+  using DimensionsBookkeeper<RANK>::getDimensions; using DimensionsBookkeeper<RANK>::getTotalDimension;
 
   ReducedDensityOperator(const std::string&, const Dimensions&, bool offDiagonals=false, const KeyLabels& =KeyLabels());
 

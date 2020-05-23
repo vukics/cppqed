@@ -8,7 +8,7 @@
 #include "PythonExtension.h"
 
 #include "BlitzTiny.h"
-#include "BlitzArrayTraits.h"
+#include "BlitzArray.h"
 #include "ComplexExtensions.h"
 #include "utils.h"
 
