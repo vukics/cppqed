@@ -43,12 +43,9 @@ int main(int argc, char* argv[])
   StateVector psi(qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*qbit::init(pplqb)*mode::init(pplm));
   psi.renorm();
 
-  evolve(psi,composite::make(Act<0,6>(jcCorr),
-                             Act<1,6>(jcRDO),
-                             Act<2,6>(jc),
-                             Act<3,6>(jc),
-                             Act<4,6>(jc),
-                             Act<5,6>(jc)),
+  evolve(psi,composite::make(_<0,6>(jcCorr),
+                             _<1,6>(jcRDO),
+                             _<2,6>(jc),_<3,6>(jc),_<4,6>(jc),_<5,6>(jc)),
          pe);
  
 

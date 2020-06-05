@@ -5,7 +5,9 @@
 
 #include "Pars.h"
 
-#include<iostream>
+#include <iostream>
+#include <string>
+
 
 using namespace std;
 
@@ -19,7 +21,6 @@ ostream& operator<<(ostream& os, QM_Picture qmp)
   return os;
 }
 
-#include<string>
 
 istream& operator>>(istream& is, QM_Picture& qmp) 
 {
@@ -36,8 +37,8 @@ istream& operator>>(istream& is, QM_Picture& qmp)
   return is;
 }
 
-namespace picture {
-QM_Picture& updateWithPicture(parameters::ParameterTable& p, int argc, char* argv[], const std::string& prefix)
+
+QM_Picture& picture::updateWithPicture(parameters::ParameterTable& p, int argc, char* argv[], const std::string& prefix)
 {
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
   parameters::update(p,argc,argv,prefix);
@@ -46,5 +47,4 @@ QM_Picture& updateWithPicture(parameters::ParameterTable& p, int argc, char* arg
     if (method==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
   } catch (const parameters::UnrecognisedParameterException&) {}
   return qmp;
-}
 }

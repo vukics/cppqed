@@ -3,7 +3,7 @@
 
 #include "Interaction.h"
 #include "TridiagonalHamiltonian.tcc"
-#include "StateVector.tcc"
+#include "StateVector.h"
 
 namespace basic {
 

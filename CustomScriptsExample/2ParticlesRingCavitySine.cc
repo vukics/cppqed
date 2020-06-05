@@ -37,8 +37,8 @@ int main(int argc, char **argv)
     particle::PtrPumped myParticle(particle::makePumped(ppp1,qmp));
     mode::Ptr myMode(mode::make(plm,qmp));
     
-    ParticleAlongCavity particlecavity(myMode,myParticle,ppci);
-    MomentumCorrelation mci(myParticle,myParticle);
+    auto particlecavity{std::make_shared<ParticleAlongCavity>(myMode,myParticle,ppci)};
+    auto mci{std::make_shared<MomentumCorrelation>(myParticle,myParticle)};
     
     StateVector<1> stateParticle1(particle::init(ppp1));
     StateVector<1> stateParticle2(particle::init(ppp2));
@@ -54,8 +54,8 @@ int main(int argc, char **argv)
     
     StateVector<3> psi(mode::init(plm)*stateParticles);
     
-    evolve(psi,composite::make(Act<0,1>(particlecavity),Act<0,2>(particlecavity),
-                               Act<1,2>(mci)),pe);
+    evolve(psi,composite::make(_<0,1>(particlecavity),_<0,2>(particlecavity),
+                               _<1,2>(mci)),pe);
 
 
 }

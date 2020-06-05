@@ -4,7 +4,7 @@
 
 #include "Pars.h"
 
-#include<iosfwd>
+#include <iosfwd>
 
 
 enum QM_Picture {QMP_IP, QMP_UIP, QMP_SCH};
@@ -15,8 +15,10 @@ std::istream& operator>>(std::istream&, QM_Picture&);
 
 
 namespace picture {
+  
 /// Convenience version of parameters::update meant to tackle the problem described in Sec. \ref masterequationlimitations
 QM_Picture& updateWithPicture(parameters::ParameterTable& p, int argc, char* argv[], const std::string& prefix="--");
+
 }
 
 #endif // CPPQEDELEMENTS_UTILS_QM_PICTURE_H_INCLUDED

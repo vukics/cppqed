@@ -1,9 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "VectorFromMatrixSliceIterator.h"
 
-#include <boost/range/algorithm/for_each.hpp>
-
-using boost::for_each; using tmptools::Vector;
+using tmptools::Vector;
 
 template <int RANK> using StateVector    =CArray<  RANK>;
 template <int RANK> using DensityOperator=CArray<2*RANK>;
@@ -14,15 +12,15 @@ void actWithA(StateVector<5>&);
 
 void actOnExtended(StateVector<11>& psi)
 {
-  using namespace blitzplusplus::basi;
-  for_each(fullRange<Vector<3,6,1,9,7> >(psi),actWithA);
+  using namespace cpputils::sliceiterator;
+  for(auto& psiS : fullRange<Vector<3,6,1,9,7>>(psi)) actWithA(psiS);
 }
 
 
 void composeWithA(DensityOperator<5>& rho)
 {
   using namespace blitzplusplus::vfmsi;
-  for_each(fullRange<Left>(rho),actWithA);
+  for(auto& psiS : fullRange<Left>(rho)) actWithA(psiS);
 }
 
 /*

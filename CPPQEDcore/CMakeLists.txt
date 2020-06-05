@@ -45,7 +45,7 @@ set(CPPQED_VERSION_MAJOR 2)
 #! MINOR - the milestone release, as in v2m10
 set(CPPQED_VERSION_MINOR 100)
 #! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_VERSION_PATCH 4)
+set(CPPQED_VERSION_PATCH 10)
 #! Full C++QED version
 set(CPPQED_VERSION
   "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
@@ -338,12 +338,13 @@ generate_version_files()
 include_directories(${PROJECT_BINARY_DIR}) # for generated config files
 
 # build libC++QEDcore.so
-set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory composites)
+set(CORE_SOURCE_DIRS utils quantumdata quantumoperator structure quantumtrajectory composites high)
 set(quantumdata_NEEDS utils)
 set(quantumoperator_NEEDS quantumdata structure utils)
 set(structure_NEEDS quantumdata utils)
 set(quantumtrajectory_NEEDS structure quantumdata utils)
 set(composites_NEEDS structure quantumdata utils)
+set(high_NEEDS composites quantumtrajectory structure quantumoperator quantumdata utils)
 foreach(d ${CORE_SOURCE_DIRS})
   add_subdirectory(${d})
 endforeach(d)
