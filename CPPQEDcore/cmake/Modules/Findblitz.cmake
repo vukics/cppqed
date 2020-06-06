@@ -1,4 +1,4 @@
-# Copyright Raimar Sandner 2012–2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 #! \file
 #! \ingroup FindPackage
@@ -11,7 +11,7 @@
 #! - `blitz_LIBRARIES`: link these to use blitz
 #! - `blitz_SERIALIZATION_FOUND`: true if blitz was configured with `--enable-serialization`
 #!
-#! Not that blitz will only be considered found if it is the [C++QED patched version](http://sourceforge.net/p/cppqed/blitz/ci/default/tree/).
+#! Note that blitz will only be considered found if it is the [C++QED patched version](https://github.com/vukics/blitz.git).
 #! This is checked by looking if it has `BLITZ_ARRAY_LARGEST_RANK`.
 
 include(LibFindMacros)
@@ -44,7 +44,7 @@ libfind_process(blitz)
 file(READ ${blitz_INCLUDE_DIR}/blitz/blitz.h BLITZ_H)
 string(REGEX MATCH BLITZ_ARRAY_LARGEST_RANK blitz_IS_CPPQED_VERSION ${BLITZ_H})
 if(NOT blitz_IS_CPPQED_VERSION)
-  message(FATAL_ERROR "You need the C++QED version of blitz++. The repository is at http://sourceforge.net/p/cppqed/blitz/ci/default/tree/")
+  message(FATAL_ERROR "You need the C++QED version of blitz++. The repository is at https://github.com/vukics/blitz.git")
 endif(NOT blitz_IS_CPPQED_VERSION)
 
 file(GLOB BZCONFIG ${blitz_INCLUDE_DIR}/blitz/*/bzconfig.h)

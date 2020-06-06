@@ -6,7 +6,7 @@
 #! The file structure is very simple, all the work is done by the scripts_project() macro.
 
 
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.12)
 
 project(scripts)
 

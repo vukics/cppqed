@@ -1,4 +1,4 @@
-# Copyright Raimar Sandner 2012–2015. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 #! \ingroup Main
 #! \file
@@ -7,7 +7,7 @@
 #! The file has the following structure:
 
 
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.12)
 
 project(cpypyqed)
 

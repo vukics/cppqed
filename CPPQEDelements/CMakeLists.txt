@@ -8,7 +8,7 @@
 #! generate the library, and cppqed_documentation() to generate the documentation.
 
 
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.12)
 
 project(elements)
 

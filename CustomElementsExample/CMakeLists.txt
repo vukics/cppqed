@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.12)
 
 # The project name must be unique and cannot be "elements".
 # This is ne name by which we refer to the library in scripts projects.
