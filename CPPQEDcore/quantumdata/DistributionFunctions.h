@@ -22,7 +22,7 @@ struct ParsFunctionScan {
     
   int &fCutoff;
   
-  ParsFunctionScan(parameters::ParameterTable& p, const std::string& mod="");
+  ParsFunctionScan(parameters::Table& p, const std::string& mod="");
 
 };
 

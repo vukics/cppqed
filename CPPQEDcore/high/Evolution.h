@@ -14,7 +14,7 @@
 
 
 /// Introduces ParameterTable into the global namespace to break ambiguity between update and parameters::update
-class ParameterTable : public parameters::ParameterTable {};
+class ParameterTable : public parameters::Table {};
 
 
 /// Convenience version of parameters::update that includes the highest-level version information

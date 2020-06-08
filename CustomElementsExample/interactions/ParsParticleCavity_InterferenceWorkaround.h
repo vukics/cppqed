@@ -14,7 +14,7 @@ struct ParsInterference {
   size_t& kInterference;
   double& uInterference;
 
-  ParsInterference(parameters::ParameterTable&, const std::string& ="");
+  ParsInterference(parameters::Table&, const std::string& ="");
 
 };
 

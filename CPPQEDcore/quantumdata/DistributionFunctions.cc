@@ -16,7 +16,7 @@ using namespace boost::math;
 namespace quantumdata {
 
 
-ParsFunctionScan::ParsFunctionScan(parameters::ParameterTable& p, const std::string& mod)
+ParsFunctionScan::ParsFunctionScan(parameters::Table& p, const std::string& mod)
   : fLimitXUL(p.addTitle("Distribution function scan",mod).add("fLimitXUL","",2.)),
     fLimitYUL(p.add("fLimitYUL","",2.)),
     fLimitXL(p.add("fLimitXL","",-2.)),

@@ -7,7 +7,7 @@
 namespace mode {
 
 
-Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
+Pars::Pars(parameters::Table& p, const std::string& mod)
   : cutoff(p.addTitle("Mode",mod).addMod<size_t>("cutoff",mod,"Mode cutoff",10)),
     minitFock(p.addMod<size_t>("minitFock",mod,"Mode initial Fock state",0)),
     minit(p.addMod<dcomp>("minit",mod,"Mode initial field",0)),
@@ -16,20 +16,20 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 {}
 
 
-ParsPumped::ParsPumped(parameters::ParameterTable& p, const std::string& mod)
+ParsPumped::ParsPumped(parameters::Table& p, const std::string& mod)
   : Pars(p,mod),
     eta(p.addTitle("PumpedMode",mod).addMod("eta",mod,"Cavity pump",dcomp(0)))
 {}
 
 
-ParsLossy::ParsLossy(parameters::ParameterTable& p, const std::string& mod)
+ParsLossy::ParsLossy(parameters::Table& p, const std::string& mod)
   : Pars(p,mod),
     kappa(p.addTitle("LossyMode",mod).addMod("kappa",mod,"Mode decay rate",-delta)),
     nTh  (p.addMod("nTh"  ,mod,"Mode thermal-photon number",0.))
 {}
 
 
-ParsPumpedLossy::ParsPumpedLossy(parameters::ParameterTable& p, const std::string& mod)
+ParsPumpedLossy::ParsPumpedLossy(parameters::Table& p, const std::string& mod)
   : Pars(p,mod), ParsPumped(p,mod), ParsLossy(p,mod)
 {}
 

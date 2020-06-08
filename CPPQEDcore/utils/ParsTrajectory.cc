@@ -11,7 +11,7 @@ const double ParsEvolved::epsRelDefault=1e-6;
 const double ParsEvolved::epsAbsDefault=1e-12;
 
 
-ParsRun::ParsRun(parameters::ParameterTable& p, const std::string& mod)
+ParsRun::ParsRun(parameters::Table& p, const std::string& mod)
   : T(p.addTitle("Trajectory",mod).addMod("T",mod,"Simulated time",1.)),
     dc(p.addMod("dc",mod,"Number of steps between two Displays",10)),
     Dt(p.addMod("Dt",mod,"Timestep between two Displays",.1)),
@@ -28,7 +28,7 @@ ParsRun::ParsRun(parameters::ParameterTable& p, const std::string& mod)
 {}
 
 
-ParsEvolved::ParsEvolved(parameters::ParameterTable& p, const std::string& mod)
+ParsEvolved::ParsEvolved(parameters::Table& p, const std::string& mod)
   : epsRel(p.addTitle("Evolved",mod).addMod("eps"   ,mod,"ODE stepper relative precision",epsRelDefault)),
     epsAbs(p.addMod("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
     sf(p.addMod("steppingFunction",mod,"Stepping function for EvolvedGSL",evolved::SF_RKCK)),
@@ -37,7 +37,7 @@ ParsEvolved::ParsEvolved(parameters::ParameterTable& p, const std::string& mod)
 {}
 
 
-ParsStochastic::ParsStochastic(parameters::ParameterTable& p, const std::string& mod)
+ParsStochastic::ParsStochastic(parameters::Table& p, const std::string& mod)
   : ParsEvolved(p,mod),
     seed(p.addTitle("StochasticTrajectory",mod).addMod("seed",mod,"Random number generator seed",1001ul)),
     noise(p.addMod("noise",mod,"Switching noise on/off",true)),

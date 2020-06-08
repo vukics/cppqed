@@ -25,7 +25,7 @@ void export_20_ParsMCWF_Trajectory()
     (
       "ParsMCWF",
       "Wrapper of :core:`quantumtrajectory::mcwf::Pars`",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
     )
     .PARS_PROPERTY(dpLimit)
     .PARS_PROPERTY(overshootTolerance)

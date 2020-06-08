@@ -49,7 +49,7 @@ void export_10_ParsTrajectory()
       (
         "ParsRun",
         "Wrapper of :core:`trajectory::ParsRun`",
-        init<parameters::ParameterTable&, optional<const string&> >()
+        init<parameters::Table&, optional<const string&> >()
           [with_custodian_and_ward<1,2>()]
       )
       .PARS_PROPERTY(T)
@@ -66,7 +66,7 @@ void export_10_ParsTrajectory()
       (
         "ParsEvolved",
         "Wrapper of :core:`trajectory::ParsEvolved`",
-        init<parameters::ParameterTable&, optional<const string&> >()
+        init<parameters::Table&, optional<const string&> >()
           [with_custodian_and_ward<1,2>()]
       )
       .PARS_PROPERTY(epsRel)

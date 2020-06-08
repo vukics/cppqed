@@ -15,7 +15,7 @@ typedef StateVector::Dimensions     Dimensions ;
 
 int main()
 {
-  parameters::ParameterTable p;
+  parameters::Table p;
   jaynescummings::Pars pjc(p); 
   pjc.g=dcomp(1,2);
 

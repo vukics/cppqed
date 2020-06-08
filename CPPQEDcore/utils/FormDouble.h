@@ -31,7 +31,7 @@ public:
   /// Generic overall precision accessible throughout the framework
   /** 
    * Can be set by reading in *any* variable of class FormDouble from the command line through the \link parameters parameter-bundle\endlink. 
-   * \see parameters::Parameter<formdouble::Zero>, and trajectory::ParsRun::precision, where the overallPrecision is set by the \link trajectory\endlink-bundle
+   * \see parameters::Typed<formdouble::Zero>, and trajectory::ParsRun::precision, where the overallPrecision is set by the \link trajectory\endlink-bundle
    */
   static       int overallPrecision;
 
@@ -146,16 +146,16 @@ namespace parameters {
 
 /// Specialization which enables the setting of formdouble::FormDouble::overallPrecision in a read operation
 template<>
-class Parameter<formdouble::Zero> : public Parameter<int>
+class Typed<formdouble::Zero> : public Typed<int>
 {
 public:
-  typedef Parameter<int> Base;
+  typedef Typed<int> Base;
 
-  Parameter(const std::string& s, const std::string& d, const formdouble::Zero& v) : Base(s,d,v), v_() {}
+  Typed(const std::string& s, const std::string& d, const formdouble::Zero& v) : Base(s,d,v), v_() {}
 
   const formdouble::Zero& get() const {return v_=formdouble::Zero(Base::get());}
 
-  formdouble::Zero& get() {return const_cast<formdouble::Zero&>(static_cast<const Parameter*>(this)->get());}
+  formdouble::Zero& get() {return const_cast<formdouble::Zero&>(static_cast<const Typed*>(this)->get());}
 
 protected:
   void read_v(std::istream& is) {Base::read_v(is); FormDouble::overallPrecision=get();}

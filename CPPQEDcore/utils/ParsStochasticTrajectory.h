@@ -25,7 +25,7 @@ struct ParsStochastic : ParsEvolved
   
   size_t &nTraj; ///< number of trajectories in case of ensemble averaging
 
-  ParsStochastic(parameters::ParameterTable&, const std::string& mod="");
+  ParsStochastic(parameters::Table&, const std::string& mod="");
       
 };
 

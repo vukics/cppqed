@@ -58,7 +58,7 @@ const std::shared_ptr<MCWF_Trajectory<RANK> > evolution::makeMCWF(std::shared_pt
 
 
 template<typename Base>
-evolution::Pars<Base>::Pars(parameters::ParameterTable& p, const std::string& mod) 
+evolution::Pars<Base>::Pars(parameters::Table& p, const std::string& mod) 
   : ParsRun(p,mod),
     Base(p,mod),
     evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master)",SINGLE)),

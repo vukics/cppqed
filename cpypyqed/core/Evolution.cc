@@ -12,8 +12,8 @@
 #include "QuantumSystem.h"
 
 #include "DensityOperator.h"
-#include "StateVector.tcc"
-#include "LazyDensityOperator.tcc"
+#include "StateVector.h"
+#include "LazyDensityOperator.h"
 
 #include "EnsembleMCWF.tcc"
 #include "Evolution.tcc"
@@ -100,7 +100,7 @@ void export_25_Evolution()
     class_<Pars, bases<ParsRun,quantumtrajectory::mcwf::Pars> >
       (
         "Pars", "Wrapper of :core:`evolution::Pars`",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
       [with_custodian_and_ward<1,2>()]
       )
       .PARS_PROPERTY(evol)

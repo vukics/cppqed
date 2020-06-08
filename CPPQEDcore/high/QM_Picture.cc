@@ -38,12 +38,12 @@ istream& operator>>(istream& is, QM_Picture& qmp)
 }
 
 
-QM_Picture& picture::updateWithPicture(parameters::ParameterTable& p, int argc, char* argv[], const std::string& prefix)
+QM_Picture& picture::updateWithPicture(parameters::Table& p, int argc, char* argv[], const std::string& prefix)
 {
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
   parameters::update(p,argc,argv,prefix);
   try {
-    const evolution::Method method=dynamic_cast<const parameters::Parameter<evolution::Method>&>(p["evol"]).get();
+    const evolution::Method method=dynamic_cast<const parameters::Typed<evolution::Method>&>(p["evol"]).get();
     if (method==evolution::MASTER && qmp==QMP_IP) qmp=QMP_UIP;
   } catch (const parameters::UnrecognisedParameterException&) {}
   return qmp;

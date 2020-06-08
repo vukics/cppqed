@@ -10,7 +10,7 @@ using namespace mathutils;
 
 int main(int argc, char* argv[])
 {
-  parameters::ParameterTable p;
+  parameters::Table p;
   dcomp         & alpha=p.add("alpha","",dcomp(-1,2));
   unsigned long & max  =p.add("max"  ,"",200ul      );
   

@@ -57,7 +57,7 @@ struct Pars
   double &theta, &phi;
   double &omega, &gamma;
 
-  Pars(parameters::ParameterTable&, const std::string& ="");
+  Pars(parameters::Table&, const std::string& ="");
 
 };
 

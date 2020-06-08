@@ -4,7 +4,7 @@
 #include "ExampleInteraction.h"
 
 
-using namespace parameters; using std::make_shared;
+using std::make_shared;
 
 int main(int argc, char* argv[])
 {
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   typedef quantumdata::StateVector<2> StateVector;
   StateVector psi(StateVector::Dimensions(10,20)); psi(0,0)=1;
   
-  evolve<0>(make_shared<StateVector>(psi),binary::make(make_shared<hierarchical::InteractionX_X_Correlations>(m0,m1,2.)),pe);
+  evolve<0>(psi,binary::make(make_shared<hierarchical::InteractionX_X_Correlations>(m0,m1,2.)),pe);
 
   }
   

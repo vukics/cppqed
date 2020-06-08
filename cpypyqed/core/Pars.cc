@@ -9,7 +9,7 @@ using namespace boost::python;
 
 namespace pythonext {
 
-void update(parameters::ParameterTable &p, list args, str s=str("--")){
+void update(parameters::Table &p, list args, str s=str("--")){
   int argc = len(args);
   char **argv = new char*[argc];
   for (int c=0; c<argc; c++) {
@@ -24,8 +24,8 @@ void export_05_Pars()
 {
   docstring_options docOpts;
   scope namespaceScope = parametersNameSpace;
-  class_<parameters::ParameterTable,boost::noncopyable>("ParameterTable", "Wrapper of :core:`parameters::ParameterTable`")
-    .def("printList", &parameters::ParameterTable::printList)
+  class_<parameters::Table,boost::noncopyable>("ParameterTable", "Wrapper of :core:`parameters::Table`")
+    .def("printList", &parameters::Table::printList)
     ;
   docOpts.disable_cpp_signatures();
   def("update",update,

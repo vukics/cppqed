@@ -4,7 +4,7 @@
 
 namespace parameters {
 
-class ParameterTable;
+class Table;
 
 } // parameters
 

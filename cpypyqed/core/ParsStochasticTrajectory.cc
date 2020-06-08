@@ -27,7 +27,7 @@ void export_15_ParsStochasticTrajectory()
     (
       "ParsStochastic",
       "Wrapper of :core:`trajectory::ParsStochastic`",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(seed)

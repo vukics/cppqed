@@ -14,14 +14,14 @@ struct ParsGenericPump {
   double &etaeff;
 
 protected:
-  ParsGenericPump(parameters::ParameterTable&, const std::string& ="");
+  ParsGenericPump(parameters::Table&, const std::string& ="");
 };
 
 struct ParsOrthogonal {
 
   double &uNot;
 
-  ParsOrthogonal(parameters::ParameterTable&, const std::string& ="");
+  ParsOrthogonal(parameters::Table&, const std::string& ="");
 
 };
 
@@ -30,17 +30,17 @@ struct ParsAlong : ParsOrthogonal {
   size_t &kCav;
   ModeFunctionType &modeCav;
 
-  ParsAlong     (parameters::ParameterTable&, const std::string& ="");
+  ParsAlong     (parameters::Table&, const std::string& ="");
 
 };
 
 struct ParsOrthogonalGenericPump : ParsOrthogonal, ParsGenericPump {
-  ParsOrthogonalGenericPump(parameters::ParameterTable &p, const std::string &mod="")
+  ParsOrthogonalGenericPump(parameters::Table &p, const std::string &mod="")
     : ParsOrthogonal(p,mod), ParsGenericPump(p,mod) {}
 };
 
 struct ParsAlongGenericPump : ParsAlong, ParsGenericPump {
-  ParsAlongGenericPump(parameters::ParameterTable &p, const std::string &mod="")
+  ParsAlongGenericPump(parameters::Table &p, const std::string &mod="")
     : ParsAlong(p,mod), ParsGenericPump(p,mod) {}
 };
 

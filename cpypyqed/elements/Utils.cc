@@ -13,7 +13,7 @@ using namespace boost::python;
 
 namespace pythonext{
 
-QM_Picture updateWithPicture(parameters::ParameterTable &p, list args, str s=str("--")){
+QM_Picture updateWithPicture(parameters::Table &p, list args, str s=str("--")){
   int argc = len(args);
   char **argv = new char*[argc];
   for (int c=0; c<argc; c++) {

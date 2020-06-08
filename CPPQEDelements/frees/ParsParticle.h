@@ -18,7 +18,7 @@ struct Pars
   InitialCondition &init;
   int &hoInitn;
 
-  Pars(parameters::ParameterTable&, const std::string& ="");
+  Pars(parameters::Table&, const std::string& ="");
 
   virtual ~Pars() {}
 
@@ -30,7 +30,7 @@ struct ParsPumped : Pars
   size_t &kPart;
   ModeFunctionType &modePart;
 
-  ParsPumped(parameters::ParameterTable&, const std::string& ="");
+  ParsPumped(parameters::Table&, const std::string& ="");
 
 };
 

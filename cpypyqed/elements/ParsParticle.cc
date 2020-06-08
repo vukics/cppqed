@@ -30,7 +30,7 @@ void export_ParsParticle()
   class_<particle::Pars>
     (
       "Pars",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(omrec)
@@ -41,7 +41,7 @@ void export_ParsParticle()
   class_<particle::ParsPumped, bases<particle::Pars> >
     (
       "ParsPumped",
-      init<parameters::ParameterTable&, optional<const std::string&> >() 
+      init<parameters::Table&, optional<const std::string&> >() 
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(vClass)

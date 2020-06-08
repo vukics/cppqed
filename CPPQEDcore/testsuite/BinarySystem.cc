@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
   // ****** Parameters of the Problem
   try {
 
-  parameters::ParameterTable p;
+  parameters::Table p;
 
   evolution::Pars<> pe(p); // Driver Parameters
   ParsPumpedLossyQbit pplqb(p); 

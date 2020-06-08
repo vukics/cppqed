@@ -13,7 +13,7 @@ struct ParsBichromatic : ParsPumpedLossy
   double &deltaOther;
   dcomp  &  etaOther;
 
-  ParsBichromatic(parameters::ParameterTable&, const std::string& ="");
+  ParsBichromatic(parameters::Table&, const std::string& ="");
 };
 
 } // mode

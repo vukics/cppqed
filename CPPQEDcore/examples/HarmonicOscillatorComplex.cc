@@ -21,7 +21,7 @@ void derivs(double tau, const Array& y, Array& dydt, double omega, double gamma)
 
 int main(int argc, char* argv[])
 {
-  ParameterTable pt;
+  Table pt;
 
   Pars p(pt);
 

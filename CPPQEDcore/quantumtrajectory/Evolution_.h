@@ -44,7 +44,7 @@ struct Pars : public trajectory::ParsRun, public Base {
     &timeAverage; ///< governs whether in the case of #SINGLE, time averaging should be performed (by using quantumtrajectory::TimeAveragingMCWF_Trajectory instead of quantumtrajectory::MCWF_Trajectory)
   double &relaxationTime; ///< the relaxation time in the case when time averaging is desired
 
-  Pars(parameters::ParameterTable& p, const std::string& mod="");
+  Pars(parameters::Table& p, const std::string& mod="");
 
 };
 

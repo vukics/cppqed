@@ -16,7 +16,7 @@ struct Pars
   size_t &displayLevel;
   double &delta;
 
-  Pars(parameters::ParameterTable&, const std::string& ="");
+  Pars(parameters::Table&, const std::string& ="");
 
 };
 
@@ -25,7 +25,7 @@ struct ParsPumped : virtual Pars
 {
   dcomp& eta;
 
-  ParsPumped(parameters::ParameterTable&, const std::string& ="");
+  ParsPumped(parameters::Table&, const std::string& ="");
 
 };
 
@@ -34,14 +34,14 @@ struct ParsLossy : virtual Pars
 {
   double &kappa, &nTh;
 
-  ParsLossy(parameters::ParameterTable&, const std::string& ="");
+  ParsLossy(parameters::Table&, const std::string& ="");
 
 };
 
 
 struct ParsPumpedLossy : ParsPumped, ParsLossy
 {
-  ParsPumpedLossy(parameters::ParameterTable&, const std::string& ="");
+  ParsPumpedLossy(parameters::Table&, const std::string& ="");
 };
 
 

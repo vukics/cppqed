@@ -8,7 +8,7 @@
 
 namespace particle {
 
-Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
+Pars::Pars(parameters::Table& p, const std::string& mod)
   : omrec(p.addTitle("Particle",mod).addMod("omrec",mod,"Particle recoil frequency",1.)),
     fin(p.addMod<size_t>("fin",mod,"Particle space resolution: 1<<fin",6)),
     init(p.addMod("pinit",mod,"Wavepacket initial condition for particle",InitialCondition(-.5,0,.1))),
@@ -17,7 +17,7 @@ Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
 }
 
 
-ParsPumped::ParsPumped(parameters::ParameterTable& p, const std::string& mod)
+ParsPumped::ParsPumped(parameters::Table& p, const std::string& mod)
   : Pars(p,mod),
     vClass(p.addTitle("PumpedParticle",mod).addMod("vClass",mod,"Particle effective pumping strength",-10.)),
     kPart(p.addMod<size_t>("kPart",mod,"Particle pump wavenumber",1)),

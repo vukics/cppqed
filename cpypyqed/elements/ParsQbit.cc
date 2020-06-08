@@ -36,7 +36,7 @@ void export_ParsQbit()
   class_<Pars>
     (
       "Pars",
-      init<parameters::ParameterTable&, const std::string&>()
+      init<parameters::Table&, const std::string&>()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(delta)
@@ -45,7 +45,7 @@ void export_ParsQbit()
   class_<ParsLossy<>,bases<Pars> >
     (
       "ParsLossy",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .add_property("gamma", &getgamma<>, &setgamma<>)
@@ -53,7 +53,7 @@ void export_ParsQbit()
   class_<ParsPumped,bases<Pars> >
     (
       "ParsPumped",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(eta)
@@ -61,7 +61,7 @@ void export_ParsQbit()
   class_<ParsPumpedLossy,bases<ParsPumped> >
     (
       "ParsPumpedLossy",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .add_property("gamma", &getgamma<ParsPumped>, &setgamma<ParsPumped>)
@@ -69,7 +69,7 @@ void export_ParsQbit()
   class_<ParsLossyPhaseNoise<>,bases<ParsLossy<>> >
     (
       "ParsLossyPhaseNoise",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .add_property("gamma_parallel", &getgamma_parallel<>, &setgamma_parallel<>)
@@ -77,7 +77,7 @@ void export_ParsQbit()
   class_<ParsPumpedLossyPhaseNoise,bases<ParsPumpedLossy> >
     (
       "ParsPumpedLossyPhaseNoise",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .add_property("gamma_parallel", &getgamma_parallel<ParsPumpedLossy>, &setgamma_parallel<ParsPumpedLossy>)

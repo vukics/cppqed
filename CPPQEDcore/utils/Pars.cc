@@ -31,43 +31,40 @@ parameters::AttemptedRecreationOfParameterException::AttemptedRecreationOfParame
 }
 
 
-namespace parameters {
-
-
-const ParameterBase&
-ParameterTable::operator[](const string& s) const
+const parameters::Base&
+parameters::Table::operator[](const string& s) const
 {
-  auto i=boost::find_if(table_,bind(equal_to<string>(),bind(&ParameterBase::getS,_1),boost::cref(s)));
+  auto i=boost::find_if(table_,bind(equal_to<string>(),bind(&Base::getS,_1),boost::cref(s)));
 
   if (i==table_.end()) throw UnrecognisedParameterException(s);
   return *i;
 }
 
 
-ParameterTable::ParameterTable() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), parsedCommandLine_(std::make_shared<std::string>("")) // tmwidth_ cf bool!
+parameters::Table::Table() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), parsedCommandLine_(std::make_shared<std::string>("")) // tmwidth_ cf bool!
 {
   IO_Manipulator::_(cout);
   IO_Manipulator::_(cerr);
 } 
 
 
-void ParameterTable::printList() const
+void parameters::Table::printList() const
 {
   cout<<"\nhelp       display this list\nversion    display version information\n\n";
-  boost::for_each(table_,bind(&ParameterBase::print,_1,smwidth_,tmwidth_,dmwidth_));
+  boost::for_each(table_,bind(&Base::print,_1,smwidth_,tmwidth_,dmwidth_));
   cout<<endl;
 }
 
 
 ///////////////////////////////////
 //
-// Boolean Parameter Specialization
+// Boolean Typed Specialization
 //
 ///////////////////////////////////
 
 
 template<>
-void Parameter<bool>::print_v(size_t smw, size_t tmw, size_t dmw) const
+void parameters::Typed<bool>::print_v(size_t smw, size_t tmw, size_t dmw) const
 {
   using namespace std;
   cout<<setw(smw+3)<<left<<getS()
@@ -77,20 +74,20 @@ void Parameter<bool>::print_v(size_t smw, size_t tmw, size_t dmw) const
 
 
 template<>
-void Parameter<bool>::read_v(std::istream&)
+void parameters::Typed<bool>::read_v(std::istream&)
 {
   v_=true;
 }
 
 
 template<>
-void Parameter<cpputils::BooleanNegatedProxy>::read_v(std::istream&)
+void parameters::Typed<cpputils::BooleanNegatedProxy>::read_v(std::istream&)
 {
   v_=true;
 }
 
 
-bool& ParameterTable::add(const std::string& s, const std::string& d, bool v)
+bool& parameters::Table::add(const std::string& s, const std::string& d, bool v)
 {
   bool& res=add<bool>(s,d,v);
   add("no_"+s,d,cpputils::BooleanNegatedProxy(res));
@@ -104,15 +101,7 @@ bool& ParameterTable::add(const std::string& s, const std::string& d, bool v)
 //
 ////////////////////////////
 
-// intel compiler bug
-// http://software.intel.com/en-us/forums/topic/507538
-#ifdef __INTEL_COMPILER
-namespace anonymous {}
-using namespace anonymous;
-namespace anonymous {
-#else
 namespace {
-#endif
 
 // A tagging class for introducing dummy parameters into the Table, which simply create a newline and a title at the listing.
 struct TitleLine {}; 
@@ -120,7 +109,7 @@ struct TitleLine {};
 }
 
 template<>
-void Parameter<TitleLine>::print_v(size_t, size_t, size_t) const
+void parameters::Typed<TitleLine>::print_v(size_t, size_t, size_t) const
 {
   using namespace std;
   cout<<endl<<"*** "<<getS()<<endl;
@@ -128,23 +117,23 @@ void Parameter<TitleLine>::print_v(size_t, size_t, size_t) const
 
 
 template<>
-void Parameter<TitleLine>::read_v(std::istream&)
+void parameters::Typed<TitleLine>::read_v(std::istream&)
 {
   throw UnrecognisedParameterException(getS());
 }
 
 
-ParameterTable& ParameterTable::addTitle(const std::string& s, const std::string& mod)
+parameters::Table& parameters::Table::addTitle(const std::string& s, const std::string& mod)
 {
   try {(*this)[s+mod]; throw AttemptedRecreationOfParameterException(s);}
   catch (UnrecognisedParameterException) {
-    table_.push_back(new Parameter<TitleLine>(s+mod,"",TitleLine()));
+    table_.push_back(new Typed<TitleLine>(s+mod,"",TitleLine()));
   }
   return *this;
 }
 
 
-void update(ParameterTable& table, int argc, char* argv[], const string& prefix)
+void parameters::update(parameters::Table& table, int argc, char* argv[], const string& prefix)
 {
   struct ErrorMessage {
     static const string _(const string& prefix) {return "\nSee "+prefix+"help for a list of parameters\nSupply all parameters with "+prefix+" prefix\n\n";}
@@ -184,7 +173,3 @@ void update(ParameterTable& table, int argc, char* argv[], const string& prefix)
       }
   }
 }
-
-
-
-} // parameters

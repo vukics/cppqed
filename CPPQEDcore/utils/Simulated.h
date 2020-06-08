@@ -11,7 +11,7 @@
 
 #include <boost/bind.hpp>
 
-using parameters::ParameterTable;
+using ParameterTable=parameters::Table;
 using parameters::update        ;
 using parameters::NamedException;
 

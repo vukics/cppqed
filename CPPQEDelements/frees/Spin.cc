@@ -71,7 +71,7 @@ Tridiagonal splus(Ptr spin) {return splus(spin->getDimension(),spin->getTwoS(),s
 
 
 
-Pars::Pars(parameters::ParameterTable& p, const std::string& mod)
+Pars::Pars(parameters::Table& p, const std::string& mod)
   : twoS(p.addTitle("Spin",mod).addMod<size_t>("twoS",mod,"2*s, the size of the spin (dimension: twoS+1 or spinDim)",1)),
     dim (p.addMod<size_t>("spinDim",mod,"the dimension of the truncated spin Hilbert space",0)),
     theta(p.addMod("theta",mod,"Spin orientation inclination",0.)),

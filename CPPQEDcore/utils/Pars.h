@@ -46,7 +46,7 @@ private:
 };
 
 
-/// Thrown if a certain Parameter name is not found in ParameterTable when \link ParameterTable::operator[] subscripting\endlink.
+/// Thrown if a certain Typed name is not found in Table when \link Table::operator[] subscripting\endlink.
 class UnrecognisedParameterException : public NamedException 
 {
 public: 
@@ -54,7 +54,7 @@ public:
 };
 
 
-/// Thrown if a given Parameter name is attempted to be used more than once when \link ParameterTable::add pushing\endlink to ParameterTable
+/// Thrown if a given Typed name is attempted to be used more than once when \link Table::add pushing\endlink to Table
 class AttemptedRecreationOfParameterException : public NamedException 
 {
 public: 
@@ -63,18 +63,18 @@ public:
 
 
 
-/// Common, template-parameter independent base class of Parameter, to be stored in a pointer-container in ParameterTable
+/// Common, template-parameter independent base class of Typed, to be stored in a pointer-container in Table
 /**
- * \note This class is not really part of the API, it is included here simply because \link Parameter parameters\endlink are stored in ParameterTable as a pointer container (`boost::ptr_list<ParameterBase>`).
- * The inclusion here could be avoided by resorting to a pointer-to-implementation technique in ParameterTable, however, … \see … Parameter
+ * \note This class is not really part of the API, it is included here simply because \link Typed parameters\endlink are stored in Table as a pointer container (`boost::ptr_list<Base>`).
+ * The inclusion here could be avoided by resorting to a pointer-to-implementation technique in Table, however, … \see … Typed
  */
-class ParameterBase
+class Base
 {
 public:
-  ParameterBase(const std::string& s, ///< parameter name (as appears in command line)
+  Base(const std::string& s, ///< parameter name (as appears in command line)
                 const std::string& d  ///< parameter description (to be listed in help)
                ) : s_(s), d_(d) {}
-  virtual ~ParameterBase() {}
+  virtual ~Base() {}
 
   const std::string& getS() const {return s_;}
   const std::string& getD() const {return d_;}
@@ -97,16 +97,16 @@ private:
 /// Template containing value for the given parameter
 /** \note This class is not really part of the API, it is included here simply in order that specializations of it might be declared elsewhere in the framework */
 template<typename T>
-class Parameter : public ParameterBase 
+class Typed : public Base 
 {
 public:
-  Parameter(const std::string& s, ///< parameter name (as appears in command line)
+  Typed(const std::string& s, ///< parameter name (as appears in command line)
             const std::string& d, ///< parameter description (to be listed in help)
             const T& v ///< parameter default value
-           ) : ParameterBase(s,d), v_(v) {}
+           ) : Base(s,d), v_(v) {}
 
   const T& get() const {return v_;}
-        T& get()       {return const_cast<T&>(static_cast<const Parameter*>(this)->get());}
+        T& get()       {return const_cast<T&>(static_cast<const Typed*>(this)->get());}
 
 protected:
   void read_v(std::istream& is) {is>>v_;}
@@ -128,32 +128,32 @@ private:
 
 /// The parameter table according to which the command line will be parsed by update()
 /** \see \ref userguideelementaryparameters in the \ref userguide */
-class ParameterTable
+class Table
 {
 public:
   typedef std::shared_ptr<std::string> ParsedCommandLine; ///< Type for passing the \link getParsedCommandLine parsed command line\endlink throughout the framework
 
-  ParameterTable();
+  Table();
 
   /// \name Subscription
   //@{
-  const ParameterBase& operator[](const std::string&  ) const; ///< Subscription by parameter name
-        ParameterBase& operator[](const std::string& s)        {return const_cast<ParameterBase&>(static_cast<const ParameterTable&>(*this)[s]);} ///< ” non-const version
+  const Base& operator[](const std::string&  ) const; ///< Subscription by parameter name
+        Base& operator[](const std::string& s)        {return const_cast<Base&>(static_cast<const Table&>(*this)[s]);} ///< ” non-const version
   //@}
 
   /// \name Adders
   //@{
   /// generic version
   /**
-   * In function scope, if `p` is a ParameterTable, then, e.g. a call like
+   * In function scope, if `p` is a Table, then, e.g. a call like
    * 
    *       double & omega=p.add("omega","harmonic oscillator mode frequency",1.);
    * 
-   * will add a parameter of type `double` to the ParameterTable, so that if on the highest level of the application the command line gets parsed with the update() function like
+   * will add a parameter of type `double` to the Table, so that if on the highest level of the application the command line gets parsed with the update() function like
    * 
    *       int main(int argc, char* argv[])
    *       {
-   *         // ParameterTable p declared and filled with omega with p.add(...) as above
+   *         // Table p declared and filled with omega with p.add(...) as above
    * 
    *         // parsing the command line according to p
    *         update(p,argc,argv,"--");
@@ -178,7 +178,7 @@ public:
     using namespace std;
     try {(*this)[s]; throw AttemptedRecreationOfParameterException(s);}
     catch (UnrecognisedParameterException) {
-      Parameter<T>* pptr=new Parameter<T>(s,d,v);
+      Typed<T>* pptr=new Typed<T>(s,d,v);
       table_.push_back(pptr);
       smwidth_=max(smwidth_,s.length());
       tmwidth_=max(tmwidth_,min(strlen(typeid(T).name()),maxTypeLabelLength));
@@ -189,7 +189,7 @@ public:
   
   /// Overload of add(const std::string &, const std::string &, const T &) for boolean
   /**
-   * This will create a switch, that does not require any value. It will also add to the ParameterTable an additional parameter of type BooleanNegatedProxy which is the opposite switch with a `no_` prefix.
+   * This will create a switch, that does not require any value. It will also add to the Table an additional parameter of type BooleanNegatedProxy which is the opposite switch with a `no_` prefix.
    * 
    * \see trajectory::ParsRun::displayInfo – if `--displayInfo` is present in the command line, the switch will have `true` value, but if `--no_displayInfo` is also present subsequently, the value will be `false`.
    */
@@ -203,7 +203,7 @@ public:
   }
 
   /// This adds a dummy “parameter” whose only effect is to cause a newline and a title to be printed for grouping parameters belonging to different modules in parameter \link printList listing\endlink
-  ParameterTable& addTitle(const std::string& s, const std::string& mod="");
+  Table& addTitle(const std::string& s, const std::string& mod="");
   //@}
   
   /// Print a full list of Parameters in help with name, typeID, description, and (default) value
@@ -217,7 +217,7 @@ public:
   void                    setParsedCommandLine(const std::string& s)       {        *parsedCommandLine_=s;}
 
 private:
-  typedef boost::ptr_list<ParameterBase> Impl;
+  typedef boost::ptr_list<Base> Impl;
 
   Impl table_;
 
@@ -230,8 +230,8 @@ private:
 };
 
 
-/// The function parsing the command line and putting the parameters into the ParameterTable \related ParameterTable
-void update(ParameterTable& p,
+/// The function parsing the command line and putting the parameters into the Table \related Table
+void update(Table& p,
             int argc, ///< number of words in the command line
             char* argv[], ///< content of the command line word by word
             const std::string& prefix="--" ///< prefix of parameters in the command line

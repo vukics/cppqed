@@ -21,7 +21,7 @@ struct Pars
 
   operator dcomp&() const {return g;}
 
-  Pars(parameters::ParameterTable&, const std::string& ="");
+  Pars(parameters::Table&, const std::string& ="");
 
 };
 

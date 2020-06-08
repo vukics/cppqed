@@ -29,7 +29,7 @@ void export_ParsMode()
   class_<mode::Pars>
     (
       "Pars",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(cutoff)
@@ -41,7 +41,7 @@ void export_ParsMode()
   class_<mode::ParsPumped, bases<mode::Pars> >
     (
       "ParsPumped",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(eta)
@@ -49,7 +49,7 @@ void export_ParsMode()
   class_<mode::ParsLossy, bases<mode::Pars> >
     (
       "ParsLossy",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(kappa)
@@ -58,7 +58,7 @@ void export_ParsMode()
   class_<mode::ParsPumpedLossy,bases<mode::ParsPumped,mode::ParsLossy> >
     (
       "ParsPumpedLossy",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
   ;

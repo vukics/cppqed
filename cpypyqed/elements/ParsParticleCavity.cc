@@ -28,7 +28,7 @@ void export_ParsParticleCavity()
   class_<ParsOrthogonal>
     (
       "ParsOrthogonal",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(uNot)
@@ -36,7 +36,7 @@ void export_ParsParticleCavity()
   class_<ParsAlong, bases<ParsOrthogonal> >
     (
       "ParsAlong",
-      init<parameters::ParameterTable&, optional<const std::string&> >()
+      init<parameters::Table&, optional<const std::string&> >()
         [with_custodian_and_ward<1,2>()]
     )
     .PARS_PROPERTY(kCav)
