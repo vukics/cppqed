@@ -21,14 +21,14 @@ class ParameterTable : public parameters::Table {};
 /** \note This cannot be put into an implementation file because then an incorrect `component_versions.h` file would be picked up */
 void update(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
 {
-  updateVersionstring(cppqed_component_versions());
+  cppqed_versionstring=cppqed_component_versions();
   parameters::update(p,argc,argv,prefix);
 }
 
 /// Convenience version of picture::updateWithPicture that includes the highest-level version information
 QM_Picture& updateWithPicture(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
 {
-  updateVersionstring(cppqed_component_versions());
+  cppqed_versionstring=cppqed_component_versions();
   return picture::updateWithPicture(p,argc,argv,prefix);
 }
 

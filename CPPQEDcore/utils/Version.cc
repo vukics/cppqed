@@ -14,8 +14,3 @@ std::string versionHelper()
 {
   return cppqed_versionstring + "\nAndras Vukics, vukics@users.sourceforge.net\n\nCompiled with\nBoost library collection : Version "+string(BOOST_LIB_VERSION).replace(1,1,".")+"\nGnu Scientific Library   : Version "+GSL_VERSION+"\nBlitz++ numerical library: "+BZ_PACKAGE_STRING+"\n\n";
 }
-
-void updateVersionstring(const std::string &s)
-{
-  cppqed_versionstring=s;
-}

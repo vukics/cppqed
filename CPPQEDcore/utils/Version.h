@@ -8,6 +8,5 @@ extern std::string cppqed_versionstring;
 
 std::string versionHelper();
 
-void updateVersionstring(const std::string &s);
 
 #endif // UTILS_VERSION_H_INCLUEDED
