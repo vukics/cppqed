@@ -5,7 +5,7 @@
 
 #include "Qbit_.h"
 #include "ParsQbit.h"
-#include "QM_PictureFwd.h"
+#include "QM_Picture.h"
 
 using namespace boost::python;
 
@@ -27,8 +27,8 @@ void export_Qbit()
 
     def("state0", qbit::state0); qbitNameSpace.staticmethod("state0");
     def("state1", qbit::state1); qbitNameSpace.staticmethod("state1");
-    def("init", (const StateVector<1> (*)(const dcomp&)) &qbit::init);
-    def("init", (const StateVector<1> (*)(const qbit::Pars&)) &qbit::init);
+    def("init", (StateVector<1> (*)(const dcomp&)) &qbit::init);
+    def("init", (StateVector<1> (*)(const qbit::Pars&)) &qbit::init);
     qbitNameSpace.staticmethod("init");
   }
 }

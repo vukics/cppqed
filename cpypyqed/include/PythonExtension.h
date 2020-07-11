@@ -6,6 +6,7 @@
 #include "cpypyqed_config.h"
 
 #include <boost/python.hpp>
+#include <boost/python/numpy.hpp>
 #include <boost/python/scope.hpp>
 
 #endif // CPYPYQED_INCLUDE_PYTHONEXTENSION_H_INCLUDED

@@ -1,8 +1,7 @@
 // Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 #include "Core.h"
-#include "blitz2numpy.tcc"
-#include "utils.h"
+#include "blitz2numpy.h"
 
 #include "ParsPropertyMacros.h"
 
@@ -35,13 +34,13 @@ using structure::QuantumSystem;
 
 namespace pythonext {
 
-PARS_GETTER_SETTER(Method, Pars, evol)
-PARS_GETTER_SETTER(bool, Pars, negativity)
+PARS_GETTER_SETTER(Method, Pars<>, evol)
+PARS_GETTER_SETTER(bool, Pars<>, negativity)
 
 template<int RANK>
-object py_evolve(const numeric::array &array,
-              typename structure::QuantumSystem<RANK>::Ptr sys,
-              const evolution::Pars<>& p)
+object py_evolve(const numpy::ndarray &array,
+                 typename structure::QuantumSystem<RANK>::Ptr sys,
+                 const evolution::Pars<>& p)
 {
   using namespace quantumdata;
 
@@ -55,18 +54,12 @@ object py_evolve(const numeric::array &array,
 
   typename LDO::Ptr result;
 
-  if (numeric_ndim(array) == RANK) {
-    CArray<RANK> a;
-    a.resize(numeric_shape<RANK>(array));
-    a = numpyToArray<dcomp,RANK>(array);
-    StateVector<RANK> psi(a,quantumdata::ByReference());
+  if (array.get_nd() == RANK) {
+    StateVector<RANK> psi(numpyToArray<dcomp,RANK>(array),quantumdata::ByReference());
     result = evolve(psi,sys,p);
   }
-  else if (numeric_ndim(array) == 2*RANK) {
-    CArray<2*RANK> a;
-    a.resize(numeric_shape<2*RANK>(array));
-    a = numpyToArray<dcomp, 2*RANK>(array);
-    DensityOperator<RANK> rho(a,quantumdata::ByReference());
+  else if (array.get_nd() == 2*RANK) {
+    DensityOperator<RANK> rho(numpyToArray<dcomp,2*RANK>(array),quantumdata::ByReference());
     result = evolve(rho,sys,p);
   }
   else {
@@ -97,7 +90,7 @@ void export_25_Evolution()
       .value("ENSEMBLE", ENSEMBLE)
       .value("MASTER",   MASTER)
     ;
-    class_<Pars, bases<ParsRun,quantumtrajectory::mcwf::Pars> >
+    class_<Pars<>, bases<ParsRun,quantumtrajectory::mcwf::Pars> >
       (
         "Pars", "Wrapper of :core:`evolution::Pars`",
       init<parameters::Table&, optional<const std::string&> >()
@@ -111,7 +104,7 @@ void export_25_Evolution()
 
   // In the docstring of these wrapper functions: working around a bug in doxylink which strips 'struct' from the 'structure' namespace
 #define EVOLVE_INSTANTIATIONS(z,r,data) \
-  def("evolve", (object(*)(const numeric::array &array,typename QuantumSystem<r>::Ptr,const evolution::Pars<>&))&py_evolve<r>, "Wrapper of :core:`evolve <Evolution_.h::evolve(quantumdata::StateVector< RANK >&, const ure::QuantumSystem< RANK >&, const evolution::Pars<>&)>` with RANK="#r ".");
+  def("evolve", (object(*)(const numpy::ndarray &array,typename QuantumSystem<r>::Ptr,const evolution::Pars<>&))&py_evolve<r>, "Wrapper of :core:`evolve <Evolution_.h::evolve(quantumdata::StateVector< RANK >&, const ure::QuantumSystem< RANK >&, const evolution::Pars<>&)>` with RANK="#r ".");
 BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_ADD(PYTHON_HALF_RANK,1), EVOLVE_INSTANTIATIONS, data)
 
 }

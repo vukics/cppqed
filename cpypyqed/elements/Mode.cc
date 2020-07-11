@@ -5,8 +5,8 @@
 
 #include "Mode.tcc"
 #include "ParsMode.h"
-#include "QM_PictureFwd.h"
-#include "StateVector.tcc"
+#include "QM_Picture.h"
+#include "StateVector.h"
 
 using namespace boost::python;
 
