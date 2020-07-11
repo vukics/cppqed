@@ -807,7 +807,7 @@ def main():
   (release or debug) as well as instantiating and running the test class.
   """
   op = OptionParser()
-  cp = configparser.SafeConfigParser()
+  cp = configparser.ConfigParser()
 
   op.add_option("--test", help="the name of the test, and the name of the section in the config file")
   op.add_option("--testclass", help="the name of the testclass to use, must implement run()")

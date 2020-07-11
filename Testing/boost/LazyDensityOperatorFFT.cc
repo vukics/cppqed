@@ -1,9 +1,9 @@
 // Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Particle.h"
 #include "TMP_Tools.h"
-#include "DensityOperator.tcc"
-#include "LazyDensityOperator.tcc"
-#include "LazyDensityOperatorFFT.tcc"
+#include "DensityOperator.h"
+#include "LazyDensityOperator.h"
+#include "LazyDensityOperatorFFT.h"
 
 #include <iostream>
 #include <boost/test/unit_test.hpp>
