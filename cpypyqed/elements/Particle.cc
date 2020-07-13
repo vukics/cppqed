@@ -6,8 +6,8 @@
 #include "Free.h"
 #include "Particle_.h"
 #include "ParsParticle.h"
-#include "QM_PictureFwd.h"
-#include "StateVector.tcc"
+#include "QM_Picture.h"
+#include "StateVector.h"
 
 using namespace boost::python;
 
@@ -23,10 +23,10 @@ namespace {
 BOOST_PYTHON_FUNCTION_OVERLOADS(wp_overloads,particle::wavePacket,1,2)
 BOOST_PYTHON_FUNCTION_OVERLOADS(ho_overloads,particle::hoState,1,2)
 #pragma GCC diagnostic pop
-const StateVector (*wp1)(const Pars&, bool) = &particle::wavePacket;
-const StateVector (*wp2)(const ParsPumped&, bool) = &particle::wavePacket;
-const StateVector (*ho1)(const Pars&, bool) = &particle::hoState;
-const StateVector (*ho2)(const ParsPumped&, bool) = &particle::hoState;
+StateVector (*wp1)(const Pars&, bool) = &particle::wavePacket;
+StateVector (*wp2)(const ParsPumped&, bool) = &particle::wavePacket;
+StateVector (*ho1)(const Pars&, bool) = &particle::hoState;
+StateVector (*ho2)(const ParsPumped&, bool) = &particle::hoState;
 }
 
 void export_Particle()

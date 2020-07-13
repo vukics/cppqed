@@ -1,10 +1,10 @@
 // Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 #include "Core.h"
-#include "blitz2numpy.tcc"
+#include "blitz2numpy.h"
 
-#include "StateVector.tcc"
-#include "DensityOperator.tcc"
+#include "StateVector.h"
+#include "DensityOperator.h"
 
 #include <boost/preprocessor/iteration/local.hpp>
 
@@ -24,7 +24,7 @@ struct SV_to_python
   {
     object qs = import("cpypyqed.tools.quantumstate");
     object StateVector = qs.attr("StateVector");
-    return boost::python::incref(StateVector(arrayToNumpy<CArray<RANK>,RANK>(s.getArray())).ptr());
+    return boost::python::incref(StateVector(arrayToNumpy(s.getArray())).ptr());
   }
 };
 
@@ -35,7 +35,7 @@ struct DO_to_python
   {
     object qs = import("cpypyqed.tools.quantumstate");
     object DensityOperator = qs.attr("DensityOperator");
-    return boost::python::incref(DensityOperator(arrayToNumpy<CArray<2*RANK>,2*RANK>(d.getArray())).ptr());
+    return boost::python::incref(DensityOperator(arrayToNumpy(d.getArray())).ptr());
   }
 };
 

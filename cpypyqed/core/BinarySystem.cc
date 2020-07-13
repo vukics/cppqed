@@ -22,7 +22,7 @@ void export_QuantumSystem_BinarySystem()
     scope namespaceScope = binaryNameSpace;
     class_<binary::Base, bases<QuantumSystem<2> >, boost::noncopyable >
       ("Base", "Wrapper of :core:`binary::Base`", no_init);
-    def("make", binary::doMake, "Wrapper of :core:`binary::make`",
+    def("make", binary::make, "Wrapper of :core:`binary::make`",
         with_custodian_and_ward_postcall<0, 1>()
     );
     binaryNameSpace.staticmethod("make");

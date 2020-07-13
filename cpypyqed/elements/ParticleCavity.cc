@@ -18,25 +18,25 @@ void export_ParticleCavity()
   class_<ParticleAlongCavity, bases<structure::Interaction<2> >, boost::noncopyable >
     (
       "ParticleAlongCavity",
-      init<const ModeBase&, const ParticleBase&, const ParsAlong&>()
+      init<mode::Ptr, particle::Ptr, const ParsAlong&>()
         [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()]
     )
-    .def(init<const ModeBase&, const ParticleBase&, const ParsAlong&, double>()
+    .def(init<mode::Ptr, particle::Ptr, const ParsAlong&, double>()
         [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()])
-    .def(init<const ModeBase&, const PumpedParticleBase&, const ParsAlong&>()
+    .def(init<mode::Ptr, particle::PtrPumped, const ParsAlong&>()
         [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()])
   ;
   class_<ParticleOrthogonalToCavity, bases<structure::Interaction<2> >, boost::noncopyable >
     (
       "ParticleOrthogonalToCavity",
-      init<const ModeBase&, const PumpedParticleBase&, const ParsOrthogonal& >()
+      init<mode::Ptr, particle::PtrPumped, const ParsOrthogonal& >()
         [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4> > >()]
     )
   ;
   class_<ParticleTwoModes, bases<structure::Interaction<3> >, boost::noncopyable >
     (
       "ParticleTwoModes",
-      init<const ModeBase&, const ModeBase&, const ParticleBase&, const ParsAlong&, const ParsAlong& >()
+      init<mode::Ptr, mode::Ptr, particle::Ptr, const ParsAlong&, const ParsAlong& >()
         [with_custodian_and_ward<1,2, with_custodian_and_ward<1,3, with_custodian_and_ward<1,4, with_custodian_and_ward<1,5, with_custodian_and_ward<1,6> > > > >()]
     )
   ;
