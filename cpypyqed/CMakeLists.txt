@@ -32,10 +32,10 @@ message(STATUS "Debug: ${PYTHON_EXECUTABLE}")
 find_package(CPPQED 2.100 REQUIRED)
 include(${CPPQED_USE})
 if(NOT PYTHONINTERP_FOUND)
-  find_package(PythonInterp 3.6 REQUIRED)
+  find_package(PythonInterp 3.5 REQUIRED)
 endif()
-find_package(PythonLibs 3.6 REQUIRED)
-find_package(Boost 1.67 QUIET REQUIRED COMPONENTS python36 numpy36)
+find_package(PythonLibs 3.5 REQUIRED)
+find_package(Boost QUIET REQUIRED COMPONENTS python)
 find_package(Numpy REQUIRED)
 
 include(PythonSetup)
@@ -46,7 +46,7 @@ include_directories(${CPPQED_INCLUDE_DIRS})
 include_directories(SYSTEM ${NUMPY_INCLUDE_DIRS})
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
-SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} Boost::python36 Boost::numpy36)
+SET(MANDATORY_LIBRARIES ${CPPQED_LIBRARIES} ${Boost_PYTHON3_LIBRARY})
 
 #! \file
 #! <!--#########################################################-->
