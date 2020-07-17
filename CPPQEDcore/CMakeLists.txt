@@ -223,7 +223,7 @@ endif()
 if( blitz_SERIALIZATION_FOUND )
   message(STATUS "Blitz++ built with serialization support.")
 else( blitz_SERIALIZATION_FOUND )
-  message(STATUS "Blitz++ built without serialization support. Please configure blitz with --enable-serialization to enable optional binary statevector output.")
+  message(STATUS "Blitz++ built without serialization support. Please configure blitz with '-D ENABLE_SERIALISATION=ON' to enable optional binary statevector output.")
   set(CPPQED_SERIALIZATION_FOUND 0)
 endif( blitz_SERIALIZATION_FOUND )
 
