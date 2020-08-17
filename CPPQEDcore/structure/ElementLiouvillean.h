@@ -6,9 +6,12 @@
 #include "Liouvillean.h"
 #include "ElementLiouvilleanAveragedCommon.h"
 
-#include <boost/function.hpp>
+#include <boost/range/algorithm/transform.hpp>
 
 #include <boost/mpl/for_each.hpp>
+
+#include <functional>
+
 
 namespace mpl=boost::mpl;
 
@@ -233,16 +236,16 @@ public:
 
   /// Strategy functional for acting with a given Lindblad operator (= performing a given jump) on a state
   /** The actual signature of the functional is decided on the basis of IS_TIME_DEPENDENT using the compile-time *if*-construct \refBoostConstruct{if_c,mpl/doc/refmanual/if-c.html}. */
-  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<void  (double,       StateVectorLow&     )>,boost::function<void  (      StateVectorLow&     )> >::type JumpStrategy;
+  typedef typename mpl::if_c<IS_TIME_DEPENDENT,std::function<void  (double,       StateVectorLow&     )>,std::function<void  (      StateVectorLow&     )> >::type JumpStrategy;
   /// Strategy functional for calculating from a state the jump rate corresponding to a given Lindblad
-  typedef typename mpl::if_c<IS_TIME_DEPENDENT,boost::function<double(double, const LazyDensityOperator&)>,boost::function<double(const LazyDensityOperator&)> >::type JumpRateStrategy;
+  typedef typename mpl::if_c<IS_TIME_DEPENDENT,std::function<double(double, const LazyDensityOperator&)>,std::function<double(const LazyDensityOperator&)> >::type JumpRateStrategy;
   
   typedef typename mpl::if_c<IS_TIME_DEPENDENT,
-                            boost::function<void(double, const DensityOperatorLow&, DensityOperatorLow&)>,
-                            boost::function<void(        const DensityOperatorLow&, DensityOperatorLow&)> >::type SuperoperatorStrategy;
+                             std::function<void(double, const DensityOperatorLow&, DensityOperatorLow&)>,
+                             std::function<void(        const DensityOperatorLow&, DensityOperatorLow&)> >::type SuperoperatorStrategy;
 };
 
-  
+
 /// Besides ElementLiouvillean, this is another solution based on the strategy idiom to control the number of Lindblads @ compile time
 /**
  * \tparamRANK
@@ -281,11 +284,32 @@ protected:
     : Base(keyTitle,il), jumps_(jumps), jumpRates_(jumpRates) {}
 
 private:
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final;
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final
+  {
+    Rates rates(NLINDBLADS); // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final;
+    boost::transform(jumpRates_,rates.begin(),
+                     [&](const auto& jrs) -> double {
+                       if constexpr (IS_TIME_DEPENDENT) return jrs(t,matrix);
+                       else return jrs(matrix);
+                     });
+    
+    return rates;
+  }
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final;
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final
+  {
+    if constexpr (IS_TIME_DEPENDENT) jumps_(lindbladNo)(t,psi);
+    else jumps_(lindbladNo)(psi);
+  }
+
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final
+  {
+    if (superoperatorStrategies_(lindbladNo)==nullptr) throw SuperoperatorNotImplementedException(lindbladNo);
+
+    if constexpr (IS_TIME_DEPENDENT) superoperatorStrategies_(lindbladNo)(t,rho,drhodt);
+    else superoperatorStrategies_(lindbladNo)(rho,drhodt);
+  }
   
   const JumpStrategies     jumps_    ;
   const JumpRateStrategies jumpRates_;
