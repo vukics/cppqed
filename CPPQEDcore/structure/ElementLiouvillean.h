@@ -29,7 +29,7 @@ class Base
 {
 protected:
   /// A tagging class for Lindblad
-  template<int LINDBLAD_ORDINAL, typename OTHER=typename boost::enable_if_c< (LINDBLAD_ORDINAL<NLINDBLADS) >::type>
+  template<int LINDBLAD_ORDINAL, typename=std::enable_if_t< (LINDBLAD_ORDINAL<NLINDBLADS) > >
   class LindbladNo : mpl::int_<LINDBLAD_ORDINAL> {};
 
 };
@@ -44,20 +44,25 @@ protected:
  * \tparam IS_TIME_DEPENDENT governs time dependence
  * \tparam NLINDBLADS the total number of Lindblads
  * 
- * In the case of the _::typeErasedActWithJ and _::typeErasedRate functions, the simultaneous use of the type-erasure & non-virtual interface idioms is notable
+ * In the case of the _::typeErased… functions, the simultaneous use of the type-erasure & non-virtual interface idioms is notable
+ * (on the other hand, we do override inherited non-virtual functions…)
  * 
  */
-template<int RANK, int LINDBLAD_ORDINAL, bool IS_TIME_DEPENDENT, int NLINDBLADS=LINDBLAD_ORDINAL+1>
+template<int RANK, int LINDBLAD_ORDINAL, bool IS_TIME_DEPENDENT, int NLINDBLADS>
 class _ : public mpl::if_c< (LINDBLAD_ORDINAL>0) ,_<RANK,LINDBLAD_ORDINAL-1,IS_TIME_DEPENDENT,NLINDBLADS>,Base<NLINDBLADS> >::type
 {
-public:
+protected:
   typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
   
   /// calls the virtual doActWithJ for the given LINDBLAD_ORDINAL
-  void typeErasedActWithJ(Time t, typename quantumdata::Types<RANK>::StateVectorLow& psi) const {doActWithJ(t,psi,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
-  
+  void typeErasedActWithJ(Time t,
+                          typename quantumdata::Types<RANK>::StateVectorLow& psi
+                         ) const {doActWithJ(t,psi,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
+
   /// calls the virtual rate for the given LINDBLAD_ORDINAL
-  double typeErasedRate(Time t, const quantumdata::LazyDensityOperator<RANK>& matrix) const {return rate(t,matrix,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
+  double typeErasedRate(Time t,
+                        const quantumdata::LazyDensityOperator<RANK>& matrix
+                       ) const {return rate(t,matrix,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
 
   void typeErasedActWithSuperoperator(Time t,
                                       const typename quantumdata::Types<RANK>::DensityOperatorLow& rho,
@@ -102,9 +107,9 @@ struct ElementLiouvilleanException : cpputils::TaggedException
  * \see Sec. \ref hierarchicaloscillator of the structure-bundle guide for an example of usage 
  * 
  */
-template<int RANK, int NLINDBLADS=1, bool IS_TIME_DEPENDENT=false>
+template<int RANK, int NLINDBLADS, bool IS_TIME_DEPENDENT=false>
 class ElementLiouvillean : public ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >,
-                           public lindblad::_<RANK,NLINDBLADS-1,false>
+                           public lindblad::_<RANK,NLINDBLADS-1,false,NLINDBLADS>
 {
 private:
   typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
@@ -120,57 +125,41 @@ protected:
   ElementLiouvillean(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
 private:
-  struct Average
-  {
-    template<typename T>
-    void operator()(T) const {rates_(T::value)=static_cast<const lindblad::_<RANK,T::value,false,NLINDBLADS>*const>(ptr_)->typeErasedRate(t_,matrix_);}
-
-    const ElementLiouvillean*const ptr_;
-    Rates& rates_;
-    const Time t_;
-    const LazyDensityOperator& matrix_;    
-  };
-
   const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final
   {
     Rates rates(NLINDBLADS);
-    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(Average{this,rates,t,matrix});
+/*
+ * if 'this' is not captured, it’s an error ("'this' cannot be implicitly captured in this context"),
+ * while if it’s captured, it’s a warning ("lambda capture 'this' is not used"), so we disable the warning
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-lambda-capture"
+    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,&rates,t,&matrix](auto arg) {
+      using T = decltype(arg);
+      rates(T::value)=lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedRate(t,matrix);
+    });
     return rates;
   }
 
-  struct ActWithJ
-  {
-    template<typename T>
-    void operator()(T) const {if (T::value==lindbladNo_) static_cast<const lindblad::_<RANK,T::value,false,NLINDBLADS>*const>(ptr_)->typeErasedActWithJ(t_,psi_);}
-
-    const ElementLiouvillean*const ptr_;
-    const Time t_;
-    StateVectorLow& psi_;
-    const size_t lindbladNo_;
-  };
 
   void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
-    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(ActWithJ{this,t,psi,lindbladNo});
+    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&psi,lindbladNo](auto arg) {
+      using T = decltype(arg);
+      if (T::value==lindbladNo) lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedActWithJ(t,psi);
+    });
   }
   
-  struct ActWithSuperoperator
-  {
-    template<typename T>
-    void operator()(T) const {if (T::value==lindbladNo_) static_cast<const lindblad::_<RANK,T::value,false,NLINDBLADS>*const>(ptr_)->typeErasedActWithSuperoperator(t_,rho_,drhodt_);}
-
-    const ElementLiouvillean*const ptr_;
-    const Time t_;
-    const DensityOperatorLow& rho_;
-    DensityOperatorLow& drhodt_;
-    const size_t lindbladNo_;
-  };
 
   void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
-    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >(ActWithSuperoperator{this,t,rho,drhodt,lindbladNo});    
+    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&rho,&drhodt,lindbladNo](auto arg) {
+      using T = decltype(arg);
+      if (T::value==lindbladNo) lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedActWithSuperoperator(t,rho,drhodt);
+    });
+#pragma GCC diagnostic pop
   }
 
 };

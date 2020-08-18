@@ -21,10 +21,10 @@
 
 
 
-class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillean<1>, public qbit::Averaged
+class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillean<1,1>, public qbit::Averaged
 {
 public:
-  typedef structure::ElementLiouvillean<1> Base;
+  typedef structure::ElementLiouvillean<1,1> Base;
   typedef Base::StateVectorLow StateVectorLow;
   typedef Base::LazyDensityOperator LazyDensityOperator;
 
