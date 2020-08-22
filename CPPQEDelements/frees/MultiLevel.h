@@ -3,8 +3,8 @@
 #ifndef   CPPQEDELEMENTS_FREES_MULTILEVEL_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_MULTILEVEL_H_INCLUDED
 
-#include "MLJC.tcc"
-#include "MultiLevel.tcc"
+#include "MLJC.h"
+#include "MultiLevel_.h"
 #include "ParsMLJC.h"
 #include "ParsMultiLevel.h"
 #include "Sigma.h"

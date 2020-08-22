@@ -15,7 +15,16 @@
 
 #include "primitive.hpp"
 
+#include <boost/fusion/sequence/intrinsic/at_c.hpp>
+// #include<boost/fusion/container/generation/make_list.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/algorithm/iteration/for_each.hpp>
+
+#include <boost/fusion/mpl/at.hpp>
 #include <boost/fusion/mpl/size.hpp>
+
+#include <boost/mpl/for_each.hpp>
+
 
 /*
 
@@ -35,8 +44,6 @@ to
 
 */
 
-
-
 /// Contains helpers for the \ref multilevelbundle "MultiLevel bundle"
 namespace multilevel {
 
@@ -45,6 +52,17 @@ const std::string keyTitle="MultiLevel";
 
 
 using namespace structure::freesystem; using structure::NoTime;
+
+// using boost::fusion::make_list;
+using boost::fusion::make_vector;
+
+
+namespace result_of {
+
+// using boost::fusion::result_of::make_list;
+using boost::fusion::result_of::make_vector;
+
+} // result_of
 
 
 
@@ -68,9 +86,13 @@ public:
   const L& get_zIs() const {return zIs_;}
 
 private:
-  void updateU(double) const;
+  void updateU(double dtdid) const {
+    boost::transform(zIs_,getDiagonal().begin(),[=](const dcomp& zI) {return exp(-zI*dtdid);});
+  }
 
-  bool applicableInMaster_v() const;
+  bool applicableInMaster_v() const {
+    return !boost::accumulate(zIs_.begin(),false,[](bool init, const dcomp& zI) {return init || hasRealPart(zI);});
+  }
 
   const L zIs_;
 
@@ -87,14 +109,18 @@ private:
 
 using cpputils::primitive;
 
-/// Class representing an elementary pump term (an \f$\eta_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
-template<int I, int J>
-class Pump : public primitive<dcomp>, public tmptools::pair_c<I,J>
+
+template<typename T, int I, int J>
+class DynamicsPair : public primitive<T>, public tmptools::pair_c<I,J>
 {
 public:
-  using primitive<dcomp>::primitive;
+  using primitive<T>::primitive;
 
 };
+
+
+/// Class representing an elementary pump term (an \f$\eta_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
+template<int I, int J> using Pump = DynamicsPair<dcomp,I,J>;
 
 
 template<int NL, typename VP>
@@ -121,6 +147,7 @@ private:
 };
 
 
+
 template<int NL, typename VP>
 class HamiltonianSch 
   : public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
@@ -135,8 +162,15 @@ public:
   const L& get_zSchs() const {return zSchs_;}
 
 private:
-  void addContribution_v(NoTime, const StateVectorLow&, StateVectorLow&) const;
-
+  void addContribution_v(NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const {
+    mpl::for_each<tmptools::Ordinals<NL>>([&](auto arg) {const int ind=decltype(arg)::value; dpsidt(ind)+=-zSchs_(ind)*psi(ind);});
+    for_each(etas_,[&](auto pump) {
+      using P=decltype(pump);
+      typename P::template SanityCheck<0,NL-1>(); // A temporary variable to instantiate the SanityCheck member template
+      dpsidt(P::first )+=conj(pump.get())*psi(P::second);
+      dpsidt(P::second)-=     pump.get() *psi(P::first );
+    });
+  }
 
   const L zSchs_;
 
@@ -153,13 +187,7 @@ private:
 
 
 /// Class representing an elementary decay term (a \f$\gamma_{ij}\f$ \ref multilevelelements "here") with a compile-time pair \f$i,j\f$ and a runtime real value
-template<int I, int J>
-class Decay : public primitive<double>, public tmptools::pair_c<I,J>
-{
-public:
-  using primitive<double>::primitive;
-
-};
+template<int I, int J> using Decay = DynamicsPair<double,I,J>;
 
 
 template<int NL, typename VL, bool IS_DIFFUSIVE, int ORDO>
@@ -171,23 +199,30 @@ private:
 protected:
   using Base::Base; using Base::NRT; using Base::gammas_;
   
-  typedef typename Base::template LindbladNo<ORDO> LindbladOrdo; // shouldn’t be named LindbladNo, as then it would be confused with the LindbladNo in the direct base, 
-                                                                 // which is not a template
-  
 private:
-  void doActWithJ(NoTime, StateVectorLow&, LindbladOrdo) const override;
-  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const override;
-  void doActWithSuperoperator(NoTime, const DensityOperatorLow&, DensityOperatorLow&, LindbladOrdo) const override;
+  void doActWithJ(NoTime, StateVectorLow& psi, typename Base::template LindbladNo<ORDO>) const override
+  {
+    typedef typename mpl::at_c<VL,ORDO>::type Decay;
+    typename Decay::template SanityCheck<0,NL-1>();
+    dcomp temp(sqrt(2.*boost::fusion::at_c<ORDO>(gammas_).get())*psi(Decay::second));
+    psi=0;
+    psi(Decay::first)=temp;
+  }
+  
+  double rate(NoTime, const LazyDensityOperator& matrix, typename Base::template LindbladNo<ORDO>) const override
+  {
+    typedef typename mpl::at_c<VL,ORDO>::type Decay;
+    return 2.*boost::fusion::at_c<ORDO>(gammas_).get()*matrix(Decay::second);    
+  }
+  
+  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, typename Base::template LindbladNo<ORDO>) const override
+  {
+    typedef typename mpl::at_c<VL,ORDO>::type Decay;
+    drhodt(Decay::first,Decay::first)+=2.*boost::fusion::at_c<ORDO>(gammas_).get()*rho(Decay::second,Decay::second);
+  }
 
 };
 
-
-namespace details {
-
-template<int ORDO>
-void doReallyActWithSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double) {} // trivial implementation for ORDO\neq0
-
-} // details
 
 template<int NL, typename VL, int ORDO>
 class LiouvilleanDiffusive : public LiouvilleanDiffusive<NL,VL,ORDO-1>
@@ -202,8 +237,22 @@ protected:
   
 private:
   void doActWithJ(NoTime, StateVectorLow& psi, LindbladOrdo) const override {psi*=sqrt(2.*gamma_parallel_); psi(ORDO)*=-1.;}
+  
   double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const override {return -1;}
-  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladOrdo) const override {details::doReallyActWithSuperoperator<ORDO>(rho,drhodt,gamma_parallel_);}
+
+  /* The trick is that this single function takes care of the superoperator of the phase diffusion of all the levels,
+   * which are highly degenerate, and easily treated in their sum over all the levels */
+  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladOrdo) const override {
+    if constexpr (!ORDO) {
+      for (int m=0; m<rho.ubound(0); ++m) {
+        drhodt(m,m)+=2*gamma_parallel_*rho(m,m);
+        for (int n=m+1; n<rho.ubound(1); ++n) {
+          drhodt(m,n)-=6*gamma_parallel_*rho(m,n);
+          drhodt(n,m)-=6*gamma_parallel_*rho(n,m);
+        }
+      }
+    }
+  }
 
 };
 
@@ -243,14 +292,19 @@ class LiouvilleanBase : public BASE_class // takes care of key composition
 private:
   typedef BASE_class Base;
 #undef BASE_class
-  class KeyHelper;
   typedef typename Base::KeyLabels KeyLabels;
-  static const KeyLabels fillKeyLabels();
   
 protected:
   static const int NRT=mpl::size<VL>::value; // number of transitions with radiative loss
 
-  LiouvilleanBase() : Base(keyTitle,fillKeyLabels()) {}
+  LiouvilleanBase() : Base(keyTitle,[] {
+    KeyLabels res;
+    mpl::for_each<VL>([&](auto arg) {res.push_back("Jump "+std::to_string(decltype(arg)::second)+" -> "+std::to_string(decltype(arg)::first));});
+    if constexpr (IS_DIFFUSIVE) 
+      mpl::for_each<tmptools::Ordinals<NL>>([&](auto arg) {res.push_back("Phase flip for level "+std::to_string(decltype(arg)::value));});
+    return res;
+  } () /* this double parenthesis syntax is required to actually run the lambda */ ) {}
+  
   LiouvilleanBase(double) : LiouvilleanBase() {}
   
 };
@@ -299,6 +353,17 @@ public:
 };
 
 
+namespace multilevel {
+
+auto elementaryComplexFreqs(structure::DynamicsBase::ComplexFreqs& cf, const std::string& label)
+{
+  return [&](auto eta) {cf.push_back({label+std::to_string(decltype(eta)::first)+std::to_string(decltype(eta)::second),eta.get(),1.});} ;
+}
+
+} // multilevel
+
+
+
 /// Implements a free multi-level system with driving and loss \see \ref multilevelbundle
 /**
  * \tparam NL number of levels
@@ -326,13 +391,32 @@ public:
   typedef typename Base::Ptr Ptr;
 
   template<typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealPerLevel&, const VP&, const VL&, double gamma_parallel, AveragingConstructorParameters&&...);
+  PumpedLossyMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, double gamma_parallel, AveragingConstructorParameters&&... a)
+    : Hamiltonian([&] {
+        ComplexPerLevel res(deltas); res*=-DCOMP_I;
+        for_each(gammas,[&](auto gamma) {res(decltype(gamma)::second)+=gamma.get();});
+        return res;
+      } (), etas),
+      Liouvillean(gammas,gamma_parallel),
+      Base([this,gamma_parallel] {
+        structure::DynamicsBase::RealFreqs res;
+        for (int i=0; i<NL; i++) if (!hasRealPart(this->get_zSchs()(i))) res.push_back({"delta"+std::to_string(i),-imag(this->get_zSchs()(i)),1.});
+        res.push_back({"gamma_parallel",gamma_parallel,1.});
+        return res;
+      } () , [this,&etas] {
+        structure::DynamicsBase::ComplexFreqs res;
+        for (int i=0; i<NL; i++) if (hasRealPart(this->get_zSchs()(i))) res.push_back({"(gamma"+std::to_string(i)+",-delta"+std::to_string(i)+")",this->get_zSchs()(i),1.});
+        for_each(etas,multilevel::elementaryComplexFreqs(res,"eta"));
+        return res;        
+      } () ),
+      AveragingType(std::forward<AveragingConstructorParameters>(a)...)
+  {
+    this->getParsStream()<<"Schroedinger picture.\n";
+  }
 
 };
-// VP is a compile-time container of pairs, specifying which
-// transitions are pumped It should model a Boost.Fusion sequence,
-// which stores the pairs for compile-time use and the pump Rabi
-// frequencies for run-time use.
+// VP is a compile-time container of pairs, specifying which transitions are pumped. It should model a Boost.Fusion sequence,
+// which stores the pairs for compile-time use and the pump Rabi frequencies for run-time use.
 
 
 

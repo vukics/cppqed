@@ -9,17 +9,13 @@
 
 #include "Interaction.h"
 
+#include "Sigma.h"
+
 #include <boost/fusion/algorithm/transformation/transform.hpp>
 
 
 /// Class representing an elementary coupling term (a \f$g_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
-template<int I, int J>
-class Coupling : public cpputils::primitive<dcomp>, public tmptools::pair_c<I,J>
-{
-public:
-  using cpputils::primitive<dcomp>::primitive;
-
-};
+template<int I, int J> using Coupling = multilevel::DynamicsPair<dcomp,I,J>;
 
 
 namespace mljc {
@@ -32,27 +28,62 @@ public:
 
   typedef typename MultiLevelBase<NL>::Ptr MultiLevelPtr;
 
-  Base(MultiLevelPtr, mode::Ptr, const VC&);
+  Base(MultiLevelPtr ml, mode::Ptr mode, const VC& gs) 
+    : structure::Interaction<2>({ml,mode},{},[&] {
+        structure::DynamicsBase::ComplexFreqs res;
+        for_each(gs,multilevel::elementaryComplexFreqs(res,"g"));
+        return res;
+      } () ),
+      mds_(modeDynamicsMaker(gs,ml,mode))
+  {
+    getParsStream()<<"Multi-Level Jaynes-Cummings\n";
+  }
 
 private:
-  class ElementaryCoupling;
+  void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
+  {
+    boost::fusion::for_each(mds_, [&] (const auto& modeDynamics) {
+      using MD=std::decay_t<decltype(modeDynamics)>;
+      
+      quantumoperator::Sigma<MD::first,MD::second> sigma;
 
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; 
+      Tridiagonal& 
+        a      (modeDynamics.a      .propagate(t-t0)),
+        adagger(modeDynamics.adagger.propagate(t-t0));
 
-  template<int,int>
-  struct ModeDynamics;
+      // Note that the multiplication with -g and conj(g) has already
+      // been taken care of by ModeDynamics above
+      
+      (sigma         *adagger).apply(psi,dpsidt);
+      (sigma.dagger()*a      ).apply(psi,dpsidt);
+    });
+  }
+
+  template<int N1, int N2>
+  struct ModeDynamics : public tmptools::pair_c<N1,N2>
+  {
+    ModeDynamics(MultiLevelPtr ml, mode::Ptr mode, const dcomp& g)
+      : a      (-g*mode::aop(mode)),
+        adagger((g*mode::aop(mode)).dagger())
+    {
+      if (dynamic_cast<const multilevel::Exact<NL>*>(ml.get())) throw multilevel::MultiLevelExactNotImplementedException();
+    }
+
+    mutable Tridiagonal a, adagger;
+
+  };
 
 
   class CouplingToModeDynamics
   {
   public:
     CouplingToModeDynamics(MultiLevelPtr ml, mode::Ptr mode) : ml_(ml), mode_(mode) {}
-    
+
     template<typename> struct result;
 
     template<typename T, typename C>
     struct result<T(const C&)> : mpl::identity<ModeDynamics<C::first,C::second> > {};
-
+   
     template<typename C>
     const ModeDynamics<C::first,C::second>
     operator()(const C& coupling) const 
@@ -66,10 +97,17 @@ private:
     
   };
 
-
-  typedef typename boost::fusion::result_of::transform<VC const,CouplingToModeDynamics>::type ModeDynamicss;
+  static auto modeDynamicsMaker(const VC& gs, MultiLevelPtr ml, mode::Ptr mode)
+  {
+    return boost::fusion::transform(gs,CouplingToModeDynamics(ml,mode));
+    /*Here, the generic lambda doesn’t seem to be a good enough solution, since we need the result of fusion::transform as well (cf. below)
+     * [=] (const auto& coupling) -> ModeDynamics<std::decay_t<decltype(coupling)>::first,std::decay_t<decltype(coupling)>::second> {
+      using C=std::decay_t<decltype(coupling)>;
+      return ModeDynamics<C::first,C::second>(ml,mode,coupling.get());
+    }*/
+  }  
   
-  const ModeDynamicss mds_;
+  const std::invoke_result_t<decltype(&Base::modeDynamicsMaker), const VC&, MultiLevelPtr, mode::Ptr> mds_;
 
 };
 
