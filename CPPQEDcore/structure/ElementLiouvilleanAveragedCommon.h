@@ -31,12 +31,15 @@ protected:
   /// \copydoc getTitle
   ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsInitializer il) : keyPrinter_(keyTitle,il) {}
 
+  const cpputils::KeyPrinter& getKeyPrinter() const {return keyPrinter_;}
+        cpputils::KeyPrinter& getKeyPrinter()       {return const_cast<cpputils::KeyPrinter&>(static_cast<const ElementLiouvilleanAveragedCommon*>(this)->getKeyPrinter());}
+  
 private:
   size_t nAvr_v() const final {return keyPrinter_.length();}
 
   std::ostream& displayKey_v(std::ostream& os, size_t& i) const final {return keyPrinter_.displayKey(os,i);}
 
-  const cpputils::KeyPrinter keyPrinter_;
+  cpputils::KeyPrinter keyPrinter_;
 
 };
 

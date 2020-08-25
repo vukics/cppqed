@@ -34,15 +34,17 @@ public:
   size_t        length    ()                       const {return keyLabels_.size();} ///< number of elements in the key
   std::ostream& displayKey(std::ostream&, size_t&) const; ///< displays the stored key in a nicely tabulated format
 
-  /// \name Getters
+  /// \name Getters/setters
   //@{
   const std::string& getTitle () const {return keyTitle_ ;}
   const KeyLabels  & getLabels() const {return keyLabels_;}
+        KeyLabels  & getLabels()       {return const_cast<KeyLabels&>(static_cast<const KeyPrinter*>(this)->getLabels());}
+  
   //@}
   
 private:
   const std::string keyTitle_ ;  
-  const KeyLabels   keyLabels_;
+  KeyLabels keyLabels_;
 };
 
 

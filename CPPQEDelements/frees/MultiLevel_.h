@@ -190,11 +190,43 @@ private:
 template<int I, int J> using Decay = DynamicsPair<double,I,J>;
 
 
-template<int NL, typename VL, bool IS_DIFFUSIVE, int ORDO>
-class LiouvilleanRadiative : public LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO-1>
+template<int NL, typename VL, int ORDO>
+class LiouvilleanRadiative;
+
+
+// With ORDO=-1, this doesn’t correspond to valid jumps, its function is to store data, fill keyLabels, etc.:
+template<int NL, typename VL>
+class LiouvilleanRadiative<NL,VL,-1> : public structure::ElementLiouvillean<1, mpl::size<VL>::value>
 {
 private:
-  typedef LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,ORDO-1> Base;
+  typedef structure::ElementLiouvillean<1, mpl::size<VL>::value> Base;
+
+  typedef typename Base::KeyLabels KeyLabels;
+  
+protected:
+  static const int NRT=mpl::size<VL>::value; // number of transitions with radiative loss
+
+  LiouvilleanRadiative(const VL& gammas,
+                       double = 0. ///< dummy to conform with LiouvilleanDiffusive
+                      )
+    : Base(keyTitle,[] {
+        KeyLabels res;
+        mpl::for_each<VL>([&](auto arg) {res.push_back("Jump "+std::to_string(decltype(arg)::second)+" -> "+std::to_string(decltype(arg)::first));});
+        return res;
+      } () /* this double parenthesis syntax is required to actually run the lambda */ ),
+      gammas_(gammas) {}
+  
+  const VL gammas_;
+
+};
+
+
+
+template<int NL, typename VL, int ORDO>
+class LiouvilleanRadiative : public LiouvilleanRadiative<NL,VL,ORDO-1>
+{
+private:
+  typedef LiouvilleanRadiative<NL,VL,ORDO-1> Base;
   
 protected:
   using Base::Base; using Base::NRT; using Base::gammas_;
@@ -224,93 +256,19 @@ private:
 };
 
 
-template<int NL, typename VL, int ORDO>
-class LiouvilleanDiffusive : public LiouvilleanDiffusive<NL,VL,ORDO-1>
-{
-private:
-  typedef LiouvilleanDiffusive<NL,VL,ORDO-1> Base;
-  
-protected:
-  using Base::Base; using Base::NRT; using Base::gamma_parallel_;
-  
-  typedef typename Base::template LindbladNo<NRT+ORDO> LindbladOrdo;
-  
-private:
-  void doActWithJ(NoTime, StateVectorLow& psi, LindbladOrdo) const override {psi*=sqrt(2.*gamma_parallel_); psi(ORDO)*=-1.;}
-  
-  double rate(NoTime, const LazyDensityOperator&, LindbladOrdo) const override {return -1;}
-
-  /* The trick is that this single function takes care of the superoperator of the phase diffusion of all the levels,
-   * which are highly degenerate, and easily treated in their sum over all the levels */
-  void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladOrdo) const override {
-    if constexpr (!ORDO) {
-      for (int m=0; m<rho.ubound(0); ++m) {
-        drhodt(m,m)+=2*gamma_parallel_*rho(m,m);
-        for (int n=m+1; n<rho.ubound(1); ++n) {
-          drhodt(m,n)-=6*gamma_parallel_*rho(m,n);
-          drhodt(n,m)-=6*gamma_parallel_*rho(n,m);
-        }
-      }
-    }
-  }
-
-};
-
-
-template<int NL, typename VL, bool IS_DIFFUSIVE>
-class LiouvilleanBase;
-
-
-// With ORDO=-1, these don’t correspond to valid jumps, they are here merely to store data:
-#define BASE_class mpl::if_c<IS_DIFFUSIVE,LiouvilleanDiffusive<NL,VL,NL-1>,LiouvilleanBase<NL,VL,false> >::type
-template<int NL, typename VL, bool IS_DIFFUSIVE>
-class LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,-1> : public BASE_class
-{
-protected:
-  LiouvilleanRadiative(const VL& gammas, double gamma_parallel) : BASE_class(gamma_parallel), gammas_(gammas) {}
-#undef BASE_class
-
-  const VL gammas_;
-};
-
-
+// Just a convenience layer above ElementLiouvilleanDiffusive
+#define BASE_class structure::ElementLiouvilleanDiffusive<1,mpl::size<VL>::value,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL>
-class LiouvilleanDiffusive<NL,VL,-1> : public LiouvilleanBase<NL,VL,true>
+class LiouvilleanDiffusive : public BASE_class
 {
 protected:
-  LiouvilleanDiffusive(double gamma_parallel) : gamma_parallel_(gamma_parallel) {}
-  
-  const double gamma_parallel_;
-  
-};
-
-
-#define BASE_class structure::ElementLiouvillean<1, mpl::size<VL>::value + tmptools::integral_if_c<IS_DIFFUSIVE,NL,0>::type::value >
-template<int NL, typename VL, bool IS_DIFFUSIVE>
-class LiouvilleanBase : public BASE_class // takes care of key composition
-{
-private:
-  typedef BASE_class Base;
+  LiouvilleanDiffusive(const VL& gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
 #undef BASE_class
-  typedef typename Base::KeyLabels KeyLabels;
-  
-protected:
-  static const int NRT=mpl::size<VL>::value; // number of transitions with radiative loss
-
-  LiouvilleanBase() : Base(keyTitle,[] {
-    KeyLabels res;
-    mpl::for_each<VL>([&](auto arg) {res.push_back("Jump "+std::to_string(decltype(arg)::second)+" -> "+std::to_string(decltype(arg)::first));});
-    if constexpr (IS_DIFFUSIVE) 
-      mpl::for_each<tmptools::Ordinals<NL>>([&](auto arg) {res.push_back("Phase flip for level "+std::to_string(decltype(arg)::value));});
-    return res;
-  } () /* this double parenthesis syntax is required to actually run the lambda */ ) {}
-  
-  LiouvilleanBase(double) : LiouvilleanBase() {}
   
 };
 
 
-#define BASE_class LiouvilleanRadiative<NL,VL,IS_DIFFUSIVE,mpl::size<VL>::value-1>
+#define BASE_class std::conditional_t<IS_DIFFUSIVE,LiouvilleanDiffusive<NL,VL>,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL, bool IS_DIFFUSIVE>
 class Liouvillean : public BASE_class
 {

@@ -124,8 +124,7 @@ protected:
   
   ElementLiouvillean(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
-private:
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
   {
     Rates rates(NLINDBLADS);
 /*
@@ -142,7 +141,7 @@ private:
   }
 
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
     mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&psi,lindbladNo](auto arg) {
@@ -152,7 +151,7 @@ private:
   }
   
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
     mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&rho,&drhodt,lindbladNo](auto arg) {
@@ -186,21 +185,21 @@ public:
 protected:
   ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,1,keyLabel) {}
   
-private:
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
   {
     if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle());
     doActWithJ(t,psi);
   }
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
   {
     if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle());
     doActWithSuperoperator(t,rho,drhodt);
   }
   
+private:
   virtual void doActWithJ(Time, StateVectorLow&) const = 0;
   
   virtual double rate(Time, const LazyDensityOperator&) const = 0;
@@ -251,7 +250,6 @@ private:
   
 public:
   TYPE_DEFINITION_FORWARD
-#undef TYPE_DEFINITION_FORWARD
 
   typedef typename Base::JumpStrategy JumpStrategy;
   typedef typename Base::JumpRateStrategy JumpRateStrategy;
@@ -272,8 +270,7 @@ protected:
   ElementLiouvilleanStrategies(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, typename Base::KeyLabelsInitializer il)
     : Base(keyTitle,il), jumps_(jumps), jumpRates_(jumpRates) {}
 
-private:
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const final
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
   {
     Rates rates(NLINDBLADS); // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
 
@@ -286,13 +283,13 @@ private:
     return rates;
   }
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const final
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
   {
     if constexpr (IS_TIME_DEPENDENT) jumps_(lindbladNo)(t,psi);
     else jumps_(lindbladNo)(psi);
   }
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const final
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
   {
     if (superoperatorStrategies_(lindbladNo)==nullptr) throw SuperoperatorNotImplementedException(lindbladNo);
 
@@ -305,6 +302,76 @@ private:
   
   SuperoperatorStrategies superoperatorStrategies_;
 
+};
+
+
+struct ElementLiouvilleanDiffusiveDimensionalityMismatchException : cpputils::Exception {};
+
+
+/// Adds as many jump operators describing phase diffusion as the number of dimensions of the element
+/**
+ *  \tparam NLINDBLADS is now the number of additional Lindblads that is known @ compile time
+ * 
+ * In this way, any number of Liouvillean classes can be chained to compose arbitrarily complex Liouvillean evolutions.
+ * For this, the implemented virtual functions must be at least protected.
+ * 
+ * This has to have access to the keys in order to be able to append, otherwise the ctor couldn’t be written for arbitrary base.
+ * 
+ */
+template<int RANK, int NLINDBLADS, typename BASE, bool IS_TIME_DEPENDENT=false>
+class ElementLiouvilleanDiffusive : public BASE
+{
+private:
+  typedef BASE Base;
+  
+public:
+  TYPE_DEFINITION_FORWARD
+#undef TYPE_DEFINITION_FORWARD
+
+  template <typename... BaseCtorPack>
+  ElementLiouvilleanDiffusive(size_t dim, double diffusionCoeff, BaseCtorPack&&... baseCtorPack)
+    : Base(std::forward<BaseCtorPack>(baseCtorPack)...), dim_(dim), base_nAvr_(this->getKeyPrinter().length()), diffusionCoeff_(diffusionCoeff)
+  {
+    for (size_t i=0; i<dim_; ++i) this->getKeyPrinter().getLabels().push_back("Phase flip for level "+std::to_string(i));
+  }
+
+protected:
+  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
+  {
+    Rates res(this->nAvr()); res=-1.;
+    res(blitz::Range(0,base_nAvr_-1))=Base::rates_v(t,matrix);
+    return res;
+  }
+
+  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
+  {
+    if (psi.extent(0)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException();
+    if (lindbladNo<base_nAvr_) Base::actWithJ_v(t,psi,lindbladNo);
+    else {
+      psi*=sqrt(2.*diffusionCoeff_);
+      psi(lindbladNo-base_nAvr_)*=-1.;
+    }
+  }
+
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
+  {
+    if (rho.extent(0)!=dim_ || rho.extent(1)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException();
+    if (lindbladNo<base_nAvr_) Base::actWithSuperoperator_v(t,rho,drhodt,lindbladNo);
+    else if(lindbladNo==base_nAvr_) { // with this single case we cover the action of all the diffusive Lindblads
+      for (int m=0; m<dim_; ++m) {
+        drhodt(m,m)+=2*diffusionCoeff_*rho(m,m);
+        for (int n=m+1; n<dim_; ++n) {
+          drhodt(m,n)-=6*diffusionCoeff_*rho(m,n);
+          drhodt(n,m)-=6*diffusionCoeff_*rho(n,m);
+        }
+      }
+    }
+  }
+
+private:
+  const size_t dim_, base_nAvr_;
+  const double diffusionCoeff_;
+  
 };
 
 
