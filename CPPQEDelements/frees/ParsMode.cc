@@ -12,7 +12,8 @@ Pars::Pars(parameters::Table& p, const std::string& mod)
     minitFock(p.addMod<size_t>("minitFock",mod,"Mode initial Fock state",0)),
     minit(p.addMod<dcomp>("minit",mod,"Mode initial field",0)),
     displayLevel(p.addMod<size_t>("modeDisplayLevel",mod,"When nonzero, quadrature variances are also calculated",0)),
-    delta(p.addMod("deltaC",mod,"Mode detuning",-10.))
+    delta(p.addMod("deltaC",mod,"Mode detuning",-10.)),
+    omegaKerr(p.addTitle("Kerr nonlinearity",mod).addMod("omegaKerr",mod,"Kerr constant",0.))
 {}
 
 

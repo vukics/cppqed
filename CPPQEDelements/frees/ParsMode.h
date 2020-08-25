@@ -14,7 +14,7 @@ struct Pars
   size_t &cutoff, &minitFock;
   dcomp& minit;
   size_t &displayLevel;
-  double &delta;
+  double &delta, &omegaKerr;
 
   Pars(parameters::Table&, const std::string& ="");
 
