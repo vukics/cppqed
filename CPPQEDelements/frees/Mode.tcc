@@ -79,8 +79,10 @@ const typename AveragedMonitorCutoff<Base>::Averages AveragedMonitorCutoff<Base>
 template<typename Base>
 void AveragedMonitorCutoff<Base>::process_v(Averages& averages) const
 {
-  Averages ranged(averages(blitz::Range(0,averages.size()-2)));
-  Averaged::process_v(ranged);
+  if (averages.size()>1) {
+    Averages ranged(averages(blitz::Range(0,averages.size()-2)));
+    Base::process_v(ranged);
+  }
 }
 
 
