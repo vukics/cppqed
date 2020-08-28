@@ -62,14 +62,14 @@ static inline auto trim(std::string s) {
 }
 
 
-auto       has_iterator = hana::is_valid([](auto t) -> hana::type<typename decltype(t)::type::      iterator> { });
-auto has_const_iterator = hana::is_valid([](auto t) -> hana::type<typename decltype(t)::type::const_iterator> { });
+static const auto       has_iterator = hana::is_valid([](auto t) -> hana::type<typename decltype(t)::type::      iterator> { });
+static const auto has_const_iterator = hana::is_valid([](auto t) -> hana::type<typename decltype(t)::type::const_iterator> { });
 
-auto has_begin = hana::is_valid( [](auto t) -> decltype( (void)hana::traits::declval(t).begin() ) { });
-auto has_end = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).end() ) { });
+static const auto has_begin = hana::is_valid( [](auto t) -> decltype( (void)hana::traits::declval(t).begin() ) { });
+static const auto has_end = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).end() ) { });
 
-auto has_cbegin = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).cbegin() ) { });
-auto has_cend = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).cend() ) { });
+static const auto has_cbegin = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).cbegin() ) { });
+static const auto has_cend = hana::is_valid([](auto t) -> decltype( (void)hana::traits::declval(t).cend() ) { });
 
 
 }  // namespace detail

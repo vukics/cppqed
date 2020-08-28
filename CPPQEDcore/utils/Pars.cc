@@ -126,7 +126,7 @@ void parameters::Typed<TitleLine>::read_v(std::istream&)
 parameters::Table& parameters::Table::addTitle(const std::string& s, const std::string& mod)
 {
   try {(*this)[s+mod]; throw AttemptedRecreationOfParameterException(s);}
-  catch (UnrecognisedParameterException) {
+  catch (const UnrecognisedParameterException&) {
     table_.push_back(new Typed<TitleLine>(s+mod,"",TitleLine()));
   }
   return *this;
