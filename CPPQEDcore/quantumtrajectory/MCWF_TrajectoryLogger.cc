@@ -1,16 +1,12 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "MCWF_TrajectoryLogger.h"
 
-#include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/numeric.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/density.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
-
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 
 #include <iostream>
 #include <cmath>
@@ -37,8 +33,6 @@ ostream& quantumtrajectory::mcwf::Logger::onEnd(ostream& os) const
       <<"\nMCWF Trajectory:\n";
       
     for (auto i : traj_) os<<i.first<<"\t"<<i.second<<std::endl;
-    // NEEDS_WORK the lambda expression of old doesn’t work with c++11
-    // boost::for_each(traj_,os<<bind(&pair<double,size_t>::first,_1)<<constant("\t")<<bind(&pair<double,size_t>::second,_1)<<constant("\n"));
     os<<endl;
   }
   return os;
@@ -86,8 +80,8 @@ ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& 
 {
   using namespace boost;
 
-#define AVERAGE_function(f) accumulate(loggerList | adaptors::transformed(bind(&Logger::f,_1)),0.)/loggerList.size()
-#define MAX_function(f) max_element(loggerList, bind(std::less<double>(),bind(&Logger::f,_1),bind(&Logger::f,_2)) )->f
+#define AVERAGE_function(f) accumulate(loggerList, 0., [] (double init, const Logger& l) {return init + l.f;})/loggerList.size()
+#define MAX_function(f) max_element(loggerList, [] (const Logger& a, const Logger& b) {return a.f<b.f;})->f
 
   os<<"\nAverage number of total steps: "<<AVERAGE_function(nMCWF_steps_)<<endl
     <<"\nOn average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
@@ -100,7 +94,7 @@ ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& 
       
   using namespace accumulators;
   
-  size_t nTotalJumps=accumulate(loggerList | adaptors::transformed( bind(&Logger::MCWF_Trajectory::size,bind(&Logger::traj_,_1)) ) ,0);
+  size_t nTotalJumps=accumulate(loggerList, 0, [] (double init, const Logger& l) {return init + l.traj_.size();});
 
   // Heuristic: if nBins is not given (0), then the number of bins is determined such that the bins contain nJumpsPerBin samples on average
   if (!nBins && nTotalJumps<2*nJumpsPerBin) {
