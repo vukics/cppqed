@@ -3,9 +3,10 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 
-#include "DO_Display.h"
-#include "MCWF_Trajectory.h"
+#include "DO_Display.tcc"
+#include "MCWF_Trajectory.tcc"
 #include "DensityOperator.h"
+#include "ParsMCWF_Trajectory.h"
 
 #include "Conversions.h"
 
@@ -42,21 +43,35 @@ public:
 
 protected:
   /// Straightforward constructor
-  Base(
-       std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition
-       QuantumSystemPtr sys, ///< the structure::QuantumSystem to be simulated
+  Base(std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition
+       QuantumSystemPtr qs, ///< the structure::QuantumSystem to be simulated
        const Pars& p, ///< parameters of the simulation (contains \link Pars::nTraj the number of trajectories\endlink)
-       const StateVectorLow& =StateVectorLow()
-       );
+       const StateVectorLow& scaleAbs=StateVectorLow())
+    : Ensemble([psi,qs,&p,&scaleAbs] {
+        Trajectories res;
+        p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
+
+        for (size_t i=0; i<p.nTraj; (++i, ++p.seed) ) 
+          res.push_back(new MCWF_Trajectory<RANK>(std::make_shared<StateVector>(*psi),qs,p,scaleAbs));
+
+        return res.release();
+      } (),p.logLevel<0),
+      qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
+    {}
 
   const QuantumSystemPtr getQS() const {return qs_;}
 
 private:
-  std::ostream& logOnEnd_v(std::ostream& os) const final;
+  std::ostream& logOnEnd_v(std::ostream& os) const final
+  {
+    LoggerList loggerList;
+    for (auto& i : this->getTrajectories())
+      if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&i))
+        loggerList.push_back(traj->getLogger());
   
-  // static helpers to constructor
-  static std::unique_ptr<Trajectories> trajectories(std::shared_ptr<const StateVector> psi, size_t nTraj, QuantumSystemPtr qs, const Pars& p, const StateVectorLow& scaleAbs);
-
+    return displayLog(os,loggerList,nBins_,nJumpsPerBin_);
+  }
+  
   const QuantumSystemPtr qs_;
 
   const size_t nBins_, nJumpsPerBin_;

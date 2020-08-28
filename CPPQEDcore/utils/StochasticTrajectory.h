@@ -5,11 +5,19 @@
 
 #include "ParsStochasticTrajectory.h"
 #include "Randomized.h"
-#include "Trajectory.h"
+#include "Trajectory.tcc"
+
+#include "Conversions.h"
 
 #include <boost/ptr_container/ptr_vector.hpp>
 
+#include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/numeric.hpp>
+
+#include <boost/progress.hpp>
+
 #include <boost/mpl/identity.hpp>
+
 
 
 namespace mpl=boost::mpl;
@@ -77,18 +85,26 @@ private:
 protected:
   /// \name Constructors
   //@{
-  Stochastic(A&, typename Evolved::Derivs, double dtInit,
+  /// Straightforward constructor combining the construction of Adaptive and randomized::Randomized
+  Stochastic(A& y, typename Evolved::Derivs derivs,
+             double dtInit,
              int logLevel,
-             double epsRel, double epsAbs, const A& scaleAbs, 
-             const evolved::Maker<A>&,
+             double epsRel, double epsAbs, const A& scaleAbs,
+             const evolved::Maker<A>& makerE,
              unsigned long seed,
-             bool noise,
-             const randomized::Maker&); ///< Straightforward constructor combining the construction of Adaptive and randomized::Randomized
+             bool n,
+             const randomized::Maker& makerR)
+    : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE),
+      seed_(seed), isNoisy_(n), randomized_(makerR(seed)) {}
 
-  Stochastic(A&, typename Evolved::Derivs, double dtInit,
-             const A& scaleAbs, const ParsStochastic&,
-             const evolved::Maker<A>&,
-             const randomized::Maker&); ///< \overload
+  /// \overload
+  Stochastic(A& y, typename Evolved::Derivs derivs,
+             double dtInit,
+             const A& scaleAbs,
+             const ParsStochastic& p,
+             const evolved::Maker<A>& makerE,
+             const randomized::Maker& makerR)
+    : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.seed,p.noise,makerR) {}
   //@}
   
   /// \name Getters
@@ -97,7 +113,10 @@ protected:
   bool                isNoisy      () const {return isNoisy_   ;}
   //@}
   
-  std::ostream& displayParameters_v(std::ostream&) const override;
+  std::ostream& displayParameters_v(std::ostream& os) const override
+  {
+    return Base::displayParameters_v(os)<<"Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
+  }
   
   /// \name Serialization
   //@{
@@ -168,7 +187,7 @@ protected:
   /// Getter
   const Trajectories& getTrajectories() const {return trajs_;}
 
-#define FOR_EACH_function(f) for_each(trajs_,bind(&Elem::f,_1,boost::ref(ios))); return ios;
+#define FOR_EACH_function(f) for (auto& t : trajs_) t.f(ios); return ios;
   
   /// \name Serialization
   //@{
@@ -181,13 +200,24 @@ private:
 
 #undef FOR_EACH_function
   
-  void evolve_v(double deltaT) final;
+  void evolve_v(double deltaT) final
+  {
+    using namespace boost;
+    
+    if (displayProgress_) {
+      progress_display pd(trajs_.size(),std::cerr);
+      for (auto i=trajs_.begin(); i!=trajs_.end(); (++i, ++pd)) i->evolve(deltaT);
+    }
+    else
+      for_each(trajs_,bind(&Trajectory::evolve,_1,deltaT));
+  }
 
   double getTime_v() const final {return trajs_.front().getTime();}
 
-  std::ostream& displayParameters_v(std::ostream&) const final;
+  std::ostream& displayParameters_v(std::ostream& os) const final {return trajs_.front().displayParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
 
-  double getDtDid_v() const final; // An average of getDtDid()-s from individual trajectories.
+  /// An average of getDtDid()-s from individual trajectories.
+  double getDtDid_v() const final {return accumulate(trajs_,0.,[] (double init, const Trajectory& t) {return init+t.getDtDid();})/size2Double(trajs_.size());}
 
   const AveragedHandle averaged_v() const final {return averageInRange(0,trajs_.size());}
 
@@ -214,8 +244,14 @@ namespace averaging {
 template<typename T, typename T_ELEM>
 struct AverageTrajectoriesInRange
 {
+  /// Naive generic implementation
   typedef typename Ensemble<T,T_ELEM>::Trajectories::const_iterator CI;
-  static const typename HandleType<T>::type _(CI begin, CI end);
+  static const typename HandleType<T>::type _(CI begin, CI end)
+  {
+    using namespace boost;
+    return accumulate(++begin,end,begin->averaged(),[] (const auto& init, const typename Ensemble<T,T_ELEM>::Elem & e) {return init + e.averaged();})/size2Double(end-begin);
+  }
+  
 };
 
 
@@ -223,6 +259,15 @@ struct AverageTrajectoriesInRange
 
 
 } // trajectory
+
+
+template<typename T, typename T_ELEM>
+auto
+trajectory::Ensemble<T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const AveragedHandle
+{
+  return averaging::AverageTrajectoriesInRange<T,T_ELEM>::_(trajs_.begin()+begin,trajs_.begin()+(begin+n));
+}
+
 
 
 #endif // CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED

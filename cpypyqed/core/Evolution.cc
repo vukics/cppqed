@@ -14,7 +14,7 @@
 #include "StateVector.h"
 #include "LazyDensityOperator.h"
 
-#include "EnsembleMCWF.tcc"
+#include "EnsembleMCWF.h"
 #include "Evolution.tcc"
 #include "Master.tcc"
 #include "ParsMCWF_Trajectory.h"

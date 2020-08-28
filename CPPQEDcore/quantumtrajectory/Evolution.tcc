@@ -4,7 +4,7 @@
 
 #include "Evolution_.h"
 
-#include "EnsembleMCWF.tcc"
+#include "EnsembleMCWF.h"
 #include "Master.tcc"
 #include "TimeAveragingMCWF_Trajectory.tcc"
 

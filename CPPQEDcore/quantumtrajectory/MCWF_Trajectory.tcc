@@ -10,7 +10,6 @@
 
 #include "EvolvedGSL.tcc"
 #include "QuantumTrajectory.h"
-#include "StochasticTrajectory.tcc"
 
 #include "FormDouble.h"
 
