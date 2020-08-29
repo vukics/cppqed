@@ -122,13 +122,13 @@ namespace details { struct EmptyBase {}; }
 template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
   : public quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
-    public mpl::if_c<IS_TIME_DEPENDENT,Exact,details::EmptyBase>::type
+    public std::conditional_t<IS_TIME_DEPENDENT,Exact,details::EmptyBase>
 {
 public:
   typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
-  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
-  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, double omegaKerr, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
+  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
+  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
   // The trailing dummy argument is there to cause a _compile_time_ (and not merely linking time) error in case of misuse
 
 protected:
@@ -137,14 +137,14 @@ protected:
 
   dcomp get_eta() const {return eta_;}
   
-  double get_omegaKerr() const {return omegaKerr_;}
+  double get_omegaKerr() const {return Exact::get_omegaKerr();}
 
 private:
   const dcomp
     zSch_,
   // z_=kappa_-I*delta_ --- zSch_ is the part appearing in the tridiagonal Hamiltonian, zI_ is appearing in the frequencies.
     eta_;
-  const double omegaKerr_;
+
   const size_t dim_;
 
 };

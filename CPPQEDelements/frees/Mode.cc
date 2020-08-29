@@ -1,8 +1,6 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Mode.tcc"
 
-#include "ParsMode.h"
-
 #include "TridiagonalHamiltonian.tcc"
 
 #include <boost/assign/list_inserter.hpp>
@@ -53,12 +51,14 @@ void Exact::updateU(Time t) const
 //
 //////////////
 
+#define KERRDIAGONAL(d,o) d=(i-1.)*i; d*=o/DCOMP_I;
 
 const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, double omegaKerr, size_t dim)
 {
+  using blitz::tensor::i;
   Tridiagonal::Diagonal res1(dim), res2(dim);
-  res1=blitz::tensor::i; res1*=z;
-  res2=(blitz::tensor::i-1.)*blitz::tensor::i; res2*=omegaKerr/DCOMP_I;
+  res1=i; res1*=z;
+  KERRDIAGONAL(res2,omegaKerr)
   return Tridiagonal::Diagonal(res1+res2);
 }
 
@@ -89,18 +89,25 @@ Tridiagonal hOverI(const dcomp& z, const dcomp& eta, double omegaKerr, size_t di
 }
 
 
-template<>
-Hamiltonian<true >::Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, size_t dim, boost::mpl::true_)
-  : Base(furnishWithFreqs(hOverI(zSch,eta,omegaKerr,dim),mainDiagonal(zI,omegaKerr,dim))), Exact(zI,omegaKerr,dim), zSch_(zSch), eta_(eta), omegaKerr_(omegaKerr), dim_(dim)
-{}
+#define FILLKERR using blitz::tensor::i; Tridiagonal::Diagonal temp(dim); KERRDIAGONAL(temp,omegaKerrAlter) getH_OverIs().push_back(Tridiagonal(temp));
+
 
 template<>
-Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, double omegaKerr, size_t dim, boost::mpl::false_)
-  : Base(hOverI(zSch,eta,omegaKerr,dim)), zSch_(zSch), eta_(eta), omegaKerr_(omegaKerr), dim_(dim)
-{}
+Hamiltonian<true >::Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::true_)
+  : Base(furnishWithFreqs(hOverI(zSch,eta,omegaKerr,dim),mainDiagonal(zI,omegaKerr,dim))), Exact(zI,omegaKerr,dim), zSch_(zSch), eta_(eta), dim_(dim)
+{
+  FILLKERR
+}
 
+template<>
+Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::false_)
+  : Base(hOverI(zSch,eta,omegaKerr,dim)), zSch_(zSch), eta_(eta), dim_(dim)
+{
+  FILLKERR
+}
 
-
+#undef KERRDIAGONAL
+#undef FILLKERR
 
 //////////////
 //

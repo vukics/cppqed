@@ -101,10 +101,10 @@ class Hamiltonian : public mode::Hamiltonian<IS_TIME_DEPENDENT>
 {
 public:
   Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta)
-    : mode::Hamiltonian<true >(zSch,zI,-eta,0,2) {}
+    : mode::Hamiltonian<true >(zSch,zI,-eta,0,0,2) {}
 
   Hamiltonian(const dcomp& zSch,                  const dcomp& eta)
-    : mode::Hamiltonian<false>(zSch,   -eta,0,2) {}
+    : mode::Hamiltonian<false>(zSch,   -eta,0,0,2) {}
 
 };
 
