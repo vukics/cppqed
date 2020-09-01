@@ -3,7 +3,7 @@
 
 mode::HomodynedBase::HomodynedBase(const ParsLossy& p,
                                    const dcomp& homodyneAmplitude, const dcomp& eta)
-  : Hamiltonian<false>(dcomp(finiteTemperatureHamiltonianDecay(p,boost::mpl::true_()),-p.delta),eta,p.cutoff),
+  : Hamiltonian<false>(dcomp(finiteTemperatureHamiltonianDecay(p,boost::mpl::true_()),-p.delta),eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
     structure::ElementLiouvillean<1,2>("HomodynedMode",{"homodyned loss","homodyned absorption"}),
     homodyneAmplitude_(homodyneAmplitude), kappa_(p.kappa), nTh_(p.nTh)
 {

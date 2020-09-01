@@ -90,7 +90,7 @@ inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl::
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl:: true_) {return p.kappa*(2.*p.nTh+1);}
 
 
-const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim);
+const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, double omegaKerr, size_t dim);
 
 const Tridiagonal pumping(const dcomp& eta, size_t dim);
 
@@ -99,9 +99,11 @@ const Tridiagonal pumping(const dcomp& eta, size_t dim);
 class Exact : public structure::FreeExact<false>
 {
 public:
-  Exact(const dcomp& zI, size_t);
+  Exact(const dcomp& zI, double omegaKerr, size_t);
 
-  const dcomp& get_zI() const {return zI_;}
+  dcomp get_zI() const {return zI_;}
+  
+  double get_omegaKerr() const {return omegaKerr_;}
   
 private:
   void updateU(Time) const; ///< `Time` is structure::OneTime in this case
@@ -109,6 +111,8 @@ private:
   bool applicableInMaster_v() const {return !bool(real(zI_));}
 
   const dcomp zI_;
+  
+  const double omegaKerr_;
 
 };
 
@@ -118,26 +122,29 @@ namespace details { struct EmptyBase {}; }
 template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
   : public quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
-    public mpl::if_c<IS_TIME_DEPENDENT,Exact,details::EmptyBase>::type
+    public std::conditional_t<IS_TIME_DEPENDENT,Exact,details::EmptyBase>
 {
 public:
   typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
-  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
-  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
+  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
+  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
   // The trailing dummy argument is there to cause a _compile_time_ (and not merely linking time) error in case of misuse
 
 protected:
-  const dcomp& get_zSch() const {return zSch_;}
-  const dcomp& get_zI  () const {return Exact::get_zI();}
+  dcomp get_zSch() const {return zSch_;}
+  dcomp get_zI  () const {return Exact::get_zI();}
 
-  const dcomp& get_eta() const {return eta_;}
+  dcomp get_eta() const {return eta_;}
+  
+  double get_omegaKerr() const {return Exact::get_omegaKerr();}
 
 private:
   const dcomp
     zSch_,
   // z_=kappa_-I*delta_ --- zSch_ is the part appearing in the tridiagonal Hamiltonian, zI_ is appearing in the frequencies.
     eta_;
+
   const size_t dim_;
 
 };

@@ -1,8 +1,6 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Mode.tcc"
 
-#include "ParsMode.h"
-
 #include "TridiagonalHamiltonian.tcc"
 
 #include <boost/assign/list_inserter.hpp>
@@ -35,8 +33,8 @@ const Tridiagonal aop(size_t);
 ////////
 
 
-Exact::Exact(const dcomp& zI, size_t dim)
-  : FreeExact(dim), zI_(zI)
+Exact::Exact(const dcomp& zI, double omegaKerr, size_t dim)
+  : FreeExact(dim), zI_(zI), omegaKerr_(omegaKerr)
 {
 }
 
@@ -53,12 +51,15 @@ void Exact::updateU(Time t) const
 //
 //////////////
 
+#define KERRDIAGONAL(d,o) d=(i-1.)*i; d*=o/DCOMP_I;
 
-const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
+const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, double omegaKerr, size_t dim)
 {
-  Tridiagonal::Diagonal res(dim);
-  res=blitz::tensor::i;
-  return res*=z;
+  using blitz::tensor::i;
+  Tridiagonal::Diagonal res1(dim), res2(dim);
+  res1=i; res1*=z;
+  KERRDIAGONAL(res2,omegaKerr)
+  return Tridiagonal::Diagonal(res1+res2);
 }
 
 
@@ -71,12 +72,12 @@ const Tridiagonal pumping(const dcomp& eta, size_t dim)
 namespace {
 
 
-Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
+Tridiagonal hOverI(const dcomp& z, const dcomp& eta, double omegaKerr, size_t dim)
 // Here we use runtime dispatching because runtime dispatching will anyway happen at the latest in some maker function.
 {
   bool isPumped=isNonZero(eta);
   if (isNonZero(z)) {
-    Tridiagonal res(mainDiagonal(-z,dim));
+    Tridiagonal res(mainDiagonal(-z,omegaKerr,dim));
     if (isPumped) return res+pumping(eta,dim);
     else return res;
   }
@@ -88,18 +89,25 @@ Tridiagonal hOverI(const dcomp& z, const dcomp& eta, size_t dim)
 }
 
 
-template<>
-Hamiltonian<true >::Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, size_t dim, boost::mpl::true_)
-  : Base(furnishWithFreqs(hOverI(zSch,eta,dim),mainDiagonal(zI,dim))), Exact(zI,dim), zSch_(zSch), eta_(eta), dim_(dim)
-{}
+#define FILLKERR using blitz::tensor::i; Tridiagonal::Diagonal temp(dim); KERRDIAGONAL(temp,omegaKerrAlter) getH_OverIs().push_back(Tridiagonal(temp));
+
 
 template<>
-Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, size_t dim, boost::mpl::false_)
-  : Base(hOverI(zSch,eta,dim)), zSch_(zSch), eta_(eta), dim_(dim)
-{}
+Hamiltonian<true >::Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::true_)
+  : Base(furnishWithFreqs(hOverI(zSch,eta,omegaKerr,dim),mainDiagonal(zI,omegaKerr,dim))), Exact(zI,omegaKerr,dim), zSch_(zSch), eta_(eta), dim_(dim)
+{
+  FILLKERR
+}
 
+template<>
+Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::false_)
+  : Base(hOverI(zSch,eta,omegaKerr,dim)), zSch_(zSch), eta_(eta), dim_(dim)
+{
+  FILLKERR
+}
 
-
+#undef KERRDIAGONAL
+#undef FILLKERR
 
 //////////////
 //
@@ -318,7 +326,7 @@ const Tridiagonal aop(Ptr mode)
 {
   size_t dim=mode->getDimension();
   Tridiagonal res(aop(dim));
-  if (const auto exact=dynamic_cast<const mode::Exact*>(mode.get())) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),dim));
+  if (const auto exact=dynamic_cast<const mode::Exact*>(mode.get())) res.furnishWithFreqs(mainDiagonal(exact->get_zI(),exact->get_omegaKerr(),dim));
   return res;
 }
 
@@ -326,7 +334,7 @@ const Tridiagonal aop(Ptr mode)
 
 const Tridiagonal nop(Ptr mode)
 {
-  return Tridiagonal(mainDiagonal(1.,mode->getDimension()));
+  return Tridiagonal(mainDiagonal(1.,0.,mode->getDimension()));
 }
 
 
@@ -390,8 +398,7 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
   : ModeBase(p.cutoff),
-    quantumoperator::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),
-                                                               mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.cutoff))),
+    quantumoperator::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.omegaKerr,p.cutoff))),
     structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"excitation loss"),
     structure::ElementAveraged<1,true>(mode::keyTitle,{"<number operator>","real(<ladder operator>)","imag(\")"}),
     z_(p.kappa,-p.delta)
