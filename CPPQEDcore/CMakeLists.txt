@@ -147,10 +147,10 @@ endif()
 #! ### Compiler detection
 #! <!--#########################################################-->
 #!
-#! At the moment g++ >= 4.7 and Clang >= 3.1 is needed for C++11 features.
+#! Ubuntu 20.04LTS versions
 
-set(GCC_MINIMAL 4.7)
-set(CLANG_MINIMAL 3.1)
+set(GCC_MINIMAL 9.3)
+set(CLANG_MINIMAL 10.0)
 
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${GCC_MINIMAL})
@@ -183,7 +183,7 @@ set(PRIVATE_LIBS)
 
 #! @}
 
-find_package(GSL REQUIRED)
+find_package(GSL 2.5 REQUIRED)
 include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 
 #! \name Project options
@@ -191,6 +191,7 @@ include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 
 #! Switch for boost serialization.
 option(SERIALIZATION "Boost serialization" ON)
+
 if(SERIALIZATION)
   set(CPPQED_SERIALIZATION_FOUND 1)
 else(SERIALIZATION)
@@ -230,8 +231,8 @@ endif( blitz_SERIALIZATION_FOUND )
 # Boost (OPTIONAL_COMPONENTS does not work with Boost find_package)
 # if an old boost version is installed, then FindBoost fails if Boost_NO_BOOST_CMAKE is not set
 set(Boost_NO_BOOST_CMAKE 1)
-find_package(Boost 1.46.0 REQUIRED)
-find_package(Boost QUIET COMPONENTS serialization iostreams)
+find_package(Boost 1.71 REQUIRED COMPONENTS iostreams)
+find_package(Boost QUIET COMPONENTS serialization)
 
 if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library found.")
