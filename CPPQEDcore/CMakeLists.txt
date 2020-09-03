@@ -221,12 +221,6 @@ else()
   set(PRIVATE_LIBS ${PRIVATE_LIBS} ${blitz_LIBRARIES})
   include_directories(SYSTEM ${blitz_INCLUDE_DIRS})
 endif()
-if( blitz_SERIALIZATION_FOUND )
-  message(STATUS "Blitz++ built with serialization support.")
-else( blitz_SERIALIZATION_FOUND )
-  message(STATUS "Blitz++ built without serialization support. Please configure blitz with '-D ENABLE_SERIALISATION=ON' to enable optional binary statevector output.")
-  set(CPPQED_SERIALIZATION_FOUND 0)
-endif( blitz_SERIALIZATION_FOUND )
 
 # Boost (OPTIONAL_COMPONENTS does not work with Boost find_package)
 # if an old boost version is installed, then FindBoost fails if Boost_NO_BOOST_CMAKE is not set
@@ -236,10 +230,19 @@ find_package(Boost QUIET COMPONENTS serialization)
 
 if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library found.")
+  
+  if( blitz_SERIALIZATION_FOUND )
+    message(STATUS "Blitz++ built with serialization support.")
+  else( blitz_SERIALIZATION_FOUND )
+    message(WARNING "Blitz++ built without serialization support. Please reconfigure blitz making sure it picks up Boost.Serialization.")
+    set(CPPQED_SERIALIZATION_FOUND 0)
+  endif( blitz_SERIALIZATION_FOUND )
+
 else( Boost_SERIALIZATION_FOUND )
   message(STATUS "Boost serialization library not found.")
   set(CPPQED_SERIALIZATION_FOUND 0)
 endif( Boost_SERIALIZATION_FOUND )
+
 if( Boost_IOSTREAMS_FOUND )
   message(STATUS "Boost iostreams library found.")
 else( Boost_IOSTREAMS_FOUND )

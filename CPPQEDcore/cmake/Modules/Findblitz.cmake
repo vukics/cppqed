@@ -15,8 +15,7 @@
 #! This is checked by looking if it has `BLITZ_ARRAY_LARGEST_RANK`.
 
 include(LibFindMacros)
-include(CheckIncludeFiles)
-include(CheckSymbolExists)
+include(CheckCXXSymbolExists)
 
 if (UNIX)
   find_package(PkgConfig QUIET)
@@ -36,16 +35,25 @@ find_library(blitz_LIBRARY
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
-# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+# NOTE: Singular variables for this library, plural for libraries this lib depends on.
 set(blitz_PROCESS_INCLUDES blitz_INCLUDE_DIR)
 set(blitz_PROCESS_LIBS blitz_LIBRARY)
 libfind_process(blitz)
 
-file(READ ${blitz_INCLUDE_DIR}/blitz/blitz.h BLITZ_H)
-string(REGEX MATCH BLITZ_ARRAY_LARGEST_RANK blitz_IS_CPPQED_VERSION ${BLITZ_H})
+CHECK_CXX_SYMBOL_EXISTS(BLITZ_ARRAY_LARGEST_RANK "${blitz_INCLUDE_DIR}/blitz/blitz.h" blitz_IS_CPPQED_VERSION)
 if(NOT blitz_IS_CPPQED_VERSION)
   message(FATAL_ERROR "You need the C++QED version of blitz++. The repository is at https://github.com/vukics/blitz.git")
 endif(NOT blitz_IS_CPPQED_VERSION)
 
 file(GLOB BZCONFIG ${blitz_INCLUDE_DIR}/blitz/*/bzconfig.h)
-CHECK_SYMBOL_EXISTS(BZ_HAVE_BOOST_SERIALIZATION "${BZCONFIG}" blitz_SERIALIZATION_FOUND)
+CHECK_CXX_SYMBOL_EXISTS(BZ_HAVE_BOOST_SERIALIZATION "${BZCONFIG}" blitz_SERIALIZATION_FOUND)
+
+if (blitz_FOUND)
+  if (NOT blitz_FIND_QUIETLY)
+    message (STATUS "Found components for blitz++: includes folder = ${blitz_INCLUDE_DIRS} ; libraries = ${blitz_LIBRARIES}")
+  endif (NOT blitz_FIND_QUIETLY)
+else (blitz_FOUND)
+  if (blitz_FIND_REQUIRED)
+    message (FATAL_ERROR "Could not find Blitz++!")
+  endif (blitz_FIND_REQUIRED)
+endif (blitz_FOUND)
