@@ -312,12 +312,6 @@ set(PRIVATE_LIBS ${PRIVATE_LIBS} ${GSL_LIBRARIES})
 # Generate config.h
 configure_file(${CPPQED_CMAKE_MODULE_PATH}/config.h.in ${PROJECT_NAME}_config.h)
 
-if(Boost_MAJOR_VERSION EQUAL "1" AND Boost_MINOR_VERSION GREATER "51")
-  set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} -DBOOST_RESULT_OF_USE_TR1)
-  message(STATUS "added -DBOOST_RESULT_OF_USE_TR1" )
-endif()
-
-
 #! \file
 #! <!--#########################################################-->
 #! ### Compilation
