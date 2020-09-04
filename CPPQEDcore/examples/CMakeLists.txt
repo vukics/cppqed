@@ -13,7 +13,7 @@ add_library(ExampleObjects OBJECT cpcPaperExamples.cc)
 
 foreach(target ExampleModeMain HarmonicOscillatorComplex CoherentElementTest ExampleObjects)
   if(BUNDLED_BLITZ)
-    add_dependencies(${target} cppqed-blitz)
+    add_dependencies(${target} blitz)
   endif()
 endforeach()
 

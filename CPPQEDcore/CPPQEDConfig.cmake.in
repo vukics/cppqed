@@ -21,7 +21,7 @@ set(CPPQED_ABI_MICRO "@CPPQED_ABI_MICRO@")
 
 
 #! Indicates whether C++QED is compiled with boost serialization support
-set(CPPQED_SERIALIZATION_FOUND "@CPPQED_SERIALIZATION_FOUND@")
+set(CPPQED_SERIALIZATION_FOUND "@Boost_SERIALIZATION_FOUND@")
 #! Indicates whether FLENS support is compiled in.
 set(CPPQED_FLENS_FOUND "@CPPQED_FLENS_FOUND@")
 

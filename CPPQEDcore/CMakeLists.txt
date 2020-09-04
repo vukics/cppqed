@@ -192,64 +192,117 @@ include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 #! Switch for boost serialization.
 option(SERIALIZATION "Boost serialization" ON)
 
-if(SERIALIZATION)
-  set(CPPQED_SERIALIZATION_FOUND 1)
-else(SERIALIZATION)
-  set(CPPQED_SERIALIZATION_FOUND 0)
-endif(SERIALIZATION)
-
 #! Switch for boost bzip2 support
 option(COMPRESSION "Boost bzip2 support" ON)
-if(COMPRESSION)
-  set(CPPQED_COMPRESSION_FOUND 1)
-else(COMPRESSION)
-  set(CPPQED_COMPRESSION_FOUND 0)
-endif(COMPRESSION)
+
+#! @}
+
+# Boost
+find_package(Boost 1.71 REQUIRED COMPONENTS iostreams OPTIONAL_COMPONENTS serialization)
+
+set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+
+
+
+#! \file
+#! <!--#########################################################-->
+#! ### Compilation of dependencies
+#! <!--#########################################################-->
+#!
+#! This is a convenience feature to download and compile some selected
+#! dependencies automatically. It uses %CMake's
+#! [ExternalProject](http://www.cmake.org/cmake/help/v2.8.12/cmake.html#module:ExternalProject).
+#!
+#! We use a trick to install the bundled libraries. If the bundled version of a library is used,
+#! we link it privately (\ref CMake::PRIVATE_LIBS instead of \ref CMake::PUBLIC_LIBS). Then
+#! we add the library manually to `CPPQED_LIBRARIES` in CPPQEDConfig.cmake.in, with the correct
+#! location for the build tree and installed tree, respectively.
+#!
+#! If this option is set, %CMake downloads and compiles the blitz++ dependency automatically.
+#!
+#! Takes care also of preparing the blitz (& FLENS) dependencies in case their source is distributed together with cppqed in a package ('external' folder)
+
+
+option(BUNDLED_BLITZ "Download and compile blitz++ automatically" OFF)
 
 #! Switch for FLENS support.
 option(FLENS "FLENS support" ON)
 
-#! @}
+#! If this option is set, %CMake downloads and compiles the optional FLENS dependency automatically.
+option(BUNDLED_FLENS "Download and compile FLENS automatically" OFF)
 
-# blitz
-if(NOT BUNDLED_BLITZ)
-  find_package(blitz REQUIRED)
-  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${blitz_LIBRARIES})
-  set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
-else()
-  message(STATUS "Using bundled blitz from ${blitz_LIBRARIES}.")
-  set(PRIVATE_LIBS ${PRIVATE_LIBS} ${blitz_LIBRARIES})
-  include_directories(SYSTEM ${blitz_INCLUDE_DIRS})
+if(BUNDLED_BLITZ OR BUNDLED_FLENS)
+  find_package(Git 1.6.5 REQUIRED) # ExternalProject requires this version
 endif()
 
-# Boost (OPTIONAL_COMPONENTS does not work with Boost find_package)
-# if an old boost version is installed, then FindBoost fails if Boost_NO_BOOST_CMAKE is not set
-set(Boost_NO_BOOST_CMAKE 1)
-find_package(Boost 1.71 REQUIRED COMPONENTS iostreams)
-find_package(Boost QUIET COMPONENTS serialization)
+if(BUNDLED_BLITZ)
+  include(ExternalProject)
 
-if( Boost_SERIALIZATION_FOUND )
-  message(STATUS "Boost serialization library found.")
-  
-  if( blitz_SERIALIZATION_FOUND )
-    message(STATUS "Blitz++ built with serialization support.")
-  else( blitz_SERIALIZATION_FOUND )
-    message(WARNING "Blitz++ built without serialization support. Please reconfigure blitz making sure it picks up Boost.Serialization.")
-    set(CPPQED_SERIALIZATION_FOUND 0)
-  endif( blitz_SERIALIZATION_FOUND )
+#   if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
+#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-64bit ")
+#   else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
+#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8 ")
+#   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
-else( Boost_SERIALIZATION_FOUND )
-  message(STATUS "Boost serialization library not found.")
-  set(CPPQED_SERIALIZATION_FOUND 0)
-endif( Boost_SERIALIZATION_FOUND )
+  if(EXISTS ${CMAKE_SOURCE_DIR}/external/blitz) # distributed packaged together with cppqed
+    set(BLITZ_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/blitz/. <SOURCE_DIR>/)
+  else()
+    set(BLITZ_SOURCE GIT_REPOSITORY http://github.com/vukics/blitz.git GIT_TAG 3d18c90195b457490a96e008573f6438066bcea3 GIT_SHALLOW TRUE GIT_PROGRESS TRUE)
+  endif()
 
-if( Boost_IOSTREAMS_FOUND )
-  message(STATUS "Boost iostreams library found.")
-else( Boost_IOSTREAMS_FOUND )
-  message(STATUS "Boost iostreams library not found.")
-  set(CPPQED_COMPRESSION_FOUND 0)
-endif( Boost_IOSTREAMS_FOUND )
-set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+  ExternalProject_Add(
+    blitz
+    ${BLITZ_SOURCE}
+    UPDATE_COMMAND ""
+    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
+  )
+  ExternalProject_Get_Property(blitz install_dir)
+  message(STATUS "Bundled blitz to be installed to ${install_dir}")
+  set(blitz_INCLUDE_DIRS ${install_dir}/include)
+  set(blitz_LIBRARIES ${install_dir}/lib/libblitz${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set(BUNDLED_BLITZ_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libblitz${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set(blitz_FOUND 1)
+  set(PRIVATE_LIBS ${PRIVATE_LIBS} ${blitz_LIBRARIES})
+  include_directories(SYSTEM ${blitz_INCLUDE_DIRS})
+
+else(BUNDLED_BLITZ)
+  find_package(blitz REQUIRED)
+  if( Boost_SERIALIZATION_FOUND )
+
+    if( blitz_SERIALIZATION_FOUND )
+      message(STATUS "Blitz++ built with serialization support.")
+    else( blitz_SERIALIZATION_FOUND )
+      message(FATAL_ERROR "Blitz++ built without serialization support. Please reconfigure blitz making sure it picks up Boost.Serialization.")
+    endif( blitz_SERIALIZATION_FOUND )
+
+  endif( Boost_SERIALIZATION_FOUND )
+
+  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${blitz_LIBRARIES})
+  set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
+endif(BUNDLED_BLITZ)
+
+
+if(BUNDLED_FLENS)
+  include(ExternalProject)
+
+  if(EXISTS ${CMAKE_SOURCE_DIR}/external/flens)
+    set(FLENS_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/flens/. <SOURCE_DIR>/)
+  else()
+    set(FLENS_SOURCE GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git GIT_TAG "public")
+  endif()
+
+  ExternalProject_Add(
+    flens
+    ${FLENS_SOURCE}
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
+    BUILD_COMMAND
+    INSTALL_COMMAND make install
+  )
+  ExternalProject_Get_Property(flens install_dir)
+  set(flens_INCLUDE_DIRS ${install_dir}/include)
+  set(flens_FOUND 1)
+endif()
 
 
 # FLENS
@@ -272,22 +325,22 @@ else( flens_FOUND AND FLENS )
 endif( flens_FOUND AND FLENS )
 
 # Check if serialization can be enabled, inform user
-if( CPPQED_SERIALIZATION_FOUND )
+if( Boost_SERIALIZATION_FOUND )
   message(STATUS "Support for binary statevector output enabled.")
   set(PUBLIC_LIBS ${PUBLIC_LIBS} ${Boost_SERIALIZATION_LIBRARY})
-else( CPPQED_SERIALIZATION_FOUND )
+else( Boost_SERIALIZATION_FOUND )
   set(DO_NOT_USE_BOOST_SERIALIZATION ON)
   message(STATUS "Optional support for binary statevector output disabled.")
-endif( CPPQED_SERIALIZATION_FOUND )
+endif( Boost_SERIALIZATION_FOUND )
 
 # Check if compression can be enabled, inform user
-if( CPPQED_COMPRESSION_FOUND )
+if( COMPRESSION )
   message(STATUS "Support for binary statevector compression enabled.")
   set(PUBLIC_LIBS ${PUBLIC_LIBS} ${Boost_IOSTREAMS_LIBRARY})
-else( CPPQED_COMPRESSION_FOUND )
+else( COMPRESSION )
   set(DO_NOT_USE_BOOST_COMPRESSION ON)
   message(STATUS "Optional support for binary statevector compression disabled.")
-endif( CPPQED_COMPRESSION_FOUND )
+endif( COMPRESSION )
 
 # Doxygen
 find_package(Doxygen 1.8)
@@ -481,6 +534,37 @@ install(EXPORT CPPQEDcoreTargets DESTINATION
 
 #! \file
 #! <!--#########################################################-->
+#! ### Installation of dependencies
+#! <!--#########################################################-->
+#!
+#! If blitz and flens are compiled as external projects, install them as well. Libraries
+#! and header files are installed into the same locations as CPPQEDcore, this way it is
+#! ensured they are found.
+
+set(BUNDLED_HEADERS "${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_DIR}/bundled")
+
+if(BUNDLED_BLITZ)
+  ExternalProject_Get_Property(blitz install_dir)
+  file(GLOB blitz_libs ${install_dir}/lib/*.so*)
+  set(blitz_libs ${install_dir}/lib/libblitzcppqed.so
+                 ${install_dir}/lib/libblitzcppqed.so.0
+                 ${install_dir}/lib/libblitzcppqed.so.0.0.0)
+  install(FILES ${blitz_libs}
+          PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
+          DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(DIRECTORY ${install_dir}/include/blitz ${install_dir}/include/random
+          DESTINATION ${BUNDLED_HEADERS})
+endif()
+
+if(BUNDLED_FLENS)
+  ExternalProject_Get_Property(flens install_dir)
+  install(DIRECTORY ${install_dir}/include/flens
+          DESTINATION ${BUNDLED_HEADERS})
+endif()
+
+
+#! \file
+#! <!--#########################################################-->
 #! ### Compile extras
 #! <!--#########################################################-->
 #!
@@ -499,7 +583,7 @@ set_package_properties(PkgConfig PROPERTIES URL "http://pkgconfig.freedesktop.or
                                 DESCRIPTION "Package config system that manages compile/link flags"
                                 TYPE OPTIONAL
                                 PURPOSE "Assists cmake in finding libraries.")
-set_package_properties(blitz PROPERTIES  URL "http://sf.net/projects/blitz/"
+set_package_properties(blitz PROPERTIES  URL "http://github.com/blitzpp/blitz"
                                 DESCRIPTION "High-performance C++ vector mathematics library"
                                 TYPE REQUIRED
                                 PURPOSE "Multi-Array implementation used in the framework.")
@@ -520,8 +604,8 @@ set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
                                 TYPE OPTIONAL
                                 PURPOSE "Generation of API documentation. Note that you also need the graphviz package to build the documentation.")
 add_feature_info("FLENS" CPPQED_FLENS_FOUND "compile framework with FLENS support.")
-add_feature_info("Serialization" CPPQED_SERIALIZATION_FOUND "needed for binary statevector output." )
-add_feature_info("Compression" CPPQED_COMPRESSION_FOUND "bzip2 compression of binary statevectors.")
+add_feature_info("Serialization" Boost_SERIALIZATION_FOUND "needed for binary statevector output." )
+add_feature_info("Compression" COMPRESSION "bzip2 compression of binary statevectors.")
 if(NOT ${CPPQED_MONOLITHIC})
   feature_summary( WHAT ALL )
 endif()

@@ -58,100 +58,6 @@ else()
 endif()
 find_package(Numpy QUIET)
 
-#! \file
-#! <!--#########################################################-->
-#! ### Compilation of dependencies
-#! <!--#########################################################-->
-#!
-#! This is a convenience feature to download and compile some selected
-#! dependencies automatically. It uses %CMake's
-#! [ExternalProject](http://www.cmake.org/cmake/help/v2.8.12/cmake.html#module:ExternalProject).
-#!
-#! We use a trick to install the bundled libraries. If the bundled version of a library is used,
-#! we link it privately (\ref CMake::PRIVATE_LIBS instead of \ref CMake::PUBLIC_LIBS). Then
-#! we add the library manually to `CPPQED_LIBRARIES` in CPPQEDConfig.cmake.in, with the correct
-#! location for the build tree and installed tree, respectively.
-
-#! If this option is set, %CMake downloads and compiles the blitz++ dependency automatically.
-option(BUNDLED_BLITZ "Download and compile blitz++ automatically" Off)
-
-if(BUNDLED_BLITZ)
-  include(ExternalProject)
-
-  find_package(Boost QUIET COMPONENTS serialization)
-  if(NOT Boost_LIBRARY_DIR)
-    set(Boost_LIBRARY_DIR ${Boost_LIBRARY_DIR_RELEASE})
-  endif()
-  if(Boost_SERIALIZATION_FOUND)
-    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-serialization ")
-    set(blitz_SERIALIZATION_FOUND On)
-  endif()
-
-  string(REGEX REPLACE "/include" "" local_boost_root ${Boost_INCLUDE_DIR})
-
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
-    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-64bit ")
-  else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
-    set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8 ")
-  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-
-  find_program(autoreconf autoreconf)
-  if(NOT autoreconf)
-    message(FATAL_ERROR "Program autoreconf not found, needed to compile blitz.")
-  endif()
-  get_filename_component(AUTOTOOLS_PATH ${autoreconf} DIRECTORY)
-
-  if(XCODE)
-    set(AUTORECONF_NO_OUTPUT "&>/dev/null")
-  endif()
-  configure_file(misc/blitz-make.sh.in ${PROJECT_BINARY_DIR}/blitz-make.sh @ONLY)
-
-  if(EXISTS ${CMAKE_SOURCE_DIR}/external/blitz)
-    set(BLITZ_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/blitz/. <SOURCE_DIR>/)
-  else()
-    set(BLITZ_SOURCE HG_REPOSITORY http://hg.code.sf.net/p/cppqed/blitz)
-  endif()
-
-  ExternalProject_Add(
-    cppqed-blitz
-    ${BLITZ_SOURCE}
-    UPDATE_COMMAND ""
-    PATCH_COMMAND patch --dry-run -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch | grep "previously applied" || patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_rename_library.patch
-          COMMAND patch --dry-run -N -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch | grep "previously applied" || patch -p1 -d <SOURCE_DIR> -i ${CMAKE_SOURCE_DIR}/misc/blitz_python26.patch
-    CONFIGURE_COMMAND ${PROJECT_BINARY_DIR}/blitz-make.sh <SOURCE_DIR> <INSTALL_DIR>
-    BUILD_COMMAND make lib
-  )
-  ExternalProject_Get_Property(cppqed-blitz install_dir)
-  set(blitz_INCLUDE_DIRS ${install_dir}/include)
-  set(blitz_LIBRARIES ${install_dir}/lib/libblitzcppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
-  set(BUNDLED_BLITZ_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libblitzcppqed${CMAKE_SHARED_LIBRARY_SUFFIX})
-  set(blitz_FOUND 1)
-endif()
-
-#! If this option is set, %CMake downloads and compiles the optional FLENS dependency automatically.
-option(BUNDLED_FLENS "Download and compile FLENS automatically" Off)
-
-if(BUNDLED_FLENS)
-  include(ExternalProject)
-
-  if(EXISTS ${CMAKE_SOURCE_DIR}/external/flens)
-    set(FLENS_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/flens/. <SOURCE_DIR>/)
-  else()
-    set(FLENS_SOURCE GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git GIT_TAG "public")
-  endif()
-
-  ExternalProject_Add(
-    flens
-    ${FLENS_SOURCE}
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
-    BUILD_COMMAND
-    INSTALL_COMMAND make install
-  )
-  ExternalProject_Get_Property(flens install_dir)
-  set(flens_INCLUDE_DIRS ${install_dir}/include)
-  set(flens_FOUND 1)
-endif()
 
 #! \file
 #! <!--#########################################################-->
@@ -207,36 +113,6 @@ else()
   add_subdirectory(CustomElementsExample EXCLUDE_FROM_ALL)
   set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
   add_subdirectory(CustomScriptsExample EXCLUDE_FROM_ALL)
-endif()
-
-#! \file
-#! <!--#########################################################-->
-#! ### Installation of dependencies
-#! <!--#########################################################-->
-#!
-#! If blitz and flens are compiled as external projects, install them as well. Libraries
-#! and header files are installed into the same locations as CPPQEDcore, this way it is
-#! ensured they are found.
-
-set(BUNDLED_HEADERS "${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_DIR}/bundled")
-
-if(BUNDLED_BLITZ)
-  ExternalProject_Get_Property(cppqed-blitz install_dir)
-  file(GLOB blitz_libs ${install_dir}/lib/*.so*)
-  set(blitz_libs ${install_dir}/lib/libblitzcppqed.so
-                 ${install_dir}/lib/libblitzcppqed.so.0
-                 ${install_dir}/lib/libblitzcppqed.so.0.0.0)
-  install(FILES ${blitz_libs}
-          PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-          DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  install(DIRECTORY ${install_dir}/include/blitz ${install_dir}/include/random
-          DESTINATION ${BUNDLED_HEADERS})
-endif()
-
-if(BUNDLED_FLENS)
-  ExternalProject_Get_Property(flens install_dir)
-  install(DIRECTORY ${install_dir}/include/flens
-          DESTINATION ${BUNDLED_HEADERS})
 endif()
 
 #! \file
