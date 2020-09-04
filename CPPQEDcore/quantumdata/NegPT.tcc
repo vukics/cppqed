@@ -8,8 +8,8 @@
 
 #ifndef DO_NOT_USE_FLENS
 
-#include "Blitz2FLENS.tcc"
-#include "BlitzArraySliceIterator.tcc"
+#include "Blitz2FLENS.h"
+#include "SliceIterator.tcc"
 
 
 namespace quantumdata {
@@ -46,7 +46,7 @@ double negPT(const DensityOperator<RANK>& rho, V)
 
   DensityOperatorLow rhoShallowPT(rho.getArray());
 
-  blitzplusplus::basi::Transposer<2*RANK,ExtendV>::transpose(rhoShallowPT);
+  cpputils::sliceiterator::Transposer<CArray,2*RANK,ExtendV>::_(rhoShallowPT);
 
   DensityOperatorLow rhoDeepPT(rhoShallowPT.shape()); rhoDeepPT=rhoShallowPT;
 

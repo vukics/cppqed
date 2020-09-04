@@ -7,7 +7,7 @@
 
 #include "MCWF_Trajectory.tcc"
 
-#include "Blitz2FLENS.tcc"
+#include "Blitz2FLENS.h"
 
 
 namespace quantumtrajectory {

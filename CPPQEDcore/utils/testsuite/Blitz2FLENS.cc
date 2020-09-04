@@ -24,7 +24,7 @@ right | v | u^*
 */
 
 
-#include "Blitz2FLENS.tcc"
+#include "Blitz2FLENS.h"
 
 #include "MathExtensions.h"
 #include "BlitzTiny.h"
@@ -32,8 +32,6 @@ right | v | u^*
 #include "Randomized.h"
 
 #include "Range.h"
-
-#include <flens/flens.h>
 
 #define BOOST_TEST_MODULE Blitz2FLENS test
 #include <boost/test/unit_test.hpp>

@@ -13,16 +13,10 @@
 #ifndef   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 #define   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 
-#include "DrivenDampedHarmonicOscillatorFwd.h"
-
 #include "ComplexExtensions.h"
 
 #include <flens/flens.h>
 
-
-typedef std::shared_ptr<DrivenDampedHarmonicOscillator> DDHO_Ptr;
-
-const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
 
 
 class DrivenDampedHarmonicOscillator
@@ -51,6 +45,11 @@ protected:
   static const Matrix makeMatrix(const dcomp&, const dcomp&, const dcomp&, const dcomp&);
 
 };
+
+
+typedef std::shared_ptr<DrivenDampedHarmonicOscillator> DDHO_Ptr;
+
+const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
 
 
 #endif // CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
