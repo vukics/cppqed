@@ -247,7 +247,7 @@ if(BUNDLED_BLITZ)
   if(EXISTS ${CMAKE_SOURCE_DIR}/external/blitz) # distributed packaged together with cppqed
     set(BLITZ_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/blitz/. <SOURCE_DIR>/)
   else()
-    set(BLITZ_SOURCE GIT_REPOSITORY http://github.com/vukics/blitz.git GIT_TAG 3d18c90195b457490a96e008573f6438066bcea3 GIT_SHALLOW TRUE GIT_PROGRESS TRUE)
+    set(BLITZ_SOURCE GIT_REPOSITORY http://github.com/vukics/blitz.git GIT_TAG a39b77e33a92cce48495306817dc1573f62f755e GIT_SHALLOW TRUE GIT_PROGRESS TRUE)
   endif()
 
   ExternalProject_Add(
@@ -546,13 +546,13 @@ set(BUNDLED_HEADERS "${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_DIR}/bundled")
 if(BUNDLED_BLITZ)
   ExternalProject_Get_Property(blitz install_dir)
   file(GLOB blitz_libs ${install_dir}/lib/*.so*)
-  set(blitz_libs ${install_dir}/lib/libblitzcppqed.so
-                 ${install_dir}/lib/libblitzcppqed.so.0
-                 ${install_dir}/lib/libblitzcppqed.so.0.0.0)
+  set(blitz_libs ${install_dir}/lib/libblitz.so
+                 ${install_dir}/lib/libblitz.so.0
+                 ${install_dir}/lib/libblitz.so.1.0.3) # it is a bit inconvenient to have to write the version explicitly, but fortunately it doesn’t change very often
   install(FILES ${blitz_libs}
           PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
           DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  install(DIRECTORY ${install_dir}/include/blitz ${install_dir}/include/random
+  install(DIRECTORY ${install_dir}/include/blitz
           DESTINATION ${BUNDLED_HEADERS})
 endif()
 
