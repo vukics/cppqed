@@ -4,7 +4,7 @@
 #define   CPPQEDELEMENTS_INTERACTIONS_MLJC_H_INCLUDED
 
 #include "Mode_.h"
-#include "MultiLevel_.h"
+#include "MultiLevel.h"
 #include "ParsMLJC.h"
 
 #include "Interaction.h"
