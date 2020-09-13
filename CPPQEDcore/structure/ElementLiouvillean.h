@@ -317,8 +317,10 @@ struct ElementLiouvilleanDiffusiveDimensionalityMismatchException : cpputils::Ex
  * 
  * This has to have access to the keys in order to be able to append, otherwise the ctor couldn’t be written for arbitrary base.
  * 
+ * TODO: the class should check whether its base indeed has the functions that it relies on, otherwise replace with default funcionality
+ * 
  */
-template<int RANK, int NLINDBLADS, typename BASE, bool IS_TIME_DEPENDENT=false>
+template<int RANK, typename BASE, bool IS_TIME_DEPENDENT=false>
 class ElementLiouvilleanDiffusive : public BASE
 {
 private:
@@ -338,7 +340,7 @@ public:
 protected:
   const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
   {
-    Rates res(this->nAvr()); res=-1.;
+    Rates res(base_nAvr_+dim_); res=-1.;
     res(blitz::Range(0,base_nAvr_-1))=Base::rates_v(t,matrix);
     return res;
   }
@@ -379,5 +381,3 @@ private:
 
 
 #endif // CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEAN_H_INCLUDED
-
-

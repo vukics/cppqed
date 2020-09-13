@@ -257,7 +257,7 @@ private:
 
 
 // Just a convenience layer above ElementLiouvilleanDiffusive
-#define BASE_class structure::ElementLiouvilleanDiffusive<1,mpl::size<VL>::value,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
+#define BASE_class structure::ElementLiouvilleanDiffusive<1,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL>
 class LiouvilleanDiffusive : public BASE_class
 {
