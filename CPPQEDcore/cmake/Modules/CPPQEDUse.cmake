@@ -11,10 +11,9 @@
 #! \return This function adds flags to the `CMAKE_CXX_FLAGS` and the
 #! `CMAKE_CXX_FLAGS_DEBUG` variables.
 #!
-#! This macro sets `-std=c++11` and otherwise only affects warnings. In Debug mode, warnings are enabled.
+#! This macro sets affects warnings. In Debug mode, warnings are enabled.
 #! It is automatically called in CPPQED_SETUP().
 macro(cppqed_cxx_flags)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual")
   if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-local-type-template-args")

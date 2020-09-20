@@ -28,6 +28,8 @@ set(ELEMENTS_SOURCE_DIRS utils frees interactions)
 set(frees_NEEDS utils)
 set(interactions_NEEDS utils frees)
 
+message(STATUS "Building CPPQEDelements " ${CPPQED_LIBRARIES} ${CPPQEDelements_LIBRARIES})
+
 # This tells the elements_project macro that the project name 'elements' is ok
 set(ORIGINAL_ELEMENTS_PROJECT 1)
 elements_project()
