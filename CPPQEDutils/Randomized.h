@@ -7,7 +7,7 @@
 #include "ComplexExtensions.h"
 #include "Exception.h"
 
-#include "core_config.h"
+#include "config.h"
 
 #include <boost/range/algorithm/generate.hpp>
 

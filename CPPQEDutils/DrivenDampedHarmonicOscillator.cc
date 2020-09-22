@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "core_config.h"
+#include "config.h"
 
 #ifndef   DO_NOT_USE_FLENS
 #include "DrivenDampedHarmonicOscillator.h"

@@ -3,7 +3,7 @@
 #ifndef   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 
-#include "core_config.h"
+#include "config.h"
 
 #ifdef    DO_NOT_USE_BOOST_SERIALIZATION
 
