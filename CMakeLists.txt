@@ -20,170 +20,149 @@
 #! @}
 
 cmake_minimum_required (VERSION 3.12)
+
 project(cppqed)
-
-enable_testing()
-
-include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/CPPQEDcore/cmake/Modules" "${CMAKE_SOURCE_DIR}/cpypyqed/cmake/Modules")
+#! \file
+#! <!--#########################################################-->
+#! ### Version management
+#! <!--#########################################################-->
+#!
+#! Set the major, minor and patch version of C++QED (c.f. \ref versioning). The major and minor
+#! versions end up in the library names of all components. In this section,
+#! also the ABI version of the library is set (c.f. \ref ABI).
 
-#! \name Project variables
-#! These variables are used in the subprojects.
+
+#! \anchor versioning
+#! \name Version variables
+#! Versioning scheme
 #! @{
 
-#! \brief Other subprojects use this variable to determine if this is a monolithic build
-set(CPPQED_MONOLITHIC 1)
-
-set(cppqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cppqed)
-set(core_DOC_DIR ${CMAKE_BINARY_DIR}/doc/core)
-set(core_DOXYGEN_TAG ${core_DOC_DIR}/core.tag)
-set(elements_DOC_DIR ${CMAKE_BINARY_DIR}/doc/elements)
-set(elements_DOXYGEN_TAG ${elements_DOC_DIR}/elements.tag)
-set(cpypyqed_DOC_DIR ${CMAKE_BINARY_DIR}/doc/cpypyqed)
+#! MAJOR - the grand version of C++QED, as in v2
+set(CPPQED_VERSION_MAJOR 2)
+#! MINOR - the milestone release, as in v2m10
+set(CPPQED_VERSION_MINOR 120)
+#! PATCH - should be increased on every snapshot package release, reset on milestone change
+set(CPPQED_VERSION_PATCH 10)
+#! Full C++QED version
+set(CPPQED_VERSION
+  "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
+#! MAJOR.MINOR, at the moment mainly distinguishes stable (2.10) from development (2.100)
+set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 
 #! @}
 
-find_package(Boost QUIET COMPONENTS python)
-find_package(PythonInterp 3 QUIET)
-if(${PYTHON_VERSION_STRING} VERSION_LESS 3.5)
-  message(WARNING "Python >=3.5 needed, disabling cpypyqed and testsuite.")
-  set(PYTHONINTERP_FOUND 0)
-else()
-  find_package(PythonLibs ${PYTHON_VERSION_STRING} EXACT QUIET)
-endif()
-find_package(Numpy QUIET)
-
-
-#! \file
-#! <!--#########################################################-->
-#! ### Compilation of the components
-#! <!--#########################################################-->
+#! \anchor ABI
+#! \name ABI versioning scheme
 #!
-#! Compile the components core, elements, scripts (optional) and cpypyqed (optional)
-#! by adding their sub-directories.
-
-add_subdirectory(CPPQEDcore)
-set(CPPQED_DIR ${core_BINARY_DIR})
-add_subdirectory(CPPQEDelements)
-set(CPPQEDelements_DIR ${elements_BINARY_DIR})
-
-#! \brief Install directory of the Doxygen documentation.
+#! Adopt the shared library versioning scheme of libtool
+#! - CURRENT  - the current ABI version
+#! - AGE      - number of versions backwards that CURRENT is compatible with
+#! - REVISION - patch revision
 #!
-#! Note that doxygen documentation can only be built and installed in monolithic builds.
-set(CPPQED_DOC_DIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/cppqed-doc-${CPPQED_ID}")
-
-#! \name Project options
+#! *Rationale*
+#!
+#! Bugfixes and Patches which do not affect ABI:
+#!  * increase REVISION
+#!
+#! Symbols added to library (i.e. binary compatibility NOT broken):
+#!  * increase AGE
+#!  * remember to call dh_makeshlibs with -V packagename (>=packageversion) when packaging
+#!
+#! Symbols removed or changed (i.e. binary compatibility broken):
+#!  * set CURRENT -> CURRENT + AGE + 1, reset AGE
+#!
+#! On every change of AGE or CURRENT: reset REVISION
+#!
+#! The library version (.so.X.Y.Z) is `{CURRENT-AGE}.{AGE}.{REVISION}`, here named
+#! `{ABI_MAJOR}.{ABI_MINOR}.{ABI_MICRO}`. This way it is ensured that ABI_MAJOR only changes
+#! when binary compatibility is broken.
+#!
+#! The SONAME of the library always is: `libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}.so.${ABI_MAJOR}`
+#! and the packages are named `libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}-${ABI_MAJOR}[-dev]`
 #! @{
 
-#! This %CMake option determines if the Python modules should be compiled.
-option(COMPILE_CPYPYQED "Compile Python wrapper and Python I/O module" On)
+#! The current ABI version
+set(CPPQED_ABI_CURRENT 5)
+#! number of Versions backwards that CURRENT is compatible with
+set(CPPQED_ABI_AGE 0)
+#! Patch revision
+set(CPPQED_ABI_REVISION 0)
+#! Set to ABI_CURRENT - ABI_AGE
+set(CPPQED_ABI_MAJOR)
+math(EXPR CPPQED_ABI_MAJOR "${CPPQED_ABI_CURRENT}-${CPPQED_ABI_AGE}")
+#! Same as ABI_AGE
+set(CPPQED_ABI_MINOR "${CPPQED_ABI_AGE}")
+#! Same as ABI_REVISION
+set(CPPQED_ABI_MICRO "${CPPQED_ABI_REVISION}")
 
-# For some reason kdevelop does not recognize PYTHONLIBS_FOUND, use PYTHON_INCLUDE_DIRS instead
-if(Boost_PYTHON_FOUND AND PYTHONINTERP_FOUND AND PYTHON_INCLUDE_DIRS AND NUMPY_FOUND AND COMPILE_CPYPYQED)
-  set(ENABLE_CPYPYQED 1)
-endif()
-add_subdirectory(cpypyqed)
-
-
-#! \brief This %CMake option determines if the scripts should be compiled as part
-#!    of the monolithic build.
-option(COMPILE_SCRIPTS "Compile the example scripts" On)
-
-#! \brief This %CMake configuration variable lets users exclude scripts from the ALL target. These
-#!    scripts can still be compiled by directly calling their target.
-set(CPPQED_EXCLUDE_SCRIPTS "" CACHE STRING "Exclude from the ALL target")
 #! @}
-if(COMPILE_SCRIPTS)
-  add_subdirectory(CPPQEDscripts)
-endif()
-
-add_subdirectory(Testing)
-
-# The EXCLUDE_FROM_ALL target makes Xcode scip the subdirectory entirely
-if(XCODE)
-  add_subdirectory(CustomElementsExample)
-  set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
-  add_subdirectory(CustomScriptsExample)
-else()
-  add_subdirectory(CustomElementsExample EXCLUDE_FROM_ALL)
-  set(CPPQEDelements_custom_example_DIR ${elements_custom_example_BINARY_DIR})
-  add_subdirectory(CustomScriptsExample EXCLUDE_FROM_ALL)
-endif()
 
 #! \file
 #! <!--#########################################################-->
-#! ### Source package
+#! ### Compiler detection
 #! <!--#########################################################-->
 #!
-#! Create source tar ball with CPack for publication on sourceforge.
+#! Ubuntu 20.04LTS versions
 
-set(CPACK_PACKAGE_VERSION_MAJOR ${CPPQED_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${CPPQED_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${CPPQED_VERSION_PATCH})
+set(GCC_MINIMAL 9.3)
+set(CLANG_MINIMAL 10.0)
 
-set(CPACK_GENERATOR TGZ)
 
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "cppqed-${CPPQED_VERSION}" CACHE INTERNAL "tarball basename")
-set(CPACK_SOURCE_IGNORE_FILES "~$" "/build/" "\\\\.kdev4.*" "\\\\.git.*" ".*orig$")
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${GCC_MINIMAL})
+  message(FATAL_ERROR "GCC g++ version >= ${GCC_MINIMAL} needed.")
+endif ()
 
-include(CPack)
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${CLANG_MINIMAL})
+  message(FATAL_ERROR "Clang version >= ${CLANG_MINIMAL} needed.")
+endif ()
 
-#! \file
-#! <!--#########################################################-->
-#! ### Documentation
-#! <!--#########################################################-->
-#!
-#! This section builds the Doxygen documentation (if Doxygen is found) and furthermore
-#! installs the example projects "CustomElementsExample" and "CustomScriptsExample" to
-#! the system. The install location is \ref CMake::CPPQED_DOC_DIR "CPPQED_DOC_DIR".
-#!
-#! For the Doxygen documentation, the filter [CMakeDoxygenFilter](https://github.com/saschazelzer/CMakeDoxygenFilter),
-#! is compiled, which allows to document %CMake in Doxygen. The overall C++QED documentation
-#! is generated with cppqed_documentation(), and a target "doc" for the full documentation is created,
-#! which depends on all the component documentation targets.
+option(BUNDLED_BLITZ "Download and compile blitz++ automatically" OFF)
 
-include(${core_SOURCE_DIR}/cmake/Modules/CPPQEDUse.cmake)
-add_executable(CMakeDoxygenFilter doc/CMakeDoxygenFilter.cpp)
-set_target_properties(CMakeDoxygenFilter PROPERTIES COMPILE_FLAGS -DUSE_NAMESPACE=CMake)
-set(CMakeDoxygenFilter_EXECUTABLE "${CMAKE_CURRENT_BINARY_DIR}/CMakeDoxygenFilter${CMAKE_EXECUTABLE_SUFFIX}")
-cppqed_documentation("cppqed_" "${CMAKE_BINARY_DIR}/doc/core/core.tag;${CMAKE_BINARY_DIR}/doc/elements/elements.tag" core_doc elements_doc CMakeDoxygenFilter)
-if(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
-  add_custom_target(doc)
-  add_dependencies(doc cppqed_doc core_doc elements_doc)
-  if(DOXYLINK_FOUND)
-    add_dependencies(cpypyqed_doc)
+#! Switch for FLENS support.
+option(FLENS "FLENS support" ON)
+
+#! If this option is set, %CMake downloads and compiles the optional FLENS dependency automatically.
+option(BUNDLED_FLENS "Download and compile FLENS automatically" OFF)
+
+if(BUNDLED_BLITZ OR BUNDLED_FLENS)
+  find_package(Git 1.6.5 REQUIRED) # ExternalProject requires this version
+endif()
+
+
+if(BUNDLED_BLITZ)
+  include(ExternalProject)
+
+#   if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
+#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-64bit ")
+#   else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
+#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8 ")
+#   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+
+  if(EXISTS ${CMAKE_SOURCE_DIR}/external/blitz) # distributed packaged together with cppqed
+    set(BLITZ_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/blitz/. <SOURCE_DIR>/)
+  else()
+    set(BLITZ_SOURCE GIT_REPOSITORY http://github.com/vukics/blitz.git GIT_TAG a39b77e33a92cce48495306817dc1573f62f755e GIT_SHALLOW TRUE GIT_PROGRESS TRUE)
   endif()
-  configure_file(doc/index.html ${CMAKE_BINARY_DIR}/doc COPYONLY)
+
+  ExternalProject_Add(
+    blitz
+    ${BLITZ_SOURCE}
+    UPDATE_COMMAND ""
+    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
+  )
+  ExternalProject_Get_Property(blitz install_dir)
+  message(STATUS "Bundled blitz to be installed to ${install_dir}")
+  
+  set(blitz_INCLUDE_DIRS ${install_dir}/include)
+  set(blitz_LIBRARIES ${install_dir}/lib/libblitz${CMAKE_SHARED_LIBRARY_SUFFIX})
+  set(blitz_SERIALIZATION_FOUND 1)
+  set(blitz_FOUND 1)
 endif()
 
-install(DIRECTORY CustomElementsExample CustomScriptsExample
-        DESTINATION ${CPPQED_DOC_DIR}
-        PATTERN .git* EXCLUDE
-        PATTERN .bzr EXCLUDE
-        PATTERN *.kdev* EXCLUDE
-        PATTERN build* EXCLUDE
-)
+add_subdirectory(CPPQEDutils)
 
-#! \file
-#! <!--#########################################################-->
-#! ### Debian build
-#! <!--#########################################################-->
-#!
-#! This adds the sub-directory "debianbuild" if it exists. If not this section is silently ignored.
-#! The directory "debianbuild" is not part of the C++QED project. One can put a special
-#! [repository](https://ge-c705.uibk.ac.at/cppqed/debian) here, which will then generate debian
-#! directories for building source packages. This guarantees that debian packages have the right
-#! version numbers and soversion in their package names, and also helps to maintain packages for different
-#! distributions without code duplication.
-
-if(EXISTS ${PROJECT_SOURCE_DIR}/debianbuild)
-  add_subdirectory(debianbuild)
-endif()
-
-add_feature_info("cpypyqed" ENABLE_CPYPYQED "Python part of C++QED (wrapper and input/output).")
-feature_summary( WHAT ALL )
