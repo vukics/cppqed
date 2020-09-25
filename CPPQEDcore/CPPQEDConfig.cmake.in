@@ -39,9 +39,6 @@ set(CPPQED_THIRDPARTY_INCLUDE_DIRS "@PACKAGE_CPPQED_THIRDPARTY_INCLUDE_DIRS@")
 
 #! Compiler definitions which should be set when using this core library (automatically set in CPPQED_SETUP())
 set(CPPQED_DEFINITIONS "@CPPQED_DEFINITIONS@")
-if(@CONF_FLAT_INCLUDE@)
-  set(CPPQED_DEFINITIONS ${CPPQED_DEFINITIONS} "-DFLAT_INCLUDE")
-endif(@CONF_FLAT_INCLUDE@)
 
 # Hint Python directory
 set(PYTHON_LIBRARY "@PYTHON_LIBRARIES@")
