@@ -34,9 +34,9 @@ option(COMPRESSION "Boost bzip2 support" ON)
 #! @}
 
 # Blitz
-if( NOT BLITZ_found )
+if( NOT blitz_FOUND )
   find_package(blitz REQUIRED)
-endif( NOT BLITZ_found )
+endif( NOT blitz_FOUND )
 
 list(APPEND PUBLIC_LIBS ${Boost_IOSTREAMS_LIBRARY} ${blitz_LIBRARIES})
 
@@ -56,13 +56,12 @@ if( FLENS AND NOT FLENS_found )
   find_package(flens)
 endif( )
 
-if( flens_FOUND )
-  include_directories(SYSTEM ${flens_INCLUDE_DIRS})
-else( )
+if( NOT flens_FOUND )
   message(STATUS "Flens library not found or disabled, optional flens support disabled.")
   set(DO_NOT_USE_FLENS ON)
 endif( )
 
+include_directories(SYSTEM ${blitz_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
 
 # Check if serialization can be enabled, inform user
 if( Boost_SERIALIZATION_FOUND )
