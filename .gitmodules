@@ -1,0 +1,3 @@
+[submodule "blitz"]
+	path = blitz
+	url = git@github.com:vukics/blitz.git
