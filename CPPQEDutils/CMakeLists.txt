@@ -8,26 +8,17 @@ add_library(CPPQEDutils SHARED
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC Blitz::Blitz)
-
-#! \file
-#! <!--#########################################################-->
-#! ### Library detection
-#! <!--#########################################################-->
-#!
-#! In this section we look for required and optional dependencies.
+# ### Library detection
 find_package(GSL 2.5 REQUIRED)
 
 # Boost
 find_package(Boost 1.71 REQUIRED COMPONENTS iostreams)
 
-#! \name Project options
-#! @{
+target_link_libraries(CPPQEDutils PUBLIC Blitz::Blitz Boost::iostreams PRIVATE GSL::gsl)
 
-#! Switch for boost bzip2 support
+# Project options
+# Switch for boost bzip2 support
 option(COMPRESSION "Boost bzip2 support" ON)
-
-#! @}
 
 #FLENS
 ##if( FLENS AND NOT FLENS_found )
@@ -42,12 +33,12 @@ option(COMPRESSION "Boost bzip2 support" ON)
 # include_directories(SYSTEM ${flens_INCLUDE_DIRS})
 
 # Check if compression can be enabled, inform user
-if( COMPRESSION )
+if(COMPRESSION)
   message(STATUS "Support for binary statevector compression enabled.")
-else( COMPRESSION )
+else(COMPRESSION)
   set(DO_NOT_USE_BOOST_COMPRESSION ON)
   message(STATUS "Optional support for binary statevector compression disabled.")
-endif( COMPRESSION )
+endif(COMPRESSION)
 
 #configure_file("${CPPQED_CMAKE_MODULE_PATH}/config.h.in" config.h)
 
