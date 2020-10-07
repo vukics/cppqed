@@ -1,11 +1,11 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Defines i/oarchive types depending on the #DO_NOT_USE_BOOST_SERIALIZATION macro}
+/// \briefFile{Defines i/oarchive types depending on the #BZ_HAVE_BOOST_SERIALIZATION macro}
 #ifndef   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 
 #include "config.h"
 
-#ifdef    DO_NOT_USE_BOOST_SERIALIZATION
+#ifndef BZ_HAVE_BOOST_SERIALIZATION
 
 #include <cstddef> // size_t
 #include <iosfwd>
@@ -65,7 +65,7 @@ typedef trivial_oarchive oarchive; ///< delegated to trivial_oarchive
 
 } // cpputils
 
-#else  // DO_NOT_USE_BOOST_SERIALIZATION
+#else // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -77,6 +77,6 @@ typedef boost::archive::binary_oarchive oarchive; ///< \copydoc iarchive
 
 } // cpputils
 
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #endif // CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED

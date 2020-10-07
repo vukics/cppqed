@@ -8,10 +8,10 @@
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 
 /// Comprises utilities related to ODE adaptive evolution
@@ -84,11 +84,11 @@ protected:
                     );
 
 private:
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & t_ & dtDid_ & dtTry_;}
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
   double t_, dtTry_, dtDid_;
 
@@ -114,11 +114,11 @@ public:
   std::ostream& logOnEnd(std::ostream& os) const;
 
 private:
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & nDerivsCalls_ & nSteps_ & nFailedSteps_;}
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
   mutable size_t nDerivsCalls_;
   size_t nSteps_, nFailedSteps_;
@@ -154,7 +154,7 @@ public:
 
 private:
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
 
   /// The serialization of A by reference leads to memory leak (for not completely understood reasons),
   /** hence we adopt serialization by a temporary, which necessitates splitting save/load. */
@@ -169,7 +169,7 @@ private:
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
   A& a_;
 

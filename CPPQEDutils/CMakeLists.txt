@@ -19,7 +19,7 @@ target_link_libraries(CPPQEDutils PUBLIC Blitz::Blitz)
 find_package(GSL 2.5 REQUIRED)
 
 # Boost
-find_package(Boost 1.71 REQUIRED COMPONENTS iostreams OPTIONAL_COMPONENTS serialization)
+find_package(Boost 1.71 REQUIRED COMPONENTS iostreams)
 
 #! \name Project options
 #! @{
@@ -28,17 +28,6 @@ find_package(Boost 1.71 REQUIRED COMPONENTS iostreams OPTIONAL_COMPONENTS serial
 option(COMPRESSION "Boost bzip2 support" ON)
 
 #! @}
-
-# The serialization configuration of Blitz must be compatible with Boost_SERIALIZATION_FOUND
-#if( Boost_SERIALIZATION_FOUND )
-
-  #if(BZ_HAVE_BOOST_SERIALIZATION)
-    #message(STATUS "Blitz++ built with serialization support.")
-  #else()
-    #message(FATAL_ERROR "Blitz++ built without serialization support. Please reconfigure blitz making sure it picks up Boost.Serialization.")
-  #endif()
-
-#endif( Boost_SERIALIZATION_FOUND )
 
 #FLENS
 ##if( FLENS AND NOT FLENS_found )
@@ -50,16 +39,7 @@ option(COMPRESSION "Boost bzip2 support" ON)
   #set(DO_NOT_USE_FLENS ON)
 #endif( )
 
-include_directories(SYSTEM ${blitz_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
-
-# Check if serialization can be enabled, inform user
-if( Boost_SERIALIZATION_FOUND )
-  message(STATUS "Support for binary statevector output enabled.")
-  list(APPEND PUBLIC_LIBS ${Boost_SERIALIZATION_LIBRARY})
-else( Boost_SERIALIZATION_FOUND )
-  set(DO_NOT_USE_BOOST_SERIALIZATION ON)
-  message(STATUS "Optional support for binary statevector output disabled.")
-endif( Boost_SERIALIZATION_FOUND )
+# include_directories(SYSTEM ${flens_INCLUDE_DIRS})
 
 # Check if compression can be enabled, inform user
 if( COMPRESSION )

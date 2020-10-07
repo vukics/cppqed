@@ -40,11 +40,11 @@ struct SerializationMetadata
   static const std::string ARRAY_ONLY;
 
 private:
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & typeID & trajectoryID;}
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 };
 

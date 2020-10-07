@@ -14,10 +14,10 @@
 #include <boost/bind.hpp>
 #include <boost/utility.hpp>
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/split_member.hpp>
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 
 /// the randomized-bundle
@@ -50,7 +50,7 @@ public:
 private:
   virtual double doSample() = 0;
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
 
   friend class boost::serialization::access;
 
@@ -72,7 +72,7 @@ private:
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
   
   virtual const std::string getState() const = 0;
   virtual void setState(const std::string&) = 0;

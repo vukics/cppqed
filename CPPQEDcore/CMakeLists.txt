@@ -73,16 +73,13 @@ include_directories(SYSTEM ${GSL_INCLUDE_DIRS})
 #! \name Project options
 #! @{
 
-#! Switch for boost serialization.
-option(SERIALIZATION "Boost serialization" ON)
-
 #! Switch for boost bzip2 support
 option(COMPRESSION "Boost bzip2 support" ON)
 
 #! @}
 
 # Boost
-find_package(Boost 1.71 REQUIRED COMPONENTS iostreams OPTIONAL_COMPONENTS serialization)
+find_package(Boost 1.71 REQUIRED COMPONENTS iostreams)
 
 set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
@@ -369,7 +366,6 @@ set_package_properties(Doxygen PROPERTIES URL "http://www.doxygen.org/"
                                 TYPE OPTIONAL
                                 PURPOSE "Generation of API documentation. Note that you also need the graphviz package to build the documentation.")
 add_feature_info("FLENS" CPPQED_FLENS_FOUND "compile framework with FLENS support.")
-add_feature_info("Serialization" Boost_SERIALIZATION_FOUND "needed for binary statevector output." )
 add_feature_info("Compression" COMPRESSION "bzip2 compression of binary statevectors.")
 if(NOT ${CPPQED_MONOLITHIC})
   feature_summary( WHAT ALL )

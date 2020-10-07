@@ -7,9 +7,9 @@
 
 #include <complex>
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/complex.hpp>
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 
 /// Double-precision complex number
