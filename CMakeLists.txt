@@ -1,4 +1,5 @@
-# Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 #! \addtogroup Main
 #! @{
@@ -21,12 +22,6 @@
 
 cmake_minimum_required (VERSION 3.12)
 
-project(cppqed)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 #! \file
 #! <!--#########################################################-->
 #! ### Version management
@@ -47,7 +42,7 @@ set(CPPQED_VERSION_MAJOR 2)
 #! MINOR - the milestone release, as in v2m10
 set(CPPQED_VERSION_MINOR 120)
 #! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_VERSION_PATCH 10)
+set(CPPQED_VERSION_PATCH 0)
 #! Full C++QED version
 set(CPPQED_VERSION
   "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
@@ -87,7 +82,7 @@ set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 #! @{
 
 #! The current ABI version
-set(CPPQED_ABI_CURRENT 5)
+set(CPPQED_ABI_CURRENT 6)
 #! number of Versions backwards that CURRENT is compatible with
 set(CPPQED_ABI_AGE 0)
 #! Patch revision
@@ -99,6 +94,36 @@ math(EXPR CPPQED_ABI_MAJOR "${CPPQED_ABI_CURRENT}-${CPPQED_ABI_AGE}")
 set(CPPQED_ABI_MINOR "${CPPQED_ABI_AGE}")
 #! Same as ABI_REVISION
 set(CPPQED_ABI_MICRO "${CPPQED_ABI_REVISION}")
+
+project(cppqed VERSION ${CPPQED_VERSION}  
+               LANGUAGES CXX
+               DESCRIPTION "A framework for simulating open quantum dynamics"
+               HOMEPAGE_URL "https://github.com/vukics/cppqed")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
+
+# Build type: guard against values other than debug/release, make release default
+
+if (NOT CMAKE_BUILD_TYPE)
+  message(WARNING "Build type not set, default is \"Release\".")
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_tolower)
+if(   NOT cmake_build_type_tolower STREQUAL "debug"
+  AND NOT cmake_build_type_tolower STREQUAL "release")
+  message(FATAL_ERROR "Unknown build type \"${CMAKE_BUILD_TYPE}\". Allowed values are Debug and Release (case-insensitive).")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual -DBZ_DEBUG")
+
+set(CMAKE_DEBUG_POSTFIX "_d")
+
 
 #! @}
 
@@ -112,7 +137,6 @@ set(CPPQED_ABI_MICRO "${CPPQED_ABI_REVISION}")
 set(GCC_MINIMAL 9.3)
 set(CLANG_MINIMAL 10.0)
 
-
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${GCC_MINIMAL})
   message(FATAL_ERROR "GCC g++ version >= ${GCC_MINIMAL} needed.")
 endif ()
@@ -121,48 +145,14 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang AND ${CMAKE_CXX_COMPILER_VERSION} VE
   message(FATAL_ERROR "Clang version >= ${CLANG_MINIMAL} needed.")
 endif ()
 
-option(BUNDLED_BLITZ "Download and compile blitz++ automatically" OFF)
-
 #! Switch for FLENS support.
-option(FLENS "FLENS support" ON)
+# option(FLENS "FLENS support" ON)
 
-#! If this option is set, %CMake downloads and compiles the optional FLENS dependency automatically.
-option(BUNDLED_FLENS "Download and compile FLENS automatically" OFF)
+add_subdirectory(blitz)
 
-if(BUNDLED_BLITZ OR BUNDLED_FLENS)
-  find_package(Git 1.6.5 REQUIRED) # ExternalProject requires this version
-endif()
-
-
-if(BUNDLED_BLITZ)
-  include(ExternalProject)
-
-#   if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
-#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-64bit ")
-#   else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
-#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8 ")
-#   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-
-  if(EXISTS ${CMAKE_SOURCE_DIR}/external/blitz) # distributed packaged together with cppqed
-    set(BLITZ_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/blitz/. <SOURCE_DIR>/)
-  else()
-    set(BLITZ_SOURCE GIT_REPOSITORY http://github.com/vukics/blitz.git GIT_TAG a39b77e33a92cce48495306817dc1573f62f755e GIT_SHALLOW TRUE GIT_PROGRESS TRUE)
-  endif()
-
-  ExternalProject_Add(
-    blitz
-    ${BLITZ_SOURCE}
-    UPDATE_COMMAND ""
-    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
-  )
-  ExternalProject_Get_Property(blitz install_dir)
-  message(STATUS "Bundled blitz to be installed to ${install_dir}")
-  
-  set(blitz_INCLUDE_DIRS ${install_dir}/include)
-  set(blitz_LIBRARIES ${install_dir}/lib/libblitz${CMAKE_SHARED_LIBRARY_SUFFIX})
-  set(blitz_SERIALIZATION_FOUND 1)
-  set(blitz_FOUND 1)
-endif()
+include_directories(SYSTEM blitz)
 
 add_subdirectory(CPPQEDutils)
+
+# add_subdirectory(CPPQEDcore)
 

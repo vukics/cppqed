@@ -5,109 +5,11 @@
 #!
 #! The file has the following structure:
 
-cmake_minimum_required (VERSION 3.12) # due to blitz
+project (cppqedcore)
 
-project (core)
+message(STATUS "Configuring CPPQEDcore")
 
-#! \name Project variables
-#! @{
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-#! \brief Path to additional CMake modules.
-set(CPPQED_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CPPQED_CMAKE_MODULE_PATH})
-
-#! @}
-
-include(FeatureSummary)
-include(CPPQEDUse)
-
-#! \file
-#! <!--#########################################################-->
-#! ### Version management
-#! <!--#########################################################-->
-#!
-#! Set the major, minor and patch version of C++QED (c.f. \ref versioning). The major and minor
-#! versions end up in the library names of all components. In this section,
-#! also the ABI version of the library is set (c.f. \ref ABI).
-
-
-#! \anchor versioning
-#! \name Version variables
-#! Versioning scheme
-#! @{
-
-#! MAJOR - the grand version of C++QED, as in v2
-set(CPPQED_VERSION_MAJOR 2)
-#! MINOR - the milestone release, as in v2m10
-set(CPPQED_VERSION_MINOR 100)
-#! PATCH - should be increased on every snapshot package release, reset on milestone change
-set(CPPQED_VERSION_PATCH 10)
-#! Full C++QED version
-set(CPPQED_VERSION
-  "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
-#! MAJOR.MINOR, at the moment mainly distinguishes stable (2.10) from development (2.100)
-set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
-
-#! @}
-
-#! \anchor ABI
-#! \name ABI versioning scheme
-#!
-#! Adopt the shared library versioning scheme of libtool
-#! - CURRENT  - the current ABI version
-#! - AGE      - number of versions backwards that CURRENT is compatible with
-#! - REVISION - patch revision
-#!
-#! *Rationale*
-#!
-#! Bugfixes and Patches which do not affect ABI:
-#!  * increase REVISION
-#!
-#! Symbols added to library (i.e. binary compatibility NOT broken):
-#!  * increase AGE
-#!  * remember to call dh_makeshlibs with -V packagename (>=packageversion) when packaging
-#!
-#! Symbols removed or changed (i.e. binary compatibility broken):
-#!  * set CURRENT -> CURRENT + AGE + 1, reset AGE
-#!
-#! On every change of AGE or CURRENT: reset REVISION
-#!
-#! The library version (.so.X.Y.Z) is `{CURRENT-AGE}.{AGE}.{REVISION}`, here named
-#! `{ABI_MAJOR}.{ABI_MINOR}.{ABI_MICRO}`. This way it is ensured that ABI_MAJOR only changes
-#! when binary compatibility is broken.
-#!
-#! The SONAME of the library always is: `libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}.so.${ABI_MAJOR}`
-#! and the packages are named `libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}-${ABI_MAJOR}[-dev]`
-#! @{
-
-#! The current ABI version
-set(CPPQED_ABI_CURRENT 5)
-#! number of Versions backwards that CURRENT is compatible with
-set(CPPQED_ABI_AGE 0)
-#! Patch revision
-set(CPPQED_ABI_REVISION 0)
-#! Set to ABI_CURRENT - ABI_AGE
-set(CPPQED_ABI_MAJOR)
-math(EXPR CPPQED_ABI_MAJOR "${CPPQED_ABI_CURRENT}-${CPPQED_ABI_AGE}")
-#! Same as ABI_AGE
-set(CPPQED_ABI_MINOR "${CPPQED_ABI_AGE}")
-#! Same as ABI_REVISION
-set(CPPQED_ABI_MICRO "${CPPQED_ABI_REVISION}")
-
-#! @}
-
-if(CPPQED_MONOLITHIC)
-  set(CPPQED_VERSION ${CPPQED_VERSION} PARENT_SCOPE)
-  set(CPPQED_VERSION_MAJOR ${CPPQED_VERSION_MAJOR} PARENT_SCOPE)
-  set(CPPQED_VERSION_MINOR ${CPPQED_VERSION_MINOR} PARENT_SCOPE)
-  set(CPPQED_VERSION_PATCH ${CPPQED_VERSION_PATCH} PARENT_SCOPE)
-  set(CPPQED_ID ${CPPQED_ID} PARENT_SCOPE)
-  set(CPPQED_ABI_MAJOR ${CPPQED_ABI_MAJOR} PARENT_SCOPE)
-endif()
+message(STATUS ${PUBLIC_LIBS})
 
 #! \name Project options
 #! @{
@@ -142,24 +44,6 @@ endif()
 #! @}
 
 
-#! \file
-#! <!--#########################################################-->
-#! ### Compiler detection
-#! <!--#########################################################-->
-#!
-#! Ubuntu 20.04LTS versions
-
-set(GCC_MINIMAL 9.3)
-set(CLANG_MINIMAL 10.0)
-
-
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${GCC_MINIMAL})
-  message(FATAL_ERROR "GCC g++ version >= ${GCC_MINIMAL} needed.")
-endif ()
-
-if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${CLANG_MINIMAL})
-  message(FATAL_ERROR "Clang version >= ${CLANG_MINIMAL} needed.")
-endif ()
 
 #! \file
 #! <!--#########################################################-->
@@ -223,124 +107,7 @@ set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${Boost_INC
 #! Takes care also of preparing the blitz (& FLENS) dependencies in case their source is distributed together with cppqed in a package ('external' folder)
 
 
-option(BUNDLED_BLITZ "Download and compile blitz++ automatically" OFF)
 
-#! Switch for FLENS support.
-option(FLENS "FLENS support" ON)
-
-#! If this option is set, %CMake downloads and compiles the optional FLENS dependency automatically.
-option(BUNDLED_FLENS "Download and compile FLENS automatically" OFF)
-
-if(BUNDLED_BLITZ OR BUNDLED_FLENS)
-  find_package(Git 1.6.5 REQUIRED) # ExternalProject requires this version
-endif()
-
-if(BUNDLED_BLITZ)
-  include(ExternalProject)
-
-#   if( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 64bit system
-#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-64bit ")
-#   else( CMAKE_SIZEOF_VOID_P EQUAL 8 ) # 32bit system
-#     set(BLITZ_CONFIG_OPTIONS "${BLITZ_CONFIG_OPTIONS} --enable-simd-width=8 ")
-#   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-
-  if(EXISTS ${CMAKE_SOURCE_DIR}/external/blitz) # distributed packaged together with cppqed
-    set(BLITZ_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/blitz/. <SOURCE_DIR>/)
-  else()
-    set(BLITZ_SOURCE GIT_REPOSITORY http://github.com/vukics/blitz.git GIT_TAG a39b77e33a92cce48495306817dc1573f62f755e GIT_SHALLOW TRUE GIT_PROGRESS TRUE)
-  endif()
-
-  ExternalProject_Add(
-    blitz
-    ${BLITZ_SOURCE}
-    UPDATE_COMMAND ""
-    CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
-  )
-  ExternalProject_Get_Property(blitz install_dir)
-  message(STATUS "Bundled blitz to be installed to ${install_dir}")
-  set(blitz_INCLUDE_DIRS ${install_dir}/include)
-  set(blitz_LIBRARIES ${install_dir}/lib/libblitz${CMAKE_SHARED_LIBRARY_SUFFIX})
-  set(BUNDLED_BLITZ_INSTALLED_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR}/libblitz${CMAKE_SHARED_LIBRARY_SUFFIX})
-  set(blitz_FOUND 1)
-  set(PRIVATE_LIBS ${PRIVATE_LIBS} ${blitz_LIBRARIES})
-  include_directories(SYSTEM ${blitz_INCLUDE_DIRS})
-
-else(BUNDLED_BLITZ)
-  find_package(blitz REQUIRED)
-  if( Boost_SERIALIZATION_FOUND )
-
-    if( blitz_SERIALIZATION_FOUND )
-      message(STATUS "Blitz++ built with serialization support.")
-    else( blitz_SERIALIZATION_FOUND )
-      message(FATAL_ERROR "Blitz++ built without serialization support. Please reconfigure blitz making sure it picks up Boost.Serialization.")
-    endif( blitz_SERIALIZATION_FOUND )
-
-  endif( Boost_SERIALIZATION_FOUND )
-
-  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${blitz_LIBRARIES})
-  set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
-endif(BUNDLED_BLITZ)
-
-
-if(BUNDLED_FLENS)
-  include(ExternalProject)
-
-  if(EXISTS ${CMAKE_SOURCE_DIR}/external/flens)
-    set(FLENS_SOURCE DOWNLOAD_COMMAND cp -a ${CMAKE_SOURCE_DIR}/external/flens/. <SOURCE_DIR>/)
-  else()
-    set(FLENS_SOURCE GIT_REPOSITORY git://github.com/michael-lehn/FLENS.git GIT_TAG "public")
-  endif()
-
-  ExternalProject_Add(
-    flens
-    ${FLENS_SOURCE}
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ../flens/
-    BUILD_COMMAND
-    INSTALL_COMMAND make install
-  )
-  ExternalProject_Get_Property(flens install_dir)
-  set(flens_INCLUDE_DIRS ${install_dir}/include)
-  set(flens_FOUND 1)
-endif()
-
-
-# FLENS
-if(NOT BUNDLED_FLENS)
-  find_package(flens)
-endif()
-if( flens_FOUND AND FLENS )
-  include_directories(SYSTEM ${flens_INCLUDE_DIRS})
-  if(BUNDLED_FLENS)
-    include_directories(SYSTEM ${flens_INCLUDE_DIRS})
-    message(STATUS "Using bundled flens from ${flens_INCLUDE_DIRS}.")
-  else()
-    set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
-  endif()
-  set(CPPQED_FLENS_FOUND 1)
-else( flens_FOUND AND FLENS )
-  message(STATUS "Flens library not found or disabled, optional flens support disabled.")
-  set(DO_NOT_USE_FLENS ON)
-  set(CPPQED_FLENS_FOUND 0)
-endif( flens_FOUND AND FLENS )
-
-# Check if serialization can be enabled, inform user
-if( Boost_SERIALIZATION_FOUND )
-  message(STATUS "Support for binary statevector output enabled.")
-  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${Boost_SERIALIZATION_LIBRARY})
-else( Boost_SERIALIZATION_FOUND )
-  set(DO_NOT_USE_BOOST_SERIALIZATION ON)
-  message(STATUS "Optional support for binary statevector output disabled.")
-endif( Boost_SERIALIZATION_FOUND )
-
-# Check if compression can be enabled, inform user
-if( COMPRESSION )
-  message(STATUS "Support for binary statevector compression enabled.")
-  set(PUBLIC_LIBS ${PUBLIC_LIBS} ${Boost_IOSTREAMS_LIBRARY})
-else( COMPRESSION )
-  set(DO_NOT_USE_BOOST_COMPRESSION ON)
-  message(STATUS "Optional support for binary statevector compression disabled.")
-endif( COMPRESSION )
 
 # Doxygen
 find_package(Doxygen 1.8)

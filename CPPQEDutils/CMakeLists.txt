@@ -1,17 +1,14 @@
 # Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-# If BUNDLED_BLITZ is ON, then we know in advance where blitz *will be* situated, so we can skip FindBlitz, and simply set the blitz variables by hand
-# thereupon, we have a unified treatment available, independently of the value of BUNDLED_BLITZ
-# so, we can confine BUNDLED_BLITZ to the highest level only (main CMakeLists.txt)
-
-# Ditto for FLENS
-
-project(cppqedutils)
-
 message(STATUS "Configuring CPPQEDutils")
 
-set(CPPQED_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
-list(APPEND CMAKE_MODULE_PATH ${CPPQED_CMAKE_MODULE_PATH})
+add_library(CPPQEDutils SHARED
+            BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc DrivenDampedHarmonicOscillator.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
+            FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Randomized.cc Trajectory.cc Version.cc)
+
+add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
+
+target_link_libraries(CPPQEDutils PUBLIC Blitz::Blitz)
 
 #! \file
 #! <!--#########################################################-->
@@ -19,7 +16,6 @@ list(APPEND CMAKE_MODULE_PATH ${CPPQED_CMAKE_MODULE_PATH})
 #! <!--#########################################################-->
 #!
 #! In this section we look for required and optional dependencies.
-
 find_package(GSL 2.5 REQUIRED)
 
 # Boost
@@ -33,33 +29,26 @@ option(COMPRESSION "Boost bzip2 support" ON)
 
 #! @}
 
-# Blitz
-if( NOT blitz_FOUND )
-  find_package(blitz REQUIRED)
-endif( NOT blitz_FOUND )
-
-list(APPEND PUBLIC_LIBS ${Boost_IOSTREAMS_LIBRARY} ${blitz_LIBRARIES})
-
 # The serialization configuration of Blitz must be compatible with Boost_SERIALIZATION_FOUND
-if( Boost_SERIALIZATION_FOUND )
+#if( Boost_SERIALIZATION_FOUND )
 
-  if( blitz_SERIALIZATION_FOUND )
-    message(STATUS "Blitz++ built with serialization support.")
-  else( blitz_SERIALIZATION_FOUND )
-    message(FATAL_ERROR "Blitz++ built without serialization support. Please reconfigure blitz making sure it picks up Boost.Serialization.")
-  endif( blitz_SERIALIZATION_FOUND )
+  #if(BZ_HAVE_BOOST_SERIALIZATION)
+    #message(STATUS "Blitz++ built with serialization support.")
+  #else()
+    #message(FATAL_ERROR "Blitz++ built without serialization support. Please reconfigure blitz making sure it picks up Boost.Serialization.")
+  #endif()
 
-endif( Boost_SERIALIZATION_FOUND )
+#endif( Boost_SERIALIZATION_FOUND )
 
 #FLENS
-if( FLENS AND NOT FLENS_found )
-  find_package(flens)
-endif( )
+##if( FLENS AND NOT FLENS_found )
+  ##find_package(flens)
+##endif( )
 
-if( NOT flens_FOUND )
-  message(STATUS "Flens library not found or disabled, optional flens support disabled.")
-  set(DO_NOT_USE_FLENS ON)
-endif( )
+#if( NOT flens_FOUND )
+  #message(STATUS "Flens library not found or disabled, optional flens support disabled.")
+  #set(DO_NOT_USE_FLENS ON)
+#endif( )
 
 include_directories(SYSTEM ${blitz_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
 
@@ -80,11 +69,22 @@ else( COMPRESSION )
   message(STATUS "Optional support for binary statevector compression disabled.")
 endif( COMPRESSION )
 
-configure_file("${CPPQED_CMAKE_MODULE_PATH}/config.h.in" config.h)
+#configure_file("${CPPQED_CMAKE_MODULE_PATH}/config.h.in" config.h)
 
-file(GLOB CPPQEDutils_sources . *.cc )
-list(REMOVE_ITEM CPPQEDutils_sources "Version.cc")
-add_library(CPPQEDutils SHARED ${CPPQEDutils_sources})
-target_link_libraries(CPPQEDutils PUBLIC ${PUBLIC_LIBS} PRIVATE ${GSL_LIBRARIES})
-target_include_directories(CPPQEDutils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-# create_object_target()
+#set(CPPQEDutils_LIB "CPPQEDutils-${CPPQED_ID}")
+#file(GLOB CPPQEDutils_SOURCES . *.cc )
+
+#add_library(${CPPQEDutils_LIB} SHARED ${CPPQEDutils_SOURCES})
+#target_link_libraries(${CPPQEDutils_LIB} PUBLIC ${PUBLIC_LIBS} PRIVATE ${GSL_LIBRARIES})
+#target_include_directories(${CPPQEDutils_LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+#set_target_properties(${CPPQEDutils_LIB} PROPERTIES
+#      PUBLIC_HEADER "${core_PUBLIC_HEADERS}"
+#      INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
+#      VERSION ${CPPQED_ABI_MAJOR}.${CPPQED_ABI_MINOR}.${CPPQED_ABI_MICRO}
+#      SOVERSION ${CPPQED_ABI_MAJOR}
+#)
+
+#install(TARGETS ${CPPQEDutils_LIB} DESTINATION lib)
+
+#file(GLOB CPPQEDutils_HEADERS . *.h )
+#install(FILES ${CPPQEDutils_HEADERS} "${PROJECT_BINARY_DIR}/config.h" DESTINATION "include/CPPQEDutils-${CPPQED_ID}")
