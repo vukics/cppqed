@@ -1,0 +1,2 @@
+add_executable(HarmonicOscillator HarmonicOscillator.cc)
+target_link_libraries(HarmonicOscillator CPPQED::CPPQEDutils)

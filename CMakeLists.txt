@@ -75,6 +75,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
+option(ENABLE_TESTING "Enable testsuite" OFF)
+
 # Build type: guard against values other than debug/release, make release default
 
 if (NOT CMAKE_BUILD_TYPE)

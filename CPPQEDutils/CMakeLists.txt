@@ -3,8 +3,9 @@
 message(STATUS "Configuring CPPQEDutils")
 
 add_library(CPPQEDutils SHARED
-            BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc DrivenDampedHarmonicOscillator.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
+            BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
             FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Randomized.cc Trajectory.cc Version.cc)
+# DrivenDampedHarmonicOscillator.cc should have an FLENS-dependent logic
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
@@ -35,10 +36,14 @@ option(COMPRESSION "Boost bzip2 support" ON)
 # Check if compression can be enabled, inform user
 if(COMPRESSION)
   message(STATUS "Support for binary statevector compression enabled.")
-else(COMPRESSION)
+else()
   set(DO_NOT_USE_BOOST_COMPRESSION ON)
   message(STATUS "Optional support for binary statevector compression disabled.")
-endif(COMPRESSION)
+endif()
+
+if(ENABLE_TESTING)
+  add_subdirectory(Testing)
+endif()
 
 #configure_file("${CPPQED_CMAKE_MODULE_PATH}/config.h.in" config.h)
 
