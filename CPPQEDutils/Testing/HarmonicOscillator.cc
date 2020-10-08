@@ -48,9 +48,8 @@ int main(int argc, char* argv[])
   Simulated<DA1R> S(y,
                     bind(derivs,_1,_2,_3,omega,gamma),
                     .1/max(1.,max(omega,gamma)),
-                    DA1R(),
                     pt);
 
-  evolve(S,pt);
+  run(S,pt);
 
 }
