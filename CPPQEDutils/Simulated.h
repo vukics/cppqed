@@ -5,7 +5,7 @@
 
 #include "BlitzArray.h"
 #include "EvolvedGSL.tcc"
-#include "Simulated.tcc"
+#include "Simulated_.h"
 
 #include "Pars.h"
 

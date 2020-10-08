@@ -15,12 +15,12 @@ namespace blitzplusplus {
 
 inline bool isfinite(double d) {return boost::math::isfinite(d);}
 
-BZ_DECLARE_FUNCTION_RET(isfinite,bool) ;
+BZ_DECLARE_FUNCTION_RET(isfinite,bool)
 
 
 inline double selectNegative(double d) {return d<0 ? d : 0;}
 
-BZ_DECLARE_FUNCTION_RET(selectNegative,double) ;
+BZ_DECLARE_FUNCTION_RET(selectNegative,double)
 
 
 /// Exception class thrown by unaryArray & binaryArray

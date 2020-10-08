@@ -5,6 +5,10 @@
 
 #include "ParsTrajectory.h"
 #include "Trajectory.h"
+// #include "ArrayTraits.h"
+// The same note applies as with EvolvedGSL.tcc
+#include "FormDouble.h"
+#include "Trajectory.tcc"
 
 
 namespace trajectory {
@@ -28,11 +32,13 @@ public:
 
   typedef evolved::Evolved<A> Evolved;
 
-  Simulated(A&, typename Evolved::Derivs, double dtInit,
+  Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
             int logLevel,
-            double, double,
+            double epsRel, double epsAbs,
             const A& scaleAbs=A(),
-            const evolved::Maker<A>& =evolved::MakerGSL<A>());
+            const evolved::Maker<A>& maker=evolved::MakerGSL<A>())
+    : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,maker) {}
+
 
   Simulated(A& array, typename Evolved::Derivs derivs, double dtInit,
             const ParsEvolved& pe,
@@ -40,7 +46,13 @@ public:
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 protected:
-  std::ostream& display_v(std::ostream&, int) const override;
+  std::ostream& display_v(std::ostream& os, int precision) const override
+  {
+    using namespace cpputils;
+    const A& a=this->getEvolved()->getA();
+    for (size_t i=0; i<subscriptLimit(a); i++) os<<FormDouble(precision)(subscript(a,i))<<' ';
+    return os;
+  }
   
 private:
   void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}

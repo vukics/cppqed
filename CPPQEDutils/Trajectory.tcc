@@ -224,7 +224,7 @@ trajectory::AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
           SerializationMetadata::ARRAY_ONLY,
           cpputils::Rank<A>::value),
     evolvedIO_(evolvedIO)
-{};
+{}
 
 template<typename A>
 cpputils::iarchive& trajectory::AdaptiveIO<A>::readState(cpputils::iarchive& iar)
