@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
 #define   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
 
-#include "core_config.h"
-
 #include "DensityOperator.h"
 
 #include "TMP_Tools.h"

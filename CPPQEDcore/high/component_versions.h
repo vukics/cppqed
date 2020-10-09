@@ -4,10 +4,10 @@
 #define component_VERSIONS_H_INCLUDED
 
 
-#include "core_version.h"
+// #include "core_version.h"
 
 
-inline string cppqed_component_versions() {return cppqed_core_version();}
+inline std::string cppqed_component_versions() {return "transitional";}
 
 
 #endif // component_VERSIONS_H_INCLUDED

@@ -1,1 +1,7 @@
-create_object_target()
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+
+add_library(CPPQEDcore_quantumoperator SHARED Sigma.cc Tridiagonal.cc)
+add_library(CPPQED::CPPQEDcore_quantumoperator ALIAS CPPQEDcore_quantumoperator)
+
+target_link_libraries(CPPQEDcore_quantumoperator PUBLIC CPPQED::CPPQEDcore_structure)

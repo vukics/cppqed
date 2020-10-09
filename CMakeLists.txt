@@ -116,5 +116,5 @@ add_compile_options(-Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-
 
 add_subdirectory(CPPQEDutils)
 
-# add_subdirectory(CPPQEDcore)
+add_subdirectory(CPPQEDcore)
 
