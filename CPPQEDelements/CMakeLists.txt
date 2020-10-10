@@ -1,43 +1,15 @@
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-#! \ingroup Main
-#! \file
-#! \brief Top level %CMake file for the C++QED elements component.
-#!
-#! The file structure is very simple, the main steps after finding the CPPQED core component are:
-#! setting include dependency relations between sub-directories, calling elements_project() to
-#! generate the library, and cppqed_documentation() to generate the documentation.
+message(STATUS "Configuring CPPQEDelements")
 
+add_subdirectory(utils)
 
-cmake_minimum_required (VERSION 3.12)
+add_subdirectory(frees)
 
-project(elements)
+add_subdirectory(interactions)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+add_library(CPPQEDelements INTERFACE)
+add_library(CPPQED::CPPQEDelements ALIAS CPPQEDelements)
 
-############################################################
-# This section is essential to find the required libraries 
-# and include files
-find_package(CPPQED 2.100 REQUIRED)
-include(${CPPQED_USE})
-include_directories(${CPPQED_INCLUDE_DIRS})
-############################################################
-
-set(ELEMENTS_SOURCE_DIRS utils frees interactions)
-set(frees_NEEDS utils)
-set(interactions_NEEDS utils frees)
-
-message(STATUS "Building CPPQEDelements " ${CPPQED_LIBRARIES} ${CPPQEDelements_LIBRARIES})
-
-# This tells the elements_project macro that the project name 'elements' is ok
-set(ORIGINAL_ELEMENTS_PROJECT 1)
-elements_project()
-
-##################################################
-# Documentation
-##################################################
-
-if(CPPQED_MONOLITHIC)
-  cppqed_documentation("elements_" ${core_DOXYGEN_TAG} core_doc)
-endif()
+target_link_libraries(CPPQEDelements INTERFACE CPPQED::CPPQEDelements_interactions)

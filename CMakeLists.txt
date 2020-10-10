@@ -118,3 +118,6 @@ add_subdirectory(CPPQEDutils)
 
 add_subdirectory(CPPQEDcore)
 
+add_subdirectory(CPPQEDelements)
+
+add_subdirectory(CPPQEDscripts)
