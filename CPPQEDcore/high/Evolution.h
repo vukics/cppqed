@@ -10,27 +10,11 @@
 #include "EvolvedGSL.tcc"
 #include "Pars.h"
 
-#include "component_versions.h"
-
 
 /// Introduces ParameterTable into the global namespace to break ambiguity between update and parameters::update
-class ParameterTable : public parameters::Table {};
+using ParameterTable = parameters::Table;
 
-
-/// Convenience version of parameters::update that includes the highest-level version information
-/** \note This cannot be put into an implementation file because then an incorrect `component_versions.h` file would be picked up */
-void update(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
-{
-  cppqed_versionstring=cppqed_component_versions();
-  parameters::update(p,argc,argv,prefix);
-}
-
-/// Convenience version of picture::updateWithPicture that includes the highest-level version information
-QM_Picture& updateWithPicture(ParameterTable& p, int argc, char* argv[], const std::string& prefix="--")
-{
-  cppqed_versionstring=cppqed_component_versions();
-  return picture::updateWithPicture(p,argc,argv,prefix);
-}
+using parameters::update, picture::updateWithPicture;
 
 
 #endif // CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION_H_INCLUDED

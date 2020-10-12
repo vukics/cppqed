@@ -1,0 +1,3 @@
+#define CPPQED_GIT_SHA1 "@CPPQED_GIT_SHA1@"
+
+extern const char cppqed_GIT_SHA1[] = CPPQED_GIT_SHA1;

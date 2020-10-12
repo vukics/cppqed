@@ -3,6 +3,7 @@
 message(STATUS "Configuring CPPQEDutils")
 
 add_library(CPPQEDutils SHARED
+            "$<TARGET_OBJECTS:cppqedGitSHA1>"
             BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
             FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Randomized.cc Trajectory.cc Version.cc)
 # DrivenDampedHarmonicOscillator.cc should have an FLENS-dependent logic

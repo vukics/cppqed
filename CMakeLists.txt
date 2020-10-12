@@ -85,7 +85,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 string(TOLOWER ${CMAKE_BUILD_TYPE} cmake_build_type_tolower)
-if(NOT(cmake_build_type_tolower MATCHES "^(release|debug)$"))
+if (NOT(cmake_build_type_tolower MATCHES "^(release|debug)$"))
   message(FATAL_ERROR "Unknown build type \"${CMAKE_BUILD_TYPE}\". Allowed values are Debug and Release (case-insensitive).")
 endif()
 
@@ -112,7 +112,23 @@ message(STATUS "Configuring blitz")
 add_subdirectory(blitz)
 include_directories(SYSTEM blitz) # in order that we do not receive warnings from blitz
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
+include(GetGitRevisionDescription)
+get_git_head_revision(CPPQED_GIT_REFSPEC CPPQED_GIT_SHA1)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/cppqedGitSHA1.cc.in" "${CMAKE_CURRENT_BINARY_DIR}/cppqedGitSHA1.cc" @ONLY)
+
+add_library(cppqedGitSHA1 OBJECT "${CMAKE_CURRENT_BINARY_DIR}/cppqedGitSHA1.cc")
+
 add_compile_options(-Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual)
+
+#macro(add_executable S)
+  #if (${cmake_build_type_tolower} STREQUAL debug)
+    #_add_executable("${S}_d" ${ARGN})
+  #else()
+    #_add_executable(${S} ${ARGN})
+  #endif()
+#endmacro()
 
 add_subdirectory(CPPQEDutils)
 
