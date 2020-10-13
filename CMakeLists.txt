@@ -74,6 +74,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# otherwise object libraries are not compiled with the -fPIC option
+# cf. http://gitlab.kitware.com/cmake/cmake/-/issues/17356
 
 option(ENABLE_TESTING "Enable testsuite" OFF)
 

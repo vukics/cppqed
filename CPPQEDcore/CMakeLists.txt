@@ -15,10 +15,13 @@ add_subdirectory(composites)
 
 add_subdirectory(high)
 
-add_library(CPPQEDcore INTERFACE)
+add_library(CPPQEDcore SHARED
+            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumdata> $<TARGET_OBJECTS:CPPQED::CPPQEDcore_structure>
+            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumoperator> $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumtrajectory>
+            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_composites> $<TARGET_OBJECTS:CPPQED::CPPQEDcore_high>)
 add_library(CPPQED::CPPQEDcore ALIAS CPPQEDcore)
 
-target_link_libraries(CPPQEDcore INTERFACE CPPQED::CPPQEDcore_high)
+target_link_libraries(CPPQEDcore PUBLIC CPPQED::CPPQEDcore_high)
 
 add_subdirectory(examples)
 

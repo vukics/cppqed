@@ -9,7 +9,8 @@ add_subdirectory(frees)
 
 add_subdirectory(interactions)
 
-add_library(CPPQEDelements INTERFACE)
+add_library(CPPQEDelements SHARED 
+            $<TARGET_OBJECTS:CPPQED::CPPQEDelements_utils> $<TARGET_OBJECTS:CPPQED::CPPQEDelements_frees> $<TARGET_OBJECTS:CPPQED::CPPQEDelements_interactions>)
 add_library(CPPQED::CPPQEDelements ALIAS CPPQEDelements)
 
-target_link_libraries(CPPQEDelements INTERFACE CPPQED::CPPQEDelements_interactions)
+target_link_libraries(CPPQEDelements PUBLIC CPPQED::CPPQEDelements_interactions)
