@@ -1,21 +1,14 @@
-include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
-CPPQED_SETUP()
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+
 add_executable(ExampleModeMain ExampleModeMain.cc ExampleMode.cc ExampleModeImpl.cc ExampleInteraction.cc)
-target_link_libraries(ExampleModeMain ${CPPQED_LIBRARIES})
+target_link_libraries(ExampleModeMain CPPQED::CPPQEDcore)
 
 add_executable(HarmonicOscillatorComplex HarmonicOscillatorComplex.cc)
-target_link_libraries(HarmonicOscillatorComplex ${CPPQED_LIBRARIES})
+target_link_libraries(HarmonicOscillatorComplex CPPQED::CPPQEDcore)
 
 add_executable(CoherentElementTest CoherentElementTest.cc)
-target_link_libraries(CoherentElementTest ${CPPQED_LIBRARIES})
+target_link_libraries(CoherentElementTest CPPQED::CPPQEDcore)
 
 add_library(ExampleObjects OBJECT cpcPaperExamples.cc)
-
-foreach(target ExampleModeMain HarmonicOscillatorComplex CoherentElementTest ExampleObjects)
-  if(BUNDLED_BLITZ)
-    add_dependencies(${target} cppqed-blitz)
-  endif()
-endforeach()
-
-add_custom_target(core_examples_main_targets)
-add_dependencies(core_examples_main_targets ExampleModeMain HarmonicOscillatorComplex CoherentElementTest)
+target_link_libraries(ExampleObjects CPPQED::CPPQEDcore)

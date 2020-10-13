@@ -5,12 +5,12 @@
 
 #include "Archive.h"
 
-#include "core_config.h"
+// #include "config.h"
 
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <iosfwd>
 #include <list>
@@ -78,13 +78,13 @@ public:
   const MCWF_Trajectory& getTrajectory() const {return traj_;}
   
 private:
-#ifndef DO_NOT_USE_BOOST_SERIALIZATION
+#ifdef BZ_HAVE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & nMCWF_steps_ & nOvershot_ & nToleranceOvershot_
                                                       & dpMaxOvershoot_ & dpToleranceMaxOvershoot_ & normMaxDeviation_
                                                       & traj_;}
-#endif // DO_NOT_USE_BOOST_SERIALIZATION
+#endif // BZ_HAVE_BOOST_SERIALIZATION
 
   friend std::ostream& ensemble::displayLog(std::ostream&, const ensemble::LoggerList&, size_t, size_t);
   

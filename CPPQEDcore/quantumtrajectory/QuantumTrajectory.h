@@ -38,7 +38,7 @@ protected:
   QuantumTrajectory(typename structure::QuantumSystem<RANK>::Ptr qs, bool isNoisy, ArgumentPack&&... argumentPack) 
     : BASE(std::forward<ArgumentPack>(argumentPack)...),
       structure::QuantumSystemWrapper<RANK,true>(qs,isNoisy),
-      t0_(0) {};
+      t0_(0) {}
 
   /// Forwards to `BASE`, but also sets \link getT0 `t0`\endlink
   cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar) override

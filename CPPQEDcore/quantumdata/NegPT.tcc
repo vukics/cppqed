@@ -2,8 +2,6 @@
 #ifndef   CPPQEDCORE_QUANTUMDATA_NEGPT_TCC_INCLUDED
 #define   CPPQEDCORE_QUANTUMDATA_NEGPT_TCC_INCLUDED
 
-#include "core_config.h"
-
 #include "NegPT.h"
 
 #ifndef DO_NOT_USE_FLENS
