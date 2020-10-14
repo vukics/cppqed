@@ -5,8 +5,6 @@
 
 #include "Archive.h"
 
-// #include "config.h"
-
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>

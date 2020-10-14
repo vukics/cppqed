@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ARCHIVE_H_INCLUDED
 
-#include "config.h"
-
 #ifndef BZ_HAVE_BOOST_SERIALIZATION
 
 #include <cstddef> // size_t

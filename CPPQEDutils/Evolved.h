@@ -3,8 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 #define CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 
-#include "config.h"
-
 #include <boost/function.hpp>   // instead of std::tr1::function
 #include <boost/utility.hpp>
 

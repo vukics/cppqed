@@ -7,8 +7,6 @@
 #include "ComplexExtensions.h"
 #include "Exception.h"
 
-#include "config.h"
-
 #include <boost/range/algorithm/generate.hpp>
 
 #include <boost/bind.hpp>

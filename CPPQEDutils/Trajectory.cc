@@ -6,8 +6,6 @@
 #include "ParsTrajectory.h"
 #include "FormDouble.h"
 
-#include "config.h"
-
 #ifndef DO_NOT_USE_BOOST_COMPRESSION
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
