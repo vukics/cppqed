@@ -13,43 +13,46 @@
 #ifndef   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 #define   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 
+#ifdef   EIGEN3_FOUND
+
 #include "ComplexExtensions.h"
 
-#include <flens/flens.h>
+#include <Eigen/Dense>
+
+#include <memory>
 
 
+namespace ddho {
 
-class DrivenDampedHarmonicOscillator
+typedef Eigen::Matrix2cd Matrix;
+typedef Eigen::Vector2cd Vector;
+
+class _
 {
 public:
-  virtual const dcomp amp     (double t) const=0;
-  virtual const dcomp ampDeriv(double t) const=0;
+  virtual dcomp amp     (double t) const=0;
+  virtual dcomp ampDeriv(double t) const=0;
 
-  virtual ~DrivenDampedHarmonicOscillator() {}
+  virtual ~_() {}
 
 protected:
-  typedef flens::GeMatrix<flens::FullStorage<dcomp,flens::ColMajor> > Matrix;
-  typedef flens::DenseVector<flens::Array<dcomp> >                    Vector;
+  _(double gamma, double omega, Matrix, dcomp ampTI, dcomp ampDerivTI, double tInit=0); // The initial condition is supplied at time tInit.
 
-  static const Vector calculateA(Matrix, dcomp ampTI, dcomp ampDerivTI, dcomp cTInit, double omega);
-  
-  DrivenDampedHarmonicOscillator(double gamma, double omega, const Matrix&, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
-  // The initial condition is supplied at time tInit.
-
-  const dcomp c(double t) const;
+  dcomp c(double t) const;
 
   const double gamma_, omega_;
 
   const Vector a_;
 
-  static const Matrix makeMatrix(const dcomp&, const dcomp&, const dcomp&, const dcomp&);
-
 };
 
 
-typedef std::shared_ptr<DrivenDampedHarmonicOscillator> DDHO_Ptr;
+typedef std::shared_ptr<_> Ptr;
 
-const DDHO_Ptr makeDDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
+Ptr make(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
 
+} // ddho
+
+#endif // EIGEN3_FOUND
 
 #endif // CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
