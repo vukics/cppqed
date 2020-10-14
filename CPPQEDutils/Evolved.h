@@ -3,13 +3,13 @@
 #ifndef CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 #define CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 
-#include <boost/function.hpp>   // instead of std::tr1::function
-#include <boost/utility.hpp>
-
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
 #endif // BZ_HAVE_BOOST_SERIALIZATION
+
+#include <functional>
+#include <memory>
 
 
 /// Comprises utilities related to ODE adaptive evolution
@@ -134,7 +134,7 @@ private:
  *
  */
 template<typename A>
-class EvolvedIO : public TimeStepBookkeeper, public LoggingBase, private boost::noncopyable
+class EvolvedIO : public TimeStepBookkeeper, public LoggingBase
 {
 public:
   typedef std::shared_ptr<EvolvedIO>            Ptr;
@@ -151,7 +151,10 @@ public:
   virtual ~EvolvedIO() {} ///< necessary in order that EvolvedIO be polymorphic
 
 private:
-
+  // make the class “noncopyable”
+  EvolvedIO(const EvolvedIO&) = delete;
+  EvolvedIO& operator=(const EvolvedIO&) = delete;
+   
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 
   /// The serialization of A by reference leads to memory leak (for not completely understood reasons),
@@ -194,7 +197,7 @@ template<typename A>
 class Evolved : public EvolvedIO<A>
 {
 public:
-  typedef boost::function<void(double, const A&, A&)> Derivs; ///< the strategy functor to calculate time derivative at a given time (3rd argument for output)
+  typedef std::function<void(double, const A&, A&)> Derivs; ///< the strategy functor to calculate time derivative at a given time (3rd argument for output)
 
   typedef std::shared_ptr<      Evolved>      Ptr;
   typedef std::shared_ptr<const Evolved> ConstPtr;
