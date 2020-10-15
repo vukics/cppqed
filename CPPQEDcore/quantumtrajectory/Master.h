@@ -9,7 +9,6 @@
 #include "QuantumTrajectory.h"
 #include "Types.h"
 
-#include "Exception.h"
 #include "VectorFromMatrixSliceIterator.h"
 
 #include <boost/function.hpp>
@@ -30,7 +29,7 @@ typedef trajectory::ParsEvolved Pars;
 /**
  * \see structure::ExactCommon::applicableInMaster, \ref masterequationlimitations
  */
-struct SystemNotApplicable : cpputils::Exception {};
+struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::runtime_error("") {}};
 
 
 /// The actual working base of Master in the case when blitzplusplus::basi::Iterator is used for implementing multi-matrix multiplications \tparamRANK

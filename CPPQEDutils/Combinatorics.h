@@ -2,11 +2,11 @@
 #ifndef   CPPQEDCORE_UTILS_COMBINATORICS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_COMBINATORICS_H_INCLUDED
 
-#include "Exception.h"
-
 #include <blitz/array.h>
 
 #include <boost/range/algorithm/equal.hpp>
+
+#include <stdexcept>
 
 namespace cpputils {
 
@@ -28,9 +28,9 @@ public:
   enum SubscriptingProblem {SIZE_MISMATCH, NOT_FOUND};
 
   template<typename C, SubscriptingProblem P>
-  struct SubscriptingException : public Exception
+  struct SubscriptingException : public std::range_error
   {
-    SubscriptingException(const C& c) : conf(c) {}
+    SubscriptingException(const C& c) : std::range_error(""), conf(c) {}
     
     const C conf;
   };

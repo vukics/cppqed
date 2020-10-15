@@ -9,6 +9,9 @@
 
 #include <boost/mpl/for_each.hpp>
 
+#ifndef   NDEBUG
+#include <stdexcept>
+#endif // NDEBUG
 
 
 namespace blitzplusplus {
@@ -69,34 +72,6 @@ concatenateTinies(const TinyVector<T1,RANK1>& op1, const TinyVector<T2,RANK2>& o
 }
 
 
-namespace details {
-
-
-#ifndef   NDEBUG
-
-template<typename T, int RANK>
-class TinyChecker
-{
-public:
-  TinyChecker(const TinyVector<T,2*RANK>& v) : v_(v) {}
-
-  template<typename U>
-  void operator()(U)
-  {
-    if (v_(U::value)!=v_(U::value+RANK)) throw HalfCutTinyException();
-  }
-
-private:
-  const TinyVector<T,2*RANK>& v_;
-  
-};
-
-#endif // NDEBUG
-
-
-} // details
-
-
 template<typename T, int TWO_TIMES_RANK> 
 TinyVector<T,TWO_TIMES_RANK/2> 
 halfCutTiny(const TinyVector<T,TWO_TIMES_RANK>& tiny)
@@ -106,8 +81,10 @@ halfCutTiny(const TinyVector<T,TWO_TIMES_RANK>& tiny)
   static const int RANK=tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value;
 
 #ifndef   NDEBUG
-  details::TinyChecker<T,RANK> checker(tiny);
-  boost::mpl::for_each<tmptools::Ordinals<RANK> >(checker);
+  boost::mpl::for_each<tmptools::Ordinals<RANK> >([&](auto arg) {
+    using U = decltype(arg);
+    if (tiny(U::value)!=tiny(U::value+RANK)) throw std::invalid_argument("In halfCutTiny");
+  });
 #endif // NDEBUG
 
   typedef TinyVector<T,TWO_TIMES_RANK> OP ;

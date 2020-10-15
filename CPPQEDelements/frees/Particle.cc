@@ -300,7 +300,7 @@ auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFun
   ptrdiff_t        sign2 = mf2==MFT_SIN && nK2<0 ? -1 : 1;
   ptrdiff_t        sign  = sign1*sign2;
 
-  if (abs(nK1) != abs(nK2)) throw NotATridiagonal();
+  if (abs(nK1) != abs(nK2)) throw std::runtime_error("Not a Tridiagonal");
 
   if (mf1==MFT_PLUS  && nK1<0) { mf1=MFT_MINUS; nK1*=-1; }
   if (mf1==MFT_MINUS && nK1<0) { mf1=MFT_PLUS;  nK1*=-1; }
@@ -342,7 +342,7 @@ auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFun
   }
   if (!(mfs == MFPair(MFT_MINUS,MFT_SIN) || mfs == MFPair(MFT_SIN,MFT_PLUS))) {
     // this should never be reached
-    throw Exception();
+    throw std::logic_error("In mfComposition");
   }
   return -sign * (expINKX(particle,2*nK)-id) * DCOMP_I/2.;
 }

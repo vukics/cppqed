@@ -4,12 +4,12 @@
 #define CPPQEDCORE_UTILS_PARS_H_INCLUDED
 
 #include "BooleanNegatedProxy.h"
-#include "Exception.h"
 
 #include <boost/ptr_container/ptr_list.hpp>
 
 #include <iostream>
 #include <iomanip>
+#include <stdexcept>
 #include <string>
 #include <typeinfo>
 
@@ -27,40 +27,11 @@ const size_t maxTypeLabelLength=24;
 //////////////////
 
 
-class Exception : public cpputils::Exception
-{
-public:
-  virtual ~Exception() {}
-};
-
-
-class NamedException : public Exception 
-{
-public:
-  NamedException(const std::string& name);
-
-  const std::string& getName() const {return name_;}
-
-private:
-  const std::string name_;
-};
-
-
 /// Thrown if a certain Typed name is not found in Table when \link Table::operator[] subscripting\endlink.
-class UnrecognisedParameterException : public NamedException 
-{
-public: 
-  UnrecognisedParameterException(const std::string& name) : NamedException(name) {}
-};
-
+struct UnrecognisedParameterException : std::runtime_error {using std::runtime_error::runtime_error;};
 
 /// Thrown if a given Typed name is attempted to be used more than once when \link Table::add pushing\endlink to Table
-class AttemptedRecreationOfParameterException : public NamedException 
-{
-public: 
-  AttemptedRecreationOfParameterException(const std::string& name);
-};
-
+struct AttemptedRecreationOfParameterException : std::runtime_error {using std::runtime_error::runtime_error;};
 
 
 /// Common, template-parameter independent base class of Typed, to be stored in a pointer-container in Table

@@ -6,14 +6,6 @@
 
 #include "TridiagonalHamiltonian.h"
 
-#include "Exception.h"
-
-
-namespace particletwomodes {
-
-class UnotsSignDiscrepancy : public cpputils::Exception {};
-
-} // particletwomodes
 
 
 class ParticleTwoModes : public structure::Interaction<3>, public structure::Hamiltonian<3>

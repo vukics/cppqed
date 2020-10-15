@@ -15,8 +15,6 @@
 #include "BlitzTinyOfArrays.tcc"
 #include "Operators.h"
 
-#include "Exception.h"
-
 #include <boost/mpl/int.hpp>
 
 
@@ -24,10 +22,6 @@ namespace mpl=boost::mpl;
 
 
 // Stencils???
-
-struct TridiagonalConsistencyErrorException  : public cpputils::Exception {};
-struct TridiagonalStructureMismatchException : public cpputils::Exception {};
-struct TridiagonalTimeMismatchException      : public cpputils::Exception {};
 
 
 /// Comprises modules representing operators of special structure (tridiagonal, sparse) over Hilbert spaces of arbitrary arity

@@ -38,8 +38,6 @@ const Tridiagonal nop(Ptr);
 inline const Tridiagonal xop(Ptr mode) {return tridiagPlusHC(aop(mode))/sqrt(2.);}
 // inline const Tridiagonal yop(mode::Ptr) {return ...}
 
-struct FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState : public cpputils::Exception {};
-
 /// Coherent state
 /**
  * The implementation relies on mathutils::coherentElement, which works also for high Fock-state elements

@@ -8,7 +8,6 @@
 
 #include "BlitzArray.h"
 #include "BlitzArrayExtensions.h"
-#include "Exception.h"
 
 #include <memory>
 
@@ -66,18 +65,6 @@ private:
 };
 
 
-/// Exception for LiouvilleanAveragedCommonRanked::average
-struct AveragesNumberMismatchException : cpputils::Exception
-{
-  AveragesNumberMismatchException(int size, size_t nAvr) {std::cerr<<size<<' '<<nAvr<<std::endl;}
-  
-};
-
-
-/// Exception for LiouvilleanAveragedCommonRanked::average
-struct InfiniteDetectedException : cpputils::Exception {};
-
-
 /// Common functionality of Liouvillean & Averaged
 /** \tparamRANK */
 template<int RANK>
@@ -106,8 +93,10 @@ public:
                         ) const
   {
     const DArray1D averages(average_v(t,matrix));
-    if (size_t(averages.size())!=nAvr()) throw AveragesNumberMismatchException(averages.size(),nAvr()); /// \post 1.: number of averages must equal LiouvilleanAveragedCommon::nAvr
-    if (!all(blitzplusplus::isfinite(averages))) throw InfiniteDetectedException(); /// \post 2.: all quantum averages must be finite
+    if (size_t(averages.size())!=nAvr()) throw std::runtime_error("Averages number mismatch -- size: "+std::to_string(averages.size())+" nAvr: "+std::to_string(nAvr()));
+    /// \post 1.: number of averages must equal LiouvilleanAveragedCommon::nAvr
+    if (!all(blitzplusplus::isfinite(averages))) throw std::runtime_error("Infinite detected in averages");
+    /// \post 2.: all quantum averages must be finite
 
     return averages;
   }

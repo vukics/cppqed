@@ -160,7 +160,7 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
       // normal  jump
       this->actWithJ(t,psi_->getArray(),lindbladNo);
       double normFactor=sqrt(rates(lindbladNo));
-      if (!boost::math::isfinite(normFactor)) throw structure::InfiniteDetectedException();
+      if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in MCWF_Trajectory::performJump");
       *psi_/=normFactor;
     }
 

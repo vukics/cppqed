@@ -22,7 +22,7 @@ unaryArray(const blitz::Array<T,RANK>& array)
 {
   if (!array.data()) return blitz::Array<T,1>();
 #ifndef   NDEBUG
-  if (!array.isStorageContiguous()) throw (NonContiguousStorageException());
+  if (!array.isStorageContiguous()) throw (NonContiguousStorageException("blitzplusplus::unaryArray"));
 #endif // NDEBUG
   return blitz::Array<T,1>(const_cast<T*>(array.data()),shape(array.size()),neverDeleteData);
 }
@@ -43,7 +43,7 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
   if (!array.data()) return blitz::Array<T,2>();
 
 #ifndef   NDEBUG
-  if (!array.isStorageContiguous()) throw (NonContiguousStorageException());
+  if (!array.isStorageContiguous()) throw (NonContiguousStorageException("blitzplusplus::unaryArray"));
 
   static const int RANK=tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value;
 
@@ -52,7 +52,7 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
     bool correct=true;
     for (int i=0; i<RANK; i++)
       correct&=(ordering(i)==ordering(i+RANK)+RANK);
-    if (!correct) throw BinaryArrayOrderingErrorException();
+    if (!correct) throw std::invalid_argument("blitzplusplus::binaryArray ordering error");
   }
 #endif // NDEBUG
 

@@ -7,6 +7,8 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_sf.h>
 
+#include <stdexcept>
+
 namespace mathutils {
   
 const double PI(M_PI);
@@ -22,7 +24,7 @@ double sqrAbs(const dcomp& x) {return sqr(real(x))+sqr(imag(x));} // saves the s
 
 double fact(unsigned n)
 {
-  if (n>GSL_SF_FACT_NMAX) throw FactOverflow();
+  if (n>GSL_SF_FACT_NMAX) throw std::out_of_range("Factorial of"+std::to_string(n));
   return gsl_sf_fact(n);
 }
 

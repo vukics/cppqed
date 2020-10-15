@@ -134,7 +134,6 @@ auto partialTrace(const MATRIX<RANK>& matrix, F&& function)
                         );
 }
 
-struct LazyDensityOperatorPartialTraceNotImplementedException : cpputils::Exception {};
 
 /// The primary tool for performing \ref slicinganldo "slice iterations"
 /**
@@ -153,7 +152,7 @@ partialTrace(const LazyDensityOperator<RANK>& matrix, F&& function)
   
   if      (auto psi=dynamic_cast<const SV*>(&matrix) ) return partialTrace<V,StateVector    >(*psi,std::move(function));
   else if (auto rho=dynamic_cast<const DO*>(&matrix) ) return partialTrace<V,DensityOperator>(*rho,std::move(function));
-  else throw LazyDensityOperatorPartialTraceNotImplementedException();
+  else throw std::runtime_error("LazyDensityOperator partialTrace not implemented");
 }
 
 

@@ -65,11 +65,18 @@ ostream& trajectory::Trajectory::displayParameters(ostream& os) const
   return displayKey_v(displayParameters_v(os)<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n" , i);
 }
 
+
+struct StateFileOpeningException : std::runtime_error
+{
+  StateFileOpeningException(const std::string& filename) : std::runtime_error("State file opening error: "+filename) {}
+};
+
+
 std::shared_ptr<istream> trajectory::openStateFileReading(const std::string &filename)
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
   std::shared_ptr<ifstream> ifs = std::make_shared<ifstream>(filename, ios_base::in | ios_base::binary);
-  if (!ifs->is_open()) throw StateFileOpeningException(filename);
+  if (!ifs->is_open()) throw StateFileOpeningException(filename)
   return ifs;
 #else
   using namespace boost::iostreams;
@@ -95,8 +102,7 @@ std::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &fil
   file_sink file(filename, mode);
   if (!file.is_open()) throw StateFileOpeningException(filename);
   if (isbz2(filename)) {
-    std::cerr << "Appending to compressed state files is not supported because of a boost bug." << std::endl;
-    throw StateFileOpeningException(filename);
+    throw std::runtime_error("Appending to compressed state files is not supported because of a boost bug. Filename: "+filename);
     // Appending to compressed state files does not work because of a bug in boost when handling multi-stream bz2 files.
     // The files can be written just fine, but cannot be read in afterwards. Hopefully this gets solved.
     // The patch in https://svn.boost.org/trac/boost/ticket/9749 actually does fix the problem.

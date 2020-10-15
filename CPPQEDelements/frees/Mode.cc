@@ -369,7 +369,7 @@ StateVector coherent(const dcomp& alpha, size_t dim)
 
 StateVector fock(size_t n, size_t dim, double phase)
 {
-  if (n>=dim) throw FockStatePreparationError_CheckYourCutoffAgainstDesiredFockState();
+  if (n>=dim) throw std::overflow_error("Fock state "+std::to_string(n)+" higher than dim "+std::to_string(dim));
   StateVector res(dim);
   res(n)=exp(DCOMP_I*phase);
   return res;

@@ -5,7 +5,7 @@ message(STATUS "Configuring CPPQEDscripts")
 
 set(FEWER_SCRIPTS_TARGETS
     PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED
-    QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix SingleParticle Ring Ring_Evolved Raman CavityRaman)
+    QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix SingleParticle Ring Raman CavityRaman)
 
 foreach(S ${FEWER_SCRIPTS_TARGETS})
   add_executable(${S} ${S}.cc)

@@ -12,7 +12,7 @@
 
 namespace structure {
 
-struct SuperoperatorNotImplementedException : cpputils::Exception
+struct SuperoperatorNotImplementedException
 {
   explicit SuperoperatorNotImplementedException(size_t m) : m_(m) {}
   

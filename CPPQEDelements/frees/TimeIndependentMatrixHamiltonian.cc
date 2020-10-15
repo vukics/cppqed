@@ -2,14 +2,11 @@
 #include "TimeIndependentMatrixHamiltonian.h"
 
 
-class MatrixNotSquareException : public cpputils::Exception {};
-
-
 TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix& hamiltonianOverI)
   : structure::Free(hamiltonianOverI.extent(0),{RF{"Largest frequency",max(abs(hamiltonianOverI)),1.}}),
     hamiltonianOverI_(hamiltonianOverI.copy())
 {
-  if (hamiltonianOverI_.extent(0)!=hamiltonianOverI_.extent(1)) throw MatrixNotSquareException();
+  if (hamiltonianOverI_.extent(0)!=hamiltonianOverI_.extent(1)) throw std::invalid_argument("Matrix sot square in TimeIndependentMatrixHamiltonian");
   getParsStream()<<"Time-independent matrix Hamiltonian"<<std::endl;
 }
 

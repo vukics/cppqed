@@ -66,7 +66,7 @@ Tridiagonal<RANK>::Tridiagonal(const Tridiagonal<RANK2>& t1, const Tridiagonal<R
     tCurrent_(t1.getTime()),
     freqs_(blitzplusplus::ShallowCopy(),details::directDiagonals<false,RANK2,RANK-RANK2>(t1.getFreqs(),t2.getFreqs()))
 {
-  if (t1.getTime()!=t2.getTime()) throw TridiagonalTimeMismatchException();
+  if (t1.getTime()!=t2.getTime()) throw std::runtime_error("Tridiagonal time mismatch");
 }
 
 
@@ -115,48 +115,34 @@ const Tridiagonal<RANK> Tridiagonal<RANK>::hermitianConjugate() const
 }
 
 
-namespace details {
-
-void binOp1(size_t otherDifference, size_t& difference);
-
-} // details
-
-
 template<int RANK>
 Tridiagonal<RANK>&
 Tridiagonal<RANK>::operator+=(const Tridiagonal& tridiag)
 {
-  struct helper
-  {
-    static void
-    doIt1(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
-    {
-      if (from.size()) {
-        if (!to.size()) {
-          to.resize(from.shape());
-          to=from;
-        }
-        else to+=from; // This will check for the compatibility of shapes
+  boost::for_each(tridiag.differences_,differences_,[](size_t otherDifference, size_t& difference) {
+    if (!difference) difference=otherDifference;
+    else if (otherDifference && difference!=otherDifference) throw std::invalid_argument("Tridiagonal structure mismatch is binOp1");
+  });
+  
+  boost::for_each(tridiag.diagonals_,diagonals_,[](const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to) {
+    if (from.size()) {
+      if (!to.size()) {
+        to.resize(from.shape());
+        to=from;
+      }
+      else to+=from; // This will check for the compatibility of shapes
+    }
+  });
+  
+  boost::for_each(tridiag.freqs_,freqs_,[](const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to) {
+    if (from.size()) {
+      if (to.size() && all(to!=from)) throw std::runtime_error("Tridiagonal structure mismatch is operator+=");
+      else {
+        to.resize(from.shape());
+        to=from;
       }
     }
-
-    static void
-    doIt2(const typename Tridiagonal<RANK>::Diagonal& from, typename Tridiagonal<RANK>::Diagonal& to)
-    {
-      if (from.size()) {
-        if (to.size() && all(to!=from)) throw TridiagonalStructureMismatchException();
-        else {
-          to.resize(from.shape());
-          to=from;
-        }
-      }
-    }
-
-  };
-
-  boost::for_each(tridiag.differences_,differences_,details::binOp1);
-  boost::for_each(tridiag.  diagonals_,  diagonals_, helper::doIt1 );
-  boost::for_each(tridiag.      freqs_,      freqs_, helper::doIt2 );
+  });
 
   return *this;
 

@@ -4,12 +4,13 @@
 #define CPPQEDCORE_QUANTUMDATA_DIMENSIONSBOOKKEEPER_H_INCLUDED
 
 #include "BlitzTiny.h"
-#include "Exception.h"
 
+#include <stdexcept>
 #include <type_traits>
 
+
 /// Thrown in the case of dimensionality mismatch of constructs over the same Hilbert space
-class DimensionalityMismatchException : cpputils::Exception {};
+struct DimensionalityMismatchException : std::invalid_argument {using std::invalid_argument::invalid_argument;};
 
 
 /// Stores and manipulates dimensions of constructs over composite Hilbert spaces of arbitrary arity

@@ -3,16 +3,12 @@
 #ifndef CPPQEDCORE_UTILS_EVOLVEDGSL_H_INCLUDED
 #define CPPQEDCORE_UTILS_EVOLVEDGSL_H_INCLUDED
 
-#include "Exception.h"
-
 #include "Evolved.h"
+
+#include <stdexcept>
 
 
 namespace evolved {
-
-
-/// Thrown if the array supplied to MakerGSL has non contiguous storage
-class NonContiguousStorageException : public cpputils::Exception {};
 
 
 /// Implements Maker and incorporates MakerGSL::_, the actual \GSL-based implementation of the Evolved interface

@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_FFT_H_INCLUDED
 #define   CPPQEDCORE_UTILS_FFT_H_INCLUDED
 
-#include "Exception.h"
-
 #include <cstddef>
 
 /// Fast Fourier transformation
@@ -16,8 +14,6 @@ enum Direction {
   DIR_KX  ///< “backward” from k- to x-space
 };
 
-
-struct FFT_Exception : public cpputils::Exception {};
 
 namespace details {
 

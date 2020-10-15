@@ -8,7 +8,6 @@
 #include "LazyDensityOperator.h"
 
 #include "Algorithm.h"
-#include "Exception.h"
 #include "SliceIterator.tcc"
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
@@ -33,9 +32,9 @@
 
 
 // template<int>
-struct CompositeConsistencyException : cpputils::Exception
+struct CompositeConsistencyException : std::logic_error
 {
-  CompositeConsistencyException(int idxx, int ii) : idx(idxx), i(ii) {}
+  CompositeConsistencyException(int idxx, int ii) : std::logic_error(std::to_string(idxx)+" "+std::to_string(ii)), idx(idxx), i(ii) {}
 
   const int idx, i;
 };

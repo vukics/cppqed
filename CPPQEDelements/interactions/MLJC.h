@@ -66,7 +66,7 @@ private:
       : a      (-g*mode::aop(mode)),
         adagger((g*mode::aop(mode)).dagger())
     {
-      if (dynamic_cast<const multilevel::Exact<NL>*>(ml.get())) throw multilevel::MultiLevelExactNotImplementedException();
+      if (dynamic_cast<const multilevel::Exact<NL>*>(ml.get())) throw std::runtime_error("multilevel::Exact not implemented");
     }
 
     mutable Tridiagonal a, adagger;

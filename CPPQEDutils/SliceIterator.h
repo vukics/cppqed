@@ -6,8 +6,6 @@
 #include "MultiIndexIterator.h"
 #include "TMP_Tools.h"
 
-#include "Exception.h"
-
 #include <boost/range.hpp>
 
 #include <boost/mpl/size.hpp>
@@ -25,6 +23,7 @@
 #include <boost/fusion/algorithm/iteration/fold.hpp>
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
 
+#include <stdexcept>
 
 
 namespace cpputils {
@@ -123,10 +122,6 @@ auto filterOut(const IdxTiny<RANK>& v)
  * @{
  */
 
-/// Exception thrown if the partial specialization of Transposer or Indexer for the given RANK does not exist.
-template<int RANK>
-class TransposerOrIndexerRankTooHighException : public Exception {};
-
 /// Class performing the “possible permutation” of the retained indices (cf. \ref multiarrayconcept "Synopsis").
 template<template <int> class ARRAY, int RANK, typename V>
 class Transposer
@@ -155,7 +150,7 @@ public:
    * ~~~
    * that is, in place of the indices specified by the elements of the compile-time vector `Vec`, the elements of `Vec` are put, but in the *order* specified by `Vec`.
    */
-  static ARRAY<RANK>& _(ARRAY<RANK>&) {throw TransposerOrIndexerRankTooHighException<RANK>();}
+  static ARRAY<RANK>& _(ARRAY<RANK>&);
 
 };
 
@@ -191,7 +186,7 @@ public:
   static ResArray<ARRAY,V>& _(const ARRAY<RANK>&, ///< The array to be sliced
                               ResArray<ARRAY,V>&, ///< The array storing the result. Necessary for the same reason why SliceIterator::operator* returns a reference
                               const VecIdxTiny<RANK,V>& ///< Set of dummy indices
-                             ) {throw TransposerOrIndexerRankTooHighException<RANK>();}
+                             );
 
 };
 
@@ -360,9 +355,6 @@ private:
 };
 
 
-class OutOfRange : public Exception {};
-
-
 /// used in the case when `Size<V> = RANK` and when `RANK = 1`
 template<template <int> class ARRAY, typename V>
 class BaseTrivial
@@ -377,9 +369,9 @@ public:
     if constexpr (!IS_END) array_.reference(array);
   }
 
-  void increment() {if (!isEnd_) isEnd_=true; else throw OutOfRange();}
+  void increment() {if (!isEnd_) isEnd_=true; else throw std::out_of_range("In sliceiterator::BaseTrivial::increment");}
 
-  auto& operator*() const {if (isEnd_) throw OutOfRange(); return array_;}
+  auto& operator*() const {if (isEnd_) throw std::out_of_range("In sliceiterator::BaseTrivial::operator*"); return array_;}
 
   friend bool operator==(const BaseTrivial& i1, const BaseTrivial& i2) {return i1.isEnd_==i2.isEnd_;}
 

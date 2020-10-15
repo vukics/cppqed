@@ -123,7 +123,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/cppqedGitSHA1.cc.in" "${CMAKE_
 
 add_library(cppqedGitSHA1 OBJECT "${CMAKE_CURRENT_BINARY_DIR}/cppqedGitSHA1.cc")
 
-add_compile_options(-Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual)
+add_compile_options(-Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual -Wunreachable-code)
 
 #macro(add_executable S)
   #if (${cmake_build_type_tolower} STREQUAL debug)

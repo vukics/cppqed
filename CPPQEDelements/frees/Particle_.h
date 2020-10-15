@@ -10,7 +10,6 @@
 
 #include "ModeFunction.h"
 #include "ElementAveraged.h"
-#include "Exception.h"
 #include "Free.h"
 #include "FreeExact.h"
 #include "TridiagonalHamiltonian.h"
@@ -60,8 +59,6 @@ typedef std::shared_ptr<const ParticleBase> Ptr;
 
 typedef std::shared_ptr<const PumpedParticleBase> PtrPumped;
 
-struct NotATridiagonal : public cpputils::Exception {};
-
 const Tridiagonal expINKX(particle::Ptr, ptrdiff_t);
 
 inline const Tridiagonal sinNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*DCOMP_I);}
@@ -74,7 +71,7 @@ const Tridiagonal mfNKX_AbsSqr(particle::Ptr, const ModeFunction&);
 /**
  * Given two mode functions \f$f(nk_1 x)\f$ and \f$g(nk_2 x)\f$, this functions returns the composition
  * \f[f^\ast(nk_1 x)g(nk_2 x)\f]
- * if this result can be represented as a Tridiagonal, i.e. if \f$|nk_1|=|nk_2|\f$. Otherwise the exception NotATridiagonal is thrown.
+ * if this result can be represented as a Tridiagonal, i.e. if \f$|nk_1|=|nk_2|\f$. Otherwise an exception is thrown.
  */
 const Tridiagonal mfComposition(particle::Ptr particle,                 ///< Determines the dimension of the result.
                                 const ModeFunction& modeFunction1,      ///< \f$f(nkx)\f$ above

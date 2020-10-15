@@ -10,12 +10,17 @@
 
 #include <blitz/array.h>
 
+#include <stdexcept>
 
 /// An array of doubles of arbitrary arity
 template <int RANK> using DArray=blitz::Array<double,RANK>;
 
 /// A complex array of arbitrary arity
 template <int RANK> using CArray=blitz::Array<dcomp ,RANK>;
+
+
+/// Thrown if the array supplied to MakerGSL has non contiguous storage
+struct NonContiguousStorageException : public std::invalid_argument {using std::invalid_argument::invalid_argument;};
 
 
 namespace cpputils {

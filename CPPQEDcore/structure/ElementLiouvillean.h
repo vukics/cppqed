@@ -87,10 +87,7 @@ private:
 
 
 /// Thrown if the Lindblad index is not smaller than the total number of Lindblads
-struct ElementLiouvilleanException : cpputils::TaggedException
-{
-  ElementLiouvilleanException(const std::string& tag) : cpputils::TaggedException(tag) {}
-};
+struct ElementLiouvilleanException : std::runtime_error {using std::runtime_error::runtime_error;};
 
 
 /// An implementation of Liouvillean for the case when the number of Lindblads is known @ compile time (which is very often the case with elements)…
@@ -305,7 +302,7 @@ protected:
 };
 
 
-struct ElementLiouvilleanDiffusiveDimensionalityMismatchException : cpputils::Exception {};
+struct ElementLiouvilleanDiffusiveDimensionalityMismatchException : std::runtime_error {using std::runtime_error::runtime_error;};
 
 
 /// Adds as many jump operators describing phase diffusion as the number of dimensions of the element
@@ -347,7 +344,7 @@ protected:
 
   void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
   {
-    if (psi.extent(0)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException();
+    if (psi.extent(0)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException("In actWithJ_v");
     if (lindbladNo<base_nAvr_) Base::actWithJ_v(t,psi,lindbladNo);
     else {
       psi*=sqrt(2.*diffusionCoeff_);
@@ -357,7 +354,7 @@ protected:
 
   void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
   {
-    if (rho.extent(0)!=dim_ || rho.extent(1)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException();
+    if (rho.extent(0)!=dim_ || rho.extent(1)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException("In actWithSuperoperator_v");
     if (lindbladNo<base_nAvr_) Base::actWithSuperoperator_v(t,rho,drhodt,lindbladNo);
     else if(lindbladNo==base_nAvr_) { // with this single case we cover the action of all the diffusive Lindblads
       for (int m=0; m<dim_; ++m) {

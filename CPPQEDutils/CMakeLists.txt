@@ -26,6 +26,7 @@ if (TARGET Eigen3::Eigen)
   target_sources(CPPQEDutils PRIVATE DrivenDampedHarmonicOscillator.cc)
 endif ()
 
+target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_FLENS)
 
 # Project options
 # Switch for boost bzip2 support

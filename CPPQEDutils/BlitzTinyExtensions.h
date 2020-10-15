@@ -3,10 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_BLITZTINYEXTENSIONS_H_INCLUDED
 #define CPPQEDCORE_UTILS_BLITZTINYEXTENSIONS_H_INCLUDED
 
-#ifndef   NDEBUG
-#include "Exception.h"
-#endif // NDEBUG
-
 #include <blitz/tinyvec2.h>
 
 
@@ -24,12 +20,6 @@ namespace blitzplusplus {
 template<typename T1, typename T2, int RANK1, int RANK2>
 blitz::TinyVector<T1,RANK1+RANK2>
 concatenateTinies(const blitz::TinyVector<T1,RANK1>& tiny1, const blitz::TinyVector<T2,RANK2>& tiny2);
-
-
-#ifndef   NDEBUG
-/// Exception class thrown by halfCutTiny
-struct HalfCutTinyException : cpputils::Exception {};
-#endif // NDEBUG
 
 
 /// Returns the first half of a tiny vector containing two equal halves

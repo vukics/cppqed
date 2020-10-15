@@ -19,18 +19,6 @@
 using namespace std;
 
 
-parameters::NamedException::NamedException(const std::string& name)
-  : name_(name)
-{}
-
-
-parameters::AttemptedRecreationOfParameterException::AttemptedRecreationOfParameterException(const std::string& name)
-  : parameters::NamedException(name)
-{
-  cerr<<name<<endl;
-}
-
-
 const parameters::Base&
 parameters::Table::operator[](const string& s) const
 {
@@ -168,7 +156,7 @@ void parameters::update(parameters::Table& table, int argc, char* argv[], const 
         }
       }
       catch (const UnrecognisedParameterException& urp) {
-        cerr<<"\nProblem in command line around \""<<urp.getName()<<'\"'<<ErrorMessage::_(prefix);
+        cerr<<"\nProblem in command line around \""<<urp.what()<<'\"'<<ErrorMessage::_(prefix);
         abort();
       }
   }

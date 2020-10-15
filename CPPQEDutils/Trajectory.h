@@ -5,11 +5,11 @@
 
 #include "Archive.h"
 #include "CommentingStream.h"
-#include "Exception.h"
 #include "Evolved.h"
 #include "ParsTrajectory.h"
 
 #include <iosfwd>
+#include <stdexcept>
 #include <string>
 
 
@@ -74,33 +74,7 @@ void  readViaSStream(      T&, std::istream*);
 SerializationMetadata readMeta(std::istream*); ///< Needed separately for the Python i/o
 
 
-class NonZero_dcOrDtRequiredException : public cpputils::Exception {};
-
-class StoppingCriterionReachedException : public cpputils::Exception {};
-
-/// Raised when the rank of a trajectory we try to read in from file does not match
-class RankMismatchException : public cpputils::Exception {};
-
-/// Raised when the dimensions of a trajectory state we try to read in from file does not match
-class DimensionsMismatchException : public cpputils::Exception {};
-
-/// Raised when the trajectory type we try to read in from file does not match.
-class TrajectoryMismatchException : public cpputils::Exception {};
-
-class TrajectoryFileOpeningException : public cpputils::TaggedException
-{
-public:
-  TrajectoryFileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
-
-
-class StateFileOpeningException : public cpputils::TaggedException
-{
-public:
-  StateFileOpeningException(const std::string tag) : cpputils::TaggedException(tag) {}
-
-};
+struct StoppingCriterionReachedException {};
 
 
 /// A heuristic determination of the inital timestep from the highest frequency of a physical system.
@@ -118,8 +92,6 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
 class Trajectory : private boost::noncopyable
 {
 public:
-  class CommentingStreamUnsetException : public cpputils::Exception {};
-  
   /// Propagation for a time interval of exactly deltaT
   void evolve(double deltaT) {evolve_v(deltaT);}
 
@@ -394,7 +366,7 @@ void run(Adaptive<A,BASE>& traj, const ParsRun& p)
 {
   if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.autoStopEpsilon,p.autoStopRepetition,p.getParsedCommandLine());
   else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
-  else throw NonZero_dcOrDtRequiredException();
+  else throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
 }
 
 

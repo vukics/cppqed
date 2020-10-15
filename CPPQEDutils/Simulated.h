@@ -11,7 +11,6 @@
 
 using ParameterTable=parameters::Table;
 using parameters::update        ;
-using parameters::NamedException;
 
 using trajectory::Simulated;
 using trajectory::Pars     ;

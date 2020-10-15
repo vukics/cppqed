@@ -6,7 +6,6 @@
 #include "StateVector.h"
 
 #include "CMatrix.h"
-#include "Exception.h"
 #include "FFT.h"
 #include "SliceIterator.tcc"
 
@@ -76,9 +75,6 @@ private:
 } // details
 
 
-struct LazyDensityOperatorFFT_NotImplementedException : cpputils::Exception {};
-
-  
 template<typename V, int RANK>
 const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDensityOperator<RANK>& matrix, fft::Direction dir)
 {
@@ -95,7 +91,7 @@ const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDe
     boost::mpl::for_each<V>(details::fftWorkerDO<RANK>(res,dir));
     return res;
   }
-  else throw LazyDensityOperatorFFT_NotImplementedException();
+  else throw std::runtime_error("LazyDensityOperator FFT not implemented");
 
 }
 

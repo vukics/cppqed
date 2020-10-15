@@ -67,7 +67,7 @@ protected:
    * \tparam CONSTRUCT typically either shared_ptr to a quantumdata::StateVector (as in MCWF_Trajectory) or a quantumdata::DensityOperator (as in Master)
    */
   template<typename CONSTRUCT>
-  void checkDimension(CONSTRUCT&& c) const {if (*c!=*(this->getQS())) throw DimensionalityMismatchException();}
+  void checkDimension(CONSTRUCT&& c) const {if (*c!=*(this->getQS())) throw DimensionalityMismatchException("during QuantumTrajectory construction");}
   
 private:
   mutable double t0_;

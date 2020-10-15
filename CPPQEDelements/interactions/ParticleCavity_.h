@@ -10,16 +10,10 @@
 #include "Mode_.h"
 #include "Particle_.h"
 
-#include "Exception.h"
-
 #include <boost/utility.hpp>
 
 
 namespace particlecavity {
-
-
-struct UnotVClassSignDiscrepancy : public cpputils::Exception {};
-
 
 
 typedef quantumoperator::Tridiagonal<2> Tridiagonal;

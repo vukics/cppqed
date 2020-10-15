@@ -122,7 +122,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
                                            std::shared_ptr<ostream>(&cout,details::nullDelete<ostream>) : // since cout is a system-wide object, this should be safe
                                            static_pointer_cast<ostream>(std::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
-  if (outstream->fail()) throw TrajectoryFileOpeningException(trajectoryFileName);
+  if (outstream->fail()) throw std::runtime_error("Trajectory file opening error: "+trajectoryFileName);
   traj.setLogStreamDuringRun(outstream);
   
   ostream& os=*outstream;
@@ -232,11 +232,11 @@ cpputils::iarchive& trajectory::AdaptiveIO<A>::readState(cpputils::iarchive& iar
   bool dimension_check = meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY;
   iar & meta_;
   if (meta_.rank!=cpputils::Rank<A>::value)
-    throw RankMismatchException();
+    throw std::runtime_error("Rank mismatch in trajectory::AdaptiveIO::readState");
   std::vector<size_t> dims = cpputils::dimensions(evolvedIO_->getA());
   iar & *evolvedIO_;
   if (dimension_check && dims != cpputils::dimensions(evolvedIO_->getA()))
-      throw DimensionsMismatchException();
+      throw std::runtime_error("Dimensions mismatch in trajectory::AdaptiveIO::readState");
   return iar;
 }
 
@@ -269,7 +269,7 @@ cpputils::iarchive& trajectory::Adaptive<A,BASE>::readState_v(cpputils::iarchive
   AdaptiveIO<A>::readState(iar);
   if (meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY) {
     if(meta_.trajectoryID != trajectoryID())
-      throw TrajectoryMismatchException();
+      throw std::runtime_error("Trajectory mismatch in trajectory::Adaptive::readState_v");
     readStateMore_v(iar);
   }
   if (getDtTry()==0)

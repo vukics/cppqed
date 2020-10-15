@@ -6,8 +6,6 @@
 #include "LiouvilleanAveragedCommon.h"
 #include "TimeDependence.h"
 
-#include "Exception.h"
-
 #include <iosfwd>
 
 

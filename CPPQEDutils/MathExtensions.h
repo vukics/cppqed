@@ -7,14 +7,10 @@
 #define CPPQEDCORE_UTILS_MATHEXTENSIONS_H_INCLUDED
 
 #include "ComplexExtensions.h"
-#include "Exception.h"
-
 
 /// Comprises wrapper functions for mathematical functions taken from libraries (Boost.Math, GSL), and several other mathematical functions.
 namespace mathutils {
-
-struct FactOverflow  : public cpputils::Exception {};
-  
+ 
 extern const double PI    ;
 extern const double SQRTPI;
 extern const double EULER ;

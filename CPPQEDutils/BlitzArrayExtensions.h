@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
 
-#include "Exception.h"
-
 #include <blitz/array.h>
 
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -21,10 +19,6 @@ BZ_DECLARE_FUNCTION_RET(isfinite,bool)
 inline double selectNegative(double d) {return d<0 ? d : 0;}
 
 BZ_DECLARE_FUNCTION_RET(selectNegative,double)
-
-
-/// Exception class thrown by unaryArray & binaryArray
-class NonContiguousStorageException : public cpputils::Exception {};
 
 
 /// Returns a unary view of `array`
@@ -47,10 +41,6 @@ class NonContiguousStorageException : public cpputils::Exception {};
 template<typename T, int RANK>
 const blitz::Array<T,1>
 unaryArray(const blitz::Array<T,RANK>&);
-
-
-/// Exception class thrown by binaryArray
-class BinaryArrayOrderingErrorException : public cpputils::Exception {};
 
 
 /// Returns a binary view of `array`. `TWO_TIMES_RANK` must be an even number

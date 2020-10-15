@@ -22,7 +22,7 @@ namespace {
 double etaEff(double uNot, double vClass)
 {
   if (uNot*vClass>=0) return sign(uNot)*sqrt(uNot*vClass);
-  else                throw particlecavity::UnotVClassSignDiscrepancy();
+  else                throw std::domain_error("Unot VClass sign discrepancy");
 }
 
 const particlecavity::Tridiagonals dispersive(mode::Ptr mode, particle::Ptr particle, double uNot, const ModeFunction& mf)

@@ -47,7 +47,7 @@ public:
       sf_(sf),
       nextDtTryCorrectionFactor_(nextDtTryCorrectionFactor)
   {
-    if (!cpputils::isStorageContiguous(a)) throw (NonContiguousStorageException());
+    if (!cpputils::isStorageContiguous(a)) throw (NonContiguousStorageException("In evolved"));
   }
 
   std::ostream& displayParameters_v(std::ostream& os) const {return os<<"EvolvedGSL implementation, stepping function: "<<sf_<<std::endl;}

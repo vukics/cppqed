@@ -5,7 +5,6 @@
 
 #include "ArrayTraits.h"
 #include "ComplexExtensions.h"
-#include "Exception.h"
 
 #include <boost/range/algorithm/generate.hpp>
 
@@ -17,16 +16,10 @@
 #include <boost/serialization/split_member.hpp>
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
+#include <stdexcept>
 
 /// the randomized-bundle
 namespace randomized {
-
-class RNGStateParsingException : public cpputils::TaggedException
-{
-public:
-  RNGStateParsingException(const std::string& tag) : cpputils::TaggedException(tag) {}
-};
-
 
 /// A common interface for random-number generators
 /**
@@ -64,7 +57,7 @@ private:
   {
     std::string state, id;
     ar & state & id;
-    if (id!=getImplID()) throw RNGStateParsingException("Wrong implementation ID, expected "+id+", found "+getImplID());
+    if (id!=getImplID()) throw std::runtime_error("Randomized archive load -- wrong implementation ID, expected "+id+", found "+getImplID());
     setState(state);
   }
 

@@ -22,7 +22,7 @@ namespace {
 
 const dcomp factor(double uNot0, double uNot1, double phi)
 {
-  if (uNot0*uNot1<0) throw particletwomodes::UnotsSignDiscrepancy(); 
+  if (uNot0*uNot1<0) throw std::domain_error("Unots sign discrepancy"); 
   return sign(uNot0)*sqrt(uNot0*uNot1)*exp(DCOMP_I*phi);
 }
 

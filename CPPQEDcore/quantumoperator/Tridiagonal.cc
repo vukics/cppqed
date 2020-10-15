@@ -58,7 +58,7 @@ Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minu
       !Compatible(zero,k,minus) || !Compatible(zero,k,plus) || !Compatible(minus,0,plus,0) || 
       ((minus.size() || plus.size()) && !k)
       )
-    throw TridiagonalConsistencyErrorException();
+    throw std::invalid_argument("Tridiagonal consistency error");
 
 }
 
@@ -71,16 +71,6 @@ const Tridiagonal<1> identity(size_t dim)
 }
 
 
-
-namespace details {
-
-void binOp1(size_t otherDifference, size_t& difference)
-{
-  if (!difference) difference=otherDifference;
-  else if (otherDifference && difference!=otherDifference) throw TridiagonalStructureMismatchException();
-}
-
-} // details
 
 } // quantumoperator
 
