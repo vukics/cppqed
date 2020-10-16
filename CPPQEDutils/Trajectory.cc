@@ -17,7 +17,7 @@
 
 using namespace std;
 
-
+#ifndef    DO_NOT_USE_BOOST_COMPRESSION
 namespace {
 
 bool isbz2(const std::string filename)
@@ -25,14 +25,16 @@ bool isbz2(const std::string filename)
   using namespace std;
   ifstream file(filename, ios_base::in | ios_base::binary);
   if (file.peek() == ifstream::traits_type::eof())
-    return false;
+    return true;
   string header; header.resize(3);
-  file.read(&header[0],3);
-  file.close();
+  file.read(header.data(),3);
   return header=="BZh";
 }
 
 }
+
+#endif // DO_NOT_USE_BOOST_COMPRESSION
+
 
 void trajectory::run(Trajectory & traj, double time, double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
                      bool displayInfo, bool firstStateDisplay,
@@ -76,15 +78,14 @@ std::shared_ptr<istream> trajectory::openStateFileReading(const std::string &fil
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
   std::shared_ptr<ifstream> ifs = std::make_shared<ifstream>(filename, ios_base::in | ios_base::binary);
-  if (!ifs->is_open()) throw StateFileOpeningException(filename)
+  if (!ifs->is_open()) throw StateFileOpeningException(filename);
   return ifs;
 #else
   using namespace boost::iostreams;
   std::shared_ptr<filtering_istream> in = std::make_shared<filtering_istream>();
   file_source file(filename, std::ios_base::in | std::ios_base::binary);
   if (!file.is_open()) throw StateFileOpeningException(filename);
-  if (isbz2(filename))
-    in->push(bzip2_decompressor());
+  if (isbz2(filename)) in->push(bzip2_decompressor());
   in->push(file);
   return in;
 #endif // DO_NOT_USE_BOOST_COMPRESSION
@@ -93,22 +94,15 @@ std::shared_ptr<istream> trajectory::openStateFileReading(const std::string &fil
 std::shared_ptr<ostream> trajectory::openStateFileWriting(const std::string &filename, const ios_base::openmode mode)
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
-  std::shared_ptr<ofstream> ofs = std::make_shared<ofstream>(filename, mode);
+  std::shared_ptr<ofstream> ofs = std::make_shared<ofstream>(filename, mode | std::ios_base::binary );
   if (!ofs->is_open()) throw StateFileOpeningException(filename);
   return ofs;
 #else
   using namespace boost::iostreams;
   std::shared_ptr<filtering_ostream> out = std::make_shared<filtering_ostream>();
-  file_sink file(filename, mode);
+  file_sink file(filename, mode | std::ios_base::binary );
   if (!file.is_open()) throw StateFileOpeningException(filename);
-  if (isbz2(filename)) {
-    throw std::runtime_error("Appending to compressed state files is not supported because of a boost bug. Filename: "+filename);
-    // Appending to compressed state files does not work because of a bug in boost when handling multi-stream bz2 files.
-    // The files can be written just fine, but cannot be read in afterwards. Hopefully this gets solved.
-    // The patch in https://svn.boost.org/trac/boost/ticket/9749 actually does fix the problem.
-    // See also: http://stackoverflow.com/q/32870991/1132850
-    out->push(bzip2_compressor());
-  }
+  if (isbz2(filename)) out->push(bzip2_compressor());
   out->push(file);
   return out;
 #endif // DO_NOT_USE_BOOST_COMPRESSION

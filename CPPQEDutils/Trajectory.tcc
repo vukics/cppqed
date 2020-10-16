@@ -93,10 +93,6 @@ const DisplayAndAutostopHandler::Ptr makeDisplayAndAutostopHandler(const Traject
 bool restoreState(Trajectory&, const std::string&, const std::string&, const std::string&);
 
 
-template<typename T>
-inline void nullDelete (T*) {}
-
-
 template<typename T, typename L, typename D>
 void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
          double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
@@ -119,7 +115,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   if (timeToReach && timeToReach<=traj.getTime()) return;
 
   const std::shared_ptr<ostream> outstream(!outputToFile ?
-                                           std::shared_ptr<ostream>(&cout,details::nullDelete<ostream>) : // since cout is a system-wide object, this should be safe
+                                           std::shared_ptr<ostream>(&cout,[](auto*){}) : // since cout is a system-wide object, this should be safe
                                            static_pointer_cast<ostream>(std::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   if (outstream->fail()) throw std::runtime_error("Trajectory file opening error: "+trajectoryFileName);

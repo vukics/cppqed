@@ -53,7 +53,7 @@ private:
  * If C++QED is compiled with compression support (boost iostreams library needed), then
  * the statefile can be in bzip2-format, the returned istream will handle this automatically.
  *
- * If the file cannot be opened, StateFileOpeningException is raised.
+ * If the file cannot be opened, an exception is raised.
  */
 std::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
 
@@ -63,9 +63,9 @@ std::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
  * the statefile can be in bzip2-format, the returned ostream will handle this automatically.
  * If the file does not yet exist, bzip2 is used if supported.
  *
- * If the file cannot be opened, StateFileOpeningException is raised.
+ * If the file cannot be opened, an exception is raised.
  */
-std::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app | std::ios_base::binary);
+std::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app);
 
 template<typename T>
 void writeViaSStream(const T&, std::ostream*);
