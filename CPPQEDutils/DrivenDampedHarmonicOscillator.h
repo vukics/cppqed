@@ -13,7 +13,7 @@
 #ifndef   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 #define   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 
-#ifdef   EIGEN3_FOUND
+#ifdef    EIGEN3_FOUND
 
 #include "ComplexExtensions.h"
 
@@ -38,7 +38,7 @@ public:
 protected:
   _(double gamma, double omega, Matrix, dcomp ampTI, dcomp ampDerivTI, double tInit=0); // The initial condition is supplied at time tInit.
 
-  dcomp c(double t) const;
+  dcomp c(double t) const; // The particular solution of the inhomogeneous equation
 
   const double gamma_, omega_;
 

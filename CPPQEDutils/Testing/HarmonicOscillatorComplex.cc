@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
                        dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
                      },
                      .1/max(1.,max(omega,gamma)),
-                     p);
+                     pt);
 
-  run(S,p);
+  run(S,pt);
 
 }

@@ -4,6 +4,7 @@
 
 #include "MathExtensions.h"
 
+#include <iostream>
 
 dcomp ddho::_::c(double t) const
 {
@@ -12,7 +13,7 @@ dcomp ddho::_::c(double t) const
 
 
 ddho::_::_(double gamma, double omega, Matrix m, dcomp ampTI, dcomp ampDerivTI, double tInit)
-  : gamma_(gamma), omega_(omega), a_([=](dcomp cTInit) {return m.inverse()*Vector{ampTI-cTInit,ampDerivTI-DCOMP_I*omega*cTInit}; } (c(tInit)) )
+  : gamma_(gamma), omega_(omega), a_(m.fullPivLu().solve(Vector(ampTI-c(tInit),ampDerivTI-DCOMP_I*omega*c(tInit))))
 {}
 
 
@@ -23,7 +24,7 @@ public:
   DDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0)
     : std::pair<dcomp,dcomp>(-gamma+sqrt(dcomp(mathutils::sqr(gamma)-1)),-gamma-sqrt(dcomp(mathutils::sqr(gamma)-1))),
       _(gamma,omega,
-        [=]() {ddho::Matrix m; m << exp(first*tInit), exp(second*tInit), first*exp(first*tInit),second*exp(second*tInit); return m;} (),
+        [=]() {ddho::Matrix m; m << exp(first*tInit), exp(second*tInit), first*exp(first*tInit), second*exp(second*tInit); return m;} (),
         ampTI,ampDerivTI,tInit),
       omega1_(first), omega2_(second) {}
 

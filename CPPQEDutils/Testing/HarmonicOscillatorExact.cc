@@ -22,11 +22,11 @@ int main(int argc, char* argv[])
   // Parameter finalization
   update(p,argc,argv,"--");
 
-  if (pt.T<0) pt.T=20./min(1.,min(omega,gamma));
+  if (pt.T<0) pt.T=10./min(1.,min(omega,gamma));
 
   double dtInit=.1/max(1.,max(omega,gamma));  
 
-  DDHO_Ptr oscillator(makeDDHO(gamma,omega,dcomp(1.,-1.),dcomp(-1.,1.),1.));
+  ddho::Ptr oscillator(ddho::make(gamma,omega,dcomp(1.,-1.),dcomp(-1.,1.),0));
 
   for (double t=0.; t<pt.T; t+=dtInit)
     cout<<t<<' '<<dtInit<<' '<<oscillator->amp(t)<<' '<<oscillator->ampDeriv(t)<<endl;

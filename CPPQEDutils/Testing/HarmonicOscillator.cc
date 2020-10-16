@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   update(p,argc,argv,"--");
 
   if (pt.T<0) pt.T=10./min(1.,min(omega,gamma));
-  // Note: 1.0 is also and existing frequency in the system, which defines the unit of time 
+  // Note: 1.0 is also an existing frequency in the system, which defines the unit of time 
 
   DA1R y(4); y=yinit.real(),yinit.imag(),dydtinit.real(),dydtinit.imag();
 
