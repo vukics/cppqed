@@ -147,8 +147,8 @@ public:
         )
   {
     using namespace std;
-    try {(*this)[s]; throw AttemptedRecreationOfParameterException(s);}
-    catch (const UnrecognisedParameterException&) {
+    auto i=findSubscript(s);
+    if (i==table_.end()) {
       Typed<T>* pptr=new Typed<T>(s,d,v);
       table_.push_back(pptr);
       smwidth_=max(smwidth_,s.length());
@@ -156,6 +156,7 @@ public:
       dmwidth_=max(dmwidth_,d.length());
       return pptr->get();
     }
+    else throw AttemptedRecreationOfParameterException(s);
   }
   
   /// Overload of add(const std::string &, const std::string &, const T &) for boolean
@@ -189,6 +190,8 @@ public:
 
 private:
   typedef boost::ptr_list<Base> Impl;
+
+  Impl::const_iterator findSubscript(const std::string& s) const;
 
   Impl table_;
 

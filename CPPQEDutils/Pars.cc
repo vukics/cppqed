@@ -8,8 +8,6 @@
 
 #include <boost/range/algorithm.hpp>
 
-#include <boost/bind.hpp>
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -18,12 +16,16 @@
 
 using namespace std;
 
+auto parameters::Table::findSubscript(const std::string& s) const -> Impl::const_iterator 
+{
+  return boost::find_if(table_,[=,&s] (const Base& b) {return b.getS()==s;});
+}
+
 
 const parameters::Base&
 parameters::Table::operator[](const string& s) const
 {
-  auto i=boost::find_if(table_,bind(equal_to<string>(),bind(&Base::getS,_1),boost::cref(s)));
-
+  auto i=findSubscript(s);
   if (i==table_.end()) throw UnrecognisedParameterException(s);
   return *i;
 }
@@ -38,8 +40,8 @@ parameters::Table::Table() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), pa
 
 void parameters::Table::printList() const
 {
-  cout<<"\nhelp       display this list\nversion    display version information\n\n";
-  boost::for_each(table_,bind(&Base::print,_1,smwidth_,tmwidth_,dmwidth_));
+  cout<<"\nhelp\t\tdisplay this list\nversion\t\tdisplay version information\n\n";
+  boost::for_each(table_,[=] (const Base& b) {b.print(smwidth_,tmwidth_,dmwidth_);});
   cout<<endl;
 }
 
@@ -113,10 +115,9 @@ void parameters::Typed<TitleLine>::read_v(std::istream&)
 
 parameters::Table& parameters::Table::addTitle(const std::string& s, const std::string& mod)
 {
-  try {(*this)[s+mod]; throw AttemptedRecreationOfParameterException(s);}
-  catch (const UnrecognisedParameterException&) {
-    table_.push_back(new Typed<TitleLine>(s+mod,"",TitleLine()));
-  }
+  auto i=findSubscript(s+mod);
+  if (i==table_.end()) table_.push_back(new Typed<TitleLine>(s+mod,"",TitleLine()));
+  else throw AttemptedRecreationOfParameterException(s);
   return *this;
 }
 
