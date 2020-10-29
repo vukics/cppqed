@@ -6,11 +6,14 @@
 #include "Archive.h"
 #include "CommentingStream.h"
 #include "Evolved.h"
+#include "FormDouble.h"
 #include "ParsTrajectory.h"
 
 #include <iosfwd>
+#include <queue>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 
 
 /// The trajectory-bundle
@@ -89,15 +92,26 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
  *
  * \todo Consider the possibility of cloning Trajectories
  */
+template<typename DA>
 class Trajectory : private boost::noncopyable
 {
 public:
   /// Propagation for a time interval of exactly deltaT
   void evolve(double deltaT) {evolve_v(deltaT);}
 
+  using DisplayedArray=DA;
+  using DisplayReturnType=std::tuple<std::ostream&,DA>;
+  
   /// Displays a limited set of relevant physical and numerical information about the actual state of Trajectory at the actual time instant
-  std::ostream& display(std::ostream&, int precision ///< the precision (number of digits) of display
-                       ) const;
+  DisplayReturnType display(std::ostream& os, int precision ///< the precision (number of digits) of display
+                           ) const
+  {
+    const FormDouble fd(formdouble::positive(precision));
+    auto res{display_v( os<<fd(getTime())<<fd(getDtDid()) , precision)};
+    std::get<0>(res)<<std::endl;
+    return res; // Note: endl flushes the buffer
+  }
+
 
   /// \name Getters
   //@{
@@ -105,8 +119,12 @@ public:
   double getDtDid() const {return getDtDid_v();} ///< last perfomed timestep
   //@}
 
-  std::ostream& displayParameters(std::ostream& os) const; ///< print header
-
+  std::ostream& displayParameters(std::ostream& os) const ///< print header
+  {
+    size_t i=3;
+    return displayKey_v(displayParameters_v(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n" , i);
+  }
+  
   std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);} ///< print a log at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
 
   /// \name Entire state i/o
@@ -128,9 +146,9 @@ private:
   virtual double         getTime_v()       const = 0;
   virtual double        getDtDid_v()       const = 0;
   
-  virtual std::ostream& displayParameters_v(std::ostream&         ) const = 0;
-  virtual std::ostream& display_v          (std::ostream&, int    ) const = 0;
-  virtual std::ostream& displayKey_v       (std::ostream&, size_t&) const = 0;
+  virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
+  virtual DisplayReturnType display_v(std::ostream&, int) const = 0;
+  virtual std::ostream& displayKey_v(std::ostream&, size_t&) const = 0;
 
   virtual cpputils::iarchive&  readState_v(cpputils::iarchive&) = 0;
   virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
@@ -271,6 +289,74 @@ private:
 };
 
 
+/// Generic implementation of AutostopHandler
+/**
+ * Assumes that DA is a container of some numeric type and DA::begin and DA::end exist
+ */
+template<typename DA>
+class AutostopHandlerGeneric
+{
+private:
+  typedef DA Averages;
+  
+public:
+  AutostopHandlerGeneric(double autoStopEpsilon, unsigned autoStopRepetition) : autoStopEpsilon_{autoStopEpsilon}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{} {}
+
+  void operator()(const DA& displayedArray)
+  {
+    if (!autoStopRepetition_) return;
+    
+    if (!averages_.size()) { // This means that no display has yet occured: the size of averages_ must be determined
+      averages_.resize(displayedArray.size());
+      averages_=0.;
+    }
+    else {
+      if (queue_.size()==autoStopRepetition_) {
+        if (max(abs(averages_-displayedArray)/(abs(averages_)+abs(displayedArray)))<autoStopEpsilon_) throw StoppingCriterionReachedException();
+        averages_=averages_+(displayedArray-queue_.front())/double(autoStopRepetition_); // update the averages set for next step
+        queue_.pop(); // remove obsolate first element of the queue
+      }
+      else averages_=(double(queue_.size())*averages_+displayedArray)/double(queue_.size()+1); // build the initial averages set to compare against
+
+      queue_.push(displayedArray); // place the new item to the back of the queue
+
+    }
+
+  }
+
+private:
+  const double autoStopEpsilon_;
+  const unsigned autoStopRepetition_;
+
+  DA averages_;
+  std::queue<DA> queue_;
+
+};
+
+
+template<typename DA>
+using TrajectoryDisplayList=std::list<std::tuple<double,double,DA>>;
+
+
+namespace details {
+
+template<
+         typename T, // type of trajectory
+         typename L, // type specifying the length of the run
+         typename D, // type specifying the frequency of display
+         typename AutostopHandler // should support operator()(const typename T::DisplayedArray &)
+         >
+TrajectoryDisplayList<typename T::DisplayedArray>
+run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
+    const std::string& trajectoryFileName, const std::string& initialFileName,
+    int precision, bool displayInfo, bool firstStateDisplay,
+    const std::string& parsedCommandLine,
+    bool saveDisplayedArray,
+    AutostopHandler&& autostopHandler
+   );
+
+} // details
+
 /// Running in deltaT mode (displays in equal time intervals) for a certain time \related Trajectory
 /**
  * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
@@ -293,20 +379,25 @@ private:
  * \todo Consider taking Trajectory by rvalue reference
  *
  */
-void run(Trajectory & trajectory, ///< the trajectory to run
-         double time, ///< end time
-         double deltaT, ///< time interval between two \link Trajectory::display displays\endlink
-         unsigned sdf, ///< number of \link Trajectory::display displays\endlink between two \link Trajectory::writeState state displays\endlink
-         const std::string& ofn, ///< name of the output file for \link Trajectory::display displays\endlink — if empty, display to standard output; \link Trajectory::writeState state displays\endlink into file named `ofn.state`
-         const std::string& initialFileName, ///< name of file containing initial condition state for the run
-         int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
-         bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
-         bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
-         double autoStopEpsilon, ///< relative precision for autostopping
-         unsigned autoStopRepetition, ///< number of displayed lines repeated within relative precision before autostopping – 0 means no autostopping
-         const std::string& parsedCommandLine
-        );
-
+template<typename DA, typename AutostopHandler>
+TrajectoryDisplayList<DA>
+run(Trajectory<DA>& traj, ///< the trajectory to run
+    double time, ///< end time
+    double deltaT, ///< time interval between two \link Trajectory::display displays\endlink
+    unsigned sdf, ///< number of \link Trajectory::display displays\endlink between two \link Trajectory::writeState state displays\endlink
+    const std::string& ofn, ///< name of the output file for \link Trajectory::display displays\endlink — if empty, display to standard output; \link Trajectory::writeState state displays\endlink into file named `ofn.state`
+    const std::string& initialFileName, ///< name of file containing initial condition state for the run
+    int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
+    bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
+    bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
+    const std::string& parsedCommandLine,
+    bool saveDisplayedArray,
+    AutostopHandler&& autostopHandler
+   )
+{
+  return details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,saveDisplayedArray,
+                      std::forward<AutostopHandler>(autostopHandler));
+}
 
 /// Same as \link Trajectory::run above\endlink but runs for a certain number of time intervals deltaT \related Trajectory
 /**
@@ -323,9 +414,17 @@ void run(Trajectory & trajectory, ///< the trajectory to run
  *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --NDt 10
  *
  */
-void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt*deltaT
-         double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
+template<typename DA, typename AutostopHandler>
+TrajectoryDisplayList<DA>
+run(Trajectory<DA>& traj, long nDt, ///< the end time of the trajectory will be nDt*deltaT
+    double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+    const std::string& parsedCommandLine, bool saveDisplayedArray,
+    AutostopHandler&& autostopHandler
+   )
+{
+  return details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,saveDisplayedArray,
+                      std::forward<AutostopHandler>(autostopHandler));
+}
 
 
 /// Another version of \link Trajectory::run `run`\endlink for running in dc-mode \related Adaptive
@@ -335,11 +434,17 @@ void run(Trajectory &, long nDt, ///< the end time of the trajectory will be nDt
  * that is, when the important things are happening in the dynamics.
  * 
  */
-template<typename A, typename BASE>
-void run(Adaptive<A,BASE>&, double time, int dc, ///< number of adaptive timesteps taken between two displays
-         unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine);
-
+template<typename A, typename BASE, typename AutostopHandler>
+TrajectoryDisplayList<typename BASE::DisplayedArray>
+run(Adaptive<A,BASE>& traj, double time, int dc, ///< number of adaptive timesteps taken between two displays
+    unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+    const std::string& parsedCommandLine, bool saveDisplayedArray,
+    AutostopHandler&& autostopHandler
+   )
+{
+  return details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,saveDisplayedArray,
+                      std::forward<AutostopHandler>(autostopHandler));
+}
 
 /// Dispatcher \related Trajectory
 /**
@@ -350,7 +455,16 @@ void run(Adaptive<A,BASE>&, double time, int dc, ///< number of adaptive timeste
  * \note This means that ParsRun::NDt takes precedence over ParsRun::T
  *
  */
-void run(Trajectory &, const ParsRun& p);
+template <typename DA>
+TrajectoryDisplayList<DA>
+run(Trajectory<DA>& traj, const ParsRun& p)
+{ 
+  if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
+  if (p.NDt) return run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),p.saveDisplayedArray,
+                        AutostopHandlerGeneric<DA>(p.autoStopEpsilon,p.autoStopRepetition));
+  else       return run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),p.saveDisplayedArray,
+                        AutostopHandlerGeneric<DA>(p.autoStopEpsilon,p.autoStopRepetition));
+}
 
 
 /// Dispatcher \related Adaptive
@@ -362,15 +476,18 @@ void run(Trajectory &, const ParsRun& p);
  * 
  */
 template<typename A, typename BASE>
-void run(Adaptive<A,BASE>& traj, const ParsRun& p)
+TrajectoryDisplayList<typename BASE::DisplayedArray>
+run(Adaptive<A,BASE>& traj, const ParsRun& p)
 {
-  if      (p.dc) run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.autoStopEpsilon,p.autoStopRepetition,p.getParsedCommandLine());
-  else if (p.Dt) run(static_cast<Trajectory&>(traj),p);
+  if      (p.dc) return run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),p.saveDisplayedArray,
+                            AutostopHandlerGeneric<typename BASE::DisplayedArray>(p.autoStopEpsilon,p.autoStopRepetition));
+  else if (p.Dt) return run(static_cast<BASE&>(traj),p);
   else throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
 }
 
 
 } // trajectory
+
 
 
 #endif // CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED

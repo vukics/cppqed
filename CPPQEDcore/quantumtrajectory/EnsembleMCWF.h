@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 
-#include "DO_Display.tcc"
+#include "DO_Display.h"
 #include "MCWF_Trajectory.tcc"
 #include "DensityOperator.h"
 #include "ParsMCWF_Trajectory.h"
@@ -18,7 +18,7 @@ namespace ensemble {
 
 using namespace mcwf;
 
-#define BASE_class trajectory::Ensemble< quantumdata::DensityOperator<RANK> , quantumdata::StateVector<RANK> >
+#define BASE_class trajectory::Ensemble< structure::AveragedCommon::Averages, quantumdata::DensityOperator<RANK> , quantumdata::StateVector<RANK> >
 
 /// Less templatized base for EnsembleMCWF \tparamRANK
 template<int RANK>
@@ -128,8 +128,13 @@ public:
     : Base(psi,sys,p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const final {return doDisplay_.display   (this->getTime(),*this->averaged(),os,precision);}
-  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const final {return doDisplay_.displayKey(os,i);}
+  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const final
+  {
+    const auto averages{*this->averaged()};
+    return doDisplay_.display(this->getTime(),averages,os,precision);
+  }
+  
+  std::ostream& displayKey_v(std::ostream& os, size_t& i) const final {return doDisplay_.displayKey(os,i);}
 
   const DO_Display doDisplay_;
 
@@ -147,10 +152,10 @@ template<int RANK>
 struct HandleType<quantumdata::DensityOperator<RANK> > : mpl::identity<std::shared_ptr<quantumdata::DensityOperator<RANK> > > {};
 
 
-template<int RANK>
-struct AverageTrajectoriesInRange<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >
+template<typename DA, int RANK>
+struct AverageTrajectoriesInRange<DA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >
 {
-  typedef typename Ensemble<quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator CI;
+  typedef typename Ensemble<DA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator CI;
   
   static const auto _(CI begin, CI end)
   {

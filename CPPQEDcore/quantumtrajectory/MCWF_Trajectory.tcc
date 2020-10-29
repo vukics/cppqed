@@ -64,16 +64,6 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(
 
 
 template<int RANK>
-std::ostream& MCWF_Trajectory<RANK>::display_v(std::ostream& os, int precision) const
-{
-  using namespace std;
-
-  return structure::QuantumSystemWrapper<RANK,true>::display(getTime(),*psi_,os,precision);
-
-}
-
-
-template<int RANK>
 double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
 {
   if (this->getHa()) {

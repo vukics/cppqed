@@ -6,7 +6,7 @@
 
 #include "EnsembleMCWF.h"
 #include "Master.tcc"
-#include "TimeAveragingMCWF_Trajectory.tcc"
+#include "TimeAveragingMCWF_Trajectory.h"
 
 #include "Trajectory.tcc"
 

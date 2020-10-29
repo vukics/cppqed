@@ -70,13 +70,13 @@ struct ParsRun
 
   formdouble::Zero &precision; ///< the overall precision of trajectory display \see FormDouble::overallPrecision
 
-  bool &displayInfo, &firstStateDisplay;
+  bool &displayInfo, &firstStateDisplay, &saveDisplayedArray;
 
   unsigned &sdf;
 
-  double &autoStopEpsilon;
+  double &autoStopEpsilon; ///< relative precision for autostopping
 
-  unsigned &autoStopRepetition;
+  unsigned &autoStopRepetition; ///< number of displayed lines repeated within relative precision before autostopping – 0 means no autostopping
   
   ParsRun(parameters::Table&, const std::string& mod="");
 

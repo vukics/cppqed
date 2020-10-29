@@ -34,7 +34,10 @@ struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::ru
 
 /// The actual working base of Master in the case when blitzplusplus::basi::Iterator is used for implementing multi-matrix multiplications \tparamRANK
 template<int RANK>
-class Base : public QuantumTrajectory<RANK, trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow,trajectory::Trajectory> >
+class Base : public QuantumTrajectory<RANK,
+                                      trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow,trajectory::Trajectory<typename structure::AveragedCommon::Averages>
+                                                          > 
+                                     >
 {
 public:
   typedef structure::QuantumSystem<RANK> QuantumSystem;
@@ -46,7 +49,7 @@ public:
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
   typedef typename quantumdata::Types<RANK>::    StateVectorLow     StateVectorLow;
 
-  typedef trajectory::Adaptive<DensityOperatorLow,trajectory::Trajectory> Adaptive;
+  typedef trajectory::Adaptive<DensityOperatorLow,trajectory::Trajectory<typename Averaged::Averages>> Adaptive;
 
   typedef quantumtrajectory::QuantumTrajectory<RANK, Adaptive> QuantumTrajectory;
 
@@ -119,8 +122,9 @@ public:
   const DO_Ptr getRho() const {return this->rho_;}
 
 private:
-  std::ostream& display_v   (std::ostream& os, int precision) const override {return doDisplay_.display   (this->getTime(),*this->rho_,os,precision);}
-  std::ostream& displayKey_v(std::ostream& os, size_t& i    ) const override {return doDisplay_.displayKey(os,i);}
+  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const override {return doDisplay_.display(this->getTime(),*this->rho_,os,precision);}
+  
+  std::ostream& displayKey_v(std::ostream& os, size_t& i) const override {return doDisplay_.displayKey(os,i);}
 
   const std::string trajectoryID_v() const override {return "Master";}
   

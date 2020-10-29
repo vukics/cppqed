@@ -4,7 +4,6 @@
 
 #include "Master.h"
 
-#include "DO_Display.tcc"
 #include "QuantumTrajectory.h"
 
 #include "MathExtensions.h"

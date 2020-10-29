@@ -72,18 +72,20 @@ qsa(std::shared_ptr<const T> t)
 
 /// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::display in succession; otherwise a no-op. \related QuantumSystemWrapper
 template<int RANK>
-std::ostream& display(std::shared_ptr<const Averaged<RANK> > av,
-                      double t,
-                      const quantumdata::LazyDensityOperator<RANK>& matrix,
-                      std::ostream& os,
-                      int precision)
+std::tuple<std::ostream&, typename Averaged<RANK>::Averages>
+display(std::shared_ptr<const Averaged<RANK> > av,
+        double t,
+        const quantumdata::LazyDensityOperator<RANK>& matrix,
+        std::ostream& os,
+        int precision)
 {
+  typename Averaged<RANK>::Averages averages;
   if (av) {
-    typename Averaged<RANK>::Averages averages(av->average(t,matrix));
+    averages.reference(av->average(t,matrix));
     av->process(averages);
     av->display(averages,os,precision);
   }
-  return os;
+  return {os,averages};
 }
 
 
@@ -97,7 +99,7 @@ const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCo
 
 /// A wrapper for Exact, Hamiltonian, Liouvillean, and Averaged
 /**
- * It’s aim is to determine whether the passed DynamicsBase or QuantumSystem object derives also from Exact, Hamiltonian, Liouvillean, and Averaged
+ * Its aim is to determine whether the passed DynamicsBase or QuantumSystem object derives also from Exact, Hamiltonian, Liouvillean, and Averaged
  *
  * If the answer is
  * - positive, it forwards the member functions of the given class with the given object dynamic-cast to the necessary type.
@@ -213,7 +215,10 @@ public:
   //@{
   void process(Averages& averages) const {if (av_) av_->process(averages);}
 
-  std::ostream& display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const {return structure::display(av_,t,matrix,os,precision);}
+  std::tuple<std::ostream&,Averages> display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const
+  {
+    return structure::display(av_,t,matrix,os,precision);
+  }
   //@}
 
 

@@ -70,13 +70,13 @@ int main(int argc, char* argv[])
 
   CA1D y(2); y(0)=dcomp(3.45263,-2.0746); y(1)=dcomp(-4.83065,1.16527);
 
-  Simulated<CA1D> simulated(y,bind(derivs,_1,_2,_3,params),dtInit,CA1D(),pt);
-  simulated.displayParameters();
+  Simulated<CA1D> simulated(y,bind(derivs,_1,_2,_3,params),dtInit,pt);
+  simulated.displayParameters(std::cout);
 
   randomized::Randomized::Ptr Ran(randomized::MakerGSL()(1001));
 
   for (size_t n=1000; n>0; n--) {
-    evolved::evolveTo(simulated,pt.T*(*Ran)()); simulated.display();
+    evolved::evolveTo(simulated,pt.T*(*Ran)()); simulated.display(std::cout,pt.precision);
   }
 
 

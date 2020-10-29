@@ -136,6 +136,8 @@ private:
 template<typename A>
 class EvolvedIO : public TimeStepBookkeeper, public LoggingBase
 {
+  EvolvedIO(const EvolvedIO&) = delete; EvolvedIO& operator=(const EvolvedIO&) = delete; // noncopyable
+
 public:
   typedef std::shared_ptr<EvolvedIO>            Ptr;
   typedef std::shared_ptr<const EvolvedIO> ConstPtr;
@@ -151,10 +153,6 @@ public:
   virtual ~EvolvedIO() {} ///< necessary in order that EvolvedIO be polymorphic
 
 private:
-  // make the class “noncopyable”
-  EvolvedIO(const EvolvedIO&) = delete;
-  EvolvedIO& operator=(const EvolvedIO&) = delete;
-   
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 
   /// The serialization of A by reference leads to memory leak (for not completely understood reasons),

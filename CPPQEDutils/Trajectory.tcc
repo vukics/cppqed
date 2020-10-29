@@ -13,7 +13,6 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
-#include <numeric> // for accumulate
 
 
 
@@ -50,11 +49,11 @@ namespace details {
   
 namespace runTraits {
 
-inline bool doContinue(const Trajectory& traj, double time, long      ) {return traj.getTime()<time;}
-inline bool doContinue(const Trajectory&     , long length, long count) {return count<=length      ;}
+template <typename DA> inline bool doContinue(const Trajectory<DA>& traj, double time, long      ) {return traj.getTime()<time;}
+template <typename DA> inline bool doContinue(const Trajectory<DA>&     , long length, long count) {return count<=length      ;}
 
-inline void advance(Trajectory & traj, long       , double deltaT) {traj.evolve(deltaT);}
-inline void advance(Trajectory & traj, double time, double deltaT) {traj.evolve(std::min(deltaT,time-traj.getTime()));}
+template <typename DA> inline void advance(Trajectory<DA>& traj, long       , double deltaT) {traj.evolve(deltaT);}
+template <typename DA> inline void advance(Trajectory<DA>& traj, double time, double deltaT) {traj.evolve(std::min(deltaT,time-traj.getTime()));}
 
 template<typename A, typename BASE>
 inline void advance(Adaptive<A,BASE>& traj, double time, int) {traj.step(time-traj.getTime());}
@@ -62,8 +61,8 @@ inline void advance(Adaptive<A,BASE>& traj, double time, int) {traj.step(time-tr
 inline bool doDisplay(long      , double         ) {return true;}
 inline bool doDisplay(long count, int displayFreq) {return !(count%displayFreq);}
 
-inline const std::string writeTimestep(int   ) {return " timestep";}
-inline const std::string writeTimestep(double) {return ""         ;}
+inline auto writeTimestep(int   ) {return " timestep";}
+inline auto writeTimestep(double) {return ""         ;}
 
 inline double endTime(long    nDt, double dt, double currentTime) {return nDt*dt+currentTime;}
 inline double endTime(double time, double   , double            ) {return time              ;}
@@ -71,34 +70,46 @@ inline double endTime(double time, double   , double            ) {return time  
 } // runTraits
 
 
-class DisplayAndAutostopHandler
+template<typename DA>
+bool restoreState(Trajectory<DA>& traj, const std::string& trajectoryFileName, const std::string& stateFileName, const std::string& initialFileName)
 {
-public:
-  typedef std::shared_ptr<const DisplayAndAutostopHandler> Ptr;
+  if (trajectoryFileName!="") {
 
-  DisplayAndAutostopHandler(const Trajectory& traj) : traj_(traj) {}
+    std::ifstream trajectoryFile(trajectoryFileName.c_str());
 
-  virtual std::ostream& display(std::ostream& os, int precision) const; // const {return traj_.display(os);}
+    if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
+      auto stateFile{openStateFileReading(stateFileName)};
+      while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,stateFile.get());
+      return true;
+    }
 
-  virtual ~DisplayAndAutostopHandler() {}
-  
-protected:
-  const Trajectory& traj_;
+  }
 
-};
+  if (initialFileName!="") {
+    auto initialFile{openStateFileReading(initialFileName)};
+    while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,initialFile.get());
+  }
 
-/** \todo The present design doesn’t provide real modularity, for this we would need a maker class for DisplayAndAutostopHandler. */
-const DisplayAndAutostopHandler::Ptr makeDisplayAndAutostopHandler(const Trajectory&, double autoStopEpsilon, unsigned autoStopRepetition);
+  return false;
+}
 
-bool restoreState(Trajectory&, const std::string&, const std::string&, const std::string&);
+} } // trajectory::details
 
 
-template<typename T, typename L, typename D>
-void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std::string& trajectoryFileName, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-         double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
+template<typename T, typename L, typename D, typename AutostopHandler>
+trajectory::TrajectoryDisplayList<typename T::DisplayedArray> 
+trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
+                         const std::string& trajectoryFileName, const std::string& initialFileName,
+                         int precision, bool displayInfo, bool firstStateDisplay,
+                         const std::string& parsedCommandLine,
+                         bool saveDisplayedArray,
+                         AutostopHandler&& autostopHandler
+                        )
 {
   using namespace std; using namespace runTraits; using namespace cpputils;
 
+  TrajectoryDisplayList<typename T::DisplayedArray> res;
+  
   ////////////////////////////////////////////////
   // Determining i/o streams, eventual state input
   ////////////////////////////////////////////////
@@ -112,7 +123,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   
   const double timeToReach=endTime(length,displayFreq,traj.getTime());
     
-  if (timeToReach && timeToReach<=traj.getTime()) return;
+  if (timeToReach && timeToReach<=traj.getTime()) return res;
 
   const std::shared_ptr<ostream> outstream(!outputToFile ?
                                            std::shared_ptr<ostream>(&cout,[](auto*){}) : // since cout is a system-wide object, this should be safe
@@ -149,7 +160,7 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 
   }
   
-  if (!timeToReach) {traj.display(os,precision); return;}
+  if (!timeToReach) {traj.display(os,precision); return res;}
 
   //////////////////////////////
   // Mid section: the actual run
@@ -162,8 +173,6 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
     evsDisplayed=false; // signifies whether the expectation values have already been displayed ”
 
   try {
-
-    auto displayAndAutostopHandler(makeDisplayAndAutostopHandler(traj,autoStopEpsilon,autoStopRepetition));
 
     for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
 
@@ -187,13 +196,16 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
 
         if (count || !continuing) {
           evsDisplayed=true;
-          displayAndAutostopHandler->display(os,precision);
+          auto displayReturn{traj.display(os,precision)};
+          if (saveDisplayedArray) res.emplace_back(traj.getTime(),traj.getDtDid(),get<1>(displayReturn));
+          autostopHandler(get<1>(displayReturn));
         }
       }
     }
 
   } catch (const StoppingCriterionReachedException& except) {CommentingStream(os)<<"Stopping criterion has been reached"<<endl;}
-  if (!evsDisplayed) traj.display(os,precision);
+  
+  if (!evsDisplayed) traj.display(os,precision); // Display at the end instant if display has not happened yet
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
@@ -202,16 +214,10 @@ void run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq, const std:
   {CommentingStream temp(os); temp<<setprecision(formdouble::actualPrecision(precision)); traj.logOnEnd(temp);}
   if (!stateSaved) writeViaSStream(traj,ofs.get());
   
+  return res;
+  
 }
 
-} } // trajectory::details
-
-
-template<typename A, typename BASE>
-void trajectory::run(Adaptive<A,BASE>& traj, double time, int dc, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision,
-                     bool displayInfo, bool firstStateDisplay,
-                     double autoStopEpsilon, unsigned autoStopRepetition, const std::string& parsedCommandLine)
-{details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,autoStopEpsilon,autoStopRepetition,parsedCommandLine);}
 
 
 template<typename A>

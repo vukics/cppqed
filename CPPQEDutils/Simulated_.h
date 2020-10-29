@@ -25,10 +25,10 @@ namespace trajectory {
  * \todo Provide optional key printing
  */
 template<typename A> 
-class Simulated : public Adaptive<A,Trajectory>
+class Simulated : public Adaptive<A,Trajectory<A> >
 {
 public:
-  typedef Adaptive<A,Trajectory> Base;
+  typedef Adaptive<A,Trajectory<A> > Base;
 
   typedef evolved::Evolved<A> Evolved;
 
@@ -46,12 +46,12 @@ public:
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 protected:
-  std::ostream& display_v(std::ostream& os, int precision) const override
+  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const override
   {
     using namespace cpputils;
     const A& a=this->getEvolved()->getA();
     for (size_t i=0; i<subscriptLimit(a); i++) os<<FormDouble(precision)(subscript(a,i))<<' ';
-    return os;
+    return {os,a.copy()};
   }
   
 private:

@@ -25,7 +25,7 @@ struct HandleType<quantumdata::StateVector<RANK> > : mpl::identity<std::shared_p
 namespace quantumtrajectory {
 
 
-#define BASE_class trajectory::Stochastic<typename quantumdata::Types<RANK>::StateVectorLow, quantumdata::StateVector<RANK> >
+#define BASE_class trajectory::Stochastic<typename structure::AveragedCommon::Averages, typename quantumdata::Types<RANK>::StateVectorLow, quantumdata::StateVector<RANK> >
 
 
 /// Implements a single Monte Carlo wave-function trajectory
@@ -108,7 +108,11 @@ public:
 protected:
   using Base::getEvolved; using Base::getDtTry;
 
-  std::ostream&    display_v(std::ostream&, int    ) const override; ///< Forwards to structure::Averaged::display
+  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const override
+  {
+    return structure::QuantumSystemWrapper<RANK,true>::display(getTime(),*psi_,os,precision);
+  } ///< Forwards to structure::Averaged::display
+  
   std::ostream& displayKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::displayKey
 
   /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes mcwf::Logger state
