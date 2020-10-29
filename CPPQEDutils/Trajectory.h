@@ -135,11 +135,11 @@ public:
 
   virtual ~Trajectory() {}
 
-  void setLogStreamDuringRun(std::shared_ptr<std::ostream> os) {commentingStream_.p=os; commentingStream_.s=*os;}
+  void setLogStreamDuringRun(std::shared_ptr<std::ostream> os) {logStream_.set(os);}
 
 protected:
   /// The stream hence obtained must always be flushed (e.g. with `std::endl`) before anything else gets to write on the same underlying stream
-  std::ostream& getLogStreamDuringRun() const {return commentingStream_.s;}
+  std::ostream& getLogStreamDuringRun() const {return logStream_;}
   
 private:
   virtual void            evolve_v(double)       = 0; // A step of exactly deltaT
@@ -155,10 +155,7 @@ private:
 
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
 
-  struct {
-    std::shared_ptr<std::ostream> p;
-    mutable cpputils::CommentingStream s{std::clog};
-  } commentingStream_;
+  mutable cpputils::CommentingStream logStream_{std::shared_ptr<std::ostream>{&std::clog,[](auto*){}}};
 
 };
 

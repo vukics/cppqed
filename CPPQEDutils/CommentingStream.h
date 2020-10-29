@@ -418,10 +418,15 @@ typedef boost::iostreams::finite_state_filter<CommentingMachine> CommentingFilte
 class CommentingStream : public boost::iostreams::filtering_ostream
 {
 public:
-  explicit CommentingStream(std::ostream& os) {push(details::CommentingFilter()); push(os);}
+  using OstreamPtr=std::shared_ptr<std::ostream>;
   
-  cpputils::CommentingStream& operator=(std::ostream& newOstream) {reset(); push(details::CommentingFilter()); push(newOstream); return *this;}
+  explicit CommentingStream(OstreamPtr os) : os_{os} {push(details::CommentingFilter()); push(*os);}
+  
+  void set(OstreamPtr os) {os_=os; reset(); push(details::CommentingFilter()); push(*os_);}
 
+private:
+  std::shared_ptr<std::ostream> os_;
+  
 };
 
 

@@ -135,23 +135,18 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
                                            static_pointer_cast<ostream>(std::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   if (outstream->fail()) throw std::runtime_error("Trajectory file opening error: "+trajectoryFileName);
-  traj.setLogStreamDuringRun(outstream);
+  traj.setLogStreamDuringRun(outstream); // logging during run occurs with default precision, so this is a different stream from commentingStream below
   
   ostream& os=*outstream;
   IO_Manipulator::_(os);
   os<<setprecision(formdouble::actualPrecision(precision));
+
+  CommentingStream commentingStream{outstream}; commentingStream<<setprecision(formdouble::actualPrecision(precision));
   
   ///////////////////////
   // Writing introduction
   ///////////////////////
 
-  {
-  
-  CommentingStream commentingStream(os);
-  commentingStream<<setprecision(formdouble::actualPrecision(precision));
-  
-  // auto & commentingStream=os;
-    
   if (displayInfo) {
     if (!continuing) {
       if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
@@ -206,7 +201,7 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
       }
     }
 
-  } catch (const StoppingCriterionReachedException& except) {CommentingStream(os)<<"Stopping criterion has been reached"<<endl;}
+  } catch (const StoppingCriterionReachedException& except) {commentingStream<<"Stopping criterion has been reached"<<endl;}
   
   if (!evsDisplayed) traj.display(os,precision); // Display at the end instant if display has not happened yet
 
@@ -214,7 +209,7 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  {CommentingStream temp(os); temp<<setprecision(formdouble::actualPrecision(precision)); traj.logOnEnd(temp);}
+  traj.logOnEnd(commentingStream);
   if (!stateSaved) writeViaSStream(traj,ofs.get());
   
   return res;
