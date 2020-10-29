@@ -70,7 +70,7 @@ struct ParsRun
 
   formdouble::Zero &precision; ///< the overall precision of trajectory display \see FormDouble::overallPrecision
 
-  bool &displayInfo, &firstStateDisplay, &saveDisplayedArray;
+  bool &displayInfo, &firstStateDisplay, &doStreaming, &saveDisplayedArray;
 
   unsigned &sdf;
 

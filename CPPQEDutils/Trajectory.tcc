@@ -10,6 +10,9 @@
 #include "IO_Manip.h"
 #include "Version.h"
 
+#include <boost/iostreams/device/null.hpp>
+#include <boost/iostreams/stream.hpp>
+
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -102,7 +105,7 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
                          const std::string& trajectoryFileName, const std::string& initialFileName,
                          int precision, bool displayInfo, bool firstStateDisplay,
                          const std::string& parsedCommandLine,
-                         bool saveDisplayedArray,
+                         bool doStreaming, bool saveDisplayedArray,
                          AutostopHandler&& autostopHandler
                         )
 {
@@ -118,15 +121,17 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
   const string stateFileName(trajectoryFileName+stateExtension);
   
   const bool
-    outputToFile=(trajectoryFileName!=""),  
+    streamToFile=(trajectoryFileName!=""),  
     continuing=restoreState(traj,trajectoryFileName,stateFileName,initialFileName);
   
   const double timeToReach=endTime(length,displayFreq,traj.getTime());
     
   if (timeToReach && timeToReach<=traj.getTime()) return res;
 
-  const std::shared_ptr<ostream> outstream(!outputToFile ?
-                                           std::shared_ptr<ostream>(&cout,[](auto*){}) : // since cout is a system-wide object, this should be safe
+  const std::shared_ptr<ostream> outstream(!streamToFile ?
+                                           ( doStreaming ? 
+                                             std::shared_ptr<ostream>(&cout,[](auto*){}) : // since cout is a system-wide object, this should be safe
+                                             static_pointer_cast<ostream>(std::make_shared<boost::iostreams::stream<boost::iostreams::null_sink>>(boost::iostreams::null_sink{}) ) ) : 
                                            static_pointer_cast<ostream>(std::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   if (outstream->fail()) throw std::runtime_error("Trajectory file opening error: "+trajectoryFileName);
@@ -158,15 +163,13 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
       commentingStream<<"Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
   }
 
-  }
-  
   if (!timeToReach) {traj.display(os,precision); return res;}
 
   //////////////////////////////
   // Mid section: the actual run
   //////////////////////////////
 
-  const std::shared_ptr<ostream> ofs = !outputToFile ? std::make_shared<ofstream>() : openStateFileWriting(stateFileName);
+  const std::shared_ptr<ostream> ofs = !streamToFile ? std::make_shared<ofstream>() : openStateFileWriting(stateFileName);
 
   bool
     stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory
