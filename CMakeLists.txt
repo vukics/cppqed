@@ -68,6 +68,8 @@ project(cppqed VERSION ${CPPQED_VERSION}
                DESCRIPTION "A framework for simulating open quantum dynamics"
                HOMEPAGE_URL "https://github.com/vukics/cppqed")
 
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

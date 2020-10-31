@@ -1,9 +1,10 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+#include "ContainerIO.h"
+#include "DrivenDampedHarmonicOscillator.h"
 #include "Simulated.h"
 
-using std::max, std::min;
 
-typedef blitz::Array<dcomp,1> Array;
+typedef CArray<1> Array;
 
 /*
   y(0) y
@@ -17,17 +18,16 @@ int main(int argc, char* argv[])
 
   Pars pt(p);
 
-  double & omega=p.add("O","Driving frequency",1.),
-         & gamma=p.add("G","Damping rate"     ,1.);
+  double & omega=p.add("O","Driving frequency",5.),
+         & gamma=p.add("G","Damping rate"     ,0.1);
 
-  dcomp &    yinit=p.add(   "yinit"," y   initial condition",dcomp(1,-1)/*,dcomp( 3.45263,-2.0746 )*/),
-        & dydtinit=p.add("dydtinit","dydt initial condition",dcomp(-1,1)/*,dcomp(-4.83065, 1.16527)*/);
+  dcomp &    yinit=p.add(   "yinit"," y   initial condition",dcomp(10,5)),
+        & dydtinit=p.add("dydtinit","dydt initial condition",dcomp(-1,1));
 
   // Parameter finalization
   update(p,argc,argv,"--");
 
-  if (pt.T<0) pt.T=10./min(1.,min(omega,gamma));
-  // Note: 1.0 is also an existing frequency in the system, which defines the unit of time 
+  pt.T=70.; pt.dc=0; pt.Dt=0.1; pt.saveDisplayedArray=true; pt.doStreaming=false;
 
   // Initial condition
   Array y(2); y=yinit,dydtinit;
@@ -38,9 +38,35 @@ int main(int argc, char* argv[])
                        dydt(0)=y(1);
                        dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
                      },
-                     .1/max(1.,max(omega,gamma)),
+                     .1/std::max(1.,std::max(omega,gamma)),
                      pt);
 
-  run(S,pt);
+  auto streamedArray=run(S,pt);
 
+  ddho::Ptr oscillator(ddho::make(gamma,omega,yinit,dydtinit,0));
+
+  // std::cout<<streamedArray;
+  auto size=int(streamedArray.size());
+  
+  auto averageDt=0., ampDev=0., ampDerivDev=0.;
+  
+  for ( auto [s,i]=std::make_tuple(streamedArray.begin(),0); s!=streamedArray.end(); (averageDt+=std::get<1>(*s++), ++i) ) {
+    double time=std::get<0>(*s);
+    
+    auto amp=std::get<2>(*s)(0),
+         ampDeriv=std::get<2>(*s)(1),
+         exactAmp=oscillator->amp(time),
+         exactAmpDeriv=oscillator->ampDeriv(time);    
+
+    ampDev+=abs(amp-exactAmp)/(abs(amp)+abs(exactAmp));
+    ampDerivDev+=abs(ampDeriv-exactAmpDeriv)/(abs(ampDeriv)+abs(exactAmpDeriv));
+
+    // std::cout<<time<<"\t"<<std::get<1>(s)<<"\t"<<std::get<2>(s)(0)<<"\t"<<oscillator->amp(time)<<"\t"<<std::get<2>(s)(1)<<"\t"<<oscillator->ampDeriv(time)<<std::endl;
+  }
+
+  // std::cout<<averageDt/size<<"\t"<<ampDev/size<<"\t"<<ampDerivDev/size<<std::endl;
+  
+  if (ampDev/size<2e-7 && ampDerivDev/size<2e-7) return 0;
+  else return 1;
+  
 }
