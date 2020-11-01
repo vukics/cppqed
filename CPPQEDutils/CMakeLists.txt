@@ -6,7 +6,7 @@ message(STATUS "Configuring CPPQEDutils")
 find_package(GSL 2.5 REQUIRED)
 
 # Boost
-find_package(Boost 1.71 REQUIRED COMPONENTS iostreams)
+find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams)
 
 find_package(Eigen3 3.3 NO_MODULE)
 
