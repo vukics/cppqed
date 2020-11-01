@@ -82,6 +82,10 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 option(ENABLE_TESTING "Enable testsuite" OFF)
 
+if(ENABLE_TESTING)
+  enable_testing()
+endif()
+
 # Build type: guard against values other than debug/release, make release default
 
 if (NOT CMAKE_BUILD_TYPE)

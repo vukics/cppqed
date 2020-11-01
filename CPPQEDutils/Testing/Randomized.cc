@@ -2,9 +2,6 @@
 #include "BlitzArray.h"
 #include "Randomized.h"
 
-#define BOOST_TEST_MODULE Randomized test
-#include <boost/test/unit_test.hpp>
-
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
@@ -14,9 +11,19 @@ using namespace randomized;
 using namespace std;
 
 
+namespace cpputils {
+
+template<>
+struct ElementType<DArray<1>> : boost::mpl::identity<double> {};
+  
+} // cpputils
+
+
 const size_t seed=1001;
 
-BOOST_AUTO_TEST_CASE( SerializationTest )
+const string filename{"CPPQEDutils_testing_Randomized.d"};
+
+int main(int, char**)
 {
   DArray<1> array(10), arrayInterrupted(10), firstHalf(arrayInterrupted(blitz::Range(0,4))), secondHalf(arrayInterrupted(blitz::Range(5,9)));
   
@@ -27,20 +34,20 @@ BOOST_AUTO_TEST_CASE( SerializationTest )
   fillWithRandom(firstHalf,ranFirst);
   
   {
-    ofstream ofs("/tmp/C++QED_utils_testsuite_Randomized.d");
+    ofstream ofs(filename);
     boost::archive::binary_oarchive ar(ofs);
-    ar & *ranFirst.get();
+    ar & *ranFirst;
   }
 
   // ... some time later restore the other Randomized object instance to its state
   {
-    ifstream ifs("/tmp/C++QED_utils_testsuite_Randomized.d");
+    ifstream ifs(filename);
     boost::archive::binary_iarchive ar(ifs);
-    ar & *ranSecond.get();
+    ar & *ranSecond;
   }
 
   fillWithRandom(secondHalf,ranSecond);
   
-  BOOST_CHECK( all(array==arrayInterrupted) );
+  return !all(array==arrayInterrupted) ;
   
 }
