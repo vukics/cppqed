@@ -21,8 +21,6 @@ ParsRun::ParsRun(parameters::Table& p, const std::string& mod)
     precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision))),
     displayInfo(p.addMod("displayInfo",mod,"Whether to display header for trajectories",true)),
     firstStateDisplay(p.addMod("firstStateDisplay",mod,"Displays trajectory state at startup",true)),
-    doStreaming(p.addMod("streaming",mod,"If false, all trajectory output is redirected to a null-stream",true)),
-    saveDisplayedArray(p.addMod("saveDisplayedArray",mod,"Saves the displayed array into a list",false)),
     sdf(p.addMod("sdf",mod,"State output frequency",0u)),
     autoStopEpsilon(p.addMod("autoStopEpsilon",mod,"Relative precision for autostopping",ParsEvolved::epsRelDefault)),
     autoStopRepetition(p.addMod("autoStopRepetition",mod,"Number of displayed lines repeated within relative precision before autostopping",0u)),

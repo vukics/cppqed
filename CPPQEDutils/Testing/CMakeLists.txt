@@ -1,7 +1,7 @@
 # Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 set(TESTING_EXECUTABLES
-    HarmonicOscillator HarmonicOscillatorExact HarmonicOscillatorRandomTimes HarmonicOscillatorComplex MultiIndexIteratorNew Randomized)
+    HarmonicOscillatorExact HarmonicOscillatorRandomTimes HarmonicOscillatorComplex MultiIndexIteratorNew Randomized)
 
 foreach(S ${TESTING_EXECUTABLES})
   add_executable(${S} ${S}.cc)

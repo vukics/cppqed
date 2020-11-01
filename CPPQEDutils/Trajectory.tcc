@@ -100,18 +100,18 @@ bool restoreState(Trajectory<DA>& traj, const std::string& trajectoryFileName, c
 
 
 template<typename T, typename L, typename D, typename AutostopHandler>
-trajectory::TrajectoryDisplayList<typename T::DisplayedArray> 
+trajectory::StreamedArray<typename T::DisplayedArray> 
 trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
                          const std::string& trajectoryFileName, const std::string& initialFileName,
                          int precision, bool displayInfo, bool firstStateDisplay,
                          const std::string& parsedCommandLine,
-                         bool doStreaming, bool saveDisplayedArray,
+                         bool doStreaming, bool returnStreamedArray,
                          AutostopHandler&& autostopHandler
                         )
 {
   using namespace std; using namespace runTraits; using namespace cpputils;
 
-  TrajectoryDisplayList<typename T::DisplayedArray> res;
+  StreamedArray<typename T::DisplayedArray> res;
   
   ////////////////////////////////////////////////
   // Determining i/o streams, eventual state input
@@ -195,7 +195,7 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
         if (count || !continuing) {
           evsDisplayed=true;
           auto displayReturn{traj.display(os,precision)};
-          if (saveDisplayedArray) res.emplace_back(traj.getTime(),traj.getDtDid(),get<1>(displayReturn));
+          if (returnStreamedArray) res.emplace_back(traj.getTime(),traj.getDtDid(),get<1>(displayReturn));
           autostopHandler(get<1>(displayReturn));
         }
       }

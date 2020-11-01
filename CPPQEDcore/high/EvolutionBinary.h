@@ -13,9 +13,11 @@ inline
 const auto
 evolve(SV_OR_DO&& initial,
        binary::Ptr sys,
-       const evolution::Pars<>& p)
+       const evolution::Pars<>& p,
+       bool doStreaming=true, bool returnStreamedArray=false
+      )
 {
-  return evolve<0>(std::forward<SV_OR_DO>(initial),sys,p);
+  return evolve<0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
 }
 
 

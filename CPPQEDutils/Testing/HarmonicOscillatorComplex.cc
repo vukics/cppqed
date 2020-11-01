@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
   // Parameter finalization
   update(p,argc,argv,"--");
 
-  pt.T=70.; pt.dc=0; pt.Dt=0.1; pt.saveDisplayedArray=true; pt.doStreaming=false;
+  pt.T=70.; pt.dc=0; pt.Dt=0.1;
 
   // Initial condition
   Array y(2); y=yinit,dydtinit;
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
                      .1/std::max(1.,std::max(omega,gamma)),
                      pt);
 
-  auto streamedArray=run(S,pt);
+  auto streamedArray=run(S,pt,false,true);
 
   ddho::Ptr oscillator(ddho::make(gamma,omega,yinit,dydtinit,0));
 

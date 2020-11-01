@@ -332,7 +332,7 @@ private:
 
 
 template<typename DA>
-using TrajectoryDisplayList=std::list<std::tuple<double,double,DA>>;
+using StreamedArray=std::list<std::tuple<double,double,DA>>;
 
 
 namespace details {
@@ -343,12 +343,12 @@ template<
          typename D, // type specifying the frequency of display
          typename AutostopHandler // should support operator()(const typename T::DisplayedArray &)
          >
-TrajectoryDisplayList<typename T::DisplayedArray>
+StreamedArray<typename T::DisplayedArray>
 run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
     const std::string& trajectoryFileName, const std::string& initialFileName,
     int precision, bool displayInfo, bool firstStateDisplay,
     const std::string& parsedCommandLine,
-    bool doStreaming, bool saveDisplayedArray,
+    bool doStreaming, bool returnStreamedArray,
     AutostopHandler&& autostopHandler
    );
 
@@ -377,7 +377,7 @@ run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
  *
  */
 template<typename DA, typename AutostopHandler>
-TrajectoryDisplayList<DA>
+StreamedArray<DA>
 run(Trajectory<DA>& traj, ///< the trajectory to run
     double time, ///< end time
     double deltaT, ///< time interval between two \link Trajectory::display displays\endlink
@@ -388,12 +388,12 @@ run(Trajectory<DA>& traj, ///< the trajectory to run
     bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
     bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
     const std::string& parsedCommandLine,
-    bool doStreaming,
-    bool saveDisplayedArray,
+    bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
+    bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
     AutostopHandler&& autostopHandler
    )
 {
-  return details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,saveDisplayedArray,
+  return details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,returnStreamedArray,
                       std::forward<AutostopHandler>(autostopHandler));
 }
 
@@ -413,14 +413,14 @@ run(Trajectory<DA>& traj, ///< the trajectory to run
  *
  */
 template<typename DA, typename AutostopHandler>
-TrajectoryDisplayList<DA>
+StreamedArray<DA>
 run(Trajectory<DA>& traj, long nDt, ///< the end time of the trajectory will be nDt*deltaT
     double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-    const std::string& parsedCommandLine, bool doStreaming, bool saveDisplayedArray,
+    const std::string& parsedCommandLine, bool doStreaming, bool returnStreamedArray,
     AutostopHandler&& autostopHandler
    )
 {
-  return details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,saveDisplayedArray,
+  return details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,returnStreamedArray,
                       std::forward<AutostopHandler>(autostopHandler));
 }
 
@@ -433,14 +433,14 @@ run(Trajectory<DA>& traj, long nDt, ///< the end time of the trajectory will be 
  * 
  */
 template<typename A, typename BASE, typename AutostopHandler>
-TrajectoryDisplayList<typename BASE::DisplayedArray>
+StreamedArray<typename BASE::DisplayedArray>
 run(Adaptive<A,BASE>& traj, double time, int dc, ///< number of adaptive timesteps taken between two displays
     unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
-    const std::string& parsedCommandLine, bool doStreaming, bool saveDisplayedArray,
+    const std::string& parsedCommandLine, bool doStreaming, bool returnStreamedArray,
     AutostopHandler&& autostopHandler
    )
 {
-  return details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,saveDisplayedArray,
+  return details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,returnStreamedArray,
                       std::forward<AutostopHandler>(autostopHandler));
 }
 
@@ -454,13 +454,15 @@ run(Adaptive<A,BASE>& traj, double time, int dc, ///< number of adaptive timeste
  *
  */
 template <typename DA>
-TrajectoryDisplayList<DA>
-run(Trajectory<DA>& traj, const ParsRun& p)
+StreamedArray<DA>
+run(Trajectory<DA>& traj, const ParsRun& p, bool doStreaming=true, bool returnStreamedArray=false)
 { 
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
-  if (p.NDt) return run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),p.doStreaming,p.saveDisplayedArray,
+  if (p.NDt) return run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),
+                        doStreaming,returnStreamedArray,
                         AutostopHandlerGeneric<DA>(p.autoStopEpsilon,p.autoStopRepetition));
-  else       return run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),p.doStreaming,p.saveDisplayedArray,
+  else       return run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),
+                        doStreaming,returnStreamedArray,
                         AutostopHandlerGeneric<DA>(p.autoStopEpsilon,p.autoStopRepetition));
 }
 
@@ -474,12 +476,13 @@ run(Trajectory<DA>& traj, const ParsRun& p)
  * 
  */
 template<typename A, typename BASE>
-TrajectoryDisplayList<typename BASE::DisplayedArray>
-run(Adaptive<A,BASE>& traj, const ParsRun& p)
+StreamedArray<typename BASE::DisplayedArray>
+run(Adaptive<A,BASE>& traj, const ParsRun& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  if      (p.dc) return run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),p.doStreaming,p.saveDisplayedArray,
+  if      (p.dc) return run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),
+                            doStreaming,returnStreamedArray,
                             AutostopHandlerGeneric<typename BASE::DisplayedArray>(p.autoStopEpsilon,p.autoStopRepetition));
-  else if (p.Dt) return run(static_cast<BASE&>(traj),p);
+  else if (p.Dt) return run(static_cast<BASE&>(traj),p,doStreaming,returnStreamedArray);
   else throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
 }
 
