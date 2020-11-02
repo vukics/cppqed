@@ -25,7 +25,7 @@ namespace details {
 template<int RANK, typename V>
 class IndexerBase
 {
-protected:
+public:
   typedef typename boost::mpl::fold<tmptools::Ordinals<RANK>,
                                     boost::fusion::vector<>,
                                     boost::mpl::push_back<boost::mpl::_1,
@@ -36,34 +36,22 @@ protected:
 private:
   typedef typename VecIdxTiny<RANK,V>::const_iterator CI;
 
-  struct Helper
-  {
-    typedef CI result_type;
-
-    const CI operator()(CI iter, blitz::Range& t) const
-    {
-      t=blitz::Range::all(); return iter;
-    }
-
-    const CI operator()(CI iter,          int& t) const
-    {
-      t=*iter++; return iter;
-    }
-
-  };
-
-protected:
+public:
   static const Idx&
   fillIdxValues(const VecIdxTiny<RANK,V>& idx)
   {
-    boost::fusion::fold(cache_,idx.begin(),helper_); return cache_;
+    boost::fusion::fold(cache_,idx.begin(),
+                        [](CI iter, auto& t) -> CI {
+                          using T=std::decay_t<decltype(t)>;
+                          if constexpr (std::is_same<T,blitz::Range>::value) {t=blitz::Range::all(); return iter;}
+                          else if constexpr (std::is_same<T,int>::value) {t=*iter++; return iter;}
+                        });
+    return cache_;
   }
 
+protected:
   static Idx cache_; 
   // In this way the creation of a default-constructed Helper & Idx objects in fillIdxValues can be avoided
-
-private:
-  static const Helper helper_;
 
 };
 
@@ -72,8 +60,6 @@ private:
 template<int RANK, typename V>
 typename IndexerBase<RANK,V>::Idx IndexerBase<RANK,V>::cache_;
 
-template<int RANK, typename V>
-const typename IndexerBase<RANK,V>::Helper IndexerBase<RANK,V>::helper_{};
 
 ////////////////////////////
 //

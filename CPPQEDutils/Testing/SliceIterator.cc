@@ -1,12 +1,8 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "BlitzArraySliceIterator.tcc"
+#include "BlitzArray.h"
+#include "SliceIterator.tcc"
 
 #include "Randomized.h"
-
-#define USE_BOOST_PROGRESS_TIMER_PROFILING
-#include "Profiling.h"
-
-#define DUMMY_TEST_FUNCTION( A ) void A()
 
 #define BOOST_TEST_MODULE BlitzArraySliceIterator test
 #include <boost/test/unit_test.hpp>
@@ -17,73 +13,59 @@
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
 namespace mpl=boost::mpl;
 
-
-#include <boost/lambda/lambda.hpp>
-namespace bll=boost::lambda;
-
 #include <sstream>
 
-using namespace blitzplusplus;
-using namespace basi;
+using namespace cpputils::sliceiterator;
 using namespace std;
 
-typedef tmptools::Vector<3,6,1,9,7> V;
+using V=tmptools::Vector<3,6,1,9,7>;
+
 const int RANK=11;
 
-typedef details::TransposerMeta<RANK,V>::type TM;
+using TM=details::TransposerMeta<RANK,V>::type;
 
-typedef details::IdxTypes<RANK,V>::type Idx;
-
-
-typedef IdxTiny<RANK> IdxTiny;
-IdxTiny idx(21,2,4,10,11,3,5,9,23,22,7);
+using FullIdx=details::IndexerBase<RANK,V>::Idx; // This contains Range types at the appropriate locations
 
 
-typedef IdxTiny<RANK-mpl::size<V>::value> VecIdxTiny;
-VecIdxTiny filteredIdx(details::filterOut<RANK,V>(idx));
+const IdxTiny<RANK> idx(21,2,4,10,11,3,5,9,23,22,7);
 
 
-typedef DArray<11> DArray11;
+const VecIdxTiny<RANK,V> filteredIdx(filterOut<RANK,V>(idx));
+
+using DArray11=DArray<11>;
 
 
 namespace {
 
-using mpl::at_c;
-using mpl::equal;
+using mpl::at_c, mpl::equal;
 
-BOOST_STATIC_ASSERT((at_c<TM,0>::type::value==0));
-BOOST_STATIC_ASSERT((at_c<TM,1>::type::value==3));
-BOOST_STATIC_ASSERT((at_c<TM,2>::type::value==2));
-BOOST_STATIC_ASSERT((at_c<TM,3>::type::value==6));
-BOOST_STATIC_ASSERT((at_c<TM,4>::type::value==4));
-BOOST_STATIC_ASSERT((at_c<TM,5>::type::value==5));
-BOOST_STATIC_ASSERT((at_c<TM,6>::type::value==1));
-BOOST_STATIC_ASSERT((at_c<TM,7>::type::value==9));
-BOOST_STATIC_ASSERT((at_c<TM,8>::type::value==8));
-BOOST_STATIC_ASSERT((at_c<TM,9>::type::value==7));
-BOOST_STATIC_ASSERT((at_c<TM,10>::type::value==10));
+static_assert(at_c<TM,0>::type::value==0);
+static_assert(at_c<TM,1>::type::value==3);
+static_assert(at_c<TM,2>::type::value==2);
+static_assert(at_c<TM,3>::type::value==6);
+static_assert(at_c<TM,4>::type::value==4);
+static_assert(at_c<TM,5>::type::value==5);
+static_assert(at_c<TM,6>::type::value==1);
+static_assert(at_c<TM,7>::type::value==9);
+static_assert(at_c<TM,8>::type::value==8);
+static_assert(at_c<TM,9>::type::value==7);
+static_assert(at_c<TM,10>::type::value==10);
 
-BOOST_STATIC_ASSERT((equal<TM,     mpl::vector_c<int,0,3,2,6,4,5,1,9,8,7,10> >::value));
-BOOST_STATIC_ASSERT((equal<TM,tmptools::Vector  <    0,3,2,6,4,5,1,9,8,7,10> >::value));
+static_assert(equal<TM,     mpl::vector_c<int,0,3,2,6,4,5,1,9,8,7,10> >::value);
+static_assert(equal<TM,tmptools::Vector  <    0,3,2,6,4,5,1,9,8,7,10> >::value);
 
 
 using blitz::Range;
 
-BOOST_STATIC_ASSERT((equal<Idx,mpl::vector<int,Range,int,Range,int,int,Range,Range,int,Range,int> >::value));
+static_assert(equal<FullIdx,mpl::vector<int,Range,int,Range,int,int,Range,Range,int,Range,int> >::value);
 
 
 }
 
 
-
-
-
 BOOST_AUTO_TEST_CASE( FilterOutTest )
 {
-  using namespace details;
-
-  BOOST_CHECK(all(filteredIdx==VecIdxTiny(21,4,11,3,23,7)));
-
+  BOOST_CHECK(all(filteredIdx==VecIdxTiny<RANK,V>(21,4,11,3,23,7)));
 }
 
 
@@ -93,18 +75,12 @@ BOOST_AUTO_TEST_CASE( IdxValueTest )
 
   const blitz::Range a(blitz::Range::all());
 
-  const Idx v(21,a,4,a,11,3,a,a,23,a,7);
+  const FullIdx v(21,a,4,a,11,3,a,a,23,a,7);
 
   // The following strange solution is needed because there is no comparison operation for Ranges
   stringstream s1(stringstream::out), s2(stringstream::out);
 
-  struct IndexerBase : details::IndexerBase<RANK,V>
-  {
-    static const Idx&
-    fillIdxValues(const VecIdxTiny& idx) {return details::IndexerBase<RANK,V>::fillIdxValues(idx);}
-  };
-
-  s1<<v; s2<<IndexerBase::fillIdxValues(filteredIdx);
+  s1<<v; s2<<details::IndexerBase<RANK,V>::fillIdxValues(filteredIdx);
 
   BOOST_CHECK(s1.str()==s2.str());
 
@@ -113,22 +89,18 @@ BOOST_AUTO_TEST_CASE( IdxValueTest )
 
 BOOST_AUTO_TEST_CASE( ArraySlicingTest )
 {
-  typedef mpl::push_front<Idx,DArray11&>::type IdxExt;
+  const auto a{blitz::Range::all()};
 
-  const blitz::Range a(blitz::Range::all());
+  DArray11 array11{22,2,5,1,12,4,4,3,24,2,8};
 
-  DArray11 array11(22,2,5,1,12,4,4,3,24,2,8);
+  FullIdx v{21,a,4,a,11,3,a,a,23,a,7};
 
-  IdxExt v(array11,21,a,4,a,11,3,a,a,23,a,7);
-
-  // invoke(&DArray11::operator(),v);
-  // this will not work because &DArray11::operator() is so heavily overloaded
-  
   using boost::fusion::at_c;
 
-  DArray<5> array5(array11(at_c<1>(v),at_c<2>(v),at_c<3>(v),at_c<4>(v),at_c<5>(v),at_c<6>(v),at_c<7>(v),at_c<8>(v),at_c<9>(v),at_c<10>(v),at_c<11>(v)));
-
-  BOOST_CHECK(all(array5.extent()==ExtTiny<5>(2,1,4,3,2)));
+  BOOST_CHECK(
+    all(DArray<5>{array11(at_c<0>(v),at_c<1>(v),at_c<2>(v),at_c<3>(v),at_c<4>(v),at_c<5>(v),at_c<6>(v),at_c<7>(v),at_c<8>(v),at_c<9>(v),at_c<10>(v))}.extent()
+        ==
+        ExtTiny<5>(2,1,4,3,2)));
 
 }
 
@@ -137,11 +109,9 @@ BOOST_AUTO_TEST_CASE( ExampleFromManual )
 {
   void actWithA(CArray<5>&);
 
-  static const int RANK=11;
-
   CArray<RANK> psi;
 
-  boost::for_each(blitzplusplus::basi::fullRange<tmptools::Vector<3,6,1,9,7> >(psi),actWithA);
+  for (auto p : fullRange<V>(psi) ) actWithA(p);
 }
 
 void actWithA(CArray<5>&) {}
@@ -149,7 +119,7 @@ void actWithA(CArray<5>&) {}
 
 
 // The following test comes from the old version of this file, and is intended to demonstrate the performance as a function of the arity of slices
-
+/*
 namespace basi_performance {
 
 const int nRepetition=1;
@@ -264,14 +234,12 @@ BOOST_AUTO_TEST_CASE( BASI_Monitor )
   tmptools::Vector<3>
     > > (Helper());
 
-  /*
-  SlicesData<6,tmptools::Vector<3,0,4,1,5> > data(array1);
-  basi_fast::Iterator<6,tmptools::Vector<3,0,4,1,5>,true> iter(data,array2,mpl::false_());
-  */
+  
+  // SlicesData<6,tmptools::Vector<3,0,4,1,5> > data(array1);
+  // basi_fast::Iterator<6,tmptools::Vector<3,0,4,1,5>,true> iter(data,array2,mpl::false_());
+
 }
-
-
-
+*/
 
 
 // BlitzArraySliceIteratorFast assumes: all storage ascending, all bases zero
