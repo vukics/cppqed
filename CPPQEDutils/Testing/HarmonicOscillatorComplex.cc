@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   
   auto averageDt=0., ampDev=0., ampDerivDev=0.;
   
-  for ( auto [s,i]=std::make_tuple(streamedArray.begin(),0); s!=streamedArray.end(); (averageDt+=std::get<1>(*s++), ++i) ) {
+  for ( auto s=streamedArray.begin(); s!=streamedArray.end(); averageDt+=std::get<1>(*s++) ) {
     double time=std::get<0>(*s);
     
     auto amp=std::get<2>(*s)(0),
@@ -58,15 +58,14 @@ int main(int argc, char* argv[])
          exactAmp=oscillator->amp(time),
          exactAmpDeriv=oscillator->ampDeriv(time);    
 
-    ampDev+=abs(amp-exactAmp)/(abs(amp)+abs(exactAmp));
-    ampDerivDev+=abs(ampDeriv-exactAmpDeriv)/(abs(ampDeriv)+abs(exactAmpDeriv));
+    ampDev+=mathutils::relativeDeviation(amp,exactAmp);
+    ampDerivDev+=mathutils::relativeDeviation(ampDeriv,exactAmpDeriv);
 
     // std::cout<<time<<"\t"<<std::get<1>(s)<<"\t"<<std::get<2>(s)(0)<<"\t"<<oscillator->amp(time)<<"\t"<<std::get<2>(s)(1)<<"\t"<<oscillator->ampDeriv(time)<<std::endl;
   }
 
   // std::cout<<averageDt/size<<"\t"<<ampDev/size<<"\t"<<ampDerivDev/size<<std::endl;
   
-  if (ampDev/size<2e-7 && ampDerivDev/size<2e-7) return 0;
-  else return 1;
+  return !(ampDev/size<2e-7 && ampDerivDev/size<2e-7);
   
 }

@@ -40,6 +40,10 @@ template<typename T>
 char minusOneToThePowerOf(T n) {return parity(n) ? -1 : 1;}
 
 
+template<typename T>
+double relativeDeviation(const T& a, const T& b) {return abs(a-b)/(abs(a)+abs(b));}
+
+
 /// Calculates \f$\alpha^n/\sqrt{n!}\f$ relying on the Stirling formula if \f$n\f$ is too large for explicit calculation of factorial
 /**
  * The point of switching is determined by \refBoostConstruct{boost::math::max_factorial,math/doc/html/math_toolkit/factorials/sf_factorial.html}.
@@ -49,6 +53,7 @@ char minusOneToThePowerOf(T n) {return parity(n) ? -1 : 1;}
  *
  */
 dcomp coherentElement(unsigned long n, const dcomp& alpha);
+
 
 } // mathutils
 

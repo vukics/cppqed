@@ -20,9 +20,6 @@
 
 #include "MathExtensions.h"
 
-#define BOOST_TEST_MODULE Evolved test
-#include <boost/test/unit_test.hpp>
-
 #include <boost/bind.hpp>
 
 
@@ -61,46 +58,31 @@ void derivs(double tau, const CA1D& yA, CA1D& dydtA, const dcomp& Z)
 }
 
 
-BOOST_AUTO_TEST_CASE( ComparisonToExactSolution )
+int main(int , char**)
 {
+  ParameterTable p;
+
+  Pars pt(p);
 
   dcomp Z(-1.,10);
 
-  stringstream slate;
+  pt.T=5; pt.dc=0; pt.Dt=0.01;
+  
+  CA1D y(2);
 
-  {
-    double 
-      T     =4.,//10./min(fabs(real(Z)),fabs(imag(Z))),
-      dtInit=trajectory::initialTimeStep(abs(Z));
+  y(0)=  EULER;
+  y(1)=Z*EULER;
+
+  Simulated<CA1D> S(y,bind(derivs,_1,_2,_3,Z),trajectory::initialTimeStep(abs(Z)),pt);
+
+  auto streamedArray=run(S,pt,false,true);
+
+  double yDev=0;
+  
+  for ( auto s : streamedArray ) yDev+=relativeDeviation(std::get<2>(s)(0),exp(exp(Z*std::get<0>(s))));
+  
+  // for ( auto s : streamedArray ) std::cout<<std::get<0>(s)<<"\t"<<std::get<2>(s)(0).real()<<"\t"<<std::get<2>(s)(0).imag()<<std::endl;
+  
+  return !(yDev/streamedArray.size()<3e-8);
  
-    CA1D y(2);
-  
-    y(0)=  exp(1);
-    y(1)=Z*exp(1);
-
-    DA1D yr(real(y));
-
-    Simulated<CA1D> S(y,bind(derivs,_1,_2,_3,Z),dtInit,1e-6,1e-30,CA1D(),slate,6);
-  
-    run(S,T,1,false);
-  }
-
-  double diff=0, sum=0;
-
-  while (slate) {
-    string str; getline(slate,str);
-    if (str!="" && str[0]!='#') {
-      stringstream line(str);
-      double time;
-      line>>time;
-      dcomp 
-        calculated(exp(exp(Z*time))),
-        read;
-      line>>time>>read; // eat the timestep first
-      diff+=abs(read-calculated); sum+=(abs(read)+abs(calculated))/2.;
-    }
-  }
-
-  BOOST_CHECK(diff/sum<1e-5);
-  
 }
