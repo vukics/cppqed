@@ -1,83 +1,57 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Simulated.h"
 
+#include "DrivenDampedHarmonicOscillator.h"
 #include "MathExtensions.h"
 #include "Randomized.h"
 
-#include <boost/bind.hpp>
-
-
-using namespace std       ;
-using namespace trajectory;
-using namespace mathutils ;
-using namespace parameters;
-
-
-typedef CArray<1> CA1D;
-typedef evolved::Evolved<CA1D>::Ptr ESP;
+typedef CArray<1> Array;
 
 /*
   y(0) y
   y(1) dy/dt
 */
 
-class DDOscPars {
 
-  size_t count_;
-
-public:
-  double omega;
-  double gamma;
-
-  DDOscPars(double o, double g) : count_(0), omega(o), gamma(g) {}
-
-  void reset() {count_=0;}
-  void add() {count_++;}
-  size_t count() const {return count_;}
-
-};
-
-
-
-void derivs(double tau, const CA1D& y, CA1D& dydt, DDOscPars& pars)
+int main(int, char**)
 {
-  pars.add();
-  dydt(0)=y(1);
-  dydt(1)=exp(DCOMP_I*pars.omega*tau)-2*pars.gamma*y(1)-y(0);
-}
+  const double omega{5.}, gamma{0.1}, T{70.};
 
+  const dcomp yinit{10,5}, dydtinit{-1,1};
 
-int main(int argc, char* argv[])
-{
-  ParameterTable p;
+  const size_t nSamples=1000;
 
-  Pars pt(p);
+  // Initial condition
+  Array y(2); y=yinit,dydtinit;
 
-  double 
-    &omega=p.add("O","Driving frequency",1.),
-    &gamma=p.add("G","Damping rate"     ,1.);
+  Simulated<Array> s(y,
+                     [=](double tau, const Array& y, Array& dydt)
+                     {
+                       dydt(0)=y(1);
+                       dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
+                     },
+                     .1/std::max(1.,std::max(omega,gamma)),
+                     0,1e-6,1e-18);
+  
+  // s.displayParameters(std::cout);
 
-  pt.epsRel=1e-12;
+  auto ran{randomized::MakerGSL()(1001)};
 
-  // Parameter finalization
-  update(p,argc,argv,"--");
+  auto ampDev=0., ampDerivDev=0.;
 
-  if (pt.T<0) pt.T=20./min(1.,min(omega,gamma));
+  auto oscillator{ddho::make(gamma,omega,yinit,dydtinit,0)};
+  
+  for (size_t n=nSamples; n>0; n--) {
+    auto time=T*(*ran)();
+    evolved::evolveTo(s,time);
+    
+    ampDev+=mathutils::relativeDeviation(y(0),oscillator->amp(time));
+    ampDerivDev+=mathutils::relativeDeviation(y(1),oscillator->ampDeriv(time));
 
-  double dtInit=initialTimeStep(max(1.,max(omega,gamma)));  
-
-  DDOscPars params(omega,gamma);
-
-  CA1D y(2); y(0)=dcomp(3.45263,-2.0746); y(1)=dcomp(-4.83065,1.16527);
-
-  Simulated<CA1D> simulated(y,bind(derivs,_1,_2,_3,params),dtInit,pt);
-  simulated.displayParameters(std::cout);
-
-  randomized::Randomized::Ptr Ran(randomized::MakerGSL()(1001));
-
-  for (size_t n=1000; n>0; n--) {
-    evolved::evolveTo(simulated,pt.T*(*Ran)()); simulated.display(std::cout,pt.precision);
   }
 
+  // std::cout<<ampDev/nSamples<<"\t"<<ampDerivDev/nSamples<<std::endl;
 
+  return !(ampDev/nSamples<1e-3 && ampDerivDev/nSamples<1e-3);
+  
 }

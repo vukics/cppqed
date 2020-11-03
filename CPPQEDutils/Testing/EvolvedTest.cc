@@ -20,62 +20,31 @@
 
 #include "MathExtensions.h"
 
-#include <boost/bind.hpp>
-
-
 using namespace std;
-// using namespace blitzplusplus;
 using namespace mathutils;
-using namespace parameters;
 using namespace trajectory;
-/*
-  y[0] Re y
-  y[1] Im y
-  y[2] Re dy/dt
-  y[3] Im dy/dt
-*/
 
-// #include<cmath>
-// #include<iostream>
-
-typedef CArray<1> CA1D;
-typedef DArray<1> DA1D;
-
-void derivs(double tau, const CA1D& yA, CA1D& dydtA, const dcomp& Z)
-{
-  // static int count=0;
-
-  dcomp
-    y(yA(0)),
-    p(yA(1));
-
-  dydtA(0)=p;
-
-  dydtA(1)=sqr(p)+Z*p+sqr(Z)*exp(2.*Z*tau)*(y-sqr(y));
-
-  // cout<<count++<<endl;
-
-}
+typedef CArray<1> Array;
 
 
 int main(int , char**)
 {
-  ParameterTable p;
-
-  Pars pt(p);
-
   dcomp Z(-1.,10);
 
-  pt.T=5; pt.dc=0; pt.Dt=0.01;
-  
-  CA1D y(2);
+  Array y(2);
 
   y(0)=  EULER;
   y(1)=Z*EULER;
 
-  Simulated<CA1D> S(y,bind(derivs,_1,_2,_3,Z),trajectory::initialTimeStep(abs(Z)),pt);
+  Simulated<Array> S(y,[=](double tau, const Array& yA, Array& dydtA) {
+                        dcomp y{yA(0)}, p{yA(1)};
+                        dydtA(0)=p;
+                        dydtA(1)=sqr(p)+Z*p+sqr(Z)*exp(2.*Z*tau)*(y-sqr(y));
+                      },
+                    trajectory::initialTimeStep(abs(Z)),0,1e-6,1e-18);
 
-  auto streamedArray=run(S,pt,false,true);
+  auto streamedArray=run(static_cast<Trajectory<Array>&>(S),5.,0.01,0,string{},string{},6,false,false,string{},false,true,
+                         AutostopHandlerNoOp<Array>{});
 
   double yDev=0;
   

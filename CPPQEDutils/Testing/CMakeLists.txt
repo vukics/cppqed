@@ -12,6 +12,8 @@ add_test(evolved_nonlinear_ode EvolvedTest)
 
 add_test(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
 
+add_test(harmonic_oscillator_random_times HarmonicOscillatorRandomTimes)
+
 add_test(multi_index_iterator MultiIndexIteratorNew)
 
 add_test(randomized_serialization Randomized)

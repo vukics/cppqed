@@ -288,7 +288,7 @@ private:
 
 /// Generic implementation of AutostopHandler
 /**
- * Assumes that DA is a container of some numeric type and DA::begin and DA::end exist
+ * Assumes quite a lot about the implicit interface of DA, this could be relieved with indirections
  */
 template<typename DA>
 class AutostopHandlerGeneric
@@ -328,6 +328,13 @@ private:
   DA averages_;
   std::queue<DA> queue_;
 
+};
+
+
+template<typename DA>
+struct AutostopHandlerNoOp
+{
+  void operator()(const DA&) {}
 };
 
 

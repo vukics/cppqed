@@ -12,22 +12,11 @@ typedef CArray<1> Array;
 */
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
-  ParameterTable p;
+  const double omega{5.}, gamma{0.1};
 
-  Pars pt(p);
-
-  double & omega=p.add("O","Driving frequency",5.),
-         & gamma=p.add("G","Damping rate"     ,0.1);
-
-  dcomp &    yinit=p.add(   "yinit"," y   initial condition",dcomp(10,5)),
-        & dydtinit=p.add("dydtinit","dydt initial condition",dcomp(-1,1));
-
-  // Parameter finalization
-  update(p,argc,argv,"--");
-
-  pt.T=70.; pt.dc=0; pt.Dt=0.1;
+  const dcomp yinit{10,5}, dydtinit{-1,1};
 
   // Initial condition
   Array y(2); y=yinit,dydtinit;
@@ -39,11 +28,11 @@ int main(int argc, char* argv[])
                        dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
                      },
                      .1/std::max(1.,std::max(omega,gamma)),
-                     pt);
+                     0,1e-6,1e-18);
 
-  auto streamedArray=run(S,pt,false,true);
-
-  ddho::Ptr oscillator(ddho::make(gamma,omega,yinit,dydtinit,0));
+  auto streamedArray=run(S,70.,1,0,"","",6,false,false,"",false,true,trajectory::AutostopHandlerNoOp<Array>{});
+  
+  auto oscillator{ddho::make(gamma,omega,yinit,dydtinit,0)};
 
   // std::cout<<streamedArray;
   auto size=int(streamedArray.size());
@@ -56,7 +45,7 @@ int main(int argc, char* argv[])
     auto amp=std::get<2>(*s)(0),
          ampDeriv=std::get<2>(*s)(1),
          exactAmp=oscillator->amp(time),
-         exactAmpDeriv=oscillator->ampDeriv(time);    
+         exactAmpDeriv=oscillator->ampDeriv(time);
 
     ampDev+=mathutils::relativeDeviation(amp,exactAmp);
     ampDerivDev+=mathutils::relativeDeviation(ampDeriv,exactAmpDeriv);
@@ -66,6 +55,6 @@ int main(int argc, char* argv[])
 
   // std::cout<<averageDt/size<<"\t"<<ampDev/size<<"\t"<<ampDerivDev/size<<std::endl;
   
-  return !(ampDev/size<2e-7 && ampDerivDev/size<2e-7);
+  return !(ampDev/size<8e-7 && ampDerivDev/size<8e-7);
   
 }
