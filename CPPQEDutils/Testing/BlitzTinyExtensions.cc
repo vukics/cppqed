@@ -3,39 +3,41 @@
 
 #include <blitz/tinyvec2io.cc>
 
+#define BOOST_TEST_MODULE BlitzTinyExtensions test
+#include <boost/test/unit_test.hpp>
+
 using namespace std;
 using namespace blitzplusplus;
 
 
-int main()
+template <int I> using IntTiny=TinyVector<int,I>;
+
+template <typename T, int I, typename OTHER>
+bool operator==(const blitz::TinyVector<T,I>& tv, const OTHER& o)
+{
+  if (tv.length()!=o.length()) return false;
+  return std::equal(tv.begin(),tv.end(),o.begin());
+}
+
+
+BOOST_AUTO_TEST_CASE( BlitzTinyExtensions )
 {
   {
-    TinyVector<int,3> v1(0,1,2);
-    TinyVector<int,4> v2(3,4,5,6);
-
-    cout<<v1<<'&'<<v2<<" concatenated "<<concatenateTinies(v1,v2)<<" concatenated the other way round "<<concatenateTinies(v2,v1)<<endl;
+    IntTiny<3> v1{0,1,2};
+    IntTiny<4> v2{3,4,5,6};
+    
+    BOOST_CHECK( concatenateTinies(v1,v2) == ( IntTiny<7>{0,1,2,3,4,5,6} ) ) ;
+    BOOST_CHECK( concatenateTinies(v2,v1) == ( IntTiny<7>{3,4,5,6,0,1,2} ) ) ;
   }
   {
-    TinyVector<int,6> v(3,4,2,3,4,2);
+    IntTiny<6> v{3,4,2,3,4,2};
 
-    cout<<v<<" half cut "<<halfCutTiny(v)<<endl;
+    BOOST_CHECK( halfCutTiny(v) == ( IntTiny<3>{3,4,2} ) ) ;
   }
-  /* This should not compile
-  {
-    TinyVector<int,7> v(3,4,2,3,4,2,4);
-    halfCutTiny(v);
-  }
-  */
 #ifndef   NDEBUG
-  try {
-    TinyVector<int,6> v(3,4,2,1,4,2);
-
-    cout<<"Trying to half cut "<<v<<"..."<<endl;
-    halfCutTiny(v);
-  }
-  catch (HalfCutTinyException) {
-    cout<<"HalfCutTinyException caught"<<endl; 
-  }
+  IntTiny<6> v{3,4,2,1,4,2};
+  
+  BOOST_CHECK_THROW( halfCutTiny(v), std::invalid_argument ) ;
 #endif // NDEBUG
 
 }

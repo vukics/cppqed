@@ -3,20 +3,13 @@
 
 #include "Randomized.h"
 
-#include "Range.h"
-
 #define BOOST_TEST_MODULE BlitzArray test
 #include <boost/test/unit_test.hpp>
-
-#include<boost/bind.hpp>
 
 using namespace std;
 using namespace randomized;
 
 typedef blitz::Array<dcomp,6> Array;
-
-typedef blitzplusplus::Array<dcomp,6> MyArray;
-
 
 BOOST_AUTO_TEST_CASE( BlitzArrayTest )
 {
@@ -34,11 +27,7 @@ BOOST_AUTO_TEST_CASE( BlitzArrayTest )
 
   memcpy(data,array.dataFirst(),array.size());
 
-  blitzplusplus::Array<dcomp,6> myArray(MyArray(array,blitzplusplus::ShallowCopy()).clone(data),blitzplusplus::ShallowCopy());
-
-  BOOST_CHECK( all(arrayvv==array) && all((2.*myArray)!=array) );
-
-  // return 0;
+  BOOST_CHECK( all(arrayvv==array) );
 
 }
 

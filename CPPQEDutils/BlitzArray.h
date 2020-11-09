@@ -56,6 +56,9 @@ auto fullRange(const CArray<RANK>& array) {return fullRange<V,CArray>(array);}
 } // sliceiterator
 
 
+template<typename T, int RANK>
+struct ElementType<blitz::Array<T,RANK>> : boost::mpl::identity<T> {};
+
 
 template<typename Numtype, int RANK>
 struct Rank<blitz::Array<Numtype,RANK> > : boost::mpl::int_<RANK> {};

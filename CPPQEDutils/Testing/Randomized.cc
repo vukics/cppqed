@@ -10,15 +10,6 @@
 using namespace randomized;
 using namespace std;
 
-
-namespace cpputils {
-
-template<>
-struct ElementType<DArray<1>> : boost::mpl::identity<double> {};
-  
-} // cpputils
-
-
 const size_t seed=1001;
 
 const string filename{"CPPQEDutils_testing_Randomized.d"};

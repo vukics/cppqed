@@ -1,16 +1,14 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "ComplexArrayExtensions.tcc"
-#include "VectorFromMatrixSliceIterator.tcc"
+#include "VectorFromMatrixSliceIterator.h"
 
-#include "Algorithm.h"
 #include "MathExtensions.h"
 #include "Randomized.h"
-#include "Range.h"
 
 #define BOOST_TEST_MODULE BlitzExtensions test
 #include <boost/test/unit_test.hpp>
 
-#include <boost/bind.hpp>
+#include <boost/range/combine.hpp>
 
 
 using namespace std;
@@ -18,8 +16,6 @@ using namespace randomized;
 using namespace blitzplusplus;
 using namespace linalg;
 using namespace mathutils;
-
-using cpputils::for_each;
 
 const double epsilonCmp=1e-12;
 
@@ -41,8 +37,7 @@ typedef CArray<RA-1> CARM1;
 typedef CArray<RA+1> CARP1;
 
 
-Randomized::Ptr ran(MakerGSL()(1001));
-
+auto ran(MakerGSL()(1001));
 
 
 BOOST_AUTO_TEST_CASE( TwoTimesRealPartOfSelfTest )
@@ -120,19 +115,22 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
   {
     using namespace blitz::tensor;
     CArray<8> temp8(concatenateTinies(
-                                          concatenateTinies(
-                                                            dims0,
-                                                            ExtTiny<2>(dims1(0),dims1(3))
-                                                            ),
-                                          dims0
-                                          ));
+                                      concatenateTinies(
+                                                        dims0,
+                                                        ExtTiny<2>(dims1(0),dims1(3))
+                                                        ),
+                                      dims0
+                                      ));
     temp8=a(i,j,k,n,o,p)*v(l,o,n,m,p);
     vResTensor=CArray<5>(sum(sum(sum(temp8,p),o),n)).transpose(3,1,0,4,2);
   }
     
   {
     typedef tmptools::Vector<2,1,4> V214;
-    for_each(blitzplusplus::basi::fullRange<V214>(v),blitzplusplus::basi::begin<V214>(vResBASI),bind(myFunc,a,_1,_2));
+    // TODO: in c++20 this should be solvable with something like this:
+    // for ( auto [v,w] : {cpputils::sliceiterator::fullRange<V214>(v),cpputils::sliceiterator::fullRange<V214>(vResBASI)} ) myFunc(a,v,w);
+    for (auto tup :  boost::combine(cpputils::sliceiterator::fullRange<V214>(v),cpputils::sliceiterator::fullRange<V214>(vResBASI)))
+      myFunc(a,tup.get<0>(),tup.get<1>());
   }
 
   BOOST_CHECK(all(vResBASI==vResTensor));
@@ -157,7 +155,7 @@ BOOST_AUTO_TEST_CASE( MatrixProducts ) // VFMSI for matrix products a*rho
 
   {
     using namespace blitzplusplus::vfmsi;
-    for_each(fullRange<Left>(rho),bind(myFunc,a,_1,_1));
+    for (auto v : fullRange<Left>(rho)) myFunc(a,v,v);
   }
   //cout<<max(abs(rho-resTensor))<<endl;
   //BOOST_CHECK(!fcmp(1-max(abs(rho-hermitianConjugate(rho))),1,epsilonCmp));
@@ -186,12 +184,12 @@ BOOST_AUTO_TEST_CASE( VFMSI_Test ) // VFMSI computing a*rho*adagger (rho Hermiti
   {
     {
       using namespace blitzplusplus::vfmsi;
-      for_each(fullRange<Left>(rho),bind(myFunc,a,_1,_1));
+      for (auto v : fullRange<Left>(rho)) myFunc(a,v,v);
     }
     hermitianConjugateSelf(rho);
     {
       using namespace blitzplusplus::vfmsi;
-      for_each(fullRange<Left>(rho),bind(myFunc,a,_1,_1));
+      for (auto v : fullRange<Left>(rho)) myFunc(a,v,v);
     }
   }
   //cout<<max(abs(rho-resTensor))<<endl;

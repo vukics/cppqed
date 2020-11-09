@@ -23,11 +23,19 @@ find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
 if (TARGET Boost::unit_test_framework)
   set(BOOST_TESTING_EXECUTABLES
-      MultiIndexIterator SliceIterator)
+      BlitzArray BlitzExtensions BlitzTinyExtensions CWR MultiIndexIterator SliceIterator)
   foreach(S ${BOOST_TESTING_EXECUTABLES})
     add_executable(${S} ${S}.cc)
     target_link_libraries(${S} CPPQED::CPPQEDutils Boost::unit_test_framework)
   endforeach()
+  
+  add_test(blitz_array BlitzArray)
+  
+  add_test(blitz_extensions BlitzExtensions)
+  
+  add_test(blitz_tiny_extensions BlitzTinyExtensions)
+  
+  add_test(combination_with_repetition CWR)
   
   add_test(multi_index_iterator_boost MultiIndexIterator)
   

@@ -1,5 +1,6 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Combinatorics.h"
+
 #define BOOST_TEST_MODULE CWR test
 #include <boost/test/unit_test.hpp>
 
@@ -22,7 +23,7 @@ BOOST_AUTO_TEST_CASE( CWR )
 
   const IdxTiny<4> idxTiny(2,2,0,1);
   
-  const boost::array<size_t,4> idxBoost={{2,2,0,1}};
+  const boost::array<size_t,4> idxBoost{{2,2,0,1}};
   BOOST_CHECK(dir[idxBoost]==12);
 
   // const boost::array<size_t,5> idxBoostErr={{2,2,0,1,2}};
