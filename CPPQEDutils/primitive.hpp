@@ -85,10 +85,6 @@ template<> struct is_promotion<double, dcomp> : std::true_type {};
 // end of file "arithmetic_traits.h"
 
 
-template< bool B, class T = void >
-using enable_if_t = typename std::enable_if<B,T>::type;
-// NEEDS_WORK this is not in the standard library, though in C++14 it should be
-
 template< typename T >
 struct IsArithmetic : std::is_arithmetic<T> {};
 
@@ -96,7 +92,7 @@ template<>
 struct IsArithmetic<dcomp> : std::true_type {}; // this makes that dcomp is also treated as a primitive arithmetic type
 
 
-template<typename T, typename = enable_if_t< IsArithmetic<T>::value >>
+template<typename T, typename = std::enable_if_t< IsArithmetic<T>::value >>
 class primitive {
     T m_value;
 
@@ -105,15 +101,15 @@ public:
 
     constexpr primitive() noexcept: m_value() {}
 
-    template<typename U, typename = enable_if_t<
+    template<typename U, typename = std::enable_if_t<
          std::is_same<T, U>::value || is_promotion<U, T>::value
     >>
     constexpr primitive(U const& value) noexcept : m_value(value) {}
 
-    template<typename U, typename = enable_if_t< is_promotion<U, T>::value >>
+    template<typename U, typename = std::enable_if_t< is_promotion<U, T>::value >>
     constexpr primitive(primitive<U> const& other) noexcept : m_value(other.get()) {}
 
-    template<typename U, typename = enable_if_t< is_conversion<U, T>::value >>
+    template<typename U, typename = std::enable_if_t< is_conversion<U, T>::value >>
     constexpr static primitive from(U const& other) noexcept {
         return primitive(T(other));
     }
@@ -126,21 +122,21 @@ public:
 
     constexpr T const& get() const noexcept { return m_value; }
 
-    template<typename U = T, typename = enable_if_t< !std::is_same<U, bool>::value  >>
+    template<typename U = T, typename = std::enable_if_t< !std::is_same<U, bool>::value  >>
     constexpr primitive const& operator+() const noexcept {
         return *this;
     }
-    template<typename U = T, typename = enable_if_t< !std::is_same<U, bool>::value  >>
+    template<typename U = T, typename = std::enable_if_t< !std::is_same<U, bool>::value  >>
     constexpr primitive operator-() const noexcept {
         return primitive(-m_value);
     }
 
-    template<typename U = T, typename = enable_if_t< std::is_integral<U>::value && !std::is_same<U, bool>::value >>
+    template<typename U = T, typename = std::enable_if_t< std::is_integral<U>::value && !std::is_same<U, bool>::value >>
     constexpr primitive operator~() const noexcept {
         return primitive(~m_value);
     }
 
-    template<typename U = T, typename = enable_if_t< std::is_same<U, bool>::value >>
+    template<typename U = T, typename = std::enable_if_t< std::is_same<U, bool>::value >>
     constexpr bool operator!() const noexcept {
         return !m_value;
     }
@@ -205,67 +201,67 @@ public:
         return *this;
     }
 
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator%=(U const& other) noexcept {
         m_value %= other;
         return *this;
     }
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator%=(primitive<U> const& other) noexcept {
         m_value %= other.get();
         return *this;
     }
 
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator<<=(U const& other) noexcept {
         m_value <<= other;
         return *this;
     }
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator<<=(primitive<U> const& other) noexcept {
         m_value <<= other.get();
         return *this;
     }
 
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator>>=(U const& other) noexcept {
         m_value >>= other;
         return *this;
     }
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator>>=(primitive<U> const& other) noexcept {
         m_value >>= other.get();
         return *this;
     }
 
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator&=(U const& other) noexcept {
         m_value &= other;
         return *this;
     }
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator&=(primitive<U> const& other) noexcept {
         m_value &= other.get();
         return *this;
     }
 
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator|=(U const& other) noexcept {
         m_value |= other;
         return *this;
     }
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator|=(primitive<U> const& other) noexcept {
         m_value |= other.get();
         return *this;
     }
 
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator^=(U const& other) noexcept {
         m_value ^= other;
         return *this;
     }
-    template<typename U, typename = enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
+    template<typename U, typename = std::enable_if_t< std::is_integral<T>::value && std::is_integral<U>::value >>
     primitive& operator^=(primitive<U> const& other) noexcept {
         m_value ^= other.get();
         return *this;
@@ -333,80 +329,80 @@ constexpr auto operator/(primitive<T1> const& lhs, primitive<T2> const& rhs) noe
     return primitive<decltype(lhs.get() / rhs.get())>(lhs.get() / rhs.get());
 }
 
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator%(primitive<T> const& lhs, T const& rhs) noexcept {
     return primitive<T>(lhs.get() % rhs);
 }
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator%(T const& lhs, primitive<T> const& rhs) noexcept {
     return primitive<T>(lhs % rhs.get());
 }
-template<typename T1, typename T2, typename = enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
+template<typename T1, typename T2, typename = std::enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
 constexpr auto operator%(primitive<T1> const& lhs, primitive<T2> const& rhs) noexcept {
     return primitive<decltype(lhs.get() % rhs.get())>(lhs.get() % rhs.get());
 }
 
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator&(primitive<T> const& lhs, T const& rhs) noexcept {
     return primitive<T>(lhs.get() & rhs);
 }
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator&(T const& lhs, primitive<T> const& rhs) noexcept {
     return primitive<T>(lhs & rhs.get());
 }
-template<typename T1, typename T2, typename = enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
+template<typename T1, typename T2, typename = std::enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
 constexpr auto operator&(primitive<T1> const& lhs, primitive<T2> const& rhs) noexcept {
     return primitive<decltype(lhs.get() & rhs.get())>(lhs.get() & rhs.get());
 }
 
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator|(primitive<T> const& lhs, T const& rhs) noexcept {
     return primitive<T>(lhs.get() | rhs);
 }
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator|(T const& lhs, primitive<T> const& rhs) noexcept {
     return primitive<T>(lhs | rhs.get());
 }
-template<typename T1, typename T2, typename = enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
+template<typename T1, typename T2, typename = std::enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
 constexpr auto operator|(primitive<T1> const& lhs, primitive<T2> const& rhs) noexcept {
     return primitive<decltype(lhs.get() | rhs.get())>(lhs.get() | rhs.get());
 }
 
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator^(primitive<T> const& lhs, T const& rhs) noexcept {
     return primitive<T>(lhs.get() ^ rhs);
 }
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator^(T const& lhs, primitive<T> const& rhs) noexcept {
     return primitive<T>(lhs ^ rhs.get());
 }
-template<typename T1, typename T2, typename = enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
+template<typename T1, typename T2, typename = std::enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
 constexpr auto operator^(primitive<T1> const& lhs, primitive<T2> const& rhs) noexcept  {
     return primitive<decltype(lhs.get() ^ rhs.get())>(lhs.get() ^ rhs.get());
 }
 
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator<<(primitive<T> const& lhs, T const& rhs) noexcept {
     return primitive<T>(lhs.get() << rhs);
 }
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator<<(T const& lhs, primitive<T> const& rhs) noexcept {
     return primitive<T>(lhs << rhs.get());
 }
-template<typename T1, typename T2, typename = enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
+template<typename T1, typename T2, typename = std::enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
 constexpr auto operator<<(primitive<T1> const& lhs, primitive<T2> const& rhs) noexcept {
     return primitive<decltype(lhs.get() << rhs.get())>(lhs.get() << rhs.get());
 }
 
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator>>(primitive<T> const& lhs, T const& rhs) noexcept {
     return primitive<T>(lhs.get() >> rhs);
 }
-template<typename T, typename = enable_if_t< std::is_integral<T>::value >>
+template<typename T, typename = std::enable_if_t< std::is_integral<T>::value >>
 constexpr primitive<T> operator>>(T const& lhs, primitive<T> const& rhs) noexcept {
     return primitive<T>(lhs >> rhs.get());
 }
-template<typename T1, typename T2, typename = enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
+template<typename T1, typename T2, typename = std::enable_if_t< std::is_integral<T1>::value && std::is_integral<T2>::value >>
 constexpr auto operator>>(primitive<T1> const& lhs, primitive<T2> const& rhs) noexcept {
     return primitive<decltype(lhs.get() >> rhs.get())>(lhs.get() >> rhs.get());
 }
