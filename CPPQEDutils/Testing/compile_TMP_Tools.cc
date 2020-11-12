@@ -63,8 +63,4 @@ static_assert( P_23_42::first==23 && P_23_42::second==42 , "Pair containment err
 
 template struct tmptools::pair_c<23,23,false>;
 
-// TODO: check why this fails for intel compiler
-#ifndef __INTEL_COMPILER
 template struct P_23_42::SanityCheck<21,45>;
-#endif
-

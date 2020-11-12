@@ -1,4 +1,11 @@
 # Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# RATIONALE:
+# * any test that runs and checks for a single case, just uses plain ctest here
+# * those that use more cases rely on boost::unit_test_framework
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
+
+configure_file(testdriver.conf.in testdriver.conf)
 
 set(TESTING_EXECUTABLES
     EvolvedTest HarmonicOscillatorRandomTimes HarmonicOscillatorComplex MultiIndexIteratorNew Randomized)
@@ -16,8 +23,8 @@ add_test(harmonic_oscillator_random_times HarmonicOscillatorRandomTimes)
 
 add_test(multi_index_iterator MultiIndexIteratorNew)
 
-add_test(randomized_serialization Randomized)
-
+add_test(randomized_serialization ${CMAKE_CURRENT_BINARY_DIR}/Randomized)
+set_tests_properties(randomized_serialization PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
 find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
@@ -42,3 +49,40 @@ if (TARGET Boost::unit_test_framework)
   add_test(slice_iterator SliceIterator)
 endif()
 
+set(COMPILE_TESTING_NAMES compile_BlitzArraySliceIteratorTMP compile_TMP_Tools)
+
+foreach(S ${COMPILE_TESTING_NAMES})
+  add_library(${S} OBJECT ${S}.cc)
+  target_link_libraries(${S} CPPQED::CPPQEDutils)
+  add_test( NAME test_${S} COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR} --target ${S} )
+  # add_test( NAME ${S} COMMAND ${PYTHON_EXECUTABLE} testdriver.py ${testing_BINARY_DIR}/testdriver.conf ${CMAKE_CURRENT_LIST_DIR}/testdriver.conf --test=${TESTNAME} --testclass=CompileTarget --script=TMP_ToolsCompile)
+endforeach()
+
+macro(add_compilefail_test S errorText)
+  add_library(${S} OBJECT ${S}.cc)
+  target_link_libraries(${S} CPPQED::CPPQEDutils)
+  add_test( NAME test_${S} COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR} --target ${S} )
+  set_tests_properties(test_${S} PROPERTIES PASS_REGULAR_EXPRESSION ${errorText})
+endmacro()
+
+add_compilefail_test(fail_BlitzArraySliceIterator1 "cpputils::SliceIterator inconsistent vector")
+
+add_compilefail_test(fail_BlitzArraySliceIterator2 "cpputils::SliceIterator vector out of range")
+
+# ??? fail_BlitzTinyExtensions compiles without error ???
+# add_compilefail_test(fail_BlitzTinyExtensions "Argument not even")
+
+add_compilefail_test(fail_TMP_Tools1 "Negative element in nonnegative vector")
+
+add_compilefail_test(fail_TMP_Tools2 "Argument not even")
+
+add_compilefail_test(fail_TMP_Tools3 "pair_c with equal elements")
+
+#add_library(fail_BlitzArraySliceIterator1 OBJECT fail_BlitzArraySliceIterator1.cc)
+#target_link_libraries(fail_BlitzArraySliceIterator1 CPPQED::CPPQEDutils)
+#add_test( NAME fail_BlitzArraySliceIterator1 COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR} --target fail_BlitzArraySliceIterator1 )
+#set_tests_properties(fail_BlitzArraySliceIterator1 PROPERTIES WILL_FAIL 1 FAIL_REGULAR_EXPRESSION "cpputils::SliceIterator inconsistent vector")
+
+# find_package (Python 3 COMPONENTS Interpreter NumPy)
+
+# find_package(Scipy)

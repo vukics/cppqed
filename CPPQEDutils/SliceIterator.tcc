@@ -43,8 +43,8 @@ public:
     boost::fusion::fold(cache_,idx.begin(),
                         [](CI iter, auto& t) -> CI {
                           using T=std::decay_t<decltype(t)>;
-                          if constexpr (std::is_same<T,blitz::Range>::value) {t=blitz::Range::all(); return iter;}
-                          else if constexpr (std::is_same<T,int>::value) {t=*iter++; return iter;}
+                          if constexpr (std::is_same_v<T,blitz::Range>) {t=blitz::Range::all(); return iter;}
+                          else if constexpr (std::is_same_v<T,int>) {t=*iter++; return iter;}
                         });
     return cache_;
   }

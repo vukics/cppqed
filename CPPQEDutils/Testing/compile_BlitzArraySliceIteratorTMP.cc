@@ -1,13 +1,19 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "BlitzArraySliceIterator.tcc"
+#include "SliceIterator.tcc"
 
-using namespace blitzplusplus;
+#include "BlitzArray.h"
 
-template class basi::Iterator<8,tmptools::Vector<3,1,6>,true>;
-template class basi::Iterator<8,tmptools::Range<6,1>,true>;
-template class basi::Iterator<8,tmptools::Ordinals<5>,true>;
+template class cpputils::SliceIterator<CArray,8,tmptools::Vector<3,1,6>>;
+template class cpputils::SliceIterator<CArray,8,tmptools::Range<6,1>>;
+template class cpputils::SliceIterator<CArray,8,tmptools::Ordinals<5>>;
 
-#include "VectorFromMatrixSliceIterator.tcc"
+/*
+#include "VectorFromMatrixSliceIterator.h"
 
-template class basi::Iterator<8,vfmsi::LeftRight<4,vfmsi::Left>,true>;
-template class basi::Iterator<8,vfmsi::LeftRight<4,vfmsi::Right>,true>;
+namespace blitzplusplus { namespace vfmsi {
+
+template class Iterator<8,Left >;
+template class Iterator<8,Right>;
+
+} }
+*/
