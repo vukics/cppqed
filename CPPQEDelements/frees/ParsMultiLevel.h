@@ -24,11 +24,14 @@ struct ParsPumpedLossy
   VL& gammas;
   double& gamma_parallel;
 
+  RealPerLevel<NL>& gamma_parallel_vector;
+  
   ParsPumpedLossy(parameters::Table& p, const std::string& mod="")
-    : deltas(p.addTitle("PumpedLossyMultiLevel",mod).addMod("deltas",mod,"MultiLevel detunings vector",RealPerLevel<NL>())),
+    : deltas(p.addTitle("PumpedLossyMultiLevel",mod).addMod("deltas",mod,"MultiLevel detunings vector",RealPerLevel<NL>{0.})),
       etas(p.addMod("etas",mod,"MultiLevel pumps vector",VP())),
       gammas(p.addMod("gammas",mod,"MultiLevel decays vector",VL())),
-      gamma_parallel(p.addMod("gamma_parallel",mod,"Phase flip rate",0.))
+      gamma_parallel(p.addMod("gamma_parallel",mod,"Phase flip rate",0.)),
+      gamma_parallel_vector(p.addMod("gamma_parallel_vector",mod,"Phase flip rate when it’s different for the individual levels",RealPerLevel<NL>{0.}))
   {
     deltas=0;
   }

@@ -259,8 +259,14 @@ private:
 template<int NL, typename VL>
 class LiouvilleanDiffusive : public BASE_class
 {
+public:
+  using DiffusionCoeffs=typename BASE_class::DiffusionCoeffs;
+
 protected:
   LiouvilleanDiffusive(const VL& gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
+  
+  LiouvilleanDiffusive(const VL& gammas, const DiffusionCoeffs& gammas_parallel) : BASE_class(NL,gammas_parallel,gammas) {}
+
 #undef BASE_class
   
 };
@@ -346,18 +352,22 @@ public:
 
   typedef typename Base::Ptr Ptr;
 
-  template<typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, double gamma_parallel, AveragingConstructorParameters&&... a)
+  template<typename GPT, typename... AveragingConstructorParameters>
+  PumpedLossyMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
     : Hamiltonian([&] {
         ComplexPerLevel res(deltas); res*=-DCOMP_I;
         for_each(gammas,[&](auto gamma) {res(decltype(gamma)::second)+=gamma.get();});
         return res;
       } (), etas),
       Liouvillean(gammas,gamma_parallel),
-      Base([this,gamma_parallel] {
+      Base([this,&gamma_parallel] {
         structure::DynamicsBase::RealFreqs res;
         for (int i=0; i<NL; i++) if (!hasRealPart(this->get_zSchs()(i))) res.push_back({"delta"+std::to_string(i),-imag(this->get_zSchs()(i)),1.});
-        res.push_back({"gamma_parallel",gamma_parallel,1.});
+        if constexpr (std::is_same_v<std::decay_t<GPT>,double>) res.push_back({"gamma_parallel",gamma_parallel,1.});
+        else if constexpr (std::is_same_v<std::decay_t<GPT>,typename Liouvillean::DiffusionCoeffs>) {
+          if (gamma_parallel.size()!=NL) throw std::runtime_error("gamma_parallel vector wrong size");
+          for (int i=0; i<NL; i++) res.push_back({"gamma_parallel_"+std::to_string(i),gamma_parallel[i],1.});
+        }
         return res;
       } () , [this,&etas] {
         structure::DynamicsBase::ComplexFreqs res;
@@ -378,49 +388,54 @@ public:
 
 namespace multilevel {
 
-#define RETURN_type typename MultiLevelBase<NL>::Ptr
-
 /// Maker function for PumpedLossyMultiLevelSch
-template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
-inline
-RETURN_type
+template<typename AveragingType, int NL, typename GPT, typename VP, typename VL, typename... AveragingConstructorParameters>
+typename MultiLevelBase<NL>::Ptr
 makePumpedLossySch(const RealPerLevel<NL>& deltas,
-                   const VP& etas, const VL& gammas, double gamma_parallel,
+                   const VP& etas, const VL& gammas,
+                   const GPT& gamma_parallel,
                    AveragingConstructorParameters&&... a)
 {
-  if (gamma_parallel) return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
-  else                return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,gamma_parallel,a...);
+  if constexpr (std::is_same_v<std::decay_t<GPT>,RealPerLevel<NL>>) {
+    if (blitz::any(gamma_parallel!=0))
+      return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
+                                                                                       typename LiouvilleanDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
+                                                                                                                                             gamma_parallel.end()},
+                                                                                       std::forward<AveragingConstructorParameters>(a)...);
+  }
+  else if (gamma_parallel)
+    return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,
+                                                                                     std::forward<AveragingConstructorParameters>(a)...);
+
+  return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,0.,std::forward<AveragingConstructorParameters>(a)...);
 }
 
 /// \overload
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
-inline
-RETURN_type
+auto
 makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
 {
+  if (blitz::any(p.gamma_parallel_vector!=0)) return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel_vector,a...);
   return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel,a...);
 }
 
 /// \overload
-template<int NL, typename VP, typename VL>
-inline
-RETURN_type
-makePumpedLossySch(const RealPerLevel<NL>& deltas, const VP& etas, const VL& gammas, double gamma_parallel, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+template<int NL, typename GPT, typename VP, typename VL>
+auto
+makePumpedLossySch(const RealPerLevel<NL>& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel,
+                   const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
 {
   return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
 }
 
 /// \overload
 template<int NL, typename VP, typename VL>
-inline
-RETURN_type
+auto
 makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
 {
   return makePumpedLossySch<ReducedDensityOperator<1> >(p,keyTitle,NL,offDiagonals);
 }
 
-
-#undef  RETURN_type
 
 } // multilevel
 

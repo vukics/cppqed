@@ -324,15 +324,22 @@ private:
   typedef BASE Base;
   
 public:
+  using DiffusionCoeffs=std::vector<double>;
+  
   TYPE_DEFINITION_FORWARD
 #undef TYPE_DEFINITION_FORWARD
 
   template <typename... BaseCtorPack>
-  ElementLiouvilleanDiffusive(size_t dim, double diffusionCoeff, BaseCtorPack&&... baseCtorPack)
-    : Base(std::forward<BaseCtorPack>(baseCtorPack)...), dim_(dim), base_nAvr_(this->getKeyPrinter().length()), diffusionCoeff_(diffusionCoeff)
+  ElementLiouvilleanDiffusive(size_t dim, const DiffusionCoeffs& diffusionCoeffs, BaseCtorPack&&... baseCtorPack)
+    : Base(std::forward<BaseCtorPack>(baseCtorPack)...), dim_(dim), base_nAvr_(this->getKeyPrinter().length()), diffusionCoeffs_(diffusionCoeffs)
   {
     for (size_t i=0; i<dim_; ++i) this->getKeyPrinter().getLabels().push_back("Phase flip for level "+std::to_string(i));
   }
+
+  template <typename... BaseCtorPack>
+  ElementLiouvilleanDiffusive(size_t dim, double diffusionCoeff, BaseCtorPack&&... baseCtorPack)
+    : ElementLiouvilleanDiffusive(dim,DiffusionCoeffs(dim,diffusionCoeff),std::forward<BaseCtorPack>(baseCtorPack)...)
+  {}
 
 protected:
   const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
@@ -347,7 +354,7 @@ protected:
     if (psi.extent(0)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException("In actWithJ_v");
     if (lindbladNo<base_nAvr_) Base::actWithJ_v(t,psi,lindbladNo);
     else {
-      psi*=sqrt(2.*diffusionCoeff_);
+      psi*=sqrt(2.*diffusionCoeffs_[lindbladNo-base_nAvr_]);
       psi(lindbladNo-base_nAvr_)*=-1.;
     }
   }
@@ -358,10 +365,10 @@ protected:
     if (lindbladNo<base_nAvr_) Base::actWithSuperoperator_v(t,rho,drhodt,lindbladNo);
     else if(lindbladNo==base_nAvr_) { // with this single case we cover the action of all the diffusive Lindblads
       for (int m=0; m<dim_; ++m) {
-        drhodt(m,m)+=2*diffusionCoeff_*rho(m,m);
+        drhodt(m,m)+=2*diffusionCoeffs_[lindbladNo-base_nAvr_]*rho(m,m);
         for (int n=m+1; n<dim_; ++n) {
-          drhodt(m,n)-=6*diffusionCoeff_*rho(m,n);
-          drhodt(n,m)-=6*diffusionCoeff_*rho(n,m);
+          drhodt(m,n)-=6*diffusionCoeffs_[lindbladNo-base_nAvr_]*rho(m,n);
+          drhodt(n,m)-=6*diffusionCoeffs_[lindbladNo-base_nAvr_]*rho(n,m);
         }
       }
     }
@@ -369,7 +376,7 @@ protected:
 
 private:
   const size_t dim_, base_nAvr_;
-  const double diffusionCoeff_;
+  const DiffusionCoeffs diffusionCoeffs_;
   
 };
 
