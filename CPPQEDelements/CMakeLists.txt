@@ -14,3 +14,5 @@ add_library(CPPQEDelements SHARED
 add_library(CPPQED::CPPQEDelements ALIAS CPPQEDelements)
 
 target_link_libraries(CPPQEDelements PUBLIC CPPQED::CPPQEDelements_interactions)
+
+install(TARGETS CPPQEDelements DESTINATION lib)

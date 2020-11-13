@@ -56,6 +56,8 @@ if(ENABLE_TESTING)
   add_subdirectory(Testing)
 endif()
 
+install(TARGETS CPPQEDutils DESTINATION lib)
+
 #configure_file("${CPPQED_CMAKE_MODULE_PATH}/config.h.in" config.h)
 
 #set(CPPQEDutils_LIB "CPPQEDutils-${CPPQED_ID}")

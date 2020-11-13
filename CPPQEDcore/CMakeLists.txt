@@ -25,6 +25,7 @@ target_link_libraries(CPPQEDcore PUBLIC CPPQED::CPPQEDcore_high)
 
 add_subdirectory(examples)
 
+install(TARGETS CPPQEDcore DESTINATION lib)
 
 ## Doxygen
 #find_package(Doxygen 1.8)

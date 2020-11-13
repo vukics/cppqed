@@ -10,11 +10,11 @@ set(FEWER_SCRIPTS_TARGETS
 foreach(S ${FEWER_SCRIPTS_TARGETS})
   add_executable(${S} ${S}.cc)
   target_link_libraries(${S} CPPQED::CPPQEDelements)
+  install(TARGETS ${S} DESTINATION bin)
 endforeach()
     
 # add target "fewer_scripts"
-add_custom_target(fewer_scripts)
-add_dependencies(fewer_scripts ${FEWER_SCRIPTS_TARGETS})
+add_custom_target(fewer_scripts DEPENDS ${FEWER_SCRIPTS_TARGETS})
 
 #set(NEED_FLENS GeneralDickeImaginaryEvolution)
 # If something needs to be excluded, that’s how to do it:

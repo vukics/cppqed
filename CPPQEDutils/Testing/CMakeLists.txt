@@ -61,6 +61,7 @@ endforeach()
 macro(add_compilefail_test S errorText)
   add_library(${S} OBJECT ${S}.cc)
   target_link_libraries(${S} CPPQED::CPPQEDutils)
+  set_target_properties(${S} PROPERTIES EXCLUDE_FROM_ALL TRUE)
   add_test( NAME test_${S} COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR} --target ${S} )
   set_tests_properties(test_${S} PROPERTIES PASS_REGULAR_EXPRESSION ${errorText})
 endmacro()
@@ -78,10 +79,8 @@ add_compilefail_test(fail_TMP_Tools2 "Argument not even")
 
 add_compilefail_test(fail_TMP_Tools3 "pair_c with equal elements")
 
-#add_library(fail_BlitzArraySliceIterator1 OBJECT fail_BlitzArraySliceIterator1.cc)
-#target_link_libraries(fail_BlitzArraySliceIterator1 CPPQED::CPPQEDutils)
-#add_test( NAME fail_BlitzArraySliceIterator1 COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR} --target fail_BlitzArraySliceIterator1 )
-#set_tests_properties(fail_BlitzArraySliceIterator1 PROPERTIES WILL_FAIL 1 FAIL_REGULAR_EXPRESSION "cpputils::SliceIterator inconsistent vector")
+
+add_custom_target(compileTests DEPENDS ${TESTING_EXECUTABLES} ${BOOST_TESTING_EXECUTABLES})
 
 # find_package (Python 3 COMPONENTS Interpreter NumPy)
 
