@@ -8,8 +8,12 @@ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 configure_file(testdriver.conf.in testdriver.conf)
 
 set(TESTING_EXECUTABLES
-    EvolvedTest HarmonicOscillatorRandomTimes HarmonicOscillatorComplex MultiIndexIteratorNew Randomized)
+    EvolvedTest MultiIndexIteratorNew Randomized)
 
+if (TARGET Eigen3::Eigen)
+  set(TESTING_EXECUTABLES ${TESTING_EXECUTABLES} HarmonicOscillatorRandomTimes HarmonicOscillatorComplex)
+endif()
+    
 foreach(S ${TESTING_EXECUTABLES})
   add_executable(${S} ${S}.cc)
   target_link_libraries(${S} CPPQED::CPPQEDutils)
@@ -17,9 +21,10 @@ endforeach()
 
 add_test(evolved_nonlinear_ode EvolvedTest)
 
-add_test(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
-
-add_test(harmonic_oscillator_random_times HarmonicOscillatorRandomTimes)
+if (TARGET Eigen3::Eigen)
+  add_test(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
+  add_test(harmonic_oscillator_random_times HarmonicOscillatorRandomTimes)
+endif()
 
 add_test(multi_index_iterator MultiIndexIteratorNew)
 
