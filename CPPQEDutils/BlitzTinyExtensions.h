@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_UTILS_BLITZTINYEXTENSIONS_H_INCLUDED
 #define CPPQEDCORE_UTILS_BLITZTINYEXTENSIONS_H_INCLUDED
 
-#include <blitz/tinyvec2.h>
+#include <blitz/array.h> // this is needed in order to pull in the expression template mechanism
 
 
 namespace blitzplusplus {
@@ -11,7 +11,7 @@ namespace blitzplusplus {
 
 /// Concatenates `tiny1` and `tiny2`
 /**
- * Implemented with the help of the compile-time–runtime facility \refBoostConstruct{for_each,mpl/doc/refmanual/for-each.html} from Boost.MPL.
+ * Leverages the compile-time–runtime facility \refBoostConstruct{for_each,mpl/doc/refmanual/for-each.html} from Boost.MPL.
  * 
  * \tparam T1 basic type of one of the operand tiny vectors *and the result*
  * \tparam T2 basic type of the other operand tiny vector. Must be convertible to T1.
