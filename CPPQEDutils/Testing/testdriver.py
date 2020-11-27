@@ -1,4 +1,5 @@
-# Copyright Raimar Sandner 2012-2014. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright Raimar Sandner 2012-2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 ## @package testdriver
 # This is the Python testdriver for the \ref testsuite.
@@ -813,21 +814,20 @@ def main():
   op.add_option("--testclass", help="the name of the testclass to use, must implement run()")
   op.add_option("--script", help="the script to run or the target to compile")
   op.add_option("--configuration", help="debug or release")
-  op.add_option("--cpypyqed_builddir", help="directory for on-demand module compilation")
-  op.add_option("--cpypyqed_config", help="configure file for on-demand module compilation")
 
   (options,args) = op.parse_args()
 
   if len(args)==0: op.error("Need configuration file(s) as argument(s).")
   cp.read(args)
   sys.path.insert(0,cp.get('Setup','modulepath'))
+
   # we can only load the io module after we know where to look for the cpypyqed package
-  global io
-  if options.configuration.lower()=="release":
-    import cpypyqed.io as io
-  elif options.configuration.lower()=="debug":
-    import cpypyqed.io_d as io
-  logging.info("Taking cpypyqed from {0}".format(io.__file__))
+  #global io
+  #if options.configuration.lower()=="release":
+    #import cpypyqed.io as io
+  #elif options.configuration.lower()=="debug":
+    #import cpypyqed.io_d as io
+  #logging.info("Taking cpypyqed from {0}".format(io.__file__))
 
   if options.testclass:
     constructor = globals()[options.testclass]
