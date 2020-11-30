@@ -272,7 +272,7 @@ const Tridiagonal sigmadagsigmaop()
 }
 
 
-StateVector init(const dcomp& psi1)
+StateVector init(dcomp psi1)
 {
   StateVector res(2);
   res(0)=sqrt(1-sqrAbs(psi1)); res(1)=psi1;

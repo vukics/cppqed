@@ -72,7 +72,7 @@ Tridiagonal<RANK>::Tridiagonal(const Tridiagonal<RANK2>& t1, const Tridiagonal<R
 
 template<int RANK>
 Tridiagonal<RANK>&
-Tridiagonal<RANK>::operator*=(const dcomp& dc)
+Tridiagonal<RANK>::operator*=(dcomp dc)
 {
   boost::for_each(diagonals_,boost::lambda::_1*=dc); 
   return *this;

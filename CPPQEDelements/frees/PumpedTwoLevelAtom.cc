@@ -39,7 +39,7 @@ PumpedTwoLevelAtomSch::PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy& pp2la)
 }
 
 
-const CMatrix PumpedTwoLevelAtomSch::hamiltonianOverI(const dcomp& za, const dcomp& eta)
+const CMatrix PumpedTwoLevelAtomSch::hamiltonianOverI(dcomp za, dcomp eta)
 {
   CMatrix res(2,2);
   res=

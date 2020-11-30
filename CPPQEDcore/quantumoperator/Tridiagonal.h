@@ -213,8 +213,8 @@ public:
 
   /// \name Algebra
   //@{
-  Tridiagonal& operator*=(const dcomp& dc); ///< Naively implemented, could be templated if need arises – Frequencies untouched.
-  Tridiagonal& operator/=(const dcomp& dc) {(*this)*=1./dc; return *this;} ///< ”
+  Tridiagonal& operator*=(dcomp dc); ///< Naively implemented, could be templated if need arises – Frequencies untouched.
+  Tridiagonal& operator/=(dcomp dc) {(*this)*=1./dc; return *this;} ///< ”
   Tridiagonal& operator*=(double d) {(*this)*=dcomp(d,0); return *this;} ///< ”
   Tridiagonal& operator/=(double d) {(*this)*=1./dcomp(d,0); return *this;} ///< ”
 

@@ -13,7 +13,7 @@
 namespace blitzplusplus {
 
 
-inline double sqrAbs(const dcomp& c) {return mathutils::sqrAbs(c);}
+inline double sqrAbs(dcomp c) {return mathutils::sqrAbs(c);}
 
 BZ_DECLARE_FUNCTION_RET(sqrAbs,double)
 

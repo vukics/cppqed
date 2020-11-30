@@ -26,11 +26,11 @@ using namespace structure::freesystem;
 
 typedef std::shared_ptr<const SpinBase> Ptr;
 
-Tridiagonal splus(size_t dim, size_t twoS, const dcomp& z, bool isExact);
+Tridiagonal splus(size_t dim, size_t twoS, dcomp z, bool isExact);
 
-inline auto sminus(size_t dim, size_t twoS, const dcomp& z, bool isExact) {return splus(dim,twoS,z,isExact).dagger();}
-inline auto sx(size_t dim, size_t twoS, const dcomp& z, bool isExact) {return (splus(dim,twoS,z,isExact)+sminus(dim,twoS,z,isExact))/2;}
-inline auto sy(size_t dim, size_t twoS, const dcomp& z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*DCOMP_I);}
+inline auto sminus(size_t dim, size_t twoS, dcomp z, bool isExact) {return splus(dim,twoS,z,isExact).dagger();}
+inline auto sx(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)+sminus(dim,twoS,z,isExact))/2;}
+inline auto sy(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*DCOMP_I);}
 
 
 Tridiagonal splus(Ptr spin);
@@ -43,7 +43,7 @@ Tridiagonal sz(size_t dim, size_t twoS);
 
 Tridiagonal sz(Ptr spin);
 
-inline auto sn(size_t dim, size_t twoS, const dcomp& z, bool isExact, double theta, double phi)
+inline auto sn(size_t dim, size_t twoS, dcomp z, bool isExact, double theta, double phi)
 {
   return sin(theta)*(cos(phi)*sx(dim,twoS,z,isExact)+sin(phi)*sy(dim,twoS,z,isExact))+cos(theta)*sz(dim,twoS);
 }

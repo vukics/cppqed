@@ -17,12 +17,12 @@ typedef std::complex<double> dcomp;
 /// Imaginary unit
 const dcomp DCOMP_I(0,1);
 
-inline bool isNonZero(const dcomp& c) {return bool(real(c)) || bool(imag(c));}
+inline bool isNonZero(dcomp c) {return bool(real(c)) || bool(imag(c));}
 
-inline bool hasRealPart(const dcomp& c) {return bool(real(c));}
-inline bool hasImagPart(const dcomp& c) {return bool(imag(c));}
+inline bool hasRealPart(dcomp c) {return bool(real(c));}
+inline bool hasImagPart(dcomp c) {return bool(imag(c));}
 
-inline bool  absCompare(const dcomp& c1, const dcomp& c2) {return  abs(c1)< abs(c2);}
-inline bool realCompare(const dcomp& c1, const dcomp& c2) {return real(c1)<real(c2);}
+inline bool  absCompare(dcomp c1, dcomp c2) {return  abs(c1)< abs(c2);}
+inline bool realCompare(dcomp c1, dcomp c2) {return real(c1)<real(c2);}
 
 #endif // CPPQEDCORE_UTILS_COMPLEXEXTENSIONS_H_INCLUDED

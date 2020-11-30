@@ -22,7 +22,7 @@ template<class T> const T sqr(T x) {return x*x;}
 
 double sqr(double x);
 
-double sqrAbs(const dcomp&);
+double sqrAbs(dcomp);
 
 double fact  (unsigned          );
 double choose(unsigned, unsigned);
@@ -52,7 +52,7 @@ double relativeDeviation(const T& a, const T& b) {return abs(a-b)/(abs(a)+abs(b)
  * \image html differencesInCoherentElements.svg
  *
  */
-dcomp coherentElement(unsigned long n, const dcomp& alpha);
+dcomp coherentElement(unsigned long n, dcomp alpha);
 
 
 } // mathutils

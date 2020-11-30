@@ -44,7 +44,7 @@ inline const Tridiagonal xop(Ptr mode) {return tridiagPlusHC(aop(mode))/sqrt(2.)
  *
  * \note The user has to take care that `alpha` is not too large for the given `cutoff` (rule of thumb: `cutoff>|alpha|^2`)
  */
-StateVector coherent(const dcomp& alpha, ///< amplitude
+StateVector coherent(dcomp alpha, ///< amplitude
                      size_t cutoff ///< cutoff
                      );
 
@@ -88,16 +88,16 @@ inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl::
 inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl:: true_) {return p.kappa*(2.*p.nTh+1);}
 
 
-const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, double omegaKerr, size_t dim);
+const Tridiagonal::Diagonal mainDiagonal(dcomp z, double omegaKerr, size_t dim);
 
-const Tridiagonal pumping(const dcomp& eta, size_t dim);
+const Tridiagonal pumping(dcomp eta, size_t dim);
 
 
 
 class Exact : public structure::FreeExact<false>
 {
 public:
-  Exact(const dcomp& zI, double omegaKerr, size_t);
+  Exact(dcomp zI, double omegaKerr, size_t);
 
   dcomp get_zI() const {return zI_;}
   
@@ -125,8 +125,8 @@ class Hamiltonian
 public:
   typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
-  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
-  Hamiltonian(const dcomp& zSch,                  const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
+  Hamiltonian(dcomp zSch, dcomp zI, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
+  Hamiltonian(dcomp zSch,                  dcomp eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
   // The trailing dummy argument is there to cause a _compile_time_ (and not merely linking time) error in case of misuse
 
 protected:

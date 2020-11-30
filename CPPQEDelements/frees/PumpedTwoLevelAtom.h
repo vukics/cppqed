@@ -55,7 +55,7 @@ public:
 private:
   void addContribution_v(structure::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
 
-  static const linalg::CMatrix hamiltonianOverI(const dcomp& za, const dcomp& etat);
+  static const linalg::CMatrix hamiltonianOverI(dcomp za, dcomp etat);
 
   const linalg::CMatrix hamiltonianOverI_;
 

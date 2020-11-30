@@ -20,7 +20,7 @@ int fcmp(double x, double y, double eps) {return gsl_fcmp(x,y,eps);}
 
 double sqr(double x) {return gsl_pow_2(x);}
 
-double sqrAbs(const dcomp& x) {return sqr(real(x))+sqr(imag(x));} // saves the sqrt
+double sqrAbs(dcomp x) {return sqr(real(x))+sqr(imag(x));} // saves the sqrt
 
 double fact(unsigned n)
 {
@@ -33,7 +33,7 @@ double choose(unsigned n, unsigned m)
   return gsl_sf_choose(n,m);
 }
 
-dcomp coherentElement(unsigned long n, const dcomp& alpha)
+dcomp coherentElement(unsigned long n, dcomp alpha)
 {
   using namespace boost::math;
   return n ? n<max_factorial<double>::value ? pow(alpha,n)/sqrt(factorial<double>(n)) 

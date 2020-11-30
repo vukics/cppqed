@@ -54,7 +54,7 @@ const Tridiagonal aop(size_t dim)
 }
 
 
-const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t dim)
+const Tridiagonal::Diagonal mainDiagonal(dcomp z, size_t dim)
 {
   Tridiagonal::Diagonal res(dim);
   res=blitz::tensor::i;

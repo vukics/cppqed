@@ -55,7 +55,7 @@ auto basic::PumpedLossyMode::average_v(NoTime, const LazyDensityOperator& matrix
 }
 
 
-const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, size_t cutoff);
+const Tridiagonal::Diagonal mainDiagonal(dcomp z, size_t cutoff);
 
 
 basic::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)

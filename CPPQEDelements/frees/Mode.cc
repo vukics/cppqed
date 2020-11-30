@@ -33,7 +33,7 @@ const Tridiagonal aop(size_t);
 ////////
 
 
-Exact::Exact(const dcomp& zI, double omegaKerr, size_t dim)
+Exact::Exact(dcomp zI, double omegaKerr, size_t dim)
   : FreeExact(dim), zI_(zI), omegaKerr_(omegaKerr)
 {
 }
@@ -53,7 +53,7 @@ void Exact::updateU(Time t) const
 
 #define KERRDIAGONAL(d,o) d=(i-1.)*i; d*=o/DCOMP_I;
 
-const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, double omegaKerr, size_t dim)
+const Tridiagonal::Diagonal mainDiagonal(dcomp z, double omegaKerr, size_t dim)
 {
   using blitz::tensor::i;
   Tridiagonal::Diagonal res1(dim), res2(dim);
@@ -63,7 +63,7 @@ const Tridiagonal::Diagonal mainDiagonal(const dcomp& z, double omegaKerr, size_
 }
 
 
-const Tridiagonal pumping(const dcomp& eta, size_t dim)
+const Tridiagonal pumping(dcomp eta, size_t dim)
 {
   return tridiagMinusHC(eta*aop(dim).dagger());
 }
@@ -72,7 +72,7 @@ const Tridiagonal pumping(const dcomp& eta, size_t dim)
 namespace {
 
 
-Tridiagonal hOverI(const dcomp& z, const dcomp& eta, double omegaKerr, size_t dim)
+Tridiagonal hOverI(dcomp z, dcomp eta, double omegaKerr, size_t dim)
 // Here we use runtime dispatching because runtime dispatching will anyway happen at the latest in some maker function.
 {
   bool isPumped=isNonZero(eta);
@@ -93,14 +93,14 @@ Tridiagonal hOverI(const dcomp& z, const dcomp& eta, double omegaKerr, size_t di
 
 
 template<>
-Hamiltonian<true >::Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::true_)
+Hamiltonian<true >::Hamiltonian(dcomp zSch, dcomp zI, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::true_)
   : Base(furnishWithFreqs(hOverI(zSch,eta,omegaKerr,dim),mainDiagonal(zI,omegaKerr,dim))), Exact(zI,omegaKerr,dim), zSch_(zSch), eta_(eta), dim_(dim)
 {
   FILLKERR
 }
 
 template<>
-Hamiltonian<false>::Hamiltonian(const dcomp& zSch, const dcomp& eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::false_)
+Hamiltonian<false>::Hamiltonian(dcomp zSch, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::false_)
   : Base(hOverI(zSch,eta,omegaKerr,dim)), zSch_(zSch), eta_(eta), dim_(dim)
 {
   FILLKERR
@@ -355,7 +355,7 @@ double photonNumber(const LazyDensityOperator& matrix)
 }
 
 
-StateVector coherent(const dcomp& alpha, size_t dim)
+StateVector coherent(dcomp alpha, size_t dim)
 {
   StateVector res(dim,false);
   double norm(exp(-sqr(abs(alpha))/2.));

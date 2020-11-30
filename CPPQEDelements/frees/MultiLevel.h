@@ -85,11 +85,11 @@ public:
 
 private:
   void updateU(double dtdid) const {
-    boost::transform(zIs_,getDiagonal().begin(),[=](const dcomp& zI) {return exp(-zI*dtdid);});
+    boost::transform(zIs_,getDiagonal().begin(),[=](dcomp zI) {return exp(-zI*dtdid);});
   }
 
   bool applicableInMaster_v() const {
-    return !boost::accumulate(zIs_.begin(),false,[](bool init, const dcomp& zI) {return init || hasRealPart(zI);});
+    return !boost::accumulate(zIs_.begin(),false,[](bool init, dcomp zI) {return init || hasRealPart(zI);});
   }
 
   const L zIs_;

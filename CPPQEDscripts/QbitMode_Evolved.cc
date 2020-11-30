@@ -17,7 +17,7 @@ typedef CArray<1> Array;
 
 
 void derivs(double, const Array& b, Array& dbdt, 
-            const mode::ParsPumpedLossy& plm, const qbit::ParsPumpedLossy& pqb, const dcomp& g)
+            const mode::ParsPumpedLossy& plm, const qbit::ParsPumpedLossy& pqb, dcomp g)
 {
   dbdt=
     dcomp(-plm.kappa,plm.delta)*b(0)+g*b(1)+plm.eta,

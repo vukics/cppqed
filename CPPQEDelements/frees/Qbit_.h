@@ -77,7 +77,7 @@ inline double saturation(const LazyDensityOperator& m) {return mode::photonNumbe
 
 inline StateVector state0() {return mode::fock(0,2);}
 inline StateVector state1() {return mode::fock(1,2);}
-StateVector init(const dcomp& psi1);
+StateVector init(dcomp psi1);
 inline StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
@@ -90,7 +90,7 @@ Ptr make(const ParsPumpedLossyPhaseNoise&, QM_Picture);
 class Exact : public mode::Exact
 {
 public:
-  Exact(const dcomp& zI) : mode::Exact(zI,0.,2) {}
+  Exact(dcomp zI) : mode::Exact(zI,0.,2) {}
 
 };
 
@@ -100,10 +100,10 @@ template<bool IS_TIME_DEPENDENT>
 class Hamiltonian : public mode::Hamiltonian<IS_TIME_DEPENDENT>
 {
 public:
-  Hamiltonian(const dcomp& zSch, const dcomp& zI, const dcomp& eta)
+  Hamiltonian(dcomp zSch, dcomp zI, dcomp eta)
     : mode::Hamiltonian<true >(zSch,zI,-eta,0,0,2) {}
 
-  Hamiltonian(const dcomp& zSch,                  const dcomp& eta)
+  Hamiltonian(dcomp zSch,                  dcomp eta)
     : mode::Hamiltonian<false>(zSch,   -eta,0,0,2) {}
 
 };

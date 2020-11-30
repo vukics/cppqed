@@ -62,7 +62,7 @@ private:
   template<int N1, int N2>
   struct ModeDynamics : public tmptools::pair_c<N1,N2>
   {
-    ModeDynamics(MultiLevelPtr ml, mode::Ptr mode, const dcomp& g)
+    ModeDynamics(MultiLevelPtr ml, mode::Ptr mode, dcomp g)
       : a      (-g*mode::aop(mode)),
         adagger((g*mode::aop(mode)).dagger())
     {

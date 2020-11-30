@@ -32,7 +32,7 @@ size_t decideDimension(size_t twoS, size_t dim)
 }
 
 
-Diagonal mainDiagonal(size_t dim, size_t twoS, const dcomp& z)
+Diagonal mainDiagonal(size_t dim, size_t twoS, dcomp z)
 {
   Diagonal diagonal(dim);
   diagonal=blitz::tensor::i-twoS/2.;
@@ -40,7 +40,7 @@ Diagonal mainDiagonal(size_t dim, size_t twoS, const dcomp& z)
 }
 
 
-Tridiagonal splus(size_t dim, size_t twoS, const dcomp& z, bool isExact)
+Tridiagonal splus(size_t dim, size_t twoS, dcomp z, bool isExact)
 {
   Diagonal diagonal(dim-1);
   using blitz::tensor::i;

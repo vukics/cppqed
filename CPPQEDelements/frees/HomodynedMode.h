@@ -29,9 +29,9 @@ class HomodynedBase
   : public Hamiltonian<false>, public structure::ElementLiouvillean<1,2>
 {
 protected:
-  HomodynedBase(const ParsLossy& p, const dcomp& homodyneAmplitude, const dcomp& eta=0.);
+  HomodynedBase(const ParsLossy& p, dcomp homodyneAmplitude, dcomp eta=0.);
 
-  HomodynedBase(const ParsPumpedLossy& p, const dcomp& homodyneAmplitude) : HomodynedBase(p,homodyneAmplitude,p.eta) {}
+  HomodynedBase(const ParsPumpedLossy& p, dcomp homodyneAmplitude) : HomodynedBase(p,homodyneAmplitude,p.eta) {}
 
 private:
   typedef Hamiltonian<false>::StateVectorLow StateVectorLow;
