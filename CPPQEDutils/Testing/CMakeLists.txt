@@ -63,7 +63,7 @@ endforeach()
 
 macro(add_compilefail_test S errorText)
   add_library(${S} OBJECT ${S}.cc)
-  target_link_libraries(${S} CPPQED::CPPQEDutils)
+  target_link_libraries(${S} CPPQED::CPPQEDutils ${ARGN})
   set_target_properties(${S} PROPERTIES EXCLUDE_FROM_ALL TRUE)
   add_test( NAME test_${S} COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR} --target ${S} )
   set_tests_properties(test_${S} PROPERTIES PASS_REGULAR_EXPRESSION ${errorText})

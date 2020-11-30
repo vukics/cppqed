@@ -99,7 +99,7 @@ endmacro()
 #add_subdirectory(run)
 #add_subdirectory(continue)
 #add_subdirectory(compile)
-#add_subdirectory(compilefail)
+add_subdirectory(compilefail)
 #add_subdirectory(boost)
 #add_subdirectory(cpypyqed)
 

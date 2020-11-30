@@ -135,7 +135,7 @@ public:
   template<typename... SubscriptPack>
   void transposeSelf(SubscriptPack... subscriptPack)
   {
-    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
+    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for DensityOperator." );
     getArray().transposeSelf(subscriptPack...,(subscriptPack+RANK)...);
     this->setDimensions(blitzplusplus::halfCutTiny(getArray().shape()));
   }
