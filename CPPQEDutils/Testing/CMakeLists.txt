@@ -5,8 +5,6 @@
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
-configure_file(testdriver.conf.in testdriver.conf)
-
 set(TESTING_EXECUTABLES
     EvolvedTest MultiIndexIteratorNew Randomized)
 
