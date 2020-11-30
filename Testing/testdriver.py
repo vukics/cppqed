@@ -44,12 +44,7 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(mes
 #
 # From this [stackoverflow question](http://stackoverflow.com/questions/600268/mkdir-p-functionality-in-python)
 def mkdir_p(path):
-  try:
-    os.makedirs(path)
-  except (OSError, exc) as e :
-    if e[1].errno == errno.EEXIST:
-      pass
-    else: raise
+  os.makedirs(path,exist_ok=True)
 
 ## Remove a file without error if it doesn't exist.
 # @param filename The file to delete.
@@ -712,7 +707,7 @@ class TrajectoryComparer(Plotter):
 
           data,timeArray,data_label=self._get_data(section=traj,runmode=runmode,n=n)
           reference,reference_label=self._get_reference(section=traj,runmode=runmode,n=n)
-          if not reference_plotted.has_key((reference_label,n)):
+          if (reference_label,n) not in reference_plotted :
             self.plot(timeArray,reference(timeArray),label=reference_label)
             reference_plotted[(reference_label,n)]=True
           self.plot(timeArray,data(timeArray),label=data_label)
@@ -729,7 +724,7 @@ class TrajectoryComparer(Plotter):
     return float(self.get_option('epsilon_'+runmode+'_'+self.test,section=section,required=True).split(',')[n])
 
   def _get_columns(self,section,runmode):
-    return map(int,self.get_option('columns_'+self.test,section=section,required=True).split(','))
+    return [int(s) for s in self.get_option('columns_'+self.test,section=section,required=True).split(',')]
 
   def _get_reference(self,section,runmode,n):
     reference=self.get_option('reference',required=True)

@@ -1,6 +1,6 @@
 [Setup]
-modulepath=@cpypyqed_BINARY_DIR@
-outputdir=output
 expecteddir=@testing_SOURCE_DIR@/expected
+modulepath=@cpypyqed_BINARY_DIR@
+outputdir=@CMAKE_CURRENT_BINARY_DIR@/output
 cmake=@CMAKE_COMMAND@
 builddir=@CMAKE_BINARY_DIR@

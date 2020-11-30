@@ -3,10 +3,13 @@
 
 message(STATUS "Configuring CPPQEDscripts")
 
+# now this is the only collective scripts target, compiles everything needed for the testsuite
+# think over: fewer_scripts should contain such scripts that collectively exemplify all the important features of the framework,
+# so that if they compile then at least the compile-time features are ok
 set(FEWER_SCRIPTS_TARGETS
     PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED
-    QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix SingleParticle Ring Raman CavityRaman)
-
+    QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix SingleParticle 1particle1mode Ring Ring_Evolved Raman CavityRaman)
+    
 foreach(S ${FEWER_SCRIPTS_TARGETS})
   add_executable(${S} ${S}.cc)
   target_link_libraries(${S} CPPQED::CPPQEDelements)

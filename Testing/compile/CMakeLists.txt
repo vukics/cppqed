@@ -2,8 +2,6 @@
 
 testdir(compile)
 
-CPPQED_SETUP()
-
 add_library(TMP_ToolsCompile OBJECT EXCLUDE_FROM_ALL TMP_ToolsCompile.cc)
 add_library(BlitzArraySliceIteratorTMP_Compile OBJECT EXCLUDE_FROM_ALL BlitzArraySliceIteratorTMP_Compile.cc)
 

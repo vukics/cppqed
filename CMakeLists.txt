@@ -157,3 +157,7 @@ add_subdirectory(CPPQEDcore)
 add_subdirectory(CPPQEDelements)
 
 add_subdirectory(CPPQEDscripts)
+
+if(ENABLE_TESTING)
+  add_subdirectory(Testing)
+endif()

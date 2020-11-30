@@ -1,12 +1,11 @@
-# Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 #! \ingroup Main
 #! \file
 #! \brief %CMake file for the C++QED testing suite.
 #!
 #! The file has the following structure:
-
-project(testing)
 
 # Please avoid any special characters in test names (+,^,.,etc.)
 # The ctest command might interpret them as regular expressions
@@ -20,19 +19,18 @@ project(testing)
 #! Find the Python interpreter and add the targets `check_fast` and `ckeck` (c.f. \ref testsuite_running).
 #! Also defines helper macros.
 
-include(${core_BINARY_DIR}/CPPQEDConfig.cmake)
-include(${CPPQED_USE})
+find_package (Python 3.8 COMPONENTS Interpreter NumPy)
 
-find_package(Scipy)
+set ( testing_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Testing )
+set ( testing_BINARY_DIR ${CMAKE_BINARY_DIR}/Testing )
 
-if(NOT ( PYTHONINTERP_FOUND AND NUMPY_FOUND AND SCIPY_FOUND  ) )
-  message(WARNING "Disabling testsuite, not all Python components are available")
-  return()
-endif()
+# there is no official FindScipy, so we assume that NumPy implies Scipy as well
+# find_package(Scipy)
 
-if(NOT COMPILE_SCRIPTS)
-  message(WARNING "Disabling testsuite, scripts are not compiled.")
-  return()
+if( ( TARGET Python::Interpreter ) AND ( TARGET Python::NumPy ) )
+  set ( PYTHONIC_TESTDRIVER_ENABLED ON )
+else()
+  message(WARNING "Some tests disabled, not all Python components are available")
 endif()
 
 configure_file(testdriver.conf.in testdriver.conf)
@@ -44,12 +42,10 @@ configure_file(${CMAKE_SOURCE_DIR}/helperscripts/check_push.sh.in ${CMAKE_BINARY
 #! <!--#########################################################-->
 #!
 
-if(NOT XCODE)
-  add_custom_target(check_fast DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
-  add_custom_target(check DEPENDS check_fast check_compile check_cpypyqed)
-  add_custom_target(check_full DEPENDS check_physics check)
-  add_custom_target(check_push COMMAND ${CMAKE_BINARY_DIR}/check_push.sh)
-endif()
+add_custom_target(check_fast DEPENDS check_compilefail check_run check_continue check_boost testdriver.conf.in)
+add_custom_target(check DEPENDS check_fast check_compile check_cpypyqed)
+add_custom_target(check_full DEPENDS check_physics check)
+add_custom_target(check_push COMMAND ${CMAKE_BINARY_DIR}/check_push.sh)
 
 #! \name Project options
 #! @{
@@ -75,14 +71,12 @@ endif()
 #! It also sets the variable `TESTSCRIPT`, which holds the full path to the python test driver and already
 #! adds some command line parameters: the configuration files and the build configuration.
 macro(testdir dir)
-  set(TESTSDEPEND cpypyqed ${ARGN})
-  if(NOT XCODE)
-    add_custom_target(check_${dir}
-                  COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
-                  DEPENDS ${TESTSDEPEND}
-    )
-  endif()
-  set(TESTSCRIPT ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf ${CMAKE_CURRENT_LIST_DIR}/testdriver.conf --configuration=$<CONFIGURATION>)
+  set(TESTSDEPEND ${ARGN})
+  add_custom_target(check_${dir}
+                    COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} ${CTEST_J}
+                    DEPENDS ${TESTSDEPEND}
+  )
+  set(TESTSCRIPT ${Python_EXECUTABLE} ${testing_SOURCE_DIR}/testdriver.py ${testing_BINARY_DIR}/testdriver.conf ${CMAKE_CURRENT_LIST_DIR}/testdriver.conf --configuration=$<CONFIGURATION>)
 endmacro()
 
 #! \brief Declare a new test.
@@ -93,9 +87,7 @@ endmacro()
 #! Besides setting `TESTNAME`, this macro adds a new target `name` which runs the specific test alone.
 macro(declaretest name)
   set(TESTNAME ${name})
-  if(NOT XCODE)
-    add_custom_target(${name} COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} -R "^${name}$" DEPENDS ${TESTSDEPEND})
-  endif()
+  add_custom_target(${name} COMMAND ${CMAKE_CTEST_COMMAND} ${CTEST_V} -R "^${name}$" DEPENDS ${TESTSDEPEND})
 endmacro()
 
 #! \file
@@ -104,10 +96,13 @@ endmacro()
 #! <!--#########################################################-->
 #!
 
-add_subdirectory(run)
-add_subdirectory(continue)
-add_subdirectory(compile)
-add_subdirectory(compilefail)
-add_subdirectory(boost)
-add_subdirectory(cpypyqed)
+#add_subdirectory(run)
+#add_subdirectory(continue)
+#add_subdirectory(compile)
+#add_subdirectory(compilefail)
+#add_subdirectory(boost)
+#add_subdirectory(cpypyqed)
+
+#if( SCIPY_FOUND )
 add_subdirectory(physics)
+#endif()
