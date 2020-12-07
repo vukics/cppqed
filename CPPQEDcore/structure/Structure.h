@@ -91,7 +91,7 @@ display(std::shared_ptr<const Averaged<RANK> > av,
 
 /// If the first argument is a valid pointer, it calles LiouvilleanAveragedCommon Averaged::average; otherwise a no-op (returning an empty array) \related QuantumSystemWrapper
 template<int RANK>
-const LiouvilleanAveragedCommon::DArray1D average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
+auto average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
 {
   return ptr ? ptr->average(t,matrix) : LiouvilleanAveragedCommon::DArray1D();
 }

@@ -101,24 +101,14 @@ public:
   static std::ostream& displayKeyLA(std::ostream& , size_t&, const Frees&, const VA& acts);
 
   template<structure::LiouvilleanAveragedTag>
-  class DisplayKey;
-  
-  template<structure::LiouvilleanAveragedTag>
   static size_t nAvrLA(const Frees& frees, const VA& acts);
 
   template<structure::LiouvilleanAveragedTag>
-  class NAvr;
- 
-  template<structure::LiouvilleanAveragedTag>
   static const Averages averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr);
-
-  template<structure::LiouvilleanAveragedTag>
-  class Average;
 
 protected:
   // Constructor
-  explicit Base(const Frees& frees, const VA& acts)
-    : RBase(frees), frees_(RBase::getFrees()), acts_(acts) {}
+  explicit Base(const Frees& frees, const VA& acts) : RBase(frees), frees_(RBase::getFrees()), acts_(acts) {}
     
   const VA& getActs() const {return acts_;}
 
@@ -126,7 +116,7 @@ private:
   // Implementing QuantumSystem interface
 
   double         highestFrequency_v(             ) const;
-  std::ostream& displayParameters_v(std::ostream&) const; class DisplayParameters;
+  std::ostream& displayParameters_v(std::ostream&) const;
 
   // Implementing Av_Base
 
@@ -134,8 +124,8 @@ private:
   size_t              nAvr_v()                                         const {return       nAvrLA<structure::LA_Av>(      frees_,acts_         );}
   const Averages   average_v(double t, const LazyDensityOperator& ldo) const {return    averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
   
-  void          process_v(Averages&)                           const; class Process;
-  std::ostream& display_v(const Averages&, std::ostream&, int) const; class Display;
+  void          process_v(Averages&)                           const;
+  std::ostream& display_v(const Averages&, std::ostream&, int) const;
 
   const Frees& frees_;
   const VA      acts_;
@@ -171,8 +161,8 @@ protected:
   Exact(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  bool applicableInMaster_v(                     ) const; class IsUnitary;
-  void actWithU_v(double, StateVectorLow&, double) const; class ActWithU ;
+  void actWithU_v(double, StateVectorLow&, double) const;
+  bool applicableInMaster_v(                     ) const;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -197,7 +187,7 @@ protected:
   Hamiltonian(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; class AddContribution;
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -231,8 +221,8 @@ private:
   size_t              nAvr_v()                                         const override {return Base<VA>::template       nAvrLA<structure::LA_Li>(      frees_,acts_         );}
   const Rates      average_v(double t, const LazyDensityOperator& ldo) const override {return Base<VA>::template    averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
-  void actWithJ_v(double, StateVectorLow&, size_t) const override; class ActWithJ;
-  void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override; class ActWithSuperoperator;
+  void actWithJ_v(double, StateVectorLow&, size_t) const override;
+  void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override;
 
   const Frees& frees_;
   const VA   &  acts_;
@@ -367,7 +357,6 @@ struct MakeConcrete : boost::mpl::identity<Composite<typename make_list<Acts...>
 
 template<typename... Acts>
 struct Make : boost::mpl::identity<typename Base<typename make_list<Acts...>::type>::Ptr> {};
-
 
 
 } // result_of
