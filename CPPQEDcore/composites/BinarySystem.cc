@@ -146,7 +146,7 @@ const Base::Averages average(double t, const Base::LazyDensityOperator& ldo, con
   using boost::copy;
 
   const ArrayName
-    a0 {quantumdata::partialTrace<V0>(ldo,[&](const auto& m){return free0.average<LA>(t,m);})/*bind(&SubSystemFree::average<LA>,free0,t,std::placeholders::_1)*/},
+    a0 {quantumdata::partialTrace<V0>(ldo,[&](const auto& m){return free0.average<LA>(t,m);})},
     a1 {quantumdata::partialTrace<V1>(ldo,[&](const auto& m){return free1.average<LA>(t,m);})},
     a01{ia.average<LA>(t,ldo)};
 
@@ -195,10 +195,14 @@ void binary::Exact::actWithU_v(double t, StateVectorLow& psi, double t0) const
 
 void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
 {
-  using namespace std::placeholders;
+  const auto lambda=[=](auto ha) {
+    return [=](const auto& psiS, auto& dpsidtS) {
+      ha->addContribution(t,psiS,dpsidtS,t0);
+    };
+  };
   
-  if (const auto ha=free0_.getHa()) boost::range::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,t0));
-  if (const auto ha=free1_.getHa()) boost::range::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),bind(&Ha1::addContribution,ha,t,_1,_2,t0));
+  if (const auto ha=free0_.getHa()) boost::range::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),lambda(ha));
+  if (const auto ha=free1_.getHa()) boost::range::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),lambda(ha));
 
   ia_.addContribution(t,psi,dpsidt,t0);
 
@@ -239,7 +243,11 @@ void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) co
 
 void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t i) const
 {
-  using namespace std::placeholders;
+  const auto lambda=[=,&i](auto li) {
+    return [=,&i](const auto& rhoS, auto& drhodtS) {
+      li->actWithSuperoperator(t,rhoS,drhodtS,i);
+    };
+  };
 
   typedef tmptools::Vector<0,2> V0;
   typedef tmptools::Vector<1,3> V1;
@@ -250,13 +258,13 @@ void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperator
 
   size_t n=free0_.nAvr<LA_Li>();
   if (li0 && i<n) {
-    boost::range::for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),bind(&Li1::actWithSuperoperator,li0,t,_1,_2,i));
+    boost::range::for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),lambda(li0));
     return;
   }
 
   i-=n;  
   if (li1 && i<(n=free1_.nAvr<LA_Li>())) {
-    boost::range::for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),bind(&Li1::actWithSuperoperator,li1,t,_1,_2,i));
+    boost::range::for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),lambda(li1));
     return;
   }
 
