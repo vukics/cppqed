@@ -15,7 +15,7 @@ struct Pars
 {
   VC& gs;
 
-  Pars(parameters::Table& p, const std::string& mod="") : gs(p.addTitle("MultiLevelJaynesCummings",mod).addMod("gs",mod,"Multi-Level Jaynes-Cummings couplings",VC()))
+  Pars(parameters::Table& p, const std::string& mod="") : gs(p.addTitle("MultiLevelJaynesCummings",mod).add("gs",mod,"Multi-Level Jaynes-Cummings couplings",VC()))
   {}
 
 };

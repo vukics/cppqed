@@ -12,36 +12,36 @@ const double ParsEvolved::epsAbsDefault=1e-12;
 
 
 ParsRun::ParsRun(parameters::Table& p, const std::string& mod)
-  : T(p.addTitle("Trajectory",mod).addMod("T",mod,"Simulated time",1.)),
-    dc(p.addMod("dc",mod,"Number of steps between two streamings",10)),
-    Dt(p.addMod("Dt",mod,"Timestep between two streamings",.1)),
-    NDt(p.addMod("NDt",mod,"Number of steps in Dt mode",0L)),
-    ofn(p.addMod<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
-    initialFileName(p.addMod<std::string>("initialFileName",mod,"Trajectory initial file name","")),
-    precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision))),
-    streamInfo(p.addMod("streamInfo",mod,"Whether to stream header for trajectories",true)),
-    firstStateStream(p.addMod("firstStateStream",mod,"Streams trajectory state at startup",true)),
-    sdf(p.addMod("sdf",mod,"State output frequency",0u)),
-    autoStopEpsilon(p.addMod("autoStopEpsilon",mod,"Relative precision for autostopping",ParsEvolved::epsRelDefault)),
-    autoStopRepetition(p.addMod("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)),
+  : T(p.addTitle("Trajectory",mod).add("T",mod,"Simulated time",1.)),
+    dc(p.add("dc",mod,"Number of steps between two streamings",10)),
+    Dt(p.add("Dt",mod,"Timestep between two streamings",.1)),
+    NDt(p.add("NDt",mod,"Number of steps in Dt mode",0L)),
+    ofn(p.add<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
+    initialFileName(p.add<std::string>("initialFileName",mod,"Trajectory initial file name","")),
+    precision(p.add("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision))),
+    streamInfo(p.add("streamInfo",mod,"Whether to stream header for trajectories",true)),
+    firstStateStream(p.add("firstStateStream",mod,"Streams trajectory state at startup",true)),
+    sdf(p.add("sdf",mod,"State output frequency",0u)),
+    autoStopEpsilon(p.add("autoStopEpsilon",mod,"Relative precision for autostopping",ParsEvolved::epsRelDefault)),
+    autoStopRepetition(p.add("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)),
     parsedCommandLine_(p.getParsedCommandLine())
 {}
 
 
 ParsEvolved::ParsEvolved(parameters::Table& p, const std::string& mod)
-  : epsRel(p.addTitle("Evolved",mod).addMod("eps"   ,mod,"ODE stepper relative precision",epsRelDefault)),
-    epsAbs(p.addMod("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
-    sf(p.addMod("steppingFunction",mod,"Stepping function for EvolvedGSL",evolved::SF_RKCK)),
-    nextDtTryCorrectionFactor(p.addMod("nextDtTryCorrectionFactor",mod,"Avoiding the tiny-next-timestep-to-try effect at the end of time intervals",100.)),
-    logLevel(p.addMod("logLevel",mod,"logging level",0))
+  : epsRel(p.addTitle("Evolved",mod).add("eps"   ,mod,"ODE stepper relative precision",epsRelDefault)),
+    epsAbs(p.add("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
+    sf(p.add("steppingFunction",mod,"Stepping function for EvolvedGSL",evolved::SF_RKCK)),
+    nextDtTryCorrectionFactor(p.add("nextDtTryCorrectionFactor",mod,"Avoiding the tiny-next-timestep-to-try effect at the end of time intervals",100.)),
+    logLevel(p.add("logLevel",mod,"logging level",0))
 {}
 
 
 ParsStochastic::ParsStochastic(parameters::Table& p, const std::string& mod)
   : ParsEvolved(p,mod),
-    seed(p.addTitle("StochasticTrajectory",mod).addMod("seed",mod,"Random number generator seed",1001ul)),
-    noise(p.addMod("noise",mod,"Switching noise on/off",true)),
-    nTraj(p.addMod("nTraj",mod,"Number of trajectories",size_t(100))) 
+    seed(p.addTitle("StochasticTrajectory",mod).add("seed",mod,"Random number generator seed",1001ul)),
+    noise(p.add("noise",mod,"Switching noise on/off",true)),
+    nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(100))) 
 {}
 
 

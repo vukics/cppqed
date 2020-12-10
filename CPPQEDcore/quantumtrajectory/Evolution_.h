@@ -46,10 +46,10 @@ struct Pars : public trajectory::ParsRun, public Base {
   Pars(parameters::Table& p, const std::string& mod="") 
     : ParsRun(p,mod),
       Base(p,mod),
-      evol(p.addTitle("Evolution",mod).addMod("evol",mod,"Evolution mode (single, ensemble, master)",SINGLE)),
-      negativity(p.addMod("negativity",mod,"Calculates negativity in ensemble & master",false)),
-      timeAverage(p.addMod("timeAverage",mod,"Calculates time averages in MCWF trajectory",false)),
-      relaxationTime(p.addMod("relaxationTime",mod,"Relaxation time for time averaging",0.)) {}    
+      evol(p.addTitle("Evolution",mod).add("evol",mod,"Evolution mode (single, ensemble, master)",SINGLE)),
+      negativity(p.add("negativity",mod,"Calculates negativity in ensemble & master",false)),
+      timeAverage(p.add("timeAverage",mod,"Calculates time averages in MCWF trajectory",false)),
+      relaxationTime(p.add("relaxationTime",mod,"Relaxation time for time averaging",0.)) {}    
 };
 
 

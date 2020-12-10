@@ -8,7 +8,7 @@ namespace jaynescummings {
 
 
 Pars::Pars(parameters::Table& p, const std::string& mod)
-  : g(p.addMod("g",mod,"Qbit-mode coupling",dcomp(1.)))
+  : g(p.add("g",mod,"Qbit-mode coupling",dcomp(1.)))
 {}
 
 

@@ -48,7 +48,7 @@ struct ParsEvolved
   
   /// All `%Pars…` classes are constructed taking a parameters::Table, to register the parameters on
   /** 
-   * This occurs via the parameters::Table::addMod member function returning a reference to the registered parameter wherewith the public attributes
+   * This occurs via the parameters::Table::add member function returning a reference to the registered parameter wherewith the public attributes
    * (like ParsEvolved::epsRel) get initialized.
    */
   ParsEvolved(parameters::Table&, ///<[in/out] the table to register the new parameters on

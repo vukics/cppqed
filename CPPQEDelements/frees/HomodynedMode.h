@@ -20,7 +20,7 @@ struct ParsHomodyned : BASE // BASE either ParsLossy or ParsPumpedLossy
 
   ParsHomodyned(parameters::Table& p, const std::string& mod="")
     : Pars(p,mod), BASE(p,mod),
-      homodyneAmplitude(p.addMod("homodyneAmplitude",mod,"homodyneAmplitude",dcomp(0))) {}
+      homodyneAmplitude(p.add("homodyneAmplitude",mod,"homodyneAmplitude",dcomp(0))) {}
 
 };
 

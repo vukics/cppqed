@@ -15,8 +15,8 @@ struct Pars
   double &delta;
 
   Pars(parameters::Table& p, const std::string& mod="")
-    : qbitInit(p.addTitle("Qbit",mod).addMod("qbitInit",mod,"Qbit initial condition excited",dcomp(0.))),
-      delta(p.addMod("deltaA",mod,"Qbit detuning",-10.)) {}
+    : qbitInit(p.addTitle("Qbit",mod).add("qbitInit",mod,"Qbit initial condition excited",dcomp(0.))),
+      delta(p.add("deltaA",mod,"Qbit detuning",-10.)) {}
       
 };
 
@@ -26,7 +26,7 @@ struct ParsPumped : Pars
   dcomp& eta;
 
   ParsPumped(parameters::Table& p, const std::string& mod="")
-    : Pars(p,mod), eta(p.addTitle("PumpedQbit",mod).addMod("etat",mod,"Qbit pump",dcomp(0.))) {}
+    : Pars(p,mod), eta(p.addTitle("PumpedQbit",mod).add("etat",mod,"Qbit pump",dcomp(0.))) {}
 
 };
 
@@ -37,7 +37,7 @@ struct ParsLossy : BASE
   double &gamma;
 
   ParsLossy(parameters::Table& p, const std::string& mod="")
-    : BASE(p,mod), gamma(p.addTitle("LossyQbit",mod).addMod("gamma",mod,"Qbit decay rate",fabs(BASE::delta))) {}
+    : BASE(p,mod), gamma(p.addTitle("LossyQbit",mod).add("gamma",mod,"Qbit decay rate",fabs(BASE::delta))) {}
 };
 
 
@@ -50,7 +50,7 @@ struct ParsLossyPhaseNoise : BASE
   double &gamma_parallel;
   
   ParsLossyPhaseNoise(parameters::Table& p, const std::string& mod="")
-    : BASE(p,mod), gamma_parallel(p.addMod("gamma_parallel",mod,"Qbit phase flip rate",0.)) {}
+    : BASE(p,mod), gamma_parallel(p.add("gamma_parallel",mod,"Qbit phase flip rate",0.)) {}
   
 };
 
