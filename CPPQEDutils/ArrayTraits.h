@@ -9,17 +9,19 @@ namespace cpputils {
 
 
 /// template metafunction for the rank (arity) of the multi-array `A`
-template<typename A>
-struct Rank;
+template<typename>
+constexpr auto Rank_v="N/A";
 
 /// template metafunction providing an identifier string for the multi-array `A`
-template<typename A>
-struct TypeID;
+template<typename>
+constexpr auto TypeID_v="";
 
 /// template metafunction returning (by convention, as a member typedef `type`) the type of elements of the multi-array `A`
-template<typename A>
+template<typename>
 struct ElementType;
 
+template<typename A>
+using ElementType_t = typename ElementType<A>::type;
 
 /// \name Array memory traits
 //@{
@@ -67,12 +69,12 @@ A create(const A& a); ///< Empty clone (create a newly allocated owning empty ar
  * wherein the return type does not play any role
  */
 template<typename A>
-const typename A::element_type& subscript(const A& a, size_t i);
+const auto& subscript(const A& a, size_t i);
 
 
 /// non-const subscription
 template<typename A>
-      typename A::element_type& subscript(      A& a, size_t i);
+      auto& subscript(      A& a, size_t i);
 
 
 template<typename A>

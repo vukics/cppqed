@@ -3,7 +3,7 @@
 #define   CPPQEDELEMENTS_FREES_BICHROMATICMODE_H_INCLUDED
 
 #include "Mode_.h"
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 
 
 namespace mode {
@@ -29,16 +29,16 @@ public:
   template<typename... AveragingConstructorParameters>
   BichromaticMode(const mode::ParsBichromatic& p, AveragingConstructorParameters&&... a)
     : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
-      mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
+      mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
       ModeBase(p.cutoff,RF{"deltaOther",p.deltaOther,1},{CF{"(kappa*(2*nTh+1),delta)",conj(get_zI()),1},CF{"eta",get_eta(),sqrt(p.cutoff)},CF{"etaOther",p.etaOther,sqrt(p.cutoff)}},"Bichromatic mode"),
       AveragingType(std::forward<AveragingConstructorParameters>(a)...),
-      zI_Other(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.deltaOther)
+      zI_Other(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.deltaOther)
   {
     mode::Hamiltonian<true>::getH_OverIs().push_back(
                                                      furnishWithFreqs(mode::pumping(p.etaOther,getDimension()),
                                                                       mode::mainDiagonal(zI_Other,0,getDimension()))
                                                      );
-    getParsStream()<<"Bichromatic pumping."; mode::isFiniteTempStream(getParsStream(),p.nTh,boost::mpl::bool_<TEMPERATURE>());
+    getParsStream()<<"Bichromatic pumping."; mode::isFiniteTempStream<TEMPERATURE>(getParsStream(),p.nTh);
   }
 
 private:

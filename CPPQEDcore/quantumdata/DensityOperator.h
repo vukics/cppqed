@@ -128,7 +128,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for DensityOperator." );
 #define SLICE_EXPR getArray()(subscriptPack...,subscriptPack...)
-    return DensityOperator<cpputils::Rank<decltype(SLICE_EXPR)>::value/2>(SLICE_EXPR,byReference);
+    return DensityOperator<cpputils::Rank_v<decltype(SLICE_EXPR)>/2>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
   
@@ -260,7 +260,8 @@ dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
 }
 
 
-template <int RANK> struct ArrayRank<DensityOperator<RANK>> {static const int value=2*RANK;};
+template <int RANK>
+constexpr auto ArrayRank_v<DensityOperator<RANK>> = 2*RANK;
 
 
 template<int RANK, typename ... SubscriptPack>

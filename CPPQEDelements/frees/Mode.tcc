@@ -4,7 +4,7 @@
 
 #include "Mode_.h"
 
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 
 
 namespace mode {
@@ -143,66 +143,66 @@ PumpedModeSch<AveragingType>::PumpedModeSch(const mode::ParsPumped& p, Averaging
 template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
 LossyMode<TEMPERATURE,AveragingType>::LossyMode(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
-    mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.omegaKerr,p.cutoff),
+    mode::Exact(dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.delta),p.omegaKerr,p.cutoff),
     ModeBase(p.cutoff,TUPLE_kappadelta(1)),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"Lossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"Lossy."; mode::isFiniteTempStream<TEMPERATURE>(getParsStream(),p.nTh);
 }
 
 
 template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
 LossyModeUIP<TEMPERATURE,AveragingType>::LossyModeUIP(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
-    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),0,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
+    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),0.),dcomp(0.,-p.delta),0,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"Lossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"Lossy, Unitary interaction picture."; mode::isFiniteTempStream<TEMPERATURE>(getParsStream(),p.nTh);
 }
 
 
 template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
 LossyModeSch<TEMPERATURE,AveragingType>::LossyModeSch(const mode::ParsLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
-    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),0,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
+    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.delta),0,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(0)}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"Lossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"Lossy, Schroedinger picture."; mode::isFiniteTempStream<TEMPERATURE>(getParsStream(),p.nTh);
 }
 
 
 template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
 PumpedLossyMode<TEMPERATURE,AveragingType>::PumpedLossyMode(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
-    mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
+    mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(1),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"PumpedLossy."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"PumpedLossy."; mode::isFiniteTempStream<TEMPERATURE>(getParsStream(),p.nTh);
 }
 
 
 template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
 PumpedLossyModeUIP<TEMPERATURE,AveragingType>::PumpedLossyModeUIP(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
-    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),0.),dcomp(0.,-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
+    mode::Hamiltonian<true>(dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),0.),dcomp(0.,-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappa,TUPLE_delta(1)},TUPLE_eta),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"PumpedLossy, Unitary interaction picture."; mode::isFiniteTempStream<TEMPERATURE>(getParsStream(),p.nTh);
 }
 
 
 template<bool TEMPERATURE, typename AveragingType> template<typename... AveragingConstructorParameters>
 PumpedLossyModeSch<TEMPERATURE,AveragingType>::PumpedLossyModeSch(const mode::ParsPumpedLossy& p, AveragingConstructorParameters&&... a)
   : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
-    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay(p,*this),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
+    mode::Hamiltonian<false>(dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
     ModeBase(p.cutoff,{TUPLE_kappadelta(0),TUPLE_eta}),
     AveragingType(std::forward<AveragingConstructorParameters>(a)...)
 {
-  getParsStream()<<"PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream(getParsStream(),p.nTh,*this);
+  getParsStream()<<"PumpedLossy, Schroedinger picture."; mode::isFiniteTempStream<TEMPERATURE>(getParsStream(),p.nTh);
 }
 
 

@@ -30,7 +30,7 @@ class Base
 protected:
   /// A tagging class for Lindblad
   template<int LINDBLAD_ORDINAL, typename=std::enable_if_t< (LINDBLAD_ORDINAL<NLINDBLADS) > >
-  class LindbladNo : mpl::int_<LINDBLAD_ORDINAL> {};
+  using LindbladNo = tmptools::integral_c<LINDBLAD_ORDINAL>;
 
 };
 
@@ -49,35 +49,35 @@ protected:
  * 
  */
 template<int RANK, int LINDBLAD_ORDINAL, bool IS_TIME_DEPENDENT, int NLINDBLADS>
-class _ : public mpl::if_c< (LINDBLAD_ORDINAL>0) ,_<RANK,LINDBLAD_ORDINAL-1,IS_TIME_DEPENDENT,NLINDBLADS>,Base<NLINDBLADS> >::type
+class _ : public std::conditional_t< (LINDBLAD_ORDINAL>0) ,_<RANK,LINDBLAD_ORDINAL-1,IS_TIME_DEPENDENT,NLINDBLADS>,Base<NLINDBLADS> >
 {
 protected:
-  typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
+  typedef time::DispatcherIsTimeDependent_t<IS_TIME_DEPENDENT> Time;
   
   /// calls the virtual doActWithJ for the given LINDBLAD_ORDINAL
   void typeErasedActWithJ(Time t,
                           typename quantumdata::Types<RANK>::StateVectorLow& psi
-                         ) const {doActWithJ(t,psi,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
+                         ) const {doActWithJ(t,psi,tmptools::integral_c<LINDBLAD_ORDINAL>());}
 
   /// calls the virtual rate for the given LINDBLAD_ORDINAL
   double typeErasedRate(Time t,
                         const quantumdata::LazyDensityOperator<RANK>& matrix
-                       ) const {return rate(t,matrix,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
+                       ) const {return rate(t,matrix,tmptools::integral_c<LINDBLAD_ORDINAL>());}
 
   void typeErasedActWithSuperoperator(Time t,
                                       const typename quantumdata::Types<RANK>::DensityOperatorLow& rho,
                                       typename quantumdata::Types<RANK>::DensityOperatorLow& drhodt
-                                     ) const {return doActWithSuperoperator(t,rho,drhodt,typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>());}
+                                     ) const {return doActWithSuperoperator(t,rho,drhodt,tmptools::integral_c<LINDBLAD_ORDINAL>());}
 
 private:
-  virtual void doActWithJ(Time, typename quantumdata::Types<RANK>::StateVectorLow&, typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>) const = 0;
+  virtual void doActWithJ(Time, typename quantumdata::Types<RANK>::StateVectorLow&, tmptools::integral_c<LINDBLAD_ORDINAL>) const = 0;
   
-  virtual double rate(Time, const quantumdata::LazyDensityOperator<RANK>&, typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>) const = 0;
+  virtual double rate(Time, const quantumdata::LazyDensityOperator<RANK>&, tmptools::integral_c<LINDBLAD_ORDINAL>) const = 0;
 
   virtual void doActWithSuperoperator(Time,
                                       const typename quantumdata::Types<RANK>::DensityOperatorLow&,
                                       typename quantumdata::Types<RANK>::DensityOperatorLow&,
-                                      typename Base<NLINDBLADS>::template LindbladNo<LINDBLAD_ORDINAL>
+                                      tmptools::integral_c<LINDBLAD_ORDINAL>
                                     ) const {throw SuperoperatorNotImplementedException(LINDBLAD_ORDINAL);}
   
 };
@@ -220,14 +220,14 @@ public:
   TYPE_DEFINITION_FORWARD
 
   /// Strategy functional for acting with a given Lindblad operator (= performing a given jump) on a state
-  /** The actual signature of the functional is decided on the basis of IS_TIME_DEPENDENT using the compile-time *if*-construct \refBoostConstruct{if_c,mpl/doc/refmanual/if-c.html}. */
-  typedef typename mpl::if_c<IS_TIME_DEPENDENT,std::function<void  (double,       StateVectorLow&     )>,std::function<void  (      StateVectorLow&     )> >::type JumpStrategy;
+  /** The actual signature of the functional is decided on the basis of IS_TIME_DEPENDENT */
+  typedef std::conditional_t<IS_TIME_DEPENDENT,std::function<void  (double,       StateVectorLow&     )>,std::function<void  (      StateVectorLow&     )> > JumpStrategy;
   /// Strategy functional for calculating from a state the jump rate corresponding to a given Lindblad
-  typedef typename mpl::if_c<IS_TIME_DEPENDENT,std::function<double(double, const LazyDensityOperator&)>,std::function<double(const LazyDensityOperator&)> >::type JumpRateStrategy;
+  typedef std::conditional_t<IS_TIME_DEPENDENT,std::function<double(double, const LazyDensityOperator&)>,std::function<double(const LazyDensityOperator&)> > JumpRateStrategy;
   
-  typedef typename mpl::if_c<IS_TIME_DEPENDENT,
+  typedef std::conditional_t<IS_TIME_DEPENDENT,
                              std::function<void(double, const DensityOperatorLow&, DensityOperatorLow&)>,
-                             std::function<void(        const DensityOperatorLow&, DensityOperatorLow&)> >::type SuperoperatorStrategy;
+                             std::function<void(        const DensityOperatorLow&, DensityOperatorLow&)> > SuperoperatorStrategy;
 };
 
 

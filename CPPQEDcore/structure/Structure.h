@@ -238,11 +238,11 @@ protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}
 
 private:
-  typename tmptools::ConditionalAddConst<QuantumSystemPtr,IS_CONST>::type qs_;
-  typename tmptools::ConditionalAddConst<ExactPtr        ,IS_CONST>::type ex_; 
-  typename tmptools::ConditionalAddConst<HamiltonianPtr  ,IS_CONST>::type ha_;
-  typename tmptools::ConditionalAddConst<LiouvilleanPtr  ,IS_CONST>::type li_; 
-  typename tmptools::ConditionalAddConst<AveragedPtr     ,IS_CONST>::type av_;
+  tmptools::ConditionalAddConst_t<QuantumSystemPtr,IS_CONST> qs_;
+  tmptools::ConditionalAddConst_t<ExactPtr        ,IS_CONST> ex_; 
+  tmptools::ConditionalAddConst_t<HamiltonianPtr  ,IS_CONST> ha_;
+  tmptools::ConditionalAddConst_t<LiouvilleanPtr  ,IS_CONST> li_; 
+  tmptools::ConditionalAddConst_t<AveragedPtr     ,IS_CONST> av_;
   
 };
 

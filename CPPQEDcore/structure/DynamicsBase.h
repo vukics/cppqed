@@ -5,8 +5,6 @@
 
 #include "ComplexExtensions.h"
 
-#include <boost/utility.hpp>
-
 #include <list>
 #include <memory>
 #include <tuple>
@@ -41,8 +39,11 @@ namespace structure {
  * and these will in turn be displayed when QuantumSystem::displayParameters is called for the system. Cf. \ref structurebundleguide "the structure-bundle guide".
  * 
  */
-class DynamicsBase : private boost::noncopyable
+class DynamicsBase
 {
+protected:
+  DynamicsBase(const DynamicsBase&) = delete; DynamicsBase& operator=(const DynamicsBase&) = delete;
+
 public:
   typedef std::shared_ptr<const DynamicsBase> Ptr;
 

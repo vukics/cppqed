@@ -158,7 +158,7 @@ public:
 } // binary
 
 
-#define BASE_class(Aux,Class) mpl::if_c<IS_##Aux,binary::Class,binary::EmptyBase<binary::Class> >::type
+#define BASE_class(Aux,Class) std::conditional_t<IS_##Aux,binary::Class,binary::EmptyBase<binary::Class> >
 
 
 /// Implements the simplest composite system: a binary where a single binary::Interaction couples two \link structure::Free free systems\endlink
@@ -183,9 +183,9 @@ class BinarySystem
     public BASE_class(LI,Liouvillean)
 {
 public:
-  typedef typename BASE_class(EX,Exact)             ExactBase;
-  typedef typename BASE_class(HA,Hamiltonian) HamiltonianBase;
-  typedef typename BASE_class(LI,Liouvillean) LiouvilleanBase;
+  typedef BASE_class(EX,Exact)             ExactBase;
+  typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
+  typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
   
   typedef structure::Interaction<2> Interaction;
 

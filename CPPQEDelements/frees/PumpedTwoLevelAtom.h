@@ -44,7 +44,7 @@ private:
 
 
 // In Schroedinger picture the Hamiltonian is implemented as a CMatrix
-class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
+class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
 {
 public:
   typedef PumpedTwoLevelAtom Base;

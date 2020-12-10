@@ -82,7 +82,7 @@ class ExactTimeDependenceDispatched : public Exact<RANK>
 public:
   typedef typename Exact<RANK>::StateVectorLow StateVectorLow;
   
-  typedef typename time::DispatcherIsTwoTime<IS_TWO_TIME>::type Time;
+  typedef time::DispatcherIsTwoTime_t<IS_TWO_TIME> Time;
   
 private:
   void actWithU_v(double t, StateVectorLow& psi, double t0) const final {actWithU_v(Time(t,t0),psi);}

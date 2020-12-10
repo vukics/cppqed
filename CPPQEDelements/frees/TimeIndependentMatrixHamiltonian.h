@@ -10,7 +10,7 @@
 
 #include "CMatrix.h"
 
-class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
+class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
 {
 public:
   typedef linalg::CMatrix CMatrix;

@@ -3,7 +3,7 @@
 #define   CPPQEDELEMENTS_FREES_HOMODYNEDMODE_H_INCLUDED
 
 #include "Mode_.h"
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 
 #include "Pars.h"
 

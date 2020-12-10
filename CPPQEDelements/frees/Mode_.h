@@ -78,15 +78,19 @@ double photonNumber(const StateVectorLow&);
 double photonNumber(const LazyDensityOperator&);
 
 
-inline std::ostream& isFiniteTempStream(std::ostream& os, double    , boost::mpl::false_)
-{return os                                     <<std::endl;}
-inline std::ostream& isFiniteTempStream(std::ostream& os, double nTh, boost::mpl:: true_)
-{return os<<" Finite temperature.\nnTh="<<nTh<<std::endl;}
+template<bool B>
+inline std::ostream& isFiniteTempStream(std::ostream& os, double nTh)
+{
+  if constexpr (B) return os<<" Finite temperature.\nnTh="<<nTh<<std::endl;
+  else return os<<std::endl;
+}
 
-
-inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl::false_) {return p.kappa             ;}
-inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p, boost::mpl:: true_) {return p.kappa*(2.*p.nTh+1);}
-
+template<bool B>
+inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p)
+{
+  if constexpr (B) return p.kappa*(2.*p.nTh+1);
+  else return p.kappa;
+}
 
 const Tridiagonal::Diagonal mainDiagonal(dcomp z, double omegaKerr, size_t dim);
 
@@ -125,9 +129,8 @@ class Hamiltonian
 public:
   typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
-  Hamiltonian(dcomp zSch, dcomp zI, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl:: true_()); // works for IS_TIME_DEPENDENT=true
-  Hamiltonian(dcomp zSch,                  dcomp eta, double omegaKerr, double omegaKerrAlter, size_t, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_()); // works for IS_TIME_DEPENDENT=false
-  // The trailing dummy argument is there to cause a _compile_time_ (and not merely linking time) error in case of misuse
+  template<bool B=IS_TIME_DEPENDENT> Hamiltonian(std::enable_if_t<B==true,dcomp> zSch, dcomp zI, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t);
+  template<bool B=IS_TIME_DEPENDENT> Hamiltonian(std::enable_if_t<B==false,dcomp> zSch, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t);
 
 protected:
   dcomp get_zSch() const {return zSch_;}
@@ -165,8 +168,7 @@ void aDagSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double);
 
 template<bool IS_ALTERNATIVE>
 class Liouvillean<false,IS_ALTERNATIVE> 
-  : protected boost::mpl::false_, // Tagging for the isFiniteTemp... functions
-    public structure::ElementLiouvillean<1,1>
+  : public structure::ElementLiouvillean<1,1>
 {
 protected:
   Liouvillean(double kappa, double=0, const std::string& kT=keyTitle) : structure::ElementLiouvillean<1,1>(kT,"excitation loss"), kappa_(kappa) {}
@@ -174,7 +176,12 @@ protected:
 
 private:
   void   doActWithJ (NoTime, StateVectorLow& psi       ) const override {details::aJump(psi,kappa_);}
-  double rate       (NoTime, const LazyDensityOperator&) const override;
+  
+  double rate       (NoTime, const LazyDensityOperator& m) const override
+  {
+    if constexpr (IS_ALTERNATIVE) return -1.;
+    else return 2*kappa_*photonNumber(m);
+  }
 
   void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt) const override {details::aSuperoperator(rho,drhodt,kappa_);}
   
@@ -190,10 +197,18 @@ class LiouvilleanFiniteTemperatureBase
 protected:
   LiouvilleanFiniteTemperatureBase(double kappa, double nTh) : kappa_(kappa), nTh_(nTh) {}
   
-  double rate0(const LazyDensityOperator&, boost::mpl::false_) const;
-  double rate1(const LazyDensityOperator&, boost::mpl::false_) const;
-  double rate0(const LazyDensityOperator&, boost::mpl:: true_) const {return -1.;}
-  double rate1(const LazyDensityOperator&, boost::mpl:: true_) const {return -1.;}
+  template<bool IA> double rate0(const LazyDensityOperator& m) const
+  {
+    if constexpr (IA) return -1.;
+    else return 2.*kappa_*(nTh_+1)*photonNumber(m);
+  }
+  
+  template<bool IA> double rate1(const LazyDensityOperator& m) const
+  {
+    if constexpr (IA) return -1.;
+    else return 2.*kappa_*nTh_*(photonNumber(m)+m.trace());
+
+  }
   
   const double kappa_, nTh_;
 
@@ -205,7 +220,6 @@ protected:
 template<bool IS_ALTERNATIVE> 
 class Liouvillean<true ,IS_ALTERNATIVE>
   : private details::LiouvilleanFiniteTemperatureBase,
-    protected boost::mpl::true_,
     public structure::ElementLiouvillean<1,2>
 {
 protected:
@@ -218,8 +232,8 @@ private:
   void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const override {details::   aJump(psi,kappa_*(nTh_+1));}
   void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const override {details::aDagJump(psi,kappa_* nTh_   );}
   
-  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const override {return rate0(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
-  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const override {return rate1(matrix,boost::mpl::bool_<IS_ALTERNATIVE>());}
+  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<0>) const override {return rate0<IS_ALTERNATIVE>(matrix);}
+  double rate(NoTime, const LazyDensityOperator& matrix, LindbladNo<1>) const override {return rate1<IS_ALTERNATIVE>(matrix);}
 
   void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladNo<0>) const override {details::   aSuperoperator(rho,drhodt,kappa_*(nTh_+1));}
   void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, LindbladNo<1>) const override {details::aDagSuperoperator(rho,drhodt,kappa_* nTh_   );}

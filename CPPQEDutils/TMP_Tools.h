@@ -27,11 +27,6 @@
 #define FUSION_MAX_LIST_SIZE FUSION_MAX_VECTOR_SIZE
 #endif // FUSION_MAX_LIST_SIZE
 
-#include <boost/type_traits/add_const.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-#include <boost/type_traits/remove_const.hpp>
-
-
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/vector.hpp>
@@ -44,26 +39,17 @@
 #include <boost/mpl/plus.hpp>
 #include <boost/mpl/push_back.hpp>
 
-
-#define DEFINE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName;
-
-#define DEFINE_INITIALIZE_TYPED_STATIC_CONST(typeDescription,typeName,variableName) typedef typeDescription typeName; static const typeName variableName=typeName();
-
+#include <type_traits>
 
 /// Template metaprogramming tools
 namespace tmptools {
 
+template<auto I>
+using integral_c=std::integral_constant<decltype(I),I>;
+  
 
-/// Combines \refBoostConstruct{remove_const,type_traits/doc/html/boost_typetraits/reference/remove_const.html} and \refBoostConstruct{remove_reference,type_traits/doc/html/boost_typetraits/reference/remove_reference.html}
-template<typename T>
-struct RemoveConstReference : boost::remove_const<typename boost::remove_reference<T>::type>
-{};
-
-
-/// Applies \refBoostConstruct{add_const,type_traits/doc/html/boost_typetraits/reference/add_const.html} if `ADD_CONST = true`.
 template<typename T, bool ADD_CONST>
-struct ConditionalAddConst 
-  : boost::mpl::eval_if_c<ADD_CONST,boost::add_const<T>,boost::mpl::identity<T> > {};
+using ConditionalAddConst_t = std::conditional_t<ADD_CONST,std::add_const_t<T>,T>;
 
 
 /// An integer \refBoostConstruct{range_c,mpl/doc/refmanual/range-c.html} starting with `Nbeg` and having `N` elements (`Nbeg ... Nbeg+N-1`)
@@ -75,10 +61,12 @@ template<int N> struct Ordinals : Range<N,0> {};
 
 
 /// Calculates the power \f$N_1^{N_2}\f$ @ compile time
-template<unsigned N1, unsigned N2> struct Power       : boost::mpl::int_<N1*Power<N1,N2-1>::value> {};
+template<unsigned N1, unsigned N2>
+constexpr int Power_v=N1*Power_v<N1,N2-1>;
 
 /** \cond SPECIALIZATION */
-template<unsigned N1>              struct Power<N1,0> : boost::mpl::int_<1>                        {};
+template<unsigned N1>
+constexpr int Power_v<N1,0> =1;
 /** \endcond */
 
 
@@ -101,8 +89,8 @@ struct numerical_contains : boost::mpl::not_<boost::is_same<typename boost::mpl:
                                              > {};
 
 /// The `_c` version of numerical_contains, which expects a value instead of an integral constant wrapper
-template<typename Seq, typename T, T VALUE>
-struct numerical_contains_c : numerical_contains<Seq,boost::mpl::integral_c<T,VALUE> > {};
+template<typename Seq, auto VALUE>
+struct numerical_contains_c : numerical_contains<Seq,boost::mpl::integral_c<decltype(VALUE),VALUE> > {};
 
 
 namespace details {
@@ -123,35 +111,41 @@ struct numerical_equal : boost::mpl::equal<Seq1,Seq2,details::value_equal<boost:
 {};
 
 
-template<bool COND, int TRUE_VALUE, int FALSE_VALUE> using integral_if_c = boost::mpl::if_c<COND,boost::mpl::int_<TRUE_VALUE>,boost::mpl::int_<FALSE_VALUE> >;
+template<bool COND, auto TRUE_VALUE, auto FALSE_VALUE>
+constexpr auto integral_if_c_v = std::conditional_t<COND,integral_c<TRUE_VALUE>,integral_c<FALSE_VALUE>>::value;
 
-template<typename COND, int TRUE_VALUE, int FALSE_VALUE> using integral_if = integral_if_c<COND::value,TRUE_VALUE,FALSE_VALUE>;
+template<typename COND, auto TRUE_VALUE, auto FALSE_VALUE>
+constexpr auto integral_if_v = integral_if_c_v<COND::value,TRUE_VALUE,FALSE_VALUE>;
 
 
 /// Provokes a compile-time error if `N` is not even, otherwise acts as a Boost.MPL \refBoostConstruct{int_,mpl/doc/refmanual/int.html} integral constant wrapper of `N/2`
-template<int N>
-struct AssertEvenAndDivideBy2 : boost::mpl::int_<N/2>
+template<auto N>
+struct AssertEvenAndDivideBy2 : integral_c<N/2>
 {
   static_assert( 2*(N/2)==N , "Argument not even" );
 };
 
 
-/// A compile-time pair of integers
+template<auto N>
+constexpr auto AssertEvenAndDivideBy2_v=AssertEvenAndDivideBy2<N>::value;
+
+
+/// A compile-time pair of integral types
 /** \tparam IS_EXCLUSIVE governs the exclusivity of the pair, that is, in the case of `IS_EXCLUSIVE=true`, the class provokes a compile-time error if `N1=N2` */
-template<int N1, int N2, bool IS_EXCLUSIVE=true>
+template<auto N1, auto N2, bool IS_EXCLUSIVE=true>
 struct pair_c;
 
 /// A non-exclusive pair_c that allows the members to be equal
-template<int N1, int N2>
+template<auto N1, auto N2>
 struct pair_c<N1,N2,false>
 {
   //  enum { first=N1, second=N2 };
 
-  static const int first =N1;
-  static const int second=N2;
+  static const auto first =N1;
+  static const auto second=N2;
   
   /** \cond FORTESTING */
-  template<int MIN, int MAX>
+  template<auto MIN, auto MAX>
   struct SanityCheck
   {
     static_assert( N1>=MIN && N2>=MIN && N1<=MAX && N2<=MAX , "pair_c sanity check failed" );
@@ -160,17 +154,17 @@ struct pair_c<N1,N2,false>
 
 };
 
-// Apparently, in the above, the static const is DECLARED only. Some compilers (including gcc in some circumstances) need to have them DEFINED as well, which is done below. Cf EffC++ 3rd Edition, item 2.
-
-template<int N1, int N2>
-const int pair_c<N1,N2,false>::first;
-
-template<int N1, int N2>
-const int pair_c<N1,N2,false>::second;
+// // Apparently, in the above, the static const is DECLARED only. Some compilers (including gcc in some circumstances) need to have them DEFINED as well, which is done below. Cf EffC++ 3rd Edition, item 2.
+// 
+// template<int N1, int N2>
+// const int pair_c<N1,N2,false>::first;
+// 
+// template<int N1, int N2>
+// const int pair_c<N1,N2,false>::second;
 
 
 /// An exclusive pair_c that provokes a compile-time error if the members are equal
-template<int N1, int N2>
+template<auto N1, auto N2>
 struct pair_c<N1,N2,true> : pair_c<N1,N2,false> 
 {
   static_assert( N1!=N2 , "pair_c with equal elements" );
@@ -224,6 +218,8 @@ struct ExtendVector : boost::mpl::fold<V,
 {};
 
 
+template<int RANK, typename V>
+using ExtendVector_t = typename ExtendVector<RANK,V>::type;
 
 } // tmptools
 

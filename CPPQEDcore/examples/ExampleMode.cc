@@ -3,7 +3,7 @@
 
 #include "ElementLiouvillean.h"
 #include "Tridiagonal.tcc"
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 
 #include <boost/bind.hpp>
 

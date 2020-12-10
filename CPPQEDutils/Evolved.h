@@ -136,7 +136,7 @@ private:
 template<typename A>
 class EvolvedIO : public TimeStepBookkeeper, public LoggingBase
 {
-  EvolvedIO(const EvolvedIO&) = delete; EvolvedIO& operator=(const EvolvedIO&) = delete; // noncopyable
+  EvolvedIO(const EvolvedIO&) = delete; EvolvedIO& operator=(const EvolvedIO&) = delete;
 
 public:
   typedef std::shared_ptr<EvolvedIO>            Ptr;

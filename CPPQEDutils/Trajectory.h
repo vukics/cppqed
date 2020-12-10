@@ -93,8 +93,12 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
  * \todo Consider the possibility of cloning Trajectories
  */
 template<typename DA>
-class Trajectory : private boost::noncopyable
+class Trajectory
 {
+protected:
+  Trajectory(const Trajectory&) = delete; Trajectory& operator=(const Trajectory&) = delete;
+  Trajectory() = default;
+  
 public:
   /// Propagation for a time interval of exactly deltaT
   void evolve(double deltaT) {evolve_v(deltaT);}

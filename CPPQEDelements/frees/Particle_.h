@@ -121,13 +121,15 @@ namespace details { struct EmptyBase {}; }
 template<bool IS_TIME_DEPENDENT>
 class Hamiltonian 
   : public quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT>,
-    public mpl::if_c<IS_TIME_DEPENDENT,Exact,details::EmptyBase>::type
+    public std::conditional_t<IS_TIME_DEPENDENT,Exact,details::EmptyBase>
 {
 public:
   typedef quantumoperator::TridiagonalHamiltonian<1,IS_TIME_DEPENDENT> Base;
 
   Hamiltonian(const Spatial&, double omrec, double vClass, const ModeFunction&);
-  Hamiltonian(const Spatial&, double omrec, mpl::bool_<IS_TIME_DEPENDENT> =mpl::false_());
+  
+  template<bool B=!IS_TIME_DEPENDENT>
+  Hamiltonian(std::enable_if_t<B,const Spatial&>, double omrec);
 
 };
 

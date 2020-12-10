@@ -39,10 +39,10 @@ public:
    * \todo 3rd argument should be passed by rvalue reference — move constructor for `blitz::Array` needed for this?
    *
    */
-  void addContribution(double t, ///<[in] the time instant \f$t\f$ for #TWO_TIME dependence
+  void addContribution(double t, ///<[in] the time instant \f$t\f$ for #TWO dependence
                        const StateVectorLow& psi, ///<[in] the state vector \f$\ket\Psi\f$
                        StateVectorLow& dpsidt, ///<[in/out] the state vector to be contributed to by \f$\frac{H(t)}i\ket\Psi\f$
-                       double t0 ///<[in] the time instant \f$t_0\f$ for #TWO_TIME dependence
+                       double t0 ///<[in] the time instant \f$t_0\f$ for #TWO dependence
                       ) const
                        {addContribution_v(t,psi,dpsidt,t0);}
 
@@ -65,7 +65,7 @@ class HamiltonianTimeDependenceDispatched : public Hamiltonian<RANK>
 public:
   typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow;
   
-  typedef typename time::Dispatcher<TD>::type Time; ///< The actual time-dependence level from the template parameter `TD`
+  typedef time::Dispatcher_t<TD> Time; ///< The actual time-dependence level from the template parameter `TD`
 
 private:
   /// The inherited virtual gets implemented by calling a newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink

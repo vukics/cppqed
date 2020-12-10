@@ -14,35 +14,27 @@ namespace composite {
 using namespace mpl;
 
 template<typename VEC, typename Pred=less<mpl::_1,mpl::_2> >
-struct MaxMF : deref<typename boost::mpl::max_element<VEC,Pred>::type>::type {};
+using MaxMF_t = typename deref<typename boost::mpl::max_element<VEC,Pred>::type>::type;
 
 template<typename VEC1, typename VEC2>
-struct SeqLess : less<typename MaxMF<VEC1>::type,typename MaxMF<VEC2>::type> {};
+struct SeqLess : less<MaxMF_t<VEC1>,MaxMF_t<VEC2>> {};
 
 namespace namehider {
 
-using namespace tmptools;
-
 template<typename VA, typename ICW>
-struct InnerCheck : fold<VA,false_,or_<numerical_contains<mpl::_2,ICW>,mpl::_1> > {};
-
-template<int RANK, typename VA>
-struct Algorithm
-  : fold<Ordinals<RANK>,
-         true_,
-         and_<mpl::_1,
-              InnerCheck<VA,mpl::_2>
-              >
-         > 
-{};
-
+struct InnerCheck : fold<VA,false_,or_<tmptools::numerical_contains<mpl::_2,ICW>,mpl::_1> > {};
 
 } // namehider
 
 
 template<int RANK, typename VA>
-struct CheckMeta : namehider::Algorithm<RANK,VA>
-{};
+constexpr bool CheckMeta_v=
+  fold<tmptools::Ordinals<RANK>,
+       true_,
+       and_<mpl::_1,
+            namehider::InnerCheck<VA,mpl::_2>
+           >
+      >::type::value;
 
 
 } // composite

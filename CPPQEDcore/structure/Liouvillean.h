@@ -99,7 +99,7 @@ public:
   typedef typename Liouvillean<RANK>::LazyDensityOperator LazyDensityOperator;
   typedef typename Liouvillean<RANK>::Rates               Rates              ;
   
-  typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
+  typedef time::DispatcherIsTimeDependent_t<IS_TIME_DEPENDENT> Time;
 
 private:
   void         actWithJ_v(double t, StateVectorLow& psi, size_t lindbladNo) const final {actWithJ_v(Time(t),psi,lindbladNo);}   ///< Redirects the virtual inherited from Liouvillean<RANK>

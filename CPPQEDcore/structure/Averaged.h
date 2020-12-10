@@ -105,7 +105,7 @@ public:
   typedef typename Averaged<RANK>::Averages            Averages           ;
   typedef typename Averaged<RANK>::LazyDensityOperator LazyDensityOperator;
   
-  typedef typename time::DispatcherIsTimeDependent<IS_TIME_DEPENDENT>::type Time;
+  typedef time::DispatcherIsTimeDependent_t<IS_TIME_DEPENDENT> Time;
 
 private:
   const Averages average_v(double t, const LazyDensityOperator& matrix) const final {return average_v(Time(t),matrix);}

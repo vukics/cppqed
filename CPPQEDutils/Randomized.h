@@ -8,15 +8,13 @@
 
 #include <boost/range/algorithm/generate.hpp>
 
-#include <boost/bind.hpp>
-#include <boost/utility.hpp>
-
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/split_member.hpp>
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <stdexcept>
+#include <memory>
 
 /// the randomized-bundle
 namespace randomized {
@@ -27,8 +25,12 @@ namespace randomized {
  * 
  * \note The logical state of the class is the state of the underlying generator, so that everything that (may) change this state, for example sampling, is logically non-const.
  */
-class Randomized : private boost::noncopyable
+class Randomized
 {
+protected:
+  Randomized(const Randomized&) = delete; Randomized& operator=(const Randomized&) = delete;
+  Randomized() = default;
+
 public:
   typedef std::shared_ptr<Randomized> Ptr;
 
@@ -120,7 +122,7 @@ public:
 template<typename A>
 const Randomized::Ptr fillWithRandom(A& data, Randomized::Ptr ran)
 {
-  boost::generate(data,boost::bind(sample<typename cpputils::ElementType<A>::type>,ran));
+  for (auto& d : data) d=sample<cpputils::ElementType_t<A>>(ran);
   return ran;
 }
 

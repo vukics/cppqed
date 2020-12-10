@@ -32,11 +32,12 @@ namespace cpputils {
 namespace sliceiterator {
   
 /// A forwarding metafunction to boost::mpl::size
-template <typename V> struct Size : boost::mpl::size<V> {};
+template <typename V>
+constexpr size_t Size_v = boost::mpl::size<V>::value;
 
-template <template <int> class ARRAY, typename V> using ResArray=ARRAY<Size<V>::value>;
+template <template <int> class ARRAY, typename V> using ResArray=ARRAY<Size_v<V>>;
 
-template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size<V>::value>; 
+template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size_v<V>>; 
 // note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
 
 using mii::Begin; using mii::End;
@@ -53,7 +54,7 @@ using mii::Begin; using mii::End;
  */
 template<int RANK, typename V> struct ConsistencyChecker
 {
-  static_assert( RANK >= Size<V>::value , "Indexer with nonpositive RANK." );
+  static_assert( RANK >= Size_v<V> , "Indexer with nonpositive RANK." );
 
   typedef typename boost::mpl::sort<V>::type SortedV;
   static_assert( boost::mpl::equal<typename boost::mpl::unique<SortedV,boost::is_same<boost::mpl::_1,boost::mpl::_2> >::type,SortedV>::value ,
@@ -83,7 +84,7 @@ template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ord
  * 
  * \param idx the indices to be filtered (of number `RANK`)
  * 
- * \return the indices *not* contained by the subsystem specified by `V` (of number `RANK-Size<V>::value`)
+ * \return the indices *not* contained by the subsystem specified by `V` (of number `RANK-Size_v<V>`)
  * 
  */
 template<int RANK, typename V>
@@ -110,14 +111,14 @@ auto filterOut(const IdxTiny<RANK>& v)
  * 
  * \tparamRANK \tparamV
  * 
- * \pre `Size<V> <= RANK`
+ * \pre `Size_v<V> <= RANK`
  * 
  * The technique of using (non-templated) static worker functions of class templates is meant to allow partial specializations, which are not possible for function templates.
  * 
  * \internal These are just rudimentary definitions, the actual definitions being partial specializations of Transposer::_ and Indexer::_ along RANK 
  * (cf. trailing part of `BlitzArraySliceIterator.tcc`) The functions will throw if a partial specialization for the given RANK does not exist. \endinternal
  * 
- * \see \ref iteratorimplementation
+ * \see \ref iteratorimplementation,*this
  * 
  * @{
  */
@@ -132,7 +133,7 @@ public:
    * Transposition corresponding to the "possible permutation" of the retained indices (cf. \ref multiarrayconcept "Synopsis"), which is necessary in order that \f$\avr{1,3,6,7,9}\f$
    * be the corresponding state vector slice, since this is how it is expected in applications. Cf. Composite for further explanations.
    * 
-   * \return Simply the reference to the function argument.
+   * \return Simply the reference to the function argument.,*this
    * 
    * \par Semantics
    * ~~~
@@ -161,7 +162,7 @@ class Indexer
 public:
   /// Static worker
   /**
-   * \return Reference to resArray
+   * \return Reference to resArray,*this
    * 
    * \par Semantics
    * ~~~
@@ -201,7 +202,7 @@ public:
 //////////////////////////
 
 // TODO: Think over: is the following solution based on inheritance to solve the specialization problem optimal?  Note: this is NOT allowed (specialization depending on a template parameter)
-// template<typename V> SliceIterator<Size<V>::value,V>;
+// template<typename V> SliceIterator<Size_v<V>,V>;
 
 template<template <int> class, typename>
 class BaseTrivial;
@@ -214,13 +215,11 @@ class Base;
 
 } // sliceiterator
 
-#define BASE_class boost::mpl::if_c<RANK==1,\
-                                    sliceiterator::BaseTrivial<ARRAY,V>,\
-                                    typename boost::mpl::if_c<RANK==sliceiterator::Size<V>::value,\
-                                                              sliceiterator::BaseSpecial<ARRAY,V>,\
-                                                              sliceiterator::Base<ARRAY,RANK,V>\
-                                                             >::type\
-                                   >::type
+#define BASE_class std::conditional_t<RANK==1,\
+                                      sliceiterator::BaseTrivial<ARRAY,V>,\
+                                      std::conditional_t<RANK==sliceiterator::Size_v<V>,\
+                                                         sliceiterator::BaseSpecial<ARRAY,V>,\
+                                                         sliceiterator::Base<ARRAY,RANK,V>>>
 
 
 /// SliceIterator
@@ -282,7 +281,7 @@ class SliceIterator
     private sliceiterator::ConsistencyChecker<RANK,V>
 {
 public:
-  typedef typename BASE_class Base;
+  typedef BASE_class Base;
 
 #undef  BASE_class
 
@@ -291,7 +290,7 @@ public:
   /// Can be initialized either to the beginning or the end of the sequence of dummy-index combinations
   /** \tparam IS_END governs the end-ness */
   template<bool IS_END>
-  SliceIterator(const ARRAY<RANK>& array, boost::mpl::bool_<IS_END> ie) : Base(array,ie) {}
+  SliceIterator(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : Base(array,ie) {}
 
 };
 
@@ -324,10 +323,10 @@ template<template <int> class ARRAY, int RANK, typename V>
 class Base
 {
 public:
-  static const int RANKIDX=RANK-Size<V>::value;
+  static const int RANKIDX=RANK-Size_v<V>;
 
   template <bool IS_END>
-  Base(const ARRAY<RANK>& array, boost::mpl::bool_<IS_END> ie)
+  Base(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie)
     : array_(array), resArray_(), mii_(filterOut<RANK,V>(array.lbound()),filterOut<RANK,V>(array.ubound()),ie)
   {
     if constexpr (!IS_END) {
@@ -355,15 +354,15 @@ private:
 };
 
 
-/// used in the case when `Size<V> = RANK` and when `RANK = 1`
+/// used in the case when `Size_v<V> = RANK` and when `RANK = 1`
 template<template <int> class ARRAY, typename V>
 class BaseTrivial
 {
 public:
-  static const int RANK=Size<V>::value;
+  static const int RANK=Size_v<V>;
 
   template <bool IS_END>
-  BaseTrivial(const ARRAY<RANK>& array, boost::mpl::bool_<IS_END>)
+  BaseTrivial(const ARRAY<RANK>& array, std::bool_constant<IS_END>)
     : array_(), isEnd_(IS_END)
   {
     if constexpr (!IS_END) array_.reference(array);
@@ -384,7 +383,7 @@ private:
 };
 
 
-/// used in the case when `Size<V> = RANK`
+/// used in the case when `Size_v<V> = RANK`
 template<template <int> class ARRAY, typename V>
 class BaseSpecial : public BaseTrivial<ARRAY,V>
 {
@@ -392,9 +391,9 @@ public:
   using BaseTrivial<ARRAY,V>::RANK;
 
   template <bool IS_END>
-  BaseSpecial(const ARRAY<RANK>& array, boost::mpl::bool_<IS_END> ie) : BaseTrivial<ARRAY,V>(array,ie)
+  BaseSpecial(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : BaseTrivial<ARRAY,V>(array,ie)
   {
-    if constexpr (!IS_END) Transposer<ARRAY,Size<V>::value,V>::_(this->array_);
+    if constexpr (!IS_END) Transposer<ARRAY,Size_v<V>,V>::_(this->array_);
   }
 
 };
@@ -415,7 +414,7 @@ public:
  * \refBoost{Boost.Fusion,fusion/doc/html/index.html} library is used.
  * 
  * SliceIterator is implemented in terms of the above two helper classes. Each SliceIterator invokes a Transposer::_ at its construction, and – if `RANK` is larger
- * than `Size<V>::value` – an Indexer::_ @ the point of its dereferencing when the actual slicing occurs.
+ * than `Size_v<V>` – an Indexer::_ @ the point of its dereferencing when the actual slicing occurs.
  * 
  * SliceIterator is a forward iterator, implemented with the help of \refBoostConstruct{forward_iterator_helper,utility/operators.htm#iterator} from Boost.Operator.
  * For this to work, we need to define only 3 operations:
@@ -424,7 +423,7 @@ public:
  * -# Dereferencing
  * A special implementation is needed when the size of the compile-time vector `V` equals `RANK` because in this case actually no slicing takes place,
  * only transposition. For this, as at several other places in the framework, we apply conditional inheritance: SliceIterator inherits from either of two classes 
- * (details::Base or details::BaseSpecial), the decision being made @ compile time with the help of `boost::mpl::if_c`.
+ * (details::Base or details::BaseSpecial).
  * 
  * The iteration over dummy indices is implemented with the help of cpputils::MultiIndexIterator.
  * 
@@ -484,7 +483,7 @@ public:
  * 
  * \par Preconditions
  * 
- * - `Size<V>::value` must not be larger than the arity
+ * - `Size_v<V>` must not be larger than the arity
  * - `V` must not “contain”
  *   - negative values,
  *   - values not smaller than the arity, and

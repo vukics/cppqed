@@ -96,8 +96,7 @@ struct Algorithm
 
 
 template<int RANK, typename V>
-struct TransposerMeta : boost::mpl::first<typename namehider::Algorithm<RANK,V>::type>
-{};
+using TransposerMeta_t = typename boost::mpl::first<typename namehider::Algorithm<RANK,V>::type>::type;
 
 } // details
 
@@ -137,7 +136,7 @@ namespace cpputils { namespace sliceiterator {
 
 template<template <int> class ARRAY, typename V> struct Transposer<ARRAY,rank,V>
 {
-  typedef typename details::TransposerMeta<rank,V>::type TM;
+  typedef details::TransposerMeta_t<rank,V> TM;
 
   static auto& _(ARRAY<rank>& array)
   {

@@ -2,7 +2,7 @@
 #include "ExampleMode.h"
 
 #include "Interaction.h"
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 #include "StateVector.h"
 
 namespace basic {

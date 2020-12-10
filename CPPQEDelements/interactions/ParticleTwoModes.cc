@@ -4,7 +4,7 @@
 #include "MathExtensions.h"
 #include "SliceIterator.tcc"
 #include "Tridiagonal.tcc"
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 
 
 using namespace std;

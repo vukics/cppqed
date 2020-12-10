@@ -5,7 +5,7 @@
 #include "ParticleInitialCondition.h"
 
 #include "LazyDensityOperatorFFT.h"
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 
 #include <boost/math/special_functions/hermite.hpp>
 
@@ -116,8 +116,8 @@ Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, double vClas
 }
 
 
-template<>
-Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec, boost::mpl::bool_<false>)
+template<> template<>
+Hamiltonian<false>::Hamiltonian(const Spatial& space, double omrec)
   : Base(
          Tridiagonal(mainDiagonal(space,-omrec))
          )

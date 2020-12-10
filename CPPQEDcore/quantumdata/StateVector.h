@@ -117,7 +117,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
 #define SLICE_EXPR getArray()(subscriptPack...)
-    return StateVector<cpputils::Rank<decltype(SLICE_EXPR)>::value>(SLICE_EXPR,byReference);
+    return StateVector<cpputils::Rank_v<decltype(SLICE_EXPR)>>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
   
@@ -206,7 +206,8 @@ dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 }
 
 
-template <int RANK> struct ArrayRank<StateVector<RANK>> {static const int value=RANK;};
+template <int RANK>
+constexpr auto ArrayRank_v<StateVector<RANK>> = RANK;
 
 
 template<int RANK, typename ... SubscriptPack>

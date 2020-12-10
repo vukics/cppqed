@@ -14,8 +14,6 @@
 
 #include "Exception.h"
 
-#include <boost/utility.hpp>
-
 
 namespace particlecavity_interferenceworkaround {
 

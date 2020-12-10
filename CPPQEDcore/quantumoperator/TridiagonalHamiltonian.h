@@ -5,7 +5,7 @@
 
 #include "Hamiltonian.h"
 
-#include "Tridiagonal.h"
+#include "Tridiagonal.tcc"
 
 #include <list>
 
@@ -21,10 +21,10 @@ using namespace structure;
 template<int RANK, bool IS_TIME_DEPENDENT>
 class TDH_Base 
   : public HamiltonianTimeDependenceDispatched<RANK,
-                                               mpl::if_c<IS_TIME_DEPENDENT,
-                                                         mpl::integral_c<TimeDependence,ONE_TIME>,
-                                                         mpl::integral_c<TimeDependence, NO_TIME>
-                                                         >::type::value
+                                               std::conditional_t<IS_TIME_DEPENDENT,
+                                                                  tmptools::integral_c<TimeDependence::ONE>,
+                                                                  tmptools::integral_c<TimeDependence::NO>
+                                                                  >::value
                                                >
 {
 protected:
@@ -40,13 +40,13 @@ protected:
         Tridiagonals& getH_OverIs()       {return const_cast<Tridiagonals&>(static_cast<const TDH_Base*>(this)->getH_OverIs());}
 
 private:
-  /// \name Virtuals inherited from HamiltonianTimeDependenceDispatched
-  //@{
-  void addContribution_v(OneTime, const StateVectorLow&, StateVectorLow&) const;
-  ///< implements HamiltonianTimeDependenceDispatched<RANK,ONE_TIME> and can be used only when `IS_TIME_DEPENDENT=true`. \see the technique used @ FreeExact & ElementLiouvillean
-  void addContribution_v( NoTime, const StateVectorLow&, StateVectorLow&) const;
-  ///< implements HamiltonianTimeDependenceDispatched<RANK,NO_TIME> and can be used only in the opposite case.
-  //@}
+  /// \name Virtual inherited from HamiltonianTimeDependenceDispatched
+  void addContribution_v(std::conditional_t<IS_TIME_DEPENDENT,OneTime,NoTime> t, const StateVectorLow& psi, StateVectorLow& dpsidt) const override
+  {
+    for (auto& h : hOverIs_)
+      if constexpr (IS_TIME_DEPENDENT) {apply<RANK>(psi,dpsidt,h.propagate(double(t)));}
+      else {apply<RANK>(psi,dpsidt,h);}
+  }
 
   mutable Tridiagonals hOverIs_;
 
@@ -66,9 +66,9 @@ private:
  * \tparamRANK
  * \tparam IS_TIME_DEPENDENT governs time-dependence & the composition of the class @ compile time
  * 
- * Implements Hamiltonian `<RANK,ONE_TIME>` when `IS_TIME_DEPENDENT=true` **OR** Hamiltonian `<RANK,NO_TIME>`  when `IS_TIME_DEPENDENT=false`
+ * Implements Hamiltonian `<RANK,ONE>` when `IS_TIME_DEPENDENT=true` **OR** Hamiltonian `<RANK,NO>`  when `IS_TIME_DEPENDENT=false`
  * 
- * \note The present architecture of Tridiagonal does not allow to cover the case structure::TWO_TIME.
+ * \note The present architecture of Tridiagonal does not allow to cover the case structure::TWO.
  *  
  */
 template<int RANK, bool IS_TIME_DEPENDENT>

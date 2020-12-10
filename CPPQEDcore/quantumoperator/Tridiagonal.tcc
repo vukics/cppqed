@@ -220,45 +220,45 @@ const typename Tridiagonal<RANK>::Ranges Tridiagonal<RANK>::fillRanges(const typ
 template<int RANK>
 void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  static const int step=tmptools::Power<3,RANK-1>::value;
+  static const int step=tmptools::Power_v<3,RANK-1>;
 
-  using tmptools::Vector; using mpl::int_;
+  using tmptools::Vector, tmptools::integral_c;
 
   const Ranges ranges(fillRanges(psi.ubound()));
 
-  doApply<0*step,Vector<0>,Vector<0>,Vector<0> >(int_<RANK-1>(),ranges,psi,dpsidt);
-  doApply<1*step,Vector<2>,Vector<1>,Vector<1> >(int_<RANK-1>(),ranges,psi,dpsidt);
-  doApply<2*step,Vector<1>,Vector<1>,Vector<2> >(int_<RANK-1>(),ranges,psi,dpsidt);
+  doApply<0*step,Vector<0>,Vector<0>,Vector<0> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
+  doApply<1*step,Vector<2>,Vector<1>,Vector<1> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
+  doApply<2*step,Vector<1>,Vector<1>,Vector<2> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
 
 }
 
 
 
 template<int RANK> template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
-void Tridiagonal<RANK>::doApply(mpl::int_<REMAINING>,
+void Tridiagonal<RANK>::doApply(tmptools::integral_c<REMAINING>,
                                 const Ranges& ranges, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
-  static const int step=tmptools::Power<3,REMAINING-1>::value;
+  static const int step=tmptools::Power_v<3,REMAINING-1>;
 
-  using mpl::push_back; using mpl::int_;
+  using mpl::push_back, tmptools::integral_c;
 
   doApply<START+0*step,
-          typename push_back<V_DPSIDT,int_<0> >::type,
-          typename push_back<V_A     ,int_<0> >::type,
-          typename push_back<V_PSI   ,int_<0> >::type>
-    (int_<REMAINING-1>(),ranges,psi,dpsidt);
+          typename push_back<V_DPSIDT,integral_c<0> >::type,
+          typename push_back<V_A     ,integral_c<0> >::type,
+          typename push_back<V_PSI   ,integral_c<0> >::type>
+    (integral_c<REMAINING-1>(),ranges,psi,dpsidt);
 
   doApply<START+1*step,
-          typename push_back<V_DPSIDT,int_<2> >::type,
-          typename push_back<V_A     ,int_<1> >::type,
-          typename push_back<V_PSI   ,int_<1> >::type>
-    (int_<REMAINING-1>(),ranges,psi,dpsidt);
+          typename push_back<V_DPSIDT,integral_c<2> >::type,
+          typename push_back<V_A     ,integral_c<1> >::type,
+          typename push_back<V_PSI   ,integral_c<1> >::type>
+    (integral_c<REMAINING-1>(),ranges,psi,dpsidt);
 
   doApply<START+2*step,
-          typename push_back<V_DPSIDT,int_<1> >::type,
-          typename push_back<V_A     ,int_<1> >::type,
-          typename push_back<V_PSI   ,int_<2> >::type>
-    (int_<REMAINING-1>(),ranges,psi,dpsidt);
+          typename push_back<V_DPSIDT,integral_c<1> >::type,
+          typename push_back<V_A     ,integral_c<1> >::type,
+          typename push_back<V_PSI   ,integral_c<2> >::type>
+    (integral_c<REMAINING-1>(),ranges,psi,dpsidt);
 
 }
 
@@ -330,7 +330,7 @@ void Tridiagonal<9>::apply(const StateVectorLow&, StateVectorLow&) const;
 
 
 template<> template<int START, typename V_DPSIDT, typename V_A, typename V_PSI>
-void quantumoperator::Tridiagonal<rank>::doApply(mpl::int_<0>,
+void quantumoperator::Tridiagonal<rank>::doApply(tmptools::integral_c<0>,
                                                  const Ranges& ranges, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   using mpl::at_c;

@@ -5,9 +5,6 @@
 
 #include "Exact.h"
 
-#include <boost/utility/enable_if.hpp>
-
-
 namespace structure {
 
 /// A unary implementation of Exact assuming that the operator that transforms between the pictures is diagonal

@@ -27,8 +27,8 @@ namespace blitzplusplus {
 namespace vfmsi {
 
 
-struct Left  : boost::mpl::false_ {}; ///< Indicates composition from left
-struct Right : boost::mpl:: true_ {}; ///< Indicates composition from right
+struct Left  : std::false_type {}; ///< Indicates composition from left
+struct Right : std::true_type {}; ///< Indicates composition from right
 
 
 /// Metafunction returning the appropriate set of retained index positions
@@ -44,7 +44,7 @@ struct Right : boost::mpl:: true_ {}; ///< Indicates composition from right
 template<int RANK, typename S>
 struct LeftRight 
   : tmptools::Range<RANK,
-                    tmptools::integral_if<S,RANK,0>::type::value> {};
+                    tmptools::integral_if_v<S,RANK,0>> {};
 
 
 /// Template alias
@@ -60,15 +60,15 @@ template<int RANK, typename S> using Iterator=cpputils::SliceIterator<CArray,RAN
 /// Same as begin but here it returns an Iterator instance
 template<typename S, typename A>
 auto
-begin(const A& array ) {return Iterator<cpputils::Rank<A>::value,S>(array,cpputils::sliceiterator::Begin{});}
+begin(const A& array ) {return Iterator<cpputils::Rank_v<A>,S>(array,cpputils::sliceiterator::Begin{});}
 
 template<typename S, typename A>
 auto
-end  (const A& array ) {return Iterator<cpputils::Rank<A>::value,S>(array,cpputils::sliceiterator::End{});}
+end  (const A& array ) {return Iterator<cpputils::Rank_v<A>,S>(array,cpputils::sliceiterator::End{});}
 
 template<typename S, typename A>
 auto
-fullRange(const A& array ) {return boost::iterator_range<Iterator<cpputils::Rank<A>::value,S> >(begin<S>(array),end<S>(array));}
+fullRange(const A& array ) {return boost::iterator_range<Iterator<cpputils::Rank_v<A>,S> >(begin<S>(array),end<S>(array));}
 //@}
 
 

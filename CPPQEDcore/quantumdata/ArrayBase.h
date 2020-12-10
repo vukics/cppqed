@@ -8,22 +8,22 @@
 #include "ComplexArrayExtensions.h"
 #include "Operators.h"
 
-#include <boost/utility.hpp>
-
 
 namespace quantumdata {
 
 struct ByReference {}; const ByReference byReference{};
 
 template<typename>
-struct ArrayRank;
+constexpr auto ArrayRank_v="N/A";
 
 /// Comprises the common functionalities of StateVector and DensityOperator.
 template<typename Derived>
-class ArrayBase : private boost::noncopyable, private linalg::VectorSpace<Derived>
+class ArrayBase : linalg::VectorSpace<Derived>
 {
 protected:
-  typedef CArray<ArrayRank<Derived>::value> ArrayLow; ///< The underlying storage
+  ArrayBase(const ArrayBase&) = delete; ArrayBase& operator=(const ArrayBase&) = delete;
+
+  typedef CArray<ArrayRank_v<Derived>> ArrayLow; ///< The underlying storage
   typedef linalg::CVector CVector;
 
   ArrayBase() : arrayLow_(0) {}

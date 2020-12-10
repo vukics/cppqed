@@ -15,13 +15,8 @@
 #include "BlitzTinyOfArrays.tcc"
 #include "Operators.h"
 
-#include <boost/mpl/int.hpp>
-
 
 namespace mpl=boost::mpl;
-
-
-// Stencils???
 
 
 /// Comprises modules representing operators of special structure (tridiagonal, sparse) over Hilbert spaces of arbitrary arity
@@ -79,8 +74,8 @@ class Tridiagonal
     private linalg::VectorSpace<Tridiagonal<RANK> >
 {
 public:
-  static const int LENGTH=tmptools::Power<3,RANK>::value; ///< The number of Diagonals the class has to store
-  static const int N_RANK=RANK;                           ///< Reports the class’s rank for example towards DirectProduct.
+  static const int LENGTH=tmptools::Power_v<3,RANK>; ///< The number of Diagonals the class has to store
+  static const int N_RANK=RANK;                      ///< Reports the class’s rank for example towards DirectProduct.
 
   typedef blitzplusplus::TinyOfArrays<dcomp,RANK,LENGTH> Diagonals; ///< The class is implemented in terms of a blitzplusplus::TinyOfArrays, this is the class used to store the Diagonals
 
@@ -99,10 +94,7 @@ private:
   
   /// \name Conveniencies for member-function signature definitions
   //@{
-  typedef mpl::int_<RANK> IntRANK;
-
-  static const mpl::int_<1> _1_  ;//=mpl::int_<1>();
-  static const Diagonal     empty;//=Diagonal    ();
+  static const Diagonal empty;//=Diagonal    ();
   //@}
   
 public:
@@ -127,12 +119,12 @@ public:
      * are also tridiagonal in momentum space, and we wanted to have the possibility of specifying \f$k\f$ at runtime.
      *
      */
-  explicit Tridiagonal(const Diagonal& zero=empty,  ///< corresponds to \f$\alpha^{(0)}\f$
+  template<int R=RANK>
+  explicit Tridiagonal(std::enable_if_t<R==1,const Diagonal&> zero=empty, ///< corresponds to \f$\alpha^{(0)}\f$
                        size_t k=0,                  ///< corresponds to \f$K\f$ above
                        const Diagonal& minus=empty, ///< corresponds to \f$\alpha^{(-)}\f$
                        const Diagonal& plus=empty,  ///< corresponds to \f$\alpha^{(+)}\f$
-                       bool toFreqs=false,          ///< governs whether the main diagonal (\f$\alpha^{(0)}\f$) is converted to frequencies \f$\delta_{n}\f$
-                       IntRANK=_1_);
+                       bool toFreqs=false);         ///< governs whether the main diagonal (\f$\alpha^{(0)}\f$) is converted to frequencies \f$\delta_{n}\f$
 
     /// Copy constructor with deep-copy semantics
   Tridiagonal(const Tridiagonal& tridiag) : Tridiagonal(tridiag,tridiag.diagonals_,tridiag.differences_,tridiag.tCurrent_,tridiag.freqs_) {}
@@ -165,7 +157,8 @@ public:
      * 
      * \todo Extend to arbitrary arity
      */
-  Tridiagonal& furnishWithFreqs(const Diagonal& mainDiagonal, IntRANK=_1_);
+  template <int R=RANK>
+  std::enable_if_t<R==1,Tridiagonal&> furnishWithFreqs(const Diagonal& mainDiagonal);
   
     /// “Applies” the tridiagonal matrix on the state vector `psiprime`, in the vein of structure::Hamiltonian::addContribution(), that is \f$\ket{\Psi'}+=T\ket\Psi\f$.
     /**
@@ -196,8 +189,8 @@ public:
      * 
      * \todo Implement.
      */
-  const dcomp average(const quantumdata::LazyDensityOperator<RANK>&, 
-                      const typename quantumdata::LazyDensityOperator<RANK>::Idx&, IntRANK=_1_);
+  template<int R=RANK>
+  std::enable_if_t<R==1,dcomp> average(const quantumdata::LazyDensityOperator<1>&, const typename quantumdata::LazyDensityOperator<1>::Idx&);
   //@}
 
   /// \name Getters
@@ -257,10 +250,10 @@ private:
   /// \name Apply implementation
   //@{
   template<int START, typename V_DPSIDT, typename V_A, typename V_PSI, int REMAINING>
-  void doApply(mpl::int_<REMAINING>,const Ranges&, const StateVectorLow&, StateVectorLow&) const; ///< Recursive implementation.
+  void doApply(tmptools::integral_c<REMAINING>,const Ranges&, const StateVectorLow&, StateVectorLow&) const; ///< Recursive implementation.
 
   template<int START, typename V_DPSIDT, typename V_A, typename V_PSI>
-  void doApply(mpl::int_<0>,const Ranges&, const StateVectorLow&, StateVectorLow&) const; ///< “Specialization” for the `REMAINING=0` case to break the recursion: This should be specialized for all `RANK`s in Tridiagonal.tcc. We rely on the Boost.Preprocessor library, in particular the \refBoostConstruct{BOOST_PP_ITERATE,preprocessor/doc/ref/iterate.html} macro.
+  void doApply(tmptools::integral_c<0>,const Ranges&, const StateVectorLow&, StateVectorLow&) const; ///< “Specialization” for the `REMAINING=0` case to break the recursion: This should be specialized for all `RANK`s in Tridiagonal.tcc. We rely on the Boost.Preprocessor library, in particular the \refBoostConstruct{BOOST_PP_ITERATE,preprocessor/doc/ref/iterate.html} macro.
 
   struct FillRangesHelper
   {
@@ -317,9 +310,6 @@ const Tridiagonal<1> zero    (size_t);
 const Tridiagonal<1> identity(size_t);
 
 
-
-template<int RANK>
-const mpl::int_<1> Tridiagonal<RANK>::_1_=mpl::int_<1>();
 
 template<int RANK>
 const typename Tridiagonal<RANK>::Diagonal Tridiagonal<RANK>::empty;

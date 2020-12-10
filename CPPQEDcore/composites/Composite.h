@@ -30,7 +30,7 @@ using boost::fusion::result_of::make_list;
 
 
 template<typename VA>
-struct MaxRank : MaxMF<typename MaxMF<VA,SeqLess<mpl::_1,mpl::_2> >::type>::type::type {};
+constexpr int MaxRank_v=MaxMF_t<MaxMF_t<VA,SeqLess<mpl::_1,mpl::_2>>>::value;
 
 
 
@@ -70,18 +70,18 @@ private:
 template<typename VA>
 // VA should model a fusion sequence of Acts
 class Base
-  : public RankedBase<MaxRank<VA>::value+1>,
-    public structure::Averaged<MaxRank<VA>::value+1>
+  : public RankedBase<MaxRank_v<VA>+1>,
+    public structure::Averaged<MaxRank_v<VA>+1>
 {
 public:
   typedef std::shared_ptr<const Base<VA> > Ptr;
   
   // The calculated RANK
-  static const int RANK=MaxRank<VA>::value+1;
+  static const int RANK=MaxRank_v<VA>+1;
 
 private:
   // Compile-time sanity check
-  static_assert( composite::CheckMeta<RANK,VA>::type::value == true , "Composite not consistent" );
+  static_assert( composite::CheckMeta_v<RANK,VA> == true , "Composite not consistent" );
 
 public:
   // Public types
@@ -146,10 +146,10 @@ const typename Base<VA>::Ptr doMake(const VA&);
 
 template<typename VA>
 class Exact
-  : public structure::Exact<MaxRank<VA>::value+1>
+  : public structure::Exact<MaxRank_v<VA>+1>
 {
 private:
-  static const int RANK=MaxRank<VA>::value+1;
+  static const int RANK=MaxRank_v<VA>+1;
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
@@ -172,10 +172,10 @@ private:
 
 template<typename VA>
 class Hamiltonian
-  : public structure::Hamiltonian<MaxRank<VA>::value+1>
+  : public structure::Hamiltonian<MaxRank_v<VA>+1>
 {
 private:
-  static const int RANK=MaxRank<VA>::value+1;
+  static const int RANK=MaxRank_v<VA>+1;
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
@@ -197,10 +197,10 @@ private:
 
 template<typename VA>
 class Liouvillean
-  : public structure::Liouvillean<MaxRank<VA>::value+1>
+  : public structure::Liouvillean<MaxRank_v<VA>+1>
 {
 private:
-  static const int RANK=MaxRank<VA>::value+1;
+  static const int RANK=MaxRank_v<VA>+1;
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
@@ -235,7 +235,7 @@ class EmptyBase
 {
 public:
   template<typename VA>
-  EmptyBase(const std::array<SubSystemFree,MaxRank<VA>::value+1>&, const VA&) {}
+  EmptyBase(const std::array<SubSystemFree,MaxRank_v<VA>+1>&, const VA&) {}
   
 };
 
@@ -244,7 +244,7 @@ public:
 
 
 
-#define BASE_class(Aux,Class) mpl::if_c<IS_##Aux,composite::Class<VA>,composite::EmptyBase<composite::Class<VA> > >::type
+#define BASE_class(Aux,Class) std::conditional_t<IS_##Aux,composite::Class<VA>,composite::EmptyBase<composite::Class<VA>>>
 
 /// Class representing a full-fledged composite quantum system defined by a network of \link composite::_ interactions\endlink
 /**
@@ -312,9 +312,9 @@ class Composite
 public:
   typedef composite::Base<VA> Base;
   
-  typedef typename BASE_class(EX,Exact)             ExactBase;
-  typedef typename BASE_class(HA,Hamiltonian) HamiltonianBase;
-  typedef typename BASE_class(LI,Liouvillean) LiouvilleanBase;
+  typedef BASE_class(EX,Exact)             ExactBase;
+  typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
+  typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
   
   typedef typename composite::Base<VA>::Frees Frees;
   

@@ -59,28 +59,14 @@ auto fullRange(const CArray<RANK>& array) {return fullRange<V,CArray>(array);}
 template<typename T, int RANK>
 struct ElementType<blitz::Array<T,RANK>> : boost::mpl::identity<T> {};
 
-
 template<typename Numtype, int RANK>
-struct Rank<blitz::Array<Numtype,RANK> > : boost::mpl::int_<RANK> {};
+constexpr int Rank_v<blitz::Array<Numtype,RANK>> = RANK;
 
 template<int RANK>
-struct TypeID<DArray<RANK> >
-{
-  static const std::string value;
-};
+constexpr auto TypeID_v<DArray<RANK>> ="DArray";
 
 template<int RANK>
-const std::string TypeID<DArray<RANK> >::value="DArray";
-
-
-template<int RANK>
-struct TypeID<CArray<RANK> >
-{
-  static const std::string value;
-};
-
-template<int RANK>
-const std::string TypeID<CArray<RANK> >::value="CArray";
+constexpr auto TypeID_v<CArray<RANK>> ="CArray";
 
 /** \endcond */
 

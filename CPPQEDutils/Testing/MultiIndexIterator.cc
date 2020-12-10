@@ -3,8 +3,7 @@
 #define BOOST_TEST_MODULE MultiIndexIterator test
 #include <boost/test/unit_test.hpp>
 
-using namespace cpputils;
-namespace mpl=boost::mpl;
+using namespace cpputils
 
 typedef IdxTiny<3> Idx;
 
@@ -15,8 +14,8 @@ BOOST_AUTO_TEST_CASE( iterator )
   Idx lbound(-2,0,1), ubound(-1,1,3);
 
   MultiIndexIterator<3> 
-    begin(lbound,ubound,mpl::false_()),
-    end  (lbound,ubound,mpl:: true_());
+    begin(lbound,ubound,std::false_type()),
+    end  (lbound,ubound,std:: true_type());
 
   BOOST_CHECK(all(*begin++==lbound));
 

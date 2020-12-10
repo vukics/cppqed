@@ -13,14 +13,14 @@ namespace structure {
 
 /// Enumeration of different possibilities for time dependence of Hamiltonians
 /** With \f$t_0\f$ being the time instant where the \link Exact two pictures\endlink coincide (cf. quantumtrajectory::QuantumTrajectory::getT0): */
-enum TimeDependence {
-  TWO_TIME, ///< **Case 1** \f$H(t,t_0)\f$ – Time-dependent problem + \link Exact exact part\endlink (\f$U(t,t_0)\f$)
-  ONE_TIME, ///< **Case 2** \f$H(t)\f$ – Time-dependent problem, no exact part **OR Case 3** \f$H(t-t_0)\f$ – Time-independent problem + \link Exact exact part\endlink (\f$U(t-t_0)\f$)
-  NO_TIME   ///< **Case 4** \f$H(0)\f$ – Time-independent problem, no exact part
+enum struct TimeDependence {
+  TWO, ///< **Case 1** \f$H(t,t_0)\f$ – Time-dependent problem + \link Exact exact part\endlink (\f$U(t,t_0)\f$)
+  ONE, ///< **Case 2** \f$H(t)\f$ – Time-dependent problem, no exact part **OR Case 3** \f$H(t-t_0)\f$ – Time-independent problem + \link Exact exact part\endlink (\f$U(t-t_0)\f$)
+  NO   ///< **Case 4** \f$H(0)\f$ – Time-independent problem, no exact part
 };
 
 
-/// Describes two-time dependence corresponding to the case #TWO_TIME
+/// Describes two-time dependence corresponding to the case #TWO
 class TwoTime : private boost::equality_comparable<TwoTime>
 {
 public:
@@ -36,7 +36,7 @@ private:
   
 };
 
-/// Describes one-time dependence corresponding to the case #ONE_TIME
+/// Describes one-time dependence corresponding to the case #ONE
 class OneTime : private boost::equality_comparable<OneTime>
 {
 public:
@@ -51,7 +51,7 @@ private:
   
 };
 
-/// Describes no-time dependence corresponding to the case #NO_TIME
+/// Describes no-time dependence corresponding to the case #NO
 class NoTime
 {
 public:
@@ -67,21 +67,21 @@ namespace time {
 
 /// Metafunction dispatching the three classes TwoTime, OneTime, & NoTime according to the template parameter `TD`
 template<TimeDependence TD>
-using Dispatcher = boost::mpl::if_c<TD==TWO_TIME,TwoTime,
-                                    typename boost::mpl::if_c<TD==ONE_TIME,OneTime,NoTime>::type
-                                    >;
+using Dispatcher_t = std::conditional_t<TD==TimeDependence::TWO,
+                                        TwoTime,
+                                        std::conditional_t<TD==TimeDependence::ONE,OneTime,NoTime>>;
 
 
 /// Metafunction dispatching two OneTime & NoTime according to the template parameter `IS_TIME_DEPENDENT`
 /** \see LiouvilleanTimeDependenceDispatched for a paradigmatic example of usage */
 template<bool IS_TIME_DEPENDENT>
-using DispatcherIsTimeDependent = boost::mpl::if_c<IS_TIME_DEPENDENT,OneTime,NoTime>;
+using DispatcherIsTimeDependent_t = std::conditional_t<IS_TIME_DEPENDENT,OneTime,NoTime>;
 
 
 /// Metafunction dispatching two TwoTime & OneTime according to the template parameter `IS_TWO_TIME`
 /** \see ExactTimeDependenceDispatched for a paradigmatic example of usage */
 template<bool IS_TWO_TIME>
-using DispatcherIsTwoTime = boost::mpl::if_c<IS_TWO_TIME,TwoTime,OneTime>;
+using DispatcherIsTwoTime_t = std::conditional_t<IS_TWO_TIME,TwoTime,OneTime>;
 
 } // time
 

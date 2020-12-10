@@ -148,7 +148,7 @@ private:
 
 template<int NL, typename VP>
 class HamiltonianSch 
-  : public structure::HamiltonianTimeDependenceDispatched<1,structure::NO_TIME>
+  : public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
 {
 public:
   static const int NPT=mpl::size<VP>::value; // number of pumped transitions

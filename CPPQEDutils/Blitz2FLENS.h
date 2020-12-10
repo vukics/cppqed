@@ -81,7 +81,7 @@ auto ev(CArray<TWO_TIMES_RANK> m)
   
   GeMatrixOf<dcomp,ColMajor> a(matrix<ColMajor>(m));
 
-  CArray<tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value> res(blitzplusplus::halfCutTiny(m.extent())); ///< The eigenvalues as Blitz++ array
+  CArray<tmptools::AssertEvenAndDivideBy2_v<TWO_TIMES_RANK>> res(blitzplusplus::halfCutTiny(m.extent())); ///< The eigenvalues as Blitz++ array
 
   DenseVector<ArrayView<dcomp>> v(vector(res)); ///< The eigenvalues as FLENS array
 

@@ -10,8 +10,6 @@
 #include "Mode_.h"
 #include "Particle_.h"
 
-#include <boost/utility.hpp>
-
 
 namespace particlecavity {
 

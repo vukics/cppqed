@@ -220,9 +220,9 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
 
 template<typename A>
 trajectory::AdaptiveIO<A>::AdaptiveIO(typename EvolvedIO::Ptr evolvedIO)
-  : meta_(cpputils::TypeID<A>::value,
+  : meta_(cpputils::TypeID_v<A>,
           SerializationMetadata::ARRAY_ONLY,
-          cpputils::Rank<A>::value),
+          cpputils::Rank_v<A>),
     evolvedIO_(evolvedIO)
 {}
 
@@ -231,7 +231,7 @@ cpputils::iarchive& trajectory::AdaptiveIO<A>::readState(cpputils::iarchive& iar
 {
   bool dimension_check = meta_.trajectoryID != SerializationMetadata::ARRAY_ONLY;
   iar & meta_;
-  if (meta_.rank!=cpputils::Rank<A>::value)
+  if (meta_.rank!=cpputils::Rank_v<A>)
     throw std::runtime_error("Rank mismatch in trajectory::AdaptiveIO::readState");
   std::vector<size_t> dims = cpputils::dimensions(evolvedIO_->getA());
   iar & *evolvedIO_;

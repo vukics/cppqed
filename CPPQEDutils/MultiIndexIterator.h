@@ -19,8 +19,8 @@ namespace cpputils {
 /// Helpers to MultiIndexIterator
 namespace mii {
  
-typedef boost::mpl::false_ Begin; 
-typedef boost::mpl::true_  End  ;
+typedef std::false_type Begin; 
+typedef std::true_type  End  ;
   
 const Begin begin=Begin();
 const End   end  =End  ();
@@ -53,14 +53,14 @@ public:
   template <bool IS_END>
   MultiIndexIterator(const MultiIndex& lbound, ///< tiny vector comprising the sequence of lower bounds
                      const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
-                     boost::mpl::bool_<IS_END>)
+                     std::bool_constant<IS_END>)
     : lbound_(lbound), ubound_(ubound), idx_(IS_END ? ubound_ : lbound_) {if constexpr (IS_END) operator++();}
 
     /// \overload
     /** `lbound` is all-zero */
   template <bool IS_END>
   MultiIndexIterator(const MultiIndex& ubound, ///< tiny vector comprising the sequence of upper bounds (inclusive!)
-                     boost::mpl::bool_<IS_END> t)
+                     std::bool_constant<IS_END> t)
     : MultiIndexIterator(MultiIndex(typename MultiIndex::T_numtype{0}),ubound,t) {}
   //@}
   

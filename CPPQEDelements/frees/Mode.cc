@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Mode.tcc"
 
-#include "TridiagonalHamiltonian.tcc"
+#include "TridiagonalHamiltonian.h"
 
 #include <boost/assign/list_inserter.hpp>
 
@@ -92,15 +92,15 @@ Tridiagonal hOverI(dcomp z, dcomp eta, double omegaKerr, size_t dim)
 #define FILLKERR using blitz::tensor::i; Tridiagonal::Diagonal temp(dim); KERRDIAGONAL(temp,omegaKerrAlter) getH_OverIs().push_back(Tridiagonal(temp));
 
 
-template<>
-Hamiltonian<true >::Hamiltonian(dcomp zSch, dcomp zI, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::true_)
+template<> template<>
+Hamiltonian<true >::Hamiltonian(dcomp zSch, dcomp zI, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t dim)
   : Base(furnishWithFreqs(hOverI(zSch,eta,omegaKerr,dim),mainDiagonal(zI,omegaKerr,dim))), Exact(zI,omegaKerr,dim), zSch_(zSch), eta_(eta), dim_(dim)
 {
   FILLKERR
 }
 
-template<>
-Hamiltonian<false>::Hamiltonian(dcomp zSch, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t dim, boost::mpl::false_)
+template<> template<>
+Hamiltonian<false>::Hamiltonian(dcomp zSch, dcomp eta, double omegaKerr, double omegaKerrAlter, size_t dim)
   : Base(hOverI(zSch,eta,omegaKerr,dim)), zSch_(zSch), eta_(eta), dim_(dim)
 {
   FILLKERR
@@ -144,43 +144,6 @@ void details::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLo
   for (int m=1; m<=rho.ubound(0); ++m)
     for (int n=1; n<=rho.ubound(1); ++n)
       drhodt(m,n)+=2*kappa*sqrt(m*n)*rho(m-1,n-1);
-}
-
-namespace {
-
-
-double aJumpRate   (const LazyDensityOperator& matrix, double kappa)
-{
-  return 2.*kappa*photonNumber(matrix);
-}
-
-
-  
-}
-
-
-double details::LiouvilleanFiniteTemperatureBase::rate0(const LazyDensityOperator& matrix, boost::mpl::false_) const
-{
-  return aJumpRate(matrix,kappa_*(nTh_+1));
-}
-
-double details::LiouvilleanFiniteTemperatureBase::rate1(const LazyDensityOperator& matrix, boost::mpl::false_) const
-{
-  return 2.*kappa_*nTh_*(photonNumber(matrix)+matrix.trace());
-}
-
-
-template<>
-double Liouvillean<false,false>::rate(NoTime, const LazyDensityOperator& matrix) const
-{
-  return aJumpRate(matrix,kappa_);
-}
-
-
-template<>
-double Liouvillean<false,true>::rate(NoTime, const LazyDensityOperator&) const
-{
-  return -1;
 }
 
 

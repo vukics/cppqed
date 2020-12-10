@@ -7,9 +7,6 @@
 namespace quantumoperator {
 
 template<>
-const mpl::int_<1> Tridiagonal<1>::_1_ =mpl::int_<1>();
-
-template<>
 const Tridiagonal<1>::Diagonal Tridiagonal<1>::empty=Tridiagonal<1>::Diagonal();
 
 
@@ -24,9 +21,9 @@ bool Compatible(const CArray<1>& a, size_t diffA, const CArray<1>& b, size_t dif
 } 
 
 
-template<>
+template<> template<>
 Tridiagonal<1>&
-Tridiagonal<1>::furnishWithFreqs(const Diagonal& mainDiagonal, IntRANK)
+Tridiagonal<1>::furnishWithFreqs(const Diagonal& mainDiagonal)
 {
   const size_t k=differences_(0), diagonalSize=getTotalDimension()-k;
   if (diagonalSize>0) {
@@ -39,8 +36,8 @@ Tridiagonal<1>::furnishWithFreqs(const Diagonal& mainDiagonal, IntRANK)
 }
 
 
-template<>
-Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minus, const Diagonal& plus, bool toFreqs, mpl::int_<1>)
+template<> template<>
+Tridiagonal<1>::Tridiagonal(const Diagonal& zero, size_t k, const Diagonal& minus, const Diagonal& plus, bool toFreqs)
   : Base(std::max(std::max(size_t(zero.size()),minus.size()+k),plus.size()+k)),
     // funnily enough, Array::size() returns an int ...
     diagonals_(blitzplusplus::DeepCopy(),

@@ -78,7 +78,7 @@ halfCutTiny(const TinyVector<T,TWO_TIMES_RANK>& tiny)
 {
   using boost::mpl::for_each;
 
-  static const int RANK=tmptools::AssertEvenAndDivideBy2<TWO_TIMES_RANK>::value;
+  static const int RANK=tmptools::AssertEvenAndDivideBy2_v<TWO_TIMES_RANK>;
 
 #ifndef   NDEBUG
   boost::mpl::for_each<tmptools::Ordinals<RANK> >([&](auto arg) {
