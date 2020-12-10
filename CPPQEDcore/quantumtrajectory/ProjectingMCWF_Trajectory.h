@@ -20,8 +20,8 @@ namespace quantumtrajectory {
  * 
  * \see This possibility was first developed for our paper Ref. \cite vukics2009cavity
  * 
- * The projections (the elements of the state vector in the given basis – that might not add up to 1 if the basis is incomplete) are displayed
- * in addition to each \link MCWF_Trajectory::display_v trajectory display\endlink. The \link MCWF_Trajectory::displayKey_v key\endlink is supplemented accordingly.
+ * The projections (the elements of the state vector in the given basis – that might not add up to 1 if the basis is incomplete) are streamed
+ * in addition to each \link MCWF_Trajectory::stream_v trajectory stream\endlink. The \link MCWF_Trajectory::streamKey_v key\endlink is supplemented accordingly.
  * 
  */
 template<int RANK>
@@ -49,8 +49,8 @@ public:
   {}
 
 private:
-  std::ostream&    display_v(std::ostream&, int    ) const override;
-  std::ostream& displayKey_v(std::ostream&, size_t&) const override;
+  std::ostream&    stream_v(std::ostream&, int    ) const override;
+  std::ostream& streamKey_v(std::ostream&, size_t&) const override;
 
   const linalg::CMatrix help() const;
 

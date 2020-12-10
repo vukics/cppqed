@@ -108,12 +108,12 @@ public:
 protected:
   using Base::getEvolved; using Base::getDtTry;
 
-  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const override
+  typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override
   {
-    return structure::QuantumSystemWrapper<RANK,true>::display(getTime(),*psi_,os,precision);
-  } ///< Forwards to structure::Averaged::display
+    return structure::QuantumSystemWrapper<RANK,true>::stream(getTime(),*psi_,os,precision);
+  } ///< Forwards to structure::Averaged::stream
   
-  std::ostream& displayKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::displayKey
+  std::ostream& streamKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::streamKey
 
   /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes mcwf::Logger state
   cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar) override {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
@@ -128,7 +128,7 @@ private:
 
   void step_v(double) override; // performs one single adaptive-stepsize MCWF step of specified maximal length
 
-  std::ostream& displayParameters_v(std::ostream&) const override;
+  std::ostream& streamParameters_v(std::ostream&) const override;
 
   const typename Base::AveragedHandle averaged_v() const override {return psi_;}
 

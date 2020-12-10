@@ -51,14 +51,14 @@ double binary::Base::highestFrequency_v() const
 }
 
 
-std::ostream& binary::Base::displayParameters_v(std::ostream& os) const
+std::ostream& binary::Base::streamParameters_v(std::ostream& os) const
 {
   using namespace std;
   os<<"Binary System\nDimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()
-    <<"\n\nSubsystem Nr. 0\n";     free0_.get()->displayParameters(os);
-  os<<    "Subsystem Nr. 1\n";     free1_.get()->displayParameters(os);
+    <<"\n\nSubsystem Nr. 0\n";     free0_.get()->streamParameters(os);
+  os<<    "Subsystem Nr. 1\n";     free1_.get()->streamParameters(os);
   os<<"0 - 1 - Interaction\n";
-  return ia_.get()->displayParameters(os);
+  return ia_.get()->streamParameters(os);
 }
 
 
@@ -86,7 +86,7 @@ void binary::Base::process_v(Averages& averages) const
 }
 
 
-std::ostream& binary::Base::display_v(const Averages& averages, std::ostream& os, int precision) const
+std::ostream& binary::Base::stream_v(const Averages& averages, std::ostream& os, int precision) const
 {
   const Av1::Ptr 
     av0 =free0_.getAv(),
@@ -94,7 +94,7 @@ std::ostream& binary::Base::display_v(const Averages& averages, std::ostream& os
   const Av2::Ptr
     av01=   ia_.getAv();
 
-#define PROCESS_Range(av,ss) ss->display(av,os,precision);
+#define PROCESS_Range(av,ss) ss->stream(av,os,precision);
   
   SUCCESSIVE_Ranges(av0,av1,av01) ;
   
@@ -118,15 +118,15 @@ namespace binary {
 // These possibilities get instantiated through compilation, so that explicit instantiation is not necessary here.
   
 template<LiouvilleanAveragedTag LA>
-std::ostream& displayKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
+std::ostream& streamKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
 {
   os<<"Binary system\n";
-  free0.displayKey<LA>(os,i);
-  free1.displayKey<LA>(os,i);
-  return ia.displayKey<LA>(os,i);
+  free0.streamKey<LA>(os,i);
+  free1.streamKey<LA>(os,i);
+  return ia.streamKey<LA>(os,i);
 }
-template std::ostream& displayKey<LA_Li>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
-template std::ostream& displayKey<LA_Av>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
+template std::ostream& streamKey<LA_Li>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
+template std::ostream& streamKey<LA_Av>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
 
 
 template<LiouvilleanAveragedTag LA>

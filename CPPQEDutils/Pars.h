@@ -163,7 +163,7 @@ public:
   /**
    * This will create a switch, that does not require any value. It will also add to the Table an additional parameter of type BooleanNegatedProxy which is the opposite switch with a `no_` prefix.
    * 
-   * \see trajectory::ParsRun::displayInfo – if `--displayInfo` is present in the command line, the switch will have `true` value, but if `--no_displayInfo` is also present subsequently, the value will be `false`.
+   * \see trajectory::ParsRun::streamInfo – if `--streamInfo` is present in the command line, the switch will have `true` value, but if `--no_streamInfo` is also present subsequently, the value will be `false`.
    */
   bool& add(const std::string& s, const std::string& d, bool v);
 

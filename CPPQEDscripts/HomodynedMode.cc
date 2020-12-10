@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
   ParsHomodyned<ParsPumpedLossy> pplm(p);
 
   bool
-    &doDisplay=p.add("doDisplay","Display diagonal elements of density operator",false),
-    &doOffDiag=p.add("doOffDiag","Display offdiagonal elements of density operator",false);
+    &doStream=p.add("doStream","Stream diagonal elements of density operator",false),
+    &doOffDiag=p.add("doOffDiag","Stream offdiagonal elements of density operator",false);
 
   // Parameter finalization
   update(p,argc,argv);
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   // ****** ****** ****** ****** ****** ******
 
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
-  if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));
+  if (doStream) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));
 
   Ptr mode(make<Collecting>(pplm,collection));
 

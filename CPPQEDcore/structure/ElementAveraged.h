@@ -13,7 +13,7 @@ namespace structure {
 
 namespace details {
 
-std::ostream& displayCommon(const AveragedCommon::Averages&, std::ostream&, int);
+std::ostream& streamCommon(const AveragedCommon::Averages&, std::ostream&, int);
 
 } // details
 
@@ -24,7 +24,7 @@ std::ostream& displayCommon(const AveragedCommon::Averages&, std::ostream&, int)
  * \tparamRANK
  * \tparam IS_TIME_DEPENDENT governs time dependence
  *
- * Implements AveragedCommon::display in such a way that the averages stemming from the given element are displayed in a nicely tabulated format
+ * Implements AveragedCommon::stream in such a way that the averages stemming from the given element are streamed in a nicely tabulated format
  *
  * \see Sec. \ref basicoscillator of the structure-bundle guide for an example of usage
  *
@@ -50,7 +50,7 @@ protected:
   const Averages initializedAverages() const {Averages res(this->nAvr()); res=0.; return res;}
 
 private:
-  std::ostream& display_v(const Averages& a, std::ostream& os, int precision) const final {return details::displayCommon(a,os,precision);}
+  std::ostream& stream_v(const Averages& a, std::ostream& os, int precision) const final {return details::streamCommon(a,os,precision);}
 
 };
 

@@ -44,14 +44,14 @@ public:
    * which would otherwise create ambiguities.
    */
   double        highestFrequency (                ) const {return QuantumSystem<1>:: highestFrequency(  );}
-  std::ostream& displayParameters(std::ostream& os) const {return QuantumSystem<1>::displayParameters(os);} ///< ”
+  std::ostream& streamParameters(std::ostream& os) const {return QuantumSystem<1>::streamParameters(os);} ///< ”
   //@}
 
 private:
   double         highestFrequency_v(                ) const final {return DynamicsBase::highestFrequency (  );}
-  std::ostream& displayParameters_v(std::ostream& os) const final {return DynamicsBase::displayParameters(os);}
+  std::ostream& streamParameters_v(std::ostream& os) const final {return DynamicsBase::streamParameters(os);}
 
-  std::ostream& displayMoreParameters(std::ostream& os) const final {return DynamicsBase::displayMoreParameters(os<<"Dimension: "<<getDimension()<<std::endl);}
+  std::ostream& streamMoreParameters(std::ostream& os) const final {return DynamicsBase::streamMoreParameters(os<<"Dimension: "<<getDimension()<<std::endl);}
 
 };
 

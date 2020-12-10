@@ -13,7 +13,7 @@ struct Pars
 {
   size_t &cutoff, &minitFock;
   dcomp& minit;
-  size_t &displayLevel;
+  size_t &streamLevel;
   double &delta, &omegaKerr, &omegaKerrAlter;
 
   Pars(parameters::Table&, const std::string& ="");

@@ -16,7 +16,7 @@ namespace cpputils {
 /**
  * The key is composed of a title and a list of labels
  * 
- * \see structure::LiouvilleanAveragedCommon::displayKey, structure::ElementLiouvilleanAveragedCommon
+ * \see structure::LiouvilleanAveragedCommon::streamKey, structure::ElementLiouvilleanAveragedCommon
  */
 class KeyPrinter
 {
@@ -32,7 +32,7 @@ public:
   KeyPrinter(const std::string& keyTitle, KeyLabelsInitializer il) : keyTitle_(keyTitle), keyLabels_(il) {}
 
   size_t        length    ()                       const {return keyLabels_.size();} ///< number of elements in the key
-  std::ostream& displayKey(std::ostream&, size_t&) const; ///< displays the stored key in a nicely tabulated format
+  std::ostream& streamKey(std::ostream&, size_t&) const; ///< streams the stored key in a nicely tabulated format
 
   /// \name Getters/setters
   //@{

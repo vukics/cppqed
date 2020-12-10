@@ -36,7 +36,7 @@ namespace structure {
  * ~~~
  * 
  * The class also stores an \refStdCppConstruct{std::ostringstream,sstream/ostringstream/} object, on which the constructor of any client (derived element class) can write its parameters,
- * and these will in turn be displayed when QuantumSystem::displayParameters is called for the system. Cf. \ref structurebundleguide "the structure-bundle guide".
+ * and these will in turn be streamed when QuantumSystem::streamParameters is called for the system. Cf. \ref structurebundleguide "the structure-bundle guide".
  * 
  */
 class DynamicsBase
@@ -63,14 +63,14 @@ public:
   
   double highestFrequency() const; ///< Calculates the fastest timescale of the system from the frequencies stored in the lists
 
-  std::ostream& displayParameters(std::ostream&) const; ///< Displays the content of the stored ostringstream followed by a call to #displayMoreParameters
+  std::ostream& streamParameters(std::ostream&) const; ///< Streams the content of the stored ostringstream followed by a call to #streamMoreParameters
 
   virtual ~DynamicsBase() {}
 
 protected:
   std::ostringstream& getParsStream() {return paramsStream_;} ///< The stored `std::ostringstream` object, for constructors of clients to write parameters on
   
-  virtual std::ostream& displayMoreParameters(std::ostream&) const; ///< In its default implementation, displayes the frequency-like parameters of the system in a nice format together with their names
+  virtual std::ostream& streamMoreParameters(std::ostream&) const; ///< In its default implementation, streames the frequency-like parameters of the system in a nice format together with their names
 
   /// \name Getters
   //@{

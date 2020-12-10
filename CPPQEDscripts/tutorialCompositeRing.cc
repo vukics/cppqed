@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
                            _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),
                            _<1,2,0>(std::make_shared<ParticleTwoModes>(plus,minus,part,ppcP,ppcM)));
 
-  system->displayParameters(std::cout);
+  system->streamParameters(std::cout);
   }
   {
   const auto
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
                            _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),
                            _<1,2,0>(std::make_shared<ParticleTwoModes>(plus,minus,part,ppcP,ppcM)));
 
-  system->displayParameters(std::cout);
+  system->streamParameters(std::cout);
   }
 
 }

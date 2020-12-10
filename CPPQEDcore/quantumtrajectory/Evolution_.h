@@ -39,7 +39,7 @@ struct Pars : public trajectory::ParsRun, public Base {
 
   Method &evol; ///< the method of evolution
   bool
-    &negativity, ///< governs whether entanglement should be calculated in the case of #ENSEMBLE and #MASTER, cf. quantumtrajectory::display_densityoperator::_, quantumdata::negPT
+    &negativity, ///< governs whether entanglement should be calculated in the case of #ENSEMBLE and #MASTER, cf. quantumtrajectory::stream_densityoperator::_, quantumdata::negPT
     &timeAverage; ///< governs whether in the case of #SINGLE, time averaging should be performed (by using quantumtrajectory::TimeAveragingMCWF_Trajectory instead of quantumtrajectory::MCWF_Trajectory)
   double &relaxationTime; ///< the relaxation time in the case when time averaging is desired
 

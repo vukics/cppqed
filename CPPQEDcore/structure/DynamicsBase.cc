@@ -67,16 +67,16 @@ double DynamicsBase::highestFrequency() const
 
 
 
-std::ostream& DynamicsBase::displayParameters(ostream& os) const
+std::ostream& DynamicsBase::streamParameters(ostream& os) const
 {
-  return displayMoreParameters(os<<paramsStream_.str())<<endl;
+  return streamMoreParameters(os<<paramsStream_.str())<<endl;
 }
 
 
 namespace {
 
 template<typename T>
-void displayFreq(ostream& os, int precision, const NamedFrequency<T>& p)
+void streamFreq(ostream& os, int precision, const NamedFrequency<T>& p)
 {
   os<<get<0>(p)<<"="<<formdouble::zeroAdditional(precision)(get<1>(p))<<endl;
 }
@@ -84,11 +84,11 @@ void displayFreq(ostream& os, int precision, const NamedFrequency<T>& p)
 } // unnamed namespace
 
 
-std::ostream& DynamicsBase::displayMoreParameters(ostream& os) const
+std::ostream& DynamicsBase::streamMoreParameters(ostream& os) const
 {
   using boost::for_each;
-  for_each(   realFreqs_,bind(displayFreq<double>,boost::ref(os),os.precision(),_1));
-  for_each(complexFreqs_,bind(displayFreq<dcomp >,boost::ref(os),os.precision(),_1));
+  for_each(   realFreqs_,bind(streamFreq<double>,boost::ref(os),os.precision(),_1));
+  for_each(complexFreqs_,bind(streamFreq<dcomp >,boost::ref(os),os.precision(),_1));
   return os;
 }
 

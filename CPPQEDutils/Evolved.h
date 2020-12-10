@@ -212,7 +212,7 @@ public:
   void step(double deltaT ///< *maximum* length of the timestep
             );
 
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);} ///< delegates to private virtual
+  std::ostream& streamParameters(std::ostream& os) const {return streamParameters_v(os);} ///< delegates to private virtual
 
   /// Wrapper around the derivatives that registers the number of calls
   void countedDerivs(double t, const A& y, A& dydt) const {derivs_(t,y,dydt); this->registerDerivsCall();}
@@ -226,7 +226,7 @@ public:
   
 private:
   virtual void step_v(double deltaT) = 0;
-  virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
+  virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
   virtual size_t nFailedStepsLast_v() const = 0;
 
   const Derivs derivs_, countedDerivs_;

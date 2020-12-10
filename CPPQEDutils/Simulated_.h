@@ -13,9 +13,9 @@
 
 namespace trajectory {
 
-/// Class fully implementing the Adaptive interface by displaying (and serializing) the whole content of the evolved array
+/// Class fully implementing the Adaptive interface by streaming (and serializing) the whole content of the evolved array
 /**
- * Meant for all cases when simple ODE evolution is desired with intermittent displays
+ * Meant for all cases when simple ODE evolution is needed with intermittent streamings
  * 
  * <b>Example usage:</b> simulation of a complex driven damped harmonic oscillator mode described by the ODE \f[\ddot{y}+2\gamma\,\dot{y}+y=e^{i\,\omega t},\f]
  * where \f$\gamma\f$ is the damping rate and \f$\omega\f$ the driving frequency, and the timescale has been chosen such that the eigenfrequency is 1.
@@ -46,7 +46,7 @@ public:
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 protected:
-  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const override
+  typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override
   {
     using namespace cpputils;
     const A& a=this->getEvolved()->getA();
@@ -57,9 +57,9 @@ protected:
 private:
   void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}
 
-  std::ostream& displayKey_v(std::ostream& os, size_t&) const final {return os;}
+  std::ostream& streamKey_v(std::ostream& os, size_t&) const final {return os;}
 
-  std::ostream& displayParameters_v(std::ostream& os) const final {return Base::displayParameters_v(os<<"\nSimulated.\n");}
+  std::ostream& streamParameters_v(std::ostream& os) const final {return Base::streamParameters_v(os<<"\nSimulated.\n");}
 
   const std::string trajectoryID_v() const final {return "Simulated";}
 

@@ -92,7 +92,7 @@ inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFr
  *
  * \todo Consider the possibility of cloning Trajectories
  */
-template<typename DA>
+template<typename SA>
 class Trajectory
 {
 protected:
@@ -103,15 +103,15 @@ public:
   /// Propagation for a time interval of exactly deltaT
   void evolve(double deltaT) {evolve_v(deltaT);}
 
-  using DisplayedArray=DA;
-  using DisplayReturnType=std::tuple<std::ostream&,DA>;
+  using StreamedArray=SA;
+  using StreamReturnType=std::tuple<std::ostream&,SA>;
   
-  /// Displays a limited set of relevant physical and numerical information about the actual state of Trajectory at the actual time instant
-  DisplayReturnType display(std::ostream& os, int precision ///< the precision (number of digits) of display
+  /// Streams a limited set of relevant physical and numerical information about the actual state of Trajectory at the actual time instant
+  StreamReturnType stream(std::ostream& os, int precision ///< the precision (number of digits) of stream
                            ) const
   {
     const FormDouble fd(formdouble::positive(precision));
-    auto res{display_v( os<<fd(getTime())<<fd(getDtDid()) , precision)};
+    auto res{stream_v( os<<fd(getTime())<<fd(getDtDid()) , precision)};
     std::get<0>(res)<<std::endl;
     return res; // Note: endl flushes the buffer
   }
@@ -123,10 +123,10 @@ public:
   double getDtDid() const {return getDtDid_v();} ///< last perfomed timestep
   //@}
 
-  std::ostream& displayParameters(std::ostream& os) const ///< print header
+  std::ostream& streamParameters(std::ostream& os) const ///< print header
   {
     size_t i=3;
-    return displayKey_v(displayParameters_v(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n" , i);
+    return streamKey_v(streamParameters_v(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n" , i);
   }
   
   std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);} ///< print a log at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
@@ -150,9 +150,9 @@ private:
   virtual double         getTime_v()       const = 0;
   virtual double        getDtDid_v()       const = 0;
   
-  virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
-  virtual DisplayReturnType display_v(std::ostream&, int) const = 0;
-  virtual std::ostream& displayKey_v(std::ostream&, size_t&) const = 0;
+  virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
+  virtual StreamReturnType stream_v(std::ostream&, int) const = 0;
+  virtual std::ostream& streamKey_v(std::ostream&, size_t&) const = 0;
 
   virtual cpputils::iarchive&  readState_v(cpputils::iarchive&) = 0;
   virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
@@ -256,7 +256,7 @@ protected:
   /// redirected to a pure virtual, this is needed for \link SerializationMetadata serialization of trajectory metadata\endlink
   const std::string trajectoryID() const  {return trajectoryID_v();}
 
-  std::ostream& displayParameters_v(std::ostream&) const override;
+  std::ostream& streamParameters_v(std::ostream&) const override;
 
   virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;} ///< hook into Trajectory::readState
   virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;} ///< hook into Trajectory::writeState
@@ -292,34 +292,34 @@ private:
 
 /// Generic implementation of AutostopHandler
 /**
- * Assumes quite a lot about the implicit interface of DA, this could be relieved with indirections
+ * Assumes quite a lot about the implicit interface of SA, this could be relieved with indirections
  */
-template<typename DA>
+template<typename SA>
 class AutostopHandlerGeneric
 {
 private:
-  typedef DA Averages;
+  typedef SA Averages;
   
 public:
   AutostopHandlerGeneric(double autoStopEpsilon, unsigned autoStopRepetition) : autoStopEpsilon_{autoStopEpsilon}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{} {}
 
-  void operator()(const DA& displayedArray)
+  void operator()(const SA& streamedArray)
   {
     if (!autoStopRepetition_) return;
     
-    if (!averages_.size()) { // This means that no display has yet occured: the size of averages_ must be determined
-      averages_.resize(displayedArray.size());
+    if (!averages_.size()) { // This means that no stream has yet occured: the size of averages_ must be determined
+      averages_.resize(streamedArray.size());
       averages_=0.;
     }
     else {
       if (queue_.size()==autoStopRepetition_) {
-        if (max(abs(averages_-displayedArray)/(abs(averages_)+abs(displayedArray)))<autoStopEpsilon_) throw StoppingCriterionReachedException();
-        averages_=averages_+(displayedArray-queue_.front())/double(autoStopRepetition_); // update the averages set for next step
+        if (max(abs(averages_-streamedArray)/(abs(averages_)+abs(streamedArray)))<autoStopEpsilon_) throw StoppingCriterionReachedException();
+        averages_=averages_+(streamedArray-queue_.front())/double(autoStopRepetition_); // update the averages set for next step
         queue_.pop(); // remove obsolate first element of the queue
       }
-      else averages_=(double(queue_.size())*averages_+displayedArray)/double(queue_.size()+1); // build the initial averages set to compare against
+      else averages_=(double(queue_.size())*averages_+streamedArray)/double(queue_.size()+1); // build the initial averages set to compare against
 
-      queue_.push(displayedArray); // place the new item to the back of the queue
+      queue_.push(streamedArray); // place the new item to the back of the queue
 
     }
 
@@ -329,21 +329,21 @@ private:
   const double autoStopEpsilon_;
   const unsigned autoStopRepetition_;
 
-  DA averages_;
-  std::queue<DA> queue_;
+  SA averages_;
+  std::queue<SA> queue_;
 
 };
 
 
-template<typename DA>
+template<typename SA>
 struct AutostopHandlerNoOp
 {
-  void operator()(const DA&) {}
+  void operator()(const SA&) {}
 };
 
 
-template<typename DA>
-using StreamedArray=std::list<std::tuple<double,double,DA>>;
+template<typename SA>
+using StreamedArray=std::list<std::tuple<double,double,SA>>;
 
 
 namespace details {
@@ -351,13 +351,13 @@ namespace details {
 template<
          typename T, // type of trajectory
          typename L, // type specifying the length of the run
-         typename D, // type specifying the frequency of display
-         typename AutostopHandler // should support operator()(const typename T::DisplayedArray &)
+         typename D, // type specifying the frequency of stream
+         typename AutostopHandler // should support operator()(const typename T::StreamedArray &)
          >
-StreamedArray<typename T::DisplayedArray>
-run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
+StreamedArray<typename T::StreamedArray>
+run(T& traj, L length, D streamFreq, unsigned stateStreamFreq,
     const std::string& trajectoryFileName, const std::string& initialFileName,
-    int precision, bool displayInfo, bool firstStateDisplay,
+    int precision, bool streamInfo, bool firstStateStream,
     const std::string& parsedCommandLine,
     bool doStreaming, bool returnStreamedArray,
     AutostopHandler&& autostopHandler
@@ -365,21 +365,21 @@ run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
 
 } // details
 
-/// Running in deltaT mode (displays in equal time intervals) for a certain time \related Trajectory
+/// Running in deltaT mode (streams in equal time intervals) for a certain time \related Trajectory
 /**
  * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
  *
  * A Trajectory can
  * - be \link Trajectory::evolve evolved\endlink (propagated in time by given time intervals)
  * - \link Trajectory::readState perform i/o of its entire state\endlink, that is, a bunch of information necessary for resuming a Trajectory from a certain time instant
- * - \link Trajectory::display display relevant physical and numerical information\endlink about its actual state at any time (e.g. a set of quantum averages in the case of a quantum trajectory)
+ * - \link Trajectory::stream stream relevant physical and numerical information\endlink about its actual state at any time (e.g. a set of quantum averages in the case of a quantum trajectory)
  *
  * \note While the entire state can be huge (e.g. the state vector or density operator in the case of a quantum trajectory) the relevant information in an actual numerical experiment
  * is usually much less (a set of quantum averages that doesn’t entirely define the state).
  *
  * Furthermore, a Trajectory can
  * - provide information about its \link Trajectory::getTime time\endlink and \link Trajectory::getDtDid last performed timestep\endlink
- * - \link Trajectory::displayParameters print a header\endlink summarizing its physical and numerical parameters together with a key to the set of relevant physical information displayed during the run
+ * - \link Trajectory::streamParameters print a header\endlink summarizing its physical and numerical parameters together with a key to the set of relevant physical information streamed during the run
  * - \link Trajectory::logOnEnd print a log\endlink at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
  *
  * \see Simulated for a full generic implementation of Trajectory together with a small tutorial
@@ -387,24 +387,24 @@ run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
  * \todo Consider taking Trajectory by rvalue reference
  *
  */
-template<typename DA, typename AutostopHandler>
-StreamedArray<DA>
-run(Trajectory<DA>& traj, ///< the trajectory to run
+template<typename SA, typename AutostopHandler>
+StreamedArray<SA>
+run(Trajectory<SA>& traj, ///< the trajectory to run
     double time, ///< end time
-    double deltaT, ///< time interval between two \link Trajectory::display displays\endlink
-    unsigned sdf, ///< number of \link Trajectory::display displays\endlink between two \link Trajectory::writeState state displays\endlink
-    const std::string& ofn, ///< name of the output file for \link Trajectory::display displays\endlink — if empty, display to standard output; \link Trajectory::writeState state displays\endlink into file named `ofn.state`
+    double deltaT, ///< time interval between two \link Trajectory::stream streams\endlink
+    unsigned sdf, ///< number of \link Trajectory::stream streams\endlink between two \link Trajectory::writeState state streams\endlink
+    const std::string& ofn, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output; \link Trajectory::writeState state streams\endlink into file named `ofn.state`
     const std::string& initialFileName, ///< name of file containing initial condition state for the run
-    int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::display displays\endlink
-    bool displayInfo, ///< governs whether a \link Trajectory::displayParameters header\endlink is displayed at the top of the output
-    bool firstStateDisplay, ///< governs whether the state is displayed at time zero (important if \link Trajectory::writeState state display\endlink is costly)
+    int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streams\endlink
+    bool streamInfo, ///< governs whether a \link Trajectory::streamParameters header\endlink is streamed at the top of the output
+    bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state stream\endlink is costly)
     const std::string& parsedCommandLine,
     bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
     AutostopHandler&& autostopHandler
    )
 {
-  return details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,returnStreamedArray,
+  return details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
                       std::forward<AutostopHandler>(autostopHandler));
 }
 
@@ -423,15 +423,15 @@ run(Trajectory<DA>& traj, ///< the trajectory to run
  *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --NDt 10
  *
  */
-template<typename DA, typename AutostopHandler>
-StreamedArray<DA>
-run(Trajectory<DA>& traj, long nDt, ///< the end time of the trajectory will be nDt*deltaT
-    double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+template<typename SA, typename AutostopHandler>
+StreamedArray<SA>
+run(Trajectory<SA>& traj, long nDt, ///< the end time of the trajectory will be nDt*deltaT
+    double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool streamInfo, bool firstStateStream,
     const std::string& parsedCommandLine, bool doStreaming, bool returnStreamedArray,
     AutostopHandler&& autostopHandler
    )
 {
-  return details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,returnStreamedArray,
+  return details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
                       std::forward<AutostopHandler>(autostopHandler));
 }
 
@@ -439,19 +439,19 @@ run(Trajectory<DA>& traj, long nDt, ///< the end time of the trajectory will be 
 /// Another version of \link Trajectory::run `run`\endlink for running in dc-mode \related Adaptive
 /**
  * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Adaptive::step single adaptive timestep\endlink, it is possible to count the
- * individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each display. Hence, we get denser displays in time when the timestep is small,
+ * individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each streaming. Hence, we get denser streamings in time when the timestep is small,
  * that is, when the important things are happening in the dynamics.
  * 
  */
 template<typename A, typename BASE, typename AutostopHandler>
-StreamedArray<typename BASE::DisplayedArray>
-run(Adaptive<A,BASE>& traj, double time, int dc, ///< number of adaptive timesteps taken between two displays
-    unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool displayInfo, bool firstStateDisplay,
+StreamedArray<typename BASE::StreamedArray>
+run(Adaptive<A,BASE>& traj, double time, int dc, ///< number of adaptive timesteps taken between two streams
+    unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool streamInfo, bool firstStateStream,
     const std::string& parsedCommandLine, bool doStreaming, bool returnStreamedArray,
     AutostopHandler&& autostopHandler
    )
 {
-  return details::run(traj,time,dc,sdf,ofn,initialFileName,precision,displayInfo,firstStateDisplay,parsedCommandLine,doStreaming,returnStreamedArray,
+  return details::run(traj,time,dc,sdf,ofn,initialFileName,precision,streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
                       std::forward<AutostopHandler>(autostopHandler));
 }
 
@@ -464,17 +464,17 @@ run(Adaptive<A,BASE>& traj, double time, int dc, ///< number of adaptive timeste
  * \note This means that ParsRun::NDt takes precedence over ParsRun::T
  *
  */
-template <typename DA>
-StreamedArray<DA>
-run(Trajectory<DA>& traj, const ParsRun& p, bool doStreaming=true, bool returnStreamedArray=false)
+template <typename SA>
+StreamedArray<SA>
+run(Trajectory<SA>& traj, const ParsRun& p, bool doStreaming=true, bool returnStreamedArray=false)
 { 
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
-  if (p.NDt) return run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),
+  if (p.NDt) return run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
                         doStreaming,returnStreamedArray,
-                        AutostopHandlerGeneric<DA>(p.autoStopEpsilon,p.autoStopRepetition));
-  else       return run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),
+                        AutostopHandlerGeneric<SA>(p.autoStopEpsilon,p.autoStopRepetition));
+  else       return run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
                         doStreaming,returnStreamedArray,
-                        AutostopHandlerGeneric<DA>(p.autoStopEpsilon,p.autoStopRepetition));
+                        AutostopHandlerGeneric<SA>(p.autoStopEpsilon,p.autoStopRepetition));
 }
 
 
@@ -487,12 +487,12 @@ run(Trajectory<DA>& traj, const ParsRun& p, bool doStreaming=true, bool returnSt
  * 
  */
 template<typename A, typename BASE>
-StreamedArray<typename BASE::DisplayedArray>
+StreamedArray<typename BASE::StreamedArray>
 run(Adaptive<A,BASE>& traj, const ParsRun& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  if      (p.dc) return run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.displayInfo,p.firstStateDisplay,p.getParsedCommandLine(),
+  if      (p.dc) return run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
                             doStreaming,returnStreamedArray,
-                            AutostopHandlerGeneric<typename BASE::DisplayedArray>(p.autoStopEpsilon,p.autoStopRepetition));
+                            AutostopHandlerGeneric<typename BASE::StreamedArray>(p.autoStopEpsilon,p.autoStopRepetition));
   else if (p.Dt) return run(static_cast<BASE&>(traj),p,doStreaming,returnStreamedArray);
   else throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
 }

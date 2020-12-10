@@ -9,7 +9,7 @@
 namespace structure {
 
 
-/// Implements LiouvilleanAveragedCommon::displayKey and LiouvilleanAveragedCommon::nAvr with the help of a cpputils::KeyPrinter
+/// Implements LiouvilleanAveragedCommon::streamKey and LiouvilleanAveragedCommon::nAvr with the help of a cpputils::KeyPrinter
 /**
  * The number of averages is taken simply to be the \link cpputils::KeyPrinter::length length of the key\endlink
  */
@@ -37,7 +37,7 @@ protected:
 private:
   size_t nAvr_v() const final {return keyPrinter_.length();}
 
-  std::ostream& displayKey_v(std::ostream& os, size_t& i) const final {return keyPrinter_.displayKey(os,i);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const final {return keyPrinter_.streamKey(os,i);}
 
   cpputils::KeyPrinter keyPrinter_;
 

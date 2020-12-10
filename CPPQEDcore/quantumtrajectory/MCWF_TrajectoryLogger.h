@@ -30,9 +30,9 @@ using namespace mcwf;
   
 typedef std::list<Logger> LoggerList;
 
-/// Called by EnsembleMCWF::logOnEnd, it displays a time histogram of total jumps
+/// Called by EnsembleMCWF::logOnEnd, it streams a time histogram of total jumps
 /** \todo The different kinds of jumps should be collected into different histograms */
-std::ostream& displayLog(std::ostream&, const LoggerList&, size_t nBins, size_t nJumpsPerBin);
+std::ostream& streamLog(std::ostream&, const LoggerList&, size_t nBins, size_t nJumpsPerBin);
   
 } // ensemble
 
@@ -46,7 +46,7 @@ namespace mcwf {
  * logLevel | effect
  * -------- | ------
  * <=1      | No log output *during* the trajectory.
- * >0       | Summary log information at the end of the trajectory display
+ * >0       | Summary log information at the end of the trajectory stream
  * >1       | Reporting jumps on `std::cout` also during trajectory evolution.
  * >2       | Reporting `dpLimit` overshoots and the resulting stepsize decrease also during trajectory evolution.
  * >3       | Reporting number of failed ODE steps in the given step of the trajectory evolution.
@@ -58,7 +58,7 @@ public:
   typedef std::list<std::pair<double,size_t> > MCWF_Trajectory; ///< Stores <time instant, lindbladNo> pairs, that is, the complete stochastic MCWF trajectory (the rest is deterministic)
 
   /// Straightforward constructor
-  Logger(int logLevel, ///< governs amount of log output during trajectory display
+  Logger(int logLevel, ///< governs amount of log output during trajectory stream
               size_t nLindblads ///< number of Lindblad operators
              );
 
@@ -71,7 +71,7 @@ public:
 
   void jumpOccured(std::ostream&, double t, size_t lindbladNo); ///< registers a jump at time `t` with its identifying ordinal
 
-  std::ostream& onEnd(std::ostream&) const; ///< displays summary log information at the end (called by MCWF_Trajectory::logOnEnd_v)
+  std::ostream& onEnd(std::ostream&) const; ///< streams summary log information at the end (called by MCWF_Trajectory::logOnEnd_v)
   
   const MCWF_Trajectory& getTrajectory() const {return traj_;}
   
@@ -84,7 +84,7 @@ private:
                                                       & traj_;}
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-  friend std::ostream& ensemble::displayLog(std::ostream&, const ensemble::LoggerList&, size_t, size_t);
+  friend std::ostream& ensemble::streamLog(std::ostream&, const ensemble::LoggerList&, size_t, size_t);
   
   const int logLevel_;
   const size_t nLindblads_;

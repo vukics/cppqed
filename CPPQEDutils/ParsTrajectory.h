@@ -44,7 +44,7 @@ struct ParsEvolved
   evolved::SteppingFunction& sf; ///< \link evolved::SteppingFunction stepping-function type\endlink
   double &nextDtTryCorrectionFactor; ///< cf. evolved::MakerGSL::MakerGSL()
   
-  int &logLevel; ///< governs how much logging information is displayed during a Trajectory run \see quantumtrajectory::mcwf::Logger for a usecase
+  int &logLevel; ///< governs how much logging information is streamed during a Trajectory run \see quantumtrajectory::mcwf::Logger for a usecase
   
   /// All `%Pars…` classes are constructed taking a parameters::Table, to register the parameters on
   /** 
@@ -68,15 +68,15 @@ struct ParsRun
   long &NDt; ///< number of deltaT intervals in \link trajectory::Trajectory::run deltaT-mode\endlink
   std::string &ofn, &initialFileName;
 
-  formdouble::Zero &precision; ///< the overall precision of trajectory display \see FormDouble::overallPrecision
+  formdouble::Zero &precision; ///< the overall precision of trajectory stream \see FormDouble::overallPrecision
 
-  bool &displayInfo, &firstStateDisplay;
+  bool &streamInfo, &firstStateStream;
 
   unsigned &sdf;
 
   double &autoStopEpsilon; ///< relative precision for autostopping
 
-  unsigned &autoStopRepetition; ///< number of displayed lines repeated within relative precision before autostopping – 0 means no autostopping
+  unsigned &autoStopRepetition; ///< number of streamed lines repeated within relative precision before autostopping – 0 means no autostopping
   
   ParsRun(parameters::Table&, const std::string& mod="");
 

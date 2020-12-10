@@ -25,7 +25,7 @@ int main(int, char**)
 
   // benchmark(mode,mode,Vector<0>());
 
-  mode.displayParameters(std::cout);
+  mode.streamParameters(std::cout);
 
   quantumdata::StateVector<1> psi(mode.getDimensions());
 
@@ -36,7 +36,7 @@ int main(int, char**)
 
   // 1
 
-  // if (doDisplay) cout<<blitzplusplus::unaryArray(psi());
+  // if (doStream) cout<<blitzplusplus::unaryArray(psi());
   quantumdata::StateVector<1> psiout(psi);
 
   {
@@ -47,7 +47,7 @@ int main(int, char**)
       structure::Hamiltonian<1>::addContribution(0.,psi(),psiout(),0.,ha);
   }
 
-  // if (doDisplay) cout<<blitzplusplus::unaryArray(psiout());
+  // if (doStream) cout<<blitzplusplus::unaryArray(psiout());
 
 
 }

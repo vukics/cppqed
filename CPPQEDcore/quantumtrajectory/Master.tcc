@@ -102,17 +102,17 @@ Base<RANK>::step_v(double deltaT)
 
 
 template<int RANK>
-std::ostream& Base<RANK>::displayParameters_v(std::ostream& os) const
+std::ostream& Base<RANK>::streamParameters_v(std::ostream& os) const
 {
   using namespace std;
 
-  this->displayCharacteristics( this->getQS()->displayParameters( Adaptive::displayParameters_v(os)<<"Solving Master equation."<<addToParameterDisplay()<<endl<<endl ) )<<endl;
+  this->streamCharacteristics( this->getQS()->streamParameters( Adaptive::streamParameters_v(os)<<"Solving Master equation."<<addToParameterStream()<<endl<<endl ) )<<endl;
 
   if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";
     {
       size_t i=0;
-      li->displayKey(os,i);
+      li->streamKey(os,i);
     }
     os<<"Explicit superoperator calculations: ";
     DensityOperator rhotemp(rho_->getDimensions());

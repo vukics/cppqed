@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Defines display_densityoperator::_}
-#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
-#define CPPQEDCORE_QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
+/// \briefFile{Defines stream_densityoperator::_}
+#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_STREAM_DENSITY_OPERATOR_H_INCLUDED
+#define CPPQEDCORE_QUANTUMTRAJECTORY_STREAM_DENSITY_OPERATOR_H_INCLUDED
 
 #include "DensityOperator.h"
 
@@ -14,14 +14,14 @@
 
 namespace quantumtrajectory {
 
-/// Contains display_densityoperator::_
-namespace display_densityoperator {
+/// Contains stream_densityoperator::_
+namespace stream_densityoperator {
 
 
-/// Wraps common functionality of Master & EnsembleMCWF concerning display of quantum averages on the basis of density operators
+/// Wraps common functionality of Master & EnsembleMCWF concerning stream of quantum averages on the basis of density operators
 /**
  * This comprises
- * - keeping a structure::Averaged instant and calling structure::Averaged::display
+ * - keeping a structure::Averaged instant and calling structure::Averaged::stream
  * - performing \link quantumdata::negPT negativity calculation\endlink if needed
  * - extending key with negativity when needed
  * 
@@ -40,9 +40,9 @@ public:
 
   _(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}
 
-  std::tuple<std::ostream&,typename Averaged::Averages> display(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
+  std::tuple<std::ostream&,typename Averaged::Averages> stream(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   {
-    auto res{structure::display(av_,t,rho,os,precision)};
+    auto res{structure::stream(av_,t,rho,os,precision)};
     auto & averages{std::get<1>(res)};
     if (negativity_) {
       auto n{negPT(rho,V())};
@@ -54,9 +54,9 @@ public:
     return {os,averages};
   }
 
-  std::ostream& displayKey(std::ostream& os, size_t& i) const
+  std::ostream& streamKey(std::ostream& os, size_t& i) const
   {
-    if (av_) av_->displayKey(os,i); 
+    if (av_) av_->streamKey(os,i); 
     if (negativity_) os<<"Trajectory\n"<<i<<". negativity"<<std::endl;
     return os;
   }
@@ -69,9 +69,9 @@ private:
 };
 
 
-} // display_densityoperator
+} // stream_densityoperator
 
 
 } // quantumtrajectory
 
-#endif // CPPQEDCORE_QUANTUMTRAJECTORY_DO_DISPLAY_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMTRAJECTORY_STREAM_DENSITY_OPERATOR_H_INCLUDED

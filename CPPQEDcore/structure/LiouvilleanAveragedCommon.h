@@ -41,14 +41,14 @@ public:
 
   virtual ~LiouvilleanAveragedCommon() {}
 
-  /// Displays a key (a.k.a. legend)
+  /// Streams a key (a.k.a. legend)
   /**
    * - for a  Liouvillean, the key is a description of decay channels,
-   * - for an Averaged, it describes the displayed columns
+   * - for an Averaged, it describes the streamed columns
    */
-  std::ostream& displayKey(std::ostream& o,
+  std::ostream& streamKey(std::ostream& o,
                            size_t& i ///< the ordinal number where the key of the present element begins
-                          ) const {return displayKey_v(o,i);}
+                          ) const {return streamKey_v(o,i);}
 
   /// Returns the number of calculated quantum averages
   /**
@@ -58,7 +58,7 @@ public:
   size_t nAvr() const {return nAvr_v();}
   
 private:
-  virtual std::ostream& displayKey_v(std::ostream&, size_t&) const = 0;
+  virtual std::ostream& streamKey_v(std::ostream&, size_t&) const = 0;
   virtual size_t        nAvr_v      (                      ) const = 0;
 
 

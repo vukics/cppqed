@@ -5,7 +5,7 @@
 
 #include "Structure.h"
 
-#include "DO_Display.h"
+#include "StreamDensityOperator.h"
 #include "QuantumTrajectory.h"
 #include "Types.h"
 
@@ -70,12 +70,12 @@ protected:
 private:
   void step_v(double) final;
 
-  std::ostream& displayParameters_v(std::ostream&) const override;
+  std::ostream& streamParameters_v(std::ostream&) const override;
 
   virtual void  unaryIter(                           DensityOperatorLow&,  UnaryFunction) const;
   virtual void binaryIter(const DensityOperatorLow&, DensityOperatorLow&, BinaryFunction) const;
 
-  virtual const std::string addToParameterDisplay() const {return "";}
+  virtual const std::string addToParameterStream() const {return "";}
 
 };
 
@@ -92,7 +92,7 @@ private:
  * \note The ODE driver underlying this class needs to store several (typically 6–7, this depends on the chosen driver) density-operator instants.
  *
  * \tparam RANK arity of the Hilbert space
- * \tparam V has the same function as the template parameter `V` in display_densityoperator::_, which class is used here for deriving quantum averages to display from the evolved density operator
+ * \tparam V has the same function as the template parameter `V` in stream_densityoperator::_, which class is used here for deriving quantum averages to stream from the evolved density operator
  * \tparam IS_FAST the class will use either blitzplusplus::basi::Iterator or blitzplusplus::basi_fast::Iterator to perform the multi-matrix multiplications, depending on this template argument
  * 
  */
@@ -113,22 +113,22 @@ public:
   Master(DO_Ptr rho, ///< the density operator to be evolved
          typename QuantumSystem::Ptr sys, ///< object representing the quantum system
          const master::Pars& pt, ///< parameters of the evolution
-         bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
+         bool negativity, ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
          const DensityOperatorLow& scaleAbs=DensityOperatorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
         )
-    : Base(rho,sys,pt,scaleAbs), doDisplay_(this->getAv(),negativity)
+    : Base(rho,sys,pt,scaleAbs), dos_(this->getAv(),negativity)
   {}
   
   const DO_Ptr getRho() const {return this->rho_;}
 
 private:
-  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const override {return doDisplay_.display(this->getTime(),*this->rho_,os,precision);}
+  typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override {return dos_.stream(this->getTime(),*this->rho_,os,precision);}
   
-  std::ostream& displayKey_v(std::ostream& os, size_t& i) const override {return doDisplay_.displayKey(os,i);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return dos_.streamKey(os,i);}
 
   const std::string trajectoryID_v() const override {return "Master";}
   
-  const display_densityoperator::_<RANK,V> doDisplay_;
+  const stream_densityoperator::_<RANK,V> dos_;
 
 };
 

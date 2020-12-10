@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 
-#include "DO_Display.h"
+#include "StreamDensityOperator.h"
 #include "MCWF_Trajectory.tcc"
 #include "DensityOperator.h"
 #include "ParsMCWF_Trajectory.h"
@@ -69,7 +69,7 @@ private:
       if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&i))
         loggerList.push_back(traj->getLogger());
   
-    return displayLog(os,loggerList,nBins_,nJumpsPerBin_);
+    return streamLog(os,loggerList,nBins_,nJumpsPerBin_);
   }
   
   const QuantumSystemPtr qs_;
@@ -83,7 +83,7 @@ private:
 
 /// Derived from trajectory::Ensemble `<` quantumdata::DensityOperator `<RANK> , ` quantumdata::StateVector `<RANK> >`, it implements an ensemble of \link MCWF_Trajectory MCWF trajectories\endlink started from a pure-state initial condition
 /**
- * The class overrides trajectory::Trajectory::display in such a way that at the time instant of display,
+ * The class overrides trajectory::Trajectory::stream in such a way that at the time instant of streaming,
  * the ensemble-averaged density operator of the system gets assembled from the stochastic state vectors of the element \link MCWF_Trajectory MCWF trajectories\endlink as
  * \f[\rho_{\text{ensemble}}(t)=\frac1{\text{\scriptsize number of trajectories}}\sum_{i\in\{\text{set of trajectories}\}}\ket{\Psi_i(t)}\bra{\Psi_i(t)}.\f]
  * 
@@ -96,7 +96,7 @@ private:
  * so that it can be used only in \link trajectory::Trajectory::run deltaT-mode\endlink.
  * 
  * \tparam RANK arity of the Hilbert space
- * \tparam V has the same function as the template parameter `V` in display_densityoperator::_, which class is used here for deriving quantum averages to display from the assembled density operator
+ * \tparam V has the same function as the template parameter `V` in stream_densityoperator::_, which class is used here for deriving quantum averages to stream from the assembled density operator
  * 
  * \todo An additional constructor could be added to initialize the ensemble by a full density operator, which could be appropriately sampled.
  * 
@@ -107,7 +107,7 @@ class EnsembleMCWF : public ensemble::Base<RANK>
 private:
   typedef ensemble::Base<RANK> Base;
 
-  typedef display_densityoperator::_<RANK,V> DO_Display;
+  typedef stream_densityoperator::_<RANK,V> DO_Stream;
 
 public:
   typedef typename Base::StateVectorLow StateVectorLow; 
@@ -115,28 +115,28 @@ public:
   typedef typename Base::Ensemble Ensemble;
 
   typedef typename Base      ::    StateVector     StateVector;
-  typedef typename DO_Display::DensityOperator DensityOperator;
+  typedef typename DO_Stream::DensityOperator DensityOperator;
 
   /// Templated constructor with the same idea as Master::Master
   EnsembleMCWF(
                std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
                typename structure::QuantumSystem<RANK>::Ptr sys, ///< represents the quantum system to be simulated
                const mcwf::Pars& p, ///< parameters of the simulation (contains \link mcwf::Pars::nTraj the number of trajectories\endlink)
-               bool negativity, ///< governs whether entanglement should be calculated, cf. display_densityoperator::_, quantumdata::negPT
+               bool negativity, ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
                const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
                )
-    : Base(psi,sys,p,scaleAbs), doDisplay_(structure::qsa<RANK>(this->getQS()),negativity) {}
+    : Base(psi,sys,p,scaleAbs), dos_(structure::qsa<RANK>(this->getQS()),negativity) {}
 
 private:
-  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const final
+  typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const final
   {
     const auto averages{*this->averaged()};
-    return doDisplay_.display(this->getTime(),averages,os,precision);
+    return dos_.stream(this->getTime(),averages,os,precision);
   }
   
-  std::ostream& displayKey_v(std::ostream& os, size_t& i) const final {return doDisplay_.displayKey(os,i);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const final {return dos_.streamKey(os,i);}
 
-  const DO_Display doDisplay_;
+  const DO_Stream dos_;
 
 };
 
@@ -152,10 +152,10 @@ template<int RANK>
 struct HandleType<quantumdata::DensityOperator<RANK> > : mpl::identity<std::shared_ptr<quantumdata::DensityOperator<RANK> > > {};
 
 
-template<typename DA, int RANK>
-struct AverageTrajectoriesInRange<DA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >
+template<typename SA, int RANK>
+struct AverageTrajectoriesInRange<SA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >
 {
-  typedef typename Ensemble<DA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator CI;
+  typedef typename Ensemble<SA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator CI;
   
   static const auto _(CI begin, CI end)
   {

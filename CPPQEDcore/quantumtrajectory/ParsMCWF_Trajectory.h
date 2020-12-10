@@ -22,7 +22,7 @@ struct Pars : public trajectory::ParsStochastic {
     &overshootTolerance; ///< the parameter \f$\delta p_\text{limit}'/\delta p_\text{limit}\f$ (cf. 2.b.ii \link MCWF_Trajectory here\endlink)
 
   size_t
-    &nBins, ///< governs how many bins should be used for the histogram of jumps created by ensemble::displayLog (a zero value means a heuristic automatic determination)
+    &nBins, ///< governs how many bins should be used for the histogram of jumps created by ensemble::streamLog (a zero value means a heuristic automatic determination)
     &nJumpsPerBin; ///< the average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination
 
   Pars(parameters::Table& p, const std::string& mod="");

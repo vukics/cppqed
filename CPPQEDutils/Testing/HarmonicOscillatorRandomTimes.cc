@@ -33,7 +33,7 @@ int main(int, char**)
                      .1/std::max(1.,std::max(omega,gamma)),
                      0,1e-6,1e-18);
   
-  // s.displayParameters(std::cout);
+  // s.streamParameters(std::cout);
 
   auto ran{randomized::MakerGSL()(1001)};
 

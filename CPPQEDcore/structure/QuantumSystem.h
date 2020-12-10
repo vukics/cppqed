@@ -37,11 +37,11 @@ public:
   virtual ~QuantumSystem() {}
 
   double        highestFrequency (                ) const {return  highestFrequency_v(  );} ///< The fastest timescale of the system for ODE stepping
-  std::ostream& displayParameters(std::ostream& os) const {return displayParameters_v(os);} ///< Communicating system parameters towards the user
+  std::ostream& streamParameters(std::ostream& os) const {return streamParameters_v(os);} ///< Communicating system parameters towards the user
 
 private:
   virtual double         highestFrequency_v(             ) const = 0;
-  virtual std::ostream& displayParameters_v(std::ostream&) const = 0;
+  virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
 
 };
 

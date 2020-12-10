@@ -123,11 +123,11 @@ public:
     : averaged_(averaged), ldo_(ldo) {}
 
 private:
-  std::ostream& displayKey_v(std::ostream& os, size_t& n) const {return averaged_->displayKey(os,n);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& n) const {return averaged_->streamKey(os,n);}
 
   void process_v(Averages& averages) const {averaged_->process(averages);}
 
-  std::ostream& display_v(const Averages& averages, std::ostream& os, int n) const {return averaged_->display(averages,os,n);}
+  std::ostream& stream_v(const Averages& averages, std::ostream& os, int n) const {return averaged_->stream(averages,os,n);}
 
   size_t nAvr_v() const {return averaged_->nAvr();}
 

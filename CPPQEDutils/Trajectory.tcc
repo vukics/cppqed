@@ -52,17 +52,17 @@ namespace details {
   
 namespace runTraits {
 
-template <typename DA> inline bool doContinue(const Trajectory<DA>& traj, double time, long      ) {return traj.getTime()<time;}
-template <typename DA> inline bool doContinue(const Trajectory<DA>&     , long length, long count) {return count<=length      ;}
+template <typename SA> inline bool doContinue(const Trajectory<SA>& traj, double time, long      ) {return traj.getTime()<time;}
+template <typename SA> inline bool doContinue(const Trajectory<SA>&     , long length, long count) {return count<=length      ;}
 
-template <typename DA> inline void advance(Trajectory<DA>& traj, long       , double deltaT) {traj.evolve(deltaT);}
-template <typename DA> inline void advance(Trajectory<DA>& traj, double time, double deltaT) {traj.evolve(std::min(deltaT,time-traj.getTime()));}
+template <typename SA> inline void advance(Trajectory<SA>& traj, long       , double deltaT) {traj.evolve(deltaT);}
+template <typename SA> inline void advance(Trajectory<SA>& traj, double time, double deltaT) {traj.evolve(std::min(deltaT,time-traj.getTime()));}
 
 template<typename A, typename BASE>
 inline void advance(Adaptive<A,BASE>& traj, double time, int) {traj.step(time-traj.getTime());}
 
-inline bool doDisplay(long      , double         ) {return true;}
-inline bool doDisplay(long count, int displayFreq) {return !(count%displayFreq);}
+inline bool doStream(long      , double         ) {return true;}
+inline bool doStream(long count, int streamFreq) {return !(count%streamFreq);}
 
 inline auto writeTimestep(int   ) {return " timestep";}
 inline auto writeTimestep(double) {return ""         ;}
@@ -73,8 +73,8 @@ inline double endTime(double time, double   , double            ) {return time  
 } // runTraits
 
 
-template<typename DA>
-bool restoreState(Trajectory<DA>& traj, const std::string& trajectoryFileName, const std::string& stateFileName, const std::string& initialFileName)
+template<typename SA>
+bool restoreState(Trajectory<SA>& traj, const std::string& trajectoryFileName, const std::string& stateFileName, const std::string& initialFileName)
 {
   if (trajectoryFileName!="") {
 
@@ -100,10 +100,10 @@ bool restoreState(Trajectory<DA>& traj, const std::string& trajectoryFileName, c
 
 
 template<typename T, typename L, typename D, typename AutostopHandler>
-trajectory::StreamedArray<typename T::DisplayedArray> 
-trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplayFreq,
+trajectory::StreamedArray<typename T::StreamedArray> 
+trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFreq,
                          const std::string& trajectoryFileName, const std::string& initialFileName,
-                         int precision, bool displayInfo, bool firstStateDisplay,
+                         int precision, bool streamInfo, bool firstStateStream,
                          const std::string& parsedCommandLine,
                          bool doStreaming, bool returnStreamedArray,
                          AutostopHandler&& autostopHandler
@@ -111,7 +111,7 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
 {
   using namespace std; using namespace runTraits; using namespace cpputils;
 
-  StreamedArray<typename T::DisplayedArray> res;
+  StreamedArray<typename T::StreamedArray> res;
   
   ////////////////////////////////////////////////
   // Determining i/o streams, eventual state input
@@ -124,7 +124,7 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
     streamToFile=(trajectoryFileName!=""),  
     continuing=restoreState(traj,trajectoryFileName,stateFileName,initialFileName);
   
-  const double timeToReach=endTime(length,displayFreq,traj.getTime());
+  const double timeToReach=endTime(length,streamFreq,traj.getTime());
     
   if (timeToReach && timeToReach<=traj.getTime()) return res;
 
@@ -147,18 +147,18 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
   // Writing introduction
   ///////////////////////
 
-  if (displayInfo) {
+  if (streamInfo) {
     if (!continuing) {
       if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
-      traj.displayParameters(commentingStream<<versionHelper())
+      traj.streamParameters(commentingStream<<versionHelper())
         <<endl<<"Run Trajectory up to time "<<timeToReach
-        <<" -- Display period: "<<displayFreq<<writeTimestep(displayFreq)<<endl<<endl;
+        <<" -- Stream period: "<<streamFreq<<writeTimestep(streamFreq)<<endl<<endl;
     }
     else
       commentingStream<<"Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
   }
 
-  if (!timeToReach) {traj.display(os,precision); return res;}
+  if (!timeToReach) {traj.stream(os,precision); return res;}
 
   //////////////////////////////
   // Mid section: the actual run
@@ -168,23 +168,23 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
 
   bool
     stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory
-    evsDisplayed=false; // signifies whether the expectation values have already been displayed ”
+    evsStreamed=false; // signifies whether the expectation values have already been streamed ”
 
   try {
 
     for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
 
       if (count) {
-        advance(traj,length,displayFreq);
-        stateSaved=evsDisplayed=false;
+        advance(traj,length,streamFreq);
+        stateSaved=evsStreamed=false;
       }
 
-      if (!count || doDisplay(count,displayFreq)) {
+      if (!count || doStream(count,streamFreq)) {
 
         if (
-            stateDisplayFreq && 
-            !(stateCount%stateDisplayFreq) && 
-            (stateCount || (firstStateDisplay && !continuing))
+            stateStreamFreq && 
+            !(stateCount%stateStreamFreq) && 
+            (stateCount || (firstStateStream && !continuing))
            )
         {
           writeViaSStream(traj,ofs.get());
@@ -193,17 +193,17 @@ trajectory::details::run(T& traj, L length, D displayFreq, unsigned stateDisplay
         ++stateCount;
 
         if (count || !continuing) {
-          evsDisplayed=true;
-          auto displayReturn{traj.display(os,precision)};
-          if (returnStreamedArray) res.emplace_back(traj.getTime(),traj.getDtDid(),get<1>(displayReturn));
-          autostopHandler(get<1>(displayReturn));
+          evsStreamed=true;
+          auto streamReturn{traj.stream(os,precision)};
+          if (returnStreamedArray) res.emplace_back(traj.getTime(),traj.getDtDid(),get<1>(streamReturn));
+          autostopHandler(get<1>(streamReturn));
         }
       }
     }
 
   } catch (const StoppingCriterionReachedException& except) {commentingStream<<"Stopping criterion has been reached"<<endl;}
   
-  if (!evsDisplayed) traj.display(os,precision); // Display at the end instant if display has not happened yet
+  if (!evsStreamed) traj.stream(os,precision); // Stream at the end instant if stream has not happened yet
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
@@ -258,9 +258,9 @@ trajectory::Adaptive<A,BASE>::Adaptive(A& y, Derivs derivs, double dtInit, int l
 
 
 template<typename A, typename BASE>
-std::ostream& trajectory::Adaptive<A,BASE>::displayParameters_v(std::ostream& os) const
+std::ostream& trajectory::Adaptive<A,BASE>::streamParameters_v(std::ostream& os) const
 {
-  return evolved_->displayParameters(os)<<"Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
+  return evolved_->streamParameters(os)<<"Trajectory Parameters: epsRel="<<evolved_->getEpsRel()<<" epsAbs="<<evolved_->getEpsAbs()<<std::endl;
 }
 
 template<typename A, typename BASE>

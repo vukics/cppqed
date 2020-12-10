@@ -70,10 +70,10 @@ qsa(std::shared_ptr<const T> t)
 // Some functions that are used in contexts other than QuantumSystemWrapper are factored out:
 
 
-/// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::display in succession; otherwise a no-op. \related QuantumSystemWrapper
+/// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::stream in succession; otherwise a no-op. \related QuantumSystemWrapper
 template<int RANK>
 std::tuple<std::ostream&, typename Averaged<RANK>::Averages>
-display(std::shared_ptr<const Averaged<RANK> > av,
+stream(std::shared_ptr<const Averaged<RANK> > av,
         double t,
         const quantumdata::LazyDensityOperator<RANK>& matrix,
         std::ostream& os,
@@ -83,7 +83,7 @@ display(std::shared_ptr<const Averaged<RANK> > av,
   if (av) {
     averages.reference(av->average(t,matrix));
     av->process(averages);
-    av->display(averages,os,precision);
+    av->stream(averages,os,precision);
   }
   return {os,averages};
 }
@@ -186,8 +186,8 @@ public:
   const L_or_A_Ptr getLA(LA_Av_tagType) const {return av_;}
   //@}
 
-  /// Displays the dynamical characteristics of the system
-  std::ostream& displayCharacteristics(std::ostream& os) const {return os<<"System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
+  /// Streams the dynamical characteristics of the system
+  std::ostream& streamCharacteristics(std::ostream& os) const {return os<<"System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
 
 
   /// \name Forwarded members from Exact
@@ -215,9 +215,9 @@ public:
   //@{
   void process(Averages& averages) const {if (av_) av_->process(averages);}
 
-  std::tuple<std::ostream&,Averages> display(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const
+  std::tuple<std::ostream&,Averages> stream(double t, const LazyDensityOperator& matrix, std::ostream& os, int precision) const
   {
-    return structure::display(av_,t,matrix,os,precision);
+    return structure::stream(av_,t,matrix,os,precision);
   }
   //@}
 
@@ -228,7 +228,7 @@ public:
   size_t nAvr() const {const auto ptr=getLA(LiouvilleanAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
 
   template<LiouvilleanAveragedTag LA>
-  std::ostream& displayKey(std::ostream& os, size_t& i) const {if (const auto ptr=getLA(LiouvilleanAveragedTag_<LA>())) ptr->displayKey(os,i); return os;}
+  std::ostream& streamKey(std::ostream& os, size_t& i) const {if (const auto ptr=getLA(LiouvilleanAveragedTag_<LA>())) ptr->streamKey(os,i); return os;}
 
   template<LiouvilleanAveragedTag LA>
   const Averages average(double t, const LazyDensityOperator& matrix) const {return structure::average(getLA(LiouvilleanAveragedTag_<LA>()),t,matrix);}

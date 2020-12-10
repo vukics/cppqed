@@ -190,17 +190,17 @@ void MCWF_Trajectory<RANK>::step_v(double Dt)
 
 
 template<int RANK>
-std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
+std::ostream& MCWF_Trajectory<RANK>::streamParameters_v(std::ostream& os) const
 {
   using namespace std;
   
-  this->displayCharacteristics(this->getQS()->displayParameters(Base::displayParameters_v(os)<<"MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
+  this->streamCharacteristics(this->getQS()->streamParameters(Base::streamParameters_v(os)<<"MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
 
   if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";
     {
       size_t i=0;
-      li->displayKey(os,i);
+      li->streamKey(os,i);
     }
     os<<"Alternative Lindblads: ";
     {
@@ -218,9 +218,9 @@ std::ostream& MCWF_Trajectory<RANK>::displayParameters_v(std::ostream& os) const
 
 
 template<int RANK>
-std::ostream& MCWF_Trajectory<RANK>::displayKey_v(std::ostream& os, size_t& i) const
+std::ostream& MCWF_Trajectory<RANK>::streamKey_v(std::ostream& os, size_t& i) const
 {
-  return this->template displayKey<structure::LA_Av>(os,i);
+  return this->template streamKey<structure::LA_Av>(os,i);
 }
 
 

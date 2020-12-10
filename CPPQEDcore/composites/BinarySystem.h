@@ -15,13 +15,13 @@ namespace binary {
 typedef structure::Interaction<2> Interaction; ///< Binary interaction
 
 
-typedef composite::SubSystemFree            SSF; ///< Convenience typedef
+typedef composite::SubSystemFree SSF; ///< Convenience typedef
 typedef composite::SubSystemsInteraction<2> SSI; ///< Convenience typedef
 
 
 /// Outfactored common functionality of Liouvillean and Averaged
 template<structure::LiouvilleanAveragedTag>
-std::ostream& displayKey(std::ostream&, size_t&, const SSF& free0, const SSF& free1, const SSI& ia);
+std::ostream& streamKey(std::ostream&, size_t&, const SSF& free0, const SSF& free1, const SSI& ia);
 
 /// Outfactored common functionality of Liouvillean and Averaged
 template<structure::LiouvilleanAveragedTag>
@@ -50,7 +50,7 @@ average(double t, const quantumdata::LazyDensityOperator<2>& ldo, const SSF& fre
  */
 class Base
   : public structure::QuantumSystem<2>,
-    public structure::Averaged     <2>
+    public structure::Averaged <2>
 {
 protected:
   typedef structure::Averaged<1> Av1;
@@ -63,18 +63,23 @@ protected:
   //@{
   const SSF& getFree0() const {return free0_;}
   const SSF& getFree1() const {return free1_;}
-  const SSI& getIA   () const {return    ia_;}
+  const SSI& getIA () const {return ia_;}
   //@}
 
 private:
-  double         highestFrequency_v(             ) const;
-  std::ostream& displayParameters_v(std::ostream&) const;
+  double highestFrequency_v() const;
 
-  size_t              nAvr_v()                                          const {return binary::nAvr      <structure::LA_Av>(      free0_,free1_,ia_       );}
-  const Averages   average_v(double t, const LazyDensityOperator& ldo)  const {return binary::average   <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}
-  void             process_v(Averages&)                                 const;
-  std::ostream&    display_v(const Averages&, std::ostream&, int)       const;
-  std::ostream& displayKey_v(std::ostream& os, size_t& i)               const {return binary::displayKey<structure::LA_Av>(os,i, free0_,free1_,ia_       );}
+  std::ostream& streamParameters_v(std::ostream&) const;
+
+  size_t nAvr_v() const {return binary::nAvr <structure::LA_Av>(free0_,free1_,ia_);}
+  
+  const Averages average_v(double t, const LazyDensityOperator& ldo) const {return binary::average <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}
+  
+  void process_v(Averages&) const;
+  
+  std::ostream& stream_v(const Averages&, std::ostream&, int) const;
+  
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const {return binary::streamKey<structure::LA_Av>(os,i, free0_,free1_,ia_);}
 
   const SSF free0_, free1_;
 
@@ -113,7 +118,7 @@ CLASS_HEADER(Exact)
 
   bool applicableInMaster_v() const;
 
-  void  actWithU_v(double, StateVectorLow&, double) const;
+  void actWithU_v(double, StateVectorLow&, double) const;
 
 };
 
@@ -134,11 +139,14 @@ CLASS_HEADER(Liouvillean)
   CLASS_BODY_PART(Liouvillean,Li)
 
   void actWithJ_v(double, StateVectorLow&, size_t) const override;
+  
   void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override;
 
-  std::ostream& displayKey_v(std::ostream& os, size_t& i             ) const override {return binary::displayKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
-  size_t              nAvr_v(                                        ) const override {return binary::nAvr      <structure::LA_Li>(      free0_,free1_,ia_);}
-  const Rates      average_v(double t, const LazyDensityOperator& ldo) const override {return binary::average   <structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return binary::streamKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
+  
+  size_t nAvr_v() const override {return binary::nAvr<structure::LA_Li>(free0_,free1_,ia_);}
+  
+  const Rates average_v(double t, const LazyDensityOperator& ldo) const override {return binary::average<structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
 
 };
 
@@ -183,8 +191,10 @@ class BinarySystem
     public BASE_class(LI,Liouvillean)
 {
 public:
-  typedef BASE_class(EX,Exact)             ExactBase;
+  typedef BASE_class(EX,Exact) ExactBase;
+  
   typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
+  
   typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
   
   typedef structure::Interaction<2> Interaction;

@@ -51,8 +51,8 @@ struct HandleType : mpl::identity<T> {};
  * \todo implement general time averaging along the lines discussed in [this tracker](https://sourceforge.net/p/cppqed/feature-requests/1/#f3b3)
  * 
  */
-template<typename DA, typename T> 
-class Averageable : public Trajectory<DA>
+template<typename SA, typename T> 
+class Averageable : public Trajectory<SA>
 {
 public:
   virtual ~Averageable() {}
@@ -69,14 +69,14 @@ private:
 
 /// Represents a trajectory that has both adaptive ODE evolution and noise
 /** In the language of the framework, this means that the class simply connects Adaptive and Averageable while storing a randomized::Randomized instant for the convenience of derived classes. */
-template<typename DA, typename A, typename T>
-class Stochastic : public Adaptive<A,Averageable<DA,T>>
+template<typename SA, typename A, typename T>
+class Stochastic : public Adaptive<A,Averageable<SA,T>>
 {
 public:
   virtual ~Stochastic() {}
 
 private:
-  typedef Adaptive<A,Averageable<DA,T>> Base;
+  typedef Adaptive<A,Averageable<SA,T>> Base;
 
   typedef typename Base::Evolved Evolved;
 
@@ -113,9 +113,9 @@ protected:
   bool                isNoisy      () const {return isNoisy_   ;}
   //@}
   
-  std::ostream& displayParameters_v(std::ostream& os) const override
+  std::ostream& streamParameters_v(std::ostream& os) const override
   {
-    return Base::displayParameters_v(os)<<"Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
+    return Base::streamParameters_v(os)<<"Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
   }
   
   /// \name Serialization
@@ -152,14 +152,14 @@ private:
  * because it might happen that the application cannot afford to store temporaries of `T` (for such an example, cf. quantumtrajectory::EnsembleMCWF)
  * 
  */
-template<typename DA, typename T, typename T_ELEM=T>
-class Ensemble : public Averageable<DA,T>
+template<typename SA, typename T, typename T_ELEM=T>
+class Ensemble : public Averageable<SA,T>
 {
 private:
-  typedef Averageable<DA,T     > Base;
+  typedef Averageable<SA,T     > Base;
   
 public:
-  typedef Averageable<DA,T_ELEM> Elem;
+  typedef Averageable<SA,T_ELEM> Elem;
 
   /// The storage of the element trajectories is through a \refBoost{pointer-vector,ptr_container/doc/ptr_vector.html}
   /** This correctly handles the elements’s eventual polymorphy and allows for random access to individual trajectories (cf. averageInRange()) */
@@ -209,15 +209,15 @@ private:
       for (auto i=trajs_.begin(); i!=trajs_.end(); (++i, ++pd)) i->evolve(deltaT);
     }
     else
-      for_each(trajs_,bind(&Trajectory<DA>::evolve,_1,deltaT));
+      for_each(trajs_,bind(&Trajectory<SA>::evolve,_1,deltaT));
   }
 
   double getTime_v() const final {return trajs_.front().getTime();}
 
-  std::ostream& displayParameters_v(std::ostream& os) const final {return trajs_.front().displayParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
+  std::ostream& streamParameters_v(std::ostream& os) const final {return trajs_.front().streamParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
 
   /// An average of getDtDid()-s from individual trajectories.
-  double getDtDid_v() const final {return accumulate(trajs_,0.,[] (double init, const Trajectory<DA>& t) {return init+t.getDtDid();})/size2Double(trajs_.size());}
+  double getDtDid_v() const final {return accumulate(trajs_,0.,[] (double init, const Trajectory<SA>& t) {return init+t.getDtDid();})/size2Double(trajs_.size());}
 
   const AveragedHandle averaged_v() const final {return averageInRange(0,trajs_.size());}
 
@@ -241,11 +241,11 @@ namespace averaging {
  * \note The wrapper-class solution is necessary here as the function parameter types cannot be inferred due to heavy type-dependence
  * 
  */
-template<typename DA, typename T, typename T_ELEM>
+template<typename SA, typename T, typename T_ELEM>
 struct AverageTrajectoriesInRange
 {
   /// Naive generic implementation
-  typedef typename Ensemble<DA,T,T_ELEM>::Trajectories::const_iterator CI;
+  typedef typename Ensemble<SA,T,T_ELEM>::Trajectories::const_iterator CI;
   static const typename HandleType<T>::type _(CI begin, CI end)
   {
     using namespace boost;
@@ -261,11 +261,11 @@ struct AverageTrajectoriesInRange
 } // trajectory
 
 
-template<typename DA, typename T, typename T_ELEM>
+template<typename SA, typename T, typename T_ELEM>
 auto
-trajectory::Ensemble<DA,T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const AveragedHandle
+trajectory::Ensemble<SA,T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const AveragedHandle
 {
-  return averaging::AverageTrajectoriesInRange<DA,T,T_ELEM>::_(trajs_.begin()+begin,trajs_.begin()+(begin+n));
+  return averaging::AverageTrajectoriesInRange<SA,T,T_ELEM>::_(trajs_.begin()+begin,trajs_.begin()+(begin+n));
 }
 
 

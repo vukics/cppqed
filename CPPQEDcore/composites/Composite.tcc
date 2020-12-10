@@ -83,14 +83,14 @@ auto composite::RankedBase<RANK>::fillDimensions(const Frees& frees)
 /////////////
 
 template<typename VA>
-std::ostream& composite::Base<VA>::displayParameters_v(std::ostream& os) const
+std::ostream& composite::Base<VA>::streamParameters_v(std::ostream& os) const
 {
   os<<"Composite\nDimensions: "<<RBase::getDimensions()<<". Total: "<<RBase::getTotalDimension()<<std::endl;
   
   mpl::for_each<Ordinals>([&](auto t)-> void {
     static const int idx=decltype(t)::value;
     os<<"Subsystem Nr. "<<idx<<std::endl;
-    frees_[idx].get()->displayParameters(os);
+    frees_[idx].get()->streamParameters(os);
   });
   
   boost::fusion::for_each(
@@ -101,7 +101,7 @@ std::ostream& composite::Base<VA>::displayParameters_v(std::ostream& os) const
         os<<decltype(t)::value<<" - ";
       });
       os<<"Interaction\n";
-      act.get()->displayParameters(os);
+      act.get()->streamParameters(os);
     });
   
   return os;
@@ -204,14 +204,14 @@ void composite::Hamiltonian<VA>::addContribution_v(double t, const StateVectorLo
 ///////////////////////
 
 template<typename VA> template<structure::LiouvilleanAveragedTag LA>
-std::ostream& composite::Base<VA>::displayKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
+std::ostream& composite::Base<VA>::streamKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
 {
   mpl::for_each<Ordinals>([&](auto t) -> void {
     static const int idx=decltype(t)::value;
-    frees[idx].template displayKey<LA>(os,i);
+    frees[idx].template streamKey<LA>(os,i);
   });
   boost::fusion::for_each(acts,[&](const auto& act) -> void {
-    act.template displayKey<LA>(os,i);
+    act.template streamKey<LA>(os,i);
   });
   
   return os;
@@ -364,14 +364,14 @@ composite::Base<VA>::process_v(Averages& avr) const
 
 template<typename VA>
 std::ostream&
-composite::Base<VA>::display_v(const Averages& avr, std::ostream& os, int precision) const
+composite::Base<VA>::stream_v(const Averages& avr, std::ostream& os, int precision) const
 {
   ptrdiff_t l=-1, u=0;
   
   const auto lambda=[&](auto av) -> void {
     using blitz::Range;
     if (av && (u=l+av->nAvr())>l) {
-      av->display(avr(Range(l+1,u)),os,precision);
+      av->stream(avr(Range(l+1,u)),os,precision);
       l=u;
     }
   };

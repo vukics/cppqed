@@ -9,7 +9,7 @@
 namespace quantumtrajectory {
 
 
-/// Derived from MCWF_Trajectory, this class in addition performs time averaging of the columns during trajectory display
+/// Derived from MCWF_Trajectory, this class in addition performs time averaging of the columns during trajectory stream
 /**
  * The time averages and the amount of averaging are part of the trajectory state, so that time averaging can be correctly resumed over trajectory-state i/o.
  * Averaging starts after a specified relaxation time.
@@ -24,7 +24,7 @@ namespace quantumtrajectory {
  * 2. **strong noise**: in the opposite regime, the timestep-control is dpLimit-dominated, the timestep will be approximately dpLimit/(total jump rate)
  * 
  * Let us consider a harmonic-oscillator mode, where the jump rate is a monotonic function of the photon number. In the 2. case, there will hence be perfect correlation between the 
- * photon number and the stepsize, which will lead to erroneous sampling in dc-mode, when the samples with the smaller stepsize are represented with the larger weight in the display.
+ * photon number and the stepsize, which will lead to erroneous sampling in dc-mode, when the samples with the smaller stepsize are represented with the larger weight in the stream.
  * 
  * Hence, in this case one must be careful to use deltaT mode.
  * 
@@ -64,7 +64,7 @@ public:
   const Averages getAverages() const {return averages_;}
   
 private:
-  typename Base::DisplayReturnType display_v(std::ostream& os, int precision) const override
+  typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override
   {
     Averages averagesNow;
     if (av_) {
@@ -74,7 +74,7 @@ private:
         ++sum_;
       }
       av_->process(averagesNow);
-      av_->display(averagesNow,os,precision);
+      av_->stream(averagesNow,os,precision);
     }
     return {os,averagesNow};
   }
@@ -85,7 +85,7 @@ private:
       Averages endValues(averages_.copy());
       // process would “corrupt” the averages_, which would be incorrectly saved afterwards by writeState_v, therefore we process a copy instead
       av_->process(endValues);
-      av_->display(endValues,os<<"Time averages after relaxation time "<<relaxationTime_<<std::endl,FormDouble::overallPrecision)<<std::endl;
+      av_->stream(endValues,os<<"Time averages after relaxation time "<<relaxationTime_<<std::endl,FormDouble::overallPrecision)<<std::endl;
     }
     return Base::logMoreOnEnd_v(os);
   }

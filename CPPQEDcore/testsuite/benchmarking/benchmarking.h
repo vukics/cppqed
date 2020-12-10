@@ -12,12 +12,12 @@ using namespace tmptools;
 
 
 template<int RANK, typename V, typename SYS>
-void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v, bool doDisplay=false, size_t nRepeat=1000)
+void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v, bool doStream=false, size_t nRepeat=1000)
 {
   static const int RANK_V=mpl::size<V>::type::value;
   typedef structure::Hamiltonian<RANK_V> Ha_V;
 
-  sys.displayParameters(std::cout);
+  sys.streamParameters(std::cout);
 
   quantumdata::StateVector<RANK> psi(sys.getDimensions());
 
@@ -28,7 +28,7 @@ void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v,
 
   // 1
 
-  if (doDisplay) cout<<blitzplusplus::unaryArray(psi());
+  if (doStream) cout<<blitzplusplus::unaryArray(psi());
   quantumdata::StateVector<RANK> psiout(psi);
 
   {
@@ -39,7 +39,7 @@ void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v,
       structure::Hamiltonian<RANK>::addContribution(0.,psi(),psiout(),0.,ha);
   }
 
-  if (doDisplay) cout<<blitzplusplus::unaryArray(psiout());
+  if (doStream) cout<<blitzplusplus::unaryArray(psiout());
 
 
   // 2

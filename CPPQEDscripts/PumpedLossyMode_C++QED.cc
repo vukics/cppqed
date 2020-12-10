@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
 
   bool
     &alternative=p.add("alternative","Alternative mode",false),
-    &doDisplay=p.add("doDisplay","Display diagonal elements of density operator",false),
-    &doOffDiag=p.add("doOffDiag","Display offdiagonal elements of density operator",false);
+    &doStream=p.add("doStream","Stream diagonal elements of density operator",false),
+    &doOffDiag=p.add("doOffDiag","Stream offdiagonal elements of density operator",false);
 
   // Parameter finalization
   QM_Picture& qmp=updateWithPicture(p,argc,argv);
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   // ****** ****** ****** ****** ****** ******
 
   Collecting::Collection collection; collection.push_back(new AveragedQuadratures());
-  if (doDisplay) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));
+  if (doStream) collection.push_back(new ReducedDensityOperator<1>("",pplm.cutoff,doOffDiag));
 
   evolve(mode::init(pplm),(alternative ? Ptr(new PumpedLossyModeIP_NoExact(pplm)) : make<Collecting>(pplm,qmp,collection)),pe);
 

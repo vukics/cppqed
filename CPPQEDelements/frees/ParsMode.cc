@@ -11,7 +11,7 @@ Pars::Pars(parameters::Table& p, const std::string& mod)
   : cutoff(p.addTitle("Mode",mod).addMod<size_t>("cutoff",mod,"Mode cutoff",10)),
     minitFock(p.addMod<size_t>("minitFock",mod,"Mode initial Fock state",0)),
     minit(p.addMod<dcomp>("minit",mod,"Mode initial field",0)),
-    displayLevel(p.addMod<size_t>("modeDisplayLevel",mod,"When nonzero, quadrature variances are also calculated",0)),
+    streamLevel(p.addMod<size_t>("modeStreamLevel",mod,"When nonzero, quadrature variances are also calculated",0)),
     delta(p.addMod("deltaC",mod,"Mode detuning",-10.)),
     omegaKerr(p.addTitle("Kerr nonlinearity",mod).addMod("omegaKerr",mod,"Kerr constant",0.)),
     omegaKerrAlter(p.addMod("omegaKerrAlter",mod,"Kerr constant – alternative implementation",0.))

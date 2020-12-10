@@ -13,17 +13,17 @@ const double ParsEvolved::epsAbsDefault=1e-12;
 
 ParsRun::ParsRun(parameters::Table& p, const std::string& mod)
   : T(p.addTitle("Trajectory",mod).addMod("T",mod,"Simulated time",1.)),
-    dc(p.addMod("dc",mod,"Number of steps between two Displays",10)),
-    Dt(p.addMod("Dt",mod,"Timestep between two Displays",.1)),
+    dc(p.addMod("dc",mod,"Number of steps between two streamings",10)),
+    Dt(p.addMod("Dt",mod,"Timestep between two streamings",.1)),
     NDt(p.addMod("NDt",mod,"Number of steps in Dt mode",0L)),
     ofn(p.addMod<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
     initialFileName(p.addMod<std::string>("initialFileName",mod,"Trajectory initial file name","")),
     precision(p.addMod("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision))),
-    displayInfo(p.addMod("displayInfo",mod,"Whether to display header for trajectories",true)),
-    firstStateDisplay(p.addMod("firstStateDisplay",mod,"Displays trajectory state at startup",true)),
+    streamInfo(p.addMod("streamInfo",mod,"Whether to stream header for trajectories",true)),
+    firstStateStream(p.addMod("firstStateStream",mod,"Streams trajectory state at startup",true)),
     sdf(p.addMod("sdf",mod,"State output frequency",0u)),
     autoStopEpsilon(p.addMod("autoStopEpsilon",mod,"Relative precision for autostopping",ParsEvolved::epsRelDefault)),
-    autoStopRepetition(p.addMod("autoStopRepetition",mod,"Number of displayed lines repeated within relative precision before autostopping",0u)),
+    autoStopRepetition(p.addMod("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)),
     parsedCommandLine_(p.getParsedCommandLine())
 {}
 

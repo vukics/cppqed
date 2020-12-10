@@ -76,7 +76,7 @@ void quantumtrajectory::mcwf::Logger::jumpOccured(ostream& os, double t, size_t 
 
 
 
-ostream& quantumtrajectory::ensemble::displayLog(ostream& os, const LoggerList& loggerList, size_t nBins, size_t nJumpsPerBin)
+ostream& quantumtrajectory::ensemble::streamLog(ostream& os, const LoggerList& loggerList, size_t nBins, size_t nJumpsPerBin)
 {
   using namespace boost;
 

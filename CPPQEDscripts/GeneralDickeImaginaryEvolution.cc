@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
     
     binary::Ptr sys(binary::make(gd));
 
-    sys->displayParameters(cout);
+    sys->streamParameters(cout);
 
     CMatrix 
       hamiltonian (calculateMatrix(*sys)), 
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
       for (pair<MCWF::Basis::const_iterator,DARRAY::const_iterator> i(eigenStates.begin(),eigenValues.begin()); 
            i.first!=eigenStates.end();
            ++i.first, ++i.second) {
-        os<<formdouble::high()(*i.second); structure::display(structure::qsa<2>(sys),0,*i.first,os,pe.precision); os<<endl;
+        os<<formdouble::high()(*i.second); structure::stream(structure::qsa<2>(sys),0,*i.first,os,pe.precision); os<<endl;
       }
 
     }

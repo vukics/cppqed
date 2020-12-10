@@ -87,18 +87,18 @@ public:
   // Public types
   typedef VA Acts;
 
-  typedef RankedBase<RANK>          RBase  ;
+  typedef RankedBase<RANK> RBase;
   typedef structure::Averaged<RANK> Av_Base;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
-  typedef typename Av_Base::Averages Averages  ;
+  typedef typename Av_Base::Averages Averages;
 
-  typedef typename RBase::   Frees    Frees;
+  typedef typename RBase::Frees Frees;
   typedef typename RBase::Ordinals Ordinals;
   
   template<structure::LiouvilleanAveragedTag>
-  static std::ostream& displayKeyLA(std::ostream& , size_t&, const Frees&, const VA& acts);
+  static std::ostream& streamKeyLA(std::ostream&, size_t&, const Frees&, const VA& acts);
 
   template<structure::LiouvilleanAveragedTag>
   static size_t nAvrLA(const Frees& frees, const VA& acts);
@@ -115,20 +115,20 @@ protected:
 private:
   // Implementing QuantumSystem interface
 
-  double         highestFrequency_v(             ) const;
-  std::ostream& displayParameters_v(std::ostream&) const;
+  double highestFrequency_v( ) const;
+  std::ostream& streamParameters_v(std::ostream&) const;
 
   // Implementing Av_Base
 
-  std::ostream& displayKey_v(std::ostream& os, size_t& i)              const {return displayKeyLA<structure::LA_Av>(os,i, frees_,acts_         );}
-  size_t              nAvr_v()                                         const {return       nAvrLA<structure::LA_Av>(      frees_,acts_         );}
-  const Averages   average_v(double t, const LazyDensityOperator& ldo) const {return    averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const {return streamKeyLA<structure::LA_Av>(os,i, frees_,acts_ );}
+  size_t nAvr_v() const {return nAvrLA<structure::LA_Av>( frees_,acts_ );}
+  const Averages average_v(double t, const LazyDensityOperator& ldo) const {return averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
   
-  void          process_v(Averages&)                           const;
-  std::ostream& display_v(const Averages&, std::ostream&, int) const;
+  void process_v(Averages&) const;
+  std::ostream& stream_v(const Averages&, std::ostream&, int) const;
 
   const Frees& frees_;
-  const VA      acts_;
+  const VA acts_;
 
 };
 
@@ -162,10 +162,10 @@ protected:
 
 private:
   void actWithU_v(double, StateVectorLow&, double) const;
-  bool applicableInMaster_v(                     ) const;
+  bool applicableInMaster_v( ) const;
 
   const Frees& frees_;
-  const VA   &  acts_;
+  const VA & acts_;
 
 };
 
@@ -190,7 +190,7 @@ private:
   void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
   const Frees& frees_;
-  const VA   &  acts_;
+  const VA & acts_;
 
 };
 
@@ -217,15 +217,17 @@ protected:
   Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  std::ostream& displayKey_v(std::ostream& os, size_t& i)              const override {return Base<VA>::template displayKeyLA<structure::LA_Li>(os,i, frees_,acts_         );}
-  size_t              nAvr_v()                                         const override {return Base<VA>::template       nAvrLA<structure::LA_Li>(      frees_,acts_         );}
-  const Rates      average_v(double t, const LazyDensityOperator& ldo) const override {return Base<VA>::template    averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<VA>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
+  
+  size_t nAvr_v() const override {return Base<VA>::template nAvrLA<structure::LA_Li>(frees_,acts_);}
+  
+  const Rates average_v(double t, const LazyDensityOperator& ldo) const override {return Base<VA>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
   void actWithJ_v(double, StateVectorLow&, size_t) const override;
   void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override;
 
   const Frees& frees_;
-  const VA   &  acts_;
+  const VA & acts_;
 
 };
 
@@ -312,7 +314,7 @@ class Composite
 public:
   typedef composite::Base<VA> Base;
   
-  typedef BASE_class(EX,Exact)             ExactBase;
+  typedef BASE_class(EX,Exact) ExactBase;
   typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
   typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
   
@@ -327,7 +329,7 @@ private:
 public:
   Composite(const Frees& frees, const VA& acts)
     : Base(frees ,acts),
-      ExactBase      (getFrees(),getActs()),
+      ExactBase(getFrees(),getActs()),
       HamiltonianBase(getFrees(),getActs()),
       LiouvilleanBase(getFrees(),getActs()) {}
 

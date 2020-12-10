@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
 
   run(S,pt);
 /*
-  auto displayedArray=run(S,pt);
+  auto streamedArray=run(S,pt);
   
-  for (const auto & t : displayedArray) std::cout<<std::get<0>(t)<<"\t"<<std::get<1>(t)<<"\t"<<std::get<2>(t);
+  for (const auto & t : streamedArray) std::cout<<std::get<0>(t)<<"\t"<<std::get<1>(t)<<"\t"<<std::get<2>(t);
 */
 }
