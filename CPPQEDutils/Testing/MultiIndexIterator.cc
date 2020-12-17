@@ -3,7 +3,7 @@
 #define BOOST_TEST_MODULE MultiIndexIterator test
 #include <boost/test/unit_test.hpp>
 
-using namespace cpputils
+using namespace cpputils;
 
 typedef IdxTiny<3> Idx;
 

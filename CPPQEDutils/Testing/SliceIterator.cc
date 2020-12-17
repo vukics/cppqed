@@ -22,7 +22,7 @@ using V=tmptools::Vector<3,6,1,9,7>;
 
 const int RANK=11;
 
-using TM=details::TransposerMeta<RANK,V>::type;
+using TM=details::TransposerMeta_t<RANK,V>;
 
 using FullIdx=details::IndexerBase<RANK,V>::Idx; // This contains Range types at the appropriate locations
 

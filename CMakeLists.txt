@@ -90,7 +90,7 @@ if("${isSystemDir}" STREQUAL "-1")
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif("${isSystemDir}" STREQUAL "-1")
 
-option(ENABLE_TESTING "Enable testsuite" OFF)
+option(ENABLE_TESTING "Enable testsuite" ON)
 
 if(ENABLE_TESTING)
   enable_testing()

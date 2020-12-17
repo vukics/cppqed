@@ -18,6 +18,7 @@ foreach(S ${TESTING_EXECUTABLES})
 endforeach()
 
 add_test(evolved_nonlinear_ode EvolvedTest)
+set_tests_properties(evolved_nonlinear_ode PROPERTIES LABELS "Fast;Utils")
 
 if (TARGET Eigen3::Eigen)
   add_test(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
