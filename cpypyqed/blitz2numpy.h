@@ -16,8 +16,12 @@ template<typename T, int RANK>
 auto arrayToNumpy(const blitz::Array<T,RANK>& a)
 {
   using namespace boost::python::numpy;
-  std::vector<long> shape(a.shape().begin(),a.shape().end()), strides(a.stride().begin(),a.stride().end());
-  return from_data(a.copy().dataFirst(),dtype::get_builtin<T>(),shape,strides,boost::python::object());
+  std::vector<Py_intptr_t> shape{RANK};
+  std::copy(a.shape().begin(),a.shape().end(),shape.begin());
+  auto res{empty(RANK,shape.data(),dtype::get_builtin<T>())}; // The cleanest solution: owns its data by default. But, it necessitates the below raw-pointer solution.
+  T* resBegin=reinterpret_cast<T*>(res.get_data());
+  std::copy(a.begin(),a.end(),resBegin);
+  return res;
 }
 
 template<typename T, int RANK>
