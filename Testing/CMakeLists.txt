@@ -19,7 +19,10 @@
 #! Find the Python interpreter and add the targets `check_fast` and `ckeck` (c.f. \ref testsuite_running).
 #! Also defines helper macros.
 
-find_package (Python 3.8 COMPONENTS Interpreter NumPy)
+message(STATUS "Configuring main testsuite")
+
+find_package (Python 3.8 COMPONENTS Interpreter)
+# find_package (Python 3.8 COMPONENTS Interpreter NumPy) # TODO numpy should be checked for, and this used to work, but not anymore for some reason 17/12/2020
 
 set ( testing_SOURCE_DIR ${CMAKE_SOURCE_DIR}/Testing )
 set ( testing_BINARY_DIR ${CMAKE_BINARY_DIR}/Testing )
@@ -27,7 +30,8 @@ set ( testing_BINARY_DIR ${CMAKE_BINARY_DIR}/Testing )
 # there is no official FindScipy, so we assume that NumPy implies Scipy as well
 # find_package(Scipy)
 
-if( ( TARGET Python::Interpreter ) AND ( TARGET Python::NumPy ) )
+if( TARGET Python::Interpreter )
+#if( ( TARGET Python::Interpreter ) AND ( TARGET Python::NumPy ) ) # TODO cf. above
   set ( PYTHONIC_TESTDRIVER_ENABLED ON )
 else()
   message(WARNING "Some tests disabled, not all Python components are available")
