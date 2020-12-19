@@ -21,14 +21,14 @@
 
 namespace trajectory { namespace details {
 
-void writeNextArchive(std::ostream*, const std::ostringstream&);
-void readNextArchive(std::istream*, std::istringstream&);
+void writeNextArchive(std::shared_ptr<std::ostream>, const std::ostringstream&);
+void readNextArchive(std::shared_ptr<std::istream>, std::istringstream&);
 
 } // details
 
 
 template<typename T>
-void writeViaSStream(const T& traj, std::ostream* ofs)
+void writeViaSStream(const T& traj, std::shared_ptr<std::ostream> ofs)
 {
   if (ofs) {
     std::ostringstream oss(std::ios_base::binary);
@@ -39,7 +39,7 @@ void writeViaSStream(const T& traj, std::ostream* ofs)
 }
 
 template<typename T>
-void readViaSStream(T& traj, std::istream* ifs)
+void readViaSStream(T& traj, std::shared_ptr<std::istream> ifs)
 {
   std::istringstream iss(std::ios_base::binary);
   details::readNextArchive(ifs,iss);
@@ -82,7 +82,7 @@ bool restoreState(Trajectory<SA>& traj, const std::string& trajectoryFileName, c
 
     if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
       auto stateFile{openStateFileReading(stateFileName)};
-      while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,stateFile.get());
+      while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,stateFile);
       return true;
     }
 
@@ -90,7 +90,7 @@ bool restoreState(Trajectory<SA>& traj, const std::string& trajectoryFileName, c
 
   if (initialFileName!="") {
     auto initialFile{openStateFileReading(initialFileName)};
-    while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,initialFile.get());
+    while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,initialFile);
   }
 
   return false;
@@ -187,7 +187,7 @@ trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFr
             (stateCount || (firstStateStream && !continuing))
            )
         {
-          writeViaSStream(traj,ofs.get());
+          writeViaSStream(traj,ofs);
           stateSaved=true;
         }
         ++stateCount;
@@ -210,7 +210,7 @@ trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFr
   //////////////////////////////////////////
   
   traj.logOnEnd(commentingStream);
-  if (!stateSaved) writeViaSStream(traj,ofs.get());
+  if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;
   

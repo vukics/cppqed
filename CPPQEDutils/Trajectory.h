@@ -19,7 +19,7 @@
 /// The trajectory-bundle
 namespace trajectory {
 
-/// Aggregate of information about a trajectory-state archive \see AdaptiveIO
+/// Type-erased aggregate of information about a trajectory-state archive \see AdaptiveIO
 /**
  * \par Rationale
  * Each archive is self-contained, so that it contains its own metadata.
@@ -71,10 +71,10 @@ std::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
 std::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app);
 
 template<typename T>
-void writeViaSStream(const T&, std::ostream*);
+void writeViaSStream(const T&, std::shared_ptr<std::ostream>);
 template<typename T>
-void  readViaSStream(      T&, std::istream*);
-SerializationMetadata readMeta(std::istream*); ///< Needed separately for the Python i/o
+void  readViaSStream(      T&, std::shared_ptr<std::istream>);
+SerializationMetadata readMeta(std::shared_ptr<std::istream>); ///< Needed separately for the Python i/o
 
 
 struct StoppingCriterionReachedException {};
@@ -188,9 +188,8 @@ public:
    * Two conformity checks are performed for to the array we try to read in:
    * - whether the rank matches (throws RankMismatchException if not)
    * - whether the dimensions match (throws DimensionsMismatchException if not)
-   * The dimensions check can be circumvented by setting the trajectoryID to SerializationMetadata::ArrayOnly in the EvolvedIO's metadata. This is done for example in the python I/O interface, 
-   * because when reading in a state in python we generally have no idea about the dimensions.
-   * 
+   * The dimensions check can be circumvented by setting the trajectoryID to SerializationMetadata::ArrayOnly in the EvolvedIO's metadata.
+   * This is done for example in the python I/O interface, because when reading in a state in python we generally have no idea about the dimensions.
    */
   cpputils::iarchive&  readState(cpputils::iarchive& iar);
   /// Write the EvolvedIO to a cpputils::oarchive
