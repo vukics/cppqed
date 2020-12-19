@@ -5,12 +5,10 @@
 #define CPYPYQED_INCLUDE_BLITZ2NUMPY_TCC_INCLUDED
 
 #include "BlitzTiny.h"
-#include "BlitzArray.h"
-#include "ComplexExtensions.h"
 
 #include <boost/python/numpy.hpp>
 
-namespace pythonext {
+namespace cpputils {
 
 template<typename T, int RANK>
 auto arrayToNumpy(const blitz::Array<T,RANK>& a)
@@ -27,7 +25,7 @@ auto arrayToNumpy(const blitz::Array<T,RANK>& a)
 template<typename T, int RANK>
 auto numpyToArray(const boost::python::numpy::ndarray& array)
 {
-  using std::string; using namespace boost::python;
+  using namespace boost::python;
   ExtTiny<RANK> shape, strides;
   for (size_t i=0; i<RANK; ++i) {
     shape(i)=array.shape(i);
@@ -36,6 +34,6 @@ auto numpyToArray(const boost::python::numpy::ndarray& array)
   return blitz::Array<T,RANK>(reinterpret_cast<T*>(array.get_data()),shape,strides,blitz::duplicateData);
 }
 
-} // pythonext
+} // cpputils
 
 #endif // CPYPYQED_INCLUDE_BLITZ2NUMPY_TCC_INCLUDED
