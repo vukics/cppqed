@@ -13,6 +13,8 @@ namespace cpputils {
 template<typename T, int RANK>
 auto arrayToNumpy(const blitz::Array<T,RANK>& a)
 {
+  if (!a.isStorageContiguous()) throw NonContiguousStorageException("cpputils::arrayToNumpy");
+  // this check in itself is not enough, as the function generating the ndarray below doesn’t allow for a nontrivial set of strides
   using namespace boost::python::numpy;
   Py_intptr_t shape[RANK]; // Plain array is the best here: nothing has the temptation on the C++ side to delete it (apparently, it happens on the Python side …)
   std::copy(a.shape().begin(),a.shape().end(),&shape[0]);
@@ -24,13 +26,19 @@ auto arrayToNumpy(const blitz::Array<T,RANK>& a)
 template<typename T, int RANK>
 auto numpyToArray(const boost::python::numpy::ndarray& array)
 {
+  // we do not know anything about the contiguousness of array
   using namespace boost::python;
-  ExtTiny<RANK> shape, strides;
+  ExtTiny<RANK> shape/*, strides*/;
   for (size_t i=0; i<RANK; ++i) {
     shape(i)=array.shape(i);
-    strides(i)=array.strides(i);
+    /* strides(i)=array.strides(i);*/
   }
-  return blitz::Array<T,RANK>(reinterpret_cast<T*>(array.get_data()),shape,strides,blitz::duplicateData);
+  blitz::Array<T,RANK> res(shape);
+  {
+    T* d=reinterpret_cast<T*>(array.get_data());
+    std::copy(d,d+res.size(),res.begin());
+  }
+  return res;
 }
 
 } // cpputils
