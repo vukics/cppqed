@@ -14,11 +14,10 @@ template<typename T, int RANK>
 auto arrayToNumpy(const blitz::Array<T,RANK>& a)
 {
   using namespace boost::python::numpy;
-  std::vector<Py_intptr_t> shape{RANK};
-  std::copy(a.shape().begin(),a.shape().end(),shape.begin());
-  auto res{empty(RANK,shape.data(),dtype::get_builtin<T>())}; // The cleanest solution: owns its data by default. But, it necessitates the below raw-pointer solution.
-  T* resBegin=reinterpret_cast<T*>(res.get_data());
-  std::copy(a.begin(),a.end(),resBegin);
+  Py_intptr_t shape[RANK]; // Plain array is the best here: nothing has the temptation on the C++ side to delete it (apparently, it happens on the Python side …)
+  std::copy(a.shape().begin(),a.shape().end(),&shape[0]);
+  auto res{empty(RANK,shape,dtype::get_builtin<T>())}; // The cleanest solution: owns its data by default. But, it necessitates the below raw-pointer solution.
+  std::copy(a.begin(),a.end(),reinterpret_cast<T*>(res.get_data()));
   return res;
 }
 

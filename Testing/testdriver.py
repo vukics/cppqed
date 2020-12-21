@@ -23,6 +23,10 @@ import scipy.interpolate
 from scipy.integrate import quadrature
 from scipy import exp
 
+sys.path.extend(["/home/vukics/work/devel/cppqed/build{}/cpypyqed/".format(s) for s in ["","Release"]])
+
+import cpypyqed as io
+
 try:
   import matplotlib
   matplotlib.use('Agg')
