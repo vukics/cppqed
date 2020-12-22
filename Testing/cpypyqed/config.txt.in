@@ -1,4 +1,0 @@
-[Setup]
-delete_temp=False
-cppqed_dir=@core_BINARY_DIR@
-compiler=@CMAKE_CXX_COMPILER@

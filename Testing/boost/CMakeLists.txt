@@ -1,26 +1,17 @@
-# Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-find_package(Boost QUIET COMPONENTS unit_test_framework)
-add_feature_info("Boost unit test framework"
-                 Boost_UNIT_TEST_FRAMEWORK_FOUND
-                 "Part of the test suite." )
+find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
-if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
+if (NOT TARGET Boost::unit_test_framework)
   message(WARNING "No boost unit test framework found. Disabling boost tests, testing suite is not complete.")
   return()
 endif()
 
-CPPQED_SETUP()
-
-include(${elements_BINARY_DIR}/CPPQEDelementsConfig.cmake)
-include_directories(${CPPQEDelements_INCLUDE_DIRS})
-
 set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc)
 
 add_executable(tester main.cc ${BOOST_TEST_SOURCES})
-target_link_libraries(tester ${CPPQED_LIBRARIES} ${CPPQEDelements_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-
-testdir(boost tester)
+target_link_libraries(tester CPPQED::CPPQEDelements Boost::unit_test_framework)
 
 set(BOOST_TESTS LAZY_DENSITY_OPERATOR_FFTRANSFORM)
 foreach(BT ${BOOST_TESTS})

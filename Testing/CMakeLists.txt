@@ -89,13 +89,13 @@ endmacro()
 #! <!--#########################################################-->
 #!
 
-#add_subdirectory(run)
-#add_subdirectory(continue)
-#add_subdirectory(compile)
 add_subdirectory(compilefail)
-#add_subdirectory(boost)
+add_subdirectory(boost)
+#add_subdirectory(compile)
 #add_subdirectory(cpypyqed)
 
 if( PYTHONIC_TESTDRIVER_ENABLED )
   add_subdirectory(physics)
+  add_subdirectory(run)
+  add_subdirectory(continue)
 endif()

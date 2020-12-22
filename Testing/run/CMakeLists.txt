@@ -1,6 +1,5 @@
-# Copyright Raimar Sandner 2012–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-
-testdir(run 1particle1mode PTLA_C++QED PTLA_Evolved Ring)
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 # PTLA_C++QED as a representative of simulating a free
 
