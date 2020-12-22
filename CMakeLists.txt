@@ -158,6 +158,8 @@ add_subdirectory(CPPQEDelements)
 
 add_subdirectory(CPPQEDscripts)
 
+add_subdirectory(cpypyqed)
+
 if(ENABLE_TESTING)
   add_subdirectory(Testing)
 endif()
