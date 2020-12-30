@@ -3,7 +3,7 @@
 
 #include "DrivenDampedHarmonicOscillator.h"
 #include "MathExtensions.h"
-#include "Randomized.h"
+#include "Random.h"
 
 typedef CArray<1> Array;
 
@@ -35,14 +35,14 @@ int main(int, char**)
   
   // s.streamParameters(std::cout);
 
-  auto ran{randomized::MakerGSL()(1001)};
+  cpputils::GSL_RandomEngine re{1001};
 
   auto ampDev=0., ampDerivDev=0.;
 
   auto oscillator{ddho::make(gamma,omega,yinit,dydtinit,0)};
   
   for (size_t n=nSamples; n>0; n--) {
-    auto time=T*(*ran)();
+    auto time=std::uniform_real_distribution(0.,T)(re);
     evolved::evolveTo(s,time);
     
     ampDev+=mathutils::relativeDeviation(y(0),oscillator->amp(time));

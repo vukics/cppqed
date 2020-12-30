@@ -6,7 +6,7 @@
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
 set(TESTING_EXECUTABLES
-    EvolvedTest MultiIndexIteratorNew Randomized)
+    EvolvedTest MultiIndexIteratorNew Random)
 
 if (TARGET Eigen3::Eigen)
   set(TESTING_EXECUTABLES ${TESTING_EXECUTABLES} HarmonicOscillatorRandomTimes HarmonicOscillatorComplex)
@@ -27,8 +27,8 @@ endif()
 
 add_test(multi_index_iterator MultiIndexIteratorNew)
 
-add_test(randomized_serialization ${CMAKE_CURRENT_BINARY_DIR}/Randomized)
-set_tests_properties(randomized_serialization PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
+add_test(random_engine_serialization ${CMAKE_CURRENT_BINARY_DIR}/Random)
+set_tests_properties(random_engine_serialization PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
 find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
