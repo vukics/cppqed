@@ -21,7 +21,6 @@ import shutil
 import ast
 import scipy.interpolate
 from scipy.integrate import quadrature
-from scipy import exp
 
 sys.path.extend(["/home/vukics/work/devel/cppqed/build{}/cpypyqed/".format(s) for s in ["","Release"]])
 
@@ -39,6 +38,8 @@ except ImportError:
   plot=False
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
+
+logging.getLogger('matplotlib.font_manager').disabled = True
 
 ## @name Helper functions
 # @{
@@ -755,13 +756,13 @@ class TrajectoryComparer(Plotter):
   def _regression(self, f1, f2, timeArray, eps) :
     t0=timeArray[ 0]
     t1=timeArray[-1]
-    res=quadrature(lambda t : (f1(t)-f2(t))**2,t0,t1,maxiter=100)[0]
+    res=quadrature(lambda t : (f1(t)-f2(t))**2,t0,t1,maxiter=1000)[0]
     logging.debug("Quadrature: {0}, epsilon: {1}".format(res,eps))
     return res<eps
 
 def exponential(a,l):
   def fn(t):
-    return a*exp(-l*t)
+    return a*np.exp(-l*t)
   return fn,"{0}*exp(-{1}*t)".format(a,l)
 
 def FreeParticleX(x0,p0):
