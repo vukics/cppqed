@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "BlitzTinyExtensions.tcc"
+#include "BlitzTinyExtensions.h"
 
 #include <blitz/tinyvec2io.cc>
 
@@ -10,7 +10,7 @@ using namespace std;
 using namespace blitzplusplus;
 
 
-template <int I> using IntTiny=TinyVector<int,I>;
+template <int I> using IntTiny=blitz::TinyVector<int,I>;
 
 
 BOOST_AUTO_TEST_CASE( BlitzTinyExtensions )

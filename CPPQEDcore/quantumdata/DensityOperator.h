@@ -10,7 +10,7 @@
 #include "LazyDensityOperator.h"
 #include "Types.h"
 
-#include "BlitzArrayExtensions.tcc"
+#include "BlitzArrayExtensions.h"
 #include "MultiIndexIterator.h"
 
 

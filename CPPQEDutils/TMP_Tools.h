@@ -118,18 +118,6 @@ template<typename COND, auto TRUE_VALUE, auto FALSE_VALUE>
 constexpr auto integral_if_v = integral_if_c_v<COND::value,TRUE_VALUE,FALSE_VALUE>;
 
 
-/// Provokes a compile-time error if `N` is not even, otherwise acts as a Boost.MPL \refBoostConstruct{int_,mpl/doc/refmanual/int.html} integral constant wrapper of `N/2`
-template<auto N>
-struct AssertEvenAndDivideBy2 : integral_c<N/2>
-{
-  static_assert( 2*(N/2)==N , "Argument not even" );
-};
-
-
-template<auto N>
-constexpr auto AssertEvenAndDivideBy2_v=AssertEvenAndDivideBy2<N>::value;
-
-
 /// A compile-time pair of integral types
 /** \tparam IS_EXCLUSIVE governs the exclusivity of the pair, that is, in the case of `IS_EXCLUSIVE=true`, the class provokes a compile-time error if `N1=N2` */
 template<auto N1, auto N2, bool IS_EXCLUSIVE=true>

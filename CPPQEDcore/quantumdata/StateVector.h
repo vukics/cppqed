@@ -10,7 +10,7 @@
 #include "LazyDensityOperator.h"
 #include "Types.h"
 
-#include "ComplexArrayExtensions.tcc"
+#include "ComplexArrayExtensions.h"
 
 
 namespace quantumdata {

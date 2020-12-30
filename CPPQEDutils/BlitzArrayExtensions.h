@@ -3,6 +3,9 @@
 #ifndef   CPPQEDCORE_UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_BLITZARRAYEXTENSIONS_H_INCLUDED
 
+#include "BlitzArray.h"
+#include "BlitzTinyExtensions.h"
+
 #include <blitz/array.h>
 
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -40,7 +43,22 @@ BZ_DECLARE_FUNCTION_RET(selectNegative,double)
  */
 template<typename T, int RANK>
 const blitz::Array<T,1>
-unaryArray(const blitz::Array<T,RANK>&);
+unaryArray(const blitz::Array<T,RANK>& array)
+{
+  if (!array.data()) return blitz::Array<T,1>();
+#ifndef   NDEBUG
+  if (!array.isStorageContiguous()) throw (NonContiguousStorageException("blitzplusplus::unaryArray"));
+#endif // NDEBUG
+  return blitz::Array<T,1>(const_cast<T*>(array.data()),blitz::shape(array.size()),blitz::neverDeleteData);
+}
+
+
+template<typename T>
+inline const blitz::Array<T,1>
+unaryArray(const blitz::Array<T,1>& array)
+{
+  return array;
+}
 
 
 /// Returns a binary view of `array`. `TWO_TIMES_RANK` must be an even number
@@ -62,8 +80,38 @@ unaryArray(const blitz::Array<T,RANK>&);
  * 
  */
 template<typename T, int TWO_TIMES_RANK>
-const blitz::Array<T,2>
-binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array);
+std::enable_if_t<TWO_TIMES_RANK%2==0,
+                 blitz::Array<T,2>>
+binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
+{
+  if (!array.data()) return blitz::Array<T,2>();
+
+#ifndef   NDEBUG
+  if (!array.isStorageContiguous()) throw (NonContiguousStorageException("blitzplusplus::unaryArray"));
+
+  static const int RANK=TWO_TIMES_RANK/2;
+
+  {
+    const blitz::TinyVector<int,TWO_TIMES_RANK>& ordering=array.ordering();
+    bool correct=true;
+    for (int i=0; i<RANK; i++)
+      correct&=(ordering(i)==ordering(i+RANK)+RANK);
+    if (!correct) throw std::invalid_argument("blitzplusplus::binaryArray ordering error");
+  }
+#endif // NDEBUG
+
+  int size=long2Int(product(halfCutTiny(array.shape())));
+  // apparently, the product is a long
+  return blitz::Array<T,2>(const_cast<T*>(array.data()),blitz::shape(size,size),blitz::neverDeleteData);
+}
+
+
+template<typename T>
+inline const blitz::Array<T,2>
+binaryArray(const blitz::Array<T,2>& array)
+{
+  return array;
+}
 
 
 } // blitzplusplus

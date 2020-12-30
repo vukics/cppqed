@@ -74,12 +74,11 @@ add_compilefail_test(fail_BlitzArraySliceIterator1 "cpputils::SliceIterator inco
 
 add_compilefail_test(fail_BlitzArraySliceIterator2 "cpputils::SliceIterator vector out of range")
 
-# ??? fail_BlitzTinyExtensions compiles without error ???
-# add_compilefail_test(fail_BlitzTinyExtensions "Argument not even")
+add_compilefail_test(fail_BlitzTinyExtensions "candidate template ignored: requirement '7 % 2 == 0' was not satisfied")
 
 add_compilefail_test(fail_TMP_Tools1 "Negative element in nonnegative vector")
 
-add_compilefail_test(fail_TMP_Tools2 "Argument not even")
+# add_compilefail_test(fail_TMP_Tools2 "Argument not even") # obsolate
 
 add_compilefail_test(fail_TMP_Tools3 "pair_c with equal elements")
 

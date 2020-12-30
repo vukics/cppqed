@@ -38,8 +38,6 @@ static_assert( !
                                     22u
                                     >::value , "Numerical containment error" );
 
-static_assert( AssertEvenAndDivideBy2_v<22> ==11 , "Evenness assertion error" );
-
 typedef Vector<87,28,93,1,23,25,97,345,6> V;
 
 static_assert( boost::is_base_of<boost::mpl::vector_c<int,87,28,93,1,23,25,97,345,6>, V >::value , "Is-base-of error" );

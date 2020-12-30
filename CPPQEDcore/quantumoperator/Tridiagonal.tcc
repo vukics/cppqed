@@ -6,7 +6,7 @@
 
 #include "Tridiagonal.h"
 
-#include "ComplexArrayExtensions.tcc"
+#include "ComplexArrayExtensions.h"
 
 #include <boost/lambda/lambda.hpp>
 #include <boost/mpl/for_each.hpp>

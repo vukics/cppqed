@@ -24,6 +24,8 @@ int main(int, char**)
   
   fillWithRandom(firstHalf,ranFirst);
   
+  std::cerr<<array<<std::endl;
+  
   {
     ofstream ofs(filename);
     boost::archive::binary_oarchive ar(ofs);
@@ -38,6 +40,8 @@ int main(int, char**)
   }
 
   fillWithRandom(secondHalf,ranSecond);
+  
+  std::cerr<<arrayInterrupted<<std::endl;
   
   return !all(array==arrayInterrupted) ;
   
