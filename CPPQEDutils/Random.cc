@@ -1,66 +1,40 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-// Randomized GSL implementation
 
-#include "Randomized.h"
-
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-
-#include <sstream>
-#include <cstdio>
+#include "Random.h"
 
 
 using namespace std;
 
+// Everything that is *defined* in GSL must be declared here, since GSL is linked only into CPPQEDutils
 
-namespace randomized {
-
-
-const dcomp Randomized::dcompRan()
+cpputils::GSL_RandomEngine::GSL_RandomEngine(result_type s/*, const gsl_rng_type* ran_gen_type*/) 
+  : ranGen_(gsl_rng_alloc(gsl_rng_taus2),[](auto p) {gsl_rng_free(p);}),
+    name_(std::string(gsl_rng_name(ranGen_.get())))
 {
-  // Note that the result of return dcomp((*this)(),(*this)()); is undefined!
-  double reRan=doSample(), imRan=doSample();
-  return dcomp(reRan,imRan);
+  gsl_rng_set(ranGen_.get(),s);
 }
 
 
-class RandomizedGSL : public Randomized 
+void cpputils::GSL_RandomEngine::seed(result_type value) {gsl_rng_set(ranGen_.get(),value);}
+
+auto cpputils::GSL_RandomEngine::operator()() -> result_type {return gsl_rng_get(ranGen_.get());}
+
+auto cpputils::GSL_RandomEngine::min() const -> result_type {return gsl_rng_min(ranGen_.get());}
+
+auto cpputils::GSL_RandomEngine::max() const -> result_type {return gsl_rng_max(ranGen_.get());}
+
+void cpputils::GSL_RandomEngine::write(std::ostream& os) const
 {
-public: 
-  explicit RandomizedGSL(unsigned long seed, const gsl_rng_type* ran_gen_type=gsl_rng_taus2) 
-    : ranGen_(gsl_rng_alloc(ran_gen_type)) {gsl_rng_set(ranGen_.get(),seed);}
-
-  ~RandomizedGSL() {}
-  
-private:
-  typedef std::shared_ptr<gsl_rng> Impl;
-  
-  double doSample() {return gsl_rng_uniform(ranGen_.get());}
-
-  const string getState() const
-  {
-    ostringstream stream;
-    stream.write(static_cast<const char*>(gsl_rng_state(ranGen_.get())),gsl_rng_size(ranGen_.get()));
-    return stream.str();
-  }
-  
-  void setState(const string& stateIn)
-  {
-    istringstream stream(stateIn);
-    stream.read(static_cast<char*>(gsl_rng_state(ranGen_.get())),gsl_rng_size(ranGen_.get()));
-  }
-
-  const string getImplID() const {return "RandomizedGSL";}
-  
-  const Impl ranGen_;
-
-};
-
-
-const Randomized::Ptr MakerGSL::operator()(unsigned long seed) const
-{
-  return std::make_shared<RandomizedGSL>(seed);
+  (os/*<<name_*/).write(static_cast<const char*>(gsl_rng_state(ranGen_.get())),gsl_rng_size(ranGen_.get()));
 }
 
 
-} // randomized
+void cpputils::GSL_RandomEngine::read(istream& is)
+{
+  /* string n; is>>n;
+  if (n!=name_) {
+    is.clear(ios_base::failbit);
+    throw std::runtime_error("GSL_RandomEngine archive load -- wrong implementation ID, expected "+name_+", found "+n);
+  }*/
+  is.read(static_cast<char*>(gsl_rng_state(ranGen_.get())),gsl_rng_size(ranGen_.get()));
+}

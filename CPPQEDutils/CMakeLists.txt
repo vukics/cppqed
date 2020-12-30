@@ -13,7 +13,7 @@ find_package(Eigen3 3.3 NO_MODULE)
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
             BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
-            FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Randomized.cc Trajectory.cc Version.cc)
+            FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Random.cc Trajectory.cc Version.cc)
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
@@ -26,7 +26,7 @@ if (TARGET Eigen3::Eigen)
   target_sources(CPPQEDutils PRIVATE DrivenDampedHarmonicOscillator.cc)
 endif ()
 
-target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_FLENS)
+target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_FLENS CPPQED_HAS_GSL)
 
 # Project options
 # Switch for boost bzip2 support

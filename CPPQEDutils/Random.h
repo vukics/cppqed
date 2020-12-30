@@ -1,10 +1,11 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Randomized & related}
-#ifndef CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED
-#define CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED
+/// \briefFile{Random & related}
+#ifndef CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
+#define CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
 
-#include "ArrayTraits.h"
-#include "ComplexExtensions.h"
+#ifdef CPPQED_HAS_GSL
+#include <gsl/gsl_rng.h>
+#endif // CPPQED_HAS_GSL
 
 #include <boost/range/algorithm/generate.hpp>
 
@@ -13,129 +14,131 @@
 #include <boost/serialization/split_member.hpp>
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-#include <stdexcept>
+#include <random>
 #include <memory>
+#include <stdexcept>
+#include <sstream>
 
-/// the randomized-bundle
-namespace randomized {
 
-/// A common interface for random-number generators
-/**
- * The class can serialize the state of the generator allowing for restoration from an archive (cf. \refBoost{Boost.Serialization,serialization})
- * 
- * \note The logical state of the class is the state of the underlying generator, so that everything that (may) change this state, for example sampling, is logically non-const.
- */
-class Randomized
+namespace cpputils {
+
+#ifdef CPPQED_HAS_GSL
+
+/// Wraps GSL random number generators into the concept [UniformRandomBitGenerator](http://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator)
+class GSL_RandomEngine 
 {
-protected:
-  Randomized(const Randomized&) = delete; Randomized& operator=(const Randomized&) = delete;
-  Randomized() = default;
-
 public:
-  typedef std::shared_ptr<Randomized> Ptr;
+  using result_type=unsigned long;
+  
+  explicit GSL_RandomEngine(result_type s/*, const gsl_rng_type* ran_gen_type=gsl_rng_taus2*/);
 
-  virtual ~Randomized() {}
+  GSL_RandomEngine(const GSL_RandomEngine&);
 
-  double operator()() {return doSample();} ///< sampling of uniform distribution over the interval [0:1)
+  void seed(result_type value);
 
-  const dcomp dcompRan(); ///< sampling of a uniform distribution over unit square on the complex plane
+  result_type operator()();
+  
+  result_type min() const;
+  result_type max() const;
+
+  void write(std::ostream& os) const;
+
+  void read(std::istream& is);
   
 private:
-  virtual double doSample() = 0;
-
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
-
-  friend class boost::serialization::access;
-
-  template<class Archive>
-  void save(Archive& ar, const unsigned int /* version */) const
-  {
-    const std::string state(getState()), id(getImplID());
-    ar  & state & id;
-  }
-  
-  template<class Archive>
-  void load(Archive& ar, const unsigned int /* version */)
-  {
-    std::string state, id;
-    ar & state & id;
-    if (id!=getImplID()) throw std::runtime_error("Randomized archive load -- wrong implementation ID, expected "+id+", found "+getImplID());
-    setState(state);
-  }
-
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
-  
-#endif // BZ_HAVE_BOOST_SERIALIZATION
-  
-  virtual const std::string getState() const = 0;
-  virtual void setState(const std::string&) = 0;
-  
-  virtual const std::string getImplID() const = 0;
-
-};
-
-
-/// \related Randomized
-template<typename D>
-inline
-const D sample(Randomized::Ptr ran);
-
-/// \related Randomized
-template<>
-inline
-const double sample<double>(Randomized::Ptr ran)
-{
-  return ran->operator()();
-}
-
-/// \related Randomized
-template<>
-inline
-const dcomp  sample<dcomp >(Randomized::Ptr ran)
-{
-  return ran->dcompRan();
-}
-
-
-/// Factory class for Randomized types
-class Maker
-{
-public:
-  virtual const Randomized::Ptr operator()(unsigned long seed) const = 0;
-
-  virtual ~Maker() {}
+  const std::shared_ptr<gsl_rng> ranGen_;
+  const std::string name_;
   
 };
 
 
-/// Implements Maker by returning a class implementing the Randomized interface by [GSL](http://www.gnu.org/software/gsl/manual/html_node/Random-Number-Distributions.html#Random-Number-Distributions)
-class MakerGSL : public Maker
-{
-public:
-  const Randomized::Ptr operator()(unsigned long seed) const;
-  
-};
+inline std::ostream& operator<<(std::ostream& os, const GSL_RandomEngine& r) {r.write(os); return os;}
+inline std::istream& operator>>(std::istream& is, GSL_RandomEngine& r) {r.read(is); return is;}
 
 
+template<typename Ar>
+void load(Ar& ar, GSL_RandomEngine& mt, unsigned) {
+  std::string text;
+  ar & text;
+  std::istringstream iss(text);
 
-/// Fills an array with random data taking a Randomized as parameter
-template<typename A>
-const Randomized::Ptr fillWithRandom(A& data, Randomized::Ptr ran)
-{
-  for (auto& d : data) d=sample<cpputils::ElementType_t<A>>(ran);
-  return ran;
+  if (!(iss >> mt))
+    throw std::invalid_argument("GSL_RandomEngine state");
+}
+
+template<typename Ar>
+void save(Ar& ar, GSL_RandomEngine const& mt, unsigned) {
+  std::ostringstream oss;
+  if (!(oss << mt))
+    throw std::invalid_argument("GSL_RandomEngine state");
+  std::string text = oss.str();
+  ar & text;
+}
+
+template<typename Ar>
+void serialize(Ar& ar, GSL_RandomEngine& mt, unsigned version) {
+  if (typename Ar::is_saving())
+    save(ar, mt, version);
+  else
+    load(ar, mt, version);
 }
 
 
-/// Fills an array with random data creating a Randomized internally
-template<typename A>
-const Randomized::Ptr fillWithRandom(A& data, unsigned long seed=1001ul, const Maker& maker=MakerGSL())
+} // cpputils
+
+#endif // CPPQED_HAS_GSL
+
+
+namespace cpputils {
+
+template<typename Distribution, typename RandomEngine, typename Array, typename... DCP>
+RandomEngine& fillWithRandom(Array a, RandomEngine& re, DCP&&... dcp)
 {
-  Randomized::Ptr ran(maker(seed));
-  return fillWithRandom(data,ran);
+  Distribution d{std::forward<DCP>(dcp)...};
+  std::generate(a.begin(),a.end(),[&]() {return d(re);});
+  return re;
 }
 
 
-} // randomized
+template<typename Distribution, typename RandomEngine, typename Array, typename... DCP>
+void fillWithRandom(Array a, unsigned long seed, DCP&&... dcp)
+{
+  RandomEngine re{seed};
+  fillWithRandom<Distribution>(a,re,std::forward<DCP>(dcp)...);
+}
 
-#endif // CPPQEDCORE_UTILS_RANDOMIZED_H_INCLUDED
+} // cpputils
+
+
+namespace boost { namespace serialization {
+
+template<typename Ar>
+void load(Ar& ar, std::mt19937_64& mt, unsigned) {
+  std::string text;
+  ar & text;
+  std::istringstream iss(text);
+
+  if (!(iss >> mt))
+    throw std::invalid_argument("mersenne_twister_engine state");
+}
+
+template<typename Ar>
+void save(Ar& ar, std::mt19937_64 const& mt, unsigned) {
+  std::ostringstream oss;
+  if (!(oss << mt))
+    throw std::invalid_argument("mersenne_twister_engine state");
+  std::string text = oss.str();
+  ar & text;
+}
+
+template<typename Ar>
+void serialize(Ar& ar, std::mt19937_64& mt, unsigned version) {
+  if (typename Ar::is_saving())
+    save(ar, mt, version);
+  else
+    load(ar, mt, version);
+}
+
+}} // boost::serialization
+
+#endif // CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
