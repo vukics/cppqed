@@ -37,20 +37,17 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
 
 
 template<int RANK>
-MCWF_Trajectory<RANK>::MCWF_Trajectory(
-                                       SV_Ptr psi,
+MCWF_Trajectory<RANK>::MCWF_Trajectory(SV_Ptr psi,
                                        typename structure::QuantumSystem<RANK>::Ptr sys,
                                        const mcwf::Pars& p,
-                                       const StateVectorLow& scaleAbs
-                                       )
+                                       const StateVectorLow& scaleAbs)
   : QuantumTrajectory(sys,p.noise,
          psi->getArray(),
          bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
          initialTimeStep<RANK>(sys),
          scaleAbs,
          p,
-         evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorrectionFactor),
-         randomized::MakerGSL()),
+         evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorrectionFactor)),
     psi_(psi),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     logger_(p.logLevel,this->template nAvr<structure::LA_Li>())
@@ -135,7 +132,7 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStep
 template<int RANK>
 void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, double t)
 {
-  double random=this->getRandomized()->operator()()/this->getDtDid();
+  double random=std::uniform_real_distribution()(this->getRandomEngine())/this->getDtDid();
 
   int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))

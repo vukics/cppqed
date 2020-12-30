@@ -25,7 +25,10 @@ struct HandleType<quantumdata::StateVector<RANK> > : mpl::identity<std::shared_p
 namespace quantumtrajectory {
 
 
-#define BASE_class trajectory::Stochastic<typename structure::AveragedCommon::Averages, typename quantumdata::Types<RANK>::StateVectorLow, quantumdata::StateVector<RANK> >
+#define BASE_class trajectory::Stochastic<typename structure::AveragedCommon::Averages,\
+                                          typename quantumdata::Types<RANK>::StateVectorLow,\
+                                          quantumdata::StateVector<RANK>,\
+                                          cpputils::GSL_RandomEngine>
 
 
 /// Implements a single Monte Carlo wave-function trajectory

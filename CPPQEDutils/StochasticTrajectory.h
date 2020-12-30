@@ -4,7 +4,7 @@
 #define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
 #include "ParsStochasticTrajectory.h"
-#include "Randomized.h"
+#include "Random.h"
 #include "Trajectory.tcc"
 
 #include "Conversions.h"
@@ -68,8 +68,8 @@ private:
 
 
 /// Represents a trajectory that has both adaptive ODE evolution and noise
-/** In the language of the framework, this means that the class simply connects Adaptive and Averageable while storing a randomized::Randomized instant for the convenience of derived classes. */
-template<typename SA, typename A, typename T>
+/** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. */
+template<typename SA, typename A, typename T, typename RE>
 class Stochastic : public Adaptive<A,Averageable<SA,T>>
 {
 public:
@@ -80,37 +80,39 @@ private:
 
   typedef typename Base::Evolved Evolved;
 
-  typedef randomized::Randomized::Ptr RandomizedPtr;
-
 protected:
   /// \name Constructors
   //@{
-  /// Straightforward constructor combining the construction of Adaptive and randomized::Randomized
+  /// Straightforward constructor combining the construction of Adaptive and a random engine
+  template<typename... RandomEngineCtorParameters>
   Stochastic(A& y, typename Evolved::Derivs derivs,
              double dtInit,
              int logLevel,
              double epsRel, double epsAbs, const A& scaleAbs,
              const evolved::Maker<A>& makerE,
+             bool isNoisy,
              unsigned long seed,
-             bool n,
-             const randomized::Maker& makerR)
+             RandomEngineCtorParameters&&... reParams)
     : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE),
-      seed_(seed), isNoisy_(n), randomized_(makerR(seed)) {}
+      isNoisy_(isNoisy), seed_(seed),
+      re_(seed,std::forward<RandomEngineCtorParameters>(reParams)...) {}
 
   /// \overload
+  template<typename... RandomEngineCtorParameters>
   Stochastic(A& y, typename Evolved::Derivs derivs,
              double dtInit,
              const A& scaleAbs,
              const ParsStochastic& p,
              const evolved::Maker<A>& makerE,
-             const randomized::Maker& makerR)
-    : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.seed,p.noise,makerR) {}
+             RandomEngineCtorParameters&&... reParams)
+    : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,p.seed,
+                 std::forward<RandomEngineCtorParameters>(reParams)...) {}
   //@}
   
   /// \name Getters
   //@{
-  const RandomizedPtr getRandomized() const {return randomized_;}
-  bool                isNoisy      () const {return isNoisy_   ;}
+  auto& getRandomEngine() {return re_;}
+  auto isNoisy() const {return isNoisy_;}
   //@}
   
   std::ostream& streamParameters_v(std::ostream& os) const override
@@ -120,15 +122,15 @@ protected:
   
   /// \name Serialization
   //@{
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return iar & *randomized_;}
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return oar & *randomized_;}
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return iar & re_;}
+  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return oar & re_;}
   //@}
   
 private:
+  const bool isNoisy_;
   const unsigned long seed_ ;
-  const bool          isNoisy_;
 
-  const RandomizedPtr randomized_;
+  RE re_;
 
 };
 
