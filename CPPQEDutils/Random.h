@@ -1,5 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Random & related}
+#ifndef CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
+
 #ifndef CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
 #define CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
 
@@ -56,33 +58,11 @@ inline std::ostream& operator<<(std::ostream& os, const GSL_RandomEngine& r) {r.
 inline std::istream& operator>>(std::istream& is, GSL_RandomEngine& r) {r.read(is); return is;}
 
 
-template<typename Ar>
-void load(Ar& ar, GSL_RandomEngine& mt, unsigned) {
-  std::string text;
-  ar & text;
-  std::istringstream iss(text);
+#define CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
+#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE GSL_RandomEngine
+#define CPPQEDCORE_UTILS_RANDOM_H_STRING "GSL_RandomEngine state"
 
-  if (!(iss >> mt))
-    throw std::invalid_argument("GSL_RandomEngine state");
-}
-
-template<typename Ar>
-void save(Ar& ar, GSL_RandomEngine const& mt, unsigned) {
-  std::ostringstream oss;
-  if (!(oss << mt))
-    throw std::invalid_argument("GSL_RandomEngine state");
-  std::string text = oss.str();
-  ar & text;
-}
-
-template<typename Ar>
-void serialize(Ar& ar, GSL_RandomEngine& mt, unsigned version) {
-  if (typename Ar::is_saving())
-    save(ar, mt, version);
-  else
-    load(ar, mt, version);
-}
-
+#include "Random.h"
 
 } // cpputils
 
@@ -112,33 +92,49 @@ void fillWithRandom(Array a, unsigned long seed, DCP&&... dcp)
 
 namespace boost { namespace serialization {
 
+#define CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
+#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE std::mt19937_64
+#define CPPQEDCORE_UTILS_RANDOM_H_STRING "mersenne_twister_engine state"
+
+#include "Random.h"
+
+} } // boost::serialization
+
+#endif // CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
+
+
+#else // CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
+
+
 template<typename Ar>
-void load(Ar& ar, std::mt19937_64& mt, unsigned) {
+void load(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE& mt, unsigned) {
   std::string text;
   ar & text;
   std::istringstream iss(text);
 
   if (!(iss >> mt))
-    throw std::invalid_argument("mersenne_twister_engine state");
+    throw std::invalid_argument(CPPQEDCORE_UTILS_RANDOM_H_STRING);
 }
 
 template<typename Ar>
-void save(Ar& ar, std::mt19937_64 const& mt, unsigned) {
+void save(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE const& mt, unsigned) {
   std::ostringstream oss;
   if (!(oss << mt))
-    throw std::invalid_argument("mersenne_twister_engine state");
+    throw std::invalid_argument(CPPQEDCORE_UTILS_RANDOM_H_STRING);
   std::string text = oss.str();
   ar & text;
 }
 
 template<typename Ar>
-void serialize(Ar& ar, std::mt19937_64& mt, unsigned version) {
+void serialize(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE& mt, unsigned version) {
   if (typename Ar::is_saving())
     save(ar, mt, version);
   else
     load(ar, mt, version);
 }
 
-}} // boost::serialization
+#undef CPPQEDCORE_UTILS_RANDOM_H_STRING
+#undef CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE
+#undef CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
 
-#endif // CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
+#endif // CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
