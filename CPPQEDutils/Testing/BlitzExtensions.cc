@@ -39,7 +39,7 @@ typedef CArray<RA-1> CARM1;
 typedef CArray<RA+1> CARP1;
 
 
-cpputils::GSL_RandomEngine ran{1001};
+std::mt19937 ran{1001};
 
 
 BOOST_AUTO_TEST_CASE( TwoTimesRealPartOfSelfTest )

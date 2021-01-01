@@ -35,7 +35,7 @@ int main(int, char**)
   
   // s.streamParameters(std::cout);
 
-  cpputils::GSL_RandomEngine re{1001};
+  std::mt19937 re{1001};
 
   auto ampDev=0., ampDerivDev=0.;
 

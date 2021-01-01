@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE( BlitzArrayTest )
 {
   Array array(blitz::shape(2,4,3,2,5,4));
 
-  cpputils::fillWithRandom<std::uniform_real_distribution<double>,cpputils::GSL_RandomEngine>(array,1001);
+  cpputils::fillWithRandom<std::uniform_real_distribution<double>,std::mt19937>(array,1001);
 
   array.transposeSelf(1,3,0,4,2,5);
 

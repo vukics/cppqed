@@ -93,7 +93,7 @@ void fillWithRandom(Array a, unsigned long seed, DCP&&... dcp)
 namespace boost { namespace serialization {
 
 #define CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
-#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE std::mt19937_64
+#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE std::mt19937
 #define CPPQEDCORE_UTILS_RANDOM_H_STRING "mersenne_twister_engine state"
 
 #include "Random.h"
