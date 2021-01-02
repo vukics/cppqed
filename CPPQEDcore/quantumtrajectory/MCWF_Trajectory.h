@@ -28,7 +28,7 @@ namespace quantumtrajectory {
 #define BASE_class trajectory::Stochastic<typename structure::AveragedCommon::Averages,\
                                           typename quantumdata::Types<RANK>::StateVectorLow,\
                                           quantumdata::StateVector<RANK>,\
-                                          cpputils::GSL_RandomEngine>
+                                          RandomEngine>
 
 
 /// Implements a single Monte Carlo wave-function trajectory
@@ -65,7 +65,7 @@ namespace quantumtrajectory {
  * 
  */
 
-template<int RANK>
+template<int RANK, typename RandomEngine>
 class MCWF_Trajectory : public QuantumTrajectory<RANK,BASE_class>
 {
 public:

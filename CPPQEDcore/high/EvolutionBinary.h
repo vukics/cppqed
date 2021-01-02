@@ -8,16 +8,31 @@
 #include "Evolution.h"
 
 
+namespace evolution {
+
+
+template<typename RandomEngine, typename SV_OR_DO>
+const auto
+_(SV_OR_DO&& initial,
+  binary::Ptr sys,
+  const evolution::Pars<>& p,
+  bool doStreaming=true, bool returnStreamedArray=false)
+{
+  return _<RandomEngine,0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+}
+
+
+} // evolution
+
+
 template<typename SV_OR_DO>
-inline
 const auto
 evolve(SV_OR_DO&& initial,
        binary::Ptr sys,
        const evolution::Pars<>& p,
-       bool doStreaming=true, bool returnStreamedArray=false
-      )
+       bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return evolve<0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+  return evolution::_<EVOLUTION_DEFAULT_RANDOM_ENGINE,0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
 }
 
 

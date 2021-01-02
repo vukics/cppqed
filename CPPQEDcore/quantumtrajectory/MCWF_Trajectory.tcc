@@ -25,8 +25,8 @@ namespace quantumtrajectory {
 //
 //////////////////
 
-template<int RANK>
-void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+template<int RANK, typename RandomEngine>
+void MCWF_Trajectory<RANK,RandomEngine>::derivs(double t, const StateVectorLow& psi, StateVectorLow& dpsidt) const
 {
   if (const auto ha=this->getHa()) {
     dpsidt=0;
@@ -36,11 +36,11 @@ void MCWF_Trajectory<RANK>::derivs(double t, const StateVectorLow& psi, StateVec
 }
 
 
-template<int RANK>
-MCWF_Trajectory<RANK>::MCWF_Trajectory(SV_Ptr psi,
-                                       typename structure::QuantumSystem<RANK>::Ptr sys,
-                                       const mcwf::Pars& p,
-                                       const StateVectorLow& scaleAbs)
+template<int RANK, typename RandomEngine>
+MCWF_Trajectory<RANK,RandomEngine>::MCWF_Trajectory(SV_Ptr psi,
+                                                    typename structure::QuantumSystem<RANK>::Ptr sys,
+                                                    const mcwf::Pars& p,
+                                                    const StateVectorLow& scaleAbs)
   : QuantumTrajectory(sys,p.noise,
          psi->getArray(),
          bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
@@ -60,8 +60,8 @@ MCWF_Trajectory<RANK>::MCWF_Trajectory(SV_Ptr psi,
 }
 
 
-template<int RANK>
-double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
+template<int RANK, typename RandomEngine>
+double MCWF_Trajectory<RANK,RandomEngine>::coherentTimeDevelopment(double Dt)
 {
   if (this->getHa()) {
     getEvolved()->step(Dt);
@@ -88,8 +88,8 @@ double MCWF_Trajectory<RANK>::coherentTimeDevelopment(double Dt)
 }
 
 
-template<int RANK>
-auto MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const -> const IndexSVL_tuples
+template<int RANK, typename RandomEngine>
+auto MCWF_Trajectory<RANK,RandomEngine>::calculateSpecialRates(Rates* rates, double t) const -> const IndexSVL_tuples
 {
   IndexSVL_tuples res;
   for (int i=0; i<rates->size(); i++)
@@ -103,8 +103,8 @@ auto MCWF_Trajectory<RANK>::calculateSpecialRates(Rates* rates, double t) const 
 }
 
 
-template<int RANK>
-bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStepBookkeeper* evolvedCache, bool logControl)
+template<int RANK, typename RandomEngine>
+bool MCWF_Trajectory<RANK,RandomEngine>::manageTimeStep(const Rates& rates, evolved::TimeStepBookkeeper* evolvedCache, bool logControl)
 {
   const double totalRate=boost::accumulate(rates,0.);
   const double dtDid=this->getDtDid(), dtTry=getDtTry();
@@ -129,8 +129,8 @@ bool MCWF_Trajectory<RANK>::manageTimeStep(const Rates& rates, evolved::TimeStep
 }
 
 
-template<int RANK>
-void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, double t)
+template<int RANK, typename RandomEngine>
+void MCWF_Trajectory<RANK,RandomEngine>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, double t)
 {
   double random=std::uniform_real_distribution()(this->getRandomEngine())/this->getDtDid();
 
@@ -156,8 +156,8 @@ void MCWF_Trajectory<RANK>::performJump(const Rates& rates, const IndexSVL_tuple
 }
 
 
-template<int RANK>
-void MCWF_Trajectory<RANK>::step_v(double Dt)
+template<int RANK, typename RandomEngine>
+void MCWF_Trajectory<RANK,RandomEngine>::step_v(double Dt)
 {
   const StateVector psiCache(*psi_);
   evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.
@@ -186,8 +186,8 @@ void MCWF_Trajectory<RANK>::step_v(double Dt)
 }
 
 
-template<int RANK>
-std::ostream& MCWF_Trajectory<RANK>::streamParameters_v(std::ostream& os) const
+template<int RANK, typename RandomEngine>
+std::ostream& MCWF_Trajectory<RANK,RandomEngine>::streamParameters_v(std::ostream& os) const
 {
   using namespace std;
   
@@ -214,8 +214,8 @@ std::ostream& MCWF_Trajectory<RANK>::streamParameters_v(std::ostream& os) const
 }
 
 
-template<int RANK>
-std::ostream& MCWF_Trajectory<RANK>::streamKey_v(std::ostream& os, size_t& i) const
+template<int RANK, typename RandomEngine>
+std::ostream& MCWF_Trajectory<RANK,RandomEngine>::streamKey_v(std::ostream& os, size_t& i) const
 {
   return this->template streamKey<structure::LA_Av>(os,i);
 }
