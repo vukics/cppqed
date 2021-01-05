@@ -10,6 +10,8 @@ find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams)
 
 find_package(Eigen3 3.3 NO_MODULE)
 
+add_subdirectory(thirdPartyRandom)
+
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
             BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
@@ -17,7 +19,7 @@ add_library(CPPQEDutils SHARED
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC Blitz::Blitz Boost::iostreams PRIVATE GSL::gsl)
+target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams PRIVATE GSL::gsl)
 
 if (TARGET Eigen3::Eigen)
   message(STATUS "Found Eigen3")

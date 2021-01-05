@@ -3,16 +3,17 @@
 #include "BlitzArray.h"
 #include "Random.h"
 
+#define BOOST_TEST_MODULE RandomEngineSerialization test
+#include <boost/test/unit_test.hpp>
+
 #include <fstream>
 
-using namespace cpputils;
 using namespace std;
 
 const size_t seed=1001;
 
-const string filename{"CPPQEDutils_testing_Random.d"};
-
-int main(int, char**)
+template<typename RandomEngine>
+auto testcase()
 {
   DArray<1>
     array(10),
@@ -20,33 +21,47 @@ int main(int, char**)
     firstHalf(arrayInterrupted(blitz::Range(0,4))),
     secondHalf(arrayInterrupted(blitz::Range(5,9)));
   
-  fillWithRandom<std::uniform_real_distribution<double>,cpputils::GSL_RandomEngine>(array,seed);
+  cpputils::fillWithRandom<uniform_real_distribution<double>,RandomEngine>(array,seed);
   
-  std::cerr<<array<<std::endl;
+  cerr<<array<<endl;
   
-  cpputils::GSL_RandomEngine reFirst(seed), reSecond(seed);
+  RandomEngine reFirst(seed), reSecond(seed);
   
-  fillWithRandom<std::uniform_real_distribution<double>>(firstHalf,reFirst);
+  cpputils::fillWithRandom<uniform_real_distribution<double>>(firstHalf,reFirst);
   
-  std::cerr<<array<<std::endl;
+  const string filename{"CPPQEDutils_testing_"+cpputils::RandomEngineID_v<RandomEngine>+".d"};
+  
+  BOOST_TEST_CHECKPOINT( "PRE_OUTPUT" );
   
   {
     ofstream ofs(filename);
-    oarchive ar(ofs);
+    cpputils::oarchive ar(ofs, ios_base::trunc | ios_base::binary);
     ar & reFirst;
   }
+
+  BOOST_TEST_CHECKPOINT( "POST_OUTPUT" );
 
   // ... some time later restore the other RandomEngine instance to its state
   {
     ifstream ifs(filename);
-    iarchive ar(ifs);
+    cpputils::iarchive ar(ifs, ios_base::binary);
     ar & reSecond;
   }
 
-  fillWithRandom<std::uniform_real_distribution<double>>(secondHalf,reSecond);
+  BOOST_TEST_CHECKPOINT( "POST_INPUT" );
 
-  std::cerr<<arrayInterrupted<<std::endl;
+  cpputils::fillWithRandom<uniform_real_distribution<double>>(secondHalf,reSecond);
 
-  return !all(array==arrayInterrupted) ;
-  
+  cerr<<arrayInterrupted<<endl;
+
+  return all(array==arrayInterrupted) ;
 }
+
+
+BOOST_AUTO_TEST_CASE( GSL_RandomEngineTest ) { BOOST_CHECK(testcase<cpputils::GSL_RandomEngine>()); }
+
+BOOST_AUTO_TEST_CASE( STD_MersenneTwisterTest ) { BOOST_CHECK(testcase<mt19937_64>()); }
+
+BOOST_AUTO_TEST_CASE( PCG64_Test ) { BOOST_CHECK(testcase<pcg64>()); }
+
+BOOST_AUTO_TEST_CASE( Xoshiro256pp_Test ) { BOOST_CHECK(testcase<XoshiroCpp::Xoshiro256PlusPlus>()); }

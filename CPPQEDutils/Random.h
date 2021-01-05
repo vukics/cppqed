@@ -5,6 +5,9 @@
 #ifndef CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
 #define CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
 
+#include "pcg_random.hpp"
+#include "XoshiroCpp.hpp"
+
 #ifdef CPPQED_HAS_GSL
 #include <gsl/gsl_rng.h>
 #endif // CPPQED_HAS_GSL
@@ -13,7 +16,7 @@
 
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/string.hpp>
-#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/array.hpp>
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <random>
@@ -87,17 +90,63 @@ void fillWithRandom(Array a, unsigned long seed, DCP&&... dcp)
   fillWithRandom<Distribution>(a,re,std::forward<DCP>(dcp)...);
 }
 
+
+template<typename RandomEngine>
+constexpr auto RandomEngineID_v = std::nullopt;
+
+template<>
+static const std::string RandomEngineID_v<GSL_RandomEngine> = "GSL_Taus2";
+
+template<>
+static const std::string RandomEngineID_v<std::mt19937_64> = "STD_MT19937_64";
+
+template<>
+static const std::string RandomEngineID_v<pcg64> = "PCG64";
+
+template<>
+static const std::string RandomEngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
+
+
 } // cpputils
 
 
 namespace boost { namespace serialization {
 
+
+template<typename Ar>
+void load(Ar& ar, XoshiroCpp::Xoshiro256PlusPlus& xpp, unsigned) {
+  XoshiroCpp::Xoshiro256PlusPlus::state_type state;
+  ar & state;
+  xpp.deserialize(state);
+}
+
+template<typename Ar>
+void save(Ar& ar, XoshiroCpp::Xoshiro256PlusPlus const& xpp, unsigned) {
+  auto state{xpp.serialize()};
+  ar & state;
+}
+
+template<typename Ar>
+void serialize(Ar& ar, XoshiroCpp::Xoshiro256PlusPlus& xpp, unsigned version) {
+  if (typename Ar::is_saving())
+    save(ar, xpp, version);
+  else
+    load(ar, xpp, version);
+}
+
+
 #define CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
-#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE std::mt19937
+#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE std::mt19937_64
 #define CPPQEDCORE_UTILS_RANDOM_H_STRING "mersenne_twister_engine state"
 
 #include "Random.h"
 
+#define CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
+#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE pcg64
+#define CPPQEDCORE_UTILS_RANDOM_H_STRING "pcg64 state"
+
+#include "Random.h"
+  
 } } // boost::serialization
 
 #endif // CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
@@ -107,30 +156,30 @@ namespace boost { namespace serialization {
 
 
 template<typename Ar>
-void load(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE& mt, unsigned) {
+void load(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE& randomEngine, unsigned) {
   std::string text;
   ar & text;
   std::istringstream iss(text);
 
-  if (!(iss >> mt))
+  if (!(iss >> randomEngine))
     throw std::invalid_argument(CPPQEDCORE_UTILS_RANDOM_H_STRING);
 }
 
 template<typename Ar>
-void save(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE const& mt, unsigned) {
+void save(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE const& randomEngine, unsigned) {
   std::ostringstream oss;
-  if (!(oss << mt))
+  if (!(oss << randomEngine))
     throw std::invalid_argument(CPPQEDCORE_UTILS_RANDOM_H_STRING);
   std::string text = oss.str();
   ar & text;
 }
 
 template<typename Ar>
-void serialize(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE& mt, unsigned version) {
+void serialize(Ar& ar, CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE& randomEngine, unsigned version) {
   if (typename Ar::is_saving())
-    save(ar, mt, version);
+    save(ar, randomEngine, version);
   else
-    load(ar, mt, version);
+    load(ar, randomEngine, version);
 }
 
 #undef CPPQEDCORE_UTILS_RANDOM_H_STRING
