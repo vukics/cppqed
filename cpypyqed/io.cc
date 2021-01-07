@@ -14,22 +14,14 @@
 #define BLITZ_ARRAY_LARGEST_RANK PYTHON_MAX_RANK
 #endif
 
-#include "Evolved.h"
-
-#include "Types.h"
-
-#include "BlitzTiny.h"
+#include "BlitzArray.h"
 #include "Trajectory.tcc"
 
 #include "blitz2numpy.h"
 
-#include <algorithm>
-#include <boost/lexical_cast.hpp>
 #include <boost/preprocessor/iteration/local.hpp>
-#include <boost/python/exception_translator.hpp>
-#include <fstream>
-#include <string>
-#include <iostream>
+
+#include <algorithm>
 
 using namespace trajectory;
 using namespace boost::python;

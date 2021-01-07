@@ -18,7 +18,7 @@ namespace {
 bool isbz2(const string filename)
 {
   using namespace std;
-  ifstream file(filename, ios_base::in | ios_base::binary);
+  ifstream file(filename, ios_base::binary);
   if (file.peek() == ifstream::traits_type::eof())
     return true;
   string header; header.resize(3);
@@ -40,7 +40,7 @@ struct StateFileOpeningException : runtime_error
 shared_ptr<istream> trajectory::openStateFileReading(const string &filename)
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
-  shared_ptr<ifstream> ifs = make_shared<ifstream>(filename, ios_base::in | ios_base::binary);
+  shared_ptr<ifstream> ifs = make_shared<ifstream>(filename, ios_base::binary);
   if (!ifs->is_open()) throw StateFileOpeningException(filename);
   return ifs;
 #else

@@ -3,6 +3,7 @@
 #ifndef   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
 
+#include <optional>
 #include <vector>
 
 namespace cpputils {
@@ -10,11 +11,11 @@ namespace cpputils {
 
 /// template metafunction for the rank (arity) of the multi-array `A`
 template<typename>
-constexpr auto Rank_v="N/A";
+constexpr auto Rank_v=std::nullopt;
 
 /// template metafunction providing an identifier string for the multi-array `A`
 template<typename>
-constexpr auto TypeID_v="";
+constexpr auto TypeID_v=std::nullopt;
 
 /// template metafunction returning (by convention, as a member typedef `type`) the type of elements of the multi-array `A`
 template<typename>
