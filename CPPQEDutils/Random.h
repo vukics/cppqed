@@ -19,13 +19,16 @@
 #include <boost/serialization/array.hpp>
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-#include <random>
 #include <memory>
+#include <random>
 #include <stdexcept>
 #include <sstream>
 
 
 namespace cpputils {
+
+template<typename RandomEngine>
+RandomEngine streamOfOrdo(typename RandomEngine::result_type seed, typename RandomEngine::result_type ordoStream);
 
 #ifdef CPPQED_HAS_GSL
 
@@ -105,6 +108,21 @@ static const std::string RandomEngineID_v<pcg64> = "PCG64";
 
 template<>
 static const std::string RandomEngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
+
+
+template<>
+inline pcg64 streamOfOrdo<pcg64>(pcg64::result_type seed, pcg64::result_type ordoStream)
+{
+  return pcg64{seed,1001+ordoStream};
+}
+
+// template<>
+// inline std::list<pcg64> independentPRNG_Streams<pcg64>(size_t n, pcg64::result_type seed, pcg64::result_type ordoStream)
+// {
+//   std::list<pcg64> res;
+//   for (size_t i=0; i<n; ++i) res.emplace_back(seed,1001+ordoStream+i);
+//   return res;
+// }
 
 
 } // cpputils

@@ -14,7 +14,7 @@ namespace trajectory {
 struct ParsStochastic : ParsEvolved
 {
 
-  unsigned long &seed; ///< random-number generator seed
+  unsigned long &seed, &prngStream; ///< random-number generator seed
   
   /// whether the noise should be on or off
   /**

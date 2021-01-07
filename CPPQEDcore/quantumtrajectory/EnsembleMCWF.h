@@ -10,6 +10,7 @@
 
 #include "Conversions.h"
 
+#include <boost/range/combine.hpp>// #include <ranges>
 
 namespace quantumtrajectory {
 
@@ -49,15 +50,11 @@ protected:
        const StateVectorLow& scaleAbs=StateVectorLow())
     : Ensemble([psi,qs,&p,&scaleAbs] {
         Trajectories res;
-        std::mt19937 randomEngine{p.seed};
-        std::uniform_int_distribution<unsigned long> distro{1,1000*p.nTraj};
         
         p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
 
-        for (size_t i=0; i<p.nTraj; ++i) {
-          p.seed=distro(randomEngine);
+        for (size_t i=0; i<p.nTraj; (++i, ++p.prngStream) ) 
           res.push_back(new Single(std::make_shared<StateVector>(*psi),qs,p,scaleAbs));
-        }
         
         return res.release();
       } (),p.logLevel<0),

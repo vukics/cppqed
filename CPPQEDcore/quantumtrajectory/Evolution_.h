@@ -4,7 +4,7 @@
 #define CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTION__H_INCLUDED
 
 #ifndef EVOLUTION_DEFAULT_RANDOM_ENGINE
-#define EVOLUTION_DEFAULT_RANDOM_ENGINE cpputils::GSL_RandomEngine
+#define EVOLUTION_DEFAULT_RANDOM_ENGINE pcg64 // XoshiroCpp::Xoshiro256PlusPlus // cpputils::GSL_RandomEngine
 #endif
 
 #include "EnsembleMCWF.h"

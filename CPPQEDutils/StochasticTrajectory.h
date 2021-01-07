@@ -69,7 +69,7 @@ private:
 
 /// Represents a trajectory that has both adaptive ODE evolution and noise
 /** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. */
-template<typename SA, typename A, typename T, typename RE>
+template<typename SA, typename A, typename T, typename RandomEngine>
 class Stochastic : public Adaptive<A,Averageable<SA,T>>
 {
 public:
@@ -84,18 +84,16 @@ protected:
   /// \name Constructors
   //@{
   /// Straightforward constructor combining the construction of Adaptive and a random engine
-  template<typename... RandomEngineCtorParameters>
   Stochastic(A& y, typename Evolved::Derivs derivs,
              double dtInit,
              int logLevel,
              double epsRel, double epsAbs, const A& scaleAbs,
              const evolved::Maker<A>& makerE,
              bool isNoisy,
-             unsigned long seed,
-             RandomEngineCtorParameters&&... reParams)
+             unsigned long seed, unsigned long prngStream)
     : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE),
-      isNoisy_(isNoisy), seed_(seed),
-      re_(seed,std::forward<RandomEngineCtorParameters>(reParams)...) {}
+      isNoisy_(isNoisy), seed_(seed), prngStream_(prngStream),
+      re_(cpputils::streamOfOrdo<RandomEngine>(seed,prngStream)) {}
 
   /// \overload
   template<typename... RandomEngineCtorParameters>
@@ -103,21 +101,23 @@ protected:
              double dtInit,
              const A& scaleAbs,
              const ParsStochastic& p,
-             const evolved::Maker<A>& makerE,
-             RandomEngineCtorParameters&&... reParams)
-    : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,p.seed,
-                 std::forward<RandomEngineCtorParameters>(reParams)...) {}
+             const evolved::Maker<A>& makerE)
+    : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,p.seed,p.prngStream) {}
   //@}
   
   /// \name Getters
   //@{
+public:
   auto& getRandomEngine() {return re_;}
+  
+protected:
   auto isNoisy() const {return isNoisy_;}
   //@}
   
   std::ostream& streamParameters_v(std::ostream& os) const override
   {
-    return Base::streamParameters_v(os)<<"Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
+    return Base::streamParameters_v(os)<<"Stochastic Trajectory Parameters: random engine="<<cpputils::RandomEngineID_v<RandomEngine>
+                                       <<" seed="<<seed_<<" prngStreamNo="<<prngStream_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
   }
   
   /// \name Serialization
@@ -128,9 +128,9 @@ protected:
   
 private:
   const bool isNoisy_;
-  const unsigned long seed_ ;
+  const unsigned long seed_, prngStream_;
 
-  RE re_;
+  RandomEngine re_;
 
 };
 
@@ -187,6 +187,8 @@ protected:
           ) : trajs_(std::move(trajs)), displayProgress_(displayProgress) {}
 
   /// Getter
+  Trajectories& getTrajectories() {return trajs_;}
+  
   const Trajectories& getTrajectories() const {return trajs_;}
 
 #define FOR_EACH_function(f) for (auto& t : trajs_) t.f(ios); return ios;
