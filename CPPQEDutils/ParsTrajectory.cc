@@ -42,7 +42,7 @@ ParsStochastic::ParsStochastic(parameters::Table& p, const std::string& mod)
     seed(p.addTitle("StochasticTrajectory",mod).add("seed",mod,"Random number generator seed",1001ul)),
     prngStream(p.add("prngStream",mod,"Random number generator independent stream ordinal",1ul)),
     noise(p.add("noise",mod,"Switching noise on/off",true)),
-    nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(100))) 
+    nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(500))) 
 {}
 
 
