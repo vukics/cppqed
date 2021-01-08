@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
-#include "ParsStochasticTrajectory.h"
+#include "ParsTrajectory.h"
 #include "Random.h"
 #include "Trajectory.tcc"
 
@@ -24,6 +24,30 @@ namespace mpl=boost::mpl;
 
 
 namespace trajectory {
+
+
+/// Aggregate of parameters pertaining to stochastic simulations
+/** \copydetails ParsRun */
+template <typename RandomEngine>
+struct ParsStochastic : cpputils::ParsRandom<RandomEngine,ParsEvolved>
+{
+  /// whether the noise should be on or off
+  /**
+   * (if it makes sense to turn it off at all for a concrete Stochastic
+   * – e.g. for a \link quantumtrajectory::MCWF_Trajectory Monte Carlo wave-function trajectory\endlink, turning off the noise means simply to disable quantum jumps)
+   */
+  bool &noise;
+  
+  size_t &nTraj; ///< number of trajectories in case of ensemble averaging
+
+  ParsStochastic(parameters::Table& p, const std::string& mod="")
+    : cpputils::ParsRandom<RandomEngine,ParsEvolved>{p,mod},
+      noise(p.add("noise",mod,"Switching noise on/off",true)),
+      nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(500)))
+  {}
+      
+};
+
 
 
 /// Contains important helpers for averaging (over time or ensemble)
@@ -90,19 +114,21 @@ protected:
              double epsRel, double epsAbs, const A& scaleAbs,
              const evolved::Maker<A>& makerE,
              bool isNoisy,
-             unsigned long seed, unsigned long prngStream)
-    : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE),
-      isNoisy_(isNoisy), seed_(seed), prngStream_(prngStream),
-      re_(cpputils::streamOfOrdo<RandomEngine>(seed,prngStream)) {}
+             RandomEngine&& re)
+    : Base{y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE},
+      isNoisy_(isNoisy),
+      reInitStateDescriptor_{ [re{std::move(re)}]() {std::ostringstream oss; oss<<re; return oss.str();}() },
+      re_(std::forward<RandomEngine>(re)) {}
 
   /// \overload
   template<typename... RandomEngineCtorParameters>
   Stochastic(A& y, typename Evolved::Derivs derivs,
              double dtInit,
              const A& scaleAbs,
-             const ParsStochastic& p,
+             const ParsStochastic<RandomEngine>& p,
              const evolved::Maker<A>& makerE)
-    : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,p.seed,p.prngStream) {}
+    : Stochastic{y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
+                 cpputils::streamOfOrdo(p)} {}
   //@}
   
   /// \name Getters
@@ -116,8 +142,8 @@ protected:
   
   std::ostream& streamParameters_v(std::ostream& os) const override
   {
-    return Base::streamParameters_v(os)<<"Stochastic Trajectory Parameters: random engine="<<cpputils::RandomEngineID_v<RandomEngine>
-                                       <<" seed="<<seed_<<" prngStreamNo="<<prngStream_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
+    return Base::streamParameters_v(os)<<"Stochastic trajectory random engine, initial state: "<<cpputils::RandomEngineID_v<RandomEngine>
+                                       <<" "<<reInitStateDescriptor_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
   }
   
   /// \name Serialization
@@ -128,7 +154,8 @@ protected:
   
 private:
   const bool isNoisy_;
-  const unsigned long seed_, prngStream_;
+  
+  const std::string reInitStateDescriptor_;
 
   RandomEngine re_;
 
@@ -260,6 +287,7 @@ struct AverageTrajectoriesInRange
 
 
 } // averaging
+
 
 
 } // trajectory

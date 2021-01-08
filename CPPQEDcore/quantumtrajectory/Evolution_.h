@@ -36,7 +36,7 @@ std::istream& operator>>(std::istream&, Method&); ///< input streaming for Metho
 
 /// Aggregate of parameters pertaining to the highest level driver functions for quantum trajectories
 /** \copydetails trajectory::ParsRun */
-template <typename Base=mcwf::Pars>
+template <typename Base=mcwf::Pars<EVOLUTION_DEFAULT_RANDOM_ENGINE>>
 struct Pars : public trajectory::ParsRun, public Base {
 
   Method &evol; ///< the method of evolution
@@ -64,11 +64,11 @@ template<int RANK>
 using EvolutionReturnType=std::tuple<evolution::LDO_Ptr<RANK>,StreamedArray>;
 
 
-template<typename V, int RANK>
+template<typename V, int RANK, typename Parameters>
 EvolutionReturnType<RANK>
 _(std::shared_ptr<quantumdata::DensityOperator<RANK>> rhoPtr,
   typename structure::QuantumSystem<RANK>::Ptr sys,
-  const evolution::Pars<>& pe,
+  const Parameters& pe,
   bool doStreaming, bool returnStreamedArray)
 {
   Master<RANK,V> traj(rhoPtr,sys,pe,pe.negativity);
@@ -84,7 +84,7 @@ template<typename RandomEngine, typename V, int RANK>
 EvolutionReturnType<RANK>
 _(std::shared_ptr<quantumdata::StateVector<RANK>> psiPtr,
   typename structure::QuantumSystem<RANK>::Ptr sys,
-  const evolution::Pars<>& pe,
+  const Pars<mcwf::Pars<RandomEngine>>& pe,
   bool doStreaming, bool returnStreamedArray)
 {
   if      (pe.evol==evolution::SINGLE) {
@@ -95,7 +95,7 @@ _(std::shared_ptr<quantumdata::StateVector<RANK>> psiPtr,
     return {traj.averaged(),trajectory::run(traj,pe,doStreaming,returnStreamedArray)};
   }
   else {
-    return _<V>(std::make_shared<quantumdata::DensityOperator<RANK>>(*psiPtr),sys,pe,doStreaming,returnStreamedArray);
+    return _<V,RANK,Pars<mcwf::Pars<RandomEngine>>>(std::make_shared<quantumdata::DensityOperator<RANK>>(*psiPtr),sys,pe,doStreaming,returnStreamedArray);
   }
 
 }
@@ -107,7 +107,7 @@ template<typename RandomEngine, typename V, int RANK>
 const auto
 _(quantumdata::StateVector<RANK>&& psi, ///<[in/out] pure state-vector initial condition
   typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-  const evolution::Pars<>& p, ///<[in] parameters of the evolution
+  const Pars<mcwf::Pars<RandomEngine>>& p, ///<[in] parameters of the evolution
   bool doStreaming=true, bool returnStreamedArray=false)
 {
   return details::_<RandomEngine,V>(std::make_shared<quantumdata::StateVector<RANK>>(std::move(psi)),sys,p,doStreaming,returnStreamedArray);
@@ -116,7 +116,8 @@ _(quantumdata::StateVector<RANK>&& psi, ///<[in/out] pure state-vector initial c
 
 template<typename RandomEngine, typename V, int RANK>
 const auto
-_(quantumdata::StateVector<RANK>& psi, typename structure::QuantumSystem<RANK>::Ptr sys, const evolution::Pars<>& p, bool doStreaming=true, bool returnStreamedArray=false)
+_(quantumdata::StateVector<RANK>& psi, typename structure::QuantumSystem<RANK>::Ptr sys, const Pars<mcwf::Pars<RandomEngine>>& p,
+  bool doStreaming=true, bool returnStreamedArray=false)
 {
   return details::_<RandomEngine,V>(std::make_shared<quantumdata::StateVector<RANK>>(psi.getArray(),quantumdata::byReference),sys,p,doStreaming,returnStreamedArray);
 }
@@ -124,7 +125,7 @@ _(quantumdata::StateVector<RANK>& psi, typename structure::QuantumSystem<RANK>::
 
 template<typename RandomEngine, int... V, typename SV_OR_DO, typename SYS>
 const auto
-_(SV_OR_DO&& initial, SYS sys, const evolution::Pars<>& p, bool doStreaming=true, bool returnStreamedArray=false)
+_(SV_OR_DO&& initial, SYS sys, const Pars<mcwf::Pars<RandomEngine>>& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
   return _<RandomEngine,tmptools::Vector<V...>>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
 }

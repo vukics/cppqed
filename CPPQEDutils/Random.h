@@ -5,6 +5,8 @@
 #ifndef CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
 #define CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
 
+#include "Pars.h"
+
 #include "pcg_random.hpp"
 #include "XoshiroCpp.hpp"
 
@@ -27,8 +29,9 @@
 
 namespace cpputils {
 
-template<typename RandomEngine>
-RandomEngine streamOfOrdo(typename RandomEngine::result_type seed, typename RandomEngine::result_type ordoStream);
+template<typename RandomEngine, typename BASE>
+struct ParsRandom;
+
 
 #ifdef CPPQED_HAS_GSL
 
@@ -110,12 +113,6 @@ template<>
 static const std::string RandomEngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
 
 
-template<>
-inline pcg64 streamOfOrdo<pcg64>(pcg64::result_type seed, pcg64::result_type ordoStream)
-{
-  return pcg64{seed,1001+ordoStream};
-}
-
 // template<>
 // inline std::list<pcg64> independentPRNG_Streams<pcg64>(size_t n, pcg64::result_type seed, pcg64::result_type ordoStream)
 // {
@@ -124,6 +121,26 @@ inline pcg64 streamOfOrdo<pcg64>(pcg64::result_type seed, pcg64::result_type ord
 //   return res;
 // }
 
+template<typename BASE>
+struct ParsRandom<pcg64,BASE> : BASE
+{
+  unsigned long &seed, &prngStream; ///< PCG64 generator seed and ordinal of independent stream
+
+  ParsRandom(parameters::Table& p, const std::string& mod="")
+    : BASE{p,mod},
+      seed(p.addTitle("StochasticTrajectory",mod).add("seed",mod,"Random number generator seed",1001ul)),
+      prngStream(p.add("prngStream",mod,"Random number generator independent stream ordinal",1ul))
+    {}
+};
+
+template<typename BASE>
+pcg64 streamOfOrdo(const ParsRandom<pcg64,BASE>& p)
+{
+  return pcg64{p.seed,1001+p.prngStream};
+}
+
+template<typename BASE>
+void incrementForNextStream(const ParsRandom<pcg64,BASE>& p) {++p.prngStream;}
 
 } // cpputils
 

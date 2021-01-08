@@ -4,8 +4,6 @@
 
 #include "MCWF_Trajectory.h"
 
-#include "ParsMCWF_Trajectory.h"
-
 #include "StateVector.h"
 
 #include "EvolvedGSL.tcc"
@@ -39,7 +37,7 @@ void MCWF_Trajectory<RANK,RandomEngine>::derivs(double t, const StateVectorLow& 
 template<int RANK, typename RandomEngine>
 MCWF_Trajectory<RANK,RandomEngine>::MCWF_Trajectory(SV_Ptr psi,
                                                     typename structure::QuantumSystem<RANK>::Ptr sys,
-                                                    const mcwf::Pars& p,
+                                                    const mcwf::Pars<RandomEngine>& p,
                                                     const StateVectorLow& scaleAbs)
   : QuantumTrajectory(sys,p.noise,
          psi->getArray(),
