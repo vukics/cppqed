@@ -29,7 +29,7 @@ namespace trajectory {
 /// Aggregate of parameters pertaining to stochastic simulations
 /** \copydetails ParsRun */
 template <typename RandomEngine>
-struct ParsStochastic : cpputils::ParsRandom<RandomEngine,ParsEvolved>
+struct ParsStochastic : randomutils::Pars<RandomEngine,ParsEvolved>
 {
   /// whether the noise should be on or off
   /**
@@ -41,7 +41,7 @@ struct ParsStochastic : cpputils::ParsRandom<RandomEngine,ParsEvolved>
   size_t &nTraj; ///< number of trajectories in case of ensemble averaging
 
   ParsStochastic(parameters::Table& p, const std::string& mod="")
-    : cpputils::ParsRandom<RandomEngine,ParsEvolved>{p,mod},
+    : randomutils::Pars<RandomEngine,ParsEvolved>{p,mod},
       noise(p.add("noise",mod,"Switching noise on/off",true)),
       nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(500)))
   {}
@@ -121,14 +121,13 @@ protected:
       re_(std::forward<RandomEngine>(re)) {}
 
   /// \overload
-  template<typename... RandomEngineCtorParameters>
   Stochastic(A& y, typename Evolved::Derivs derivs,
              double dtInit,
              const A& scaleAbs,
              const ParsStochastic<RandomEngine>& p,
              const evolved::Maker<A>& makerE)
     : Stochastic{y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
-                 cpputils::streamOfOrdo(p)} {}
+                 randomutils::streamOfOrdo(p)} {}
   //@}
   
   /// \name Getters
@@ -142,7 +141,7 @@ protected:
   
   std::ostream& streamParameters_v(std::ostream& os) const override
   {
-    return Base::streamParameters_v(os)<<"Stochastic trajectory random engine, initial state: "<<cpputils::RandomEngineID_v<RandomEngine>
+    return Base::streamParameters_v(os)<<"Stochastic trajectory random engine, initial state: "<<randomutils::EngineID_v<RandomEngine>
                                        <<" "<<reInitStateDescriptor_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
   }
   

@@ -27,23 +27,23 @@
 #include <sstream>
 
 
-namespace cpputils {
+namespace randomutils {
 
-template<typename RandomEngine, typename BASE>
-struct ParsRandom;
+template<typename Engine, typename BASE>
+struct Pars;
 
 
 #ifdef CPPQED_HAS_GSL
 
 /// Wraps GSL random number generators into the concept [UniformRandomBitGenerator](http://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator)
-class GSL_RandomEngine 
+class GSL_Engine 
 {
 public:
   using result_type=unsigned long;
   
-  explicit GSL_RandomEngine(result_type s/*, const gsl_rng_type* ran_gen_type=gsl_rng_taus2*/);
+  explicit GSL_Engine(result_type s/*, const gsl_rng_type* ran_gen_type=gsl_rng_taus2*/);
 
-  GSL_RandomEngine(const GSL_RandomEngine&);
+  GSL_Engine(const GSL_Engine&);
 
   void seed(result_type value);
 
@@ -63,25 +63,25 @@ private:
 };
 
 
-inline std::ostream& operator<<(std::ostream& os, const GSL_RandomEngine& r) {r.write(os); return os;}
-inline std::istream& operator>>(std::istream& is, GSL_RandomEngine& r) {r.read(is); return is;}
+inline std::ostream& operator<<(std::ostream& os, const GSL_Engine& r) {r.write(os); return os;}
+inline std::istream& operator>>(std::istream& is, GSL_Engine& r) {r.read(is); return is;}
 
 
 #define CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
-#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE GSL_RandomEngine
-#define CPPQEDCORE_UTILS_RANDOM_H_STRING "GSL_RandomEngine state"
+#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE GSL_Engine
+#define CPPQEDCORE_UTILS_RANDOM_H_STRING "GSL_Engine state"
 
 #include "Random.h"
 
-} // cpputils
+} // randomutils
 
 #endif // CPPQED_HAS_GSL
 
 
-namespace cpputils {
+namespace randomutils {
 
-template<typename Distribution, typename RandomEngine, typename Array, typename... DCP>
-RandomEngine& fillWithRandom(Array a, RandomEngine& re, DCP&&... dcp)
+template<typename Distribution, typename Engine, typename Array, typename... DCP>
+Engine& fill(Array a, Engine& re, DCP&&... dcp)
 {
   Distribution d{std::forward<DCP>(dcp)...};
   std::generate(a.begin(),a.end(),[&]() {return d(re);});
@@ -89,28 +89,28 @@ RandomEngine& fillWithRandom(Array a, RandomEngine& re, DCP&&... dcp)
 }
 
 
-template<typename Distribution, typename RandomEngine, typename Array, typename... DCP>
-void fillWithRandom(Array a, unsigned long seed, DCP&&... dcp)
+template<typename Distribution, typename Engine, typename Array, typename... DCP>
+void fill(Array a, unsigned long seed, DCP&&... dcp)
 {
-  RandomEngine re{seed};
-  fillWithRandom<Distribution>(a,re,std::forward<DCP>(dcp)...);
+  Engine re{seed};
+  fill<Distribution>(a,re,std::forward<DCP>(dcp)...);
 }
 
 
-template<typename RandomEngine>
-constexpr auto RandomEngineID_v = std::nullopt;
+template<typename Engine>
+constexpr auto EngineID_v = std::nullopt;
 
 template<>
-static const std::string RandomEngineID_v<GSL_RandomEngine> = "GSL_Taus2";
+static const std::string EngineID_v<GSL_Engine> = "GSL_Taus2";
 
 template<>
-static const std::string RandomEngineID_v<std::mt19937_64> = "STD_MT19937_64";
+static const std::string EngineID_v<std::mt19937_64> = "STD_MT19937_64";
 
 template<>
-static const std::string RandomEngineID_v<pcg64> = "PCG64";
+static const std::string EngineID_v<pcg64> = "PCG64";
 
 template<>
-static const std::string RandomEngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
+static const std::string EngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
 
 
 // template<>
@@ -122,11 +122,11 @@ static const std::string RandomEngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xos
 // }
 
 template<typename BASE>
-struct ParsRandom<pcg64,BASE> : BASE
+struct Pars<pcg64,BASE> : BASE
 {
   unsigned long &seed, &prngStream; ///< PCG64 generator seed and ordinal of independent stream
 
-  ParsRandom(parameters::Table& p, const std::string& mod="")
+  Pars(parameters::Table& p, const std::string& mod="")
     : BASE{p,mod},
       seed(p.addTitle("StochasticTrajectory",mod).add("seed",mod,"Random number generator seed",1001ul)),
       prngStream(p.add("prngStream",mod,"Random number generator independent stream ordinal",1ul))
@@ -134,15 +134,15 @@ struct ParsRandom<pcg64,BASE> : BASE
 };
 
 template<typename BASE>
-pcg64 streamOfOrdo(const ParsRandom<pcg64,BASE>& p)
+pcg64 streamOfOrdo(const Pars<pcg64,BASE>& p)
 {
   return pcg64{p.seed,1001+p.prngStream};
 }
 
 template<typename BASE>
-void incrementForNextStream(const ParsRandom<pcg64,BASE>& p) {++p.prngStream;}
+void incrementForNextStream(const Pars<pcg64,BASE>& p) {++p.prngStream;}
 
-} // cpputils
+} // randomutils
 
 
 namespace boost { namespace serialization {

@@ -21,15 +21,15 @@ auto testcase()
     firstHalf(arrayInterrupted(blitz::Range(0,4))),
     secondHalf(arrayInterrupted(blitz::Range(5,9)));
   
-  cpputils::fillWithRandom<uniform_real_distribution<double>,RandomEngine>(array,seed);
+  randomutils::fill<uniform_real_distribution<double>,RandomEngine>(array,seed);
   
   cerr<<array<<endl;
   
   RandomEngine reFirst(seed), reSecond(seed);
   
-  cpputils::fillWithRandom<uniform_real_distribution<double>>(firstHalf,reFirst);
+  randomutils::fill<uniform_real_distribution<double>>(firstHalf,reFirst);
   
-  const string filename{"CPPQEDutils_testing_"+cpputils::RandomEngineID_v<RandomEngine>+".d"};
+  const string filename{"CPPQEDutils_testing_"+randomutils::EngineID_v<RandomEngine>+".d"};
   
   BOOST_TEST_CHECKPOINT( "PRE_OUTPUT" );
   
@@ -50,7 +50,7 @@ auto testcase()
 
   BOOST_TEST_CHECKPOINT( "POST_INPUT" );
 
-  cpputils::fillWithRandom<uniform_real_distribution<double>>(secondHalf,reSecond);
+  randomutils::fill<uniform_real_distribution<double>>(secondHalf,reSecond);
 
   cerr<<arrayInterrupted<<endl;
 
@@ -58,7 +58,7 @@ auto testcase()
 }
 
 
-BOOST_AUTO_TEST_CASE( GSL_RandomEngineTest ) { BOOST_CHECK(testcase<cpputils::GSL_RandomEngine>()); }
+BOOST_AUTO_TEST_CASE( GSL_RandomEngineTest ) { BOOST_CHECK(testcase<randomutils::GSL_Engine>()); }
 
 BOOST_AUTO_TEST_CASE( STD_MersenneTwisterTest ) { BOOST_CHECK(testcase<mt19937_64>()); }
 

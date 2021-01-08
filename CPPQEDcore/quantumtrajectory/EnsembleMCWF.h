@@ -54,7 +54,7 @@ protected:
 
         for (size_t i=0; i<p.nTraj; ++i) {
           res.push_back(new Single(std::make_shared<StateVector>(*psi),qs,p,scaleAbs));
-          cpputils::incrementForNextStream(p);
+          randomutils::incrementForNextStream(p);
         }
         
         return res.release();

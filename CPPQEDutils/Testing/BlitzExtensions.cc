@@ -15,7 +15,7 @@ using namespace std;
 using namespace blitzplusplus;
 using namespace linalg;
 using namespace mathutils;
-using cpputils::fillWithRandom;
+using randomutils::fill;
 
 using URD=std::uniform_real_distribution<double>;
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE( TwoTimesRealPartOfSelfTest )
 { 
   ExtTiny<RA/2> dims(6,4);
   CAR array(concatenateTinies(dims,dims));
-  fillWithRandom<URD>(array,ran);
+  fill<URD>(array,ran);
 
   CAR arrayHC(hermitianConjugate(array));
   CAR arrayReal(array.shape()); arrayReal=(array+arrayHC);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( DoDirectTest )
   CARM1 am1(dims0);
   CARP1 ap1(dims1);
 
-  fillWithRandom<URD>(ap1,fillWithRandom<URD>(am1,ran));
+  fill<URD>(ap1,fill<URD>(am1,ran));
 
   CA2R a2r(concatenateTinies(dims0,dims1));
   {
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
   CArray<6> a(concatenateTinies(dims0,dims0));
   CArray<5> v(dims1), vResTensor(dims1), vResBASI(dims1);
 
-  fillWithRandom<URD>(v,fillWithRandom<URD>(a,ran));
+  fill<URD>(v,fill<URD>(a,ran));
 
   {
     using namespace blitz::tensor;
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE( MatrixProducts ) // VFMSI for matrix products a*rho
   ExtTiny<3> dims0(4,5,2);
   CArray<6> rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
 
-  fillWithRandom<URD>(rho,fillWithRandom<URD>(a,ran));
+  fill<URD>(rho,fill<URD>(a,ran));
 
   {
     using namespace blitz::tensor;
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE( VFMSI_Test ) // VFMSI computing a*rho*adagger (rho Hermiti
   CArray<6> rho(concatenateTinies(dims0,dims0)), a(rho.shape()), resTensor(rho.shape());
   CMatrix matrixView(binaryArray(rho));
 
-  fillWithRandom<URD>(rho,fillWithRandom<URD>(a,ran));
+  fill<URD>(rho,fill<URD>(a,ran));
 
   calculateTwoTimesRealPartOfSelf(matrixView);
   {
