@@ -6,10 +6,10 @@
 #include "StreamDensityOperator.h"
 #include "MCWF_Trajectory.tcc"
 #include "DensityOperator.h"
-#include "ParsMCWF_Trajectory.h"
 
 #include "Conversions.h"
 
+#include <boost/range/combine.hpp>// #include <ranges>
 
 namespace quantumtrajectory {
 
@@ -21,7 +21,7 @@ using namespace mcwf;
 #define BASE_class trajectory::Ensemble< structure::AveragedCommon::Averages, quantumdata::DensityOperator<RANK> , quantumdata::StateVector<RANK> >
 
 /// Less templatized base for EnsembleMCWF \tparamRANK
-template<int RANK>
+template<int RANK, typename RandomEngine>
 class Base
   : public BASE_class
 {
@@ -33,7 +33,7 @@ protected:
 private:
   typedef typename Ensemble::Trajectories Trajectories;
 
-  typedef MCWF_Trajectory<RANK> Single;
+  typedef MCWF_Trajectory<RANK,RandomEngine> Single;
 
 public:
   typedef typename Single::StateVector    StateVector   ;
@@ -45,15 +45,18 @@ protected:
   /// Straightforward constructor
   Base(std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition
        QuantumSystemPtr qs, ///< the structure::QuantumSystem to be simulated
-       const Pars& p, ///< parameters of the simulation (contains \link Pars::nTraj the number of trajectories\endlink)
+       const Pars<RandomEngine>& p, ///< parameters of the simulation (contains \link Pars::nTraj the number of trajectories\endlink)
        const StateVectorLow& scaleAbs=StateVectorLow())
     : Ensemble([psi,qs,&p,&scaleAbs] {
         Trajectories res;
+        
         p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
 
-        for (size_t i=0; i<p.nTraj; (++i, ++p.seed) ) 
-          res.push_back(new MCWF_Trajectory<RANK>(std::make_shared<StateVector>(*psi),qs,p,scaleAbs));
-
+        for (size_t i=0; i<p.nTraj; ++i) {
+          res.push_back(new Single(std::make_shared<StateVector>(*psi),qs,p,scaleAbs));
+          randomutils::incrementForNextStream(p);
+        }
+        
         return res.release();
       } (),p.logLevel<0),
       qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
@@ -66,7 +69,7 @@ private:
   {
     LoggerList loggerList;
     for (auto& i : this->getTrajectories())
-      if (const auto traj=dynamic_cast<const MCWF_Trajectory<RANK>*>(&i))
+      if (const auto traj=dynamic_cast<const Single*>(&i))
         loggerList.push_back(traj->getLogger());
   
     return streamLog(os,loggerList,nBins_,nJumpsPerBin_);
@@ -101,11 +104,11 @@ private:
  * \todo An additional constructor could be added to initialize the ensemble by a full density operator, which could be appropriately sampled.
  * 
  */
-template<int RANK, typename V=tmptools::V_Empty>
-class EnsembleMCWF : public ensemble::Base<RANK>
+template<int RANK, typename RandomEngine, typename V=tmptools::V_Empty>
+class EnsembleMCWF : public ensemble::Base<RANK,RandomEngine>
 {
 private:
-  typedef ensemble::Base<RANK> Base;
+  typedef ensemble::Base<RANK,RandomEngine> Base;
 
   typedef stream_densityoperator::_<RANK,V> DO_Stream;
 
@@ -121,7 +124,7 @@ public:
   EnsembleMCWF(
                std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
                typename structure::QuantumSystem<RANK>::Ptr sys, ///< represents the quantum system to be simulated
-               const mcwf::Pars& p, ///< parameters of the simulation (contains \link mcwf::Pars::nTraj the number of trajectories\endlink)
+               const mcwf::Pars<RandomEngine>& p, ///< parameters of the simulation (contains \link mcwf::Pars::nTraj the number of trajectories\endlink)
                bool negativity, ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
                const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in evolved::Maker::operator()
                )

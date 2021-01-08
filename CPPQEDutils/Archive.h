@@ -8,8 +8,6 @@
 #include <cstddef> // size_t
 #include <iosfwd>
 
-#include <boost/hana/bool.hpp>
-
 
 namespace cpputils {
 
@@ -17,8 +15,8 @@ namespace cpputils {
 
 class trivial_archive_base {
 public:
-  typedef boost::hana::false_ is_saving ;
-  typedef boost::hana:: true_ is_loading;
+  typedef std::false_type is_saving ;
+  typedef std:: true_type is_loading;
 
   template<class T> void register_type(){}
   

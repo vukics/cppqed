@@ -1,19 +1,17 @@
-# /home/vukics/work/cppqed/build/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --1p1mconf 4 --dc 1 --T 0.1 --evol single --o output/run_1particle1mode_ndt_conf4_single
+# /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --1p1mconf 4 --dc 1 --T 0.1 --evol single --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_1particle1mode_ndt_conf4_single
 
-# C++QEDcore Version 2.100.4, core git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# elements git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# scripts git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-
-# Andras Vukics, vukics@users.sourceforge.net
+# http://github.com/vukics/cppqed
+# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
 
 # Compiled with
-# Boost library collection : Version 1.62
-# Gnu Scientific Library   : Version 2.3
-# Blitz++ numerical library: Config date: Sat Jun 13 11:30:49 CEST 2015
+# Boost library collection : Version 1.75
+# Gnu Scientific Library   : Version 2.6
+# Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
+# Eigen library            : Version 3.3.9
 
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
-# Stochastic Trajectory Parameters: seed=1001
+# Stochastic Trajectory Parameters: random engine=PCG64 seed=1001 prngStreamNo=1
 # MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Binary System
@@ -29,14 +27,14 @@
 # Subsystem Nr. 1
 # Particle
 # Spatial Degree of Freedom finesse=3 xMax=3.14159 deltaX=0.785398 kMax=4 deltaK=1
-# Pump (Sin 1)
+# Pump (Sin, 1)
 # Dimension: 8
 # omrec=1
 # vClass=-10
 
 # 0 - 1 - Interaction
 # Particle-Cavity Interaction
-# Particle moving along cavity with (Sin 1)
+# Particle moving along cavity with (Sin, 1)
 # Unot=-1
 # etaeff=0
 
@@ -63,7 +61,7 @@
 #  9. <X>
 # 10. DEV(X)
 
-# Run Trajectory up to time 0.1 -- Display period: 1 timestep
+# Run Trajectory up to time 0.1 -- Stream period: 1 timestep
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
 0.0057735    0.0057735    	0.00314648    0.00314646    0.0560742     -0.0014632    	-0.49975      5.24625       -1.57071      0.0343808     

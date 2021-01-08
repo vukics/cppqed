@@ -1,20 +1,18 @@
-# /home/vukics/work/cppqed/build/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --dc 0 --Dt 0.01 --T 0.1 --nTraj 3 --evol ensemble --o output/run_1particle1mode_dt_ensemble
+# /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --dc 0 --Dt 0.01 --T 0.1 --nTraj 3 --evol ensemble --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_1particle1mode_dt_ensemble
 
-# C++QEDcore Version 2.100.4, core git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# elements git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# scripts git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-
-# Andras Vukics, vukics@users.sourceforge.net
+# http://github.com/vukics/cppqed
+# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
 
 # Compiled with
-# Boost library collection : Version 1.62
-# Gnu Scientific Library   : Version 2.3
-# Blitz++ numerical library: Config date: Sat Jun 13 11:30:49 CEST 2015
+# Boost library collection : Version 1.75
+# Gnu Scientific Library   : Version 2.6
+# Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
+# Eigen library            : Version 3.3.9
 
 # Ensemble of 3 trajectories.
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
-# Stochastic Trajectory Parameters: seed=1001
+# Stochastic Trajectory Parameters: random engine=PCG64 seed=1001 prngStreamNo=1
 # MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Binary System
@@ -30,7 +28,7 @@
 # Subsystem Nr. 1
 # Particle
 # Spatial Degree of Freedom finesse=3 xMax=3.14159 deltaX=0.785398 kMax=4 deltaK=1
-# Pump (Sin 1)
+# Pump (Sin, 1)
 # Dimension: 8
 # omrec=1
 # vClass=-10
@@ -80,7 +78,7 @@
 #  9. <X>
 # 10. DEV(X)
 
-# Run Trajectory up to time 0.1 -- Display period: 0.01
+# Run Trajectory up to time 0.1 -- Stream period: 0.01
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
 0.01         0.0042265    	0.00978315    0.00978274    0.0937119     -0.0309558    	-0.499268     5.23886       -1.57052      0.0600198     
@@ -89,19 +87,19 @@
 0.04         0.00305922   	0.115784      0.115158      0.303825      -0.149009     	-0.489154     5.0901        -1.56691      0.236568      
 0.05         0.00200681   	0.163503      0.161818      0.352026      -0.191657     	-0.483515     5.00789       -1.56492      0.294241      
 0.06         0.00154051   	0.21272       0.209151      0.390382      -0.233938     	-0.47695      4.91159       -1.5626       0.351252      
-0.07         0.00125861   	0.254221      0.23124       0.400302      -0.266829     	-0.471579     4.83363       -1.55906      0.400087      
-0.08         0.000803671  	0.302858      0.272771      0.429698      -0.309395     	-0.463486     4.71631       -1.55613      0.455397      
-0.09         0.000664445  	0.350115      0.314385      0.449591      -0.350129     	-0.45493      4.58848       -1.55299      0.509848      
-0.1          0.000499353  	0.394235      0.353641      0.460981      -0.388182     	-0.446079     4.45144       -1.54965      0.563299      
-0.1          1.38778e-17  	0.394235      0.353641      0.460981      -0.388182     	-0.446079     4.45144       -1.54965      0.563299      
+0.07         0.00125861   	0.253323      0.230458      0.395159      -0.265062     	-0.471638     4.83548       -1.559        0.400007      
+0.08         0.000818979  	0.301334      0.2702        0.425956      -0.30761      	-0.463535     4.71801       -1.55607      0.455322      
+0.09         0.000397529  	0.337964      0.274023      0.425691      -0.33938      	-0.456869     4.63546       -1.55161      0.501761      
+0.1          0.000515959  	0.385956      0.315531      0.447138      -0.383159     	-0.447868     4.50099       -1.54826      0.555281      
+0.1          1.38778e-17  	0.385956      0.315531      0.447138      -0.383159     	-0.447868     4.50099       -1.54826      0.555281      
 
 # Average number of total steps: 40
 
-# On average, dpLimit overshot: 37 times, maximal overshoot: 0.058757
+# On average, dpLimit overshot: 36.3333 times, maximal overshoot: 0.058757
 # On average, dpTolerance overshot: 0 times, maximal overshoot: 0
 
 # Maximal deviation of norm from 1: 0.00600005
 
 # Too few jumps for a histogram
 
-# Average number of total jumps: 0.333333
+# Average number of total jumps: 0.666667

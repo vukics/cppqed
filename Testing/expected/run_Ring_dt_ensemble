@@ -1,20 +1,18 @@
-# /home/vukics/work/cppqed/build/CPPQEDscripts/Ring --epsAbs 1e-5 --etaM 10 --etaP 10 --cutoffM 3 --cutoffP 3 --fin 3 --sdf 3 --dc 0 --Dt 0.01 --T 0.1 --nTraj 3 --evol ensemble --o output/run_Ring_dt_ensemble
+# /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/Ring --epsAbs 1e-5 --etaM 10 --etaP 10 --cutoffM 3 --cutoffP 3 --fin 3 --sdf 3 --dc 0 --Dt 0.01 --T 0.1 --nTraj 3 --evol ensemble --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_Ring_dt_ensemble
 
-# C++QEDcore Version 2.100.4, core git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# elements git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# scripts git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-
-# Andras Vukics, vukics@users.sourceforge.net
+# http://github.com/vukics/cppqed
+# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
 
 # Compiled with
-# Boost library collection : Version 1.62
-# Gnu Scientific Library   : Version 2.3
-# Blitz++ numerical library: Config date: Sat Jun 13 11:30:49 CEST 2015
+# Boost library collection : Version 1.75
+# Gnu Scientific Library   : Version 2.6
+# Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
+# Eigen library            : Version 3.3.9
 
 # Ensemble of 3 trajectories.
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
-# Stochastic Trajectory Parameters: seed=1001
+# Stochastic Trajectory Parameters: random engine=PCG64 seed=1001 prngStreamNo=1
 # MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Composite
@@ -41,13 +39,13 @@
 
 # 1 - 0 - Interaction
 # Particle-Cavity Interaction
-# Particle moving along cavity with (Plus 1)
+# Particle moving along cavity with (Plus, 1)
 # Unot=-1
 # etaeff=0
 
 # 2 - 0 - Interaction
 # Particle-Cavity Interaction
-# Particle moving along cavity with (Minus 1)
+# Particle moving along cavity with (Minus, 1)
 # Unot=-1
 # etaeff=0
 
@@ -105,7 +103,7 @@
 # 13. real(<ladder operator>)
 # 14. imag(")
 
-# Run Trajectory up to time 0.1 -- Display period: 0.01
+# Run Trajectory up to time 0.1 -- Stream period: 0.01
 
 0            0            	-0.5          5.25          -1.5708       2.2102e-07    	0             0             0             0             	0             0             0             0             
 0.01         0.0042265    	-0.500001     5.25001       -1.5705       0.0538338     	0.00904956    0.00904921    0.0950178     -0.00455806   	0.00904778    0.00904742    0.0950084     -0.00455752   
@@ -113,20 +111,20 @@
 0.03         0.00236682   	-0.500079     5.25091       -1.56811      0.161538      	0.0667343     0.0666071     0.255556      -0.0357356    	0.0666205     0.0664939     0.255339      -0.0356988    
 0.04         0.000510435  	-0.500216     5.25245       -1.56595      0.215447      	0.107404      0.106902      0.321389      -0.0591855    	0.107087      0.106589      0.320922      -0.0590794    
 0.05         0.0017204    	-0.500449     5.25508       -1.56311      0.269428      	0.15194       0.150586      0.377918      -0.0860508    	0.151259      0.149924      0.377099      -0.0858156    
-0.06         0.00105862   	-0.505557     5.26886       -1.55956      0.325639      	0.194611      0.181911      0.415287      -0.11357      	0.196845      0.194058      0.424281      -0.114561     
-0.07         0.000681125  	-0.506042     5.2737        -1.55521      0.379827      	0.241951      0.225023      0.459547      -0.144863     	0.242156      0.237156      0.462974      -0.144684     
-0.08         0.00044518   	-0.50661      5.27941       -1.54999      0.434145      	0.288715      0.268018      0.494883      -0.177202     	0.285876      0.277873      0.493855      -0.175154     
-0.09         0.000220834  	-0.507226     5.28555       -1.54384      0.488583      	0.333412      0.30901       0.521936      -0.209637     	0.327089      0.315306      0.517704      -0.205246     
-0.1          0.000428843  	-0.507837     5.29159       -1.53668      0.54312       	0.375011      0.346729      0.541549      -0.241376     	0.365205      0.348897      0.535381      -0.23438      
-0.1          1.38778e-17  	-0.507837     5.29159       -1.53668      0.54312       	0.375011      0.346729      0.541549      -0.241376     	0.365205      0.348897      0.535381      -0.23438      
+0.06         0.00108506   	-0.50604      5.26991       -1.55957      0.325756      	0.193974      0.180921      0.412263      -0.113227     	0.196842      0.194056      0.424285      -0.114534     
+0.07         0.000623191  	-0.502088     5.29256       -1.55432      0.377503      	0.241003      0.223206      0.45736       -0.144118     	0.236482      0.216996      0.446773      -0.142113     
+0.08         0.000340668  	-0.496777     5.32359       -1.54741      0.42947       	0.288423      0.266254      0.494514      -0.174982     	0.272864      0.228311      0.456573      -0.169368     
+0.09         0.000306173  	-0.497097     5.33083       -1.54081      0.483926      	0.333298      0.307285      0.522138      -0.207747     	0.318523      0.265383      0.496969      -0.203133     
+0.1          0.000463911  	-0.497451     5.33838       -1.53317      0.538484      	0.375096      0.345212      0.542075      -0.239966     	0.363262      0.305029      0.526813      -0.237836     
+0.1          1.38778e-17  	-0.497451     5.33838       -1.53317      0.538484      	0.375096      0.345212      0.542075      -0.239966     	0.363262      0.305029      0.526813      -0.237836     
 
-# Average number of total steps: 69.3333
+# Average number of total steps: 69
 
-# On average, dpLimit overshot: 66 times, maximal overshoot: 0.0587391
+# On average, dpLimit overshot: 65.6667 times, maximal overshoot: 0.0587391
 # On average, dpTolerance overshot: 0 times, maximal overshoot: 0
 
 # Maximal deviation of norm from 1: 0.00683368
 
 # Too few jumps for a histogram
 
-# Average number of total jumps: 0.333333
+# Average number of total jumps: 1

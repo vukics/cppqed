@@ -3,8 +3,8 @@
 #ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
-#include "ParsStochasticTrajectory.h"
-#include "Randomized.h"
+#include "ParsTrajectory.h"
+#include "Random.h"
 #include "Trajectory.tcc"
 
 #include "Conversions.h"
@@ -24,6 +24,30 @@ namespace mpl=boost::mpl;
 
 
 namespace trajectory {
+
+
+/// Aggregate of parameters pertaining to stochastic simulations
+/** \copydetails ParsRun */
+template <typename RandomEngine>
+struct ParsStochastic : randomutils::Pars<RandomEngine,ParsEvolved>
+{
+  /// whether the noise should be on or off
+  /**
+   * (if it makes sense to turn it off at all for a concrete Stochastic
+   * – e.g. for a \link quantumtrajectory::MCWF_Trajectory Monte Carlo wave-function trajectory\endlink, turning off the noise means simply to disable quantum jumps)
+   */
+  bool &noise;
+  
+  size_t &nTraj; ///< number of trajectories in case of ensemble averaging
+
+  ParsStochastic(parameters::Table& p, const std::string& mod="")
+    : randomutils::Pars<RandomEngine,ParsEvolved>{p,mod},
+      noise(p.add("noise",mod,"Switching noise on/off",true)),
+      nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(500)))
+  {}
+      
+};
+
 
 
 /// Contains important helpers for averaging (over time or ensemble)
@@ -68,8 +92,8 @@ private:
 
 
 /// Represents a trajectory that has both adaptive ODE evolution and noise
-/** In the language of the framework, this means that the class simply connects Adaptive and Averageable while storing a randomized::Randomized instant for the convenience of derived classes. */
-template<typename SA, typename A, typename T>
+/** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. */
+template<typename SA, typename A, typename T, typename RandomEngine>
 class Stochastic : public Adaptive<A,Averageable<SA,T>>
 {
 public:
@@ -80,55 +104,59 @@ private:
 
   typedef typename Base::Evolved Evolved;
 
-  typedef randomized::Randomized::Ptr RandomizedPtr;
-
 protected:
   /// \name Constructors
   //@{
-  /// Straightforward constructor combining the construction of Adaptive and randomized::Randomized
+  /// Straightforward constructor combining the construction of Adaptive and a random engine
   Stochastic(A& y, typename Evolved::Derivs derivs,
              double dtInit,
              int logLevel,
              double epsRel, double epsAbs, const A& scaleAbs,
              const evolved::Maker<A>& makerE,
-             unsigned long seed,
-             bool n,
-             const randomized::Maker& makerR)
-    : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE),
-      seed_(seed), isNoisy_(n), randomized_(makerR(seed)) {}
+             bool isNoisy,
+             RandomEngine&& re)
+    : Base{y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE},
+      isNoisy_(isNoisy),
+      reInitStateDescriptor_{ [re{std::move(re)}]() {std::ostringstream oss; oss<<re; return oss.str();}() },
+      re_(std::forward<RandomEngine>(re)) {}
 
   /// \overload
   Stochastic(A& y, typename Evolved::Derivs derivs,
              double dtInit,
              const A& scaleAbs,
-             const ParsStochastic& p,
-             const evolved::Maker<A>& makerE,
-             const randomized::Maker& makerR)
-    : Stochastic(y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.seed,p.noise,makerR) {}
+             const ParsStochastic<RandomEngine>& p,
+             const evolved::Maker<A>& makerE)
+    : Stochastic{y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
+                 randomutils::streamOfOrdo(p)} {}
   //@}
   
   /// \name Getters
   //@{
-  const RandomizedPtr getRandomized() const {return randomized_;}
-  bool                isNoisy      () const {return isNoisy_   ;}
+public:
+  auto& getRandomEngine() {return re_;}
+  
+protected:
+  auto isNoisy() const {return isNoisy_;}
   //@}
   
   std::ostream& streamParameters_v(std::ostream& os) const override
   {
-    return Base::streamParameters_v(os)<<"Stochastic Trajectory Parameters: seed="<<seed_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
+    return Base::streamParameters_v(os)<<"Stochastic trajectory random engine, initial state: "<<randomutils::EngineID_v<RandomEngine>
+                                       <<" "<<reInitStateDescriptor_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
   }
   
   /// \name Serialization
   //@{
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return iar & *randomized_;}
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return oar & *randomized_;}
+  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return iar & re_;}
+  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return oar & re_;}
   //@}
   
 private:
-  const unsigned long seed_ ;
-  const bool          isNoisy_;
+  const bool isNoisy_;
+  
+  const std::string reInitStateDescriptor_;
 
-  const RandomizedPtr randomized_;
+  RandomEngine re_;
 
 };
 
@@ -185,6 +213,8 @@ protected:
           ) : trajs_(std::move(trajs)), displayProgress_(displayProgress) {}
 
   /// Getter
+  Trajectories& getTrajectories() {return trajs_;}
+  
   const Trajectories& getTrajectories() const {return trajs_;}
 
 #define FOR_EACH_function(f) for (auto& t : trajs_) t.f(ios); return ios;
@@ -256,6 +286,7 @@ struct AverageTrajectoriesInRange
 
 
 } // averaging
+
 
 
 } // trajectory

@@ -6,7 +6,6 @@
 #include "StateVector.h"
 
 #include "MCWF_TrajectoryLogger.h"
-#include "ParsMCWF_Trajectory.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 
@@ -24,8 +23,41 @@ struct HandleType<quantumdata::StateVector<RANK> > : mpl::identity<std::shared_p
 
 namespace quantumtrajectory {
 
+/// Auxiliary tools to MCWF_Trajectory  
+namespace mcwf {
 
-#define BASE_class trajectory::Stochastic<typename structure::AveragedCommon::Averages, typename quantumdata::Types<RANK>::StateVectorLow, quantumdata::StateVector<RANK> >
+
+/// Aggregate of parameters pertaining to \link MCWF_Trajectory MCWF\endlink simulations
+/** \copydetails trajectory::ParsRun */
+template<typename RandomEngine>
+struct Pars : public trajectory::ParsStochastic<RandomEngine> {
+  
+  double
+    &dpLimit, ///< the parameter \f$\delta p_\text{limit}\f$ (cf. 2.b.ii \link MCWF_Trajectory here\endlink)
+    &overshootTolerance; ///< the parameter \f$\delta p_\text{limit}'/\delta p_\text{limit}\f$ (cf. 2.b.ii \link MCWF_Trajectory here\endlink)
+
+  size_t
+    &nBins, ///< governs how many bins should be used for the histogram of jumps created by ensemble::streamLog (a zero value means a heuristic automatic determination)
+    &nJumpsPerBin; ///< the average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination
+
+  Pars(parameters::Table& p, const std::string& mod="")
+    : trajectory::ParsStochastic<RandomEngine>{p,mod},
+      dpLimit(p.addTitle("MCWF_Trajectory",mod).add("dpLimit",mod,"MCWFS stepper total jump probability limit",0.01)),
+      overshootTolerance(p.add("overshootTolerance",mod,"Jump probability overshoot tolerance factor",10.)),
+      nBins(p.add("nBins",mod,"number of bins used for the histogram of jumps created by EnsembleMCWF",size_t(0))),
+      nJumpsPerBin(p.add("nJumpsPerBin",mod,"average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",size_t(50)))
+    {}
+
+};
+
+
+} // mcwf
+
+
+#define BASE_class trajectory::Stochastic<typename structure::AveragedCommon::Averages,\
+                                          typename quantumdata::Types<RANK>::StateVectorLow,\
+                                          quantumdata::StateVector<RANK>,\
+                                          RandomEngine>
 
 
 /// Implements a single Monte Carlo wave-function trajectory
@@ -62,7 +94,7 @@ namespace quantumtrajectory {
  * 
  */
 
-template<int RANK>
+template<int RANK, typename RandomEngine>
 class MCWF_Trajectory : public QuantumTrajectory<RANK,BASE_class>
 {
 public:
@@ -88,7 +120,7 @@ public:
   /// Templated constructor with the same idea as Master::Master
   MCWF_Trajectory(SV_Ptr psi, ///< the state vector to be evolved
                   typename structure::QuantumSystem<RANK>::Ptr sys, ///< object representing the quantum system
-                  const mcwf::Pars& p, ///< parameters of the evolution
+                  const mcwf::Pars<RandomEngine>& p, ///< parameters of the evolution
                   const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in Master::Master
                  );
 

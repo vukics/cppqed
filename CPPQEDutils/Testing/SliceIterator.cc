@@ -2,7 +2,7 @@
 #include "BlitzArray.h"
 #include "SliceIterator.tcc"
 
-#include "Randomized.h"
+// #include "Random.h"
 
 #define BOOST_TEST_MODULE BlitzArraySliceIterator test
 #include <boost/test/unit_test.hpp>

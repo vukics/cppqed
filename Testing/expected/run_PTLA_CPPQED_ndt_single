@@ -1,19 +1,17 @@
-# /home/vukics/work/cppqed/build/CPPQEDscripts/PTLA_C++QED --epsAbs 1e-5 --etat 8 --sdf 3 --dc 0 --Dt 0.1 --NDt 10 --evol single --o output/run_PTLA_CPPQED_ndt_single
+# /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/PTLA_C++QED --epsAbs 1e-5 --etat 8 --sdf 3 --dc 0 --Dt 0.1 --NDt 10 --evol single --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_PTLA_CPPQED_ndt_single
 
-# C++QEDcore Version 2.100.4, core git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# elements git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-# scripts git commit: db2fc5efe1770d6627787e83a89a44bcca800950
-
-# Andras Vukics, vukics@users.sourceforge.net
+# http://github.com/vukics/cppqed
+# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
 
 # Compiled with
-# Boost library collection : Version 1.62
-# Gnu Scientific Library   : Version 2.3
-# Blitz++ numerical library: Config date: Sat Jun 13 11:30:49 CEST 2015
+# Boost library collection : Version 1.75
+# Gnu Scientific Library   : Version 2.6
+# Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
+# Eigen library            : Version 3.3.9
 
 # EvolvedGSL implementation, stepping function: rkck
 # Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
-# Stochastic Trajectory Parameters: seed=1001
+# Stochastic Trajectory Parameters: random engine=PCG64 seed=1001 prngStreamNo=1
 # MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Pumped Two-Level Atom
@@ -38,16 +36,16 @@
 #  5. real(rho10=<sigma>)
 #  6. imag(")
 
-# Run Trajectory up to time 1 -- Display period: 0.1
+# Run Trajectory up to time 1 -- Stream period: 0.1
 
 0            0            	1             0             0             0             
 0.1          6.42757e-05  	0.767517      0.232483      -0.37304      0.198182      
 0.2          0.000607647  	0.669728      0.330272      -0.237248     0.406086      
 0.3          0.00211867   	0.802399      0.197601      -0.127577     0.377199      
-0.4          0.00357823   	0.87164       0.12836       -0.320053     0.09721       
-0.5          0.000379528  	0.669697      0.330303      -0.317048     0.347396      
-0.6          0.00058149   	0.74822       0.25178       -0.136754     0.411928      
-0.7          0.000869866  	0.810052      0.189948      -0.360865     0.153766      
-0.8          0.000167663  	0.663642      0.336358      -0.273116     0.385524      
-0.9          0.00100256   	0.781254      0.218746      -0.12621      0.393659      
-1            0.0025559    	0.831745      0.168255      -0.19239      0.32083       
+0.4          0.00162753   	0.825964      0.174036      -0.205023     0.318926      
+0.5          0.000490128  	0.784127      0.215873      -0.226777     0.343284      
+0.6          0.0112444    	0.989786      0.010214      -0.100325     0.00667229    
+0.7          0.00172736   	0.737066      0.262934      -0.372858     0.234044      
+0.8          0.000724146  	0.680854      0.319146      -0.208819     0.416757      
+0.9          0.000600319  	0.815942      0.184058      -0.133543     0.363795      
+1            0.000399241  	0.820034      0.179966      -0.213497     0.31937       

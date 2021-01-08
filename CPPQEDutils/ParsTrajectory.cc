@@ -1,8 +1,8 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "ParsStochasticTrajectory.h"
-
 #include "FormDouble.h"
 #include "Pars.h"
+#include "ParsTrajectory.h"
+
 
 namespace trajectory {
 
@@ -36,13 +36,6 @@ ParsEvolved::ParsEvolved(parameters::Table& p, const std::string& mod)
     logLevel(p.add("logLevel",mod,"logging level",0))
 {}
 
-
-ParsStochastic::ParsStochastic(parameters::Table& p, const std::string& mod)
-  : ParsEvolved(p,mod),
-    seed(p.addTitle("StochasticTrajectory",mod).add("seed",mod,"Random number generator seed",1001ul)),
-    noise(p.add("noise",mod,"Switching noise on/off",true)),
-    nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(100))) 
-{}
 
 
 } // trajectory
