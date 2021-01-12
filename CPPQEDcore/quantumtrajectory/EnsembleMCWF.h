@@ -43,7 +43,7 @@ public:
 
 protected:
   /// Straightforward constructor
-  Base(std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition
+  Base(const StateVector& psi, ///< the (pure-state) initial condition
        QuantumSystemPtr qs, ///< the structure::QuantumSystem to be simulated
        const Pars<RandomEngine>& p, ///< parameters of the simulation (contains \link Pars::nTraj the number of trajectories\endlink)
        const StateVectorLow& scaleAbs=StateVectorLow())
@@ -53,7 +53,7 @@ protected:
         p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
 
         for (size_t i=0; i<p.nTraj; ++i) {
-          res.push_back(new Single(std::make_shared<StateVector>(*psi),qs,p,scaleAbs));
+          res.push_back(new Single(StateVector(psi),qs,p,scaleAbs));
           randomutils::incrementForNextStream(p);
         }
         
@@ -121,8 +121,7 @@ public:
   typedef typename DO_Stream::DensityOperator DensityOperator;
 
   /// Templated constructor with the same idea as Master::Master
-  EnsembleMCWF(
-               std::shared_ptr<const StateVector> psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
+  EnsembleMCWF(const StateVector& psi, ///< the (pure-state) initial condition used to initialize all the element \link MCWF_Trajectory MCWF trajectories\endlink
                typename structure::QuantumSystem<RANK>::Ptr sys, ///< represents the quantum system to be simulated
                const mcwf::Pars<RandomEngine>& p, ///< parameters of the simulation (contains \link mcwf::Pars::nTraj the number of trajectories\endlink)
                bool negativity, ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT

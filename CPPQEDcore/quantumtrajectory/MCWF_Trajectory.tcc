@@ -35,24 +35,24 @@ void MCWF_Trajectory<RANK,RandomEngine>::derivs(double t, const StateVectorLow& 
 
 
 template<int RANK, typename RandomEngine>
-MCWF_Trajectory<RANK,RandomEngine>::MCWF_Trajectory(SV_Ptr psi,
+MCWF_Trajectory<RANK,RandomEngine>::MCWF_Trajectory(StateVector&& psi,
                                                     typename structure::QuantumSystem<RANK>::Ptr sys,
                                                     const mcwf::Pars<RandomEngine>& p,
                                                     const StateVectorLow& scaleAbs)
   : QuantumTrajectory(sys,p.noise,
-         psi->getArray(),
-         bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
-         initialTimeStep<RANK>(sys),
-         scaleAbs,
-         p,
-         evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorrectionFactor)),
-    psi_(psi),
+                      psi.getArray(),
+                      bind(&MCWF_Trajectory::derivs,this,_1,_2,_3),
+                      initialTimeStep<RANK>(sys),
+                      scaleAbs,
+                      p,
+                      evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorrectionFactor)),
+    psi_(std::move(psi)),
     dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
     logger_(p.logLevel,this->template nAvr<structure::LA_Li>())
 {
   QuantumTrajectory::checkDimension(psi);
   if (!getTime()) if(const auto li=this->getLi()) { // On startup, dpLimit should not be overshot, either.
-    Rates rates(li->rates(0.,*psi_)); calculateSpecialRates(&rates,0.);
+    Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
     manageTimeStep(rates,getEvolved().get(),false);
   }
 }
@@ -76,11 +76,11 @@ double MCWF_Trajectory<RANK,RandomEngine>::coherentTimeDevelopment(double Dt)
   double t=getTime();
 
   if (const auto ex=this->getEx()) {
-    ex->actWithU(getTime(),psi_->getArray(),this->getT0());
+    ex->actWithU(getTime(),psi_.getArray(),this->getT0());
     QuantumTrajectory::setT0(t);
   }
 
-  logger_.processNorm(psi_->renorm());
+  logger_.processNorm(psi_.renorm());
 
   return t;
 }
@@ -92,7 +92,7 @@ auto MCWF_Trajectory<RANK,RandomEngine>::calculateSpecialRates(Rates* rates, dou
   IndexSVL_tuples res;
   for (int i=0; i<rates->size(); i++)
     if ((*rates)(i)<0) {
-      StateVector psiTemp(*psi_);
+      StateVector psiTemp(psi_);
       this->actWithJ(t,psiTemp.getArray(),i);
       res.push_back(IndexSVL_tuple(i,psiTemp.getArray()));
       (*rates)(i)=mathutils::sqr(psiTemp.renorm());
@@ -140,13 +140,13 @@ void MCWF_Trajectory<RANK,RandomEngine>::performJump(const Rates& rates, const I
     --lindbladNo; auto i=boost::find_if(specialRates,[=](const IndexSVL_tuple& j){return lindbladNo==std::get<0>(j);});
     if (i!=specialRates.end())
       // special jump
-      *psi_=std::get<1>(*i); // RHS already normalized above
+      psi_=std::get<1>(*i); // RHS already normalized above
     else {
       // normal  jump
-      this->actWithJ(t,psi_->getArray(),lindbladNo);
+      this->actWithJ(t,psi_.getArray(),lindbladNo);
       double normFactor=sqrt(rates(lindbladNo));
       if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in MCWF_Trajectory::performJump");
-      *psi_/=normFactor;
+      psi_/=normFactor;
     }
 
     logger_.jumpOccured(this->getLogStreamDuringRun(),t,lindbladNo);
@@ -157,20 +157,20 @@ void MCWF_Trajectory<RANK,RandomEngine>::performJump(const Rates& rates, const I
 template<int RANK, typename RandomEngine>
 void MCWF_Trajectory<RANK,RandomEngine>::step_v(double Dt)
 {
-  const StateVector psiCache(*psi_);
+  const StateVector psiCache(psi_);
   evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.
 
   double t=coherentTimeDevelopment(Dt);
 
   if (const auto li=this->getLi()) {
 
-    Rates rates(li->rates(t,*psi_));
+    Rates rates(li->rates(t,psi_));
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
 
     while (manageTimeStep(rates,&evolvedCache)) {
-      *psi_=psiCache;
+      psi_=psiCache;
       t=coherentTimeDevelopment(Dt); // the next try
-      rates=li->rates(t,*psi_);
+      rates=li->rates(t,psi_);
       specialRates=calculateSpecialRates(&rates,t);
     }
 
@@ -199,7 +199,7 @@ std::ostream& MCWF_Trajectory<RANK,RandomEngine>::streamParameters_v(std::ostrea
     }
     os<<"Alternative Lindblads: ";
     {
-      const Rates rates(li->rates(0,*psi_));
+      const Rates rates(li->rates(0,psi_));
       int n=0;
       for (int i=0; i<rates.size(); ++i) if (rates(i)<0) {os<<i<<' '; ++n;}
       if (!n) os<<"none";

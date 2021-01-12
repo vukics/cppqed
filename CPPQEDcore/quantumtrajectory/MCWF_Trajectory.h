@@ -104,7 +104,6 @@ public:
   typedef structure::Averaged     <RANK> Averaged   ;
 
   typedef quantumdata::StateVector<RANK> StateVector;
-  typedef std::shared_ptr<StateVector> SV_Ptr;
 
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
@@ -118,7 +117,7 @@ private:
 
 public:
   /// Templated constructor with the same idea as Master::Master
-  MCWF_Trajectory(SV_Ptr psi, ///< the state vector to be evolved
+  MCWF_Trajectory(StateVector&& psi, ///< the state vector to be evolved
                   typename structure::QuantumSystem<RANK>::Ptr sys, ///< object representing the quantum system
                   const mcwf::Pars<RandomEngine>& p, ///< parameters of the evolution
                   const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in Master::Master
@@ -130,8 +129,6 @@ public:
 
   /// \name Getters
   //@{
-  const SV_Ptr getPsi() const {return psi_;} 
-
   const mcwf::Logger& getLogger() const {return logger_;}
   //@}
   
@@ -142,7 +139,7 @@ protected:
 
   typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override
   {
-    return structure::QuantumSystemWrapper<RANK,true>::stream(getTime(),*psi_,os,precision);
+    return structure::QuantumSystemWrapper<RANK,true>::stream(getTime(),psi_,os,precision);
   } ///< Forwards to structure::Averaged::stream
   
   std::ostream& streamKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::streamKey
@@ -162,7 +159,7 @@ private:
 
   std::ostream& streamParameters_v(std::ostream&) const override;
 
-  const typename Base::AveragedHandle averaged_v() const override {return psi_;}
+  const typename Base::AveragedHandle averaged_v() const override {return std::make_shared<StateVector>(std::move(psi_));}
 
   const std::string trajectoryID_v() const override {return "MCWF_Trajectory";}
 
@@ -174,7 +171,7 @@ private:
   void                  performJump                (const Rates&, const IndexSVL_tuples&, double); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
-  const SV_Ptr psi_;
+  StateVector psi_;
 
   const double dpLimit_, overshootTolerance_;
 
