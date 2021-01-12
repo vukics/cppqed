@@ -13,100 +13,93 @@
 
 #include <boost/range/algorithm_ext/for_each.hpp>
 
-namespace quantumtrajectory {
 
+template<int RANK, typename V>
+quantumtrajectory::Master<RANK,V>::Master(DensityOperator&& rho,
+                                          typename QuantumSystem::Ptr qs,
+                                          const master::Pars& p,
+                                          bool negativity,
+                                          const DensityOperatorLow& scaleAbs)
+  : QTraj(qs,true,
+          rho.getArray(),
+          //std::bind(&Master::derivs,this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3),
+          [this](double t, const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow)
+          {
+            using namespace blitzplusplus::vfmsi;
 
-namespace master {
-
-
-template<int RANK>
-Base<RANK>::Base(DO_Ptr rho,
-                 typename QuantumSystem::Ptr qs,
-                 const master::Pars& p,
-                 const DensityOperatorLow& scaleAbs
-                 )
-  : QuantumTrajectory(qs,true,
-                      rho->getArray(),
-                      bind(&Base<RANK>::derivs,this,_1,_2,_3),
-                      initialTimeStep<RANK>(qs),
-                      p.logLevel,p.epsRel,p.epsAbs,
-                      scaleAbs,
-                      evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
-    rho_(rho)
+            drhodtLow=0;
+            
+            for (auto&& [rhoS,drhodtS] : boost::combine(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow)) )
+              this->addContribution(t,rhoS,drhodtS,this->getT0());
+            
+            {
+              linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
+              linalg::calculateTwoTimesRealPartOfSelf(drhodtMatrixView);
+            }
+            
+            // Now act with the reset operator --- implement this in terms of the individual jumps by iteration and addition
+            
+            for (size_t i=0; i < this->template nAvr<structure::LA_Li>(); i++) {
+              try {
+                this->getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
+              } catch (const structure::SuperoperatorNotImplementedException&) {
+                DensityOperatorLow rhotemp(rhoLow.copy());
+#define UNARY_ITER for (auto& rhoS : fullRange<Left>(rhotemp)) this->getLi()->actWithJ(t,rhoS,i);
+                UNARY_ITER; blitzplusplus::hermitianConjugateSelf(rhotemp); UNARY_ITER;
+#undef UNARY_ITER
+                drhodtLow+=rhotemp;
+              }
+            }            
+          },
+          initialTimeStep<RANK>(qs),
+          p.logLevel,p.epsRel,p.epsAbs,
+          scaleAbs,
+          evolved::MakerGSL<DensityOperatorLow>(p.sf,p.nextDtTryCorrectionFactor)),
+    rho_(std::move(rho)),
+    dos_(this->getAv(),negativity)
 {
   if (!this->applicableInMaster()) throw master::SystemNotApplicable();
-  QuantumTrajectory::checkDimension(rho);
-
+  QTraj::checkDimension(rho);
 }
 
 
-template<int RANK>
-void Base<RANK>::derivs(double t, const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow) const
-{
-  drhodtLow=0;
-
-  binaryIter(rhoLow,drhodtLow,bind(&QuantumTrajectory::QuantumSystemWrapper::addContribution,this,t,_1,_2,this->getT0()));
-
-  {
-    linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
-    linalg::calculateTwoTimesRealPartOfSelf(drhodtMatrixView);
-  }
-
-  // Now act with the reset operator --- implement this in terms of the individual jumps by iteration and addition
-
-  for (size_t i=0; i<this->template nAvr<structure::LA_Li>(); i++) {
-    try {
-      this->getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
-    } catch (const structure::SuperoperatorNotImplementedException&) {
-      DensityOperatorLow rhotemp(rhoLow.copy());
-      UnaryFunction functionLi(bind(&Liouvillean::actWithJ,this->getLi(),t,_1,i));
-      unaryIter(rhotemp,functionLi);
-      blitzplusplus::hermitianConjugateSelf(rhotemp);
-      unaryIter(rhotemp,functionLi);
-      drhodtLow+=rhotemp;
-    }
-  }
-
-}
-
-template<int RANK>
-void 
-Base<RANK>::step_v(double deltaT)
+template<int RANK, typename V>
+void quantumtrajectory::Master<RANK,V>::step_v(double deltaT)
 {
   this->getEvolved()->step(deltaT);
   if (const auto ex=this->getEx()) {
     using namespace blitzplusplus;
-    DensityOperatorLow rhoLow(rho_->getArray());
-    UnaryFunction functionEx(bind(&Exact::actWithU,ex,this->getTime(),_1,this->getT0()));
-    unaryIter(rhoLow,functionEx);
+    using namespace vfmsi;
+    DensityOperatorLow rhoLow(rho_.getArray());
+    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
     hermitianConjugateSelf(rhoLow);
-    unaryIter(rhoLow,functionEx);
+    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
     rhoLow=conj(rhoLow);
   }
 
-  QuantumTrajectory::setT0();
+  QTraj::setT0();
 
 
   // The following "smoothing" of rho_ has proven to be necessary for the algorithm to remain stable:
   // We make the approximately Hermitian and normalized rho_ exactly so.
 
   {
-    linalg::CMatrix m(rho_->matrixView());
+    linalg::CMatrix m(rho_.matrixView());
     linalg::calculateTwoTimesRealPartOfSelf(m); 
-    // here we get two times of what is desired, but it is anyway renormalized in the next step
+    // here we get two times of what is needed, but it is anyway renormalized in the next step
   }
 
-  rho_->renorm();
+  rho_.renorm();
 
 }
 
 
-template<int RANK>
-std::ostream& Base<RANK>::streamParameters_v(std::ostream& os) const
+template<int RANK, typename V>
+std::ostream& quantumtrajectory::Master<RANK,V>::streamParameters_v(std::ostream& os) const
 {
   using namespace std;
 
-  this->streamCharacteristics( this->getQS()->streamParameters( Adaptive::streamParameters_v(os)<<"Solving Master equation."<<addToParameterStream()<<endl<<endl ) )<<endl;
+  this->streamCharacteristics( this->getQS()->streamParameters(Adaptive::streamParameters_v(os)<<"Solving Master equation."<<endl<<endl ) )<<endl;
 
   if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";
@@ -115,12 +108,12 @@ std::ostream& Base<RANK>::streamParameters_v(std::ostream& os) const
       li->streamKey(os,i);
     }
     os<<"Explicit superoperator calculations: ";
-    DensityOperator rhotemp(rho_->getDimensions());
+    DensityOperator rhotemp(rho_.getDimensions());
     {
       int n=0;
       for (int i=0; i<li->nAvr(); ++i)
         try {
-          li->actWithSuperoperator(0,rho_->getArray(),rhotemp.getArray(),i);
+          li->actWithSuperoperator(0,rho_.getArray(),rhotemp.getArray(),i);
           os<<i<<' '; ++n;
         }
         catch (const structure::SuperoperatorNotImplementedException&) {}
@@ -133,6 +126,8 @@ std::ostream& Base<RANK>::streamParameters_v(std::ostream& os) const
   return os;
 }
 
+
+/*
 
 // NEEDS_WORK needs to create again the iterators because the array stored in the iterator IS NOT transposed because transpose does not touch the data. For this reason one must be very careful with reusing SliceIterators because probably most of the times it does not produce the required semantics. Alternatively, one could imagine a rebind functionality in SliceIterators.
 
@@ -151,11 +146,6 @@ void Base<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow
   boost::for_each(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow),function);
 }
 
-
-} // master
-
-
-} // quantumtrajectory
-
+*/
 
 #endif // CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_TCC_INCLUDED
