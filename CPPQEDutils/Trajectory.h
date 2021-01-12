@@ -9,11 +9,15 @@
 #include "FormDouble.h"
 #include "ParsTrajectory.h"
 
+#include <boost/hana.hpp>
+
 #include <iosfwd>
 #include <queue>
 #include <stdexcept>
 #include <string>
 #include <tuple>
+
+namespace hana=boost::hana;
 
 
 /// The trajectory-bundle
@@ -342,7 +346,7 @@ struct AutostopHandlerNoOp
 
 
 template<typename SA>
-using StreamedArray=std::list<std::tuple<double,double,SA>>;
+using TemporalStreamedArray=std::list<std::tuple<double,double,SA>>;
 
 
 namespace details {
@@ -351,10 +355,10 @@ template<
          typename T, // type of trajectory
          typename L, // type specifying the length of the run
          typename D, // type specifying the frequency of stream
-         typename AutostopHandler // should support operator()(const typename T::StreamedArray &)
+         typename AutostopHandler // should support operator()(const typename T::TemporalStreamedArray &)
          >
-StreamedArray<typename T::StreamedArray>
-run(T& traj, L length, D streamFreq, unsigned stateStreamFreq,
+TemporalStreamedArray<typename std::decay_t<T>::StreamedArray>
+run(T&& traj, L length, D streamFreq, unsigned stateStreamFreq,
     const std::string& trajectoryFileName, const std::string& initialFileName,
     int precision, bool streamInfo, bool firstStateStream,
     const std::string& parsedCommandLine,
@@ -386,9 +390,10 @@ run(T& traj, L length, D streamFreq, unsigned stateStreamFreq,
  * \todo Consider taking Trajectory by rvalue reference
  *
  */
+/*
 template<typename SA, typename AutostopHandler>
-StreamedArray<SA>
-run(Trajectory<SA>& traj, ///< the trajectory to run
+auto
+run(Trajectory<SA>&& traj, ///< the trajectory to run
     double time, ///< end time
     double deltaT, ///< time interval between two \link Trajectory::stream streams\endlink
     unsigned sdf, ///< number of \link Trajectory::stream streams\endlink between two \link Trajectory::writeState state streams\endlink
@@ -403,12 +408,24 @@ run(Trajectory<SA>& traj, ///< the trajectory to run
     AutostopHandler&& autostopHandler
    )
 {
-  return details::run(traj,time,deltaT,sdf,ofn,initialFileName,precision,streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
+  return details::run(std::forward<Trajectory<SA>>(traj),time,deltaT,sdf,ofn,initialFileName,precision,
+                      streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
                       std::forward<AutostopHandler>(autostopHandler));
 }
+*/
 
-/// Same as \link Trajectory::run above\endlink but runs for a certain number of time intervals deltaT \related Trajectory
+
+auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0)) { });
+auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0)) { });
+
+/// Dispatcher \related Adaptive
 /**
+ * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Adaptive::step single adaptive timestep\endlink,
+ * it is possible to count the individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each streaming.
+ * Hence, we get denser streamings in time when the timestep is small, that is, when the important things are happening in the dynamics.
+ *
+ * NDt-mode: runs for a certain number of time intervals deltaT \related Trajectory
+ *
  * <b>Rationale:</b> This version of `run` exists to avoid the eventual tiny timestep at the end of the run that might occur with
  * \link Trajectory::run the above version\endlink.
  * This is because e.g. in the case of `deltaT=0.1`, `time=1`, adding up `0.1` ten times numerically does not result in exactly `1`.
@@ -421,79 +438,37 @@ run(Trajectory<SA>& traj, ///< the trajectory to run
  *
  *     examples/HarmonicOscillatorComplex --dc 0 --Dt 0.1 --NDt 10
  *
- */
-template<typename SA, typename AutostopHandler>
-StreamedArray<SA>
-run(Trajectory<SA>& traj, long nDt, ///< the end time of the trajectory will be nDt*deltaT
-    double deltaT, unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool streamInfo, bool firstStateStream,
-    const std::string& parsedCommandLine, bool doStreaming, bool returnStreamedArray,
-    AutostopHandler&& autostopHandler
-   )
-{
-  return details::run(traj,nDt ,deltaT,sdf,ofn,initialFileName,precision,streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
-                      std::forward<AutostopHandler>(autostopHandler));
-}
-
-
-/// Another version of \link Trajectory::run `run`\endlink for running in dc-mode \related Adaptive
-/**
- * Since in addition to the Trajectory interface, Adaptive has also the capability to be propagated over a \link Adaptive::step single adaptive timestep\endlink, it is possible to count the
- * individual ODE steps. Running in dc-mode means that a fixed number of adaptive steps are performed between each streaming. Hence, we get denser streamings in time when the timestep is small,
- * that is, when the important things are happening in the dynamics.
- * 
- */
-template<typename A, typename BASE, typename AutostopHandler>
-StreamedArray<typename BASE::StreamedArray>
-run(Adaptive<A,BASE>& traj, double time, int dc, ///< number of adaptive timesteps taken between two streams
-    unsigned sdf, const std::string& ofn, const std::string& initialFileName, int precision, bool streamInfo, bool firstStateStream,
-    const std::string& parsedCommandLine, bool doStreaming, bool returnStreamedArray,
-    AutostopHandler&& autostopHandler
-   )
-{
-  return details::run(traj,time,dc,sdf,ofn,initialFileName,precision,streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
-                      std::forward<AutostopHandler>(autostopHandler));
-}
-
-/// Dispatcher \related Trajectory
-/**
- * Runs
- * - run(Trajectory&, long, double, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.NDt` is nonzero and
- * - run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) otherwise
- * 
- * \note This means that ParsRun::NDt takes precedence over ParsRun::T
  *
- */
-template <typename SA>
-StreamedArray<SA>
-run(Trajectory<SA>& traj, const ParsRun& p, bool doStreaming=true, bool returnStreamedArray=false)
-{ 
-  if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
-  if (p.NDt) return run(traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                        doStreaming,returnStreamedArray,
-                        AutostopHandlerGeneric<SA>(p.autoStopEpsilon,p.autoStopRepetition));
-  else       return run(traj,p.T  ,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                        doStreaming,returnStreamedArray,
-                        AutostopHandlerGeneric<SA>(p.autoStopEpsilon,p.autoStopRepetition));
-}
-
-
-/// Dispatcher \related Adaptive
-/**
  * - Runs run(Adaptive&, double, int, unsigned, const std::string&, const std::string&, int, bool, bool) if `p.dc` is nonzero (dc-mode)
  * - delegates to run(Trajectory&, const ParsRun& p) otherwise (deltaT-mode)
  * 
- * \note This means that ParsRun::dc takes precedence over ParsRun::Dt
+ * \note This means that ParsRun::NDt takes precedence over ParsRun::T and ParsRun::dc takes precedence over ParsRun::Dt
  * 
  */
-template<typename A, typename BASE>
-StreamedArray<typename BASE::StreamedArray>
-run(Adaptive<A,BASE>& traj, const ParsRun& p, bool doStreaming=true, bool returnStreamedArray=false)
+template<typename TRAJ>
+auto
+run(TRAJ&& traj, const ParsRun& p,
+    bool doStreaming=true, bool returnStreamedArray=false)
+-> std::enable_if_t<decltype(has_evolve(traj))::value,TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>
 {
-  if      (p.dc) return run(traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                            doStreaming,returnStreamedArray,
-                            AutostopHandlerGeneric<typename BASE::StreamedArray>(p.autoStopEpsilon,p.autoStopRepetition));
-  else if (p.Dt) return run(static_cast<BASE&>(traj),p,doStreaming,returnStreamedArray);
-  else throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
+  using AHG=AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>;
+  
+  if constexpr (decltype(has_step(traj))::value) { // it is of the Adaptive family
+    if (p.dc) return details::run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
+                                  p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+                                  doStreaming,returnStreamedArray,
+                                  AHG(p.autoStopEpsilon,p.autoStopRepetition));
+    else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
+  }
+  if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
+  if (p.NDt) return details::run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+                        p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+                        doStreaming,returnStreamedArray,
+                        AHG(p.autoStopEpsilon,p.autoStopRepetition));
+  else return details::run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+                  p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+                  doStreaming,returnStreamedArray,
+                  AHG(p.autoStopEpsilon,p.autoStopRepetition));
 }
 
 

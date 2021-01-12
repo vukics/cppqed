@@ -50,29 +50,6 @@ void readViaSStream(T& traj, std::shared_ptr<std::istream> ifs)
 namespace details {
 
   
-namespace runTraits {
-
-template <typename SA> inline bool doContinue(const Trajectory<SA>& traj, double time, long      ) {return traj.getTime()<time;}
-template <typename SA> inline bool doContinue(const Trajectory<SA>&     , long length, long count) {return count<=length      ;}
-
-template <typename SA> inline void advance(Trajectory<SA>& traj, long       , double deltaT) {traj.evolve(deltaT);}
-template <typename SA> inline void advance(Trajectory<SA>& traj, double time, double deltaT) {traj.evolve(std::min(deltaT,time-traj.getTime()));}
-
-template<typename A, typename BASE>
-inline void advance(Adaptive<A,BASE>& traj, double time, int) {traj.step(time-traj.getTime());}
-
-inline bool doStream(long      , double         ) {return true;}
-inline bool doStream(long count, int streamFreq) {return !(count%streamFreq);}
-
-inline auto writeTimestep(int   ) {return " timestep";}
-inline auto writeTimestep(double) {return ""         ;}
-
-inline double endTime(long    nDt, double dt, double currentTime) {return nDt*dt+currentTime;}
-inline double endTime(double time, double   , double            ) {return time              ;}
-
-} // runTraits
-
-
 template<typename SA>
 bool restoreState(Trajectory<SA>& traj, const std::string& trajectoryFileName, const std::string& stateFileName, const std::string& initialFileName)
 {
@@ -100,8 +77,8 @@ bool restoreState(Trajectory<SA>& traj, const std::string& trajectoryFileName, c
 
 
 template<typename T, typename L, typename D, typename AutostopHandler>
-trajectory::StreamedArray<typename T::StreamedArray> 
-trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFreq,
+trajectory::TemporalStreamedArray<typename std::decay_t<T>::StreamedArray> 
+trajectory::details::run(T&& traj, L length, D streamFreq, unsigned stateStreamFreq,
                          const std::string& trajectoryFileName, const std::string& initialFileName,
                          int precision, bool streamInfo, bool firstStateStream,
                          const std::string& parsedCommandLine,
@@ -109,9 +86,13 @@ trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFr
                          AutostopHandler&& autostopHandler
                         )
 {
-  using namespace std; using namespace runTraits; using namespace cpputils;
+  using namespace std; using namespace cpputils;
 
-  StreamedArray<typename T::StreamedArray> res;
+  static constexpr bool
+    endTimeMode=std::is_floating_point_v<std::decay_t<decltype(length)>>,
+    isDtMode=std::is_floating_point_v<std::decay_t<decltype(streamFreq)>>;
+  
+  TemporalStreamedArray<typename std::decay_t<T>::StreamedArray> res;
   
   ////////////////////////////////////////////////
   // Determining i/o streams, eventual state input
@@ -123,9 +104,12 @@ trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFr
   const bool
     streamToFile=(trajectoryFileName!=""),  
     continuing=restoreState(traj,trajectoryFileName,stateFileName,initialFileName);
+
+  const double timeToReach=[&]() {
+    if constexpr (endTimeMode) return length;
+    else return length*streamFreq+traj.getTime();    
+  }();
   
-  const double timeToReach=endTime(length,streamFreq,traj.getTime());
-    
   if (timeToReach && timeToReach<=traj.getTime()) return res;
 
   const std::shared_ptr<ostream> outstream(!streamToFile ?
@@ -152,7 +136,10 @@ trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFr
       if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
       traj.streamParameters(commentingStream<<versionHelper())
         <<endl<<"Run Trajectory up to time "<<timeToReach
-        <<" -- Stream period: "<<streamFreq<<writeTimestep(streamFreq)<<endl<<endl;
+        <<" -- Stream period: "<<streamFreq<<[&]() {
+          if constexpr (isDtMode) return "";
+          else return " timestep";
+        }()<<endl<<endl;
     }
     else
       commentingStream<<"Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
@@ -167,19 +154,33 @@ trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFr
   const std::shared_ptr<ostream> ofs = !streamToFile ? std::make_shared<ofstream>() : openStateFileWriting(stateFileName);
 
   bool
-    stateSaved=false,   // signifies whether the state has already been saved for the actual time instant of the trajectory
+    stateSaved=false,  // signifies whether the state has already been saved for the actual time instant of the trajectory
     evsStreamed=false; // signifies whether the expectation values have already been streamed ”
 
   try {
 
-    for (long count=0, stateCount=0; doContinue(traj,length,count); ++count) {
+    for (long count=0, stateCount=0; [&]() {
+      if constexpr (endTimeMode) return traj.getTime()<length;
+      else return count<=length;
+    }(); ++count) {
 
       if (count) {
-        advance(traj,length,streamFreq);
+        // advance trajectory
+        if constexpr (!isDtMode) {traj.step(length-traj.getTime());}
+        else {
+          if constexpr (endTimeMode) traj.evolve(std::min(streamFreq,length-traj.getTime()));
+          else traj.evolve(streamFreq);
+        }
         stateSaved=evsStreamed=false;
       }
 
-      if (!count || doStream(count,streamFreq)) {
+// inline bool doStream(long      , double         ) {return true;}
+// inline bool doStream(long count, int streamFreq) {return }
+
+      if (!count || [&]() {
+        if constexpr (isDtMode) return true;
+        else return !(count%streamFreq);
+      }() ) {
 
         if (
             stateStreamFreq && 
@@ -199,7 +200,7 @@ trajectory::details::run(T& traj, L length, D streamFreq, unsigned stateStreamFr
           autostopHandler(get<1>(streamReturn));
         }
       }
-    }
+    } // end of main for loop
 
   } catch (const StoppingCriterionReachedException& except) {commentingStream<<"Stopping criterion has been reached"<<endl;}
   

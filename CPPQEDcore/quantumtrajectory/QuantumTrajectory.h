@@ -32,6 +32,9 @@ inline double initialTimeStep(typename structure::QuantumSystem<RANK>::Ptr qs)
 template<int RANK, typename BASE>
 class QuantumTrajectory : public BASE, public structure::QuantumSystemWrapper<RANK,true>
 {
+public:
+  using TrajectoryBase=BASE;
+  
 protected:
   /// Constructor forwarding to `BASE` and QuantumSystemWrapper
   template<typename... ArgumentPack>

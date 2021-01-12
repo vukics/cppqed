@@ -11,11 +11,11 @@
 namespace evolution {
 
 
-template<typename RandomEngine, typename SV_OR_DO>
-const auto
+template<typename RandomEngine, typename SV_OR_DO, typename Parameters>
+auto
 _(SV_OR_DO&& initial,
   binary::Ptr sys,
-  const evolution::Pars<>& p,
+  const evolution::Pars<mcwf::Pars<RandomEngine>>& p,
   bool doStreaming=true, bool returnStreamedArray=false)
 {
   return _<RandomEngine,0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
@@ -25,14 +25,14 @@ _(SV_OR_DO&& initial,
 } // evolution
 
 
-template<typename SV_OR_DO>
-const auto
+template<typename SV_OR_DO, typename Parameters>
+auto
 evolve(SV_OR_DO&& initial,
        binary::Ptr sys,
        const evolution::Pars<>& p,
        bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return evolution::_<EVOLUTION_DEFAULT_RANDOM_ENGINE,0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+  return evolution::_<EVOLUTION_DEFAULT_RANDOM_ENGINE,tmptools::Vector<0>>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
 }
 
 

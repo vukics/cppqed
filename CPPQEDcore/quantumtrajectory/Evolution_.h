@@ -40,94 +40,130 @@ template <typename Base=mcwf::Pars<EVOLUTION_DEFAULT_RANDOM_ENGINE>>
 struct Pars : public trajectory::ParsRun, public Base {
 
   Method &evol; ///< the method of evolution
-  bool
-    &negativity, ///< governs whether entanglement should be calculated in the case of #ENSEMBLE and #MASTER, cf. quantumtrajectory::stream_densityoperator::_, quantumdata::negPT
-    &timeAverage; ///< governs whether in the case of #SINGLE, time averaging should be performed (by using quantumtrajectory::TimeAveragingMCWF_Trajectory instead of quantumtrajectory::MCWF_Trajectory)
-  double &relaxationTime; ///< the relaxation time in the case when time averaging is desired
+  bool &negativity; ///< governs whether entanglement should be calculated in the case of #ENSEMBLE and #MASTER, cf. quantumtrajectory::stream_densityoperator::_, quantumdata::negPT
 
   Pars(parameters::Table& p, const std::string& mod="") 
     : ParsRun(p,mod),
       Base(p,mod),
       evol(p.addTitle("Evolution",mod).add("evol",mod,"Evolution mode (single, ensemble, master)",SINGLE)),
-      negativity(p.add("negativity",mod,"Calculates negativity in ensemble & master",false)),
-      timeAverage(p.add("timeAverage",mod,"Calculates time averages in MCWF trajectory",false)),
-      relaxationTime(p.add("relaxationTime",mod,"Relaxation time for time averaging",0.)) {}    
+      negativity(p.add("negativity",mod,"Calculates negativity in ensemble & master",false))
+      {}
+
 };
 
 
-template<int RANK>
+template<auto RANK>
 using LDO_Ptr=typename quantumdata::LazyDensityOperator<RANK>::Ptr;
 
-using StreamedArray=trajectory::StreamedArray<DArray<1>>;
+using TemporalStreamedArray=trajectory::TemporalStreamedArray<DArray<1>>;
 
-template<int RANK>
-using EvolutionReturnType=std::tuple<evolution::LDO_Ptr<RANK>,StreamedArray>;
+template<auto RANK>
+using ReturnType=std::tuple<evolution::LDO_Ptr<RANK>,TemporalStreamedArray>;
+
+} // evolution
 
 
-template<typename V, int RANK, typename Parameters>
-EvolutionReturnType<RANK>
-_(std::shared_ptr<quantumdata::DensityOperator<RANK>> rhoPtr,
-  typename structure::QuantumSystem<RANK>::Ptr sys,
-  const Parameters& pe,
-  bool doStreaming, bool returnStreamedArray)
+/// The prototype function to evolve a Master trajectory from a DensityOperator initial condition
+template<typename V, typename DO, typename SYS, typename Parameters>
+auto
+evolveMaster(DO&& rho, ///<[in/out] density operator initial condition
+             SYS&& sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
+             const Parameters& p, ///<[in] parameters of the evolution
+             bool doStreaming=true, bool returnStreamedArray=false)
 {
-  Master<RANK,V> traj(rhoPtr,sys,pe,pe.negativity);
+  static constexpr auto RANK=std::decay_t<DO>::N_RANK;
+  
+  Master<RANK,V> traj(std::forward<quantumdata::DensityOperator<RANK>>(rho),
+                      std::forward<SYS>(sys),
+                      p,p.negativity);
 
-  return {rhoPtr,trajectory::run(traj,pe,doStreaming,returnStreamedArray)};
-
+  return evolution::ReturnType<RANK>{std::make_shared<quantumdata::DensityOperator<RANK>>(std::move(rho)),
+                                     trajectory::run(static_cast<typename Master<RANK,V>::TrajectoryBase&>(traj),p,doStreaming,returnStreamedArray)};
+                                     // this ugly static_cast is needed because the member function `stream` is found in two separate bases of Master
 }
+
+
+template<int... V, typename DO, typename SYS, typename Parameters>
+auto
+evolveMaster(DO&& rho, SYS&& sys, const Parameters& p, bool doStreaming=true, bool returnStreamedArray=false)
+{
+  return evolveMaster(std::forward<DO>(rho),std::forward<SYS>(sys),p,doStreaming,returnStreamedArray);
+}
+
+
+namespace evolution {
 
 
 namespace details {
+  
 
-template<typename RandomEngine, typename V, int RANK>
-EvolutionReturnType<RANK>
-_(std::shared_ptr<quantumdata::StateVector<RANK>> psiPtr,
-  typename structure::QuantumSystem<RANK>::Ptr sys,
-  const Pars<mcwf::Pars<RandomEngine>>& pe,
-  bool doStreaming, bool returnStreamedArray)
-{
-  if      (pe.evol==evolution::SINGLE) {
-    return {psiPtr,trajectory::run(*std::make_shared<MCWF_Trajectory<RANK,RandomEngine>>(psiPtr,sys,pe),pe,doStreaming,returnStreamedArray)};
-  }
-  else if (pe.evol==evolution::ENSEMBLE) {
-    EnsembleMCWF<RANK,RandomEngine,V> traj(psiPtr,sys,pe,pe.negativity);
-    return {traj.averaged(),trajectory::run(traj,pe,doStreaming,returnStreamedArray)};
-  }
-  else {
-    return _<V,RANK,Pars<mcwf::Pars<RandomEngine>>>(std::make_shared<quantumdata::DensityOperator<RANK>>(*psiPtr),sys,pe,doStreaming,returnStreamedArray);
-  }
-
-}
-
-} // details
-
-
-template<typename RandomEngine, typename V, int RANK>
-const auto
-_(quantumdata::StateVector<RANK>&& psi, ///<[in/out] pure state-vector initial condition
+template<auto RANK, typename RandomEngine, typename V, typename SV_OR_DO, typename Parameters>
+std::enable_if_t<std::is_same_v<std::decay_t<SV_OR_DO>,quantumdata::DensityOperator<RANK>> || std::is_same_v<std::decay_t<SV_OR_DO>,quantumdata::StateVector<RANK>>,
+                 ReturnType<RANK>>
+_(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
   typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-  const Pars<mcwf::Pars<RandomEngine>>& p, ///<[in] parameters of the evolution
+  const Parameters& pe, ///<[in] parameters of the evolution
   bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return details::_<RandomEngine,V>(std::make_shared<quantumdata::StateVector<RANK>>(std::move(psi)),sys,p,doStreaming,returnStreamedArray);
+  // DensityOperator initial condition
+  if constexpr (std::is_same_v<std::decay_t<SV_OR_DO>,quantumdata::DensityOperator<RANK>>) {
+    if (pe.evol==evolution::SINGLE) {
+      throw std::runtime_error("Single MCWF trajectory from DensityOperator initial condition");
+    }
+    else if (pe.evol==evolution::ENSEMBLE) {
+      EnsembleMCWF<RANK,RandomEngine,V> traj{initial,sys,pe,pe.negativity};
+      return {traj.averaged(),
+              trajectory::run(traj,pe,doStreaming,returnStreamedArray)};
+    }
+    else {
+      return ::evolveMaster<V>(std::forward<quantumdata::DensityOperator<RANK>>(initial),sys,pe,
+                               doStreaming,returnStreamedArray);
+    }
+  }
+  // StateVector initial condition
+  else {
+    if (pe.evol==evolution::SINGLE) {
+      return {std::make_shared<quantumdata::StateVector<RANK>>(std::move(initial)),
+              trajectory::run(static_cast<typename MCWF_Trajectory<RANK,RandomEngine>::TrajectoryBase&&>(
+                                MCWF_Trajectory<RANK,RandomEngine>(std::forward<quantumdata::StateVector<RANK>>(initial),sys,pe)),
+                              pe,doStreaming,returnStreamedArray)};
+                              // this ugly static cast is needed because the member function `stream` is found in two separate bases of MCWF_Trajectory
+    }
+    else if (pe.evol==evolution::ENSEMBLE) {
+      EnsembleMCWF<RANK,RandomEngine,V> traj{initial,sys,pe,pe.negativity};
+      return {traj.averaged(),
+              trajectory::run(traj,pe,doStreaming,returnStreamedArray)};
+    }
+    else {
+      return ::evolveMaster<V>(quantumdata::DensityOperator<RANK>(initial),sys,pe,
+                               doStreaming,returnStreamedArray);
+    }    
+  }
+
 }
 
 
-template<typename RandomEngine, typename V, int RANK>
-const auto
-_(quantumdata::StateVector<RANK>& psi, typename structure::QuantumSystem<RANK>::Ptr sys, const Pars<mcwf::Pars<RandomEngine>>& p,
-  bool doStreaming=true, bool returnStreamedArray=false)
+}
+
+template<typename RandomEngine, typename V, typename SV_OR_DO, typename SYS, typename Parameters>
+auto
+_(SV_OR_DO&& initial, SYS&& sys, const Parameters& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return details::_<RandomEngine,V>(std::make_shared<quantumdata::StateVector<RANK>>(psi.getArray(),quantumdata::byReference),sys,p,doStreaming,returnStreamedArray);
+  static constexpr auto RANK=std::decay_t<SV_OR_DO>::N_RANK;
+
+  return details::_<RANK,RandomEngine,V>(std::forward<SV_OR_DO>(initial),
+                                         std::forward<SYS>(sys),
+                                         p,doStreaming,returnStreamedArray);
 }
 
 
-template<typename RandomEngine, int... V, typename SV_OR_DO, typename SYS>
-const auto
-_(SV_OR_DO&& initial, SYS sys, const Pars<mcwf::Pars<RandomEngine>>& p, bool doStreaming=true, bool returnStreamedArray=false)
+template<typename RandomEngine, int... V, typename SV_OR_DO, typename SYS, typename Parameters>
+auto
+_(SV_OR_DO&& initial, SYS&& sys, const Parameters& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return _<RandomEngine,tmptools::Vector<V...>>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+  return _<RandomEngine,tmptools::Vector<V...>>(std::forward<SV_OR_DO>(initial),
+                                                std::forward<SYS>(sys),
+                                                p,doStreaming,returnStreamedArray);
 }
 
 
@@ -146,42 +182,16 @@ _(SV_OR_DO&& initial, SYS sys, const Pars<mcwf::Pars<RandomEngine>>& p, bool doS
  * while for evolution::MASTER and evolution::ENSEMBLE a \link quantumdata::DensityOperator density operator\endlink)
  *
  */
-template<typename V, int RANK>
-const auto
-evolve(quantumdata::StateVector<RANK>&& psi, ///<[in/out] pure state-vector initial condition
-       typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-       const evolution::Pars<>& p, ///<[in] parameters of the evolution
+template<typename V, typename SV_OR_DO, typename SYS, typename Parameters>
+auto
+evolve(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
+       SYS sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
+       const Parameters& p, ///<[in] parameters of the evolution
        bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return evolution::_<EVOLUTION_DEFAULT_RANDOM_ENGINE,V,RANK>(std::forward<quantumdata::StateVector<RANK>>(psi),sys,p,doStreaming,returnStreamedArray);
-}
-
-
-/// \overload
-template<typename V, int RANK>
-const auto
-evolve(quantumdata::StateVector<RANK>& psi, typename structure::QuantumSystem<RANK>::Ptr sys, const evolution::Pars<>& p, bool doStreaming=true, bool returnStreamedArray=false)
-{
-  return evolution::_<EVOLUTION_DEFAULT_RANDOM_ENGINE,V>(std::forward<quantumdata::StateVector<RANK>>(psi),sys,p,doStreaming,returnStreamedArray);
-}
-
-
-/// The prototype function to evolve a Master trajectory from a DensityOperator initial condition
-template<typename V, int RANK>
-const auto
-evolve(quantumdata::DensityOperator<RANK>&& rho, ///<[in/out] density operator initial condition
-       typename structure::QuantumSystem<RANK>::Ptr sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
-       const evolution::Pars<>& p, ///<[in] parameters of the evolution
-       bool doStreaming=true, bool returnStreamedArray=false);
-
-
-/// \overload
-template<typename V, int RANK>
-const auto
-evolve(quantumdata::DensityOperator<RANK>& rho, typename structure::QuantumSystem<RANK>::Ptr sys, const evolution::Pars<>& p,
-       bool doStreaming=true, bool returnStreamedArray=false)
-{
-  return evolution::_<V>(std::make_shared<quantumdata::DensityOperator<RANK>>(rho.getArray(),quantumdata::byReference),sys,p,doStreaming,returnStreamedArray);
+  return evolution::_<EVOLUTION_DEFAULT_RANDOM_ENGINE,V>(std::forward<SV_OR_DO>(initial),
+                                                         std::forward<SYS>(sys),
+                                                         p,doStreaming,returnStreamedArray);
 }
 
 
@@ -196,14 +206,16 @@ evolve(quantumdata::DensityOperator<RANK>& rho, typename structure::QuantumSyste
  *     evolve<tmptools::Vector<2,0,4> >(psi,sys,p)
  *
  */
-template<int... V, typename SV_OR_DO, typename SYS>
-const auto
+template<int... V, typename SV_OR_DO, typename SYS, typename Parameters>
+auto
 evolve(SV_OR_DO&& initial,
-       SYS sys,
-       const evolution::Pars<>& p,
+       SYS&& sys,
+       const Parameters& p,
        bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return evolve<tmptools::Vector<V...>>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+  return evolve<tmptools::Vector<V...>>(std::forward<SV_OR_DO>(initial),
+                                        std::forward<SYS>(sys),
+                                        p,doStreaming,returnStreamedArray);
 }
 
 
