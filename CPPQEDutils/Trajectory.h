@@ -11,7 +11,6 @@
 
 #include <boost/hana.hpp>
 
-#include <iosfwd>
 #include <queue>
 #include <stdexcept>
 #include <string>
@@ -242,8 +241,14 @@ protected:
   typedef typename Evolved::Derivs Derivs;
   
   /// Constructor taking the same parameters as needed to operate evolved::Maker
-  template<typename... BaseInitializationPack>
-  Adaptive(A&, Derivs, double, int, double, double, const A&, const evolved::Maker<A>&, BaseInitializationPack&&...);
+  template<typename ARRAY, typename... BaseInitializationPack>
+  Adaptive(ARRAY&& y, Derivs derivs, double dtInit, int logLevel, double epsRel, double epsAbs,
+           const A& scaleAbs, const evolved::Maker<A>& maker,
+           BaseInitializationPack&&... bip)
+    : AdaptiveIO<A>{maker(std::forward<ARRAY>(y),derivs,dtInit,epsRel,epsAbs,scaleAbs)},
+      BASE{std::forward<BaseInitializationPack>(bip)...},
+      evolved_{std::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())},
+      dtInit_(dtInit), logLevel_(logLevel) {}
 
   typedef typename Evolved::ConstPtr ConstPtr;
   typedef typename Evolved::     Ptr      Ptr;
@@ -349,25 +354,6 @@ template<typename SA>
 using TemporalStreamedArray=std::list<std::tuple<double,double,SA>>;
 
 
-namespace details {
-
-template<
-         typename T, // type of trajectory
-         typename L, // type specifying the length of the run
-         typename D, // type specifying the frequency of stream
-         typename AutostopHandler // should support operator()(const typename T::TemporalStreamedArray &)
-         >
-TemporalStreamedArray<typename std::decay_t<T>::StreamedArray>
-run(T&& traj, L length, D streamFreq, unsigned stateStreamFreq,
-    const std::string& trajectoryFileName, const std::string& initialFileName,
-    int precision, bool streamInfo, bool firstStateStream,
-    const std::string& parsedCommandLine,
-    bool doStreaming, bool returnStreamedArray,
-    AutostopHandler&& autostopHandler
-   );
-
-} // details
-
 /// Running in deltaT mode (streams in equal time intervals) for a certain time \related Trajectory
 /**
  * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
@@ -387,36 +373,33 @@ run(T&& traj, L length, D streamFreq, unsigned stateStreamFreq,
  *
  * \see Simulated for a full generic implementation of Trajectory together with a small tutorial
  * 
- * \todo Consider taking Trajectory by rvalue reference
+ * \link Trajectory::writeState state streams\endlink into file named `ofn.state`
  *
  */
-/*
-template<typename SA, typename AutostopHandler>
-auto
-run(Trajectory<SA>&& traj, ///< the trajectory to run
-    double time, ///< end time
-    double deltaT, ///< time interval between two \link Trajectory::stream streams\endlink
-    unsigned sdf, ///< number of \link Trajectory::stream streams\endlink between two \link Trajectory::writeState state streams\endlink
-    const std::string& ofn, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output; \link Trajectory::writeState state streams\endlink into file named `ofn.state`
+template<typename T, // type of trajectory
+         typename L, // type specifying the length of the run
+         typename D, // type specifying the frequency of stream
+         typename AutostopHandler // should support operator()(const typename T::TemporalStreamedArray &)
+         >
+TemporalStreamedArray<typename std::decay_t<T>::StreamedArray>
+run(T&& traj, ///< the trajectory to run
+    L length, ///< length of run
+    D streamFreq, ///< interval between two \link Trajectory::stream streamings\endlink
+    unsigned stateStreamFreq, ///< number of \link Trajectory::stream streamings\endlink between two \link Trajectory::writeState state streamings\endlink
+    const std::string& trajectoryFileName, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output
     const std::string& initialFileName, ///< name of file containing initial condition state for the run
-    int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streams\endlink
-    bool streamInfo, ///< governs whether a \link Trajectory::streamParameters header\endlink is streamed at the top of the output
-    bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state stream\endlink is costly)
-    const std::string& parsedCommandLine,
+    int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streamings\endlink
+    bool streamInfo, //< governs whether a \link Trajectory::streamParameters header\endlink is streamed at the top of the output
+    bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state streaming\endlink is costly)
+    const std::string& parsedCommandLine, 
     bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
     AutostopHandler&& autostopHandler
-   )
-{
-  return details::run(std::forward<Trajectory<SA>>(traj),time,deltaT,sdf,ofn,initialFileName,precision,
-                      streamInfo,firstStateStream,parsedCommandLine,doStreaming,returnStreamedArray,
-                      std::forward<AutostopHandler>(autostopHandler));
-}
-*/
+   );
 
 
-auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0,std::clog)) { });
-auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
+inline auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0,std::clog)) { });
+inline auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
 
 /// Dispatcher \related Adaptive
 /**
@@ -454,18 +437,18 @@ run(TRAJ&& traj, const ParsRun& p,
   using AHG=AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>;
   
   if constexpr (decltype(has_step(traj))::value) { // it is of the Adaptive family
-    if (p.dc) return details::run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
-                                  p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                                  doStreaming,returnStreamedArray,
-                                  AHG(p.autoStopEpsilon,p.autoStopRepetition));
+    if (p.dc) return run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
+                         p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+                         doStreaming,returnStreamedArray,
+                         AHG(p.autoStopEpsilon,p.autoStopRepetition));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
-  if (p.NDt) return details::run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+  if (p.NDt) return run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
                         p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
                         doStreaming,returnStreamedArray,
                         AHG(p.autoStopEpsilon,p.autoStopRepetition));
-  else return details::run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+  else return run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
                   p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
                   doStreaming,returnStreamedArray,
                   AHG(p.autoStopEpsilon,p.autoStopRepetition));

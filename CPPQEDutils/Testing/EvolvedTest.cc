@@ -43,8 +43,7 @@ int main(int , char**)
                       },
                     trajectory::initialTimeStep(abs(Z)),0,1e-6,1e-18);
 
-  auto streamedArray=run(static_cast<Trajectory<Array>&>(S),5.,0.01,0,string{},string{},6,false,false,string{},false,true,
-                         AutostopHandlerNoOp<Array>{});
+  auto streamedArray=run(S,5.,0.01,0,string{},string{},6,false,false,string{},false,true,AutostopHandlerNoOp<Array>{});
 
   double yDev=0;
   

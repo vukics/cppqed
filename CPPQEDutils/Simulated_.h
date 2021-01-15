@@ -28,22 +28,25 @@ template<typename A>
 class Simulated : public Adaptive<A,Trajectory<A> >
 {
 public:
+  Simulated(Simulated&&) = default; Simulated& operator=(Simulated&&) = default;
+  
   typedef Adaptive<A,Trajectory<A> > Base;
 
   typedef evolved::Evolved<A> Evolved;
 
-  Simulated(A& y, typename Evolved::Derivs derivs, double dtInit,
+  template <typename ARRAY>
+  Simulated(ARRAY&& y, typename Evolved::Derivs derivs, double dtInit,
             int logLevel,
             double epsRel, double epsAbs,
             const A& scaleAbs=A(),
             const evolved::Maker<A>& maker=evolved::MakerGSL<A>())
-    : Base(y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,maker) {}
+    : Base(std::forward<ARRAY>(y),derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,maker) {}
 
-
-  Simulated(A& array, typename Evolved::Derivs derivs, double dtInit,
+  template <typename ARRAY>
+  Simulated(ARRAY&& array, typename Evolved::Derivs derivs, double dtInit,
             const ParsEvolved& pe,
             const A& scaleAbs=A(),
-            const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(array,derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
+            const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(std::forward<ARRAY>(array),derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
 
 protected:
   typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override

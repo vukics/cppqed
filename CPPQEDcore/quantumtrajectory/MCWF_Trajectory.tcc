@@ -28,7 +28,7 @@ MCWF_Trajectory<RANK,RandomEngine>::MCWF_Trajectory(StateVector&& psi,
                                                     const mcwf::Pars<RandomEngine>& p,
                                                     const StateVectorLow& scaleAbs)
   : QuantumTrajectory(sys,p.noise,
-                      psi.getArray(),
+                      std::move(psi.getArray()),
                       [this](double t, const StateVectorLow& psi, StateVectorLow& dpsidt) {
                         if (const auto ha=this->getHa()) {
                           dpsidt=0;

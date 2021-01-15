@@ -77,13 +77,12 @@ bool restoreState(Trajectory<SA>& traj, const std::string& trajectoryFileName, c
 
 template<typename T, typename L, typename D, typename AutostopHandler>
 trajectory::TemporalStreamedArray<typename std::decay_t<T>::StreamedArray> 
-trajectory::details::run(T&& traj, L length, D streamFreq, unsigned stateStreamFreq,
-                         const std::string& trajectoryFileName, const std::string& initialFileName,
-                         int precision, bool streamInfo, bool firstStateStream,
-                         const std::string& parsedCommandLine,
-                         bool doStreaming, bool returnStreamedArray,
-                         AutostopHandler&& autostopHandler
-                        )
+trajectory::run(T&& traj, L length, D streamFreq, unsigned stateStreamFreq,
+                const std::string& trajectoryFileName, const std::string& initialFileName,
+                int precision, bool streamInfo, bool firstStateStream,
+                const std::string& parsedCommandLine,
+                bool doStreaming, bool returnStreamedArray,
+                AutostopHandler&& autostopHandler)
 {
   using namespace std; using namespace cpputils;
 
@@ -102,7 +101,7 @@ trajectory::details::run(T&& traj, L length, D streamFreq, unsigned stateStreamF
   
   const bool
     streamToFile=(trajectoryFileName!=""),  
-    continuing=restoreState(traj,trajectoryFileName,stateFileName,initialFileName);
+    continuing=details::restoreState(traj,trajectoryFileName,stateFileName,initialFileName);
 
   const double timeToReach=[&]() {
     if constexpr (endTimeMode) return length;
@@ -174,9 +173,6 @@ trajectory::details::run(T&& traj, L length, D streamFreq, unsigned stateStreamF
         stateSaved=evsStreamed=false;
       }
 
-// inline bool doStream(long      , double         ) {return true;}
-// inline bool doStream(long count, int streamFreq) {return }
-
       if (!count || [&]() {
         if constexpr (isDtMode) return true;
         else return !(count%streamFreq);
@@ -247,15 +243,6 @@ cpputils::oarchive& trajectory::AdaptiveIO<A>::writeState(cpputils::oarchive& oa
   return oar & meta_ & *evolvedIO_;
 }
 
-
-template<typename A, typename BASE> template<typename... BaseInitializationPack>
-trajectory::Adaptive<A,BASE>::Adaptive(A& y, Derivs derivs, double dtInit, int logLevel, double epsRel, double epsAbs, const A& scaleAbs, const evolved::Maker<A>& maker,
-                                       BaseInitializationPack&&... bip)
-  : AdaptiveIO<A>(maker(y,derivs,dtInit,epsRel,epsAbs,scaleAbs)),
-    BASE(std::forward<BaseInitializationPack>(bip)...),
-    evolved_(std::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())),
-    dtInit_(dtInit), logLevel_(logLevel)
-{}
 
 
 template<typename A, typename BASE>

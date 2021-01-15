@@ -39,8 +39,8 @@ public:
   typedef typename Base::Derivs Derivs;
 
   /** \see MakerGSL::MakerGSL() for an explanation of the role of `nextDtTryCorrectionFactor` */
-  _(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorrectionFactor)
-    : Base(a,derivs,dtInit,epsRel,epsAbs),
+  _(A&& a, Derivs derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs, SteppingFunction sf, double nextDtTryCorrectionFactor)
+    : Base(std::forward<A>(a),derivs,dtInit,epsRel,epsAbs),
       pImpl_(details::createImpl(this,cpputils::size(this->getA()),auxFunction,epsRel,epsAbs,cpputils::data(scaleAbs),sf)),
       sf_(sf),
       nextDtTryCorrectionFactor_(nextDtTryCorrectionFactor)
@@ -93,7 +93,7 @@ private:
 
 template<typename A>
 auto MakerGSL<A>::make(
-                       A& a,
+                       A&& a,
                        Derivs derivs,
                        double dtInit,
                        double epsRel,
@@ -101,7 +101,7 @@ auto MakerGSL<A>::make(
                        const A& scaleAbs
                       ) const -> const Ptr
 {
-  return std::make_shared<_,A&>(a,derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorrectionFactor_);
+  return std::make_shared<_>(std::forward<A>(a),derivs,dtInit,epsRel,epsAbs,scaleAbs,sf_,nextDtTryCorrectionFactor_);
 }
 
 

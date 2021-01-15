@@ -11,6 +11,7 @@
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <functional>
+#include <iostream>
 #include <memory>
 
 /// Comprises utilities related to ODE adaptive evolution
@@ -144,8 +145,8 @@ public:
   typedef std::shared_ptr<const EvolvedIO> ConstPtr;
 
   /// straightforward constructor \see TimeStepBookkeeper::TimeStepBookkeeper()
-  EvolvedIO(A& a, double dtInit, double epsRel, double epsAbs)
-    : TimeStepBookkeeper(dtInit,epsRel,epsAbs), LoggingBase(), a_(a) 
+  EvolvedIO(A&& a, double dtInit, double epsRel, double epsAbs)
+    : TimeStepBookkeeper{dtInit,epsRel,epsAbs}, LoggingBase(), a_{std::forward<A>(a)}
   {}
 
   using TimeStepBookkeeper::operator=;
@@ -173,7 +174,7 @@ private:
 
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-  A& a_;
+  A a_;
 
 };
 
@@ -204,8 +205,8 @@ public:
   typedef std::shared_ptr<const Evolved> ConstPtr;
   
   /// straightforward constructor \see EvolvedIO::EvolvedIO()
-  Evolved(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs) 
-    : EvolvedIO<A>(a,dtInit,epsRel,epsAbs), derivs_(derivs), countedDerivs_([this](double t, const A& y, A& dydt) {this->countedDerivs(t,y,dydt);})
+  Evolved(A&& a, Derivs derivs, double dtInit, double epsRel, double epsAbs) 
+    : EvolvedIO<A>(std::forward<A>(a),dtInit,epsRel,epsAbs), derivs_(derivs), countedDerivs_([this](double t, const A& y, A& dydt) {this->countedDerivs(t,y,dydt);})
   {}
 
   using TimeStepBookkeeper::operator=;
@@ -254,7 +255,7 @@ private:
 /// evolves for exactly time `deltaT`
 /** \tparam E type of the object to evolve. Implicit interface assumed: member function named step with signature `...(double)` */
 template<typename E>
-void evolve(E& e, double deltaT, std::ostream& logStream)
+void evolve(E& e, double deltaT, std::ostream& logStream=std::clog)
 {
   double endTime=e.getTime()+deltaT;
   while (double dt=endTime-e.getTime()) e.step(dt,logStream);
@@ -263,7 +264,7 @@ void evolve(E& e, double deltaT, std::ostream& logStream)
 
 /// evolves up to exactly time `t` \copydetails evolve
 template<typename E>
-void evolveTo(E& e, double t, std::ostream& logStream)
+void evolveTo(E& e, double t, std::ostream& logStream=std::clog)
 {
   evolve(e,t-e.getTime(),logStream);
 }
@@ -281,22 +282,23 @@ public:
   typedef typename Evolved<A>::Derivs Derivs;
   
   /// The factory member function expecting the most generic set of parameters
-  const Ptr operator()(A& array, Derivs derivs, double dtInit, double epsRel, double epsAbs,
+  template <typename ARRAY>
+  const Ptr operator()(ARRAY&& array, Derivs derivs, double dtInit, double epsRel, double epsAbs,
                        const A& scaleAbs ///< this parameter is basically an element-wise mask for stepsize control – for an explanation cf. [<tt>gsl_odeiv_control_scaled_new</tt>](http://www.gnu.org/software/gsl/manual/html_node/Adaptive-Step_002dsize-Control.html#Adaptive-Step_002dsize-Control)
-                      ) const {return make(array,derivs,dtInit,epsRel,epsAbs,scaleAbs);}
+                      ) const {return make(std::move(array),derivs,dtInit,epsRel,epsAbs,scaleAbs);}
 
   virtual ~Maker() {}
   
 private:
-  virtual const Ptr make(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const = 0;
+  virtual const Ptr make(A&&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const = 0;
 
 };
 
 
 template<typename A>
-typename EvolvedIO<A>::Ptr makeIO(A& a, double time=0)
+auto makeIO(A&& a, double time=0)
 {
-  typename EvolvedIO<A>::Ptr res = std::make_shared<EvolvedIO<A>, A &>(a,0,0,0);
+  typename EvolvedIO<A>::Ptr res = std::make_shared<EvolvedIO<A>>(std::forward<A>(a),0,0,0);
   res->setTime(time);
   return res;
 }

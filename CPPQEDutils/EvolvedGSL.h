@@ -31,7 +31,7 @@ private:
   typedef typename Maker<A>::Ptr Ptr;
   typedef typename Maker<A>::Derivs Derivs;
 
-  const Ptr make(A&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
+  const Ptr make(A&&, Derivs, double dtInit, double epsRel, double epsAbs, const A& scaleAbs) const;
 
   const SteppingFunction sf_;
   const double nextDtTryCorrectionFactor_;

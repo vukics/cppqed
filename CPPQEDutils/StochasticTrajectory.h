@@ -93,25 +93,25 @@ protected:
   /// \name Constructors
   //@{
   /// Straightforward constructor combining the construction of Adaptive and a random engine
-  Stochastic(A& y, typename Evolved::Derivs derivs,
+  Stochastic(A&& y, typename Evolved::Derivs derivs,
              double dtInit,
              int logLevel,
              double epsRel, double epsAbs, const A& scaleAbs,
              const evolved::Maker<A>& makerE,
              bool isNoisy,
              RandomEngine&& re)
-    : Base{y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE},
+    : Base{std::forward<A>(y),derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE},
       isNoisy_(isNoisy),
       reInitStateDescriptor_{ [re{std::move(re)}]() {std::ostringstream oss; oss<<re; return oss.str();}() },
       re_(std::forward<RandomEngine>(re)) {}
 
   /// \overload
-  Stochastic(A& y, typename Evolved::Derivs derivs,
+  Stochastic(A&& y, typename Evolved::Derivs derivs,
              double dtInit,
              const A& scaleAbs,
              const ParsStochastic<RandomEngine>& p,
              const evolved::Maker<A>& makerE)
-    : Stochastic{y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
+    : Stochastic{std::forward<A>(y),derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
                  randomutils::streamOfOrdo(p)} {}
   //@}
   

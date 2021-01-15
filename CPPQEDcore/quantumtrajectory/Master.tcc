@@ -19,7 +19,7 @@ quantumtrajectory::Master<RANK,V>::Master(DensityOperator&& rho,
                                           bool negativity,
                                           const DensityOperatorLow& scaleAbs)
   : QTraj(qs,true,
-          rho.getArray(),
+          std::move(rho.getArray()),
           [this](double t, const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow)
           {
             using namespace blitzplusplus::vfmsi;

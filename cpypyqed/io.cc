@@ -35,7 +35,7 @@ object doRead(std::shared_ptr<std::istream> ifs)
   
   list states, times;
   ARRAY a{ExtTiny<RANK>(0ul)};
-  AdaptiveIO<ARRAY> traj{evolved::makeIO(a)};
+  AdaptiveIO<ARRAY> traj{evolved::makeIO(std::move(a))};
   while ( (ifs->peek(), !ifs->eof()) ) {
     trajectory::readViaSStream(traj,ifs);
     states.append(cpputils::arrayToNumpy(a));
@@ -47,8 +47,7 @@ object doRead(std::shared_ptr<std::istream> ifs)
 template<typename T, int RANK>
 void doWrite(std::shared_ptr<std::ostream> ofs, const numpy::ndarray &a, double time)
 {
-  auto blitz_a{cpputils::numpyToArray<T,RANK>(a)};
-  trajectory::writeViaSStream(AdaptiveIO<blitz::Array<T,RANK>>{evolved::makeIO(blitz_a, time)},ofs);
+  trajectory::writeViaSStream(AdaptiveIO<blitz::Array<T,RANK>>{evolved::makeIO(cpputils::numpyToArray<T,RANK>(a), time)},ofs);
 }
 
 
