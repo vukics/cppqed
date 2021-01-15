@@ -18,7 +18,7 @@ namespace ensemble {
 
 using namespace mcwf;
 
-#define BASE_class trajectory::Ensemble< structure::AveragedCommon::Averages, quantumdata::DensityOperator<RANK> , quantumdata::StateVector<RANK> >
+#define BASE_class trajectory::Ensemble<MCWF_Trajectory<RANK,RandomEngine>,structure::AveragedCommon::Averages, quantumdata::DensityOperator<RANK> >
 
 /// Less templatized base for EnsembleMCWF \tparamRANK
 template<int RANK, typename RandomEngine>
@@ -33,9 +33,9 @@ protected:
 private:
   typedef typename Ensemble::Trajectories Trajectories;
 
-  typedef MCWF_Trajectory<RANK,RandomEngine> Single;
-
 public:
+  typedef typename Ensemble::Single Single;
+
   typedef typename Single::StateVector    StateVector   ;
   typedef typename Single::StateVectorLow StateVectorLow; 
 
@@ -53,12 +53,12 @@ protected:
         p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
 
         for (size_t i=0; i<p.nTraj; ++i) {
-          res.push_back(new Single(StateVector(psi),qs,p,scaleAbs));
+          res.emplace_back(StateVector(psi),qs,p,scaleAbs);
           randomutils::incrementForNextStream(p);
         }
         
-        return res.release();
-      } (),p.logLevel<0),
+        return res;
+      } () ),
       qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
     {}
 
@@ -132,8 +132,7 @@ public:
 private:
   typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const final
   {
-    const auto averages{*this->averaged()};
-    return dos_.stream(this->getTime(),averages,os,precision);
+    return dos_.stream(this->getTime(),this->averaged(),os,precision);
   }
   
   std::ostream& streamKey_v(std::ostream& os, size_t& i) const final {return dos_.streamKey(os,i);}
@@ -150,22 +149,22 @@ private:
 namespace trajectory { namespace averaging {
 
 
-template<int RANK>
-struct HandleType<quantumdata::DensityOperator<RANK> > : mpl::identity<std::shared_ptr<quantumdata::DensityOperator<RANK> > > {};
-
-
-template<typename SA, int RANK>
-struct AverageTrajectoriesInRange<SA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >
+template<int RANK, typename RandomEngine>
+struct AverageTrajectoriesInRange<quantumtrajectory::MCWF_Trajectory<RANK,RandomEngine>,
+                                  structure::AveragedCommon::Averages,
+                                  quantumdata::DensityOperator<RANK>>
 {
-  typedef typename Ensemble<SA,quantumdata::DensityOperator<RANK>,quantumdata::StateVector<RANK> >::Trajectories::const_iterator CI;
+  typedef typename Ensemble<quantumtrajectory::MCWF_Trajectory<RANK,RandomEngine>,
+                            structure::AveragedCommon::Averages,
+                            quantumdata::DensityOperator<RANK>>::Trajectories::const_iterator CI;
   
   static const auto _(CI begin, CI end)
   {
-    auto res(std::make_shared<quantumdata::DensityOperator<RANK> >(*begin->averaged()));
+    quantumdata::DensityOperator<RANK> res(begin->averaged());
       
-    for (auto i=begin+1; i<end; i++) i->averaged()->addTo(*res);
+    for (auto i=begin+1; i<end; i++) i->averaged().addTo(res);
 
-    *res/=size2Double(end-begin);
+    res/=size2Double(end-begin);
     return res;
 
   }

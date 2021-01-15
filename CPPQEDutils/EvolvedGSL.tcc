@@ -7,8 +7,6 @@
 
 #include "EvolvedGSL.h"
 
-#include "Evolved.tcc"
-
 
 namespace evolved {
 
@@ -68,7 +66,7 @@ private:
     return details::onSuccess;
   }
 
-  void step_v(double deltaT)
+  void step_v(double deltaT, std::ostream&) final
   {
     double
       time=this->getTime(),

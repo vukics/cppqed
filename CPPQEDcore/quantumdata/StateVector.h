@@ -95,7 +95,14 @@ public:
   
   /// Assignment with by-value semantics.
   /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
-  StateVector& operator=(const StateVector& sv) {ABase::operator=(sv.getArray()); return *this;}
+  StateVector& operator=(const StateVector&) = default;
+ 
+  StateVector& operator=(StateVector&& sv)
+  {
+    ABase::operator=(std::move(sv));
+    LDO_Base::setDimensions(sv.getDimensions());
+    return *this;
+  }
  
   /// \name Subscripting
   //@{

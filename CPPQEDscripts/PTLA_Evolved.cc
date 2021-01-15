@@ -16,24 +16,6 @@ using namespace qbit      ;
 
 typedef DArray<1> Array;
 
-void derivs(double, const Array& b, Array& dbdt, const ParsPumpedLossy& p)
-{
-  double
-    z=b(0);
-
-  dcomp
-    Omega(-p.gamma,p.delta),
-    s(b(1),-b(2));
-
-  dcomp
-    temp(-2.*conj(p.eta)*z+conj(Omega)*s);
-
-  dbdt=
-    2.*real(p.eta*s)+2*p.gamma*(1-z),
-     real(temp),
-    -imag(temp);
-}
-
 
 int main(int argc, char* argv[])
 {
@@ -60,7 +42,18 @@ int main(int argc, char* argv[])
      -2*imag(rho(0)(1))  ;
   }
 
-  Simulated<Array> S(zxy,bind(derivs,_1,_2,_3,pp2la),dtinit,pt);
+  Simulated<Array> S(zxy,[&](double, const Array& b, Array& dbdt) {
+    double z=b(0);
+
+    dcomp Omega(-pp2la.gamma,pp2la.delta), s(b(1),-b(2));
+
+    dcomp temp(-2.*conj(pp2la.eta)*z+conj(Omega)*s);
+
+    dbdt=
+      2.*real(pp2la.eta*s)+2*pp2la.gamma*(1-z),
+       real(temp),
+      -imag(temp);    
+  },dtinit,pt);
   
   run(S,pt);
   

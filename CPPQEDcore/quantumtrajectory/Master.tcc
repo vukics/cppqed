@@ -11,8 +11,6 @@
 #include "VectorFromMatrixSliceIterator.h"
 #include "ComplexArrayExtensions.h"
 
-#include <boost/range/algorithm_ext/for_each.hpp>
-
 
 template<int RANK, typename V>
 quantumtrajectory::Master<RANK,V>::Master(DensityOperator&& rho,
@@ -22,7 +20,6 @@ quantumtrajectory::Master<RANK,V>::Master(DensityOperator&& rho,
                                           const DensityOperatorLow& scaleAbs)
   : QTraj(qs,true,
           rho.getArray(),
-          //std::bind(&Master::derivs,this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3),
           [this](double t, const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow)
           {
             using namespace blitzplusplus::vfmsi;
@@ -64,9 +61,9 @@ quantumtrajectory::Master<RANK,V>::Master(DensityOperator&& rho,
 
 
 template<int RANK, typename V>
-void quantumtrajectory::Master<RANK,V>::step_v(double deltaT)
+void quantumtrajectory::Master<RANK,V>::step_v(double deltaT, std::ostream& logStream)
 {
-  this->getEvolved()->step(deltaT);
+  this->getEvolved()->step(deltaT,logStream);
   if (const auto ex=this->getEx()) {
     using namespace blitzplusplus;
     using namespace vfmsi;
@@ -126,26 +123,5 @@ std::ostream& quantumtrajectory::Master<RANK,V>::streamParameters_v(std::ostream
   return os;
 }
 
-
-/*
-
-// NEEDS_WORK needs to create again the iterators because the array stored in the iterator IS NOT transposed because transpose does not touch the data. For this reason one must be very careful with reusing SliceIterators because probably most of the times it does not produce the required semantics. Alternatively, one could imagine a rebind functionality in SliceIterators.
-
-template<int RANK>
-void Base<RANK>::unaryIter(DensityOperatorLow& rhoLow, UnaryFunction function) const
-{
-  using namespace blitzplusplus::vfmsi;
-  boost::for_each(fullRange<Left>(rhoLow),function);
-}
-
-
-template<int RANK>
-void Base<RANK>::binaryIter(const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, BinaryFunction function) const
-{
-  using namespace blitzplusplus::vfmsi;
-  boost::for_each(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow),function);
-}
-
-*/
 
 #endif // CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_TCC_INCLUDED

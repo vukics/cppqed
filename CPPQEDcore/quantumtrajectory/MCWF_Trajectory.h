@@ -13,13 +13,6 @@
 
 #include <tuple>
 
-namespace trajectory { namespace averaging {
-
-template<int RANK>
-struct HandleType<quantumdata::StateVector<RANK> > : mpl::identity<std::shared_ptr<quantumdata::StateVector<RANK> > > {};
-
-} } // trajectory::averaging
-
 
 namespace quantumtrajectory {
 
@@ -54,7 +47,7 @@ struct Pars : public trajectory::ParsStochastic<RandomEngine> {
 } // mcwf
 
 
-#define BASE_class trajectory::Stochastic<typename structure::AveragedCommon::Averages,\
+#define BASE_class trajectory::Stochastic<structure::AveragedCommon::Averages,\
                                           typename quantumdata::Types<RANK>::StateVectorLow,\
                                           quantumdata::StateVector<RANK>,\
                                           RandomEngine>
@@ -90,14 +83,14 @@ struct Pars : public trajectory::ParsStochastic<RandomEngine> {
  * This has several drawbacks, however, the most significant being that in the ODE stepper, it is not clear what to take as the timestep to try at the point when the direction of time is reversed.
  * (Although in evolved::Evolved it is simply taken to be the timestep done in the last step…)
  * 
- * \todo factor out template-parameter independent code
- * 
  */
 
 template<int RANK, typename RandomEngine>
 class MCWF_Trajectory : public QuantumTrajectory<RANK,BASE_class>
 {
 public:
+  MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
+
   typedef structure::Exact        <RANK> Exact      ;
   typedef structure::Hamiltonian  <RANK> Hamiltonian;
   typedef structure::Liouvillean  <RANK> Liouvillean;
@@ -122,10 +115,6 @@ public:
                   const mcwf::Pars<RandomEngine>& p, ///< parameters of the evolution
                   const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in Master::Master
                  );
-
-  /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
-  /** Implemented via structure::Hamiltonian::addContribution */
-  void derivs(double, const StateVectorLow&, StateVectorLow&) const;
 
   /// \name Getters
   //@{
@@ -155,20 +144,20 @@ private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Rates Rates;
 
-  void step_v(double) override; // performs one single adaptive-stepsize MCWF step of specified maximal length
+  void step_v(double, std::ostream&) override; // performs one single adaptive-stepsize MCWF step of specified maximal length
 
   std::ostream& streamParameters_v(std::ostream&) const override;
 
-  const typename Base::AveragedHandle averaged_v() const override {return std::make_shared<StateVector>(std::move(psi_));}
+  StateVector averaged_v() const override {return psi_;}
 
   const std::string trajectoryID_v() const override {return "MCWF_Trajectory";}
 
-  double                coherentTimeDevelopment(                    double Dt);
-  const IndexSVL_tuples calculateSpecialRates  (      Rates* rates, double  t) const;
+  double coherentTimeDevelopment(double Dt, std::ostream&);
+  const IndexSVL_tuples calculateSpecialRates(Rates* rates, double t) const;
 
-  bool                  manageTimeStep             (const Rates& rates, evolved::TimeStepBookkeeper*, bool logControl=true);
+  bool manageTimeStep (const Rates& rates, evolved::TimeStepBookkeeper*, std::ostream&, bool logControl=true);
 
-  void                  performJump                (const Rates&, const IndexSVL_tuples&, double); // LOGICALLY non-const
+  void performJump (const Rates&, const IndexSVL_tuples&, double, std::ostream&); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   StateVector psi_;

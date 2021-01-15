@@ -3,6 +3,8 @@
 #ifndef CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 #define CPPQEDCORE_UTILS_EVOLVED_H_INCLUDED
 
+#include "MathExtensions.h"
+
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -10,7 +12,6 @@
 
 #include <functional>
 #include <memory>
-
 
 /// Comprises utilities related to ODE adaptive evolution
 namespace evolved {
@@ -143,7 +144,9 @@ public:
   typedef std::shared_ptr<const EvolvedIO> ConstPtr;
 
   /// straightforward constructor \see TimeStepBookkeeper::TimeStepBookkeeper()
-  EvolvedIO(A&, double dtInit, double epsRel, double epsAbs);
+  EvolvedIO(A& a, double dtInit, double epsRel, double epsAbs)
+    : TimeStepBookkeeper(dtInit,epsRel,epsAbs), LoggingBase(), a_(a) 
+  {}
 
   using TimeStepBookkeeper::operator=;
 
@@ -201,7 +204,9 @@ public:
   typedef std::shared_ptr<const Evolved> ConstPtr;
   
   /// straightforward constructor \see EvolvedIO::EvolvedIO()
-  Evolved(A&, Derivs, double dtInit, double epsRel, double epsAbs);
+  Evolved(A& a, Derivs derivs, double dtInit, double epsRel, double epsAbs) 
+    : EvolvedIO<A>(a,dtInit,epsRel,epsAbs), derivs_(derivs), countedDerivs_([this](double t, const A& y, A& dydt) {this->countedDerivs(t,y,dydt);})
+  {}
 
   using TimeStepBookkeeper::operator=;
   using EvolvedIO<A>::getA;
@@ -209,9 +214,19 @@ public:
   virtual ~Evolved() {}
 
   /// takes a single adaptive step
-  void step(double deltaT ///< *maximum* length of the timestep
-            );
-
+  void step(double deltaT, ///< *maximum* length of the timestep
+            std::ostream& logStream)
+  {
+    if (mathutils::sign(deltaT)!=mathutils::sign(EvolvedIO<A>::getDtTry())) {
+      // Stepping backward
+      this->setDtTry(-EvolvedIO<A>::getDtDid());
+      step_v(deltaT,logStream);
+    }
+    else step_v(deltaT,logStream);
+    this->registerStep();
+    this->registerFailedSteps(nFailedStepsLast_v());
+  }
+  
   std::ostream& streamParameters(std::ostream& os) const {return streamParameters_v(os);} ///< delegates to private virtual
 
   /// Wrapper around the derivatives that registers the number of calls
@@ -225,7 +240,7 @@ public:
   size_t nFailedStepsLast() const {return nFailedStepsLast_v();} ///< number of failed steps in the last timestep (delegates to pure virtual)
   
 private:
-  virtual void step_v(double deltaT) = 0;
+  virtual void step_v(double deltaT, std::ostream&) = 0;
   virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
   virtual size_t nFailedStepsLast_v() const = 0;
 
@@ -239,14 +254,18 @@ private:
 /// evolves for exactly time `deltaT`
 /** \tparam E type of the object to evolve. Implicit interface assumed: member function named step with signature `...(double)` */
 template<typename E>
-void evolve(E&, double deltaT);
+void evolve(E& e, double deltaT, std::ostream& logStream)
+{
+  double endTime=e.getTime()+deltaT;
+  while (double dt=endTime-e.getTime()) e.step(dt,logStream);
+}
 
 
 /// evolves up to exactly time `t` \copydetails evolve
 template<typename E>
-void evolveTo(E& e, double t)
+void evolveTo(E& e, double t, std::ostream& logStream)
 {
-  evolve(e,t-e.getTime());
+  evolve(e,t-e.getTime(),logStream);
 }
 //@}
 
@@ -273,6 +292,14 @@ private:
 
 };
 
+
+template<typename A>
+typename EvolvedIO<A>::Ptr makeIO(A& a, double time=0)
+{
+  typename EvolvedIO<A>::Ptr res = std::make_shared<EvolvedIO<A>, A &>(a,0,0,0);
+  res->setTime(time);
+  return res;
+}
 
 
 } // evolved

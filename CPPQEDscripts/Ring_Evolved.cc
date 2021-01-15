@@ -11,25 +11,6 @@ using namespace mathutils ;
 typedef CArray<1> Array;
 
 
-void derivs(double, const Array& b, Array& dbdt,
-            const particle::Pars& pp,
-            const mode::ParsPumpedLossy& pm1, const mode::ParsPumpedLossy& pm2,
-            const particlecavity::ParsAlong pac1, const particlecavity::ParsAlong pac2)
-{
-  const double x=PI*pp.init.getX0();
-
-  const dcomp
-    z1=DCOMP_I*(pm1.delta-pac1.uNot*sqrAbs(modeFunction(pac1.modeCav,x)))-pm1.kappa,
-    z2=DCOMP_I*(pm2.delta-pac2.uNot*sqrAbs(modeFunction(pac2.modeCav,x)))-pm2.kappa,
-    g=sign(pac1.uNot)*sqrt(pac1.uNot*pac2.uNot)*conj(modeFunction(pac1.modeCav,x))*modeFunction(pac2.modeCav,x);
-
-  dbdt=
-    z1*b(0)+pm1.eta-DCOMP_I*     g *b(1),
-    z2*b(1)+pm2.eta-DCOMP_I*conj(g)*b(0);
-
-}
-
-
 int main(int argc, char* argv[])
 {
   // ****** Parameters of the Problem
@@ -51,11 +32,19 @@ int main(int argc, char* argv[])
 
   Array alpha(2); alpha=pmP.minit,pmM.minit;
 
-  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pp,pmP,pmM,ppcP,ppcM),1e-6,pe);
+  Simulated<Array> S(alpha,[&](double, const Array& b, Array& dbdt) {
+    const double x=PI*pp.init.getX0();
+
+    const dcomp
+      z1=DCOMP_I*(pmP.delta-ppcP.uNot*sqrAbs(modeFunction(ppcP.modeCav,x)))-pmP.kappa,
+      z2=DCOMP_I*(pmM.delta-ppcM.uNot*sqrAbs(modeFunction(ppcM.modeCav,x)))-pmM.kappa,
+      g=sign(ppcP.uNot)*sqrt(ppcP.uNot*ppcM.uNot)*conj(modeFunction(ppcP.modeCav,x))*modeFunction(ppcM.modeCav,x);
+
+    dbdt=
+      z1*b(0)+pmP.eta-DCOMP_I*     g *b(1),
+      z2*b(1)+pmM.eta-DCOMP_I*conj(g)*b(0);
+  },1e-6,pe);
 
   run(S,pr);
-
-
-
 
 }

@@ -131,7 +131,7 @@ _(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
     }
     else if (pe.evol==evolution::ENSEMBLE) {
       EnsembleMCWF<RANK,RandomEngine,V> traj{initial,sys,pe,pe.negativity};
-      return {traj.averaged(),
+      return {std::make_shared<quantumdata::DensityOperator<RANK>>(std::move(traj.averaged())),
               trajectory::run(traj,pe,doStreaming,returnStreamedArray)};
     }
     else {

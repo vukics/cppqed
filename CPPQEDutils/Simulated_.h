@@ -55,7 +55,7 @@ protected:
   }
   
 private:
-  void step_v(double deltaT) final {this->getEvolved()->step(deltaT);}
+  void step_v(double deltaT, std::ostream& logStream) final {this->getEvolved()->step(deltaT,logStream);}
 
   std::ostream& streamKey_v(std::ostream& os, size_t&) const final {return os;}
 

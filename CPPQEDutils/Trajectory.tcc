@@ -5,7 +5,6 @@
 #include "Trajectory.h"
 
 #include "CommentingStream.h"
-#include "Evolved.tcc"
 #include "FormDouble.h"
 #include "IO_Manip.h"
 #include "Version.h"
@@ -119,7 +118,8 @@ trajectory::details::run(T&& traj, L length, D streamFreq, unsigned stateStreamF
                                            static_pointer_cast<ostream>(std::make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))); // regulates the deletion policy
   
   if (outstream->fail()) throw std::runtime_error("Trajectory file opening error: "+trajectoryFileName);
-  traj.setLogStreamDuringRun(outstream); // logging during run occurs with default precision, so this is a different stream from commentingStream below
+  
+  CommentingStream logStream{outstream};
   
   ostream& os=*outstream;
   IO_Manipulator::_(os);
@@ -166,10 +166,10 @@ trajectory::details::run(T&& traj, L length, D streamFreq, unsigned stateStreamF
 
       if (count) {
         // advance trajectory
-        if constexpr (!isDtMode) {traj.step(length-traj.getTime());}
+        if constexpr (!isDtMode) {traj.step(length-traj.getTime(),logStream);}
         else {
-          if constexpr (endTimeMode) traj.evolve(std::min(streamFreq,length-traj.getTime()));
-          else traj.evolve(streamFreq);
+          if constexpr (endTimeMode) traj.evolve(std::min(streamFreq,length-traj.getTime()),logStream);
+          else traj.evolve(streamFreq,logStream);
         }
         stateSaved=evsStreamed=false;
       }
@@ -288,11 +288,11 @@ cpputils::oarchive& trajectory::Adaptive<A,BASE>::writeState_v(cpputils::oarchiv
 
 
 template<typename A, typename BASE>
-void trajectory::Adaptive<A,BASE>::step(double deltaT)
+void trajectory::Adaptive<A,BASE>::step(double deltaT, std::ostream& logStream)
 {
-  step_v(deltaT);
+  step_v(deltaT,logStream);
   if (logLevel_>3)
-    this->getLogStreamDuringRun()<<"Number of failed steps in this timestep: "<<evolved_->nFailedStepsLast()<<std::endl;
+    logStream<<"Number of failed steps in this timestep: "<<evolved_->nFailedStepsLast()<<std::endl;
 }
 
 

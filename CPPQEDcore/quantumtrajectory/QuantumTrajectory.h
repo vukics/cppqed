@@ -36,6 +36,8 @@ public:
   using TrajectoryBase=BASE;
   
 protected:
+  QuantumTrajectory(QuantumTrajectory&&) = default; QuantumTrajectory& operator=(QuantumTrajectory&&) = default;
+
   /// Constructor forwarding to `BASE` and QuantumSystemWrapper
   template<typename... ArgumentPack>
   QuantumTrajectory(typename structure::QuantumSystem<RANK>::Ptr qs, bool isNoisy, ArgumentPack&&... argumentPack) 

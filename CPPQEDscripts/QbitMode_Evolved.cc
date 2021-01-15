@@ -16,14 +16,6 @@ using namespace trajectory;
 typedef CArray<1> Array;
 
 
-void derivs(double, const Array& b, Array& dbdt, 
-            const mode::ParsPumpedLossy& plm, const qbit::ParsPumpedLossy& pqb, dcomp g)
-{
-  dbdt=
-    dcomp(-plm.kappa,plm.delta)*b(0)+g*b(1)+plm.eta,
-    dcomp(-pqb.gamma,pqb.delta)*b(1)-g*b(0)-pqb.eta;
-}
-
 
 int main(int argc, char* argv[])
 {
@@ -49,7 +41,11 @@ int main(int argc, char* argv[])
   
   alpha=pplm.minit,pplqb.qbitInit;
 
-  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pplm,pplqb,pjc.g),dtinit,pt);
+  Simulated<Array> S(alpha,[&](double, const Array& b, Array& dbdt) {
+    dbdt=
+      dcomp(-pplm.kappa,pplm.delta)*b(0)+pjc.g*b(1)+pplm.eta,
+      dcomp(-pplqb.gamma,pplqb.delta)*b(1)-pjc.g*b(0)-pplqb.eta;
+  },dtinit,pt);
 
   run(S,pt);
 

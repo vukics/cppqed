@@ -48,6 +48,9 @@ class Master : public QuantumTrajectory<RANK,
                                         trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow,
                                                              trajectory::Trajectory<typename structure::AveragedCommon::Averages>>>
 {
+protected:
+  Master(Master&&) = default; Master& operator=(Master&&) = default;
+
 public:
   using Adaptive=trajectory::Adaptive<typename quantumdata::Types<RANK>::DensityOperatorLow, trajectory::Trajectory<typename structure::AveragedCommon::Averages>>;
   
@@ -64,9 +67,6 @@ public:
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  /// The actual function calculating the time derivative for \link evolved::Evolved ODE evolution\endlink
-  void derivs(double, const DensityOperatorLow&, DensityOperatorLow&) const;
-
   Master(DensityOperator&& rho, ///< the density operator to be evolved
          typename QuantumSystem::Ptr sys, ///< object representing the quantum system
          const master::Pars& pt, ///< parameters of the evolution
@@ -79,7 +79,7 @@ private:
   
   std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return dos_.streamKey(os,i);}
 
-  void step_v(double) final;
+  void step_v(double, std::ostream&) final;
 
   std::ostream& streamParameters_v(std::ostream&) const override;
 

@@ -75,8 +75,15 @@ public:
   DensityOperator() : LDO_Base(Dimensions{size_t(0)}), ABase() {}
 
   /// Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
-  DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho.getArray()); return *this;}
+  DensityOperator& operator=(const DensityOperator&) = default;// {ABase::operator=(rho.getArray()); return *this;}
 
+  DensityOperator& operator=(DensityOperator&& rho)
+  {
+    ABase::operator=(std::move(rho));
+    LDO_Base::setDimensions(rho.getDimensions());
+    return *this;
+  }
+  
 private:
   class IndexerProxy
   {

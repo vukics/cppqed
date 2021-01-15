@@ -100,19 +100,21 @@ template<typename SA>
 class Trajectory
 {
 protected:
-  Trajectory(const Trajectory&) = delete; Trajectory& operator=(const Trajectory&) = delete;
   Trajectory() = default;
+  Trajectory(const Trajectory&) = delete; Trajectory& operator=(const Trajectory&) = delete;
+  Trajectory(Trajectory&&) = default; Trajectory& operator=(Trajectory&&) = default;
   
 public:
   /// Propagation for a time interval of exactly deltaT
-  void evolve(double deltaT) {evolve_v(deltaT);}
+  /** \note logStream must always be flushed (e.g. with `std::endl`) before anything else gets to write on the same underlying stream  */
+  void evolve(double deltaT, std::ostream& logStream) {evolve_v(deltaT, logStream);}
 
   using StreamedArray=SA;
   using StreamReturnType=std::tuple<std::ostream&,SA>;
   
   /// Streams a limited set of relevant physical and numerical information about the actual state of Trajectory at the actual time instant
   StreamReturnType stream(std::ostream& os, int precision ///< the precision (number of digits) of stream
-                           ) const
+                         ) const
   {
     const FormDouble fd(formdouble::positive(precision));
     auto res{stream_v( os<<fd(getTime())<<fd(getDtDid()) , precision)};
@@ -143,16 +145,10 @@ public:
 
   virtual ~Trajectory() {}
 
-  void setLogStreamDuringRun(std::shared_ptr<std::ostream> os) {logStream_.set(os);}
-
-protected:
-  /// The stream hence obtained must always be flushed (e.g. with `std::endl`) before anything else gets to write on the same underlying stream
-  std::ostream& getLogStreamDuringRun() const {return logStream_;}
-  
 private:
-  virtual void            evolve_v(double)       = 0; // A step of exactly deltaT
-  virtual double         getTime_v()       const = 0;
-  virtual double        getDtDid_v()       const = 0;
+  virtual void evolve_v(double, std::ostream&) = 0; 
+  virtual double getTime_v() const = 0;
+  virtual double getDtDid_v() const = 0;
   
   virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
   virtual StreamReturnType stream_v(std::ostream&, int) const = 0;
@@ -162,8 +158,6 @@ private:
   virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
 
   virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
-
-  mutable cpputils::CommentingStream logStream_{std::shared_ptr<std::ostream>{&std::clog,[](auto*){}}};
 
 };
 
@@ -179,6 +173,9 @@ private:
 template<typename A>
 class AdaptiveIO
 {
+protected:
+  AdaptiveIO(AdaptiveIO&&) = default; AdaptiveIO& operator=(AdaptiveIO&&) = default;
+  
 private:
   typedef evolved::EvolvedIO<A> EvolvedIO;
 
@@ -223,6 +220,9 @@ private:
 template<typename A, typename BASE>
 class Adaptive : public trajectory::AdaptiveIO<A>, public BASE
 {
+protected:
+  Adaptive(Adaptive&&) = default; Adaptive& operator=(Adaptive&&) = default;
+
 public:
   // needed to break ambiguity with identically named functions in AdaptiveIO
   using BASE::readState; using BASE::writeState; using BASE::getTime;
@@ -231,8 +231,8 @@ public:
 
   /// corresponding to Evolved::step, it takes a single adaptive step
   /** It does not delegate directly to Evolved::step, as usually trajectories need to do more for a step than just propagating the ODE: instead, it is kept purely virtual */
-  void step(double deltaT ///< *maximum* length of the timestep
-           );
+  void step(double deltaT, ///< *maximum* length of the timestep
+            std::ostream& logStream);
   
   virtual ~Adaptive() {}
 
@@ -272,11 +272,11 @@ private:
 
   double getDtDid_v() const final {return evolved_->getDtDid();}
 
-  void evolve_v(double deltaT) final {evolved::evolve<Adaptive>(*this,deltaT);}
+  void evolve_v(double deltaT, std::ostream& logStream) final {evolved::evolve<Adaptive>(*this,deltaT,logStream);}
 
   double getTime_v() const final {return evolved_->getTime();}
 
-  virtual void step_v(double deltaT) = 0;
+  virtual void step_v(double deltaT, std::ostream& logStream) = 0;
 
   virtual const std::string trajectoryID_v() const = 0;
   
@@ -415,8 +415,8 @@ run(Trajectory<SA>&& traj, ///< the trajectory to run
 */
 
 
-auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0)) { });
-auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0)) { });
+auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0,std::clog)) { });
+auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
 
 /// Dispatcher \related Adaptive
 /**
