@@ -101,16 +101,16 @@ template<typename Engine>
 constexpr auto EngineID_v = std::nullopt;
 
 template<>
-static const std::string EngineID_v<GSL_Engine> = "GSL_Taus2";
+inline const std::string EngineID_v<GSL_Engine> = "GSL_Taus2";
 
 template<>
-static const std::string EngineID_v<std::mt19937_64> = "STD_MT19937_64";
+inline const std::string EngineID_v<std::mt19937_64> = "STD_MT19937_64";
 
 template<>
-static const std::string EngineID_v<pcg64> = "PCG64";
+inline const std::string EngineID_v<pcg64> = "PCG64";
 
 template<>
-static const std::string EngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
+inline const std::string EngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
 
 
 // template<>
