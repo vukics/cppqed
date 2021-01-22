@@ -53,11 +53,11 @@ protected:
         p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
 
         for (size_t i=0; i<p.nTraj; ++i) {
-          res.emplace_back(StateVector(psi),qs,p,scaleAbs);
+          res.push_back(new Single(StateVector(psi),qs,p,scaleAbs));// emplace_back(StateVector(psi),qs,p,scaleAbs);
           randomutils::incrementForNextStream(p);
         }
         
-        return res;
+        return res.release();
       } () ),
       qs_(qs), nBins_(p.nBins), nJumpsPerBin_(p.nJumpsPerBin)
     {}

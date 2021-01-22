@@ -9,6 +9,8 @@
 
 #include "Conversions.h"
 
+#include <boost/ptr_container/ptr_vector.hpp>
+
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 
@@ -177,7 +179,10 @@ public:
   
   using SingleToBeAveraged=typename Single::ToBeAveraged;
 
-  typedef std::vector<Single> Trajectories;
+#ifndef NDEBUG
+#pragma GCC warning "TODO: replace with std::vector"
+#endif // NDEBUG
+  typedef boost::ptr_vector<Single> Trajectories;
   
   /// Averages only in a range `begin..begin+n-1`
   /** It could be called `averaged` as well, but it is not good to redefine an \link Averageable::averaged inherited non-virtual function\endlink. */
@@ -187,7 +192,7 @@ public:
 
 protected:
   /// Generic constructor
-  Ensemble(Trajectories&& trajs ///< the sequence of Singles (in general, there is no way to create different Singles from a given set of ctor parameters)
+  Ensemble(std::unique_ptr<Trajectories> trajs ///< the sequence of Singles (in general, there is no way to create different Singles from a given set of ctor parameters)
           ) : trajs_(std::move(trajs)) {}
 
   /// Getter
