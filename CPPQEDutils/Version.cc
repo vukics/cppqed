@@ -14,7 +14,10 @@ using namespace std;
 string versionHelper()
 {
   return "http://github.com/vukics/cppqed\ncommit# " +
-         string(cppqed_GIT_SHA1) + 
+         string(cppqed_GIT_SHA1) +
+#ifndef NDEBUG
+         "\nDEBUG build" +
+#endif // NDEBUG
          "\n\nCompiled with\nBoost library collection : Version " +
          string(BOOST_LIB_VERSION).replace(1,1,".") +
          "\nGnu Scientific Library   : Version " +
