@@ -128,8 +128,8 @@ protected:
  * if 'this' is not captured, it’s an error ("'this' cannot be implicitly captured in this context"),
  * while if it’s captured, it’s a warning ("lambda capture 'this' is not used"), so we disable the warning
  */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-lambda-capture"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-lambda-capture"
     mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,&rates,t,&matrix](auto arg) {
       using T = decltype(arg);
       rates(T::value)=lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedRate(t,matrix);
@@ -155,7 +155,7 @@ protected:
       using T = decltype(arg);
       if (T::value==lindbladNo) lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedActWithSuperoperator(t,rho,drhodt);
     });
-#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
   }
 
 };
