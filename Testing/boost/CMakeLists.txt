@@ -10,11 +10,11 @@ endif()
 
 set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc)
 
-add_executable(tester main.cc ${BOOST_TEST_SOURCES})
-target_link_libraries(tester CPPQED::CPPQEDelements Boost::unit_test_framework)
+add_executable(boostTester main.cc ${BOOST_TEST_SOURCES})
+target_link_libraries(boostTester CPPQED::CPPQEDelements Boost::unit_test_framework)
 
 set(BOOST_TESTS LAZY_DENSITY_OPERATOR_FFTRANSFORM)
 foreach(BT ${BOOST_TESTS})
   declaretest(${BT})
-  add_test(NAME ${TESTNAME} COMMAND $<TARGET_FILE:tester> -t ${BT})
+  add_test(NAME ${TESTNAME} COMMAND $<TARGET_FILE:boostTester> -t ${BT})
 endforeach()
