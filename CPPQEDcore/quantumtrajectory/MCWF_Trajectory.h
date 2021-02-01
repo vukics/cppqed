@@ -123,6 +123,8 @@ public:
   
   using Base::getTime;
 
+  const StateVector& getState() const {return psi_;}
+  
 protected:
   using Base::getEvolved; using Base::getDtTry;
 

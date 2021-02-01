@@ -71,7 +71,7 @@ void throw_type(std::string typeID)
 
 object read(str filename) 
 {
-  std::string f = extract<std::string>(filename);
+  auto f = extract<std::string>(filename);
 
   trajectory::SerializationMetadata meta{trajectory::readMeta(trajectory::openStateFileReading(f))};
 
