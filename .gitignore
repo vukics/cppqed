@@ -10,3 +10,4 @@ external
 .ipynb_checkpoints
 .directory
 CPPQEDcore/doc/logoCppQED_old.*
+OwnScripts/
