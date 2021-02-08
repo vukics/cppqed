@@ -8,9 +8,46 @@
 #include "ComplexExtensions.h"
 #include "SliceIterator.h"
 
+#include <boost/numeric/odeint.hpp>
+
 #include <blitz/array.h>
 
 #include <stdexcept>
+
+
+
+namespace boost { namespace numeric { namespace odeint {
+  
+template<typename Numtype, int RANK>
+struct is_resizeable<blitz::Array<Numtype,RANK>> : boost::true_type {};
+
+template<typename Numtype, int RANK>
+struct same_size_impl<blitz::Array<Numtype,RANK>, blitz::Array<Numtype,RANK>>
+{ // define how to check size
+  static bool same_size(const blitz::Array<Numtype,RANK> &v1, const blitz::Array<Numtype,RANK> &v2) {return all( v1.shape() == v2.shape() );}
+};
+
+template<typename Numtype, int RANK>
+struct resize_impl<blitz::Array<Numtype,RANK>, blitz::Array<Numtype,RANK>>
+{ // define how to resize
+  static void resize(blitz::Array<Numtype,RANK> &v1, const blitz::Array<Numtype,RANK> &v2) {v1.resize( v2.shape() );}
+};
+
+template<typename Numtype, int RANK>
+struct vector_space_norm_inf<blitz::Array<Numtype,RANK>>
+{
+  typedef double result_type;
+  double operator()(const blitz::Array<Numtype,RANK>& v ) const
+  {
+    return max( abs(v) );
+  }
+};
+
+template<typename Numtype, int RANK>
+struct norm_result_type<blitz::Array<Numtype,RANK>> : mpl::identity<double> {};
+
+} } } // boost::numeric::odeint
+
 
 /// An array of doubles of arbitrary arity
 template <int RANK> using DArray=blitz::Array<double,RANK>;
@@ -160,7 +197,7 @@ inline size_t stride(const CArray<1>& a) {return a.stride(0);}
 
 
 
-/// \name `blitz::Array` traversal traits for unary double and complex arrays
+/// \name `blitz::Array` traversal traits for double and complex arrays of arbitrary arity
 //@{
 /**
  * \note this is broken since `blitz::Array` iterators are not random-access
