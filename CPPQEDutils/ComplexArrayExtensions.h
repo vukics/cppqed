@@ -17,15 +17,13 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 
 
-namespace blitzplusplus {
+namespace cppqedutils {
 
-
-inline double sqrAbs(dcomp c) {return mathutils::sqrAbs(c);}
 
 BZ_DECLARE_FUNCTION_RET(sqrAbs,double)
 
 
-namespace details {
+namespace blitzplusplus {
 
 #define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_DIV(BLITZ_ARRAY_LARGEST_RANK,2))
 #define BOOST_PP_FILENAME_1 "ComplexArrayExtensions.h"
@@ -35,7 +33,7 @@ namespace details {
 #undef BOOST_PP_FILENAME_1
 #undef BOOST_PP_ITERATION_LIMITS
 
-} // details
+} // blitzplusplus
 
 
 template<int TWO_TIMES_RANK>
@@ -43,7 +41,7 @@ std::enable_if_t<TWO_TIMES_RANK%2==0>
 hermitianConjugateSelf(CArray<TWO_TIMES_RANK>& array) 
 {
   array=conj(array); 
-  details::helpHermitianConjugate(array);
+  blitzplusplus::helpHermitianConjugate(array);
 }
 
 
@@ -52,7 +50,7 @@ std::enable_if_t<TWO_TIMES_RANK%2==0,CArray<TWO_TIMES_RANK>>
 hermitianConjugate(const CArray<TWO_TIMES_RANK>& array)
 {
   CArray<TWO_TIMES_RANK> res(conj(array));
-  details::helpHermitianConjugate(res);
+  blitzplusplus::helpHermitianConjugate(res);
   return res;
 }
 
@@ -61,7 +59,7 @@ namespace dodirect {
 
 using namespace linalg;
 
-template<bool> void doDirect(CMatrix&, const CVector&, const CVector&);
+template<bool> void _(CMatrix&, const CVector&, const CVector&);
 
 const bool multiplication=true;
 const bool addition=false;
@@ -89,14 +87,14 @@ doDirect(const CArray<RANK1>& array1, const CArray<RANK2>& array2)
     CVector r1array2(unaryArray(array2));
     CMatrix r2res(res.data(),blitz::shape(array1.size(),array2.size()),blitz::neverDeleteData);
     
-    dodirect::doDirect<IS_MULTIPLICATION>(r2res,r1array1,r1array2);
+    dodirect::_<IS_MULTIPLICATION>(r2res,r1array1,r1array2);
   }
   return res;
 
 }
 
 
-} // blitzplusplus
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED

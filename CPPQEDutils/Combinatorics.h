@@ -8,7 +8,7 @@
 
 #include <stdexcept>
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 class CWR_Dir // Combinations with repetitions
@@ -57,7 +57,7 @@ private:
 
 
 
-} // cpputils
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_COMBINATORICS_H_INCLUDED

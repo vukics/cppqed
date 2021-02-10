@@ -6,7 +6,7 @@
 #include <optional>
 #include <vector>
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 /// template metafunction for the rank (arity) of the multi-array `A`
@@ -83,7 +83,7 @@ size_t subscriptLimit(const A& a);
 
 //@}
 
-} // cpputils
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED

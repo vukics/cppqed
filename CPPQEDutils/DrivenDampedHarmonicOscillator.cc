@@ -6,13 +6,17 @@
 
 #include <iostream>
 
-dcomp ddho::_::c(double t) const
+
+using namespace cppqedutils;
+
+
+dcomp cppqedutils::ddho::_::c(double t) const
 {
-  return exp(DCOMP_I*omega_*t)/(1.+2.*DCOMP_I*gamma_*omega_-mathutils::sqr(omega_));
+  return exp(DCOMP_I*omega_*t)/(1.+2.*DCOMP_I*gamma_*omega_-sqr(omega_));
 }
 
 
-ddho::_::_(double gamma, double omega, Matrix m, dcomp ampTI, dcomp ampDerivTI, double tInit)
+cppqedutils::ddho::_::_(double gamma, double omega, Matrix m, dcomp ampTI, dcomp ampDerivTI, double tInit)
   : gamma_(gamma), omega_(omega), a_(m.fullPivLu().solve(Vector(ampTI-c(tInit),ampDerivTI-DCOMP_I*omega*c(tInit))))
 {}
 
@@ -22,7 +26,7 @@ class DDHO : private std::pair<dcomp,dcomp>, public ddho::_
 {
 public:
   DDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0)
-    : std::pair<dcomp,dcomp>(-gamma+sqrt(dcomp(mathutils::sqr(gamma)-1)),-gamma-sqrt(dcomp(mathutils::sqr(gamma)-1))),
+    : std::pair<dcomp,dcomp>(-gamma+sqrt(dcomp(sqr(gamma)-1)),-gamma-sqrt(dcomp(sqr(gamma)-1))),
       _(gamma,omega,
         [=]() {ddho::Matrix m; m << exp(first*tInit), exp(second*tInit), first*exp(first*tInit), second*exp(second*tInit); return m;} (),
         ampTI,ampDerivTI,tInit),
@@ -53,7 +57,7 @@ public:
 
 
 
-ddho::Ptr ddho::make(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit)
+cppqedutils::ddho::Ptr cppqedutils::ddho::make(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit)
 {
   if (gamma==1.)
     return std::make_shared<DDHO_Critical>(omega,ampTI,ampDerivTI,tInit);

@@ -3,12 +3,12 @@
 #ifndef CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED
 
-#include "Evolved.h"
 #include "FormDouble.h"
+#include "ODE.h"
 #include "ParsFwd.h"
 
 
-namespace trajectory {
+namespace cppqedutils::trajectory {
 
 /// Aggregate condensing parameters concerning adaptive ODE evolution (cf. Adaptive::Adaptive()) in the style of a parameters::Table
 /**
@@ -96,6 +96,6 @@ struct Pars : ParsRun, ParsEvolved
 };
 
 
-} // trajectory
+} // cppqedutils::trajectory
 
 #endif // CPPQEDCORE_UTILS_PARSTRAJECTORY_H_INCLUDED

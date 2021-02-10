@@ -60,7 +60,7 @@ template <int RANK> using CArray=blitz::Array<dcomp ,RANK>;
 struct NonContiguousStorageException : public std::invalid_argument {using std::invalid_argument::invalid_argument;};
 
 
-namespace cpputils {
+namespace cppqedutils {
 
 /** \cond SPECIALIZATION */
 
@@ -213,7 +213,7 @@ template<int n>
 inline size_t subscriptLimit(const CArray<n>& a) {return a.size();}
 //@}
 
-} // cpputils
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_BLITZARRAY_H_INCLUDED

@@ -9,7 +9,7 @@
 #include <iosfwd>
 
 
-namespace cpputils {
+namespace cppqedutils {
 
 //////////////////////////////////////////////////////////////
 
@@ -59,19 +59,19 @@ public:
 typedef trivial_iarchive iarchive; ///< delegated to trivial_iarchive
 typedef trivial_oarchive oarchive; ///< delegated to trivial_oarchive
 
-} // cpputils
+} // cppqedutils
 
 #else // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
-namespace cpputils {
+namespace cppqedutils {
 
 typedef boost::archive::binary_iarchive iarchive; ///< delegated to \refBoost{Boost.Serialization,serialization}
 typedef boost::archive::binary_oarchive oarchive; ///< \copydoc iarchive
 
-} // cpputils
+} // cppqedutils
 
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
