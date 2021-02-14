@@ -5,7 +5,7 @@
 
 #include "ParsTrajectory.h"
 #include "Random.h"
-#include "Trajectory.tcc"
+#include "Trajectory.h"
 
 #include "Conversions.h"
 

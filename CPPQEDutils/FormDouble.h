@@ -26,14 +26,14 @@ class Bound;
 class FormDouble 
 {
 public:
-  static const int defaultPrecision; ///< Ultimate default precision for streaming doubles for the whole framework
+  inline static constexpr int defaultPrecision=6; ///< Ultimate default precision for streaming doubles for the whole framework
   
   /// Generic overall precision accessible throughout the framework
   /** 
    * Can be set by reading in *any* variable of class FormDouble from the command line through the \link parameters parameter-bundle\endlink. 
    * \see parameters::Typed<formdouble::Zero>, and trajectory::ParsRun::precision, where the overallPrecision is set by the \link trajectory\endlink-bundle
    */
-  static       int overallPrecision;
+  inline static int overallPrecision=defaultPrecision/2;
 
   /// \name Constructors
   //@{

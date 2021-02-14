@@ -49,6 +49,9 @@ public:
   virtual ~Hamiltonian() {}
 
 private:
+#ifndef NDEBUG
+#pragma GCC warning "TODO: the correct signature is addContribution_v(double, const StateVectorLow, StateVectorLow, double)"
+#endif // NDEBUG
   virtual void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const = 0; 
 
 };

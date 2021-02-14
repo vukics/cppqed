@@ -14,7 +14,7 @@ add_subdirectory(thirdPartyRandom)
 
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
-            BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
+            BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc FFT.cc FormDouble.cc
             FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Random.cc Trajectory.cc Version.cc)
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
@@ -53,6 +53,8 @@ else()
   message(STATUS "Optional support for binary statevector compression disabled.")
   target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_BOOST_COMPRESSION)
 endif()
+
+add_subdirectory(examples)
 
 if(ENABLE_TESTING)
   add_subdirectory(Testing)

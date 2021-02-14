@@ -133,8 +133,11 @@ struct Pars<pcg64,BASE> : BASE
     {}
 };
 
+#ifndef NDEBUG
+#pragma GCC warning "TODO: implement nextStream optionally from previousState"
+#endif // NDEBUG
 template<typename BASE>
-pcg64 streamOfOrdo(const Pars<pcg64,BASE>& p)
+pcg64 streamOfOrdo(const Pars<pcg64,BASE>& p/*, std::optional<EngineState> previousState*/)
 {
   return pcg64{p.seed,1001+p.prngStream};
 }

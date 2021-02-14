@@ -5,45 +5,101 @@
 
 #include "Archive.h"
 #include "CommentingStream.h"
-#include "Evolved.h"
 #include "FormDouble.h"
+#include "IO_Manip.h"
 #include "ParsTrajectory.h"
+#include "ODE.h"
+#include "Version.h"
 
 #include <boost/hana.hpp>
 
+#include <boost/iostreams/device/null.hpp>
+#include <boost/iostreams/stream.hpp>
+
+#include <iomanip>
+#include <iostream>
+#include <fstream>
 #include <queue>
 #include <stdexcept>
 #include <string>
 #include <tuple>
 
+
+
 namespace hana=boost::hana;
 
 
 /// The trajectory-bundle
+namespace cppqedutils {
+
+
+inline auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
+inline auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0,std::clog)) { });
+
+
+/// \name Generic evolution functions
+//@{
+/// evolves for exactly time `deltaT`
+/** \tparam Trajectory type of the trajectory to evolve. Enabled only if it has `step(double, std::ostream&)` */
+template<typename Trajectory>
+void evolve(Trajectory& traj,
+            std::enable_if_t<decltype(has_step(traj))::value,double> deltaT,
+            std::ostream& logStream=std::clog)
+{
+  double endTime=traj.getTime()+deltaT;
+  while (double dt=endTime-traj.getTime()) traj.step(dt,logStream);
+}
+
+
+/// evolves for exactly time `deltaT`
+/** \tparam Trajectory type of the trajectory to evolve. Enabled only if it has `evolve(double, std::ostream&)` */
+template<typename Trajectory>
+void evolve(Trajectory& traj,
+            std::enable_if_t<!decltype(has_step(traj))::value && decltype(has_evolve(traj))::value,double> deltaT,
+            std::ostream& logStream=std::clog)
+{
+  traj.evolve(deltaT,logStream);
+}
+
+
+/// evolves up to exactly time `t` \copydetails evolve
+template<typename Trajectory>
+void evolveTo(Trajectory& traj, double t, std::ostream& logStream=std::clog)
+{
+  evolve(traj,t-traj.getTime(),logStream);
+}
+//@}
+
+  
 namespace trajectory {
 
-/// Type-erased aggregate of information about a trajectory-state archive \see AdaptiveIO
+
+/// A heuristic determination of the inital timestep from the highest frequency of a physical system.
+inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFrequency);}
+  
+
+/// Type-erased aggregate of information about a trajectory-state archive
 /**
  * \par Rationale
  * Each archive is self-contained, so that it contains its own metadata.
  * Then, the state files can eventually even be split into several archives, each containing a single self-contained state.
  */
 struct SerializationMetadata
-{
-  SerializationMetadata(std::string type=UNSPECIFIED, std::string id=UNSPECIFIED, int r=0)
-    : protocolVersion(0),
-      rank(r),
-      typeID(type),
-      trajectoryID(id)
-  {};
+{ 
+  explicit SerializationMetadata(std::string type=UNSPECIFIED, std::string id=UNSPECIFIED, int r=0)
+    : rank(r), typeID(type), trajectoryID(id) {};
+  
+  bool operator==(const SerializationMetadata& v) const {return rank==v.rank && typeID==v.typeID && trajectoryID==v.trajectoryID;}
+  bool operator!=(const SerializationMetadata& v) const {return !(*this==v);}
+  
+  int rank=0;
+  std::string typeID=UNSPECIFIED;
+  std::string trajectoryID=UNSPECIFIED;
 
-  int protocolVersion;
-  int rank;
-  std::string typeID;
-  std::string trajectoryID;
+  int protocolVersion=0;  
 
-  static const std::string UNSPECIFIED;
-  static const std::string ARRAY_ONLY;
+  inline static const std::string UNSPECIFIED = "Unspecified" ;
+  inline static const std::string ARRAY_ONLY = "ArrayOnly" ;
 
 private:
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
@@ -54,248 +110,18 @@ private:
 
 };
 
-/// Opens a file with the given filename for reading and returns an associated std::istream object.
-/**
- * If C++QED is compiled with compression support (boost iostreams library needed), then
- * the statefile can be in bzip2-format, the returned istream will handle this automatically.
- *
- * If the file cannot be opened, an exception is raised.
- */
-std::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
 
-/// Opens a file with the given filename for writing (appending) and returns an associated std::ostream object.
-/**
- * If C++QED is compiled with compression support (boost iostreams library needed), then
- * the statefile can be in bzip2-format, the returned ostream will handle this automatically.
- * If the file does not yet exist, bzip2 is used if supported.
- *
- * If the file cannot be opened, an exception is raised.
- */
-std::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app);
-
-template<typename T>
-void writeViaSStream(const T&, std::shared_ptr<std::ostream>);
-template<typename T>
-void  readViaSStream(      T&, std::shared_ptr<std::istream>);
-SerializationMetadata readMeta(std::shared_ptr<std::istream>); ///< Needed separately for the Python i/o
+template <typename Trajectory>
+struct MakeSerializationMetadata;
 
 
 struct StoppingCriterionReachedException {};
 
 
-/// A heuristic determination of the inital timestep from the highest frequency of a physical system.
-inline double initialTimeStep(double highestFrequency) {return 1./(10.*highestFrequency);}
+} // trajectory
 
 
-/// The base class of the trajectory-bundle condensing the quintessential characteristics of any trajectory
-/**
- * \see run(Trajectory&, double, double, unsigned, const std::string&, const std::string&, int, bool, bool) which manifests all the principal functionalities of this class
- *
- * The i/o of the entire state is performed via \refBoost{Boost.Serialization,serialization}, and is disabled if this library is not installed
- *
- * \todo Consider the possibility of cloning Trajectories
- */
-template<typename SA>
-class Trajectory
-{
-protected:
-  Trajectory() = default;
-  Trajectory(const Trajectory&) = delete; Trajectory& operator=(const Trajectory&) = delete;
-  Trajectory(Trajectory&&) = default; Trajectory& operator=(Trajectory&&) = default;
-  
-public:
-  /// Propagation for a time interval of exactly deltaT
-  /** \note logStream must always be flushed (e.g. with `std::endl`) before anything else gets to write on the same underlying stream  */
-  void evolve(double deltaT, std::ostream& logStream) {evolve_v(deltaT, logStream);}
-
-  using StreamedArray=SA;
-  using StreamReturnType=std::tuple<std::ostream&,SA>;
-  
-  /// Streams a limited set of relevant physical and numerical information about the actual state of Trajectory at the actual time instant
-  StreamReturnType stream(std::ostream& os, int precision ///< the precision (number of digits) of stream
-                         ) const
-  {
-    const FormDouble fd(formdouble::positive(precision));
-    auto res{stream_v( os<<fd(getTime())<<fd(getDtDid()) , precision)};
-    std::get<0>(res)<<std::endl;
-    return res; // Note: endl flushes the buffer
-  }
-
-
-  /// \name Getters
-  //@{
-  double getTime() const {return getTime_v();} ///< actual time instant
-  double getDtDid() const {return getDtDid_v();} ///< last perfomed timestep
-  //@}
-
-  std::ostream& streamParameters(std::ostream& os) const ///< print header
-  {
-    size_t i=3;
-    return streamKey_v(streamParameters_v(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n" , i);
-  }
-  
-  std::ostream& logOnEnd(std::ostream& os) const {return logOnEnd_v(os);} ///< print a log at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
-
-  /// \name Entire state i/o
-  //@{
-  cpputils::iarchive&  readState(cpputils::iarchive& iar)       {return  readState_v(iar);} ///< read from an archive
-  cpputils::oarchive& writeState(cpputils::oarchive& oar) const {return writeState_v(oar);} ///< write to an archive
-  //@}
-
-  virtual ~Trajectory() {}
-
-private:
-  virtual void evolve_v(double, std::ostream&) = 0; 
-  virtual double getTime_v() const = 0;
-  virtual double getDtDid_v() const = 0;
-  
-  virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
-  virtual StreamReturnType stream_v(std::ostream&, int) const = 0;
-  virtual std::ostream& streamKey_v(std::ostream&, size_t&) const = 0;
-
-  virtual cpputils::iarchive&  readState_v(cpputils::iarchive&) = 0;
-  virtual cpputils::oarchive& writeState_v(cpputils::oarchive&) const = 0;
-
-  virtual std::ostream& logOnEnd_v(std::ostream& os) const {return os;}
-
-};
-
-
-///////////
-//
-// Adaptive
-//
-///////////
-
-/// Corresponds to evolved::EvolvedIO, adding the capability of state serialization involving a SerializationMetadata instant
-/** This class exists for the sake of Python I/O */
-template<typename A>
-class AdaptiveIO
-{
-protected:
-  AdaptiveIO(AdaptiveIO&&) = default; AdaptiveIO& operator=(AdaptiveIO&&) = default;
-  
-private:
-  typedef evolved::EvolvedIO<A> EvolvedIO;
-
-  typedef typename EvolvedIO::Ptr Ptr;
-
-public:
-  AdaptiveIO(Ptr);
-
-  /// Read in the EvolvedIO from a cpputils::iarchive.
-  /**
-   * Two conformity checks are performed for to the array we try to read in:
-   * - whether the rank matches (throws RankMismatchException if not)
-   * - whether the dimensions match (throws DimensionsMismatchException if not)
-   * The dimensions check can be circumvented by setting the trajectoryID to SerializationMetadata::ArrayOnly in the EvolvedIO's metadata.
-   * This is done for example in the python I/O interface, because when reading in a state in python we generally have no idea about the dimensions.
-   */
-  cpputils::iarchive&  readState(cpputils::iarchive& iar);
-  /// Write the EvolvedIO to a cpputils::oarchive
-  cpputils::oarchive& writeState(cpputils::oarchive& oar) const;
-
-  /// Returns the time of the underlying EvolvedIO
-  double getTime() const {return evolvedIO_->getTime();}
-
-protected:
-  const Ptr getEvolvedIO() const {return evolvedIO_;} ///< note: not the same const-correctness as in Adaptive
-
-  mutable SerializationMetadata meta_;
-
-private:
-  const Ptr evolvedIO_;
-
-};
-
-
-
-/// Adaptive is basically an evolved::Evolved wrapped into the Trajectory interface
-/** The class stores an evolved::Evolved instance by shared pointer
- * 
- * \tparam BASE either Trajectory or Averageable (cf. StochasticTrajectory.h)
- * 
- */
-template<typename A, typename BASE>
-class Adaptive : public trajectory::AdaptiveIO<A>, public BASE
-{
-protected:
-  Adaptive(Adaptive&&) = default; Adaptive& operator=(Adaptive&&) = default;
-
-public:
-  // needed to break ambiguity with identically named functions in AdaptiveIO
-  using BASE::readState; using BASE::writeState; using BASE::getTime;
-
-  typedef evolved::Evolved<A> Evolved;
-
-  /// corresponding to Evolved::step, it takes a single adaptive step
-  /** It does not delegate directly to Evolved::step, as usually trajectories need to do more for a step than just propagating the ODE: instead, it is kept purely virtual */
-  void step(double deltaT, ///< *maximum* length of the timestep
-            std::ostream& logStream);
-  
-  virtual ~Adaptive() {}
-
-protected:
-  using AdaptiveIO<A>::meta_;
-
-  typedef typename Evolved::Derivs Derivs;
-  
-  /// Constructor taking the same parameters as needed to operate evolved::Maker
-  template<typename ARRAY, typename... BaseInitializationPack>
-  Adaptive(ARRAY&& y, Derivs derivs, double dtInit, int logLevel, double epsRel, double epsAbs,
-           const A& scaleAbs, const evolved::Maker<A>& maker,
-           BaseInitializationPack&&... bip)
-    : AdaptiveIO<A>{maker(std::forward<ARRAY>(y),derivs,dtInit,epsRel,epsAbs,scaleAbs)},
-      BASE{std::forward<BaseInitializationPack>(bip)...},
-      evolved_{std::dynamic_pointer_cast<Evolved>(AdaptiveIO<A>::getEvolvedIO())},
-      dtInit_(dtInit), logLevel_(logLevel) {}
-
-  typedef typename Evolved::ConstPtr ConstPtr;
-  typedef typename Evolved::     Ptr      Ptr;
-
-  /// \name Getters
-  //@{
-  const ConstPtr getEvolved() const {return ConstPtr(evolved_);}
-  const      Ptr getEvolved()       {return          evolved_ ;}
-
-  double getDtTry() const {return evolved_->getDtTry();}
-  //@}
-  
-  /// redirected to a pure virtual, this is needed for \link SerializationMetadata serialization of trajectory metadata\endlink
-  const std::string trajectoryID() const  {return trajectoryID_v();}
-
-  std::ostream& streamParameters_v(std::ostream&) const override;
-
-  virtual cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar)       {return iar;} ///< hook into Trajectory::readState
-  virtual cpputils::oarchive& writeStateMore_v(cpputils::oarchive &oar) const {return oar;} ///< hook into Trajectory::writeState
-
-private:
-  /// calls AdaptiveIO::readState, checks post-conditions in metadata, calls readStateMore_v, and finally sets `dtTry` in `evolved_`
-  cpputils::iarchive&  readState_v(cpputils::iarchive& iar)       final;
-  /// calls AdaptiveIO::writeState followed by writeStateMore_v
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oar) const final;
-
-  double getDtDid_v() const final {return evolved_->getDtDid();}
-
-  void evolve_v(double deltaT, std::ostream& logStream) final {evolved::evolve<Adaptive>(*this,deltaT,logStream);}
-
-  double getTime_v() const final {return evolved_->getTime();}
-
-  virtual void step_v(double deltaT, std::ostream& logStream) = 0;
-
-  virtual const std::string trajectoryID_v() const = 0;
-  
-  std::ostream& logOnEnd_v(std::ostream& os) const final {if (logLevel_) evolved_->logOnEnd(os); return logMoreOnEnd_v(os);}
-
-  virtual std::ostream& logMoreOnEnd_v(std::ostream& os) const {return os;} ///< hook into Trajectory::logOnEnd
-  
-  const Ptr evolved_;
-
-  const double dtInit_;
-  
-  const int logLevel_;
-
-};
+namespace trajectory {
 
 
 /// Generic implementation of AutostopHandler
@@ -309,7 +135,8 @@ private:
   typedef SA Averages;
   
 public:
-  AutostopHandlerGeneric(double autoStopEpsilon, unsigned autoStopRepetition) : autoStopEpsilon_{autoStopEpsilon}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{} {}
+  AutostopHandlerGeneric(double autoStopEpsilon, unsigned autoStopRepetition) 
+    : autoStopEpsilon_{autoStopEpsilon}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{} {}
 
   void operator()(const SA& streamedArray)
   {
@@ -376,15 +203,15 @@ using TemporalStreamedArray=std::list<std::tuple<double,double,SA>>;
  * \link Trajectory::writeState state streams\endlink into file named `ofn.state`
  *
  */
-template<typename T, // type of trajectory
-         typename L, // type specifying the length of the run
-         typename D, // type specifying the frequency of stream
+template<typename TRAJ, // type of trajectory
+         typename LENGTH, // type specifying the length of the run
+         typename DELTA, // type specifying the frequency of stream
          typename AutostopHandler // should support operator()(const typename T::TemporalStreamedArray &)
          >
-TemporalStreamedArray<typename std::decay_t<T>::StreamedArray>
-run(T&& traj, ///< the trajectory to run
-    L length, ///< length of run
-    D streamFreq, ///< interval between two \link Trajectory::stream streamings\endlink
+TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>
+run(TRAJ&& traj, ///< the trajectory to run
+    LENGTH length, ///< length of run
+    DELTA streamFreq, ///< interval between two \link Trajectory::stream streamings\endlink
     unsigned stateStreamFreq, ///< number of \link Trajectory::stream streamings\endlink between two \link Trajectory::writeState state streamings\endlink
     const std::string& trajectoryFileName, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output
     const std::string& initialFileName, ///< name of file containing initial condition state for the run
@@ -398,8 +225,8 @@ run(T&& traj, ///< the trajectory to run
    );
 
 
-inline auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0,std::clog)) { });
-inline auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
+} // trajectory
+
 
 /// Dispatcher \related Adaptive
 /**
@@ -430,11 +257,12 @@ inline auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,st
  */
 template<typename TRAJ>
 auto
-run(TRAJ&& traj, const ParsRun& p,
+run(TRAJ&& traj, const trajectory::ParsRun& p,
     bool doStreaming=true, bool returnStreamedArray=false)
--> std::enable_if_t<decltype(has_evolve(traj))::value,TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>
+-> std::enable_if_t<decltype(has_evolve(traj))::value || decltype(has_step(traj))::value,
+                    trajectory::TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>
 {
-  using AHG=AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>;
+  using AHG=trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>;
   
   if constexpr (decltype(has_step(traj))::value) { // it is of the Adaptive family
     if (p.dc) return run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
@@ -455,7 +283,258 @@ run(TRAJ&& traj, const ParsRun& p,
 }
 
 
-} // trajectory
+namespace trajectory {
+
+
+/// Opens a file with the given filename for reading and returns an associated std::istream object.
+/**
+ * If C++QED is compiled with compression support (boost iostreams library needed), then
+ * the statefile can be in bzip2-format, the returned istream will handle this automatically.
+ *
+ * If the file cannot be opened, an exception is raised.
+ */
+std::shared_ptr<std::istream> openStateFileReading(const std::string &filename);
+
+
+/// Opens a file with the given filename for writing (appending) and returns an associated std::ostream object.
+/**
+ * If C++QED is compiled with compression support (boost iostreams library needed), then
+ * the statefile can be in bzip2-format, the returned ostream will handle this automatically.
+ * If the file does not yet exist, bzip2 is used if supported.
+ *
+ * If the file cannot be opened, an exception is raised.
+ */
+std::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, const std::ios_base::openmode mode=std::ios_base::app);
+
+
+template <typename Trajectory>
+iarchive& readState(Trajectory& traj, iarchive& iar)
+{
+  SerializationMetadata sm;
+  iar & sm;
+  if (sm.trajectoryID==SerializationMetadata::ARRAY_ONLY) return traj.readFromArrayOnlyArchive(iar);
+  else {
+    if (sm != MakeSerializationMetadata<Trajectory>::_()) throw std::runtime_error("Trajectory mismatch in cppqedutils::trajectory::readState");
+    return traj.readState(iar);
+  }
+}
+
+
+template <typename Trajectory>
+oarchive& writeState(const Trajectory& traj, oarchive& oar)
+{
+  oar & MakeSerializationMetadata<Trajectory>::_();
+  return traj.writeState(oar);
+}
+
+
+template<typename T>
+void writeViaSStream(const T& traj, std::shared_ptr<std::ostream> ofs)
+{
+  using namespace std;
+  if (ofs) {
+    ostringstream oss(ios_base::binary);
+    oarchive stateArchive(oss);
+    writeState(traj,stateArchive);
+    {
+      const string& buffer=oss.str();
+      *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
+    }
+  }
+}
+
+
+template<typename T>
+void readViaSStream(T& traj, std::shared_ptr<std::istream> ifs)
+{
+  using namespace std;
+  istringstream iss(ios_base::binary);
+  {
+    string buffer;
+    streamsize n; *ifs>>n; buffer.resize(n);
+    ifs->read(&buffer[0],n);
+    iss.str(buffer);
+  }
+  iarchive stateArchive(iss);
+  readState(traj,stateArchive);
+}
+
+
+/// Streams a limited set of relevant physical and numerical information about the actual state of Trajectory at the actual time instant
+template <typename Trajectory>
+auto stream(const Trajectory& traj, std::ostream& os,
+            int precision ///< the precision (number of digits) of stream
+            )
+{
+  const FormDouble fd(formdouble::positive(precision));
+  auto res{traj.stream( os<<fd(traj.getTime())<<fd(traj.getDtDid()) , precision)};
+  os<<std::endl; // Note: endl flushes the buffer
+  return res;
+}
+
+
+/// Print header
+template <typename Trajectory>
+std::ostream& streamParameters(const Trajectory& traj, std::ostream& os)
+{
+  return traj.streamKey(traj.streamParameters(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n");
+}
+
+
+} } // cppqedutils::trajectory
+
+
+#pragma GCC warning "TODO: This souldn’t call any TRAJ member function directly, only through traits classes"
+
+template<typename TRAJ, typename LENGTH, typename DELTA, typename AutostopHandler>
+auto
+cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsigned stateStreamFreq,
+                             const std::string& trajectoryFileName, const std::string& initialFileName,
+                             int precision, bool streamInfo, bool firstStateStream,
+                             const std::string& parsedCommandLine,
+                             bool doStreaming, bool returnStreamedArray,
+                             AutostopHandler&& autostopHandler) -> TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>
+{
+  using namespace std;
+
+  static constexpr bool
+    endTimeMode=is_floating_point_v<LENGTH>,
+    isDtMode=is_floating_point_v<DELTA>;
+  
+  TemporalStreamedArray<typename decay_t<TRAJ>::StreamedArray> res;
+  
+  ////////////////////////////////////////////////
+  // Determining i/o streams, eventual state input
+  ////////////////////////////////////////////////
+
+  static const string stateExtension{".state"};
+  const string stateFileName{trajectoryFileName+stateExtension};
+  
+  const bool
+    streamToFile=(trajectoryFileName!=""),
+    continuing=[&]() {
+      if (trajectoryFileName!="") {
+        
+        ifstream trajectoryFile{trajectoryFileName.c_str()};
+        
+        if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
+          auto stateFile{openStateFileReading(stateFileName)};
+          while ( (stateFile->peek(), !stateFile->eof()) ) readViaSStream(traj,stateFile);
+          return true;
+        }
+        
+      }
+      
+      if (initialFileName!="") {
+        auto initialFile{openStateFileReading(initialFileName)};
+        while ( (initialFile->peek(), !initialFile->eof()) ) readViaSStream(traj,initialFile);
+      }
+      
+      return false;
+    }();
+    
+  // this is formally a runtime expression, but since endTimeMode is constexpr, the compiler should be able to do this @ compile time
+  const double timeToReach = (endTimeMode ? length : traj.getTime()+length*streamFreq);
+  
+  if (timeToReach && timeToReach<=traj.getTime()) return res;
+
+  const shared_ptr<ostream> outstream{
+    !streamToFile ?
+    ( doStreaming ? 
+      shared_ptr<ostream>(&cout,[](auto*){}) : // since cout is a system-wide object, this should be safe
+      static_pointer_cast<ostream>(make_shared<boost::iostreams::stream<boost::iostreams::null_sink>>(boost::iostreams::null_sink{}) ) ) : 
+    static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))}; // regulates the deletion policy
+  
+  if (outstream->fail()) throw runtime_error("Trajectory stream opening error: "+trajectoryFileName);
+  
+  CommentingStream logStream{outstream};
+  
+  ostream& os=*outstream;
+  IO_Manipulator::_(os);
+  os<<setprecision(formdouble::actualPrecision(precision));
+
+  CommentingStream commentingStream{outstream}; commentingStream<<setprecision(formdouble::actualPrecision(precision));
+  
+  ///////////////////////
+  // Writing introduction
+  ///////////////////////
+
+  if (streamInfo) {
+    if (!continuing) {
+      if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
+      streamParameters(traj,commentingStream<<versionHelper())
+        <<endl<<"Run Trajectory up to time "<<timeToReach
+        <<" -- Stream period: "<<streamFreq<< (isDtMode ? "" : " timestep") <<endl<<endl;
+    }
+    else
+      commentingStream<<"Continuing from time "<<traj.getTime()<<" up to time "<<timeToReach<<endl;
+  }
+
+  if (!timeToReach) {stream(traj,os,precision); return res;}
+
+  //////////////////////////////
+  // Mid section: the actual run
+  //////////////////////////////
+
+  const std::shared_ptr<ostream> ofs = !streamToFile ? std::make_shared<ofstream>() : openStateFileWriting(stateFileName);
+
+  bool
+    stateSaved=false,  // signifies whether the state has already been saved for the actual time instant of the trajectory
+    evsStreamed=false; // signifies whether the expectation values have already been streamed ”
+
+  try {
+
+    for (long count=0, stateCount=0; (endTimeMode ? traj.getTime()<length : count<=length); ++count) {
+
+      if (count) {
+        // advance trajectory
+        if constexpr (!isDtMode) {traj.step(length-traj.getTime(),logStream);}
+        else {
+          if constexpr (endTimeMode) evolve(traj,std::min(streamFreq,length-traj.getTime()),logStream);
+          else evolve(traj,streamFreq,logStream);
+        }
+        stateSaved=evsStreamed=false;
+      }
+
+      if (!count || [&]() {
+        if constexpr (isDtMode) return true;
+        else return !(count%streamFreq); // here, we still use a lambda because this doesn’t compile if streamFreq is double
+      }() ) {
+
+        if (
+            stateStreamFreq && 
+            !(stateCount%stateStreamFreq) && 
+            (stateCount || (firstStateStream && !continuing))
+           )
+        {
+          writeViaSStream(traj,ofs);
+          stateSaved=true;
+        }
+        ++stateCount;
+
+        if (count || !continuing) {
+          evsStreamed=true;
+          auto streamReturn{stream(traj,os,precision)};
+          if (returnStreamedArray) res.emplace_back(traj.getTime(),traj.getDtDid(),get<1>(streamReturn));
+          autostopHandler(get<1>(streamReturn));
+        }
+      }
+    } // end of main for loop
+
+  } catch (const StoppingCriterionReachedException& except) {commentingStream<<"Stopping criterion has been reached"<<endl;}
+  
+  if (!evsStreamed) stream(traj,os,precision); // Stream at the end instant if stream has not happened yet
+
+  //////////////////////////////////////////
+  // Logging on end, saving trajectory state
+  //////////////////////////////////////////
+  
+  traj.logOnEnd(commentingStream);
+  if (!stateSaved) writeViaSStream(traj,ofs);
+  
+  return res;
+  
+}
 
 
 

@@ -4,14 +4,7 @@
 #include "ParsTrajectory.h"
 
 
-namespace trajectory {
-
-
-const double ParsEvolved::epsRelDefault=1e-6;
-const double ParsEvolved::epsAbsDefault=1e-12;
-
-
-ParsRun::ParsRun(parameters::Table& p, const std::string& mod)
+cppqedutils::trajectory::ParsRun::ParsRun(parameters::Table& p, const std::string& mod)
   : T(p.addTitle("Trajectory",mod).add("T",mod,"Simulated time",1.)),
     dc(p.add("dc",mod,"Number of steps between two streamings",10)),
     Dt(p.add("Dt",mod,"Timestep between two streamings",.1)),
@@ -28,14 +21,8 @@ ParsRun::ParsRun(parameters::Table& p, const std::string& mod)
 {}
 
 
-ParsEvolved::ParsEvolved(parameters::Table& p, const std::string& mod)
+cppqedutils::trajectory::ParsEvolved::ParsEvolved(parameters::Table& p, const std::string& mod)
   : epsRel(p.addTitle("Evolved",mod).add("eps"   ,mod,"ODE stepper relative precision",epsRelDefault)),
     epsAbs(p.add("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
-    sf(p.add("steppingFunction",mod,"Stepping function for EvolvedGSL",evolved::SF_RKCK)),
-    nextDtTryCorrectionFactor(p.add("nextDtTryCorrectionFactor",mod,"Avoiding the tiny-next-timestep-to-try effect at the end of time intervals",100.)),
     logLevel(p.add("logLevel",mod,"logging level",0))
 {}
-
-
-
-} // trajectory

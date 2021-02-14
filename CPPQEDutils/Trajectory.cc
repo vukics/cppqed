@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "ArrayTraits.h"
 #include "BlitzArray.h"
-#include "Trajectory.tcc"
+#include "Trajectory.h"
 
 #ifndef DO_NOT_USE_BOOST_COMPRESSION
 #include <boost/iostreams/filtering_stream.hpp>
@@ -37,7 +37,7 @@ struct StateFileOpeningException : runtime_error
 };
 
 
-shared_ptr<istream> trajectory::openStateFileReading(const string &filename)
+shared_ptr<istream> cppqedutils::trajectory::openStateFileReading(const string &filename)
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
   shared_ptr<ifstream> ifs = make_shared<ifstream>(filename, ios_base::binary);
@@ -54,7 +54,7 @@ shared_ptr<istream> trajectory::openStateFileReading(const string &filename)
 #endif // DO_NOT_USE_BOOST_COMPRESSION
 }
 
-shared_ptr<ostream> trajectory::openStateFileWriting(const string &filename, const ios_base::openmode mode)
+shared_ptr<ostream> cppqedutils::trajectory::openStateFileWriting(const string &filename, const ios_base::openmode mode)
 {
 #ifdef DO_NOT_USE_BOOST_COMPRESSION
   shared_ptr<ofstream> ofs = make_shared<ofstream>(filename, mode | ios_base::binary );
@@ -72,31 +72,4 @@ shared_ptr<ostream> trajectory::openStateFileWriting(const string &filename, con
 }
 
 
-void trajectory::details::writeNextArchive(shared_ptr<ostream> ofs, const ostringstream &oss)
-{
-  const string& buffer=oss.str();
-  *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
-}
-
-void trajectory::details::readNextArchive(shared_ptr<istream> ifs, istringstream &iss)
-{
-  string buffer;
-  streamsize n; *ifs>>n; buffer.resize(n);
-  ifs->read(&buffer[0],n);
-  iss.str(buffer);
-}
-
-
-auto trajectory::readMeta(shared_ptr<istream> ifs) -> SerializationMetadata
-{
-  istringstream iss(ios_base::binary);
-  details::readNextArchive(ifs,iss);
-  cpputils::iarchive archive(iss);
-  SerializationMetadata meta;
-  archive >> meta;
-  return meta;
-}
-
-const string trajectory::SerializationMetadata::UNSPECIFIED = "Unspecified";
-const string trajectory::SerializationMetadata::ARRAY_ONLY  = "ArrayOnly";
 

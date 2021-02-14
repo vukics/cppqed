@@ -4,15 +4,15 @@
 #define CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED
 
 #include "BlitzArray.h"
-#include "EvolvedGSL.tcc"
 #include "Simulated_.h"
 
 #include "Pars.h"
 
 using ParameterTable=parameters::Table;
-using parameters::update        ;
+using parameters::update;
 
-using trajectory::Simulated;
-using trajectory::Pars     ;
+using namespace cppqedutils;
+
+using trajectory::Pars;
 
 #endif // CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED

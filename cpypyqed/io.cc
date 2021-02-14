@@ -15,7 +15,7 @@
 #endif
 
 #include "BlitzArray.h"
-#include "Trajectory.tcc"
+#include "Trajectory.h"
 
 #include "blitz2numpy.h"
 
@@ -73,7 +73,7 @@ object read(str filename)
 {
   auto f = extract<std::string>(filename);
 
-  trajectory::SerializationMetadata meta{trajectory::readMeta(trajectory::openStateFileReading(f))};
+  auto meta{trajectory::readMeta(trajectory::openStateFileReading(f))};
 
   throw_rank(meta.rank);
   throw_type(meta.typeID);

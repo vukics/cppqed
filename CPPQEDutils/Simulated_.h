@@ -3,15 +3,14 @@
 #ifndef CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
 #define CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
 
+#include "KeyPrinter.h"
 #include "ParsTrajectory.h"
 #include "Trajectory.h"
 // #include "ArrayTraits.h"
 // The same note applies as with EvolvedGSL.tcc
-#include "FormDouble.h"
-#include "Trajectory.tcc"
 
 
-namespace trajectory {
+namespace cppqedutils {
 
 /// Class fully implementing the Adaptive interface by streaming (and serializing) the whole content of the evolved array
 /**
@@ -24,52 +23,82 @@ namespace trajectory {
  * 
  * \todo Provide optional key printing
  */
-template<typename A> 
-class Simulated : public Adaptive<A,Trajectory<A> >
+template<typename StateType, typename Derivs, typename ODE_Engine = ODE_EngineBoost<StateType> >
+class Simulated
 {
 public:
-  Simulated(Simulated&&) = default; Simulated& operator=(Simulated&&) = default;
+  using StreamedArray=StateType;
   
-  typedef Adaptive<A,Trajectory<A> > Base;
+  template <typename STATE, typename ... ODE_EngineCtorParams>
+  Simulated(STATE&& stateInit, Derivs derivs, double dtInit, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+    : state_{std::forward<STATE>(stateInit)},
+      derivs_{derivs},
+      keyPrinter_{"Simulated",keyLabels},
+      ode_{dtInit,std::forward<ODE_EngineCtorParams>(odePack)...} {
+        auto& labels{keyPrinter_.getLabels()};
+        if (labels.size()<size(state_)) labels.insert(labels.end(),size(state_)-labels.size(),"N/A");
+        else if (labels.size()>size(state_)) throw std::runtime_error("More keys than values in Simulated");
+      }
 
-  typedef evolved::Evolved<A> Evolved;
+  auto getTime() const {return t_;}
 
-  template <typename ARRAY>
-  Simulated(ARRAY&& y, typename Evolved::Derivs derivs, double dtInit,
-            int logLevel,
-            double epsRel, double epsAbs,
-            const A& scaleAbs=A(),
-            const evolved::Maker<A>& maker=evolved::MakerGSL<A>())
-    : Base(std::forward<ARRAY>(y),derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,maker) {}
+  void step(double deltaT, std::ostream& logStream) {ode_.step(deltaT,logStream,derivs_,t_,state_);}
 
-  template <typename ARRAY>
-  Simulated(ARRAY&& array, typename Evolved::Derivs derivs, double dtInit,
-            const ParsEvolved& pe,
-            const A& scaleAbs=A(),
-            const evolved::Maker<A>& maker=evolved::MakerGSL<A>()) : Simulated(std::forward<ARRAY>(array),derivs,dtInit,pe.logLevel,pe.epsRel,pe.epsAbs,scaleAbs,maker) {}
+  auto getDtDid() const {return ode_.getDtDid();}
+  
+  std::ostream& streamParameters(std::ostream& os) const {return ode_.streamParameters(os<<"\nSimulated.\n");}
 
-protected:
-  typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override
+  std::tuple<std::ostream&,StateType> stream(std::ostream& os, int precision) const
   {
-    using namespace cpputils;
-    const A& a=this->getEvolved()->getA();
-    for (size_t i=0; i<subscriptLimit(a); i++) os<<FormDouble(precision)(subscript(a,i))<<' ';
-    return {os,a.copy()};
+    using namespace cppqedutils;
+    for (size_t i=0; i<subscriptLimit(state_); i++) os<<FormDouble(precision)(subscript(state_,i))<<' ';
+    return {os,state_};
   }
+
+  iarchive& readFromArrayOnlyArchive(iarchive& iar) {return iar;}
+
+  iarchive& readState(iarchive& iar) {return iar;}
+
+  oarchive& writeState(oarchive& oar) const {return oar;}
+
+  std::ostream& streamKey(std::ostream& os) const {return keyPrinter_.stream(os,3);}
+
+  void logOnEnd(std::ostream&) const {}
   
 private:
-  void step_v(double deltaT, std::ostream& logStream) final {this->getEvolved()->step(deltaT,logStream);}
-
-  std::ostream& streamKey_v(std::ostream& os, size_t&) const final {return os;}
-
-  std::ostream& streamParameters_v(std::ostream& os) const final {return Base::streamParameters_v(os<<"\nSimulated.\n");}
-
-  const std::string trajectoryID_v() const final {return "Simulated";}
-
+  double t_=0.;
+  
+  StateType state_;
+  
+  Derivs derivs_;
+  
+  KeyPrinter keyPrinter_;
+  
+  ODE_Engine ode_;
+  
 };
 
 
-} // trajectory
+template <typename StateType, typename Derivs, typename ODE_Engine>
+struct trajectory::MakeSerializationMetadata<Simulated<StateType,Derivs,ODE_Engine>>
+{
+  // TODO: TypeID_v is not really correct here, since what we need is an ID of the element type
+  static auto _() {return SerializationMetadata{TypeID_v<StateType>,"Simulated",Rank_v<StateType>};}
+};
+
+
+namespace simulated {
+
+template<typename StateType, typename Derivs, typename ... ODE_EngineCtorParams>
+auto make(StateType&& stateInit, Derivs derivs, double dtInit, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+{
+  return Simulated<std::decay_t<StateType>,Derivs>{std::forward<StateType>(stateInit),derivs,dtInit,keyLabels,std::forward<ODE_EngineCtorParams>(odePack)...};
+}
+  
+} // simulated
+
+
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED

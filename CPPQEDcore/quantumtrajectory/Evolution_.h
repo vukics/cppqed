@@ -12,7 +12,6 @@
 #include "MCWF_Trajectory.h"
 
 #include "TMP_Tools.h"
-#include "Trajectory.tcc"
 
 #include <iosfwd>
 

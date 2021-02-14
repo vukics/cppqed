@@ -15,32 +15,29 @@
 #include <optional>
 
 
+namespace cppqedutils {
+
 /*
 template <typename E>
 concept ordinary_differential_equation_engine = requires(E e) {
-  { e.step(); }
+  { e.step(); } -> size_t;
 };
 */
 
 namespace ode_engine {
+
 
 namespace bno=boost::numeric::odeint;
 
 template <typename ControlledErrorStepper>
 struct ControlledErrorStepperParameters;
 
+template <typename Stepper>
+constexpr auto StepperDescriptor=std::nullopt;
+
+
 template <typename ControlledErrorStepper>
-constexpr auto ControlledErrorStepperDescriptor=std::nullopt;
-
-template <typename ErrorStepper>
-constexpr auto ErrorStepperDescriptor=std::nullopt;
-
-template <typename ErrorStepper>
-auto makeControlledErrorStepper(bno::controlled_runge_kutta<ErrorStepper>, double epsRel, double epsAbs)
-{
-  return std::make_tuple(make_controlled(epsRel,epsAbs,ErrorStepper()),
-                         ControlledErrorStepperParameters<bno::controlled_runge_kutta<ErrorStepper>>{epsRel,epsAbs});
-}
+struct MakeControlledErrorStepper;
 
 
 class DefaultLogger
@@ -70,22 +67,37 @@ private:
 
 
 template <typename ControlledErrorStepper, typename Logger=DefaultLogger>
-class ODE_EngineBase
+class Base
 {
 public:
+  /**
+   * \param nextDtTryCorrectionFactor
+   * Since dtTry is at most deltaT, dtTry will drop severely if deltaT is very small (e.g. when completing a given interval at its end).
+   * Since this drop can be several orders of magnitude, this must not be allowed as it would slow down the simulation extremely.
+   * To patch this, we check before the actual timestep whether we are in the case of a *very small* `deltaT` (`< dtTry/nextDtTryCorrectionFactor`).
+   * In such a case the present dtTry is cached and used unchanged in the next step. That is, such a tiny step is excluded from stepsize control.
+   */
+  inline static const double nextDtTryCorrectionFactor=50.;
+  
+  
   using Time=typename ControlledErrorStepper::time_type;
   
   template <typename ... Args>
-  ODE_EngineBase(Time dtInit, Args&&... args)
-    : ces_{makeControlledErrorStepper(ControlledErrorStepper(),std::forward<Args>(args)...)},
+  Base(Time dtInit, Args&&... args)
+    : ces_{MakeControlledErrorStepper<ControlledErrorStepper>{}(std::forward<Args>(args)...)},
       dtTry_(dtInit) {}
   
+  /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
   template <typename System, typename ... States>
-  size_t step(System sys, Time& time, Time deltaT, States&&... states) {
-    if (mathutils::sign(deltaT)!=mathutils::sign(EvolvedIO<A>::getDtTry())) setDtTry(-EvolvedIO<A>::getDtDid()); // Stepping backward
+  size_t step(Time deltaT, std::ostream& logStream, System sys, Time& time, States&&... states) {
     
-    Time timeBefore=time;
-    dtTry_=std::min(dtTry_,deltaT);
+    Time 
+      timeBefore=time,
+      nextDtTry=( fabs(deltaT)<fabs(dtTry_/nextDtTryCorrectionFactor) ? dtTry_ : 0. );
+    
+    if (sign(deltaT)!=sign(dtTry_)) dtTry_=-dtDid_; // Stepping backward
+    
+    if (fabs(dtTry_)>fabs(deltaT)) dtTry_=deltaT;
     
     size_t nFailedSteps=0;
     
@@ -98,6 +110,7 @@ public:
          ++nFailedSteps) ;
 
     dtDid_=time-timeBefore;
+    if (nextDtTry) dtTry_=nextDtTry;
     
     logger_.logStep();
     logger_.logFailedSteps(nFailedSteps);
@@ -112,7 +125,7 @@ public:
   void setDtTry(Time dtTry) {dtTry_=dtTry;}
 
   std::ostream& streamParameters(std::ostream& os) const {
-    return os<<"ODE engine implementation: " << ControlledErrorStepperDescriptor<ControlledErrorStepper> << " " << std::get<1>(ces_) << std::endl;
+    return std::get<1>(ces_).stream(os<<"ODE engine implementation: " << StepperDescriptor<ControlledErrorStepper> << ". ")<< std::endl;
   }
   
 private:
@@ -128,7 +141,8 @@ private:
   void serialize(Archive& ar, const unsigned int) {ar & std::get<0>(ces_) & logger_ & dtDid_ & dtTry_;}
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-  std::tuple<ControlledErrorStepper,ControlledErrorStepperParameters<ControlledErrorStepper>> ces_;
+  std::tuple<ControlledErrorStepper,
+             ControlledErrorStepperParameters<ControlledErrorStepper>> ces_;
   
   Time dtDid_=0., dtTry_;
   
@@ -137,51 +151,46 @@ private:
 };
 
 
+/// Specializations for Boost.Odeint controlled_runge_kutta & runge_kutta_cash_karp54
+
 template <typename ErrorStepper>
 struct ControlledErrorStepperParameters<bno::controlled_runge_kutta<ErrorStepper>>
 {
   const double epsRel, epsAbs;
+  
+  std::ostream& stream(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << " epsAbs=" << epsAbs;}
+  
 };
 
 
 template <typename ErrorStepper>
-constexpr auto ControlledErrorStepperDescriptor<bno::controlled_runge_kutta<ErrorStepper>> = "Boost.Odeint controlled stepper " + ErrorStepperDescriptor<ErrorStepper>;
+inline const std::string StepperDescriptor<bno::controlled_runge_kutta<ErrorStepper>> = "Boost.Odeint controlled stepper " + StepperDescriptor<ErrorStepper>;
+
 
 template <typename StateType>
-constexpr auto ErrorStepperDescriptor<bno::runge_kutta_cash_karp54<StateType>> = "RKCK54";
+inline const std::string StepperDescriptor<bno::runge_kutta_cash_karp54<StateType>> = "RKCK54";
+
+
+template <typename ErrorStepper>
+struct MakeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
+{
+  auto operator()(double epsRel, double epsAbs) {
+    return std::make_tuple(make_controlled(epsRel,epsAbs,ErrorStepper()),
+                           ControlledErrorStepperParameters<bno::controlled_runge_kutta<ErrorStepper>>{epsRel,epsAbs});
+  }
+};
+
 
 } // ode_engine
 
 
+/// from this point on, every Time is double
 template <typename StateType>
-using ODE_EngineBoost = ode_engine::ODE_EngineBase<boost::numeric::odeint::controlled_runge_kutta<boost::numeric::odeint::runge_kutta_cash_karp54<StateType>>>;
+using ODE_EngineBoost = ode_engine::Base<boost::numeric::odeint::controlled_runge_kutta<boost::numeric::odeint::runge_kutta_cash_karp54<StateType>>>;
 
 
-namespace cpputils {
 
-
-/// \name Generic evolution functions
-//@{
-/// evolves for exactly time `deltaT`
-/** \tparam E type of the object to evolve. Implicit interface assumed: member function named step with signature `...(double)` */
-template<typename E>
-void evolve(E& e, double deltaT, std::ostream& logStream=std::clog)
-{
-  double endTime=e.getTime()+deltaT;
-  while (double dt=endTime-e.getTime()) e.step(dt,logStream);
-}
-
-
-/// evolves up to exactly time `t` \copydetails evolve
-template<typename E>
-void evolveTo(E& e, double t, std::ostream& logStream=std::clog)
-{
-  evolve(e,t-e.getTime(),logStream);
-}
-//@}
-
-
-} // cpputils
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_ODE_H_INCLUDED

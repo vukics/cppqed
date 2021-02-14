@@ -34,16 +34,13 @@ namespace cppqedutils::trajectory {
  */
 struct ParsEvolved
 {
-  static const double epsRelDefault; ///< The ultimate default of \link ParsEvolved::epsRel epsRel\endlink in the framework
-  static const double epsAbsDefault; ///< ” for \link ParsEvolved::epsAbs epsAbs\endlink
+  inline static const double epsRelDefault=1e-6; ///< The ultimate default of \link ParsEvolved::epsRel epsRel\endlink in the framework
+  inline static const double epsAbsDefault=1e-12; ///< ” for \link ParsEvolved::epsAbs epsAbs\endlink
 
   double
-    &epsRel, ///< relative precision of ODE stepping (cf. evolved::TimeStepBookkeeper)
+    &epsRel, ///< relative precision of ODE stepping
     &epsAbs; ///< absolute precision ”
 
-  evolved::SteppingFunction& sf; ///< \link evolved::SteppingFunction stepping-function type\endlink
-  double &nextDtTryCorrectionFactor; ///< cf. evolved::MakerGSL::MakerGSL()
-  
   int &logLevel; ///< governs how much logging information is streamed during a Trajectory run \see quantumtrajectory::mcwf::Logger for a usecase
   
   /// All `%Pars…` classes are constructed taking a parameters::Table, to register the parameters on
