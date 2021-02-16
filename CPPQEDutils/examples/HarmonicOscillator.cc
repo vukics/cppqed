@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
       dydt(0)=y(2); dydt(1)=y(3); 
       dydt(2)=cos(omega*tau)-2*gamma*y(2)-y(0); dydt(3)=sin(omega*tau)-2*gamma*y(3)-y(1);
     },
-    .1/max(1.,max(omega,gamma)), 
+    .1/max(1.,max(omega,gamma)),10, 
     {"Re{coordinate}","Im{coordinate}","Re{velocity}","Im{velocity}"},
     1e-6,1e-18)};
   

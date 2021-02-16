@@ -51,7 +51,7 @@ public:
   {
     return os<<"\nTotal number of ODE steps: "<<nSteps_
              <<"\nNumber of failed ODE steps: "<<nFailedSteps_
-             <<"\nNumber of calls of function calculating RHS for ODE: "<<nDerivsCalls_<<std::endl;
+             <<"\nNumber of calls to function calculating RHS for ODE: "<<nDerivsCalls_<<std::endl;
   }
 
 private:
@@ -61,7 +61,7 @@ private:
   void serialize(Archive& ar, const unsigned int) {ar & nDerivsCalls_ & nSteps_ & nFailedSteps_;}
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-  size_t nDerivsCalls_, nSteps_, nFailedSteps_;
+  size_t nDerivsCalls_=0, nSteps_=0, nFailedSteps_=0;
 
 };
 
@@ -83,40 +83,13 @@ public:
   using Time=typename ControlledErrorStepper::time_type;
   
   template <typename ... Args>
-  Base(Time dtInit, Args&&... args)
+  Base(Time dtInit, int logLevel, Args&&... args)
     : ces_{MakeControlledErrorStepper<ControlledErrorStepper>{}(std::forward<Args>(args)...)},
-      dtTry_(dtInit) {}
+      dtTry_(dtInit), logLevel_(logLevel) {}
   
   /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
   template <typename System, typename ... States>
-  size_t step(Time deltaT, std::ostream& logStream, System sys, Time& time, States&&... states) {
-    
-    Time 
-      timeBefore=time,
-      nextDtTry=( fabs(deltaT)<fabs(dtTry_/nextDtTryCorrectionFactor) ? dtTry_ : 0. );
-    
-    if (sign(deltaT)!=sign(dtTry_)) dtTry_=-dtDid_; // Stepping backward
-    
-    if (fabs(dtTry_)>fabs(deltaT)) dtTry_=deltaT;
-    
-    size_t nFailedSteps=0;
-    
-    for (;
-         // wraps the sys functional in order that the number of calls to it can be logged
-         stepImpl([this,sys](const auto& y, auto& dydt, double t) {
-           logger_.logDerivsCall();
-           return sys(y,dydt,t);
-         },time,std::forward<States>(states)...)!=bno::success;
-         ++nFailedSteps) ;
-
-    dtDid_=time-timeBefore;
-    if (nextDtTry) dtTry_=nextDtTry;
-    
-    logger_.logStep();
-    logger_.logFailedSteps(nFailedSteps);
-    
-    return nFailedSteps;
-  }
+  void step(Time deltaT, std::ostream& logStream, System sys, Time& time, States&&... states);
 
   Time getDtDid() const {return dtDid_;}
 
@@ -127,6 +100,8 @@ public:
   std::ostream& streamParameters(std::ostream& os) const {
     return std::get<1>(ces_).stream(os<<"ODE engine implementation: " << StepperDescriptor<ControlledErrorStepper> << ". ")<< std::endl;
   }
+  
+  std::ostream& logOnEnd(std::ostream& os) const {return logger_.logOnEnd(os);}
   
 private:
   template <typename System, typename State>
@@ -147,6 +122,8 @@ private:
   Time dtDid_=0., dtTry_;
   
   Logger logger_;
+  
+  int logLevel_;
 
 };
 
@@ -191,6 +168,37 @@ using ODE_EngineBoost = ode_engine::Base<boost::numeric::odeint::controlled_rung
 
 
 } // cppqedutils
+
+
+template <typename ControlledErrorStepper, typename Logger> template <typename System, typename ... States>
+void cppqedutils::ode_engine::Base<ControlledErrorStepper,Logger>::step(Time deltaT, std::ostream& logStream, System sys, Time& time, States&&... states)
+{  
+  Time 
+    timeBefore=time,
+    nextDtTry=( fabs(deltaT)<fabs(dtTry_/nextDtTryCorrectionFactor) ? dtTry_ : 0. );
+  
+  if (sign(deltaT)!=sign(dtTry_)) dtTry_=-dtDid_; // Stepping backward
+  
+  if (fabs(dtTry_)>fabs(deltaT)) dtTry_=deltaT;
+  
+  size_t nFailedSteps=0;
+  
+  for (;
+        // wraps the sys functional in order that the number of calls to it can be logged
+        stepImpl([this,sys](const auto& y, auto& dydt, double t) {
+          logger_.logDerivsCall();
+          return sys(y,dydt,t);
+        },time,std::forward<States>(states)...)!=bno::success;
+        ++nFailedSteps) ;
+
+  dtDid_=time-timeBefore;
+  if (nextDtTry) dtTry_=nextDtTry;
+  
+  logger_.logStep();
+  logger_.logFailedSteps(nFailedSteps);
+  
+  if (logLevel_>3) logStream<<"Number of failed steps in this timestep: "<<nFailedSteps<<std::endl;
+}
 
 
 #endif // CPPQEDCORE_UTILS_ODE_H_INCLUDED

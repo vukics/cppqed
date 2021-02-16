@@ -30,11 +30,11 @@ public:
   using StreamedArray=StateType;
   
   template <typename STATE, typename ... ODE_EngineCtorParams>
-  Simulated(STATE&& stateInit, Derivs derivs, double dtInit, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+  Simulated(STATE&& stateInit, Derivs derivs, double dtInit, int logLevel, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
     : state_{std::forward<STATE>(stateInit)},
       derivs_{derivs},
       keyPrinter_{"Simulated",keyLabels},
-      ode_{dtInit,std::forward<ODE_EngineCtorParams>(odePack)...} {
+      ode_{dtInit,logLevel,std::forward<ODE_EngineCtorParams>(odePack)...} {
         auto& labels{keyPrinter_.getLabels()};
         if (labels.size()<size(state_)) labels.insert(labels.end(),size(state_)-labels.size(),"N/A");
         else if (labels.size()>size(state_)) throw std::runtime_error("More keys than values in Simulated");
@@ -63,7 +63,7 @@ public:
 
   std::ostream& streamKey(std::ostream& os) const {return keyPrinter_.stream(os,3);}
 
-  void logOnEnd(std::ostream&) const {}
+  std::ostream& logOnEnd(std::ostream& os) const {return ode_.logOnEnd(os);}
   
 private:
   double t_=0.;
@@ -90,9 +90,9 @@ struct trajectory::MakeSerializationMetadata<Simulated<StateType,Derivs,ODE_Engi
 namespace simulated {
 
 template<typename StateType, typename Derivs, typename ... ODE_EngineCtorParams>
-auto make(StateType&& stateInit, Derivs derivs, double dtInit, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+auto make(StateType&& stateInit, Derivs derivs, double dtInit, int logLevel, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
 {
-  return Simulated<std::decay_t<StateType>,Derivs>{std::forward<StateType>(stateInit),derivs,dtInit,keyLabels,std::forward<ODE_EngineCtorParams>(odePack)...};
+  return Simulated<std::decay_t<StateType>,Derivs>{std::forward<StateType>(stateInit),derivs,dtInit,logLevel,keyLabels,std::forward<ODE_EngineCtorParams>(odePack)...};
 }
   
 } // simulated
