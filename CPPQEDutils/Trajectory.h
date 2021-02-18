@@ -315,37 +315,21 @@ iarchive& readState(Trajectory& traj, iarchive& iar)
   if (sm.trajectoryID==SerializationMetadata::ARRAY_ONLY) return traj.readFromArrayOnlyArchive(iar);
   else {
     if (sm != MakeSerializationMetadata<Trajectory>::_()) throw std::runtime_error("Trajectory mismatch in cppqedutils::trajectory::readState");
-    return traj.readState(iar);
+    return traj.stateIO(iar);
   }
 }
 
 
 template <typename Trajectory>
-oarchive& writeState(const Trajectory& traj, oarchive& oar)
+oarchive& writeState(Trajectory& traj, // cannot be const, because traj.stateIO is non-const
+                     oarchive& oar)
 {
-  oar & MakeSerializationMetadata<Trajectory>::_();
-  return traj.writeState(oar);
+  return traj.stateIO(oar & MakeSerializationMetadata<Trajectory>::_());
 }
 
 
-template<typename T>
-void writeViaSStream(const T& traj, std::shared_ptr<std::ostream> ofs)
-{
-  using namespace std;
-  if (ofs) {
-    ostringstream oss(ios_base::binary);
-    oarchive stateArchive(oss);
-    writeState(traj,stateArchive);
-    {
-      const string& buffer=oss.str();
-      *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
-    }
-  }
-}
-
-
-template<typename T>
-void readViaSStream(T& traj, std::shared_ptr<std::istream> ifs)
+template<typename Trajectory>
+void readViaSStream(Trajectory& traj, std::shared_ptr<std::istream> ifs)
 {
   using namespace std;
   istringstream iss(ios_base::binary);
@@ -357,6 +341,23 @@ void readViaSStream(T& traj, std::shared_ptr<std::istream> ifs)
   }
   iarchive stateArchive(iss);
   readState(traj,stateArchive);
+}
+
+
+template<typename Trajectory>
+void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO is non-const
+                     std::shared_ptr<std::ostream> ofs)
+{
+  using namespace std;
+  if (ofs) {
+    ostringstream oss(ios_base::binary);
+    oarchive stateArchive(oss);
+    writeState(traj,stateArchive);
+    {
+      const string& buffer=oss.str();
+      *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());
+    }
+  }
 }
 
 

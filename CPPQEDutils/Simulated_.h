@@ -3,12 +3,14 @@
 #ifndef CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
 #define CPPQEDCORE_UTILS_SIMULATED__H_INCLUDED
 
+#include "ArrayTraits.h"
 #include "KeyPrinter.h"
 #include "ParsTrajectory.h"
 #include "Trajectory.h"
 // #include "ArrayTraits.h"
 // The same note applies as with EvolvedGSL.tcc
 
+#include <typeinfo>
 
 namespace cppqedutils {
 
@@ -55,12 +57,14 @@ public:
     return {os,state_};
   }
 
-  iarchive& readFromArrayOnlyArchive(iarchive& iar) {return iar;}
+  iarchive& readFromArrayOnlyArchive(iarchive& iar) {return iar & state_;}
 
-  iarchive& readState(iarchive& iar) {return iar;}
-
-  oarchive& writeState(oarchive& oar) const {return oar;}
-
+  /** structure of Simulated archives:
+   * metaData – time – array – odeStepper – odeLogger – dtDid – dtTry
+   */
+  template <typename Archive>
+  Archive& stateIO(Archive& ar) {return ode_.stateIO(ar & state_ & t_);} // state should precede time in order to be compatible with array-only archives
+  
   std::ostream& streamKey(std::ostream& os) const {return keyPrinter_.stream(os,3);}
 
   std::ostream& logOnEnd(std::ostream& os) const {return ode_.logOnEnd(os);}
@@ -82,8 +86,7 @@ private:
 template <typename StateType, typename Derivs, typename ODE_Engine>
 struct trajectory::MakeSerializationMetadata<Simulated<StateType,Derivs,ODE_Engine>>
 {
-  // TODO: TypeID_v is not really correct here, since what we need is an ID of the element type
-  static auto _() {return SerializationMetadata{TypeID_v<StateType>,"Simulated",Rank_v<StateType>};}
+  static auto _() {return SerializationMetadata{typeid(ElementType_t<StateType>).name(),"Simulated",Rank_v<StateType>};}
 };
 
 

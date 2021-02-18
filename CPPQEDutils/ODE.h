@@ -40,6 +40,11 @@ template <typename ControlledErrorStepper>
 struct MakeControlledErrorStepper;
 
 
+template <typename ControlledErrorStepper>
+struct SerializeControlledErrorStepper;
+
+
+
 class DefaultLogger
 {
 public:
@@ -84,7 +89,7 @@ public:
   
   template <typename ... Args>
   Base(Time dtInit, int logLevel, Args&&... args)
-    : ces_{MakeControlledErrorStepper<ControlledErrorStepper>{}(std::forward<Args>(args)...)},
+    : ces_{MakeControlledErrorStepper<ControlledErrorStepper>::_(std::forward<Args>(args)...)},
       dtTry_(dtInit), logLevel_(logLevel) {}
   
   /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
@@ -100,6 +105,9 @@ public:
   std::ostream& streamParameters(std::ostream& os) const {
     return std::get<1>(ces_).stream(os<<"ODE engine implementation: " << StepperDescriptor<ControlledErrorStepper> << ". ")<< std::endl;
   }
+
+  template <typename Archive>
+  Archive& stateIO(Archive& ar) {return SerializeControlledErrorStepper<ControlledErrorStepper>::_(ar,std::get<0>(ces_)) & logger_ & dtDid_ & dtTry_;}
   
   std::ostream& logOnEnd(std::ostream& os) const {return logger_.logOnEnd(os);}
   
@@ -110,12 +118,6 @@ private:
   template <typename System, typename State>
   auto stepImpl(System sys, Time& time, const State& stateIn, State&& stateOut) {return std::get<0>(ces_).try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry_);}
   
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
-  friend class boost::serialization::access;
-  template<class Archive>
-  void serialize(Archive& ar, const unsigned int) {ar & std::get<0>(ces_) & logger_ & dtDid_ & dtTry_;}
-#endif // BZ_HAVE_BOOST_SERIALIZATION
-
   std::tuple<ControlledErrorStepper,
              ControlledErrorStepperParameters<ControlledErrorStepper>> ces_;
   
@@ -151,11 +153,24 @@ inline const std::string StepperDescriptor<bno::runge_kutta_cash_karp54<StateTyp
 template <typename ErrorStepper>
 struct MakeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
 {
-  auto operator()(double epsRel, double epsAbs) {
+  static auto _(double epsRel, double epsAbs)
+  {
     return std::make_tuple(make_controlled(epsRel,epsAbs,ErrorStepper()),
                            ControlledErrorStepperParameters<bno::controlled_runge_kutta<ErrorStepper>>{epsRel,epsAbs});
   }
 };
+
+
+template <typename ErrorStepper>
+struct SerializeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
+{
+  template <typename Archive>
+  static Archive& _(Archive& ar, bno::controlled_runge_kutta<ErrorStepper>)
+  {
+    return ar;
+  }
+};
+
 
 
 } // ode_engine
