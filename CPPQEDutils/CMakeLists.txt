@@ -15,7 +15,7 @@ add_subdirectory(thirdPartyRandom)
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
             BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc FFT.cc FormDouble.cc
-            FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Random.cc Trajectory.cc Version.cc)
+            FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc Random.cc Trajectory.cc Version.cc)
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 

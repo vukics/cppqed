@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  Pars pt(p);
+  Pars<> pt(p);
 
   double& omega=p.add("O","Driving frequency",1.);
   double& gamma=p.add("G","Damping rate"     ,1.);
@@ -33,14 +33,13 @@ int main(int argc, char* argv[])
 
   DA1R y(4); y=yinit.real(),yinit.imag(),dydtinit.real(),dydtinit.imag();
 
-  auto S{simulated::make(y,
+  auto S{simulated::makeBoost(y,
     [=](const DA1R& y, DA1R& dydt, double tau) {
       dydt(0)=y(2); dydt(1)=y(3); 
       dydt(2)=cos(omega*tau)-2*gamma*y(2)-y(0); dydt(3)=sin(omega*tau)-2*gamma*y(3)-y(1);
     },
-    .1/max(1.,max(omega,gamma)),10, 
     {"Re{coordinate}","Im{coordinate}","Re{velocity}","Im{velocity}"},
-    1e-6,1e-18)};
+    .1/max(1.,max(omega,gamma)),pt)};
   
   run(S,pt);
 

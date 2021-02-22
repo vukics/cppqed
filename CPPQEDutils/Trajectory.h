@@ -7,7 +7,6 @@
 #include "CommentingStream.h"
 #include "FormDouble.h"
 #include "IO_Manip.h"
-#include "ParsTrajectory.h"
 #include "ODE.h"
 #include "Version.h"
 
@@ -72,6 +71,52 @@ void evolveTo(Trajectory& traj, double t, std::ostream& logStream=std::clog)
 
   
 namespace trajectory {
+  
+
+/// Parameters corresponding to the different versions of run()
+template <typename BASE = ode_engine::Pars<>>
+struct Pars : BASE
+{
+  double &T; ///< endtime of the run
+  int &dc;
+  double &Dt;
+  long &NDt; ///< number of deltaT intervals in \link trajectory::Trajectory::run deltaT-mode\endlink
+  std::string &ofn, &initialFileName;
+
+  formdouble::Zero &precision; ///< the overall precision of trajectory stream \see FormDouble::overallPrecision
+
+  bool &streamInfo, &firstStateStream;
+
+  unsigned &sdf;
+
+  double &autoStopEpsilon; ///< relative precision for autostopping
+
+  unsigned &autoStopRepetition; ///< number of streamed lines repeated within relative precision before autostopping – 0 means no autostopping
+  
+  Pars(parameters::Table& p, const std::string& mod="")
+  : BASE{p,mod},
+    T(p.addTitle("Trajectory",mod).add("T",mod,"Simulated time",1.)),
+    dc(p.add("dc",mod,"Number of steps between two streamings",10)),
+    Dt(p.add("Dt",mod,"Timestep between two streamings",.1)),
+    NDt(p.add("NDt",mod,"Number of steps in Dt mode",0L)),
+    ofn(p.add<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
+    initialFileName(p.add<std::string>("initialFileName",mod,"Trajectory initial file name","")),
+    precision(p.add("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision))),
+    streamInfo(p.add("streamInfo",mod,"Whether to stream header for trajectories",true)),
+    firstStateStream(p.add("firstStateStream",mod,"Streams trajectory state at startup",true)),
+    sdf(p.add("sdf",mod,"State output frequency",0u)),
+    autoStopEpsilon(p.add("autoStopEpsilon",mod,"Relative precision for autostopping",ode_engine::epsRelDefault)),
+    autoStopRepetition(p.add("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)),
+    parsedCommandLine_(p.getParsedCommandLine())
+    {};
+
+  /// Corresponds to parameters::Table::getParsedCommandLine
+  const std::string getParsedCommandLine() const {return *parsedCommandLine_;}
+
+private:
+  const parameters::Table::ParsedCommandLine parsedCommandLine_;
+
+};
 
 
 /// A heuristic determination of the inital timestep from the highest frequency of a physical system.
@@ -255,9 +300,9 @@ run(TRAJ&& traj, ///< the trajectory to run
  * \note This means that ParsRun::NDt takes precedence over ParsRun::T and ParsRun::dc takes precedence over ParsRun::Dt
  * 
  */
-template<typename TRAJ>
+template<typename TRAJ, typename ParsBase>
 auto
-run(TRAJ&& traj, const trajectory::ParsRun& p,
+run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p,
     bool doStreaming=true, bool returnStreamedArray=false)
 -> std::enable_if_t<decltype(has_evolve(traj))::value || decltype(has_step(traj))::value,
                     trajectory::TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>

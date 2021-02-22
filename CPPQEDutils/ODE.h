@@ -4,6 +4,7 @@
 #define CPPQEDCORE_UTILS_ODE_H_INCLUDED
 
 #include "MathExtensions.h"
+#include "Pars.h"
 
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/serialization.hpp>
@@ -26,11 +27,48 @@ concept ordinary_differential_equation_engine = requires(E e) {
 
 namespace ode_engine {
 
+inline static const double epsRelDefault=1e-6; ///< The ultimate default of \link ParsEvolved::epsRel epsRel\endlink in the framework
+inline static const double epsAbsDefault=1e-12; ///< ” for \link ParsEvolved::epsAbs epsAbs\endlink
+
+
+/// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a parameters::Table
+/** If necessary, it can be made customizable by an additional template parameter, but a very sensible default can be provided */
+template <typename BASE = parameters::Empty>
+struct Pars : BASE
+{
+  double
+    &epsRel, ///< relative precision of ODE stepping
+    &epsAbs; ///< absolute precision ”
+
+  int &logLevel; ///< governs how much logging information is streamed during a Trajectory run
+  
+  /// All `%Pars…` classes are constructed taking a parameters::Table, to register the parameters on
+  /** 
+   * This occurs via the parameters::Table::add member function returning a reference to the registered parameter wherewith the public attributes
+   * (like Pars::epsRel) get initialized.
+   */
+  Pars(parameters::Table& p, ///<[in/out] the table to register the new parameters on
+       const std::string& mod=""    ///<[in] possible modifier suffix
+       )
+    : BASE{p,mod},
+      epsRel(p.addTitle("ODE_Engine generic parameters",mod).add("eps",mod,"ODE stepper relative precision",epsRelDefault)),
+      epsAbs(p.add("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
+      logLevel(p.add("logLevel",mod,"logging level",0)) {}
+      
+};
+
 
 namespace bno=boost::numeric::odeint;
 
+
 template <typename ControlledErrorStepper>
-struct ControlledErrorStepperParameters;
+struct ControlledErrorStepperParameters
+{
+  const double epsRel, epsAbs;
+  
+  std::ostream& stream(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << " epsAbs=" << epsAbs;}
+};
+
 
 template <typename Stepper>
 constexpr auto StepperDescriptor=std::nullopt;
@@ -41,8 +79,14 @@ struct MakeControlledErrorStepper;
 
 
 template <typename ControlledErrorStepper>
-struct SerializeControlledErrorStepper;
-
+struct SerializeControlledErrorStepper
+{
+  template <typename Archive>
+  static Archive& _(Archive& ar, ControlledErrorStepper)
+  {
+    return ar;
+  }
+};
 
 
 class DefaultLogger
@@ -91,7 +135,12 @@ public:
   Base(Time dtInit, int logLevel, Args&&... args)
     : ces_{MakeControlledErrorStepper<ControlledErrorStepper>::_(std::forward<Args>(args)...)},
       dtTry_(dtInit), logLevel_(logLevel) {}
-  
+
+  template <typename ParsBase>
+  Base(Time dtInit, const Pars<ParsBase>& p)
+    : ces_{MakeControlledErrorStepper<ControlledErrorStepper>::_(p)},
+      dtTry_(dtInit), logLevel_(p.logLevel) {}
+
   /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
   template <typename System, typename ... States>
   void step(Time deltaT, std::ostream& logStream, System sys, Time& time, States&&... states);
@@ -109,7 +158,7 @@ public:
   template <typename Archive>
   Archive& stateIO(Archive& ar) {return SerializeControlledErrorStepper<ControlledErrorStepper>::_(ar,std::get<0>(ces_)) & logger_ & dtDid_ & dtTry_;}
   
-  std::ostream& logOnEnd(std::ostream& os) const {return logger_.logOnEnd(os);}
+  std::ostream& logOnEnd(std::ostream& os) const {return logLevel_ > 0 ? logger_.logOnEnd(os) : os;}
   
 private:
   template <typename System, typename State>
@@ -133,16 +182,6 @@ private:
 /// Specializations for Boost.Odeint controlled_runge_kutta & runge_kutta_cash_karp54
 
 template <typename ErrorStepper>
-struct ControlledErrorStepperParameters<bno::controlled_runge_kutta<ErrorStepper>>
-{
-  const double epsRel, epsAbs;
-  
-  std::ostream& stream(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << " epsAbs=" << epsAbs;}
-  
-};
-
-
-template <typename ErrorStepper>
 inline const std::string StepperDescriptor<bno::controlled_runge_kutta<ErrorStepper>> = "Boost.Odeint controlled stepper " + StepperDescriptor<ErrorStepper>;
 
 
@@ -158,19 +197,15 @@ struct MakeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
     return std::make_tuple(make_controlled(epsRel,epsAbs,ErrorStepper()),
                            ControlledErrorStepperParameters<bno::controlled_runge_kutta<ErrorStepper>>{epsRel,epsAbs});
   }
-};
 
-
-template <typename ErrorStepper>
-struct SerializeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
-{
-  template <typename Archive>
-  static Archive& _(Archive& ar, bno::controlled_runge_kutta<ErrorStepper>)
+  template <typename ParsBase>
+  static auto _(const Pars<ParsBase>& p)
   {
-    return ar;
+    return _(p.epsRel,p.epsAbs);
   }
-};
 
+  
+};
 
 
 } // ode_engine

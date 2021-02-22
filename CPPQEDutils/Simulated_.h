@@ -5,7 +5,6 @@
 
 #include "ArrayTraits.h"
 #include "KeyPrinter.h"
-#include "ParsTrajectory.h"
 #include "Trajectory.h"
 // #include "ArrayTraits.h"
 // The same note applies as with EvolvedGSL.tcc
@@ -31,17 +30,17 @@ class Simulated
 public:
   using StreamedArray=StateType;
   
-  template <typename STATE, typename ... ODE_EngineCtorParams>
-  Simulated(STATE&& stateInit, Derivs derivs, double dtInit, int logLevel, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+  template <typename STATE>
+  Simulated(STATE&& stateInit, Derivs derivs, std::initializer_list<std::string> keyLabels, ODE_Engine ode)
     : state_{std::forward<STATE>(stateInit)},
       derivs_{derivs},
       keyPrinter_{"Simulated",keyLabels},
-      ode_{dtInit,logLevel,std::forward<ODE_EngineCtorParams>(odePack)...} {
+      ode_{ode} {
         auto& labels{keyPrinter_.getLabels()};
         if (labels.size()<size(state_)) labels.insert(labels.end(),size(state_)-labels.size(),"N/A");
         else if (labels.size()>size(state_)) throw std::runtime_error("More keys than values in Simulated");
       }
-
+  
   auto getTime() const {return t_;}
 
   void step(double deltaT, std::ostream& logStream) {ode_.step(deltaT,logStream,derivs_,t_,state_);}
@@ -92,12 +91,18 @@ struct trajectory::MakeSerializationMetadata<Simulated<StateType,Derivs,ODE_Engi
 
 namespace simulated {
 
-template<typename StateType, typename Derivs, typename ... ODE_EngineCtorParams>
-auto make(StateType&& stateInit, Derivs derivs, double dtInit, int logLevel, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+template<typename ODE_Engine, typename StateType, typename Derivs, typename ... ODE_EngineCtorParams>
+auto make(StateType&& stateInit, Derivs derivs, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
 {
-  return Simulated<std::decay_t<StateType>,Derivs>{std::forward<StateType>(stateInit),derivs,dtInit,logLevel,keyLabels,std::forward<ODE_EngineCtorParams>(odePack)...};
+  return Simulated<std::decay_t<StateType>,Derivs,ODE_Engine>{std::forward<StateType>(stateInit),derivs,keyLabels,ODE_Engine{std::forward<ODE_EngineCtorParams>(odePack)...}};
 }
-  
+
+template<typename StateType, typename Derivs, typename ... ODE_EngineCtorParams>
+auto makeBoost(StateType&& stateInit, Derivs derivs, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+{
+  return make<ODE_EngineBoost<std::decay_t<StateType>>>(std::forward<StateType>(stateInit),derivs,keyLabels,std::forward<ODE_EngineCtorParams>(odePack)...);
+}
+
 } // simulated
 
 

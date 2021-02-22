@@ -3,7 +3,6 @@
 #ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
-#include "ParsTrajectory.h"
 #include "Random.h"
 #include "Trajectory.h"
 
