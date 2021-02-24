@@ -37,8 +37,8 @@ public:
       keyPrinter_{"Simulated",keyLabels},
       ode_{ode} {
         auto& labels{keyPrinter_.getLabels()};
-        if (labels.size()<size(state_)) labels.insert(labels.end(),size(state_)-labels.size(),"N/A");
-        else if (labels.size()>size(state_)) throw std::runtime_error("More keys than values in Simulated");
+        if (labels.size()<::cppqedutils::size(state_)) labels.insert(labels.end(),::cppqedutils::size(state_)-labels.size(),"N/A");
+        else if (labels.size()>::cppqedutils::size(state_)) throw std::runtime_error("More keys than values in Simulated");
       }
   
   auto getTime() const {return t_;}

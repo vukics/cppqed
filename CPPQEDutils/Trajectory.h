@@ -215,11 +215,11 @@ private:
 };
 
 
-template<typename SA>
-struct AutostopHandlerNoOp
+const struct
 {
+  template <typename SA>
   void operator()(const SA&) {}
-};
+} autostopHandlerNoOp;
 
 
 template<typename SA>
@@ -300,32 +300,37 @@ run(TRAJ&& traj, ///< the trajectory to run
  * \note This means that ParsRun::NDt takes precedence over ParsRun::T and ParsRun::dc takes precedence over ParsRun::Dt
  * 
  */
-template<typename TRAJ, typename ParsBase>
+template<typename AutostopHandler, typename TRAJ, typename ParsBase>
 auto
-run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p,
+run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p, AutostopHandler&& ah,
     bool doStreaming=true, bool returnStreamedArray=false)
 -> std::enable_if_t<decltype(has_evolve(traj))::value || decltype(has_step(traj))::value,
                     trajectory::TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>
 {
-  using AHG=trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>;
-  
   if constexpr (decltype(has_step(traj))::value) { // it is of the Adaptive family
     if (p.dc) return run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
                          p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                         doStreaming,returnStreamedArray,
-                         AHG(p.autoStopEpsilon,p.autoStopRepetition));
+                         doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
   if (p.NDt) return run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
                         p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                        doStreaming,returnStreamedArray,
-                        AHG(p.autoStopEpsilon,p.autoStopRepetition));
+                        doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
   else return run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
                   p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                  doStreaming,returnStreamedArray,
-                  AHG(p.autoStopEpsilon,p.autoStopRepetition));
+                  doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
 }
+
+
+template<typename TRAJ, typename ParsBase>
+auto
+run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p, bool doStreaming=true, bool returnStreamedArray=false)
+{
+  return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilon,p.autoStopRepetition),
+             doStreaming,returnStreamedArray);
+}
+
 
 
 namespace trajectory {

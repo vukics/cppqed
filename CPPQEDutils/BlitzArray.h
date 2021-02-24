@@ -116,10 +116,6 @@ inline bool isStorageContiguous(const DArray<n>& a) {return a.isStorageContiguou
 
 
 template<int n>
-inline size_t size(const DArray<n>& a) {return a.size();}
-
-
-template<int n>
 inline std::vector<size_t> dimensions(const DArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
 
 
