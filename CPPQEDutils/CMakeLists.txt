@@ -19,7 +19,7 @@ add_library(CPPQEDutils SHARED
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams PRIVATE GSL::gsl)
+target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams GSL::gsl)
 
 if (TARGET Eigen3::Eigen)
   message(STATUS "Found Eigen3")

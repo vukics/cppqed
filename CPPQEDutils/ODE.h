@@ -12,6 +12,7 @@
 
 #include <boost/numeric/odeint.hpp>
 
+#include <functional>
 #include <iostream>
 #include <optional>
 
@@ -29,6 +30,10 @@ namespace ode_engine {
 
 inline static const double epsRelDefault=1e-6; ///< The ultimate default of \link ParsEvolved::epsRel epsRel\endlink in the framework
 inline static const double epsAbsDefault=1e-12; ///< ” for \link ParsEvolved::epsAbs epsAbs\endlink
+
+
+template <typename Time, typename State>
+using SystemFunctional_t=std::function<void(const State&, State&, Time)>;
 
 
 /// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a parameters::Table
@@ -124,9 +129,9 @@ public:
    * Since dtTry is at most deltaT, dtTry will drop severely if deltaT is very small (e.g. when completing a given interval at its end).
    * Since this drop can be several orders of magnitude, this must not be allowed as it would slow down the simulation extremely.
    * To patch this, we check before the actual timestep whether we are in the case of a *very small* `deltaT` (`< dtTry/nextDtTryCorrectionFactor`).
-   * In such a case the present dtTry is cached and used unchanged in the next step. That is, such a tiny step is excluded from stepsize control.
+   * In such a case the actual dtTry is cached and used unchanged in the next step. That is, such a tiny step is excluded from stepsize control.
    */
-  inline static const double nextDtTryCorrectionFactor=50.;
+  inline static const double nextDtTryCorrectionFactor=10.;
   
   
   using Time=typename ControlledErrorStepper::time_type;
@@ -162,10 +167,10 @@ public:
   
 private:
   template <typename System, typename State>
-  auto stepImpl(System sys, Time& time, State&& stateInOut) {return std::get<0>(ces_).try_step(sys,std::forward<State>(stateInOut),time,dtTry_);}
+  auto tryStep(System sys, Time& time, State&& stateInOut) {return std::get<0>(ces_).try_step(sys,std::forward<State>(stateInOut),time,dtTry_);}
 
   template <typename System, typename State>
-  auto stepImpl(System sys, Time& time, const State& stateIn, State&& stateOut) {return std::get<0>(ces_).try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry_);}
+  auto tryStep(System sys, Time& time, const State& stateIn, State&& stateOut) {return std::get<0>(ces_).try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry_);}
   
   std::tuple<ControlledErrorStepper,
              ControlledErrorStepperParameters<ControlledErrorStepper>> ces_;
@@ -220,12 +225,16 @@ using ODE_EngineBoost = ode_engine::Base<boost::numeric::odeint::controlled_rung
 } // cppqedutils
 
 
+/**
+ * The possibility of FSAL steppers (that can reuse the derivative calculated in the last stage of the previous step)
+ * is not included, that would require more involved logic.
+ */
 template <typename ControlledErrorStepper, typename Logger> template <typename System, typename ... States>
 void cppqedutils::ode_engine::Base<ControlledErrorStepper,Logger>::step(Time deltaT, std::ostream& logStream, System sys, Time& time, States&&... states)
 {  
-  Time 
-    timeBefore=time,
-    nextDtTry=( fabs(deltaT)<fabs(dtTry_/nextDtTryCorrectionFactor) ? dtTry_ : 0. );
+  const Time timeBefore=time;
+  
+  Time nextDtTry=( fabs(deltaT)<fabs(dtTry_/nextDtTryCorrectionFactor) ? dtTry_ : 0. );
   
   if (sign(deltaT)!=sign(dtTry_)) dtTry_=-dtDid_; // Stepping backward
   
@@ -235,7 +244,7 @@ void cppqedutils::ode_engine::Base<ControlledErrorStepper,Logger>::step(Time del
   
   for (;
         // wraps the sys functional in order that the number of calls to it can be logged
-        stepImpl([this,sys](const auto& y, auto& dydt, double t) {
+        tryStep([this,sys](const auto& y, auto& dydt, double t) {
           logger_.logDerivsCall();
           return sys(y,dydt,t);
         },time,std::forward<States>(states)...)!=bno::success;

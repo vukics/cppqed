@@ -5,7 +5,7 @@
 
 #include <array>
 #include <optional>
-#include <vector>
+#include <stdexcept>
 
 namespace cppqedutils {
 
@@ -32,6 +32,12 @@ using ElementType_t = typename ElementType<A>::type;
 //@{
 
 
+template <size_t Rank>
+using Extents_t=std::array<size_t,Rank>;
+
+
+struct NonContiguousStorageException : public std::invalid_argument {using std::invalid_argument::invalid_argument;};
+
 template<typename A>
 bool isStorageContiguous(const A& a);
 
@@ -40,7 +46,7 @@ template<typename A>
 auto size(const A& a) {return a.size();}
 
 template<typename A>
-std::vector<size_t> dimensions(const A& a);
+Extents_t<Rank_v<A>> extents(const A& a);
 
 
 
@@ -48,19 +54,19 @@ template<typename A>
 const double* data(const A& a);
 
 template<typename A>
-      double* data(      A& a);
+inline double* data(A& a) {return const_cast<double*>(data(static_cast<const A&>(a)));}
 
 
 
 template<typename A>
-      A create(      double* y, const A& a); ///< Clone (create a non-owning array of data `y` of the same memory layout as `a`)
+A create(double* y, Extents_t<Rank_v<A>> e); ///< Create a non-owning array of data `y` with memory layout specified by `e`
 
 template<typename A>
-const A create(const double* y, const A& a); ///< Const clone (create a const non-owning array of data `y` of the same memory layout as `a`)
-
+inline const A create(const double* y, Extents_t<Rank_v<A>> e) {return create<A>(const_cast<double*>(y),e);}
 
 template<typename A>
-A create(const A& a); ///< Empty clone (create a newly allocated owning empty array of the same memory layout as `a`)
+A create(Extents_t<Rank_v<A>> e); ///< Owning empty array with memory layout specified by `e`
+
 //@}
 
 
@@ -75,7 +81,7 @@ const auto& subscript(const A& a, size_t i) {return a[i];}
 
 /// non-const subscription
 template<typename A>
-auto& subscript(A& a, size_t i) {return a[i];}
+inline auto& subscript(A& a, size_t i) {return const_cast<ElementType_t<A>&>(subscript(static_cast<const A&>(a),i));}
 
 
 template<typename A>

@@ -1,7 +1,7 @@
 # Copyright András Vukics 2021. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 set(EXEC_TARGETS
-    HarmonicOscillator HarmonicOscillatorStdArray)
+    HarmonicOscillator HarmonicOscillatorStdArray HarmonicOscillatorGSL)
 
 foreach(S ${EXEC_TARGETS})
   add_executable(${S} ${S}.cc)
