@@ -37,8 +37,8 @@ public:
       keyPrinter_{"Simulated",keyLabels},
       ode_{ode} {
         auto& labels{keyPrinter_.getLabels()};
-        if (labels.size()<::cppqedutils::size(state_)) labels.insert(labels.end(),::cppqedutils::size(state_)-labels.size(),"N/A");
-        else if (labels.size()>::cppqedutils::size(state_)) throw std::runtime_error("More keys than values in Simulated");
+        if (labels.size()<::cppqedutils::Size<StateType>::_(state_)) labels.insert(labels.end(),::cppqedutils::Size<StateType>::_(state_)-labels.size(),"N/A");
+        else if (labels.size()>::cppqedutils::Size<StateType>::_(state_)) throw std::runtime_error("More keys than values in Simulated");
       }
   
   auto getTime() const {return t_;}
@@ -52,7 +52,7 @@ public:
   std::tuple<std::ostream&,StateType> stream(std::ostream& os, int precision) const
   {
     using namespace cppqedutils;
-    for (size_t i=0; i<subscriptLimit(state_); i++) os<<FormDouble(precision)(subscript(state_,i))<<' ';
+    for (size_t i=0; i < SubscriptLimit<StateType>::_(state_); i++) os<<FormDouble(precision)(Subscript_c<StateType>::_(state_,i))<<' ';
     return {os,state_};
   }
 

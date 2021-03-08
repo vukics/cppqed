@@ -7,6 +7,7 @@
 #include <optional>
 #include <stdexcept>
 
+
 namespace cppqedutils {
 
 
@@ -38,34 +39,49 @@ using Extents_t=std::array<size_t,Rank>;
 
 struct NonContiguousStorageException : public std::invalid_argument {using std::invalid_argument::invalid_argument;};
 
-template<typename A>
-bool isStorageContiguous(const A& a);
-
 
 template<typename A>
-auto size(const A& a) {return a.size();}
-
-template<typename A>
-Extents_t<Rank_v<A>> extents(const A& a);
-
+struct IsStorageContiguous;
 
 
 template<typename A>
-const double* data(const A& a);
+struct Size
+{
+  static auto _(const A& a) {return a.size();}
+};
+
 
 template<typename A>
-inline double* data(A& a) {return const_cast<double*>(data(static_cast<const A&>(a)));}
+struct Extents;
 
 
 
 template<typename A>
-A create(double* y, Extents_t<Rank_v<A>> e); ///< Create a non-owning array of data `y` with memory layout specified by `e`
+struct Data_c;
+
 
 template<typename A>
-inline const A create(const double* y, Extents_t<Rank_v<A>> e) {return create<A>(const_cast<double*>(y),e);}
+struct Data
+{
+  static double* _(A& a) {return const_cast<double*>(Data_c<A>::_(a));}
+};
+
 
 template<typename A>
-A create(Extents_t<Rank_v<A>> e); ///< Owning empty array with memory layout specified by `e`
+struct Create;
+
+
+template<typename A>
+struct Create_c
+{
+  /// Create a non-owning array of data `y` with memory layout specified by `e`
+  static const A _(const double* y, Extents_t<Rank_v<A>> e) {return Create<A>::_(const_cast<double*>(y),e);}
+};
+
+
+///< Owning empty array with memory layout specified by `e`
+template<typename A>
+struct CreateFromExtents;
 
 //@}
 
@@ -76,16 +92,30 @@ A create(Extents_t<Rank_v<A>> e); ///< Owning empty array with memory layout spe
 
 /// subscription of `a` (which might be a multi-array) with a *single* integer
 template<typename A>
-const auto& subscript(const A& a, size_t i) {return a[i];}
+struct Subscript_c
+{
+  static const auto& _(const A& a, size_t i) {return a[i];}
+};
 
 
 /// non-const subscription
 template<typename A>
-inline auto& subscript(A& a, size_t i) {return const_cast<ElementType_t<A>&>(subscript(static_cast<const A&>(a),i));}
+struct Subscript
+{
+  static auto& _(A& a, size_t i) {return const_cast<ElementType_t<A>&>(Subscript_c<A>::_(a,i));}
+};
 
 
 template<typename A>
-size_t subscriptLimit(const A& a) {return a.size();}
+struct SubscriptLimit
+{
+  static auto _(const A& a) {return a.size();}
+};
+
+
+template<typename A>
+struct Stride;
+
 
 //@}
 

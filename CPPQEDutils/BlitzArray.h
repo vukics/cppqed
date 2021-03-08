@@ -102,19 +102,35 @@ constexpr auto TypeID_v<CArray<RANK>> ="CArray";
 
 
 template<typename T, int n>
-inline bool isStorageContiguous(const blitz::Array<T,n>& a) {return a.isStorageContiguous();}
+struct IsStorageContiguous<blitz::Array<T,n>>
+{
+  static auto _(const blitz::Array<T,n>& a) {return a.isStorageContiguous();}
+};
 
 
 template<typename T, int n>
-inline auto extents(const blitz::Array<T,n>& a) {Extents_t<n> res; std::copy(a.extent().begin(),a.extent().end(),res.begin()); return res;}
-
+struct Extents<blitz::Array<T,n>>
+{
+  static auto _(const blitz::Array<T,n>& a) {Extents_t<n> res; std::copy(a.extent().begin(),a.extent().end(),res.begin()); return res;}
+};
 
 
 /// \name `blitz::Array` memory traits for `blitz::Array<double,n>`
 //@{
 
 template<int n>
-inline const double* data(const DArray<n>& a) {return a.size() ? a.data() : 0;}
+struct Data_c<DArray<n>>
+{
+  static const double* _(const DArray<n>& a) {return a.size() ? a.data() : 0;}
+};
+
+
+template<int n>
+struct Create<DArray<n>>
+{
+  static DArray<n> _(double* y, Extents_t<n> e) {ExtTiny<n> et; std::copy(e.begin(),e.end(),et.begin()); return DArray<n>(y,et,blitz::neverDeleteData);}
+};
+
 
 //@}
 
@@ -123,23 +139,54 @@ inline const double* data(const DArray<n>& a) {return a.size() ? a.data() : 0;}
 //@{
 
 template<int n>
-inline size_t size(const CArray<n>& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
+struct Size<CArray<n>>
+{
+  static auto _(const CArray<n>& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
+};
 
 
 template<int n>
-inline const double* data(const CArray<n>& a) {return a.size() ? real(a).data() : 0;}
+struct Data_c<CArray<n>>
+{
+  static const double* _(const CArray<n>& a) {return a.size() ? real(a).data() : 0;}
+};
+
+
+template<int n>
+struct Create<CArray<n>>
+{
+  static CArray<n> _(double* y, Extents_t<n> e)
+  {
+    ExtTiny<n> et; std::copy(e.begin(),e.end(),et.begin());
+    return CArray<n>(reinterpret_cast<dcomp*>(y),et,blitz::neverDeleteData);    
+  }
+};
+
 
 //@}
+
+template<typename T, int n>
+struct CreateFromExtents<blitz::Array<T,n>>
+{
+  static blitz::Array<T,n> _(Extents_t<n> e) {ExtTiny<n> et; std::copy(e.begin(),e.end(),et.begin()); return blitz::Array<T,n>(et);}
+};
 
 
 /// \name `blitz::Array` traversal traits for unary double and complex arrays
 //@{
 
 template<typename T>
-inline const auto& subscript(const blitz::Array<T,1>& a, size_t i) {return a(i);}
+struct Subscript_c<blitz::Array<T,1>>
+{
+  static const auto& _(const blitz::Array<T,1>& a, size_t i) {return a(i);}
+};
+
 
 template<typename T>
-inline size_t stride(const blitz::Array<T,1>& a) {return a.stride(0);}
+struct Stride<blitz::Array<T,1>>
+{
+  static auto _(const blitz::Array<T,1>& a) {return a.stride(0);}
+};
 
 //@}
 
