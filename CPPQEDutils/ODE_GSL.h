@@ -62,9 +62,6 @@ public:
     }
 #endif // NDEBUG
     
-    double time0=time;
-    StateType state0{CreateFromExtents<StateType>::_(Extents<StateType>::_(stateInOut))}; state0=stateInOut;
-    
     SystemFunctional_t<double,StateType> sysVariable=sys; // it’s important to convert `sys` (which can be a lambda) to a variable of known type
     
     Aux_t aux{sysVariable,Extents<StateType>::_(stateInOut)};
@@ -77,13 +74,13 @@ public:
 
     if (step_status != GSL_SUCCESS) {
       dtTry *= 0.5;
-      stateInOut=state0; // deep reset state
-      time=time0;
       return bno::fail;
     }
     else {
-      const auto hadjust_status = gsl_odeiv2_control_hadjust (con_, step_, Data<StateType>::_(stateInOut), yerr_.data(), dydt_out_.data(), &dtTry);
-      if (hadjust_status == GSL_ODEIV_HADJ_DEC) throw std::runtime_error{"Unexpected change of dtTry in ControlledErrorStepperGSL::tryStep"};
+      time+=dtTry;
+      /* const auto hadjust_status = */
+      gsl_odeiv2_control_hadjust (con_, step_, Data<StateType>::_(stateInOut), yerr_.data(), dydt_out_.data(), &dtTry);
+      // if (hadjust_status == GSL_ODEIV_HADJ_DEC) throw std::runtime_error{"Unexpected change of dtTry in ControlledErrorStepperGSL::tryStep"};
       return bno::success;
     }
   }
