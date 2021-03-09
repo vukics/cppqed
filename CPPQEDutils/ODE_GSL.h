@@ -28,12 +28,10 @@ public:
   using stepper_category=bno::controlled_stepper_tag;
   
   ControlledErrorStepperGSL(double epsAbs, double epsRel)
-    : step_{},
-      con_{gsl_odeiv2_control_standard_new(epsAbs,epsRel,1,1)},
-      yerr_{},
-      dydt_out_{} {}
+    : control_{gsl_odeiv2_control_standard_new(epsAbs,epsRel,1,1), [] (auto* ptr) {if (ptr) gsl_odeiv2_control_free(ptr);}} {}
   
 private:
+  using ValueVector=std::vector<value_type>;
   using Aux_t=std::tuple<SystemFunctional_t<double,StateType>&,Extents_t<Rank_v<StateType>>>;
   
 public:
@@ -48,16 +46,16 @@ public:
   {
     auto totalExtent=Size<StateType>::_(stateInOut);
     
-    if (!yerr_.size()) { // this means that tryStep is called for the first time
-      step_=gsl_odeiv2_step_alloc(gsl_odeiv2_step_rkck,totalExtent);
-      yerr_.resize(totalExtent);
-      dydt_out_.resize(totalExtent);
+    if (!step_) { // this means that tryStep is called for the first time
+      step_.reset(gsl_odeiv2_step_alloc(gsl_odeiv2_step_rkck,totalExtent), [] (auto* ptr) {if (ptr) gsl_odeiv2_step_free(ptr);});
+      yerr_=std::make_shared<ValueVector>(totalExtent);
+      dydt_out_=std::make_shared<ValueVector>(totalExtent);
     }
 #ifndef NDEBUG
     else if (!IsStorageContiguous<StateType>::_(stateInOut)) {
       throw NonContiguousStorageException{"ControlledErrorStepperGSL::tryStep"};
     }
-    else if (yerr_.size()!=Size<StateType>::_(stateInOut) || dydt_out_.size()!=Size<StateType>::_(stateInOut)) {
+    else if (yerr_->size()!=Size<StateType>::_(stateInOut) || dydt_out_->size()!=Size<StateType>::_(stateInOut)) {
       throw std::runtime_error("Dimensionality mismatch in ControlledErrorStepperGSL::tryStep");
     }
 #endif // NDEBUG
@@ -66,9 +64,9 @@ public:
     
     Aux_t aux{sysVariable,Extents<StateType>::_(stateInOut)};
     
-    gsl_odeiv2_system dydt{ControlledErrorStepperGSL::lowLevelSystemFunction,NULL,totalExtent,&aux};
+    gsl_odeiv2_system dydt{ControlledErrorStepperGSL::lowLevelSystemFunction,nullptr,totalExtent,&aux};
     
-    auto step_status = gsl_odeiv2_step_apply (step_, time, dtTry, Data<StateType>::_(stateInOut), yerr_.data(), NULL, dydt_out_.data(), &dydt);
+    auto step_status = gsl_odeiv2_step_apply (step_.get(), time, dtTry, Data<StateType>::_(stateInOut), yerr_->data(), nullptr, dydt_out_->data(), &dydt);
     
     if (step_status == GSL_EFAULT || step_status == GSL_EBADFUNC) throw std::runtime_error("GSL bad step_status");
 
@@ -79,7 +77,7 @@ public:
     else {
       time+=dtTry;
       /* const auto hadjust_status = */
-      gsl_odeiv2_control_hadjust (con_, step_, Data<StateType>::_(stateInOut), yerr_.data(), dydt_out_.data(), &dtTry);
+      gsl_odeiv2_control_hadjust (control_.get(), step_.get(), Data<StateType>::_(stateInOut), yerr_->data(), dydt_out_->data(), &dtTry);
       // if (hadjust_status == GSL_ODEIV_HADJ_DEC) throw std::runtime_error{"Unexpected change of dtTry in ControlledErrorStepperGSL::tryStep"};
       return bno::success;
     }
@@ -99,12 +97,12 @@ private:
     return GSL_SUCCESS;
   }
   
-  gsl_odeiv2_step * step_;
+  std::shared_ptr<gsl_odeiv2_step> step_;
 
-  gsl_odeiv2_control * const con_;
+  const std::shared_ptr<gsl_odeiv2_control> control_;
   
-  // make this movable easily, as ControlledErrorStepperGSL is carried around by value
-  std::vector<value_type> yerr_, dydt_out_;
+  // Needs to be easily copyable, as Steppers are carried around by value
+  std::shared_ptr<ValueVector> yerr_, dydt_out_;
   
 };
 
