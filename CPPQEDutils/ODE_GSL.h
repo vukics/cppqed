@@ -31,7 +31,7 @@ public:
     : control_{gsl_odeiv2_control_standard_new(epsAbs,epsRel,1,1), [] (auto* ptr) {if (ptr) gsl_odeiv2_control_free(ptr);}} {}
   
 private:
-  using ValueVector=std::vector<value_type>;
+  using ValueVector=std::vector<double>;
   using Aux_t=std::tuple<SystemFunctional_t<double,StateType>&,Extents_t<Rank_v<StateType>>>;
   
 public:

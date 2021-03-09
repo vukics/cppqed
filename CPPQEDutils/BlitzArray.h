@@ -121,7 +121,7 @@ struct Extents<blitz::Array<T,n>>
 template<int n>
 struct Data_c<DArray<n>>
 {
-  static const double* _(const DArray<n>& a) {return a.size() ? a.data() : 0;}
+  static const double* _(const DArray<n>& a) {return a.size() ? a.data() : nullptr;}
 };
 
 
@@ -148,7 +148,7 @@ struct Size<CArray<n>>
 template<int n>
 struct Data_c<CArray<n>>
 {
-  static const double* _(const CArray<n>& a) {return a.size() ? real(a).data() : 0;}
+  static const double* _(const CArray<n>& a) {return a.size() ? real(a).data() : nullptr;}
 };
 
 
