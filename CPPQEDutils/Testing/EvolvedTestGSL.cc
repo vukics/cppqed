@@ -19,6 +19,7 @@
 #include "Simulated.h"
 
 #include "MathExtensions.h"
+#include "ODE_GSL.h"
 
 using namespace std;
 using namespace trajectory;
@@ -35,7 +36,7 @@ int main(int , char**)
   y(0)=  EULER;
   y(1)=Z*EULER;
 
-  auto S(simulated::makeBoost(y,[=](const Array& yA, Array& dydtA, double tau) {
+  auto S(simulated::make<ODE_EngineGSL<Array>>(y,[=](const Array& yA, Array& dydtA, double tau) {
     dcomp y{yA(0)}, p{yA(1)};
     dydtA(0)=p;
     dydtA(1)=sqr(p)+Z*p+sqr(Z)*exp(2.*Z*tau)*(y-sqr(y));
@@ -51,6 +52,6 @@ int main(int , char**)
   
   // for ( auto s : streamedArray ) cout<<get<0>(s)<<"\t"<<get<2>(s)(0).real()<<"\t"<<get<2>(s)(0).imag()<<endl;
   
-  return !(yDev/streamedArray.size()<2e-8);
+  return !(yDev/streamedArray.size()<5e-8);
  
 }

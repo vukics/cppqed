@@ -6,7 +6,7 @@
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
 set(TESTING_EXECUTABLES
-    EvolvedTest MultiIndexIteratorNew)
+    EvolvedTest EvolvedTestGSL MultiIndexIteratorNew)
 
 if (TARGET Eigen3::Eigen)
   set(TESTING_EXECUTABLES ${TESTING_EXECUTABLES} HarmonicOscillatorRandomTimes HarmonicOscillatorComplex)
@@ -17,8 +17,12 @@ foreach(S ${TESTING_EXECUTABLES})
   target_link_libraries(${S} CPPQED::CPPQEDutils)
 endforeach()
 
-add_test(evolved_nonlinear_ode EvolvedTest)
-set_tests_properties(evolved_nonlinear_ode PROPERTIES LABELS "Fast;Utils")
+add_test(evolved_nonlinear_ode_boost EvolvedTest)
+set_tests_properties(evolved_nonlinear_ode_boost PROPERTIES LABELS "Fast;Utils")
+
+add_test(evolved_nonlinear_ode_gsl EvolvedTestGSL)
+set_tests_properties(evolved_nonlinear_ode_gsl PROPERTIES LABELS "Fast;Utils")
+
 
 if (TARGET Eigen3::Eigen)
   add_test(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)

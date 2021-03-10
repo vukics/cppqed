@@ -6,8 +6,6 @@
 #include "ArrayTraits.h"
 #include "KeyPrinter.h"
 #include "Trajectory.h"
-// #include "ArrayTraits.h"
-// The same note applies as with EvolvedGSL.tcc
 
 #include <typeinfo>
 
@@ -53,7 +51,7 @@ public:
   {
     using namespace cppqedutils;
     for (size_t i=0; i < SubscriptLimit<StateType>::_(state_); i++) os<<FormDouble(precision)(Subscript_c<StateType>::_(state_,i))<<' ';
-    return {os,state_};
+    return {os,state_.copy()};
   }
 
   iarchive& readFromArrayOnlyArchive(iarchive& iar) {return iar & state_;}

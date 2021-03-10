@@ -218,7 +218,7 @@ private:
 const struct
 {
   template <typename SA>
-  void operator()(const SA&) {}
+  void operator()(const SA&) const {}
 } autostopHandlerNoOp;
 
 
@@ -531,7 +531,7 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
 
   bool
     stateSaved=false,  // signifies whether the state has already been saved for the actual time instant of the trajectory
-    evsStreamed=false; // signifies whether the expectation values have already been streamed ”
+    arrayStreamed=false; // signifies whether the expectation values have already been streamed ”
 
   try {
 
@@ -544,7 +544,7 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
           if constexpr (endTimeMode) evolve(traj,std::min(streamFreq,length-traj.getTime()),logStream);
           else evolve(traj,streamFreq,logStream);
         }
-        stateSaved=evsStreamed=false;
+        stateSaved=arrayStreamed=false;
       }
 
       if (!count || [&]() {
@@ -564,7 +564,7 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
         ++stateCount;
 
         if (count || !continuing) {
-          evsStreamed=true;
+          arrayStreamed=true;
           auto streamReturn{stream(traj,os,precision)};
           if (returnStreamedArray) res.emplace_back(traj.getTime(),traj.getDtDid(),get<1>(streamReturn));
           autostopHandler(get<1>(streamReturn));
@@ -574,7 +574,7 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
 
   } catch (const StoppingCriterionReachedException& except) {commentingStream<<"Stopping criterion has been reached"<<endl;}
   
-  if (!evsStreamed) stream(traj,os,precision); // Stream at the end instant if stream has not happened yet
+  if (!arrayStreamed) stream(traj,os,precision); // Stream at the end instant if stream has not happened yet
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
