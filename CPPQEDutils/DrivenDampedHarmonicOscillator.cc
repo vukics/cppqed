@@ -7,9 +7,6 @@
 #include <iostream>
 
 
-using namespace cppqedutils;
-
-
 dcomp cppqedutils::ddho::_::c(double t) const
 {
   return exp(DCOMP_I*omega_*t)/(1.+2.*DCOMP_I*gamma_*omega_-sqr(omega_));
@@ -20,6 +17,11 @@ cppqedutils::ddho::_::_(double gamma, double omega, Matrix m, dcomp ampTI, dcomp
   : gamma_(gamma), omega_(omega), a_(m.fullPivLu().solve(Vector(ampTI-c(tInit),ampDerivTI-DCOMP_I*omega*c(tInit))))
 {}
 
+
+namespace {
+
+
+using namespace cppqedutils;
 
 
 class DDHO : private std::pair<dcomp,dcomp>, public ddho::_
@@ -55,6 +57,8 @@ public:
 
 };
 
+
+}
 
 
 cppqedutils::ddho::Ptr cppqedutils::ddho::make(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit)

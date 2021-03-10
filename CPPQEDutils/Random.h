@@ -43,8 +43,6 @@ public:
   
   explicit GSL_Engine(result_type s/*, const gsl_rng_type* ran_gen_type=gsl_rng_taus2*/);
 
-  GSL_Engine(const GSL_Engine&);
-
   void seed(result_type value);
 
   result_type operator()();

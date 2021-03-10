@@ -1,6 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "ContainerIO.h"
 #include "DrivenDampedHarmonicOscillator.h"
+#include "ODE_GSL.h"
 #include "Simulated.h"
 
 
@@ -21,21 +22,20 @@ int main(int, char**)
   // Initial condition
   Array y(2); y=yinit,dydtinit;
 
-  auto S{simulated::makeBoost(y,
-                         [=](const Array& y, Array& dydt, double tau)
-                         {
-                           dydt(0)=y(1);
-                           dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
-                         },
-                         {"coordinate","velocity"},
-                         .1/std::max(1.,std::max(omega,gamma)),
-                         0,1e-6,1e-18)};
+  auto S{simulated::make<ODE_EngineGSL<Array>>(y,
+    [=](const Array& y, Array& dydt, double tau)
+    {
+      dydt(0)=y(1);
+      dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
+    },
+    {"coordinate","velocity"},
+    .1/std::max(1.,std::max(omega,gamma)),
+    0,1e-6,1e-18)};
 
   auto streamedArray=run(S,70.,1,0,"","",6,false,false,"",false,true,trajectory::autostopHandlerNoOp);
   
   auto oscillator{ddho::make(gamma,omega,yinit,dydtinit,0)};
 
-  // std::cout<<streamedArray;
   auto size=int(streamedArray.size());
   
   auto averageDt=0., ampDev=0., ampDerivDev=0.;

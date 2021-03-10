@@ -15,7 +15,7 @@ namespace mpl=boost::mpl;
 
 #include <sstream>
 
-using namespace cpputils::sliceiterator;
+using namespace cppqedutils::sliceiterator;
 using namespace std;
 
 using V=tmptools::Vector<3,6,1,9,7>;

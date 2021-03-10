@@ -4,5 +4,5 @@
 using namespace linalg;
 using namespace blitz::tensor;
 
-template<> void cppqedutils::dodirect::_<true >(CMatrix& m, const CVector& v1, const CVector& v2) {m=v1(i)*v2(j);}
-template<> void cppqedutils::dodirect::_<false>(CMatrix& m, const CVector& v1, const CVector& v2) {m=v1(i)+v2(j);}
+template<> void blitzplusplus::dodirect::_<true >(CMatrix& m, const CVector& v1, const CVector& v2) {m=v1(i)*v2(j);}
+template<> void blitzplusplus::dodirect::_<false>(CMatrix& m, const CVector& v1, const CVector& v2) {m=v1(i)+v2(j);}

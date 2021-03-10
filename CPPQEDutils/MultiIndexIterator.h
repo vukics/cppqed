@@ -13,7 +13,7 @@
 
 
 /// Namespace comprising otherwise hard-to-classify generic utilities
-namespace cpputils {
+namespace cppqedutils {
 
 
 /// Helpers to MultiIndexIterator
@@ -104,7 +104,7 @@ private:
 };
 
 
-} // cpputils
+} // cppqedutils
 
 
 

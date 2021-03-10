@@ -17,13 +17,13 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 
 
-namespace cppqedutils {
+namespace blitzplusplus {
 
 
 BZ_DECLARE_FUNCTION_RET(sqrAbs,double)
 
 
-namespace blitzplusplus {
+namespace details {
 
 #define BOOST_PP_ITERATION_LIMITS (1,BOOST_PP_DIV(BLITZ_ARRAY_LARGEST_RANK,2))
 #define BOOST_PP_FILENAME_1 "ComplexArrayExtensions.h"
@@ -33,7 +33,7 @@ namespace blitzplusplus {
 #undef BOOST_PP_FILENAME_1
 #undef BOOST_PP_ITERATION_LIMITS
 
-} // blitzplusplus
+} // details
 
 
 template<int TWO_TIMES_RANK>
@@ -41,7 +41,7 @@ std::enable_if_t<TWO_TIMES_RANK%2==0>
 hermitianConjugateSelf(CArray<TWO_TIMES_RANK>& array) 
 {
   array=conj(array); 
-  blitzplusplus::helpHermitianConjugate(array);
+  details::helpHermitianConjugate(array);
 }
 
 
@@ -50,7 +50,7 @@ std::enable_if_t<TWO_TIMES_RANK%2==0,CArray<TWO_TIMES_RANK>>
 hermitianConjugate(const CArray<TWO_TIMES_RANK>& array)
 {
   CArray<TWO_TIMES_RANK> res(conj(array));
-  blitzplusplus::helpHermitianConjugate(res);
+  details::helpHermitianConjugate(res);
   return res;
 }
 
@@ -94,7 +94,7 @@ doDirect(const CArray<RANK1>& array1, const CArray<RANK2>& array2)
 }
 
 
-} // cppqedutils
+} // blitzplusplus
 
 
 #endif // CPPQEDCORE_UTILS_COMPLEXARRAYEXTENSIONS_H_INCLUDED

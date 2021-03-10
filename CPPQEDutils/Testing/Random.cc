@@ -35,7 +35,7 @@ auto testcase()
   
   {
     ofstream ofs(filename);
-    cpputils::oarchive ar(ofs, ios_base::trunc | ios_base::binary);
+    cppqedutils::oarchive ar(ofs, ios_base::trunc | ios_base::binary);
     ar & reFirst;
   }
 
@@ -44,7 +44,7 @@ auto testcase()
   // ... some time later restore the other RandomEngine instance to its state
   {
     ifstream ifs(filename);
-    cpputils::iarchive ar(ifs, ios_base::binary);
+    cppqedutils::iarchive ar(ifs, ios_base::binary);
     ar & reSecond;
   }
 
