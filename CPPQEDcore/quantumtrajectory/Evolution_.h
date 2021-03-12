@@ -8,6 +8,7 @@
 #endif
 
 #include "EnsembleMCWF.h"
+#include "EvolutionMethod.h"
 #include "Master.h"
 #include "MCWF_Trajectory.h"
 
@@ -21,16 +22,6 @@ using namespace quantumtrajectory;
 
 /// Auxiliary tools for the evolve functions
 namespace evolution {
-
-/// Method of evolution for a quantum system
-enum Method {
-  SINGLE, ///< single \link quantumtrajectory::MCWF_Trajectory MCWF trajectory\endlink
-  ENSEMBLE, ///< \link quantumtrajectory::EnsembleMCWF ensemble\endlink of MCWF trajectories
-  MASTER ///< Master equation with \link quantumtrajectory::master::Base normal iteration\endlink
-};
-
-std::ostream& operator<<(std::ostream&, Method ); ///< output streaming for Method
-std::istream& operator>>(std::istream&, Method&); ///< input streaming for Method
 
 
 /// Aggregate of parameters pertaining to the highest level driver functions for quantum trajectories
