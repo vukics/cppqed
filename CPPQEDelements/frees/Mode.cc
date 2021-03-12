@@ -156,7 +156,7 @@ void details::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLo
 
 namespace {
 
-typedef cpputils::KeyPrinter::KeyLabels KeyLabels;
+typedef cppqedutils::KeyPrinter::KeyLabels KeyLabels;
 
 const KeyLabels Assemble(const KeyLabels& first, const KeyLabels& middle, const KeyLabels& last=KeyLabels())
 {

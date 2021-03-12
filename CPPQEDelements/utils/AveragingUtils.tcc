@@ -25,11 +25,11 @@ template<int RANK>
 auto
 ReducedDensityOperator<RANK>::helper(const Dimensions& dim, bool offDiagonals, const KeyLabels& subsequent) -> const KeyLabels
 {
-  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  typedef cppqedutils::MultiIndexIterator<RANK> Iterator;
   using std::ostringstream;
 
   KeyLabels res;
-  Iterator i(dim-1,cpputils::mii::begin);
+  Iterator i(dim-1,cppqedutils::mii::begin);
 
   // Diagonals
   for (; i!=i.getEnd(); ++i) {
@@ -116,7 +116,7 @@ void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) con
 template<int RANK, bool IS_TIME_DEPENDENT>
 averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::Collecting(const Collection& collection)
   : Base(collection.front().getTitle(),
-         cpputils::concatenateGrow<KeyLabels>( collection | boost::adaptors::transformed(bind(&Element::getLabels,_1)) )),
+         cppqedutils::concatenateGrow<KeyLabels>( collection | boost::adaptors::transformed(bind(&Element::getLabels,_1)) )),
     collection_(collection.clone())
 {}
 
@@ -141,7 +141,7 @@ auto
 averagingUtils::Collecting<RANK,IS_TIME_DEPENDENT>::average_v(Time t, const LazyDensityOperator& matrix) const -> const Averages
 {
   Averages res(this->nAvr()); res=0;
-  return cpputils::concatenate( collection_ | boost::adaptors::transformed(bind(&Element::average,_1,details::convert(t),boost::cref(matrix))) , res);
+  return cppqedutils::concatenate( collection_ | boost::adaptors::transformed(bind(&Element::average,_1,details::convert(t),boost::cref(matrix))) , res);
 
 }
 
@@ -181,11 +181,11 @@ averagingUtils::Transferring<RANKFROM,RANKTO,IS_TIME_DEPENDENT>::average_v(Time 
 template<int RANK>
 struct ReducedDensityOperator<RANK>::Helper
 {
-  typedef cpputils::MultiIndexIterator<RANK> Iterator;
+  typedef cppqedutils::MultiIndexIterator<RANK> Iterator;
   
-  Helper(const Dimensions& dim) : i_(Dimensions(size_t(0)),dim-1,cpputils::mii::begin), j_(i_), real_(true), offDiagonals_(false) {++i_; ++j_;}
+  Helper(const Dimensions& dim) : i_(Dimensions(size_t(0)),dim-1,cppqedutils::mii::begin), j_(i_), real_(true), offDiagonals_(false) {++i_; ++j_;}
   
-  Helper() : i_(Dimensions(size_t(0)),Dimensions(size_t(0)),cpputils::mii::begin), j_(i_), real_(true), offDiagonals_(false) {}
+  Helper() : i_(Dimensions(size_t(0)),Dimensions(size_t(0)),cppqedutils::mii::begin), j_(i_), real_(true), offDiagonals_(false) {}
 
   const std::string operator()()
   {

@@ -49,7 +49,7 @@ protected:
       t0_(0) {}
 
   /// Forwards to `BASE`, but also sets \link getT0 `t0`\endlink
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive &iar) override
+  cppqedutils::iarchive&  readStateMore_v(cppqedutils::iarchive &iar) override
     { BASE::readStateMore_v(iar); if (this->getEx()) setT0(); return iar; }
 
   /// The time instant of the beginning of the current time step

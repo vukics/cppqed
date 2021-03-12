@@ -133,8 +133,8 @@ protected:
   
   /// \name Serialization
   //@{
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return iar & re_;}
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return oar & re_;}
+  cppqedutils::iarchive&  readStateMore_v(cppqedutils::iarchive& iar)       override {return iar & re_;}
+  cppqedutils::oarchive& writeStateMore_v(cppqedutils::oarchive& oar) const override {return oar & re_;}
   //@}
   
 private:
@@ -200,8 +200,8 @@ protected:
 
   /// \name Serialization
   //@{
-  cpputils::iarchive& readState_v(cpputils::iarchive& ia) final {for (auto& t : trajs_) t.readState(ia); return ia;}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& oa) const final {for (auto& t : trajs_) t.writeState(oa); return oa;}
+  cppqedutils::iarchive& readState_v(cppqedutils::iarchive& ia) final {for (auto& t : trajs_) t.readState(ia); return ia;}
+  cppqedutils::oarchive& writeState_v(cppqedutils::oarchive& oa) const final {for (auto& t : trajs_) t.writeState(oa); return oa;}
   //@}
   
 private:

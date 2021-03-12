@@ -118,7 +118,7 @@ void ParticleAlongCavity::addContribution_v(double t, const StateVectorLow& psi,
 
   if (isSpecialH_) return;
 
-  using cpputils::sliceiterator::fullRange;
+  using cppqedutils::sliceiterator::fullRange;
 
   typedef tmptools::Vector<1> V1;
 

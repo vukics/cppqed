@@ -10,7 +10,7 @@
 #include "Simulated.h"
 
 using namespace std       ;
-using namespace cpputils  ;
+using namespace cppqedutils  ;
 using namespace trajectory;
 using namespace qbit      ;
 

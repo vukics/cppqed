@@ -8,12 +8,12 @@
 
 #include <boost/python/numpy.hpp>
 
-namespace cpputils {
+namespace cppqedutils {
 
 template<typename T, int RANK>
 auto arrayToNumpy(const blitz::Array<T,RANK>& a)
 {
-  if (!a.isStorageContiguous()) throw NonContiguousStorageException("cpputils::arrayToNumpy");
+  if (!a.isStorageContiguous()) throw NonContiguousStorageException("cppqedutils::arrayToNumpy");
   // this check in itself is not enough, as the function generating the ndarray below doesn’t allow for a nontrivial set of strides
   using namespace boost::python::numpy;
   Py_intptr_t shape[RANK]; // Plain array is the best here: nothing has the temptation on the C++ side to delete it (apparently, it happens on the Python side …)
@@ -41,6 +41,6 @@ auto numpyToArray(const boost::python::numpy::ndarray& array)
   return res;
 }
 
-} // cpputils
+} // cppqedutils
 
 #endif // CPYPYQED_INCLUDE_BLITZ2NUMPY_TCC_INCLUDED

@@ -51,7 +51,7 @@ void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v,
 
     boost::progress_timer t;
     for (unsigned count=0; count<nRepeat; ++count)
-      cpputils::for_each(blitzplusplus::basi::fullRange(psi(),v),blitzplusplus::basi::begin(psiout(),v),
+      cppqedutils::for_each(blitzplusplus::basi::fullRange(psi(),v),blitzplusplus::basi::begin(psiout(),v),
                          bind(&Ha_V::addContribution,ha,0,_1,_2,0));
   }
 
@@ -62,7 +62,7 @@ void benchmark(const structure::QuantumSystem<RANK>& sys, const SYS& sys_v, V v,
 
     boost::progress_timer t;
     for (unsigned count=0; count<nRepeat; ++count)
-      cpputils::for_each(blitzplusplus::basi_fast::fullRange(sd,psi(),v),blitzplusplus::basi_fast::begin(sd,psiout(),v),
+      cppqedutils::for_each(blitzplusplus::basi_fast::fullRange(sd,psi(),v),blitzplusplus::basi_fast::begin(sd,psiout(),v),
                          bind(&Ha_V::addContribution,ha,0,_1,_2,0));
   }
 

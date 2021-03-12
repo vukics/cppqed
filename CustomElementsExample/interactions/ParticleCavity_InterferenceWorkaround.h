@@ -18,7 +18,7 @@
 namespace particlecavity_interferenceworkaround {
 
 
-struct UnotEtaeffSignDiscrepancy : public cpputils::Exception {};
+struct UnotEtaeffSignDiscrepancy : public cppqedutils::Exception {};
 
 
 

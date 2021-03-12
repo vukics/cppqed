@@ -20,7 +20,7 @@ using composite::SubSystemFree;
 
 using namespace structure;
 
-using cpputils::sliceiterator::fullRange;
+using cppqedutils::sliceiterator::fullRange;
 
 
 namespace {

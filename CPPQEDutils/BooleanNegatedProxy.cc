@@ -4,13 +4,13 @@
 #include <iostream>
 
 /*
-std::ostream& operator<<(std::ostream& os, const cpputils::BooleanNegatedProxy& b)
+std::ostream& operator<<(std::ostream& os, const cppqedutils::BooleanNegatedProxy& b)
 {
   return os<<bool(b);
 }
 */
 
-std::istream& cpputils::operator>>(std::istream& is,       cpputils::BooleanNegatedProxy& b)
+std::istream& cppqedutils::operator>>(std::istream& is,       cppqedutils::BooleanNegatedProxy& b)
 {
   bool neg; is>>neg; b=neg; return is;
 }

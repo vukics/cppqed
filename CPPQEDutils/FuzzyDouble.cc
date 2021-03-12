@@ -6,7 +6,7 @@
 #include<limits>
 
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 const double FuzzyDouble::eps=10.*std::numeric_limits<double>::epsilon();
@@ -42,4 +42,4 @@ bool operator> (FuzzyDouble a, double b)
 }
 
 
-} // cpputils
+} // cppqedutils

@@ -53,7 +53,7 @@ void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, St
     return;
   }
 
-  using cpputils::sliceiterator::fullRange;
+  using cppqedutils::sliceiterator::fullRange;
 
   typedef tmptools::Vector<2> V2;
 

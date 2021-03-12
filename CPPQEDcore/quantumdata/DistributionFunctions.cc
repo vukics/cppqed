@@ -9,7 +9,7 @@
 #include <boost/math/special_functions/factorials.hpp>
 
 
-using namespace mathutils;
+using namespace cppqedutils;
 using namespace boost::math;
 
 

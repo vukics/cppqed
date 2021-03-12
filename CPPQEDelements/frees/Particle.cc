@@ -17,7 +17,7 @@
 
 using namespace std;
 using namespace mathutils;
-using namespace cpputils;
+using namespace cppqedutils;
 using namespace fft;
 
 

@@ -56,7 +56,7 @@ double w(size_t n, double r, size_t k);
 template<typename DensityOperatorFunctor>
 double wignerFunction(const DensityOperatorFunctor& rho, double x, double y, size_t truncatedDimension=0)
 {
-  using namespace mathutils; using boost::math::factorial;
+  using cppqedutils::sqr; using boost::math::factorial;
 
   struct Helper
   {
@@ -82,7 +82,7 @@ double wignerFunction(const DensityOperatorFunctor& rho, double x, double y, siz
 template<typename DensityOperator>
 double qFunction(const DensityOperator& rho, double x, double y, size_t)
 {
-  using namespace mathutils;
+  using namespace cppqedutils;
 
   const dcomp alpha(x,y);
 
@@ -115,7 +115,7 @@ template<typename DensityOperatorFunctor>
 double wignerFunctionOld(const DensityOperatorFunctor& rho, double x, double y, size_t truncatedDimension=0)
 // NEEDS_WORK should refer rho only via some traits class to make the code really generic.
 {
-  using namespace mathutils; using boost::math::factorial;
+  using namespace cppqedutils; using boost::math::factorial;
   
   const size_t dim=truncatedDimension ? truncatedDimension : rho.getDimension(0);
   

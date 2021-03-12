@@ -136,9 +136,9 @@ protected:
   std::ostream& streamKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::streamKey
 
   /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes mcwf::Logger state
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar) override {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
+  cppqedutils::iarchive&  readStateMore_v(cppqedutils::iarchive& iar) override {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
   /// Forwards to Base::writeStateMore_v + serializes mcwf::Logger state
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & logger_;}
+  cppqedutils::oarchive& writeStateMore_v(cppqedutils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & logger_;}
 
   std::ostream& logMoreOnEnd_v(std::ostream& os) const override {return logger_.onEnd(os);} ///< calls mcwf::Logger::onEnd
   

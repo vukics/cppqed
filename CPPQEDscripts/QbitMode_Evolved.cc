@@ -10,7 +10,7 @@
 
 
 using namespace std       ;
-using namespace cpputils  ;
+using namespace cppqedutils  ;
 using namespace trajectory;
 
 typedef CArray<1> Array;

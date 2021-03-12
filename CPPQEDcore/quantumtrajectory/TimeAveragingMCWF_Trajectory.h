@@ -90,8 +90,8 @@ private:
     return Base::logMoreOnEnd_v(os);
   }
   
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return Base:: readStateMore_v(iar) & averages_ & sum_;}
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & averages_ & sum_;}
+  cppqedutils::iarchive&  readStateMore_v(cppqedutils::iarchive& iar)       override {return Base:: readStateMore_v(iar) & averages_ & sum_;}
+  cppqedutils::oarchive& writeStateMore_v(cppqedutils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & averages_ & sum_;}
   
   const std::string trajectoryID_v() const override {return "TimeAveragingMCWF_Trajectory";}
 

@@ -124,7 +124,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
 #define SLICE_EXPR getArray()(subscriptPack...)
-    return StateVector<cpputils::Rank_v<decltype(SLICE_EXPR)>>(SLICE_EXPR,byReference);
+    return StateVector<cppqedutils::Rank_v<decltype(SLICE_EXPR)>>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
   
@@ -218,7 +218,7 @@ constexpr auto ArrayRank_v<StateVector<RANK>> = RANK;
 
 
 template<int RANK, typename ... SubscriptPack>
-auto subscript(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cpputils::SliceIterator
+auto subscript(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cppqedutils::SliceIterator
 {
   return psi.sliceIndex(subscriptPack...);
 }

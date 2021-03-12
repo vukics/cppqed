@@ -11,7 +11,7 @@ using namespace std;
 
 typedef IdxTiny<10> Size    ;
 typedef IdxTiny< 6> DummyIdx;
-typedef cpputils::MultiIndexIterator<6> MII6;
+typedef cppqedutils::MultiIndexIterator<6> MII6;
 typedef tmptools::Vector<6,2,5,7> SliceVec;
 typedef blitzplusplus::basi::Indexer<10,SliceVec> Indexer;
 typedef blitzplusplus::basi::Iterator<10,SliceVec,true> BASI;

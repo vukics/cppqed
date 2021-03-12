@@ -35,7 +35,7 @@ concatenateTinies(const blitz::TinyVector<T1,RANK1>& op1, const blitz::TinyVecto
     res(i)=op1(i);});
   boost::mpl::for_each<tmptools::Ordinals<RANK2> >([&](auto t) {
     static const auto i=decltype(t)::value;
-    res(i+RANK1)=cpputils::Converter<T1,T2>::convert(op2(i));});
+    res(i+RANK1)=cppqedutils::Converter<T1,T2>::convert(op2(i));});
 
   return res;
     

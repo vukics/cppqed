@@ -44,7 +44,7 @@ double negPT(const DensityOperator<RANK>& rho, V)
 
   DensityOperatorLow rhoShallowPT(rho.getArray());
 
-  cpputils::sliceiterator::Transposer<CArray,2*RANK,ExtendV>::_(rhoShallowPT);
+  cppqedutils::sliceiterator::Transposer<CArray,2*RANK,ExtendV>::_(rhoShallowPT);
 
   DensityOperatorLow rhoDeepPT(rhoShallowPT.shape()); rhoDeepPT=rhoShallowPT;
 

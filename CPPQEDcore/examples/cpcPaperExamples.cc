@@ -12,7 +12,7 @@ void actWithA(StateVector<5>&);
 
 void actOnExtended(StateVector<11>& psi)
 {
-  using namespace cpputils::sliceiterator;
+  using namespace cppqedutils::sliceiterator;
   for(auto& psiS : fullRange<Vector<3,6,1,9,7>>(psi)) actWithA(psiS);
 }
 

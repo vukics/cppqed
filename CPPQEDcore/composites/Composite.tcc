@@ -156,7 +156,7 @@ bool composite::Exact<VA>::applicableInMaster_v() const
 template<typename VA>
 void composite::Exact<VA>::actWithU_v(double t, StateVectorLow& psi, double t0) const
 {
-  const auto lambda=[&](auto ex, auto v) -> void {if (ex) for (auto& psiS : cpputils::sliceiterator::fullRange<decltype(v)>(psi)) ex->actWithU(t,psiS,t0);};
+  const auto lambda=[&](auto ex, auto v) -> void {if (ex) for (auto& psiS : cppqedutils::sliceiterator::fullRange<decltype(v)>(psi)) ex->actWithU(t,psiS,t0);};
 
   mpl::for_each<Ordinals>([&](auto t) -> void {
     static const int idx=decltype(t)::value;
@@ -181,8 +181,8 @@ void composite::Hamiltonian<VA>::addContribution_v(double t, const StateVectorLo
   const auto lambda=[&](auto ha, auto v) -> void {
     using Vec=std::decay_t<decltype(v)>;
     if (ha)
-      boost::for_each(cpputils::sliceiterator::fullRange<Vec>(psi),
-                      cpputils::sliceiterator::fullRange<Vec>(dpsidt),
+      boost::for_each(cppqedutils::sliceiterator::fullRange<Vec>(psi),
+                      cppqedutils::sliceiterator::fullRange<Vec>(dpsidt),
                       [&](const auto& psiS, auto& dpsidtS) {ha->addContribution(t,psiS,dpsidtS,t0);}); 
   };
   
@@ -264,7 +264,7 @@ composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const F
   }
 
   Averages res(numberAvr); res=0;
-  return cpputils::concatenate(seqAverages,res);
+  return cppqedutils::concatenate(seqAverages,res);
 
 }
 
@@ -285,7 +285,7 @@ void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_
     if (!flag && li) {
       size_t n=li->nAvr();
       if (ordoJump<n) {
-        for (auto& psiS : cpputils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(psi)) li->actWithJ(t,psiS,ordoJump);
+        for (auto& psiS : cppqedutils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(psi)) li->actWithJ(t,psiS,ordoJump);
         flag=true;
       }
       ordoJump-=n;  
@@ -313,8 +313,8 @@ void composite::Liouvillean<VA>::actWithSuperoperator_v(double t, const DensityO
     if (!flag && li) {
       size_t n=li->nAvr();
       if (ordoJump<n) {
-        boost::for_each(cpputils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,Vec>>(rho),
-                        cpputils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,Vec>>(drhodt),
+        boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,Vec>>(rho),
+                        cppqedutils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,Vec>>(drhodt),
                         [&](const auto& rhoS, auto& drhodtS) {li->actWithSuperoperator(t,rhoS,drhodtS,ordoJump);});
         flag=true;
       }
