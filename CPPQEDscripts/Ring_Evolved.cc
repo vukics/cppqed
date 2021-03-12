@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ParsEvolved pe(p);
+  ode_engine::Pars<> pe(p);
   ParsRun pr(p);
 
   particle::Pars pp(p);

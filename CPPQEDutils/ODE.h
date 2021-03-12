@@ -28,8 +28,8 @@ concept ordinary_differential_equation_engine = requires(E e) {
 
 namespace ode_engine {
 
-inline static const double epsRelDefault=1e-6; ///< The ultimate default of \link ParsEvolved::epsRel epsRel\endlink in the framework
-inline static const double epsAbsDefault=1e-12; ///< ” for \link ParsEvolved::epsAbs epsAbs\endlink
+inline static const double epsRelDefault=1e-6; ///< The ultimate default of \link ode_engine::Pars::epsRel epsRel\endlink in the framework
+inline static const double epsAbsDefault=1e-12; ///< ” for \link ode_engine::Pars::epsAbs epsAbs\endlink
 
 
 template <typename Time, typename State>

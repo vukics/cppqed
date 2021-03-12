@@ -20,7 +20,7 @@ using StreamReturnType=std::tuple<std::ostream&,typename structure::AveragedComm
 template<int RANK>
 inline double initialTimeStep(typename structure::QuantumSystem<RANK>::Ptr qs)
 {
-  return trajectory::initialTimeStep(qs->highestFrequency());
+  return cppqedutils::trajectory::initialTimeStep(qs->highestFrequency());
 }
 
 /// Class hosting common code of MCWF_Trajectory and Master.

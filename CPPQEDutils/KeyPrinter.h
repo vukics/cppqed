@@ -32,7 +32,7 @@ public:
   KeyPrinter(const std::string& keyTitle, KeyLabelsInitializer il) : keyTitle_(keyTitle), keyLabels_(il) {}
 
   size_t size() const {return keyLabels_.size();} ///< number of elements in the key
-  std::ostream& stream(std::ostream&, size_t&&) const; ///< streams the stored key in a nicely tabulated format
+  std::ostream& stream(std::ostream&, size_t&) const; ///< streams the stored key in a nicely tabulated format
 
   /// \name Getters/setters
   //@{

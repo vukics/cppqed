@@ -13,6 +13,7 @@
 #include "MathExtensions.h"
 #include "VectorFromMatrixSliceIterator.h"
 
+#include <boost/range/combine.hpp>
 
 
 namespace quantumtrajectory {
@@ -22,7 +23,7 @@ namespace quantumtrajectory {
 namespace master {
 
 
-typedef trajectory::ParsEvolved Pars;
+typedef cppqedutils::ode_engine::Pars<> Pars;
 
 
 /// Thrown if the system is not applicable in Master-equation evolution
@@ -64,13 +65,13 @@ public:
          ODE_Engine ode,
          bool negativity ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
          ) 
-  : structure::QuantumSystemWrapper<RANK,true>{qs,true},
+  : structure::QuantumSystemWrapper<RANK,true>{sys,true},
     rho_{std::forward<DensityOperator>(rho)},
     ode_(ode),
     dos_(this->getAv(),negativity)
   {
     if (!this->applicableInMaster()) throw master::SystemNotApplicable();
-    QTraj::checkDimension(rho);
+    if (rho!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
   }
     
   auto getTime() const {return t_;}
@@ -83,7 +84,7 @@ public:
   
   auto stream(std::ostream& os, int precision) const {return dos_.stream(t_,rho_,os,precision);}
   
-  iarchive& readFromArrayOnlyArchive(iarchive& iar) {return rho_.readFromArrayOnlyArchive(iar);}
+  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {return rho_.readFromArrayOnlyArchive(iar);}
 
   /** structure of Master archives:
   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) - t0
@@ -119,7 +120,7 @@ struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Mas
 
 
 template<int RANK, typename ODE_Engine, typename V>
-void quantumtrajectory::Master<RANK,V>::step(double deltaT, std::ostream& logStream)
+void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostream& logStream)
 {
   const auto derivs = [this](const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, double t)
     {
@@ -153,11 +154,11 @@ void quantumtrajectory::Master<RANK,V>::step(double deltaT, std::ostream& logStr
   ode_.step(deltaT,logStream,derivs,t_,rho_.getArray());
 
   if (const auto ex=this->getEx()) {
-    using namespace blitzplusplus;
+    using namespace blitzplusplus; using namespace vfmsi;
     DensityOperatorLow rhoLow(rho_.getArray());
-    for (auto& rhoS : vfmsi::fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
+    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
     hermitianConjugateSelf(rhoLow);
-    for (auto& rhoS : vfmsi::fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
+    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
     rhoLow=conj(rhoLow);
   }
 
@@ -178,7 +179,7 @@ void quantumtrajectory::Master<RANK,V>::step(double deltaT, std::ostream& logStr
 
 
 template<int RANK, typename ODE_Engine, typename V>
-std::ostream& quantumtrajectory::Master<RANK,V>::streamParameters(std::ostream& os) const
+std::ostream& quantumtrajectory::Master<RANK,ODE_Engine,V>::streamParameters(std::ostream& os) const
 {
   using namespace std;
 

@@ -36,7 +36,7 @@ class DensityOperator
 public:
   static const int N_RANK=RANK;
   
-  typedef LazyDensityOperator<  RANK> LDO_Base;
+  typedef LazyDensityOperator<RANK> LDO_Base;
   
   typedef ArrayBase<DensityOperator<RANK>> ABase;
 

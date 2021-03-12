@@ -62,7 +62,7 @@ public:
   template <typename Archive>
   Archive& stateIO(Archive& ar) {return ode_.stateIO(ar & state_ & t_);} // state should precede time in order to be compatible with array-only archives
   
-  std::ostream& streamKey(std::ostream& os) const {return keyPrinter_.stream(os,3);}
+  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return keyPrinter_.stream(os,i);}
 
   std::ostream& logOnEnd(std::ostream& os) const {return ode_.logOnEnd(os);}
   

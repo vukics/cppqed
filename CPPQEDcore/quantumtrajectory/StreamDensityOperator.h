@@ -7,6 +7,7 @@
 
 #include "Averaged.h"
 #include "NegPT.tcc"
+#include "QuantumTrajectory.h"
 #include "Structure.h"
 
 #include "FormDouble.h"

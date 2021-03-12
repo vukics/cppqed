@@ -16,7 +16,6 @@
 #include <utility>
 
 using namespace std;
-using namespace mathutils;
 using namespace cppqedutils;
 using namespace fft;
 

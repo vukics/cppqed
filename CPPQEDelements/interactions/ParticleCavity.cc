@@ -8,7 +8,7 @@
 #include "SliceIterator.tcc"
 
 using namespace std;
-using namespace mathutils;
+using namespace cppqedutils;
 
 using particle:: mfNKX;
 using particle::cosNKX;

@@ -6,7 +6,7 @@
 #include <boost/bind.hpp>
 
 
-using namespace mathutils; using std::make_shared;
+using namespace cppqedutils; using std::make_shared;
 
 
 namespace qbit {

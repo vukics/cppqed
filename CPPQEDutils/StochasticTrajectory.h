@@ -15,13 +15,13 @@
 
 
 
-namespace trajectory {
+namespace cppqedutils::trajectory {
 
 
 /// Aggregate of parameters pertaining to stochastic simulations
 /** \copydetails ParsRun */
 template <typename RandomEngine>
-struct ParsStochastic : randomutils::Pars<RandomEngine,ParsEvolved>
+struct ParsStochastic : randomutils::Pars<RandomEngine,ode_engine::Pars<>>
 {
   /// whether the noise should be on or off
   /**
@@ -33,7 +33,7 @@ struct ParsStochastic : randomutils::Pars<RandomEngine,ParsEvolved>
   size_t &nTraj; ///< number of trajectories in case of ensemble averaging
 
   ParsStochastic(parameters::Table& p, const std::string& mod="")
-    : randomutils::Pars<RandomEngine,ParsEvolved>{p,mod},
+    : randomutils::Pars<RandomEngine,ode_engine::Pars<>>{p,mod},
       noise(p.add("noise",mod,"Switching noise on/off",true)),
       nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(500)))
   {}
@@ -54,6 +54,7 @@ struct ParsStochastic : randomutils::Pars<RandomEngine,ParsEvolved>
  * \todo implement general time averaging along the lines discussed in [this tracker](https://sourceforge.net/p/cppqed/feature-requests/1/#f3b3)
  * 
  */
+/*
 template<typename SA, typename T> 
 class Averageable : public Trajectory<SA>
 {
@@ -72,10 +73,10 @@ private:
   virtual T averaged_v() const = 0;
 
 };
-
+*/
 
 /// Represents a trajectory that has both adaptive ODE evolution and noise
-/** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. */
+/** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. *//*
 template<typename SA, typename A, typename T, typename RandomEngine>
 class Stochastic : public Adaptive<A,Averageable<SA,T>>
 {
@@ -145,7 +146,7 @@ private:
   RandomEngine re_;
 
 };
-
+*/
 
 
 /// An ensemble of Averageable trajectories providing services for ensemble averaging and evolving the element trajectories serially
@@ -165,7 +166,7 @@ private:
  * 
  */
 template<typename ST, typename SA, typename T>
-class Ensemble : public Averageable<SA,T>
+class Ensemble // : public Averageable<SA,T>
 {
 protected:
   Ensemble(Ensemble&&) = default; Ensemble& operator=(Ensemble&&) = default;
@@ -224,7 +225,7 @@ private:
   Trajectories trajs_;
 
 };
-
+*/
 
 namespace averaging {
 
@@ -260,11 +261,11 @@ struct AverageTrajectoriesInRange
 
 
 
-} // trajectory
+} // cppqedutils::trajectory
 
 
 template<typename ST, typename SA, typename T>
-T trajectory::Ensemble<ST,SA,T>::averageInRange(size_t begin, size_t n) const
+T cppqedutils::trajectory::Ensemble<ST,SA,T>::averageInRange(size_t begin, size_t n) const
 {
   return averaging::AverageTrajectoriesInRange<ST,SA,T>::_(trajs_.begin()+begin,trajs_.begin()+(begin+n));
 }

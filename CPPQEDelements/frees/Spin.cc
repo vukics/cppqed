@@ -15,7 +15,7 @@
 using namespace std;
 using namespace boost;
 using namespace assign;
-using namespace mathutils;
+using namespace cppqedutils;
 
 namespace spin {
 
@@ -102,8 +102,8 @@ const SpinBase::Averages SpinBase::average_v(structure::NoTime, const LazyDensit
   for (int n=0; n<matrix.getDimension(); n++) {
 
     double diag=matrix(n);
-    averages(0)+=              (n-s_)*diag;
-    averages(1)+=mathutils::sqr(n-s_)*diag;
+    averages(0)+=(n-s_)*diag;
+    averages(1)+=sqr(n-s_)*diag;
 
     if (n<matrix.getDimension()-1) {
       dcomp temp(sqrt((twoS_-n)*(n+1))*matrix(n)(n+1));

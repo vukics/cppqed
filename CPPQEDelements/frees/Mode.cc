@@ -8,7 +8,7 @@
 
 using std::cout; using std::endl; using std::string;
 using namespace boost;
-using namespace mathutils;
+using namespace cppqedutils;
 
 
 namespace mode {

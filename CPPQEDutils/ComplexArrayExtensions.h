@@ -19,6 +19,7 @@
 
 namespace blitzplusplus {
 
+using cppqedutils::sqrAbs;
 
 BZ_DECLARE_FUNCTION_RET(sqrAbs,double)
 
