@@ -13,6 +13,9 @@
 namespace quantumtrajectory {
 
 
+using StreamReturnType=std::tuple<std::ostream&,typename structure::AveragedCommon::Averages>;
+
+  
 /// Forwards to trajectory::initialTimeStep, with the highest frequency of the system taken as structure::QuantumSystem::highestFrequency
 template<int RANK>
 inline double initialTimeStep(typename structure::QuantumSystem<RANK>::Ptr qs)

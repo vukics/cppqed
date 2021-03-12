@@ -40,7 +40,7 @@ public:
 
   _(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}
 
-  std::tuple<std::ostream&,typename Averaged::Averages> stream(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
+  StreamReturnType stream(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   {
     auto res{structure::stream(av_,t,rho,os,precision)};
     auto & averages{std::get<1>(res)};

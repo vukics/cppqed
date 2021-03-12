@@ -57,7 +57,7 @@ public:
   iarchive& readFromArrayOnlyArchive(iarchive& iar) {return iar & state_;}
 
   /** structure of Simulated archives:
-   * metaData – time – array – odeStepper – odeLogger – dtDid – dtTry
+   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry )
    */
   template <typename Archive>
   Archive& stateIO(Archive& ar) {return ode_.stateIO(ar & state_ & t_);} // state should precede time in order to be compatible with array-only archives
