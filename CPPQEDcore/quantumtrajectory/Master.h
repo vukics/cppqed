@@ -50,17 +50,19 @@ struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::ru
 template<int RANK, typename ODE_Engine, typename V=tmptools::V_Empty>
 class Master : public structure::QuantumSystemWrapper<RANK,true>
 {
-protected:
+public:
   Master(Master&&) = default; Master& operator=(Master&&) = default;
 
-public:
+  using StreamedArray=structure::AveragedCommon::Averages;
+  
   typedef structure::QuantumSystem<RANK> QuantumSystem;
 
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  Master(DensityOperator&& rho, ///< the density operator to be evolved
+  template <typename DO>
+  Master(DO&& rho, ///< the density operator to be evolved
          typename QuantumSystem::Ptr sys, ///< object representing the quantum system
          ODE_Engine ode,
          bool negativity ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
@@ -84,15 +86,24 @@ public:
   
   auto stream(std::ostream& os, int precision) const {return dos_.stream(t_,rho_,os,precision);}
   
-  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {return rho_.readFromArrayOnlyArchive(iar);}
+  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {DensityOperatorLow temp; iar & temp; rho_.getArray().reference(temp); return iar;}
 
   /** structure of Master archives:
-  * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) - t0
+  * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry )
   */
-  template <typename Archive>
-  Archive& stateIO(Archive& ar) {return ode_.stateIO(ar & rho_ & t_) & t0_;} // state should precede time in order to be compatible with array-only archives
+  // state should precede time in order to be compatible with array-only archives
+  auto& stateIO(cppqedutils::iarchive& iar)
+  {
+    DensityOperatorLow temp;
+    ode_.stateIO(iar & temp & t_);
+    rho_.getArray().reference(temp);
+    t0_=t_; // A very important step!
+    return iar;
+  }
+  
+  auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & rho_.getArray() & t_);}
 
-  std::ostream& streamKey_v(std::ostream& os) const {size_t i=3; return dos_.streamKey(os,i);}
+  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return dos_.streamKey(os,i);}
   
   std::ostream& logOnEnd(std::ostream& os) const {return ode_.logOnEnd(os);}
 
@@ -122,14 +133,16 @@ struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Mas
 template<int RANK, typename ODE_Engine, typename V>
 void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostream& logStream)
 {
-  const auto derivs = [this](const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, double t)
+  // auto derivs = ;
+  
+  ode_.step(deltaT,logStream,[this](const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, double t)
     {
       using namespace blitzplusplus::vfmsi;
 
       drhodtLow=0;
       
       for (auto&& [rhoS,drhodtS] : boost::combine(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow)) )
-        this->addContribution(t,rhoS,drhodtS,this->getT0());
+        this->addContribution(t,rhoS,drhodtS,t0_);
       
       {
         linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
@@ -149,16 +162,14 @@ void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostr
           drhodtLow+=rhotemp;
         }
       }            
-    };
-  
-  ode_.step(deltaT,logStream,derivs,t_,rho_.getArray());
+    },t_,rho_.getArray());
 
   if (const auto ex=this->getEx()) {
     using namespace blitzplusplus; using namespace vfmsi;
     DensityOperatorLow rhoLow(rho_.getArray());
-    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
+    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,t0_);
     hermitianConjugateSelf(rhoLow);
-    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,this->getT0());
+    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,t0_);
     rhoLow=conj(rhoLow);
   }
 
