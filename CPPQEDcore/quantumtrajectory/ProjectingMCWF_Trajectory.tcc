@@ -5,7 +5,7 @@
 
 #include "ProjectingMCWF_Trajectory.h"
 
-#include "MCWF_Trajectory.tcc"
+#include "MCWF_Trajectory.h"
 
 #include "Blitz2FLENS.h"
 
