@@ -48,8 +48,10 @@ struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::ru
  * 
  */
 template<int RANK, typename ODE_Engine, typename V=tmptools::V_Empty>
-class Master : public structure::QuantumSystemWrapper<RANK,true>
+class Master : private structure::QuantumSystemWrapper<RANK,true>
 {
+private:
+  using QuantumSystemWrapper=structure::QuantumSystemWrapper<RANK,true>;
 public:
   Master(Master&&) = default; Master& operator=(Master&&) = default;
 
@@ -62,12 +64,12 @@ public:
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
   template <typename DO>
-  Master(DO&& rho, ///< the density operator to be evolved
-         typename QuantumSystem::Ptr sys, ///< object representing the quantum system
+  Master(typename QuantumSystem::Ptr sys, ///< object representing the quantum system
+         DO&& rho, ///< the density operator to be evolved
          ODE_Engine ode,
          bool negativity ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
          ) 
-  : structure::QuantumSystemWrapper<RANK,true>{sys,true},
+  : QuantumSystemWrapper{sys,true},
     rho_{std::forward<DensityOperator>(rho)},
     ode_(ode),
     dos_(this->getAv(),negativity)
@@ -75,7 +77,7 @@ public:
     if (!this->applicableInMaster()) throw master::SystemNotApplicable();
     if (rho!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
   }
-    
+
   auto getTime() const {return t_;}
 
   void step(double deltaT, std::ostream& logStream);
@@ -122,8 +124,8 @@ private:
 } // quantumtrajectory
 
 
-template <int RANK, typename V>
-struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Master<RANK,V>>
+template <int RANK, typename ODE_Engine, typename V>
+struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Master<RANK,ODE_Engine,V>>
 {
   static auto _() {return SerializationMetadata{typeid(dcomp).name(),"Master",RANK};}
 };

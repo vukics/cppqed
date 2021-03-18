@@ -4,7 +4,6 @@
 
 #include "MCWF_Trajectory.h"
 
-#include "EvolvedGSL.tcc"
 #include "QuantumTrajectory.h"
 
 #include "FormDouble.h"
@@ -13,8 +12,6 @@
 #include <boost/range/algorithm/find_if.hpp>
 
 
-namespace quantumtrajectory {
-
 //////////////////
 //
 // Implementations
@@ -22,91 +19,64 @@ namespace quantumtrajectory {
 //////////////////
 
 
-template<int RANK, typename RandomEngine>
-MCWF_Trajectory<RANK,RandomEngine>::MCWF_Trajectory(StateVector&& psi,
-                                                    typename structure::QuantumSystem<RANK>::Ptr sys,
-                                                    const mcwf::Pars<RandomEngine>& p,
-                                                    const StateVectorLow& scaleAbs)
-  : QuantumTrajectory(sys,p.noise,
-                      std::move(psi.getArray()),
-                      [this](double t, const StateVectorLow& psi, StateVectorLow& dpsidt) {
-                        if (const auto ha=this->getHa()) {
-                          dpsidt=0;
-                          ha->addContribution(t,psi,dpsidt,this->getT0());                  
-                        }
-                      },
-                      initialTimeStep<RANK>(sys),
-                      scaleAbs,
-                      p,
-                      evolved::MakerGSL<StateVectorLow>(p.sf,p.nextDtTryCorrectionFactor)),
-    psi_(std::move(psi)),
-    dpLimit_(p.dpLimit), overshootTolerance_(p.overshootTolerance),
-    logger_(p.logLevel,this->template nAvr<structure::LA_Li>())
-{
-  QuantumTrajectory::checkDimension(psi);
-  if (!getTime()) if(const auto li=this->getLi()) { // On startup, dpLimit should not be overshot, either.
-    Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates,0.);
-    manageTimeStep(rates,getEvolved().get(),std::clog,false);
-  }
-}
-
-
-template<int RANK, typename RandomEngine>
-double MCWF_Trajectory<RANK,RandomEngine>::coherentTimeDevelopment(double Dt, std::ostream& logStream)
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentTimeDevelopment(double Dt, std::ostream& logStream)
 {
   if (this->getHa()) {
-    getEvolved()->step(Dt,logStream);
+    ode_.step(Dt,logStream,[this](const StateVectorLow& psi, StateVectorLow& dpsidt, double t) {
+      dpsidt=0;
+      this->getHa()->addContribution(t,psi,dpsidt,t0_);
+    },t_,psi_.getArray());
   }
   else {
-    double stepToDo=this->getLi() ? std::min(getDtTry(),Dt) : Dt; // Cf. tracker #3482771
-    getEvolved()->update(getTime()+stepToDo,getDtTry());
+    double stepToDo=this->getLi() ? std::min(ode_.getDtTry(),Dt) : Dt; // Cf. tracker #3482771
+    t_+=stepToDo;
   }
+  
   // This defines three levels:
   // 1. System is Hamiltonian -> internal timestep control is used with dtTry possibly modified by Liouvillean needs (cf. manageTimeStep)
   // 2. System is not Hamiltonian, but it is Liouvillean -> dtTry is used, which is governed solely by Liouvillean in this case (cf. manageTimeStep)
-  // 3. System is neither Hamiltonian nor Liouvillean (might be of Exact) -> as step of Dt is taken
+  // 3. System is neither Hamiltonian nor Liouvillean (might be of Exact) -> a step of Dt is taken
   
-  double t=getTime();
-
   if (const auto ex=this->getEx()) {
-    ex->actWithU(getTime(),psi_.getArray(),this->getT0());
-    QuantumTrajectory::setT0(t);
+    ex->actWithU(t_,psi_.getArray(),t0_);
+    t0_=t_;
   }
 
   logger_.processNorm(psi_.renorm());
 
-  return t;
 }
 
 
-template<int RANK, typename RandomEngine>
-auto MCWF_Trajectory<RANK,RandomEngine>::calculateSpecialRates(Rates* rates, double t) const -> const IndexSVL_tuples
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculateSpecialRates(Rates* rates) const -> const IndexSVL_tuples
 {
   IndexSVL_tuples res;
   for (int i=0; i<rates->size(); i++)
     if ((*rates)(i)<0) {
       StateVector psiTemp(psi_);
-      this->actWithJ(t,psiTemp.getArray(),i);
+      this->actWithJ(t_,psiTemp.getArray(),i);
       res.push_back(IndexSVL_tuple(i,psiTemp.getArray()));
-      (*rates)(i)=mathutils::sqr(psiTemp.renorm());
+      (*rates)(i)=cppqedutils::sqr(psiTemp.renorm());
     } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the StateVectorLow in the tuple
   return res;
 }
 
 
-template<int RANK, typename RandomEngine>
-bool MCWF_Trajectory<RANK,RandomEngine>::manageTimeStep(const Rates& rates, evolved::TimeStepBookkeeper* evolvedCache, std::ostream& logStream, bool logControl)
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+bool quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
+manageTimeStep(const Rates& rates, double tCache, double dtDidCache, double & dtTryCache, std::ostream& logStream, bool logControl)
 {
   const double totalRate=boost::accumulate(rates,0.);
-  const double dtDid=this->getDtDid(), dtTry=getDtTry();
+  const double dtDid=ode_.getDtDid(), dtTry=ode_.getDtTry();
 
   const double liouvilleanSuggestedDtTry=dpLimit_/totalRate;
 
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
   if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
-    evolvedCache->setDtTry(liouvilleanSuggestedDtTry);
-    (*getEvolved())=*evolvedCache;
-    logger_.stepBack(logStream,totalRate*dtDid,dtDid,getDtTry(),getTime(),logControl);
+    dtTryCache=liouvilleanSuggestedDtTry;
+    t_=tCache; /*ode_.setDtDid(dtDidCache);*/ ode_.setDtTry(dtTryCache);
+    logger_.stepBack(logStream,totalRate*dtDid,dtDid,ode_.getDtTry(),t_,logControl);
     return true; // Step-back required.
   }
   else if ( totalRate*dtTry>dpLimit_) {
@@ -114,16 +84,16 @@ bool MCWF_Trajectory<RANK,RandomEngine>::manageTimeStep(const Rates& rates, evol
   }
 
   // dtTry-adjustment for next step:
-  getEvolved()->setDtTry(this->getHa() ? std::min(getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
+  ode_.setDtTry(this->getHa() ? std::min(ode_.getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
 
   return false; // Step-back not required.
 }
 
 
-template<int RANK, typename RandomEngine>
-void MCWF_Trajectory<RANK,RandomEngine>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, double t, std::ostream& logStream)
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
-  double random=std::uniform_real_distribution()(this->getRandomEngine())/this->getDtDid();
+  double random=std::uniform_real_distribution()(re_)/this->getDtDid();
 
   int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))
@@ -136,39 +106,39 @@ void MCWF_Trajectory<RANK,RandomEngine>::performJump(const Rates& rates, const I
       psi_=std::get<1>(*i); // RHS already normalized above
     else {
       // normal  jump
-      this->actWithJ(t,psi_.getArray(),lindbladNo);
+      this->actWithJ(t_,psi_.getArray(),lindbladNo);
       double normFactor=sqrt(rates(lindbladNo));
       if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in MCWF_Trajectory::performJump");
       psi_/=normFactor;
     }
 
-    logger_.jumpOccured(logStream,t,lindbladNo);
+    logger_.jumpOccured(logStream,t_,lindbladNo);
   }
 }
 
 
-template<int RANK, typename RandomEngine>
-void MCWF_Trajectory<RANK,RandomEngine>::step_v(double Dt, std::ostream& logStream)
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(double Dt, std::ostream& logStream)
 {
   const StateVector psiCache(psi_); // deep copy
-  evolved::TimeStepBookkeeper evolvedCache(*getEvolved()); // This cannot be const since dtTry might change.
+  double tCache=t_, dtDidCache=ode_.getDtDid(), dtTryCache=ode_.getDtTry();
 
-  double t=coherentTimeDevelopment(Dt,logStream);
+  coherentTimeDevelopment(Dt,logStream);
 
   if (const auto li=this->getLi()) {
 
-    Rates rates(li->rates(t,psi_));
-    IndexSVL_tuples specialRates=calculateSpecialRates(&rates,t);
+    Rates rates(li->rates(t_,psi_));
+    IndexSVL_tuples specialRates=calculateSpecialRates(&rates);
 
-    while (manageTimeStep(rates,&evolvedCache,logStream)) {
+    while (manageTimeStep(rates,tCache,dtDidCache,dtTryCache,logStream)) {
       psi_=psiCache;
-      t=coherentTimeDevelopment(Dt,logStream); // the next try
-      rates=li->rates(t,psi_);
-      specialRates=calculateSpecialRates(&rates,t);
+      coherentTimeDevelopment(Dt,logStream); // the next try
+      rates=li->rates(t_,psi_);
+      specialRates=calculateSpecialRates(&rates);
     }
 
     // Jump
-    performJump(rates,specialRates,t,logStream);
+    performJump(rates,specialRates,logStream);
 
   }
 
@@ -177,12 +147,15 @@ void MCWF_Trajectory<RANK,RandomEngine>::step_v(double Dt, std::ostream& logStre
 }
 
 
-template<int RANK, typename RandomEngine>
-std::ostream& MCWF_Trajectory<RANK,RandomEngine>::streamParameters_v(std::ostream& os) const
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::streamParameters(std::ostream& os) const
 {
   using namespace std;
   
-  this->streamCharacteristics(this->getQS()->streamParameters(Base::streamParameters_v(os)<<"MCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl))<<endl;
+  this->streamCharacteristics(this->getQS()->streamParameters(
+    ode_.streamParameters(os)<<"Random engine: "<<randomutils::EngineID_v<RandomEngine><<". Initial state: "<<re_
+    <<"\nMCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl)
+  )<<endl;
 
   if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";
@@ -204,15 +177,6 @@ std::ostream& MCWF_Trajectory<RANK,RandomEngine>::streamParameters_v(std::ostrea
   
 }
 
-
-template<int RANK, typename RandomEngine>
-std::ostream& MCWF_Trajectory<RANK,RandomEngine>::streamKey_v(std::ostream& os, size_t& i) const
-{
-  return this->template streamKey<structure::LA_Av>(os,i);
-}
-
-
-} // quantumtrajectory
 
 
 #endif // CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_TCC_INCLUDED

@@ -9,7 +9,8 @@
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 
-#include "StochasticTrajectory.h"
+#include "Random.h"
+#include "Trajectory.h"
 
 #include <tuple>
 
@@ -21,9 +22,9 @@ namespace mcwf {
 
 
 /// Aggregate of parameters pertaining to \link MCWF_Trajectory MCWF\endlink simulations
-/** \copydetails trajectory::ParsRun */
+/** \copydetails trajectory::ParsRun *//*
 template<typename RandomEngine>
-struct Pars : public trajectory::ParsStochastic<RandomEngine> {
+struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
   
   double
     &dpLimit, ///< the parameter \f$\delta p_\text{limit}\f$ (cf. 2.b.ii \link MCWF_Trajectory here\endlink)
@@ -34,23 +35,18 @@ struct Pars : public trajectory::ParsStochastic<RandomEngine> {
     &nJumpsPerBin; ///< the average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination
 
   Pars(parameters::Table& p, const std::string& mod="")
-    : trajectory::ParsStochastic<RandomEngine>{p,mod},
+    : cppqedutils::trajectory::ParsStochastic<RandomEngine>{p,mod},
       dpLimit(p.addTitle("MCWF_Trajectory",mod).add("dpLimit",mod,"MCWFS stepper total jump probability limit",0.01)),
       overshootTolerance(p.add("overshootTolerance",mod,"Jump probability overshoot tolerance factor",10.)),
       nBins(p.add("nBins",mod,"number of bins used for the histogram of jumps created by EnsembleMCWF",size_t(0))),
       nJumpsPerBin(p.add("nJumpsPerBin",mod,"average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",size_t(50)))
     {}
 
-};
+};*/
 
 
 } // mcwf
 
-
-#define BASE_class trajectory::Stochastic<structure::AveragedCommon::Averages,\
-                                          typename quantumdata::Types<RANK>::StateVectorLow,\
-                                          quantumdata::StateVector<RANK>,\
-                                          RandomEngine>
 
 
 /// Implements a single Monte Carlo wave-function trajectory
@@ -85,85 +81,100 @@ struct Pars : public trajectory::ParsStochastic<RandomEngine> {
  * 
  */
 
-template<int RANK, typename RandomEngine>
-class MCWF_Trajectory : public QuantumTrajectory<RANK,BASE_class>
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+class MCWF_Trajectory : private structure::QuantumSystemWrapper<RANK,true>
 {
+private:
+  using QuantumSystemWrapper=structure::QuantumSystemWrapper<RANK,true>;
 public:
   MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
-  typedef structure::Exact        <RANK> Exact      ;
-  typedef structure::Hamiltonian  <RANK> Hamiltonian;
-  typedef structure::Liouvillean  <RANK> Liouvillean;
-  typedef structure::Averaged     <RANK> Averaged   ;
+  using StreamedArray=structure::AveragedCommon::Averages;
+
+  typedef structure::Exact      <RANK> Exact      ;
+  typedef structure::Hamiltonian<RANK> Hamiltonian;
+  typedef structure::Liouvillean<RANK> Liouvillean;
+  typedef structure::Averaged   <RANK> Averaged   ;
+
+  typedef structure::QuantumSystem<RANK> QuantumSystem;
 
   typedef quantumdata::StateVector<RANK> StateVector;
-
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
+  /// Templated constructor with the same idea as Master::Master
+  template <typename SV>
+  MCWF_Trajectory(typename QuantumSystem::Ptr sys, ///< object representing the quantum system
+                  SV&& psi, ///< the state vector to be evolved
+                  ODE_Engine ode, RandomEngine re, double dpLimit, double overshootTolerance, int logLevel)
+  : QuantumSystemWrapper{sys,true}, psi_{std::forward<StateVector>(psi)},
+    ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
+    logger_{logLevel,this->template nAvr<structure::LA_Li>()}
+  {
+    if (psi!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
+    if (t_) if(const auto li=this->getLi()) { // On startup, dpLimit should not be overshot, either.
+      Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates);
+      double dtTry=ode_.getDtTry();
+      manageTimeStep(rates,0,0,dtTry,std::clog,false);
+      ode_.setDtTry(dtTry);
+    }
+  }
+  
+  auto getTime() const {return t_;}
+
+  void step(double deltaT, std::ostream& logStream);
+  
+  auto getDtDid() const {return ode_.getDtDid();}
+  
+  std::ostream& streamParameters(std::ostream&) const;
+
+  auto stream(std::ostream& os, int precision) const {return QuantumSystemWrapper::stream(getTime(),psi_,os,precision);} ///< Forwards to structure::Averaged::stream
+  
+  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {StateVectorLow temp; iar & temp; psi_.getArray().reference(temp); return iar;}
+
+  /** structure of MCWF_Trajectory archives:
+  * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
+  */
+  // state should precede time in order to be compatible with array-only archives
+  auto& stateIO(cppqedutils::iarchive& iar)
+  {
+    StateVectorLow temp;
+    ode_.stateIO(iar & temp & t_) & re_ & logger_;
+    psi_.getArray().reference(temp);
+    t0_=t_; // A very important step!
+    return iar;
+  }
+  
+  auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & psi_.getArray() & t_) & re_ & logger_;}
+
+  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return QuantumSystemWrapper::template streamKey<structure::LA_Av>(os,i);} ///< Forwards to structure::Averaged::streamKey
+
+  std::ostream& logOnEnd(std::ostream& os) const {return logger_.onEnd(ode_.logOnEnd(os));} ///< calls mcwf::Logger::onEnd
+  
 private:
-  typedef quantumtrajectory::QuantumTrajectory<RANK,BASE_class> QuantumTrajectory;
-  typedef BASE_class Base;
-
-#undef  BASE_class
-
   typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
 
-public:
-  /// Templated constructor with the same idea as Master::Master
-  MCWF_Trajectory(StateVector&& psi, ///< the state vector to be evolved
-                  typename structure::QuantumSystem<RANK>::Ptr sys, ///< object representing the quantum system
-                  const mcwf::Pars<RandomEngine>& p, ///< parameters of the evolution
-                  const StateVectorLow& scaleAbs=StateVectorLow() ///< has the same role as `scaleAbs` in Master::Master
-                 );
-
-  /// \name Getters
-  //@{
-  const mcwf::Logger& getLogger() const {return logger_;}
-  //@}
-  
-  using Base::getTime;
-
-  const StateVector& getState() const {return psi_;}
-  
-protected:
-  using Base::getEvolved; using Base::getDtTry;
-
-  typename Base::StreamReturnType stream_v(std::ostream& os, int precision) const override
-  {
-    return structure::QuantumSystemWrapper<RANK,true>::stream(getTime(),psi_,os,precision);
-  } ///< Forwards to structure::Averaged::stream
-  
-  std::ostream& streamKey_v(std::ostream&, size_t&) const override; ///< Forwards to structure::Averaged::streamKey
-
-  /// Forwards to QuantumTrajectory::readStateMore_v (that involves setting \link QuantumTrajectory::getT0 `t0`\endlink) + serializes mcwf::Logger state
-  cppqedutils::iarchive&  readStateMore_v(cppqedutils::iarchive& iar) override {return QuantumTrajectory::readStateMore_v(iar) & logger_;}
-  /// Forwards to Base::writeStateMore_v + serializes mcwf::Logger state
-  cppqedutils::oarchive& writeStateMore_v(cppqedutils::oarchive& oar) const override {return Base::writeStateMore_v(oar) & logger_;}
-
-  std::ostream& logMoreOnEnd_v(std::ostream& os) const override {return logger_.onEnd(os);} ///< calls mcwf::Logger::onEnd
-  
-private:
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
   typedef typename Liouvillean::Rates Rates;
 
-  void step_v(double, std::ostream&) override; // performs one single adaptive-stepsize MCWF step of specified maximal length
+  StateVector averaged() const {return psi_;}
 
-  std::ostream& streamParameters_v(std::ostream&) const override;
+  void coherentTimeDevelopment(double Dt, std::ostream&);
+  
+  const IndexSVL_tuples calculateSpecialRates(Rates* rates) const;
 
-  StateVector averaged_v() const override {return psi_;}
+  bool manageTimeStep (const Rates& rates, double tCache, double dtDidCache, double & dtTryCache, std::ostream&, bool logControl=true);
 
-  const std::string trajectoryID_v() const override {return "MCWF_Trajectory";}
-
-  double coherentTimeDevelopment(double Dt, std::ostream&);
-  const IndexSVL_tuples calculateSpecialRates(Rates* rates, double t) const;
-
-  bool manageTimeStep (const Rates& rates, evolved::TimeStepBookkeeper*, std::ostream&, bool logControl=true);
-
-  void performJump (const Rates&, const IndexSVL_tuples&, double, std::ostream&); // LOGICALLY non-const
+  void performJump (const Rates&, const IndexSVL_tuples&, std::ostream&); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
+  double t_=0., t0_=0.;
+  
   StateVector psi_;
 
+  ODE_Engine ode_;
+
+  RandomEngine re_;
+  
   const double dpLimit_, overshootTolerance_;
 
   mutable mcwf::Logger logger_;
@@ -172,6 +183,14 @@ private:
 
 
 } // quantumtrajectory
+
+
+template <int RANK, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
+{
+  static auto _() {return SerializationMetadata{typeid(dcomp).name(),"MCWF_Trajectory",RANK};}
+};
+
 
 
 #endif // CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
