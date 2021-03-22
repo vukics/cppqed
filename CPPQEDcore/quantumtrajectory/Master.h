@@ -5,7 +5,7 @@
 
 #include "Structure.h"
 
-#include "StreamDensityOperator.h"
+#include "DensityOperatorStreamer.h"
 #include "QuantumTrajectory.h"
 #include "Types.h"
 

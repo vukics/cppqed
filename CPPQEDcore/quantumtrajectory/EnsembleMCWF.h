@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_ENSEMBLEMCWF_H_INCLUDED
 
-#include "StreamDensityOperator.h"
+#include "DensityOperatorStreamer.h"
 #include "MCWF_Trajectory.h"
 #include "DensityOperator.h"
 
