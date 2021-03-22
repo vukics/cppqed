@@ -86,7 +86,7 @@ public:
   
   std::ostream& streamParameters(std::ostream& os) const;
   
-  auto stream(std::ostream& os, int precision) const {return dos_.stream(t_,rho_,os,precision);}
+  auto stream(std::ostream& os, int precision) const {return dos_(t_,rho_,os,precision);}
   
   auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {DensityOperatorLow temp; iar & temp; rho_.getArray().reference(temp); return iar;}
 
@@ -116,7 +116,7 @@ private:
   
   ODE_Engine ode_;
 
-  const stream_densityoperator::_<RANK,V> dos_;
+  const DensityOperatorStreamer<RANK,V> dos_;
 
 };
 

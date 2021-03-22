@@ -9,8 +9,7 @@
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 
-#include "Random.h"
-#include "Trajectory.h"
+#include "StochasticTrajectory.h"
 
 #include <boost/range/algorithm/find_if.hpp>
 
@@ -88,6 +87,7 @@ class MCWF_Trajectory : private structure::QuantumSystemWrapper<RANK,true>
 {
 private:
   using QuantumSystemWrapper=structure::QuantumSystemWrapper<RANK,true>;
+  
 public:
   MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
@@ -103,6 +103,9 @@ public:
   typedef quantumdata::StateVector<RANK> StateVector;
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
+  using EnsembleAverageElement = StateVector;
+  using EnsembleAverageResult = quantumdata::DensityOperator<RANK>;
+  
   /// Templated constructor with the same idea as Master::Master
   template <typename SV>
   MCWF_Trajectory(typename QuantumSystem::Ptr sys, ///< object representing the quantum system

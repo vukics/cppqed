@@ -15,9 +15,6 @@
 
 namespace quantumtrajectory {
 
-/// Contains stream_densityoperator::_
-namespace stream_densityoperator {
-
 
 /// Wraps common functionality of Master & EnsembleMCWF concerning stream of quantum averages on the basis of density operators
 /**
@@ -31,7 +28,7 @@ namespace stream_densityoperator {
  * 
  */
 template<int RANK, typename V>
-class _
+class DensityOperatorStreamer
 {
 public:
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
@@ -39,9 +36,9 @@ public:
   typedef          structure::Averaged<RANK>      Averaged   ;
   typedef typename structure::Averaged<RANK>::Ptr AveragedPtr;
 
-  _(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}
+  DensityOperatorStreamer(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}
 
-  StreamReturnType stream(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
+  StreamReturnType operator()(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   {
     auto res{structure::stream(av_,t,rho,os,precision)};
     auto & averages{std::get<1>(res)};
@@ -68,9 +65,6 @@ private:
   const bool negativity_;
 
 };
-
-
-} // stream_densityoperator
 
 
 } // quantumtrajectory
