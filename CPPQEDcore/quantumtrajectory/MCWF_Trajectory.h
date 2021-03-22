@@ -89,7 +89,7 @@ private:
   using QuantumSystemWrapper=structure::QuantumSystemWrapper<RANK,true>;
   
 public:
-  MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
+  MCWF_Trajectory(const MCWF_Trajectory&) = default; MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
   using StreamedArray=structure::AveragedCommon::Averages;
 
@@ -154,6 +154,8 @@ public:
   std::ostream& streamKey(std::ostream& os) const {size_t i=3; return QuantumSystemWrapper::template streamKey<structure::LA_Av>(os,i);} ///< Forwards to structure::Averaged::streamKey
 
   std::ostream& logOnEnd(std::ostream& os) const {return logger_.onEnd(ode_.logOnEnd(os));} ///< calls mcwf::Logger::onEnd
+  
+  const StateVector& getStateVector() const {return psi_;}
   
 private:
   typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
@@ -355,6 +357,54 @@ std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
   return os;
   
 }
+
+
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
+{
+  static const auto& _(quantumdata::DensityOperator<RANK>& rho,
+                       const std::vector<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>& trajs)
+  {
+    rho=trajs.begin()->getStateVector();
+      
+    for (auto i=trajs.begin()+1; i<trajs.end(); i++) i->getStateVector().addTo(rho);
+
+    return rho/=size2Double(trajs.size());
+    
+  }
+
+};
+
+
+/*
+ * This could be implemented in several different ways, depending on how many arrays the archive contains
+ * - Single array archive: initialize all trajectories from the same array
+ * - As many arrays in archive as trajectories: initialize all trajectories from its own corresponding array
+ * **Most general solution**: create a DensityOperator from the available arrays (independently of their number)
+ * and sample the density operator to initialize as many trajectories as needed.
+ */
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
+{
+  static auto& _(const std::vector<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>&, cppqedutils::iarchive& iar)
+  {
+    throw std::runtime_error("InitializeEnsembleFromArrayOnlyArchive not implemented for MCWF_Trajectory");
+    return iar;
+  }
+};
+
+
+template<int RANK, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::EnsembleLogger<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
+{
+  static auto& _(const std::vector<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>& trajs, std::ostream& os)
+  {
+    LoggerList loggerList;
+    for (auto& traj : trajs) loggerList.push_back(traj.getLogger());
+  
+    return streamLog(os,loggerList,nBins_,nJumpsPerBin_);
+  }
+};
 
 
 

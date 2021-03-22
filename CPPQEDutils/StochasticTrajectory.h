@@ -8,7 +8,6 @@
 
 #include "Conversions.h"
 
-#include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 
 #include <vector>
@@ -160,13 +159,13 @@ template<typename SingleTrajectory>
 struct AverageTrajectories
 {
   /// Naive generic implementation
-  static const auto& _(typename SingleTrajectory::EnsembleAverageResult& res, const std::vector<SingleTrajectory> trajs)
+  static const auto& _(typename SingleTrajectory::EnsembleAverageResult& res, const std::vector<SingleTrajectory>& trajs)
   {
     using namespace boost;
     return res = accumulate(++trajs.begin(),trajs.end(),trajs.begin()->averaged(),[] (const auto& init, const SingleTrajectory& s) {
       return init + s.averaged();
     }
-    )/size2Double(trajs.end()-trajs.begin());
+    )/size2Double(trajs.size());
   }
   
 };
@@ -174,6 +173,11 @@ struct AverageTrajectories
 
 template<typename SingleTrajectory>
 struct InitializeEnsembleFromArrayOnlyArchive;
+
+
+template<typename SingleTrajectory>
+struct EnsembleLogger;
+
 
 
 /// An ensemble of Averageable trajectories providing services for ensemble averaging and evolving the element trajectories serially
@@ -201,6 +205,8 @@ public:
   
   using EnsembleAverageResult = typename SingleTrajectory::EnsembleAverageResult;
   
+  using StreamedArray = typename SingleTrajectory::StreamedArray;
+  
   Ensemble(Ensemble&&) = default; Ensemble& operator=(Ensemble&&) = default;
 
   /// Generic constructor
@@ -216,7 +222,7 @@ public:
   
   void evolve(double deltaT, std::ostream& logStream) {for (auto& t : trajs_) cppqedutils::evolve(t,deltaT,logStream);}
 
-  /// An average of getDtDid()-s from individual trajectories.
+  /// An average of `dtDid`s from individual trajectories.
   double getDtDid() const {return boost::accumulate(trajs_,0.,[] (double init, const SingleTrajectory& t) {
       return init+t.getDtDid();
     })/size2Double(trajs_.size());
@@ -236,8 +242,8 @@ public:
   
   std::ostream& streamKey(std::ostream& os) const {size_t i=3; return streamer_.streamKey(os,i);}
 
-  std::ostream& logOnEnd(std::ostream& os) const {logger_(trajs_,os); return os;};
-  
+  std::ostream& logOnEnd(std::ostream& os) const {EnsembleLogger<SingleTrajectory>::_(trajs_,os); return os;};
+
   /// This is what gets averaged when we have an ensemble of Ensembles
   const EnsembleAverageResult& averaged() const {return AverageTrajectories<SingleTrajectory>::_(ensembleAverageResult_,trajs_);}
   
@@ -252,6 +258,18 @@ private:
 
 
 } // cppqedutils::trajectory
+
+
+
+template <typename SingleTrajectory, typename Streamer>
+struct cppqedutils::trajectory::MakeSerializationMetadata<cppqedutils::trajectory::Ensemble<SingleTrajectory,Streamer>>
+{
+  static auto _()
+  {
+    auto metadataForSingle=MakeSerializationMetadata<SingleTrajectory>::_();
+    return SerializationMetadata{metadataForSingle.typeID,"Ensemble of "+metadataForSingle.trajectoryID,metadataForSingle.rank};
+  }
+};
 
 
 

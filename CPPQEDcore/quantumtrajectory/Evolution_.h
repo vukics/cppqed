@@ -7,7 +7,6 @@
 #define EVOLUTION_DEFAULT_RANDOM_ENGINE pcg64 // XoshiroCpp::Xoshiro256PlusPlus // cppqedutils::GSL_RandomEngine
 #endif
 
-#include "EnsembleMCWF.h"
 #include "EvolutionMethod.h"
 #include "Master.h"
 #include "MCWF_Trajectory.h"

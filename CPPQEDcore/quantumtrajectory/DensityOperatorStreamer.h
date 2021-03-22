@@ -27,7 +27,7 @@ namespace quantumtrajectory {
  * \tparam V has the same function as the template parameter `V` in quantumdata::negPT
  * 
  */
-template<int RANK, typename V>
+template<int RANK, typename V=tmptools::V_Empty>
 class DensityOperatorStreamer
 {
 public:
