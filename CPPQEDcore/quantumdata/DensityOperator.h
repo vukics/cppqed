@@ -83,7 +83,15 @@ public:
     return *this;
   }
   
-  DensityOperator& operator=(const StateVector<RANK>& psi);
+  DensityOperator& operator=(const StateVector<RANK>& psi)
+  {
+    using namespace linalg;
+    CMatrix matrix(matrixView());
+    CVector vector(psi.vectorView());
+    int dim(this->getTotalDimension());
+    for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)=vector(i)*conj(vector(j));
+    return *this;
+  }
   
 private:
   class IndexerProxy

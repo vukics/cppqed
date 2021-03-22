@@ -157,6 +157,8 @@ public:
   
   const StateVector& getStateVector() const {return psi_;}
   
+  const mcwf::Logger& getLogger() const {return logger_;}
+  
 private:
   typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
 
@@ -390,19 +392,6 @@ struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtr
   {
     throw std::runtime_error("InitializeEnsembleFromArrayOnlyArchive not implemented for MCWF_Trajectory");
     return iar;
-  }
-};
-
-
-template<int RANK, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::EnsembleLogger<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
-{
-  static auto& _(const std::vector<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>& trajs, std::ostream& os)
-  {
-    LoggerList loggerList;
-    for (auto& traj : trajs) loggerList.push_back(traj.getLogger());
-  
-    return streamLog(os,loggerList,nBins_,nJumpsPerBin_);
   }
 };
 

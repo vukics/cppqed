@@ -175,11 +175,6 @@ template<typename SingleTrajectory>
 struct InitializeEnsembleFromArrayOnlyArchive;
 
 
-template<typename SingleTrajectory>
-struct EnsembleLogger;
-
-
-
 /// An ensemble of Averageable trajectories providing services for ensemble averaging and evolving the element trajectories serially
 /**
  * \note Time averaging does not use stepsize-weighting, as experience has shown that this leads to worse convergence (similarly to quantumtrajectory::TimeAveragingMCWF_Trajectory).
@@ -195,7 +190,7 @@ struct EnsembleLogger;
  * because it might happen that the application cannot afford to store temporaries of `T` (for such an example, cf. quantumtrajectory::EnsembleMCWF)
  * 
  */
-template<typename ST, typename Streamer>
+template<typename ST, typename Streamer, typename Logger>
 class Ensemble
 {
 public:
@@ -210,12 +205,14 @@ public:
   Ensemble(Ensemble&&) = default; Ensemble& operator=(Ensemble&&) = default;
 
   /// Generic constructor
-  template <typename TC, typename STR, typename ... Args>
+  template <typename TC, typename STR, typename LOG, typename ... Args>
   Ensemble(TC&& trajs, ///< the sequence of Singles (in general, there is no way to create different Singles from a given set of ctor parameters)
            STR&& streamer,
+           LOG&& logger,
            Args&&... args)
   : trajs_{std::forward<TrajectoriesContainer>(trajs)},
     streamer_{std::forward<Streamer>(streamer)},
+    logger_{std::forward<Logger>(logger)},
     ensembleAverageResult_{std::forward<Args>(args)...} {}
 
   auto getTime() const {return trajs_.front().getTime();}
@@ -242,7 +239,7 @@ public:
   
   std::ostream& streamKey(std::ostream& os) const {size_t i=3; return streamer_.streamKey(os,i);}
 
-  std::ostream& logOnEnd(std::ostream& os) const {EnsembleLogger<SingleTrajectory>::_(trajs_,os); return os;};
+  std::ostream& logOnEnd(std::ostream& os) const {logger_(trajs_,os); return os;};
 
   /// This is what gets averaged when we have an ensemble of Ensembles
   const EnsembleAverageResult& averaged() const {return AverageTrajectories<SingleTrajectory>::_(ensembleAverageResult_,trajs_);}
@@ -251,6 +248,8 @@ private:
   TrajectoriesContainer trajs_;
   
   Streamer streamer_;
+  
+  Logger logger_;
   
   mutable EnsembleAverageResult ensembleAverageResult_;
 
@@ -261,8 +260,8 @@ private:
 
 
 
-template <typename SingleTrajectory, typename Streamer>
-struct cppqedutils::trajectory::MakeSerializationMetadata<cppqedutils::trajectory::Ensemble<SingleTrajectory,Streamer>>
+template <typename SingleTrajectory, typename Streamer, typename Logger>
+struct cppqedutils::trajectory::MakeSerializationMetadata<cppqedutils::trajectory::Ensemble<SingleTrajectory,Streamer,Logger>>
 {
   static auto _()
   {
