@@ -121,6 +121,11 @@ private:
 };
 
 
+/// Deduction guide (note: `V` cannot be deduced this way, and partial deduction is not possible as of C++17):
+template<typename System, int RANK, typename ODE_Engine>
+Master(System, quantumdata::DensityOperator<RANK>, ODE_Engine, bool) -> Master<RANK,ODE_Engine,tmptools::V_Empty>;
+
+
 } // quantumtrajectory
 
 

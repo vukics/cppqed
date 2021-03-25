@@ -256,6 +256,11 @@ private:
 };
 
 
+/// Deduction guide:
+template <typename SingleTrajectory, typename Streamer, typename Logger, typename ... Args>
+Ensemble(std::vector<SingleTrajectory>, Streamer, Logger, Args...) -> Ensemble<SingleTrajectory,Streamer,Logger>;
+
+
 } // cppqedutils::trajectory
 
 

@@ -191,6 +191,11 @@ private:
 };
 
 
+/// Deduction guide:
+template<typename System, int RANK, typename ODE_Engine, typename RandomEngine>
+MCWF_Trajectory(System, quantumdata::StateVector<RANK>, ODE_Engine, RandomEngine, double, double, int ) -> MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
+
+
 } // quantumtrajectory
 
 

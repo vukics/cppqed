@@ -22,7 +22,7 @@ namespace cppqedutils {
  * 
  * \todo Provide optional key printing
  */
-template<typename StateType, typename Derivs, typename ODE_Engine = ODE_EngineBoost<StateType> >
+template<typename StateType, typename Derivs, typename ODE_Engine>
 class Simulated
 {
 public:
@@ -78,6 +78,12 @@ private:
   ODE_Engine ode_;
   
 };
+
+
+/// Deduction guide:
+template<typename StateType, typename Derivs, typename ODE_Engine>
+Simulated(StateType, Derivs, std::initializer_list<std::string>, ODE_Engine) -> Simulated<StateType,Derivs,ODE_Engine> ;
+
 
 
 template <typename StateType, typename Derivs, typename ODE_Engine>
