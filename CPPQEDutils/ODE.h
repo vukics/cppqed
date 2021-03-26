@@ -66,12 +66,14 @@ struct Pars : BASE
 namespace bno=boost::numeric::odeint;
 
 
+/// Binds together a ControlledErrorStepper with its construction parameters, that unfortunalety cannot be recovered from the Boost steppers otherwise.
 template <typename ControlledErrorStepper>
-struct ControlledErrorStepperParameters
+struct ControlledErrorStepperWithParameters
 {
+  std::ostream& stream(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << ", epsAbs=" << epsAbs;}
+
+  ControlledErrorStepper stepper;
   const double epsRel, epsAbs;
-  
-  std::ostream& stream(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << " epsAbs=" << epsAbs;}
 };
 
 
@@ -157,23 +159,22 @@ public:
   void setDtTry(Time dtTry) {dtTry_=dtTry;}
 
   std::ostream& streamParameters(std::ostream& os) const {
-    return std::get<1>(ces_).stream(os<<"ODE engine implementation: " << StepperDescriptor<ControlledErrorStepper> << ". ")<< std::endl;
+    return ces_.stream(os<<"ODE engine: " << StepperDescriptor<ControlledErrorStepper> << ". ")<< std::endl;
   }
 
   template <typename Archive>
-  Archive& stateIO(Archive& ar) {return SerializeControlledErrorStepper<ControlledErrorStepper>::_(ar,std::get<0>(ces_)) & logger_ & dtDid_ & dtTry_;}
+  Archive& stateIO(Archive& ar) {return SerializeControlledErrorStepper<ControlledErrorStepper>::_(ar,ces_.stepper) & logger_ & dtDid_ & dtTry_;}
   
   std::ostream& logOnEnd(std::ostream& os) const {return logLevel_ > 0 ? logger_.logOnEnd(os) : os;}
   
 private:
   template <typename System, typename State>
-  auto tryStep(System sys, Time& time, State&& stateInOut) {return std::get<0>(ces_).try_step(sys,std::forward<State>(stateInOut),time,dtTry_);}
+  auto tryStep(System sys, Time& time, State&& stateInOut) {return ces_.stepper.try_step(sys,std::forward<State>(stateInOut),time,dtTry_);}
 
   template <typename System, typename State>
-  auto tryStep(System sys, Time& time, const State& stateIn, State&& stateOut) {return std::get<0>(ces_).try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry_);}
+  auto tryStep(System sys, Time& time, const State& stateIn, State&& stateOut) {return ces_.stepper.try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry_);}
   
-  std::tuple<ControlledErrorStepper,
-             ControlledErrorStepperParameters<ControlledErrorStepper>> ces_;
+  ControlledErrorStepperWithParameters<ControlledErrorStepper> ces_;
   
   Time dtDid_=0., dtTry_;
   
@@ -199,8 +200,8 @@ struct MakeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
 {
   static auto _(double epsRel, double epsAbs)
   {
-    return std::make_tuple(make_controlled(epsRel,epsAbs,ErrorStepper()),
-                           ControlledErrorStepperParameters<bno::controlled_runge_kutta<ErrorStepper>>{epsRel,epsAbs});
+    return ControlledErrorStepperWithParameters<bno::controlled_runge_kutta<ErrorStepper>>{
+      make_controlled(epsRel,epsAbs,ErrorStepper()),epsRel,epsAbs};
   }
 
   template <typename ParsBase>

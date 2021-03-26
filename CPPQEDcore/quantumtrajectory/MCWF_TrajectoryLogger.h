@@ -88,7 +88,7 @@ private:
                                                       & traj_;}
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-  friend class EnsembleLogger;
+  friend struct EnsembleLogger;
   
   const int logLevel_;
   const size_t nLindblads_;

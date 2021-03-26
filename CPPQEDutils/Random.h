@@ -111,6 +111,19 @@ template<>
 inline const std::string EngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
 
 
+template<typename Engine>
+struct EngineWithParameters
+{
+  EngineWithParameters(unsigned long s, unsigned long p) : engine{s,p}, seed{s}, prngStream{p} {}
+  
+  std::ostream& stream(std::ostream& os) const {return os << "Random engine: "<<EngineID_v<Engine><<". Parameters: seed="<<seed<<", streamOrdo=" << prngStream;}
+
+  Engine engine;
+  const unsigned long seed, prngStream;
+
+};
+
+
 // template<>
 // inline std::list<pcg64> independentPRNG_Streams<pcg64>(size_t n, pcg64::result_type seed, pcg64::result_type ordoStream)
 // {
@@ -131,17 +144,20 @@ struct Pars<pcg64,BASE> : BASE
     {}
 };
 
+
 #ifndef NDEBUG
 #pragma GCC warning "TODO: implement nextStream optionally from previousState"
 #endif // NDEBUG
 template<typename BASE>
-pcg64 streamOfOrdo(const Pars<pcg64,BASE>& p/*, std::optional<EngineState> previousState*/)
+pcg64 streamOfOrdo(const Pars<pcg64,BASE>& p/*, std::optional<EngineState> previousState = std::nullopt*/)
 {
   return pcg64{p.seed,1001+p.prngStream};
 }
 
+
 template<typename BASE>
 void incrementForNextStream(const Pars<pcg64,BASE>& p) {++p.prngStream;}
+
 
 } // randomutils
 

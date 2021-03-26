@@ -110,7 +110,7 @@ public:
   template <typename SV>
   MCWF_Trajectory(typename QuantumSystem::Ptr sys, ///< object representing the quantum system
                   SV&& psi, ///< the state vector to be evolved
-                  ODE_Engine ode, RandomEngine re, double dpLimit, double overshootTolerance, int logLevel)
+                  ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit, double overshootTolerance, int logLevel)
   : QuantumSystemWrapper{sys,true}, psi_{std::forward<StateVector>(psi)},
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
     logger_{logLevel,this->template nAvr<structure::LA_Li>()}
@@ -143,13 +143,13 @@ public:
   auto& stateIO(cppqedutils::iarchive& iar)
   {
     StateVectorLow temp;
-    ode_.stateIO(iar & temp & t_) & re_ & logger_;
+    ode_.stateIO(iar & temp & t_) & re_.engine & logger_;
     psi_.getArray().reference(temp);
     t0_=t_; // A very important step!
     return iar;
   }
   
-  auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & psi_.getArray() & t_) & re_ & logger_;}
+  auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & psi_.getArray() & t_) & re_.engine & logger_;}
 
   std::ostream& streamKey(std::ostream& os) const {size_t i=3; return QuantumSystemWrapper::template streamKey<structure::LA_Av>(os,i);} ///< Forwards to structure::Averaged::streamKey
 
@@ -182,7 +182,7 @@ private:
 
   ODE_Engine ode_;
 
-  RandomEngine re_;
+  randomutils::EngineWithParameters<RandomEngine> re_;
   
   const double dpLimit_, overshootTolerance_;
 
@@ -193,7 +193,7 @@ private:
 
 /// Deduction guide:
 template<typename System, int RANK, typename ODE_Engine, typename RandomEngine>
-MCWF_Trajectory(System, quantumdata::StateVector<RANK>, ODE_Engine, RandomEngine, double, double, int ) -> MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
+MCWF_Trajectory(System, quantumdata::StateVector<RANK>, ODE_Engine, randomutils::EngineWithParameters<RandomEngine>, double, double, int ) -> MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
 
 
 } // quantumtrajectory
@@ -281,7 +281,7 @@ manageTimeStep(const Rates& rates, double tCache, double dtDidCache, double & dt
 template<int RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
-  double random=std::uniform_real_distribution()(re_)/this->getDtDid();
+  double random=std::uniform_real_distribution()(re_.engine)/this->getDtDid();
 
   int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))
@@ -341,9 +341,7 @@ std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
   using namespace std;
   
   this->streamCharacteristics(this->getQS()->streamParameters(
-    ode_.streamParameters(os)<<"Random engine: "<<randomutils::EngineID_v<RandomEngine><<". Initial state: "<<re_
-    <<"\nMCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl)
-  )<<endl;
+    re_.stream(ode_.streamParameters(os))<<"\nMCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl) )<<endl;
 
   if (const auto li=this->getLi()) {
     os<<"Decay channels:\n";

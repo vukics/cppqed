@@ -112,8 +112,8 @@ struct MakeControlledErrorStepper<ControlledErrorStepperGSL<StateType>>
 {
   static auto _(double epsRel, double epsAbs)
   {
-    return std::make_tuple(ControlledErrorStepperGSL<StateType>{epsRel,epsAbs},
-                           ControlledErrorStepperParameters<ControlledErrorStepperGSL<StateType>>{epsRel,epsAbs});
+    return ControlledErrorStepperWithParameters<ControlledErrorStepperGSL<StateType>>{
+      {epsRel,epsAbs},epsRel,epsAbs};
   }
 
   template <typename ParsBase>
