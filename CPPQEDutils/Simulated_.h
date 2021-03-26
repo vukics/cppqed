@@ -51,7 +51,7 @@ public:
   {
     using namespace cppqedutils;
     for (size_t i=0; i < SubscriptLimit<StateType>::_(state_); i++) os<<FormDouble(precision)(Subscript_c<StateType>::_(state_,i))<<' ';
-    return {os,state_.copy()};
+    return {os,Copy<StateType>::_(state_)};
   }
 
   iarchive& readFromArrayOnlyArchive(iarchive& iar) {return iar & state_;}

@@ -172,6 +172,14 @@ struct CreateFromExtents<blitz::Array<T,n>>
 };
 
 
+template<typename T, int n>
+struct Copy<blitz::Array<T,n>>
+{
+  /// Copy of a with its own memory
+  static auto _(const blitz::Array<T,n>& a) {return a.copy();}
+};
+
+
 /// \name `blitz::Array` traversal traits for unary double and complex arrays
 //@{
 

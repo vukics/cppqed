@@ -79,9 +79,17 @@ struct Create_c
 };
 
 
-///< Owning empty array with memory layout specified by `e`
+///< Owning empty array with memory layout specified by Extents
 template<typename A>
 struct CreateFromExtents;
+
+
+template<typename A>
+struct Copy
+{
+  /// Copy of a with its own memory
+  static A _(const A& a) {return a;}
+};
 
 //@}
 
