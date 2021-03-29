@@ -306,7 +306,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 {
   using namespace structure;
   
-  const QuantumSystem<1>::Ptr
+  const QuantumSystemPtr<1>
     free0=ia->getFrees()[0],
     free1=ia->getFrees()[1];
 

@@ -98,8 +98,6 @@ public:
   typedef structure::Liouvillean<RANK> Liouvillean;
   typedef structure::Averaged   <RANK> Averaged   ;
 
-  typedef structure::QuantumSystem<RANK> QuantumSystem;
-
   typedef quantumdata::StateVector<RANK> StateVector;
   typedef typename StateVector::StateVectorLow StateVectorLow;
 
@@ -108,9 +106,10 @@ public:
   
   /// Templated constructor with the same idea as Master::Master
   template <typename SV>
-  MCWF_Trajectory(typename QuantumSystem::Ptr sys, ///< object representing the quantum system
+  MCWF_Trajectory(structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
                   SV&& psi, ///< the state vector to be evolved
-                  ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit, double overshootTolerance, int logLevel)
+                  ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re,
+                  double dpLimit, double overshootTolerance, int logLevel)
   : QuantumSystemWrapper{sys,true}, psi_{std::forward<StateVector>(psi)},
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
     logger_{logLevel,this->template nAvr<structure::LA_Li>()}

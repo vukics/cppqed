@@ -57,25 +57,23 @@ public:
 
   using StreamedArray=structure::AveragedCommon::Averages;
   
-  typedef structure::QuantumSystem<RANK> QuantumSystem;
-
   typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  template <typename DO>
-  Master(typename QuantumSystem::Ptr sys, ///< object representing the quantum system
-         DO&& rho, ///< the density operator to be evolved
+  template <typename StateVector_OR_DensityOperator>
+  Master(structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
+         StateVector_OR_DensityOperator&& state, ///< the state vector or density operator to be evolved
          ODE_Engine ode,
          bool negativity ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
          ) 
   : QuantumSystemWrapper{sys,true},
-    rho_{std::forward<DensityOperator>(rho)},
+    rho_{std::forward<StateVector_OR_DensityOperator>(state)},
     ode_(ode),
     dos_(this->getAv(),negativity)
   {
     if (!this->applicableInMaster()) throw master::SystemNotApplicable();
-    if (rho!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
+    if (rho_!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
   }
 
   auto getTime() const {return t_;}
