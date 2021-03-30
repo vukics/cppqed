@@ -23,7 +23,7 @@ namespace mcwf {
 
 
 /// Aggregate of parameters pertaining to \link MCWF_Trajectory MCWF\endlink simulations
-/** \copydetails trajectory::ParsRun *//*
+/** \copydetails trajectory::ParsRun */
 template<typename RandomEngine>
 struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
   
@@ -43,7 +43,7 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
       nJumpsPerBin(p.add("nJumpsPerBin",mod,"average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",size_t(50)))
     {}
 
-};*/
+};
 
 
 } // mcwf
@@ -193,6 +193,41 @@ private:
 /// Deduction guide:
 template<typename System, int RANK, typename ODE_Engine, typename RandomEngine>
 MCWF_Trajectory(System, quantumdata::StateVector<RANK>, ODE_Engine, randomutils::EngineWithParameters<RandomEngine>, double, double, int ) -> MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
+
+
+namespace mcwf {
+
+template<typename ODE_Engine, typename RandomEngine, typename SV>
+auto make(structure::QuantumSystemPtr<std::decay_t<SV>::N_RANK> sys,
+          SV&& state, const Pars<RandomEngine>& p)
+{
+  return MCWF_Trajectory<std::decay_t<SV>::N_RANK,ODE_Engine,RandomEngine>{
+    sys,std::forward<SV>(state),{initialTimeStep(sys),p},{p.seed,p.prngStream},p.dpLimit,p.overshootTolerance,p.logLevel
+  };
+}
+ 
+template<typename ODE_Engine, typename RandomEngine, typename V, typename SYS, typename SV>
+auto makeEnsemble(SYS sys, SV&& psi, const Pars<RandomEngine>& p, bool negativity)
+{
+  constexpr auto RANK=std::decay_t<SV>::N_RANK;
+  using Single=MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
+
+  std::vector<Single> trajs;
+  
+  p.logLevel=(p.logLevel>0 ? 1 : p.logLevel); // reduced logging for individual trajectories in an Ensemble
+
+  for (size_t i=0; i<p.nTraj; ++i) {
+    trajs.push_back(make<ODE_Engine,RandomEngine>(sys,quantumdata::StateVector<RANK>(psi),p));
+    randomutils::incrementForNextStream(p);
+  }
+
+  return cppqedutils::trajectory::Ensemble{trajs,DensityOperatorStreamer<RANK,V>{sys,negativity},
+                                           mcwf::EnsembleLogger{p.nBins,p.nJumpsPerBin},
+                                           quantumdata::DensityOperator<RANK>{psi.getDimensions()}};
+
+}
+ 
+} // mcwd
 
 
 } // quantumtrajectory

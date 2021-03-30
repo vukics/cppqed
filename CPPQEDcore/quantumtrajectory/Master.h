@@ -119,9 +119,25 @@ private:
 };
 
 
-/// Deduction guide (note: `V` cannot be deduced this way, and partial deduction is not possible as of C++17):
+/// Deduction guides (note: `V` cannot be deduced this way, and partial deduction is not possible as of C++17):
 template<typename System, int RANK, typename ODE_Engine>
 Master(System, quantumdata::DensityOperator<RANK>, ODE_Engine, bool) -> Master<RANK,ODE_Engine,tmptools::V_Empty>;
+
+template<typename System, int RANK, typename ODE_Engine>
+Master(System, quantumdata::StateVector<RANK>, ODE_Engine, bool) -> Master<RANK,ODE_Engine,tmptools::V_Empty>;
+
+
+namespace master {
+
+template<typename ODE_Engine, typename V, typename StateVector_OR_DensityOperator>
+auto make(structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperator>::N_RANK> sys,
+          StateVector_OR_DensityOperator&& state, const Pars& p, bool negativity)
+{
+  return Master<std::decay_t<StateVector_OR_DensityOperator>::N_RANK,ODE_Engine,V>(
+    sys,std::forward<StateVector_OR_DensityOperator>(state),ODE_Engine{initialTimeStep(sys),p},negativity);
+}
+  
+} // master
 
 
 } // quantumtrajectory
