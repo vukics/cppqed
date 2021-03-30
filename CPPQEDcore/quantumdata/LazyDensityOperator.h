@@ -22,6 +22,10 @@
 /** Some of its most important classes fit into a single class rooted in the virtual interface LazyDensityOperator. */
 namespace quantumdata {
 
+  
+template<auto RANK>
+using LazyDensityOperatorPtr=std::shared_ptr<const LazyDensityOperator<RANK>>;
+
 
 /// Common interface for calculating quantum averages
 /**
@@ -48,8 +52,6 @@ class LazyDensityOperator
     std::enable_shared_from_this<const LazyDensityOperator<RANK>>
 {
 public:
-  typedef std::shared_ptr<const LazyDensityOperator> Ptr; ///< Many class templates in the framework define shared pointers to their own types, in a template-metafunction like manner
-  
   typedef DimensionsBookkeeper<RANK> Base;
 
   typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper
