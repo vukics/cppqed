@@ -56,7 +56,7 @@ protected:
   
   /// calls the virtual doActWithJ for the given LINDBLAD_ORDINAL
   void typeErasedActWithJ(Time t,
-                          typename quantumdata::Types<RANK>::StateVectorLow& psi
+                          quantumdata::StateVectorLow<RANK>& psi
                          ) const {doActWithJ(t,psi,tmptools::integral_c<LINDBLAD_ORDINAL>());}
 
   /// calls the virtual rate for the given LINDBLAD_ORDINAL
@@ -65,18 +65,18 @@ protected:
                        ) const {return rate(t,matrix,tmptools::integral_c<LINDBLAD_ORDINAL>());}
 
   void typeErasedActWithSuperoperator(Time t,
-                                      const typename quantumdata::Types<RANK>::DensityOperatorLow& rho,
-                                      typename quantumdata::Types<RANK>::DensityOperatorLow& drhodt
+                                      const quantumdata::DensityOperatorLow<RANK>& rho,
+                                      quantumdata::DensityOperatorLow<RANK>& drhodt
                                      ) const {return doActWithSuperoperator(t,rho,drhodt,tmptools::integral_c<LINDBLAD_ORDINAL>());}
 
 private:
-  virtual void doActWithJ(Time, typename quantumdata::Types<RANK>::StateVectorLow&, tmptools::integral_c<LINDBLAD_ORDINAL>) const = 0;
+  virtual void doActWithJ(Time, quantumdata::StateVectorLow<RANK>&, tmptools::integral_c<LINDBLAD_ORDINAL>) const = 0;
   
   virtual double rate(Time, const quantumdata::LazyDensityOperator<RANK>&, tmptools::integral_c<LINDBLAD_ORDINAL>) const = 0;
 
   virtual void doActWithSuperoperator(Time,
-                                      const typename quantumdata::Types<RANK>::DensityOperatorLow&,
-                                      typename quantumdata::Types<RANK>::DensityOperatorLow&,
+                                      const quantumdata::DensityOperatorLow<RANK>&,
+                                      quantumdata::DensityOperatorLow<RANK>&,
                                       tmptools::integral_c<LINDBLAD_ORDINAL>
                                     ) const {throw SuperoperatorNotImplementedException(LINDBLAD_ORDINAL);}
   

@@ -8,22 +8,12 @@
 
 namespace quantumdata {
 
+template<int RANK>
+using StateVectorLow=CArray<RANK>;
 
-namespace details { struct EmptyBase {}; }
-
-/// Basically only a metafunction defining types for higher-level constructs of arity `RANK`
-/**
- * \tparamRANK
- * \tparam B An optional base class for base-class chaining. An empty class by default
- */
-template<int RANK, typename B=details::EmptyBase>
-struct Types : B 
-// it's basically just a metafunction
-{
-  typedef CArray<  RANK>     StateVectorLow;
-  typedef CArray<2*RANK> DensityOperatorLow;
-};
-
+template<int RANK>
+using DensityOperatorLow=CArray<2*RANK>;
+  
 
 } // quantumdata
 

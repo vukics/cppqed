@@ -5,7 +5,7 @@
 
 #include "TMP_Tools.h"
 
-using quantumdata::Types;
+using quantumdata::StateVectorLow;
 using blitz::Range;
 
 #include <boost/preprocessor/iteration/iterate.hpp>
@@ -27,26 +27,22 @@ using blitz::Range;
 
 #define PartialProject_print(z,nouse,unused) Range::all()
 
-namespace quantumoperator {
-
 
 template<>
-const Types<ITERM1>::StateVectorLow
-partialProject<ITER,true >(const Types<ITER>::StateVectorLow& psi, int n)
+const StateVectorLow<ITERM1>
+quantumoperator::partialProject<ITER,true >(const StateVectorLow<ITER>& psi, int n)
 {
   return psi(n,BOOST_PP_ENUM(ITERM1,PartialProject_print,~));
 }
 
 
 template<>
-const Types<ITERM1>::StateVectorLow
-partialProject<ITER,false>(const Types<ITER>::StateVectorLow& psi, int n)
+const StateVectorLow<ITERM1>
+quantumoperator::partialProject<ITER,false>(const StateVectorLow<ITER>& psi, int n)
 {
   return psi(BOOST_PP_ENUM(ITERM1,PartialProject_print,~),n);
 }
 
-
-} // quantumoperator
 
 #undef PartialProject_print
 

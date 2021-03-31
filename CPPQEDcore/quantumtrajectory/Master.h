@@ -57,7 +57,7 @@ public:
 
   using StreamedArray=structure::AveragedCommon::Averages;
   
-  typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
+  typedef typename quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 

@@ -76,7 +76,7 @@ private:
  * 
  */
 template<int RANK>
-class Averaged : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >, public AveragedCommon
+class Averaged : public LiouvilleanAveragedCommonRanked<RANK>, public AveragedCommon
 {
 public:
   static const int N_RANK=RANK;

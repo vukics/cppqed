@@ -19,12 +19,12 @@ namespace structure {
  *
  */
 template<int RANK>
-class Hamiltonian : private quantumdata::Types<RANK>
+class Hamiltonian
 {
 public:
   typedef std::shared_ptr<const Hamiltonian> Ptr;
 
-  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
 
   /// Adds the Hamiltonian contribution \f$\frac{H(t)}i\ket\Psi\f$ of the given (sub)system to `dpsidt`
   /**
