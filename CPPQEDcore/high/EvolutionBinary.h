@@ -11,14 +11,14 @@
 namespace evolution {
 
 
-template<typename RandomEngine, typename SV_OR_DO, typename Parameters>
+template<template <typename StateType> class ODE_Engine, typename RandomEngine, typename SV_OR_DO, typename Parameters>
 auto
 _(SV_OR_DO&& initial,
   binary::Ptr sys,
   const evolution::Pars<mcwf::Pars<RandomEngine>>& p,
   bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return _<RandomEngine,0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+  return _<ODE_Engine,RandomEngine,0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
 }
 
 
@@ -32,7 +32,8 @@ evolve(SV_OR_DO&& initial,
        const evolution::Pars<>& p,
        bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return evolution::_<EVOLUTION_DEFAULT_RANDOM_ENGINE,tmptools::Vector<0>>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+  return evolution::_<QUANTUM_EVOLUTION_DEFAULT_ODE_ENGINE,QUANTUM_EVOLUTION_DEFAULT_RANDOM_ENGINE,tmptools::Vector<0>>(
+    std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
 }
 
 
