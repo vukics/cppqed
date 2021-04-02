@@ -217,7 +217,7 @@ public:
 
   auto getTime() const {return trajs_.front().getTime();}
   
-  void evolve(double deltaT, std::ostream& logStream) {for (auto& t : trajs_) cppqedutils::evolve(t,deltaT,logStream);}
+  void advance(double deltaT, std::ostream& logStream) {for (auto& t : trajs_) cppqedutils::advance(t,deltaT,logStream);}
 
   /// An average of `dtDid`s from individual trajectories.
   double getDtDid() const {return boost::accumulate(trajs_,0.,[] (double init, const SingleTrajectory& t) {

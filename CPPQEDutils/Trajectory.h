@@ -33,15 +33,15 @@ namespace cppqedutils {
 
 
 inline auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
-inline auto has_evolve = hana::is_valid([](auto&& obj) -> decltype(obj.evolve(1.0,std::clog)) { });
+inline auto has_advance = hana::is_valid([](auto&& obj) -> decltype(obj.advance(1.0,std::clog)) { });
 
 
 /// \name Generic evolution functions
 //@{
-/// evolves for exactly time `deltaT`
-/** \tparam Trajectory type of the trajectory to evolve. Enabled only if it has `step(double, std::ostream&)` */
+/// advances for exactly time `deltaT`
+/** \tparam Trajectory type of the trajectory to advance. Enabled only if it has `step(double, std::ostream&)` */
 template<typename Trajectory>
-void evolve(Trajectory& traj,
+void advance(Trajectory& traj,
             std::enable_if_t<decltype(has_step(traj))::value,double> deltaT,
             std::ostream& logStream=std::clog)
 {
@@ -50,22 +50,22 @@ void evolve(Trajectory& traj,
 }
 
 
-/// evolves for exactly time `deltaT`
-/** \tparam Trajectory type of the trajectory to evolve. Enabled only if it has `evolve(double, std::ostream&)` */
+/// advances for exactly time `deltaT`
+/** \tparam Trajectory type of the trajectory to advance. Enabled only if it has `advance(double, std::ostream&)` */
 template<typename Trajectory>
-void evolve(Trajectory& traj,
-            std::enable_if_t<!decltype(has_step(traj))::value && decltype(has_evolve(traj))::value,double> deltaT,
+void advance(Trajectory& traj,
+            std::enable_if_t<!decltype(has_step(traj))::value && decltype(has_advance(traj))::value,double> deltaT,
             std::ostream& logStream=std::clog)
 {
-  traj.evolve(deltaT,logStream);
+  traj.advance(deltaT,logStream);
 }
 
 
-/// evolves up to exactly time `t` \copydetails evolve
+/// advances up to exactly time `t` \copydetails advance
 template<typename Trajectory>
-void evolveTo(Trajectory& traj, double t, std::ostream& logStream=std::clog)
+void advanceTo(Trajectory& traj, double t, std::ostream& logStream=std::clog)
 {
-  evolve(traj,t-traj.getTime(),logStream);
+  advance(traj,t-traj.getTime(),logStream);
 }
 //@}
 
@@ -231,7 +231,7 @@ using TemporalStreamedArray=std::list<std::tuple<double,double,SA>>;
  * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
  *
  * A Trajectory can
- * - be \link Trajectory::evolve evolved\endlink (propagated in time by given time intervals)
+ * - be \link Trajectory::advance advanced\endlink (propagated in time by given time intervals)
  * - \link Trajectory::readState perform i/o of its entire state\endlink, that is, a bunch of information necessary for resuming a Trajectory from a certain time instant
  * - \link Trajectory::stream stream relevant physical and numerical information\endlink about its actual state at any time (e.g. a set of quantum averages in the case of a quantum trajectory)
  *
@@ -304,7 +304,7 @@ template<typename AutostopHandler, typename TRAJ, typename ParsBase>
 auto
 run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p, AutostopHandler&& ah,
     bool doStreaming=true, bool returnStreamedArray=false)
--> std::enable_if_t<decltype(has_evolve(traj))::value || decltype(has_step(traj))::value,
+-> std::enable_if_t<decltype(has_advance(traj))::value || decltype(has_step(traj))::value,
                     trajectory::TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>
 {
   if constexpr (decltype(has_step(traj))::value) { // it is of the Adaptive family
@@ -541,8 +541,8 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
         // advance trajectory
         if constexpr (!isDtMode) {traj.step(length-traj.getTime(),logStream);}
         else {
-          if constexpr (endTimeMode) evolve(traj,std::min(streamFreq,length-traj.getTime()),logStream);
-          else evolve(traj,streamFreq,logStream);
+          if constexpr (endTimeMode) advance(traj,std::min(streamFreq,length-traj.getTime()),logStream);
+          else advance(traj,streamFreq,logStream);
         }
         stateSaved=arrayStreamed=false;
       }

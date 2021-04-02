@@ -44,7 +44,7 @@ int main(int, char**)
   
   for (size_t n=nSamples; n>0; n--) {
     auto time=std::uniform_real_distribution(0.,T)(re);
-    cppqedutils::evolveTo(s,time);
+    cppqedutils::advanceTo(s,time);
     
     ampDev+=relativeDeviation(y(0),oscillator->amp(time));
     ampDerivDev+=relativeDeviation(y(1),oscillator->ampDeriv(time));
