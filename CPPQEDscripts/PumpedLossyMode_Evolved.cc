@@ -28,10 +28,8 @@ int main(int argc, char* argv[])
   
   alpha=pplm.minit;
 
-  Simulated<Array> S(alpha,[&](double t, const Array& b, Array& dbdt) {
+  run(simulated::makeBoost(alpha,[&](const Array& b, Array& dbdt, double t) {
     dbdt(0)=dcomp(-pplm.kappa,pplm.delta)*b(0)+pplm.eta+pplm.etaOther*exp(DCOMP_I*t*(pplm.deltaOther+pplm.delta));
-  },dtinit,pt);
-  
-  run(S,pt);
+  },{"alpha"},dtinit,pt),pt);
   
 }

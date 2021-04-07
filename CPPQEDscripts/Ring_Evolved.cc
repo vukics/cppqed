@@ -1,12 +1,13 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+#include "Evolution_.h"
+
 #include "Simulated.h"
 
 #include "ParticleTwoModes.h"
 
 using namespace std       ;
-using namespace cppqedutils  ;
+using namespace cppqedutils;
 using namespace trajectory;
-using namespace mathutils ;
 
 typedef CArray<1> Array;
 
@@ -17,8 +18,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ode_engine::Pars<> pe(p);
-  ParsRun pr(p);
+  evolution::Pars<> pt(p);
 
   particle::Pars pp(p);
   mode::ParsPumpedLossy pmP(p,"P");
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
   Array alpha(2); alpha=pmP.minit,pmM.minit;
 
-  Simulated<Array> S(alpha,[&](double, const Array& b, Array& dbdt) {
+  run(simulated::makeBoost(alpha,[&](const Array& b, Array& dbdt, double) {
     const double x=PI*pp.init.getX0();
 
     const dcomp
@@ -43,8 +43,6 @@ int main(int argc, char* argv[])
     dbdt=
       z1*b(0)+pmP.eta-DCOMP_I*     g *b(1),
       z2*b(1)+pmM.eta-DCOMP_I*conj(g)*b(0);
-  },1e-6,pe);
-
-  run(S,pr);
+  },{"alphaP","alphaM"},1e-6,pt),pt);
 
 }

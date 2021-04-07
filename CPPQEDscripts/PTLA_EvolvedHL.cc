@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     sigma=real(rho(1)(0)),imag(rho(1)(0));
   }
 
-  Simulated<Array> S(sigma,[&](double, const Array& b, Array& dbdt) {
+  run(simulated::makeBoost(sigma,[&](const Array& b, Array& dbdt, double) {
     dcomp
       Omega(-pp2la.gamma,pp2la.delta),
       sigma(b(0),b(1));
@@ -49,9 +49,7 @@ int main(int argc, char* argv[])
       temp(Omega*sigma-pp2la.eta);
 
     dbdt=real(temp),imag(temp);
-  },dtinit,pt);
-  
-  run(S,pt);
+  },{"Re(sigma)","Im(sigma)"},dtinit,pt),pt);
 
   
 }

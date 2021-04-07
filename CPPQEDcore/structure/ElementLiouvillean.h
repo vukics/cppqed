@@ -331,7 +331,7 @@ public:
 
   template <typename... BaseCtorPack>
   ElementLiouvilleanDiffusive(size_t dim, const DiffusionCoeffs& diffusionCoeffs, BaseCtorPack&&... baseCtorPack)
-    : Base(std::forward<BaseCtorPack>(baseCtorPack)...), dim_(dim), base_nAvr_(this->getKeyPrinter().length()), diffusionCoeffs_(diffusionCoeffs)
+    : Base(std::forward<BaseCtorPack>(baseCtorPack)...), dim_(dim), base_nAvr_(this->getKeyPrinter().size()), diffusionCoeffs_(diffusionCoeffs)
   {
     for (size_t i=0; i<dim_; ++i) this->getKeyPrinter().getLabels().push_back("Phase flip for level "+std::to_string(i));
   }
