@@ -358,24 +358,30 @@ std::shared_ptr<std::ostream> openStateFileWriting(const std::string &filename, 
 
 
 template <typename Trajectory>
-iarchive& readState(Trajectory& traj, iarchive& iar)
+struct ReadState
 {
-  SerializationMetadata sm;
-  iar & sm;
-  if (sm.trajectoryID==SerializationMetadata::ARRAY_ONLY) return traj.readFromArrayOnlyArchive(iar);
-  else {
-    if (sm != MakeSerializationMetadata<Trajectory>::_()) throw std::runtime_error("Trajectory mismatch in cppqedutils::trajectory::readState");
-    return traj.stateIO(iar);
+  static iarchive& _(Trajectory& traj, iarchive& iar)
+  {
+    SerializationMetadata sm;
+    iar & sm;
+    if (sm.trajectoryID==SerializationMetadata::ARRAY_ONLY) return traj.readFromArrayOnlyArchive(iar);
+    else {
+      if (sm != MakeSerializationMetadata<Trajectory>::_()) throw std::runtime_error("Trajectory mismatch in cppqedutils::trajectory::ReadState");
+      return traj.stateIO(iar);
+    }
   }
-}
+};
 
 
 template <typename Trajectory>
-oarchive& writeState(Trajectory& traj, // cannot be const, because traj.stateIO is non-const
-                     oarchive& oar)
+struct WriteState
 {
-  return traj.stateIO(oar & MakeSerializationMetadata<Trajectory>::_());
-}
+  static oarchive& _(Trajectory& traj, // cannot be const, because traj.stateIO is non-const
+                     oarchive& oar)
+  {
+    return traj.stateIO(oar & MakeSerializationMetadata<Trajectory>::_());
+  }  
+};
 
 
 template<typename Trajectory>
@@ -390,7 +396,7 @@ void readViaSStream(Trajectory& traj, std::shared_ptr<std::istream> ifs)
     iss.str(buffer);
   }
   iarchive stateArchive(iss);
-  readState(traj,stateArchive);
+  ReadState<Trajectory>::_(traj,stateArchive);
 }
 
 
@@ -402,7 +408,7 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
   if (ofs) {
     ostringstream oss(ios_base::binary);
     oarchive stateArchive(oss);
-    writeState(traj,stateArchive);
+    WriteState<Trajectory>::_(traj,stateArchive);
     {
       const string& buffer=oss.str();
       *ofs<<buffer.size(); ofs->write(&buffer[0],buffer.size());

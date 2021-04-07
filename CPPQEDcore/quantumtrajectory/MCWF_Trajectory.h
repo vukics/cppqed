@@ -239,7 +239,7 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, bool nega
 template <int RANK, typename ODE_Engine, typename RandomEngine>
 struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
 {
-  static auto _() {return SerializationMetadata{typeid(dcomp).name(),"MCWF_Trajectory",RANK};}
+  static auto _() {return SerializationMetadata{"CArray","MCWF_Trajectory",RANK};}
 };
 
 

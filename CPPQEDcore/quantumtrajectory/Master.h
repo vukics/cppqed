@@ -146,7 +146,7 @@ auto make(structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperato
 template <int RANK, typename ODE_Engine, typename V>
 struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Master<RANK,ODE_Engine,V>>
 {
-  static auto _() {return SerializationMetadata{typeid(dcomp).name(),"Master",RANK};}
+  static auto _() {return SerializationMetadata{"CArray","Master",RANK};}
 };
 
 
