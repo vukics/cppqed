@@ -6,7 +6,7 @@
 
 using namespace std;
 using namespace boost::math;
-using namespace mathutils;
+using namespace cppqedutils;
 
 int main(int argc, char* argv[])
 {
