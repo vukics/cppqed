@@ -4,7 +4,7 @@
 
 #include<boost/operators.hpp>
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 class FuzzyDouble 
@@ -35,6 +35,6 @@ private:
 };
 
 
-} // cpputils
+} // cppqedutils
 
 #endif // CPPQEDCORE_UTILS_FUZZYDOUBLE_H_INCLUDED

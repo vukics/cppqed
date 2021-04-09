@@ -7,7 +7,7 @@
 
 #include <type_traits>
 
-namespace cpputils {
+namespace cppqedutils {
 
 // beginning of file "arithmetic_traits.h"
 
@@ -510,6 +510,6 @@ std::ostream& operator<<(std::ostream& lhs, primitive<T> const& rhs) {
     return lhs << rhs.get();
 }
 
-} // cpputils
+} // cppqedutils
 
 #endif // CPPQEDCORE_UTILS_PRIMITIVE_HPP_INCLUDED

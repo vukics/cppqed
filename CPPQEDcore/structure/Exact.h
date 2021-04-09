@@ -49,12 +49,12 @@ private:
  * 
  */
 template<int RANK>
-class Exact : public ExactCommon, private quantumdata::Types<RANK> 
+class Exact : public ExactCommon
 {
 public:
   typedef std::shared_ptr<const Exact> Ptr;
 
-  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
 
   virtual ~Exact() {}
 

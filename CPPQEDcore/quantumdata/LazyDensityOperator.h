@@ -22,6 +22,10 @@
 /** Some of its most important classes fit into a single class rooted in the virtual interface LazyDensityOperator. */
 namespace quantumdata {
 
+  
+template<auto RANK>
+using LazyDensityOperatorPtr=std::shared_ptr<const LazyDensityOperator<RANK>>;
+
 
 /// Common interface for calculating quantum averages
 /**
@@ -48,8 +52,6 @@ class LazyDensityOperator
     std::enable_shared_from_this<const LazyDensityOperator<RANK>>
 {
 public:
-  typedef std::shared_ptr<const LazyDensityOperator> Ptr; ///< Many class templates in the framework define shared pointers to their own types, in a template-metafunction like manner
-  
   typedef DimensionsBookkeeper<RANK> Base;
 
   typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper
@@ -123,12 +125,12 @@ private:
 template<typename V, template <int> class MATRIX, int RANK, typename F>
 auto partialTrace(const MATRIX<RANK>& matrix, F&& function)
 {
-  auto begin{cpputils::sliceiterator::begin<V,MATRIX>(matrix)};
+  auto begin{cppqedutils::sliceiterator::begin<V,MATRIX>(matrix)};
 
   auto init{function(*begin)};
 
   return std::accumulate(++begin,
-                         cpputils::sliceiterator::end<V,MATRIX>(matrix),
+                         cppqedutils::sliceiterator::end<V,MATRIX>(matrix),
                          init,
                          [f{std::move(function)}](const auto& res, const auto& slice){return decltype(init){res+f(slice)};}
                         );
@@ -166,14 +168,14 @@ partialTrace(const LazyDensityOperator<RANK>& matrix, F&& function)
 template<int RANK>
 const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
 {
-  using mathutils::sqr;
+  using cppqedutils::sqr;
   
   const size_t dim=matrix.getTotalDimension();
   
   DArray<1> res(offDiagonals ? sqr(dim) : dim);
   
-  typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(matrix.getDimensions()-1,cpputils::mii::begin);
+  typedef cppqedutils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(matrix.getDimensions()-1,cppqedutils::mii::begin);
   
   size_t idx=0;
 
@@ -314,7 +316,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
  * Notes on implementation {#slicinganldoimplementation}
  * =======================
  * 
- * It is implemented in terms of a cpputils::SliceIterator, which is adapted to work with StateVector or DensityOperator (or their non-orthogonal counterparts). 
+ * It is implemented in terms of a cppqedutils::SliceIterator, which is adapted to work with StateVector or DensityOperator (or their non-orthogonal counterparts). 
  * A runtime implementation selection occurs in partialTrace.
  * 
  */

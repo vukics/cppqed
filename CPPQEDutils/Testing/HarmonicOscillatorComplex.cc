@@ -21,16 +21,17 @@ int main(int, char**)
   // Initial condition
   Array y(2); y=yinit,dydtinit;
 
-  Simulated<Array> S(y,
-                     [=](double tau, const Array& y, Array& dydt)
-                     {
-                       dydt(0)=y(1);
-                       dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
-                     },
-                     .1/std::max(1.,std::max(omega,gamma)),
-                     0,1e-6,1e-18);
+  auto S{simulated::makeBoost(y,
+                         [=](const Array& y, Array& dydt, double tau)
+                         {
+                           dydt(0)=y(1);
+                           dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
+                         },
+                         {"coordinate","velocity"},
+                         .1/std::max(1.,std::max(omega,gamma)),
+                         0,1e-6,1e-18)};
 
-  auto streamedArray=run(S,70.,1,0,"","",6,false,false,"",false,true,trajectory::AutostopHandlerNoOp<Array>{});
+  auto streamedArray=run(S,70.,1,0,"","",6,false,false,"",false,true,trajectory::autostopHandlerNoOp);
   
   auto oscillator{ddho::make(gamma,omega,yinit,dydtinit,0)};
 
@@ -47,14 +48,14 @@ int main(int, char**)
          exactAmp=oscillator->amp(time),
          exactAmpDeriv=oscillator->ampDeriv(time);
 
-    ampDev+=mathutils::relativeDeviation(amp,exactAmp);
-    ampDerivDev+=mathutils::relativeDeviation(ampDeriv,exactAmpDeriv);
+    ampDev+=relativeDeviation(amp,exactAmp);
+    ampDerivDev+=relativeDeviation(ampDeriv,exactAmpDeriv);
 
     // std::cout<<time<<"\t"<<std::get<1>(s)<<"\t"<<std::get<2>(s)(0)<<"\t"<<oscillator->amp(time)<<"\t"<<std::get<2>(s)(1)<<"\t"<<oscillator->ampDeriv(time)<<std::endl;
   }
 
-  // std::cout<<averageDt/size<<"\t"<<ampDev/size<<"\t"<<ampDerivDev/size<<std::endl;
+  std::cout<<averageDt/size<<"\t"<<ampDev/size<<"\t"<<ampDerivDev/size<<std::endl;
   
-  return !(ampDev/size<8e-7 && ampDerivDev/size<8e-7);
+  return !(ampDev/size<2e-6 && ampDerivDev/size<8e-7);
   
 }

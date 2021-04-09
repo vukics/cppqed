@@ -87,7 +87,7 @@ private:
 public:
   typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper
 
-  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
   
 private:
   typedef blitz::TinyVector<blitz::TinyVector<blitz::Range,3>,RANK> Ranges;
@@ -290,7 +290,7 @@ private:
 /// A free-standing version of Tridiagonal::apply \related Tridiagonal
 template<int RANK>
 inline void
-apply(const typename quantumdata::Types<RANK>::StateVectorLow& psi, typename quantumdata::Types<RANK>::StateVectorLow& dpsidt, const Tridiagonal<RANK>& tridiag)
+apply(const quantumdata::StateVectorLow<RANK>& psi, quantumdata::StateVectorLow<RANK>& dpsidt, const Tridiagonal<RANK>& tridiag)
 {
   tridiag.apply(psi,dpsidt);
 }

@@ -3,7 +3,7 @@
 #define CPPQEDCORE_UTILS_SHAREDMEMORYALLOCATOR_H_INCLUDED
 
 
-namespace cpputils {
+namespace cppqedutils {
 
   
 template<typename> class SharedMemoryAllocator;
@@ -134,7 +134,7 @@ bool operator!= (const SharedMemoryAllocator<T1>&,  const SharedMemoryAllocator<
 
 
 
-} // cpputils
+} // cppqedutils
 
 
 

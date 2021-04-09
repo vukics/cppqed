@@ -15,7 +15,7 @@ namespace mpl=boost::mpl;
 
 #include <sstream>
 
-using namespace cpputils::sliceiterator;
+using namespace cppqedutils::sliceiterator;
 using namespace std;
 
 using V=tmptools::Vector<3,6,1,9,7>;
@@ -131,7 +131,7 @@ struct Helper
   template<typename V> void operator()(V)
   {
     PROGRESS_TIMER_IN_POINT(cout);
-    for (int i=nRepetition; i; --i) cpputils::for_each(fullRange<V>(array1),basi::begin<V>(array2),bll::_1*=bll::_2); 
+    for (int i=nRepetition; i; --i) cppqedutils::for_each(fullRange<V>(array1),basi::begin<V>(array2),bll::_1*=bll::_2); 
     cout<<"Arity "<<11-mpl::size<V>::value<<": ";
     PROGRESS_TIMER_OUT_POINT("");
 
@@ -139,7 +139,7 @@ struct Helper
 
     PROGRESS_TIMER_IN_POINT(cout);
     SlicesData<11,V> slicesData(array1);
-    for (int i=nRepetition; i; --i) cpputils::for_each(basi_fast::fullRange(array1,slicesData),basi_fast::begin(array2,slicesData),bll::_1*=bll::_2); 
+    for (int i=nRepetition; i; --i) cppqedutils::for_each(basi_fast::fullRange(array1,slicesData),basi_fast::begin(array2,slicesData),bll::_1*=bll::_2); 
     cout<<"Fast. Arity "<<11-mpl::size<V>::value;
     PROGRESS_TIMER_OUT_POINT("");
 
@@ -208,7 +208,7 @@ struct Helper
       "****************\n"<<
       "*** Slice Arity: "<<mpl::size<V>::value<<endl<<
       "****************\n";
-    cpputils::for_each(fullRange<V>(array1),basi_fast::begin(array2,slicesData),boost::bind(helper<mpl::size<V>::value>,_1,_2,array1.data(),array2.data())); 
+    cppqedutils::for_each(fullRange<V>(array1),basi_fast::begin(array2,slicesData),boost::bind(helper<mpl::size<V>::value>,_1,_2,array1.data(),array2.data())); 
   }
 
 };

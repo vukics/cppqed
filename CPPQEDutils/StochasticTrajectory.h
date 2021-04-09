@@ -3,33 +3,23 @@
 #ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
 
-#include "ParsTrajectory.h"
 #include "Random.h"
-#include "Trajectory.tcc"
+#include "Trajectory.h"
 
 #include "Conversions.h"
 
-#include <boost/ptr_container/ptr_vector.hpp>
-
-#include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/numeric.hpp>
 
-#include <boost/progress.hpp>
-
-#include <boost/mpl/identity.hpp>
+#include <vector>
 
 
-
-namespace mpl=boost::mpl;
-
-
-namespace trajectory {
+namespace cppqedutils::trajectory {
 
 
 /// Aggregate of parameters pertaining to stochastic simulations
 /** \copydetails ParsRun */
 template <typename RandomEngine>
-struct ParsStochastic : randomutils::Pars<RandomEngine,ParsEvolved>
+struct ParsStochastic : randomutils::Pars<RandomEngine,ode_engine::Pars<>>
 {
   /// whether the noise should be on or off
   /**
@@ -41,26 +31,13 @@ struct ParsStochastic : randomutils::Pars<RandomEngine,ParsEvolved>
   size_t &nTraj; ///< number of trajectories in case of ensemble averaging
 
   ParsStochastic(parameters::Table& p, const std::string& mod="")
-    : randomutils::Pars<RandomEngine,ParsEvolved>{p,mod},
+    : randomutils::Pars<RandomEngine,ode_engine::Pars<>>{p,mod},
       noise(p.add("noise",mod,"Switching noise on/off",true)),
       nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(500)))
   {}
       
 };
 
-
-
-/// Contains important helpers for averaging (over time or ensemble)
-namespace averaging {
-
-/// Whereby a type T can safely and efficiently be passed around (for storage, function parameter/return, ect.)
-/**
- * by default, the handle type is the same as the type itself (for types that can be passed around by value)
- */
-template<typename T>
-struct HandleType : mpl::identity<T> {};
-
-} // averaging
 
 
 /// The very general concept of an averageable trajectory
@@ -75,27 +52,35 @@ struct HandleType : mpl::identity<T> {};
  * \todo implement general time averaging along the lines discussed in [this tracker](https://sourceforge.net/p/cppqed/feature-requests/1/#f3b3)
  * 
  */
+/*
 template<typename SA, typename T> 
 class Averageable : public Trajectory<SA>
 {
+protected:
+  Averageable() = default;
+  Averageable(Averageable&&) = default; Averageable& operator=(Averageable&&) = default;
+
 public:
+  using ToBeAveraged=T;
+  
   virtual ~Averageable() {}
 
-  typedef typename averaging::HandleType<T>::type AveragedHandle;
-  
-  const AveragedHandle averaged() const {return averaged_v();} ///< returns the set of quantities condensed in a variable of type `T` that are “to be averaged”
+  T averaged() const {return averaged_v();} ///< returns the set of quantities condensed in a variable of type `T` that are “to be averaged”
 
 private:
-  virtual const AveragedHandle averaged_v() const = 0;
+  virtual T averaged_v() const = 0;
 
 };
-
+*/
 
 /// Represents a trajectory that has both adaptive ODE evolution and noise
-/** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. */
+/** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. *//*
 template<typename SA, typename A, typename T, typename RandomEngine>
 class Stochastic : public Adaptive<A,Averageable<SA,T>>
 {
+protected:
+  Stochastic(Stochastic&&) = default; Stochastic& operator=(Stochastic&&) = default;
+
 public:
   virtual ~Stochastic() {}
 
@@ -108,25 +93,25 @@ protected:
   /// \name Constructors
   //@{
   /// Straightforward constructor combining the construction of Adaptive and a random engine
-  Stochastic(A& y, typename Evolved::Derivs derivs,
+  Stochastic(A&& y, typename Evolved::Derivs derivs,
              double dtInit,
              int logLevel,
              double epsRel, double epsAbs, const A& scaleAbs,
              const evolved::Maker<A>& makerE,
              bool isNoisy,
              RandomEngine&& re)
-    : Base{y,derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE},
+    : Base{std::forward<A>(y),derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE},
       isNoisy_(isNoisy),
       reInitStateDescriptor_{ [re{std::move(re)}]() {std::ostringstream oss; oss<<re; return oss.str();}() },
       re_(std::forward<RandomEngine>(re)) {}
 
   /// \overload
-  Stochastic(A& y, typename Evolved::Derivs derivs,
+  Stochastic(A&& y, typename Evolved::Derivs derivs,
              double dtInit,
              const A& scaleAbs,
              const ParsStochastic<RandomEngine>& p,
              const evolved::Maker<A>& makerE)
-    : Stochastic{y,derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
+    : Stochastic{std::forward<A>(y),derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
                  randomutils::streamOfOrdo(p)} {}
   //@}
   
@@ -147,8 +132,8 @@ protected:
   
   /// \name Serialization
   //@{
-  cpputils::iarchive&  readStateMore_v(cpputils::iarchive& iar)       override {return iar & re_;}
-  cpputils::oarchive& writeStateMore_v(cpputils::oarchive& oar) const override {return oar & re_;}
+  cppqedutils::iarchive&  readStateMore_v(cppqedutils::iarchive& iar)       override {return iar & re_;}
+  cppqedutils::oarchive& writeStateMore_v(cppqedutils::oarchive& oar) const override {return oar & re_;}
   //@}
   
 private:
@@ -159,7 +144,35 @@ private:
   RandomEngine re_;
 
 };
+*/
 
+
+/// Governs how to average up several `SingleTrajectory` types in the most efficient way (which is sometimes not with the naive addition operator)
+/**
+ * \tparam SingleTrajectory type of a single trajectory in the ensemble
+ * 
+ * A generic naive implementation is provided for the traits class right away, assuming that `SingleTrajectory::EnsembleAverageElement` is additive and dividable by a double,
+ * and that it can be converted into `SingleTrajectory::EnsembleAverageResult` via assignment.
+ * 
+ */
+template<typename SingleTrajectory>
+struct AverageTrajectories
+{
+  /// Naive generic implementation
+  static const auto& _(typename SingleTrajectory::EnsembleAverageResult& res, const std::vector<SingleTrajectory>& trajs)
+  {
+    using namespace boost;
+    return res = accumulate(++trajs.begin(),trajs.end(),trajs.begin()->averaged(),[] (const auto& init, const SingleTrajectory& s) {
+      return init + s.averaged();
+    }
+    )/size2Double(trajs.size());
+  }
+  
+};
+
+
+template<typename SingleTrajectory>
+struct InitializeEnsembleFromArrayOnlyArchive;
 
 
 /// An ensemble of Averageable trajectories providing services for ensemble averaging and evolving the element trajectories serially
@@ -170,134 +183,97 @@ private:
  * 
  * The design is recursive: since Ensemble itself inherits from Averageable, it can act as an element in a larger Ensemble.
  * 
- * The elements do not need to have the same type, they only need to have a common Averageable type as a base.
- * 
- * \tparam T The type condensing the quantities to be averaged for Ensemble in its function as an Averageable
- * \tparam T_ELEM Same for the Averageable%s 
+ * \tparam ST Type of the elementary trajectories that form the Ensemble 
  * 
  * At the level of Ensemble, no implicit interface is assumed for `T` and `T_ELEM` since Ensemble treats variables of these types only via ensemble::Traits.
  * It is important that the way the averaged `T` will be calculated from the sequence of `T_ELEM`%s can be tailored
  * because it might happen that the application cannot afford to store temporaries of `T` (for such an example, cf. quantumtrajectory::EnsembleMCWF)
  * 
  */
-template<typename SA, typename T, typename T_ELEM=T>
-class Ensemble : public Averageable<SA,T>
+template<typename ST, typename Streamer, typename Logger>
+class Ensemble
 {
-private:
-  typedef Averageable<SA,T     > Base;
-  
 public:
-  typedef Averageable<SA,T_ELEM> Elem;
-
-  /// The storage of the element trajectories is through a \refBoost{pointer-vector,ptr_container/doc/ptr_vector.html}
-  /** This correctly handles the elements’s eventual polymorphy and allows for random access to individual trajectories (cf. averageInRange()) */
-  typedef boost::ptr_vector<Elem> Trajectories;
+  using SingleTrajectory = ST;
   
-  typedef T Averaged;
+  using TrajectoriesContainer = std::vector<SingleTrajectory>;
   
-  typedef typename averaging::HandleType<T>::type AveragedHandle;
-
-  /// Averages only in a range `begin..begin+n-1`
-  /** It could be called `averaged` as well, but it is not good to redefine an \link Averageable::averaged inherited non-virtual function\endlink. */
-  const AveragedHandle averageInRange(size_t begin, size_t n) const;
-
-  virtual ~Ensemble() {}
-
-protected:
-  // static helpers to constructor
-  typedef std::unique_ptr<Trajectories> Ptr;
+  using EnsembleAverageResult = typename SingleTrajectory::EnsembleAverageResult;
   
+  using StreamedArray = typename SingleTrajectory::StreamedArray;
+  
+  Ensemble(Ensemble&&) = default; Ensemble& operator=(Ensemble&&) = default;
+
   /// Generic constructor
-  Ensemble(Ptr&& trajs, ///< the sequence of elements owned by the `ptr_vector`
-           bool displayProgress ///< when true, a \refBoost{display of progress,timer/doc/index.html} through the element trajectories will show up on `cerr` at each step of time evolution
-          ) : trajs_(std::move(trajs)), displayProgress_(displayProgress) {}
+  template <typename TC, typename STR, typename LOG, typename ... Args>
+  Ensemble(TC&& trajs, ///< the sequence of Singles (in general, there is no way to create different Singles from a given set of ctor parameters)
+           STR&& streamer,
+           LOG&& logger,
+           Args&&... args)
+  : trajs_{std::forward<TrajectoriesContainer>(trajs)},
+    streamer_{std::forward<Streamer>(streamer)},
+    logger_{std::forward<Logger>(logger)},
+    ensembleAverageResult_{std::forward<Args>(args)...} {}
 
-  /// Getter
-  Trajectories& getTrajectories() {return trajs_;}
+  auto getTime() const {return trajs_.front().getTime();}
   
-  const Trajectories& getTrajectories() const {return trajs_;}
+  void advance(double deltaT, std::ostream& logStream) {for (auto& t : trajs_) cppqedutils::advance(t,deltaT,logStream);}
 
-#define FOR_EACH_function(f) for (auto& t : trajs_) t.f(ios); return ios;
+  /// An average of `dtDid`s from individual trajectories.
+  double getDtDid() const {return boost::accumulate(trajs_,0.,[] (double init, const SingleTrajectory& t) {
+      return init+t.getDtDid();
+    })/size2Double(trajs_.size());
+  }
   
-  /// \name Serialization
-  //@{
-  cpputils::iarchive&  readState_v(cpputils::iarchive& ios)       final {FOR_EACH_function( readState)}
-  cpputils::oarchive& writeState_v(cpputils::oarchive& ios) const final {FOR_EACH_function(writeState)}
-  //@}
+  std::ostream& streamParameters(std::ostream& os) const {return trajs_.front().streamParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
+
+  auto stream(std::ostream& os, int precision) const
+  {
+    return streamer_(getTime(),averaged(),os,precision);
+  }
+  
+  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {InitializeEnsembleFromArrayOnlyArchive<SingleTrajectory>::_(trajs_,iar); return iar;}
+  
+  template <typename Archive>
+  auto& stateIO(Archive& ar) {for (auto& t : trajs_) t.stateIO(ar); return ar;}
+  
+  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return streamer_.streamKey(os,i);}
+
+  std::ostream& logOnEnd(std::ostream& os) const {logger_(trajs_,os); return os;};
+
+  /// This is what gets averaged when we have an ensemble of Ensembles
+  const EnsembleAverageResult& averaged() const {return AverageTrajectories<SingleTrajectory>::_(ensembleAverageResult_,trajs_);}
   
 private:
-  std::ostream& logOnEnd_v(std::ostream& ios) const override {FOR_EACH_function(logOnEnd)}
-
-#undef FOR_EACH_function
+  TrajectoriesContainer trajs_;
   
-  void evolve_v(double deltaT) final
-  {
-    using namespace boost;
-    
-    if (displayProgress_) {
-      progress_display pd(trajs_.size(),std::cerr);
-      for (auto i=trajs_.begin(); i!=trajs_.end(); (++i, ++pd)) i->evolve(deltaT);
-    }
-    else
-      for_each(trajs_,bind(&Trajectory<SA>::evolve,_1,deltaT));
-  }
-
-  double getTime_v() const final {return trajs_.front().getTime();}
-
-  std::ostream& streamParameters_v(std::ostream& os) const final {return trajs_.front().streamParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
-
-  /// An average of getDtDid()-s from individual trajectories.
-  double getDtDid_v() const final {return accumulate(trajs_,0.,[] (double init, const Trajectory<SA>& t) {return init+t.getDtDid();})/size2Double(trajs_.size());}
-
-  const AveragedHandle averaged_v() const final {return averageInRange(0,trajs_.size());}
-
-  Trajectories trajs_; // cannot be const because ptr_vector “propagates constness” (very correctly)
-
-  const bool displayProgress_;
+  Streamer streamer_;
+  
+  Logger logger_;
+  
+  mutable EnsembleAverageResult ensembleAverageResult_;
 
 };
 
 
-namespace averaging {
+/// Deduction guide:
+template <typename SingleTrajectory, typename Streamer, typename Logger, typename ... Args>
+Ensemble(std::vector<SingleTrajectory>, Streamer, Logger, Args...) -> Ensemble<SingleTrajectory,Streamer,Logger>;
 
 
-/// Governs how to average up several `T_ELEM` types into a `T` type in the most efficient way (which is usually not with the naive addition operator)
-/**
- * \tparam T the averaged type of the ensemble
- * \tparam T_ELEM the averaged type of the underlying Averageable instances
- * 
- * A generic (naive) implementation is provided for the traits class right away, assuming that `T_ELEM` is additive and dividable by a double, and that it can be converted into a `T`.
- * 
- * \note The wrapper-class solution is necessary here as the function parameter types cannot be inferred due to heavy type-dependence
- * 
- */
-template<typename SA, typename T, typename T_ELEM>
-struct AverageTrajectoriesInRange
+} // cppqedutils::trajectory
+
+
+
+template <typename SingleTrajectory, typename Streamer, typename Logger>
+struct cppqedutils::trajectory::MakeSerializationMetadata<cppqedutils::trajectory::Ensemble<SingleTrajectory,Streamer,Logger>>
 {
-  /// Naive generic implementation
-  typedef typename Ensemble<SA,T,T_ELEM>::Trajectories::const_iterator CI;
-  static const typename HandleType<T>::type _(CI begin, CI end)
+  static auto _()
   {
-    using namespace boost;
-    return accumulate(++begin,end,begin->averaged(),[] (const auto& init, const typename Ensemble<T,T_ELEM>::Elem & e) {return init + e.averaged();})/size2Double(end-begin);
+    auto metadataForSingle=MakeSerializationMetadata<SingleTrajectory>::_();
+    return SerializationMetadata{metadataForSingle.typeID,"Ensemble of "+metadataForSingle.trajectoryID,metadataForSingle.rank};
   }
-  
 };
-
-
-} // averaging
-
-
-
-} // trajectory
-
-
-template<typename SA, typename T, typename T_ELEM>
-auto
-trajectory::Ensemble<SA,T,T_ELEM>::averageInRange(size_t begin, size_t n) const -> const AveragedHandle
-{
-  return averaging::AverageTrajectoriesInRange<SA,T,T_ELEM>::_(trajs_.begin()+begin,trajs_.begin()+(begin+n));
-}
 
 
 

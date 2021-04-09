@@ -7,7 +7,6 @@
 #include "QM_Picture.h"
 #include "Tridiagonal.tcc"
 
-#include "EvolvedGSL.tcc"
 #include "Pars.h"
 
 

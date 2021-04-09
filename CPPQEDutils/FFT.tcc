@@ -11,7 +11,7 @@ namespace fft {
 template<typename A>
 void transform(A& a, Direction dir)
 {
-  details::transform(cpputils::data(a),cpputils::stride(a),cpputils::subscriptLimit(a),dir);
+  details::transform(cppqedutils::Data<A>::_(a),cppqedutils::Stride<A>::_(a),cppqedutils::SubscriptLimit<A>::_(a),dir);
 }
 
 

@@ -3,4 +3,4 @@
 
 #include "BlitzArray.h"
 
-template class cpputils::SliceIterator<CArray,4,tmptools::Vector<3,2,4,1>>;
+template class cppqedutils::SliceIterator<CArray,4,tmptools::Vector<3,2,4,1>>;

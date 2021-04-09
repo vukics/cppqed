@@ -3,6 +3,8 @@
 #ifndef CPPQEDCORE_UTILS_PARS_H_INCLUDED
 #define CPPQEDCORE_UTILS_PARS_H_INCLUDED
 
+#include "ParsFwd.h"
+
 #include "BooleanNegatedProxy.h"
 
 #include <boost/ptr_container/ptr_list.hpp>
@@ -17,7 +19,14 @@
 /// The parameter-bundle
 namespace parameters {
 
-const size_t maxTypeLabelLength=24;
+
+struct Empty
+{
+  Empty(Table&, const std::string& ="") {}
+};
+
+
+inline const size_t maxTypeLabelLength=24;
 
 
 //////////////////
@@ -137,7 +146,7 @@ public:
    * 
    * In addition, the reference `omega` serves as a convenient handle for further operations involving omega in the program.
    * 
-   * \see e.g. the implementation of trajectory::ParsEvolved::ParsEvolved()
+   * \see e.g. the implementation of ode_engine::Pars::Pars()
    * 
    */
   template<typename T> 

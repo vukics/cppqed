@@ -71,7 +71,7 @@ void parameters::Typed<bool>::read_v(std::istream&)
 
 
 template<>
-void parameters::Typed<cpputils::BooleanNegatedProxy>::read_v(std::istream&)
+void parameters::Typed<cppqedutils::BooleanNegatedProxy>::read_v(std::istream&)
 {
   v_=true;
 }
@@ -80,7 +80,7 @@ void parameters::Typed<cpputils::BooleanNegatedProxy>::read_v(std::istream&)
 bool& parameters::Table::add(const std::string& s, const std::string& d, bool v)
 {
   bool& res=add<bool>(s,d,v);
-  add("no_"+s,d,cpputils::BooleanNegatedProxy(res));
+  add("no_"+s,d,cppqedutils::BooleanNegatedProxy(res));
   return res;
 }
 

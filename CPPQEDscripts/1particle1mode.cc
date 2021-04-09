@@ -4,8 +4,8 @@
 #include "ParticleCavity.h"
 
 
-using namespace std      ;
-using namespace mathutils;
+using namespace std;
+using namespace cppqedutils;
 
 
 typedef quantumdata::StateVector    <2> StateVector    ;

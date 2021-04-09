@@ -16,8 +16,9 @@ namespace structure {
 /** \note The namespace was earlier called `free`, which in some situations created clashes with the global function of the same name declared in cstdlib */
 namespace freesystem {
 
-typedef quantumdata::Types<1>::    StateVectorLow     StateVectorLow; ///< unary StateVectorLow
-typedef quantumdata::Types<1>::DensityOperatorLow DensityOperatorLow; ///< unary DensityOperatorFwd
+typedef quantumdata::StateVectorLow<1> StateVectorLow; ///< unary StateVectorLow
+
+typedef quantumdata::DensityOperatorLow<1> DensityOperatorLow; ///< unary DensityOperatorFwd
 
 typedef quantumdata::LazyDensityOperator<1> LazyDensityOperator; ///< unary LazyDensityOperator
 

@@ -105,7 +105,7 @@ private:
 //////////////
 
 
-using cpputils::primitive;
+using cppqedutils::primitive;
 
 
 template<typename T, int I, int J>

@@ -1,21 +1,19 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines stream_densityoperator::_}
-#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_STREAM_DENSITY_OPERATOR_H_INCLUDED
-#define CPPQEDCORE_QUANTUMTRAJECTORY_STREAM_DENSITY_OPERATOR_H_INCLUDED
+#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_DENSITY_OPERATOR_STREAMER_H_INCLUDED
+#define CPPQEDCORE_QUANTUMTRAJECTORY_DENSITY_OPERATOR_STREAMER_H_INCLUDED
 
 #include "DensityOperator.h"
 
 #include "Averaged.h"
 #include "NegPT.tcc"
+#include "QuantumTrajectory.h"
 #include "Structure.h"
 
 #include "FormDouble.h"
 
 
 namespace quantumtrajectory {
-
-/// Contains stream_densityoperator::_
-namespace stream_densityoperator {
 
 
 /// Wraps common functionality of Master & EnsembleMCWF concerning stream of quantum averages on the basis of density operators
@@ -29,8 +27,8 @@ namespace stream_densityoperator {
  * \tparam V has the same function as the template parameter `V` in quantumdata::negPT
  * 
  */
-template<int RANK, typename V>
-class _
+template<int RANK, typename V=tmptools::V_Empty>
+class DensityOperatorStreamer
 {
 public:
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
@@ -38,9 +36,9 @@ public:
   typedef          structure::Averaged<RANK>      Averaged   ;
   typedef typename structure::Averaged<RANK>::Ptr AveragedPtr;
 
-  _(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}
+  DensityOperatorStreamer(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}
 
-  std::tuple<std::ostream&,typename Averaged::Averages> stream(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
+  StreamReturnType operator()(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   {
     auto res{structure::stream(av_,t,rho,os,precision)};
     auto & averages{std::get<1>(res)};
@@ -69,9 +67,6 @@ private:
 };
 
 
-} // stream_densityoperator
-
-
 } // quantumtrajectory
 
-#endif // CPPQEDCORE_QUANTUMTRAJECTORY_STREAM_DENSITY_OPERATOR_H_INCLUDED
+#endif // CPPQEDCORE_QUANTUMTRAJECTORY_DENSITY_OPERATOR_STREAMER_H_INCLUDED

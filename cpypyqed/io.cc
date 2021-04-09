@@ -15,7 +15,7 @@
 #endif
 
 #include "BlitzArray.h"
-#include "Trajectory.tcc"
+#include "Trajectory.h"
 
 #include "blitz2numpy.h"
 
@@ -23,23 +23,72 @@
 
 #include <algorithm>
 
-using namespace trajectory;
+using namespace cppqedutils::trajectory;
 using namespace boost::python;
+
+
+namespace cppqedutils::trajectory {
+
+template <>
+struct ReadState<SerializationMetadata>
+{
+  
+  static iarchive& _(SerializationMetadata& sm, iarchive& iar)
+  {
+    iar & sm;
+    return iar;
+  }
+  
+};
+
+
+template <typename T, int RANK>
+using AdaptiveIO = std::tuple<blitz::Array<T,RANK>,double>;
+
+
+template <typename T, int RANK>
+struct ReadState<AdaptiveIO<T,RANK>>
+{
+  
+  static iarchive& _(AdaptiveIO<T,RANK>& arrayTime, iarchive& iar)
+  {
+    SerializationMetadata sm;
+    iar & sm & std::get<0>(arrayTime) & std::get<1>(arrayTime);
+    return iar;
+  }
+  
+};
+
+
+template <typename T, int RANK>
+struct WriteState<AdaptiveIO<T,RANK>>
+{
+  
+  static oarchive& _(const AdaptiveIO<T,RANK>& arrayTime, oarchive& oar)
+  {
+    oar & SerializationMetadata{"CArray",SerializationMetadata::ARRAY_ONLY,RANK} & std::get<0>(arrayTime) & std::get<1>(arrayTime);
+    return oar;
+  }
+  
+};
+
+} // cppqedutils::trajectory
 
 namespace cpypyqed { // helps resolving function overloads
 
 template<typename T, int RANK>
 object doRead(std::shared_ptr<std::istream> ifs)
 {
-  using ARRAY=blitz::Array<T,RANK>;
-  
   list states, times;
-  ARRAY a{ExtTiny<RANK>(0ul)};
-  AdaptiveIO<ARRAY> traj{evolved::makeIO(a)};
+  
+  AdaptiveIO<T,RANK> arrayTime{};
+  
   while ( (ifs->peek(), !ifs->eof()) ) {
-    trajectory::readViaSStream(traj,ifs);
-    states.append(cpputils::arrayToNumpy(a));
-    times.append(traj.getTime());
+    readViaSStream(arrayTime,ifs);
+    // specialize cppqedutils::trajectory::readState for something that eats a SerializationMetadata & then reads an array
+    // (& ignores the rest of the archive)
+    states.append(cppqedutils::arrayToNumpy(std::get<0>(arrayTime)));
+    times.append(std::get<1>(arrayTime));
   }
   return make_tuple(states,times);
 }
@@ -47,8 +96,8 @@ object doRead(std::shared_ptr<std::istream> ifs)
 template<typename T, int RANK>
 void doWrite(std::shared_ptr<std::ostream> ofs, const numpy::ndarray &a, double time)
 {
-  auto blitz_a{cpputils::numpyToArray<T,RANK>(a)};
-  trajectory::writeViaSStream(AdaptiveIO<blitz::Array<T,RANK>>{evolved::makeIO(blitz_a, time)},ofs);
+  AdaptiveIO<T,RANK> arrayTime{cppqedutils::numpyToArray<T,RANK>(a), time};
+  writeViaSStream(arrayTime,ofs);
 }
 
 
@@ -72,14 +121,15 @@ void throw_type(std::string typeID)
 
 object read(str filename) 
 {
-  std::string f = extract<std::string>(filename);
+  auto f = extract<std::string>(filename);
 
-  trajectory::SerializationMetadata meta{trajectory::readMeta(trajectory::openStateFileReading(f))};
-
+  SerializationMetadata meta;
+  readViaSStream(meta,openStateFileReading(f)); // necessary, since this is the only way to determine the rank for the switch statement below
+    
   throw_rank(meta.rank);
   throw_type(meta.typeID);
 
-  std::shared_ptr<std::istream> is = trajectory::openStateFileReading(f);
+  std::shared_ptr<std::istream> is = openStateFileReading(f);
 
   list result;
   result.append(meta);
@@ -99,7 +149,7 @@ object read(str filename)
 void write(str filename, const numpy::ndarray &array, double time)
 {
   auto f = extract<std::string>(filename);
-  auto ofs = trajectory::openStateFileWriting(f,std::ios_base::trunc | std::ios_base::binary);
+  auto ofs = openStateFileWriting(f,std::ios_base::trunc | std::ios_base::binary);
 
   const int r=array.get_nd(); throw_rank(r);
   
@@ -140,9 +190,9 @@ R"doc(Write a state vector file.
   (arg("fname"),"a", "t")
   );
 
-  class_<trajectory::SerializationMetadata>("SerializationMetadata")
-    .def_readonly("protocolVersion", &trajectory::SerializationMetadata::protocolVersion)
-    .def_readonly("rank",            &trajectory::SerializationMetadata::rank)
-    .def_readonly("trajectoryID",    &trajectory::SerializationMetadata::trajectoryID);
+  class_<SerializationMetadata>("SerializationMetadata")
+    .def_readonly("protocolVersion", &SerializationMetadata::protocolVersion)
+    .def_readonly("rank",            &SerializationMetadata::rank)
+    .def_readonly("trajectoryID",    &SerializationMetadata::trajectoryID);
   
 }

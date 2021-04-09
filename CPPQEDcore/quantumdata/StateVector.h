@@ -95,7 +95,14 @@ public:
   
   /// Assignment with by-value semantics.
   /** Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base). */
-  StateVector& operator=(const StateVector& sv) {ABase::operator=(sv.getArray()); return *this;}
+  StateVector& operator=(const StateVector&) = default;
+ 
+  StateVector& operator=(StateVector&& sv)
+  {
+    ABase::operator=(std::move(sv));
+    LDO_Base::setDimensions(sv.getDimensions());
+    return *this;
+  }
  
   /// \name Subscripting
   //@{
@@ -117,7 +124,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for StateVector." );
 #define SLICE_EXPR getArray()(subscriptPack...)
-    return StateVector<cpputils::Rank_v<decltype(SLICE_EXPR)>>(SLICE_EXPR,byReference);
+    return StateVector<cppqedutils::Rank_v<decltype(SLICE_EXPR)>>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
   
@@ -211,7 +218,7 @@ constexpr auto ArrayRank_v<StateVector<RANK>> = RANK;
 
 
 template<int RANK, typename ... SubscriptPack>
-auto subscript(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cpputils::SliceIterator
+auto subscript(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cppqedutils::SliceIterator
 {
   return psi.sliceIndex(subscriptPack...);
 }

@@ -1,6 +1,5 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines template aliases for real and complex arrays + implements the traits functions declared in ArrayTraits.h for `blitz::Array`}
-/** \todo Much of the traits in this file are superfluous as many components can be formulated generally for all `blitz::Array` types */
 #ifndef   CPPQEDCORE_UTILS_BLITZARRAY_H_INCLUDED
 #define   CPPQEDCORE_UTILS_BLITZARRAY_H_INCLUDED
 
@@ -8,9 +7,44 @@
 #include "ComplexExtensions.h"
 #include "SliceIterator.h"
 
+#include <boost/numeric/odeint.hpp>
+
 #include <blitz/array.h>
 
-#include <stdexcept>
+
+
+namespace boost { namespace numeric { namespace odeint {
+  
+template<typename Numtype, int RANK>
+struct is_resizeable<blitz::Array<Numtype,RANK>> : boost::true_type {};
+
+template<typename Numtype, int RANK>
+struct same_size_impl<blitz::Array<Numtype,RANK>, blitz::Array<Numtype,RANK>>
+{ // define how to check size
+  static bool same_size(const blitz::Array<Numtype,RANK> &v1, const blitz::Array<Numtype,RANK> &v2) {return all( v1.shape() == v2.shape() );}
+};
+
+template<typename Numtype, int RANK>
+struct resize_impl<blitz::Array<Numtype,RANK>, blitz::Array<Numtype,RANK>>
+{ // define how to resize
+  static void resize(blitz::Array<Numtype,RANK> &v1, const blitz::Array<Numtype,RANK> &v2) {v1.resize( v2.shape() );}
+};
+
+template<typename Numtype, int RANK>
+struct vector_space_norm_inf<blitz::Array<Numtype,RANK>>
+{
+  typedef double result_type;
+  double operator()(const blitz::Array<Numtype,RANK>& v ) const
+  {
+    return max( abs(v) );
+  }
+};
+
+template<typename Numtype, int RANK>
+struct norm_result_type<blitz::Array<Numtype,RANK>> : mpl::identity<double> {};
+
+} } } // boost::numeric::odeint
+
 
 /// An array of doubles of arbitrary arity
 template <int RANK> using DArray=blitz::Array<double,RANK>;
@@ -19,11 +53,7 @@ template <int RANK> using DArray=blitz::Array<double,RANK>;
 template <int RANK> using CArray=blitz::Array<dcomp ,RANK>;
 
 
-/// Thrown if the array supplied to MakerGSL has non contiguous storage
-struct NonContiguousStorageException : public std::invalid_argument {using std::invalid_argument::invalid_argument;};
-
-
-namespace cpputils {
+namespace cppqedutils {
 
 /** \cond SPECIALIZATION */
 
@@ -71,37 +101,36 @@ constexpr auto TypeID_v<CArray<RANK>> ="CArray";
 /** \endcond */
 
 
+template<typename T, int n>
+struct IsStorageContiguous<blitz::Array<T,n>>
+{
+  static auto _(const blitz::Array<T,n>& a) {return a.isStorageContiguous();}
+};
+
+
+template<typename T, int n>
+struct Extents<blitz::Array<T,n>>
+{
+  static auto _(const blitz::Array<T,n>& a) {Extents_t<n> res; std::copy(a.extent().begin(),a.extent().end(),res.begin()); return res;}
+};
+
+
 /// \name `blitz::Array` memory traits for `blitz::Array<double,n>`
 //@{
 
 template<int n>
-inline bool isStorageContiguous(const DArray<n>& a) {return a.isStorageContiguous();}
+struct Data_c<DArray<n>>
+{
+  static const double* _(const DArray<n>& a) {return a.size() ? a.data() : nullptr;}
+};
 
 
 template<int n>
-inline size_t size(const DArray<n>& a) {return a.size();}
+struct Create<DArray<n>>
+{
+  static DArray<n> _(double* y, Extents_t<n> e) {ExtTiny<n> et; std::copy(e.begin(),e.end(),et.begin()); return DArray<n>(y,et,blitz::neverDeleteData);}
+};
 
-
-template<int n>
-inline std::vector<size_t> dimensions(const DArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
-
-
-template<int n>
-inline const double* data(const DArray<n>& a) {return a.size() ? a.data() : 0;}
-
-template<int n>
-inline       double* data(      DArray<n>& a) {return const_cast<double*>(data(static_cast<const DArray<n>&>(a)));}
-
-
-template<int n>
-inline       DArray<n> create(      double* y, const DArray<n>& a) {return DArray<n>(y,a.shape(),blitz::neverDeleteData);}
-
-template<int n>
-inline const DArray<n> create(const double* y, const DArray<n>& a) {return create(const_cast<double*>(y),a);}
-
-
-template<int n>
-inline DArray<n> create(const DArray<n>& a) {return DArray<n>(a.shape());}
 
 //@}
 
@@ -110,57 +139,68 @@ inline DArray<n> create(const DArray<n>& a) {return DArray<n>(a.shape());}
 //@{
 
 template<int n>
-inline bool isStorageContiguous(const CArray<n>& a) {return a.isStorageContiguous();}
+struct Size<CArray<n>>
+{
+  static auto _(const CArray<n>& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
+};
 
 
 template<int n>
-inline size_t size(const CArray<n>& a) {return a.size()<<1;} // The size of the underlying double* storage!!!
+struct Data_c<CArray<n>>
+{
+  static const double* _(const CArray<n>& a) {return a.size() ? real(a).data() : nullptr;}
+};
 
 
 template<int n>
-inline std::vector<size_t> dimensions(const CArray<n>& a) {return std::vector<size_t>(a.extent().begin(),a.extent().end());}
+struct Create<CArray<n>>
+{
+  static CArray<n> _(double* y, Extents_t<n> e)
+  {
+    ExtTiny<n> et; std::copy(e.begin(),e.end(),et.begin());
+    return CArray<n>(reinterpret_cast<dcomp*>(y),et,blitz::neverDeleteData);    
+  }
+};
 
 
-template<int n>
-inline const double* data(const CArray<n>& a) {return a.size() ? real(a).data() : 0;}
-
-template<int n>
-inline       double* data(      CArray<n>& a) {return const_cast<double*>(data(static_cast<const CArray<n>&>(a)));}
-
-
-template<int n>
-inline       CArray<n> create(      double* y, const CArray<n>& a) {return CArray<n>(reinterpret_cast<dcomp*>(y),a.shape(),blitz::neverDeleteData);}
-
-template<int n>
-inline const CArray<n> create(const double* y, const CArray<n>& a) {return create(const_cast<double*>(y),a);}
-
-
-template<int n>
-inline CArray<n> create(const CArray<n>& a) {return CArray<n>(a.shape());}
 //@}
 
+template<typename T, int n>
+struct CreateFromExtents<blitz::Array<T,n>>
+{
+  static blitz::Array<T,n> _(Extents_t<n> e) {ExtTiny<n> et; std::copy(e.begin(),e.end(),et.begin()); return blitz::Array<T,n>(et);}
+};
+
+
+template<typename T, int n>
+struct Copy<blitz::Array<T,n>>
+{
+  /// Copy of a with its own memory
+  static auto _(const blitz::Array<T,n>& a) {return a.copy();}
+};
 
 
 /// \name `blitz::Array` traversal traits for unary double and complex arrays
 //@{
 
-inline const double& subscript(const DArray<1>& a, size_t i) {return a(i);}
-inline       double& subscript(      DArray<1>& a, size_t i) {return const_cast<double&>(subscript(static_cast<const DArray<1>&>(a),i));}
+template<typename T>
+struct Subscript_c<blitz::Array<T,1>>
+{
+  static const auto& _(const blitz::Array<T,1>& a, size_t i) {return a(i);}
+};
 
-inline size_t subscriptLimit(const DArray<1>& a) {return a.size();}
 
+template<typename T>
+struct Stride<blitz::Array<T,1>>
+{
+  static auto _(const blitz::Array<T,1>& a) {return a.stride(0);}
+};
 
-inline const dcomp& subscript(const CArray<1>& a, size_t i) {return a(i);}
-inline       dcomp& subscript(      CArray<1>& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const CArray<1>&>(a),i));}
-
-inline size_t subscriptLimit(const CArray<1>& a) {return a.size();}
-
-inline size_t stride(const CArray<1>& a) {return a.stride(0);}
 //@}
 
 
 
-/// \name `blitz::Array` traversal traits for unary double and complex arrays
+/// \name `blitz::Array` traversal traits for double and complex arrays of arbitrary arity
 //@{
 /**
  * \note this is broken since `blitz::Array` iterators are not random-access
@@ -170,13 +210,10 @@ template<int n>
 inline const dcomp& subscript(const CArray<n>& a, size_t i) {return *(a.begin()+i);}
 
 template<int n>
-inline       dcomp& subscript(      CArray<n>& a, size_t i) {return const_cast<dcomp&>(subscript(static_cast<const CArray<n>&>(a),i));}
-
-template<int n>
 inline size_t subscriptLimit(const CArray<n>& a) {return a.size();}
 //@}
 
-} // cpputils
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_BLITZARRAY_H_INCLUDED

@@ -9,7 +9,7 @@
 #include <utility>
 
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 /// Stores and prints a “key” (a.k.a. legend) to data, that is, an explanation to each element of a certain range of data
@@ -31,14 +31,14 @@ public:
   /// construction from a KeyLabelsInitializer list
   KeyPrinter(const std::string& keyTitle, KeyLabelsInitializer il) : keyTitle_(keyTitle), keyLabels_(il) {}
 
-  size_t        length    ()                       const {return keyLabels_.size();} ///< number of elements in the key
-  std::ostream& streamKey(std::ostream&, size_t&) const; ///< streams the stored key in a nicely tabulated format
+  size_t size() const {return keyLabels_.size();} ///< number of elements in the key
+  std::ostream& stream(std::ostream&, size_t&) const; ///< streams the stored key in a nicely tabulated format
 
   /// \name Getters/setters
   //@{
   const std::string& getTitle () const {return keyTitle_ ;}
-  const KeyLabels  & getLabels() const {return keyLabels_;}
-        KeyLabels  & getLabels()       {return const_cast<KeyLabels&>(static_cast<const KeyPrinter*>(this)->getLabels());}
+  const KeyLabels& getLabels() const {return keyLabels_;}
+  KeyLabels& getLabels() {return const_cast<KeyLabels&>(static_cast<const KeyPrinter*>(this)->getLabels());}
   
   //@}
   
@@ -48,6 +48,6 @@ private:
 };
 
 
-} // cpputils
+} // cppqedutils
 
 #endif // CPPQEDCORE_UTILS_KEYPRINTER_H_INCLUDED

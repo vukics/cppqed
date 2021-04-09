@@ -11,23 +11,11 @@
 #include<algorithm>
 
 using namespace std       ;
-using namespace cpputils  ;
+using namespace cppqedutils  ;
 using namespace trajectory;
 using namespace qbit      ;
 
 typedef DArray<1> Array;
-
-void derivs(double, const Array& b, Array& dbdt, const ParsPumpedLossy& p)
-{
-  dcomp
-    Omega(-p.gamma,p.delta),
-    sigma(b(0),b(1));
-
-  dcomp
-    temp(Omega*sigma-p.eta);
-
-  dbdt=real(temp),imag(temp);
-}
 
 
 int main(int argc, char* argv[])
@@ -52,9 +40,16 @@ int main(int argc, char* argv[])
     sigma=real(rho(1)(0)),imag(rho(1)(0));
   }
 
-  Simulated<Array> S(sigma,bind(derivs,_1,_2,_3,pp2la),dtinit,pt);
-  
-  run(S,pt);
+  run(simulated::makeBoost(sigma,[&](const Array& b, Array& dbdt, double) {
+    dcomp
+      Omega(-pp2la.gamma,pp2la.delta),
+      sigma(b(0),b(1));
+
+    dcomp
+      temp(Omega*sigma-pp2la.eta);
+
+    dbdt=real(temp),imag(temp);
+  },{"Re(sigma)","Im(sigma)"},dtinit,pt),pt);
 
   
 }

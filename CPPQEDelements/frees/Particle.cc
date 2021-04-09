@@ -16,8 +16,7 @@
 #include <utility>
 
 using namespace std;
-using namespace mathutils;
-using namespace cpputils;
+using namespace cppqedutils;
 using namespace fft;
 
 
@@ -146,7 +145,7 @@ auto particle::Averaged::average_v(NoTime, const LazyDensityOperator& matrix) co
 
   auto averages(initializedAverages());
   
-  const LazyDensityOperator::Ptr matrixX(quantumdata::ffTransform<tmptools::Vector<0> >(matrix,DIR_KX));
+  const auto matrixX(quantumdata::ffTransform<tmptools::Vector<0> >(matrix,DIR_KX));
   
   for (int i=0; i<dim; i++) {
 

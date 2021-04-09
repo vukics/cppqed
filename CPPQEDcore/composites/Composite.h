@@ -153,7 +153,7 @@ private:
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
-  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
 
   typedef tmptools::Ordinals<RANK> Ordinals;
 
@@ -179,7 +179,7 @@ private:
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
-  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
 
   typedef tmptools::Ordinals<RANK> Ordinals;
 
@@ -204,8 +204,8 @@ private:
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
-  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
-  typedef typename quantumdata::Types<RANK>::DensityOperatorLow DensityOperatorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
+  typedef quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 

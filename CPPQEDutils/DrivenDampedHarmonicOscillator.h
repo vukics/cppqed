@@ -22,7 +22,7 @@
 #include <memory>
 
 
-namespace ddho {
+namespace cppqedutils::ddho {
 
 typedef Eigen::Matrix2cd Matrix;
 typedef Eigen::Vector2cd Vector;
@@ -51,7 +51,7 @@ typedef std::shared_ptr<_> Ptr;
 
 Ptr make(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0);
 
-} // ddho
+} // cppqedutils::ddho
 
 #endif // EIGEN3_FOUND
 

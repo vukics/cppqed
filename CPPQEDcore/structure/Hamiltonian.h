@@ -19,12 +19,12 @@ namespace structure {
  *
  */
 template<int RANK>
-class Hamiltonian : private quantumdata::Types<RANK>
+class Hamiltonian
 {
 public:
   typedef std::shared_ptr<const Hamiltonian> Ptr;
 
-  typedef typename quantumdata::Types<RANK>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
 
   /// Adds the Hamiltonian contribution \f$\frac{H(t)}i\ket\Psi\f$ of the given (sub)system to `dpsidt`
   /**
@@ -49,6 +49,9 @@ public:
   virtual ~Hamiltonian() {}
 
 private:
+#ifndef NDEBUG
+#pragma GCC warning "TODO: the correct signature is addContribution_v(double, const StateVectorLow, StateVectorLow, double)"
+#endif // NDEBUG
   virtual void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const = 0; 
 
 };

@@ -21,11 +21,6 @@ namespace structure {
 template<int RANK>
 class QuantumSystem : public DimensionsBookkeeper<RANK>
 {
-public:
-  /// Many of the basic template classes in the framework act as template metafunctions returning a shared pointer to their own type
-  /** \todo define Ptr types outside classes as template aliases eg QuantumSystem::Ptr => QuantumSystemPtr */
-  typedef std::shared_ptr<const QuantumSystem> Ptr;
-  
 private:
   typedef DimensionsBookkeeper<RANK> Base;
 
@@ -40,10 +35,16 @@ public:
   std::ostream& streamParameters(std::ostream& os) const {return streamParameters_v(os);} ///< Communicating system parameters towards the user
 
 private:
-  virtual double         highestFrequency_v(             ) const = 0;
+  virtual double         highestFrequency_v(            ) const = 0;
   virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
 
 };
+
+
+template <int RANK>
+using QuantumSystemPtr=std::shared_ptr<const QuantumSystem<RANK>>;
+  
+
 
 
 } // structure

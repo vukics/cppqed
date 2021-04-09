@@ -12,7 +12,7 @@ namespace blitzplusplus {
 
 /// The name of the namespace stands for <strong>V</strong>ector<strong>F</strong>rom<strong>M</strong>atrix<strong>S</strong>lice<strong>I</strong>terator
 /**
- * It comprises tools for adapting cpputils::SliceIterator%s to iteration over rows or columns of (multi)matrices
+ * It comprises tools for adapting cppqedutils::SliceIterator%s to iteration over rows or columns of (multi)matrices
  * 
  * \par Semantics
  * Consider the following piece of code:
@@ -53,22 +53,22 @@ struct LeftRight
  * \tparam S should be either Left or Right
  * 
  */
-template<int RANK, typename S> using Iterator=cpputils::SliceIterator<CArray,RANK,LeftRight<RANK/2,S>>;
+template<int RANK, typename S> using Iterator=cppqedutils::SliceIterator<CArray,RANK,LeftRight<RANK/2,S>>;
 
 /// \name Makers for Iterator
 //@{
 /// Same as begin but here it returns an Iterator instance
 template<typename S, typename A>
 auto
-begin(const A& array ) {return Iterator<cpputils::Rank_v<A>,S>(array,cpputils::sliceiterator::Begin{});}
+begin(const A& array ) {return Iterator<cppqedutils::Rank_v<A>,S>(array,cppqedutils::sliceiterator::Begin{});}
 
 template<typename S, typename A>
 auto
-end  (const A& array ) {return Iterator<cpputils::Rank_v<A>,S>(array,cpputils::sliceiterator::End{});}
+end  (const A& array ) {return Iterator<cppqedutils::Rank_v<A>,S>(array,cppqedutils::sliceiterator::End{});}
 
 template<typename S, typename A>
 auto
-fullRange(const A& array ) {return boost::iterator_range<Iterator<cpputils::Rank_v<A>,S> >(begin<S>(array),end<S>(array));}
+fullRange(const A& array ) {return boost::iterator_range<Iterator<cppqedutils::Rank_v<A>,S> >(begin<S>(array),end<S>(array));}
 //@}
 
 
@@ -79,11 +79,11 @@ fullRange(const A& array ) {return boost::iterator_range<Iterator<cpputils::Rank
 
 /** \cond SPECIALIZATION */
 
-namespace cpputils { namespace sliceiterator {
+namespace cppqedutils { namespace sliceiterator {
 
 template<int RANK, typename S> struct ConsistencyChecker<RANK,blitzplusplus::vfmsi::LeftRight<RANK/2,S> > {};
 
-} } // cpputils::sliceiterator
+} } // cppqedutils::sliceiterator
 
 /** \endcond */
 

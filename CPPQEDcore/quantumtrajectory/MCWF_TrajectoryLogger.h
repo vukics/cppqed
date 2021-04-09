@@ -14,30 +14,34 @@
 #include <list>
 
 
-namespace quantumtrajectory {
+namespace quantumtrajectory::mcwf {
 
-  
-namespace mcwf {
 
 class Logger;
 
-} // mcwf
 
-/// Auxiliary tools to EnsembleMCWF
-namespace ensemble {
+struct EnsembleLogger
+{
+  typedef std::list<Logger> LoggerList;
 
-using namespace mcwf;
+  /// Called by Ensemble<MCWF_Trajectory>::logOnEnd, it calculates a temporal histogram of total jumps
+  /** \todo The different kinds of jumps should be collected into different histograms */
+  static std::ostream& stream(std::ostream&, const LoggerList&, size_t nBins, size_t nJumpsPerBin);
+
+  template <typename SingleTrajectory>
+  auto& operator()(const std::vector<SingleTrajectory>& trajs, std::ostream& os) const
+  {
+    LoggerList loggerList;
+    for (auto& traj : trajs) loggerList.push_back(traj.getLogger());
   
-typedef std::list<Logger> LoggerList;
-
-/// Called by EnsembleMCWF::logOnEnd, it streams a time histogram of total jumps
-/** \todo The different kinds of jumps should be collected into different histograms */
-std::ostream& streamLog(std::ostream&, const LoggerList&, size_t nBins, size_t nJumpsPerBin);
+    return stream(os,loggerList,nBins_,nJumpsPerBin_);
+  }
   
-} // ensemble
+  const size_t nBins_, nJumpsPerBin_;
+  
+};
 
 
-namespace mcwf {
 
 /// Essentially an aggregate of data fields for logging during a MCWF_Trajectory run.
 /**
@@ -84,7 +88,7 @@ private:
                                                       & traj_;}
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
-  friend std::ostream& ensemble::streamLog(std::ostream&, const ensemble::LoggerList&, size_t, size_t);
+  friend struct EnsembleLogger;
   
   const int logLevel_;
   const size_t nLindblads_;
@@ -97,7 +101,9 @@ private:
 };
 
 
-} } // quantumtrajectory::mcwf
+} // quantumtrajectory::mcwf
+
+
 
 
 #endif // CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED

@@ -19,8 +19,7 @@
 
 namespace blitzplusplus {
 
-
-inline double sqrAbs(dcomp c) {return mathutils::sqrAbs(c);}
+using cppqedutils::sqrAbs;
 
 BZ_DECLARE_FUNCTION_RET(sqrAbs,double)
 
@@ -61,7 +60,7 @@ namespace dodirect {
 
 using namespace linalg;
 
-template<bool> void doDirect(CMatrix&, const CVector&, const CVector&);
+template<bool> void _(CMatrix&, const CVector&, const CVector&);
 
 const bool multiplication=true;
 const bool addition=false;
@@ -89,7 +88,7 @@ doDirect(const CArray<RANK1>& array1, const CArray<RANK2>& array2)
     CVector r1array2(unaryArray(array2));
     CMatrix r2res(res.data(),blitz::shape(array1.size(),array2.size()),blitz::neverDeleteData);
     
-    dodirect::doDirect<IS_MULTIPLICATION>(r2res,r1array1,r1array2);
+    dodirect::_<IS_MULTIPLICATION>(r2res,r1array1,r1array2);
   }
   return res;
 

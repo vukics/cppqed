@@ -21,7 +21,6 @@
 #include "MathExtensions.h"
 
 using namespace std;
-using namespace mathutils;
 using namespace trajectory;
 
 typedef CArray<1> Array;
@@ -36,22 +35,22 @@ int main(int , char**)
   y(0)=  EULER;
   y(1)=Z*EULER;
 
-  Simulated<Array> S(y,[=](double tau, const Array& yA, Array& dydtA) {
-                        dcomp y{yA(0)}, p{yA(1)};
-                        dydtA(0)=p;
-                        dydtA(1)=sqr(p)+Z*p+sqr(Z)*exp(2.*Z*tau)*(y-sqr(y));
-                      },
-                    trajectory::initialTimeStep(abs(Z)),0,1e-6,1e-18);
+  auto S(simulated::makeBoost(y,[=](const Array& yA, Array& dydtA, double tau) {
+    dcomp y{yA(0)}, p{yA(1)};
+    dydtA(0)=p;
+    dydtA(1)=sqr(p)+Z*p+sqr(Z)*exp(2.*Z*tau)*(y-sqr(y));
+  },{"Re{y}","Im{y}"},trajectory::initialTimeStep(abs(Z)),
+                              0, //logLevel
+                              1e-6,1e-18));
 
-  auto streamedArray=run(static_cast<Trajectory<Array>&>(S),5.,0.01,0,string{},string{},6,false,false,string{},false,true,
-                         AutostopHandlerNoOp<Array>{});
+  auto streamedArray=run(S,5.,0.01,0,string{},string{},6,false,false,string{},false,true,autostopHandlerNoOp);
 
   double yDev=0;
   
-  for ( auto s : streamedArray ) yDev+=relativeDeviation(std::get<2>(s)(0),exp(exp(Z*std::get<0>(s))));
+  for ( auto s : streamedArray ) yDev+=relativeDeviation(get<2>(s)(0),exp(exp(Z*get<0>(s))));
   
-  // for ( auto s : streamedArray ) std::cout<<std::get<0>(s)<<"\t"<<std::get<2>(s)(0).real()<<"\t"<<std::get<2>(s)(0).imag()<<std::endl;
+  // for ( auto s : streamedArray ) cout<<get<0>(s)<<"\t"<<get<2>(s)(0).real()<<"\t"<<get<2>(s)(0).imag()<<endl;
   
-  return !(yDev/streamedArray.size()<3e-8);
+  return !(yDev/streamedArray.size()<2e-8);
  
 }

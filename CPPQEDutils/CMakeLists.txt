@@ -14,12 +14,12 @@ add_subdirectory(thirdPartyRandom)
 
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
-            BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc Evolved.cc EvolvedGSL.cc FFT.cc FormDouble.cc
-            FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc ParsTrajectory.cc Random.cc Trajectory.cc Version.cc)
+            BooleanNegatedProxy.cc CMatrix.cc Combinatorics.cc ComplexArrayExtensions.cc FFT.cc FormDouble.cc
+            FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc Random.cc Trajectory.cc Version.cc)
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams PRIVATE GSL::gsl)
+target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams GSL::gsl)
 
 if (TARGET Eigen3::Eigen)
   message(STATUS "Found Eigen3")
@@ -53,6 +53,8 @@ else()
   message(STATUS "Optional support for binary statevector compression disabled.")
   target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_BOOST_COMPRESSION)
 endif()
+
+add_subdirectory(examples)
 
 if(ENABLE_TESTING)
   add_subdirectory(Testing)

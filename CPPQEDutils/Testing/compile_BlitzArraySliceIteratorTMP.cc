@@ -3,9 +3,9 @@
 
 #include "BlitzArray.h"
 
-template class cpputils::SliceIterator<CArray,8,tmptools::Vector<3,1,6>>;
-template class cpputils::SliceIterator<CArray,8,tmptools::Range<6,1>>;
-template class cpputils::SliceIterator<CArray,8,tmptools::Ordinals<5>>;
+template class cppqedutils::SliceIterator<CArray,8,tmptools::Vector<3,1,6>>;
+template class cppqedutils::SliceIterator<CArray,8,tmptools::Range<6,1>>;
+template class cppqedutils::SliceIterator<CArray,8,tmptools::Ordinals<5>>;
 
 /*
 #include "VectorFromMatrixSliceIterator.h"

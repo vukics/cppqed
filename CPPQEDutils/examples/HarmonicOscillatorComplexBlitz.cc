@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Simulated.h"
 
-using std::max, std::min;
+using namespace std;
 
 typedef blitz::Array<dcomp,1> Array;
 
@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 {
   ParameterTable p;
 
-  Pars pt(p);
+  Pars<> pt(p);
 
   double & omega=p.add("O","Driving frequency",1.),
          & gamma=p.add("G","Damping rate"     ,1.);
@@ -32,14 +32,14 @@ int main(int argc, char* argv[])
   // Initial condition
   Array y(2); y=yinit,dydtinit;
 
-  Simulated<Array> S(y,
-                     [=](double tau, const Array& y, Array& dydt)
-                     {
-                       dydt(0)=y(1);
-                       dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
-                     },
-                     .1/max(1.,max(omega,gamma)),
-                     pt);
+  auto S{simulated::makeBoost(y,
+    [=](const Array& y, Array& dydt, double tau)
+    {
+      dydt(0)=y(1);
+      dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
+    },
+    {"complex coordinate","complex velocity"},
+    .1/max(1.,max(omega,gamma)),pt)};
 
   run(S,pt);
 /*

@@ -8,7 +8,7 @@
 
 #include <boost/array.hpp>
 
-using namespace cpputils;
+using namespace cppqedutils;
 using namespace std;
 
 

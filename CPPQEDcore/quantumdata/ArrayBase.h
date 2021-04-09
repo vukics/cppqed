@@ -14,25 +14,24 @@ namespace quantumdata {
 struct ByReference {}; const ByReference byReference{};
 
 template<typename>
-constexpr auto ArrayRank_v="N/A";
+constexpr auto ArrayRank_v=std::nullopt;
 
 /// Comprises the common functionalities of StateVector and DensityOperator.
 template<typename Derived>
 class ArrayBase : linalg::VectorSpace<Derived>
 {
 protected:
-  ArrayBase(const ArrayBase&) = delete; ArrayBase& operator=(const ArrayBase&) = delete;
-
+  ArrayBase() = default;
+  ArrayBase(const ArrayBase&) = delete;
+  ArrayBase& operator=(const ArrayBase&) = default;
+  ArrayBase(ArrayBase&&) = default; ArrayBase& operator=(ArrayBase&&) = default;
+  
   typedef CArray<ArrayRank_v<Derived>> ArrayLow; ///< The underlying storage
   typedef linalg::CVector CVector;
-
-  ArrayBase() : arrayLow_(0) {}
   
   explicit ArrayBase(const ArrayLow& arrayLow) : arrayLow_(arrayLow) {} ///< By-reference semantics (basically the copy of a `blitz::Array`). Apart from this, copying is not possible.
 
   ArrayBase(ArrayLow&& array) : arrayLow_(array) {}
-  
-  ArrayBase(ArrayBase&& array) : ArrayBase(std::move(array.getArray())) {}
   
   virtual ~ArrayBase() {}
 

@@ -1,7 +1,7 @@
 # /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --dc 1 --T 0.1 --nTraj 3 --evol ensemble --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_1particle1mode_dc_ensemble
 
 # http://github.com/vukics/cppqed
-# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
+# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
 
 # Compiled with
 # Boost library collection : Version 1.75
@@ -10,9 +10,8 @@
 # Eigen library            : Version 3.3.9
 
 # Ensemble of 3 trajectories.
-# EvolvedGSL implementation, stepping function: rkck
-# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
-# Stochastic Trajectory Parameters: random engine=PCG64 seed=1001 prngStreamNo=1
+# ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
+# Random engine: PCG64. Parameters: seed=1001, streamOrdo=1
 # MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Binary System
@@ -62,34 +61,18 @@
 #  9. <X>
 # 10. DEV(X)
 
-# Key to data:
-# Trajectory
-#  1. time
-#  2. dtDid
-# Binary system
-# Mode
-#  3. <number operator>
-#  4. VAR(number operator)
-#  5. real(<ladder operator>)
-#  6. imag(")
-# Particle
-#  7. <P>
-#  8. VAR(P)
-#  9. <X>
-# 10. DEV(X)
-
 # Run Trajectory up to time 0.1 -- Stream period: 0.1
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
-0.1          0.000183006  	0.378654      0.302011      0.435687      -0.376001     	-0.447941     4.5066        -1.54795      0.555043      
+0.1          0.000436834  	0.393109      0.371753      0.462929      -0.384514     	-0.44447      4.41033       -1.55061      0.570863      
 
-# Average number of total steps: 34.3333
+# Average number of total steps: 35
 
-# On average, dpLimit overshot: 32.6667 times, maximal overshoot: 0.0577996
+# On average, dpLimit overshot: 34 times, maximal overshoot: 0.0534358
 # On average, dpTolerance overshot: 0 times, maximal overshoot: 0
 
-# Maximal deviation of norm from 1: 0.00732993
+# Maximal deviation of norm from 1: 0.00643183
 
 # Too few jumps for a histogram
 
-# Average number of total jumps: 0.666667
+# Average number of total jumps: 0

@@ -126,11 +126,10 @@ public:
 
   /// \name Pointers to wrapped types
   //@{
-  typedef typename QS::Ptr QuantumSystemPtr;
-  typedef typename Ex::Ptr         ExactPtr;
-  typedef typename Ha::Ptr   HamiltonianPtr;
-  typedef typename Li::Ptr   LiouvilleanPtr;
-  typedef typename Av::Ptr      AveragedPtr;
+  typedef typename Ex::Ptr       ExactPtr;
+  typedef typename Ha::Ptr HamiltonianPtr;
+  typedef typename Li::Ptr LiouvilleanPtr;
+  typedef typename Av::Ptr    AveragedPtr;
   //@}
 
   /// \name Necessary types from wrapped types for definition of member-function signatures
@@ -155,7 +154,7 @@ public:
       av_(qsa<RANK>(qs))
   {} ///< Constructor from DynamicsBase
 
-  explicit QuantumSystemWrapper(QuantumSystemPtr qs, bool isNoisy)
+  explicit QuantumSystemWrapper(QuantumSystemPtr<RANK> qs, bool isNoisy)
     : qs_(qs),
       ex_(qse<RANK>(qs)),
       ha_(qsh<RANK>(qs)),
@@ -166,7 +165,8 @@ public:
 
   /// \name Getters
   //@{
-  QuantumSystemPtr getQS() const {return qs_;}
+  auto getQS() const {return qs_;}
+  
   ExactPtr         getEx() const {return ex_;} 
   HamiltonianPtr   getHa() const {return ha_;}
   LiouvilleanPtr   getLi() const {return li_;} 
@@ -238,11 +238,12 @@ protected:
   QuantumSystemWrapper() : qs_(), ex_(), ha_(), li_(), av_() {}
 
 private:
-  tmptools::ConditionalAddConst_t<QuantumSystemPtr,IS_CONST> qs_;
-  tmptools::ConditionalAddConst_t<ExactPtr        ,IS_CONST> ex_; 
-  tmptools::ConditionalAddConst_t<HamiltonianPtr  ,IS_CONST> ha_;
-  tmptools::ConditionalAddConst_t<LiouvilleanPtr  ,IS_CONST> li_; 
-  tmptools::ConditionalAddConst_t<AveragedPtr     ,IS_CONST> av_;
+  tmptools::ConditionalAddConst_t<QuantumSystemPtr<RANK>,IS_CONST> qs_;
+  
+  tmptools::ConditionalAddConst_t<ExactPtr      ,IS_CONST> ex_; 
+  tmptools::ConditionalAddConst_t<HamiltonianPtr,IS_CONST> ha_;
+  tmptools::ConditionalAddConst_t<LiouvilleanPtr,IS_CONST> li_; 
+  tmptools::ConditionalAddConst_t<AveragedPtr   ,IS_CONST> av_;
   
 };
 

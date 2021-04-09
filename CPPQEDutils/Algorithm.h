@@ -6,7 +6,7 @@
 #include <boost/range/numeric.hpp>
 
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 /// Fills a container by output iterator with concatenated values taken subsequently from the input sequences. \note Concatenation can be expressed as accumulation
@@ -41,7 +41,7 @@ concatenateGrow(const SeqOfSeqs& sOs)
 }
 
 
-} // cpputils
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_ALGORITHM_H_INCLUDED

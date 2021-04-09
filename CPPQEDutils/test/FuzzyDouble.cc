@@ -5,7 +5,7 @@
 #include<limits>
 
 using namespace std;
-using namespace cpputils;
+using namespace cppqedutils;
 
 int main()
 {

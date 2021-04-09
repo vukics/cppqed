@@ -47,7 +47,7 @@ unaryArray(const blitz::Array<T,RANK>& array)
 {
   if (!array.data()) return blitz::Array<T,1>();
 #ifndef   NDEBUG
-  if (!array.isStorageContiguous()) throw (NonContiguousStorageException("blitzplusplus::unaryArray"));
+  if (!array.isStorageContiguous()) throw cppqedutils::NonContiguousStorageException("blitzplusplus::unaryArray");
 #endif // NDEBUG
   return blitz::Array<T,1>(const_cast<T*>(array.data()),blitz::shape(array.size()),blitz::neverDeleteData);
 }
@@ -87,7 +87,7 @@ binaryArray(const blitz::Array<T,TWO_TIMES_RANK>& array)
   if (!array.data()) return blitz::Array<T,2>();
 
 #ifndef   NDEBUG
-  if (!array.isStorageContiguous()) throw (NonContiguousStorageException("blitzplusplus::unaryArray"));
+  if (!array.isStorageContiguous()) throw cppqedutils::NonContiguousStorageException("blitzplusplus::unaryArray");
 
   static const int RANK=TWO_TIMES_RANK/2;
 

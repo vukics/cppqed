@@ -4,25 +4,24 @@
 #include "MathExtensions.h"
 
 
-using namespace mathutils;
 using namespace std;
 
 using blitz::Range;
 
 
-cpputils::CWR_Dir::CWR_Dir(size_t n, size_t k)
+cppqedutils::CWR_Dir::CWR_Dir(size_t n, size_t k)
   : impl_(recurse(Impl(choose(n+k-1,k),n),k))
 {}
 
 
-const cpputils::CWR_Dir::Configuration cpputils::CWR_Dir::operator[](size_t i) const
+const cppqedutils::CWR_Dir::Configuration cppqedutils::CWR_Dir::operator[](size_t i) const
 {
   return impl_(i,Range::all());
 }
 
 
 
-const cpputils::CWR_Dir::Impl cpputils::CWR_Dir::recurse(cpputils::CWR_Dir::Impl dir, size_t k)
+const cppqedutils::CWR_Dir::Impl cppqedutils::CWR_Dir::recurse(cppqedutils::CWR_Dir::Impl dir, size_t k)
 {
   const size_t 
     n=dir.extent(1); // Current n

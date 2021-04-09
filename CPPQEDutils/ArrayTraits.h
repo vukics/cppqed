@@ -3,10 +3,12 @@
 #ifndef   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED
 
+#include <array>
 #include <optional>
-#include <vector>
+#include <stdexcept>
 
-namespace cpputils {
+
+namespace cppqedutils {
 
 
 /// template metafunction for the rank (arity) of the multi-array `A`
@@ -18,8 +20,11 @@ template<typename>
 constexpr auto TypeID_v=std::nullopt;
 
 /// template metafunction returning (by convention, as a member typedef `type`) the type of elements of the multi-array `A`
-template<typename>
-struct ElementType;
+template<typename A>
+struct ElementType
+{
+  using type=typename A::value_type;
+};
 
 template<typename A>
 using ElementType_t = typename ElementType<A>::type;
@@ -28,35 +33,64 @@ using ElementType_t = typename ElementType<A>::type;
 //@{
 
 
-template<typename A>
-bool isStorageContiguous(const A& a);
+template <size_t Rank>
+using Extents_t=std::array<size_t,Rank>;
+
+
+struct NonContiguousStorageException : public std::invalid_argument {using std::invalid_argument::invalid_argument;};
 
 
 template<typename A>
-size_t size(const A& a);
-
-template<typename A>
-std::vector<size_t> dimensions(const A& a);
-
+struct IsStorageContiguous;
 
 
 template<typename A>
-const double* data(const A& a);
-
-template<typename A>
-      double* data(      A& a);
-
-
-
-template<typename A>
-      A create(      double* y, const A& a); ///< Clone (create a non-owning array of data `y` of the same memory layout as `a`)
-
-template<typename A>
-const A create(const double* y, const A& a); ///< Const clone (create a const non-owning array of data `y` of the same memory layout as `a`)
+struct Size
+{
+  static auto _(const A& a) {return a.size();}
+};
 
 
 template<typename A>
-A create(const A& a); ///< Empty clone (create a newly allocated owning empty array of the same memory layout as `a`)
+struct Extents;
+
+
+
+template<typename A>
+struct Data_c;
+
+
+template<typename A>
+struct Data
+{
+  static double* _(A& a) {return const_cast<double*>(Data_c<A>::_(a));}
+};
+
+
+template<typename A>
+struct Create;
+
+
+template<typename A>
+struct Create_c
+{
+  /// Create a non-owning array of data `y` with memory layout specified by `e`
+  static const A _(const double* y, Extents_t<Rank_v<A>> e) {return Create<A>::_(const_cast<double*>(y),e);}
+};
+
+
+///< Owning empty array with memory layout specified by Extents
+template<typename A>
+struct CreateFromExtents;
+
+
+template<typename A>
+struct Copy
+{
+  /// Copy of a with its own memory
+  static A _(const A& a) {return a;}
+};
+
 //@}
 
 
@@ -65,25 +99,42 @@ A create(const A& a); ///< Empty clone (create a newly allocated owning empty ar
 //@{
 
 /// subscription of `a` (which might be a multi-array) with a *single* integer
-/**
- * \note `A::element_type` is a hypothetic member type, which in fact never plays a role, since we are relying on template-parameter inference & overload resolution,
- * wherein the return type does not play any role
- */
 template<typename A>
-const auto& subscript(const A& a, size_t i);
+struct Subscript_c
+{
+  static const auto& _(const A& a, size_t i) {return a[i];}
+};
 
 
 /// non-const subscription
 template<typename A>
-      auto& subscript(      A& a, size_t i);
+struct Subscript
+{
+  static auto& _(A& a, size_t i) {return const_cast<ElementType_t<A>&>(Subscript_c<A>::_(a,i));}
+};
 
 
 template<typename A>
-size_t subscriptLimit(const A& a);
+struct SubscriptLimit
+{
+  static auto _(const A& a) {return a.size();}
+};
+
+
+template<typename A>
+struct Stride;
+
 
 //@}
 
-} // cpputils
+
+/** Specializations for std::array */
+
+template<typename T, std::size_t N>
+constexpr auto Rank_v<std::array<T,N>> = 1;
+
+
+} // cppqedutils
 
 
 #endif // CPPQEDCORE_UTILS_ARRAYTRAITS_H_INCLUDED

@@ -376,11 +376,10 @@ private:
 #include <boost/iostreams/filtering_stream.hpp>
 
 
-namespace cpputils
-{
+namespace cppqedutils {
 
 
-namespace details {
+namespace commentingstream {
 
 
 class CommentingMachine : public boost::iostreams::finite_state_machine<CommentingMachine>
@@ -413,16 +412,16 @@ public:
 
 typedef boost::iostreams::finite_state_filter<CommentingMachine> CommentingFilter;
 
-} // details
+} // commentingstream
 
 class CommentingStream : public boost::iostreams::filtering_ostream
 {
 public:
   using OstreamPtr=std::shared_ptr<std::ostream>;
   
-  explicit CommentingStream(OstreamPtr os) : os_{os} {push(details::CommentingFilter()); push(*os);}
+  explicit CommentingStream(OstreamPtr os) : os_{os} {push(commentingstream::CommentingFilter()); push(*os);}
   
-  void set(OstreamPtr os) {os_=os; reset(); push(details::CommentingFilter()); push(*os_);}
+  void set(OstreamPtr os) {os_=os; reset(); push(commentingstream::CommentingFilter()); push(*os_);}
 
 private:
   std::shared_ptr<std::ostream> os_;
@@ -430,6 +429,6 @@ private:
 };
 
 
-} // cpputils
+} // cppqedutils
 
 #endif // CPPQEDCORE_UTILS_COMMENTING_STREAM_H_INCLUDED

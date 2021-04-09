@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "MultiIndexIterator.h"
 
-using namespace cpputils;
+using namespace cppqedutils;
 
 namespace mpl=boost::mpl;
 

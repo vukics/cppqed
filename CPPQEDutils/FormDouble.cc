@@ -5,11 +5,6 @@
 #include <limits>
 
 
-const int FormDouble::defaultPrecision=6;
-
-int FormDouble::overallPrecision=defaultPrecision/2;
-
-
 using namespace std;
 
 

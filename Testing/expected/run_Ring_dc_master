@@ -1,7 +1,7 @@
 # /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/Ring --epsAbs 1e-5 --etaM 10 --etaP 10 --cutoffM 3 --cutoffP 3 --fin 3 --sdf 3 --T 0.1 --dc 1 --T 0.0002 --evol master --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_Ring_dc_master
 
 # http://github.com/vukics/cppqed
-# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
+# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
 
 # Compiled with
 # Boost library collection : Version 1.75
@@ -9,8 +9,7 @@
 # Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
 # Eigen library            : Version 3.3.9
 
-# EvolvedGSL implementation, stepping function: rkck
-# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+# ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
 # Solving Master equation.
 
 # Composite

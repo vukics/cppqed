@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Definition of cpputils::SliceIterator together with its helpers}
+/// \briefFile{Definition of cppqedutils::SliceIterator together with its helpers}
 #ifndef CPPQEDCORE_UTILS_SLICEITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_SLICEITERATOR_H_INCLUDED
 
@@ -26,7 +26,7 @@
 #include <stdexcept>
 
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 namespace sliceiterator {
@@ -58,9 +58,9 @@ template<int RANK, typename V> struct ConsistencyChecker
 
   typedef typename boost::mpl::sort<V>::type SortedV;
   static_assert( boost::mpl::equal<typename boost::mpl::unique<SortedV,boost::is_same<boost::mpl::_1,boost::mpl::_2> >::type,SortedV>::value ,
-                 "cpputils::SliceIterator inconsistent vector" );
+                 "cppqedutils::SliceIterator inconsistent vector" );
   static_assert( boost::mpl::deref<typename boost::mpl::max_element<V>::type>::type::value < RANK , 
-                 "cpputils::SliceIterator vector out of range" );
+                 "cppqedutils::SliceIterator vector out of range" );
 };
 
 
@@ -68,7 +68,7 @@ template<int RANK, typename V> struct ConsistencyChecker
 template<int RANK, int I1, int I2>  struct ConsistencyChecker<RANK,boost::mpl::range_c<int,I1,I2> >
 {
   static_assert( I1>=0 && I2<RANK , 
-                 "cpputils::SliceIterator vector out of range" );
+                 "cppqedutils::SliceIterator vector out of range" );
 };
 
 /** \cond SPECIALIZATION */
@@ -256,12 +256,12 @@ class Base;
  * ~~~
  * void actOnExtended(CArray<11>& psi)
  * {
- *   boost::for_each(cpputils::sliceiterator::fullRange<tmptools::Vector<3,6,1,9,7> >(psi),
+ *   boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<3,6,1,9,7> >(psi),
  *                   actWithA);
  * }
  * ~~~
  * 
- * \see cpputils::sliceiterator::fullRange and the \refBoostConstruct{for_each,range/doc/html/range/reference/algorithms/non_mutating/for_each.html} algorithm of Boost.Range.
+ * \see cppqedutils::sliceiterator::fullRange and the \refBoostConstruct{for_each,range/doc/html/range/reference/algorithms/non_mutating/for_each.html} algorithm of Boost.Range.
  * 
  * For further basic examples of usage cf. `utils/testsuite/BlitzArraySliceIterator.cc` & `utils/testsuite/BlitzArraySliceIteratorTMP.cc`.
  * 
@@ -425,7 +425,7 @@ public:
  * only transposition. For this, as at several other places in the framework, we apply conditional inheritance: SliceIterator inherits from either of two classes 
  * (details::Base or details::BaseSpecial).
  * 
- * The iteration over dummy indices is implemented with the help of cpputils::MultiIndexIterator.
+ * The iteration over dummy indices is implemented with the help of cppqedutils::MultiIndexIterator.
  * 
  * A metaprogramming example {#metaprogrammingexample}
  * =========================
@@ -499,6 +499,6 @@ public:
 
 } // sliceiterator
 
-} // cpputils
+} // cppqedutils
 
 #endif // CPPQEDCORE_UTILS_SLICEITERATOR_H_INCLUDED

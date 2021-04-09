@@ -185,7 +185,7 @@ private:
 
       typedef tmptools::Range<Traits<TRAFO>::N_RANK,boost::remove_reference<typename result_of::at_c<TUPLE,1>::type>::type::value> Range;
 
-      cpputils::for_each(fullRange(in,Range()),basi::begin(buf_,Range()),bind(&Traits<TRAFO>::transform,at_c<0>(tuple),_1,_2));
+      cppqedutils::for_each(fullRange(in,Range()),basi::begin(buf_,Range()),bind(&Traits<TRAFO>::transform,at_c<0>(tuple),_1,_2));
 
       blitz::swap(buf_,out_); return out_;
     }

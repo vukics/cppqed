@@ -36,7 +36,7 @@ class DensityOperator
 public:
   static const int N_RANK=RANK;
   
-  typedef LazyDensityOperator<  RANK> LDO_Base;
+  typedef LazyDensityOperator<RANK> LDO_Base;
   
   typedef ArrayBase<DensityOperator<RANK>> ABase;
 
@@ -74,9 +74,25 @@ public:
     
   DensityOperator() : LDO_Base(Dimensions{size_t(0)}), ABase() {}
 
-  /// Default assignment doesn't work, because LazyDensityOperator is always purely constant (const DimensionsBookkeeper base)
-  DensityOperator& operator=(const DensityOperator& rho) {ABase::operator=(rho.getArray()); return *this;}
+  DensityOperator& operator=(const DensityOperator&) = default;
 
+  DensityOperator& operator=(DensityOperator&& rho)
+  {
+    ABase::operator=(std::move(rho));
+    LDO_Base::setDimensions(rho.getDimensions());
+    return *this;
+  }
+  
+  DensityOperator& operator=(const StateVector<RANK>& psi)
+  {
+    using namespace linalg;
+    CMatrix matrix(matrixView());
+    CVector vector(psi.vectorView());
+    int dim(this->getTotalDimension());
+    for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)=vector(i)*conj(vector(j));
+    return *this;
+  }
+  
 private:
   class IndexerProxy
   {
@@ -128,7 +144,7 @@ public:
   {
     static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for DensityOperator." );
 #define SLICE_EXPR getArray()(subscriptPack...,subscriptPack...)
-    return DensityOperator<cpputils::Rank_v<decltype(SLICE_EXPR)>/2>(SLICE_EXPR,byReference);
+    return DensityOperator<cppqedutils::Rank_v<decltype(SLICE_EXPR)>/2>(SLICE_EXPR,byReference);
 #undef  SLICE_EXPR
   }
   
@@ -196,12 +212,10 @@ double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm
 template<int RANK>
 void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDiagonals)
 {
-  using mathutils::sqr;
-
   const size_t dim=rho.getTotalDimension();
   
-  typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(rho.getDimensions()-1,cpputils::mii::begin);
+  typedef cppqedutils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(rho.getDimensions()-1,cppqedutils::mii::begin);
   
   size_t idx=0;
 
@@ -211,7 +225,7 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
   
   // OffDiagonal
   if (offDiagonals)
-    for (Iterator i(etalon); idx<mathutils::sqr(dim); ++i)
+    for (Iterator i(etalon); idx<cppqedutils::sqr(dim); ++i)
       for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j, idx+=2) {
         dcomp matrixElement(rho(*i)(*j)=dcomp(flattened(idx),flattened(idx+1)));
         rho(*j)(*i)=conj(matrixElement);
@@ -227,8 +241,8 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 {
   DensityOperator<RANK> res(matrix.getDimension());
   
-  typedef cpputils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(matrix.getDimensions()-1,cpputils::mii::begin);
+  typedef cppqedutils::MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(matrix.getDimensions()-1,cppqedutils::mii::begin);
   
   for (Iterator i(etalon); i!=etalon.getEnd(); ++i) {
     res(*i)(*i)=matrix(*i);
@@ -265,7 +279,7 @@ constexpr auto ArrayRank_v<DensityOperator<RANK>> = 2*RANK;
 
 
 template<int RANK, typename ... SubscriptPack>
-auto subscript(const quantumdata::DensityOperator<RANK>& rho, const SubscriptPack&... subscriptPack) ///< for use in cpputils::SliceIterator
+auto subscript(const quantumdata::DensityOperator<RANK>& rho, const SubscriptPack&... subscriptPack) ///< for use in cppqedutils::SliceIterator
 {
   return rho.diagonalSliceIndex(subscriptPack...);
 }

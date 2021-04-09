@@ -9,7 +9,7 @@
 #include "ComplexExtensions.h"
 
 /// Comprises wrapper functions for mathematical functions taken from libraries (Boost.Math, GSL), and several other mathematical functions.
-namespace mathutils {
+namespace cppqedutils {
  
 extern const double PI    ;
 extern const double SQRTPI;
@@ -55,6 +55,6 @@ double relativeDeviation(const T& a, const T& b) {return abs(a-b)/(abs(a)+abs(b)
 dcomp coherentElement(unsigned long n, dcomp alpha);
 
 
-} // mathutils
+} // cppqedutils
 
 #endif // CPPQEDCORE_UTILS_MATHEXTENSIONS_H_INCLUDED

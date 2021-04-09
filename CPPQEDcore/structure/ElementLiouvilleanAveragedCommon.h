@@ -9,18 +9,18 @@
 namespace structure {
 
 
-/// Implements LiouvilleanAveragedCommon::streamKey and LiouvilleanAveragedCommon::nAvr with the help of a cpputils::KeyPrinter
+/// Implements LiouvilleanAveragedCommon::streamKey and LiouvilleanAveragedCommon::nAvr with the help of a cppqedutils::KeyPrinter
 /**
- * The number of averages is taken simply to be the \link cpputils::KeyPrinter::length length of the key\endlink
+ * The number of averages is taken simply to be the \link cppqedutils::KeyPrinter::length length of the key\endlink
  */
 template<typename BASE>
 class ElementLiouvilleanAveragedCommon : public BASE
 {
 public:
-  typedef cpputils::KeyPrinter::KeyLabels            KeyLabels           ;
-  typedef cpputils::KeyPrinter::KeyLabelsInitializer KeyLabelsInitializer;
+  typedef cppqedutils::KeyPrinter::KeyLabels            KeyLabels           ;
+  typedef cppqedutils::KeyPrinter::KeyLabelsInitializer KeyLabelsInitializer;
   
-  const std::string& getTitle () const {return keyPrinter_.getTitle ();} ///< redirect to cpputils::KeyPrinter
+  const std::string& getTitle () const {return keyPrinter_.getTitle ();} ///< redirect to cppqedutils::KeyPrinter
   const KeyLabels  & getLabels() const {return keyPrinter_.getLabels();} ///< \copydoc getTitle
 
 protected:
@@ -31,15 +31,15 @@ protected:
   /// \copydoc getTitle
   ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsInitializer il) : keyPrinter_(keyTitle,il) {}
 
-  const cpputils::KeyPrinter& getKeyPrinter() const {return keyPrinter_;}
-        cpputils::KeyPrinter& getKeyPrinter()       {return const_cast<cpputils::KeyPrinter&>(static_cast<const ElementLiouvilleanAveragedCommon*>(this)->getKeyPrinter());}
+  const cppqedutils::KeyPrinter& getKeyPrinter() const {return keyPrinter_;}
+        cppqedutils::KeyPrinter& getKeyPrinter()       {return const_cast<cppqedutils::KeyPrinter&>(static_cast<const ElementLiouvilleanAveragedCommon*>(this)->getKeyPrinter());}
   
 private:
-  size_t nAvr_v() const final {return keyPrinter_.length();}
+  size_t nAvr_v() const final {return keyPrinter_.size();}
 
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const final {return keyPrinter_.streamKey(os,i);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const final {return keyPrinter_.stream(os,i);}
 
-  cpputils::KeyPrinter keyPrinter_;
+  cppqedutils::KeyPrinter keyPrinter_;
 
 };
 

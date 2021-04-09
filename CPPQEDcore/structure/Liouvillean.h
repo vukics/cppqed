@@ -38,7 +38,7 @@ struct SuperoperatorNotImplementedException
  * 
  */
 template<int RANK>
-class Liouvillean : public quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> >
+class Liouvillean : public LiouvilleanAveragedCommonRanked<RANK>
 {
 public:
   static const int N_RANK=RANK;
@@ -46,13 +46,13 @@ public:
   typedef std::shared_ptr<const Liouvillean> Ptr;
   
 private:
-  typedef quantumdata::Types<RANK,LiouvilleanAveragedCommonRanked<RANK> > Base;
+  typedef LiouvilleanAveragedCommonRanked<RANK> Base;
 
 public:
   typedef quantumdata::StateVector<RANK> StateVector;
   
-  typedef typename Base::    StateVectorLow     StateVectorLow;
-  typedef typename Base::DensityOperatorLow DensityOperatorLow;
+  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
+  typedef quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
 
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 

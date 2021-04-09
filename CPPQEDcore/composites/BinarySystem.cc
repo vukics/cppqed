@@ -20,7 +20,7 @@ using composite::SubSystemFree;
 
 using namespace structure;
 
-using cpputils::sliceiterator::fullRange;
+using cppqedutils::sliceiterator::fullRange;
 
 
 namespace {
@@ -306,7 +306,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 {
   using namespace structure;
   
-  const QuantumSystem<1>::Ptr
+  const QuantumSystemPtr<1>
     free0=ia->getFrees()[0],
     free1=ia->getFrees()[1];
 

@@ -37,7 +37,7 @@ public:
 
   size_t getDimension(size_t i) const {return dimensions_[i];}
 
-  void setDimensions(const Dimensions& dimensions) {dimensions_=dimensions; totalDimension_=product(dimensions);} ///< This will work only in the non-const case
+  void setDimensions(const Dimensions& dimensions) {dimensions_=dimensions; totalDimension_=product(dimensions);}
 
 private:
   Dimensions dimensions_;

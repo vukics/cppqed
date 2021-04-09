@@ -1,7 +1,7 @@
 # /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/PTLA_Evolved --epsAbs 1e-5 --etat 8 --sdf 3 --dc 0 --Dt 0.1 --NDt 10 --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_PTLA_Evolved_ndt
 
 # http://github.com/vukics/cppqed
-# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
+# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
 
 # Compiled with
 # Boost library collection : Version 1.75
@@ -11,24 +11,27 @@
 
 
 # Simulated.
-# EvolvedGSL implementation, stepping function: rkck
-# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+# ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
 
 # Key to data:
 # Trajectory
 #  1. time
 #  2. dtDid
+# Simulated
+#  3. 2*real(rho00)-1
+#  4. 2*real(rho01)
+#  5. -2*imag(rho01)
 
 # Run Trajectory up to time 1 -- Stream period: 0.1
 
 0            0            1              0              -0             
-0.1          0.00290445   0.602265       -0.674182      0.336897       
-0.2          0.0297906    0.55288        -0.512764      0.49167        
-0.3          0.0274029    0.608238       -0.476183      0.484828       
-0.4          0.00995742   0.611398       -0.488507      0.484437       
-0.5          0.0537639    0.609027       -0.488785      0.487451       
-0.6          0.0337044    0.609555       -0.487722      0.487815       
-0.7          0.0182543    0.609779       -0.487769      0.487758       
-0.8          0.00872855   0.609755       -0.487819      0.48779        
-0.9          0.0563573    0.609751       -0.487807      0.487804       
+0.1          0.0167173    0.602264       -0.674183      0.336897       
+0.2          0.0169003    0.55288        -0.512763      0.49167        
+0.3          0.0291004    0.608239       -0.476182      0.484828       
+0.4          0.0126787    0.611397       -0.488507      0.484437       
+0.5          0.043392     0.609027       -0.488785      0.487451       
+0.6          0.0315517    0.609554       -0.487723      0.487815       
+0.7          0.0106043    0.609778       -0.487769      0.487759       
+0.8          0.0522807    0.609754       -0.487819      0.48779        
+0.9          0.1          0.609752       -0.487808      0.487804       
 1            0.1          0.609756       -0.487804      0.487805       

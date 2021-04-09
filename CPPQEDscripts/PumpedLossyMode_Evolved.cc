@@ -9,11 +9,6 @@ using namespace mode      ;
 
 typedef CArray<1> Array;
 
-void derivs(double t, const Array& b, Array& dbdt, const ParsBichromatic& p)
-{
-  dbdt(0)=dcomp(-p.kappa,p.delta)*b(0)+p.eta+p.etaOther*exp(DCOMP_I*t*(p.deltaOther+p.delta));
-}
-
 
 int main(int argc, char* argv[])
 {
@@ -33,8 +28,8 @@ int main(int argc, char* argv[])
   
   alpha=pplm.minit;
 
-  Simulated<Array> S(alpha,bind(derivs,_1,_2,_3,pplm),dtinit,pt);
-  
-  run(S,pt);
+  run(simulated::makeBoost(alpha,[&](const Array& b, Array& dbdt, double t) {
+    dbdt(0)=dcomp(-pplm.kappa,pplm.delta)*b(0)+pplm.eta+pplm.etaOther*exp(DCOMP_I*t*(pplm.deltaOther+pplm.delta));
+  },{"alpha"},dtinit,pt),pt);
   
 }

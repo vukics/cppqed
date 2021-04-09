@@ -5,7 +5,7 @@
 
 #include <iosfwd>
 
-namespace cpputils {
+namespace cppqedutils {
 
 
 /// Bound to a boolean lvalue, it behaves like a boolean always with opposite value
@@ -35,6 +35,6 @@ private:
 std::istream& operator>>(std::istream&, BooleanNegatedProxy&);
 
 
-} // cpputils
+} // cppqedutils
 
 #endif // CPPQEDCORE_UTILS_BOOLEANNEGATEDPROXY_H_INCLUDED

@@ -40,7 +40,7 @@ public:
 
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
-    boost::for_each(cpputils::sliceiterator::fullRange<tmptools::Vector<IDX> >(psi_->getArray()),
+    boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX> >(psi_->getArray()),
                     [=](linalg::CVector& psiS){ffTransform(psiS,dir_);});
   }
 
@@ -61,7 +61,7 @@ public:
 
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
-    boost::for_each(cpputils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho_->getArray()),
+    boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho_->getArray()),
                     [=](linalg::CMatrix& rhoS){ffTransform(rhoS,dir_);});
   }
   

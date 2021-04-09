@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Definition of cpputils::SliceIterator together with its helpers}
+/// \briefFile{Definition of cppqedutils::SliceIterator together with its helpers}
 #if !BOOST_PP_IS_ITERATING
 
 #ifndef CPPQEDCORE_UTILS_SLICEITERATOR_TCC_INCLUDED
@@ -11,7 +11,7 @@
 
 
 
-namespace cpputils { namespace sliceiterator {
+namespace cppqedutils { namespace sliceiterator {
 
 //////////////////////////
 //
@@ -101,7 +101,7 @@ using TransposerMeta_t = typename boost::mpl::first<typename namehider::Algorith
 } // details
 
 
-} } // cpputils::sliceiterator
+} } // cppqedutils::sliceiterator
 
 
 
@@ -132,7 +132,7 @@ using TransposerMeta_t = typename boost::mpl::first<typename namehider::Algorith
 #define INDEXER_print1(z,m,data) boost::mpl::at_c<TM,m>::type::value
 #define INDEXER_print2(z,m,data) boost::fusion::at_c<m>(Base::cache_)
 
-namespace cpputils { namespace sliceiterator {
+namespace cppqedutils { namespace sliceiterator {
 
 template<template <int> class ARRAY, typename V> struct Transposer<ARRAY,rank,V>
 {
@@ -160,7 +160,7 @@ template<template <int> class ARRAY, typename V> struct Indexer<ARRAY,rank,V> : 
 
 };
 
-} } // cpputils::sliceiterator
+} } // cppqedutils::sliceiterator
 
 #undef INDEXER_print1
 #undef INDEXER_print2

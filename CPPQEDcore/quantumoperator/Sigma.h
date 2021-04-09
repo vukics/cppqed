@@ -22,7 +22,7 @@ class Sigma
 public:
   static const int N_RANK=1;
 
-  typedef quantumdata::Types<1>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<1> StateVectorLow;
 
   /// Application of the operator on a state vector can be implemented trivially
   void
@@ -50,8 +50,8 @@ public:
  * \note It’s better to convert `n` into a runtime variable because then we can use complete specializations of this function. Eventually it has to be converted anyway into an index of `psi`.
  */
 template<int RANK, bool IS_HEAD>
-const typename quantumdata::Types<RANK-1>::StateVectorLow
-partialProject(const typename quantumdata::Types<RANK>::StateVectorLow& psi, int n);
+const quantumdata::StateVectorLow<RANK-1>
+partialProject(const quantumdata::StateVectorLow<RANK>& psi, int n);
 
 
 /// A direct-product clause, representing a germinal expression-template mechanism for direct products of Sigma`<L,R>` instances with `OTHER` types.
@@ -70,7 +70,7 @@ class DirectProduct
 public:
   static const int N_RANK=OTHER::N_RANK+1; ///< Reports the rank of the class for recursive usage
 
-  typedef typename quantumdata::Types<N_RANK>::StateVectorLow StateVectorLow;
+  typedef quantumdata::StateVectorLow<N_RANK> StateVectorLow;
 
   DirectProduct(const OTHER& other) : other_(other) {} ///< The object has to store a reference to the `OTHER` object to enable DirectProduct::apply as an operator
   
@@ -82,7 +82,7 @@ public:
   void
   apply(const StateVectorLow& psi, StateVectorLow& dpsidt) const
   {
-    typename quantumdata::Types<N_RANK-1>::StateVectorLow dpsidtProjected(partialProject<N_RANK,IS_HEAD>(dpsidt,L));
+    auto dpsidtProjected(partialProject<N_RANK,IS_HEAD>(dpsidt,L));
     other_.apply(partialProject<N_RANK,IS_HEAD>(psi,R),dpsidtProjected);
   }
 

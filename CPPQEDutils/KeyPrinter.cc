@@ -11,7 +11,7 @@
 using namespace std;
 
 
-ostream& cpputils::KeyPrinter::streamKey(ostream& os, size_t& i) const
+ostream& cppqedutils::KeyPrinter::stream(ostream& os, size_t& i) const
 {
   namespace bll=boost::lambda;
 

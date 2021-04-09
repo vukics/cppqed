@@ -8,7 +8,7 @@
 #include "SliceIterator.tcc"
 
 using namespace std;
-using namespace mathutils;
+using namespace cppqedutils;
 
 using particle:: mfNKX;
 using particle::cosNKX;
@@ -118,7 +118,7 @@ void ParticleAlongCavity::addContribution_v(double t, const StateVectorLow& psi,
 
   if (isSpecialH_) return;
 
-  using cpputils::sliceiterator::fullRange;
+  using cppqedutils::sliceiterator::fullRange;
 
   typedef tmptools::Vector<1> V1;
 
