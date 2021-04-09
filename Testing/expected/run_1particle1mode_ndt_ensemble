@@ -1,7 +1,7 @@
 # /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --dc 0 --Dt 0.01 --NDt 10 --nTraj 3 --evol ensemble --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_1particle1mode_ndt_ensemble
 
 # http://github.com/vukics/cppqed
-# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
+# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
 
 # Compiled with
 # Boost library collection : Version 1.75
@@ -10,9 +10,8 @@
 # Eigen library            : Version 3.3.9
 
 # Ensemble of 3 trajectories.
-# EvolvedGSL implementation, stepping function: rkck
-# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
-# Stochastic Trajectory Parameters: random engine=PCG64 seed=1001 prngStreamNo=1
+# ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
+# Random engine: PCG64. Parameters: seed=1001, streamOrdo=1
 # MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Binary System
@@ -62,22 +61,6 @@
 #  9. <X>
 # 10. DEV(X)
 
-# Key to data:
-# Trajectory
-#  1. time
-#  2. dtDid
-# Binary system
-# Mode
-#  3. <number operator>
-#  4. VAR(number operator)
-#  5. real(<ladder operator>)
-#  6. imag(")
-# Particle
-#  7. <P>
-#  8. VAR(P)
-#  9. <X>
-# 10. DEV(X)
-
 # Run Trajectory up to time 0.1 -- Stream period: 0.01
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
@@ -87,18 +70,18 @@
 0.04         0.00305922   	0.115784      0.115158      0.303825      -0.149009     	-0.489154     5.0901        -1.56691      0.236568      
 0.05         0.00200681   	0.163503      0.161818      0.352026      -0.191657     	-0.483515     5.00789       -1.56492      0.294241      
 0.06         0.00154051   	0.21272       0.209151      0.390382      -0.233938     	-0.47695      4.91159       -1.5626       0.351252      
-0.07         0.00125861   	0.253323      0.230458      0.395159      -0.265062     	-0.471638     4.83548       -1.559        0.400007      
-0.08         0.000818979  	0.301334      0.2702        0.425956      -0.30761      	-0.463535     4.71801       -1.55607      0.455322      
-0.09         0.000397529  	0.337964      0.274023      0.425691      -0.33938      	-0.456869     4.63546       -1.55161      0.501761      
-0.1          0.000515959  	0.385956      0.315531      0.447138      -0.383159     	-0.447868     4.50099       -1.54826      0.555281      
+0.07         0.00125861   	0.261524      0.25509       0.419697      -0.274965     	-0.469599     4.8024        -1.55998      0.40752       
+0.08         0.0010256    	0.308482      0.298131      0.440882      -0.314048     	-0.461621     4.68154       -1.5571       0.462951      
+0.09         0.000788227  	0.352569      0.337239      0.454938      -0.35068      	-0.453184     4.55035       -1.55397      0.517437      
+0.1          0.000523792  	0.39311       0.371753      0.462929      -0.384514     	-0.44447      4.41034       -1.55061      0.570864      
 
 # Average number of total steps: 39
 
-# On average, dpLimit overshot: 36.3333 times, maximal overshoot: 0.058757
+# On average, dpLimit overshot: 37 times, maximal overshoot: 0.0528813
 # On average, dpTolerance overshot: 0 times, maximal overshoot: 0
 
 # Maximal deviation of norm from 1: 0.00600005
 
 # Too few jumps for a histogram
 
-# Average number of total jumps: 0.666667
+# Average number of total jumps: 0

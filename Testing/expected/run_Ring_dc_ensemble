@@ -1,7 +1,7 @@
 # /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/Ring --epsAbs 1e-5 --etaM 10 --etaP 10 --cutoffM 3 --cutoffP 3 --fin 3 --sdf 3 --T 0.1 --dc 1 --nTraj 3 --evol ensemble --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_Ring_dc_ensemble
 
 # http://github.com/vukics/cppqed
-# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
+# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
 
 # Compiled with
 # Boost library collection : Version 1.75
@@ -10,9 +10,8 @@
 # Eigen library            : Version 3.3.9
 
 # Ensemble of 3 trajectories.
-# EvolvedGSL implementation, stepping function: rkck
-# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
-# Stochastic Trajectory Parameters: random engine=PCG64 seed=1001 prngStreamNo=1
+# ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
+# Random engine: PCG64. Parameters: seed=1001, streamOrdo=1
 # MCWF Trajectory Parameters: dpLimit=0.01 (overshoot tolerance factor)=10
 
 # Composite
@@ -83,38 +82,18 @@
 # 13. real(<ladder operator>)
 # 14. imag(")
 
-# Key to data:
-# Trajectory
-#  1. time
-#  2. dtDid
-# Particle
-#  3. <P>
-#  4. VAR(P)
-#  5. <X>
-#  6. DEV(X)
-# Mode
-#  7. <number operator>
-#  8. VAR(number operator)
-#  9. real(<ladder operator>)
-# 10. imag(")
-# Mode
-# 11. <number operator>
-# 12. VAR(number operator)
-# 13. real(<ladder operator>)
-# 14. imag(")
-
 # Run Trajectory up to time 0.1 -- Stream period: 0.1
 
 0            0            	-0.5          5.25          -1.5708       2.2102e-07    	0             0             0             0             	0             0             0             0             
-0.1          0.000277554  	-0.497358     5.3431        -1.53292      0.538736      	0.374495      0.342514      0.541501      -0.239424     	0.36047       0.298955      0.522102      -0.236125     
+0.1          0.0005767    	-0.502751     5.28138       -1.53646      0.541012      	0.370887      0.353662      0.538788      -0.23653      	0.365553      0.349104      0.535668      -0.234397     
 
-# Average number of total steps: 63.3333
+# Average number of total steps: 64
 
-# On average, dpLimit overshot: 62 times, maximal overshoot: 0.0593428
+# On average, dpLimit overshot: 63 times, maximal overshoot: 0.052805
 # On average, dpTolerance overshot: 0 times, maximal overshoot: 0
 
-# Maximal deviation of norm from 1: 0.00882479
+# Maximal deviation of norm from 1: 0.00641256
 
 # Too few jumps for a histogram
 
-# Average number of total jumps: 1
+# Average number of total jumps: 0

@@ -1,7 +1,7 @@
 # /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/1particle1mode --epsAbs 1e-5 --cutoff 3 --fin 3 --eta 10 --sdf 3 --1p1mconf 3 --dc 1 --T 0.1 --T 0.03 --evol master --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_1particle1mode_ndt_conf3_master
 
 # http://github.com/vukics/cppqed
-# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
+# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
 
 # Compiled with
 # Boost library collection : Version 1.75
@@ -9,8 +9,7 @@
 # Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
 # Eigen library            : Version 3.3.9
 
-# EvolvedGSL implementation, stepping function: rkck
-# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+# ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
 # Solving Master equation.
 
 # Binary System
@@ -65,5 +64,5 @@
 
 0            0            	0             0             0             0             	-0.5          5.25          -1.5708       2.2102e-07    
 0.00333333   0.00333333   	0.00116407    0.00116406    0.0329983     0.00857195    	-0.499915     5.2487        -1.57077      0.0199588     
-0.0199756    0.0166423    	0.0359758     0.0359488     0.186454      0.0336011     	-0.49679      5.20037       -1.5698       0.120562      
-0.03         0.0100244    	0.0732202     0.0729965     0.267461      0.0365461     	-0.492569     5.13461       -1.5687       0.181497      
+0.0181251    0.0147918    	0.0300953     0.0300797     0.170291      0.0321679     	-0.497371     5.20939       -1.56996      0.109322      
+0.03         0.0118749    	0.0731705     0.0729474     0.267363      0.0365856     	-0.49257      5.13462       -1.5687       0.181495      

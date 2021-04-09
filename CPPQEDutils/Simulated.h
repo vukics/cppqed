@@ -15,4 +15,19 @@ using namespace cppqedutils;
 
 using trajectory::Pars;
 
+
+template <int RANK, typename Derivs, typename ODE_Engine>
+struct trajectory::MakeSerializationMetadata<Simulated<DArray<RANK>,Derivs,ODE_Engine>>
+{
+  static auto _() {return SerializationMetadata{"DArray","Simulated",RANK};}
+};
+
+
+template <int RANK, typename Derivs, typename ODE_Engine>
+struct trajectory::MakeSerializationMetadata<Simulated<CArray<RANK>,Derivs,ODE_Engine>>
+{
+  static auto _() {return SerializationMetadata{"CArray","Simulated",RANK};}
+};
+
+
 #endif // CPPQEDCORE_UTILS_SIMULATED_H_INCLUDED

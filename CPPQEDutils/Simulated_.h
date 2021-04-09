@@ -89,6 +89,7 @@ Simulated(StateType, Derivs, std::initializer_list<std::string>, ODE_Engine) -> 
 template <typename StateType, typename Derivs, typename ODE_Engine>
 struct trajectory::MakeSerializationMetadata<Simulated<StateType,Derivs,ODE_Engine>>
 {
+  /// This is probably not quite correct because elsewhere the typeID refers to the whole StateType
   static auto _() {return SerializationMetadata{typeid(ElementType_t<StateType>).name(),"Simulated",Rank_v<StateType>};}
 };
 

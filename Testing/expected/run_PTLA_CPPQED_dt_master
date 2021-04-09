@@ -1,7 +1,7 @@
 # /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/PTLA_C++QED --epsAbs 1e-5 --etat 8 --sdf 3 --dc 0 --Dt 0.1 --evol master --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_PTLA_CPPQED_dt_master
 
 # http://github.com/vukics/cppqed
-# commit# eb112554cf76b10c721c74a40a1e5e04b74486e6
+# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
 
 # Compiled with
 # Boost library collection : Version 1.75
@@ -9,8 +9,7 @@
 # Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
 # Eigen library            : Version 3.3.9
 
-# EvolvedGSL implementation, stepping function: rkck
-# Trajectory Parameters: epsRel=1e-06 epsAbs=1e-05
+# ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
 # Solving Master equation.
 
 # Pumped Two-Level Atom
@@ -38,14 +37,14 @@
 # Run Trajectory up to time 1 -- Stream period: 0.1
 
 0            0            	1             0             0             0             
-0.1          0.0183906    	0.801133      0.198867      -0.33709      0.168448      
-0.2          0.00413762   	0.77644       0.22356       -0.256383     0.245835      
-0.3          0.041011     	0.804118      0.195882      -0.238092     0.242414      
-0.4          6.35834e-06  	0.805699      0.194301      -0.244252     0.242219      
-0.5          0.0239102    	0.804514      0.195486      -0.244392     0.243725      
-0.6          0.027351     	0.804777      0.195223      -0.243862     0.243907      
-0.7          0.0100806    	0.804889      0.195111      -0.243884     0.24388       
-0.8          0.0495972    	0.804877      0.195123      -0.24391      0.243895      
+0.1          0.00806551   	0.801132      0.198868      -0.337091     0.168449      
+0.2          0.0170545    	0.77644       0.22356       -0.256382     0.245835      
+0.3          0.0262208    	0.804119      0.195881      -0.238091     0.242414      
+0.4          0.0134477    	0.805699      0.194301      -0.244254     0.242218      
+0.5          0.0394852    	0.804514      0.195486      -0.244392     0.243725      
+0.6          0.031939     	0.804777      0.195223      -0.243861     0.243907      
+0.7          0.00351975   	0.804888      0.195112      -0.243884     0.24388       
+0.8          0.00351975   	0.804878      0.195122      -0.243909     0.243895      
 0.9          0.1          	0.804876      0.195124      -0.243904     0.243902      
 1            0.1          	0.804878      0.195122      -0.243902     0.243902      
 1            1.11022e-16  	0.804878      0.195122      -0.243902     0.243902      
