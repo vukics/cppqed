@@ -71,7 +71,7 @@ def load_sv(fname, format=None):
   floatingReString=r'([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)'
   complexReString =r'\(\s*'+floatingReString+'\s*,\s*'+floatingReString+'\s*\)'
 
-  return np.fromregex(fname,format.replace(r'+',r'\s*').replace('f',floatingReString).replace('c',complexReString),np.float)
+  return np.fromregex(fname,format.replace(r'+',r'\s*').replace('f',floatingReString).replace('c',complexReString),float)
 
 ## @}
 
