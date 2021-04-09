@@ -144,15 +144,16 @@ public:
       dtTry_(dtInit), logLevel_(logLevel) {}
 
   template <typename ParsBase>
-  Base(Time dtInit, const Pars<ParsBase>& p)
-    : ces_{MakeControlledErrorStepper<ControlledErrorStepper>::_(p)},
-      dtTry_(dtInit), logLevel_(p.logLevel) {}
+  Base(Time dtInit, const Pars<ParsBase>& p) : Base(dtInit,p.logLevel,p) {}
 
   /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
   template <typename System, typename ... States>
   void step(Time deltaT, std::ostream& logStream, System sys, Time& time, States&&... states);
 
   Time getDtDid() const {return dtDid_;}
+  
+  /// This is needed in some situations when other mechanisms are superposed on the ODE time evolution
+  void setDtDid(Time dtDid) {dtDid_=dtDid;}
 
   Time getDtTry() const {return dtTry_;}
   

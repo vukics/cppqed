@@ -114,12 +114,11 @@ public:
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
     logger_{logLevel,this->template nAvr<structure::LA_Li>()}
   {
+    // std::cout<<"# initial timestep: "<<ode_.getDtTry()<<std::endl;
     if (psi!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
-    if (t_) if(const auto li=this->getLi()) { // On startup, dpLimit should not be overshot, either.
+    if (const auto li=this->getLi(); bool(li) && !t_)  { // On startup, dpLimit should not be overshot, either.
       Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates);
-      double dtTry=ode_.getDtTry();
-      manageTimeStep(rates,0,0,dtTry,std::clog,false);
-      ode_.setDtTry(dtTry);
+      manageTimeStep(rates,0,0,std::clog,false);
     }
   }
   
@@ -170,7 +169,7 @@ private:
   
   const IndexSVL_tuples calculateSpecialRates(Rates* rates) const;
 
-  bool manageTimeStep (const Rates& rates, double tCache, double dtDidCache, double & dtTryCache, std::ostream&, bool logControl=true);
+  bool manageTimeStep (const Rates& rates, double tCache, double dtDidCache, std::ostream&, bool logControl=true);
 
   void performJump (const Rates&, const IndexSVL_tuples&, std::ostream&); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
@@ -255,7 +254,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentT
   }
   else {
     double stepToDo=this->getLi() ? std::min(ode_.getDtTry(),Dt) : Dt; // Cf. tracker #3482771
-    t_+=stepToDo;
+    t_+=stepToDo; ode_.setDtDid(stepToDo);
   }
   
   // This defines three levels:
@@ -290,17 +289,16 @@ auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculate
 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
 bool quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
-manageTimeStep(const Rates& rates, double tCache, double dtDidCache, double & dtTryCache, std::ostream& logStream, bool logControl)
+manageTimeStep(const Rates& rates, double tCache, double dtDidCache, std::ostream& logStream, bool logControl)
 {
   const double totalRate=boost::accumulate(rates,0.);
-  const double dtDid=ode_.getDtDid(), dtTry=ode_.getDtTry();
+  const double dtDid=getDtDid(), dtTry=ode_.getDtTry();
 
   const double liouvilleanSuggestedDtTry=dpLimit_/totalRate;
 
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
   if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
-    dtTryCache=liouvilleanSuggestedDtTry;
-    t_=tCache; /*ode_.setDtDid(dtDidCache);*/ ode_.setDtTry(dtTryCache);
+    t_=tCache; ode_.setDtDid(dtDidCache); ode_.setDtTry(liouvilleanSuggestedDtTry);
     logger_.stepBack(logStream,totalRate*dtDid,dtDid,ode_.getDtTry(),t_,logControl);
     return true; // Step-back required.
   }
@@ -318,7 +316,7 @@ manageTimeStep(const Rates& rates, double tCache, double dtDidCache, double & dt
 template<int RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
-  double random=std::uniform_real_distribution()(re_.engine)/this->getDtDid();
+  double random=std::uniform_real_distribution()(re_.engine)/getDtDid();
 
   int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))
@@ -346,7 +344,7 @@ template<int RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(double Dt, std::ostream& logStream)
 {
   const StateVector psiCache(psi_); // deep copy
-  double tCache=t_, dtDidCache=ode_.getDtDid(), dtTryCache=ode_.getDtTry();
+  double tCache=t_, dtDidCache=getDtDid();
 
   coherentTimeDevelopment(Dt,logStream);
 
@@ -355,7 +353,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(doub
     Rates rates(li->rates(t_,psi_));
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates);
 
-    while (manageTimeStep(rates,tCache,dtDidCache,dtTryCache,logStream)) {
+    while (manageTimeStep(rates,tCache,dtDidCache,logStream)) {
       psi_=psiCache;
       coherentTimeDevelopment(Dt,logStream); // the next try
       rates=li->rates(t_,psi_);
