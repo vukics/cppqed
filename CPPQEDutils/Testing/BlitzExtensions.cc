@@ -131,8 +131,8 @@ BOOST_AUTO_TEST_CASE( MatrixWithVectorMultiplication ) // computing v*a (v actin
     typedef tmptools::Vector<2,1,4> V214;
     // TODO: in c++20 this should be solvable with something like this:
     // for ( auto [v,w] : {cppqedutils::sliceiterator::fullRange<V214>(v),cppqedutils::sliceiterator::fullRange<V214>(vResBASI)} ) myFunc(a,v,w);
-    for (auto&& [v,w] :  boost::combine(cppqedutils::sliceiterator::fullRange<V214>(v),cppqedutils::sliceiterator::fullRange<V214>(vResBASI)))
-      myFunc(a,v,w);
+    for (auto tup :  boost::combine(cppqedutils::sliceiterator::fullRange<V214>(v),cppqedutils::sliceiterator::fullRange<V214>(vResBASI)))
+      myFunc(a,tup.template get<0>(),tup.template get<1>());
   }
 
   BOOST_CHECK(all(vResBASI==vResTensor));

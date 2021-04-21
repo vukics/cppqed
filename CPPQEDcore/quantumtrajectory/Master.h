@@ -162,8 +162,8 @@ void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostr
 
       drhodtLow=0;
       
-      for (auto&& [rhoS,drhodtS] : boost::combine(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow)) )
-        this->addContribution(t,rhoS,drhodtS,t0_);
+      for (auto tup : boost::combine(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow)) )
+        this->addContribution(t,tup.template get<0>(),tup.template get<1>(),t0_);
       
       {
         linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));

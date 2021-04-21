@@ -4,11 +4,11 @@
 
 message(STATUS "Configuring cpypyqed")
 
-find_package(Boost ${BOOST_MINIMAL} COMPONENTS python3 numpy3)
+find_package(Boost ${BOOST_MINIMAL} COMPONENTS python numpy)
 
 find_package(Python 3.8 COMPONENTS Development)
 
-if ( ( NOT TARGET Boost::python3 ) OR ( NOT TARGET Boost::numpy3 ) )
+if ( ( NOT TARGET Boost::python ) OR ( NOT TARGET Boost::numpy ) )
   return()
 endif()
 
@@ -20,7 +20,7 @@ add_library(cpypyqed MODULE io.cc) # MODULE means it cannot be linked to, only l
 
 add_library(CPPQED::cpypyqed ALIAS cpypyqed)
 
-target_link_libraries(cpypyqed PRIVATE CPPQED::CPPQEDcore Boost::python3 Boost::numpy3 Python::Python)
+target_link_libraries(cpypyqed PRIVATE CPPQED::CPPQEDcore Boost::python Boost::numpy Python::Python)
 
 
 #! \file

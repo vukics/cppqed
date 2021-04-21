@@ -1,13 +1,13 @@
-# /home/vukics/work/devel/cppqed/buildRelease/CPPQEDscripts/Ring --epsAbs 1e-5 --etaM 10 --etaP 10 --cutoffM 3 --cutoffP 3 --fin 3 --sdf 3 --dc 0 --Dt 0.01 --NDt 10 --evol single --o /home/vukics/work/devel/cppqed/buildRelease/Testing/output/run_Ring_ndt_single
+# /home/ubuntu/cppqed/build/CPPQEDscripts/Ring --epsAbs 1e-5 --etaM 10 --etaP 10 --cutoffM 3 --cutoffP 3 --fin 3 --sdf 3 --dc 0 --Dt 0.01 --NDt 10 --evol single --o /home/ubuntu/cppqed/build/Testing/output/run_Ring_ndt_single
 
 # http://github.com/vukics/cppqed
-# commit# 72c2fab7203e2630c917f9a5ffba67fdcdcbb00e
+# commit# c4e28abcd7a404402ce41d15cb31af43d5212c0e
 
 # Compiled with
-# Boost library collection : Version 1.75
-# Gnu Scientific Library   : Version 2.6
-# Blitz++ numerical library: http://github.com/vukics/blitz #f012695c80f436d4277ff9636ae82e4092129fe7
-# Eigen library            : Version 3.3.9
+# Boost library collection : Version 1.71
+# Gnu Scientific Library   : Version 2.5
+# Blitz++ numerical library: http://github.com/vukics/blitz #ref: refs/heads/Development
+# Eigen library            : Version 3.3.7
 
 # ODE engine: Boost.Odeint controlled stepper RKCK54. Parameters: epsRel=1e-06, epsAbs=1e-05
 # Random engine: PCG64. Parameters: seed=1001, streamOrdo=1
