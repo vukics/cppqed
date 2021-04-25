@@ -22,10 +22,6 @@ import ast
 import scipy.interpolate
 from scipy.integrate import quadrature
 
-sys.path.extend(["/home/ubuntu/cppqed/build/cpypyqed/".format(s) for s in ["","Release"]])
-
-import cpypyqed as io
-
 try:
   import matplotlib
   matplotlib.use('Agg')
@@ -820,14 +816,14 @@ def main():
   if len(args)==0: op.error("Need configuration file(s) as argument(s).")
   cp.read(args)
   sys.path.insert(0,cp.get('Setup','modulepath'))
-
+  
   # we can only load the io module after we know where to look for the cpypyqed package
-  #global io
-  #if options.configuration.lower()=="release":
-    #import cpypyqed.io as io
-  #elif options.configuration.lower()=="debug":
-    #import cpypyqed.io_d as io
-  #logging.info("Taking cpypyqed from {0}".format(io.__file__))
+  global io
+  if options.configuration.lower()=="release":
+    import cpypyqed as io
+  elif options.configuration.lower()=="debug":
+    import cpypyqed_d as io
+  logging.info("Taking cpypyqed from {0}".format(io.__file__))
 
   if options.testclass:
     constructor = globals()[options.testclass]
