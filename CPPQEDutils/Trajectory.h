@@ -89,7 +89,9 @@ struct Pars : BASE
 
   unsigned &sdf;
 
-  double &autoStopEpsilon; ///< relative precision for autostopping
+  double
+    &autoStopEpsilon, ///< relative precision for autostopping
+    &autoStopEpsilonAbs; ///< absolute precision for autostopping (everything below is not considered)
 
   unsigned &autoStopRepetition; ///< number of streamed lines repeated within relative precision before autostopping – 0 means no autostopping
   
@@ -106,6 +108,7 @@ struct Pars : BASE
     firstStateStream(p.add("firstStateStream",mod,"Streams trajectory state at startup",true)),
     sdf(p.add("sdf",mod,"State output frequency",0u)),
     autoStopEpsilon(p.add("autoStopEpsilon",mod,"Relative precision for autostopping",ode_engine::epsRelDefault)),
+    autoStopEpsilonAbs(p.add("autoStopEpsilonAbs",mod,"Absolute precision for autostopping",ode_engine::epsAbsDefault)),
     autoStopRepetition(p.add("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)),
     parsedCommandLine_(p.getParsedCommandLine())
     {};
@@ -180,33 +183,37 @@ private:
   typedef SA Averages;
   
 public:
-  AutostopHandlerGeneric(double autoStopEpsilon, unsigned autoStopRepetition) 
-    : autoStopEpsilon_{autoStopEpsilon}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{} {}
+  AutostopHandlerGeneric(double autoStopEpsilon, double autoStopEpsilonAbs, unsigned autoStopRepetition) 
+    : autoStopEpsilon_{autoStopEpsilon}, autoStopEpsilonAbs_{autoStopEpsilonAbs}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{} {}
 
   void operator()(const SA& streamedArray)
   {
+    SA buffer{streamedArray.copy()};
+    
+    for (auto& v : buffer) if (std::abs(v)<autoStopEpsilonAbs_) v=autoStopEpsilonAbs_;
+    
     if (!autoStopRepetition_) return;
     
     if (!averages_.size()) { // This means that no stream has yet occured: the size of averages_ must be determined
-      averages_.resize(streamedArray.size());
+      averages_.resize(buffer.size());
       averages_=0.;
     }
     else {
       if (queue_.size()==autoStopRepetition_) {
-        if (max(abs(averages_-streamedArray)/(abs(averages_)+abs(streamedArray)))<autoStopEpsilon_) throw StoppingCriterionReachedException();
-        averages_=averages_+(streamedArray-queue_.front())/double(autoStopRepetition_); // update the averages set for next step
+        if (max(abs(averages_-buffer)/(abs(averages_)+abs(buffer)))<autoStopEpsilon_) throw StoppingCriterionReachedException();
+        averages_=averages_+(buffer-queue_.front())/double(autoStopRepetition_); // update the averages set for next step
         queue_.pop(); // remove obsolate first element of the queue
       }
-      else averages_=(double(queue_.size())*averages_+streamedArray)/double(queue_.size()+1); // build the initial averages set to compare against
+      else averages_=(double(queue_.size())*averages_+buffer)/double(queue_.size()+1); // build the initial averages set to compare against
 
-      queue_.push(streamedArray); // place the new item to the back of the queue
+      queue_.push(buffer); // place the new item to the back of the queue
 
     }
 
   }
 
 private:
-  const double autoStopEpsilon_;
+  const double autoStopEpsilon_, autoStopEpsilonAbs_;
   const unsigned autoStopRepetition_;
 
   SA averages_;
@@ -327,7 +334,7 @@ template<typename TRAJ, typename ParsBase>
 auto
 run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilon,p.autoStopRepetition),
+  return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilon,p.autoStopEpsilonAbs,p.autoStopRepetition),
              doStreaming,returnStreamedArray);
 }
 
