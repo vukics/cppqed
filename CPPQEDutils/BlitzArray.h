@@ -60,13 +60,16 @@ namespace cppqedutils {
 namespace sliceiterator {
 
 
-template<typename T, int RANK, typename ... SubscriptPack>
-auto subscript(const blitz::Array<T,RANK>& array, SubscriptPack&&... subscriptPack)
+template<typename T, int RANK>
+struct SubscriptMultiArray<blitz::Array<T,RANK>>
 {
-  static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for blitz::Array." );
-  return array(std::forward<SubscriptPack>(subscriptPack)...);
-}
-
+  template <typename ... SubscriptPack>
+  static auto _(const blitz::Array<T,RANK>& array, SubscriptPack&&... subscriptPack)
+  {
+    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for blitz::Array." );
+    return array(std::forward<SubscriptPack>(subscriptPack)...);
+  }
+};
 
 /**
  * \todo SliceIterator could be defined as taking an ARRAY *type* as template param instead of a *template* (a traits metafunction calculating ResArray in this case)

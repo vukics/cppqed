@@ -3,223 +3,314 @@
 #ifndef CPPQEDCORE_UTILS_SLICEITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_SLICEITERATOR_H_INCLUDED
 
+#include "ArrayTraits.h"
 #include "MultiIndexIterator.h"
 #include "TMP_Tools.h"
 
 #include <boost/range.hpp>
 
-#include <boost/mpl/size.hpp>
-#include <boost/mpl/sort.hpp>
-#include <boost/mpl/unique.hpp>
-#include <boost/mpl/max_element.hpp>
-#include <boost/mpl/for_each.hpp>
-#include <boost/mpl/filter_view.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/push_back.hpp>
-
-#include <boost/fusion/mpl.hpp> // include all, otherwise difficult to find out what is actually needed
-#include <boost/fusion/container/vector/convert.hpp>
-#include <boost/fusion/algorithm/iteration/fold.hpp>
-#include <boost/fusion/sequence/intrinsic/at_c.hpp>
+#include <boost/hana.hpp>
 
 #include <stdexcept>
+
+
+namespace hana = boost::hana;
 
 
 namespace cppqedutils {
 
 
+template <typename RetainedAxes>
+constexpr auto hanaSize(RetainedAxes ra=RetainedAxes{}) {return int(hana::size(ra));}
+
+
 namespace sliceiterator {
+
+using mii::Begin; using mii::End; using tmptools::ordinals;
   
-/// A forwarding metafunction to boost::mpl::size
-template <typename V>
-constexpr size_t Size_v = boost::mpl::size<V>::value;
-
-template <template <int> class ARRAY, typename V> using ResArray=ARRAY<Size_v<V>>;
-
-template <int RANK, typename V> using VecIdxTiny=IdxTiny<RANK-Size_v<V>>; 
-// note that Array::lbound and ubound return a TinyVector<int,...>, so that here we have to use int as well.
-
-using mii::Begin; using mii::End;
-
-
 /// Checking the consistency of template arguments for use in slicing
 /**
- * - size of `V` must not be larger than `RANK`
- * - `V` must not contain duplicated elements
- * - all elements of `V` must be smaller than `RANK`
+ * - size of `RetainedAxes` must not be larger than `RANK`
+ * - `RetainedAxes` must not contain duplicated elements
+ * - all elements of `RetainedAxes` must be smaller than `RANK`
  * 
  * \see \ref specifyingsubsystems
  * 
  */
-template<int RANK, typename V> struct ConsistencyChecker
+template <int RANK, typename RetainedAxes>
+void checkConsistency(RetainedAxes ra=RetainedAxes{})
 {
-  static_assert( RANK >= Size_v<V> , "Indexer with nonpositive RANK." );
-
-  typedef typename boost::mpl::sort<V>::type SortedV;
-  static_assert( boost::mpl::equal<typename boost::mpl::unique<SortedV,boost::is_same<boost::mpl::_1,boost::mpl::_2> >::type,SortedV>::value ,
-                 "cppqedutils::SliceIterator inconsistent vector" );
-  static_assert( boost::mpl::deref<typename boost::mpl::max_element<V>::type>::type::value < RANK , 
-                 "cppqedutils::SliceIterator vector out of range" );
-};
-
-
-/// Specialization necessary since boost::mpl::range_c cannot be sorted
-template<int RANK, int I1, int I2>  struct ConsistencyChecker<RANK,boost::mpl::range_c<int,I1,I2> >
-{
-  static_assert( I1>=0 && I2<RANK , 
-                 "cppqedutils::SliceIterator vector out of range" );
-};
-
-/** \cond SPECIALIZATION */
-template<int RANK, int N, int Nbeg> struct ConsistencyChecker<RANK,tmptools::Range<N,Nbeg> > : private ConsistencyChecker<RANK,boost::mpl::range_c<int,Nbeg,Nbeg+N> > {};
-template<int RANK, int N>           struct ConsistencyChecker<RANK,tmptools::Ordinals<N>   > : private ConsistencyChecker<RANK,tmptools::  Range  <N,0>             > {};
-/** \endcond */
+  using namespace hana; using namespace literals;
+  
+  static constexpr auto sorted = sort(ra);
+  
+  BOOST_HANA_CONSTANT_ASSERT_MSG ( unique(sorted) == sorted , "Duplicate value(s) found" );
+  
+  BOOST_HANA_CONSTANT_ASSERT_MSG ( maximum(ra) < int_c<RANK> , "Too large element" );
+  BOOST_HANA_CONSTANT_ASSERT_MSG ( minimum(ra) >= 0_c , "Negative element" );
+  
+}
 
 
 /// Filters out the indices corresponding to a subsystem
 /**
  * \tparamRANK
- * \tparam V compile-time vector specifying the subsystem (cf. \ref specifyingsubsystems)
+ * \tparam RetainedAxes compile-time vector specifying the subsystem (cf. \ref specifyingsubsystems)
  * 
  * \param idx the indices to be filtered (of number `RANK`)
  * 
- * \return the indices *not* contained by the subsystem specified by `V` (of number `RANK-Size_v<V>`)
+ * \return the indices *not* contained by the subsystem specified by `RetainedAxes`
+ * 
+ * ** Example **
+ *     
+ *     #include "SliceIterator.h"
+ * 
+ *     const int RANK=11;
+ *     constexpr auto v_c=vector_c<3,6,1,9,7>;
+ *     
+ *     int main() {
+ *       const IdxTiny<RANK> idx{21,2,4,10,11,3,5,9,23,22,7};
+ *       const auto filteredIdx{filterOut(idx,v_c)};
+ *       assert( all( filteredIdx==IdxTiny<6>{21,4,11,3,23,7} ) );
+ *     }
  * 
  */
-template<int RANK, typename V>
-auto filterOut(const IdxTiny<RANK>& v)
+template<int RANK, typename RetainedAxes>
+auto filterOut(const IdxTiny<RANK>& idx, RetainedAxes ra=RetainedAxes{})
 {
-  namespace mpl=boost::mpl;
-
-  unsigned curr=0;
-  VecIdxTiny<RANK,V> res;
-
-  auto helper=[&](auto i){res(curr++)=v(decltype(i)::value);};
+  int origIndex=0, resIndex=0;
   
-  mpl::for_each<tmptools::NegatedView<RANK,V> >(helper);
+  static constexpr auto sortedV = hana::sort(ra);
+  
+  IdxTiny<RANK-hanaSize(ra)> res;
+
+  hana::for_each(sortedV,[&](auto i) {
+    for (; origIndex<i; (++origIndex,++resIndex)) res(resIndex)=idx(origIndex);
+    ++origIndex; // skip value found in sortedV
+  });
+  // the final segment:
+  for (; origIndex<idx.length(); (++origIndex,++resIndex)) res(resIndex)=idx(origIndex);
   
   return res;
 
 }
 
+/// Helper to transpose
+template<int RANK, typename RetainedAxes>
+constexpr auto transposingIndeces(RetainedAxes ra=RetainedAxes{})
+{
+  using namespace hana; using namespace literals;
+  
+  return fold(
+    ordinals<RANK>,make_tuple(tuple_c<int>,0_c),[&](auto state, auto element) {
+      if constexpr ( contains(ra,element) )
+        return make_tuple(append(state[0_c],ra[state[1_c]]),state[1_c]+1_c);
+      else
+        return make_tuple(append(state[0_c],element),state[1_c]);
+    })[0_c];
+}  
 
+
+/// Performs the “possible permutation” of the retained axes (cf. \ref multiarrayconcept "Synopsis")
 /**
- * \defgroup helperstoiterator Helpers to BlitzArraySliceIterator
+ *  This is needed in order that \f$\avr{1,3,6,7,9}\f$ be the corresponding state vector slice, since this is how it is expected in applications. Cf. Composite for further explanations
+ * \return Reference to the function argument.
  * 
- * Sometimes used on their own as well, so they are exposed in the header file.
+ * \par Semantics
+ * ~~~
+ * static const int RANK=11;
  * 
- * \tparamRANK \tparamV
+ * ARRAY<RANK> psi;
  * 
- * \pre `Size_v<V> <= RANK`
+ * typedef tmptools::Vector<3,6,1,9,7> Vec;
  * 
- * The technique of using (non-templated) static worker functions of class templates is meant to allow partial specializations, which are not possible for function templates.
- * 
- * \internal These are just rudimentary definitions, the actual definitions being partial specializations of Transposer::_ and Indexer::_ along RANK 
- * (cf. trailing part of `BlitzArraySliceIterator.tcc`) The functions will throw if a partial specialization for the given RANK does not exist. \endinternal
- * 
- * \see \ref iteratorimplementation,*this
- * 
- * @{
+ * Transposer<ARRAY<RANK>,Vec>::_(psi);
+ * ~~~
+ * is equivalent to ::
+ * ~~~
+ * psi.transposeSelf(0,3,2,6,4,5,1,9,8,7,10);
+ * ~~~
+ * that is, in place of the indices specified by the elements of the compile-time vector `Vec`, the elements of `Vec` are put, but in the *order* specified by `Vec`.
  */
+template<typename RetainedAxes, typename ARRAY>
+ARRAY& transpose(ARRAY& array, RetainedAxes ra=RetainedAxes{})
+{
+  hana::unpack(transposingIndeces<Rank_v<ARRAY>>(ra),[&](auto && ... i) -> void {array.transposeSelf(std::forward<std::decay_t<decltype(i)>>(i)...);});
+  return array;
+}
 
-/// Class performing the “possible permutation” of the retained indices (cf. \ref multiarrayconcept "Synopsis").
-template<template <int> class ARRAY, int RANK, typename V>
-class Transposer
+
+template<int RANK, typename RetainedAxes>
+auto slicingTuple(RetainedAxes ra=RetainedAxes{})
+{
+  using namespace hana; using namespace literals;
+  return fold(ordinals<RANK>,hana::make_tuple(hana::make_tuple(),0_c),[&](auto state, auto element) {
+    if constexpr ( contains(ra,element) )
+      return make_tuple(append(state[0_c],blitz::Range::all()),state[1_c]);
+    else
+      return make_tuple(append(state[0_c],0),state[1_c]+1_c);
+  })[0_c];
+}
+
+
+/// Performs the slicing on an array already transposed
+/**
+ * \return Reference to resArray,*this
+ * 
+ * \par Semantics
+ * ~~~
+ * static const int RANK=11;
+ * 
+ * ARRAY<RANK> psi;
+ * 
+ * typedef tmptools::Vector<3,6,1,9,7> Vec;
+ * 
+ * ResArray<ARRAY,Vec> psiRes;
+ * 
+ * VecIdxTiny<RANK,Vec> idxTiny;
+ * 
+ * Indexer<ARRAY,RANK,Vec>::_(psi,psiRes,idxTiny);
+ * ~~~
+ * is equivalent to
+ * ~~~
+ * const blitz::Range a(blitz::Range::all());
+ * psiRes.reference(psi(0,a,2,a,4,5,a,a,8,a,10));
+ * ~~~
+ */
+template <int RANK, typename RetainedAxes>
+class Slicer
 {
 public:
-  /// Static worker
-  /**
-   * Transposition corresponding to the "possible permutation" of the retained indices (cf. \ref multiarrayconcept "Synopsis"), which is necessary in order that \f$\avr{1,3,6,7,9}\f$
-   * be the corresponding state vector slice, since this is how it is expected in applications. Cf. Composite for further explanations.
-   * 
-   * \return Simply the reference to the function argument.,*this
-   * 
-   * \par Semantics
-   * ~~~
-   * static const int RANK=11;
-   * 
-   * ARRAY<RANK> psi;
-   * 
-   * typedef tmptools::Vector<3,6,1,9,7> Vec;
-   * 
-   * Transposer<ARRAY,RANK,Vec>::_(psi);
-   * ~~~
-   * is equivalent to ::
-   * ~~~
-   * psi.transposeSelf(0,3,2,6,4,5,1,9,8,7,10);
-   * ~~~
-   * that is, in place of the indices specified by the elements of the compile-time vector `Vec`, the elements of `Vec` are put, but in the *order* specified by `Vec`.
-   */
-  static ARRAY<RANK>& _(ARRAY<RANK>&);
+  static constexpr auto raSize=hanaSize<RetainedAxes>();
+  
+  template<template <int> class ARRAY>
+  static auto& _(const ARRAY<RANK>& array, ///< The array to be sliced
+                 ARRAY<raSize>& resArray, ///< The array storing the result.
+                 const IdxTiny<RANK-raSize>& idx ///< Set of dummy indices
+  )
+  {
+    using namespace hana; using namespace literals;
 
+    // fill idx_ with the run-time values
+    fold(ordinals<RANK>,idx.begin(),[&](auto iter, auto element) {
+        if constexpr ( !contains(RetainedAxes{},element) ) idx_[element]=*iter++;
+        return iter;
+      });
+    
+    resArray.reference( unpack(idx_,[&](auto && ... i) {return SubscriptMultiArray<ARRAY<RANK>>::_(array,std::forward<std::decay_t<decltype(i)>>(i)...); }) );
+    return resArray;      
+  }
+  
+private:
+  // preloaded with blitz::Range::all()s at the retained axes
+  inline static auto idx_ = slicingTuple<RANK,RetainedAxes>();
+                                    
 };
 
-/// Performs the slicing on an array already transposed by Transposer.
-template<template <int> class ARRAY, int RANK, typename V>
-class Indexer
-{
-public:
-  /// Static worker
-  /**
-   * \return Reference to resArray,*this
-   * 
-   * \par Semantics
-   * ~~~
-   * static const int RANK=11;
-   * 
-   * ARRAY<RANK> psi;
-   * 
-   * typedef tmptools::Vector<3,6,1,9,7> Vec;
-   * 
-   * ResArray<ARRAY,Vec> psiRes;
-   * 
-   * VecIdxTiny<RANK,Vec> idxTiny;
-   * 
-   * Indexer<ARRAY,RANK,Vec>::_(psi,psiRes,idxTiny);
-   * ~~~
-   * is equivalent to
-   * ~~~
-   * const blitz::Range a(blitz::Range::all());
-   * psiRes.reference(psi(0,a,2,a,4,5,a,a,8,a,10));
-   * ~~~
-   */
-  static ResArray<ARRAY,V>& _(const ARRAY<RANK>&, ///< The array to be sliced
-                              ResArray<ARRAY,V>&, ///< The array storing the result. Necessary for the same reason why SliceIterator::operator* returns a reference
-                              const VecIdxTiny<RANK,V>& ///< Set of dummy indices
-                             );
-
-};
 
 
 /** @} */
 
 
-//////////////////////////
+////////////////
 //
-// BlitzArraySliceIterator
+// SliceIterator
 //
-//////////////////////////
+////////////////
 
-// TODO: Think over: is the following solution based on inheritance to solve the specialization problem optimal?  Note: this is NOT allowed (specialization depending on a template parameter)
+// TODO: Think over: is the following solution based on inheritance to solve the specialization problem optimal? 
+// Note: this is NOT allowed (specialization depending on a template parameter)
 // template<typename V> SliceIterator<Size_v<V>,V>;
 
-template<template <int> class, typename>
-class BaseTrivial;
+/// Generic worker base for SliceIterator
+template<template <int> class ARRAY, int RANK, typename RetainedAxes>
+class Base
+{
+public:
+  static constexpr int RANKIDX=RANK-hanaSize<RetainedAxes>();
 
-template<template <int> class, typename>
-class BaseSpecial;
+  template <bool IS_END>
+  Base(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie)
+    : array_(array), resArray_(), mii_(filterOut<RANK,RetainedAxes>(array.lbound()),filterOut<RANK,RetainedAxes>(array.ubound()),ie)
+  {
+    if constexpr (!IS_END) {
+      array_.reference(array);
+      transpose(array_,RetainedAxes{});
+    }
+  }
 
-template<template <int> class, int, typename>
-class Base;
+  void increment() {++mii_;}
+  
+  auto& operator*() const {return Slicer<RANK,RetainedAxes>::template _<ARRAY>(array_,resArray_,*mii_);}
+
+  friend bool operator==(const Base& i1, const Base& i2) {return i1.mii_==i2.mii_ /* && i1.array_==i2.array_ */;}
+  // The user has to ensure that the two arrays are actually the same
+
+  const MultiIndexIterator<RANKIDX>& operator()() const {return mii_;}
+
+private:
+  ARRAY<RANK> array_; // By value, so that the necessary transposition specified by RetainedAxes can be readily performed
+
+  mutable ARRAY<hanaSize<RetainedAxes>()> resArray_;
+  
+  MultiIndexIterator<RANKIDX> mii_;
+
+};
+
+
+/// used in the case when `size<RetainedAxes> = RANK` and when `RANK = 1`
+template<template <int> class ARRAY, typename RetainedAxes>
+class BaseTrivial
+{
+public:
+  static constexpr int RANK=hanaSize<RetainedAxes>();
+
+  template <bool IS_END>
+  BaseTrivial(const ARRAY<RANK>& array, std::bool_constant<IS_END>)
+    : array_(), isEnd_(IS_END)
+  {
+    if constexpr (!IS_END) array_.reference(array);
+  }
+
+  void increment() {if (!isEnd_) isEnd_=true; else throw std::out_of_range("In sliceiterator::BaseTrivial::increment");}
+
+  auto& operator*() const {if (isEnd_) throw std::out_of_range("In sliceiterator::BaseTrivial::operator*"); return array_;}
+
+  friend bool operator==(const BaseTrivial& i1, const BaseTrivial& i2) {return i1.isEnd_==i2.isEnd_;}
+
+protected:
+  mutable ARRAY<RANK> array_; // must be mutable in order that the const operator* can return a non-const ARRAY (without mutable here, the auto there resolves to const)
+
+private:
+  bool isEnd_;
+
+};
+
+
+/// used in the case when `size<RetainedAxes> = RANK`
+template<template <int> class ARRAY, typename RetainedAxes>
+class BaseSpecial : public BaseTrivial<ARRAY,RetainedAxes>
+{
+public:
+  using BaseTrivial<ARRAY,RetainedAxes>::RANK;
+
+  template <bool IS_END>
+  BaseSpecial(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : BaseTrivial<ARRAY,RetainedAxes>(array,ie)
+  {
+    if constexpr (!IS_END) transpose(this->array_,RetainedAxes{});
+  }
+
+};
+
+
 
 } // sliceiterator
 
 #define BASE_class std::conditional_t<RANK==1,\
-                                      sliceiterator::BaseTrivial<ARRAY,V>,\
-                                      std::conditional_t<RANK==sliceiterator::Size_v<V>,\
-                                                         sliceiterator::BaseSpecial<ARRAY,V>,\
-                                                         sliceiterator::Base<ARRAY,RANK,V>>>
+                                      sliceiterator::BaseTrivial<ARRAY,RetainedAxes>,\
+                                      std::conditional_t<RANK==hanaSize<RetainedAxes>(),\
+                                                         sliceiterator::BaseSpecial<ARRAY,RetainedAxes>,\
+                                                         sliceiterator::Base<ARRAY,RANK,RetainedAxes>>>
 
 
 /// SliceIterator
@@ -274,11 +365,10 @@ class Base;
  * The point is that a multi-array is not a container of slices, so SliceIterator is definitely not a standard iterator. It seems rather like a proxy iterator.
  *
  */
-template<template <int> class ARRAY, int RANK, typename V>
+template<template <int> class ARRAY, int RANK, typename RetainedAxes>
 class SliceIterator 
-  : public boost::forward_iterator_helper<SliceIterator<ARRAY,RANK,V>,sliceiterator::ResArray<ARRAY,V>>, // The inheritance has to be public here because of needed inherited types 
-    public BASE_class,
-    private sliceiterator::ConsistencyChecker<RANK,V>
+  : public boost::forward_iterator_helper<SliceIterator<ARRAY,RANK,RetainedAxes>,ARRAY<hanaSize<RetainedAxes>()>>, // The inheritance has to be public here because of needed inherited types 
+    public BASE_class
 {
 public:
   typedef BASE_class Base;
@@ -290,7 +380,7 @@ public:
   /// Can be initialized either to the beginning or the end of the sequence of dummy-index combinations
   /** \tparam IS_END governs the end-ness */
   template<bool IS_END>
-  SliceIterator(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : Base(array,ie) {}
+  SliceIterator(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : Base(array,ie) {sliceiterator::checkConsistency<RANK,RetainedAxes>();}
 
 };
 
@@ -299,104 +389,24 @@ namespace sliceiterator {
 
 
 /// Iterator to the beginning of the sequence \related SliceIterator – template parameters have the same meaning as there \return SliceIterator
-template<typename V, template <int> class ARRAY, int RANK>
-auto begin(const ARRAY<RANK>& array) {return SliceIterator<ARRAY,RANK,V>(array,Begin());}
+template<typename RetainedAxes, template <int> class ARRAY, int RANK>
+auto begin(const ARRAY<RANK>& array) {return SliceIterator<ARRAY,RANK,RetainedAxes>(array,Begin());}
 
 /// Iterator to the end of the sequence \related SliceIterator – template parameters have the same meaning as there \return SliceIterator
-template<typename V, template <int> class ARRAY, int RANK>
-auto end(const ARRAY<RANK>& array) {return SliceIterator<ARRAY,RANK,V>(array,End());}
+template<typename RetainedAxes, template <int> class ARRAY, int RANK>
+auto end(const ARRAY<RANK>& array) {return SliceIterator<ARRAY,RANK,RetainedAxes>(array,End());}
 
 /// \refBoost{Boost.Range,range/doc/html/range/reference/utilities/iterator_range.html}-compliant full range of slice iterators \related SliceIterator
 /**
  * It corresponds to all the possible combinations of dummy indices (\f$\iota_0,\iota_2,\iota_4,\iota_5,\iota_8,\iota_{10},\f$…) \ref retainedindexpositionsdefined "here".
- * \tparam V the retained index positions \tparam A array type taken itself as a parameter to ease template-parameter inference 
+ * \tparam RetainedAxes the retained index positions \tparam A array type taken itself as a parameter to ease template-parameter inference 
  */
-template<typename V, template <int> class ARRAY, int RANK>
+template<typename RetainedAxes, template <int> class ARRAY, int RANK>
 auto fullRange(const ARRAY<RANK>& array)
 {
-  return boost::iterator_range<SliceIterator<ARRAY,RANK,V>>(begin<V,ARRAY>(array),end<V,ARRAY>(array));
+  return boost::iterator_range<SliceIterator<ARRAY,RANK,RetainedAxes>>(begin<RetainedAxes,ARRAY>(array),end<RetainedAxes,ARRAY>(array));
 }
 
-
-/// Generic worker base for SliceIterator
-template<template <int> class ARRAY, int RANK, typename V>
-class Base
-{
-public:
-  static const int RANKIDX=RANK-Size_v<V>;
-
-  template <bool IS_END>
-  Base(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie)
-    : array_(array), resArray_(), mii_(filterOut<RANK,V>(array.lbound()),filterOut<RANK,V>(array.ubound()),ie)
-  {
-    if constexpr (!IS_END) {
-      array_.reference(array);
-      Transposer<ARRAY,RANK,V>::_(array_);
-    }
-  }
-
-  void increment() {++mii_;}
-  
-  auto& operator*() const {return Indexer<ARRAY,RANK,V>::_(array_,resArray_,*mii_);}
-
-  friend bool operator==(const Base& i1, const Base& i2) {return i1.mii_==i2.mii_ /* && i1.array_==i2.array_ */;}
-  // The user has to ensure that the two arrays are actually the same
-
-  const MultiIndexIterator<RANKIDX>& operator()() const {return mii_;}
-
-private:
-  ARRAY<RANK> array_; // By value, so that the necessary transposition specified by V can be readily performed
-
-  mutable ResArray<ARRAY,V> resArray_;
-  
-  MultiIndexIterator<RANKIDX> mii_;
-
-};
-
-
-/// used in the case when `Size_v<V> = RANK` and when `RANK = 1`
-template<template <int> class ARRAY, typename V>
-class BaseTrivial
-{
-public:
-  static const int RANK=Size_v<V>;
-
-  template <bool IS_END>
-  BaseTrivial(const ARRAY<RANK>& array, std::bool_constant<IS_END>)
-    : array_(), isEnd_(IS_END)
-  {
-    if constexpr (!IS_END) array_.reference(array);
-  }
-
-  void increment() {if (!isEnd_) isEnd_=true; else throw std::out_of_range("In sliceiterator::BaseTrivial::increment");}
-
-  auto& operator*() const {if (isEnd_) throw std::out_of_range("In sliceiterator::BaseTrivial::operator*"); return array_;}
-
-  friend bool operator==(const BaseTrivial& i1, const BaseTrivial& i2) {return i1.isEnd_==i2.isEnd_;}
-
-protected:
-  mutable ARRAY<RANK> array_; // must be mutable in order that the const operator* can return a non-const ARRAY (without mutable here, the auto there resolves to const)
-
-private:
-  bool isEnd_;
-
-};
-
-
-/// used in the case when `Size_v<V> = RANK`
-template<template <int> class ARRAY, typename V>
-class BaseSpecial : public BaseTrivial<ARRAY,V>
-{
-public:
-  using BaseTrivial<ARRAY,V>::RANK;
-
-  template <bool IS_END>
-  BaseSpecial(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : BaseTrivial<ARRAY,V>(array,ie)
-  {
-    if constexpr (!IS_END) Transposer<ARRAY,Size_v<V>,V>::_(this->array_);
-  }
-
-};
 
 
 /** \page iteratorimplementation Notes on the implementation of SliceIterator
@@ -405,10 +415,10 @@ public:
  * 
  * Transposer and Indexer are implemented in such a way that a partial template specialization is provided for each possible `RANK` (up to #BLITZ_ARRAY_LARGEST_RANK), 
  * and the corresponding code is automatically generated by the \refBoost{Boost.Preprocessor,preprocessor/doc/index.html} library.
- * This can be seen in the trailing part of BlitzArraySliceIterator.tcc. To actually see what code is generated, this file needs to be preprocessed.
+ * This can be seen in the trailing part of BlitzArraySliceIterator.h. To actually see what code is generated, this file needs to be preprocessed.
  * Issue the following command from the root directory of the distribution:
  * ~~~{.sh}
- * g++ -P -E -Iutils/ utils/BlitzArraySliceIterator.tcc | tail -n286
+ * g++ -P -E -Iutils/ utils/BlitzArraySliceIterator.h | tail -n286
  * ~~~
  * To store and manipulate the heterogenous collection of slicing indices like `0,a,2,a,4,5,a,a,8,a,10` in Indexer::_, the `vector` class of the 
  * \refBoost{Boost.Fusion,fusion/doc/html/index.html} library is used.
@@ -433,7 +443,7 @@ public:
  * In the following we analyse a metaprogramming example typical for the framework: how the compile-time vector `0,3,2,6,4,5,1,9,8,7,10`
  * for the self-transposition in Transposer::_ is prepared.
  * 
- * This is done by the following snippet in `utils/BlitzArraySliceIterator.tcc`: \dontinclude BlitzArraySliceIterator.tcc
+ * This is done by the following snippet in `utils/BlitzArraySliceIterator.h`: \dontinclude BlitzArraySliceIterator.h
  * \skip namespace namehider {
  * \until fold
  * We are using the \refBoostConstruct{fold,mpl/doc/refmanual/fold.html} metaalgorithm from Boost.MPL.

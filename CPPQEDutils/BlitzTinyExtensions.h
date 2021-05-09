@@ -30,13 +30,9 @@ concatenateTinies(const blitz::TinyVector<T1,RANK1>& op1, const blitz::TinyVecto
 {
   blitz::TinyVector<T1,RANK1+RANK2> res;
 
-  boost::mpl::for_each<tmptools::Ordinals<RANK1> >([&](auto t) {
-    static const auto i=decltype(t)::value;
-    res(i)=op1(i);});
-  boost::mpl::for_each<tmptools::Ordinals<RANK2> >([&](auto t) {
-    static const auto i=decltype(t)::value;
-    res(i+RANK1)=cppqedutils::Converter<T1,T2>::convert(op2(i));});
-
+  hana::for_each(tmptools::ordinals<RANK1>,[&](auto t) {res(t)=op1(t);});
+  hana::for_each(tmptools::ordinals<RANK2>,[&](auto t) {res(t+RANK1)=cppqedutils::Converter<T1,T2>::convert(op2(t));});
+  
   return res;
     
 }
@@ -58,17 +54,12 @@ halfCutTiny(const blitz::TinyVector<T,TWO_TIMES_RANK>& tiny)
   static const int RANK=TWO_TIMES_RANK/2;
 
 #ifndef   NDEBUG
-  boost::mpl::for_each<tmptools::Ordinals<RANK> >([&](auto arg) {
-    using U = decltype(arg);
-    if (tiny(U::value)!=tiny(U::value+RANK)) throw std::invalid_argument("In halfCutTiny");
-  });
+  hana::for_each(tmptools::ordinals<RANK>,[&](auto t) {if (tiny(t)!=tiny(t+RANK)) throw std::invalid_argument("In halfCutTiny");});
 #endif // NDEBUG
 
   blitz::TinyVector<T,RANK> res;
 
-  boost::mpl::for_each<tmptools::Ordinals<RANK> >([&](auto t) {
-    static const auto i=decltype(t)::value;
-    res(i)=tiny(i);});
+  hana::for_each(tmptools::ordinals<RANK>,[&](auto t) {res(t)=tiny(t);});
 
   return res;
 

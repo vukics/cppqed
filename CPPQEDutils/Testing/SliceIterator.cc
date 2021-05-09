@@ -1,74 +1,84 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+
+#include "SliceIterator.h"
+
 #include "BlitzArray.h"
-#include "SliceIterator.tcc"
+
+#include "TMP_Tools.h"
 
 // #include "Random.h"
 
 #define BOOST_TEST_MODULE BlitzArraySliceIterator test
 #include <boost/test/unit_test.hpp>
 
-#include <boost/fusion/sequence/io.hpp>
-#include <boost/fusion/sequence/comparison.hpp>
-#include <boost/fusion/functional/invocation/invoke.hpp>
-#include <boost/fusion/sequence/intrinsic/at_c.hpp>
-namespace mpl=boost::mpl;
-
 #include <sstream>
 
 using namespace cppqedutils::sliceiterator;
+using namespace hana::literals;
 using namespace std;
 
-using V=tmptools::Vector<3,6,1,9,7>;
+using RetainedAxes=tmptools::Vector<3,6,1,9,7>;
 
 const int RANK=11;
 
-using TM=details::TransposerMeta_t<RANK,V>;
 
-using FullIdx=details::IndexerBase<RANK,V>::Idx; // This contains Range types at the appropriate locations
+constexpr auto ti = transposingIndeces<RANK,RetainedAxes>();
+
+const auto fullIdx=slicingTuple<RANK,RetainedAxes>(); // This contains Ranges at the appropriate locations
 
 
 const IdxTiny<RANK> idx(21,2,4,10,11,3,5,9,23,22,7);
 
 
-const VecIdxTiny<RANK,V> filteredIdx(filterOut<RANK,V>(idx));
+const auto filteredIdx(filterOut<RANK,RetainedAxes>(idx));
 
 using DArray11=DArray<11>;
 
 
+BOOST_HANA_CONSTANT_ASSERT( ti[0_c] == 0_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[1_c] == 3_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[2_c] == 2_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[3_c] == 6_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[4_c] == 4_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[5_c] == 5_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[6_c] == 1_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[7_c] == 9_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[8_c] == 8_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[9_c] == 7_c );
+BOOST_HANA_CONSTANT_ASSERT( ti[10_c] == 10_c );
+
+static_assert( ti[9_c] == 7_c );
+
+static_assert( ti == tmptools::vector<0,3,2,6,4,5,1,9,8,7,10> );
+
 namespace {
-
-using mpl::at_c, mpl::equal;
-
-static_assert(at_c<TM,0>::type::value==0);
-static_assert(at_c<TM,1>::type::value==3);
-static_assert(at_c<TM,2>::type::value==2);
-static_assert(at_c<TM,3>::type::value==6);
-static_assert(at_c<TM,4>::type::value==4);
-static_assert(at_c<TM,5>::type::value==5);
-static_assert(at_c<TM,6>::type::value==1);
-static_assert(at_c<TM,7>::type::value==9);
-static_assert(at_c<TM,8>::type::value==8);
-static_assert(at_c<TM,9>::type::value==7);
-static_assert(at_c<TM,10>::type::value==10);
-
-static_assert(equal<TM,     mpl::vector_c<int,0,3,2,6,4,5,1,9,8,7,10> >::value);
-static_assert(equal<TM,tmptools::Vector  <    0,3,2,6,4,5,1,9,8,7,10> >::value);
-
 
 using blitz::Range;
 
-static_assert(equal<FullIdx,mpl::vector<int,Range,int,Range,int,int,Range,Range,int,Range,int> >::value);
+static_assert( hana::type_c<std::decay_t<decltype(fullIdx[2_c])>> == hana::type_c<int> );
+static_assert( hana::type_c<std::decay_t<decltype(fullIdx[6_c])>> == hana::type_c<Range> );
 
+static_assert( std::is_same_v<decltype(fullIdx),const hana::tuple<int,Range,int,Range,int,int,Range,Range,int,Range,int> > );
 
 }
 
 
 BOOST_AUTO_TEST_CASE( FilterOutTest )
 {
-  BOOST_CHECK(all(filteredIdx==VecIdxTiny<RANK,V>(21,4,11,3,23,7)));
+  BOOST_CHECK(all(filteredIdx==decltype(filteredIdx){21,4,11,3,23,7}));
 }
 
 
+BOOST_AUTO_TEST_CASE( TransposeTest )
+{
+  DArray11 array11{22,2,5,1,12,4,4,3,24,2,8};
+  transpose<RetainedAxes>(array11);
+  std::cout<<array11.extent();
+  BOOST_CHECK(all( array11.extent() == ExtTiny<11>{22,1,5,4,12,4,2,2,24,3,8} ));
+}
+
+
+/*
 BOOST_AUTO_TEST_CASE( IdxValueTest )
 {
   using namespace std;
@@ -80,11 +90,12 @@ BOOST_AUTO_TEST_CASE( IdxValueTest )
   // The following strange solution is needed because there is no comparison operation for Ranges
   stringstream s1(stringstream::out), s2(stringstream::out);
 
-  s1<<v; s2<<details::IndexerBase<RANK,V>::fillIdxValues(filteredIdx);
+  s1<<v; s2<<details::IndexerBase<RANK,RetainedAxes>::fillIdxValues(filteredIdx);
 
   BOOST_CHECK(s1.str()==s2.str());
 
 }
+*/
 
 
 BOOST_AUTO_TEST_CASE( ArraySlicingTest )
@@ -93,15 +104,22 @@ BOOST_AUTO_TEST_CASE( ArraySlicingTest )
 
   DArray11 array11{22,2,5,1,12,4,4,3,24,2,8};
 
-  FullIdx v{21,a,4,a,11,3,a,a,23,a,7};
-
-  using boost::fusion::at_c;
-
-  BOOST_CHECK(
-    all(DArray<5>{array11(at_c<0>(v),at_c<1>(v),at_c<2>(v),at_c<3>(v),at_c<4>(v),at_c<5>(v),at_c<6>(v),at_c<7>(v),at_c<8>(v),at_c<9>(v),at_c<10>(v))}.extent()
-        ==
-        ExtTiny<5>(2,1,4,3,2)));
-
+  {
+    using namespace hana::literals;
+    
+    decltype(fullIdx) v{21,a,4,a,11,3,a,a,23,a,7};    
+    
+    BOOST_CHECK( all( DArray<5>{array11(v[0_c],v[1_c],v[2_c],v[3_c],v[4_c],v[5_c],v[6_c],v[7_c],v[8_c],v[9_c],v[10_c])}.extent() == ExtTiny<5>{2,1,4,3,2} ) );
+  
+  }
+  
+  DArray<5> array5;
+  
+  {
+    Slicer<11,RetainedAxes>::_<DArray>(array11,array5,IdxTiny<6>{18,3,8,1,15,5});
+    BOOST_CHECK( all( array5.extent() == ExtTiny<5>{2,1,4,3,2} ) );
+  }
+  
 }
 
 
@@ -111,11 +129,10 @@ BOOST_AUTO_TEST_CASE( ExampleFromManual )
 
   CArray<RANK> psi;
 
-  for (auto p : fullRange<V>(psi) ) actWithA(p);
+  for (auto p : fullRange<RetainedAxes>(psi) ) actWithA(p);
 }
 
 void actWithA(CArray<5>&) {}
-
 
 
 // The following test comes from the old version of this file, and is intended to demonstrate the performance as a function of the arity of slices

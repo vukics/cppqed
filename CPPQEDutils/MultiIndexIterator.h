@@ -3,13 +3,9 @@
 #ifndef CPPQEDCORE_UTILS_MULTIINDEXITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_MULTIINDEXITERATOR_H_INCLUDED
 
-#include "MultiIndexIterator.h"
-
 #include "BlitzTiny.h"
 
 #include <boost/operators.hpp>
-
-#include <boost/mpl/identity.hpp>
 
 
 /// Namespace comprising otherwise hard-to-classify generic utilities

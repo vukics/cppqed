@@ -128,6 +128,15 @@ struct Stride;
 //@}
 
 
+namespace sliceiterator {
+
+
+template<typename A>
+struct SubscriptMultiArray;
+
+
+} // sliceiterator
+
 /** Specializations for std::array */
 
 template<typename T, std::size_t N>

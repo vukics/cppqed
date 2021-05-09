@@ -16,35 +16,16 @@
 #endif // BLITZ_ARRAY_LARGEST_RANK
 
 
-/// Cf. \refBoost{this page,fusion/doc/html/fusion/container/vector.html}
-#ifndef FUSION_MAX_VECTOR_SIZE
-#define FUSION_MAX_VECTOR_SIZE 20
-#endif // FUSION_MAX_VECTOR_SIZE
+#include <type_traits>
 
+#include <boost/hana.hpp>
 
-/// Cf. \refBoost{this page,fusion/doc/html/fusion/container/list.html}
-#ifndef FUSION_MAX_LIST_SIZE
-#define FUSION_MAX_LIST_SIZE FUSION_MAX_VECTOR_SIZE
-#endif // FUSION_MAX_LIST_SIZE
-
-#include <boost/mpl/max_element.hpp>
+namespace hana=boost::hana;
 #include <boost/mpl/deref.hpp>
 #include <boost/mpl/copy.hpp>
 #include <boost/mpl/back_inserter.hpp>
-#include <boost/mpl/range_c.hpp>
-#include <boost/mpl/vector_c.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/identity.hpp>
-#include <boost/mpl/int.hpp>
 #include <boost/mpl/filter_view.hpp>
-#include <boost/mpl/find_if.hpp>
-#include <boost/mpl/equal.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/mpl/push_back.hpp>
 
-#include <type_traits>
 
 /// Template metaprogramming tools
 namespace tmptools {
@@ -57,63 +38,12 @@ template<typename T, bool ADD_CONST>
 using ConditionalAddConst_t = std::conditional_t<ADD_CONST,std::add_const_t<T>,T>;
 
 
-/// An integer \refBoostConstruct{range_c,mpl/doc/refmanual/range-c.html} starting with `Nbeg` and having `N` elements (`Nbeg ... Nbeg+N-1`)
-template<unsigned N, int Nbeg> struct Range : boost::mpl::range_c<int,Nbeg,Nbeg+N> {};
-
-
-/// Sequence of ordinals `0 ... N-1` based on Range
-template<int N> struct Ordinals : Range<N,0> {};
-
-
 /// Calculates the power \f$N_1^{N_2}\f$ @ compile time
 template<unsigned N1, unsigned N2>
 constexpr int Power_v=N1*Power_v<N1,N2-1>;
 
-/** \cond SPECIALIZATION */
 template<unsigned N1>
 constexpr int Power_v<N1,0> =1;
-/** \endcond */
-
-
-/// Determines whether a compile-time sequence “numerically contains” a given value
-/**
- * \tparam Seq the sequence (presumably containing integers)
- * \tparam ICW \refBoost{an integral constant wrapper,mpl/doc/refmanual/integral-constant.html}
- * 
- * The motivation for this metafunction is that Boost.MPL’s \refBoostConstruct{contains,mpl/doc/refmanual/contains.html} metafunction
- * looks for the identity of the actual types, and not the numerical equality of the contained values.
- * 
- * \see numerical_equal
- */
-template<typename Seq, typename ICW>
-struct numerical_contains : boost::mpl::not_<boost::is_same<typename boost::mpl::find_if<Seq,
-                                                                                         boost::mpl::equal_to<boost::mpl::_,ICW> 
-                                                                                         >::type,
-                                                            typename boost::mpl::end<Seq>::type
-                                                            >
-                                             > {};
-
-/// The `_c` version of numerical_contains, which expects a value instead of an integral constant wrapper
-template<typename Seq, auto VALUE>
-struct numerical_contains_c : numerical_contains<Seq,boost::mpl::integral_c<decltype(VALUE),VALUE> > {};
-
-
-namespace details {
-
-template<typename T1, typename T2>
-struct value_equal : boost::mpl::bool_<T1::value==T2::value>
-{};
-
-} // details
-
-
-/// Determines the numerical equality of two compile-time sequences
-/**
- * \see numerical_contains for the motivation
- */
-template<typename Seq1, typename Seq2>
-struct numerical_equal : boost::mpl::equal<Seq1,Seq2,details::value_equal<boost::mpl::_1,boost::mpl::_2> >
-{};
 
 
 template<bool COND, auto TRUE_VALUE, auto FALSE_VALUE>
@@ -164,41 +94,38 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
 };
 
 
-////////////////////////////////////////////
-//
-// A nonnegative compile-time integer vector
-//
-////////////////////////////////////////////
+template<int... i>
+constexpr auto vector = hana::tuple_c<int,i...>;
 
 
-namespace details {
-
-template<int V>
-struct ArgumentDispatcher : boost::mpl::integral_c<int,V>
-{
-  static_assert( V>=0 , "Negative element in nonnegative vector" );
-};
-
-} // details
-
-/// A non-negative compile-time vector
-/**
- * It is based on and has the same characteristics as Boost.MPL’s \refBoostConstruct{vector,mpl/doc/refmanual/vector.html}.
- * 
- * Besides the check for the non-negativity of the elements @ compile time, its main motivation is that syntactic sugar that one can simply write
- * `tmptools::Vector<2,4,1,...>` instead of `boost::mpl::vector_c<int,2,4,1,...>`, where the superfluity of `int` creates considerable mental friction
- * 
- * \tparam V variadic number of integers
- * 
- */
-template<int... V> 
-struct Vector : boost::mpl::vector_c<int,details::ArgumentDispatcher<V>::value...> {};
+constexpr auto vEmpty = vector<>;
 
 
-typedef Vector<> V_Empty;
+template<int... i>
+using Vector = decltype(vector<i...>);
+
+
+using V_Empty = Vector<>;
+
+
+template<int begin, int end>
+constexpr auto range = hana::range_c<int,begin,end>;
+
+
+template<int begin, int end>
+using Range = decltype(range<begin,end>);
+
+
+template<int end>
+constexpr auto ordinals = range<0,end>;
+
+
+template<int end>
+using Ordinals = decltype(ordinals<end>);
 
 
 
+/*
 template<int RANK, typename V>
 struct ExtendVector : boost::mpl::fold<V,
                                        V,
@@ -213,7 +140,7 @@ struct ExtendVector : boost::mpl::fold<V,
 
 template<int RANK, typename V>
 using ExtendVector_t = typename ExtendVector<RANK,V>::type;
-
+*/
 
 template <typename Sequence>
 using CopyToVector=typename boost::mpl::copy<Sequence,boost::mpl::back_inserter<V_Empty> >::type;
@@ -226,7 +153,6 @@ using NegatedView=boost::mpl::filter_view<tmptools::Ordinals<RANK>,boost::mpl::n
 template <int RANK, typename V>
 using NegatedVector=CopyToVector<NegatedView<RANK,V>>;
 // copy makes a vector of filter_view, which is important since the latter cannot be applied in all algorithms
-
 
 } // tmptools
 
