@@ -41,14 +41,15 @@ template <int RANK, typename RetainedAxes>
 void checkConsistency(RetainedAxes ra=RetainedAxes{})
 {
   using namespace hana; using namespace literals;
-  
-  static constexpr auto sorted = sort(ra);
-  
-  BOOST_HANA_CONSTANT_ASSERT_MSG ( unique(sorted) == sorted , "Duplicate value(s) found" );
-  
+
   BOOST_HANA_CONSTANT_ASSERT_MSG ( maximum(ra) < int_c<RANK> , "Too large element" );
   BOOST_HANA_CONSTANT_ASSERT_MSG ( minimum(ra) >= 0_c , "Negative element" );
-  
+
+  if constexpr ( Sequence<RetainedAxes>::value ) {
+    static constexpr auto sorted = sort(ra);
+    
+    BOOST_HANA_CONSTANT_ASSERT_MSG ( unique(sorted) == sorted , "Duplicates found" );
+  }
 }
 
 
@@ -78,15 +79,20 @@ void checkConsistency(RetainedAxes ra=RetainedAxes{})
 template<int RANK, typename RetainedAxes>
 auto filterOut(const IdxTiny<RANK>& idx, RetainedAxes ra=RetainedAxes{})
 {
+  using namespace hana;
+  
   int origIndex=0, resIndex=0;
   
-  static constexpr auto sortedV = hana::sort(ra);
+  static constexpr auto sorted = [&]() {
+    if constexpr ( Sequence<RetainedAxes>::value ) return sort(ra);  
+    else return ra;
+  }();
   
   IdxTiny<RANK-hanaSize(ra)> res;
 
-  hana::for_each(sortedV,[&](auto i) {
+  for_each(sorted,[&](auto i) {
     for (; origIndex<i; (++origIndex,++resIndex)) res(resIndex)=idx(origIndex);
-    ++origIndex; // skip value found in sortedV
+    ++origIndex; // skip value found in sorted
   });
   // the final segment:
   for (; origIndex<idx.length(); (++origIndex,++resIndex)) res(resIndex)=idx(origIndex);
@@ -380,7 +386,10 @@ public:
   /// Can be initialized either to the beginning or the end of the sequence of dummy-index combinations
   /** \tparam IS_END governs the end-ness */
   template<bool IS_END>
-  SliceIterator(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : Base(array,ie) {sliceiterator::checkConsistency<RANK,RetainedAxes>();}
+  SliceIterator(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : Base(array,ie) {}
+  
+private:
+  static void checkConsistency() {sliceiterator::checkConsistency<RANK,RetainedAxes>();}
 
 };
 

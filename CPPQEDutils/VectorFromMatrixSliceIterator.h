@@ -4,7 +4,7 @@
 #define CPPQEDCORE_UTILS_VECTORFROMMATRIXSLICEITERATOR_H_INCLUDED
 
 #include "BlitzArray.h"
-#include "SliceIterator.tcc"
+#include "SliceIterator.h"
 
 
 namespace blitzplusplus {
@@ -42,9 +42,8 @@ struct Right : std::true_type {}; ///< Indicates composition from right
  * - `LeftRight<RANK,Right>` ” `<RANK,RANK+1,...,2*RANK-1>`
  */
 template<int RANK, typename S>
-struct LeftRight 
-  : tmptools::Range<RANK,
-                    tmptools::integral_if_v<S,RANK,0>> {};
+using LeftRight = tmptools::Range<tmptools::integral_if_v<S,RANK,0>,
+                                  tmptools::integral_if_v<S,2*RANK,RANK>>;
 
 
 /// Template alias
@@ -76,16 +75,6 @@ fullRange(const A& array ) {return boost::iterator_range<Iterator<cppqedutils::R
 
 } // blitzplusplus
 
-
-/** \cond SPECIALIZATION */
-
-namespace cppqedutils { namespace sliceiterator {
-
-template<int RANK, typename S> struct ConsistencyChecker<RANK,blitzplusplus::vfmsi::LeftRight<RANK/2,S> > {};
-
-} } // cppqedutils::sliceiterator
-
-/** \endcond */
 
 
 
