@@ -16,8 +16,6 @@
 #include "Operators.h"
 
 
-namespace mpl=boost::mpl;
-
 
 /// Comprises modules representing operators of special structure (tridiagonal, sparse) over Hilbert spaces of arbitrary arity
 namespace quantumoperator {

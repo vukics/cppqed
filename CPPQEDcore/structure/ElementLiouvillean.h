@@ -129,10 +129,7 @@ protected:
  */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-lambda-capture"
-    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,&rates,t,&matrix](auto arg) {
-      using T = decltype(arg);
-      rates(T::value)=lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedRate(t,matrix);
-    });
+    hana::for_each(tmptools::ordinals<NLINDBLADS>,[&,this](auto a) {rates(a)=lindblad::_<RANK,a,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedRate(t,matrix);});
     return rates;
   }
 
@@ -140,20 +137,14 @@ protected:
   void actWithJ_v(Time t, StateVectorLow<RANK>& psi, size_t lindbladNo) const override
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
-    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&psi,lindbladNo](auto arg) {
-      using T = decltype(arg);
-      if (T::value==lindbladNo) lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedActWithJ(t,psi);
-    });
+    hana::for_each(tmptools::ordinals<NLINDBLADS>,[&,this](auto a) {if (a==lindbladNo) lindblad::_<RANK,a,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedActWithJ(t,psi);});
   }
   
 
   void actWithSuperoperator_v(Time t, const DensityOperatorLow<RANK>& rho, DensityOperatorLow<RANK>& drhodt, size_t lindbladNo) const override
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
-    mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&rho,&drhodt,lindbladNo](auto arg) {
-      using T = decltype(arg);
-      if (T::value==lindbladNo) lindblad::_<RANK,T::value,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedActWithSuperoperator(t,rho,drhodt);
-    });
+    hana::for_each(tmptools::ordinals<NLINDBLADS>,[&,this](auto a) {if (a==lindbladNo) lindblad::_<RANK,a,IS_TIME_DEPENDENT,NLINDBLADS>::typeErasedActWithSuperoperator(t,rho,drhodt);});
 #pragma clang diagnostic pop
   }
 

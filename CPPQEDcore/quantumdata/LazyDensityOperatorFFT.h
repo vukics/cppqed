@@ -27,68 +27,28 @@ void ffTransform(linalg::CVector&, fft::Direction);
 void ffTransform(linalg::CMatrix&, fft::Direction);
 
 
-namespace details {
-
-
-template<int RANK>
-class fftWorkerSV
-{
-public:
-  typedef std::shared_ptr<StateVector<RANK> > SV;
-
-  fftWorkerSV(SV psi, fft::Direction dir) : psi_(psi), dir_(dir) {};
-
-  template<int IDX> void operator()(mpl::integral_c<int,IDX>)
-  {
-    boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX> >(psi_->getArray()),
-                    [=,this](linalg::CVector& psiS){ffTransform(psiS,dir_);});
-  }
-
-private:
-  const SV psi_;
-  const fft::Direction dir_;
-
-};
-
-
-template<int RANK>
-class fftWorkerDO
-{
-public:
-  typedef std::shared_ptr<DensityOperator<RANK> > DO;
-  
-  fftWorkerDO(DO rho, fft::Direction dir) : rho_(rho), dir_(dir) {};
-
-  template<int IDX> void operator()(mpl::integral_c<int,IDX>)
-  {
-    boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho_->getArray()),
-                    [=,this](linalg::CMatrix& rhoS){ffTransform(rhoS,dir_);});
-  }
-  
-private:
-  const DO rho_;
-  const fft::Direction dir_;
-  
-};
-
-
-} // details
-
 
 template<typename V, int RANK>
-const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDensityOperator<RANK>& matrix, fft::Direction dir)
+const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDensityOperator<RANK>& matrix, fft::Direction dir, V v=V{})
 {
   typedef StateVector    <RANK> SV;
   typedef DensityOperator<RANK> DO;
   
   if      (const auto psi=dynamic_cast<const SV*>(&matrix) ) {
     const std::shared_ptr<SV> res(std::make_shared<SV>(*psi));
-    boost::mpl::for_each<V>(details::fftWorkerSV<RANK>(res,dir));
+    hana::for_each(v,[&](auto a) {
+      boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<a.value> >(psi->getArray()),
+                      [=](linalg::CVector& psiS){ffTransform(psiS,dir);});
+    });
     return res;
   }
   else if (const auto rho=dynamic_cast<const DO*>(&matrix) ) {
     const std::shared_ptr<DO> res(std::make_shared<DO>(*rho));
-    boost::mpl::for_each<V>(details::fftWorkerDO<RANK>(res,dir));
+    hana::for_each(v,[&](auto a) {
+      constexpr auto IDX=a.value;
+      boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho->getArray()),
+                      [=](linalg::CMatrix& rhoS){ffTransform(rhoS,dir);});
+    });
     return res;
   }
   else throw std::runtime_error("LazyDensityOperator FFT not implemented");

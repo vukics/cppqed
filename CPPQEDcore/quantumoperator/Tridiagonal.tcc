@@ -9,13 +9,17 @@
 #include "ComplexArrayExtensions.h"
 
 #include <boost/lambda/lambda.hpp>
-#include <boost/mpl/for_each.hpp>
 #include <boost/range/algorithm_ext/for_each.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 
+#include <boost/mpl/vector_c.hpp>
+
 #include <algorithm>
+
+
+namespace mpl=boost::mpl;
 
 
 
@@ -211,7 +215,7 @@ const typename Tridiagonal<RANK>::Ranges Tridiagonal<RANK>::fillRanges(const typ
 {
   Ranges res;
   
-  mpl::for_each<tmptools::Ordinals<RANK> >(FillRangesHelper(res,ubound,differences_));
+  mpl::for_each<mpl::range_c<int,0,RANK>>(FillRangesHelper(res,ubound,differences_));
   return res;
 }
 
@@ -222,13 +226,13 @@ void Tridiagonal<RANK>::apply(const StateVectorLow& psi, StateVectorLow& dpsidt)
 {
   static const int step=tmptools::Power_v<3,RANK-1>;
 
-  using tmptools::Vector, tmptools::integral_c;
+  using mpl::vector_c; using tmptools::integral_c;
 
   const Ranges ranges(fillRanges(psi.ubound()));
 
-  doApply<0*step,Vector<0>,Vector<0>,Vector<0> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
-  doApply<1*step,Vector<2>,Vector<1>,Vector<1> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
-  doApply<2*step,Vector<1>,Vector<1>,Vector<2> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
+  doApply<0*step,vector_c<int,0>,vector_c<int,0>,vector_c<int,0> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
+  doApply<1*step,vector_c<int,2>,vector_c<int,1>,vector_c<int,1> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
+  doApply<2*step,vector_c<int,1>,vector_c<int,1>,vector_c<int,2> >(integral_c<RANK-1>(),ranges,psi,dpsidt);
 
 }
 
