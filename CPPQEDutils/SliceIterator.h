@@ -138,10 +138,10 @@ constexpr auto transposingIndeces(RetainedAxes ra=RetainedAxes{})
  * ~~~
  * that is, in place of the indices specified by the elements of the compile-time vector `Vec`, the elements of `Vec` are put, but in the *order* specified by `Vec`.
  */
-template<typename RetainedAxes, typename ARRAY>
+template<int RANK, typename RetainedAxes, typename ARRAY>
 ARRAY& transpose(ARRAY& array, RetainedAxes ra=RetainedAxes{})
 {
-  hana::unpack(transposingIndeces<Rank_v<ARRAY>>(ra),[&](auto && ... i) -> void {array.transposeSelf(std::forward<std::decay_t<decltype(i)>>(i)...);});
+  hana::unpack(transposingIndeces<RANK>(ra),[&](auto && ... i) -> void {array.transposeSelf(std::forward<std::decay_t<decltype(i)>>(i)...);});
   return array;
 }
 
@@ -241,7 +241,7 @@ public:
   {
     if constexpr (!IS_END) {
       array_.reference(array);
-      transpose(array_,RetainedAxes{});
+      transpose<RANK>(array_,RetainedAxes{});
     }
   }
 
@@ -303,7 +303,7 @@ public:
   template <bool IS_END>
   BaseSpecial(const ARRAY<RANK>& array, std::bool_constant<IS_END> ie) : BaseTrivial<ARRAY,RetainedAxes>(array,ie)
   {
-    if constexpr (!IS_END) transpose(this->array_,RetainedAxes{});
+    if constexpr (!IS_END) transpose<RANK>(this->array_,RetainedAxes{});
   }
 
 };
