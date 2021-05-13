@@ -91,7 +91,7 @@ endmacro()
 
 add_subdirectory(compilefail)
 add_subdirectory(boost)
-#add_subdirectory(compile)
+add_subdirectory(compile)
 #add_subdirectory(cpypyqed)
 
 if( PYTHONIC_TESTDRIVER_ENABLED )
