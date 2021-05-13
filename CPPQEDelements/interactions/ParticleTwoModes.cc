@@ -2,7 +2,7 @@
 #include "ParticleTwoModes_.h"
 
 #include "MathExtensions.h"
-#include "SliceIterator.tcc"
+#include "SliceIterator.h"
 #include "Tridiagonal.tcc"
 #include "TridiagonalHamiltonian.h"
 

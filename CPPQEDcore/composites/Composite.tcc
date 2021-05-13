@@ -8,7 +8,7 @@
 #include "LazyDensityOperator.h"
 
 #include "Algorithm.h"
-#include "SliceIterator.tcc"
+#include "SliceIterator.h"
 
 #include <boost/mpl/for_each.hpp>
 

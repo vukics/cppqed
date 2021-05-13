@@ -298,12 +298,22 @@ template <int RANK>
 constexpr auto ArrayRank_v<DensityOperator<RANK>> = 2*RANK;
 
 
-template<int RANK, typename ... SubscriptPack>
-auto subscript(const quantumdata::DensityOperator<RANK>& rho, const SubscriptPack&... subscriptPack) ///< for use in cppqedutils::SliceIterator
-{
-  return rho.diagonalSliceIndex(subscriptPack...);
-}
-
 } // quantumdata
+
+
+namespace cppqedutils::sliceiterator {
+
+template<int RANK>
+struct SubscriptMultiArray<quantumdata::DensityOperator<RANK>>
+{
+  template<typename ... SubscriptPack>
+  static auto _(const quantumdata::DensityOperator<RANK>& rho, const SubscriptPack&... subscriptPack)
+  {
+    return rho.diagonalSliceIndex(subscriptPack...);
+  }
+};
+  
+} // cppqedutils::sliceiterator
+
 
 #endif // CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED

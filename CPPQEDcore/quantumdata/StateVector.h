@@ -218,13 +218,22 @@ dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 template <int RANK>
 constexpr auto ArrayRank_v<StateVector<RANK>> = RANK;
 
-
-template<int RANK, typename ... SubscriptPack>
-auto subscript(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cppqedutils::SliceIterator
-{
-  return psi.sliceIndex(subscriptPack...);
-}
-
 } // quantumdata
+
+
+namespace cppqedutils::sliceiterator {
+
+template<int RANK>
+struct SubscriptMultiArray<quantumdata::StateVector<RANK>>
+{
+  template<typename ... SubscriptPack>
+  static auto _(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cppqedutils::SliceIterator
+  {
+    return psi.sliceIndex(subscriptPack...);
+  }
+};
+  
+} // cppqedutils::sliceiterator
+
 
 #endif // CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED

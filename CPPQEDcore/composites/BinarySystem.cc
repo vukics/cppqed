@@ -6,7 +6,7 @@
 #include "StateVector.h"
 
 #include "Algorithm.h"
-#include "SliceIterator.tcc"
+#include "SliceIterator.h"
 
 #include "BlitzTiny.h"
 

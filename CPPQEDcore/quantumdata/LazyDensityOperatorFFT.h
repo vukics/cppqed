@@ -7,7 +7,7 @@
 
 #include "CMatrix.h"
 #include "FFT.h"
-#include "SliceIterator.tcc"
+#include "SliceIterator.h"
 
 #include <boost/range/algorithm/for_each.hpp>
 

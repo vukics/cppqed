@@ -5,7 +5,7 @@
 
 #include "ContainerIO.h"
 #include "MathExtensions.h"
-#include "SliceIterator.tcc"
+#include "SliceIterator.h"
 
 using namespace std;
 using namespace cppqedutils;

@@ -12,7 +12,7 @@
 #include "BlitzTinyExtensions.h"
 #include "ComplexExtensions.h"
 #include "MathExtensions.h"
-#include "SliceIterator.tcc"
+#include "SliceIterator.h"
 
 #include <memory>
 #include <numeric>
