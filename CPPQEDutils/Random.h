@@ -25,6 +25,7 @@
 #include <random>
 #include <stdexcept>
 #include <sstream>
+#include <optional>
 
 
 namespace randomutils {
