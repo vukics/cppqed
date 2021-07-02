@@ -42,13 +42,13 @@ void checkConsistency(RetainedAxes ra=RetainedAxes{})
 {
   using namespace hana; using namespace literals;
 
-  BOOST_HANA_CONSTANT_ASSERT_MSG ( maximum(ra) < int_c<RANK> , "Too large element" );
-  BOOST_HANA_CONSTANT_ASSERT_MSG ( minimum(ra) >= 0_c , "Negative element" );
+  static_assert ( maximum(ra) < int_c<RANK> , "Too large element" );
+  static_assert ( minimum(ra) >= 0_c , "Negative element" );
 
   if constexpr ( Sequence<RetainedAxes>::value ) {
     static constexpr auto sorted = sort(ra);
     
-    BOOST_HANA_CONSTANT_ASSERT_MSG ( unique(sorted) == sorted , "Duplicates found" );
+    static_assert ( unique(sorted) == sorted , "Duplicates found" );
   }
 }
 
@@ -58,7 +58,7 @@ void checkConsistency(RetainedAxes ra=RetainedAxes{})
  * \tparamRANK
  * \tparam RetainedAxes compile-time vector specifying the subsystem (cf. \ref specifyingsubsystems)
  * 
- * \param idx the indices to be filtered (of number `RANK`)
+ * \param idx the indices to be filtered (of size `RANK`)
  * 
  * \return the indices *not* contained by the subsystem specified by `RetainedAxes`
  * 
@@ -66,12 +66,10 @@ void checkConsistency(RetainedAxes ra=RetainedAxes{})
  *     
  *     #include "SliceIterator.h"
  * 
- *     const int RANK=11;
- *     constexpr auto v_c=vector_c<3,6,1,9,7>;
  *     
  *     int main() {
- *       const IdxTiny<RANK> idx{21,2,4,10,11,3,5,9,23,22,7};
- *       const auto filteredIdx{filterOut(idx,v_c)};
+ *       const IdxTiny<11> idx{21,2,4,10,11,3,5,9,23,22,7};
+ *       const auto filteredIdx{filterOut(idx,tmptools::vector_c<3,6,1,9,7>)};
  *       assert( all( filteredIdx==IdxTiny<6>{21,4,11,3,23,7} ) );
  *     }
  * 
@@ -128,15 +126,14 @@ constexpr auto transposingIndeces(RetainedAxes ra=RetainedAxes{})
  * 
  * ARRAY<RANK> psi;
  * 
- * typedef tmptools::Vector<3,6,1,9,7> Vec;
- * 
- * Transposer<ARRAY<RANK>,Vec>::_(psi);
+ * transpose<RANK>(psi,tmptools::vector_c<3,6,1,9,7>);
  * ~~~
  * is equivalent to ::
  * ~~~
  * psi.transposeSelf(0,3,2,6,4,5,1,9,8,7,10);
  * ~~~
- * that is, in place of the indices specified by the elements of the compile-time vector `Vec`, the elements of `Vec` are put, but in the *order* specified by `Vec`.
+ * that is, in place of the indices specified by the elements of the compile-time vector `RetainedAxes`,
+ * the elements of `RetainedAxes` are put, but in the *order* specified by this tuple.
  */
 template<int RANK, typename RetainedAxes, typename ARRAY>
 ARRAY& transpose(ARRAY& array, RetainedAxes ra=RetainedAxes{})
@@ -161,7 +158,7 @@ auto slicingTuple(RetainedAxes ra=RetainedAxes{})
 
 /// Performs the slicing on an array already transposed
 /**
- * \return Reference to resArray,*this
+ * \return Reference to resArray
  * 
  * \par Semantics
  * ~~~
@@ -323,7 +320,7 @@ public:
 /**
  * \tparam ARRAY the array to operate on, practically either a blitz::Array, or a quantumdata::StateVector or quantumdata::DensityOperator
  * \tparam RANK positive integer standing for the number of elementary Hilbert spaces
- * \tparam V compile-time vector holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$ \ref retainedindexpositionsdefined "here". (Cf. \ref specifyingsubsystems)
+ * \tparam RetainedAxes compile-time tuple holding the *retained index positions* like \f$\avr{3,6,1,9,7}\f$ \ref retainedindexpositionsdefined "here". (Cf. \ref specifyingsubsystems)
  * 
  * To understand the template parameters, cf. also \ref multiarrayconcept.
  * 
@@ -353,22 +350,14 @@ public:
  * ~~~
  * void actOnExtended(CArray<11>& psi)
  * {
- *   boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<3,6,1,9,7> >(psi),
- *                   actWithA);
+ *   for (auto&& psiS : cppqedutils::sliceiterator::fullRange<tmptools::Vector<3,6,1,9,7> >(psi)) actWithA(psiS);
  * }
  * ~~~
  * 
- * \see cppqedutils::sliceiterator::fullRange and the \refBoostConstruct{for_each,range/doc/html/range/reference/algorithms/non_mutating/for_each.html} algorithm of Boost.Range.
- * 
- * For further basic examples of usage cf. `utils/testsuite/BlitzArraySliceIterator.cc` & `utils/testsuite/BlitzArraySliceIteratorTMP.cc`.
- * 
- * \see \ref iteratorimplementation
+ * \see cppqedutils::sliceiterator::fullRange
  * 
  * \todo Implement a default version of SliceIterator for the case when neither slicing nor transposition is necessary, that is when `V` is equivalent to a range<0,RANK-1>.
  * This will require further compile-time implementation selection.
- *
- * \todo Refine the iterator category according to the \refBoost{New-Style iterator concepts,iterator/doc/index.html#new-style-iterators}.
- * The point is that a multi-array is not a container of slices, so SliceIterator is definitely not a standard iterator. It seems rather like a proxy iterator.
  *
  */
 template<template <int> class ARRAY, int RANK, typename RetainedAxes>
@@ -417,101 +406,26 @@ auto fullRange(const ARRAY<RANK>& array)
 }
 
 
-
-/** \page iteratorimplementation Notes on the implementation of SliceIterator
- * 
- * \tableofcontents 
- * 
- * Transposer and Indexer are implemented in such a way that a partial template specialization is provided for each possible `RANK` (up to #BLITZ_ARRAY_LARGEST_RANK), 
- * and the corresponding code is automatically generated by the \refBoost{Boost.Preprocessor,preprocessor/doc/index.html} library.
- * This can be seen in the trailing part of BlitzArraySliceIterator.h. To actually see what code is generated, this file needs to be preprocessed.
- * Issue the following command from the root directory of the distribution:
- * ~~~{.sh}
- * g++ -P -E -Iutils/ utils/BlitzArraySliceIterator.h | tail -n286
- * ~~~
- * To store and manipulate the heterogenous collection of slicing indices like `0,a,2,a,4,5,a,a,8,a,10` in Indexer::_, the `vector` class of the 
- * \refBoost{Boost.Fusion,fusion/doc/html/index.html} library is used.
- * 
- * SliceIterator is implemented in terms of the above two helper classes. Each SliceIterator invokes a Transposer::_ at its construction, and – if `RANK` is larger
- * than `Size_v<V>` – an Indexer::_ @ the point of its dereferencing when the actual slicing occurs.
- * 
- * SliceIterator is a forward iterator, implemented with the help of \refBoostConstruct{forward_iterator_helper,utility/operators.htm#iterator} from Boost.Operator.
- * For this to work, we need to define only 3 operations:
- * -# Comparison for equality
- * -# Prefix increment
- * -# Dereferencing
- * A special implementation is needed when the size of the compile-time vector `V` equals `RANK` because in this case actually no slicing takes place,
- * only transposition. For this, as at several other places in the framework, we apply conditional inheritance: SliceIterator inherits from either of two classes 
- * (details::Base or details::BaseSpecial).
- * 
- * The iteration over dummy indices is implemented with the help of cppqedutils::MultiIndexIterator.
- * 
- * A metaprogramming example {#metaprogrammingexample}
- * =========================
- * 
- * In the following we analyse a metaprogramming example typical for the framework: how the compile-time vector `0,3,2,6,4,5,1,9,8,7,10`
- * for the self-transposition in Transposer::_ is prepared.
- * 
- * This is done by the following snippet in `utils/BlitzArraySliceIterator.h`: \dontinclude BlitzArraySliceIterator.h
- * \skip namespace namehider {
- * \until fold
- * We are using the \refBoostConstruct{fold,mpl/doc/refmanual/fold.html} metaalgorithm from Boost.MPL.
- * Here, it iterates over the sequence of ordinals (tmptools::Ordinals) between `0` and `RANK-1`.
- * \until vector_c
- * The initial state for the fold algorithm is an empty \refBoost{compile-time vector of integers,mpl/doc/refmanual/vector-c.html}
- * and the \refBoost{iterator,mpl/doc/refmanual/begin.html} pointing to the first element of the compile-time vector `V`. 
- * These two are “zipped” into a \refBoost{compile-time pair,mpl/doc/refmanual/pair.html}.
- * At the end, the first element of this pair will hold the result.
- * 
- * The rest expresses the forward operation of the fold algorithm in the form of a \refBoost{compile-time lambda expression,mpl/doc/tutorial/handling-placeholders.html}.
- * After each step, the new state will again be a pair composed of
- * \until _2
- * \until _1
- * \until _2
- * \until >,
- * i. the vector is \refBoost{augmented,mpl/doc/refmanual/push-back.html} either by the current element in `V` pointed to by the iterator (Line 13), or the current ordinal (Line 14),
- * depending on whether `V` tmptools::numerical_contains this ordinal.
- * \until second
- * \until >
- * \until >
- * ii. the iterator is \refBoost{advanced,mpl/doc/refmanual/next.html} (Line 18) if the same numerical containment criterion is met,
- * otherwise it is left untouched for the same element to be considered again (Line 19).
- * \note In template metaprogramming, “calling” tmptools::numerical_contains<V,mpl::_2> twice is no waste because the second time no further template 
- * instantiations are needed, the compiler will use the ones already instantiated the first time.
- * 
- * \until TransposerMeta
- * \until {};
- * the \refBoost{first element,mpl/doc/refmanual/trivial-metafunctions-summary.html#first} of the resulting pair of the above algorithm is picked. As it is easy to verify,
- * ~~~
- * TransposerMeta<11,tmptools::Vector<3,6,1,9,7> >::type
- * ~~~
- * will be an
- * ~~~
- * mpl::vector_c<int,0,3,2,6,4,5,1,9,8,7,10>
- * ~~~  
- */
-
 /** \page specifyingsubsystems Specifying subsystems
  * 
- * Many constructs in the framework require the specification of a subsystem of a multiary quantum system @ compile time. The main example is retained index positions for slicing
- * (cf. \ref multiarrayconcept). It is the template parameter `V`, a compile-time sequence, that specifies the subsystem.
+ * It is assumed throughout that RetainedAxes is given as a `hana::tuple_c<int,...>` or `hana::range_c<int,...>`
+ * Since the type of such an object is a `final` class, it is safe to assume that it is default-constructible 
  * 
- * \par Example models
- * 
- * tmptools::Vector and \refBoostConstruct{range_c,mpl/doc/refmanual/range-c.html} from Boost.MPL.
+ * Many constructs in the framework require the specification of a subsystem of a quantum system of arbitrary arity @ compile time.
+ * The main example is retained index positions for slicing (cf. \ref multiarrayconcept).
+ * It is the template parameter `RetainedAxes`, a compile-time sequence, that specifies the subsystem.
  * 
  * \par Preconditions
  * 
- * - `Size_v<V>` must not be larger than the arity
- * - `V` must not “contain”
- *   - negative values,
- *   - values not smaller than the arity, and
- *   - duplicate values.
+ * `RetainedAxes` must not contain
+ * - negative values,
+ * - values not smaller than the arity, and
+ * - duplicate values.
+ * These imply that the size of `RetainedAxes` cannot be greater than `RANK`.
  * 
- * These are checked for @ compile time, and any violation is signalled by more or less intelligent compiler errors generated with the help of
- * \refBoost{Boost.MPL's static assertions,mpl/doc/refmanual/asserts.html}.
+ * These are checked for @ compile time, and any violation is signalled by assertions from Boost.Hana
  * 
- * \see ConsistencyChecker, tmptools::Vector
+ * \see checkConsistency
  * 
  */
 

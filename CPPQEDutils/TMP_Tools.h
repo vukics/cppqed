@@ -125,23 +125,6 @@ using Ordinals = decltype(ordinals<end>);
 
 
 
-/*
-template<int RANK, typename V>
-struct ExtendVector : boost::mpl::fold<V,
-                                       V,
-                                       boost::mpl::push_back<boost::mpl::_1,
-                                                             boost::mpl::plus<boost::mpl::_2,
-                                                                              boost::mpl::int_<RANK>
-                                                                             >
-                                                            >
-                                      >
-{};
-
-
-template<int RANK, typename V>
-using ExtendVector_t = typename ExtendVector<RANK,V>::type;
-*/
-
 template <typename Sequence>
 using CopyToVector=typename boost::mpl::copy<Sequence,boost::mpl::back_inserter<V_Empty> >::type;
 

@@ -61,20 +61,6 @@ auto composite::fillFrees(const VA& acts)
 }
 
 
-template<int RANK>
-auto composite::RankedBase<RANK>::fillDimensions(const Frees& frees)
-{
-  typename composite::RankedBase<RANK>::Dimensions res;
-  
-  mpl::for_each<Ordinals>([&](auto t) -> void {
-    static const int idx=decltype(t)::value;
-    res(idx)=frees[idx].get()->getDimension();
-  });
-  
-  return res;
-}
-
-
 
 /////////////
 //

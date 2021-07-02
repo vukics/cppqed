@@ -3,61 +3,64 @@
 #ifndef   CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
 #define   CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
 
-#include "Act.h"
-
-#include "SliceIterator.h"
-// This is included at this point mainly to pull in necessary TMP tools
-
 #include "SubSystem.h"
 
-#include "details_TMP_helpers.h"
-
-#include <boost/fusion/container/generation/make_list.hpp>
+#include "SliceIterator.h"
 
 #include <array>
 
+
 namespace composite {
 
-using boost::fusion::make_list;
 
 using ::size_t; using ::structure::Averages; using ::structure::Rates;
 
-namespace result_of {
 
-using boost::fusion::result_of::make_list;
-
-} // result_of
-
-
-template<typename VA>
-constexpr int MaxRank_v=MaxMF_t<MaxMF_t<VA,SeqLess<mpl::_1,mpl::_2>>>::value;
-
-
-
-template<int N_RANK>
-// Factoring out code that depends only on RANK:
-class RankedBase : public structure::QuantumSystem<N_RANK>
+/// Helper class to Composite (an Act)
+/**
+ * It combines a set of \link retainedindexpositionsdefined retained index positions\endlink (via its tmptools::Vector base) with a certain structure::Interaction element
+ * (via the SubSystemsInteraction base) of the corresponding arity (equalling the number of retained index positions) – this means that the given structure::Interaction
+ * element will act on the given retained index positions.
+ *
+ * Composite expects a \refBoost{Boost.Fusion,fusion} sequence as its template argument `Acts`.
+ *
+ * \tparam RetainedAxes has the same role as in tmptools::Vector
+ */
+template<int... RetainedAxes>
+class _
+  : public SubSystemsInteraction<sizeof...(RetainedAxes)>
 {
 public:
-  static const int RANK=N_RANK;
+  explicit _(typename structure::InteractionPtr<sizeof...(RetainedAxes)> ia) : SubSystemsInteraction<sizeof...(RetainedAxes)>(ia) {}
 
-  typedef std::shared_ptr<const RankedBase<RANK> > Ptr;
+  constexpr operator tmptools::Vector<RetainedAxes...>() const {return tmptools::vector<RetainedAxes...>;};
+  
+};
 
-  typedef std::array<SubSystemFree,RANK> Frees;
 
-  typedef structure::QuantumSystem<RANK> QS_Base;
+template<typename Acts>
+constexpr int calculateRank(Acts acts = Acts{})
+{
+  return hana::maximum(hana::maximum(hana::maximum(acts, [&](auto&& a, auto&& b) {return hana::maximum(a)<hana::maximum(b);}))) + 1;
+}
 
-  typedef typename QS_Base::Dimensions Dimensions;
 
-  typedef tmptools::Ordinals<RANK> Ordinals;
+template<int RANK>
+// Factoring out code that depends only on RANK:
+class RankedBase : public structure::QuantumSystem<RANK>
+{
+public:
+  static const int N_RANK = RANK;
 
-private:
-  // Constructor helper
-  static auto fillDimensions(const Frees&);
+  using Frees = std::array<SubSystemFree,RANK> ;
 
 protected:
   explicit RankedBase(const Frees& frees)
-    : QS_Base(fillDimensions(frees)), frees_(frees) {}
+    : structure::QuantumSystem<RANK>([&] () {
+        typename structure::QuantumSystem<RANK>::Dimensions res;
+        hana::for_each(tmptools::ordinals<RANK>,[&](auto t) {res(t)=frees[t].get()->getDimension();});
+        return res;
+    }()), frees_(frees) {}
   
   const Frees& getFrees() const {return frees_;}
 
@@ -67,48 +70,39 @@ private:
 };
 
 
-template<typename VA>
-// VA should model a fusion sequence of Acts
+template<typename Acts> // Acts should be a hana::tuple of Acts
 class Base
-  : public RankedBase<MaxRank_v<VA>+1>,
-    public structure::Averaged<MaxRank_v<VA>+1>
+  : public RankedBase<calculateRank<Acts>()>,
+    public structure::Averaged<calculateRank<Acts>()>
 {
 public:
-  typedef std::shared_ptr<const Base<VA> > Ptr;
-  
   // The calculated RANK
-  static const int RANK=MaxRank_v<VA>+1;
+  static constexpr int RANK = calculateRank<Acts>;
 
 private:
-  // Compile-time sanity check
-  static_assert( composite::CheckMeta_v<RANK,VA> == true , "Composite not consistent" );
+  using Frees = typename RankedBase<RANK>::Frees; using RankedBase<RANK>::getFrees;
+  
+  // Compile-time sanity check: each ordinal up to RANK has to be contained by at least one act.
+  // (That is, no free system can be left out of the network of interactions)
+  static_assert( hana::fold (tmptools::ordinals<RANK>, hana::true_c, [](auto state, auto ordinal) {
+    return state && hana::fold (Acts{}, hana::false_c, [o=ordinal](auto state, auto act) {return state || hana::contains(act,o);}); }
+  ) == true , "Composite not consistent" );
 
 public:
-  // Public types
-  typedef VA Acts;
-
-  typedef RankedBase<RANK> RBase;
-  typedef structure::Averaged<RANK> Av_Base;
-
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
-  typedef typename RBase::Frees Frees;
-  typedef typename RBase::Ordinals Ordinals;
-  
   template<structure::LiouvilleanAveragedTag>
-  static std::ostream& streamKeyLA(std::ostream&, size_t&, const Frees&, const VA& acts);
+  static std::ostream& streamKeyLA(std::ostream&, size_t&, const Frees&, const Acts& acts);
 
   template<structure::LiouvilleanAveragedTag>
-  static size_t nAvrLA(const Frees& frees, const VA& acts);
+  static size_t nAvrLA(const Frees& frees, const Acts& acts);
 
   template<structure::LiouvilleanAveragedTag>
-  static const Averages averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr);
+  static const structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo, const Frees& frees, const Acts& acts, size_t numberAvr);
 
 protected:
   // Constructor
-  explicit Base(const Frees& frees, const VA& acts) : RBase(frees), frees_(RBase::getFrees()), acts_(acts) {}
+  explicit Base(const Frees& frees, const Acts& acts) : RankedBase<RANK>(frees), acts_(acts) {}
     
-  const VA& getActs() const {return acts_;}
+  const Acts& getActs() const {return acts_;}
 
 private:
   // Implementing QuantumSystem interface
@@ -118,36 +112,35 @@ private:
 
   // Implementing Av_Base
 
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const {return streamKeyLA<structure::LA_Av>(os,i, frees_,acts_ );}
-  size_t nAvr_v() const {return nAvrLA<structure::LA_Av>( frees_,acts_ );}
-  const Averages average_v(double t, const LazyDensityOperator& ldo) const {return averageLA<structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const {return streamKeyLA<structure::LA_Av>(os,i, getFrees() ,acts_ );}
+  size_t nAvr_v() const {return nAvrLA<structure::LA_Av>( getFrees(),acts_ );}
+  const structure::Averages average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return averageLA<structure::LA_Av>(t,ldo,getFrees(),acts_,nAvr_v());}
   
-  void process_v(Averages&) const;
-  std::ostream& stream_v(const Averages&, std::ostream&, int) const;
+  void process_v(structure::Averages&) const;
+  std::ostream& stream_v(const structure::Averages&, std::ostream&, int) const;
 
-  const Frees& frees_;
-  const VA acts_;
+  const Acts acts_;
 
 };
 
 
 // Constructor helper
-template<typename VA>
-auto fillFrees(const VA& acts);
+template<typename Acts>
+auto fillFrees(const Acts& acts);
 
 
 
-template<typename VA>
-const typename Base<VA>::Ptr doMake(const VA&);
+template<typename Acts>
+const typename Base<Acts>::Ptr doMake(const Acts&);
 
 
 
-template<typename VA>
+template<typename Acts>
 class Exact
-  : public structure::Exact<MaxRank_v<VA>+1>
+  : public structure::Exact<MaxRank_v<Acts>+1>
 {
 private:
-  static const int RANK=MaxRank_v<VA>+1;
+  static const int RANK=MaxRank_v<Acts>+1;
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
@@ -156,24 +149,24 @@ private:
   typedef tmptools::Ordinals<RANK> Ordinals;
 
 protected:
-  Exact(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
+  Exact(const Frees& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
 
 private:
   void actWithU_v(double, StateVectorLow&, double) const;
   bool applicableInMaster_v( ) const;
 
   const Frees& frees_;
-  const VA & acts_;
+  const Acts & acts_;
 
 };
 
 
-template<typename VA>
+template<typename Acts>
 class Hamiltonian
-  : public structure::Hamiltonian<MaxRank_v<VA>+1>
+  : public structure::Hamiltonian<MaxRank_v<Acts>+1>
 {
 private:
-  static const int RANK=MaxRank_v<VA>+1;
+  static const int RANK=MaxRank_v<Acts>+1;
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
@@ -182,23 +175,23 @@ private:
   typedef tmptools::Ordinals<RANK> Ordinals;
 
 protected:
-  Hamiltonian(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
+  Hamiltonian(const Frees& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
 
 private:
   void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
 
   const Frees& frees_;
-  const VA & acts_;
+  const Acts & acts_;
 
 };
 
 
-template<typename VA>
+template<typename Acts>
 class Liouvillean
-  : public structure::Liouvillean<MaxRank_v<VA>+1>
+  : public structure::Liouvillean<MaxRank_v<Acts>+1>
 {
 private:
-  static const int RANK=MaxRank_v<VA>+1;
+  static const int RANK=MaxRank_v<Acts>+1;
 
   typedef std::array<SubSystemFree,RANK> Frees;
 
@@ -210,20 +203,20 @@ private:
   typedef tmptools::Ordinals<RANK> Ordinals;
 
 protected:
-  Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
+  Liouvillean(const Frees& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<VA>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<Acts>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
   
-  size_t nAvr_v() const override {return Base<VA>::template nAvrLA<structure::LA_Li>(frees_,acts_);}
+  size_t nAvr_v() const override {return Base<Acts>::template nAvrLA<structure::LA_Li>(frees_,acts_);}
   
-  const Rates average_v(double t, const LazyDensityOperator& ldo) const override {return Base<VA>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
+  const Rates average_v(double t, const LazyDensityOperator& ldo) const override {return Base<Acts>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
   void actWithJ_v(double, StateVectorLow&, size_t) const override;
   void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override;
 
   const Frees& frees_;
-  const VA & acts_;
+  const Acts & acts_;
 
 };
 
@@ -232,8 +225,8 @@ template<typename>
 class EmptyBase
 {
 public:
-  template<typename VA>
-  EmptyBase(const std::array<SubSystemFree,MaxRank_v<VA>+1>&, const VA&) {}
+  template<typename Acts>
+  EmptyBase(const std::array<SubSystemFree,MaxRank_v<Acts>+1>&, const Acts&) {}
   
 };
 
@@ -242,7 +235,7 @@ public:
 
 
 
-#define BASE_class(Aux,Class) std::conditional_t<IS_##Aux,composite::Class<VA>,composite::EmptyBase<composite::Class<VA>>>
+#define BASE_class(Aux,Class) std::conditional_t<IS_##Aux,composite::Class<Acts>,composite::EmptyBase<composite::Class<Acts>>>
 
 /// Class representing a full-fledged composite quantum system defined by a network of \link composite::_ interactions\endlink
 /**
@@ -294,27 +287,27 @@ public:
  * This is followed by a check at runtime, when the actual elements become available, whether the legs of the composite::_ objects are consistent among each other.
  * Cf. composite::FillFrees::Inner::operator().
  *
- * \tparam VA should model a \refBoost{Boost.Fusion list,fusion/doc/html/fusion/container/list.html} of composite::_ objects
+ * \tparam Acts should model a \refBoost{Boost.Fusion list,fusion/doc/html/fusion/container/list.html} of composite::_ objects
  * \tparam IS_EX governs whether the class should inherit from composite::Exact
  * \tparam IS_HA governs whether the class should inherit from composite::Hamiltonian
  * \tparam IS_LI governs whether the class should inherit from composite::Liouvillean
  */
-template<typename VA, bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
-// VA should model a fusion sequence of Acts
+template<typename Acts, bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
+// Acts should model a fusion sequence of Acts
 class Composite
-  : public composite::Base<VA>,
+  : public composite::Base<Acts>,
     public BASE_class(EX,Exact),
     public BASE_class(HA,Hamiltonian),
     public BASE_class(LI,Liouvillean)
 {
 public:
-  typedef composite::Base<VA> Base;
+  typedef composite::Base<Acts> Base;
   
   typedef BASE_class(EX,Exact) ExactBase;
   typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
   typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
   
-  typedef typename composite::Base<VA>::Frees Frees;
+  typedef typename composite::Base<Acts>::Frees Frees;
   
   // The calculated RANK
   static const int RANK=Base::RANK;
@@ -323,17 +316,17 @@ private:
   using Base::getFrees; using Base::getActs ;
   
 public:
-  Composite(const Frees& frees, const VA& acts)
+  Composite(const Frees& frees, const Acts& acts)
     : Base(frees ,acts),
       ExactBase(getFrees(),getActs()),
       HamiltonianBase(getFrees(),getActs()),
       LiouvilleanBase(getFrees(),getActs()) {}
 
   // Constructor
-  explicit Composite(const VA& acts)
+  explicit Composite(const Acts& acts)
     : Composite(composite::fillFrees(acts),acts) {}
 
-  friend const typename composite::Base<VA>::Ptr composite::doMake<VA>(const VA&);
+  friend const typename composite::Base<Acts>::Ptr composite::doMake<Acts>(const Acts&);
 
   // Note that Frees and Acts are stored by value in Base
 
@@ -368,6 +361,11 @@ auto make(const Acts&... acts)
 
 
 } // composite
+
+
+/// Template alias for backward compatibility
+template<int... RetainedAxes>
+using Act = composite::_<RetainedAxes...>;
 
 
 #endif // CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
