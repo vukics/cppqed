@@ -19,7 +19,6 @@ private:
   typedef structure::ClonableElementAveraged<RANK> Base;
 
 public:
-  typedef typename Base::Averages Averages;
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
   
   typedef typename Base::KeyLabels KeyLabels;
@@ -36,7 +35,7 @@ private:
   Base*const do_clone() const {return new ReducedDensityOperator(*this);}
 
 protected:
-  const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
+  const structure::Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
 
 private:
   const bool offDiagonals_;
@@ -50,7 +49,6 @@ class ReducedDensityOperatorNegativity : public ReducedDensityOperator<RANK>
 public:
   typedef ReducedDensityOperator<RANK> Base;
   typedef typename Base::Dimensions Dimensions;
-  typedef typename Base::Averages Averages;
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
   
   using Base::getDimensions; using Base::getTotalDimension;
@@ -59,8 +57,8 @@ public:
     : Base(label,dim,true,boost::assign::list_of("negativity")) {}
 
 private:
-  const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
-  void           process_v(                   Averages&                 ) const;
+  const structure::Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
+  void process_v(structure::Averages&) const;
   
 };
 
@@ -68,6 +66,9 @@ private:
 namespace averagingUtils {
 
 
+using structure::Averages;
+
+  
 template<int RANK, bool IS_TIME_DEPENDENT=false>
 class Collecting : public structure::ClonableElementAveraged<RANK,IS_TIME_DEPENDENT>
 {
@@ -80,7 +81,6 @@ public:
 
   typedef typename Base::KeyLabels KeyLabels;
 
-  typedef structure::AveragedCommon::Averages Averages;
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
   typedef typename Base::Time Time;
@@ -111,7 +111,6 @@ private:
   typedef structure::AveragedTimeDependenceDispatched<RANKFROM,IS_TIME_DEPENDENT> Base;
   
 public:
-  typedef typename Base::Averages            Averages           ;
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
   typedef typename Base::Time Time;

@@ -139,18 +139,16 @@ template size_t nAvr< LA_Av >(const SSF& free0, const SSF& free1, const SSI& ia)
 
 
 template<LiouvilleanAveragedTag LA>
-const Base::Averages average(double t, const Base::LazyDensityOperator& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr)
+const Averages average(double t, const Base::LazyDensityOperator& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr)
 {
-  typedef Base::Averages ArrayName;
-  
   using boost::copy;
 
-  const ArrayName
+  const Averages
     a0 {quantumdata::partialTrace<V0>(ldo,[&](const auto& m){return free0.average<LA>(t,m);})},
     a1 {quantumdata::partialTrace<V1>(ldo,[&](const auto& m){return free1.average<LA>(t,m);})},
     a01{ia.average<LA>(t,ldo)};
 
-  ArrayName a(numberAvr);
+  Averages a(numberAvr);
 
   copy(a01,copy(a1,copy(a0,a.begin())));
 

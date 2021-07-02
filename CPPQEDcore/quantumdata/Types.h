@@ -6,6 +6,13 @@
 #include "BlitzArray.h"
 
 
+namespace structure {
+
+using Averages = DArray<1>; using Rates = Averages;
+
+} // structure
+
+
 namespace quantumdata {
 
 template<int RANK>

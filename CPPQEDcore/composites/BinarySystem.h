@@ -18,6 +18,7 @@ typedef structure::Interaction<2> Interaction; ///< Binary interaction
 typedef composite::SubSystemFree SSF; ///< Convenience typedef
 typedef composite::SubSystemsInteraction<2> SSI; ///< Convenience typedef
 
+using structure::Averages; using structure::Rates;
 
 /// Outfactored common functionality of Liouvillean and Averaged
 template<structure::LiouvilleanAveragedTag>
@@ -29,7 +30,7 @@ size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia);
 
 /// Outfactored common functionality of Liouvillean and Averaged
 template<structure::LiouvilleanAveragedTag>
-const structure::LiouvilleanAveragedCommon::DArray1D
+const Averages
 average(double t, const quantumdata::LazyDensityOperator<2>& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr);
 
 

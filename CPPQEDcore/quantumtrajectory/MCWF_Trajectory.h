@@ -91,7 +91,7 @@ private:
 public:
   MCWF_Trajectory(const MCWF_Trajectory&) = default; MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
-  using StreamedArray=structure::AveragedCommon::Averages;
+  using StreamedArray=structure::Averages;
 
   typedef structure::Exact      <RANK> Exact      ;
   typedef structure::Hamiltonian<RANK> Hamiltonian;
@@ -117,7 +117,7 @@ public:
     // std::cout<<"# initial timestep: "<<ode_.getDtTry()<<std::endl;
     if (psi!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
     if (const auto li=this->getLi(); bool(li) && !t_)  { // On startup, dpLimit should not be overshot, either.
-      Rates rates(li->rates(0.,psi_)); calculateSpecialRates(&rates);
+      auto rates(li->rates(0.,psi_)); calculateSpecialRates(&rates);
       manageTimeStep(rates,0,0,std::clog,false);
     }
   }
@@ -161,17 +161,16 @@ private:
   typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
 
   typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
-  typedef typename Liouvillean::Rates Rates;
 
   StateVector averaged() const {return psi_;}
 
   void coherentTimeDevelopment(double Dt, std::ostream&);
   
-  const IndexSVL_tuples calculateSpecialRates(Rates* rates) const;
+  const IndexSVL_tuples calculateSpecialRates(structure::Rates* rates) const;
 
-  bool manageTimeStep (const Rates& rates, double tCache, double dtDidCache, std::ostream&, bool logControl=true);
+  bool manageTimeStep (const structure::Rates& rates, double tCache, double dtDidCache, std::ostream&, bool logControl=true);
 
-  void performJump (const Rates&, const IndexSVL_tuples&, std::ostream&); // LOGICALLY non-const
+  void performJump (const structure::Rates&, const IndexSVL_tuples&, std::ostream&); // LOGICALLY non-const
   // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
 
   double t_=0., t0_=0.;
@@ -273,7 +272,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentT
 
 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
-auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculateSpecialRates(Rates* rates) const -> const IndexSVL_tuples
+auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculateSpecialRates(structure::Rates* rates) const -> const IndexSVL_tuples
 {
   IndexSVL_tuples res;
   for (int i=0; i<rates->size(); i++)
@@ -289,7 +288,7 @@ auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculate
 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
 bool quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
-manageTimeStep(const Rates& rates, double tCache, double dtDidCache, std::ostream& logStream, bool logControl)
+manageTimeStep(const structure::Rates& rates, double tCache, double dtDidCache, std::ostream& logStream, bool logControl)
 {
   const double totalRate=boost::accumulate(rates,0.);
   const double dtDid=getDtDid(), dtTry=ode_.getDtTry();
@@ -314,7 +313,7 @@ manageTimeStep(const Rates& rates, double tCache, double dtDidCache, std::ostrea
 
 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
-void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
+void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const structure::Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
   double random=std::uniform_real_distribution()(re_.engine)/getDtDid();
 
@@ -350,7 +349,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(doub
 
   if (const auto li=this->getLi()) {
 
-    Rates rates(li->rates(t_,psi_));
+    auto rates(li->rates(t_,psi_));
     IndexSVL_tuples specialRates=calculateSpecialRates(&rates);
 
     while (manageTimeStep(rates,tCache,dtDidCache,logStream)) {
@@ -386,7 +385,7 @@ std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
     }
     os<<"Alternative Lindblads: ";
     {
-      const Rates rates(li->rates(0,psi_));
+      const auto rates(li->rates(0,psi_));
       int n=0;
       for (int i=0; i<rates.size(); ++i) if (rates(i)<0) {os<<i<<' '; ++n;}
       if (!n) os<<"none";

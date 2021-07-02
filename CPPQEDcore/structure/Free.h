@@ -25,6 +25,8 @@ typedef quantumdata::LazyDensityOperator<1> LazyDensityOperator; ///< unary Lazy
 typedef quantumdata::    StateVector<1>     StateVector; ///< unary StateVector
 typedef quantumdata::DensityOperator<1> DensityOperator; ///< unary DensityOperator
 
+using ::structure::Averages; using ::structure::Rates;
+
 } // freesystem
 
 

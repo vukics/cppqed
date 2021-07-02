@@ -72,14 +72,14 @@ qsa(std::shared_ptr<const T> t)
 
 /// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::stream in succession; otherwise a no-op. \related QuantumSystemWrapper
 template<int RANK>
-std::tuple<std::ostream&, typename Averaged<RANK>::Averages>
+std::tuple<std::ostream&,Averages>
 stream(std::shared_ptr<const Averaged<RANK> > av,
         double t,
         const quantumdata::LazyDensityOperator<RANK>& matrix,
         std::ostream& os,
         int precision)
 {
-  typename Averaged<RANK>::Averages averages;
+  Averages averages;
   if (av) {
     averages.reference(av->average(t,matrix));
     av->process(averages);
@@ -93,7 +93,7 @@ stream(std::shared_ptr<const Averaged<RANK> > av,
 template<int RANK>
 auto average(typename LiouvilleanAveragedCommonRanked<RANK>::Ptr ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
 {
-  return ptr ? ptr->average(t,matrix) : LiouvilleanAveragedCommon::DArray1D();
+  return ptr ? ptr->average(t,matrix) : Averages{};
 }
 
 
@@ -136,12 +136,10 @@ public:
   //@{
   typedef typename Ex::StateVectorLow StateVectorLow;
 
-  typedef typename Li::Rates               Rates              ;
   typedef typename Li::LazyDensityOperator LazyDensityOperator;
 
   typedef typename Li::DensityOperatorLow DensityOperatorLow;
   
-  typedef typename Av::Averages Averages;
   //@}
 
   /// \name Constructors

@@ -56,8 +56,6 @@ public:
 
   typedef typename Base::LazyDensityOperator LazyDensityOperator;
 
-  typedef typename Base::DArray1D Rates; ///< The 1D real array for storing the jump rates
-
   virtual ~Liouvillean() {}
   
   /// Returns the set of jump rates \f$\bra{\Psi}J_m^\dagger J_m\ket{\Psi},\f$ where the Lindblads are in general time-dependent
@@ -97,7 +95,6 @@ public:
   typedef typename Liouvillean<RANK>::StateVectorLow      StateVectorLow     ;
   typedef typename Liouvillean<RANK>::DensityOperatorLow  DensityOperatorLow ;
   typedef typename Liouvillean<RANK>::LazyDensityOperator LazyDensityOperator;
-  typedef typename Liouvillean<RANK>::Rates               Rates              ;
   
   typedef time::DispatcherIsTimeDependent_t<IS_TIME_DEPENDENT> Time;
 

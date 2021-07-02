@@ -33,7 +33,6 @@ class DensityOperatorStreamer
 public:
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  typedef          structure::Averaged<RANK>      Averaged   ;
   typedef typename structure::Averaged<RANK>::Ptr AveragedPtr;
 
   DensityOperatorStreamer(AveragedPtr av, bool negativity) : av_(av), negativity_(negativity) {}

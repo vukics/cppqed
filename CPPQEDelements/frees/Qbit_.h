@@ -12,7 +12,7 @@
 
 namespace qbit {
 
-using mode::NoTime;
+using mode::NoTime; using mode::Averages;
 
 const std::string keyTitle="Qbit";
 

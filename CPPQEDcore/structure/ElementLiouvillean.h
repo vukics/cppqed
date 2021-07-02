@@ -112,7 +112,7 @@ private:
   typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
-#define TYPE_DEFINITION_FORWARD typedef typename Base::StateVectorLow StateVectorLow; typedef typename Base::DensityOperatorLow DensityOperatorLow; typedef typename Base::LazyDensityOperator LazyDensityOperator; typedef typename Base::Rates Rates; typedef typename Base::Time Time;  
+#define TYPE_DEFINITION_FORWARD typedef typename Base::StateVectorLow StateVectorLow; typedef typename Base::DensityOperatorLow DensityOperatorLow; typedef typename Base::LazyDensityOperator LazyDensityOperator; typedef typename Base::Time Time;  
   TYPE_DEFINITION_FORWARD
   
 protected:

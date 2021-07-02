@@ -245,7 +245,7 @@ composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const F
     typename std::list<Averages>::iterator iter(seqAverages.begin());
 
     const auto lambda=[&](auto av, auto v) {
-      iter++->reference(quantumdata::partialTrace<std::decay_t<decltype(v)>>(ldo,[&](const auto& ldoS) -> structure::LiouvilleanAveragedCommon::DArray1D {
+      iter++->reference(quantumdata::partialTrace<std::decay_t<decltype(v)>>(ldo,[&](const auto& ldoS) {
         return structure::average(av,t,ldoS);
       }));
     };

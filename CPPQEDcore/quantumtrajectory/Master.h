@@ -55,7 +55,7 @@ private:
 public:
   Master(Master&&) = default; Master& operator=(Master&&) = default;
 
-  using StreamedArray=structure::AveragedCommon::Averages;
+  using StreamedArray=structure::Averages;
   
   typedef typename quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
 

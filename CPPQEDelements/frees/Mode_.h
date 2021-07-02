@@ -533,7 +533,7 @@ private:
   void   doActWithJ (OneTime, StateVectorLow&           ) const;
   double rate       (OneTime, const LazyDensityOperator&) const;
 
-  const Averages average_v(OneTime, const LazyDensityOperator&) const;
+  const mode::Averages average_v(OneTime, const LazyDensityOperator&) const;
 
   const dcomp z_;
 
