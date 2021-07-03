@@ -22,7 +22,7 @@ private:
   typedef quantumoperator::TridiagonalHamiltonian<3,true> TridiagonalHamiltonian;
   typedef TridiagonalHamiltonian::Tridiagonals            Tridiagonals;
 
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const; 
+  void addContribution_v(double, const quantumdata::StateVectorLow<3>&, quantumdata::StateVectorLow<3>&, double) const override;
 
   mutable quantumoperator::Tridiagonal<3> firstH_, firstHT_;
 

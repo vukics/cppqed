@@ -115,7 +115,8 @@ public:
 
   typedef typename Base::Time Time;
   
-  typedef typename structure::AveragedTimeDependenceDispatched<RANKTO,IS_TIME_DEPENDENT>::Ptr AveragedToPtr;
+  using AveragedToPtr = structure::AveragedPtr<RANKTO> ;
+  
   typedef quantumdata::LazyDensityOperator<RANKTO> LazyDensityOperatorTo;
 
   Transferring(AveragedToPtr averaged, const LazyDensityOperatorTo& ldo)

@@ -30,11 +30,9 @@ template<int RANK>
 class Interaction : public DynamicsBase, public DimensionsBookkeeper<RANK>
 {
 public:
-  typedef std::shared_ptr<const Interaction> Ptr;
-
   /// A tiny vector of shared pointers to the Free objects between which the interaction is defined
   /** \note The order of the Free objects is essential! (Cf. BinarySystem, Composite) */
-  typedef std::array<Free::Ptr,RANK> Frees;
+  typedef std::array<FreePtr,RANK> Frees;
 
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
@@ -56,6 +54,10 @@ private:
   const Frees frees_;
 
 };
+
+
+template<int RANK>
+using InteractionPtr = std::shared_ptr<const Interaction<RANK>>;
 
 
 } // structure

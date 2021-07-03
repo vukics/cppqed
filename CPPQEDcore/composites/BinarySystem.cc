@@ -37,7 +37,7 @@ namespace {
 //////////
 
 
-binary::Base::Base(Interaction::Ptr ia)
+binary::Base::Base(InteractionPtr ia)
   : QuantumSystem<2>(Dimensions(ia->getFrees()[0]->getDimension(),ia->getFrees()[1]->getDimension())),
     free0_(ia->getFrees()[0]), free1_(ia->getFrees()[1]), ia_(ia)
 {
@@ -88,10 +88,10 @@ void binary::Base::process_v(Averages& averages) const
 
 std::ostream& binary::Base::stream_v(const Averages& averages, std::ostream& os, int precision) const
 {
-  const Av1::Ptr 
+  const auto 
     av0 =free0_.getAv(),
     av1 =free1_.getAv();
-  const Av2::Ptr
+  const auto
     av01=   ia_.getAv();
 
 #define PROCESS_Range(av,ss) ss->stream(av,os,precision);
@@ -216,7 +216,7 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
 
 void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) const
 {
-  const Li1::Ptr
+  const auto
     li0 =free0_.getLi(),
     li1 =free1_.getLi();
 
@@ -250,7 +250,7 @@ void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperator
   typedef tmptools::Vector<0,2> V0;
   typedef tmptools::Vector<1,3> V1;
 
-  const Li1::Ptr
+  const auto
     li0 =free0_.getLi(),
     li1 =free1_.getLi();
 
@@ -284,7 +284,7 @@ void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperator
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI>
-BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(Interaction::Ptr ia) 
+BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(binary::InteractionPtr ia) 
 : binary::Base(ia),
   BASE_ctor(Exact),
   BASE_ctor(Hamiltonian),
@@ -300,7 +300,7 @@ namespace {
 
 using structure::SystemCharacteristics;
 
-const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr ia)
+const SystemCharacteristics querySystemCharacteristics(binary::InteractionPtr ia)
 {
   using namespace structure;
   
@@ -308,9 +308,10 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
     free0=ia->getFrees()[0],
     free1=ia->getFrees()[1];
 
-  return SystemCharacteristics{qse<1>(free0) || qse<1>(free1) || qse<2>(ia),
-                               qsh<1>(free0) || qsh<1>(free1) || qsh<2>(ia),
-                               qsl<1>(free0) || qsl<1>(free1) || qsl<2>(ia)};
+  return SystemCharacteristics{
+    std::dynamic_pointer_cast<const Exact<1>>(free0) || std::dynamic_pointer_cast<const Exact<1>>(free1) || std::dynamic_pointer_cast<const Exact<2>>(ia),
+    std::dynamic_pointer_cast<const Hamiltonian<1>>(free0) || std::dynamic_pointer_cast<const Hamiltonian<1>>(free1) || std::dynamic_pointer_cast<const Hamiltonian<2>>(ia),
+    std::dynamic_pointer_cast<const Liouvillean<1>>(free0) || std::dynamic_pointer_cast<const Liouvillean<1>>(free1) || std::dynamic_pointer_cast<const Liouvillean<2>>(ia)};
 }
 
 }
@@ -319,7 +320,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::Interaction::Ptr 
 #define DISPATCHER(EX,HA,LI) (all(querySystemCharacteristics(ia)==SystemCharacteristics{EX,HA,LI})) return std::make_shared<BinarySystem<EX,HA,LI> >(ia)
 
 
-const binary::Ptr binary::make(Interaction::Ptr ia)
+const binary::Ptr binary::make(InteractionPtr ia)
 {
   if      DISPATCHER(true ,true ,true ) ;
   else if DISPATCHER(true ,true ,false) ;

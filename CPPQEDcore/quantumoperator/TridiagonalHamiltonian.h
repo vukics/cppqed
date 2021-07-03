@@ -31,8 +31,6 @@ protected:
   typedef quantumoperator::Tridiagonal<RANK> Tridiagonal;
   typedef std::list<Tridiagonal>             Tridiagonals;
 
-  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow; ///< Should be the same for Hamiltonian classes of any TimeDependence.
-
   template<typename... ArgumentPack>
   TDH_Base(ArgumentPack&&... a) : hOverIs_(a...) {}
 
@@ -41,7 +39,7 @@ protected:
 
 private:
   /// \name Virtual inherited from HamiltonianTimeDependenceDispatched
-  void addContribution_v(std::conditional_t<IS_TIME_DEPENDENT,OneTime,NoTime> t, const StateVectorLow& psi, StateVectorLow& dpsidt) const override
+  void addContribution_v(std::conditional_t<IS_TIME_DEPENDENT,OneTime,NoTime> t, const StateVectorLow<RANK>& psi, StateVectorLow<RANK>& dpsidt) const override
   {
     for (auto& h : hOverIs_)
       if constexpr (IS_TIME_DEPENDENT) {apply<RANK>(psi,dpsidt,h.propagate(double(t)));}

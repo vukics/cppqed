@@ -11,7 +11,7 @@ TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix
 }
 
 
-void TimeIndependentMatrixHamiltonian::addContribution_v(structure::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const
+void TimeIndependentMatrixHamiltonian::addContribution_v(structure::NoTime, const structure::freesystem::StateVectorLow& psi, structure::freesystem::StateVectorLow& dpsidt) const
 {
   linalg::apply(psi,dpsidt,hamiltonianOverI_);
 }

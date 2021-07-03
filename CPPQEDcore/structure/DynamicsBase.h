@@ -45,8 +45,6 @@ protected:
   DynamicsBase(const DynamicsBase&) = delete; DynamicsBase& operator=(const DynamicsBase&) = delete;
 
 public:
-  typedef std::shared_ptr<const DynamicsBase> Ptr;
-
   typedef std::tuple<std::string,double,double> RF; ///< name-value-multiplier tuple for a real frequency-like parameter
   typedef std::tuple<std::string,dcomp ,double> CF; ///< same for complex
   
@@ -84,6 +82,9 @@ private:
   std::ostringstream paramsStream_;
 
 };
+
+
+using DynamicsBasePtr = std::shared_ptr<const DynamicsBase> ;
 
 
 } // structure

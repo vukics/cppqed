@@ -34,8 +34,6 @@ using ::structure::Averages; using ::structure::Rates;
 class Free : public QuantumSystem<1>, public DynamicsBase
 {
 public:
-  typedef std::shared_ptr<const Free> Ptr;
-
   /// A single dimension to initialise QuantumSystem`<1>` and the lists of real and complex name-frequency-multiplier tuples for DynamicsBase
   explicit Free(size_t dim, const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF) : QuantumSystem<1>(dim), DynamicsBase(realFreqs,complexFreqs) {}
 
@@ -57,6 +55,9 @@ private:
   std::ostream& streamMoreParameters(std::ostream& os) const final {return DynamicsBase::streamMoreParameters(os<<"Dimension: "<<getDimension()<<std::endl);}
 
 };
+
+
+using FreePtr = std::shared_ptr<const Free>;
 
 
 } // structure

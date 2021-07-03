@@ -36,8 +36,6 @@ const LA_Av_tagType LA_Av_tag;
 class LiouvilleanAveragedCommon
 {
 public:
-  typedef std::shared_ptr<const LiouvilleanAveragedCommon> Ptr;
-
   virtual ~LiouvilleanAveragedCommon() {}
 
   /// Streams a key (a.k.a. legend)
@@ -70,8 +68,6 @@ template<int RANK>
 class LiouvilleanAveragedCommonRanked : public LiouvilleanAveragedCommon
 {
 public:
-  typedef std::shared_ptr<const LiouvilleanAveragedCommonRanked> Ptr;
-  
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   virtual ~LiouvilleanAveragedCommonRanked() {}

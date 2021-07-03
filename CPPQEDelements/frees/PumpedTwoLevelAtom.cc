@@ -12,7 +12,7 @@ using namespace structure;
 
 PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
   : Free(2,{},{CF{"(gamma,deltaA)",{pp2la.gamma,pp2la.delta},1.},CF{"eta",pp2la.eta,1.}}), 
-    Base("Pumped Two-Level Atom","atomic decay"),
+    structure::ElementLiouvillean<1,1>("Pumped Two-Level Atom","atomic decay"),
     za_(-pp2la.gamma,pp2la.delta), eta_(pp2la.eta)
 {
   getParsStream()<<"Pumped Two-Level Atom\n";
@@ -25,7 +25,7 @@ double PumpedTwoLevelAtom::rate(NoTime, const LazyDensityOperator& matrix) const
 }
 
 
-void PumpedTwoLevelAtom::doActWithJ(NoTime, StateVectorLow& psi) const
+void PumpedTwoLevelAtom::doActWithJ(NoTime, qbit::StateVectorLow& psi) const
 {
   psi(0)=sqrt(-2.*real(za_))*psi(1);
   psi(1)=0;
@@ -33,7 +33,7 @@ void PumpedTwoLevelAtom::doActWithJ(NoTime, StateVectorLow& psi) const
 
 
 PumpedTwoLevelAtomSch::PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy& pp2la)
-  : Base(pp2la), hamiltonianOverI_(hamiltonianOverI(getZa(),pp2la.eta)) 
+  : PumpedTwoLevelAtom(pp2la), hamiltonianOverI_(hamiltonianOverI(getZa(),pp2la.eta)) 
 {
   getParsStream()<<"Schroedinger picture.\n"; 
 }

@@ -3,7 +3,6 @@
 #ifndef CPPQEDCORE_COMPOSITES_SUBSYSTEM_H_INCLUDED
 #define CPPQEDCORE_COMPOSITES_SUBSYSTEM_H_INCLUDED
 
-#include "Free.h"
 #include "Interaction.h"
 
 #include "Structure.h"
@@ -12,29 +11,28 @@
 namespace composite {
 
 
+using ::structure::FreePtr, ::structure::InteractionPtr;
+
+  
 template<int RANK> 
-class SubSystemsInteraction : public structure::QuantumSystemWrapper<RANK,false>
+class SubSystemsInteraction : public structure::QuantumSystemWrapper<RANK>
 {
 public:
-  typedef typename structure::Interaction<RANK>::Ptr InteractionPtr;
+  explicit SubSystemsInteraction(InteractionPtr<RANK> ia) : structure::QuantumSystemWrapper<RANK>(ia), ia_(ia) {}
 
-  explicit SubSystemsInteraction(InteractionPtr ia) : structure::QuantumSystemWrapper<RANK,false>(ia), ia_(ia) {}
-
-  const InteractionPtr get() const {return ia_;} 
+  const InteractionPtr<RANK> get() const {return ia_;} 
 
 private:
-  InteractionPtr ia_;
+  InteractionPtr<RANK> ia_;
 
 };
 
 
 
-class SubSystemFree : public structure::QuantumSystemWrapper<1,false>
+class SubSystemFree : public structure::QuantumSystemWrapper<1>
 {
 public:
-  typedef structure::Free::Ptr FreePtr;
-
-  explicit SubSystemFree(FreePtr free) : structure::QuantumSystemWrapper<1,false>(free,true), free_(free) {}
+  explicit SubSystemFree(FreePtr free) : structure::QuantumSystemWrapper<1>(free,true), free_(free) {}
 
   SubSystemFree() : free_() {}
 

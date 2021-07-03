@@ -23,8 +23,6 @@ namespace structure {
 class AveragedCommon
 {
 public:
-  typedef std::shared_ptr<const AveragedCommon> Ptr;
-
   virtual ~AveragedCommon() {}
 
   /// This function is a hook between LiouvilleanAveragedCommonRanked::average and stream.
@@ -79,11 +77,11 @@ class Averaged : public LiouvilleanAveragedCommonRanked<RANK>, public AveragedCo
 public:
   static const int N_RANK=RANK;
 
-  typedef std::shared_ptr<const Averaged> Ptr;
-
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
 };
+
+
+template <int RANK>
+using AveragedPtr=std::shared_ptr<const Averaged<RANK>>;
 
 
 /// Implements the general Liouvillean interface by dispatching the two possible \link time::DispatcherIsTimeDependent time-dependence levels\endlink

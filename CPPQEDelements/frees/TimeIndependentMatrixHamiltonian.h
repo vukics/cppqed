@@ -19,7 +19,7 @@ public:
   // For safety, the matrix will be copied in.
 
 private:
-  void addContribution_v(structure::NoTime, const StateVectorLow&, StateVectorLow&) const; 
+  void addContribution_v(structure::NoTime, const structure::freesystem::StateVectorLow&, structure::freesystem::StateVectorLow&) const; 
 
   const CMatrix hamiltonianOverI_;
 

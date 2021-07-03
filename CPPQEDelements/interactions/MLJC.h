@@ -40,7 +40,7 @@ public:
   }
 
 private:
-  void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
+  void addContribution_v(double t, const structure::StateVectorLow<2>& psi, structure::StateVectorLow<2>& dpsidt, double t0) const override
   {
     boost::fusion::for_each(mds_, [&] (const auto& modeDynamics) {
       using MD=std::decay_t<decltype(modeDynamics)>;

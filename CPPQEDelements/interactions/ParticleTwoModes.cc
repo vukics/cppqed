@@ -15,7 +15,6 @@ using particle::mfNKX;
 using particle::mfComposition;
 using quantumoperator::identity;
 
-using namespace mode;
 
 namespace {
 
@@ -36,17 +35,17 @@ ParticleTwoModes::ParticleTwoModes(mode::Ptr mode0, mode::Ptr mode1, particle::P
                                    double phi)
   : structure::Interaction<3>({mode0,mode1,part},
                               {RF{"Unot0",uNot0,sqrt(mode0->getDimension())},RF{"Unot1",uNot1,sqrt(mode1->getDimension())}}),
-                              firstH_(factor(uNot0,uNot1,phi)*aop(mode0)*aop(mode1).dagger()*mfNKX(part,mf0)/DCOMP_I), firstHT_(-firstH_.dagger()),
+                              firstH_(factor(uNot0,uNot1,phi)*mode::aop(mode0)*mode::aop(mode1).dagger()*mfNKX(part,mf0)/DCOMP_I), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(part,mf1).dagger()), secondHT_(secondH_.dagger()),
     isSpecialH_(abs(get<1>(mf0))==abs(get<1>(mf1))),
-    specialH_(isSpecialH_ ? Tridiagonals{quantumoperator::tridiagPlusHC_overI( factor(uNot0,uNot1,phi)*aop(mode0).dagger()*aop(mode1)*mfComposition(part,mf0,mf1) )}: Tridiagonals{})
+    specialH_(isSpecialH_ ? Tridiagonals{quantumoperator::tridiagPlusHC_overI( factor(uNot0,uNot1,phi)*mode::aop(mode0).dagger()*mode::aop(mode1)*mfComposition(part,mf0,mf1) )}: Tridiagonals{})
 {
   getParsStream()<<"ParticleTwoModes\nphi="<<phi<<endl;
 }
 
 
 
-void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
+void ParticleTwoModes::addContribution_v(double t, const quantumdata::StateVectorLow<3>& psi, quantumdata::StateVectorLow<3>& dpsidt, double t0) const
 {
   if (isSpecialH_){
     specialH_.addContribution(t,psi,dpsidt,t0);
@@ -63,7 +62,7 @@ void ParticleTwoModes::addContribution_v(double t, const StateVectorLow& psi, St
     secondH_.propagate(dt); secondHT_.propagate(dt);
   }
 
-  StateVectorLow dpsidtTemp(psi.shape()); // NEEDS_WORK check whether putting this into class scope saves time (only one dynamic allocation)
+  quantumdata::StateVectorLow<3> dpsidtTemp(psi.shape()); // NEEDS_WORK check whether putting this into class scope saves time (only one dynamic allocation)
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstH_);

@@ -83,20 +83,12 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
  */
 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
-class MCWF_Trajectory : private structure::QuantumSystemWrapper<RANK,true>
+class MCWF_Trajectory : private structure::QuantumSystemWrapper<RANK>
 {
-private:
-  using QuantumSystemWrapper=structure::QuantumSystemWrapper<RANK,true>;
-  
 public:
   MCWF_Trajectory(const MCWF_Trajectory&) = default; MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
   using StreamedArray=structure::Averages;
-
-  typedef structure::Exact      <RANK> Exact      ;
-  typedef structure::Hamiltonian<RANK> Hamiltonian;
-  typedef structure::Liouvillean<RANK> Liouvillean;
-  typedef structure::Averaged   <RANK> Averaged   ;
 
   typedef quantumdata::StateVector<RANK> StateVector;
   typedef typename StateVector::StateVectorLow StateVectorLow;
@@ -110,7 +102,7 @@ public:
                   SV&& psi, ///< the state vector to be evolved
                   ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re,
                   double dpLimit, double overshootTolerance, int logLevel)
-  : QuantumSystemWrapper{sys,true}, psi_{std::forward<StateVector>(psi)},
+  : structure::QuantumSystemWrapper<RANK>{sys,true}, psi_{std::forward<StateVector>(psi)},
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
     logger_{logLevel,this->template nAvr<structure::LA_Li>()}
   {
@@ -130,7 +122,8 @@ public:
   
   std::ostream& streamParameters(std::ostream&) const;
 
-  auto stream(std::ostream& os, int precision) const {return QuantumSystemWrapper::stream(getTime(),psi_,os,precision);} ///< Forwards to structure::Averaged::stream
+  /// Forwards to structure::Averaged::stream
+  auto stream(std::ostream& os, int precision) const {return structure::QuantumSystemWrapper<RANK>::stream(getTime(),psi_,os,precision);}
   
   auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {StateVectorLow temp; iar & temp; psi_.getArray().reference(temp); return iar;}
 
@@ -149,7 +142,8 @@ public:
   
   auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & psi_.getArray() & t_) & re_.engine & logger_;}
 
-  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return QuantumSystemWrapper::template streamKey<structure::LA_Av>(os,i);} ///< Forwards to structure::Averaged::streamKey
+  /// Forwards to structure::Averaged::streamKey
+  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return structure::QuantumSystemWrapper<RANK>::template streamKey<structure::LA_Av>(os,i);}
 
   std::ostream& logOnEnd(std::ostream& os) const {return logger_.onEnd(ode_.logOnEnd(os));} ///< calls mcwf::Logger::onEnd
   

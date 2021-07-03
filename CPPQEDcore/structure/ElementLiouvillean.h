@@ -112,8 +112,7 @@ private:
   typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
-#define TYPE_DEFINITION_FORWARD typedef typename Base::StateVectorLow StateVectorLow; typedef typename Base::DensityOperatorLow DensityOperatorLow; typedef typename Base::LazyDensityOperator LazyDensityOperator; typedef typename Base::Time Time;  
-  TYPE_DEFINITION_FORWARD
+  using Time = typename Base::Time;  
   
 protected:
   template<typename... KeyLabelsPack>
@@ -121,7 +120,7 @@ protected:
   
   ElementLiouvillean(const std::string& keyTitle, typename Base::KeyLabelsInitializer il) : Base(keyTitle,il) {}
 
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
+  const Rates rates_v(Time t, const ::quantumdata::LazyDensityOperator<RANK>& matrix) const override
   {
     Rates rates(NLINDBLADS);
 /*
@@ -138,7 +137,7 @@ protected:
   }
 
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
+  void actWithJ_v(Time t, StateVectorLow<RANK>& psi, size_t lindbladNo) const override
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
     mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&psi,lindbladNo](auto arg) {
@@ -148,7 +147,7 @@ protected:
   }
   
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow<RANK>& rho, DensityOperatorLow<RANK>& drhodt, size_t lindbladNo) const override
   {
     if (lindbladNo>=NLINDBLADS) throw ElementLiouvilleanException(Base::getTitle());
     mpl::for_each<tmptools::Ordinals<NLINDBLADS> >([this,t,&rho,&drhodt,lindbladNo](auto arg) {
@@ -177,31 +176,31 @@ private:
   typedef ElementLiouvilleanAveragedCommon<LiouvilleanTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 public:
-  TYPE_DEFINITION_FORWARD
+  using Time = typename Base::Time;  
   
 protected:
   ElementLiouvillean(const std::string& keyTitle, const std::string& keyLabel) : Base(keyTitle,1,keyLabel) {}
   
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
+  const Rates rates_v(Time t, const ::quantumdata::LazyDensityOperator<RANK>& matrix) const override {Rates rates(1); rates(0)=rate(t,matrix); return rates;}
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
+  void actWithJ_v(Time t, StateVectorLow<RANK>& psi, size_t lindbladNo) const override
   {
     if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle());
     doActWithJ(t,psi);
   }
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow<RANK>& rho, DensityOperatorLow<RANK>& drhodt, size_t lindbladNo) const override
   {
     if (lindbladNo) throw ElementLiouvilleanException(Base::getTitle());
     doActWithSuperoperator(t,rho,drhodt);
   }
   
 private:
-  virtual void doActWithJ(Time, StateVectorLow&) const = 0;
+  virtual void doActWithJ(Time, StateVectorLow<RANK>&) const = 0;
   
-  virtual double rate(Time, const LazyDensityOperator&) const = 0;
+  virtual double rate(Time, const ::quantumdata::LazyDensityOperator<RANK>&) const = 0;
 
-  virtual void doActWithSuperoperator(Time, const DensityOperatorLow&, DensityOperatorLow&) const {throw SuperoperatorNotImplementedException(0);}
+  virtual void doActWithSuperoperator(Time, const DensityOperatorLow<RANK>&, DensityOperatorLow<RANK>&) const {throw SuperoperatorNotImplementedException(0);}
 
 };
 
@@ -217,17 +216,22 @@ protected:
   using Base::Base; // inherit constructor
   
 public:
-  TYPE_DEFINITION_FORWARD
+  using Time = typename Base::Time;  
 
   /// Strategy functional for acting with a given Lindblad operator (= performing a given jump) on a state
   /** The actual signature of the functional is decided on the basis of IS_TIME_DEPENDENT */
-  typedef std::conditional_t<IS_TIME_DEPENDENT,std::function<void  (double,       StateVectorLow&     )>,std::function<void  (      StateVectorLow&     )> > JumpStrategy;
+  typedef std::conditional_t<IS_TIME_DEPENDENT,
+                             std::function<void(double,StateVectorLow<RANK>&)>,
+                             std::function<void(StateVectorLow<RANK>&)> > JumpStrategy;
+                             
   /// Strategy functional for calculating from a state the jump rate corresponding to a given Lindblad
-  typedef std::conditional_t<IS_TIME_DEPENDENT,std::function<double(double, const LazyDensityOperator&)>,std::function<double(const LazyDensityOperator&)> > JumpRateStrategy;
+  typedef std::conditional_t<IS_TIME_DEPENDENT,
+                             std::function<double(double, const ::quantumdata::LazyDensityOperator<RANK>&)>,
+                             std::function<double(const ::quantumdata::LazyDensityOperator<RANK>&)> > JumpRateStrategy;
   
   typedef std::conditional_t<IS_TIME_DEPENDENT,
-                             std::function<void(double, const DensityOperatorLow&, DensityOperatorLow&)>,
-                             std::function<void(        const DensityOperatorLow&, DensityOperatorLow&)> > SuperoperatorStrategy;
+                             std::function<void(double, const DensityOperatorLow<RANK>&, DensityOperatorLow<RANK>&)>,
+                             std::function<void(const DensityOperatorLow<RANK>&, DensityOperatorLow<RANK>&)> > SuperoperatorStrategy;
 };
 
 
@@ -246,7 +250,7 @@ private:
   typedef ElementLiouvilleanStrategiesBase<RANK,IS_TIME_DEPENDENT> Base;
   
 public:
-  TYPE_DEFINITION_FORWARD
+  using Time = typename Base::Time;  
 
   typedef typename Base::JumpStrategy JumpStrategy;
   typedef typename Base::JumpRateStrategy JumpRateStrategy;
@@ -267,7 +271,7 @@ protected:
   ElementLiouvilleanStrategies(const JumpStrategies& jumps, const JumpRateStrategies& jumpRates, const std::string& keyTitle, typename Base::KeyLabelsInitializer il)
     : Base(keyTitle,il), jumps_(jumps), jumpRates_(jumpRates) {}
 
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
+  const Rates rates_v(Time t, const ::quantumdata::LazyDensityOperator<RANK>& matrix) const override
   {
     Rates rates(NLINDBLADS); // Note that this cannot be anything like static because of the by-reference semantics of blitz::Array
 
@@ -280,13 +284,13 @@ protected:
     return rates;
   }
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
+  void actWithJ_v(Time t, StateVectorLow<RANK>& psi, size_t lindbladNo) const override
   {
     if constexpr (IS_TIME_DEPENDENT) jumps_(lindbladNo)(t,psi);
     else jumps_(lindbladNo)(psi);
   }
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow<RANK>& rho, DensityOperatorLow<RANK>& drhodt, size_t lindbladNo) const override
   {
     if (superoperatorStrategies_(lindbladNo)==nullptr) throw SuperoperatorNotImplementedException(lindbladNo);
 
@@ -326,8 +330,7 @@ private:
 public:
   using DiffusionCoeffs=std::vector<double>;
   
-  TYPE_DEFINITION_FORWARD
-#undef TYPE_DEFINITION_FORWARD
+  using Time = typename Base::Time;  
 
   template <typename... BaseCtorPack>
   ElementLiouvilleanDiffusive(size_t dim, const DiffusionCoeffs& diffusionCoeffs, BaseCtorPack&&... baseCtorPack)
@@ -342,14 +345,14 @@ public:
   {}
 
 protected:
-  const Rates rates_v(Time t, const LazyDensityOperator& matrix) const override
+  const Rates rates_v(Time t, const ::quantumdata::LazyDensityOperator<RANK>& matrix) const override
   {
     Rates res(base_nAvr_+dim_); res=-1.;
     res(blitz::Range(0,base_nAvr_-1))=Base::rates_v(t,matrix);
     return res;
   }
 
-  void actWithJ_v(Time t, StateVectorLow& psi, size_t lindbladNo) const override
+  void actWithJ_v(Time t, StateVectorLow<RANK>& psi, size_t lindbladNo) const override
   {
     if (psi.extent(0)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException("In actWithJ_v");
     if (lindbladNo<base_nAvr_) Base::actWithJ_v(t,psi,lindbladNo);
@@ -359,7 +362,7 @@ protected:
     }
   }
 
-  void actWithSuperoperator_v(Time t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t lindbladNo) const override
+  void actWithSuperoperator_v(Time t, const DensityOperatorLow<RANK>& rho, DensityOperatorLow<RANK>& drhodt, size_t lindbladNo) const override
   {
     if (rho.extent(0)!=dim_ || rho.extent(1)!=dim_) throw ElementLiouvilleanDiffusiveDimensionalityMismatchException("In actWithSuperoperator_v");
     if (lindbladNo<base_nAvr_) Base::actWithSuperoperator_v(t,rho,drhodt,lindbladNo);

@@ -22,10 +22,6 @@ template<int RANK>
 class Hamiltonian
 {
 public:
-  typedef std::shared_ptr<const Hamiltonian> Ptr;
-
-  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
-
   /// Adds the Hamiltonian contribution \f$\frac{H(t)}i\ket\Psi\f$ of the given (sub)system to `dpsidt`
   /**
    * The assumption is that the time when the Schrödinger picture and interaction picture (if any) coincide is `t0`. There are two important points to note:
@@ -40,8 +36,8 @@ public:
    *
    */
   void addContribution(double t, ///<[in] the time instant \f$t\f$ for #TWO dependence
-                       const StateVectorLow& psi, ///<[in] the state vector \f$\ket\Psi\f$
-                       StateVectorLow& dpsidt, ///<[in/out] the state vector to be contributed to by \f$\frac{H(t)}i\ket\Psi\f$
+                       const StateVectorLow<RANK>& psi, ///<[in] the state vector \f$\ket\Psi\f$
+                       StateVectorLow<RANK>& dpsidt, ///<[in/out] the state vector to be contributed to by \f$\frac{H(t)}i\ket\Psi\f$
                        double t0 ///<[in] the time instant \f$t_0\f$ for #TWO dependence
                       ) const
                        {addContribution_v(t,psi,dpsidt,t0);}
@@ -52,9 +48,14 @@ private:
 #ifndef NDEBUG
 #pragma GCC warning "TODO: the correct signature is addContribution_v(double, const StateVectorLow, StateVectorLow, double)"
 #endif // NDEBUG
-  virtual void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const = 0; 
+  virtual void addContribution_v(double, const StateVectorLow<RANK>&, StateVectorLow<RANK>&, double) const = 0; 
 
 };
+
+
+template <int RANK>
+using HamiltonianPtr=std::shared_ptr<const Hamiltonian<RANK>>;
+
 
 /// Implements the general Hamiltonian interface by dispatching the different \link time::Dispatcher time-dependence levels\endlink
 /**
@@ -66,19 +67,17 @@ template<int RANK, TimeDependence TD>
 class HamiltonianTimeDependenceDispatched : public Hamiltonian<RANK>
 {
 public:
-  typedef typename Hamiltonian<RANK>::StateVectorLow StateVectorLow;
-  
   typedef time::Dispatcher_t<TD> Time; ///< The actual time-dependence level from the template parameter `TD`
 
 private:
   /// The inherited virtual gets implemented by calling a newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink
-  void addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const final
+  void addContribution_v(double t, const StateVectorLow<RANK>& psi, StateVectorLow<RANK>& dpsidt, double t0) const final
   {
     addContribution_v(Time(t,t0),psi,dpsidt);
   }
 
   /// The newly defined virtual with only one parameter describing different \link time::Dispatcher time-dependence levels\endlink
-  virtual void addContribution_v(Time, const StateVectorLow&, StateVectorLow&) const = 0;
+  virtual void addContribution_v(Time, const StateVectorLow<RANK>&, StateVectorLow<RANK>&) const = 0;
 
 };
 

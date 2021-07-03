@@ -377,7 +377,7 @@ double PumpedLossyModeIP_NoExact::rate(OneTime, const LazyDensityOperator& m) co
 }
 
 
-void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, StateVectorLow& psi) const
+void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi) const
 {
   dcomp fact=sqrt(2.*real(z_))*exp(-z_*double(t));
   int ubound=psi.ubound(0);

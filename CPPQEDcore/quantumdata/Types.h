@@ -6,13 +6,6 @@
 #include "BlitzArray.h"
 
 
-namespace structure {
-
-using Averages = DArray<1>; using Rates = Averages;
-
-} // structure
-
-
 namespace quantumdata {
 
 template<int RANK>
@@ -23,5 +16,16 @@ using DensityOperatorLow=CArray<2*RANK>;
   
 
 } // quantumdata
+
+
+namespace structure {
+
+using ::quantumdata::StateVectorLow, ::quantumdata::DensityOperatorLow;
+
+using Averages = DArray<1>; using Rates = Averages;
+
+} // structure
+
+
 
 #endif // CPPQEDCORE_QUANTUMDATA_TYPES_H_INCLUDED
