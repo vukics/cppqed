@@ -165,7 +165,7 @@ struct AverageTrajectories
     return res = accumulate(++trajs.begin(),trajs.end(),trajs.begin()->averaged(),[] (const auto& init, const SingleTrajectory& s) {
       return init + s.averaged();
     }
-    )/size2Double(trajs.size());
+    )/size_t2Double(trajs.size());
   }
   
 };
