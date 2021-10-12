@@ -402,7 +402,7 @@ struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::MCWF_Traj
       
     for (auto i=trajs.begin()+1; i<trajs.end(); i++) i->getStateVector().addTo(rho);
 
-    return rho/=size2Double(trajs.size());
+    return rho/=size_t2Double(trajs.size());
     
   }
 
