@@ -20,7 +20,7 @@ namespace composite {
 
 using boost::fusion::make_list;
 
-using ::size_t;
+using ::size_t; using ::structure::Averages; using ::structure::Rates;
 
 namespace result_of {
 
@@ -91,8 +91,6 @@ public:
   typedef structure::Averaged<RANK> Av_Base;
 
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
-  typedef typename Av_Base::Averages Averages;
 
   typedef typename RBase::Frees Frees;
   typedef typename RBase::Ordinals Ordinals;
@@ -210,8 +208,6 @@ private:
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   typedef tmptools::Ordinals<RANK> Ordinals;
-
-  typedef typename structure::Liouvillean<RANK>::Rates Rates;
 
 protected:
   Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}

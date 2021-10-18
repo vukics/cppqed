@@ -165,7 +165,7 @@ struct AverageTrajectories
     return res = accumulate(++trajs.begin(),trajs.end(),trajs.begin()->averaged(),[] (const auto& init, const SingleTrajectory& s) {
       return init + s.averaged();
     }
-    )/size2Double(trajs.size());
+    )/size_t2Double(trajs.size());
   }
   
 };
@@ -222,7 +222,7 @@ public:
   /// An average of `dtDid`s from individual trajectories.
   double getDtDid() const {return boost::accumulate(trajs_,0.,[] (double init, const SingleTrajectory& t) {
       return init+t.getDtDid();
-    })/size2Double(trajs_.size());
+    })/size_t2Double(trajs_.size());
   }
   
   std::ostream& streamParameters(std::ostream& os) const {return trajs_.front().streamParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}

@@ -26,8 +26,7 @@ namespace {
 }
 
 
-const ModeCorrelations::Averages
-ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
+const mode::Averages ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
 {
   using quantumdata::partialTrace;
 
@@ -36,7 +35,7 @@ ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix
   {
     auto fun=[&](const auto& psiS){return averagedMode_.average(0,psiS);};
     
-    const Averages 
+    const auto 
       a0{partialTrace<V0>(matrix,fun)},
       a1{partialTrace<V1>(matrix,fun)};
 
@@ -61,15 +60,14 @@ ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix
 }
 
 
-void
-ModeCorrelations::process_v(Averages& averages) const
+void ModeCorrelations::process_v(mode::Averages& averages) const
 {
   {
-    Averages ranged(averages(blitz::Range(0, 6)));
+    auto ranged(averages(blitz::Range(0, 6)));
     averagedMode_.process(ranged);
   }
   {
-    Averages ranged(averages(blitz::Range(7,13)));
+    auto ranged(averages(blitz::Range(7,13)));
     averagedMode_.process(ranged);
   }
 

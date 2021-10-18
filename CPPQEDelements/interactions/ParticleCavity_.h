@@ -88,7 +88,7 @@ private:
   ParticleAlongCavity(mode::Ptr, particle::Ptr,       double uNot, size_t kCav, ModeFunctionType, double etaeff);
   ParticleAlongCavity(mode::Ptr, particle::PtrPumped, double uNot, size_t kCav, ModeFunctionType, double etaeff);
 
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
+  void addContribution_v(double, const quantumdata::StateVectorLow<2>&, quantumdata::StateVectorLow<2>&, double) const;
 
   const bool isSpecialH_;
   mutable TridiagonalHamiltonian tridiagonalH_;

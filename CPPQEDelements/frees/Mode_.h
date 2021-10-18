@@ -526,14 +526,12 @@ public:
   PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy&);
 
 private:
-  typedef structure::OneTime OneTime;
-  typedef quantumoperator::TridiagonalHamiltonian<1,true>::StateVectorLow StateVectorLow;
-  typedef structure::ElementLiouvillean<1,1,true>::LazyDensityOperator LazyDensityOperator;
+  using OneTime = structure::OneTime;
 
-  void   doActWithJ (OneTime, StateVectorLow&           ) const;
-  double rate       (OneTime, const LazyDensityOperator&) const;
+  void   doActWithJ (OneTime, mode::StateVectorLow&           ) const;
+  double rate       (OneTime, const mode::LazyDensityOperator&) const;
 
-  const Averages average_v(OneTime, const LazyDensityOperator&) const;
+  const mode::Averages average_v(OneTime, const mode::LazyDensityOperator&) const;
 
   const dcomp z_;
 

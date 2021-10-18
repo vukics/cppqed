@@ -23,10 +23,6 @@ namespace structure {
 class AveragedCommon
 {
 public:
-  typedef std::shared_ptr<const AveragedCommon> Ptr;
-
-  typedef LiouvilleanAveragedCommon::DArray1D Averages; ///< The 1D real array storing the calculated quantum averages (perhaps in real-imaginary pairs if a given average is complex).
-
   virtual ~AveragedCommon() {}
 
   /// This function is a hook between LiouvilleanAveragedCommonRanked::average and stream.
@@ -81,13 +77,11 @@ class Averaged : public LiouvilleanAveragedCommonRanked<RANK>, public AveragedCo
 public:
   static const int N_RANK=RANK;
 
-  typedef std::shared_ptr<const Averaged> Ptr;
-
-  typedef AveragedCommon::Averages Averages;
-
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
 };
+
+
+template <int RANK>
+using AveragedPtr=std::shared_ptr<const Averaged<RANK>>;
 
 
 /// Implements the general Liouvillean interface by dispatching the two possible \link time::DispatcherIsTimeDependent time-dependence levels\endlink
@@ -102,7 +96,6 @@ template<int RANK, bool IS_TIME_DEPENDENT>
 class AveragedTimeDependenceDispatched : public Averaged<RANK>
 {
 public:
-  typedef typename Averaged<RANK>::Averages            Averages           ;
   typedef typename Averaged<RANK>::LazyDensityOperator LazyDensityOperator;
   
   typedef time::DispatcherIsTimeDependent_t<IS_TIME_DEPENDENT> Time;

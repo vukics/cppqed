@@ -14,6 +14,7 @@
 
 namespace structure {
 
+  
 /// Enumeration describing a (compile-time) choice between Liouvillean & Averaged
 enum LiouvilleanAveragedTag {
   LA_Li, ///< Liouvillean
@@ -35,10 +36,6 @@ const LA_Av_tagType LA_Av_tag;
 class LiouvilleanAveragedCommon
 {
 public:
-  typedef std::shared_ptr<const LiouvilleanAveragedCommon> Ptr;
-
-  typedef DArray<1> DArray1D; ///< A 1D real array storing the quantum averages – even if they are complex, their real & imaginary parts must be stored separately as reals
-
   virtual ~LiouvilleanAveragedCommon() {}
 
   /// Streams a key (a.k.a. legend)
@@ -71,10 +68,6 @@ template<int RANK>
 class LiouvilleanAveragedCommonRanked : public LiouvilleanAveragedCommon
 {
 public:
-  typedef std::shared_ptr<const LiouvilleanAveragedCommonRanked> Ptr;
-  
-  typedef typename LiouvilleanAveragedCommon::DArray1D DArray1D;
-
   typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
 
   virtual ~LiouvilleanAveragedCommonRanked() {}
@@ -88,11 +81,11 @@ public:
    * \throw InfiniteDetectedException if postcondition 2. is not met
    * 
    */
-  const DArray1D average(double t, ///< one or more of the operators whose quantum average is calculated, might be time-dependent
+  const Averages average(double t, ///< one or more of the operators whose quantum average is calculated, might be time-dependent
                          const LazyDensityOperator& matrix /// the state of the quantum system
                         ) const
   {
-    const DArray1D averages(average_v(t,matrix));
+    const Averages averages(average_v(t,matrix));
     if (size_t(averages.size())!=nAvr()) throw std::runtime_error("Averages number mismatch -- size: "+std::to_string(averages.size())+" nAvr: "+std::to_string(nAvr()));
     /// \post 1.: number of averages must equal LiouvilleanAveragedCommon::nAvr
     if (!all(blitzplusplus::isfinite(averages))) throw std::runtime_error("Infinite detected in averages");
@@ -102,7 +95,7 @@ public:
   }
 
 private:
-  virtual const DArray1D average_v(double, const LazyDensityOperator&) const = 0;
+  virtual const Averages average_v(double, const LazyDensityOperator&) const = 0;
   
 };
 

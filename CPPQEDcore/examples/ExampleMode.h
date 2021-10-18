@@ -6,9 +6,8 @@
 
 #include "TridiagonalHamiltonian.h"
 
-using namespace structure;
-using quantumoperator::TridiagonalHamiltonian;
-using namespace freesystem;
+using quantumoperator::TridiagonalHamiltonian, structure::NoTime, structure::OneTime;
+using namespace structure::freesystem;
 
 
 const Tridiagonal aop(size_t dim); // ladder operator of the given dimension
@@ -19,7 +18,7 @@ namespace basic {
 
 
 class PumpedLossyMode 
-  : public Free, public TridiagonalHamiltonian<1,false>, public ElementLiouvilleanStrategies<1,2>, public ElementAveraged<1>
+  : public structure::Free, public TridiagonalHamiltonian<1,false>, public structure::ElementLiouvilleanStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
   typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
@@ -44,7 +43,8 @@ namespace basic {
 
 
 class PumpedLossyModeIP
-  : public Free, public FreeExact<false>, public TridiagonalHamiltonian<1,true>, public ElementLiouvilleanStrategies<1,2>, public ElementAveraged<1>
+  : public structure::Free, public structure::FreeExact<false>, public TridiagonalHamiltonian<1,true>,
+    public structure::ElementLiouvilleanStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
   typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
@@ -54,11 +54,11 @@ public:
   const dcomp get_z() const {return z_;}
 
 private:
-  void updateU(OneTime) const;
+  void updateU(OneTime) const override;
 
-  bool applicableInMaster_v() const {return true;}
+  bool applicableInMaster_v() const override {return true;}
 
-  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const override;
 
   const dcomp z_; // Needed for updateU
 
@@ -72,25 +72,26 @@ namespace hierarchical {
 
 // All inculdes and using directives the same as above
 
-class ModeBase : public Free, public ElementLiouvillean<1,2>, public ElementAveraged<1>
+class ModeBase : public structure::Free, public structure::ElementLiouvillean<1,2>, public structure::ElementAveraged<1>
 {
 public:
   typedef std::shared_ptr<ModeBase> Ptr;
   
-  typedef ElementLiouvillean<1,2>::StateVectorLow StateVectorLow     ;
-  typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
+  using StateVectorLow = ::quantumdata::StateVectorLow<1>;
+  
+  using LazyDensityOperator = ::quantumdata::LazyDensityOperator<1>;
 
 protected:
   ModeBase(double kappa, double nTh, size_t cutoff);
   
 private:
-  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<0>) const;
-  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<1>) const;
+  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<0>) const override;
+  void doActWithJ(NoTime, StateVectorLow&, LindbladNo<1>) const override;
   
-  double rate(NoTime, const LazyDensityOperator&, LindbladNo<0>) const;
-  double rate(NoTime, const LazyDensityOperator&, LindbladNo<1>) const;
+  double rate(NoTime, const LazyDensityOperator&, LindbladNo<0>) const override;
+  double rate(NoTime, const LazyDensityOperator&, LindbladNo<1>) const override;
   
-  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  const Averages average_v(NoTime, const LazyDensityOperator&) const override;
 
   const double kappa_, nTh_; // needed for calculating jumps & rates 
   
@@ -112,7 +113,7 @@ public:
 
 
 class PumpedLossyModeIP
-  : public ModeBase, public FreeExact<false>, public TridiagonalHamiltonian<1,true >
+  : public ModeBase, public structure::FreeExact<false>, public TridiagonalHamiltonian<1,true >
 {
 public:
   PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
@@ -120,9 +121,9 @@ public:
   const dcomp get_z() const {return z_;}
 
 private:
-  void updateU(OneTime) const;
+  void updateU(OneTime) const override;
 
-  bool applicableInMaster_v() const {return true;}
+  bool applicableInMaster_v() const override {return true;}
 
   const dcomp z_; // Needed for updateU
 

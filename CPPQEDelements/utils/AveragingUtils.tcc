@@ -72,7 +72,7 @@ ReducedDensityOperator<RANK>::ReducedDensityOperator(const std::string& label, c
 
 
 template<int RANK>
-const typename ReducedDensityOperator<RANK>::Averages 
+const structure::Averages 
 ReducedDensityOperator<RANK>::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
 {
   return deflate(matrix,offDiagonals_);
@@ -80,17 +80,17 @@ ReducedDensityOperator<RANK>::average_v(structure::NoTime, const LazyDensityOper
 
 
 template<int RANK, typename V>
-const typename ReducedDensityOperatorNegativity<RANK,V>::Averages 
+const structure::Averages 
 ReducedDensityOperatorNegativity<RANK,V>::average_v(structure::NoTime t, const LazyDensityOperator& matrix) const
 {
-  Averages res(Base::average_v(t,matrix));
+  auto res(Base::average_v(t,matrix));
   res.resize(res.size()+1);
   return res;
 }
 
 
 template<int RANK, typename V>
-void ReducedDensityOperatorNegativity<RANK,V>::process_v(Averages& averages) const
+void ReducedDensityOperatorNegativity<RANK,V>::process_v(structure::Averages& averages) const
 {
   quantumdata::DensityOperator<RANK> rho(getDimensions());
   linalg::CMatrix matrix(rho.matrixView()); // references the same data

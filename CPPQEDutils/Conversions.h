@@ -12,7 +12,7 @@
 namespace cppqedutils {
 
 
-namespace details {
+namespace conversions {
 
 
 template<class T>
@@ -24,36 +24,36 @@ struct DummyRangeCheckerPolicy
 };
 
 
-typedef
+using OverflowHandler =
 #ifndef   NDEBUG
 boost::numeric::   def_overflow_handler
 #else
 boost::numeric::silent_overflow_handler
 #endif // NDEBUG
-OverflowHandler;
+;
 
 
-template<class T> struct RangeCheckerMF : boost::mpl::identity<
+template<class T>
+using RangeCheckerMF = 
 #ifndef   NDEBUG
   boost::numeric::UseInternalRangeChecker
 #else
   DummyRangeCheckerPolicy<T>
 #endif // NDEBUG
->
-{};
+;
 
 
-} // details
+} // conversions
 
 
 
 template<typename T, typename S>
 struct Converter : boost::numeric::converter<T,S,
                                              boost::numeric::conversion_traits<T,S>,
-                                             cppqedutils::details::OverflowHandler,
+                                             cppqedutils::conversions::OverflowHandler,
                                              boost::numeric::Trunc<typename boost::numeric::conversion_traits<T,S>::source_type>,
                                              boost::numeric::raw_converter<boost::numeric::conversion_traits<T,S> >,
-                                             typename cppqedutils::details::RangeCheckerMF<boost::numeric::conversion_traits<T,S> >::type
+                                             cppqedutils::conversions::RangeCheckerMF<boost::numeric::conversion_traits<T,S> >
                                              >
 {};
 
@@ -61,87 +61,27 @@ struct Converter : boost::numeric::converter<T,S,
 } // cppqedutils
 
 
-// Double2Int
+// from double
 
-typedef boost::numeric::converter<int,
-                                  double,
-                                  boost::numeric::conversion_traits<int,double>,
-                                  cppqedutils::details::OverflowHandler,
-                                  boost::numeric::Trunc<boost::numeric::conversion_traits<int,double>::source_type>,
-                                  boost::numeric::raw_converter<boost::numeric::conversion_traits<int,double> >,
-                                  cppqedutils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,double> >::type
-                                  > Double2Int;
+const cppqedutils::Converter<int,double> double2Int{};
+const cppqedutils::Converter<long,double> double2Long{};
+const cppqedutils::Converter<unsigned,double> double2Unsigned{};
+const cppqedutils::Converter<size_t,double> double2Size_t{};
+const cppqedutils::Converter<ptrdiff_t,double> double2Ptrdiff_t{};
 
-const Double2Int double2Int=Double2Int();
+// from long double
 
+const cppqedutils::Converter<long,long double> longDouble2Long{};
+const cppqedutils::Converter<size_t,long double> longDouble2Size_t{};
+const cppqedutils::Converter<ptrdiff_t,long double> longDouble2Ptrdiff_t{};
 
-// Long2Int
+// from size_t
 
-typedef boost::numeric::converter<int,
-                                  long,
-                                  boost::numeric::conversion_traits<int,long>,
-                                  cppqedutils::details::OverflowHandler,
-                                  boost::numeric::Trunc<boost::numeric::conversion_traits<int,long>::source_type>,
-                                  boost::numeric::raw_converter<boost::numeric::conversion_traits<int,long> >,
-                                  cppqedutils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,long> >::type
-                                  > Long2Int;
+const cppqedutils::Converter<double,size_t> size_t2Double{};
 
-const Long2Int long2Int=Long2Int();
+// from long
 
+const cppqedutils::Converter<int,long> long2Int{};
 
-// Size2Int
-
-typedef boost::numeric::converter<int,
-                                  size_t,
-                                  boost::numeric::conversion_traits<int,size_t>,
-                                  cppqedutils::details::OverflowHandler,
-                                  boost::numeric::Trunc<boost::numeric::conversion_traits<int,size_t>::source_type>,
-                                  boost::numeric::raw_converter<boost::numeric::conversion_traits<int,size_t> >,
-                                  cppqedutils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,size_t> >::type
-                                  > Size2Int;
-
-const Size2Int size2Int=Size2Int();
-
-
-// Idx2Int
-
-typedef boost::numeric::converter<int,
-                                  ptrdiff_t,
-                                  boost::numeric::conversion_traits<int,ptrdiff_t>,
-                                  cppqedutils::details::OverflowHandler,
-                                  boost::numeric::Trunc<boost::numeric::conversion_traits<int,ptrdiff_t>::source_type>,
-                                  boost::numeric::raw_converter<boost::numeric::conversion_traits<int,ptrdiff_t> >,
-                                  cppqedutils::details::RangeCheckerMF<boost::numeric::conversion_traits<int,ptrdiff_t> >::type
-                                  > Idx2Int;
-
-const Idx2Int idx2Int=Idx2Int();
-
-
-// Int2Size
-
-typedef boost::numeric::converter<size_t,
-                                  int,
-                                  boost::numeric::conversion_traits<size_t,int>,
-                                  cppqedutils::details::OverflowHandler,
-                                  boost::numeric::Trunc<boost::numeric::conversion_traits<size_t,int>::source_type>,
-                                  boost::numeric::raw_converter<boost::numeric::conversion_traits<size_t,int> >,
-                                  cppqedutils::details::RangeCheckerMF<boost::numeric::conversion_traits<size_t,int> >::type
-                                  > Int2Size;
-
-const Int2Size int2Size=Int2Size();
-
-
-// Size2Double
-
-typedef boost::numeric::converter<double,
-                                  size_t,
-                                  boost::numeric::conversion_traits<double,size_t>,
-                                  cppqedutils::details::OverflowHandler,
-                                  boost::numeric::Trunc<boost::numeric::conversion_traits<double,size_t>::source_type>,
-                                  boost::numeric::raw_converter<boost::numeric::conversion_traits<double,size_t> >,
-                                  cppqedutils::details::RangeCheckerMF<boost::numeric::conversion_traits<double,size_t> >::type
-                                  > Size2Double;
-
-const Size2Double size2Double=Size2Double();
 
 #endif // CPPQEDCORE_UTILS_CONVERSIONS_H_INCLUDED

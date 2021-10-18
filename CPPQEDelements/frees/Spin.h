@@ -102,9 +102,9 @@ public:
   const dcomp get_z() const {return dcomp(gamma_,omega_);} ///< This plays analogous role to \f$z\f$ in Mode
 
 private:
-  void process_v(Averages&) const;
+  void process_v(spin::Averages&) const;
 
-  const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
+  const spin::Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
 
   const size_t twoS_;
 

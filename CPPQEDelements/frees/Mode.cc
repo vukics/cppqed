@@ -174,7 +174,7 @@ Averaged::Averaged(const KeyLabels& follow, const KeyLabels& precede)
 }
 
 
-const Averaged::Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
+const Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) const
 {
   auto averages(initializedAverages());
 
@@ -208,7 +208,7 @@ AveragedQuadratures::AveragedQuadratures(const KeyLabels& follow, const KeyLabel
 }
 
 
-const AveragedQuadratures::Averages AveragedQuadratures::average_v(NoTime t, const LazyDensityOperator& matrix) const
+const Averages AveragedQuadratures::average_v(NoTime t, const LazyDensityOperator& matrix) const
 {
   auto averages(initializedAverages());
 
@@ -377,7 +377,7 @@ double PumpedLossyModeIP_NoExact::rate(OneTime, const LazyDensityOperator& m) co
 }
 
 
-void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, StateVectorLow& psi) const
+void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi) const
 {
   dcomp fact=sqrt(2.*real(z_))*exp(-z_*double(t));
   int ubound=psi.ubound(0);
@@ -388,7 +388,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, StateVectorLow& psi) const
 
 
 
-const PumpedLossyModeIP_NoExact::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const LazyDensityOperator& matrix) const
+const mode::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const LazyDensityOperator& matrix) const
 {
   auto averages(initializedAverages());
 

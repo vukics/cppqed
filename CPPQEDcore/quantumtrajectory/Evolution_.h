@@ -139,9 +139,7 @@ auto _(SV_OR_DO&& initial, SYS&& sys, const Parameters& p, bool doStreaming=true
 {
   static constexpr auto RANK=std::decay_t<SV_OR_DO>::N_RANK;
 
-  return details::_<RANK,ODE_Engine,RandomEngine,V>(std::forward<SV_OR_DO>(initial),
-                                         std::forward<SYS>(sys),
-                                         p,doStreaming,returnStreamedArray);
+  return details::_<RANK,ODE_Engine,RandomEngine,V>(std::forward<SV_OR_DO>(initial),std::forward<SYS>(sys),p,doStreaming,returnStreamedArray);
 }
 
 

@@ -12,12 +12,16 @@ namespace mpl=boost::mpl;
 /// Auxiliary tools for BinarySystem
 namespace binary {
 
-typedef structure::Interaction<2> Interaction; ///< Binary interaction
+typedef ::structure::Interaction<2> Interaction; ///< Binary interaction
+using InteractionPtr = ::structure::InteractionPtr<2>;
 
+using StateVectorLow = ::structure::StateVectorLow<2>;
+using DensityOperatorLow = ::structure::DensityOperatorLow<2>;
 
 typedef composite::SubSystemFree SSF; ///< Convenience typedef
 typedef composite::SubSystemsInteraction<2> SSI; ///< Convenience typedef
 
+using structure::Averages; using structure::Rates;
 
 /// Outfactored common functionality of Liouvillean and Averaged
 template<structure::LiouvilleanAveragedTag>
@@ -29,7 +33,7 @@ size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia);
 
 /// Outfactored common functionality of Liouvillean and Averaged
 template<structure::LiouvilleanAveragedTag>
-const structure::LiouvilleanAveragedCommon::DArray1D
+const Averages
 average(double t, const quantumdata::LazyDensityOperator<2>& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr);
 
 
@@ -57,7 +61,7 @@ protected:
   typedef structure::Averaged<2> Av2;
 
   /// Constructor from an #Interaction instant
-  explicit Base(Interaction::Ptr);
+  explicit Base(InteractionPtr);
 
   /// \name Getters
   //@{
@@ -95,7 +99,7 @@ typedef std::shared_ptr<const Base> Ptr; ///< Convenience typedef
  * (the two \link structure::Free free systems\endlink and the #Interaction): whether they derive from structure::Exact, structure::Hamiltonian, structure::Liouvillean.
  * If any of the components derive from structure::Exact, then the whole BinarySystem has to derive from structure::Exact, and so on.
  */
-const Ptr make(Interaction::Ptr);
+const Ptr make(InteractionPtr);
 
 
 #define CLASS_HEADER(Class) class Class : public structure::Class<2>
@@ -197,9 +201,7 @@ public:
   
   typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
   
-  typedef structure::Interaction<2> Interaction;
-
-  explicit BinarySystem(Interaction::Ptr);
+  explicit BinarySystem(binary::InteractionPtr);
 
 };
 

@@ -22,9 +22,11 @@
 #endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <memory>
+#include <optional>
 #include <random>
 #include <stdexcept>
 #include <sstream>
+#include <optional>
 
 
 namespace randomutils {

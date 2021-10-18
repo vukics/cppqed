@@ -8,6 +8,8 @@
 
 #include "ComplexExtensions.h"
 
+#include <boost/math/special_functions/binomial.hpp>
+
 /// Comprises wrapper functions for mathematical functions taken from libraries (Boost.Math, GSL), and several other mathematical functions.
 namespace cppqedutils {
  
@@ -26,6 +28,10 @@ double sqrAbs(dcomp);
 
 double fact  (unsigned          );
 double choose(unsigned, unsigned);
+
+template <class T>
+inline T multiChoose(unsigned n, unsigned k) {return boost::math::binomial_coefficient<T>(n+k-1,k);}
+
 
 template<typename T>
 bool parity(T n) { return n & 1;}

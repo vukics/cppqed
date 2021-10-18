@@ -34,13 +34,11 @@ protected:
   HomodynedBase(const ParsPumpedLossy& p, dcomp homodyneAmplitude) : HomodynedBase(p,homodyneAmplitude,p.eta) {}
 
 private:
-  typedef Hamiltonian<false>::StateVectorLow StateVectorLow;
+  void doActWithJ(NoTime, mode::StateVectorLow& psi, LindbladNo<0>) const;
+  void doActWithJ(NoTime, mode::StateVectorLow& psi, LindbladNo<1>) const;
 
-  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const;
-  void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<1>) const;
-
-  double rate(NoTime, const LazyDensityOperator&, LindbladNo<0>) const {return -1;}
-  double rate(NoTime, const LazyDensityOperator&, LindbladNo<1>) const {return -1;}
+  double rate(NoTime, const mode::LazyDensityOperator&, LindbladNo<0>) const {return -1;}
+  double rate(NoTime, const mode::LazyDensityOperator&, LindbladNo<1>) const {return -1;}
 
   const dcomp homodyneAmplitude_; ///< \f$\sqrt(f)\,e^{i\vartheta}\f$ in Charmichael’s notation
 

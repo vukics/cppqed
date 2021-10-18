@@ -14,8 +14,6 @@ using particle:: mfNKX;
 using particle::cosNKX;
 using particle::mfComposition;
 
-using namespace mode;
-
 
 namespace {
 
@@ -29,18 +27,18 @@ const particlecavity::Tridiagonals dispersive(mode::Ptr mode, particle::Ptr part
 {
   particlecavity::Tridiagonals res;
   if (uNot && !isComplex(get<0>(mf)))
-    res.push_back(uNot*nop(mode)*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(particle,get<1>(mf)<<1)/(2.*DCOMP_I));
+    res.push_back(uNot*mode::nop(mode)*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(particle,get<1>(mf)<<1)/(2.*DCOMP_I));
   return res;
 }
 
 particlecavity::Tridiagonal interfericOneModeFN(mode::Ptr mode, particle::Ptr particle, double etaeff, const ModeFunction& mf)
 {
-  return etaeff*tridiagPlusHC_overI(aop(mode)*mfNKX(particle,mf));
+  return etaeff*tridiagPlusHC_overI(mode::aop(mode)*mfNKX(particle,mf));
 }
 
 const particlecavity::Tridiagonal interfericTwoModeFN(mode::Ptr mode, particle::Ptr particle, double etaeff, const ModeFunction& mfCav, const ModeFunction& mfPart)
 {
-  return etaeff*tridiagPlusHC_overI(aop(mode).dagger()*mfComposition(particle, mfCav, mfPart));
+  return etaeff*tridiagPlusHC_overI(mode::aop(mode).dagger()*mfComposition(particle, mfCav, mfPart));
 }
 
 const particlecavity::Tridiagonals fillT(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff, const ModeFunction& mf)
@@ -106,13 +104,13 @@ ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped par
     particlecavity::Base(mode,particle,uNot,etaeff),
     isSpecialH_(kCav==abs(get<1>(particle->getMF()))),
     tridiagonalH_(fillTTwoModeFN(mode,particle,uNot,etaeff,MF_Base::member,isSpecialH_)),
-    firstH_(etaeff*aop(mode)*mfNKX(particle,MF_Base::member)/DCOMP_I), firstHT_(-firstH_.dagger()),
+    firstH_(etaeff*mode::aop(mode)*mfNKX(particle,MF_Base::member)/DCOMP_I), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(particle,particle->getMF()).dagger()), secondHT_(secondH_.dagger())
 {
   getParsStream()<<"Particle with "<< particle->getMF() <<" pump moving along cavity with "<<getMF()<<endl;
 }
 
-void ParticleAlongCavity::addContribution_v(double t, const StateVectorLow& psi, StateVectorLow& dpsidt, double t0) const
+void ParticleAlongCavity::addContribution_v(double t, const quantumdata::StateVectorLow<2>& psi, quantumdata::StateVectorLow<2>& dpsidt, double t0) const
 {
   tridiagonalH_.addContribution(t,psi,dpsidt,t0);
 
@@ -128,7 +126,7 @@ void ParticleAlongCavity::addContribution_v(double t, const StateVectorLow& psi,
     secondH_.propagate(dt); secondHT_.propagate(dt);
   }
 
-  StateVectorLow dpsidtTemp(psi.shape()); // NEEDS_WORK check whether putting this into class scope saves time (only one dynamic allocation)
+  quantumdata::StateVectorLow<2> dpsidtTemp{psi.shape()}; // NEEDS_WORK check whether putting this into class scope saves time (only one dynamic allocation)
   {
     dpsidtTemp=0;
     apply(psi,dpsidtTemp,firstH_);

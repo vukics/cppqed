@@ -24,10 +24,6 @@
 class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillean<1,1>, public qbit::Averaged
 {
 public:
-  typedef structure::ElementLiouvillean<1,1> Base;
-  typedef Base::StateVectorLow StateVectorLow;
-  typedef Base::LazyDensityOperator LazyDensityOperator;
-
   const dcomp getZa() const {return za_;}
 
 protected:
@@ -36,7 +32,7 @@ protected:
 private:
   double rate(structure::NoTime, const LazyDensityOperator&) const;
 
-  void doActWithJ(structure::NoTime, StateVectorLow&) const;
+  void doActWithJ(structure::NoTime, qbit::StateVectorLow&) const;
 
   const dcomp za_, eta_;
 
@@ -47,13 +43,10 @@ private:
 class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
 {
 public:
-  typedef PumpedTwoLevelAtom Base;
-  typedef Base::StateVectorLow StateVectorLow;
-
   PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy&);
   
 private:
-  void addContribution_v(structure::NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
+  void addContribution_v(structure::NoTime, const qbit::StateVectorLow& psi, qbit::StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
 
   static const linalg::CMatrix hamiltonianOverI(dcomp za, dcomp etat);
 

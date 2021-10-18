@@ -48,14 +48,12 @@ struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::ru
  * 
  */
 template<int RANK, typename ODE_Engine, typename V=tmptools::V_Empty>
-class Master : private structure::QuantumSystemWrapper<RANK,true>
+class Master : private structure::QuantumSystemWrapper<RANK>
 {
-private:
-  using QuantumSystemWrapper=structure::QuantumSystemWrapper<RANK,true>;
 public:
   Master(Master&&) = default; Master& operator=(Master&&) = default;
 
-  using StreamedArray=structure::AveragedCommon::Averages;
+  using StreamedArray=structure::Averages;
   
   typedef typename quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
 
@@ -67,7 +65,7 @@ public:
          ODE_Engine ode,
          bool negativity ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
          ) 
-  : QuantumSystemWrapper{sys,true},
+  : structure::QuantumSystemWrapper<RANK>{sys,true},
     rho_{std::forward<StateVector_OR_DensityOperator>(state)},
     ode_(ode),
     dos_(this->getAv(),negativity)

@@ -20,8 +20,8 @@ protected:
   typedef structure::       Averaged<1> Averaged1;
 
 private:
-  const Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
-  void           process_v(                   Averages&)                  const;
+  const mode::Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
+  void process_v(mode::Averages&) const;
 
   const mode::AveragedQuadratures averagedMode_;
 

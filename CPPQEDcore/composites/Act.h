@@ -32,7 +32,7 @@ class _
 public:
   typedef tmptools::Vector<V...> Vector;
 
-  explicit _(typename structure::Interaction<sizeof...(V)>::Ptr ia) : BASE_class(ia) {}
+  explicit _(typename structure::InteractionPtr<sizeof...(V)> ia) : BASE_class(ia) {}
 
 };
 

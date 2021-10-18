@@ -13,7 +13,7 @@ namespace structure {
 
 namespace details {
 
-std::ostream& streamCommon(const AveragedCommon::Averages&, std::ostream&, int);
+std::ostream& streamCommon(const Averages&, std::ostream&, int);
 
 } // details
 
@@ -35,9 +35,6 @@ class ElementAveraged : public ElementLiouvilleanAveragedCommon<AveragedTimeDepe
 private:
   typedef ElementLiouvilleanAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
-public:
-  typedef AveragedCommon::Averages Averages;
-
 protected:
   /// \name Constructors
   //@{

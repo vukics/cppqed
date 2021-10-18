@@ -25,6 +25,8 @@ typedef quantumdata::LazyDensityOperator<1> LazyDensityOperator; ///< unary Lazy
 typedef quantumdata::    StateVector<1>     StateVector; ///< unary StateVector
 typedef quantumdata::DensityOperator<1> DensityOperator; ///< unary DensityOperator
 
+using ::structure::Averages; using ::structure::Rates;
+
 } // freesystem
 
 
@@ -32,8 +34,6 @@ typedef quantumdata::DensityOperator<1> DensityOperator; ///< unary DensityOpera
 class Free : public QuantumSystem<1>, public DynamicsBase
 {
 public:
-  typedef std::shared_ptr<const Free> Ptr;
-
   /// A single dimension to initialise QuantumSystem`<1>` and the lists of real and complex name-frequency-multiplier tuples for DynamicsBase
   explicit Free(size_t dim, const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF) : QuantumSystem<1>(dim), DynamicsBase(realFreqs,complexFreqs) {}
 
@@ -55,6 +55,9 @@ private:
   std::ostream& streamMoreParameters(std::ostream& os) const final {return DynamicsBase::streamMoreParameters(os<<"Dimension: "<<getDimension()<<std::endl);}
 
 };
+
+
+using FreePtr = std::shared_ptr<const Free>;
 
 
 } // structure
