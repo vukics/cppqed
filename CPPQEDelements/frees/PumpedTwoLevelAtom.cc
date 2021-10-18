@@ -19,7 +19,7 @@ PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
 }
 
 
-double PumpedTwoLevelAtom::rate(NoTime, const LazyDensityOperator& matrix) const
+double PumpedTwoLevelAtom::rate(NoTime, const qbit::LazyDensityOperator& matrix) const
 {
   return -2.*real(za_)*matrix(1);
 }

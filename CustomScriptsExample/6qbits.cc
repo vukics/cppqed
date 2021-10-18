@@ -6,7 +6,7 @@
 
 #include "EvolutionComposite.h"
 
-#include "AveragingUtils.tcc"
+#include "AveragingUtils.h"
 #include "JaynesCummings.h"
 #include "QbitModeCorrelations.h"
 

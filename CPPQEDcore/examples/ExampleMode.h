@@ -21,12 +21,10 @@ class PumpedLossyMode
   : public structure::Free, public TridiagonalHamiltonian<1,false>, public structure::ElementLiouvilleanStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
-  typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
-
   PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
 private:
-  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  const Averages average_v(NoTime, const structure::freesystem::LazyDensityOperator&) const;
 
 };
 
@@ -47,8 +45,6 @@ class PumpedLossyModeIP
     public structure::ElementLiouvilleanStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
-  typedef ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
-
   PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
   const dcomp get_z() const {return z_;}
@@ -58,7 +54,7 @@ private:
 
   bool applicableInMaster_v() const override {return true;}
 
-  const Averages average_v(NoTime, const LazyDensityOperator&) const override;
+  const Averages average_v(NoTime, const structure::freesystem::LazyDensityOperator&) const override;
 
   const dcomp z_; // Needed for updateU
 

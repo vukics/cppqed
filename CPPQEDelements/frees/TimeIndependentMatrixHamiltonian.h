@@ -2,7 +2,7 @@
 #ifndef   CPPQEDELEMENTS_FREES_TIMEINDEPENDENTMATRIXHAMILTONIAN_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_TIMEINDEPENDENTMATRIXHAMILTONIAN_H_INCLUDED
 
-#include "AveragingUtils.tcc"
+#include "AveragingUtils.h"
 
 #include "Averaged.h"
 #include "Free.h"
@@ -35,9 +35,7 @@ private:
 public:
   typedef typename Base::AveragedToPtr AveragedToPtr;
 
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
-  TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, AveragedToPtr averaged, const LazyDensityOperator& ldo)
+  TimeIndependentMatrixHamiltonianAveraged(const CMatrix& matrix, AveragedToPtr averaged, const quantumdata::LazyDensityOperator<RANK>& ldo)
     : TimeIndependentMatrixHamiltonian(matrix), Base(averaged,ldo) {}
 
 };

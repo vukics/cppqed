@@ -139,7 +139,7 @@ template size_t nAvr< LA_Av >(const SSF& free0, const SSF& free1, const SSI& ia)
 
 
 template<LiouvilleanAveragedTag LA>
-const Averages average(double t, const Base::LazyDensityOperator& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr)
+const Averages average(double t, const LazyDensityOperator& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr)
 {
   using boost::copy;
 

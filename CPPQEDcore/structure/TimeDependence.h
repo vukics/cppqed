@@ -83,6 +83,11 @@ using DispatcherIsTimeDependent_t = std::conditional_t<IS_TIME_DEPENDENT,OneTime
 template<bool IS_TWO_TIME>
 using DispatcherIsTwoTime_t = std::conditional_t<IS_TWO_TIME,TwoTime,OneTime>;
 
+
+inline double convert(OneTime t) {return t ;}
+inline double convert( NoTime  ) {return 0.;}
+
+
 } // time
 
 

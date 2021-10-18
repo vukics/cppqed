@@ -16,7 +16,7 @@ protected:
   typedef structure::ElementAveraged<2>::Time NoTime;
 
 private:
-  const structure::Averages average_v(NoTime, const LazyDensityOperator&) const;
+  const structure::Averages average_v(NoTime, const quantumdata::LazyDensityOperator<2>&) const;
 
 };
 
