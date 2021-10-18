@@ -18,6 +18,8 @@ using InteractionPtr = ::structure::InteractionPtr<2>;
 using StateVectorLow = ::structure::StateVectorLow<2>;
 using DensityOperatorLow = ::structure::DensityOperatorLow<2>;
 
+using LazyDensityOperator = ::quantumdata::LazyDensityOperator<2>;
+
 typedef composite::SubSystemFree SSF; ///< Convenience typedef
 typedef composite::SubSystemsInteraction<2> SSI; ///< Convenience typedef
 

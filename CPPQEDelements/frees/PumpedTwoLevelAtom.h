@@ -30,7 +30,7 @@ protected:
   PumpedTwoLevelAtom(const qbit::ParsPumpedLossy&);
 
 private:
-  double rate(structure::NoTime, const LazyDensityOperator&) const;
+  double rate(structure::NoTime, const qbit::LazyDensityOperator&) const;
 
   void doActWithJ(structure::NoTime, qbit::StateVectorLow&) const;
 

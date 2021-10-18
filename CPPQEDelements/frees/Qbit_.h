@@ -12,6 +12,8 @@
 
 namespace qbit {
 
+using namespace structure::freesystem;
+
 using mode::NoTime; using mode::Averages;
 
 const std::string keyTitle="Qbit";
@@ -26,7 +28,7 @@ public:
   Averaged();
 
 private:
-  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  const Averages average_v(NoTime, const qbit::LazyDensityOperator&) const;
 
 };
 
@@ -56,8 +58,6 @@ public:
 
 
 namespace qbit {
-
-using namespace structure::freesystem;
 
 typedef std::shared_ptr<const QbitBase> Ptr;
 

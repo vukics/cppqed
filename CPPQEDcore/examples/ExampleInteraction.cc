@@ -19,7 +19,7 @@ hierarchical::InteractionX_X::InteractionX_X(ModeBase::Ptr m0, ModeBase::Ptr m1,
 {}
 
 
-auto hierarchical::InteractionX_X_Correlations::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
+auto hierarchical::InteractionX_X_Correlations::average_v(NoTime, const quantumdata::LazyDensityOperator<2>& matrix) const -> const Averages
 {
   auto averages(initializedAverages());
 

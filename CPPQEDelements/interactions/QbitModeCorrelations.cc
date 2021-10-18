@@ -10,7 +10,7 @@ QbitModeCorrelations::QbitModeCorrelations()
 }
 
 
-const structure::Averages QbitModeCorrelations::average_v(NoTime, const LazyDensityOperator& matrix) const
+const structure::Averages QbitModeCorrelations::average_v(NoTime, const quantumdata::LazyDensityOperator<2>& matrix) const
 {
   auto averages(initializedAverages());
 

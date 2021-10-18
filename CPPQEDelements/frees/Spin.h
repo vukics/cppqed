@@ -87,7 +87,7 @@ class SpinBase
     public structure::ElementAveraged<1>
 {
 public:
-  typedef structure::ElementAveraged<1>::LazyDensityOperator LazyDensityOperator;
+  typedef structure::freesystem::LazyDensityOperator LazyDensityOperator;
 
   SpinBase(size_t twoS, double theta, double phi, double omega, double gamma, size_t dim=0);
 

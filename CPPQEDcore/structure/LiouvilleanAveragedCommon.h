@@ -68,8 +68,6 @@ template<int RANK>
 class LiouvilleanAveragedCommonRanked : public LiouvilleanAveragedCommon
 {
 public:
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
   virtual ~LiouvilleanAveragedCommonRanked() {}
 
   /// Calculates quantum averages & checks post-conditions
@@ -82,7 +80,7 @@ public:
    * 
    */
   const Averages average(double t, ///< one or more of the operators whose quantum average is calculated, might be time-dependent
-                         const LazyDensityOperator& matrix /// the state of the quantum system
+                         const quantumdata::LazyDensityOperator<RANK>& matrix /// the state of the quantum system
                         ) const
   {
     const Averages averages(average_v(t,matrix));
@@ -95,7 +93,7 @@ public:
   }
 
 private:
-  virtual const Averages average_v(double, const LazyDensityOperator&) const = 0;
+  virtual const Averages average_v(double, const quantumdata::LazyDensityOperator<RANK>&) const = 0;
   
 };
 

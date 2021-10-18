@@ -371,7 +371,7 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
 
 
 
-double PumpedLossyModeIP_NoExact::rate(OneTime, const LazyDensityOperator& m) const
+double PumpedLossyModeIP_NoExact::rate(OneTime, const mode::LazyDensityOperator& m) const
 {
   return mode::photonNumber(m);
 }
@@ -388,7 +388,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi)
 
 
 
-const mode::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const LazyDensityOperator& matrix) const
+const mode::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const mode::LazyDensityOperator& matrix) const
 {
   auto averages(initializedAverages());
 

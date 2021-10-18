@@ -26,7 +26,7 @@ namespace {
 }
 
 
-const mode::Averages ModeCorrelations::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
+const mode::Averages ModeCorrelations::average_v(structure::NoTime, const quantumdata::LazyDensityOperator<2>& matrix) const
 {
   using quantumdata::partialTrace;
 

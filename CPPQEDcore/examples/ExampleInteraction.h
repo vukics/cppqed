@@ -42,7 +42,7 @@ public:
   {}
 
 private:
-  const Averages average_v(NoTime, const LazyDensityOperator&) const;
+  const Averages average_v(NoTime, const quantumdata::LazyDensityOperator<2>&) const;
 
 };
 

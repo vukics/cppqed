@@ -37,7 +37,7 @@ basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, d
 }
 
 
-auto basic::PumpedLossyMode::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
+auto basic::PumpedLossyMode::average_v(NoTime, const structure::freesystem::LazyDensityOperator& matrix) const -> const Averages
 {
   auto averages(initializedAverages());
 
@@ -85,7 +85,7 @@ void basic::PumpedLossyModeIP::updateU(OneTime dtDid) const
 
 
 // PumpedLossyModeIP::average_v exactly the same as PumpedLossyMode::average_v above
-auto basic::PumpedLossyModeIP::average_v(NoTime, const LazyDensityOperator& matrix) const -> const Averages
+auto basic::PumpedLossyModeIP::average_v(NoTime, const structure::freesystem::LazyDensityOperator& matrix) const -> const Averages
 {
   auto averages(initializedAverages());
 

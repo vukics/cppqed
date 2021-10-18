@@ -96,14 +96,12 @@ template<int RANK, bool IS_TIME_DEPENDENT>
 class AveragedTimeDependenceDispatched : public Averaged<RANK>
 {
 public:
-  typedef typename Averaged<RANK>::LazyDensityOperator LazyDensityOperator;
-  
   typedef time::DispatcherIsTimeDependent_t<IS_TIME_DEPENDENT> Time;
 
 private:
-  const Averages average_v(double t, const LazyDensityOperator& matrix) const final {return average_v(Time(t),matrix);}
+  const Averages average_v(double t, const quantumdata::LazyDensityOperator<RANK>& matrix) const final {return average_v(Time(t),matrix);}
 
-  virtual const Averages average_v(Time, const LazyDensityOperator&) const = 0;
+  virtual const Averages average_v(Time, const quantumdata::LazyDensityOperator<RANK>&) const = 0;
 
 };
 
