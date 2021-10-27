@@ -279,14 +279,19 @@ template<typename Base=Averaged>
 class AveragedMonitorCutoff : public Base
 {
 public:
-  typedef typename Base::Averages Averages;
   typedef typename Base::KeyLabels KeyLabels;
 
   AveragedMonitorCutoff();
 
 private:
-  const Averages average_v(NoTime, const LazyDensityOperator&) const;
-  void           process_v(        Averages&)                  const;
+  const Averages average_v(NoTime t, const LazyDensityOperator& matrix) const
+  {
+    auto averages{Base::average_v(t,matrix)}; // This is already of the correct size, since nAvr knows about the size updated by the derived class
+    averages(averages.size()-1)=matrix(matrix.getDimension()-1);
+    return averages;
+  }
+  
+  void process_v(Averages&) const;
 
 };
 
