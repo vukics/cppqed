@@ -5,6 +5,7 @@
 
 #include "SubSystem.h"
 
+#include "Algorithm.h"
 #include "SliceIterator.h"
 
 #include <array>
@@ -14,6 +15,9 @@ namespace composite {
 
 
 using ::size_t; using ::structure::Averages; using ::structure::Rates;
+
+template<int RANK>
+using Frees = std::array<SubSystemFree,RANK> ;
 
 
 /// Helper class to Composite (an Act)
@@ -52,20 +56,18 @@ class RankedBase : public structure::QuantumSystem<RANK>
 public:
   static const int N_RANK = RANK;
 
-  using Frees = std::array<SubSystemFree,RANK> ;
-
 protected:
-  explicit RankedBase(const Frees& frees)
-    : structure::QuantumSystem<RANK>([&] () {
+  explicit RankedBase(const Frees<RANK>& frees)
+    : structure::QuantumSystem<RANK>([&] () { // calculate the dimensions
         typename structure::QuantumSystem<RANK>::Dimensions res;
         hana::for_each(tmptools::ordinals<RANK>,[&](auto t) {res(t)=frees[t].get()->getDimension();});
         return res;
     }()), frees_(frees) {}
   
-  const Frees& getFrees() const {return frees_;}
+  const Frees<RANK>& getFrees() const {return frees_;}
 
 private:
-  const Frees frees_;
+  const Frees<RANK> frees_;
  
 };
 
@@ -80,53 +82,152 @@ public:
   static constexpr int RANK = calculateRank<Acts>;
 
 private:
-  using Frees = typename RankedBase<RANK>::Frees; using RankedBase<RANK>::getFrees;
+  using RankedBase<RANK>::getFrees;
   
   // Compile-time sanity check: each ordinal up to RANK has to be contained by at least one act.
   // (That is, no free system can be left out of the network of interactions)
   static_assert( hana::fold (tmptools::ordinals<RANK>, hana::true_c, [](auto state, auto ordinal) {
-    return state && hana::fold (Acts{}, hana::false_c, [o=ordinal](auto state, auto act) {return state || hana::contains(act,o);}); }
+    return state && hana::fold (Acts{}, hana::false_c, [o=ordinal](auto state, const auto& act) {return state || hana::contains(act,o);}); }
   ) == true , "Composite not consistent" );
 
 public:
-  template<structure::LiouvilleanAveragedTag>
-  static std::ostream& streamKeyLA(std::ostream&, size_t&, const Frees&, const Acts& acts);
+  template<structure::LiouvilleanAveragedTag LA>
+  static std::ostream& streamKeyLA(std::ostream& os, size_t& i, const Frees<RANK>& frees, const Acts& acts)
+  {
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {frees[idx].template streamKey<LA>(os,i);});
+    hana::for_each(acts,[&](const auto& act) {act.template streamKey<LA>(os,i);});    
+    return os;
+  }
+  
+  
+  template<structure::LiouvilleanAveragedTag LA>
+  static size_t nAvrLA(const Frees<RANK>& frees, const Acts& acts)
+  {
+    
+    return hana::fold(acts,
+                      hana::fold(tmptools::ordinals<RANK>,0,[&](size_t res, auto idx) {return res + frees[idx].template nAvr<LA>();}),
+                      [&](size_t s, const auto& act) {return s+act.template nAvr<LA>();});
+  }
+  
 
-  template<structure::LiouvilleanAveragedTag>
-  static size_t nAvrLA(const Frees& frees, const Acts& acts);
+#ifndef NDEBUG
+#pragma GCC warning "TODO: This solution is a bit insane, could be solved more effectively with blitz::Array slice"
+#endif // NDEBUG
+  template<structure::LiouvilleanAveragedTag LA>
+  static const structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo, const Frees<RANK>& frees, const Acts& acts, size_t numberAvr)
+  {
+    std::list<Averages> seqAverages{RANK+hana::size(acts)}; // Averages res(numberAvr); size_t resIdx=0;
+    
+    {
+      typename std::list<Averages>::iterator iter(seqAverages.begin());
+      
+      const auto lambda=[&](auto av, auto v) {
+        iter++->reference(quantumdata::partialTrace<std::decay_t<decltype(v)>>(ldo,[&](const auto& ldoS) {
+          return structure::average(av,t,ldoS);
+        }));
+      };
+      
+      auto tag=structure::LiouvilleanAveragedTag_<LA>();
+      
+      hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees[idx].getLA(tag),tmptools::vector<idx>);});
+      
+      hana::for_each(acts,[&](const auto& act) {lambda(act.getLA(tag),act);});
+      
+    }
+    
+    Averages res(numberAvr); res=0;
+    return cppqedutils::concatenate(seqAverages,res);
+    
+  }
 
-  template<structure::LiouvilleanAveragedTag>
-  static const structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo, const Frees& frees, const Acts& acts, size_t numberAvr);
 
 protected:
   // Constructor
-  explicit Base(const Frees& frees, const Acts& acts) : RankedBase<RANK>(frees), acts_(acts) {}
+  explicit Base(const Frees<RANK>& frees, const Acts& acts) : RankedBase<RANK>(frees), acts_(acts) {}
     
   const Acts& getActs() const {return acts_;}
 
 private:
   // Implementing QuantumSystem interface
 
-  double highestFrequency_v( ) const;
-  std::ostream& streamParameters_v(std::ostream&) const;
+  double highestFrequency_v( ) const override
+  {
+    return std::max(
+      getFrees()[hana::maximum(tmptools::ordinals<RANK>,[&](auto idx1, auto idx2) {
+        return  getFrees()[idx1].get()->highestFrequency() < getFrees()[idx2].get()->highestFrequency();
+      })].get()->highestFrequency()
+      ,
+      hana::maximum(acts_,[&](const auto& act1, const auto& act2) {return act1.get()->highestFrequency() < act2.get()->highestFrequency();}).get()->highestFrequency()
+    );
+  }
+  
+  std::ostream& streamParameters_v(std::ostream& os) const override
+  {
+    os<<"Composite\nDimensions: "<<RankedBase<RANK>::getDimensions()<<". Total: "<<RankedBase<RANK>::getTotalDimension()<<std::endl;
+    
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {
+      os<<"Subsystem Nr. "<<idx<<std::endl;
+      getFrees()[idx].get()->streamParameters(os);
+    });
+    
+    hana::for_each(acts_, [&](const auto& act) {
+      hana::for_each(act,[&](auto idx) {os<<idx<<" - ";});
+      os<<"Interaction\n";
+      act.get()->streamParameters(os);
+    });
+    
+    return os;
+  }
+  
 
-  // Implementing Av_Base
+  // Implementing the Averaged base
 
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const {return streamKeyLA<structure::LA_Av>(os,i, getFrees() ,acts_ );}
-  size_t nAvr_v() const {return nAvrLA<structure::LA_Av>( getFrees(),acts_ );}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return streamKeyLA<structure::LA_Av>(os,i, getFrees() ,acts_ );}
+  size_t nAvr_v() const override {return nAvrLA<structure::LA_Av>( getFrees(),acts_ );}
   const structure::Averages average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return averageLA<structure::LA_Av>(t,ldo,getFrees(),acts_,nAvr_v());}
   
-  void process_v(structure::Averages&) const;
-  std::ostream& stream_v(const structure::Averages&, std::ostream&, int) const;
+  void process_v(structure::Averages& avr) const override
+  {
+    ptrdiff_t l=-1, u=0;
 
+    const auto lambda=[&](auto av) {
+      if (av && (u=l+av->nAvr())>l) {
+        Averages temp(avr(blitz::Range(l+1,u)));
+        av->process(temp);
+        l=u;
+      }
+    };
+  
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(getFrees()[idx].getAv());});
+    
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getAv());});
+  }
+  
+  
+  std::ostream& stream_v(const structure::Averages& avr, std::ostream& os, int precision) const override
+  {
+    ptrdiff_t l=-1, u=0;
+  
+    const auto lambda=[&](auto av){
+      if (av && (u=l+av->nAvr())>l) {
+        av->stream(avr(blitz::Range(l+1,u)),os,precision);
+        l=u;
+      }
+    };
+    
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(getFrees()[idx].getAv());});
+    
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getAv());});
+    
+    return os;
+    
+  }
+  
+  
   const Acts acts_;
 
 };
 
-
-// Constructor helper
-template<typename Acts>
-auto fillFrees(const Acts& acts);
 
 
 
@@ -137,25 +238,35 @@ const typename Base<Acts>::Ptr doMake(const Acts&);
 
 template<typename Acts>
 class Exact
-  : public structure::Exact<MaxRank_v<Acts>+1>
+  : public structure::Exact<calculateRank<Acts>()>
 {
 private:
-  static const int RANK=MaxRank_v<Acts>+1;
-
-  typedef std::array<SubSystemFree,RANK> Frees;
-
-  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
-
-  typedef tmptools::Ordinals<RANK> Ordinals;
+  static const int RANK=calculateRank<Acts>();
 
 protected:
-  Exact(const Frees& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
+  Exact(const Frees<RANK>& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  void actWithU_v(double, StateVectorLow&, double) const;
-  bool applicableInMaster_v( ) const;
+  void actWithU_v(double t, quantumdata::StateVectorLow<RANK>& psi, double t0) const override
+  {
+    const auto lambda=[&](auto ex, auto v) {if (ex) for (auto& psiS : cppqedutils::sliceiterator::fullRange<decltype(v)>(psi)) ex->actWithU(t,psiS,t0);};
+    
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getEx(),tmptools::Vector<idx>());});
+    
+    boost::fusion::for_each(acts_,[&](const auto& act) {lambda(act.getEx(),act);});
+    
+  }
+  
+  
+  bool applicableInMaster_v( ) const override
+  {
+    if (hana::fold(tmptools::ordinals<RANK>,true,[&](bool s, auto idx) {return s && frees_[idx].applicableInMaster();}))
+      return hana::fold(acts_,true,[&](bool s, const auto& act) {return s && act.applicableInMaster();});
+    else return false;
+  }
+  
 
-  const Frees& frees_;
+  const Frees<RANK>& frees_;
   const Acts & acts_;
 
 };
@@ -163,24 +274,31 @@ private:
 
 template<typename Acts>
 class Hamiltonian
-  : public structure::Hamiltonian<MaxRank_v<Acts>+1>
+  : public structure::Hamiltonian<calculateRank<Acts>()>
 {
 private:
-  static const int RANK=MaxRank_v<Acts>+1;
-
-  typedef std::array<SubSystemFree,RANK> Frees;
-
-  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
-
-  typedef tmptools::Ordinals<RANK> Ordinals;
+  static const int RANK=calculateRank<Acts>();
 
 protected:
-  Hamiltonian(const Frees& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
+  Hamiltonian(const Frees<RANK>& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
+  void addContribution_v(double t, const quantumdata::StateVectorLow<RANK>& psi, quantumdata::StateVectorLow<RANK>& dpsidt, double t0) const override
+  {
+    const auto lambda=[&](auto ha, auto v) {
+      if (ha)
+        boost::for_each(cppqedutils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(psi),
+                        cppqedutils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(dpsidt),
+                        [&](const auto& psiS, auto& dpsidtS) {ha->addContribution(t,psiS,dpsidtS,t0);});
+    };
+    
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getHa(),tmptools::Vector<idx>());});
 
-  const Frees& frees_;
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getHa(),act);});
+    
+  }
+  
+  const Frees<RANK>& frees_;
   const Acts & acts_;
 
 };
@@ -188,34 +306,67 @@ private:
 
 template<typename Acts>
 class Liouvillean
-  : public structure::Liouvillean<MaxRank_v<Acts>+1>
+  : public structure::Liouvillean<calculateRank<Acts>()>
 {
 private:
-  static const int RANK=MaxRank_v<Acts>+1;
-
-  typedef std::array<SubSystemFree,RANK> Frees;
-
-  typedef quantumdata::StateVectorLow<RANK> StateVectorLow;
-  typedef quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
-
-  typedef quantumdata::LazyDensityOperator<RANK> LazyDensityOperator;
-
-  typedef tmptools::Ordinals<RANK> Ordinals;
+  static const int RANK=calculateRank<Acts>();
 
 protected:
-  Liouvillean(const Frees& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
+  Liouvillean(const Frees<RANK>& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
 
 private:
   std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<Acts>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
   
   size_t nAvr_v() const override {return Base<Acts>::template nAvrLA<structure::LA_Li>(frees_,acts_);}
   
-  const Rates average_v(double t, const LazyDensityOperator& ldo) const override {return Base<Acts>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
+  const Rates average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return Base<Acts>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
-  void actWithJ_v(double, StateVectorLow&, size_t) const override;
-  void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override;
-
-  const Frees& frees_;
+  void actWithJ_v(double t, quantumdata::StateVectorLow<RANK>& psi, size_t ordoJump) const override
+  {
+    bool flag=false;
+    
+    const auto lambda=[&](auto li, auto v) {
+      if (!flag && li) {
+        size_t n=li->nAvr();
+        if (ordoJump<n) {
+          for (auto& psiS : cppqedutils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(psi)) li->actWithJ(t,psiS,ordoJump);
+          flag=true;
+        }
+        ordoJump-=n;  
+      }
+    };
+    
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::Vector<idx>());});
+    
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act);});
+    
+  }
+  
+  
+  void actWithSuperoperator_v(double t, const quantumdata::DensityOperatorLow<RANK>& rho, quantumdata::DensityOperatorLow<RANK>& drhodt, size_t ordoJump) const override
+  {
+    bool flag=false;
+    
+    const auto lambda=[&](auto li, auto v) {
+      if (!flag && li) {
+        size_t n=li->nAvr();
+        if (ordoJump<n) {
+          boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,std::decay_t<decltype(v)>>>(rho),
+                          cppqedutils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,std::decay_t<decltype(v)>>>(drhodt),
+                          [&](const auto& rhoS, auto& drhodtS) {li->actWithSuperoperator(t,rhoS,drhodtS,ordoJump);});
+          flag=true;
+        }
+        ordoJump-=n;  
+      }
+    };
+    
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::Vector<idx>());});
+    
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act);});
+    
+  }
+  
+  const Frees<RANK>& frees_;
   const Acts & acts_;
 
 };
@@ -225,8 +376,8 @@ template<typename>
 class EmptyBase
 {
 public:
-  template<typename Acts>
-  EmptyBase(const std::array<SubSystemFree,MaxRank_v<Acts>+1>&, const Acts&) {}
+  template<typename Dummy, typename Acts>
+  EmptyBase(const Dummy&, const Acts&) {}
   
 };
 
@@ -324,8 +475,24 @@ public:
 
   // Constructor
   explicit Composite(const Acts& acts)
-    : Composite(composite::fillFrees(acts),acts) {}
-
+    : Composite([&]() {
+      typename composite::Base<Acts>::Frees res; res.fill(SubSystemFree());
+      
+      boost::fusion::for_each(acts,[&](const auto& act) -> void {
+        int i=0;
+        mpl::for_each<std::decay_t<decltype(act)>>([&](auto t) -> void {
+          static const int idx=decltype(t)::value;
+          if (res[idx].get()) {
+            if (res[idx].get()!=act.get()->getFrees()[i]) throw CompositeConsistencyException(idx,i);
+          }
+          else res[idx]=SubSystemFree(act.get()->getFrees()[i]);
+          i++;
+        });
+      });
+      
+      return res;
+    } (),acts) {}
+    
   friend const typename composite::Base<Acts>::Ptr composite::doMake<Acts>(const Acts&);
 
   // Note that Frees and Acts are stored by value in Base

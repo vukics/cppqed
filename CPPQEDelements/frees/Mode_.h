@@ -279,8 +279,6 @@ template<typename Base=Averaged>
 class AveragedMonitorCutoff : public Base
 {
 public:
-  typedef typename Base::KeyLabels KeyLabels;
-
   AveragedMonitorCutoff();
 
 private:
