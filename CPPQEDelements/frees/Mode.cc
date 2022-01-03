@@ -320,13 +320,7 @@ double photonNumber(const LazyDensityOperator& matrix)
 
 StateVector coherent(dcomp alpha, size_t dim)
 {
-  StateVector res(dim,false);
-  double norm(exp(-sqr(abs(alpha))/2.));
-
-  for (size_t n=0; n<dim; ++n) res(n)=norm*coherentElement(n,alpha);
-
-  return res;
-
+  return StateVector{dim,[=](StateVector& psi) {double norm=exp(-cppqedutils::sqrAbs(alpha)/2.); for (size_t n=0; n<dim; ++n) psi(n)=norm*coherentElement(n,alpha);}};
 }
 
 

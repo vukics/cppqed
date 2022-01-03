@@ -69,8 +69,10 @@ public:
     */
   StateVector(const StateVectorLow& psi, ByReference) : LDO_Base(psi.shape()), ABase(psi) {}
 
-  explicit StateVector(const Dimensions& dimensions, bool init=true) ///< Constructs the class with a newly allocated chunk of memory, which is initialized only if `init` is `true`.
-    : LDO_Base(dimensions), ABase(StateVectorLow(dimensions)) {if (init) *this=0;}
+  template<typename INITIALIZER=std::function<void(StateVector&)>>
+  explicit StateVector(const Dimensions& dimensions,
+                       INITIALIZER&& initializer=[](StateVector& psi) {psi=0;}) ///< Constructs the class with a newly allocated chunk of memory, which is initialized only if `init` is `true`.
+    : LDO_Base(dimensions), ABase(StateVectorLow(dimensions)) {initializer(*this);}
 
   StateVector(const StateVector& sv) ///< Copy constructor using by value semantics, that is, deep copy.
     : LDO_Base(sv.getDimensions()), ABase(sv.getArray().copy()) {}
