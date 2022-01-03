@@ -5,6 +5,7 @@
 
 #include "StateVector.h"
 
+#include "DensityOperatorStreamer.h"
 #include "MCWF_TrajectoryLogger.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"

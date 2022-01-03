@@ -445,6 +445,15 @@ std::ostream& streamParameters(const Trajectory& traj, std::ostream& os)
 }
 
 
+/// Step trajectory
+template <typename Trajectory>
+void step(Trajectory& traj, double deltaT, std::ostream& os)
+{
+  traj.step(deltaT,os);
+}
+
+
+
 } } // cppqedutils::trajectory
 
 
@@ -552,7 +561,7 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
 
       if (count) {
         // advance trajectory
-        if constexpr (!isDtMode) {traj.step(length-traj.getTime(),logStream);}
+        if constexpr (!isDtMode) {step(traj,length-traj.getTime(),logStream);}
         else {
           if constexpr (endTimeMode) advance(traj,std::min(streamFreq,length-traj.getTime()),logStream);
           else advance(traj,streamFreq,logStream);
