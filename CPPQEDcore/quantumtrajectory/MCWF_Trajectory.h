@@ -84,11 +84,13 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
  */
 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
-class MCWF_Trajectory : private structure::QuantumSystemWrapper<RANK>
+class MCWF_Trajectory : public structure::QuantumSystemWrapper<RANK>
 {
 public:
   MCWF_Trajectory(const MCWF_Trajectory&) = default; MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
+  using structure::QuantumSystemWrapper<RANK>::operator=;
+  
   using StreamedArray=structure::Averages;
 
   typedef quantumdata::StateVector<RANK> StateVector;
@@ -120,6 +122,7 @@ public:
   void step(double deltaT, std::ostream& logStream);
   
   auto getDtDid() const {return ode_.getDtDid();}
+  auto getDtTry() const {return ode_.getDtTry();}
   
   std::ostream& streamParameters(std::ostream&) const;
 
@@ -152,6 +155,11 @@ public:
   
   const mcwf::Logger& getLogger() const {return logger_;}
   
+  void referenceNewStateVector(const StateVector& psi) {psi_.reference(psi);}
+  void setODE(ODE_Engine ode) {ode_=std::move(ode);}
+  
+  double sampleRandom() {return distro_(re_.engine);}
+  
 private:
   typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
 
@@ -179,6 +187,8 @@ private:
   const double dpLimit_, overshootTolerance_;
 
   mutable mcwf::Logger logger_;
+  
+  std::uniform_real_distribution<double> distro_{};
 
 };
 
@@ -310,7 +320,7 @@ manageTimeStep(const structure::Rates& rates, double tCache, double dtDidCache, 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const structure::Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
-  double random=std::uniform_real_distribution()(re_.engine)/getDtDid();
+  double random=sampleRandom()/getDtDid();
 
   int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))

@@ -99,7 +99,7 @@ private:
   
   std::shared_ptr<gsl_odeiv2_step> step_;
 
-  const std::shared_ptr<gsl_odeiv2_control> control_;
+  std::shared_ptr<gsl_odeiv2_control> control_;
   
   // Needs to be easily copyable, as Steppers are carried around by value
   std::shared_ptr<ValueVector> yerr_, dydt_out_;

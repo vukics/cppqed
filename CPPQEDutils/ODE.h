@@ -73,7 +73,7 @@ struct ControlledErrorStepperWithParameters
   std::ostream& stream(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << ", epsAbs=" << epsAbs;}
 
   ControlledErrorStepper stepper;
-  const double epsRel, epsAbs;
+  double epsRel, epsAbs;
 };
 
 
