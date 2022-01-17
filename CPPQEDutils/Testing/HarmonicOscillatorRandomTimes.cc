@@ -51,6 +51,8 @@ int main(int, char**)
 
   }
 
-  return !(ampDev/nSamples<3e-4 && ampDerivDev/nSamples<4e-4);
+  std::cerr<<(ampDev/=nSamples)<<" "<<(ampDerivDev/=nSamples)<<std::endl;
+  
+  return !(ampDev<3e-4 && ampDerivDev<4e-4);
   
 }

@@ -315,18 +315,18 @@ run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p, AutostopHandler&& ah,
                     trajectory::TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>
 {
   if constexpr (decltype(has_step(traj))::value) { // it is of the Adaptive family
-    if (p.dc) return run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
-                         p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                         doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
+    if (p.dc) return trajectory::run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
+                                     p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+                                     doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
-  if (p.NDt) return run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-                        p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                        doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
-  else return run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-                  p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                  doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
+  if (p.NDt) return trajectory::run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+                                    p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+                                    doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
+  else return trajectory::run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+                              p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+                              doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
 }
 
 

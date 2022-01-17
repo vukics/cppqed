@@ -28,7 +28,7 @@ typedef Tridiagonal::Diagonal Diagonal;
 
 size_t decideDimension(size_t twoS, size_t dim)
 {
-  return dim && dim<twoS+1 ? dim : twoS+1;
+  return (dim && dim<twoS+1) ? dim : twoS+1;
 }
 
 
