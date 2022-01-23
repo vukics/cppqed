@@ -8,10 +8,22 @@
 #include "Algorithm.h"
 #include "SliceIterator.h"
 
+#include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/algorithm_ext/for_each.hpp>
+
 #include <array>
 
 
+
 namespace composite {
+
+
+struct ConsistencyException : std::logic_error
+{
+  ConsistencyException(int idxx, int ii) : std::logic_error(std::to_string(idxx)+" "+std::to_string(ii)), idx(idxx), i(ii) {}
+
+  const int idx, i;
+};
 
 
 using ::size_t; using ::structure::Averages; using ::structure::Rates;
@@ -35,17 +47,19 @@ class _
   : public SubSystemsInteraction<sizeof...(RetainedAxes)>
 {
 public:
-  explicit _(typename structure::InteractionPtr<sizeof...(RetainedAxes)> ia) : SubSystemsInteraction<sizeof...(RetainedAxes)>(ia) {}
+  explicit _(structure::InteractionPtr<sizeof...(RetainedAxes)> ia) : SubSystemsInteraction<sizeof...(RetainedAxes)>(ia) {}
 
-  constexpr operator tmptools::Vector<RetainedAxes...>() const {return tmptools::vector<RetainedAxes...>;};
+  static constexpr auto retainedAxesVector=tmptools::vector<RetainedAxes...>;
   
 };
 
 
-template<typename Acts>
-constexpr int calculateRank(Acts acts = Acts{})
+template<typename LiftedActs>
+constexpr int calculateRank()
 {
-  return hana::maximum(hana::maximum(hana::maximum(acts, [&](auto&& a, auto&& b) {return hana::maximum(a)<hana::maximum(b);}))) + 1;
+  return hana::maximum(hana::flatten(hana::transform(LiftedActs{},
+                                                     [&] (const auto& actType) {return decltype(actType)::type::retainedAxesVector;}
+                                                     )));
 }
 
 
@@ -79,7 +93,7 @@ class Base
 {
 public:
   // The calculated RANK
-  static constexpr int RANK = calculateRank<Acts>;
+  static constexpr int RANK = calculateRank<Acts>();
 
 private:
   using RankedBase<RANK>::getFrees;
@@ -251,9 +265,9 @@ private:
   {
     const auto lambda=[&](auto ex, auto v) {if (ex) for (auto& psiS : cppqedutils::sliceiterator::fullRange<decltype(v)>(psi)) ex->actWithU(t,psiS,t0);};
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getEx(),tmptools::Vector<idx>());});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getEx(),tmptools::vector<idx>);});
     
-    boost::fusion::for_each(acts_,[&](const auto& act) {lambda(act.getEx(),act);});
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getEx(),act);});
     
   }
   
@@ -292,7 +306,7 @@ private:
                         [&](const auto& psiS, auto& dpsidtS) {ha->addContribution(t,psiS,dpsidtS,t0);});
     };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getHa(),tmptools::Vector<idx>());});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getHa(),tmptools::vector<idx>);});
 
     hana::for_each(acts_,[&](const auto& act) {lambda(act.getHa(),act);});
     
@@ -336,7 +350,7 @@ private:
       }
     };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::Vector<idx>());});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::vector<idx>);});
     
     hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act);});
     
@@ -351,8 +365,9 @@ private:
       if (!flag && li) {
         size_t n=li->nAvr();
         if (ordoJump<n) {
-          boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,std::decay_t<decltype(v)>>>(rho),
-                          cppqedutils::sliceiterator::fullRange<tmptools::ExtendVector_t<RANK,std::decay_t<decltype(v)>>>(drhodt),
+          using ExtendedV=decltype(hana::concat(v,hana::transform(v,[&](auto element) {return element+RANK;})));
+
+          boost::for_each(cppqedutils::sliceiterator::fullRange<ExtendedV>(rho),cppqedutils::sliceiterator::fullRange<ExtendedV>(drhodt),
                           [&](const auto& rhoS, auto& drhodtS) {li->actWithSuperoperator(t,rhoS,drhodtS,ordoJump);});
           flag=true;
         }
@@ -360,7 +375,7 @@ private:
       }
     };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::Vector<idx>());});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::vector<idx>);});
     
     hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act);});
     
@@ -468,22 +483,19 @@ private:
   
 public:
   Composite(const Frees& frees, const Acts& acts)
-    : Base(frees ,acts),
-      ExactBase(getFrees(),getActs()),
-      HamiltonianBase(getFrees(),getActs()),
-      LiouvilleanBase(getFrees(),getActs()) {}
+    : Base(frees,acts), ExactBase(getFrees(),getActs()), HamiltonianBase(getFrees(),getActs()), LiouvilleanBase(getFrees(),getActs()) {}
+  // Note that Frees and Acts are stored by value in Base, that’s why we need the getters here
 
   // Constructor
   explicit Composite(const Acts& acts)
     : Composite([&]() {
-      typename composite::Base<Acts>::Frees res; res.fill(SubSystemFree());
+      typename composite::Base<Acts>::Frees res; res.fill({});
       
-      boost::fusion::for_each(acts,[&](const auto& act) -> void {
+      hana::for_each(acts,[&](const auto& act) {
         int i=0;
-        mpl::for_each<std::decay_t<decltype(act)>>([&](auto t) -> void {
-          static const int idx=decltype(t)::value;
+        hana::for_each(act, [&] (auto idx) {
           if (res[idx].get()) {
-            if (res[idx].get()!=act.get()->getFrees()[i]) throw CompositeConsistencyException(idx,i);
+            if (res[idx].get()!=act.get()->getFrees()[i]) throw composite::ConsistencyException(idx,i);
           }
           else res[idx]=SubSystemFree(act.get()->getFrees()[i]);
           i++;
@@ -492,10 +504,9 @@ public:
       
       return res;
     } (),acts) {}
-    
-  friend const typename composite::Base<Acts>::Ptr composite::doMake<Acts>(const Acts&);
+ 
 
-  // Note that Frees and Acts are stored by value in Base
+ friend const typename composite::Base<Acts>::Ptr composite::doMake<Acts>(const Acts&);
 
 };
 
@@ -506,24 +517,11 @@ public:
 
 namespace composite {
 
-namespace result_of {
-
-
-template<bool IS_EX, bool IS_HA, bool IS_LI, typename... Acts>
-struct MakeConcrete : boost::mpl::identity<Composite<typename make_list<Acts...>::type, IS_EX, IS_HA, IS_LI> > {};
-
-
-template<typename... Acts>
-struct Make : boost::mpl::identity<typename Base<typename make_list<Acts...>::type>::Ptr> {};
-
-
-} // result_of
-
 
 template<typename... Acts>
 auto make(const Acts&... acts)
 {
-  return doMake(make_list(acts...));
+  return doMake(hana::make_tuple(acts...));
 }
 
 
@@ -533,6 +531,36 @@ auto make(const Acts&... acts)
 /// Template alias for backward compatibility
 template<int... RetainedAxes>
 using Act = composite::_<RetainedAxes...>;
+
+
+#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics{EX,HA,LI})) return std::make_shared<Composite<Acts,EX,HA,LI> >(frees,acts)
+
+template<typename Acts>
+const typename composite::Base<Acts>::Ptr composite::doMake(const Acts& acts)
+{
+  using namespace structure;
+  
+  const typename Base<Acts>::Frees frees(fillFrees(acts));
+
+  auto systemCharacteristics{hana::fold( acts, hana::fold(tmptools::ordinals<Base<Acts>::RANK>, SystemCharacteristics{false,false,false}, [&](SystemCharacteristics sc, auto idx) {
+    const SubSystemFree& free=frees[idx];
+    return sc || SystemCharacteristics{free.getEx()!=0,free.getHa()!=0,free.getLi()!=0};
+  }), [&](SystemCharacteristics sc, const auto& act) {
+    return sc || SystemCharacteristics{act.getEx()!=0,act.getHa()!=0,act.getLi()!=0};
+  })};
+  
+  if      DISPATCHER(true ,true ,true ) ;
+  else if DISPATCHER(true ,true ,false) ;
+  else if DISPATCHER(true ,false,true ) ;
+  else if DISPATCHER(true ,false,false) ;
+  else if DISPATCHER(false,true ,true ) ;
+  else if DISPATCHER(false,true ,false) ;
+  else if DISPATCHER(false,false,true ) ;
+  else return std::make_shared<Composite<Acts,false,false,false> >(frees,acts);
+}
+
+
+#undef DISPATCHER
 
 
 #endif // CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED

@@ -3,7 +3,7 @@
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTIONCOMPOSITE_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTIONCOMPOSITE_H_INCLUDED
 
-#include "Composite.tcc"
+#include "Composite.h"
 
 #include "Evolution.h"
 
