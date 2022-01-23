@@ -23,11 +23,8 @@ using namespace structure;
 using cppqedutils::sliceiterator::fullRange;
 
 
-namespace {
-
-#include "details_BinaryHelper.h"
-
-}
+typedef tmptools::Vector<0> V0;
+typedef tmptools::Vector<1> V1;
 
 
 //////////

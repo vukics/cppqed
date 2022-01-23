@@ -62,7 +62,7 @@ const Ptr make(const ParsPumpedLossy& p, QM_Picture qmp, AveragingConstructorPar
 
 template<typename Base>
 AveragedMonitorCutoff<Base>::AveragedMonitorCutoff()
-  : Base(KeyLabels(1,"|Psi(cutoff-1)|^2"))
+  : Base({{1,"|Psi(cutoff-1)|^2"}})
 {
 }
 
