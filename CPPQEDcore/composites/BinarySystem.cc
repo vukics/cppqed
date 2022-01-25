@@ -44,7 +44,7 @@ binary::Base::Base(InteractionPtr ia)
 double binary::Base::highestFrequency_v() const
 {
   using std::max;
-  return max(ia_.get()->highestFrequency(),max(free0_.get()->highestFrequency(),free1_.get()->highestFrequency()));
+  return max(ia_->highestFrequency(),max(free0_->highestFrequency(),free1_->highestFrequency()));
 }
 
 
@@ -52,10 +52,10 @@ std::ostream& binary::Base::streamParameters_v(std::ostream& os) const
 {
   using namespace std;
   os<<"Binary System\nDimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()
-    <<"\n\nSubsystem Nr. 0\n";     free0_.get()->streamParameters(os);
-  os<<    "Subsystem Nr. 1\n";     free1_.get()->streamParameters(os);
+    <<"\n\nSubsystem Nr. 0\n";     free0_->streamParameters(os);
+  os<<    "Subsystem Nr. 1\n";     free1_->streamParameters(os);
   os<<"0 - 1 - Interaction\n";
-  return ia_.get()->streamParameters(os);
+  return ia_->streamParameters(os);
 }
 
 

@@ -49,18 +49,13 @@ class _
 public:
   explicit _(structure::InteractionPtr<sizeof...(RetainedAxes)> ia) : SubSystemsInteraction<sizeof...(RetainedAxes)>(ia) {}
 
-  static constexpr auto retainedAxesVector=tmptools::vector<RetainedAxes...>;
+  static constexpr auto retainedAxes=tmptools::vector<RetainedAxes...>;
   
 };
 
 
-template<typename LiftedActs>
-constexpr int calculateRank()
-{
-  return hana::maximum(hana::flatten(hana::transform(LiftedActs{},
-                                                     [&] (const auto& actType) {return decltype(actType)::type::retainedAxesVector;}
-                                                     )));
-}
+template<typename... Acts>
+constexpr auto rank_v=hana::maximum(hana::flatten(hana::make_tuple(Acts::retainedAxes...)))+1;
 
 
 template<int RANK>
@@ -74,11 +69,11 @@ protected:
   explicit RankedBase(const Frees<RANK>& frees)
     : structure::QuantumSystem<RANK>([&] () { // calculate the dimensions
         typename structure::QuantumSystem<RANK>::Dimensions res;
-        hana::for_each(tmptools::ordinals<RANK>,[&](auto t) {res(t)=frees[t].get()->getDimension();});
+        hana::for_each(tmptools::ordinals<RANK>,[&](auto t) {res(t)=frees[t]->getDimension();});
         return res;
     }()), frees_(frees) {}
   
-  const Frees<RANK>& getFrees() const {return frees_;}
+  const auto& getFrees() const {return frees_;}
 
 private:
   const Frees<RANK> frees_;
@@ -86,27 +81,27 @@ private:
 };
 
 
-template<typename Acts> // Acts should be a hana::tuple of Acts
+template<typename... Acts> // Acts should be a hana::tuple of Acts
 class Base
-  : public RankedBase<calculateRank<Acts>()>,
-    public structure::Averaged<calculateRank<Acts>()>
+  : public RankedBase<rank_v<Acts...>>,
+    public structure::Averaged<rank_v<Acts...>>
 {
 public:
   // The calculated RANK
-  static constexpr int RANK = calculateRank<Acts>();
+  static constexpr int RANK = rank_v<Acts...>;
 
-private:
+protected:
   using RankedBase<RANK>::getFrees;
   
   // Compile-time sanity check: each ordinal up to RANK has to be contained by at least one act.
   // (That is, no free system can be left out of the network of interactions)
   static_assert( hana::fold (tmptools::ordinals<RANK>, hana::true_c, [](auto state, auto ordinal) {
-    return state && hana::fold (Acts{}, hana::false_c, [o=ordinal](auto state, const auto& act) {return state || hana::contains(act,o);}); }
-  ) == true , "Composite not consistent" );
+    return state && hana::contains(hana::flatten(hana::make_tuple(Acts::retainedAxes...)),ordinal);
+  }) == true , "Composite not consistent" );
 
 public:
   template<structure::LiouvilleanAveragedTag LA>
-  static std::ostream& streamKeyLA(std::ostream& os, size_t& i, const Frees<RANK>& frees, const Acts& acts)
+  static std::ostream& streamKeyLA(std::ostream& os, size_t& i, const Frees<RANK>& frees, const hana::tuple<Acts...>& acts)
   {
     hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {frees[idx].template streamKey<LA>(os,i);});
     hana::for_each(acts,[&](const auto& act) {act.template streamKey<LA>(os,i);});    
@@ -115,7 +110,7 @@ public:
   
   
   template<structure::LiouvilleanAveragedTag LA>
-  static size_t nAvrLA(const Frees<RANK>& frees, const Acts& acts)
+  static size_t nAvrLA(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts)
   {
     
     return hana::fold(acts,
@@ -128,7 +123,8 @@ public:
 #pragma GCC warning "TODO: This solution is a bit insane, could be solved more effectively with blitz::Array slice"
 #endif // NDEBUG
   template<structure::LiouvilleanAveragedTag LA>
-  static const structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo, const Frees<RANK>& frees, const Acts& acts, size_t numberAvr)
+  static const structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo,
+                                             const Frees<RANK>& frees, const hana::tuple<Acts...>& acts, size_t numberAvr)
   {
     std::list<Averages> seqAverages{RANK+hana::size(acts)}; // Averages res(numberAvr); size_t resIdx=0;
     
@@ -145,7 +141,7 @@ public:
       
       hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees[idx].getLA(tag),tmptools::vector<idx>);});
       
-      hana::for_each(acts,[&](const auto& act) {lambda(act.getLA(tag),act);});
+      hana::for_each(acts,[&](const auto& act) {lambda(act.getLA(tag),act.retainedAxes);});
       
     }
     
@@ -157,9 +153,9 @@ public:
 
 protected:
   // Constructor
-  explicit Base(const Frees<RANK>& frees, const Acts& acts) : RankedBase<RANK>(frees), acts_(acts) {}
+  explicit Base(const Frees<RANK>& frees, const Acts&... acts) : RankedBase<RANK>{frees}, acts_{acts...} {}
     
-  const Acts& getActs() const {return acts_;}
+  const auto& getActs() const {return acts_;}
 
 private:
   // Implementing QuantumSystem interface
@@ -167,11 +163,11 @@ private:
   double highestFrequency_v( ) const override
   {
     return std::max(
-      getFrees()[hana::maximum(tmptools::ordinals<RANK>,[&](auto idx1, auto idx2) {
-        return  getFrees()[idx1].get()->highestFrequency() < getFrees()[idx2].get()->highestFrequency();
-      })].get()->highestFrequency()
+      getFrees()[hana::maximum(tmptools::ordinals<RANK>,[this](auto idx1, auto idx2) {
+        return  getFrees()[idx1]->highestFrequency() < getFrees()[idx2]->highestFrequency();
+      })]->highestFrequency()
       ,
-      hana::maximum(acts_,[&](const auto& act1, const auto& act2) {return act1.get()->highestFrequency() < act2.get()->highestFrequency();}).get()->highestFrequency()
+      hana::maximum(acts_,[&](const auto& act1, const auto& act2) {return act1->highestFrequency() < act2->highestFrequency();})->highestFrequency()
     );
   }
   
@@ -181,13 +177,13 @@ private:
     
     hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {
       os<<"Subsystem Nr. "<<idx<<std::endl;
-      getFrees()[idx].get()->streamParameters(os);
+      getFrees()[idx]->streamParameters(os);
     });
     
     hana::for_each(acts_, [&](const auto& act) {
-      hana::for_each(act,[&](auto idx) {os<<idx<<" - ";});
+      hana::for_each(act.retainedAxes,[&](auto idx) {os<<idx<<" - ";});
       os<<"Interaction\n";
-      act.get()->streamParameters(os);
+      act->streamParameters(os);
     });
     
     return os;
@@ -238,27 +234,22 @@ private:
   }
   
   
-  const Acts acts_;
+  const hana::tuple<Acts...> acts_;
 
 };
 
 
 
 
-template<typename Acts>
-const typename Base<Acts>::Ptr doMake(const Acts&);
-
-
-
-template<typename Acts>
+template<typename... Acts>
 class Exact
-  : public structure::Exact<calculateRank<Acts>()>
+  : public structure::Exact<rank_v<Acts...>>
 {
 private:
-  static const int RANK=calculateRank<Acts>();
+  static const int RANK=rank_v<Acts...>;
 
 protected:
-  Exact(const Frees<RANK>& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
+  Exact(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts) : frees_(frees), acts_(acts) {}
 
 private:
   void actWithU_v(double t, quantumdata::StateVectorLow<RANK>& psi, double t0) const override
@@ -267,7 +258,7 @@ private:
     
     hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getEx(),tmptools::vector<idx>);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getEx(),act);});
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getEx(),act.retainedAxes);});
     
   }
   
@@ -281,20 +272,20 @@ private:
   
 
   const Frees<RANK>& frees_;
-  const Acts & acts_;
+  const hana::tuple<Acts...> & acts_;
 
 };
 
 
-template<typename Acts>
+template<typename... Acts>
 class Hamiltonian
-  : public structure::Hamiltonian<calculateRank<Acts>()>
+  : public structure::Hamiltonian<rank_v<Acts...>>
 {
 private:
-  static const int RANK=calculateRank<Acts>();
+  static const int RANK=rank_v<Acts...>;
 
 protected:
-  Hamiltonian(const Frees<RANK>& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
+  Hamiltonian(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts) : frees_(frees), acts_(acts) {}
 
 private:
   void addContribution_v(double t, const quantumdata::StateVectorLow<RANK>& psi, quantumdata::StateVectorLow<RANK>& dpsidt, double t0) const override
@@ -308,32 +299,32 @@ private:
     
     hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getHa(),tmptools::vector<idx>);});
 
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getHa(),act);});
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getHa(),act.retainedAxes);});
     
   }
   
   const Frees<RANK>& frees_;
-  const Acts & acts_;
+  const hana::tuple<Acts...> & acts_;
 
 };
 
 
-template<typename Acts>
+template<typename... Acts>
 class Liouvillean
-  : public structure::Liouvillean<calculateRank<Acts>()>
+  : public structure::Liouvillean<rank_v<Acts...>>
 {
 private:
-  static const int RANK=calculateRank<Acts>();
+  static const int RANK=rank_v<Acts...>;
 
 protected:
-  Liouvillean(const Frees<RANK>& frees, const Acts& acts) : frees_(frees), acts_(acts) {}
+  Liouvillean(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts) : frees_(frees), acts_(acts) {}
 
 private:
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<Acts>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<Acts...>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
   
-  size_t nAvr_v() const override {return Base<Acts>::template nAvrLA<structure::LA_Li>(frees_,acts_);}
+  size_t nAvr_v() const override {return Base<Acts...>::template nAvrLA<structure::LA_Li>(frees_,acts_);}
   
-  const Rates average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return Base<Acts>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
+  const Rates average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return Base<Acts...>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
 
   void actWithJ_v(double t, quantumdata::StateVectorLow<RANK>& psi, size_t ordoJump) const override
   {
@@ -352,7 +343,7 @@ private:
     
     hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::vector<idx>);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act);});
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act.retainedAxes);});
     
   }
   
@@ -365,7 +356,7 @@ private:
       if (!flag && li) {
         size_t n=li->nAvr();
         if (ordoJump<n) {
-          using ExtendedV=decltype(hana::concat(v,hana::transform(v,[&](auto element) {return element+RANK;})));
+          using ExtendedV=decltype(hana::concat(v, /* hana::transform(v,[&](auto element) constexpr {return element+RANK;})*/ v+RANK ));
 
           boost::for_each(cppqedutils::sliceiterator::fullRange<ExtendedV>(rho),cppqedutils::sliceiterator::fullRange<ExtendedV>(drhodt),
                           [&](const auto& rhoS, auto& drhodtS) {li->actWithSuperoperator(t,rhoS,drhodtS,ordoJump);});
@@ -377,12 +368,12 @@ private:
     
     hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::vector<idx>);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act);});
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act.retainedAxes);});
     
   }
   
   const Frees<RANK>& frees_;
-  const Acts & acts_;
+  const hana::tuple<Acts...> & acts_;
 
 };
 
@@ -401,7 +392,104 @@ public:
 
 
 
-#define BASE_class(Aux,Class) std::conditional_t<IS_##Aux,composite::Class<Acts>,composite::EmptyBase<composite::Class<Acts>>>
+#define BASE_class(Aux,Class) std::conditional_t<IS_##Aux,composite::Class<Acts...>,composite::EmptyBase<composite::Class<Acts...>>>
+
+
+template<bool IS_EX, bool IS_HA, bool IS_LI, typename... Acts>
+// Acts should model a fusion sequence of Acts
+class Composite
+  : public composite::Base<Acts...>,
+    public BASE_class(EX,Exact),
+    public BASE_class(HA,Hamiltonian),
+    public BASE_class(LI,Liouvillean)
+{
+public:
+  typedef composite::Base<Acts...> Base;
+  
+  typedef BASE_class(EX,Exact) ExactBase;
+  typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
+  typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
+  
+  // The calculated RANK
+  static const int RANK=Base::RANK;
+
+private:
+  using Base::getFrees; using Base::getActs ;
+  
+public:
+  // Constructor
+  Composite(const composite::Frees<RANK>& frees, const Acts&... acts)
+    : Base(frees,acts...), ExactBase(getFrees(),getActs()), HamiltonianBase(getFrees(),getActs()), LiouvilleanBase(getFrees(),getActs()) {}
+    // Note that Frees and Acts are stored by value in Base, that’s why we need the getters here
+ 
+};
+
+#undef BASE_class
+
+
+// The following provides a much more convenient interface:
+
+namespace composite {
+
+#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics{EX,HA,LI})) return std::make_shared<Composite<EX,HA,LI,Acts...>>(frees,acts...)
+
+template<typename... Acts>
+std::shared_ptr<const composite::Base<Acts...>> make(const Acts&... acts)
+{
+  using namespace structure;
+  
+  const auto frees{[&]() {
+    Frees<rank_v<Acts...>> res; res.fill({});
+    
+    hana::for_each(hana::make_tuple(acts...),[&](const auto& act) {
+      int i=0;
+      hana::for_each(act.retainedAxes, [&] (auto idx) {
+        if (res[idx].get()) {
+          if (res[idx].get()!=act->getFrees()[i]) throw composite::ConsistencyException(idx,i);
+        }
+        else res[idx]=SubSystemFree(act->getFrees()[i]);
+        i++;
+      });
+    });
+    
+    return res;
+  } ()};
+
+  auto systemCharacteristics{hana::fold( hana::make_tuple(acts...), 
+    hana::fold(tmptools::ordinals<Base<Acts...>::RANK>, SystemCharacteristics{false,false,false}, [&](SystemCharacteristics sc, auto idx) {
+      const SubSystemFree& free=frees[idx];
+      return sc || SystemCharacteristics{free.getEx()!=0,free.getHa()!=0,free.getLi()!=0};
+    }), [&](SystemCharacteristics sc, const auto& act) {
+      return sc || SystemCharacteristics{act.getEx()!=0,act.getHa()!=0,act.getLi()!=0};
+    })};
+  
+  if      DISPATCHER(true ,true ,true ) ;
+  else if DISPATCHER(true ,true ,false) ;
+  else if DISPATCHER(true ,false,true ) ;
+  else if DISPATCHER(true ,false,false) ;
+  else if DISPATCHER(false,true ,true ) ;
+  else if DISPATCHER(false,true ,false) ;
+  else if DISPATCHER(false,false,true ) ;
+  else return std::make_shared<Composite<false,false,false,Acts...>>(frees,acts...);
+}
+
+
+#undef DISPATCHER
+
+
+
+} // composite
+
+
+
+/// Template alias for backward compatibility
+template<int... RetainedAxes>
+using Act = composite::_<RetainedAxes...>;
+
+
+#endif // CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
+
+
 
 /// Class representing a full-fledged composite quantum system defined by a network of \link composite::_ interactions\endlink
 /**
@@ -455,112 +543,6 @@ public:
  *
  * \tparam Acts should model a \refBoost{Boost.Fusion list,fusion/doc/html/fusion/container/list.html} of composite::_ objects
  * \tparam IS_EX governs whether the class should inherit from composite::Exact
- * \tparam IS_HA governs whether the class should inherit from composite::Hamiltonian
+ * \tparam IS_HA governs whether the class should inherit from composite::Hamiltonianhana::tuple<Acts...>
  * \tparam IS_LI governs whether the class should inherit from composite::Liouvillean
  */
-template<typename Acts, bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
-// Acts should model a fusion sequence of Acts
-class Composite
-  : public composite::Base<Acts>,
-    public BASE_class(EX,Exact),
-    public BASE_class(HA,Hamiltonian),
-    public BASE_class(LI,Liouvillean)
-{
-public:
-  typedef composite::Base<Acts> Base;
-  
-  typedef BASE_class(EX,Exact) ExactBase;
-  typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
-  typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
-  
-  typedef typename composite::Base<Acts>::Frees Frees;
-  
-  // The calculated RANK
-  static const int RANK=Base::RANK;
-
-private:
-  using Base::getFrees; using Base::getActs ;
-  
-public:
-  Composite(const Frees& frees, const Acts& acts)
-    : Base(frees,acts), ExactBase(getFrees(),getActs()), HamiltonianBase(getFrees(),getActs()), LiouvilleanBase(getFrees(),getActs()) {}
-  // Note that Frees and Acts are stored by value in Base, that’s why we need the getters here
-
-  // Constructor
-  explicit Composite(const Acts& acts)
-    : Composite([&]() {
-      typename composite::Base<Acts>::Frees res; res.fill({});
-      
-      hana::for_each(acts,[&](const auto& act) {
-        int i=0;
-        hana::for_each(act, [&] (auto idx) {
-          if (res[idx].get()) {
-            if (res[idx].get()!=act.get()->getFrees()[i]) throw composite::ConsistencyException(idx,i);
-          }
-          else res[idx]=SubSystemFree(act.get()->getFrees()[i]);
-          i++;
-        });
-      });
-      
-      return res;
-    } (),acts) {}
- 
-
- friend const typename composite::Base<Acts>::Ptr composite::doMake<Acts>(const Acts&);
-
-};
-
-#undef BASE_class
-
-
-// The following provides a much more convenient interface:
-
-namespace composite {
-
-
-template<typename... Acts>
-auto make(const Acts&... acts)
-{
-  return doMake(hana::make_tuple(acts...));
-}
-
-
-} // composite
-
-
-/// Template alias for backward compatibility
-template<int... RetainedAxes>
-using Act = composite::_<RetainedAxes...>;
-
-
-#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics{EX,HA,LI})) return std::make_shared<Composite<Acts,EX,HA,LI> >(frees,acts)
-
-template<typename Acts>
-const typename composite::Base<Acts>::Ptr composite::doMake(const Acts& acts)
-{
-  using namespace structure;
-  
-  const typename Base<Acts>::Frees frees(fillFrees(acts));
-
-  auto systemCharacteristics{hana::fold( acts, hana::fold(tmptools::ordinals<Base<Acts>::RANK>, SystemCharacteristics{false,false,false}, [&](SystemCharacteristics sc, auto idx) {
-    const SubSystemFree& free=frees[idx];
-    return sc || SystemCharacteristics{free.getEx()!=0,free.getHa()!=0,free.getLi()!=0};
-  }), [&](SystemCharacteristics sc, const auto& act) {
-    return sc || SystemCharacteristics{act.getEx()!=0,act.getHa()!=0,act.getLi()!=0};
-  })};
-  
-  if      DISPATCHER(true ,true ,true ) ;
-  else if DISPATCHER(true ,true ,false) ;
-  else if DISPATCHER(true ,false,true ) ;
-  else if DISPATCHER(true ,false,false) ;
-  else if DISPATCHER(false,true ,true ) ;
-  else if DISPATCHER(false,true ,false) ;
-  else if DISPATCHER(false,false,true ) ;
-  else return std::make_shared<Composite<Acts,false,false,false> >(frees,acts);
-}
-
-
-#undef DISPATCHER
-
-
-#endif // CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED

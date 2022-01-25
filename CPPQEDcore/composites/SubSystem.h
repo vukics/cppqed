@@ -20,8 +20,10 @@ class SubSystemsInteraction : public structure::QuantumSystemWrapper<RANK>
 public:
   explicit SubSystemsInteraction(InteractionPtr<RANK> ia) : structure::QuantumSystemWrapper<RANK>(ia), ia_(ia) {}
 
-  const InteractionPtr<RANK> get() const {return ia_;} 
+  const auto operator->() const {return ia_;}
 
+  const auto get() const {return ia_;}
+  
 private:
   InteractionPtr<RANK> ia_;
 
@@ -36,8 +38,10 @@ public:
 
   SubSystemFree() : free_() {}
 
-  const FreePtr get() const {return free_;}
+  const auto operator->() const {return free_;}
 
+  const auto get() const {return free_;}
+  
 private:
   FreePtr free_;
 
