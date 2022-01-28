@@ -44,8 +44,8 @@ public:
    * An exception to the rule “never redefine an inherited non-virtual function” is taken because these functions are called the same in the two bases of Free,
    * which would otherwise create ambiguities.
    */
-  double        highestFrequency (                ) const {return QuantumSystem<1>:: highestFrequency(  );}
-  std::ostream& streamParameters(std::ostream& os) const {return QuantumSystem<1>::streamParameters(os);} ///< ”
+  using DynamicsBase::highestFrequency;
+  using DynamicsBase::streamParameters;
   //@}
 
 private:

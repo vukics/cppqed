@@ -4,13 +4,19 @@
 #define CPPQEDCORE_COMPOSITES_BINARYSYSTEM_H_INCLUDED
 
 #include "LazyDensityOperator.h"
-#include "QuantumSystem.h"
-#include "SubSystem.h"
+#include "Structure.h"
+
+#include "Interaction.h"
 
 namespace mpl=boost::mpl;
 
 /// Auxiliary tools for BinarySystem
 namespace binary {
+
+typedef tmptools::Vector<0> V0;
+typedef tmptools::Vector<1> V1;
+
+using structure::FreePtr;
 
 typedef ::structure::Interaction<2> Interaction; ///< Binary interaction
 using InteractionPtr = ::structure::InteractionPtr<2>;
@@ -20,24 +26,46 @@ using DensityOperatorLow = ::structure::DensityOperatorLow<2>;
 
 using LazyDensityOperator = ::quantumdata::LazyDensityOperator<2>;
 
-typedef composite::SubSystemFree SSF; ///< Convenience typedef
-typedef composite::SubSystemsInteraction<2> SSI; ///< Convenience typedef
 
 using structure::Averages; using structure::Rates;
 
 /// Outfactored common functionality of Liouvillian and Averaged
-template<structure::LiouvillianAveragedTag>
-std::ostream& streamKey(std::ostream&, size_t&, const SSF& free0, const SSF& free1, const SSI& ia);
+//@{
+template<structure::LiouvillianAveragedTag LA>
+std::ostream& streamKey(InteractionPtr ia, std::ostream& os, size_t& i)
+{  
+  return ::structure::streamKey<LA>(ia,
+                                    ::structure::streamKey<LA>((*ia)[1],
+                                                               ::structure::streamKey<LA>((*ia)[0],
+                                                                                          os<<"Binary system\n",i),i),i);
+}
 
-/// Outfactored common functionality of Liouvillian and Averaged
-template<structure::LiouvillianAveragedTag>
-size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia);
 
-/// Outfactored common functionality of Liouvillian and Averaged
-template<structure::LiouvillianAveragedTag>
-const Averages
-average(double t, const quantumdata::LazyDensityOperator<2>& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr);
+template<structure::LiouvillianAveragedTag LA>
+size_t nAvr(InteractionPtr ia)
+{
+  return structure::nAvr<LA>((*ia)[0]) + structure::nAvr<LA>((*ia)[1]) + structure::nAvr<LA>(ia);
+}
 
+
+template<structure::LiouvillianAveragedTag LA>
+const Averages average(InteractionPtr ia, double t, const quantumdata::LazyDensityOperator<2>& ldo, size_t numberAvr)
+{
+  using boost::copy;
+
+  const Averages
+    a0 {quantumdata::partialTrace<V0>(ldo,[&](const auto& m){return ::structure::average<LA>((*ia)[0],t,m);})},
+    a1 {quantumdata::partialTrace<V1>(ldo,[&](const auto& m){return ::structure::average<LA>((*ia)[1],t,m);})},
+    a01{::structure::average<LA>(ia,t,ldo)};
+
+  Averages a(numberAvr);
+
+  copy(a01,copy(a1,copy(a0,a.begin())));
+
+  return a;
+}
+
+//@}
 
 /// Common base for all class-composed BinarySystem%s
 /**
@@ -59,37 +87,25 @@ class Base
     public structure::Averaged <2>
 {
 protected:
-  typedef structure::Averaged<1> Av1;
-  typedef structure::Averaged<2> Av2;
-
-  /// Constructor from an #Interaction instant
-  explicit Base(InteractionPtr);
-
-  /// \name Getters
-  //@{
-  const SSF& getFree0() const {return free0_;}
-  const SSF& getFree1() const {return free1_;}
-  const SSI& getIA () const {return ia_;}
-  //@}
+  explicit Base(InteractionPtr ia) : QuantumSystem<2>(ia->getDimensions()), ia_(ia) {}
 
 private:
-  double highestFrequency_v() const;
+  double highestFrequency_v() const override;
 
-  std::ostream& streamParameters_v(std::ostream&) const;
+  std::ostream& streamParameters_v(std::ostream&) const override;
 
-  size_t nAvr_v() const {return binary::nAvr <structure::LA_Av>(free0_,free1_,ia_);}
+  size_t nAvr_v() const override {return binary::nAvr <structure::LA_Av>(ia_);}
   
-  const Averages average_v(double t, const LazyDensityOperator& ldo) const {return binary::average <structure::LA_Av>(t,ldo,free0_,free1_,ia_,nAvr());}
+  const Averages average_v(double t, const LazyDensityOperator& ldo) const override {return binary::average<structure::LA_Av>(ia_,t,ldo,nAvr());}
   
-  void process_v(Averages&) const;
+  void process_v(Averages&) const override;
   
-  std::ostream& stream_v(const Averages&, std::ostream&, int) const;
+  std::ostream& stream_v(const Averages&, std::ostream&, int) const override;
   
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const {return binary::streamKey<structure::LA_Av>(os,i, free0_,free1_,ia_);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return binary::streamKey<structure::LA_Av>(ia_,os,i);}
 
-  const SSF free0_, free1_;
-
-  const SSI ia_;
+protected:
+  const InteractionPtr ia_;
   
 };
 
@@ -104,68 +120,64 @@ typedef std::shared_ptr<const Base> Ptr; ///< Convenience typedef
 const Ptr make(InteractionPtr);
 
 
-#define CLASS_HEADER(Class) class Class : public structure::Class<2>
-
-#define CLASS_BODY_PART(Class,Aux) public:                                   \
-  typedef structure::Class<1> Aux##1;                                        \
-  typedef structure::Class<2> Aux##2;                                        \
-                                                                             \
-  Class(const SSF& free0, const SSF& free1, const SSI& ia) : free0_(free0), free1_(free1), ia_(ia) {} \
-                                                                             \
-private:                                                                     \
-  const SSF &free0_, &free1_;                                                \
-  const SSI &ia_;                                                            \
-
-
 /// Implements the structure::Exact interface for a BinarySystem along the same lines as Base implements the structure::Averaged interface
-CLASS_HEADER(Exact)
+class Exact : public structure::Exact<2>
 {
-  CLASS_BODY_PART(Exact,Ex)
+public:
+  explicit Exact(InteractionPtr ia) : ia_{ia} {}
+  
+private:
+  bool applicableInMaster_v() const override;
 
-  bool applicableInMaster_v() const;
-
-  void actWithU_v(double, StateVectorLow&, double) const;
+  void actWithU_v(double, StateVectorLow&, double) const override;
+  
+  const InteractionPtr ia_;
 
 };
 
 
 /// Implements the structure::Hamiltonian interface for a BinarySystem
-CLASS_HEADER(Hamiltonian)
+class Hamiltonian : public structure::Hamiltonian<2>
 {
-  CLASS_BODY_PART(Hamiltonian,Ha)
+public:
+  explicit Hamiltonian(InteractionPtr ia) : ia_{ia} {}
 
-  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const;
+private:
+  void addContribution_v(double, const StateVectorLow&, StateVectorLow&, double) const override;
 
+  const InteractionPtr ia_;
+  
 };
 
 
 /// Implements the structure::Liouvillian interface for a BinarySystem
-CLASS_HEADER(Liouvillian)
+class Liouvillian : public structure::Liouvillian<2>
 {
-  CLASS_BODY_PART(Liouvillian,Li)
+public:
+  explicit Liouvillian(InteractionPtr ia) : ia_{ia} {}
 
+private:
   void actWithJ_v(double, StateVectorLow&, size_t) const override;
   
   void actWithSuperoperator_v(double, const DensityOperatorLow&, DensityOperatorLow&, size_t) const override;
 
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return binary::streamKey<structure::LA_Li>(os,i, free0_,free1_,ia_);}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return binary::streamKey<structure::LA_Li>(ia_,os,i);}
   
-  size_t nAvr_v() const override {return binary::nAvr<structure::LA_Li>(free0_,free1_,ia_);}
+  size_t nAvr_v() const override {return binary::nAvr<structure::LA_Li>(ia_);}
   
-  const Rates average_v(double t, const LazyDensityOperator& ldo) const override {return binary::average<structure::LA_Li>(t,ldo,free0_,free1_,ia_,nAvr());}
+  const Rates average_v(double t, const LazyDensityOperator& ldo) const override {return binary::average<structure::LA_Li>(ia_,t,ldo,nAvr());}
+
+  const InteractionPtr ia_;
 
 };
 
-
-#undef CLASS_BODY_PART
-#undef CLASS_HEADER
 
 /// Helper for class composition of BinarySystem
 template<typename>
 class EmptyBase
 {
 public:
-  EmptyBase(const SSF&, const SSF&, const SSI&) {}
+  EmptyBase(InteractionPtr) {}
 };
 
 
