@@ -21,16 +21,6 @@ enum LiouvilleanAveragedTag {
   LA_Av  ///< Averaged
 };
 
-/// A tagging struct corresponding to LiouvilleanAveragedTag
-template<LiouvilleanAveragedTag>
-struct LiouvilleanAveragedTag_ {LiouvilleanAveragedTag_() {}};
-
-typedef LiouvilleanAveragedTag_<LA_Li> LA_Li_tagType;
-typedef LiouvilleanAveragedTag_<LA_Av> LA_Av_tagType;
-
-const LA_Li_tagType LA_Li_tag;
-const LA_Av_tagType LA_Av_tag;
-
 
 /// The template-parameter independent part of LiouvilleanAveragedCommonRanked
 class LiouvilleanAveragedCommon

@@ -4,7 +4,6 @@
 #define CPPQEDCORE_QUANTUMTRAJECTORY_QUANTUMTRAJECTORY_H_INCLUDED
 
 #include "QuantumSystem.h"
-#include "Structure.h"
 
 #include "Trajectory.h"
 

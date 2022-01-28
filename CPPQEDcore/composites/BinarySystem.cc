@@ -2,7 +2,6 @@
 #include "BinarySystem.h"
 
 #include "DensityOperator.h"
-#include "Interaction.h"
 #include "StateVector.h"
 
 #include "Algorithm.h"
@@ -15,16 +14,9 @@
 #include <boost/range/algorithm_ext/for_each.hpp>
 
 
-using composite::SubSystemFree;
-
-
 using namespace structure;
 
 using cppqedutils::sliceiterator::fullRange;
-
-
-typedef tmptools::Vector<0> V0;
-typedef tmptools::Vector<1> V1;
 
 
 //////////
@@ -34,126 +26,45 @@ typedef tmptools::Vector<1> V1;
 //////////
 
 
-binary::Base::Base(InteractionPtr ia)
-  : QuantumSystem<2>(Dimensions(ia->getFrees()[0]->getDimension(),ia->getFrees()[1]->getDimension())),
-    free0_(ia->getFrees()[0]), free1_(ia->getFrees()[1]), ia_(ia)
-{
-} 
 
 
 double binary::Base::highestFrequency_v() const
 {
-  using std::max;
-  return max(ia_->highestFrequency(),max(free0_->highestFrequency(),free1_->highestFrequency()));
+  return std::max(ia_->highestFrequency(),std::max((*ia_)[0]->highestFrequency(),(*ia_)[1]->highestFrequency()));
 }
 
 
 std::ostream& binary::Base::streamParameters_v(std::ostream& os) const
 {
-  using namespace std;
-  os<<"Binary System\nDimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()
-    <<"\n\nSubsystem Nr. 0\n";     free0_->streamParameters(os);
-  os<<    "Subsystem Nr. 1\n";     free1_->streamParameters(os);
-  os<<"0 - 1 - Interaction\n";
-  return ia_->streamParameters(os);
+  return ia_->streamParameters((*ia_)[1]->streamParameters(
+    (*ia_)[0]->streamParameters(os<<"Binary System\nDimensions: "<<getDimensions()<<". Total: "<<getTotalDimension()<<"\n\nSubsystem Nr. 0\n")
+    <<"Subsystem Nr. 1\n")<<"0 - 1 - Interaction\n");
 }
 
 
 
-#define SUCCESSIVE_Ranges(f0,f1,ia) ptrdiff_t l=-1, u;  \
-  if ((u=l+free0_.nAvr<LA_Av>())>l) {                          \
-    PROCESS_Range( averages(blitz::Range(l+1,u)) , f0)  \
-  }                                                     \
-  if ((l=u+free1_.nAvr<LA_Av>())>u) {                          \
-    PROCESS_Range( averages(blitz::Range(u+1,l)) , f1)  \
-  }                                                     \
-  if ((u=l+ia_.nAvr<LA_Av>())>l) {                             \
-    PROCESS_Range( averages(blitz::Range(l+1,u)) , ia)  \
-  }                                                     \
-
-
 void binary::Base::process_v(Averages& averages) const
 {
-#define PROCESS_Range(av,ss) Averages temp(av); ss.process(temp);
+  ptrdiff_t l=-1, u;
   
-  SUCCESSIVE_Ranges(free0_,free1_,ia_) ;
-  
-#undef  PROCESS_Range
+  if ( ( u = l + ::structure::nAvr<LA_Av>((*ia_)[0]) ) > l ) {Averages temp(averages(blitz::Range(l+1,u))); ::structure::process((*ia_)[0],temp);}
+  if ( ( l = u + ::structure::nAvr<LA_Av>((*ia_)[1]) ) > u ) {Averages temp(averages(blitz::Range(u+1,l))); ::structure::process((*ia_)[1],temp);}
+  if ( ( u = l + ::structure::nAvr<LA_Av>(ia_) ) > l ) {Averages temp(averages(blitz::Range(l+1,u))); ::structure::process(ia_,temp);}
   
 }
 
 
 std::ostream& binary::Base::stream_v(const Averages& averages, std::ostream& os, int precision) const
 {
-  const auto 
-    av0 =free0_.getAv(),
-    av1 =free1_.getAv();
-  const auto
-    av01=   ia_.getAv();
-
-#define PROCESS_Range(av,ss) ss->stream(av,os,precision);
+  ptrdiff_t l=-1, u;
   
-  SUCCESSIVE_Ranges(av0,av1,av01) ;
-  
-#undef  PROCESS_Range
+  if ( const auto av=::structure::castAv((*ia_)[0]); av && ( u = l + ::structure::nAvr<LA_Av>((*ia_)[0]) ) > l ) av->stream(averages(blitz::Range(l+1,u)),os,precision);
+  if ( const auto av=::structure::castAv((*ia_)[1]); av && ( l = u + ::structure::nAvr<LA_Av>((*ia_)[1]) ) > u ) av->stream(averages(blitz::Range(u+1,l)),os,precision);
+  if ( const auto av=::structure::castAv(ia_); av && ( u = l + ::structure::nAvr<LA_Av>(ia_) ) > l ) av->stream(averages(blitz::Range(l+1,u)),os,precision);
 
   return os;
 
 }
-
-#undef  SUCCESSIVE_Ranges
-
-////////////////////////////
-//                        //
-// Averaged - Liouvillean //
-//                        //
-////////////////////////////
-
-
-namespace binary {
-
-// These possibilities get instantiated through compilation, so that explicit instantiation is not necessary here.
-  
-template<LiouvilleanAveragedTag LA>
-std::ostream& streamKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
-{
-  os<<"Binary system\n";
-  free0.streamKey<LA>(os,i);
-  free1.streamKey<LA>(os,i);
-  return ia.streamKey<LA>(os,i);
-}
-template std::ostream& streamKey<LA_Li>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
-template std::ostream& streamKey<LA_Av>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
-
-
-template<LiouvilleanAveragedTag LA>
-size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia)
-{
-  return free0.nAvr<LA>() + free1.nAvr<LA>() + ia.nAvr<LA>();
-}
-template size_t nAvr< LA_Li >(const SSF& free0, const SSF& free1, const SSI& ia); // explicit instantiation
-template size_t nAvr< LA_Av >(const SSF& free0, const SSF& free1, const SSI& ia); // explicit instantiation
-
-
-template<LiouvilleanAveragedTag LA>
-const Averages average(double t, const LazyDensityOperator& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr)
-{
-  using boost::copy;
-
-  const Averages
-    a0 {quantumdata::partialTrace<V0>(ldo,[&](const auto& m){return free0.average<LA>(t,m);})},
-    a1 {quantumdata::partialTrace<V1>(ldo,[&](const auto& m){return free1.average<LA>(t,m);})},
-    a01{ia.average<LA>(t,ldo)};
-
-  Averages a(numberAvr);
-
-  copy(a01,copy(a1,copy(a0,a.begin())));
-
-  return a;
-}
-
-
-} // binary
 
 
 ///////////
@@ -166,17 +77,17 @@ const Averages average(double t, const LazyDensityOperator& ldo, const SSF& free
 
 bool binary::Exact::applicableInMaster_v() const
 {
-  return free0_.applicableInMaster() && free1_.applicableInMaster() && ia_.applicableInMaster();
+  return ::structure::applicableInMaster((*ia_)[0]) && ::structure::applicableInMaster((*ia_)[1]) && ::structure::applicableInMaster(ia_);
 }
 
 
 
 void binary::Exact::actWithU_v(double t, StateVectorLow& psi, double t0) const
 {
-  if (const auto ex=free0_.getEx()) for(auto& psiS : fullRange<V0>(psi)) ex->actWithU(t,psiS,t0);
-  if (const auto ex=free1_.getEx()) for(auto& psiS : fullRange<V1>(psi)) ex->actWithU(t,psiS,t0);
+  if (const auto ex=castEx((*ia_)[0])) for(auto& psiS : fullRange<V0>(psi)) ex->actWithU(t,psiS,t0);
+  if (const auto ex=castEx((*ia_)[1])) for(auto& psiS : fullRange<V1>(psi)) ex->actWithU(t,psiS,t0);
 
-  ia_.actWithU(t,psi,t0);
+  ::structure::actWithU(ia_,t,psi,t0);
 
 }
 
@@ -196,10 +107,10 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
     };
   };
   
-  if (const auto ha=free0_.getHa()) boost::range::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),lambda(ha));
-  if (const auto ha=free1_.getHa()) boost::range::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),lambda(ha));
+  if (const auto ha=castHa((*ia_)[0])) boost::range::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),lambda(ha));
+  if (const auto ha=castHa((*ia_)[1])) boost::range::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),lambda(ha));
 
-  ia_.addContribution(t,psi,dpsidt,t0);
+  ::structure::addContribution(ia_,t,psi,dpsidt,t0);
 
 }
 
@@ -213,25 +124,22 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
 
 void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) const
 {
-  const auto
-    li0 =free0_.getLi(),
-    li1 =free1_.getLi();
-
-  size_t n=free0_.nAvr<LA_Li>();
-  if (li0 && i<n) {
+  size_t n=::structure::nAvr<LA_Li>((*ia_)[0]);
+  
+  if ( const auto li0=castLi((*ia_)[0]); li0 && i<n) {
     for(auto& psiS : fullRange<V0>(psi)) li0->actWithJ(t,psiS,i);
     return;
   }
 
   i-=n;  
-  if (li1 && i<(n=free1_.nAvr<LA_Li>())) {
+  if ( const auto li1=castLi((*ia_)[1]); li1 && i < ( n = ::structure::nAvr<LA_Li>((*ia_)[1])) ) {
     for(auto& psiS : fullRange<V1>(psi)) li1->actWithJ(t,psiS,i);
     return;
   }
 
   i-=n;
-  if (i<ia_.nAvr<LA_Li>())
-    ia_.actWithJ(t,psi,i);
+  if ( i < ::structure::nAvr<LA_Li>(ia_) )
+    ::structure::actWithJ(ia_,t,psi,i);
 
 }
 
@@ -244,28 +152,24 @@ void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperator
     };
   };
 
-  typedef tmptools::Vector<0,2> V0;
-  typedef tmptools::Vector<1,3> V1;
+  using V0=tmptools::Vector<0,2>;
+  using V1=tmptools::Vector<1,3>;
 
-  const auto
-    li0 =free0_.getLi(),
-    li1 =free1_.getLi();
-
-  size_t n=free0_.nAvr<LA_Li>();
-  if (li0 && i<n) {
+  size_t n=::structure::nAvr<LA_Li>((*ia_)[0]);
+  
+  if ( const auto li0=castLi((*ia_)[0]);  li0 && i<n ) {
     boost::range::for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),lambda(li0));
     return;
   }
 
-  i-=n;  
-  if (li1 && i<(n=free1_.nAvr<LA_Li>())) {
+  i-=n;
+  if ( const auto li1=castLi((*ia_)[1]);  li1 && i < ( n = ::structure::nAvr<LA_Li>((*ia_)[1]) ) ) {
     boost::range::for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),lambda(li1));
     return;
   }
 
   i-=n;
-  if (i<ia_.nAvr<LA_Li>())
-    ia_.actWithSuperoperator(t,rho,drhodt,i);
+  if ( i < ::structure::nAvr<LA_Li>(ia_) ) ::structure::actWithSuperoperator(ia_,t,rho,drhodt,i);
 
 }
 
@@ -277,7 +181,7 @@ void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperator
 //////////////////
 
 
-#define BASE_ctor(Class) Class##Base(getFree0(),getFree1(),getIA())
+#define BASE_ctor(Class) Class##Base(ia)
 
 
 template<bool IS_EX, bool IS_HA, bool IS_LI>
@@ -301,14 +205,12 @@ const SystemCharacteristics querySystemCharacteristics(binary::InteractionPtr ia
 {
   using namespace structure;
   
-  const QuantumSystemPtr<1>
-    free0=ia->getFrees()[0],
-    free1=ia->getFrees()[1];
+  const auto free0=(*ia)[0], free1=(*ia)[1];
 
   return SystemCharacteristics{
-    std::dynamic_pointer_cast<const Exact<1>>(free0) || std::dynamic_pointer_cast<const Exact<1>>(free1) || std::dynamic_pointer_cast<const Exact<2>>(ia),
-    std::dynamic_pointer_cast<const Hamiltonian<1>>(free0) || std::dynamic_pointer_cast<const Hamiltonian<1>>(free1) || std::dynamic_pointer_cast<const Hamiltonian<2>>(ia),
-    std::dynamic_pointer_cast<const Liouvillean<1>>(free0) || std::dynamic_pointer_cast<const Liouvillean<1>>(free1) || std::dynamic_pointer_cast<const Liouvillean<2>>(ia)};
+    castEx(free0) || castEx(free1) || castEx(ia),
+    castHa(free0) || castHa(free1) || castHa(ia),
+    castLi(free0) || castLi(free1) || castLi(ia)};
 }
 
 }

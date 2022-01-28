@@ -41,7 +41,7 @@ public:
                        const ComplexFreqs& complexFreqs=emptyCF)
     : DynamicsBase(realFreqs,complexFreqs), DimensionsBookkeeper<RANK>(extractDimensions(frees)), frees_(frees) {}
 
-  const Frees& getFrees() const {return frees_;}
+  auto operator[](size_t i) const {return frees_[i];}
 
 private:
   static const Dimensions extractDimensions(const Frees& frees)

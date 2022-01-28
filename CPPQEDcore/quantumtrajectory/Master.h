@@ -28,7 +28,7 @@ typedef cppqedutils::ode_engine::Pars<> Pars;
 
 /// Thrown if the system is not applicable in Master-equation evolution
 /**
- * \see structure::ExactCommon::applicableInMaster, \ref masterequationlimitations
+ * \see ::structure::structure::ExactCommon::applicableInMaster, \ref masterequationlimitations
  */
 struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::runtime_error("") {}};
 
@@ -48,29 +48,26 @@ struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::ru
  * 
  */
 template<int RANK, typename ODE_Engine, typename V=tmptools::V_Empty>
-class Master : private structure::QuantumSystemWrapper<RANK>
+class Master
 {
 public:
   Master(Master&&) = default; Master& operator=(Master&&) = default;
 
-  using StreamedArray=structure::Averages;
+  using StreamedArray=::structure::Averages;
   
   typedef typename quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
   template <typename StateVector_OR_DensityOperator>
-  Master(structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
+  Master(::structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
          StateVector_OR_DensityOperator&& state, ///< the state vector or density operator to be evolved
          ODE_Engine ode,
          EntanglementMeasuresSwitch ems ///< governs whether entanglement measures should be calculated
          ) 
-  : structure::QuantumSystemWrapper<RANK>{sys,true},
-    rho_{std::forward<StateVector_OR_DensityOperator>(state)},
-    ode_(ode),
-    dos_(this->getAv(),ems)
+  : sys_{sys}, rho_{std::forward<StateVector_OR_DensityOperator>(state)}, ode_(ode), dos_(::structure::castAv(sys),ems)
   {
-    if (!this->applicableInMaster()) throw master::SystemNotApplicable();
+    if (!::structure::applicableInMaster(sys)) throw master::SystemNotApplicable();
     if (rho_!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
   }
 
@@ -108,6 +105,8 @@ public:
 private:
   double t_=0., t0_=0.;
   
+  ::structure::QuantumSystemPtr<RANK> sys_;
+  
   DensityOperator rho_;
   
   ODE_Engine ode_;
@@ -128,7 +127,7 @@ Master(System, quantumdata::StateVector<RANK>, ODE_Engine, bool) -> Master<RANK,
 namespace master {
 
 template<typename ODE_Engine, typename V, typename StateVector_OR_DensityOperator>
-auto make(structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperator>::N_RANK> sys,
+auto make(::structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperator>::N_RANK> sys,
           StateVector_OR_DensityOperator&& state, const Pars& p, EntanglementMeasuresSwitch ems)
 {
   return Master<std::decay_t<StateVector_OR_DensityOperator>::N_RANK,ODE_Engine,V>(
@@ -161,7 +160,7 @@ void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostr
       drhodtLow=0;
       
       for (auto&& [rhoS,drhodtS] : boost::combine(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow)) )
-        this->addContribution(t,rhoS,drhodtS,t0_);
+        ::structure::addContribution(sys_,t,rhoS,drhodtS,t0_);
       
       {
         linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
@@ -170,12 +169,12 @@ void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostr
       
       // Now act with the reset operator --- implement this in terms of the individual jumps by iteration and addition
       
-      for (size_t i=0; i < this->template nAvr<structure::LA_Li>(); i++) {
+      for (size_t i=0; i < ::structure::nAvr<::structure::LA_Li>(sys_); i++) {
         try {
-          this->getLi()->actWithSuperoperator(t,rhoLow,drhodtLow,i);
-        } catch (const structure::SuperoperatorNotImplementedException&) {
+          ::structure::actWithSuperoperator(sys_,t,rhoLow,drhodtLow,i);
+        } catch (const ::structure::SuperoperatorNotImplementedException&) {
           DensityOperatorLow rhotemp(rhoLow.copy());
-#define UNARY_ITER for (auto& rhoS : fullRange<Left>(rhotemp)) this->getLi()->actWithJ(t,rhoS,i);
+#define UNARY_ITER for (auto& rhoS : fullRange<Left>(rhotemp)) ::structure::actWithJ(sys_,t,rhoS,i);
           UNARY_ITER; blitzplusplus::hermitianConjugateSelf(rhotemp); UNARY_ITER;
 #undef UNARY_ITER
           drhodtLow+=rhotemp;
@@ -183,7 +182,7 @@ void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostr
       }            
     },t_,rho_.getArray());
 
-  if (const auto ex=this->getEx()) {
+  if (const auto ex=::structure::castEx(sys_)) {
     using namespace blitzplusplus; using namespace vfmsi;
     DensityOperatorLow rhoLow(rho_.getArray());
     for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,t0_);
@@ -213,9 +212,9 @@ std::ostream& quantumtrajectory::Master<RANK,ODE_Engine,V>::streamParameters(std
 {
   using namespace std;
 
-  this->streamCharacteristics( this->getQS()->streamParameters(ode_.streamParameters(os)<<"Solving Master equation."<<endl<<endl ) )<<endl;
+  ::structure::streamCharacteristics(sys_, sys_->streamParameters(ode_.streamParameters(os)<<"Solving Master equation."<<endl<<endl ) )<<endl;
 
-  if (const auto li=this->getLi()) {
+  if (const auto li=::structure::castLi(sys_)) {
     os<<"Decay channels:\n";
     {
       size_t i=0;
@@ -230,7 +229,7 @@ std::ostream& quantumtrajectory::Master<RANK,ODE_Engine,V>::streamParameters(std
           li->actWithSuperoperator(0,rho_.getArray(),rhotemp.getArray(),i);
           os<<i<<' '; ++n;
         }
-        catch (const structure::SuperoperatorNotImplementedException&) {}
+        catch (const ::structure::SuperoperatorNotImplementedException&) {}
       if (!n) os<<"none";
     }
     os<<endl;
