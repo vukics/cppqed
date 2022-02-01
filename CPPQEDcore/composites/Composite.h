@@ -3,7 +3,8 @@
 #ifndef   CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
 #define   CPPQEDCORE_COMPOSITES_COMPOSITE_H_INCLUDED
 
-#include "SubSystem.h"
+#include "Interaction.h"
+#include "Structure.h"
 
 #include "Algorithm.h"
 #include "SliceIterator.h"
@@ -29,27 +30,30 @@ struct ConsistencyException : std::logic_error
 using ::size_t; using ::structure::Averages; using ::structure::Rates;
 
 template<int RANK>
-using Frees = std::array<SubSystemFree,RANK> ;
+using Frees = typename ::structure::Interaction<RANK>::Frees;
 
 
-/// Helper class to Composite (an Act)
+/// Helper to create Composites
 /**
- * It combines a set of \link retainedindexpositionsdefined retained index positions\endlink (via its tmptools::Vector base) with a certain structure::Interaction element
- * (via the SubSystemsInteraction base) of the corresponding arity (equalling the number of retained index positions) – this means that the given structure::Interaction
- * element will act on the given retained index positions.
- *
- * Composite expects a \refBoost{Boost.Fusion,fusion} sequence as its template argument `Acts`.
- *
- * \tparam RetainedAxes has the same role as in tmptools::Vector
+ * It combines a set of \link retainedindexpositionsdefined retained axes\endlink (as tmptools::Vector) with a certain structure::Interaction element
+ * of the corresponding arity (equalling the number of retained index positions) – this means that the given structure::Interaction element
+ * will act on the given retained index positions.
  */
 template<int... RetainedAxes>
-class _
-  : public SubSystemsInteraction<sizeof...(RetainedAxes)>
+struct _
 {
 public:
-  explicit _(structure::InteractionPtr<sizeof...(RetainedAxes)> ia) : SubSystemsInteraction<sizeof...(RetainedAxes)>(ia) {}
+  explicit _(::structure::InteractionPtr<sizeof...(RetainedAxes)> ia) : ia_{ia} {}
+
+  template <typename IA, typename ... T>
+  static _ make(T&&... t)
+  {
+    return _{std::make_shared<const IA>(std::forward<T>(t)...)};
+  }
 
   static constexpr auto retainedAxes=tmptools::vector<RetainedAxes...>;
+  
+  ::structure::InteractionPtr<sizeof...(RetainedAxes)> ia_;
   
 };
 
@@ -58,40 +62,22 @@ template<typename... Acts>
 constexpr auto rank_v=hana::maximum(hana::flatten(hana::make_tuple(Acts::retainedAxes...)))+1;
 
 
-template<int RANK>
-// Factoring out code that depends only on RANK:
-class RankedBase : public structure::QuantumSystem<RANK>
-{
-public:
-  static const int N_RANK = RANK;
 
-protected:
-  explicit RankedBase(const Frees<RANK>& frees)
-    : structure::QuantumSystem<RANK>([&] () { // calculate the dimensions
-        typename structure::QuantumSystem<RANK>::Dimensions res;
-        hana::for_each(tmptools::ordinals<RANK>,[&](auto t) {res(t)=frees[t]->getDimension();});
-        return res;
-    }()), frees_(frees) {}
-  
-  const auto& getFrees() const {return frees_;}
-
-private:
-  const Frees<RANK> frees_;
- 
-};
-
-
-template<typename... Acts> // Acts should be a hana::tuple of Acts
+template<typename... Acts>
 class Base
-  : public RankedBase<rank_v<Acts...>>,
-    public structure::Averaged<rank_v<Acts...>>
+  : public ::structure::QuantumSystem<rank_v<Acts...>>,
+    public ::structure::Averaged<rank_v<Acts...>>
 {
 public:
   // The calculated RANK
   static constexpr int RANK = rank_v<Acts...>;
 
 protected:
-  using RankedBase<RANK>::getFrees;
+  Base(Frees<RANK> frees, Acts... acts) : ::structure::QuantumSystem<RANK>([=] () { // calculate the dimensions
+    typename structure::QuantumSystem<RANK>::Dimensions res;
+    hana::for_each(tmptools::ordinals<RANK>,[=,&res](auto t) {res(t)=frees[t]->getDimension();});
+    return res;
+  }()), frees_{frees}, acts_{acts...} {}
   
   // Compile-time sanity check: each ordinal up to RANK has to be contained by at least one act.
   // (That is, no free system can be left out of the network of interactions)
@@ -100,22 +86,24 @@ protected:
   }) == true , "Composite not consistent" );
 
 public:
+
   template<structure::LiouvilleanAveragedTag LA>
-  static std::ostream& streamKeyLA(std::ostream& os, size_t& i, const Frees<RANK>& frees, const hana::tuple<Acts...>& acts)
+  static std::ostream& streamKeyLA(std::ostream& os, size_t& i, Frees<RANK> frees, hana::tuple<Acts...> acts)
   {
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {frees[idx].template streamKey<LA>(os,i);});
-    hana::for_each(acts,[&](const auto& act) {act.template streamKey<LA>(os,i);});    
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {::structure::streamKey<LA>(frees[idx],os,i);});
+    hana::for_each(acts,[&](auto act) {::structure::streamKey<LA>(act.ia_,os,i);});    
     return os;
   }
   
   
   template<structure::LiouvilleanAveragedTag LA>
-  static size_t nAvrLA(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts)
-  {
-    
+  static size_t nAvrLA(Frees<RANK> frees, hana::tuple<Acts...> acts)
+  {    
     return hana::fold(acts,
-                      hana::fold(tmptools::ordinals<RANK>,0,[&](size_t res, auto idx) {return res + frees[idx].template nAvr<LA>();}),
-                      [&](size_t s, const auto& act) {return s+act.template nAvr<LA>();});
+                      hana::fold(tmptools::ordinals<RANK>,
+                                 0,
+                                 [=](size_t res, auto idx) {return res + ::structure::nAvr<LA>(frees[idx]);}),
+                      [=](size_t s, auto act) {return s+::structure::nAvr<LA>(act.ia_);});
   }
   
 
@@ -123,25 +111,22 @@ public:
 #pragma GCC warning "TODO: This solution is a bit insane, could be solved more effectively with blitz::Array slice"
 #endif // NDEBUG
   template<structure::LiouvilleanAveragedTag LA>
-  static const structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo,
-                                             const Frees<RANK>& frees, const hana::tuple<Acts...>& acts, size_t numberAvr)
+  static structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo, Frees<RANK> frees, hana::tuple<Acts...> acts, size_t numberAvr)
   {
-    std::list<Averages> seqAverages{RANK+hana::size(acts)}; // Averages res(numberAvr); size_t resIdx=0;
+    std::list<Averages> seqAverages{RANK+hana::size(acts).value}; // Averages res(numberAvr); size_t resIdx=0;
     
     {
       typename std::list<Averages>::iterator iter(seqAverages.begin());
       
-      const auto lambda=[&](auto av, auto v) {
+      const auto lambda = [=,&iter,&ldo](auto av_or_li, auto v) {
         iter++->reference(quantumdata::partialTrace<std::decay_t<decltype(v)>>(ldo,[&](const auto& ldoS) {
-          return structure::average(av,t,ldoS);
+          return structure::average<LA>(av_or_li,t,ldoS);
         }));
       };
       
-      auto tag=structure::LiouvilleanAveragedTag_<LA>();
+      hana::for_each(tmptools::ordinals<RANK>,[=](auto idx) {lambda(frees[idx],tmptools::vector<idx>);});
       
-      hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees[idx].getLA(tag),tmptools::vector<idx>);});
-      
-      hana::for_each(acts,[&](const auto& act) {lambda(act.getLA(tag),act.retainedAxes);});
+      hana::for_each(acts,[=](auto act) {lambda(act.ia_,act.retainedAxes);});
       
     }
     
@@ -151,39 +136,32 @@ public:
   }
 
 
-protected:
-  // Constructor
-  explicit Base(const Frees<RANK>& frees, const Acts&... acts) : RankedBase<RANK>{frees}, acts_{acts...} {}
-    
-  const auto& getActs() const {return acts_;}
-
 private:
   // Implementing QuantumSystem interface
 
   double highestFrequency_v( ) const override
   {
     return std::max(
-      getFrees()[hana::maximum(tmptools::ordinals<RANK>,[this](auto idx1, auto idx2) {
-        return  getFrees()[idx1]->highestFrequency() < getFrees()[idx2]->highestFrequency();
-      })]->highestFrequency()
-      ,
-      hana::maximum(acts_,[&](const auto& act1, const auto& act2) {return act1->highestFrequency() < act2->highestFrequency();})->highestFrequency()
+      frees_[hana::maximum(tmptools::ordinals<RANK>,[this](auto idx1, auto idx2) {
+        return  frees_[idx1]->highestFrequency() < frees_[idx2]->highestFrequency();
+      })]->highestFrequency(),
+      hana::maximum( hana::transform( acts_, [](auto act) {return act.ia_->highestFrequency();} ) )
     );
   }
   
   std::ostream& streamParameters_v(std::ostream& os) const override
   {
-    os<<"Composite\nDimensions: "<<RankedBase<RANK>::getDimensions()<<". Total: "<<RankedBase<RANK>::getTotalDimension()<<std::endl;
+    os<<"Composite\nDimensions: "<<this->getDimensions()<<". Total: "<<this->getTotalDimension()<<std::endl;
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {
+    hana::for_each(tmptools::ordinals<RANK>,[=,&os](auto idx) {
       os<<"Subsystem Nr. "<<idx<<std::endl;
-      getFrees()[idx]->streamParameters(os);
+      frees_[idx]->streamParameters(os);
     });
     
-    hana::for_each(acts_, [&](const auto& act) {
+    hana::for_each(acts_, [=,&os](auto act) {
       hana::for_each(act.retainedAxes,[&](auto idx) {os<<idx<<" - ";});
       os<<"Interaction\n";
-      act->streamParameters(os);
+      act.ia_->streamParameters(os);
     });
     
     return os;
@@ -192,25 +170,28 @@ private:
 
   // Implementing the Averaged base
 
-  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return streamKeyLA<structure::LA_Av>(os,i, getFrees() ,acts_ );}
-  size_t nAvr_v() const override {return nAvrLA<structure::LA_Av>( getFrees(),acts_ );}
-  const structure::Averages average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return averageLA<structure::LA_Av>(t,ldo,getFrees(),acts_,nAvr_v());}
+  std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return streamKeyLA<::structure::LA_Av>(os,i, frees_ ,acts_ );}
   
-  void process_v(structure::Averages& avr) const override
+  size_t nAvr_v() const override {return nAvrLA<::structure::LA_Av>( frees_,acts_ );}
+  
+  const ::structure::Averages average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return averageLA<::structure::LA_Av>(t,ldo,frees_,acts_,nAvr_v());}
+  
+  
+  void process_v(::structure::Averages& avr) const override
   {
     ptrdiff_t l=-1, u=0;
 
-    const auto lambda=[&](auto av) {
-      if (av && (u=l+av->nAvr())>l) {
+    const auto lambda=[&](auto ptr) {
+      if (const auto av=::structure::castAv(ptr); av && (u=l+av->nAvr())>l) {
         Averages temp(avr(blitz::Range(l+1,u)));
         av->process(temp);
         l=u;
       }
     };
   
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(getFrees()[idx].getAv());});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx]);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getAv());});
+    hana::for_each(acts_,[&](auto act) {lambda(act.ia_);});
   }
   
   
@@ -218,21 +199,22 @@ private:
   {
     ptrdiff_t l=-1, u=0;
   
-    const auto lambda=[&](auto av){
-      if (av && (u=l+av->nAvr())>l) {
+    const auto lambda=[&](auto ptr){
+      if (const auto av=::structure::castAv(ptr); av && (u=l+av->nAvr())>l) {
         av->stream(avr(blitz::Range(l+1,u)),os,precision);
         l=u;
       }
     };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(getFrees()[idx].getAv());});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx]);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getAv());});
+    hana::for_each(acts_,[&](auto act) {lambda(act.ia_);});
     
     return os;
     
   }
   
+  const Frees<RANK> frees_;
   
   const hana::tuple<Acts...> acts_;
 
@@ -246,33 +228,35 @@ class Exact
   : public structure::Exact<rank_v<Acts...>>
 {
 private:
-  static const int RANK=rank_v<Acts...>;
+  static constexpr int RANK=rank_v<Acts...>;
 
 protected:
-  Exact(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts) : frees_(frees), acts_(acts) {}
+  Exact(Frees<RANK> frees, Acts... acts) : frees_{frees}, acts_{acts...} {}
 
 private:
   void actWithU_v(double t, quantumdata::StateVectorLow<RANK>& psi, double t0) const override
   {
-    const auto lambda=[&](auto ex, auto v) {if (ex) for (auto& psiS : cppqedutils::sliceiterator::fullRange<decltype(v)>(psi)) ex->actWithU(t,psiS,t0);};
+    const auto lambda=[&](auto ptr, auto v) {
+      if (const auto ex=::structure::castEx(ptr)) for (auto& psiS : cppqedutils::sliceiterator::fullRange<decltype(v)>(psi)) ex->actWithU(t,psiS,t0);
+    };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getEx(),tmptools::vector<idx>);});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx],tmptools::vector<idx>);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getEx(),act.retainedAxes);});
+    hana::for_each(acts_,[&](auto act) {lambda(act.ia_,act.retainedAxes);});
     
   }
   
   
   bool applicableInMaster_v( ) const override
   {
-    if (hana::fold(tmptools::ordinals<RANK>,true,[&](bool s, auto idx) {return s && frees_[idx].applicableInMaster();}))
-      return hana::fold(acts_,true,[&](bool s, const auto& act) {return s && act.applicableInMaster();});
+    if (hana::fold(tmptools::ordinals<RANK>,true,[&](bool s, auto idx) {return s && ::structure::applicableInMaster(frees_[idx]);}))
+      return hana::fold(acts_,true,[&](bool s, auto act) {return s && applicableInMaster(act.ia_);});
     else return false;
   }
   
 
-  const Frees<RANK>& frees_;
-  const hana::tuple<Acts...> & acts_;
+  const Frees<RANK> frees_;
+  const hana::tuple<Acts...> acts_;
 
 };
 
@@ -282,29 +266,29 @@ class Hamiltonian
   : public structure::Hamiltonian<rank_v<Acts...>>
 {
 private:
-  static const int RANK=rank_v<Acts...>;
+  static constexpr int RANK=rank_v<Acts...>;
 
 protected:
-  Hamiltonian(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts) : frees_(frees), acts_(acts) {}
+  Hamiltonian(Frees<RANK> frees, Acts... acts) : frees_{frees}, acts_{acts...} {}
 
 private:
   void addContribution_v(double t, const quantumdata::StateVectorLow<RANK>& psi, quantumdata::StateVectorLow<RANK>& dpsidt, double t0) const override
   {
-    const auto lambda=[&](auto ha, auto v) {
-      if (ha)
+    const auto lambda=[&](auto ptr, auto v) {
+      if (const auto ha=::structure::castHa(ptr))
         boost::for_each(cppqedutils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(psi),
                         cppqedutils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(dpsidt),
                         [&](const auto& psiS, auto& dpsidtS) {ha->addContribution(t,psiS,dpsidtS,t0);});
     };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getHa(),tmptools::vector<idx>);});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx],tmptools::vector<idx>);});
 
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getHa(),act.retainedAxes);});
+    hana::for_each(acts_,[&](auto act) {lambda(act.ia_,act.retainedAxes);});
     
   }
   
-  const Frees<RANK>& frees_;
-  const hana::tuple<Acts...> & acts_;
+  const Frees<RANK> frees_;
+  const hana::tuple<Acts...> acts_;
 
 };
 
@@ -314,24 +298,27 @@ class Liouvillean
   : public structure::Liouvillean<rank_v<Acts...>>
 {
 private:
-  static const int RANK=rank_v<Acts...>;
+  static constexpr int RANK=rank_v<Acts...>;
 
 protected:
-  Liouvillean(const Frees<RANK>& frees, const hana::tuple<Acts...>& acts) : frees_(frees), acts_(acts) {}
+  Liouvillean(Frees<RANK> frees, Acts... acts) : frees_{frees}, acts_{acts...} {}
 
 private:
   std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<Acts...>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
   
   size_t nAvr_v() const override {return Base<Acts...>::template nAvrLA<structure::LA_Li>(frees_,acts_);}
   
-  const Rates average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override {return Base<Acts...>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());}
+  const Rates average_v(double t, const quantumdata::LazyDensityOperator<RANK>& ldo) const override
+  {
+    return Base<Acts...>::template averageLA<structure::LA_Li>(t,ldo,frees_,acts_,nAvr_v());
+  }
 
   void actWithJ_v(double t, quantumdata::StateVectorLow<RANK>& psi, size_t ordoJump) const override
   {
     bool flag=false;
     
-    const auto lambda=[&](auto li, auto v) {
-      if (!flag && li) {
+    const auto lambda=[&](auto ptr, auto v) {
+      if (const auto li=::structure::castLi(ptr); !flag && li) {
         size_t n=li->nAvr();
         if (ordoJump<n) {
           for (auto& psiS : cppqedutils::sliceiterator::fullRange<std::decay_t<decltype(v)>>(psi)) li->actWithJ(t,psiS,ordoJump);
@@ -341,9 +328,9 @@ private:
       }
     };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::vector<idx>);});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx],tmptools::vector<idx>);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act.retainedAxes);});
+    hana::for_each(acts_,[&](const auto& act) {lambda(act.ia_,act.retainedAxes);});
     
   }
   
@@ -352,38 +339,41 @@ private:
   {
     bool flag=false;
     
-    const auto lambda=[&](auto li, auto v) {
-      if (!flag && li) {
+    const auto lambda=[&](auto ptr, auto ev) {
+      if (const auto li=::structure::castLi(ptr); !flag && li) {
         size_t n=li->nAvr();
         if (ordoJump<n) {
-          using ExtendedV=decltype(hana::concat(v, /* hana::transform(v,[&](auto element) constexpr {return element+RANK;})*/ v+RANK ));
+          using ExtendedV=std::decay_t<decltype(ev)>;
 
           boost::for_each(cppqedutils::sliceiterator::fullRange<ExtendedV>(rho),cppqedutils::sliceiterator::fullRange<ExtendedV>(drhodt),
                           [&](const auto& rhoS, auto& drhodtS) {li->actWithSuperoperator(t,rhoS,drhodtS,ordoJump);});
+          
           flag=true;
         }
         ordoJump-=n;  
       }
     };
     
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx].getLi(),tmptools::vector<idx>);});
+    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {lambda(frees_[idx],tmptools::vector<idx,idx+RANK>);});
     
-    hana::for_each(acts_,[&](const auto& act) {lambda(act.getLi(),act.retainedAxes);});
+    hana::for_each(acts_,[&](auto act) {lambda(act.ia_,hana::concat(act.retainedAxes,
+                                                                    hana::transform(act.retainedAxes,
+                                                                                    [](auto element) constexpr {return element+hana::int_c<RANK>;} ) ) ); } );
     
   }
   
-  const Frees<RANK>& frees_;
-  const hana::tuple<Acts...> & acts_;
+  const Frees<RANK> frees_;
+  const hana::tuple<Acts...> acts_;
 
 };
 
 
-template<typename>
+template<typename TAG>
 class EmptyBase
 {
 public:
-  template<typename Dummy, typename Acts>
-  EmptyBase(const Dummy&, const Acts&) {}
+  template<typename... T>
+  EmptyBase(T...) {}
   
 };
 
@@ -410,16 +400,9 @@ public:
   typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
   typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
   
-  // The calculated RANK
-  static const int RANK=Base::RANK;
-
-private:
-  using Base::getFrees; using Base::getActs ;
-  
-public:
   // Constructor
-  Composite(const composite::Frees<RANK>& frees, const Acts&... acts)
-    : Base(frees,acts...), ExactBase(getFrees(),getActs()), HamiltonianBase(getFrees(),getActs()), LiouvilleanBase(getFrees(),getActs()) {}
+  Composite(composite::Frees<Base::RANK> frees, Acts... acts)
+    : Base(frees,acts...), ExactBase(frees,acts...), HamiltonianBase(frees,acts...), LiouvilleanBase(frees,acts...) {}
     // Note that Frees and Acts are stored by value in Base, that’s why we need the getters here
  
 };
@@ -434,33 +417,33 @@ namespace composite {
 #define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics{EX,HA,LI})) return std::make_shared<Composite<EX,HA,LI,Acts...>>(frees,acts...)
 
 template<typename... Acts>
-std::shared_ptr<const composite::Base<Acts...>> make(const Acts&... acts)
+std::shared_ptr<const composite::Base<Acts...>> make(Acts... acts)
 {
   using namespace structure;
   
   const auto frees{[&]() {
-    Frees<rank_v<Acts...>> res; res.fill({});
+    Frees<rank_v<Acts...>> res;// res.fill({});
     
-    hana::for_each(hana::make_tuple(acts...),[&](const auto& act) {
+    hana::for_each(hana::make_tuple(acts...),[&](auto act) {
       int i=0;
       hana::for_each(act.retainedAxes, [&] (auto idx) {
-        if (res[idx].get()) {
-          if (res[idx].get()!=act->getFrees()[i]) throw composite::ConsistencyException(idx,i);
+        if (res[idx]) {
+          if ( res[idx]!=(*act.ia_)[i] ) throw composite::ConsistencyException(idx,i);
         }
-        else res[idx]=SubSystemFree(act->getFrees()[i]);
+        else res[idx]=(*act.ia_)[i];
         i++;
       });
     });
     
     return res;
   } ()};
-
+  
   auto systemCharacteristics{hana::fold( hana::make_tuple(acts...), 
-    hana::fold(tmptools::ordinals<Base<Acts...>::RANK>, SystemCharacteristics{false,false,false}, [&](SystemCharacteristics sc, auto idx) {
-      const SubSystemFree& free=frees[idx];
-      return sc || SystemCharacteristics{free.getEx()!=0,free.getHa()!=0,free.getLi()!=0};
-    }), [&](SystemCharacteristics sc, const auto& act) {
-      return sc || SystemCharacteristics{act.getEx()!=0,act.getHa()!=0,act.getLi()!=0};
+    hana::fold(tmptools::ordinals<rank_v<Acts...>>, SystemCharacteristics{false,false,false}, [&](SystemCharacteristics sc, auto idx) {
+      const auto freePtr=frees[idx];
+      return sc || SystemCharacteristics{castEx(freePtr)!=0,castHa(freePtr)!=0,castLi(freePtr)!=0};
+    }), [&](SystemCharacteristics sc, auto act) {
+      return sc || SystemCharacteristics{castEx(act.ia_)!=0,castHa(act.ia_)!=0,castLi(act.ia_)!=0};
     })};
   
   if      DISPATCHER(true ,true ,true ) ;

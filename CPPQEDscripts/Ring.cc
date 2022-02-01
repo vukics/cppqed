@@ -28,9 +28,9 @@ int main(int argc, char* argv[])
 
   evolve<0>(init(pp)*init(pmP)*init(pmM),
             composite::make(
-                            _<1,0>  (std::make_shared<ParticleAlongCavity>(plus ,part,ppcP)),
-                            _<2,0>  (std::make_shared<ParticleAlongCavity>(minus,part,ppcM)),
-                            _<1,2,0>(std::make_shared<ParticleTwoModes>(plus,minus,part,ppcP,ppcM))
+                            _<1,0>::make<ParticleAlongCavity>(plus ,part,ppcP),
+                            _<2,0>::make<ParticleAlongCavity>(minus,part,ppcM),
+                            _<1,2,0>::make<ParticleTwoModes>(plus,minus,part,ppcP,ppcM)
                             ),
             pe);
 
