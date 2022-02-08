@@ -414,7 +414,7 @@ public:
 
 namespace composite {
 
-#define DISPATCHER(EX,HA,LI) (all(systemCharacteristics==SystemCharacteristics{EX,HA,LI})) return std::make_shared<Composite<EX,HA,LI,Acts...>>(frees,acts...)
+#define DISPATCHER(EX,HA,LI) (all(sysChar==SystemCharacteristics{EX,HA,LI})) return std::make_shared<Composite<EX,HA,LI,Acts...>>(frees,acts...)
 
 template<typename... Acts>
 std::shared_ptr<const composite::Base<Acts...>> make(Acts... acts)
@@ -438,12 +438,12 @@ std::shared_ptr<const composite::Base<Acts...>> make(Acts... acts)
     return res;
   } ()};
   
-  auto systemCharacteristics{hana::fold( hana::make_tuple(acts...), 
+  SystemCharacteristics sysChar{hana::fold( hana::make_tuple(acts...), 
     hana::fold(tmptools::ordinals<rank_v<Acts...>>, SystemCharacteristics{false,false,false}, [&](SystemCharacteristics sc, auto idx) {
       const auto freePtr=frees[idx];
-      return sc || SystemCharacteristics{castEx(freePtr)!=0,castHa(freePtr)!=0,castLi(freePtr)!=0};
+      return sc or systemCharacteristics(freePtr);
     }), [&](SystemCharacteristics sc, auto act) {
-      return sc || SystemCharacteristics{castEx(act.ia_)!=0,castHa(act.ia_)!=0,castLi(act.ia_)!=0};
+      return sc or systemCharacteristics(act.ia_);
     })};
   
   if      DISPATCHER(true ,true ,true ) ;

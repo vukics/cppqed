@@ -45,6 +45,11 @@ template<typename T> auto castLi(std::shared_ptr<const T> qs) {return std::dynam
 template<typename T> auto castAv(std::shared_ptr<const T> qs) {return std::dynamic_pointer_cast<const Averaged<T::N_RANK>>(qs);}
 
 
+template<typename T> SystemCharacteristics systemCharacteristics(std::shared_ptr<const T> qs)
+{
+  return {bool(castEx(qs)),bool(castHa(qs)),bool(castLi(qs))};
+}
+
 /// Wrappers for Exact, Hamiltonian, Liouvillean, and Averaged member functions
 /**
  * The aim is to determine whether the passed DynamicsBase or QuantumSystem object derives also from Exact, Hamiltonian, Liouvillean, or Averaged
