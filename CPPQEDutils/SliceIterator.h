@@ -38,7 +38,7 @@ using mii::Begin; using mii::End; using tmptools::ordinals;
  * 
  */
 template <int RANK, typename RetainedAxes>
-void checkConsistency(RetainedAxes ra=RetainedAxes{})
+void checkConsistency(std::optional<RetainedAxes> ra=std::nullopt) // if the optional argument is not given, RetainedAxes needs to be default-constructible 
 {
   using namespace hana; using namespace literals;
 
