@@ -125,9 +125,6 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang AND ${CMAKE_CXX_COMPILER_VERSION} VE
   message(FATAL_ERROR "Clang version >= ${CLANG_MINIMAL} needed.")
 endif ()
 
-# Switch for FLENS support.
-# option(FLENS "FLENS support" ON)
-
 message(STATUS "Configuring blitz")
 add_subdirectory(blitz)
 include_directories(SYSTEM blitz) # in order that we do not receive warnings from blitz

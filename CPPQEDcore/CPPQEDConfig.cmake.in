@@ -20,9 +20,6 @@ set(CPPQED_ABI_MINOR "@CPPQED_ABI_MINOR@")
 set(CPPQED_ABI_MICRO "@CPPQED_ABI_MICRO@")
 
 
-#! Indicates whether FLENS support is compiled in.
-set(CPPQED_FLENS_FOUND "@CPPQED_FLENS_FOUND@")
-
 #! Core git commit sha1 hash value
 set(CPPQED_CORE_GIT "@CONF_GIT_SHA1@")
 

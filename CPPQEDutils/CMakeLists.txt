@@ -28,23 +28,12 @@ if (TARGET Eigen3::Eigen)
   target_sources(CPPQEDutils PRIVATE DrivenDampedHarmonicOscillator.cc)
 endif ()
 
-target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_FLENS CPPQED_HAS_GSL)
+target_compile_definitions(CPPQEDutils PUBLIC CPPQED_HAS_GSL)
 
 # Project options
 # Switch for boost bzip2 support
 option(COMPRESSION "Boost bzip2 support" ON)
 
-#FLENS
-##if( FLENS AND NOT FLENS_found )
-  ##find_package(flens)
-##endif( )
-
-#if( NOT flens_FOUND )
-  #message(STATUS "Flens library not found or disabled, optional flens support disabled.")
-  #set(DO_NOT_USE_FLENS ON)
-#endif( )
-
-# include_directories(SYSTEM ${flens_INCLUDE_DIRS})
 
 # Check if compression can be enabled, inform user
 if(COMPRESSION)
