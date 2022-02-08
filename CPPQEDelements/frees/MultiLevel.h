@@ -15,19 +15,7 @@
 
 #include "primitive.hpp"
 
-#include <boost/fusion/sequence/intrinsic/at_c.hpp>
-// #include<boost/fusion/container/generation/make_list.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/algorithm/iteration/for_each.hpp>
-
-#include <boost/fusion/mpl/at.hpp>
-#include <boost/fusion/mpl/size.hpp>
-
-#include <boost/mpl/for_each.hpp>
-
-
 /*
-
 Convention is the following: an (l,m) pair in VP (or VL) below means a sigma_lm=|l><m|
 
 This yields an 
@@ -47,23 +35,10 @@ to
 /// Contains helpers for the \ref multilevelbundle "MultiLevel bundle"
 namespace multilevel {
 
-
 const std::string keyTitle="MultiLevel";
 
 
 using namespace structure::freesystem; using structure::NoTime;
-
-// using boost::fusion::make_list;
-using boost::fusion::make_vector;
-
-
-namespace result_of {
-
-// using boost::fusion::result_of::make_list;
-using boost::fusion::result_of::make_vector;
-
-} // result_of
-
 
 
 ////////
@@ -105,20 +80,18 @@ private:
 //////////////
 
 
-using cppqedutils::primitive;
-
-
 template<typename T, int I, int J>
-class DynamicsPair : public primitive<T>, public tmptools::pair_c<I,J>
+class DynamicsPair : public cppqedutils::primitive<T>, public tmptools::pair_c<I,J>
 {
 public:
-  using primitive<T>::primitive;
+  using cppqedutils::primitive<T>::primitive;
 
 };
 
 
-/// Class representing an elementary pump term (an \f$\eta_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
+/// Class representing an elementary pump/drive term (an \f$\eta_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
 template<int I, int J> using Pump = DynamicsPair<dcomp,I,J>;
+template<int I, int J> using Drive = Pump<I,J>;
 
 
 template<int NL, typename VP>
@@ -127,8 +100,6 @@ class HamiltonianIP
     public Exact<NL>
 {
 public:
-  static const int NPT=mpl::size<VP>::value; // number of pumped transitions
-
   typedef typename Exact<NL>::L L;
 
   HamiltonianIP(const L& zSchs, const L& zIs, const VP& etas)
@@ -151,17 +122,16 @@ class HamiltonianSch
   : public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
 {
 public:
-  static const int NPT=mpl::size<VP>::value; // number of pumped transitions
-
   typedef ComplexPerLevel<NL> L;
 
-  HamiltonianSch(const L& zSchs, const VP& etas) : zSchs_(zSchs), etas_(etas) {}
+  HamiltonianSch(const L& zSchs, VP etas) : zSchs_(zSchs), etas_(etas) {}
 
   const L& get_zSchs() const {return zSchs_;}
 
 private:
-  void addContribution_v(NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const {
-    mpl::for_each<tmptools::Ordinals<NL>>([&](auto arg) {const int ind=decltype(arg)::value; dpsidt(ind)+=-zSchs_(ind)*psi(ind);});
+  void addContribution_v(NoTime, const StateVectorLow& psi, StateVectorLow& dpsidt) const override
+  {
+    hana::for_each(tmptools::ordinals<NL>,[&](auto ind) {dpsidt(ind)+=-zSchs_(ind)*psi(ind);});
     for_each(etas_,[&](auto pump) {
       using P=decltype(pump);
       typename P::template SanityCheck<0,NL-1>(); // A temporary variable to instantiate the SanityCheck member template
@@ -194,22 +164,20 @@ class LiouvilleanRadiative;
 
 // With ORDO=-1, this doesn’t correspond to valid jumps, its function is to store data, fill keyLabels, etc.:
 template<int NL, typename VL>
-class LiouvilleanRadiative<NL,VL,-1> : public structure::ElementLiouvillean<1, mpl::size<VL>::value>
+class LiouvilleanRadiative<NL,VL,-1> : public structure::ElementLiouvillean<1, hana::size(VL{})>
 {
 private:
-  typedef structure::ElementLiouvillean<1, mpl::size<VL>::value> Base;
+  typedef structure::ElementLiouvillean<1, hana::size(VL{})> Base;
 
   typedef typename Base::KeyLabels KeyLabels;
   
 protected:
-  static const int NRT=mpl::size<VL>::value; // number of transitions with radiative loss
-
-  LiouvilleanRadiative(const VL& gammas,
+  LiouvilleanRadiative(VL gammas,
                        double = 0. ///< dummy to conform with LiouvilleanDiffusive
                       )
-    : Base(keyTitle,[] {
+    : Base(keyTitle,[=] {
         KeyLabels res;
-        mpl::for_each<VL>([&](auto arg) {res.push_back("Jump "+std::to_string(decltype(arg)::second)+" -> "+std::to_string(decltype(arg)::first));});
+        hana::for_each(gammas, [&](auto arg) {res.push_back("Jump "+std::to_string(decltype(arg)::second)+" -> "+std::to_string(decltype(arg)::first));});
         return res;
       } () /* this double parenthesis syntax is required to actually run the lambda */ ),
       gammas_(gammas) {}
@@ -227,28 +195,27 @@ private:
   typedef LiouvilleanRadiative<NL,VL,ORDO-1> Base;
   
 protected:
-  using Base::Base; using Base::NRT; using Base::gammas_;
+  using Base::gammas_;
   
 private:
   void doActWithJ(NoTime, StateVectorLow& psi, typename Base::template LindbladNo<ORDO>) const override
   {
-    typedef typename mpl::at_c<VL,ORDO>::type Decay;
-    typename Decay::template SanityCheck<0,NL-1>();
-    dcomp temp(sqrt(2.*boost::fusion::at_c<ORDO>(gammas_).get())*psi(Decay::second));
+    const auto gamma=gammas_[hana::int_c<ORDO>]; gamma.template SanityCheck<0,NL-1>();
+    dcomp temp(sqrt(2.*gamma.get())*psi(gamma.second));
     psi=0;
-    psi(Decay::first)=temp;
+    psi(gamma.first)=temp;
   }
   
   double rate(NoTime, const LazyDensityOperator& matrix, typename Base::template LindbladNo<ORDO>) const override
   {
-    typedef typename mpl::at_c<VL,ORDO>::type Decay;
-    return 2.*boost::fusion::at_c<ORDO>(gammas_).get()*matrix(Decay::second);    
+    const auto gamma=gammas_[hana::int_c<ORDO>];
+    return 2.*gamma.get()*matrix(gamma.second);
   }
   
   void doActWithSuperoperator(NoTime, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, typename Base::template LindbladNo<ORDO>) const override
   {
-    typedef typename mpl::at_c<VL,ORDO>::type Decay;
-    drhodt(Decay::first,Decay::first)+=2.*boost::fusion::at_c<ORDO>(gammas_).get()*rho(Decay::second,Decay::second);
+    const auto gamma=gammas_[hana::int_c<ORDO>];
+    drhodt(gamma.first,gamma.first)+=2.*gamma.get()*rho(gamma.second,gamma.second);
   }
 
 };
@@ -263,9 +230,9 @@ public:
   using DiffusionCoeffs=typename BASE_class::DiffusionCoeffs;
 
 protected:
-  LiouvilleanDiffusive(const VL& gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
+  LiouvilleanDiffusive(VL gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
   
-  LiouvilleanDiffusive(const VL& gammas, const DiffusionCoeffs& gammas_parallel) : BASE_class(NL,gammas_parallel,gammas) {}
+  LiouvilleanDiffusive(VL gammas, const DiffusionCoeffs& gammas_parallel) : BASE_class(NL,gammas_parallel,gammas) {}
 
 #undef BASE_class
   
@@ -353,10 +320,10 @@ public:
   typedef typename Base::Ptr Ptr;
 
   template<typename GPT, typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
+  PumpedLossyMultiLevelSch(const RealPerLevel& deltas, VP etas, VL gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
     : Hamiltonian([&] {
         ComplexPerLevel res(deltas); res*=-DCOMP_I;
-        for_each(gammas,[&](auto gamma) {res(decltype(gamma)::second)+=gamma.get();});
+        hana::for_each(gammas,[&](auto gamma) {res(gamma.second)+=gamma.get();});
         return res;
       } (), etas),
       Liouvillean(gammas,gamma_parallel),

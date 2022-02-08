@@ -64,8 +64,8 @@ struct pair_c<N1,N2,false>
 {
   //  enum { first=N1, second=N2 };
 
-  static const auto first =N1;
-  static const auto second=N2;
+  static constexpr auto first =N1;
+  static constexpr auto second=N2;
   
   /** \cond FORTESTING */
   template<auto MIN, auto MAX>

@@ -8,9 +8,10 @@ using namespace multilevel;
 
 const int NL=3; // NL stands for "Number of Levels"
 
-typedef multilevel::result_of::make_vector<Pump <0,2>,Pump <1,2> >::type Pumps;
 
-typedef multilevel::result_of::make_vector<Decay<0,2>,Decay<1,2> >::type Decays;
+using Drives=hana::tuple< Pump<0,2>, Pump <1,2> >;
+
+using Decays=hana::tuple< Decay<0,2>, Decay<1,2> >;
 
 
 int main(int argc, char* argv[])
@@ -19,12 +20,13 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ParsPumpedLossy<NL,Pumps,Decays> pml(p);
+  ParsPumpedLossy<NL,Drives,Decays> pml(p);
 
   evolution::Pars<> pe(p); // Driver Parameters
 
-  pml.etas=make_vector(dcomp(30,40),dcomp(-60,40));
-  pml.gammas=make_vector(10,5);
+  pml.etas  =hana::make_tuple(Drive<0,2>{30,40},Drive<1,2>{-60,40});
+  
+  pml.gammas=hana::make_tuple(Decay<0,2>{10},Decay<1,2>{5});
 
   pml.deltas=RealPerLevel<3>(0,0,-1e5);
 
