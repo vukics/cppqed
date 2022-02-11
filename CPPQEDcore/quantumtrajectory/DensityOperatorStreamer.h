@@ -6,7 +6,7 @@
 #include "DensityOperator.h"
 
 #include "Averaged.h"
-#include "NegPT.tcc"
+#include "NegPT.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 
@@ -27,7 +27,7 @@ namespace quantumtrajectory {
  * \tparam V has the same function as the template parameter `V` in quantumdata::negPT
  * 
  */
-template<int RANK, typename V=tmptools::V_Empty>
+template<int RANK, typename V>
 class DensityOperatorStreamer
 {
 public:
@@ -42,9 +42,9 @@ public:
     if (negativity_) {
       auto n{negPT(rho,V())};
       os<<'\t'<<FormDouble(precision)(n);
-#ifndef   DO_NOT_USE_FLENS
+#ifdef EIGEN3_FOUND
       averages.resizeAndPreserve(averages.size()+1); averages(averages.ubound(0))=n;
-#endif // DO_NOT_USE_FLENS
+#endif // EIGEN3_FOUND
     }
     return {os,averages};
   }

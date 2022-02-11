@@ -11,7 +11,7 @@
 namespace evolution {
 
 
-template<template <typename StateType> class ODE_Engine, typename RandomEngine, typename SV_OR_DO, typename Parameters>
+template<template <typename StateType> class ODE_Engine, typename RandomEngine, typename SV_OR_DO>
 auto
 _(SV_OR_DO&& initial,
   binary::Ptr sys,
@@ -25,7 +25,7 @@ _(SV_OR_DO&& initial,
 } // evolution
 
 
-template<typename SV_OR_DO, typename Parameters>
+template<typename SV_OR_DO>
 auto
 evolve(SV_OR_DO&& initial,
        binary::Ptr sys,

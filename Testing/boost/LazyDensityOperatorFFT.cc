@@ -12,9 +12,8 @@ typedef quantumdata::StateVector<3>         SV3;
 typedef quantumdata::DensityOperator<3>     DO3;
 typedef quantumdata::LazyDensityOperator<3> LDO3;
 
-const double eps=1e-12;
 
-BOOST_AUTO_TEST_CASE( LAZY_DENSITY_OPERATOR_FFTRANSFORM )
+BOOST_AUTO_TEST_CASE( LAZY_DENSITY_OPERATOR_FFTRANSFORM , * boost::unit_test::tolerance(1e-12) )
 {
   using tmptools::Vector;
   using namespace particle;
@@ -29,11 +28,11 @@ BOOST_AUTO_TEST_CASE( LAZY_DENSITY_OPERATOR_FFTRANSFORM )
   SV3 psi2 = wavePacket(ic1,spacial,false)*wavePacket(ic2,spacial,true)*wavePacket(ic3,spacial,false);
   auto psiX = ffTransform<Vector<0,2> >(psi1,fft::DIR_KX);
   const SV3 *psi3 = dynamic_cast<const SV3 *>(psiX.get());
-  BOOST_CHECK(max(abs(psi2.getArray()-psi3->getArray()))<eps);
+  BOOST_TEST(max(abs(psi2.getArray()-psi3->getArray())) == 0);
   
   DO3 rho1 = dyad(psi1,psi1);
   DO3 rho2 = dyad(psi2,psi2);
   auto rhoX = ffTransform<Vector<0,2> >(rho1,fft::DIR_KX);
   const DO3 *rho3 = dynamic_cast<const DO3 *>(rhoX.get());
-  BOOST_CHECK(max(abs(rho2.getArray()-rho3->getArray()))<eps);
+  BOOST_TEST(max(abs(rho2.getArray()-rho3->getArray())) == 0);
 }

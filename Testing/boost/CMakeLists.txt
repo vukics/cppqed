@@ -4,16 +4,16 @@
 find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
 if (NOT TARGET Boost::unit_test_framework)
-  message(WARNING "No boost unit test framework found. Disabling boost tests, testing suite is not complete.")
+  message(WARNING "No boost unit test framework found. Disabling boost tests, testsuite is not complete.")
   return()
 endif()
 
-set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc)
+set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc NegPT.cc)
 
 add_executable(boostTester main.cc ${BOOST_TEST_SOURCES})
 target_link_libraries(boostTester CPPQED::CPPQEDelements Boost::unit_test_framework)
 
-set(BOOST_TESTS LAZY_DENSITY_OPERATOR_FFTRANSFORM)
+set(BOOST_TESTS LAZY_DENSITY_OPERATOR_FFTRANSFORM NEGATIVITY_OF_PARTIAL_TRANSPOSE)
 foreach(BT ${BOOST_TESTS})
   declaretest(${BT})
   add_test(NAME ${TESTNAME} COMMAND $<TARGET_FILE:boostTester> -t ${BT})

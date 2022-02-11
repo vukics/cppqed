@@ -5,11 +5,13 @@
 
 #include "DensityOperator.h"
 
+#ifdef EIGEN3_FOUND
+
+#include "SliceIterator.h"
 #include "TMP_Tools.h"
 
-
-
-#ifndef   DO_NOT_USE_FLENS
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues> 
 
 
 namespace quantumdata {
@@ -36,7 +38,44 @@ namespace quantumdata {
  * 
  */
 template<int RANK, typename V>
-double negPT(const DensityOperator<RANK>&, V);
+double negPT(const DensityOperator<RANK>& rho, V)
+{
+  using namespace boost::mpl;
+  namespace mpl=boost::mpl;
+  using namespace tmptools;
+
+  using ExtendV = typename
+    fold<Range<RANK,RANK>,
+        typename fold<Ordinals<RANK>,
+                      vector_c<int>,
+                      push_back<mpl::_1,
+                                if_<numerical_contains<V,mpl::_2>,
+                                    plus<mpl::_2,int_<RANK> >,
+                                    mpl::_2
+                                    >
+                                >
+                      >::type,
+        push_back<mpl::_1,
+                  if_<numerical_contains<V,minus<mpl::_2,int_<RANK> > >,
+                      minus<mpl::_2,int_<RANK> >,
+                      mpl::_2
+                      >
+                  >
+        >::type;
+
+  DensityOperatorLow<RANK> rhoShallowPT(rho.getArray());
+
+  cppqedutils::sliceiterator::Transposer<CArray,2*RANK,ExtendV>::_(rhoShallowPT);
+
+  DensityOperatorLow<RANK> rhoDeepPT(rhoShallowPT.shape()); rhoDeepPT=rhoShallowPT;
+  
+  auto ev=Eigen::ComplexEigenSolver<Eigen::MatrixX<dcomp>>{
+    Eigen::Map<Eigen::MatrixX<dcomp>>{rhoDeepPT.data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},
+    false}.eigenvalues();
+  
+  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, dcomp e) {return v - (real(e)<0 ? real(e) : 0.) ;}) ;
+    
+}
 
 template<int RANK>
 inline
@@ -49,7 +88,7 @@ double negPT(const DensityOperator<RANK>&, tmptools::V_Empty)
 } // quantumdata 
 
 
-#else  // DO_NOT_USE_FLENS
+#else  // EIGEN3_FOUND
 
 namespace quantumdata {
 
@@ -65,7 +104,7 @@ std::string negPT(const DensityOperator<RANK>&, V)
 } // quantumdata 
 
 
-#endif // DO_NOT_USE_FLENS
+#endif // EIGEN3_FOUND
 
 
 #endif // CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
