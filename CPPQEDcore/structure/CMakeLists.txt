@@ -1,5 +1,5 @@
 # Copyright Raimar Sandner 2012–2020.
-# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 add_library(CPPQEDcore_structure OBJECT DynamicsBase.cc ElementAveraged.cc)
 add_library(CPPQED::CPPQEDcore_structure ALIAS CPPQEDcore_structure)

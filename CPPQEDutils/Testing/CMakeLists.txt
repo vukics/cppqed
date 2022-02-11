@@ -1,4 +1,4 @@
-# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 # RATIONALE:
 # * any test that runs and checks for a single case, just uses plain ctest here
 # * those that use more cases rely on boost::unit_test_framework

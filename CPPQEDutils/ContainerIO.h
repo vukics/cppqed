@@ -1,4 +1,4 @@
-// Copyright András Vukics 2020
+// Copyright András Vukics 2020–2022.
 // Extending the original work of Louis Delacroix with operator>> + boost::hana::tuple
 // Code retrieved from https://github.com/louisdx/cxx-prettyprint on 13/03/2020
 
