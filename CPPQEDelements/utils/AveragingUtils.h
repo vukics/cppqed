@@ -6,7 +6,7 @@
 
 #include "DensityOperator.h"
 #include "LazyDensityOperator.h"
-#include "NegPT.h"
+#include "EntanglementMeasures.h"
 
 #include "DimensionsBookkeeper.h"
 

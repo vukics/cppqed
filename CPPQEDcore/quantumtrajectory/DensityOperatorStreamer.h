@@ -6,7 +6,7 @@
 #include "DensityOperator.h"
 
 #include "Averaged.h"
-#include "NegPT.h"
+#include "EntanglementMeasures.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 

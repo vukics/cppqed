@@ -4,7 +4,7 @@
 
 #include "Qbit.h"
 
-#include "NegPT.h"
+#include "EntanglementMeasures.h"
 
 #include <boost/test/unit_test.hpp>
 

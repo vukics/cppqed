@@ -8,7 +8,7 @@ if (NOT TARGET Boost::unit_test_framework)
   return()
 endif()
 
-set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc NegPT.cc)
+set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc EntanglementMeasures.cc)
 
 add_executable(boostTester main.cc ${BOOST_TEST_SOURCES})
 target_link_libraries(boostTester CPPQED::CPPQEDelements Boost::unit_test_framework)
