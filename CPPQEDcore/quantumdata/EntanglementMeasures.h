@@ -7,9 +7,6 @@
 
 #ifdef EIGEN3_FOUND
 
-#include "SliceIterator.h"
-#include "TMP_Tools.h"
-
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues> 
 
@@ -17,6 +14,9 @@
 namespace quantumdata {
 
 
+using EigenCMatrix=Eigen::MatrixX<dcomp>;
+
+  
 /// Calculates the negativity of the partial transpose of the density operator of an arbitrarily complex system
 /**
  * \see \cite vidal02
@@ -69,8 +69,8 @@ double negPT(const DensityOperator<RANK>& rho, V)
 
   DensityOperatorLow<RANK> rhoDeepPT(rhoShallowPT.shape()); rhoDeepPT=rhoShallowPT;
   
-  auto ev=Eigen::ComplexEigenSolver<Eigen::MatrixX<dcomp>>{
-    Eigen::Map<Eigen::MatrixX<dcomp>>{rhoDeepPT.data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},
+  auto ev=Eigen::ComplexEigenSolver<EigenCMatrix>{
+    Eigen::Map<EigenCMatrix>{rhoDeepPT.data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},
     false}.eigenvalues();
   
   return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, dcomp e) {return v - (real(e)<0 ? real(e) : 0.) ;}) ;
@@ -85,6 +85,25 @@ double negPT(const DensityOperator<RANK>&, tmptools::V_Empty)
 }
 
 
+template<int RANK>
+double entropy(const DensityOperator<RANK>& rho)
+{
+  auto ev=Eigen::SelfAdjointEigenSolver<EigenCMatrix>{
+    Eigen::Map<EigenCMatrix>{rho.getArray().data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
+    
+  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e*std::log(e);});
+}
+
+
+template<int RANK, typename V>
+double mutualInformation(const DensityOperator<RANK>& rho, V)
+{
+  return entropy(reduce<V>(rho))
+    +entropy(reduce<mpl::filter_view<tmptools::Ordinals<RANK>,mpl::not_<tmptools::numerical_contains<V,mpl::_> > > >(rho))
+    -entropy(rho);
+}
+
+
 } // quantumdata 
 
 
@@ -92,7 +111,7 @@ double negPT(const DensityOperator<RANK>&, tmptools::V_Empty)
 
 namespace quantumdata {
 
-/** If FLENS is not used, a dummy definition of negPT is provided. */
+/** If Eigen is not found, a dummy definition of negPT is provided. */
 template<int RANK, typename V>
 inline
 std::string negPT(const DensityOperator<RANK>&, V)

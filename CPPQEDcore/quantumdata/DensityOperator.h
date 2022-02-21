@@ -257,13 +257,37 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 }
 
 
-template<int... SUBSYSTEM, int RANK>
-const DensityOperator<sizeof...(SUBSYSTEM)>
+template<typename V, int RANK>
+const auto
 reduce(const LazyDensityOperator<RANK>& matrix)
 {
-  static const int RES_ARITY=sizeof...(SUBSYSTEM);
-  return partialTrace<tmptools::Vector<SUBSYSTEM...>,DensityOperator<RES_ARITY> >(matrix,densityOperatorize<RES_ARITY>);
+  return partialTrace<V>(matrix,densityOperatorize<mpl::size<V>::value>);
 }
+
+
+template<int... SUBSYSTEM, int RANK>
+const auto
+reduce(const LazyDensityOperator<RANK>& matrix)
+{
+  return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
+}
+
+
+template<typename V, int RANK>
+const auto
+reduce(const DensityOperator<RANK>& matrix)
+{
+  return partialTrace<V>(matrix,[](const auto& v) {return v;});
+}
+
+
+template<int... SUBSYSTEM, int RANK>
+const auto
+reduce(const DensityOperator<RANK>& matrix)
+{
+  return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
+}
+
 
 
 template<int RANK>

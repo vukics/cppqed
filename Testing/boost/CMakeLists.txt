@@ -13,7 +13,7 @@ set(BOOST_TEST_SOURCES LazyDensityOperatorFFT.cc EntanglementMeasures.cc)
 add_executable(boostTester main.cc ${BOOST_TEST_SOURCES})
 target_link_libraries(boostTester CPPQED::CPPQEDelements Boost::unit_test_framework)
 
-set(BOOST_TESTS LAZY_DENSITY_OPERATOR_FFTRANSFORM NEGATIVITY_OF_PARTIAL_TRANSPOSE)
+set(BOOST_TESTS LAZY_DENSITY_OPERATOR_FFTRANSFORM NEGATIVITY_OF_PARTIAL_TRANSPOSE ENTROPY_AND_MUTUAL_INFORMATION)
 foreach(BT ${BOOST_TESTS})
   declaretest(${BT})
   add_test(NAME ${TESTNAME} COMMAND $<TARGET_FILE:boostTester> -t ${BT})

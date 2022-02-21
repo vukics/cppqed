@@ -10,13 +10,16 @@
 
 #include <numbers>
 
+template <int RANK, typename V>
+using Negate=mpl::filter_view<tmptools::Ordinals<RANK>,mpl::not_<tmptools::numerical_contains<V,mpl::_> > >;
+
 template <int i>
 constexpr auto tmpVec = tmptools::Vector<i>{};
 
 typedef quantumdata::DensityOperator<2> DO2;
 // typedef quantumdata::LazyDensityOperator<3> LDO3;
 
-using quantumdata::negPT;
+using quantumdata::negPT; using quantumdata::mutualInformation;
 
 using namespace qbit;
 
@@ -81,5 +84,18 @@ BOOST_AUTO_TEST_CASE( NEGATIVITY_OF_PARTIAL_TRANSPOSE , * boost::unit_test::tole
   
 }
 
+
+BOOST_AUTO_TEST_CASE( ENTROPY_AND_MUTUAL_INFORMATION , * boost::unit_test::tolerance(1e-14) )
+{
+  BOOST_MPL_ASSERT( ( mpl::equal<Negate<10,tmptools::Vector<0,5,1,3> >, tmptools::Vector<2,4,6,7,8,9> > ) ) ;
+  
+  reduce<tmptools::Vector<0>>(wernerState(0));
+  
+  /*
+  std::cerr<<mutualInformation(wernerState(0),tmpVec<0>)<<std::endl
+    <<mutualInformation(wernerState(1),tmpVec<0>)<<std::endl
+    <<mutualInformation(wernerState(.5),tmpVec<0>)<<std::endl;*/
+  
+}
 
 #endif // EIGEN3_FOUND
