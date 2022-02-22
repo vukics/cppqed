@@ -1,9 +1,9 @@
-[submodule "blitz"]
-	path = blitz
-	url = https://github.com/vukics/blitz.git
 [submodule "CPPQEDutils/thirdPartyRandom/pcg-cpp"]
 	path = CPPQEDutils/thirdPartyRandom/pcg-cpp
 	url = https://github.com/vukics/pcg-cpp.git
 [submodule "CPPQEDutils/thirdPartyRandom/Xoshiro-cpp"]
 	path = CPPQEDutils/thirdPartyRandom/Xoshiro-cpp
 	url = https://github.com/vukics/Xoshiro-cpp.git
+[submodule "CPPQEDutils/ra-ra"]
+	path = CPPQEDutils/ra-ra
+	url = https://github.com/vukics/ra-ra.git
