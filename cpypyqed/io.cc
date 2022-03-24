@@ -143,7 +143,7 @@ object read(str filename)
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
   }
-  return std::move(result);
+  return result;
 }
 
 void write(str filename, const numpy::ndarray &array, double time)

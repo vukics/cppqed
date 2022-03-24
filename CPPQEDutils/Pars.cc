@@ -41,7 +41,7 @@ parameters::Table::Table() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), pa
 void parameters::Table::printList() const
 {
   cout<<"\nhelp\t\tdisplay this list\nversion\t\tdisplay version information\n\n";
-  boost::for_each(table_,[=] (const Base& b) {b.print(smwidth_,tmwidth_,dmwidth_);});
+  boost::for_each(table_,[=,this] (const Base& b) {b.print(smwidth_,tmwidth_,dmwidth_);});
   cout<<endl;
 }
 
