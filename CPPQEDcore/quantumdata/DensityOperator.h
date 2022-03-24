@@ -78,7 +78,7 @@ public:
 
   DensityOperator& operator=(DensityOperator&& rho)
   {
-    ABase::operator=(std::move(rho));
+    ABase::operator=(rho.getArray());
     LDO_Base::setDimensions(rho.getDimensions());
     return *this;
   }
@@ -236,7 +236,7 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
 
 /// Creates a DensityOperator as the (deep) copy of the data of a LazyDensityOperator of the same arity
 template<int RANK>
-const DensityOperator<RANK>
+DensityOperator<RANK>
 densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 {
   DensityOperator<RANK> res(matrix.getDimension());
@@ -258,32 +258,28 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 
 
 template<typename V, int RANK>
-const auto
-reduce(const LazyDensityOperator<RANK>& matrix)
+auto reduce(const LazyDensityOperator<RANK>& matrix)
 {
   return partialTrace<V>(matrix,densityOperatorize<mpl::size<V>::value>);
 }
 
 
 template<int... SUBSYSTEM, int RANK>
-const auto
-reduce(const LazyDensityOperator<RANK>& matrix)
+auto reduce(const LazyDensityOperator<RANK>& matrix)
 {
   return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
 }
 
 
 template<typename V, int RANK>
-const auto
-reduce(const DensityOperator<RANK>& matrix)
+auto reduce(const DensityOperator<RANK>& matrix)
 {
   return partialTrace<V>(matrix,[](const auto& v) {return v;});
 }
 
 
 template<int... SUBSYSTEM, int RANK>
-const auto
-reduce(const DensityOperator<RANK>& matrix)
+auto reduce(const DensityOperator<RANK>& matrix)
 {
   return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
 }

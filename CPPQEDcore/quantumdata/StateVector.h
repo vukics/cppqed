@@ -101,7 +101,7 @@ public:
  
   StateVector& operator=(StateVector&& sv)
   {
-    ABase::operator=(std::move(sv));
+    ABase::operator=(sv.getArray());
     LDO_Base::setDimensions(sv.getDimensions());
     return *this;
   }
