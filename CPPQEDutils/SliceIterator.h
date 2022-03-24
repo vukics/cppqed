@@ -97,7 +97,7 @@ auto filterOut(const IdxTiny<RANK>& v)
 
   auto helper=[&](auto i){res(curr++)=v(decltype(i)::value);};
   
-  mpl::for_each<mpl::filter_view<tmptools::Ordinals<RANK>,mpl::not_<tmptools::numerical_contains<V,mpl::_> > > >(helper);
+  mpl::for_each<tmptools::NegatedView<RANK,V> >(helper);
   
   return res;
 

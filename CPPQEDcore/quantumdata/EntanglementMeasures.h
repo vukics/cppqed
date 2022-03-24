@@ -89,7 +89,7 @@ template<int RANK>
 double entropy(const DensityOperator<RANK>& rho)
 {
   auto ev=Eigen::SelfAdjointEigenSolver<EigenCMatrix>{
-    Eigen::Map<EigenCMatrix>{rho.getArray().data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
+    Eigen::Map<EigenCMatrix>{const_cast<dcomp*>(rho.getArray().data()),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
     
   return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e*std::log(e);});
 }
@@ -98,8 +98,8 @@ double entropy(const DensityOperator<RANK>& rho)
 template<int RANK, typename V>
 double mutualInformation(const DensityOperator<RANK>& rho, V)
 {
-  return entropy(reduce<V>(rho))
-    +entropy(reduce<mpl::filter_view<tmptools::Ordinals<RANK>,mpl::not_<tmptools::numerical_contains<V,mpl::_> > > >(rho))
+  return entropy(::quantumdata::reduce<V>(rho))
+    +entropy(::quantumdata::reduce<::tmptools::NegatedVector<RANK,V> >(rho))
     -entropy(rho);
 }
 
