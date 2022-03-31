@@ -4,11 +4,6 @@
 
 #include "BlitzTinyOfArrays.h"
 
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/lambda/lambda.hpp>
-
-
-
 // The following are implemented as runtime loops because they would be too slow at compile time
 
 namespace blitzplusplus {
@@ -52,7 +47,7 @@ const TinyOfArrays<T,RANK,LENGTH>
 negate(const TinyOfArrays<T,RANK,LENGTH>& arrays)
 {
   TinyOfArrays<T,RANK,LENGTH> res(DeepCopy(),arrays);
-  boost::for_each(res,boost::lambda::_1*=-1);
+  for (auto& r : res) r*=-1;
   return res;
 }
 

@@ -5,10 +5,6 @@
 #include "Tridiagonal.tcc"
 #include "TridiagonalHamiltonian.h"
 
-#include <boost/bind.hpp>
-
-using boost::bind;
-
 
 void aJump   (StateVectorLow&, double kappa_nPlus1);
 void aDagJump(StateVectorLow&, double kappa_n     );

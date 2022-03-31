@@ -2,22 +2,10 @@
 #include "DynamicsBase.h"
 #include "FormDouble.h"
 
-#include <boost/range/algorithm.hpp>
-
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-
-#include <boost/mpl/identity.hpp>
-
-namespace mpl=boost::mpl;
 
 using namespace std;
 
 namespace structure {
-
-
-const DynamicsBase::   RealFreqs DynamicsBase::emptyRF{};
-const DynamicsBase::ComplexFreqs DynamicsBase::emptyCF{};
 
 
 DynamicsBase::DynamicsBase(const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs) 
@@ -28,40 +16,17 @@ DynamicsBase::DynamicsBase(const RealFreqs& realFreqs, const ComplexFreqs& compl
 
 
 
-namespace {
-
-template <typename T> using NamedFrequency=typename std::list<std::tuple<std::string,T,double> >::value_type;
-
-inline double absReal   (const NamedFrequency<double>& p) {return fabs(get<1>(p)*get<2>(p));}
-inline double absComplex(const NamedFrequency<dcomp >& p) {return  abs(get<1>(p)*get<2>(p));}
-
-
-template<typename T>
-bool templateCompare(const NamedFrequency<T>& p1, const NamedFrequency<T>& p2,
-                     boost::function<double(const NamedFrequency<T>&)> f)
-{
-  return f(p1)<f(p2);
-}
-
-} // unnamed namespace
+template <typename T>
+inline double absFreq(const std::tuple<std::string,T,double>& p) {return std::abs(get<1>(p)*get<2>(p));}
 
 
 double DynamicsBase::highestFrequency() const
 {
-  using boost::max_element;
-  return
-    max(
-        realFreqs_.size() 
-        ? 
-        absReal   (*max_element(realFreqs_   ,bind(templateCompare<double>,_1,_2,absReal   )))
-        :
-        0,
-        complexFreqs_.size()
-        ?
-        absComplex(*max_element(complexFreqs_,bind(templateCompare<dcomp >,_1,_2,absComplex)))
-        :
-        0
-        );
+  const auto compareFreqs=[](const auto& a, const auto& b) {return absFreq(a)<absFreq(b);};
+  
+  return max(
+    realFreqs_.size() ? absFreq(*std::ranges::max_element(realFreqs_,compareFreqs)) : 0,
+    complexFreqs_.size() ? absFreq(*std::ranges::max_element(complexFreqs_,compareFreqs)) : 0);
 
 }
 
@@ -73,22 +38,10 @@ std::ostream& DynamicsBase::streamParameters(ostream& os) const
 }
 
 
-namespace {
-
-template<typename T>
-void streamFreq(ostream& os, int precision, const NamedFrequency<T>& p)
-{
-  os<<get<0>(p)<<"="<<formdouble::zeroAdditional(precision)(get<1>(p))<<endl;
-}
-
-} // unnamed namespace
-
-
 std::ostream& DynamicsBase::streamMoreParameters(ostream& os) const
 {
-  using boost::for_each;
-  for_each(   realFreqs_,bind(streamFreq<double>,boost::ref(os),os.precision(),_1));
-  for_each(complexFreqs_,bind(streamFreq<dcomp >,boost::ref(os),os.precision(),_1));
+  for(const auto& rf :    realFreqs_) os<<get<0>(rf)<<"="<<formdouble::zeroAdditional(os.precision())(get<1>(rf))<<endl;
+  for(const auto& cf : complexFreqs_) os<<get<0>(cf)<<"="<<formdouble::zeroAdditional(os.precision())(get<1>(cf))<<endl;
   return os;
 }
 

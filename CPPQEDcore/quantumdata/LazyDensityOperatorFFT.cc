@@ -4,8 +4,6 @@
 #include "FFT.tcc"
 #include "VectorFromMatrixSliceIterator.h"
 
-#include <boost/range/algorithm/for_each.hpp>
-
 
 using namespace fft; using namespace linalg;
 

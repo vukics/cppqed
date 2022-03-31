@@ -3,8 +3,6 @@
 
 #include "ParsQbit.h"
 
-#include <boost/bind.hpp>
-
 
 using namespace cppqedutils; using std::make_shared;
 
@@ -48,20 +46,14 @@ void sigma_zJump(qbit::StateVectorLow& psi, double gamma_parallel)
   psi(0)*= fact; psi(1)*=-fact;
 }
 
-
-double dummyProba(const qbit::LazyDensityOperator&)
-{
-  return -1;
 }
 
 
-}
-
+using std::placeholders::_1;
 
 LiouvilleanPhaseNoise::LiouvilleanPhaseNoise(double gamma_perpendicular, double gamma_parallel) 
-  : structure::ElementLiouvilleanStrategies<1,2>(JumpStrategies(bind(sigmaJump  ,_1,gamma_perpendicular),
-                                                                bind(sigma_zJump,_1,gamma_parallel)),
-                                                 JumpRateStrategies(dummyProba),
+  : structure::ElementLiouvilleanStrategies<1,2>({std::bind(sigmaJump,_1,gamma_perpendicular),std::bind(sigma_zJump,_1,gamma_parallel)},
+                                                 {[](const auto&) {return -1;},[](const auto&) {return -1;}},
                                                  "LossyQbitWithPhaseNoise",{"excitation loss","phase noise"})
 {}
 

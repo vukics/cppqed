@@ -10,10 +10,6 @@
 
 #include "BlitzTiny.h"
 
-#include <boost/range/algorithm/copy.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/algorithm_ext/for_each.hpp>
-
 
 using composite::SubSystemFree;
 
@@ -199,8 +195,8 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
     };
   };
   
-  if (const auto ha=free0_.getHa()) boost::range::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),lambda(ha));
-  if (const auto ha=free1_.getHa()) boost::range::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),lambda(ha));
+  if (const auto ha=free0_.getHa()) std::ranges::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),lambda(ha));
+  if (const auto ha=free1_.getHa()) std::ranges::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),lambda(ha));
 
   ia_.addContribution(t,psi,dpsidt,t0);
 
@@ -256,13 +252,13 @@ void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperator
 
   size_t n=free0_.nAvr<LA_Li>();
   if (li0 && i<n) {
-    boost::range::for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),lambda(li0));
+    std::ranges::for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),lambda(li0));
     return;
   }
 
   i-=n;  
   if (li1 && i<(n=free1_.nAvr<LA_Li>())) {
-    boost::range::for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),lambda(li1));
+    std::ranges::for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),lambda(li1));
     return;
   }
 

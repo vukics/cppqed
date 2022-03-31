@@ -170,7 +170,7 @@ class ParticleBase
   : public structure::Free, public particle::Averaged
 {
 protected:
-  explicit ParticleBase(size_t fin, const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF);
+  explicit ParticleBase(size_t fin, const RealFreqs& ={}, const ComplexFreqs& ={});
 
 };
 
@@ -185,7 +185,7 @@ public:
 
 protected:
   PumpedParticleBase(size_t fin, double vClass, const ModeFunction&,
-                     const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF);
+                     const RealFreqs& ={}, const ComplexFreqs& ={});
 
 private:
   const double       vClass_;

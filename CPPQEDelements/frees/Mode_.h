@@ -312,10 +312,10 @@ class ModeBase
 {
 public:
   ModeBase(size_t dim,
-           const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF,
+           const RealFreqs& realFreqs={}, const ComplexFreqs& complexFreqs={},
            const std::string& keyTitle=mode::keyTitle);
 
-  ModeBase(size_t dim, const ComplexFreqs& complexFreqs, const std::string& keyTitle=mode::keyTitle) : ModeBase(dim,emptyRF,complexFreqs,keyTitle) {}
+  ModeBase(size_t dim, const ComplexFreqs& complexFreqs, const std::string& keyTitle=mode::keyTitle) : ModeBase(dim,{},complexFreqs,keyTitle) {}
   ModeBase(size_t dim, RealFreqsInitializer rf, ComplexFreqsInitializer cf={}, const std::string& keyTitle=mode::keyTitle)
     : ModeBase(dim,RealFreqs(rf),ComplexFreqs(cf),keyTitle) {}
   ModeBase(size_t dim, ComplexFreqsInitializer cf, const std::string& keyTitle=mode::keyTitle) : ModeBase(dim,{},cf,keyTitle) {}

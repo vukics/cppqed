@@ -8,8 +8,6 @@
 
 #include "Conversions.h"
 
-#include <boost/range/numeric.hpp>
-
 #include <vector>
 
 

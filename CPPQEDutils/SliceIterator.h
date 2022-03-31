@@ -6,8 +6,6 @@
 #include "MultiIndexIterator.h"
 #include "TMP_Tools.h"
 
-#include <boost/range.hpp>
-
 #include <boost/mpl/size.hpp>
 #include <boost/mpl/sort.hpp>
 #include <boost/mpl/unique.hpp>
@@ -22,6 +20,8 @@
 #include <boost/fusion/container/vector/convert.hpp>
 #include <boost/fusion/algorithm/iteration/fold.hpp>
 #include <boost/fusion/sequence/intrinsic/at_c.hpp>
+
+#include <boost/range/iterator_range.hpp>
 
 #include <stdexcept>
 
@@ -314,7 +314,9 @@ auto end(const ARRAY<RANK>& array) {return SliceIterator<ARRAY,RANK,V>(array,End
 template<typename V, template <int> class ARRAY, int RANK>
 auto fullRange(const ARRAY<RANK>& array)
 {
-  return boost::iterator_range<SliceIterator<ARRAY,RANK,V>>(begin<V,ARRAY>(array),end<V,ARRAY>(array));
+  return std::ranges::subrange<SliceIterator<ARRAY,RANK,V>,
+                               SliceIterator<ARRAY,RANK,V>,
+                               std::ranges::subrange_kind::unsized>(begin<V,ARRAY>(array),end<V,ARRAY>(array));
 }
 
 

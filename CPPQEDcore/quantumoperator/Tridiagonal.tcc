@@ -8,9 +8,7 @@
 
 #include "ComplexArrayExtensions.h"
 
-#include <boost/lambda/lambda.hpp>
 #include <boost/mpl/for_each.hpp>
-#include <boost/range/algorithm_ext/for_each.hpp>
 
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
@@ -74,7 +72,7 @@ template<int RANK>
 Tridiagonal<RANK>&
 Tridiagonal<RANK>::operator*=(dcomp dc)
 {
-  boost::for_each(diagonals_,boost::lambda::_1*=dc); 
+  for (auto& d : diagonals_) d*=dc; 
   return *this;
 }
 

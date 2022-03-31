@@ -9,8 +9,6 @@
 #include "FFT.h"
 #include "SliceIterator.tcc"
 
-#include <boost/range/algorithm/for_each.hpp>
-
 #include <boost/mpl/integral_c.hpp>
 #include <boost/mpl/for_each.hpp>
 
@@ -40,8 +38,8 @@ public:
 
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
-    boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX> >(psi_->getArray()),
-                    [=](linalg::CVector& psiS){ffTransform(psiS,dir_);});
+    std::ranges::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX> >(psi_->getArray()),
+                          [=,this](linalg::CVector& psiS){ffTransform(psiS,dir_);});
   }
 
 private:
@@ -61,8 +59,8 @@ public:
 
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
-    boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho_->getArray()),
-                    [=](linalg::CMatrix& rhoS){ffTransform(rhoS,dir_);});
+    std::ranges::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho_->getArray()),
+                          [=,this](linalg::CMatrix& rhoS){ffTransform(rhoS,dir_);});
   }
   
 private:

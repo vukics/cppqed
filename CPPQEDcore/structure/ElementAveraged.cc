@@ -3,8 +3,6 @@
 
 #include "FormDouble.h"
 
-#include <boost/range/algorithm/for_each.hpp>
-
 
 using namespace std;
 
@@ -17,7 +15,7 @@ std::ostream& structure::details::streamCommon(const Averages& averages, std::os
   os<<'\t';
   {
     const FormDouble fd(precision);
-    boost::for_each(averages,[&](double v){os<<fd(v);});
+    ranges::for_each(averages,[&](double v){os<<fd(v);});
   }
   return os;
 }

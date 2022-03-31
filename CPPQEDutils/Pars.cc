@@ -6,8 +6,6 @@
 #include "IO_Manip.h"
 #include "Version.h"
 
-#include <boost/range/algorithm.hpp>
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -18,7 +16,7 @@ using namespace std;
 
 auto parameters::Table::findSubscript(const std::string& s) const -> Impl::const_iterator 
 {
-  return boost::find_if(table_,[=,&s] (const Base& b) {return b.getS()==s;});
+  return std::ranges::find_if(table_,[=,&s] (const Base& b) {return b.getS()==s;});
 }
 
 
@@ -41,7 +39,7 @@ parameters::Table::Table() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), pa
 void parameters::Table::printList() const
 {
   cout<<"\nhelp\t\tdisplay this list\nversion\t\tdisplay version information\n\n";
-  boost::for_each(table_,[=] (const Base& b) {b.print(smwidth_,tmwidth_,dmwidth_);});
+  std::ranges::for_each(table_,[=,this] (const Base& b) {b.print(smwidth_,tmwidth_,dmwidth_);});
   cout<<endl;
 }
 

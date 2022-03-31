@@ -15,10 +15,6 @@
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/fusion/algorithm/iteration/fold.hpp>
 
-#include <boost/range/algorithm/max_element.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/algorithm_ext/for_each.hpp>
-
 #include <algorithm>
 #include <list>
 

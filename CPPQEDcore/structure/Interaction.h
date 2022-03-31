@@ -37,8 +37,8 @@ public:
   typedef typename DimensionsBookkeeper<RANK>::Dimensions Dimensions;
   
   explicit Interaction(const Frees& frees,
-                       const    RealFreqs&    realFreqs=emptyRF, 
-                       const ComplexFreqs& complexFreqs=emptyCF)
+                       const    RealFreqs&    realFreqs={}, 
+                       const ComplexFreqs& complexFreqs={})
     : DynamicsBase(realFreqs,complexFreqs), DimensionsBookkeeper<RANK>(extractDimensions(frees)), frees_(frees) {}
 
   const Frees& getFrees() const {return frees_;}

@@ -36,9 +36,6 @@ right | v | u^*
 #define BOOST_TEST_MODULE Blitz2FLENS test
 #include <boost/test/unit_test.hpp>
 
-#include <boost/bind.hpp>
-
-
 using namespace std;
 using namespace randomized;
 using namespace blitz2flens;

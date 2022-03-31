@@ -4,8 +4,6 @@
 #include "LazyDensityOperator.h"
 #include "Structure.h"
 
-#include <boost/range/algorithm/copy.hpp>
-
 using namespace boost;
 
 
