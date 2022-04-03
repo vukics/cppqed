@@ -6,7 +6,7 @@
 
 #include "DensityOperator.h"
 #include "LazyDensityOperator.h"
-#include "NegPT.tcc"
+#include "EntanglementMeasures.h"
 
 #include "DimensionsBookkeeper.h"
 
@@ -127,11 +127,11 @@ private:
     }
     
     averages(averages.size()-1)=
-    #ifndef   DO_NOT_USE_FLENS
+    #ifdef EIGEN3_FOUND
     quantumdata::negPT(rho,V())
-    #else  // DO_NOT_USE_FLENS
+    #else  // EIGEN3_FOUND
     0
-    #endif // DO_NOT_USE_FLENS
+    #endif // EIGEN3_FOUND
     ;
     
   }

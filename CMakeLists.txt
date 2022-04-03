@@ -70,7 +70,7 @@ project(cppqed VERSION ${CPPQED_VERSION}
 
 include(CTest)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -125,9 +125,6 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL Clang AND ${CMAKE_CXX_COMPILER_VERSION} VE
   message(FATAL_ERROR "Clang version >= ${CLANG_MINIMAL} needed.")
 endif ()
 
-# Switch for FLENS support.
-# option(FLENS "FLENS support" ON)
-
 message(STATUS "Configuring blitz")
 add_subdirectory(blitz)
 include_directories(SYSTEM blitz) # in order that we do not receive warnings from blitz
@@ -140,7 +137,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/cppqedGitSHA1.cc.in" "${CMAKE_
 
 add_library(cppqedGitSHA1 OBJECT "${CMAKE_CURRENT_BINARY_DIR}/cppqedGitSHA1.cc")
 
-add_compile_options(-Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual -Wunreachable-code)
+add_compile_options(-Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers -Wno-sign-compare -Wno-overloaded-virtual -Wunreachable-code -Wno-unknown-pragmas)
 
 #macro(add_executable S)
   #if (${cmake_build_type_tolower} STREQUAL debug)

@@ -811,8 +811,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @CMAKE_CURRENT_SOURCE_DIR@/utils/Blitz2FLENS.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTinyOfArrays.h \
+EXCLUDE                = @CMAKE_CURRENT_SOURCE_DIR@/utils/BlitzTinyOfArrays.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/Combinatorics.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/DrivenDampedHarmonicOscillator.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/FuzzyDouble.h \
