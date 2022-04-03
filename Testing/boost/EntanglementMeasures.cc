@@ -14,7 +14,9 @@
 template <int i>
 constexpr auto tmpVec = tmptools::Vector<i>{};
 
-typedef quantumdata::DensityOperator<2> DO2;
+using DO1=quantumdata::DensityOperator<1>;
+using DO2=quantumdata::DensityOperator<2>;
+
 // typedef quantumdata::LazyDensityOperator<3> LDO3;
 
 using quantumdata::negPT; using quantumdata::mutualInformation;
@@ -29,21 +31,23 @@ DO2 wernerState(double p)
 }
 
 
+const DO2 rhoBell{(state0()*state1()+state1()*state0())/std::numbers::sqrt2};
+
+
 BOOST_AUTO_TEST_CASE( NEGATIVITY_OF_PARTIAL_TRANSPOSE , * boost::unit_test::tolerance(1e-14) )
 {
   {
-    DO2 rho{(state0()*state1()+state1()*state0())/std::numbers::sqrt2};
-    
-    std::cerr<<rho.getArray()<<std::endl<<Eigen::ComplexEigenSolver<Eigen::MatrixX<dcomp>>{
-      Eigen::Map<Eigen::MatrixX<dcomp>>{rho.getArray().data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},false}.eigenvalues()<<std::endl;
+    std::cerr<<rhoBell.getArray()<<std::endl<<Eigen::ComplexEigenSolver<Eigen::MatrixX<dcomp>>{
+      Eigen::Map<Eigen::MatrixX<dcomp>>{const_cast<dcomp*>(rhoBell.getArray().data()),long(rhoBell.getTotalDimension()),long(rhoBell.getTotalDimension())},false
+    }.eigenvalues()<<std::endl;
       
-    auto neg=negPT(rho, tmpVec<0>);
+    auto neg=negPT(rhoBell, tmpVec<0>);
     
     std::cerr<<neg<<std::endl;
     
     BOOST_TEST ( neg == 0.5 ) ;
     
-    neg=negPT(rho, tmpVec<1>);
+    neg=negPT(rhoBell, tmpVec<1>);
     
     BOOST_TEST ( neg == 0.5 ) ;
   }
@@ -83,18 +87,35 @@ BOOST_AUTO_TEST_CASE( NEGATIVITY_OF_PARTIAL_TRANSPOSE , * boost::unit_test::tole
 }
 
 
-BOOST_AUTO_TEST_CASE( ENTROPY_AND_MUTUAL_INFORMATION , * boost::unit_test::tolerance(1e-14) )
+BOOST_AUTO_TEST_CASE( ENTROPY_AND_MUTUAL_INFORMATION , * boost::unit_test::tolerance(1e-15) )
 {
   static_assert( mpl::equal<tmptools::NegatedView<10,tmptools::Vector<0,5,1,3> >, tmptools::Vector<2,4,6,7,8,9> >::value ) ;
+ 
+  /* reduce<tmptools::Vector<0>>(wernerState(0)); reduce<tmptools::NegatedVector<2,tmptools::Vector<0>>>(wernerState(0));*/
   
-  reduce<tmptools::Vector<0>>(wernerState(0));
+  DO1 rhoReduced0{reduce<tmptools::Vector<0>>(rhoBell)} , rhoReduced1{reduce<tmptools::Vector<1>>(rhoBell)} , rhoMixed{{2},true};
+  rhoMixed(0)(0)=.5; rhoMixed(1)(1)=.5;
+  
+  BOOST_TEST ( frobeniusNorm( rhoReduced0-rhoMixed ) == 0 ) ;
 
-  reduce<tmptools::NegatedVector<2,tmptools::Vector<0>>>(wernerState(0));
+  BOOST_TEST ( frobeniusNorm( rhoReduced1-rhoMixed ) == 0 ) ;
+  
+  BOOST_TEST ( mutualInformation(rhoBell,tmpVec<0>) == -2.*std::log(.5) ) ;
+  
+  BOOST_TEST ( mutualInformation(wernerState(0),tmpVec<0>) == 0. ) ;
+  
+  BOOST_TEST ( mutualInformation(wernerState(1),tmpVec<0>) == -2.*std::log(.5) ) ;
+  
+  BOOST_TEST ( mutualInformation(wernerState(.5),tmpVec<0>) == 0.3127515147113673 ) ;
+  
+  /*
+  std::cerr.precision(16);
+  std::cerr<<mutualInformation(rhoBell,tmpVec<0>)<<std::endl;
   
   std::cerr<<mutualInformation(wernerState(0),tmpVec<0>)<<std::endl
     <<mutualInformation(wernerState(1),tmpVec<0>)<<std::endl
     <<mutualInformation(wernerState(.5),tmpVec<0>)<<std::endl;
-  
+  */
 }
 
 #endif // EIGEN3_FOUND

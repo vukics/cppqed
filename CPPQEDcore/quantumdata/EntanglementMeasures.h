@@ -91,7 +91,7 @@ double entropy(const DensityOperator<RANK>& rho)
   auto ev=Eigen::SelfAdjointEigenSolver<EigenCMatrix>{
     Eigen::Map<EigenCMatrix>{const_cast<dcomp*>(rho.getArray().data()),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
     
-  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e*std::log(e);});
+  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e * (e ? std::log(e) : 0.) ;});
 }
 
 
