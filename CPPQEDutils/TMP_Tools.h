@@ -215,12 +215,16 @@ template<int RANK, typename V>
 using ExtendVector_t = typename ExtendVector<RANK,V>::type;
 
 
+template <typename Sequence>
+using CopyToVector=typename boost::mpl::copy<Sequence,boost::mpl::back_inserter<V_Empty> >::type;
+
+
 template <int RANK, typename V>
 requires ( boost::mpl::deref<boost::mpl::max_element<V> >::type::type::value < RANK )
 using NegatedView=boost::mpl::filter_view<tmptools::Ordinals<RANK>,boost::mpl::not_<tmptools::numerical_contains<V,boost::mpl::_> > >;
 
 template <int RANK, typename V>
-using NegatedVector=typename boost::mpl::copy<NegatedView<RANK,V>,boost::mpl::back_inserter<V_Empty> >::type;
+using NegatedVector=CopyToVector<NegatedView<RANK,V>>;
 // copy makes a vector of filter_view, which is important since the latter cannot be applied in all algorithms
 
 

@@ -90,7 +90,7 @@ add_compilefail_test_utils(fail_BlitzArraySliceIterator1 "cppqedutils::SliceIter
 
 add_compilefail_test_utils(fail_BlitzArraySliceIterator2 "cppqedutils::SliceIterator vector out of range")
 
-add_compilefail_test_utils(fail_BlitzTinyExtensions "candidate template ignored: requirement '7 % 2 == 0' was not satisfied")
+# add_compilefail_test_utils(fail_BlitzTinyExtensions "the expression ‘TWO_TIMES_RANK % 2 == 0 [with TWO_TIMES_RANK = 7]’ evaluated to ‘false’")
 
 add_compilefail_test_utils(fail_TMP_Tools1 "Negative element in nonnegative vector")
 

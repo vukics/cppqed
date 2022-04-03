@@ -51,8 +51,8 @@ concatenateTinies(const blitz::TinyVector<T1,RANK1>& op1, const blitz::TinyVecto
  * 
  */
 template<typename T, int TWO_TIMES_RANK>
-std::enable_if_t<TWO_TIMES_RANK%2==0,
-                 blitz::TinyVector<T,TWO_TIMES_RANK/2>>
+requires ( TWO_TIMES_RANK%2==0 )
+blitz::TinyVector<T,TWO_TIMES_RANK/2>
 halfCutTiny(const blitz::TinyVector<T,TWO_TIMES_RANK>& tiny)
 {
   static const int RANK=TWO_TIMES_RANK/2;
