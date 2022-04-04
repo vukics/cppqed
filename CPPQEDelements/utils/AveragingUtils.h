@@ -126,13 +126,7 @@ private:
       for (int i=0; i<dim; ++i) for (int j=i+1; j<dim; ++j, idx+=2) matrix(j,i)=conj(matrix(i,j)=dcomp(averages(idx),averages(idx+1)));
     }
     
-    averages(averages.size()-1)=
-    #ifdef EIGEN3_FOUND
-    quantumdata::negPT(rho,V())
-    #else  // EIGEN3_FOUND
-    0
-    #endif // EIGEN3_FOUND
-    ;
+    averages(averages.size()-1)=quantumdata::negPT(rho,V());
     
   }
 

@@ -8,10 +8,12 @@
 
 #include "Trajectory.h"
 
+#include <bitset>
 
 /// Comprises modules representing trajectory drivers for simulating quantum systems
 namespace quantumtrajectory {
 
+using EntanglementMeasuresSwitch = std::bitset<2>;
 
 using StreamReturnType=std::tuple<std::ostream&,structure::Averages>;
 

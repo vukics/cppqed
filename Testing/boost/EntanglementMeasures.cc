@@ -1,7 +1,5 @@
 // Copyright András Vukics 2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-#ifdef  EIGEN3_FOUND
-
 #include "Qbit.h"
 
 #include "EntanglementMeasures.h"
@@ -118,4 +116,3 @@ BOOST_AUTO_TEST_CASE( ENTROPY_AND_MUTUAL_INFORMATION , * boost::unit_test::toler
   */
 }
 
-#endif // EIGEN3_FOUND

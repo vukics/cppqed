@@ -211,7 +211,7 @@ auto make(structure::QuantumSystemPtr<std::decay_t<SV>::N_RANK> sys,
 
 /// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `MCWF_Trajectory`s
 template<typename ODE_Engine, typename RandomEngine, typename V, typename SYS, typename SV>
-auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, bool negativity)
+auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, EntanglementMeasuresSwitch ems)
 {
   constexpr auto RANK=std::decay_t<SV>::N_RANK;
   using Single=MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
@@ -227,7 +227,7 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, bool nega
 
   auto av=std::dynamic_pointer_cast<const structure::Averaged<RANK>>(sys);
   
-  return cppqedutils::trajectory::Ensemble{trajs,DensityOperatorStreamer<RANK,V>{av,negativity},
+  return cppqedutils::trajectory::Ensemble{trajs,DensityOperatorStreamer<RANK,V>{av,ems},
                                            mcwf::EnsembleLogger{p.nBins,p.nJumpsPerBin},
                                            quantumdata::DensityOperator<RANK>{psi.getDimensions()}};
 

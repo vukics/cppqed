@@ -5,9 +5,7 @@
 #include <gsl/gsl_version.h>
 #include <boost/version.hpp>
 
-#ifdef    EIGEN3_FOUND
 #include <Eigen/Eigen>
-#endif // EIGEN3_FOUND
 
 using namespace std;
 
@@ -23,9 +21,7 @@ string versionHelper()
          "\nGnu Scientific Library   : Version " +
          GSL_VERSION +
          "\nBlitz++ numerical library: http://github.com/vukics/blitz #" + string(blitz_GIT_SHA1)+
-#ifdef    EIGEN3_FOUND
          "\nEigen library            : Version "+to_string(EIGEN_WORLD_VERSION)+"."+to_string(EIGEN_MAJOR_VERSION)+"."+to_string(EIGEN_MINOR_VERSION)+
-#endif // EIGEN3_FOUND
          "\n\n";         
         
 }

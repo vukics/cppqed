@@ -5,8 +5,6 @@
 
 #include "DensityOperator.h"
 
-#ifdef EIGEN3_FOUND
-
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues> 
 
@@ -73,8 +71,8 @@ double negPT(const DensityOperator<RANK>& rho, V)
     Eigen::Map<EigenCMatrix>{rhoDeepPT.data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},
     false}.eigenvalues();
   
-  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, dcomp e) {return v - (real(e)<0 ? real(e) : 0.) ;}) ;
-    
+  return (std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, dcomp e) {return v + std::abs(e) ;}) - 1.)/2. ;
+  
 }
 
 template<int RANK>
@@ -91,7 +89,7 @@ double entropy(const DensityOperator<RANK>& rho)
   auto ev=Eigen::SelfAdjointEigenSolver<EigenCMatrix>{
     Eigen::Map<EigenCMatrix>{const_cast<dcomp*>(rho.getArray().data()),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
     
-  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e * (e ? std::log(e) : 0.) ;});
+  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e * ( e>0. ? std::log(e) : 0. ) ;});
 }
 
 
@@ -105,25 +103,6 @@ double mutualInformation(const DensityOperator<RANK>& rho, V)
 
 
 } // quantumdata 
-
-
-#else  // EIGEN3_FOUND
-
-namespace quantumdata {
-
-/** If Eigen is not found, a dummy definition of negPT is provided. */
-template<int RANK, typename V>
-inline
-std::string negPT(const DensityOperator<RANK>&, V)
-{
-  return "n/a";
-}
-
-
-} // quantumdata 
-
-
-#endif // EIGEN3_FOUND
 
 
 #endif // CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED

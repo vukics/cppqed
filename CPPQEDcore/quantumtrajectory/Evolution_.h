@@ -35,12 +35,12 @@ template <typename Base=mcwf::Pars<QUANTUM_EVOLUTION_DEFAULT_RANDOM_ENGINE>>
 struct Pars : public cppqedutils::trajectory::Pars<Base> {
 
   Method &evol; ///< the method of evolution
-  bool &negativity; ///< governs whether entanglement should be calculated in the case of #ENSEMBLE and #MASTER, cf. quantumtrajectory::stream_densityoperator::_, quantumdata::negPT
+  EntanglementMeasuresSwitch &ems; ///< governs whether entanglement should be calculated in the case of #ENSEMBLE and #MASTER, cf. quantumtrajectory::stream_densityoperator::_, quantumdata::negPT
 
   Pars(parameters::Table& p, const std::string& mod="") 
     : cppqedutils::trajectory::Pars<Base>(p,mod),
       evol(p.addTitle("Evolution",mod).add("evol",mod,"Evolution mode (single, ensemble, master)",SINGLE)),
-      negativity(p.add("negativity",mod,"Calculates negativity in ensemble & master",false))
+      ems(p.add<EntanglementMeasuresSwitch>("ems",mod,"Entanglement measures switch for ensemble & master",00))
       {}
 
 };
@@ -64,7 +64,7 @@ evolveMaster(DO&& rho, ///<[in/out] density operator initial condition
   return cppqedutils::run(master::make<ODE_Engine<quantumdata::DensityOperatorLow<RANK>>,V>
     (std::forward<SYS>(sys),
      std::forward<quantumdata::DensityOperator<RANK>>(rho),
-     p,p.negativity),
+     p,p.ems),
      p,doStreaming,returnStreamedArray);
 }
 
@@ -120,7 +120,7 @@ _(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
     }
     else if (pe.evol==evolution::ENSEMBLE) {
       /// here, it’s intentional that `initial` is converted into an lvalue
-      return cppqedutils::run(mcwf::makeEnsemble<OE,RandomEngine,V>(sys,initial,pe,pe.negativity),pe,doStreaming,returnStreamedArray);
+      return cppqedutils::run(mcwf::makeEnsemble<OE,RandomEngine,V>(sys,initial,pe,pe.ems),pe,doStreaming,returnStreamedArray);
     }
     else {
       return ::evolveMaster<ODE_Engine,V>(quantumdata::DensityOperator<RANK>(initial),sys,pe,doStreaming,returnStreamedArray);

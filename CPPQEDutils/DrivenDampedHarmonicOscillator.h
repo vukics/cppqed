@@ -13,8 +13,6 @@
 #ifndef   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 #define   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 
-#ifdef    EIGEN3_FOUND
-
 #include "ComplexExtensions.h"
 
 #include <Eigen/Dense>
@@ -53,6 +51,5 @@ Ptr make(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit
 
 } // cppqedutils::ddho
 
-#endif // EIGEN3_FOUND
 
 #endif // CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED

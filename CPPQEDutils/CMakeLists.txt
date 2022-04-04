@@ -8,25 +8,18 @@ find_package(GSL 2.5 REQUIRED)
 # Boost
 find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams)
 
-find_package(Eigen3 3.3 NO_MODULE)
+find_package(Eigen3 3.3 REQUIRED)
 
 add_subdirectory(thirdPartyRandom)
 
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
-            BooleanNegatedProxy.cc CMatrix.cc ComplexArrayExtensions.cc FFT.cc FormDouble.cc
+            BooleanNegatedProxy.cc CMatrix.cc ComplexArrayExtensions.cc DrivenDampedHarmonicOscillator.cc FFT.cc FormDouble.cc
             FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc Random.cc Trajectory.cc Version.cc)
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams GSL::gsl)
-
-if (TARGET Eigen3::Eigen)
-  message(STATUS "Found Eigen3")
-  target_compile_definitions(CPPQEDutils PUBLIC EIGEN3_FOUND)
-  target_link_libraries(CPPQEDutils PUBLIC Eigen3::Eigen)
-  target_sources(CPPQEDutils PRIVATE DrivenDampedHarmonicOscillator.cc)
-endif ()
+target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams GSL::gsl Eigen3::Eigen)
 
 target_compile_definitions(CPPQEDutils PUBLIC CPPQED_HAS_GSL)
 
