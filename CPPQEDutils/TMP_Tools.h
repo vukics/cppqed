@@ -21,10 +21,6 @@
 #include <boost/hana.hpp>
 
 namespace hana=boost::hana;
-#include <boost/mpl/deref.hpp>
-#include <boost/mpl/copy.hpp>
-#include <boost/mpl/back_inserter.hpp>
-#include <boost/mpl/filter_view.hpp>
 
 
 /// Template metaprogramming tools
@@ -124,7 +120,7 @@ template<int end>
 using Ordinals = decltype(ordinals<end>);
 
 
-
+/*
 template <typename Sequence>
 using CopyToVector=typename boost::mpl::copy<Sequence,boost::mpl::back_inserter<V_Empty> >::type;
 
@@ -136,6 +132,7 @@ using NegatedView=boost::mpl::filter_view<tmptools::Ordinals<RANK>,boost::mpl::n
 template <int RANK, typename V>
 using NegatedVector=CopyToVector<NegatedView<RANK,V>>;
 // copy makes a vector of filter_view, which is important since the latter cannot be applied in all algorithms
+*/
 
 } // tmptools
 

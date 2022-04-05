@@ -7,8 +7,6 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
-#include <boost/mpl/identity.hpp>
-
 namespace mpl=boost::mpl;
 
 using namespace std;

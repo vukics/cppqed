@@ -14,8 +14,6 @@
 #include <boost/preprocessor/iteration/iterate.hpp>
 #include <boost/preprocessor/repetition/enum.hpp>
 
-#include <boost/mpl/vector_c.hpp>
-
 #include <algorithm>
 
 

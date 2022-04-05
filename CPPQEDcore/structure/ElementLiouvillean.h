@@ -8,8 +8,6 @@
 
 #include <boost/range/algorithm/transform.hpp>
 
-#include <boost/mpl/for_each.hpp>
-
 #include <functional>
 
 

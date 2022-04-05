@@ -11,9 +11,6 @@
 
 #include <boost/range/algorithm/for_each.hpp>
 
-#include <boost/mpl/integral_c.hpp>
-#include <boost/mpl/for_each.hpp>
-
 #include <memory>
 
 

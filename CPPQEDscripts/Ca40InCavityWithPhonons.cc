@@ -3,8 +3,6 @@
 #include "Mode.h"
 #include "MLJC.h"
 
-#include <boost/fusion/sequence/intrinsic/at.hpp>
-
 
 using namespace std;
 

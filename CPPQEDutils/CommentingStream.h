@@ -32,9 +32,7 @@
 #include <boost/iostreams/detail/ios.hpp>           // openmode.
 #include <boost/iostreams/filter/stdio.hpp>
 #include <boost/iostreams/operations.hpp>
-#include <boost/mpl/begin_end.hpp>
-#include <boost/mpl/deref.hpp>
-#include <boost/mpl/vector.hpp>
+
 #include <boost/preprocessor/control/expr_if.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>

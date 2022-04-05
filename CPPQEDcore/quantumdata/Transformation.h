@@ -7,12 +7,6 @@
 #include "CMatrix.h"
 #include "SliceIterator.h"
 
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/algorithm/transformation/join.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector/convert.hpp>
-#include <boost/fusion/sequence/intrinsic/at_c.hpp>
-
 
 
 namespace quantumdata {

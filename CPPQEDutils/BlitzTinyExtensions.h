@@ -8,7 +8,6 @@
 
 #include <blitz/array.h> // this is needed in order to pull in the expression template mechanism
 
-#include <boost/mpl/for_each.hpp>
 
 #ifndef   NDEBUG
 #include <stdexcept>

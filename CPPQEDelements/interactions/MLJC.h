@@ -11,8 +11,6 @@
 
 #include "Sigma.h"
 
-#include <boost/fusion/algorithm/transformation/transform.hpp>
-
 
 /// Class representing an elementary coupling term (a \f$g_{ij}\f$ \ref multilevelactualHamiltonian "here") with a compile-time pair \f$i,j\f$ and a runtime complex value
 template<int I, int J> using Coupling = multilevel::DynamicsPair<dcomp,I,J>;

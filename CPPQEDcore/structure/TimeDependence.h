@@ -5,8 +5,6 @@
 
 #include <boost/operators.hpp>
 
-#include <boost/mpl/if.hpp>
-
 
 namespace structure {
 
