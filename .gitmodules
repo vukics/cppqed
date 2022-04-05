@@ -4,6 +4,3 @@
 [submodule "CPPQEDutils/thirdPartyRandom/Xoshiro-cpp"]
 	path = CPPQEDutils/thirdPartyRandom/Xoshiro-cpp
 	url = https://github.com/vukics/Xoshiro-cpp.git
-[submodule "CPPQEDutils/ra-ra"]
-	path = CPPQEDutils/ra-ra
-	url = https://github.com/vukics/ra-ra.git
