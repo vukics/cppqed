@@ -11,12 +11,8 @@ endmacro()
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
 set(TESTING_EXECUTABLES
-    EvolvedTest EvolvedTestGSL MultiIndexIteratorNew)
+    EvolvedTest EvolvedTestGSL MultiIndexIteratorNew HarmonicOscillatorRandomTimes HarmonicOscillatorComplex HarmonicOscillatorComplexGSL)
 
-if (TARGET Eigen3::Eigen)
-  set(TESTING_EXECUTABLES ${TESTING_EXECUTABLES} HarmonicOscillatorRandomTimes HarmonicOscillatorComplex HarmonicOscillatorComplexGSL)
-endif()
-    
 foreach(S ${TESTING_EXECUTABLES})
   add_executable(${S} ${S}.cc)
   target_link_libraries(${S} CPPQED::CPPQEDutils)
@@ -26,12 +22,11 @@ add_test_utils(evolved_nonlinear_ode_boost EvolvedTest)
 
 add_test_utils(evolved_nonlinear_ode_gsl EvolvedTestGSL)
 
+add_test_utils(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
 
-if (TARGET Eigen3::Eigen)
-  add_test_utils(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
-  add_test_utils(harmonic_oscillator_compare_ode_with_exact_solution_gsl HarmonicOscillatorComplexGSL)
-  add_test_utils(harmonic_oscillator_random_times HarmonicOscillatorRandomTimes)
-endif()
+add_test_utils(harmonic_oscillator_compare_ode_with_exact_solution_gsl HarmonicOscillatorComplexGSL)
+
+add_test_utils(harmonic_oscillator_random_times HarmonicOscillatorRandomTimes)
 
 add_test_utils(multi_index_iterator MultiIndexIteratorNew)
 
