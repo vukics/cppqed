@@ -9,10 +9,6 @@
 
 #include "BlitzTiny.h"
 
-#include <boost/range/algorithm/copy.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/algorithm_ext/for_each.hpp>
-
 
 using namespace structure;
 
@@ -107,8 +103,8 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
     };
   };
   
-  if (const auto ha=castHa((*ia_)[0])) boost::range::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),lambda(ha));
-  if (const auto ha=castHa((*ia_)[1])) boost::range::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),lambda(ha));
+  if (const auto ha=castHa((*ia_)[0])) std::ranges::for_each(fullRange<V0>(psi),fullRange<V0>(dpsidt),lambda(ha));
+  if (const auto ha=castHa((*ia_)[1])) std::ranges::for_each(fullRange<V1>(psi),fullRange<V1>(dpsidt),lambda(ha));
 
   ::structure::addContribution(ia_,t,psi,dpsidt,t0);
 
@@ -158,13 +154,13 @@ void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperator
   size_t n=::structure::nAvr<LA_Li>((*ia_)[0]);
   
   if ( const auto li0=castLi((*ia_)[0]);  li0 && i<n ) {
-    boost::range::for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),lambda(li0));
+    std::ranges::for_each(fullRange<V0>(rho),fullRange<V0>(drhodt),lambda(li0));
     return;
   }
 
   i-=n;
   if ( const auto li1=castLi((*ia_)[1]);  li1 && i < ( n = ::structure::nAvr<LA_Li>((*ia_)[1]) ) ) {
-    boost::range::for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),lambda(li1));
+    std::ranges::for_each(fullRange<V1>(rho),fullRange<V1>(drhodt),lambda(li1));
     return;
   }
 

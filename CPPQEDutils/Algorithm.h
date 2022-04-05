@@ -3,8 +3,6 @@
 #ifndef   CPPQEDCORE_UTILS_ALGORITHM_H_INCLUDED
 #define   CPPQEDCORE_UTILS_ALGORITHM_H_INCLUDED
 
-#include <boost/range/numeric.hpp>
-
 
 namespace cppqedutils {
 
@@ -15,7 +13,7 @@ const Out_Iterator
 concatenateViaIterator(const SeqOfSeqs& sOs, ///<[in] the sequence containing the input sequences
                        Out_Iterator out)
 {
-  return boost::accumulate(sOs,out, [](auto iter, const auto& t){return std::copy(t.begin(),t.end(),iter);});
+  return std::accumulate(sOs.begin(),sOs.end(),out, [](auto iter, const auto& t){return std::copy(t.begin(),t.end(),iter);});
 }
 
 

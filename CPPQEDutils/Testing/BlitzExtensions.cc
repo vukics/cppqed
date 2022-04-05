@@ -8,8 +8,6 @@
 #define BOOST_TEST_MODULE BlitzExtensions test
 #include <boost/test/unit_test.hpp>
 
-#include <boost/range/combine.hpp>
-
 
 using namespace std;
 using namespace blitzplusplus;

@@ -13,8 +13,6 @@
 #include "MathExtensions.h"
 #include "VectorFromMatrixSliceIterator.h"
 
-#include <boost/range/combine.hpp>
-
 
 namespace quantumtrajectory {
 

@@ -7,8 +7,6 @@
 
 #include "Randomized.h"
 
-#include <boost/function.hpp>
-
 #include <iostream>
 
 

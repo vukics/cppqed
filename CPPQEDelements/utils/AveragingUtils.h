@@ -18,11 +18,8 @@
 
 #include <boost/ptr_container/ptr_list.hpp>
 
-#include <boost/bind.hpp>
-
-#include <boost/range/adaptor/transformed.hpp>
-
 #include <algorithm>
+#include <ranges>
 
 
 template<int RANK>
@@ -156,7 +153,7 @@ public:
   
   Collecting(const Collection& collection)
     : Base(collection.front().getTitle(),
-           cppqedutils::concatenateGrow<KeyLabels>( collection | boost::adaptors::transformed(bind(&Element::getLabels,_1)) )),
+           cppqedutils::concatenateGrow<KeyLabels>( std::ranges::views::transform(collection, [&](const auto& e) {return e.getLabels();}) ) ),
       collection_(collection.clone()) {}
 
   Collecting(const Collecting& collecting)
@@ -168,26 +165,22 @@ private:
   const Averages average_v(Time t, const quantumdata::LazyDensityOperator<RANK>& matrix) const override
   {
     Averages res(this->nAvr()); res=0;
-    return cppqedutils::concatenate( collection_ | boost::adaptors::transformed(bind(&Element::average,_1,structure::time::convert(t),boost::cref(matrix))) , res);
+    return cppqedutils::concatenate(std::ranges::views::transform(collection_,
+                                                                  [&] (const auto& e) {return e.average(structure::time::convert(t),matrix);} ) ,
+                                    res);
   }
 
   void process_v(Averages& avr) const override
   {
-    struct Helper
-    {
-      static void doIt(const Element& eav, Averages& avr, ptrdiff_t& l, ptrdiff_t& u)
-      {
-        using blitz::Range;
-        if ((u=l+eav.nAvr())>l) {
-          Averages temp(avr(Range(l+1,u)));
-          eav.process(temp);
-        }
-        std::swap(l,u);
-      }
-    };
- 
     ptrdiff_t l=-1, u=0;
-    for_each(collection_,boost::bind(Helper::doIt,_1,avr,l,u));
+    for (const Element& eav : collection_) {
+      using blitz::Range;
+      if ((u=l+eav.nAvr())>l) {
+        Averages temp(avr(Range(l+1,u)));
+        eav.process(temp);
+      }
+      std::swap(l,u);
+    }
   }
 
   const Collection collection_;

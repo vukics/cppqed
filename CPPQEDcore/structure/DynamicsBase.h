@@ -54,10 +54,7 @@ public:
   typedef std::initializer_list<RF>    RealFreqsInitializer;
   typedef std::initializer_list<CF> ComplexFreqsInitializer;
 
-  static const    RealFreqs emptyRF;
-  static const ComplexFreqs emptyCF;
-  
-  explicit DynamicsBase(const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF); ///< Straightforward constructor
+  explicit DynamicsBase(const RealFreqs& ={}, const ComplexFreqs& ={}); ///< Straightforward constructor
   
   double highestFrequency() const; ///< Calculates the fastest timescale of the system from the frequencies stored in the lists
 

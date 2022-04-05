@@ -30,7 +30,7 @@ public:
   DDHO(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit=0)
     : std::pair<dcomp,dcomp>(-gamma+sqrt(dcomp(sqr(gamma)-1)),-gamma-sqrt(dcomp(sqr(gamma)-1))),
       _(gamma,omega,
-        [=]() {ddho::Matrix m; m << exp(first*tInit), exp(second*tInit), first*exp(first*tInit), second*exp(second*tInit); return m;} (),
+        [=,this]() {ddho::Matrix m; m << exp(first*tInit), exp(second*tInit), first*exp(first*tInit), second*exp(second*tInit); return m;} (),
         ampTI,ampDerivTI,tInit),
       omega1_(first), omega2_(second) {}
 

@@ -6,8 +6,6 @@
 #include "LazyDensityOperator.tcc"
 #include "StateVector.h"
 
-#include <boost/bind.hpp>
-
 #define BOOST_TEST_MODULE LazyDensityOperator test
 #include <boost/test/unit_test.hpp>
 

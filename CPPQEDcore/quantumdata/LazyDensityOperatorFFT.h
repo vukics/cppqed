@@ -9,8 +9,6 @@
 #include "FFT.h"
 #include "SliceIterator.h"
 
-#include <boost/range/algorithm/for_each.hpp>
-
 #include <memory>
 
 
@@ -34,8 +32,8 @@ const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDe
   if      (const auto psi=dynamic_cast<const SV*>(&matrix) ) {
     const std::shared_ptr<SV> res(std::make_shared<SV>(*psi));
     hana::for_each(v,[&](auto a) {
-      boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<a.value> >(psi->getArray()),
-                      [=](linalg::CVector& psiS){ffTransform(psiS,dir);});
+      std::ranges::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<a.value> >(psi->getArray()),
+                            [=](linalg::CVector& psiS){ffTransform(psiS,dir);});
     });
     return res;
   }
@@ -43,8 +41,8 @@ const std::shared_ptr<const LazyDensityOperator<RANK> > ffTransform(const LazyDe
     const std::shared_ptr<DO> res(std::make_shared<DO>(*rho));
     hana::for_each(v,[&](auto a) {
       constexpr auto IDX=a.value;
-      boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho->getArray()),
-                      [=](linalg::CMatrix& rhoS){ffTransform(rhoS,dir);});
+      std::ranges::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho->getArray()),
+                            [=](linalg::CMatrix& rhoS){ffTransform(rhoS,dir);});
     });
     return res;
   }

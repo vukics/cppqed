@@ -1,16 +1,13 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "MCWF_TrajectoryLogger.h"
 
-#include <boost/range/algorithm/max_element.hpp>
-#include <boost/range/numeric.hpp>
-
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/density.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 
-#include <iostream>
 #include <cmath>
-
+#include <iostream>
+#include <numeric>
 
 using namespace std;
 
@@ -80,8 +77,8 @@ ostream& quantumtrajectory::mcwf::EnsembleLogger::stream(ostream& os, const Logg
 {
   using namespace boost;
 
-#define AVERAGE_function(f) accumulate(loggerList, 0., [] (double init, const Logger& l) {return init + l.f;})/loggerList.size()
-#define MAX_function(f) max_element(loggerList, [] (const Logger& a, const Logger& b) {return a.f<b.f;})->f
+#define AVERAGE_function(f) accumulate(loggerList.begin(),loggerList.end(), 0., [] (double init, const Logger& l) {return init + l.f;})/loggerList.size()
+#define MAX_function(f) ranges::max_element(loggerList, [] (const Logger& a, const Logger& b) {return a.f<b.f;})->f
 
   os<<"\nAverage number of total steps: "<<AVERAGE_function(nMCWF_steps_)<<endl
     <<"\nOn average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
@@ -94,7 +91,7 @@ ostream& quantumtrajectory::mcwf::EnsembleLogger::stream(ostream& os, const Logg
       
   using namespace accumulators;
   
-  size_t nTotalJumps=accumulate(loggerList, 0, [] (double init, const Logger& l) {return init + l.traj_.size();});
+  size_t nTotalJumps=accumulate(loggerList.begin(), loggerList.end(), 0, [] (double init, const Logger& l) {return init + l.traj_.size();});
 
   // Heuristic: if nBins is not given (0), then the number of bins is determined such that the bins contain nJumpsPerBin samples on average
   if (!nBins && nTotalJumps<2*nJumpsPerBin) {

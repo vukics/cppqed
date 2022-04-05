@@ -1,10 +1,6 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "KeyPrinter.h"
 
-#include <boost/range/algorithm/for_each.hpp>
-
-#include <boost/lambda/lambda.hpp>
-
 #include <iostream>
 #include <iomanip>
 
@@ -13,10 +9,8 @@ using namespace std;
 
 ostream& cppqedutils::KeyPrinter::stream(ostream& os, size_t& i) const
 {
-  namespace bll=boost::lambda;
-
   os<<keyTitle_;
-  boost::for_each(keyLabels_,os<<bll::constant("\n")<<bll::constant(setw(2))<<bll::var(i)++<<". "<<bll::_1);
+  for (const auto& kl : keyLabels_) os<<endl<<setw(2)<<i++<<". "<<kl;
   return os<<endl;
 }
 

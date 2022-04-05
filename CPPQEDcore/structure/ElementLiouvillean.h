@@ -6,8 +6,6 @@
 #include "Liouvillean.h"
 #include "ElementLiouvilleanAveragedCommon.h"
 
-#include <boost/range/algorithm/transform.hpp>
-
 #include <functional>
 
 
@@ -246,11 +244,11 @@ public:
   typedef typename Base::SuperoperatorStrategy SuperoperatorStrategy;
 
   /// Tiny vector of length NLINDBLADS containing the #JumpStrategy instances
-  typedef blitz::TinyVector<JumpStrategy    ,NLINDBLADS> JumpStrategies;
+  typedef std::array<JumpStrategy    ,NLINDBLADS> JumpStrategies;
   /// Tiny vector of length NLINDBLADS containing the #JumpRateStrategy instances
-  typedef blitz::TinyVector<JumpRateStrategy,NLINDBLADS> JumpRateStrategies;
+  typedef std::array<JumpRateStrategy,NLINDBLADS> JumpRateStrategies;
 
-  typedef blitz::TinyVector<SuperoperatorStrategy,NLINDBLADS> SuperoperatorStrategies;
+  typedef std::array<SuperoperatorStrategy,NLINDBLADS> SuperoperatorStrategies;
 
 protected:
   template<typename... KeyLabelsPack>
@@ -275,16 +273,16 @@ protected:
 
   void actWithJ_v(Time t, StateVectorLow<RANK>& psi, size_t lindbladNo) const override
   {
-    if constexpr (IS_TIME_DEPENDENT) jumps_(lindbladNo)(t,psi);
-    else jumps_(lindbladNo)(psi);
+    if constexpr (IS_TIME_DEPENDENT) jumps_[lindbladNo](t,psi);
+    else jumps_[lindbladNo](psi);
   }
 
   void actWithSuperoperator_v(Time t, const DensityOperatorLow<RANK>& rho, DensityOperatorLow<RANK>& drhodt, size_t lindbladNo) const override
   {
-    if (superoperatorStrategies_(lindbladNo)==nullptr) throw SuperoperatorNotImplementedException(lindbladNo);
+    if (superoperatorStrategies_[lindbladNo]==nullptr) throw SuperoperatorNotImplementedException{lindbladNo};
 
-    if constexpr (IS_TIME_DEPENDENT) superoperatorStrategies_(lindbladNo)(t,rho,drhodt);
-    else superoperatorStrategies_(lindbladNo)(rho,drhodt);
+    if constexpr (IS_TIME_DEPENDENT) superoperatorStrategies_[lindbladNo](t,rho,drhodt);
+    else superoperatorStrategies_[lindbladNo](rho,drhodt);
   }
   
   const JumpStrategies     jumps_    ;

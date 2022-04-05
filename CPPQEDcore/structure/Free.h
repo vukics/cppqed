@@ -35,7 +35,7 @@ class Free : public QuantumSystem<1>, public DynamicsBase
 {
 public:
   /// A single dimension to initialise QuantumSystem`<1>` and the lists of real and complex name-frequency-multiplier tuples for DynamicsBase
-  explicit Free(size_t dim, const RealFreqs& realFreqs=emptyRF, const ComplexFreqs& complexFreqs=emptyCF) : QuantumSystem<1>(dim), DynamicsBase(realFreqs,complexFreqs) {}
+  explicit Free(size_t dim, const RealFreqs& realFreqs={}, const ComplexFreqs& complexFreqs={}) : QuantumSystem<1>(dim), DynamicsBase(realFreqs,complexFreqs) {}
 
   /// \name Implementating inherited virtuals
   //@{

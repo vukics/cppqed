@@ -7,9 +7,9 @@
 #include "MultiIndexIterator.h"
 #include "TMP_Tools.h"
 
-#include <boost/range.hpp>
-
 #include <boost/hana.hpp>
+
+#include <boost/range/iterator_range.hpp>
 
 #include <stdexcept>
 
@@ -403,6 +403,8 @@ template<typename RetainedAxes, template <int> class ARRAY, int RANK>
 auto fullRange(const ARRAY<RANK>& array)
 {
   return boost::iterator_range<SliceIterator<ARRAY,RANK,RetainedAxes>>(begin<RetainedAxes,ARRAY>(array),end<RetainedAxes,ARRAY>(array));
+/*                               SliceIterator<ARRAY,RANK,V>,
+                                 std::ranges::subrange_kind::unsized>(begin<V,ARRAY>(array),end<V,ARRAY>(array));*/
 }
 
 

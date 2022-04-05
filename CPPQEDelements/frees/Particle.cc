@@ -12,7 +12,6 @@
 #include "TMP_Tools.h"
 
 #include <boost/assign/list_of.hpp>
-#include <boost/bind.hpp>
 #include <utility>
 
 using namespace std;
