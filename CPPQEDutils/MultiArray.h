@@ -16,7 +16,7 @@
 namespace cppqedutils {
 
   
-template <unsigned RANK>
+template <size_t RANK>
 using Extents=std::array<size_t,RANK>;
 
 
@@ -49,7 +49,7 @@ constexpr bool consistent(RetainedAxes ra) // if the optional argument is not gi
 } // multiarray
 
 
-template <typename T, unsigned RANK>
+template <typename T, size_t RANK>
 class MultiArrayView
 {
 public:
@@ -107,7 +107,7 @@ protected:
 
 namespace multiarray {
 
-template <unsigned RANK>
+template <size_t RANK>
 auto calculateStrides(const Extents<RANK>& extents)
 {
   Extents<RANK> strides; strides[0]=1;
@@ -119,7 +119,7 @@ auto calculateStrides(const Extents<RANK>& extents)
 
 
 
-template <typename T, unsigned RANK>
+template <typename T, size_t RANK>
 class MultiArray : public MultiArrayView<T,RANK>
 {
 public:
@@ -131,7 +131,7 @@ public:
   
   template<typename INITIALIZER=std::function<void(StorageType&)>>
   MultiArray(const Extents<RANK>& extents, INITIALIZER&& initializer=[](StorageType&) {})
-  : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides<RANK>(extents),0},
+  : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0},
   data_(std::accumulate(extents.begin(),extents.end(),1ul,std::multiplies{}))
   {
     this->dataView_=std::span<T>(data_);
@@ -147,7 +147,7 @@ private:
 
 namespace multiarray {
 
-template <unsigned RANK, typename RetainedAxes>
+template <size_t RANK, typename RetainedAxes>
 auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, RetainedAxes ra)
 {
   std::vector<size_t> res;
@@ -155,7 +155,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, Retain
 }
 
 
-template <unsigned RANK, typename RetainedAxes>
+template <size_t RANK, typename RetainedAxes>
 auto calculateSlicesOffsets(Extents<RANK> extents, RetainedAxes ra)
 {
   return calculateSlicesOffsets(extents,calculateStrides(extents),ra);
