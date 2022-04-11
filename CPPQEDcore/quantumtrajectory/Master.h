@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_H_INCLUDED
@@ -63,12 +63,12 @@ public:
   Master(structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
          StateVector_OR_DensityOperator&& state, ///< the state vector or density operator to be evolved
          ODE_Engine ode,
-         bool negativity ///< governs whether entanglement should be calculated, cf. stream_densityoperator::_, quantumdata::negPT
+         EntanglementMeasuresSwitch ems ///< governs whether entanglement measures should be calculated
          ) 
   : structure::QuantumSystemWrapper<RANK>{sys,true},
     rho_{std::forward<StateVector_OR_DensityOperator>(state)},
     ode_(ode),
-    dos_(this->getAv(),negativity)
+    dos_(this->getAv(),ems)
   {
     if (!this->applicableInMaster()) throw master::SystemNotApplicable();
     if (rho_!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
@@ -129,10 +129,10 @@ namespace master {
 
 template<typename ODE_Engine, typename V, typename StateVector_OR_DensityOperator>
 auto make(structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperator>::N_RANK> sys,
-          StateVector_OR_DensityOperator&& state, const Pars& p, bool negativity)
+          StateVector_OR_DensityOperator&& state, const Pars& p, EntanglementMeasuresSwitch ems)
 {
   return Master<std::decay_t<StateVector_OR_DensityOperator>::N_RANK,ODE_Engine,V>(
-    sys,std::forward<StateVector_OR_DensityOperator>(state),ODE_Engine{initialTimeStep(sys),p},negativity);
+    sys,std::forward<StateVector_OR_DensityOperator>(state),ODE_Engine{initialTimeStep(sys),p},ems);
 }
   
 } // master

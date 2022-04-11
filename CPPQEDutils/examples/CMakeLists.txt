@@ -1,4 +1,4 @@
-# Copyright András Vukics 2021. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright András Vukics 2021–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 set(EXEC_TARGETS
     HarmonicOscillator HarmonicOscillatorStdArray HarmonicOscillatorGSL HarmonicOscillatorComplexBlitz HarmonicOscillatorComplexBlitzGSL)

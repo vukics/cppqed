@@ -1,4 +1,4 @@
-# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 message(STATUS "Configuring CPPQEDutils")
 
@@ -8,43 +8,25 @@ find_package(GSL 2.5 REQUIRED)
 # Boost
 find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams)
 
-find_package(Eigen3 3.3 NO_MODULE)
+find_package(Eigen3 3.3 REQUIRED)
 
 add_subdirectory(thirdPartyRandom)
 
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
-            BooleanNegatedProxy.cc CMatrix.cc ComplexArrayExtensions.cc FFT.cc FormDouble.cc
+            BooleanNegatedProxy.cc CMatrix.cc ComplexArrayExtensions.cc DrivenDampedHarmonicOscillator.cc FFT.cc FormDouble.cc
             FuzzyDouble.cc KeyPrinter.cc MathExtensions.cc Pars.cc Random.cc Trajectory.cc Version.cc)
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams GSL::gsl)
+target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Blitz::Blitz Boost::iostreams GSL::gsl Eigen3::Eigen)
 
-if (TARGET Eigen3::Eigen)
-  message(STATUS "Found Eigen3")
-  target_compile_definitions(CPPQEDutils PUBLIC EIGEN3_FOUND)
-  target_link_libraries(CPPQEDutils PUBLIC Eigen3::Eigen)
-  target_sources(CPPQEDutils PRIVATE DrivenDampedHarmonicOscillator.cc)
-endif ()
-
-target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_FLENS CPPQED_HAS_GSL)
+target_compile_definitions(CPPQEDutils PUBLIC CPPQED_HAS_GSL)
 
 # Project options
 # Switch for boost bzip2 support
 option(COMPRESSION "Boost bzip2 support" ON)
 
-#FLENS
-##if( FLENS AND NOT FLENS_found )
-  ##find_package(flens)
-##endif( )
-
-#if( NOT flens_FOUND )
-  #message(STATUS "Flens library not found or disabled, optional flens support disabled.")
-  #set(DO_NOT_USE_FLENS ON)
-#endif( )
-
-# include_directories(SYSTEM ${flens_INCLUDE_DIRS})
 
 # Check if compression can be enabled, inform user
 if(COMPRESSION)

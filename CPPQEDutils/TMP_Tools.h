@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Template metaprogramming tools, extending (and based on) Boost.MPL.}
 #ifndef CPPQEDCORE_UTILS_TMP_TOOLS_H_INCLUDED
 #define CPPQEDCORE_UTILS_TMP_TOOLS_H_INCLUDED
@@ -27,12 +27,17 @@
 #define FUSION_MAX_LIST_SIZE FUSION_MAX_VECTOR_SIZE
 #endif // FUSION_MAX_LIST_SIZE
 
+#include <boost/mpl/max_element.hpp>
+#include <boost/mpl/deref.hpp>
+#include <boost/mpl/copy.hpp>
+#include <boost/mpl/back_inserter.hpp>
 #include <boost/mpl/range_c.hpp>
 #include <boost/mpl/vector_c.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/int.hpp>
+#include <boost/mpl/filter_view.hpp>
 #include <boost/mpl/find_if.hpp>
 #include <boost/mpl/equal.hpp>
 #include <boost/mpl/fold.hpp>
@@ -208,6 +213,20 @@ struct ExtendVector : boost::mpl::fold<V,
 
 template<int RANK, typename V>
 using ExtendVector_t = typename ExtendVector<RANK,V>::type;
+
+
+template <typename Sequence>
+using CopyToVector=typename boost::mpl::copy<Sequence,boost::mpl::back_inserter<V_Empty> >::type;
+
+
+template <int RANK, typename V>
+requires ( boost::mpl::deref<boost::mpl::max_element<V> >::type::type::value < RANK )
+using NegatedView=boost::mpl::filter_view<tmptools::Ordinals<RANK>,boost::mpl::not_<tmptools::numerical_contains<V,boost::mpl::_> > >;
+
+template <int RANK, typename V>
+using NegatedVector=CopyToVector<NegatedView<RANK,V>>;
+// copy makes a vector of filter_view, which is important since the latter cannot be applied in all algorithms
+
 
 } // tmptools
 

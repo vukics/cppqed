@@ -1,5 +1,5 @@
 # Copyright Raimar Sandner 2012–2020.
-# Copyright András Vukics 2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 message(STATUS "Configuring CPPQEDcore")
 
@@ -115,11 +115,6 @@ install(TARGETS CPPQEDcore DESTINATION lib)
 #if(BUNDLED_BLITZ)
   #set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${blitz_INCLUDE_DIRS})
 #endif()
-#if(FLENS AND flens_FOUND)
-  #if(BUNDLED_FLENS)
-    #set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${flens_INCLUDE_DIRS})
-  #endif()
-#endif()
 #set(CONF_CMAKE_DIR ${PROJECT_BINARY_DIR})
 #configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}/CPPQEDConfig.cmake"
   #INSTALL_DESTINATION  "${PROJECT_BINARY_DIR}"
@@ -138,20 +133,10 @@ install(TARGETS CPPQEDcore DESTINATION lib)
 ## ... and for the installation tree
 #set(CONF_INCLUDE_DIRS ${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_SUBDIR})
 #set(CONF_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/${CPPQED_CMAKE_SUBDIR})
-#if(BUNDLED_BLITZ OR BUNDLED_FLENS)
-  #set(CPPQED_THIRDPARTY_INCLUDE_DIRS ${CPPQED_THIRDPARTY_INCLUDE_DIRS} ${BUNDLED_HEADERS})
-#endif()
 #if(BUNDLED_BLITZ)
   #set(CONF_SPECIAL_LIBRARIES ${BUNDLED_BLITZ_INSTALLED_LIBRARY})
 #else()
   #set(CONF_SPECIAL_LIBRARIES ${blitz_LIBRARIES})
-#endif()
-#if(FLENS AND flens_FOUND)
-  #if(BUNDLED_FLENS)
-    #set(CONF_SPECIAL_LIBRARIES ${CONF_SPECIAL_LIBRARIES} ${BUNDLED_FLENS_INSTALLED_LIBRARY})
-  #else()
-    #set(CONF_SPECIAL_LIBRARIES ${CONF_SPECIAL_LIBRARIES} ${flens_LIBRARIES})
-  #endif()
 #endif()
 #configure_package_config_file(CPPQEDConfig.cmake.in "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CPPQEDConfig.cmake"
   #INSTALL_DESTINATION "${CONF_CMAKE_DIR}"
@@ -182,30 +167,6 @@ install(TARGETS CPPQEDcore DESTINATION lib)
 ##! ### Installation of dependencies
 ##! <!--#########################################################-->
 ##!
-##! If blitz and flens are compiled as external projects, install them as well. Libraries
-##! and header files are installed into the same locations as CPPQEDcore, this way it is
-##! ensured they are found.
-
-#set(BUNDLED_HEADERS "${CMAKE_INSTALL_INCLUDEDIR}/${CPPQED_INCLUDE_DIR}/bundled")
-
-#if(BUNDLED_BLITZ)
-  #ExternalProject_Get_Property(blitz install_dir)
-  #file(GLOB blitz_libs ${install_dir}/lib/*.so*)
-  #set(blitz_libs ${install_dir}/lib/libblitz.so
-                 #${install_dir}/lib/libblitz.so.0
-                 #${install_dir}/lib/libblitz.so.1.0.3) # it is a bit inconvenient to have to write the version explicitly, but fortunately it doesn’t change very often
-  #install(FILES ${blitz_libs}
-          #PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
-          #DESTINATION ${CMAKE_INSTALL_LIBDIR})
-  #install(DIRECTORY ${install_dir}/include/blitz
-          #DESTINATION ${BUNDLED_HEADERS})
-#endif()
-
-#if(BUNDLED_FLENS)
-  #ExternalProject_Get_Property(flens install_dir)
-  #install(DIRECTORY ${install_dir}/include/flens
-          #DESTINATION ${BUNDLED_HEADERS})
-#endif()
 
 
 ##! \file
@@ -232,10 +193,6 @@ install(TARGETS CPPQEDcore DESTINATION lib)
                                 #DESCRIPTION "High-performance C++ vector mathematics library"
                                 #TYPE REQUIRED
                                 #PURPOSE "Multi-Array implementation used in the framework.")
-#set_package_properties(flens PROPERTIES URL "http://flens.sourceforge.net"
-                                #DESCRIPTION "Flexible Library for Efficient Numerical Solutions."
-                                #TYPE OPTIONAL
-                                #PURPOSE "With FLENS the negativity of the partially transposed density operator can be calculated.")
 #set_package_properties(Boost PROPERTIES URL "http://www.boost.org/"
                                 #DESCRIPTION "Collection of portable C++ source libraries."
                                 #TYPE REQUIRED
@@ -248,7 +205,6 @@ install(TARGETS CPPQEDcore DESTINATION lib)
                                 #DESCRIPTION "Generate documentation from source code."
                                 #TYPE OPTIONAL
                                 #PURPOSE "Generation of API documentation. Note that you also need the graphviz package to build the documentation.")
-#add_feature_info("FLENS" CPPQED_FLENS_FOUND "compile framework with FLENS support.")
 #add_feature_info("Compression" COMPRESSION "bzip2 compression of binary statevectors.")
 #if(NOT ${CPPQED_MONOLITHIC})
   #feature_summary( WHAT ALL )

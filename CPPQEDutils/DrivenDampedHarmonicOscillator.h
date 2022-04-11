@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 /*
   
@@ -12,8 +12,6 @@
 
 #ifndef   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
 #define   CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED
-
-#ifdef    EIGEN3_FOUND
 
 #include "ComplexExtensions.h"
 
@@ -53,6 +51,5 @@ Ptr make(double gamma, double omega, dcomp ampTI, dcomp ampDerivTI, double tInit
 
 } // cppqedutils::ddho
 
-#endif // EIGEN3_FOUND
 
 #endif // CPPQEDCORE_UTILS_DRIVENDAMPEDHARMONICOSCILLATOR_H_INCLUDED

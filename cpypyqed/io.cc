@@ -1,5 +1,5 @@
 // Copyright Raimar Sandner 2012–2019.
-// Copyright András Vukics 2019–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2019–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #ifndef CPYPYQED_BOOST_PYTHON_MODULE_NAME
 #ifndef NDEBUG
 #define CPYPYQED_BOOST_PYTHON_MODULE_NAME cpypyqed_d
@@ -143,7 +143,7 @@ object read(str filename)
     #define BOOST_PP_LOCAL_LIMITS (1, PYTHON_MAX_RANK)
     #include BOOST_PP_LOCAL_ITERATE()
   }
-  return std::move(result);
+  return result;
 }
 
 void write(str filename, const numpy::ndarray &array, double time)

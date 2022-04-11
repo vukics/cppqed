@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #ifndef CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATORFFT_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATORFFT_H_INCLUDED
 
@@ -41,7 +41,7 @@ public:
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
     boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX> >(psi_->getArray()),
-                    [=](linalg::CVector& psiS){ffTransform(psiS,dir_);});
+                    [=,this](linalg::CVector& psiS){ffTransform(psiS,dir_);});
   }
 
 private:
@@ -62,7 +62,7 @@ public:
   template<int IDX> void operator()(mpl::integral_c<int,IDX>)
   {
     boost::for_each(cppqedutils::sliceiterator::fullRange<tmptools::Vector<IDX,IDX+RANK> >(rho_->getArray()),
-                    [=](linalg::CMatrix& rhoS){ffTransform(rhoS,dir_);});
+                    [=,this](linalg::CMatrix& rhoS){ffTransform(rhoS,dir_);});
   }
   
 private:

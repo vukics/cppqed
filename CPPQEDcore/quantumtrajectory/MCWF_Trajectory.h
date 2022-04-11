@@ -1,10 +1,11 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
 
 #include "StateVector.h"
 
+#include "DensityOperatorStreamer.h"
 #include "MCWF_TrajectoryLogger.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
@@ -83,11 +84,13 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
  */
 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
-class MCWF_Trajectory : private structure::QuantumSystemWrapper<RANK>
+class MCWF_Trajectory : public structure::QuantumSystemWrapper<RANK>
 {
 public:
   MCWF_Trajectory(const MCWF_Trajectory&) = default; MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
+  using structure::QuantumSystemWrapper<RANK>::operator=;
+  
   using StreamedArray=structure::Averages;
 
   typedef quantumdata::StateVector<RANK> StateVector;
@@ -119,6 +122,7 @@ public:
   void step(double deltaT, std::ostream& logStream);
   
   auto getDtDid() const {return ode_.getDtDid();}
+  auto getDtTry() const {return ode_.getDtTry();}
   
   std::ostream& streamParameters(std::ostream&) const;
 
@@ -151,6 +155,11 @@ public:
   
   const mcwf::Logger& getLogger() const {return logger_;}
   
+  void referenceNewStateVector(const StateVector& psi) {psi_.reference(psi);}
+  void setODE(ODE_Engine ode) {ode_=std::move(ode);}
+  
+  double sampleRandom() {return distro_(re_.engine);}
+  
 private:
   typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
 
@@ -178,6 +187,8 @@ private:
   const double dpLimit_, overshootTolerance_;
 
   mutable mcwf::Logger logger_;
+  
+  std::uniform_real_distribution<double> distro_{};
 
 };
 
@@ -200,7 +211,7 @@ auto make(structure::QuantumSystemPtr<std::decay_t<SV>::N_RANK> sys,
 
 /// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `MCWF_Trajectory`s
 template<typename ODE_Engine, typename RandomEngine, typename V, typename SYS, typename SV>
-auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, bool negativity)
+auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, EntanglementMeasuresSwitch ems)
 {
   constexpr auto RANK=std::decay_t<SV>::N_RANK;
   using Single=MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
@@ -216,7 +227,7 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, bool nega
 
   auto av=std::dynamic_pointer_cast<const structure::Averaged<RANK>>(sys);
   
-  return cppqedutils::trajectory::Ensemble{trajs,DensityOperatorStreamer<RANK,V>{av,negativity},
+  return cppqedutils::trajectory::Ensemble{trajs,DensityOperatorStreamer<RANK,V>{av,ems},
                                            mcwf::EnsembleLogger{p.nBins,p.nJumpsPerBin},
                                            quantumdata::DensityOperator<RANK>{psi.getDimensions()}};
 
@@ -309,7 +320,7 @@ manageTimeStep(const structure::Rates& rates, double tCache, double dtDidCache, 
 template<int RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const structure::Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
-  double random=std::uniform_real_distribution()(re_.engine)/getDtDid();
+  double random=sampleRandom()/getDtDid();
 
   int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
   for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))

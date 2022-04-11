@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines stream_densityoperator::_}
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_DENSITY_OPERATOR_STREAMER_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_DENSITY_OPERATOR_STREAMER_H_INCLUDED
@@ -6,7 +6,7 @@
 #include "DensityOperator.h"
 
 #include "Averaged.h"
-#include "NegPT.tcc"
+#include "EntanglementMeasures.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 
@@ -27,24 +27,29 @@ namespace quantumtrajectory {
  * \tparam V has the same function as the template parameter `V` in quantumdata::negPT
  * 
  */
-template<int RANK, typename V=tmptools::V_Empty>
+template<int RANK, typename V>
 class DensityOperatorStreamer
 {
 public:
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  DensityOperatorStreamer(::structure::AveragedPtr<RANK> av, bool negativity) : av_(av), negativity_(negativity) {}
+  DensityOperatorStreamer(::structure::AveragedPtr<RANK> av, EntanglementMeasuresSwitch ems) : av_(av), ems_(ems) {}
 
   StreamReturnType operator()(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   {
     auto res{structure::stream(av_,t,rho,os,precision)};
     auto & averages{std::get<1>(res)};
-    if (negativity_) {
-      auto n{negPT(rho,V())};
-      os<<'\t'<<FormDouble(precision)(n);
-#ifndef   DO_NOT_USE_FLENS
-      averages.resizeAndPreserve(averages.size()+1); averages(averages.ubound(0))=n;
-#endif // DO_NOT_USE_FLENS
+    if constexpr ( !isV_empty ) {
+      if (ems_[0]) {
+        auto n{negPT(rho,V{})};
+        os<<'\t'<<FormDouble(precision)(n);
+        averages.resizeAndPreserve(averages.size()+1); averages(averages.ubound(0))=n;
+      }
+      if (ems_[1]) {
+        auto mi{mutualInformation(rho,V{})};
+        os<<'\t'<<FormDouble(precision)(mi);
+        averages.resizeAndPreserve(averages.size()+1); averages(averages.ubound(0))=mi;
+      }
     }
     return {os,averages};
   }
@@ -52,15 +57,21 @@ public:
   std::ostream& streamKey(std::ostream& os, size_t& i) const
   {
     if (av_) av_->streamKey(os,i); 
-    if (negativity_) os<<"Trajectory\n"<<i<<". negativity"<<std::endl;
+    if constexpr ( !isV_empty ) {
+      if (ems_.any()) os<<"Trajectory\n";
+      if (ems_[0]) os<<i++<<". negativity\n";
+      if (ems_[1]) os<<i++<<". mutual information\n";
+    }
     return os;
   }
 
 private:
   const ::structure::AveragedPtr<RANK> av_ ;
 
-  const bool negativity_;
+  const EntanglementMeasuresSwitch ems_;
 
+  static constexpr bool isV_empty=boost::mpl::empty<V>::value;
+  
 };
 
 

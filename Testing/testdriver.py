@@ -61,13 +61,12 @@ def rm_f(filename):
 ## Loads a trajectory file.
 # \param fname File name to load from.
 # \return array Numpy array.
+# format is in fact obsolate since 12/2/2022, but it can be used for consistency checking
 def load_sv(fname, format=None):
   if format is None: return np.genfromtxt(fname)
-
-  floatingReString=r'([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)'
-  complexReString =r'\(\s*'+floatingReString+'\s*,\s*'+floatingReString+'\s*\)'
-
-  return np.fromregex(fname,format.replace(r'+',r'\s*').replace('f',floatingReString).replace('c',complexReString),float)
+  res=np.loadtxt([line.replace(",","\t").replace("(","\t").replace(")","\t") for line in open(fname).readlines()],dtype=float)
+  if not res.shape[1]==format.count("f")+2*format.count("c") : raise SyntaxError("format string inconsistent with contents of file")
+  return res
 
 ## @}
 

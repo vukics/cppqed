@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Collecting the macros and for compilation configuration to one place for documentation with doxygen + documents directories. This file is never included in the framework.}
 
 /// \dir utils \brief General purpose utilities, which can be considered a small but rather diverse library in themselves

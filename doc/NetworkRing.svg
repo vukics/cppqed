@@ -2,22 +2,22 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="1349.2815"
    height="919.47723"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    sodipodi:docname="NetworkRing.svg"
    inkscape:export-filename="NetworkRing.png"
    inkscape:export-xdpi="50.017551"
-   inkscape:export-ydpi="50.017551">
+   inkscape:export-ydpi="50.017551"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -26,15 +26,15 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="0.62333144"
-     inkscape:cx="897.24045"
-     inkscape:cy="400.37211"
+     inkscape:cx="897.59631"
+     inkscape:cy="395.45575"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1749"
-     inkscape:window-height="1060"
-     inkscape:window-x="134"
-     inkscape:window-y="-3"
+     inkscape:window-width="1864"
+     inkscape:window-height="1051"
+     inkscape:window-x="56"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      showborder="false"
      inkscape:showpageshadow="false"
@@ -42,16 +42,19 @@
      fit-margin-top="20"
      fit-margin-left="20"
      fit-margin-right="20"
-     fit-margin-bottom="20">
+     fit-margin-bottom="20"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
-       originy="591.20753px"
-       originx="379.57398px"
+       originy="591.20753"
+       originx="379.57398"
        snapvisiblegridlinesonly="true"
        enabled="true"
        visible="true"
        empspacing="5"
        id="grid2985"
-       type="xygrid" />
+       type="xygrid"
+       spacingx="1"
+       spacingy="1" />
   </sodipodi:namedview>
   <defs
      id="defs4">
@@ -128,7 +131,11 @@
     <filter
        color-interpolation-filters="sRGB"
        id="filter3765"
-       inkscape:collect="always">
+       inkscape:collect="always"
+       x="-0.014619931"
+       y="-0.036549828"
+       width="1.0292399"
+       height="1.0730997">
       <feGaussianBlur
          id="feGaussianBlur3767"
          stdDeviation="1.05"
@@ -291,7 +298,11 @@
     <filter
        id="filter4103"
        inkscape:collect="always"
-       color-interpolation-filters="sRGB">
+       color-interpolation-filters="sRGB"
+       x="-0.008776832"
+       y="-0.02194208"
+       width="1.0175537"
+       height="1.0438842">
       <feGaussianBlur
          id="feGaussianBlur4105"
          stdDeviation="0.50475807"
@@ -300,7 +311,11 @@
     <filter
        id="filter4103-4"
        inkscape:collect="always"
-       color-interpolation-filters="sRGB">
+       color-interpolation-filters="sRGB"
+       x="-0.0033650537"
+       y="-inf"
+       width="1.0067301"
+       height="inf">
       <feGaussianBlur
          id="feGaussianBlur4105-2"
          stdDeviation="0.50475807"
@@ -309,7 +324,11 @@
     <filter
        id="filter4174"
        inkscape:collect="always"
-       color-interpolation-filters="sRGB">
+       color-interpolation-filters="sRGB"
+       x="-0.0029999999"
+       y="-inf"
+       width="1.006"
+       height="inf">
       <feGaussianBlur
          id="feGaussianBlur4176"
          stdDeviation="0.45"
@@ -436,7 +455,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -453,16 +472,16 @@
      inkscape:label="Layer 1"
      style="display:inline">
     <text
-       sodipodi:linespacing="100%"
        id="text2989"
        y="125.21932"
        x="331.07144"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Brioso Pro;-inkscape-font-specification:Brioso Pro"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Brioso Pro';-inkscape-font-specification:'Brioso Pro';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="125.21932"
-         x="331.07144"
+         x="334.79742"
          id="tspan2991"
-         sodipodi:role="line" /></text>
+         sodipodi:role="line"
+         style="font-size:36px;line-height:1"> </tspan></text>
     <rect
        style="opacity:0.9;fill:#f4d7d7;fill-opacity:1;stroke:#782121;stroke-width:3.73195887;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3765)"
        id="rect3869"
@@ -475,26 +494,26 @@
        transform="matrix(0.83941726,0,0,1.1085452,-653.11438,1037.697)" />
     <text
        xml:space="preserve"
-       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#280b0b;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#280b0b;fill-opacity:1;stroke:none"
        x="220"
        y="1536.3622"
-       id="text3871"
-       sodipodi:linespacing="100%"><tspan
+       id="text3871"><tspan
          id="tspan3200"
          sodipodi:role="line"
          x="220"
-         y="1536.3622">Free Nr. 0</tspan></text>
+         y="1536.3622"
+         style="font-size:48px;line-height:1">Free Nr. 0</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4665"
        y="1602.3622"
        x="220"
-       style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#280b0b;fill-opacity:1;stroke:none;font-family:Silentium Pro;-inkscape-font-specification:Silentium Pro"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Silentium Pro';-inkscape-font-specification:'Silentium Pro';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#280b0b;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="1602.3622"
          x="220"
          id="tspan3166"
-         sodipodi:role="line">Particle</tspan></text>
+         sodipodi:role="line"
+         style="font-size:56px;line-height:1">Particle</tspan></text>
     <rect
        transform="matrix(0.83941726,0,0,1.1085452,-353.11438,1037.697)"
        ry="18.041666"
@@ -506,27 +525,27 @@
        id="rect3168"
        style="opacity:0.9;fill:#aaffaa;fill-opacity:1;stroke:#005500;stroke-width:3.73195887;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3765)" />
     <text
-       sodipodi:linespacing="100%"
        id="text3170"
        y="1536.3622"
        x="520"
-       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#002b00;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#002b00;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          id="tspan3202"
          sodipodi:role="line"
          x="520"
-         y="1536.3622">Free Nr. 1</tspan></text>
+         y="1536.3622"
+         style="font-size:48px;line-height:1">Free Nr. 1</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#002b00;fill-opacity:1;stroke:none;font-family:Silentium Pro;-inkscape-font-specification:Silentium Pro"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Silentium Pro';-inkscape-font-specification:'Silentium Pro';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#002b00;fill-opacity:1;stroke:none"
        x="520"
        y="1598.3622"
-       id="text3174"
-       sodipodi:linespacing="100%"><tspan
+       id="text3174"><tspan
          y="1598.3622"
          x="520"
          id="tspan3194"
-         sodipodi:role="line">LossyMode</tspan></text>
+         sodipodi:role="line"
+         style="font-size:48px;line-height:1">LossyMode</tspan></text>
     <rect
        style="opacity:0.9;fill:#d5e5ff;fill-opacity:1;stroke:#002255;stroke-width:3.73195887;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter3765)"
        id="rect3178"
@@ -539,26 +558,26 @@
        transform="matrix(0.83941726,0,0,1.1085452,-53.11438,1037.697)" />
     <text
        xml:space="preserve"
-       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#00112b;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#00112b;fill-opacity:1;stroke:none"
        x="820"
        y="1536.3622"
-       id="text3180"
-       sodipodi:linespacing="100%"><tspan
+       id="text3180"><tspan
          id="tspan3204"
          sodipodi:role="line"
          x="820"
-         y="1536.3622">Free Nr. 2</tspan></text>
+         y="1536.3622"
+         style="font-size:48px;line-height:1">Free Nr. 2</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text3184"
        y="1592.3622"
        x="820"
-       style="font-size:32px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#00112b;fill-opacity:1;stroke:none;font-family:Silentium Pro;-inkscape-font-specification:Silentium Pro"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Silentium Pro';-inkscape-font-specification:'Silentium Pro';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#00112b;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="1592.3622"
          x="820"
          id="tspan3198"
-         sodipodi:role="line">PumpedLossyMode</tspan></text>
+         sodipodi:role="line"
+         style="font-size:32px;line-height:1">PumpedLossyMode</tspan></text>
     <rect
        style="opacity:0.5;fill:#edfeff;fill-opacity:1;stroke:#1c2224;stroke-width:1.99151731;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter4103)"
        id="rect4970"
@@ -581,81 +600,81 @@
        style="opacity:0.5;fill:#dbe2e3;fill-opacity:1;stroke:#1c2224;stroke-width:2.45926499;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter4103)" />
     <text
        xml:space="preserve"
-       style="font-size:48px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Silentium Pro;-inkscape-font-specification:Silentium Pro"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Silentium Pro';-inkscape-font-specification:'Silentium Pro';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        x="56"
        y="1252.3622"
-       id="text3221"
-       sodipodi:linespacing="100%"><tspan
+       id="text3221"><tspan
          y="1252.3622"
          x="56"
          id="tspan3225"
-         sodipodi:role="line">ParticleTwoModes</tspan></text>
+         sodipodi:role="line"
+         style="font-size:48px;line-height:1">ParticleTwoModes</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4107"
        y="1306.3622"
        x="10"
-       style="font-size:38px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="1306.3622"
-         x="10"
+         x="9.9999962"
          id="tspan4111"
-         sodipodi:role="line">ModeBase</tspan></text>
+         sodipodi:role="line"
+         style="font-size:38px;line-height:1">ModeBase</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:38px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        x="10"
        y="1360.3622"
-       id="text4113"
-       sodipodi:linespacing="100%"><tspan
+       id="text4113"><tspan
          y="1360.3622"
-         x="10"
+         x="9.9999962"
          sodipodi:role="line"
-         id="tspan4115">ModeBase</tspan></text>
+         id="tspan4115"
+         style="font-size:38px;line-height:1">ModeBase</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4117"
        y="1412.3622"
        x="10"
-       style="font-size:38px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="1412.3622"
-         x="10"
+         x="9.9999924"
          id="tspan4121"
-         sodipodi:role="line">ParticleBase</tspan></text>
+         sodipodi:role="line"
+         style="font-size:38px;line-height:1">ParticleBase</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none"
        x="44"
        y="1306.3622"
-       id="text4127"
-       sodipodi:linespacing="100%"><tspan
+       id="text4127"><tspan
          y="1306.3622"
          x="44"
          id="tspan4131"
-         sodipodi:role="line">0</tspan></text>
+         sodipodi:role="line"
+         style="font-size:40px;line-height:1">0</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4133"
        y="1360.3622"
        x="44"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="1360.3622"
          x="44"
          id="tspan4143"
-         sodipodi:role="line">1</tspan></text>
+         sodipodi:role="line"
+         style="font-size:40px;line-height:1">1</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none"
        x="44"
        y="1412.3622"
-       id="text4137"
-       sodipodi:linespacing="100%"><tspan
+       id="text4137"><tspan
          y="1412.3622"
          x="44"
          id="tspan4141"
-         sodipodi:role="line">2</tspan></text>
+         sodipodi:role="line"
+         style="font-size:40px;line-height:1">2</tspan></text>
     <path
        inkscape:connector-curvature="0"
        id="path4145"
@@ -682,60 +701,60 @@
        ry="14.893296"
        transform="matrix(1.1938026,0,0,1.3428861,-1351.7509,478.51976)" />
     <text
-       sodipodi:linespacing="100%"
        id="text4180"
        y="1062.3622"
        x="56"
-       style="font-size:44px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Silentium Pro;-inkscape-font-specification:Silentium Pro"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Silentium Pro';-inkscape-font-specification:'Silentium Pro';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          id="tspan4216"
          sodipodi:role="line"
-         x="56"
-         y="1062.3622">ParticleAlongCavity</tspan></text>
+         x="55.999985"
+         y="1062.3622"
+         style="font-size:44px;line-height:1">ParticleAlongCavity</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:38px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        x="10"
        y="1116.3622"
-       id="text4184"
-       sodipodi:linespacing="100%"><tspan
+       id="text4184"><tspan
          sodipodi:role="line"
          id="tspan4186"
-         x="10"
-         y="1116.3622">ModeBase</tspan></text>
+         x="9.9999962"
+         y="1116.3622"
+         style="font-size:38px;line-height:1">ModeBase</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:38px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        x="10"
        y="1170.3622"
-       id="text4192"
-       sodipodi:linespacing="100%"><tspan
+       id="text4192"><tspan
          sodipodi:role="line"
          id="tspan4194"
-         x="10"
-         y="1170.3622">ParticleBase</tspan></text>
+         x="9.9999924"
+         y="1170.3622"
+         style="font-size:38px;line-height:1">ParticleBase</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4196"
        y="1116.3622"
        x="44"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          sodipodi:role="line"
          id="tspan4198"
          x="44"
-         y="1116.3622">0</tspan></text>
+         y="1116.3622"
+         style="font-size:40px;line-height:1">0</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none"
        x="44"
        y="1170.3622"
-       id="text4200"
-       sodipodi:linespacing="100%"><tspan
+       id="text4200"><tspan
          sodipodi:role="line"
          id="tspan4202"
          x="44"
-         y="1170.3622">1</tspan></text>
+         y="1170.3622"
+         style="font-size:40px;line-height:1">1</tspan></text>
     <path
        style="opacity:0.5;color:#000000;fill:#dbe2e3;fill-opacity:1;fill-rule:nonzero;stroke:#1c2224;stroke-width:3.5999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;filter:url(#filter4103-4);enable-background:accumulate"
        d="m -290,1072.3621 360,0"
@@ -758,59 +777,59 @@
        style="opacity:0.5;fill:#dbe2e3;fill-opacity:1;stroke:#1c2224;stroke-width:2.84326053;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter4103)" />
     <text
        xml:space="preserve"
-       style="font-size:44px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Silentium Pro;-inkscape-font-specification:Silentium Pro"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Silentium Pro';-inkscape-font-specification:'Silentium Pro';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        x="56"
        y="872.36218"
-       id="text4220"
-       sodipodi:linespacing="100%"><tspan
+       id="text4220"><tspan
          y="872.36218"
-         x="56"
+         x="55.999985"
          sodipodi:role="line"
-         id="tspan4222">ParticleAlongCavity</tspan></text>
+         id="tspan4222"
+         style="font-size:44px;line-height:1">ParticleAlongCavity</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4224"
        y="926.36218"
        x="10"
-       style="font-size:38px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="926.36218"
-         x="10"
+         x="9.9999962"
          id="tspan4226"
-         sodipodi:role="line">ModeBase</tspan></text>
+         sodipodi:role="line"
+         style="font-size:38px;line-height:1">ModeBase</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4228"
        y="980.36218"
        x="10"
-       style="font-size:38px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:end;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:end;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="980.36218"
-         x="10"
+         x="9.9999924"
          id="tspan4230"
-         sodipodi:role="line">ParticleBase</tspan></text>
+         sodipodi:role="line"
+         style="font-size:38px;line-height:1">ParticleBase</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none"
        x="44"
        y="926.36218"
-       id="text4232"
-       sodipodi:linespacing="100%"><tspan
+       id="text4232"><tspan
          y="926.36218"
          x="44"
          id="tspan4234"
-         sodipodi:role="line">0</tspan></text>
+         sodipodi:role="line"
+         style="font-size:40px;line-height:1">0</tspan></text>
     <text
-       sodipodi:linespacing="100%"
        id="text4236"
        y="980.36218"
        x="44"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none;font-family:Carolina LT Std;-inkscape-font-specification:Carolina LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Carolina LT Std';-inkscape-font-specification:'Carolina LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#1c2224;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="980.36218"
          x="44"
          id="tspan4238"
-         sodipodi:role="line">1</tspan></text>
+         sodipodi:role="line"
+         style="font-size:40px;line-height:1">1</tspan></text>
     <path
        inkscape:connector-curvature="0"
        id="path4240"
@@ -864,14 +883,14 @@
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
-       style="font-size:46px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:100%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#93a7ac;fill-opacity:1;stroke:none;font-family:Clairvaux LT Std;-inkscape-font-specification:Clairvaux LT Std"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:'Clairvaux LT Std';-inkscape-font-specification:'Clairvaux LT Std';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#93a7ac;fill-opacity:1;stroke:none"
        x="-127.97812"
        y="802.62604"
-       id="text4972"
-       sodipodi:linespacing="100%"><tspan
+       id="text4972"><tspan
          sodipodi:role="line"
          id="tspan4974"
-         x="-127.97812"
-         y="802.62604">Composite constructor</tspan></text>
+         x="-127.97811"
+         y="802.62604"
+         style="font-size:46px;line-height:1">Composite constructor</tspan></text>
   </g>
 </svg>

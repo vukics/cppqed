@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Simulated.h"
 
 #include "DrivenDampedHarmonicOscillator.h"
@@ -51,6 +51,8 @@ int main(int, char**)
 
   }
 
-  return !(ampDev/nSamples<3e-4 && ampDerivDev/nSamples<4e-4);
+  std::cerr<<(ampDev/=nSamples)<<" "<<(ampDerivDev/=nSamples)<<std::endl;
+  
+  return !(ampDev<3e-4 && ampDerivDev<4e-4);
   
 }

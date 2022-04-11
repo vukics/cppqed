@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
 #ifndef CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
 #define CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
@@ -78,7 +78,7 @@ public:
 
   DensityOperator& operator=(DensityOperator&& rho)
   {
-    ABase::operator=(std::move(rho));
+    ABase::operator=(rho.getArray());
     LDO_Base::setDimensions(rho.getDimensions());
     return *this;
   }
@@ -236,7 +236,7 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
 
 /// Creates a DensityOperator as the (deep) copy of the data of a LazyDensityOperator of the same arity
 template<int RANK>
-const DensityOperator<RANK>
+DensityOperator<RANK>
 densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 {
   DensityOperator<RANK> res(matrix.getDimension());
@@ -257,13 +257,33 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 }
 
 
-template<int... SUBSYSTEM, int RANK>
-const DensityOperator<sizeof...(SUBSYSTEM)>
-reduce(const LazyDensityOperator<RANK>& matrix)
+template<typename V, int RANK>
+auto reduce(const LazyDensityOperator<RANK>& matrix)
 {
-  static const int RES_ARITY=sizeof...(SUBSYSTEM);
-  return partialTrace<tmptools::Vector<SUBSYSTEM...>,DensityOperator<RES_ARITY> >(matrix,densityOperatorize<RES_ARITY>);
+  return partialTrace<V>(matrix,densityOperatorize<mpl::size<V>::value>);
 }
+
+
+template<int... SUBSYSTEM, int RANK>
+auto reduce(const LazyDensityOperator<RANK>& matrix)
+{
+  return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
+}
+
+
+template<typename V, int RANK>
+auto reduce(const DensityOperator<RANK>& matrix)
+{
+  return partialTrace<V>(matrix,[](const auto& v) {return v;});
+}
+
+
+template<int... SUBSYSTEM, int RANK>
+auto reduce(const DensityOperator<RANK>& matrix)
+{
+  return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
+}
+
 
 
 template<int RANK>

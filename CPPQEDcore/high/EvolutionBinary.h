@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Besides Evolution.h, BinarySystem gets included as well for scripts simulating binary quantum systems}
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTIONBINARY_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_EVOLUTIONBINARY_H_INCLUDED
@@ -11,7 +11,7 @@
 namespace evolution {
 
 
-template<template <typename StateType> class ODE_Engine, typename RandomEngine, typename SV_OR_DO, typename Parameters>
+template<template <typename StateType> class ODE_Engine, typename RandomEngine, typename SV_OR_DO>
 auto
 _(SV_OR_DO&& initial,
   binary::Ptr sys,
@@ -25,7 +25,7 @@ _(SV_OR_DO&& initial,
 } // evolution
 
 
-template<typename SV_OR_DO, typename Parameters>
+template<typename SV_OR_DO>
 auto
 evolve(SV_OR_DO&& initial,
        binary::Ptr sys,

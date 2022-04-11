@@ -1,4 +1,4 @@
-// Copyright András Vukics 2021. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2021–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
 #ifndef CPPQEDCORE_UTILS_ODE_H_INCLUDED
 #define CPPQEDCORE_UTILS_ODE_H_INCLUDED
@@ -73,7 +73,7 @@ struct ControlledErrorStepperWithParameters
   std::ostream& stream(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << ", epsAbs=" << epsAbs;}
 
   ControlledErrorStepper stepper;
-  const double epsRel, epsAbs;
+  double epsRel, epsAbs;
 };
 
 

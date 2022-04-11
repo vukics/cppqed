@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #ifndef   CPPQEDELEMENTS_UTILS_AVERAGINGUTILS_H_INCLUDED
 #define   CPPQEDELEMENTS_UTILS_AVERAGINGUTILS_H_INCLUDED
 
@@ -6,7 +6,7 @@
 
 #include "DensityOperator.h"
 #include "LazyDensityOperator.h"
-#include "NegPT.tcc"
+#include "EntanglementMeasures.h"
 
 #include "DimensionsBookkeeper.h"
 
@@ -126,13 +126,7 @@ private:
       for (int i=0; i<dim; ++i) for (int j=i+1; j<dim; ++j, idx+=2) matrix(j,i)=conj(matrix(i,j)=dcomp(averages(idx),averages(idx+1)));
     }
     
-    averages(averages.size()-1)=
-    #ifndef   DO_NOT_USE_FLENS
-    quantumdata::negPT(rho,V())
-    #else  // DO_NOT_USE_FLENS
-    0
-    #endif // DO_NOT_USE_FLENS
-    ;
+    averages(averages.size()-1)=quantumdata::negPT(rho,V());
     
   }
 

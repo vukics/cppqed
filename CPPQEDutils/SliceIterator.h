@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Definition of cppqedutils::SliceIterator together with its helpers}
 #ifndef CPPQEDCORE_UTILS_SLICEITERATOR_H_INCLUDED
 #define CPPQEDCORE_UTILS_SLICEITERATOR_H_INCLUDED
@@ -97,7 +97,7 @@ auto filterOut(const IdxTiny<RANK>& v)
 
   auto helper=[&](auto i){res(curr++)=v(decltype(i)::value);};
   
-  mpl::for_each<mpl::filter_view<tmptools::Ordinals<RANK>,mpl::not_<tmptools::numerical_contains<V,mpl::_> > > >(helper);
+  mpl::for_each<tmptools::NegatedView<RANK,V> >(helper);
   
   return res;
 

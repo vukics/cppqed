@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2020. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Spin.h"
 
 #include "MathExtensions.h"
@@ -28,7 +28,7 @@ typedef Tridiagonal::Diagonal Diagonal;
 
 size_t decideDimension(size_t twoS, size_t dim)
 {
-  return dim && dim<twoS+1 ? dim : twoS+1;
+  return (dim && dim<twoS+1) ? dim : twoS+1;
 }
 
 
