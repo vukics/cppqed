@@ -35,11 +35,11 @@ using ConditionalAddConst_t = std::conditional_t<ADD_CONST,std::add_const_t<T>,T
 
 
 /// Calculates the power \f$N_1^{N_2}\f$ @ compile time
-template<unsigned N1, unsigned N2>
-constexpr int Power_v=N1*Power_v<N1,N2-1>;
+template<size_t N1, size_t N2>
+constexpr size_t Power_v=N1*Power_v<N1,N2-1>;
 
-template<unsigned N1>
-constexpr int Power_v<N1,0> =1;
+template<size_t N1>
+constexpr size_t Power_v<N1,0> =1;
 
 
 template<bool COND, auto TRUE_VALUE, auto FALSE_VALUE>
@@ -90,33 +90,33 @@ struct pair_c<N1,N2,true> : pair_c<N1,N2,false>
 };
 
 
-template<int... i>
-constexpr auto vector = hana::tuple_c<int,i...>;
+template<size_t... i>
+constexpr auto vector = hana::tuple_c<size_t,i...>;
 
 
 constexpr auto vEmpty = vector<>;
 
 
-template<int... i>
+template<size_t... i>
 using Vector = decltype(vector<i...>);
 
 
 using V_Empty = Vector<>;
 
 
-template<int begin, int end>
-constexpr auto range = hana::range_c<int,begin,end>;
+template<size_t begin, size_t end>
+constexpr auto range = hana::range_c<size_t,begin,end>;
 
 
-template<int begin, int end>
+template<size_t begin, size_t end>
 using Range = decltype(range<begin,end>);
 
 
-template<int end>
+template<size_t end>
 constexpr auto ordinals = range<0,end>;
 
 
-template<int end>
+template<size_t end>
 using Ordinals = decltype(ordinals<end>);
 
 
