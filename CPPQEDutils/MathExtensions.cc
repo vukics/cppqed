@@ -12,6 +12,7 @@
   
 const double cppqedutils::PI(M_PI);
 const double cppqedutils::SQRTPI(M_SQRTPI);
+const double cppqedutils::SQRT2(M_SQRT2);
 const double cppqedutils::EULER(M_E);
 
 int cppqedutils::sign(double x) {return GSL_SIGN(x);}

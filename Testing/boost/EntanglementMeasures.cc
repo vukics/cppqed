@@ -6,8 +6,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <numbers>
-
+using cppqedutils::SQRT2;
 
 template <int i>
 constexpr auto tmpVec = tmptools::Vector<i>{};
@@ -24,21 +23,17 @@ using namespace qbit;
 // example from https://en.wikipedia.org/wiki/Peres%E2%80%93Horodecki_criterion#Example
 DO2 wernerState(double p)
 {
-  return p*DO2{(state0()*state1()-state1()*state0())/std::numbers::sqrt2} 
+  return p*DO2{(state0()*state1()-state1()*state0())/SQRT2} 
     + (0.25*(1-p))*(DO2{state0()*state0()}+DO2{state0()*state1()}+DO2{state1()*state0()}+DO2{state1()*state1()});
 }
 
 
-const DO2 rhoBell{(state0()*state1()+state1()*state0())/std::numbers::sqrt2};
+const DO2 rhoBell{(state0()*state1()+state1()*state0())/SQRT2};
 
 
 BOOST_AUTO_TEST_CASE( NEGATIVITY_OF_PARTIAL_TRANSPOSE , * boost::unit_test::tolerance(1e-14) )
 {
   {
-    std::cerr<<rhoBell.getArray()<<std::endl<<Eigen::ComplexEigenSolver<Eigen::MatrixX<dcomp>>{
-      Eigen::Map<Eigen::MatrixX<dcomp>>{const_cast<dcomp*>(rhoBell.getArray().data()),long(rhoBell.getTotalDimension()),long(rhoBell.getTotalDimension())},false
-    }.eigenvalues()<<std::endl;
-      
     auto neg=negPT(rhoBell, tmpVec<0>);
     
     std::cerr<<neg<<std::endl;
@@ -53,9 +48,6 @@ BOOST_AUTO_TEST_CASE( NEGATIVITY_OF_PARTIAL_TRANSPOSE , * boost::unit_test::tole
   {
     DO2 rho{(state0()+state1())*(state0()+state1())/2.};
     
-    std::cerr<<rho.getArray()<<std::endl<<Eigen::ComplexEigenSolver<Eigen::MatrixX<dcomp>>{
-      Eigen::Map<Eigen::MatrixX<dcomp>>{rho.getArray().data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},false}.eigenvalues()<<std::endl;
-      
     auto neg=negPT(rho, tmpVec<0>);
     
     std::cerr<<neg<<std::endl;

@@ -397,7 +397,7 @@ makePumpedLossySch(const RealPerLevel<NL>& deltas,
                    AveragingConstructorParameters&&... a)
 {
   if constexpr (std::is_same_v<std::decay_t<GPT>,RealPerLevel<NL>>) {
-    if (blitz::any(gamma_parallel!=0))
+    if (blitz::any(gamma_parallel!=RealPerLevel<NL>(0.)))
       return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
                                                                                        typename LiouvilleanDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
                                                                                                                                              gamma_parallel.end()},
@@ -415,7 +415,7 @@ template<typename AveragingType, int NL, typename VP, typename VL, typename... A
 auto
 makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
 {
-  if (blitz::any(p.gamma_parallel_vector!=0)) return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel_vector,a...);
+  if (blitz::any(p.gamma_parallel_vector!=RealPerLevel<NL>(0.))) return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel_vector,a...);
   return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel,a...);
 }
 

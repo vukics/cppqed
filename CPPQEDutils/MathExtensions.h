@@ -15,6 +15,7 @@ namespace cppqedutils {
  
 extern const double PI    ;
 extern const double SQRTPI;
+extern const double SQRT2;
 extern const double EULER ;
   
 int sign(double);

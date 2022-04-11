@@ -5,14 +5,13 @@
 
 #include "DensityOperator.h"
 
-#include <Eigen/Dense>
-#include <Eigen/Eigenvalues> 
+#include <Eigen/Eigen> 
 
 
 namespace quantumdata {
 
 
-using EigenCMatrix=Eigen::MatrixX<dcomp>;
+using EigenCMatrix=Eigen::Matrix<dcomp,Eigen::Dynamic,Eigen::Dynamic>;
 
   
 /// Calculates the negativity of the partial transpose of the density operator of an arbitrarily complex system
@@ -70,8 +69,12 @@ double negPT(const DensityOperator<RANK>& rho, V)
   auto ev=Eigen::ComplexEigenSolver<EigenCMatrix>{
     Eigen::Map<EigenCMatrix>{rhoDeepPT.data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},
     false}.eigenvalues();
+
+  double norm=0.;
+
+  for (::size_t i=0; i<ev.size(); ++i) norm += std::abs(ev[i]) ;
   
-  return (std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, dcomp e) {return v + std::abs(e) ;}) - 1.)/2. ;
+  return (norm - 1.)/2. ;
   
 }
 
@@ -88,8 +91,12 @@ double entropy(const DensityOperator<RANK>& rho)
 {
   auto ev=Eigen::SelfAdjointEigenSolver<EigenCMatrix>{
     Eigen::Map<EigenCMatrix>{const_cast<dcomp*>(rho.getArray().data()),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
-    
-  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e * ( e>0. ? std::log(e) : 0. ) ;});
+
+  double ret=0.;
+
+  for (::size_t i=0; i<ev.size(); ++i) ret -= ev[i] * ( ev[i]>0. ? std::log(ev[i]) : 0. ) ;
+  
+  return ret;
 }
 
 
