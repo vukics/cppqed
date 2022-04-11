@@ -3,6 +3,8 @@
 
 #include "TMP_Tools.h"
 
+#include <boost/range/combine.hpp>
+
 #include <array>
 #include <concepts>
 #include <functional>
@@ -20,40 +22,11 @@ template <size_t RANK>
 using Extents=std::array<size_t,RANK>;
 
 
-namespace multiarray {
-
-/// Checking the consistency of template arguments for use in slicing
-/**
- * - size of `RetainedAxes` must not be larger than `RANK`
- * - `RetainedAxes` must not contain duplicated elements
- * - all elements of `RetainedAxes` must be smaller than `RANK`
- * 
- * \see \ref specifyingsubsystems
- * 
- */
-template <int RANK, typename RetainedAxes>
-constexpr bool consistent(RetainedAxes ra) // if the optional argument is not given, RetainedAxes needs to be default-constructible 
-{
-  using namespace hana; using namespace literals;
-
-  constexpr bool res = maximum(ra) < int_c<RANK> && minimum(ra) >= 0_c;
-  
-  if constexpr ( Sequence<RetainedAxes>::value ) {
-    constexpr auto sorted = sort(ra);
-    res &= (unique(sorted) == sorted);    
-  }
-  
-  return res;
-}
-
-} // multiarray
-
-
 template <typename T, size_t RANK>
 class MultiArrayView
 {
 public:
-  MultiArrayView(const MultiArrayView&) = default; MultiArrayView(MultiArrayView&&) = default;
+  MultiArrayView(const MultiArrayView&) = default; MultiArrayView(MultiArrayView&&) = default; MultiArrayView() = default;
   
   MultiArrayView& operator=(const MultiArrayView&) = default; MultiArrayView& operator=(MultiArrayView&&) = default;
   
@@ -87,13 +60,13 @@ public:
   T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {return dataView_[offset_+strides_[0]*i+strides_[1]*j];}
 
   
-  template <typename RetainedAxes>
-  auto slicesRange(RetainedAxes ra, std::vector<size_t>&& offsets) const requires (multiarray::consistent<RANK>(ra))
-  {
-    std::vector<MultiArrayView<T,hana::size(ra)>> res;
-  }
+  const Extents<RANK>& extents() const {return extents_;}
+  const Extents<RANK>& strides() const {return strides_;}
   
- 
+  size_t offset() const {return offset_;}
+  
+  std::span<T> dataView() const {return dataView_;}
+  
 private:
   Extents<RANK> extents_, strides_;
 
@@ -147,22 +120,123 @@ private:
 
 namespace multiarray {
 
+  
+/// Checking the consistency of template arguments for use in slicing
+/**
+ * - size of `RetainedAxes` must not be larger than `RANK`
+ * - `RetainedAxes` must not contain duplicated elements
+ * - all elements of `RetainedAxes` must be smaller than `RANK`
+ * 
+ * \see \ref specifyingsubsystems
+ * 
+ */
+template <size_t RANK, typename RetainedAxes>
+constexpr bool consistent(RetainedAxes ra) // if the optional argument is not given, RetainedAxes needs to be default-constructible 
+{
+  using namespace hana;
+  if constexpr ( Sequence<RetainedAxes>::value ) {
+    constexpr auto sorted = sort(ra);
+    return (unique(sorted) == sorted);    
+  }
+  else return true;
+}
+
+
+template <size_t RANK, typename RetainedAxes>
+auto filterIn(const Extents<RANK>& extents, RetainedAxes ra)
+{
+  Extents<hana::size(ra)> res;
+  hana::fold(ra,res.begin(),
+             [&] (auto iterator, auto ind) {*iterator=extents[ind]; return ++iterator;});
+  return res;
+}
+
+  
+/// Filters out the indices corresponding to a subsystem
+/**
+ * \tparamRANK
+ * \tparam RetainedAxes compile-time vector specifying the subsystem (cf. \ref specifyingsubsystems)
+ * 
+ * \param idx the indices to be filtered (of size `RANK`)
+ * 
+ * \return the indices *not* contained by the subsystem specified by `RetainedAxes`
+ * 
+ * ** Example **
+ *     
+ *     #include "SliceIterator.h"
+ * 
+ *     
+ *     int main() {
+ *       const IdxTiny<11> idx{21,2,4,10,11,3,5,9,23,22,7};
+ *       const auto filteredIdx{filterOut(idx,tmptools::vector_c<3,6,1,9,7>)};
+ *       assert( all( filteredIdx==IdxTiny<6>{21,4,11,3,23,7} ) );
+ *     }
+ * 
+ */
+template<size_t RANK, typename RetainedAxes>
+auto filterOut(const Extents<RANK>& idx, RetainedAxes ra)
+{
+  using namespace hana;
+  
+  ::size_t origIndex=0, resIndex=0;
+  
+  static constexpr auto sorted = [&]() {
+    if constexpr ( Sequence<RetainedAxes>::value ) return sort(ra);  
+    else return ra;
+  }();
+  
+  Extents<RANK-hana::size(ra)> res;
+
+  for_each(sorted,[&](auto i) {
+    for (; origIndex<i; (++origIndex,++resIndex)) res[resIndex]=idx[origIndex];
+    ++origIndex; // skip value found in sorted
+  });
+  // the final segment:
+  for (; origIndex<idx.size(); (++origIndex,++resIndex)) res[resIndex]=idx[origIndex];
+  
+  return res;
+
+}
+
+
 template <size_t RANK, typename RetainedAxes>
 auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, RetainedAxes ra)
 {
   std::vector<size_t> res;
+  Extents<RANK-hana::size(ra)> dummyExtents{filterOut(extents,ra)}, dummyStrides{filterOut(strides,ra)};
+  
+  
   return res;
 }
 
 
+} // multiarray
+
+
+
+/// To be used by Composites
 template <size_t RANK, typename RetainedAxes>
 auto calculateSlicesOffsets(Extents<RANK> extents, RetainedAxes ra)
 {
-  return calculateSlicesOffsets(extents,calculateStrides(extents),ra);
+  return multiarray::calculateSlicesOffsets(extents,calculateStrides(extents),ra);
 }
 
 
-} // multiarray
+/// SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
+template <typename T, size_t RANK, typename RetainedAxes>
+auto slicesRange(const MultiArrayView<T,RANK>& mav, RetainedAxes ra, std::vector<size_t>&& offsets)
+requires ( RANK>1 && (hana::maximum(ra) < hana::integral_c<::size_t,RANK>).value && multiarray::consistent<RANK>(ra) )
+{
+  using SliceType=MultiArrayView<T,hana::size(ra)>;
+  
+  std::vector<SliceType> res(offsets.size());
+  
+  for (auto&& [slice,sliceOffset] : boost::combine(res,offsets) )
+    slice=SliceType{multiarray::filterIn(mav.extents(),ra),multiarray::filterIn(mav.strides(),ra),mav.offset()+sliceOffset,mav.dataView()};
+  
+  return res;
+}
+  
 
 
 } // cppqedutils

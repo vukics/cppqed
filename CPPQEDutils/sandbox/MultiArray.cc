@@ -3,6 +3,8 @@
 #include <iostream>
 #include <tuple>
 
+using namespace cppqedutils;
+
 int main()
 {
   std::vector<double> vec(1000);
@@ -11,7 +13,7 @@ int main()
   
   std::cerr<<vec.size()<<" "<<span.size()<<std::endl;
   
-  cppqedutils::MultiArray<double,5> ma{{10,11,13,9,8}};
+  MultiArray<double,5> ma{{10,11,13,9,8}};
   
   double& v1=ma(1,5,6,3,4) ;
   
@@ -29,5 +31,7 @@ int main()
   
   // double& v5=ma(1,5,6,3) ;
   // double& v6=ma(1,5,6,3,4,2) ;
+  
+  auto sr=slicesRange(ma,tmptools::vector<2,4,0>,multiarray::calculateSlicesOffsets(ma.extents(),ma.strides(),tmptools::vector<2,4,0>));
   
 }
