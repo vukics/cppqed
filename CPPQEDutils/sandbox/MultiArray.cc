@@ -19,7 +19,7 @@ int main()
   
   std::cout<<v1<<std::endl;
   
-  std::cout<<ma(10,5,6,3,4)<<std::endl;
+  // std::cout<<ma(10,5,6,3,4)<<std::endl;
   // double& v2=ma(1,5,6,std::tuple<int>{3},4) ;
 
   // cppqedutils::MultiArray<const double,5> mac; // "std::vector must have a non-const, non-volatile value_type"
@@ -32,6 +32,10 @@ int main()
   // double& v5=ma(1,5,6,3) ;
   // double& v6=ma(1,5,6,3,4,2) ;
   
-  auto sr=slicesRange(ma,tmptools::vector<2,4,0>,multiarray::calculateSlicesOffsets(ma.extents(),ma.strides(),tmptools::vector<2,4,0>));
+  auto offsets(multiarray::calculateSlicesOffsets(ma.extents(),ma.strides(),tmptools::vector<2,4,0>));
+  
+  for (auto o : offsets) std::cerr<<o<<" "<<std::endl;
+  
+  auto sr=slicesRange(ma,tmptools::vector<2,4,0>,std::move(offsets));
   
 }

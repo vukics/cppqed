@@ -1,6 +1,7 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
+#include "Algorithm.h"
 #include "TMP_Tools.h"
 
 #include <boost/range/combine.hpp>
@@ -8,10 +9,8 @@
 #include <array>
 #include <concepts>
 #include <functional>
-#include <numeric>
 #include <span>
 #include <stdexcept>
-#include <tuple>
 #include <vector>
 
 
@@ -88,6 +87,12 @@ auto calculateStrides(const Extents<RANK>& extents)
   return strides;
 }
 
+template <size_t RANK>
+auto calculateExtent(const Extents<RANK>& extents)
+{
+  return cppqedutils::ranges::fold(extents,1ul,std::multiplies{});
+}
+
 } // multiarray
 
 
@@ -104,8 +109,7 @@ public:
   
   template<typename INITIALIZER=std::function<void(StorageType&)>>
   MultiArray(const Extents<RANK>& extents, INITIALIZER&& initializer=[](StorageType&) {})
-  : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0},
-  data_(std::accumulate(extents.begin(),extents.end(),1ul,std::multiplies{}))
+  : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_(multiarray::calculateExtent(extents))
   {
     this->dataView_=std::span<T>(data_);
     initializer(data_); // initialize vector
@@ -159,18 +163,7 @@ auto filterIn(const Extents<RANK>& extents, RetainedAxes ra)
  * 
  * \param idx the indices to be filtered (of size `RANK`)
  * 
- * \return the indices *not* contained by the subsystem specified by `RetainedAxes`
- * 
- * ** Example **
- *     
- *     #include "SliceIterator.h"
- * 
- *     
- *     int main() {
- *       const IdxTiny<11> idx{21,2,4,10,11,3,5,9,23,22,7};
- *       const auto filteredIdx{filterOut(idx,tmptools::vector_c<3,6,1,9,7>)};
- *       assert( all( filteredIdx==IdxTiny<6>{21,4,11,3,23,7} ) );
- *     }
+ * \return the indices *not* contained by the subsystem specified by `RetainedAxes` (dummy indices)
  * 
  */
 template<size_t RANK, typename RetainedAxes>
@@ -199,12 +192,33 @@ auto filterOut(const Extents<RANK>& idx, RetainedAxes ra)
 }
 
 
+/// This calculates the slices offsets purely from the (dummy) extents and strides
+/**
+ * Any indexing offset that the MultiArrayView might itself have is added at the point of indexing/slicing
+ */
 template <size_t RANK, typename RetainedAxes>
 auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, RetainedAxes ra)
 {
-  std::vector<size_t> res;
-  Extents<RANK-hana::size(ra)> dummyExtents{filterOut(extents,ra)}, dummyStrides{filterOut(strides,ra)};
+  Extents<RANK-hana::size(ra)> dummyExtents{filterOut(extents,ra)}, dummyStrides{filterOut(strides,ra)}, 
+                               idx; idx.fill(0);
   
+  std::vector<size_t> res(calculateExtent(dummyExtents));
+
+  auto increment=[&](auto n, auto inc)
+  {
+    using namespace hana; using namespace literals;
+    if constexpr (n!=0_c) {
+      if (idx[n]==dummyExtents[n]-1) {idx[n]=0; inc(n-1_c,inc);}
+      else idx[n]++;
+    }
+    else idx[0]++; // This will of course eventually put the iterator into an illegal state when idx(0)>ubound(0), but this is how every (unchecked) iterator works.
+  };
+  
+  for (auto i=res.begin(); i!=res.end(); (
+    *i++ = cppqedutils::ranges::fold( boost::combine(idx,dummyStrides), 
+                                      0, 
+                                      [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
+    increment(hana::llong_c<idx.size()-1>,increment)));
   
   return res;
 }
@@ -222,7 +236,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents, RetainedAxes ra)
 }
 
 
-/// SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
+/// TODO: SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
 template <typename T, size_t RANK, typename RetainedAxes>
 auto slicesRange(const MultiArrayView<T,RANK>& mav, RetainedAxes ra, std::vector<size_t>&& offsets)
 requires ( RANK>1 && (hana::maximum(ra) < hana::integral_c<::size_t,RANK>).value && multiarray::consistent<RANK>(ra) )
