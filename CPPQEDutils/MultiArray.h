@@ -37,12 +37,12 @@ public:
   T& operator() (const Extents<RANK>& indices) const
   {
 #ifndef   NDEBUG
-    hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {
-      if ( size_t actualIndex=indices[idx], actualExtent=extents_[idx]; actualIndex >= actualExtent )
-        throw std::range_error("Index position: "+std::to_string(idx)+", index value: "+std::to_string(actualIndex)+", extent: "+std::to_string(actualExtent));
-    });
+    for (size_t i=0; i<RANK; ++i)
+      if ( size_t actualIndex=indices[i], actualExtent=extents_[i]; actualIndex >= actualExtent )
+        throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(actualIndex)+", extent: "+std::to_string(actualExtent));
 #endif // NDEBUG
-    return dataView_[hana::fold(tmptools::ordinals<RANK>,offset_,[&](size_t v,auto idx) {return v+strides_[idx]*indices[idx];})];
+    return dataView_[cppqedutils::ranges::fold(boost::combine(indices,strides_),offset_,
+                                               [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
     
   }
   
