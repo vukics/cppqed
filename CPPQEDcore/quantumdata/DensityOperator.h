@@ -304,6 +304,14 @@ auto subscript(const quantumdata::DensityOperator<RANK>& rho, const SubscriptPac
   return rho.diagonalSliceIndex(subscriptPack...);
 }
 
+
+template<int RANK>
+double purity(const DensityOperator<RANK>& rho)
+{
+  return std::accumulate(rho.getArray().begin(),rho.getArray().end(),0.,[] (double init, dcomp element) { return init+cppqedutils::sqrAbs(element); });
+}
+
+
 } // quantumdata
 
 #endif // CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED

@@ -71,7 +71,7 @@ double negPT(const DensityOperator<RANK>& rho, V)
     Eigen::Map<EigenCMatrix>{rhoDeepPT.data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},
     false}.eigenvalues();
   
-  return (std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, dcomp e) {return v + std::abs(e) ;}) - 1.)/2. ;
+  return (std::accumulate(ev.begin(),ev.end(),0.,[] (double v, dcomp e) {return v + std::abs(e) ;}) - 1.)/2. ;
   
 }
 
@@ -89,7 +89,7 @@ double entropy(const DensityOperator<RANK>& rho)
   auto ev=Eigen::SelfAdjointEigenSolver<EigenCMatrix>{
     Eigen::Map<EigenCMatrix>{const_cast<dcomp*>(rho.getArray().data()),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
     
-  return std::accumulate(ev.begin(),ev.end(),0.,[&] (double v, double e) {return v - e * ( e>0. ? std::log(e) : 0. ) ;});
+  return std::accumulate(ev.begin(),ev.end(),0.,[] (double v, double e) {return v - e * ( e>0. ? std::log(e) : 0. ) ;});
 }
 
 
@@ -100,6 +100,14 @@ double mutualInformation(const DensityOperator<RANK>& rho, V)
     +entropy(::quantumdata::reduce<::tmptools::NegatedVector<RANK,V> >(rho))
     -entropy(rho);
 }
+
+
+template<int RANK, typename V>
+double purityOfPartialTrace(const DensityOperator<RANK>& rho, V)
+{
+  return ::quantumdata::purity(::quantumdata::reduce<V>(rho));
+}
+
 
 
 } // quantumdata 
