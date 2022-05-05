@@ -21,6 +21,8 @@ using quantumdata::negPT; using quantumdata::mutualInformation;
 using namespace qbit;
 
 // example from https://en.wikipedia.org/wiki/Peres%E2%80%93Horodecki_criterion#Example
+// the state is entangled for $1 \geq p > 1/3$
+// NOTE: the parametrization is different from (this page)[https://en.wikipedia.org/wiki/Werner_state]
 DO2 wernerState(double p)
 {
   return p*DO2{(state0()*state1()-state1()*state0())/SQRT2} 
@@ -108,3 +110,26 @@ BOOST_AUTO_TEST_CASE( ENTROPY_AND_MUTUAL_INFORMATION , * boost::unit_test::toler
   */
 }
 
+
+BOOST_AUTO_TEST_CASE( PURITY_OF_PARTIAL_TRACE , * boost::unit_test::tolerance(1e-15) )
+{
+  DO2 rhoSep{wernerState(0.6)}, rhoEnt{wernerState(0.3)}, rhoSepPure{ (state0()+state1())*(state0()+state1())/2. };
+  
+  std::cerr<<rhoSep.norm()<<" "<<rhoEnt.norm()<<std::endl
+  <<purityOfPartialTrace(rhoSep,tmpVec<0>)<<" "<<purityOfPartialTrace(rhoSep,tmpVec<1>)<<std::endl
+  <<purityOfPartialTrace(rhoEnt,tmpVec<0>)<<" "<<purityOfPartialTrace(rhoEnt,tmpVec<1>)<<std::endl
+  <<purityOfPartialTrace(rhoBell,tmpVec<0>)<<" "<<purityOfPartialTrace(rhoBell,tmpVec<1>)<<std::endl
+  <<purityOfPartialTrace(rhoSepPure,tmpVec<0>)<<" "<<purityOfPartialTrace(rhoSepPure,tmpVec<1>)<<std::endl;
+  
+  BOOST_TEST ( ::quantumdata::reduce<0>(rhoEnt).norm() == 1. ) ;
+  
+  BOOST_TEST ( purityOfPartialTrace(rhoSep,tmpVec<0>) == .5 ) ; // For Werner states this is always 0.5, regardless of the value of p!
+  BOOST_TEST ( purityOfPartialTrace(rhoSep,tmpVec<1>) == .5 ) ;
+  BOOST_TEST ( purityOfPartialTrace(rhoEnt,tmpVec<0>) == .5 ) ;
+  BOOST_TEST ( purityOfPartialTrace(rhoEnt,tmpVec<1>) == .5 ) ;
+  BOOST_TEST ( purityOfPartialTrace(rhoBell,tmpVec<0>) == .5 ) ;
+  BOOST_TEST ( purityOfPartialTrace(rhoBell,tmpVec<1>) == .5 ) ;
+  BOOST_TEST ( purityOfPartialTrace(rhoSepPure,tmpVec<0>) == 1. ) ;
+  BOOST_TEST ( purityOfPartialTrace(rhoSepPure,tmpVec<1>) == 1. ) ;
+
+}

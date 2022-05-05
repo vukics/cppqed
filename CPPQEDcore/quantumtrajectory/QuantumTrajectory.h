@@ -13,7 +13,7 @@
 /// Comprises modules representing trajectory drivers for simulating quantum systems
 namespace quantumtrajectory {
 
-using EntanglementMeasuresSwitch = std::bitset<2>;
+using EntanglementMeasuresSwitch = std::bitset<3>;
 
 using StreamReturnType=std::tuple<std::ostream&,structure::Averages>;
 

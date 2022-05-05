@@ -50,6 +50,12 @@ public:
         os<<'\t'<<FormDouble(precision)(mi);
         averages.resizeAndPreserve(averages.size()+1); averages(averages.ubound(0))=mi;
       }
+      if (ems_[2]) {
+        auto p{purityOfPartialTrace(rho,V{})};
+        os<<'\t'<<FormDouble(precision)(p);
+        averages.resizeAndPreserve(averages.size()+1); averages(averages.ubound(0))=p;
+      }
+
     }
     return {os,averages};
   }
@@ -61,6 +67,7 @@ public:
       if (ems_.any()) os<<"Trajectory\n";
       if (ems_[0]) os<<i++<<". negativity\n";
       if (ems_[1]) os<<i++<<". mutual information\n";
+      if (ems_[2]) os<<i++<<". purity of partial trace\n";
     }
     return os;
   }

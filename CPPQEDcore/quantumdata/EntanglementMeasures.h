@@ -109,6 +109,14 @@ double mutualInformation(const DensityOperator<RANK>& rho, V)
 }
 
 
+template<int RANK, typename V>
+double purityOfPartialTrace(const DensityOperator<RANK>& rho, V)
+{
+  return ::quantumdata::purity(::quantumdata::reduce<V>(rho));
+}
+
+
+
 } // quantumdata 
 
 
