@@ -1,10 +1,12 @@
-// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
 #include "Algorithm.h"
 #include "TMP_Tools.h"
 
 #include <boost/range/combine.hpp>
+
+#include <boost/json.hpp>
 
 #include <array>
 #include <concepts>
@@ -99,14 +101,43 @@ public:
   
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
   
-  template<typename INITIALIZER=std::function<void(StorageType&)>>
-  MultiArray(const Extents<RANK>& extents, INITIALIZER&& initializer=[](StorageType&) {})
-  : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_(multiarray::calculateExtent(extents))
+  /// INITIALIZER is a callable, taking Extents<RANK> as argument.
+  template<typename INITIALIZER=std::function<StorageType(size_t)>>
+  MultiArray(const Extents<RANK>& extents, INITIALIZER&& initializer=[](size_t s) {
+    return StorageType(s);
+  })
+  : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
   {
-    this->dataView_=std::span<T>(data_);
-    initializer(data_); // initialize vector
+    this->dataView=std::span<T>(data_);
   }
 
+
+  friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray<T,RANK>& ma )
+  {
+    jv = {
+      { "extents" , ma.extents },
+      //    { "strides" , ma.strides },
+      { "data", ma.data_ }
+    };
+  }
+
+  friend auto tag_invoke( boost::json::value_to_tag< MultiArray<T,RANK> >, const boost::json::value& jv )
+  {
+    const boost::json::object & obj = jv.as_object();
+    return MultiArray<T,RANK> {
+      value_to<Extents<RANK>>( obj.at( "extents" ) ),
+#ifndef   NDEBUG
+      [&] (size_t s) {
+        auto ret{value_to<StorageType>( obj.at( "data" ) )};
+        if (ret.size() != s) throw std::runtime_error("Mismatch in data size and extents parsed from JSON");
+        return ret;        
+      }
+#else  // NDEBUG
+      [&] (size_t) {return value_to<StorageType>( obj.at( "data" ) ); }
+#endif // NDEBUG
+    };
+  }
+  
   
 private:
   StorageType data_;
@@ -244,5 +275,13 @@ requires ( RANK>1 && (hana::maximum(ra) < hana::integral_c<::size_t,RANK>).value
 }
   
 
+
+/// Value equality, so offset doesn’t matter
+template <typename T, size_t RANK>
+bool operator==(MultiArrayView<T,RANK> m1, MultiArrayView<T,RANK> m2)
+{
+  return m1.extents==m2.extents && std::ranges::equal(m1.dataView,m2.dataView);
+}
+ 
 
 } // cppqedutils

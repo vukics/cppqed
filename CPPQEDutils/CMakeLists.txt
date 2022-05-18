@@ -6,7 +6,7 @@ message(STATUS "Configuring CPPQEDutils")
 find_package(GSL 2.5 REQUIRED)
 
 # Boost
-find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams)
+find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams json)
 
 find_package(Eigen3 3.3 REQUIRED)
 
@@ -19,7 +19,7 @@ add_library(CPPQEDutils SHARED
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Boost::iostreams GSL::gsl Eigen3::Eigen)
+target_link_libraries(CPPQEDutils PUBLIC ThirdPartyRandom Boost::iostreams Boost::json GSL::gsl Eigen3::Eigen)
 
 target_compile_definitions(CPPQEDutils PUBLIC CPPQED_HAS_GSL)
 

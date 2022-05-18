@@ -1,9 +1,11 @@
 #include "MultiArray.h"
 
 #include <iostream>
+#include <random>
 #include <tuple>
 
 using namespace cppqedutils;
+using namespace boost::json;
 
 int main()
 {
@@ -11,7 +13,7 @@ int main()
   
   std::span<double> span(vec);
   
-  std::cerr<<vec.size()<<" "<<span.size()<<std::endl;
+  std::cout<<vec.size()<<" "<<span.size()<<std::endl;
   
   MultiArray<double,5> ma{{10,11,13,9,8}};
   
@@ -32,10 +34,45 @@ int main()
   // double& v5=ma(1,5,6,3) ;
   // double& v6=ma(1,5,6,3,4,2) ;
   
-  auto offsets(multiarray::calculateSlicesOffsets(ma.extents(),ma.strides(),tmptools::vector<2,4,0>));
+  auto offsets(multiarray::calculateSlicesOffsets(ma.extents,ma.strides,tmptools::vector<2,4,0>));
   
-  for (auto o : offsets) std::cerr<<o<<" "<<std::endl;
+  for (auto o : offsets) std::cout<<o<<std::endl;
   
-  auto sr=slicesRange(ma,tmptools::vector<2,4,0>,std::move(offsets));
+  auto sr=slicesRange(ma,tmptools::vector<2,4,0>,offsets);
+
+  std::uniform_real_distribution distro{1.,10.};
+  std::mt19937 gen{1001};
+  
+  MultiArray<double,3> maSmall{{5,7,4},[&] (size_t s) {
+    MultiArray<double,3>::StorageType data(s);
+    for (auto& d : data) d=distro(gen);
+    return data;
+  }};  
+  
+  std::string maSmallSerialized=serialize( value_from( maSmall ) );
+  
+  std::cout << maSmallSerialized << std::endl;
+  
+  MultiArray<double,3> maSmallReconstructed{ value_to<MultiArray<double,3>>(parse(maSmallSerialized)) };
+  
+  std::cout << (maSmall==maSmallReconstructed) << std::endl;
+  
+  for (auto o : maSmallReconstructed.dataView) std::cout<<o<<" "/*<<std::endl*/;
+  
+  std::cout<<std::endl;
+  
+  std::cout<<serialize( value_from( maSmallReconstructed ) )<<std::endl;
+  
+  std::cout<< (maSmallSerialized == serialize( value_from( maSmallReconstructed ) ) ) << std::endl;
+  
+//   {
+//     MultiArray<double,5> ma{{2,3,4,2,4}};
+//     
+//     for (size_t i=0; i<ma.dataView.size(); ++i) ma.dataView[i]=i;
+//     
+//     for (auto&& slice : slicesRange(ma,tmptools::vector<2,4,0>,
+//                                     multiarray::calculateSlicesOffsets(ma.extents,ma.strides,tmptools::vector<2,4,0>)))
+//       std::cout<<slice(0,0,0)<<std::endl;
+//   }
   
 }
