@@ -21,6 +21,7 @@ template <size_t RANK>
 using Extents=std::array<size_t,RANK>;
 
 
+/// A non-owning view, should be passed by value.
 template <typename T, size_t RANK>
 class MultiArrayView
 {
@@ -31,18 +32,18 @@ public:
   
   /* template <typename... Indices> requires ( sizeof...(Indices)==RANK && ( ... && std::is_convertible_v<Indices,size_t> ) ) T& operator() (Indices... i); */
   
-  MultiArrayView(const Extents<RANK>& extents, const Extents<RANK>& strides, size_t offset, auto&&... spanArgs)
-  : extents_{extents}, strides_{strides}, offset_{offset}, dataView_{std::forward<decltype(spanArgs)>(spanArgs)...} {}
+  MultiArrayView(const Extents<RANK>& e, const Extents<RANK>& s, size_t o, auto&&... spanArgs)
+  : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(spanArgs)>(spanArgs)...} {}
   
   T& operator() (const Extents<RANK>& indices) const
   {
 #ifndef   NDEBUG
     for (size_t i=0; i<RANK; ++i)
-      if ( size_t actualIndex=indices[i], actualExtent=extents_[i]; actualIndex >= actualExtent )
+      if ( size_t actualIndex=indices[i], actualExtent=extents[i]; actualIndex >= actualExtent )
         throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(actualIndex)+", extent: "+std::to_string(actualExtent));
 #endif // NDEBUG
-    return dataView_[cppqedutils::ranges::fold(boost::combine(indices,strides_),offset_,
-                                               [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
+    return dataView[cppqedutils::ranges::fold(boost::combine(indices,strides),offset,
+                                              [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
     
   }
   
@@ -53,28 +54,19 @@ public:
   }
   
   /// A simple specialization for unary views
-  T& operator() (std::convertible_to<size_t> auto i) const requires (RANK==1) {return dataView_[offset_+strides_[0]*i];}
+  T& operator() (std::convertible_to<size_t> auto i) const requires (RANK==1) {return dataView[offset+strides[0]*i];}
 
   /// A simple specialization for binary views
-  T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {return dataView_[offset_+strides_[0]*i+strides_[1]*j];}
+  T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {return dataView[offset+strides[0]*i+strides[1]*j];}
 
-  
-  const Extents<RANK>& extents() const {return extents_;}
-  const Extents<RANK>& strides() const {return strides_;}
-  
-  size_t offset() const {return offset_;}
-  
-  std::span<T> dataView() const {return dataView_;}
-  
-private:
-  Extents<RANK> extents_, strides_;
+  Extents<RANK> extents, strides;
 
-  size_t offset_;
+  size_t offset;
   
-protected:
-  std::span<T> dataView_; // the storage can eventually become a kokkos::View
+  std::span<T> dataView; // the storage can eventually become a kokkos::View
   
 };
+
 
 
 namespace multiarray {
@@ -96,7 +88,7 @@ auto calculateExtent(const Extents<RANK>& extents)
 } // multiarray
 
 
-
+/// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned) 
 template <typename T, size_t RANK>
 class MultiArray : public MultiArrayView<T,RANK>
 {
@@ -131,16 +123,13 @@ namespace multiarray {
  * - `RetainedAxes` must not contain duplicated elements
  * - all elements of `RetainedAxes` must be smaller than `RANK`
  * 
- * \see \ref specifyingsubsystems
- * 
  */
 template <size_t RANK, typename RetainedAxes>
 constexpr bool consistent(RetainedAxes ra) // if the optional argument is not given, RetainedAxes needs to be default-constructible 
 {
-  using namespace hana;
-  if constexpr ( Sequence<RetainedAxes>::value ) {
-    constexpr auto sorted = sort(ra);
-    return (unique(sorted) == sorted);    
+  if constexpr ( hana::Sequence<RetainedAxes>::value ) {
+    constexpr auto sorted = hana::sort(ra);
+    return (hana::unique(sorted) == sorted);    
   }
   else return true;
 }
@@ -206,7 +195,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, Retain
 
   auto increment=[&](auto n, auto inc)
   {
-    using namespace hana; using namespace literals;
+    using namespace hana::literals;
     if constexpr (n!=0_c) {
       if (idx[n]==dummyExtents[n]-1) {idx[n]=0; inc(n-1_c,inc);}
       else idx[n]++;
@@ -236,9 +225,12 @@ auto calculateSlicesOffsets(Extents<RANK> extents, RetainedAxes ra)
 }
 
 
-/// TODO: SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
-template <typename T, size_t RANK, typename RetainedAxes>
-auto slicesRange(const MultiArrayView<T,RANK>& mav, RetainedAxes ra, std::vector<size_t>&& offsets)
+/**
+ * TODO: SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
+ * (Storing full MultiArrayView classes is somewhat wasteful, since extents and strides is the same for all of them in a given SlicesRange)
+ */
+template <typename T, size_t RANK, typename RetainedAxes, typename OFFSETS>
+auto slicesRange(MultiArrayView<T,RANK> mav, RetainedAxes ra, OFFSETS&& offsets)
 requires ( RANK>1 && (hana::maximum(ra) < hana::integral_c<::size_t,RANK>).value && multiarray::consistent<RANK>(ra) )
 {
   using SliceType=MultiArrayView<T,hana::size(ra)>;
@@ -246,7 +238,7 @@ requires ( RANK>1 && (hana::maximum(ra) < hana::integral_c<::size_t,RANK>).value
   std::vector<SliceType> res(offsets.size());
   
   for (auto&& [slice,sliceOffset] : boost::combine(res,offsets) )
-    slice=SliceType{multiarray::filterIn(mav.extents(),ra),multiarray::filterIn(mav.strides(),ra),mav.offset()+sliceOffset,mav.dataView()};
+    slice=SliceType{multiarray::filterIn(mav.extents,ra),multiarray::filterIn(mav.strides,ra),mav.offset+sliceOffset,mav.dataView};
   
   return res;
 }
