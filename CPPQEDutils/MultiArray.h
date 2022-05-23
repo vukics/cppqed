@@ -18,9 +18,30 @@
 
 namespace cppqedutils {
 
-  
+
+/// should be passed by value
 template <size_t RANK>
 using Extents=std::array<size_t,RANK>;
+
+
+template <size_t RANK>
+auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
+{
+  static const auto increment=[&](auto n, auto inc)
+  {
+    using namespace hana::literals;
+    if constexpr (n!=0_c) {
+      if (idx[n]==extents[n]-1) {idx[n]=0; inc(n-1_c,inc);}
+      else idx[n]++;
+    }
+    else idx[0]++; // This will eventually put the iterator into an illegal state when idx(0)>ubound(0), but this is how every (unchecked) iterator works.
+  };
+  
+  increment(hana::llong_c<RANK-1>,increment);
+  
+  return idx;
+}
+
 
 
 /// A non-owning view, should be passed by value.
@@ -34,19 +55,24 @@ public:
   
   /* template <typename... Indices> requires ( sizeof...(Indices)==RANK && ( ... && std::is_convertible_v<Indices,size_t> ) ) T& operator() (Indices... i); */
   
-  MultiArrayView(const Extents<RANK>& e, const Extents<RANK>& s, size_t o, auto&&... spanArgs)
-  : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(spanArgs)>(spanArgs)...} {}
+  /// offset can come from a previous slicing
+  MultiArrayView(Extents<RANK> e, Extents<RANK> s, size_t o, auto&&... spanArgs)
+    : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(spanArgs)>(spanArgs)...} {}
   
-  T& operator() (const Extents<RANK>& indices) const
+  /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
+  /** The index of the underlying 1D storage is calculated as 
+   * \f[ o + \sum_{\iota=0}^{\iota<R} s_{\iota} i_{\iota} ,\f]
+   * where \f$o\f$ is the offset, \f$R\f$ is the rank, \f$s\f$ is the set of strides and \f$i\f$ is the multi-index.
+   */
+  T& operator() (Extents<RANK> indices) const
   {
 #ifndef   NDEBUG
     for (size_t i=0; i<RANK; ++i)
-      if ( size_t actualIndex=indices[i], actualExtent=extents[i]; actualIndex >= actualExtent )
-        throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(actualIndex)+", extent: "+std::to_string(actualExtent));
+      if (indices[i] >= extents[i])
+        throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(indices[i])+", extent: "+std::to_string(extents[i]));
 #endif // NDEBUG
     return dataView[cppqedutils::ranges::fold(boost::combine(indices,strides),offset,
                                               [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
-    
   }
   
   T& operator() (std::convertible_to<size_t> auto ... i) const
@@ -65,7 +91,7 @@ public:
 
   size_t offset;
   
-  std::span<T> dataView; // the storage can eventually become a kokkos::View
+  std::span<T> dataView; //< the storage can eventually become a kokkos::View
   
 };
 
@@ -74,7 +100,7 @@ public:
 namespace multiarray {
 
 template <size_t RANK>
-auto calculateStrides(const Extents<RANK>& extents)
+auto calculateStrides(Extents<RANK> extents)
 {
   Extents<RANK> strides; strides[0]=1;
   for (size_t i=1; i<RANK; ++i) strides[i]=strides[i-1]*extents[i-1];
@@ -101,12 +127,12 @@ public:
   
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
   
-  /// INITIALIZER is a callable, taking Extents<RANK> as argument.
+  /// INITIALIZER is a callable, taking the total size as argument.
   template<typename INITIALIZER=std::function<StorageType(size_t)>>
   MultiArray(const Extents<RANK>& extents, INITIALIZER&& initializer=[](size_t s) {
     return StorageType(s);
   })
-  : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
+    : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
   {
     this->dataView=std::span<T>(data_);
   }
@@ -167,7 +193,7 @@ constexpr bool consistent(RetainedAxes ra) // if the optional argument is not gi
 
 
 template <size_t RANK, typename RetainedAxes>
-auto filterIn(const Extents<RANK>& extents, RetainedAxes ra)
+auto filterIn(Extents<RANK> extents, RetainedAxes ra)
 {
   Extents<hana::size(ra)> res;
   hana::fold(ra,res.begin(),
@@ -187,7 +213,7 @@ auto filterIn(const Extents<RANK>& extents, RetainedAxes ra)
  * 
  */
 template<size_t RANK, typename RetainedAxes>
-auto filterOut(const Extents<RANK>& idx, RetainedAxes ra)
+auto filterOut(Extents<RANK> idx, RetainedAxes ra)
 {
   using namespace hana;
   
@@ -219,26 +245,18 @@ auto filterOut(const Extents<RANK>& idx, RetainedAxes ra)
 template <size_t RANK, typename RetainedAxes>
 auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, RetainedAxes ra)
 {
-  Extents<RANK-hana::size(ra)> dummyExtents{filterOut(extents,ra)}, dummyStrides{filterOut(strides,ra)}, 
-                               idx; idx.fill(0);
+  Extents<RANK-hana::size(ra)> 
+    dummyExtents{filterOut(extents,ra)},
+    dummyStrides{filterOut(strides,ra)}, 
+    idx; idx.fill(0);
   
   std::vector<size_t> res(calculateExtent(dummyExtents));
 
-  auto increment=[&](auto n, auto inc)
-  {
-    using namespace hana::literals;
-    if constexpr (n!=0_c) {
-      if (idx[n]==dummyExtents[n]-1) {idx[n]=0; inc(n-1_c,inc);}
-      else idx[n]++;
-    }
-    else idx[0]++; // This will of course eventually put the iterator into an illegal state when idx(0)>ubound(0), but this is how every (unchecked) iterator works.
-  };
-  
   for (auto i=res.begin(); i!=res.end(); (
     *i++ = cppqedutils::ranges::fold( boost::combine(idx,dummyStrides), 
                                       0, 
                                       [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
-    increment(hana::llong_c<idx.size()-1>,increment)));
+    incrementMultiIndex(idx,dummyExtents)));
   
   return res;
 }
