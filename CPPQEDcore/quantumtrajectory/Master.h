@@ -11,7 +11,6 @@
 
 #include "ComplexArrayExtensions.h"
 #include "MathExtensions.h"
-#include "VectorFromMatrixSliceIterator.h"
 
 
 namespace quantumtrajectory {

@@ -21,7 +21,6 @@
 
 #include "FFT.h"
 // #include "MathExtensions.h"
-#include "VectorFromMatrixSliceIterator.h"
 
 #include <flens/flens.h>
 

@@ -2,7 +2,6 @@
 #include "LazyDensityOperatorFFT.h"
 
 #include "FFT.tcc"
-#include "VectorFromMatrixSliceIterator.h"
 
 
 using namespace fft; using namespace linalg;
