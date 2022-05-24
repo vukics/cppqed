@@ -1,6 +1,5 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Combinatorics.h"
-#include "ContainerIO.h"
 
 #define BOOST_TEST_MODULE CWR test
 #include <boost/test/unit_test.hpp>

@@ -3,7 +3,6 @@
 
 #include "TridiagonalHamiltonian.h"
 
-#include "ContainerIO.h"
 #include "MathExtensions.h"
 #include "SliceIterator.h"
 

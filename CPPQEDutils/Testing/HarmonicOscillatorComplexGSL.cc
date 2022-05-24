@@ -1,5 +1,4 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "ContainerIO.h"
 #include "DrivenDampedHarmonicOscillator.h"
 #include "ODE_GSL.h"
 #include "Simulated.h"
