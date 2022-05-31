@@ -106,7 +106,7 @@ _(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
     }
     else if (pe.evol==evolution::ENSEMBLE) {
       /// here, it’s intentional that `initial` is converted into an lvalue
-      return cppqedutils::run(mcwf::makeEnsemble<OE,RandomEngine,V>(sys,initial,pe,pe.negativity),pe,doStreaming,returnStreamedArray);
+      return cppqedutils::run(mcwf::makeEnsemble<OE,RandomEngine,V>(sys,initial,pe,pe.ems),pe,doStreaming,returnStreamedArray);
     }
     else {
       return ::evolveMaster<ODE_Engine,V>(std::forward<quantumdata::DensityOperator<RANK>>(initial),sys,pe,doStreaming,returnStreamedArray);
