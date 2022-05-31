@@ -9,6 +9,3 @@ target_link_libraries(ExampleModeMain CPPQED::CPPQEDcore)
 
 add_executable(CoherentElementTest CoherentElementTest.cc)
 target_link_libraries(CoherentElementTest CPPQED::CPPQEDcore)
-
-add_library(ExampleObjects OBJECT cpcPaperExamples.cc)
-target_link_libraries(ExampleObjects CPPQED::CPPQEDcore)

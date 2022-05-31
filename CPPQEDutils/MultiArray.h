@@ -34,7 +34,7 @@ auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
       if (idx[n]==extents[n]-1) {idx[n]=0; inc(n-1_c,inc);}
       else idx[n]++;
     }
-    else idx[0]++; // This will eventually put the iterator into an illegal state when idx(0)>ubound(0), but this is how every (unchecked) iterator works.
+    else idx[0]++; // This will eventually put the iterator into an illegal state, but this is how every (unchecked) iterator works.
   };
   
   increment(hana::llong_c<RANK-1>,increment);
@@ -180,6 +180,7 @@ namespace multiarray {
  * - `RetainedAxes` must not contain duplicated elements
  * - all elements of `RetainedAxes` must be smaller than `RANK`
  * 
+ * \todo Think over requirements here & everywhere else in multiarray
  */
 template <size_t RANK, typename RetainedAxes>
 constexpr bool consistent(RetainedAxes ra) // if the optional argument is not given, RetainedAxes needs to be default-constructible 
@@ -192,53 +193,36 @@ constexpr bool consistent(RetainedAxes ra) // if the optional argument is not gi
 }
 
 
+/// Filters in the indices corresponding to a subsystem
+/**
+ * When the size of `RetainedAxes` equals `RANK`, this is a transposition
+ */
 template <size_t RANK, typename RetainedAxes>
-auto filterIn(Extents<RANK> extents, RetainedAxes ra)
+auto filterIn(Extents<RANK> idx, RetainedAxes ra) requires ( hana::size(ra) <= RANK )
 {
   Extents<hana::size(ra)> res;
-  hana::fold(ra,res.begin(),
-             [&] (auto iterator, auto ind) {*iterator=extents[ind]; return ++iterator;});
+  hana::fold(ra, res.begin(), [&] (auto iterator, auto ind) {*iterator=idx[ind]; return ++iterator;});
   return res;
 }
 
   
-/// Filters out the indices corresponding to a subsystem
-/**
- * \tparamRANK
- * \tparam RetainedAxes compile-time vector specifying the subsystem (cf. \ref specifyingsubsystems)
- * 
- * \param idx the indices to be filtered (of size `RANK`)
- * 
- * \return the indices *not* contained by the subsystem specified by `RetainedAxes` (dummy indices)
- * 
- */
+/// Filters out the indices corresponding to a subsystem (specified by `RetainedAxes`)
 template<size_t RANK, typename RetainedAxes>
-auto filterOut(Extents<RANK> idx, RetainedAxes ra)
+auto filterOut(Extents<RANK> idx, RetainedAxes ra) requires ( hana::size(ra) <= RANK )
 {
-  using namespace hana;
-  
-  ::size_t origIndex=0, resIndex=0;
-  
-  static constexpr auto sorted = [&]() {
-    if constexpr ( Sequence<RetainedAxes>::value ) return sort(ra);  
-    else return ra;
-  }();
-  
   Extents<RANK-hana::size(ra)> res;
-
-  for_each(sorted,[&](auto i) {
-    for (; origIndex<i; (++origIndex,++resIndex)) res[resIndex]=idx[origIndex];
-    ++origIndex; // skip value found in sorted
-  });
-  // the final segment:
-  for (; origIndex<idx.size(); (++origIndex,++resIndex)) res[resIndex]=idx[origIndex];
+  
+  hana::fold(tmptools::ordinals<RANK>, res.begin(), [&] (auto iterator, auto ind) {
+    if ( ! hana::contains(ra, ind) ) *iterator++ = idx[ind];
+    return iterator;
+  } );
   
   return res;
 
 }
 
 
-/// This calculates the slices offsets purely from the (dummy) extents and strides
+/// Calculates the slices offsets purely from the (dummy) extents and strides
 /**
  * Any indexing offset that the MultiArrayView might itself have is added at the point of indexing/slicing
  */
@@ -275,7 +259,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents, RetainedAxes ra)
 
 
 /**
- * TODO: SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
+ * \todo SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
  * (Storing full MultiArrayView classes is somewhat wasteful, since extents and strides is the same for all of them in a given SlicesRange)
  */
 template <typename T, size_t RANK, typename RetainedAxes, typename OFFSETS>

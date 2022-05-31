@@ -26,7 +26,7 @@ int main()
 
   // cppqedutils::MultiArray<const double,5> mac; // "std::vector must have a non-const, non-volatile value_type"
 
-  // cppqedutils::MultiArrayView<const double,5> mavc;
+  cppqedutils::MultiArrayView<const double,5> mavc;
 
   // const double& v3=mavc(1,5,6,3,4) ;
   // double& v4=mavc(1,5,6,3,4) ;
@@ -64,6 +64,15 @@ int main()
   std::cout<<serialize( value_from( maSmallReconstructed ) )<<std::endl;
   
   std::cout<< (maSmallSerialized == serialize( value_from( maSmallReconstructed ) ) ) << std::endl;
+  
+  {
+    Extents<5> idx{0,0,0,0,0}, ext{5,2,4,3,2};
+    for (size_t i=0; i<multiarray::calculateExtent(ext); (++i, incrementMultiIndex(idx, ext) ) ) std::cout<<serialize(value_from(idx))<<std::endl;
+  }
+  
+  std::cout<<hana::Sequence<tmptools::Range<0,10>>::value<<hana::Sequence<tmptools::Vector<1,5,10>>::value<<std::endl;
+  
+  std::cout<<serialize(value_from(std::make_tuple(1.2,"hello",32ul)))<<std::endl;
   
 //   {
 //     MultiArray<double,5> ma{{2,3,4,2,4}};
