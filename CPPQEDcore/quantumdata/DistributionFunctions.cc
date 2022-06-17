@@ -65,7 +65,7 @@ dcomp WignerFunctionKernelOld::operator()(size_t m, size_t n) const
       binomial_coefficient<double>(m,u)*
       binomial_coefficient<double>(n,v)*
       minusOneToThePowerOf(v)*
-      pow(DCOMP_I,u+v)*
+      pow(1i,u+v)*
       hermite_m2x_(    u+v)*
       hermite_2y_ (n+m-u-v);
 

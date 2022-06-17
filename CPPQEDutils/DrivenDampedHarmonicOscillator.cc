@@ -9,12 +9,12 @@
 
 dcomp cppqedutils::ddho::_::c(double t) const
 {
-  return exp(DCOMP_I*omega_*t)/(1.+2.*DCOMP_I*gamma_*omega_-sqr(omega_));
+  return exp(1i*omega_*t)/(1.+2.*1i*gamma_*omega_-sqr(omega_));
 }
 
 
 cppqedutils::ddho::_::_(double gamma, double omega, Matrix m, dcomp ampTI, dcomp ampDerivTI, double tInit)
-  : gamma_(gamma), omega_(omega), a_(m.fullPivLu().solve(Vector(ampTI-c(tInit),ampDerivTI-DCOMP_I*omega*c(tInit))))
+  : gamma_(gamma), omega_(omega), a_(m.fullPivLu().solve(Vector(ampTI-c(tInit),ampDerivTI-1i*omega*c(tInit))))
 {}
 
 
@@ -35,7 +35,7 @@ public:
       omega1_(first), omega2_(second) {}
 
   dcomp amp     (double t) const override {return         exp(omega1_*t)*a_(0)+        exp(omega2_*t)*a_(1)+               c(t);}
-  dcomp ampDeriv(double t) const override {return omega1_*exp(omega1_*t)*a_(0)+omega2_*exp(omega2_*t)*a_(1)+DCOMP_I*omega_*c(t);}
+  dcomp ampDeriv(double t) const override {return omega1_*exp(omega1_*t)*a_(0)+omega2_*exp(omega2_*t)*a_(1)+1i*omega_*c(t);}
 
 private:
   const dcomp& omega1_, omega2_;
@@ -53,7 +53,7 @@ public:
   {}
 
   dcomp amp     (double t) const override {return  exp(-t)*a_(0)+ t   *exp(-t)*a_(1)+               c(t);}
-  dcomp ampDeriv(double t) const override {return -exp(-t)*a_(0)-(t-1)*exp(-t)*a_(1)+DCOMP_I*omega_*c(t);}
+  dcomp ampDeriv(double t) const override {return -exp(-t)*a_(0)-(t-1)*exp(-t)*a_(1)+1i*omega_*c(t);}
 
 };
 

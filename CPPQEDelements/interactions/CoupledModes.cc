@@ -19,7 +19,7 @@ Base<false>::Base(mode::Ptr m1, mode::Ptr m2, dcomp u)
 
 template<>
 Base<true ,CM_NX>::Base(mode::Ptr m1, mode::Ptr m2, dcomp u)
-  : Base<false>(m1,m2,u), TridiagonalHamiltonian<2,true>(real(u)*nop(m1)*xop(m2)/DCOMP_I)
+  : Base<false>(m1,m2,u), TridiagonalHamiltonian<2,true>(real(u)*nop(m1)*xop(m2)/1i)
 {
   getParsStream()<<"N-X coupling between modes\n";
 }
@@ -27,7 +27,7 @@ Base<true ,CM_NX>::Base(mode::Ptr m1, mode::Ptr m2, dcomp u)
 
 template<>
 Base<true ,CM_XX>::Base(mode::Ptr m1, mode::Ptr m2, dcomp u)
-  : Base<false>(m1,m2,u), TridiagonalHamiltonian<2,true>(real(u)*xop(m1)*xop(m2)/DCOMP_I)
+  : Base<false>(m1,m2,u), TridiagonalHamiltonian<2,true>(real(u)*xop(m1)*xop(m2)/1i)
 {
   getParsStream()<<"X-X coupling between modes\n";
 }

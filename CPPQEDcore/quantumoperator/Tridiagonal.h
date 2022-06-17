@@ -344,7 +344,7 @@ tridiagPlusHC      (const Tridiagonal<RANK>& tridiag) {return tridiag+tridiag.he
 template<int RANK>
 inline 
 Tridiagonal<RANK>
-tridiagPlusHC_overI(const Tridiagonal<RANK>& tridiag) {return tridiagPlusHC(tridiag)/DCOMP_I;}
+tridiagPlusHC_overI(const Tridiagonal<RANK>& tridiag) {return tridiagPlusHC(tridiag)/1i;}
 
 
 /// \related Tridiagonal

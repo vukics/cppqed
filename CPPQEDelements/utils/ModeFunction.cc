@@ -40,10 +40,10 @@ const dcomp modeFunction(ModeFunctionType mf, double x)
   switch (mf) {
   case MFT_SIN  : return sin(x)        ;
   case MFT_COS  : return cos(x)        ;
-  case MFT_PLUS : return exp(DCOMP_I*x);
+  case MFT_PLUS : return exp(1i*x);
   case MFT_MINUS:                      ;
   }
-  return exp(-DCOMP_I*x);
+  return exp(-1i*x);
 }
 
 

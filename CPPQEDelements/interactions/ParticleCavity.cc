@@ -27,7 +27,7 @@ const particlecavity::Tridiagonals dispersive(mode::Ptr mode, particle::Ptr part
 {
   particlecavity::Tridiagonals res;
   if (uNot && !isComplex(get<0>(mf)))
-    res.push_back(uNot*mode::nop(mode)*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(particle,get<1>(mf)<<1)/(2.*DCOMP_I));
+    res.push_back(uNot*mode::nop(mode)*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(particle,get<1>(mf)<<1)/(2.*1i));
   return res;
 }
 
@@ -104,7 +104,7 @@ ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped par
     particlecavity::Base(mode,particle,uNot,etaeff),
     isSpecialH_(kCav==abs(get<1>(particle->getMF()))),
     tridiagonalH_(fillTTwoModeFN(mode,particle,uNot,etaeff,MF_Base::member,isSpecialH_)),
-    firstH_(etaeff*mode::aop(mode)*mfNKX(particle,MF_Base::member)/DCOMP_I), firstHT_(-firstH_.dagger()),
+    firstH_(etaeff*mode::aop(mode)*mfNKX(particle,MF_Base::member)/1i), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(particle,particle->getMF()).dagger()), secondHT_(secondH_.dagger())
 {
   getParsStream()<<"Particle with "<< particle->getMF() <<" pump moving along cavity with "<<getMF()<<endl;

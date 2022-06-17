@@ -61,7 +61,7 @@ typedef std::shared_ptr<const PumpedParticleBase> PtrPumped;
 
 const Tridiagonal expINKX(particle::Ptr, ptrdiff_t);
 
-inline const Tridiagonal sinNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*DCOMP_I);}
+inline const Tridiagonal sinNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)-expINKX(particle,-nK))/(2.*1i);}
 inline const Tridiagonal cosNKX(particle::Ptr particle, ptrdiff_t nK) {return (expINKX(particle,nK)+expINKX(particle,-nK))/ 2.         ;}
 
 const Tridiagonal mfNKX       (particle::Ptr, const ModeFunction&);

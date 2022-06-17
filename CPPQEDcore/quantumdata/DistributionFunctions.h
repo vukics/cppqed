@@ -74,7 +74,7 @@ double wignerFunction(const DensityOperatorFunctor& rho, double x, double y, siz
 
   double res=real(Helper::_(rho,dim,r,0));
   
-  for (size_t k=1; k<dim; ++k) res+=2*real(Helper::_(rho,dim,r,k)*exp(-DCOMP_I*(k*phi)));
+  for (size_t k=1; k<dim; ++k) res+=2*real(Helper::_(rho,dim,r,k)*exp(-1i*(k*phi)));
 
   return res;
 }
@@ -124,10 +124,10 @@ double wignerFunctionOld(const DensityOperatorFunctor& rho, double x, double y, 
   double res=0;
 
   for (size_t m=0; m<dim; ++m) {
-    res+=real(minusOneToThePowerOf(m)/factorial<double>(m)*rho(m,m)*pow(2.*DCOMP_I,-2*m)*wignerFunctionKernel(m,m));
+    res+=real(minusOneToThePowerOf(m)/factorial<double>(m)*rho(m,m)*pow(2.*1i,-2*m)*wignerFunctionKernel(m,m));
     
     for (size_t n=m+1; n<dim; ++n)
-      res+=2.*real(minusOneToThePowerOf(m)/sqrt(factorial<double>(n)*factorial<double>(m))*rho(n,m)*pow(2.*DCOMP_I,-m-n)*wignerFunctionKernel(n,m));
+      res+=2.*real(minusOneToThePowerOf(m)/sqrt(factorial<double>(n)*factorial<double>(m))*rho(n,m)*pow(2.*1i,-m-n)*wignerFunctionKernel(n,m));
     
   }
   

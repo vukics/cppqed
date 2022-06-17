@@ -10,19 +10,19 @@ int main(int argc, char* argv[])
 {
   { // basic
   {
-    basic::PumpedLossyModeIP mode(1,1,DCOMP_I,1,10);
+    basic::PumpedLossyModeIP mode(1,1,1i,1,10);
   }
 
-  basic::InteractionX_X(make_shared<basic::PumpedLossyMode>(1,1,DCOMP_I,1,10),make_shared<basic::PumpedLossyMode>(1,1,DCOMP_I,1,10),2.);
+  basic::InteractionX_X(make_shared<basic::PumpedLossyMode>(1,1,1i,1,10),make_shared<basic::PumpedLossyMode>(1,1,1i,1,10),2.);
   }
   
   { // hierarchical
   {
-    hierarchical::PumpedLossyMode mode(1,1,DCOMP_I,1,10);
+    hierarchical::PumpedLossyMode mode(1,1,1i,1,10);
   }
 
-  auto m0{make_shared<hierarchical::PumpedLossyModeIP>(1,1,DCOMP_I,1,10)};
-  auto m1{make_shared<hierarchical::PumpedLossyMode  >(1,1,DCOMP_I,1,20)};
+  auto m0{make_shared<hierarchical::PumpedLossyModeIP>(1,1,1i,1,10)};
+  auto m1{make_shared<hierarchical::PumpedLossyMode  >(1,1,1i,1,20)};
   
   hierarchical::InteractionX_X i(m0,m1,2.);
   
