@@ -36,13 +36,13 @@ int main(int argc, char* argv[])
     const double x=PI*pp.init.getX0();
 
     const dcomp
-      z1=DCOMP_I*(pmP.delta-ppcP.uNot*sqrAbs(modeFunction(ppcP.modeCav,x)))-pmP.kappa,
-      z2=DCOMP_I*(pmM.delta-ppcM.uNot*sqrAbs(modeFunction(ppcM.modeCav,x)))-pmM.kappa,
+      z1=1i*(pmP.delta-ppcP.uNot*sqrAbs(modeFunction(ppcP.modeCav,x)))-pmP.kappa,
+      z2=1i*(pmM.delta-ppcM.uNot*sqrAbs(modeFunction(ppcM.modeCav,x)))-pmM.kappa,
       g=sign(ppcP.uNot)*sqrt(ppcP.uNot*ppcM.uNot)*conj(modeFunction(ppcP.modeCav,x))*modeFunction(ppcM.modeCav,x);
 
     dbdt=
-      z1*b(0)+pmP.eta-DCOMP_I*     g *b(1),
-      z2*b(1)+pmM.eta-DCOMP_I*conj(g)*b(0);
+      z1*b(0)+pmP.eta-1i*     g *b(1),
+      z2*b(1)+pmM.eta-1i*conj(g)*b(0);
   },{"alphaP","alphaM"},1e-6,pt),pt);
 
 }

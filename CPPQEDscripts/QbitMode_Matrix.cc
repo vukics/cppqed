@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   auto psi2(qbit::init(pplqb)*mode::init(pplm)); psi2.renorm();
   StateVector1 psi1(psi2.vectorView(),quantumdata::byReference);
   
-  const CMatrix hamiltonianOverI(calculateMatrix(*system2)/DCOMP_I);
+  const CMatrix hamiltonianOverI(calculateMatrix(*system2)/1i);
 
   evolve(psi1, // Here, this references the same data as psi2
          std::make_shared<TimeIndependentMatrixHamiltonianAveraged<2>>(hamiltonianOverI,system2,psi2),

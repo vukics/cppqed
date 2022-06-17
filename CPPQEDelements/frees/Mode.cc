@@ -51,7 +51,7 @@ void Exact::updateU(Time t) const
 //
 //////////////
 
-#define KERRDIAGONAL(d,o) d=(i-1.)*i; d*=o/DCOMP_I;
+#define KERRDIAGONAL(d,o) d=(i-1.)*i; d*=o/1i;
 
 const Tridiagonal::Diagonal mainDiagonal(dcomp z, double omegaKerr, size_t dim)
 {
@@ -328,7 +328,7 @@ StateVector fock(size_t n, size_t dim, double phase)
 {
   if (n>=dim) throw std::overflow_error("Fock state "+std::to_string(n)+" higher than dim "+std::to_string(dim));
   StateVector res(dim);
-  res(n)=exp(DCOMP_I*phase);
+  res(n)=exp(1i*phase);
   return res;
 }
 

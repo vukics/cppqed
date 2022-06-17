@@ -88,8 +88,8 @@ int main(int argc, char* argv[])
     at_c<0>(pml.etas).set(eta);
     at_c<1>(pml.etas).set(eta);
 
-    at_c<0>(pPhononCouplings.gs).set(-DCOMP_I*phononCouplingFactor*at_c<0>(pml.etas).get());
-    at_c<1>(pPhononCouplings.gs).set(-DCOMP_I*phononCouplingFactor*at_c<1>(pml.etas).get());
+    at_c<0>(pPhononCouplings.gs).set(-1i*phononCouplingFactor*at_c<0>(pml.etas).get());
+    at_c<1>(pPhononCouplings.gs).set(-1i*phononCouplingFactor*at_c<1>(pml.etas).get());
 
     at_c<0>(pmljc.gs).set(sqrt12*g);
     at_c<1>(pmljc.gs).set(sqrt13*g);

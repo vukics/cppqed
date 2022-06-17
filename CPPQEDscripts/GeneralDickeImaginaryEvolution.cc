@@ -106,8 +106,8 @@ int main(int argc, char* argv[])
     // ****** ****** ****** ****** ****** ******
     // Mapping for imaginary time propagation:
 
-    u*=-DCOMP_I;
-    y*=-DCOMP_I;
+    u*=-1i;
+    y*=-1i;
     swap(plm.delta,plm.kappa); plm.kappa*=-1;
     swap(ps .omega,ps .gamma); ps .omega*=-1;
 

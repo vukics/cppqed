@@ -355,7 +355,7 @@ public:
   template<typename GPT, typename... AveragingConstructorParameters>
   PumpedLossyMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
     : Hamiltonian([&] {
-        ComplexPerLevel res(deltas); res*=-DCOMP_I;
+        ComplexPerLevel res(deltas); res*=-1i;
         for_each(gammas,[&](auto gamma) {res(decltype(gamma)::second)+=gamma.get();});
         return res;
       } (), etas),

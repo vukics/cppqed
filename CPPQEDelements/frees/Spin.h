@@ -30,14 +30,14 @@ Tridiagonal splus(size_t dim, size_t twoS, dcomp z, bool isExact);
 
 inline auto sminus(size_t dim, size_t twoS, dcomp z, bool isExact) {return splus(dim,twoS,z,isExact).dagger();}
 inline auto sx(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)+sminus(dim,twoS,z,isExact))/2;}
-inline auto sy(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*DCOMP_I);}
+inline auto sy(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*1i);}
 
 
 Tridiagonal splus(Ptr spin);
 
 inline auto sminus(Ptr spin) {return splus(spin).dagger();}
 inline auto sx(Ptr spin) {return (splus(spin)+sminus(spin))/2;}
-inline auto sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
+inline auto sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*1i);}
 
 Tridiagonal sz(size_t dim, size_t twoS);
 
