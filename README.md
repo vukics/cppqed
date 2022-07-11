@@ -1,5 +1,5 @@
 * [An introductory talk](https://youtu.be/yunR73LNJ1M) given at GPU Day 2019
-* [Video tutorial part 1](https://youtu.be/Ozj4sDNdlmM) — How to download, configure and build C++QED, and run the testsuite on a fresh Ubuntu20.04 installation. The commands used in the tutorial can be found in `helperscripts/cloudScript.sh`. They are as follows:
+* [Video tutorial part 1](https://youtu.be/Ozj4sDNdlmM) — How to download, configure and build C++QED, and run the testsuite on a fresh Ubuntu20.04 installation. The commands used in the tutorial can be found in [`helperscripts/cloudScript.sh`](helperscripts/cloudScript.sh). They are as follows:
 ```
 # Starting from fresh Ubuntu 20.04 LTS installation
 # Install prerequisites:
