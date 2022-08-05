@@ -1,7 +1,6 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef   CPPQEDCORE_STRUCTURE_LIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
-#define   CPPQEDCORE_STRUCTURE_LIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
+#pragma once
 
 #include "LazyDensityOperator.h"
 #include "Types.h"
@@ -10,6 +9,16 @@
 #include "BlitzArrayExtensions.h"
 
 #include <memory>
+
+
+
+template <int RANK>
+using TimeDependentExpectationValue = std::function<double(double t, const quantumdata::LazyDensityOperator<RANK>& psi)>;
+
+template <int RANK>
+using TimeIndependentExpectationValue = std::function<double(const quantumdata::LazyDensityOperator<RANK>& psi)>;
+
+
 
 
 namespace structure {
@@ -56,7 +65,7 @@ public:
   
 private:
   virtual std::ostream& streamKey_v(std::ostream&, size_t&) const = 0;
-  virtual size_t        nAvr_v      (                      ) const = 0;
+  virtual size_t        nAvr_v     (                      ) const = 0;
 
 
 };
@@ -100,6 +109,3 @@ private:
 
 } // structure
 
-
-
-#endif // CPPQEDCORE_STRUCTURE_LIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
