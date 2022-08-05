@@ -9,6 +9,9 @@
 #include <iosfwd>
 
 
+/// Just a set of functionals, however, each functional can return not only a single, but an array of expectation values
+/// => this solves the problem of how to handle Fourier transformation in Particle elements
+
 namespace structure {
 
 
