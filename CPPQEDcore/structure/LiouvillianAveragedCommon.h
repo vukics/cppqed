@@ -24,32 +24,32 @@ using TimeIndependentExpectationValue = std::function<double(const quantumdata::
 namespace structure {
 
   
-/// Enumeration describing a (compile-time) choice between Liouvillean & Averaged
-enum LiouvilleanAveragedTag {
-  LA_Li, ///< Liouvillean
+/// Enumeration describing a (compile-time) choice between Liouvillian & Averaged
+enum LiouvillianAveragedTag {
+  LA_Li, ///< Liouvillian
   LA_Av  ///< Averaged
 };
 
-/// A tagging struct corresponding to LiouvilleanAveragedTag
-template<LiouvilleanAveragedTag>
-struct LiouvilleanAveragedTag_ {LiouvilleanAveragedTag_() {}};
+/// A tagging struct corresponding to LiouvillianAveragedTag
+template<LiouvillianAveragedTag>
+struct LiouvillianAveragedTag_ {LiouvillianAveragedTag_() {}};
 
-typedef LiouvilleanAveragedTag_<LA_Li> LA_Li_tagType;
-typedef LiouvilleanAveragedTag_<LA_Av> LA_Av_tagType;
+typedef LiouvillianAveragedTag_<LA_Li> LA_Li_tagType;
+typedef LiouvillianAveragedTag_<LA_Av> LA_Av_tagType;
 
 const LA_Li_tagType LA_Li_tag;
 const LA_Av_tagType LA_Av_tag;
 
 
-/// The template-parameter independent part of LiouvilleanAveragedCommonRanked
-class LiouvilleanAveragedCommon
+/// The template-parameter independent part of LiouvillianAveragedCommonRanked
+class LiouvillianAveragedCommon
 {
 public:
-  virtual ~LiouvilleanAveragedCommon() {}
+  virtual ~LiouvillianAveragedCommon() {}
 
   /// Streams a key (a.k.a. legend)
   /**
-   * - for a  Liouvillean, the key is a description of decay channels,
+   * - for a  Liouvillian, the key is a description of decay channels,
    * - for an Averaged, it describes the streamed columns
    */
   std::ostream& streamKey(std::ostream& o,
@@ -58,7 +58,7 @@ public:
 
   /// Returns the number of calculated quantum averages
   /**
-   * - for a Liouvillean the quantum averages are the jump rates
+   * - for a Liouvillian the quantum averages are the jump rates
    * - for an Averaged, they are the quantum averages calculated for display
    */
   size_t nAvr() const {return nAvr_v();}
@@ -71,13 +71,13 @@ private:
 };
 
 
-/// Common functionality of Liouvillean & Averaged
+/// Common functionality of Liouvillian & Averaged
 /** \tparamRANK */
 template<int RANK>
-class LiouvilleanAveragedCommonRanked : public LiouvilleanAveragedCommon
+class LiouvillianAveragedCommonRanked : public LiouvillianAveragedCommon
 {
 public:
-  virtual ~LiouvilleanAveragedCommonRanked() {}
+  virtual ~LiouvillianAveragedCommonRanked() {}
 
   /// Calculates quantum averages & checks post-conditions
   /**
@@ -94,7 +94,7 @@ public:
   {
     const Averages averages(average_v(t,matrix));
     if (size_t(averages.size())!=nAvr()) throw std::runtime_error("Averages number mismatch -- size: "+std::to_string(averages.size())+" nAvr: "+std::to_string(nAvr()));
-    /// \post 1.: number of averages must equal LiouvilleanAveragedCommon::nAvr
+    /// \post 1.: number of averages must equal LiouvillianAveragedCommon::nAvr
     if (!all(blitzplusplus::isfinite(averages))) throw std::runtime_error("Infinite detected in averages");
     /// \post 2.: all quantum averages must be finite
 

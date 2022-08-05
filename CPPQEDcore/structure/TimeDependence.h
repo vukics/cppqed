@@ -73,7 +73,7 @@ using Dispatcher_t = std::conditional_t<TD==TimeDependence::TWO,
 
 
 /// Metafunction dispatching two OneTime & NoTime according to the template parameter `IS_TIME_DEPENDENT`
-/** \see LiouvilleanTimeDependenceDispatched for a paradigmatic example of usage */
+/** \see LiouvillianTimeDependenceDispatched for a paradigmatic example of usage */
 template<bool IS_TIME_DEPENDENT>
 using DispatcherIsTimeDependent_t = std::conditional_t<IS_TIME_DEPENDENT,OneTime,NoTime>;
 

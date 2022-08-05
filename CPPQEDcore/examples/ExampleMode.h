@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// [basic example mode]
 #include "Free.h"
-#include "ElementLiouvillean.h"
+#include "ElementLiouvillian.h"
 #include "ElementAveraged.h"
 
 #include "TridiagonalHamiltonian.h"
@@ -18,7 +18,7 @@ namespace basic {
 
 
 class PumpedLossyMode 
-  : public structure::Free, public TridiagonalHamiltonian<1,false>, public structure::ElementLiouvilleanStrategies<1,2>, public structure::ElementAveraged<1>
+  : public structure::Free, public TridiagonalHamiltonian<1,false>, public structure::ElementLiouvillianStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
   PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
@@ -42,7 +42,7 @@ namespace basic {
 
 class PumpedLossyModeIP
   : public structure::Free, public structure::FreeExact<false>, public TridiagonalHamiltonian<1,true>,
-    public structure::ElementLiouvilleanStrategies<1,2>, public structure::ElementAveraged<1>
+    public structure::ElementLiouvillianStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
   PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
@@ -68,7 +68,7 @@ namespace hierarchical {
 
 // All inculdes and using directives the same as above
 
-class ModeBase : public structure::Free, public structure::ElementLiouvillean<1,2>, public structure::ElementAveraged<1>
+class ModeBase : public structure::Free, public structure::ElementLiouvillian<1,2>, public structure::ElementAveraged<1>
 {
 public:
   typedef std::shared_ptr<ModeBase> Ptr;

@@ -4,7 +4,7 @@
 #define CPPQEDCORE_STRUCTURE_ELEMENTAVERAGED_H_INCLUDED
 
 #include "Averaged.h"
-#include "ElementLiouvilleanAveragedCommon.h"
+#include "ElementLiouvillianAveragedCommon.h"
 
 
 
@@ -30,10 +30,10 @@ std::ostream& streamCommon(const Averages&, std::ostream&, int);
  *
  */
 template<int RANK, bool IS_TIME_DEPENDENT=false>
-class ElementAveraged : public ElementLiouvilleanAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
+class ElementAveraged : public ElementLiouvillianAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> >
 {
 private:
-  typedef ElementLiouvilleanAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
+  typedef ElementLiouvillianAveragedCommon<AveragedTimeDependenceDispatched<RANK,IS_TIME_DEPENDENT> > Base;
   
 protected:
   /// \name Constructors

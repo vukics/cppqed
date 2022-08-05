@@ -8,7 +8,7 @@
 
 #include "Exact.h"
 #include "Hamiltonian.h"
-#include "Liouvillean.h"
+#include "Liouvillian.h"
 #include "Averaged.h"
 
 /// Comprises modules for describing quantum systems.
@@ -60,17 +60,17 @@ stream(AveragedPtr<RANK> av,
 }
 
 
-/// If the first argument is a valid pointer, it calles LiouvilleanAveragedCommon Averaged::average; otherwise a no-op (returning an empty array) \related QuantumSystemWrapper
+/// If the first argument is a valid pointer, it calles LiouvillianAveragedCommon Averaged::average; otherwise a no-op (returning an empty array) \related QuantumSystemWrapper
 template<int RANK>
-auto average(std::shared_ptr<const LiouvilleanAveragedCommonRanked<RANK>> ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
+auto average(std::shared_ptr<const LiouvillianAveragedCommonRanked<RANK>> ptr, double t, const quantumdata::LazyDensityOperator<RANK>& matrix)
 {
   return ptr ? ptr->average(t,matrix) : Averages{};
 }
 
 
-/// A wrapper for Exact, Hamiltonian, Liouvillean, and Averaged
+/// A wrapper for Exact, Hamiltonian, Liouvillian, and Averaged
 /**
- * Its aim is to determine whether the passed DynamicsBase or QuantumSystem object derives also from Exact, Hamiltonian, Liouvillean, and Averaged
+ * Its aim is to determine whether the passed DynamicsBase or QuantumSystem object derives also from Exact, Hamiltonian, Liouvillian, and Averaged
  *
  * If the answer is
  * - positive, it forwards the member functions of the given class with the given object dynamic-cast to the necessary type.
@@ -90,7 +90,7 @@ public:
     : qs_(std::dynamic_pointer_cast<const QuantumSystem<RANK>>(qs)),
       ex_(std::dynamic_pointer_cast<const Exact<RANK>>(qs)),
       ha_(std::dynamic_pointer_cast<const Hamiltonian<RANK>>(qs)),
-      li_(std::dynamic_pointer_cast<const Liouvillean<RANK>>(qs)),
+      li_(std::dynamic_pointer_cast<const Liouvillian<RANK>>(qs)),
       av_(std::dynamic_pointer_cast<const Averaged<RANK>>(qs))
   {} ///< Constructor from DynamicsBase
 
@@ -98,7 +98,7 @@ public:
     : qs_(qs),
       ex_(std::dynamic_pointer_cast<const Exact<RANK>>(qs)),
       ha_(std::dynamic_pointer_cast<const Hamiltonian<RANK>>(qs)),
-      li_(isNoisy ? std::dynamic_pointer_cast<const Liouvillean<RANK>>(qs) : LiouvilleanPtr<RANK>()),
+      li_(isNoisy ? std::dynamic_pointer_cast<const Liouvillian<RANK>>(qs) : LiouvillianPtr<RANK>()),
       av_(std::dynamic_pointer_cast<const Averaged<RANK>>(qs))
   {} ///< Constructor from QuantumSystem
   //@}
@@ -115,16 +115,16 @@ public:
 
 public:
   /**
-   * \name Dispatcher between Liouvillean and Averaged
+   * \name Dispatcher between Liouvillian and Averaged
    * \internal We use overload instead of template specialization, which is only possible in namespace scope
    *  @{
    */
-  std::shared_ptr<const LiouvilleanAveragedCommonRanked<RANK>> getLA(LA_Li_tagType) const {return li_;}
-  std::shared_ptr<const LiouvilleanAveragedCommonRanked<RANK>> getLA(LA_Av_tagType) const {return av_;}
+  std::shared_ptr<const LiouvillianAveragedCommonRanked<RANK>> getLA(LA_Li_tagType) const {return li_;}
+  std::shared_ptr<const LiouvillianAveragedCommonRanked<RANK>> getLA(LA_Av_tagType) const {return av_;}
   //@}
 
   /// Streams the dynamical characteristics of the system
-  std::ostream& streamCharacteristics(std::ostream& os) const {return os<<"System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillean evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
+  std::ostream& streamCharacteristics(std::ostream& os) const {return os<<"System characteristics: "<<(ex_ ? "Interaction picture, "   : "")<<(ha_ ? "Hamiltonian evolution, " : "")<<(li_ ? "Liouvillian evolution, " : "")<<(av_ ? "calculates Averages."    : "");}
 
 
   /// \name Forwarded members from Exact
@@ -141,7 +141,7 @@ public:
   //@}
 
 
-  /// \name Forwarded member from Liouvillean
+  /// \name Forwarded member from Liouvillian
   //@{
   void actWithJ(double t, StateVectorLow<RANK>& psi, size_t lindbladNo) const {if (li_) li_->actWithJ(t,psi,lindbladNo);}
   void actWithSuperoperator(double t, const DensityOperatorLow<RANK>& rho, DensityOperatorLow<RANK>& drhodt, size_t lindbladNo) const {if (li_) li_->actWithSuperoperator(t,rho,drhodt,lindbladNo);}
@@ -159,16 +159,16 @@ public:
   //@}
 
 
-  /// \name Forwarded members from LiouvilleanAveragedCommon
+  /// \name Forwarded members from LiouvillianAveragedCommon
   //@{
-  template<LiouvilleanAveragedTag LA>
-  size_t nAvr() const {const auto ptr=getLA(LiouvilleanAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
+  template<LiouvillianAveragedTag LA>
+  size_t nAvr() const {const auto ptr=getLA(LiouvillianAveragedTag_<LA>()); return ptr ? ptr->nAvr() : 0;}
 
-  template<LiouvilleanAveragedTag LA>
-  std::ostream& streamKey(std::ostream& os, size_t& i) const {if (const auto ptr=getLA(LiouvilleanAveragedTag_<LA>())) ptr->streamKey(os,i); return os;}
+  template<LiouvillianAveragedTag LA>
+  std::ostream& streamKey(std::ostream& os, size_t& i) const {if (const auto ptr=getLA(LiouvillianAveragedTag_<LA>())) ptr->streamKey(os,i); return os;}
 
-  template<LiouvilleanAveragedTag LA>
-  const Averages average(double t, const quantumdata::LazyDensityOperator<RANK>& matrix) const {return structure::average(getLA(LiouvilleanAveragedTag_<LA>()),t,matrix);}
+  template<LiouvillianAveragedTag LA>
+  const Averages average(double t, const quantumdata::LazyDensityOperator<RANK>& matrix) const {return structure::average(getLA(LiouvillianAveragedTag_<LA>()),t,matrix);}
   //@}
 
 protected:
@@ -181,7 +181,7 @@ private:
 
   HamiltonianPtr<RANK> ha_;
   
-  LiouvilleanPtr<RANK> li_;
+  LiouvillianPtr<RANK> li_;
   
   AveragedPtr<RANK> av_;
   

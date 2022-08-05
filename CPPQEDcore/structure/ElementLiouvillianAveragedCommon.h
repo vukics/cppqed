@@ -1,7 +1,6 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
-#define CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
+#pragma once
 
 #include "KeyPrinter.h"
 
@@ -9,12 +8,12 @@
 namespace structure {
 
 
-/// Implements LiouvilleanAveragedCommon::streamKey and LiouvilleanAveragedCommon::nAvr with the help of a cppqedutils::KeyPrinter
+/// Implements LiouvillianAveragedCommon::streamKey and LiouvillianAveragedCommon::nAvr with the help of a cppqedutils::KeyPrinter
 /**
  * The number of averages is taken simply to be the \link cppqedutils::KeyPrinter::length length of the key\endlink
  */
 template<typename BASE>
-class ElementLiouvilleanAveragedCommon : public BASE
+class ElementLiouvillianAveragedCommon : public BASE
 {
 public:
   typedef cppqedutils::KeyPrinter::KeyLabels            KeyLabels           ;
@@ -26,13 +25,13 @@ public:
 protected:
   /// \copydoc getTitle
   template<typename... KeyLabelsPack>
-  ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyPrinter_(keyTitle,keyLabelsPack...) {}
+  ElementLiouvillianAveragedCommon(const std::string& keyTitle, KeyLabelsPack&&... keyLabelsPack) : keyPrinter_(keyTitle,keyLabelsPack...) {}
 
   /// \copydoc getTitle
-  ElementLiouvilleanAveragedCommon(const std::string& keyTitle, KeyLabelsInitializer il) : keyPrinter_(keyTitle,il) {}
+  ElementLiouvillianAveragedCommon(const std::string& keyTitle, KeyLabelsInitializer il) : keyPrinter_(keyTitle,il) {}
 
   const cppqedutils::KeyPrinter& getKeyPrinter() const {return keyPrinter_;}
-        cppqedutils::KeyPrinter& getKeyPrinter()       {return const_cast<cppqedutils::KeyPrinter&>(static_cast<const ElementLiouvilleanAveragedCommon*>(this)->getKeyPrinter());}
+        cppqedutils::KeyPrinter& getKeyPrinter()       {return const_cast<cppqedutils::KeyPrinter&>(static_cast<const ElementLiouvillianAveragedCommon*>(this)->getKeyPrinter());}
   
 private:
   size_t nAvr_v() const final {return keyPrinter_.size();}
@@ -44,8 +43,4 @@ private:
 };
 
 } // structure
-
-
-#endif // CPPQEDCORE_STRUCTURE_ELEMENTLIOUVILLEANAVERAGEDCOMMON_H_INCLUDED
-
 

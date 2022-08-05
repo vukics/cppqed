@@ -12,7 +12,7 @@ using namespace structure;
 
 PumpedTwoLevelAtom::PumpedTwoLevelAtom(const qbit::ParsPumpedLossy& pp2la)
   : Free(2,{},{CF{"(gamma,deltaA)",{pp2la.gamma,pp2la.delta},1.},CF{"eta",pp2la.eta,1.}}), 
-    structure::ElementLiouvillean<1,1>("Pumped Two-Level Atom","atomic decay"),
+    structure::ElementLiouvillian<1,1>("Pumped Two-Level Atom","atomic decay"),
     za_(-pp2la.gamma,pp2la.delta), eta_(pp2la.eta)
 {
   getParsStream()<<"Pumped Two-Level Atom\n";

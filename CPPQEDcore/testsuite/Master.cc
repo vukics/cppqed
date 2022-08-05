@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
   /*
   cout<<psi();
-  structure::Liouvillean<1>::actWithJ(&plm,psi(),0);
+  structure::Liouvillian<1>::actWithJ(&plm,psi(),0);
   psi()/=dcomp(1,-.5); psi.renorm();
   cout<<psi();
   */

@@ -59,9 +59,9 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
  *   -# If the system time evolution has Hamiltonian part, it is evolved with an adaptive-size step (cf. evolved::Evolved). This takes the system into \f$t+\Delta t\f$.
  *   -# The exact part (if any) of the time evolution is applied, making that the Schrödinger and interaction pictures coincide again at \f$t+\Delta t\f$.
  *   -# The state vector is renormalized.
- * -# If the system is *not* Liouvillean, the timestep ends here, reducing to a simple ODE evolution. Otherwise:
+ * -# If the system is *not* Liouvillian, the timestep ends here, reducing to a simple ODE evolution. Otherwise:
  *   -# The rates (probabilities per unit time) corresponding to all jump operators are calculated. If some rates are found negative
- *      (“special jump”, cf. explanation at structure::Liouvillean::probabilities, then \f$J_\text{at}\ket\Psi\f$ is calculated (and tabulated) instead,
+ *      (“special jump”, cf. explanation at structure::Liouvillian::probabilities, then \f$J_\text{at}\ket\Psi\f$ is calculated (and tabulated) instead,
  *      and the rate is calculated as \f$\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2\f$. \see \ref specialjump
  *   -# First, it is verified whether the total jump probability is not too big. This is performed on two levels:
  *     -# The total jump rate \f$\delta r\f$ is calculated.
@@ -262,9 +262,9 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentT
   }
   
   // This defines three levels:
-  // 1. System is Hamiltonian -> internal timestep control is used with dtTry possibly modified by Liouvillean needs (cf. manageTimeStep)
-  // 2. System is not Hamiltonian, but it is Liouvillean -> dtTry is used, which is governed solely by Liouvillean in this case (cf. manageTimeStep)
-  // 3. System is neither Hamiltonian nor Liouvillean (might be of Exact) -> a step of Dt is taken
+  // 1. System is Hamiltonian -> internal timestep control is used with dtTry possibly modified by Liouvillian needs (cf. manageTimeStep)
+  // 2. System is not Hamiltonian, but it is Liouvillian -> dtTry is used, which is governed solely by Liouvillian in this case (cf. manageTimeStep)
+  // 3. System is neither Hamiltonian nor Liouvillian (might be of Exact) -> a step of Dt is taken
   
   if (const auto ex=this->getEx()) {
     ex->actWithU(t_,psi_.getArray(),t0_);
@@ -298,20 +298,20 @@ manageTimeStep(const structure::Rates& rates, double tCache, double dtDidCache, 
   const double totalRate=boost::accumulate(rates,0.);
   const double dtDid=getDtDid(), dtTry=ode_.getDtTry();
 
-  const double liouvilleanSuggestedDtTry=dpLimit_/totalRate;
+  const double liouvillianSuggestedDtTry=dpLimit_/totalRate;
 
   // Assumption: overshootTolerance_>=1 (equality is the limiting case of no tolerance)
   if (totalRate*dtDid>overshootTolerance_*dpLimit_) {
-    t_=tCache; ode_.setDtDid(dtDidCache); ode_.setDtTry(liouvilleanSuggestedDtTry);
+    t_=tCache; ode_.setDtDid(dtDidCache); ode_.setDtTry(liouvillianSuggestedDtTry);
     logger_.stepBack(logStream,totalRate*dtDid,dtDid,ode_.getDtTry(),t_,logControl);
     return true; // Step-back required.
   }
   else if ( totalRate*dtTry>dpLimit_) {
-    logger_.overshot(logStream,totalRate*dtTry,dtTry,liouvilleanSuggestedDtTry,logControl);
+    logger_.overshot(logStream,totalRate*dtTry,dtTry,liouvillianSuggestedDtTry,logControl);
   }
 
   // dtTry-adjustment for next step:
-  ode_.setDtTry(this->getHa() ? std::min(ode_.getDtTry(),liouvilleanSuggestedDtTry) : liouvilleanSuggestedDtTry);
+  ode_.setDtTry(this->getHa() ? std::min(ode_.getDtTry(),liouvillianSuggestedDtTry) : liouvillianSuggestedDtTry);
 
   return false; // Step-back not required.
 }

@@ -8,7 +8,7 @@
 #include "QM_Picture.h"
 #include "StateVector.h"
 
-#include "ElementLiouvillean.h"
+#include "ElementLiouvillian.h"
 #include "ElementAveraged.h"
 #include "Free.h"
 #include "FreeExact.h"
@@ -152,7 +152,7 @@ private:
 
 
 
-template<bool TEMPERATURE, bool IS_ALTERNATIVE=false> class Liouvillean;
+template<bool TEMPERATURE, bool IS_ALTERNATIVE=false> class Liouvillian;
 
 
 namespace details {
@@ -167,11 +167,11 @@ void aDagSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double);
 
 
 template<bool IS_ALTERNATIVE>
-class Liouvillean<false,IS_ALTERNATIVE> 
-  : public structure::ElementLiouvillean<1,1>
+class Liouvillian<false,IS_ALTERNATIVE> 
+  : public structure::ElementLiouvillian<1,1>
 {
 protected:
-  Liouvillean(double kappa, double=0, const std::string& kT=keyTitle) : structure::ElementLiouvillean<1,1>(kT,"excitation loss"), kappa_(kappa) {}
+  Liouvillian(double kappa, double=0, const std::string& kT=keyTitle) : structure::ElementLiouvillian<1,1>(kT,"excitation loss"), kappa_(kappa) {}
   // the second dummy argument is there only to have the same form for the ctor as in the TEMPERATURE=true case
 
 private:
@@ -192,10 +192,10 @@ private:
 
 namespace details {
 
-class LiouvilleanFiniteTemperatureBase
+class LiouvillianFiniteTemperatureBase
 {
 protected:
-  LiouvilleanFiniteTemperatureBase(double kappa, double nTh) : kappa_(kappa), nTh_(nTh) {}
+  LiouvillianFiniteTemperatureBase(double kappa, double nTh) : kappa_(kappa), nTh_(nTh) {}
   
   template<bool IA> double rate0(const LazyDensityOperator& m) const
   {
@@ -218,15 +218,15 @@ protected:
 
 
 template<bool IS_ALTERNATIVE> 
-class Liouvillean<true ,IS_ALTERNATIVE>
-  : private details::LiouvilleanFiniteTemperatureBase,
-    public structure::ElementLiouvillean<1,2>
+class Liouvillian<true ,IS_ALTERNATIVE>
+  : private details::LiouvillianFiniteTemperatureBase,
+    public structure::ElementLiouvillian<1,2>
 {
 protected:
-  typedef structure::ElementLiouvillean<1,2> Base;
+  typedef structure::ElementLiouvillian<1,2> Base;
 
-  Liouvillean(double kappa, double nTh, const std::string& kT=keyTitle)
-    : details::LiouvilleanFiniteTemperatureBase(kappa,nTh), Base(kT,{"excitation loss","excitation absorption"}) {}
+  Liouvillian(double kappa, double nTh, const std::string& kT=keyTitle)
+    : details::LiouvillianFiniteTemperatureBase(kappa,nTh), Base(kT,{"excitation loss","excitation absorption"}) {}
   
 private:
   void doActWithJ(NoTime, StateVectorLow& psi, LindbladNo<0>) const override {details::   aJump(psi,kappa_*(nTh_+1));}
@@ -421,7 +421,7 @@ public:
 /** \tparam TEMPERATURE governs whether the possibility of finite temperature is considered */
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class LossyMode 
-  : public mode::Liouvillean<TEMPERATURE>, public mode::Exact, public ModeBase, public AveragingType
+  : public mode::Liouvillian<TEMPERATURE>, public mode::Exact, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
@@ -436,7 +436,7 @@ public:
 /// Same as LossyMode, but in unitary interaction picture, defined only by the \f$-\delta\,a^\dagger a\f$ part of the Hamiltonian \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class LossyModeUIP 
-  : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
+  : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
@@ -451,7 +451,7 @@ public:
 /// Same as LossyMode, but in Schrödinger picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class LossyModeSch 
-  : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
+  : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
@@ -467,7 +467,7 @@ public:
 /// Combines LossyMode with pumping in full (non-unitary) interaction picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyMode 
-  : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
+  : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
@@ -481,7 +481,7 @@ public:
 /// Combines LossyModeUIP and PumpedMode \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyModeUIP 
-  : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
+  : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
@@ -495,7 +495,7 @@ public:
 /// Combines LossyModeSch and PumpedModeSch \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyModeSch
-  : public mode::Liouvillean<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
+  : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
@@ -509,7 +509,7 @@ public:
 
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class PumpedLossyModeAlternative 
-  : public mode::Liouvillean<TEMPERATURE,true>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
+  : public mode::Liouvillian<TEMPERATURE,true>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
@@ -524,7 +524,7 @@ public:
 class PumpedLossyModeIP_NoExact
   : public ModeBase,
     public quantumoperator::TridiagonalHamiltonian<1,true>, 
-    public structure::ElementLiouvillean<1,1,true>,
+    public structure::ElementLiouvillian<1,1,true>,
     public structure::ElementAveraged<1,true>
 {
 public:

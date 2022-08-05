@@ -134,7 +134,7 @@ void Spin::updateU(structure::OneTime dtDid) const
 }
 
 
-void spin::Liouvillean::doActWithJ(structure::NoTime, structure::freesystem::StateVectorLow& psi) const
+void spin::Liouvillian::doActWithJ(structure::NoTime, structure::freesystem::StateVectorLow& psi) const
 {
   double fact=sqrt(2.*gamma_);
   int ubound=psi.ubound(0);
@@ -144,7 +144,7 @@ void spin::Liouvillean::doActWithJ(structure::NoTime, structure::freesystem::Sta
 }
 
 
-double spin::Liouvillean::rate(structure::NoTime, const structure::freesystem::LazyDensityOperator& matrix) const
+double spin::Liouvillian::rate(structure::NoTime, const structure::freesystem::LazyDensityOperator& matrix) const
 {
   double res=0;
   for (size_t n=1; n<matrix.getDimension(); ++n)

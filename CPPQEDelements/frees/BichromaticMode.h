@@ -21,14 +21,14 @@ struct ParsBichromatic : ParsPumpedLossy
 
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
 class BichromaticMode
-  : public mode::Liouvillean<TEMPERATURE>,
+  : public mode::Liouvillian<TEMPERATURE>,
     public mode::Hamiltonian<true>,
     public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
   BichromaticMode(const mode::ParsBichromatic& p, AveragingConstructorParameters&&... a)
-    : mode::Liouvillean<TEMPERATURE>(p.kappa,p.nTh),
+    : mode::Liouvillian<TEMPERATURE>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
       ModeBase(p.cutoff,RF{"deltaOther",p.deltaOther,1},{CF{"(kappa*(2*nTh+1),delta)",conj(get_zI()),1},CF{"eta",get_eta(),sqrt(p.cutoff)},CF{"etaOther",p.etaOther,sqrt(p.cutoff)}},"Bichromatic mode"),
       AveragingType(std::forward<AveragingConstructorParameters>(a)...),

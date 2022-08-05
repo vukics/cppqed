@@ -26,7 +26,7 @@ struct ParsHomodyned : BASE // BASE either ParsLossy or ParsPumpedLossy
 
 
 class HomodynedBase
-  : public Hamiltonian<false>, public structure::ElementLiouvillean<1,2>
+  : public Hamiltonian<false>, public structure::ElementLiouvillian<1,2>
 {
 protected:
   HomodynedBase(const ParsLossy& p, dcomp homodyneAmplitude, dcomp eta=0.);

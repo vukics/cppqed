@@ -11,7 +11,7 @@
 
 #include "Qbit_.h"
 
-#include "ElementLiouvillean.h"
+#include "ElementLiouvillian.h"
 #include "ElementAveraged.h"
 #include "Free.h"
 #include "Hamiltonian.h"
@@ -21,7 +21,7 @@
 
 
 
-class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillean<1,1>, public qbit::Averaged
+class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillian<1,1>, public qbit::Averaged
 {
 public:
   const dcomp getZa() const {return za_;}

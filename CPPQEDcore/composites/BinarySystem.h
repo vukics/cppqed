@@ -25,16 +25,16 @@ typedef composite::SubSystemsInteraction<2> SSI; ///< Convenience typedef
 
 using structure::Averages; using structure::Rates;
 
-/// Outfactored common functionality of Liouvillean and Averaged
-template<structure::LiouvilleanAveragedTag>
+/// Outfactored common functionality of Liouvillian and Averaged
+template<structure::LiouvillianAveragedTag>
 std::ostream& streamKey(std::ostream&, size_t&, const SSF& free0, const SSF& free1, const SSI& ia);
 
-/// Outfactored common functionality of Liouvillean and Averaged
-template<structure::LiouvilleanAveragedTag>
+/// Outfactored common functionality of Liouvillian and Averaged
+template<structure::LiouvillianAveragedTag>
 size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia);
 
-/// Outfactored common functionality of Liouvillean and Averaged
-template<structure::LiouvilleanAveragedTag>
+/// Outfactored common functionality of Liouvillian and Averaged
+template<structure::LiouvillianAveragedTag>
 const Averages
 average(double t, const quantumdata::LazyDensityOperator<2>& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr);
 
@@ -42,7 +42,7 @@ average(double t, const quantumdata::LazyDensityOperator<2>& ldo, const SSF& fre
 /// Common base for all class-composed BinarySystem%s
 /**
  * It implements only the structure::Averaged and structure::QuantumSystem interfaces, since all the other characteristics
- * (structure::Exact, structure::Hamiltonian, structure::Liouvillean) will be added by class composition.
+ * (structure::Exact, structure::Hamiltonian, structure::Liouvillian) will be added by class composition.
  *
  * \see explanation @ make()
  *
@@ -98,7 +98,7 @@ typedef std::shared_ptr<const Base> Ptr; ///< Convenience typedef
 /// Maker function for BinarySystem
 /**
  * Uses runtime dispatching to select the suitable class-composed BinarySystem on the basis of the characteristics of the components
- * (the two \link structure::Free free systems\endlink and the #Interaction): whether they derive from structure::Exact, structure::Hamiltonian, structure::Liouvillean.
+ * (the two \link structure::Free free systems\endlink and the #Interaction): whether they derive from structure::Exact, structure::Hamiltonian, structure::Liouvillian.
  * If any of the components derive from structure::Exact, then the whole BinarySystem has to derive from structure::Exact, and so on.
  */
 const Ptr make(InteractionPtr);
@@ -139,10 +139,10 @@ CLASS_HEADER(Hamiltonian)
 };
 
 
-/// Implements the structure::Liouvillean interface for a BinarySystem
-CLASS_HEADER(Liouvillean)
+/// Implements the structure::Liouvillian interface for a BinarySystem
+CLASS_HEADER(Liouvillian)
 {
-  CLASS_BODY_PART(Liouvillean,Li)
+  CLASS_BODY_PART(Liouvillian,Li)
 
   void actWithJ_v(double, StateVectorLow&, size_t) const override;
   
@@ -184,7 +184,7 @@ public:
  *
  * \tparam IS_EX governs whether the class should inherit from binary::Exact
  * \tparam IS_HA governs whether the class should inherit from binary::Hamiltonian
- * \tparam IS_LI governs whether the class should inherit from binary::Liouvillean
+ * \tparam IS_LI governs whether the class should inherit from binary::Liouvillian
  *
  * If `IS_EX` is `true`, the class inherits from binary::Exact, otherwise from binary::EmptyBase, and so on.
  *
@@ -194,14 +194,14 @@ class BinarySystem
   : public binary::Base,
     public BASE_class(EX,Exact), 
     public BASE_class(HA,Hamiltonian),
-    public BASE_class(LI,Liouvillean)
+    public BASE_class(LI,Liouvillian)
 {
 public:
   typedef BASE_class(EX,Exact) ExactBase;
   
   typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
   
-  typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
+  typedef BASE_class(LI,Liouvillian) LiouvillianBase;
   
   explicit BinarySystem(binary::InteractionPtr);
 

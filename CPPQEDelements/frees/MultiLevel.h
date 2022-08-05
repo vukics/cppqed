@@ -8,7 +8,7 @@
 #include "AveragingUtils.h"
 
 #include "ElementAveraged.h"
-#include "ElementLiouvillean.h"
+#include "ElementLiouvillian.h"
 #include "Free.h"
 #include "FreeExact.h"
 #include "Hamiltonian.h"
@@ -179,7 +179,7 @@ private:
 
 //////////////
 //
-// Liouvillean
+// Liouvillian
 //
 //////////////
 
@@ -189,23 +189,23 @@ template<int I, int J> using Decay = DynamicsPair<double,I,J>;
 
 
 template<int NL, typename VL, int ORDO>
-class LiouvilleanRadiative;
+class LiouvillianRadiative;
 
 
 // With ORDO=-1, this doesn’t correspond to valid jumps, its function is to store data, fill keyLabels, etc.:
 template<int NL, typename VL>
-class LiouvilleanRadiative<NL,VL,-1> : public structure::ElementLiouvillean<1, mpl::size<VL>::value>
+class LiouvillianRadiative<NL,VL,-1> : public structure::ElementLiouvillian<1, mpl::size<VL>::value>
 {
 private:
-  typedef structure::ElementLiouvillean<1, mpl::size<VL>::value> Base;
+  typedef structure::ElementLiouvillian<1, mpl::size<VL>::value> Base;
 
   typedef typename Base::KeyLabels KeyLabels;
   
 protected:
   static const int NRT=mpl::size<VL>::value; // number of transitions with radiative loss
 
-  LiouvilleanRadiative(const VL& gammas,
-                       double = 0. ///< dummy to conform with LiouvilleanDiffusive
+  LiouvillianRadiative(const VL& gammas,
+                       double = 0. ///< dummy to conform with LiouvillianDiffusive
                       )
     : Base(keyTitle,[] {
         KeyLabels res;
@@ -221,10 +221,10 @@ protected:
 
 
 template<int NL, typename VL, int ORDO>
-class LiouvilleanRadiative : public LiouvilleanRadiative<NL,VL,ORDO-1>
+class LiouvillianRadiative : public LiouvillianRadiative<NL,VL,ORDO-1>
 {
 private:
-  typedef LiouvilleanRadiative<NL,VL,ORDO-1> Base;
+  typedef LiouvillianRadiative<NL,VL,ORDO-1> Base;
   
 protected:
   using Base::Base; using Base::NRT; using Base::gammas_;
@@ -254,27 +254,27 @@ private:
 };
 
 
-// Just a convenience layer above ElementLiouvilleanDiffusive
-#define BASE_class structure::ElementLiouvilleanDiffusive<1,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
+// Just a convenience layer above ElementLiouvillianDiffusive
+#define BASE_class structure::ElementLiouvillianDiffusive<1,LiouvillianRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL>
-class LiouvilleanDiffusive : public BASE_class
+class LiouvillianDiffusive : public BASE_class
 {
 public:
   using DiffusionCoeffs=typename BASE_class::DiffusionCoeffs;
 
 protected:
-  LiouvilleanDiffusive(const VL& gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
+  LiouvillianDiffusive(const VL& gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
   
-  LiouvilleanDiffusive(const VL& gammas, const DiffusionCoeffs& gammas_parallel) : BASE_class(NL,gammas_parallel,gammas) {}
+  LiouvillianDiffusive(const VL& gammas, const DiffusionCoeffs& gammas_parallel) : BASE_class(NL,gammas_parallel,gammas) {}
 
 #undef BASE_class
   
 };
 
 
-#define BASE_class std::conditional_t<IS_DIFFUSIVE,LiouvilleanDiffusive<NL,VL>,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
+#define BASE_class std::conditional_t<IS_DIFFUSIVE,LiouvillianDiffusive<NL,VL>,LiouvillianRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL, bool IS_DIFFUSIVE>
-class Liouvillean : public BASE_class
+class Liouvillian : public BASE_class
 {
 private:
   typedef BASE_class Base;
@@ -337,7 +337,7 @@ auto elementaryComplexFreqs(structure::DynamicsBase::ComplexFreqs& cf, const std
 template<int NL, typename VP, typename VL, bool IS_DIFFUSIVE, typename AveragingType=ReducedDensityOperator<1>>
 class PumpedLossyMultiLevelSch 
   : public multilevel::HamiltonianSch<NL,VP>,
-    public multilevel::Liouvillean<NL,VL,IS_DIFFUSIVE>,
+    public multilevel::Liouvillian<NL,VL,IS_DIFFUSIVE>,
     public MultiLevelBase<NL>,
     public AveragingType
   // The ordering becomes important here
@@ -347,7 +347,7 @@ public:
   typedef multilevel::   RealPerLevel<NL>    RealPerLevel;
 
   typedef multilevel::HamiltonianSch<NL,VP>              Hamiltonian;
-  typedef multilevel::Liouvillean   <NL,VL,IS_DIFFUSIVE> Liouvillean;
+  typedef multilevel::Liouvillian   <NL,VL,IS_DIFFUSIVE> Liouvillian;
   typedef MultiLevelBase<NL> Base;
 
   typedef typename Base::Ptr Ptr;
@@ -359,12 +359,12 @@ public:
         for_each(gammas,[&](auto gamma) {res(decltype(gamma)::second)+=gamma.get();});
         return res;
       } (), etas),
-      Liouvillean(gammas,gamma_parallel),
+      Liouvillian(gammas,gamma_parallel),
       Base([this,&gamma_parallel] {
         structure::DynamicsBase::RealFreqs res;
         for (int i=0; i<NL; i++) if (!hasRealPart(this->get_zSchs()(i))) res.push_back({"delta"+std::to_string(i),-imag(this->get_zSchs()(i)),1.});
         if constexpr (std::is_same_v<std::decay_t<GPT>,double>) res.push_back({"gamma_parallel",gamma_parallel,1.});
-        else if constexpr (std::is_same_v<std::decay_t<GPT>,typename Liouvillean::DiffusionCoeffs>) {
+        else if constexpr (std::is_same_v<std::decay_t<GPT>,typename Liouvillian::DiffusionCoeffs>) {
           if (gamma_parallel.size()!=NL) throw std::runtime_error("gamma_parallel vector wrong size");
           for (int i=0; i<NL; i++) res.push_back({"gamma_parallel_"+std::to_string(i),gamma_parallel[i],1.});
         }
@@ -399,7 +399,7 @@ makePumpedLossySch(const RealPerLevel<NL>& deltas,
   if constexpr (std::is_same_v<std::decay_t<GPT>,RealPerLevel<NL>>) {
     if (blitz::any(gamma_parallel!=0))
       return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
-                                                                                       typename LiouvilleanDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
+                                                                                       typename LiouvillianDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
                                                                                                                                              gamma_parallel.end()},
                                                                                        std::forward<AveragingConstructorParameters>(a)...);
   }

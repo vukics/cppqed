@@ -108,7 +108,7 @@ std::ostream& binary::Base::stream_v(const Averages& averages, std::ostream& os,
 
 ////////////////////////////
 //                        //
-// Averaged - Liouvillean //
+// Averaged - Liouvillian //
 //                        //
 ////////////////////////////
 
@@ -117,7 +117,7 @@ namespace binary {
 
 // These possibilities get instantiated through compilation, so that explicit instantiation is not necessary here.
   
-template<LiouvilleanAveragedTag LA>
+template<LiouvillianAveragedTag LA>
 std::ostream& streamKey(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia)
 {
   os<<"Binary system\n";
@@ -129,7 +129,7 @@ template std::ostream& streamKey<LA_Li>(std::ostream& os, size_t& i, const SSF& 
 template std::ostream& streamKey<LA_Av>(std::ostream& os, size_t& i, const SSF& free0, const SSF& free1, const SSI& ia);
 
 
-template<LiouvilleanAveragedTag LA>
+template<LiouvillianAveragedTag LA>
 size_t nAvr(const SSF& free0, const SSF& free1, const SSI& ia)
 {
   return free0.nAvr<LA>() + free1.nAvr<LA>() + ia.nAvr<LA>();
@@ -138,7 +138,7 @@ template size_t nAvr< LA_Li >(const SSF& free0, const SSF& free1, const SSI& ia)
 template size_t nAvr< LA_Av >(const SSF& free0, const SSF& free1, const SSI& ia); // explicit instantiation
 
 
-template<LiouvilleanAveragedTag LA>
+template<LiouvillianAveragedTag LA>
 const Averages average(double t, const LazyDensityOperator& ldo, const SSF& free0, const SSF& free1, const SSI& ia, size_t numberAvr)
 {
   using boost::copy;
@@ -209,12 +209,12 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
 
 /////////////////
 //             //
-// Liouvillean //
+// Liouvillian //
 //             //
 /////////////////
 
 
-void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) const
+void binary::Liouvillian::actWithJ_v(double t, StateVectorLow& psi, size_t i) const
 {
   const auto
     li0 =free0_.getLi(),
@@ -239,7 +239,7 @@ void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) co
 }
 
 
-void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t i) const
+void binary::Liouvillian::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t i) const
 {
   const auto lambda=[=,&i](auto li) {
     return [=,&i](const auto& rhoS, auto& drhodtS) {
@@ -288,7 +288,7 @@ BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(binary::InteractionPtr ia)
 : binary::Base(ia),
   BASE_ctor(Exact),
   BASE_ctor(Hamiltonian),
-  BASE_ctor(Liouvillean)
+  BASE_ctor(Liouvillian)
 {
 } 
 
@@ -311,7 +311,7 @@ const SystemCharacteristics querySystemCharacteristics(binary::InteractionPtr ia
   return SystemCharacteristics{
     std::dynamic_pointer_cast<const Exact<1>>(free0) || std::dynamic_pointer_cast<const Exact<1>>(free1) || std::dynamic_pointer_cast<const Exact<2>>(ia),
     std::dynamic_pointer_cast<const Hamiltonian<1>>(free0) || std::dynamic_pointer_cast<const Hamiltonian<1>>(free1) || std::dynamic_pointer_cast<const Hamiltonian<2>>(ia),
-    std::dynamic_pointer_cast<const Liouvillean<1>>(free0) || std::dynamic_pointer_cast<const Liouvillean<1>>(free1) || std::dynamic_pointer_cast<const Liouvillean<2>>(ia)};
+    std::dynamic_pointer_cast<const Liouvillian<1>>(free0) || std::dynamic_pointer_cast<const Liouvillian<1>>(free1) || std::dynamic_pointer_cast<const Liouvillian<2>>(ia)};
 }
 
 }

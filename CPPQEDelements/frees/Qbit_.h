@@ -110,18 +110,18 @@ public:
 
 
 
-class Liouvillean : public mode::Liouvillean<false>
+class Liouvillian : public mode::Liouvillian<false>
 {
 protected:
-  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma,0,keyTitle) {}
+  Liouvillian(double gamma) : mode::Liouvillian<false>(gamma,0,keyTitle) {}
 
 };
 
 
-class LiouvilleanPhaseNoise : public structure::ElementLiouvilleanStrategies<1,2>
+class LiouvillianPhaseNoise : public structure::ElementLiouvillianStrategies<1,2>
 {
 protected:
-  LiouvilleanPhaseNoise(double gamma_perpendicular, double gamma_parallel);
+  LiouvillianPhaseNoise(double gamma_perpendicular, double gamma_parallel);
   
 };
 
@@ -174,7 +174,7 @@ public:
 
 
 class LossyQbit
-  : public qbit::Liouvillean, public qbit::Exact, public QbitBase
+  : public qbit::Liouvillian, public qbit::Exact, public QbitBase
 {
 public:
   LossyQbit(double, double);
@@ -186,7 +186,7 @@ public:
 
 
 class LossyQbitSch
-  : public qbit::Liouvillean, public qbit::Hamiltonian<false>, public QbitBase
+  : public qbit::Liouvillian, public qbit::Hamiltonian<false>, public QbitBase
 {
 public:
   LossyQbitSch(double, double);
@@ -197,7 +197,7 @@ public:
 
 
 class LossyQbitUIP
-  : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
+  : public qbit::Liouvillian, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
   LossyQbitUIP(double, double);
@@ -208,7 +208,7 @@ public:
 
 
 class PumpedLossyQbit 
-  : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
+  : public qbit::Liouvillian, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
   PumpedLossyQbit(const qbit::ParsPumpedLossy& p);
@@ -216,7 +216,7 @@ public:
 
 
 class PumpedLossyQbitUIP
-  : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
+  : public qbit::Liouvillian, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
   PumpedLossyQbitUIP(const qbit::ParsPumpedLossy&);
@@ -224,7 +224,7 @@ public:
 
 
 class PumpedLossyQbitSch
-  : public qbit::Liouvillean, public qbit::Hamiltonian<false>, public QbitBase
+  : public qbit::Liouvillian, public qbit::Hamiltonian<false>, public QbitBase
 {
 public:
   PumpedLossyQbitSch(const qbit::ParsPumpedLossy&);
@@ -232,7 +232,7 @@ public:
 
 
 class LossyQbitWithPhaseNoise
-  : public qbit::Exact, public qbit::LiouvilleanPhaseNoise, public QbitBase
+  : public qbit::Exact, public qbit::LiouvillianPhaseNoise, public QbitBase
 {
 public:
   LossyQbitWithPhaseNoise(double, double, double);
@@ -244,7 +244,7 @@ public:
 
 
 class LossyQbitWithPhaseNoiseUIP
-  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianPhaseNoise, public QbitBase
 {
 public:
   LossyQbitWithPhaseNoiseUIP(double, double, double);
@@ -255,14 +255,14 @@ public:
 };
 
 class PumpedLossyQbitWithPhaseNoise
-  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianPhaseNoise, public QbitBase
 {
 public:
   PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossyPhaseNoise&);
 };
 
 class PumpedLossyQbitWithPhaseNoiseUIP
-  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianPhaseNoise, public QbitBase
 {
 public:
   PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossyPhaseNoise&);

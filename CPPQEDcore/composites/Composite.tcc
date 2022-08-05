@@ -199,11 +199,11 @@ void composite::Hamiltonian<VA>::addContribution_v(double t, const StateVectorLo
 
 ///////////////////////
 //
-// Liouvillean-Averaged
+// Liouvillian-Averaged
 //
 ///////////////////////
 
-template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+template<typename VA> template<structure::LiouvillianAveragedTag LA>
 std::ostream& composite::Base<VA>::streamKeyLA(std::ostream& os, size_t& i, const Frees& frees, const VA& acts)
 {
   mpl::for_each<Ordinals>([&](auto t) -> void {
@@ -218,7 +218,7 @@ std::ostream& composite::Base<VA>::streamKeyLA(std::ostream& os, size_t& i, cons
 }
 
 
-template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+template<typename VA> template<structure::LiouvillianAveragedTag LA>
 size_t composite::Base<VA>::nAvrLA(const Frees& frees, const VA& acts)
 {
   size_t res=0;
@@ -235,7 +235,7 @@ size_t composite::Base<VA>::nAvrLA(const Frees& frees, const VA& acts)
 
 
 
-template<typename VA> template<structure::LiouvilleanAveragedTag LA>
+template<typename VA> template<structure::LiouvillianAveragedTag LA>
 auto
 composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr) -> const Averages
 {
@@ -250,7 +250,7 @@ composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const F
       }));
     };
 
-    auto tag=structure::LiouvilleanAveragedTag_<LA>();
+    auto tag=structure::LiouvillianAveragedTag_<LA>();
     
     mpl::for_each<Ordinals>([&](auto t) -> void {
       static const int idx=decltype(t)::value;
@@ -271,13 +271,13 @@ composite::Base<VA>::averageLA(double t, const LazyDensityOperator& ldo, const F
 
 //////////////
 //
-// Liouvillean
+// Liouvillian
 //
 //////////////
 
 
 template<typename VA>
-void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_t ordoJump) const
+void composite::Liouvillian<VA>::actWithJ_v(double t, StateVectorLow& psi, size_t ordoJump) const
 {
   bool flag=false;
 
@@ -304,7 +304,7 @@ void composite::Liouvillean<VA>::actWithJ_v(double t, StateVectorLow& psi, size_
 
 
 template<typename VA>
-void composite::Liouvillean<VA>::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t ordoJump) const
+void composite::Liouvillian<VA>::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t ordoJump) const
 {
   bool flag=false;
 

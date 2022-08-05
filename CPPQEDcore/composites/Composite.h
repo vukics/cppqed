@@ -95,13 +95,13 @@ public:
   typedef typename RBase::Frees Frees;
   typedef typename RBase::Ordinals Ordinals;
   
-  template<structure::LiouvilleanAveragedTag>
+  template<structure::LiouvillianAveragedTag>
   static std::ostream& streamKeyLA(std::ostream&, size_t&, const Frees&, const VA& acts);
 
-  template<structure::LiouvilleanAveragedTag>
+  template<structure::LiouvillianAveragedTag>
   static size_t nAvrLA(const Frees& frees, const VA& acts);
 
-  template<structure::LiouvilleanAveragedTag>
+  template<structure::LiouvillianAveragedTag>
   static const Averages averageLA(double t, const LazyDensityOperator& ldo, const Frees& frees, const VA& acts, size_t numberAvr);
 
 protected:
@@ -194,8 +194,8 @@ private:
 
 
 template<typename VA>
-class Liouvillean
-  : public structure::Liouvillean<MaxRank_v<VA>+1>
+class Liouvillian
+  : public structure::Liouvillian<MaxRank_v<VA>+1>
 {
 private:
   static const int RANK=MaxRank_v<VA>+1;
@@ -210,7 +210,7 @@ private:
   typedef tmptools::Ordinals<RANK> Ordinals;
 
 protected:
-  Liouvillean(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
+  Liouvillian(const Frees& frees, const VA& acts) : frees_(frees), acts_(acts) {}
 
 private:
   std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<VA>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
@@ -297,7 +297,7 @@ public:
  * \tparam VA should model a \refBoost{Boost.Fusion list,fusion/doc/html/fusion/container/list.html} of composite::_ objects
  * \tparam IS_EX governs whether the class should inherit from composite::Exact
  * \tparam IS_HA governs whether the class should inherit from composite::Hamiltonian
- * \tparam IS_LI governs whether the class should inherit from composite::Liouvillean
+ * \tparam IS_LI governs whether the class should inherit from composite::Liouvillian
  */
 template<typename VA, bool IS_EX=true, bool IS_HA=true, bool IS_LI=true>
 // VA should model a fusion sequence of Acts
@@ -305,14 +305,14 @@ class Composite
   : public composite::Base<VA>,
     public BASE_class(EX,Exact),
     public BASE_class(HA,Hamiltonian),
-    public BASE_class(LI,Liouvillean)
+    public BASE_class(LI,Liouvillian)
 {
 public:
   typedef composite::Base<VA> Base;
   
   typedef BASE_class(EX,Exact) ExactBase;
   typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
-  typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
+  typedef BASE_class(LI,Liouvillian) LiouvillianBase;
   
   typedef typename composite::Base<VA>::Frees Frees;
   
@@ -327,7 +327,7 @@ public:
     : Base(frees ,acts),
       ExactBase(getFrees(),getActs()),
       HamiltonianBase(getFrees(),getActs()),
-      LiouvilleanBase(getFrees(),getActs()) {}
+      LiouvillianBase(getFrees(),getActs()) {}
 
   // Constructor
   explicit Composite(const VA& acts)

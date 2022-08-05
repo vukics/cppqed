@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "ExampleMode.h"
 
-#include "ElementLiouvillean.h"
+#include "ElementLiouvillian.h"
 #include "Tridiagonal.tcc"
 #include "TridiagonalHamiltonian.h"
 
@@ -26,7 +26,7 @@ basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, d
     TridiagonalHamiltonian<1,false>(dcomp(-kappa*(2*nTh+1),delta)*nop(cutoff)
                                     +
                                     tridiagPlusHC_overI(conj(eta)*aop(cutoff))),
-    ElementLiouvilleanStrategies<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
+    ElementLiouvillianStrategies<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
                                                      bind(aDagJump,_1,kappa* nTh   )),
                                       JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(nTh+1)),
                                                          bind(aDagJumpRate,_1,kappa* nTh   )),
@@ -68,7 +68,7 @@ basic::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp et
     FreeExact<false>(cutoff),
     TridiagonalHamiltonian<1,true>(furnishWithFreqs(tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
                                                     mainDiagonal(dcomp(kappa*(2*nTh+1),-delta),cutoff))),
-    ElementLiouvilleanStrategies<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
+    ElementLiouvillianStrategies<1,2>(JumpStrategies(bind(aJump   ,_1,kappa*(nTh+1)),
                                                      bind(aDagJump,_1,kappa* nTh   )),
                                       JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(nTh+1)),
                                                          bind(aDagJumpRate,_1,kappa* nTh   )),
@@ -105,7 +105,7 @@ auto basic::PumpedLossyModeIP::average_v(NoTime, const structure::freesystem::La
 
 hierarchical::ModeBase::ModeBase(double kappa, double nTh, size_t cutoff)
   : Free(cutoff,{RF{"kappa*(2*nTh+1)",kappa*(2*nTh+1),cutoff}}),
-    ElementLiouvillean<1,2>("Mode",{"photon loss","photon absorption"}),
+    ElementLiouvillian<1,2>("Mode",{"photon loss","photon absorption"}),
     ElementAveraged<1>("PumpedLossyMode",{"<number operator>","real(<ladder operator>)","imag(\")"}),
     kappa_(kappa), nTh_(nTh)
 {}
