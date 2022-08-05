@@ -58,6 +58,17 @@ struct ParsLossyPhaseNoise : BASE
 typedef ParsLossyPhaseNoise<ParsPumpedLossy> ParsPumpedLossyPhaseNoise;
 
 
+template <typename BASE>
+struct ParsLossyIncoherentPump : BASE
+{
+  double &gamma_pump;
+  
+  ParsLossyIncoherentPump(parameters::Table& p, const std::string& mod="")
+    : BASE(p,mod), gamma_pump(p.add("gamma_pump",mod,"Qbit incoherent pump rate",0.)) {}
+  
+};
+
+
 } // qbit
 
 #endif // CPPQEDELEMENTS_FREES_PARSQBIT_H_INCLUDED

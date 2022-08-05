@@ -125,6 +125,13 @@ protected:
   
 };
 
+class LiouvillianPumpedPhaseNoise : public structure::ElementLiouvillianStrategies<1,3>
+{
+protected:
+  LiouvillianPumpedPhaseNoise(double gamma_perpendicular, double gamma_pump, double gamma_parallel);
+  
+};
+
 
 } // qbit
 
@@ -267,5 +274,31 @@ class PumpedLossyQbitWithPhaseNoiseUIP
 public:
   PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossyPhaseNoise&);
 };
+
+
+
+class LossyQbitWithIncoherentPumpAndPhaseNoise
+  : public qbit::Exact, public qbit::LiouvillianPumpedPhaseNoise, public QbitBase
+{
+public:
+  LossyQbitWithIncoherentPumpAndPhaseNoise(double, double, double, double);
+
+  template<typename PARS>
+  LossyQbitWithIncoherentPumpAndPhaseNoise(PARS p) : LossyQbitWithIncoherentPumpAndPhaseNoise(p.delta,p.gamma,p.gamma_pump,p.gamma_parallel) {}
+  
+};
+
+
+class LossyQbitWithIncoherentPumpAndPhaseNoiseUIP
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianPumpedPhaseNoise, public QbitBase
+{
+public:
+  LossyQbitWithIncoherentPumpAndPhaseNoiseUIP(double, double, double, double);
+
+  template<typename PARS>
+  LossyQbitWithIncoherentPumpAndPhaseNoiseUIP(PARS p) : LossyQbitWithIncoherentPumpAndPhaseNoiseUIP(p.delta,p.gamma,p.gamma_pump,p.gamma_parallel) {}
+  
+};
+
 
 #endif // CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED
