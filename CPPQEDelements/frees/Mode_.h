@@ -3,16 +3,16 @@
 #ifndef CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
 #define CPPQEDELEMENTS_FREES_MODE__H_INCLUDED
 
-#include "ParsMode.h" // for the user interface
+#include "ParsMode.h"
 
 #include "QM_Picture.h"
-#include "StateVector.h"
 
-#include "ElementLiouvillian.h"
-#include "ElementAveraged.h"
 #include "Free.h"
 #include "FreeExact.h"
+#include "Liouvillian.h"
 #include "TridiagonalHamiltonian.h"
+
+#include "Algorithm.h"
 
 
 class ModeBase;
@@ -21,13 +21,37 @@ class ModeBase;
 namespace mode {
 
 
-struct DoNotAverage {};
-
-
-const std::string keyTitle="Mode";
-
-
 using namespace structure::freesystem; using structure::NoTime;
+
+
+struct diagonalFrequencies
+{
+  dcomp
+    zODE,   // this goes into the ODE stepping
+    zExact; // this is taken care of by exact propagation
+  double omegaInt; // this is permanent interaction picture, must appear in averages
+};
+
+
+struct diagonalFrequenciesKerr : diagonalFrequencies
+{
+  double omegaKerr; // the coefficient of the Kerr term
+};
+
+
+double photonnumber(const LazyDensityOperator& matrix);
+
+
+void aJump(StateVectorLow& psi, double fact); // fact = sqrt(2.*kappa*(nTh+1))
+
+void aDagJump(StateVectorLow& psi, double fact); // fact = sqrt(2.*kappa*nTh)
+
+
+void aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact); // fact = 2.*kappa*(nTh+1)
+
+void aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact); // fact = 2.*kappa*nTh
+
+
 
 typedef std::shared_ptr<const ModeBase> Ptr;
 
@@ -154,16 +178,6 @@ private:
 
 template<bool TEMPERATURE, bool IS_ALTERNATIVE=false> class Liouvillian;
 
-
-namespace details {
-
-void aJump   (StateVectorLow&, double);
-void aDagJump(StateVectorLow&, double);
-
-void aSuperoperator   (const DensityOperatorLow&, DensityOperatorLow&, double);
-void aDagSuperoperator(const DensityOperatorLow&, DensityOperatorLow&, double);
-
-} // details
 
 
 template<bool IS_ALTERNATIVE>

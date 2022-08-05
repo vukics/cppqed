@@ -25,7 +25,7 @@ template <int RANK>
 using TimeDependentRate = TimeDependentExpectationValue<RANK>;
 
 template <int RANK>
-using TimeIndependentRate = TimeIndepedentExpectationValue<RANK>;
+using TimeIndependentRate = TimeIndependentExpectationValuee<RANK>;
 
 
 template <int RANK>

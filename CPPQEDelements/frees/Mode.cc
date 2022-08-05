@@ -11,8 +11,50 @@ using namespace boost;
 using namespace cppqedutils;
 
 
+double mode::photonnumber(const LazyDensityOperator& matrix)
+{
+  double res{0};
+  for (size_t n=0; n<matrix.getDimension(); ++n) res+=n*matrix(n);
+  return res;
+}
+
+
+void mode::aJump(StateVectorLow& psi, double fact)
+{
+  for (size_t n=0; n<psi.ubound(0); ++n) psi(n)=fact*sqrt(n+1)*psi(n+1);
+  psi(psi.ubound(0))=0;
+}
+    
+
+void mode::aDagJump(StateVectorLow& psi, double fact)
+{
+  for (size_t n=psi.ubound(0); n>0; --n) psi(n)=fact*sqrt(n)*psi(n-1);
+  psi(0)=0;
+}
+
+
+void mode::aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact)
+{
+  for (int m=0; m<rho.ubound(0); ++m)
+    for (int n=0; n<rho.ubound(1); ++n)
+      drhodt(m,n)+=fact*sqrt((m+1)*(n+1))*rho(m+1,n+1);
+}
+
+
+void mode::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact)
+{
+  for (int m=1; m<=rho.ubound(0); ++m)
+    for (int n=1; n<=rho.ubound(1); ++n)
+      drhodt(m,n)+=fact*sqrt(m*n)*rho(m-1,n-1);
+}
+
+    
+    
 namespace mode {
 
+
+
+  
 #define DEFINE_make_by_redirect(AUX) const Ptr make(const BOOST_PP_CAT(Pars,AUX) & p, QM_Picture qmp) {return make<Averaged>(p,qmp);}
 
 DEFINE_make_by_redirect()
@@ -115,36 +157,6 @@ Hamiltonian<false>::Hamiltonian(dcomp zSch, dcomp eta, double omegaKerr, double 
 //
 //////////////
 
-void details::aJump   (StateVectorLow& psi, double kappa) // kappa is kappa*(nTh+1) when the temperature is finite
-{
-  double fact=sqrt(2.*kappa);
-  int ubound=psi.ubound(0);
-  for (int n=0; n<ubound; ++n)
-    psi(n)=fact*sqrt(n+1)*psi(n+1);
-  psi(ubound)=0;
-}
-
-void details::aDagJump(StateVectorLow& psi, double kappa) // kappa is kappa* nTh    when the temperature is finite
-{
-  double fact=sqrt(2.*kappa);
-  for (int n=psi.ubound(0); n>0; --n)
-    psi(n)=fact*sqrt(n)*psi(n-1);
-  psi(0)=0;
-}
-
-void details::aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double kappa)
-{
-  for (int m=0; m<rho.ubound(0); ++m)
-    for (int n=0; n<rho.ubound(1); ++n)
-      drhodt(m,n)+=2*kappa*sqrt((m+1)*(n+1))*rho(m+1,n+1);
-}
-
-void details::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double kappa)
-{
-  for (int m=1; m<=rho.ubound(0); ++m)
-    for (int n=1; n<=rho.ubound(1); ++n)
-      drhodt(m,n)+=2*kappa*sqrt(m*n)*rho(m-1,n-1);
-}
 
 
 ///////////
