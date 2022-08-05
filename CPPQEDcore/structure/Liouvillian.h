@@ -10,7 +10,6 @@
 #include "VectorFromMatrixSliceIterator.h"
 
 #include <list>
-#include <tuple>
 #include <variant>
 
 
@@ -22,10 +21,10 @@ using TimeIndependentJump = std::function<void(quantumdata::StateVectorLow<RANK>
 
 
 template <int RANK>
-using TimeDependentRate = TimeDependentExpectationValue<RANK>;
+using TimeDependentRate = TimeDependentExpectationValue<RANK,double>;
 
 template <int RANK>
-using TimeIndependentRate = TimeIndependentExpectationValuee<RANK>;
+using TimeIndependentRate = TimeIndependentExpectationValue<RANK,double>;
 
 
 template <int RANK>
