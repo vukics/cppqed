@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
   
   ParameterTable p;
 
-  ParsPumpedLossy<NL,Pumps,Decays> pml(p);
+  ParsDrivenDissipative<NL,Pumps,Decays> pml(p);
 
   evolution::Pars<> pe(p); // Driver Parameters
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
   StateVector psi{NL}; psi(0)=1; psi(1)=1; psi.renorm();
 
   evolve(psi,
-         multilevel::makePumpedLossySch(pml,"Lambda atom",true),
+         multilevel::makeDrivenDissipativeSch(pml,"Lambda atom",true),
          pe);
 
 

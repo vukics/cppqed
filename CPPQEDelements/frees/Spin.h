@@ -149,24 +149,24 @@ public:
 };
 
 
-class LossySpin
+class DissipativeSpin
   : public Spin,
     public spin::Liouvillian
 {
 public:
   
-  LossySpin(const spin::Pars& p) : Spin(p), spin::Liouvillian(p.twoS,p.gamma) {}
+  DissipativeSpin(const spin::Pars& p) : Spin(p), spin::Liouvillian(p.twoS,p.gamma) {}
   
 };
 
 
-class LossySpinSch
+class DissipativeSpinSch
   : public SpinSch,
     public spin::Liouvillian
 {
 public:
   
-  LossySpinSch(const spin::Pars& p) : SpinSch(p), spin::Liouvillian(p.twoS,p.gamma) {}
+  DissipativeSpinSch(const spin::Pars& p) : SpinSch(p), spin::Liouvillian(p.twoS,p.gamma) {}
   
 };
 

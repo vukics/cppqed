@@ -1,7 +1,7 @@
 #include "HomodynedMode.h"
 
 
-mode::HomodynedBase::HomodynedBase(const ParsLossy& p,
+mode::HomodynedBase::HomodynedBase(const ParsDissipative& p,
                                    dcomp homodyneAmplitude, dcomp eta)
   : Hamiltonian<false>(dcomp(finiteTemperatureHamiltonianDecay<true>(p),-p.delta),eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
     structure::ElementLiouvillian<1,2>("HomodynedMode",{"homodyned loss","homodyned absorption"}),

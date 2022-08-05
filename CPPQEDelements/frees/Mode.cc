@@ -58,9 +58,9 @@ namespace mode {
 #define DEFINE_make_by_redirect(AUX) const Ptr make(const BOOST_PP_CAT(Pars,AUX) & p, QM_Picture qmp) {return make<Averaged>(p,qmp);}
 
 DEFINE_make_by_redirect()
-DEFINE_make_by_redirect(Lossy)
-DEFINE_make_by_redirect(Pumped)
-DEFINE_make_by_redirect(PumpedLossy)
+DEFINE_make_by_redirect(Dissipative)
+DEFINE_make_by_redirect(Driven)
+DEFINE_make_by_redirect(DrivenDissipative)
 
 #undef DEFINE_make_by_redirect
 
@@ -117,13 +117,13 @@ namespace {
 Tridiagonal hOverI(dcomp z, dcomp eta, double omegaKerr, size_t dim)
 // Here we use runtime dispatching because runtime dispatching will anyway happen at the latest in some maker function.
 {
-  bool isPumped=isNonZero(eta);
+  bool isDriven=isNonZero(eta);
   if (isNonZero(z)) {
     Tridiagonal res(mainDiagonal(-z,omegaKerr,dim));
-    if (isPumped) return res+pumping(eta,dim);
+    if (isDriven) return res+pumping(eta,dim);
     else return res;
   }
-  else if(isPumped) return pumping(eta,dim);
+  else if(isDriven) return pumping(eta,dim);
   else return Tridiagonal();
 }
 
@@ -365,7 +365,7 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 
 
-PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
+DrivenDissipativeModeIP_NoExact::DrivenDissipativeModeIP_NoExact(const mode::ParsDrivenDissipative& p)
   : ModeBase(p.cutoff),
     quantumoperator::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.omegaKerr,p.cutoff))),
     structure::ElementLiouvillian<1,1,true>(mode::keyTitle,"excitation loss"),
@@ -377,13 +377,13 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
 
 
 
-double PumpedLossyModeIP_NoExact::rate(OneTime, const mode::LazyDensityOperator& m) const
+double DrivenDissipativeModeIP_NoExact::rate(OneTime, const mode::LazyDensityOperator& m) const
 {
   return mode::photonNumber(m);
 }
 
 
-void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi) const
+void DrivenDissipativeModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi) const
 {
   dcomp fact=sqrt(2.*real(z_))*exp(-z_*double(t));
   int ubound=psi.ubound(0);
@@ -394,7 +394,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi)
 
 
 
-const mode::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const mode::LazyDensityOperator& matrix) const
+const mode::Averages DrivenDissipativeModeIP_NoExact::average_v(OneTime t, const mode::LazyDensityOperator& matrix) const
 {
   auto averages(initializedAverages());
 

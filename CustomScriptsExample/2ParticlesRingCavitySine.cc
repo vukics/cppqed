@@ -15,15 +15,15 @@ int main(int argc, char **argv)
     ParameterTable p;
 
     evolution::Pars<> pe(p);              // Driver parameters
-    mode::ParsLossy plm(p);             // Lossy mode (cosine)
-    particle::ParsPumped ppp1(p,"1");   // Pumped particle 1 (sine)
-    particle::ParsPumped ppp2(p,"2");   // Pumped particle 2
+    mode::ParsDissipative plm(p);             // Dissipative mode (cosine)
+    particle::ParsDriven ppp1(p,"1");   // Driven particle 1 (sine)
+    particle::ParsDriven ppp2(p,"2");   // Driven particle 2
     particlecavity::ParsAlong ppci(p);  // Particle-Cavity interaction
 
     bool &bosons = p.add("bosons", "Particle are bosons", false);
     bool &fermions = p.add("fermions", "Particles are fermions", false);
     
-    double &alphasquare = p.add("alphasquare", "Coherent state of pumped cavity mode (has to be real)", 1.);
+    double &alphasquare = p.add("alphasquare", "Coherent state of driven cavity mode (has to be real)", 1.);
     pe.evol = evolution::SINGLE;
     
     QM_Picture& qmp=updateWithPicture(p,argc,argv);
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     ppp1.vClass = ppp2.vClass = ppci.uNot * alphasquare;
     plm.delta -= ppci.uNot;
 
-    particle::PtrPumped myParticle(particle::makePumped(ppp1,qmp));
+    particle::PtrDriven myParticle(particle::makeDriven(ppp1,qmp));
     mode::Ptr myMode(mode::make(plm,qmp));
     
     auto particlecavity{std::make_shared<ParticleAlongCavity>(myMode,myParticle,ppci)};

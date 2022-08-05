@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 
   evolution::Pars<> pe(p);
 
-  mode::ParsPumpedLossy
+  mode::ParsDrivenDissipative
     pm0(p,"0"),
     pm1(p,"1"),
     pm2(p,"2"),
@@ -21,10 +21,10 @@ int main(int argc, char* argv[])
 
   evolve(init(pm0)*init(pm1)*init(pm2)*init(pm3),
          composite::make(
-                         _<0,1,2,3>(std::make_shared<Interaction>(Interaction::Frees{std::make_shared<PumpedLossyMode<>>(pm0),
-                                                                                     std::make_shared<PumpedLossyModeAlternative<false>>(pm1),
-                                                                                     std::make_shared<PumpedLossyMode<>>(pm2),
-                                                                                     std::make_shared<PumpedLossyModeAlternative<false>>(pm3)}))
+                         _<0,1,2,3>(std::make_shared<Interaction>(Interaction::Frees{std::make_shared<DrivenDissipativeMode<>>(pm0),
+                                                                                     std::make_shared<DrivenDissipativeModeAlternative<false>>(pm1),
+                                                                                     std::make_shared<DrivenDissipativeMode<>>(pm2),
+                                                                                     std::make_shared<DrivenDissipativeModeAlternative<false>>(pm3)}))
                         ),
          pe);
 

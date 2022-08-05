@@ -127,7 +127,7 @@ class HamiltonianIP
     public Exact<NL>
 {
 public:
-  static const int NPT=mpl::size<VP>::value; // number of pumped transitions
+  static const int NPT=mpl::size<VP>::value; // number of driven transitions
 
   typedef typename Exact<NL>::L L;
 
@@ -151,7 +151,7 @@ class HamiltonianSch
   : public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
 {
 public:
-  static const int NPT=mpl::size<VP>::value; // number of pumped transitions
+  static const int NPT=mpl::size<VP>::value; // number of driven transitions
 
   typedef ComplexPerLevel<NL> L;
 
@@ -335,7 +335,7 @@ auto elementaryComplexFreqs(structure::DynamicsBase::ComplexFreqs& cf, const std
  * \todo some static sanity checks of `VP` and `VL` in view of `NL` should be done
  */
 template<int NL, typename VP, typename VL, bool IS_DIFFUSIVE, typename AveragingType=ReducedDensityOperator<1>>
-class PumpedLossyMultiLevelSch 
+class DrivenDissipativeMultiLevelSch 
   : public multilevel::HamiltonianSch<NL,VP>,
     public multilevel::Liouvillian<NL,VL,IS_DIFFUSIVE>,
     public MultiLevelBase<NL>,
@@ -353,7 +353,7 @@ public:
   typedef typename Base::Ptr Ptr;
 
   template<typename GPT, typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
+  DrivenDissipativeMultiLevelSch(const RealPerLevel& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
     : Hamiltonian([&] {
         ComplexPerLevel res(deltas); res*=-1i;
         for_each(gammas,[&](auto gamma) {res(decltype(gamma)::second)+=gamma.get();});
@@ -381,59 +381,59 @@ public:
   }
 
 };
-// VP is a compile-time container of pairs, specifying which transitions are pumped. It should model a Boost.Fusion sequence,
+// VP is a compile-time container of pairs, specifying which transitions are driven. It should model a Boost.Fusion sequence,
 // which stores the pairs for compile-time use and the pump Rabi frequencies for run-time use.
 
 
 
 namespace multilevel {
 
-/// Maker function for PumpedLossyMultiLevelSch
+/// Maker function for DrivenDissipativeMultiLevelSch
 template<typename AveragingType, int NL, typename GPT, typename VP, typename VL, typename... AveragingConstructorParameters>
 typename MultiLevelBase<NL>::Ptr
-makePumpedLossySch(const RealPerLevel<NL>& deltas,
+makeDrivenDissipativeSch(const RealPerLevel<NL>& deltas,
                    const VP& etas, const VL& gammas,
                    const GPT& gamma_parallel,
                    AveragingConstructorParameters&&... a)
 {
   if constexpr (std::is_same_v<std::decay_t<GPT>,RealPerLevel<NL>>) {
     if (blitz::any(gamma_parallel!=0))
-      return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
+      return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
                                                                                        typename LiouvillianDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
                                                                                                                                              gamma_parallel.end()},
                                                                                        std::forward<AveragingConstructorParameters>(a)...);
   }
   else if (gamma_parallel)
-    return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,
+    return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,
                                                                                      std::forward<AveragingConstructorParameters>(a)...);
 
-  return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,0.,std::forward<AveragingConstructorParameters>(a)...);
+  return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,0.,std::forward<AveragingConstructorParameters>(a)...);
 }
 
 /// \overload
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 auto
-makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
+makeDrivenDissipativeSch(const multilevel::ParsDrivenDissipative<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
 {
-  if (blitz::any(p.gamma_parallel_vector!=0)) return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel_vector,a...);
-  return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel,a...);
+  if (blitz::any(p.gamma_parallel_vector!=0)) return makeDrivenDissipativeSch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel_vector,a...);
+  return makeDrivenDissipativeSch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel,a...);
 }
 
 /// \overload
 template<int NL, typename GPT, typename VP, typename VL>
 auto
-makePumpedLossySch(const RealPerLevel<NL>& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel,
-                   const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+makeDrivenDissipativeSch(const RealPerLevel<NL>& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel,
+                   const std::string& keyTitle="DrivenDissipativeMultiLevelSch", bool offDiagonals=false)
 {
-  return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
+  return makeDrivenDissipativeSch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
 }
 
 /// \overload
 template<int NL, typename VP, typename VL>
 auto
-makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+makeDrivenDissipativeSch(const multilevel::ParsDrivenDissipative<NL,VP,VL>& p, const std::string& keyTitle="DrivenDissipativeMultiLevelSch", bool offDiagonals=false)
 {
-  return makePumpedLossySch<ReducedDensityOperator<1> >(p,keyTitle,NL,offDiagonals);
+  return makeDrivenDissipativeSch<ReducedDensityOperator<1> >(p,keyTitle,NL,offDiagonals);
 }
 
 

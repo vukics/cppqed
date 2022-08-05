@@ -17,7 +17,7 @@ template<int NL> using RealPerLevel = blitz::TinyVector<double,NL>;
 
 
 template<int NL, typename VP, typename VL>
-struct ParsPumpedLossy
+struct ParsDrivenDissipative
 {
   RealPerLevel<NL>& deltas;
   VP& etas;
@@ -26,8 +26,8 @@ struct ParsPumpedLossy
 
   RealPerLevel<NL>& gamma_parallel_vector;
   
-  ParsPumpedLossy(parameters::Table& p, const std::string& mod="")
-    : deltas(p.addTitle("PumpedLossyMultiLevel",mod).add("deltas",mod,"MultiLevel detunings vector",RealPerLevel<NL>{0.})),
+  ParsDrivenDissipative(parameters::Table& p, const std::string& mod="")
+    : deltas(p.addTitle("DrivenDissipativeMultiLevel",mod).add("deltas",mod,"MultiLevel detunings vector",RealPerLevel<NL>{0.})),
       etas(p.add("etas",mod,"MultiLevel pumps vector",VP())),
       gammas(p.add("gammas",mod,"MultiLevel decays vector",VL())),
       gamma_parallel(p.add("gamma_parallel",mod,"Phase flip rate",0.)),

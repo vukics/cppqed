@@ -59,14 +59,14 @@ static constexpr auto dummyRate=[](const qbit::LazyDensityOperator&) {return -1;
 LiouvillianPhaseNoise::LiouvillianPhaseNoise(double gamma_perpendicular, double gamma_parallel) 
   : structure::ElementLiouvillianStrategies<1,2>({sigmaJump(gamma_perpendicular),sigma_zJump(gamma_parallel)},
                                                  {dummyRate,dummyRate},
-                                                 "LossyQbitWithPhaseNoise",{"excitation loss","phase noise"})
+                                                 "DissipativeQbitWithPhaseNoise",{"excitation loss","phase noise"})
 {}
 
 
-LiouvillianPumpedPhaseNoise::LiouvillianPumpedPhaseNoise(double gamma_perpendicular, double gamma_pump, double gamma_parallel)
+LiouvillianDrivenPhaseNoise::LiouvillianDrivenPhaseNoise(double gamma_perpendicular, double gamma_pump, double gamma_parallel)
   : structure::ElementLiouvillianStrategies<1,3>({sigmaJump(gamma_perpendicular),sigmaPlusJump(gamma_pump),sigma_zJump(gamma_parallel)},
                                                  {dummyRate,dummyRate,dummyRate},
-                                                 "LossyQbitWithPhaseNoise",{"excitation loss","incoherent pump","phase noise"})
+                                                 "DissipativeQbitWithPhaseNoise",{"excitation loss","incoherent pump","phase noise"})
 {}
 
 
@@ -102,125 +102,125 @@ QbitSch::QbitSch(const qbit::Pars& p)
 }
 
    
-PumpedQbit::PumpedQbit(const qbit::ParsPumped& p)
+DrivenQbit::DrivenQbit(const qbit::ParsDriven& p)
   : qbit::Hamiltonian<true>(0,dcomp(0,-p.delta),p.eta),
     QbitBase(TUPLE_delta(1),TUPLE_eta)
 {
-  getParsStream()<<"Pumped.\n";
+  getParsStream()<<"Driven.\n";
 }
 
 
-PumpedQbitSch::PumpedQbitSch(const qbit::ParsPumped& p)
+DrivenQbitSch::DrivenQbitSch(const qbit::ParsDriven& p)
   : qbit::Hamiltonian<false>(dcomp(0,-p.delta),p.eta),
     QbitBase(TUPLE_delta(0),TUPLE_eta)
 {
-  getParsStream()<<"Pumped, Schroedinger picture.\n";
+  getParsStream()<<"Driven, Schroedinger picture.\n";
 }
 
 
-LossyQbit::LossyQbit(double delta, double gamma)
+DissipativeQbit::DissipativeQbit(double delta, double gamma)
   : qbit::Liouvillian(gamma),
     Exact(dcomp(gamma,-delta)),
     QbitBase{TUPLE_gammadelta(1)}
 {
-  getParsStream()<<"Lossy.\n";
+  getParsStream()<<"Dissipative.\n";
 }
 
 
-LossyQbitSch::LossyQbitSch(double delta, double gamma)
+DissipativeQbitSch::DissipativeQbitSch(double delta, double gamma)
   : qbit::Liouvillian(gamma),
     qbit::Hamiltonian<false>(dcomp(gamma,-delta),0),
     QbitBase{TUPLE_gamma,TUPLE_delta(0)}
 {
-  getParsStream()<<"Lossy, Schroedinger picture.\n";
+  getParsStream()<<"Dissipative, Schroedinger picture.\n";
 }
 
 
-LossyQbitUIP::LossyQbitUIP(double delta, double gamma)
+DissipativeQbitUIP::DissipativeQbitUIP(double delta, double gamma)
   : qbit::Liouvillian(gamma),
     qbit::Hamiltonian<true>(dcomp(gamma,0),dcomp(0,-delta),0),
     QbitBase{TUPLE_gamma,TUPLE_delta(1)}
 {
-  getParsStream()<<"Lossy, Unitary interaction picture.\n";
+  getParsStream()<<"Dissipative, Unitary interaction picture.\n";
 }
 
 
-PumpedLossyQbit::PumpedLossyQbit(const qbit::ParsPumpedLossy& p)
+DrivenDissipativeQbit::DrivenDissipativeQbit(const qbit::ParsDrivenDissipative& p)
   : qbit::Liouvillian(p.gamma),
     qbit::Hamiltonian<true>(0,dcomp(p.gamma,-p.delta),p.eta),
     QbitBase{TUPLE_gammadelta(1),TUPLE_eta}
 {
-  getParsStream()<<"PumpedLossy.\n";
+  getParsStream()<<"DrivenDissipative.\n";
 }
 
 
-PumpedLossyQbitUIP::PumpedLossyQbitUIP(const qbit::ParsPumpedLossy& p)
+DrivenDissipativeQbitUIP::DrivenDissipativeQbitUIP(const qbit::ParsDrivenDissipative& p)
   : qbit::Liouvillian(p.gamma),
     qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),p.eta),
     QbitBase({TUPLE_gamma,TUPLE_delta(1)},TUPLE_eta)
 {
-  getParsStream()<<"PumpedLossy, Unitary interaction picture.\n";
+  getParsStream()<<"DrivenDissipative, Unitary interaction picture.\n";
 }
 
 
-PumpedLossyQbitSch::PumpedLossyQbitSch(const qbit::ParsPumpedLossy& p)
+DrivenDissipativeQbitSch::DrivenDissipativeQbitSch(const qbit::ParsDrivenDissipative& p)
   : qbit::Liouvillian(p.gamma),
     qbit::Hamiltonian<false>(dcomp(p.gamma,-p.delta),p.eta),
     QbitBase{TUPLE_gammadelta(0),TUPLE_eta}
 {
-  getParsStream()<<"PumpedLossy, Schroedinger picture.\n";
+  getParsStream()<<"DrivenDissipative, Schroedinger picture.\n";
 }
 
 
-LossyQbitWithPhaseNoise::LossyQbitWithPhaseNoise(double delta, double gamma, double gamma_parallel)
+DissipativeQbitWithPhaseNoise::DissipativeQbitWithPhaseNoise(double delta, double gamma, double gamma_parallel)
   : Exact(dcomp(gamma,-delta)), // gamma_parallel does not contribute to the Hamiltonian
     qbit::LiouvillianPhaseNoise(gamma,gamma_parallel),
     QbitBase(RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1))
 {
-  getParsStream()<<"LossyWithPhaseNoise.\n";
+  getParsStream()<<"DissipativeWithPhaseNoise.\n";
 }
 
 
-LossyQbitWithPhaseNoiseUIP::LossyQbitWithPhaseNoiseUIP(double delta, double gamma, double gamma_parallel)
+DissipativeQbitWithPhaseNoiseUIP::DissipativeQbitWithPhaseNoiseUIP(double delta, double gamma, double gamma_parallel)
   : qbit::Hamiltonian<true>(dcomp(gamma,0),dcomp(0,-delta),0),
     qbit::LiouvillianPhaseNoise(gamma,gamma_parallel),
     QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
-  getParsStream()<<"LossyWithPhaseNoise, Unitary interaction picture.\n";
+  getParsStream()<<"DissipativeWithPhaseNoise, Unitary interaction picture.\n";
 }
 
-PumpedLossyQbitWithPhaseNoise::PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossyPhaseNoise& p)
+DrivenDissipativeQbitWithPhaseNoise::DrivenDissipativeQbitWithPhaseNoise(const qbit::ParsDrivenDissipativePhaseNoise& p)
   : qbit::Hamiltonian<true>(0,dcomp(p.gamma,-p.delta),p.eta),
     qbit::LiouvillianPhaseNoise(p.gamma,p.gamma_parallel),
     QbitBase{RF{"gamma_parallel",p.gamma_parallel,1},TUPLE_gammadelta(1),TUPLE_eta}
 {
-  getParsStream()<<"PumpedLossyWithPhaseNoise.\n";
+  getParsStream()<<"DrivenDissipativeWithPhaseNoise.\n";
 }
 
-PumpedLossyQbitWithPhaseNoiseUIP::PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossyPhaseNoise& p)
+DrivenDissipativeQbitWithPhaseNoiseUIP::DrivenDissipativeQbitWithPhaseNoiseUIP(const qbit::ParsDrivenDissipativePhaseNoise& p)
   : qbit::Hamiltonian<true>(dcomp(p.gamma,0),dcomp(0,-p.delta),p.eta),
     qbit::LiouvillianPhaseNoise(p.gamma,p.gamma_parallel),
     QbitBase{RF{"gamma_parallel",p.gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
-  getParsStream()<<"PumpedLossyWithPhaseNoise, Unitary interaction picture.\n";
+  getParsStream()<<"DrivenDissipativeWithPhaseNoise, Unitary interaction picture.\n";
 }
 
 
-LossyQbitWithIncoherentPumpAndPhaseNoise::LossyQbitWithIncoherentPumpAndPhaseNoise(double delta, double gamma, double gamma_pump, double gamma_parallel)
+DissipativeQbitWithIncoherentPumpAndPhaseNoise::DissipativeQbitWithIncoherentPumpAndPhaseNoise(double delta, double gamma, double gamma_pump, double gamma_parallel)
   : Exact(dcomp(gamma,-delta)), // gamma_parallel does not contribute to the Hamiltonian
-    qbit::LiouvillianPumpedPhaseNoise(gamma,gamma_pump,gamma_parallel),
+    qbit::LiouvillianDrivenPhaseNoise(gamma,gamma_pump,gamma_parallel),
     QbitBase(RF{"gamma_parallel",gamma_parallel,1},TUPLE_gammadelta(1))
 {
-  getParsStream()<<"LossyWithPhaseNoise.\n";
+  getParsStream()<<"DissipativeWithPhaseNoise.\n";
 }
 
 
-LossyQbitWithIncoherentPumpAndPhaseNoiseUIP::LossyQbitWithIncoherentPumpAndPhaseNoiseUIP(double delta, double gamma, double gamma_pump, double gamma_parallel)
+DissipativeQbitWithIncoherentPumpAndPhaseNoiseUIP::DissipativeQbitWithIncoherentPumpAndPhaseNoiseUIP(double delta, double gamma, double gamma_pump, double gamma_parallel)
   : qbit::Hamiltonian<true>(dcomp(gamma,0),dcomp(0,-delta),0),
-    qbit::LiouvillianPumpedPhaseNoise(gamma,gamma_pump,gamma_parallel),
+    qbit::LiouvillianDrivenPhaseNoise(gamma,gamma_pump,gamma_parallel),
     QbitBase{RF{"gamma_parallel",gamma_parallel,1},TUPLE_gamma,TUPLE_delta(1)}
 {
-  getParsStream()<<"LossyWithPhaseNoise, Unitary interaction picture.\n";
+  getParsStream()<<"DissipativeWithPhaseNoise, Unitary interaction picture.\n";
 }
 
 
@@ -238,55 +238,55 @@ LossyQbitWithIncoherentPumpAndPhaseNoiseUIP::LossyQbitWithIncoherentPumpAndPhase
 namespace qbit {
 
 
-Ptr make(const ParsPumpedLossy& p, QM_Picture qmp)
+Ptr make(const ParsDrivenDissipative& p, QM_Picture qmp)
 {
   switch (qmp) {
   case QMP_IP  :
     if (p.gamma==0 && std::abs(p.eta)==0)
       return std::make_shared<Qbit            >(p);
     if (p.gamma==0)
-      return std::make_shared<PumpedQbit      >(p);
+      return std::make_shared<DrivenQbit      >(p);
     if (std::abs(p.eta)==0)
-      return std::make_shared<LossyQbit       >(p);
-    return std::make_shared<PumpedLossyQbit   >(p);
+      return std::make_shared<DissipativeQbit       >(p);
+    return std::make_shared<DrivenDissipativeQbit   >(p);
   case QMP_UIP :
     if (p.gamma==0 && std::abs(p.eta)==0)
       return std::make_shared<QbitUIP         >(p);
     if (p.gamma==0)
-      return std::make_shared<PumpedQbitUIP   >(p);
+      return std::make_shared<DrivenQbitUIP   >(p);
     if (std::abs(p.eta)==0)
-      return std::make_shared<LossyQbitUIP    >(p);
-    return std::make_shared<PumpedLossyQbitUIP>(p);
+      return std::make_shared<DissipativeQbitUIP    >(p);
+    return std::make_shared<DrivenDissipativeQbitUIP>(p);
   case QMP_SCH :
     ;
   }
   if (p.gamma==0 && std::abs(p.eta)==0)
     return std::make_shared<QbitSch         >(p);
   if (p.gamma==0)
-    return std::make_shared<PumpedQbitSch   >(p);
+    return std::make_shared<DrivenQbitSch   >(p);
   if (std::abs(p.eta)==0)
-    return std::make_shared<LossyQbitSch    >(p);
-  return std::make_shared<PumpedLossyQbitSch>(p);
+    return std::make_shared<DissipativeQbitSch    >(p);
+  return std::make_shared<DrivenDissipativeQbitSch>(p);
 }
 
 
-Ptr make(const ParsPumpedLossyPhaseNoise& p, QM_Picture qmp)
+Ptr make(const ParsDrivenDissipativePhaseNoise& p, QM_Picture qmp)
 {
   if (p.gamma_parallel) {
     if (qmp==QMP_UIP) {
       if (std::abs(p.eta))
-        return std::make_shared<PumpedLossyQbitWithPhaseNoiseUIP>(p);
+        return std::make_shared<DrivenDissipativeQbitWithPhaseNoiseUIP>(p);
       else
-        return std::make_shared<      LossyQbitWithPhaseNoiseUIP>(p);
+        return std::make_shared<      DissipativeQbitWithPhaseNoiseUIP>(p);
     }
     else {
       if (std::abs(p.eta))
-        return std::make_shared<PumpedLossyQbitWithPhaseNoise>(p);
+        return std::make_shared<DrivenDissipativeQbitWithPhaseNoise>(p);
       else
-        return std::make_shared<      LossyQbitWithPhaseNoise>(p);
+        return std::make_shared<      DissipativeQbitWithPhaseNoise>(p);
     }
   }
-  return make(static_cast<const ParsPumpedLossy&>(p),qmp);
+  return make(static_cast<const ParsDrivenDissipative&>(p),qmp);
 }
 
 

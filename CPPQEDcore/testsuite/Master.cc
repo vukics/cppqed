@@ -21,9 +21,9 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  ParsPumpedLossy pplm(p); 
+  ParsDrivenDissipative pplm(p); 
 
-  qbit::ParsPumpedLossy pplqb(p); 
+  qbit::ParsDrivenDissipative pplqb(p); 
   jaynescummings::Pars  pjc  (p); 
 
   pplm.kappa=0;

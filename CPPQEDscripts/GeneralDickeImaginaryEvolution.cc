@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
   evolution::Pars<> pe(p); // Driver Parameters
 
-  mode::ParsLossy plm(p);
+  mode::ParsDissipative plm(p);
 
   spin::Pars ps(p);
 
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
   DARRAY      eigenValues(dim);
 
   if (!noEigenStates) {
-    LossyModeSch<> mode(plm);
+    DissipativeModeSch<> mode(plm);
     SpinSch        spin(ps );
     // Important that everything is in Sch picture here.
 

@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  qbit::ParsPumpedLossy pplqb(p); 
-  mode::ParsPumpedLossy pplm (p); 
+  qbit::ParsDrivenDissipative pplqb(p); 
+  mode::ParsDrivenDissipative pplm (p); 
   jaynescummings::Pars  pjc  (p); 
 
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);

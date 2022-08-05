@@ -17,7 +17,7 @@ double aJumpRate   (const LazyDensityOperator&, double kappa_nPlus1);
 double aDagJumpRate(const LazyDensityOperator&, double kappa_n     );
 
 
-basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
+basic::DrivenDissipativeMode::DrivenDissipativeMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
   : Free(cutoff,{},
          {
            CF{"(kappa*(2*nTh+1),delta)",dcomp(kappa*(2*nTh+1),delta),     cutoff },
@@ -31,13 +31,13 @@ basic::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, d
                                       JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(nTh+1)),
                                                          bind(aDagJumpRate,_1,kappa* nTh   )),
                                       "Mode",{"photon loss","photon absorption"}),
-    ElementAveraged<1>("PumpedLossyMode",{"<number operator>","real(<ladder operator>)","imag(\")"})
+    ElementAveraged<1>("DrivenDissipativeMode",{"<number operator>","real(<ladder operator>)","imag(\")"})
 {
-  getParsStream()<<"Pumped lossy mode";
+  getParsStream()<<"Driven dissipative mode";
 }
 
 
-auto basic::PumpedLossyMode::average_v(NoTime, const structure::freesystem::LazyDensityOperator& matrix) const -> const Averages
+auto basic::DrivenDissipativeMode::average_v(NoTime, const structure::freesystem::LazyDensityOperator& matrix) const -> const Averages
 {
   auto averages(initializedAverages());
 
@@ -58,7 +58,7 @@ auto basic::PumpedLossyMode::average_v(NoTime, const structure::freesystem::Lazy
 const Tridiagonal::Diagonal mainDiagonal(dcomp z, size_t cutoff);
 
 
-basic::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
+basic::DrivenDissipativeModeIP::DrivenDissipativeModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
   : Free(cutoff,
          {
            RF{"kappa*(2*nTh+1)",kappa*(2*nTh+1),cutoff},
@@ -73,19 +73,19 @@ basic::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp et
                                       JumpRateStrategies(bind(aJumpRate   ,_1,kappa*(nTh+1)),
                                                          bind(aDagJumpRate,_1,kappa* nTh   )),
                                       "Mode",{"photon loss","photon absorption"}),
-    ElementAveraged<1>("PumpedLossyMode",{"<number operator>","real(<ladder operator>)","imag(\")"}),
+    ElementAveraged<1>("DrivenDissipativeMode",{"<number operator>","real(<ladder operator>)","imag(\")"}),
     z_(kappa*(2*nTh+1),-delta)
 {}
 
 
-void basic::PumpedLossyModeIP::updateU(OneTime dtDid) const
+void basic::DrivenDissipativeModeIP::updateU(OneTime dtDid) const
 {
   getDiagonal()=exp(-z_*(dtDid*blitz::tensor::i));
 }
 
 
-// PumpedLossyModeIP::average_v exactly the same as PumpedLossyMode::average_v above
-auto basic::PumpedLossyModeIP::average_v(NoTime, const structure::freesystem::LazyDensityOperator& matrix) const -> const Averages
+// DrivenDissipativeModeIP::average_v exactly the same as DrivenDissipativeMode::average_v above
+auto basic::DrivenDissipativeModeIP::average_v(NoTime, const structure::freesystem::LazyDensityOperator& matrix) const -> const Averages
 {
   auto averages(initializedAverages());
 
@@ -106,7 +106,7 @@ auto basic::PumpedLossyModeIP::average_v(NoTime, const structure::freesystem::La
 hierarchical::ModeBase::ModeBase(double kappa, double nTh, size_t cutoff)
   : Free(cutoff,{RF{"kappa*(2*nTh+1)",kappa*(2*nTh+1),cutoff}}),
     ElementLiouvillian<1,2>("Mode",{"photon loss","photon absorption"}),
-    ElementAveraged<1>("PumpedLossyMode",{"<number operator>","real(<ladder operator>)","imag(\")"}),
+    ElementAveraged<1>("DrivenDissipativeMode",{"<number operator>","real(<ladder operator>)","imag(\")"}),
     kappa_(kappa), nTh_(nTh)
 {}
 
@@ -131,7 +131,7 @@ double hierarchical::ModeBase::rate(NoTime, const LazyDensityOperator& matrix, L
   return aDagJumpRate(matrix,kappa_*nTh_);
 }
 
-// ModeBase::average_v exactly the same as PumpedLossyMode::average_v above
+// ModeBase::average_v exactly the same as DrivenDissipativeMode::average_v above
 auto hierarchical::ModeBase::average_v (NoTime, const hierarchical::ModeBase::LazyDensityOperator& matrix) const -> const Averages
 {
   auto averages(initializedAverages());
@@ -150,7 +150,7 @@ auto hierarchical::ModeBase::average_v (NoTime, const hierarchical::ModeBase::La
 }
 
 
-hierarchical::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
+hierarchical::DrivenDissipativeMode::DrivenDissipativeMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
   : ModeBase(kappa,nTh,cutoff),
     TridiagonalHamiltonian<1,false>(dcomp(-kappa*(2*nTh+1),delta)*nop(cutoff)
                                     +
@@ -158,7 +158,7 @@ hierarchical::PumpedLossyMode::PumpedLossyMode(double delta, double kappa, dcomp
 {}
 
 
-hierarchical::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
+hierarchical::DrivenDissipativeModeIP::DrivenDissipativeModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff)
   : ModeBase(kappa,nTh,cutoff),
     FreeExact<false>(cutoff),
     TridiagonalHamiltonian<1,true>(furnishWithFreqs(tridiagPlusHC_overI(conj(eta)*aop(cutoff)),
@@ -167,8 +167,8 @@ hierarchical::PumpedLossyModeIP::PumpedLossyModeIP(double delta, double kappa, d
 {}
 
 
-// PumpedLossyModeIP::updateU exactly the same as above
-void hierarchical::PumpedLossyModeIP::updateU(OneTime dtDid) const
+// DrivenDissipativeModeIP::updateU exactly the same as above
+void hierarchical::DrivenDissipativeModeIP::updateU(OneTime dtDid) const
 {
   getDiagonal()=exp(-z_*(dtDid*blitz::tensor::i));
 }

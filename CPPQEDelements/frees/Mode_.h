@@ -82,19 +82,19 @@ template<typename AveragingType, typename... AveragingConstructorParameters>
 const Ptr make(const Pars           &, QM_Picture, AveragingConstructorParameters&&... );
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsLossy      &, QM_Picture, AveragingConstructorParameters&&... );
+const Ptr make(const ParsDissipative      &, QM_Picture, AveragingConstructorParameters&&... );
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsPumped     &, QM_Picture, AveragingConstructorParameters&&... );
+const Ptr make(const ParsDriven     &, QM_Picture, AveragingConstructorParameters&&... );
 
 template<typename AveragingType, typename... AveragingConstructorParameters>
-const Ptr make(const ParsPumpedLossy&, QM_Picture, AveragingConstructorParameters&&... );
+const Ptr make(const ParsDrivenDissipative&, QM_Picture, AveragingConstructorParameters&&... );
 
 
 const Ptr make(const Pars           &, QM_Picture);
-const Ptr make(const ParsLossy      &, QM_Picture);
-const Ptr make(const ParsPumped     &, QM_Picture);
-const Ptr make(const ParsPumpedLossy&, QM_Picture);
+const Ptr make(const ParsDissipative      &, QM_Picture);
+const Ptr make(const ParsDriven     &, QM_Picture);
+const Ptr make(const ParsDrivenDissipative&, QM_Picture);
 
 
 double photonNumber(const StateVectorLow&); 
@@ -110,7 +110,7 @@ inline std::ostream& isFiniteTempStream(std::ostream& os, double nTh)
 }
 
 template<bool B>
-inline double finiteTemperatureHamiltonianDecay(const ParsLossy& p)
+inline double finiteTemperatureHamiltonianDecay(const ParsDissipative& p)
 {
   if constexpr (B) return p.kappa*(2.*p.nTh+1);
   else return p.kappa;
@@ -390,24 +390,24 @@ public:
 // 3
 /////
 
-/// Implements a pumped mode, that is \f$H=-\delta\,a^\dagger a+i\lp\eta a^\dagger-\hermConj\rp\f$ in interaction picture defined by the first term \see \ref genericelementsfreesmode "Summary of the various Mode classes"
+/// Implements a driven mode, that is \f$H=-\delta\,a^\dagger a+i\lp\eta a^\dagger-\hermConj\rp\f$ in interaction picture defined by the first term \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<typename AveragingType=mode::Averaged>
-class PumpedMode 
+class DrivenMode 
   : public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedMode(const mode::ParsPumped&, AveragingConstructorParameters&&... );
+  DrivenMode(const mode::ParsDriven&, AveragingConstructorParameters&&... );
 };
 
 
 /** \cond */
 
 template<typename AveragingType=mode::Averaged>
-struct PumpedModeUIP : PumpedMode<AveragingType>
+struct DrivenModeUIP : DrivenMode<AveragingType>
 {
   template<typename... AveragingConstructorParameters>
-  PumpedModeUIP(const mode::ParsPumped& p, AveragingConstructorParameters&&... a) : PumpedMode<AveragingType>(p,a...) {}
+  DrivenModeUIP(const mode::ParsDriven& p, AveragingConstructorParameters&&... a) : DrivenMode<AveragingType>(p,a...) {}
 };
 
 /** \endcond */
@@ -416,14 +416,14 @@ struct PumpedModeUIP : PumpedMode<AveragingType>
 // 4
 /////
 
-/// Same as PumpedMode, without exact propagation \see \ref genericelementsfreesmode "Summary of the various Mode classes"
+/// Same as DrivenMode, without exact propagation \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<typename AveragingType=mode::Averaged>
-class PumpedModeSch
+class DrivenModeSch
   : public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedModeSch(const mode::ParsPumped&, AveragingConstructorParameters&&... );
+  DrivenModeSch(const mode::ParsDriven&, AveragingConstructorParameters&&... );
 };
 
 
@@ -434,12 +434,12 @@ public:
 /// Implements a mode damped with rate \f$\kappa\f$, that is \f$H=\lp-\delta-i\kappa\rp a^\dagger a\f$, in a fully exact way, that is \f$\ket{\Psi(t)}=e^{-z\,t\,a^\dagger a}\ket{\Psi(0)}\f$, and \f$\Liou\rho=2\kappa\lp(n_\text{Th}+1)\,a\rho a^\dagger+n_\text{Th}\,a^\dagger\rho a\rp\f$ \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 /** \tparam TEMPERATURE governs whether the possibility of finite temperature is considered */
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
-class LossyMode 
+class DissipativeMode 
   : public mode::Liouvillian<TEMPERATURE>, public mode::Exact, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  LossyMode(const mode::ParsLossy&, AveragingConstructorParameters&&... );
+  DissipativeMode(const mode::ParsDissipative&, AveragingConstructorParameters&&... );
 
 };
 
@@ -447,14 +447,14 @@ public:
 // 6
 /////
 
-/// Same as LossyMode, but in unitary interaction picture, defined only by the \f$-\delta\,a^\dagger a\f$ part of the Hamiltonian \see \ref genericelementsfreesmode "Summary of the various Mode classes"
+/// Same as DissipativeMode, but in unitary interaction picture, defined only by the \f$-\delta\,a^\dagger a\f$ part of the Hamiltonian \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
-class LossyModeUIP 
+class DissipativeModeUIP 
   : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  LossyModeUIP(const mode::ParsLossy&, AveragingConstructorParameters&&... );
+  DissipativeModeUIP(const mode::ParsDissipative&, AveragingConstructorParameters&&... );
 
 };
 
@@ -462,14 +462,14 @@ public:
 // 7
 /////
 
-/// Same as LossyMode, but in Schrödinger picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
+/// Same as DissipativeMode, but in Schrödinger picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
-class LossyModeSch 
+class DissipativeModeSch 
   : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  LossyModeSch(const mode::ParsLossy&, AveragingConstructorParameters&&... );
+  DissipativeModeSch(const mode::ParsDissipative&, AveragingConstructorParameters&&... );
 
 };
 
@@ -478,42 +478,42 @@ public:
 // 8
 /////
 
-/// Combines LossyMode with pumping in full (non-unitary) interaction picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
+/// Combines DissipativeMode with pumping in full (non-unitary) interaction picture \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
-class PumpedLossyMode 
+class DrivenDissipativeMode 
   : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyMode(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
+  DrivenDissipativeMode(const mode::ParsDrivenDissipative&, AveragingConstructorParameters&&... );
 };
 
 /////
 // 9
 /////
 
-/// Combines LossyModeUIP and PumpedMode \see \ref genericelementsfreesmode "Summary of the various Mode classes"
+/// Combines DissipativeModeUIP and DrivenMode \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
-class PumpedLossyModeUIP 
+class DrivenDissipativeModeUIP 
   : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyModeUIP(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
+  DrivenDissipativeModeUIP(const mode::ParsDrivenDissipative&, AveragingConstructorParameters&&... );
 };
 
 /////
 // 10
 /////
 
-/// Combines LossyModeSch and PumpedModeSch \see \ref genericelementsfreesmode "Summary of the various Mode classes"
+/// Combines DissipativeModeSch and DrivenModeSch \see \ref genericelementsfreesmode "Summary of the various Mode classes"
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
-class PumpedLossyModeSch
+class DrivenDissipativeModeSch
   : public mode::Liouvillian<TEMPERATURE>, public mode::Hamiltonian<false>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyModeSch(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
+  DrivenDissipativeModeSch(const mode::ParsDrivenDissipative&, AveragingConstructorParameters&&... );
 };
 
 
@@ -522,12 +522,12 @@ public:
 //////////////////////////////////////////////////////////////////////
 
 template<bool TEMPERATURE=false, typename AveragingType=mode::Averaged>
-class PumpedLossyModeAlternative 
+class DrivenDissipativeModeAlternative 
   : public mode::Liouvillian<TEMPERATURE,true>, public mode::Hamiltonian<true>, public ModeBase, public AveragingType
 {
 public:
   template<typename... AveragingConstructorParameters>
-  PumpedLossyModeAlternative(const mode::ParsPumpedLossy&, AveragingConstructorParameters&&... );
+  DrivenDissipativeModeAlternative(const mode::ParsDrivenDissipative&, AveragingConstructorParameters&&... );
 };
 
 
@@ -535,14 +535,14 @@ public:
 // One more to test time-dependent jump and averages 
 //////////////////////////////////////////////////////////////////////
 
-class PumpedLossyModeIP_NoExact
+class DrivenDissipativeModeIP_NoExact
   : public ModeBase,
     public quantumoperator::TridiagonalHamiltonian<1,true>, 
     public structure::ElementLiouvillian<1,1,true>,
     public structure::ElementAveraged<1,true>
 {
 public:
-  PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy&);
+  DrivenDissipativeModeIP_NoExact(const mode::ParsDrivenDissipative&);
 
 private:
   using OneTime = structure::OneTime;

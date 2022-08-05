@@ -17,7 +17,7 @@
 #include <tuple>
 
 class ParticleBase;
-class PumpedParticleBase;
+class DrivenParticleBase;
 
 namespace particle {
 
@@ -57,7 +57,7 @@ using namespace structure::freesystem; using structure::NoTime;
 
 typedef std::shared_ptr<const ParticleBase> Ptr;
 
-typedef std::shared_ptr<const PumpedParticleBase> PtrPumped;
+typedef std::shared_ptr<const DrivenParticleBase> PtrDriven;
 
 const Tridiagonal expINKX(particle::Ptr, ptrdiff_t);
 
@@ -80,17 +80,17 @@ const Tridiagonal mfComposition(particle::Ptr particle,                 ///< Det
 
 StateVector wavePacket(const InitialCondition&, const Spatial&, bool kFlag=true);
 StateVector wavePacket(const Pars      &,                       bool kFlag=true);
-StateVector wavePacket(const ParsPumped&,                       bool kFlag=true);
+StateVector wavePacket(const ParsDriven&,                       bool kFlag=true);
 
 StateVector hoState(int n, const InitialCondition&, const Spatial&, bool kFlag=true/*, bool exactRenorm=true*/);
 StateVector hoState(const Pars      &,                                 bool Kflag=true);
-StateVector hoState(const ParsPumped&,                                 bool Kflag=true);
+StateVector hoState(const ParsDriven&,                                 bool Kflag=true);
 
 StateVector init(const Pars&);
 
 Ptr make(const Pars&, QM_Picture);
 
-PtrPumped makePumped(const ParsPumped&, QM_Picture);
+PtrDriven makeDriven(const ParsDriven&, QM_Picture);
 
 
 namespace details {
@@ -175,7 +175,7 @@ protected:
 };
 
 
-class PumpedParticleBase
+class DrivenParticleBase
   : public ParticleBase
 {
 public:
@@ -184,7 +184,7 @@ public:
   const ModeFunction& getMF() const {return mf_;}
 
 protected:
-  PumpedParticleBase(size_t fin, double vClass, const ModeFunction&,
+  DrivenParticleBase(size_t fin, double vClass, const ModeFunction&,
                      const RealFreqs& =emptyRF, const ComplexFreqs& =emptyCF);
 
 private:
@@ -212,19 +212,19 @@ public:
 };
 
 
-class PumpedParticle
-  : public PumpedParticleBase, public particle::Hamiltonian<true>
+class DrivenParticle
+  : public DrivenParticleBase, public particle::Hamiltonian<true>
 {
 public:
-  explicit PumpedParticle(const particle::ParsPumped&);
+  explicit DrivenParticle(const particle::ParsDriven&);
 };
 
 
-class PumpedParticleSch
-  : public PumpedParticleBase, public particle::Hamiltonian<false>
+class DrivenParticleSch
+  : public DrivenParticleBase, public particle::Hamiltonian<false>
 {
 public:
-  explicit PumpedParticleSch(const particle::ParsPumped&);
+  explicit DrivenParticleSch(const particle::ParsDriven&);
 };
 
 

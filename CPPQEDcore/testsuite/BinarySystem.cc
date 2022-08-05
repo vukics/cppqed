@@ -19,8 +19,8 @@ int main(int argc, char* argv[])
   parameters::Table p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  ParsPumpedLossyQbit pplqb(p); 
-  ParsPumpedLossyMode pplm (p); 
+  ParsDrivenDissipativeQbit pplqb(p); 
+  ParsDrivenDissipativeMode pplm (p); 
   ParsJaynesCummings  pjc  (p); 
 
   pplqb.eta=dcomp(-.2, .3);

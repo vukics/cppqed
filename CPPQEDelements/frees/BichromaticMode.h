@@ -8,7 +8,7 @@
 
 namespace mode {
 
-struct ParsBichromatic : ParsPumpedLossy
+struct ParsBichromatic : ParsDrivenDissipative
 {
   double &deltaOther;
   dcomp  &  etaOther;
@@ -53,7 +53,7 @@ namespace mode {
 template<typename AveragingType, typename... AveragingConstructorParameters>
 const Ptr make(const ParsBichromatic& p, QM_Picture qmp, AveragingConstructorParameters&&... a)
 {
-  if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsPumpedLossy&>(p),qmp,a...);
+  if (!isNonZero(p.etaOther)) return make<AveragingType>(static_cast<const ParsDrivenDissipative&>(p),qmp,a...);
   else {
     if (p.nTh) {return std::make_shared<BichromaticMode<true ,AveragingType> >(p,a...);}
     else       {return std::make_shared<BichromaticMode<false,AveragingType> >(p,a...);}

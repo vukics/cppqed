@@ -16,8 +16,8 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  qbit::ParsPumpedLossyPhaseNoise pplqb(p); 
-  mode::ParsPumpedLossy pplm (p); 
+  qbit::ParsDrivenDissipativePhaseNoise pplqb(p); 
+  mode::ParsDrivenDissipative pplm (p); 
   jaynescummings::Pars  pjc  (p); 
 
   // Parameter finalization

@@ -17,11 +17,11 @@ const Tridiagonal nop(size_t dim); // number operator "
 namespace basic {
 
 
-class PumpedLossyMode 
+class DrivenDissipativeMode 
   : public structure::Free, public TridiagonalHamiltonian<1,false>, public structure::ElementLiouvillianStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
-  PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
+  DrivenDissipativeMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
 private:
   const Averages average_v(NoTime, const structure::freesystem::LazyDensityOperator&) const;
@@ -31,7 +31,7 @@ private:
 
 } // basic
 
-inline const Tridiagonal aop(const basic::PumpedLossyMode& mode) {return aop(mode.getDimension());} // just for convenience
+inline const Tridiagonal aop(const basic::DrivenDissipativeMode& mode) {return aop(mode.getDimension());} // just for convenience
 
 /// [basic example mode]
 
@@ -40,12 +40,12 @@ inline const Tridiagonal aop(const basic::PumpedLossyMode& mode) {return aop(mod
 namespace basic {
 
 
-class PumpedLossyModeIP
+class DrivenDissipativeModeIP
   : public structure::Free, public structure::FreeExact<false>, public TridiagonalHamiltonian<1,true>,
     public structure::ElementLiouvillianStrategies<1,2>, public structure::ElementAveraged<1>
 {
 public:
-  PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
+  DrivenDissipativeModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
   const dcomp get_z() const {return z_;}
 
@@ -99,20 +99,20 @@ private:
 namespace hierarchical {
 
 
-class PumpedLossyMode
+class DrivenDissipativeMode
   : public ModeBase, public TridiagonalHamiltonian<1,false>
 {
 public:
-  PumpedLossyMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
+  DrivenDissipativeMode(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
 };
 
 
-class PumpedLossyModeIP
+class DrivenDissipativeModeIP
   : public ModeBase, public structure::FreeExact<false>, public TridiagonalHamiltonian<1,true >
 {
 public:
-  PumpedLossyModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
+  DrivenDissipativeModeIP(double delta, double kappa, dcomp eta, double nTh, size_t cutoff);
 
   const dcomp get_z() const {return z_;}
 

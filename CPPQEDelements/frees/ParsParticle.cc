@@ -17,9 +17,9 @@ Pars::Pars(parameters::Table& p, const std::string& mod)
 }
 
 
-ParsPumped::ParsPumped(parameters::Table& p, const std::string& mod)
+ParsDriven::ParsDriven(parameters::Table& p, const std::string& mod)
   : Pars(p,mod),
-    vClass(p.addTitle("PumpedParticle",mod).add("vClass",mod,"Particle effective pumping strength",-10.)),
+    vClass(p.addTitle("DrivenParticle",mod).add("vClass",mod,"Particle effective pumping strength",-10.)),
     kPart(p.add<size_t>("kPart",mod,"Particle pump wavenumber",1)),
     modePart(p.add("modePart",mod,"Particle pump mode function",MFT_SIN))
 {

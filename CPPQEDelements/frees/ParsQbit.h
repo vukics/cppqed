@@ -21,49 +21,49 @@ struct Pars
 };
 
 
-struct ParsPumped : Pars
+struct ParsDriven : Pars
 {
   dcomp& eta;
 
-  ParsPumped(parameters::Table& p, const std::string& mod="")
-    : Pars(p,mod), eta(p.addTitle("PumpedQbit",mod).add("etat",mod,"Qbit pump",dcomp(0.))) {}
+  ParsDriven(parameters::Table& p, const std::string& mod="")
+    : Pars(p,mod), eta(p.addTitle("DrivenQbit",mod).add("etat",mod,"Qbit pump",dcomp(0.))) {}
 
 };
 
 
 template <typename BASE=Pars>
-struct ParsLossy : BASE
+struct ParsDissipative : BASE
 {
   double &gamma;
 
-  ParsLossy(parameters::Table& p, const std::string& mod="")
-    : BASE(p,mod), gamma(p.addTitle("LossyQbit",mod).add("gamma",mod,"Qbit decay rate",fabs(BASE::delta))) {}
+  ParsDissipative(parameters::Table& p, const std::string& mod="")
+    : BASE(p,mod), gamma(p.addTitle("DissipativeQbit",mod).add("gamma",mod,"Qbit decay rate",fabs(BASE::delta))) {}
 };
 
 
-typedef ParsLossy<ParsPumped> ParsPumpedLossy;
+typedef ParsDissipative<ParsDriven> ParsDrivenDissipative;
 
 
-template <typename BASE=ParsLossy<>>
-struct ParsLossyPhaseNoise : BASE
+template <typename BASE=ParsDissipative<>>
+struct ParsDissipativePhaseNoise : BASE
 {
   double &gamma_parallel;
   
-  ParsLossyPhaseNoise(parameters::Table& p, const std::string& mod="")
+  ParsDissipativePhaseNoise(parameters::Table& p, const std::string& mod="")
     : BASE(p,mod), gamma_parallel(p.add("gamma_parallel",mod,"Qbit phase flip rate",0.)) {}
   
 };
 
 
-typedef ParsLossyPhaseNoise<ParsPumpedLossy> ParsPumpedLossyPhaseNoise;
+typedef ParsDissipativePhaseNoise<ParsDrivenDissipative> ParsDrivenDissipativePhaseNoise;
 
 
 template <typename BASE>
-struct ParsLossyIncoherentPump : BASE
+struct ParsDissipativeIncoherentPump : BASE
 {
   double &gamma_pump;
   
-  ParsLossyIncoherentPump(parameters::Table& p, const std::string& mod="")
+  ParsDissipativeIncoherentPump(parameters::Table& p, const std::string& mod="")
     : BASE(p,mod), gamma_pump(p.add("gamma_pump",mod,"Qbit incoherent pump rate",0.)) {}
   
 };

@@ -1,14 +1,14 @@
 # Copyright Raimar Sandner 2012–2020.
 # Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-declaretest(ph_PTLA_Evolved)
+declaretest(ph_DTLA_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PTLA_Evolved>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DTLA_Evolved>)
 set_tests_properties(${TESTNAME} PROPERTIES LABELS "Physics")
 
-declaretest(ph_PTLA_CPPQED)
+declaretest(ph_DTLA_CPPQED)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PTLA_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DTLA_C++QED>)
 
 declaretest(ph_QbitMode_CPPQED)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
@@ -20,54 +20,54 @@ add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
 
 declaretest(ph_PLQ_CPPQEDuip)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyQbit>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeQbit>)
 
 declaretest(ph_PLQ_CPPQEDsch)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyQbit>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeQbit>)
 
 declaretest(ph_PLQ_CPPQED)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyQbit>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeQbit>)
 
-declaretest(compare_PTLA)
+declaretest(compare_DTLA)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=TrajectoryComparer)
 set_tests_properties(${TESTNAME} PROPERTIES
-  DEPENDS "ph_PTLA_Evolved;ph_PTLA_CPPQED;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch;ph_PLQ_CPPQEDuip;ph_PLQ_CPPQEDsch;ph_PLQ_CPPQED")
+  DEPENDS "ph_DTLA_Evolved;ph_DTLA_CPPQED;ph_QbitMode_CPPQED;ph_QbitMode_CPPQEDsch;ph_PLQ_CPPQEDuip;ph_PLQ_CPPQEDsch;ph_PLQ_CPPQED")
 
-# Scripts needed for PTLAHL testcase
+# Scripts needed for DTLAHL testcase
 
-declaretest(ph_PTLAHL_Evolved)
+declaretest(ph_DTLAHL_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PTLA_EvolvedHL>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DTLA_EvolvedHL>)
 
-declaretest(ph_PTLAHL_Si)
+declaretest(ph_DTLAHL_Si)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PTLA_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DTLA_C++QED>)
 
-declaretest(compare_PTLAHL)
+declaretest(compare_DTLAHL)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
             --test=${TESTNAME} --testclass=TrajectoryComparer)
-set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "ph_PTLAHL_Evolved;ph_PTLAHL_Si")
+set_tests_properties(${TESTNAME} PROPERTIES DEPENDS "ph_DTLAHL_Evolved;ph_DTLAHL_Si")
 
 # Scripts needed for PLM testcase
 
 declaretest(ph_PLM_Evolved)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_Evolved>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_Evolved>)
 
 declaretest(ph_PLM_CPPQED)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
 
 declaretest(ph_PLM_CPPQEDsch)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
 
 declaretest(ph_PLM_CPPQEDuip)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
 
 declaretest(compare_PLM)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
@@ -143,7 +143,7 @@ set_tests_properties(${TESTNAME} PROPERTIES
 
 declaretest(ph_PLM_FT)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:PumpedLossyMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
 
 declaretest(compare_PLM_FT)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}

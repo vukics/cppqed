@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
 
   ParameterTable pDummy, pActual;
 
-  multilevel::ParsPumpedLossy<NL,Pumps,Decays> pml  (pDummy);
+  multilevel::ParsDrivenDissipative<NL,Pumps,Decays> pml  (pDummy);
   mode::      Pars                             pphon(pDummy,"P");
-  mode::      ParsPumpedLossy                  pplm (pDummy,"C"); 
+  mode::      ParsDrivenDissipative                  pplm (pDummy,"C"); 
 
   mljc::Pars<PhononCouplings> pPhononCouplings(pDummy,"P");
   mljc::Pars<      Couplings> pmljc           (pDummy,"C");
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 
   // The free components
 
-  MultiLevelBase<NL>::Ptr atomInner(multilevel::makePumpedLossySch(pml.deltas,pml.etas,pml.gammas));
+  MultiLevelBase<NL>::Ptr atomInner(multilevel::makeDrivenDissipativeSch(pml.deltas,pml.etas,pml.gammas));
 
   Mode<> phonon(pphon);
   

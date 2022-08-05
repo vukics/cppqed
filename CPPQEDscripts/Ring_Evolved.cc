@@ -21,8 +21,8 @@ int main(int argc, char* argv[])
   evolution::Pars<> pt(p);
 
   particle::Pars pp(p);
-  mode::ParsPumpedLossy pmP(p,"P");
-  mode::ParsPumpedLossy pmM(p,"M");
+  mode::ParsDrivenDissipative pmP(p,"P");
+  mode::ParsDrivenDissipative pmM(p,"M");
   particlecavity::ParsAlong ppcP(p,"P");
   particlecavity::ParsAlong ppcM(p,"M");
 

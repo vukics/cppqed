@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe   (p); // Driver Parameters
-  ParsPumped    ppart(p); 
+  ParsDriven    ppart(p); 
 
   // Parameter finalization
   QM_Picture& qmp=updateWithPicture(p,argc,argv);

@@ -14,14 +14,14 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  ParsPumpedLossy pplm(p);
+  ParsDrivenDissipative pplm(p);
 
   pplm.eta=dcomp(4.,-2.);
   pplm.cutoff=16;
 
   // ****** ****** ****** ****** ****** ******
 
-  const PumpedLossyModeSch<false> modeH(pplm);
+  const DrivenDissipativeModeSch<false> modeH(pplm);
   const ModeBase mode0(pplm.cutoff);
 
   const Composite<composite::result_of::make_vector<Act<0,1,2,3,4> >::type>

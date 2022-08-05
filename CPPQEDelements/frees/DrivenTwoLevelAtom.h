@@ -3,11 +3,10 @@
 // This is a very primitive implementation used as a test of the
 // framework: Structure, MCWF_Trajectory, Master, EnsembleMCWF,
 // etc. If there is an error, it is probably in there and not
-// here. The corresponding driver is PTLA_C++QED. Better
+// here. The corresponding driver is DTLA_C++QED. Better
 // implementation based on class composition is found in Qbit_.h
 
-#ifndef CPPQEDELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
-#define CPPQEDELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED
+#pragma once
 
 #include "Qbit_.h"
 
@@ -21,13 +20,13 @@
 
 
 
-class PumpedTwoLevelAtom : public structure::Free, public structure::ElementLiouvillian<1,1>, public qbit::Averaged
+class DrivenTwoLevelAtom : public structure::Free, public structure::ElementLiouvillian<1,1>, public qbit::Averaged
 {
 public:
   const dcomp getZa() const {return za_;}
 
 protected:
-  PumpedTwoLevelAtom(const qbit::ParsPumpedLossy&);
+  DrivenTwoLevelAtom(const qbit::ParsDrivenDissipative&);
 
 private:
   double rate(structure::NoTime, const qbit::LazyDensityOperator&) const;
@@ -40,10 +39,10 @@ private:
 
 
 // In Schroedinger picture the Hamiltonian is implemented as a CMatrix
-class PumpedTwoLevelAtomSch : public PumpedTwoLevelAtom, public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
+class DrivenTwoLevelAtomSch : public DrivenTwoLevelAtom, public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
 {
 public:
-  PumpedTwoLevelAtomSch(const qbit::ParsPumpedLossy&);
+  DrivenTwoLevelAtomSch(const qbit::ParsDrivenDissipative&);
   
 private:
   void addContribution_v(structure::NoTime, const qbit::StateVectorLow& psi, qbit::StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
@@ -54,4 +53,3 @@ private:
 
 };
 
-#endif // CPPQEDELEMENTS_FREES_PUMPEDTWOLEVELATOM_H_INCLUDED

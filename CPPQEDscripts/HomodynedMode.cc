@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  ParsHomodyned<ParsPumpedLossy> pplm(p);
+  ParsHomodyned<ParsDrivenDissipative> pplm(p);
 
   bool
     &doStream=p.add("doStream","Stream diagonal elements of density operator",false),

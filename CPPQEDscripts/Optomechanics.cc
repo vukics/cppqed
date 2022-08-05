@@ -19,8 +19,8 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  ParsPumpedLossy pA(p,"Opt");
-  ParsLossy       pB(p,"Mech"); 
+  ParsDrivenDissipative pA(p,"Opt");
+  ParsDissipative       pB(p,"Mech"); 
 
   double& u=p.addTitle("Optomechanics","").add("u","N-Q coupling",1.);
 

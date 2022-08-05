@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 
   ParameterTable p;
 
-  multilevel::ParsPumpedLossy<NL,Pumps,Decays> pml (p);
-  mode::      ParsPumpedLossy                  pplm(p); 
+  multilevel::ParsDrivenDissipative<NL,Pumps,Decays> pml (p);
+  mode::      ParsDrivenDissipative                  pplm(p); 
 
   mljc::Pars<Couplings> pmljc(p);
 
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 
   auto psi{psiML*mode::init(pplm)}; psi.renorm();
 
-  evolve(psi,binary::make(std::make_shared<MLJC<NL,Couplings>>(multilevel::makePumpedLossySch(pml,"Lambda atom",true),mode::make(pplm,QMP_IP),pmljc)),pe);
+  evolve(psi,binary::make(std::make_shared<MLJC<NL,Couplings>>(multilevel::makeDrivenDissipativeSch(pml,"Lambda atom",true),mode::make(pplm,QMP_IP),pmljc)),pe);
 
 }
 
