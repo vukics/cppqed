@@ -2,15 +2,16 @@
 /// \briefFileDefault
 #pragma once
 
-#include "LiouvillianAveragedCommon.h"
-
-#include "LazyDensityOperator.h"
+#include "ExpectationValues.h"
 #include "StateVector.h"
 
 #include "VectorFromMatrixSliceIterator.h"
 
 #include <list>
 #include <variant>
+
+
+namespace structure {
 
 
 template <int RANK>
@@ -107,3 +108,5 @@ std::ostream& streamKey(std::ostream& os, const ElementLiouvillian<RANK>& el, si
   return os<<endl;
 }
 
+
+} // structure
