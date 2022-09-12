@@ -6,6 +6,8 @@
 #include <boost/assign/list_inserter.hpp>
 
 
+using namespace structure;
+
 using std::cout; using std::endl; using std::string;
 using namespace boost;
 using namespace cppqedutils;
@@ -48,8 +50,65 @@ void mode::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& 
       drhodt(m,n)+=fact*sqrt(m*n)*rho(m-1,n-1);
 }
 
-    
-    
+
+Lindblad<1> mode::photonLoss(double kappaTimes_nThPlus1)
+{
+  return {
+    .label{"excitation loss"},
+    .jump{[=](StateVectorLow& psi) {aJump(psi,sqrt(2.*kappaTimes_nThPlus1));}},
+    .rate{[=](const LazyDensityOperator& m) {return 2.*kappaTimes_nThPlus1*photonnumber(m);}},
+    .superoperator{[=](const DensityOperatorLow& rho, DensityOperatorLow& drhodt) {aSuperoperator(rho,drhodt,2.*kappaTimes_nThPlus1);}}
+  };
+}
+
+Lindblad<1> mode::photonGain(double kappaTimes_nTh)
+{
+  return {
+    .label{"excitation absorption"},
+    .jump{[=](StateVectorLow& psi) {aDagJump(psi,sqrt(2.*kappaTimes_nTh));}},
+    .rate{[=](const LazyDensityOperator& m) {return 2.*kappaTimes_nTh*(photonnumber(m)+m.trace());}},
+    .superoperator{[=](const DensityOperatorLow& rho, DensityOperatorLow& drhodt) {aDagSuperoperator(rho,drhodt,2.*kappaTimes_nTh);}}
+  };
+}
+
+
+ExpectationValue<1> mode::photonnumberEV_Variance{
+  .label{"<number operator>","VAR(number operator)"},
+  .process{calculateVariance},
+  .eva{[] (const LazyDensityOperator& m) {
+    EV_Array res{0.,2};
+    for (int n=1; n<int(m.getDimension()); n++) {
+      res[0]+=  n*m(n);
+      res[1]+=n*n*m(n);
+    }    
+    return res;
+}}};
+
+
+ExpectationValue<1> mode::ladderOperatorEV {
+  .label{"real(<ladder operator>)","imag(\")"},
+  .eva{[] (const LazyDensityOperator& m) {
+    EV_Array res{0.,2};
+    for (int n=1; n<int(m.getDimension()); n++) {
+      dcomp offdiag(sqrt(n)*m(n)(n-1));
+      res[0]+=real(offdiag);
+      res[1]+=imag(offdiag);
+    }    
+    return res;
+}}};
+
+
+ExpectationValue<1> mode::monitorCutoff {
+  .label{"|Psi(cutoff-1)|^2"},
+  .eva{[] (const LazyDensityOperator& m) {
+    EV_Array res{0.,1};
+    res[0]=m(m.getDimension()-1);
+    return res;
+}}};
+
+
+
+
 namespace mode {
 
 
@@ -150,14 +209,6 @@ Hamiltonian<false>::Hamiltonian(dcomp zSch, dcomp eta, double omegaKerr, double 
 
 #undef KERRDIAGONAL
 #undef FILLKERR
-
-//////////////
-//
-// Liouvillian
-//
-//////////////
-
-
 
 ///////////
 //
