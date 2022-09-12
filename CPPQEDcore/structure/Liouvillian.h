@@ -57,6 +57,7 @@ struct Lindblad
 };
 
 
+/// alternatively, we could use this and the next function as default values for rate and superoperator in Lindblads, but this seems a bit over-the-top
 template <int RANK>
 auto rateFromJump(double t, const quantumdata::StateVector<RANK>& psi, Jump<RANK> jump)
 {
