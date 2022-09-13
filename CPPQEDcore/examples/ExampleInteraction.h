@@ -11,7 +11,7 @@ class InteractionX_X
   : public structure::Interaction<2>, public TridiagonalHamiltonian<2,false>
 {
 public:
-  InteractionX_X(std::shared_ptr<PumpedLossyMode>, std::shared_ptr<PumpedLossyMode>, double g);
+  InteractionX_X(std::shared_ptr<DrivenDissipativeMode>, std::shared_ptr<DrivenDissipativeMode>, double g);
 
 };
 

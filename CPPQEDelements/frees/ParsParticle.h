@@ -24,13 +24,13 @@ struct Pars
 
 };
 
-struct ParsPumped : Pars
+struct ParsDriven : Pars
 {
   double &vClass;
   size_t &kPart;
   ModeFunctionType &modePart;
 
-  ParsPumped(parameters::Table&, const std::string& ="");
+  ParsDriven(parameters::Table&, const std::string& ="");
 
 };
 

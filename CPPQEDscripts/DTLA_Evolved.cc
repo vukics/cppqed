@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Evolution_.h"
 
-#include "PumpedTwoLevelAtom.h"
+#include "DrivenTwoLevelAtom.h"
 #include "Qbit.h"
 
 #include "StateVector.h"
@@ -22,12 +22,12 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pt(p);
-  ParsPumpedLossy pp2la(p); 
+  ParsDrivenDissipative pp2la(p); 
 
   // Parameter finalization
   update(p,argc,argv,"--");
 
-  PumpedTwoLevelAtomSch atom(pp2la);
+  DrivenTwoLevelAtomSch atom(pp2la);
 
   double dtinit=.1/atom.highestFrequency();
  

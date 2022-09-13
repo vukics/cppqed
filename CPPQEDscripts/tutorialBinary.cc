@@ -9,8 +9,8 @@ int main(int argc, char* argv[])
 
   evolution::Pars<> pe(p); 
 
-  qbit::ParsPumpedLossy pq(p);
-  mode::ParsPumpedLossy pm(p);
+  qbit::ParsDrivenDissipative pq(p);
+  mode::ParsDrivenDissipative pm(p);
   jaynescummings::Pars pjc(p);
 
   auto qmp=updateWithPicture(p,argc,argv,"--"); // Parsing the command line

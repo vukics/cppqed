@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "ExampleInteraction.h"
 
-basic::InteractionX_X::InteractionX_X(std::shared_ptr<PumpedLossyMode> m0, std::shared_ptr<PumpedLossyMode> m1, double g)
+basic::InteractionX_X::InteractionX_X(std::shared_ptr<DrivenDissipativeMode> m0, std::shared_ptr<DrivenDissipativeMode> m1, double g)
   : Interaction<2>({m0,m1},{RF{"g",g,sqrt(m0->getDimension()*m1->getDimension())}}),
     TridiagonalHamiltonian<2,false>(g*
                                     (aop(*m0)+aop(*m0).dagger())*

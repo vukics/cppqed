@@ -19,8 +19,8 @@ int main(int argc, char* argv[])
   parameters::Table p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  ParsPumpedLossyQbit pplqb(p); 
-  ParsPumpedLossyMode pplm (p); 
+  ParsDrivenDissipativeQbit pplqb(p); 
+  ParsDrivenDissipativeMode pplm (p); 
   ParsJaynesCummings  pjc  (p); 
 
   pplqb.eta=dcomp(-.2, .3);
@@ -60,13 +60,13 @@ int main(int argc, char* argv[])
   structure::Hamiltonian<2>::addContribution(&system,0,psi(),dpsidt(),0);
   cout<<dpsidt()<<endl;
 
-  cout<<structure::Liouvillean<2>::probabilities(&system,psi)<<endl;
+  cout<<structure::Liouvillian<2>::probabilities(&system,psi)<<endl;
 
 
-  structure::Liouvillean<2>::actWithJ(&system,psi(),0);
+  structure::Liouvillian<2>::actWithJ(&system,psi(),0);
   cout<<psi()<<endl;
 
-  structure::Liouvillean<2>::actWithJ(&system,psi(),1);
+  structure::Liouvillian<2>::actWithJ(&system,psi(),1);
   cout<<psi()<<endl;
 
 

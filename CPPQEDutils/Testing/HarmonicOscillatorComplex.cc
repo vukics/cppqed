@@ -24,7 +24,7 @@ int main(int, char**)
                          [=](const Array& y, Array& dydt, double tau)
                          {
                            dydt(0)=y(1);
-                           dydt(1)=exp(DCOMP_I*omega*tau)-2*gamma*y(1)-y(0);
+                           dydt(1)=exp(1i*omega*tau)-2*gamma*y(1)-y(0);
                          },
                          {"coordinate","velocity"},
                          .1/std::max(1.,std::max(omega,gamma)),

@@ -12,7 +12,7 @@ namespace mode {
 
   
 template<typename BASE>
-struct ParsHomodyned : BASE // BASE either ParsLossy or ParsPumpedLossy
+struct ParsHomodyned : BASE // BASE either ParsDissipative or ParsDrivenDissipative
 {
   typedef BASE BASE_class;
 
@@ -26,12 +26,12 @@ struct ParsHomodyned : BASE // BASE either ParsLossy or ParsPumpedLossy
 
 
 class HomodynedBase
-  : public Hamiltonian<false>, public structure::ElementLiouvillean<1,2>
+  : public Hamiltonian<false>, public structure::ElementLiouvillian<1,2>
 {
 protected:
-  HomodynedBase(const ParsLossy& p, dcomp homodyneAmplitude, dcomp eta=0.);
+  HomodynedBase(const ParsDissipative& p, dcomp homodyneAmplitude, dcomp eta=0.);
 
-  HomodynedBase(const ParsPumpedLossy& p, dcomp homodyneAmplitude) : HomodynedBase(p,homodyneAmplitude,p.eta) {}
+  HomodynedBase(const ParsDrivenDissipative& p, dcomp homodyneAmplitude) : HomodynedBase(p,homodyneAmplitude,p.eta) {}
 
 private:
   void doActWithJ(NoTime, mode::StateVectorLow& psi, LindbladNo<0>) const;

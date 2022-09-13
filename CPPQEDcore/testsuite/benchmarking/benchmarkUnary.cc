@@ -14,14 +14,14 @@ int main(int, char**)
 
   ParameterTable p;
 
-  ParsPumpedLossy pplm(p);
+  ParsDrivenDissipative pplm(p);
 
   pplm.eta=dcomp(4.,-2.);
   pplm.cutoff=1000000;
 
   // ****** ****** ****** ****** ****** ******
 
-  const PumpedLossyModeSch<false> mode(pplm);
+  const DrivenDissipativeModeSch<false> mode(pplm);
 
   // benchmark(mode,mode,Vector<0>());
 

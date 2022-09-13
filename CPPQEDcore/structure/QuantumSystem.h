@@ -34,9 +34,14 @@ public:
   double        highestFrequency (                ) const {return  highestFrequency_v(  );} ///< The fastest timescale of the system for ODE stepping
   std::ostream& streamParameters(std::ostream& os) const {return streamParameters_v(os);} ///< Communicating system parameters towards the user
 
+  QM_Picture picture() const {return picture_v();}
+
+
 private:
   virtual double         highestFrequency_v(            ) const = 0;
   virtual std::ostream& streamParameters_v(std::ostream&) const = 0;
+
+  virtual QM_Picture picture_v() const = 0;
 
 };
 

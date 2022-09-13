@@ -25,8 +25,8 @@ int main(int argc, char* argv[])
 
   evolution::Pars<> pt(p);
 
-  qbit::ParsPumpedLossy pplqb(p); 
-  mode::ParsPumpedLossy pplm (p); 
+  qbit::ParsDrivenDissipative pplqb(p); 
+  mode::ParsDrivenDissipative pplm (p); 
   jaynescummings::Pars  pjc  (p); 
 
   // Parameter finalization
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   // ****** ****** ****** ****** ****** ******
 
   
-  double dtinit=.1/binary::make(jaynescummings::make(std::make_shared<const PumpedLossyQbitSch>(pplqb),std::make_shared<const PumpedLossyModeSch<>>(pplm),pjc))->highestFrequency();
+  double dtinit=.1/binary::make(jaynescummings::make(std::make_shared<const DrivenDissipativeQbitSch>(pplqb),std::make_shared<const DrivenDissipativeModeSch<>>(pplm),pjc))->highestFrequency();
 
   Array alpha(2);
   

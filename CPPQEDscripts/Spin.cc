@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
   
   // ****** ****** ****** ****** ****** ******
 
-  const auto spin{std::make_shared<LossySpinSch>(ps)};
+  const auto spin{std::make_shared<DissipativeSpinSch>(ps)};
   
   structure::freesystem::StateVector psi{spin->getDimensions()};
 

@@ -21,8 +21,8 @@ int main(int argc, char* argv[])
   int& conf=p.add("1p1mconf","System configuration code for 1particle1mode",1);
 
   evolution::Pars<> pe(p); // Driver Parameters
-  mode::ParsPumpedLossy pplm(p); // (Pumped) Cavity
-  particle::ParsPumped ppp(p); // Pumped Particle
+  mode::ParsDrivenDissipative pplm(p); // (Driven) Cavity
+  particle::ParsDriven ppp(p); // Driven Particle
   particlecavity::ParsAlong ppci(p); // Particle Cavity Interaction
 
   dcomp& superposition=p.add("superposition","Particle initial condition |0>+|2>",dcomp(0,0));
@@ -39,33 +39,33 @@ int main(int argc, char* argv[])
 
   particle::Ptr particle(make(ppp,qmp));
 
-  particle::PtrPumped pumpedparticle(makePumped(ppp,qmp));
+  particle::PtrDriven drivenparticle(makeDriven(ppp,qmp));
 
   std::shared_ptr<particlecavity::Base> particlecavityBase;
   
   switch (conf) {
   case 1:
-    // Pumped particle moving orthogonal to (pumped) cavity
-    particlecavityBase.reset(new ParticleOrthogonalToCavity(mode,pumpedparticle,ppci));
+    // Driven particle moving orthogonal to (driven) cavity
+    particlecavityBase.reset(new ParticleOrthogonalToCavity(mode,drivenparticle,ppci));
     break;
   case 2:
-    // (Pumped) particle moving along cavity. 
+    // (Driven) particle moving along cavity. 
     // Atomic pump aligned orthogonal to cavity -> doesn't affect atomic motion directly. 
-    // Cavity pumped + atom scatters from atomic pump into cavity.
+    // Cavity driven + atom scatters from atomic pump into cavity.
     if (!abs(pplm.eta) && !ppp.vClass) {cerr<<"No driving in the system!"<<endl; return 1;}
     if (!ppp.init.getSig()) {cerr<<"No initial spread specified!"<<endl; return 1;}
     particlecavityBase.reset(new ParticleAlongCavity(mode,particle,ppci,ppp.vClass));
     break;
   case 3:
-    // Pumped particle moving along cavity. 
+    // Driven particle moving along cavity. 
     // Atomic pump aligned along cavity -> atomic moves in additional classical potential. 
-    // Cavity pumped + atom scatters from atomic pump into cavity.
-    particlecavityBase.reset(new ParticleAlongCavity(mode,pumpedparticle,ppci));
+    // Cavity driven + atom scatters from atomic pump into cavity.
+    particlecavityBase.reset(new ParticleAlongCavity(mode,drivenparticle,ppci));
     break;
   case 4:
     // Same as case 3, but atom doesn't scatter from atomic pump to cavity.
     // -> Atomic pump merely a classical potential.
-    particlecavityBase.reset(new ParticleAlongCavity(mode,pumpedparticle,ppci,0));
+    particlecavityBase.reset(new ParticleAlongCavity(mode,drivenparticle,ppci,0));
     break;
   default:
     cerr<<"Configuration not recognized!"<<endl;

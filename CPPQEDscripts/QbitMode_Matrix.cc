@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe(p); // Driver Parameters
-  qbit::ParsPumpedLossy pplqb(p); 
-  mode::ParsPumpedLossy pplm (p); 
+  qbit::ParsDrivenDissipative pplqb(p); 
+  mode::ParsDrivenDissipative pplm (p); 
   jaynescummings::Pars  pjc  (p); 
 
   QM_Picture& qmp=p.add("picture","Quantum mechanical picture",QMP_IP);
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   auto psi2(qbit::init(pplqb)*mode::init(pplm)); psi2.renorm();
   StateVector1 psi1(psi2.vectorView(),quantumdata::byReference);
   
-  const CMatrix hamiltonianOverI(calculateMatrix(*system2)/DCOMP_I);
+  const CMatrix hamiltonianOverI(calculateMatrix(*system2)/1i);
 
   evolve(psi1, // Here, this references the same data as psi2
          std::make_shared<TimeIndependentMatrixHamiltonianAveraged<2>>(hamiltonianOverI,system2,psi2),

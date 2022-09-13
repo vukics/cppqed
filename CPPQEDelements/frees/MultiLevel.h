@@ -8,7 +8,7 @@
 #include "AveragingUtils.h"
 
 #include "ElementAveraged.h"
-#include "ElementLiouvillean.h"
+#include "ElementLiouvillian.h"
 #include "Free.h"
 #include "FreeExact.h"
 #include "Hamiltonian.h"
@@ -149,7 +149,7 @@ private:
 
 //////////////
 //
-// Liouvillean
+// Liouvillian
 //
 //////////////
 
@@ -159,21 +159,21 @@ template<int I, int J> using Decay = DynamicsPair<double,I,J>;
 
 
 template<int NL, typename VL, int ORDO>
-class LiouvilleanRadiative;
+class LiouvillianRadiative;
 
 
 // With ORDO=-1, this doesn’t correspond to valid jumps, its function is to store data, fill keyLabels, etc.:
 template<int NL, typename VL>
-class LiouvilleanRadiative<NL,VL,-1> : public structure::ElementLiouvillean<1, hana::size(VL{})>
+class LiouvillianRadiative<NL,VL,-1> : public structure::ElementLiouvillian<1, hana::size(VL{})>
 {
 private:
-  typedef structure::ElementLiouvillean<1, hana::size(VL{})> Base;
+  typedef structure::ElementLiouvillian<1, hana::size(VL{})> Base;
 
   typedef typename Base::KeyLabels KeyLabels;
   
 protected:
-  LiouvilleanRadiative(VL gammas,
-                       double = 0. ///< dummy to conform with LiouvilleanDiffusive
+  LiouvillianRadiative(VL gammas,
+                       double = 0. ///< dummy to conform with LiouvillianDiffusive
                       )
     : Base(keyTitle,[=] {
         KeyLabels res;
@@ -189,10 +189,10 @@ protected:
 
 
 template<int NL, typename VL, int ORDO>
-class LiouvilleanRadiative : public LiouvilleanRadiative<NL,VL,ORDO-1>
+class LiouvillianRadiative : public LiouvillianRadiative<NL,VL,ORDO-1>
 {
 private:
-  typedef LiouvilleanRadiative<NL,VL,ORDO-1> Base;
+  typedef LiouvillianRadiative<NL,VL,ORDO-1> Base;
   
 protected:
   using Base::gammas_;
@@ -221,27 +221,27 @@ private:
 };
 
 
-// Just a convenience layer above ElementLiouvilleanDiffusive
-#define BASE_class structure::ElementLiouvilleanDiffusive<1,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
+// Just a convenience layer above ElementLiouvillianDiffusive
+#define BASE_class structure::ElementLiouvillianDiffusive<1,LiouvillianRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL>
-class LiouvilleanDiffusive : public BASE_class
+class LiouvillianDiffusive : public BASE_class
 {
 public:
   using DiffusionCoeffs=typename BASE_class::DiffusionCoeffs;
 
 protected:
-  LiouvilleanDiffusive(VL gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
+  LiouvillianDiffusive(VL gammas, double gamma_parallel) : BASE_class(NL,gamma_parallel,gammas) {}
   
-  LiouvilleanDiffusive(VL gammas, const DiffusionCoeffs& gammas_parallel) : BASE_class(NL,gammas_parallel,gammas) {}
+  LiouvillianDiffusive(VL gammas, const DiffusionCoeffs& gammas_parallel) : BASE_class(NL,gammas_parallel,gammas) {}
 
 #undef BASE_class
   
 };
 
 
-#define BASE_class std::conditional_t<IS_DIFFUSIVE,LiouvilleanDiffusive<NL,VL>,LiouvilleanRadiative<NL,VL,mpl::size<VL>::value-1>>
+#define BASE_class std::conditional_t<IS_DIFFUSIVE,LiouvillianDiffusive<NL,VL>,LiouvillianRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL, bool IS_DIFFUSIVE>
-class Liouvillean : public BASE_class
+class Liouvillian : public BASE_class
 {
 private:
   typedef BASE_class Base;
@@ -302,9 +302,9 @@ auto elementaryComplexFreqs(structure::DynamicsBase::ComplexFreqs& cf, const std
  * \todo some static sanity checks of `VP` and `VL` in view of `NL` should be done
  */
 template<int NL, typename VP, typename VL, bool IS_DIFFUSIVE, typename AveragingType=ReducedDensityOperator<1>>
-class PumpedLossyMultiLevelSch 
+class DrivenDissipativeMultiLevelSch 
   : public multilevel::HamiltonianSch<NL,VP>,
-    public multilevel::Liouvillean<NL,VL,IS_DIFFUSIVE>,
+    public multilevel::Liouvillian<NL,VL,IS_DIFFUSIVE>,
     public MultiLevelBase<NL>,
     public AveragingType
   // The ordering becomes important here
@@ -314,24 +314,24 @@ public:
   typedef multilevel::   RealPerLevel<NL>    RealPerLevel;
 
   typedef multilevel::HamiltonianSch<NL,VP>              Hamiltonian;
-  typedef multilevel::Liouvillean   <NL,VL,IS_DIFFUSIVE> Liouvillean;
+  typedef multilevel::Liouvillian   <NL,VL,IS_DIFFUSIVE> Liouvillian;
   typedef MultiLevelBase<NL> Base;
 
   typedef typename Base::Ptr Ptr;
 
   template<typename GPT, typename... AveragingConstructorParameters>
-  PumpedLossyMultiLevelSch(const RealPerLevel& deltas, VP etas, VL gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
+  DrivenDissipativeMultiLevelSch(const RealPerLevel& deltas, VP etas, VL gammas, const GPT& gamma_parallel, AveragingConstructorParameters&&... a)
     : Hamiltonian([&] {
-        ComplexPerLevel res(deltas); res*=-DCOMP_I;
+        ComplexPerLevel res(deltas); res*=-1i;
         hana::for_each(gammas,[&](auto gamma) {res(gamma.second)+=gamma.get();});
         return res;
       } (), etas),
-      Liouvillean(gammas,gamma_parallel),
+      Liouvillian(gammas,gamma_parallel),
       Base([this,&gamma_parallel] {
         structure::DynamicsBase::RealFreqs res;
         for (int i=0; i<NL; i++) if (!hasRealPart(this->get_zSchs()(i))) res.push_back({"delta"+std::to_string(i),-imag(this->get_zSchs()(i)),1.});
         if constexpr (std::is_same_v<std::decay_t<GPT>,double>) res.push_back({"gamma_parallel",gamma_parallel,1.});
-        else if constexpr (std::is_same_v<std::decay_t<GPT>,typename Liouvillean::DiffusionCoeffs>) {
+        else if constexpr (std::is_same_v<std::decay_t<GPT>,typename Liouvillian::DiffusionCoeffs>) {
           if (gamma_parallel.size()!=NL) throw std::runtime_error("gamma_parallel vector wrong size");
           for (int i=0; i<NL; i++) res.push_back({"gamma_parallel_"+std::to_string(i),gamma_parallel[i],1.});
         }
@@ -348,59 +348,59 @@ public:
   }
 
 };
-// VP is a compile-time container of pairs, specifying which transitions are pumped. It should model a Boost.Fusion sequence,
+// VP is a compile-time container of pairs, specifying which transitions are driven. It should model a Boost.Fusion sequence,
 // which stores the pairs for compile-time use and the pump Rabi frequencies for run-time use.
 
 
 
 namespace multilevel {
 
-/// Maker function for PumpedLossyMultiLevelSch
+/// Maker function for DrivenDissipativeMultiLevelSch
 template<typename AveragingType, int NL, typename GPT, typename VP, typename VL, typename... AveragingConstructorParameters>
 typename MultiLevelBase<NL>::Ptr
-makePumpedLossySch(const RealPerLevel<NL>& deltas,
+makeDrivenDissipativeSch(const RealPerLevel<NL>& deltas,
                    const VP& etas, const VL& gammas,
                    const GPT& gamma_parallel,
                    AveragingConstructorParameters&&... a)
 {
   if constexpr (std::is_same_v<std::decay_t<GPT>,RealPerLevel<NL>>) {
     if (blitz::any(gamma_parallel!=0))
-      return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
-                                                                                       typename LiouvilleanDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
+      return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
+                                                                                       typename LiouvillianDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
                                                                                                                                              gamma_parallel.end()},
                                                                                        std::forward<AveragingConstructorParameters>(a)...);
   }
   else if (gamma_parallel)
-    return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,
+    return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,
                                                                                      std::forward<AveragingConstructorParameters>(a)...);
 
-  return std::make_shared<PumpedLossyMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,0.,std::forward<AveragingConstructorParameters>(a)...);
+  return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,0.,std::forward<AveragingConstructorParameters>(a)...);
 }
 
 /// \overload
 template<typename AveragingType, int NL, typename VP, typename VL, typename... AveragingConstructorParameters>
 auto
-makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
+makeDrivenDissipativeSch(const multilevel::ParsDrivenDissipative<NL,VP,VL>& p, AveragingConstructorParameters&&... a)
 {
-  if (blitz::any(p.gamma_parallel_vector!=0)) return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel_vector,a...);
-  return makePumpedLossySch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel,a...);
+  if (blitz::any(p.gamma_parallel_vector!=0)) return makeDrivenDissipativeSch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel_vector,a...);
+  return makeDrivenDissipativeSch<AveragingType>(p.deltas,p.etas,p.gammas,p.gamma_parallel,a...);
 }
 
 /// \overload
 template<int NL, typename GPT, typename VP, typename VL>
 auto
-makePumpedLossySch(const RealPerLevel<NL>& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel,
-                   const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+makeDrivenDissipativeSch(const RealPerLevel<NL>& deltas, const VP& etas, const VL& gammas, const GPT& gamma_parallel,
+                   const std::string& keyTitle="DrivenDissipativeMultiLevelSch", bool offDiagonals=false)
 {
-  return makePumpedLossySch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
+  return makeDrivenDissipativeSch<ReducedDensityOperator<1> >(deltas,etas,gammas,gamma_parallel,keyTitle,NL,offDiagonals);
 }
 
 /// \overload
 template<int NL, typename VP, typename VL>
 auto
-makePumpedLossySch(const multilevel::ParsPumpedLossy<NL,VP,VL>& p, const std::string& keyTitle="PumpedLossyMultiLevelSch", bool offDiagonals=false)
+makeDrivenDissipativeSch(const multilevel::ParsDrivenDissipative<NL,VP,VL>& p, const std::string& keyTitle="DrivenDissipativeMultiLevelSch", bool offDiagonals=false)
 {
-  return makePumpedLossySch<ReducedDensityOperator<1> >(p,keyTitle,NL,offDiagonals);
+  return makeDrivenDissipativeSch<ReducedDensityOperator<1> >(p,keyTitle,NL,offDiagonals);
 }
 
 

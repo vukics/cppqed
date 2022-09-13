@@ -26,7 +26,7 @@ const particlecavity::Tridiagonals dispersive(mode::Ptr mode, particle::Ptr part
 {
   particlecavity::Tridiagonals res;
   if (uNot && !isComplex(get<0>(mf)))
-    res.push_back(uNot*mode::nop(mode)*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(particle,get<1>(mf)<<1)/(2.*DCOMP_I));
+    res.push_back(uNot*mode::nop(mode)*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(particle,get<1>(mf)<<1)/(2.*1i));
   return res;
 }
 
@@ -49,7 +49,7 @@ const particlecavity::Tridiagonals fillT(mode::Ptr mode, particle::Ptr particle,
   return res;
 }
 
-const particlecavity::Tridiagonals fillTTwoModeFN(mode::Ptr mode, particle::PtrPumped particle, double uNot, double etaeff, const ModeFunction& mf, bool isSpecial)
+const particlecavity::Tridiagonals fillTTwoModeFN(mode::Ptr mode, particle::PtrDriven particle, double uNot, double etaeff, const ModeFunction& mf, bool isSpecial)
 {
   particlecavity::Tridiagonals res = dispersive(mode,particle,uNot,mf);
   const ModeFunction mfPart = particle->getMF();
@@ -68,11 +68,11 @@ particlecavity::Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, 
   getParsStream()<<"Particle-Cavity Interaction\n";
 }
 
-ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot)
+ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrDriven particle, double uNot)
   : ParticleOrthogonalToCavity(mode, particle, uNot, etaEff(uNot, particle->getV_Class())) {}
 
 
-ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot, double etaeff)
+ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrDriven particle, double uNot, double etaeff)
   : particlecavity::Base(mode,particle,uNot,etaeff),
     TridiagonalHamiltonian(interfericOneModeFN(mode,particle,etaeff,particle->getMF()))
 {
@@ -84,7 +84,7 @@ ParticleOrthogonalToCavity::ParticleOrthogonalToCavity(mode::Ptr mode, particle:
 ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::Ptr particle, const particlecavity::ParsAlong& p, double vClass, const ThePrivateOne&)
   : ParticleAlongCavity(mode, particle, p.uNot, p.kCav, p.modeCav, etaEff(p.uNot,vClass)) {}
 
-ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped particle, const particlecavity::ParsAlong& p, const ThePrivateOne&)
+ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrDriven particle, const particlecavity::ParsAlong& p, const ThePrivateOne&)
   : ParticleAlongCavity(mode, particle, p.uNot, p.kCav, p.modeCav, etaEff(p.uNot,particle->getV_Class())) {}
 
 ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::Ptr particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
@@ -98,12 +98,12 @@ ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::Ptr particle,
   getParsStream()<<"Particle moving along cavity with "<<getMF()<<endl;
 }
 
-ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
+ParticleAlongCavity::ParticleAlongCavity(mode::Ptr mode, particle::PtrDriven particle, double uNot, size_t kCav, ModeFunctionType modeCav, double etaeff)
   : MF_Base(modeCav,kCav),
     particlecavity::Base(mode,particle,uNot,etaeff),
     isSpecialH_(kCav==abs(get<1>(particle->getMF()))),
     tridiagonalH_(fillTTwoModeFN(mode,particle,uNot,etaeff,MF_Base::member,isSpecialH_)),
-    firstH_(etaeff*mode::aop(mode)*mfNKX(particle,MF_Base::member)/DCOMP_I), firstHT_(-firstH_.dagger()),
+    firstH_(etaeff*mode::aop(mode)*mfNKX(particle,MF_Base::member)/1i), firstHT_(-firstH_.dagger()),
     secondH_(mfNKX(particle,particle->getMF()).dagger()), secondHT_(secondH_.dagger())
 {
   getParsStream()<<"Particle with "<< particle->getMF() <<" pump moving along cavity with "<<getMF()<<endl;

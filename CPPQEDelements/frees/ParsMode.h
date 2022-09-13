@@ -21,27 +21,27 @@ struct Pars
 };
 
 
-struct ParsPumped : virtual Pars 
+struct ParsDriven : virtual Pars 
 {
   dcomp& eta;
 
-  ParsPumped(parameters::Table&, const std::string& ="");
+  ParsDriven(parameters::Table&, const std::string& ="");
 
 };
 
 
-struct ParsLossy : virtual Pars
+struct ParsDissipative : virtual Pars
 {
   double &kappa, &nTh;
 
-  ParsLossy(parameters::Table&, const std::string& ="");
+  ParsDissipative(parameters::Table&, const std::string& ="");
 
 };
 
 
-struct ParsPumpedLossy : ParsPumped, ParsLossy
+struct ParsDrivenDissipative : ParsDriven, ParsDissipative
 {
-  ParsPumpedLossy(parameters::Table&, const std::string& ="");
+  ParsDrivenDissipative(parameters::Table&, const std::string& ="");
 };
 
 

@@ -16,7 +16,7 @@ namespace cppqedutils {
 /**
  * The key is composed of a title and a list of labels
  * 
- * \see structure::LiouvilleanAveragedCommon::streamKey, structure::ElementLiouvilleanAveragedCommon
+ * \see structure::LiouvillianAveragedCommon::streamKey, structure::ElementLiouvillianAveragedCommon
  */
 class KeyPrinter
 {

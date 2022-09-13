@@ -8,7 +8,7 @@
 
 #include "Exact.h"
 #include "Hamiltonian.h"
-#include "Liouvillean.h"
+#include "Liouvillian.h"
 #include "Averaged.h"
 
 /// Comprises modules for describing quantum systems.
@@ -41,18 +41,14 @@ typedef blitz::TinyVector<bool,3> SystemCharacteristics;
 
 template<typename T> auto castEx(std::shared_ptr<const T> qs) {return std::dynamic_pointer_cast<const Exact<T::N_RANK>>(qs);}
 template<typename T> auto castHa(std::shared_ptr<const T> qs) {return std::dynamic_pointer_cast<const Hamiltonian<T::N_RANK>>(qs);}
-template<typename T> auto castLi(std::shared_ptr<const T> qs) {return std::dynamic_pointer_cast<const Liouvillean<T::N_RANK>>(qs);}
+template<typename T> auto castLi(std::shared_ptr<const T> qs) {return std::dynamic_pointer_cast<const Liouvillian<T::N_RANK>>(qs);}
 template<typename T> auto castAv(std::shared_ptr<const T> qs) {return std::dynamic_pointer_cast<const Averaged<T::N_RANK>>(qs);}
-
-
 template<typename T> SystemCharacteristics systemCharacteristics(std::shared_ptr<const T> qs)
-{
   return {bool(castEx(qs)),bool(castHa(qs)),bool(castLi(qs))};
-}
 
-/// Wrappers for Exact, Hamiltonian, Liouvillean, and Averaged member functions
+/// Wrappers for Exact, Hamiltonian, Liouvillian, and Averaged member functions
 /**
- * The aim is to determine whether the passed DynamicsBase or QuantumSystem object derives also from Exact, Hamiltonian, Liouvillean, or Averaged
+ * The aim is to determine whether the passed DynamicsBase or QuantumSystem object derives also from Exact, Hamiltonian, Liouvillian, or Averaged
  *
  * If the answer is
  * - positive, it forwards the member functions of the given class with the given object dynamic-cast to the necessary type.
@@ -62,14 +58,13 @@ template<typename T> SystemCharacteristics systemCharacteristics(std::shared_ptr
  */
 //@{
 
-
 template<typename T>
 std::ostream& streamCharacteristics(std::shared_ptr<const T> qs, std::ostream& os)
 {
   return os<<"System characteristics: "
       <<(castEx(qs) ? "Interaction picture, "   : "")
       <<(castHa(qs) ? "Hamiltonian evolution, " : "")
-      <<(castLi(qs) ? "Liouvillean evolution, " : "")
+      <<(castLi(qs) ? "Liouvillian evolution, " : "")
       <<(castAv(qs) ? "calculates Averages."    : "");
 }
 
@@ -102,7 +97,7 @@ void addContribution(std::shared_ptr<const T> qs, double t, const StateVectorLow
 //@}
 
 
-/// \name Forwarded member from Liouvillean
+/// \name Forwarded member from Liouvillian
 //@{
 template<typename T>
 void actWithJ(std::shared_ptr<const T> qs, double t, StateVectorLow<T::N_RANK>& psi, size_t lindbladNo)
@@ -144,36 +139,39 @@ stream(std::shared_ptr<const T> qs, double t, const quantumdata::LazyDensityOper
 //@}
 
 
-/// \name Forwarded members from LiouvilleanAveragedCommon
+/// \name Forwarded members from LiouvillianAveragedCommon
 //@{
-
-template<LiouvilleanAveragedTag LA, typename T>
-std::shared_ptr<const LiouvilleanAveragedCommonRanked<T::N_RANK>> dispatchLiouvilleanAverage(std::shared_ptr<const T> qs)
+template<LiouvillianAveragedTag LA, typename T>
+std::shared_ptr<const LiouvillianAveragedCommonRanked<T::N_RANK>> dispatchLiouvillianAverage(std::shared_ptr<const T> qs)
+{
+  if constexpr (LA==LA_Li) return castLi(qs);
+  else return castAv(qs);
+}
 {
   if constexpr (LA==LA_Li) return castLi(qs);
   else return castAv(qs);
 }
 
 
-template<LiouvilleanAveragedTag LA, typename T>
+template<LiouvillianAveragedTag LA, typename T>
 size_t nAvr(std::shared_ptr<const T> qs)
 {
-  const auto ptr=dispatchLiouvilleanAverage<LA>(qs);
+  const auto ptr=dispatchLiouvillianAverage<LA>(qs);
   return ptr ? ptr->nAvr() : 0;
 }
 
-template<LiouvilleanAveragedTag LA, typename T>
+template<LiouvillianAveragedTag LA, typename T>
 std::ostream& streamKey(std::shared_ptr<const T> qs, std::ostream& os, size_t& i)
 {
-  if (const auto ptr=dispatchLiouvilleanAverage<LA>(qs)) ptr->streamKey(os,i);
+  if (const auto ptr=dispatchLiouvillianAverage<LA>(qs)) ptr->streamKey(os,i);
   return os;
 }
 
 
-template<LiouvilleanAveragedTag LA, typename T>
+template<LiouvillianAveragedTag LA, typename T>
 const Averages average(std::shared_ptr<const T> qs, double t, const quantumdata::LazyDensityOperator<T::N_RANK>& matrix)
 {
-  if (const auto ptr=dispatchLiouvilleanAverage<LA>(qs))
+  if (const auto ptr=dispatchLiouvillianAverage<LA>(qs))
     return ptr->average(t,matrix);
   else return Averages{};
 }

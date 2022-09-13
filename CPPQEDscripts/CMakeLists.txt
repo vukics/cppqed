@@ -7,7 +7,7 @@ message(STATUS "Configuring CPPQEDscripts")
 # think over: fewer_scripts should contain such scripts that collectively exemplify all the important features of the framework,
 # so that if they compile then at least the compile-time features are ok
 set(FEWER_SCRIPTS_TARGETS
-    PTLA_Evolved PTLA_C++QED PumpedLossyQbit PTLA_EvolvedHL PumpedLossyMode_Evolved PumpedLossyMode_C++QED
+    DTLA_Evolved DTLA_C++QED DrivenDissipativeQbit DTLA_EvolvedHL DrivenDissipativeMode_Evolved DrivenDissipativeMode_C++QED
     QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix SingleParticle 1particle1mode Ring Ring_Evolved Raman CavityRaman)
     
 foreach(S ${FEWER_SCRIPTS_TARGETS})
@@ -21,7 +21,7 @@ add_custom_target(fewer_scripts DEPENDS ${FEWER_SCRIPTS_TARGETS})
 
 #set(NEED_FLENS GeneralDickeImaginaryEvolution)
 # If something needs to be excluded, that’s how to do it:
-# set(EXCLUDE_SCRIPTS GeneralDickeImaginaryEvolution NX_coupledModesElim PumpedLossyModeRegression Spin)
+# set(EXCLUDE_SCRIPTS GeneralDickeImaginaryEvolution NX_coupledModesElim DrivenDissipativeModeRegression Spin)
 # If the target should exist, but the script should not be compiled as part of ALL, add it to the following
 # variable:
 # set(EXCLUDE_FROM_ALL_SCRIPTS 6qbits)

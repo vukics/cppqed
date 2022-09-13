@@ -3,7 +3,7 @@
 #ifndef   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
 #define   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
 
-#include "ElementLiouvillean.h"
+#include "ElementLiouvillian.h"
 #include "ElementAveraged.h"
 #include "Free.h"
 #include "FreeExact.h"
@@ -17,7 +17,7 @@ class SpinBase;
 // A general Spin yet incomplete
 // Implements the following Hamiltonian: 
 // (omega-i*gamma)*S_z
-// with the usual Liouvillean
+// with the usual Liouvillian
 
 namespace spin {
 
@@ -30,14 +30,14 @@ Tridiagonal splus(size_t dim, size_t twoS, dcomp z, bool isExact);
 
 inline auto sminus(size_t dim, size_t twoS, dcomp z, bool isExact) {return splus(dim,twoS,z,isExact).dagger();}
 inline auto sx(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)+sminus(dim,twoS,z,isExact))/2;}
-inline auto sy(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*DCOMP_I);}
+inline auto sy(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*1i);}
 
 
 Tridiagonal splus(Ptr spin);
 
 inline auto sminus(Ptr spin) {return splus(spin).dagger();}
 inline auto sx(Ptr spin) {return (splus(spin)+sminus(spin))/2;}
-inline auto sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*DCOMP_I);}
+inline auto sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*1i);}
 
 Tridiagonal sz(size_t dim, size_t twoS);
 
@@ -62,11 +62,11 @@ struct Pars
 };
 
 
-class Liouvillean
-  : public structure::ElementLiouvillean<1,1,false>
+class Liouvillian
+  : public structure::ElementLiouvillian<1,1,false>
 {
 protected:
-  Liouvillean(size_t twoS, double gamma) : structure::ElementLiouvillean<1,1,false>("Spin","S-"), twoS_(twoS), gamma_(gamma) {}
+  Liouvillian(size_t twoS, double gamma) : structure::ElementLiouvillian<1,1,false>("Spin","S-"), twoS_(twoS), gamma_(gamma) {}
   
 private:
   void   doActWithJ(structure::NoTime,       structure::freesystem::StateVectorLow     &) const ;
@@ -149,24 +149,24 @@ public:
 };
 
 
-class LossySpin
+class DissipativeSpin
   : public Spin,
-    public spin::Liouvillean
+    public spin::Liouvillian
 {
 public:
   
-  LossySpin(const spin::Pars& p) : Spin(p), spin::Liouvillean(p.twoS,p.gamma) {}
+  DissipativeSpin(const spin::Pars& p) : Spin(p), spin::Liouvillian(p.twoS,p.gamma) {}
   
 };
 
 
-class LossySpinSch
+class DissipativeSpinSch
   : public SpinSch,
-    public spin::Liouvillean
+    public spin::Liouvillian
 {
 public:
   
-  LossySpinSch(const spin::Pars& p) : SpinSch(p), spin::Liouvillean(p.twoS,p.gamma) {}
+  DissipativeSpinSch(const spin::Pars& p) : SpinSch(p), spin::Liouvillian(p.twoS,p.gamma) {}
   
 };
 

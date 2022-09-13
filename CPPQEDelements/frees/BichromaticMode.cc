@@ -4,7 +4,7 @@
 #include "Pars.h"
 
 mode::ParsBichromatic::ParsBichromatic(parameters::Table& p, const std::string& mod)
-  : Pars(p,mod), ParsPumpedLossy(p,mod),
+  : Pars(p,mod), ParsDrivenDissipative(p,mod),
     deltaOther(p.addTitle("BichromaticMode",mod).add("deltaC_Other",mod,"Other mode detuning",0.)),
     etaOther  (p.add("etaOther",mod,"Other cavity pump",dcomp(0)))
 {}

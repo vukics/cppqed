@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
   evolution::Pars<> pe(p); // Driver Parameters
 
-  mode::ParsLossy plm(p);
+  mode::ParsDissipative plm(p);
 
   spin::Pars ps(p);
 
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
   DARRAY      eigenValues(dim);
 
   if (!noEigenStates) {
-    LossyModeSch<> mode(plm);
+    DissipativeModeSch<> mode(plm);
     SpinSch        spin(ps );
     // Important that everything is in Sch picture here.
 
@@ -106,8 +106,8 @@ int main(int argc, char* argv[])
     // ****** ****** ****** ****** ****** ******
     // Mapping for imaginary time propagation:
 
-    u*=-DCOMP_I;
-    y*=-DCOMP_I;
+    u*=-1i;
+    y*=-1i;
     swap(plm.delta,plm.kappa); plm.kappa*=-1;
     swap(ps .omega,ps .gamma); ps .omega*=-1;
 

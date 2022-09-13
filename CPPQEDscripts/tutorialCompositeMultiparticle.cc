@@ -9,14 +9,14 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pe(p);
-  particle::ParsPumped pp(p);
-  mode::ParsLossy pm(p);
+  particle::ParsDriven pp(p);
+  mode::ParsDissipative pm(p);
   particlecavity::ParsOrthogonal ppc(p);
 
   update(p,argc,argv,"--");
 
-  auto mode{std::make_shared<LossyMode<>>(pm)}; // Free0
-  auto part{std::make_shared<PumpedParticle>(pp)}; // Free1,2 – only one instant
+  auto mode{std::make_shared<DissipativeMode<>>(pm)}; // Free0
+  auto part{std::make_shared<DrivenParticle>(pp)}; // Free1,2 – only one instant
 
   auto act{std::make_shared<ParticleOrthogonalToCavity>(mode,part,ppc)}; // only one instant
 

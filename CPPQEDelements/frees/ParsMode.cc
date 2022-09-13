@@ -18,21 +18,21 @@ Pars::Pars(parameters::Table& p, const std::string& mod)
 {}
 
 
-ParsPumped::ParsPumped(parameters::Table& p, const std::string& mod)
+ParsDriven::ParsDriven(parameters::Table& p, const std::string& mod)
   : Pars(p,mod),
-    eta(p.addTitle("PumpedMode",mod).add("eta",mod,"Cavity pump",dcomp(0)))
+    eta(p.addTitle("DrivenMode",mod).add("eta",mod,"Cavity pump",dcomp(0)))
 {}
 
 
-ParsLossy::ParsLossy(parameters::Table& p, const std::string& mod)
+ParsDissipative::ParsDissipative(parameters::Table& p, const std::string& mod)
   : Pars(p,mod),
-    kappa(p.addTitle("LossyMode",mod).add("kappa",mod,"Mode decay rate",-delta)),
+    kappa(p.addTitle("DissipativeMode",mod).add("kappa",mod,"Mode decay rate",-delta)),
     nTh  (p.add("nTh"  ,mod,"Mode thermal-photon number",0.))
 {}
 
 
-ParsPumpedLossy::ParsPumpedLossy(parameters::Table& p, const std::string& mod)
-  : Pars(p,mod), ParsPumped(p,mod), ParsLossy(p,mod)
+ParsDrivenDissipative::ParsDrivenDissipative(parameters::Table& p, const std::string& mod)
+  : Pars(p,mod), ParsDriven(p,mod), ParsDissipative(p,mod)
 {}
 
 

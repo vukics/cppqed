@@ -75,12 +75,12 @@ int main()
         xAx   =DEVector(x-x0)*DEVector(A   *DEVector(x-x0)), 
         kAinvk=DEVector(k-k0)*DEVector(Ainv*DEVector(k-k0));
 
-      psi (i,j)=exp(-xAx      +DCOMP_I*(k0*x));
-      psiK(i,j)=exp(-kAinvk/4.-DCOMP_I*(x0*k));
+      psi (i,j)=exp(-xAx      +1i*(k0*x));
+      psiK(i,j)=exp(-kAinvk/4.-1i*(x0*k));
 
     }
 
-  psiK*=exp(DCOMP_I*(x0*k0))*mathutils::PI/sqrt(A(1,1)*A(2,2)-A(1,2)*A(2,1));
+  psiK*=exp(1i*(x0*k0))*mathutils::PI/sqrt(A(1,1)*A(2,2)-A(1,2)*A(2,1));
 
   SVL psiFFT(psi.copy()), psiKFFT(psiK.copy());
 

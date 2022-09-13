@@ -31,7 +31,7 @@ namespace {
 
 const particle::Exact::Diagonal fExpFill(const particle::Spatial& space, double omrec)
 {
-  return particle::Exact::Diagonal(-DCOMP_I*omrec*blitz::sqr(space.getK()));
+  return particle::Exact::Diagonal(-1i*omrec*blitz::sqr(space.getK()));
 }
 
 } 
@@ -81,13 +81,13 @@ const particle::Tridiagonal cosNKX(size_t dim, ptrdiff_t nK)
 
 const particle::Tridiagonal hOverI(size_t dim, double vClass, const ModeFunction& mf)
 {
-  return (vClass && !isComplex(get<0>(mf))) ? vClass*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(dim,get<1>(mf)<<1)/(2.*DCOMP_I) : particle::Tridiagonal();
+  return (vClass && !isComplex(get<0>(mf))) ? vClass*(get<0>(mf)==MFT_SIN ? -1 : 1)*cosNKX(dim,get<1>(mf)<<1)/(2.*1i) : particle::Tridiagonal();
 }
 
 
 const particle::Tridiagonal::Diagonal mainDiagonal(const particle::Spatial& space, double omrec)
 {
-  return particle::Tridiagonal::Diagonal(DCOMP_I*omrec*blitz::sqr(space.getK()));
+  return particle::Tridiagonal::Diagonal(1i*omrec*blitz::sqr(space.getK()));
 }
 
 
@@ -187,7 +187,7 @@ ParticleBase::ParticleBase(size_t fin,
 }
 
 
-PumpedParticleBase::PumpedParticleBase(size_t fin, double vClass, const ModeFunction& mf,
+DrivenParticleBase::DrivenParticleBase(size_t fin, double vClass, const ModeFunction& mf,
                                        const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs)
   : ParticleBase(fin,
                  boost::assign::list_of(*realFreqs.begin()).range(next(realFreqs.begin()),realFreqs.end())({"vClass",vClass,1.}),
@@ -215,15 +215,15 @@ ParticleSch::ParticleSch(const particle::Pars& p)
 
 
 
-PumpedParticle::PumpedParticle(const particle::ParsPumped& p)
-  : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec",p.omrec,1<<p.fin}}),
+DrivenParticle::DrivenParticle(const particle::ParsDriven& p)
+  : DrivenParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec",p.omrec,1<<p.fin}}),
     Hamiltonian<true>(getSpace(),p.omrec,p.vClass,getMF())
 {
 }
 
 
-PumpedParticleSch::PumpedParticleSch(const particle::ParsPumped& p)
-  : PumpedParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec" ,p.omrec,sqr(1<<p.fin)}}),
+DrivenParticleSch::DrivenParticleSch(const particle::ParsDriven& p)
+  : DrivenParticleBase(p.fin,p.vClass,ModeFunction(p.modePart,p.kPart),{RF{"omrec" ,p.omrec,sqr(1<<p.fin)}}),
     Hamiltonian<false>(getSpace(),p.omrec,p.vClass,getMF())
 {
   getParsStream()<<"Schroedinger picture.\n";
@@ -330,7 +330,7 @@ auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFun
     return expINKX(particle,2*nK);
   }
   if (mfs == MFPair(MFT_PLUS,MFT_SIN) || mfs == MFPair(MFT_SIN,MFT_MINUS)) {
-    return sign * (expINKX(particle, -2*nK)-id) * DCOMP_I/2.;
+    return sign * (expINKX(particle, -2*nK)-id) * 1i/2.;
   }
   if (mfs == MFPair(MFT_PLUS,MFT_COS) || mfs == MFPair(MFT_COS,MFT_MINUS)) {
     return (id + expINKX(particle,-2*nK)) / 2.;
@@ -342,7 +342,7 @@ auto particle::mfComposition(particle::Ptr particle, const ModeFunction& modeFun
     // this should never be reached
     throw std::logic_error("In mfComposition");
   }
-  return -sign * (expINKX(particle,2*nK)-id) * DCOMP_I/2.;
+  return -sign * (expINKX(particle,2*nK)-id) * 1i/2.;
 }
 
 /*
@@ -363,7 +363,7 @@ auto particle::wavePacket(const InitialCondition& init, const Spatial& space, bo
 
   const Spatial::Array array(init.isInK() ? space.getK() : space.getX());
 
-  StateVectorLow psiLow(exp(-blitz::sqr(array-offset1)/(4*sqr(init.getSig()))+DCOMP_I*array*offset2));
+  StateVectorLow psiLow(exp(-blitz::sqr(array-offset1)/(4*sqr(init.getSig()))+1i*array*offset2));
 
   if      ( kFlag && !init.isInK()) quantumdata::ffTransform(psiLow,DIR_XK);
   else if (!kFlag &&  init.isInK()) quantumdata::ffTransform(psiLow,DIR_KX);
@@ -383,14 +383,14 @@ auto particle::wavePacket(const Pars& p, bool kFlag) -> StateVector
 
 namespace {
 
-const particle::InitialCondition coherent(const particle::ParsPumped& p)
+const particle::InitialCondition coherent(const particle::ParsDriven& p)
 {
   return particle::InitialCondition(p.init.getX0(),p.init.getK0(),pow(p.omrec/fabs(p.vClass),.25)/sqrt(2),false);
 }
 
 }
 
-auto particle::wavePacket(const ParsPumped& p, bool kFlag) -> StateVector
+auto particle::wavePacket(const ParsDriven& p, bool kFlag) -> StateVector
 {
   if (p.init.getSig()) return wavePacket(static_cast<const Pars&>(p),kFlag);
   else                 return wavePacket(coherent(p),
@@ -429,7 +429,7 @@ auto particle::hoState(const Pars      & p, bool kFlag) -> StateVector
 }
 
 
-auto particle::hoState(const ParsPumped& p, bool kFlag) -> StateVector
+auto particle::hoState(const ParsDriven& p, bool kFlag) -> StateVector
 {
   if (p.init.getSig()) return hoState(static_cast<const Pars&>(p),kFlag);
   else                 return hoState(p.hoInitn,
@@ -441,7 +441,7 @@ auto particle::hoState(const ParsPumped& p, bool kFlag) -> StateVector
 
 auto particle::init(const Pars& p) -> StateVector
 {
-  if (const auto pp=dynamic_cast<const ParsPumped*>(&p))
+  if (const auto pp=dynamic_cast<const ParsDriven*>(&p))
     return p.hoInitn<0 ? wavePacket(*pp) : hoState(*pp);
   else
     return p.hoInitn<0 ? wavePacket( p ) : hoState( p );
@@ -456,7 +456,7 @@ particle::Ptr particle::make(const Pars& p, QM_Picture qmp)
 }
 
 
-particle::PtrPumped particle::makePumped(const ParsPumped& p, QM_Picture qmp)
+particle::PtrDriven particle::makeDriven(const ParsDriven& p, QM_Picture qmp)
 {
-  return qmp==QMP_SCH ? PtrPumped(std::make_shared<PumpedParticleSch>(p)) : PtrPumped(std::make_shared<PumpedParticle>(p));
+  return qmp==QMP_SCH ? PtrDriven(std::make_shared<DrivenParticleSch>(p)) : PtrDriven(std::make_shared<DrivenParticle>(p));
 }

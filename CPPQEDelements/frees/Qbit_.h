@@ -81,9 +81,9 @@ StateVector init(dcomp psi1);
 inline StateVector init(const Pars& p) {return init(p.qbitInit);}
 
 
-Ptr make(const ParsPumpedLossy&, QM_Picture);
+Ptr make(const ParsDrivenDissipative&, QM_Picture);
 
-Ptr make(const ParsPumpedLossyPhaseNoise&, QM_Picture);
+Ptr make(const ParsDrivenDissipativePhaseNoise&, QM_Picture);
 
 
 
@@ -110,18 +110,25 @@ public:
 
 
 
-class Liouvillean : public mode::Liouvillean<false>
+class Liouvillian : public mode::Liouvillian<false>
 {
 protected:
-  Liouvillean(double gamma) : mode::Liouvillean<false>(gamma,0,keyTitle) {}
+  Liouvillian(double gamma) : mode::Liouvillian<false>(gamma,0,keyTitle) {}
 
 };
 
 
-class LiouvilleanPhaseNoise : public structure::ElementLiouvilleanStrategies<1,2>
+class LiouvillianPhaseNoise : public structure::ElementLiouvillianStrategies<1,2>
 {
 protected:
-  LiouvilleanPhaseNoise(double gamma_perpendicular, double gamma_parallel);
+  LiouvillianPhaseNoise(double gamma_perpendicular, double gamma_parallel);
+  
+};
+
+class LiouvillianDrivenPhaseNoise : public structure::ElementLiouvillianStrategies<1,3>
+{
+protected:
+  LiouvillianDrivenPhaseNoise(double gamma_perpendicular, double gamma_pump, double gamma_parallel);
   
 };
 
@@ -155,117 +162,143 @@ public:
 };
 
 
-class PumpedQbit
+class DrivenQbit
   : public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
-  PumpedQbit(const qbit::ParsPumped&);
+  DrivenQbit(const qbit::ParsDriven&);
 };
 
-typedef PumpedQbit PumpedQbitUIP;
+typedef DrivenQbit DrivenQbitUIP;
 
 
-class PumpedQbitSch
+class DrivenQbitSch
   : public qbit::Hamiltonian<false>, public QbitBase
 {
 public:
-  PumpedQbitSch(const qbit::ParsPumped&);
+  DrivenQbitSch(const qbit::ParsDriven&);
 };
 
 
-class LossyQbit
-  : public qbit::Liouvillean, public qbit::Exact, public QbitBase
+class DissipativeQbit
+  : public qbit::Liouvillian, public qbit::Exact, public QbitBase
 {
 public:
-  LossyQbit(double, double);
+  DissipativeQbit(double, double);
 
   template<typename BASE>
-  LossyQbit(const qbit::ParsLossy<BASE>& p) : LossyQbit(p.delta,p.gamma) {}
+  DissipativeQbit(const qbit::ParsDissipative<BASE>& p) : DissipativeQbit(p.delta,p.gamma) {}
   
 };
 
 
-class LossyQbitSch
-  : public qbit::Liouvillean, public qbit::Hamiltonian<false>, public QbitBase
+class DissipativeQbitSch
+  : public qbit::Liouvillian, public qbit::Hamiltonian<false>, public QbitBase
 {
 public:
-  LossyQbitSch(double, double);
+  DissipativeQbitSch(double, double);
   
   template<typename BASE>
-  LossyQbitSch(const qbit::ParsLossy<BASE>& p) : LossyQbitSch(p.delta,p.gamma) {}
+  DissipativeQbitSch(const qbit::ParsDissipative<BASE>& p) : DissipativeQbitSch(p.delta,p.gamma) {}
 };
 
 
-class LossyQbitUIP
-  : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
+class DissipativeQbitUIP
+  : public qbit::Liouvillian, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
-  LossyQbitUIP(double, double);
+  DissipativeQbitUIP(double, double);
 
   template<typename BASE>
-  LossyQbitUIP(const qbit::ParsLossy<BASE>& p) : LossyQbitUIP(p.delta,p.gamma) {}
+  DissipativeQbitUIP(const qbit::ParsDissipative<BASE>& p) : DissipativeQbitUIP(p.delta,p.gamma) {}
 };
 
 
-class PumpedLossyQbit 
-  : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
+class DrivenDissipativeQbit 
+  : public qbit::Liouvillian, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
-  PumpedLossyQbit(const qbit::ParsPumpedLossy& p);
+  DrivenDissipativeQbit(const qbit::ParsDrivenDissipative& p);
 };
 
 
-class PumpedLossyQbitUIP
-  : public qbit::Liouvillean, public qbit::Hamiltonian<true>, public QbitBase
+class DrivenDissipativeQbitUIP
+  : public qbit::Liouvillian, public qbit::Hamiltonian<true>, public QbitBase
 {
 public:
-  PumpedLossyQbitUIP(const qbit::ParsPumpedLossy&);
+  DrivenDissipativeQbitUIP(const qbit::ParsDrivenDissipative&);
 };
 
 
-class PumpedLossyQbitSch
-  : public qbit::Liouvillean, public qbit::Hamiltonian<false>, public QbitBase
+class DrivenDissipativeQbitSch
+  : public qbit::Liouvillian, public qbit::Hamiltonian<false>, public QbitBase
 {
 public:
-  PumpedLossyQbitSch(const qbit::ParsPumpedLossy&);
+  DrivenDissipativeQbitSch(const qbit::ParsDrivenDissipative&);
 };
 
 
-class LossyQbitWithPhaseNoise
-  : public qbit::Exact, public qbit::LiouvilleanPhaseNoise, public QbitBase
+class DissipativeQbitWithPhaseNoise
+  : public qbit::Exact, public qbit::LiouvillianPhaseNoise, public QbitBase
 {
 public:
-  LossyQbitWithPhaseNoise(double, double, double);
+  DissipativeQbitWithPhaseNoise(double, double, double);
 
   template<typename BASE>
-  LossyQbitWithPhaseNoise(const qbit::ParsLossyPhaseNoise<BASE>& p) : LossyQbitWithPhaseNoise(p.delta,p.gamma,p.gamma_parallel) {}
-  
-};
-
-
-class LossyQbitWithPhaseNoiseUIP
-  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
-{
-public:
-  LossyQbitWithPhaseNoiseUIP(double, double, double);
-
-  template<typename BASE>
-  LossyQbitWithPhaseNoiseUIP(const qbit::ParsLossyPhaseNoise<BASE>& p) : LossyQbitWithPhaseNoiseUIP(p.delta,p.gamma,p.gamma_parallel) {}
+  DissipativeQbitWithPhaseNoise(const qbit::ParsDissipativePhaseNoise<BASE>& p) : DissipativeQbitWithPhaseNoise(p.delta,p.gamma,p.gamma_parallel) {}
   
 };
 
-class PumpedLossyQbitWithPhaseNoise
-  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+
+class DissipativeQbitWithPhaseNoiseUIP
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianPhaseNoise, public QbitBase
 {
 public:
-  PumpedLossyQbitWithPhaseNoise(const qbit::ParsPumpedLossyPhaseNoise&);
+  DissipativeQbitWithPhaseNoiseUIP(double, double, double);
+
+  template<typename BASE>
+  DissipativeQbitWithPhaseNoiseUIP(const qbit::ParsDissipativePhaseNoise<BASE>& p) : DissipativeQbitWithPhaseNoiseUIP(p.delta,p.gamma,p.gamma_parallel) {}
+  
 };
 
-class PumpedLossyQbitWithPhaseNoiseUIP
-  : public qbit::Hamiltonian<true>, public qbit::LiouvilleanPhaseNoise, public QbitBase
+class DrivenDissipativeQbitWithPhaseNoise
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianPhaseNoise, public QbitBase
 {
 public:
-  PumpedLossyQbitWithPhaseNoiseUIP(const qbit::ParsPumpedLossyPhaseNoise&);
+  DrivenDissipativeQbitWithPhaseNoise(const qbit::ParsDrivenDissipativePhaseNoise&);
 };
+
+class DrivenDissipativeQbitWithPhaseNoiseUIP
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianPhaseNoise, public QbitBase
+{
+public:
+  DrivenDissipativeQbitWithPhaseNoiseUIP(const qbit::ParsDrivenDissipativePhaseNoise&);
+};
+
+
+
+class DissipativeQbitWithIncoherentPumpAndPhaseNoise
+  : public qbit::Exact, public qbit::LiouvillianDrivenPhaseNoise, public QbitBase
+{
+public:
+  DissipativeQbitWithIncoherentPumpAndPhaseNoise(double, double, double, double);
+
+  template<typename PARS>
+  DissipativeQbitWithIncoherentPumpAndPhaseNoise(PARS p) : DissipativeQbitWithIncoherentPumpAndPhaseNoise(p.delta,p.gamma,p.gamma_pump,p.gamma_parallel) {}
+  
+};
+
+
+class DissipativeQbitWithIncoherentPumpAndPhaseNoiseUIP
+  : public qbit::Hamiltonian<true>, public qbit::LiouvillianDrivenPhaseNoise, public QbitBase
+{
+public:
+  DissipativeQbitWithIncoherentPumpAndPhaseNoiseUIP(double, double, double, double);
+
+  template<typename PARS>
+  DissipativeQbitWithIncoherentPumpAndPhaseNoiseUIP(PARS p) : DissipativeQbitWithIncoherentPumpAndPhaseNoiseUIP(p.delta,p.gamma,p.gamma_pump,p.gamma_parallel) {}
+  
+};
+
 
 #endif // CPPQEDELEMENTS_FREES_QBIT__H_INCLUDED

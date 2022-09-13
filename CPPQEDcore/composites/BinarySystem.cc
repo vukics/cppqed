@@ -9,7 +9,6 @@
 
 #include "BlitzTiny.h"
 
-
 using namespace structure;
 
 using cppqedutils::sliceiterator::fullRange;
@@ -113,12 +112,12 @@ void binary::Hamiltonian::addContribution_v(double t, const StateVectorLow& psi,
 
 /////////////////
 //             //
-// Liouvillean //
+// Liouvillian //
 //             //
 /////////////////
 
 
-void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) const
+void binary::Liouvillian::actWithJ_v(double t, StateVectorLow& psi, size_t i) const
 {
   size_t n=::structure::nAvr<LA_Li>((*ia_)[0]);
   
@@ -140,7 +139,7 @@ void binary::Liouvillean::actWithJ_v(double t, StateVectorLow& psi, size_t i) co
 }
 
 
-void binary::Liouvillean::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t i) const
+void binary::Liouvillian::actWithSuperoperator_v(double t, const DensityOperatorLow& rho, DensityOperatorLow& drhodt, size_t i) const
 {
   const auto lambda=[=,&i](auto li) {
     return [=,&i](const auto& rhoS, auto& drhodtS) {
@@ -185,7 +184,7 @@ BinarySystem<IS_EX,IS_HA,IS_LI>::BinarySystem(binary::InteractionPtr ia)
 : binary::Base(ia),
   BASE_ctor(Exact),
   BASE_ctor(Hamiltonian),
-  BASE_ctor(Liouvillean)
+  BASE_ctor(Liouvillian)
 {
 } 
 

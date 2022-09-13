@@ -6,19 +6,120 @@
 #include <boost/assign/list_inserter.hpp>
 
 
+using namespace structure;
+
 using std::cout; using std::endl; using std::string;
 using namespace boost;
 using namespace cppqedutils;
 
 
+double mode::photonnumber(const LazyDensityOperator& matrix)
+{
+  double res{0};
+  for (size_t n=0; n<matrix.getDimension(); ++n) res+=n*matrix(n);
+  return res;
+}
+
+
+void mode::aJump(StateVectorLow& psi, double fact)
+{
+  for (size_t n=0; n<psi.ubound(0); ++n) psi(n)=fact*sqrt(n+1)*psi(n+1);
+  psi(psi.ubound(0))=0;
+}
+    
+
+void mode::aDagJump(StateVectorLow& psi, double fact)
+{
+  for (size_t n=psi.ubound(0); n>0; --n) psi(n)=fact*sqrt(n)*psi(n-1);
+  psi(0)=0;
+}
+
+
+void mode::aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact)
+{
+  for (int m=0; m<rho.ubound(0); ++m)
+    for (int n=0; n<rho.ubound(1); ++n)
+      drhodt(m,n)+=fact*sqrt((m+1)*(n+1))*rho(m+1,n+1);
+}
+
+
+void mode::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact)
+{
+  for (int m=1; m<=rho.ubound(0); ++m)
+    for (int n=1; n<=rho.ubound(1); ++n)
+      drhodt(m,n)+=fact*sqrt(m*n)*rho(m-1,n-1);
+}
+
+
+Lindblad<1> mode::photonLoss(double kappaTimes_nThPlus1)
+{
+  return {
+    .label{"excitation loss"},
+    .jump{[=](StateVectorLow& psi) {aJump(psi,sqrt(2.*kappaTimes_nThPlus1));}},
+    .rate{[=](const LazyDensityOperator& m) {return 2.*kappaTimes_nThPlus1*photonnumber(m);}},
+    .superoperator{[=](const DensityOperatorLow& rho, DensityOperatorLow& drhodt) {aSuperoperator(rho,drhodt,2.*kappaTimes_nThPlus1);}}
+  };
+}
+
+Lindblad<1> mode::photonGain(double kappaTimes_nTh)
+{
+  return {
+    .label{"excitation absorption"},
+    .jump{[=](StateVectorLow& psi) {aDagJump(psi,sqrt(2.*kappaTimes_nTh));}},
+    .rate{[=](const LazyDensityOperator& m) {return 2.*kappaTimes_nTh*(photonnumber(m)+m.trace());}},
+    .superoperator{[=](const DensityOperatorLow& rho, DensityOperatorLow& drhodt) {aDagSuperoperator(rho,drhodt,2.*kappaTimes_nTh);}}
+  };
+}
+
+
+ExpectationValue<1> mode::photonnumberEV_Variance{
+  .label{"<number operator>","VAR(number operator)"},
+  .process{calculateVariance},
+  .eva{[] (const LazyDensityOperator& m) {
+    EV_Array res{0.,2};
+    for (int n=1; n<int(m.getDimension()); n++) {
+      res[0]+=  n*m(n);
+      res[1]+=n*n*m(n);
+    }    
+    return res;
+}}};
+
+
+ExpectationValue<1> mode::ladderOperatorEV {
+  .label{"real(<ladder operator>)","imag(\")"},
+  .eva{[] (const LazyDensityOperator& m) {
+    EV_Array res{0.,2};
+    for (int n=1; n<int(m.getDimension()); n++) {
+      dcomp offdiag(sqrt(n)*m(n)(n-1));
+      res[0]+=real(offdiag);
+      res[1]+=imag(offdiag);
+    }    
+    return res;
+}}};
+
+
+ExpectationValue<1> mode::monitorCutoff {
+  .label{"|Psi(cutoff-1)|^2"},
+  .eva{[] (const LazyDensityOperator& m) {
+    EV_Array res{0.,1};
+    res[0]=m(m.getDimension()-1);
+    return res;
+}}};
+
+
+
+
 namespace mode {
 
+
+
+  
 #define DEFINE_make_by_redirect(AUX) const Ptr make(const BOOST_PP_CAT(Pars,AUX) & p, QM_Picture qmp) {return make<Averaged>(p,qmp);}
 
 DEFINE_make_by_redirect()
-DEFINE_make_by_redirect(Lossy)
-DEFINE_make_by_redirect(Pumped)
-DEFINE_make_by_redirect(PumpedLossy)
+DEFINE_make_by_redirect(Dissipative)
+DEFINE_make_by_redirect(Driven)
+DEFINE_make_by_redirect(DrivenDissipative)
 
 #undef DEFINE_make_by_redirect
 
@@ -51,7 +152,7 @@ void Exact::updateU(Time t) const
 //
 //////////////
 
-#define KERRDIAGONAL(d,o) d=(i-1.)*i; d*=o/DCOMP_I;
+#define KERRDIAGONAL(d,o) d=(i-1.)*i; d*=o/1i;
 
 const Tridiagonal::Diagonal mainDiagonal(dcomp z, double omegaKerr, size_t dim)
 {
@@ -75,13 +176,13 @@ namespace {
 Tridiagonal hOverI(dcomp z, dcomp eta, double omegaKerr, size_t dim)
 // Here we use runtime dispatching because runtime dispatching will anyway happen at the latest in some maker function.
 {
-  bool isPumped=isNonZero(eta);
+  bool isDriven=isNonZero(eta);
   if (isNonZero(z)) {
     Tridiagonal res(mainDiagonal(-z,omegaKerr,dim));
-    if (isPumped) return res+pumping(eta,dim);
+    if (isDriven) return res+pumping(eta,dim);
     else return res;
   }
-  else if(isPumped) return pumping(eta,dim);
+  else if(isDriven) return pumping(eta,dim);
   else return Tridiagonal();
 }
 
@@ -108,44 +209,6 @@ Hamiltonian<false>::Hamiltonian(dcomp zSch, dcomp eta, double omegaKerr, double 
 
 #undef KERRDIAGONAL
 #undef FILLKERR
-
-//////////////
-//
-// Liouvillean
-//
-//////////////
-
-void details::aJump   (StateVectorLow& psi, double kappa) // kappa is kappa*(nTh+1) when the temperature is finite
-{
-  double fact=sqrt(2.*kappa);
-  int ubound=psi.ubound(0);
-  for (int n=0; n<ubound; ++n)
-    psi(n)=fact*sqrt(n+1)*psi(n+1);
-  psi(ubound)=0;
-}
-
-void details::aDagJump(StateVectorLow& psi, double kappa) // kappa is kappa* nTh    when the temperature is finite
-{
-  double fact=sqrt(2.*kappa);
-  for (int n=psi.ubound(0); n>0; --n)
-    psi(n)=fact*sqrt(n)*psi(n-1);
-  psi(0)=0;
-}
-
-void details::aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double kappa)
-{
-  for (int m=0; m<rho.ubound(0); ++m)
-    for (int n=0; n<rho.ubound(1); ++n)
-      drhodt(m,n)+=2*kappa*sqrt((m+1)*(n+1))*rho(m+1,n+1);
-}
-
-void details::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double kappa)
-{
-  for (int m=1; m<=rho.ubound(0); ++m)
-    for (int n=1; n<=rho.ubound(1); ++n)
-      drhodt(m,n)+=2*kappa*sqrt(m*n)*rho(m-1,n-1);
-}
-
 
 ///////////
 //
@@ -328,7 +391,7 @@ StateVector fock(size_t n, size_t dim, double phase)
 {
   if (n>=dim) throw std::overflow_error("Fock state "+std::to_string(n)+" higher than dim "+std::to_string(dim));
   StateVector res(dim);
-  res(n)=exp(DCOMP_I*phase);
+  res(n)=exp(1i*phase);
   return res;
 }
 
@@ -353,10 +416,10 @@ ModeBase::ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& c
 
 
 
-PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy& p)
+DrivenDissipativeModeIP_NoExact::DrivenDissipativeModeIP_NoExact(const mode::ParsDrivenDissipative& p)
   : ModeBase(p.cutoff),
     quantumoperator::TridiagonalHamiltonian<1,true>(furnishWithFreqs(mode::pumping(p.eta,p.cutoff),mode::mainDiagonal(dcomp(p.kappa,-p.delta),p.omegaKerr,p.cutoff))),
-    structure::ElementLiouvillean<1,1,true>(mode::keyTitle,"excitation loss"),
+    structure::ElementLiouvillian<1,1,true>(mode::keyTitle,"excitation loss"),
     structure::ElementAveraged<1,true>(mode::keyTitle,{"<number operator>","real(<ladder operator>)","imag(\")"}),
     z_(p.kappa,-p.delta)
 {
@@ -365,13 +428,13 @@ PumpedLossyModeIP_NoExact::PumpedLossyModeIP_NoExact(const mode::ParsPumpedLossy
 
 
 
-double PumpedLossyModeIP_NoExact::rate(OneTime, const mode::LazyDensityOperator& m) const
+double DrivenDissipativeModeIP_NoExact::rate(OneTime, const mode::LazyDensityOperator& m) const
 {
   return mode::photonNumber(m);
 }
 
 
-void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi) const
+void DrivenDissipativeModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi) const
 {
   dcomp fact=sqrt(2.*real(z_))*exp(-z_*double(t));
   int ubound=psi.ubound(0);
@@ -382,7 +445,7 @@ void PumpedLossyModeIP_NoExact::doActWithJ(OneTime t, mode::StateVectorLow& psi)
 
 
 
-const mode::Averages PumpedLossyModeIP_NoExact::average_v(OneTime t, const mode::LazyDensityOperator& matrix) const
+const mode::Averages DrivenDissipativeModeIP_NoExact::average_v(OneTime t, const mode::LazyDensityOperator& matrix) const
 {
   auto averages(initializedAverages());
 

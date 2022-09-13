@@ -87,7 +87,7 @@ protected:
 
 public:
 
-  template<structure::LiouvilleanAveragedTag LA>
+  template<structure::LiouvillianAveragedTag LA>
   static std::ostream& streamKeyLA(std::ostream& os, size_t& i, Frees<RANK> frees, hana::tuple<Acts...> acts)
   {
     hana::for_each(tmptools::ordinals<RANK>,[&](auto idx) {::structure::streamKey<LA>(frees[idx],os,i);});
@@ -96,7 +96,7 @@ public:
   }
   
   
-  template<structure::LiouvilleanAveragedTag LA>
+  template<structure::LiouvillianAveragedTag LA>
   static size_t nAvrLA(Frees<RANK> frees, hana::tuple<Acts...> acts)
   {    
     return hana::fold(acts,
@@ -110,7 +110,7 @@ public:
 #ifndef NDEBUG
 #pragma GCC warning "TODO: This solution is a bit insane, could be solved more effectively with blitz::Array slice"
 #endif // NDEBUG
-  template<structure::LiouvilleanAveragedTag LA>
+  template<structure::LiouvillianAveragedTag LA>
   static structure::Averages averageLA(double t, const quantumdata::LazyDensityOperator<RANK>& ldo, Frees<RANK> frees, hana::tuple<Acts...> acts, size_t numberAvr)
   {
     std::list<Averages> seqAverages{RANK+hana::size(acts).value}; // Averages res(numberAvr); size_t resIdx=0;
@@ -294,14 +294,14 @@ private:
 
 
 template<typename... Acts>
-class Liouvillean
-  : public structure::Liouvillean<rank_v<Acts...>>
+class Liouvillian
+  : public structure::Liouvillian<rank_v<Acts...>>
 {
 private:
   static constexpr int RANK=rank_v<Acts...>;
 
 protected:
-  Liouvillean(Frees<RANK> frees, Acts... acts) : frees_{frees}, acts_{acts...} {}
+  Liouvillian(Frees<RANK> frees, Acts... acts) : frees_{frees}, acts_{acts...} {}
 
 private:
   std::ostream& streamKey_v(std::ostream& os, size_t& i) const override {return Base<Acts...>::template streamKeyLA<structure::LA_Li>(os,i, frees_,acts_);}
@@ -391,18 +391,18 @@ class Composite
   : public composite::Base<Acts...>,
     public BASE_class(EX,Exact),
     public BASE_class(HA,Hamiltonian),
-    public BASE_class(LI,Liouvillean)
+    public BASE_class(LI,Liouvillian)
 {
 public:
   typedef composite::Base<Acts...> Base;
   
   typedef BASE_class(EX,Exact) ExactBase;
   typedef BASE_class(HA,Hamiltonian) HamiltonianBase;
-  typedef BASE_class(LI,Liouvillean) LiouvilleanBase;
+  typedef BASE_class(LI,Liouvillian) LiouvillianBase;
   
   // Constructor
   Composite(composite::Frees<Base::RANK> frees, Acts... acts)
-    : Base(frees,acts...), ExactBase(frees,acts...), HamiltonianBase(frees,acts...), LiouvilleanBase(frees,acts...) {}
+    : Base(frees,acts...), ExactBase(frees,acts...), HamiltonianBase(frees,acts...), LiouvillianBase(frees,acts...) {}
     // Note that Frees and Acts are stored by value in Base, that’s why we need the getters here
  
 };
@@ -527,5 +527,5 @@ using Act = composite::_<RetainedAxes...>;
  * \tparam Acts should model a \refBoost{Boost.Fusion list,fusion/doc/html/fusion/container/list.html} of composite::_ objects
  * \tparam IS_EX governs whether the class should inherit from composite::Exact
  * \tparam IS_HA governs whether the class should inherit from composite::Hamiltonianhana::tuple<Acts...>
- * \tparam IS_LI governs whether the class should inherit from composite::Liouvillean
+ * \tparam IS_LI governs whether the class should inherit from composite::Liouvillian
  */

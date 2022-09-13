@@ -38,12 +38,12 @@ class ParticleOrthogonalToCavity
   : public particlecavity::Base, public particlecavity::TridiagonalHamiltonian
 {
 public:
-  ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsOrthogonal& p)
+  ParticleOrthogonalToCavity(mode::Ptr mode, particle::PtrDriven part, const particlecavity::ParsOrthogonal& p)
     : ParticleOrthogonalToCavity(mode,part,p.uNot) {}
 
 private:
-  ParticleOrthogonalToCavity(mode::Ptr, particle::PtrPumped, double uNot);
-  ParticleOrthogonalToCavity(mode::Ptr, particle::PtrPumped, double uNot, double etaeff);
+  ParticleOrthogonalToCavity(mode::Ptr, particle::PtrDriven, double uNot);
+  ParticleOrthogonalToCavity(mode::Ptr, particle::PtrDriven, double uNot, double etaeff);
 
 };
 
@@ -68,13 +68,13 @@ public:
   ParticleAlongCavity(mode::Ptr mode, PART part, const particlecavity::ParsAlongGenericPump& p)
     : ParticleAlongCavity(mode,part, p.uNot, p.kCav, p.modeCav, p.etaeff) {}
 
-  // The following two describe the case when there is an additional fixed standing wave ALONG the cavity, in which case the particle must be derived from PumpedParticleBase
+  // The following two describe the case when there is an additional fixed standing wave ALONG the cavity, in which case the particle must be derived from DrivenParticleBase
   // The particle type is not a template parameter to avoid ambiguity with the previous constructors
 
-  ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsAlong& p)
+  ParticleAlongCavity(mode::Ptr mode, particle::PtrDriven part, const particlecavity::ParsAlong& p)
     : ParticleAlongCavity(mode, part, p, ThePrivateOne()) {}
 
-  ParticleAlongCavity(mode::Ptr mode, particle::PtrPumped part, const particlecavity::ParsAlongGenericPump& p)
+  ParticleAlongCavity(mode::Ptr mode, particle::PtrDriven part, const particlecavity::ParsAlongGenericPump& p)
     : ParticleAlongCavity(mode,part, p.uNot, p.kCav, p.modeCav, p.etaeff) {}
 
 private:
@@ -83,10 +83,10 @@ private:
   typedef TridiagonalHamiltonian::Tridiagonals            Tridiagonals;
 
   ParticleAlongCavity(mode::Ptr, particle::Ptr,       const particlecavity::ParsAlong& p, double vClass, const ThePrivateOne&);
-  ParticleAlongCavity(mode::Ptr, particle::PtrPumped, const particlecavity::ParsAlong& p, const ThePrivateOne&);
+  ParticleAlongCavity(mode::Ptr, particle::PtrDriven, const particlecavity::ParsAlong& p, const ThePrivateOne&);
 
   ParticleAlongCavity(mode::Ptr, particle::Ptr,       double uNot, size_t kCav, ModeFunctionType, double etaeff);
-  ParticleAlongCavity(mode::Ptr, particle::PtrPumped, double uNot, size_t kCav, ModeFunctionType, double etaeff);
+  ParticleAlongCavity(mode::Ptr, particle::PtrDriven, double uNot, size_t kCav, ModeFunctionType, double etaeff);
 
   void addContribution_v(double, const quantumdata::StateVectorLow<2>&, quantumdata::StateVectorLow<2>&, double) const;
 

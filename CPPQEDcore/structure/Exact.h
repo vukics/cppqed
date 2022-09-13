@@ -9,26 +9,6 @@
 namespace structure {
 
 
-/// The template-parameter-independent base of Exact
-class ExactCommon
-{
-public:
-  typedef std::shared_ptr<const ExactCommon> Ptr;
-
-  virtual ~ExactCommon() {}
-
-  /// Describes whether the system fulfills the requirement to be used in Master-equation evolution
-  /**
-   * \see \ref masterequationlimitations of the Master-equation driver
-   */
-  bool applicableInMaster() const {return applicableInMaster_v();}
-
-private:
-  virtual bool applicableInMaster_v() const = 0;
-
-};
-
-
 /// The interface every system that needs transformation between two quantum mechanical pictures must present towards the trajectory drivers
 /**
  * Experience shows that even when a system uses interaction picture (which is automatically the case if any of its subsystems does) – that is, part of its dynamics is solved exactly – 
@@ -49,7 +29,7 @@ private:
  * 
  */
 template<int RANK>
-class Exact : public ExactCommon
+class Exact
 {
 public:
   virtual ~Exact() {}

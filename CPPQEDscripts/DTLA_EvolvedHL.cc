@@ -3,7 +3,7 @@
 
 #include "StateVector.h"
 #include "DensityOperator.h"
-#include "PumpedTwoLevelAtom.h"
+#include "DrivenTwoLevelAtom.h"
 #include "Qbit.h"
 
 #include "Simulated.h"
@@ -23,12 +23,12 @@ int main(int argc, char* argv[])
   ParameterTable p;
 
   evolution::Pars<> pt(p);
-  ParsPumpedLossy pp2la(p); 
+  ParsDrivenDissipative pp2la(p); 
 
   // Parameter finalization
   update(p,argc,argv,"--");
 
-  PumpedTwoLevelAtomSch atom(pp2la);
+  DrivenTwoLevelAtomSch atom(pp2la);
 
   double dtinit=.1/atom.highestFrequency();
  

@@ -1,31 +1,31 @@
 # Copyright Raimar Sandner 2012–2020.
 # Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-# PTLA_C++QED as a representative of simulating a free
+# DTLA_C++QED as a representative of simulating a free
 
-declaretest(run_PTLA_CPPQED_dc)
+declaretest(run_DTLA_CPPQED_dc)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:PTLA_C++QED>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:DTLA_C++QED>)
 
-declaretest(run_PTLA_CPPQED_dt)
+declaretest(run_DTLA_CPPQED_dt)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:PTLA_C++QED>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:DTLA_C++QED>)
 
-declaretest(run_PTLA_CPPQED_ndt)
+declaretest(run_DTLA_CPPQED_ndt)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:PTLA_C++QED>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:DTLA_C++QED>)
 
-declaretest(run_PTLA_Evolved_dc)
+declaretest(run_DTLA_Evolved_dc)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:PTLA_Evolved>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:DTLA_Evolved>)
 
-declaretest(run_PTLA_Evolved_dt)
+declaretest(run_DTLA_Evolved_dt)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:PTLA_Evolved>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:DTLA_Evolved>)
 
-declaretest(run_PTLA_Evolved_ndt)
+declaretest(run_DTLA_Evolved_ndt)
 add_test( NAME ${TESTNAME} COMMAND ${PYTHON_EXECUTABLE} ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:PTLA_Evolved>)
+            --test=${TESTNAME} --testclass=VerifiedRunner --script=$<TARGET_FILE:DTLA_Evolved>)
 
 # 1particle1mode as a representative of simulating a binary interaction
 

@@ -1,7 +1,6 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef CPPQEDCORE_STRUCTURE_HAMILTONIAN_H_INCLUDED
-#define CPPQEDCORE_STRUCTURE_HAMILTONIAN_H_INCLUDED
+#pragma once
 
 #include "TimeDependence.h"
 #include "Types.h"
@@ -9,6 +8,14 @@
 
 namespace structure {
 
+
+template <int RANK>
+using TimeDependentJump = std::function<void(double t, quantumdata::StateVectorLow<RANK>& psi)>;
+
+template <int RANK>
+using TimeIndependentJump = std::function<void(quantumdata::StateVectorLow<RANK>& psi)>;
+
+  
 
 /// The interface every system having (possibly non-Hermitian) Hamiltonian time-evolution must present towards the trajectory drivers
 /**
@@ -84,4 +91,3 @@ private:
 
 } // structure
 
-#endif // CPPQEDCORE_STRUCTURE_HAMILTONIAN_H_INCLUDED
