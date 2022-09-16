@@ -16,6 +16,13 @@ int main()
   std::cout<<vec.size()<<" "<<span.size()<<std::endl;
   
   MultiArray<double,5> ma{{10,11,13,9,8}};
+
+  {
+    MultiArrayConstView<double,5> macv{ma};
+    // macv(2,3,1,6,2)=1.1;
+  }
+  
+  std::cout<<ma.dataView.size()<<std::endl;
   
   double& v1=ma(1,5,6,3,4) ;
   
@@ -40,12 +47,12 @@ int main()
   
   auto sr=slicesRange(ma,tmptools::vector<2,4,0>,offsets);
 
-  std::uniform_real_distribution distro{1.,10.};
-  std::mt19937 gen{1001};
-  
   MultiArray<double,3> maSmall{{5,7,4},[&] (size_t s) {
     MultiArray<double,3>::StorageType data(s);
-    for (auto& d : data) d=distro(gen);
+    std::uniform_real_distribution uniform{1.,10.};
+    std::mt19937 gen{1001};
+
+    for (auto& d : data) d=uniform(gen);
     return data;
   }};  
   

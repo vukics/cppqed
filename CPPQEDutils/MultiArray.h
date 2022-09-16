@@ -60,7 +60,13 @@ public:
   /// offset can come from a previous slicing
   MultiArrayView(Extents<RANK> e, Extents<RANK> s, size_t o, auto&&... spanArgs)
     : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(spanArgs)>(spanArgs)...} {}
-  
+
+  /// implicit conversion to a const view
+  operator MultiArrayView<const T, RANK>() requires ( !std::is_const<T>() )
+  {
+    return {extents,strides,offset};
+  }
+    
   /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
   /** The index of the underlying 1D storage is calculated as 
    * \f[ o + \sum_{\iota=0}^{\iota<R} s_{\iota} i_{\iota} ,\f]
@@ -98,6 +104,9 @@ public:
 };
 
 
+template <typename T, size_t RANK> requires ( !std::is_const<T>() )
+using MultiArrayConstView = MultiArrayView<const T, RANK>;
+
 
 namespace multiarray {
 
@@ -112,7 +121,7 @@ auto calculateStrides(Extents<RANK> extents)
 template <size_t RANK>
 auto calculateExtent(const Extents<RANK>& extents)
 {
-  return cppqedutils::ranges::fold(extents,1ul,std::multiplies{});
+  return cppqedutils::ranges::fold(extents,size_t{1},std::multiplies{});
 }
 
 } // multiarray
@@ -120,6 +129,7 @@ auto calculateExtent(const Extents<RANK>& extents)
 
 /// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned) 
 template <typename T, size_t RANK>
+requires ( !std::is_const<T>() )
 class MultiArray : public MultiArrayView<T,RANK>
 {
 public:
@@ -129,16 +139,16 @@ public:
   
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
   
-  /// INITIALIZER is a callable, taking the total size as argument.
-  template<typename INITIALIZER=std::function<StorageType(size_t)>>
-  MultiArray(const Extents<RANK>& extents, INITIALIZER&& initializer=[](size_t s) {
-    return StorageType(s);
+  /// initializer is a callable, taking the total size as argument.
+  MultiArray(const Extents<RANK>& extents,
+             std::function<StorageType(size_t)> initializer=[](size_t s) {
+    return StorageType(s); // no braces here, please!!!
   })
-    : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
+    : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0},
+      data_{initializer(multiarray::calculateExtent(extents))}
   {
     this->dataView=std::span<T>(data_);
   }
-
 
   friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray<T,RANK>& ma )
   {
@@ -184,19 +194,19 @@ namespace multiarray {
  * 
  * \todo Think over requirements here & everywhere else in multiarray
  */
-constexpr bool consistent(auto retainedAxes) // if the optional argument is not given, RetainedAxes needs to be default-constructible 
-{
-  if constexpr ( hana::Sequence<RetainedAxes>::value ) {
+constexpr bool consistent(auto retainedAxes)
+{/*
+  if constexpr ( hana::sequence(retainedAxes) ) {
     constexpr auto sorted = hana::sort(retainedAxes);
     return (hana::unique(sorted) == sorted);    
   }
-  else return true;
+  else*/ return true;
 }
 
 
 /// Filters in the indices corresponding to a subsystem
 /**
- * When the size of `RetainedAxes` equals `RANK`, this is a transposition
+ * When the size of `retainedAxes` equals `RANK`, this is a transposition
  */
 template <size_t RANK>
 auto filterIn(Extents<RANK> idx, auto retainedAxes) requires ( hana::size(retainedAxes) <= RANK )
@@ -207,7 +217,7 @@ auto filterIn(Extents<RANK> idx, auto retainedAxes) requires ( hana::size(retain
 }
 
   
-/// Filters out the indices corresponding to a subsystem (specified by `RetainedAxes`)
+/// Filters out the indices corresponding to a subsystem (specified by `retainedAxes`)
 template<size_t RANK>
 auto filterOut(Extents<RANK> idx, auto retainedAxes) requires ( hana::size(retainedAxes) <= RANK )
 {
@@ -261,11 +271,11 @@ auto calculateSlicesOffsets(Extents<RANK> extents, auto retainedAxes)
 
 /**
  * \todo SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
- * (Storing full MultiArrayView classes is somewhat wasteful, since extents and strides is the same for all of them in a given SlicesRange)
+ * (Storing full MultiArrayView classes is somewhat wasteful, since extents and strides are the same for all of them in a given SlicesRange)
  */
 template <typename T, size_t RANK>
 auto slicesRange(MultiArrayView<T,RANK> mav, auto retainedAxes, auto&& offsets)
-requires ( RANK>1 && (hana::maximum(retainedAxes) < hana::integral_c<::size_t,RANK>).value && multiarray::consistent<RANK>(retainedAxes) )
+requires ( RANK>1 && (hana::maximum(retainedAxes) < hana::integral_c<::size_t,RANK>).value && multiarray::consistent(retainedAxes) )
 {
   using SliceType=MultiArrayView<T,hana::size(retainedAxes)>;
   
@@ -280,6 +290,7 @@ requires ( RANK>1 && (hana::maximum(retainedAxes) < hana::integral_c<::size_t,RA
 
 
 /// Value equality, so offset doesn’t matter
+/** \todo here, the full data is compared, whereas m1 and/or m2 can be only slices */
 template <typename T, size_t RANK>
 bool operator==(MultiArrayView<T,RANK> m1, MultiArrayView<T,RANK> m2)
 {
