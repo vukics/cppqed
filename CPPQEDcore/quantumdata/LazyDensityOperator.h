@@ -1,30 +1,13 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
-#define CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
+#pragma once
 
-#include "ArrayBase.h" // for ByReference
-#include "QuantumDataFwd.h"
+#include "DensityOperator.h"
 
-#include "DimensionsBookkeeper.h"
-
-#include "BlitzArray.h"
-#include "BlitzTinyExtensions.h"
-#include "ComplexExtensions.h"
-#include "MathExtensions.h"
-#include "SliceIterator.h"
-
-#include <memory>
-#include <numeric>
+#include <variant>
 
 
-/// Comprises classes representing the state of composite quantum systems and providing various interfaces to manipulate this data
-/** Some of its most important classes fit into a single class rooted in the virtual interface LazyDensityOperator. */
 namespace quantumdata {
-
-  
-template<auto RANK>
-using LazyDensityOperatorPtr=std::shared_ptr<const LazyDensityOperator<RANK>>;
 
 
 /// Common interface for calculating quantum averages
@@ -46,19 +29,11 @@ using LazyDensityOperatorPtr=std::shared_ptr<const LazyDensityOperator<RANK>>;
  * 
  * \tparamRANK
  */
-template<int RANK> 
-class LazyDensityOperator 
-  : public DimensionsBookkeeper<RANK>,
-    std::enable_shared_from_this<const LazyDensityOperator<RANK>>
+template<size_t RANK> 
+class LazyDensityOperator
 {
 public:
-  typedef DimensionsBookkeeper<RANK> Base;
-
-  typedef typename Base::Dimensions Dimensions; ///< Inherited from DimensionsBookkeeper
-
   typedef IdxTiny<RANK> Idx; ///< The type used for indexing the “rows” and the “columns”: a tiny vector of integers (multi-index)
-
-  virtual ~LazyDensityOperator() {}
 
 private:
   class IndexerProxy
@@ -119,10 +94,12 @@ private:
   
   virtual double trace_v() const = 0;
   
+  std::variant<StateVectorConstView<RANK>,DensityOperatorConstView<RANK>> data_;
+  
 };
 
 
-template<typename V, template <int> class MATRIX, int RANK, typename F>
+template<typename V, template <int> class MATRIX, size_t RANK, typename F>
 auto partialTrace(const MATRIX<RANK>& matrix, F&& function)
 {
   auto begin{cppqedutils::sliceiterator::begin<V,MATRIX>(matrix)};
@@ -145,7 +122,7 @@ auto partialTrace(const MATRIX<RANK>& matrix, F&& function)
  * \tparam F a callable type with signature `T(const LazyDensityOperator<mpl::size<V>::value>&)`, where T is an arithmetic type
  * 
  */
-template<typename V, int RANK, typename F>
+template<typename V, size_t RANK, typename F>
 auto
 partialTrace(const LazyDensityOperator<RANK>& matrix, F&& function)
 {
@@ -165,7 +142,7 @@ partialTrace(const LazyDensityOperator<RANK>& matrix, F&& function)
  * 
  * \param offDiagonals governs whether the upper triangle of the (multi-)matrix is included in the result
  */
-template<int RANK>
+template<size_t RANK>
 const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
 {
   using cppqedutils::sqr;
@@ -230,7 +207,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
  * 
  */
 
-/** \fn template<typename V, typename T, int RANK, typename F> const T partialTrace(const LazyDensityOperator<RANK>&, F function)
+/** \fn template<typename V, typename T, size_t RANK, typename F> const T partialTrace(const LazyDensityOperator<RANK>&, F function)
  * 
  * \Semantics
  * 
@@ -240,7 +217,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
  * - *Calculating the full partial density operator of a unary subsystem*: 
  *   The partial density operator of any unary subsystem of a system of any rank may be calculated as follows (e.g. from a StateVector):
  *   ~~~
- *   template<int SUBSYSTEM, int RANK> // for the subsystem indexed by the index SUBSYSTEM
+ *   template<int SUBSYSTEM, size_t RANK> // for the subsystem indexed by the index SUBSYSTEM
  *   const DensityOperator<1>
  *   partialTraceOfUnarySubsystem(const StateVector<RANK>& psi)
  *   {
@@ -252,7 +229,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
  *   Then, if these modes are embedded at index positions 3 and 1 (note that the order might be important) in a larger system of arity larger than 3,
  *   we can write the following function:
  *   ~~~
- *   template<int RANK> // RANK>3
+ *   template<size_t RANK> // RANK>3
  *   const dcomp
  *   calculateADaggerB_atPositions3and1(const LazyDensityOperator<RANK>& matrix)
  *   {
@@ -291,7 +268,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
  *   ~~~
  *   Then the following function will calculate these averages for a mode embedded in a larger system at index position `MODE_POSITION`:
  *   ~~~
- *   template<int RANK, int MODE_POSITION> // for the subsystem indexed by the index MODE_POSITION
+ *   template<size_t RANK, int MODE_POSITION> // for the subsystem indexed by the index MODE_POSITION
  *   const Averages
  *   calculateEmbeddedModeAverages(const StateVector<RANK>& psi)
  *   {
@@ -324,4 +301,9 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
 } // quantumdata
 
 
-#endif // CPPQEDCORE_QUANTUMDATA_LAZYDENSITYOPERATOR_H_INCLUDED
+
+namespace structure {
+
+using ::quantumdata::LazyDensityOperator;
+
+} // structure

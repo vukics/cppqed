@@ -1,79 +1,47 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
-#define CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
-
-#include "QuantumDataFwd.h"
+#pragma once
 
 #include "ArrayBase.h"
 #include "DimensionsBookkeeper.h"
-#include "LazyDensityOperator.h"
-#include "Types.h"
-
-#include "ComplexArrayExtensions.h"
 
 
 namespace quantumdata {
 
 
-/** \page quantumdatahighlevel High-level data structures
- * 
- * The StateVector and DensityOperator classes (and their non-orthogonal counterparts) exist for two main reasons:
- * - As interfaces to Types::StateVectorLow and Types::DensityOperatorLow, respectively, which are more convenient to use on higher levels of the framework,
- * e.g. in scripts and in quantum trajectories. This is especially because while `blitz::Array` uses by-reference copy semantics and expression templates,
- * these classes use the more usual by-value copy semantics and normal semantics for arithmetic operations. This means, however, 
- * that copying and arithmetics should be used judiciously, if possible only in the startup phase of simulations.
- * - As implementations of the LazyDensityOperator interface.
- * 
- */
+template <size_t RANK>
+using StateVectorView=cppqedutils::MultiArrayView<dcomp,RANK>;
+
+
+template <size_t RANK>
+using StateVectorConstView=cppqedutils::MultiArrayConstView<dcomp,RANK>;
+
 
 
 /// State vector of arbitrary arity
 /**
- * Cf. \ref quantumdatahighlevel "rationale"
- * 
  * \tparamRANK
- * 
- * The inheritance of StateVector from linalg::VectorSpace provides for a lot of free-standing helpers describing vector-space algebra.
- * These are all naively based on the arithmetic member functions like StateVector::operator+=, StateVector::operator*=, etc.
+ *
+ * Owns its data. Should be present on the highest level of the simulations in a single copy
+ * (representing first the initial condition, to be evolved by the quantum dynamics).
  * 
  */
-template<int RANK>
-class StateVector 
-  : public LazyDensityOperator<RANK>, 
-    public ArrayBase<StateVector<RANK>>
+template<size_t RANK>
+struct StateVector : ArrayBase<StateVector<RANK>>, DimensionsBookkeeper<RANK>
 {
-public:
-  static const int N_RANK=RANK;
+  static constexpr size_t N_RANK=RANK;
 
-  typedef LazyDensityOperator<RANK> LDO_Base;
-  
   typedef ArrayBase<StateVector<RANK>> ABase;
 
-  typedef typename LDO_Base::Dimensions Dimensions;
+  explicit StateVector(const Dimensions& dimensions, std::function<void(StateVector&)> initializer=[](StateVector& psi) {psi=0;})
+    : ABase{dimensions}, DimensionsBookkeeper<RANK>{dimensions} {initializer(*this);}
 
-  using StateVectorLow=typename ABase::ArrayLow ;
-
-  typedef typename LDO_Base::Idx Idx;
-
-  using ABase::getArray; using ABase::vectorView; using ABase::operator=;
+  StateVector(const StateVector&) = delete; StateVector& operator=(const StateVector&) = delete;
   
-  /// \name Construction, assignment
-  //@{
-    /// Constructs the class in such a way that the underlying data reference the same data as `psi`.
-    /**
-    * Simply furnishes an already existing StateVectorLow with a StateVector interface.
-    * 
-    * \note By-reference semantics! Since everywhere else the class represents by-value semantics, some care is needed with this constructor’s use.
-    * For this reason, the tagging dummy class ByReference is introduced, to make the user conscious of what the semantics is.
-    */
-  StateVector(const StateVectorLow& psi, ByReference) : LDO_Base(psi.shape()), ABase(psi) {}
+  StateVector(StateVector&&);
+  StateVector& operator=(StateVector&&);
 
-  template<typename INITIALIZER=std::function<void(StateVector&)>>
-  explicit StateVector(const Dimensions& dimensions,
-                       INITIALIZER&& initializer=[](StateVector& psi) {psi=0;}) ///< Constructs the class with a newly allocated chunk of memory, which is initialized only if `init` is `true`.
-    : LDO_Base(dimensions), ABase(StateVectorLow(dimensions)) {initializer(*this);}
-
+  
   StateVector(const StateVector& sv) ///< Copy constructor using by value semantics, that is, deep copy.
     : LDO_Base(sv.getDimensions()), ABase(sv.getArray().copy()) {}
 
@@ -88,7 +56,7 @@ public:
     * The implementation relies on blitzplusplus::concatenateTinies and blitzplusplus::doDirect.
     * \tparam RANK2 the arity of one of the operands
     */
-  template<int RANK2>
+  template<size_t RANK2>
   StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)
     : LDO_Base(blitzplusplus::concatenateTinies(psi1.getDimensions(),psi2.getDimensions())),
       ABase(blitzplusplus::doDirect<blitzplusplus::dodirect::multiplication,RANK2,RANK-RANK2>(psi1.getArray(),psi2.getArray())) {}
@@ -109,14 +77,14 @@ public:
   /// \name Subscripting
   //@{
   template<typename... SubscriptPack>
-  const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const ///< Multi-array style subscription. \tparam ...SubscriptPack expected as all integers of number RANK-1 (checked @ compile time)
+  const dcomp& operator()(size_t s0, SubscriptPack... subscriptPack) const ///< Multi-array style subscription. \tparam ...SubscriptPack expected as all integers of number RANK-1 (checked @ compile time)
   {
     static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for StateVector." );
     return getArray()(s0,subscriptPack...);
   }
   
   template<typename... SubscriptPack>
-  dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const StateVector*>(this)->operator()(s0,subscriptPack...));} ///< ”
+  dcomp& operator()(size_t s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const StateVector*>(this)->operator()(s0,subscriptPack...));} ///< ”
   //@}
 
   /// \name LazyDensityOperator diagonal iteration
@@ -175,8 +143,8 @@ public:
     using namespace linalg;
     CMatrix matrix(rho.matrixView());
     CVector vector(vectorView());
-    int dim(this->getTotalDimension());
-    for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
+    size_t dim(this->getTotalDimension());
+    for (size_t i=0; i<dim; i++) for (size_t j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
   }
   
   void reference(const StateVector& other) {getArray().reference(other.getArray()); this->setDimensions(other.getDimensions());}
@@ -197,7 +165,7 @@ private:
 
 
 /// Creates the direct product, relying on the direct-product constructor
-template<int RANK1, int RANK2>
+template<size_t RANK1, size_t RANK2>
 inline auto operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
 {
   return StateVector<RANK1+RANK2>(t1,t2);
@@ -205,7 +173,7 @@ inline auto operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2
 
 
 /// Calculates the inner product, relying on StateVector::vectorView
-template<int RANK>
+template<size_t RANK>
 dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 {
   using blitz::tensor::i;
@@ -215,25 +183,15 @@ dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2)
 }
 
 
-template <int RANK>
-constexpr auto ArrayRank_v<StateVector<RANK>> = RANK;
+template <size_t RANK>
+constexpr auto MultiArrayRank_v<StateVector<RANK>> = RANK;
+
 
 } // quantumdata
 
 
-namespace cppqedutils::sliceiterator {
+namespace structure {
 
-template<int RANK>
-struct SubscriptMultiArray<quantumdata::StateVector<RANK>>
-{
-  template<typename ... SubscriptPack>
-  static auto _(const quantumdata::StateVector<RANK>& psi, const SubscriptPack&... subscriptPack) ///< for use in cppqedutils::SliceIterator
-  {
-    return psi.sliceIndex(subscriptPack...);
-  }
-};
-  
-} // cppqedutils::sliceiterator
+using ::quantumdata::StateVectorView, ::quantumdata::StateVectorConstView;
 
-
-#endif // CPPQEDCORE_QUANTUMDATA_STATEVECTOR_H_INCLUDED
+} // structure

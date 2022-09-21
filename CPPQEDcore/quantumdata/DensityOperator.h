@@ -1,20 +1,19 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
-#define CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
+#pragma once
 
-#include "QuantumDataFwd.h"
-
-#include "ArrayBase.h"
-#include "DimensionsBookkeeper.h"
-#include "LazyDensityOperator.h"
-#include "Types.h"
-
-#include "BlitzArrayExtensions.h"
-#include "MultiIndexIterator.h"
+#include "StateVector.h"
 
 
 namespace quantumdata {
+
+  
+template <size_t RANK>
+using DensityOperatorView=cppqedutils::MultiArrayView<dcomp,2*RANK>;
+
+
+template <size_t RANK>
+using DensityOperatorConstView=cppqedutils::MultiArrayConstView<dcomp,2*RANK>;
 
 
 /// Density operator of arbitrary arity
@@ -28,13 +27,11 @@ namespace quantumdata {
  * \note A DensityOperator `<RANK>` represents a density operator on a Hilbert space of arity `RANK`. This makes that the number of its indices is actually `2*RANK`.
  * 
  */
-template<int RANK>
-class DensityOperator
-  : public LazyDensityOperator<RANK>,
-    public ArrayBase<DensityOperator<RANK>>
+template<size_t RANK>
+struct DensityOperator : ArrayBase<DensityOperator<RANK>>, DimensionsBookkeeper<RANK>
 {
 public:
-  static const int N_RANK=RANK;
+  static const size_t N_RANK=RANK;
   
   typedef LazyDensityOperator<RANK> LDO_Base;
   
@@ -88,8 +85,8 @@ public:
     using namespace linalg;
     CMatrix matrix(matrixView());
     CVector vector(psi.vectorView());
-    int dim(this->getTotalDimension());
-    for (int i=0; i<dim; i++) for (int j=0; j<dim; j++) matrix(i,j)=vector(i)*conj(vector(j));
+    size_t dim(this->getTotalDimension());
+    for (size_t i=0; i<dim; i++) for (size_t j=0; j<dim; j++) matrix(i,j)=vector(i)*conj(vector(j));
     return *this;
   }
   
@@ -100,21 +97,21 @@ private:
     IndexerProxy(const DensityOperator* rho, const Idx& firstIndex) : rho_(rho), firstIndex_(firstIndex) {}
 
     template<typename... SubscriptPack>
-    IndexerProxy(const DensityOperator* rho, int s0, SubscriptPack... subscriptPack) : IndexerProxy(rho,Idx(s0,subscriptPack...))
+    IndexerProxy(const DensityOperator* rho, size_t s0, SubscriptPack... subscriptPack) : IndexerProxy(rho,Idx(s0,subscriptPack...))
     {static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for DensityOperator." );}
 
     const dcomp& operator()(const Idx& secondIndex) const {return rho_->indexWithTiny(firstIndex_,secondIndex);}
           dcomp& operator()(const Idx& secondIndex)       {return const_cast<dcomp&>(static_cast<const IndexerProxy&>(*this)(secondIndex));}
 
     template<typename... SubscriptPack>
-    const dcomp& operator()(int s0, SubscriptPack... subscriptPack) const
+    const dcomp& operator()(size_t s0, SubscriptPack... subscriptPack) const
     {
       static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for DensityOperator." );
       return operator()(Idx(s0,subscriptPack...));
     }
 
     template<typename... SubscriptPack>
-          dcomp& operator()(int s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const IndexerProxy&>(*this)(s0,subscriptPack...));}
+          dcomp& operator()(size_t s0, SubscriptPack... subscriptPack) {return const_cast<dcomp&>(static_cast<const IndexerProxy&>(*this)(s0,subscriptPack...));}
 
   private:
     const DensityOperator*const rho_;
@@ -131,10 +128,10 @@ public:
         IndexerProxy operator()(const Idx& firstIndex)       {return IndexerProxy(this,firstIndex);}
 
   template<typename... SubscriptPack>
-  const IndexerProxy operator()(int s0, SubscriptPack... subscriptPack) const {return IndexerProxy(this,s0,subscriptPack...);}
+  const IndexerProxy operator()(size_t s0, SubscriptPack... subscriptPack) const {return IndexerProxy(this,s0,subscriptPack...);}
 
   template<typename... SubscriptPack>
-        IndexerProxy operator()(int s0, SubscriptPack... subscriptPack)       {return IndexerProxy(this,s0,subscriptPack...);}
+        IndexerProxy operator()(size_t s0, SubscriptPack... subscriptPack)       {return IndexerProxy(this,s0,subscriptPack...);}
   //@}
 
   /// \name LazyDensityOperator diagonal iteration
@@ -187,7 +184,7 @@ public:
 private:
   const dcomp& indexWithTiny(const Idx& i, const Idx& j) const ///< Used for implementing operator() and the index function below.
   {
-    return getArray()(blitzplusplus::concatenateTinies<int,int,RANK,RANK>(i,j));
+    return getArray()(blitzplusplus::concatenateTinies<size_t,size_t,RANK,RANK>(i,j));
   }
   
   const dcomp index(const Idx& i, const Idx& j) const override {return indexWithTiny(i,j);} ///< This function implements the LazyDensityOperator interface in a trivial element-access way
@@ -197,19 +194,19 @@ private:
 };
 
 
-template<int RANK1, int RANK2>
+template<size_t RANK1, size_t RANK2>
 inline
 const DensityOperator<RANK1+RANK2>
 operator*(const DensityOperator<RANK1>&, const DensityOperator<RANK2>&);
 
 
-template<int RANK>
+template<size_t RANK>
 inline
 double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm();}
 
 
 /// Performs the opposite of quantumdata::deflate
-template<int RANK>
+template<size_t RANK>
 void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDiagonals)
 {
   const size_t dim=rho.getTotalDimension();
@@ -235,7 +232,7 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
 
 
 /// Creates a DensityOperator as the (deep) copy of the data of a LazyDensityOperator of the same arity
-template<int RANK>
+template<size_t RANK>
 DensityOperator<RANK>
 densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 {
@@ -257,28 +254,28 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 }
 
 
-template<typename V, int RANK>
+template<typename V, size_t RANK>
 auto reduce(const LazyDensityOperator<RANK>& matrix)
 {
   return partialTrace<V>(matrix,densityOperatorize<mpl::size<V>::value>);
 }
 
 
-template<int... SUBSYSTEM, int RANK>
+template<size_t... SUBSYSTEM, size_t RANK>
 auto reduce(const LazyDensityOperator<RANK>& matrix)
 {
   return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
 }
 
 
-template<typename V, int RANK>
+template<typename V, size_t RANK>
 auto reduce(const DensityOperator<RANK>& matrix)
 {
   return partialTrace<V>(matrix,[](const auto& v) {return v;});
 }
 
 
-template<int... SUBSYSTEM, int RANK>
+template<size_t... SUBSYSTEM, size_t RANK>
 auto reduce(const DensityOperator<RANK>& matrix)
 {
   return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
@@ -286,7 +283,7 @@ auto reduce(const DensityOperator<RANK>& matrix)
 
 
 
-template<int RANK>
+template<size_t RANK>
 inline auto
 dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
 {
@@ -294,8 +291,8 @@ dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
 }
 
 
-template <int RANK>
-constexpr auto ArrayRank_v<DensityOperator<RANK>> = 2*RANK;
+template <size_t RANK>
+constexpr auto MultiArrayRank_v<DensityOperator<RANK>> = 2*RANK;
 
 
 } // quantumdata
@@ -303,7 +300,7 @@ constexpr auto ArrayRank_v<DensityOperator<RANK>> = 2*RANK;
 
 namespace cppqedutils::sliceiterator {
 
-template<int RANK>
+template<size_t RANK>
 struct SubscriptMultiArray<quantumdata::DensityOperator<RANK>>
 {
   template<typename ... SubscriptPack>
@@ -316,7 +313,7 @@ struct SubscriptMultiArray<quantumdata::DensityOperator<RANK>>
 } // cppqedutils::sliceiterator
 
 
-template<int RANK>
+template<size_t RANK>
 double purity(const DensityOperator<RANK>& rho)
 {
   return std::accumulate(rho.getArray().begin(),rho.getArray().end(),0.,[] (double init, dcomp element) { return init+cppqedutils::sqrAbs(element); });
@@ -324,4 +321,9 @@ double purity(const DensityOperator<RANK>& rho)
 
 
 
-#endif // CPPQEDCORE_QUANTUMDATA_DENSITYOPERATOR_H_INCLUDED
+namespace structure {
+
+using ::quantumdata::DensityOperatorView, ::quantumdata::DensityOperatorConstView;
+
+} // structure
+

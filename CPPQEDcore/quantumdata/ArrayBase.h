@@ -1,76 +1,37 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef   CPPQEDCORE_QUANTUMDATA_ARRAYBASE_H_INCLUDED
-#define   CPPQEDCORE_QUANTUMDATA_ARRAYBASE_H_INCLUDED
+#pragma once
 
-#include "BlitzArrayExtensions.h"
-#include "CMatrix.h"
-#include "ComplexArrayExtensions.h"
-#include "Operators.h"
+
+#include "LinearAlgebra.h"
+#include "MathExtensions.h"
+#include "MultiArray.h"
 
 
 namespace quantumdata {
 
-struct ByReference {}; const ByReference byReference{};
-
 template<typename>
-constexpr auto ArrayRank_v=std::nullopt;
+constexpr auto MultiArrayRank_v=std::nullopt;
 
 /// Comprises the common functionalities of StateVector and DensityOperator.
 template<typename Derived>
-class ArrayBase : linalg::VectorSpace<Derived>
+struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,MultiArrayRank_v<Derived>>>
 {
-protected:
-  ArrayBase() = default;
-  ArrayBase(const ArrayBase&) = delete;
-  ArrayBase& operator=(const ArrayBase&) = default;
-  ArrayBase(ArrayBase&&) = default; ArrayBase& operator=(ArrayBase&&) = default;
-  
-  typedef CArray<ArrayRank_v<Derived>> ArrayLow; ///< The underlying storage
-  typedef linalg::CVector CVector;
-  
-  explicit ArrayBase(const ArrayLow& arrayLow) : arrayLow_(arrayLow) {} ///< By-reference semantics (basically the copy of a `blitz::Array`). Apart from this, copying is not possible.
-
-  ArrayBase(ArrayLow&& array) : arrayLow_(array) {}
-  
-  virtual ~ArrayBase() {}
-
-public:
-  /// Mixed-mode assignment with by-value semantics
-  /**
-  * The standard assignment and the templated assignment together cover a lot of possibilities, including also assignment from a StateVectorLow,
-  * but for example also from a DArray<RANK>, or just a const c-number. (Can be assigned from anything a CArray<RANK> can be assigned from.)
-  * 
-  * \tparam OTHER the “other” type in mixed mode
-  */
-  template <typename OTHER>
-  Derived& operator=(const OTHER& other) {arrayLow_=other; return static_cast<Derived&>(*this);}
-  
-  /// \name The underlying ArrayLow
-  //@{
-  const ArrayLow& getArray() const {return arrayLow_;}
-        ArrayLow& getArray()       {return const_cast<ArrayLow&>(static_cast<const ArrayBase*>(this)->getArray());}
-  //@}
+  using cppqedutils::MultiArray<dcomp,MultiArrayRank_v<Derived>>::MultiArray;
   
   /// \name Naive vector-space operations
   //@{
-  Derived& operator+=(const ArrayBase& arrayBase) {arrayLow_+=arrayBase.arrayLow_; return static_cast<Derived&>(*this);}
-  Derived& operator-=(const ArrayBase& arrayBase) {arrayLow_-=arrayBase.arrayLow_; return static_cast<Derived&>(*this);}
-
-  Derived operator-() const {Derived res(this->getDimensions(),false); res.getArray()=-this->getArray(); return res;} ///< involves a deep-copy
-  Derived operator+() const {return *this;} ///< simply deep copy
+  Derived& operator+=(const ArrayBase& other) {for (auto&& [t,o] : boost::combine(this->dataView,other.dataView) ) t+=o; return static_cast<Derived&>(*this);}
+  Derived& operator-=(const ArrayBase& other) {for (auto&& [t,o] : boost::combine(this->dataView,other.dataView) ) t-=o; return static_cast<Derived&>(*this);}
   //@}
 
   /// \name Naive vector-space operations allowing also for mixed-mode arithmetics
   //@{
-  template<typename OTHER>
-  Derived& operator*=(const OTHER& dc) {arrayLow_*=dc; return static_cast<Derived&>(*this);} ///< \tparam OTHER the “other” type in mixed mode
+  Derived& operator*=(const auto& dc); // {arrayLow_*=dc; return static_cast<Derived&>(*this);} ///< \tparam OTHER the “other” type in mixed mode
 
-  template<typename OTHER>
-  Derived& operator/=(const OTHER& dc) {arrayLow_/=dc; return static_cast<Derived&>(*this);}
+  Derived& operator/=(const auto& dc); // {arrayLow_/=dc; return static_cast<Derived&>(*this);}
   //@}
 
-protected:
   /// \name One-dimensional view of the underlying data
   //@{
     /// 1d view created on the fly via blitzplusplus::unaryArray.
@@ -79,7 +40,7 @@ protected:
       * In debug mode, a non-contiguous storage is detected by the implementing function blitzplusplus::unaryArray, and an exception of type 
       * blitzplusplus::NonContiguousStorageException is thrown.
       */
-  auto vectorView() const {return blitzplusplus::unaryArray(arrayLow_);}
+  linalg::CVector vectorView(); // what about constness here??? const {return blitzplusplus::unaryArray(arrayLow_);}
   //@}
 
   /// The entrywise array norm
@@ -87,10 +48,7 @@ protected:
    * \f[\norm A _{\text{F}}=\sqrt{\sum_i\,\abs{A_i}^2},\f]
    * with \f$i\f$ running through all the multi-indices.
    */
-  double frobeniusNorm() const {return sqrt(sum(blitzplusplus::sqrAbs(arrayLow_)));}
-
-private:
-  ArrayLow arrayLow_;
+  double frobeniusNorm() const { return cppqedutils::ranges::fold( this->dataView | std::views::transform(cppqedutils::sqrAbs) , 0., std::plus{} ); }
 
 };
 
@@ -98,4 +56,3 @@ private:
 } // quantumdata
 
 
-#endif // CPPQEDCORE_QUANTUMDATA_ARRAYBASE_H_INCLUDED
