@@ -153,6 +153,8 @@ add_subdirectory(CPPQEDcore)
 
 add_subdirectory(CPPQEDelements)
 
+add_subdirectory(dockerEntry)
+
 add_subdirectory(CPPQEDscripts)
 
 add_subdirectory(cpypyqed)
