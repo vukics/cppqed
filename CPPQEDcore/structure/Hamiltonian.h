@@ -4,6 +4,8 @@
 
 #include "StateVector.h"
 
+#include "Overoaded.h"
+
 #include <variant>
 
 
@@ -26,22 +28,27 @@ template <size_t RANK>
 using HamiltonianContribution = std::variant<TimeIndependentContribution<RANK>,OneTimeDependentContribution<RANK>,TwoTimeDependentContribution<RANK>>;
 
 
+template <size_t RANK>
+using Hamiltonian = std::list<HamiltonianContribution<RANK>>;
+
+
 template <typename H, size_t RANK>
-concept Hamiltonian = std::ranges::input_range<H> && std::convertible_to<std::ranges::range_value_t<H>,HamiltonianContribution<RANK>>;
+concept HamiltonianSystem = std::convertible_to<H,HamiltonianContribution<RANK>>;
 
 
-template <typename H, size_t RANK> requires Hamiltonian<H,RANK>
-void addContribution(const H& hamiltonian, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
+template <size_t RANK>// requires Hamiltonian<H,RANK>
+void addContribution(const Hamiltonian<RANK>& hamiltonian, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
 {
-  for (auto&& convertible : hamiltonian) {
-    HamiltonianContribution<RANK> contribution{convertible};
-    switch (contribution.index()) {
-      case 0 : std::get<0>(contribution)(psi,dpsidt); break;
-      case 1 : std::get<1>(contribution)(t-t0,psi,dpsidt); break;
-      case 2 : std::get<2>(contribution)(t,psi,dpsidt,t0); break;
-    }
-  }
+  for (auto& contribution : hamiltonian)
+    std::visit(cppqedutils::overload{
+      [&] (const TimeIndependentContribution<RANK>& c) {c(psi,dpsidt);},
+      [&] (const OneTimeDependentContribution<RANK>& c) {c(t-t0,psi,dpsidt);},
+      [&] (const TwoTimeDependentContribution<RANK>& c) {c(t,psi,dpsidt,t0);},
+    },contribution);
 }
+
+
+
 
 
 /*
