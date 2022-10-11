@@ -4,6 +4,8 @@
 #include "Algorithm.h"
 #include "TMP_Tools.h"
 
+#include <boost/operators.hpp>
+
 #include <boost/range/combine.hpp>
 
 #include <boost/json.hpp>
@@ -13,10 +15,12 @@
 #include <functional>
 #include <span>
 #include <stdexcept>
+#include <variant>
 #include <vector>
 
 
 // TODO: RetainedAxes can be a non-type template parameter in C++20!!! And maybe retainedAxes can be a std::index_sequence, which can be converted to hana::tuple when needed?
+
 
 namespace cppqedutils {
 
@@ -58,8 +62,8 @@ public:
   /* template <typename... Indices> requires ( sizeof...(Indices)==RANK && ( ... && std::is_convertible_v<Indices,size_t> ) ) T& operator() (Indices... i); */
   
   /// offset can come from a previous slicing
-  MultiArrayView(Extents<RANK> e, Extents<RANK> s, size_t o, auto&&... spanArgs)
-    : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(spanArgs)>(spanArgs)...} {}
+  MultiArrayView(Extents<RANK> e, Extents<RANK> s, size_t o, auto&&... dv)
+    : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(dv)>(dv)...} {}
 
   /// implicit conversion to a const view
   operator MultiArrayView<const T, RANK>() requires ( !std::is_const<T>() )
@@ -119,7 +123,7 @@ auto calculateStrides(Extents<RANK> extents)
 }
 
 template <size_t RANK>
-auto calculateExtent(const Extents<RANK>& extents)
+auto calculateExtent(Extents<RANK> extents)
 {
   return cppqedutils::ranges::fold(extents,size_t{1},std::multiplies{});
 }
@@ -140,7 +144,7 @@ public:
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
   
   /// initializer is a callable, taking the total size as argument.
-  MultiArray(const Extents<RANK>& extents,
+  MultiArray(Extents<RANK> extents,
              std::function<StorageType(size_t)> initializer=[](size_t s) {
     return StorageType(s); // no braces here, please!!!
   })
@@ -176,6 +180,11 @@ public:
     };
   }
   
+  friend bool operator==(const MultiArray& m1, const MultiArray& m2)
+  {
+    return m1.extents==m2.extents && m1.data_==m2.data_;
+  }
+
   
 private:
   StorageType data_;
@@ -194,22 +203,28 @@ namespace multiarray {
  * 
  * \todo Think over requirements here & everywhere else in multiarray
  */
-constexpr bool consistent(auto retainedAxes)
-{/*
+template <auto retainedAxes>
+constexpr bool consistentBase = 
+/*{
   if constexpr ( hana::sequence(retainedAxes) ) {
     constexpr auto sorted = hana::sort(retainedAxes);
     return (hana::unique(sorted) == sorted);    
   }
-  else*/ return true;
-}
+  else*/ true;
+//}
+
+template <auto retainedAxes, size_t RANK>
+constexpr bool consistent = ( RANK>1 && (hana::maximum(retainedAxes) < hana::integral_c<::size_t,RANK>).value && consistentBase<retainedAxes> );
 
 
 /// Filters in the indices corresponding to a subsystem
 /**
  * When the size of `retainedAxes` equals `RANK`, this is a transposition
+ * 
+ * \todo accept several arrays at the same time (since this is how it is used by clients)
  */
-template <size_t RANK>
-auto filterIn(Extents<RANK> idx, auto retainedAxes) requires ( hana::size(retainedAxes) <= RANK )
+template <auto retainedAxes, size_t RANK>
+auto filterIn(Extents<RANK> idx) requires ( hana::size(retainedAxes) <= RANK )
 {
   Extents<hana::size(retainedAxes)> res;
   hana::fold(retainedAxes, res.begin(), [&] (auto iterator, auto ind) {*iterator=idx[ind]; return ++iterator;});
@@ -218,8 +233,9 @@ auto filterIn(Extents<RANK> idx, auto retainedAxes) requires ( hana::size(retain
 
   
 /// Filters out the indices corresponding to a subsystem (specified by `retainedAxes`)
-template<size_t RANK>
-auto filterOut(Extents<RANK> idx, auto retainedAxes) requires ( hana::size(retainedAxes) <= RANK )
+/** \todo accept several arrays at the same time (since this is how it is used by clients) */
+template <auto retainedAxes, size_t RANK>
+auto filterOut(Extents<RANK> idx) requires ( hana::size(retainedAxes) <= RANK )
 {
   Extents<RANK-hana::size(retainedAxes)> res;
   
@@ -237,12 +253,12 @@ auto filterOut(Extents<RANK> idx, auto retainedAxes) requires ( hana::size(retai
 /**
  * Any indexing offset that the MultiArrayView might itself have is added at the point of indexing/slicing
  */
-template <size_t RANK>
-auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, auto retainedAxes)
+template <auto retainedAxes, size_t RANK>
+auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
 {
   Extents<RANK-hana::size(retainedAxes)> 
-    dummyExtents{filterOut(extents,retainedAxes)},
-    dummyStrides{filterOut(strides,retainedAxes)}, 
+    dummyExtents{filterOut<retainedAxes>(extents)},
+    dummyStrides{filterOut<retainedAxes>(strides)}, 
     idx; idx.fill(0);
   
   std::vector<size_t> res(calculateExtent(dummyExtents));
@@ -262,40 +278,122 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides, auto r
 
 
 /// To be used by Composites
-template <size_t RANK>
-auto calculateSlicesOffsets(Extents<RANK> extents, auto retainedAxes)
+template <auto retainedAxes, size_t RANK>
+auto calculateSlicesOffsets(Extents<RANK> extents)
 {
-  return multiarray::calculateSlicesOffsets(extents,calculateStrides(extents),retainedAxes);
+  return multiarray::calculateSlicesOffsets<retainedAxes>(extents,calculateStrides(extents));
 }
 
 
-/**
- * \todo SlicesRange should be a class with deduction guides and a member class Iterator derived from boost::random_access_iterator_helper
- * (Storing full MultiArrayView classes is somewhat wasteful, since extents and strides are the same for all of them in a given SlicesRange)
- */
-template <typename T, size_t RANK>
-auto slicesRange(MultiArrayView<T,RANK> mav, auto retainedAxes, auto&& offsets)
-requires ( RANK>1 && (hana::maximum(retainedAxes) < hana::integral_c<::size_t,RANK>).value && multiarray::consistent(retainedAxes) )
+
+template <auto retainedAxes, typename T, size_t RANK>
+auto sliceRangeSimple(MultiArrayView<T,RANK> mav, auto&& offsets)
+requires multiarray::consistent<retainedAxes,RANK>
 {
   using SliceType=MultiArrayView<T,hana::size(retainedAxes)>;
   
   std::vector<SliceType> res(offsets.size());
   
   for (auto&& [slice,sliceOffset] : boost::combine(res,offsets) )
-    slice=SliceType{multiarray::filterIn(mav.extents,retainedAxes),multiarray::filterIn(mav.strides,retainedAxes),mav.offset+sliceOffset,mav.dataView};
+    slice=SliceType{multiarray::filterIn<retainedAxes>(mav.extents),multiarray::filterIn<retainedAxes>(mav.strides),mav.offset+sliceOffset,mav.dataView};
   
   return res;
 }
-  
 
 
-/// Value equality, so offset doesn’t matter
-/** \todo here, the full data is compared, whereas m1 and/or m2 can be only slices */
-template <typename T, size_t RANK>
-bool operator==(MultiArrayView<T,RANK> m1, MultiArrayView<T,RANK> m2)
+template <typename Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
+requires (std::is_same_v<Offsets,std::span<const size_t>> || std::is_same_v<Offsets,std::vector<size_t>>)
+struct SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offsets,T,RRANK>,MultiArrayView<T,RRANK>>
+/// \todo Unfortunately, std::iterator has been deprecated as of C++17, and there doesn’t seem to be a replacement in STL
 {
-  return m1.extents==m2.extents && std::ranges::equal(m1.dataView,m2.dataView);
+  SliceIterator(Extents<RRANK> e, Extents<RRANK> s, typename Offsets::iterator i, std::span<T> dv) :
+    extents{e}, strides{s}, iter{i}, dataView{dv} {}
+  
+  auto operator*() {return MultiArrayView<T,RRANK>{extents,strides,*iter,dataView};}
+  
+  SliceIterator& operator++() {iter++; return *this;}
+  
+  const Extents<RRANK> extents, strides;
+  
+  typename Offsets::iterator iter;
+
+  const std::span<T> dataView;
+  
+};
+
+
+template <typename Offsets, typename T, size_t RRANK>
+bool operator==(SliceIterator<Offsets,T,RRANK> i0, typename Offsets::iterator i1) {return i0.iter==i1;}
+
+
+
+template <typename Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
+class SliceRangeBase
+{
+public:
+  using iterator=SliceIterator<Offsets,T,RRANK>;
+  
+/*  SliceRangeBase(Extents<RRANK> e, Extents<RRANK> s, Offsets os, std::span<T> dv) requires std::is_same_v<Offsets,std::span<const size_t>>
+    : begin{e,s,os.begin(),dv}, end{os.end()}, offsets_{os} {}*/
+
+  SliceRangeBase(Extents<RRANK> e, Extents<RRANK> s, const Offsets& os, std::span<T> dv) // requires std::is_same_v<Offsets,std::vector<size_t>>
+    : offsets_{os}, b_{e,s,offsets_.begin(),dv}, e_{offsets_.end()} {}
+    
+  auto begin() const {return b_;}
+  auto end() const {return e_;}
+    
+private:
+  const Offsets offsets_;
+
+  iterator b_;  
+  typename Offsets::iterator e_;
+  
+};
+
+
+/**
+ * For the case when Offsets are stored outside of the class.
+ * E.g. Composite might calculate and store the offsets for all its subsystems
+ */
+template <typename T, size_t RRANK>
+using SliceRangeReferencing = SliceRangeBase<std::span<const size_t>,T,RRANK>;
+
+
+/** For the case when Offsets are stored within the class. */
+template <typename T, size_t RRANK> // RRANK stands for retained rank
+using SliceRangeOwning = SliceRangeBase<std::vector<const size_t>,T,RRANK>;
+
+
+
+template <auto retainedAxes, typename T, size_t RANK>
+auto sliceRange(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets) requires multiarray::consistent<retainedAxes,RANK>
+{
+  return SliceRangeReferencing<T,hana::size(retainedAxes)>{
+    multiarray::filterIn<retainedAxes>(mav.extents),
+    multiarray::filterIn<retainedAxes>(mav.strides),
+    std::span<const size_t>(offsets.begin(),offsets.end()),
+    mav.dataView};
 }
- 
+
+
+template <auto retainedAxes, typename T, size_t RANK>
+auto sliceRange(MultiArrayView<T,RANK> mav, std::vector<size_t>&& offsets) requires multiarray::consistent<retainedAxes,RANK>
+{
+  return SliceRangeOwning<T,hana::size(retainedAxes)>{
+    multiarray::filterIn<retainedAxes>(mav.extents),
+    multiarray::filterIn<retainedAxes>(mav.strides),
+    std::move(offsets),
+    mav.dataView};
+}
+
+
+template <auto retainedAxes, typename T, size_t RANK>
+auto sliceRange(MultiArrayView<T,RANK> mav) requires multiarray::consistent<retainedAxes,RANK>
+{
+  return sliceRange(mav,calculateSlicesOffsets<retainedAxes>(mav.extents,mav.strides));
+}
+
+
+
 
 } // cppqedutils

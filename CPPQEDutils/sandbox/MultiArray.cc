@@ -41,12 +41,14 @@ int main()
   // double& v5=ma(1,5,6,3) ;
   // double& v6=ma(1,5,6,3,4,2) ;
   
-  auto offsets(multiarray::calculateSlicesOffsets(ma.extents,ma.strides,tmptools::vector<2,4,0>));
+  auto offsets(multiarray::calculateSlicesOffsets<tmptools::vector<2,4,0>>(ma.extents,ma.strides));
   
   for (auto o : offsets) std::cout<<o<<std::endl;
   
-  auto sr=slicesRange(ma,tmptools::vector<2,4,0>,offsets);
+  auto sr=sliceRange<tmptools::vector<2,4,0>>(ma,offsets);
 
+  for (auto mav : sr) std::cout<<mav.offset<<std::endl;
+  
   MultiArray<double,3> maSmall{{5,7,4},[&] (size_t s) {
     MultiArray<double,3>::StorageType data(s);
     std::uniform_real_distribution uniform{1.,10.};
