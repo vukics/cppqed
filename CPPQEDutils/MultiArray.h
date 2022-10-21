@@ -68,7 +68,7 @@ public:
   /// implicit conversion to a const view
   operator MultiArrayView<const T, RANK>() requires ( !std::is_const<T>() )
   {
-    return {extents,strides,offset};
+    return {extents,strides,offset,dataView};
   }
     
   /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
@@ -83,8 +83,10 @@ public:
       if (indices[i] >= extents[i])
         throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(indices[i])+", extent: "+std::to_string(extents[i]));
 #endif // NDEBUG
+
     return dataView[cppqedutils::ranges::fold(boost::combine(indices,strides),offset,
                                               [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
+                                              
   }
   
   T& operator() (std::convertible_to<size_t> auto ... i) const
@@ -184,7 +186,6 @@ public:
   {
     return m1.extents==m2.extents && m1.data_==m2.data_;
   }
-
   
 private:
   StorageType data_;
@@ -281,7 +282,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
 template <auto retainedAxes, size_t RANK>
 auto calculateSlicesOffsets(Extents<RANK> extents)
 {
-  return multiarray::calculateSlicesOffsets<retainedAxes>(extents,calculateStrides(extents));
+  return multiarray::calculateSlicesOffsets<retainedAxes>(extents,multiarray::calculateStrides(extents));
 }
 
 
@@ -301,29 +302,37 @@ requires multiarray::consistent<retainedAxes,RANK>
 }
 
 
+template <auto retainedAxes, typename T, size_t RANK>
+auto sliceRangeSimple(MultiArrayView<T,RANK> mav)
+{
+  return sliceRangeSimple<retainedAxes>(mav,multiarray::calculateSlicesOffsets<retainedAxes>(mav.extents,mav.strides));
+}
+
+
+
 template <typename Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
 requires (std::is_same_v<Offsets,std::span<const size_t>> || std::is_same_v<Offsets,std::vector<size_t>>)
 struct SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offsets,T,RRANK>,MultiArrayView<T,RRANK>>
 /// \todo Unfortunately, std::iterator has been deprecated as of C++17, and there doesn’t seem to be a replacement in STL
 {
-  SliceIterator(Extents<RRANK> e, Extents<RRANK> s, typename Offsets::iterator i, std::span<T> dv) :
+  using member_iterator = std::conditional_t<std::is_same_v<Offsets,std::span<const size_t>>,std::span<const size_t>::iterator,std::vector<size_t>::const_iterator>;
+  
+  SliceIterator(Extents<RRANK> e, Extents<RRANK> s, member_iterator i, std::span<T> dv) :
     extents{e}, strides{s}, iter{i}, dataView{dv} {}
   
-  auto operator*() {return MultiArrayView<T,RRANK>{extents,strides,*iter,dataView};}
+  auto operator*() const {return MultiArrayView<T,RRANK>{extents,strides,*iter,dataView};}
   
   SliceIterator& operator++() {iter++; return *this;}
   
   const Extents<RRANK> extents, strides;
   
-  typename Offsets::iterator iter;
+  member_iterator iter;
 
   const std::span<T> dataView;
   
+  friend bool operator==(SliceIterator i0, member_iterator i1) {return i0.iter==i1;}
+  
 };
-
-
-template <typename Offsets, typename T, size_t RRANK>
-bool operator==(SliceIterator<Offsets,T,RRANK> i0, typename Offsets::iterator i1) {return i0.iter==i1;}
 
 
 
@@ -345,8 +354,9 @@ public:
 private:
   const Offsets offsets_;
 
-  iterator b_;  
-  typename Offsets::iterator e_;
+  iterator b_;
+  
+  typename iterator::member_iterator e_;
   
 };
 
@@ -361,7 +371,7 @@ using SliceRangeReferencing = SliceRangeBase<std::span<const size_t>,T,RRANK>;
 
 /** For the case when Offsets are stored within the class. */
 template <typename T, size_t RRANK> // RRANK stands for retained rank
-using SliceRangeOwning = SliceRangeBase<std::vector<const size_t>,T,RRANK>;
+using SliceRangeOwning = SliceRangeBase<std::vector<size_t>,T,RRANK>;
 
 
 
@@ -390,7 +400,7 @@ auto sliceRange(MultiArrayView<T,RANK> mav, std::vector<size_t>&& offsets) requi
 template <auto retainedAxes, typename T, size_t RANK>
 auto sliceRange(MultiArrayView<T,RANK> mav) requires multiarray::consistent<retainedAxes,RANK>
 {
-  return sliceRange(mav,calculateSlicesOffsets<retainedAxes>(mav.extents,mav.strides));
+  return sliceRange<retainedAxes>(mav,multiarray::calculateSlicesOffsets<retainedAxes>(mav.extents,mav.strides));
 }
 
 

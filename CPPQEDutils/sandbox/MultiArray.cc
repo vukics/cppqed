@@ -1,13 +1,91 @@
 #include "MultiArray.h"
 
+#include "ComplexExtensions.h"
+#include "Random.h"
+
 #include <iostream>
-#include <random>
 #include <tuple>
 
 using namespace cppqedutils;
 using namespace boost::json;
 
+constexpr auto v20741 = tmptools::vector<2,0,7,4,1>;
+
 int main()
+{
+  MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
+  
+  Extents<5> 
+    filteredExtents{multiarray::filterIn<v20741>(array.extents)},
+    filteredStrides{multiarray::filterIn<v20741>(array.strides)};
+  
+  std::cerr<<array.dataView.size()<<std::endl;
+
+  {
+    std::uniform_real_distribution d{-1.0,1.0};
+    std::mt19937_64 re{1001};
+    std::generate(array.dataView.begin(),array.dataView.end(),
+                  [&]() {return std::complex{d(re),d(re)};});
+  }
+
+  std::cerr<<array.dataView[0]<<std::endl;
+
+  std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
+  
+  {
+    std::cerr<<"*** Simple range: ***"<<std::endl;
+    
+    auto range{sliceRangeSimple<v20741>(array)};
+    
+    auto iter{range.begin()};
+    
+    std::cerr<<serialize( value_from( iter->extents ) )<<std::endl;
+    for (size_t i=0; i<10; (++i, ++iter));
+    
+    std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
+    
+    auto rangeRecurse{sliceRangeSimple<tmptools::vector<1,3>>(*iter)};
+
+    std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+  }
+  
+  
+  auto offsets{multiarray::calculateSlicesOffsets<v20741>(array.extents,array.strides)};
+  
+  std::cerr<<serialize( value_from( offsets ) )<<std::endl;
+  
+  for (SliceIterator<std::vector<size_t>,dcomp,5> iter{filteredExtents,filteredStrides,offsets.begin(),array.dataView}; iter!=offsets.end(); ++iter)
+    std::cerr<<(*iter)(1,0,2,1,0)<<std::endl;
+  
+  SliceRangeReferencing<dcomp,5> sliceRange{filteredExtents,filteredStrides,offsets,array.dataView};
+  
+  // for (MultiArrayView<dcomp,5> mav : sliceRange) std::cerr<<mav(1,0,2,1,0)<<std::endl;
+  
+  for (MultiArrayView<dcomp,5> macv : sliceRange) std::cerr<<macv.dataView[0]/*(1,0,2,1,0)*/<<std::endl;
+  
+  /*
+  {
+    std::cerr<<"*** Proxy range: ***"<<std::endl;
+    
+    auto range{sliceRange<tmptools::vector<2,0,7,4,1>>(array)};
+    
+    auto iter{range.begin()};
+    
+    std::cerr<<serialize( value_from( iter->extents ) )<<std::endl;
+    for (size_t i=0; i<10; (++i, ++iter));
+    
+    std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
+    
+    auto rangeRecurse{sliceRange<tmptools::vector<1,3>>(*iter)};
+
+    std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+  }
+  */
+}
+
+
+
+void f()
 {
   std::vector<double> vec(1000);
   
@@ -67,7 +145,7 @@ int main()
   std::cout << (maSmall==maSmallReconstructed) << std::endl;
   
   for (auto o : maSmallReconstructed.dataView) std::cout<<o<<" "/*<<std::endl*/;
-  
+
   std::cout<<std::endl;
   
   std::cout<<serialize( value_from( maSmallReconstructed ) )<<std::endl;
