@@ -2,7 +2,9 @@
 #pragma once
 
 #include "Algorithm.h"
-#include "TMP_Tools.h"
+
+#include <boost/hana.hpp>
+namespace hana=boost::hana;
 
 #include <boost/operators.hpp>
 
@@ -24,6 +26,15 @@
 
 namespace cppqedutils {
 
+
+template<size_t... i>
+constexpr auto retainedAxes = hana::tuple_c<size_t,i...>;
+
+template<size_t begin, size_t end>
+constexpr auto compileTimeRange = hana::range_c<size_t,begin,end>;
+
+template<size_t end>
+constexpr auto compileTimeOrdinals = compileTimeRange<0,end>;
 
 /// should be passed by value
 template <size_t RANK>
@@ -240,7 +251,7 @@ auto filterOut(Extents<RANK> idx) requires ( hana::size(retainedAxes) <= RANK )
 {
   Extents<RANK-hana::size(retainedAxes)> res;
   
-  hana::fold(tmptools::ordinals<RANK>, res.begin(), [&] (auto iterator, auto ind) {
+  hana::fold(compileTimeOrdinals<RANK>, res.begin(), [&] (auto iterator, auto ind) {
     if ( ! hana::contains(retainedAxes, ind) ) *iterator++ = idx[ind];
     return iterator;
   } );
