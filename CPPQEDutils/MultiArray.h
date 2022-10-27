@@ -44,14 +44,14 @@ using Extents=std::array<size_t,RANK>;
 template <size_t RANK>
 auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
 {
-  static const auto increment=[&](auto n, auto inc)
+  const auto increment=[&](auto n, auto inc)
   {
     using namespace hana::literals;
     if constexpr (n!=0_c) {
       if (idx[n]==extents[n]-1) {idx[n]=0; inc(n-1_c,inc);}
       else idx[n]++;
     }
-    else idx[0]++; // This will eventually put the iterator into an illegal state, but this is how every (unchecked) iterator works.
+    else idx[0]++; // This will eventually put the iterator into an illegal state, but this is how all (unchecked) iterators work.
   };
   
   increment(hana::llong_c<RANK-1>,increment);
@@ -278,9 +278,9 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
   for (auto i=res.begin(); i!=res.end(); (
     *i++ = cppqedutils::ranges::fold( boost::combine(idx,dummyStrides), 
                                       0, 
-                                      [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
+                                      [](size_t init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
     incrementMultiIndex(idx,dummyExtents)));
-  
+
   return res;
 }
 
@@ -299,7 +299,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents)
 
 
 template <auto retainedAxes, typename T, size_t RANK>
-auto sliceRangeSimple(MultiArrayView<T,RANK> mav, auto&& offsets)
+auto sliceRangeSimple(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets)
 requires multiarray::consistent<retainedAxes,RANK>
 {
   using SliceType=MultiArrayView<T,hana::size(retainedAxes)>;
@@ -323,25 +323,25 @@ auto sliceRangeSimple(MultiArrayView<T,RANK> mav)
 
 template <typename Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
 requires (std::is_same_v<Offsets,std::span<const size_t>> || std::is_same_v<Offsets,std::vector<size_t>>)
-struct SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offsets,T,RRANK>,MultiArrayView<T,RRANK>>
+class SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offsets,T,RRANK>,MultiArrayView<T,RRANK>>
 /// \todo Unfortunately, std::iterator has been deprecated as of C++17, and there doesn’t seem to be a replacement in STL
 {
+public:
   using member_iterator = std::conditional_t<std::is_same_v<Offsets,std::span<const size_t>>,std::span<const size_t>::iterator,std::vector<size_t>::const_iterator>;
   
   SliceIterator(Extents<RRANK> e, Extents<RRANK> s, member_iterator i, std::span<T> dv) :
-    extents{e}, strides{s}, iter{i}, dataView{dv} {}
+    iter{i}, mav_{e,s,*i,dv} {}
   
-  auto operator*() const {return MultiArrayView<T,RRANK>{extents,strides,*iter,dataView};}
+  auto& operator*() const {return mav_;}
   
-  SliceIterator& operator++() {iter++; return *this;}
-  
-  const Extents<RRANK> extents, strides;
+  SliceIterator& operator++() {mav_.offset=*(++iter); return *this;}
   
   member_iterator iter;
 
-  const std::span<T> dataView;
-  
   friend bool operator==(SliceIterator i0, member_iterator i1) {return i0.iter==i1;}
+  
+private:
+  mutable MultiArrayView<T,RRANK> mav_; // the reason why we store a full MultiArrayView is simply that operator* can return a reference
   
 };
 

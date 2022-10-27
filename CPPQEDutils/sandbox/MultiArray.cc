@@ -1,23 +1,24 @@
+#include <iostream>
+
 #include "MultiArray.h"
 
 #include "ComplexExtensions.h"
 #include "Random.h"
 
-#include <iostream>
 #include <tuple>
 
 using namespace cppqedutils;
 using namespace boost::json;
 
-constexpr auto v20741 = tmptools::vector<2,0,7,4,1>;
+constexpr auto ra20741 = retainedAxes<2,0,7,4,1>;
 
 int main()
 {
   MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
   
   Extents<5> 
-    filteredExtents{multiarray::filterIn<v20741>(array.extents)},
-    filteredStrides{multiarray::filterIn<v20741>(array.strides)};
+    filteredExtents{multiarray::filterIn<ra20741>(array.extents)},
+    filteredStrides{multiarray::filterIn<ra20741>(array.strides)};
   
   std::cerr<<array.dataView.size()<<std::endl;
 
@@ -35,7 +36,7 @@ int main()
   {
     std::cerr<<"*** Simple range: ***"<<std::endl;
     
-    auto range{sliceRangeSimple<v20741>(array)};
+    auto range{sliceRangeSimple<ra20741>(array)};
     
     auto iter{range.begin()};
     
@@ -44,30 +45,26 @@ int main()
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
-    auto rangeRecurse{sliceRangeSimple<tmptools::vector<1,3>>(*iter)};
+    auto rangeRecurse{sliceRangeSimple<retainedAxes<1,3>>(*iter)};
 
     std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
   }
   
+  // auto offsets{multiarray::calculateSlicesOffsets<ra20741>(array.extents,array.strides)};
   
-  auto offsets{multiarray::calculateSlicesOffsets<v20741>(array.extents,array.strides)};
+  // for (SliceIterator<std::vector<size_t>,dcomp,5> iter{filteredExtents,filteredStrides,offsets.begin(),array.dataView}; iter!=offsets.end(); ++iter)
+  //  std::cerr<<(*iter)(1,0,2,1,0)<<std::endl;
   
-  std::cerr<<serialize( value_from( offsets ) )<<std::endl;
-  
-  for (SliceIterator<std::vector<size_t>,dcomp,5> iter{filteredExtents,filteredStrides,offsets.begin(),array.dataView}; iter!=offsets.end(); ++iter)
-    std::cerr<<(*iter)(1,0,2,1,0)<<std::endl;
-  
-  SliceRangeReferencing<dcomp,5> sliceRange{filteredExtents,filteredStrides,offsets,array.dataView};
+  // SliceRangeReferencing<dcomp,5> sliceRange{filteredExtents,filteredStrides,offsets,array.dataView};
   
   // for (MultiArrayView<dcomp,5> mav : sliceRange) std::cerr<<mav(1,0,2,1,0)<<std::endl;
   
-  for (MultiArrayView<dcomp,5> macv : sliceRange) std::cerr<<macv.dataView[0]/*(1,0,2,1,0)*/<<std::endl;
+  // for (MultiArrayView<dcomp,5> macv : sliceRange) std::cerr<<macv.dataView[0]/*(1,0,2,1,0)*/<<std::endl;
   
-  /*
   {
-    std::cerr<<"*** Proxy range: ***"<<std::endl;
+    std::cerr<<"*** Proxy range owning: ***"<<std::endl;
     
-    auto range{sliceRange<tmptools::vector<2,0,7,4,1>>(array)};
+    auto range{sliceRange<ra20741>(array)};
     
     auto iter{range.begin()};
     
@@ -76,11 +73,30 @@ int main()
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
-    auto rangeRecurse{sliceRange<tmptools::vector<1,3>>(*iter)};
+    auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
 
     std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
   }
-  */
+
+  {
+    std::cerr<<"*** Proxy range referencing: ***"<<std::endl;
+    
+    auto offsets{calculateSlicesOffsets<ra20741>(array.extents)};
+    
+    auto range{sliceRange<ra20741>(array,offsets)};
+    
+    auto iter{range.begin()};
+    
+    std::cerr<<serialize( value_from( iter->extents ) )<<std::endl;
+    for (size_t i=0; i<10; (++i, ++iter));
+    
+    std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
+    
+    auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
+
+    std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+  }
+
 }
 
 
@@ -119,11 +135,11 @@ void f()
   // double& v5=ma(1,5,6,3) ;
   // double& v6=ma(1,5,6,3,4,2) ;
   
-  auto offsets(multiarray::calculateSlicesOffsets<tmptools::vector<2,4,0>>(ma.extents,ma.strides));
+  auto offsets(multiarray::calculateSlicesOffsets<retainedAxes<2,4,0>>(ma.extents,ma.strides));
   
   for (auto o : offsets) std::cout<<o<<std::endl;
   
-  auto sr=sliceRange<tmptools::vector<2,4,0>>(ma,offsets);
+  auto sr=sliceRange<retainedAxes<2,4,0>>(ma,offsets);
 
   for (auto mav : sr) std::cout<<mav.offset<<std::endl;
   
@@ -157,7 +173,7 @@ void f()
     for (size_t i=0; i<multiarray::calculateExtent(ext); (++i, incrementMultiIndex(idx, ext) ) ) std::cout<<serialize(value_from(idx))<<std::endl;
   }
   
-  std::cout<<hana::Sequence<tmptools::Range<0,10>>::value<<hana::Sequence<tmptools::Vector<1,5,10>>::value<<std::endl;
+  std::cout<<hana::Sequence<decltype(compileTimeRange<0,10>)>::value<<hana::Sequence<decltype(retainedAxes<1,5,10>)>::value<<std::endl;
   
   std::cout<<serialize(value_from(std::make_tuple(1.2,"hello",32ul)))<<std::endl;
   
@@ -166,8 +182,8 @@ void f()
 //     
 //     for (size_t i=0; i<ma.dataView.size(); ++i) ma.dataView[i]=i;
 //     
-//     for (auto&& slice : slicesRange(ma,tmptools::vector<2,4,0>,
-//                                     multiarray::calculateSlicesOffsets(ma.extents,ma.strides,tmptools::vector<2,4,0>)))
+//     for (auto&& slice : slicesRange(ma,retainedAxes<2,4,0>,
+//                                     multiarray::calculateSlicesOffsets(ma.extents,ma.strides,retainedAxes<2,4,0>)))
 //       std::cout<<slice(0,0,0)<<std::endl;
 //   }
   
