@@ -329,18 +329,20 @@ class SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offset
 public:
   using member_iterator = std::conditional_t<std::is_same_v<Offsets,std::span<const size_t>>,std::span<const size_t>::iterator,std::vector<size_t>::const_iterator>;
   
-  SliceIterator(Extents<RRANK> e, Extents<RRANK> s, member_iterator i, std::span<T> dv) :
-    iter{i}, mav_{e,s,*i,dv} {}
+  SliceIterator(Extents<RRANK> e, Extents<RRANK> s, size_t originalOffset, member_iterator i, std::span<T> dv) :
+    iter{i}, originalOffset_{originalOffset}, mav_{e,s,*i,dv} {}
   
   auto& operator*() const {return mav_;}
   
-  SliceIterator& operator++() {mav_.offset=*(++iter); return *this;}
+  SliceIterator& operator++() {mav_.offset=*(++iter)+originalOffset_; return *this;}
   
   member_iterator iter;
 
   friend bool operator==(SliceIterator i0, member_iterator i1) {return i0.iter==i1;}
   
 private:
+  const size_t originalOffset_;
+  
   mutable MultiArrayView<T,RRANK> mav_; // the reason why we store a full MultiArrayView is simply that operator* can return a reference
   
 };
@@ -356,8 +358,8 @@ public:
 /*  SliceRangeBase(Extents<RRANK> e, Extents<RRANK> s, Offsets os, std::span<T> dv) requires std::is_same_v<Offsets,std::span<const size_t>>
     : begin{e,s,os.begin(),dv}, end{os.end()}, offsets_{os} {}*/
 
-  SliceRangeBase(Extents<RRANK> e, Extents<RRANK> s, const Offsets& os, std::span<T> dv) // requires std::is_same_v<Offsets,std::vector<size_t>>
-    : offsets_{os}, b_{e,s,offsets_.begin(),dv}, e_{offsets_.end()} {}
+  SliceRangeBase(Extents<RRANK> e, Extents<RRANK> s, size_t originalOffset, const Offsets& os, std::span<T> dv) // requires std::is_same_v<Offsets,std::vector<size_t>>
+    : offsets_{os}, b_{e,s,originalOffset,offsets_.begin(),dv}, e_{offsets_.end()} {}
     
   auto begin() const {return b_;}
   auto end() const {return e_;}
@@ -392,6 +394,7 @@ auto sliceRange(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets) 
   return SliceRangeReferencing<T,hana::size(retainedAxes)>{
     multiarray::filterIn<retainedAxes>(mav.extents),
     multiarray::filterIn<retainedAxes>(mav.strides),
+    mav.offset,
     std::span<const size_t>(offsets.begin(),offsets.end()),
     mav.dataView};
 }
@@ -403,6 +406,7 @@ auto sliceRange(MultiArrayView<T,RANK> mav, std::vector<size_t>&& offsets) requi
   return SliceRangeOwning<T,hana::size(retainedAxes)>{
     multiarray::filterIn<retainedAxes>(mav.extents),
     multiarray::filterIn<retainedAxes>(mav.strides),
+    mav.offset,
     std::move(offsets),
     mav.dataView};
 }

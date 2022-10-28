@@ -29,8 +29,6 @@ int main()
                   [&]() {return std::complex{d(re),d(re)};});
   }
 
-  std::cerr<<array.dataView[0]<<std::endl;
-
   std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
   
   {
@@ -48,6 +46,12 @@ int main()
     auto rangeRecurse{sliceRangeSimple<retainedAxes<1,3>>(*iter)};
 
     std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+    
+    auto iter2{rangeRecurse.begin()};
+    for (size_t i=0; i<3; (++i, ++iter2));
+
+    std::cerr<<(*iter2)(3,2)<<std::endl;
+    
   }
   
   // auto offsets{multiarray::calculateSlicesOffsets<ra20741>(array.extents,array.strides)};
@@ -76,6 +80,12 @@ int main()
     auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
 
     std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+
+    auto iter2{rangeRecurse.begin()};
+    for (size_t i=0; i<3; (++i, ++iter2));
+
+    std::cerr<<(*iter2)(3,2)<<std::endl;
+
   }
 
   {
@@ -95,6 +105,12 @@ int main()
     auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
 
     std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+    
+    auto iter2{rangeRecurse.begin()};
+    for (size_t i=0; i<3; (++i, ++iter2));
+
+    std::cerr<<(*iter2)(3,2)<<std::endl;
+
   }
 
 }
