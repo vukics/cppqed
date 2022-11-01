@@ -17,11 +17,7 @@ namespace hana=boost::hana;
 #include <functional>
 #include <span>
 #include <stdexcept>
-#include <variant>
 #include <vector>
-
-
-// TODO: RetainedAxes can be a non-type template parameter in C++20!!! And maybe retainedAxes can be a std::index_sequence, which can be converted to hana::tuple when needed?
 
 
 namespace cppqedutils {
@@ -77,10 +73,7 @@ public:
     : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(dv)>(dv)...} {}
 
   /// implicit conversion to a const view
-  operator MultiArrayView<const T, RANK>() requires ( !std::is_const<T>() )
-  {
-    return {extents,strides,offset,dataView};
-  }
+  operator MultiArrayView<const T, RANK>() const requires ( !std::is_const<T>() ) {return {extents,strides,offset,dataView}; }
     
   /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
   /** The index of the underlying 1D storage is calculated as 
@@ -95,8 +88,8 @@ public:
         throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(indices[i])+", extent: "+std::to_string(extents[i]));
 #endif // NDEBUG
 
-    return dataView[cppqedutils::ranges::fold(boost::combine(indices,strides),offset,
-                                              [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
+    return dataView[std_ext::ranges::fold(boost::combine(indices,strides),offset,
+                                          [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
                                               
   }
   
@@ -138,7 +131,7 @@ auto calculateStrides(Extents<RANK> extents)
 template <size_t RANK>
 auto calculateExtent(Extents<RANK> extents)
 {
-  return cppqedutils::ranges::fold(extents,size_t{1},std::multiplies{});
+  return std_ext::ranges::fold(extents,size_t{1},std::multiplies{});
 }
 
 } // multiarray
@@ -166,6 +159,9 @@ public:
   {
     this->dataView=std::span<T>(data_);
   }
+
+  /// implicit conversion to a const view
+  operator MultiArrayView<const T, RANK>() const {return {this->extents,this->strides,0,this->dataView}; }
 
   friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray<T,RANK>& ma )
   {
@@ -276,9 +272,9 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
   std::vector<size_t> res(calculateExtent(dummyExtents));
 
   for (auto i=res.begin(); i!=res.end(); (
-    *i++ = cppqedutils::ranges::fold( boost::combine(idx,dummyStrides), 
-                                      0, 
-                                      [](size_t init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
+    *i++ = std_ext::ranges::fold( boost::combine(idx,dummyStrides), 
+                                  0, 
+                                  [](size_t init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
     incrementMultiIndex(idx,dummyExtents)));
 
   return res;
@@ -417,7 +413,6 @@ auto sliceRange(MultiArrayView<T,RANK> mav) requires multiarray::consistent<reta
 {
   return sliceRange<retainedAxes>(mav,multiarray::calculateSlicesOffsets<retainedAxes>(mav.extents,mav.strides));
 }
-
 
 
 

@@ -1,8 +1,7 @@
 #include <iostream>
 
-#include "MultiArray.h"
+#include "MultiArrayComplex.h"
 
-#include "ComplexExtensions.h"
 #include "Random.h"
 
 #include <tuple>
@@ -25,8 +24,7 @@ int main()
   {
     std::uniform_real_distribution d{-1.0,1.0};
     std::mt19937_64 re{1001};
-    std::generate(array.dataView.begin(),array.dataView.end(),
-                  [&]() {return std::complex{d(re),d(re)};});
+    std::ranges::generate(array.dataView, [&]() {return std::complex{d(re),d(re)};});
   }
 
   std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
@@ -113,6 +111,21 @@ int main()
 
   }
 
+  {
+    MultiArray<dcomp,4> a1{{5,2,3,2}};
+    MultiArray<dcomp,5> a2{{4,3,2,4,6}};
+  
+    {
+      std::uniform_real_distribution d{-1.0,1.0};
+      std::mt19937_64 re{1001};
+      std::ranges::generate(a1.dataView, [&]() {return std::complex{d(re),d(re)};} );
+      std::ranges::generate(a2.dataView, [&]() {return std::complex{d(re),d(re)};} );
+    }
+
+    auto res{directProduct<4,5>(a1,a2)};
+
+  }
+  
 }
 
 
@@ -202,5 +215,14 @@ void f()
 //                                     multiarray::calculateSlicesOffsets(ma.extents,ma.strides,retainedAxes<2,4,0>)))
 //       std::cout<<slice(0,0,0)<<std::endl;
 //   }
+
+  // std::views::join({a1.extents,a2.extents})
+  
+  {
+    std::vector<size_t> v1{1,2,3,4}, v2{5,6,7};
+    auto joined(std::views::join(std::vector{v1,v2}));
+    
+    std::cerr<<serialize( value_from( std::vector<size_t>(joined.begin(),joined.end()) ) )<<std::endl;
+  }
   
 }

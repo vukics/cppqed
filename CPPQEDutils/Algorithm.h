@@ -2,11 +2,12 @@
 /// \briefFile{Range algorithms not yet in STL in C++20}
 #pragma once
 
+#include <algorithm>
 #include <iterator>
 #include <ranges>
 
 
-namespace cppqedutils::ranges {
+namespace std_ext::ranges {
 
 using namespace std;
 
@@ -36,5 +37,24 @@ constexpr T fold(R&& r, T init, BinaryOperation op, Proj proj = {}) {
 }
   
 
-} // cppqedutils::ranges
+} // std_ext::ranges
 
+
+namespace cppqedutils {
+
+
+/// std::array`s of different size cannot be std::views::join`ed because the size is part of the type
+/** this solution based on C++17 fold expressions comes from [here](http://stackoverflow.com/a/42774523/1171157) */
+template <typename Type, std::size_t... sizes>
+constexpr auto concatenate(const std::array<Type, sizes>&... arrays)
+{
+  std::array<Type, (sizes + ...)> result;
+  std::size_t index{};
+
+  ((std::copy_n(arrays.begin(), sizes, result.begin() + index), index += sizes), ...);
+
+  return result;
+}
+
+
+} // cppqedutils
