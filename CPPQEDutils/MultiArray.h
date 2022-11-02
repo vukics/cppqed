@@ -58,6 +58,10 @@ auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
 
 
 /// A non-owning view, should be passed by value.
+/**
+ * Follows reference semantics regarding constness.
+ * All four possibilities of (const)MultiArrayView<(const)T,RANK> can be used and have the same semantics as if MultiArrayView was a pointer (same as with std::span)
+ */
 template <typename T, size_t RANK>
 class MultiArrayView
 {
@@ -76,16 +80,17 @@ public:
   operator MultiArrayView<const T, RANK>() const requires ( !std::is_const<T>() ) {return {extents,strides,offset,dataView}; }
     
   /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
-  /** The index of the underlying 1D storage is calculated as 
+  /** 
+   * The index of the underlying 1D storage is calculated as 
    * \f[ o + \sum_{\iota=0}^{\iota<R} s_{\iota} i_{\iota} ,\f]
    * where \f$o\f$ is the offset, \f$R\f$ is the rank, \f$s\f$ is the set of strides and \f$i\f$ is the multi-index.
+   * 
+   * Note that the subscription operator is always const, as it doesn’t modify the view itself, only maybe the underlying data.
    */
   T& operator() (Extents<RANK> indices) const
   {
 #ifndef   NDEBUG
-    for (size_t i=0; i<RANK; ++i)
-      if (indices[i] >= extents[i])
-        throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(indices[i])+", extent: "+std::to_string(extents[i]));
+    for (size_t i=0; i<RANK; ++i) if (indices[i] >= extents[i]) throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(indices[i])+", extent: "+std::to_string(extents[i]));
 #endif // NDEBUG
 
     return dataView[std_ext::ranges::fold(boost::combine(indices,strides),offset,
@@ -138,9 +143,12 @@ auto calculateExtent(Extents<RANK> extents)
 
 
 /// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned) 
+/**
+ * Follows value semantics regarding constness.
+ */
 template <typename T, size_t RANK>
 requires ( !std::is_const<T>() )
-class MultiArray : public MultiArrayView<T,RANK>
+class MultiArray : public MultiArrayConstView<T,RANK>
 {
 public:
   using StorageType = std::vector<T>;
@@ -151,18 +159,20 @@ public:
   
   /// initializer is a callable, taking the total size as argument.
   MultiArray(Extents<RANK> extents,
-             std::function<StorageType(size_t)> initializer=[](size_t s) {
-    return StorageType(s); // no braces here, please!!!
-  })
-    : MultiArrayView<T,RANK>{extents,multiarray::calculateStrides(extents),0},
+             std::function<StorageType(size_t)> initializer=[](size_t s) {return StorageType(s); /* no braces here, please!!! */})
+    : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0},
       data_{initializer(multiarray::calculateExtent(extents))}
   {
     this->dataView=std::span<T>(data_);
   }
 
-  /// implicit conversion to a const view
-  operator MultiArrayView<const T, RANK>() const {return {this->extents,this->strides,0,this->dataView}; }
+  /// conversion to a view
+  auto mutableView() {return MultiArrayView<T, RANK>{this->extents,this->strides,0,data_};}
+  operator MultiArrayView<T,RANK>() {return mutableView();}
 
+  /// non-const subscripting
+  T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
+  
   friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray<T,RANK>& ma )
   {
     jv = {

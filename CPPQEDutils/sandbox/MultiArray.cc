@@ -24,7 +24,7 @@ int main()
   {
     std::uniform_real_distribution d{-1.0,1.0};
     std::mt19937_64 re{1001};
-    std::ranges::generate(array.dataView, [&]() {return std::complex{d(re),d(re)};});
+    std::ranges::generate(array.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};});
   }
 
   std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
@@ -118,8 +118,8 @@ int main()
     {
       std::uniform_real_distribution d{-1.0,1.0};
       std::mt19937_64 re{1001};
-      std::ranges::generate(a1.dataView, [&]() {return std::complex{d(re),d(re)};} );
-      std::ranges::generate(a2.dataView, [&]() {return std::complex{d(re),d(re)};} );
+      std::ranges::generate(a1.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};} );
+      std::ranges::generate(a2.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};} );
     }
 
     auto res{directProduct<4,5>(a1,a2)};

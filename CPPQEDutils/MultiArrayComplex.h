@@ -13,7 +13,7 @@ auto directProduct(const MultiArray<dcomp,RANK1>& m1, const MultiArray<dcomp,RAN
                    std::function<dcomp(dcomp,dcomp)> func=[](dcomp v1, dcomp v2) {return v1*v2;} )
 {
   MultiArray<dcomp,RANK1+RANK2> res{concatenate(m1.extents,m2.extents)};
-  for (size_t stride=m1.dataView.size(), i=0; i<stride; ++i) for (size_t j=0; j<m2.dataView.size(); ++j) res.dataView[i+stride*j]=func(m1.dataView[i],m2.dataView[j]);
+  for (size_t stride=m1.dataView.size(), i=0; i<stride; ++i) for (size_t j=0; j<m2.dataView.size(); ++j) res.mutableView().dataView[i+stride*j]=func(m1.dataView[i],m2.dataView[j]);
   return res;
 }
 
