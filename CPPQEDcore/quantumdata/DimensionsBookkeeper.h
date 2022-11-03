@@ -2,7 +2,8 @@
 /// \briefFileDefault
 #pragma once
 
-#include <array>
+#include "MultiArray.h"
+
 #include <stdexcept>
 
 
@@ -11,50 +12,29 @@ struct DimensionalityMismatchException : std::invalid_argument {using std::inval
 
 
 /// Stores and manipulates dimensions of constructs over composite Hilbert spaces of arbitrary arity
-/**
- * \tparamRANK
- */
 template<size_t RANK>
 class DimensionsBookkeeper
 {
 public:
   static constexpr size_t N_RANK=RANK; ///< Arity of the Hilbert space
 
-  using Dimensions = std::array<size_t,RANK>; ///< The dimensions as a static vector of size N_RANK
+  using Dimensions = cppqedutils::Extents<RANK>;
 
-  explicit DimensionsBookkeeper(const Dimensions& dimensions) : dimensions_{dimensions}, totalDimension_{product(dimensions)} {}
+  auto operator<=>(const DimensionsBookkeeper&) const = default;
+  
+  explicit DimensionsBookkeeper(const Dimensions& dimensions) : dimensions_{dimensions} {}
 
   const Dimensions& getDimensions() const {return dimensions_;} ///< Get the Dimensions vector
   
-  size_t getTotalDimension() const {return totalDimension_;} ///< Get the total dimension of a system of arbitrary arity
+  size_t getTotalDimension() const {return cppqedutils::multiarray::calculateExtent(dimensions_);} ///< Get the total dimension of a system of arbitrary arity
 
-  size_t getDimension() requires ( RANK==1 ) const {return totalDimension_;} ///< Get the (single) dimension for a unary system
+  size_t getDimension() requires ( RANK==1 ) const {return dimensions_[0];} ///< Get the (single) dimension for a unary system
 
   size_t getDimension(size_t i) const {return dimensions_[i];}
 
-  void setDimensions(const Dimensions& dimensions) {dimensions_=dimensions; totalDimension_=product(dimensions);}
+  void setDimensions(const Dimensions& dimensions) {dimensions_=dimensions;}
 
 private:
   Dimensions dimensions_;
-  size_t totalDimension_ ;
 
 };
-
-
-/// dimensionality comparison for types derived from DimensionsBookkeeper \related DimensionsBookkeeper
-template<size_t RANK>
-inline bool
-operator==(const DimensionsBookkeeper<RANK>& d1, const DimensionsBookkeeper<RANK>& d2)
-{
-  return d1.getDimensions()==d2.getDimensions();
-}
-
-/// dimensionality comparison for types derived from DimensionsBookkeeper \related DimensionsBookkeeper
-template<size_t RANK>
-inline bool
-operator!=(const DimensionsBookkeeper<RANK>& d1, const DimensionsBookkeeper<RANK>& d2)
-{
-  return !(d1==d2);
-}
-
-

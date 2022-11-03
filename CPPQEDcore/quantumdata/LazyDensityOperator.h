@@ -10,24 +10,20 @@
 namespace quantumdata {
 
 
-/// Common interface for calculating quantum averages
+/// Common interface for calculating quantum averages from StateVector, DensityOperator (and potentially their non-orthogonal counterparts)
 /**
- * In a quantum-simulation framework, users should be able to write code for calculating quantum expectation values from quantumdata, 
- * independently of whether this data is represented by state vectors or density operators, in orthogonal or non-orthogonal bases. 
- * One obvious solution is relying on the formula
+ * Relies on the formula
  * \f[\avr{A}=\Tr{A\rho}\f]
- * (\f$A\f$ being an observable and \f$\rho\f$ the density operator of the system), to write code only for the density-operator case,
- * and fall back to this in the state-vector case as well, by calculating a dyad from the state vector. This is, however, extremely wasteful, 
- * since usually not all the matrix elements of \f$\rho\f$ are needed for calculating the average, furthermore, for large dimensionality,
- * this solution may become outright unaffordable in terms of memory: for large systems, we may afford to store \f$\ket\Psi\f$, but not \f$\ket\Psi\bra\Psi\f$.
+ * (\f$A\f$ is an observable, and \f$\rho\f$ the density operator of the system).
+ * 
+ * \f$\rho\f$ is simply the dyad of the state vector in the pure-state case, which is however treated lazily (usually not all the matrix elements of \f$\rho\f$ are needed for calculating the average, 
+ * plus for large dimensionality, we may not be able to store the full \f$\ket\Psi\bra\Psi\f$).
  * 
  * The solution adopted for this problem in the framework is represented by LazyDensityOperator, which provides a common interface 
- * for all the four cases StateVector, DensityOperator, and their non-orthogonal counterparts, to calculate quantum averages from their data.
+ * for all the four cases , to calculate quantum averages from their data.
  * The “laziness” amounts to that in the case of state vectors, only those elements of the density operator are calculated that are actually asked for.
  * 
- * This class is totally immutable, all its member functions being constant.
- * 
- * \tparamRANK
+ * Immutable class.
  */
 template<size_t RANK> 
 class LazyDensityOperator

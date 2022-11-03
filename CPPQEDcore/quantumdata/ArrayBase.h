@@ -5,15 +5,17 @@
 
 #include "LinearAlgebra.h"
 #include "MathExtensions.h"
-#include "MultiArray.h"
+#include "MultiArrayComplex.h"
 
 
 namespace quantumdata {
 
+
 template<typename>
 constexpr auto MultiArrayRank_v=std::nullopt;
 
-/// Comprises the common functionalities of StateVector and DensityOperator.
+
+/// Adding common linear algebra functionality to StateVector and DensityOperator.
 template<typename Derived>
 struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,MultiArrayRank_v<Derived>>>
 {
@@ -33,13 +35,6 @@ struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,Mul
   //@}
 
   /// \name One-dimensional view of the underlying data
-  //@{
-    /// 1d view created on the fly via blitzplusplus::unaryArray.
-    /**
-      * \note This is meant to be used only if the underlying storage is contiguous, which may not be the case since the object may reference arrays of any layout.
-      * In debug mode, a non-contiguous storage is detected by the implementing function blitzplusplus::unaryArray, and an exception of type 
-      * blitzplusplus::NonContiguousStorageException is thrown.
-      */
   linalg::CVector vectorView(); // what about constness here??? const {return blitzplusplus::unaryArray(arrayLow_);}
   //@}
 
@@ -48,7 +43,7 @@ struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,Mul
    * \f[\norm A _{\text{F}}=\sqrt{\sum_i\,\abs{A_i}^2},\f]
    * with \f$i\f$ running through all the multi-indices.
    */
-  double frobeniusNorm() const { return cppqedutils::ranges::fold( this->dataView | std::views::transform(cppqedutils::sqrAbs) , 0., std::plus{} ); }
+  double frobeniusNorm() const { return std_ext::ranges::fold( this->dataView | std::views::transform(cppqedutils::sqrAbs) , 0., std::plus{} ); }
 
 };
 
