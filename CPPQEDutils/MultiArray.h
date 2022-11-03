@@ -87,21 +87,16 @@ public:
    * 
    * Note that the subscription operator is always const, as it doesn’t modify the view itself, only maybe the underlying data.
    */
-  T& operator() (Extents<RANK> indices) const
+  T& operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==RANK)
   {
-#ifndef   NDEBUG
-    for (size_t i=0; i<RANK; ++i) if (indices[i] >= extents[i]) throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(indices[i])+", extent: "+std::to_string(extents[i]));
-#endif // NDEBUG
+    size_t idx=0;
+    auto e=extents.begin(), s=strides.begin();
 
-    return dataView[std_ext::ranges::fold(boost::combine(indices,strides),offset,
-                                          [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
-                                              
-  }
-  
-  T& operator() (std::convertible_to<size_t> auto ... i) const
-  requires (sizeof...(i)==RANK)
-  {
-    return operator()(Extents<RANK>{i...});
+    return dataView[ ( [&] {
+#ifndef   NDEBUG
+      if (auto eComp=e++; i >= *eComp) throw std::range_error("Index position: "+std::to_string(eComp-extents.begin())+", index value: "+std::to_string(i)+", extent: "+std::to_string(*eComp));
+#endif // NDEBUG
+      return idx+=(*s++)*i;} (), ... ) ];
   }
   
   /// A simple specialization for unary views

@@ -11,14 +11,15 @@ using namespace boost::json;
 
 constexpr auto ra20741 = retainedAxes<2,0,7,4,1>;
 
+
 int main()
 {
   MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
-  
+
   Extents<5> 
     filteredExtents{multiarray::filterIn<ra20741>(array.extents)},
     filteredStrides{multiarray::filterIn<ra20741>(array.strides)};
-  
+
   std::cerr<<array.dataView.size()<<std::endl;
 
   {
@@ -27,7 +28,7 @@ int main()
     std::ranges::generate(array.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};});
   }
 
-  std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
+  std::cerr<<array(1,1,2,2,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
   
   {
     std::cerr<<"*** Simple range: ***"<<std::endl;
@@ -225,4 +226,32 @@ void f()
     std::cerr<<serialize( value_from( std::vector<size_t>(joined.begin(),joined.end()) ) )<<std::endl;
   }
   
+}
+
+
+
+auto calcIndex=[]<size_t RANK> (Extents<RANK> extents, auto... i) requires (sizeof...(i)==RANK) {
+  size_t res=0;
+  auto e=extents.begin();
+
+  ( [&] {
+#ifndef   NDEBUG
+    if (i >= *e) throw std::range_error("Index position: "+std::to_string(e-extents.begin())+", index value: "+std::to_string(i)+", extent: "+std::to_string(*e));
+#endif // NDEBUG
+    return res+=(*e++)*i;} (), ... );
+  
+  return res;
+  
+};
+
+
+void g()
+{
+  MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
+
+  Extents<5> 
+    filteredExtents{multiarray::filterIn<ra20741>(array.extents)},
+    filteredStrides{multiarray::filterIn<ra20741>(array.strides)};
+
+  std::cerr<<calcIndex(filteredExtents,1,2,3,2,0)<<std::endl;
 }
