@@ -40,9 +40,12 @@ struct DensityOperator : ArrayBase<DensityOperator<RANK>>, DimensionsBookkeeper<
   
   DensityOperator(DensityOperator&&) = default; DensityOperator& operator=(DensityOperator&&) = default;
 
-  explicit DensityOperator(const Dimensions& dimensions, std::function<void(DensityOperator&)> initializer=[](DensityOperator& rho) {rho=0; rho.mutableView().dataView[0]=1.;})
+  DensityOperator(const Dimensions& dimensions, auto&& initializer)
     : ABase{cppqedutils::concatenate(dimensions,dimensions)}, DimensionsBookkeeper<RANK>{this->extents} {initializer(*this);}
 
+  explicit DensityOperator(const Dimensions& dimensions)
+    : DensityOperator{dimensions,[](DensityOperator& rho) {rho=0; rho.mutableView().dataView[0]=1.;}} {}
+    
   explicit DensityOperator(const StateVector<RANK>& psi) ///< Constructs the class as a dyadic product of `psi` with itself.
     : ABase(psi.dyad()), DimensionsBookkeeper<RANK>{this->extents} {}
 

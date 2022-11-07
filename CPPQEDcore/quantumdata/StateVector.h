@@ -41,9 +41,11 @@ struct StateVector : ArrayBase<StateVector<RANK>>, DimensionsBookkeeper<RANK>
   
   StateVector(StateVector&&) = default; StateVector& operator=(StateVector&&) = default;
 
-  explicit StateVector(const Dimensions& dimensions, std::function<void(StateVector&)> initializer=[](StateVector& psi) {psi=0; psi.mutableView().dataView[0]=1.;})
-    : ABase{dimensions}, DimensionsBookkeeper<RANK>{dimensions} {initializer(*this);}
+  StateVector(const Dimensions& dimensions, auto&& initializer) : ABase{dimensions}, DimensionsBookkeeper<RANK>{dimensions} {initializer(*this);}
 
+  explicit StateVector(const Dimensions& dimensions)
+    : StateVector{dimensions,[](StateVector& psi) {psi=0.; psi.mutableView().dataView[0]=1.;}} {}
+    
   /// Constructs the class as the direct product of `psi1` and `psi2`, whose arities add up to `RANK`.
   template<size_t RANK2>
   StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)

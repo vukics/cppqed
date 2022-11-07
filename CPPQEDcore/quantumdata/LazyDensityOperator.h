@@ -4,6 +4,8 @@
 
 #include "DensityOperator.h"
 
+#include "Overloaded.h"
+
 #include <variant>
 
 
@@ -23,111 +25,69 @@ namespace quantumdata {
  * for all the four cases , to calculate quantum averages from their data.
  * The “laziness” amounts to that in the case of state vectors, only those elements of the density operator are calculated that are actually asked for.
  * 
- * Immutable class.
+ * Immutable class. Should be passed by value.
  */
 template<size_t RANK> 
-class LazyDensityOperator
+struct LazyDensityOperator
 {
-public:
-  typedef IdxTiny<RANK> Idx; ///< The type used for indexing the “rows” and the “columns”: a tiny vector of integers (multi-index)
-
-private:
-  class IndexerProxy
+  LazyDensityOperator(auto&&... qd) : quantumdata_{std::forward<decltype(qd)>(qd)...} {}
+  
+  const dcomp operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==2*RANK)
   {
-  public:
-    IndexerProxy(const LazyDensityOperator* ldo, const Idx& firstIndex) : ldo_(ldo), firstIndex_(firstIndex) {}
-
-    const dcomp operator()(const Idx& secondIndex) const {return ldo_->index(firstIndex_,secondIndex);}
-
-    template<typename... SubscriptPack>
-    const dcomp operator()(int s0, SubscriptPack... subscriptPack) const
-    {
-      static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for LazyDensityOperator::IndexerProxy." );
-      return operator()(Idx(s0,subscriptPack...));
-    }
-
-    operator double() const {return real(ldo_->index(firstIndex_,firstIndex_));}
-
-  private:
-    const LazyDensityOperator*const ldo_;
-    const Idx firstIndex_;
-
-  };
-
-public:
-  /// Multi-matrix style indexing via Idx type
-  const IndexerProxy operator()(const Idx& firstIndex) const {return IndexerProxy(this,firstIndex);}
-
-  /// Multi-matrix style indexing via packs of integers
-  /**
-   * This allows for the very convenient indexing syntax (e.g. a ternary LazyDensityOperator `matrix` indexed by multi-indeces `i` and `j`):
-   *
-   *     matrix(i0,i1,i2)(j0,j1,j2)
-   *
-   * while
-   *
-   *     matrix(i0,i1,i2)
-   *
-   * returns a proxy implicitly convertible to a `double`, giving the diagonal element corresponding to the multi-index `i`
-   *
-   * \note The number of indeces in the multi-index is checked @ compile time.
-   *
-   */
-  template<typename... SubscriptPack>
-  const auto operator()(int s0, SubscriptPack... subscriptPack) const
-  {
-    static_assert( sizeof...(SubscriptPack)==RANK-1 , "Incorrect number of subscripts for LazyDensityOperator." );
-    return operator()(Idx(s0,subscriptPack...));
+    return std::visit(cppqedutils::overload{
+      [&] (StateVectorConstView<RANK> psi) {return psi(i...)*conj(psi(i...));},
+      [&] (DensityOperatorConstView<RANK> rho) {return rho(i...);},
+    },quantumdata_);
   }
+  
+  double trace() const;
 
-  double trace() const {return trace_v();} ///< Returns the trace (redirected to a pure virtual)
-  
-protected:
-  LazyDensityOperator(const Dimensions& dims) : Base(dims) {}
-
-private:
-  virtual const dcomp index(const Idx& i, const Idx& j) const = 0;
-  
-  virtual double trace_v() const = 0;
-  
-  std::variant<StateVectorConstView<RANK>,DensityOperatorConstView<RANK>> data_;
+  std::variant<StateVectorConstView<RANK>,DensityOperatorConstView<RANK>> quantumdata_;
   
 };
 
 
-template<typename V, template <int> class MATRIX, size_t RANK, typename F>
-auto partialTrace(const MATRIX<RANK>& matrix, F&& function)
+/// The primary tool for performing slice iteration of LazyDensityOperator#s
+/**
+ * On higher levels of the framework (BinarySystem, Composite), this function is used exclusively for performing LazyDensityOperator slice iteration.
+ *
+ * `function` is a callable with signature `T(LazyDensityOperator<hana::size(retainedAxes)>)`, where T is an arithmetic type
+ */
+template<auto retainedAxes, size_t RANK>
+auto partialTrace(LazyDensityOperator<RANK> matrix, const std::vector<size_t>& offsets, auto&& function, auto&& plus)
 {
-  auto begin{cppqedutils::sliceiterator::begin<V,MATRIX>(matrix)};
-
-  auto init{function(*begin)};
-
-  return std::accumulate(++begin,
-                         cppqedutils::sliceiterator::end<V,MATRIX>(matrix),
-                         init,
-                         [f{std::move(function)}](const auto& res, const auto& slice){return decltype(init){res+f(slice)};}
-                        );
+  // static constexpr auto extendedAxes{hana::fold(retainedAxes,retainedAxes, [] (const auto& state, auto element) {return hana::append(state,element+RANK);})};
+  
+  static constexpr auto extendedAxes{hana::concat(retainedAxes,
+                                                  hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
+  
+  const auto iterateSlices{[&] (const auto& sr) {
+    return std_ext::ranges::fold(
+      sr | std::views::drop(1),
+      function(*std::ranges::begin(sr)),
+      [&] (const auto& res, const auto& slice) {return plus(res,function(slice));});
+  }};
+  
+  // for the DensityOperatorConstView case, the same slices range can be used, but with the offsets multiplied by (dim+1)
+  return std::visit(cppqedutils::overload{
+      [&] (StateVectorConstView<RANK> psi) {
+        auto sr{cppqedutils::sliceRange<retainedAxes>(psi,offsets)};
+        return iterateSlices(sr);
+      },
+      [&] (DensityOperatorConstView<RANK> rho) {
+        auto diagonalOffsets{offsets | std::views::transform([&] (size_t v) {return v*(std::lround(std::sqrt(rho.dataView.size()))+1);} ) };
+        auto sr{cppqedutils::sliceRange<extendedAxes>(rho,diagonalOffsets)};
+        return iterateSlices(sr);
+      },
+    }, matrix.quantumdata_);
+  
 }
 
 
-/// The primary tool for performing \ref slicinganldo "slice iterations"
-/**
- * On higher levels of the framework (cf. eg. BinarySystem, Composite), this function is used exclusively for performing LazyDensityOperator slice iteration.
- * 
- * \tparamV
- * \tparam F a callable type with signature `T(const LazyDensityOperator<mpl::size<V>::value>&)`, where T is an arithmetic type
- * 
- */
-template<typename V, size_t RANK, typename F>
-auto
-partialTrace(const LazyDensityOperator<RANK>& matrix, F&& function)
+template<auto retainedAxes, size_t RANK>
+auto partialTrace(LazyDensityOperator<RANK> matrix, const std::vector<size_t>& offsets, auto&& function)
 {
-  typedef StateVector    <RANK> SV;
-  typedef DensityOperator<RANK> DO;
-  
-  if      (auto psi=dynamic_cast<const SV*>(&matrix) ) return partialTrace<V,StateVector    >(*psi,std::move(function));
-  else if (auto rho=dynamic_cast<const DO*>(&matrix) ) return partialTrace<V,DensityOperator>(*rho,std::move(function));
-  else throw std::runtime_error("LazyDensityOperator partialTrace not implemented");
+  return partialTrace<retainedAxes>(matrix,offsets,std::forward<decltype(function)>(function),std::plus{});
 }
 
 
@@ -137,7 +97,7 @@ partialTrace(const LazyDensityOperator<RANK>& matrix, F&& function)
  * For this to make sense, the matrix is assumed to be Hermitian.
  * 
  * \param offDiagonals governs whether the upper triangle of the (multi-)matrix is included in the result
- */
+ *//*
 template<size_t RANK>
 const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagonals)
 {
@@ -166,7 +126,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
   return res;
 
 }
-
+*/
 
 /** \class LazyDensityOperator
  * 

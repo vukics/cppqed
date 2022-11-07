@@ -153,14 +153,14 @@ public:
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
   
   /// initializer is a callable, taking the total size as argument.
-  MultiArray(Extents<RANK> extents,
-             std::function<StorageType(size_t)> initializer=[](size_t s) {return StorageType(s); /* no braces here, please!!! */})
-    : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0},
-      data_{initializer(multiarray::calculateExtent(extents))}
+  MultiArray(Extents<RANK> extents, auto&& initializer)
+    : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
   {
     this->dataView=std::span<T>(data_);
   }
 
+  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,[](size_t s) {return StorageType(s); /* no braces here, please!!! */}} {}
+  
   /// conversion to a view
   auto mutableView() {return MultiArrayView<T, RANK>{this->extents,this->strides,0,data_};}
   operator MultiArrayView<T,RANK>() {return mutableView();}

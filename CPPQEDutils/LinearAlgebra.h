@@ -8,6 +8,8 @@
 
 #include <boost/operators.hpp>
 
+#include <optional>
+
 
 namespace linalg {
 
