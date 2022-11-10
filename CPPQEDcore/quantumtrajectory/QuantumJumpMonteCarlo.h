@@ -5,7 +5,7 @@
 #include "StateVector.h"
 
 #include "DensityOperatorStreamer.h"
-#include "MCWF_TrajectoryLogger.h"
+#include "QuantumJumpMonteCarloLogger.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 
@@ -16,77 +16,46 @@
 
 namespace quantumtrajectory {
 
-/// Auxiliary tools to MCWF_Trajectory  
-namespace mcwf {
+/// Auxiliary tools to QuantumJumpMonteCarlo  
+namespace qjmc {
 
 
-/// Aggregate of parameters pertaining to \link MCWF_Trajectory MCWF\endlink simulations
-/** \copydetails trajectory::ParsRun */
+/// Aggregate of parameters of QuantumJumpMonteCarlo
 template<typename RandomEngine>
 struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
   
   double
-    &dpLimit, ///< the parameter \f$\delta p_\text{limit}\f$ (cf. 2.b.ii \link MCWF_Trajectory here\endlink)
-    &overshootTolerance; ///< the parameter \f$\delta p_\text{limit}'/\delta p_\text{limit}\f$ (cf. 2.b.ii \link MCWF_Trajectory here\endlink)
+    &dpLimit, ///< the parameter \f$\Delta p\f$
+    &overshootTolerance; ///< the parameter \f$\Delta p'/\Delta p\f$
 
   size_t
-    &nBins, ///< governs how many bins should be used for the histogram of jumps created by ensemble::streamLog (a zero value means a heuristic automatic determination)
+    &nBins, ///< governs how many bins should be used for the histogram of jumps created by qjmc::EnsembleLogger::stream (a zero value means a heuristic automatic determination)
     &nJumpsPerBin; ///< the average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination
 
   Pars(parameters::Table& p, const std::string& mod="")
     : cppqedutils::trajectory::ParsStochastic<RandomEngine>{p,mod},
-      dpLimit(p.addTitle("MCWF_Trajectory",mod).add("dpLimit",mod,"MCWFS stepper total jump probability limit",0.01)),
+      dpLimit(p.addTitle("QuantumJumpMonteCarlo",mod).add("dpLimit",mod,"QJMC stepper total jump probability limit",0.01)),
       overshootTolerance(p.add("overshootTolerance",mod,"Jump probability overshoot tolerance factor",10.)),
-      nBins(p.add("nBins",mod,"number of bins used for the histogram of jumps created by EnsembleMCWF",size_t(0))),
+      nBins(p.add("nBins",mod,"number of bins used for a histogram of jumps",size_t(0))),
       nJumpsPerBin(p.add("nJumpsPerBin",mod,"average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",size_t(50)))
     {}
 
 };
 
 
-} // mcwf
+} // qjmc
 
 
 
-/// Implements a single Monte Carlo wave-function trajectory
-/**
- * In the framework, a single \ref mcwftrajectory "Monte Carlo wave-function step" at time \f$t\f$ (at which point, if the system inherits from structure::Exact,
- * the Schrödinger- and interaction pictures coincide) is implemented as a sequence of the following stages:
- * -# Coherent time development is applied:
- *   -# If the system time evolution has Hamiltonian part, it is evolved with an adaptive-size step (cf. evolved::Evolved). This takes the system into \f$t+\Delta t\f$.
- *   -# The exact part (if any) of the time evolution is applied, making that the Schrödinger and interaction pictures coincide again at \f$t+\Delta t\f$.
- *   -# The state vector is renormalized.
- * -# If the system is *not* Liouvillian, the timestep ends here, reducing to a simple ODE evolution. Otherwise:
- *   -# The rates (probabilities per unit time) corresponding to all jump operators are calculated. If some rates are found negative
- *      (“special jump”, cf. explanation at structure::Liouvillian::probabilities, then \f$J_\text{at}\ket\Psi\f$ is calculated (and tabulated) instead,
- *      and the rate is calculated as \f$\delta r_\text{at}=\norm{J_\text{at}\ket\Psi}^2\f$. \see \ref specialjump
- *   -# First, it is verified whether the total jump probability is not too big. This is performed on two levels:
- *     -# The total jump rate \f$\delta r\f$ is calculated.
- *     -# If \f$\delta r\delta t>\delta p_\text{limit}'\f$, the step is retraced: both the state vector and the state of the ODE stepper are restored to cached values
- *        at the beginning of the timestep, and phase I. is performed anew with a smaller stepsize \f$\delta p_\text{limit}/\delta r\f$. 
- *        With this, we ensure that \f$\delta p_\text{limit}\f$ (the parameter mcwf::Pars::dpLimit) is likely not to be overshot in the next try.
- *        \note It is assumed that \f$\delta p_\text{limit}'>\delta p_\text{limit}\f$, their ratio being a parameter (mcwf::Pars::overshootTolerance) of the MCWF stepper.
- *     -# If just \f$\delta r\delta t_\text{next}>\delta p_\text{limit}\f$ (where \f$\Delta t_\text{next}\f$ is a guess for the next timestep given by the ODE stepper),
- *        the coherent step is accepted, but the timestep to try next is modified, to reduce the likeliness of overshoot: \f$\delta t_\text{next}\longrightarrow\delta p_\text{limit}/\delta r\f$.
- *     \see The discussion at Sec. \ref anadaptivemcwfmethod "An adaptive MCWF method".
- *   -# After a successful coherent step resulting in an acceptable \f$\delta r\f$, the possible occurence of a quantum jump is considered:
- *      It is randomly decided which (if any) of the jumps to perform. If it is found to be a special jump, then the tabulated \f$J_\text{at}\ket\Psi\f$ is taken.
- * 
- * \tparamRANK
- * 
- * \note In phase 2.b.ii, another approach would be not to trace back the whole step, but make a coherent step *backwards* to an intermediate time instant found by linear interpolation.
- * This has several drawbacks, however, the most significant being that in the ODE stepper, it is not clear what to take as the timestep to try at the point when the direction of time is reversed.
- * (Although in evolved::Evolved it is simply taken to be the timestep done in the last step…)
- * 
- */
-
+/// Implements a single Quantum-Jump Monte Carlo trajectory
+/** the stepwise adaptive algorithm is used, cf. Comp. Phys. Comm. 238:88 (2019) */
 template<size_t RANK,
          ::structure::hamiltonian<RANK> HA, ::structure::liouvillian<RANK> LI, ::structure::expectation_values<RANK> EV,
          typename ODE_Engine, std::uniform_random_bit_generator RandomEngine>
-class MCWF_Trajectory
+class QuantumJumpMonteCarlo
 {
 public:
-  MCWF_Trajectory(const MCWF_Trajectory&) = default; MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
+  QuantumJumpMonteCarlo(const QuantumJumpMonteCarlo&) = default; QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default; QuantumJumpMonteCarlo& operator=(QuantumJumpMonteCarlo&&) = default;
 
   using StreamedArray=::structure::EV_Array;
 
@@ -95,7 +64,7 @@ public:
   using EnsembleAverageElement = StateVectorView;
   using EnsembleAverageResult = quantumdata::DensityOperator<RANK>;
   
-  MCWF_Trajectory(const HA& ha, const LI& li, const EV& ev,
+  QuantumJumpMonteCarlo(const HA& ha, const LI& li, const EV& ev,
                   StateVectorView<RANK> psi, ///< the state vector to be evolved
                   ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re,
                   double dpLimit, double overshootTolerance, int logLevel)
@@ -104,8 +73,6 @@ public:
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
     logger_{logLevel,::structure::nAvr<::structure::LA_Li>(sys_)}
   {
-    // std::cout<<"# initial timestep: "<<ode_.getDtTry()<<std::endl;
-    // if (psi.extents!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
     if (!t_ && li.size() )  { // On startup, dpLimit should not be overshot, either.
       auto rates{calculateRates(li,0.,psi_)};
       manageTimeStep(rates,0,0,std::clog,false);
@@ -127,7 +94,7 @@ public:
   auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {StateVectorLow temp; iar & temp; psi_.getArray().reference(temp); return iar;}
 
   /** 
-   * structure of MCWF_Trajectory archives:
+   * structure of QuantumJumpMonteCarlo archives:
    * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
    * (state should precede time in order to be compatible with array-only archives)
    */
@@ -145,11 +112,11 @@ public:
   /// Forwards to ::structure::Averaged::streamKey
   std::ostream& streamKey(std::ostream& os) const {size_t i=3; return ::structure::streamKey<::structure::LA_Av>(sys_,os,i);}
 
-  std::ostream& logOnEnd(std::ostream& os) const {return logger_.onEnd(ode_.logOnEnd(os));} ///< calls mcwf::Logger::onEnd
+  std::ostream& logOnEnd(std::ostream& os) const {return logger_.onEnd(ode_.logOnEnd(os));} ///< calls qjmc::Logger::onEnd
   
   const StateVector& getStateVector() const {return psi_;}
   
-  const mcwf::Logger& getLogger() const {return logger_;}
+  const qjmc::Logger& getLogger() const {return logger_;}
   
   void referenceNewStateVector(const StateVector& psi) {psi_.reference(psi);}
   void setODE(ODE_Engine ode) {ode_=std::move(ode);}
@@ -170,11 +137,13 @@ private:
   bool manageTimeStep (const ::structure::Rates& rates, double tCache, double dtDidCache, std::ostream&, bool logControl=true);
 
   void performJump (const ::structure::Rates&, const IndexSVL_tuples&, std::ostream&); // LOGICALLY non-const
-  // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole MCWF_Trajectory has to be passed
+  // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole QuantumJumpMonteCarlo has to be passed
 
   double t_=0., t0_=0.;
   
-  ::structure::QuantumSystemPtr<RANK> sys_;
+  const HA& ha_;
+  const LI& li_;
+  const EV& ev_;
   
   StateVectorView<RANK> psi_;
 
@@ -184,35 +153,31 @@ private:
   
   const double dpLimit_, overshootTolerance_;
 
-  mutable mcwf::Logger logger_;
+  mutable qjmc::Logger logger_;
   
   std::uniform_real_distribution<double> distro_{};
 
 };
 
 
-/// Deduction guide:
-template<typename System, size_t RANK, typename ODE_Engine, typename RandomEngine>
-MCWF_Trajectory(System, quantumdata::StateVector<RANK>, ODE_Engine, randomutils::EngineWithParameters<RandomEngine>, double, double, int ) -> MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
 
-
-namespace mcwf {
+namespace qjmc {
 
 template<typename ODE_Engine, typename RandomEngine, typename SV>
 auto make(::structure::QuantumSystemPtr<std::decay_t<SV>::N_RANK> sys,
           SV&& state, const Pars<RandomEngine>& p)
 {
-  return MCWF_Trajectory<std::decay_t<SV>::N_RANK,ODE_Engine,RandomEngine>{
+  return QuantumJumpMonteCarlo<std::decay_t<SV>::N_RANK,ODE_Engine,RandomEngine>{
     sys,std::forward<SV>(state),{initialTimeStep(sys),p},{p.seed,p.prngStream},p.dpLimit,p.overshootTolerance,p.logLevel
   };
 }
 
-/// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `MCWF_Trajectory`s
+/// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `QuantumJumpMonteCarlo`s
 template<typename ODE_Engine, typename RandomEngine, typename V, typename SYS, typename SV>
 auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, EntanglementMeasuresSwitch ems)
 {
   constexpr auto RANK=std::decay_t<SV>::N_RANK;
-  using Single=MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
+  using Single=QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>;
 
   std::vector<Single> trajs;
   
@@ -226,7 +191,7 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, Entanglem
   auto av=::structure::castAv(sys);
   
   return cppqedutils::trajectory::Ensemble{trajs,DensityOperatorStreamer<RANK,V>{av,ems},
-                                           mcwf::EnsembleLogger{p.nBins,p.nJumpsPerBin},
+                                           qjmc::EnsembleLogger{p.nBins,p.nJumpsPerBin},
                                            quantumdata::DensityOperator<RANK>{psi.getDimensions()}};
 
 }
@@ -238,15 +203,15 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, Entanglem
 
 
 template <size_t RANK, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
+struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>
 {
-  static auto _() {return SerializationMetadata{"CArray","MCWF_Trajectory",RANK};}
+  static auto _() {return SerializationMetadata{"CArray","QuantumJumpMonteCarlo",RANK};}
 };
 
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentTimeDevelopment(double Dt, std::ostream& logStream)
+void quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::coherentTimeDevelopment(double Dt, std::ostream& logStream)
 {
   if (const auto ha=::structure::castHa(sys_)) {
     ode_.step(Dt,logStream,[this,ha](const StateVectorLow& psi, StateVectorLow& dpsidt, double t) {
@@ -275,7 +240,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentT
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculateSpecialRates(::structure::Rates* rates) const -> const IndexSVL_tuples
+auto quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::calculateSpecialRates(::structure::Rates* rates) const -> const IndexSVL_tuples
 {
   IndexSVL_tuples res;
   for (int i=0; i<rates->size(); i++)
@@ -290,7 +255,7 @@ auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculate
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-bool quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
+bool quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::
 manageTimeStep(const ::structure::Rates& rates, double tCache, double dtDidCache, std::ostream& logStream, bool logControl)
 {
   const double totalRate=boost::accumulate(rates,0.);
@@ -316,7 +281,7 @@ manageTimeStep(const ::structure::Rates& rates, double tCache, double dtDidCache
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const ::structure::Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
+void quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::performJump(const ::structure::Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
   double random=sampleRandom()/getDtDid();
 
@@ -333,7 +298,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJu
       // normal  jump
       ::structure::actWithJ(sys_,t_,psi_.getArray(),lindbladNo);
       double normFactor=sqrt(rates(lindbladNo));
-      if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in MCWF_Trajectory::performJump");
+      if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
       psi_/=normFactor;
     }
 
@@ -343,7 +308,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJu
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(double Dt, std::ostream& logStream)
+void quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::step(double Dt, std::ostream& logStream)
 {
   const StateVector psiCache(psi_); // deep copy
   double tCache=t_, dtDidCache=getDtDid();
@@ -373,7 +338,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(doub
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::streamParameters(std::ostream& os) const
+std::ostream& quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::streamParameters(std::ostream& os) const
 {
   using namespace std;
   
@@ -402,10 +367,10 @@ std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
+struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>
 {
   static const auto& _(quantumdata::DensityOperator<RANK>& rho,
-                       const std::vector<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>& trajs)
+                       const std::vector<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>& trajs)
   {
     rho=trajs.begin()->getStateVector();
       
@@ -426,11 +391,11 @@ struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::MCWF_Traj
  * and sample the density operator to initialize as many trajectories as needed.
  */
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
+struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>
 {
-  static auto& _(const std::vector<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>&, cppqedutils::iarchive& iar)
+  static auto& _(const std::vector<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>&, cppqedutils::iarchive& iar)
   {
-    throw std::runtime_error("InitializeEnsembleFromArrayOnlyArchive not implemented for MCWF_Trajectory");
+    throw std::runtime_error("InitializeEnsembleFromArrayOnlyArchive not implemented for QuantumJumpMonteCarlo");
     return iar;
   }
 };

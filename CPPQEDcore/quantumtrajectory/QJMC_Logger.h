@@ -24,7 +24,7 @@ struct EnsembleLogger
 {
   typedef std::list<Logger> LoggerList;
 
-  /// Called by Ensemble<MCWF_Trajectory>::logOnEnd, it calculates a temporal histogram of total jumps
+  /// Called by Ensemble<QuantumJumpMonteCarlo>::logOnEnd, it calculates a temporal histogram of total jumps
   /** \todo The different kinds of jumps should be collected into different histograms */
   static std::ostream& stream(std::ostream&, const LoggerList&, size_t nBins, size_t nJumpsPerBin);
 
@@ -43,7 +43,7 @@ struct EnsembleLogger
 
 
 
-/// Essentially an aggregate of data fields for logging during a MCWF_Trajectory run.
+/// Essentially an aggregate of data fields for logging during a QuantumJumpMonteCarlo run.
 /**
  * Different log levels are to be supplied as the first parameter to Logger::Logger, and mean the following:
  * 
@@ -59,7 +59,7 @@ struct EnsembleLogger
 class Logger
 {
 public:
-  typedef std::list<std::pair<double,size_t> > MCWF_Trajectory; ///< Stores <time instant, lindbladNo> pairs, that is, the complete stochastic MCWF trajectory (the rest is deterministic)
+  typedef std::list<std::pair<double,size_t> > jumpTrajectory; ///< Stores <time instant, lindbladNo> pairs, that is, the complete stochastic MCWF trajectory (the rest is deterministic)
 
   /// Straightforward constructor
   Logger(int logLevel, ///< governs amount of log output during trajectory stream
@@ -75,9 +75,9 @@ public:
 
   void jumpOccured(std::ostream&, double t, size_t lindbladNo); ///< registers a jump at time `t` with its identifying ordinal
 
-  std::ostream& onEnd(std::ostream&) const; ///< streams summary log information at the end (called by MCWF_Trajectory::logOnEnd_v)
+  std::ostream& onEnd(std::ostream&) const; ///< streams summary log information at the end (called by QuantumJumpMonteCarlo::logOnEnd_v)
   
-  const MCWF_Trajectory& getTrajectory() const {return traj_;}
+  const jumpTrajectory& getTrajectory() const {return traj_;}
   
 private:
 #ifdef BZ_HAVE_BOOST_SERIALIZATION
@@ -96,7 +96,7 @@ private:
   size_t nMCWF_steps_, nOvershot_, nToleranceOvershot_;
   double dpMaxOvershoot_, dpToleranceMaxOvershoot_, normMaxDeviation_;
 
-  MCWF_Trajectory traj_;
+  jumpTrajectory traj_;
   
 };
 
