@@ -1,7 +1,6 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFileDefault
-#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
-#define CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED
+#pragma once
 
 #include "StateVector.h"
 
@@ -81,34 +80,34 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
  * 
  */
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK,
+         ::structure::hamiltonian<RANK> HA, ::structure::liouvillian<RANK> LI, ::structure::expectation_values<RANK> EV,
+         typename ODE_Engine, std::uniform_random_bit_generator RandomEngine>
 class MCWF_Trajectory
 {
 public:
   MCWF_Trajectory(const MCWF_Trajectory&) = default; MCWF_Trajectory(MCWF_Trajectory&&) = default; MCWF_Trajectory& operator=(MCWF_Trajectory&&) = default;
 
-  using StreamedArray=::structure::Averages;
+  using StreamedArray=::structure::EV_Array;
 
-  typedef quantumdata::StateVector<RANK> StateVector;
-  typedef typename StateVector::StateVectorLow StateVectorLow;
+  using StateVectorView=quantumdata::StateVectorView<RANK>;
 
-  using EnsembleAverageElement = StateVector;
+  using EnsembleAverageElement = StateVectorView;
   using EnsembleAverageResult = quantumdata::DensityOperator<RANK>;
   
-  /// Templated constructor with the same idea as Master::Master
-  template <typename SV>
-  MCWF_Trajectory(::structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
-                  SV&& psi, ///< the state vector to be evolved
+  MCWF_Trajectory(const HA& ha, const LI& li, const EV& ev,
+                  StateVectorView<RANK> psi, ///< the state vector to be evolved
                   ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re,
                   double dpLimit, double overshootTolerance, int logLevel)
-  : sys_{sys}, psi_{std::forward<StateVector>(psi)},
+  : ha_{ha}, li_{li}, ev_{ev},
+    psi_{psi},
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
     logger_{logLevel,::structure::nAvr<::structure::LA_Li>(sys_)}
   {
     // std::cout<<"# initial timestep: "<<ode_.getDtTry()<<std::endl;
-    if (psi!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
-    if (const auto li=::structure::castLi(sys_); bool(li) && !t_)  { // On startup, dpLimit should not be overshot, either.
-      auto rates(li->rates(0.,psi_)); calculateSpecialRates(&rates);
+    // if (psi.extents!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
+    if (!t_ && li.size() )  { // On startup, dpLimit should not be overshot, either.
+      auto rates{calculateRates(li,0.,psi_)};
       manageTimeStep(rates,0,0,std::clog,false);
     }
   }
@@ -127,10 +126,11 @@ public:
   
   auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {StateVectorLow temp; iar & temp; psi_.getArray().reference(temp); return iar;}
 
-  /** structure of MCWF_Trajectory archives:
-  * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
-  */
-  // state should precede time in order to be compatible with array-only archives
+  /** 
+   * structure of MCWF_Trajectory archives:
+   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
+   * (state should precede time in order to be compatible with array-only archives)
+   */
   auto& stateIO(cppqedutils::iarchive& iar)
   {
     StateVectorLow temp;
@@ -176,7 +176,7 @@ private:
   
   ::structure::QuantumSystemPtr<RANK> sys_;
   
-  StateVector psi_;
+  StateVectorView<RANK> psi_;
 
   ODE_Engine ode_;
 
@@ -192,7 +192,7 @@ private:
 
 
 /// Deduction guide:
-template<typename System, int RANK, typename ODE_Engine, typename RandomEngine>
+template<typename System, size_t RANK, typename ODE_Engine, typename RandomEngine>
 MCWF_Trajectory(System, quantumdata::StateVector<RANK>, ODE_Engine, randomutils::EngineWithParameters<RandomEngine>, double, double, int ) -> MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>;
 
 
@@ -237,7 +237,7 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, Entanglem
 } // quantumtrajectory
 
 
-template <int RANK, typename ODE_Engine, typename RandomEngine>
+template <size_t RANK, typename ODE_Engine, typename RandomEngine>
 struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
 {
   static auto _() {return SerializationMetadata{"CArray","MCWF_Trajectory",RANK};}
@@ -245,7 +245,7 @@ struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::MCW
 
 
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentTimeDevelopment(double Dt, std::ostream& logStream)
 {
   if (const auto ha=::structure::castHa(sys_)) {
@@ -274,7 +274,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::coherentT
 }
 
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculateSpecialRates(::structure::Rates* rates) const -> const IndexSVL_tuples
 {
   IndexSVL_tuples res;
@@ -289,7 +289,7 @@ auto quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::calculate
 }
 
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 bool quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
 manageTimeStep(const ::structure::Rates& rates, double tCache, double dtDidCache, std::ostream& logStream, bool logControl)
 {
@@ -315,7 +315,7 @@ manageTimeStep(const ::structure::Rates& rates, double tCache, double dtDidCache
 }
 
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJump(const ::structure::Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
 {
   double random=sampleRandom()/getDtDid();
@@ -342,7 +342,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::performJu
 }
 
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(double Dt, std::ostream& logStream)
 {
   const StateVector psiCache(psi_); // deep copy
@@ -372,7 +372,7 @@ void quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::step(doub
 }
 
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::streamParameters(std::ostream& os) const
 {
   using namespace std;
@@ -401,7 +401,7 @@ std::ostream& quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>::
 }
 
 
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
 {
   static const auto& _(quantumdata::DensityOperator<RANK>& rho,
@@ -425,7 +425,7 @@ struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::MCWF_Traj
  * **Most general solution**: create a DensityOperator from the available arrays (independently of their number)
  * and sample the density operator to initialize as many trajectories as needed.
  */
-template<int RANK, typename ODE_Engine, typename RandomEngine>
+template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>
 {
   static auto& _(const std::vector<quantumtrajectory::MCWF_Trajectory<RANK,ODE_Engine,RandomEngine>>&, cppqedutils::iarchive& iar)
@@ -436,5 +436,3 @@ struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtr
 };
 
 
-
-#endif // CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORY_H_INCLUDED

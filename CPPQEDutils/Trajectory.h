@@ -457,8 +457,7 @@ void step(Trajectory& traj, double deltaT, std::ostream& os)
 } } // cppqedutils::trajectory
 
 
-#pragma GCC warning "TODO: This souldn’t call any TRAJ member function directly, only through traits classes"
-
+/// TODO: This shouldn’t call any TRAJ member function directly, only through traits classes
 template<typename TRAJ, typename LENGTH, typename DELTA, typename AutostopHandler>
 auto
 cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsigned stateStreamFreq,
