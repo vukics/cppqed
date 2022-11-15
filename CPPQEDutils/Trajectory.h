@@ -32,6 +32,9 @@ namespace hana=boost::hana;
 namespace cppqedutils {
 
 
+// TODO: define concept of trajectory
+  
+
 inline auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
 inline auto has_advance = hana::is_valid([](auto&& obj) -> decltype(obj.advance(1.0,std::clog)) { });
 
@@ -150,11 +153,9 @@ struct SerializationMetadata
   inline static const std::string ARRAY_ONLY = "ArrayOnly" ;
 
 private:
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & protocolVersion & rank & typeID & trajectoryID;}
-#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 };
 

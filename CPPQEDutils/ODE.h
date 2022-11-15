@@ -1,14 +1,9 @@
 // Copyright András Vukics 2021–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFileDefault
-#ifndef CPPQEDCORE_UTILS_ODE_H_INCLUDED
-#define CPPQEDCORE_UTILS_ODE_H_INCLUDED
+#pragma once
 
+#include "Archive.h"
 #include "MathExtensions.h"
 #include "Pars.h"
-
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
-#include <boost/serialization/serialization.hpp>
-#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <boost/numeric/odeint.hpp>
 
@@ -111,11 +106,9 @@ public:
   }
 
 private:
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & nDerivsCalls_ & nSteps_ & nFailedSteps_;}
-#endif // BZ_HAVE_BOOST_SERIALIZATION
 
   size_t nDerivsCalls_=0, nSteps_=0, nFailedSteps_=0;
 
@@ -260,6 +253,3 @@ void cppqedutils::ode_engine::Base<ControlledErrorStepper,Logger>::step(Time del
   
   if (logLevel_>3) logStream<<"Number of failed steps in this timestep: "<<nFailedSteps<<std::endl;
 }
-
-
-#endif // CPPQEDCORE_UTILS_ODE_H_INCLUDED

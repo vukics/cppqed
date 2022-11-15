@@ -14,10 +14,8 @@
 #include <gsl/gsl_rng.h>
 #endif // CPPQED_HAS_GSL
 
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/array.hpp>
-#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <memory>
 #include <optional>
