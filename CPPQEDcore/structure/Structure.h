@@ -58,15 +58,6 @@ template<typename T> SystemCharacteristics systemCharacteristics(std::shared_ptr
  */
 //@{
 
-template<typename T>
-std::ostream& streamCharacteristics(std::shared_ptr<const T> qs, std::ostream& os)
-{
-  return os<<"System characteristics: "
-      <<(castEx(qs) ? "Interaction picture, "   : "")
-      <<(castHa(qs) ? "Hamiltonian evolution, " : "")
-      <<(castLi(qs) ? "Liouvillian evolution, " : "")
-      <<(castAv(qs) ? "calculates Averages."    : "");
-}
 
 
 /// \name Forwarded members from Exact
@@ -122,19 +113,6 @@ void process(std::shared_ptr<const T> qs, Averages& averages)
 }
 
 
-/// If the first argument is a valid pointer, it calles Averaged::average, Averaged::process, and Averaged::stream in succession; otherwise a no-op. \related QuantumSystemWrapper
-template<typename T>
-std::tuple<std::ostream&,Averages>
-stream(std::shared_ptr<const T> qs, double t, const quantumdata::LazyDensityOperator<T::N_RANK>& matrix, std::ostream& os, int precision)
-{
-  Averages averages;
-  if (const auto av=castAv(qs)) {
-    averages.reference(av->average(t,matrix));
-    av->process(averages);
-    av->stream(averages,os,precision);
-  }
-  return {os,averages};
-}
 
 //@}
 

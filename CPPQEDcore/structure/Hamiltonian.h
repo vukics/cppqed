@@ -1,5 +1,4 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFileDefault
 #pragma once
 
 #include "StateVector.h"
@@ -24,12 +23,20 @@ template <size_t RANK>
 using TwoTimeDependentTerm = std::function<void(double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)>;
 
 
+template <size_t RANK>
+using OneTimeDependentPropagator = std::function<void(double, StateVectorView<RANK>)>;
+
+
+template <size_t RANK>
+using TwoTimeDependentPropagator = std::function<void(double, StateVectorView<RANK>, double)>;
+
+
 /// a label and a term
 /*
  * the `label` becomes a `prefix:label` when the system becomes part of a more complex system
  */
 template <size_t RANK>
-using HamiltonianTerm = std::tuple<std::string,std::variant<TimeIndependentTerm<RANK>,OneTimeDependentTerm<RANK>,TwoTimeDependentTerm<RANK>>>;
+using HamiltonianTerm = std::tuple<std::string,std::variant<TimeIndependentTerm<RANK>,OneTimeDependentTerm<RANK>,TwoTimeDependentTerm<RANK>,OneTimeDependentPropagator<RANK>,TwoTimeDependentPropagator<RANK>>>;
 
 
 // e.g. `std::list<HamiltonianTerm<RANK>>`, but transformed views might be necessary
@@ -45,7 +52,7 @@ concept hamiltonian =
  * However, if indexing is done carefully, `psi` and `dpsidt` can refer to the same underlying data
  */
 template <size_t RANK, hamiltonian<RANK> HA>
-void apply(const HA& ha, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
+void applyHamiltonian(const HA& ha, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
 {
   for (auto& term : ha)
     std::visit(cppqedutils::overload{
@@ -56,16 +63,43 @@ void apply(const HA& ha, double t, StateVectorConstView<RANK> psi, StateVectorVi
 }
 
 
-
-
-
-/*
-template <typename SYSTEM, size_t RANK>
-void apply(SYSTEM&& sys, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
+/// applying a Propagator is interpreted as replacing |psi> with U|psi>
+template <size_t RANK, hamiltonian<RANK> HA>
+void applyPropagator(const HA& ha, double t, StateVectorView<RANK> psi, double t0)
 {
-  if constexpr (std::is_convertible_v<SYSTEM,Hamiltonian<RANK>>) addContribution(std::static_cast<const >)
+  for (auto& term : ha)
+    std::visit(cppqedutils::overload{
+      [&] (const OneTimeDependentPropagator<RANK>& c) {c(t-t0,psi);},
+      [&] (const TwoTimeDependentPropagator<RANK>& c) {c(t,psi,t0);},
+    },std::get<1>(term));
 }
-*/
+
+
+
+/// A unary propagator that assumes that the operator that transforms between the pictures is diagonal
+template<bool IS_TWO_TIME>
+struct UnaryDiagonalPropagator
+{
+  using Diagonal = std::valarray<dcomp>;
+
+  using UpdateFunctional = std::conditional_t<IS_TWO_TIME,std::function<void(double,double,Diagonal&)>,std::function<void(double,Diagonal&)>>;
+  
+  UnaryDiagonalPropagator(size_t dim, UpdateFunctional updateDiagonal) : diagonal{dim}, updateDiagonal_{updateDiagonal} {}
+  
+  void operator()(double t, StateVectorView<1> psi, double t0) const requires (IS_TWO_TIME) {if (t!=t_ || t0!=t0_) {updateDiagonal_(t_=t,t0_=t0,diagonal);} psi*=diagonal;}
+
+  void operator()(double t, StateVectorView<1> psi) const requires (!IS_TWO_TIME) {if (t!=t_) {updateDiagonal_(t_=t,diagonal);} psi*=diagonal;}
+
+  mutable Diagonal diagonal;
+
+private:
+  mutable double t_=0, t0_=0;
+  
+  const UpdateFunctional updateDiagonal_;
+
+};
+
+
 
 } // structure
 
