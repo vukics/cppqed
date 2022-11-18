@@ -17,8 +17,8 @@ int main()
   MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
 
   Extents<5> 
-    filteredExtents{multiarray::filterIn<ra20741>(array.extents)},
-    filteredStrides{multiarray::filterIn<ra20741>(array.strides)};
+    filteredExtents{multiarray::filterIn<ra20741>(array.extents)}/*,
+    filteredStrides{multiarray::filterIn<ra20741>(array.strides)}*/;
 
   std::cerr<<array.dataView.size()<<std::endl;
 

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Algorithm.h"
+#include "Archive.h"
 
 #include <boost/hana.hpp>
 namespace hana=boost::hana;
@@ -201,6 +202,15 @@ public:
   
 private:
   StorageType data_;
+  
+  
+  friend class boost::serialization::access;
+  
+  template<class Archive> void save(Archive& ar, const unsigned int) const {ar & this->extents & data_;}
+
+  template<class Archive> void load(Archive& ar, const unsigned int) {ar & this->extents & data_; this->strides=calculateStrides(this->extents); this->offset=0;}
+
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
   
 };
 
