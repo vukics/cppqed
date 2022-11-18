@@ -1,13 +1,9 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFileDefault
 #pragma once
 
 #include "StateVector.h"
-
-#include "DensityOperatorStreamer.h"
-#include "QuantumJumpMonteCarloLogger.h"
+#include "QJMC_Logger.h"
 #include "QuantumTrajectory.h"
-#include "Structure.h"
 
 #include "StochasticTrajectory.h"
 
@@ -52,31 +48,28 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
 template<size_t RANK,
          ::structure::hamiltonian<RANK> HA, ::structure::liouvillian<RANK> LI, ::structure::expectation_values<RANK> EV,
          typename ODE_Engine, std::uniform_random_bit_generator RandomEngine>
-class QuantumJumpMonteCarlo
+struct QuantumJumpMonteCarlo
 {
-public:
-  QuantumJumpMonteCarlo(const QuantumJumpMonteCarlo&) = default; QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default; QuantumJumpMonteCarlo& operator=(QuantumJumpMonteCarlo&&) = default;
+  QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default; QuantumJumpMonteCarlo& operator=(QuantumJumpMonteCarlo&&) = default;
 
   using StreamedArray=::structure::EV_Array;
 
-  using StateVectorView=quantumdata::StateVectorView<RANK>;
+  using StateVector=quantumdata::StateVector<RANK>;
 
-  using EnsembleAverageElement = StateVectorView;
+  using EnsembleAverageElement = StateVector;
   using EnsembleAverageResult = quantumdata::DensityOperator<RANK>;
   
+  template <typename SV>
   QuantumJumpMonteCarlo(const HA& ha, const LI& li, const EV& ev,
-                  StateVectorView<RANK> psi, ///< the state vector to be evolved
-                  ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re,
-                  double dpLimit, double overshootTolerance, int logLevel)
+                        SV&& psi, ///< the state vector to be evolved
+                        ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re,
+                        double dpLimit, double overshootTolerance, qjmc::LogLevel logLevel)
   : ha_{ha}, li_{li}, ev_{ev},
-    psi_{psi},
+    psi_{std::forward<SV>(psi)},
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
-    logger_{logLevel,::structure::nAvr<::structure::LA_Li>(sys_)}
+    logger_{logLevel,li.size()}
   {
-    if (!t_ && li.size() )  { // On startup, dpLimit should not be overshot, either.
-      auto rates{calculateRates(li,0.,psi_)};
-      manageTimeStep(rates,0,0,std::clog,false);
-    }
+    if (!t_ && li.size() ) manageTimeStep(calculateRates(li,0.,psi_),0,0,std::clog,false);
   }
   
   auto getTime() const {return t_;}
@@ -88,56 +81,32 @@ public:
   
   std::ostream& streamParameters(std::ostream&) const;
 
-  /// Forwards to ::structure::Averaged::stream
-  auto stream(std::ostream& os, int precision) const {return ::structure::stream(sys_,getTime(),psi_,os,precision);}
+  auto stream(std::ostream& os, int precision) const {return ::structure::calculate_process_stream(ev_,getTime(),psi_,os,precision);}
   
-  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {StateVectorLow temp; iar & temp; psi_.getArray().reference(temp); return iar;}
+  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {return iar & psi_;}
 
   /** 
    * structure of QuantumJumpMonteCarlo archives:
    * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
    * (state should precede time in order to be compatible with array-only archives)
    */
-  auto& stateIO(cppqedutils::iarchive& iar)
-  {
-    StateVectorLow temp;
-    ode_.stateIO(iar & temp & t_) & re_.engine & logger_;
-    psi_.getArray().reference(temp);
-    t0_=t_; // A very important step!
-    return iar;
-  }
+  auto& stateIO(cppqedutils::iarchive& iar) {ode_.stateIO(iar & psi_ & t_) & re_.engine & logger_; t0_=t_; /* A very important step! */ return iar;}
   
-  auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & psi_.getArray() & t_) & re_.engine & logger_;}
+  auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & psi_ & t_) & re_.engine & logger_;}
 
-  /// Forwards to ::structure::Averaged::streamKey
-  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return ::structure::streamKey<::structure::LA_Av>(sys_,os,i);}
+  /// Forwards to ::structure::streamKey
+  std::ostream& streamKey(std::ostream& os) const {return ::structure::streamKey(ev_,os);}
 
   std::ostream& logOnEnd(std::ostream& os) const {return logger_.onEnd(ode_.logOnEnd(os));} ///< calls qjmc::Logger::onEnd
   
-  const StateVector& getStateVector() const {return psi_;}
-  
-  const qjmc::Logger& getLogger() const {return logger_;}
-  
-  void referenceNewStateVector(const StateVector& psi) {psi_.reference(psi);}
-  void setODE(ODE_Engine ode) {ode_=std::move(ode);}
-  
   double sampleRandom() {return distro_(re_.engine);}
-  
+
 private:
-  typedef std::tuple<int,StateVectorLow> IndexSVL_tuple;
-
-  typedef std::vector<IndexSVL_tuple> IndexSVL_tuples;
-
   StateVector averaged() const {return psi_;}
 
   void coherentTimeDevelopment(double Dt, std::ostream&);
   
-  const IndexSVL_tuples calculateSpecialRates(::structure::Rates* rates) const;
-
   bool manageTimeStep (const ::structure::Rates& rates, double tCache, double dtDidCache, std::ostream&, bool logControl=true);
-
-  void performJump (const ::structure::Rates&, const IndexSVL_tuples&, std::ostream&); // LOGICALLY non-const
-  // helpers to step---we are deliberately avoiding the normal technique of defining such helpers, because in that case the whole QuantumJumpMonteCarlo has to be passed
 
   double t_=0., t0_=0.;
   
@@ -145,7 +114,7 @@ private:
   const LI& li_;
   const EV& ev_;
   
-  StateVectorView<RANK> psi_;
+  StateVector psi_;
 
   ODE_Engine ode_;
 
@@ -196,7 +165,7 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, Entanglem
 
 }
  
-} // mcwd
+} // qjmc
 
 
 } // quantumtrajectory
@@ -240,21 +209,6 @@ void quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::coh
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-auto quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::calculateSpecialRates(::structure::Rates* rates) const -> const IndexSVL_tuples
-{
-  IndexSVL_tuples res;
-  for (int i=0; i<rates->size(); i++)
-    if ((*rates)(i)<0) {
-      StateVector psiTemp(psi_);
-      actWithJ(sys_,t_,psiTemp.getArray(),i);
-      res.push_back(IndexSVL_tuple(i,psiTemp.getArray()));
-      (*rates)(i)=cppqedutils::sqr(psiTemp.renorm());
-    } // psiTemp disappears here, but its storage does not, because the ownership is taken over by the StateVectorLow in the tuple
-  return res;
-}
-
-
-template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 bool quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::
 manageTimeStep(const ::structure::Rates& rates, double tCache, double dtDidCache, std::ostream& logStream, bool logControl)
 {
@@ -280,36 +234,35 @@ manageTimeStep(const ::structure::Rates& rates, double tCache, double dtDidCache
 }
 
 
-template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-void quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::performJump(const ::structure::Rates& rates, const IndexSVL_tuples& specialRates, std::ostream& logStream)
-{
-  double random=sampleRandom()/getDtDid();
-
-  int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
-  for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++))
-    ;
-
-  if(random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
-    --lindbladNo; auto i=boost::find_if(specialRates,[=](const IndexSVL_tuple& j){return lindbladNo==std::get<0>(j);});
-    if (i!=specialRates.end())
-      // special jump
-      psi_=std::get<1>(*i); // RHS already normalized above
-    else {
-      // normal  jump
-      ::structure::actWithJ(sys_,t_,psi_.getArray(),lindbladNo);
-      double normFactor=sqrt(rates(lindbladNo));
-      if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
-      psi_/=normFactor;
-    }
-
-    logger_.jumpOccured(logStream,t_,lindbladNo);
-  }
-}
-
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 void quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::step(double Dt, std::ostream& logStream)
 {
+  
+  auto performJump=[](const ::structure::Rates& rates, std::ostream& logStream)
+  {
+    double random=sampleRandom()/getDtDid();
+
+    int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
+    for (; random>0 && lindbladNo!=rates.size(); random-=rates(lindbladNo++)) ;
+
+    if(random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
+      --lindbladNo; auto i=boost::find_if(specialRates,[=](const IndexSVL_tuple& j){return lindbladNo==std::get<0>(j);});
+      if (i!=specialRates.end())
+        // special jump
+        psi_=std::get<1>(*i); // RHS already normalized above
+      else {
+        // normal  jump
+        ::structure::actWithJ(sys_,t_,psi_.getArray(),lindbladNo);
+        double normFactor=sqrt(rates(lindbladNo));
+        if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
+        psi_/=normFactor;
+      }
+
+      logger_.jumpOccured(logStream,t_,lindbladNo);
+    }
+  }
+
   const StateVector psiCache(psi_); // deep copy
   double tCache=t_, dtDidCache=getDtDid();
 

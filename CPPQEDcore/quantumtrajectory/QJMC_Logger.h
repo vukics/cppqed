@@ -1,23 +1,21 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFileDefault
-#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED
-#define CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED
+#pragma once
 
 #include "Archive.h"
 
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>
-#endif // BZ_HAVE_BOOST_SERIALIZATION
 
 #include <iosfwd>
 #include <list>
 
 
-namespace quantumtrajectory::mcwf {
+namespace quantumtrajectory::qjmc {
 
 
 class Logger;
+
+using LogLevel=std::bitset<3>;
 
 
 struct EnsembleLogger
@@ -68,8 +66,8 @@ public:
 
   void step(); ///< registers an MCWF step
 
-  void stepBack(std::ostream&, double dp, double    dtDid, double newDtTry, double t, bool logControl); ///< registers a step-back upon \link mcwf::Pars::overshootTolerance tolerance-overshoot\endlink
-  void overshot(std::ostream&, double dp, double oldDtTry, double newDtTry          , bool logControl); ///< registers a \link mcwf::Pars::dpLimit dpLimit\endlink overshoot
+  void stepBack(std::ostream&, double dp, double    dtDid, double newDtTry, double t, bool logControl); ///< registers a step-back upon \link qjmc::Pars::overshootTolerance tolerance-overshoot\endlink
+  void overshot(std::ostream&, double dp, double oldDtTry, double newDtTry          , bool logControl); ///< registers a \link qjmc::Pars::dpLimit dpLimit\endlink overshoot
 
   void processNorm(double norm); ///< bookkeeps maximal deviation of the stochastic state vector from norm 1
 
@@ -80,13 +78,11 @@ public:
   const jumpTrajectory& getTrajectory() const {return traj_;}
   
 private:
-#ifdef BZ_HAVE_BOOST_SERIALIZATION
   friend class boost::serialization::access;
   template<class Archive>
   void serialize(Archive& ar, const unsigned int) {ar & nMCWF_steps_ & nOvershot_ & nToleranceOvershot_
                                                       & dpMaxOvershoot_ & dpToleranceMaxOvershoot_ & normMaxDeviation_
                                                       & traj_;}
-#endif // BZ_HAVE_BOOST_SERIALIZATION
 
   friend struct EnsembleLogger;
   
@@ -101,9 +97,5 @@ private:
 };
 
 
-} // quantumtrajectory::mcwf
+} // quantumtrajectory::qjmc
 
-
-
-
-#endif // CPPQEDCORE_QUANTUMTRAJECTORY_MCWF_TRAJECTORYLOGGER_H_INCLUDED

@@ -5,8 +5,8 @@
 
 #include "DensityOperator.h"
 
-#include "Averaged.h"
 #include "EntanglementMeasures.h"
+#include "ExpectationValues.h"
 #include "QuantumTrajectory.h"
 #include "Structure.h"
 
