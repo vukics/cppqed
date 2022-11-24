@@ -20,16 +20,11 @@
  * "eta",eta,sqrt(cutoff)
  * ~~~
  */
-#ifndef CPPQEDCORE_STRUCTURE_DYNAMICSBASE_H_INCLUDED
-#define CPPQEDCORE_STRUCTURE_DYNAMICSBASE_H_INCLUDED
+#pragma once
 
-#include "ComplexExtensions.h"
-#include "FormDouble.h"
-
-#include <algorithm>
-#include <ranges>
-#include <tuple>
-#include <variant>
+#include "ExpectationValues.h"
+#include "Hamiltonian.h"
+#include "Liouvillian.h"
 
 
 namespace structure {
@@ -42,15 +37,13 @@ template <typename T>
 concept system_frequency_store = 
   std::ranges::forward_range<T> && 
   std::is_same_v<std::ranges::range_value_t<T>,SystemFrequencyDescriptor>;
-  
-  
+
 
 template <system_frequency_store SFS>
 double highestFrequency(const SFS& sfs)
 {
   return sfs.size() ? *std::ranges::max_element(sfs | std::views::transform( [](const auto& p) {return std::abs(get<1>(p)*get<2>(p));} ) ) : 0.;
 }
-
 
 
 template <system_frequency_store SFS>
@@ -61,9 +54,19 @@ std::ostream& stream(const SFS& sfs, std::ostream& os)
 }
 
 
+template <typename T, size_t RANK>
+concept quantum_system_dynamics = requires (T qsd)
+{
+  { getFreqs(qsd) } -> system_frequency_store;
+  // or even
+  // { GetFrequencies<T>{}(qsd) } -> system_frequency_store;
+  // which gives even more flexibility
+  { getHa(qsd) } -> hamiltonian<RANK>;
+  { getLi(qsd) } -> liouvillian<RANK>;
+  { getEV(qsd) } -> expectation_values<RANK>;  
+}
+
+
 
 } // structure
 
-
-
-#endif // CPPQEDCORE_STRUCTURE_DYNAMICSBASE_H_INCLUDED
