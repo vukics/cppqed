@@ -64,8 +64,22 @@ concept quantum_system_dynamics = requires (T qsd)
   { getHa(qsd) } -> hamiltonian<RANK>;
   { getLi(qsd) } -> liouvillian<RANK>;
   { getEV(qsd) } -> expectation_values<RANK>;  
-}
+};
 
+
+/// a simple implementation of the concept:
+template <size_t RANK>
+using QuantumSystemDynamics = std::tuple<
+  std::list<SystemFrequencyDescriptor>,
+  std::list<HamiltonianTerm<RANK>>,
+  std::list<Lindblad<RANK>>,
+  std::list<ExpectationValue<RANK>>
+>
+
+template <size_t RANK> auto getFreqs(const QuantumSystemDynamics<RANK>& qsd) {return std::get<0>(qsd);}
+template <size_t RANK> auto getHa   (const QuantumSystemDynamics<RANK>& qsd) {return std::get<1>(qsd);}
+template <size_t RANK> auto getLi   (const QuantumSystemDynamics<RANK>& qsd) {return std::get<2>(qsd);}
+template <size_t RANK> auto getEV   (const QuantumSystemDynamics<RANK>& qsd) {return std::get<3>(qsd);}
 
 
 } // structure

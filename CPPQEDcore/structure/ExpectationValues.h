@@ -4,22 +4,20 @@
 #include "LazyDensityOperator.h"
 
 #include <functional>
+#include <list>
 #include <valarray>
 
 
 namespace structure {
 
+using EV_Array = std::valarray<double>;
 
-template <size_t RANK, typename RESULT>
+template <size_t RANK, typename RESULT=EV_Array>
 using TimeDependentExpectationValue = std::function<RESULT(double t, LazyDensityOperator<RANK>)>;
 
 
-template <size_t RANK, typename RESULT>
+template <size_t RANK, typename RESULT=EV_Array>
 using TimeIndependentExpectationValue = std::function<RESULT(LazyDensityOperator<RANK>)>;
-
-
-using EV_Array = std::valarray<double>;
-
 
 
 /// From the size of label, it’s possible to infer the size of the array
@@ -27,11 +25,11 @@ using EV_Array = std::valarray<double>;
 template <size_t RANK>
 struct ExpectationValue
 {
-  std::list<std::string> label; // of the ExpectationValue, like photonnumber, sigmaoperator, etc.
-
-  std::optional<std::function<void(EV_Array&)>> process{}; // by default, std::nullopt
+  std::list<std::string> labels; // of the ExpectationValue, like photonnumber, sigmaoperator, etc.
 
   std::variant<TimeDependentExpectationValue<RANK,EV_Array>,TimeIndependentExpectationValue<RANK,EV_Array>> eva;
+
+  std::optional<std::function<void(EV_Array&)>> process{}; // by default, std::nullopt
 
 };
 

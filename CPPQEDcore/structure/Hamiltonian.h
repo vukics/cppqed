@@ -77,7 +77,7 @@ void applyPropagator(const HA& ha, double t, StateVectorView<RANK> psi, double t
 
 
 /// A unary propagator that assumes that the operator that transforms between the pictures is diagonal
-template<bool IS_TWO_TIME>
+template<bool IS_TWO_TIME=false>
 struct UnaryDiagonalPropagator
 {
   using Diagonal = std::valarray<dcomp>;

@@ -45,8 +45,7 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
 
 /// Implements a single Quantum-Jump Monte Carlo trajectory
 /** the stepwise adaptive algorithm is used, cf. Comp. Phys. Comm. 238:88 (2019) */
-template<size_t RANK,
-         ::structure::hamiltonian<RANK> HA, ::structure::liouvillian<RANK> LI, ::structure::expectation_values<RANK> EV,
+template<size_t RANK, ::structure::quantum_system_dynamics<RANK> QSD,
          typename ODE_Engine, std::uniform_random_bit_generator RandomEngine>
 struct QuantumJumpMonteCarlo
 {
@@ -59,13 +58,11 @@ struct QuantumJumpMonteCarlo
   using EnsembleAverageElement = StateVector;
   using EnsembleAverageResult = quantumdata::DensityOperator<RANK>;
   
-  template <typename SV>
-  QuantumJumpMonteCarlo(const HA& ha, const LI& li, const EV& ev,
-                        SV&& psi, ///< the state vector to be evolved
+  template <typename Q, typename SV>
+  QuantumJumpMonteCarlo(Q&& qsd, SV&& psi, ///< the state vector to be evolved
                         ODE_Engine ode, randomutils::EngineWithParameters<RandomEngine> re,
                         double dpLimit, double overshootTolerance, qjmc::LogLevel logLevel)
-  : ha_{ha}, li_{li}, ev_{ev},
-    psi_{std::forward<SV>(psi)},
+  : qsd_{std::forward<Q>(qsd)}, psi_{std::forward<SV>(psi)},
     ode_{ode}, re_{re}, dpLimit_{dpLimit}, overshootTolerance_{overshootTolerance},
     logger_{logLevel,li.size()}
   {
@@ -110,9 +107,7 @@ private:
 
   double t_=0., t0_=0.;
   
-  const HA& ha_;
-  const LI& li_;
-  const EV& ev_;
+  QSD qsd_;
   
   StateVector psi_;
 

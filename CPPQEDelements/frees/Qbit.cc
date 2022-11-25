@@ -1,13 +1,50 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Qbit_.h"
 
-#include "ParsQbit.h"
+
+using namespace cppqedutils; using namespace structure;
 
 
-using namespace cppqedutils; using std::make_shared;
+TimeIndependentTerm<1> qbit::diagonalH(dcomp z)
+{
+  return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(1)-=z*psi(1);};
+}
 
+TimeIndependentTerm<1> qbit::offDiagonalH(dcomp eta)
+{
+  return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(0)+=-conj(eta)*psi(1); dpsidt(1)+=eta*psi(0);};
+}
+
+UnaryDiagonalPropagator<> qbit::propagator(dcomp z)
+{
+  return {2,[=] (double t, UnaryDiagonalPropagator<>::Diagonal& d) {d[0]=1; d[1]=exp(-z*t);}};
+}
+
+
+TimeIndependentJump<1> qbit::sigmaJump(double gamma_m) { return [=] (StateVectorView<1> psi) {psi(0)=sqrt(2.*gamma_m)*psi(1); psi(1)=0;}; }
+
+TimeIndependentJump<1> qbit::sigmaPlusJump(double gamma_p) { return [=] (StateVectorView<1> psi) {psi(1)=sqrt(2.*gamma_p)*psi(0); psi(0)=0;}; }
+
+TimeIndependentJump<1> qbit::sigma_zJump(double gamma_phi) { return [=] (StateVectorView<1> psi) {double fact=sqrt(2.*gamma_phi); psi(0)*=fact; psi(1)*=-fact;}; }
+
+
+TimeIndependentSuperoperator<1> qbit::sigmaSuperoperator(double gamma_m)
+{
+  return [=] (DensityOperatorConstView<1> rho, DensityOperatorView<1> drhodt) {drhodt(0,0)+=2.*gamma_m*rho(1,1);};
+}
+
+TimeIndependentSuperoperator<1> qbit::sigmaPlusSuperoperator(double gamma_p)
+{
+  return [=] (DensityOperatorConstView<1> rho, DensityOperatorView<1> drhodt) {drhodt(1,1)+=2.*gamma_p*rho(0,0);};
+}
+
+
+
+/*
 
 namespace qbit {
+
+
 
 
 ///////////
@@ -33,22 +70,6 @@ const Averages Averaged::average_v(NoTime, const LazyDensityOperator& matrix) co
 namespace {
 
 
-auto sigmaJump(double gamma_perpendicular) { return [=](qbit::StateVectorLow& psi) {
-  psi(0)=sqrt(2.*gamma_perpendicular)*psi(1);
-  psi(1)=0;
-};}
-
-
-auto sigmaPlusJump(double gamma_pump) { return [=](qbit::StateVectorLow& psi) {
-  psi(1)=sqrt(2.*gamma_pump)*psi(0);
-  psi(0)=0;
-};}
-
-
-auto sigma_zJump(double gamma_parallel) { return [=](qbit::StateVectorLow& psi) {
-  double fact=sqrt(2.*gamma_parallel);
-  psi(0)*= fact; psi(1)*=-fact;
-};}
 
 static constexpr auto dummyRate=[](const qbit::LazyDensityOperator&) {return -1;};
 
@@ -303,3 +324,4 @@ StateVector init(dcomp psi1)
 
 
 } // qbit
+*/
