@@ -28,7 +28,7 @@ int main()
     std::ranges::generate(array.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};});
   }
 
-  std::cerr<<array(1,1,2,2,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
+  std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
   
   {
     std::cerr<<"*** Simple range: ***"<<std::endl;
@@ -125,6 +125,20 @@ int main()
 
     auto res{directProduct<4,5>(a1,a2)};
 
+  }
+  
+  {
+    const MultiArray<dcomp,9>& carray=array;
+    
+    auto v{vectorize(array)};
+    auto cv{vectorize(carray)};
+  }
+    
+  {
+    MultiArray<dcomp,8> array1{{5,2,3,2,5,2,1,2}};
+    const MultiArray<dcomp,8>& carray1 = array1;
+    auto m{matricize(array1)};
+    auto cm{matricize(carray1)};
   }
   
 }
@@ -250,8 +264,8 @@ void g()
   MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
 
   Extents<5> 
-    filteredExtents{multiarray::filterIn<ra20741>(array.extents)},
-    filteredStrides{multiarray::filterIn<ra20741>(array.strides)};
+    filteredExtents{multiarray::filterIn<ra20741>(array.extents)}/*,
+    filteredStrides{multiarray::filterIn<ra20741>(array.strides)}*/;
 
   std::cerr<<calcIndex(filteredExtents,1,2,3,2,0)<<std::endl;
 }

@@ -18,6 +18,7 @@ namespace hana=boost::hana;
 #include <functional>
 #include <span>
 #include <stdexcept>
+//#include <valarray>
 #include <vector>
 
 
@@ -110,7 +111,7 @@ public:
 
   size_t offset;
   
-  std::span<T> dataView; //< the storage can eventually become a kokkos::View
+  std::span<T> dataView;
   
 };
 
@@ -147,6 +148,8 @@ requires ( !std::is_const<T>() )
 class MultiArray : public MultiArrayConstView<T,RANK>
 {
 public:
+  /// the storage might eventually become a kokkos::View or, a std::valarray
+  /** TODO: check whether `std::vector` incurs too much overhead */
   using StorageType = std::vector<T>;
   
   MultiArray(const MultiArray&) = delete; MultiArray& operator=(const MultiArray&) = delete;
@@ -198,6 +201,7 @@ public:
   friend bool operator==(const MultiArray& m1, const MultiArray& m2)
   {
     return m1.extents==m2.extents && m1.data_==m2.data_;
+    // (m1.data_==m2.data_).min(); // this seems to be the idiom to convert std::valarray<bool> to a single bool
   }
   
 private:
@@ -428,7 +432,6 @@ auto sliceRange(MultiArrayView<T,RANK> mav) requires multiarray::consistent<reta
 {
   return sliceRange<retainedAxes>(mav,multiarray::calculateSlicesOffsets<retainedAxes>(mav.extents,mav.strides));
 }
-
 
 
 } // cppqedutils

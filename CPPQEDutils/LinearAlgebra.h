@@ -4,18 +4,12 @@
 
 #include "ComplexExtensions.h"
 
-#include <Eigen/Dense>
-
 #include <boost/operators.hpp>
 
 #include <optional>
 
 
 namespace linalg {
-
-
-using CMatrix=Eigen::MatrixX<dcomp>;
-using CVector=Eigen::VectorX<dcomp>;
 
 
 /// Operator aggregate for a complex vector space built on top of \refBoost{Boost.Operator,utility/operators.htm}.
