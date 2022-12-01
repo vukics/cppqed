@@ -237,7 +237,6 @@ ALIASES                = "tparamRANK=\tparam RANK arity of the Hilbert space" \
                          "refBoostConstruct{2}=\refBoost{<tt>\1</tt>,\2}" \
                          "refStdCpp{2}=[\1](http://www.cplusplus.com/reference/\2)" \
                          "refStdCppConstruct{2}=\refStdCpp{<tt>\1</tt>,\2}" \
-                         "GSL=[GSL](http://www.gnu.org/software/gsl/)" \
                          "coreMainPage=../../core/html/index.html" \
                          "elementsMainPage=../../elements/html/index.html" \
                          "cpypyqedMainPage=../../cpypyqed/html/index.html"

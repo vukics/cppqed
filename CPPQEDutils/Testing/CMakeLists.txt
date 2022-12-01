@@ -11,7 +11,7 @@ endmacro()
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
 set(TESTING_EXECUTABLES
-    EvolvedTest EvolvedTestGSL MultiIndexIteratorNew HarmonicOscillatorRandomTimes HarmonicOscillatorComplex HarmonicOscillatorComplexGSL)
+    EvolvedTest MultiIndexIteratorNew HarmonicOscillatorRandomTimes HarmonicOscillatorComplex)
 
 foreach(S ${TESTING_EXECUTABLES})
   add_executable(${S} ${S}.cc)
@@ -20,11 +20,7 @@ endforeach()
 
 add_test_utils(evolved_nonlinear_ode_boost EvolvedTest)
 
-add_test_utils(evolved_nonlinear_ode_gsl EvolvedTestGSL)
-
 add_test_utils(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
-
-add_test_utils(harmonic_oscillator_compare_ode_with_exact_solution_gsl HarmonicOscillatorComplexGSL)
 
 add_test_utils(harmonic_oscillator_random_times HarmonicOscillatorRandomTimes)
 

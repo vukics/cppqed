@@ -10,10 +10,6 @@
 #include "pcg_random.hpp"
 #include "XoshiroCpp.hpp"
 
-#ifdef CPPQED_HAS_GSL
-#include <gsl/gsl_rng.h>
-#endif // CPPQED_HAS_GSL
-
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/array.hpp>
 
@@ -29,51 +25,6 @@ namespace randomutils {
 template<typename Engine, typename BASE>
 struct Pars;
 
-
-#ifdef CPPQED_HAS_GSL
-
-/// Wraps GSL random number generators into the concept [UniformRandomBitGenerator](http://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator)
-class GSL_Engine 
-{
-public:
-  using result_type=unsigned long;
-  
-  explicit GSL_Engine(result_type s/*, const gsl_rng_type* ran_gen_type=gsl_rng_taus2*/);
-
-  void seed(result_type value);
-
-  result_type operator()();
-  
-  result_type min() const;
-  result_type max() const;
-
-  void write(std::ostream& os) const;
-
-  void read(std::istream& is);
-  
-private:
-  const std::shared_ptr<gsl_rng> ranGen_;
-  const std::string name_;
-  
-};
-
-
-inline std::ostream& operator<<(std::ostream& os, const GSL_Engine& r) {r.write(os); return os;}
-inline std::istream& operator>>(std::istream& is, GSL_Engine& r) {r.read(is); return is;}
-
-
-#define CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
-#define CPPQEDCORE_UTILS_RANDOM_H_RANDOMENGINE GSL_Engine
-#define CPPQEDCORE_UTILS_RANDOM_H_STRING "GSL_Engine state"
-
-#include "Random.h"
-
-} // randomutils
-
-#endif // CPPQED_HAS_GSL
-
-
-namespace randomutils {
 
 template<typename Distribution, typename Engine, typename Array, typename... DCP>
 Engine& fill(Array a, Engine& re, DCP&&... dcp)
@@ -94,9 +45,6 @@ void fill(Array a, unsigned long seed, DCP&&... dcp)
 
 template<typename Engine>
 constexpr auto EngineID_v = std::nullopt;
-
-template<>
-inline const std::string EngineID_v<GSL_Engine> = "GSL_Taus2";
 
 template<>
 inline const std::string EngineID_v<std::mt19937_64> = "STD_MT19937_64";

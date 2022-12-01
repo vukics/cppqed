@@ -5,7 +5,7 @@
 
 /// The evolve methods use these engines, but they can still be modified in a script by defining these macros before including Evolution.h
 #ifndef QUANTUM_EVOLUTION_DEFAULT_RANDOM_ENGINE
-#define QUANTUM_EVOLUTION_DEFAULT_RANDOM_ENGINE pcg64 // XoshiroCpp::Xoshiro256PlusPlus // cppqedutils::GSL_RandomEngine
+#define QUANTUM_EVOLUTION_DEFAULT_RANDOM_ENGINE pcg64 // XoshiroCpp::Xoshiro256PlusPlus
 #endif
 
 #ifndef QUANTUM_EVOLUTION_DEFAULT_ODE_ENGINE
@@ -16,7 +16,6 @@
 #include "Master.h"
 #include "MCWF_Trajectory.h"
 
-#include "ODE_GSL.h"
 #include "TMP_Tools.h"
 
 #include <iosfwd>
