@@ -4,3 +4,6 @@
 [submodule "CPPQEDutils/thirdPartyRandom/Xoshiro-cpp"]
 	path = CPPQEDutils/thirdParty/Xoshiro-cpp
 	url = https://github.com/vukics/Xoshiro-cpp.git
+[submodule "CPPQEDutils/thirdParty/popl"]
+	path = CPPQEDutils/thirdParty/popl
+	url = git@github.com:vukics/popl.git

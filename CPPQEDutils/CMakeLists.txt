@@ -10,7 +10,7 @@ find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams json)
 
 find_package(Eigen3 3.3 REQUIRED)
 
-add_subdirectory(thirdPartyRandom)
+add_subdirectory(thirdParty)
 
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>

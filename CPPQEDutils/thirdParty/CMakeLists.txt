@@ -2,4 +2,4 @@
 
 add_library(ThirdPartyRandom INTERFACE)
 
-target_include_directories(ThirdPartyRandom INTERFACE Xoshiro-cpp pcg-cpp/include)
+target_include_directories(ThirdPartyRandom INTERFACE Xoshiro-cpp pcg-cpp/include popl/include)
