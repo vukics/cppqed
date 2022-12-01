@@ -10,9 +10,9 @@ cmake_minimum_required (VERSION 3.12)
 # also the ABI version of the library is set (c.f. \ref ABI).
 
 # MAJOR - the grand version of C++QED, as in v2
-set(CPPQED_VERSION_MAJOR 2)
+set(CPPQED_VERSION_MAJOR 3)
 # MINOR - the milestone release, as in v2m10
-set(CPPQED_VERSION_MINOR 120)
+set(CPPQED_VERSION_MINOR 0)
 # PATCH - should be increased on every snapshot package release, reset on milestone change
 set(CPPQED_VERSION_PATCH 0)
 # Full C++QED version
@@ -20,48 +20,6 @@ set(CPPQED_VERSION
   "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}.${CPPQED_VERSION_PATCH}")
 # MAJOR.MINOR, at the moment mainly distinguishes stable (2.10) from development (2.100)
 set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
-
-# ABI versioning scheme
-#
-# Adopt the shared library versioning scheme of libtool
-# - CURRENT  - the current ABI version
-# - AGE      - number of versions backwards that CURRENT is compatible with
-# - REVISION - patch revision
-#
-# *Rationale*
-#
-# Bugfixes and Patches which do not affect ABI:
-#  * increase REVISION
-#
-# Symbols added to library (i.e. binary compatibility NOT broken):
-#  * increase AGE
-#  * remember to call dh_makeshlibs with -V packagename (>=packageversion) when packaging
-#
-# Symbols removed or changed (i.e. binary compatibility broken):
-#  * set CURRENT -> CURRENT + AGE + 1, reset AGE
-#
-# On every change of AGE or CURRENT: reset REVISION
-#
-# The library version (.so.X.Y.Z) is `{CURRENT-AGE}.{AGE}.{REVISION}`, here named
-# `{ABI_MAJOR}.{ABI_MINOR}.{ABI_MICRO}`. This way it is ensured that ABI_MAJOR only changes
-# when binary compatibility is broken.
-#
-# The SONAME of the library always is: `libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}.so.${ABI_MAJOR}`
-# and the packages are named `libC++QED-${MAJOR_VERSION}.${MINOR_VERSION}-${ABI_MAJOR}[-dev]`
-
-# The current ABI version
-set(CPPQED_ABI_CURRENT 6)
-# number of Versions backwards that CURRENT is compatible with
-set(CPPQED_ABI_AGE 0)
-# Patch revision
-set(CPPQED_ABI_REVISION 0)
-# Set to ABI_CURRENT - ABI_AGE
-set(CPPQED_ABI_MAJOR)
-math(EXPR CPPQED_ABI_MAJOR "${CPPQED_ABI_CURRENT}-${CPPQED_ABI_AGE}")
-# Same as ABI_AGE
-set(CPPQED_ABI_MINOR "${CPPQED_ABI_AGE}")
-# Same as ABI_REVISION
-set(CPPQED_ABI_MICRO "${CPPQED_ABI_REVISION}")
 
 project(cppqed VERSION ${CPPQED_VERSION}  
                LANGUAGES CXX
@@ -134,7 +92,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/cppqedGitSHA1.cc.in" "${CMAKE_
 add_library(cppqedGitSHA1 OBJECT "${CMAKE_CURRENT_BINARY_DIR}/cppqedGitSHA1.cc")
 
 add_compile_options(-Wall -Wextra -Wpedantic -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wno-ignored-qualifiers 
--Wno-sign-compare -Wno-overloaded-virtual -Wunreachable-code -Wno-unknown-pragmas -Wno-c++11-narrowing -Wno-narrowing)
+-Wno-sign-compare -Wno-overloaded-virtual -Wunreachable-code -Wno-unknown-pragmas -Wno-narrowing)
 
 #macro(add_executable S)
   #if (${cmake_build_type_tolower} STREQUAL debug)
