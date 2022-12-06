@@ -1,124 +1,34 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Pars.h"
 
-#include "BooleanNegatedProxy.h"
+// #include "BooleanNegatedProxy.h"
 
-#include "IO_Manip.h"
 #include "Version.h"
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
+
+using namespace popl;
 
 
-using namespace std;
+std::shared_ptr<Switch> help_switch, version_switch;
 
-auto parameters::Table::findSubscript(const std::string& s) const -> Impl::const_iterator 
+
+OptionParser optionParser(std::string pre, std::string post)
 {
-  return std::ranges::find_if(table_,[=,&s] (const Base& b) {return b.getS()==s;});
-}
-
-
-const parameters::Base&
-parameters::Table::operator[](const string& s) const
-{
-  auto i=findSubscript(s);
-  if (i==table_.end()) throw UnrecognisedParameterException(s);
-  return *i;
-}
-
-
-parameters::Table::Table() : table_(), smwidth_(0), tmwidth_(6), dmwidth_(0), parsedCommandLine_(std::make_shared<std::string>("")) // tmwidth_ cf bool!
-{
-  IO_Manipulator::_(cout);
-  IO_Manipulator::_(cerr);
-} 
-
-
-void parameters::Table::printList() const
-{
-  cout<<"\nhelp\t\tdisplay this list\nversion\t\tdisplay version information\n\n";
-  std::ranges::for_each(table_,[=,this] (const Base& b) {b.print(smwidth_,tmwidth_,dmwidth_);});
-  cout<<endl;
-}
-
-
-///////////////////////////////////
-//
-// Boolean Typed Specialization
-//
-///////////////////////////////////
-
-
-template<>
-void parameters::Typed<bool>::print_v(size_t smw, size_t tmw, size_t dmw) const
-{
-  using namespace std;
-  cout<<setw(smw+3)<<left<<getS()
-      <<setw(tmw+3)<<left<<"switch"
-      <<setw(dmw+3)<<left<<getD()<<v_<<endl;
-}
-
-
-template<>
-void parameters::Typed<bool>::read_v(std::istream&)
-{
-  v_=true;
-}
-
-
-template<>
-void parameters::Typed<cppqedutils::BooleanNegatedProxy>::read_v(std::istream&)
-{
-  v_=true;
-}
-
-
-bool& parameters::Table::add(const std::string& s, const std::string& d, bool v)
-{
-  bool& res=add<bool>(s,d,v);
-  add("no_"+s,d,cppqedutils::BooleanNegatedProxy(res));
+  OptionParser res{pre+versionHelper()+post};
+  help_switch=res.add<Switch>("h", "help", "list physical parameters & program options");
+  version_switch=res.add<Switch>("v", "version", "display version information");
   return res;
 }
 
+//    if (temp=="help") {
+//      table.printList(); exit(0);
+//    }
+//    if (temp=="version") {
+//      cerr << versionHelper(); exit(0);
+//    }
+// }
 
-////////////////////////////
-//
-// TitleLine specializations
-//
-////////////////////////////
-
-namespace {
-
-// A tagging class for introducing dummy parameters into the Table, which simply create a newline and a title at the listing.
-struct TitleLine {}; 
-
-}
-
-template<>
-void parameters::Typed<TitleLine>::print_v(size_t, size_t, size_t) const
-{
-  using namespace std;
-  cout<<endl<<"*** "<<getS()<<endl;
-}
-
-
-template<>
-void parameters::Typed<TitleLine>::read_v(std::istream&)
-{
-  throw UnrecognisedParameterException(getS());
-}
-
-
-parameters::Table& parameters::Table::addTitle(const std::string& s, const std::string& mod)
-{
-  auto i=findSubscript(s+mod);
-  if (i==table_.end()) table_.push_back(new Typed<TitleLine>(s+mod,"",TitleLine()));
-  else throw AttemptedRecreationOfParameterException(s);
-  return *this;
-}
-
+/*
 
 void parameters::update(parameters::Table& table, int argc, char* argv[], const string& prefix)
 {
@@ -159,4 +69,4 @@ void parameters::update(parameters::Table& table, int argc, char* argv[], const 
         abort();
       }
   }
-}
+}*/
