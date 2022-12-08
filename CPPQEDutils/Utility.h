@@ -7,4 +7,8 @@ namespace cppqedutils {
 template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
 
 
+/// An empty base class with a constructor of arbitrary signature
+struct Empty { template <typename... T> Empty(T&&... ) {} };
+
+
 } // cppqedutils
