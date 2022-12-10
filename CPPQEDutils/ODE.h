@@ -3,6 +3,7 @@
 
 #include "Archive.h"
 #include "Pars.h"
+#include "Utility.h"
 
 #include <boost/numeric/odeint.hpp>
 
@@ -60,23 +61,24 @@ concept engine =
   requires ( T&& t, Time deltaT, std::ostream& logStream, System sys, Time& time, const State& stateIn, State&& stateOut ) { 
     { step(t,deltaT,logStream,sys,time,stateIn,stateOut) };*/ };
 
- 
-/// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a parameters::Table
+
+
+/// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a popl::OptionParser
 /** If necessary, it can be made customizable by an additional template parameter, but a very sensible default can be provided */
-struct Pars
+template <typename BASE=Empty>
+struct Pars : BASE
 {
   double
     epsRel, ///< relative precision of ODE stepping
     epsAbs; ///< absolute precision ”
 
-  Pars(popl::OptionParser& op)
+  Pars(popl::OptionParser& op) : BASE{op}
   {
-    op.add<popl::Value<double>>("","epsRel","ODE engine relative precision",epsRelDefault,&epsRel);
-    op.add<popl::Value<double>>("","epsAbs","ODE engine absolute precision",epsAbsDefault,&epsAbs);
+    addTitle(add(add(op,
+      "epsAbs","ODE engine absolute precision",epsAbsDefault,&epsAbs),
+      "epsRel","ODE engine relative precision",epsRelDefault,&epsRel),
+      "ODE_Engine generic parameters");
   }
-   /* : epsRel(p.addTitle("ODE_Engine generic parameters",mod).add("eps",mod,"ODE stepper relative precision",epsRelDefault)),
-      epsAbs(p.add("epsAbs",mod,"ODE stepper absolute precision",epsAbsDefault)),
-      lc(p.add("lc",mod,"logging level",0)) {}*/
       
 };
 
@@ -236,7 +238,8 @@ struct MakeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
       make_controlled(epsRel,epsAbs,ErrorStepper()),epsRel,epsAbs};
   }
 
-  static auto _(const Pars& p) {return _(p.epsRel,p.epsAbs);}
+  template <typename P>
+  static auto _(const P& p) {return _(p.epsRel,p.epsAbs);}
 
   
 };

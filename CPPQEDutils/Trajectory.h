@@ -1,12 +1,9 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Defines the basic classes of the trajectory-bundle}
-#ifndef CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED
-#define CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED
+#pragma once
 
 #include "Archive.h"
 #include "CommentingStream.h"
 #include "FormDouble.h"
-#include "IO_Manip.h"
 #include "ODE.h"
 #include "Version.h"
 
@@ -28,99 +25,103 @@
 namespace hana=boost::hana;
 
 
-/// The trajectory-bundle
 namespace cppqedutils {
 
 
-// TODO: define concept of trajectory
-  
+template <typename T> concept time_keeper = requires (const T& t) { { getTime(t) } -> std::convertible_to<double>; };
 
-inline auto has_step = hana::is_valid([](auto&& obj) -> decltype(obj.step(1.0,std::clog)) { });
-inline auto has_advance = hana::is_valid([](auto&& obj) -> decltype(obj.advance(1.0,std::clog)) { });
+template <typename T> concept adaptive_time_keeper = adaptive_timestep_keeper<T> && time_keeper<T>;
 
 
-/// \name Generic evolution functions
-//@{
-/// advances for exactly time `deltaT`
-/** \tparam Trajectory type of the trajectory to advance. Enabled only if it has `step(double, std::ostream&)` */
-template<typename Trajectory>
-void advance(Trajectory& traj,
-            std::enable_if_t<decltype(has_step(traj))::value,double> deltaT,
-            std::ostream& logStream=std::clog)
-{
-  double endTime=traj.getTime()+deltaT;
-  while (double dt=endTime-traj.getTime()) traj.step(dt,logStream);
-}
+// single adaptive step of at most deltaT
+template <typename T>
+concept adaptive_steppable = adaptive_time_keeper<T> && requires (T&& t, double deltaT, std::ostream& os) { step(t,deltaT,os); };
+
 
 
 /// advances for exactly time `deltaT`
-/** \tparam Trajectory type of the trajectory to advance. Enabled only if it has `advance(double, std::ostream&)` */
-template<typename Trajectory>
-void advance(Trajectory& traj,
-            std::enable_if_t<!decltype(has_step(traj))::value && decltype(has_advance(traj))::value,double> deltaT,
-            std::ostream& logStream=std::clog)
+template<adaptive_steppable T>
+void advance(T& traj, double deltaT, std::ostream& logStream)
 {
-  traj.advance(deltaT,logStream);
+  double endTime=getTime(traj)+deltaT;
+  while (double dt=endTime-getTime(traj)) step(traj,dt,logStream);
 }
 
 
-/// advances up to exactly time `t` \copydetails advance
-template<typename Trajectory>
-void advanceTo(Trajectory& traj, double t, std::ostream& logStream=std::clog)
-{
-  advance(traj,t-traj.getTime(),logStream);
-}
-//@}
-
-  
 namespace trajectory {
   
 
+// the basic trajectory concept
+template <typename T>
+concept uniform_step =
+  adaptive_time_keeper<T> && 
+  intro_outro_streamer<T> && 
+  requires (T&& t, double deltaT, std::shared_ptr<std::istream> ifs, std::shared_ptr<std::ostream> ofs, std::ostream& os, int precision)
+  {
+    advance(t,deltaT,os); readViaSStream(t,ifs); writeViaSStream(t,ofs);
+    { stream(t,os,precision) } -> std::convertible_to<typename T::StreamedArray>;
+  };
+
+template <typename T>
+concept adaptive = uniform_step<T> && adaptive_steppable<T>;
+
+
+enum struct StreamFreqType {DT_MODE=0, DC_MODE=1};
+
+enum struct RunLengthType {T_MODE=0, NDT_MODE=1};
+
+
+/// advances up to exactly time `t` \copydetails advance
+template<uniform_step Trajectory>
+void advanceTo(Trajectory& traj, double t, std::ostream& logStream) { advance(traj,t-traj.getTime(),logStream); }
+
+
+
 /// Parameters corresponding to the different versions of run()
-template <typename BASE = ode_engine::Pars<>>
+template <typename BASE = Empty>
 struct Pars : BASE
 {
-  double &T; ///< endtime of the run
-  int &dc;
-  double &Dt;
-  long &NDt; ///< number of deltaT intervals in \link trajectory::Trajectory::run deltaT-mode\endlink
-  std::string &ofn, &initialFileName;
+  double T; ///< endtime of the run
+  unsigned dc;
+  double Dt;
+  size_t NDt; ///< number of deltaT intervals in \link trajectory::Trajectory::run deltaT-mode\endlink
+  std::string ofn, initialFileName;
 
-  formdouble::Zero &precision; ///< the overall precision of trajectory stream \see FormDouble::overallPrecision
+  bool streamInfo=true, firstStateStream=true;
 
-  bool &streamInfo, &firstStateStream;
-
-  unsigned &sdf;
+  unsigned sdf;
 
   double
-    &autoStopEpsilon, ///< relative precision for autostopping
-    &autoStopEpsilonAbs; ///< absolute precision for autostopping (everything below is not considered)
+    autoStopEpsilon, ///< relative precision for autostopping
+    autoStopEpsilonAbs; ///< absolute precision for autostopping (everything below is not considered)
 
-  unsigned &autoStopRepetition; ///< number of streamed lines repeated within relative precision before autostopping – 0 means no autostopping
+  unsigned autoStopRepetition; ///< number of streamed lines repeated within relative precision before autostopping – 0 means no autostopping
   
-  Pars(parameters::Table& p, const std::string& mod="")
-  : BASE{p,mod},
-    T(p.addTitle("Trajectory",mod).add("T",mod,"Simulated time",1.)),
-    dc(p.add("dc",mod,"Number of steps between two streamings",10)),
-    Dt(p.add("Dt",mod,"Timestep between two streamings",.1)),
-    NDt(p.add("NDt",mod,"Number of steps in Dt mode",0L)),
-    ofn(p.add<std::string>("o",mod,"Output file name for Trajectory, when empty, cout","")),
-    initialFileName(p.add<std::string>("initialFileName",mod,"Trajectory initial file name","")),
-    precision(p.add("precision",mod,"General precision of output",formdouble::Zero(FormDouble::defaultPrecision))),
+  Pars(popl::OptionParser& op) : BASE{op}
+  {
+    addTitle(add(add(add(add(add(add(op,
+     "initialFileName","Trajectory initial file name",std::string{},&initialFileName),
+     "o","Output file name for Trajectory, when empty, cout",std::string{},&ofn),
+     "NDt","Number of steps in Dt mode",size_t{0},&NDt),
+     "Dt","Timestep between two streamings",.1,&Dt),
+     "dc","Number of steps between two streamings",10u,&dc),
+     "T","Simulated time",1.,&T),
+     "Trajectory");
+/*    
     streamInfo(p.add("streamInfo",mod,"Whether to stream header for trajectories",true)),
     firstStateStream(p.add("firstStateStream",mod,"Streams trajectory state at startup",true)),
     sdf(p.add("sdf",mod,"State output frequency",0u)),
     autoStopEpsilon(p.add("autoStopEpsilon",mod,"Relative precision for autostopping",ode_engine::epsRelDefault)),
     autoStopEpsilonAbs(p.add("autoStopEpsilonAbs",mod,"Absolute precision for autostopping",ode_engine::epsAbsDefault)),
     autoStopRepetition(p.add("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)),
-    parsedCommandLine_(p.getParsedCommandLine())
-    {};
+    parsedCommandLine_(p.getParsedCommandLine())*/
+  }
 
   /// Corresponds to parameters::Table::getParsedCommandLine
-  const std::string getParsedCommandLine() const {return *parsedCommandLine_;}
+/*  const std::string getParsedCommandLine() const {return *parsedCommandLine_;}
 
 private:
-  const parameters::Table::ParsedCommandLine parsedCommandLine_;
+  const parameters::Table::ParsedCommandLine parsedCommandLine_;*/
 
 };
 
@@ -160,18 +161,16 @@ private:
 };
 
 
-template <typename Trajectory>
+template <uniform_step Trajectory>
 struct MakeSerializationMetadata;
 
 
 struct StoppingCriterionReachedException {};
 
 
-} // trajectory
 
-
-namespace trajectory {
-
+template <typename T, typename TRAJ>
+concept autostop_handler = uniform_step<TRAJ> && requires (T&& t, typename TRAJ::StreamedArray sa) { t(sa); };
 
 /// Generic implementation of AutostopHandler
 /**
@@ -234,47 +233,22 @@ template<typename SA>
 using TemporalStreamedArray=std::list<std::tuple<double,double,SA>>;
 
 
-/// Running in deltaT mode (streams in equal time intervals) for a certain time \related Trajectory
-/**
- * This function manifests all the basic features of Adaptive and the whole idea behind the trajectory bundle.
- *
- * A Trajectory can
- * - be \link Trajectory::advance advanced\endlink (propagated in time by given time intervals)
- * - \link Trajectory::readState perform i/o of its entire state\endlink, that is, a bunch of information necessary for resuming a Trajectory from a certain time instant
- * - \link Trajectory::stream stream relevant physical and numerical information\endlink about its actual state at any time (e.g. a set of quantum averages in the case of a quantum trajectory)
- *
- * \note While the entire state can be huge (e.g. the state vector or density operator in the case of a quantum trajectory) the relevant information in an actual numerical experiment
- * is usually much less (a set of quantum averages that doesn’t entirely define the state).
- *
- * Furthermore, a Trajectory can
- * - provide information about its \link Trajectory::getTime time\endlink and \link Trajectory::getDtDid last performed timestep\endlink
- * - \link Trajectory::streamParameters print a header\endlink summarizing its physical and numerical parameters together with a key to the set of relevant physical information streamed during the run
- * - \link Trajectory::logOnEnd print a log\endlink at the end summarizing overall (e.g. time-averaged) physical and numerical data during the run
- *
- * \see Simulated for a full generic implementation of Trajectory together with a small tutorial
- * 
- * \link Trajectory::writeState state streams\endlink into file named `ofn.state`
- *
- */
-template<typename TRAJ, // type of trajectory
-         typename LENGTH, // type specifying the length of the run
-         typename DELTA, // type specifying the frequency of stream
-         typename AutostopHandler // should support operator()(const typename T::TemporalStreamedArray &)
-         >
+/// The most general run function
+template<uniform_step TRAJ, RunLengthType RLT, StreamFreqType SFT, autostop_handler<TRAJ> AH >
 TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>
 run(TRAJ&& traj, ///< the trajectory to run
-    LENGTH length, ///< length of run
-    DELTA streamFreq, ///< interval between two \link Trajectory::stream streamings\endlink
+    std::conditional_t<bool(RLT),size_t,double> length, ///< length of run
+    std::conditional_t<bool(SFT),size_t,double> streamFreq, ///< interval between two \link Trajectory::stream streamings\endlink
     unsigned stateStreamFreq, ///< number of \link Trajectory::stream streamings\endlink between two \link Trajectory::writeState state streamings\endlink
     const std::string& trajectoryFileName, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output
     const std::string& initialFileName, ///< name of file containing initial condition state for the run
     int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streamings\endlink
-    bool streamInfo, //< governs whether a \link Trajectory::streamParameters header\endlink is streamed at the top of the output
+    bool streamInfo, //< governs whether a \link Trajectory::streamIntro header\endlink is streamed at the top of the output
     bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state streaming\endlink is costly)
     const std::string& parsedCommandLine, 
     bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
-    AutostopHandler&& autostopHandler
+    AH&& autostopHandler
    );
 
 
@@ -308,32 +282,28 @@ run(TRAJ&& traj, ///< the trajectory to run
  * \note This means that ParsRun::NDt takes precedence over ParsRun::T and ParsRun::dc takes precedence over ParsRun::Dt
  * 
  */
-template<typename AutostopHandler, typename TRAJ, typename ParsBase>
-auto
-run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p, AutostopHandler&& ah,
-    bool doStreaming=true, bool returnStreamedArray=false)
--> std::enable_if_t<decltype(has_advance(traj))::value || decltype(has_step(traj))::value,
-                    trajectory::TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>>
+template<typename AH, trajectory::uniform_step TRAJ, typename PB> requires trajectory::autostop_handler<AH,TRAJ>
+auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  if constexpr (decltype(has_step(traj))::value) { // it is of the Adaptive family
+  if constexpr (trajectory::adaptive<TRAJ>) {
     if (p.dc) return trajectory::run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
                                      p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                                     doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
+                                     doStreaming,returnStreamedArray,std::forward<AH>(ah));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
   if (p.NDt) return trajectory::run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
                                     p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                                    doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
+                                    doStreaming,returnStreamedArray,std::forward<AH>(ah));
   else return trajectory::run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
                               p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                              doStreaming,returnStreamedArray,std::forward<AutostopHandler>(ah));
+                              doStreaming,returnStreamedArray,std::forward<AH>(ah));
 }
 
 
-template<typename TRAJ, typename ParsBase>
+template<trajectory::uniform_step TRAJ, typename PB>
 auto
-run(TRAJ&& traj, const trajectory::Pars<ParsBase>& p, bool doStreaming=true, bool returnStreamedArray=false)
+run(TRAJ&& traj, const trajectory::Pars<PB>& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
   return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilon,p.autoStopEpsilonAbs,p.autoStopRepetition),
              doStreaming,returnStreamedArray);
@@ -440,9 +410,9 @@ auto stream(const Trajectory& traj, std::ostream& os,
 
 /// Print header
 template <typename Trajectory>
-std::ostream& streamParameters(const Trajectory& traj, std::ostream& os)
+std::ostream& streamIntro(const Trajectory& traj, std::ostream& os)
 {
-  return traj.streamKey(traj.streamParameters(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n");
+  return traj.streamKey(traj.streamIntro(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n");
 }
 
 
@@ -458,22 +428,24 @@ void step(Trajectory& traj, double deltaT, std::ostream& os)
 } } // cppqedutils::trajectory
 
 
+
 /// TODO: This shouldn’t call any TRAJ member function directly, only through traits classes
-template<typename TRAJ, typename LENGTH, typename DELTA, typename AutostopHandler>
-auto
-cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsigned stateStreamFreq,
+template<cppqedutils::trajectory::uniform_step TRAJ,
+         cppqedutils::trajectory::RunLengthType RLT,
+         cppqedutils::trajectory::StreamFreqType SFT,
+         cppqedutils::trajectory::autostop_handler<TRAJ> AH >
+cppqedutils::trajectory::TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>
+cppqedutils::trajectory::run(TRAJ&& traj,
+                             std::conditional_t<bool(RLT),size_t,double> length,
+                             std::conditional_t<bool(SFT),size_t,double> streamFreq, unsigned stateStreamFreq,
                              const std::string& trajectoryFileName, const std::string& initialFileName,
                              int precision, bool streamInfo, bool firstStateStream,
                              const std::string& parsedCommandLine,
                              bool doStreaming, bool returnStreamedArray,
-                             AutostopHandler&& autostopHandler) -> TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>
+                             AH&& autostopHandler)
 {
   using namespace std;
 
-  static constexpr bool
-    endTimeMode=is_floating_point_v<LENGTH>,
-    isDtMode=is_floating_point_v<DELTA>;
-  
   TemporalStreamedArray<typename decay_t<TRAJ>::StreamedArray> res;
   
   ////////////////////////////////////////////////
@@ -535,7 +507,7 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
   if (streamInfo) {
     if (!continuing) {
       if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
-      streamParameters(traj,commentingStream<<versionHelper())
+      streamIntro(traj,commentingStream<<versionHelper())
         <<endl<<"Run Trajectory up to time "<<timeToReach
         <<" -- Stream period: "<<streamFreq<< (isDtMode ? "" : " timestep") <<endl<<endl;
     }
@@ -602,13 +574,10 @@ cppqedutils::trajectory::run(TRAJ&& traj, LENGTH length, DELTA streamFreq, unsig
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  traj.logOnEnd(commentingStream);
+  traj.streamOutro(commentingStream);
   if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;
   
 }
 
-
-
-#endif // CPPQEDCORE_UTILS_TRAJECTORY_H_INCLUDED
