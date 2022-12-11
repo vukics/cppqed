@@ -9,6 +9,12 @@ namespace cppqedutils {
 typedef boost::archive::binary_iarchive iarchive; ///< delegated to \refBoost{Boost.Serialization,serialization}
 typedef boost::archive::binary_oarchive oarchive; ///< \copydoc iarchive
 
+
+// template <typename T, typename Archive> concept serializable = requires (Archive& ar, T& t) {serialize(ar,t)};
+// the problem with this is that the Archive type has to be explicitly specified when using the concept
+// cf. Q&As here https://stackoverflow.com/a/63452199/1171157 and https://stackoverflow.com/a/67092860/1171157
+
+
 } // cppqedutils
 
 
