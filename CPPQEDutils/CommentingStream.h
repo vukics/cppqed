@@ -37,6 +37,11 @@
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/is_base_and_derived.hpp>
 
+/// TODO: this is the only place where Boost.MPL is still allowed, but probably not necessary 
+#include <boost/mpl/begin_end.hpp>
+#include <boost/mpl/deref.hpp>
+#include <boost/mpl/vector.hpp>
+
 namespace boost { namespace iostreams {
 
 //------------------Definition of basic character classes---------------------//

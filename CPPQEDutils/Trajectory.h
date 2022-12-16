@@ -60,7 +60,7 @@ concept uniform_step =
   {
     advance(t,deltaT,os);
     { streamKey(t,os) } -> std::convertible_to<std::ostream&>;
-    { stream(t,os,precision) } -> std::convertible_to<typename T::StreamedArray>;
+    { stream(t,os,precision) } -> std::convertible_to<typename std::decay_t<T>::StreamedArray>;
   };
 
 template <typename T>
@@ -70,7 +70,8 @@ concept adaptive = uniform_step<T> && adaptive_steppable<T>;
 template <typename T, typename Archive>
 concept archiving = requires (T&& t, Archive& ar) {
   { stateIO(t,ar) } -> std::convertible_to<Archive&>;
-  { readFromArrayOnlyArchive(t,ar) } -> std::convertible_to<Archive&>;
+  // { readFromArrayOnlyArchive(t,ar) } -> std::convertible_to<Archive&>;
+  // this latter only holds for iarchives, so we should split the concept into input/output archiving if we want to include this
 };
 
 
@@ -94,6 +95,8 @@ struct Pars : BASE
   double Dt;
   size_t NDt; ///< number of deltaT intervals in \link trajectory::Trajectory::run deltaT-mode\endlink
   std::string ofn, initialFileName;
+  
+  int precision=6;
 
   bool streamInfo=true, firstStateStream=true;
 
@@ -126,10 +129,7 @@ struct Pars : BASE
   }
 
   /// Corresponds to parameters::Table::getParsedCommandLine
-/*  const std::string getParsedCommandLine() const {return *parsedCommandLine_;}
-
-private:
-  const parameters::Table::ParsedCommandLine parsedCommandLine_;*/
+  std::string getParsedCommandLine() const {return "*** parsed command line is not yet available in new Parameter infrastructure ***" /* *parsedCommandLine_*/;}
 
 };
 
@@ -149,12 +149,10 @@ struct SerializationMetadata
   explicit SerializationMetadata(std::string type=UNSPECIFIED, std::string id=UNSPECIFIED, int r=0)
     : rank(r), typeID(type), trajectoryID(id) {};
   
-  bool operator==(const SerializationMetadata& v) const {return rank==v.rank && typeID==v.typeID && trajectoryID==v.trajectoryID;}
-  bool operator!=(const SerializationMetadata& v) const {return !(*this==v);}
+  bool operator==(const SerializationMetadata&) const = default;
   
   int rank=0;
-  std::string typeID=UNSPECIFIED;
-  std::string trajectoryID=UNSPECIFIED;
+  std::string typeID=UNSPECIFIED, trajectoryID=UNSPECIFIED;
 
   int protocolVersion=0;  
 
@@ -178,11 +176,12 @@ struct StoppingCriterionReachedException {};
 
 
 template <typename T, typename TRAJ>
-concept autostop_handler = uniform_step<TRAJ> && requires (T&& t, typename TRAJ::StreamedArray sa) { t(sa); };
+concept autostop_handler = uniform_step<TRAJ> && requires (T&& t, const typename std::decay_t<TRAJ>::StreamedArray& sa) { t(sa); };
 
 /// Generic implementation of AutostopHandler
 /**
  * Assumes quite a lot about the implicit interface of SA, this could be relieved with indirections
+ * TODO: should rely on boost::odeint state algebra
  */
 template<typename SA>
 class AutostopHandlerGeneric
@@ -196,7 +195,7 @@ public:
 
   void operator()(const SA& streamedArray)
   {
-    SA buffer{streamedArray.copy()};
+    SA buffer{streamedArray};
     
     for (auto& v : buffer) if (std::abs(v)<autoStopEpsilonAbs_) v=autoStopEpsilonAbs_;
     
@@ -325,18 +324,9 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
 
 
 
-/// Print header
-template <typename Trajectory>
-std::ostream& streamIntro(const Trajectory& traj, std::ostream& os)
-{
-  return traj.streamKey(traj.streamIntro(os)<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n");
-}
-
-
-
 /// The most general run function
-template<uniform_step TRAJ, RunLengthType RLT, StreamFreqType SFT, autostop_handler<TRAJ> AH >
-requires ( ( SFT==DT_MODE || adaptive<TRAJ> ) && ( RLT==T_MODE || SFT==DT_MODE ) )
+template<RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, autostop_handler<TRAJ> AH >
+requires ( ( SFT==StreamFreqType::DT_MODE || adaptive<TRAJ> ) && ( RLT==RunLengthType::T_MODE || SFT==StreamFreqType::DT_MODE ) )
 TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>
 run(TRAJ&& traj, ///< the trajectory to run
     std::conditional_t<bool(RLT),size_t,double> length, ///< length of run
@@ -389,7 +379,7 @@ run(TRAJ&& traj, ///< the trajectory to run
       return false;
     }();
     
-  const double timeToReach = (RLT==T_MODE ? length : getTime(traj)+length*streamFreq);
+  const double timeToReach = (RLT==RunLengthType::T_MODE ? length : getTime(traj)+length*streamFreq);
   
   if (timeToReach && timeToReach<=getTime(traj)) return res;
 
@@ -405,7 +395,6 @@ run(TRAJ&& traj, ///< the trajectory to run
   CommentingStream logStream{outstream};
   
   ostream& os=*outstream;
-  IO_Manipulator::_(os);
   os<<setprecision(formdouble::actualPrecision(precision));
 
   CommentingStream commentingStream{outstream}; commentingStream<<setprecision(formdouble::actualPrecision(precision));
@@ -417,15 +406,15 @@ run(TRAJ&& traj, ///< the trajectory to run
   if (streamInfo) {
     if (!continuing) {
       if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
-      streamIntro(traj,commentingStream<<versionHelper())
+      streamKey(traj,streamIntro(traj,commentingStream<<versionHelper())<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n")
         <<endl<<"Run Trajectory up to time "<<timeToReach
-        <<" -- Stream period: "<<streamFreq<< (isDtMode ? "" : " timestep") <<endl<<endl;
+        <<" -- Stream period: "<<streamFreq<< (SFT==StreamFreqType::DT_MODE ? "" : " timestep") <<endl<<endl;
     }
     else
       commentingStream<<"Continuing from time "<<getTime(traj)<<" up to time "<<timeToReach<<endl;
   }
 
-  if (!timeToReach) {streamWrapper(traj,os,precision); return res;}
+  if (!timeToReach) {streamWrapper(os); return res;}
 
   //////////////////////////////
   // Mid section: the actual run
@@ -439,20 +428,20 @@ run(TRAJ&& traj, ///< the trajectory to run
 
   try {
 
-    for (long count=0, stateCount=0; (endTimeMode ? getTime(traj)<length : count<=length); ++count) {
+    for (long count=0, stateCount=0; (RLT==RunLengthType::T_MODE ? getTime(traj)<length : count<=length); ++count) {
 
       if (count) {
         // advance trajectory
-        if constexpr (!isDtMode) {step(traj,length-getTime(traj),logStream);}
+        if constexpr (SFT==StreamFreqType::DC_MODE) {step(traj,length-getTime(traj),logStream);}
         else {
-          if constexpr (endTimeMode) advance(traj,std::min(streamFreq,length-getTime(traj)),logStream);
+          if constexpr (RLT==RunLengthType::T_MODE) advance(traj,std::min(streamFreq,length-getTime(traj)),logStream);
           else advance(traj,streamFreq,logStream);
         }
         stateSaved=arrayStreamed=false;
       }
 
       if (!count || [&]() {
-        if constexpr (isDtMode) return true;
+        if constexpr (SFT==StreamFreqType::DT_MODE) return true;
         else return !(count%streamFreq); // here, we still use a lambda because this doesn’t compile if streamFreq is double
       }() ) {
 
@@ -469,22 +458,22 @@ run(TRAJ&& traj, ///< the trajectory to run
 
         if (count || !continuing) {
           arrayStreamed=true;
-          auto streamReturn{streamWrapper(traj,os,precision)};
-          if (returnStreamedArray) res.emplace_back(getTime(traj),traj.getDtDid(),get<1>(streamReturn));
-          autostopHandler(get<1>(streamReturn));
+          auto streamReturn{streamWrapper(os)};
+          if (returnStreamedArray) res.emplace_back(getTime(traj),getDtDid(traj),streamReturn);
+          autostopHandler(streamReturn);
         }
       }
     } // end of main for loop
 
   } catch (const StoppingCriterionReachedException& except) {commentingStream<<"Stopping criterion has been reached"<<endl;}
   
-  if (!arrayStreamed) streamWrapper(traj,os,precision); // Stream at the end instant if stream has not happened yet
+  if (!arrayStreamed) streamWrapper(os); // Stream at the end instant if stream has not happened yet
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  traj.streamOutro(commentingStream);
+  streamOutro(traj,commentingStream);
   if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;
@@ -525,19 +514,23 @@ run(TRAJ&& traj, ///< the trajectory to run
 template<typename AH, trajectory::uniform_step TRAJ, typename PB> requires trajectory::autostop_handler<AH,TRAJ>
 auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  if constexpr (trajectory::adaptive<TRAJ>) {
-    if (p.dc) return trajectory::run(std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
-                                     p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                                     doStreaming,returnStreamedArray,std::forward<AH>(ah));
+  using namespace trajectory;
+  if constexpr (adaptive<TRAJ>) {
+    if (p.dc) return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(
+      std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
+      p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+      doStreaming,returnStreamedArray,std::forward<AH>(ah));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
-  if (p.NDt) return trajectory::run(std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-                                    p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                                    doStreaming,returnStreamedArray,std::forward<AH>(ah));
-  else return trajectory::run(std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-                              p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
-                              doStreaming,returnStreamedArray,std::forward<AH>(ah));
+  if (p.NDt) return trajectory::run<RunLengthType::NDT_MODE,StreamFreqType::DT_MODE>(
+    std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+    p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+    doStreaming,returnStreamedArray,std::forward<AH>(ah));
+  else return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(
+    std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
+    p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+    doStreaming,returnStreamedArray,std::forward<AH>(ah));
 }
 
 
@@ -550,9 +543,5 @@ run(TRAJ&& traj, const trajectory::Pars<PB>& p, bool doStreaming=true, bool retu
 }
 
 
-
-} // trajectory
-
-
-#include "Trajectory.tcc"
+} // cppqedutils
 

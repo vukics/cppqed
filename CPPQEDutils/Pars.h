@@ -22,4 +22,4 @@ auto& add(popl::OptionParser& op, std::string option, std::string mod, std::stri
 }
 
 /// A no-op. TODO: resurrect the add-title feature
-auto& addTitle(popl::OptionParser& op, std::string /* title */, std::string /* mod */ = "") {return op;}
+inline auto& addTitle(popl::OptionParser& op, std::string /* title */, std::string /* mod */ = "") {return op;}

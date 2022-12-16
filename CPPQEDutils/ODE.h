@@ -42,26 +42,29 @@ inline static const double nextDtTryCorrectionFactor=10.;
 
 
 /// Embodies the concept defined at https://www.boost.org/doc/libs/1_80_0/libs/numeric/odeint/doc/html/boost_numeric_odeint/concepts/system.html
-template <typename T, typename Time, typename State>
+template <typename T, typename State, typename Time=double>
 concept system = requires (T&& t, const State& stateIn, State& stateOut, Time time) { t(stateIn,stateOut,time) ; };
 
 /// Embodies the concept defined at https://www.boost.org/doc/libs/1_80_0/libs/numeric/odeint/doc/html/boost_numeric_odeint/concepts/controlled_stepper.html
-template <typename T, typename Time, typename State, typename System>
+template <typename T, typename State, typename System, typename Time=double>
 concept controlled_stepper =
-  system<System,Time,State> &&
-  std::convertible_to<typename T::state_type,State> && std::convertible_to<typename T::deriv_type,System> && std::convertible_to<typename T::time_type,Time> &&
+  system<System,State,Time> &&
+  std::convertible_to<typename std::decay_t<T>::state_type,std::decay_t<State>> &&
+  std::convertible_to<typename std::decay_t<T>::deriv_type,std::decay_t<State>> &&
+  std::convertible_to<typename std::decay_t<T>::time_type,std::decay_t<Time>> &&
   requires (T&& t, System sys, Time time, Time dt, State&& x ) { t.try_step( sys , x , time , dt ); };
 
 
-template <typename T, typename Time, typename State, typename System>
+template <typename T, typename State, typename System, typename Time=double>
 concept engine = 
-  system<System,Time,State> && adaptive_timestep_keeper<T> && intro_outro_streamer<T> &&
+  system<System,State,Time> && adaptive_timestep_keeper<T> && intro_outro_streamer<T> &&
   requires ( T&& t, Time deltaT, std::ostream& logStream, System sys, Time& time, State&& stateInOut ) { 
     { step(t,deltaT,logStream,sys,time,stateInOut) }; /*}  && 
   requires ( T&& t, Time deltaT, std::ostream& logStream, System sys, Time& time, const State& stateIn, State&& stateOut ) { 
     { step(t,deltaT,logStream,sys,time,stateIn,stateOut) };*/ };
 
 
+using LogControl=std::bitset<2>;
 
 /// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a popl::OptionParser
 /** If necessary, it can be made customizable by an additional template parameter, but a very sensible default can be provided */
@@ -71,6 +74,8 @@ struct Pars : BASE
   double
     epsRel, ///< relative precision of ODE stepping
     epsAbs; ///< absolute precision ”
+
+  LogControl logControl{0};
 
   Pars(popl::OptionParser& op) : BASE{op}
   {
@@ -117,13 +122,12 @@ struct SerializeControlledErrorStepper
 
 
 template <typename T>
-concept ode_logger = outro_streamer<T> && requires (T t) { logDerivsCall(t); logStep(t); logFailedSteps(t); };
+concept ode_logger = outro_streamer<T> && requires (T&& t, size_t failedStepsLast) { logDerivsCall(t); logStep(t,failedStepsLast); };
 
 struct DefaultLogger { size_t nDerivsCalls=0, nSteps=0, nFailedSteps=0; };
 
 void logDerivsCall(DefaultLogger& dl) {++dl.nDerivsCalls;}
-void logStep(DefaultLogger& dl) {++dl.nSteps;}
-void logFailedSteps(DefaultLogger& dl, size_t failedStepsLast) {dl.nFailedSteps+=failedStepsLast;}
+void logStep(DefaultLogger& dl, size_t failedStepsLast) {++dl.nSteps; dl.nFailedSteps+=failedStepsLast;}
 
 template<typename Archive>
 inline void serialize(Archive & ar, DefaultLogger& dl, const unsigned int /*file_version*/) { ar & dl.nDerivsCalls & dl.nSteps & dl.nFailedSteps; }
@@ -143,16 +147,14 @@ struct Base
 {
   using Time=typename CES::time_type;
   
-  using LogControl=std::bitset<2>;
-  
   Base(Time dtInit, LogControl lc, auto&&... args)
     : ces{MakeControlledErrorStepper<CES>::_(std::forward<decltype(args)>(args)...)},
       dtTry(dtInit), logControl(lc) {}
 
-  template <typename State, system<Time,State> SYS> requires controlled_stepper<CES,Time,State,SYS>
+  template <typename State, system<State,Time> SYS> requires controlled_stepper<CES,State,SYS,Time>
   auto tryStep(SYS sys, Time& time, State&& stateInOut) {return ces.stepper.try_step(sys,std::forward<State>(stateInOut),time,dtTry);}
 
-  template <typename State, system<Time,State> SYS> requires controlled_stepper<CES,Time,State,SYS>
+  template <typename State, system<State,Time> SYS> requires controlled_stepper<CES,State,SYS,Time>
   auto tryStep(SYS sys, Time& time, const State& stateIn, State&& stateOut) {return ces.stepper.try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry);}
   
   ControlledErrorStepperWrapper<CES> ces;
@@ -162,9 +164,6 @@ struct Base
   Logger logger;
   
   LogControl logControl;
-
-  template <typename Archive>
-  Archive& stateIO(Archive& ar) {return SerializeControlledErrorStepper<CES>::_(ar,ces.stepper) & logger & dtDid & dtTry;}
 
 };
 
@@ -193,9 +192,9 @@ void step(Base<CES,Logger>& b, typename CES::time_type deltaT, std::ostream& log
   using Time=typename CES::time_type;
   
   const Time timeBefore=time;
-  Time nextDtTry=( fabs(deltaT)<fabs(b.dtTry/b.nextDtTryCorrectionFactor) ? b.dtTry : 0. );
+  Time nextDtTry=( fabs(deltaT)<fabs(b.dtTry/nextDtTryCorrectionFactor) ? b.dtTry : 0. );
   
-  if (sign(deltaT)!=sign(b.dtTry)) b.dtTry=-b.dtDid; // Stepping backward
+  if ( ( deltaT<0 && b.dtTry>0 ) || ( deltaT>0 && b.dtTry<0 ) ) b.dtTry=-b.dtDid; // Stepping backward
   
   if (fabs(b.dtTry)>fabs(deltaT)) b.dtTry=deltaT;
   
@@ -203,8 +202,8 @@ void step(Base<CES,Logger>& b, typename CES::time_type deltaT, std::ostream& log
   
   for (;
         // wraps the sys functional in order that the number of calls to it can be logged
-        tryStep( [&] (const auto& y, auto& dydt, double t) {
-          b.logger.logDerivsCall();
+        b.tryStep( [&] (const auto& y, auto& dydt, double t) {
+          logDerivsCall(b.logger);
           return sys(y,dydt,t);
         },time,std::forward<decltype(states)>(states)...)!=bno::success;
         ++nFailedSteps) ;
@@ -212,11 +211,14 @@ void step(Base<CES,Logger>& b, typename CES::time_type deltaT, std::ostream& log
   b.dtDid=time-timeBefore;
   if (nextDtTry) b.dtTry=nextDtTry;
   
-  b.logger.logStep();
-  b.logger.logFailedSteps(nFailedSteps);
+  logStep(b.logger,nFailedSteps);
   
   if (b.logControl[1]) logStream<<"Number of failed steps in this timestep: "<<nFailedSteps<<std::endl;
 }
+
+
+template <typename CES, typename Logger, typename Archive>
+Archive& stateIO(Base<CES,Logger>& b, Archive& ar) {return SerializeControlledErrorStepper<CES>::_(ar,b.ces.stepper) & b.logger & b.dtDid & b.dtTry;}
 
 
 /// Specializations for Boost.Odeint controlled_runge_kutta & runge_kutta_cash_karp54
@@ -248,10 +250,22 @@ struct MakeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
 } // ode
 
 
-/// from this point on, every Time is double
+/// from this point on, Time is double everywhere
 template <typename StateType>
 using ODE_EngineBoost = ode::Base<boost::numeric::odeint::controlled_runge_kutta<boost::numeric::odeint::runge_kutta_cash_karp54<StateType>>>;
 
+
+namespace ode {
+
+template <typename StateType, typename P>
+ODE_EngineBoost<StateType> makeBoost(double dtInit, const P& p)
+{
+  return {dtInit,p.logControl,p.epsRel,p.epsAbs};
+}
+
+
+
+} // ode
 
 
 } // cppqedutils

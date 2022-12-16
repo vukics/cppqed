@@ -1,7 +1,5 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFileDefault
-#ifndef CPPQEDCORE_UTILS_FORMDOUBLE_H_INCLUDED
-#define CPPQEDCORE_UTILS_FORMDOUBLE_H_INCLUDED
+#pragma once
 
 #include "Pars.h"
 
@@ -140,7 +138,7 @@ public:
 } // formdouble
 
 
-
+/*
 namespace parameters {
 
 
@@ -167,6 +165,4 @@ private:
 
 
 } // parameters
-
-
-#endif // CPPQEDCORE_UTILS_FORMDOUBLE_H_INCLUDED
+*/
