@@ -46,6 +46,7 @@ template <typename T, typename State, typename Time=double>
 concept system = requires (T&& t, const State& stateIn, State& stateOut, Time time) { t(stateIn,stateOut,time) ; };
 
 /// Embodies the concept defined at https://www.boost.org/doc/libs/1_80_0/libs/numeric/odeint/doc/html/boost_numeric_odeint/concepts/controlled_stepper.html
+/// TODO: lots of decays are ugly, how to make this simpler?
 template <typename T, typename State, typename System, typename Time=double>
 concept controlled_stepper =
   system<System,State,Time> &&

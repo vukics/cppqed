@@ -14,7 +14,7 @@ using Array = std::array<dcomp,2>;
 
 int main(int argc, char* argv[])
 {
-  popl::OptionParser op;
+  auto op{optionParser()};
 
   simulated::Pars<> pt(op);
 
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
       "G","Damping rate",1.,&gamma),
       "O","Driving frequency",1.,&omega);
 
-  op.parse(argc, argv);
+  parse(op,argc, argv);
   
   if (pt.T<0) pt.T=10./min(1.,min(omega,gamma));
   // Note: 1.0 is also an existing frequency in the system, which defines the unit of time 

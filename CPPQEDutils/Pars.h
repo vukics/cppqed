@@ -3,10 +3,11 @@
 
 #include "popl.hpp"
 
+inline std::string parsedCommandLine="";
 
 popl::OptionParser optionParser(std::string pre="", std::string post="");
 
-void parse(const popl::OptionParser&);
+void parse(popl::OptionParser&, int argc, const char* const argv[]);
 
 template <typename T>
 auto& add(popl::OptionParser& op, std::string option, std::string description, T defaultValue, auto&& binding)

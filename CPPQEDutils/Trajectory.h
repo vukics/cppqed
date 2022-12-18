@@ -124,12 +124,8 @@ struct Pars : BASE
     sdf(p.add("sdf",mod,"State output frequency",0u)),
     autoStopEpsilon(p.add("autoStopEpsilon",mod,"Relative precision for autostopping",ode_engine::epsRelDefault)),
     autoStopEpsilonAbs(p.add("autoStopEpsilonAbs",mod,"Absolute precision for autostopping",ode_engine::epsAbsDefault)),
-    autoStopRepetition(p.add("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)),
-    parsedCommandLine_(p.getParsedCommandLine())*/
+    autoStopRepetition(p.add("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)), */
   }
-
-  /// Corresponds to parameters::Table::getParsedCommandLine
-  std::string getParsedCommandLine() const {return "*** parsed command line is not yet available in new Parameter infrastructure ***" /* *parsedCommandLine_*/;}
 
 };
 
@@ -337,7 +333,6 @@ run(TRAJ&& traj, ///< the trajectory to run
     int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streamings\endlink
     bool streamInfo, //< governs whether a \link Trajectory::streamIntro header\endlink is streamed at the top of the output
     bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state streaming\endlink is costly)
-    const std::string& parsedCommandLine, 
     bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
     AH&& autostopHandler
@@ -518,18 +513,18 @@ auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=t
   if constexpr (adaptive<TRAJ>) {
     if (p.dc) return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(
       std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
-      p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+      p.streamInfo,p.firstStateStream,
       doStreaming,returnStreamedArray,std::forward<AH>(ah));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
   if (p.NDt) return trajectory::run<RunLengthType::NDT_MODE,StreamFreqType::DT_MODE>(
     std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-    p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+    p.streamInfo,p.firstStateStream,
     doStreaming,returnStreamedArray,std::forward<AH>(ah));
   else return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(
     std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-    p.streamInfo,p.firstStateStream,p.getParsedCommandLine(),
+    p.streamInfo,p.firstStateStream,
     doStreaming,returnStreamedArray,std::forward<AH>(ah));
 }
 

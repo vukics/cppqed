@@ -9,64 +9,50 @@
 using namespace popl;
 
 
-std::shared_ptr<Switch> help_switch, version_switch;
+static std::shared_ptr<Switch> help_switch, version_switch;
 
 
 OptionParser optionParser(std::string pre, std::string post)
 {
-  OptionParser res{pre+versionHelper()+post};
+  OptionParser res{pre+versionHelper()+post+"Command-line arguments"};
   help_switch=res.add<Switch>("h", "help", "list physical parameters & program options");
   version_switch=res.add<Switch>("v", "version", "display version information");
   return res;
 }
 
-//    if (temp=="help") {
-//      table.printList(); exit(0);
-//    }
-//    if (temp=="version") {
-//      cerr << versionHelper(); exit(0);
-//    }
-// }
 
-/*
-
-void parameters::update(parameters::Table& table, int argc, char* argv[], const string& prefix)
+void parse(popl::OptionParser& op, int argc, const char* const argv[])
 {
-  struct ErrorMessage {
-    static const string _(const string& prefix) {return "\nSee "+prefix+"help for a list of parameters\nSupply all parameters with "+prefix+" prefix\n\n";}
-  };
+  for (const char* const* i=argv;  i<argv+argc; ++i) (parsedCommandLine+=*i)+=' ';
 
-  std::stringstream line; IO_Manipulator::_(line);
-  for (char** i=argv+1;  i<argv+argc; ++i) line<<' '<<*i;
-  table.setParsedCommandLine(string(*argv)+line.str());
+  if ( !bool(help_switch) || !bool(version_switch) )
+    throw std::logic_error("Uninitialized help and/or version switches – did you maybe forget using the optionParser() function?");
+ 
+  op.parse(argc, argv);
+  
+  using std::cerr;
 
-  if (argc<2) return;
-
-  string temp;
-  size_t prefixl=prefix.length();
-  while (line>>temp) {
-    if (string(temp,0,prefixl)!=prefix) {
-      cerr<<"\nSyntax error in command line around \""<<temp<<"\""<<ErrorMessage::_(prefix);
-      abort();
-    }
-    temp=string(temp,prefixl,temp.length()-prefixl);
-    if (temp=="help") {
-      table.printList(); exit(0);
-    }
-    if (temp=="version") {
-      cerr << versionHelper(); exit(0);
-    }
-    else
-      try {
-        table[temp].read(line);
-        if (line.fail()) {
-          cerr<<"\nParameter \""<<temp<<"\" supplied with incorrect syntax"<<ErrorMessage::_(prefix);
-          abort();
-        }
-      }
-      catch (const UnrecognisedParameterException& urp) {
-        cerr<<"\nProblem in command line around \""<<urp.what()<<'\"'<<ErrorMessage::_(prefix);
-        abort();
-      }
+  // print auto-generated help message
+  if (version_switch->count()) {
+    cerr << versionHelper(); exit(0);
   }
-}*/
+  
+  // print auto-generated help message
+  if (help_switch->count()) {
+    if (help_switch->count() == 1)
+      cerr << op << "\n";
+    else if (help_switch->count() == 2)
+      cerr << op.help(Attribute::advanced) << "\n";
+    else if (help_switch->count() > 2)
+      cerr << op.help(Attribute::expert) << "\n";
+    exit(0);
+  }
+
+  // show all non option arguments (those without "-o" or "--option")
+  for (const auto& non_option_arg: op.non_option_args())
+    cerr << "non_option_args: " << non_option_arg << "\n";
+
+  // show unknown options (undefined ones, like "-u" or "--undefined")
+  for (const auto& unknown_option: op.unknown_options())
+    cerr << "unknown_options: " << unknown_option << "\n";
+}
