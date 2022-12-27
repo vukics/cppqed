@@ -12,10 +12,12 @@
 #include <boost/iostreams/device/null.hpp>
 #include <boost/iostreams/stream.hpp>
 
-#include <iomanip>
+#include <boost/range/combine.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <queue>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -86,7 +88,8 @@ void advanceTo(Trajectory& traj, double t, std::ostream& logStream) { advance(tr
 
 
 
-/// Parameters corresponding to the different versions of run()
+/// Parameters of run() control
+/** This could be more finely grained by factoring out autoStopping-control, but the present solution should be sufficient for most puposes */
 template <typename BASE = Empty>
 struct Pars : BASE
 {
@@ -98,19 +101,27 @@ struct Pars : BASE
   
   int precision=6;
 
-  bool streamInfo=true, firstStateStream=true;
+  bool streamIntroOff=false, serializeFirstStateOff=false;
 
   unsigned sdf;
 
   double
-    autoStopEpsilon, ///< relative precision for autostopping
+    autoStopEpsilonRel, ///< relative precision for autostopping
     autoStopEpsilonAbs; ///< absolute precision for autostopping (everything below is not considered)
 
   unsigned autoStopRepetition; ///< number of streamed lines repeated within relative precision before autostopping – 0 means no autostopping
   
+  /// TODO: the many add`s here and in similar places could be relieved with functional techniques
   Pars(popl::OptionParser& op) : BASE{op}
   {
-    addTitle(add(add(add(add(add(add(op,
+    addTitle(add(add(add(add(add(add(/*add(*/add(add(add(add(add(add(op,
+     "autoStopRepetition","Number of streamed lines repeated within relative precision before autostopping",0u,&autoStopRepetition),
+     "autoStopEpsilonAbs","Absolute precision for autostopping",ode::epsAbsDefault,&autoStopEpsilonAbs),
+     "autoStopEpsilonRel","Relative precision for autostopping",ode::epsRelDefault,&autoStopEpsilonRel),
+     "sdf","State output frequency",0u,&sdf),
+     "serializeFirstStateOff","Turns off serializing trajectory state at startup",&serializeFirstStateOff),
+     "streamIntroOff","Turn off streaming intro of trajectories",&streamIntroOff),
+//     "precision","General precision of output",formdouble::Zero(FormDouble::defaultPrecision)),
      "initialFileName","Trajectory initial file name",std::string{},&initialFileName),
      "o","Output file name for Trajectory, when empty, cout",std::string{},&ofn),
      "NDt","Number of steps in Dt mode",size_t{0},&NDt),
@@ -118,13 +129,7 @@ struct Pars : BASE
      "dc","Number of steps between two streamings",10u,&dc),
      "T","Simulated time",1.,&T),
      "Trajectory");
-/*    
-    streamInfo(p.add("streamInfo",mod,"Whether to stream header for trajectories",true)),
-    firstStateStream(p.add("firstStateStream",mod,"Streams trajectory state at startup",true)),
-    sdf(p.add("sdf",mod,"State output frequency",0u)),
-    autoStopEpsilon(p.add("autoStopEpsilon",mod,"Relative precision for autostopping",ode_engine::epsRelDefault)),
-    autoStopEpsilonAbs(p.add("autoStopEpsilonAbs",mod,"Absolute precision for autostopping",ode_engine::epsAbsDefault)),
-    autoStopRepetition(p.add("autoStopRepetition",mod,"Number of streamed lines repeated within relative precision before autostopping",0u)), */
+
   }
 
 };
@@ -172,46 +177,44 @@ struct StoppingCriterionReachedException {};
 
 
 template <typename T, typename TRAJ>
-concept autostop_handler = uniform_step<TRAJ> && requires (T&& t, const typename std::decay_t<TRAJ>::StreamedArray& sa) { t(sa); };
+concept autostop_handler = uniform_step<TRAJ> && requires (T&& t, typename std::decay_t<TRAJ>::StreamedArray sa) { t(sa); };
 
 /// Generic implementation of AutostopHandler
-/**
- * Assumes quite a lot about the implicit interface of SA, this could be relieved with indirections
- * TODO: should rely on boost::odeint state algebra
+/** 
+ * Stops if the same value occurs in the output autoStopRepetition times within the specified absolute and relative precisions
+ * Assumption is that SA is a standard-conforming range
  */
 template<typename SA>
 class AutostopHandlerGeneric
 {
-private:
-  typedef SA Averages;
-  
 public:
   AutostopHandlerGeneric(double autoStopEpsilon, double autoStopEpsilonAbs, unsigned autoStopRepetition) 
-    : autoStopEpsilon_{autoStopEpsilon}, autoStopEpsilonAbs_{autoStopEpsilonAbs}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{} {}
+    : autoStopEpsilon_{autoStopEpsilon}, autoStopEpsilonAbs_{autoStopEpsilonAbs}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{}
+    {
+      std::ranges::fill(averages_,0.); // this assumes that the value_type of SA can be converted from double
+    }
 
-  void operator()(const SA& streamedArray)
+  void operator()(SA sa)
   {
-    SA buffer{streamedArray};
-    
-    for (auto& v : buffer) if (std::abs(v)<autoStopEpsilonAbs_) v=autoStopEpsilonAbs_;
-    
     if (!autoStopRepetition_) return;
+
+    for (auto& v : sa) if (std::abs(v)<autoStopEpsilonAbs_) v=autoStopEpsilonAbs_; // this assumes that range-based for works for SA
     
-    if (!averages_.size()) { // This means that no stream has yet occured: the size of averages_ must be determined
-      averages_.resize(buffer.size());
-      averages_=0.;
+    if constexpr ( requires (SA v, size_t s) { v.resize(s,0.); } )
+      if (!averages_.size()) // This means that no stream has yet occured: the size of averages_ must be determined if it wasn’t determined at compile time
+        averages_.resize(sa.size(),0.);
+    
+    if (queue_.size()==autoStopRepetition_) {
+      if ( std::ranges::max(boost::combine(averages_,sa) | std::views::transform([] (const auto& t) {
+        // projection is simply the relative difference
+        return std::abs( t.template get<0>() - t.template get<1>() ) / ( std::abs(t.template get<0>()) + std::abs(t.template get<1>()) );
+      }) ) < autoStopEpsilon_ ) throw StoppingCriterionReachedException();
+      for ( auto&& [a,s,q] : boost::combine(averages_,sa,queue_.front()) ) a+=(s-q)/double(autoStopRepetition_); // update the averages set for next step
+      queue_.pop(); // remove obsolate first element of the queue
     }
-    else {
-      if (queue_.size()==autoStopRepetition_) {
-        if (max(abs(averages_-buffer)/(abs(averages_)+abs(buffer)))<autoStopEpsilon_) throw StoppingCriterionReachedException();
-        averages_=averages_+(buffer-queue_.front())/double(autoStopRepetition_); // update the averages set for next step
-        queue_.pop(); // remove obsolate first element of the queue
-      }
-      else averages_=(double(queue_.size())*averages_+buffer)/double(queue_.size()+1); // build the initial averages set to compare against
+    else for ( auto&& [a,s] : boost::combine(averages_,sa) ) a=(double(queue_.size())*a+s)/double(queue_.size()+1); // build the initial averages set to compare against
 
-      queue_.push(buffer); // place the new item to the back of the queue
-
-    }
+    queue_.push(sa); // place the new item to the back of the queue
 
   }
 
@@ -225,11 +228,7 @@ private:
 };
 
 
-const struct
-{
-  template <typename SA>
-  void operator()(const SA&) const {}
-} autostopHandlerNoOp;
+auto autostopHandlerNoOp = [] (const auto&) {};
 
 
 template<typename SA>
@@ -331,7 +330,7 @@ run(TRAJ&& traj, ///< the trajectory to run
     const std::string& trajectoryFileName, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output
     const std::string& initialFileName, ///< name of file containing initial condition state for the run
     int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streamings\endlink
-    bool streamInfo, //< governs whether a \link Trajectory::streamIntro header\endlink is streamed at the top of the output
+    bool sI, //< governs whether a \link Trajectory::streamIntro header\endlink is streamed at the top of the output
     bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state streaming\endlink is costly)
     bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
@@ -398,7 +397,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   // Writing introduction
   ///////////////////////
 
-  if (streamInfo) {
+  if (sI) {
     if (!continuing) {
       if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
       streamKey(traj,streamIntro(traj,commentingStream<<versionHelper())<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n")
@@ -513,18 +512,18 @@ auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=t
   if constexpr (adaptive<TRAJ>) {
     if (p.dc) return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(
       std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
-      p.streamInfo,p.firstStateStream,
+      !p.streamIntroOff,!p.serializeFirstStateOff,
       doStreaming,returnStreamedArray,std::forward<AH>(ah));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
   if (p.NDt) return trajectory::run<RunLengthType::NDT_MODE,StreamFreqType::DT_MODE>(
     std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-    p.streamInfo,p.firstStateStream,
+    !p.streamIntroOff,!p.serializeFirstStateOff,
     doStreaming,returnStreamedArray,std::forward<AH>(ah));
   else return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(
     std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-    p.streamInfo,p.firstStateStream,
+    !p.streamIntroOff,!p.serializeFirstStateOff,
     doStreaming,returnStreamedArray,std::forward<AH>(ah));
 }
 
@@ -533,7 +532,7 @@ template<trajectory::uniform_step TRAJ, typename PB>
 auto
 run(TRAJ&& traj, const trajectory::Pars<PB>& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilon,p.autoStopEpsilonAbs,p.autoStopRepetition),
+  return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilonRel,p.autoStopEpsilonAbs,p.autoStopRepetition),
              doStreaming,returnStreamedArray);
 }
 

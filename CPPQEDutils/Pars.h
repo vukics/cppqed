@@ -22,5 +22,20 @@ auto& add(popl::OptionParser& op, std::string option, std::string mod, std::stri
   return add(op,option+mod,description,defaultValue,std::forward<decltype(binding)>(binding));
 }
 
+
+inline auto& add(popl::OptionParser& op, std::string option, std::string description, bool* binding)
+{
+  op.add<popl::Switch>("",option,description,binding);
+  return op;
+}
+
+
+inline auto& add(popl::OptionParser& op, std::string option, std::string mod, std::string description, bool* binding)
+{
+  return add(op,option+mod,description,binding);
+}
+
+
+
 /// A no-op. TODO: resurrect the add-title feature
 inline auto& addTitle(popl::OptionParser& op, std::string /* title */, std::string /* mod */ = "") {return op;}

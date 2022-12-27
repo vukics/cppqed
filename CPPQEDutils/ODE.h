@@ -68,7 +68,7 @@ concept engine =
 using LogControl=std::bitset<2>;
 
 /// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a popl::OptionParser
-/** If necessary, it can be made customizable by an additional template parameter, but a very sensible default can be provided */
+/** This could be more finely grained by factoring out logControl, but the present solution should be sufficient for most puposes */
 template <typename BASE=Empty>
 struct Pars : BASE
 {

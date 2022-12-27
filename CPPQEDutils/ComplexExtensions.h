@@ -21,3 +21,11 @@ inline bool hasImagPart(dcomp c) {return bool(imag(c));}
 inline bool  absCompare(dcomp c1, dcomp c2) {return  abs(c1)< abs(c2);}
 inline bool realCompare(dcomp c1, dcomp c2) {return real(c1)<real(c2);}
 
+/// Generic sqr from this Q&A: https://stackoverflow.com/a/64849248/1171157
+auto sqr(auto&& x) // return type is non-reference or trailing
+noexcept(noexcept(x*x)) // propagate noexcept
+-> decltype(x*x) // enable SFINAE
+{ return x * x; }
+
+
+double relativeDeviation(const auto& a, const auto& b) {return std::abs(a-b)/(std::abs(a)+std::abs(b));}

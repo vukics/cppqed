@@ -16,41 +16,38 @@
 
  */
 
+#include "ComplexExtensions.h"
 #include "Simulated.h"
 
-#include "MathExtensions.h"
+#include <numbers>
 
 using namespace std;
 using namespace trajectory;
 
-typedef CArray<1> Array;
+using Array=std::array<dcomp,2>;
 
 
 int main(int , char**)
 {
   dcomp Z(-1.,10);
 
-  Array y(2);
+  Array y{numbers::e,Z*numbers::e};
 
-  y(0)=  EULER;
-  y(1)=Z*EULER;
-
-  auto S(simulated::makeBoost(y,[=](const Array& yA, Array& dydtA, double tau) {
-    dcomp y{yA(0)}, p{yA(1)};
-    dydtA(0)=p;
-    dydtA(1)=sqr(p)+Z*p+sqr(Z)*exp(2.*Z*tau)*(y-sqr(y));
+  auto S(simulated::make<ODE_EngineBoost<Array>>(y,[=](const Array& yA, Array& dydtA, double tau) {
+    dydtA[0]=yA[1];
+    dydtA[1]=sqr(yA[1])+Z*yA[1]+sqr(Z)*exp(2.*Z*tau)*(yA[0]-sqr(yA[0]));
   },{"Re{y}","Im{y}"},trajectory::initialTimeStep(abs(Z)),
-                              0, //logLevel
-                              1e-6,1e-18));
+  0, //logLevel
+  1e-6,1e-18));
 
-  auto streamedArray=run(S,5.,0.01,0,string{},string{},6,false,false,string{},false,true,autostopHandlerNoOp);
+  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(S,5.,0.01,0,"","",6,false,false,false,true,autostopHandlerNoOp);
 
   double yDev=0;
   
-  for ( auto s : streamedArray ) yDev+=relativeDeviation(get<2>(s)(0),exp(exp(Z*get<0>(s))));
+  for ( auto s : streamedArray ) yDev+=relativeDeviation(get<2>(s)[0],exp(exp(Z*get<0>(s))));
   
   // for ( auto s : streamedArray ) cout<<get<0>(s)<<"\t"<<get<2>(s)(0).real()<<"\t"<<get<2>(s)(0).imag()<<endl;
   
-  return !(yDev/streamedArray.size()<2e-8);
+  return !(yDev/streamedArray.size()<1.5e-8);
  
 }
