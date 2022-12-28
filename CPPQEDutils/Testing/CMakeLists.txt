@@ -11,14 +11,14 @@ endmacro()
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
 set(TESTING_EXECUTABLES
-    EvolvedTest MultiIndexIteratorNew HarmonicOscillatorRandomTimes HarmonicOscillatorComplex)
+    ODE_Test MultiIndexIteratorNew HarmonicOscillatorRandomTimes HarmonicOscillatorComplex)
 
 foreach(S ${TESTING_EXECUTABLES})
   add_executable(${S} ${S}.cc)
   target_link_libraries(${S} CPPQED::CPPQEDutils)
 endforeach()
 
-add_test_utils(evolved_nonlinear_ode_boost EvolvedTest)
+add_test_utils(ode_nonlinear ODE_Test)
 
 add_test_utils(harmonic_oscillator_compare_ode_with_exact_solution HarmonicOscillatorComplex)
 
