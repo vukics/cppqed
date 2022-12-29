@@ -30,7 +30,7 @@ find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
 if (TARGET Boost::unit_test_framework)
   set(BOOST_TESTING_EXECUTABLES
-      BlitzArray BlitzExtensions BlitzTinyExtensions CWR MultiIndexIterator Random SliceIterator)
+      BlitzArray BlitzExtensions MultiIndexIterator Random SliceIterator)
   foreach(S ${BOOST_TESTING_EXECUTABLES})
     add_executable(${S} ${S}.cc)
     target_link_libraries(${S} CPPQED::CPPQEDutils Boost::unit_test_framework)
@@ -39,10 +39,6 @@ if (TARGET Boost::unit_test_framework)
   add_test_utils(blitz_array BlitzArray)
   
   add_test_utils(blitz_extensions BlitzExtensions)
-  
-  add_test_utils(blitz_tiny_extensions BlitzTinyExtensions)
-  
-  add_test_utils(combination_with_repetition CWR)
   
   add_test_utils(multi_index_iterator_boost MultiIndexIterator)
 

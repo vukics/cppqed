@@ -1,5 +1,4 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Random & related}
 #ifndef CPPQEDCORE_UTILS_RANDOM_H_REENTRANT
 
 #ifndef CPPQEDCORE_UTILS_RANDOM_H_INCLUDED
@@ -22,28 +21,31 @@
 
 namespace randomutils {
 
-template<typename Engine, typename BASE>
+template<std::uniform_random_bit_generator Engine, typename BASE>
 struct Pars;
 
 
-template<typename Distribution, typename Engine, typename Array, typename... DCP>
-Engine& fill(Array a, Engine& re, DCP&&... dcp)
+template<typename Distribution,
+         typename Engine,
+         std::ranges::forward_range Array>
+requires ( std::uniform_random_bit_generator<std::decay_t<Engine>> )
+auto fill(Array&& a, Engine&& re, auto&&... dp)
 {
-  Distribution d{std::forward<DCP>(dcp)...};
-  std::generate(a.begin(),a.end(),[&]() {return d(re);});
-  return re;
+  Distribution d{std::forward<decltype(dp)>(dp)...};
+  return std::ranges::generate(std::forward<Array>(a), [ & ]() {return d(re);});
 }
 
 
-template<typename Distribution, typename Engine, typename Array, typename... DCP>
-void fill(Array a, unsigned long seed, DCP&&... dcp)
+template<typename Distribution,
+         std::uniform_random_bit_generator Engine,
+         std::ranges::forward_range Array>
+auto fill(Array&& a, unsigned long seed, auto&&... dp)
 {
-  Engine re{seed};
-  fill<Distribution>(a,re,std::forward<DCP>(dcp)...);
+  return fill<Distribution>(std::forward<Array>(a),Engine{seed},std::forward<decltype(dp)>(dp)...);
 }
 
 
-template<typename Engine>
+template<std::uniform_random_bit_generator Engine>
 constexpr auto EngineID_v = std::nullopt;
 
 template<>
@@ -56,7 +58,7 @@ template<>
 inline const std::string EngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
 
 
-template<typename Engine>
+template<std::uniform_random_bit_generator Engine>
 struct EngineWithParameters
 {
   EngineWithParameters(unsigned long s, unsigned long p) : engine{s,p}, seed{s}, prngStream{p} {}
@@ -80,13 +82,15 @@ struct EngineWithParameters
 template<typename BASE>
 struct Pars<pcg64,BASE> : BASE
 {
-  unsigned long &seed, &prngStream; ///< PCG64 generator seed and ordinal of independent stream
+  unsigned long seed, prngStream; ///< PCG64 generator seed and ordinal of independent stream
 
-  Pars(parameters::Table& p, const std::string& mod="")
-    : BASE{p,mod},
-      seed(p.addTitle("StochasticTrajectory",mod).add("seed",mod,"Random number generator seed",1001ul)),
-      prngStream(p.add("prngStream",mod,"Random number generator independent stream ordinal",1ul))
-    {}
+  Pars(popl::OptionParser& op) : BASE{op}
+  {
+    addTitle(add(add(op,
+      "seed","Random number generator seed",1001ul,&seed),
+      "prngStream","Random number generator independent stream ordinal",1ul,&prngStream),
+      "Random number generator");
+  }
 };
 
 

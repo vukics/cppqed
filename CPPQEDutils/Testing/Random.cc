@@ -1,35 +1,41 @@
 // Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Archive.h"
-#include "BlitzArray.h"
 #include "Random.h"
 
 #define BOOST_TEST_MODULE RandomEngineSerialization test
 #include <boost/test/unit_test.hpp>
 
+#include <boost/json.hpp>
+
 #include <fstream>
+#include <span>
+#include <vector>
 
 using namespace std;
+using namespace boost::json;
 
 const size_t seed=1001;
 
 template<typename RandomEngine>
 auto testcase()
 {
-  DArray<1>
+  vector<double>
     array(10),
-    arrayInterrupted(10),
-    firstHalf(arrayInterrupted(blitz::Range(0,4))),
-    secondHalf(arrayInterrupted(blitz::Range(5,9)));
+    arrayInterrupted(10);
+    
+  span
+    firstHalf{arrayInterrupted.begin(),arrayInterrupted.begin()+5},
+    secondHalf{arrayInterrupted.begin()+5,arrayInterrupted.end()};
   
   randomutils::fill<uniform_real_distribution<double>,RandomEngine>(array,seed);
   
-  cerr<<array<<endl;
+  cerr<<serialize( value_from (array) )<<endl;
   
   RandomEngine reFirst(seed), reSecond(seed);
   
   randomutils::fill<uniform_real_distribution<double>>(firstHalf,reFirst);
   
-  const string filename{"CPPQEDutils_testing_"+randomutils::EngineID_v<RandomEngine>+".d"};
+  const std::string filename{"CPPQEDutils_testing_"+randomutils::EngineID_v<RandomEngine>+".d"};
   
   BOOST_TEST_CHECKPOINT( "PRE_OUTPUT" );
   
@@ -52,13 +58,13 @@ auto testcase()
 
   randomutils::fill<uniform_real_distribution<double>>(secondHalf,reSecond);
 
-  cerr<<arrayInterrupted<<endl;
+  cerr<<serialize( value_from ( arrayInterrupted ) )<<endl;
 
-  return all(array==arrayInterrupted) ;
+  return array==arrayInterrupted ;
 }
 
 
-BOOST_AUTO_TEST_CASE( GSL_RandomEngineTest ) { BOOST_CHECK(testcase<randomutils::GSL_Engine>()); }
+// BOOST_AUTO_TEST_CASE( GSL_RandomEngineTest ) { BOOST_CHECK(testcase<randomutils::GSL_Engine>()); }
 
 BOOST_AUTO_TEST_CASE( STD_MersenneTwisterTest ) { BOOST_CHECK(testcase<mt19937_64>()); }
 
