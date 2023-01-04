@@ -42,8 +42,8 @@ concept adaptive_steppable = adaptive_time_keeper<T> && requires (T&& t, double 
 
 
 /// advances for exactly time `deltaT`
-template<adaptive_steppable T>
-void advance(T& traj, double deltaT, std::ostream& logStream)
+void advance(adaptive_steppable auto& traj,
+             double deltaT, std::ostream& logStream)
 {
   double endTime=getTime(traj)+deltaT;
   while (double dt=endTime-getTime(traj)) step(traj,dt,logStream);
@@ -83,8 +83,7 @@ enum struct RunLengthType {T_MODE=0, NDT_MODE=1};
 
 
 /// advances up to exactly time `t` \copydetails advance
-template<uniform_step Trajectory>
-void advanceTo(Trajectory& traj, double t, std::ostream& logStream) { advance(traj,t-getTime(traj),logStream); }
+void advanceTo(uniform_step auto& traj, double t, std::ostream& logStream) { advance(traj,t-getTime(traj),logStream); }
 
 
 
@@ -529,8 +528,7 @@ auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=t
 
 
 template<trajectory::uniform_step TRAJ, typename PB>
-auto
-run(TRAJ&& traj, const trajectory::Pars<PB>& p, bool doStreaming=true, bool returnStreamedArray=false)
+auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
   return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilonRel,p.autoStopEpsilonAbs,p.autoStopRepetition),
              doStreaming,returnStreamedArray);

@@ -46,7 +46,11 @@ template <typename T, typename State, typename Time=double>
 concept system = requires (T&& t, const State& stateIn, State& stateOut, Time time) { t(stateIn,stateOut,time) ; };
 
 /// Embodies the concept defined at https://www.boost.org/doc/libs/1_80_0/libs/numeric/odeint/doc/html/boost_numeric_odeint/concepts/controlled_stepper.html
-/// TODO: lots of decays are ugly, how to make this simpler?
+/**
+ * Lots of decays in concepts are ugly, however, cf.
+ * [this suggestion](http://developercommunity.visualstudio.com/t/c-concepts-should-be-decayed/1268876)
+ * [and this Q&A](http://stackoverflow.com/questions/74999063/when-if-ever-c-concepts-must-be-decayed-do-it-at-concept-definition-or-at)
+ */
 template <typename T, typename State, typename System, typename Time=double>
 concept controlled_stepper =
   system<System,State,Time> &&
