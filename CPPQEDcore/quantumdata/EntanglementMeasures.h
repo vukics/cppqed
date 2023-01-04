@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Declares the function calculating the negativity of a partially transposed density operator}
 #ifndef   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
 #define   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED

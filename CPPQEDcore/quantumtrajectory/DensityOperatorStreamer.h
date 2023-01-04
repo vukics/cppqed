@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 /// \briefFile{Defines stream_densityoperator::_}
 #ifndef CPPQEDCORE_QUANTUMTRAJECTORY_DENSITY_OPERATOR_STREAMER_H_INCLUDED
 #define CPPQEDCORE_QUANTUMTRAJECTORY_DENSITY_OPERATOR_STREAMER_H_INCLUDED

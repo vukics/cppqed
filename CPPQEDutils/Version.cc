@@ -1,4 +1,4 @@
-// Copyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+// Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Version.h"
 
 #include <boost/version.hpp>
@@ -9,7 +9,7 @@ using namespace std;
 
 string versionHelper()
 {
-  return "C++QEDv3 : a framework for simulating open quantum dynamics\nCopyright András Vukics 2006–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)\nhttp://github.com/vukics/cppqed\ncommit# " +
+  return "C++QEDv3 : a framework for simulating open quantum dynamics\nCopyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)\nhttp://github.com/vukics/cppqed\ncommit# " +
          string(cppqed_GIT_SHA1) +
 #ifndef NDEBUG
          "\nDEBUG build" +

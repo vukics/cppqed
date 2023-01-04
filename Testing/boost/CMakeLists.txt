@@ -1,5 +1,5 @@
 # Copyright Raimar Sandner 2012–2020.
-# Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright András Vukics 2020–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
 find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
