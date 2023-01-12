@@ -1,6 +1,6 @@
 # Copyright András Vukics 2020–2022. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-message(STATUS "Configuring MultiQubit")
+message(STATUS "Configuring dockerEntry")
 
 file(GLOB SCRIPTS . *.cc)
 foreach(s ${SCRIPTS})
