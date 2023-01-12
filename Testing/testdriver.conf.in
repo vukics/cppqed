@@ -1,6 +1,0 @@
-[Setup]
-expecteddir=@testing_SOURCE_DIR@/expected
-modulepath=@CMAKE_BINARY_DIR@/cpypyqed
-outputdir=@CMAKE_CURRENT_BINARY_DIR@/output
-cmake=@CMAKE_COMMAND@
-builddir=@CMAKE_BINARY_DIR@
