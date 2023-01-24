@@ -1,16 +1,7 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFileDefault
-#ifndef CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_H_INCLUDED
-#define CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_H_INCLUDED
+#pragma once
 
-#include "Structure.h"
-
-#include "DensityOperatorStreamer.h"
 #include "QuantumTrajectory.h"
-#include "Types.h"
-
-#include "ComplexArrayExtensions.h"
-#include "MathExtensions.h"
 
 
 namespace quantumtrajectory {
@@ -20,39 +11,30 @@ namespace quantumtrajectory {
 namespace master {
 
 
-typedef cppqedutils::ode_engine::Pars<> Pars;
-
-
-/// Thrown if the system is not applicable in Master-equation evolution
-/**
- * \see ::structure::structure::ExactCommon::applicableInMaster, \ref masterequationlimitations
- */
-struct SystemNotApplicable : std::runtime_error {SystemNotApplicable() : std::runtime_error("") {}};
+typedef cppqedutils::ode::Pars<> Pars;
 
 
 } // master
 
 
 
-/// An \link trajectory::Adaptive Adaptive\endlink trajectory class representing Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
+/// Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
 /**
  * \see \ref masterequation.
-
+ * 
  * \note The ODE driver underlying this class needs to store several (typically 6–7, this depends on the chosen driver) density-operator instants.
  *
- * \tparam RANK arity of the Hilbert space
- * \tparam V has the same function as the template parameter `V` in stream_densityoperator::_, which class is used here for deriving quantum averages to stream from the evolved density operator
- * 
  */
-template<int RANK, typename ODE_Engine, typename V=tmptools::V_Empty>
+template <size_t RANK,
+          cppqedutils::ode::engine ODE_Engine,
+          auto axesOfSubsystem = cppqedutils::retainedAxes<> // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
+          >
 class Master
 {
 public:
   Master(Master&&) = default; Master& operator=(Master&&) = default;
 
-  using StreamedArray=::structure::Averages;
-  
-  typedef typename quantumdata::DensityOperatorLow<RANK> DensityOperatorLow;
+  using StreamedArray=::structure::EV_Array;
 
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
@@ -60,7 +42,7 @@ public:
   Master(::structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
          StateVector_OR_DensityOperator&& state, ///< the state vector or density operator to be evolved
          ODE_Engine ode,
-         EntanglementMeasuresSwitch ems ///< governs whether entanglement measures should be calculated
+         EntanglementMeasuresSwitch ems ///< governs which entanglement measures should be calculated
          ) 
   : sys_{sys}, rho_{std::forward<StateVector_OR_DensityOperator>(state)}, ode_(ode), dos_(::structure::castAv(sys),ems)
   {
