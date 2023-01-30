@@ -6,8 +6,7 @@
 
 #include <tuple>
 
-using namespace cppqedutils;
-using namespace boost::json;
+using namespace cppqedutils; using namespace boost::json;
 
 constexpr auto ra20741 = retainedAxes<2,0,7,4,1>;
 
@@ -28,7 +27,7 @@ int main()
     std::ranges::generate(array.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};});
   }
 
-  std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<serialize( value_from( filteredExtents ) )<<std::endl;
+  std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<toStringJSON( filteredExtents )<<std::endl;
   
   {
     std::cerr<<"*** Simple range: ***"<<std::endl;
@@ -37,14 +36,14 @@ int main()
     
     auto iter{range.begin()};
     
-    std::cerr<<serialize( value_from( iter->extents ) )<<std::endl;
+    std::cerr<<toStringJSON( iter->extents )<<std::endl;
     for (size_t i=0; i<10; (++i, ++iter));
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
     auto rangeRecurse{sliceRangeSimple<retainedAxes<1,3>>(*iter)};
 
-    std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+    std::cerr<<toStringJSON( rangeRecurse.begin()->extents )<<std::endl;
     
     auto iter2{rangeRecurse.begin()};
     for (size_t i=0; i<3; (++i, ++iter2));
@@ -71,14 +70,14 @@ int main()
     
     auto iter{range.begin()};
     
-    std::cerr<<serialize( value_from( iter->extents ) )<<std::endl;
+    std::cerr<<toStringJSON( iter->extents )<<std::endl;
     for (size_t i=0; i<10; (++i, ++iter));
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
     auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
 
-    std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+    std::cerr<<toStringJSON( rangeRecurse.begin()->extents )<<std::endl;
 
     auto iter2{rangeRecurse.begin()};
     for (size_t i=0; i<3; (++i, ++iter2));
@@ -96,14 +95,14 @@ int main()
     
     auto iter{range.begin()};
     
-    std::cerr<<serialize( value_from( iter->extents ) )<<std::endl;
+    std::cerr<<toStringJSON( iter->extents )<<std::endl;
     for (size_t i=0; i<10; (++i, ++iter));
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
     auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
 
-    std::cerr<<serialize( value_from( rangeRecurse.begin()->extents ) )<<std::endl;
+    std::cerr<<toStringJSON( rangeRecurse.begin()->extents )<<std::endl;
     
     auto iter2{rangeRecurse.begin()};
     for (size_t i=0; i<3; (++i, ++iter2));
@@ -196,7 +195,7 @@ void f()
     return data;
   }};  
   
-  std::string maSmallSerialized=serialize( value_from( maSmall ) );
+  std::string maSmallSerialized=toStringJSON( maSmall );
   
   std::cout << maSmallSerialized << std::endl;
   
@@ -208,18 +207,18 @@ void f()
 
   std::cout<<std::endl;
   
-  std::cout<<serialize( value_from( maSmallReconstructed ) )<<std::endl;
+  std::cout<<toStringJSON( maSmallReconstructed )<<std::endl;
   
-  std::cout<< (maSmallSerialized == serialize( value_from( maSmallReconstructed ) ) ) << std::endl;
+  std::cout<< (maSmallSerialized == toStringJSON( maSmallReconstructed ) ) << std::endl;
   
   {
     Extents<5> idx{0,0,0,0,0}, ext{5,2,4,3,2};
-    for (size_t i=0; i<multiarray::calculateExtent(ext); (++i, incrementMultiIndex(idx, ext) ) ) std::cout<<serialize(value_from(idx))<<std::endl;
+    for (size_t i=0; i<multiarray::calculateExtent(ext); (++i, incrementMultiIndex(idx, ext) ) ) std::cout<<toStringJSON(idx)<<std::endl;
   }
   
   std::cout<<hana::Sequence<decltype(compileTimeRange<0,10>)>::value<<hana::Sequence<decltype(retainedAxes<1,5,10>)>::value<<std::endl;
   
-  std::cout<<serialize(value_from(std::make_tuple(1.2,"hello",32ul)))<<std::endl;
+  std::cout<<toStringJSON(std::make_tuple(1.2,"hello",32ul))<<std::endl;
   
 //   {
 //     MultiArray<double,5> ma{{2,3,4,2,4}};
@@ -237,7 +236,7 @@ void f()
     std::vector<size_t> v1{1,2,3,4}, v2{5,6,7};
     auto joined(std::views::join(std::vector{v1,v2}));
     
-    std::cerr<<serialize( value_from( std::vector<size_t>(joined.begin(),joined.end()) ) )<<std::endl;
+    std::cerr<<toStringJSON( std::vector<size_t>(joined.begin(),joined.end()) )<<std::endl;
   }
   
 }

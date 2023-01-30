@@ -5,14 +5,11 @@
 #define BOOST_TEST_MODULE RandomEngineSerialization test
 #include <boost/test/unit_test.hpp>
 
-#include <boost/json.hpp>
-
 #include <fstream>
 #include <span>
 #include <vector>
 
 using namespace std;
-using namespace boost::json;
 
 const size_t seed=1001;
 
@@ -29,7 +26,7 @@ auto testcase()
   
   randomutils::fill<uniform_real_distribution<double>,RandomEngine>(array,seed);
   
-  cerr<<serialize( value_from (array) )<<endl;
+  cerr<<cppqedutils::toStringJSON(array)<<endl;
   
   RandomEngine reFirst(seed), reSecond(seed);
   
@@ -58,7 +55,7 @@ auto testcase()
 
   randomutils::fill<uniform_real_distribution<double>>(secondHalf,reSecond);
 
-  cerr<<serialize( value_from ( arrayInterrupted ) )<<endl;
+  cerr<<cppqedutils::toStringJSON(arrayInterrupted)<<endl;
 
   return array==arrayInterrupted ;
 }
