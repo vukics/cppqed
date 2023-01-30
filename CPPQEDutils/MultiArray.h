@@ -11,8 +11,6 @@ namespace hana=boost::hana;
 
 #include <boost/range/combine.hpp>
 
-#include <boost/json.hpp>
-
 #include <array>
 #include <concepts>
 #include <functional>
@@ -39,6 +37,7 @@ template <size_t RANK>
 using Extents=std::array<size_t,RANK>;
 
 
+/// TODO: this could be formulated as a std compliant range with `extents` as an endpoint guard
 template <size_t RANK>
 auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
 {
@@ -69,7 +68,6 @@ class MultiArrayView
 {
 public:
   MultiArrayView(const MultiArrayView&) = default; MultiArrayView(MultiArrayView&&) = default; MultiArrayView() = default;
-  
   MultiArrayView& operator=(const MultiArrayView&) = default; MultiArrayView& operator=(MultiArrayView&&) = default;
   
   /* template <typename... Indices> requires ( sizeof...(Indices)==RANK && ( ... && std::is_convertible_v<Indices,size_t> ) ) T& operator() (Indices... i); */
@@ -80,15 +78,24 @@ public:
 
   /// implicit conversion to a const view
   operator MultiArrayView<const T, RANK>() const requires ( !std::is_const<T>() ) {return {extents,strides,offset,dataView}; }
-    
+
   /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
   /** 
-   * The index of the underlying 1D storage is calculated as 
-   * \f[ o + \sum_{\iota=0}^{\iota<R} s_{\iota} i_{\iota} ,\f]
+   * The index of the underlying 1D storage is calculated as \f[ o + \sum_{\iota=0}^{\iota<R} s_{\iota} i_{\iota} ,\f]
    * where \f$o\f$ is the offset, \f$R\f$ is the rank, \f$s\f$ is the set of strides and \f$i\f$ is the multi-index.
    * 
    * Note that the subscription operator is always const, as it doesn’t modify the view itself, only maybe the underlying data.
    */
+  T& operator() (Extents<RANK> idx) const
+  {
+#ifndef   NDEBUG
+    for (size_t i=0; i<RANK; ++i) if (idx[i] >= extents[i]) throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(idx[i])+", extent: "+std::to_string(extents[i]));
+#endif // NDEBUG
+    return dataView[std_ext::ranges::fold(boost::combine(idx,strides),offset,
+                                          [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
+  }
+  
+  
   T& operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==RANK)
   {
     size_t idx=0;
@@ -120,6 +127,21 @@ template <typename T, size_t RANK> requires ( !std::is_const<T>() )
 using MultiArrayConstView = MultiArrayView<const T, RANK>;
 
 
+/// Element-by-element comparison
+/** \note The operator-style syntax is not used, since this can be a rather expensive operation! */
+template <typename T1, typename T2, size_t RANK>
+bool isEqual(MultiArrayConstView<T1,RANK> m1, MultiArrayConstView<T2,RANK> m2)
+{
+#ifndef   NDEBUG
+  if (m1.extents!=m2.extents) throw std::runtime_error("Extent mismatch in MultiArrayView comparison: "+toStringJSON(m1.extents)+" "+toStringJSON(m2.extents));
+#endif // NDEBUG
+  bool res=true;
+  for (Extents<RANK> idx{}; idx!=m1.extents; incrementMultiIndex(idx,m1.extents))
+    res &= ( m1(idx)==m2(idx) );
+  return res;
+}
+
+
 namespace multiarray {
 
 template <size_t RANK>
@@ -140,16 +162,16 @@ auto calculateExtent(Extents<RANK> extents)
 
 
 /// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned) 
-/**
- * Follows value semantics regarding constness.
- */
+/** Follows value semantics regarding constness. */
 template <typename T, size_t RANK>
 requires ( !std::is_const<T>() )
 class MultiArray : public MultiArrayConstView<T,RANK>
 {
 public:
-  /// the storage might eventually become a kokkos::View or, a std::valarray
-  /** TODO: check whether `std::vector` incurs too much overhead */
+  /// the storage might eventually become a kokkos::View or a std::valarray
+  /** TODO: check whether `std::vector` incurs too much overhead – with std::valarray, the slicing functionality could be exploited
+   * (MultiArrayView could store a std::slice_array in this case? Ooops, std::slice_array cannot be further sliced???!!! :-O )
+   */
   using StorageType = std::vector<T>;
   
   MultiArray(const MultiArray&) = delete; MultiArray& operator=(const MultiArray&) = delete;
@@ -164,7 +186,21 @@ public:
   }
 
   explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,[](size_t s) {return StorageType(s); /* no braces here, please!!! */}} {}
-  
+
+  /// Element-by-element assignment
+  /** \note The operator-style syntax is not used, since this can be a rather expensive operation! */
+  template <typename TT>
+  void assignTo(MultiArrayConstView<TT,RANK> macv)
+  {
+#ifndef   NDEBUG
+    if (this->dataView.data()==macv.dataView.data())
+      throw std::runtime_error("Self assignment attempted in MultiArray");
+    if (this->extents!=macv.extents)
+      throw std::runtime_error("Extent mismatch in MultiArrayView assignment: "+toStringJSON(this->extents)+" "+toStringJSON(macv.extents));
+#endif // NDEBUG
+    for (Extents<RANK> idx{}; idx!=this->extents; incrementMultiIndex(idx,this->extents)) (*this)(idx)=macv(idx);
+  }
+
   /// conversion to a view
   auto mutableView() {return MultiArrayView<T, RANK>{this->extents,this->strides,0,data_};}
   operator MultiArrayView<T,RANK>() {return mutableView();}
@@ -172,6 +208,7 @@ public:
   /// non-const subscripting
   T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
+  /// to JSON-ize
   friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray<T,RANK>& ma )
   {
     jv = {
@@ -198,16 +235,10 @@ public:
     };
   }
   
-  friend bool operator==(const MultiArray& m1, const MultiArray& m2)
-  {
-    return m1.extents==m2.extents && m1.data_==m2.data_;
-    // (m1.data_==m2.data_).min(); // this seems to be the idiom to convert std::valarray<bool> to a single bool
-  }
-  
-private:
+protected:
   StorageType data_;
   
-  
+private:
   friend class boost::serialization::access;
   
   template<class Archive> void save(Archive& ar, const unsigned int) const {ar & this->extents & data_;}
@@ -295,6 +326,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
                                   0, 
                                   [](size_t init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
     incrementMultiIndex(idx,dummyExtents)));
+    // note: the appearance of idx on both sides of the comma operator cannot cause problems since it ensures left-to-right evaluation order
 
   return res;
 }
