@@ -1,18 +1,17 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Defines classes related to stochastic evolution}
-#ifndef CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
-#define CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED
+#pragma once
 
 #include "Random.h"
 #include "Trajectory.h"
-
-#include "Conversions.h"
 
 #include <vector>
 
 
 namespace cppqedutils::trajectory {
 
+
+// TODO: define concept of stochastic_trajectory
+  
 
 /// Aggregate of parameters pertaining to stochastic simulations
 /** \copydetails ParsRun */
@@ -159,11 +158,12 @@ struct AverageTrajectories
   /// Naive generic implementation
   static const auto& _(typename SingleTrajectory::EnsembleAverageResult& res, const std::vector<SingleTrajectory>& trajs)
   {
-    using namespace boost;
-    return res = accumulate(++trajs.begin(),trajs.end(),trajs.begin()->averaged(),[] (const auto& init, const SingleTrajectory& s) {
-      return init + s.averaged();
-    }
-    )/size_t2Double(trajs.size());
+    return res = std_ext::ranges::fold(
+      trajs | std::views::drop(1),
+      trajs.begin()->averaged(),
+      [] (const auto& init, const SingleTrajectory& s) {
+       return init + s.averaged();
+    })/trajs.size();
   }
   
 };
@@ -218,9 +218,9 @@ public:
   void advance(double deltaT, std::ostream& logStream) {for (auto& t : trajs_) cppqedutils::advance(t,deltaT,logStream);}
 
   /// An average of `dtDid`s from individual trajectories.
-  double getDtDid() const {return boost::accumulate(trajs_,0.,[] (double init, const SingleTrajectory& t) {
+  double getDtDid() const {return std_ext::ranges::fold(trajs_,0.,[] (double init, const SingleTrajectory& t) {
       return init+t.getDtDid();
-    })/size_t2Double(trajs_.size());
+    })/trajs_.size();
   }
   
   std::ostream& streamParameters(std::ostream& os) const {return trajs_.front().streamParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
@@ -272,7 +272,3 @@ struct cppqedutils::trajectory::MakeSerializationMetadata<cppqedutils::trajector
     return SerializationMetadata{metadataForSingle.typeID,"Ensemble of "+metadataForSingle.trajectoryID,metadataForSingle.rank};
   }
 };
-
-
-
-#endif // CPPQEDCORE_UTILS_STOCHASTICTRAJECTORY_H_INCLUDED

@@ -208,8 +208,8 @@ public:
   /// non-const subscripting
   T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
-  /// to JSON-ize
-  friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray<T,RANK>& ma )
+  /// to (un)JSON-ize // don’t seem to work as friends
+  friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray& ma )
   {
     jv = {
       { "extents" , ma.extents },
@@ -218,10 +218,10 @@ public:
     };
   }
 
-  friend auto tag_invoke( boost::json::value_to_tag< MultiArray<T,RANK> >, const boost::json::value& jv )
+  friend auto tag_invoke( boost::json::value_to_tag< MultiArray >, const boost::json::value& jv )
   {
     const boost::json::object & obj = jv.as_object();
-    return MultiArray<T,RANK> {
+    return MultiArray {
       value_to<Extents<RANK>>( obj.at( "extents" ) ),
 #ifndef   NDEBUG
       [&] (size_t s) {
