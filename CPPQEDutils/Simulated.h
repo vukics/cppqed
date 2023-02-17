@@ -38,45 +38,35 @@ struct Simulated
   D derivs;
   KeyPrinter keyPrinter;
   OE ode;
-  
+
+  friend double getDtDid(const Simulated& s) {return getDtDid(s.ode);}
+
+  friend double getTime(const Simulated& s) {return s.time;}
+
+  friend std::ostream& streamIntro(const Simulated& s, std::ostream& os) {return streamIntro(s.ode,os<<"\nSimulated.\n");}
+
+  friend std::ostream& streamOutro(const Simulated& s, std::ostream& os) {return streamOutro(s.ode,os);}
+
+  friend void step(Simulated& s, double deltaT, std::ostream& logStream) {step(s.ode,deltaT,logStream,s.derivs,s.time,s.state);}
+
+  friend std::ostream& streamKey(const Simulated& s, std::ostream& os) {size_t i=3; return s.keyPrinter.stream(os,i);}
+
+  friend ST stream(const Simulated& s, std::ostream& os, int precision)
+  {
+    for (size_t i=0; i < size(s.state); i++) os<<FormDouble(precision)(s.state[i])<<' ';
+    return s.state;
+  }
+
+  friend iarchive& readFromArrayOnlyArchive(Simulated& s, iarchive& iar) {return iar & s.state;}
+
+  /** structure of Simulated archives:
+  * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry )
+  * state should precede time in order to be compatible with array-only archives
+  */
+  template <typename Archive>
+  friend Archive& stateIO(Simulated& s, Archive& ar) {return stateIO(s.ode, ar & s.state & s.time);}
+
 };
-
-
-template<typename ST, typename D, typename OE>
-double getTime(const Simulated<ST,D,OE>& s) {return s.time;}
-
-template<typename ST, typename D, typename OE>
-double getDtDid(const Simulated<ST,D,OE>& s) {return getDtDid(s.ode);}
-
-template<typename ST, typename D, typename OE>
-std::ostream& streamIntro(const Simulated<ST,D,OE>& s, std::ostream& os) {return streamIntro(s.ode,os<<"\nSimulated.\n");}
-
-template<typename ST, typename D, typename OE>
-std::ostream& streamOutro(const Simulated<ST,D,OE>& s, std::ostream& os) {return streamOutro(s.ode,os);}
-
-template<typename ST, typename D, typename OE>
-void step(Simulated<ST,D,OE>& s, double deltaT, std::ostream& logStream) {step(s.ode,deltaT,logStream,s.derivs,s.time,s.state);}
-
-template<typename ST, typename D, typename OE>
-std::ostream& streamKey(const Simulated<ST,D,OE>& s, std::ostream& os) {size_t i=3; return s.keyPrinter.stream(os,i);}
-
-template<typename ST, typename D, typename OE>
-ST stream(const Simulated<ST,D,OE>& s, std::ostream& os, int precision)
-{
-  for (size_t i=0; i < size(s.state); i++) os<<FormDouble(precision)(s.state[i])<<' ';
-  return s.state;
-}
-
-template<typename ST, typename D, typename OE>
-iarchive& readFromArrayOnlyArchive(Simulated<ST,D,OE>& s, iarchive& iar) {return iar & s.state;}
-
-/** structure of Simulated archives:
- * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry )
- * state should precede time in order to be compatible with array-only archives
- */
-template <typename ST, typename D, typename OE, typename Archive>
-Archive& stateIO(Simulated<ST,D,OE>& s, Archive& ar) {return stateIO(s.ode, ar & s.state & s.time);}
-
 
 
 template <typename ST, typename D, typename OE>

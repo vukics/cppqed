@@ -170,60 +170,57 @@ struct Base
   
   LogControl logControl;
 
+
+  friend double getDtDid(const Base& b) {return b.dtDid;}
+
+  friend std::ostream& streamIntro(const Base& b, std::ostream& os)
+  {
+    return b.ces.streamIntro(os<<"ODE engine: " << StepperDescriptor<CES> << ". ") << std::endl;
+  }
+
+  friend std::ostream& streamOutro(const Base& b, std::ostream& os) {return b.logControl[0] ? streamOutro(b.logger,os) : os;}
+
+  /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
+  /**
+  * The possibility of FSAL steppers (that can reuse the derivative calculated in the last stage of the previous step)
+  * is not included, that would require more involved logic.
+  */
+  friend void step(Base& b, typename CES::time_type deltaT, std::ostream& logStream, auto sys, typename CES::time_type& time, auto&&... states)
+  {
+    using Time=typename CES::time_type;
+
+    const Time timeBefore=time;
+    Time nextDtTry=( fabs(deltaT)<fabs(b.dtTry/nextDtTryCorrectionFactor) ? b.dtTry : 0. );
+
+    if ( ( deltaT<0 && b.dtTry>0 ) || ( deltaT>0 && b.dtTry<0 ) ) b.dtTry=-b.dtDid; // Stepping backward
+
+    if (fabs(b.dtTry)>fabs(deltaT)) b.dtTry=deltaT;
+
+    size_t nFailedSteps=0;
+
+    for (;
+          // wraps the sys functional in order that the number of calls to it can be logged
+          b.tryStep( [&] (const auto& y, auto& dydt, double t) {
+            logDerivsCall(b.logger);
+            return sys(y,dydt,t);
+          },time,std::forward<decltype(states)>(states)...)!=bno::success;
+          ++nFailedSteps) ;
+
+    b.dtDid=time-timeBefore;
+    if (nextDtTry) b.dtTry=nextDtTry;
+
+    logStep(b.logger,nFailedSteps);
+
+    if (b.logControl[1]) logStream<<"Number of failed steps in this timestep: "<<nFailedSteps<<std::endl;
+  }
+
+
+  template <typename Archive>
+  friend Archive& stateIO(Base& b, Archive& ar) {return SerializeControlledErrorStepper<CES>::_(ar,b.ces.stepper) & b.logger & b.dtDid & b.dtTry;}
+
+
 };
 
-
-template <typename CES, typename Logger> auto getDtDid(const Base<CES,Logger>& b) {return b.dtDid;}
-
-template <typename CES, typename Logger> std::ostream& streamIntro(const Base<CES,Logger>& b, std::ostream& os)
-{
-  return b.ces.streamIntro(os<<"ODE engine: " << StepperDescriptor<CES> << ". ") << std::endl;
-}
-
-template <typename CES, typename Logger> std::ostream& streamOutro(const Base<CES,Logger>& b, std::ostream& os)
-{
-  return b.logControl[0] ? streamOutro(b.logger,os) : os;
-}
-
-
-/// The signature is such that it matches the signature of step in trajectories without the trailing parameters
-/**
- * The possibility of FSAL steppers (that can reuse the derivative calculated in the last stage of the previous step)
- * is not included, that would require more involved logic.
- */
-template <typename CES, typename Logger>
-void step(Base<CES,Logger>& b, typename CES::time_type deltaT, std::ostream& logStream, auto sys, typename CES::time_type& time, auto&&... states)
-{
-  using Time=typename CES::time_type;
-  
-  const Time timeBefore=time;
-  Time nextDtTry=( fabs(deltaT)<fabs(b.dtTry/nextDtTryCorrectionFactor) ? b.dtTry : 0. );
-  
-  if ( ( deltaT<0 && b.dtTry>0 ) || ( deltaT>0 && b.dtTry<0 ) ) b.dtTry=-b.dtDid; // Stepping backward
-  
-  if (fabs(b.dtTry)>fabs(deltaT)) b.dtTry=deltaT;
-  
-  size_t nFailedSteps=0;
-  
-  for (;
-        // wraps the sys functional in order that the number of calls to it can be logged
-        b.tryStep( [&] (const auto& y, auto& dydt, double t) {
-          logDerivsCall(b.logger);
-          return sys(y,dydt,t);
-        },time,std::forward<decltype(states)>(states)...)!=bno::success;
-        ++nFailedSteps) ;
-
-  b.dtDid=time-timeBefore;
-  if (nextDtTry) b.dtTry=nextDtTry;
-  
-  logStep(b.logger,nFailedSteps);
-  
-  if (b.logControl[1]) logStream<<"Number of failed steps in this timestep: "<<nFailedSteps<<std::endl;
-}
-
-
-template <typename CES, typename Logger, typename Archive>
-Archive& stateIO(Base<CES,Logger>& b, Archive& ar) {return SerializeControlledErrorStepper<CES>::_(ar,b.ces.stepper) & b.logger & b.dtDid & b.dtTry;}
 
 
 /// Specializations for Boost.Odeint controlled_runge_kutta & runge_kutta_cash_karp54
