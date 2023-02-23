@@ -201,7 +201,7 @@ void f()
   
   MultiArray<double,3> maSmallReconstructed{ value_to<MultiArray<double,3>>(parse(maSmallSerialized)) };
   
-  std::cout << (maSmall==maSmallReconstructed) << std::endl;
+  std::cout << isEqual(maSmall,maSmallReconstructed)  << std::endl;
   
   for (auto o : maSmallReconstructed.dataView) std::cout<<o<<" "/*<<std::endl*/;
 

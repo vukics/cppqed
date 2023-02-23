@@ -208,26 +208,29 @@ public:
   /// non-const subscripting
   T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
-  /// to (un)JSON-ize // don’t seem to work as friends
-  friend void tag_invoke( boost::json::value_from_tag, boost::json::value& jv, const MultiArray& ma )
+  /// JSONize
+  friend void tag_invoke( ::boost::json::value_from_tag, ::boost::json::value& jv, const MultiArray& ma )
   {
+    using namespace ::boost::json;
     jv = {
-      { "extents" , ma.extents },
+      { "extents" , value_from(ma.extents) },
       //    { "strides" , ma.strides },
-      { "data", ma.data_ }
+      { "data", value_from(ma.data_) }
     };
   }
 
-  friend auto tag_invoke( boost::json::value_to_tag< MultiArray >, const boost::json::value& jv )
+  /// unJSONize
+  friend auto tag_invoke( ::boost::json::value_to_tag< MultiArray >, const ::boost::json::value& jv )
   {
-    const boost::json::object & obj = jv.as_object();
+    using namespace ::boost::json;
+    const object & obj = jv.as_object();
     return MultiArray {
       value_to<Extents<RANK>>( obj.at( "extents" ) ),
 #ifndef   NDEBUG
       [&] (size_t s) {
         auto ret{value_to<StorageType>( obj.at( "data" ) )};
         if (ret.size() != s) throw std::runtime_error("Mismatch in data size and extents parsed from JSON");
-        return ret;        
+        return ret;
       }
 #else  // NDEBUG
       [&] (size_t) {return value_to<StorageType>( obj.at( "data" ) ); }
