@@ -101,11 +101,12 @@ public:
     size_t idx=0;
     auto e=extents.begin(), s=strides.begin();
 
-    return dataView[ ( [&] {
+    return dataView[ offset + ( ... , [&] {
 #ifndef   NDEBUG
       if (auto eComp=e++; i >= *eComp) throw std::range_error("Index position: "+std::to_string(eComp-extents.begin())+", index value: "+std::to_string(i)+", extent: "+std::to_string(*eComp));
 #endif // NDEBUG
-      return idx+=(*s++)*i;} (), ... ) ];
+      return idx+=(*s++)*i;} () ) ];
+
   }
   
   /// A simple specialization for unary views
