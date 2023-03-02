@@ -20,6 +20,8 @@
 
 namespace cppqedutils {
 
+template <typename T>
+constexpr auto passByValue_v=std::nullopt;
 
 template<size_t... i>
 constexpr auto retainedAxes = hana::tuple_c<size_t,i...>;
@@ -120,6 +122,10 @@ public:
   std::span<T> dataView;
   
 };
+
+
+template <typename T, size_t RANK>
+constexpr auto passByValue_v<MultiArrayView<T,RANK>> = true;
 
 
 template <typename T, size_t RANK> requires ( !std::is_const<T>() )
@@ -250,6 +256,10 @@ private:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   
 };
+
+
+template <typename T, size_t RANK>
+constexpr auto passByValue_v<MultiArray<T,RANK>> = false;
 
 
 namespace multiarray {

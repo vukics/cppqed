@@ -131,6 +131,10 @@ constexpr auto multiArrayRank_v<StateVector<RANK>> = RANK;
 } // quantumdata
 
 
+template <size_t RANK>
+constexpr auto cppqedutils::passByValue_v<quantumdata::StateVector<RANK>> = false;
+
+
 namespace structure {
 
 using ::quantumdata::StateVectorView, ::quantumdata::StateVectorConstView;

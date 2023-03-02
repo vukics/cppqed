@@ -175,6 +175,8 @@ constexpr auto multiArrayRank_v<DensityOperator<RANK>> = 2*RANK;
 
 
 
+template <size_t RANK>
+constexpr auto cppqedutils::passByValue_v<quantumdata::DensityOperator<RANK>> = false;
 
 
 
