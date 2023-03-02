@@ -3,75 +3,67 @@
 
 #include "StateVector.h"
 
-#include "Utility.h"
-
-#include <variant>
-
 
 namespace structure {
 
+template <typename H, size_t RANK>
+concept time_independent_term = requires(H&& h, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt) { h(psi,dpsidt); };
 
-template <size_t RANK>
-using TimeIndependentTerm = std::function<void(StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt)>;
+template <typename H, size_t RANK>
+concept one_time_dependent_term = requires(H&& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt) { h(t,psi,dpsidt); };
 
+template <typename H, size_t RANK>
+concept two_time_dependent_term = requires(H&& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0) { h(t,psi,dpsidt,t0); };
 
-template <size_t RANK>
-using OneTimeDependentTerm = std::function<void(double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt)>;
+template <typename H, size_t RANK>
+concept one_time_dependent_propagator = requires(H&& h, double t, StateVectorView<RANK> psi) { h(t,psi); };
 
+template <typename H, size_t RANK>
+concept two_time_dependent_propagator = requires(H&& h, double t, StateVectorView<RANK> psi, double t0) { h(t,psi,t0); };
 
-template <size_t RANK>
-using TwoTimeDependentTerm = std::function<void(double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)>;
+template <typename H, size_t RANK>
+concept term_or_propagator = 
+  time_independent_term<H,RANK> || one_time_dependent_term<H,RANK> || two_time_dependent_term<H,RANK> || 
+  one_time_dependent_propagator<H,RANK> || two_time_dependent_propagator<H,RANK> ;
 
-
-template <size_t RANK>
-using OneTimeDependentPropagator = std::function<void(double, StateVectorView<RANK>)>;
-
-
-template <size_t RANK>
-using TwoTimeDependentPropagator = std::function<void(double, StateVectorView<RANK>, double)>;
 
 
 /// a label and a term
-/*
- * the `label` becomes a `prefix:label` when the system becomes part of a more complex system
- */
-template <size_t RANK>
-using HamiltonianTerm = std::tuple<std::string,std::variant<TimeIndependentTerm<RANK>,OneTimeDependentTerm<RANK>,TwoTimeDependentTerm<RANK>,OneTimeDependentPropagator<RANK>,TwoTimeDependentPropagator<RANK>>>;
+/** the `label` becomes a `prefix:label` when the system becomes part of a more complex system */
+template <typename H, size_t RANK>
+concept hamiltonian_term = requires (H&& h) {
+  { label(h) } -> std::convertible_to<std::string>;
+  { termOrPropagator(h) } -> term_or_propagator<RANK>;
+};
 
 
-// e.g. `std::list<HamiltonianTerm<RANK>>`, but transformed views might be necessary
-template <typename T, size_t RANK>
-concept hamiltonian = 
-  std::ranges::forward_range<T> && 
-  std::is_same_v<std::ranges::range_value_t<T>,
-                 HamiltonianTerm<RANK>>;
+template <typename H, size_t RANK>
+concept hamiltonian = hana_sequence<H> && !!hana::all_of(
+  decltype(hana::transform(std::declval<H>(), hana::typeid_)){},
+  []<class T>(T) { return hamiltonian_term<typename T::type,RANK>; });
 
 
 /// applying a Hamiltonian is by default interpreted as |dpsidt>+=H|psi>
-/**
- * However, if indexing is done carefully, `psi` and `dpsidt` can refer to the same underlying data
- */
-template <size_t RANK, hamiltonian<RANK> HA>
-void applyHamiltonian(const HA& ha, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
+/** However, if indexing is done carefully, `psi` and `dpsidt` can refer to the same underlying data */
+template <size_t RANK>
+void applyHamiltonian(const hamiltonian<RANK> auto& ha, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
 {
-  for (auto& term : ha)
-    std::visit(cppqedutils::overload{
-      [&] (const TimeIndependentTerm<RANK>& c) {c(psi,dpsidt);},
-      [&] (const OneTimeDependentTerm<RANK>& c) {c(t-t0,psi,dpsidt);},
-      [&] (const TwoTimeDependentTerm<RANK>& c) {c(t,psi,dpsidt,t0);},
-    },std::get<1>(term));
+  hana::for_each(hana::transform(ha, [] (auto h) {return func(h);} ), [&]<typename H> (H h) {
+    if constexpr (time_independent_term  <H,RANK>) h(psi,dpsidt);
+    else if      (one_time_dependent_term<H,RANK>) h(t-t0,psi,dpsidt);
+    else if      (two_time_dependent_term<H,RANK>) h(t,psi,dpsidt,t0);
+  });
 }
 
 
 /// applying a Propagator is interpreted as replacing |psi> with U|psi>
-template <size_t RANK, hamiltonian<RANK> HA>
-void applyPropagator(const HA& ha, double t, StateVectorView<RANK> psi, double t0)
+template <size_t RANK>
+void applyPropagator(const hamiltonian<RANK> auto& ha, double t, StateVectorView<RANK> psi, double t0)
 {
-  for (auto& term : ha)
-    std::visit(cppqedutils::overload{
-      [&] (const OneTimeDependentPropagator<RANK>& c) {c(t-t0,psi);},
-      [&] (const TwoTimeDependentPropagator<RANK>& c) {c(t,psi,t0);},
-    },std::get<1>(term));
+  hana::for_each(hana::transform(ha, [] (auto h) {return func(h);} ), [&]<typename H> (H h) {
+    if constexpr (one_time_dependent_propagator<H,RANK>) h(t-t0,psi);
+    else if      (two_time_dependent_propagator<H,RANK>) h(t,psi,t0);
+  });
 }
 
 
@@ -82,13 +74,13 @@ struct UnaryDiagonalPropagator
 {
   using Diagonal = std::valarray<dcomp>;
 
-  using UpdateFunctional = std::conditional_t<IS_TWO_TIME,std::function<void(double,double,Diagonal&)>,std::function<void(double,Diagonal&)>>;
+  using UpdateFunctional = std::conditional_t<IS_TWO_TIME,std::function<void(double,Diagonal&,double)>,std::function<void(double,Diagonal&)>>;
   
   UnaryDiagonalPropagator(size_t dim, UpdateFunctional updateDiagonal) : diagonal{dim}, updateDiagonal_{updateDiagonal} {}
   
-  void operator()(double t, StateVectorView<1> psi, double t0) const requires (IS_TWO_TIME) {if (t!=t_ || t0!=t0_) {updateDiagonal_(t_=t,t0_=t0,diagonal);} psi*=diagonal;}
+  void operator()(double t, StateVectorView<1> psi, double t0) const requires (IS_TWO_TIME);// {if (t!=t_ || t0!=t0_) {updateDiagonal_(t_=t,diagonal,t0_=t0);} psi*=diagonal;}
 
-  void operator()(double t, StateVectorView<1> psi) const requires (!IS_TWO_TIME) {if (t!=t_) {updateDiagonal_(t_=t,diagonal);} psi*=diagonal;}
+  void operator()(double t, StateVectorView<1> psi) const requires (!IS_TWO_TIME);// {if (t!=t_) {updateDiagonal_(t_=t,diagonal);} psi*=diagonal;}
 
   mutable Diagonal diagonal;
 
@@ -99,6 +91,16 @@ private:
 
 };
 
+
+template <size_t RANK, term_or_propagator<RANK> TOP>
+struct HamiltonianTerm
+{
+  std::string label;
+  TOP termOrPropagator;
+  
+  friend std::string label(HamiltonianTerm ht) {return ht.label;}
+  friend TOP termOrPropagator(HamiltonianTerm ht) {return ht.termOrPropagator;}
+};
 
 
 } // structure
