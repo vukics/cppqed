@@ -15,9 +15,20 @@ template <size_t RANK>
 using StateVectorView=cppqedutils::MultiArrayView<dcomp,RANK>;
 
 
-template <size_t RANK>
-using StateVectorConstView=cppqedutils::MultiArrayConstView<dcomp,RANK>;
+template <typename, size_t RANK> // the first template parameter is there just in order to conform with what MultiArray expects
+struct StateVectorConstViewBase : cppqedutils::MultiArrayConstView<dcomp,RANK>
+{
+  using cppqedutils::MultiArrayConstView<dcomp,RANK>::MultiArrayConstView;
+  using cppqedutils::MultiArrayConstView<dcomp,RANK>::operator=;
+  
+  /// lazy_density_operator-style indexing
+  const dcomp operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==2*RANK);
 
+};
+
+
+template <size_t RANK>
+using StateVectorConstView = StateVectorConstViewBase<dcomp,RANK>;
 
 
 /// State vector of arbitrary arity
@@ -29,13 +40,11 @@ using StateVectorConstView=cppqedutils::MultiArrayConstView<dcomp,RANK>;
  * 
  */
 template<size_t RANK>
-struct StateVector : ArrayBase<StateVector<RANK>>, DimensionsBookkeeper<RANK>
+struct StateVector : ArrayBase<StateVector<RANK>,StateVectorConstViewBase>, DimensionsBookkeeper<RANK>
 {
-  static constexpr size_t N_RANK=RANK;
-  
   using Dimensions=typename DimensionsBookkeeper<RANK>::Dimensions;
 
-  typedef ArrayBase<StateVector<RANK>> ABase;
+  using ABase = ArrayBase<StateVector<RANK>,StateVectorConstViewBase>;
 
   StateVector(const StateVector&) = delete; StateVector& operator=(const StateVector&) = delete;
   
@@ -116,7 +125,7 @@ dcomp braket(const StateVector<RANK>& psi1, const StateVector<RANK>& psi2);/*
 
 
 template <size_t RANK>
-constexpr auto MultiArrayRank_v<StateVector<RANK>> = RANK;
+constexpr auto multiArrayRank_v<StateVector<RANK>> = RANK;
 
 
 } // quantumdata

@@ -4,7 +4,6 @@
 
 
 #include "LinearAlgebra.h"
-#include "MathExtensions.h"
 #include "MultiArrayComplex.h"
 
 
@@ -12,14 +11,14 @@ namespace quantumdata {
 
 
 template<typename>
-constexpr auto MultiArrayRank_v=std::nullopt;
+constexpr auto multiArrayRank_v=std::nullopt;
 
 
 /// Adding common linear algebra functionality to StateVector and DensityOperator.
-template<typename Derived>
-struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,MultiArrayRank_v<Derived>>>
+template<typename Derived, template <typename, size_t> typename MA_BASE=cppqedutils::MultiArrayConstView>
+struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,multiArrayRank_v<Derived>,MA_BASE>>
 {
-  using cppqedutils::MultiArray<dcomp,MultiArrayRank_v<Derived>>::MultiArray;
+  using cppqedutils::MultiArray<dcomp,multiArrayRank_v<Derived>,MA_BASE>::MultiArray;
   
   /// \name Naive vector-space operations
   //@{
@@ -29,13 +28,8 @@ struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,Mul
 
   /// \name Naive vector-space operations allowing also for mixed-mode arithmetics
   //@{
-  Derived& operator*=(const auto& dc); // {arrayLow_*=dc; return static_cast<Derived&>(*this);} ///< \tparam OTHER the “other” type in mixed mode
-
-  Derived& operator/=(const auto& dc); // {arrayLow_/=dc; return static_cast<Derived&>(*this);}
-  //@}
-
-  /// \name One-dimensional view of the underlying data
-  linalg::CVector vectorView(); // what about constness here??? const {return blitzplusplus::unaryArray(arrayLow_);}
+  Derived& operator*=(const auto& dc) {for (auto&& t : this->dataView) t*=dc; return static_cast<Derived&>(*this);}
+  Derived& operator/=(const auto& dc) {for (auto&& t : this->dataView) t/=dc; return static_cast<Derived&>(*this);}
   //@}
 
   /// The entrywise array norm
@@ -43,7 +37,7 @@ struct ArrayBase : linalg::VectorSpace<Derived,cppqedutils::MultiArray<dcomp,Mul
    * \f[\norm A _{\text{F}}=\sqrt{\sum_i\,\abs{A_i}^2},\f]
    * with \f$i\f$ running through all the multi-indices.
    */
-  double frobeniusNorm() const { return std_ext::ranges::fold( this->dataView | std::views::transform(cppqedutils::sqrAbs) , 0., std::plus{} ); }
+  double frobeniusNorm() const { return std_ext::ranges::fold( this->dataView | std::views::transform(sqrAbs) , 0., std::plus{} ); }
 
 };
 

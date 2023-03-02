@@ -29,3 +29,6 @@ noexcept(noexcept(x*x)) // propagate noexcept
 
 
 double relativeDeviation(const auto& a, const auto& b) {return std::abs(a-b)/(std::abs(a)+std::abs(b));}
+
+/// TODO: is std::pow efficient enough here?
+inline double sqrAbs(dcomp v) {return sqr(std::abs(v));}

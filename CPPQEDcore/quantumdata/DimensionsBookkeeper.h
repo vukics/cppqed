@@ -20,7 +20,7 @@ public:
 
   using Dimensions = cppqedutils::Extents<RANK>;
 
-  auto operator<=>(const DimensionsBookkeeper&) const = default;
+  bool operator==(const DimensionsBookkeeper&) const = default;
   
   explicit DimensionsBookkeeper(const Dimensions& dimensions) : dimensions_{dimensions} {}
 
@@ -28,7 +28,7 @@ public:
   
   size_t getTotalDimension() const {return cppqedutils::multiarray::calculateExtent(dimensions_);} ///< Get the total dimension of a system of arbitrary arity
 
-  size_t getDimension() requires ( RANK==1 ) const {return dimensions_[0];} ///< Get the (single) dimension for a unary system
+  size_t getDimension() const requires ( RANK==1 ) {return dimensions_[0];} ///< Get the (single) dimension for a unary system
 
   size_t getDimension(size_t i) const {return dimensions_[i];}
 

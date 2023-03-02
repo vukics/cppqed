@@ -162,9 +162,9 @@ auto calculateExtent(Extents<RANK> extents)
 
 /// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned) 
 /** Follows value semantics regarding constness. */
-template <typename T, size_t RANK>
+template <typename T, size_t RANK, template <typename, size_t> typename BASE=MultiArrayConstView>
 requires ( !std::is_const<T>() )
-class MultiArray : public MultiArrayConstView<T,RANK>
+class MultiArray : public BASE<T,RANK>
 {
 public:
   /// the storage might eventually become a kokkos::View or a std::valarray
@@ -179,7 +179,7 @@ public:
   
   /// initializer is a callable, taking the total size as argument.
   MultiArray(Extents<RANK> extents, auto&& initializer)
-    : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
+    : BASE<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
   {
     this->dataView=std::span<T>(data_);
   }
@@ -205,7 +205,7 @@ public:
   operator MultiArrayView<T,RANK>() {return mutableView();}
 
   /// non-const subscripting
-  T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
+  T& operator()(auto&&... i) {return const_cast<T&>(static_cast<BASE<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
   /// JSONize
   friend void tag_invoke( ::boost::json::value_from_tag, ::boost::json::value& jv, const MultiArray& ma )

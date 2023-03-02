@@ -28,13 +28,11 @@ using DensityOperatorConstView=cppqedutils::MultiArrayConstView<dcomp,2*RANK>;
  * 
  */
 template<size_t RANK>
-struct DensityOperator : ArrayBase<DensityOperator<RANK>>, DimensionsBookkeeper<RANK>
+struct DensityOperator : ArrayBase<DensityOperator<RANK>,cppqedutils::MultiArrayConstView<dcomp,2*RANK>>, DimensionsBookkeeper<RANK>
 {
-  static constexpr size_t N_RANK=RANK;
-
   using Dimensions=typename DimensionsBookkeeper<RANK>::Dimensions;
   
-  typedef ArrayBase<DensityOperator<RANK>> ABase;
+  using ABase = ArrayBase<DensityOperator<RANK>,cppqedutils::MultiArrayConstView<dcomp,2*RANK>>;
 
   DensityOperator(const DensityOperator&) = delete; DensityOperator& operator=(const DensityOperator&) = delete;
   
@@ -50,29 +48,9 @@ struct DensityOperator : ArrayBase<DensityOperator<RANK>>, DimensionsBookkeeper<
     : ABase(psi.dyad()), DimensionsBookkeeper<RANK>{this->extents} {}
 
 
-  DensityOperator& operator=(const StateVector<RANK>& psi)
-  {
-    using namespace linalg;
-    CMatrix matrix(matrixView());
-    CVector vector(psi.vectorView());
-    size_t dim(this->getTotalDimension());
-    for (size_t i=0; i<dim; i++) for (size_t j=0; j<dim; j++) matrix(i,j)=vector(i)*conj(vector(j));
-    return *this;
-  }
-  
-
-  template<typename... SubscriptPack>
-  void transposeSelf(SubscriptPack... subscriptPack)
-  {
-    static_assert( sizeof...(SubscriptPack)==RANK , "Incorrect number of subscripts for DensityOperator." );
-    getArray().transposeSelf(subscriptPack...,(subscriptPack+RANK)...);
-    this->setDimensions(blitzplusplus::halfCutTiny(getArray().shape()));
-  }
-  //@}
-  
   /// \name Norm
   //@{
-  double norm() const ///< returns the trace norm
+  double trace() const ///< returns the trace norm
   {
     using blitz::tensor::i;
     const linalg::CMatrix m(matrixView());
@@ -87,18 +65,7 @@ struct DensityOperator : ArrayBase<DensityOperator<RANK>>, DimensionsBookkeeper<
   }
   //@}
 
-  /// \name Matrix view
-  //@{
-  auto matrixView() const {return blitzplusplus::binaryArray(getArray());} ///< returns a two-dimensional view of the underlying data, created on the fly via blitzplusplus::binaryArray
-  //@}
-
 };
-
-
-template<size_t RANK1, size_t RANK2>
-inline
-const DensityOperator<RANK1+RANK2>
-operator*(const DensityOperator<RANK1>&, const DensityOperator<RANK2>&);
 
 
 template<size_t RANK>
@@ -192,33 +159,22 @@ dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
 }
 
 
+template<size_t RANK>
+double purity(const DensityOperator<RANK>& rho)
+{
+  return std_ext::ranges::fold(rho.dataView,0.,[] (double init, dcomp element) { return init+cppqedutils::sqrAbs(element); });
+}
+
+
 template <size_t RANK>
-constexpr auto MultiArrayRank_v<DensityOperator<RANK>> = 2*RANK;
+constexpr auto multiArrayRank_v<DensityOperator<RANK>> = 2*RANK;
+
 
 
 } // quantumdata
 
 
-namespace cppqedutils::sliceiterator {
 
-template<size_t RANK>
-struct SubscriptMultiArray<quantumdata::DensityOperator<RANK>>
-{
-  template<typename ... SubscriptPack>
-  static auto _(const quantumdata::DensityOperator<RANK>& rho, const SubscriptPack&... subscriptPack)
-  {
-    return rho.diagonalSliceIndex(subscriptPack...);
-  }
-};
-  
-} // cppqedutils::sliceiterator
-
-
-template<size_t RANK>
-double purity(const DensityOperator<RANK>& rho)
-{
-  return std::accumulate(rho.getArray().begin(),rho.getArray().end(),0.,[] (double init, dcomp element) { return init+cppqedutils::sqrAbs(element); });
-}
 
 
 
