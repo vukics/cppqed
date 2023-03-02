@@ -6,11 +6,8 @@
 
 #include "Utility.h"
 
-#include <variant>
-
 
 namespace quantumdata {
-
 
 /// Common interface for calculating quantum averages from StateVector, DensityOperator (and potentially their non-orthogonal counterparts)
 /**
@@ -27,24 +24,10 @@ namespace quantumdata {
  * 
  * Immutable class. Should be passed by value.
  */
-template<size_t RANK> 
-struct LazyDensityOperator
-{
-  LazyDensityOperator(auto&&... qd) : quantumdata_{std::forward<decltype(qd)>(qd)...} {}
-  
-  const dcomp operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==2*RANK)
-  {
-    return std::visit(cppqedutils::overload{
-      [&] (StateVectorConstView<RANK> psi) {return psi(i...)*conj(psi(i...));},
-      [&] (DensityOperatorConstView<RANK> rho) {return rho(i...);},
-    },quantumdata_);
-  }
-  
-  double trace() const;
 
-  std::variant<StateVectorConstView<RANK>,DensityOperatorConstView<RANK>> quantumdata_;
-  
-};
+
+template <typename T, size_t RANK>
+concept lazy_density_operator = ( std::same_as<T,StateVectorConstView<RANK>> || std::same_as<T,DensityOperatorConstView<RANK>> );
 
 
 /// The primary tool for performing slice iteration of LazyDensityOperator#s
@@ -54,38 +37,35 @@ struct LazyDensityOperator
  * `function` is a callable with signature `T(LazyDensityOperator<hana::size(retainedAxes)>)`, where T is an arithmetic type
  */
 template<auto retainedAxes, size_t RANK>
-auto partialTrace(LazyDensityOperator<RANK> matrix, const std::vector<size_t>& offsets, auto&& function, auto&& plus)
+auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets, auto&& function, auto&& plus)
 {
   // static constexpr auto extendedAxes{hana::fold(retainedAxes,retainedAxes, [] (const auto& state, auto element) {return hana::append(state,element+RANK);})};
-  
-  static constexpr auto extendedAxes{hana::concat(retainedAxes,
-                                                  hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
-  
+  using LDO = decltype(matrix);
+ 
   const auto iterateSlices{[&] (const auto& sr) {
     return std_ext::ranges::fold(
       sr | std::views::drop(1),
       function(*std::ranges::begin(sr)),
       [&] (const auto& res, const auto& slice) {return plus(res,function(slice));});
   }};
-  
-  // for the DensityOperatorConstView case, the same slices range can be used, but with the offsets multiplied by (dim+1)
-  return std::visit(cppqedutils::overload{
-      [&] (StateVectorConstView<RANK> psi) {
-        auto sr{cppqedutils::sliceRange<retainedAxes>(psi,offsets)};
-        return iterateSlices(sr);
-      },
-      [&] (DensityOperatorConstView<RANK> rho) {
-        auto diagonalOffsets{offsets | std::views::transform([&] (size_t v) {return v*(std::lround(std::sqrt(rho.dataView.size()))+1);} ) };
-        auto sr{cppqedutils::sliceRange<extendedAxes>(rho,diagonalOffsets)};
-        return iterateSlices(sr);
-      },
-    }, matrix.quantumdata_);
-  
+
+  if constexpr (std::same_as<LDO,StateVectorConstView<RANK>>) {
+    auto sr{cppqedutils::sliceRange<retainedAxes>(matrix,offsets)};
+    return iterateSlices(sr);
+  }
+  else if (std::same_as<LDO,DensityOperatorConstView<RANK>>) {
+    static constexpr auto extendedAxes{hana::concat(retainedAxes,
+                                                    hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
+    auto diagonalOffsets{offsets | std::views::transform([&] (size_t v) {return v*(std::lround(std::sqrt(matrix.dataView.size()))+1);} ) };
+    auto sr{cppqedutils::sliceRange<extendedAxes>(matrix,diagonalOffsets)};
+    return iterateSlices(sr);
+  }
+ 
 }
 
 
 template<auto retainedAxes, size_t RANK>
-auto partialTrace(LazyDensityOperator<RANK> matrix, const std::vector<size_t>& offsets, auto&& function)
+auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets, auto&& function)
 {
   return partialTrace<retainedAxes>(matrix,offsets,std::forward<decltype(function)>(function),std::plus{});
 }
@@ -260,6 +240,6 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
 
 namespace structure {
 
-using ::quantumdata::LazyDensityOperator;
+using ::quantumdata::lazy_density_operator;
 
 } // structure
