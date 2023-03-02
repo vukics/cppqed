@@ -4,10 +4,9 @@
 #include "Archive.h"
 #include "CommentingStream.h"
 #include "FormDouble.h"
+#include "Hana.h"
 #include "ODE.h"
 #include "Version.h"
-
-#include <boost/hana.hpp>
 
 #include <boost/iostreams/device/null.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -22,9 +21,6 @@
 #include <string>
 #include <tuple>
 
-
-
-namespace hana=boost::hana;
 
 
 namespace cppqedutils {

@@ -3,9 +3,7 @@
 
 #include "Algorithm.h"
 #include "Archive.h"
-
-#include <boost/hana.hpp>
-namespace hana=boost::hana;
+#include "Hana.h"
 
 #include <boost/operators.hpp>
 
