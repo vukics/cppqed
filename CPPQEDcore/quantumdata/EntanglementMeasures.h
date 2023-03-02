@@ -1,18 +1,14 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Declares the function calculating the negativity of a partially transposed density operator}
-#ifndef   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
-#define   CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED
+#pragma once
 
 #include "DensityOperator.h"
 
-#include <Eigen/Dense>
 #include <Eigen/Eigenvalues> 
 
+#include <numeric>
 
 namespace quantumdata {
 
-
-using EigenCMatrix=Eigen::MatrixX<dcomp>;
 
   
 /// Calculates the negativity of the partial transpose of the density operator of an arbitrarily complex system
@@ -35,69 +31,42 @@ using EigenCMatrix=Eigen::MatrixX<dcomp>;
  * \tparam V a compile-time vector, tipically a tmptools::Vector, specifying the quantum numbers grouped into one part of the bipartite (cf. \ref specifyingsubsystems)
  * 
  */
-template<int RANK, typename V>
-double negPT(const DensityOperator<RANK>& rho, V)
+template<auto subsystemAxes, size_t RANK>
+double negPT(const DensityOperator<RANK>& rho)
 {
-  using namespace boost::mpl;
-  namespace mpl=boost::mpl;
-  using namespace tmptools;
+  static constexpr auto extendedAxes = hana::fold (
+    subsystemAxes ,
+    cppqedutils::compileTimeOrdinals<2*RANK> ,
+    [] (auto state, auto v) {state[v]=v+RANK; state[v+RANK]=v; return state;}
+    );  
 
-  using ExtendV = typename
-    fold<Range<RANK,RANK>,
-        typename fold<Ordinals<RANK>,
-                      vector_c<int>,
-                      push_back<mpl::_1,
-                                if_<numerical_contains<V,mpl::_2>,
-                                    plus<mpl::_2,int_<RANK> >,
-                                    mpl::_2
-                                    >
-                                >
-                      >::type,
-        push_back<mpl::_1,
-                  if_<numerical_contains<V,minus<mpl::_2,int_<RANK> > >,
-                      minus<mpl::_2,int_<RANK> >,
-                      mpl::_2
-                      >
-                  >
-        >::type;
-
-  DensityOperatorLow<RANK> rhoShallowPT(rho.getArray());
-
-  cppqedutils::sliceiterator::Transposer<CArray,2*RANK,ExtendV>::_(rhoShallowPT);
-
-  DensityOperatorLow<RANK> rhoDeepPT(rhoShallowPT.shape()); rhoDeepPT=rhoShallowPT;
+  DensityOperator<RANK> rhoDeepPT{rho.extents,
+                                  [&] (auto& r) {r.mutableView.assignTo(cppqedutils::transpose<extendedAxes>(rho));}};
   
-  auto ev=Eigen::ComplexEigenSolver<EigenCMatrix>{
-    Eigen::Map<EigenCMatrix>{rhoDeepPT.data(),long(rho.getTotalDimension()),long(rho.getTotalDimension())},
-    false}.eigenvalues();
+  auto ev=Eigen::ComplexEigenSolver<CMatrix>{Eigen::Map<CMatrix>{rhoDeepPT.data(),rho.getTotalDimension(),rho.getTotalDimension()},false}.eigenvalues();
   
   return (std::accumulate(ev.begin(),ev.end(),0.,[] (double v, dcomp e) {return v + std::abs(e) ;}) - 1.)/2. ;
   
 }
 
-template<int RANK>
-inline
-double negPT(const DensityOperator<RANK>&, tmptools::V_Empty)
-{
-  return 0;
-}
+template<size_t RANK> double negPT(const DensityOperator<RANK>&) {return 0;}
 
 
-template<int RANK>
+template<size_t RANK>
 double entropy(const DensityOperator<RANK>& rho)
 {
-  auto ev=Eigen::SelfAdjointEigenSolver<EigenCMatrix>{
-    Eigen::Map<EigenCMatrix>{const_cast<dcomp*>(rho.getArray().data()),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
+  auto ev=Eigen::SelfAdjointEigenSolver<CMatrix>{
+    Eigen::Map<CMatrix>{const_cast<dcomp*>(rho.getArray().data()),long(rho.getTotalDimension()),long(rho.getTotalDimension())},Eigen::EigenvaluesOnly}.eigenvalues();
     
   return std::accumulate(ev.begin(),ev.end(),0.,[] (double v, double e) {return v - e * ( e>0. ? std::log(e) : 0. ) ;});
 }
 
 
-template<int RANK, typename V>
-double mutualInformation(const DensityOperator<RANK>& rho, V)
+template<auto subsystemAxes, size_t RANK>
+double mutualInformation(const DensityOperator<RANK>& rho)
 {
-  return entropy(::quantumdata::reduce<V>(rho))
-    +entropy(::quantumdata::reduce<::tmptools::NegatedVector<RANK,V> >(rho))
+  return entropy(reduce<V>(rho))
+    +entropy(reduce<::tmptools::NegatedVector<RANK,V> >(rho))
     -entropy(rho);
 }
 
@@ -105,12 +74,9 @@ double mutualInformation(const DensityOperator<RANK>& rho, V)
 template<int RANK, typename V>
 double purityOfPartialTrace(const DensityOperator<RANK>& rho, V)
 {
-  return ::quantumdata::purity(::quantumdata::reduce<V>(rho));
+  return purity(reduce<V>(rho));
 }
 
 
 
 } // quantumdata 
-
-
-#endif // CPPQEDCORE_QUANTUMDATA_NEGPT_H_INCLUDED

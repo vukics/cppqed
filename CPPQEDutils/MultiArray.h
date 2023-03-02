@@ -478,4 +478,12 @@ auto sliceRange(MultiArrayView<T,RANK> mav) requires multiarray::consistent<reta
 }
 
 
+template <auto axes, typename T, size_t RANK>
+MultiArrayView<T,RANK> transpose(MultiArrayView<T,RANK> mav) requires ( hana::size(axes) == RANK )
+{
+  mav.extents=filterIn<axes>(mav.extents); mav.strides=filterIn<axes>(mav.strides);
+  return mav;
+}
+
+
 } // cppqedutils
