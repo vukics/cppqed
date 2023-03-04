@@ -43,7 +43,7 @@ concept hamiltonian = hana_sequence<H> && !!hana::all_of(
   []<class T>(T) { return hamiltonian_term<typename T::type,RANK>; });
 
 
-/// applying a Hamiltonian is by default interpreted as |dpsidt>+=H|psi>
+/// applying a Hamiltonian is by default interpreted as |dpsidt>+=H|psi>/(i*hbar)
 /** However, if indexing is done carefully, `psi` and `dpsidt` can refer to the same underlying data */
 template <size_t RANK>
 void applyHamiltonian(const hamiltonian<RANK> auto& ha, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
