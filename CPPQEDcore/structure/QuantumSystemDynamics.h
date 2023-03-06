@@ -22,9 +22,9 @@
  */
 #pragma once
 
-#include "ExpectationValues.h"
-#include "Hamiltonian.h"
 #include "Liouvillian.h"
+
+#include "FormDouble.h"
 
 
 namespace structure {
@@ -46,8 +46,7 @@ double highestFrequency(const SFS& sfs)
 }
 
 
-template <system_frequency_store SFS>
-std::ostream& stream(const SFS& sfs, std::ostream& os)
+std::ostream& stream(const system_frequency_store auto& sfs, std::ostream& os)
 {
   for(const auto& sf : sfs) os<<get<0>(sf)<<"="<<formdouble::zeroAdditional(os.precision())(get<1>(sf))<<std::endl;
   return os;
@@ -68,19 +67,16 @@ concept quantum_system_dynamics = requires (T qsd)
 
 
 /// a simple implementation of the concept:
-template <size_t RANK>
-using QuantumSystemDynamics = std::tuple<
-  std::list<SystemFrequencyDescriptor>,
-  std::list<HamiltonianTerm<RANK>>,
-  std::list<Lindblad<RANK>>,
-  std::list<ExpectationValue<RANK>>
->
+template <system_frequency_store SFS, size_t RANK, hamiltonian<RANK> HA, liouvillian<RANK> LI, expectation_values<RANK> EV>
+struct QuantumSystemDynamics
+{
+  SFS freqs; HA ha; LI li; EV ev;
 
-template <size_t RANK> auto getFreqs(const QuantumSystemDynamics<RANK>& qsd) {return std::get<0>(qsd);}
-template <size_t RANK> auto getHa   (const QuantumSystemDynamics<RANK>& qsd) {return std::get<1>(qsd);}
-template <size_t RANK> auto getLi   (const QuantumSystemDynamics<RANK>& qsd) {return std::get<2>(qsd);}
-template <size_t RANK> auto getEV   (const QuantumSystemDynamics<RANK>& qsd) {return std::get<3>(qsd);}
-
+  friend auto getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
+  friend auto getHa   (const QuantumSystemDynamics& qsd) {return qsd.ha;}
+  friend auto getLi   (const QuantumSystemDynamics& qsd) {return qsd.li;}
+  friend auto getEV   (const QuantumSystemDynamics& qsd) {return qsd.ev;}
+};
 
 } // structure
 

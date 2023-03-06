@@ -8,7 +8,7 @@ std::ostream& structure::stream(const EV_Array& eva, std::ostream& os, int preci
 {
   os<<'\t';
   {
-    const formdouble::FormDouble fd{precision};
+    const FormDouble fd{precision};
     for (double ev : eva) os<<fd(ev);
   }
   return os;

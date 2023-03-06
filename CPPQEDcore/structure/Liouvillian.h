@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ExpectationValues.h"
+#include "Hamiltonian.h"
 
 
 namespace structure {
@@ -10,52 +11,59 @@ namespace structure {
 using Rates=EV_Array;
 
 
-template <size_t RANK>
-using TimeDependentJump = std::function<void(double t, StateVectorView<RANK> psi)>;
+template <typename L, size_t RANK>
+concept time_dependent_jump = one_time_dependent_propagator<L,RANK>;
 
-template <size_t RANK>
-using TimeIndependentJump = std::function<void(StateVectorView<RANK> psi)>;
+template <typename L, size_t RANK>
+concept time_independent_jump = requires(L&& l, StateVectorView<RANK> psi) { l(psi); };
 
-
-template <size_t RANK>
-using TimeDependentRate = TimeDependentExpectationValue<RANK,double>;
-
-template <size_t RANK>
-using TimeIndependentRate = TimeIndependentExpectationValue<RANK,double>;
+template <typename L, size_t RANK>
+concept jump = time_dependent_jump<L,RANK> || time_independent_jump<L,RANK>;
 
 
-template <size_t RANK>
-using TimeDependentSuperoperator = std::function<void(double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK>& drhodt)>;
+template <typename L, size_t RANK>
+concept time_dependent_rate = time_dependent_expectation_value<L,RANK,double>;
 
-template <size_t RANK>
-using TimeIndependentSuperoperator = std::function<void(DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt)>;
+template <typename L, size_t RANK>
+concept time_independent_rate = time_independent_expectation_value<L,RANK,double>;
 
-
-template <size_t RANK>
-using Rate = std::variant<TimeDependentRate<RANK>,TimeIndependentRate<RANK>>;
-
-template <size_t RANK>
-using Jump = std::variant<TimeDependentJump<RANK>,TimeIndependentJump<RANK>>;
-
-template <size_t RANK>
-using Superoperator = std::variant<TimeDependentSuperoperator<RANK>,TimeIndependentSuperoperator<RANK>>;
+template <typename L, size_t RANK>
+concept rate = time_dependent_rate<L,RANK> || time_independent_rate<L,RANK>;
 
 
-template <size_t RANK>
-struct Lindblad
-{
-  std::string label;
-  Jump<RANK> jump;
-  Rate<RANK> rate; // could be made std::optional<Rate<RANK>> rate; if it’s null, then the rate is calculated from the jump functional
-  Superoperator<RANK> superoperator; // std::optional<Superoperator<RANK>> superoperator; if it’s null, then the superoperator is calculated from the jump functional
+template <typename L, size_t RANK>
+concept time_dependent_superoperator = ode_derivative_time_dependent_contribution<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
+
+template <typename L, size_t RANK>
+concept time_independent_superoperator = ode_derivative_time_independent_contribution<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
+
+template <typename L, size_t RANK>
+concept superoperator = time_dependent_superoperator<L,RANK> || time_independent_superoperator<L,RANK>;
+
+
+template <typename L, size_t RANK>
+concept lindblad_with_jump = labelled<L> && requires (L&& l) {
+  { jumpFunctional(l) } -> jump<RANK> ;
 };
 
+template <typename L, size_t RANK>
+concept lindblad_with_rate = lindblad<L> && requires (L&& l) {
+  { rateFunctional(l) } -> rate<RANK> ;
+};
 
-template <typename T, size_t RANK>
-concept liouvillian = 
-  std::ranges::forward_range<T> && 
-  std::is_same_v<std::ranges::range_value_t<T>,
-                 Lindblad<RANK>>;
+template <typename L, size_t RANK>
+concept lindblad_with_superoperator = lindblad<L> && requires (L&& l) {
+  { superoperatorFunctional(l) } -> superoperator<RANK> ;
+};
+
+template <typename L, size_t RANK>
+concept lindblad = lindblad_with_superoperator<L,RANK> || lindblad_with_rate<L,RANK> || lindblad_with_jump<L,RANK>;
+
+
+template <typename L, size_t RANK>
+concept liouvillian = hana_sequence<L> && !!hana::all_of(
+  decltype(hana::transform(std::declval<L>(), hana::typeid_)){},
+  []<class T>(T) { return lindblad<typename T::type,RANK>; });
 
 
 template <size_t RANK, liouvillian<RANK> LI>
@@ -103,6 +111,15 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
   drhodt+=rhotemp;
 }*/;
 
+
+template <size_t RANK>
+struct Lindblad
+{
+  std::string label;
+  Jump<RANK> jump;
+  Rate<RANK> rate; // could be made std::optional<Rate<RANK>> rate; if it’s null, then the rate is calculated from the jump functional
+  Superoperator<RANK> superoperator; // std::optional<Superoperator<RANK>> superoperator; if it’s null, then the superoperator is calculated from the jump functional
+};
 
 
 } // structure
