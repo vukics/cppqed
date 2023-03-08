@@ -2,8 +2,6 @@
 
 #include "DrivenDampedHarmonicOscillator.h"
 
-#include "MathExtensions.h"
-
 #include <iostream>
 
 

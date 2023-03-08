@@ -2,12 +2,13 @@
 #include "DrivenDampedHarmonicOscillator.h"
 #include "Simulated.h"
 
+using namespace trajectory;
 
-typedef CArray<1> Array;
+using Array=std::array<dcomp,2>;
 
 /*
-  y(0) y
-  y(1) dy/dt
+  y[0] y
+  y[1] dy/dt
 */
 
 
@@ -18,19 +19,18 @@ int main(int, char**)
   const dcomp yinit{10,5}, dydtinit{-1,1};
 
   // Initial condition
-  Array y(2); y=yinit,dydtinit;
+  Array y{yinit,dydtinit};
 
-  auto S{simulated::makeBoost(y,
-                         [=](const Array& y, Array& dydt, double tau)
+  auto S{simulated::make<ODE_EngineBoost>(y,[=](const Array& y, Array& dydt, double tau)
                          {
-                           dydt(0)=y(1);
-                           dydt(1)=exp(1i*omega*tau)-2*gamma*y(1)-y(0);
+                           dydt[0]=y[1];
+                           dydt[1]=exp(1i*omega*tau)-2*gamma*y[1]-y[0];
                          },
                          {"coordinate","velocity"},
                          .1/std::max(1.,std::max(omega,gamma)),
                          0,1e-6,1e-18)};
 
-  auto streamedArray=run(S,70.,1,0,"","",6,false,false,"",false,true,trajectory::autostopHandlerNoOp);
+  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(S,70.,1,0,"","",6,false,false,false,true,trajectory::autostopHandlerNoOp);
   
   auto oscillator{ddho::make(gamma,omega,yinit,dydtinit,0)};
 
@@ -42,8 +42,8 @@ int main(int, char**)
   for ( auto s=streamedArray.begin(); s!=streamedArray.end(); averageDt+=std::get<1>(*s++) ) {
     double time=std::get<0>(*s);
     
-    auto amp=std::get<2>(*s)(0),
-         ampDeriv=std::get<2>(*s)(1),
+    auto amp=std::get<2>(*s)[0],
+         ampDeriv=std::get<2>(*s)[1],
          exactAmp=oscillator->amp(time),
          exactAmpDeriv=oscillator->ampDeriv(time);
 

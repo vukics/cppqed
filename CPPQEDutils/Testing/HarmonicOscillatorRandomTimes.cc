@@ -1,11 +1,11 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+#include "DrivenDampedHarmonicOscillator.h"
+#include "Random.h"
 #include "Simulated.h"
 
-#include "DrivenDampedHarmonicOscillator.h"
-#include "MathExtensions.h"
-#include "Random.h"
+using namespace trajectory;
 
-typedef CArray<1> Array;
+using Array=std::array<dcomp,2>;
 
 /*
   y(0) y
@@ -22,13 +22,12 @@ int main(int, char**)
   const size_t nSamples=1000;
 
   // Initial condition
-  Array y(2); y=yinit,dydtinit;
+  Array y{yinit,dydtinit};
 
-  auto s(simulated::makeBoost(y,
-    [=](const Array& y, Array& dydt, double tau)
+  auto s(simulated::make<ODE_EngineBoost>(y,[=](const Array& y, Array& dydt, double tau)
     {
-      dydt(0)=y(1);
-      dydt(1)=exp(1i*omega*tau)-2*gamma*y(1)-y(0);
+      dydt[0]=y[1];
+      dydt[1]=exp(1i*omega*tau)-2*gamma*y[1]-y[0];
     },
     {"coordinate","velocity"},
     .1/std::max(1.,std::max(omega,gamma)),
@@ -44,10 +43,12 @@ int main(int, char**)
   
   for (size_t n=nSamples; n>0; n--) {
     auto time=std::uniform_real_distribution(0.,T)(re);
-    cppqedutils::advanceTo(s,time);
+    trajectory::advanceTo(s,time,std::clog);
     
-    ampDev+=relativeDeviation(y(0),oscillator->amp(time));
-    ampDerivDev+=relativeDeviation(y(1),oscillator->ampDeriv(time));
+    std::cerr<<y[0]<<" "<<y[1]<<std::endl;
+
+    ampDev+=relativeDeviation(y[0],oscillator->amp(time));
+    ampDerivDev+=relativeDeviation(y[1],oscillator->ampDeriv(time));
 
   }
 
