@@ -18,12 +18,12 @@ using namespace cppqedutils;
  * 
  * \include HarmonicOscillatorComplex.cc
  */
-template<typename ST, ode::system<ST> D, ode::engine<ST,D> OE>
+template<typename ST, ode::system<ST> D, template <typename > typename OE> requires ode::engine<OE<ST>,ST>
 struct Simulated
 {
   using StreamedArray=ST;
   
-  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> keyLabels, OE oe)
+  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> keyLabels, OE<ST> oe)
     : state{std::forward<decltype(stateInit)>(stateInit)},
       derivs{d},
       keyPrinter{"Simulated",keyLabels},
@@ -37,7 +37,7 @@ struct Simulated
   ST state;
   D derivs;
   KeyPrinter keyPrinter;
-  OE ode;
+  OE<ST> ode;
 
   friend double getDtDid(const Simulated& s) {return getDtDid(s.ode);}
 
@@ -69,7 +69,7 @@ struct Simulated
 };
 
 
-template <typename ST, typename D, typename OE>
+template <typename ST, typename D, template <typename > typename OE >
 struct trajectory::MakeSerializationMetadata<Simulated<ST,D,OE>>
 {
   /// This is probably not quite correct because elsewhere the typeID refers to the whole ST
@@ -80,20 +80,20 @@ struct trajectory::MakeSerializationMetadata<Simulated<ST,D,OE>>
 
 namespace simulated {
 
-template<typename OE, typename ST, typename D, typename ... ODE_EngineCtorParams>
+template<template <typename > typename OE, typename ST, typename D, typename ... ODE_EngineCtorParams>
+requires ::cppqedutils::ode::engine<OE<std::decay_t<ST>>,std::decay_t<ST>>
 auto make(ST&& stateInit, D derivs, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
 {
-  return Simulated<std::decay_t<ST>,D,OE>{std::forward<ST>(stateInit),derivs,keyLabels,OE{std::forward<ODE_EngineCtorParams>(odePack)...}};
+  return Simulated<std::decay_t<ST>,D,OE>{std::forward<ST>(stateInit),derivs,keyLabels,OE<std::decay_t<ST>>{std::forward<ODE_EngineCtorParams>(odePack)...}};
 }
 
 template <typename BASE = Empty>
 using Pars=::trajectory::Pars<::ode::Pars<BASE>>;
 
 
-template<typename ST, typename D, typename P>
-auto makeBoost(ST&& stateInit, D derivs, std::initializer_list<std::string> keyLabels, double dtInit, const P& p)
+auto makeBoost(auto && stateInit, auto derivs, std::initializer_list<std::string> keyLabels, double dtInit, const auto& p)
 {
-  return make<ODE_EngineBoost<std::decay_t<ST>>>(std::forward<ST>(stateInit),derivs,keyLabels,dtInit,p.logControl,p.epsRel,p.epsAbs);
+  return make<ODE_EngineBoost>(std::forward<decltype(stateInit)>(stateInit),derivs,keyLabels,dtInit,p.logControl,p.epsRel,p.epsAbs);
 }
 
 } // simulated
