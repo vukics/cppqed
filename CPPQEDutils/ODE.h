@@ -43,11 +43,11 @@ inline static const double nextDtTryCorrectionFactor=10.;
 
 /// Embodies the concept defined at https://www.boost.org/doc/libs/1_80_0/libs/numeric/odeint/doc/html/boost_numeric_odeint/concepts/system.html
 template <typename T, typename State, typename Time=double>
-concept system = requires (T&& t, const State& stateIn, State& stateOut, Time time) { t(stateIn,stateOut,time) ; };
+concept system = requires (T&& t, ConstReference<State> stateIn, Reference<State> stateOut, Time time) { t(stateIn,stateOut,time) ; };
 
 
 template <typename State, typename Time=double>
-using SystemFunctional = std::function<void(const State& stateIn, State& stateOut, Time time)>;
+using SystemFunctional = std::function<void(ConstReference<State>, Reference<State>, Time)>;
 
 /// Embodies the concept defined at https://www.boost.org/doc/libs/1_80_0/libs/numeric/odeint/doc/html/boost_numeric_odeint/concepts/controlled_stepper.html
 /**
@@ -60,14 +60,14 @@ concept controlled_stepper =
   std::convertible_to<typename std::decay_t<T>::state_type,std::decay_t<State>> &&
   std::convertible_to<typename std::decay_t<T>::deriv_type,std::decay_t<State>> &&
   std::convertible_to<typename std::decay_t<T>::time_type,std::decay_t<Time>> &&
-  requires (T&& t, SystemFunctional<State,Time> sys, Time time, Time dt, State&& x ) { t.try_step( sys , x , time , dt ); };
+  requires (T&& t, Time deltaT, SystemFunctional<State,Time> sys, Time time, State&& stateInOut ) { t.try_step( sys , stateInOut , time , deltaT ); };
 
 
 template <typename T, typename State, typename Time=double>
 concept engine = adaptive_timestep_keeper<T> && intro_outro_streamer<T> &&
   requires ( T&& t, Time deltaT, std::ostream& logStream, SystemFunctional<State,Time> sys, Time& time, State&& stateInOut ) {
     { step(t,deltaT,logStream,sys,time,stateInOut) }; /*}  && 
-  requires ( T&& t, Time deltaT, std::ostream& logStream, System sys, Time& time, const State& stateIn, State&& stateOut ) { 
+  requires ( T&& t, Time deltaT, std::ostream& logStream, System sys, Time& time, ConstReference<State> stateIn, State&& stateOut ) {
     { step(t,deltaT,logStream,sys,time,stateIn,stateOut) };*/ };
 
 
@@ -162,7 +162,7 @@ struct Base
   auto tryStep(system<State,Time> auto sys, Time& time, State&& stateInOut) {return ces.stepper.try_step(sys,std::forward<State>(stateInOut),time,dtTry);}
 
   template <typename State> requires controlled_stepper<CES,State,Time>
-  auto tryStep(system<State,Time> auto sys, Time& time, const State& stateIn, State&& stateOut) {return ces.stepper.try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry);}
+  auto tryStep(system<State,Time> auto sys, Time& time, ConstReference<State> stateIn, State&& stateOut) {return ces.stepper.try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry);}
   
   ControlledErrorStepperWrapper<CES> ces;
   

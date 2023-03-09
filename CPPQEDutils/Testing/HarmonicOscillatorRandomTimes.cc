@@ -45,8 +45,6 @@ int main(int, char**)
     auto time=std::uniform_real_distribution(0.,T)(re);
     trajectory::advanceTo(s,time,std::clog);
     
-    std::cerr<<y[0]<<" "<<y[1]<<std::endl;
-
     ampDev+=relativeDeviation(y[0],oscillator->amp(time));
     ampDerivDev+=relativeDeviation(y[1],oscillator->ampDeriv(time));
 

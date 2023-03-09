@@ -4,6 +4,7 @@
 #include "Algorithm.h"
 #include "Archive.h"
 #include "Hana.h"
+#include "Utility.h"
 
 #include <boost/operators.hpp>
 
@@ -20,8 +21,6 @@
 
 namespace cppqedutils {
 
-template <typename T>
-constexpr auto passByValue_v=std::nullopt;
 
 template<size_t... i>
 constexpr auto retainedAxes = hana::tuple_c<size_t,i...>;
@@ -77,7 +76,7 @@ public:
     : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(dv)>(dv)...} {}
 
   /// implicit conversion to a const view
-  operator MultiArrayView<const T, RANK>() const requires ( !std::is_const<T>() ) {return {extents,strides,offset,dataView}; }
+  operator MultiArrayView<const T, RANK>() const requires ( !std::is_const_v<T> ) {return {extents,strides,offset,dataView}; }
 
   /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
   /** 
@@ -128,8 +127,17 @@ template <typename T, size_t RANK>
 constexpr auto passByValue_v<MultiArrayView<T,RANK>> = true;
 
 
-template <typename T, size_t RANK> requires ( !std::is_const<T>() )
+template <typename T, size_t RANK> requires ( !std::is_const_v<T> )
 using MultiArrayConstView = MultiArrayView<const T, RANK>;
+
+
+// MultiArrayView is itself a reference
+template <typename T, size_t RANK> requires ( !std::is_const_v<T> )
+struct ReferenceMF<MultiArrayView<T,RANK>> : std::type_identity<MultiArrayView<T,RANK>> {};
+
+template <typename T, size_t RANK> requires ( !std::is_const_v<T> )
+struct ConstReferenceMF<MultiArrayView<T,RANK>> : std::type_identity<MultiArrayConstView<T,RANK>> {};
+
 
 
 /// Element-by-element comparison
@@ -169,7 +177,7 @@ auto calculateExtent(Extents<RANK> extents)
 /// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned) 
 /** Follows value semantics regarding constness. */
 template <typename T, size_t RANK, template <typename, size_t> typename BASE=MultiArrayConstView>
-requires ( !std::is_const<T>() )
+requires ( !std::is_const_v<T> )
 class MultiArray : public BASE<T,RANK>
 {
 public:

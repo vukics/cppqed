@@ -18,12 +18,12 @@ using namespace cppqedutils;
  * 
  * \include HarmonicOscillatorComplex.cc
  */
-template<typename ST, ode::system<ST> D, template <typename > typename OE> requires ode::engine<OE<ST>,ST>
+template<typename ST, ode::system<ST> D, template <typename > typename OE> requires ode::engine<OE<std::decay_t<ST>>,std::decay_t<ST>>
 struct Simulated
 {
-  using StreamedArray=ST;
+  using StreamedArray=std::decay_t<ST>;
   
-  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> keyLabels, OE<ST> oe)
+  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> keyLabels, OE<std::decay_t<ST>> oe)
     : state{std::forward<decltype(stateInit)>(stateInit)},
       derivs{d},
       keyPrinter{"Simulated",keyLabels},
@@ -37,7 +37,7 @@ struct Simulated
   ST state;
   D derivs;
   KeyPrinter keyPrinter;
-  OE<ST> ode;
+  OE<std::decay_t<ST>> ode;
 
   friend double getDtDid(const Simulated& s) {return getDtDid(s.ode);}
 
@@ -84,7 +84,7 @@ template<template <typename > typename OE, typename ST, typename D, typename ...
 requires ::cppqedutils::ode::engine<OE<std::decay_t<ST>>,std::decay_t<ST>>
 auto make(ST&& stateInit, D derivs, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
 {
-  return Simulated<std::decay_t<ST>,D,OE>{std::forward<ST>(stateInit),derivs,keyLabels,OE<std::decay_t<ST>>{std::forward<ODE_EngineCtorParams>(odePack)...}};
+  return Simulated<ST,D,OE>{std::forward<ST>(stateInit),derivs,keyLabels,OE<std::decay_t<ST>>{std::forward<ODE_EngineCtorParams>(odePack)...}};
 }
 
 template <typename BASE = Empty>

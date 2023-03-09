@@ -33,7 +33,7 @@ int main(int , char**)
 
   Array y{numbers::e,Z*numbers::e};
 
-  auto S(simulated::make<ODE_EngineBoost<Array>>(y,[=](const Array& yA, Array& dydtA, double tau) {
+  auto S(simulated::make<ODE_EngineBoost>(y,[=](const Array& yA, Array& dydtA, double tau) {
     dydtA[0]=yA[1];
     dydtA[1]=sqr(yA[1])+Z*yA[1]+sqr(Z)*exp(2.*Z*tau)*(yA[0]-sqr(yA[0]));
   },{"Re{y}","Im{y}"},trajectory::initialTimeStep(abs(Z)),
@@ -48,6 +48,8 @@ int main(int , char**)
   
   // for ( auto s : streamedArray ) cout<<get<0>(s)<<"\t"<<get<2>(s)(0).real()<<"\t"<<get<2>(s)(0).imag()<<endl;
   
+  std::cerr<<streamedArray.size()<<" "<<yDev/streamedArray.size()<<std::endl;
+
   return !(yDev/streamedArray.size()<1.5e-8);
  
 }
