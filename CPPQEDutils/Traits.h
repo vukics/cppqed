@@ -1,7 +1,10 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
+#include "ComplexExtensions.h"
+
 #include <type_traits>
+#include <valarray>
 
 namespace cppqedutils {
 
@@ -17,6 +20,7 @@ template <typename T>
 constexpr bool passByValue_v=false;
 
 
+/// metafunctions are needed since template aliases cannot be partially specialized
 template <typename State> struct ReferenceMF : std::type_identity<std::add_lvalue_reference_t<State>> {};
 
 template <typename State> using Reference = typename ReferenceMF<State>::type;

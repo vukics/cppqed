@@ -3,7 +3,7 @@
 
 #include "Archive.h"
 #include "Pars.h"
-#include "Utility.h"
+#include "Traits.h"
 
 #include <boost/numeric/odeint.hpp>
 

@@ -4,8 +4,6 @@
 
 #include "DensityOperator.h"
 
-#include "Utility.h"
-
 
 namespace quantumdata {
 

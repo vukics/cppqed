@@ -3,8 +3,7 @@
 
 #include "Algorithm.h"
 #include "Archive.h"
-#include "Hana.h"
-#include "Utility.h"
+#include "Traits.h"
 
 #include <boost/operators.hpp>
 
