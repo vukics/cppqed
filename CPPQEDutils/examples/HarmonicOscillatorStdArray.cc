@@ -41,6 +41,6 @@ int main(int argc, char* argv[])
     {"Re{coordinate}","Im{coordinate}","Re{velocity}","Im{velocity}"},
     .1/max(1.,max(omega,gamma)),pt)};
   
-  run(S,pt,trajectory::autostopHandlerNoOp);
+  run(S,pt,trajectory::observerNoOp);
 
 }

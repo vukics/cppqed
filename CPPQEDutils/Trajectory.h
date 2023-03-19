@@ -3,13 +3,8 @@
 
 #include "Archive.h"
 #include "CommentingStream.h"
-#include "FormDouble.h"
-#include "Hana.h"
 #include "ODE.h"
 #include "Version.h"
-
-#include <boost/iostreams/device/null.hpp>
-#include <boost/iostreams/stream.hpp>
 
 #include <boost/range/combine.hpp>
 
@@ -33,32 +28,30 @@ template <typename T> concept adaptive_time_keeper = adaptive_timestep_keeper<T>
 
 // single adaptive step of at most deltaT
 template <typename T>
-concept adaptive_steppable = adaptive_time_keeper<T> && requires (T&& t, double deltaT, std::ostream& os) { step(t,deltaT,os); };
+concept adaptive_steppable = adaptive_time_keeper<T> && requires (T&& t, double deltaT) { { step(t,deltaT) } -> std::convertible_to<LogTree>; };
 
 
 
 /// advances for exactly time `deltaT`
-void advance(adaptive_steppable auto& traj,
-             double deltaT, std::ostream& logStream)
+LogTree advance(adaptive_steppable auto& traj, double deltaT)
 {
+  boost::json::array res;
   double endTime=getTime(traj)+deltaT;
-  while (double dt=endTime-getTime(traj)) step(traj,dt,logStream);
+  while (double dt=endTime-getTime(traj)) res.push_back( step(traj,dt).begin()->value() ) ;
+  return {{"nFailedSteps",res}};
 }
 
 
 namespace trajectory {
-  
+
 
 // the basic trajectory concept
 template <typename T>
-concept uniform_step =
-  adaptive_time_keeper<T> && 
-  intro_outro_streamer<T> && 
-  requires (T&& t, double deltaT, std::ostream& os, int precision)
+concept uniform_step = adaptive_time_keeper<T> &&  logger<T> && requires (T&& t, double deltaT)
   {
-    advance(t,deltaT,os);
-    { streamKey(t,os) } -> std::convertible_to<std::ostream&>;
-    { stream(t,os,precision) } -> std::convertible_to<typename std::decay_t<T>::StreamedArray>;
+    { advance(t,deltaT) } -> std::convertible_to<LogTree>;
+    { temporalDataPoint(t) } -> temporal_data_point;
+    { dataStreamKey(t) } -> std::convertible_to<LogTree>;
   };
 
 template <typename T>
@@ -79,7 +72,7 @@ enum struct RunLengthType {T_MODE=0, NDT_MODE=1};
 
 
 /// advances up to exactly time `t` \copydetails advance
-void advanceTo(uniform_step auto& traj, double t, std::ostream& logStream) { advance(traj,t-getTime(traj),logStream); }
+LogTree advanceTo(uniform_step auto& traj, double t) { return advance(traj,t-getTime(traj)); }
 
 
 
@@ -172,44 +165,55 @@ struct StoppingCriterionReachedException {};
 
 
 template <typename T, typename TRAJ>
-concept autostop_handler = uniform_step<TRAJ> && requires (T&& t, typename std::decay_t<TRAJ>::StreamedArray sa) { t(sa); };
+concept observer = uniform_step<TRAJ> && requires (T&& t, TRAJ&& traj) { t(temporalDataPoint(traj)); };
 
 /// Generic implementation of AutostopHandler
 /** 
  * Stops if the same value occurs in the output autoStopRepetition times within the specified absolute and relative precisions
- * Assumption is that SA is a standard-conforming range
+ * Assumption is that TDP is a standard-conforming range
  */
-template<typename SA>
+template<temporal_data_point TDP>
 class AutostopHandlerGeneric
 {
 public:
   AutostopHandlerGeneric(double autoStopEpsilon, double autoStopEpsilonAbs, unsigned autoStopRepetition) 
     : autoStopEpsilon_{autoStopEpsilon}, autoStopEpsilonAbs_{autoStopEpsilonAbs}, autoStopRepetition_{autoStopRepetition}, averages_{}, queue_{}
     {
-      std::ranges::fill(averages_,0.); // this assumes that the value_type of SA can be converted from double
+      std::ranges::fill(averages_,0.); // this assumes that the value_type of TDP can be converted from double
     }
 
-  void operator()(SA sa)
+  void operator()(TDP tdp)
   {
     if (!autoStopRepetition_) return;
 
-    for (auto& v : sa) if (std::abs(v)<autoStopEpsilonAbs_) v=autoStopEpsilonAbs_; // this assumes that range-based for works for SA
+    // if there are 0 elements in tdp, replace them with autoStopEpsilonAbs_
+    {
+      auto replaceZeros = [&] <temporal_data_point T> (T& t, const auto& lambda) {
+        if constexpr (std::same_as<T,std::valarray<dcomp>>) t[abs(t)<autoStopEpsilonAbs_]=autoStopEpsilonAbs_;
+        else for (auto& v : tdp) lambda(t,lambda);
+      };
+      replaceZeros(tdp,replaceZeros);
+    }
+
+    // This means that the present call is the first
+    if (!averages_.size()) {
+      averages_.swap(tdp);
+      return;
+    }
     
-    if constexpr ( requires (SA v, size_t s) { v.resize(s,0.); } )
-      if (!averages_.size()) // This means that no stream has yet occured: the size of averages_ must be determined if it wasn’t determined at compile time
-        averages_.resize(sa.size(),0.);
-    
+    // Queue is fully filled
     if (queue_.size()==autoStopRepetition_) {
-      if ( std::ranges::max(boost::combine(averages_,sa) | std::views::transform([] (const auto& t) {
-        // projection is simply the relative difference
-        return std::abs( t.template get<0>() - t.template get<1>() ) / ( std::abs(t.template get<0>()) + std::abs(t.template get<1>()) );
-      }) ) < autoStopEpsilon_ ) throw StoppingCriterionReachedException();
-      for ( auto&& [a,s,q] : boost::combine(averages_,sa,queue_.front()) ) a+=(s-q)/double(autoStopRepetition_); // update the averages set for next step
+      if ( abs(averages_-tdp)/(abs(averages_)+abs(tdp)) < autoStopEpsilon_ ) throw StoppingCriterionReachedException{};
+      averages_+=(tdp-queue_.front())/double(autoStopRepetition_); // update the averages set for next step
       queue_.pop(); // remove obsolate first element of the queue
     }
-    else for ( auto&& [a,s] : boost::combine(averages_,sa) ) a=(double(queue_.size())*a+s)/double(queue_.size()+1); // build the initial averages set to compare against
+    // queue is not yet fully filled – build the initial averages set to compare against
+    else {
+      averages_*=double(queue_.size())/double(queue_.size()+1);
+      averages_+=tdp/double(queue_.size()+1);
+    }
 
-    queue_.push(sa); // place the new item to the back of the queue
+    queue_.push(tdp); // place the new item to the back of the queue
 
   }
 
@@ -217,17 +221,17 @@ private:
   const double autoStopEpsilon_, autoStopEpsilonAbs_;
   const unsigned autoStopRepetition_;
 
-  SA averages_;
-  std::queue<SA> queue_;
+  TDP averages_;
+  std::queue<TDP> queue_;
 
 };
 
 
-auto autostopHandlerNoOp = [] (const auto&) {};
+auto observerNoOp = [] (const auto&) {};
 
 
-template<typename SA>
-using TemporalStreamedArray=std::list<std::tuple<double,double,SA>>;
+template<temporal_data_point TDP>
+using DataStream=std::list<std::tuple<double,double,TDP>>;
 
 
 
@@ -313,11 +317,33 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
 }
 
 
+std::ostream& stream(const std::valarray<dcomp>& tdp, std::ostream& os);// {for (auto v : tdp) os<<v<<" "; return os;}
+
+
+template <temporal_data_point TDP>
+std::ostream& stream(const TDP& tdp, std::ostream& os)
+{
+  for (auto&& va : tdp) stream(va,os);
+  return os;
+}
+
+
+template <typename T, typename TRAJ>
+concept trajectory_data_streamer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj, std::ostream& os) {
+  { t(traj,os) } -> std::convertible_to<decltype(temporalDataPoint(traj))> ;
+};
+
+
+const auto trajectoryDataStreamerDefault = [] (const uniform_step auto& traj, std::ostream& os) {
+  auto tdp{temporalDataPoint(traj)};
+  stream(tdp, os)<<std::endl; // Note: endl flushes the buffer
+  return tdp;
+};
 
 /// The most general run function
-template<RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, autostop_handler<TRAJ> AH >
+template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, trajectory_data_streamer<TRAJ> TDS = decltype(trajectoryDataStreamerDefault) >
 requires ( ( SFT==StreamFreqType::DT_MODE || adaptive<TRAJ> ) && ( RLT==RunLengthType::T_MODE || SFT==StreamFreqType::DT_MODE ) )
-TemporalStreamedArray<typename std::decay_t<TRAJ>::StreamedArray>
+auto
 run(TRAJ&& traj, ///< the trajectory to run
     std::conditional_t<bool(RLT),size_t,double> length, ///< length of run
     std::conditional_t<bool(SFT),size_t,double> streamFreq, ///< interval between two \link Trajectory::stream streamings\endlink
@@ -325,24 +351,18 @@ run(TRAJ&& traj, ///< the trajectory to run
     const std::string& trajectoryFileName, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output
     const std::string& initialFileName, ///< name of file containing initial condition state for the run
     int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streamings\endlink
-    bool sI, //< governs whether a \link Trajectory::streamIntro header\endlink is streamed at the top of the output
+    bool streamIntro, //< governs whether a \link Trajectory::streamIntro header\endlink is streamed at the top of the output
     bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state streaming\endlink is costly)
     bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
-    AH&& autostopHandler
-   )
+    observer<TRAJ> auto&& observer,
+    const TDS& tds = trajectoryDataStreamerDefault)
 {
-  auto streamWrapper=[&] (std::ostream& os)
-  {
-    const FormDouble fd(formdouble::positive(precision));
-    auto res{stream(traj, os<<fd(getTime(traj))<<fd(getDtDid(traj)) , precision)};
-    os<<std::endl; // Note: endl flushes the buffer
-    return res;
-  };
- 
+  auto streamWrapper=[&] (std::ostream& os) {return tds(traj,os<<getTime(traj)<<getDtDid(traj));};
+
   using namespace std;
 
-  TemporalStreamedArray<typename decay_t<TRAJ>::StreamedArray> res;
+  DataStream<decltype(temporalDataPoint(traj))> res;
   
   ////////////////////////////////////////////////
   // Determining i/o streams, eventual state input
@@ -372,35 +392,35 @@ run(TRAJ&& traj, ///< the trajectory to run
   
   if (timeToReach && timeToReach<=getTime(traj)) return res;
 
-  const shared_ptr<ostream> outstream{
-    !streamToFile ?
-    ( doStreaming ? 
-      shared_ptr<ostream>(&cout,[](auto*){}) : // since cout is a system-wide object, this should be safe
-      static_pointer_cast<ostream>(make_shared<boost::iostreams::stream<boost::iostreams::null_sink>>(boost::iostreams::null_sink{}) ) ) : 
-    static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app))}; // regulates the deletion policy
+  struct : std::streambuf { int overflow(int c) override { return c; } } nullBuffer;
+
+  const auto outstream{
+    doStreaming ? (
+      streamToFile ?
+      static_pointer_cast<ostream>(make_shared<ofstream>(trajectoryFileName.c_str(),ios_base::app)) :
+      shared_ptr<ostream>(&cout,[](auto*){}) // since cout is a system-wide object, this should be safe
+      ) : make_shared<ostream>(&nullBuffer)
+  }; // regulates the deletion policy
   
   if (outstream->fail()) throw runtime_error("Trajectory stream opening error: "+trajectoryFileName);
   
-  CommentingStream logStream{outstream};
-  
   ostream& os=*outstream;
-  os<<setprecision(formdouble::actualPrecision(precision));
 
-  CommentingStream commentingStream{outstream}; commentingStream<<setprecision(formdouble::actualPrecision(precision));
+  CommentingStream logStream{outstream};
   
   ///////////////////////
   // Writing introduction
   ///////////////////////
 
-  if (sI) {
+  if (streamIntro) {
     if (!continuing) {
-      if (parsedCommandLine!="") commentingStream<<parsedCommandLine<<endl<<endl;
-      streamKey(traj,streamIntro(traj,commentingStream<<versionHelper())<<std::endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n")
+      if (parsedCommandLine!="") logStream<<parsedCommandLine<<endl<<endl;
+      logStream<<versionHelper()<<endl<<logIntro(traj)<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<dataStreamKey(traj)
         <<endl<<"Run Trajectory up to time "<<timeToReach
         <<" -- Stream period: "<<streamFreq<< (SFT==StreamFreqType::DT_MODE ? "" : " timestep") <<endl<<endl;
     }
     else
-      commentingStream<<"Continuing from time "<<getTime(traj)<<" up to time "<<timeToReach<<endl;
+      logStream<<"Continuing from time "<<getTime(traj)<<" up to time "<<timeToReach<<endl;
   }
 
   if (!timeToReach) {streamWrapper(os); return res;}
@@ -413,7 +433,7 @@ run(TRAJ&& traj, ///< the trajectory to run
 
   bool
     stateSaved=false,  // signifies whether the state has already been saved for the actual time instant of the trajectory
-    arrayStreamed=false; // signifies whether the expectation values have already been streamed ”
+    tdpStreamed=false; // signifies whether the temporal data point has already been streamed ”
 
   try {
 
@@ -421,12 +441,12 @@ run(TRAJ&& traj, ///< the trajectory to run
 
       if (count) {
         // advance trajectory
-        if constexpr (SFT==StreamFreqType::DC_MODE) {step(traj,length-getTime(traj),logStream);}
+        if constexpr (SFT==StreamFreqType::DC_MODE) {logStream<<step(traj,length-getTime(traj))<<endl;}
         else {
-          if constexpr (RLT==RunLengthType::T_MODE) advance(traj,std::min(streamFreq,length-getTime(traj)),logStream);
-          else advance(traj,streamFreq,logStream);
+          if constexpr (RLT==RunLengthType::T_MODE) logStream<<advance(traj,std::min(streamFreq,length-getTime(traj)))<<endl;
+          else logStream<<advance(traj,streamFreq)<<endl;
         }
-        stateSaved=arrayStreamed=false;
+        stateSaved=tdpStreamed=false;
       }
 
       if (!count || [&]() {
@@ -446,23 +466,23 @@ run(TRAJ&& traj, ///< the trajectory to run
         ++stateCount;
 
         if (count || !continuing) {
-          arrayStreamed=true;
+          tdpStreamed=true;
           auto streamReturn{streamWrapper(os)};
           if (returnStreamedArray) res.emplace_back(getTime(traj),getDtDid(traj),streamReturn);
-          autostopHandler(streamReturn);
+          observer(streamReturn);
         }
       }
     } // end of main for loop
 
-  } catch (const StoppingCriterionReachedException& except) {commentingStream<<"Stopping criterion has been reached"<<endl;}
+  } catch (const StoppingCriterionReachedException& except) {logStream<<"Stopping criterion has been reached"<<endl;}
   
-  if (!arrayStreamed) streamWrapper(os); // Stream at the end instant if stream has not happened yet
+  if (!tdpStreamed) streamWrapper(os); // Stream at the end instant if stream has not happened yet
 
   //////////////////////////////////////////
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  streamOutro(traj,commentingStream);
+  logStream<<logOutro(traj)<<endl;
   if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;
@@ -500,7 +520,7 @@ run(TRAJ&& traj, ///< the trajectory to run
  * \note This means that ParsRun::NDt takes precedence over ParsRun::T and ParsRun::dc takes precedence over ParsRun::Dt
  * 
  */
-template<typename AH, trajectory::uniform_step TRAJ, typename PB> requires trajectory::autostop_handler<AH,TRAJ>
+template<typename AH, trajectory::uniform_step TRAJ, typename PB> requires trajectory::observer<AH,TRAJ>
 auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=true, bool returnStreamedArray=false)
 {
   using namespace trajectory;
@@ -526,7 +546,7 @@ auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=t
 template<trajectory::uniform_step TRAJ, typename PB>
 auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return run(traj,p,trajectory::AutostopHandlerGeneric<typename std::decay_t<TRAJ>::StreamedArray>(p.autoStopEpsilonRel,p.autoStopEpsilonAbs,p.autoStopRepetition),
+  return run(traj,p,trajectory::AutostopHandlerGeneric<decltype(temporalDataPoint(traj))>(p.autoStopEpsilonRel,p.autoStopEpsilonAbs,p.autoStopRepetition),
              doStreaming,returnStreamedArray);
 }
 

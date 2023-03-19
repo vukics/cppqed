@@ -30,7 +30,7 @@ int main(int, char**)
                          .1/std::max(1.,std::max(omega,gamma)),
                          0,1e-6,1e-18)};
 
-  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(S,70.,1,0,"","",6,false,false,false,true,trajectory::autostopHandlerNoOp);
+  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(S,70.,1,0,"","",6,false,false,false,true,trajectory::observerNoOp);
   
   auto oscillator{ddho::make(gamma,omega,yinit,dydtinit,0)};
 

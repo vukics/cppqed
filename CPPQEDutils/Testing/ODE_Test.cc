@@ -37,10 +37,9 @@ int main(int , char**)
     dydtA[0]=yA[1];
     dydtA[1]=sqr(yA[1])+Z*yA[1]+sqr(Z)*exp(2.*Z*tau)*(yA[0]-sqr(yA[0]));
   },{"Re{y}","Im{y}"},trajectory::initialTimeStep(abs(Z)),
-  0, //logLevel
   1e-6,1e-18));
 
-  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(S,5.,0.01,0,"","",6,false,false,false,true,autostopHandlerNoOp);
+  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(S,5.,0.01,0,"","",6,false,false,false,true,observerNoOp);
 
   double yDev=0;
   

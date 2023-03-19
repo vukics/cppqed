@@ -8,7 +8,6 @@
 #include <boost/numeric/odeint.hpp>
 
 #include <bitset>
-#include <iostream>
 #include <optional>
 
 
@@ -17,14 +16,6 @@ namespace cppqedutils {
 
 template <typename T> concept adaptive_timestep_keeper = requires (const T& t) { 
   { getDtDid(t) } -> std::convertible_to<double>; };
-
-template <typename T> concept intro_streamer = requires ( const T& t, std::ostream& os ) { 
-  { streamIntro(t,os) } -> std::convertible_to<std::ostream&>; };
-
-template <typename T> concept outro_streamer = requires ( const T& t, std::ostream& os ) { 
-  { streamOutro(t,os) } -> std::convertible_to<std::ostream&>; };
-
-template <typename T> concept intro_outro_streamer = intro_streamer<T> && outro_streamer<T>;
 
 
 namespace ode {
@@ -63,26 +54,21 @@ concept controlled_stepper =
   requires (T&& t, Time deltaT, SystemFunctional<State,Time> sys, Time time, State&& stateInOut ) { t.try_step( sys , stateInOut , time , deltaT ); };
 
 
+/// TODO: see whether it’s not too big an overhead to produce a logTree every time step is calculated
+/** Otherwise step can get a reference to a logTree from the call scope */
 template <typename T, typename State, typename Time=double>
-concept engine = adaptive_timestep_keeper<T> && intro_outro_streamer<T> &&
-  requires ( T&& t, Time deltaT, std::ostream& logStream, SystemFunctional<State,Time> sys, Time& time, State&& stateInOut ) {
-    { step(t,deltaT,logStream,sys,time,stateInOut) }; /*}  && 
-  requires ( T&& t, Time deltaT, std::ostream& logStream, System sys, Time& time, ConstReference<State> stateIn, State&& stateOut ) {
-    { step(t,deltaT,logStream,sys,time,stateIn,stateOut) };*/ };
+concept engine = adaptive_timestep_keeper<T> && logger<T> &&
+  requires ( T&& t, Time deltaT, SystemFunctional<State,Time> sys, Time& time, State&& stateInOut ) {
+    { step(t,deltaT,sys,time,stateInOut) } -> std::convertible_to<LogTree>; };
 
-
-using LogControl=std::bitset<2>;
 
 /// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a popl::OptionParser
-/** This could be more finely grained by factoring out logControl, but the present solution should be sufficient for most puposes */
 template <typename BASE=Empty>
 struct Pars : BASE
 {
   double
     epsRel, ///< relative precision of ODE stepping
     epsAbs; ///< absolute precision ”
-
-  LogControl logControl{0};
 
   Pars(popl::OptionParser& op) : BASE{op}
   {
@@ -102,7 +88,7 @@ namespace bno=boost::numeric::odeint;
 template <typename ControlledErrorStepper>
 struct ControlledErrorStepperWrapper
 {
-  std::ostream& streamIntro(std::ostream& os) const {return os << "Parameters: epsRel=" << epsRel << ", epsAbs=" << epsAbs;}
+  LogTree logIntro() const {return {{"epsRel",epsRel},{"epsAbs",epsAbs}};}
 
   ControlledErrorStepper stepper;
   double epsRel, epsAbs;
@@ -129,7 +115,7 @@ struct SerializeControlledErrorStepper
 
 
 template <typename T>
-concept ode_logger = outro_streamer<T> && requires (T&& t, size_t failedStepsLast) { logDerivsCall(t); logStep(t,failedStepsLast); };
+concept ode_logger = outro_logger<T> && requires (T&& t, size_t failedStepsLast) { logDerivsCall(t); logStep(t,failedStepsLast); };
 
 struct DefaultLogger { size_t nDerivsCalls=0, nSteps=0, nFailedSteps=0; };
 
@@ -139,11 +125,13 @@ void logStep(DefaultLogger& dl, size_t failedStepsLast) {++dl.nSteps; dl.nFailed
 template<typename Archive>
 inline void serialize(Archive & ar, DefaultLogger& dl, const unsigned int /*file_version*/) { ar & dl.nDerivsCalls & dl.nSteps & dl.nFailedSteps; }
 
-std::ostream& streamOutro(const DefaultLogger& dl, std::ostream& os)
+LogTree logOutro(const DefaultLogger& dl)
 {
-  return os<<"\nODE DefaultLogger\nTotal number of ODE steps: "<<dl.nSteps
-           <<"\nNumber of failed ODE steps: "<<dl.nFailedSteps
-           <<"\nNumber of calls to function calculating RHS for ODE: "<<dl.nDerivsCalls<<std::endl;
+  return {
+    {"name","default"},
+    {"nSteps",dl.nSteps},
+    {"nFailedSteps",dl.nFailedSteps},
+    {"nDerivsCalls",dl.nDerivsCalls}};
 }
 
 
@@ -154,9 +142,9 @@ struct Base
 {
   using Time=typename CES::time_type;
   
-  Base(Time dtInit, LogControl lc, auto&&... args)
+  Base(Time dtInit, auto&&... args)
     : ces{MakeControlledErrorStepper<CES>::_(std::forward<decltype(args)>(args)...)},
-      dtTry(dtInit), logControl(lc) {}
+      dtTry(dtInit) {}
 
   template <typename State> requires controlled_stepper<CES,State,Time>
   auto tryStep(system<State,Time> auto sys, Time& time, State&& stateInOut) {return ces.stepper.try_step(sys,std::forward<State>(stateInOut),time,dtTry);}
@@ -170,24 +158,23 @@ struct Base
   
   Logger logger;
   
-  LogControl logControl;
-
-
   friend double getDtDid(const Base& b) {return b.dtDid;}
 
-  friend std::ostream& streamIntro(const Base& b, std::ostream& os)
+  friend LogTree logIntro(const Base& b)
   {
-    return b.ces.streamIntro(os<<"ODE engine: " << StepperDescriptor<CES> << ". ") << std::endl;
+    return {
+      {"name",StepperDescriptor<CES>},
+      {"parameters",b.ces.logIntro()}};
   }
 
-  friend std::ostream& streamOutro(const Base& b, std::ostream& os) {return b.logControl[0] ? streamOutro(b.logger,os) : os;}
+  friend LogTree logOutro(const Base& b) {return logOutro(b.logger);}
 
   /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
   /**
   * The possibility of FSAL steppers (that can reuse the derivative calculated in the last stage of the previous step)
   * is not included, that would require more involved logic.
   */
-  friend void step(Base& b, typename CES::time_type deltaT, std::ostream& logStream, auto sys, typename CES::time_type& time, auto&&... states)
+  friend LogTree step(Base& b, typename CES::time_type deltaT, auto sys, typename CES::time_type& time, auto&&... states)
   {
     using Time=typename CES::time_type;
 
@@ -213,7 +200,7 @@ struct Base
 
     logStep(b.logger,nFailedSteps);
 
-    if (b.logControl[1]) logStream<<"Number of failed steps in this timestep: "<<nFailedSteps<<std::endl;
+    return {{"nFailedSteps",nFailedSteps}};
   }
 
 
@@ -241,7 +228,7 @@ struct MakeControlledErrorStepper<bno::controlled_runge_kutta<ErrorStepper>>
   static auto _(double epsRel, double epsAbs)
   {
     return ControlledErrorStepperWrapper<bno::controlled_runge_kutta<ErrorStepper>>{
-      make_controlled(epsRel,epsAbs,ErrorStepper()),epsRel,epsAbs};
+      make_controlled(epsRel,epsAbs,ErrorStepper{}),epsRel,epsAbs};
   }
 
   template <typename P>
@@ -264,7 +251,7 @@ namespace ode {
 template <typename StateType, typename P>
 ODE_EngineBoost<StateType> makeBoost(double dtInit, const P& p)
 {
-  return {dtInit,p.logControl,p.epsRel,p.epsAbs};
+  return {dtInit,p.epsRel,p.epsAbs};
 }
 
 

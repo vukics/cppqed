@@ -70,4 +70,6 @@ shared_ptr<ostream> cppqedutils::trajectory::openStateFileWriting(const string &
 }
 
 
+std::ostream& cppqedutils::trajectory::stream(const std::valarray<dcomp>& tdp, std::ostream& os) {for (auto v : tdp) os<<v<<" "; return os;}
+
 

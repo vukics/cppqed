@@ -1,5 +1,4 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "ComplexExtensions.h"
 #include "Simulated.h"
 
 using namespace std;
@@ -33,7 +32,7 @@ int main(int argc, char* argv[])
   // Note: 1.0 is also an existing frequency in the system, which defines the unit of time 
 
   // Initial condition
-  Array y({yinit,dydtinit});
+  Array y{yinit,dydtinit};
 
   auto S{simulated::makeBoost(y,
     [=](const Array& y, Array& dydt, double tau)
@@ -44,7 +43,7 @@ int main(int argc, char* argv[])
     {"complex coordinate","complex velocity"},
     .1/max(1.,max(omega,gamma)),pt)};
 
-  run(S,pt/*,trajectory::autostopHandlerNoOp*/);
+  run(S,pt/*,trajectory::observerNoOp*/);
 /*
   auto streamedArray=run(S,pt);
   

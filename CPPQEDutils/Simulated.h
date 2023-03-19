@@ -1,7 +1,6 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-#include "KeyPrinter.h"
 #include "Trajectory.h"
 
 #include <boost/core/demangle.hpp>
@@ -21,40 +20,41 @@ using namespace cppqedutils;
 template<typename ST, ode::system<ST> D, template <typename > typename OE> requires ode::engine<OE<std::decay_t<ST>>,std::decay_t<ST>>
 struct Simulated
 {
-  using StreamedArray=std::decay_t<ST>;
-  
-  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> keyLabels, OE<std::decay_t<ST>> oe)
+  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> kl, OE<std::decay_t<ST>> oe)
     : state{std::forward<decltype(stateInit)>(stateInit)},
       derivs{d},
-      keyPrinter{"Simulated",keyLabels},
+      keyLabels{kl},
       ode{oe} {
-        auto& labels{keyPrinter.getLabels()};
-        if (labels.size() < size(state)) labels.insert(labels.end(),size(state)-labels.size(),"N/A");
-        else if (labels.size() > size(state)) throw std::runtime_error("More keys than values in Simulated");
+        if (keyLabels.size() < size(state)) keyLabels.insert(keyLabels.cend(),size(state)-keyLabels.size(),"N/A");
+        else if (keyLabels.size() > size(state)) throw std::runtime_error("More keys than values in Simulated");
       }
   
   double time=0.;
   ST state;
   D derivs;
-  KeyPrinter keyPrinter;
+  std::list<std::string> keyLabels;
   OE<std::decay_t<ST>> ode;
 
   friend double getDtDid(const Simulated& s) {return getDtDid(s.ode);}
 
   friend double getTime(const Simulated& s) {return s.time;}
 
-  friend std::ostream& streamIntro(const Simulated& s, std::ostream& os) {return streamIntro(s.ode,os<<"\nSimulated.\n");}
+  friend LogTree logIntro(const Simulated& s) {return {{"name","Simulated"},{"odeEngine",logIntro(s.ode)}};}
 
-  friend std::ostream& streamOutro(const Simulated& s, std::ostream& os) {return streamOutro(s.ode,os);}
+  friend LogTree logOutro(const Simulated& s) {return logOutro(s.ode);}
 
-  friend void step(Simulated& s, double deltaT, std::ostream& logStream) {step(s.ode,deltaT,logStream,s.derivs,s.time,s.state);}
+  friend LogTree step(Simulated& s, double deltaT) {return step(s.ode,deltaT,s.derivs,s.time,s.state);}
 
-  friend std::ostream& streamKey(const Simulated& s, std::ostream& os) {size_t i=3; return s.keyPrinter.stream(os,i);}
+  friend LogTree dataStreamKey(const Simulated& s) {return {{"Simulated",boost::json::value_from(s.keyLabels)}};}
 
-  friend ST stream(const Simulated& s, std::ostream& os, int precision)
+  friend auto temporalDataPoint(const Simulated& s)
   {
-    for (size_t i=0; i < size(s.state); i++) os<<FormDouble(precision)(s.state[i])<<' ';
-    return s.state;
+    if constexpr (temporal_data_point<ST>) return s.state;
+    else {
+      std::valarray<dcomp> res(s.state.size());
+      std::ranges::copy(s.state,begin(res));
+      return res;
+    }
   }
 
   friend iarchive& readFromArrayOnlyArchive(Simulated& s, iarchive& iar) {return iar & s.state;}
@@ -93,7 +93,7 @@ using Pars=::trajectory::Pars<::ode::Pars<BASE>>;
 
 auto makeBoost(auto && stateInit, auto derivs, std::initializer_list<std::string> keyLabels, double dtInit, const auto& p)
 {
-  return make<ODE_EngineBoost>(std::forward<decltype(stateInit)>(stateInit),derivs,keyLabels,dtInit,p.logControl,p.epsRel,p.epsAbs);
+  return make<ODE_EngineBoost>(std::forward<decltype(stateInit)>(stateInit),derivs,keyLabels,dtInit,p.epsRel,p.epsAbs);
 }
 
 } // simulated
