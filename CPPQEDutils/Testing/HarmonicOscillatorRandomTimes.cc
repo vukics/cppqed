@@ -31,7 +31,7 @@ int main(int, char**)
     },
     {"coordinate","velocity"},
     .1/std::max(1.,std::max(omega,gamma)),
-    0,1e-6,1e-18));
+    1e-6,1e-18));
   
   // s.streamParameters(std::cout);
 
@@ -43,7 +43,7 @@ int main(int, char**)
   
   for (size_t n=nSamples; n>0; n--) {
     auto time=std::uniform_real_distribution(0.,T)(re);
-    trajectory::advanceTo(s,time,std::clog);
+    trajectory::advanceTo(s,time);
     
     ampDev+=relativeDeviation(y[0],oscillator->amp(time));
     ampDerivDev+=relativeDeviation(y[1],oscillator->ampDeriv(time));

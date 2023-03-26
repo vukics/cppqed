@@ -21,8 +21,7 @@
 
 #include <numbers>
 
-using namespace std;
-using namespace trajectory;
+using namespace std; using namespace trajectory; using namespace hana::literals;
 
 using Array=std::array<dcomp,2>;
 
@@ -43,7 +42,7 @@ int main(int , char**)
 
   double yDev=0;
   
-  for ( auto s : streamedArray ) yDev+=relativeDeviation(get<2>(s)[0],exp(exp(Z*get<0>(s))));
+  for ( auto s : streamedArray ) yDev+=relativeDeviation(get<2>(s)[0_c],exp(exp(Z*get<0>(s))));
   
   // for ( auto s : streamedArray ) cout<<get<0>(s)<<"\t"<<get<2>(s)(0).real()<<"\t"<<get<2>(s)(0).imag()<<endl;
   

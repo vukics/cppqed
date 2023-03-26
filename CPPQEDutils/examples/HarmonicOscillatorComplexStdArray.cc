@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     {"complex coordinate","complex velocity"},
     .1/max(1.,max(omega,gamma)),pt)};
 
-  run(S,pt/*,trajectory::observerNoOp*/);
+  run(S,pt,trajectory::observerNoOp);
 /*
   auto streamedArray=run(S,pt);
   

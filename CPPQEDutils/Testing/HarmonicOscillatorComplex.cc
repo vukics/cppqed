@@ -2,7 +2,7 @@
 #include "DrivenDampedHarmonicOscillator.h"
 #include "Simulated.h"
 
-using namespace trajectory;
+using namespace trajectory; using namespace hana::literals;
 
 using Array=std::array<dcomp,2>;
 
@@ -28,7 +28,7 @@ int main(int, char**)
                          },
                          {"coordinate","velocity"},
                          .1/std::max(1.,std::max(omega,gamma)),
-                         0,1e-6,1e-18)};
+                         1e-6,1e-18)};
 
   auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(S,70.,1,0,"","",6,false,false,false,true,trajectory::observerNoOp);
   
@@ -42,8 +42,8 @@ int main(int, char**)
   for ( auto s=streamedArray.begin(); s!=streamedArray.end(); averageDt+=std::get<1>(*s++) ) {
     double time=std::get<0>(*s);
     
-    auto amp=std::get<2>(*s)[0],
-         ampDeriv=std::get<2>(*s)[1],
+    auto amp=std::get<2>(*s)[0_c],
+         ampDeriv=std::get<2>(*s)[1_c],
          exactAmp=oscillator->amp(time),
          exactAmpDeriv=oscillator->ampDeriv(time);
 

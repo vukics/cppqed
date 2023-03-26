@@ -6,8 +6,6 @@
 #include "ODE.h"
 #include "Version.h"
 
-#include <boost/range/combine.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <queue>
@@ -317,13 +315,14 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
 }
 
 
-std::ostream& stream(const std::valarray<dcomp>& tdp, std::ostream& os);// {for (auto v : tdp) os<<v<<" "; return os;}
+std::ostream& stream(double tdp, std::ostream& os);
+std::ostream& stream(dcomp  tdp, std::ostream& os);
 
 
-template <temporal_data_point TDP>
-std::ostream& stream(const TDP& tdp, std::ostream& os)
+std::ostream& stream(const temporal_data_point auto& tdp, std::ostream& os)
 {
-  for (auto&& va : tdp) stream(va,os);
+  size_t n{0};
+  hana::for_each( tdp, [&] (const auto& v) { stream(v,os) << (++n != hana::size(tdp) ? "\t" : "") ; } );
   return os;
 }
 
@@ -358,7 +357,7 @@ run(TRAJ&& traj, ///< the trajectory to run
     observer<TRAJ> auto&& observer,
     const TDS& tds = trajectoryDataStreamerDefault)
 {
-  auto streamWrapper=[&] (std::ostream& os) {return tds(traj,os<<getTime(traj)<<getDtDid(traj));};
+  auto streamWrapper=[&] (std::ostream& os) {return tds(traj,os<<getTime(traj)<<" "<<getDtDid(traj)<<"\t");};
 
   using namespace std;
 

@@ -51,9 +51,7 @@ struct Simulated
   {
     if constexpr (temporal_data_point<ST>) return s.state;
     else {
-      std::valarray<dcomp> res(s.state.size());
-      std::ranges::copy(s.state,begin(res));
-      return res;
+      return std::apply(hana::make_tuple,s.state);
     }
   }
 
