@@ -4,72 +4,61 @@
 #include "LazyDensityOperator.h"
 
 #include <functional>
-#include <list>
-#include <valarray>
 
 
 namespace structure {
 
 
-using EV_Array = std::valarray<double>;
+namespace expectationvalues {
 
+/// TODO: how to express this more conveniently (all the possibilities for a lazy_density_operator have to be listed here?)
+template <typename L, size_t RANK>
+concept time_dependent_functional =/*
+  requires (const L& l, double t, StateVectorConstView<RANK> rho) { { l(t,rho) } -> temporal_data_point ; } &&*/
+  requires (const L& l, double t, DensityOperatorConstView<RANK> rho) { { l(t,rho) } -> ::cppqedutils::temporal_data_point ; } ;
 
-/// TODO: how to express this more conveniently (all the possibilities for a lazy_density_operator have to be )
-template <typename L, size_t RANK, typename RESULT>
-concept time_dependent_expectation_value =
-  requires (L&& l, double t, StateVectorConstView<RANK> rho) { { l(t,rho) } -> std::convertible_to<RESULT>; } &&
-  requires (L&& l, double t, DensityOperatorConstView<RANK> rho) { { l(t,rho) } -> std::convertible_to<RESULT>; } ;
+template <typename L, size_t RANK>
+concept time_independent_functional =/*
+  requires (const L& l, StateVectorConstView<RANK> rho) { { l(rho) } -> std::convertible_to<RESULT>; } &&*/
+  requires (const L& l, DensityOperatorConstView<RANK> rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ;
 
-template <typename L, size_t RANK, typename RESULT>
-concept time_independent_expectation_value =
-  requires (L&& l, StateVectorConstView<RANK> rho) { { l(rho) } -> std::convertible_to<RESULT>; } &&
-  requires (L&& l, DensityOperatorConstView<RANK> rho) { { l(rho) } -> std::convertible_to<RESULT>; } ;
+template <typename L, size_t RANK>
+concept functional = time_dependent_functional<L,RANK> || time_independent_functional<L,RANK> ;
 
-template <typename L, size_t RANK, typename RESULT>
-concept expectation_value = time_dependent_expectation_value<L,RANK,RESULT> || time_independent_expectation_value<L,RANK,RESULT>;
-
-
-template <typename RESULT, size_t RANK, expectation_value<RANK,RESULT> EV>
-RESULT calculateEV(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
+template <size_t RANK, functional<RANK> EV>
+auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 {
-  if constexpr (time_dependent_expectation_value<EV,RANK,RESULT>) return ev(t,matrix);
-  else if (time_independent_expectation_value<EV,RANK,RESULT>) return ev(matrix);
+  if constexpr (time_dependent_functional<EV,RANK>) return ev(t,matrix);
+  else if (time_independent_functional<EV,RANK>) return ev(matrix);
 }
 
-
-template <typename T>
-concept key_labels = std::ranges::forward_range<T> && std::same_as<std::ranges::range_value_t<T>,std::string>;
-
-
-/// From the size of labels, it’s possible to infer the size of the array
-/// pre- & postcondition: the size of EV_Array must be the same as that of label
+/// pre- & postcondition: the LogTree must have the same structure as the temporal_data_point returned by expectation_value
 template <typename L, size_t RANK>
-concept expectation_value_element_without_process = requires (L&& l) {
- { labels(l) } -> key_labels ;
- { expectationValue(l) } -> expectation_value<RANK,EV_Array>;
+concept labelled_and_without_nonlinear_postprocessing = requires (const L& l) {
+  { labels(l) } -> std::convertible_to<cppqedutils::LogTree> ;
+  { getFunctional(l) } -> functional<RANK> ;
 };
 
+/// Postprocessing means any operation on the expectation values that is not linear in the density operator (as the calculation of variance, for istance)
 template <typename L, size_t RANK>
-concept expectation_value_element_with_process = expectation_value_element_without_process<L,RANK> && requires (L&& l) {
- { process(l) } -> std::convertible_to<std::function<void(EV_Array&)>> ;
-};
+concept labelled_and_with_nonlinear_postprocessing = labelled_and_without_nonlinear_postprocessing<L,RANK> && (
+  requires (const L& l, double t, DensityOperatorConstView<RANK> rho) { postProcess(l)( getFunctional(l)(t,rho) ); } ||
+  requires (const L& l, DensityOperatorConstView<RANK> rho) { postProcess(l)( getFunctional(l)(rho) ); } ) ;
+
+} // expectationvalues
+
 
 template <typename L, size_t RANK>
-concept expectation_value_element = expectation_value_element_without_process<L,RANK> || expectation_value_element_with_process<L,RANK> ;
-
-
-template <typename L, size_t RANK>
-concept expectation_values = hana_sequence<L> && !!hana::all_of(
-  decltype(hana::transform(std::declval<L>(), hana::typeid_)){},
-  []<class T>(T) { return expectation_value_element<typename T::type,RANK>; });
-
-
-std::ostream& stream(const EV_Array&, std::ostream& os, int precision);
+concept expectation_values = expectationvalues::labelled_and_without_nonlinear_postprocessing<L,RANK> || expectationvalues::labelled_and_with_nonlinear_postprocessing<L,RANK> ;
 
 
 template <size_t RANK>
-EV_Array calculateProcessStream(const expectation_values<RANK> auto& ev, double t, lazy_density_operator<RANK> auto matrix, std::ostream& os, int precision);
-/*{
+void checkConsistencyWithLabels (const expectation_values<RANK> auto&);
+
+
+template <size_t RANK>
+auto calculateAndProcess(const expectation_values<RANK> auto& ev, double t, lazy_density_operator<RANK> auto rho) -> decltype(expectationvalues::calculate(getFunctional(ev),t,rho)) ;/*
+{
   Averages averages;
   if (const auto av=castAv(qs)) {
     averages.reference(av->average(t,matrix));
@@ -80,34 +69,24 @@ EV_Array calculateProcessStream(const expectation_values<RANK> auto& ev, double 
 }*/
 
 
-/*
-template <size_t RANK>
-struct ExpectationValue
-{
-  std::list<std::string> labels; // of the ExpectationValue, like photonnumber, sigmaoperator, etc.
 
-  std::variant<TimeDependentExpectationValue<RANK,EV_Array>,TimeIndependentExpectationValue<RANK,EV_Array>> eva;
+/* Another definition of key_labels that mirrors that of temporal_data_points is probably an overkill
+/// hana::tuple of std::string or such hana::tuples (recursive definition)
+namespace expectationvalues {
 
-  std::optional<> process{}; // by default, std::nullopt
+template <typename T> constexpr bool kl = false;
 
-};*/
+template <> constexpr bool kl<std::string> = true;
 
-                 
+template <hana_sequence S> constexpr bool kl<S> = !!hana::all_of(
+  decltype(hana::transform(std::declval<S>(), hana::typeid_)){},
+  []<class T>(T) { return kl<typename T::type>; });
 
-template <key_labels KL>
-std::ostream& streamKey(std::ostream&, const KL&);
-/*{
-  using namespace std;
-  os<<el.label;
-  for (const auto& l : el.lindblads) os<<endl<<setw(2)<<i++<<". "<<l.label;
-  return os<<endl;
-}*/
+} // expectationvalues
 
+template <typename T> concept key_labels = expectationvalues::kl<T>;
+*/
 
-
-
-/// assumption: eva[0] is expectation value, eva[1] is expectation value of the square
-void calculateVariance(EV_Array& eva);
 
 
 } // structure
