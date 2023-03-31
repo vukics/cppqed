@@ -54,8 +54,8 @@ concept controlled_stepper =
   requires (T&& t, Time deltaT, SystemFunctional<State,Time> sys, Time time, State&& stateInOut ) { t.try_step( sys , stateInOut , time , deltaT ); };
 
 
-/// TODO: see whether it’s not too big an overhead to produce a logTree every time step is calculated
-/** Otherwise step can get a reference to a logTree from the call scope */
+/// TODO: see whether it’s not too big an overhead to produce a LogTree every time step is calculated
+/** Otherwise step can get a reference to a LogTree from the call scope */
 template <typename T, typename State, typename Time=double>
 concept engine = adaptive_timestep_keeper<T> && logger<T> &&
   requires ( T&& t, Time deltaT, SystemFunctional<State,Time> sys, Time& time, State&& stateInOut ) {
@@ -127,11 +127,10 @@ inline void serialize(Archive & ar, DefaultLogger& dl, const unsigned int /*file
 
 LogTree logOutro(const DefaultLogger& dl)
 {
-  return {
-    {"name","default"},
+  return {{"DefaultLogger", {
     {"nSteps",dl.nSteps},
     {"nFailedSteps",dl.nFailedSteps},
-    {"nDerivsCalls",dl.nDerivsCalls}};
+    {"nDerivsCalls",dl.nDerivsCalls}}}};
 }
 
 
@@ -162,9 +161,7 @@ struct Base
 
   friend LogTree logIntro(const Base& b)
   {
-    return {
-      {"name",StepperDescriptor<CES>},
-      {"parameters",b.ces.logIntro()}};
+    return {{StepperDescriptor<CES>,b.ces.logIntro()}};
   }
 
   friend LogTree logOutro(const Base& b) {return logOutro(b.logger);}

@@ -39,13 +39,13 @@ struct Simulated
 
   friend double getTime(const Simulated& s) {return s.time;}
 
-  friend LogTree logIntro(const Simulated& s) {return {{"name","Simulated"},{"odeEngine",logIntro(s.ode)}};}
+  friend LogTree logIntro(const Simulated& s) {return {{"Simulated",{"odeEngine",logIntro(s.ode)}}};}
 
   friend LogTree logOutro(const Simulated& s) {return logOutro(s.ode);}
 
   friend LogTree step(Simulated& s, double deltaT) {return step(s.ode,deltaT,s.derivs,s.time,s.state);}
 
-  friend LogTree dataStreamKey(const Simulated& s) {return {{"Simulated",boost::json::value_from(s.keyLabels)}};}
+  friend LogTree dataStreamKey(const Simulated& s) {return {{"Simulated",s.keyLabels}};}
 
   friend auto temporalDataPoint(const Simulated& s)
   {

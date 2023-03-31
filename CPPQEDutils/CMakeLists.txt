@@ -3,7 +3,7 @@
 message(STATUS "Configuring CPPQEDutils")
 
 # ### Library detection
-find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams json serialization)
+find_package(Boost ${BOOST_MINIMAL} REQUIRED COMPONENTS iostreams serialization)
 
 find_package(Eigen3 3.3 REQUIRED)
 
@@ -16,7 +16,7 @@ add_library(CPPQEDutils SHARED
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
 
-target_link_libraries(CPPQEDutils PUBLIC ThirdParty Boost::iostreams Boost::json Boost::serialization Eigen3::Eigen)
+target_link_libraries(CPPQEDutils PUBLIC ThirdParty Boost::iostreams Boost::serialization Eigen3::Eigen)
 
 # Project options
 # Switch for boost bzip2 support

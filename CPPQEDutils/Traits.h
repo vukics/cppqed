@@ -66,11 +66,11 @@ static_assert(!temporal_data_point<int>);
 } // cppqedutils
 
 
-#include <boost/json.hpp>
+#include <json.hpp>
 
 namespace cppqedutils {
 
-using LogTree = boost::json::object;
+using LogTree = nlohmann::json ;
 
 template <typename T> concept intro_logger = requires ( const T& t ) {
   { logIntro(t) } -> std::convertible_to<LogTree>; };

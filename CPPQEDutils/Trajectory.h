@@ -33,10 +33,10 @@ concept adaptive_steppable = adaptive_time_keeper<T> && requires (T&& t, double 
 /// advances for exactly time `deltaT`
 LogTree advance(adaptive_steppable auto& traj, double deltaT)
 {
-  boost::json::array res;
+  LogTree res;
   double endTime=getTime(traj)+deltaT;
-  while (double dt=endTime-getTime(traj)) res.push_back( step(traj,dt).begin()->value() ) ;
-  return {{"nFailedSteps",res}};
+  while (double dt=endTime-getTime(traj)) res.push_back( step(traj,dt).begin().value() ) ;
+  return {{"advance",res}};
 }
 
 
@@ -339,7 +339,9 @@ const auto trajectoryDataStreamerDefault = [] (const uniform_step auto& traj, st
   return tdp;
 };
 
+
 /// The most general run function
+/** TODO: use std::setw instead of lots of dump(ppindent) for json pretty printing */
 template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, trajectory_data_streamer<TRAJ> TDS = decltype(trajectoryDataStreamerDefault) >
 requires ( ( SFT==StreamFreqType::DT_MODE || adaptive<TRAJ> ) && ( RLT==RunLengthType::T_MODE || SFT==StreamFreqType::DT_MODE ) )
 auto
@@ -357,6 +359,8 @@ run(TRAJ&& traj, ///< the trajectory to run
     observer<TRAJ> auto&& observer,
     const TDS& tds = trajectoryDataStreamerDefault)
 {
+  static constexpr size_t ppindent = 2; // json pretty-print indent
+
   auto streamWrapper=[&] (std::ostream& os) {return tds(traj,os<<getTime(traj)<<" "<<getDtDid(traj)<<"\t");};
 
   using namespace std;
@@ -414,8 +418,8 @@ run(TRAJ&& traj, ///< the trajectory to run
   if (streamIntro) {
     if (!continuing) {
       if (parsedCommandLine!="") logStream<<parsedCommandLine<<endl<<endl;
-      logStream<<versionHelper()<<endl<<logIntro(traj)<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<dataStreamKey(traj)
-        <<endl<<"Run Trajectory up to time "<<timeToReach
+      logStream<<versionHelper()<<logIntro(traj).dump(ppindent)<<endl<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<dataStreamKey(traj).dump(ppindent)
+        <<endl<<endl<<"Run Trajectory up to time "<<timeToReach
         <<" -- Stream period: "<<streamFreq<< (SFT==StreamFreqType::DT_MODE ? "" : " timestep") <<endl<<endl;
     }
     else
@@ -440,10 +444,10 @@ run(TRAJ&& traj, ///< the trajectory to run
 
       if (count) {
         // advance trajectory
-        if constexpr (SFT==StreamFreqType::DC_MODE) {logStream<<step(traj,length-getTime(traj))<<endl;}
+        if constexpr (SFT==StreamFreqType::DC_MODE) {logStream<<step(traj,length-getTime(traj)).dump(ppindent)<<endl;}
         else {
-          if constexpr (RLT==RunLengthType::T_MODE) logStream<<advance(traj,std::min(streamFreq,length-getTime(traj)))<<endl;
-          else logStream<<advance(traj,streamFreq)<<endl;
+          if constexpr (RLT==RunLengthType::T_MODE) logStream<<advance(traj,std::min(streamFreq,length-getTime(traj))).dump(ppindent)<<endl;
+          else logStream<<advance(traj,streamFreq).dump(ppindent)<<endl;
         }
         stateSaved=tdpStreamed=false;
       }
@@ -481,7 +485,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  logStream<<logOutro(traj)<<endl;
+  logStream<<logOutro(traj).dump(ppindent)<<endl;
   if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;

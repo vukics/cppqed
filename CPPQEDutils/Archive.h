@@ -4,15 +4,12 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
-#include <boost/json.hpp>
 
 namespace cppqedutils {
 
 typedef boost::archive::binary_iarchive iarchive; ///< delegated to \refBoost{Boost.Serialization,serialization}
 typedef boost::archive::binary_oarchive oarchive; ///< \copydoc iarchive
 
-
-std::string toStringJSON(auto&& v) {return ::boost::json::serialize( ::boost::json::value_from( std::forward<decltype(v)>(v) ) ) ;}
 
 
 // template <typename T, typename Archive> concept serializable = requires (Archive& ar, T& t) {serialize(ar,t)};
