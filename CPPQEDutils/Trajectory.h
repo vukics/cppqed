@@ -73,6 +73,8 @@ enum struct RunLengthType {T_MODE=0, NDT_MODE=1};
 LogTree advanceTo(uniform_step auto& traj, double t) { return advance(traj,t-getTime(traj)); }
 
 
+using StreamSwitch = std::bitset<4>; // stream intro,  stream outro, stream log underway, serialize 1st state
+
 
 /// Parameters of run() control
 /** This could be more finely grained by factoring out autoStopping-control, but the present solution should be sufficient for most puposes */
@@ -87,7 +89,7 @@ struct Pars : BASE
   
   int precision=6;
 
-  bool streamIntroOff=false, serializeFirstStateOff=false;
+  StreamSwitch streamSwitch;
 
   unsigned sdf;
 
@@ -100,13 +102,12 @@ struct Pars : BASE
   /// TODO: the many add`s here and in similar places could be relieved with functional techniques
   Pars(popl::OptionParser& op) : BASE{op}
   {
-    addTitle(add(add(add(add(add(add(/*add(*/add(add(add(add(add(add(op,
+    addTitle(add(add(add(add(add(add(add(add(add(add(add(op,
      "autoStopRepetition","Number of streamed lines repeated within relative precision before autostopping",0u,&autoStopRepetition),
      "autoStopEpsilonAbs","Absolute precision for autostopping",ode::epsAbsDefault,&autoStopEpsilonAbs),
      "autoStopEpsilonRel","Relative precision for autostopping",ode::epsRelDefault,&autoStopEpsilonRel),
      "sdf","State output frequency",0u,&sdf),
-     "serializeFirstStateOff","Turns off serializing trajectory state at startup",&serializeFirstStateOff),
-     "streamIntroOff","Turn off streaming intro of trajectories",&streamIntroOff),
+     "streamSwitch","stream intro,  stream outro, stream log underway, serialize 1st state",StreamSwitch("1011"),&streamSwitch),
 //     "precision","General precision of output",formdouble::Zero(FormDouble::defaultPrecision)),
      "initialFileName","Trajectory initial file name",std::string{},&initialFileName),
      "o","Output file name for Trajectory, when empty, cout",std::string{},&ofn),
@@ -352,9 +353,7 @@ run(TRAJ&& traj, ///< the trajectory to run
     const std::string& trajectoryFileName, ///< name of the output file for \link Trajectory::stream streams\endlink — if empty, stream to standard output
     const std::string& initialFileName, ///< name of file containing initial condition state for the run
     int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streamings\endlink
-    bool streamIntro, //< governs whether a \link Trajectory::streamIntro header\endlink is streamed at the top of the output
-    bool firstStateStream, ///< governs whether the state is streamed at time zero (important if \link Trajectory::writeState state streaming\endlink is costly)
-    bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
+    StreamSwitch streamSwitch, bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
     observer<TRAJ> auto&& observer,
     const TDS& tds = trajectoryDataStreamerDefault)
@@ -415,7 +414,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   // Writing introduction
   ///////////////////////
 
-  if (streamIntro) {
+  if (streamSwitch[0]) {
     if (!continuing) {
       if (parsedCommandLine!="") logStream<<parsedCommandLine<<endl<<endl;
       logStream<<versionHelper()<<logIntro(traj).dump(ppindent)<<endl<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<dataStreamKey(traj).dump(ppindent)
@@ -444,11 +443,13 @@ run(TRAJ&& traj, ///< the trajectory to run
 
       if (count) {
         // advance trajectory
-        if constexpr (SFT==StreamFreqType::DC_MODE) {logStream<<step(traj,length-getTime(traj)).dump(ppindent)<<endl;}
+        LogTree lt;
+        if constexpr (SFT==StreamFreqType::DC_MODE) {lt=step(traj,length-getTime(traj));}
         else {
-          if constexpr (RLT==RunLengthType::T_MODE) logStream<<advance(traj,std::min(streamFreq,length-getTime(traj))).dump(ppindent)<<endl;
-          else logStream<<advance(traj,streamFreq).dump(ppindent)<<endl;
+          if constexpr (RLT==RunLengthType::T_MODE) lt=advance(traj,std::min(streamFreq,length-getTime(traj)));
+          else lt=advance(traj,streamFreq);
         }
+        if (streamSwitch[2]) logStream<<lt.dump(ppindent)<<endl;
         stateSaved=tdpStreamed=false;
       }
 
@@ -460,7 +461,7 @@ run(TRAJ&& traj, ///< the trajectory to run
         if (
             stateStreamFreq && 
             !(stateCount%stateStreamFreq) && 
-            (stateCount || (firstStateStream && !continuing))
+            (stateCount || (streamSwitch[3] && !continuing))
            )
         {
           writeViaSStream(traj,ofs);
@@ -485,7 +486,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  logStream<<logOutro(traj).dump(ppindent)<<endl;
+  if (streamSwitch[1]) logStream<<logOutro(traj).dump(ppindent)<<endl;
   if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;
@@ -529,20 +530,14 @@ auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=t
   using namespace trajectory;
   if constexpr (adaptive<TRAJ>) {
     if (p.dc) return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(
-      std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,
-      !p.streamIntroOff,!p.serializeFirstStateOff,
-      doStreaming,returnStreamedArray,std::forward<AH>(ah));
+      std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,std::forward<AH>(ah));
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
   if (p.NDt) return trajectory::run<RunLengthType::NDT_MODE,StreamFreqType::DT_MODE>(
-    std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-    !p.streamIntroOff,!p.serializeFirstStateOff,
-    doStreaming,returnStreamedArray,std::forward<AH>(ah));
+    std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,std::forward<AH>(ah));
   else return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(
-    std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,
-    !p.streamIntroOff,!p.serializeFirstStateOff,
-    doStreaming,returnStreamedArray,std::forward<AH>(ah));
+    std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,std::forward<AH>(ah));
 }
 
 
