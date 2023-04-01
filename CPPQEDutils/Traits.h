@@ -80,6 +80,10 @@ template <typename T> concept outro_logger = requires ( const T& t ) {
 
 template <typename T> concept logger = intro_logger<T> && outro_logger<T>;
 
+template <typename H>
+concept labelled = requires (H&& h) { { label(h) } -> std::convertible_to<LogTree>; } || requires (H&& h) { { h.label } -> std::convertible_to<LogTree>; } ;
+
+
 } // cppqedutils
 
 
