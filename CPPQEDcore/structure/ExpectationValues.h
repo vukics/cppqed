@@ -11,19 +11,22 @@ namespace structure {
 
 namespace expectationvalues {
 
-/// TODO: how to express this more conveniently (all the possibilities for a lazy_density_operator have to be listed here?)
-template <typename L, size_t RANK>
-concept time_dependent_functional =/*
-  requires (const L& l, double t, StateVectorConstView<RANK> rho) { { l(t,rho) } -> temporal_data_point ; } &&*/
-  requires (const L& l, double t, DensityOperatorConstView<RANK> rho) { { l(t,rho) } -> ::cppqedutils::temporal_data_point ; } ;
 
 template <typename L, size_t RANK>
-concept time_independent_functional =/*
-  requires (const L& l, StateVectorConstView<RANK> rho) { { l(rho) } -> std::convertible_to<RESULT>; } &&*/
-  requires (const L& l, DensityOperatorConstView<RANK> rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ;
+concept time_dependent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
+  return s && ( requires (const L& l, double t, typename E::type rho) { { l(t,rho) } -> ::cppqedutils::temporal_data_point ; } ; )
+} );
+
+
+template <typename L, size_t RANK>
+concept time_independent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
+  return s && ( requires (const L& l, typename E::type rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ; )
+} );
+
 
 template <typename L, size_t RANK>
 concept functional = time_dependent_functional<L,RANK> || time_independent_functional<L,RANK> ;
+
 
 template <size_t RANK, functional<RANK> EV>
 auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
@@ -32,18 +35,16 @@ auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
   else if (time_independent_functional<EV,RANK>) return ev(matrix);
 }
 
+
 /// pre- & postcondition: the LogTree must have the same structure as the temporal_data_point returned by expectation_value
 template <typename L, size_t RANK>
-concept labelled_and_without_nonlinear_postprocessing = requires (const L& l) {
-  { labels(l) } -> std::convertible_to<cppqedutils::LogTree> ;
-  { getFunctional(l) } -> functional<RANK> ;
-};
+concept labelled_and_without_nonlinear_postprocessing = ::cppqedutils::labelled<L> && expectationvalues::functional<L,RANK> ;
 
 /// Postprocessing means any operation on the expectation values that is not linear in the density operator (as the calculation of variance, for istance)
 template <typename L, size_t RANK>
 concept labelled_and_with_nonlinear_postprocessing = labelled_and_without_nonlinear_postprocessing<L,RANK> && (
-  requires (const L& l, double t, DensityOperatorConstView<RANK> rho) { postProcess(l)( getFunctional(l)(t,rho) ); } ||
-  requires (const L& l, DensityOperatorConstView<RANK> rho) { postProcess(l)( getFunctional(l)(rho) ); } ) ;
+  // here, only one example of a valid call of l is enough
+  requires (const L& l, double t, DensityOperatorConstView<RANK> rho) { postProcessor(l)( l(t,rho) ) || postProcessor(l)( l(rho) ); } ) ;
 
 } // expectationvalues
 
@@ -57,7 +58,7 @@ void checkConsistencyWithLabels (const expectation_values<RANK> auto&);
 
 
 template <size_t RANK>
-auto calculateAndProcess(const expectation_values<RANK> auto& ev, double t, lazy_density_operator<RANK> auto rho) -> decltype(expectationvalues::calculate(getFunctional(ev),t,rho)) ;/*
+auto calculateAndPostprocess(const expectation_values<RANK> auto& ev, double t, lazy_density_operator<RANK> auto rho) -> decltype(expectationvalues::calculate(getFunctional(ev),t,rho)) ;/*
 {
   Averages averages;
   if (const auto av=castAv(qs)) {
