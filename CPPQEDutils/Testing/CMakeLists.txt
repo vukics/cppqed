@@ -30,7 +30,7 @@ find_package(Boost ${BOOST_MINIMAL} COMPONENTS unit_test_framework)
 
 if (TARGET Boost::unit_test_framework)
   set(BOOST_TESTING_EXECUTABLES
-      BlitzArray BlitzExtensions MultiIndexIterator Random SliceIterator)
+      BlitzArray BlitzExtensions MultiIndexIterator Random SliceIterator MultiArray)
   foreach(S ${BOOST_TESTING_EXECUTABLES})
     add_executable(${S} ${S}.cc)
     target_link_libraries(${S} CPPQED::CPPQEDutils Boost::unit_test_framework)
@@ -46,6 +46,9 @@ if (TARGET Boost::unit_test_framework)
   set_tests_properties(random_engine_serialization PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/output)
 
   add_test_utils(slice_iterator SliceIterator)
+
+  add_test_utils(multi_array MultiArray)
+
 endif()
 
 set(COMPILE_TESTING_NAMES compile_BlitzArraySliceIteratorTMP compile_TMP_Tools)

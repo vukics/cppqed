@@ -6,28 +6,30 @@
 
 #include <tuple>
 
-using namespace cppqedutils; using namespace boost::json;
+using namespace cppqedutils;
 
 constexpr auto ra20741 = retainedAxes<2,0,7,4,1>;
+
+using CArray9=MultiArray<dcomp,9>;
 
 
 int main()
 {
-  MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
+  CArray9 array{{5,2,3,2,4,3,2,4,6}, [](auto extents) {
+    CArray9::StorageType res(cppqedutils::multiarray::calculateExtent(extents));
+    std::uniform_real_distribution d{-1.0,1.0};
+    std::mt19937_64 randomEngine{1001};
+    std::ranges::generate(res, [&]() {
+      double re{d(randomEngine)}, im{d(randomEngine)};
+      return std::complex{re,im};});
+    return res;
+  }};
 
   Extents<5> 
     filteredExtents{multiarray::filterIn<ra20741>(array.extents)}/*,
     filteredStrides{multiarray::filterIn<ra20741>(array.strides)}*/;
 
-  std::cerr<<array.dataView.size()<<std::endl;
-
-  {
-    std::uniform_real_distribution d{-1.0,1.0};
-    std::mt19937_64 re{1001};
-    std::ranges::generate(array.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};});
-  }
-
-  std::cerr<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<toStringJSON( filteredExtents )<<std::endl;
+  std::cerr<<array.dataView.size()<<std::endl<<array(1,1,2,1,0,1,1,3,2)<<std::endl<<json( filteredExtents )<<std::endl;
   
   {
     std::cerr<<"*** Simple range: ***"<<std::endl;
@@ -36,14 +38,14 @@ int main()
     
     auto iter{range.begin()};
     
-    std::cerr<<toStringJSON( iter->extents )<<std::endl;
+    std::cerr<<json( iter->extents )<<std::endl;
     for (size_t i=0; i<10; (++i, ++iter));
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
     auto rangeRecurse{sliceRangeSimple<retainedAxes<1,3>>(*iter)};
 
-    std::cerr<<toStringJSON( rangeRecurse.begin()->extents )<<std::endl;
+    std::cerr<<json( rangeRecurse.begin()->extents )<<std::endl;
     
     auto iter2{rangeRecurse.begin()};
     for (size_t i=0; i<3; (++i, ++iter2));
@@ -70,14 +72,14 @@ int main()
     
     auto iter{range.begin()};
     
-    std::cerr<<toStringJSON( iter->extents )<<std::endl;
+    std::cerr<<json( iter->extents )<<std::endl;
     for (size_t i=0; i<10; (++i, ++iter));
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
     auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
 
-    std::cerr<<toStringJSON( rangeRecurse.begin()->extents )<<std::endl;
+    std::cerr<<json( rangeRecurse.begin()->extents )<<std::endl;
 
     auto iter2{rangeRecurse.begin()};
     for (size_t i=0; i<3; (++i, ++iter2));
@@ -95,14 +97,14 @@ int main()
     
     auto iter{range.begin()};
     
-    std::cerr<<toStringJSON( iter->extents )<<std::endl;
+    std::cerr<<json( iter->extents )<<std::endl;
     for (size_t i=0; i<10; (++i, ++iter));
     
     std::cerr<<(*iter)(2,2,1,3,0)<<std::endl;
     
     auto rangeRecurse{sliceRange<retainedAxes<1,3>>(*iter)};
 
-    std::cerr<<toStringJSON( rangeRecurse.begin()->extents )<<std::endl;
+    std::cerr<<json( rangeRecurse.begin()->extents )<<std::endl;
     
     auto iter2{rangeRecurse.begin()};
     for (size_t i=0; i<3; (++i, ++iter2));
@@ -127,14 +129,14 @@ int main()
   }
   
   {
-    const MultiArray<dcomp,9>& carray=array;
+    const CArray9& carray=array;
     
     auto v{vectorize(array)};
     auto cv{vectorize(carray)};
   }
     
   {
-    MultiArray<dcomp,8> array1{{5,2,3,2,5,2,1,2}};
+    MultiArray<dcomp,8> array1{{5,2,3,2,5,2,3,2}};
     const MultiArray<dcomp,8>& carray1 = array1;
     auto m{matricize(array1)};
     auto cm{matricize(carray1)};
@@ -142,7 +144,7 @@ int main()
   
 }
 
-
+/*
 
 void f()
 {
@@ -195,7 +197,7 @@ void f()
     return data;
   }};  
   
-  std::string maSmallSerialized=toStringJSON( maSmall );
+  std::string maSmallSerialized=json( maSmall );
   
   std::cout << maSmallSerialized << std::endl;
   
@@ -203,22 +205,22 @@ void f()
   
   std::cout << isEqual(maSmall,maSmallReconstructed)  << std::endl;
   
-  for (auto o : maSmallReconstructed.dataView) std::cout<<o<<" "/*<<std::endl*/;
+  for (auto o : maSmallReconstructed.dataView) std::cout<<o<<" "<<std::endl;
 
   std::cout<<std::endl;
   
-  std::cout<<toStringJSON( maSmallReconstructed )<<std::endl;
+  std::cout<<json( maSmallReconstructed )<<std::endl;
   
-  std::cout<< (maSmallSerialized == toStringJSON( maSmallReconstructed ) ) << std::endl;
+  std::cout<< (maSmallSerialized == json( maSmallReconstructed ) ) << std::endl;
   
   {
     Extents<5> idx{0,0,0,0,0}, ext{5,2,4,3,2};
-    for (size_t i=0; i<multiarray::calculateExtent(ext); (++i, incrementMultiIndex(idx, ext) ) ) std::cout<<toStringJSON(idx)<<std::endl;
+    for (size_t i=0; i<multiarray::calculateExtent(ext); (++i, incrementMultiIndex(idx, ext) ) ) std::cout<<json(idx)<<std::endl;
   }
   
   std::cout<<hana::Sequence<decltype(compileTimeRange<0,10>)>::value<<hana::Sequence<decltype(retainedAxes<1,5,10>)>::value<<std::endl;
   
-  std::cout<<toStringJSON(std::make_tuple(1.2,"hello",32ul))<<std::endl;
+  std::cout<<json(std::make_tuple(1.2,"hello",32ul))<<std::endl;
   
 //   {
 //     MultiArray<double,5> ma{{2,3,4,2,4}};
@@ -236,11 +238,12 @@ void f()
     std::vector<size_t> v1{1,2,3,4}, v2{5,6,7};
     auto joined(std::views::join(std::vector{v1,v2}));
     
-    std::cerr<<toStringJSON( std::vector<size_t>(joined.begin(),joined.end()) )<<std::endl;
+    std::cerr<<json( std::vector<size_t>(joined.begin(),joined.end()) )<<std::endl;
   }
   
 }
 
+*/
 
 
 auto calcIndex=[]<size_t RANK> (Extents<RANK> extents, auto... i) requires (sizeof...(i)==RANK) {
@@ -260,7 +263,7 @@ auto calcIndex=[]<size_t RANK> (Extents<RANK> extents, auto... i) requires (size
 
 void g()
 {
-  MultiArray<dcomp,9> array{{5,2,3,2,4,3,2,4,6}};
+  CArray9 array{{5,2,3,2,4,3,2,4,6}};
 
   Extents<5> 
     filteredExtents{multiarray::filterIn<ra20741>(array.extents)}/*,
@@ -268,3 +271,4 @@ void g()
 
   std::cerr<<calcIndex(filteredExtents,1,2,3,2,0)<<std::endl;
 }
+

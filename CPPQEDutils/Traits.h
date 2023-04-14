@@ -71,6 +71,7 @@ static_assert(!temporal_data_point<int>);
 namespace cppqedutils {
 
 using LogTree = nlohmann::json ;
+using json = nlohmann::json ;
 
 template <typename T> concept intro_logger = requires ( const T& t ) {
   { logIntro(t) } -> std::convertible_to<LogTree>; };

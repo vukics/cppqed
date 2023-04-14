@@ -1,8 +1,38 @@
 #include <boost/json.hpp>
 
+#include <boost/hana.hpp>
+
 #include <complex>
 #include <iostream>
 #include <vector>
+
+
+namespace hana = boost::hana;
+
+
+struct A {};
+struct B {};
+struct C {};
+
+
+constexpr auto typeOptions = hana::tuple_t<A,B>;
+
+
+template <typename T>
+concept type_options = std::same_as<T,A> || std::same_as<T,B>;
+
+
+template <typename L>
+concept functional = hana::fold( typeOptions, true, [] <typename E> (bool s, E) { return s &&  ( requires (const L& l, typename E::type rho) { { l(rho) } -> std::convertible_to<double> ; } ) ; } );
+
+
+
+auto f = [] (type_options auto) {return 1.;};
+
+// static_assert(functional_helper<decltype(f),A>);
+static_assert(functional<decltype(f)>);
+
+
 
 int main()
 {

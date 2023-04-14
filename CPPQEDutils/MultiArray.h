@@ -11,7 +11,6 @@
 
 #include <array>
 #include <concepts>
-#include <functional>
 #include <span>
 #include <stdexcept>
 //#include <valarray>
@@ -145,7 +144,7 @@ template <typename T1, typename T2, size_t RANK>
 bool isEqual(MultiArrayConstView<T1,RANK> m1, MultiArrayConstView<T2,RANK> m2)
 {
 #ifndef   NDEBUG
-  if (m1.extents!=m2.extents) throw std::runtime_error("Extent mismatch in MultiArrayView comparison: "+toStringJSON(m1.extents)+" "+toStringJSON(m2.extents));
+  if (m1.extents!=m2.extents) throw std::runtime_error("Extent mismatch in MultiArrayView comparison: "+json(m1.extents).dump()+" "+json(m2.extents).dump());
 #endif // NDEBUG
   bool res=true;
   for (Extents<RANK> idx{}; idx!=m1.extents; incrementMultiIndex(idx,m1.extents))
@@ -191,13 +190,15 @@ public:
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
   
   /// initializer is a callable, taking the total size as argument.
-  MultiArray(Extents<RANK> extents, auto&& initializer)
-    : BASE<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
+  MultiArray(Extents<RANK> extents, auto&& initializer) requires requires (Extents<RANK> e) {initializer(e);}
+    : BASE<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(extents)}
   {
     this->dataView=std::span<T>(data_);
   }
 
-  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,[](size_t s) {return StorageType(s); /* no braces here, please!!! */}} {}
+  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,[](Extents<RANK> extents) {
+    return StorageType(multiarray::calculateExtent(extents)); /* no braces here, please!!! */
+  }} {}
 
   /// Element-by-element assignment
   /** \note The operator-style syntax is not used, since this can be a rather expensive operation! */
@@ -221,33 +222,25 @@ public:
   T& operator()(auto&&... i) {return const_cast<T&>(static_cast<BASE<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
   /// JSONize
-  friend void tag_invoke( ::boost::json::value_from_tag, ::boost::json::value& jv, const MultiArray& ma )
+  friend void to_json( json& jv, const MultiArray& ma )
   {
-    using namespace ::boost::json;
     jv = {
-      { "extents" , value_from(ma.extents) },
+      { "extents" , ma.extents },
       //    { "strides" , ma.strides },
-      { "data", value_from(ma.data_) }
+      { "data", ma.data_ }
     };
   }
 
   /// unJSONize
-  friend auto tag_invoke( ::boost::json::value_to_tag< MultiArray >, const ::boost::json::value& jv )
+  friend void from_json( const json& jv, MultiArray& ma )
   {
-    using namespace ::boost::json;
-    const object & obj = jv.as_object();
-    return MultiArray {
-      value_to<Extents<RANK>>( obj.at( "extents" ) ),
+    ma.extents=jv["extents"];
+    StorageType dataTemp=jv["data"];
 #ifndef   NDEBUG
-      [&] (size_t s) {
-        auto ret{value_to<StorageType>( obj.at( "data" ) )};
-        if (ret.size() != s) throw std::runtime_error("Mismatch in data size and extents parsed from JSON");
-        return ret;
-      }
-#else  // NDEBUG
-      [&] (size_t) {return value_to<StorageType>( obj.at( "data" ) ); }
+    if (ma.data_.size() != multiarray::calculateExtent(ma.extents)) throw std::runtime_error("Mismatch in data size and extents parsed from JSON");
 #endif // NDEBUG
-    };
+    ma.data_.swap(dataTemp); ma.dataView=std::span<T>(ma.data_);
+    ma.strides=multiarray::calculateStrides(ma.extents);
   }
   
 protected:
