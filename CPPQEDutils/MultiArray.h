@@ -58,7 +58,12 @@ auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
 /// A non-owning view, should be passed by value.
 /**
  * Follows reference semantics regarding constness.
- * All four possibilities of (const)MultiArrayView<(const)T,RANK> can be used and have the same semantics as if MultiArrayView was a pointer (same as with std::span)
+ * All four possibilities of (const)MultiArrayView<(const)T,RANK> can be used
+ * and have the same semantics as if MultiArrayView was a pointer (same as with std::span)
+ *
+ * TODO: alternative design: MultiArrayBase with StorageType as template parameter
+ * then, when StorageType is a span, it’s a view, and when it’s a vector, it’s an owning MultiArray.
+ * In this case, MultiArray need not be derived from MultiArrayView, of course :)
  */
 template <typename T, size_t RANK>
 class MultiArrayView
@@ -66,8 +71,6 @@ class MultiArrayView
 public:
   MultiArrayView(const MultiArrayView&) = default; MultiArrayView(MultiArrayView&&) = default; MultiArrayView() = default;
   MultiArrayView& operator=(const MultiArrayView&) = default; MultiArrayView& operator=(MultiArrayView&&) = default;
-  
-  /* template <typename... Indices> requires ( sizeof...(Indices)==RANK && ( ... && std::is_convertible_v<Indices,size_t> ) ) T& operator() (Indices... i); */
   
   /// offset can come from a previous slicing
   MultiArrayView(Extents<RANK> e, Extents<RANK> s, size_t o, auto&&... dv)
@@ -169,14 +172,20 @@ auto calculateExtent(Extents<RANK> extents)
   return std_ext::ranges::fold(extents,size_t{1},std::multiplies{});
 }
 
+template <typename T, size_t RANK>
+const auto noInit(Extents<RANK> e) {return [=] () -> std::vector<T> {return std::vector<T>(multiarray::calculateExtent(e));};}
+
+template <typename T, size_t RANK>
+const auto zeroInit(Extents<RANK> e) {return [=] () -> std::vector<T> {return std::vector<T>(multiarray::calculateExtent(e),T(0.));};}
+
 } // multiarray
 
 
-/// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned) 
+/// Owns data, hence it’s uncopyable (and unassignable), but can be move-constructed (move-assigned)
 /** Follows value semantics regarding constness. */
-template <typename T, size_t RANK, template <typename, size_t> typename BASE=MultiArrayConstView>
+template <typename T, size_t RANK>
 requires ( !std::is_const_v<T> )
-class MultiArray : public BASE<T,RANK>
+class MultiArray : public MultiArrayConstView<T,RANK>
 {
 public:
   /// the storage might eventually become a kokkos::View or a std::valarray
@@ -188,17 +197,15 @@ public:
   MultiArray(const MultiArray&) = delete; MultiArray& operator=(const MultiArray&) = delete;
   
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
-  
+
   /// initializer is a callable, taking the total size as argument.
-  MultiArray(Extents<RANK> extents, auto&& initializer) requires requires (Extents<RANK> e) {initializer(e);}
-    : BASE<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(extents)}
+  MultiArray(Extents<RANK> extents, auto&& initializer) requires requires { { initializer() } -> std::convertible_to<StorageType>;}
+    : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer()}
   {
     this->dataView=std::span<T>(data_);
   }
 
-  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,[](Extents<RANK> extents) {
-    return StorageType(multiarray::calculateExtent(extents)); /* no braces here, please!!! */
-  }} {}
+  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,multiarray::noInit<T>(extents)} {}
 
   /// Element-by-element assignment
   /** \note The operator-style syntax is not used, since this can be a rather expensive operation! */
@@ -219,7 +226,7 @@ public:
   operator MultiArrayView<T,RANK>() {return mutableView();}
 
   /// non-const subscripting
-  T& operator()(auto&&... i) {return const_cast<T&>(static_cast<BASE<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
+  T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
   /// JSONize
   friend void to_json( json& jv, const MultiArray& ma )

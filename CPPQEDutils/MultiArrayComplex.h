@@ -65,4 +65,8 @@ auto directProduct(const MultiArray<dcomp,RANK1>& m1, const MultiArray<dcomp,RAN
 }
 
 
+template <size_t RANK>
+MultiArray<dcomp,RANK>& conj(MultiArray<dcomp,RANK>& ma) { std::ranges::transform( ma.mutableView().dataView, std::conj ); return ma;}
+
+
 } // cppqedutils

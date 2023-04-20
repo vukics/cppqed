@@ -3,90 +3,54 @@
 #pragma once
 
 #include "ArrayBase.h"
-#include "DimensionsBookkeeper.h"
 
 
 namespace quantumdata {
 
-template<size_t RANK> struct DensityOperator; // forward declaration
+template <size_t RANK> struct DensityOperator; // forward declaration
 
 
 template <size_t RANK>
 using StateVectorView=cppqedutils::MultiArrayView<dcomp,RANK>;
 
 
-template <typename, size_t RANK> // the first template parameter is there just in order to conform with what MultiArray expects
-struct StateVectorConstViewBase : cppqedutils::MultiArrayConstView<dcomp,RANK>
-{
-  using cppqedutils::MultiArrayConstView<dcomp,RANK>::MultiArrayConstView;
-  using cppqedutils::MultiArrayConstView<dcomp,RANK>::operator=;
-  
-  /// lazy_density_operator-style indexing
-  const dcomp operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==2*RANK);
-
-};
-
-
 template <size_t RANK>
-using StateVectorConstView = StateVectorConstViewBase<dcomp,RANK>;
+using StateVectorConstView=cppqedutils::MultiArrayConstView<dcomp,RANK>;
 
 
 /// State vector of arbitrary arity
 /**
- * \tparamRANK
- *
  * Owns its data. Should be present on the highest level of the simulations in a single copy
  * (representing the initial condition, to be evolved by the quantum dynamics).
- * 
  */
 template<size_t RANK>
-struct StateVector : ArrayBase<StateVector<RANK>,StateVectorConstViewBase>, DimensionsBookkeeper<RANK>
+struct StateVector : ArrayBase<StateVector<RANK>>
 {
-  using Dimensions=typename DimensionsBookkeeper<RANK>::Dimensions;
+  using ABase = ArrayBase<StateVector<RANK>>;
 
-  using ABase = ArrayBase<StateVector<RANK>,StateVectorConstViewBase>;
+  using Dimensions=::cppqedutils::Extents<RANK>;
 
   StateVector(const StateVector&) = delete; StateVector& operator=(const StateVector&) = delete;
-  
+
   StateVector(StateVector&&) = default; StateVector& operator=(StateVector&&) = default;
 
-  StateVector(const Dimensions& dimensions, auto&& initializer) : ABase{dimensions}, DimensionsBookkeeper<RANK>{dimensions} {initializer(*this);}
+  StateVector(::cppqedutils::MultiArray<dcomp,RANK>&& ma) : ABase{std::move(ma)} {}
 
-  explicit StateVector(const Dimensions& dimensions)
-    : StateVector{dimensions,[](StateVector& psi) {psi=0.; psi.mutableView().dataView[0]=1.;}} {}
-    
-  /// Constructs the class as the direct product of `psi1` and `psi2`, whose arities add up to `RANK`.
-  template<size_t RANK2>
-  StateVector(const StateVector<RANK2>& psi1, const StateVector<RANK-RANK2>& psi2)
-    : ABase{cppqedutils::directProduct(psi1,psi2)}, DimensionsBookkeeper<RANK>{cppqedutils::concatenate(psi1.extents,psi2.extents)} {}
-  
+  StateVector(Dimensions dimensions, auto&& initializer) : ABase{dimensions,std::forward<decltype(initializer)>(initializer)} {}
+
+  explicit StateVector(Dimensions dimensions)
+    : StateVector{dimensions, [=] () {auto res(::cppqedutils::multiarray::zeroInit<dcomp,RANK>(dimensions)()); res[0]=1.; return res;}} {}
+
+  // StateVector(auto&& ... a) : ArrayBase<StateVector<RANK>>(std::forward<decltype(a)>(a)...) {}
+
   /// \name Metric
   //@{
     /// Returns the norm \f$\norm\Psi\f$, implemented in terms of ArrayBase::frobeniusNorm.
-  double   norm() const {return ABase::frobeniusNorm();}
+  friend double norm(const StateVector& sv) {return frobeniusNorm(sv);}
   
-  double renorm() ///< ” and also renormalises
-  {
-    double res=norm();
-    this->operator/=(res);
-    return res;
-  }
+  friend double renorm(StateVector& sv) {double res=norm(sv); sv/=res; return res;}
   //@}
   
-  /// \name Dyad
-  //@{
-    /// Forms a dyad with the argument, a rather expensive operation, implemented as a directProduct
-  inline auto dyad(const StateVector& sv) const
-  {
-#ifndef NDEBUG
-    if (this->getDimensions() != sv.getDimensions()) throw std::runtime_error("Mismatch in StateVector::dyad dimensions");
-#endif // NDEBUG
-    return cppqedutils::directProduct(*this,sv);
-  }
-
-  auto dyad() const {return dyad(*this);} ///< dyad with the object itself
-  //@}
-
   /// Adds a dyad of the present object to `densityOperator`
   /**
    * This is done without actually forming the dyad in memory (so that this is not implemented in terms of StateVector::dyad),
@@ -105,11 +69,22 @@ struct StateVector : ArrayBase<StateVector<RANK>,StateVectorConstViewBase>, Dime
 };
 
 
+/// Forms a dyad with the argument, a rather expensive operation, implemented as a directProduct
+template <size_t RANK>
+auto dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
+{
+#ifndef NDEBUG
+  if (sv1.extents != sv2.extents) throw std::runtime_error("Mismatch in StateVector::dyad dimensions");
+#endif // NDEBUG
+  return cppqedutils::directProduct(sv1, sv2, [] (dcomp v1, dcomp v2) {return v1*conj(v2);} );
+}
+
+
 /// Creates the direct product, relying on the direct-product constructor
 template<size_t RANK1, size_t RANK2>
-inline auto operator*(const StateVector<RANK1>& t1, const StateVector<RANK2>& t2)
+inline auto operator*(const StateVector<RANK1>& psi1, const StateVector<RANK2>& psi2)
 {
-  return StateVector<RANK1+RANK2>(t1,t2);
+  return StateVector<RANK1+RANK2>(cppqedutils::directProduct<RANK1,RANK2>(psi1,psi2));
 }
 
 

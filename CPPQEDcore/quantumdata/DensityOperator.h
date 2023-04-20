@@ -28,51 +28,35 @@ using DensityOperatorConstView=cppqedutils::MultiArrayConstView<dcomp,2*RANK>;
  * 
  */
 template<size_t RANK>
-struct DensityOperator : ArrayBase<DensityOperator<RANK>,cppqedutils::MultiArrayConstView<dcomp,2*RANK>>, DimensionsBookkeeper<RANK>
+struct DensityOperator : ArrayBase<DensityOperator<RANK>>
 {
-  using Dimensions=typename DimensionsBookkeeper<RANK>::Dimensions;
+  using Dimensions=::cppqedutils::Extents<RANK>; /// Note: this is not the extents of the underlying multiarray!
   
-  using ABase = ArrayBase<DensityOperator<RANK>,cppqedutils::MultiArrayConstView<dcomp,2*RANK>>;
+  using ABase = ArrayBase<DensityOperator<RANK>>;
 
   DensityOperator(const DensityOperator&) = delete; DensityOperator& operator=(const DensityOperator&) = delete;
   
   DensityOperator(DensityOperator&&) = default; DensityOperator& operator=(DensityOperator&&) = default;
 
+  DensityOperator(::cppqedutils::MultiArray<dcomp,2*RANK>&& ma) : ABase(std::move(ma)) {}
+
   DensityOperator(const Dimensions& dimensions, auto&& initializer)
-    : ABase{cppqedutils::concatenate(dimensions,dimensions)}, DimensionsBookkeeper<RANK>{this->extents} {initializer(*this);}
+    : ABase{cppqedutils::concatenate(dimensions,dimensions)} {initializer(*this);}
 
   explicit DensityOperator(const Dimensions& dimensions)
     : DensityOperator{dimensions,[](DensityOperator& rho) {rho=0; rho.mutableView().dataView[0]=1.;}} {}
     
   explicit DensityOperator(const StateVector<RANK>& psi) ///< Constructs the class as a dyadic product of `psi` with itself.
-    : ABase(psi.dyad()), DimensionsBookkeeper<RANK>{this->extents} {}
+    : DensityOperator(dyad(psi,psi)) {}
 
 
-  /// \name Norm
-  //@{
-  double trace() const ///< returns the trace norm
-  {
-    using blitz::tensor::i;
-    const linalg::CMatrix m(matrixView());
-    return real(sum(m(i,i)));
-  }
+  friend double trace(const DensityOperator& rho) {return ::cppqedutils::matricize(rho).trace();} //< delegates to Eigen3
 
-  double renorm() ///< ” and also renormalises
-  {
-    double trace=norm();
-    *this/=trace;
-    return trace;
-  }
-  //@}
+  friend double renorm(DensityOperator& rho) {double res=trace(rho); rho/=res; return res;}
 
 };
 
-
-template<size_t RANK>
-inline
-double frobeniusNorm(const DensityOperator<RANK>& rho) {return rho.frobeniusNorm();}
-
-
+/*
 /// Performs the opposite of quantumdata::deflate
 template<size_t RANK>
 void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDiagonals)
@@ -148,21 +132,14 @@ auto reduce(const DensityOperator<RANK>& matrix)
 {
   return reduce<tmptools::Vector<SUBSYSTEM...>>(matrix);
 }
+*/
 
-
-
-template<size_t RANK>
-inline auto
-dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
-{
-  return DensityOperator<RANK>(sv1.dyad(sv2),byReference);
-}
 
 
 template<size_t RANK>
 double purity(const DensityOperator<RANK>& rho)
 {
-  return std_ext::ranges::fold(rho.dataView,0.,[] (double init, dcomp element) { return init+cppqedutils::sqrAbs(element); });
+  return std_ext::ranges::fold(rho.dataView,0.,[] (double init, dcomp element) { return init+sqrAbs(element); });
 }
 
 

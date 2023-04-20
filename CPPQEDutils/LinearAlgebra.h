@@ -26,7 +26,10 @@ struct VectorSpace
     boost::multiplicative<T,double, // Vector space
     boost::multiplicative<T,dcomp,  // "
     /*  boost::multipliable1  <T,        // Direct product */
-    boost::equality_comparable<T> > > >, Base {};
+    boost::equality_comparable<T> > > >, Base
+{
+  VectorSpace(auto&& ... a) : Base(std::forward<decltype(a)>(a)...) {}
+};
 
 
 } // linalg
