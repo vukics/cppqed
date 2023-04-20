@@ -14,13 +14,13 @@ namespace expectationvalues {
 
 template <typename L, size_t RANK>
 concept time_dependent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
-  return s && ( requires (const L& l, double t, typename E::type rho) { { l(t,rho) } -> ::cppqedutils::temporal_data_point ; } ; )
+  return s && ( requires (const L& l, double t, typename E::type rho) { { l(t,rho) } -> ::cppqedutils::temporal_data_point ; } ) ;
 } );
 
 
 template <typename L, size_t RANK>
 concept time_independent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
-  return s && ( requires (const L& l, typename E::type rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ; )
+  return s && ( requires (const L& l, typename E::type rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ) ;
 } );
 
 

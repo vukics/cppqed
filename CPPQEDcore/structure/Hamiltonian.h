@@ -17,6 +17,17 @@ template <typename H, typename StateIn, typename StateOut>
 concept ode_derivative_time_dependent_contribution = requires(H&& h, double t, StateIn psi, StateOut dpsidt) { h(t,psi,dpsidt); };
 
 
+template <typename StateIn, typename StateOut>
+using ODE_derivativeTimeIndependentFunctional = std::function<void(StateIn psi, StateOut dpsidt)> ;
+
+template <typename StateIn, typename StateOut>
+using ODE_derivativeTimeDependentFunctional = std::function<void(double t, StateIn psi, StateOut dpsidt)> ;
+
+
+template <size_t RANK> using TimeIndependentTerm = ODE_derivativeTimeIndependentFunctional<StateVectorConstView<RANK>,StateVectorView<RANK>>;
+template <size_t RANK> using TimeDependentTerm = ODE_derivativeTimeDependentFunctional<StateVectorConstView<RANK>,StateVectorView<RANK>>;
+
+
 namespace hamiltonian_ns {
 
 template <typename H, size_t RANK>
@@ -79,15 +90,15 @@ struct UnaryDiagonalPropagator
 
   using UpdateFunctional = std::conditional_t<IS_TWO_TIME,std::function<void(double,Diagonal&,double)>,std::function<void(double,Diagonal&)>>;
   
-  UnaryDiagonalPropagator(std::string l, size_t dim, UpdateFunctional updateDiagonal) : label(l), diagonal{dim}, updateDiagonal_{updateDiagonal} {}
+  UnaryDiagonalPropagator(std::string l, size_t dim, UpdateFunctional updateDiagonal) : label(l), diagonal(dim), updateDiagonal_{updateDiagonal} {}
   
   void operator()(double t, StateVectorView<1> psi, double t0) const requires (IS_TWO_TIME);// {if (t!=t_ || t0!=t0_) {updateDiagonal_(t_=t,diagonal,t0_=t0);} psi*=diagonal;}
 
   void operator()(double t, StateVectorView<1> psi) const requires (!IS_TWO_TIME);// {if (t!=t_) {updateDiagonal_(t_=t,diagonal);} psi*=diagonal;}
 
-  mutable Diagonal diagonal;
-
   const std::string label;
+
+  mutable Diagonal diagonal;
 
 private:
   mutable double t_=0, t0_=0;

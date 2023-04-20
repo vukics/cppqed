@@ -24,8 +24,18 @@ namespace quantumdata {
  */
 
 
+template <size_t RANK>
+constexpr auto lazyDensityOperatorOptions = hana::tuple_t<StateVectorConstView<RANK>,DensityOperatorConstView<RANK>>;
+
+
+// Either of the lazyDensityOperatorOptions
 template <typename T, size_t RANK>
-concept lazy_density_operator = ( std::same_as<T,StateVectorConstView<RANK>> || std::same_as<T,DensityOperatorConstView<RANK>> );
+concept lazy_density_operator = hana::fold(lazyDensityOperatorOptions<RANK>, false, [] <typename E> (bool s, E) {return s || std::same_as<T,typename E::type>; } );
+
+
+// Models
+static_assert( lazy_density_operator<StateVectorConstView<2>,2> ) ;
+static_assert( lazy_density_operator<DensityOperatorConstView<3>,3> ) ;
 
 
 /// The primary tool for performing slice iteration of LazyDensityOperator#s
@@ -238,6 +248,7 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
 
 namespace structure {
 
+using ::quantumdata::lazyDensityOperatorOptions;
 using ::quantumdata::lazy_density_operator;
 
 } // structure

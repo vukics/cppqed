@@ -22,9 +22,9 @@
  */
 #pragma once
 
+#include "ExpectationValues.h"
+#include "Hamiltonian.h"
 #include "Liouvillian.h"
-
-#include "FormDouble.h"
 
 
 namespace structure {
@@ -39,6 +39,7 @@ concept system_frequency_store =
   std::is_same_v<std::ranges::range_value_t<T>,SystemFrequencyDescriptor>;
 
 
+/// TODO: what happens if sfs is empty?
 template <system_frequency_store SFS>
 double highestFrequency(const SFS& sfs)
 {
@@ -46,15 +47,8 @@ double highestFrequency(const SFS& sfs)
 }
 
 
-std::ostream& stream(const system_frequency_store auto& sfs, std::ostream& os)
-{
-  for(const auto& sf : sfs) os<<get<0>(sf)<<"="<<formdouble::zeroAdditional(os.precision())(get<1>(sf))<<std::endl;
-  return os;
-}
-
-
 template <typename T, size_t RANK>
-concept quantum_system_dynamics = requires (T qsd)
+concept quantum_system_dynamics = requires (T&& qsd, std::ostream& os)
 {
   { getFreqs(qsd) } -> system_frequency_store;
   // or even
@@ -62,7 +56,8 @@ concept quantum_system_dynamics = requires (T qsd)
   // which gives even more flexibility
   { getHa(qsd) } -> hamiltonian<RANK>;
   { getLi(qsd) } -> liouvillian<RANK>;
-  { getEV(qsd) } -> expectation_values<RANK>;  
+  { getEV(qsd) } -> expectation_values<RANK>;
+  { streamParameters(qsd,os) } -> std::convertible_to<std::ostream&>;
 };
 
 
