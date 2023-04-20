@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "Qbit_.h"
+#include "Qbit.h"
 
 
 using namespace cppqedutils; using namespace structure;
@@ -17,7 +17,7 @@ TimeIndependentTerm<1> qbit::offDiagonalH(dcomp eta)
 
 UnaryDiagonalPropagator<> qbit::propagator(dcomp z)
 {
-  return {2,[=] (double t, UnaryDiagonalPropagator<>::Diagonal& d) {d[0]=1; d[1]=exp(-z*t);}};
+  return {"diagonalPropagator", 2 , [=] (double t, auto& d) {d[0]=1; d[1]=exp(-z*t);} };
 }
 
 
@@ -37,6 +37,12 @@ TimeIndependentSuperoperator<1> qbit::sigmaPlusSuperoperator(double gamma_p)
 {
   return [=] (DensityOperatorConstView<1> rho, DensityOperatorView<1> drhodt) {drhodt(1,1)+=2.*gamma_p*rho(0,0);};
 }
+
+
+TimeIndependentRate<1> qbit::sigmaRate(double gamma_m) {return [=] (StateVectorConstView<1> psi) {return 2.*gamma_m*sqrAbs(psi(1));}; }
+
+
+TimeIndependentRate<1> qbit::sigmaPlusRate(double gamma_p) {return [=] (StateVectorConstView<1> psi) {return 2.*gamma_p*sqrAbs(psi(0));}; }
 
 
 
