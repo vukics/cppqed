@@ -16,6 +16,10 @@ template <size_t RANK>
 using DensityOperatorConstView=cppqedutils::MultiArrayConstView<dcomp,2*RANK>;
 
 
+template <size_t RANK>
+auto getDimensions(const DensityOperator<RANK>& rho) {return ::cppqedutils::halveExtents(rho.extents);}
+
+
 /// Density operator of arbitrary arity
 /**
  * Cf. \ref quantumdatahighlevel "rationale"
@@ -28,11 +32,11 @@ using DensityOperatorConstView=cppqedutils::MultiArrayConstView<dcomp,2*RANK>;
  * 
  */
 template<size_t RANK>
-struct DensityOperator : ArrayBase<DensityOperator<RANK>>
+struct DensityOperator : ::cppqedutils::MultiArray<dcomp,2*RANK>, private VectorSpaceOperatorsGenerator<DensityOperator<RANK>>
 {
+  using ABase = ::cppqedutils::MultiArray<dcomp,2*RANK>;
+
   using Dimensions=::cppqedutils::Extents<RANK>; /// Note: this is not the extents of the underlying multiarray!
-  
-  using ABase = ArrayBase<DensityOperator<RANK>>;
 
   DensityOperator(const DensityOperator&) = delete; DensityOperator& operator=(const DensityOperator&) = delete;
   
@@ -40,11 +44,15 @@ struct DensityOperator : ArrayBase<DensityOperator<RANK>>
 
   DensityOperator(::cppqedutils::MultiArray<dcomp,2*RANK>&& ma) : ABase(std::move(ma)) {}
 
-  DensityOperator(const Dimensions& dimensions, auto&& initializer)
-    : ABase{cppqedutils::concatenate(dimensions,dimensions)} {initializer(*this);}
+  DensityOperator(Dimensions dimensions, auto&& initializer)
+    : ABase{cppqedutils::concatenate(dimensions,dimensions),std::forward<decltype(initializer)>(initializer)} {}
 
-  explicit DensityOperator(const Dimensions& dimensions)
-    : DensityOperator{dimensions,[](DensityOperator& rho) {rho=0; rho.mutableView().dataView[0]=1.;}} {}
+  explicit DensityOperator(Dimensions dimensions)
+    : DensityOperator{dimensions, [=] () {
+        auto res{zeroInit<2*RANK>};
+        res[0]=1.;
+        return res;
+    }} {}
     
   explicit DensityOperator(const StateVector<RANK>& psi) ///< Constructs the class as a dyadic product of `psi` with itself.
     : DensityOperator(dyad(psi,psi)) {}
@@ -145,7 +153,6 @@ double purity(const DensityOperator<RANK>& rho)
 
 template <size_t RANK>
 constexpr auto multiArrayRank_v<DensityOperator<RANK>> = 2*RANK;
-
 
 
 } // quantumdata

@@ -78,12 +78,11 @@ struct Lindblad
 };
 
 
-/// alternatively, we could use this and the next function as default values for rate and superoperator in Lindblads, but this seems a bit over-the-top
 template <size_t RANK>
 auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 {
-  quantumdata::StateVector<RANK> psiTemp( psi.extents, [=] () {
-    auto res(::cppqedutils::multiarray::noInit<dcomp>(psi.extents)());
+  quantumdata::StateVector<RANK> psiTemp( psi.extents, [=] (size_t e) {
+    auto res{quantumdata::noInit<RANK>(e)};
     std::ranges::copy(psi.dataView,res.begin());
     return res;
   } );
@@ -95,15 +94,31 @@ auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 template <size_t RANK>
 void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt, Jump<RANK> jump, const std::vector<size_t>& rowIterationOffsets)
 {
-  quantumdata::DensityOperator<RANK> rhoTemp(rho); // deep copy
+  auto dimensions=::cppqedutils::halveExtents(rho.extents);
 
-  auto sr=sliceRange(rhoTemp,rowIterationOffsets);
+  quantumdata::DensityOperator<RANK> rhoTemp(dimensions, ::cppqedutils::multiarray::copyInit<dcomp,RANK>(rho.dataView)); // deep copy
+
+  auto sr=sliceRange<hana::range_c<size_t,0,RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
 
   auto unaryIteration=[&] () { for (auto& psiTemp : sr) applyJump(jump,t,psiTemp); };
 
-  unaryIteration(); hermitianConjugateSelf(rhoTemp); unaryIteration();
+  unaryIteration();
 
-  drhodt+=rhoTemp;
+  // Hermitian conjugate:
+  {
+    size_t totalDimensions=::cppqedutils::multiarray::calculateExtent(dimensions);
+    for (size_t i=0; i<totalDimensions; ++i) for (size_t j=i; j<totalDimensions; ++j) {
+      dcomp
+        &u=rhoTemp.mutableView().dataView[i+totalDimensions*j],
+        &l=rhoTemp.mutableView().dataView[j+totalDimensions*i];
+      u=conj(u); l=conj(l);
+      std::swap(u, l);
+    }
+  }
+
+  unaryIteration();
+
+  for (auto&& [t,o] : boost::combine(drhodt.dataView,rhoTemp.dataView) ) t+=o;
 }
 
 

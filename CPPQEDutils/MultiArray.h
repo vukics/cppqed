@@ -64,6 +64,8 @@ auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
  * TODO: alternative design: MultiArrayBase with StorageType as template parameter
  * then, when StorageType is a span, it’s a view, and when it’s a vector, it’s an owning MultiArray.
  * In this case, MultiArray need not be derived from MultiArrayView, of course :)
+ * In this case, StorageType could even be a std range view (e.g. a transformed view),
+ * in which case MultiArrayView could represent the result of lazy operations
  */
 template <typename T, size_t RANK>
 class MultiArrayView
@@ -95,25 +97,29 @@ public:
                                           [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
   }
   
+  void checkBounds(std::convertible_to<size_t> auto ... i) const
+  {
+    auto e=extents.begin();
+#ifndef   NDEBUG
+    (... , [&] { if (auto eComp=e++; i >= *eComp) throw std::range_error("Index position: "+std::to_string(eComp-extents.begin())+", index value: "+std::to_string(i)+", extent: "+std::to_string(*eComp)); } () );
+#endif // NDEBUG
+  }
   
   T& operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==RANK)
   {
+    checkBounds(i...);
     size_t idx=0;
-    auto e=extents.begin(), s=strides.begin();
+    auto s=strides.begin();
 
-    return dataView[ offset + ( ... , [&] {
-#ifndef   NDEBUG
-      if (auto eComp=e++; i >= *eComp) throw std::range_error("Index position: "+std::to_string(eComp-extents.begin())+", index value: "+std::to_string(i)+", extent: "+std::to_string(*eComp));
-#endif // NDEBUG
-      return idx+=(*s++)*i;} () ) ];
+    return dataView[ offset + ( ... , [&] { return idx+=(*s++)*i;} () ) ];
 
   }
   
   /// A simple specialization for unary views
-  T& operator() (std::convertible_to<size_t> auto i) const requires (RANK==1) {return dataView[offset+strides[0]*i];}
+  T& operator() (std::convertible_to<size_t> auto i) const requires (RANK==1) {checkBounds(i); return dataView[offset+strides[0]*i];}
 
   /// A simple specialization for binary views
-  T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {return dataView[offset+strides[0]*i+strides[1]*j];}
+  T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {checkBounds(i,j); return dataView[offset+strides[0]*i+strides[1]*j];}
 
   Extents<RANK> extents, strides;
 
@@ -140,15 +146,20 @@ template <typename T, size_t RANK> requires ( !std::is_const_v<T> )
 struct ConstReferenceMF<MultiArrayView<T,RANK>> : std::type_identity<MultiArrayConstView<T,RANK>> {};
 
 
+template <typename T1, typename T2, size_t RANK>
+void checkExtents(MultiArrayConstView<T1,RANK> m1, MultiArrayConstView<T2,RANK> m2, std::string message)
+{
+#ifndef   NDEBUG
+  if (m1.extents!=m2.extents) throw std::runtime_error("Extent mismatch in "+message+": "+json(m1.extents).dump()+" "+json(m2.extents).dump());
+#endif // NDEBUG
+}
 
 /// Element-by-element comparison
 /** \note The operator-style syntax is not used, since this can be a rather expensive operation! */
 template <typename T1, typename T2, size_t RANK>
 bool isEqual(MultiArrayConstView<T1,RANK> m1, MultiArrayConstView<T2,RANK> m2)
 {
-#ifndef   NDEBUG
-  if (m1.extents!=m2.extents) throw std::runtime_error("Extent mismatch in MultiArrayView comparison: "+json(m1.extents).dump()+" "+json(m2.extents).dump());
-#endif // NDEBUG
+  checkExtents(m1,m2,"MultiArrayView comparison");
   bool res=true;
   for (Extents<RANK> idx{}; idx!=m1.extents; incrementMultiIndex(idx,m1.extents))
     res &= ( m1(idx)==m2(idx) );
@@ -173,10 +184,10 @@ auto calculateExtent(Extents<RANK> extents)
 }
 
 template <typename T, size_t RANK>
-const auto noInit(Extents<RANK> e) {return [=] () -> std::vector<T> {return std::vector<T>(multiarray::calculateExtent(e));};}
+const auto noInit = [] (size_t e) -> std::vector<T> {return std::vector<T>(e);};
 
 template <typename T, size_t RANK>
-const auto zeroInit(Extents<RANK> e) {return [=] () -> std::vector<T> {return std::vector<T>(multiarray::calculateExtent(e),T(0.));};}
+const auto zeroInit = [] (size_t e) -> std::vector<T> {return std::vector<T>(e,T(0.));};
 
 } // multiarray
 
@@ -199,13 +210,13 @@ public:
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
 
   /// initializer is a callable, taking the total size as argument.
-  MultiArray(Extents<RANK> extents, auto&& initializer) requires requires { { initializer() } -> std::convertible_to<StorageType>;}
-    : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer()}
+  MultiArray(Extents<RANK> extents, auto&& initializer) requires requires (size_t e) { { initializer(e) } -> std::convertible_to<StorageType>;}
+    : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
   {
     this->dataView=std::span<T>(data_);
   }
 
-  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,multiarray::noInit<T>(extents)} {}
+  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,multiarray::noInit<T,RANK>} {}
 
   /// Element-by-element assignment
   /** \note The operator-style syntax is not used, since this can be a rather expensive operation! */
@@ -215,9 +226,9 @@ public:
 #ifndef   NDEBUG
     if (this->dataView.data()==macv.dataView.data())
       throw std::runtime_error("Self assignment attempted in MultiArray");
-    if (this->extents!=macv.extents)
-      throw std::runtime_error("Extent mismatch in MultiArrayView assignment: "+toStringJSON(this->extents)+" "+toStringJSON(macv.extents));
 #endif // NDEBUG
+    checkExtents(*this,macv,"MultiArrayView assignment");
+
     for (Extents<RANK> idx{}; idx!=this->extents; incrementMultiIndex(idx,this->extents)) (*this)(idx)=macv(idx);
   }
 
@@ -231,7 +242,7 @@ public:
   /// JSONize
   friend void to_json( json& jv, const MultiArray& ma )
   {
-    jv = {
+    jv = json{
       { "extents" , ma.extents },
       //    { "strides" , ma.strides },
       { "data", ma.data_ }
@@ -264,12 +275,18 @@ private:
   
 };
 
-
 template <typename T, size_t RANK>
 constexpr auto passByValue_v<MultiArray<T,RANK>> = false;
 
 
 namespace multiarray {
+
+
+template <typename T, size_t RANK>
+const auto copyInit(const std::ranges::sized_range auto& input) {return [&] (size_t e) {
+  if (size(input) != e) throw std::runtime_error("Extent mismatch in MultiArray copyInit: "+std::to_string(size(input))+" "+std::to_string(e));
+  return typename MultiArray<T,RANK>::StorageType(begin(input),end(input));
+};}
 
   
 /// Checking the consistency of template arguments for use in slicing

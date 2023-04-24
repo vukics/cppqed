@@ -27,17 +27,18 @@ auto vectorize(const MultiArray<dcomp,RANK>& ma)
 
 
 template <size_t TWO_TIMES_RANK> requires ( !(TWO_TIMES_RANK%2) )
-size_t halveExtents(Extents<TWO_TIMES_RANK> extents)
+Extents<TWO_TIMES_RANK/2> halveExtents(Extents<TWO_TIMES_RANK> extents)
 {
   static constexpr size_t RANK=TWO_TIMES_RANK/2;
-  return std_ext::ranges::fold(std::views::iota(0ul,RANK),size_t(1), [&] (size_t init, size_t i) {
-    size_t a=extents[i];
+  Extents<RANK> res;
+  std::ranges::for_each(std::views::iota(0ul,RANK), [&] (size_t i) {
+    res[i]=extents[i];
 #ifndef   NDEBUG
-    if (size_t b=extents[i+RANK]; a!=b)
-      throw std::invalid_argument("MultiArray does not have the shape of a matrix: index no. "+std::to_string(i)+": "+std::to_string(a)+" vs. "+std::to_string(b));
+    if (size_t b=extents[i+RANK]; res[i]!=b)
+      throw std::invalid_argument("MultiArray does not have the shape of a matrix: index no. "+std::to_string(i)+": "+std::to_string(res[i])+" vs. "+std::to_string(b));
 #endif // NDEBUG
-    return init*a;
   });
+  return res;
 }
 
 template <size_t TWO_TIMES_RANK>
@@ -69,4 +70,10 @@ template <size_t RANK>
 MultiArray<dcomp,RANK>& conj(MultiArray<dcomp,RANK>& ma) { std::ranges::transform( ma.mutableView().dataView, std::conj ); return ma;}
 
 
+template <size_t RANK>
+double frobeniusNorm(const MultiArray<dcomp,RANK>& ma) { return sqrt( std_ext::ranges::fold( ma.dataView | std::views::transform(sqrAbs) , 0., std::plus{} ) ); }
+
+
 } // cppqedutils
+
+

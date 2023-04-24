@@ -63,15 +63,6 @@ static_assert(temporal_data_point<decltype(hana::make_tuple(1.,dcomp{2.,-1.}),ha
 static_assert(!temporal_data_point<int>);
 
 
-} // cppqedutils
-
-
-#include <json.hpp>
-
-namespace cppqedutils {
-
-using LogTree = nlohmann::json ;
-using json = nlohmann::json ;
 
 template <typename T> concept intro_logger = requires ( const T& t ) {
   { logIntro(t) } -> std::convertible_to<LogTree>; };
