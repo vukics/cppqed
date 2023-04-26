@@ -23,7 +23,6 @@
 #pragma once
 
 #include "ExpectationValues.h"
-#include "Hamiltonian.h"
 #include "Liouvillian.h"
 
 
@@ -48,7 +47,7 @@ double highestFrequency(const SFS& sfs)
 
 
 template <typename T, size_t RANK>
-concept quantum_system_dynamics = requires (T&& qsd, std::ostream& os)
+concept quantum_system_dynamics = requires (T&& qsd)
 {
   { getFreqs(qsd) } -> system_frequency_store;
   // or even
@@ -57,21 +56,35 @@ concept quantum_system_dynamics = requires (T&& qsd, std::ostream& os)
   { getHa(qsd) } -> hamiltonian<RANK>;
   { getLi(qsd) } -> liouvillian<RANK>;
   { getEV(qsd) } -> expectation_values<RANK>;
-  { streamParameters(qsd,os) } -> std::convertible_to<std::ostream&>;
+  // { streamParameters(qsd,os) } -> std::convertible_to<std::ostream&>;
 };
 
 
 /// a simple implementation of the concept:
-template <system_frequency_store SFS, size_t RANK, hamiltonian<RANK> HA, liouvillian<RANK> LI, expectation_values<RANK> EV>
+template <size_t RANK, system_frequency_store SFS, liouvillian<RANK> LI, hamiltonian<RANK> HA, expectation_values<RANK> EV>
 struct QuantumSystemDynamics
 {
-  SFS freqs; HA ha; LI li; EV ev;
+  SFS freqs; LI li; HA ha; EV ev;
 
   friend auto getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
-  friend auto getHa   (const QuantumSystemDynamics& qsd) {return qsd.ha;}
   friend auto getLi   (const QuantumSystemDynamics& qsd) {return qsd.li;}
+  friend auto getHa   (const QuantumSystemDynamics& qsd) {return qsd.ha;}
   friend auto getEV   (const QuantumSystemDynamics& qsd) {return qsd.ev;}
 };
+
+
+template <system_frequency_store SFS, typename LI, typename HA, typename EV>
+auto make(SFS&& freqs, LI&& li, HA&& ha, EV&& ev)
+{
+  static constexpr size_t RANK = std::ranges::range_value_t<LI>::N_RANK;
+
+  return QuantumSystemDynamics<RANK,SFS,LI,HA,EV>{
+    .freqs{std::forward<SFS>(freqs)},
+    .li{std::forward<LI>(li)},
+    .ha{std::forward<HA>(ha)},
+    .ev{std::forward<EV>(ev)}};
+}
+
 
 } // structure
 

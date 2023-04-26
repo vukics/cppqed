@@ -71,11 +71,17 @@ void applySuperoperator(Superoperator<RANK> sup, double t, DensityOperatorConstV
 template <size_t RANK>
 struct Lindblad
 {
+  static constexpr size_t N_RANK=RANK;
+
   std::string label;
   Jump<RANK> jump;
-  std::optional<Rate<RANK>> rate;
-  std::optional<Superoperator<RANK>> superoperator;
+  Rate<RANK> rate;
+  Superoperator<RANK> superoperator;
 };
+
+
+template <typename L, size_t RANK>
+concept liouvillian = std::ranges::forward_range<L> && std::is_same_v<std::ranges::range_value_t<L>,Lindblad<RANK>>;
 
 
 template <size_t RANK>
@@ -153,11 +159,6 @@ concept lindblad_with_superoperator = lindblad_with_jump<L,RANK> && superoperato
 template <typename L, size_t RANK>
 concept lindblad = lindblad_with_superoperator<L,RANK> || lindblad_with_rate<L,RANK> || lindblad_with_jump<L,RANK>;
 
-
-template <typename L, size_t RANK>
-concept liouvillian = hana_sequence<L> && !!hana::all_of(
-  decltype(hana::transform(std::declval<L>(), hana::typeid_)){},
-  []<class T>(T) { return lindblad<typename T::type,RANK>; } );
 
 
 

@@ -17,6 +17,11 @@ using DensityOperatorConstView=cppqedutils::MultiArrayConstView<dcomp,2*RANK>;
 
 
 template <size_t RANK>
+dcomp _(DensityOperatorConstView<RANK> rho, std::convertible_to<size_t> auto ... i) requires (sizeof...(i)==2*RANK) {return rho(i...);}
+
+
+
+template <size_t RANK>
 auto getDimensions(const DensityOperator<RANK>& rho) {return ::cppqedutils::halveExtents(rho.extents);}
 
 
