@@ -20,38 +20,35 @@ template <typename Derived>
 struct VectorSpaceOperatorsGenerator
 {
 
-  friend Derived operator+(const Derived& a, const Derived& b)
+  friend auto operator+(const Derived& a, const Derived& b)
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator plus");
-    Derived res{getDimensions(a), [&] (size_t e) {
+    return Derived{getDimensions(a), [&] (size_t e) {
       auto r{noInit<multiArrayRank_v<Derived>>(e)}; auto ri=r.begin();
       for (auto ai=a.dataView.begin(), bi=b.dataView.begin(); ai!=a.dataView.end(); *ri++=(*ai++)+(*bi++) ) ;
       return r;
     }};
-    return res;
   }
 
 
-  friend Derived operator-(const Derived& a, const Derived& b)
+  friend auto operator-(const Derived& a, const Derived& b)
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator minus");
-    Derived res{getDimensions(a), [&] (size_t e) {
+    return Derived{getDimensions(a), [&] (size_t e) {
       auto r{noInit<multiArrayRank_v<Derived>>(e)}; auto ri=r.begin();
       for (auto ai=a.dataView.begin(), bi=b.dataView.begin(); ai!=a.dataView.end(); *ri++=(*ai++)-(*bi++) ) ;
       return r;
     }};
-    return res;
   }
 
 
-  friend Derived operator*(dcomp v, const Derived& a)
+  friend auto operator*(dcomp v, const Derived& a)
   {
-    Derived res{getDimensions(a), [&] (size_t e) {
+    return Derived{getDimensions(a), [&] (size_t e) {
       auto r{noInit<multiArrayRank_v<Derived>>(e)}; auto ri=r.begin();
       for (auto ai=a.dataView.begin(); ai!=a.dataView.end(); (*ri++)=v*(*ai++) ) ;
       return r;
     }};
-    return res;
   }
 
 };

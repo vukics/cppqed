@@ -44,14 +44,14 @@ Extents<TWO_TIMES_RANK/2> halveExtents(Extents<TWO_TIMES_RANK> extents)
 template <size_t TWO_TIMES_RANK>
 auto matricize(MultiArray<dcomp,TWO_TIMES_RANK>& ma)
 {
-  const size_t matrixDim = halveExtents(ma.extents);
+  const size_t matrixDim = multiarray::calculateExtent(halveExtents(ma.extents));
   return Eigen::Map<CMatrix>{ma.mutableView().dataView.data(),matrixDim,matrixDim};
 }
 
 template <size_t TWO_TIMES_RANK>
 auto matricize(const MultiArray<dcomp,TWO_TIMES_RANK>& ma)
 {
-  const size_t matrixDim = halveExtents(ma.extents);
+  const size_t matrixDim = multiarray::calculateExtent(halveExtents(ma.extents));
   return Eigen::Map<const CMatrix>{ma.dataView.data(),matrixDim,matrixDim};
 }
 
@@ -74,6 +74,18 @@ template <size_t RANK>
 double frobeniusNorm(const MultiArray<dcomp,RANK>& ma) { return sqrt( std_ext::ranges::fold( ma.dataView | std::views::transform(sqrAbs) , 0., std::plus{} ) ); }
 
 
+template <size_t TWO_TIMES_RANK>
+void hermitianConjugateSelf(MultiArray<dcomp,TWO_TIMES_RANK>& ma)
+{
+  const size_t matrixDim = multiarray::calculateExtent(halveExtents(ma.extents));
+  for (size_t i=0; i<matrixDim; ++i) for (size_t j=i; j<matrixDim; ++j) {
+    dcomp
+      &u=ma.mutableView().dataView[i+matrixDim*j],
+      &l=ma.mutableView().dataView[j+matrixDim*i];
+    u=conj(u); l=conj(l);
+    std::swap(u, l);
+  }
+}
+
+
 } // cppqedutils
-
-

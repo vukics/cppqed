@@ -17,8 +17,8 @@ constexpr auto ra20741 = retainedAxes<2,0,7,4,1>;
 
 using CArray9=MultiArray<dcomp,9>;
 
-CArray9 array{{5,2,3,2,4,3,2,4,6}, [](auto extents) {
-  CArray9::StorageType res(multiarray::calculateExtent(extents));
+CArray9 array{{5,2,3,2,4,3,2,4,6}, [] (size_t e) {
+  CArray9::StorageType res(e);
   std::uniform_real_distribution d{-1.0,1.0};
   std::mt19937_64 randomEngine{1001};
   std::ranges::generate(res, [&]() {

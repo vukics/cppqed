@@ -81,11 +81,7 @@ struct Lindblad
 template <size_t RANK>
 auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 {
-  quantumdata::StateVector<RANK> psiTemp( psi.extents, [=] (size_t e) {
-    auto res{quantumdata::noInit<RANK>(e)};
-    std::ranges::copy(psi.dataView,res.begin());
-    return res;
-  } );
+  quantumdata::StateVector<RANK> psiTemp{ psi.extents, ::cppqedutils::multiarray::copyInit<dcomp,RANK>(psi.dataView) };
   applyJump(jump,t,psiTemp.mutableView());
   return sqr(norm(psiTemp)); // we cannot return psiTemp because StateVector is not copyable
 }
@@ -94,29 +90,13 @@ auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 template <size_t RANK>
 void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt, Jump<RANK> jump, const std::vector<size_t>& rowIterationOffsets)
 {
-  auto dimensions=::cppqedutils::halveExtents(rho.extents);
-
-  quantumdata::DensityOperator<RANK> rhoTemp(dimensions, ::cppqedutils::multiarray::copyInit<dcomp,RANK>(rho.dataView)); // deep copy
+  quantumdata::DensityOperator<RANK> rhoTemp(::cppqedutils::halveExtents(rho.extents), ::cppqedutils::multiarray::copyInit<dcomp,RANK>(rho.dataView)); // deep copy
 
   auto sr=sliceRange<hana::range_c<size_t,0,RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
 
   auto unaryIteration=[&] () { for (auto& psiTemp : sr) applyJump(jump,t,psiTemp); };
 
-  unaryIteration();
-
-  // Hermitian conjugate:
-  {
-    size_t totalDimensions=::cppqedutils::multiarray::calculateExtent(dimensions);
-    for (size_t i=0; i<totalDimensions; ++i) for (size_t j=i; j<totalDimensions; ++j) {
-      dcomp
-        &u=rhoTemp.mutableView().dataView[i+totalDimensions*j],
-        &l=rhoTemp.mutableView().dataView[j+totalDimensions*i];
-      u=conj(u); l=conj(l);
-      std::swap(u, l);
-    }
-  }
-
-  unaryIteration();
+  unaryIteration(); hermitianConjugateSelf(rhoTemp); unaryIteration();
 
   for (auto&& [t,o] : boost::combine(drhodt.dataView,rhoTemp.dataView) ) t+=o;
 }
