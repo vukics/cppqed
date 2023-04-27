@@ -18,11 +18,11 @@ int main(int argc, char* argv[])
   static_assert( system_frequency_store< decltype(std::array{structure::SystemFrequencyDescriptor{"z",z,1.},structure::SystemFrequencyDescriptor{"η",eta,1.}}) > );
   static_assert( expectationvalues::time_independent_functional<decltype(expectationValues),1> ) ;
 
-  auto qbit{make(
+  QuantumSystemDynamics qbit {
     std::array{structure::SystemFrequencyDescriptor{"z",z,1.},structure::SystemFrequencyDescriptor{"η",eta,1.}},
     std::array{loss(1.),gain(.1)},
     diagonalH(z),
-    expectationValues )}; //= make({1,1},{1,1},{1,1},1,1,1);
+    expectationValues }; //= make({1,1},{1,1},{1,1},1,1,1);
   
   // ****** Parameters of the Problem
   

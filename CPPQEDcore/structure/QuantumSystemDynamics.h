@@ -74,16 +74,16 @@ struct QuantumSystemDynamics
 
 
 template <system_frequency_store SFS, typename LI, typename HA, typename EV>
-auto make(SFS&& freqs, LI&& li, HA&& ha, EV&& ev)
-{
-  static constexpr size_t RANK = std::ranges::range_value_t<LI>::N_RANK;
+QuantumSystemDynamics(SFS&& freqs, LI&& li, HA&& ha, EV&& ev) -> QuantumSystemDynamics<std::ranges::range_value_t<LI>::N_RANK,SFS,LI,HA,EV>;
+/*{
+  static constexpr size_t RANK = ;
 
   return QuantumSystemDynamics<RANK,SFS,LI,HA,EV>{
     .freqs{std::forward<SFS>(freqs)},
     .li{std::forward<LI>(li)},
     .ha{std::forward<HA>(ha)},
     .ev{std::forward<EV>(ev)}};
-}
+}*/
 
 
 } // structure

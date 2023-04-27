@@ -73,7 +73,18 @@ template <typename T> concept outro_logger = requires ( const T& t ) {
 template <typename T> concept logger = intro_logger<T> && outro_logger<T>;
 
 template <typename H, typename OUT = LogTree>
-concept labelled = requires (H&& h) { { label(h) } -> std::convertible_to<OUT>; } || requires (H&& h) { { h.label } -> std::convertible_to<OUT>; } ;
+concept has_label_member = requires (H&& h) { { h.label } -> std::convertible_to<OUT>; } ;
+
+template <typename H, typename OUT = LogTree>
+concept labelled = has_label_member<H,OUT> || requires (H&& h) { { label(h) } -> std::convertible_to<OUT>; } ;
+
+
+template <typename OUT, labelled H>
+OUT getLabel(H&& h)
+{
+  if constexpr (has_label_member<H,OUT>) return h.label;
+  else return label(h);
+}
 
 
 } // cppqedutils

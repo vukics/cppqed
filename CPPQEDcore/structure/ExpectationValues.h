@@ -22,7 +22,10 @@ template <typename L, size_t RANK>
 concept time_independent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
   return s && ( requires (const L& l, typename E::type rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ) ;
 } );
-
+// Alternatively:
+/* requires (const L& l) { requires (
+requires (StateVectorConstView<RANK> rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } &&
+requires (DensityOperatorConstView<RANK> rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ) ; } ;*/
 
 template <typename L, size_t RANK>
 concept functional = time_dependent_functional<L,RANK> || time_independent_functional<L,RANK> ;

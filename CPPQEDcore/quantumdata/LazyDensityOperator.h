@@ -25,6 +25,13 @@ namespace quantumdata {
 
 
 template <size_t RANK>
+dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, std::convertible_to<size_t> auto ... i) requires (sizeof...(i)==2*RANK);
+
+template <size_t RANK>
+dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> rho, std::convertible_to<size_t> auto ... i) requires (RANK%2==0 && sizeof...(i)==RANK) {return rho(i...);}
+
+
+template <size_t RANK>
 constexpr auto lazyDensityOperatorOptions = hana::tuple_t<StateVectorConstView<RANK>,DensityOperatorConstView<RANK>>;
 
 

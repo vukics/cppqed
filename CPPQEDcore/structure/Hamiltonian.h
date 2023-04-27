@@ -144,7 +144,11 @@ struct HamiltonianCollection
     hana::for_each(collection, [&] (const auto& h) {applyPropagator(h,t,psi,t0);});
   }
 
-  friend ::cppqedutils::LogTree label(HamiltonianCollection hc); // {return ht.label;}
+  friend ::cppqedutils::LogTree label(HamiltonianCollection hc) {
+    cppqedutils::json res;
+    hana::for_each(hc.collection,[&] (const auto& h) {res.push_back(::cppqedutils::getLabel<::cppqedutils::LogTree>(h));});
+    return res;
+  }
 
 };
 

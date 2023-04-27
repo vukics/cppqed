@@ -65,9 +65,6 @@ template <size_t RANK>
 using StateVectorConstView=cppqedutils::MultiArrayConstView<dcomp,RANK>;
 
 
-template <size_t RANK>
-dcomp _(StateVectorConstView<RANK> rho, std::convertible_to<size_t> auto ... i) requires (sizeof...(i)==2*RANK);
-
 
 /// State vector of arbitrary arity
 /**
