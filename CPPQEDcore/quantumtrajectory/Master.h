@@ -1,7 +1,12 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-#include "QuantumTrajectory.h"
+// #include "QuantumTrajectory.h"
+
+#include "QuantumSystemDynamics.h"
+
+#include "Trajectory.h"
+
 
 
 namespace quantumtrajectory {
@@ -17,7 +22,6 @@ typedef cppqedutils::ode::Pars<> Pars;
 } // master
 
 
-
 /// Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
 /**
  * \see \ref masterequation.
@@ -26,83 +30,94 @@ typedef cppqedutils::ode::Pars<> Pars;
  *
  */
 template <size_t RANK,
-          cppqedutils::ode::engine ODE_Engine,
-          auto axesOfSubsystem = cppqedutils::retainedAxes<> // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
-          >
-class Master
+          ::structure::quantum_system_dynamics<RANK> QSD,
+          ::cppqedutils::ode::engine<::quantumdata::DensityOperator<RANK>> OE>
+struct Master
 {
-public:
-  Master(Master&&) = default; Master& operator=(Master&&) = default;
-
-  using StreamedArray=::structure::EV_Array;
-
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  template <typename StateVector_OR_DensityOperator>
-  Master(::structure::QuantumSystemPtr<RANK> sys, ///< object representing the quantum system
-         StateVector_OR_DensityOperator&& state, ///< the state vector or density operator to be evolved
-         ODE_Engine ode,
-         EntanglementMeasuresSwitch ems ///< governs which entanglement measures should be calculated
-         ) 
-  : sys_{sys}, rho_{std::forward<StateVector_OR_DensityOperator>(state)}, ode_(ode), dos_(::structure::castAv(sys),ems)
+  friend double getDtDid(const Master& m) {return getDtDid(m.oe);}
+
+  friend double getTime(const Master& m) {return m.time;}
+
+  /// TODO: put here the system-specific things
+  friend ::cppqedutils::LogTree logIntro(const Master& m)
   {
-    if (!::structure::applicableInMaster(sys)) throw master::SystemNotApplicable();
-    if (rho_!=*sys) throw DimensionalityMismatchException("during QuantumTrajectory construction");
+    return {{"Master",{{"odeEngine",logIntro(m.oe)},{"System","TAKE FROM SYSTEM"}}}};
+    // streamCharacteristics(m.qsd,streamParameters(m.qsd,streamIntro(m.oe,os)<<"Solving Master equation."<<endl<<endl ) )<<endl;
   }
 
-  auto getTime() const {return t_;}
+  friend ::cppqedutils::LogTree logOutro(const Master& m) {return logOutro(m.oe);}
 
-  void step(double deltaT, std::ostream& logStream);
+  friend ::cppqedutils::LogTree step(Master& m, double deltaT) {
+    auto res = step ( m.oe, deltaT, [&] (const ::quantumdata::DensityOperator<RANK>& rho, ::quantumdata::DensityOperator<RANK>& drhodt, double t)
+    {
+      for (dcomp& v : drhodt.dataView) v=0;
 
-  auto getDtDid() const {return ode_.getDtDid();}
-  
-  std::ostream& streamParameters(std::ostream& os) const;
-  
-  auto stream(std::ostream& os, int precision) const {return dos_(t_,rho_,os,precision);}
-  
-  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {DensityOperatorLow temp; iar & temp; rho_.getArray().reference(temp); return iar;}
+      for (auto&& [psi,dpsidt] : boost::combine(::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets),
+                                                ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt.mutableView(),m.rowIterationOffsets)))
+        getHa(m.qsd)(t,psi,dpsidt,m.time0);
+
+      twoTimesRealPartOfSelf(drhodt);
+
+      for (auto&& lindblad : getLi(m.qsd))
+        applySuperoperator(lindblad.superoperator, t, rho, drhodt.mutableView());
+
+    },m.time,m.rho.mutableView());
+
+    // exact propagation
+    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets)) getHa(m.qsd)(m.time,psi,m.time0);
+    hermitianConjugateSelf(m.rho);
+    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets)) getHa(m.qsd)(m.time,psi,m.time0);
+    conj(m.rho);
+    m.time0=m.time;
+
+    // The following "smoothening" of rho_ has proven necessary for the algorithm to remain stable:
+    // We make the approximately Hermitian and normalized rho_ exactly so.
+
+    twoTimesRealPartOfSelf(m.rho);
+
+    renorm(m.rho);
+
+    return res;
+  }
+
+  friend ::cppqedutils::LogTree dataStreamKey(const Master& m) {return {{"Master","TAKE FROM SYSTEM"}};}
+
+  friend auto temporalDataPoint(const Master& m) { return calculateAndPostprocess( getEv(m.qsd), m.time, m.rho );  }
+
+  friend ::cppqedutils::iarchive& readFromArrayOnlyArchive(Master& m, ::cppqedutils::iarchive& iar) {return iar & m.rho;} // MultiArray can be (de)serialized
 
   /** structure of Master archives:
   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry )
+  * state should precede time in order to be compatible with array-only archives
   */
-  // state should precede time in order to be compatible with array-only archives
-  auto& stateIO(cppqedutils::iarchive& iar)
+  template <typename Archive>
+  friend auto& stateIO(Master& m, Archive& ar)
   {
-    DensityOperatorLow temp;
-    ode_.stateIO(iar & temp & t_);
-    rho_.getArray().reference(temp);
-    t0_=t_; // A very important step!
-    return iar;
+    stateIO(m.ode, ar & m.rho & m.time);
+    // The following is a no-op in the case of state output, since time0 is equated with time @ the end of each step, however, it is an essential step for state input!
+    m.time0=m.time;
+    return ar;
   }
-  
-  auto& stateIO(cppqedutils::oarchive& oar) {return ode_.stateIO(oar & rho_.getArray() & t_);}
 
-  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return dos_.streamKey(os,i);}
-  
-  std::ostream& logOnEnd(std::ostream& os) const {return ode_.logOnEnd(os);}
+
+  double time=0., time0=0.;
+  QSD qsd;
+  DensityOperator rho;
+  OE oe;
 
 private:
-  double t_=0., t0_=0.;
-  
-  ::structure::QuantumSystemPtr<RANK> sys_;
-  
-  DensityOperator rho_;
-  
-  ODE_Engine ode_;
+  const std::vector<size_t> rowIterationOffsets;
 
-  const DensityOperatorStreamer<RANK,V> dos_;
+  static constexpr auto rowIterationRetainedAxes=hana::range_c<size_t,0,RANK>;
+
+  // const DensityOperatorStreamer<RANK,V> dos_;
 
 };
 
 
-/// Deduction guides (note: `V` cannot be deduced this way, and partial deduction is not possible as of C++17):
-template<typename System, int RANK, typename ODE_Engine>
-Master(System, quantumdata::DensityOperator<RANK>, ODE_Engine, bool) -> Master<RANK,ODE_Engine,tmptools::V_Empty>;
-
-template<typename System, int RANK, typename ODE_Engine>
-Master(System, quantumdata::StateVector<RANK>, ODE_Engine, bool) -> Master<RANK,ODE_Engine,tmptools::V_Empty>;
-
-
+/*
 namespace master {
 
 template<typename ODE_Engine, typename V, typename StateVector_OR_DensityOperator>
@@ -115,10 +130,10 @@ auto make(::structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOpera
   
 } // master
 
-
+*/
 } // quantumtrajectory
 
-
+/*
 template <int RANK, typename ODE_Engine, typename V>
 struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Master<RANK,ODE_Engine,V>>
 {
@@ -126,64 +141,6 @@ struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Mas
 };
 
 
-
-template<int RANK, typename ODE_Engine, typename V>
-void quantumtrajectory::Master<RANK,ODE_Engine,V>::step(double deltaT, std::ostream& logStream)
-{
-  // auto derivs = ;
-  
-  ode_.step(deltaT,logStream,[this](const DensityOperatorLow& rhoLow, DensityOperatorLow& drhodtLow, double t)
-    {
-      using namespace blitzplusplus::vfmsi;
-
-      drhodtLow=0;
-      
-      for (auto&& [rhoS,drhodtS] : boost::combine(fullRange<Left>(rhoLow),fullRange<Left>(drhodtLow)) )
-        ::structure::addContribution(sys_,t,rhoS,drhodtS,t0_);
-      
-      {
-        linalg::CMatrix drhodtMatrixView(blitzplusplus::binaryArray(drhodtLow));
-        linalg::calculateTwoTimesRealPartOfSelf(drhodtMatrixView);
-      }
-      
-      // Now act with the reset operator --- implement this in terms of the individual jumps by iteration and addition
-      
-      for (size_t i=0; i < ::structure::nAvr<::structure::LA_Li>(sys_); i++) {
-        try {
-          ::structure::actWithSuperoperator(sys_,t,rhoLow,drhodtLow,i);
-        } catch (const ::structure::SuperoperatorNotImplementedException&) {
-          DensityOperatorLow rhotemp(rhoLow.copy());
-#define UNARY_ITER for (auto& rhoS : fullRange<Left>(rhotemp)) ::structure::actWithJ(sys_,t,rhoS,i);
-          UNARY_ITER; blitzplusplus::hermitianConjugateSelf(rhotemp); UNARY_ITER;
-#undef UNARY_ITER
-          drhodtLow+=rhotemp;
-        }
-      }            
-    },t_,rho_.getArray());
-
-  if (const auto ex=::structure::castEx(sys_)) {
-    using namespace blitzplusplus; using namespace vfmsi;
-    DensityOperatorLow rhoLow(rho_.getArray());
-    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,t0_);
-    hermitianConjugateSelf(rhoLow);
-    for (auto& rhoS : fullRange<Left>(rhoLow)) ex->actWithU(this->getTime(),rhoS,t0_);
-    rhoLow=conj(rhoLow);
-  }
-
-  t0_=t_;
-
-  // The following "smoothing" of rho_ has proven necessary for the algorithm to remain stable:
-  // We make the approximately Hermitian and normalized rho_ exactly so.
-
-  {
-    linalg::CMatrix m(rho_.matrixView());
-    linalg::calculateTwoTimesRealPartOfSelf(m); 
-    // here we get two times of what is needed, but it is anyway renormalized in the next step
-  }
-
-  rho_.renorm();
-
-}
 
 
 template<int RANK, typename ODE_Engine, typename V>
@@ -218,6 +175,41 @@ std::ostream& quantumtrajectory::Master<RANK,ODE_Engine,V>::streamParameters(std
   return os;
 }
 
+*/
 
+/*
 
-#endif // CPPQEDCORE_QUANTUMTRAJECTORY_MASTER_H_INCLUDED
+namespace boost { namespace numeric { namespace odeint {
+
+template <size_t RANK>
+struct is_resizeable<::quantumdata::DensityOperator<RANK>> : boost::true_type {};
+
+template <size_t RANK>
+struct same_size_impl<::quantumdata::DensityOperator<RANK>, ::quantumdata::DensityOperator<RANK>>
+{ // define how to check size
+  static bool same_size(const ::quantumdata::DensityOperator<RANK> &v1, const ::quantumdata::DensityOperator<RANK> &v2) {return v1.extents == v2.extents;}
+};
+
+/// TODO: a reserve could be defined for the vector to be resized
+template <size_t RANK>
+struct resize_impl<::quantumdata::DensityOperator<RANK>, ::quantumdata::DensityOperator<RANK>>
+{ // define how to resize
+  static void resize(::quantumdata::DensityOperator<RANK> &v1, const ::quantumdata::DensityOperator<RANK> &v2) {v1.resize( v2.extents );}
+};
+
+template <size_t RANK>
+struct vector_space_norm_inf<::quantumdata::DensityOperator<RANK>>
+{
+  typedef double result_type;
+  double operator()(const ::quantumdata::DensityOperator<RANK>& v ) const
+  {
+    return max( abs(v) );
+  }
+};
+
+template <size_t RANK>
+struct norm_result_type<::quantumdata::DensityOperator<RANK>> : mpl::identity<double> {};
+
+} } } // boost::numeric::odeint
+
+*/
