@@ -68,13 +68,14 @@ auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<siz
     auto sr{cppqedutils::sliceRange<retainedAxes>(matrix,offsets)};
     return iterateSlices(sr);
   }
-  else if (std::same_as<LDO,DensityOperatorConstView<RANK>>) {
+  else if constexpr (std::same_as<LDO,DensityOperatorConstView<RANK>>) {
     static constexpr auto extendedAxes{hana::concat(retainedAxes,
                                                     hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
     auto diagonalOffsets{offsets | std::views::transform([&] (size_t v) {return v*(std::lround(std::sqrt(matrix.dataView.size()))+1);} ) };
     auto sr{cppqedutils::sliceRange<extendedAxes>(matrix,diagonalOffsets)};
     return iterateSlices(sr);
   }
+  else static_assert(::cppqedutils::always_false_v<LDO>, "unknown type input in partialTrace");
  
 }
 

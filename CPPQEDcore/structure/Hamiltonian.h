@@ -62,9 +62,10 @@ template <typename H, size_t RANK> concept functional = term<H,RANK> || propagat
 template <size_t RANK, hamiltonian_ns::functional<RANK> T>
 void applyHamiltonian(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
 {
-  if constexpr (hamiltonian_ns::time_independent_term  <T,RANK>) h(psi,dpsidt);
-  else if      (hamiltonian_ns::one_time_dependent_term<T,RANK>) h(t-t0,psi,dpsidt);
-  else if      (hamiltonian_ns::two_time_dependent_term<T,RANK>) h(t,psi,dpsidt,t0);
+  if constexpr      (hamiltonian_ns::time_independent_term  <T,RANK>) h(psi,dpsidt);
+  else if constexpr (hamiltonian_ns::one_time_dependent_term<T,RANK>) h(t-t0,psi,dpsidt);
+  else if constexpr (hamiltonian_ns::two_time_dependent_term<T,RANK>) h(t,psi,dpsidt,t0);
+  else static_assert(::cppqedutils::always_false_v<T>,"unexpected type in applyHamiltonian");
 }
 
 
@@ -72,8 +73,9 @@ void applyHamiltonian(const T& h, double t, StateVectorConstView<RANK> psi, Stat
 template <size_t RANK, hamiltonian_ns::functional<RANK> T>
 void applyPropagator(const T& h, double t, StateVectorView<RANK> psi, double t0)
 {
-  if constexpr (hamiltonian_ns::one_time_dependent_propagator<T,RANK>) h(t-t0,psi);
-  else if      (hamiltonian_ns::two_time_dependent_propagator<T,RANK>) h(t,psi,t0);
+  if constexpr      (hamiltonian_ns::one_time_dependent_propagator<T,RANK>) h(t-t0,psi);
+  else if constexpr (hamiltonian_ns::two_time_dependent_propagator<T,RANK>) h(t,psi,t0);
+  else static_assert(::cppqedutils::always_false_v<T>,"unexpected type in applyPropagator");
 }
 
 
@@ -151,6 +153,11 @@ struct HamiltonianCollection
   }
 
 };
+
+
+template <size_t RANK, typename... H>
+auto makeHamiltonianCollection(H&&... h) { return HamiltonianCollection<RANK,H...>{.collection{std::forward<H>(h)...}}; }
+
 
 
 static_assert(hamiltonian<UnaryDiagonalPropagator<false>,1>);

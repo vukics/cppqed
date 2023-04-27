@@ -35,7 +35,8 @@ template <size_t RANK, functional<RANK> EV>
 auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 {
   if constexpr (time_dependent_functional<EV,RANK>) return ev(t,matrix);
-  else if (time_independent_functional<EV,RANK>) return ev(matrix);
+  else if constexpr (time_independent_functional<EV,RANK>) return ev(matrix);
+  else static_assert(::cppqedutils::always_false_v<EV>,"unexpected type in expectationvalues::calculate");
 }
 
 
