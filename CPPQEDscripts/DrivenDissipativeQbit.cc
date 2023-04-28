@@ -3,6 +3,8 @@
 
 #include "Qbit.h"
 
+#include "Master.h"
+
 #include <iostream>
 
 using namespace qbit;
@@ -14,16 +16,25 @@ int main(int argc, char* argv[])
 {
   dcomp z{.1,1.}, eta{-.1,.2};
 
-  static_assert( hamiltonian<decltype(diagonalH(z)),1> ) ;
-  static_assert( system_frequency_store< decltype(std::array{structure::SystemFrequencyDescriptor{"z",z,1.},structure::SystemFrequencyDescriptor{"η",eta,1.}}) > );
-  static_assert( expectationvalues::time_independent_functional<decltype(expectationValues),1> ) ;
-
   QuantumSystemDynamics qbit {
     std::array{structure::SystemFrequencyDescriptor{"z",z,1.},structure::SystemFrequencyDescriptor{"η",eta,1.}},
     std::array{loss(1.),gain(.1)},
-    diagonalH(z),
+    makeHamiltonianCollection<1>(diagonalH(z),offDiagonalH(eta)),
     expectationValues }; //= make({1,1},{1,1},{1,1},1,1,1);
   
+  auto oe=::cppqedutils::ODE_EngineBoost<::quantumdata::DensityOperator<1>::StorageType>(1./(10.*highestFrequency(qbit.freqs)),1e-12,1e-30);
+
+  quantumtrajectory::Master<1,decltype(qbit),decltype(oe)> m{qbit,quantumdata::DensityOperator<1>{{2}},oe};
+
+  auto streamedArray=run<cppqedutils::trajectory::RunLengthType::T_MODE,cppqedutils::trajectory::StreamFreqType::DC_MODE>(
+    m,70.,1,0,"","",6,0,false,true,cppqedutils::trajectory::observerNoOp);
+
+  static_assert(cppqedutils::trajectory::data_streamer<decltype(cppqedutils::trajectory::dataStreamerDefault),decltype(m)>);
+
+  cppqedutils::trajectory::dataStreamerDefault(m,cerr);
+
+  static_assert(cppqedutils::trajectory::adaptive<decltype(m)>);
+
   // ****** Parameters of the Problem
   
   /*ParameterTable p;
@@ -45,3 +56,10 @@ int main(int argc, char* argv[])
 
 }
 
+
+
+/*
+  static_assert( hamiltonian<decltype(diagonalH(z)),1> ) ;
+  static_assert( system_frequency_store< decltype(std::array{structure::SystemFrequencyDescriptor{"z",z,1.},structure::SystemFrequencyDescriptor{"η",eta,1.}}) > );
+  static_assert( expectationvalues::time_independent_functional<decltype(expectationValues),1> ) ;
+*/

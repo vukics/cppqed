@@ -61,17 +61,13 @@ template <size_t RANK>
 void checkConsistencyWithLabels (const expectation_values<RANK> auto&);
 
 
-template <size_t RANK>
-auto calculateAndPostprocess(const expectation_values<RANK> auto& ev, double t, lazy_density_operator<RANK> auto rho) -> decltype(expectationvalues::calculate(getFunctional(ev),t,rho)) ;/*
+template <size_t RANK, expectation_values<RANK> EV>
+auto calculateAndPostprocess(const EV& ev, double t, lazy_density_operator<RANK> auto rho)
 {
-  Averages averages;
-  if (const auto av=castAv(qs)) {
-    averages.reference(av->average(t,matrix));
-    av->process(averages);
-    av->stream(averages,os,precision);
-  }
-  return {os,averages};
-}*/
+  auto res{expectationvalues::calculate<RANK>(ev,t,rho)};
+  if constexpr (expectationvalues::labelled_and_with_nonlinear_postprocessing<EV,RANK>) postProcessor(ev)(res);
+  return res;
+}
 
 
 

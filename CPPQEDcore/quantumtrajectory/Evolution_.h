@@ -45,7 +45,7 @@ struct Pars : public cppqedutils::trajectory::Pars<Base> {
 };
 
 
-using TemporalStreamedArray=cppqedutils::trajectory::TemporalStreamedArray<DArray<1>>;
+using DataStream=cppqedutils::trajectory::DataStream<DArray<1>>;
 
 } // evolution
 
@@ -90,7 +90,7 @@ template<auto RANK,
          typename Parameters>
 std::enable_if_t<std::is_same_v<std::decay_t<SV_OR_DO>,quantumdata::DensityOperator<RANK>> ||
                  std::is_same_v<std::decay_t<SV_OR_DO>,quantumdata::StateVector<RANK>>,
-                 TemporalStreamedArray>
+                 DataStream>
 _(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
   structure::QuantumSystemPtr<RANK> sys, ///<[in] the simulated \link structure::QuantumSystem quantum system\endlink
   const Parameters& pe, ///<[in] parameters of the evolution

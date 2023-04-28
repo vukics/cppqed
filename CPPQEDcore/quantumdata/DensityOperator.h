@@ -49,8 +49,8 @@ struct DensityOperator : ::cppqedutils::MultiArray<dcomp,2*RANK>, private Vector
     : ABase{cppqedutils::concatenate(dimensions,dimensions),std::forward<decltype(initializer)>(initializer)} {}
 
   explicit DensityOperator(Dimensions dimensions)
-    : DensityOperator{dimensions, [=] () {
-        auto res{zeroInit<2*RANK>};
+    : DensityOperator{dimensions, [=] (size_t e) {
+        auto res{zeroInit<2*RANK>(e)};
         res[0]=1.;
         return res;
     }} {}
@@ -170,4 +170,5 @@ namespace structure {
 using ::quantumdata::DensityOperatorView, ::quantumdata::DensityOperatorConstView;
 
 } // structure
+
 

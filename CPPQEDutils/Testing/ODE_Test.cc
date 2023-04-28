@@ -38,7 +38,7 @@ int main(int , char**)
   },{"Re{y}","Im{y}"},trajectory::initialTimeStep(abs(Z)),
   1e-6,1e-18));
 
-  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(S,5.,0.01,0,"","",6,false,false,false,true,observerNoOp);
+  auto streamedArray=run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(S,5.,0.01,0,"","",6,0,false,true,observerNoOp);
 
   double yDev=0;
   

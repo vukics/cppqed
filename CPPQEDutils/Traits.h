@@ -19,6 +19,9 @@ namespace cppqedutils {
 template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
 
 
+template<typename > inline constexpr bool always_false_v = false;
+
+
 /// An empty base class with a constructor of arbitrary signature
 struct Empty { template <typename... T> Empty(T&&... ) {} };
 

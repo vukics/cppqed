@@ -31,10 +31,14 @@ typedef cppqedutils::ode::Pars<> Pars;
  */
 template <size_t RANK,
           ::structure::quantum_system_dynamics<RANK> QSD,
-          ::cppqedutils::ode::engine<::quantumdata::DensityOperator<RANK>> OE>
+          ::cppqedutils::ode::engine<typename ::quantumdata::DensityOperator<RANK>::StorageType> OE>
 struct Master
 {
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
+
+  Master(auto&& q, auto&& r, auto&& o)
+    : qsd{std::forward<decltype(q)>(q)}, rho{std::forward<decltype(r)>(r)}, oe{std::forward<decltype(o)>(o)},
+      rowIterationOffsets_{::cppqedutils::calculateSlicesOffsets<rowIterationRetainedAxes>(rho.extents)} {}
 
   friend double getDtDid(const Master& m) {return getDtDid(m.oe);}
 
@@ -50,12 +54,15 @@ struct Master
   friend ::cppqedutils::LogTree logOutro(const Master& m) {return logOutro(m.oe);}
 
   friend ::cppqedutils::LogTree step(Master& m, double deltaT) {
-    auto res = step ( m.oe, deltaT, [&] (const ::quantumdata::DensityOperator<RANK>& rho, ::quantumdata::DensityOperator<RANK>& drhodt, double t)
+    auto res = step ( m.oe, deltaT, [&] (const typename ::quantumdata::DensityOperator<RANK>::StorageType& rhoRaw, typename ::quantumdata::DensityOperator<RANK>::StorageType& drhodtRaw, double t)
     {
+      ::quantumdata::DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,rhoRaw.begin(),rhoRaw.end()};
+      ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,drhodtRaw.begin(),drhodtRaw.end()};
+
       for (dcomp& v : drhodt.dataView) v=0;
 
-      for (auto&& [psi,dpsidt] : boost::combine(::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets),
-                                                ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt.mutableView(),m.rowIterationOffsets)))
+      for (auto&& [psi,dpsidt] : boost::combine(::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_),
+                                                ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt.mutableView(),m.rowIterationOffsets_)))
         getHa(m.qsd)(t,psi,dpsidt,m.time0);
 
       twoTimesRealPartOfSelf(drhodt);
@@ -66,9 +73,9 @@ struct Master
     },m.time,m.rho.mutableView());
 
     // exact propagation
-    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets)) getHa(m.qsd)(m.time,psi,m.time0);
+    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets_)) getHa(m.qsd)(m.time,psi,m.time0);
     hermitianConjugateSelf(m.rho);
-    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets)) getHa(m.qsd)(m.time,psi,m.time0);
+    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets_)) getHa(m.qsd)(m.time,psi,m.time0);
     conj(m.rho);
     m.time0=m.time;
 
@@ -84,7 +91,10 @@ struct Master
 
   friend ::cppqedutils::LogTree dataStreamKey(const Master& m) {return {{"Master","TAKE FROM SYSTEM"}};}
 
-  friend auto temporalDataPoint(const Master& m) { return calculateAndPostprocess( getEv(m.qsd), m.time, m.rho );  }
+  friend auto temporalDataPoint(const Master& m)
+  {
+    return ::structure::calculateAndPostprocess<RANK>( getEV(m.qsd), m.time, ::quantumdata::DensityOperatorConstView<RANK>(m.rho) );
+  }
 
   friend ::cppqedutils::iarchive& readFromArrayOnlyArchive(Master& m, ::cppqedutils::iarchive& iar) {return iar & m.rho;} // MultiArray can be (de)serialized
 
@@ -95,7 +105,7 @@ struct Master
   template <typename Archive>
   friend auto& stateIO(Master& m, Archive& ar)
   {
-    stateIO(m.ode, ar & m.rho & m.time);
+    stateIO(m.oe, ar & m.rho & m.time);
     // The following is a no-op in the case of state output, since time0 is equated with time @ the end of each step, however, it is an essential step for state input!
     m.time0=m.time;
     return ar;
@@ -108,9 +118,9 @@ struct Master
   OE oe;
 
 private:
-  const std::vector<size_t> rowIterationOffsets;
+  const std::vector<size_t> rowIterationOffsets_;
 
-  static constexpr auto rowIterationRetainedAxes=hana::range_c<size_t,0,RANK>;
+  static constexpr auto rowIterationRetainedAxes=::cppqedutils::compileTimeOrdinals<RANK>;
 
   // const DensityOperatorStreamer<RANK,V> dos_;
 

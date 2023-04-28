@@ -98,7 +98,7 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 {
   quantumdata::DensityOperator<RANK> rhoTemp(::cppqedutils::halveExtents(rho.extents), ::cppqedutils::multiarray::copyInit<dcomp,RANK>(rho.dataView)); // deep copy
 
-  auto sr=sliceRange<hana::range_c<size_t,0,RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
+  auto sr=sliceRange<::cppqedutils::compileTimeOrdinals<RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
 
   auto unaryIteration=[&] () { for (auto& psiTemp : sr) applyJump(jump,t,psiTemp); };
 

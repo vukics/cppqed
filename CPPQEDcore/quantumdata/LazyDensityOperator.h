@@ -24,6 +24,12 @@ namespace quantumdata {
  */
 
 
+/// The lazy_density_operator-style indexing should be defined in the language of ::cppqedutils::MultiArrayConstView
+/**
+ * If we do it as DensityOperatorConstView, then template-argument-deduction doesn’t work very well
+ * TODO: (re)evaluate the alternative design of making StateVectorConstView & DensityOperatorConstView optional bases of MultiArray
+ *   In that case, lazy_density_operator-style indexing could be defined as member functions
+ */
 template <size_t RANK>
 dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, std::convertible_to<size_t> auto ... i) requires (sizeof...(i)==2*RANK);
 

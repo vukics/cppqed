@@ -329,12 +329,12 @@ std::ostream& stream(const temporal_data_point auto& tdp, std::ostream& os)
 
 
 template <typename T, typename TRAJ>
-concept trajectory_data_streamer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj, std::ostream& os) {
+concept data_streamer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj, std::ostream& os) {
   { t(traj,os) } -> std::convertible_to<decltype(temporalDataPoint(traj))> ;
 };
 
 
-const auto trajectoryDataStreamerDefault = [] (const uniform_step auto& traj, std::ostream& os) {
+const auto dataStreamerDefault = [] (const uniform_step auto& traj, std::ostream& os) {
   auto tdp{temporalDataPoint(traj)};
   stream(tdp, os)<<std::endl; // Note: endl flushes the buffer
   return tdp;
@@ -343,7 +343,7 @@ const auto trajectoryDataStreamerDefault = [] (const uniform_step auto& traj, st
 
 /// The most general run function
 /** TODO: use std::setw instead of lots of dump(ppindent) for json pretty printing */
-template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, trajectory_data_streamer<TRAJ> TDS = decltype(trajectoryDataStreamerDefault) >
+template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, data_streamer<TRAJ> TDS = decltype(dataStreamerDefault) >
 requires ( ( SFT==StreamFreqType::DT_MODE || adaptive<TRAJ> ) && ( RLT==RunLengthType::T_MODE || SFT==StreamFreqType::DT_MODE ) )
 auto
 run(TRAJ&& traj, ///< the trajectory to run
@@ -356,7 +356,7 @@ run(TRAJ&& traj, ///< the trajectory to run
     StreamSwitch streamSwitch, bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
     observer<TRAJ> auto&& observer,
-    const TDS& tds = trajectoryDataStreamerDefault)
+    const TDS& tds = dataStreamerDefault)
 {
   static constexpr size_t ppindent = 2; // json pretty-print indent
 

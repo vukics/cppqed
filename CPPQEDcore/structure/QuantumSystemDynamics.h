@@ -42,7 +42,11 @@ concept system_frequency_store =
 template <system_frequency_store SFS>
 double highestFrequency(const SFS& sfs)
 {
-  return sfs.size() ? *std::ranges::max_element(sfs | std::views::transform( [](const auto& p) {return std::abs(get<1>(p)*get<2>(p));} ) ) : 0.;
+  return sfs.size()
+  ? std::ranges::max(sfs | std::views::transform( [](const auto& p) {
+    return std::visit([&] (auto v) {
+      return std::abs(v*get<2>(p));},get<1>(p)); } ) )
+  : 0.;
 }
 
 
@@ -75,15 +79,6 @@ struct QuantumSystemDynamics
 
 template <system_frequency_store SFS, typename LI, typename HA, typename EV>
 QuantumSystemDynamics(SFS&& freqs, LI&& li, HA&& ha, EV&& ev) -> QuantumSystemDynamics<std::ranges::range_value_t<LI>::N_RANK,SFS,LI,HA,EV>;
-/*{
-  static constexpr size_t RANK = ;
-
-  return QuantumSystemDynamics<RANK,SFS,LI,HA,EV>{
-    .freqs{std::forward<SFS>(freqs)},
-    .li{std::forward<LI>(li)},
-    .ha{std::forward<HA>(ha)},
-    .ev{std::forward<EV>(ev)}};
-}*/
 
 
 } // structure
