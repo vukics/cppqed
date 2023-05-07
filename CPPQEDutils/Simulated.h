@@ -15,31 +15,34 @@ using namespace cppqedutils;
  * <b>Example usage:</b> simulation of a complex driven damped harmonic oscillator mode described by the ODE \f[\ddot{y}+2\gamma\,\dot{y}+y=e^{i\,\omega t},\f]
  * where \f$\gamma\f$ is the damping rate and \f$\omega\f$ the driving frequency, and the timescale has been chosen such that the eigenfrequency is 1.
  * 
- * \include HarmonicOscillatorComplex.cc
+ * \include HarmonicOscillatorComplexStdArray.cc
  */
 template<typename ST, ode::system<ST> D, template <typename > typename OE> requires ode::engine<OE<std::decay_t<ST>>,std::decay_t<ST>>
 struct Simulated
 {
-  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> kl, OE<std::decay_t<ST>> oe)
-    : state{std::forward<decltype(stateInit)>(stateInit)},
-      derivs{d},
-      keyLabels{kl},
-      ode{oe} {
-        if (keyLabels.size() < size(state)) keyLabels.insert(keyLabels.cend(),size(state)-keyLabels.size(),"N/A");
-        else if (keyLabels.size() > size(state)) throw std::runtime_error("More keys than values in Simulated");
-      }
+  Simulated(auto&& stateInit, D d, std::initializer_list<std::string> kl, OE<std::decay_t<ST>> oe, const LogTree& p={})
+  : state{std::forward<decltype(stateInit)>(stateInit)},
+    derivs{d},
+    keyLabels{kl},
+    ode{oe},
+    parameters(p)
+  {
+    if (keyLabels.size() < size(state)) keyLabels.insert(keyLabels.cend(),size(state)-keyLabels.size(),"N/A");
+    else if (keyLabels.size() > size(state)) throw std::runtime_error("More keys than values in Simulated");
+  }
   
   double time=0.;
   ST state;
   D derivs;
   std::list<std::string> keyLabels;
   OE<std::decay_t<ST>> ode;
+  LogTree parameters;
 
   friend double getDtDid(const Simulated& s) {return getDtDid(s.ode);}
 
   friend double getTime(const Simulated& s) {return s.time;}
 
-  friend LogTree logIntro(const Simulated& s) {return {{"Simulated",{"odeEngine",logIntro(s.ode)}}};}
+  friend LogTree logIntro(const Simulated& s) {return LogTree{{"Simulated",{{"odeEngine",logIntro(s.ode)},{"system parameters",s.parameters}}}};}
 
   friend LogTree logOutro(const Simulated& s) {return logOutro(s.ode);}
 
@@ -80,18 +83,18 @@ namespace simulated {
 
 template<template <typename > typename OE, typename ST, typename D, typename ... ODE_EngineCtorParams>
 requires ::cppqedutils::ode::engine<OE<std::decay_t<ST>>,std::decay_t<ST>>
-auto make(ST&& stateInit, D derivs, std::initializer_list<std::string> keyLabels, ODE_EngineCtorParams&&... odePack)
+auto make(ST&& stateInit, D derivs, std::initializer_list<std::string> keyLabels, const LogTree& parameters, ODE_EngineCtorParams&&... odePack)
 {
-  return Simulated<ST,D,OE>{std::forward<ST>(stateInit),derivs,keyLabels,OE<std::decay_t<ST>>{std::forward<ODE_EngineCtorParams>(odePack)...}};
+  return Simulated<ST,D,OE>{std::forward<ST>(stateInit),derivs,keyLabels,OE<std::decay_t<ST>>{std::forward<ODE_EngineCtorParams>(odePack)...},parameters};
 }
 
 template <typename BASE = Empty>
 using Pars=::trajectory::Pars<::ode::Pars<BASE>>;
 
 
-auto makeBoost(auto && stateInit, auto derivs, std::initializer_list<std::string> keyLabels, double dtInit, const auto& p)
+auto makeBoost(auto && stateInit, auto derivs, std::initializer_list<std::string> keyLabels, const LogTree& parameters, double dtInit, const auto& p)
 {
-  return make<ODE_EngineBoost>(std::forward<decltype(stateInit)>(stateInit),derivs,keyLabels,dtInit,p.epsRel,p.epsAbs);
+  return make<ODE_EngineBoost>(std::forward<decltype(stateInit)>(stateInit),derivs,keyLabels,parameters,dtInit,p.epsRel,p.epsAbs);
 }
 
 } // simulated

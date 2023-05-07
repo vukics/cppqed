@@ -3,3 +3,6 @@
 
 add_executable(SandBox SandBox.cc)
 target_link_libraries(SandBox CPPQED::CPPQEDutils)
+
+add_executable(JSON JSON.cc)
+target_link_libraries(JSON CPPQED::CPPQEDutils)

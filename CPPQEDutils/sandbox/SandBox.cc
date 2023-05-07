@@ -1,4 +1,4 @@
-#include <boost/json.hpp>
+// #include <boost/json.hpp>
 
 #include <boost/hana.hpp>
 
@@ -10,7 +10,13 @@
 namespace hana = boost::hana;
 
 
-struct A {};
+struct A
+{
+  A(const A&) = delete;
+  A(A&&) {std::cerr<<"move ctor called"<<std::endl;}
+  A() {std::cerr<<"default ctor called"<<std::endl;}
+};
+
 struct B {};
 struct C {};
 
@@ -30,13 +36,15 @@ concept functional = hana::fold( typeOptions, true, [] <typename E> (bool s, E) 
 auto f = [] (type_options auto) {return 1.;};
 
 // static_assert(functional_helper<decltype(f),A>);
-static_assert(functional<decltype(f)>);
+// static_assert(functional<decltype(f)>);
 
+
+A g() {return A();}
 
 
 int main()
 {
-  boost::json::object o, oo;
+/*  boost::json::object o, oo;
 
   o["int"]=2;
   o["double"]=2.1;//boost::json::value_from(std::complex{1.2,-3.1});
@@ -45,6 +53,8 @@ int main()
   oo["object"]=o;
   oo["pi"]=3.14;
 
-  std::cerr<<oo<<std::endl;
+  std::cerr<<oo<<std::endl;*/
+
+  A a(g()), aa(std::move(g()));
 
 }

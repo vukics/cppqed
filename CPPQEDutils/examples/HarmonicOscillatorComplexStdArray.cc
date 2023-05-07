@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
       dydt[1]=exp(1i*omega*tau)-2*gamma*y[1]-y[0];
     },
     {"complex coordinate","complex velocity"},
+    {{"G",gamma},{"O",omega}},
     .1/max(1.,max(omega,gamma)),pt)};
 
   run(S,pt,trajectory::observerNoOp);
