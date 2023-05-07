@@ -16,6 +16,7 @@ const auto noInit = ::cppqedutils::multiarray::noInit<dcomp,RANK>;
 template <size_t RANK>
 const auto zeroInit = ::cppqedutils::multiarray::zeroInit<dcomp,RANK>;
 
+// TODO: std::ranges::views::zip to be applied here
 template <typename Derived>
 struct VectorSpaceOperatorsGenerator
 {
@@ -24,8 +25,8 @@ struct VectorSpaceOperatorsGenerator
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator plus");
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)}; auto ri=r.begin();
-      for (auto ai=a.dataView.begin(), bi=b.dataView.begin(); ai!=a.dataView.end(); *ri++=(*ai++)+(*bi++) ) ;
+      auto r{noInit<multiArrayRank_v<Derived>>(e)};
+      for (auto [ri,ai,bi]=std::make_tuple(r.begin(),a.dataView.begin(),b.dataView.begin()); ai!=a.dataView.end(); *ri++=(*ai++)+(*bi++) ) ;
       return r;
     }};
   }
@@ -35,8 +36,8 @@ struct VectorSpaceOperatorsGenerator
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator minus");
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)}; auto ri=r.begin();
-      for (auto ai=a.dataView.begin(), bi=b.dataView.begin(); ai!=a.dataView.end(); *ri++=(*ai++)-(*bi++) ) ;
+      auto r{noInit<multiArrayRank_v<Derived>>(e)};
+      for (auto [ri,ai,bi]=std::make_tuple(r.begin(),a.dataView.begin(),b.dataView.begin()); ai!=a.dataView.end(); *ri++=(*ai++)-(*bi++) ) ;
       return r;
     }};
   }
@@ -45,8 +46,8 @@ struct VectorSpaceOperatorsGenerator
   friend auto operator*(dcomp v, const Derived& a)
   {
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)}; auto ri=r.begin();
-      for (auto ai=a.dataView.begin(); ai!=a.dataView.end(); (*ri++)=v*(*ai++) ) ;
+      auto r{noInit<multiArrayRank_v<Derived>>(e)};
+      for (auto [ri,ai]=std::make_tuple(r.begin(),a.dataView.begin()); ai!=a.dataView.end(); (*ri++)=v*(*ai++) ) ;
       return r;
     }};
   }
@@ -96,7 +97,12 @@ struct StateVector : ::cppqedutils::MultiArray<dcomp,RANK>, private VectorSpaceO
     /// Returns the norm \f$\norm\Psi\f$, implemented in terms of ArrayBase::frobeniusNorm.
   friend double norm(const StateVector& sv) {return frobeniusNorm(sv);}
   
-  friend double renorm(StateVector& sv) {double res=norm(sv); std::ranges::for_each(sv.mutableView().dataView,[=] (auto& v) {v/=res;}); return res;}
+  friend double renorm(StateVector& sv)
+  {
+    double res=norm(sv);
+    for (dcomp& v : sv.mutableView().dataView) v/=res;
+    return res;
+  }
   //@}
   
   /// Adds a dyad of the present object to `densityOperator`

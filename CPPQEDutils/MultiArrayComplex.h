@@ -67,7 +67,11 @@ auto directProduct(const MultiArray<dcomp,RANK1>& m1, const MultiArray<dcomp,RAN
 
 
 template <size_t RANK>
-MultiArray<dcomp,RANK>& conj(MultiArray<dcomp,RANK>& ma) { std::ranges::transform( ma.mutableView().dataView, std::conj ); return ma;}
+MultiArray<dcomp,RANK>& conj(MultiArray<dcomp,RANK>& ma)
+{
+  for (dcomp& v : ma.mutableView().dataView) v=conj(v);
+  return ma;
+}
 
 
 template <size_t RANK>
@@ -78,7 +82,7 @@ template <size_t TWO_TIMES_RANK>
 void hermitianConjugateSelf(MultiArray<dcomp,TWO_TIMES_RANK>& ma)
 {
   const size_t matrixDim = multiarray::calculateExtent(halveExtents(ma.extents));
-  for (size_t i=0; i<matrixDim; ++i) for (size_t j=i; j<matrixDim; ++j) {
+  for (size_t i=0; i<matrixDim; ++i) for (size_t j=i+1; j<matrixDim; ++j) {
     dcomp
       &u=ma.mutableView().dataView[i+matrixDim*j],
       &l=ma.mutableView().dataView[j+matrixDim*i];
@@ -86,6 +90,18 @@ void hermitianConjugateSelf(MultiArray<dcomp,TWO_TIMES_RANK>& ma)
     std::swap(u, l);
   }
 }
+
+
+template <size_t TWO_TIMES_RANK>
+void twoTimesRealPartOfSelf(MultiArrayView<dcomp,TWO_TIMES_RANK> mav)
+{
+  const size_t matrixDim = multiarray::calculateExtent(halveExtents(mav.extents));
+  auto _=[&] (size_t i, size_t j) -> dcomp& {return mav.dataView[i+matrixDim*j];};
+  for (size_t i=0; i<matrixDim; ++i) {
+    _(i,i)=2.*real(_(i,i));
+    for (size_t j=i; j<matrixDim; ++j) _(j,i)=conj(_(i,j)=_(i,j)+_(j,i));
+  }
+};
 
 
 } // cppqedutils

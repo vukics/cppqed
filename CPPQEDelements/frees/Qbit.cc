@@ -5,16 +5,6 @@
 using namespace cppqedutils; using namespace structure;
 
 
-TimeIndependentTerm<1> qbit::diagonalH(dcomp z)
-{
-  return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(1)-=z*psi(1);};
-}
-
-TimeIndependentTerm<1> qbit::offDiagonalH(dcomp eta)
-{
-  return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(0)+=-conj(eta)*psi(1); dpsidt(1)+=eta*psi(0);};
-}
-
 UnaryDiagonalPropagator<> qbit::propagator(dcomp z)
 {
   return {"diagonalPropagator", 2 , [=] (double t, auto& d) {d[0]=1; d[1]=exp(-z*t);} };

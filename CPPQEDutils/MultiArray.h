@@ -9,6 +9,8 @@
 
 #include <boost/range/combine.hpp>
 
+#include <boost/serialization/vector.hpp>
+
 #include <array>
 #include <concepts>
 #include <span>
@@ -239,6 +241,10 @@ public:
   /// non-const subscripting
   T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
+  /// access data storage
+  StorageType& dataStorage() {return data_;}
+  const StorageType& dataStorage() const {return data_;}
+
   /// JSONize
   friend void to_json( json& jv, const MultiArray& ma )
   {
@@ -261,15 +267,17 @@ public:
     ma.strides=multiarray::calculateStrides(ma.extents);
   }
   
-protected:
-  StorageType data_;
-  
 private:
+  StorageType data_;
+
   friend class boost::serialization::access;
   
   template<class Archive> void save(Archive& ar, const unsigned int) const {ar & this->extents & data_;}
 
-  template<class Archive> void load(Archive& ar, const unsigned int) {ar & this->extents & data_; this->strides=calculateStrides(this->extents); this->offset=0;}
+  template<class Archive> void load(Archive& ar, const unsigned int)
+  {
+    ar & this->extents & data_; this->strides=multiarray::calculateStrides(this->extents); this->offset=0;
+  }
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   
@@ -403,7 +411,7 @@ auto sliceRangeSimple(MultiArrayView<T,RANK> mav)
 }
 
 
-
+/// TODO: think over semantics here, can MultiArrayView be the reference type?
 template <typename Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
 requires (std::is_same_v<Offsets,std::span<const size_t>> || std::is_same_v<Offsets,std::vector<size_t>>)
 class SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offsets,T,RRANK>,MultiArrayView<T,RRANK>>
@@ -478,7 +486,7 @@ auto sliceRange(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets) 
     multiarray::filterIn<retainedAxes>(mav.extents),
     multiarray::filterIn<retainedAxes>(mav.strides),
     mav.offset,
-    std::span<const size_t>(offsets.begin(),offsets.end()),
+    std::span<const size_t>(offsets),
     mav.dataView};
 }
 

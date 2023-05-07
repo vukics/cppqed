@@ -14,6 +14,12 @@ void f(hamiltonian<1> auto) {}
 
 int main(int argc, char* argv[])
 {
+  auto op{optionParser()};
+
+  cppqedutils::trajectory::Pars<quantumtrajectory::master::Pars> pt(op);
+
+  parse(op,argc, argv);
+
   dcomp z{.1,1.}, eta{-.1,.2};
 
   QuantumSystemDynamics qbit {
@@ -26,14 +32,14 @@ int main(int argc, char* argv[])
 
   quantumtrajectory::Master<1,decltype(qbit),decltype(oe)> m{qbit,quantumdata::DensityOperator<1>{{2}},oe};
 
+  cppqedutils::run(m,pt,cppqedutils::trajectory::observerNoOp);
+
+/*  for (size_t i=0; i<1e2; ++i) {
+    step(m,1.); cppqedutils::trajectory::dataStreamerDefault(m,std::cerr<<getTime(m)<<" "<<getDtDid(m)<<"\t");
+  }
+
   auto streamedArray=run<cppqedutils::trajectory::RunLengthType::T_MODE,cppqedutils::trajectory::StreamFreqType::DC_MODE>(
-    m,70.,1,0,"","",6,0,false,true,cppqedutils::trajectory::observerNoOp);
-
-  static_assert(cppqedutils::trajectory::data_streamer<decltype(cppqedutils::trajectory::dataStreamerDefault),decltype(m)>);
-
-  cppqedutils::trajectory::dataStreamerDefault(m,cerr);
-
-  static_assert(cppqedutils::trajectory::adaptive<decltype(m)>);
+    m,70.,1,0,"","",6,cppqedutils::trajectory::StreamSwitch{"1111"},false,true,cppqedutils::trajectory::observerNoOp);*/
 
   // ****** Parameters of the Problem
   

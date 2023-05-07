@@ -59,9 +59,14 @@ struct DensityOperator : ::cppqedutils::MultiArray<dcomp,2*RANK>, private Vector
     : DensityOperator(dyad(psi,psi)) {}
 
 
-  friend double trace(const DensityOperator& rho) {return ::cppqedutils::matricize(rho).trace();} //< delegates to Eigen3
+  friend double trace(const DensityOperator& rho) {return real(::cppqedutils::matricize(rho).trace());} //< delegates to Eigen3
 
-  friend double renorm(DensityOperator& rho) {double res=trace(rho); rho/=res; return res;}
+  friend double renorm(DensityOperator& rho)
+  {
+    double res=trace(rho);
+    for (dcomp& v : rho.mutableView().dataView) v/=res;
+    return res;
+  }
 
 };
 

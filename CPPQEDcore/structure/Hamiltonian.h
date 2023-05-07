@@ -65,7 +65,6 @@ void applyHamiltonian(const T& h, double t, StateVectorConstView<RANK> psi, Stat
   if constexpr      (hamiltonian_ns::time_independent_term  <T,RANK>) h(psi,dpsidt);
   else if constexpr (hamiltonian_ns::one_time_dependent_term<T,RANK>) h(t-t0,psi,dpsidt);
   else if constexpr (hamiltonian_ns::two_time_dependent_term<T,RANK>) h(t,psi,dpsidt,t0);
-  else static_assert(::cppqedutils::always_false_v<T>,"unexpected type in applyHamiltonian");
 }
 
 
@@ -75,7 +74,6 @@ void applyPropagator(const T& h, double t, StateVectorView<RANK> psi, double t0)
 {
   if constexpr      (hamiltonian_ns::one_time_dependent_propagator<T,RANK>) h(t-t0,psi);
   else if constexpr (hamiltonian_ns::two_time_dependent_propagator<T,RANK>) h(t,psi,t0);
-  else static_assert(::cppqedutils::always_false_v<T>,"unexpected type in applyPropagator");
 }
 
 

@@ -3,11 +3,8 @@
 
 #include "QuantumSystemDynamics.h"
 
-#include "DensityOperator.h"
-
 #include "EntanglementMeasures.h"
 
-#include "FormDouble.h"
 #include "Trajectory.h"
 
 
@@ -16,45 +13,50 @@ namespace quantumtrajectory {
 
 using EntanglementMeasuresSwitch = std::bitset<3>;
 
-
-using StreamReturnType=std::tuple<std::ostream&,::structure::EV_Array>;
-
   
 /// Forwards to trajectory::initialTimeStep, with the highest frequency of the system taken as structure::QuantumSystem::highestFrequency
-template<size_t RANK, ::structure::quantum_system_dynamics<RANK> QSD>
-inline double initialTimeStep(structure::QuantumSystemPtr<RANK> qs)
+template<size_t RANK>
+double initialTimeStep(const ::structure::quantum_system_dynamics<RANK> auto qsd)
 {
-  return cppqedutils::trajectory::initialTimeStep(qs->highestFrequency());
+  return cppqedutils::trajectory::initialTimeStep(highestFrequency(getFreqs(qsd)));
 }
 
 
-template<size_t RANK, ::structure::quantum_system_dynamics<RANK> QSD>
-std::ostream& streamCharacteristics(const QSD& qsd, std::ostream& os)
+template<size_t RANK>
+std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<RANK> auto& qsd, std::ostream& os)
 {
-  return os<<"System characteristics: "
-      <<(castEx(qs) ? "Interaction picture, "   : "")
-      <<(castHa(qs) ? "Hamiltonian evolution, " : "")
-      <<(castLi(qs) ? "Liouvillian evolution, " : "")
-      <<(castAv(qs) ? "calculates Averages."    : "");
+  return
+    hana::fold(getLi(qsd),
+    hana::fold(getHa(qsd),os<<"System characteristics:\nHamiltonian terms: ", [] (std::ostream& os, const auto& he) {
+      {
+        using T=decltype(termOrPropagator(he));
+        if constexpr (::structure::one_time_dependent_propagator<T,RANK> || ::structure::two_time_dependent_propagator<T,RANK>)
+          os<<"*";
+      }
+      return os<<label(he)<<", ";
+    })<<"Liouvillian ", [&]<typename LI> (std::ostream& os, const LI& lindblad) {
+      if constexpr(::structure::lindblad_with_rate<LI,RANK>) os<<"*";
+      if constexpr(::structure::lindblad_with_superoperator<LI,RANK>) os<<"!";
+      return os<<label(lindblad);
+    });
 }
 
 
 /// Wraps common functionality of Master & EnsembleMCWF concerning stream of quantum averages on the basis of density operators
 /**
+ * TODO: hook this as a trajectory::data_streamer
  * This comprises
  * - keeping a structure::Averaged instant and calling structure::Averaged::stream
- * - performing \link quantumdata::negPT negativity calculation\endlink if needed
- * - extending key with negativity when needed
- * 
- * \tparamRANK
- * \tparam V has the same function as the template parameter `V` in quantumdata::negPT
- * 
+ * - performing calculation of entanglement measures if needed
+ * - extending key with entanglement measures when needed
  */
-template<int RANK, typename V>
+template<size_t RANK,
+         auto axesOfSubsystem // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
+         >
 class DensityOperatorStreamer
 {
 public:
-  typedef quantumdata::DensityOperator<RANK> DensityOperator;
+  using DensityOperator=quantumdata::DensityOperator<RANK>;
 
   DensityOperatorStreamer(::structure::AveragedPtr<RANK> av, EntanglementMeasuresSwitch ems) : av_(av), ems_(ems) {}
 

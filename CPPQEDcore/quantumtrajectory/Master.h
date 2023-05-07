@@ -54,35 +54,41 @@ struct Master
   friend ::cppqedutils::LogTree logOutro(const Master& m) {return logOutro(m.oe);}
 
   friend ::cppqedutils::LogTree step(Master& m, double deltaT) {
-    auto res = step ( m.oe, deltaT, [&] (const typename ::quantumdata::DensityOperator<RANK>::StorageType& rhoRaw, typename ::quantumdata::DensityOperator<RANK>::StorageType& drhodtRaw, double t)
+    auto res = step ( m.oe, deltaT, [&] (const typename ::quantumdata::DensityOperator<RANK>::StorageType& rhoRaw,
+                                         typename ::quantumdata::DensityOperator<RANK>::StorageType& drhodtRaw, double t)
     {
-      ::quantumdata::DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,rhoRaw.begin(),rhoRaw.end()};
-      ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,drhodtRaw.begin(),drhodtRaw.end()};
+      ::quantumdata::DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
+      ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw};
 
       for (dcomp& v : drhodt.dataView) v=0;
 
-      for (auto&& [psi,dpsidt] : boost::combine(::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_),
-                                                ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt.mutableView(),m.rowIterationOffsets_)))
-        getHa(m.qsd)(t,psi,dpsidt,m.time0);
+      // TODO: std::ranges::views::zip to be applied here
+      {
+        auto psiRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_)};
+        auto dpsidtRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt,m.rowIterationOffsets_)};
+        for (auto [psi,dpsidt]=std::make_tuple(psiRange.begin(),dpsidtRange.begin()); psi!=psiRange.end(); getHa(m.qsd)(t,*psi++,*dpsidt++,m.time0)) ;
+      }
 
       twoTimesRealPartOfSelf(drhodt);
 
       for (auto&& lindblad : getLi(m.qsd))
-        applySuperoperator(lindblad.superoperator, t, rho, drhodt.mutableView());
+        ::structure::applySuperoperator<RANK>(lindblad.superoperator, t, rho, drhodt);
 
-    },m.time,m.rho.mutableView());
+    },m.time,m.rho.dataStorage());
 
     // exact propagation
-    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets_)) getHa(m.qsd)(m.time,psi,m.time0);
+    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho.mutableView(),m.rowIterationOffsets_))
+      structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
     hermitianConjugateSelf(m.rho);
-    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho,m.rowIterationOffsets_)) getHa(m.qsd)(m.time,psi,m.time0);
+    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho.mutableView(),m.rowIterationOffsets_))
+      structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
     conj(m.rho);
     m.time0=m.time;
 
     // The following "smoothening" of rho_ has proven necessary for the algorithm to remain stable:
     // We make the approximately Hermitian and normalized rho_ exactly so.
 
-    twoTimesRealPartOfSelf(m.rho);
+    twoTimesRealPartOfSelf(m.rho.mutableView());
 
     renorm(m.rho);
 
@@ -143,14 +149,15 @@ auto make(::structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOpera
 */
 } // quantumtrajectory
 
-/*
-template <int RANK, typename ODE_Engine, typename V>
-struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Master<RANK,ODE_Engine,V>>
+
+template <size_t RANK, typename QSD, typename OE>
+struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Master<RANK,QSD,OE>>
 {
   static auto _() {return SerializationMetadata{"CArray","Master",2*RANK};}
 };
 
 
+/*
 
 
 template<int RANK, typename ODE_Engine, typename V>
