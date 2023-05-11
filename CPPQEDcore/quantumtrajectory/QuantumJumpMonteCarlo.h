@@ -59,11 +59,11 @@ struct QuantumJumpMonteCarlo
   using EnsembleAverageElement = StateVector;
   using EnsembleAverageResult = quantumdata::DensityOperator<RANK>;
   
-  QuantumJumpMonteCarlo(auto&& q, auto&& p, auto&& o, randomutils::EngineWithParameters<RandomEngine> r, double dpLimit, qjmc::LogLevel logLevel)
+  QuantumJumpMonteCarlo(auto&& q, auto&& p, auto&& o, randomutils::EngineWithParameters<RandomEngine> r, double dpLimit)
   : qsd{std::forward<decltype(q)>(q)}, psi{std::forward<decltype(p)>(p)}, oe{std::forward<decltype(o)>(o)}, re{r}, dpLimit_{dpLimit},
-    logger_{logLevel,size(getLi(qsd))}
+    logger_{size(getLi(qsd))}
   {
-    if (const auto& li{getLi(q.qsd)}; !time && size(li) ) manageTimeStep(calculateRates(li,0.,psi));
+    if (const auto& li{getLi(qsd)}; !time && size(li) ) manageTimeStep(li | std::views::transform( [&] (const ::structure::Lindblad<RANK>& l) {return ::structure::calculateRate(l.rate,time,psi); } ) );
   }
 
   double time=0., time0=0.;
@@ -82,7 +82,7 @@ struct QuantumJumpMonteCarlo
     return {{"Quantum-Jump Monte Carlo",{{"QJMC algorithm","stepwise"},{"odeEngine",logIntro(q.oe)},{"randomEngine",logIntro(q.re)},{"System","TAKE FROM SYSTEM"}}}};
   }
 
-  friend ::cppqedutils::LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {{"QJMC",logOutro(q.logger_)},{"ODE_Engine",logOutro(q.oe)}};}
+  friend ::cppqedutils::LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {/*{"QJMC",logOutro(q.logger_)},*/{"ODE_Engine",logOutro(q.oe)}};}
 
   friend ::cppqedutils::LogTree step(QuantumJumpMonteCarlo& q, double deltaT)
   {
@@ -114,7 +114,7 @@ struct QuantumJumpMonteCarlo
       // perform jump
       double random=q.sampleRandom()/getDtDid(q);
 
-      int lindbladNo=0; // TODO: this could be expressed with an iterator into rates
+      size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
       for (; random>0 && lindbladNo!=rates.size(); random-=rates[lindbladNo++]) ;
 
       if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
@@ -174,14 +174,14 @@ private:
     ::cppqedutils::LogTree res;
 
     const double totalRate=std::accumulate(rates.begin(),rates.end(),0.);
-    const double dtDid=getDtDid(*this), dtTry=getDtTry(oe);
+    const double dtDid=getDtDid(*this), dtTry=oe.dtTry;
 
     const double liouvillianSuggestedDtTry=dpLimit_/totalRate;
 
     if (totalRate*dtTry>dpLimit_) res.push_back(logger_.overshot(totalRate*dtTry,dtTry,liouvillianSuggestedDtTry));
 
     // dtTry-adjustment for next step:
-    setDtTry(oe, std::min(getDtTry(oe),liouvillianSuggestedDtTry) );
+    oe.dtTry = std::min(oe.dtTry,liouvillianSuggestedDtTry) ;
 
     return res;
   }
@@ -192,6 +192,7 @@ private:
 
 namespace qjmc {
 
+/*
 template<typename ODE_Engine, typename RandomEngine, typename SV>
 auto make(::structure::QuantumSystemPtr<std::decay_t<SV>::N_RANK> sys,
           SV&& state, const Pars<RandomEngine>& p)
@@ -224,21 +225,21 @@ auto makeEnsemble(SYS sys, const SV& psi, const Pars<RandomEngine>& p, Entanglem
                                            quantumdata::DensityOperator<RANK>{psi.getDimensions()}};
 
 }
- 
+ */
 } // qjmc
 
 
 } // quantumtrajectory
 
 
-template <size_t RANK, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>
+template <size_t RANK, typename QSD, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::QuantumJumpMonteCarlo<RANK,QSD,ODE_Engine,RandomEngine>>
 {
   static auto _() {return SerializationMetadata{"CArray","QuantumJumpMonteCarlo",RANK};}
 };
 
 
-
+/*
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 std::ostream& quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::streamParameters(std::ostream& os) const
@@ -285,6 +286,7 @@ struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::QuantumJu
 
 };
 
+*/
 
 /*
  * This could be implemented in several different ways, depending on how many arrays the archive contains
@@ -293,7 +295,7 @@ struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::QuantumJu
  * **Most general solution**: create a DensityOperator from the available arrays (independently of their number)
  * and sample the density operator to initialize as many trajectories as needed.
  */
-template<size_t RANK, typename ODE_Engine, typename RandomEngine>
+/*template<size_t RANK, typename ODE_Engine, typename RandomEngine>
 struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>
 {
   static auto& _(const std::vector<quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>>&, cppqedutils::iarchive& iar)
@@ -301,6 +303,6 @@ struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtr
     throw std::runtime_error("InitializeEnsembleFromArrayOnlyArchive not implemented for QuantumJumpMonteCarlo");
     return iar;
   }
-};
+};*/
 
 

@@ -16,8 +16,6 @@ namespace quantumtrajectory::qjmc {
 
 class Logger;
 
-using LogLevel=std::bitset<3>;
-
 
 struct EnsembleLogger
 {
@@ -61,18 +59,15 @@ public:
   typedef std::list<std::pair<double,size_t> > jumpTrajectory; ///< Stores <time instant, lindbladNo> pairs, that is, the complete stochastic MCWF trajectory (the rest is deterministic)
 
   /// Straightforward constructor
-  Logger(int logLevel, ///< governs amount of log output during trajectory stream
-              size_t nLindblads ///< number of Lindblad operators
-             );
+  Logger(size_t nLindblads);
 
   void step(); ///< registers an MCWF step
 
-  void stepBack(std::ostream&, double dp, double    dtDid, double newDtTry, double t, bool logControl); ///< registers a step-back upon \link qjmc::Pars::overshootTolerance tolerance-overshoot\endlink
-  void overshot(std::ostream&, double dp, double oldDtTry, double newDtTry          , bool logControl); ///< registers a \link qjmc::Pars::dpLimit dpLimit\endlink overshoot
+  ::cppqedutils::LogTree overshot(double dp, double oldDtTry, double newDtTry); ///< registers a \link qjmc::Pars::dpLimit dpLimit\endlink overshoot
 
   void processNorm(double norm); ///< bookkeeps maximal deviation of the stochastic state vector from norm 1
 
-  void jumpOccured(std::ostream&, double t, size_t lindbladNo); ///< registers a jump at time `t` with its identifying ordinal
+  void jumpOccured(double t, size_t lindbladNo); ///< registers a jump at time `t` with its identifying ordinal
 
   std::ostream& onEnd(std::ostream&) const; ///< streams summary log information at the end (called by QuantumJumpMonteCarlo::logOnEnd_v)
   
@@ -87,7 +82,6 @@ private:
 
   friend struct EnsembleLogger;
   
-  const int logLevel_;
   const size_t nLindblads_;
 
   size_t nMCWF_steps_, nOvershot_, nToleranceOvershot_;

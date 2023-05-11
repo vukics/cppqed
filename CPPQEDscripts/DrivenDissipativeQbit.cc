@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
   quantumtrajectory::Master<1,decltype(qbit),decltype(oe)> m{qbit,quantumdata::DensityOperator<1>{{2}},oe};
 
-  quantumtrajectory::QuantumJumpMonteCarlo<1,decltype(qbit),decltype(oe),pcg64> q{qbit,quantumdata::StateVector<1>{{2}},oe,{1001,1},0.01,0};
+  quantumtrajectory::QuantumJumpMonteCarlo<1,decltype(qbit),decltype(oe),pcg64> q{qbit,quantumdata::StateVector<1>{{2}},oe,{1001,1},0.01};
 
   cppqedutils::run(m,pt,cppqedutils::trajectory::observerNoOp);
 
