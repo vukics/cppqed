@@ -16,132 +16,16 @@ namespace cppqedutils::trajectory {
 /// Aggregate of parameters pertaining to stochastic simulations
 /** \copydetails ParsRun */
 template <typename RandomEngine>
-struct ParsStochastic : randomutils::Pars<RandomEngine,ode_engine::Pars<>>
+struct ParsStochastic : randomutils::Pars<RandomEngine,ode::Pars<>>
 {
-  /// whether the noise should be on or off
-  /**
-   * (if it makes sense to turn it off at all for a concrete Stochastic
-   * – e.g. for a \link quantumtrajectory::MCWF_Trajectory Monte Carlo wave-function trajectory\endlink, turning off the noise means simply to disable quantum jumps)
-   */
-  bool &noise;
-  
-  size_t &nTraj; ///< number of trajectories in case of ensemble averaging
+  size_t nTraj; ///< number of trajectories in case of ensemble averaging
 
-  ParsStochastic(parameters::Table& p, const std::string& mod="")
-    : randomutils::Pars<RandomEngine,ode_engine::Pars<>>{p,mod},
-      noise(p.add("noise",mod,"Switching noise on/off",true)),
-      nTraj(p.add("nTraj",mod,"Number of trajectories",size_t(500)))
-  {}
-      
-};
-
-
-
-/// The very general concept of an averageable trajectory
-/**
- * Besides being a Trajectory, it can report a certain set of quantities, which are to be averaged either
- * - along a single Averageable trajectory (time average) or
- * - over several instances of Averageable all evolved to a certain time instant (ensemble average)
- * 
- * \tparam T the type condensing the quantities to be averaged. No implicit interface assumed @ this point.
- * Possible models: `double` or `complex` for a single c-number quantity; an \refStdCppConstruct{std::valarray,valarray/valarray}, or a quantumdata::DensityOperator
- * 
- * \todo implement general time averaging along the lines discussed in [this tracker](https://sourceforge.net/p/cppqed/feature-requests/1/#f3b3)
- * 
- */
-/*
-template<typename SA, typename T> 
-class Averageable : public Trajectory<SA>
-{
-protected:
-  Averageable() = default;
-  Averageable(Averageable&&) = default; Averageable& operator=(Averageable&&) = default;
-
-public:
-  using ToBeAveraged=T;
-  
-  virtual ~Averageable() {}
-
-  T averaged() const {return averaged_v();} ///< returns the set of quantities condensed in a variable of type `T` that are “to be averaged”
-
-private:
-  virtual T averaged_v() const = 0;
-
-};
-*/
-
-/// Represents a trajectory that has both adaptive ODE evolution and noise
-/** Simply connects Adaptive and Averageable while storing a RandomEngine instant for the convenience of derived classes. *//*
-template<typename SA, typename A, typename T, typename RandomEngine>
-class Stochastic : public Adaptive<A,Averageable<SA,T>>
-{
-protected:
-  Stochastic(Stochastic&&) = default; Stochastic& operator=(Stochastic&&) = default;
-
-public:
-  virtual ~Stochastic() {}
-
-private:
-  typedef Adaptive<A,Averageable<SA,T>> Base;
-
-  typedef typename Base::Evolved Evolved;
-
-protected:
-  /// \name Constructors
-  //@{
-  /// Straightforward constructor combining the construction of Adaptive and a random engine
-  Stochastic(A&& y, typename Evolved::Derivs derivs,
-             double dtInit,
-             int logLevel,
-             double epsRel, double epsAbs, const A& scaleAbs,
-             const evolved::Maker<A>& makerE,
-             bool isNoisy,
-             RandomEngine&& re)
-    : Base{std::forward<A>(y),derivs,dtInit,logLevel,epsRel,epsAbs,scaleAbs,makerE},
-      isNoisy_(isNoisy),
-      reInitStateDescriptor_{ [re{std::move(re)}]() {std::ostringstream oss; oss<<re; return oss.str();}() },
-      re_(std::forward<RandomEngine>(re)) {}
-
-  /// \overload
-  Stochastic(A&& y, typename Evolved::Derivs derivs,
-             double dtInit,
-             const A& scaleAbs,
-             const ParsStochastic<RandomEngine>& p,
-             const evolved::Maker<A>& makerE)
-    : Stochastic{std::forward<A>(y),derivs,dtInit,p.logLevel,p.epsRel,p.epsAbs,scaleAbs,makerE,p.noise,
-                 randomutils::streamOfOrdo(p)} {}
-  //@}
-  
-  /// \name Getters
-  //@{
-public:
-  auto& getRandomEngine() {return re_;}
-  
-protected:
-  auto isNoisy() const {return isNoisy_;}
-  //@}
-  
-  std::ostream& streamParameters_v(std::ostream& os) const override
-  {
-    return Base::streamParameters_v(os)<<"Stochastic trajectory random engine, initial state: "<<randomutils::EngineID_v<RandomEngine>
-                                       <<" "<<reInitStateDescriptor_<<std::endl<<(isNoisy_ ? "" : "No noise.\n");
+  ParsStochastic(popl::OptionParser& op) : randomutils::Pars<RandomEngine,ode::Pars<>>{op} {
+    add(op,"nTraj","Number of trajectories",size_t(500),&nTraj);
   }
-  
-  /// \name Serialization
-  //@{
-  cppqedutils::iarchive&  readStateMore_v(cppqedutils::iarchive& iar)       override {return iar & re_;}
-  cppqedutils::oarchive& writeStateMore_v(cppqedutils::oarchive& oar) const override {return oar & re_;}
-  //@}
-  
-private:
-  const bool isNoisy_;
-  
-  const std::string reInitStateDescriptor_;
-
-  RandomEngine re_;
 
 };
-*/
+
 
 
 /// Governs how to average up several `SingleTrajectory` types in the most efficient way (which is sometimes not with the naive addition operator)

@@ -16,12 +16,13 @@ using EntanglementMeasuresSwitch = std::bitset<3>;
   
 /// Forwards to trajectory::initialTimeStep, with the highest frequency of the system taken as structure::QuantumSystem::highestFrequency
 template<size_t RANK>
-double initialTimeStep(const ::structure::quantum_system_dynamics<RANK> auto qsd)
+double initialTimeStep(const ::structure::quantum_system_dynamics<RANK> auto& qsd)
 {
-  return cppqedutils::trajectory::initialTimeStep(highestFrequency(getFreqs(qsd)));
+  return ::cppqedutils::trajectory::initialTimeStep(::structure::highestFrequency(getFreqs(qsd)));
 }
 
 
+/*
 template<size_t RANK>
 std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<RANK> auto& qsd, std::ostream& os)
 {
@@ -40,7 +41,7 @@ std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<R
       return os<<label(lindblad);
     });
 }
-
+*/
 
 /// Wraps common functionality of Master & EnsembleMCWF concerning stream of quantum averages on the basis of density operators
 /**
@@ -53,7 +54,7 @@ std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<R
 template<size_t RANK,
          auto axesOfSubsystem // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
          >
-class DensityOperatorStreamer
+class DensityOperatorStreamer/*
 {
 public:
   using DensityOperator=quantumdata::DensityOperator<RANK>;
@@ -104,7 +105,7 @@ private:
 
   static constexpr bool isV_empty=boost::mpl::empty<V>::value;
   
-};
+}*/;
 
 } // quantumtrajectory
 

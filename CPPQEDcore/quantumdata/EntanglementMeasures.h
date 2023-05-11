@@ -63,12 +63,12 @@ double entropy(const DensityOperator<RANK>& rho)
 
 
 template<auto subsystemAxes, size_t RANK>
-double mutualInformation(const DensityOperator<RANK>& rho)
+double mutualInformation(const DensityOperator<RANK>& rho);/*
 {
   return entropy(reduce<V>(rho))
     +entropy(reduce<::tmptools::NegatedVector<RANK,V> >(rho))
     -entropy(rho);
-}
+}*/
 
 
 template<int RANK, typename V>

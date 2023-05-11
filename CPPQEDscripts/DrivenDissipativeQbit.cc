@@ -4,13 +4,14 @@
 #include "Qbit.h"
 
 #include "Master.h"
+#include "QuantumJumpMonteCarlo.h"
 
 #include <iostream>
 
 using namespace qbit;
 using namespace std;
 
-void f(hamiltonian<1> auto) {}
+
 
 int main(int argc, char* argv[])
 {
@@ -28,9 +29,11 @@ int main(int argc, char* argv[])
     makeHamiltonianCollection<1>(diagonalH(z),offDiagonalH(eta)),
     expectationValues }; //= make({1,1},{1,1},{1,1},1,1,1);
   
-  auto oe=::cppqedutils::ODE_EngineBoost<::quantumdata::DensityOperator<1>::StorageType>(1./(10.*highestFrequency(qbit.freqs)),1e-12,1e-30);
+  cppqedutils::ODE_EngineBoost<quantumdata::DensityOperator<1>::StorageType> oe(quantumtrajectory::initialTimeStep<1>(qbit),1e-12,1e-30);
 
   quantumtrajectory::Master<1,decltype(qbit),decltype(oe)> m{qbit,quantumdata::DensityOperator<1>{{2}},oe};
+
+  quantumtrajectory::QuantumJumpMonteCarlo<1,decltype(qbit),decltype(oe),pcg64> q{qbit,quantumdata::StateVector<1>{{2}},oe,{1001,1},0.01,0};
 
   cppqedutils::run(m,pt,cppqedutils::trajectory::observerNoOp);
 

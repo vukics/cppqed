@@ -70,10 +70,10 @@ struct QuantumSystemDynamics
 {
   SFS freqs; LI li; HA ha; EV ev;
 
-  friend auto getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
-  friend auto getLi   (const QuantumSystemDynamics& qsd) {return qsd.li;}
-  friend auto getHa   (const QuantumSystemDynamics& qsd) {return qsd.ha;}
-  friend auto getEV   (const QuantumSystemDynamics& qsd) {return qsd.ev;}
+  friend const SFS& getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
+  friend const LI & getLi   (const QuantumSystemDynamics& qsd) {return qsd.li;}
+  friend const HA & getHa   (const QuantumSystemDynamics& qsd) {return qsd.ha;}
+  friend const EV & getEV   (const QuantumSystemDynamics& qsd) {return qsd.ev;}
 };
 
 

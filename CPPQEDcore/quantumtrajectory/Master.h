@@ -1,11 +1,8 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-// #include "QuantumTrajectory.h"
-
 #include "QuantumSystemDynamics.h"
-
-#include "Trajectory.h"
+#include "QuantumTrajectory.h"
 
 
 
@@ -40,6 +37,11 @@ struct Master
     : qsd{std::forward<decltype(q)>(q)}, rho{std::forward<decltype(r)>(r)}, oe{std::forward<decltype(o)>(o)},
       rowIterationOffsets_{::cppqedutils::calculateSlicesOffsets<rowIterationRetainedAxes>(rho.extents)} {}
 
+  double time=0., time0=0.;
+  QSD qsd;
+  DensityOperator rho;
+  OE oe;
+
   friend double getDtDid(const Master& m) {return getDtDid(m.oe);}
 
   friend double getTime(const Master& m) {return m.time;}
@@ -53,20 +55,22 @@ struct Master
 
   friend ::cppqedutils::LogTree logOutro(const Master& m) {return logOutro(m.oe);}
 
-  friend ::cppqedutils::LogTree step(Master& m, double deltaT) {
-    auto res = step ( m.oe, deltaT, [&] (const typename ::quantumdata::DensityOperator<RANK>::StorageType& rhoRaw,
-                                         typename ::quantumdata::DensityOperator<RANK>::StorageType& drhodtRaw, double t)
+  friend ::cppqedutils::LogTree step(Master& m, double deltaT)
+  {
+    // TODO: think over what happens here when there is no Hamiltonian to apply – it’s probably OK, since at least one superoperator is always there
+    // Moreover, I’m not sure anymore that these algorithms should be prepared for such special cases.
+    auto res = step ( m.oe, deltaT, [&] (const typename DensityOperator::StorageType& rhoRaw,
+                                         typename DensityOperator::StorageType& drhodtRaw, double t)
     {
       ::quantumdata::DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
-      ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw};
-
-      for (dcomp& v : drhodt.dataView) v=0;
+      ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw.begin(),std::ranges::fill(drhodtRaw,0)};
 
       // TODO: std::ranges::views::zip to be applied here
       {
         auto psiRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_)};
         auto dpsidtRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt,m.rowIterationOffsets_)};
-        for (auto [psi,dpsidt]=std::make_tuple(psiRange.begin(),dpsidtRange.begin()); psi!=psiRange.end(); getHa(m.qsd)(t,*psi++,*dpsidt++,m.time0)) ;
+        for (auto [psi,dpsidt]=std::make_tuple(psiRange.begin(),dpsidtRange.begin()); psi!=psiRange.end();
+             ::structure::applyHamiltonian(getHa(m.qsd),t,*psi++,*dpsidt++,m.time0)) ;
       }
 
       twoTimesRealPartOfSelf(drhodt);
@@ -78,10 +82,10 @@ struct Master
 
     // exact propagation
     for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho.mutableView(),m.rowIterationOffsets_))
-      structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
+      ::structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
     hermitianConjugateSelf(m.rho);
     for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho.mutableView(),m.rowIterationOffsets_))
-      structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
+      ::structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
     conj(m.rho);
     m.time0=m.time;
 
@@ -117,11 +121,6 @@ struct Master
     return ar;
   }
 
-
-  double time=0., time0=0.;
-  QSD qsd;
-  DensityOperator rho;
-  OE oe;
 
 private:
   const std::vector<size_t> rowIterationOffsets_;

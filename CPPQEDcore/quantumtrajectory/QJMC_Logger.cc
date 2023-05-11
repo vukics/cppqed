@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "MCWF_TrajectoryLogger.h"
+#include "QJMC_Logger.h"
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/density.hpp>

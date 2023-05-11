@@ -6,6 +6,7 @@
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>
 
+#include <bitset>
 #include <iosfwd>
 #include <list>
 
