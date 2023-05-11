@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 
   quantumtrajectory::QuantumJumpMonteCarlo<1,decltype(qbit),decltype(oe),pcg64> q{qbit,quantumdata::StateVector<1>{{2}},oe,{1001,1},0.01};
 
-  cppqedutils::run(m,pt,cppqedutils::trajectory::observerNoOp);
+  cppqedutils::run(q,pt,cppqedutils::trajectory::observerNoOp);
 
 /*  for (size_t i=0; i<1e2; ++i) {
     step(m,1.); cppqedutils::trajectory::dataStreamerDefault(m,std::cerr<<getTime(m)<<" "<<getDtDid(m)<<"\t");

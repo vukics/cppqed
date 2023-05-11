@@ -88,7 +88,7 @@ struct QuantumJumpMonteCarlo
   {
     auto coherentTimeDevelopment = [&] (double deltaT)
     {
-      step(q.oe, std::min(getDtTry(q.oe),deltaT), [&] (const typename StateVector::StorageType& psiRaw, typename StateVector::StorageType& dpsidtRaw, double t)
+      step(q.oe, std::min(q.oe.dtTry,deltaT), [&] (const typename StateVector::StorageType& psiRaw, typename StateVector::StorageType& dpsidtRaw, double t)
       {
         ::structure::applyHamiltonian(getHa(q.qsd),t,
                                       ::quantumdata::StateVectorConstView<RANK>{q.psi.extents,q.psi.strides,0,psiRaw},
@@ -97,7 +97,7 @@ struct QuantumJumpMonteCarlo
                                       q.time0);
       },q.time,q.psi.dataStorage());
 
-      ::structure::applyPropagator(getHa(q.qsd),q.time,q.psi,q.time0); q.time0=q.time;
+      ::structure::applyPropagator(getHa(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
 
       q.logger_.processNorm(renorm(q.psi));
 
@@ -115,18 +115,19 @@ struct QuantumJumpMonteCarlo
       double random=q.sampleRandom()/getDtDid(q);
 
       size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
+#pragma GCC warning "PROBLEM: What guarantees that rates is a random-access range?"
       for (; random>0 && lindbladNo!=rates.size(); random-=rates[lindbladNo++]) ;
 
       if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
         --lindbladNo;
 
-        ::structure::applyJump(li[lindbladNo].jump,q.time,q.psi);
+        ::structure::applyJump(li[lindbladNo].jump,q.time,q.psi.mutableView());
 
-        double normFactor=sqrt(rates(lindbladNo));
+        double normFactor=sqrt(rates[lindbladNo]);
 
         if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
 
-        q.psi/=normFactor;
+        for (dcomp& v : q.psi.mutableView().dataView) v/=normFactor;
 
         q.logger_.jumpOccured(q.time,lindbladNo);
       }
@@ -141,7 +142,7 @@ struct QuantumJumpMonteCarlo
 
   friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
-    return ::structure::calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, ::quantumdata::StateVectorConstView<RANK>(q.rho) );
+    return ::structure::calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, ::quantumdata::StateVectorConstView<RANK>(q.psi) );
   }
 
   friend ::cppqedutils::iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarlo& q, ::cppqedutils::iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized
@@ -154,7 +155,7 @@ struct QuantumJumpMonteCarlo
   template <typename Archive>
   friend auto& stateIO(QuantumJumpMonteCarlo& q, Archive& ar)
   {
-    stateIO(q.oe, ar & q.psi & q.time) & q.re.engine & q.logger;
+    stateIO(q.oe, ar & q.psi & q.time) & q.re.engine & q.logger_;
     q.time0=q.time;
     return ar;
   }

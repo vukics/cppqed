@@ -63,7 +63,10 @@ struct EngineWithParameters
 {
   EngineWithParameters(unsigned long s, unsigned long p) : engine{s,p}, seed{s}, prngStream{p} {}
   
-  std::ostream& stream(std::ostream& os) const {return os << "Random engine: "<<EngineID_v<Engine><<". Parameters: seed="<<seed<<", streamOrdo=" << prngStream;}
+  friend ::cppqedutils::LogTree logIntro(const EngineWithParameters& e)
+  {
+    return {{"ID",EngineID_v<Engine>},{"Parameters",::cppqedutils::LogTree{{"seed",e.seed},{"streamOrdo",e.prngStream}}}};
+  }
 
   Engine engine;
   const unsigned long seed, prngStream;
