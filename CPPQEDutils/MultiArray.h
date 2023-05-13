@@ -83,6 +83,17 @@ public:
   /// implicit conversion to a const view
   operator MultiArrayView<const T, RANK>() const requires ( !std::is_const_v<T> ) {return {extents,strides,offset,dataView}; }
 
+  void checkBounds(std::convertible_to<size_t> auto ... i) const
+  {
+#ifndef   NDEBUG
+    auto e=extents.begin();
+    (... , [&] {
+      if (auto eComp=e++; i >= *eComp)
+        throw std::range_error("Index position: "+std::to_string(eComp-extents.begin())+", index value: "+std::to_string(i)+", extent: "+std::to_string(*eComp));
+    } () );
+#endif // NDEBUG
+  }
+
   /// A MultiArray(View) is nothing else than a function that takes a set of indices (=multi-index) as argument and returns the element corresponding to that multi-index
   /** 
    * The index of the underlying 1D storage is calculated as \f[ o + \sum_{\iota=0}^{\iota<R} s_{\iota} i_{\iota} ,\f]
@@ -92,19 +103,9 @@ public:
    */
   T& operator() (Extents<RANK> idx) const
   {
-#ifndef   NDEBUG
-    for (size_t i=0; i<RANK; ++i) if (idx[i] >= extents[i]) throw std::range_error("Index position: "+std::to_string(i)+", index value: "+std::to_string(idx[i])+", extent: "+std::to_string(extents[i]));
-#endif // NDEBUG
+    std::apply([this] (auto &&... args) { checkBounds(std::forward<decltype(args)>(args)...); },idx);
     return dataView[std_ext::ranges::fold(boost::combine(idx,strides),offset,
                                           [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
-  }
-  
-  void checkBounds(std::convertible_to<size_t> auto ... i) const
-  {
-    auto e=extents.begin();
-#ifndef   NDEBUG
-    (... , [&] { if (auto eComp=e++; i >= *eComp) throw std::range_error("Index position: "+std::to_string(eComp-extents.begin())+", index value: "+std::to_string(i)+", extent: "+std::to_string(*eComp)); } () );
-#endif // NDEBUG
   }
   
   T& operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==RANK)
@@ -112,9 +113,7 @@ public:
     checkBounds(i...);
     size_t idx=0;
     auto s=strides.begin();
-
     return dataView[ offset + ( ... , [&] { return idx+=(*s++)*i;} () ) ];
-
   }
   
   /// A simple specialization for unary views

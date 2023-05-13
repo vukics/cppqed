@@ -82,10 +82,12 @@ struct QuantumJumpMonteCarlo
     return {{"Quantum-Jump Monte Carlo",{{"QJMC algorithm","stepwise"},{"odeEngine",logIntro(q.oe)},{"randomEngine",logIntro(q.re)},{"System","TAKE FROM SYSTEM"}}}};
   }
 
-  friend ::cppqedutils::LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {/*{"QJMC",logOutro(q.logger_)},*/{"ODE_Engine",logOutro(q.oe)}};}
+  friend ::cppqedutils::LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {{"QJMC",q.logger_.outro()},{"ODE_Engine",logOutro(q.oe)}};}
 
-  friend ::cppqedutils::LogTree step(QuantumJumpMonteCarlo& q, double deltaT)
+  friend auto step(QuantumJumpMonteCarlo& q, double deltaT)
   {
+    ::cppqedutils::LogTree res;
+
     auto coherentTimeDevelopment = [&] (double deltaT)
     {
       step(q.oe, std::min(q.oe.dtTry,deltaT), [&] (const typename StateVector::StorageType& psiRaw, typename StateVector::StorageType& dpsidtRaw, double t)
@@ -107,9 +109,9 @@ struct QuantumJumpMonteCarlo
 
     if (const auto& li{getLi(q.qsd)}; size(li)) {
 
-      auto rates{ li | std::views::transform( [&] (const ::structure::Lindblad<RANK>& l) {return ::structure::calculateRate(l.rate,q.time,q.psi); } ) };
+      auto rates{ li | std::views::transform( [&] (const ::structure::Lindblad<RANK>& l) -> double {return ::structure::calculateRate(l.rate,q.time,q.psi); } ) };
 
-      q.manageTimeStep(rates);
+      res.push_back(q.manageTimeStep(rates));
 
       // perform jump
       double random=q.sampleRandom()/getDtDid(q);
@@ -119,22 +121,25 @@ struct QuantumJumpMonteCarlo
       for (; random>0 && lindbladNo!=rates.size(); random-=rates[lindbladNo++]) ;
 
       if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
-        --lindbladNo;
+        ::structure::applyJump(li[--lindbladNo].jump,q.time,q.psi.mutableView());
 
-        ::structure::applyJump(li[lindbladNo].jump,q.time,q.psi.mutableView());
-
+        std::cerr<<"### "<<lindbladNo<<" "<<rates[lindbladNo]<<" "<<*std::begin(rates)
+          <<" "<<::structure::calculateRate(li[0].rate,q.time,q.psi)<<" "<<::structure::calculateRate(li[1].rate,q.time,q.psi)
+          <<" "<<norm(q.psi)<<std::endl;
         double normFactor=sqrt(rates[lindbladNo]);
 
         if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
 
         for (dcomp& v : q.psi.mutableView().dataView) v/=normFactor;
 
-        q.logger_.jumpOccured(q.time,lindbladNo);
+        res.push_back(q.logger_.jumpOccured(q.time,lindbladNo));
       }
 
     }
 
     q.logger_.step();
+
+    return res;
 
   }
 

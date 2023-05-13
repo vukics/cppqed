@@ -30,11 +30,23 @@ namespace quantumdata {
  * TODO: (re)evaluate the alternative design of making StateVectorConstView & DensityOperatorConstView optional bases of MultiArray
  *   In that case, lazy_density_operator-style indexing could be defined as member functions
  */
-template <size_t RANK>
-dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, std::convertible_to<size_t> auto ... i) requires (sizeof...(i)==2*RANK);
+inline dcomp _(::cppqedutils::MultiArrayConstView<dcomp,1> psi, size_t i, size_t j) {return psi(i)*std::conj(psi(j));}
+
+inline dcomp _(::cppqedutils::MultiArrayConstView<dcomp,2> rho, size_t i, size_t j) {return rho(i,j);}
 
 template <size_t RANK>
-dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> rho, std::convertible_to<size_t> auto ... i) requires (RANK%2==0 && sizeof...(i)==RANK) {return rho(i...);}
+dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, ::cppqedutils::Extents<RANK> i, ::cppqedutils::Extents<RANK> j)
+{
+  return psi(i)*std::conj(psi(j));
+}
+
+template <size_t TWO_TIMES_RANK>
+dcomp _(::cppqedutils::MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
+        ::cppqedutils::Extents<TWO_TIMES_RANK/2> i,
+        ::cppqedutils::Extents<TWO_TIMES_RANK/2> j) requires (TWO_TIMES_RANK%2==0)
+{
+  return rho(::cppqedutils::concatenate(i,j));
+}
 
 
 template <size_t RANK>

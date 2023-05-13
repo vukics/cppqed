@@ -80,6 +80,7 @@ struct Lindblad
 };
 
 
+#pragma GCC warning "TODO: maybe liouvillian could yet be a concrete (random-access) range type?"
 template <typename L, size_t RANK>
 concept liouvillian = std::ranges::forward_range<L> && std::is_same_v<std::ranges::range_value_t<L>,Lindblad<RANK>>;
 

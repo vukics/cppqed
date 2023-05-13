@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Archive.h"
+#include "Traits.h"
 
 #include <boost/serialization/list.hpp>
 #include <boost/serialization/utility.hpp>
@@ -56,38 +57,36 @@ struct EnsembleLogger
 class Logger
 {
 public:
-  typedef std::list<std::pair<double,size_t> > jumpTrajectory; ///< Stores <time instant, lindbladNo> pairs, that is, the complete stochastic MCWF trajectory (the rest is deterministic)
+  typedef std::list<std::pair<double,size_t> > jumpTrajectory; ///< Stores <time instant, lindbladNo> pairs, that is, the complete stochastic QJMC trajectory (the rest is deterministic)
 
   /// Straightforward constructor
   Logger(size_t nLindblads);
 
-  void step(); ///< registers an MCWF step
+  void step(); ///< registers a QJMC step
 
   ::cppqedutils::LogTree overshot(double dp, double oldDtTry, double newDtTry); ///< registers a \link qjmc::Pars::dpLimit dpLimit\endlink overshoot
 
   void processNorm(double norm); ///< bookkeeps maximal deviation of the stochastic state vector from norm 1
 
-  void jumpOccured(double t, size_t lindbladNo); ///< registers a jump at time `t` with its identifying ordinal
+  ::cppqedutils::LogTree jumpOccured(double t, size_t lindbladNo); ///< registers a jump at time `t` with its identifying ordinal
 
-  std::ostream& onEnd(std::ostream&) const; ///< streams summary log information at the end (called by QuantumJumpMonteCarlo::logOnEnd_v)
+  ::cppqedutils::LogTree outro() const; ///< streams summary log information at the end (called by QuantumJumpMonteCarlo::logOnEnd_v)
   
   const jumpTrajectory& getTrajectory() const {return traj_;}
   
 private:
   friend class boost::serialization::access;
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int) {ar & nMCWF_steps_ & nOvershot_ & nToleranceOvershot_
-                                                      & dpMaxOvershoot_ & dpToleranceMaxOvershoot_ & normMaxDeviation_
-                                                      & traj_;}
+  void serialize(Archive& ar, const unsigned int) {ar & nQJMC_steps_ & nOvershot_ & dpMaxOvershoot_ & normMaxDeviation_ & traj_;}
 
   friend struct EnsembleLogger;
   
   const size_t nLindblads_;
 
-  size_t nMCWF_steps_, nOvershot_, nToleranceOvershot_;
-  double dpMaxOvershoot_, dpToleranceMaxOvershoot_, normMaxDeviation_;
+  size_t nQJMC_steps_{}, nOvershot_{};
+  double dpMaxOvershoot_{}, normMaxDeviation_{};
 
-  jumpTrajectory traj_;
+  jumpTrajectory traj_{};
   
 };
 

@@ -11,69 +11,49 @@
 
 using namespace std;
 
+using cppqedutils::LogTree;
 
-quantumtrajectory::mcwf::Logger::Logger(int logLevel, size_t nLindblads)
-  : logLevel_(logLevel), nLindblads_(nLindblads),
-    nMCWF_steps_(), nOvershot_(), nToleranceOvershot_(),
-    dpMaxOvershoot_(), dpToleranceMaxOvershoot_(), normMaxDeviation_(),
-    traj_()
-{}
+quantumtrajectory::qjmc::Logger::Logger(size_t nLindblads) : nLindblads_(nLindblads) {}
 
 
-ostream& quantumtrajectory::mcwf::Logger::onEnd(ostream& os) const
+LogTree quantumtrajectory::qjmc::Logger::outro() const
 {
-  if (logLevel_) {
-    os<<"\nTotal number of MCWF steps: "<<nMCWF_steps_<<endl
-      <<"\ndpLimit overshot: "<<nOvershot_<<" times, maximal overshoot: "<<dpMaxOvershoot_
-      <<"\ndpTolerance overshot: "<<nToleranceOvershot_<<" times, maximal overshoot: "<<dpToleranceMaxOvershoot_<<endl
-      <<"\nMaximal deviation of norm from 1: "<<normMaxDeviation_<<endl
-      <<"\nMCWF Trajectory:\n";
-      
-    for (auto i : traj_) os<<i.first<<"\t"<<i.second<<std::endl;
-    os<<endl;
-  }
-  return os;
+  return {
+    {"Total number of MCWF steps",nQJMC_steps_},
+    {"dpLimit overshot",{
+      {"nOvershot",nOvershot_},
+      {"maximal overshoot",dpMaxOvershoot_}}},
+    {"normMaxDeviation",normMaxDeviation_},
+    {"Jump trajectory",LogTree{traj_}}};
 }
 
 
-void quantumtrajectory::mcwf::Logger::step() {++nMCWF_steps_;}
+void quantumtrajectory::qjmc::Logger::step() {++nQJMC_steps_;}
 
 
-void quantumtrajectory::mcwf::Logger::stepBack(ostream& os, double dp, double dtDid, double newDtTry, double t, bool logControl)
+LogTree quantumtrajectory::qjmc::Logger::overshot(double dp, double oldDtTry, double newDtTry)
 {
-  ++nToleranceOvershot_;
-  if (logControl) dpToleranceMaxOvershoot_=max(dpToleranceMaxOvershoot_,dp);
-  if (logLevel_>2)
-    os<<"dpTolerance overshot: "<<dp<<" stepping back to "<<t<<" timestep decreased: "<<dtDid<<" => "<<newDtTry<<endl;
+  ++nOvershot_; dpMaxOvershoot_=max(dpMaxOvershoot_,dp);
+  return {{"dpLimit overshot",dp},{"timestep decreased",{{"from",oldDtTry},{"to",newDtTry}}}};
 }
 
 
-void quantumtrajectory::mcwf::Logger::overshot(ostream& os, double dp, double oldDtTry, double newDtTry, bool logControl)
-{
-  ++nOvershot_;
-  if (logControl) dpMaxOvershoot_=max(dpMaxOvershoot_,dp);
-  if (logLevel_>2)
-    os<<"dpLimit overshot: "<<dp<<" timestep decreased: "<<oldDtTry<<" => "<<newDtTry<<endl;
-}
-
-
-void quantumtrajectory::mcwf::Logger::processNorm(double norm)
+void quantumtrajectory::qjmc::Logger::processNorm(double norm)
 {
   normMaxDeviation_=max(normMaxDeviation_,fabs(1-norm));
-  // NEEDS_WORK this should be somehow weighed by the timestep
+  // TODO: this should be somehow weighed by the timestep
 }
 
 
-void quantumtrajectory::mcwf::Logger::jumpOccured(ostream& os, double t, size_t lindbladNo)
+LogTree quantumtrajectory::qjmc::Logger::jumpOccured(double t, size_t lindbladNo)
 {
   traj_.push_back({t,lindbladNo});
-  if (logLevel_>1)
-    os<<"Jump No. "<<lindbladNo<<" at time "<<t<<endl;
+  return {{"jump no.",lindbladNo},{"at time",t}};
 }
 
 
-
-ostream& quantumtrajectory::mcwf::EnsembleLogger::stream(ostream& os, const LoggerList& loggerList, size_t nBins, size_t nJumpsPerBin)
+/*
+ostream& quantumtrajectory::qjmc::EnsembleLogger::stream(ostream& os, const LoggerList& loggerList, size_t nBins, size_t nJumpsPerBin)
 {
   using namespace boost;
 
@@ -84,7 +64,8 @@ ostream& quantumtrajectory::mcwf::EnsembleLogger::stream(ostream& os, const Logg
     <<"\nOn average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
     <<"\nOn average, dpTolerance overshot: "<<AVERAGE_function(nToleranceOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpToleranceMaxOvershoot_)<<endl
     <<"\nMaximal deviation of norm from 1: "<<MAX_function(normMaxDeviation_)<<endl;
-/* NEEDS_WORK: this was before factoring out logging to Evolved/Adaptive, so it could be restored on some more fundamental level:  if (loggerList.front().isHamiltonian_) os<<"\nAverage number of failed ODE steps: "<<AVERAGE_function(nFailedSteps_)<<"\nAverage number of Hamiltonian calls:"<<AVERAGE_function(nHamiltonianCalls_)<<endl;*/
+// NEEDS_WORK: this was before factoring out logging to Evolved/Adaptive, so it could be restored on some more fundamental level:  if (loggerList.front().isHamiltonian_)
+//    os<<"\nAverage number of failed ODE steps: "<<AVERAGE_function(nFailedSteps_)<<"\nAverage number of Hamiltonian calls:"<<AVERAGE_function(nHamiltonianCalls_)<<endl;
       
 #undef  MAX_function
 #undef  AVERAGE_function
@@ -116,3 +97,4 @@ ostream& quantumtrajectory::mcwf::EnsembleLogger::stream(ostream& os, const Logg
   return os;
 }
 
+*/
