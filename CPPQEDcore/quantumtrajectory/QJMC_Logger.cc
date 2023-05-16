@@ -24,7 +24,7 @@ LogTree quantumtrajectory::qjmc::Logger::outro() const
       {"nOvershot",nOvershot_},
       {"maximal overshoot",dpMaxOvershoot_}}},
     {"normMaxDeviation",normMaxDeviation_},
-    {"Jump trajectory",LogTree{traj_}}};
+    {"Jump trajectory",traj_}};
 }
 
 
@@ -48,7 +48,7 @@ void quantumtrajectory::qjmc::Logger::processNorm(double norm)
 LogTree quantumtrajectory::qjmc::Logger::jumpOccured(double t, size_t lindbladNo)
 {
   traj_.push_back({t,lindbladNo});
-  return {{"jump no.",lindbladNo},{"at time",t}};
+  return {{"no.",lindbladNo},{"at time",t}};
 }
 
 

@@ -58,12 +58,14 @@ struct QuantumJumpMonteCarlo
 
   using EnsembleAverageElement = StateVector;
   using EnsembleAverageResult = quantumdata::DensityOperator<RANK>;
+
+  using Rates = std::vector<double>;
   
   QuantumJumpMonteCarlo(auto&& q, auto&& p, auto&& o, randomutils::EngineWithParameters<RandomEngine> r, double dpLimit)
   : qsd{std::forward<decltype(q)>(q)}, psi{std::forward<decltype(p)>(p)}, oe{std::forward<decltype(o)>(o)}, re{r}, dpLimit_{dpLimit},
     logger_{size(getLi(qsd))}
   {
-    if (const auto& li{getLi(qsd)}; !time && size(li) ) manageTimeStep(li | std::views::transform( [&] (const ::structure::Lindblad<RANK>& l) {return ::structure::calculateRate(l.rate,time,psi); } ) );
+    if (const auto& li{getLi(qsd)}; !time && size(li) ) manageTimeStep( calculateRates(li) );
   }
 
   double time=0., time0=0.;
@@ -109,9 +111,9 @@ struct QuantumJumpMonteCarlo
 
     if (const auto& li{getLi(q.qsd)}; size(li)) {
 
-      auto rates{ li | std::views::transform( [&] (const ::structure::Lindblad<RANK>& l) -> double {return ::structure::calculateRate(l.rate,q.time,q.psi); } ) };
+      auto rates(q.calculateRates(li));
 
-      res.push_back(q.manageTimeStep(rates));
+      res=q.manageTimeStep(rates);
 
       // perform jump
       double random=q.sampleRandom()/getDtDid(q);
@@ -132,7 +134,7 @@ struct QuantumJumpMonteCarlo
 
         for (dcomp& v : q.psi.mutableView().dataView) v/=normFactor;
 
-        res.push_back(q.logger_.jumpOccured(q.time,lindbladNo));
+        res.emplace("jump",q.logger_.jumpOccured(q.time,lindbladNo));
       }
 
     }
@@ -165,6 +167,13 @@ struct QuantumJumpMonteCarlo
     return ar;
   }
   
+  auto calculateRates(const ::structure::liouvillian<RANK> auto& li) const
+  {
+    Rates res(std::size(li));
+    std::ranges::transform(li, res.begin(), [&] (const ::structure::Lindblad<RANK>& l) -> double {return ::structure::calculateRate(l.rate,time,psi); } );
+    return res;
+  }
+
   double sampleRandom() {return distro_(re.engine);}
 
 private:
@@ -175,7 +184,7 @@ private:
 
   StateVector averaged() const {return psi;}
 
-  auto manageTimeStep(const auto& rates)
+  auto manageTimeStep(const Rates& rates)
   {
     ::cppqedutils::LogTree res;
 
@@ -184,7 +193,7 @@ private:
 
     const double liouvillianSuggestedDtTry=dpLimit_/totalRate;
 
-    if (totalRate*dtTry>dpLimit_) res.push_back(logger_.overshot(totalRate*dtTry,dtTry,liouvillianSuggestedDtTry));
+    if (totalRate*dtTry>dpLimit_) res=logger_.overshot(totalRate*dtTry,dtTry,liouvillianSuggestedDtTry);
 
     // dtTry-adjustment for next step:
     oe.dtTry = std::min(oe.dtTry,liouvillianSuggestedDtTry) ;
