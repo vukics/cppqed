@@ -61,8 +61,8 @@ struct QuantumJumpMonteCarlo
 
   using Rates = std::vector<double>;
   
-  QuantumJumpMonteCarlo(auto&& q, auto&& p, auto&& o, randomutils::EngineWithParameters<RandomEngine> r, double dpLimit)
-  : qsd{std::forward<decltype(q)>(q)}, psi{std::forward<decltype(p)>(p)}, oe{std::forward<decltype(o)>(o)}, re{r}, dpLimit_{dpLimit},
+  QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
+  : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re}, dpLimit_{dpLimit},
     logger_{size(getLi(qsd))}
   {
     if (const auto& li{getLi(qsd)}; !time && size(li) ) manageTimeStep( calculateRates(li) );
@@ -172,6 +172,9 @@ struct QuantumJumpMonteCarlo
     Rates res(std::size(li));
     std::ranges::transform(li, res.begin(), [&] (const ::structure::Lindblad<RANK>& l) -> double {return ::structure::calculateRate(l.rate,time,psi); } );
     return res;
+    // TODO: with std::ranges::to the following beautiful solution will be possible:
+    // return li | std::views::transform([&] (const ::structure::Lindblad<RANK>& l) -> double {return ::structure::calculateRate(l.rate,time,psi); } ) | std::ranges::to<Rates>() ;
+
   }
 
   double sampleRandom() {return distro_(re.engine);}

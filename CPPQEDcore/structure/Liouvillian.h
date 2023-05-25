@@ -105,7 +105,7 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 
   unaryIteration(); hermitianConjugateSelf(rhoTemp); unaryIteration();
 
-  for (auto&& [t,o] : boost::combine(drhodt.dataView,rhoTemp.dataView) ) t+=o;
+  for (auto& [t,o] : std::views::zip(drhodt.dataView,rhoTemp.dataView) ) t+=o;
 }
 
 

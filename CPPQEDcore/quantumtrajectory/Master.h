@@ -33,8 +33,8 @@ struct Master
 {
   typedef quantumdata::DensityOperator<RANK> DensityOperator;
 
-  Master(auto&& q, auto&& r, auto&& o)
-    : qsd{std::forward<decltype(q)>(q)}, rho{std::forward<decltype(r)>(r)}, oe{std::forward<decltype(o)>(o)},
+  Master(auto&& qsd, auto&& rho, auto&& oe)
+    : qsd{std::forward<decltype(qsd)>(qsd)}, rho{std::forward<decltype(rho)>(rho)}, oe{std::forward<decltype(oe)>(oe)},
       rowIterationOffsets_{::cppqedutils::calculateSlicesOffsets<rowIterationRetainedAxes>(rho.extents)} {}
 
   double time=0., time0=0.;
@@ -65,7 +65,10 @@ struct Master
       ::quantumdata::DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
       ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw.begin(),std::ranges::fill(drhodtRaw,0)};
 
-      // TODO: std::ranges::views::zip to be applied here
+      // TODO: std::ranges::views::zip to be applied here, but for some reason, sliceRange is not compatible with zipping – it does work with sliceRangeSimple, though.
+      //for (auto [psi,dpsidt] : std::views::zip(::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_),
+      //                                         ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt,m.rowIterationOffsets_) ) )
+      //  ::structure::applyHamiltonian(getHa(m.qsd),t,psi,dpsidt,m.time0) ;
       {
         auto psiRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_)};
         auto dpsidtRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt,m.rowIterationOffsets_)};

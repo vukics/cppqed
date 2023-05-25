@@ -16,7 +16,7 @@ const auto noInit = ::cppqedutils::multiarray::noInit<dcomp,RANK>;
 template <size_t RANK>
 const auto zeroInit = ::cppqedutils::multiarray::zeroInit<dcomp,RANK>;
 
-// TODO: std::ranges::views::zip to be applied here
+
 template <typename Derived>
 struct VectorSpaceOperatorsGenerator
 {
@@ -25,9 +25,7 @@ struct VectorSpaceOperatorsGenerator
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator plus");
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)};
-      for (auto [ri,ai,bi]=std::make_tuple(r.begin(),a.dataView.begin(),b.dataView.begin()); ai!=a.dataView.end(); *ri++=(*ai++)+(*bi++) ) ;
-      return r;
+      auto r{noInit<multiArrayRank_v<Derived>>(e)}; for (auto& [re,ae,be] : std::views::zip(r,a.dataView,b.dataView)) re=ae+be; return r;
     }};
   }
 
@@ -36,9 +34,7 @@ struct VectorSpaceOperatorsGenerator
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator minus");
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)};
-      for (auto [ri,ai,bi]=std::make_tuple(r.begin(),a.dataView.begin(),b.dataView.begin()); ai!=a.dataView.end(); *ri++=(*ai++)-(*bi++) ) ;
-      return r;
+      auto r{noInit<multiArrayRank_v<Derived>>(e)}; for (auto& [re,ae,be] : std::views::zip(r,a.dataView,b.dataView)) re=ae-be; return r;
     }};
   }
 
@@ -46,9 +42,7 @@ struct VectorSpaceOperatorsGenerator
   friend auto operator*(dcomp v, const Derived& a)
   {
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)};
-      for (auto [ri,ai]=std::make_tuple(r.begin(),a.dataView.begin()); ai!=a.dataView.end(); (*ri++)=v*(*ai++) ) ;
-      return r;
+      auto r{noInit<multiArrayRank_v<Derived>>(e)}; for (auto& [re,ae] : std::views::zip(r,a.dataView)) re=v*ae; return r;
     }};
   }
 
@@ -118,17 +112,7 @@ struct StateVector : ::cppqedutils::MultiArray<dcomp,RANK>, private VectorSpaceO
     size_t dim(this->getTotalDimension());
     for (size_t i=0; i<dim; i++) for (size_t j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
   }*/
-  /*
-  friend Derived operator+(const Derived&, const Derived&);
-  friend Derived operator-(const Derived& aa, const Derived& bb)
-  {
-    auto res{Derived::clone(aa)};
-    for (auto&& [r,a,b] : boost::combine(res.mutableView().dataView,aa.dataView,bb.dataView) ) r=a-b;
-    return res;
-  };
 
-  friend Derived operator*(dcomp, const ArrayBase&);
-*/
 };
 
 
