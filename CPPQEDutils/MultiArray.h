@@ -7,8 +7,6 @@
 
 #include <boost/operators.hpp>
 
-#include <boost/range/combine.hpp>
-
 #include <boost/serialization/vector.hpp>
 
 #include <array>
@@ -21,15 +19,11 @@
 
 namespace cppqedutils {
 
+// TODO: Boost.Hana is probably not needed here at all, everything can be done with constexpr std algorithms, and constexpr std arrays
 
 template<size_t... i>
-constexpr auto retainedAxes = hana::tuple_c<size_t,i...>;
+constexpr std::array retainedAxes{i...};
 
-template<size_t begin, size_t end>
-constexpr auto compileTimeRange = hana::range_c<size_t,begin,end>;
-
-template<size_t end>
-constexpr auto compileTimeOrdinals = compileTimeRange<0,end>;
 
 /// should be passed by value
 template <size_t RANK>
@@ -77,8 +71,8 @@ public:
   MultiArrayView& operator=(const MultiArrayView&) = default; MultiArrayView& operator=(MultiArrayView&&) = default;
   
   /// offset can come from a previous slicing
-  MultiArrayView(Extents<RANK> e, Extents<RANK> s, size_t o, auto&&... dv)
-    : extents{e}, strides{s}, offset{o}, dataView{std::forward<decltype(dv)>(dv)...} {}
+  MultiArrayView(Extents<RANK> extents, Extents<RANK> strides, size_t offset, auto&&... dataView)
+    : extents{extents}, strides{strides}, offset{offset}, dataView{std::forward<decltype(dataView)>(dataView)...} {}
 
   /// implicit conversion to a const view
   operator MultiArrayView<const T, RANK>() const requires ( !std::is_const_v<T> ) {return {extents,strides,offset,dataView}; }
@@ -104,8 +98,8 @@ public:
   T& operator() (Extents<RANK> idx) const
   {
     std::apply([this] (auto &&... args) { checkBounds(std::forward<decltype(args)>(args)...); },idx);
-    return dataView[std_ext::ranges::fold(boost::combine(idx,strides),offset,
-                                          [&](auto init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ) ];
+    return dataView[std_ext::ranges::fold( std::views::zip(idx,strides), offset,
+                                           [&] (auto init, auto ids) {return init+get<0>(ids)*get<1>(ids);} ) ];
   }
   
   T& operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==RANK)
@@ -120,7 +114,9 @@ public:
   T& operator() (std::convertible_to<size_t> auto i) const requires (RANK==1) {checkBounds(i); return dataView[offset+strides[0]*i];}
 
   /// A simple specialization for binary views
-  T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {checkBounds(i,j); return dataView[offset+strides[0]*i+strides[1]*j];}
+  T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {
+    checkBounds(i,j); return dataView[offset+strides[0]*i+strides[1]*j];
+  }
 
   Extents<RANK> extents, strides;
 
@@ -301,21 +297,16 @@ const auto copyInit(const std::ranges::sized_range auto& input) {return [&] (siz
  * - size of `RetainedAxes` must not be larger than `RANK`
  * - `RetainedAxes` must not contain duplicated elements
  * - all elements of `RetainedAxes` must be smaller than `RANK`
- * 
- * \todo Think over requirements here & everywhere else in multiarray
  */
-template <auto retainedAxes>
-constexpr bool consistentBase = 
-/*{
-  if constexpr ( hana::sequence(retainedAxes) ) {
-    constexpr auto sorted = hana::sort(retainedAxes);
-    return (hana::unique(sorted) == sorted);    
-  }
-  else*/ true;
-//}
-
 template <auto retainedAxes, size_t RANK>
-constexpr bool consistent = ( RANK>1 && (hana::maximum(retainedAxes) < hana::integral_c<::size_t,RANK>).value && consistentBase<retainedAxes> );
+constexpr bool consistent = (
+  RANK > 1 && std::size(retainedAxes) < RANK &&
+  (*std::ranges::max_element(retainedAxes) < RANK) &&
+  [us(retainedAxes)] mutable {
+    std::ranges::sort(us);
+    const auto [first, last] = std::ranges::unique(us);
+    return (first==last);
+} () );
 
 
 /// Filters in the indices corresponding to a subsystem
@@ -325,10 +316,10 @@ constexpr bool consistent = ( RANK>1 && (hana::maximum(retainedAxes) < hana::int
  * \todo accept several arrays at the same time (since this is how it is used by clients)
  */
 template <auto retainedAxes, size_t RANK>
-auto filterIn(Extents<RANK> idx) requires ( hana::size(retainedAxes) <= RANK )
+auto filterIn(Extents<RANK> idx) requires ( std::size(retainedAxes) < RANK )
 {
-  Extents<hana::size(retainedAxes)> res;
-  hana::fold(retainedAxes, res.begin(), [&] (auto iterator, auto ind) {*iterator=idx[ind]; return ++iterator;});
+  Extents<std::size(retainedAxes)> res;
+  std::ranges::fold_left(retainedAxes, res.begin(), [&] (auto iterator, auto ind) {*iterator=idx[ind]; return ++iterator;});
   return res;
 }
 
@@ -336,12 +327,12 @@ auto filterIn(Extents<RANK> idx) requires ( hana::size(retainedAxes) <= RANK )
 /// Filters out the indices corresponding to a subsystem (specified by `retainedAxes`)
 /** \todo accept several arrays at the same time (since this is how it is used by clients) */
 template <auto retainedAxes, size_t RANK>
-auto filterOut(Extents<RANK> idx) requires ( hana::size(retainedAxes) <= RANK )
+auto filterOut(Extents<RANK> idx) requires ( std::size(retainedAxes) < RANK )
 {
-  Extents<RANK-hana::size(retainedAxes)> res;
+  Extents<RANK-std::size(retainedAxes)> res;
   
-  hana::fold(compileTimeOrdinals<RANK>, res.begin(), [&] (auto iterator, auto ind) {
-    if ( ! hana::contains(retainedAxes, ind) ) *iterator++ = idx[ind];
+  std::ranges::fold_left(std::views::iota(0ul,RANK), res.begin(), [&] (auto iterator, auto ind) {
+    if ( ! std::ranges::contains(retainedAxes, ind) ) *iterator++ = idx[ind];
     return iterator;
   } );
   
@@ -357,7 +348,7 @@ auto filterOut(Extents<RANK> idx) requires ( hana::size(retainedAxes) <= RANK )
 template <auto retainedAxes, size_t RANK>
 auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
 {
-  Extents<RANK-hana::size(retainedAxes)> 
+  Extents<RANK-std::size(retainedAxes)>
     dummyExtents{filterOut<retainedAxes>(extents)},
     dummyStrides{filterOut<retainedAxes>(strides)}, 
     idx; idx.fill(0);
@@ -365,9 +356,8 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
   std::vector<size_t> res(calculateExtent(dummyExtents));
 
   for (auto i=res.begin(); i!=res.end(); (
-    *i++ = std_ext::ranges::fold( boost::combine(idx,dummyStrides), 
-                                  0, 
-                                  [](size_t init, auto ids) {return init+ids.template get<0>()*ids.template get<1>();} ),
+    *i++ = std_ext::ranges::fold( std::views::zip(idx,dummyStrides), 0,
+                                  [] (size_t init, auto ids) {return init+get<0>(ids)*get<1>(ids);} ),
     incrementMultiIndex(idx,dummyExtents)));
     // note: the appearance of idx on both sides of the comma operator cannot cause problems since it ensures left-to-right evaluation order
 
@@ -392,11 +382,11 @@ template <auto retainedAxes, typename T, size_t RANK>
 auto sliceRangeSimple(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets)
 requires multiarray::consistent<retainedAxes,RANK>
 {
-  using SliceType=MultiArrayView<T,hana::size(retainedAxes)>;
+  using SliceType=MultiArrayView<T,std::size(retainedAxes)>;
   
   std::vector<SliceType> res(offsets.size());
   
-  for (auto&& [slice,sliceOffset] : boost::combine(res,offsets) )
+  for (auto&& [slice,sliceOffset] : std::views::zip(res,offsets) )
     slice=SliceType{multiarray::filterIn<retainedAxes>(mav.extents),multiarray::filterIn<retainedAxes>(mav.strides),mav.offset+sliceOffset,mav.dataView};
   
   return res;
@@ -481,7 +471,7 @@ using SliceRangeOwning = SliceRangeBase<std::vector<size_t>,T,RRANK>;
 template <auto retainedAxes, typename T, size_t RANK>
 auto sliceRange(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets) requires multiarray::consistent<retainedAxes,RANK>
 {
-  return SliceRangeReferencing<T,hana::size(retainedAxes)>{
+  return SliceRangeReferencing<T,std::size(retainedAxes)>{
     multiarray::filterIn<retainedAxes>(mav.extents),
     multiarray::filterIn<retainedAxes>(mav.strides),
     mav.offset,
@@ -493,7 +483,7 @@ auto sliceRange(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets) 
 template <auto retainedAxes, typename T, size_t RANK>
 auto sliceRange(MultiArrayView<T,RANK> mav, std::vector<size_t>&& offsets) requires multiarray::consistent<retainedAxes,RANK>
 {
-  return SliceRangeOwning<T,hana::size(retainedAxes)>{
+  return SliceRangeOwning<T,std::size(retainedAxes)>{
     multiarray::filterIn<retainedAxes>(mav.extents),
     multiarray::filterIn<retainedAxes>(mav.strides),
     mav.offset,
@@ -510,7 +500,7 @@ auto sliceRange(MultiArrayView<T,RANK> mav) requires multiarray::consistent<reta
 
 
 template <auto axes, typename T, size_t RANK>
-MultiArrayView<T,RANK> transpose(MultiArrayView<T,RANK> mav) requires ( hana::size(axes) == RANK )
+MultiArrayView<T,RANK> transpose(MultiArrayView<T,RANK> mav) requires ( std::size(axes) == RANK )
 {
   mav.extents=filterIn<axes>(mav.extents); mav.strides=filterIn<axes>(mav.strides);
   return mav;

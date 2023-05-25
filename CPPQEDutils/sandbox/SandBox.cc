@@ -1,5 +1,7 @@
 // #include <boost/json.hpp>
 
+#include "MultiArray.h"
+
 #include <boost/hana.hpp>
 
 #include <complex>
@@ -8,6 +10,21 @@
 
 
 namespace hana = boost::hana;
+
+
+constexpr auto ra{cppqedutils::retainedAxes<2,0,7,4,1>};
+
+constexpr auto sorted([s(ra)] mutable { std::ranges::sort(s); return s; } () );
+
+constexpr auto uniquedSorted([us(sorted)] mutable { std::ranges::unique(us); return us; } () );
+
+constexpr bool hasDuplicate=[us(ra)] mutable { std::ranges::sort(us); const auto [first, last] = std::ranges::unique(us); return (first==last); } () ;
+
+static_assert( hasDuplicate );
+
+// static_assert( std::ranges::equal(uniquedSorted,sorted) );
+
+//static_assert( std::ranges::equal(std::ranges::unique(sorted), sorted ) );
 
 
 struct A
