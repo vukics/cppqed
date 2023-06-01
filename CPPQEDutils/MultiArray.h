@@ -19,8 +19,6 @@
 
 namespace cppqedutils {
 
-// TODO: Boost.Hana is probably not needed here at all, everything can be done with constexpr std algorithms, and constexpr std arrays
-
 template<size_t... i>
 constexpr std::array retainedAxes{i...};
 
@@ -236,6 +234,9 @@ public:
   /// non-const subscripting
   T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
   
+  /// this overload is needed, otherwise any call to operator() with a MultiArray object resolves to the previous function
+  const T& operator()(auto&&... i) const {return static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...) ;}
+
   /// access data storage
   StorageType& dataStorage() {return data_;}
   const StorageType& dataStorage() const {return data_;}
