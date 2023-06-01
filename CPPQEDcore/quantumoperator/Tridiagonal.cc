@@ -1,9 +1,31 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-// Tridiagonal.tcc needed because of binOp1
 #include "Tridiagonal.h"
 
 
 
+auto quantumoperator::compose(const quantumoperator::MultiDiagonal<1>& a, const quantumoperator::MultiDiagonal<1> b) -> MultiDiagonal<1>
+{
+  if (a.dimensions!=b.dimensions) throw std::runtime_error("Mismatch in MultiDiagonal::compose dimensions");
+
+  MultiDiagonal<1> res{a.dimensions};
+
+  for (auto&& [ao,ad] : a.diagonals) for (auto&& [bo,bd] : b.diagonals) {
+    int n=ao[0], s=ao[0]+bo[0];
+    MultiDiagonal<1>::Offsets composedOffsets{s};
+    MultiDiagonal<1>::Diagonal composedDiagonal{ {a.dimensions[0]-s}, ::quantumdata::noInit<1> };
+    auto composedIndexer{MultiDiagonal<1>::diagonalIndexer(composedOffsets,composedDiagonal)};
+    auto aIndexer{MultiDiagonal<1>::diagonalIndexer(ao,ad)};
+    auto bIndexer{MultiDiagonal<1>::diagonalIndexer(bo,bd)};
+    for (size_t k=0; k<a.dimensions[0]-s; ++k) composedIndexer({k})=aIndexer({k})*bIndexer({k+n});
+    try { for (auto&& [de,cde] : std::views::zip(res.diagonals.at(composedOffsets).mutableView().dataView,composedDiagonal.dataView)) de+=cde; }
+    catch (const std::out_of_range&) { res.diagonals.insert({composedOffsets,std::move(composedDiagonal)}); }
+  }
+  return res;
+}
+
+
+
+/*
 namespace quantumoperator {
 
 template<>
@@ -72,3 +94,4 @@ const Tridiagonal<1> identity(size_t dim)
 } // quantumoperator
 
 
+*/
