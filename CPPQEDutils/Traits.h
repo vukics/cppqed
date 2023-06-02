@@ -90,6 +90,10 @@ OUT getLabel(H&& h)
 }
 
 
+/// this solution comes directly from ChatGPT
+template <size_t N> constexpr auto compileTimeOrdinals = [] {std::array<size_t,N> res{}; std::iota(res.begin(),res.end(),0); return res;} ();
+
+
 } // cppqedutils
 
 

@@ -1,9 +1,21 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{The mode-bundle convenience header}
-#ifndef   CPPQEDELEMENTS_FREES_MODE_H_INCLUDED
-#define   CPPQEDELEMENTS_FREES_MODE_H_INCLUDED
+#pragma once
 
-#include "Mode.tcc"
-#include "ParsMode.h"
+#include "QuantumSystemDynamics.h"
 
-#endif // CPPQEDELEMENTS_FREES_MODE_H_INCLUDED
+#include "MultiDiagonal.h"
+
+
+namespace mode {
+
+
+using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;
+
+
+MultiDiagonal aOp(size_t cutoff);
+
+MultiDiagonal aDagOp(size_t cutoff);
+
+MultiDiagonal nOp(size_t cutoff);
+
+} // mode

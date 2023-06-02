@@ -41,9 +41,9 @@ struct MultiDiagonal
 
   using Diagonal = ::cppqedutils::MultiArray<dcomp,RANK>;
 
-  /// indexing via a diagonalIndexer ensures that all diagonals are indexed 0 … e-1-o, where e is the extent along the given dimension, and o is the offset
+  /// indexing via an indexer ensures that all diagonals are indexed 0 … e-1-o, where e is the extent along the given dimension, and o is the offset
   template <typename D> requires std::same_as<std::decay_t<D>,Diagonal>
-  static auto diagonalIndexer(const Offsets& offsets, D&& diagonal) {
+  static auto indexer(const Offsets& offsets, D&& diagonal) {
     return [&] (::cppqedutils::Extents<RANK> idx) {
       for (auto&& [o,i] : std::views::zip(offsets,idx)) if (o<0) i+=o;
       return diagonal(idx);
@@ -62,18 +62,24 @@ struct MultiDiagonal
   Diagonals diagonals;
   // double tCurrent=0;
 
+  void hermitianConjugateSelf() {
+    Diagonals newDiagonals;
+    for (auto iter=diagonals.begin(); iter!=diagonals.end(); ++iter) {
+      Offsets newOffsets{};
+      for (size_t i=0; i<RANK; ++i) newOffsets[i]=-iter->first[i]; // negate the offsets
+      conj(iter->second); // conjugate the diagonal
+      newDiagonals.insert(std::pair{newOffsets,std::move(iter->second)});
+    }
+    diagonals.swap(newDiagonals);
+  }
+
   /// calculates a propagator from `mainDiagonal` and stores them in `frequencies`
-  MultiDiagonal& furnishWithFreqs(const Diagonal& mainDiagonal) requires (RANK==1);
+  // MultiDiagonal& furnishWithFreqs(const Diagonal& mainDiagonal) requires (RANK==1);
   
   /// propagates the elements of the matrix to time instant `t` using `frequencies`
-  MultiDiagonal& propagate(double t);
+  // MultiDiagonal& propagate(double t);
   
   /// Calculates the quantum average of a MultiDiagonal in a quantum state described by a (unary) quantumdata::LazyDensityOperator
-  /**
-    * \note Not implemented.
-    *
-    * \todo Implement.
-    */
   // template<int R=RANK> std::enable_if_t<R==1,dcomp> average(const quantumdata::LazyDensityOperator<1>&, const typename quantumdata::LazyDensityOperator<1>::Idx&);
 
 
@@ -84,7 +90,6 @@ struct MultiDiagonal
   MultiDiagonal& operator*=(double d) {(*this)*=dcomp(d,0); return *this;} ///< ”
   MultiDiagonal& operator/=(double d) {(*this)*=1./dcomp(d,0); return *this;} ///< ”
 
-  // void           hermitianConjugateSelf();
     /// Returns a newly constructed object, which is the Hermitian conjugate of `this`.
     /**
     * Transposition involves a non-trivial permutation of diagonals, which could be done @ compile-time, but at the moment it’s runtime.
