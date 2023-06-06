@@ -149,12 +149,12 @@ auto reduce(const DensityOperator<RANK>& matrix)
 */
 
 
-
+/// TODO: in what way is this different from the Frobenius norm?
 template<size_t RANK>
-double purity(const DensityOperator<RANK>& rho)
+double purity(const DensityOperator<RANK>& rho)/*
 {
-  return std_ext::ranges::fold(rho.dataView,0.,[] (double init, dcomp element) { return init+sqrAbs(element); });
-}
+  return std::ranges::fold_left(rho.dataView,0.,[] (double init, dcomp element) { return init+sqrAbs(element); });
+}*/ ;
 
 
 template <size_t RANK>

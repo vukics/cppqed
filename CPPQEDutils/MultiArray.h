@@ -96,8 +96,8 @@ public:
   T& operator() (Extents<RANK> idx) const
   {
     std::apply([this] (auto &&... args) { checkBounds(std::forward<decltype(args)>(args)...); },idx);
-    return dataView[std_ext::ranges::fold( std::views::zip(idx,strides), offset,
-                                           [&] (auto init, auto ids) {return init+get<0>(ids)*get<1>(ids);} ) ];
+    return dataView[std::ranges::fold_left( std::views::zip(idx,strides), offset,
+                                            [&] (auto init, auto ids) {return init+get<0>(ids)*get<1>(ids);} ) ];
   }
   
   T& operator() (std::convertible_to<size_t> auto ... i) const requires (sizeof...(i)==RANK)
@@ -172,10 +172,10 @@ auto calculateStrides(Extents<RANK> extents)
   return strides;
 }
 
-template <size_t RANK>
+template <size_t RANK> requires ( RANK > 0 )
 auto calculateExtent(Extents<RANK> extents)
 {
-  return std_ext::ranges::fold(extents,size_t{1},std::multiplies{});
+  return std::ranges::fold_left(extents,1uz,std::multiplies{});
 }
 
 template <typename T, size_t RANK>
@@ -357,8 +357,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents, Extents<RANK> strides)
   std::vector<size_t> res(calculateExtent(dummyExtents));
 
   for (auto i=res.begin(); i!=res.end(); (
-    *i++ = std_ext::ranges::fold( std::views::zip(idx,dummyStrides), 0,
-                                  [] (size_t init, auto ids) {return init+get<0>(ids)*get<1>(ids);} ),
+    *i++ = std::ranges::fold_left_first( std::views::zip(idx,dummyStrides) | std::views::transform( [] (auto ids) {return get<0>(ids)*get<1>(ids);} ) , std::plus{}).value_or(0uz) ,
     incrementMultiIndex(idx,dummyExtents)));
     // note: the appearance of idx on both sides of the comma operator cannot cause problems since it ensures left-to-right evaluation order
 

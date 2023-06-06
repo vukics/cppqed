@@ -75,7 +75,7 @@ MultiArray<dcomp,RANK>& conj(MultiArray<dcomp,RANK>& ma)
 
 
 template <size_t RANK>
-double frobeniusNorm(const MultiArray<dcomp,RANK>& ma) { return sqrt( std_ext::ranges::fold( ma.dataView | std::views::transform(sqrAbs) , 0., std::plus{} ) ); }
+double frobeniusNorm(const MultiArray<dcomp,RANK>& ma) { return sqrt( std::ranges::fold_left_first( ma.dataView | std::views::transform(sqrAbs), std::plus{} ).value_or(0.) ); }
 
 
 template <size_t TWO_TIMES_RANK>

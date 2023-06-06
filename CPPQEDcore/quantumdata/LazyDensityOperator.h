@@ -76,10 +76,8 @@ auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<siz
   using LDO = decltype(matrix);
  
   const auto iterateSlices{[&] (const auto& sr) {
-    return std_ext::ranges::fold(
-      sr | std::views::drop(1),
-      function(*std::ranges::begin(sr)),
-      [&] (const auto& res, const auto& slice) {return plus(res,function(slice));});
+    return std::ranges::fold_left_first(
+      sr | std::views::transform(function), [&] (const auto& res, const auto& slice) {return plus(res,slice);}).value();
   }};
 
   if constexpr (std::same_as<LDO,StateVectorConstView<RANK>>) {

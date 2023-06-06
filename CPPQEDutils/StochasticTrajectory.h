@@ -42,12 +42,7 @@ struct AverageTrajectories
   /// Naive generic implementation
   static const auto& _(typename SingleTrajectory::EnsembleAverageResult& res, const std::vector<SingleTrajectory>& trajs)
   {
-    return res = std_ext::ranges::fold(
-      trajs | std::views::drop(1),
-      trajs.begin()->averaged(),
-      [] (const auto& init, const SingleTrajectory& s) {
-       return init + s.averaged();
-    })/trajs.size();
+    return std::ranges::fold_left_first (trajs | std::views::transform( [] (const SingleTrajectory& s) {return s.averaged();} ), std::plus{} ).value()/trajs.size();
   }
   
 };
@@ -102,9 +97,11 @@ public:
   void advance(double deltaT, std::ostream& logStream) {for (auto& t : trajs_) cppqedutils::advance(t,deltaT,logStream);}
 
   /// An average of `dtDid`s from individual trajectories.
-  double getDtDid() const {return std_ext::ranges::fold(trajs_,0.,[] (double init, const SingleTrajectory& t) {
-      return init+t.getDtDid();
-    })/trajs_.size();
+  double getDtDid() const
+  {
+    return std::ranges::fold_left_first( trajs_ | std::views::transform([] (const SingleTrajectory& t) {
+      return t.getDtDid();
+    }), std::plus{} ).value()/trajs_.size();
   }
   
   std::ostream& streamParameters(std::ostream& os) const {return trajs_.front().streamParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
