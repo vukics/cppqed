@@ -4,7 +4,7 @@
 
 mode::MultiDiagonal mode::aOp(size_t cutoff)
 {
-  MultiDiagonal res(::cppqedutils::Extents<1>{cutoff});
+  MultiDiagonal res{};
   res.diagonals.insert({MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{{cutoff-1}, [c=cutoff] (size_t) {
     // TODO: pending support for std::ranges::to, the following solution will be possible:
     // return std::ranges::to<MultiDiagonal::Diagonal::StorageType>(std::views::iota(0uz, c-1) | std::views::transform([] (size_t num) -> dcomp { return std::sqrt(num+1); }));

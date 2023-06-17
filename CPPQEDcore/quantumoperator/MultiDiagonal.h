@@ -3,6 +3,7 @@
 
 #include "StateVector.h"
 
+#include <iostream>
 
 
 /// Comprises modules representing operators of special structure (multidiagonal, sparse) over Hilbert spaces of arbitrary arity
@@ -23,9 +24,7 @@ namespace quantumoperator {
 template <size_t RANK>
 struct MultiDiagonal
 {
-  using Dimensions=::cppqedutils::Extents<RANK>;
-
-  using Offsets = std::array<int,RANK>;
+  using Offsets = std::array<ptrdiff_t,RANK>;
 
   struct CompareOffsets
   {
@@ -45,7 +44,9 @@ struct MultiDiagonal
   template <typename D> requires std::same_as<std::decay_t<D>,Diagonal>
   static auto indexer(const Offsets& offsets, D&& diagonal) {
     return [&] (::cppqedutils::Extents<RANK> idx) {
-      for (auto&& [o,i] : std::views::zip(offsets,idx)) if (o<0) i+=o;
+      std::cerr<<cppqedutils::json(offsets)<<" "<<cppqedutils::json(idx)<<" ";
+      for (auto&& [o,i] : std::views::zip(offsets,idx)) if (o<0) i+=std::abs(o);
+      std::cerr<<cppqedutils::json(idx)<<std::endl;
       return diagonal(idx);
     };
   }
@@ -56,13 +57,13 @@ struct MultiDiagonal
   MultiDiagonal(const MultiDiagonal&) = delete; MultiDiagonal& operator=(const MultiDiagonal&) = delete;
   MultiDiagonal(MultiDiagonal&&) = default; MultiDiagonal& operator=(MultiDiagonal&&) = default;
 
-  explicit MultiDiagonal(Dimensions dimensions, auto&&... args) : dimensions{dimensions}, diagonals{std::forward<decltype(args)>...} {}
+  explicit MultiDiagonal(auto&&... args) : diagonals{std::forward<decltype(args)>...} {}
 
-  Dimensions dimensions;
   Diagonals diagonals;
   // double tCurrent=0;
 
-  void hermitianConjugateSelf() {
+  void hermitianConjugateSelf()
+  {
     Diagonals newDiagonals;
     for (auto iter=diagonals.begin(); iter!=diagonals.end(); ++iter) {
       Offsets newOffsets{};
@@ -112,6 +113,23 @@ struct MultiDiagonal
   MultiDiagonal& operator-=(const MultiDiagonal& tridiag) {(*this)+=-tridiag; return *this;} ///< Implemented in terms of operator+=
   //@}
  */
+
+  friend ::cppqedutils::Extents<RANK> calculateAndCheckDimensions(const MultiDiagonal& md)
+  {
+    auto transformExtentsOfDiagonals = [] (const auto& diagonal) -> ::cppqedutils::Extents<RANK> {
+      auto res{diagonal.second.extents};
+      for (auto&& [v,o] : std::views::zip(res,diagonal.first)) v+=std::abs(o);
+      return res;
+    };
+
+    auto res{transformExtentsOfDiagonals(*md.diagonals.cbegin())};
+
+    if (!std::ranges::fold_left_first( md.diagonals | std::views::drop(1) | std::views::transform([=] (const auto& diagonal) {
+      return std::ranges::equal(res,transformExtentsOfDiagonals(diagonal));
+    }), std::logical_and{} ).value_or(true)) throw std::runtime_error("Dimensions mismatch in MultiDiagonal");
+
+    return res;
+  }
 };
 
 

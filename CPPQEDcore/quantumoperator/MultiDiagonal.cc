@@ -2,20 +2,21 @@
 #include "MultiDiagonal.h"
 
 
-
 auto quantumoperator::compose(const quantumoperator::MultiDiagonal<1>& a, const quantumoperator::MultiDiagonal<1> b) -> MultiDiagonal<1>
 {
-  auto dimensions{checkAndCalculateDimensions(a)};
-  if (dimensions!=checkAndCalculateDimensions(b)) throw std::runtime_error("Mismatch in MultiDiagonal::compose dimensions");
+  auto dimensions{calculateAndCheckDimensions(a)};
+  if (dimensions!=calculateAndCheckDimensions(b)) throw std::runtime_error("Mismatch in MultiDiagonal::compose dimensions");
 
   MultiDiagonal<1> res;
 
   for (auto&& [ao,ad] : a.diagonals) for (auto&& [bo,bd] : b.diagonals) {
-    int n=ao[0], s=ao[0]+bo[0];
+    ptrdiff_t n=ao[0], s=ao[0]+bo[0];
     MultiDiagonal<1>::Offsets composedOffsets{s};
     MultiDiagonal<1>::Diagonal composedDiagonal{ {dimensions[0]-s}, ::quantumdata::noInit<1> };
-    for (size_t k=0; k<dimensions[0]-s; ++k)
-      MultiDiagonal<1>::indexer(composedOffsets,composedDiagonal)({k})=MultiDiagonal<1>::indexer(ao,ad)({k})*MultiDiagonal<1>::indexer(bo,bd)({k+n});
+    for (size_t k=0; k<dimensions[0]-s; ++k) {
+      std::cerr<<dimensions[0]<<" "<<n<<" "<<s<<" "<<k<<std::endl;
+      MultiDiagonal<1>::indexer(composedOffsets,composedDiagonal)({k})=MultiDiagonal<1>::indexer(ao,ad)({k})*MultiDiagonal<1>::indexer(bo,bd)({k+std::abs(n)});
+    }
     try { for (auto&& [de,cde] : std::views::zip(res.diagonals.at(composedOffsets).mutableView().dataView,composedDiagonal.dataView)) de+=cde; }
     catch (const std::out_of_range&) { res.diagonals.insert({composedOffsets,std::move(composedDiagonal)}); }
   }
