@@ -3,6 +3,7 @@
 
 #include "StateVector.h"
 
+#include <bitset>
 #include <iostream>
 
 
@@ -24,35 +25,13 @@ namespace quantumoperator {
 template <size_t RANK>
 struct MultiDiagonal
 {
-  using Offsets = std::array<ptrdiff_t,RANK>;
-
-  struct CompareOffsets
-  {
-    bool operator() (const Offsets& o1, const Offsets o2) const {
-      auto recurse = [&] (Offsets::const_iterator i1, Offsets::const_iterator i2, const auto r) {
-        if (i1==o1.end()) return false;
-        else if (*i1==*i2) return r(++i1,++i2,r);
-        else return *i1<*i2;
-      };
-      return recurse(o1.begin(),o2.begin(),recurse);
-    }
-  };
-
+  using Index = std::bitset<RANK>; // true means upper (or the main) diagonal, false lower
+  using Offsets = ::cppqedutils::Extents<RANK>;
   using Diagonal = ::cppqedutils::MultiArray<dcomp,RANK>;
+  using DiagToIdx = std::map<Offsets,Diagonal>;
 
-  /// indexing via an indexer ensures that all diagonals are indexed 0 … e-1-o, where e is the extent along the given dimension, and o is the offset
-  template <typename D> requires std::same_as<std::decay_t<D>,Diagonal>
-  static auto indexer(const Offsets& offsets, D&& diagonal) {
-    return [&] (::cppqedutils::Extents<RANK> idx) {
-      std::cerr<<cppqedutils::json(offsets)<<" "<<cppqedutils::json(idx)<<" ";
-      for (auto&& [o,i] : std::views::zip(offsets,idx)) if (o<0) i+=std::abs(o);
-      std::cerr<<cppqedutils::json(idx)<<std::endl;
-      return diagonal(idx);
-    };
-  }
-
-  // need to add comparison for std::arrays
-  using Diagonals = std::map<Offsets,Diagonal,CompareOffsets>;
+  /// \note `std::bitset` has hash but no comparison, whereas `std::array` has lexicographic comparison by default
+  using Diagonals = std::unordered_map<Index,DiagToIdx>;
 
   MultiDiagonal(const MultiDiagonal&) = delete; MultiDiagonal& operator=(const MultiDiagonal&) = delete;
   MultiDiagonal(MultiDiagonal&&) = default; MultiDiagonal& operator=(MultiDiagonal&&) = default;
@@ -62,17 +41,20 @@ struct MultiDiagonal
   Diagonals diagonals;
   // double tCurrent=0;
 
-  void hermitianConjugateSelf()
+  MultiDiagonal& hermitianConjugate()
   {
     Diagonals newDiagonals;
-    for (auto iter=diagonals.begin(); iter!=diagonals.end(); ++iter) {
-      Offsets newOffsets{};
-      for (size_t i=0; i<RANK; ++i) newOffsets[i]=-iter->first[i]; // negate the offsets
-      conj(iter->second); // conjugate the diagonal
-      newDiagonals.insert(std::pair{newOffsets,std::move(iter->second)});
-    }
+    for (auto& [index,innerMap] : diagonals) for (auto& [offsets,diagToIndex] : innerMap) {
+        /// in the original index all those elements must be negated for which offset is nonzero
+        Index newIndex{index}; for (size_t i=0; i<RANK; ++i) if (offsets[i]) newIndex.flip(i);
+        conj(diagToIndex); // conjugate the diagonal
+        newDiagonals[newIndex].emplace(offsets,std::move(diagToIndex));
+      }
     diagonals.swap(newDiagonals);
+    return *this;
   }
+
+  MultiDiagonal& dagger() {return hermitianConjugate();}
 
   /// calculates a propagator from `mainDiagonal` and stores them in `frequencies`
   // MultiDiagonal& furnishWithFreqs(const Diagonal& mainDiagonal) requires (RANK==1);
@@ -118,22 +100,39 @@ struct MultiDiagonal
   {
     auto transformExtentsOfDiagonals = [] (const auto& diagonal) -> ::cppqedutils::Extents<RANK> {
       auto res{diagonal.second.extents};
-      for (auto&& [v,o] : std::views::zip(res,diagonal.first)) v+=std::abs(o);
+      for (auto&& [v,o] : std::views::zip(res,diagonal.first)) v+=o;
       return res;
     };
 
-    auto res{transformExtentsOfDiagonals(*md.diagonals.cbegin())};
+    auto res{transformExtentsOfDiagonals(*md.diagonals.cbegin()->second.cbegin())};
 
-    if (!std::ranges::fold_left_first( md.diagonals | std::views::drop(1) | std::views::transform([=] (const auto& diagonal) {
+    if (!std::ranges::fold_left_first( std::views::join(md.diagonals | std::views::values) | std::views::transform([=] (const auto& diagonal) {
       return std::ranges::equal(res,transformExtentsOfDiagonals(diagonal));
     }), std::logical_and{} ).value_or(true)) throw std::runtime_error("Dimensions mismatch in MultiDiagonal");
 
     return res;
   }
+
+  friend MultiDiagonal hermitianConjugate(const MultiDiagonal& md)
+  {
+    MultiDiagonal res;
+    /// md has to be copied by hand
+    for (const auto& [index,innerMap] : md.diagonals) for (const auto& [offsets,diagToIndex] : innerMap)
+      res.diagonals[index].emplace(offsets,Diagonal{diagToIndex.extents, [&] (size_t) {
+        auto r{diagToIndex.dataStorage()}; return r;
+      }});
+    res.hermitianConjugate(); return res;
+  }
+
+  friend void to_json( ::cppqedutils::json& jv, const MultiDiagonal& md )
+  {
+    for (const auto& d : md.diagonals) jv.emplace(d.first.to_string(),d.second);
+  }
+
 };
 
 
-MultiDiagonal<1> compose(const MultiDiagonal<1>&, const MultiDiagonal<1>);
+MultiDiagonal<1> compose(const MultiDiagonal<1>&, const MultiDiagonal<1>&);
 
 /*
 /// A free-standing version of Tridiagonal::apply \related Tridiagonal

@@ -2,24 +2,52 @@
 #include "MultiDiagonal.h"
 
 
-auto quantumoperator::compose(const quantumoperator::MultiDiagonal<1>& a, const quantumoperator::MultiDiagonal<1> b) -> MultiDiagonal<1>
+auto quantumoperator::compose(const quantumoperator::MultiDiagonal<1>& a, const quantumoperator::MultiDiagonal<1>& b) -> MultiDiagonal<1>
 {
-  auto dimensions{calculateAndCheckDimensions(a)};
-  if (dimensions!=calculateAndCheckDimensions(b)) throw std::runtime_error("Mismatch in MultiDiagonal::compose dimensions");
+  using Offsets=MultiDiagonal<1>::Offsets;
+  using Diagonal=MultiDiagonal<1>::Diagonal;
+
+  size_t dimension=calculateAndCheckDimensions(a)[0];
+  if (dimension!=calculateAndCheckDimensions(b)[0]) throw std::runtime_error("Mismatch in MultiDiagonal::compose dimensions");
 
   MultiDiagonal<1> res;
 
-  for (auto&& [ao,ad] : a.diagonals) for (auto&& [bo,bd] : b.diagonals) {
-    ptrdiff_t n=ao[0], s=ao[0]+bo[0];
-    MultiDiagonal<1>::Offsets composedOffsets{s};
-    MultiDiagonal<1>::Diagonal composedDiagonal{ {dimensions[0]-s}, ::quantumdata::noInit<1> };
-    for (size_t k=0; k<dimensions[0]-s; ++k) {
-      std::cerr<<dimensions[0]<<" "<<n<<" "<<s<<" "<<k<<std::endl;
-      MultiDiagonal<1>::indexer(composedOffsets,composedDiagonal)({k})=MultiDiagonal<1>::indexer(ao,ad)({k})*MultiDiagonal<1>::indexer(bo,bd)({k+std::abs(n)});
+  for (const auto& [aidx,adti] : a.diagonals) for (const auto& [bidx,bdti] : b.diagonals) for (const auto& [aoffset,adiag] : adti) for (const auto& [boffset,bdiag] : bdti) {
+
+    auto diagInit = [&] (ptrdiff_t i, ptrdiff_t j, size_t start=0) {
+      return [a=adiag.dataView, b=bdiag.dataView, i=i, j=j, start=start] (size_t e) {
+        auto res{::quantumdata::zeroInit<1>(e)}; for (size_t k=start; k<e; ++k) res[k]=a[k+i]*b[k+j]; return res;
+      };
+    };
+
+    auto emplaceDiagonal = [&] (size_t idx, size_t offset, size_t extent, ptrdiff_t i, ptrdiff_t j, size_t start=0) {
+      res.diagonals[idx].emplace(Offsets{offset}, Diagonal{{extent}, diagInit(i,j,start)});
+    };
+
+    // both upper
+    if (size_t n=aoffset[0], m=boffset[0]; aidx==1 && bidx==1) {
+      if (m+n<dimension) emplaceDiagonal( 1, n+m, adiag.extents[0]-m, 0, n ) ;
     }
-    try { for (auto&& [de,cde] : std::views::zip(res.diagonals.at(composedOffsets).mutableView().dataView,composedDiagonal.dataView)) de+=cde; }
-    catch (const std::out_of_range&) { res.diagonals.insert({composedOffsets,std::move(composedDiagonal)}); }
+    // both lower
+    else if (aidx==0 && bidx==0) {
+      if (m+n<dimension) emplaceDiagonal( 0, n+m, adiag.extents[0]-m, m, 0 ) ;
+    }
+    // upper with lower
+    else if (aidx==1 && bidx==0) {
+      if (n<m) // the result is lower
+        emplaceDiagonal( 0, m-n, bdiag.extents[0], m-n, 0 ) ;
+      else // the result is upper
+        emplaceDiagonal( 1, n-m, adiag.extents[0], 0, n-m ) ;
+    }
+    // lower with upper
+    else {
+      if (m<n) // the result is lower
+        emplaceDiagonal( 0, n-m, adiag.extents[0]+m, -m, -m, m ) ;
+      else // the result is upper
+        emplaceDiagonal( 1, m-n, bdiag.extents[0]+n, -n, -n, n ) ;
+    }
   }
+
   return res;
 }
 

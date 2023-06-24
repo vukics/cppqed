@@ -4,21 +4,23 @@
 
 mode::MultiDiagonal mode::aOp(size_t cutoff)
 {
-  MultiDiagonal res{};
-  res.diagonals.insert({MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{{cutoff-1}, [c=cutoff] (size_t) {
+  MultiDiagonal res;
+  MultiDiagonal::DiagToIdx d;
+  d.emplace(MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{{cutoff-1}, [c=cutoff] (size_t) {
     // TODO: pending support for std::ranges::to, the following solution will be possible:
     // return std::ranges::to<MultiDiagonal::Diagonal::StorageType>(std::views::iota(0uz, c-1) | std::views::transform([] (size_t num) -> dcomp { return std::sqrt(num+1); }));
     auto res{::quantumdata::noInit<1>(c-1)};
     for (size_t i=0; i<res.size(); ++i) res[i]=sqrt(double(i+1));
     return res;
-  }}});
+  }});
+  res.diagonals.insert({1,std::move(d)});
   return res;
 }
 
 
 mode::MultiDiagonal mode::aDagOp(size_t cutoff)
 {
-  auto res(aOp(cutoff)); res.hermitianConjugateSelf(); return res;
+  return hermitianConjugate(aOp(cutoff));
 }
 
 
