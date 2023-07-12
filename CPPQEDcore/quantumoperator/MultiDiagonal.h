@@ -4,7 +4,6 @@
 #include "StateVector.h"
 
 #include <bitset>
-#include <iostream>
 
 
 /// Comprises modules representing operators of special structure (multidiagonal, sparse) over Hilbert spaces of arbitrary arity
@@ -20,7 +19,9 @@ namespace quantumoperator {
  * - direct product
  * - (composition with Sigma)
  *
- * \todo
+ * \todo have a more transparent mechanism to iterate through diagonals
+ * \todo consider allowing copying
+ *
  */
 template <size_t RANK>
 struct MultiDiagonal
@@ -41,14 +42,60 @@ struct MultiDiagonal
   Diagonals diagonals;
   // double tCurrent=0;
 
+  void operator () (double t, ::quantumdata::StateVectorConstView<RANK> psi, ::quantumdata::StateVectorView<RANK> dpsidt)
+  {
+    using ::cppqedutils::Extents;
+#ifndef NDEBUG
+    if (psi.extents != calculateAndCheckDimensions(*this)) throw std::runtime_error("Mismatch between StateVector and MultiDiagonal dimensions");
+#endif // NDEBUG
+
+    for (const auto& [index,diagToIndex] : diagonals) for (const auto& [offsets,diag] : diagToIndex) {
+
+      Extents<RANK> ubound{psi.extents}, lboundLHS, lboundRHS;
+      for (auto&& [i,o,u,lL,lR] : std::views::zip(std::views::iota(0uz,RANK),offsets,ubound,lboundLHS,lboundRHS)) {
+        u -= index[i] ? o : 0; lL = index[i] ? 0 : o; lR = index[i] ? o : 0;
+      }
+
+      // Here, a generalized version of `cppqedutils::incrementMultiIndex` could be used, but let’s not touch that at the moment
+      const auto increment=[&] (auto n, const auto& inc, Extents<RANK>& idxLHS, Extents<RANK>& idxRHS, Extents<RANK>& idxDiag)
+      {
+        using namespace hana::literals;
+        if constexpr (n!=0_c) {
+          if (idxLHS[n]==ubound[n]-1) {idxLHS[n]=lboundLHS[n]; idxRHS[n]=lboundRHS[n]; idxDiag[n]=0; inc(n-1_c,inc,idxLHS,idxRHS,idxDiag);}
+          else {idxLHS[n]++; idxRHS[n]++; idxDiag[n]++;}
+        }
+        else {idxLHS[0]++; idxRHS[0]++; idxDiag[0]++;} // This will eventually put the index into an illegal state, but this is how all (unchecked) iterators work.
+      };
+
+      for ( Extents<RANK> idxLHS{lboundLHS}, idxRHS{lboundRHS}, idxDiag{}; idxLHS[0]!=ubound[0] ; increment( hana::llong_c<RANK-1>, increment, idxLHS, idxRHS, idxDiag ) )
+        dpsidt(idxLHS) += diag(idxDiag)*psi(idxRHS) ;
+    }
+  }
+
+
+  /// direct product
+  template <size_t RANK2>
+  friend auto operator* (const MultiDiagonal<RANK>& md1, const MultiDiagonal<RANK2>& md2)
+  {
+    using ResultType = MultiDiagonal<RANK+RANK2>;
+    ResultType res;
+    for (const auto& [index1,diagToIndex1] : md1.diagonals) for (const auto& [index2,diagToIndex2] : md2.diagonals) {
+      typename ResultType::Index resIndex{index1.to_string()+index2.to_string()};
+      for (const auto& [offsets1,diag1] : diagToIndex1) for (const auto& [offsets2,diag2] : diagToIndex2)
+        res.diagonals[resIndex].emplace(::cppqedutils::concatenate(offsets1,offsets2),directProduct(diag1,diag2));
+    }
+    return res;
+  }
+
+
   MultiDiagonal& hermitianConjugate()
   {
     Diagonals newDiagonals;
-    for (auto& [index,innerMap] : diagonals) for (auto& [offsets,diagToIndex] : innerMap) {
+    for (auto& [index,diagToIndex] : diagonals) for (auto& [offsets,diag] : diagToIndex) {
         /// in the original index all those elements must be negated for which offset is nonzero
         Index newIndex{index}; for (size_t i=0; i<RANK; ++i) if (offsets[i]) newIndex.flip(i);
-        conj(diagToIndex); // conjugate the diagonal
-        newDiagonals[newIndex].emplace(offsets,std::move(diagToIndex));
+        conj(diag); // conjugate the diagonal
+        newDiagonals[newIndex].emplace(offsets,std::move(diag));
       }
     diagonals.swap(newDiagonals);
     return *this;
@@ -83,18 +130,25 @@ struct MultiDiagonal
     * 
     * \todo Implement an in-place version.
     */
-/*  const MultiDiagonal hermitianConjugate    () const;
-  const MultiDiagonal dagger                () const {return hermitianConjugate();} ///< Same as hermitianConjugate
 
-  MultiDiagonal& operator+=(const MultiDiagonal&);
-
+  MultiDiagonal& operator+=(const MultiDiagonal& md)
+  {
+#ifndef NDEBUG
+    if (calculateAndCheckDimensions(md) != calculateAndCheckDimensions(*this)) throw std::runtime_error("Dimension mismatch in addition of MultiDiagonals");
+#endif // NDEBUG
+    for (const auto& [index,diagToIndex] : md.diagonals) for (const auto& [offsets,diag] : diagToIndex)
+      if (auto insertResult=diagonals[index].emplace(offsets,Diagonal{diag.extents, [&] (size_t) {auto r{diag.dataStorage()}; return r;}});
+          !insertResult.second)
+        for (auto&& [to,from] : std::views::zip(insertResult.first->second.mutableView().dataView,diag.dataView)) to+=from;
+    return *this;
+  }
+/*
   const MultiDiagonal operator-() const {return MultiDiagonal(*this,blitzplusplus::negate(diagonals_),differences_,tCurrent_,freqs_);} ///< Returns a (deep) copy with negated diagonals. Frequencies remain untouched.
 
   const MultiDiagonal operator+() const {return *this;} ///< Returns a (deep) copy.
   
   MultiDiagonal& operator-=(const MultiDiagonal& tridiag) {(*this)+=-tridiag; return *this;} ///< Implemented in terms of operator+=
-  //@}
- */
+*/
 
   friend ::cppqedutils::Extents<RANK> calculateAndCheckDimensions(const MultiDiagonal& md)
   {
@@ -117,9 +171,9 @@ struct MultiDiagonal
   {
     MultiDiagonal res;
     /// md has to be copied by hand
-    for (const auto& [index,innerMap] : md.diagonals) for (const auto& [offsets,diagToIndex] : innerMap)
-      res.diagonals[index].emplace(offsets,Diagonal{diagToIndex.extents, [&] (size_t) {
-        auto r{diagToIndex.dataStorage()}; return r;
+    for (const auto& [index,diagToIndex] : md.diagonals) for (const auto& [offsets,diag] : diagToIndex)
+      res.diagonals[index].emplace(offsets,Diagonal{diag.extents, [&] (size_t) {
+        auto r{diag.dataStorage()}; return r;
       }});
     res.hermitianConjugate(); return res;
   }

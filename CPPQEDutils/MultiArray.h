@@ -23,12 +23,13 @@ template<size_t... i>
 constexpr std::array retainedAxes{i...};
 
 
-/// should be passed by value
+/// should be passed by value, but can be `std::move`d when used in class constructors
 template <size_t RANK>
 using Extents=std::array<size_t,RANK>;
 
 
-/// TODO: this could be formulated as a std compliant range with `extents` as an endpoint guard
+/// endpoint guard is: `idx[0]!=extents[0]` note the `[0]`!
+/// TODO: this could be formulated as a std compliant range with the
 template <size_t RANK>
 auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
 {
@@ -39,7 +40,7 @@ auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
       if (idx[n]==extents[n]-1) {idx[n]=0; inc(n-1_c,inc);}
       else idx[n]++;
     }
-    else idx[0]++; // This will eventually put the iterator into an illegal state, but this is how all (unchecked) iterators work.
+    else idx[0]++; // This will eventually put the index into an illegal state, but this is how all (unchecked) iterators work.
   };
   
   increment(hana::llong_c<RANK-1>,increment);
@@ -156,7 +157,7 @@ bool isEqual(MultiArrayConstView<T1,RANK> m1, MultiArrayConstView<T2,RANK> m2)
 {
   checkExtents(m1,m2,"MultiArrayView comparison");
   bool res=true;
-  for (Extents<RANK> idx{}; idx!=m1.extents; incrementMultiIndex(idx,m1.extents))
+  for (Extents<RANK> idx{}; idx[0]!=m1.extents[0]; incrementMultiIndex(idx,m1.extents))
     res &= ( m1(idx)==m2(idx) );
   return res;
 }
@@ -224,7 +225,7 @@ public:
 #endif // NDEBUG
     checkExtents(*this,macv,"MultiArrayView assignment");
 
-    for (Extents<RANK> idx{}; idx!=this->extents; incrementMultiIndex(idx,this->extents)) (*this)(idx)=macv(idx);
+    for (Extents<RANK> idx{}; idx[0]!=this->extents[0]; incrementMultiIndex(idx,this->extents)) (*this)(idx)=macv(idx);
   }
 
   /// conversion to a view
