@@ -5,8 +5,6 @@
 #include "Archive.h"
 #include "Traits.h"
 
-#include <boost/operators.hpp>
-
 #include <boost/serialization/vector.hpp>
 
 #include <array>
@@ -29,7 +27,7 @@ using Extents=std::array<size_t,RANK>;
 
 
 /// endpoint guard is: `idx[0]!=extents[0]` note the `[0]`!
-/// TODO: this could be formulated as a std compliant range with the
+/// TODO: this could be formulated as a std compliant range, cf. chatGPT’s implementation towards the end of this file
 template <size_t RANK>
 auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
 {
@@ -213,6 +211,8 @@ public:
   }
 
   explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,multiarray::noInit<T,RANK>} {}
+
+  friend MultiArray copy(const MultiArray& ma) {return MultiArray{ma.extents, [&] (size_t) {return ma.dataStorage();}};}
 
   /// Element-by-element assignment
   /** \note The operator-style syntax is not used, since this can be a rather expensive operation! */
@@ -507,5 +507,85 @@ MultiArrayView<T,RANK> transpose(MultiArrayView<T,RANK> mav) requires ( std::siz
   return mav;
 }
 
+
+namespace multi_index_range_solution_by_chatgpt {
+
+
+template <size_t RANK>
+struct MultiIndexIterator {
+  using ExtentsType = Extents<RANK>;
+  using value_type = ExtentsType;
+  using difference_type = std::ptrdiff_t;
+  using pointer = ExtentsType*;
+  using reference = ExtentsType&;
+  using iterator_category = std::forward_iterator_tag;
+
+  mutable ExtentsType idx;
+  ExtentsType extents;
+
+  MultiIndexIterator(ExtentsType idx, ExtentsType extents)
+    : idx(std::move(idx)), extents(std::move(extents))
+  {}
+
+  reference operator*() const { return idx; }
+  pointer operator->() const { return &idx; }
+
+  MultiIndexIterator& operator++() {
+    increment(hana::llong_c<RANK - 1>);
+    return *this;
+  }
+
+  MultiIndexIterator operator++(int) {
+    MultiIndexIterator prev = *this;
+    ++(*this);
+    return prev;
+  }
+
+  friend auto operator<=>(const MultiIndexIterator& lhs, const MultiIndexIterator& rhs) = default;
+
+  friend bool operator!=(const MultiIndexIterator& lhs, size_t end) {return lhs.idx[0]!=end;}
+
+private:
+  void increment(auto n) {
+    using namespace hana::literals;
+    if constexpr (n != 0_c) {
+      if (idx[n] == extents[n] - 1) {
+        idx[n] = 0;
+        increment(n - 1_c);
+      } else {
+        ++idx[n];
+      }
+    } else {
+      ++idx[0];
+    }
+  }
+};
+
+template <size_t RANK>
+struct MultiIndexRange {
+  using ExtentsType = Extents<RANK>;
+
+  ExtentsType extents;
+
+  explicit MultiIndexRange(ExtentsType extents)
+    : extents(std::move(extents))
+  {}
+
+  MultiIndexIterator<RANK> begin() const {
+    ExtentsType idx{};
+    return MultiIndexIterator<RANK>(idx, extents);
+  }
+
+  size_t end() const { return extents[0]; }
+};
+
+
+// It doesn’t seem to be a valid range somehow, so for example this doesn’t compile
+// static_assert( std::ranges::range<MultiIndexRange<3>> );
+// This is ok though:
+static_assert( std::input_iterator<MultiIndexIterator<3>> );
+
+
+} // multi_index_range_solution_by_chatgpt
 
 } // cppqedutils
