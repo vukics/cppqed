@@ -10,6 +10,32 @@
 namespace quantumoperator {
 
 
+namespace multidiagonal {
+
+
+auto range(auto&& md)
+{
+  if constexpr (std::is_pointer_v<std::decay_t<decltype(md)>>) return range(*md);
+  else return md.diagonals | std::views::transform([&](auto&& outer_entry) {
+    return outer_entry.second | std::views::transform([&](auto&& inner_entry) {
+      return std::tie(outer_entry.first, inner_entry.first, inner_entry.second);
+    });
+  }) | std::views::join;
+}
+
+template <typename MD>
+void for_each(MD&& md, auto&& func)
+{
+  for (auto&& [index,offsets,diag] : range(std::forward<MD>(md)))
+    func(std::forward<decltype(index)>(index),
+         std::forward<decltype(offsets)>(offsets),
+         std::forward<decltype(diag)>(diag));
+}
+
+
+} // multidiagonal
+
+
 /// A sparse matrix storing a set of diagonals
 /**
  * non-trivial functionality
@@ -19,9 +45,7 @@ namespace quantumoperator {
  * - direct product
  * - (composition with Sigma)
  *
- * \todo have a more transparent mechanism to iterate through diagonals
- * \todo consider allowing copying
- *
+ * TODO: MultiDiagonal should be applicable also as a jump operator, but there are serious difficulties in indexing.
  */
 template <size_t RANK>
 struct MultiDiagonal
@@ -39,9 +63,17 @@ struct MultiDiagonal
 
   explicit MultiDiagonal(auto&&... args) : diagonals{std::forward<decltype(args)>...} {}
 
+  friend MultiDiagonal copy(auto&& md)
+  {
+    MultiDiagonal res;
+    for (const auto& [index,offsets,diag] : multidiagonal::range(std::forward<decltype(md)>(md))) res.diagonals[index].emplace(offsets,copy(diag));
+    return res;
+  }
+
   Diagonals diagonals;
   // double tCurrent=0;
 
+  /// Applying as a Hamiltonian
   void operator () (double t, ::quantumdata::StateVectorConstView<RANK> psi, ::quantumdata::StateVectorView<RANK> dpsidt)
   {
     using ::cppqedutils::Extents;
@@ -49,7 +81,7 @@ struct MultiDiagonal
     if (psi.extents != calculateAndCheckDimensions(*this)) throw std::runtime_error("Mismatch between StateVector and MultiDiagonal dimensions");
 #endif // NDEBUG
 
-    for (const auto& [index,diagToIndex] : diagonals) for (const auto& [offsets,diag] : diagToIndex) {
+    for (const auto& [index,offsets,diag] : multidiagonal::range(this))  {
 
       Extents<RANK> ubound{psi.extents}, lboundLHS, lboundRHS;
       for (auto&& [i,o,u,lL,lR] : std::views::zip(std::views::iota(0uz,RANK),offsets,ubound,lboundLHS,lboundRHS)) {
@@ -73,7 +105,7 @@ struct MultiDiagonal
   }
 
 
-  /// direct product
+  /// Direct product
   template <size_t RANK2>
   friend auto operator* (const MultiDiagonal<RANK>& md1, const MultiDiagonal<RANK2>& md2)
   {
@@ -88,10 +120,12 @@ struct MultiDiagonal
   }
 
 
+  /// \name Hermitian conjugation
+  //@{
   MultiDiagonal& hermitianConjugate()
   {
     Diagonals newDiagonals;
-    for (auto& [index,diagToIndex] : diagonals) for (auto& [offsets,diag] : diagToIndex) {
+    for (auto&& [index,offsets,diag] : multidiagonal::range(this)) {
         /// in the original index all those elements must be negated for which offset is nonzero
         Index newIndex{index}; for (size_t i=0; i<RANK; ++i) if (offsets[i]) newIndex.flip(i);
         conj(diag); // conjugate the diagonal
@@ -102,6 +136,11 @@ struct MultiDiagonal
   }
 
   MultiDiagonal& dagger() {return hermitianConjugate();}
+
+  friend MultiDiagonal hermitianConjugate(const MultiDiagonal& md) {MultiDiagonal res(copy(md)); res.hermitianConjugate(); return res;}
+
+  friend MultiDiagonal twoTimesRe(const MultiDiagonal& md) {return md+hermitianConjugate(md);}
+  //@}
 
   /// calculates a propagator from `mainDiagonal` and stores them in `frequencies`
   // MultiDiagonal& furnishWithFreqs(const Diagonal& mainDiagonal) requires (RANK==1);
@@ -114,41 +153,46 @@ struct MultiDiagonal
 
 
   /// \name Algebra
+  /** We cannot use old techniques like Boost.Operator, since MultiDiagonal is not copyable */
   //@{
-  MultiDiagonal& operator*=(dcomp dc); ///< Naively implemented, could be templated if need arises – Frequencies untouched.
-  MultiDiagonal& operator/=(dcomp dc) {(*this)*=1./dc; return *this;} ///< ”
-  MultiDiagonal& operator*=(double d) {(*this)*=dcomp(d,0); return *this;} ///< ”
-  MultiDiagonal& operator/=(double d) {(*this)*=1./dcomp(d,0); return *this;} ///< ”
+  MultiDiagonal operator-() const
+  {
+    MultiDiagonal res{copy(this)};
+    for (auto&& [index,offsets,diag] : multidiagonal::range(res)) for (dcomp& v : diag.dataView) v*=-1;
+    return res;
+  }
 
-    /// Returns a newly constructed object, which is the Hermitian conjugate of `this`.
-    /**
-    * Transposition involves a non-trivial permutation of diagonals, which could be done @ compile-time, but at the moment it’s runtime.
-    * 
-    * Frequencies need not be transposed, because they are identical to their transpose.
-    * 
-    * \note Eventually, an in-place version of Hermitian conjugation could be also implemented, if need for this arises.
-    * 
-    * \todo Implement an in-place version.
-    */
+  MultiDiagonal operator+() const {return copy(this);}
 
   MultiDiagonal& operator+=(const MultiDiagonal& md)
   {
 #ifndef NDEBUG
     if (calculateAndCheckDimensions(md) != calculateAndCheckDimensions(*this)) throw std::runtime_error("Dimension mismatch in addition of MultiDiagonals");
 #endif // NDEBUG
-    for (const auto& [index,diagToIndex] : md.diagonals) for (const auto& [offsets,diag] : diagToIndex)
-      if (auto insertResult=diagonals[index].emplace(offsets,Diagonal{diag.extents, [&] (size_t) {auto r{diag.dataStorage()}; return r;}});
-          !insertResult.second)
+    for (const auto& [index,offsets,diag] : multidiagonal::range(md))
+      if (auto insertResult=diagonals[index].emplace(offsets,copy(diag)); !insertResult.second)
         for (auto&& [to,from] : std::views::zip(insertResult.first->second.mutableView().dataView,diag.dataView)) to+=from;
     return *this;
   }
-/*
-  const MultiDiagonal operator-() const {return MultiDiagonal(*this,blitzplusplus::negate(diagonals_),differences_,tCurrent_,freqs_);} ///< Returns a (deep) copy with negated diagonals. Frequencies remain untouched.
 
-  const MultiDiagonal operator+() const {return *this;} ///< Returns a (deep) copy.
-  
-  MultiDiagonal& operator-=(const MultiDiagonal& tridiag) {(*this)+=-tridiag; return *this;} ///< Implemented in terms of operator+=
-*/
+  MultiDiagonal& operator-=(const MultiDiagonal& md) {return operator+=(-md);}
+
+  MultiDiagonal& operator*=(cppqedutils::scalar auto d)
+  {
+    for (auto&& [index,offsets,diag] : multidiagonal::range(this)) for (dcomp& v : diag.dataView) v*=d;
+    return *this;
+  }
+
+  MultiDiagonal& operator/=(cppqedutils::scalar auto d) {(*this)*=1./d; return *this;}
+
+  friend auto operator+(const MultiDiagonal& md1, const MultiDiagonal& md2) {MultiDiagonal res{copy(md1)}; res+=md2; return res;}
+  friend auto operator-(const MultiDiagonal& md1, const MultiDiagonal& md2) {MultiDiagonal res{copy(md1)}; res-=md2; return res;}
+
+  friend auto operator-(cppqedutils::scalar auto v, const MultiDiagonal& md) {MultiDiagonal res{copy(md)}; res*=v; return res;}
+  friend auto operator/(const MultiDiagonal& md, cppqedutils::scalar auto v) {MultiDiagonal res{copy(md)}; res/=v; return res;}
+
+  //@}
+
 
   friend ::cppqedutils::Extents<RANK> calculateAndCheckDimensions(const MultiDiagonal& md)
   {
@@ -167,17 +211,6 @@ struct MultiDiagonal
     return res;
   }
 
-  friend MultiDiagonal hermitianConjugate(const MultiDiagonal& md)
-  {
-    MultiDiagonal res;
-    /// md has to be copied by hand
-    for (const auto& [index,diagToIndex] : md.diagonals) for (const auto& [offsets,diag] : diagToIndex)
-      res.diagonals[index].emplace(offsets,Diagonal{diag.extents, [&] (size_t) {
-        auto r{diag.dataStorage()}; return r;
-      }});
-    res.hermitianConjugate(); return res;
-  }
-
   friend void to_json( ::cppqedutils::json& jv, const MultiDiagonal& md )
   {
     for (const auto& d : md.diagonals) jv.emplace(d.first.to_string(),d.second);
@@ -186,7 +219,13 @@ struct MultiDiagonal
 };
 
 
-MultiDiagonal<1> compose(const MultiDiagonal<1>&, const MultiDiagonal<1>&);
+/// Composition
+/**
+ * It’s unfortunate that operator* has precedence over operator| according to c++ precedence rules,
+ * so parentheses must be used in expressions containing both of them, but we can live with this.
+ */
+MultiDiagonal<1> operator|(const MultiDiagonal<1>&, const MultiDiagonal<1>&);
+
 
 /*
 /// A free-standing version of Tridiagonal::apply \related Tridiagonal

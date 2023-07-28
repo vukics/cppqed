@@ -94,6 +94,10 @@ OUT getLabel(H&& h)
 template <size_t N> constexpr auto compileTimeOrdinals = [] {std::array<size_t,N> res{}; std::iota(res.begin(),res.end(),0); return res;} ();
 
 
+/// TODO: try to express this as any kind of floating type (perhaps arbitrary precision), or its corresponding complex type
+template <typename N> concept scalar = std::convertible_to<N,double> || std::convertible_to<N,dcomp>;
+
+
 } // cppqedutils
 
 

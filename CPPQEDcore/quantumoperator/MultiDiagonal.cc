@@ -2,7 +2,7 @@
 #include "MultiDiagonal.h"
 
 
-auto quantumoperator::compose(const quantumoperator::MultiDiagonal<1>& a, const quantumoperator::MultiDiagonal<1>& b) -> MultiDiagonal<1>
+auto quantumoperator::operator|(const quantumoperator::MultiDiagonal<1>& a, const quantumoperator::MultiDiagonal<1>& b) -> MultiDiagonal<1>
 {
   using Offsets=MultiDiagonal<1>::Offsets;
   using Diagonal=MultiDiagonal<1>::Diagonal;
