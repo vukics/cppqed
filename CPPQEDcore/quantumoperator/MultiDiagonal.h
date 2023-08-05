@@ -139,7 +139,7 @@ struct MultiDiagonal
 
   friend MultiDiagonal hermitianConjugate(const MultiDiagonal& md) {MultiDiagonal res(copy(md)); res.hermitianConjugate(); return res;}
 
-  friend MultiDiagonal twoTimesRe(const MultiDiagonal& md) {return md+hermitianConjugate(md);}
+  friend MultiDiagonal twoTimesRealPartOf(const MultiDiagonal& md) {return md+hermitianConjugate(md);}
   //@}
 
   /// calculates a propagator from `mainDiagonal` and stores them in `frequencies`
@@ -171,7 +171,7 @@ struct MultiDiagonal
 #endif // NDEBUG
     for (const auto& [index,offsets,diag] : multidiagonal::range(md))
       if (auto insertResult=diagonals[index].emplace(offsets,copy(diag)); !insertResult.second)
-        for (auto&& [to,from] : std::views::zip(insertResult.first->second.mutableView().dataView,diag.dataView)) to+=from;
+        for (auto&& [to,from] : std::views::zip(insertResult.first->second.dataStorage(),diag.dataStorage())) to+=from;
     return *this;
   }
 
@@ -179,7 +179,7 @@ struct MultiDiagonal
 
   MultiDiagonal& operator*=(cppqedutils::scalar auto d)
   {
-    for (auto&& [index,offsets,diag] : multidiagonal::range(this)) for (dcomp& v : diag.dataView) v*=d;
+    for (auto&& [index,offsets,diag] : multidiagonal::range(this)) for (dcomp& v : diag.dataStorage()) v*=d;
     return *this;
   }
 
@@ -188,7 +188,7 @@ struct MultiDiagonal
   friend auto operator+(const MultiDiagonal& md1, const MultiDiagonal& md2) {MultiDiagonal res{copy(md1)}; res+=md2; return res;}
   friend auto operator-(const MultiDiagonal& md1, const MultiDiagonal& md2) {MultiDiagonal res{copy(md1)}; res-=md2; return res;}
 
-  friend auto operator-(cppqedutils::scalar auto v, const MultiDiagonal& md) {MultiDiagonal res{copy(md)}; res*=v; return res;}
+  friend auto operator*(cppqedutils::scalar auto v, const MultiDiagonal& md) {MultiDiagonal res{copy(md)}; res*=v; return res;}
   friend auto operator/(const MultiDiagonal& md, cppqedutils::scalar auto v) {MultiDiagonal res{copy(md)}; res/=v; return res;}
 
   //@}

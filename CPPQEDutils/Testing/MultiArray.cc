@@ -102,8 +102,8 @@ BOOST_AUTO_TEST_CASE( MULTIARRAY_SLICING_PROXY_RANGE_REFERENCING , * boost::unit
     {
       std::uniform_real_distribution d{-1.0,1.0};
       std::mt19937_64 re{1001};
-      std::ranges::generate(a1.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};} );
-      std::ranges::generate(a2.mutableView().dataView, [&]() {return std::complex{d(re),d(re)};} );
+      std::ranges::generate(a1.dataStorage(), [&]() {return std::complex{d(re),d(re)};} );
+      std::ranges::generate(a2.dataStorage(), [&]() {return std::complex{d(re),d(re)};} );
     }
 
     auto res{directProduct<4,5>(a1,a2)};

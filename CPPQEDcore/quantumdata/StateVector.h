@@ -94,7 +94,7 @@ struct StateVector : ::cppqedutils::MultiArray<dcomp,RANK>, private VectorSpaceO
   friend double renorm(StateVector& sv)
   {
     double res=norm(sv);
-    for (dcomp& v : sv.mutableView().dataView) v/=res;
+    for (dcomp& v : sv.dataStorage()) v/=res;
     return res;
   }
   //@}

@@ -132,7 +132,7 @@ struct QuantumJumpMonteCarlo
 
         if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
 
-        for (dcomp& v : q.psi.mutableView().dataView) v/=normFactor;
+        for (dcomp& v : q.psi.dataStorage()) v/=normFactor;
 
         res.emplace("jump",q.logger_.jumpOccured(q.time,lindbladNo));
       }

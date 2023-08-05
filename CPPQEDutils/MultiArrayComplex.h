@@ -16,7 +16,7 @@ namespace cppqedutils {
 template <size_t RANK>
 auto vectorize(MultiArray<dcomp,RANK>& ma)
 {
-  return Eigen::Map<CVector>{ma.mutableView().dataView.data(),ma.dataView.size()};
+  return Eigen::Map<CVector>{ma.dataStorage().data(),ma.dataView.size()};
 }
 
 template <size_t RANK>
@@ -45,7 +45,7 @@ template <size_t TWO_TIMES_RANK>
 auto matricize(MultiArray<dcomp,TWO_TIMES_RANK>& ma)
 {
   const size_t matrixDim = multiarray::calculateExtent(halveExtents(ma.extents));
-  return Eigen::Map<CMatrix>{ma.mutableView().dataView.data(),matrixDim,matrixDim};
+  return Eigen::Map<CMatrix>{ma.dataStorage().data(),matrixDim,matrixDim};
 }
 
 template <size_t TWO_TIMES_RANK>
@@ -61,7 +61,7 @@ auto directProduct(const MultiArray<dcomp,RANK1>& m1, const MultiArray<dcomp,RAN
                    std::function<dcomp(dcomp,dcomp)> func=std::multiplies<dcomp>{} )
 {
   MultiArray<dcomp,RANK1+RANK2> res{concatenate(m1.extents,m2.extents)};
-  for (size_t stride=m1.dataView.size(), i=0; i<stride; ++i) for (size_t j=0; j<m2.dataView.size(); ++j) res.mutableView().dataView[i+stride*j]=func(m1.dataView[i],m2.dataView[j]);
+  for (size_t stride=m1.dataView.size(), i=0; i<stride; ++i) for (size_t j=0; j<m2.dataView.size(); ++j) res.dataStorage()[i+stride*j]=func(m1.dataView[i],m2.dataView[j]);
   return res;
 }
 
@@ -69,7 +69,7 @@ auto directProduct(const MultiArray<dcomp,RANK1>& m1, const MultiArray<dcomp,RAN
 template <size_t RANK>
 MultiArray<dcomp,RANK>& conj(MultiArray<dcomp,RANK>& ma)
 {
-  for (dcomp& v : ma.mutableView().dataView) v=conj(v);
+  for (dcomp& v : ma.dataStorage()) v=conj(v);
   return ma;
 }
 
@@ -84,8 +84,8 @@ void hermitianConjugateSelf(MultiArray<dcomp,TWO_TIMES_RANK>& ma)
   const size_t matrixDim = multiarray::calculateExtent(halveExtents(ma.extents));
   for (size_t i=0; i<matrixDim; ++i) for (size_t j=i+1; j<matrixDim; ++j) {
     dcomp
-      &u=ma.mutableView().dataView[i+matrixDim*j],
-      &l=ma.mutableView().dataView[j+matrixDim*i];
+      &u=ma.dataStorage()[i+matrixDim*j],
+      &l=ma.dataStorage()[j+matrixDim*i];
     u=conj(u); l=conj(l);
     std::swap(u, l);
   }

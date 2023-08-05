@@ -64,7 +64,7 @@ struct DensityOperator : ::cppqedutils::MultiArray<dcomp,2*RANK>, private Vector
   friend double renorm(DensityOperator& rho)
   {
     double res=trace(rho);
-    for (dcomp& v : rho.mutableView().dataView) v/=res;
+    for (dcomp& v : rho.dataStorage()) v/=res;
     return res;
   }
 
