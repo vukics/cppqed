@@ -2,33 +2,99 @@
 #include "Mode.h"
 
 
+using namespace cppqedutils; using namespace structure;
+
+
 mode::MultiDiagonal mode::aOp(size_t cutoff)
 {
   MultiDiagonal res;
-  MultiDiagonal::DiagToIdx d;
-  d.emplace(MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{{cutoff-1}, [c=cutoff] (size_t) {
-    // TODO: pending support for std::ranges::to, the following solution will be possible:
+  res.diagonals[1].emplace(MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{{cutoff-1}, [c=cutoff] (size_t) {
+    // TODO: pending support of std::ranges::to, the following solution will be possible:
     // return std::ranges::to<MultiDiagonal::Diagonal::StorageType>(std::views::iota(0uz, c-1) | std::views::transform([] (size_t num) -> dcomp { return std::sqrt(num+1); }));
     auto res{::quantumdata::noInit<1>(c-1)};
     for (size_t i=0; i<res.size(); ++i) res[i]=sqrt(double(i+1));
     return res;
   }});
-  res.diagonals.insert({1,std::move(d)});
   return res;
 }
 
 
 mode::MultiDiagonal mode::aDagOp(size_t cutoff)
 {
-  return hermitianConjugate(aOp(cutoff));
+  return hermitianConjugateOf(aOp(cutoff));
 }
 
 
 mode::MultiDiagonal mode::nOp(size_t cutoff)
 {
-  return compose(aDagOp(cutoff),aOp(cutoff));
+  return aDagOp(cutoff) | aOp(cutoff);
 }
 
+
+TimeIndependentJump<1> mode::aJump(double fact)
+{
+  return [=] (StateVectorView<1> psi) {
+    for (size_t n=0; n<psi.extents[0]-1; ++n) psi(n)=fact*sqrt(n+1)*psi(n+1);
+    psi(psi.extents[0]-1)=0;
+  };
+}
+
+
+TimeIndependentJump<1> mode::aDagJump(double fact)
+{
+  return [=] (StateVectorView<1> psi) {
+    for (size_t n=psi.extents[0]-1; n>0; --n) psi(n)=fact*sqrt(n)*psi(n-1);
+    psi(0)=0;
+  };
+}
+
+
+TimeIndependentSuperoperator<1> mode::aSuperoperator(double fact)
+{
+  return [=] (DensityOperatorConstView<1> rho, DensityOperatorView<1> drhodt) {
+    for (int m=0; m<rho.extents[0]; ++m)
+      for (int n=0; n<rho.extents[1]; ++n)
+        drhodt(m,n)+=fact*sqrt((m+1)*(n+1))*rho(m+1,n+1);
+  };
+}
+
+
+TimeIndependentSuperoperator<1> mode::aDagSuperoperator(double fact)
+{
+  return [=] (DensityOperatorConstView<1> rho, DensityOperatorView<1> drhodt) {
+    for (int m=1; m<=rho.extents[0]; ++m)
+      for (int n=1; n<=rho.extents[1]; ++n)
+        drhodt(m,n)+=fact*sqrt(m*n)*rho(m-1,n-1);
+  };
+}
+
+
+Lindblad<1> mode::photonLoss(double kappa, double nTh)
+{
+  double fact=2.*kappa*(nTh+1);
+  return {
+    .label{"photon loss"},
+    .jump{aJump(sqrt(fact))},
+    .rate{ [=] (StateVectorConstView<1> psi) {return fact*photonnumber(psi);}},
+    .superoperator{aSuperoperator(sqrt(fact))}
+  };
+}
+
+
+Lindblad<1> mode::photonGain(double kappa, double nTh)
+{
+  double fact=2.*kappa*nTh;
+  return {
+    .label{"photon gain"},
+    .jump{aDagJump(sqrt(fact))},
+    .rate{ [=] (StateVectorConstView<1> psi) {
+      double res=0;
+      for (size_t n=0; n<psi.extents[0]; ++n) res+=(n+1)*_(psi,n);
+      return fact*res;
+    }},
+    .superoperator{aDagSuperoperator(sqrt(fact))}
+  };
+}
 
 
 /*
@@ -42,53 +108,14 @@ double mode::photonnumber(const LazyDensityOperator& matrix)
 
 void mode::aJump(StateVectorLow& psi, double fact)
 {
-  for (size_t n=0; n<psi.ubound(0); ++n) psi(n)=fact*sqrt(n+1)*psi(n+1);
-  psi(psi.ubound(0))=0;
 }
     
 
 void mode::aDagJump(StateVectorLow& psi, double fact)
 {
-  for (size_t n=psi.ubound(0); n>0; --n) psi(n)=fact*sqrt(n)*psi(n-1);
-  psi(0)=0;
 }
 
 
-void mode::aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact)
-{
-  for (int m=0; m<rho.ubound(0); ++m)
-    for (int n=0; n<rho.ubound(1); ++n)
-      drhodt(m,n)+=fact*sqrt((m+1)*(n+1))*rho(m+1,n+1);
-}
-
-
-void mode::aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact)
-{
-  for (int m=1; m<=rho.ubound(0); ++m)
-    for (int n=1; n<=rho.ubound(1); ++n)
-      drhodt(m,n)+=fact*sqrt(m*n)*rho(m-1,n-1);
-}
-
-
-Lindblad<1> mode::photonLoss(double kappaTimes_nThPlus1)
-{
-  return {
-    .label{"excitation loss"},
-    .jump{[=](StateVectorLow& psi) {aJump(psi,sqrt(2.*kappaTimes_nThPlus1));}},
-    .rate{[=](const LazyDensityOperator& m) {return 2.*kappaTimes_nThPlus1*photonnumber(m);}},
-    .superoperator{[=](const DensityOperatorLow& rho, DensityOperatorLow& drhodt) {aSuperoperator(rho,drhodt,2.*kappaTimes_nThPlus1);}}
-  };
-}
-
-Lindblad<1> mode::photonGain(double kappaTimes_nTh)
-{
-  return {
-    .label{"excitation absorption"},
-    .jump{[=](StateVectorLow& psi) {aDagJump(psi,sqrt(2.*kappaTimes_nTh));}},
-    .rate{[=](const LazyDensityOperator& m) {return 2.*kappaTimes_nTh*(photonnumber(m)+m.trace());}},
-    .superoperator{[=](const DensityOperatorLow& rho, DensityOperatorLow& drhodt) {aDagSuperoperator(rho,drhodt,2.*kappaTimes_nTh);}}
-  };
-}
 
 
 ExpectationValue<1> mode::photonnumberEV_Variance{

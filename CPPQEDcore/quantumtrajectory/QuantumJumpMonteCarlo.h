@@ -65,7 +65,8 @@ struct QuantumJumpMonteCarlo
   : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re}, dpLimit_{dpLimit},
     logger_{size(getLi(qsd))}
   {
-    if (const auto& li{getLi(qsd)}; !time && size(li) ) manageTimeStep( calculateRates(li) );
+    if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
+        !time && size(li) ) manageTimeStep( calculateRates(li) );
   }
 
   double time=0., time0=0.;
@@ -125,9 +126,6 @@ struct QuantumJumpMonteCarlo
       if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
         ::structure::applyJump(li[--lindbladNo].jump,q.time,q.psi.mutableView());
 
-        std::cerr<<"### "<<lindbladNo<<" "<<rates[lindbladNo]<<" "<<*std::begin(rates)
-          <<" "<<::structure::calculateRate(li[0].rate,q.time,q.psi)<<" "<<::structure::calculateRate(li[1].rate,q.time,q.psi)
-          <<" "<<norm(q.psi)<<std::endl;
         double normFactor=sqrt(rates[lindbladNo]);
 
         if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");

@@ -58,9 +58,11 @@ template<>
 inline const std::string EngineID_v<XoshiroCpp::Xoshiro256PlusPlus> = "Xoshiro256pp";
 
 
-template<std::uniform_random_bit_generator Engine>
+template<std::uniform_random_bit_generator RE>
 struct EngineWithParameters
 {
+  using Engine = RE;
+
   EngineWithParameters(unsigned long s, unsigned long p) : engine{s,p}, seed{s}, prngStream{p} {}
   
   friend ::cppqedutils::LogTree logIntro(const EngineWithParameters& e)

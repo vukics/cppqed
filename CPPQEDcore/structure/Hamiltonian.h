@@ -128,6 +128,14 @@ struct HamiltonianElement
 };
 
 
+
+template <size_t RANK, hamiltonian_ns::functional<RANK> F>
+auto makeHamiltonianElement(std::string label, F&& functional)
+{
+  return HamiltonianElement<RANK,F>{.label{label},.functional{std::forward<F>(functional)}};
+}
+
+
 // itself a hamiltonian
 template <size_t RANK, hamiltonian<RANK>... H>
 struct HamiltonianCollection
@@ -153,9 +161,8 @@ struct HamiltonianCollection
 };
 
 
-template <size_t RANK, typename... H>
+template <size_t RANK, hamiltonian<RANK>... H>
 auto makeHamiltonianCollection(H&&... h) { return HamiltonianCollection<RANK,H...>{.collection{std::forward<H>(h)...}}; }
-
 
 
 static_assert(hamiltonian<UnaryDiagonalPropagator<false>,1>);

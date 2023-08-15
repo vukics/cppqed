@@ -32,12 +32,22 @@ namespace quantumdata {
  */
 inline dcomp _(::cppqedutils::MultiArrayConstView<dcomp,1> psi, size_t i, size_t j) {return psi(i)*std::conj(psi(j));}
 
+inline double _(::cppqedutils::MultiArrayConstView<dcomp,1> psi, size_t i) {return sqrAbs(psi(i));}
+
 inline dcomp _(::cppqedutils::MultiArrayConstView<dcomp,2> rho, size_t i, size_t j) {return rho(i,j);}
+
+inline double _(::cppqedutils::MultiArrayConstView<dcomp,2> rho, size_t i) {return real(rho(i,i));}
 
 template <size_t RANK>
 dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, ::cppqedutils::Extents<RANK> i, ::cppqedutils::Extents<RANK> j)
 {
   return psi(i)*std::conj(psi(j));
+}
+
+template <size_t RANK>
+double _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, ::cppqedutils::Extents<RANK> i)
+{
+  return sqrAbs(psi(i));
 }
 
 template <size_t TWO_TIMES_RANK>
@@ -46,6 +56,13 @@ dcomp _(::cppqedutils::MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
         ::cppqedutils::Extents<TWO_TIMES_RANK/2> j) requires (TWO_TIMES_RANK%2==0)
 {
   return rho(::cppqedutils::concatenate(i,j));
+}
+
+template <size_t TWO_TIMES_RANK>
+double _(::cppqedutils::MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
+         ::cppqedutils::Extents<TWO_TIMES_RANK/2> i) requires (TWO_TIMES_RANK%2==0)
+{
+  return real(rho(::cppqedutils::concatenate(i,i)));
 }
 
 

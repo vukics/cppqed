@@ -50,8 +50,9 @@ void for_each(MD&& md, auto&& func)
 template <size_t RANK>
 struct MultiDiagonal
 {
+  using Dimensions = ::cppqedutils::Extents<RANK>;
   using Index = std::bitset<RANK>; // true means upper (or the main) diagonal, false lower
-  using Offsets = ::cppqedutils::Extents<RANK>;
+  using Offsets = Dimensions;
   using Diagonal = ::cppqedutils::MultiArray<dcomp,RANK>;
   using DiagToIdx = std::map<Offsets,Diagonal>;
 
@@ -74,22 +75,23 @@ struct MultiDiagonal
   // double tCurrent=0;
 
   /// Applying as a Hamiltonian
-  void operator () (double t, ::quantumdata::StateVectorConstView<RANK> psi, ::quantumdata::StateVectorView<RANK> dpsidt)
+  void operator () (double t, ::quantumdata::StateVectorConstView<RANK> psi, ::quantumdata::StateVectorView<RANK> dpsidt) const
   {
-    using ::cppqedutils::Extents;
+    if (diagonals.empty()) return;
+
 #ifndef NDEBUG
     if (psi.extents != calculateAndCheckDimensions(*this)) throw std::runtime_error("Mismatch between StateVector and MultiDiagonal dimensions");
 #endif // NDEBUG
 
     for (const auto& [index,offsets,diag] : multidiagonal::range(this))  {
 
-      Extents<RANK> ubound{psi.extents}, lboundLHS, lboundRHS;
+      Dimensions ubound{psi.extents}, lboundLHS, lboundRHS;
       for (auto&& [i,o,u,lL,lR] : std::views::zip(std::views::iota(0uz,RANK),offsets,ubound,lboundLHS,lboundRHS)) {
         u -= index[i] ? o : 0; lL = index[i] ? 0 : o; lR = index[i] ? o : 0;
       }
 
       // Here, a generalized version of `cppqedutils::incrementMultiIndex` could be used, but let’s not touch that at the moment
-      const auto increment=[&] (auto n, const auto& inc, Extents<RANK>& idxLHS, Extents<RANK>& idxRHS, Extents<RANK>& idxDiag)
+      const auto increment=[&] (auto n, const auto& inc, Dimensions& idxLHS, Dimensions& idxRHS, Dimensions& idxDiag)
       {
         using namespace hana::literals;
         if constexpr (n!=0_c) {
@@ -99,7 +101,7 @@ struct MultiDiagonal
         else {idxLHS[0]++; idxRHS[0]++; idxDiag[0]++;} // This will eventually put the index into an illegal state, but this is how all (unchecked) iterators work.
       };
 
-      for ( Extents<RANK> idxLHS{lboundLHS}, idxRHS{lboundRHS}, idxDiag{}; idxLHS[0]!=ubound[0] ; increment( hana::llong_c<RANK-1>, increment, idxLHS, idxRHS, idxDiag ) )
+      for ( Dimensions idxLHS{lboundLHS}, idxRHS{lboundRHS}, idxDiag{}; idxLHS[0]!=ubound[0] ; increment( hana::llong_c<RANK-1>, increment, idxLHS, idxRHS, idxDiag ) )
         dpsidt(idxLHS) += diag(idxDiag)*psi(idxRHS) ;
     }
   }
@@ -137,9 +139,10 @@ struct MultiDiagonal
 
   MultiDiagonal& dagger() {return hermitianConjugate();}
 
-  friend MultiDiagonal hermitianConjugate(const MultiDiagonal& md) {MultiDiagonal res(copy(md)); res.hermitianConjugate(); return res;}
+  friend MultiDiagonal hermitianConjugateOf(const MultiDiagonal& md) {MultiDiagonal res(copy(md)); res.hermitianConjugate(); return res;}
 
-  friend MultiDiagonal twoTimesRealPartOf(const MultiDiagonal& md) {return md+hermitianConjugate(md);}
+  friend MultiDiagonal twoTimesRealPartOf(const MultiDiagonal& md) {return md+hermitianConjugateOf(md);}
+  friend MultiDiagonal twoTimesImagPartOf(const MultiDiagonal& md) {return md-hermitianConjugateOf(md);}
   //@}
 
   /// calculates a propagator from `mainDiagonal` and stores them in `frequencies`
@@ -158,7 +161,7 @@ struct MultiDiagonal
   MultiDiagonal operator-() const
   {
     MultiDiagonal res{copy(this)};
-    for (auto&& [index,offsets,diag] : multidiagonal::range(res)) for (dcomp& v : diag.dataView) v*=-1;
+    for (auto&& [index,offsets,diag] : multidiagonal::range(res)) for (dcomp& v : diag.dataStorage()) v*=-1;
     return res;
   }
 
@@ -167,7 +170,9 @@ struct MultiDiagonal
   MultiDiagonal& operator+=(const MultiDiagonal& md)
   {
 #ifndef NDEBUG
-    if (calculateAndCheckDimensions(md) != calculateAndCheckDimensions(*this)) throw std::runtime_error("Dimension mismatch in addition of MultiDiagonals");
+    if (auto dim{calculateAndCheckDimensions(*this)}, mdDim{calculateAndCheckDimensions(md)};
+      dim!=Dimensions{} && mdDim!=Dimensions{} && dim!=mdDim)
+        throw std::runtime_error("Dimension mismatch in addition of MultiDiagonals");
 #endif // NDEBUG
     for (const auto& [index,offsets,diag] : multidiagonal::range(md))
       if (auto insertResult=diagonals[index].emplace(offsets,copy(diag)); !insertResult.second)
@@ -194,9 +199,11 @@ struct MultiDiagonal
   //@}
 
 
-  friend ::cppqedutils::Extents<RANK> calculateAndCheckDimensions(const MultiDiagonal& md)
+  friend Dimensions calculateAndCheckDimensions(const MultiDiagonal& md)
   {
-    auto transformExtentsOfDiagonals = [] (const auto& diagonal) -> ::cppqedutils::Extents<RANK> {
+    if (md.diagonals.empty()) return {};
+
+    auto transformExtentsOfDiagonals = [] (const auto& diagonal) -> Dimensions {
       auto res{diagonal.second.extents};
       for (auto&& [v,o] : std::views::zip(res,diagonal.first)) v+=o;
       return res;
