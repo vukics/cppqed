@@ -207,6 +207,11 @@ private:
 };
 
 
+template<typename QSD, typename SV, typename OE, typename RandomEngineWithParameters>
+QuantumJumpMonteCarlo(QSD , SV , OE , RandomEngineWithParameters , double )
+-> QuantumJumpMonteCarlo< quantumdata::multiArrayRank_v<SV>, QSD, OE, typename RandomEngineWithParameters::Engine >;
+
+
 
 namespace qjmc {
 
