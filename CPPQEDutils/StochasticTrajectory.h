@@ -21,7 +21,7 @@ struct ParsStochastic : randomutils::Pars<RandomEngine,ode::Pars<>>
   size_t nTraj; ///< number of trajectories in case of ensemble averaging
 
   ParsStochastic(popl::OptionParser& op) : randomutils::Pars<RandomEngine,ode::Pars<>>{op} {
-    add(op,"nTraj","Number of trajectories",size_t(500),&nTraj);
+    addTuple(op,"StochasticTrajectory",::parameters::_("nTraj","Number of trajectories",500,nTraj));
   }
 
 };

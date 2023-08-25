@@ -98,6 +98,13 @@ template <size_t N> constexpr auto compileTimeOrdinals = [] {std::array<size_t,N
 template <typename N> concept scalar = std::convertible_to<N,double> || std::convertible_to<N,dcomp>;
 
 
+/// cf. https://www.scs.stanford.edu/~dm/blog/param-pack.html#multilambda
+template<typename ...L>
+struct multilambda : L... {
+  using L::operator()...;
+  constexpr multilambda(L...lambda) : L(std::move(lambda))... {}
+};
+
 } // cppqedutils
 
 

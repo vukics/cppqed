@@ -102,20 +102,21 @@ struct Pars : BASE
   /// TODO: the many add`s here and in similar places could be relieved with functional techniques
   Pars(popl::OptionParser& op) : BASE{op}
   {
-    addTitle(add(add(add(add(add(add(add(add(add(add(add(op,
-     "autoStopRepetition","Number of streamed lines repeated within relative precision before autostopping",0u,&autoStopRepetition),
-     "autoStopEpsilonAbs","Absolute precision for autostopping",ode::epsAbsDefault,&autoStopEpsilonAbs),
-     "autoStopEpsilonRel","Relative precision for autostopping",ode::epsRelDefault,&autoStopEpsilonRel),
-     "sdf","State output frequency",0u,&sdf),
-     "streamSwitch","stream intro,  stream outro, stream log underway, serialize 1st state",StreamSwitch("1011"),&streamSwitch),
-//     "precision","General precision of output",formdouble::Zero(FormDouble::defaultPrecision)),
-     "initialFileName","Trajectory initial file name",std::string{},&initialFileName),
-     "o","Output file name for Trajectory, when empty, cout",std::string{},&ofn),
-     "NDt","Number of steps in Dt mode",size_t{0},&NDt),
-     "Dt","Timestep between two streamings",.1,&Dt),
-     "dc","Number of steps between two streamings",10u,&dc),
-     "T","Simulated time",1.,&T),
-     "Trajectory");
+    using ::parameters::_;
+    addTuple(op,"Trajectory",  //Title(add(add(add(add(add(add(add(add(add(add(add(op,
+     _("T","Simulated time",1.,T),
+     _("dc","Number of steps between two streamings",10,dc),
+     _("Dt","Timestep between two streamings",.1,Dt),
+     _("NDt","Number of steps in Dt mode",0,NDt),
+     _("o","Output file name for Trajectory, when empty, cout","",ofn),
+     _("initialFileName","Trajectory initial file name","",initialFileName),
+//   _("precision","General precision of output",formdouble::Zero(FormDouble::defaultPrecision)),
+     _("streamSwitch","stream intro,  stream outro, stream log underway, serialize 1st state",StreamSwitch("1011"),streamSwitch),
+     _("sdf","State output frequency",0,sdf),
+     _("autoStopEpsilonRel","Relative precision for autostopping",ode::epsRelDefault,autoStopEpsilonRel),
+     _("autoStopEpsilonAbs","Absolute precision for autostopping",ode::epsAbsDefault,autoStopEpsilonAbs),
+     _("autoStopRepetition","Number of streamed lines repeated within relative precision before autostopping",0,autoStopRepetition)
+    );
 
   }
 

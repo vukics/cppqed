@@ -91,10 +91,10 @@ struct Pars<pcg64,BASE> : BASE
 
   Pars(popl::OptionParser& op) : BASE{op}
   {
-    addTitle(add(add(op,
-      "seed","Random number generator seed",1001ul,&seed),
-      "prngStream","Random number generator independent stream ordinal",1ul,&prngStream),
-      "Random number generator");
+    addTuple(op,"Random number generator",
+      ::parameters::_("prngStream","Random number generator independent stream ordinal",1,prngStream),
+      ::parameters::_("seed","Random number generator seed",1001,seed)
+      );
   }
 };
 

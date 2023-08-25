@@ -62,7 +62,7 @@ concept engine = adaptive_timestep_keeper<T> && logger<T> &&
     { step(t,deltaT,sys,time,stateInOut) } -> std::convertible_to<LogTree>; };
 
 
-/// Aggregate condensing parameters concerning adaptive ODE evolution in the style of a popl::OptionParser
+/// Aggregate condensing parameters related to adaptive ODE evolution in the style of a popl::OptionParser
 template <typename BASE=Empty>
 struct Pars : BASE
 {
@@ -72,10 +72,9 @@ struct Pars : BASE
 
   Pars(popl::OptionParser& op) : BASE{op}
   {
-    addTitle(add(add(op,
-      "epsAbs","ODE engine absolute precision",epsAbsDefault,&epsAbs),
-      "epsRel","ODE engine relative precision",epsRelDefault,&epsRel),
-      "ODE_Engine generic parameters");
+    addTuple(op,"ODE_Engine generic parameters",
+      ::parameters::_("epsRel","ODE engine relative precision",epsRelDefault,epsRel),
+      ::parameters::_("epsAbs","ODE engine absolute precision",epsAbsDefault,epsAbs));
   }
       
 };

@@ -28,11 +28,12 @@ struct Pars : public cppqedutils::trajectory::ParsStochastic<RandomEngine> {
 
   Pars(popl::OptionParser& op) : cppqedutils::trajectory::ParsStochastic<RandomEngine>{op}
   {
-    addTitle(add(add(add(op,
-        "nJumpsPerBin","average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",size_t(50),&nJumpsPerBin),
-        "nBins","number of bins used for a histogram of jumps",size_t(0),&nBins),
-        "dpLimit","QJMC stepper total jump probability limit",0.01,&dpLimit),
-        "QuantumJumpMonteCarlo");
+    using ::parameters::_;
+    addTuple(op,"QuantumJumpMonteCarlo",
+      _("dpLimit","QJMC stepper total jump probability limit",0.01,dpLimit),
+      _("nBins","number of bins used for a histogram of jumps",0,nBins),
+      _("nJumpsPerBin","average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",50,nJumpsPerBin)
+    );
   }
 
 };
