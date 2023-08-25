@@ -52,8 +52,8 @@ TimeIndependentJump<1> mode::aDagJump(double fact)
 TimeIndependentSuperoperator<1> mode::aSuperoperator(double fact)
 {
   return [=] (DensityOperatorConstView<1> rho, DensityOperatorView<1> drhodt) {
-    for (int m=0; m<rho.extents[0]; ++m)
-      for (int n=0; n<rho.extents[1]; ++n)
+    for (int m=0; m<rho.extents[0]-1; ++m)
+      for (int n=0; n<rho.extents[1]-1; ++n)
         drhodt(m,n)+=fact*sqrt((m+1)*(n+1))*rho(m+1,n+1);
   };
 }
@@ -62,8 +62,8 @@ TimeIndependentSuperoperator<1> mode::aSuperoperator(double fact)
 TimeIndependentSuperoperator<1> mode::aDagSuperoperator(double fact)
 {
   return [=] (DensityOperatorConstView<1> rho, DensityOperatorView<1> drhodt) {
-    for (int m=1; m<=rho.extents[0]; ++m)
-      for (int n=1; n<=rho.extents[1]; ++n)
+    for (int m=1; m<=rho.extents[0]-1; ++m)
+      for (int n=1; n<=rho.extents[1]-1; ++n)
         drhodt(m,n)+=fact*sqrt(m*n)*rho(m-1,n-1);
   };
 }
