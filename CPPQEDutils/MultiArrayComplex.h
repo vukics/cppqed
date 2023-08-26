@@ -99,7 +99,7 @@ void twoTimesRealPartOfSelf(MultiArrayView<dcomp,TWO_TIMES_RANK> mav)
   auto _=[&] (size_t i, size_t j) -> dcomp& {return mav.dataView[i+matrixDim*j];};
   for (size_t i=0; i<matrixDim; ++i) {
     _(i,i)=2.*real(_(i,i));
-    for (size_t j=i; j<matrixDim; ++j) _(j,i)=conj(_(i,j)=_(i,j)+_(j,i));
+    for (size_t j=i; j<matrixDim; ++j) _(j,i)=conj(_(i,j)=_(i,j)+conj(_(j,i)));
   }
 };
 
