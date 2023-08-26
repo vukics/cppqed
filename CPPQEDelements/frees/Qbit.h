@@ -80,12 +80,12 @@ struct Pars
   Pars(popl::OptionParser& op, std::string mod="")
   {
     using ::parameters::_;
-    addTuple(mod,op,"Qubit",
+    add(mod,op,"Qubit",
       _("delta","qubit detuning",-10.,delta),
 //      _("init","initial condition",dcomp(0.),init),
       _("eta","qubit drive",0.,eta),
       _("gamma_m","qubit decay rate",10.,gamma_m),
-      _("gamma_p","qubit gain rate",10.,gamma_p));
+      _("gamma_p","qubit gain rate",0.,gamma_p));
   }
 
 };

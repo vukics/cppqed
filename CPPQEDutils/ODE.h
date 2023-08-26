@@ -72,7 +72,7 @@ struct Pars : BASE
 
   Pars(popl::OptionParser& op) : BASE{op}
   {
-    addTuple(op,"ODE_Engine generic parameters",
+    add(op,"ODE_Engine generic parameters",
       ::parameters::_("epsRel","ODE engine relative precision",epsRelDefault,epsRel),
       ::parameters::_("epsAbs","ODE engine absolute precision",epsAbsDefault,epsAbs));
   }

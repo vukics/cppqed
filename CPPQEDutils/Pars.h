@@ -11,6 +11,10 @@ popl::OptionParser optionParser(std::string pre="", std::string post="");
 
 void parse(popl::OptionParser&, int argc, const char* const argv[]);
 
+
+namespace parameters {
+
+
 template <typename T>
 auto& add(popl::OptionParser& op, std::string option, std::string description, T defaultValue, auto&& binding)
 {
@@ -47,9 +51,6 @@ inline auto& addTitle(popl::OptionParser& op, std::string title, std::string mod
 }
 
 
-namespace parameters {
-
-
 template <typename T, std::convertible_to<T> U>
 auto _(std::string option, std::string description, const U& defaultValue, T& binding)
 {
@@ -66,9 +67,9 @@ popl::OptionParser& add_dispatch(std::string mod, popl::OptionParser& op, const 
 {
   ::cppqedutils::multilambda worker {
     [&op,mod] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> & t ) {
-      ::add(op,std::get<0>(t),mod,std::get<1>(t),std::get<2>(t),&std::get<3>(t));
+      add(op,std::get<0>(t),mod,std::get<1>(t),std::get<2>(t),&std::get<3>(t));
     },
-    [&op,mod] (const std::string& title) {::addTitle(op,title,mod);}
+    [&op,mod] (const std::string& title) {addTitle(op,title,mod);}
   };
 
   (worker(t), ...);
@@ -81,13 +82,7 @@ popl::OptionParser& add_dispatch(std::string mod, popl::OptionParser& op, const 
 
 
 
-popl::OptionParser& addTuple(std::string mod, popl::OptionParser& op, const auto&... t) {return parameters::add_dispatch(mod,op,t...);}
+popl::OptionParser& add(std::string mod, popl::OptionParser& op, const auto&... t) {return parameters::add_dispatch(mod,op,t...);}
 
-popl::OptionParser& addTuple(popl::OptionParser& op, const auto&... t) {return parameters::add_dispatch("",op,t...);}
+popl::OptionParser& add(popl::OptionParser& op, const auto&... t) {return parameters::add_dispatch("",op,t...);}
 
-
-
-// popl::OptionParser& addTuple(popl::OptionParser& op, const auto&... t)
-// {
-//   return addTuple(op,"",t...);
-// }
