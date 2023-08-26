@@ -135,6 +135,10 @@ private:
 };
 
 
+template<typename QSD, typename DO, typename OE>
+Master(QSD , DO , OE ) -> Master< quantumdata::multiArrayRank_v<DO>/2, QSD, OE >;
+
+
 /*
 namespace master {
 

@@ -17,30 +17,26 @@ int main(int argc, char* argv[])
 {
   auto op{optionParser()};
 
-  cppqedutils::trajectory::Pars<quantumtrajectory::master::Pars> pt(op);
+  cppqedutils::trajectory::Pars<quantumtrajectory::qjmc::Pars<pcg64>> pt(op);
+
+  Pars pq(op);
 
   parse(op,argc, argv);
 
-  dcomp z{.1,1.}, eta{-.1,.2};
+  auto qbit{make(pq)};
 
-  QuantumSystemDynamics qbit {
-    std::array{structure::SystemFrequencyDescriptor{"z",z,1.},structure::SystemFrequencyDescriptor{"η",eta,1.}},
-    std::array{loss(1.),gain(.1)},
-    makeHamiltonianCollection<1>(diagonalH(z),offDiagonalH(eta)),
-    expectationValues }; //= make({1,1},{1,1},{1,1},1,1,1);
-  
-  cppqedutils::ODE_EngineBoost<quantumdata::DensityOperator<1>::StorageType> oe(quantumtrajectory::initialTimeStep<1>(qbit),1e-12,1e-30);
+  cppqedutils::ODE_EngineBoost<quantumdata::DensityOperator<1>::StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
 
-  quantumtrajectory::Master<1,decltype(qbit),decltype(oe)> m{qbit,quantumdata::DensityOperator<1>{{2}},oe};
+  quantumtrajectory::Master m{qbit,quantumdata::DensityOperator<1>{{2}},oe};
 
-  quantumtrajectory::QuantumJumpMonteCarlo<1,decltype(qbit),decltype(oe),pcg64> q{qbit,quantumdata::StateVector<1>{{2}},oe,{1001,1},0.01};
+  // quantumtrajectory::QuantumJumpMonteCarlo q{qbit,quantumdata::StateVector<1>{{2}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
 
   cppqedutils::run(m,pt,cppqedutils::trajectory::observerNoOp);
 
-  {
-    quantumdata::StateVector<2> psi{{2,3}}; quantumdata::DensityOperator<2> rho{{2,3}};
-    std::cerr<<_(psi,{0,1},{1,0})<<" "<<_(rho,{0,1},{1,0})<<std::endl;
-  }
+  // {
+  //   quantumdata::StateVector<2> psi{{2,3}}; quantumdata::DensityOperator<2> rho{{2,3}};
+  //   std::cerr<<_(psi,{0,1},{1,0})<<" "<<_(rho,{0,1},{1,0})<<std::endl;
+  // }
 
 
 /*  for (size_t i=0; i<1e2; ++i) {

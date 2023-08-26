@@ -58,7 +58,7 @@ auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*,
 
   return QuantumSystemDynamics{
     std::vector<SystemFrequencyDescriptor>{{"zSch",zSch,1}/*,{"zI",zI,1}*/,{"η",eta,1},{"γ_m",gamma_m,1},{"γ_p",gamma_p,1}/*,{"γ_phi",gamma_phi,1}*/},
-    liouvillian,
+    std::move(liouvillian),
     makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
     expectationValues
   };

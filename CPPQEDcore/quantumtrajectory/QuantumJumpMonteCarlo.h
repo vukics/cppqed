@@ -64,7 +64,7 @@ struct QuantumJumpMonteCarlo
   
   QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
   : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re}, dpLimit_{dpLimit},
-    logger_{size(getLi(qsd))}
+    logger_{std::size(getLi(this->qsd))}
   {
     if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
         !time && size(li) ) manageTimeStep( calculateRates(li) );
