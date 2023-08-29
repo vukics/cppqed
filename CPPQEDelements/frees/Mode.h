@@ -5,6 +5,7 @@
 
 #include "MultiDiagonal.h"
 
+#include "Pars.h"
 
 namespace mode {
 
@@ -53,10 +54,83 @@ Lindblad<1> photonLoss(double kappa, double nTh);
 Lindblad<1> photonGain(double kappa, double nTh);
 
 
-static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho) { return photonnumber(rho); };
+static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
+{
+  double pn=0, pnn=0; dcomp a=0;
+  for (size_t n=1; n<rho.extents[0]; ++n) {
+    pn +=n*  _(rho,n);
+    pnn+=n*n*_(rho,n);
+    a+=sqrt(n)*_(rho,n,n-1);
+  }
+  return hana::make_tuple(pn,pnn,a);
+};
 
-::cppqedutils::LogTree label(decltype(expectationValues)) { return {"photon number"}; }
 
+constexpr auto postProcessor(decltype(expectationValues)) {
+  return [] (std::invoke_result_t<decltype(expectationValues),StateVectorConstView<1>> & t) {
+    using namespace hana::literals; t[1_c] -= sqr(t[0_c]);
+  };
+}
+
+
+constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {"photon number","photon number variance","ladder operator"}; }
+
+
+static_assert(::structure::expectationvalues::labelled_and_with_nonlinear_postprocessing<decltype(expectationValues),1>);
+
+
+auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
+{
+  std::vector<Lindblad<1>> liouvillian;
+  std::vector<SystemFrequencyDescriptor> freqs;
+
+  dcomp z{kappa*(2*nTh+1),-delta};
+
+  if (delta) freqs.emplace_back("δ",delta,cutoff);
+
+  if (omegaKerr) freqs.emplace_back("ω",omegaKerr,sqr(cutoff));
+
+  if (abs(eta)) freqs.emplace_back("η",eta,sqrt(cutoff));
+
+  if (kappa) {
+    liouvillian.push_back(photonLoss(kappa,nTh));
+    freqs.emplace_back("κ",kappa,(nTh+1)*cutoff);
+    if (nTh) liouvillian.push_back(photonGain(kappa,nTh));
+  }
+
+  return QuantumSystemDynamics { std::move(freqs), std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), expectationValues };
+}
+
+
+
+struct Pars
+{
+  size_t cutoff;
+  double delta, omegaKerr, kappa, nTh;
+  dcomp eta;
+
+  Pars(popl::OptionParser& op, std::string mod="")
+  {
+    using ::parameters::_;
+    add(mod,op,"Mode",
+        _("cutoff","Fock space cutoff",10,cutoff),
+        _("delta","detuning",-10.,delta),
+        _("omegaKerr","Kerr constant",0.,omegaKerr),
+        _("eta","drive amplitude",dcomp(0),eta),
+        _("kappa","decay rate",10.,kappa),
+        _("nTh","thermal photon number",0.,nTh));
+  }
+
+    // minitFock(p.add<size_t>("minitFock",mod,"Mode initial Fock state",0)),
+    // minit(p.add<dcomp>("minit",mod,"Mode initial field",0)),
+
+};
+
+
+auto make(const Pars& p)
+{
+  return make(p.cutoff,p.delta,p.omegaKerr,p.eta,p.kappa,p.nTh);
+}
 
 
 /*

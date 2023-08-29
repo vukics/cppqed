@@ -65,28 +65,27 @@ int main(int argc, char* argv[])
 
   cppqedutils::trajectory::Pars<quantumtrajectory::master::Pars> pt(op);
 
+  Pars pm(op);
+
   parse(op,argc, argv);
 
-  dcomp z{.1,1.}, eta{-.1,.2};
-  double omegaKerr=2, nTh=1.;
-  size_t cutoff=10;
+  auto mode{make(pm)};
 
-  std::array freqs{
-    structure::SystemFrequencyDescriptor{"z",z,1.},
-    structure::SystemFrequencyDescriptor{"η",eta,sqrt(cutoff)},
-    structure::SystemFrequencyDescriptor{"omegaKerr",omegaKerr,sqr(cutoff)}};
+  cppqedutils::ODE_EngineBoost<quantumdata::StateVector<1>::StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(mode)),1e-12,1e-30);
 
-  cppqedutils::ODE_EngineBoost<quantumdata::StateVector<1>::StorageType> oe(quantumtrajectory::initialTimeStep(freqs),1e-12,1e-30);
+  cppqedutils::run(
+    quantumtrajectory::QuantumJumpMonteCarlo{std::move(mode),quantumdata::StateVector<1>{{pm.cutoff}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01},
+    pt,cppqedutils::trajectory::observerNoOp);
 
-  quantumtrajectory::QuantumJumpMonteCarlo
-    q{QuantumSystemDynamics{
-        freqs,
-        std::array<structure::Lindblad<1>,2>{photonLoss(1.,nTh),photonGain(.1,nTh)},
-        mode::hamiltonian(cutoff,z,omegaKerr,eta),
-        expectationValues },
-      quantumdata::StateVector<1>{{cutoff}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
-
-  cppqedutils::run(q,pt,cppqedutils::trajectory::observerNoOp);
+  // cppqedutils::run(
+  //   quantumtrajectory::Master{
+  //     QuantumSystemDynamics {
+  //         freqs,
+  //         std::array<structure::Lindblad<1>,2>{photonLoss(1.,nTh),photonGain(.1,nTh)},
+  //         mode::hamiltonian(cutoff,z,omegaKerr,eta),
+  //         expectationValues },
+  //     quantumdata::DensityOperator<1>{{cutoff}},oe},
+  //   pt,cppqedutils::trajectory::observerNoOp);
 
 
   //  for ( auto&& [idx0,idx1] : std::views::zip( cppqedutils::MultiIndexRange<5>{{5,2,4,3,2}},cppqedutils::MultiIndexRange<5>{{10,2,2,3,2}} ) )

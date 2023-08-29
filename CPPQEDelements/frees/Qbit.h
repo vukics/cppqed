@@ -15,8 +15,13 @@ auto diagonalH(dcomp z) { return [=] (StateVectorConstView<1> psi, StateVectorVi
 
 auto offDiagonalH(dcomp eta) { return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(0)+=-conj(eta)*psi(1); dpsidt(1)+=eta*psi(0);}; }
 
+auto fullH(dcomp z, dcomp eta) { return [diag=diagonalH(z),offDiag=offDiagonalH(eta)] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {
+  diag(psi,dpsidt); offDiag(psi,dpsidt);
+};}
+
 ::cppqedutils::LogTree label(decltype(diagonalH(dcomp{}))) { return {"diagonalH"}; }
 ::cppqedutils::LogTree label(decltype(offDiagonalH(dcomp{}))) { return {"offDiagonalH"}; }
+::cppqedutils::LogTree label(decltype(fullH(dcomp{},dcomp{}))) { return {"fullH"}; }
 
 
 UnaryDiagonalPropagator<> propagator(dcomp z);
@@ -51,18 +56,17 @@ StateVector<1> init(dcomp psi1);
 auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/)
 {
   std::vector<Lindblad<1>> liouvillian;
+  std::vector<SystemFrequencyDescriptor> freqs;
 
-  if (gamma_m) liouvillian.push_back(loss(gamma_m));
-  if (gamma_p) liouvillian.push_back(gain(gamma_m));
+  if (abs(zSch)) freqs.emplace_back("zSch",zSch,1);
+  if (abs(eta)) freqs.emplace_back("η",eta,1);
+  if (gamma_m) {liouvillian.push_back(loss(gamma_m)); freqs.emplace_back("γ_m",gamma_m,1);}
+  if (gamma_p) {liouvillian.push_back(gain(gamma_m)); freqs.emplace_back("γ_p",gamma_p,1);}
   // if (gamma_phi) liouvillian.emplace(dephasing(gamma_phi));
 
-  return QuantumSystemDynamics{
-    std::vector<SystemFrequencyDescriptor>{{"zSch",zSch,1}/*,{"zI",zI,1}*/,{"η",eta,1},{"γ_m",gamma_m,1},{"γ_p",gamma_p,1}/*,{"γ_phi",gamma_phi,1}*/},
-    std::move(liouvillian),
-    makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
-    expectationValues
-  };
+  return QuantumSystemDynamics { std::move(freqs), std::move(liouvillian), fullH(zSch,eta), expectationValues }; //makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
 }
+
 
 
 auto make(double delta, dcomp eta, double gamma_m, double gamma_p)
@@ -81,11 +85,11 @@ struct Pars
   {
     using ::parameters::_;
     add(mod,op,"Qubit",
-      _("delta","qubit detuning",-10.,delta),
+      _("delta","detuning",-10.,delta),
 //      _("init","initial condition",dcomp(0.),init),
-      _("eta","qubit drive",0.,eta),
-      _("gamma_m","qubit decay rate",10.,gamma_m),
-      _("gamma_p","qubit gain rate",0.,gamma_p));
+      _("eta","drive",0.,eta),
+      _("gamma_m","decay rate",10.,gamma_m),
+      _("gamma_p","gain rate",0.,gamma_p));
   }
 
 };

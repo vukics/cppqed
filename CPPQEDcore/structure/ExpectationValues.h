@@ -42,13 +42,15 @@ auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 
 /// pre- & postcondition: the LogTree must have the same structure as the temporal_data_point returned by expectation_value
 template <typename L, size_t RANK>
-concept labelled_and_without_nonlinear_postprocessing = ::cppqedutils::labelled<L> && expectationvalues::functional<L,RANK> ;
+concept labelled_and_without_nonlinear_postprocessing = ::cppqedutils::labelled<L> && functional<L,RANK> ;
 
 /// Postprocessing means any operation on the expectation values that is not linear in the density operator (as the calculation of variance, for istance)
 template <typename L, size_t RANK>
 concept labelled_and_with_nonlinear_postprocessing = labelled_and_without_nonlinear_postprocessing<L,RANK> && (
-  // here, only one example of a valid call of l is enough
-  requires (const L& l, double t, DensityOperatorConstView<RANK> rho) { postProcessor(l)( l(t,rho) ) || postProcessor(l)( l(rho) ); } ) ;
+  ( time_dependent_functional<L,RANK> && requires (const L& l, std::invoke_result_t<L,double,StateVectorConstView<1>> & tdp) { postProcessor(l)(tdp); } ) ||
+  ( time_independent_functional<L,RANK> && requires (const L& l, std::invoke_result_t<L,StateVectorConstView<1>> & tdp) { postProcessor(l)(tdp); } )
+) ;
+
 
 } // expectationvalues
 
