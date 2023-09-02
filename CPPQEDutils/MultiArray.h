@@ -47,6 +47,12 @@ auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
 }
 
 
+namespace multiarray {
+
+static constexpr struct Placeholder {} _;
+
+} // multiarray
+
 
 /// A non-owning view, should be passed by value.
 /**
@@ -113,6 +119,15 @@ public:
   /// A simple specialization for binary views
   T& operator() (std::convertible_to<size_t> auto i, std::convertible_to<size_t> auto j) const requires (RANK==2) {
     checkBounds(i,j); return dataView[offset+strides[0]*i+strides[1]*j];
+  }
+
+  /// TODO: extend these to arbitrary RANK
+  auto operator() (std::convertible_to<size_t> auto i, multiarray::Placeholder) const requires (RANK==2) {
+    return MultiArrayView<T,1>{ {extents[1]}, {strides[1]}, offset+i*strides[0], dataView};
+  }
+
+  auto operator() (multiarray::Placeholder, std::convertible_to<size_t> auto j) const requires (RANK==2) {
+    return MultiArrayView<T,1>{ {extents[0]}, {strides[0]}, offset+j*strides[1], dataView};
   }
 
   Extents<RANK> extents, strides;
