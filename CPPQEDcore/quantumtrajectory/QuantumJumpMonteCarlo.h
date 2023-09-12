@@ -208,15 +208,19 @@ QuantumJumpMonteCarlo(QSD , SV , OE , RandomEngineWithParameters , double )
 
 namespace qjmc {
 
-/*
-template<typename ODE_Engine, typename RandomEngine, typename SV>
-auto make(::structure::QuantumSystemPtr<std::decay_t<SV>::N_RANK> sys,
-          SV&& state, const Pars<RandomEngine>& p)
+template <template<typename> class OE, typename RandomEngine, typename QSD, typename SV>
+auto make(QSD&& qsd, SV&& state, const Pars<RandomEngine>& p)
 {
-  return QuantumJumpMonteCarlo<std::decay_t<SV>::N_RANK,ODE_Engine,RandomEngine>{
-    sys,std::forward<SV>(state),{initialTimeStep(sys),p},{p.seed,p.prngStream},p.dpLimit,p.overshootTolerance,p.logLevel
-  };
+  return quantumtrajectory::QuantumJumpMonteCarlo{
+    std::forward<QSD>(qsd),
+    std::forward<SV>(state),
+    OE<typename quantumdata::StateVector<::quantumdata::multiArrayRank_v<std::decay_t<SV>>>::StorageType>{
+      quantumtrajectory::initialTimeStep(getFreqs(qsd)),p.epsRel,p.epsAbs},
+    randomutils::EngineWithParameters<RandomEngine>{p.seed,p.prngStream},
+    p.dpLimit};
 }
+
+/*
 
 /// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `QuantumJumpMonteCarlo`s
 template<typename ODE_Engine, typename RandomEngine, typename V, typename SYS, typename SV>
@@ -257,33 +261,6 @@ struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::Qua
 
 /*
 
-template<size_t RANK, typename ODE_Engine, typename RandomEngine>
-std::ostream& quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::streamParameters(std::ostream& os) const
-{
-  using namespace std;
-  
-  ::structure::streamCharacteristics(sys_,sys_->streamParameters(
-    re_.stream(ode_.streamParameters(os))<<"\nMCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl) )<<endl;
-
-  if (const auto li=::structure::castLi(sys_)) {
-    os<<"Decay channels:\n";
-    {
-      size_t i=0;
-      li->streamKey(os,i);
-    }
-    os<<"Alternative Lindblads: ";
-    {
-      const auto rates(li->rates(0,psi_));
-      int n=0;
-      for (int i=0; i<rates.size(); ++i) if (rates(i)<0) {os<<i<<' '; ++n;}
-      if (!n) os<<"none";
-    }
-    os<<endl;
-  }
-
-  return os;
-  
-}
 
 
 template<size_t RANK, typename ODE_Engine, typename RandomEngine>
@@ -321,4 +298,34 @@ struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtr
   }
 };*/
 
+
+
+
+// template<size_t RANK, typename ODE_Engine, typename RandomEngine>
+// std::ostream& quantumtrajectory::QuantumJumpMonteCarlo<RANK,ODE_Engine,RandomEngine>::streamParameters(std::ostream& os) const
+// {
+//   using namespace std;
+//
+//   ::structure::streamCharacteristics(sys_,sys_->streamParameters(
+//     re_.stream(ode_.streamParameters(os))<<"\nMCWF Trajectory Parameters: dpLimit="<<dpLimit_<<" (overshoot tolerance factor)="<<overshootTolerance_<<endl<<endl) )<<endl;
+//
+//   if (const auto li=::structure::castLi(sys_)) {
+//     os<<"Decay channels:\n";
+//     {
+//       size_t i=0;
+//       li->streamKey(os,i);
+//     }
+//     os<<"Alternative Lindblads: ";
+//     {
+//       const auto rates(li->rates(0,psi_));
+//       int n=0;
+//       for (int i=0; i<rates.size(); ++i) if (rates(i)<0) {os<<i<<' '; ++n;}
+//       if (!n) os<<"none";
+//     }
+//     os<<endl;
+//   }
+//
+//   return os;
+//
+// }
 
