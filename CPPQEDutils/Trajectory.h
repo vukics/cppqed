@@ -35,7 +35,8 @@ LogTree advance(adaptive_steppable auto& traj, double deltaT)
 {
   LogTree res;
   double endTime=getTime(traj)+deltaT;
-  while (double dt=endTime-getTime(traj)) res.push_back( step(traj,dt).begin().value() ) ;
+  // TODO: what is an idiomatic way to do this? (Check for null value before adding.)
+  while (double dt=endTime-getTime(traj)) if (LogTree logFromStep=step(traj,dt); !empty(logFromStep) ) res.push_back(logFromStep) ;
   return {{"advance",res}};
 }
 

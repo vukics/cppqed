@@ -2,12 +2,9 @@
 #pragma once
 
 #include "QJMC_Logger.h"
-#include "QuantumSystemDynamics.h"
 #include "QuantumTrajectory.h"
 
 #include "StochasticTrajectory.h"
-
-#include <tuple>
 
 
 namespace quantumtrajectory {
@@ -88,34 +85,31 @@ struct QuantumJumpMonteCarlo
 
   friend ::cppqedutils::LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {{"QJMC",q.logger_.outro()},{"ODE_Engine",logOutro(q.oe)}};}
 
+  /// TODO: the returned log should contain information about the coherent step + the time step change as well
   friend auto step(QuantumJumpMonteCarlo& q, double deltaT)
   {
     ::cppqedutils::LogTree res;
 
-    auto coherentTimeDevelopment = [&] (double deltaT)
+    // Coherent time development
+    step(q.oe, std::min(q.oe.dtTry,deltaT), [&] (const typename StateVector::StorageType& psiRaw, typename StateVector::StorageType& dpsidtRaw, double t)
     {
-      step(q.oe, std::min(q.oe.dtTry,deltaT), [&] (const typename StateVector::StorageType& psiRaw, typename StateVector::StorageType& dpsidtRaw, double t)
-      {
-        ::structure::applyHamiltonian(getHa(q.qsd),t,
-                                      ::quantumdata::StateVectorConstView<RANK>{q.psi.extents,q.psi.strides,0,psiRaw},
-                                      ::quantumdata::StateVectorView<RANK>{q.psi.extents,q.psi.strides,0,
-                                                                           dpsidtRaw.begin(),std::ranges::fill(dpsidtRaw,0)},
-                                      q.time0);
-      },q.time,q.psi.dataStorage());
+      ::structure::applyHamiltonian(getHa(q.qsd),t,
+                                    ::quantumdata::StateVectorConstView<RANK>{q.psi.extents,q.psi.strides,0,psiRaw},
+                                    ::quantumdata::StateVectorView<RANK>{q.psi.extents,q.psi.strides,0,
+                                                                         dpsidtRaw.begin(),std::ranges::fill(dpsidtRaw,0)},
+                                    q.time0);
+    },q.time,q.psi.dataStorage());
 
-      ::structure::applyPropagator(getHa(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
+    ::structure::applyPropagator(getHa(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
 
-      q.logger_.processNorm(renorm(q.psi));
+    q.logger_.processNorm(renorm(q.psi));
 
-    };
-
-    coherentTimeDevelopment(deltaT);
-
+    // Jump
     if (const auto& li{getLi(q.qsd)}; size(li)) {
 
       auto rates(q.calculateRates(li));
 
-      res=q.manageTimeStep(rates);
+      q.manageTimeStep(rates);
 
       // perform jump
       double random=q.sampleRandom()/getDtDid(q);
