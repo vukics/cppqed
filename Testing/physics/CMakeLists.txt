@@ -59,15 +59,15 @@ add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
 
 declaretest(ph_PLM_CPPQED)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode>)
 
 declaretest(ph_PLM_CPPQEDsch)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode>)
 
 declaretest(ph_PLM_CPPQEDuip)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode>)
 
 declaretest(compare_PLM)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
@@ -143,7 +143,7 @@ set_tests_properties(${TESTNAME} PROPERTIES
 
 declaretest(ph_PLM_FT)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:DrivenDissipativeMode>)
 
 declaretest(compare_PLM_FT)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
