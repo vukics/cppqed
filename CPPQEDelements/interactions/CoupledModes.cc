@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#include "CoupledModes.h"
+/*#include "CoupledModes.h"
 
 #include "Tridiagonal.tcc"
 
@@ -41,3 +41,4 @@ Base<true ,CM_XX_RWA>::Base(mode::Ptr m1, mode::Ptr m2, dcomp u)
 }
 
 }
+*/

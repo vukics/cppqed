@@ -1,5 +1,5 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-#if !BOOST_PP_IS_ITERATING
+/* #if !BOOST_PP_IS_ITERATING
 
 #include "Sigma.h"
 
@@ -51,3 +51,4 @@ quantumoperator::partialProject<ITER,false>(const StateVectorLow<ITER>& psi, int
 
 
 #endif // BOOST_PP_IS_ITERATING
+*/

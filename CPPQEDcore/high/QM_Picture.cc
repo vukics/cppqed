@@ -37,6 +37,7 @@ istream& operator>>(istream& is, QM_Picture& qmp)
   return is;
 }
 
+/*
 
 QM_Picture& picture::updateWithPicture(parameters::Table& p, int argc, char* argv[], const std::string& prefix)
 {
@@ -48,3 +49,5 @@ QM_Picture& picture::updateWithPicture(parameters::Table& p, int argc, char* arg
   } catch (const parameters::UnrecognisedParameterException&) {}
   return qmp;
 }
+
+*/

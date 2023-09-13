@@ -17,7 +17,7 @@ std::istream& operator>>(std::istream&, QM_Picture&);
 namespace picture {
   
 /// Convenience version of parameters::update meant to tackle the problem described in Sec. \ref masterequationlimitations
-QM_Picture& updateWithPicture(parameters::Table& p, int argc, char* argv[], const std::string& prefix="--");
+// QM_Picture& updateWithPicture(parameters::Table& p, int argc, char* argv[], const std::string& prefix="--");
 
 }
 

@@ -3,7 +3,7 @@
 #ifndef   CPPQEDCORE_QUANTUMOPERATOR_SIGMA_H_INCLUDED
 #define   CPPQEDCORE_QUANTUMOPERATOR_SIGMA_H_INCLUDED
 
-#include "Types.h"
+// #include "Types.h"
 
 
 namespace quantumoperator {

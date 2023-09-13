@@ -20,11 +20,15 @@ int main(int argc, char* argv[])
   double omega, gamma;
   dcomp yinit, dydtinit;
   
-  add(add(add(add(op,
-      "dydtinit","dydt initial condition",dcomp(-1,1)/*,dcomp(-4.83065, 1.16527)*/,&dydtinit),
-      "yinit","y initial condition",dcomp(1,-1)/*,dcomp( 3.45263,-2.0746 )*/,&yinit),
-      "G","Damping rate",1.,&gamma),
-      "O","Driving frequency",1.,&omega);
+  {
+    using parameters::_;
+    add(op,"HarmonicOscillator",
+        _("O","Driving frequency",1.,omega),
+        _("G","Damping rate",1.,gamma),
+        _("yinit","y initial condition",dcomp(1,-1)/*,dcomp( 3.45263,-2.0746 )*/,yinit),
+        _("dydtinit","dydt initial condition",dcomp(-1,1)/*,dcomp(-4.83065, 1.16527)*/,dydtinit)
+    );
+  }
 
   parse(op,argc, argv);
   

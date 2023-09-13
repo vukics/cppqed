@@ -56,7 +56,6 @@ template <typename H, size_t RANK> concept functional = term<H,RANK> || propagat
 } // hamiltonian_ns
 
 
-
 /// applying a Hamiltonian term is by default interpreted as |dpsidt>+=H|psi>/(i*hbar)
 /** However, if indexing is done carefully, `psi` and `dpsidt` can refer to the same underlying data */
 template <size_t RANK, hamiltonian_ns::functional<RANK> T>
@@ -66,6 +65,16 @@ void applyHamiltonian(const T& h, double t, StateVectorConstView<RANK> psi, Stat
   else if constexpr (hamiltonian_ns::one_time_dependent_term<T,RANK>) h(t-t0,psi,dpsidt);
   else if constexpr (hamiltonian_ns::two_time_dependent_term<T,RANK>) h(t,psi,dpsidt,t0);
 }
+
+
+/// composition of two hamiltonian functionals, meant for interaction-type elements
+/**
+ * For simplicity, it always returns a hamiltonian_ns::two_time_dependent_term
+ * \note Here, we cannot really use the operator syntax as in MultiDiagonal as this function will not be found by ADL
+ */
+template <size_t RANK1, size_t RANK2>
+auto compose(const hamiltonian_ns::term<RANK1> auto& h1, const hamiltonian_ns::term<RANK2> auto& h2);
+
 
 
 /// applying the propagators (interpreted as replacing |psi> with U|psi>)
@@ -128,7 +137,7 @@ struct HamiltonianElement
 };
 
 
-
+/// TODO: how to make a deduction guide that would deduce RANK from the StateVector argument of the functional?
 template <size_t RANK, hamiltonian_ns::functional<RANK> F>
 auto makeHamiltonianElement(std::string label, F&& functional)
 {
@@ -137,6 +146,9 @@ auto makeHamiltonianElement(std::string label, F&& functional)
 
 
 // itself a hamiltonian
+/**
+ * \note It would be easy to do a runtime collection as well. For that, all the functionals should be wrapped in a `std::function`, and stored in a runtime container
+ */
 template <size_t RANK, hamiltonian<RANK>... H>
 struct HamiltonianCollection
 {

@@ -523,6 +523,25 @@ MultiArrayView<T,RANK> transpose(MultiArrayView<T,RANK> mav) requires ( std::siz
 }
 
 
+
+template <auto retainedAxes, typename F, typename... ARGS>
+void broadcastFor(F&& f, ARGS&&... args)
+{
+  auto arrayArgs=hana::filter(hana::make_tuple(args...),
+                              multilambda{
+                                [] <typename T, size_t RANK> (MultiArrayView<T,RANK>) {return std::true_type{};},
+                                [] (const auto&) {return std::false_type{};}
+                              });
+
+  // check extents
+
+  // create offset vector
+
+  // create ranges
+}
+
+
+
 namespace multi_index_range_solution_by_chatgpt {
 
 

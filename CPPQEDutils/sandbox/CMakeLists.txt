@@ -6,3 +6,6 @@ target_link_libraries(SandBox CPPQED::CPPQEDutils)
 
 add_executable(JSON JSON.cc)
 target_link_libraries(JSON CPPQED::CPPQEDutils)
+
+add_executable(MultiDiagonal MultiDiagonal.cc)
+target_link_libraries(MultiDiagonal CPPQED::CPPQEDutils)

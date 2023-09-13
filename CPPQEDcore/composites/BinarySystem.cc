@@ -1,4 +1,5 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+/*
 #include "BinarySystem.h"
 
 #include "DensityOperator.h"
@@ -238,3 +239,4 @@ template class BinarySystem<false,true ,false>;
 template class BinarySystem<false,false,true >;
 template class BinarySystem<false,false,false>;
 
+*/

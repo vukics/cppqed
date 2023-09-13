@@ -3,11 +3,12 @@
 #ifndef CPPQEDCORE_STRUCTURE_INTERACTION_H_INCLUDED
 #define CPPQEDCORE_STRUCTURE_INTERACTION_H_INCLUDED
 
+/*
 #include "DynamicsBase.h"
 #include "Free.h"
 
 #include "BlitzTiny.h"
-
+*/
 #include <algorithm>
 
 namespace structure {

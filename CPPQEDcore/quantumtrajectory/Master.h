@@ -97,7 +97,11 @@ struct Master
 
     twoTimesRealPartOfSelf(m.rho.mutableView());
 
+    //std::cerr<<trace(m.rho)<<" ";
+
     renorm(m.rho);
+
+    //std::cerr<<trace(m.rho)<<std::endl;
 
     return res;
   }
@@ -128,7 +132,7 @@ struct Master
 private:
   const std::vector<size_t> rowIterationOffsets_;
 
-  static constexpr auto rowIterationRetainedAxes=::cppqedutils::compileTimeOrdinals<RANK>;
+  static constexpr auto rowIterationRetainedAxes= ::cppqedutils::compileTimeOrdinals<RANK>;
 
   // const DensityOperatorStreamer<RANK,V> dos_;
 
