@@ -10,12 +10,9 @@
 namespace cppqedutils::trajectory {
 
 
-// TODO: define concept of stochastic_trajectory
-  
-
 /// Aggregate of parameters pertaining to stochastic simulations
 /** \copydetails ParsRun */
-template <typename RandomEngine>
+template <std::uniform_random_bit_generator RandomEngine>
 struct ParsStochastic : randomutils::Pars<RandomEngine,ode::Pars<>>
 {
   size_t nTraj; ///< number of trajectories in case of ensemble averaging
@@ -27,6 +24,15 @@ struct ParsStochastic : randomutils::Pars<RandomEngine,ode::Pars<>>
 };
 
 
+template <typename T>
+concept stochastic = uniform_step<T> && requires (T&& t)
+  {
+    typename T::EnsembleAverageResult;
+    typename T::EnsembleAverageElement;
+    { averaged(t) } -> std::same_as<typename T::EnsembleAverageElement>;
+  };
+
+
 
 /// Governs how to average up several `SingleTrajectory` types in the most efficient way (which is sometimes not with the naive addition operator)
 /**
@@ -36,116 +42,94 @@ struct ParsStochastic : randomutils::Pars<RandomEngine,ode::Pars<>>
  * and that it can be converted into `SingleTrajectory::EnsembleAverageResult` via assignment.
  * 
  */
-template<typename SingleTrajectory>
+template<stochastic SingleTrajectory>
 struct AverageTrajectories
 {
   /// Naive generic implementation
-  static const auto& _(typename SingleTrajectory::EnsembleAverageResult& res, const std::vector<SingleTrajectory>& trajs)
+  static const auto& _(typename SingleTrajectory::EnsembleAverageResult& , const std::vector<SingleTrajectory>& trajs)
   {
-    return std::ranges::fold_left_first (trajs | std::views::transform( [] (const SingleTrajectory& s) {return s.averaged();} ), std::plus{} ).value()/trajs.size();
+    return std::ranges::fold_left_first (trajs | std::views::transform( [] (const SingleTrajectory& s) {return averaged(s);} ), std::plus{} ).value()/trajs.size();
   }
   
 };
 
 
-template<typename SingleTrajectory>
+template<stochastic SingleTrajectory>
 struct InitializeEnsembleFromArrayOnlyArchive;
 
 
 /// An ensemble of Averageable trajectories providing services for ensemble averaging and evolving the element trajectories serially
 /**
  * \note Time averaging does not use stepsize-weighting, as experience has shown that this leads to worse convergence (similarly to quantumtrajectory::TimeAveragingMCWF_Trajectory).
- * 
  * \todo Stepsize-weighting could eventually be enabled as an option by a switch
  * 
  * The design is recursive: since Ensemble itself inherits from Averageable, it can act as an element in a larger Ensemble.
  * 
- * \tparam ST Type of the elementary trajectories that form the Ensemble 
- * 
- * At the level of Ensemble, no implicit interface is assumed for `T` and `T_ELEM` since Ensemble treats variables of these types only via ensemble::Traits.
- * It is important that the way the averaged `T` will be calculated from the sequence of `T_ELEM`%s can be tailored
- * because it might happen that the application cannot afford to store temporaries of `T` (for such an example, cf. quantumtrajectory::EnsembleMCWF)
- * 
+ * TODO: resurrect ensemble logging
  */
-template<typename ST, typename Streamer, typename Logger>
+template<stochastic SingleTrajectory, typename TDP_Calculator /*, typename Logger*/>
 class Ensemble
 {
 public:
-  using SingleTrajectory = ST;
-  
   using TrajectoriesContainer = std::vector<SingleTrajectory>;
   
   using EnsembleAverageResult = typename SingleTrajectory::EnsembleAverageResult;
-  
-  using StreamedArray = typename SingleTrajectory::StreamedArray;
-  
-  Ensemble(Ensemble&&) = default; Ensemble& operator=(Ensemble&&) = default;
+  using EnsembleAverageElement = EnsembleAverageResult; // for the recursive usage
 
-  /// Generic constructor
-  template <typename TC, typename STR, typename LOG, typename ... Args>
-  Ensemble(TC&& trajs, ///< the sequence of Singles (in general, there is no way to create different Singles from a given set of ctor parameters)
-           STR&& streamer,
-           LOG&& logger,
-           Args&&... args)
-  : trajs_{std::forward<TrajectoriesContainer>(trajs)},
-    streamer_{std::forward<Streamer>(streamer)},
-    logger_{std::forward<Logger>(logger)},
-    ensembleAverageResult_{std::forward<Args>(args)...} {}
-
-  auto getTime() const {return trajs_.front().getTime();}
-  
-  void advance(double deltaT, std::ostream& logStream) {for (auto& t : trajs_) cppqedutils::advance(t,deltaT,logStream);}
+  TrajectoriesContainer trajs;
+  TDP_Calculator tdpCalculator;
+//  Logger logger;
+  mutable EnsembleAverageResult ensembleAverageResult;
 
   /// An average of `dtDid`s from individual trajectories.
-  double getDtDid() const
+  friend double getDtDid(const Ensemble& e)
   {
-    return std::ranges::fold_left_first( trajs_ | std::views::transform([] (const SingleTrajectory& t) {
-      return t.getDtDid();
-    }), std::plus{} ).value()/trajs_.size();
+    return std::ranges::fold_left_first( e.trajs | std::views::transform([] (const SingleTrajectory& t) {
+      return getDtDid(t);
+    }), std::plus{} ).value()/e.trajs.size();
   }
-  
-  std::ostream& streamParameters(std::ostream& os) const {return trajs_.front().streamParameters( os<<"Ensemble of "<<trajs_.size()<<" trajectories."<<std::endl );}
 
-  auto stream(std::ostream& os, int precision) const
+  friend double getTime(const Ensemble& e) {return getTime(e.trajs.front());}
+  
+  // TODO: what to return here as log?
+  friend auto advance(const Ensemble& e, double deltaT)
   {
-    return streamer_(getTime(),averaged(),os,precision);
+    ::cppqedutils::LogTree res;
+    for (auto& t : e.trajs) cppqedutils::advance(t,deltaT);
+    return res;
+  }
+
+  friend auto logIntro(const Ensemble& e) { return ::cppqedutils::LogTree{{"Ensemble #traj",e.trajs.size()},{"Single-trajectory parameters",logIntro(e.trajs.front())}}; }
+
+  friend auto logOutro(const Ensemble& e) { return logOutro(e.trajs.front()); }
+
+  friend ::cppqedutils::LogTree dataStreamKey(const Ensemble& e) {return e.tdpCalculator.dataStreamKey();}
+
+  friend auto temporalDataPoint(const Ensemble& e)
+  {
+    return e.tdpCalculator(getTime(e),averaged(e));
   }
   
-  auto& readFromArrayOnlyArchive(cppqedutils::iarchive& iar) {InitializeEnsembleFromArrayOnlyArchive<SingleTrajectory>::_(trajs_,iar); return iar;}
+  friend ::cppqedutils::iarchive& readFromArrayOnlyArchive(Ensemble& e, cppqedutils::iarchive& iar) {return InitializeEnsembleFromArrayOnlyArchive<SingleTrajectory>::_(e.trajs,iar);}
   
   template <typename Archive>
-  auto& stateIO(Archive& ar) {for (auto& t : trajs_) t.stateIO(ar); return ar;}
+  friend auto& stateIO(Ensemble& e, Archive& ar)
+  {
+    for (auto& t : e.trajs) stateIO(t,ar); return ar;
+  }
   
-  std::ostream& streamKey(std::ostream& os) const {size_t i=3; return streamer_.streamKey(os,i);}
-
-  std::ostream& logOnEnd(std::ostream& os) const {logger_(trajs_,os); return os;};
-
-  /// This is what gets averaged when we have an ensemble of Ensembles
-  const EnsembleAverageResult& averaged() const {return AverageTrajectories<SingleTrajectory>::_(ensembleAverageResult_,trajs_);}
+  /// This is what gets averaged when we have an Ensemble of Ensembles
+  const EnsembleAverageResult& averaged(const Ensemble& e) const {return AverageTrajectories<SingleTrajectory>::_(e.ensembleAverageResult,e.trajs);}
   
-private:
-  TrajectoriesContainer trajs_;
-  
-  Streamer streamer_;
-  
-  Logger logger_;
-  
-  mutable EnsembleAverageResult ensembleAverageResult_;
-
 };
-
-
-/// Deduction guide:
-template <typename SingleTrajectory, typename Streamer, typename Logger, typename ... Args>
-Ensemble(std::vector<SingleTrajectory>, Streamer, Logger, Args...) -> Ensemble<SingleTrajectory,Streamer,Logger>;
 
 
 } // cppqedutils::trajectory
 
 
 
-template <typename SingleTrajectory, typename Streamer, typename Logger>
-struct cppqedutils::trajectory::MakeSerializationMetadata<cppqedutils::trajectory::Ensemble<SingleTrajectory,Streamer,Logger>>
+template <typename SingleTrajectory, typename TDP_Calculator/*, typename Logger*/>
+struct cppqedutils::trajectory::MakeSerializationMetadata<cppqedutils::trajectory::Ensemble<SingleTrajectory,TDP_Calculator/*,Logger*/>>
 {
   static auto _()
   {

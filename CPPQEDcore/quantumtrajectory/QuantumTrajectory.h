@@ -42,23 +42,23 @@ std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<R
 }
 */
 
-/// Wraps common functionality of Master & EnsembleMCWF concerning stream of quantum averages on the basis of density operators
+/// Wraps common functionality of Master & EnsembleMCWF concerning calculating temporal data points on the basis of density operators
 /**
- * TODO: hook this as a trajectory::data_streamer
  * This comprises
- * - keeping a structure::Averaged instant and calling structure::Averaged::stream
+ * - keeping a structure::QSD instant and calling structure::Averaged::stream
  * - performing calculation of entanglement measures if needed
  * - extending key with entanglement measures when needed
  */
 template<size_t RANK,
+         ::structure::quantum_system_dynamics<RANK> QSD,
          auto axesOfSubsystem // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
          >
-class DensityOperatorStreamer/*
+class TDP_DensityOperator/*
 {
 public:
   using DensityOperator=quantumdata::DensityOperator<RANK>;
 
-  DensityOperatorStreamer(::structure::AveragedPtr<RANK> av, EntanglementMeasuresSwitch ems) : av_(av), ems_(ems) {}
+  TDP_DensityOperator(::structure::AveragedPtr<RANK> av, EntanglementMeasuresSwitch ems) : av_(av), ems_(ems) {}
 
   StreamReturnType operator()(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
   {

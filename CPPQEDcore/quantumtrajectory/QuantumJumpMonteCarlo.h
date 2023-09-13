@@ -172,13 +172,13 @@ struct QuantumJumpMonteCarlo
 
   double sampleRandom() {return distro_(re.engine);}
 
+  friend const StateVector& averaged(const QuantumJumpMonteCarlo& q) {return q.psi;}
+
 private:
   const double dpLimit_;
   mutable qjmc::Logger logger_;
 
   std::uniform_real_distribution<double> distro_{};
-
-  StateVector averaged() const {return psi;}
 
   auto manageTimeStep(const Rates& rates)
   {
