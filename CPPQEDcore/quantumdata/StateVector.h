@@ -104,14 +104,11 @@ struct StateVector : ::cppqedutils::MultiArray<dcomp,RANK>, private VectorSpaceO
    * This is done without actually forming the dyad in memory (so that this is not implemented in terms of StateVector::dyad),
    * which is important in situations when an average density operator is needed from an ensemble of state vectors, an example being quantumtrajectory::EnsembleMCWF. 
    */
-  void addTo(DensityOperator<RANK>& rho, double weight=1.) const;/*
+  friend void addTo(const StateVector<RANK>& psi, DensityOperator<RANK>& rho, double weight=1.)
   {
-    using namespace linalg;
-    CMatrix matrix(rho.matrixView());
-    CVector vector(vectorView());
-    size_t dim(this->getTotalDimension());
-    for (size_t i=0; i<dim; i++) for (size_t j=0; j<dim; j++) matrix(i,j)+=weight*vector(i)*conj(vector(j));
-  }*/
+    for (size_t size=psi.dataView.size(), i=0; i<size; ++i) for (size_t j=0; j<size; ++j)
+      rho.dataStorage()[i+size*j]+=psi.dataView[i]*conj(psi.dataView[j]);
+  }
 
 };
 

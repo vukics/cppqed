@@ -108,7 +108,7 @@ pcg64 streamOfOrdo(const Pars<pcg64,BASE>& p/*, std::optional<EngineState> previ
 
 
 template<typename BASE>
-void incrementForNextStream(const Pars<pcg64,BASE>& p) {++p.prngStream;}
+void incrementForNextStream(Pars<pcg64,BASE>& p) {++p.prngStream;}
 
 
 } // randomutils

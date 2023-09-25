@@ -88,7 +88,7 @@ concept liouvillian = std::ranges::forward_range<L> && std::is_same_v<std::range
 template <size_t RANK>
 auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 {
-  quantumdata::StateVector<RANK> psiTemp{ psi.extents, ::cppqedutils::multiarray::copyInit<dcomp,RANK>(psi.dataView) };
+  quantumdata::StateVector<RANK> psiTemp{ copy(psi) };
   applyJump(jump,t,psiTemp.mutableView());
   return sqr(norm(psiTemp)); // we cannot return psiTemp because StateVector is not copyable
 }
@@ -97,7 +97,7 @@ auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 template <size_t RANK>
 void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt, Jump<RANK> jump, const std::vector<size_t>& rowIterationOffsets)
 {
-  quantumdata::DensityOperator<RANK> rhoTemp(::cppqedutils::halveExtents(rho.extents), ::cppqedutils::multiarray::copyInit<dcomp,RANK>(rho.dataView)); // deep copy
+  quantumdata::DensityOperator<RANK> rhoTemp{ copy(rho) }; // deep copy
 
   auto sr=sliceRange<::cppqedutils::compileTimeOrdinals<RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
 

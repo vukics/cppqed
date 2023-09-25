@@ -23,9 +23,11 @@ int main(int argc, char* argv[])
 
   auto mode{make(pm)};
 
-  cppqedutils::run(
-    quantumtrajectory::qjmc::make<cppqedutils::ODE_EngineBoost,pcg64>(std::move(mode),quantumdata::StateVector<1>{{pm.cutoff}},pt),
-    pt,cppqedutils::trajectory::observerNoOp);
+  quantumdata::StateVector<1> psi{{pm.cutoff}}; psi(0)=0; psi(1)=1;
 
+  cppqedutils::run(
+    // quantumtrajectory::qjmc::make<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    pt,cppqedutils::trajectory::observerNoOp);
 }
 

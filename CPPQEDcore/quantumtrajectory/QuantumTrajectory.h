@@ -50,20 +50,24 @@ std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<R
  * - extending key with entanglement measures when needed
  */
 template<size_t RANK,
-         ::structure::quantum_system_dynamics<RANK> QSD,
-         auto axesOfSubsystem // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
+         ::structure::quantum_system_dynamics<RANK> QSD/*,
+         auto axesOfSubsystem */ // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
          >
-class TDP_DensityOperator/*
+class TDP_DensityOperator
 {
 public:
-  using DensityOperator=quantumdata::DensityOperator<RANK>;
+  using DensityOperator = ::quantumdata::DensityOperator<RANK>;
 
-  TDP_DensityOperator(::structure::AveragedPtr<RANK> av, EntanglementMeasuresSwitch ems) : av_(av), ems_(ems) {}
+  TDP_DensityOperator(QSD qsd /*, EntanglementMeasuresSwitch ems*/) : qsd{std::forward<QSD>(qsd)} {}
 
-  StreamReturnType operator()(double t, const DensityOperator& rho, std::ostream& os, int precision) const 
+  QSD qsd;
+//  const EntanglementMeasuresSwitch ems_;
+
+
+  auto operator()(double t, const DensityOperator& rho) const
   {
-    auto res{structure::stream(av_,t,rho,os,precision)};
-    auto & averages{std::get<1>(res)};
+    return ::structure::calculateAndPostprocess<RANK>(getEV(qsd),t,static_cast<::quantumdata::DensityOperatorConstView<RANK>>(rho));
+/*    auto & averages{std::get<1>(res)};
     if constexpr ( !isV_empty ) {
       if (ems_[0]) {
         auto n{negPT(rho,V{})};
@@ -82,29 +86,22 @@ public:
       }
 
     }
-    return {os,averages};
+    return {os,averages};*/
   }
 
-  std::ostream& streamKey(std::ostream& os, size_t& i) const
+  friend ::cppqedutils::LogTree dataStreamKey(const TDP_DensityOperator& t)
   {
-    if (av_) av_->streamKey(os,i); 
-    if constexpr ( !isV_empty ) {
+    return label(getEV(t.qsd));
+/*    if constexpr ( !isV_empty ) {
       if (ems_.any()) os<<"Trajectory\n";
       if (ems_[0]) os<<i++<<". negativity\n";
       if (ems_[1]) os<<i++<<". mutual information\n";
       if (ems_[2]) os<<i++<<". purity of partial trace\n";
     }
-    return os;
+    return os;*/
   }
 
-private:
-  const ::structure::AveragedPtr<RANK> av_ ;
-
-  const EntanglementMeasuresSwitch ems_;
-
-  static constexpr bool isV_empty=boost::mpl::empty<V>::value;
-  
-}*/;
+};
 
 } // quantumtrajectory
 

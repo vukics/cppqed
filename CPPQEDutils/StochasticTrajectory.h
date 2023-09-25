@@ -74,7 +74,7 @@ public:
   using TrajectoriesContainer = std::vector<SingleTrajectory>;
   
   using EnsembleAverageResult = typename SingleTrajectory::EnsembleAverageResult;
-  using EnsembleAverageElement = EnsembleAverageResult; // for the recursive usage
+  using EnsembleAverageElement = std::add_lvalue_reference_t<std::add_const_t<EnsembleAverageResult>>; // for the recursive usage
 
   TrajectoriesContainer trajs;
   TDP_Calculator tdpCalculator;
@@ -92,7 +92,7 @@ public:
   friend double getTime(const Ensemble& e) {return getTime(e.trajs.front());}
   
   // TODO: what to return here as log?
-  friend auto advance(const Ensemble& e, double deltaT)
+  friend auto advance(Ensemble& e, double deltaT)
   {
     ::cppqedutils::LogTree res;
     for (auto& t : e.trajs) cppqedutils::advance(t,deltaT);
@@ -103,23 +103,28 @@ public:
 
   friend auto logOutro(const Ensemble& e) { return logOutro(e.trajs.front()); }
 
-  friend ::cppqedutils::LogTree dataStreamKey(const Ensemble& e) {return e.tdpCalculator.dataStreamKey();}
+  friend ::cppqedutils::LogTree dataStreamKey(const Ensemble& e) {return dataStreamKey(e.tdpCalculator);}
 
   friend auto temporalDataPoint(const Ensemble& e)
   {
     return e.tdpCalculator(getTime(e),averaged(e));
   }
   
-  friend ::cppqedutils::iarchive& readFromArrayOnlyArchive(Ensemble& e, cppqedutils::iarchive& iar) {return InitializeEnsembleFromArrayOnlyArchive<SingleTrajectory>::_(e.trajs,iar);}
+  friend ::cppqedutils::iarchive& readFromArrayOnlyArchive(Ensemble& e, cppqedutils::iarchive& iar)
+  {
+    return InitializeEnsembleFromArrayOnlyArchive<SingleTrajectory>::_(e.trajs,iar);
+  }
   
   template <typename Archive>
   friend auto& stateIO(Ensemble& e, Archive& ar)
   {
-    for (auto& t : e.trajs) stateIO(t,ar); return ar;
+    for (auto& t : e.trajs)
+      stateIO(t,ar);
+    return ar;
   }
   
   /// This is what gets averaged when we have an Ensemble of Ensembles
-  const EnsembleAverageResult& averaged(const Ensemble& e) const {return AverageTrajectories<SingleTrajectory>::_(e.ensembleAverageResult,e.trajs);}
+  friend EnsembleAverageElement averaged(const Ensemble& e) {return AverageTrajectories<SingleTrajectory>::_(e.ensembleAverageResult,e.trajs);}
   
 };
 
