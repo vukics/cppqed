@@ -92,9 +92,8 @@ auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<siz
   // static constexpr auto extendedAxes{hana::fold(retainedAxes,retainedAxes, [] (const auto& state, auto element) {return hana::append(state,element+RANK);})};
   using LDO = decltype(matrix);
  
-  const auto iterateSlices{[&] (const auto& sr) {
-    return std::ranges::fold_left_first(
-      sr | std::views::transform(function), [&] (const auto& res, const auto& slice) {return plus(res,slice);}).value();
+  const auto iterateSlices{ [&] (const auto& sr) {
+    return std::ranges::fold_left_first(sr | std::views::transform(function), plus ).value();
   }};
 
   if constexpr (std::same_as<LDO,StateVectorConstView<RANK>>) {
@@ -104,7 +103,7 @@ auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<siz
   else if constexpr (std::same_as<LDO,DensityOperatorConstView<RANK>>) {
     static constexpr auto extendedAxes{hana::concat(retainedAxes,
                                                     hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
-    auto diagonalOffsets{offsets | std::views::transform([&] (size_t v) {return v*(std::lround(std::sqrt(matrix.dataView.size()))+1);} ) };
+    auto diagonalOffsets{ offsets | std::views::transform( [&] (size_t v) {return v * ( std::lround(std::sqrt(matrix.dataView.size())) + 1 ) ; } ) };
     auto sr{cppqedutils::sliceRange<extendedAxes>(matrix,diagonalOffsets)};
     return iterateSlices(sr);
   }

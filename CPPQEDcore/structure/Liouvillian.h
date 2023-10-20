@@ -110,6 +110,50 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 
 
 
+namespace liouvillian_ns {
+
+template <auto retainedAxes, size_t RANK> requires ( std::size(retainedAxes) < RANK )
+Lindblad<RANK> broadcast(const Lindblad<RANK-std::size(retainedAxes)>& l, const std::vector<size_t>& offsets)
+{
+  // TODO: this is a repetition from lazydensityoperator
+  static constexpr auto extendedAxes{hana::concat(retainedAxes,
+                                                  hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
+
+  return {
+
+    .label{l.label},
+
+    .jump{ [&] (double t, StateVectorView<RANK> psi) {
+      for (auto&& psiElem : ::cppqedutils::sliceRange<retainedAxes>(psi,offsets)) applyJump(l.jump,t,psiElem);
+    } },
+
+    .rate{ [&] (double t, StateVectorConstView<RANK> psi) {
+      return partialTrace(psi,offsets,[&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return l.rate(t,psiElem); } );
+    } }
+
+    .superoperator{
+      [ &, matrixOffsets=std::vector<size_t>{} ] (double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt) {
+        // matrixOffsets is populated when the lambda is first called
+        if (!std::size(matrixOffsets)) {
+          size_t extent=std::lround(std::sqrt(rho.dataView.size()));
+          matrixOffsets.resize(sqr(offsets.size()));
+          for (auto i=matrixOffsets.begin(), u=offsets.begin(); u!=offsets.end(); ++u )
+            for (auto v=offsets.begin(); v!=offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
+        }
+        auto rhoRange{::cppqedutils::sliceRange<extendedAxes>(rho,matrixOffsets)};
+        auto drhodtRange{::cppqedutils::sliceRange<extendedAxes>(drhodt,matrixOffsets)};
+        for ( auto [rho,drhodt]=std::make_tuple(rhoRange.begin(),drhodtRange.begin()); rho!=rhoRange.end();
+          applySuperoperator(l.superoperator,t,*rho++,*drhodt++,t0) ) ;
+      }
+    }
+
+  };
+}
+
+
+} // liouvillian_ns
+
+
 /**
  * The below concept-based structure mirrors ExpectationValues & Hamiltonian, but probably won’t have a lot of practical use.
  */
@@ -159,7 +203,6 @@ concept lindblad_with_superoperator = lindblad_with_jump<L,RANK> && superoperato
 
 template <typename L, size_t RANK>
 concept lindblad = lindblad_with_superoperator<L,RANK> || lindblad_with_rate<L,RANK> || lindblad_with_jump<L,RANK>;
-
 
 
 

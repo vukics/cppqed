@@ -65,16 +65,7 @@ struct Master
       ::quantumdata::DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
       ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw.begin(),std::ranges::fill(drhodtRaw,0)};
 
-      // TODO: std::ranges::views::zip to be applied here, but for some reason, sliceRange is not compatible with zipping – it does work with sliceRangeSimple, though.
-      //for (auto [psi,dpsidt] : std::views::zip(::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_),
-      //                                         ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt,m.rowIterationOffsets_) ) )
-      //  ::structure::applyHamiltonian(getHa(m.qsd),t,psi,dpsidt,m.time0) ;
-      {
-        auto psiRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(rho,m.rowIterationOffsets_)};
-        auto dpsidtRange{::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(drhodt,m.rowIterationOffsets_)};
-        for (auto [psi,dpsidt]=std::make_tuple(psiRange.begin(),dpsidtRange.begin()); psi!=psiRange.end();
-             ::structure::applyHamiltonian(getHa(m.qsd),t,*psi++,*dpsidt++,m.time0)) ;
-      }
+      ::structure::hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),t,rho,drhodt,m.time0,m.rowIterationOffsets_);
 
       twoTimesRealPartOfSelf(drhodt);
 
@@ -84,11 +75,9 @@ struct Master
     },m.time,m.rho.dataStorage());
 
     // exact propagation
-    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho.mutableView(),m.rowIterationOffsets_))
-      ::structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
+    ::structure::hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
     hermitianConjugateSelf(m.rho);
-    for (auto&& psi : ::cppqedutils::sliceRange<Master::rowIterationRetainedAxes>(m.rho.mutableView(),m.rowIterationOffsets_))
-      ::structure::applyPropagator(getHa(m.qsd),m.time,psi,m.time0);
+    ::structure::hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
     conj(m.rho);
     m.time0=m.time;
 

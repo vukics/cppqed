@@ -190,6 +190,31 @@ concept hamiltonian = hana_sequence<H> && !!hana::all_of(
 
 */
 
+namespace hamiltonian_ns {
+
+/// Maybe this can be just an overload of applyHamiltonian ?
+// TODO: std::ranges::views::zip to be applied here, but for some reason, sliceRange is not compatible with zipping – it does work with sliceRangeSimple, though.
+//for (auto [psi,dpsidt] : std::views::zip(::cppqedutils::sliceRange<retainedAxes>(psi,offsets),
+//                                         ::cppqedutils::sliceRange<retainedAxes>(drhodt,offsets) ) )
+//  ::structure::applyHamiltonian(h,t,psi,dpsidt,t0) ;
+template <auto retainedAxes, size_t RANK, hamiltonian_ns::functional<RANK> T >
+void broadcast(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0, const std::vector<size_t>& offsets)
+{
+  auto psiRange{::cppqedutils::sliceRange<retainedAxes>(psi,offsets)};
+  auto dpsidtRange{::cppqedutils::sliceRange<retainedAxes>(dpsidt,offsets)};
+  for ( auto&& [psi,dpsidt]=std::make_tuple(psiRange.begin(),dpsidtRange.begin()); psi!=psiRange.end(); applyHamiltonian(h,t,*psi++,*dpsidt++,t0) ) ;
+}
+
+
+template <auto retainedAxes, size_t RANK, hamiltonian_ns::functional<RANK> T >
+void broadcast(const T& h, double t, StateVectorView<RANK> psi, double t0, const std::vector<size_t>& offsets)
+{
+  for (auto&& psiElem : ::cppqedutils::sliceRange<retainedAxes>(psi,offsets)) applyPropagator(h,t,psiElem,t0);
+}
+
+} // hamiltonian_ns
+
+
 
 } // structure
 
