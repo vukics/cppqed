@@ -76,7 +76,7 @@ constexpr auto postProcessor(decltype(expectationValues)) {
 constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {"photon number","photon number variance","ladder operator"}; }
 
 
-static_assert(::structure::expectationvalues::labelled_and_with_nonlinear_postprocessing<decltype(expectationValues),1>);
+static_assert(::structure::expectation_values_ns::labelled_and_with_nonlinear_postprocessing<decltype(expectationValues),1>);
 
 
 auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
@@ -98,7 +98,7 @@ auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa
     if (nTh) liouvillian.push_back(photonGain(kappa,nTh));
   }
 
-  return QuantumSystemDynamics { std::move(freqs), std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), expectationValues };
+  return QuantumSystemDynamics { std::move(freqs), std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), exact_propagator_ns::noOp, expectationValues };
 }
 
 

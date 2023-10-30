@@ -57,27 +57,29 @@ struct Master
 
   friend ::cppqedutils::LogTree step(Master& m, double deltaT)
   {
+    using namespace structure; using namespace quantumdata;
+
     // TODO: think over what happens here when there is no Hamiltonian to apply – it’s probably OK, since at least one superoperator is always there
     // Moreover, I’m not sure anymore that these algorithms should be prepared for such special cases.
     auto res = step ( m.oe, deltaT, [&] (const typename DensityOperator::StorageType& rhoRaw,
                                          typename DensityOperator::StorageType& drhodtRaw, double t)
     {
-      ::quantumdata::DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
-      ::quantumdata::DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw.begin(),std::ranges::fill(drhodtRaw,0)};
+      DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
+      DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw.begin(),std::ranges::fill(drhodtRaw,0)};
 
-      ::structure::hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),t,rho,drhodt,m.time0,m.rowIterationOffsets_);
+      hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),t,rho,drhodt,m.time0,m.rowIterationOffsets_);
 
       twoTimesRealPartOfSelf(drhodt);
 
       for (auto&& lindblad : getLi(m.qsd))
-        ::structure::applySuperoperator<RANK>(lindblad.superoperator, t, rho, drhodt);
+        applySuperoperator<RANK>(lindblad.superoperator, t, rho, drhodt);
 
     },m.time,m.rho.dataStorage());
 
     // exact propagation
-    ::structure::hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
+    exact_propagator_ns::broadcast<Master::rowIterationRetainedAxes>(getEx(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
     hermitianConjugateSelf(m.rho);
-    ::structure::hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
+    exact_propagator_ns::broadcast<Master::rowIterationRetainedAxes>(getEx(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
     conj(m.rho);
     m.time0=m.time;
 

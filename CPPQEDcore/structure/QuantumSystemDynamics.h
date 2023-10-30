@@ -58,27 +58,67 @@ concept quantum_system_dynamics = requires (T&& qsd)
   // { GetFrequencies<T>{}(qsd) } -> system_frequency_store;
   // which gives even more flexibility
   { getHa(qsd) } -> hamiltonian<RANK>;
+  { getEx(qsd) } -> exact_propagator<RANK>;
   { getLi(qsd) } -> liouvillian<RANK>;
   { getEV(qsd) } -> expectation_values<RANK>;
   // { streamParameters(qsd,os) } -> std::convertible_to<std::ostream&>;
 };
 
 
-/// a simple implementation of the concept:
-template <size_t RANK, system_frequency_store SFS, liouvillian<RANK> LI, hamiltonian<RANK> HA, expectation_values<RANK> EV>
+/// a simple implementation of the concept
+/**
+ * It’s probably not necessary to have this class at all.
+ * Systems like Qubit, Mode could simply define a class for themselves that fulfill the quantum_system_dynamics concept
+ * Also, in the concept, the getHa, getLi, getEV functions should be optional
+ */
+template <size_t RANK, system_frequency_store SFS, liouvillian<RANK> LI, hamiltonian<RANK> HA, exact_propagator<RANK> EX, expectation_values<RANK> EV>
 struct QuantumSystemDynamics
 {
-  SFS freqs; LI li; HA ha; EV ev;
+  SFS freqs; LI li; HA ha; EX ex; EV ev;
 
   friend const SFS& getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
   friend const LI & getLi   (const QuantumSystemDynamics& qsd) {return qsd.li;}
   friend const HA & getHa   (const QuantumSystemDynamics& qsd) {return qsd.ha;}
+  friend const EX & getEx   (const QuantumSystemDynamics& qsd) {return qsd.ex;}
   friend const EV & getEV   (const QuantumSystemDynamics& qsd) {return qsd.ev;}
 };
 
 
-template <system_frequency_store SFS, typename LI, typename HA, typename EV>
-QuantumSystemDynamics(SFS&& freqs, LI&& li, HA&& ha, EV&& ev) -> QuantumSystemDynamics<std::ranges::range_value_t<LI>::N_RANK,SFS,LI,HA,EV>;
+template <system_frequency_store SFS, typename LI, typename HA, typename EX, typename EV>
+QuantumSystemDynamics(SFS&& freqs, LI&& li, HA&& ha, EX&& ex, EV&& ev) -> QuantumSystemDynamics<std::ranges::range_value_t<LI>::N_RANK,SFS,LI,HA,EX,EV>;
+
+
+
+template <
+  quantum_system_dynamics<1> QSD0,
+  quantum_system_dynamics<1> QSD1,
+  system_frequency_store SFS,
+  liouvillian<2> LI,
+  hamiltonian<2> HA,
+  exact_propagator<2> EX,
+  expectation_values<2> EV >
+struct BinarySystem
+{
+  QSD0 qsd0; QSD1 qsd1;
+  SFS freqs; LI li; HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
+
+  friend auto getFreqs(const BinarySystem& bs) {
+    std::vector<SystemFrequencyDescriptor> res;
+    for (const auto& i : getFreqs(bs.qsd0)) res.push_back(i);
+    for (const auto& i : getFreqs(bs.qsd1)) res.push_back(i);
+    for (const auto& i : bs.freqs) res.push_back(i);
+    return res;
+  }
+
+private:
+  const std::vector<size_t> offsets0_, offsets1_;
+
+  static constexpr auto
+    rA0=::cppqedutils::retainedAxes<0>, rA1=::cppqedutils::retainedAxes<1>;
+
+
+};
+
 
 
 } // structure

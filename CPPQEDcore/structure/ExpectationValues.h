@@ -9,7 +9,7 @@
 namespace structure {
 
 
-namespace expectationvalues {
+namespace expectation_values_ns {
 
 
 template <typename L, size_t RANK>
@@ -36,7 +36,7 @@ auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 {
   if constexpr (time_dependent_functional<EV,RANK>) return ev(t,matrix);
   else if constexpr (time_independent_functional<EV,RANK>) return ev(matrix);
-  else static_assert(::cppqedutils::always_false_v<EV>,"unexpected type in expectationvalues::calculate");
+  else static_assert(::cppqedutils::always_false_v<EV>,"unexpected type in expectation_values_ns::calculate");
 }
 
 
@@ -52,11 +52,11 @@ concept labelled_and_with_nonlinear_postprocessing = labelled_and_without_nonlin
 ) ;
 
 
-} // expectationvalues
+} // expectation_values_ns
 
 
 template <typename L, size_t RANK>
-concept expectation_values = expectationvalues::labelled_and_without_nonlinear_postprocessing<L,RANK> || expectationvalues::labelled_and_with_nonlinear_postprocessing<L,RANK> ;
+concept expectation_values = expectation_values_ns::labelled_and_without_nonlinear_postprocessing<L,RANK> || expectation_values_ns::labelled_and_with_nonlinear_postprocessing<L,RANK> ;
 
 
 template <size_t RANK>
@@ -66,8 +66,8 @@ void checkConsistencyWithLabels (const expectation_values<RANK> auto&);
 template <size_t RANK, expectation_values<RANK> EV>
 auto calculateAndPostprocess(const EV& ev, double t, lazy_density_operator<RANK> auto rho)
 {
-  auto res{expectationvalues::calculate<RANK>(ev,t,rho)};
-  if constexpr (expectationvalues::labelled_and_with_nonlinear_postprocessing<EV,RANK>) postProcessor(ev)(res);
+  auto res{expectation_values_ns::calculate<RANK>(ev,t,rho)};
+  if constexpr (expectation_values_ns::labelled_and_with_nonlinear_postprocessing<EV,RANK>) postProcessor(ev)(res);
   return res;
 }
 
@@ -75,7 +75,7 @@ auto calculateAndPostprocess(const EV& ev, double t, lazy_density_operator<RANK>
 
 /* Another definition of key_labels that mirrors that of temporal_data_points is probably an overkill
 /// hana::tuple of std::string or such hana::tuples (recursive definition)
-namespace expectationvalues {
+namespace expectation_values_ns {
 
 template <typename T> constexpr bool kl = false;
 
@@ -85,9 +85,9 @@ template <hana_sequence S> constexpr bool kl<S> = !!hana::all_of(
   decltype(hana::transform(std::declval<S>(), hana::typeid_)){},
   []<class T>(T) { return kl<typename T::type>; });
 
-} // expectationvalues
+} // expectation_values_ns
 
-template <typename T> concept key_labels = expectationvalues::kl<T>;
+template <typename T> concept key_labels = expectation_values_ns::kl<T>;
 */
 
 

@@ -28,4 +28,4 @@ auto hamiltonian(size_t cutoff, dcomp g)
 
 // JaynesCummings is a template which knows about the levels between which it steps @ compile time => it covers also the former MLCJ
 
-// two version: one which treats the sigma operator “by hand”, and one with purely (binary) MultiDiagonal design
+// two versions: one which treats the sigma operator “by hand”, and one with purely (binary) MultiDiagonal design

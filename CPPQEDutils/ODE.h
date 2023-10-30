@@ -14,8 +14,8 @@
 namespace cppqedutils {
 
 
-template <typename T> concept adaptive_timestep_keeper = requires (const T& t) { 
-  { getDtDid(t) } -> std::convertible_to<double>; };
+template <typename T, typename Time=double> concept adaptive_timestep_keeper = requires (const T& t) {
+  { getDtDid(t) } -> std::convertible_to<Time>; };
 
 
 namespace ode {
@@ -57,7 +57,7 @@ concept controlled_stepper =
 /// TODO: see whether it’s not too big an overhead to produce a LogTree every time step is calculated
 /** Otherwise step can get a reference to a LogTree from the call scope */
 template <typename T, typename State, typename Time=double>
-concept engine = adaptive_timestep_keeper<T> && logger<T> &&
+concept engine = adaptive_timestep_keeper<T,Time> && logger<T> &&
   requires ( T&& t, Time deltaT, SystemFunctional<State,Time> sys, Time& time, State&& stateInOut ) {
     { step(t,deltaT,sys,time,stateInOut) } -> std::convertible_to<LogTree>; };
 
