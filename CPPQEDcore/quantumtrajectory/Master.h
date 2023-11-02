@@ -57,8 +57,6 @@ struct Master
 
   friend LogTree step(Master& m, double deltaT)
   {
-    using namespace structure; using namespace quantumdata;
-
     // TODO: think over what happens here when there is no Hamiltonian to apply – it’s probably OK, since at least one superoperator is always there
     // Moreover, I’m not sure anymore that these algorithms should be prepared for such special cases.
     auto res = step ( m.oe, deltaT, [&] (const typename DensityOperator::StorageType& rhoRaw,

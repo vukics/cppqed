@@ -90,8 +90,6 @@ struct QuantumJumpMonteCarlo
   /// TODO: the returned log should contain information about the coherent step + the time step change as well
   friend auto step(QuantumJumpMonteCarlo& q, double deltaT)
   {
-    using namespace ::structure; using namespace ::quantumdata;
-
     LogTree res;
 
     // Coherent time development
@@ -217,10 +215,12 @@ auto make(QSD&& qsd, SV&& state, const Pars<RandomEngine>& p)
   constexpr size_t RANK=multiArrayRank_v<std::decay_t<SV>>;
   using ODE=OE<typename StateVector<RANK>::StorageType>;
 
-  return quantumtrajectory::QuantumJumpMonteCarlo<RANK,QSD,ODE,RandomEngine>{
+  double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
+  
+  return QuantumJumpMonteCarlo<RANK,QSD,ODE,RandomEngine>{
     std::forward<QSD>(qsd),
     std::forward<SV>(state),
-    ODE{quantumtrajectory::initialTimeStep(getFreqs(qsd)),p.epsRel,p.epsAbs},
+    ODE{iDt,p.epsRel,p.epsAbs},
     randomutils::EngineWithParameters<RandomEngine>{p.seed,p.prngStream},
     p.dpLimit};
 }
@@ -236,21 +236,19 @@ auto makeEnsemble(QSD&& qsd, const StateVector<RANK>& psi, Pars<RandomEngine>& p
   // quantum_system_dynamics is stored by value in TDP_DensityOperator, and the individual trajectories borrow it from there
   using Single=QuantumJumpMonteCarlo<RANK,QSD_const_ref,OE<typename StateVector::StorageType>,RandomEngine>;
 
-  std::vector<Single> trajs;
-  
-//  Single s{make<OE,QSD_const_ref>(qsd,StateVector{copy(psi)},p)};
-
-  for (size_t i=0; i<p.nTraj; ++i) {
-    trajs.push_back(make<OE,QSD_const_ref>(qsd,StateVector{copy(psi)},p));
-    ::randomutils::incrementForNextStream(p);
-  }
-
-  return trajectory::Ensemble<Single,TDP_DensityOperator<RANK,QSD>>{
-    .trajs{std::move(trajs)},
+  trajectory::Ensemble<Single,TDP_DensityOperator<RANK,QSD>> res{
+    .trajs{},
     .tdpCalculator{std::forward<QSD>(qsd)/*,ems*/},
     // qjmc::EnsembleLogger{p.nBins,p.nJumpsPerBin},
     .ensembleAverageResult{DensityOperator<RANK>{getDimensions(psi),noInit<2*RANK>}}
   };
+  
+  for (size_t i=0; i<p.nTraj; ++i) {
+    res.trajs.push_back(make<OE,QSD_const_ref>(res.tdpCalculator.qsd,StateVector{copy(psi)},p));
+    randomutils::incrementForNextStream(p);
+  }
+
+  return res;
 
 }
 
@@ -275,7 +273,8 @@ struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::QuantumJu
   {
     std::ranges::for_each(trajs | std::views::drop(1) ,
                           [&rhoInner=(rho=dyad(trajs[0].psi,trajs[0].psi))] (const auto& traj) {addTo(traj.psi,rhoInner);});
-    return rho/*/=dcomp(size(trajs))*/;
+    for (dcomp& v : rho.dataStorage()) v/=dcomp(size(trajs));
+    return rho;
   }
 
 };
