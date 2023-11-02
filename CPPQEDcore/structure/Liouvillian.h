@@ -22,7 +22,7 @@ using Jump = std::variant<TimeDependentJump<RANK>,TimeIndependentJump<RANK>>;
 template <size_t RANK>
 void applyJump(Jump<RANK> jump, double t, StateVectorView<RANK> psi)
 {
-  std::visit(cppqedutils::overload{
+  std::visit(overload{
     [&] (const TimeDependentJump<RANK>& j) {j(t,psi);},
     [&] (const TimeIndependentJump<RANK>& j) {j(psi);}
   },jump);
@@ -42,7 +42,7 @@ using Rate = std::variant<TimeDependentRate<RANK>,TimeIndependentRate<RANK>>;
 template <size_t RANK>
 double calculateRate(Rate<RANK> rate, double t, StateVectorConstView<RANK> psi)
 {
-  return std::visit(cppqedutils::overload{
+  return std::visit(overload{
     [&] (const TimeDependentRate<RANK>& r) {return r(t,psi);},
     [&] (const TimeIndependentRate<RANK>& r) {return r(psi);}
   },rate);
@@ -62,7 +62,7 @@ using Superoperator = std::variant<TimeDependentSuperoperator<RANK>,TimeIndepend
 template <size_t RANK>
 void applySuperoperator(Superoperator<RANK> sup, double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK>& drhodt)
 {
-  return std::visit(cppqedutils::overload{
+  return std::visit(overload{
     [&] (const TimeDependentSuperoperator<RANK>& s) {s(t,rho,drhodt);},
     [&] (const TimeIndependentSuperoperator<RANK>& s) {s(rho,drhodt);}
   },sup);
@@ -92,7 +92,7 @@ template <size_t RANK> using Liouvillian = std::vector<Lindblad<RANK>>;
 template <size_t RANK>
 auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 {
-  quantumdata::StateVector<RANK> psiTemp{ copy(psi) };
+  StateVector<RANK> psiTemp{ copy(psi) };
   applyJump(jump,t,psiTemp.mutableView());
   return sqr(norm(psiTemp)); // we cannot return psiTemp because StateVector is not copyable
 }
@@ -101,9 +101,9 @@ auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 template <size_t RANK>
 void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt, Jump<RANK> jump, const std::vector<size_t>& rowIterationOffsets)
 {
-  quantumdata::DensityOperator<RANK> rhoTemp{ copy(rho) }; // deep copy
+  DensityOperator<RANK> rhoTemp{ copy(rho) }; // deep copy
 
-  auto sr=sliceRange<::cppqedutils::compileTimeOrdinals<RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
+  auto sr=sliceRange<compileTimeOrdinals<RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
 
   auto unaryIteration=[&] () { for (auto& psiTemp : sr) applyJump(jump,t,psiTemp); };
 
@@ -128,7 +128,7 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
     .label{l.label} ,
 
     .jump{ [&] (double t, StateVectorView<RANK> psi) {
-      for (auto&& psiElem : ::cppqedutils::sliceRange<retainedAxes>(psi,offsets)) applyJump(l.jump,t,psiElem);
+      for (auto&& psiElem : sliceRange<retainedAxes>(psi,offsets)) applyJump(l.jump,t,psiElem);
     } } ,
 
     .rate{ [&] (double t, StateVectorConstView<RANK> psi) {
@@ -143,8 +143,8 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
           for (auto i=matrixOffsets.begin(), u=offsets.begin(); u!=offsets.end(); ++u )
             for (auto v=offsets.begin(); v!=offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
         }
-        auto rhoRange{::cppqedutils::sliceRange<extendedAxes>(rho,matrixOffsets)};
-        auto drhodtRange{::cppqedutils::sliceRange<extendedAxes>(drhodt,matrixOffsets)};
+        auto rhoRange{sliceRange<extendedAxes>(rho,matrixOffsets)};
+        auto drhodtRange{sliceRange<extendedAxes>(drhodt,matrixOffsets)};
         for ( auto [rho,drhodt]=std::make_tuple(rhoRange.begin(),drhodtRange.begin()); rho!=rhoRange.end();
           applySuperoperator(l.superoperator,t,*rho++,*drhodt++) ) ;
       }
@@ -193,7 +193,7 @@ concept superoperator = time_dependent_superoperator<L,RANK> || time_independent
 
 
 template <typename L, size_t RANK>
-concept lindblad_with_jump = ::cppqedutils::labelled<L,std::string> && jump<L,RANK> ;
+concept lindblad_with_jump = labelled<L,std::string> && jump<L,RANK> ;
 
 
 template <typename L, size_t RANK>

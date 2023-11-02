@@ -16,7 +16,7 @@ auto quantumoperator::operator|(const quantumoperator::MultiDiagonal<1>& a, cons
 
     auto diagInit = [&] (ptrdiff_t i, ptrdiff_t j, size_t start=0) {
       return [a=adiag.dataView, b=bdiag.dataView, i=i, j=j, start=start] (size_t e) {
-        auto res{::quantumdata::zeroInit<1>(e)}; for (size_t k=start; k<e; ++k) res[k]=a[k+i]*b[k+j]; return res;
+        auto res{zeroInit<1>(e)}; for (size_t k=start; k<e; ++k) res[k]=a[k+i]*b[k+j]; return res;
       };
     };
 

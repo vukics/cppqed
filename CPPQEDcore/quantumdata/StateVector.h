@@ -7,14 +7,18 @@
 
 namespace quantumdata {
 
+
+using namespace ::cppqedutils;
+
+
 template<typename>
 constexpr auto multiArrayRank_v=std::nullopt;
 
 template <size_t RANK>
-const auto noInit = ::cppqedutils::multiarray::noInit<dcomp,RANK>;
+const auto noInit = multiarray::noInit<dcomp,RANK>;
 
 template <size_t RANK>
-const auto zeroInit = ::cppqedutils::multiarray::zeroInit<dcomp,RANK>;
+const auto zeroInit = multiarray::zeroInit<dcomp,RANK>;
 
 
 template <typename Derived>
@@ -53,11 +57,11 @@ template <size_t RANK> struct DensityOperator; // forward declaration
 
 
 template <size_t RANK>
-using StateVectorView=cppqedutils::MultiArrayView<dcomp,RANK>;
+using StateVectorView=MultiArrayView<dcomp,RANK>;
 
 
 template <size_t RANK>
-using StateVectorConstView=cppqedutils::MultiArrayConstView<dcomp,RANK>;
+using StateVectorConstView=MultiArrayConstView<dcomp,RANK>;
 
 
 
@@ -67,17 +71,17 @@ using StateVectorConstView=cppqedutils::MultiArrayConstView<dcomp,RANK>;
  * (representing the initial condition, to be evolved by the quantum dynamics).
  */
 template<size_t RANK>
-struct StateVector : ::cppqedutils::MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerator<StateVector<RANK>>
+struct StateVector : MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerator<StateVector<RANK>>
 {
-  using ABase = ::cppqedutils::MultiArray<dcomp,RANK>;
+  using ABase = MultiArray<dcomp,RANK>;
 
-  using Dimensions=::cppqedutils::Extents<RANK>;
+  using Dimensions=Extents<RANK>;
 
   StateVector(const StateVector&) = delete; StateVector& operator=(const StateVector&) = delete;
 
   StateVector(StateVector&&) = default; StateVector& operator=(StateVector&&) = default;
 
-  StateVector(::cppqedutils::MultiArray<dcomp,RANK>&& ma) : ABase{std::move(ma)} {}
+  StateVector(MultiArray<dcomp,RANK>&& ma) : ABase{std::move(ma)} {}
 
   StateVector(Dimensions dimensions, auto&& initializer) : ABase{dimensions,std::forward<decltype(initializer)>(initializer)} {}
 
@@ -124,7 +128,7 @@ auto dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
 #ifndef NDEBUG
   if (sv1.extents != sv2.extents) throw std::runtime_error("Mismatch in StateVector::dyad dimensions");
 #endif // NDEBUG
-  return cppqedutils::directProduct(sv1, sv2, [] (dcomp v1, dcomp v2) {return v1*conj(v2);} );
+  return directProduct(sv1, sv2, [] (dcomp v1, dcomp v2) {return v1*conj(v2);} );
 }
 
 
@@ -132,7 +136,7 @@ auto dyad(const StateVector<RANK>& sv1, const StateVector<RANK>& sv2)
 template<size_t RANK1, size_t RANK2>
 inline auto operator*(const StateVector<RANK1>& psi1, const StateVector<RANK2>& psi2)
 {
-  return StateVector<RANK1+RANK2>(cppqedutils::directProduct<RANK1,RANK2>(psi1,psi2));
+  return StateVector<RANK1+RANK2>(directProduct<RANK1,RANK2>(psi1,psi2));
 }
 
 
@@ -157,12 +161,6 @@ constexpr auto multiArrayRank_v<StateVector<RANK>> = RANK;
 template <size_t RANK>
 constexpr auto cppqedutils::passByValue_v<quantumdata::StateVector<RANK>> = false;
 
-
-namespace structure {
-
-using ::quantumdata::StateVectorView, ::quantumdata::StateVectorConstView;
-
-} // structure
 
 
 /*

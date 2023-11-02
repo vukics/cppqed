@@ -8,24 +8,25 @@
 
 namespace structure {
 
+using namespace quantumdata;
 
 namespace expectation_values_ns {
 
 
 template <typename L, size_t RANK>
 concept time_dependent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
-  return s && ( requires (const L& l, double t, typename E::type rho) { { l(t,rho) } -> ::cppqedutils::temporal_data_point ; } ) ;
+  return s && ( requires (const L& l, double t, typename E::type rho) { { l(t,rho) } -> temporal_data_point ; } ) ;
 } );
 
 
 template <typename L, size_t RANK>
 concept time_independent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
-  return s && ( requires (const L& l, typename E::type rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ) ;
+  return s && ( requires (const L& l, typename E::type rho) { { l(rho) } -> temporal_data_point ; } ) ;
 } );
 // Alternatively:
 /* requires (const L& l) { requires (
-requires (StateVectorConstView<RANK> rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } &&
-requires (DensityOperatorConstView<RANK> rho) { { l(rho) } -> ::cppqedutils::temporal_data_point ; } ) ; } ;*/
+requires (StateVectorConstView<RANK> rho) { { l(rho) } -> temporal_data_point ; } &&
+requires (DensityOperatorConstView<RANK> rho) { { l(rho) } -> temporal_data_point ; } ) ; } ;*/
 
 template <typename L, size_t RANK>
 concept functional = time_dependent_functional<L,RANK> || time_independent_functional<L,RANK> ;
@@ -41,7 +42,7 @@ auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 
 /// pre- & postcondition: the LogTree must have the same structure as the temporal_data_point returned by expectation_value
 template <typename L, size_t RANK>
-concept labelled_and_without_nonlinear_postprocessing = ::cppqedutils::labelled<L> && functional<L,RANK> ;
+concept labelled_and_without_nonlinear_postprocessing = labelled<L> && functional<L,RANK> ;
 
 /// Postprocessing means any operation on the expectation values that is not linear in the density operator (as the calculation of variance, for istance)
 template <typename L, size_t RANK>

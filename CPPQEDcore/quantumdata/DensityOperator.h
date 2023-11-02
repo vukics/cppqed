@@ -7,18 +7,18 @@
 
 namespace quantumdata {
 
-  
-template <size_t RANK>
-using DensityOperatorView=cppqedutils::MultiArrayView<dcomp,2*RANK>;
-
 
 template <size_t RANK>
-using DensityOperatorConstView=cppqedutils::MultiArrayConstView<dcomp,2*RANK>;
-
+using DensityOperatorView=MultiArrayView<dcomp,2*RANK>;
 
 
 template <size_t RANK>
-auto getDimensions(const DensityOperator<RANK>& rho) {return ::cppqedutils::halveExtents(rho.extents);}
+using DensityOperatorConstView=MultiArrayConstView<dcomp,2*RANK>;
+
+
+
+template <size_t RANK>
+auto getDimensions(const DensityOperator<RANK>& rho) {return halveExtents(rho.extents);}
 
 
 /// Density operator of arbitrary arity
@@ -33,20 +33,20 @@ auto getDimensions(const DensityOperator<RANK>& rho) {return ::cppqedutils::halv
  * 
  */
 template<size_t RANK>
-struct DensityOperator : ::cppqedutils::MultiArray<dcomp,2*RANK>, private VectorSpaceOperatorsGenerator<DensityOperator<RANK>>
+struct DensityOperator : MultiArray<dcomp,2*RANK>, private VectorSpaceOperatorsGenerator<DensityOperator<RANK>>
 {
-  using ABase = ::cppqedutils::MultiArray<dcomp,2*RANK>;
+  using ABase = MultiArray<dcomp,2*RANK>;
 
-  using Dimensions=::cppqedutils::Extents<RANK>; /// Note: this is not the extents of the underlying multiarray!
+  using Dimensions=Extents<RANK>; /// Note: this is not the extents of the underlying multiarray!
 
   DensityOperator(const DensityOperator&) = delete; DensityOperator& operator=(const DensityOperator&) = delete;
   
   DensityOperator(DensityOperator&&) = default; DensityOperator& operator=(DensityOperator&&) = default;
 
-  DensityOperator(::cppqedutils::MultiArray<dcomp,2*RANK>&& ma) : ABase(std::move(ma)) {}
+  DensityOperator(MultiArray<dcomp,2*RANK>&& ma) : ABase(std::move(ma)) {}
 
   DensityOperator(Dimensions dimensions, auto&& initializer)
-    : ABase{cppqedutils::concatenate(dimensions,dimensions),std::forward<decltype(initializer)>(initializer)} {}
+    : ABase{concatenate(dimensions,dimensions),std::forward<decltype(initializer)>(initializer)} {}
 
   explicit DensityOperator(Dimensions dimensions)
     : DensityOperator{dimensions, [=] (size_t e) {
@@ -59,7 +59,7 @@ struct DensityOperator : ::cppqedutils::MultiArray<dcomp,2*RANK>, private Vector
     : DensityOperator(dyad(psi,psi)) {}
 
 
-  friend double trace(const DensityOperator& rho) {return real(::cppqedutils::matricize(rho).trace());} //< delegates to Eigen3
+  friend double trace(const DensityOperator& rho) {return real(matricize(rho).trace());} //< delegates to Eigen3
 
   friend double renorm(DensityOperator& rho)
   {
@@ -77,8 +77,8 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
 {
   const size_t dim=rho.getTotalDimension();
   
-  typedef cppqedutils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(rho.getDimensions()-1,cppqedutils::mii::begin);
+  typedef MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(rho.getDimensions()-1,mii::begin);
   
   size_t idx=0;
 
@@ -88,7 +88,7 @@ void inflate(const DArray<1>& flattened, DensityOperator<RANK>& rho, bool offDia
   
   // OffDiagonal
   if (offDiagonals)
-    for (Iterator i(etalon); idx<cppqedutils::sqr(dim); ++i)
+    for (Iterator i(etalon); idx<sqr(dim); ++i)
       for (Iterator j=++Iterator(i); j!=etalon.getEnd(); ++j, idx+=2) {
         dcomp matrixElement(rho(*i)(*j)=dcomp(flattened(idx),flattened(idx+1)));
         rho(*j)(*i)=conj(matrixElement);
@@ -104,8 +104,8 @@ densityOperatorize(const LazyDensityOperator<RANK>& matrix)
 {
   DensityOperator<RANK> res(matrix.getDimension());
   
-  typedef cppqedutils::MultiIndexIterator<RANK> Iterator;
-  const Iterator etalon(matrix.getDimensions()-1,cppqedutils::mii::begin);
+  typedef MultiIndexIterator<RANK> Iterator;
+  const Iterator etalon(matrix.getDimensions()-1,mii::begin);
   
   for (Iterator i(etalon); i!=etalon.getEnd(); ++i) {
     res(*i)(*i)=matrix(*i);
@@ -167,13 +167,4 @@ constexpr auto multiArrayRank_v<DensityOperator<RANK>> = 2*RANK;
 
 template <size_t RANK>
 constexpr auto cppqedutils::passByValue_v<quantumdata::DensityOperator<RANK>> = false;
-
-
-
-namespace structure {
-
-using ::quantumdata::DensityOperatorView, ::quantumdata::DensityOperatorConstView;
-
-} // structure
-
 

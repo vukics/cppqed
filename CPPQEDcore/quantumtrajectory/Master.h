@@ -13,13 +13,13 @@ namespace quantumtrajectory {
 namespace master {
 
 
-typedef cppqedutils::ode::Pars<> Pars;
+typedef ode::Pars<> Pars;
 
 
 } // master
 
 
-/// Master equation evolution from a \link quantumdata::DensityOperator density-operator\endlink initial condition
+/// Master equation evolution from a \link DensityOperator density-operator\endlink initial condition
 /**
  * \see \ref masterequation.
  * 
@@ -27,15 +27,15 @@ typedef cppqedutils::ode::Pars<> Pars;
  *
  */
 template <size_t RANK,
-          ::structure::quantum_system_dynamics<RANK> QSD,
-          ::cppqedutils::ode::engine<typename ::quantumdata::DensityOperator<RANK>::StorageType> OE>
+          quantum_system_dynamics<RANK> QSD,
+          ode::engine<typename DensityOperator<RANK>::StorageType> OE>
 struct Master
 {
-  typedef quantumdata::DensityOperator<RANK> DensityOperator;
+  typedef DensityOperator<RANK> DensityOperator;
 
   Master(auto&& qsd, auto&& rho, auto&& oe)
     : qsd{std::forward<decltype(qsd)>(qsd)}, rho{std::forward<decltype(rho)>(rho)}, oe{std::forward<decltype(oe)>(oe)},
-      rowIterationOffsets_{::cppqedutils::calculateSlicesOffsets<rowIterationRetainedAxes>(rho.extents)} {}
+      rowIterationOffsets_{calculateSlicesOffsets<rowIterationRetainedAxes>(rho.extents)} {}
 
   double time=0., time0=0.;
   QSD qsd;
@@ -47,15 +47,15 @@ struct Master
   friend double getTime(const Master& m) {return m.time;}
 
   /// TODO: put here the system-specific things
-  friend ::cppqedutils::LogTree logIntro(const Master& m)
+  friend LogTree logIntro(const Master& m)
   {
     return {{"Master",{{"odeEngine",logIntro(m.oe)},{"System","TAKE FROM SYSTEM"}}}};
     // streamCharacteristics(m.qsd,streamParameters(m.qsd,streamIntro(m.oe,os)<<"Solving Master equation."<<endl<<endl ) )<<endl;
   }
 
-  friend ::cppqedutils::LogTree logOutro(const Master& m) {return logOutro(m.oe);}
+  friend LogTree logOutro(const Master& m) {return logOutro(m.oe);}
 
-  friend ::cppqedutils::LogTree step(Master& m, double deltaT)
+  friend LogTree step(Master& m, double deltaT)
   {
     using namespace structure; using namespace quantumdata;
 
@@ -97,14 +97,14 @@ struct Master
     return res;
   }
 
-  friend ::cppqedutils::LogTree dataStreamKey(const Master& m) {return {{"Master","TAKE FROM SYSTEM"}};}
+  friend LogTree dataStreamKey(const Master& m) {return {{"Master","TAKE FROM SYSTEM"}};}
 
   friend auto temporalDataPoint(const Master& m)
   {
-    return ::structure::calculateAndPostprocess<RANK>( getEV(m.qsd), m.time, ::quantumdata::DensityOperatorConstView<RANK>(m.rho) );
+    return calculateAndPostprocess<RANK>( getEV(m.qsd), m.time, DensityOperatorConstView<RANK>(m.rho) );
   }
 
-  friend ::cppqedutils::iarchive& readFromArrayOnlyArchive(Master& m, ::cppqedutils::iarchive& iar) {return iar & m.rho;} // MultiArray can be (de)serialized
+  friend iarchive& readFromArrayOnlyArchive(Master& m, iarchive& iar) {return iar & m.rho;} // MultiArray can be (de)serialized
 
   /** structure of Master archives:
   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry )
@@ -123,7 +123,7 @@ struct Master
 private:
   const std::vector<size_t> rowIterationOffsets_;
 
-  static constexpr auto rowIterationRetainedAxes= ::cppqedutils::compileTimeOrdinals<RANK>;
+  static constexpr auto rowIterationRetainedAxes= compileTimeOrdinals<RANK>;
 
   // const DensityOperatorStreamer<RANK,V> dos_;
 
@@ -131,14 +131,14 @@ private:
 
 
 template<typename QSD, typename DO, typename OE>
-Master(QSD , DO , OE ) -> Master< quantumdata::multiArrayRank_v<DO>/2, QSD, OE >;
+Master(QSD , DO , OE ) -> Master< multiArrayRank_v<DO>/2, QSD, OE >;
 
 
 /*
 namespace master {
 
 template<typename ODE_Engine, typename V, typename StateVector_OR_DensityOperator>
-auto make(::structure::QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperator>::N_RANK> sys,
+auto make(QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperator>::N_RANK> sys,
           StateVector_OR_DensityOperator&& state, const Pars& p, EntanglementMeasuresSwitch ems)
 {
   return Master<std::decay_t<StateVector_OR_DensityOperator>::N_RANK,ODE_Engine,V>(
@@ -166,9 +166,9 @@ std::ostream& quantumtrajectory::Master<RANK,ODE_Engine,V>::streamParameters(std
 {
   using namespace std;
 
-  ::structure::streamCharacteristics(sys_, sys_->streamParameters(ode_.streamParameters(os)<<"Solving Master equation."<<endl<<endl ) )<<endl;
+  streamCharacteristics(sys_, sys_->streamParameters(ode_.streamParameters(os)<<"Solving Master equation."<<endl<<endl ) )<<endl;
 
-  if (const auto li=::structure::castLi(sys_)) {
+  if (const auto li=castLi(sys_)) {
     os<<"Decay channels:\n";
     {
       size_t i=0;
@@ -183,7 +183,7 @@ std::ostream& quantumtrajectory::Master<RANK,ODE_Engine,V>::streamParameters(std
           li->actWithSuperoperator(0,rho_.getArray(),rhotemp.getArray(),i);
           os<<i<<' '; ++n;
         }
-        catch (const ::structure::SuperoperatorNotImplementedException&) {}
+        catch (const SuperoperatorNotImplementedException&) {}
       if (!n) os<<"none";
     }
     os<<endl;
@@ -200,33 +200,33 @@ std::ostream& quantumtrajectory::Master<RANK,ODE_Engine,V>::streamParameters(std
 namespace boost { namespace numeric { namespace odeint {
 
 template <size_t RANK>
-struct is_resizeable<::quantumdata::DensityOperator<RANK>> : boost::true_type {};
+struct is_resizeable<DensityOperator<RANK>> : boost::true_type {};
 
 template <size_t RANK>
-struct same_size_impl<::quantumdata::DensityOperator<RANK>, ::quantumdata::DensityOperator<RANK>>
+struct same_size_impl<DensityOperator<RANK>, DensityOperator<RANK>>
 { // define how to check size
-  static bool same_size(const ::quantumdata::DensityOperator<RANK> &v1, const ::quantumdata::DensityOperator<RANK> &v2) {return v1.extents == v2.extents;}
+  static bool same_size(const DensityOperator<RANK> &v1, const DensityOperator<RANK> &v2) {return v1.extents == v2.extents;}
 };
 
 /// TODO: a reserve could be defined for the vector to be resized
 template <size_t RANK>
-struct resize_impl<::quantumdata::DensityOperator<RANK>, ::quantumdata::DensityOperator<RANK>>
+struct resize_impl<DensityOperator<RANK>, DensityOperator<RANK>>
 { // define how to resize
-  static void resize(::quantumdata::DensityOperator<RANK> &v1, const ::quantumdata::DensityOperator<RANK> &v2) {v1.resize( v2.extents );}
+  static void resize(DensityOperator<RANK> &v1, const DensityOperator<RANK> &v2) {v1.resize( v2.extents );}
 };
 
 template <size_t RANK>
-struct vector_space_norm_inf<::quantumdata::DensityOperator<RANK>>
+struct vector_space_norm_inf<DensityOperator<RANK>>
 {
   typedef double result_type;
-  double operator()(const ::quantumdata::DensityOperator<RANK>& v ) const
+  double operator()(const DensityOperator<RANK>& v ) const
   {
     return max( abs(v) );
   }
 };
 
 template <size_t RANK>
-struct norm_result_type<::quantumdata::DensityOperator<RANK>> : mpl::identity<double> {};
+struct norm_result_type<DensityOperator<RANK>> : mpl::identity<double> {};
 
 } } } // boost::numeric::odeint
 

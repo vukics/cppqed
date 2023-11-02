@@ -9,6 +9,7 @@
 /// Comprises modules representing operators of special structure (multidiagonal, sparse) over Hilbert spaces of arbitrary arity
 namespace quantumoperator {
 
+using namespace ::quantumdata;
 
 namespace multidiagonal {
 
@@ -50,10 +51,10 @@ void for_each(MD&& md, auto&& func)
 template <size_t RANK>
 struct MultiDiagonal
 {
-  using Dimensions = ::cppqedutils::Extents<RANK>;
+  using Dimensions = Extents<RANK>;
   using Index = std::bitset<RANK>; // true means upper (or the main) diagonal, false lower
   using Offsets = Dimensions;
-  using Diagonal = ::cppqedutils::MultiArray<dcomp,RANK>;
+  using Diagonal = MultiArray<dcomp,RANK>;
   using DiagToIdx = std::map<Offsets,Diagonal>;
 
   /// \note `std::bitset` has hash but no comparison, whereas `std::array` has lexicographic comparison by default
@@ -75,7 +76,7 @@ struct MultiDiagonal
   // double tCurrent=0;
 
   /// Applying as a Hamiltonian
-  void operator () (double t, ::quantumdata::StateVectorConstView<RANK> psi, ::quantumdata::StateVectorView<RANK> dpsidt) const
+  void operator () (double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt) const
   {
     if (diagonals.empty()) return;
 
@@ -116,7 +117,7 @@ struct MultiDiagonal
     for (const auto& [index1,diagToIndex1] : md1.diagonals) for (const auto& [index2,diagToIndex2] : md2.diagonals) {
       typename ResultType::Index resIndex{index1.to_string()+index2.to_string()};
       for (const auto& [offsets1,diag1] : diagToIndex1) for (const auto& [offsets2,diag2] : diagToIndex2)
-        res.diagonals[resIndex].emplace(::cppqedutils::concatenate(offsets1,offsets2),directProduct(diag1,diag2));
+        res.diagonals[resIndex].emplace(concatenate(offsets1,offsets2),directProduct(diag1,diag2));
     }
     return res;
   }
@@ -182,19 +183,19 @@ struct MultiDiagonal
 
   MultiDiagonal& operator-=(const MultiDiagonal& md) {return operator+=(-md);}
 
-  MultiDiagonal& operator*=(cppqedutils::scalar auto d)
+  MultiDiagonal& operator*=(scalar auto d)
   {
     for (auto&& [index,offsets,diag] : multidiagonal::range(this)) for (dcomp& v : diag.dataStorage()) v*=d;
     return *this;
   }
 
-  MultiDiagonal& operator/=(cppqedutils::scalar auto d) {(*this)*=1./d; return *this;}
+  MultiDiagonal& operator/=(scalar auto d) {(*this)*=1./d; return *this;}
 
   friend auto operator+(const MultiDiagonal& md1, const MultiDiagonal& md2) {MultiDiagonal res{copy(md1)}; res+=md2; return res;}
   friend auto operator-(const MultiDiagonal& md1, const MultiDiagonal& md2) {MultiDiagonal res{copy(md1)}; res-=md2; return res;}
 
-  friend auto operator*(cppqedutils::scalar auto v, const MultiDiagonal& md) {MultiDiagonal res{copy(md)}; res*=v; return res;}
-  friend auto operator/(const MultiDiagonal& md, cppqedutils::scalar auto v) {MultiDiagonal res{copy(md)}; res/=v; return res;}
+  friend auto operator*(scalar auto v, const MultiDiagonal& md) {MultiDiagonal res{copy(md)}; res*=v; return res;}
+  friend auto operator/(const MultiDiagonal& md, scalar auto v) {MultiDiagonal res{copy(md)}; res/=v; return res;}
 
   //@}
 
@@ -218,7 +219,7 @@ struct MultiDiagonal
     return res;
   }
 
-  friend void to_json( ::cppqedutils::json& jv, const MultiDiagonal& md )
+  friend void to_json( json& jv, const MultiDiagonal& md )
   {
     for (const auto& d : md.diagonals) jv.emplace(d.first.to_string(),d.second);
   }

@@ -9,7 +9,7 @@
 
 namespace qbit {
 
-using namespace ::structure; using namespace ::quantumdata;
+using namespace ::structure;
 
 auto diagonalH(dcomp z) { return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(1)-=z*psi(1);}; }
 
@@ -55,8 +55,8 @@ StateVector<1> init(dcomp psi1);
 
 auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/)
 {
-  std::vector<Lindblad<1>> liouvillian;
-  std::vector<SystemFrequencyDescriptor> freqs;
+  Liouvillian<1> liouvillian;
+  SystemFrequencyStore freqs;
 
   if (abs(zSch)) freqs.emplace_back("zSch",zSch,1);
   if (abs(eta)) freqs.emplace_back("η",eta,1);
@@ -64,7 +64,7 @@ auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*,
   if (gamma_p) {liouvillian.push_back(gain(gamma_m)); freqs.emplace_back("γ_p",gamma_p,1);}
   // if (gamma_phi) liouvillian.emplace(dephasing(gamma_phi));
 
-  return QuantumSystemDynamics { std::move(freqs), std::move(liouvillian), fullH(zSch,eta), exact_propagator_ns::noOp, expectationValues }; //makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
+  return QuantumSystemDynamics { freqs, liouvillian, fullH(zSch,eta), exact_propagator_ns::noOp, expectationValues }; //makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
 }
 
 

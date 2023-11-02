@@ -6,6 +6,7 @@
 
 namespace structure {
 
+using namespace quantumdata;
 
 /// TODO: this could be fused with ode::system, but let’s not go into that for the moment :)
 template <typename H, typename StateIn, typename StateOut>
@@ -56,7 +57,7 @@ auto compose(const hamiltonian_ns::functional<RANK1> auto& h1, const hamiltonian
 
 
 template <typename H, size_t RANK>
-concept hamiltonian = ::cppqedutils::labelled<H> && hamiltonian_ns::functional<H,RANK>;
+concept hamiltonian = labelled<H> && hamiltonian_ns::functional<H,RANK>;
 
 
 
@@ -97,9 +98,9 @@ struct HamiltonianCollection
     hana::for_each(collection, [&] (const auto& h) {applyHamiltonian(h,t,psi,dpsidt,t0);});
   }
 
-  friend ::cppqedutils::LogTree label(const HamiltonianCollection& hc) {
-    ::cppqedutils::LogTree res;
-    hana::for_each(hc.collection,[&] (const auto& h) {res.push_back(::cppqedutils::getLabel(h));});
+  friend LogTree label(const HamiltonianCollection& hc) {
+    LogTree res;
+    hana::for_each(hc.collection,[&] (const auto& h) {res.push_back(getLabel(h));});
     return res;
   }
 
@@ -123,8 +124,8 @@ namespace hamiltonian_ns {
 
 /// Maybe this can be just an overload of applyHamiltonian ?
 // TODO: std::ranges::views::zip to be applied here, but for some reason, sliceRange is not compatible with zipping – it does work with sliceRangeSimple, though.
-//for (auto [psi,dpsidt] : std::views::zip(::cppqedutils::sliceRange<retainedAxes>(psi,offsets),
-//                                         ::cppqedutils::sliceRange<retainedAxes>(drhodt,offsets) ) )
+//for (auto [psi,dpsidt] : std::views::zip(sliceRange<retainedAxes>(psi,offsets),
+//                                         sliceRange<retainedAxes>(drhodt,offsets) ) )
 //  ::structure::applyHamiltonian(h,t,psi,dpsidt,t0) ;
 template <
   auto retainedAxes,
@@ -132,8 +133,8 @@ template <
   functional<std::size(retainedAxes)> T >
 void broadcast(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0, const std::vector<size_t>& offsets)
 {
-  auto psiRange{::cppqedutils::sliceRange<retainedAxes>(psi,offsets)};
-  auto dpsidtRange{::cppqedutils::sliceRange<retainedAxes>(dpsidt,offsets)};
+  auto psiRange{sliceRange<retainedAxes>(psi,offsets)};
+  auto dpsidtRange{sliceRange<retainedAxes>(dpsidt,offsets)};
   for ( auto&& [psi,dpsidt]=std::make_tuple(psiRange.begin(),dpsidtRange.begin()); psi!=psiRange.end(); applyHamiltonian(h,t,*psi++,*dpsidt++,t0) ) ;
 }
 

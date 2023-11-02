@@ -9,7 +9,7 @@
 
 namespace mode {
 
-using namespace ::structure; using namespace ::quantumdata;
+using namespace ::structure;
 using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;
 
 
@@ -82,7 +82,7 @@ static_assert(::structure::expectation_values_ns::labelled_and_with_nonlinear_po
 auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
 {
   Liouvillian<1> liouvillian;
-  std::vector<SystemFrequencyDescriptor> freqs;
+  SystemFrequencyStore freqs;
 
   dcomp z{kappa*(2*nTh+1),-delta};
 

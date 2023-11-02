@@ -7,6 +7,7 @@
 
 namespace quantumdata {
 
+
 /// Common interface for calculating quantum averages from StateVector, DensityOperator (and potentially their non-orthogonal counterparts)
 /**
  * Relies on the formula
@@ -24,45 +25,45 @@ namespace quantumdata {
  */
 
 
-/// The lazy_density_operator-style indexing should be defined in the language of ::cppqedutils::MultiArrayConstView
+/// The lazy_density_operator-style indexing should be defined in the language of MultiArrayConstView
 /**
  * If we do it as DensityOperatorConstView, then template-argument-deduction doesn’t work very well
  * TODO: (re)evaluate the alternative design of making StateVectorConstView & DensityOperatorConstView optional bases of MultiArray
  *   In that case, lazy_density_operator-style indexing could be defined as member functions
  */
-inline dcomp _(::cppqedutils::MultiArrayConstView<dcomp,1> psi, size_t i, size_t j) {return psi(i)*std::conj(psi(j));}
+inline dcomp _(MultiArrayConstView<dcomp,1> psi, size_t i, size_t j) {return psi(i)*std::conj(psi(j));}
 
-inline double _(::cppqedutils::MultiArrayConstView<dcomp,1> psi, size_t i) {return sqrAbs(psi(i));}
+inline double _(MultiArrayConstView<dcomp,1> psi, size_t i) {return sqrAbs(psi(i));}
 
-inline dcomp _(::cppqedutils::MultiArrayConstView<dcomp,2> rho, size_t i, size_t j) {return rho(i,j);}
+inline dcomp _(MultiArrayConstView<dcomp,2> rho, size_t i, size_t j) {return rho(i,j);}
 
-inline double _(::cppqedutils::MultiArrayConstView<dcomp,2> rho, size_t i) {return real(rho(i,i));}
+inline double _(MultiArrayConstView<dcomp,2> rho, size_t i) {return real(rho(i,i));}
 
 template <size_t RANK>
-dcomp _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, ::cppqedutils::Extents<RANK> i, ::cppqedutils::Extents<RANK> j)
+dcomp _(MultiArrayConstView<dcomp,RANK> psi, Extents<RANK> i, Extents<RANK> j)
 {
   return psi(i)*std::conj(psi(j));
 }
 
 template <size_t RANK>
-double _(::cppqedutils::MultiArrayConstView<dcomp,RANK> psi, ::cppqedutils::Extents<RANK> i)
+double _(MultiArrayConstView<dcomp,RANK> psi, Extents<RANK> i)
 {
   return sqrAbs(psi(i));
 }
 
 template <size_t TWO_TIMES_RANK>
-dcomp _(::cppqedutils::MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
-        ::cppqedutils::Extents<TWO_TIMES_RANK/2> i,
-        ::cppqedutils::Extents<TWO_TIMES_RANK/2> j) requires (TWO_TIMES_RANK%2==0)
+dcomp _(MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
+        Extents<TWO_TIMES_RANK/2> i,
+        Extents<TWO_TIMES_RANK/2> j) requires (TWO_TIMES_RANK%2==0)
 {
-  return rho(::cppqedutils::concatenate(i,j));
+  return rho(concatenate(i,j));
 }
 
 template <size_t TWO_TIMES_RANK>
-double _(::cppqedutils::MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
-         ::cppqedutils::Extents<TWO_TIMES_RANK/2> i) requires (TWO_TIMES_RANK%2==0)
+double _(MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
+         Extents<TWO_TIMES_RANK/2> i) requires (TWO_TIMES_RANK%2==0)
 {
-  return real(rho(::cppqedutils::concatenate(i,i)));
+  return real(rho(concatenate(i,i)));
 }
 
 
@@ -97,17 +98,17 @@ auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<siz
   }};
 
   if constexpr (std::same_as<LDO,StateVectorConstView<RANK>>) {
-    auto sr{cppqedutils::sliceRange<retainedAxes>(matrix,offsets)};
+    auto sr{sliceRange<retainedAxes>(matrix,offsets)};
     return iterateSlices(sr);
   }
   else if constexpr (std::same_as<LDO,DensityOperatorConstView<RANK>>) {
     static constexpr auto extendedAxes{hana::concat(retainedAxes,
                                                     hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
     auto diagonalOffsets{ offsets | std::views::transform( [&] (size_t v) {return v * ( std::lround(std::sqrt(matrix.dataView.size())) + 1 ) ; } ) };
-    auto sr{cppqedutils::sliceRange<extendedAxes>(matrix,diagonalOffsets)};
+    auto sr{sliceRange<extendedAxes>(matrix,diagonalOffsets)};
     return iterateSlices(sr);
   }
-  else static_assert(::cppqedutils::always_false_v<LDO>, "unknown type input in partialTrace");
+  else static_assert(always_false_v<LDO>, "unknown type input in partialTrace");
  
 }
 
@@ -285,10 +286,3 @@ const DArray<1> deflate(const LazyDensityOperator<RANK>& matrix, bool offDiagona
 } // quantumdata
 
 
-
-namespace structure {
-
-using ::quantumdata::lazyDensityOperatorOptions;
-using ::quantumdata::lazy_density_operator;
-
-} // structure

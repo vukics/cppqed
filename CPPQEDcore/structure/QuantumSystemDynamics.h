@@ -25,6 +25,8 @@
 #include "ExpectationValues.h"
 #include "Liouvillian.h"
 
+#include <list>
+
 
 namespace structure {
 
@@ -68,9 +70,9 @@ struct QuantumSystemDynamics
 {
   SystemFrequencyStore freqs;
 
-  HA ha; EX ex; EV ev;
-
   Liouvillian<RANK> li;
+
+  HA ha; EX ex; EV ev;
 
   friend const SystemFrequencyStore& getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
 
@@ -81,6 +83,11 @@ struct QuantumSystemDynamics
   friend const EV & getEV(const QuantumSystemDynamics& qsd) {return qsd.ev;}
 
 };
+
+
+template <size_t RANK, typename HA, typename EX, typename EV>
+QuantumSystemDynamics(const SystemFrequencyStore&, const Liouvillian<RANK>&, HA&&, EX&&, EV&&) -> QuantumSystemDynamics<RANK,HA,EX,EV>;
+
 
 
 // this class could be derived from QuantumSystemDynamics, with the latter having some kind of base class?
@@ -107,8 +114,8 @@ struct BinarySystem
       liFull_{ [&] {
         std::vector< Lindblad<2> > res;
       } () },
-      offsets0_{::cppqedutils::calculateSlicesOffsets<rA0>({dim0,dim1})},
-      offsets1_{::cppqedutils::calculateSlicesOffsets<rA1>({dim0,dim1})}
+      offsets0_{calculateSlicesOffsets<rA0>({dim0,dim1})},
+      offsets1_{calculateSlicesOffsets<rA1>({dim0,dim1})}
   {}
 
   friend const auto& getFreqs(const BinarySystem& bs) {return
@@ -149,7 +156,7 @@ struct BinarySystem
 
 private:
   static constexpr auto
-    rA0=::cppqedutils::retainedAxes<0>, rA1=::cppqedutils::retainedAxes<1>;
+    rA0=retainedAxes<0>, rA1=retainedAxes<1>;
 
   const SystemFrequencyStore freqsFull_;
 

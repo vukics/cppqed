@@ -8,9 +8,11 @@
 
 namespace structure {
 
+using namespace quantumdata;
+
 namespace exact_propagator_ns {
 
-static const struct NoOp {::cppqedutils::LogTree label{"noOp"};} noOp;
+static const struct NoOp {LogTree label{"noOp"};} noOp;
 
 template <typename H, size_t RANK>
 concept one_time_dependent_functional = requires (H&& h, double t, StateVectorView<RANK> psi) { h(t,psi); };
@@ -33,7 +35,7 @@ void applyPropagator(const T& h, double t, StateVectorView<RANK> psi, double t0)
 
 
 template <typename H, size_t RANK>
-concept exact_propagator = ::cppqedutils::labelled<H> && exact_propagator_ns::functional<H,RANK>;
+concept exact_propagator = labelled<H> && exact_propagator_ns::functional<H,RANK>;
 
 
 /// A unary propagator that assumes that the operator that transforms between the pictures is diagonal
@@ -69,7 +71,7 @@ namespace exact_propagator_ns {
 template < auto retainedAxes, size_t RANK, functional<std::size(retainedAxes)> T >
 void broadcast(const T& h, double t, StateVectorView<RANK> psi, double t0, const std::vector<size_t>& offsets)
 {
-  for (auto&& psiElem : ::cppqedutils::sliceRange<retainedAxes>(psi,offsets)) applyPropagator(h,t,psiElem,t0);
+  for (auto&& psiElem : sliceRange<retainedAxes>(psi,offsets)) applyPropagator(h,t,psiElem,t0);
 }
 
 

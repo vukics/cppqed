@@ -25,9 +25,13 @@ int main(int argc, char* argv[])
 
   quantumdata::StateVector<1> psi{{pm.cutoff}}; psi(0)=0; psi(1)=1;
 
+  auto ensemble(quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),std::move(psi),pt));
+
+  std::cerr<<json(getHa(ensemble.tdpCalculator.qsd).functional)<<json(getHa(ensemble.trajs[0].qsd).functional)<<std::endl;
+
   cppqedutils::run(
-    // quantumtrajectory::qjmc::make<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
-    quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    quantumtrajectory::qjmc::make<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     pt,cppqedutils::trajectory::observerNoOp);
 }
 

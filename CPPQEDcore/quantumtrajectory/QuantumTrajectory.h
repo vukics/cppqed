@@ -11,32 +11,35 @@
 
 namespace quantumtrajectory {
 
+using namespace structure;
+
+
 using EntanglementMeasuresSwitch = std::bitset<3>;
 
   
-/// Forwards to trajectory::initialTimeStep, with the highest frequency of the system taken as structure::QuantumSystem::highestFrequency
+/// Forwards to trajectory::initialTimeStep, with the highest frequency of the system taken as QuantumSystem::highestFrequency
 inline double initialTimeStep(const SystemFrequencyStore& freqs)
 {
-  return ::cppqedutils::trajectory::initialTimeStep(::structure::highestFrequency(freqs));
+  return trajectory::initialTimeStep(highestFrequency(freqs));
 }
 
 
 /*
 template<size_t RANK>
-std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<RANK> auto& qsd, std::ostream& os)
+std::ostream& streamCharacteristics(const quantum_system_dynamics<RANK> auto& qsd, std::ostream& os)
 {
   return
     hana::fold(getLi(qsd),
     hana::fold(getHa(qsd),os<<"System characteristics:\nHamiltonian terms: ", [] (std::ostream& os, const auto& he) {
       {
         using T=decltype(termOrPropagator(he));
-        if constexpr (::structure::one_time_dependent_propagator<T,RANK> || ::structure::two_time_dependent_propagator<T,RANK>)
+        if constexpr (one_time_dependent_propagator<T,RANK> || two_time_dependent_propagator<T,RANK>)
           os<<"*";
       }
       return os<<label(he)<<", ";
     })<<"Liouvillian ", [&]<typename LI> (std::ostream& os, const LI& lindblad) {
-      if constexpr(::structure::lindblad_with_rate<LI,RANK>) os<<"*";
-      if constexpr(::structure::lindblad_with_superoperator<LI,RANK>) os<<"!";
+      if constexpr(lindblad_with_rate<LI,RANK>) os<<"*";
+      if constexpr(lindblad_with_superoperator<LI,RANK>) os<<"!";
       return os<<label(lindblad);
     });
 }
@@ -45,18 +48,18 @@ std::ostream& streamCharacteristics(const ::structure::quantum_system_dynamics<R
 /// Wraps common functionality of Master & EnsembleMCWF concerning calculating temporal data points on the basis of density operators
 /**
  * This comprises
- * - keeping a structure::QSD instant and calling structure::Averaged::stream
+ * - keeping a QSD instant and calling Averaged::stream
  * - performing calculation of entanglement measures if needed
  * - extending key with entanglement measures when needed
  */
 template<size_t RANK,
-         ::structure::quantum_system_dynamics<RANK> QSD/*,
+         quantum_system_dynamics<RANK> QSD/*,
          auto axesOfSubsystem */ // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
          >
 class TDP_DensityOperator
 {
 public:
-  using DensityOperator = ::quantumdata::DensityOperator<RANK>;
+  using DensityOperator = DensityOperator<RANK>;
 
   TDP_DensityOperator(QSD qsd /*, EntanglementMeasuresSwitch ems*/) : qsd{std::forward<QSD>(qsd)} {}
 
@@ -66,7 +69,7 @@ public:
 
   auto operator()(double t, const DensityOperator& rho) const
   {
-    return ::structure::calculateAndPostprocess<RANK>(getEV(qsd),t,static_cast<::quantumdata::DensityOperatorConstView<RANK>>(rho));
+    return calculateAndPostprocess<RANK>(getEV(qsd),t,static_cast<DensityOperatorConstView<RANK>>(rho));
 /*    auto & averages{std::get<1>(res)};
     if constexpr ( !isV_empty ) {
       if (ems_[0]) {
@@ -89,7 +92,7 @@ public:
     return {os,averages};*/
   }
 
-  friend ::cppqedutils::LogTree dataStreamKey(const TDP_DensityOperator& t)
+  friend LogTree dataStreamKey(const TDP_DensityOperator& t)
   {
     return label(getEV(t.qsd));
 /*    if constexpr ( !isV_empty ) {

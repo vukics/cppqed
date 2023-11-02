@@ -27,11 +27,11 @@ int main(int argc, char* argv[])
 
   cppqedutils::ODE_EngineBoost<quantumdata::DensityOperator<1>::StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
 
-  quantumtrajectory::Master m{qbit,quantumdata::DensityOperator<1>{{2}},oe};
+  // quantumtrajectory::Master traj{qbit,quantumdata::DensityOperator<1>{{2}},oe};
 
-  // quantumtrajectory::QuantumJumpMonteCarlo q{qbit,quantumdata::StateVector<1>{{2}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
+  quantumtrajectory::QuantumJumpMonteCarlo traj{qbit,quantumdata::StateVector<1>{{2}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
 
-  cppqedutils::run(m,pt,cppqedutils::trajectory::observerNoOp);
+  cppqedutils::run(traj,pt,cppqedutils::trajectory::observerNoOp);
 
   // {
   //   quantumdata::StateVector<2> psi{{2,3}}; quantumdata::DensityOperator<2> rho{{2,3}};
@@ -71,6 +71,5 @@ int main(int argc, char* argv[])
 
 /*
   static_assert( hamiltonian<decltype(diagonalH(z)),1> ) ;
-  static_assert( system_frequency_store< decltype(std::array{structure::SystemFrequencyDescriptor{"z",z,1.},structure::SystemFrequencyDescriptor{"η",eta,1.}}) > );
   static_assert( expectationvalues::time_independent_functional<decltype(expectationValues),1> ) ;
 */
