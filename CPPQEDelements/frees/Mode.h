@@ -66,8 +66,8 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 };
 
 
-constexpr auto postProcessor(decltype(expectationValues)) {
-  return [] (std::invoke_result_t<decltype(expectationValues),StateVectorConstView<1>> & t) {
+constexpr auto postProcessor(decltype(expectationValues) t) {
+  return [] (std::invoke_result_t<decltype(t),StateVectorConstView<1>> & t) {
     using namespace hana::literals; t[1_c] -= sqr(t[0_c]);
   };
 }
@@ -81,7 +81,7 @@ static_assert(::structure::expectation_values_ns::labelled_and_with_nonlinear_po
 
 auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
 {
-  std::vector<Lindblad<1>> liouvillian;
+  Liouvillian<1> liouvillian;
   std::vector<SystemFrequencyDescriptor> freqs;
 
   dcomp z{kappa*(2*nTh+1),-delta};

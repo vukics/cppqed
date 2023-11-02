@@ -15,7 +15,7 @@ using EntanglementMeasuresSwitch = std::bitset<3>;
 
   
 /// Forwards to trajectory::initialTimeStep, with the highest frequency of the system taken as structure::QuantumSystem::highestFrequency
-double initialTimeStep(const ::structure::system_frequency_store auto& freqs)
+inline double initialTimeStep(const SystemFrequencyStore& freqs)
 {
   return ::cppqedutils::trajectory::initialTimeStep(::structure::highestFrequency(freqs));
 }

@@ -31,16 +31,11 @@ namespace structure {
 
 using SystemFrequencyDescriptor = std::tuple<std::string,std::variant<dcomp,double>,double>; /// name-value-multiplier
 
-
-template <typename T>
-concept system_frequency_store = 
-  std::ranges::forward_range<T> && 
-  std::is_same_v<std::ranges::range_value_t<T>,SystemFrequencyDescriptor>;
+using SystemFrequencyStore = std::list<SystemFrequencyDescriptor>;
 
 
 /// TODO: what happens if sfs is empty?
-template <system_frequency_store SFS>
-double highestFrequency(const SFS& sfs)
+inline double highestFrequency(const SystemFrequencyStore& sfs)
 {
   return sfs.size()
   ? std::ranges::max(sfs | std::views::transform( [](const auto& p) {
@@ -53,14 +48,11 @@ double highestFrequency(const SFS& sfs)
 template <typename T, size_t RANK>
 concept quantum_system_dynamics = requires (T&& qsd)
 {
-  { getFreqs(qsd) } -> system_frequency_store;
-  // or even
-  // { GetFrequencies<T>{}(qsd) } -> system_frequency_store;
-  // which gives even more flexibility
+  { getFreqs(qsd) } -> std::convertible_to<SystemFrequencyStore>;
   { getHa(qsd) } -> hamiltonian<RANK>;
   { getEx(qsd) } -> exact_propagator<RANK>;
-  { getLi(qsd) } -> liouvillian<RANK>;
   { getEV(qsd) } -> expectation_values<RANK>;
+  { getLi(qsd) } -> std::convertible_to<Liouvillian<RANK>>;
   // { streamParameters(qsd,os) } -> std::convertible_to<std::ostream&>;
 };
 
@@ -71,38 +63,55 @@ concept quantum_system_dynamics = requires (T&& qsd)
  * Systems like Qubit, Mode could simply define a class for themselves that fulfill the quantum_system_dynamics concept
  * Also, in the concept, the getHa, getLi, getEV functions should be optional
  */
-template <size_t RANK, system_frequency_store SFS, liouvillian<RANK> LI, hamiltonian<RANK> HA, exact_propagator<RANK> EX, expectation_values<RANK> EV>
+template <size_t RANK, hamiltonian<RANK> HA, exact_propagator<RANK> EX, expectation_values<RANK> EV>
 struct QuantumSystemDynamics
 {
-  SFS freqs; LI li; HA ha; EX ex; EV ev;
+  SystemFrequencyStore freqs;
 
-  friend const SFS& getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
-  friend const LI & getLi   (const QuantumSystemDynamics& qsd) {return qsd.li;}
-  friend const HA & getHa   (const QuantumSystemDynamics& qsd) {return qsd.ha;}
-  friend const EX & getEx   (const QuantumSystemDynamics& qsd) {return qsd.ex;}
-  friend const EV & getEV   (const QuantumSystemDynamics& qsd) {return qsd.ev;}
+  HA ha; EX ex; EV ev;
+
+  Liouvillian<RANK> li;
+
+  friend const SystemFrequencyStore& getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
+
+  friend const Liouvillian<RANK>& getLi(const QuantumSystemDynamics& qsd) {return qsd.li;}
+
+  friend const HA & getHa(const QuantumSystemDynamics& qsd) {return qsd.ha;}
+  friend const EX & getEx(const QuantumSystemDynamics& qsd) {return qsd.ex;}
+  friend const EV & getEV(const QuantumSystemDynamics& qsd) {return qsd.ev;}
+
 };
 
 
-template <system_frequency_store SFS, typename LI, typename HA, typename EX, typename EV>
-QuantumSystemDynamics(SFS&& freqs, LI&& li, HA&& ha, EX&& ex, EV&& ev) -> QuantumSystemDynamics<std::ranges::range_value_t<LI>::N_RANK,SFS,LI,HA,EX,EV>;
-
-
-
+// this class could be derived from QuantumSystemDynamics, with the latter having some kind of base class?
 template <
   quantum_system_dynamics<1> QSD0,
   quantum_system_dynamics<1> QSD1,
-  system_frequency_store SFS,
-  liouvillian<2> LI,
   hamiltonian<2> HA,
   exact_propagator<2> EX,
   expectation_values<2> EV >
 struct BinarySystem
 {
   QSD0 qsd0; QSD1 qsd1;
-  SFS freqs; LI li; HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
 
-  friend auto getFreqs(const BinarySystem& bs) {
+  HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
+
+
+  BinarySystem(auto&& qsd0, size_t dim0, auto&& qsd1, size_t dim1, const SystemFrequencyStore& freqs, const Liouvillian<2> li, auto&& ha, auto&& ex, auto&& ev)
+    : qsd0{std::forward<decltype(qsd0)>(qsd0)},
+      qsd1{std::forward<decltype(qsd1)>(qsd1)},
+      ha{std::forward<decltype(ha)>(ha)},
+      ex{std::forward<decltype(ex)>(ex)},
+      ev{std::forward<decltype(ev)>(ev)},
+      freqsFull_{std::ranges::views::join({getFreqs(qsd0),getFreqs(qsd1),freqs})},
+      liFull_{ [&] {
+        std::vector< Lindblad<2> > res;
+      } () },
+      offsets0_{::cppqedutils::calculateSlicesOffsets<rA0>({dim0,dim1})},
+      offsets1_{::cppqedutils::calculateSlicesOffsets<rA1>({dim0,dim1})}
+  {}
+
+  friend const auto& getFreqs(const BinarySystem& bs) {return
     std::vector<SystemFrequencyDescriptor> res;
     for (const auto& i : getFreqs(bs.qsd0)) res.push_back(i);
     for (const auto& i : getFreqs(bs.qsd1)) res.push_back(i);
@@ -110,13 +119,43 @@ struct BinarySystem
     return res;
   }
 
-private:
-  const std::vector<size_t> offsets0_, offsets1_;
 
+  friend auto getHa(const BinarySystem& bs) {
+    return [&] (double t, StateVectorConstView<2> psi, StateVectorView<2> dpsidt, double t0) {
+      hamiltonian_ns::broadcast<BinarySystem::rA0>(getHa(bs.qsd0),t,psi,dpsidt,t0,bs.offsets0_);
+      hamiltonian_ns::broadcast<BinarySystem::rA1>(getHa(bs.qsd1),t,psi,dpsidt,t0,bs.offsets1_);
+      bs.ha(t,psi,dpsidt,t0);
+    };
+  }
+
+  friend auto getEx(const BinarySystem& bs) {
+    return [&] (double t, lazy_density_operator<2> auto psi, double t0) {
+      return hana::tuple(
+        exact_propagator_ns::broadcast<BinarySystem::rA0>(getEx(bs.qsd0),t,psi,bs.offsets0_),
+        exact_propagator_ns::broadcast<BinarySystem::rA1>(getEx(bs.qsd1),t,psi,bs.offsets1_),
+        bs.ex(t,psi));
+    };
+  }
+
+  /*
+  friend void postProcessor(std::invoke_result_t<getEx,BinarySystem> )
+  constexpr auto postProcessor(decltype(expectationValues)) {
+  return [] (std::invoke_result_t<decltype(expectationValues),StateVectorConstView<1>> & t) {
+    using namespace hana::literals; t[1_c] -= sqr(t[0_c]);
+  };
+  }*/
+
+  friend const auto& getLi(const BinarySystem& bs) {return bs.li_;}
+
+private:
   static constexpr auto
     rA0=::cppqedutils::retainedAxes<0>, rA1=::cppqedutils::retainedAxes<1>;
 
+  const SystemFrequencyStore freqsFull_;
 
+  const Liouvillian<2> liFull_;
+
+  const std::vector<size_t> offsets0_, offsets1_;
 };
 
 

@@ -163,7 +163,7 @@ struct QuantumJumpMonteCarlo
     return ar;
   }
   
-  auto calculateRates(const ::structure::liouvillian<RANK> auto& li) const
+  auto calculateRates(const Liouvillian<RANK> & li) const
   {
     Rates res(std::size(li));
     std::ranges::transform(li, res.begin(), [&] (const ::structure::Lindblad<RANK>& l) -> double {return ::structure::calculateRate(l.rate,time,psi); } );

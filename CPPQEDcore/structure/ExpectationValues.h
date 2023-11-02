@@ -35,8 +35,7 @@ template <size_t RANK, functional<RANK> EV>
 auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 {
   if constexpr (time_dependent_functional<EV,RANK>) return ev(t,matrix);
-  else if constexpr (time_independent_functional<EV,RANK>) return ev(matrix);
-  else static_assert(::cppqedutils::always_false_v<EV>,"unexpected type in expectation_values_ns::calculate");
+  else                                              return ev(matrix);
 }
 
 
@@ -71,6 +70,20 @@ auto calculateAndPostprocess(const EV& ev, double t, lazy_density_operator<RANK>
   return res;
 }
 
+
+
+namespace expectation_values_ns {
+
+template <
+  auto retainedAxes,
+  size_t RANK,
+  functional<std::size(retainedAxes)> EV>
+auto broadcast(const EV& ev, double t, lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets)
+{
+  return partialTrace( matrix, offsets, [&] (auto psiElem) {return calculate(ev,t,psiElem); } );
+}
+
+} // expectation_values_ns
 
 
 /* Another definition of key_labels that mirrors that of temporal_data_points is probably an overkill

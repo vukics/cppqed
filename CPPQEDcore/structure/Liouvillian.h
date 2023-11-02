@@ -1,6 +1,7 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
+#include "ExactPropagator.h"
 #include "Hamiltonian.h"
 
 #include <variant>
@@ -80,9 +81,12 @@ struct Lindblad
 };
 
 
-/// TODO: maybe liouvillian could yet be a concrete (random-access) range type?
-template <typename L, size_t RANK>
-concept liouvillian = std::ranges::forward_range<L> && std::is_same_v<std::ranges::range_value_t<L>,Lindblad<RANK>>;
+/*
+ * liouvillian can be a concept like this:
+ * template <typename L, size_t RANK> concept liouvillian = std::ranges::forward_range<L> && std::is_same_v<std::ranges::range_value_t<L>,Lindblad<RANK>>;
+ * but `std::join_view`s are very limited, so probably we anyway need to join broadcasted subsystem Lindblads into a single monolithic container in composites
+*/
+template <size_t RANK> using Liouvillian = std::vector<Lindblad<RANK>>;
 
 
 template <size_t RANK>
@@ -113,7 +117,7 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 namespace liouvillian_ns {
 
 template <auto retainedAxes, size_t RANK> requires ( std::size(retainedAxes) < RANK )
-Lindblad<RANK> broadcast(const Lindblad<RANK-std::size(retainedAxes)>& l, const std::vector<size_t>& offsets)
+Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::vector<size_t>& offsets)
 {
   // TODO: this is a repetition from lazydensityoperator
   static constexpr auto extendedAxes{hana::concat(retainedAxes,
@@ -121,29 +125,28 @@ Lindblad<RANK> broadcast(const Lindblad<RANK-std::size(retainedAxes)>& l, const 
 
   return {
 
-    .label{l.label},
+    .label{l.label} ,
 
     .jump{ [&] (double t, StateVectorView<RANK> psi) {
       for (auto&& psiElem : ::cppqedutils::sliceRange<retainedAxes>(psi,offsets)) applyJump(l.jump,t,psiElem);
-    } },
+    } } ,
 
     .rate{ [&] (double t, StateVectorConstView<RANK> psi) {
-      return partialTrace(psi,offsets,[&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return l.rate(t,psiElem); } );
-    } }
+      return partialTrace(psi,offsets,[&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return calculateRate(l.rate,t,psiElem); } );
+    } } ,
 
     .superoperator{
-      [ &, matrixOffsets=std::vector<size_t>{} ] (double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt) {
-        // matrixOffsets is populated when the lambda is first called
-        if (!std::size(matrixOffsets)) {
+      [ &, matrixOffsets=std::vector<size_t>(sqr(offsets.size()),0uz) ] (double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt) {
+        // matrixOffsets is populated when the lambda is first called TODO: is there a better way to signal that this is the case?
+        if (matrixOffsets[0]==matrixOffsets[1]) {
           size_t extent=std::lround(std::sqrt(rho.dataView.size()));
-          matrixOffsets.resize(sqr(offsets.size()));
           for (auto i=matrixOffsets.begin(), u=offsets.begin(); u!=offsets.end(); ++u )
             for (auto v=offsets.begin(); v!=offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
         }
         auto rhoRange{::cppqedutils::sliceRange<extendedAxes>(rho,matrixOffsets)};
         auto drhodtRange{::cppqedutils::sliceRange<extendedAxes>(drhodt,matrixOffsets)};
         for ( auto [rho,drhodt]=std::make_tuple(rhoRange.begin(),drhodtRange.begin()); rho!=rhoRange.end();
-          applySuperoperator(l.superoperator,t,*rho++,*drhodt++,t0) ) ;
+          applySuperoperator(l.superoperator,t,*rho++,*drhodt++) ) ;
       }
     }
 
@@ -159,7 +162,7 @@ Lindblad<RANK> broadcast(const Lindblad<RANK-std::size(retainedAxes)>& l, const 
  */
 
 template <typename L, size_t RANK>
-concept time_dependent_jump = hamiltonian_ns::one_time_dependent_propagator<L,RANK>;
+concept time_dependent_jump = exact_propagator_ns::one_time_dependent_functional<L,RANK>;
 
 template <typename L, size_t RANK>
 concept time_independent_jump = requires(L&& l, StateVectorView<RANK> psi) { l(psi); };
@@ -180,10 +183,10 @@ template <typename L, size_t RANK> concept rate = time_dependent_rate<L,RANK> ||
 
 
 template <typename L, size_t RANK>
-concept time_dependent_superoperator = ode_derivative_time_dependent_contribution<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
+concept time_dependent_superoperator = ode_time_dependent_derivative<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
 
 template <typename L, size_t RANK>
-concept time_independent_superoperator = ode_derivative_time_independent_contribution<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
+concept time_independent_superoperator = ode_time_independent_derivative<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
 
 template <typename L, size_t RANK>
 concept superoperator = time_dependent_superoperator<L,RANK> || time_independent_superoperator<L,RANK>;
