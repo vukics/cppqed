@@ -110,21 +110,19 @@ struct BinarySystem
       ha{std::forward<decltype(ha)>(ha)},
       ex{std::forward<decltype(ex)>(ex)},
       ev{std::forward<decltype(ev)>(ev)},
-      freqsFull_{std::ranges::views::join({getFreqs(qsd0),getFreqs(qsd1),freqs})},
+      freqsFull_{std::views::join({getFreqs(qsd0),getFreqs(qsd1),freqs})},
       liFull_{ [&] {
-        std::vector< Lindblad<2> > res;
+        Liouvillian<2> res(size(getLi(qsd0))+size(getLi(qsd1))+size(li));
+        auto resIter=res.begin();
+        for (const Lindblad<1> & l : getLi(qsd0) ) *resIter++ = liouvillian_ns::broadcast<rA0,2>(l,offsets0_);
+        for (const Lindblad<1> & l : getLi(qsd1) ) *resIter++ = liouvillian_ns::broadcast<rA1,2>(l,offsets1_);
+        for (const Lindblad<2> & l : li ) *resIter++ = li;
+        return res;
       } () },
-      offsets0_{calculateSlicesOffsets<rA0>({dim0,dim1})},
-      offsets1_{calculateSlicesOffsets<rA1>({dim0,dim1})}
+      offsets0_{calculateSlicesOffsets<rA0>(Extents{dim0,dim1})},
+      offsets1_{calculateSlicesOffsets<rA1>(Extents{dim0,dim1})}
   {}
 
-  friend const auto& getFreqs(const BinarySystem& bs) {return
-    std::vector<SystemFrequencyDescriptor> res;
-    for (const auto& i : getFreqs(bs.qsd0)) res.push_back(i);
-    for (const auto& i : getFreqs(bs.qsd1)) res.push_back(i);
-    for (const auto& i : bs.freqs) res.push_back(i);
-    return res;
-  }
 
 
   friend auto getHa(const BinarySystem& bs) {
