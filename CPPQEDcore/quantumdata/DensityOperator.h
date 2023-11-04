@@ -50,7 +50,7 @@ struct DensityOperator : MultiArray<dcomp,2*RANK>, private VectorSpaceOperatorsG
 
   explicit DensityOperator(Dimensions dimensions)
     : DensityOperator{dimensions, [=] (size_t e) {
-        auto res{zeroInit<2*RANK>(e)};
+        auto res{zeroInit(e)};
         res[0]=1.;
         return res;
     }} {}

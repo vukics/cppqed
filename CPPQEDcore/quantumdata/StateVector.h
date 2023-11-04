@@ -14,11 +14,9 @@ using namespace ::cppqedutils;
 template<typename>
 constexpr auto multiArrayRank_v=std::nullopt;
 
-template <size_t RANK>
-const auto noInit = multiarray::noInit<dcomp,RANK>;
+static const auto noInit = multiarray::noInit<dcomp>;
 
-template <size_t RANK>
-const auto zeroInit = multiarray::zeroInit<dcomp,RANK>;
+static const auto zeroInit = multiarray::zeroInit<dcomp>;
 
 
 template <typename Derived>
@@ -86,7 +84,7 @@ struct StateVector : MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerat
   StateVector(Dimensions dimensions, auto&& initializer) : ABase{dimensions,std::forward<decltype(initializer)>(initializer)} {}
 
   explicit StateVector(Dimensions dimensions)
-    : StateVector{dimensions, [] (size_t e) {auto res{zeroInit<RANK>(e)}; res[0]=1.; return res;}} {}
+    : StateVector{dimensions, [] (size_t e) {auto res{zeroInit(e)}; res[0]=1.; return res;}} {}
 
   // StateVector(auto&& ... a) : ArrayBase<StateVector<RANK>>(std::forward<decltype(a)>(a)...) {}
 

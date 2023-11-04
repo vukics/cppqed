@@ -192,10 +192,10 @@ auto calculateExtent(Extents<RANK> extents)
   return std::ranges::fold_left(extents,1uz,std::multiplies{});
 }
 
-template <typename T, size_t RANK>
+template <typename T>
 const auto noInit = [] (size_t e) -> std::vector<T> {return std::vector<T>(e);};
 
-template <typename T, size_t RANK>
+template <typename T>
 const auto zeroInit = [] (size_t e) -> std::vector<T> {return std::vector<T>(e,T(0.));};
 
 } // multiarray
@@ -225,7 +225,7 @@ public:
     this->dataView=std::span<T>(data_);
   }
 
-  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,multiarray::noInit<T,RANK>} {}
+  explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,multiarray::noInit<T>} {}
 
   friend MultiArray copy(const MultiArray& ma) {return MultiArray{ma.extents, [&] (size_t) {return ma.dataStorage();}};}
 

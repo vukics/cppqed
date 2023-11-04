@@ -240,7 +240,7 @@ auto makeEnsemble(QSD&& qsd, const StateVector<RANK>& psi, Pars<RandomEngine>& p
     .trajs{},
     .tdpCalculator{std::forward<QSD>(qsd)/*,ems*/},
     // qjmc::EnsembleLogger{p.nBins,p.nJumpsPerBin},
-    .ensembleAverageResult{DensityOperator<RANK>{getDimensions(psi),noInit<2*RANK>}}
+    .ensembleAverageResult{DensityOperator<RANK>{getDimensions(psi),noInit}}
   };
   
   for (size_t i=0; i<p.nTraj; ++i) {
