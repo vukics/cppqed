@@ -198,6 +198,11 @@ const auto noInit = [] (size_t e) -> std::vector<T> {return std::vector<T>(e);};
 template <typename T>
 const auto zeroInit = [] (size_t e) -> std::vector<T> {return std::vector<T>(e,T(0.));};
 
+
+template <typename T>
+using StorageType = std::vector<T>;
+
+
 } // multiarray
 
 
@@ -212,7 +217,7 @@ public:
   /** TODO: check whether `std::vector` incurs too much overhead – with std::valarray, the slicing functionality could be exploited
    * (MultiArrayView could store a std::slice_array in this case? Ooops, std::slice_array cannot be further sliced???!!! :-O )
    */
-  using StorageType = std::vector<T>;
+  using StorageType = multiarray::StorageType<T>;
   
   MultiArray(const MultiArray&) = delete; MultiArray& operator=(const MultiArray&) = delete;
   
@@ -416,14 +421,27 @@ auto sliceRangeSimple(MultiArrayView<T,RANK> mav)
 }
 
 
+namespace multiarray {
+
+template <typename O>
+concept slice_iteration_offsets = std::is_same_v<O,std::span<const size_t>> || std::is_same_v<O,std::vector<size_t>> ;
+
+} // multiarray
+
+
 /// TODO: think over semantics here, can MultiArrayView be the reference type?
-template <typename Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
-requires (std::is_same_v<Offsets,std::span<const size_t>> || std::is_same_v<Offsets,std::vector<size_t>>)
+template <multiarray::slice_iteration_offsets Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
 class SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offsets,T,RRANK>,MultiArrayView<T,RRANK>>
 /// \todo Unfortunately, std::iterator has been deprecated as of C++17, and there doesn’t seem to be a replacement in STL
 {
 public:
-  using member_iterator = std::conditional_t<std::is_same_v<Offsets,std::span<const size_t>>,std::span<const size_t>::iterator,std::vector<size_t>::const_iterator>;
+  using member_iterator = std::conditional_t<
+    std::is_same_v<Offsets,std::span<const size_t>>,
+    std::span<const size_t>::iterator,
+    std::vector<size_t>::const_iterator>;
+  
+  SliceIterator(const SliceIterator&) = default; SliceIterator(SliceIterator&&) = default; SliceIterator() = default;
+  SliceIterator& operator=(const SliceIterator&) = default; SliceIterator& operator=(SliceIterator&&) = default;
   
   SliceIterator(Extents<RRANK> e, Extents<RRANK> s, size_t originalOffset, member_iterator i, std::span<T> dv) :
     iter{i}, originalOffset_{originalOffset}, mav_{e,s,*i,dv} {}
@@ -434,10 +452,12 @@ public:
   
   member_iterator iter;
 
-  friend bool operator==(SliceIterator i0, member_iterator i1) {return i0.iter==i1;}
+  friend bool operator==(const SliceIterator& i0, const member_iterator& i1) {return i0.iter==i1;}
+
+  friend bool operator==(const SliceIterator& i0, const SliceIterator& i1) {return i0.iter==i1.iter;}
   
 private:
-  const size_t originalOffset_;
+  size_t originalOffset_;
   
   mutable MultiArrayView<T,RRANK> mav_; // the reason why we store a full MultiArrayView is simply that operator* can return a reference
   
@@ -451,6 +471,10 @@ class SliceRangeBase
 public:
   using iterator=SliceIterator<Offsets,T,RRANK>;
   
+  SliceRangeBase(const SliceRangeBase&) = delete; SliceRangeBase& operator=(const SliceRangeBase&) = delete; 
+  SliceRangeBase(SliceRangeBase&&) = default; SliceRangeBase& operator=(SliceRangeBase&&) = default; // SliceRangeBase() = default;
+  
+  
 /*  SliceRangeBase(Extents<RRANK> e, Extents<RRANK> s, Offsets os, std::span<T> dv) requires std::is_same_v<Offsets,std::span<const size_t>>
     : begin{e,s,os.begin(),dv}, end{os.end()}, offsets_{os} {}*/
 
@@ -461,7 +485,7 @@ public:
   auto end() const {return e_;}
     
 private:
-  const Offsets offsets_;
+  Offsets offsets_;
 
   iterator b_;
   

@@ -133,9 +133,8 @@ template <
   functional<std::size(retainedAxes)> T >
 void broadcast(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0, const std::vector<size_t>& offsets)
 {
-  auto psiRange{sliceRange<retainedAxes>(psi,offsets)};
-  auto dpsidtRange{sliceRange<retainedAxes>(dpsidt,offsets)};
-  for ( auto&& [psi,dpsidt]=std::make_tuple(psiRange.begin(),dpsidtRange.begin()); psi!=psiRange.end(); applyHamiltonian(h,t,*psi++,*dpsidt++,t0) ) ;
+  for ( auto&& [psi,dpsidt] : std::views::zip( sliceRange<retainedAxes>(psi,offsets), sliceRange<retainedAxes>(dpsidt,offsets) ) )
+    applyHamiltonian(h,t,psi,dpsidt,t0);
 }
 
 
