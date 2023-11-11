@@ -120,9 +120,10 @@ template <auto retainedAxes, size_t RANK> requires ( std::size(retainedAxes) < R
 Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::vector<size_t>& offsets)
 {
   // TODO: this is a repetition from lazydensityoperator
-  static constexpr auto extendedAxes{hana::concat(retainedAxes,
-                                                  hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
+  static constexpr auto extendedAxes{concatenate(retainedAxes,[rA=retainedAxes] mutable {for (size_t& i : rA) i+=RANK; return rA;} () )};
 
+  static constexpr size_t RRANK = std::size(retainedAxes);
+  
   return {
 
     .label{l.label} ,
@@ -132,21 +133,22 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
     } } ,
 
     .rate{ [&] (double t, StateVectorConstView<RANK> psi) {
-      return partialTrace(psi,offsets,[&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return calculateRate(l.rate,t,psiElem); } );
+      return partialTrace<retainedAxes,RANK>(psi,offsets,[&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return calculateRate(l.rate,t,psiElem); } );
     } } ,
 
     .superoperator{
-      [ &, matrixOffsets=std::vector<size_t>(sqr(offsets.size()),0uz) ] (double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt) {
-        // matrixOffsets is populated when the lambda is first called TODO: is there a better way to signal that this is the case?
-        if (matrixOffsets[0]==matrixOffsets[1]) {
+      [ &, matrixOffsets=std::vector<size_t>{} ] (double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt) mutable {
+        // matrixOffsets is populated when the lambda is first called
+        if (!matrixOffsets.size()) {
+          matrixOffsets.resize(sqr(offsets.size()));
           size_t extent=std::lround(std::sqrt(rho.dataView.size()));
-          for (auto i=matrixOffsets.begin(), u=offsets.begin(); u!=offsets.end(); ++u )
+          auto i=matrixOffsets.begin(); 
+          for (auto u=offsets.begin(); u!=offsets.end(); ++u )
             for (auto v=offsets.begin(); v!=offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
         }
-        auto rhoRange{sliceRange<extendedAxes>(rho,matrixOffsets)};
-        auto drhodtRange{sliceRange<extendedAxes>(drhodt,matrixOffsets)};
-        for ( auto [rho,drhodt]=std::make_tuple(rhoRange.begin(),drhodtRange.begin()); rho!=rhoRange.end();
-          applySuperoperator(l.superoperator,t,*rho++,*drhodt++) ) ;
+
+        for ( auto&& [rho,drhodt] : std::views::zip( sliceRange<extendedAxes>(rho,matrixOffsets), sliceRange<extendedAxes>(drhodt,matrixOffsets) ) )
+          applySuperoperator<RRANK>(l.superoperator,t,rho,drhodt) ;
       }
     }
 
