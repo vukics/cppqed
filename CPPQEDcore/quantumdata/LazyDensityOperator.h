@@ -67,18 +67,14 @@ double _(MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
 }
 
 
-template <size_t RANK>
-constexpr auto lazyDensityOperatorOptions = hana::tuple_t<StateVectorConstView<RANK>,DensityOperatorConstView<RANK>>;
 
-
-// Either of the lazyDensityOperatorOptions
 template <typename T, size_t RANK>
-concept lazy_density_operator = hana::fold(lazyDensityOperatorOptions<RANK>, false, [] <typename E> (bool s, E) {return s || std::same_as<T,typename E::type>; } );
+concept lazy_density_operator = requires (T&& t, Extents<RANK> i, Extents<RANK> j)
+{
+  {_(t,i,j)} -> std::convertible_to<dcomp>;
+  {_(t,i)} -> std::convertible_to<double>;
+};
 
-
-// Models
-static_assert( lazy_density_operator<StateVectorConstView<2>,2> ) ;
-static_assert( lazy_density_operator<DensityOperatorConstView<3>,3> ) ;
 
 
 /// The primary tool for performing slice iteration of LazyDensityOperator#s
@@ -116,7 +112,7 @@ auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<siz
 template<auto retainedAxes, size_t RANK>
 auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets, auto&& function)
 {
-  return partialTrace<retainedAxes>(matrix,offsets,std::forward<decltype(function)>(function),std::plus{});
+  return partialTrace<retainedAxes,RANK>(matrix,offsets,std::forward<decltype(function)>(function),std::plus{});
 }
 
 

@@ -9,7 +9,7 @@ namespace quantumtrajectory {
 
 template <size_t RANK,
           ::structure::quantum_system_dynamics<RANK> QSD,
-          ::cppqedutils::ode::engine<typename ::quantumdata::StateVector<RANK>::StorageType> OE>
+          ::cppqedutils::ode::engine<StorageType> OE>
 struct Schrödinger
 {
   Schrödinger(auto&& qsd, auto&& psi, auto&& oe)

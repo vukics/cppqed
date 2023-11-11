@@ -28,18 +28,16 @@ typedef ode::Pars<> Pars;
  */
 template <size_t RANK,
           quantum_system_dynamics<RANK> QSD,
-          ode::engine<typename DensityOperator<RANK>::StorageType> OE>
+          ode::engine<StorageType> OE>
 struct Master
 {
-  typedef DensityOperator<RANK> DensityOperator;
-
   Master(auto&& qsd, auto&& rho, auto&& oe)
     : qsd{std::forward<decltype(qsd)>(qsd)}, rho{std::forward<decltype(rho)>(rho)}, oe{std::forward<decltype(oe)>(oe)},
       rowIterationOffsets_{calculateSlicesOffsets<rowIterationRetainedAxes>(rho.extents)} {}
 
   double time=0., time0=0.;
   QSD qsd;
-  DensityOperator rho;
+  DensityOperator<RANK> rho;
   OE oe;
 
   friend double getDtDid(const Master& m) {return getDtDid(m.oe);}
@@ -59,8 +57,7 @@ struct Master
   {
     // TODO: think over what happens here when there is no Hamiltonian to apply – it’s probably OK, since at least one superoperator is always there
     // Moreover, I’m not sure anymore that these algorithms should be prepared for such special cases.
-    auto res = step ( m.oe, deltaT, [&] (const typename DensityOperator::StorageType& rhoRaw,
-                                         typename DensityOperator::StorageType& drhodtRaw, double t)
+    auto res = step ( m.oe, deltaT, [&] (const StorageType& rhoRaw, StorageType& drhodtRaw, double t)
     {
       DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
       DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw.begin(),std::ranges::fill(drhodtRaw,0)};

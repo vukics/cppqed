@@ -48,13 +48,11 @@ struct Pars : public trajectory::ParsStochastic<RandomEngine> {
 template<
   size_t RANK,
   quantum_system_dynamics<RANK> QSD,
-  ode::engine<typename StateVector<RANK>::StorageType> OE,
+  ode::engine<StorageType> OE,
   std::uniform_random_bit_generator RandomEngine >
 struct QuantumJumpMonteCarlo
 {
-  using StateVector = StateVector<RANK>;
-
-  using EnsembleAverageElement = const StateVector&;
+  using EnsembleAverageElement = const StateVector<RANK>&;
   using EnsembleAverageResult = DensityOperator<RANK>;
 
   using Rates = std::vector<double>;
@@ -71,7 +69,7 @@ struct QuantumJumpMonteCarlo
 
   double time=0., time0=0.;
   QSD qsd;
-  StateVector psi;
+  StateVector<RANK> psi;
   OE oe;
   randomutils::EngineWithParameters<RandomEngine> re;
 
@@ -93,7 +91,7 @@ struct QuantumJumpMonteCarlo
     LogTree res;
 
     // Coherent time development
-    step(q.oe, std::min(q.oe.dtTry,deltaT), [&] (const typename StateVector::StorageType& psiRaw, typename StateVector::StorageType& dpsidtRaw, double t)
+    step(q.oe, std::min(q.oe.dtTry,deltaT), [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
     {
       applyHamiltonian(getHa(q.qsd),t,
                        StateVectorConstView<RANK>{q.psi.extents,q.psi.strides,0,psiRaw},
@@ -173,7 +171,7 @@ struct QuantumJumpMonteCarlo
 
   double sampleRandom() {return distro_(re.engine);}
 
-  friend const StateVector& averaged(const QuantumJumpMonteCarlo& q) {return q.psi;}
+  friend const StateVector<RANK>& averaged(const QuantumJumpMonteCarlo& q) {return q.psi;}
 
 private:
   const double dpLimit_;
@@ -213,7 +211,7 @@ template <template<typename> class OE, typename QSD, typename SV, typename Rando
 auto make(QSD&& qsd, SV&& state, const Pars<RandomEngine>& p)
 {
   constexpr size_t RANK=multiArrayRank_v<std::decay_t<SV>>;
-  using ODE=OE<typename StateVector<RANK>::StorageType>;
+  using ODE=OE<StorageType>;
 
   double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
   
@@ -231,10 +229,9 @@ template<template<typename> class OE, /* auto retainedAxes,*/ size_t RANK,
          quantum_system_dynamics<RANK> QSD, typename RandomEngine>
 auto makeEnsemble(QSD&& qsd, const StateVector<RANK>& psi, Pars<RandomEngine>& p /*, EntanglementMeasuresSwitch ems*/)
 {
-  using StateVector=StateVector<RANK>;
   using QSD_const_ref = std::add_lvalue_reference_t<std::add_const_t<QSD>>;
   // quantum_system_dynamics is stored by value in TDP_DensityOperator, and the individual trajectories borrow it from there
-  using Single=QuantumJumpMonteCarlo<RANK,QSD_const_ref,OE<typename StateVector::StorageType>,RandomEngine>;
+  using Single=QuantumJumpMonteCarlo<RANK,QSD_const_ref,OE<StorageType>,RandomEngine>;
 
   trajectory::Ensemble<Single,TDP_DensityOperator<RANK,QSD>> res{
     .trajs{},
@@ -244,7 +241,7 @@ auto makeEnsemble(QSD&& qsd, const StateVector<RANK>& psi, Pars<RandomEngine>& p
   };
   
   for (size_t i=0; i<p.nTraj; ++i) {
-    res.trajs.push_back(make<OE,QSD_const_ref>(res.tdpCalculator.qsd,StateVector{copy(psi)},p));
+    res.trajs.push_back(make<OE,QSD_const_ref>(res.tdpCalculator.qsd,StateVector<RANK>{copy(psi)},p));
     randomutils::incrementForNextStream(p);
   }
 

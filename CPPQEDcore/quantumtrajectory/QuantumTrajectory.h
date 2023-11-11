@@ -59,15 +59,13 @@ template<size_t RANK,
 class TDP_DensityOperator
 {
 public:
-  using DensityOperator = DensityOperator<RANK>;
-
   TDP_DensityOperator(QSD qsd /*, EntanglementMeasuresSwitch ems*/) : qsd{std::forward<QSD>(qsd)} {}
 
   QSD qsd;
 //  const EntanglementMeasuresSwitch ems_;
 
 
-  auto operator()(double t, const DensityOperator& rho) const
+  auto operator()(double t, const DensityOperator<RANK>& rho) const
   {
     return calculateAndPostprocess<RANK>(getEV(qsd),t,static_cast<DensityOperatorConstView<RANK>>(rho));
 /*    auto & averages{std::get<1>(res)};

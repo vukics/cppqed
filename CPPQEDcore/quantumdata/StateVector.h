@@ -11,6 +11,9 @@ namespace quantumdata {
 using namespace ::cppqedutils;
 
 
+using StorageType = multiarray::StorageType<dcomp>;
+
+
 template<typename>
 constexpr auto multiArrayRank_v=std::nullopt;
 
