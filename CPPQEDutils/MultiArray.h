@@ -248,8 +248,12 @@ public:
     for (Extents<RANK> idx{}; idx[0]!=this->extents[0]; incrementMultiIndex(idx,this->extents)) (*this)(idx)=macv(idx);
   }
 
+  /// in contexts where implicit conversions are ignored, it is sometimes convenient to have this as a member :)
+  MultiArrayConstView<T,RANK> constView() const {return *this;}
+  
   /// conversion to a view
   auto mutableView() {return MultiArrayView<T, RANK>{this->extents,this->strides,0,data_};}
+  
   operator MultiArrayView<T,RANK>() {return mutableView();}
 
   /// non-const subscripting

@@ -12,17 +12,29 @@ using namespace quantumdata;
 
 namespace expectation_values_ns {
 
+static const struct NoOp
+{
+  LogTree label{"noOp"};
+  
+  std::nullopt_t operator() (auto) const {return std::nullopt;}
+  
+} noOp;
+
 
 template <typename L, size_t RANK>
-concept time_dependent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
-  return s && ( requires (const L& l, double t, typename E::type rho) { { l(t,rho) } -> temporal_data_point ; } ) ;
-} );
+concept time_dependent_functional = requires (L&& l, DensityOperatorConstView<RANK> rho, double t)
+{
+  { l(t,rho) } -> temporal_data_point ;
+};
 
 
 template <typename L, size_t RANK>
-concept time_independent_functional = hana::fold(lazyDensityOperatorOptions<RANK>, true, [] <typename E> (bool s, E) {
-  return s && ( requires (const L& l, typename E::type rho) { { l(rho) } -> temporal_data_point ; } ) ;
-} );
+concept time_independent_functional = requires (L&& l, DensityOperatorConstView<RANK> rho)
+{ 
+  { l(rho) } -> temporal_data_point ;
+};
+
+
 // Alternatively:
 /* requires (const L& l) { requires (
 requires (StateVectorConstView<RANK> rho) { { l(rho) } -> temporal_data_point ; } &&

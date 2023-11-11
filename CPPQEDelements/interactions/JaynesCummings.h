@@ -17,10 +17,14 @@ auto hamiltonian(size_t cutoff, dcomp g)
     aDagOp = conj(g)*::mode::aDagOp(cutoff)
   ] (StateVectorConstView<2> psi, StateVectorView<2> dpsidt) {
     using ::cppqedutils::multiarray::_;
-    aOp(psi(i,_),dpsidt(j,_));
-    aDagOp(psi(j,_),dpsidt(i,_));
+    aOp(0,psi(i,_),dpsidt(j,_));
+    aDagOp(0,psi(j,_),dpsidt(i,_));
   };
 }
+
+// TODO: I cannot get this to be picked up
+// template <size_t i, size_t j>
+// LogTree label(decltype(hamiltonian<0,1>(0,0.))) { return {"fullH"}; }
 
 } // jaynescummings
 

@@ -50,6 +50,8 @@ template <> constexpr bool tdp<double> = true;
 
 template <> constexpr bool tdp<dcomp> = true;
 
+template <> constexpr bool tdp<std::nullopt_t> = true;
+
 template <hana_sequence S> constexpr bool tdp<S> = !!hana::all_of(
   decltype(hana::transform(std::declval<S>(), hana::typeid_)){},
   []<class T>(T) { return tdp<typename T::type>; });

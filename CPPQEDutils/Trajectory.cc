@@ -70,8 +70,8 @@ shared_ptr<ostream> cppqedutils::trajectory::openStateFileWriting(const string &
 }
 
 
-std::ostream& cppqedutils::trajectory::stream(double tdp, std::ostream& os) {return os<<tdp;}
-std::ostream& cppqedutils::trajectory::stream(dcomp  tdp, std::ostream& os) {return os<<tdp;}
+ostream& cppqedutils::trajectory::stream(double tdp, ostream& os) {return os<<tdp;}
 
+ostream& cppqedutils::trajectory::stream(dcomp tdp, ostream& os) {return os<<tdp;}
 
-
+ostream& cppqedutils::trajectory::stream(nullopt_t, ostream& os) {return os;}

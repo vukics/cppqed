@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 
   auto qbit{make(pq)};
 
-  cppqedutils::ODE_EngineBoost<quantumdata::DensityOperator<1>::StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
+  cppqedutils::ODE_EngineBoost<StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
 
   // quantumtrajectory::Master traj{qbit,quantumdata::DensityOperator<1>{{2}},oe};
 
