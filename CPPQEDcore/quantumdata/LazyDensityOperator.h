@@ -4,6 +4,7 @@
 
 #include "DensityOperator.h"
 
+#include "SliceIterator.h"
 
 namespace quantumdata {
 
