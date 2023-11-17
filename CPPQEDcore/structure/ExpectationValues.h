@@ -22,14 +22,14 @@ static const struct NoOp
 
 
 template <typename L, size_t RANK>
-concept time_dependent_functional = requires (L&& l, DensityOperatorConstView<RANK> rho, double t)
+concept time_dependent_functional = requires (L&& l, LDO<DensityOperator,RANK> rho, double t)
 {
   { l(t,rho) } -> temporal_data_point ;
 };
 
 
 template <typename L, size_t RANK>
-concept time_independent_functional = requires (L&& l, DensityOperatorConstView<RANK> rho)
+concept time_independent_functional = requires (L&& l, LDO<DensityOperator,RANK> rho)
 { 
   { l(rho) } -> temporal_data_point ;
 };
@@ -54,13 +54,13 @@ auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 
 /// pre- & postcondition: the LogTree must have the same structure as the temporal_data_point returned by expectation_value
 template <typename L, size_t RANK>
-concept labelled_and_without_nonlinear_postprocessing = labelled<L> && functional<L,RANK> ;
+concept labelled_and_without_nonlinear_postprocessing = /* labelled<L> && */ functional<L,RANK> ;
 
 /// Postprocessing means any operation on the expectation values that is not linear in the density operator (as the calculation of variance, for istance)
 template <typename L, size_t RANK>
 concept labelled_and_with_nonlinear_postprocessing = labelled_and_without_nonlinear_postprocessing<L,RANK> && (
-  ( time_dependent_functional<L,RANK> && requires (const L& l, std::invoke_result_t<L,double,StateVectorConstView<1>> & tdp) { postProcessor(l)(tdp); } ) ||
-  ( time_independent_functional<L,RANK> && requires (const L& l, std::invoke_result_t<L,StateVectorConstView<1>> & tdp) { postProcessor(l)(tdp); } )
+  ( time_dependent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, double, LDO<DensityOperator, RANK> > & tdp) { postProcessor(l)(tdp); } ) ||
+  ( time_independent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, LDO<DensityOperator, RANK> > & tdp) { postProcessor(l)(tdp); } )
 ) ;
 
 

@@ -149,7 +149,7 @@ struct BinarySystem
     };
   }
   
-  friend LogTree label(const decltype( getEV( std::declval<BinarySystem>() ) ) & ) {return "BinarySystem";}
+  // friend LogTree label(const decltype( getEV( std::declval<BinarySystem>() ) ) & ) {return "BinarySystem";}
   
   
   

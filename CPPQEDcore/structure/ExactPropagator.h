@@ -35,7 +35,7 @@ void applyPropagator(const T& h, double t, StateVectorView<RANK> psi, double t0)
 
 
 template <typename H, size_t RANK>
-concept exact_propagator = labelled<H> && exact_propagator_ns::functional<H,RANK>;
+concept exact_propagator = /* labelled<H> && */ exact_propagator_ns::functional<H,RANK>;
 
 
 /// A unary propagator that assumes that the operator that transforms between the pictures is diagonal
