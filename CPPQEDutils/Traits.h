@@ -27,7 +27,7 @@ struct Empty { template <typename... T> Empty(T&&... ) {} };
 
 
 template <typename T>
-constexpr bool passByValue_v=false;
+constexpr auto passByValue_v=std::nullopt;
 
 
 /// metafunctions are needed since template aliases cannot be partially specialized
@@ -75,7 +75,12 @@ struct plusTDP
   std::nullopt_t operator()(std::nullopt_t, std::nullopt_t) const {return std::nullopt;}
 
   template <temporal_data_point T>
-  T operator()(const T& a, const T& b) const;
+  T operator()(const T& a, const T& b) const {
+    using namespace hana::literals;
+    T res;
+    hana::for_each(hana::range_c<int,0,hana::size(res)>, [&,this] (auto i) {res[i]=(*this)(a[i],b[i]);});
+    return res;
+  }
 
 };
 

@@ -9,7 +9,7 @@ using namespace std; using namespace quantumtrajectory;
 
 
 int main(int argc, char* argv[])
-{  
+{
   auto op{optionParser()};
   
   cppqedutils::trajectory::Pars<quantumtrajectory::qjmc::Pars<pcg64>> pt(op);
@@ -19,8 +19,6 @@ int main(int argc, char* argv[])
   
   parse(op,argc, argv);
 
-  // static_assert( expectation_values<expectation_values_ns::NoOp,2> );
-  
   BinarySystem bs{
     make(pq),2,make(pm),pm.cutoff,
     SystemFrequencyStore{},Liouvillian<2>{},
@@ -28,16 +26,13 @@ int main(int argc, char* argv[])
     exact_propagator_ns::noOp,
     expectation_values_ns::noOp};
 
-//  static_assert ( quantum_system_dynamics< decltype(bs), 2 > );
-    
-//  static_assert( expectation_values<expectation_values_ns::NoOp,2> );
-    
-//   quantumdata::StateVector<2> psi{{2,pm.cutoff}}; psi(0)=1;// psi(1)=1; 
-//  
-//   run(
-//     qjmc::make<cppqedutils::ODE_EngineBoost>(bs,/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
-//     // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
-//     pt,trajectory::observerNoOp);
+
+  quantumdata::StateVector<2> psi{{2,pm.cutoff}}; psi(0,0)=1;// psi(1)=1; 
+ 
+  run(
+    qjmc::make<cppqedutils::ODE_EngineBoost>(bs,/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    pt,trajectory::observerNoOp);
   
   
   // evolution::Pars<> pe(p); // Driver Parameters
@@ -91,7 +86,17 @@ void f()
   auto probe2 = std::views::zip(sr,sr2);
   
   auto probe3 = std::views::zip(sliceRange<retainedAxes<1,3,0>>(array),sliceRange<retainedAxes<1,3,0>>(array2));
+
+  std::vector<size_t> offsets{0,10,12,20,22,30,32,40};
   
+  MultiArray<dcomp,5> array{{2,4,2,3,5}}, array2{{2,4,2,3,5}};
+  
+  auto sr=sliceRange<retainedAxes<2,1,3,0,4>>(array)//, sr2=sliceRange<retainedAxes<1,3,0>>(array2)
+  ;
+
+  // Print the extent
+  std::cout << "The extent of the range is: " << std::ranges::distance(std::ranges::begin(sr),std::ranges::end(sr)) << std::endl;
+
 }
 */
 

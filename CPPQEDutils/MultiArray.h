@@ -42,7 +42,7 @@ auto& incrementMultiIndex(Extents<RANK>& idx, Extents<RANK> extents)
   return idx;
 }
 
-inline auto& incrementMultiIndex(Extents<0>& idx, Extents<0> extents) {return idx;}
+inline auto& incrementMultiIndex(Extents<0>& idx, Extents<0>) {return idx;}
 
 
 namespace multiarray {
