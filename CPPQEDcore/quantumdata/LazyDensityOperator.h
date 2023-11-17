@@ -8,6 +8,14 @@
 namespace quantumdata {
 
 
+template <template<size_t> typename TAG, size_t RANK>
+struct LDO : MultiArrayConstView<dcomp,multiArrayRank_v<TAG<RANK>>>
+{
+  template <typename ... A>
+  LDO(A&& ... a) : MultiArrayConstView<dcomp,multiArrayRank_v<TAG<RANK>>>{std::forward<A>(a)...} {}
+};
+
+
 /// Common interface for calculating quantum averages from StateVector, DensityOperator (and potentially their non-orthogonal counterparts)
 /**
  * Relies on the formula
@@ -31,45 +39,30 @@ namespace quantumdata {
  * TODO: (re)evaluate the alternative design of making StateVectorConstView & DensityOperatorConstView optional bases of MultiArray
  *   In that case, lazy_density_operator-style indexing could be defined as member functions
  */
-inline dcomp _(MultiArrayConstView<dcomp,1> psi, size_t i, size_t j) {return psi(i)*std::conj(psi(j));}
+inline dcomp _(LDO<StateVector,1> psi, size_t i, size_t j) {return psi(i)*std::conj(psi(j));}
 
-inline double _(MultiArrayConstView<dcomp,1> psi, size_t i) {return sqrAbs(psi(i));}
+inline double _(LDO<StateVector,1> psi, size_t i) {return sqrAbs(psi(i));}
 
-inline dcomp _(MultiArrayConstView<dcomp,2> rho, size_t i, size_t j) {return rho(i,j);}
+inline dcomp _(LDO<DensityOperator,1> rho, size_t i, size_t j) {return rho(i,j);}
 
-inline double _(MultiArrayConstView<dcomp,2> rho, size_t i) {return real(rho(i,i));}
-
-template <size_t RANK>
-dcomp _(MultiArrayConstView<dcomp,RANK> psi, Extents<RANK> i, Extents<RANK> j)
-{
-  return psi(i)*std::conj(psi(j));
-}
+inline double _(LDO<DensityOperator,1> rho, size_t i) {return real(rho(i,i));}
 
 template <size_t RANK>
-double _(MultiArrayConstView<dcomp,RANK> psi, Extents<RANK> i)
-{
-  return sqrAbs(psi(i));
-}
+dcomp _(LDO<StateVector,RANK> psi, Extents<RANK> i, Extents<RANK> j) {return psi(i)*std::conj(psi(j));}
 
-template <size_t TWO_TIMES_RANK>
-dcomp _(MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
-        Extents<TWO_TIMES_RANK/2> i,
-        Extents<TWO_TIMES_RANK/2> j) requires (TWO_TIMES_RANK%2==0)
-{
-  return rho(concatenate(i,j));
-}
+template <size_t RANK>
+double _(LDO<StateVector,RANK> psi, Extents<RANK> i) {return sqrAbs(psi(i));}
 
-template <size_t TWO_TIMES_RANK>
-double _(MultiArrayConstView<dcomp,TWO_TIMES_RANK> rho,
-         Extents<TWO_TIMES_RANK/2> i) requires (TWO_TIMES_RANK%2==0)
-{
-  return real(rho(concatenate(i,i)));
-}
+template <size_t RANK>
+dcomp _(LDO<DensityOperator,RANK> rho, Extents<RANK> i, Extents<RANK> j) {return rho(concatenate(i,j));}
+
+template <size_t RANK>
+double _(LDO<DensityOperator,RANK> rho, Extents<RANK> i) {return real(rho(concatenate(i,i)));}
 
 
 
 template <typename T, size_t RANK>
-concept lazy_density_operator = requires (T&& t, Extents<RANK> i, Extents<RANK> j)
+concept lazy_density_operator = requires (T t, Extents<RANK> i, Extents<RANK> j)
 {
   {_(t,i,j)} -> std::convertible_to<dcomp>;
   {_(t,i)} -> std::convertible_to<double>;
@@ -83,36 +76,34 @@ concept lazy_density_operator = requires (T&& t, Extents<RANK> i, Extents<RANK> 
  *
  * `function` is a callable with signature `T(LazyDensityOperator<hana::size(retainedAxes)>)`, where T is an arithmetic type
  */
-template<auto retainedAxes, size_t RANK>
-auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets, auto&& function, auto&& plus)
+template<auto retainedAxes, size_t RANK, typename F, typename P>
+auto partialTrace(LDO<StateVector,RANK> matrix, const std::vector<size_t>& offsets, F&& function, P&& plus)
 {
-  // static constexpr auto extendedAxes{hana::fold(retainedAxes,retainedAxes, [] (const auto& state, auto element) {return hana::append(state,element+RANK);})};
-  using LDO = decltype(matrix);
- 
-  const auto iterateSlices{ [&] (const auto& sr) {
-    return std::ranges::fold_left_first(sr | std::views::transform(function), plus ).value();
-  }};
+  return std::ranges::fold_left_first(
+    sliceRange<retainedAxes>(matrix,offsets) |
+    std::views::transform([] (auto slice) {return LDO<StateVector,size(retainedAxes)>{slice};} ) |
+    std::views::transform(std::forward<F>(function)), std::forward<P>(plus) ).value();
+}
 
-  if constexpr (std::same_as<LDO,StateVectorConstView<RANK>>) {
-    auto sr{sliceRange<retainedAxes>(matrix,offsets)};
-    return iterateSlices(sr);
-  }
-  else if constexpr (std::same_as<LDO,DensityOperatorConstView<RANK>>) {
-    static constexpr auto extendedAxes{hana::concat(retainedAxes,
-                                                    hana::transform(retainedAxes, [] (const auto& e) {return e+RANK;} ))};
-    auto diagonalOffsets{ offsets | std::views::transform( [&] (size_t v) {return v * ( std::lround(std::sqrt(matrix.dataView.size())) + 1 ) ; } ) };
-    auto sr{sliceRange<extendedAxes>(matrix,diagonalOffsets)};
-    return iterateSlices(sr);
-  }
-  else static_assert(always_false_v<LDO>, "unknown type input in partialTrace");
+
+template<auto retainedAxes, size_t RANK, typename F, typename P>
+auto partialTrace(LDO<DensityOperator,RANK> matrix, const std::vector<size_t>& offsets, F&& function, P&& plus)
+{
+  std::vector<size_t> diagonalOffsets(offsets.size());
+  std::ranges::transform(offsets, diagonalOffsets.begin(), [&] (size_t v) {return v * ( std::lround(std::sqrt(matrix.dataView.size())) + 1 ) ; } ) ;
+
+  return std::ranges::fold_left_first(
+    sliceRange<extendedAxes<retainedAxes,RANK>>(matrix,diagonalOffsets) | 
+    std::views::transform([] (auto slice) {return LDO<DensityOperator,size(retainedAxes)>{slice};} ) |
+    std::views::transform(std::forward<F>(function)), std::forward<P>(plus) ).value();
  
 }
 
 
-template<auto retainedAxes, size_t RANK>
-auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets, auto&& function)
+template<auto retainedAxes, size_t RANK, typename F, typename P>
+auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets, F&& function, P&& plus)
 {
-  return partialTrace<retainedAxes,RANK>(matrix,offsets,std::forward<decltype(function)>(function),std::plus{});
+  return partialTrace<retainedAxes,RANK>(matrix,offsets,std::forward<decltype(function)>(function));
 }
 
 

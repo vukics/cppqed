@@ -20,6 +20,8 @@ namespace cppqedutils {
 template<size_t... i>
 constexpr std::array retainedAxes{i...};
 
+template <auto retainedAxes, size_t RANK>
+constexpr std::array extendedAxes = concatenate(retainedAxes, [rA=retainedAxes] mutable {for (size_t& i : rA) i+=RANK; return rA;} () );
 
 /// should be passed by value, but can be `std::move`d when used in class constructors
 template <size_t RANK>

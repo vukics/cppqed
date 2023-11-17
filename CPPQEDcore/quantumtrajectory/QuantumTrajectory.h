@@ -67,7 +67,7 @@ public:
 
   auto operator()(double t, const DensityOperator<RANK>& rho) const
   {
-    return calculateAndPostprocess<RANK>(getEV(qsd),t,static_cast<DensityOperatorConstView<RANK>>(rho));
+    return calculateAndPostprocess<RANK>(getEV(qsd),t,LDO<DensityOperator,RANK>(rho));
 /*    auto & averages{std::get<1>(res)};
     if constexpr ( !isV_empty ) {
       if (ems_[0]) {

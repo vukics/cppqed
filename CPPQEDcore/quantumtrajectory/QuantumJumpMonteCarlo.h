@@ -141,7 +141,7 @@ struct QuantumJumpMonteCarlo
 
   friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
-    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, StateVectorConstView<RANK>(q.psi) );
+    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
   }
 
   friend iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarlo& q, iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized

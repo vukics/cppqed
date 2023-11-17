@@ -119,9 +119,6 @@ namespace liouvillian_ns {
 template <auto retainedAxes, size_t RANK> requires ( std::size(retainedAxes) < RANK )
 Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::vector<size_t>& offsets)
 {
-  // TODO: this is a repetition from lazydensityoperator
-  static constexpr auto extendedAxes{concatenate(retainedAxes,[rA=retainedAxes] mutable {for (size_t& i : rA) i+=RANK; return rA;} () )};
-
   static constexpr size_t RRANK = std::size(retainedAxes);
   
   return {
@@ -133,7 +130,10 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
     } } ,
 
     .rate{ [&] (double t, StateVectorConstView<RANK> psi) {
-      return partialTrace<retainedAxes,RANK>(psi,offsets,[&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return calculateRate(l.rate,t,psiElem); } );
+      return partialTrace<retainedAxes,RANK>(LDO<StateVector,RANK>{psi},
+                                             offsets,
+                                             [&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return calculateRate(l.rate,t,psiElem); },
+                                             std::plus{} );
     } } ,
 
     .superoperator{
@@ -147,7 +147,8 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
             for (auto v=offsets.begin(); v!=offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
         }
 
-        for ( auto&& [rho,drhodt] : std::views::zip( sliceRange<extendedAxes>(rho,matrixOffsets), sliceRange<extendedAxes>(drhodt,matrixOffsets) ) )
+        for ( auto&& [rho,drhodt] : std::views::zip( sliceRange<extendedAxes<retainedAxes,RANK>>(rho,matrixOffsets), 
+                                                     sliceRange<extendedAxes<retainedAxes,RANK>>(drhodt,matrixOffsets) ) )
           applySuperoperator<RRANK>(l.superoperator,t,rho,drhodt) ;
       }
     }

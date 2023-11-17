@@ -82,7 +82,7 @@ struct StateVector : MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerat
 
   StateVector(StateVector&&) = default; StateVector& operator=(StateVector&&) = default;
 
-  StateVector(MultiArray<dcomp,RANK>&& ma) : ABase{std::move(ma)} {}
+  StateVector(ABase && ma) : ABase{std::move(ma)} {}
 
   StateVector(Dimensions dimensions, auto&& initializer) : ABase{dimensions,std::forward<decltype(initializer)>(initializer)} {}
 

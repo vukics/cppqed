@@ -75,7 +75,7 @@ Lindblad<1> mode::photonLoss(double kappa, double nTh)
   return {
     .label{"photon loss"},
     .jump{aJump(sqrt(fact))},
-    .rate{ [=] (StateVectorConstView<1> psi) {return fact*photonnumber(psi);}},
+    .rate{ [=] (StateVectorConstView<1> psi) {return fact*photonnumber(psi);} },
     .superoperator{aSuperoperator(sqrt(fact))}
   };
 }
@@ -89,7 +89,7 @@ Lindblad<1> mode::photonGain(double kappa, double nTh)
     .jump{aDagJump(sqrt(fact))},
     .rate{ [=] (StateVectorConstView<1> psi) {
       double res=0;
-      for (size_t n=0; n<psi.extents[0]; ++n) res+=(n+1)*_(psi,n);
+      for (size_t n=0; n<psi.extents[0]; ++n) res+=(n+1)*sqrAbs(psi(n));
       return fact*res;
     }},
     .superoperator{aDagSuperoperator(sqrt(fact))}

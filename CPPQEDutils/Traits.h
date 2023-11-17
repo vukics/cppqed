@@ -68,6 +68,19 @@ static_assert(temporal_data_point<decltype(hana::make_tuple(1.,dcomp{2.,-1.}),ha
 static_assert(!temporal_data_point<int>);
 
 
+struct plusTDP
+{
+  double operator()(double a, double b) const {return a+b;}
+  dcomp operator()(dcomp a, dcomp b) const {return a+b;}
+  std::nullopt_t operator()(std::nullopt_t, std::nullopt_t) const {return std::nullopt;}
+
+  template <temporal_data_point T>
+  T operator()(const T& a, const T& b) const;
+
+};
+
+
+
 
 template <typename T> concept intro_logger = requires ( const T& t ) {
   { logIntro(t) } -> std::convertible_to<LogTree>; };

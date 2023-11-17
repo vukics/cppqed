@@ -68,10 +68,3 @@ shared_ptr<ostream> cppqedutils::trajectory::openStateFileWriting(const string &
   return out;
 #endif // DO_NOT_USE_BOOST_COMPRESSION
 }
-
-
-ostream& cppqedutils::trajectory::stream(double tdp, ostream& os) {return os<<tdp;}
-
-ostream& cppqedutils::trajectory::stream(dcomp tdp, ostream& os) {return os<<tdp;}
-
-ostream& cppqedutils::trajectory::stream(nullopt_t, ostream& os) {return os;}

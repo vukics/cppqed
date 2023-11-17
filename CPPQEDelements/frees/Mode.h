@@ -20,10 +20,10 @@ MultiDiagonal aDagOp(size_t cutoff);
 MultiDiagonal nOp(size_t cutoff);
 
 
-double photonnumber(lazy_density_operator<1> auto matrix)
+double photonnumber(StateVectorConstView<1> psi)
 {
   double res=0;
-  for (size_t n=0; n<matrix.extents[0]; ++n) res+=n*_(matrix,n);
+  for (size_t n=0; n<psi.extents[0]; ++n) res+=n*sqrAbs(psi(n));
   return res;
 }
 
@@ -67,7 +67,7 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 
 
 constexpr auto postProcessor(decltype(expectationValues) t) {
-  return [] (std::invoke_result_t<decltype(t),StateVectorConstView<1>> & t) {
+  return [] (std::invoke_result_t< decltype(t), LDO<DensityOperator,1> > & t) {
     using namespace hana::literals; t[1_c] -= sqr(t[0_c]);
   };
 }

@@ -43,7 +43,7 @@ struct DensityOperator : MultiArray<dcomp,2*RANK>, private VectorSpaceOperatorsG
   
   DensityOperator(DensityOperator&&) = default; DensityOperator& operator=(DensityOperator&&) = default;
 
-  DensityOperator(MultiArray<dcomp,2*RANK>&& ma) : ABase(std::move(ma)) {}
+  DensityOperator(ABase && ma) : ABase(std::move(ma)) {}
 
   DensityOperator(Dimensions dimensions, auto&& initializer)
     : ABase{concatenate(dimensions,dimensions),std::forward<decltype(initializer)>(initializer)} {}

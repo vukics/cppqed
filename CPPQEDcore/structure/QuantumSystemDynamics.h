@@ -143,8 +143,8 @@ struct BinarySystem
   friend auto getEV(const BinarySystem& bs) {//return expectation_values_ns::noOp;}
     return [&] (double t, lazy_density_operator<2> auto psi) {
       return hana::make_tuple(
-        partialTrace<BinarySystem::rA0,2>(psi,bs.offsets0_,[&] (auto m) {return expectation_values_ns::calculate<1>(getEV(bs.qsd0),t,m);}),
-        partialTrace<BinarySystem::rA1,2>(psi,bs.offsets1_,[&] (auto m) {return expectation_values_ns::calculate<1>(getEV(bs.qsd1),t,m);}),
+        partialTrace<BinarySystem::rA0,2>(psi,bs.offsets0_,[&] (auto m) {return expectation_values_ns::calculate<1>(getEV(bs.qsd0),t,m);},plusTDP{}),
+        partialTrace<BinarySystem::rA1,2>(psi,bs.offsets1_,[&] (auto m) {return expectation_values_ns::calculate<1>(getEV(bs.qsd1),t,m);},plusTDP{}),
         expectation_values_ns::calculate<2>(bs.ev,t,psi));
     };
   }
