@@ -15,10 +15,10 @@ namespace exact_propagator_ns {
 static const struct NoOp {LogTree label{"noOp"};} noOp;
 
 template <typename H, size_t RANK>
-concept one_time_dependent_functional = requires (H&& h, double t, StateVectorView<RANK> psi) { h(t,psi); };
+concept one_time_dependent_functional = requires (const H& h, double t, StateVectorView<RANK> psi) { h(t,psi); };
 
 template <typename H, size_t RANK>
-concept two_time_dependent_functional = requires (H&& h, double t, StateVectorView<RANK> psi, double t0) { h(t,psi,t0); };
+concept two_time_dependent_functional = requires (const H& h, double t, StateVectorView<RANK> psi, double t0) { h(t,psi,t0); };
 
 template <typename H, size_t RANK>
 concept functional = one_time_dependent_functional<H,RANK> || two_time_dependent_functional<H,RANK> || std::same_as<std::decay_t<H>,NoOp> ;
@@ -29,7 +29,7 @@ concept functional = one_time_dependent_functional<H,RANK> || two_time_dependent
 template <size_t RANK, exact_propagator_ns::functional<RANK> T>
 void applyPropagator(const T& h, double t, StateVectorView<RANK> psi, double t0)
 {
-  if constexpr (exact_propagator_ns::one_time_dependent_functional<T,RANK>) h(t-t0,psi);
+  if      constexpr (exact_propagator_ns::one_time_dependent_functional<T,RANK>) h(t-t0,psi);
   else if constexpr (exact_propagator_ns::two_time_dependent_functional<T,RANK>) h(t,psi,t0);
 }
 

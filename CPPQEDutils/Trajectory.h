@@ -166,7 +166,7 @@ struct StoppingCriterionReachedException {};
 
 
 template <typename T, typename TRAJ>
-concept observer = uniform_step<TRAJ> && requires (T&& t, TRAJ&& traj) { t(temporalDataPoint(traj)); };
+concept observer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj) { t(temporalDataPoint(traj)); };
 
 /// Generic implementation of AutostopHandler
 /** 

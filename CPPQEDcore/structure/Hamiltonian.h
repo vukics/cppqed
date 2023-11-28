@@ -10,13 +10,15 @@ using namespace quantumdata;
 
 /// TODO: this could be fused with ode::system, but let’s not go into that for the moment :)
 template <typename H, typename StateIn, typename StateOut>
-concept ode_time_independent_derivative = requires(H&& h, StateIn psi, StateOut dpsidt) { h(psi,dpsidt); };
+concept ode_time_independent_derivative = requires(const H& h, StateIn psi, StateOut dpsidt) { h(psi,dpsidt); };
 
 template <typename H, typename StateIn, typename StateOut>
-concept ode_time_dependent_derivative = requires(H&& h, double t, StateIn psi, StateOut dpsidt) { h(t,psi,dpsidt); };
+concept ode_time_dependent_derivative = requires(const H& h, double t, StateIn psi, StateOut dpsidt) { h(t,psi,dpsidt); };
 
 
 namespace hamiltonian_ns {
+
+static const struct NoOp {LogTree label{"noOp"};} noOp;
 
 template <typename H, size_t RANK>
 concept time_independent_functional = ode_time_independent_derivative<H,StateVectorConstView<RANK>,StateVectorView<RANK>>;
@@ -25,10 +27,10 @@ template <typename H, size_t RANK>
 concept one_time_dependent_functional = ode_time_dependent_derivative<H,StateVectorConstView<RANK>,StateVectorView<RANK>>;
 
 template <typename H, size_t RANK>
-concept two_time_dependent_functional = requires (H&& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0) { h(t,psi,dpsidt,t0); };
+concept two_time_dependent_functional = requires (const H& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0) { h(t,psi,dpsidt,t0); };
 
 template <typename H, size_t RANK>
-concept functional = time_independent_functional<H,RANK> || one_time_dependent_functional<H,RANK> || two_time_dependent_functional<H,RANK>;
+concept functional = time_independent_functional<H,RANK> || one_time_dependent_functional<H,RANK> || two_time_dependent_functional<H,RANK> || std::same_as<std::decay_t<H>,NoOp>;
 
 
 } // hamiltonian_ns
@@ -41,7 +43,7 @@ void applyHamiltonian(const T& h, double t, StateVectorConstView<RANK> psi, Stat
 {
   if      constexpr (hamiltonian_ns::  time_independent_functional<T,RANK>) h(psi,dpsidt);
   else if constexpr (hamiltonian_ns::one_time_dependent_functional<T,RANK>) h(t-t0,psi,dpsidt);
-  else                                                                      h(t,psi,dpsidt,t0);
+  else if constexpr (hamiltonian_ns::two_time_dependent_functional<T,RANK>) h(t,psi,dpsidt,t0);
 }
 
 
@@ -57,7 +59,7 @@ auto compose(const hamiltonian_ns::functional<RANK1> auto& h1, const hamiltonian
 
 
 template <typename H, size_t RANK>
-concept hamiltonian = /* labelled<H> && */ hamiltonian_ns::functional<H,RANK>;
+concept hamiltonian = labelled<H> && hamiltonian_ns::functional<H,RANK>;
 
 
 

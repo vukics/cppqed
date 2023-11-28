@@ -160,56 +160,56 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
 } // liouvillian_ns
 
 
-/**
- * The below concept-based structure mirrors ExpectationValues & Hamiltonian, but probably won’t have a lot of practical use.
- */
-
-template <typename L, size_t RANK>
-concept time_dependent_jump = exact_propagator_ns::one_time_dependent_functional<L,RANK>;
-
-template <typename L, size_t RANK>
-concept time_independent_jump = requires(L&& l, StateVectorView<RANK> psi) { l(psi); };
-
-template <typename L, size_t RANK>
-concept jump = time_dependent_jump<L,RANK> || time_independent_jump<L,RANK>;
-
-
-/// Here, we could just use an alias to expectationvalues::functional, however, lindblad represents expressly just a single jump operator …
-/** … so that rate is just a single double. Accordingly, the label is only a single string as well. */
-template <typename L, size_t RANK>
-concept time_dependent_rate = requires (const L& l, double t, StateVectorConstView<RANK> psi) { { l(t,psi) } -> ::std::convertible_to<double>; } ;
-
-template <typename L, size_t RANK>
-concept time_independent_rate = requires (const L& l, StateVectorConstView<RANK> psi) { { l(psi) } -> ::std::convertible_to<double>; } ;
-
-template <typename L, size_t RANK> concept rate = time_dependent_rate<L,RANK> || time_independent_rate<L,RANK> ;
-
-
-template <typename L, size_t RANK>
-concept time_dependent_superoperator = ode_time_dependent_derivative<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
-
-template <typename L, size_t RANK>
-concept time_independent_superoperator = ode_time_independent_derivative<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
-
-template <typename L, size_t RANK>
-concept superoperator = time_dependent_superoperator<L,RANK> || time_independent_superoperator<L,RANK>;
-
-
-template <typename L, size_t RANK>
-concept lindblad_with_jump = labelled<L,std::string> && jump<L,RANK> ;
-
-
-template <typename L, size_t RANK>
-concept lindblad_with_rate = lindblad_with_jump<L,RANK> && rate<L,RANK> ;
-
-
-template <typename L, size_t RANK>
-concept lindblad_with_superoperator = lindblad_with_jump<L,RANK> && superoperator<L,RANK> ;
-
-
-template <typename L, size_t RANK>
-concept lindblad = lindblad_with_superoperator<L,RANK> || lindblad_with_rate<L,RANK> || lindblad_with_jump<L,RANK>;
-
+// /**
+//  * The below concept-based structure mirrors ExpectationValues & Hamiltonian, but probably won’t have a lot of practical use.
+//  */
+//
+// template <typename L, size_t RANK>
+// concept time_dependent_jump = exact_propagator_ns::one_time_dependent_functional<L,RANK>;
+//
+// template <typename L, size_t RANK>
+// concept time_independent_jump = requires(L&& l, StateVectorView<RANK> psi) { l(psi); };
+//
+// template <typename L, size_t RANK>
+// concept jump = time_dependent_jump<L,RANK> || time_independent_jump<L,RANK>;
+//
+//
+// /// Here, we could just use an alias to expectationvalues::functional, however, lindblad represents expressly just a single jump operator …
+// /** … so that rate is just a single double. Accordingly, the label is only a single string as well. */
+// template <typename L, size_t RANK>
+// concept time_dependent_rate = requires (const L& l, double t, StateVectorConstView<RANK> psi) { { l(t,psi) } -> ::std::convertible_to<double>; } ;
+//
+// template <typename L, size_t RANK>
+// concept time_independent_rate = requires (const L& l, StateVectorConstView<RANK> psi) { { l(psi) } -> ::std::convertible_to<double>; } ;
+//
+// template <typename L, size_t RANK> concept rate = time_dependent_rate<L,RANK> || time_independent_rate<L,RANK> ;
+//
+//
+// template <typename L, size_t RANK>
+// concept time_dependent_superoperator = ode_time_dependent_derivative<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
+//
+// template <typename L, size_t RANK>
+// concept time_independent_superoperator = ode_time_independent_derivative<L,DensityOperatorConstView<RANK>,DensityOperatorView<RANK>>;
+//
+// template <typename L, size_t RANK>
+// concept superoperator = time_dependent_superoperator<L,RANK> || time_independent_superoperator<L,RANK>;
+//
+//
+// template <typename L, size_t RANK>
+// concept lindblad_with_jump = labelled<L,std::string> && jump<L,RANK> ;
+//
+//
+// template <typename L, size_t RANK>
+// concept lindblad_with_rate = lindblad_with_jump<L,RANK> && rate<L,RANK> ;
+//
+//
+// template <typename L, size_t RANK>
+// concept lindblad_with_superoperator = lindblad_with_jump<L,RANK> && superoperator<L,RANK> ;
+//
+//
+// template <typename L, size_t RANK>
+// concept lindblad = lindblad_with_superoperator<L,RANK> || lindblad_with_rate<L,RANK> || lindblad_with_jump<L,RANK>;
+//
 
 
 } // structure

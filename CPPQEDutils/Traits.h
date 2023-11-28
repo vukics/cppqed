@@ -23,7 +23,7 @@ template<typename > inline constexpr bool always_false_v = false;
 
 
 /// An empty base class with a constructor of arbitrary signature
-struct Empty { template <typename... T> Empty(T&&... ) {} };
+struct Empty { Empty(auto&&... ) {} };
 
 
 template <typename T>
@@ -97,13 +97,13 @@ template <typename T> concept logger = intro_logger<T> && outro_logger<T>;
 
 
 template <typename H, typename OUT = LogTree>
-concept labelled = requires (H&& h) { { h.label } -> std::convertible_to<OUT>; } || requires (H&& h) { { label(h) } -> std::convertible_to<OUT>; } ;
+concept labelled = requires (const H& h) { { h.label } -> std::convertible_to<OUT>; } || requires (const H& h) { { label(h) } -> std::convertible_to<OUT>; } ;
 
 
-template <typename H> requires ( requires (H&& h) { h.label ; } || requires (H&& h) { label(h) ; } )
-auto getLabel(H&& h)
+template <typename H> requires ( requires (const H& h) { h.label ; } || requires (const H& h) { label(h) ; } )
+auto getLabel(const H& h)
 {
-  if constexpr (requires (H&& h) { h.label ; }) return h.label;
+  if constexpr (requires (const H& h) { h.label ; }) return h.label;
   else return label(h);
 }
 
