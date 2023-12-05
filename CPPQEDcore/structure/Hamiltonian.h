@@ -59,7 +59,7 @@ auto compose(const hamiltonian_ns::functional<RANK1> auto& h1, const hamiltonian
 
 
 template <typename H, size_t RANK>
-concept hamiltonian = labelled<H> && hamiltonian_ns::functional<H,RANK>;
+concept hamiltonian = /* labelled<H> && */ hamiltonian_ns::functional<H,RANK>;
 
 
 

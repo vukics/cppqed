@@ -17,18 +17,21 @@ int main(int argc, char* argv[])
   qbit::Pars pq(op,"Q");
   mode::Pars pm(op,"M");
   
+  double g; add(op,parameters::_("g","Jaynes-Cummings coupling",1.,g));
+
   parse(op,argc, argv);
 
   BinarySystem bs{
     make(pq),2,make(pm),pm.cutoff,
     SystemFrequencyStore{},Liouvillian<2>{},
-    structure::makeHamiltonianElement<2>("jc",jaynescummings::hamiltonian<0,1>(pm.cutoff,1.)),
+    structure::makeHamiltonianElement<2>("jc",jaynescummings::hamiltonian<0,1>(pm.cutoff,g)),
     exact_propagator_ns::noOp,
     expectation_values_ns::noOp};
 
+//  static_assert( labelled< decltype(getHa(bs)) > );
 
-  quantumdata::StateVector<2> psi{{2,pm.cutoff}}; psi(0,0)=1;// psi(1)=1; 
- 
+  quantumdata::StateVector<2> psi{{2,pm.cutoff}}; psi(0,0)=1;// psi(1)=1;
+
   run(
     qjmc::make<cppqedutils::ODE_EngineBoost>(bs,/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
