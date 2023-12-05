@@ -47,6 +47,13 @@ void for_each(MD&& md, auto&& func)
  * - (composition with Sigma)
  *
  * TODO: MultiDiagonal should be applicable also as a jump operator, but there are serious difficulties in indexing.
+ *
+ * Diagonal class :
+ * - as multiarray:
+ *   * factors
+ *   * optionally frequencies
+ * - optionally as a single lambda: an envelope function
+ *
  */
 template <size_t RANK>
 struct MultiDiagonal

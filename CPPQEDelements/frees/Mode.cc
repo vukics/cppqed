@@ -2,19 +2,19 @@
 #include "Mode.h"
 
 
-using namespace cppqedutils; using namespace structure;
+using namespace structure;
 
 
 mode::MultiDiagonal mode::aOp(size_t cutoff)
 {
   MultiDiagonal res;
-  res.diagonals[1].emplace(MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{{cutoff-1}, [c=cutoff] (size_t) {
+  res.diagonals[1].emplace(MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{ [c=cutoff] {
     // TODO: pending support of std::ranges::to, the following solution will be possible:
     // return std::ranges::to<MultiDiagonal::Diagonal::StorageType>(std::views::iota(0uz, c-1) | std::views::transform([] (size_t num) -> dcomp { return std::sqrt(num+1); }));
     auto res{noInit(c-1)};
     for (size_t i=0; i<res.size(); ++i) res[i]=sqrt(double(i+1));
     return res;
-  }});
+  } () } );
   return res;
 }
 

@@ -4,6 +4,8 @@
 
 #include "QuantumSystemDynamics.h"
 
+#include "MultiDiagonal.h"
+
 #include "Pars.h"
 
 
@@ -100,6 +102,28 @@ auto make(const Pars& p)
   return make(p.delta,p.eta,p.gamma_m,p.gamma_p);
 }
 
+
+// operators are defined here as MultiDiagonals, which is an overkill, of course
+/**
+ * TODO: define qbit operators as Sigmas, and define composition of MultiDiagonal with Sigma
+ */
+namespace multidiagonal {
+
+using namespace ::structure;
+using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;
+
+
+MultiDiagonal splus();
+
+MultiDiagonal sminus();
+
+MultiDiagonal sx();
+MultiDiagonal sy();
+
+
+MultiDiagonal sz();
+
+}
 
 } // qbit
 

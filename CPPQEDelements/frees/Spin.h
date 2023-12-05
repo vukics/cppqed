@@ -1,48 +1,33 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
-/// \briefFile{Defines the spin-bundle}
-#ifndef   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
-#define   CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
+#pragma once
 
-#include "ElementLiouvillian.h"
-#include "ElementAveraged.h"
-#include "Free.h"
-#include "FreeExact.h"
-#include "TridiagonalHamiltonian.h"
+#include "QuantumSystemDynamics.h"
+
+#include "MultiDiagonal.h"
 
 #include "Pars.h"
 
 
-class SpinBase;
-
-// A general Spin yet incomplete
-// Implements the following Hamiltonian: 
-// (omega-i*gamma)*S_z
-// with the usual Liouvillian
 
 namespace spin {
 
-using namespace structure::freesystem;
+
+using namespace ::structure;
+using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;
 
 
-typedef std::shared_ptr<const SpinBase> Ptr;
+MultiDiagonal splus(size_t twoS, size_t dim=0);
 
-Tridiagonal splus(size_t dim, size_t twoS, dcomp z, bool isExact);
+MultiDiagonal sminus(size_t twoS, size_t dim=0);
 
-inline auto sminus(size_t dim, size_t twoS, dcomp z, bool isExact) {return splus(dim,twoS,z,isExact).dagger();}
-inline auto sx(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)+sminus(dim,twoS,z,isExact))/2;}
-inline auto sy(size_t dim, size_t twoS, dcomp z, bool isExact) {return (splus(dim,twoS,z,isExact)-sminus(dim,twoS,z,isExact))/(2.*1i);}
+MultiDiagonal sx(size_t twoS, size_t dim=0);
+MultiDiagonal sy(size_t twoS, size_t dim=0);
 
 
-Tridiagonal splus(Ptr spin);
+MultiDiagonal sz(size_t twoS, size_t dim=0);
 
-inline auto sminus(Ptr spin) {return splus(spin).dagger();}
-inline auto sx(Ptr spin) {return (splus(spin)+sminus(spin))/2;}
-inline auto sy(Ptr spin) {return (splus(spin)-sminus(spin))/(2.*1i);}
 
-Tridiagonal sz(size_t dim, size_t twoS);
-
-Tridiagonal sz(Ptr spin);
-
+/*
 inline auto sn(size_t dim, size_t twoS, dcomp z, bool isExact, double theta, double phi)
 {
   return sin(theta)*(cos(phi)*sx(dim,twoS,z,isExact)+sin(phi)*sy(dim,twoS,z,isExact))+cos(theta)*sz(dim,twoS);
@@ -77,11 +62,11 @@ private:
   
 };
 
-
+*/
 } // spin
 
 
-/** \todo Implement some spherical-coordinates class and use it here */
+/** \todo Implement some spherical-coordinates class and use it here */ /*
 class SpinBase
   : public structure::Free, 
     public structure::ElementAveraged<1>
@@ -169,6 +154,4 @@ public:
   DissipativeSpinSch(const spin::Pars& p) : SpinSch(p), spin::Liouvillian(p.twoS,p.gamma) {}
   
 };
-
-
-#endif // CPPQEDELEMENTS_FREES_SPIN_H_INCLUDED
+*/

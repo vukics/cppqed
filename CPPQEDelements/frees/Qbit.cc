@@ -36,6 +36,29 @@ TimeIndependentRate<1> qbit::sigmaPlusRate(double gamma_p) {return [=] (StateVec
 
 
 
+qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::splus()
+{
+  MultiDiagonal res;
+  res.diagonals[0].emplace( MultiDiagonal::Offsets{1}, MultiDiagonal::Diagonal{ [=] {auto res{noInit(1)}; res[0]=1; return res;} () } );
+  return res;
+}
+
+qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::sminus() {return hermitianConjugateOf(splus());}
+
+qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::sx() {return (splus()+sminus())/2;}
+qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::sy() {return (splus()-sminus())/2i;}
+
+qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::sz()
+{
+  MultiDiagonal res;
+  res.diagonals[0].emplace( MultiDiagonal::Offsets{0}, MultiDiagonal::Diagonal{ [=] {auto res{noInit(2)}; res[0]=.5; res[1]=-.5; return res;} () } );
+  return res;
+}
+
+
+//qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::sz();
+
+
 /*
 
 namespace qbit {

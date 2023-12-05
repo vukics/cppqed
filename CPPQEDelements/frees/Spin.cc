@@ -1,22 +1,49 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Spin.h"
 
-#include "MathExtensions.h"
 
-#include "Mode_.h"
+using namespace structure;
 
-#include "LazyDensityOperator.h"
-#include "Tridiagonal.tcc"
 
-#include "Pars.h"
+void decideDimension(size_t twoS, size_t& dim) {dim = (dim && dim<twoS+1) ? dim : twoS+1;}
 
-#include<boost/assign/std/list.hpp>
 
-using namespace std;
-using namespace boost;
-using namespace assign;
-using namespace cppqedutils;
+spin::MultiDiagonal spin::splus(size_t twoS, size_t dim)
+{
+  MultiDiagonal res;
+  decideDimension(twoS,dim);
+  res.diagonals[0].emplace(MultiDiagonal::Offsets{1},MultiDiagonal::Diagonal{ [=] {
+    auto res{noInit(dim-1)};
+    // i=m+s (m is the magnetic quantum number)
+    for (size_t i=0; i<res.size(); ++i) res[i]=sqrt((twoS-i)*(i+1.));
+    return res;
+  } () } );
+  return res;
+}
 
+
+spin::MultiDiagonal spin::sminus(size_t twoS, size_t dim) {return hermitianConjugateOf(splus(twoS,dim));}
+
+spin::MultiDiagonal spin::sx(size_t twoS, size_t dim) {return (splus(twoS,dim)+sminus(twoS,dim))/2;}
+
+spin::MultiDiagonal spin::sy(size_t twoS, size_t dim) {return (splus(twoS,dim)-sminus(twoS,dim))/2i;}
+
+spin::MultiDiagonal spin::sz(size_t twoS, size_t dim)
+{
+  MultiDiagonal res;
+  decideDimension(twoS,dim);
+  res.diagonals[0].emplace(MultiDiagonal::Offsets{0},MultiDiagonal::Diagonal{ [=] {
+    auto res{noInit(dim)};
+    // i=m+s (m is the magnetic quantum number)
+    for (size_t i=0; i<res.size(); ++i) res[i]=i-twoS/2.;
+    return res;
+  } () });
+  return res;
+}
+
+
+
+/*
 namespace spin {
 
 namespace {
@@ -26,30 +53,16 @@ typedef Tridiagonal::Diagonal Diagonal;
 }
 
 
-size_t decideDimension(size_t twoS, size_t dim)
-{
-  return (dim && dim<twoS+1) ? dim : twoS+1;
-}
 
 
 Diagonal mainDiagonal(size_t dim, size_t twoS, dcomp z)
 {
   Diagonal diagonal(dim);
-  diagonal=blitz::tensor::i-twoS/2.;
+  diagonal=blitz::tensor::;
   return Diagonal(z*diagonal);
 }
 
 
-Tridiagonal splus(size_t dim, size_t twoS, dcomp z, bool isExact)
-{
-  Diagonal diagonal(dim-1);
-  using blitz::tensor::i;
-  // i=m+s (m is the magnetic quantum number)
-  Tridiagonal res(Diagonal(),1,diagonal=sqrt((twoS-i)*(i+1.)));
-  // writing "1." is tremendously important here, for converting the whole thing to doubles: otherwise, the sqrt is apparently performed within integers by blitz!!! 
-  if (isExact) res.furnishWithFreqs(mainDiagonal(dim,twoS,z));
-  return res;
-}
 
 
 Tridiagonal sn(Ptr spin)
@@ -151,3 +164,5 @@ double spin::Liouvillian::rate(structure::NoTime, const structure::freesystem::L
     res+=2.*gamma_*n*(twoS_-n+1)*matrix(n);
   return res;
 }
+
+*/

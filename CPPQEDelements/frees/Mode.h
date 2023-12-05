@@ -7,7 +7,10 @@
 
 #include "Pars.h"
 
+
+
 namespace mode {
+
 
 using namespace ::structure;
 using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;

@@ -201,6 +201,13 @@ template <typename T>
 using StorageType = std::vector<T>;
 
 
+template <typename T>
+const auto copyInit(const std::ranges::sized_range auto& input) {return [&] (size_t e) {
+  if (size(input) != e) throw std::runtime_error("Extent mismatch in MultiArray copyInit: "+std::to_string(size(input))+" "+std::to_string(e));
+  return StorageType<T>(begin(input),end(input));
+};}
+
+
 } // multiarray
 
 
@@ -229,6 +236,8 @@ public:
   }
 
   explicit MultiArray(Extents<RANK> extents) : MultiArray{extents,multiarray::noInit<T>} {}
+
+  explicit MultiArray(const StorageType& st) requires (RANK==1) : MultiArray{{st.size()},multiarray::copyInit<T>(st)} {}
 
   friend MultiArray copy(const MultiArray& ma) {return MultiArray{ma.extents, [&] (size_t) {return ma.dataStorage();}};}
 
@@ -304,19 +313,6 @@ private:
 
 template <typename T, size_t RANK>
 constexpr auto passByValue_v<MultiArray<T,RANK>> = false;
-
-
-namespace multiarray {
-
-
-template <typename T, size_t RANK>
-const auto copyInit(const std::ranges::sized_range auto& input) {return [&] (size_t e) {
-  if (size(input) != e) throw std::runtime_error("Extent mismatch in MultiArray copyInit: "+std::to_string(size(input))+" "+std::to_string(e));
-  return typename MultiArray<T,RANK>::StorageType(begin(input),end(input));
-};}
-
-
-} // multiarray
 
 
 } // cppqedutils
