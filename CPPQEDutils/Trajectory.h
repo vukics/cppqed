@@ -320,7 +320,6 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
 
 inline std::ostream& stream(double         tdp, std::ostream& os) {return os<<tdp;}
 inline std::ostream& stream(dcomp          tdp, std::ostream& os) {return os<<tdp;}
-inline std::ostream& stream(std::nullopt_t    , std::ostream& os) {return os;}
 
 std::ostream& stream(const temporal_data_point auto& tdp, std::ostream& os)
 {

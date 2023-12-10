@@ -50,8 +50,6 @@ template <> constexpr bool tdp<double> = true;
 
 template <> constexpr bool tdp<dcomp> = true;
 
-template <> constexpr bool tdp<std::nullopt_t> = true;
-
 template <hana_sequence S> constexpr bool tdp<S> = !!hana::all_of(
   decltype(hana::transform(std::declval<S>(), hana::typeid_)){},
   []<class T>(T) { return tdp<typename T::type>; });
@@ -66,13 +64,13 @@ static_assert(temporal_data_point<dcomp>);
 static_assert(temporal_data_point<decltype(hana::make_tuple(1.,dcomp{2.,-1.}))>);
 static_assert(temporal_data_point<decltype(hana::make_tuple(1.,dcomp{2.,-1.}),hana::make_tuple(1.,dcomp{2.,-1.}))>);
 static_assert(!temporal_data_point<int>);
+static_assert(temporal_data_point<hana::tuple<>>);
 
 
 struct plusTDP
 {
   double operator()(double a, double b) const {return a+b;}
   dcomp operator()(dcomp a, dcomp b) const {return a+b;}
-  std::nullopt_t operator()(std::nullopt_t, std::nullopt_t) const {return std::nullopt;}
 
   template <temporal_data_point T>
   T operator()(const T& a, const T& b) const {

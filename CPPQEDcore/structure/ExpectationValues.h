@@ -16,8 +16,8 @@ static const struct NoOp
 {
   LogTree label{"noOp"};
   
-  std::nullopt_t operator() (auto) const {return std::nullopt;}
-  
+  auto operator() (auto) const {return hana::make_tuple();}
+
 } noOp;
 
 
