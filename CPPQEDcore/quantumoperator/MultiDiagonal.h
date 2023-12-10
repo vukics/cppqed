@@ -54,6 +54,10 @@ void for_each(MD&& md, auto&& func)
  *   * optionally frequencies
  * - optionally as a single lambda: an envelope function
  *
+ * + a global envelope can also be useful in certain cases
+ *
+ * The envelopes can be evaluated when applying the object as a Hamiltonian
+ *
  */
 template <size_t RANK>
 struct MultiDiagonal
@@ -234,6 +238,7 @@ struct MultiDiagonal
 };
 
 
+
 /// Composition
 /**
  * It’s unfortunate that operator* has precedence over operator| according to c++ precedence rules,
@@ -241,6 +246,12 @@ struct MultiDiagonal
  */
 MultiDiagonal<1> operator|(const MultiDiagonal<1>&, const MultiDiagonal<1>&);
 
+
+namespace multidiagonal {
+
+MultiDiagonal<1> identity(size_t dim);
+
+} // multidiagonal
 
 /*
 /// A free-standing version of Tridiagonal::apply \related Tridiagonal

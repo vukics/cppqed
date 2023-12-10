@@ -2,6 +2,16 @@
 #include "MultiDiagonal.h"
 
 
+quantumoperator::MultiDiagonal<1> quantumoperator::multidiagonal::identity(size_t dim)
+{
+  MultiDiagonal<1> res;
+  res.diagonals[1].emplace(
+    MultiDiagonal<1>::Offsets{0},
+    MultiDiagonal<1>::Diagonal{ multiarray::StorageType<dcomp>(dim,1.) } );
+  return res;
+}
+
+
 auto quantumoperator::operator|(const quantumoperator::MultiDiagonal<1>& a, const quantumoperator::MultiDiagonal<1>& b) -> MultiDiagonal<1>
 {
   using Offsets=MultiDiagonal<1>::Offsets;

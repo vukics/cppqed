@@ -127,7 +127,7 @@ public:
 
   HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
 
-
+  // TODO: if qsd has a notion of dimensionality, then the dim arguments are unnecessary
   BinarySystem(auto&& qsd0, size_t dim0, auto&& qsd1, size_t dim1, const SystemFrequencyStore& freqs, const Liouvillian<2>& li, auto&& ha, auto&& ex, auto&& ev)
     : freqsFull_{ [&] {
         SystemFrequencyStore res(getFreqs(qsd0));/* res.append_range(getFreqs(qsd1)); res.append_range(freqs);*/ return res;
@@ -157,7 +157,7 @@ public:
     return [&] (double t, StateVectorConstView<2> psi, StateVectorView<2> dpsidt, double t0) {
       hamiltonian_ns::broadcast<retainedAxes<0>>(getHa(bs.qsd0),t,psi,dpsidt,t0,bs.offsets0_);
       hamiltonian_ns::broadcast<retainedAxes<1>>(getHa(bs.qsd1),t,psi,dpsidt,t0,bs.offsets1_);
-      bs.ha(t,psi,dpsidt,t0);
+      applyHamiltonian(bs.ha,t,psi,dpsidt,t0);
     };
   }
 

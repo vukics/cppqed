@@ -51,7 +51,7 @@ qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::sy() {return (splus()-sm
 qbit::multidiagonal::MultiDiagonal qbit::multidiagonal::sz()
 {
   MultiDiagonal res;
-  res.diagonals[0].emplace( MultiDiagonal::Offsets{0}, MultiDiagonal::Diagonal{ [=] {auto res{noInit(2)}; res[0]=.5; res[1]=-.5; return res;} () } );
+  res.diagonals[1].emplace( MultiDiagonal::Offsets{0}, MultiDiagonal::Diagonal{ [=] {auto res{noInit(2)}; res[0]=.5; res[1]=-.5; return res;} () } );
   return res;
 }
 
