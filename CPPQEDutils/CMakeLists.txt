@@ -11,7 +11,7 @@ add_subdirectory(thirdParty)
 
 add_library(CPPQEDutils SHARED
             $<TARGET_OBJECTS:cppqedGitSHA1>
-            DrivenDampedHarmonicOscillator.cc Pars.cc Trajectory.cc FormDouble.cc KeyPrinter.cc Version.cc
+            DrivenDampedHarmonicOscillator.cc Pars.cc Trajectory.cc Version.cc
             )
 
 add_library(CPPQED::CPPQEDutils ALIAS CPPQEDutils)
