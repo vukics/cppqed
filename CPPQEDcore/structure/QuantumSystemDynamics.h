@@ -30,8 +30,8 @@
 
 namespace structure {
 
-
-using SystemFrequencyDescriptor = std::tuple<std::string,std::variant<dcomp,double>,double>; /// name-value-multiplier
+/// name-value-multiplier
+using SystemFrequencyDescriptor = std::tuple<std::string,std::variant<dcomp,double>,double>;
 
 using SystemFrequencyStore = std::list<SystemFrequencyDescriptor>;
 
@@ -135,7 +135,6 @@ public:
       offsets0_{calculateSlicesOffsets<retainedAxes<0>>(Extents{dim0,dim1})},
       offsets1_{calculateSlicesOffsets<retainedAxes<1>>(Extents{dim0,dim1})},
       liFull_{ [&] {
-//        BAD BUGS: qsds are taken from the arguments, already moved, offsets_s are not yet calculated
         Liouvillian<2> res(size(getLi(qsd0))+size(getLi(qsd1))+size(li));
         auto resIter=res.begin();
         for (const Lindblad<1> & l : getLi(qsd0) ) *resIter++ = liouvillian_ns::broadcast<retainedAxes<0>,2>(l,offsets0_);

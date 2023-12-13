@@ -34,12 +34,8 @@ struct LDO : MultiArrayConstView<dcomp,multiArrayRank_v<TAG<RANK>>>
  */
 
 
-/// The lazy_density_operator-style indexing should be defined in the language of MultiArrayConstView
-/**
- * If we do it as DensityOperatorConstView, then template-argument-deduction doesn’t work very well
- * TODO: (re)evaluate the alternative design of making StateVectorConstView & DensityOperatorConstView optional bases of MultiArray
- *   In that case, lazy_density_operator-style indexing could be defined as member functions
- */
+/// lazy_density_operator-style indexing
+
 inline dcomp _(LDO<StateVector,1> psi, size_t i, size_t j) {return psi(i)*std::conj(psi(j));}
 
 inline double _(LDO<StateVector,1> psi, size_t i) {return sqrAbs(psi(i));}

@@ -22,14 +22,14 @@ static const struct NoOp
 
 
 template <typename L, size_t RANK>
-concept time_dependent_functional = requires (const L& l, LDO<DensityOperator,RANK> rho, double t)
+concept time_dependent_functional = requires (const L& l, LDO<StateVector,RANK> rho, double t)
 {
   { l(t,rho) } -> temporal_data_point ;
 };
 
 
 template <typename L, size_t RANK>
-concept time_independent_functional = requires (const L& l, LDO<DensityOperator,RANK> rho)
+concept time_independent_functional = requires (const L& l, LDO<StateVector,RANK> rho)
 { 
   { l(rho) } -> temporal_data_point ;
 };
@@ -59,8 +59,8 @@ concept labelled_and_without_nonlinear_postprocessing = /* labelled<L> && */ fun
 /// Postprocessing means any operation on the expectation values that is not linear in the density operator (as the calculation of variance, for istance)
 template <typename L, size_t RANK>
 concept labelled_and_with_nonlinear_postprocessing = labelled_and_without_nonlinear_postprocessing<L,RANK> && (
-  ( time_dependent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, double, LDO<DensityOperator, RANK> > & tdp) { postProcessor(l)(tdp); } ) ||
-  ( time_independent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, LDO<DensityOperator, RANK> > & tdp) { postProcessor(l)(tdp); } )
+  ( time_dependent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, double, LDO<StateVector, RANK> > & tdp) { postProcessor(l)(tdp); } ) ||
+  ( time_independent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, LDO<StateVector, RANK> > & tdp) { postProcessor(l)(tdp); } )
 ) ;
 
 
