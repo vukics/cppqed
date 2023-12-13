@@ -98,7 +98,8 @@ public:
    */
   T& operator() (Extents<RANK> idx) const
   {
-    std::apply([this] (auto &&... args) { checkBounds(std::forward<decltype(args)>(args)...); },idx);
+    std::apply([this] (auto ... args) { checkBounds(args ...); },idx);
+
     return dataView[std::ranges::fold_left( std::views::zip(idx,strides), offset,
                                             [&] (auto init, auto ids) {return init+get<0>(ids)*get<1>(ids);} ) ];
   }
@@ -229,7 +230,7 @@ public:
   MultiArray(MultiArray&&) = default; MultiArray& operator=(MultiArray&&) = default;
 
   /// initializer is a callable, taking the total size as argument.
-  MultiArray(Extents<RANK> extents, auto&& initializer) requires requires (size_t e) { { initializer(e) } -> std::convertible_to<StorageType>;}
+  MultiArray(Extents<RANK> extents, auto initializer) requires requires (size_t e) { { initializer(e) } -> std::convertible_to<StorageType>;}
     : MultiArrayConstView<T,RANK>{extents,multiarray::calculateStrides(extents),0}, data_{initializer(multiarray::calculateExtent(extents))}
   {
     this->dataView=std::span<T>(data_);

@@ -45,8 +45,7 @@ struct DensityOperator : MultiArray<dcomp,2*RANK>, private VectorSpaceOperatorsG
 
   DensityOperator(ABase && ma) : ABase(std::move(ma)) {}
 
-  DensityOperator(Dimensions dimensions, auto&& initializer)
-    : ABase{concatenate(dimensions,dimensions),std::forward<decltype(initializer)>(initializer)} {}
+  DensityOperator(Dimensions dimensions, auto initializer) : ABase{concatenate(dimensions,dimensions),initializer} {}
 
   explicit DensityOperator(Dimensions dimensions)
     : DensityOperator{dimensions, [=] (size_t e) {

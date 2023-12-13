@@ -75,7 +75,7 @@ struct Schrödinger
 
 
 template<typename QSD, typename SV, typename OE>
-Schrödinger(QSD , SV , OE ) -> Schrödinger< multiArrayRank_v<SV>, QSD, OE >;
+Schrödinger(QSD&& , SV&& , OE&& ) -> Schrödinger< multiArrayRank_v<SV>, QSD, OE >;
 
 
 namespace schrödinger {

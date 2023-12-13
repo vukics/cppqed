@@ -84,12 +84,10 @@ struct StateVector : MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerat
 
   StateVector(ABase && ma) : ABase{std::move(ma)} {}
 
-  StateVector(Dimensions dimensions, auto&& initializer) : ABase{dimensions,std::forward<decltype(initializer)>(initializer)} {}
+  StateVector(Dimensions dimensions, auto initializer) : ABase{dimensions,initializer} {}
 
   explicit StateVector(Dimensions dimensions)
     : StateVector{dimensions, [] (size_t e) {auto res{zeroInit(e)}; res[0]=1.; return res;}} {}
-
-  // StateVector(auto&& ... a) : ArrayBase<StateVector<RANK>>(std::forward<decltype(a)>(a)...) {}
 
   /// \name Metric
   //@{

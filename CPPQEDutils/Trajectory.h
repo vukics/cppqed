@@ -533,14 +533,14 @@ auto run(TRAJ&& traj, const trajectory::Pars<PB>& p, AH&& ah, bool doStreaming=t
   using namespace trajectory;
   if constexpr (adaptive<TRAJ>) {
     if (p.dc) return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DC_MODE>(
-      std::forward<TRAJ>(traj),p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,std::forward<AH>(ah));
+      traj,p.T,p.dc,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,ah);
     else if (!p.Dt) throw std::runtime_error("Nonzero dc or Dt required in trajectory::run");
   }
   if (!p.Dt) throw std::runtime_error("Nonzero Dt required in trajectory::run");
   if (p.NDt) return trajectory::run<RunLengthType::NDT_MODE,StreamFreqType::DT_MODE>(
-    std::forward<TRAJ>(traj),p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,std::forward<AH>(ah));
+    traj,p.NDt,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,ah);
   else return trajectory::run<RunLengthType::T_MODE,StreamFreqType::DT_MODE>(
-    std::forward<TRAJ>(traj),p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,std::forward<AH>(ah));
+    traj,p.T,p.Dt,p.sdf,p.ofn,p.initialFileName,p.precision,p.streamSwitch,doStreaming,returnStreamedArray,ah);
 }
 
 

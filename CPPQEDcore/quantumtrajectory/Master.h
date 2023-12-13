@@ -10,13 +10,7 @@ namespace quantumtrajectory {
 
 
 /// Auxiliary tools to Master
-namespace master {
-
-
-typedef ode::Pars<> Pars;
-
-
-} // master
+namespace master { typedef ode::Pars<> Pars; } // master
 
 
 /// Master equation evolution from a \link DensityOperator density-operator\endlink initial condition
@@ -33,7 +27,7 @@ struct Master
 {
   Master(auto&& qsd, auto&& rho, auto&& oe)
     : qsd{std::forward<decltype(qsd)>(qsd)}, rho{std::forward<decltype(rho)>(rho)}, oe{std::forward<decltype(oe)>(oe)},
-      rowIterationOffsets_{calculateSlicesOffsets<rowIterationRetainedAxes>(rho.extents)} {}
+      rowIterationOffsets_{calculateSlicesOffsets<compileTimeOrdinals<RANK>>(this->rho.extents)} {}
 
   double time=0., time0=0.;
   QSD qsd;
@@ -62,7 +56,7 @@ struct Master
       DensityOperatorConstView<RANK> rho{m.rho.extents,m.rho.strides,0,rhoRaw};
       DensityOperatorView<RANK> drhodt{m.rho.extents,m.rho.strides,0,drhodtRaw.begin(),std::ranges::fill(drhodtRaw,0)};
 
-      hamiltonian_ns::broadcast<Master::rowIterationRetainedAxes>(getHa(m.qsd),t,rho,drhodt,m.time0,m.rowIterationOffsets_);
+      hamiltonian_ns::broadcast<compileTimeOrdinals<RANK>>(getHa(m.qsd),t,rho,drhodt,m.time0,m.rowIterationOffsets_);
 
       twoTimesRealPartOfSelf(drhodt);
 
@@ -72,9 +66,9 @@ struct Master
     },m.time,m.rho.dataStorage());
 
     // exact propagation
-    exact_propagator_ns::broadcast<Master::rowIterationRetainedAxes>(getEx(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
+    exact_propagator_ns::broadcast<compileTimeOrdinals<RANK>>(getEx(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
     hermitianConjugateSelf(m.rho);
-    exact_propagator_ns::broadcast<Master::rowIterationRetainedAxes>(getEx(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
+    exact_propagator_ns::broadcast<compileTimeOrdinals<RANK>>(getEx(m.qsd),m.time,m.rho.mutableView(),m.time0,m.rowIterationOffsets_);
     conj(m.rho);
     m.time0=m.time;
 
@@ -96,7 +90,7 @@ struct Master
 
   friend auto temporalDataPoint(const Master& m)
   {
-    return calculateAndPostprocess<RANK>( getEV(m.qsd), m.time, DensityOperatorConstView<RANK>(m.rho) );
+    return calculateAndPostprocess<RANK>( getEV(m.qsd), m.time, LDO<DensityOperator,RANK>(m.rho) );
   }
 
   friend iarchive& readFromArrayOnlyArchive(Master& m, iarchive& iar) {return iar & m.rho;} // MultiArray can be (de)serialized
@@ -118,31 +112,34 @@ struct Master
 private:
   const std::vector<size_t> rowIterationOffsets_;
 
-  static constexpr auto rowIterationRetainedAxes= compileTimeOrdinals<RANK>;
-
   // const DensityOperatorStreamer<RANK,V> dos_;
 
 };
 
 
 template<typename QSD, typename DO, typename OE>
-Master(QSD , DO , OE ) -> Master< multiArrayRank_v<DO>/2, QSD, OE >;
+Master(QSD&& , DO&& , OE&& ) -> Master< multiArrayRank_v<DO>/2, QSD, OE >;
 
 
-/*
+
 namespace master {
 
-template<typename ODE_Engine, typename V, typename StateVector_OR_DensityOperator>
-auto make(QuantumSystemPtr<std::decay_t<StateVector_OR_DensityOperator>::N_RANK> sys,
-          StateVector_OR_DensityOperator&& state, const Pars& p, EntanglementMeasuresSwitch ems)
+
+template <template<typename> class OE, typename QSD, typename DO>
+auto make(QSD&& qsd, DO&& state, const Pars& p)
 {
-  return Master<std::decay_t<StateVector_OR_DensityOperator>::N_RANK,ODE_Engine,V>(
-    sys,std::forward<StateVector_OR_DensityOperator>(state),ODE_Engine{initialTimeStep(sys),p},ems);
+  constexpr size_t RANK=multiArrayRank_v<std::decay_t<DO>>/2;
+  using ODE=OE<StorageType>;
+
+  double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
+
+  return Master<RANK,QSD,ODE>{std::forward<QSD>(qsd),std::forward<DO>(state),ODE{iDt,p.epsRel,p.epsAbs}};
 }
-  
+
+
 } // master
 
-*/
+
 } // quantumtrajectory
 
 

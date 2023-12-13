@@ -59,7 +59,7 @@ template<size_t RANK,
 class TDP_DensityOperator
 {
 public:
-  TDP_DensityOperator(QSD qsd /*, EntanglementMeasuresSwitch ems*/) : qsd{std::forward<QSD>(qsd)} {}
+  TDP_DensityOperator(auto&& qsd /*, EntanglementMeasuresSwitch ems*/) : qsd{std::forward<QSD>(qsd)} {}
 
   QSD qsd;
 //  const EntanglementMeasuresSwitch ems_;

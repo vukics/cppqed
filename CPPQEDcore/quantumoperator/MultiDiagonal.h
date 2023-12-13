@@ -24,15 +24,6 @@ auto range(auto&& md)
   }) | std::views::join;
 }
 
-template <typename MD>
-void for_each(MD&& md, auto&& func)
-{
-  for (auto&& [index,offsets,diag] : range(std::forward<MD>(md)))
-    func(std::forward<decltype(index)>(index),
-         std::forward<decltype(offsets)>(offsets),
-         std::forward<decltype(diag)>(diag));
-}
-
 
 } // multidiagonal
 
@@ -74,12 +65,12 @@ struct MultiDiagonal
   MultiDiagonal(const MultiDiagonal&) = delete; MultiDiagonal& operator=(const MultiDiagonal&) = delete;
   MultiDiagonal(MultiDiagonal&&) = default; MultiDiagonal& operator=(MultiDiagonal&&) = default;
 
-  explicit MultiDiagonal(auto&&... args) : diagonals{std::forward<decltype(args)>...} {}
+  explicit MultiDiagonal(auto&&... args) : diagonals{std::forward<decltype(args)>(args)...} {}
 
-  friend MultiDiagonal copy(auto&& md)
+  friend MultiDiagonal copy(const auto& md)
   {
     MultiDiagonal res;
-    for (const auto& [index,offsets,diag] : multidiagonal::range(std::forward<decltype(md)>(md))) res.diagonals[index].emplace(offsets,copy(diag));
+    for (const auto& [index,offsets,diag] : multidiagonal::range(md)) res.diagonals[index].emplace(offsets,copy(diag));
     return res;
   }
 

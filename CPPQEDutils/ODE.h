@@ -145,10 +145,10 @@ struct Base
       dtTry(dtInit) {}
 
   template <typename State> requires controlled_stepper<CES,State,Time>
-  auto tryStep(system<State,Time> auto sys, Time& time, State&& stateInOut) {return ces.stepper.try_step(sys,std::forward<State>(stateInOut),time,dtTry);}
+  auto tryStep(system<State,Time> auto sys, Time& time, State&& stateInOut) {return ces.stepper.try_step(sys,stateInOut,time,dtTry);}
 
   template <typename State> requires controlled_stepper<CES,State,Time>
-  auto tryStep(system<State,Time> auto sys, Time& time, ConstReference<State> stateIn, State&& stateOut) {return ces.stepper.try_step(sys,stateIn,time,std::forward<State>(stateOut),dtTry);}
+  auto tryStep(system<State,Time> auto sys, Time& time, ConstReference<State> stateIn, State&& stateOut) {return ces.stepper.try_step(sys,stateIn,time,stateOut,dtTry);}
   
   ControlledErrorStepperWrapper<CES> ces;
   
@@ -188,7 +188,7 @@ struct Base
           b.tryStep( [&] (const auto& y, auto& dydt, double t) {
             logDerivsCall(b.logger);
             return sys(y,dydt,t);
-          },time,std::forward<decltype(states)>(states)...)!=bno::success;
+          },time,states...)!=bno::success;
           ++nFailedSteps) ;
 
     b.dtDid=time-timeBefore;

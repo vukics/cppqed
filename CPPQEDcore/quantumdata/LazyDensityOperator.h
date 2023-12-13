@@ -73,18 +73,18 @@ concept lazy_density_operator = requires (T t, Extents<RANK> i, Extents<RANK> j)
  *
  * `function` is a callable with signature `T(LazyDensityOperator<hana::size(retainedAxes)>)`, where T is an arithmetic type
  */
-template<auto retainedAxes, size_t RANK, typename F, typename P>
-auto partialTrace(LDO<StateVector,RANK> matrix, const std::vector<size_t>& offsets, F&& function, P&& plus)
+template<auto retainedAxes, size_t RANK>
+auto partialTrace(LDO<StateVector,RANK> matrix, const std::vector<size_t>& offsets, auto&& function, auto plus)
 {
   return std::ranges::fold_left_first(
     sliceRange<retainedAxes>(matrix,offsets) |
     std::views::transform([] (auto slice) {return LDO<StateVector,size(retainedAxes)>{slice};} ) |
-    std::views::transform(std::forward<F>(function)), std::forward<P>(plus) ).value();
+    std::views::transform(function), plus ).value();
 }
 
 
-template<auto retainedAxes, size_t RANK, typename F, typename P>
-auto partialTrace(LDO<DensityOperator,RANK> matrix, const std::vector<size_t>& offsets, F&& function, P&& plus)
+template<auto retainedAxes, size_t RANK>
+auto partialTrace(LDO<DensityOperator,RANK> matrix, const std::vector<size_t>& offsets, auto&& function, auto plus)
 {
   std::vector<size_t> diagonalOffsets(offsets.size());
   std::ranges::transform(offsets, diagonalOffsets.begin(), [&] (size_t v) {return v * ( std::lround(std::sqrt(matrix.dataView.size())) + 1 ) ; } ) ;
@@ -92,15 +92,8 @@ auto partialTrace(LDO<DensityOperator,RANK> matrix, const std::vector<size_t>& o
   return std::ranges::fold_left_first(
     sliceRange<extendedAxes<retainedAxes,RANK>>(matrix,diagonalOffsets) | 
     std::views::transform([] (auto slice) {return LDO<DensityOperator,size(retainedAxes)>{slice};} ) |
-    std::views::transform(std::forward<F>(function)), std::forward<P>(plus) ).value();
+    std::views::transform(function), plus ).value();
  
-}
-
-
-template<auto retainedAxes, size_t RANK, typename F, typename P>
-auto partialTrace(lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets, F&& function, P&& plus)
-{
-  return partialTrace<retainedAxes,RANK>(matrix,offsets,std::forward<decltype(function)>(function));
 }
 
 

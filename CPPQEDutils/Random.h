@@ -31,8 +31,8 @@ template<typename Distribution,
 requires ( std::uniform_random_bit_generator<std::decay_t<Engine>> )
 auto fill(Array&& a, Engine&& re, auto&&... dp)
 {
-  Distribution d{std::forward<decltype(dp)>(dp)...};
-  return std::ranges::generate(std::forward<Array>(a), [ & ]() {return d(re);});
+  Distribution d{dp...};
+  return std::ranges::generate(a, [ & ]() {return d(re);});
 }
 
 
@@ -41,7 +41,7 @@ template<typename Distribution,
          std::ranges::forward_range Array>
 auto fill(Array&& a, unsigned long seed, auto&&... dp)
 {
-  return fill<Distribution>(std::forward<Array>(a),Engine{seed},std::forward<decltype(dp)>(dp)...);
+  return fill<Distribution>(a,Engine{seed},dp...);
 }
 
 
