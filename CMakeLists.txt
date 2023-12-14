@@ -107,15 +107,3 @@ add_subdirectory(CPPQEDutils)
 add_subdirectory(CPPQEDcore)
 
 add_subdirectory(CPPQEDelements)
-
-add_subdirectory(CPPQEDscripts)
-
-add_subdirectory(cpypyqed)
-
-if(ENABLE_TESTING)
-  add_subdirectory(Testing)
-endif()
-
-if (EXISTS ${PROJECT_SOURCE_DIR}/OwnScripts)
-  add_subdirectory(OwnScripts)
-endif()

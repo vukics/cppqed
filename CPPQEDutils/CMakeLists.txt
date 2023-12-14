@@ -31,13 +31,5 @@ else()
   target_compile_definitions(CPPQEDutils PUBLIC DO_NOT_USE_BOOST_COMPRESSION)
 endif()
 
-add_subdirectory(examples)
-
-if(ENABLE_TESTING)
-  add_subdirectory(Testing)
-endif()
-
-add_subdirectory(sandbox)
-
 install(TARGETS CPPQEDutils DESTINATION lib)
 

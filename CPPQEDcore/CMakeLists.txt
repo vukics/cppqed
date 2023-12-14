@@ -24,7 +24,5 @@ add_library(CPPQED::CPPQEDcore ALIAS CPPQEDcore)
 
 target_link_libraries(CPPQEDcore PUBLIC CPPQED::CPPQEDcore_high)
 
-add_subdirectory(examples)
-
 install(TARGETS CPPQEDcore DESTINATION lib)
 

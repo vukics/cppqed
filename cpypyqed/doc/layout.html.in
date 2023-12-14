@@ -1,7 +1,0 @@
-{% extends "!layout.html" %}
-{% block rootrellink %}
-    <li><a href="../../cppqed/html/index.html">C++QED</a> &raquo;</li>
-    <li><a href="../../core/html/index.html">core</a> &raquo;</li>
-    <li><a href="../../elements/html/index.html">elements</a> &raquo;</li>
-    {{ super() }}
-{% endblock %}
