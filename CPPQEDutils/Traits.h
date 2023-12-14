@@ -5,6 +5,7 @@
 
 #include <boost/hana.hpp>
 
+#include <iostream>
 #include <type_traits>
 
 

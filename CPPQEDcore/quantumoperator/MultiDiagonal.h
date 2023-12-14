@@ -43,6 +43,7 @@ auto range(auto&& md)
  * - as multiarray:
  *   * factors
  *   * optionally frequencies
+ *   * can be copied, stores ubound & lbound to be used when applying, and maybe even ranges of idxs (LHS,RHS,Diag)
  * - optionally as a single lambda: an envelope function
  *
  * + a global envelope can also be useful in certain cases
@@ -117,7 +118,7 @@ struct MultiDiagonal
     using ResultType = MultiDiagonal<RANK+RANK2>;
     ResultType res;
     for (const auto& [index1,diagToIndex1] : md1.diagonals) for (const auto& [index2,diagToIndex2] : md2.diagonals) {
-      typename ResultType::Index resIndex{index1.to_string()+index2.to_string()};
+      typename ResultType::Index resIndex{index2.to_string()+index1.to_string()};
       for (const auto& [offsets1,diag1] : diagToIndex1) for (const auto& [offsets2,diag2] : diagToIndex2)
         res.diagonals[resIndex].emplace(concatenate(offsets1,offsets2),directProduct(diag1,diag2));
     }
