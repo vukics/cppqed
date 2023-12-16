@@ -29,5 +29,7 @@ int main(int argc, char* argv[])
     // quantumtrajectory::qjmc::make<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     pt,cppqedutils::trajectory::observerNoOp);
+
+ // std::cerr<<json(nOp(10))<<std::endl;
 }
 

@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
   auto op{optionParser()};
   
-  cppqedutils::trajectory::Pars<quantumtrajectory::qjmc::Pars<pcg64>> pt(op);
+  trajectory::Pars<qjmc::Pars<pcg64>> pt(op);
   
   qbit::Pars pq(op,"Q");
   mode::Pars pm(op,"M");
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   quantumdata::StateVector<2> psi{{2,pm.cutoff}}; psi(0,0)=1;// psi(1)=1;
 
   run(
-    qjmc::make<cppqedutils::ODE_EngineBoost>(bs,/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    qjmc::make<ODE_EngineBoost>(bs,/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     pt,trajectory::observerNoOp);
   

@@ -25,11 +25,13 @@ int main(int argc, char* argv[])
 
   auto qbit{make(pq)};
 
-  cppqedutils::ODE_EngineBoost<StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
+  // cppqedutils::ODE_EngineBoost<StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
 
   // quantumtrajectory::Master traj{qbit,quantumdata::DensityOperator<1>{{2}},oe};
 
-  quantumtrajectory::QuantumJumpMonteCarlo traj{qbit,quantumdata::StateVector<1>{{2}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
+  // quantumtrajectory::QuantumJumpMonteCarlo traj{qbit,quantumdata::StateVector<1>{{2}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
+
+  auto traj{quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(qbit,quantumdata::StateVector<1>{{2}},pt)};
 
   cppqedutils::run(traj,pt,cppqedutils::trajectory::observerNoOp);
 

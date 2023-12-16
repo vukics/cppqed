@@ -15,7 +15,10 @@ foreach(S ${FEWER_SCRIPTS_TARGETS})
   target_link_libraries(${S} CPPQED::CPPQEDelements)
   install(TARGETS ${S} DESTINATION bin)
 endforeach()
-    
+
+add_executable(Spin Spin.cc)
+target_link_libraries(Spin CPPQED::CPPQEDelements)
+
 # add target "fewer_scripts"
 add_custom_target(fewer_scripts DEPENDS ${FEWER_SCRIPTS_TARGETS})
 
