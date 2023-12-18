@@ -66,7 +66,7 @@ auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*,
   if (gamma_p) {liouvillian.push_back(gain(gamma_m)); freqs.emplace_back("γ_p",gamma_p,1);}
   // if (gamma_phi) liouvillian.emplace(dephasing(gamma_phi));
 
-  return QuantumSystemDynamics { freqs, liouvillian, fullH(zSch,eta), exact_propagator_ns::noOp, expectationValues }; //makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
+  return QuantumSystemDynamics { 2, freqs, liouvillian, fullH(zSch,eta), exact_propagator_ns::noOp, expectationValues }; //makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
 }
 
 

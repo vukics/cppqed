@@ -55,6 +55,7 @@ concept quantum_system_dynamics = requires (T&& qsd)
   { getEx(qsd) } -> exact_propagator<RANK>;
   { getEV(qsd) } -> expectation_values<RANK>;
   { getLi(qsd) } -> std::convertible_to<Liouvillian<RANK>>;
+  { getDimensions(qsd) } -> std::convertible_to<Dimensions<RANK>>;
   // { streamParameters(qsd,os) } -> std::convertible_to<std::ostream&>;
 };
 
@@ -68,11 +69,15 @@ concept quantum_system_dynamics = requires (T&& qsd)
 template <size_t RANK, hamiltonian<RANK> HA, exact_propagator<RANK> EX, expectation_values<RANK> EV>
 struct QuantumSystemDynamics
 {
+  Dimensions<RANK> dim;
+
   SystemFrequencyStore freqs;
 
   Liouvillian<RANK> li;
 
-  HA ha; EX ex; EV ev;
+  HA ha;
+  EX ex = exact_propagator_ns::noOp;
+  EV ev = expectation_values_ns::noOp;
 
   friend const SystemFrequencyStore& getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
 
@@ -82,12 +87,16 @@ struct QuantumSystemDynamics
   friend const EX & getEx(const QuantumSystemDynamics& qsd) {return qsd.ex;}
   friend const EV & getEV(const QuantumSystemDynamics& qsd) {return qsd.ev;}
 
+  friend auto getDimensions(const QuantumSystemDynamics& qsd) {return qsd.dim;}
+
 };
 
 
 template <size_t RANK, typename HA, typename EX, typename EV>
-QuantumSystemDynamics(const SystemFrequencyStore&, const Liouvillian<RANK>&, HA&&, EX&&, EV&&) -> QuantumSystemDynamics<RANK,HA,EX,EV>;
+QuantumSystemDynamics(Dimensions<RANK>, const SystemFrequencyStore&, const Liouvillian<RANK>&, HA&&, EX&&, EV&&) -> QuantumSystemDynamics<RANK,HA,EX,EV>;
 
+template <typename HA, typename EX, typename EV>
+QuantumSystemDynamics(size_t, const SystemFrequencyStore&, const Liouvillian<1>&, HA&&, EX&&, EV&&) -> QuantumSystemDynamics<1,HA,EX,EV>;
 
 
 namespace binary {
@@ -128,12 +137,12 @@ public:
   HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
 
   // TODO: if qsd has a notion of dimensionality, then the dim arguments are unnecessary
-  BinarySystem(auto&& qsd0, size_t dim0, auto&& qsd1, size_t dim1, const SystemFrequencyStore& freqs, const Liouvillian<2>& li, auto&& ha, auto&& ex, auto&& ev)
+  BinarySystem(auto&& qsd0, auto&& qsd1, const SystemFrequencyStore& freqs, const Liouvillian<2>& li, auto&& ha, auto&& ex, auto&& ev)
     : freqsFull_{ [&] {
         SystemFrequencyStore res(getFreqs(qsd0));/* res.append_range(getFreqs(qsd1)); res.append_range(freqs);*/ return res;
       } () },
-      offsets0_{calculateSlicesOffsets<retainedAxes<0>>(Extents{dim0,dim1})},
-      offsets1_{calculateSlicesOffsets<retainedAxes<1>>(Extents{dim0,dim1})},
+      offsets0_{calculateSlicesOffsets<retainedAxes<0>>(concatenate(getDimensions(qsd0),getDimensions(qsd1)))},
+      offsets1_{calculateSlicesOffsets<retainedAxes<1>>(concatenate(getDimensions(qsd0),getDimensions(qsd1)))},
       liFull_{ [&] {
         Liouvillian<2> res(size(getLi(qsd0))+size(getLi(qsd1))+size(li));
         auto resIter=res.begin();
@@ -202,6 +211,8 @@ public:
 
   friend const auto& getLi(const BinarySystem& bs) {return bs.liFull_;}
 
+  friend auto getDimensions(const BinarySystem& bs) {return concatenate(getDimensions(bs.qsd0),getDimensions(bs.qsd1));}
+
 };
 
 
@@ -212,7 +223,7 @@ LogTree label( std::invoke_result_t< decltype(BS::getHa), BS > ) {return "Binary
 
 
 template <typename QSD0, typename QSD1, typename HA, typename EX, typename EV>
-BinarySystem(QSD0, size_t, QSD1, size_t, const SystemFrequencyStore&, const Liouvillian<2>&, HA&& ha, EX&& ex, EV&& ev) -> BinarySystem<QSD0,QSD1,HA,EX,EV>;
+BinarySystem(QSD0, QSD1, const SystemFrequencyStore&, const Liouvillian<2>&, HA&& ha, EX&& ex, EV&& ev) -> BinarySystem<QSD0,QSD1,HA,EX,EV>;
 
 
 } // structure

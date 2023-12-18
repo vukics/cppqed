@@ -35,19 +35,15 @@ auto getDimensions(const DensityOperator<RANK>& rho) {return halveExtents(rho.ex
 template<size_t RANK>
 struct DensityOperator : MultiArray<dcomp,2*RANK>, private VectorSpaceOperatorsGenerator<DensityOperator<RANK>>
 {
-  using ABase = MultiArray<dcomp,2*RANK>;
-
-  using Dimensions=Extents<RANK>; /// Note: this is not the extents of the underlying multiarray!
-
   DensityOperator(const DensityOperator&) = delete; DensityOperator& operator=(const DensityOperator&) = delete;
   
   DensityOperator(DensityOperator&&) = default; DensityOperator& operator=(DensityOperator&&) = default;
 
-  DensityOperator(ABase && ma) : ABase(std::move(ma)) {}
+  DensityOperator(MultiArray<dcomp,2*RANK> && ma) : MultiArray<dcomp,2*RANK>(std::move(ma)) {}
 
-  DensityOperator(Dimensions dimensions, auto initializer) : ABase{concatenate(dimensions,dimensions),initializer} {}
+  DensityOperator(Dimensions<RANK> dimensions, auto initializer) : MultiArray<dcomp,2*RANK>{concatenate(dimensions,dimensions),initializer} {}
 
-  explicit DensityOperator(Dimensions dimensions)
+  explicit DensityOperator(Dimensions<RANK> dimensions)
     : DensityOperator{dimensions, [=] (size_t e) {
         auto res{zeroInit(e)};
         res[0]=1.;

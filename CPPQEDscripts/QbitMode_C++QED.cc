@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
   parse(op,argc, argv);
 
   BinarySystem bs{
-    make(pq),2,make(pm),pm.cutoff,
+    make(pq),make(pm),
     SystemFrequencyStore{},Liouvillian<2>{},
     structure::makeHamiltonianElement<2>("jc",jaynescummings::hamiltonian<0,1>(pm.cutoff,g)),
     exact_propagator_ns::noOp,
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   quantumdata::StateVector<2> psi{{2,pm.cutoff}}; psi(0,0)=1;// psi(1)=1;
 
   run(
-    qjmc::make<ODE_EngineBoost>(bs,/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
+    qjmc::make<ODE_EngineBoost>(bs,std::move(psi),pt),
     // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     pt,trajectory::observerNoOp);
   
