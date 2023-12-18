@@ -101,7 +101,7 @@ auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa
     if (nTh) liouvillian.push_back(photonGain(kappa,nTh));
   }
 
-  return QuantumSystemDynamics { std::move(freqs), std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), exact_propagator_ns::noOp, expectationValues };
+  return QuantumSystemDynamics { cutoff, std::move(freqs), std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), exact_propagator_ns::noOp, expectationValues };
 }
 
 

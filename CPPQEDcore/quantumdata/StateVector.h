@@ -10,6 +10,9 @@ namespace quantumdata {
 
 using namespace ::cppqedutils;
 
+template <size_t RANK>
+using Dimensions=Extents<RANK>;
+
 
 using StorageType = multiarray::StorageType<dcomp>;
 
@@ -74,19 +77,15 @@ using StateVectorConstView=MultiArrayConstView<dcomp,RANK>;
 template<size_t RANK>
 struct StateVector : MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerator<StateVector<RANK>>
 {
-  using ABase = MultiArray<dcomp,RANK>;
-
-  using Dimensions=Extents<RANK>;
-
   StateVector(const StateVector&) = delete; StateVector& operator=(const StateVector&) = delete;
 
   StateVector(StateVector&&) = default; StateVector& operator=(StateVector&&) = default;
 
-  StateVector(ABase && ma) : ABase{std::move(ma)} {}
+  StateVector(MultiArray<dcomp,RANK> && ma) : MultiArray<dcomp,RANK>{std::move(ma)} {}
 
-  StateVector(Dimensions dimensions, auto initializer) : ABase{dimensions,initializer} {}
+  StateVector(Dimensions<RANK> dimensions, auto initializer) : MultiArray<dcomp,RANK>{dimensions,initializer} {}
 
-  explicit StateVector(Dimensions dimensions)
+  explicit StateVector(Dimensions<RANK> dimensions)
     : StateVector{dimensions, [] (size_t e) {auto res{zeroInit(e)}; res[0]=1.; return res;}} {}
 
   /// \name Metric
