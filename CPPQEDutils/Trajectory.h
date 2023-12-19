@@ -318,8 +318,8 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
 }
 
 
-inline std::ostream& stream(double         tdp, std::ostream& os) {return os<<tdp;}
-inline std::ostream& stream(dcomp          tdp, std::ostream& os) {return os<<tdp;}
+inline std::ostream& stream(double tdp, std::ostream& os) {return os<<tdp;}
+inline std::ostream& stream(dcomp  tdp, std::ostream& os) {return os<<tdp;}
 
 inline std::ostream& stream(hana::tuple<> tdp, std::ostream& os) {return os;}
 
@@ -489,7 +489,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  if (streamSwitch[1]) logStream<<logOutro(traj).dump(ppindent)<<endl;
+  if (streamSwitch[1]) logStream<<"OUTRO: "<<logOutro(traj).dump()<<endl;
   if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;
