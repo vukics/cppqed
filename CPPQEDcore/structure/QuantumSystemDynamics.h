@@ -176,8 +176,7 @@ public:
 
   friend auto getEV(const BinarySystem& bs) {return binary::expectation_values(bs.qsd0,bs.qsd1,bs.offsets0_,bs.offsets1_,bs.ev);}
   
-
-  // friend void postProcessor( std::invoke_result_t<getEV,BinarySystem> )
+  // friend void postProcessor( decltype( getEV( std::declval<BinarySystem>() ) ) ) ;
   
   
 /*
@@ -199,8 +198,7 @@ public:
   }
 
   friend LogTree label(const decltype(getEV(std::declval<BinarySystem>())) & ) {return "BinarySystem";}
-  */
-  /*
+
   friend void postProcessor(std::invoke_result_t<getEx,BinarySystem> )
   constexpr auto postProcessor(decltype(expectationValues)) {
   return [] (std::invoke_result_t<decltype(expectationValues),StateVectorConstView<1>> & t) {
