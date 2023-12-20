@@ -136,7 +136,6 @@ public:
 
   HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
 
-  // TODO: if qsd has a notion of dimensionality, then the dim arguments are unnecessary
   BinarySystem(auto&& qsd0, auto&& qsd1, const SystemFrequencyStore& freqs, const Liouvillian<2>& li, auto&& ha, auto&& ex, auto&& ev)
     : freqsFull_{ [&] {
         SystemFrequencyStore res(getFreqs(qsd0));/* res.append_range(getFreqs(qsd1)); res.append_range(freqs);*/ return res;
