@@ -40,7 +40,7 @@ constexpr bool consistent = (
 /**
  * When the size of `retainedAxes` equals `RANK`, this is a transposition
  * 
- * \todo accept several arrays at the same time (since this is how it is used by clients)
+ * TODO: accept several arrays at the same time (since this is how it is used by clients)
  */
 template <auto retainedAxes, size_t RANK>
 auto filterIn(Extents<RANK> idx) requires ( std::size(retainedAxes) <= RANK )
@@ -52,7 +52,7 @@ auto filterIn(Extents<RANK> idx) requires ( std::size(retainedAxes) <= RANK )
 
   
 /// Filters out the indices corresponding to a subsystem (specified by `retainedAxes`)
-/** \todo accept several arrays at the same time (since this is how it is used by clients) */
+/** TODO: accept several arrays at the same time (since this is how it is used by clients) */
 template <auto retainedAxes, size_t RANK>
 auto filterOut(Extents<RANK> idx) requires ( std::size(retainedAxes) <= RANK )
 {
@@ -137,7 +137,7 @@ concept slice_iteration_offsets = std::is_same_v<O,std::span<const size_t>> || s
 /// TODO: think over semantics here, can MultiArrayView be the reference type?
 template <slice_iterator::slice_iteration_offsets Offsets, typename T, size_t RRANK> // RRANK stands for retained rank
 class SliceIterator : public boost::forward_iterator_helper<SliceIterator<Offsets,T,RRANK>,MultiArrayView<T,RRANK>>
-/// \todo Unfortunately, std::iterator has been deprecated as of C++17, and there doesn’t seem to be a replacement in STL
+/// TODO: Unfortunately, std::iterator has been deprecated as of C++17, and there doesn’t seem to be a replacement in STL
 {
 public:
   using member_iterator = std::conditional_t<

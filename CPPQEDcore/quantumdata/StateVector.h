@@ -160,38 +160,3 @@ template <size_t RANK>
 constexpr auto cppqedutils::passByValue_v<quantumdata::StateVector<RANK>> = false;
 
 
-
-/*
-namespace boost { namespace numeric { namespace odeint {
-
-template<typename Derived>
-struct is_resizeable<::quantumdata::ArrayBase<Derived>> : boost::true_type {};
-
-template<typename Derived>
-struct same_size_impl<::quantumdata::ArrayBase<Derived>, ::quantumdata::ArrayBase<Derived>>
-{ // define how to check size
-  static bool same_size(const ::quantumdata::ArrayBase<Derived> &v1, const ::quantumdata::ArrayBase<Derived> &v2) {return v1.extents == v2.extents;}
-};
-
-/// TODO: a reserve could be defined for the vector to be resized
-template<typename Derived>
-struct resize_impl<::quantumdata::ArrayBase<Derived>, ::quantumdata::ArrayBase<Derived>>
-{ // define how to resize
-  static void resize(::quantumdata::ArrayBase<Derived> &v1, const ::quantumdata::ArrayBase<Derived> &v2) {v1.resize( v2.extents );}
-};
-
-template<typename Derived>
-struct vector_space_norm_inf<::quantumdata::ArrayBase<Derived>>
-{
-  typedef double result_type;
-  double operator()(const ::quantumdata::ArrayBase<Derived>& v ) const
-  {
-    return max( abs(v) );
-  }
-};
-
-template<typename Derived>
-struct norm_result_type<::quantumdata::ArrayBase<Derived>> : mpl::identity<double> {};
-
-} } } // boost::numeric::odeint
-*/

@@ -100,7 +100,6 @@ struct Pars : BASE
 
   unsigned autoStopRepetition; ///< number of streamed lines repeated within relative precision before autostopping – 0 means no autostopping
   
-  /// TODO: the many add`s here and in similar places could be relieved with functional techniques
   Pars(popl::OptionParser& op) : BASE{op}
   {
     using ::parameters::_;
@@ -345,7 +344,6 @@ const auto dataStreamerDefault = [] (const uniform_step auto& traj, std::ostream
 
 
 /// The most general run function
-/** TODO: use std::setw instead of lots of dump(ppindent) for json pretty printing */
 template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, data_streamer<TRAJ> TDS = decltype(dataStreamerDefault) >
 requires ( ( SFT==StreamFreqType::DT_MODE || adaptive<TRAJ> ) && ( RLT==RunLengthType::T_MODE || SFT==StreamFreqType::DT_MODE ) )
 auto

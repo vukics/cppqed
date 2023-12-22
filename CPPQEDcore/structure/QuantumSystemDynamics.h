@@ -136,7 +136,6 @@ public:
 
   HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
 
-  // TODO: if qsd has a notion of dimensionality, then the dim arguments are unnecessary
   BinarySystem(auto&& qsd0, auto&& qsd1, const SystemFrequencyStore& freqs, const Liouvillian<2>& li, auto&& ha, auto&& ex, auto&& ev)
     : freqsFull_{ [&] {
         SystemFrequencyStore res(getFreqs(qsd0));/* res.append_range(getFreqs(qsd1)); res.append_range(freqs);*/ return res;
@@ -177,8 +176,7 @@ public:
 
   friend auto getEV(const BinarySystem& bs) {return binary::expectation_values(bs.qsd0,bs.qsd1,bs.offsets0_,bs.offsets1_,bs.ev);}
   
-
-  // friend void postProcessor( std::invoke_result_t<getEV,BinarySystem> )
+  // friend void postProcessor( decltype( getEV( std::declval<BinarySystem>() ) ) ) ;
   
   
 /*
@@ -200,8 +198,7 @@ public:
   }
 
   friend LogTree label(const decltype(getEV(std::declval<BinarySystem>())) & ) {return "BinarySystem";}
-  */
-  /*
+
   friend void postProcessor(std::invoke_result_t<getEx,BinarySystem> )
   constexpr auto postProcessor(decltype(expectationValues)) {
   return [] (std::invoke_result_t<decltype(expectationValues),StateVectorConstView<1>> & t) {

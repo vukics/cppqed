@@ -78,7 +78,8 @@ struct HamiltonianElement
 };
 
 
-/// TODO: how to make a deduction guide that would deduce RANK from the StateVector argument of the functional?
+/// TODO: make a deduction guide that would deduce RANK from the StateVector argument of the functional via std::function and std::tuple_element
+/** note: the 2nd argument is always of type StateVector(Const)View, regardless of the time dependence */
 template <size_t RANK, hamiltonian_ns::functional<RANK> F>
 auto makeHamiltonianElement(std::string label, F&& functional)
 {
@@ -125,10 +126,6 @@ concept hamiltonian = hana_sequence<H> && !!hana::all_of(
 namespace hamiltonian_ns {
 
 /// Maybe this can be just an overload of applyHamiltonian ?
-// TODO: std::ranges::views::zip to be applied here, but for some reason, sliceRange is not compatible with zipping – it does work with sliceRangeSimple, though.
-//for (auto [psi,dpsidt] : std::views::zip(sliceRange<retainedAxes>(psi,offsets),
-//                                         sliceRange<retainedAxes>(drhodt,offsets) ) )
-//  ::structure::applyHamiltonian(h,t,psi,dpsidt,t0) ;
 template <
   auto retainedAxes,
   size_t RANK,
