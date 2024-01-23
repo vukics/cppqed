@@ -450,7 +450,7 @@ run(TRAJ&& traj, ///< the trajectory to run
           if constexpr (RLT==RunLengthType::T_MODE) lt=advance(traj,std::min(streamFreq,length-getTime(traj)));
           else lt=advance(traj,streamFreq);
         }
-        if (streamSwitch[2]) logStream<<lt.dump(ppindent)<<endl;
+        if (streamSwitch[2] && !lt.is_null()) logStream<<lt.dump(ppindent)<<endl;
         stateSaved=tdpStreamed=false;
       }
 
