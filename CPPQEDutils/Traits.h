@@ -125,6 +125,30 @@ struct multilambda : L... {
 } // cppqedutils
 
 
+namespace boost::serialization {
+
+
+template <class Archive>
+void serialize(Archive & ar, ::cppqedutils::LogTree& o, unsigned int version)
+{
+  split_free(ar, o, version);
+}
+
+
+template<class Archive>
+void save(Archive& ar, const ::cppqedutils::LogTree& l, unsigned int) {
+  ar & l.dump() ;
+}
+
+template<class Archive>
+void load(Archive& ar, ::cppqedutils::LogTree& l, unsigned int) {
+  std::string s;
+  ar & s ;
+  l=::cppqedutils::json::parse(s);
+}
+
+} // boost::serialization
+
 
 /// cf. [this discussion](https://github.com/boostorg/hana/issues/317)
 /** TODO: Unfortunately, this doesn’t seem to be enough for use in std::apply fold expressions */

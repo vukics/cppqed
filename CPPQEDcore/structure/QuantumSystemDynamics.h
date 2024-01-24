@@ -115,7 +115,13 @@ auto expectation_values(const quantum_system_dynamics<1> auto& qsd0, const quant
 } // binary
 
 
-// this class could be derived from QuantumSystemDynamics, with the latter having some kind of base class?
+
+/**
+ * TODO: this class should be templated for the full hamiltonian, propagator, expectation_values types
+ * in that case, the ctor could calculate these functions, and BinarySystem expose them as members, instead of these getter-function craziness
+ * (the quantum_system_dynamics has to be redefined for this)
+ * the maker function / deduction guide can calculate these types rather easily
+ */
 template <
   quantum_system_dynamics<1> QSD0,
   quantum_system_dynamics<1> QSD1,

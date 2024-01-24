@@ -3,13 +3,14 @@
 
 #include "Qbit.h"
 
-#include "Master.h"
+// #include "Master.h"
 #include "QuantumJumpMonteCarlo.h"
 
 #include <iostream>
 
 using namespace qbit;
 using namespace std;
+using namespace quantumtrajectory;
 
 
 
@@ -17,7 +18,7 @@ int main(int argc, char* argv[])
 {
   auto op{optionParser()};
 
-  cppqedutils::trajectory::Pars<quantumtrajectory::qjmc::Pars<pcg64>> pt(op);
+  trajectory::Pars<qjmc::Pars<pcg64>> pt(op);
 
   Pars pq(op);
 
@@ -25,15 +26,16 @@ int main(int argc, char* argv[])
 
   auto qbit{make(pq)};
 
-  // cppqedutils::ODE_EngineBoost<StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
+  // ODE_EngineBoost<StorageType> oe(quantumtrajectory::initialTimeStep(getFreqs(qbit)),1e-12,1e-30);
 
   // quantumtrajectory::Master traj{qbit,quantumdata::DensityOperator<1>{{2}},oe};
 
   // quantumtrajectory::QuantumJumpMonteCarlo traj{qbit,quantumdata::StateVector<1>{{2}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
 
-  auto traj{quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(qbit,quantumdata::StateVector<1>{{2}},pt)};
+  auto traj{// quantumtrajectory::qjmc::makeEnsemble<ODE_EngineBoost>(qbit,quantumdata::StateVector<1>{{2}},pt)};
+    qjmc::make<ODE_EngineBoost>(qbit,quantumdata::StateVector<1>{{2}},pt)};
 
-  cppqedutils::run(traj,pt,cppqedutils::trajectory::observerNoOp);
+  run(traj,pt,trajectory::observerNoOp);
 
   // {
   //   quantumdata::StateVector<2> psi{{2,3}}; quantumdata::DensityOperator<2> rho{{2,3}};
@@ -42,11 +44,11 @@ int main(int argc, char* argv[])
 
 
 /*  for (size_t i=0; i<1e2; ++i) {
-    step(m,1.); cppqedutils::trajectory::dataStreamerDefault(m,std::cerr<<getTime(m)<<" "<<getDtDid(m)<<"\t");
+    step(m,1.); trajectory::dataStreamerDefault(m,std::cerr<<getTime(m)<<" "<<getDtDid(m)<<"\t");
   }
 
-  auto streamedArray=run<cppqedutils::trajectory::RunLengthType::T_MODE,cppqedutils::trajectory::StreamFreqType::DC_MODE>(
-    m,70.,1,0,"","",6,cppqedutils::trajectory::StreamSwitch{"1111"},false,true,cppqedutils::trajectory::observerNoOp);*/
+  auto streamedArray=run<trajectory::RunLengthType::T_MODE,trajectory::StreamFreqType::DC_MODE>(
+    m,70.,1,0,"","",6,trajectory::StreamSwitch{"1111"},false,true,trajectory::observerNoOp);*/
 
   // ****** Parameters of the Problem
   
