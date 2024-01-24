@@ -1,7 +1,6 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-#include "QJMC_Logger.h"
 #include "QuantumTrajectory.h"
 
 #include "StochasticTrajectory.h"
@@ -61,7 +60,7 @@ struct QuantumJumpMonteCarlo
 
   QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
   : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re}, dpLimit_{dpLimit},
-    logger_{std::size(getLi(this->qsd))}
+    log_{{"Total number of MCWF steps",0uz},{"dpLimit overshot",{{"nOvershot",0uz},{"maximal overshoot",0.}}},{"Jump trajectory",{}}}
   {
     if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
         !time && size(li) ) manageTimeStep( calculateRates(li) );
@@ -83,7 +82,7 @@ struct QuantumJumpMonteCarlo
     return {{"Quantum-Jump Monte Carlo",{{"QJMC algorithm","stepwise"},{"odeEngine",logIntro(q.oe)},{"randomEngine",logIntro(q.re)},{"System","TAKE FROM SYSTEM"}}}};
   }
 
-  friend LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {{"QJMC",q.logger_.outro()},{"ODE_Engine",logOutro(q.oe)}};}
+  friend LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {{"QJMC",q.log_},{"ODE_Engine",logOutro(q.oe)}};}
 
   /// TODO: the returned log should contain information about the coherent step + the time step change as well
   friend auto step(QuantumJumpMonteCarlo& q, double deltaT)
@@ -101,7 +100,7 @@ struct QuantumJumpMonteCarlo
 
     applyPropagator(getEx(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
 
-    q.logger_.processNorm(renorm(q.psi));
+    renorm(q.psi);
 
     // Jump
     if (const auto& li{getLi(q.qsd)}; size(li)) {
@@ -126,12 +125,13 @@ struct QuantumJumpMonteCarlo
 
         for (dcomp& v : q.psi.dataStorage()) v/=normFactor;
 
-        res.emplace("jump",q.logger_.jumpOccured(q.time,lindbladNo));
+        res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",q.time}});
+        q.log_["Jump trajectory"].push_back({q.time,lindbladNo});
       }
 
     }
 
-    q.logger_.step();
+    q.log_["Total number of MCWF steps"]+=1;
 
     return res;
 
@@ -154,7 +154,7 @@ struct QuantumJumpMonteCarlo
   template <typename Archive>
   friend auto& stateIO(QuantumJumpMonteCarlo& q, Archive& ar)
   {
-    stateIO(q.oe, ar & q.psi & q.time) & q.re.engine & q.logger_;
+    stateIO(q.oe, ar & q.psi & q.time) & q.re.engine & q.log_;
     q.time0=q.time;
     return ar;
   }
@@ -175,7 +175,7 @@ struct QuantumJumpMonteCarlo
 
 private:
   const double dpLimit_;
-  mutable qjmc::Logger logger_;
+  mutable LogTree log_; // serialization can be solved via converting to/from string
 
   std::uniform_real_distribution<double> distro_{};
 
@@ -188,7 +188,11 @@ private:
 
     const double liouvillianSuggestedDtTry=dpLimit_/totalRate;
 
-    if (totalRate*dtTry>dpLimit_) res=logger_.overshot(totalRate*dtTry,dtTry,liouvillianSuggestedDtTry);
+    if (double dp=totalRate*dtTry; dp>dpLimit_) {
+      auto& l=log_["dpLimit overshot"];
+      l["nOvershot"]+=1; l["dpMaxOvershoot"]=std::max(double(l["dpMaxOvershoot"]),dp);
+      res={{"dpLimit overshot",dp},{"timestep decreased",{{"from",dtTry},{"to",liouvillianSuggestedDtTry}}}};
+    }
 
     // dtTry-adjustment for next step:
     oe.dtTry = std::min(oe.dtTry,liouvillianSuggestedDtTry) ;
