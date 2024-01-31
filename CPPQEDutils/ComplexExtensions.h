@@ -4,17 +4,8 @@
 
 #include <boost/serialization/complex.hpp>
 
-#include <json.hpp>
-
 #include <complex>
 
-
-namespace cppqedutils {
-
-using LogTree = nlohmann::json ;
-using json = nlohmann::json ;
-
-} // cppqedutils
 
 /// Double-precision complex number
 /** Even though it is a type, we name it this way because we would like it to closely resemble built-in types */
@@ -42,10 +33,10 @@ double relativeDeviation(const auto& a, const auto& b) {return std::abs(a-b)/(st
 inline double sqrAbs(dcomp v) {return sqr(std::abs(v));}
 
 
-namespace std {
-
-inline void to_json( ::cppqedutils::json& jv, const complex<double>& dc ) { jv = ::cppqedutils::json{dc.real(),dc.imag()}; }
-
-inline void from_json( const ::cppqedutils::json& jv, complex<double>& dc ) { dc.real(jv[0]); dc.imag(jv[1]); }
-
-}
+// namespace std {
+//
+// inline void to_json( ::cppqedutils::json& jv, const complex<double>& dc ) { jv = ::cppqedutils::json{dc.real(),dc.imag()}; }
+//
+// inline void from_json( const ::cppqedutils::json& jv, complex<double>& dc ) { dc.real(jv[0]); dc.imag(jv[1]); }
+//
+// }

@@ -33,10 +33,10 @@ concept adaptive_steppable = adaptive_time_keeper<T> && requires (T&& t, double 
 /// advances for exactly time `deltaT`
 LogTree advance(adaptive_steppable auto& traj, double deltaT)
 {
-  LogTree res;
+  json::array res;
   double endTime=getTime(traj)+deltaT;
   // TODO: what is an idiomatic way to do this? (Check for null value before adding.)
-  while (double dt=endTime-getTime(traj)) if (LogTree logFromStep=step(traj,dt); !empty(logFromStep) ) res.push_back(logFromStep) ;
+  while (double dt=endTime-getTime(traj)) res.push_back(step(traj,dt)) ;
   return {{"advance",res}};
 }
 
@@ -450,7 +450,7 @@ run(TRAJ&& traj, ///< the trajectory to run
           if constexpr (RLT==RunLengthType::T_MODE) lt=advance(traj,std::min(streamFreq,length-getTime(traj)));
           else lt=advance(traj,streamFreq);
         }
-        if (streamSwitch[2] && !lt.is_null()) logStream<<lt.dump(ppindent)<<endl;
+        if (streamSwitch[2] && size(lt)) logStream<<serialize(lt)<<endl;
         stateSaved=tdpStreamed=false;
       }
 

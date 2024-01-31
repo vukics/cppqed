@@ -4,9 +4,20 @@
 #include "ComplexExtensions.h"
 
 #include <boost/hana.hpp>
+#include <boost/json.hpp>
 
 #include <iostream>
+#include <numeric>
 #include <type_traits>
+
+
+namespace cppqedutils {
+
+namespace json = boost::json ;
+using LogTree = json::object ;
+
+
+} // cppqedutils
 
 
 namespace hana=boost::hana;
@@ -124,30 +135,6 @@ struct multilambda : L... {
 
 } // cppqedutils
 
-
-namespace boost::serialization {
-
-
-template <class Archive>
-void serialize(Archive & ar, ::cppqedutils::LogTree& o, unsigned int version)
-{
-  split_free(ar, o, version);
-}
-
-
-template<class Archive>
-void save(Archive& ar, const ::cppqedutils::LogTree& l, unsigned int) {
-  ar & l.dump() ;
-}
-
-template<class Archive>
-void load(Archive& ar, ::cppqedutils::LogTree& l, unsigned int) {
-  std::string s;
-  ar & s ;
-  l=::cppqedutils::json::parse(s);
-}
-
-} // boost::serialization
 
 
 /// cf. [this discussion](https://github.com/boostorg/hana/issues/317)
