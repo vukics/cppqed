@@ -35,7 +35,6 @@ LogTree advance(adaptive_steppable auto& traj, double deltaT)
 {
   json::array res;
   double endTime=getTime(traj)+deltaT;
-  // TODO: what is an idiomatic way to do this? (Check for null value before adding.)
   while (double dt=endTime-getTime(traj)) res.push_back(step(traj,dt)) ;
   return {{"advance",res}};
 }
@@ -359,8 +358,6 @@ run(TRAJ&& traj, ///< the trajectory to run
     observer<TRAJ> auto&& observer,
     const TDS& tds = dataStreamerDefault)
 {
-  static constexpr size_t ppindent = 2; // json pretty-print indent
-
   auto streamWrapper=[&] (std::ostream& os) {return tds(traj,os<<getTime(traj)<<" "<<getDtDid(traj)<<"\t");};
 
   using namespace std;
@@ -418,7 +415,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   if (streamSwitch[0]) {
     if (!continuing) {
       if (parsedCommandLine!="") logStream<<parsedCommandLine<<endl<<endl;
-      logStream<<versionHelper()<<logIntro(traj).dump(ppindent)<<endl<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<dataStreamKey(traj).dump(ppindent)
+      logStream<<versionHelper()<<endl<<logIntro(traj)<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<dataStreamKey(traj)
         <<endl<<endl<<"Run Trajectory up to time "<<timeToReach
         <<" -- Stream period: "<<streamFreq<< (SFT==StreamFreqType::DT_MODE ? "" : " timestep") <<endl<<endl;
     }
@@ -450,7 +447,7 @@ run(TRAJ&& traj, ///< the trajectory to run
           if constexpr (RLT==RunLengthType::T_MODE) lt=advance(traj,std::min(streamFreq,length-getTime(traj)));
           else lt=advance(traj,streamFreq);
         }
-        if (streamSwitch[2] && size(lt)) logStream<<serialize(lt)<<endl;
+        if (streamSwitch[2] && size(lt)) logStream<<lt<<endl;
         stateSaved=tdpStreamed=false;
       }
 
@@ -487,7 +484,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   // Logging on end, saving trajectory state
   //////////////////////////////////////////
   
-  if (streamSwitch[1]) logStream<<"OUTRO: "<<logOutro(traj).dump()<<endl;
+  if (streamSwitch[1]) logStream<<"OUTRO: "<<logOutro(traj)<<endl;
   if (!stateSaved) writeViaSStream(traj,ofs);
   
   return res;

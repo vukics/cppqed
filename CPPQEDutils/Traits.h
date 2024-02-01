@@ -16,6 +16,7 @@ namespace cppqedutils {
 namespace json = boost::json ;
 using LogTree = json::object ;
 
+std::string toStringJSON(auto&& v) {return json::serialize( json::value_from( std::forward<decltype(v)>(v) ) ) ;}
 
 } // cppqedutils
 
@@ -135,6 +136,30 @@ struct multilambda : L... {
 
 } // cppqedutils
 
+
+namespace boost::serialization {
+
+
+template <class Archive>
+void serialize(Archive & ar, ::cppqedutils::LogTree& o, unsigned int version)
+{
+  split_free(ar, o, version);
+}
+
+
+template<class Archive>
+void save(Archive& ar, const ::cppqedutils::LogTree& l, unsigned int) {
+  ar & serialize(l) ;
+}
+
+template<class Archive>
+void load(Archive& ar, ::cppqedutils::LogTree& l, unsigned int) {
+  std::string s;
+  ar & s ;
+  l=::cppqedutils::json::parse(s).as_object();
+}
+
+} // boost::serialization
 
 
 /// cf. [this discussion](https://github.com/boostorg/hana/issues/317)
