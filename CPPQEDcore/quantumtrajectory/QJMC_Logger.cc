@@ -15,7 +15,7 @@ using cppqedutils::LogTree;
 
 quantumtrajectory::qjmc::Logger::Logger(size_t nLindblads) : nLindblads_(nLindblads) {}
 
-
+/*
 LogTree quantumtrajectory::qjmc::Logger::outro() const
 {
   return {
@@ -50,7 +50,7 @@ LogTree quantumtrajectory::qjmc::Logger::jumpOccured(double t, size_t lindbladNo
   traj_.push_back({t,lindbladNo});
   return {{"no.",lindbladNo},{"at time",t}};
 }
-
+*/
 
 /*
 ostream& quantumtrajectory::qjmc::EnsembleLogger::stream(ostream& os, const LoggerList& loggerList, size_t nBins, size_t nJumpsPerBin)

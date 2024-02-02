@@ -4,6 +4,7 @@
 #include "StateVector.h"
 
 #include <bitset>
+#include <map>
 
 
 /// Comprises modules representing operators of special structure (multidiagonal, sparse) over Hilbert spaces of arbitrary arity
@@ -222,9 +223,10 @@ struct MultiDiagonal
     return res;
   }
 
-  friend void to_json( json& jv, const MultiDiagonal& md )
+  /// JSONize
+  friend void tag_invoke( const json::value_from_tag&, json::value& jv, const MultiDiagonal& md )
   {
-    for (const auto& d : md.diagonals) jv.emplace(d.first.to_string(),d.second);
+    for (const auto& d : md.diagonals) jv.as_object().emplace( d.first.to_string(), json::value_from(d.second) );
   }
 
 };
