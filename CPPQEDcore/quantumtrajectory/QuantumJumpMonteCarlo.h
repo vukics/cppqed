@@ -11,22 +11,17 @@ namespace quantumtrajectory {
 /// Auxiliary tools to QuantumJumpMonteCarlo  
 namespace qjmc {
 
-
 /// Aggregate of parameters of QuantumJumpMonteCarlo
 template<typename RandomEngine>
-struct Pars : public trajectory::ParsStochastic<RandomEngine> {
-  
-  double dpLimit; ///< the parameter \f$\Delta p\f$
-
+struct ParsBase : public trajectory::ParsStochastic<RandomEngine> {
   size_t
     nBins, ///< governs how many bins should be used for the histogram of jumps created by qjmc::EnsembleLogger::stream (a zero value means a heuristic automatic determination)
     nJumpsPerBin; ///< the average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination
 
-  Pars(popl::OptionParser& op) : trajectory::ParsStochastic<RandomEngine>{op}
+  ParsBase(popl::OptionParser& op) : trajectory::ParsStochastic<RandomEngine>{op}
   {
     using ::parameters::_;
     add(op,"QuantumJumpMonteCarlo",
-      _("dpLimit","QJMC stepper total jump probability limit",0.01,dpLimit),
       _("nBins","number of bins used for a histogram of jumps",0,nBins),
       _("nJumpsPerBin","average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",50,nJumpsPerBin)
     );
@@ -35,13 +30,39 @@ struct Pars : public trajectory::ParsStochastic<RandomEngine> {
 };
 
 
+template<typename RandomEngine>
+struct Pars : public ParsBase<RandomEngine> {
+  double dpLimit; ///< the parameter \f$\Delta p\f$
+  Pars(popl::OptionParser& op) : ParsBase<RandomEngine>{op} {add(op,::parameters::_("dpLimit","QJMC stepper total jump probability limit",0.01,dpLimit));}
+};
+
+
+template<typename RandomEngine>
+struct Pars2 : public ParsBase<RandomEngine> {
+
+  double normTol;
+
+  Pars2(popl::OptionParser& op) : ParsBase<RandomEngine>{op}
+  {
+    using ::parameters::_;
+    add(op,
+      _("normTol","QJMC stepper total jump probability limit",1e-6/*0.001*/,normTol)
+    );
+  }
+
+};
+
+
 LogTree defaultLogger()
 {
-  return {{"Total number of MCWF steps",0uz},{"dpLimit overshot",{{"n",0uz},{"max.",0.}}},{"Jump trajectory",json::array{}}};
+  return {{"Total number of MCWF steps",0uz},{"Jump trajectory",json::array{}}};
 }
+
 
 } // qjmc
 
+
+using Rates = std::vector<double>;
 
 
 /// Implements a single Quantum-Jump Monte Carlo trajectory
@@ -54,22 +75,16 @@ template<
   quantum_system_dynamics<RANK> QSD,
   ode::engine<StorageType> OE,
   std::uniform_random_bit_generator RandomEngine >
-struct QuantumJumpMonteCarlo
+struct QuantumJumpMonteCarloBase
 {
   using EnsembleAverageElement = const StateVector<RANK>&;
   using EnsembleAverageResult = DensityOperator<RANK>;
 
-  using Rates = std::vector<double>;
-  
-  QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default;
+  QuantumJumpMonteCarloBase(QuantumJumpMonteCarloBase&&) = default;
 
-  QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
-  : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re}, dpLimit_{dpLimit},
-    log_{qjmc::defaultLogger()}
-  {
-    if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
-        !time && size(li) ) manageTimeStep( calculateRates(li) );
-  }
+  QuantumJumpMonteCarloBase(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re)
+  : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re},
+    log_{qjmc::defaultLogger()} {}
 
   double time=0., time0=0.;
   QSD qsd;
@@ -77,17 +92,81 @@ struct QuantumJumpMonteCarlo
   OE oe;
   randomutils::EngineWithParameters<RandomEngine> re;
 
-  friend double getDtDid(const QuantumJumpMonteCarlo& q) {return getDtDid(q.oe);}
+  friend double getDtDid(const QuantumJumpMonteCarloBase& q) {return getDtDid(q.oe);}
 
-  friend double getTime(const QuantumJumpMonteCarlo& q) {return q.time;}
+  friend double getTime(const QuantumJumpMonteCarloBase& q) {return q.time;}
 
   /// TODO: put here the system-specific things
-  friend LogTree logIntro(const QuantumJumpMonteCarlo& q)
+  friend LogTree logIntro(const QuantumJumpMonteCarloBase& q)
   {
     return {{"Quantum-Jump Monte Carlo",{{"QJMC algorithm","stepwise"},{"odeEngine",logIntro(q.oe)},{"randomEngine",logIntro(q.re)},{"System","TAKE FROM SYSTEM"}}}};
   }
 
-  friend LogTree logOutro(const QuantumJumpMonteCarlo& q) {return {{"QJMC",q.log_},{"ODE_Engine",logOutro(q.oe)}};}
+  friend LogTree logOutro(const QuantumJumpMonteCarloBase& q) {return {{"QJMC",q.log_},{"ODE_Engine",logOutro(q.oe)}};}
+
+  // CAREFUL!!! in QuantumJumpMonteCarlo2, tdp should be normalized, since the state vector is not!
+  friend LogTree dataStreamKey(const QuantumJumpMonteCarloBase& q) {return {{"QuantumJumpMonteCarloBase","TAKE FROM SYSTEM"}};}
+
+  friend auto temporalDataPoint(const QuantumJumpMonteCarloBase& q)
+  {
+    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
+  }
+
+  friend iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarloBase& q, iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized
+
+  /** 
+   * structure of QuantumJumpMonteCarlo archives:
+   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
+   * (state should precede time in order to be compatible with array-only archives)
+   */
+  template <typename Archive>
+  friend auto& stateIO(QuantumJumpMonteCarloBase& q, Archive& ar)
+  {
+    stateIO(q.oe, ar & q.psi & q.time) & q.re.engine & q.log_;
+    q.time0=q.time;
+    return ar;
+  }
+  
+  auto calculateRates(const Liouvillian<RANK> & li) const
+  {
+    Rates res(std::size(li));
+    std::ranges::transform(li, res.begin(), [&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } );
+    return res;
+    // TODO: with std::ranges::to the following beautiful solution will be possible:
+    // return li | std::views::transform([&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } ) | std::ranges::to<Rates>() ;
+
+  }
+
+  double sampleRandom() {return distro_(re.engine);}
+
+  friend const StateVector<RANK>& averaged(const QuantumJumpMonteCarloBase& q) {return q.psi;}
+
+protected:
+  mutable LogTree log_; // serialization can be solved via converting to/from string
+
+  std::uniform_real_distribution<double> distro_{};
+
+};
+
+
+
+template<
+  size_t RANK,
+  quantum_system_dynamics<RANK> QSD,
+  ode::engine<StorageType> OE,
+  std::uniform_random_bit_generator RandomEngine >
+struct QuantumJumpMonteCarlo : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>
+{
+  QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default;
+
+  QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
+    : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
+      dpLimit_{dpLimit}
+  {
+    if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
+        !time && size(li) ) manageTimeStep( this->calculateRates(li) );
+    this->log_["dpLimit overshot"]={{"n",0uz},{"max.",0.}};
+  }
 
   /// TODO: the returned log should contain information about the coherent step + the time step change as well
   friend auto step(QuantumJumpMonteCarlo& q, double deltaT)
@@ -142,71 +221,32 @@ struct QuantumJumpMonteCarlo
 
   }
 
-  friend LogTree dataStreamKey(const QuantumJumpMonteCarlo& q) {return {{"QuantumJumpMonteCarlo","TAKE FROM SYSTEM"}};}
-
-  friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
-  {
-    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
-  }
-
-  friend iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarlo& q, iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized
-
-  /** 
-   * structure of QuantumJumpMonteCarlo archives:
-   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
-   * (state should precede time in order to be compatible with array-only archives)
-   */
-  template <typename Archive>
-  friend auto& stateIO(QuantumJumpMonteCarlo& q, Archive& ar)
-  {
-    stateIO(q.oe, ar & q.psi & q.time) & q.re.engine & q.log_;
-    q.time0=q.time;
-    return ar;
-  }
-  
-  auto calculateRates(const Liouvillian<RANK> & li) const
-  {
-    Rates res(std::size(li));
-    std::ranges::transform(li, res.begin(), [&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } );
-    return res;
-    // TODO: with std::ranges::to the following beautiful solution will be possible:
-    // return li | std::views::transform([&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } ) | std::ranges::to<Rates>() ;
-
-  }
-
-  double sampleRandom() {return distro_(re.engine);}
-
-  friend const StateVector<RANK>& averaged(const QuantumJumpMonteCarlo& q) {return q.psi;}
 
 private:
   const double dpLimit_;
-  mutable LogTree log_; // serialization can be solved via converting to/from string
-
-  std::uniform_real_distribution<double> distro_{};
 
   auto manageTimeStep(const Rates& rates)
   {
     LogTree res;
 
     const double totalRate=std::accumulate(rates.begin(),rates.end(),0.);
-    const double dtDid=getDtDid(*this), dtTry=oe.dtTry;
+    const double dtDid=getDtDid(*this), dtTry=this->oe.dtTry;
 
     const double liouvillianSuggestedDtTry=dpLimit_/totalRate;
 
     if (double dp=totalRate*dtTry; dp>dpLimit_) {
-      auto& l=log_["dpLimit overshot"].as_object();
+      auto& l=this->log_["dpLimit overshot"].as_object();
       l["n"].as_uint64()+=1; l["max."].as_double()=std::max(l["max."].as_double(),dp);
       res={{"dpLimit overshot",dp},{"timestep decreased",{{"from",dtTry},{"to",liouvillianSuggestedDtTry}}}};
     }
 
     // dtTry-adjustment for next step:
-    oe.dtTry = std::min(oe.dtTry,liouvillianSuggestedDtTry) ;
+    this->oe.dtTry = std::min(this->oe.dtTry,liouvillianSuggestedDtTry) ;
 
     return res;
   }
 
 };
-
 
 template<typename QSD, typename SV, typename OE, typename RandomEngineWithParameters>
 QuantumJumpMonteCarlo(QSD , SV , OE , RandomEngineWithParameters , double )
@@ -333,4 +373,86 @@ struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtr
 //   return os;
 //
 // }
+
+
+namespace quantumtrajectory::qjmc {
+
+
+struct EnsembleLogger
+{
+  typedef std::list<LogTree> LoggerList;
+
+  /// Called by Ensemble<QuantumJumpMonteCarlo>::logOnEnd, it calculates a temporal histogram of total jumps
+  /** \todo The different kinds of jumps should be collected into different histograms */
+  static std::ostream& stream(std::ostream&, const LoggerList&, size_t nBins, size_t nJumpsPerBin);
+
+  template <typename SingleTrajectory>
+  auto& operator()(const std::vector<SingleTrajectory>& trajs, std::ostream& os) const
+  {
+    LoggerList loggerList;
+    for (auto& traj : trajs) loggerList.push_back(traj.getLogger());
+
+    return stream(os,loggerList,nBins_,nJumpsPerBin_);
+  }
+
+  const size_t nBins_, nJumpsPerBin_;
+
+};
+
+
+} // quantumtrajectory::qjmc
+
+
+/*
+
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/density.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+
+ostream& quantumtrajectory::qjmc::EnsembleLogger::stream(ostream& os, const LoggerList& loggerList, size_t nBins, size_t nJumpsPerBin)
+{
+  using namespace boost;
+
+#define AVERAGE_function(f) accumulate(loggerList.begin(),loggerList.end(), 0., [] (double init, const Logger& l) {return init + l.f;})/loggerList.size()
+#define MAX_function(f) ranges::max_element(loggerList, [] (const Logger& a, const Logger& b) {return a.f<b.f;})->f
+
+  os<<"\nAverage number of total steps: "<<AVERAGE_function(nMCWF_steps_)<<endl
+    <<"\nOn average, dpLimit overshot: "<<AVERAGE_function(nOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpMaxOvershoot_)
+    <<"\nOn average, dpTolerance overshot: "<<AVERAGE_function(nToleranceOvershot_)<<" times, maximal overshoot: "<<MAX_function(dpToleranceMaxOvershoot_)<<endl
+    <<"\nMaximal deviation of norm from 1: "<<MAX_function(normMaxDeviation_)<<endl;
+// NEEDS_WORK: this was before factoring out logging to Evolved/Adaptive, so it could be restored on some more fundamental level:  if (loggerList.front().isHamiltonian_)
+//    os<<"\nAverage number of failed ODE steps: "<<AVERAGE_function(nFailedSteps_)<<"\nAverage number of Hamiltonian calls:"<<AVERAGE_function(nHamiltonianCalls_)<<endl;
+
+#undef  MAX_function
+#undef  AVERAGE_function
+
+  using namespace accumulators;
+
+  size_t nTotalJumps=accumulate(loggerList.begin(), loggerList.end(), 0, [] (double init, const Logger& l) {return init + l.traj_.size();});
+
+  // Heuristic: if nBins is not given (0), then the number of bins is determined such that the bins contain nJumpsPerBin samples on average
+  if (!nBins && nTotalJumps<2*nJumpsPerBin) {
+    os<<"\nToo few jumps for a histogram\n";
+  }
+  else {
+    size_t actualNumberOfBins=nBins ? nBins : nTotalJumps/nJumpsPerBin;
+    accumulator_set<double, features<tag::density> > acc( tag::density::num_bins = actualNumberOfBins , tag::density::cache_size = nTotalJumps );
+
+    // fill accumulator
+    for (auto i : loggerList) for (auto j : i.traj_) acc(j.first);
+
+    const iterator_range<std::vector<std::pair<double, double> >::iterator> histogram=density(acc);
+
+    os<<"\nHistogram of jumps. Number of bins="<<actualNumberOfBins+2<<endl;
+    for (auto i : histogram)
+      os<<i.first<<"\t"<<i.second<<endl;
+  }
+
+  os<<"\nAverage number of total jumps: "<<nTotalJumps/double(loggerList.size())<<endl;
+
+  return os;
+}
+
+*/
+
 

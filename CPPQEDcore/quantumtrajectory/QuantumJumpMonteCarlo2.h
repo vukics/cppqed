@@ -8,36 +8,6 @@
 
 namespace quantumtrajectory {
 
-/// Auxiliary tools to QuantumJumpMonteCarlo2
-namespace qjmc {
-
-
-/// Aggregate of parameters of QuantumJumpMonteCarlo2
-template<typename RandomEngine>
-struct Pars : public trajectory::ParsStochastic<RandomEngine> {
-  
-  double normTol; ///< the parameter \f$\Delta p\f$
-
-  size_t
-    nBins, ///< governs how many bins should be used for the histogram of jumps created by qjmc::EnsembleLogger::stream (a zero value means a heuristic automatic determination)
-    nJumpsPerBin; ///< the average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination
-
-  Pars(popl::OptionParser& op) : trajectory::ParsStochastic<RandomEngine>{op}
-  {
-    using ::parameters::_;
-    add(op,"QuantumJumpMonteCarlo22",
-      _("normTol","QJMC stepper total jump probability limit",1e-6/*0.001*/,normTol),
-      _("nBins","number of bins used for a histogram of jumps",0,nBins),
-      _("nJumpsPerBin","average number of jumps per bin in the histogram of jumps for the case of heuristic bin-number determination",50,nJumpsPerBin)
-    );
-  }
-
-};
-
-
-} // qjmc
-
-
 
 /// Implements a single Quantum-Jump Monte Carlo trajectory
 /**
@@ -49,41 +19,20 @@ template<
   quantum_system_dynamics<RANK> QSD,
   ode::engine<StorageType> OE,
   std::uniform_random_bit_generator RandomEngine >
-struct QuantumJumpMonteCarlo2
+struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>
 {
-  using EnsembleAverageElement = const StateVector<RANK>&;
-  using EnsembleAverageResult = DensityOperator<RANK>;
-
-  using Rates = std::vector<double>;
-  
   QuantumJumpMonteCarlo2(QuantumJumpMonteCarlo2&&) = default;
 
   QuantumJumpMonteCarlo2(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double normTol)
-  : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re}, normTol_{normTol},
-    logger_{std::size(getLi(this->qsd))}, normAt_{0.1/*sampleRandom()*/}
-  {}
-
-  double time=0., time0=0.;
-  QSD qsd;
-  StateVector<RANK> psi;
-  OE oe;
-  randomutils::EngineWithParameters<RandomEngine> re;
-
-  friend double getDtDid(const QuantumJumpMonteCarlo2& q) {return getDtDid(q.oe);}
-
-  friend double getTime(const QuantumJumpMonteCarlo2& q) {return q.time;}
-
-  /// TODO: put here the system-specific things
-  friend LogTree logIntro(const QuantumJumpMonteCarlo2& q)
+  : QuantumJumpMonteCarloBase{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
+    normTol_{normTol}, normAt_{sampleRandom()}
   {
-    return {{"Quantum-Jump Monte Carlo",{{"QJMC algorithm","stepwise"},{"odeEngine",logIntro(q.oe)},{"randomEngine",logIntro(q.re)},{"System","TAKE FROM SYSTEM"}}}};
+    log_
   }
 
-  friend LogTree logOutro(const QuantumJumpMonteCarlo2& q) {return {{"QJMC",q.logger_.outro()},{"ODE_Engine",logOutro(q.oe)}};}
 
   friend double evolveNorm(QuantumJumpMonteCarlo2& q, double deltaT)
   {
-
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
     {
@@ -157,49 +106,16 @@ struct QuantumJumpMonteCarlo2
   }
 
 
-  friend LogTree dataStreamKey(const QuantumJumpMonteCarlo2& q) {return {{"QuantumJumpMonteCarlo2","TAKE FROM SYSTEM"}};}
-
-  friend auto temporalDataPoint(const QuantumJumpMonteCarlo2& q)
-  {
-    // CAREFUL!!! tdp should be normalized, since the state vector is not!
-    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
-  }
-
-  friend iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarlo2& q, iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized
-
-  /** 
-   * structure of QuantumJumpMonteCarlo2 archives:
-   * metaData – array – time – ( odeStepper – odeLogger – dtDid – dtTry ) – randomEngine – logger
-   * (state should precede time in order to be compatible with array-only archives)
-   */
   template <typename Archive>
   friend auto& stateIO(QuantumJumpMonteCarlo2& q, Archive& ar)
   {
-    stateIO(q.oe, ar & q.psi & q.time) & q.re.engine & q.logger_;
-    q.time0=q.time;
-    return ar;
+    return stateIO_base(q,ar) & q.normAt_;
   }
   
-  auto calculateRates(const Liouvillian<RANK> & li) const
-  {
-    Rates res(std::size(li));
-    std::ranges::transform(li, res.begin(), [&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } );
-    return res;
-    // TODO: with std::ranges::to the following beautiful solution will be possible:
-    // return li | std::views::transform([&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } ) | std::ranges::to<Rates>() ;
-
-  }
-
-  double sampleRandom() {return distro_(re.engine);}
-
-  friend const StateVector<RANK>& averaged(const QuantumJumpMonteCarlo2& q) {return q.psi;}
 
 private:
   const double normTol_;
   double normAt_;
-  mutable LogTree log_;
-
-  std::uniform_real_distribution<double> distro_{};
 
 };
 
