@@ -18,7 +18,7 @@ concept ode_time_dependent_derivative = requires(const H& h, double t, StateIn p
 
 namespace hamiltonian_ns {
 
-static const struct NoOp {LogTree label{"noOp"};} noOp;
+static const struct NoOp {/*LogTree label{"noOp"};*/} noOp;
 
 template <typename H, size_t RANK>
 concept time_independent_functional = ode_time_independent_derivative<H,StateVectorConstView<RANK>,StateVectorView<RANK>>;
@@ -101,12 +101,13 @@ struct HamiltonianCollection
     hana::for_each(collection, [&] (const auto& h) {applyHamiltonian(h,t,psi,dpsidt,t0);});
   }
 
+  /*
   friend LogTree label(const HamiltonianCollection& hc) {
     LogTree res;
     hana::for_each(hc.collection,[&] (const auto& h) {res.push_back(getLabel(h));});
     return res;
   }
-
+  */
 };
 
 

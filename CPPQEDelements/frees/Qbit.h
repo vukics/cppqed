@@ -21,9 +21,9 @@ auto fullH(dcomp z, dcomp eta) { return [diag=diagonalH(z),offDiag=offDiagonalH(
   diag(psi,dpsidt); offDiag(psi,dpsidt);
 };}
 
-::cppqedutils::LogTree label(decltype(diagonalH(dcomp{}))) { return {"diagonalH"}; }
-::cppqedutils::LogTree label(decltype(offDiagonalH(dcomp{}))) { return {"offDiagonalH"}; }
-::cppqedutils::LogTree label(decltype(fullH(dcomp{},dcomp{}))) { return {"fullH"}; }
+// ::cppqedutils::LogTree label(decltype(diagonalH(dcomp{}))) { return {"diagonalH"}; }
+// ::cppqedutils::LogTree label(decltype(offDiagonalH(dcomp{}))) { return {"offDiagonalH"}; }
+// ::cppqedutils::LogTree label(decltype(fullH(dcomp{},dcomp{}))) { return {"fullH"}; }
 
 
 UnaryDiagonalPropagator<> propagator(dcomp z);
@@ -47,7 +47,7 @@ Lindblad<1> gain(double gamma_p) {return {"gain", sigmaPlusJump(gamma_p), sigmaP
 
 static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho) { return hana::make_tuple(_(rho,0),_(rho,0,1)); };
 
-::cppqedutils::LogTree label(decltype(expectationValues)) { return {"population ground","polarization"}; }
+::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Qbit",json::array{"population ground","polarization"}}}; }
 
 
 StateVector<1> state0();// {return mode::fock(0,2);}

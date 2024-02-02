@@ -35,6 +35,11 @@ struct Pars : public trajectory::ParsStochastic<RandomEngine> {
 };
 
 
+LogTree defaultLogger()
+{
+  return {{"Total number of MCWF steps",0uz},{"dpLimit overshot",{{"n",0uz},{"max.",0.}}},{"Jump trajectory",json::array{}}};
+}
+
 } // qjmc
 
 
@@ -60,7 +65,7 @@ struct QuantumJumpMonteCarlo
 
   QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
   : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re}, dpLimit_{dpLimit},
-    log_{{"Total number of MCWF steps",0uz},{"dpLimit overshot",{{"nOvershot",0uz},{"maximal overshoot",0.}}},{"Jump trajectory",{}}}
+    log_{qjmc::defaultLogger()}
   {
     if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
         !time && size(li) ) manageTimeStep( calculateRates(li) );
@@ -126,12 +131,12 @@ struct QuantumJumpMonteCarlo
         for (dcomp& v : q.psi.dataStorage()) v/=normFactor;
 
         res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",q.time}});
-        q.log_["Jump trajectory"].push_back({q.time,lindbladNo});
+        q.log_["Jump trajectory"].as_array().push_back({q.time,lindbladNo});
       }
 
     }
 
-    q.log_["Total number of MCWF steps"]+=1;
+    q.log_["Total number of MCWF steps"].as_uint64()+=1;
 
     return res;
 
@@ -189,8 +194,8 @@ private:
     const double liouvillianSuggestedDtTry=dpLimit_/totalRate;
 
     if (double dp=totalRate*dtTry; dp>dpLimit_) {
-      auto& l=log_["dpLimit overshot"];
-      l["nOvershot"]+=1; l["dpMaxOvershoot"]=std::max(double(l["dpMaxOvershoot"]),dp);
+      auto& l=log_["dpLimit overshot"].as_object();
+      l["n"].as_uint64()+=1; l["max."].as_double()=std::max(l["max."].as_double(),dp);
       res={{"dpLimit overshot",dp},{"timestep decreased",{{"from",dtTry},{"to",liouvillianSuggestedDtTry}}}};
     }
 
