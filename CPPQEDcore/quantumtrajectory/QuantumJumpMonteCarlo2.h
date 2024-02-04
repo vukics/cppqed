@@ -81,7 +81,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
       auto rates(this->calculateRates(li));
 
       // perform jump
-      double random=this->sampleRandom()/getDtDid(this->oe);
+      double random=this->sampleRandom() ;
 
       size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
 
