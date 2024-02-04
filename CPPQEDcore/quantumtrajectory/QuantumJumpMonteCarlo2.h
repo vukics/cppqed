@@ -198,7 +198,7 @@ struct QuantumJumpMonteCarlo2
 private:
   const double normTol_;
   double normAt_;
-  mutable LogTree log_;
+  mutable qjmc::Logger logger_;
 
   std::uniform_real_distribution<double> distro_{};
 
