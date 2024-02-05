@@ -316,19 +316,6 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
 }
 
 
-inline std::ostream& stream(double tdp, std::ostream& os) {return os<<tdp;}
-inline std::ostream& stream(dcomp  tdp, std::ostream& os) {return os<<tdp;}
-
-inline std::ostream& stream(hana::tuple<> tdp, std::ostream& os) {return os;}
-
-std::ostream& stream(const temporal_data_point auto& tdp, std::ostream& os)
-{
-  size_t n{0};
-  hana::for_each( tdp, [&] (const auto& v) { stream(v,os) << (++n != hana::size(tdp) ? "\t" : "") ; } );
-  return os;
-}
-
-
 template <typename T, typename TRAJ>
 concept data_streamer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj, std::ostream& os) {
   { t(traj,os) } -> std::convertible_to<decltype(temporalDataPoint(traj))> ;
@@ -337,7 +324,7 @@ concept data_streamer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj,
 
 const auto dataStreamerDefault = [] (const uniform_step auto& traj, std::ostream& os) {
   auto tdp{temporalDataPoint(traj)};
-  stream(tdp, os)<<std::endl; // Note: endl flushes the buffer
+  streamTDP(tdp, os)<<std::endl; // Note: endl flushes the buffer
   return tdp;
 };
 

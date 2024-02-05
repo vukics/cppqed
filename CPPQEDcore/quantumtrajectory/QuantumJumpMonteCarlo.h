@@ -104,13 +104,7 @@ struct QuantumJumpMonteCarloBase
 
   friend LogTree logOutro(const QuantumJumpMonteCarloBase& q) {return {{"QJMC",q.log_},{"ODE_Engine",logOutro(q.oe)}};}
 
-  // CAREFUL!!! in QuantumJumpMonteCarlo2, tdp should be normalized, since the state vector is not!
   friend LogTree dataStreamKey(const QuantumJumpMonteCarloBase& q) {return {{"QuantumJumpMonteCarloBase","TAKE FROM SYSTEM"}};}
-
-  friend auto temporalDataPoint(const QuantumJumpMonteCarloBase& q)
-  {
-    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
-  }
 
   friend iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarloBase& q, iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized
 
@@ -221,6 +215,10 @@ struct QuantumJumpMonteCarlo : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngin
 
   }
 
+  friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
+  {
+    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
+  }
 
 private:
   const double dpLimit_;

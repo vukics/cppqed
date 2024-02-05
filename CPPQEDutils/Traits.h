@@ -96,6 +96,26 @@ struct plusTDP
 };
 
 
+inline std::ostream& streamTDP(double tdp, std::ostream& os) {return os<<tdp;}
+inline std::ostream& streamTDP(dcomp  tdp, std::ostream& os) {return os<<tdp;}
+
+inline std::ostream& streamTDP(hana::tuple<> tdp, std::ostream& os) {return os;}
+
+std::ostream& streamTDP(const temporal_data_point auto& tdp, std::ostream& os)
+{
+  size_t n{0};
+  hana::for_each( tdp, [&] (const auto& v) { streamTDP(v,os) << (++n != hana::size(tdp) ? "\t" : "") ; } );
+  return os;
+}
+
+
+inline void renormTDP(double& tdp, double norm) {tdp/=norm;}
+inline void renormTDP(dcomp&  tdp, double norm) {tdp/=norm;}
+
+inline void renormTDP(hana::tuple<>& , double ) {}
+
+void renormTDP(temporal_data_point auto& tdp, double norm) { hana::for_each( tdp, [=] (auto& v) { renormTDP(v,norm) ; } ); }
+
 
 
 template <typename T> concept intro_logger = requires ( const T& t ) {

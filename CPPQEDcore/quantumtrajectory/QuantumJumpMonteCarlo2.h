@@ -54,7 +54,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
 
     if (bisect) std::cout<<"# # bisecting: "<<bisect->first<<" "<<bisect->second<<std::endl;
 
-    if (double norm{evolveNorm(q,deltaT)}; abs(norm-q.normAt_)<q.normTol_) q.performJump();
+    if (double norm{evolveNorm(q,deltaT)}; abs(norm-q.normAt_)<q.normTol_) res=q.performJump();
     else if ( norm < q.normAt_-q.normTol_ ) {
      std::pair newBisect{bisect ? bisect->first : q.time-getDtDid(q), q.time} ;
       step( q, (newBisect.first-newBisect.second)/2. , newBisect );
@@ -70,8 +70,10 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
   }
 
 
-  void performJump()
+  LogTree performJump()
   {
+    LogTree res;
+
     normAt_=this->sampleRandom();
     renorm(this->psi);
 
@@ -96,11 +98,22 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
 
         for (dcomp& v : this->psi.dataStorage()) v/=normFactor;
 
-        // res.emplace("jump",logger_.jumpOccured(time,lindbladNo));
+        res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",this->time}});
+        this->log_["Jump trajectory"].as_array().push_back({this->time,lindbladNo});
       }
 
     }
 
+    return res;
+
+  }
+
+
+  friend auto temporalDataPoint(const QuantumJumpMonteCarlo2& q)
+  {
+    auto res{calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
+    renormTDP(res,norm(q.psi));
+    return res;
   }
 
 
