@@ -76,7 +76,7 @@ constexpr auto postProcessor(decltype(expectationValues) t) {
 }
 */
 
-constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {"photon number","photon number variance","ladder operator"}; }
+constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Mode",{"photon number","photon number variance","ladder operator"}}}; }
 
 
 // static_assert(::structure::expectation_values_ns::labelled_and_with_nonlinear_postprocessing<decltype(expectationValues),1>);

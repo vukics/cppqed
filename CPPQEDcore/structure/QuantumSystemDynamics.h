@@ -65,6 +65,8 @@ concept quantum_system_dynamics = requires (T&& qsd)
  * It’s probably not necessary to have this class at all.
  * Systems like Qubit, Mode could simply define a class for themselves that fulfill the quantum_system_dynamics concept
  * Also, in the concept, the getHa, getLi, getEV functions should be optional
+ *
+ * A JSON snippet could be supplied to express the other (non-frequency) parameters
  */
 template <size_t RANK, hamiltonian<RANK> HA, exact_propagator<RANK> EX, expectation_values<RANK> EV>
 struct QuantumSystemDynamics
@@ -115,7 +117,13 @@ auto expectation_values(const quantum_system_dynamics<1> auto& qsd0, const quant
 } // binary
 
 
-// this class could be derived from QuantumSystemDynamics, with the latter having some kind of base class?
+
+/**
+ * TODO: this class should be templated for the full hamiltonian, propagator, expectation_values types
+ * in that case, the ctor could calculate these functions, and BinarySystem expose them as members, instead of these getter-function craziness
+ * (the quantum_system_dynamics has to be redefined for this)
+ * the maker function / deduction guide can calculate these types rather easily
+ */
 template <
   quantum_system_dynamics<1> QSD0,
   quantum_system_dynamics<1> QSD1,
@@ -214,8 +222,8 @@ public:
 
 
 
-template <typename BS >
-LogTree label( std::invoke_result_t< decltype(BS::getHa), BS > ) {return "BinarySystem";}
+// template <typename BS >
+// LogTree label( std::invoke_result_t< decltype(BS::getHa), BS > ) {return "BinarySystem";}
 
 
 
