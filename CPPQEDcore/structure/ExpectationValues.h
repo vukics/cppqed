@@ -14,7 +14,7 @@ namespace expectation_values_ns {
 
 static const struct NoOp
 {
-  LogTree label{"noOp"};
+  std::string label{"noOp"};
   
   auto operator() (auto) const {return hana::make_tuple();}
 

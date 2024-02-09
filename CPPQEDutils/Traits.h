@@ -4,9 +4,21 @@
 #include "ComplexExtensions.h"
 
 #include <boost/hana.hpp>
+#include <boost/json.hpp>
 
 #include <iostream>
+#include <numeric>
 #include <type_traits>
+
+
+namespace cppqedutils {
+
+namespace json = boost::json ;
+using LogTree = json::object ;
+
+std::string toStringJSON(auto&& v) {return json::serialize( json::value_from( std::forward<decltype(v)>(v) ) ) ;}
+
+} // cppqedutils
 
 
 namespace hana=boost::hana;
@@ -84,6 +96,26 @@ struct plusTDP
 };
 
 
+inline std::ostream& streamTDP(double tdp, std::ostream& os) {return os<<tdp;}
+inline std::ostream& streamTDP(dcomp  tdp, std::ostream& os) {return os<<tdp;}
+
+inline std::ostream& streamTDP(hana::tuple<> tdp, std::ostream& os) {return os;}
+
+std::ostream& streamTDP(const temporal_data_point auto& tdp, std::ostream& os)
+{
+  size_t n{0};
+  hana::for_each( tdp, [&] (const auto& v) { streamTDP(v,os) << (++n != hana::size(tdp) ? "\t" : "") ; } );
+  return os;
+}
+
+
+inline void renormTDP(double& tdp, double norm) {tdp/=norm;}
+inline void renormTDP(dcomp&  tdp, double norm) {tdp/=norm;}
+
+inline void renormTDP(hana::tuple<>& , double ) {}
+
+void renormTDP(temporal_data_point auto& tdp, double norm) { hana::for_each( tdp, [=] (auto& v) { renormTDP(v,norm) ; } ); }
+
 
 
 template <typename T> concept intro_logger = requires ( const T& t ) {
@@ -137,14 +169,14 @@ void serialize(Archive & ar, ::cppqedutils::LogTree& o, unsigned int version)
 
 template<class Archive>
 void save(Archive& ar, const ::cppqedutils::LogTree& l, unsigned int) {
-  ar & l.dump() ;
+  ar & serialize(l) ;
 }
 
 template<class Archive>
 void load(Archive& ar, ::cppqedutils::LogTree& l, unsigned int) {
   std::string s;
   ar & s ;
-  l=::cppqedutils::json::parse(s);
+  l=::cppqedutils::json::parse(s).as_object();
 }
 
 } // boost::serialization

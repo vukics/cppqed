@@ -48,7 +48,7 @@ struct Simulated
 
   friend LogTree step(Simulated& s, double deltaT) {return step(s.ode,deltaT,s.derivs,s.time,s.state);}
 
-  friend LogTree dataStreamKey(const Simulated& s) {return {{"Simulated",s.keyLabels}};}
+  friend LogTree dataStreamKey(const Simulated& s) {return {{"Simulated",json::value_from(s.keyLabels)}};}
 
   friend auto temporalDataPoint(const Simulated& s)
   {

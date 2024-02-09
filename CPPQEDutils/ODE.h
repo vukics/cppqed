@@ -113,36 +113,21 @@ struct SerializeControlledErrorStepper
 };
 
 
-template <typename T>
-concept ode_logger = outro_logger<T> && requires (T&& t, size_t failedStepsLast) { logDerivsCall(t); logStep(t,failedStepsLast); };
-
-struct DefaultLogger { size_t nDerivsCalls=0, nSteps=0, nFailedSteps=0; };
-
-void logDerivsCall(DefaultLogger& dl) {++dl.nDerivsCalls;}
-void logStep(DefaultLogger& dl, size_t failedStepsLast) {++dl.nSteps; dl.nFailedSteps+=failedStepsLast;}
-
-template<typename Archive>
-inline void serialize(Archive & ar, DefaultLogger& dl, const unsigned int /*file_version*/) { ar & dl.nDerivsCalls & dl.nSteps & dl.nFailedSteps; }
-
-LogTree logOutro(const DefaultLogger& dl)
+LogTree defaultLogger()
 {
-  return {{"DefaultLogger", {
-    {"nSteps",dl.nSteps},
-    {"nFailedSteps",dl.nFailedSteps},
-    {"nDerivsCalls",dl.nDerivsCalls}}}};
+  return {{"nSteps",0uz},{"nFailedSteps",0uz},{"nDerivsCalls",0uz}};
 }
 
 
-template <typename CES, 
-//< here we cannot use the above concept, since at this point we don’t know the time, state, and system types – this comes only in the step function
-          ode_logger Logger=DefaultLogger>
+template <typename CES //< here we cannot use the above concept, since at this point we don’t know the time, state, and system types – this comes only in the step function
+         >
 struct Base
 {
   using Time=typename CES::time_type;
   
   Base(Time dtInit, auto&&... args)
     : ces{MakeControlledErrorStepper<CES>::_(std::forward<decltype(args)>(args)...)},
-      dtTry(dtInit) {}
+      dtTry(dtInit), logger{defaultLogger()} {}
 
   template <typename State> requires controlled_stepper<CES,State,Time>
   auto tryStep(system<State,Time> auto sys, Time& time, State&& stateInOut) {return ces.stepper.try_step(sys,stateInOut,time,dtTry);}
@@ -154,16 +139,16 @@ struct Base
   
   Time dtDid=0., dtTry;
   
-  Logger logger;
+  LogTree logger;
   
   friend double getDtDid(const Base& b) {return b.dtDid;}
 
   friend LogTree logIntro(const Base& b)
   {
-    return {{StepperDescriptor<CES>,b.ces.logIntro()}};
+    return {{StepperDescriptor<CES>,b.ces.logIntro()}}; // alternatively: {{"name",StepperDescriptor<CES>},{"parameters",b.ces.logIntro()}}, which provides standard labels
   }
 
-  friend LogTree logOutro(const Base& b) {return logOutro(b.logger);}
+  friend LogTree logOutro(const Base& b) {return b.logger;}
 
   /// The signature is such that it matches the signature of step in trajectories without the trailing parameters
   /**
@@ -186,7 +171,7 @@ struct Base
     for (;
           // wraps the sys functional in order that the number of calls to it can be logged
           b.tryStep( [&] (const auto& y, auto& dydt, double t) {
-            logDerivsCall(b.logger);
+            ++b.logger["nDerivsCalls"].as_uint64();
             return sys(y,dydt,t);
           },time,states...)!=bno::success;
           ++nFailedSteps) ;
@@ -194,7 +179,7 @@ struct Base
     b.dtDid=time-timeBefore;
     if (nextDtTry) b.dtTry=nextDtTry;
 
-    logStep(b.logger,nFailedSteps);
+    ++b.logger["nSteps"].as_uint64(); b.logger["nFailedSteps"].as_uint64()+=nFailedSteps;
 
     return {{"nFailedSteps",nFailedSteps}};
   }

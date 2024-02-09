@@ -158,7 +158,7 @@ template <typename T1, typename T2, size_t RANK>
 void checkExtents(MultiArrayConstView<T1,RANK> m1, MultiArrayConstView<T2,RANK> m2, std::string message)
 {
 #ifndef   NDEBUG
-  if (m1.extents!=m2.extents) throw std::runtime_error("Extent mismatch in "+message+": "+json(m1.extents).dump()+" "+json(m2.extents).dump());
+  if (m1.extents!=m2.extents) throw std::runtime_error("Extent mismatch in "+message+": "+toStringJSON(m1.extents)+" "+toStringJSON(m2.extents));
 #endif // NDEBUG
 }
 
@@ -275,25 +275,21 @@ public:
   const StorageType& dataStorage() const {return data_;}
 
   /// JSONize
-  friend void to_json( json& jv, const MultiArray& ma )
+  friend void tag_invoke( const json::value_from_tag&, json::value& jv, const MultiArray& ma )
   {
-    jv = json{
-      { "extents" , ma.extents },
+    jv = json::object{
+      { "extents" , value_from(ma.extents) },
       //    { "strides" , ma.strides },
-      { "data", ma.data_ }
+      { "data", value_from(ma.data_) }
     };
   }
 
   /// unJSONize
-  friend void from_json( const json& jv, MultiArray& ma )
+  friend MultiArray tag_invoke( const json::value_to_tag< MultiArray >&, const json::value& jv )
   {
-    ma.extents=jv["extents"];
-    StorageType dataTemp=jv["data"];
-#ifndef   NDEBUG
-    if (ma.data_.size() != multiarray::calculateExtent(ma.extents)) throw std::runtime_error("Mismatch in data size and extents parsed from JSON");
-#endif // NDEBUG
-    ma.data_.swap(dataTemp); ma.dataView=std::span<T>(ma.data_);
-    ma.strides=multiarray::calculateStrides(ma.extents);
+    return MultiArray{
+      json::value_to<Extents<RANK>>(jv.as_object().at("extents")),
+      multiarray::copyInit<T>( json::value_to<StorageType>(jv.as_object().at("data") ) ) };
   }
   
 private:

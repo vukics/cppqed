@@ -65,6 +65,8 @@ concept quantum_system_dynamics = requires (T&& qsd)
  * It’s probably not necessary to have this class at all.
  * Systems like Qubit, Mode could simply define a class for themselves that fulfill the quantum_system_dynamics concept
  * Also, in the concept, the getHa, getLi, getEV functions should be optional
+ *
+ * A JSON snippet could be supplied to express the other (non-frequency) parameters
  */
 template <size_t RANK, hamiltonian<RANK> HA, exact_propagator<RANK> EX, expectation_values<RANK> EV>
 struct QuantumSystemDynamics
@@ -220,8 +222,8 @@ public:
 
 
 
-template <typename BS >
-LogTree label( std::invoke_result_t< decltype(BS::getHa), BS > ) {return "BinarySystem";}
+// template <typename BS >
+// LogTree label( std::invoke_result_t< decltype(BS::getHa), BS > ) {return "BinarySystem";}
 
 
 
