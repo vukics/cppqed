@@ -4,7 +4,7 @@
 #include "Qbit.h"
 
 // #include "Master.h"
-#include "QuantumJumpMonteCarlo.h"
+#include "QuantumJumpMonteCarlo2.h"
 
 #include <iostream>
 
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 {
   auto op{optionParser()};
 
-  trajectory::Pars<qjmc::Pars<pcg64>> pt(op);
+  trajectory::Pars<qjmc::Pars2<pcg64>> pt(op);
 
   Pars pq(op);
 
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   // quantumtrajectory::QuantumJumpMonteCarlo traj{qbit,quantumdata::StateVector<1>{{2}},oe,randomutils::EngineWithParameters<pcg64>{1001,1},0.01};
 
   auto traj{// quantumtrajectory::qjmc::makeEnsemble<ODE_EngineBoost>(qbit,quantumdata::StateVector<1>{{2}},pt)};
-    qjmc::make<ODE_EngineBoost>(qbit,quantumdata::StateVector<1>{{2}},pt)};
+    qjmc::make2<ODE_EngineBoost>(qbit,quantumdata::StateVector<1>{{2}},pt)};
 
   run(traj,pt,trajectory::observerNoOp);
 

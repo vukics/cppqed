@@ -56,7 +56,9 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
 
     if (double norm{evolveNorm(q,deltaT)}; abs(norm-q.normAt_)<q.normTol_) res=q.performJump();
     else if ( norm < q.normAt_-q.normTol_ ) {
-     std::pair newBisect{bisect ? bisect->first : q.time-getDtDid(q), q.time} ;
+      std::pair newBisect{bisect ? bisect->first : q.time-getDtDid(q), q.time} ;
+      // TODO: simple binary bisecting is very dumb here, we should use at least a linear interpolation
+      // alternatively, more than two points could be passed on, to use arbitrary nonlinear interpolation
       step( q, (newBisect.first-newBisect.second)/2. , newBisect );
     }
     else if (bisect) {
