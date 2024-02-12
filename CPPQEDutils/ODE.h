@@ -113,9 +113,10 @@ struct SerializeControlledErrorStepper
 };
 
 
+/// \note These cannot be unsigned because after serialization, they will not be parsed as such, so the as_uint64 will throw
 LogTree defaultLogger()
 {
-  return {{"nSteps",0uz},{"nFailedSteps",0uz},{"nDerivsCalls",0uz}};
+  return {{"nSteps",0z},{"nFailedSteps",0z},{"nDerivsCalls",0z}};
 }
 
 
@@ -171,7 +172,7 @@ struct Base
     for (;
           // wraps the sys functional in order that the number of calls to it can be logged
           b.tryStep( [&] (const auto& y, auto& dydt, double t) {
-            ++b.logger["nDerivsCalls"].as_uint64();
+            ++b.logger["nDerivsCalls"].as_int64();
             return sys(y,dydt,t);
           },time,states...)!=bno::success;
           ++nFailedSteps) ;
@@ -179,7 +180,7 @@ struct Base
     b.dtDid=time-timeBefore;
     if (nextDtTry) b.dtTry=nextDtTry;
 
-    ++b.logger["nSteps"].as_uint64(); b.logger["nFailedSteps"].as_uint64()+=nFailedSteps;
+    ++b.logger["nSteps"].as_int64(); b.logger["nFailedSteps"].as_int64()+=nFailedSteps;
 
     return {{"nFailedSteps",nFailedSteps}};
   }
