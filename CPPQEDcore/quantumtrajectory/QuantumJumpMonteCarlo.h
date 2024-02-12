@@ -55,7 +55,7 @@ struct Pars2 : public ParsBase<RandomEngine> {
 
 LogTree defaultLogger()
 {
-  return {{"Total number of MCWF steps",0uz},{"Jump trajectory",json::array{}}};
+  return {{"Total number of MCWF steps",0z},{"Jump trajectory",json::array{}}};
 }
 
 
@@ -159,7 +159,7 @@ struct QuantumJumpMonteCarlo : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngin
   {
     if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
         !time && size(li) ) manageTimeStep( this->calculateRates(li) );
-    this->log_["dpLimit overshot"]={{"n",0uz},{"max.",0.}};
+    this->log_["dpLimit overshot"]={{"n",0z},{"max.",0.}};
   }
 
   /// TODO: the returned log should contain information about the coherent step + the time step change as well
@@ -209,7 +209,7 @@ struct QuantumJumpMonteCarlo : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngin
 
     }
 
-    q.log_["Total number of MCWF steps"].as_uint64()+=1;
+    q.log_["Total number of MCWF steps"].as_int64()+=1;
 
     return res;
 
@@ -234,7 +234,7 @@ private:
 
     if (double dp=totalRate*dtTry; dp>dpLimit_) {
       auto& l=this->log_["dpLimit overshot"].as_object();
-      l["n"].as_uint64()+=1; l["max."].as_double()=std::max(l["max."].as_double(),dp);
+      l["n"].as_int64()+=1; l["max."].as_double()=std::max(l["max."].as_double(),dp);
       res={{"dpLimit overshot",dp},{"timestep decreased",{{"from",dtTry},{"to",liouvillianSuggestedDtTry}}}};
     }
 

@@ -25,7 +25,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
   : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
     normTol_{normTol}, normAt_{this->sampleRandom()}
   {
-    this->log_["bisectMaxIter"]=0uz;
+    this->log_["bisectMaxIter"]=0z;
   }
 
 
@@ -48,7 +48,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
   }
 
 
-  friend LogTree step( QuantumJumpMonteCarlo2& q, double deltaT, std::optional<std::tuple<double,double,size_t>> bisect = std::nullopt)
+  friend LogTree step( QuantumJumpMonteCarlo2& q, double deltaT, std::optional<std::tuple<double,double,long>> bisect = std::nullopt)
   {
     LogTree res;
 
@@ -56,7 +56,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
 
     if (double norm{evolveNorm(q,deltaT)}; abs(norm-q.normAt_)<q.normTol_) {
       res=q.performJump();
-      if (bisect) {auto& l=q.log_["bisectMaxIter"].as_uint64(); l=std::max(l,std::get<2>(*bisect));}
+      if (bisect) {auto& l=q.log_["bisectMaxIter"].as_int64(); l=std::max(l,std::get<2>(*bisect));}
     }
     else if ( norm < q.normAt_-q.normTol_ ) {
       std::tuple newBisect{bisect ? std::get<0>(*bisect) : q.time-getDtDid(q), q.time, bisect ? ++std::get<2>(*bisect) : 1 } ;
