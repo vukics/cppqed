@@ -26,6 +26,10 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
     normTol_{normTol}, normAt_{this->sampleRandom()}
   {
     this->log_["bisectMaxIter"]=0z;
+    {
+      auto& intro=this->intro_["Quantum-Jump Monte Carlo"].as_object();
+      intro["algorithm"]="integrating"; intro["normTol"]=normTol;
+    }
   }
 
 
@@ -41,8 +45,6 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
     },q.time,q.psi.dataStorage());
 
     applyPropagator(getEx(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
-
-//    std::cout<<"# # norm: "<<norm(q.psi)<<" "<<q.normAt_<<" "<<q.time<<std::endl;
 
     return norm(q.psi);
   }
@@ -62,6 +64,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
       std::tuple newBisect{bisect ? std::get<0>(*bisect) : q.time-getDtDid(q), q.time, bisect ? ++std::get<2>(*bisect) : 1 } ;
       // TODO: simple binary bisecting is very dumb here, we should use at least a linear interpolation
       // alternatively, more than two points could be passed on, to use arbitrary nonlinear interpolation
+      // TODO: furthermore, bisecting results in very small timesteps, the original dtTry should be restored after bisecting is over
       step( q, (std::get<0>(newBisect)-std::get<1>(newBisect))/2. , newBisect );
     }
     else if (bisect) {
@@ -88,7 +91,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
       auto rates(this->calculateRates(li));
 
       // perform jump
-      double random=this->sampleRandom() ;
+      double random=std::accumulate(rates.begin(),rates.end(),0.)*this->sampleRandom() ;
 
       size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
 
@@ -118,7 +121,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
   {
     auto res{calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
     renormTDP(res,norm(q.psi));
-    return res;
+    return hana::make_tuple(res,norm(q.psi));
   }
 
 

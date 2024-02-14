@@ -31,12 +31,16 @@ concept adaptive_steppable = adaptive_time_keeper<T> && requires (T&& t, double 
 
 
 /// advances for exactly time `deltaT`
-LogTree advance(adaptive_steppable auto& traj, double deltaT)
+/** TODO: in-trajectory log from eg. QJMC is not put through here for some reason */
+auto advance(adaptive_steppable auto& traj, double deltaT)
 {
   json::array res;
   double endTime=getTime(traj)+deltaT;
-  while (double dt=endTime-getTime(traj)) res.push_back(step(traj,dt)) ;
-  return {{"advance",res}};
+  while (double dt=endTime-getTime(traj)) {
+    LogTree log=step(traj,dt);
+    if (std::size(log)) res.push_back(log) ;
+  }
+  return std::size(res) ? LogTree{{"advance",res}} : LogTree{};
 }
 
 
@@ -330,6 +334,7 @@ const auto dataStreamerDefault = [] (const uniform_step auto& traj, std::ostream
 
 
 /// The most general run function
+/** TODO: in-trajectory log in dc-mode will not appear for dc>1 */
 template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, data_streamer<TRAJ> TDS = decltype(dataStreamerDefault) >
 requires ( ( SFT==StreamFreqType::DT_MODE || adaptive<TRAJ> ) && ( RLT==RunLengthType::T_MODE || SFT==StreamFreqType::DT_MODE ) )
 auto
