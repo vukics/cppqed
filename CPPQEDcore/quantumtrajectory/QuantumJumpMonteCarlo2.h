@@ -91,7 +91,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
       auto rates(this->calculateRates(li));
 
       // perform jump
-      double random=this->sampleRandom() ;
+      double random=std::accumulate(rates.begin(),rates.end(),0.)*this->sampleRandom() ;
 
       size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
 
