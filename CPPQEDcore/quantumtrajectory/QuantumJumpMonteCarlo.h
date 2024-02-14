@@ -84,7 +84,9 @@ struct QuantumJumpMonteCarloBase
 
   QuantumJumpMonteCarloBase(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re)
   : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re},
-    log_{qjmc::defaultLogger()} {}
+    log_{qjmc::defaultLogger()},
+    intro_{{"Quantum-Jump Monte Carlo",{{"odeEngine",logIntro(this->oe)},{"randomEngine",logIntro(this->re)},{"System","TAKE FROM SYSTEM"}}}}
+    {}
 
   double time=0., time0=0.;
   QSD qsd;
@@ -99,7 +101,7 @@ struct QuantumJumpMonteCarloBase
   /// TODO: put here the system-specific things
   friend LogTree logIntro(const QuantumJumpMonteCarloBase& q)
   {
-    return {{"Quantum-Jump Monte Carlo",{{"QJMC algorithm","stepwise"},{"odeEngine",logIntro(q.oe)},{"randomEngine",logIntro(q.re)},{"System","TAKE FROM SYSTEM"}}}};
+    return q.intro_;
   }
 
   friend LogTree logOutro(const QuantumJumpMonteCarloBase& q) {return {{"QJMC",q.log_},{"ODE_Engine",logOutro(q.oe)}};}
@@ -138,6 +140,8 @@ struct QuantumJumpMonteCarloBase
 protected:
   mutable LogTree log_; // serialization can be solved via converting to/from string
 
+  LogTree intro_;
+
   std::uniform_real_distribution<double> distro_{};
 
 };
@@ -160,6 +164,10 @@ struct QuantumJumpMonteCarlo : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngin
     if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
         !time && size(li) ) manageTimeStep( this->calculateRates(li) );
     this->log_["dpLimit overshot"]={{"n",0z},{"max.",0.}};
+     {
+      auto& intro=this->intro_["Quantum-Jump Monte Carlo"].as_object();
+      intro["algorithm"]="stepwise"; intro["pdLimit"]=dpLimit;
+     }
   }
 
   /// TODO: the returned log should contain information about the coherent step + the time step change as well
