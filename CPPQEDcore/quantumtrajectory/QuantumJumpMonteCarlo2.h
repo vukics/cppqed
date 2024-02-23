@@ -17,11 +17,11 @@ template<
   quantum_system_dynamics<RANK> QSD,
   ode::engine<StorageType> OE,
   std::uniform_random_bit_generator RandomEngine >
-struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>
+struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngine> : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>
 {
-  QuantumJumpMonteCarlo2(QuantumJumpMonteCarlo2&&) = default;
+  QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default;
 
-  QuantumJumpMonteCarlo2(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double normTol)
+  QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double normTol)
   : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
     normTol_{normTol}, normAt_{this->sampleRandom()}
   {
@@ -33,7 +33,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
   }
 
 
-  friend double evolveNorm(QuantumJumpMonteCarlo2& q, double deltaT)
+  friend double evolveNorm(QuantumJumpMonteCarlo& q, double deltaT)
   {
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
@@ -50,7 +50,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
   }
 
 
-  friend LogTree step( QuantumJumpMonteCarlo2& q, double deltaT, std::optional<std::tuple<double,double,long>> bisect = std::nullopt)
+  friend LogTree step( QuantumJumpMonteCarlo& q, double deltaT, std::optional<std::tuple<double,double,long>> bisect = std::nullopt)
   {
     LogTree res;
 
@@ -117,7 +117,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
   }
 
 
-  friend auto temporalDataPoint(const QuantumJumpMonteCarlo2& q)
+  friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
     auto res{calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
     renormTDP(res,norm(q.psi));
@@ -126,7 +126,7 @@ struct QuantumJumpMonteCarlo2 : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngi
 
 
   template <typename Archive>
-  friend auto& stateIO(QuantumJumpMonteCarlo2& q, Archive& ar)
+  friend auto& stateIO(QuantumJumpMonteCarlo& q, Archive& ar)
   {
     return stateIO(static_cast<QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>&>(q),ar) & q.normAt_;
   }
@@ -139,42 +139,6 @@ private:
 };
 
 
-template<typename QSD, typename SV, typename OE, typename RandomEngineWithParameters>
-QuantumJumpMonteCarlo2(QSD , SV , OE , RandomEngineWithParameters , double )
--> QuantumJumpMonteCarlo2< multiArrayRank_v<SV>, QSD, OE, typename RandomEngineWithParameters::Engine >;
-
-
-
-namespace qjmc {
-
-template <template<typename> class OE, typename QSD, typename SV, typename RandomEngine>
-auto make2(QSD&& qsd, SV&& state, const Pars2<RandomEngine>& p)
-{
-  constexpr size_t RANK=multiArrayRank_v<std::decay_t<SV>>;
-  using ODE=OE<StorageType>;
-
-  double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
-  
-  return QuantumJumpMonteCarlo2<RANK,QSD,ODE,RandomEngine>{
-    std::forward<QSD>(qsd),
-    std::forward<SV>(state),
-    ODE{iDt,p.epsRel,p.epsAbs},
-    randomutils::EngineWithParameters<RandomEngine>{p.seed,p.prngStream},
-    p.normTol};
-}
-
-
-
-} // qjmc
-
 
 } // quantumtrajectory
-
-
-template <size_t RANK, typename QSD, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::QuantumJumpMonteCarlo2<RANK,QSD,ODE_Engine,RandomEngine>>
-{
-  static auto _() {return SerializationMetadata{"CArray","QuantumJumpMonteCarlo2",RANK};}
-};
-
 
