@@ -8,14 +8,16 @@
 #include <iostream>
 
 
-using cppqedutils::json;
 using namespace mode;
+using namespace quantumtrajectory;
+
+static const auto algorithm=qjmc::Algorithm::integrating;
 
 int main(int argc, char* argv[])
 {
   auto op{optionParser()};
 
-  cppqedutils::trajectory::Pars<quantumtrajectory::qjmc::Pars<pcg64>> pt(op);
+  trajectory::Pars<qjmc::Pars<algorithm,pcg64>> pt(op);
 
   Pars pm(op);
 
@@ -23,12 +25,12 @@ int main(int argc, char* argv[])
 
   auto mode{make(pm)};
 
-  quantumdata::StateVector<1> psi{{pm.cutoff}}; psi(0)=0; psi(1)=1;
+  quantumdata::StateVector<1> psi{{pm.cutoff}}; psi(0)=0; psi(9)=1;
 
-  cppqedutils::run(
-    quantumtrajectory::qjmc::make<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
-    // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
-    pt,cppqedutils::trajectory::observerNoOp);
+  run(
+    // qjmc::make<algorithm,ODE_EngineBoost>(std::move(mode),std::move(psi),pt),
+    qjmc::makeEnsemble<algorithm,ODE_EngineBoost>(std::move(mode),std::move(psi),pt),
+    pt,trajectory::observerNoOp);
 
  // std::cerr<<json(nOp(10))<<std::endl;
 }
