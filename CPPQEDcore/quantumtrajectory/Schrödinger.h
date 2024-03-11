@@ -52,7 +52,7 @@ struct Schrödinger
 
   friend auto temporalDataPoint(const Schrödinger& s)
   {
-    return calculateAndPostprocess<RANK>( getEV(s.qsd), s.time, LDO<StateVector,RANK>(s.psi) );
+    return calculateExpectationValues<RANK>( getEV(s.qsd), s.time, LDO<StateVector,RANK>(s.psi) );
   }
 
   friend iarchive& readFromArrayOnlyArchive(Schrödinger& s, iarchive& iar) {return iar & s.psi;}

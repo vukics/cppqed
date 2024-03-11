@@ -263,7 +263,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
 
   friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
-    auto res{calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
+    auto res{calculateExpectationValues<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
     renormTDP(res,norm(q.psi));
     return hana::make_tuple(res,norm(q.psi));
   }
@@ -365,7 +365,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,QSD,OE,RandomEngine>
 
   friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
-    return calculateAndPostprocess<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
+    return calculateExpectationValues<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) );
   }
 
 private:

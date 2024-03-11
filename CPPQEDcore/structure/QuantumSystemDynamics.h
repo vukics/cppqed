@@ -108,9 +108,9 @@ auto expectation_values(const quantum_system_dynamics<1> auto& qsd0, const quant
                         const expectation_values<2> auto& ev) {
   return [&] (double t, lazy_density_operator<2> auto psi) {
     return hana::make_tuple(
-      partialTrace<retainedAxes<0>,2>(psi,offsets0,[&] (auto m) {return expectation_values_ns::calculate<1>(getEV(qsd0),t,m);},plusTDP{}),
-      partialTrace<retainedAxes<1>,2>(psi,offsets1,[&] (auto m) {return expectation_values_ns::calculate<1>(getEV(qsd1),t,m);},plusTDP{}),
-      expectation_values_ns::calculate<2>(ev,t,psi));
+      partialTrace<retainedAxes<0>,2>(psi,offsets0,[&] (auto m) {return calculateExpectationValues<1>(getEV(qsd0),t,m);},plusTDP{}),
+      partialTrace<retainedAxes<1>,2>(psi,offsets1,[&] (auto m) {return calculateExpectationValues<1>(getEV(qsd1),t,m);},plusTDP{}),
+      calculateExpectationValues<2>(ev,t,psi));
   };
 }
   
@@ -184,8 +184,6 @@ public:
 
   friend auto getEV(const BinarySystem& bs) {return binary::expectation_values(bs.qsd0,bs.qsd1,bs.offsets0_,bs.offsets1_,bs.ev);}
   
-  // friend void postProcessor( decltype( getEV( std::declval<BinarySystem>() ) ) ) ;
-  
   
 /*
   friend auto getEx(const BinarySystem& bs) {
@@ -207,12 +205,7 @@ public:
 
   friend LogTree label(const decltype(getEV(std::declval<BinarySystem>())) & ) {return "BinarySystem";}
 
-  friend void postProcessor(std::invoke_result_t<getEx,BinarySystem> )
-  constexpr auto postProcessor(decltype(expectationValues)) {
-  return [] (std::invoke_result_t<decltype(expectationValues),StateVectorConstView<1>> & t) {
-    using namespace hana::literals; t[1_c] -= sqr(t[0_c]);
-  };
-  }*/
+*/
 
   friend const auto& getLi(const BinarySystem& bs) {return bs.liFull_;}
 

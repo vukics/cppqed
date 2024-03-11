@@ -44,31 +44,12 @@ template <typename L, size_t RANK>
 concept functional = time_dependent_functional<L,RANK> || time_independent_functional<L,RANK> ;
 
 
-template <size_t RANK, functional<RANK> EV>
-auto calculate(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
-{
-  if constexpr (time_dependent_functional<EV,RANK>) return ev(t,matrix);
-  else                                              return ev(matrix);
-}
+} // expectation_values_ns
 
 
 /// pre- & postcondition: the LogTree must have the same structure as the temporal_data_point returned by expectation_value
 template <typename L, size_t RANK>
-concept labelled_and_without_nonlinear_postprocessing = /* labelled<L> && */ functional<L,RANK> ;
-
-/// Postprocessing means any operation on the expectation values that is not linear in the density operator (as the calculation of variance, for istance)
-template <typename L, size_t RANK>
-concept labelled_and_with_nonlinear_postprocessing = labelled_and_without_nonlinear_postprocessing<L,RANK> && (
-  ( time_dependent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, double, LDO<StateVector, RANK> > & tdp) { postProcessor(l)(tdp); } ) ||
-  ( time_independent_functional<L,RANK> && requires (const L& l, std::invoke_result_t< L, LDO<StateVector, RANK> > & tdp) { postProcessor(l)(tdp); } )
-) ;
-
-
-} // expectation_values_ns
-
-
-template <typename L, size_t RANK>
-concept expectation_values = expectation_values_ns::labelled_and_without_nonlinear_postprocessing<L,RANK> || expectation_values_ns::labelled_and_with_nonlinear_postprocessing<L,RANK> ;
+concept expectation_values = /* labelled<L> && */ expectation_values_ns::functional<L,RANK> ;
 
 
 template <size_t RANK>
@@ -76,13 +57,11 @@ void checkConsistencyWithLabels (const expectation_values<RANK> auto&);
 
 
 template <size_t RANK, expectation_values<RANK> EV>
-auto calculateAndPostprocess(const EV& ev, double t, lazy_density_operator<RANK> auto rho)
+auto calculateExpectationValues(const EV& ev, double t, lazy_density_operator<RANK> auto matrix)
 {
-  auto res{expectation_values_ns::calculate<RANK>(ev,t,rho)};
-  if constexpr (expectation_values_ns::labelled_and_with_nonlinear_postprocessing<EV,RANK>) postProcessor(ev)(res);
-  return res;
+  if constexpr (expectation_values_ns::time_dependent_functional<EV,RANK>) return ev(t,matrix);
+  else return ev(matrix);
 }
-
 
 
 namespace expectation_values_ns {
