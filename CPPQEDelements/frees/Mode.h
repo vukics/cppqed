@@ -68,19 +68,8 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
   return hana::make_tuple(pn,pnn,a);
 };
 
-/*
-constexpr auto postProcessor(decltype(expectationValues) t) {
-  return [] (std::invoke_result_t< decltype(t), LDO<DensityOperator,1> > & t) {
-    using namespace hana::literals; t[1_c] -= sqr(t[0_c]);
-  };
-}
-*/
 
 constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Mode",{"photon number","photon number variance","ladder operator"}}}; }
-
-
-// static_assert(::structure::expectation_values_ns::labelled_and_with_nonlinear_postprocessing<decltype(expectationValues),1>);
-static_assert(::structure::expectation_values_ns::labelled_and_without_nonlinear_postprocessing<decltype(expectationValues),1>);
 
 
 auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)

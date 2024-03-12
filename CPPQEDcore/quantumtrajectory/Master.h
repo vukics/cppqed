@@ -90,7 +90,7 @@ struct Master
 
   friend auto temporalDataPoint(const Master& m)
   {
-    return calculateAndPostprocess<RANK>( getEV(m.qsd), m.time, LDO<DensityOperator,RANK>(m.rho) );
+    return calculateExpectationValues<RANK>( getEV(m.qsd), m.time, LDO<DensityOperator,RANK>(m.rho) );
   }
 
   friend iarchive& readFromArrayOnlyArchive(Master& m, iarchive& iar) {return iar & m.rho;} // MultiArray can be (de)serialized
