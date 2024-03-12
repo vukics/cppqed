@@ -2,17 +2,18 @@
 #include "JaynesCummings.h"
 #include "Qbit.h"
 
-#include "QuantumJumpMonteCarlo2.h"
+#include "QuantumJumpMonteCarlo.h"
 
 
 using namespace std; using namespace quantumtrajectory;
 
+static const auto algorithm=qjmc::Algorithm::integrating;
 
 int main(int argc, char* argv[])
 {
   auto op{optionParser()};
   
-  trajectory::Pars<qjmc::Pars2<pcg64>> pt(op);
+  trajectory::Pars<qjmc::Pars<algorithm,pcg64>> pt(op);
   
   qbit::Pars pq(op,"Q");
   mode::Pars pm(op,"M");
@@ -33,7 +34,7 @@ int main(int argc, char* argv[])
   quantumdata::StateVector<2> psi{{2,pm.cutoff}}; psi(0,0)=1;// psi(1)=1;
 
   run(
-    qjmc::make2<ODE_EngineBoost>(bs,std::move(psi),pt),
+    qjmc::make<algorithm,ODE_EngineBoost>(bs,std::move(psi),pt),
     // quantumtrajectory::qjmc::makeEnsemble<cppqedutils::ODE_EngineBoost>(std::move(mode),/*quantumdata::StateVector<1>{{pm.cutoff}}*/std::move(psi),pt),
     pt,trajectory::observerNoOp);
   
