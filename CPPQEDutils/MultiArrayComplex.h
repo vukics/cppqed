@@ -75,8 +75,10 @@ MultiArray<dcomp,RANK>& conj(MultiArray<dcomp,RANK>& ma)
 
 
 template <size_t RANK>
-double frobeniusNorm(const MultiArray<dcomp,RANK>& ma) { return sqrt( std::ranges::fold_left_first( ma.dataView | std::views::transform(sqrAbs), std::plus{} ).value_or(0.) ); }
+double frobeniusNormSqr(const MultiArray<dcomp,RANK>& ma) { return std::ranges::fold_left_first( ma.dataView | std::views::transform(sqrAbs), std::plus{} ).value_or(0.); }
 
+template <size_t RANK>
+double frobeniusNorm(const MultiArray<dcomp,RANK>& ma) { return sqrt( frobeniusNormSqr(ma) ); }
 
 template <size_t TWO_TIMES_RANK>
 void hermitianConjugateSelf(MultiArray<dcomp,TWO_TIMES_RANK>& ma)

@@ -88,19 +88,6 @@ struct StateVector : MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerat
   explicit StateVector(Dimensions<RANK> dimensions)
     : StateVector{dimensions, [] (size_t e) {auto res{zeroInit(e)}; res[0]=1.; return res;}} {}
 
-  /// \name Metric
-  //@{
-    /// Returns the norm \f$\norm\Psi\f$, implemented in terms of ArrayBase::frobeniusNorm.
-  friend double norm(const StateVector& sv) {return frobeniusNorm(sv);}
-  
-  friend double renorm(StateVector& sv)
-  {
-    double res=norm(sv);
-    for (dcomp& v : sv.dataStorage()) v/=res;
-    return res;
-  }
-  //@}
-  
   /// Adds a dyad of the present object to `densityOperator`
   /**
    * This is done without actually forming the dyad in memory (so that this is not implemented in terms of StateVector::dyad),
@@ -113,6 +100,23 @@ struct StateVector : MultiArray<dcomp,RANK>, private VectorSpaceOperatorsGenerat
   }
 
 };
+
+
+template <size_t RANK>
+double normSqr(const StateVector<RANK>& sv) {return frobeniusNormSqr(sv);}
+
+
+template <size_t RANK>
+double norm(const StateVector<RANK>& sv) {return frobeniusNorm(sv);}
+
+
+template <size_t RANK>
+double renorm(StateVector<RANK>& sv)
+{
+  double res=norm(sv);
+  for (dcomp& v : sv.dataStorage()) v/=res;
+  return res;
+}
 
 
 template <size_t RANK>
