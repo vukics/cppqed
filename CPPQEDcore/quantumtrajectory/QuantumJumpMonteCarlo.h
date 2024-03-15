@@ -189,7 +189,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
 
     applyPropagator(getEx(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
 
-    return norm(q.psi);
+    return normSqr(q.psi);
   }
 
 
