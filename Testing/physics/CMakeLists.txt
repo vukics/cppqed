@@ -12,11 +12,11 @@ add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
 
 declaretest(ph_QbitMode_CPPQED)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode>)
 
 declaretest(ph_QbitMode_CPPQEDsch)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode>)
 
 declaretest(ph_PLQ_CPPQEDuip)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
@@ -87,11 +87,11 @@ set_tests_properties(${TESTNAME} PROPERTIES
 
 declaretest(ph_Decay)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode>)
 
 declaretest(ph_DecayFock)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode>)
 
 declaretest(compare_DecayQB)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
@@ -117,15 +117,15 @@ add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
 
 declaretest(ph_QMJ_Int)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode>)
 
 declaretest(ph_QMJ_IntSch)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode>)
 
 declaretest(ph_QMJ_IntUIP)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}
-            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode_C++QED>)
+            --test=${TESTNAME} --testclass=Runner --script=$<TARGET_FILE:QbitMode>)
 
 declaretest(compare_QMJ_Int)
 add_test( NAME ${TESTNAME} COMMAND ${TESTSCRIPT}

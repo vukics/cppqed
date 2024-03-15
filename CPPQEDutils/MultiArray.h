@@ -278,9 +278,9 @@ public:
   friend void tag_invoke( const json::value_from_tag&, json::value& jv, const MultiArray& ma )
   {
     jv = json::object{
-      { "extents" , value_from(ma.extents) },
+      { "extents" , json::value_from(ma.extents) },
       //    { "strides" , ma.strides },
-      { "data", value_from(ma.data_) }
+      { "data", json::value_from(ma.data_) }
     };
   }
 

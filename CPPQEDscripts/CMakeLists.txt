@@ -8,7 +8,7 @@ message(STATUS "Configuring CPPQEDscripts")
 # so that if they compile then at least the compile-time features are ok
 set(FEWER_SCRIPTS_TARGETS
     DTLA_Evolved DTLA_C++QED DrivenDissipativeQbit DTLA_EvolvedHL DrivenDissipativeMode_Evolved DrivenDissipativeMode
-    QbitMode_C++QED QbitMode_Evolved QbitMode_Matrix SingleParticle 1particle1mode Ring Ring_Evolved Raman CavityRaman)
+    QbitMode QbitMode_Evolved QbitMode_Matrix SingleParticle 1particle1mode Ring Ring_Evolved Raman CavityRaman)
     
 foreach(S ${FEWER_SCRIPTS_TARGETS})
   add_executable(${S} ${S}.cc)
