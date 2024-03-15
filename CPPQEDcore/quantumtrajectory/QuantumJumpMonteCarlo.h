@@ -448,6 +448,16 @@ auto makeEnsemble(QSD&& qsd, const StateVector<RANK>& psi, Pars<a,RandomEngine>&
 } // qjmc
 
 
+template <qjmc::Algorithm a, template<typename> class OE, typename RandomEngine, typename QSD, typename SV, typename AH>
+void run(QSD&& qsd, SV&& state, trajectory::Pars<qjmc::Pars<a,RandomEngine>>& p, AH && observer)
+{
+  if (!p.nTraj) // single trajectory
+    run(qjmc::make<a,OE>(std::forward<QSD>(qsd),std::forward<SV>(state),p),p,std::forward<AH>(observer));
+  else
+    run(qjmc::makeEnsemble<a,OE>(std::forward<QSD>(qsd),state,p),p,std::forward<AH>(observer));
+}
+
+
 } // quantumtrajectory
 
 

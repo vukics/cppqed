@@ -11,7 +11,7 @@
 using namespace mode;
 using namespace quantumtrajectory;
 
-static const auto algorithm=qjmc::Algorithm::integrating;
+static const auto algorithm=qjmc::Algorithm::stepwise;
 
 int main(int argc, char* argv[])
 {
@@ -27,10 +27,12 @@ int main(int argc, char* argv[])
 
   quantumdata::StateVector<1> psi{{pm.cutoff}}; psi(0)=0; psi(9)=1;
 
-  run(
-    // qjmc::make<algorithm,ODE_EngineBoost>(std::move(mode),std::move(psi),pt),
-    qjmc::makeEnsemble<algorithm,ODE_EngineBoost>(std::move(mode),std::move(psi),pt),
-    pt,trajectory::observerNoOp);
+  run<algorithm,ODE_EngineBoost>(std::move(mode),std::move(psi),pt,trajectory::observerNoOp);
+
+  // run(
+  //   // qjmc::make<algorithm,ODE_EngineBoost>(std::move(mode),std::move(psi),pt),
+  //   qjmc::makeEnsemble<algorithm,ODE_EngineBoost>(std::move(mode),psi,pt),
+  //   pt,trajectory::observerNoOp);
 
  // std::cerr<<json(nOp(10))<<std::endl;
 }

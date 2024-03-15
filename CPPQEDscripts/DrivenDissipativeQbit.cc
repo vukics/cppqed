@@ -36,12 +36,7 @@ int main(int argc, char* argv[])
 
   quantumdata::StateVector<1> psi{{2},zeroInit}, dpsidt{{2},zeroInit}; psi(1)=1;
 
-  auto traj{
-    // quantumtrajectory::qjmc::makeEnsemble<algorithm,ODE_EngineBoost>(qbit,psi,pt)
-    qjmc::make<algorithm,ODE_EngineBoost>(qbit,std::move(psi),pt)
-  };
-
-  run(traj,pt,trajectory::observerNoOp);
+  run<algorithm,ODE_EngineBoost>(qbit,std::move(psi),pt,trajectory::observerNoOp);
 
   // {
   //   quantumdata::StateVector<2> psi{{2,3}}; quantumdata::DensityOperator<2> rho{{2,3}};
