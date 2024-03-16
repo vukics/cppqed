@@ -264,7 +264,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
     auto res{calculateExpectationValues<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
-    renormTDP(res,norm(q.psi));
+    renormTDP(res,normSqr(q.psi));
     return hana::make_tuple(res,norm(q.psi));
   }
 
