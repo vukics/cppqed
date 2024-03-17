@@ -11,3 +11,5 @@ external
 .directory
 CPPQEDcore/doc/logoCppQED_old.*
 OwnScripts/
+scripts/
+benchmarking/

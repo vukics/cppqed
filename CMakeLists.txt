@@ -109,3 +109,7 @@ add_subdirectory(CPPQEDcore)
 add_subdirectory(CPPQEDelements)
 
 add_subdirectory(dockerEntry)
+
+if (EXISTS ${PROJECT_SOURCE_DIR}/OwnScripts)
+  add_subdirectory(scripts)
+endif()
