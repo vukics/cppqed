@@ -2,6 +2,8 @@
 /// \briefFile{Additional helpers for dcomp}
 #pragma once
 
+#include <boost/json.hpp>
+
 #include <boost/serialization/complex.hpp>
 
 #include <complex>
@@ -31,6 +33,19 @@ noexcept(noexcept(x*x)) // propagate noexcept
 double relativeDeviation(const auto& a, const auto& b) {return std::abs(a-b)/(std::abs(a)+std::abs(b));}
 
 inline double sqrAbs(dcomp v) {return sqr(std::abs(v));}
+
+
+namespace boost::json {
+    template<class T>
+    void tag_invoke(value_from_tag, value& jv, const std::complex<T>& c) {
+        jv = {c.real(), c.imag()};
+    }
+
+    template<class T>
+    std::complex<T> tag_invoke(value_to_tag<std::complex<T>>, const value& jv) {
+        return {jv.at(0), jv.at(1)};
+    }
+} // boost::json
 
 
 // namespace std {

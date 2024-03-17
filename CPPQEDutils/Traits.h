@@ -4,7 +4,6 @@
 #include "ComplexExtensions.h"
 
 #include <boost/hana.hpp>
-#include <boost/json.hpp>
 
 #include <iostream>
 #include <numeric>
