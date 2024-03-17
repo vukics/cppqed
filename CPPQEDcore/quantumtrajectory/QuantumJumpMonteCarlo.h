@@ -61,7 +61,7 @@ struct Pars<Algorithm::integrating,RandomEngine> : public ParsBase<RandomEngine>
 
 LogTree defaultLogger()
 {
-  return {{"Total number of MCWF steps",0z},{"Jump trajectory",json::array{}}};
+  return {{"Jump trajectory",json::array{}}};
 }
 
 
@@ -356,8 +356,6 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,QSD,OE,RandomEngine>
       }
 
     }
-
-    q.log_["Total number of MCWF steps"].as_int64()+=1;
 
     return res;
 
