@@ -151,10 +151,35 @@ protected:
 
   std::uniform_real_distribution<double> distro_{};
 
+  LogTree performJump(const Rates& rates, double random)
+  {
+    LogTree res;
+
+    size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
+
+    for (; random>0 && lindbladNo!=rates.size(); random-=rates[lindbladNo++]) ;
+
+    if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
+      applyJump(getLi(this->qsd)[--lindbladNo].jump,
+                this->time,this->psi.mutableView());
+
+      double normFactor=sqrt(rates[lindbladNo]);
+
+      for (dcomp& v : this->psi.dataStorage()) v/=normFactor;
+
+      res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",this->time}});
+      this->log_["Jump trajectory"].as_array().push_back({this->time,lindbladNo});
+    }
+
+    return res;
+
+  }
+
+
 };
 
 
-/// the integrating algorithm, cf. https://qutip.org/docs/latest/guide/dynamics/dynamics-monte.html
+/// THE INTEGRATING ALGORITHM, cf. https://qutip.org/docs/latest/guide/dynamics/dynamics-monte.html
 template<
   size_t RANK,
   quantum_system_dynamics<RANK> QSD,
@@ -200,7 +225,15 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
 //    if (bisect) std::cout<<"# # bisecting: "<<std::get<0>(*bisect)<<" "<<std::get<1>(*bisect)<<" "<<std::get<2>(*bisect)<<std::endl;
 
     if (double norm{evolveNorm(q,deltaT)}; abs(norm-q.normAt_)<q.normTol_) {
-      res=q.performJump();
+      q.normAt_=q.sampleRandom();
+      renorm(q.psi);
+
+      // Jump
+      auto rates(q.calculateRates(getLi(q.qsd)));
+
+      res=q.performJump(rates,
+                        std::accumulate(rates.begin(),rates.end(),0.)*q.sampleRandom());
+
       if (bisect) {auto& l=q.log_["bisectMaxIter"].as_int64(); l=std::max(l,std::get<2>(*bisect));}
     }
     else if ( norm < q.normAt_-q.normTol_ ) {
@@ -218,46 +251,6 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
     }
 
     return res;
-  }
-
-
-  LogTree performJump()
-  {
-    LogTree res;
-
-    normAt_=this->sampleRandom();
-    renorm(this->psi);
-
-    // Jump
-    if (const auto& li{getLi(this->qsd)}; size(li)) {
-
-      auto rates(this->calculateRates(li));
-
-      // perform jump
-      double random=std::accumulate(rates.begin(),rates.end(),0.)*this->sampleRandom() ;
-
-      size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
-
-      for (; random>0 && lindbladNo!=rates.size(); random-=rates[lindbladNo++]) ;
-
-      if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
-        applyJump(li[--lindbladNo].jump,this->time,this->psi.mutableView());
-
-        double normFactor=sqrt(rates[lindbladNo]);
-
-        if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
-
-        for (dcomp& v : this->psi.dataStorage()) v/=normFactor;
-
-        res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",this->time}});
-        this->log_["Jump trajectory"].as_array().push_back({this->time,lindbladNo});
-      }
-//      else throw std::runtime_error("Jump did not occur!") ;
-
-    }
-
-    return res;
-
   }
 
 
@@ -285,7 +278,7 @@ private:
 
 
 /**
- * the stepwise adaptive algorithm is used, cf. Comp. Phys. Comm. 238:88 (2019)
+ * THE STEPWISE ADAPTIVE ALGORITHM, cf. Comp. Phys. Comm. 238:88 (2019)
  * \note Finite overshoot tolerance is not supported. The extent of overshoots can be found out from the logs anyway
  */
 template<
@@ -301,8 +294,12 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,QSD,OE,RandomEngine>
     : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
       dpLimit_{dpLimit}
   {
-    if (const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
-        !time && size(li) ) manageTimeStep( this->calculateRates(li) );
+    const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
+
+    if (!size(li)) throw std::runtime_error("No Lindblad in QuantumJumpMonteCarlo");
+
+    if (!time) manageTimeStep( this->calculateRates(li) );
+
     this->log_["dpLimit overshot"]={{"n",0z},{"max.",0.}};
      {
       auto& intro=this->intro_["Quantum-Jump Monte Carlo"].as_object();
@@ -313,8 +310,6 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,QSD,OE,RandomEngine>
   /// TODO: the returned log should contain information about the coherent step + the time step change as well
   friend auto step(QuantumJumpMonteCarlo& q, double deltaT)
   {
-    LogTree res;
-
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
     {
@@ -329,35 +324,12 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,QSD,OE,RandomEngine>
     renorm(q.psi);
 
     // Jump
-    if (const auto& li{getLi(q.qsd)}; size(li)) {
+    auto rates(q.calculateRates(getLi(q.qsd)));
 
-      auto rates(q.calculateRates(li));
+    q.manageTimeStep(rates);
 
-      q.manageTimeStep(rates);
-
-      // perform jump
-      double random=q.sampleRandom()/getDtDid(q);
-
-      size_t lindbladNo=0; // TODO: this could be expressed with an iterator into rates
-
-      for (; random>0 && lindbladNo!=rates.size(); random-=rates[lindbladNo++]) ;
-
-      if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
-        applyJump(li[--lindbladNo].jump,q.time,q.psi.mutableView());
-
-        double normFactor=sqrt(rates[lindbladNo]);
-
-        if (!boost::math::isfinite(normFactor)) throw std::runtime_error("Infinite detected in QuantumJumpMonteCarlo::performJump");
-
-        for (dcomp& v : q.psi.dataStorage()) v/=normFactor;
-
-        res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",q.time}});
-        q.log_["Jump trajectory"].as_array().push_back({q.time,lindbladNo});
-      }
-
-    }
-
-    return res;
+    return q.performJump(rates,
+                         q.sampleRandom()/getDtDid(q));
 
   }
 
