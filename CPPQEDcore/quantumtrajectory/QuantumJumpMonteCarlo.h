@@ -93,7 +93,9 @@ struct QuantumJumpMonteCarloBase
   : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re},
     log_{qjmc::defaultLogger()},
     intro_{{"Quantum-Jump Monte Carlo",{{"odeEngine",logIntro(this->oe)},{"randomEngine",logIntro(this->re)},{"System","TAKE FROM SYSTEM"}}}}
-    {}
+    {
+      if (!size(getLi(this->qsd))) throw std::runtime_error("No Lindblad in QuantumJumpMonteCarlo");
+    }
 
   double time=0., time0=0.;
   QSD qsd;
@@ -201,8 +203,10 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   }
 
 
-  friend double evolveNorm(QuantumJumpMonteCarlo& q, double deltaT)
+  friend LogTree step( QuantumJumpMonteCarlo& q, double deltaT, bool isBisecting = false )
   {
+    LogTree res;
+
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
     {
@@ -214,40 +218,33 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
 
     applyPropagator(getEx(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
 
-    return normSqr(q.psi);
-  }
+    q.bisect_.update(q.time,normSqr(q.psi));
 
 
-  friend LogTree step( QuantumJumpMonteCarlo& q, double deltaT, std::optional<std::tuple<double,double,long>> bisect = std::nullopt)
-  {
-    LogTree res;
-
-//    if (bisect) std::cout<<"# # bisecting: "<<std::get<0>(*bisect)<<" "<<std::get<1>(*bisect)<<" "<<std::get<2>(*bisect)<<std::endl;
-
-    if (double norm{evolveNorm(q,deltaT)}; abs(norm-q.normAt_)<q.normTol_) {
+    if (abs(q.bisect_.n1-q.normAt_)<q.normTol_) {
+      // jump occurs
       q.normAt_=q.sampleRandom();
       renorm(q.psi);
 
-      // Jump
       auto rates(q.calculateRates(getLi(q.qsd)));
 
       res=q.performJump(rates,
                         std::accumulate(rates.begin(),rates.end(),0.)*q.sampleRandom());
 
-      if (bisect) {auto& l=q.log_["bisectMaxIter"].as_int64(); l=std::max(l,std::get<2>(*bisect));}
+      if (isBisecting) {
+        auto& l=q.log_["bisectMaxIter"].as_int64(); l=std::max(l,q.bisect_.iter);
+        q.bisect_.iter=0; q.oe.dtTry=q.bisect_.dtTryBefore;
+      }
     }
-    else if ( norm < q.normAt_-q.normTol_ ) {
-      std::tuple newBisect{bisect ? std::get<0>(*bisect) : q.time-getDtDid(q), q.time, bisect ? ++std::get<2>(*bisect) : 1 } ;
-      // TODO: simple binary bisecting is very dumb here, we should use at least a linear interpolation
-      // alternatively, more than two points could be passed on, to use arbitrary nonlinear interpolation
-      // TODO: furthermore, bisecting results in very small timesteps, the original dtTry should be restored after bisecting is over
-      step( q, (std::get<0>(newBisect)-std::get<1>(newBisect))/2. , newBisect );
+    else if ( q.bisect_.n1 < q.normAt_-q.normTol_ ) {
+      if (isBisecting) ++q.bisect_.iter;
+      else q.bisect_.dtTryBefore=q.oe.dtTry; // bisecting starts right here
+      step( q, q.bisect_.deltaT(q.normAt_), true );
     }
-    else if (bisect) {
-      // in this case the norm is above the interval, which needs special treatment only when bisecting
-      // otherwise it simply means that we haven’t YET reached normAt_
-      std::tuple newBisect{ q.time, std::get<1>(*bisect), ++std::get<2>(*bisect) } ;
-      step( q, (std::get<1>(newBisect)-std::get<0>(newBisect))/2. , newBisect );
+    else if (isBisecting) { // in this case the norm is above the interval, which needs special treatment only when bisecting
+                       // otherwise it simply means that we haven’t YET reached normAt_
+      ++q.bisect_.iter;
+      step( q, q.bisect_.deltaT(q.normAt_), true );
     }
 
     return res;
@@ -265,13 +262,26 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   template <typename Archive>
   friend auto& stateIO(QuantumJumpMonteCarlo& q, Archive& ar)
   {
-    return stateIO(static_cast<QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>&>(q),ar) & q.normAt_;
+    return stateIO(static_cast<QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>&>(q),ar) & q.normAt_ & q.bisect_;
   }
 
 
 private:
   const double normTol_;
   double normAt_;
+
+  struct {
+    double t0=0, t1=0, n0=1, n1=1, dtTryBefore=0;
+    // before bisecting starts we save the actual dtTry to be restored after bisecting
+    // otherwise dtTry becomes very small due to the small timesteps required for bisecting
+    long iter=0;
+
+    void serialize(auto& ar, const unsigned int) {ar & t0 & t1 & n0 & n1;}
+
+    double deltaT(double nAt) const {return (n1-nAt)*(t1-t0)/(n0-n1);}
+    void update(double tNew, double nNew) {t0=tNew; n0=nNew; std::swap(t0,t1); std::swap(n0,n1);}
+
+  } bisect_;
 
 };
 
@@ -294,11 +304,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,QSD,OE,RandomEngine>
     : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
       dpLimit_{dpLimit}
   {
-    const auto& li{getLi(this->qsd)}; // Careful! the argument shadows the member
-
-    if (!size(li)) throw std::runtime_error("No Lindblad in QuantumJumpMonteCarlo");
-
-    if (!time) manageTimeStep( this->calculateRates(li) );
+    if (!time) manageTimeStep( this->calculateRates(getLi(this->qsd)) );
 
     this->log_["dpLimit overshot"]={{"n",0z},{"max.",0.}};
      {
