@@ -207,6 +207,8 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   {
     LogTree res;
 
+//    if (isBisecting) std::cerr<<"# "<<q.bisect_.t0<<"\t"<<q.bisect_.n0<<"\t"<<q.bisect_.t1<<"\t"<<q.bisect_.n1<<"\t"<<q.bisect_.iter<<std::endl;
+
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
     {
@@ -231,6 +233,8 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
       res=q.performJump(rates,
                         std::accumulate(rates.begin(),rates.end(),0.)*q.sampleRandom());
 
+      q.bisect_.update(q.time,1.);
+
       if (isBisecting) {
         auto& l=q.log_["bisectMaxIter"].as_int64(); l=std::max(l,q.bisect_.iter);
         q.bisect_.iter=0; q.oe.dtTry=q.bisect_.dtTryBefore;
@@ -254,8 +258,8 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
     auto res{calculateExpectationValues<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
-    renormTDP(res,normSqr(q.psi));
-    return hana::make_tuple(res,norm(q.psi));
+    renormTDP(res,q.bisect_.n1);
+    return res; // hana::make_tuple(res,q.bisect_.n1);
   }
 
 
