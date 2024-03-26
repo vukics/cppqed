@@ -196,6 +196,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
     normTol_{normTol}, normAt_{this->sampleRandom()}
   {
     this->log_["bisectMaxIter"]=0z;
+    this->log_["maxIterOvershot"]={{"times",0z},{"maxDev",0.}};
     {
       auto& intro=this->intro_["Quantum-Jump Monte Carlo"].as_object();
       intro["algorithm"]="integrating"; intro["normTol"]=normTol;
@@ -207,7 +208,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   {
     LogTree res;
 
-//    if (isBisecting) std::cerr<<"# "<<q.bisect_.t0<<"\t"<<q.bisect_.n0<<"\t"<<q.bisect_.t1<<"\t"<<q.bisect_.n1<<"\t"<<q.bisect_.iter<<std::endl;
+//    if (isBisecting) std::cout<<"# "<<q.bisect_.t0<<"\t"<<q.bisect_.n0<<"\t"<<q.bisect_.t1<<"\t"<<q.bisect_.n1<<"\t"<<q.bisect_.iter<<std::endl;
 
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
@@ -223,7 +224,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
     q.bisect_.update(q.time,normSqr(q.psi));
 
 
-    if (abs(q.bisect_.n1-q.normAt_)<q.normTol_) {
+    if (double dev=abs(q.bisect_.n1-q.normAt_); dev<q.normTol_ || q.bisect_.iter>q.maxIter_) {
       // jump occurs
       q.normAt_=q.sampleRandom();
       renorm(q.psi);
@@ -237,6 +238,10 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
 
       if (isBisecting) {
         auto& l=q.log_["bisectMaxIter"].as_int64(); l=std::max(l,q.bisect_.iter);
+        if (q.bisect_.iter>q.maxIter_) {
+          auto& o=q.log_["maxIterOvershot"].as_object();
+          ++o["times"].as_int64(); o["maxDev"].as_double()=std::max(o["maxDev"].as_double(),dev);
+        }
         q.bisect_.iter=0; q.oe.dtTry=q.bisect_.dtTryBefore;
       }
     }
@@ -259,7 +264,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   {
     auto res{calculateExpectationValues<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
     renormTDP(res,q.bisect_.n1);
-    return res; // hana::make_tuple(res,q.bisect_.n1);
+    return res; // hana::make_tuple(res,q.bisect_.n1,q.normAt_);
   }
 
 
@@ -273,6 +278,8 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
 private:
   const double normTol_;
   double normAt_;
+
+  static constexpr size_t maxIter_=10;
 
   struct {
     double t0=0, t1=0, n0=1, n1=1, dtTryBefore=0;
