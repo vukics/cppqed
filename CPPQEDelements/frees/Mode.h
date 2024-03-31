@@ -69,7 +69,7 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 };
 
 
-constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Mode",{"photon number","photon number variance","ladder operator"}}}; }
+constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Mode",{"photon number","photon number square","ladder operator"}}}; }
 
 
 auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
@@ -91,7 +91,10 @@ auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa
     if (nTh) liouvillian.push_back(photonGain(kappa,nTh));
   }
 
-  return QuantumSystemDynamics { cutoff, std::move(freqs), std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), exact_propagator_ns::noOp, expectationValues };
+  return QuantumSystemDynamics { "Mode", cutoff, std::move(freqs),
+    std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), exact_propagator_ns::noOp, expectationValues,
+    {{"cutoff",cutoff}}
+  };
 }
 
 

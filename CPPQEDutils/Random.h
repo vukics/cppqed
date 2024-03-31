@@ -67,7 +67,7 @@ struct EngineWithParameters
   
   friend ::cppqedutils::LogTree logIntro(const EngineWithParameters& e)
   {
-    return {{"ID",EngineID_v<Engine>},{"Parameters",::cppqedutils::LogTree{{"seed",e.seed},{"streamOrdo",e.prngStream}}}};
+    return {{EngineID_v<Engine>,{{"seed",e.seed},{"streamOrdo",e.prngStream}}}};
   }
 
   Engine engine;

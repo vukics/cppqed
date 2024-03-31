@@ -90,6 +90,15 @@ template <size_t RANK> using Liouvillian = std::vector<Lindblad<RANK>>;
 
 
 template <size_t RANK>
+json::array toJSON_array(const Liouvillian<RANK>& li)
+{
+  json::array res(size(li));
+  for (auto&& [r,l] : std::views::zip(res,li)) r=l.label;
+  return res;
+}
+
+
+template <size_t RANK>
 auto rateFromJump(double t, StateVectorConstView<RANK> psi, Jump<RANK> jump)
 {
   StateVector<RANK> psiTemp{ copy(psi) };

@@ -92,7 +92,7 @@ struct QuantumJumpMonteCarloBase
   QuantumJumpMonteCarloBase(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re)
   : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re},
     log_{qjmc::defaultLogger()},
-    intro_{{"Quantum-Jump Monte Carlo",{{"odeEngine",logIntro(this->oe)},{"randomEngine",logIntro(this->re)},{"System","TAKE FROM SYSTEM"}}}}
+    intro_{{"Quantum-Jump Monte Carlo",{{"odeEngine",logIntro(this->oe)},{"randomEngine",logIntro(this->re)}}}}
     {
       if (!size(getLi(this->qsd))) throw std::runtime_error("No Lindblad in QuantumJumpMonteCarlo");
     }
@@ -110,12 +110,13 @@ struct QuantumJumpMonteCarloBase
   /// TODO: put here the system-specific things
   friend LogTree logIntro(const QuantumJumpMonteCarloBase& q)
   {
-    return q.intro_;
+    LogTree res{q.intro_}; res.insert({{getLabel(q.qsd),getParameters(q.qsd)},{"Jump operators",toJSON_array(getLi(q.qsd))}});
+    return res;
   }
 
   friend LogTree logOutro(const QuantumJumpMonteCarloBase& q) {return {{"QJMC",q.log_},{"ODE_Engine",logOutro(q.oe)}};}
 
-  friend LogTree dataStreamKey(const QuantumJumpMonteCarloBase& q) {return {{"QuantumJumpMonteCarloBase","TAKE FROM SYSTEM"}};}
+  friend LogTree dataStreamKey(const QuantumJumpMonteCarloBase& q) {return label(getEV(q.qsd));}
 
   friend iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarloBase& q, iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized
 

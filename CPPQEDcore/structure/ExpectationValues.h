@@ -49,7 +49,7 @@ concept functional = time_dependent_functional<L,RANK> || time_independent_funct
 
 /// pre- & postcondition: the LogTree must have the same structure as the temporal_data_point returned by expectation_value
 template <typename L, size_t RANK>
-concept expectation_values = /* labelled<L> && */ expectation_values_ns::functional<L,RANK> ;
+concept expectation_values = labelled<L> && expectation_values_ns::functional<L,RANK> ;
 
 
 template <size_t RANK>

@@ -197,7 +197,7 @@ struct Base
 /// Specializations for Boost.Odeint controlled_runge_kutta & runge_kutta_cash_karp54
 
 template <typename ErrorStepper>
-inline const std::string StepperDescriptor<bno::controlled_runge_kutta<ErrorStepper>> = "Boost.Odeint controlled stepper " + StepperDescriptor<ErrorStepper>;
+inline const std::string StepperDescriptor<bno::controlled_runge_kutta<ErrorStepper>> = "Boost.Odeint." + StepperDescriptor<ErrorStepper>;
 
 
 template <typename StateType>

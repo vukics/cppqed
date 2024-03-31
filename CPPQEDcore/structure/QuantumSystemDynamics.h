@@ -46,9 +46,21 @@ inline double highestFrequency(const SystemFrequencyStore& sfs)
   : 0.;
 }
 
+/// TODO: this and the previous could be put into a precompiled library
+inline auto SFS_toJSON(const SystemFrequencyStore& sfs)
+{
+  LogTree res;
+  for (const SystemFrequencyDescriptor& sfd : sfs)
+    res.emplace(std::get<0>(sfd),std::visit(overload{
+      [] (double v) {return json::value{v};},
+      [] (dcomp v) {return json::value(json::array{v.real(),v.imag()});}
+    },std::get<1>(sfd)));
+  return res;
+}
+
 
 template <typename T, size_t RANK>
-concept quantum_system_dynamics = requires (T&& qsd)
+concept quantum_system_dynamics = labelled<T,std::string> && requires (T&& qsd)
 {
   { getFreqs(qsd) } -> std::convertible_to<SystemFrequencyStore>;
   { getHa(qsd) } -> hamiltonian<RANK>;
@@ -56,7 +68,7 @@ concept quantum_system_dynamics = requires (T&& qsd)
   { getEV(qsd) } -> expectation_values<RANK>;
   { getLi(qsd) } -> std::convertible_to<Liouvillian<RANK>>;
   { getDimensions(qsd) } -> std::convertible_to<Dimensions<RANK>>;
-  // { streamParameters(qsd,os) } -> std::convertible_to<std::ostream&>;
+  { getParameters(qsd) } -> std::convertible_to<LogTree>;
 };
 
 
@@ -71,6 +83,8 @@ concept quantum_system_dynamics = requires (T&& qsd)
 template <size_t RANK, hamiltonian<RANK> HA, exact_propagator<RANK> EX, expectation_values<RANK> EV>
 struct QuantumSystemDynamics
 {
+  std::string label;
+
   Dimensions<RANK> dim;
 
   SystemFrequencyStore freqs;
@@ -80,6 +94,8 @@ struct QuantumSystemDynamics
   HA ha;
   EX ex = exact_propagator_ns::noOp;
   EV ev = expectation_values_ns::noOp;
+
+  LogTree nonFrequencyParams={};
 
   friend const SystemFrequencyStore& getFreqs(const QuantumSystemDynamics& qsd) {return qsd.freqs;}
 
@@ -91,14 +107,23 @@ struct QuantumSystemDynamics
 
   friend auto getDimensions(const QuantumSystemDynamics& qsd) {return qsd.dim;}
 
+  friend auto getParameters(const QuantumSystemDynamics& qsd)
+  {
+    LogTree res{SFS_toJSON(getFreqs(qsd))};
+    res.insert(qsd.nonFrequencyParams.cbegin(),qsd.nonFrequencyParams.cend());
+    return res;
+  }
+
 };
 
 
 template <size_t RANK, typename HA, typename EX, typename EV>
-QuantumSystemDynamics(Dimensions<RANK>, const SystemFrequencyStore&, const Liouvillian<RANK>&, HA&&, EX&&, EV&&) -> QuantumSystemDynamics<RANK,HA,EX,EV>;
+QuantumSystemDynamics(std::string, Dimensions<RANK>, const SystemFrequencyStore&, const Liouvillian<RANK>&, HA&&, EX&&, EV&&, const LogTree& = {})
+-> QuantumSystemDynamics<RANK,HA,EX,EV>;
 
 template <typename HA, typename EX, typename EV>
-QuantumSystemDynamics(size_t, const SystemFrequencyStore&, const Liouvillian<1>&, HA&&, EX&&, EV&&) -> QuantumSystemDynamics<1,HA,EX,EV>;
+QuantumSystemDynamics(std::string, size_t, const SystemFrequencyStore&, const Liouvillian<1>&, HA&&, EX&&, EV&&, const LogTree& = {})
+-> QuantumSystemDynamics<1,HA,EX,EV>;
 
 
 namespace binary {
