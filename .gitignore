@@ -13,3 +13,4 @@ CPPQEDcore/doc/logoCppQED_old.*
 OwnScripts/
 scripts/
 benchmarking/
+__pycache__/

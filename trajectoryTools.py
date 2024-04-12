@@ -39,3 +39,8 @@ def correlationInTime(traj) :
 
 def upperPhotonNum(g) :
     return g**2/50.
+
+
+def waitingTimeDistro(jumpTraj,jumpNo=0) :
+    photonClicks=(jumpTraj[jumpTraj[:,1]==jumpNo])[:,0]
+    return photonClicks[1:]-photonClicks[:-1]
