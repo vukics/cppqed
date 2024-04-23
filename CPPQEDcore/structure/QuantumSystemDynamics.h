@@ -128,9 +128,9 @@ QuantumSystemDynamics(std::string, size_t, const SystemFrequencyStore&, const Li
 
 namespace binary {
 
-auto expectation_values(const quantum_system_dynamics<1> auto& qsd0, const quantum_system_dynamics<1> auto& qsd1,
-                        const std::vector<size_t>& offsets0, const std::vector<size_t>& offsets1, 
-                        const expectation_values<2> auto& ev) {
+auto assembleEV(const quantum_system_dynamics<1> auto& qsd0, const quantum_system_dynamics<1> auto& qsd1,
+                const std::vector<size_t>& offsets0, const std::vector<size_t>& offsets1,
+                const expectation_values<2> auto& ev) {
   return [&] (double t, lazy_density_operator<2> auto psi) {
     return hana::make_tuple(
       partialTrace<retainedAxes<0>,2>(psi,offsets0,[&] (auto m) {return calculateExpectationValues<1>(getEV(qsd0),t,m);},plusTDP{}),
@@ -138,7 +138,14 @@ auto expectation_values(const quantum_system_dynamics<1> auto& qsd0, const quant
       calculateExpectationValues<2>(ev,t,psi));
   };
 }
-  
+
+
+template <
+  typename QSD0,
+  typename QSD1,
+  typename EV>
+LogTree label(const decltype( assembleEV( std::declval<QSD0>(), std::declval<QSD1>(), std::vector<size_t>{}, std::vector<size_t>{}, std::declval<EV>() ) ) & ) {return {};}
+
 } // binary
 
 
@@ -154,26 +161,26 @@ template <
   quantum_system_dynamics<1> QSD1,
   hamiltonian<2> HA,
   exact_propagator<2> EX,
-  expectation_values<2> EV >
+  expectation_values<2> EV,
+  typename EVFULL>
 class BinarySystem
 {
 private:
-  const SystemFrequencyStore freqsFull_;
-
   const std::vector<size_t> offsets0_, offsets1_;
 
   const Liouvillian<2> liFull_;
+
+  const EVFULL evFull_;
 
 public:
   QSD0 qsd0; QSD1 qsd1;
 
   HA ha; EX ex; EV ev; // these are the properties that the interaction element might have
 
+  const std::string label="BinarySystem";
+
   BinarySystem(auto&& qsd0, auto&& qsd1, const SystemFrequencyStore& freqs, const Liouvillian<2>& li, auto&& ha, auto&& ex, auto&& ev)
-    : freqsFull_{ [&] {
-        SystemFrequencyStore res(getFreqs(qsd0));/* res.append_range(getFreqs(qsd1)); res.append_range(freqs);*/ return res;
-      } () },
-      offsets0_{calculateSlicesOffsets<retainedAxes<0>>(concatenate(getDimensions(qsd0),getDimensions(qsd1)))},
+    : offsets0_{calculateSlicesOffsets<retainedAxes<0>>(concatenate(getDimensions(qsd0),getDimensions(qsd1)))},
       offsets1_{calculateSlicesOffsets<retainedAxes<1>>(concatenate(getDimensions(qsd0),getDimensions(qsd1)))},
       liFull_{ [&] {
         Liouvillian<2> res(size(getLi(qsd0))+size(getLi(qsd1))+size(li));
@@ -183,6 +190,7 @@ public:
         for (const Lindblad<2> & l : li ) *resIter++ = l;
         return res;
       } () },
+      evFull_{binary::assembleEV(qsd0,qsd1,offsets0_,offsets1_,ev)},
       qsd0{std::forward<decltype(qsd0)>(qsd0)},
       qsd1{std::forward<decltype(qsd1)>(qsd1)},
       ha{std::forward<decltype(ha)>(ha)},
@@ -191,7 +199,15 @@ public:
   {}
 
 
-  friend const SystemFrequencyStore& getFreqs(const BinarySystem& bs) {return bs.freqsFull_;}
+  friend auto getFreqs(const BinarySystem& bs) {
+    SystemFrequencyStore res(getFreqs(bs.qsd0));
+    { // TODO: append_range can be used in C++23
+      const auto& f=getFreqs(bs.qsd1);
+      res.insert(res.end(),f.begin(),f.end());
+    }
+//    res.append_range(freqs);
+    return res;
+  }
 
   friend auto getHa(const BinarySystem& bs) {
     return [&] (double t, StateVectorConstView<2> psi, StateVectorView<2> dpsidt, double t0) {
@@ -201,13 +217,9 @@ public:
     };
   }
 
-  // friend LogTree label(decltype(
-  //   binary::hamiltonian( std::declval<QSD0>(), std::declval<QSD1>(), std::vector<size_t>{}, std::vector<size_t>{}, std::declval<HA>() )
-  // ) ) {return "BinarySystem";}
-
   friend auto getEx(const BinarySystem& bs) {return exact_propagator_ns::noOp;}
 
-  friend auto getEV(const BinarySystem& bs) {return binary::expectation_values(bs.qsd0,bs.qsd1,bs.offsets0_,bs.offsets1_,bs.ev);}
+  friend auto getEV(const BinarySystem& bs) {return bs.evFull_;}
   
   
 /*
@@ -219,34 +231,27 @@ public:
     };
   }
 
-  friend auto getEV(const BinarySystem& bs) {
-    return [&] (double t, lazy_density_operator<2> auto psi) {
-      return hana::make_tuple(
-        partialTrace<BinarySystem::retainedAxes<0>,2>(psi,bs.offsets0_,[&] (lazy_density_operator<1> auto m) {return getEV(bs.qsd0)(t,m);}),
-        partialTrace<BinarySystem::retainedAxes<1>,2>(psi,bs.offsets1_,[&] (lazy_density_operator<1> auto m) {return getEV(bs.qsd1)(t,m);}),
-        bs.ev(t,psi));
-    };
-  }
-
-  friend LogTree label(const decltype(getEV(std::declval<BinarySystem>())) & ) {return "BinarySystem";}
 
 */
+
+//  friend LogTree label(const EVFULL&) {return {};}
 
   friend const auto& getLi(const BinarySystem& bs) {return bs.liFull_;}
 
   friend auto getDimensions(const BinarySystem& bs) {return concatenate(getDimensions(bs.qsd0),getDimensions(bs.qsd1));}
 
+  friend LogTree getParameters(const BinarySystem& bs)
+  {
+    return {{getLabel(bs.qsd0),getParameters(bs.qsd0)},{getLabel(bs.qsd1),getParameters(bs.qsd1)}};
+    // Interaction element could be just a tag class, but also have some functionalities, like checking Free subsystems for compatibility (e.g. Jaynes-Cummings expects a mode and a qbit)
+  }
 };
 
 
 
-// template <typename BS >
-// LogTree label( std::invoke_result_t< decltype(BS::getHa), BS > ) {return "BinarySystem";}
-
-
-
 template <typename QSD0, typename QSD1, typename HA, typename EX, typename EV>
-BinarySystem(QSD0, QSD1, const SystemFrequencyStore&, const Liouvillian<2>&, HA&& ha, EX&& ex, EV&& ev) -> BinarySystem<QSD0,QSD1,HA,EX,EV>;
+BinarySystem(QSD0&& qsd0, QSD1&& qsd1, const SystemFrequencyStore& sfs, const Liouvillian<2>& li, HA&& ha, EX&& ex, EV&& ev)
+-> BinarySystem<QSD0,QSD1,HA,EX,EV,decltype(binary::assembleEV(qsd0,qsd1,std::vector<size_t>{},std::vector<size_t>{},ev))>;
 
 
 } // structure

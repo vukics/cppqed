@@ -124,6 +124,7 @@ concept hamiltonian = hana_sequence<H> && !!hana::all_of(
 
 */
 
+
 namespace hamiltonian_ns {
 
 /// Maybe this can be just an overload of applyHamiltonian ?
@@ -154,3 +155,34 @@ template <size_t RANK> using TimeDependentTerm = ODE_derivativeTimeDependentFunc
 
 } // structure
 
+
+
+#include "SparseMatrix.h"
+
+#include "progressbar.hpp"
+
+namespace structure::hamiltonian_ns {
+
+template <size_t RANK, hamiltonian<RANK> H>
+quantumoperator::SparseMatrix vectorize(H&& h, Dimensions<RANK> d)
+{
+  return {
+    [&] ()
+    {
+      quantumoperator::SparseMatrix::Elements elements;
+      StateVector<RANK> psi{d,zeroInit}, dpsidt{d,zeroInit};
+      auto psiView{psi.mutableView().dataView}, dpsidtView{dpsidt.mutableView().dataView};
+      size_t dim=multiarray::calculateExtent(d);
+      progressbar bar(dim);
+      for ( size_t i=0; i<dim; (bar.update(), ++i) ) {
+        psiView[i]=1.;
+        applyHamiltonian(h,0.,psi,dpsidt.mutableView(),0.);
+        for (size_t j=0; j<dim; ++j) if (dcomp v=dpsidtView[j]; abs(v)) elements.push_back({j,i,v});
+        psiView[i]=0.; for (dcomp& v : dpsidtView) v=0.;
+      }
+      return elements;
+    } ()
+  };
+}
+
+} // structure::hamiltonian_ns

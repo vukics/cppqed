@@ -103,6 +103,12 @@ auto calculateSlicesOffsets(Extents<RANK> extents)
 }
 
 
+template <size_t... i, size_t RANK> requires (sizeof...(i)<RANK)
+auto cso(Extents<RANK> extents)
+{
+  return calculateSlicesOffsets<retainedAxes<i...>>(extents);
+}
+
 
 template <auto retainedAxes, typename T, size_t RANK>
 auto sliceRangeSimple(MultiArrayView<T,RANK> mav, const std::vector<size_t>& offsets)

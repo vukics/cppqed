@@ -33,7 +33,7 @@ struct VectorSpaceOperatorsGenerator
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator plus");
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)}; for (auto& [re,ae,be] : std::views::zip(r,a.dataView,b.dataView)) re=ae+be; return r;
+      auto r{noInit(e)}; for (auto&& [re,ae,be] : std::views::zip(r,a.dataView,b.dataView)) re=ae+be; return r;
     }};
   }
 
@@ -42,7 +42,7 @@ struct VectorSpaceOperatorsGenerator
   {
     checkExtents(a,b,"VectorSpaceOperatorsGenerator minus");
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)}; for (auto& [re,ae,be] : std::views::zip(r,a.dataView,b.dataView)) re=ae-be; return r;
+      auto r{noInit(e)}; for (auto&& [re,ae,be] : std::views::zip(r,a.dataView,b.dataView)) re=ae-be; return r;
     }};
   }
 
@@ -50,7 +50,7 @@ struct VectorSpaceOperatorsGenerator
   friend auto operator*(dcomp v, const Derived& a)
   {
     return Derived{getDimensions(a), [&] (size_t e) {
-      auto r{noInit<multiArrayRank_v<Derived>>(e)}; for (auto& [re,ae] : std::views::zip(r,a.dataView)) re=v*ae; return r;
+      auto r{noInit(e)}; for (auto&& [re,ae] : std::views::zip(r,a.dataView)) re=v*ae; return r;
     }};
   }
 
