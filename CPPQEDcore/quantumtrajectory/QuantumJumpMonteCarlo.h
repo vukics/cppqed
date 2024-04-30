@@ -69,17 +69,17 @@ LogTree defaultLogger()
 
 
 /// Implements a single Quantum-Jump Monte Carlo trajectory
-template <qjmc::Algorithm, size_t RANK, quantum_system_dynamics<RANK>, ode::engine<StorageType>, std::uniform_random_bit_generator>
+template <qjmc::Algorithm, size_t RANK, hamiltonian<RANK> HA, expectation_values<RANK> EV, ode::engine<StorageType>, std::uniform_random_bit_generator>
 struct QuantumJumpMonteCarlo;
 
 
 using Rates = std::vector<double>;
 
 
-
 template<
   size_t RANK,
-  quantum_system_dynamics<RANK> QSD,
+  hamiltonian<RANK> HA,
+  expectation_values<RANK> EV,
   ode::engine<StorageType> OE,
   std::uniform_random_bit_generator RandomEngine >
 struct QuantumJumpMonteCarloBase
@@ -89,16 +89,19 @@ struct QuantumJumpMonteCarloBase
 
   QuantumJumpMonteCarloBase(QuantumJumpMonteCarloBase&&) = default;
 
-  QuantumJumpMonteCarloBase(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re)
-  : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re},
+  QuantumJumpMonteCarloBase(auto&& ha, const Liouvillian<RANK>& li, auto&& ev, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re)
+  : ha{std::forward<decltype(ha)>(ha)}, li{li}, ev{std::forward<decltype(ev)>(ev)},
+    psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re},
     log_{qjmc::defaultLogger()},
     intro_{{"Quantum-Jump Monte Carlo",{{"odeEngine",logIntro(this->oe)},{"randomEngine",logIntro(this->re)}}}}
     {
-      if (!size(getLi(this->qsd))) throw std::runtime_error("No Lindblad in QuantumJumpMonteCarlo");
+      if (!size(li)) throw std::runtime_error("No Lindblad in QuantumJumpMonteCarlo");
     }
 
   double time=0., time0=0.;
-  QSD qsd;
+  HA ha;
+  const Liouvillian<RANK> li;
+  EV ev;
   StateVector<RANK> psi;
   OE oe;
   randomutils::EngineWithParameters<RandomEngine> re;
@@ -110,7 +113,7 @@ struct QuantumJumpMonteCarloBase
   /// TODO: put here the system-specific things
   friend LogTree logIntro(const QuantumJumpMonteCarloBase& q)
   {
-    LogTree res{q.intro_}; res.insert({{getLabel(q.qsd),getParameters(q.qsd)},{"Jump operators",toJSON_array(getLi(q.qsd))}});
+    LogTree res{q.intro_}; res.insert({/*{getLabel(q.qsd),getParameters(q.qsd)},*/{"Jump operators",toJSON_array(q.li)}});
     return res;
   }
 
@@ -133,14 +136,13 @@ struct QuantumJumpMonteCarloBase
     return ar;
   }
   
-  auto calculateRates(const Liouvillian<RANK> & li) const
+  auto calculateRates() const
   {
     Rates res(std::size(li));
     std::ranges::transform(li, res.begin(), [&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } );
     return res;
     // TODO: with std::ranges::to the following beautiful solution will be possible:
     // return li | std::views::transform([&] (const Lindblad<RANK>& l) -> double {return calculateRate(l.rate,time,psi); } ) | std::ranges::to<Rates>() ;
-
   }
 
   double sampleRandom() {return distro_(re.engine);}
@@ -163,15 +165,14 @@ protected:
     for (; random>0 && lindbladNo!=rates.size(); random-=rates[lindbladNo++]) ;
 
     if (random<0) { // Jump corresponding to Lindblad no. lindbladNo-1 occurs
-      applyJump(getLi(this->qsd)[--lindbladNo].jump,
-                this->time,this->psi.mutableView());
+      applyJump(li[--lindbladNo].jump,time,psi.mutableView());
 
       double normFactor=sqrt(rates[lindbladNo]);
 
-      for (dcomp& v : this->psi.dataStorage()) v/=normFactor;
+      for (dcomp& v : psi.dataStorage()) v/=normFactor;
 
-      res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",this->time}});
-      this->log_["Jump trajectory"].as_array().push_back({this->time,lindbladNo});
+      res.emplace("jump",LogTree{{"no.",lindbladNo},{"at time",time}});
+      log_["Jump trajectory"].as_array().push_back({time,lindbladNo});
     }
 
     return res;
@@ -185,16 +186,20 @@ protected:
 /// THE INTEGRATING ALGORITHM, cf. https://qutip.org/docs/latest/guide/dynamics/dynamics-monte.html
 template<
   size_t RANK,
-  quantum_system_dynamics<RANK> QSD,
+  hamiltonian<RANK> HA,
+  expectation_values<RANK> EV,
   ode::engine<StorageType> OE,
   std::uniform_random_bit_generator RandomEngine >
-struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngine> : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>
+struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,HA,EV,OE,RandomEngine> : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>
 {
   QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default;
 
-  QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double normTol)
-  : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
-    normTol_{normTol}, normAt_{this->sampleRandom()}
+  QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK> li, auto&& ev,
+                        auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double normTol)
+    : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>{
+        std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),
+        std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
+      normTol_{normTol}, normAt_{this->sampleRandom()}
   {
     this->log_["bisectMaxIter"]=0z;
     this->log_["maxIterOvershot"]={{"times",0z},{"maxDev",0.}};
@@ -272,7 +277,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,QSD,OE,RandomEngi
   template <typename Archive>
   friend auto& stateIO(QuantumJumpMonteCarlo& q, Archive& ar)
   {
-    return stateIO(static_cast<QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>&>(q),ar) & q.normAt_ & q.bisect_;
+    return stateIO(static_cast<QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>&>(q),ar) & q.normAt_ & q.bisect_;
   }
 
 
@@ -305,24 +310,28 @@ private:
  */
 template<
   size_t RANK,
-  quantum_system_dynamics<RANK> QSD,
+  hamiltonian<RANK> HA,
+  expectation_values<RANK> EV,
   ode::engine<StorageType> OE,
   std::uniform_random_bit_generator RandomEngine >
-struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,QSD,OE,RandomEngine> : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>
+struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,HA,EV,OE,RandomEngine> : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>
 {
   QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default;
 
-  QuantumJumpMonteCarlo(auto&& qsd, auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
-    : QuantumJumpMonteCarloBase<RANK,QSD,OE,RandomEngine>{std::forward<decltype(qsd)>(qsd),std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
+  QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK> li, auto&& ev,
+                        auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
+    : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>{
+        std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),
+        std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
       dpLimit_{dpLimit}
   {
-    if (!time) manageTimeStep( this->calculateRates(getLi(this->qsd)) );
+    if (!time) manageTimeStep( this->calculateRates(this->li) ) ;
 
     this->log_["dpLimit overshot"]={{"n",0z},{"max.",0.}};
-     {
+    {
       auto& intro=this->intro_["Quantum-Jump Monte Carlo"].as_object();
       intro["algorithm"]="stepwise"; intro["pdLimit"]=dpLimit;
-     }
+    }
   }
 
   /// TODO: the returned log should contain information about the coherent step + the time step change as well
@@ -386,16 +395,15 @@ private:
 
 namespace qjmc {
 
-template <Algorithm a, template<typename> class OE, typename QSD, typename SV, typename RandomEngine>
-auto make(QSD&& qsd, SV&& state, const Pars<a,RandomEngine>& p)
+template <Algorithm a, template<typename> class OE, size_t RANK, typename HA, typename EV, typename SV, typename RandomEngine>
+auto make(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, SV&& state, const Pars<a,RandomEngine>& p)
 {
-  constexpr size_t RANK=multiArrayRank_v<std::decay_t<SV>>;
   using ODE=OE<StorageType>;
 
   double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
   
-  return QuantumJumpMonteCarlo<a,RANK,QSD,ODE,RandomEngine>{
-    std::forward<QSD>(qsd),
+  return QuantumJumpMonteCarlo<a,RANK,HA,EV,ODE,RandomEngine>{
+    std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),
     std::forward<SV>(state),
     ODE{iDt,p.epsRel,p.epsAbs},
     randomutils::EngineWithParameters<RandomEngine>{p.seed,p.prngStream},
@@ -409,16 +417,18 @@ auto make(QSD&& qsd, SV&& state, const Pars<a,RandomEngine>& p)
 /// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `QuantumJumpMonteCarlo`s
 template<Algorithm a,
          template<typename> class OE, /* auto retainedAxes,*/ size_t RANK,
-         quantum_system_dynamics<RANK> QSD, typename RandomEngine>
-auto makeEnsemble(QSD&& qsd, const StateVector<RANK>& psi, Pars<a,RandomEngine>& p /*, EntanglementMeasuresSwitch ems*/)
+         typename HA, typename EV,
+         typename RandomEngine>
+auto makeEnsemble(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const StateVector<RANK>& psi, Pars<a,RandomEngine>& p /*, EntanglementMeasuresSwitch ems*/)
 {
-  using QSD_const_ref = std::add_lvalue_reference_t<std::add_const_t<QSD>>;
+  using HA_const_ref = std::add_lvalue_reference_t<std::add_const_t<HA>>;
+  using EV_const_ref = std::add_lvalue_reference_t<std::add_const_t<EV>>;
   // quantum_system_dynamics is stored by value in TDP_DensityOperator, and the individual trajectories borrow it from there
-  using Single=QuantumJumpMonteCarlo<a,RANK,QSD_const_ref,OE<StorageType>,RandomEngine>;
+  using Single=QuantumJumpMonteCarlo<a,RANK,HA_const_ref,EV_const_ref,OE<StorageType>,RandomEngine>;
 
-  trajectory::Ensemble<Single,TDP_DensityOperator<RANK,QSD>> res{
+  trajectory::Ensemble<Single,TDP_DensityOperator<RANK,EV>> res{
     .trajs{},
-    .tdpCalculator{std::forward<QSD>(qsd)/*,ems*/},
+    .tdpCalculator{std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev)/*,ems*/},
     // qjmc::EnsembleLogger{p.nBins,p.nJumpsPerBin},
     .ensembleAverageResult{DensityOperator<RANK>{getDimensions(psi),noInit}}
   };
@@ -436,29 +446,29 @@ auto makeEnsemble(QSD&& qsd, const StateVector<RANK>& psi, Pars<a,RandomEngine>&
 } // qjmc
 
 
-template <qjmc::Algorithm a, template<typename> class OE, typename RandomEngine, typename QSD, typename SV, typename AH>
-void run(QSD&& qsd, SV&& state, trajectory::Pars<qjmc::Pars<a,RandomEngine>>& p, AH && observer)
+template <qjmc::Algorithm a, template<typename> class OE, typename RandomEngine, typename HA, typename EV, typename SV, typename AH>
+void run(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, SV&& state, trajectory::Pars<qjmc::Pars<a,RandomEngine>>& p, AH && observer)
 {
   if (!p.nTraj) // single trajectory
-    run(qjmc::make<a,OE>(std::forward<QSD>(qsd),std::forward<SV>(state),p),p,std::forward<AH>(observer));
+    run(qjmc::make<a,OE>(std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),std::forward<SV>(state),p),p,std::forward<AH>(observer));
   else
-    run(qjmc::makeEnsemble<a,OE>(std::forward<QSD>(qsd),state,p),p,std::forward<AH>(observer));
+    run(qjmc::makeEnsemble<a,OE>(std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),state,p),p,std::forward<AH>(observer));
 }
 
 
 } // quantumtrajectory
 
 
-template <quantumtrajectory::qjmc::Algorithm a, size_t RANK, typename QSD, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,QSD,ODE_Engine,RandomEngine>>
+template <quantumtrajectory::qjmc::Algorithm a, size_t RANK, typename HA, typename EV, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::MakeSerializationMetadata<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,HA,EV,ODE_Engine,RandomEngine>>
 {
   static auto _() {return SerializationMetadata{"CArray","QuantumJumpMonteCarlo",RANK};}
 };
 
 
 
-template<quantumtrajectory::qjmc::Algorithm a, size_t RANK, typename QSD, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,QSD,ODE_Engine,RandomEngine>>
+template<quantumtrajectory::qjmc::Algorithm a, size_t RANK, typename HA, typename EV, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,HA,EV,ODE_Engine,RandomEngine>>
 {
   static const auto& _(quantumdata::DensityOperator<RANK>& rho, const auto& trajs)
   {
@@ -478,10 +488,10 @@ struct cppqedutils::trajectory::AverageTrajectories<quantumtrajectory::QuantumJu
  * **Most general solution**: create a DensityOperator from the available arrays (independently of their number)
  * and sample the density operator to initialize as many trajectories as needed.
  */
-template<quantumtrajectory::qjmc::Algorithm a, size_t RANK, typename QSD, typename ODE_Engine, typename RandomEngine>
-struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,QSD,ODE_Engine,RandomEngine>>
+template<quantumtrajectory::qjmc::Algorithm a, size_t RANK, typename HA, typename EV, typename ODE_Engine, typename RandomEngine>
+struct cppqedutils::trajectory::InitializeEnsembleFromArrayOnlyArchive<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,HA,EV,ODE_Engine,RandomEngine>>
 {
-  static auto& _(const std::vector<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,QSD,ODE_Engine,RandomEngine>>&, iarchive& iar)
+  static auto& _(const std::vector<quantumtrajectory::QuantumJumpMonteCarlo<a,RANK,HA,EV,ODE_Engine,RandomEngine>>&, iarchive& iar)
   {
     throw std::runtime_error("InitializeEnsembleFromArrayOnlyArchive not implemented for QuantumJumpMonteCarlo");
     return iar;

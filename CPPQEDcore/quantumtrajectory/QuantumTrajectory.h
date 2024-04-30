@@ -53,21 +53,21 @@ std::ostream& streamCharacteristics(const quantum_system_dynamics<RANK> auto& qs
  * - extending key with entanglement measures when needed
  */
 template<size_t RANK,
-         quantum_system_dynamics<RANK> QSD/*,
+         expectation_values<RANK> EV/*,
          auto axesOfSubsystem */ // the axes belonging to one of the subsystems defined for entanglementMeasuresCalculation
          >
 class TDP_DensityOperator
 {
 public:
-  TDP_DensityOperator(auto&& qsd /*, EntanglementMeasuresSwitch ems*/) : qsd{std::forward<QSD>(qsd)} {}
+  TDP_DensityOperator(auto&& ev /*, EntanglementMeasuresSwitch ems*/) : ev{std::forward<decltype(ev)>(ev)} {}
 
-  QSD qsd;
+  EV ev;
 //  const EntanglementMeasuresSwitch ems_;
 
 
   auto operator()(double t, const DensityOperator<RANK>& rho) const
   {
-    return calculateExpectationValues<RANK>(getEV(qsd),t,LDO<DensityOperator,RANK>(rho));
+    return calculateExpectationValues<RANK>(ev,t,LDO<DensityOperator,RANK>(rho));
 /*    auto & averages{std::get<1>(res)};
     if constexpr ( !isV_empty ) {
       if (ems_[0]) {
@@ -92,7 +92,7 @@ public:
 
   friend LogTree dataStreamKey(const TDP_DensityOperator& t)
   {
-    return label(getEV(t.qsd));
+    return getLabel(t.ev);
 /*    if constexpr ( !isV_empty ) {
       if (ems_.any()) os<<"Trajectory\n";
       if (ems_[0]) os<<i++<<". negativity\n";
