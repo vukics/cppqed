@@ -103,6 +103,7 @@ auto calculateSlicesOffsets(Extents<RANK> extents)
 }
 
 
+/// TODO: how to integrate this with the above overloads of calculateSlicesOffsets
 template <size_t... i, size_t RANK> requires (sizeof...(i)<RANK)
 auto cso(Extents<RANK> extents)
 {
@@ -275,6 +276,16 @@ void broadcastFor(F&& f, ARGS&&... args)
   // create ranges
 }
 
+
+
+template <auto retainedAxes>
+struct Broadcaster
+{
+  template <size_t RANK>
+  Broadcaster(Extents<RANK> extents) : offsets{calculateSlicesOffsets<retainedAxes>(extents)} {}
+
+  const std::vector<size_t> offsets;
+};
 
 
 namespace multi_index_range_solution_by_chatgpt {

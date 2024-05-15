@@ -2,7 +2,7 @@
 /// \briefFile{Defines the qbit-bundle (tackling the dynamics of a single qbit)}
 #pragma once
 
-#include "QuantumSystemDynamics.h"
+#include "Liouvillian.h"
 
 #include "MultiDiagonal.h"
 
@@ -55,30 +55,30 @@ StateVector<1> state1();// {return mode::fock(1,2);}
 StateVector<1> init(dcomp psi1);
 
 
-auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/)
-{
-  Liouvillian<1> liouvillian;
-  SystemFrequencyStore freqs;
-
-  if (abs(zSch)) freqs.emplace_back("zSch",zSch,1);
-  if (abs(eta)) freqs.emplace_back("η",eta,1);
-  if (gamma_m) {liouvillian.push_back(loss(gamma_m)); freqs.emplace_back("γ_m",gamma_m,1);}
-  if (gamma_p) {liouvillian.push_back(gain(gamma_m)); freqs.emplace_back("γ_p",gamma_p,1);}
-  // if (gamma_phi) liouvillian.emplace(dephasing(gamma_phi));
-
-  return QuantumSystemDynamics { "Qbit", 2, freqs, liouvillian, fullH(zSch,eta), exact_propagator_ns::noOp, expectationValues}; //makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
-}
-
-
-
-auto make(double delta, dcomp eta, double gamma_m, double gamma_p)
-{
-  return make(dcomp{gamma_m-gamma_p,-delta},eta,gamma_m,gamma_p);
-}
+// auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/)
+// {
+//   Liouvillian<1> liouvillian;
+//   SystemFrequencyStore freqs;
+//
+//   if (abs(zSch)) freqs.emplace_back("zSch",zSch,1);
+//   if (abs(eta)) freqs.emplace_back("η",eta,1);
+//   if (gamma_m) {liouvillian.push_back(loss(gamma_m)); freqs.emplace_back("γ_m",gamma_m,1);}
+//   if (gamma_p) {liouvillian.push_back(gain(gamma_m)); freqs.emplace_back("γ_p",gamma_p,1);}
+//   // if (gamma_phi) liouvillian.emplace(dephasing(gamma_phi));
+//
+//   return QuantumSystemDynamics { "Qbit", 2, freqs, liouvillian, fullH(zSch,eta), exact_propagator_ns::noOp, expectationValues}; //makeHamiltonianCollection<1>(diagonalH(zSch)/*,{"diagI",propagator(zI)}*/,offDiagonalH(eta)),
+// }
 
 
 
-struct Pars
+// auto make(double delta, dcomp eta, double gamma_m, double gamma_p)
+// {
+//   return make(dcomp{gamma_m-gamma_p,-delta},eta,gamma_m,gamma_p);
+// }
+
+
+
+struct Pars : ::parameters::JSONizable
 {
   double delta, gamma_m, gamma_p;
   dcomp eta;
@@ -97,10 +97,10 @@ struct Pars
 };
 
 
-auto make(const Pars& p)
-{
-  return make(p.delta,p.eta,p.gamma_m,p.gamma_p);
-}
+// auto make(const Pars& p)
+// {
+//   return make(p.delta,p.eta,p.gamma_m,p.gamma_p);
+// }
 
 
 // operators are defined here as MultiDiagonals, which is an overkill, of course

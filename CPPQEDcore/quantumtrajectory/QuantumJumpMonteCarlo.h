@@ -219,13 +219,13 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,HA,EV,OE,RandomEn
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
     {
-      applyHamiltonian(getHa(q.qsd),t,
+      applyHamiltonian(q.ha,t,
                        StateVectorConstView<RANK>{q.psi.extents,q.psi.strides,0,psiRaw},
                        StateVectorView<RANK>{q.psi.extents,q.psi.strides,0,dpsidtRaw.begin(),std::ranges::fill(dpsidtRaw,0)},
                        q.time0);
     },q.time,q.psi.dataStorage());
 
-    applyPropagator(getEx(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
+    // applyPropagator(q.ex,q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
 
     q.bisect_.update(q.time,normSqr(q.psi));
 
@@ -235,7 +235,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,HA,EV,OE,RandomEn
       q.normAt_=q.sampleRandom();
       renorm(q.psi);
 
-      auto rates(q.calculateRates(getLi(q.qsd)));
+      auto rates(q.calculateRates());
 
       res=q.performJump(rates,
                         std::accumulate(rates.begin(),rates.end(),0.)*q.sampleRandom());
@@ -268,7 +268,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,HA,EV,OE,RandomEn
 
   friend auto temporalDataPoint(const QuantumJumpMonteCarlo& q)
   {
-    auto res{calculateExpectationValues<RANK>( getEV(q.qsd), q.time, LDO<StateVector,RANK>(q.psi) )};
+    auto res{calculateExpectationValues<RANK>( q.ev, q.time, LDO<StateVector,RANK>(q.psi) )};
     renormTDP(res,q.bisect_.n1);
     return res; // hana::make_tuple(res,q.bisect_.n1,q.normAt_);
   }
@@ -340,18 +340,18 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,HA,EV,OE,RandomEngin
     // Coherent time development
     step(q.oe, deltaT, [&] (const StorageType& psiRaw, StorageType& dpsidtRaw, double t)
     {
-      applyHamiltonian(getHa(q.qsd),t,
+      applyHamiltonian(q.ha,t,
                        StateVectorConstView<RANK>{q.psi.extents,q.psi.strides,0,psiRaw},
                        StateVectorView<RANK>{q.psi.extents,q.psi.strides,0,dpsidtRaw.begin(),std::ranges::fill(dpsidtRaw,0)},
                        q.time0);
     },q.time,q.psi.dataStorage());
 
-    applyPropagator(getEx(q.qsd),q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
+    applyPropagator(q.ex,q.time,q.psi.mutableView(),q.time0); q.time0=q.time;
 
     renorm(q.psi);
 
     // Jump
-    auto rates(q.calculateRates(getLi(q.qsd)));
+    auto rates(q.calculateRates(q.li));
 
     q.manageTimeStep(rates);
 
@@ -400,7 +400,7 @@ auto make(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, SV&& state, const Pars<
 {
   using ODE=OE<StorageType>;
 
-  double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
+  double iDt=initialTimeStep(ha,getDimensions(state)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
   
   return QuantumJumpMonteCarlo<a,RANK,HA,EV,ODE,RandomEngine>{
     std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),
@@ -414,45 +414,46 @@ auto make(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, SV&& state, const Pars<
 }
 
 
-/// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `QuantumJumpMonteCarlo`s
-template<Algorithm a,
-         template<typename> class OE, /* auto retainedAxes,*/ size_t RANK,
-         typename HA, typename EV,
-         typename RandomEngine>
-auto makeEnsemble(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const StateVector<RANK>& psi, Pars<a,RandomEngine>& p /*, EntanglementMeasuresSwitch ems*/)
-{
-  using HA_const_ref = std::add_lvalue_reference_t<std::add_const_t<HA>>;
-  using EV_const_ref = std::add_lvalue_reference_t<std::add_const_t<EV>>;
-  // quantum_system_dynamics is stored by value in TDP_DensityOperator, and the individual trajectories borrow it from there
-  using Single=QuantumJumpMonteCarlo<a,RANK,HA_const_ref,EV_const_ref,OE<StorageType>,RandomEngine>;
-
-  trajectory::Ensemble<Single,TDP_DensityOperator<RANK,EV>> res{
-    .trajs{},
-    .tdpCalculator{std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev)/*,ems*/},
-    // qjmc::EnsembleLogger{p.nBins,p.nJumpsPerBin},
-    .ensembleAverageResult{DensityOperator<RANK>{getDimensions(psi),noInit}}
-  };
-
-  for (size_t i=0; i<p.nTraj; ++i) {
-    res.trajs.push_back(make<a,OE,QSD_const_ref>(res.tdpCalculator.qsd,StateVector<RANK>{copy(psi)},p));
-    randomutils::incrementForNextStream(p);
-  }
-
-  return res;
-
-}
+// /// Here, it is very important that psi is taken by const reference, since it has to be copied by value into the individual `QuantumJumpMonteCarlo`s
+// template<Algorithm a,
+//          template<typename> class OE, /* auto retainedAxes,*/ size_t RANK,
+//          typename HA, typename EV,
+//          typename RandomEngine>
+// auto makeEnsemble(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const StateVector<RANK>& psi, Pars<a,RandomEngine>& p /*, EntanglementMeasuresSwitch ems*/)
+// {
+//   using HA_const_ref = std::add_lvalue_reference_t<std::add_const_t<HA>>;
+//   using EV_const_ref = std::add_lvalue_reference_t<std::add_const_t<EV>>;
+//   // quantum_system_dynamics is stored by value in TDP_DensityOperator, and the individual trajectories borrow it from there
+//   using Single=QuantumJumpMonteCarlo<a,RANK,HA_const_ref,EV_const_ref,OE<StorageType>,RandomEngine>;
+//
+//   trajectory::Ensemble<Single,TDP_DensityOperator<RANK,EV>> res{
+//     .trajs{},
+//     .tdpCalculator{std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev)/*,ems*/},
+//     // qjmc::EnsembleLogger{p.nBins,p.nJumpsPerBin},
+//     .ensembleAverageResult{DensityOperator<RANK>{getDimensions(psi),noInit}}
+//   };
+//
+//   for (size_t i=0; i<p.nTraj; ++i) {
+//     res.trajs.push_back(make<a,OE,RANK,HA_const_ref,EV_const_ref>(res.tdpCalculator.qsd,StateVector<RANK>{copy(psi)},p));
+//     randomutils::incrementForNextStream(p);
+//   }
+//
+//   return res;
+//
+// }
 
 
 } // qjmc
 
 
-template <qjmc::Algorithm a, template<typename> class OE, typename RandomEngine, typename HA, typename EV, typename SV, typename AH>
+template <qjmc::Algorithm a, template<typename> class OE, typename RandomEngine, size_t RANK, typename HA, typename EV, typename SV, typename AH>
 void run(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, SV&& state, trajectory::Pars<qjmc::Pars<a,RandomEngine>>& p, AH && observer)
 {
   if (!p.nTraj) // single trajectory
     run(qjmc::make<a,OE>(std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),std::forward<SV>(state),p),p,std::forward<AH>(observer));
   else
-    run(qjmc::makeEnsemble<a,OE>(std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),state,p),p,std::forward<AH>(observer));
+    throw std::runtime_error("makeEnsemble out for the moment!");
+//    run(qjmc::makeEnsemble<a,OE>(std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),state,p),p,std::forward<AH>(observer));
 }
 
 

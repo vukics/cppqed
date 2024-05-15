@@ -70,9 +70,9 @@ template <
   auto retainedAxes,
   size_t RANK,
   functional<std::size(retainedAxes)> EV>
-auto broadcast(const EV& ev, double t, lazy_density_operator<RANK> auto matrix, const std::vector<size_t>& offsets)
+auto broadcast(const EV& ev, double t, lazy_density_operator<RANK> auto matrix, const Broadcaster<retainedAxes>& bc)
 {
-  return partialTrace( matrix, offsets, [&] (auto psiElem) {return calculate(ev,t,psiElem); } );
+  return partialTrace( matrix, bc.offsets, [&] (auto psiElem) {return calculate(ev,t,psiElem); } );
 }
 
 } // expectation_values_ns

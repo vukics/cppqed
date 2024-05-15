@@ -1,7 +1,7 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-#include "QuantumSystemDynamics.h"
+#include "Liouvillian.h"
 
 #include "MultiDiagonal.h"
 
@@ -33,17 +33,21 @@ double photonnumber(StateVectorConstView<1> psi)
 
 auto hamiltonian(size_t cutoff, dcomp z, double omegaKerr, dcomp eta)
 {
-  std::string label{"Mode monolithic MultiDiagonal:"};
   MultiDiagonal ham, a{aOp(cutoff)}, aDag{aDagOp(cutoff)};
 
-  if (abs(z)) {label+=" linear term;"; ham-=z*nOp(cutoff);}
-  if (omegaKerr) {label+=" Kerr term;"; ham+=(omegaKerr/1.i) * (aDag|aDag|a|a);}
-  if (abs(eta)) {label+=" drive term;"; ham+=twoTimesImagPartOf(eta*aDag);}
+  if (abs(z)) ham-=z*nOp(cutoff);
+  if (omegaKerr) ham+=(omegaKerr/1.i) * (aDag|aDag|a|a);
+  if (abs(eta)) ham+=twoTimesImagPartOf(eta*aDag);
 
-  return makeHamiltonianElement<1>(label,std::move(ham));
-    //-z*nOp(cutoff) + (omegaKerr/1.i) * (aDag|aDag|a|a) + twoTimesImagPartOf(eta*aDag)
+  return ham;
 }
 
+auto hamiltonian(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
+{
+  return hamiltonian(cutoff,
+                     {kappa*(2*nTh+1),-delta},
+                     omegaKerr,eta);
+}
 
 
 TimeIndependentJump<1> aJump(double fact);
@@ -72,12 +76,13 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Mode",{"photon number","photon number square","ladder operator"}}}; }
 
 
+/*
 auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
 {
   Liouvillian<1> liouvillian;
   SystemFrequencyStore freqs;
 
-  dcomp z{kappa*(2*nTh+1),-delta};
+  dcomp z{};
 
   if (delta) freqs.emplace_back("δ",delta,cutoff);
 
@@ -96,7 +101,7 @@ auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa
     {{"cutoff",cutoff}}
   };
 }
-
+*/
 
 
 struct Pars
@@ -122,11 +127,6 @@ struct Pars
 
 };
 
-
-auto make(const Pars& p)
-{
-  return make(p.cutoff,p.delta,p.omegaKerr,p.eta,p.kappa,p.nTh);
-}
 
 
 /*

@@ -333,6 +333,9 @@ const auto dataStreamerDefault = [] (const uniform_step auto& traj, std::ostream
 };
 
 
+/// TODO: factor out and unify observer, datastreamer (precision), calculation of TDP, return of DataStream, stateStream during run into a single OBSERVER + the number of steps can be logged directly within the run function
+/// then, for quantum trajectories, the expectation_values can be stored in an observer (only once even for Ensemble)
+
 /// The most general run function
 /** TODO: in-trajectory log in dc-mode will not appear for dc>1 */
 template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, data_streamer<TRAJ> TDS = decltype(dataStreamerDefault) >

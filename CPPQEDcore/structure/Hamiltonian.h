@@ -63,30 +63,6 @@ concept hamiltonian = /* labelled<H> && */ hamiltonian_ns::functional<H,RANK>;
 
 
 
-template <size_t RANK, hamiltonian_ns::functional<RANK> F>
-struct HamiltonianElement
-{
-  std::string label;
-
-  F functional;
-  
-  void operator()(double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0) const
-  {
-    applyHamiltonian(functional,t,psi,dpsidt,t0);
-  };
-
-};
-
-
-/// TODO: make a deduction guide that would deduce RANK from the StateVector argument of the functional via std::function and std::tuple_element
-/** note: the 2nd argument is always of type StateVector(Const)View, regardless of the time dependence */
-template <size_t RANK, hamiltonian_ns::functional<RANK> F>
-auto makeHamiltonianElement(std::string label, F&& functional)
-{
-  return HamiltonianElement<RANK,F>{.label{label},.functional{std::forward<F>(functional)}};
-}
-
-
 // itself a hamiltonian
 /**
  * \note It would be easy to do a runtime collection as well. For that, all the functionals should be wrapped in a `std::function`, and stored in a runtime container
@@ -125,22 +101,6 @@ concept hamiltonian = hana_sequence<H> && !!hana::all_of(
 */
 
 
-namespace hamiltonian_ns {
-
-/// Maybe this can be just an overload of applyHamiltonian ?
-template <
-  auto retainedAxes,
-  size_t RANK,
-  functional<std::size(retainedAxes)> T >
-void broadcast(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0, const std::vector<size_t>& offsets)
-{
-  for ( auto&& [psi,dpsidt] : std::views::zip( sliceRange<retainedAxes>(psi,offsets), sliceRange<retainedAxes>(dpsidt,offsets) ) )
-    applyHamiltonian(h,t,psi,dpsidt,t0);
-}
-
-
-} // hamiltonian_ns
-
 
 template <typename StateIn, typename StateOut>
 using ODE_derivativeTimeIndependentFunctional = std::function<void(StateIn psi, StateOut dpsidt)> ;
@@ -157,11 +117,25 @@ template <size_t RANK> using TimeDependentTerm = ODE_derivativeTimeDependentFunc
 
 
 
+#include "SliceIterator.h"
 #include "SparseMatrix.h"
 
 #include "progressbar.hpp"
 
 namespace structure::hamiltonian_ns {
+
+
+/// Maybe this can be just an overload of applyHamiltonian ?
+template <
+  auto retainedAxes,
+  size_t RANK,
+  functional<std::size(retainedAxes)> T >
+void broadcast(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0, const Broadcaster<retainedAxes>& bc)
+{
+  for ( auto&& [psi,dpsidt] : std::views::zip( sliceRange<retainedAxes>(psi,bc.offsets), sliceRange<retainedAxes>(dpsidt,bc.offsets) ) )
+    applyHamiltonian(h,t,psi,dpsidt,t0);
+}
+
 
 template <size_t RANK, hamiltonian<RANK> H>
 quantumoperator::SparseMatrix vectorize(H&& h, Dimensions<RANK> d)
@@ -184,5 +158,6 @@ quantumoperator::SparseMatrix vectorize(H&& h, Dimensions<RANK> d)
     } ()
   };
 }
+
 
 } // structure::hamiltonian_ns

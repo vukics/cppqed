@@ -1,7 +1,8 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-#include "QuantumSystemDynamics.h"
+#include "ExpectationValues.h"
+#include "Hamiltonian.h"
 
 #include "EntanglementMeasures.h"
 
@@ -17,10 +18,12 @@ using namespace structure;
 using EntanglementMeasuresSwitch = std::bitset<3>;
 
   
-/// Forwards to trajectory::initialTimeStep, with the highest frequency of the system taken as QuantumSystem::highestFrequency
-inline double initialTimeStep(const SystemFrequencyStore& freqs)
+template <size_t RANK>
+double initialTimeStep(const hamiltonian<RANK> auto h, Dimensions<RANK> d)
 {
-  return trajectory::initialTimeStep(highestFrequency(freqs));
+  StateVector<RANK> dpsidt{d,zeroInit}, psi{d,noInit}; for (dcomp& v : psi.mutableView().dataView) v=1.;
+  applyHamiltonian(h,0.,psi,dpsidt.mutableView(),0.);
+  return .1/std::ranges::max(dpsidt.dataView | std::views::transform( [] (dcomp v) {return abs(v);} ) ) ; // tenth of the inverse of the largest frequency
 }
 
 

@@ -4,6 +4,8 @@
 #include "ExactPropagator.h"
 #include "Hamiltonian.h"
 
+#include "LazyDensityOperator.h"
+
 #include <variant>
 
 namespace structure {
@@ -126,7 +128,7 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 namespace liouvillian_ns {
 
 template <auto retainedAxes, size_t RANK> requires ( std::size(retainedAxes) < RANK )
-Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::vector<size_t>& offsets)
+Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const Broadcaster<retainedAxes>& bc)
 {
   static constexpr size_t RRANK = std::size(retainedAxes);
   
@@ -135,12 +137,12 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
     .label{l.label} ,
 
     .jump{ [&] (double t, StateVectorView<RANK> psi) {
-      for (auto&& psiElem : sliceRange<retainedAxes>(psi,offsets)) applyJump(l.jump,t,psiElem);
+      for (auto&& psiElem : sliceRange<retainedAxes>(psi,bc.offsets)) applyJump(l.jump,t,psiElem);
     } } ,
 
     .rate{ [&] (double t, StateVectorConstView<RANK> psi) {
       return partialTrace<retainedAxes,RANK>(LDO<StateVector,RANK>{psi},
-                                             offsets,
+                                             bc.offsets,
                                              [&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return calculateRate(l.rate,t,psiElem); },
                                              std::plus{} );
     } } ,
@@ -149,11 +151,11 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const std::
       [ &, matrixOffsets=std::vector<size_t>{} ] (double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt) mutable {
         // matrixOffsets is populated when the lambda is first called
         if (!matrixOffsets.size()) {
-          matrixOffsets.resize(sqr(offsets.size()));
+          matrixOffsets.resize(sqr(bc.offsets.size()));
           size_t extent=std::lround(std::sqrt(rho.dataView.size()));
           auto i=matrixOffsets.begin(); 
-          for (auto u=offsets.begin(); u!=offsets.end(); ++u )
-            for (auto v=offsets.begin(); v!=offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
+          for (auto u=bc.offsets.begin(); u!=bc.offsets.end(); ++u )
+            for (auto v=bc.offsets.begin(); v!=bc.offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
         }
 
         for ( auto&& [rho,drhodt] : std::views::zip( sliceRange<extendedAxes<retainedAxes,RANK>>(rho,matrixOffsets), 
