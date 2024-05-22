@@ -5,6 +5,8 @@
 
 #include "popl.hpp"
 
+#include <list>
+
 inline std::string parsedCommandLine="";
 
 popl::OptionParser optionParser(std::string pre="", std::string post="");
@@ -14,42 +16,62 @@ void parse(popl::OptionParser&, int argc, const char* const argv[]);
 
 namespace parameters {
 
+using namespace cppqedutils;
+
+using to_json_converter=std::list<std::function<void(json::object&)>> ;
 
 template <typename T>
-auto& add(popl::OptionParser& op, std::string option, std::string description, T defaultValue, auto&& binding)
+void add(popl::OptionParser& op, std::string option, std::string description, T defaultValue, T& binding)
 {
-  op.add<popl::Value<T>>("",option,description,defaultValue,std::forward<decltype(binding)>(binding));
-  return op;
+  op.add<popl::Value<T>>("",option,description,defaultValue,&binding);
 }
+
 
 template <typename T>
-auto& add(popl::OptionParser& op, std::string option, std::string mod, std::string description, T defaultValue, auto&& binding)
+void add(popl::OptionParser& op, std::string option, std::string mod, std::string description, T defaultValue, T& binding)
 {
-  return add(op,option+mod,description,defaultValue,std::forward<decltype(binding)>(binding));
+  add(op,option+mod,description,defaultValue,binding);
 }
 
 
-inline auto& add(popl::OptionParser& op, std::string option, std::string description, bool* binding)
+template <typename T>
+void add(popl::OptionParser& op, to_json_converter& tjc, std::string option, std::string mod, std::string description, T defaultValue, T& binding)
 {
-  op.add<popl::Switch>("",option,description,binding);
-  return op;
+  add(op,option,mod,description,defaultValue,binding) ;
+  tjc.push_back( [&] (json::object& v) {
+    if constexpr (std::is_same_v<T,dcomp>) v.emplace(option,json::array{real(binding),imag(binding)});
+    else v.emplace(option,binding);
+  } );
 }
 
 
-inline auto& add(popl::OptionParser& op, std::string option, std::string mod, std::string description, bool* binding)
-{
-  return add(op,option+mod,description,binding);
-}
+// inline void add(popl::OptionParser& op, std::string option, std::string description, bool* binding)
+// {
+//   op.add<popl::Switch>("",option,description,binding);
+// }
+//
+//
+// inline void add(popl::OptionParser& op, std::string option, std::string mod, std::string description, bool* binding)
+// {
+//   add(op,option+mod,description,binding);
+// }
 
 
 
 /// TODO: insert this more directly into popl
-inline auto& addTitle(popl::OptionParser& op, std::string title, std::string mod = "")
+inline void addTitle(popl::OptionParser& op, std::string title, std::string mod = "")
 {
   op.add<popl::Value<std::string>>("","\n### "+title+mod,"###","###");
-  return op;
 }
 
+
+inline void addTitle(popl::OptionParser& op, to_json_converter& tjc, std::string title, std::string mod = "")
+{
+  addTitle(op,title,mod);
+  tjc.push_back( [&] (json::object& v) {v.emplace("######",title);} );
+}
+
+// and one more overload for no_json_converter here
 
 template <typename T, std::convertible_to<T> U>
 auto _(std::string option, std::string description, const U& defaultValue, T& binding)
@@ -63,26 +85,51 @@ template <typename... T> requires ( ... && ( decltype( ::cppqedutils::multilambd
   [] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> &) { return std::is_convertible<U,V>{}; },
   [] <typename U> (const U &) { return std::is_convertible<U,std::string>{}; }
   } (std::declval<T>()))::value ) )
-popl::OptionParser& add_dispatch(std::string mod, popl::OptionParser& op, const T&... t)
+void add_dispatch(std::string mod, popl::OptionParser& op, to_json_converter& tjc, const T&... t)
 {
   ::cppqedutils::multilambda worker {
-    [&op,mod] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> & t ) {
-      add(op,std::get<0>(t),mod,std::get<1>(t),std::get<2>(t),&std::get<3>(t));
+    [&op,&tjc,mod] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> & t ) {
+      add(op,tjc,std::get<0>(t),mod,std::get<1>(t),std::get<2>(t),std::get<3>(t));
     },
-    [&op,mod] (const std::string& title) {addTitle(op,title,mod);}
+    [&op,&tjc,mod] (const std::string& title) {addTitle(op,tjc,title,mod);}
   };
 
   (worker(t), ...);
-
-  return op;
 }
+
+
+struct JSONizable
+{
+  to_json_converter tjc;
+
+  /// JSONize
+  json::object jsonize() const
+  {
+    json::object res{};
+    for (const auto& f : tjc) f(res);
+    return res;
+  }
+
+};
 
 
 } // parameters
 
 
+void add(std::string mod, popl::OptionParser& op, parameters::to_json_converter& tjc, const auto&... t) {parameters::add_dispatch(mod,op,tjc,t...);}
 
-popl::OptionParser& add(std::string mod, popl::OptionParser& op, const auto&... t) {return parameters::add_dispatch(mod,op,t...);}
+void add(popl::OptionParser& op, parameters::to_json_converter& tjc, const auto&... t) {parameters::add_dispatch("",op,tjc,t...);}
 
-popl::OptionParser& add(popl::OptionParser& op, const auto&... t) {return parameters::add_dispatch("",op,t...);}
 
+void add(std::string mod, popl::OptionParser& op, const auto&... t)
+{
+  parameters::to_json_converter dummy;
+  add(mod,op,dummy,t...);
+}
+
+
+void add(popl::OptionParser& op, const auto&... t)
+{
+  parameters::to_json_converter dummy;
+  add(op,dummy,t...);
+}
