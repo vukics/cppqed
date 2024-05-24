@@ -55,7 +55,7 @@ StateVector<1> state1();// {return mode::fock(1,2);}
 StateVector<1> init(dcomp psi1);
 
 
-auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/, json::object descr)
+auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/, const json::object& descr)
 {
   Liouvillian<1> liouvillian;
 
@@ -67,7 +67,7 @@ auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*,
 }
 
 
-auto make(double delta, dcomp eta, double gamma_m, double gamma_p, json::object descr)
+auto make(double delta, dcomp eta, double gamma_m, double gamma_p, const json::object& descr)
 {
   return make(dcomp{gamma_m-gamma_p,-delta},eta,gamma_m,gamma_p,descr);
 }

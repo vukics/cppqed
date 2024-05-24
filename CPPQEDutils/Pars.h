@@ -38,10 +38,7 @@ template <typename T>
 void add(popl::OptionParser& op, to_json_converter& tjc, std::string option, std::string mod, std::string description, T defaultValue, T& binding)
 {
   add(op,option,mod,description,defaultValue,binding) ;
-  tjc.push_back( [&] (json::object& v) {
-    if constexpr (std::is_same_v<T,dcomp>) v.emplace(option,json::array{real(binding),imag(binding)});
-    else v.emplace(option,binding);
-  } );
+  tjc.push_back( [o=option,&b=binding] (json::object& v) {v.emplace(o,json::value_from(b));} );
 }
 
 
@@ -68,10 +65,9 @@ inline void addTitle(popl::OptionParser& op, std::string title, std::string mod 
 inline void addTitle(popl::OptionParser& op, to_json_converter& tjc, std::string title, std::string mod = "")
 {
   addTitle(op,title,mod);
-  tjc.push_back( [&] (json::object& v) {v.emplace("######",title);} );
+  tjc.push_back( [t=title] (json::object& v) {v.emplace("######",t);} );
 }
 
-// and one more overload for no_json_converter here
 
 template <typename T, std::convertible_to<T> U>
 auto _(std::string option, std::string description, const U& defaultValue, T& binding)
@@ -80,7 +76,37 @@ auto _(std::string option, std::string description, const U& defaultValue, T& bi
 }
 
 
+template <typename T, std::convertible_to<T> U>
+auto _(to_json_converter& tjc, std::string option, std::string description, const U& defaultValue, T& binding)
+{
+  return std::tuple<to_json_converter&,std::string,std::string,T,T&>{tjc,option,description,defaultValue,binding};
+}
+
+
+
 /// `T` is either a string (title), or a tuple
+template <typename... T> requires ( ... && ( decltype( ::cppqedutils::multilambda {
+  [] <typename U, typename V> (const std::tuple<to_json_converter&,std::string,std::string,U,V&> &) { return std::is_convertible<U,V>{}; },
+  [] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> &) { return std::is_convertible<U,V>{}; },
+  [] <typename U> (const U &) { return std::is_convertible<U,std::string>{}; }
+  } (std::declval<T>()))::value ) )
+void add_dispatch(std::string mod, popl::OptionParser& op, const T&... t)
+{
+  ::cppqedutils::multilambda worker {
+    [&op,mod] <typename U, typename V> (const std::tuple<to_json_converter&,std::string,std::string,U,V&> & t ) {
+      add(op,std::get<0>(t),std::get<1>(t),mod,std::get<2>(t),std::get<3>(t),std::get<4>(t));
+    },
+    [&op,mod] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> & t ) {
+      add(op,std::get<0>(t),mod,std::get<1>(t),std::get<2>(t),std::get<3>(t));
+    },
+    [&op,mod] (const std::string& title) {addTitle(op,title,mod);}
+  };
+
+  (worker(t), ...);
+}
+
+
+
 template <typename... T> requires ( ... && ( decltype( ::cppqedutils::multilambda {
   [] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> &) { return std::is_convertible<U,V>{}; },
   [] <typename U> (const U &) { return std::is_convertible<U,std::string>{}; }
@@ -121,15 +147,7 @@ void add(std::string mod, popl::OptionParser& op, parameters::to_json_converter&
 void add(popl::OptionParser& op, parameters::to_json_converter& tjc, const auto&... t) {parameters::add_dispatch("",op,tjc,t...);}
 
 
-void add(std::string mod, popl::OptionParser& op, const auto&... t)
-{
-  parameters::to_json_converter dummy;
-  add(mod,op,dummy,t...);
-}
+void add(std::string mod, popl::OptionParser& op, const auto&... t) {parameters::add_dispatch(mod,op,t...);}
 
+void add(popl::OptionParser& op, const auto&... t) {parameters::add_dispatch("",op,t...);}
 
-void add(popl::OptionParser& op, const auto&... t)
-{
-  parameters::to_json_converter dummy;
-  add(op,dummy,t...);
-}

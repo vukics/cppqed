@@ -19,7 +19,7 @@ using EntanglementMeasuresSwitch = std::bitset<3>;
 
   
 template <size_t RANK>
-double initialTimeStep(const hamiltonian<RANK> auto h, Dimensions<RANK> d)
+double initialTimeStep(const hamiltonian<RANK> auto& h, Dimensions<RANK> d)
 {
   StateVector<RANK> dpsidt{d,zeroInit}, psi{d,noInit}; for (dcomp& v : psi.mutableView().dataView) v=1.;
   applyHamiltonian(h,0.,psi,dpsidt.mutableView(),0.);

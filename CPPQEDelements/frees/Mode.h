@@ -76,35 +76,24 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Mode",{"photon number","photon number square","ladder operator"}}}; }
 
 
-/*
-auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
+auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh, json::object descr)
 {
   Liouvillian<1> liouvillian;
-  SystemFrequencyStore freqs;
 
   dcomp z{};
 
-  if (delta) freqs.emplace_back("δ",delta,cutoff);
-
-  if (omegaKerr) freqs.emplace_back("ω",omegaKerr,sqr(cutoff));
-
-  if (abs(eta)) freqs.emplace_back("η",eta,sqrt(cutoff));
-
   if (kappa) {
     liouvillian.push_back(photonLoss(kappa,nTh));
-    freqs.emplace_back("κ",kappa,(nTh+1)*cutoff);
     if (nTh) liouvillian.push_back(photonGain(kappa,nTh));
   }
 
-  return QuantumSystemDynamics { "Mode", cutoff, std::move(freqs),
-    std::move(liouvillian), hamiltonian(cutoff,z,omegaKerr,eta), exact_propagator_ns::noOp, expectationValues,
-    {{"cutoff",cutoff}}
-  };
+  return std::make_tuple( cutoff, hamiltonian(cutoff,z,omegaKerr,eta), liouvillian, expectationValues, descr );
+
 }
-*/
 
 
-struct Pars
+
+struct Pars : ::parameters::JSONizable
 {
   size_t cutoff;
   double delta, omegaKerr, kappa, nTh;
@@ -113,7 +102,7 @@ struct Pars
   Pars(popl::OptionParser& op, std::string mod="")
   {
     using ::parameters::_;
-    add(mod,op,"Mode",
+    add(mod,op,tjc,"Mode",
         _("cutoff","Fock space cutoff",10,cutoff),
         _("delta","detuning",-10.,delta),
         _("omegaKerr","Kerr constant",0.,omegaKerr),
@@ -128,6 +117,10 @@ struct Pars
 };
 
 
+auto make(const Pars& p)
+{
+  return make(p.cutoff,p.delta,p.omegaKerr,p.eta,p.kappa,p.nTh,p.jsonize());
+}
 
 /*
 

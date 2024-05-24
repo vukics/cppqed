@@ -106,7 +106,7 @@ struct Pars : BASE
   Pars(popl::OptionParser& op) : BASE{op}
   {
     using ::parameters::_;
-    add(op,"Trajectory",  //Title(add(add(add(add(add(add(add(add(add(add(add(op,
+    add(op,"Trajectory",
      _("T","Simulated time",1.,T),
      _("dc","Number of steps between two streamings",10,dc),
      _("Dt","Timestep between two streamings",.1,Dt),
