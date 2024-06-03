@@ -278,11 +278,12 @@ void broadcastFor(F&& f, ARGS&&... args)
 
 
 
-template <auto retainedAxes>
+// broadcaster could have RANK as a top-level template parameter, to act as a tag in broadcasting functions, allowing for deducing RANK
+template <size_t ... i>
 struct Broadcaster
 {
   template <size_t RANK>
-  Broadcaster(Extents<RANK> extents) : offsets{calculateSlicesOffsets<retainedAxes>(extents)} {}
+  Broadcaster(Extents<RANK> extents) : offsets{cso<i...>(extents)} {}
 
   const std::vector<size_t> offsets;
 };

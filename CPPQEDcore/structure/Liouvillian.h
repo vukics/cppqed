@@ -127,9 +127,11 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 
 namespace liouvillian_ns {
 
-template <auto retainedAxes, size_t RANK> requires ( std::size(retainedAxes) < RANK )
-Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const Broadcaster<retainedAxes>& bc)
+
+template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
+Lindblad<RANK> broadcast(const Broadcaster<ra...>& bc, const Lindblad<sizeof...(ra)>& l)
 {
+  static constexpr std::array retainedAxes{ra...};
   static constexpr size_t RRANK = std::size(retainedAxes);
   
   return {
@@ -166,6 +168,10 @@ Lindblad<RANK> broadcast(const Lindblad<std::size(retainedAxes)>& l, const Broad
 
   };
 }
+
+
+template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
+Liouvillian<RANK> broadcast(const Broadcaster<ra...>& bc, const Liouvillian<sizeof...(ra)>& l);
 
 
 } // liouvillian_ns

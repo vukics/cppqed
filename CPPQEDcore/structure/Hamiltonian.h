@@ -127,36 +127,33 @@ namespace structure::hamiltonian_ns {
 
 /// Maybe this can be just an overload of applyHamiltonian ?
 template <
-  auto retainedAxes,
   size_t RANK,
-  functional<std::size(retainedAxes)> T >
-void broadcast(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0, const Broadcaster<retainedAxes>& bc)
+  size_t ... i,
+  functional<sizeof...(i)> T >
+auto broadcast(const Broadcaster<i...>& bc, const T& h)
 {
-  for ( auto&& [psi,dpsidt] : std::views::zip( sliceRange<retainedAxes>(psi,bc.offsets), sliceRange<retainedAxes>(dpsidt,bc.offsets) ) )
-    applyHamiltonian(h,t,psi,dpsidt,t0);
+  return [&] ( double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0 ) {
+    for ( auto&& [psi,dpsidt] : std::views::zip( sliceRange<retainedAxes<i...>>(psi,bc.offsets), sliceRange<retainedAxes<i...>>(dpsidt,bc.offsets) ) )
+      applyHamiltonian(h,t,psi,dpsidt,t0);
+  };
 }
 
 
 template <size_t RANK, hamiltonian<RANK> H>
 quantumoperator::SparseMatrix vectorize(H&& h, Dimensions<RANK> d)
 {
-  return {
-    [&] ()
-    {
-      quantumoperator::SparseMatrix::Elements elements;
-      StateVector<RANK> psi{d,zeroInit}, dpsidt{d,zeroInit};
-      auto psiView{psi.mutableView().dataView}, dpsidtView{dpsidt.mutableView().dataView};
-      size_t dim=multiarray::calculateExtent(d);
-      progressbar bar(dim);
-      for ( size_t i=0; i<dim; (bar.update(), ++i) ) {
-        psiView[i]=1.;
-        applyHamiltonian(h,0.,psi,dpsidt.mutableView(),0.);
-        for (size_t j=0; j<dim; ++j) if (dcomp v=dpsidtView[j]; abs(v)) elements.push_back({j,i,v});
-        psiView[i]=0.; for (dcomp& v : dpsidtView) v=0.;
-      }
-      return elements;
-    } ()
-  };
+  quantumoperator::SparseMatrix::Elements elements;
+  StateVector<RANK> psi{d,zeroInit}, dpsidt{d,zeroInit};
+  auto psiView{psi.mutableView().dataView}, dpsidtView{dpsidt.mutableView().dataView};
+  size_t dim=multiarray::calculateExtent(d);
+  progressbar bar(dim);
+  for ( size_t i=0; i<dim; (bar.update(), ++i) ) {
+    psiView[i]=1.;
+    applyHamiltonian(h,0.,psi,dpsidt.mutableView(),0.);
+    for (size_t j=0; j<dim; ++j) if (dcomp v=dpsidtView[j]; abs(v)) elements.push_back({j,i,v});
+    psiView[i]=0.; for (dcomp& v : dpsidtView) v=0.;
+  }
+  return {.elements{elements}};
 }
 
 
