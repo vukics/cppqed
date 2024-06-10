@@ -129,7 +129,7 @@ namespace liouvillian_ns {
 
 
 template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
-Lindblad<RANK> broadcast(const Broadcaster<ra...>& bc, const Lindblad<sizeof...(ra)>& l)
+Lindblad<RANK> broadcast(const Broadcaster<RANK,ra...>& bc, const Lindblad<sizeof...(ra)>& l)
 {
   static constexpr std::array retainedAxes{ra...};
   static constexpr size_t RRANK = std::size(retainedAxes);
@@ -171,7 +171,7 @@ Lindblad<RANK> broadcast(const Broadcaster<ra...>& bc, const Lindblad<sizeof...(
 
 
 template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
-Liouvillian<RANK> broadcast(const Broadcaster<ra...>& bc, const Liouvillian<sizeof...(ra)>& l);
+Liouvillian<RANK> broadcast(const Broadcaster<RANK,ra...>& bc, const Liouvillian<sizeof...(ra)>& l);
 
 
 } // liouvillian_ns

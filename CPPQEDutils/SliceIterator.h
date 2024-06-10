@@ -279,11 +279,10 @@ void broadcastFor(F&& f, ARGS&&... args)
 
 
 // broadcaster could have RANK as a top-level template parameter, to act as a tag in broadcasting functions, allowing for deducing RANK
-template <size_t ... i>
+template <size_t RANK, size_t ... ra>
 struct Broadcaster
 {
-  template <size_t RANK>
-  Broadcaster(Extents<RANK> extents) : offsets{cso<i...>(extents)} {}
+  Broadcaster(Extents<RANK> extents) : offsets{cso<ra...>(extents)} {}
 
   const std::vector<size_t> offsets;
 };

@@ -130,7 +130,7 @@ template <
   size_t RANK,
   size_t ... i,
   functional<sizeof...(i)> T >
-auto broadcast(const Broadcaster<i...>& bc, const T& h)
+auto broadcast(const Broadcaster<RANK,i...>& bc, const T& h)
 {
   return [&] ( double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0 ) {
     for ( auto&& [psi,dpsidt] : std::views::zip( sliceRange<retainedAxes<i...>>(psi,bc.offsets), sliceRange<retainedAxes<i...>>(dpsidt,bc.offsets) ) )

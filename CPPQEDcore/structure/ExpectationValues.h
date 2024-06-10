@@ -67,12 +67,16 @@ auto calculateExpectationValues(const EV& ev, double t, lazy_density_operator<RA
 namespace expectation_values_ns {
 
 template <
-  auto retainedAxes,
   size_t RANK,
-  functional<std::size(retainedAxes)> EV>
-auto broadcast(const EV& ev, double t, lazy_density_operator<RANK> auto matrix, const Broadcaster<retainedAxes>& bc)
+  size_t ... ra,
+  functional<sizeof...(ra)> EV>
+auto broadcast(const Broadcaster<RANK,ra...>& bc, const EV& ev)
 {
-  return partialTrace( matrix, bc.offsets, [&] (auto psiElem) {return calculate(ev,t,psiElem); } );
+  return [&] (double t, lazy_density_operator<RANK> auto matrix) {
+    return partialTrace<retainedAxes<ra...>,RANK>( matrix, bc.offsets,
+                                                   [&] (auto psiElem) {return calculateExpectationValues<sizeof...(ra)>(ev,t,psiElem); },
+                                                   plusTDP{} );
+  };
 }
 
 } // expectation_values_ns
