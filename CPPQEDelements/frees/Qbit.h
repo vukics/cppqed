@@ -50,11 +50,6 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Qbit",json::array{"population ground","polarization"}}}; }
 
 
-StateVector<1> state0();// {return mode::fock(0,2);}
-StateVector<1> state1();// {return mode::fock(1,2);}
-StateVector<1> init(dcomp psi1);
-
-
 auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/, const json::object& descr)
 {
   Liouvillian<1> liouvillian;
@@ -77,20 +72,27 @@ auto make(double delta, dcomp eta, double gamma_m, double gamma_p, const json::o
 struct Pars : ::parameters::JSONizable
 {
   double delta, gamma_m, gamma_p;
-  dcomp eta;
+  dcomp eta, init;
 
   Pars(popl::OptionParser& op, std::string mod="")
   {
-    using ::parameters::_;
+    using namespace ::parameters;
     add(mod,op,tjc,"Qubit",
       _("delta","detuning",-10.,delta),
-//      _("init","initial condition",dcomp(0.),init),
       _("eta","drive",0.,eta),
       _("gamma_m","decay rate",10.,gamma_m),
-      _("gamma_p","gain rate",0.,gamma_p));
+      _("gamma_p","gain rate",0.,gamma_p),
+      _("init","initial condition",dcomp(0.),init,noJSON));
   }
 
 };
+
+
+StateVector<1> state0();
+StateVector<1> state1();
+StateVector<1> init(dcomp psi1);
+
+inline StateVector<1> init(const Pars& p) {return init(p.init);}
 
 
 auto make(const Pars& p)

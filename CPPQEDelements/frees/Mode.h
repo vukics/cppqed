@@ -80,7 +80,7 @@ auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa
 {
   Liouvillian<1> liouvillian;
 
-  dcomp z{};
+  dcomp z{kappa*(2*nTh+1),-delta};
 
   if (kappa) {
     liouvillian.push_back(photonLoss(kappa,nTh));
@@ -95,20 +95,23 @@ auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa
 
 struct Pars : ::parameters::JSONizable
 {
-  size_t cutoff;
+  size_t cutoff, initFock;
   double delta, omegaKerr, kappa, nTh;
-  dcomp eta;
+  dcomp eta, init;
 
   Pars(popl::OptionParser& op, std::string mod="")
   {
-    using ::parameters::_;
+    using namespace ::parameters;
     add(mod,op,tjc,"Mode",
         _("cutoff","Fock space cutoff",10,cutoff),
         _("delta","detuning",-10.,delta),
         _("omegaKerr","Kerr constant",0.,omegaKerr),
         _("eta","drive amplitude",dcomp(0),eta),
         _("kappa","decay rate",10.,kappa),
-        _("nTh","thermal photon number",0.,nTh));
+        _("nTh","thermal photon number",0.,nTh),
+        _("initFock","Fock state initial condition",0,initFock,noJSON),
+        _("init","Coherent state initial condition",dcomp(0),init,noJSON)
+        );
   }
 
     // minitFock(p.add<size_t>("minitFock",mod,"Mode initial Fock state",0)),
@@ -121,6 +124,24 @@ auto make(const Pars& p)
 {
   return make(p.cutoff,p.delta,p.omegaKerr,p.eta,p.kappa,p.nTh,p.jsonize());
 }
+
+
+/// Coherent state
+/**
+ * The implementation relies on mathutils::coherentElement, which works also for high Fock-state elements
+ *
+ * \note The user has to take care that `alpha` is not too large for the given `cutoff` (rule of thumb: `cutoff>|alpha|^2`)
+ */
+StateVector<1> coherent(dcomp alpha, ///< amplitude
+                        size_t cutoff ///< cutoff
+                       );
+
+StateVector<1> fock(size_t n, size_t dim, double phase=0);
+
+/// Dispatcher for initial condition
+StateVector<1> init(const Pars&);
+
+
 
 /*
 

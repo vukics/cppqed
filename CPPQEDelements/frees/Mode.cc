@@ -1,6 +1,8 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #include "Mode.h"
 
+#include <boost/math/special_functions/factorials.hpp>
+
 
 using namespace structure;
 
@@ -97,69 +99,35 @@ Lindblad<1> mode::photonGain(double kappa, double nTh)
 }
 
 
-/*
-double mode::photonnumber(const LazyDensityOperator& matrix)
+dcomp coherentElement(unsigned long n, dcomp alpha)
 {
-  double res{0};
-  for (size_t n=0; n<matrix.getDimension(); ++n) res+=n*matrix(n);
+  using namespace boost::math;
+  return n ? n<max_factorial<double>::value ? pow(alpha,n)/sqrt(factorial<double>(n))
+                                            : pow(2*n*std::numbers::pi,-.25)*pow(alpha/sqrt(n/std::numbers::e),n)
+           : 1.;
+}
+
+StateVector<1> mode::coherent(dcomp alpha, size_t dim)
+{
+  return { {dim} , [=] (size_t e) {
+    auto r{noInit(e)};
+    double norm=exp(-sqrAbs(alpha)/2.);
+    for (size_t n=0; n<dim; ++n) r[n]=norm*coherentElement(n,alpha);
+    return r;
+  } };
+}
+
+
+StateVector<1> mode::fock(size_t n, size_t dim, double phase)
+{
+  if (n>=dim) throw std::overflow_error("Fock state "+std::to_string(n)+" higher than dim "+std::to_string(dim));
+  StateVector<1> res({dim},zeroInit);
+  res(n)=exp(1i*phase);
   return res;
 }
 
 
-void mode::aJump(StateVectorLow& psi, double fact)
+StateVector<1> mode::init(const Pars& p)
 {
+  return p.initFock ? fock(p.initFock,p.cutoff) : coherent(p.init,p.cutoff);
 }
-    
-
-void mode::aDagJump(StateVectorLow& psi, double fact)
-{
-}
-
-
-
-
-ExpectationValue<1> mode::photonnumberEV_Variance{
-  .label{"<number operator>","VAR(number operator)"},
-  .process{calculateVariance},
-  .eva{[] (const LazyDensityOperator& m) {
-    EV_Array res{0.,2};
-    for (int n=1; n<int(m.getDimension()); n++) {
-      res[0]+=  n*m(n);
-      res[1]+=n*n*m(n);
-    }    
-    return res;
-}}};
-
-
-ExpectationValue<1> mode::ladderOperatorEV {
-  .label{"real(<ladder operator>)","imag(\")"},
-  .eva{[] (const LazyDensityOperator& m) {
-    EV_Array res{0.,2};
-    for (int n=1; n<int(m.getDimension()); n++) {
-      dcomp offdiag(sqrt(n)*m(n)(n-1));
-      res[0]+=real(offdiag);
-      res[1]+=imag(offdiag);
-    }    
-    return res;
-}}};
-
-
-ExpectationValue<1> mode::monitorCutoff {
-  .label{"|Psi(cutoff-1)|^2"},
-  .eva{[] (const LazyDensityOperator& m) {
-    EV_Array res{0.,1};
-    res[0]=m(m.getDimension()-1);
-    return res;
-}}};
-
-
-
-
-const Tridiagonal aop(size_t dim)
-{
-  typedef Tridiagonal::Diagonal Diagonal;
-  Diagonal diagonal(dim-1);
-  return Tridiagonal(Diagonal(),1,Diagonal(),diagonal=sqrt(blitz::tensor::i+1.));
-}
-
-*/

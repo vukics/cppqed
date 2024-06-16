@@ -76,6 +76,15 @@ auto _(std::string option, std::string description, const U& defaultValue, T& bi
 }
 
 
+static const struct NoJSON {} noJSON;
+
+template <typename T, std::convertible_to<T> U>
+auto _(std::string option, std::string description, const U& defaultValue, T& binding, NoJSON)
+{
+  return std::tuple<std::string,std::string,T,T&,NoJSON>{option,description,defaultValue,binding,noJSON};
+}
+
+
 template <typename T, std::convertible_to<T> U>
 auto _(to_json_converter& tjc, std::string option, std::string description, const U& defaultValue, T& binding)
 {
@@ -109,6 +118,7 @@ void add_dispatch(std::string mod, popl::OptionParser& op, const T&... t)
 
 template <typename... T> requires ( ... && ( decltype( ::cppqedutils::multilambda {
   [] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> &) { return std::is_convertible<U,V>{}; },
+  [] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&,NoJSON> &) { return std::is_convertible<U,V>{}; },
   [] <typename U> (const U &) { return std::is_convertible<U,std::string>{}; }
   } (std::declval<T>()))::value ) )
 void add_dispatch(std::string mod, popl::OptionParser& op, to_json_converter& tjc, const T&... t)
@@ -116,6 +126,9 @@ void add_dispatch(std::string mod, popl::OptionParser& op, to_json_converter& tj
   ::cppqedutils::multilambda worker {
     [&op,&tjc,mod] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&> & t ) {
       add(op,tjc,std::get<0>(t),mod,std::get<1>(t),std::get<2>(t),std::get<3>(t));
+    },
+    [&op,&tjc,mod] <typename U, typename V> (const std::tuple<std::string,std::string,U,V&,NoJSON> & t ) {
+      add(op,std::get<0>(t),mod,std::get<1>(t),std::get<2>(t),std::get<3>(t));
     },
     [&op,&tjc,mod] (const std::string& title) {addTitle(op,tjc,title,mod);}
   };
