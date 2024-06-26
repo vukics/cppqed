@@ -121,8 +121,6 @@ struct QuantumJumpMonteCarloBase
 
   friend LogTree logOutro(const QuantumJumpMonteCarloBase& q) {return {{"QJMC",q.log_},{"ODE_Engine",logOutro(q.oe)}};}
 
-  friend LogTree dataStreamKey(const QuantumJumpMonteCarloBase& q) {return {}; /*getLabel(getEV(q.qsd));*/}
-
   friend iarchive& readFromArrayOnlyArchive(QuantumJumpMonteCarloBase& q, iarchive& iar) {return iar & q.psi;} // MultiArray can be (de)serialized
 
   /** 

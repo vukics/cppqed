@@ -2,6 +2,7 @@
 /// \briefFile{Defines the qbit-bundle (tackling the dynamics of a single qbit)}
 #pragma once
 
+#include "ExpectationValues.h"
 #include "Liouvillian.h"
 
 #include "MultiDiagonal.h"
@@ -45,9 +46,10 @@ Lindblad<1> gain(double gamma_p) {return {"gain", sigmaPlusJump(gamma_p), sigmaP
 // Lindblad<1> dephasing(double gamma_phi) {return {"dephasing", sigma_zJump(gamma_phi), sigma_zRate(gamma_phi), sigma_zSuperoperator(gamma_phi)};}
 
 
-static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho) { return hana::make_tuple(_(rho,0),_(rho,0,1)); };
-
-::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Qbit",json::array{"population ground","polarization"}}}; }
+static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
+{
+  return hana::make_tuple( slv<"population0">(_(rho,0)), slv<"polarization">(_(rho,0,1)) );
+};
 
 
 auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/, const json::object& descr)

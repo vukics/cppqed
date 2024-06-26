@@ -103,8 +103,6 @@ public:
 
   friend auto logOutro(const Ensemble& e) { return logOutro(e.trajs.front()); }
 
-  friend ::cppqedutils::LogTree dataStreamKey(const Ensemble& e) {return dataStreamKey(e.tdpCalculator);}
-
   friend auto temporalDataPoint(const Ensemble& e)
   {
     return e.tdpCalculator(getTime(e),averaged(e));

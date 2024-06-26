@@ -3,6 +3,8 @@
 
 #include "LazyDensityOperator.h"
 
+#include "TemporalDataPoint.h"
+
 #include <functional>
 
 

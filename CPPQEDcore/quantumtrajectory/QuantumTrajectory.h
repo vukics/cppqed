@@ -93,18 +93,6 @@ public:
     return {os,averages};*/
   }
 
-  friend LogTree dataStreamKey(const TDP_DensityOperator& t)
-  {
-    return getLabel(t.ev);
-/*    if constexpr ( !isV_empty ) {
-      if (ems_.any()) os<<"Trajectory\n";
-      if (ems_[0]) os<<i++<<". negativity\n";
-      if (ems_[1]) os<<i++<<". mutual information\n";
-      if (ems_[2]) os<<i++<<". purity of partial trace\n";
-    }
-    return os;*/
-  }
-
 };
 
 } // quantumtrajectory

@@ -34,7 +34,6 @@ struct Simulated
   double time=0.;
   ST state;
   D derivs;
-  std::list<std::string> keyLabels;
   OE<std::decay_t<ST>> ode;
   LogTree parameters;
 
@@ -47,8 +46,6 @@ struct Simulated
   friend LogTree logOutro(const Simulated& s) {return logOutro(s.ode);}
 
   friend LogTree step(Simulated& s, double deltaT) {return step(s.ode,deltaT,s.derivs,s.time,s.state);}
-
-  friend LogTree dataStreamKey(const Simulated& s) {return {{"Simulated",json::value_from(s.keyLabels)}};}
 
   friend auto temporalDataPoint(const Simulated& s)
   {

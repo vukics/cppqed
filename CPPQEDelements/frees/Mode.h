@@ -1,6 +1,7 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
+#include "ExpectationValues.h"
 #include "Liouvillian.h"
 
 #include "MultiDiagonal.h"
@@ -69,11 +70,8 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
     pnn+=n*n*_(rho,n);
     a+=sqrt(n)*_(rho,n,n-1);
   }
-  return hana::make_tuple(pn,pnn,a);
+  return hana::make_tuple(slv<"photon number">(pn),slv<"photon number square">(pnn),slv<"ladder operator">(a));
 };
-
-
-constexpr ::cppqedutils::LogTree label(decltype(expectationValues)) { return {{"Mode",{"photon number","photon number square","ladder operator"}}}; }
 
 
 auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh, json::object descr)

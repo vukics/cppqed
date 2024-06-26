@@ -4,14 +4,13 @@
 #include "Archive.h"
 #include "CommentingStream.h"
 #include "ODE.h"
+#include "TemporalDataPoint.h"
 #include "Version.h"
 
-#include <iostream>
 #include <fstream>
 #include <queue>
 #include <ranges>
 #include <stdexcept>
-#include <string>
 #include <tuple>
 
 
@@ -53,7 +52,6 @@ concept uniform_step = adaptive_time_keeper<T> &&  logger<T> && requires (T&& t,
   {
     { advance(t,deltaT) } -> std::convertible_to<LogTree>;
     { temporalDataPoint(t) } -> temporal_data_point;
-    { dataStreamKey(t) } -> std::convertible_to<LogTree>;
   };
 
 template <typename T>
@@ -408,9 +406,10 @@ run(TRAJ&& traj, ///< the trajectory to run
   ///////////////////////
 
   if (streamSwitch[0]) {
-    if (!continuing) {
+    if (!continuing) { // TODO: all this could perhaps be fused into a single json object
       if (parsedCommandLine!="") logStream<<parsedCommandLine<<endl<<endl;
-      logStream<<versionHelper()<<endl<<logIntro(traj)<<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<dataStreamKey(traj)
+      logStream<<versionHelper()<<endl<<logIntro(traj)
+        <<endl<<"Key to data:\nTrajectory\n 1. time\n 2. dtDid\n"<<jsonizeTDP_labels( temporalDataPoint(traj) )
         <<endl<<endl<<"Run Trajectory up to time "<<timeToReach
         <<" -- Stream period: "<<streamFreq<< (SFT==StreamFreqType::DT_MODE ? "" : " timestep") <<endl<<endl;
     }

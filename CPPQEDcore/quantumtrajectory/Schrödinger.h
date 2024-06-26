@@ -48,8 +48,6 @@ struct Schrödinger
     },s.time,s.psi.dataStorage());
   }
 
-  friend LogTree dataStreamKey(const Schrödinger& s) {return {{"Schrödinger","TAKE FROM SYSTEM"}};}
-
   friend auto temporalDataPoint(const Schrödinger& s)
   {
     return calculateExpectationValues<RANK>( getEV(s.qsd), s.time, LDO<StateVector,RANK>(s.psi) );

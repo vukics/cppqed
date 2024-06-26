@@ -4,8 +4,8 @@
 #include "ComplexExtensions.h"
 
 #include <boost/hana.hpp>
+namespace hana=boost::hana;
 
-#include <iostream>
 #include <numeric>
 #include <type_traits>
 
@@ -17,12 +17,11 @@ using LogTree = json::object ;
 
 std::string toStringJSON(auto&& v) {return json::serialize( json::value_from( std::forward<decltype(v)>(v) ) ) ;}
 
+// Helper template that is always false, used to induce a compilation error
+template <typename T>
+struct always_false : std::false_type {};
+
 } // cppqedutils
-
-
-namespace hana=boost::hana;
-
-template <typename S> concept hana_sequence = hana::Sequence<S>::value;
 
 
 namespace cppqedutils {
@@ -50,70 +49,6 @@ template <typename State> using Reference = typename ReferenceMF<State>::type;
 template <typename State> struct ConstReferenceMF : std::type_identity<std::add_lvalue_reference_t<std::add_const_t<State>>> {};
 
 template <typename State> using ConstReference = typename ConstReferenceMF<State>::type;
-
-
-/// hana::tuple of double/dcomp or such hana::tuples (recursive definition)
-/** Workaround for defining concept recursively from [this Q&A](https://stackoverflow.com/questions/56741456/how-to-define-a-recursive-concept) */
-namespace traits {
-
-template <typename T> constexpr bool tdp = false;
-
-template <> constexpr bool tdp<double> = true;
-
-template <> constexpr bool tdp<dcomp> = true;
-
-template <hana_sequence S> constexpr bool tdp<S> = !!hana::all_of(
-  decltype(hana::transform(std::declval<S>(), hana::typeid_)){},
-  []<class T>(T) { return tdp<typename T::type>; });
-
-} // traits
-
-template <typename T> concept temporal_data_point = traits::tdp<T>;
-
-
-static_assert(temporal_data_point<double>);
-static_assert(temporal_data_point<dcomp>);
-static_assert(temporal_data_point<decltype(hana::make_tuple(1.,dcomp{2.,-1.}))>);
-static_assert(temporal_data_point<decltype(hana::make_tuple(1.,dcomp{2.,-1.}),hana::make_tuple(1.,dcomp{2.,-1.}))>);
-static_assert(!temporal_data_point<int>);
-static_assert(temporal_data_point<hana::tuple<>>);
-
-
-struct plusTDP
-{
-  double operator()(double a, double b) const {return a+b;}
-  dcomp operator()(dcomp a, dcomp b) const {return a+b;}
-
-  template <temporal_data_point T>
-  T operator()(const T& a, const T& b) const {
-    using namespace hana::literals;
-    T res;
-    hana::for_each(hana::range_c<int,0,hana::size(res)>, [&,this] (auto i) {res[i]=(*this)(a[i],b[i]);});
-    return res;
-  }
-
-};
-
-
-inline std::ostream& streamTDP(double tdp, std::ostream& os) {return os<<tdp;}
-inline std::ostream& streamTDP(dcomp  tdp, std::ostream& os) {return os<<tdp;}
-
-inline std::ostream& streamTDP(hana::tuple<> tdp, std::ostream& os) {return os;}
-
-std::ostream& streamTDP(const temporal_data_point auto& tdp, std::ostream& os)
-{
-  size_t n{0};
-  hana::for_each( tdp, [&] (const auto& v) { streamTDP(v,os) << (++n != hana::size(tdp) ? "\t" : "") ; } );
-  return os;
-}
-
-
-inline void renormTDP(double& tdp, double norm) {tdp/=norm;}
-inline void renormTDP(dcomp&  tdp, double norm) {tdp/=norm;}
-
-inline void renormTDP(hana::tuple<>& , double ) {}
-
-void renormTDP(temporal_data_point auto& tdp, double norm) { hana::for_each( tdp, [=] (auto& v) { renormTDP(v,norm) ; } ); }
 
 
 

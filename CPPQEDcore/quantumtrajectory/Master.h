@@ -86,8 +86,6 @@ struct Master
     return res;
   }
 
-  friend LogTree dataStreamKey(const Master& m) {return {{"Master","TAKE FROM SYSTEM"}};}
-
   friend auto temporalDataPoint(const Master& m)
   {
     return calculateExpectationValues<RANK>( getEV(m.qsd), m.time, LDO<DensityOperator,RANK>(m.rho) );
