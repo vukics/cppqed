@@ -9,8 +9,6 @@
 namespace cppqedutils {
 
 
-template <typename S> concept hana_sequence = hana::Sequence<S>::value;
-
 // statically_labelled_value
 namespace slv_ns {
 

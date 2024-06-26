@@ -12,6 +12,8 @@ namespace hana=boost::hana;
 
 namespace cppqedutils {
 
+template <typename S> concept hana_sequence = hana::Sequence<S>::value;
+
 namespace json = boost::json ;
 using LogTree = json::object ;
 

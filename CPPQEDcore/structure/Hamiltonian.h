@@ -32,18 +32,30 @@ concept two_time_dependent_functional = requires (const H& h, double t, StateVec
 template <typename H, size_t RANK>
 concept functional = time_independent_functional<H,RANK> || one_time_dependent_functional<H,RANK> || two_time_dependent_functional<H,RANK> || std::same_as<std::decay_t<H>,NoOp>;
 
+template <typename H, size_t RANK> constexpr bool recursiveTrait = [] () {
+  if constexpr (hana_sequence<H>)
+    return !!hana::all_of(
+      decltype(hana::transform(std::declval<H>(), hana::typeid_)){},
+      [] <class T> (T) { return recursiveTrait<typename T::type,RANK>; } );
+  else return functional<H,RANK> ;
+} ();
 
 } // hamiltonian_ns
 
 
+template <typename H, size_t RANK>
+concept hamiltonian = hamiltonian_ns::recursiveTrait<H,RANK>;
+
 /// applying a Hamiltonian term is by default interpreted as |dpsidt>+=H|psi>/(i*hbar)
 /** However, if indexing is done carefully, `psi` and `dpsidt` can refer to the same underlying data */
-template <size_t RANK, hamiltonian_ns::functional<RANK> T>
-void applyHamiltonian(const T& h, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
+template <size_t RANK, hamiltonian<RANK> T>
+void applyHamiltonian(const T& hamiltonian, double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0)
 {
-  if      constexpr (hamiltonian_ns::  time_independent_functional<T,RANK>) h(psi,dpsidt);
-  else if constexpr (hamiltonian_ns::one_time_dependent_functional<T,RANK>) h(t-t0,psi,dpsidt);
-  else if constexpr (hamiltonian_ns::two_time_dependent_functional<T,RANK>) h(t,psi,dpsidt,t0);
+  if      constexpr (hana_sequence<T>) hana::for_each( hamiltonian, [&] (const auto& h) {applyHamiltonian(h,t,psi,dpsidt,t0);} );
+  else if constexpr (hamiltonian_ns::  time_independent_functional<T,RANK>) hamiltonian(psi,dpsidt);
+  else if constexpr (hamiltonian_ns::one_time_dependent_functional<T,RANK>) hamiltonian(t-t0,psi,dpsidt);
+  else if constexpr (hamiltonian_ns::two_time_dependent_functional<T,RANK>) hamiltonian(t,psi,dpsidt,t0);
+  else static_assert(always_false<T>::value, "Unsupported type in applyHamiltonian");
 }
 
 
@@ -54,41 +66,6 @@ void applyHamiltonian(const T& h, double t, StateVectorConstView<RANK> psi, Stat
  */
 template <size_t RANK1, size_t RANK2>
 auto compose(const hamiltonian_ns::functional<RANK1> auto& h1, const hamiltonian_ns::functional<RANK2> auto& h2);
-
-
-
-
-template <typename H, size_t RANK>
-concept hamiltonian = /* labelled<H> && */ hamiltonian_ns::functional<H,RANK>;
-
-
-
-// itself a hamiltonian
-/**
- * \note It would be easy to do a runtime collection as well. For that, all the functionals should be wrapped in a `std::function`, and stored in a runtime container
- */
-template <size_t RANK, hamiltonian<RANK>... H>
-struct HamiltonianCollection
-{
-  hana::tuple<H...> collection;
-
-  void operator()(double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0) const
-  {
-    hana::for_each(collection, [&] (const auto& h) {applyHamiltonian(h,t,psi,dpsidt,t0);});
-  }
-
-  /*
-  friend LogTree label(const HamiltonianCollection& hc) {
-    LogTree res;
-    hana::for_each(hc.collection,[&] (const auto& h) {res.push_back(getLabel(h));});
-    return res;
-  }
-  */
-};
-
-
-template <size_t RANK, hamiltonian<RANK>... H>
-auto makeHamiltonianCollection(H&&... h) { return HamiltonianCollection<RANK,H...>{.collection{std::forward<H>(h)...}}; }
 
 
 
