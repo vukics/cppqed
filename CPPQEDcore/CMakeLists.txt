@@ -11,18 +11,13 @@ add_subdirectory(quantumoperator)
 
 add_subdirectory(quantumtrajectory)
 
-add_subdirectory(composites)
-
-add_subdirectory(high)
-
 add_library(CPPQEDcore SHARED
 #            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumdata>
 #            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_structure>
-            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumoperator> $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumtrajectory>
-            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_composites> $<TARGET_OBJECTS:CPPQED::CPPQEDcore_high>)
+            $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumoperator> $<TARGET_OBJECTS:CPPQED::CPPQEDcore_quantumtrajectory>)
 add_library(CPPQED::CPPQEDcore ALIAS CPPQEDcore)
 
-target_link_libraries(CPPQEDcore PUBLIC CPPQED::CPPQEDcore_high)
+target_link_libraries(CPPQEDcore PUBLIC CPPQED::CPPQEDcore_quantumoperator CPPQED::CPPQEDcore_quantumtrajectory)
 
 install(TARGETS CPPQEDcore DESTINATION lib)
 
