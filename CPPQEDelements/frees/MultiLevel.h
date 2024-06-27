@@ -342,7 +342,7 @@ public:
         for_each(etas,multilevel::elementaryComplexFreqs(res,"eta"));
         return res;        
       } () ),
-      AveragingType(std::forward<AveragingConstructorParameters>(a)...)
+      AveragingType(FWD(a)...)
   {
     this->getParsStream()<<"Schroedinger picture.\n";
   }
@@ -368,13 +368,13 @@ makeDrivenDissipativeSch(const RealPerLevel<NL>& deltas,
       return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,
                                                                                        typename LiouvillianDiffusive<NL,VL>::DiffusionCoeffs{gamma_parallel.begin(),
                                                                                                                                              gamma_parallel.end()},
-                                                                                       std::forward<AveragingConstructorParameters>(a)...);
+                                                                                       FWD(a)...);
   }
   else if (gamma_parallel)
     return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,true ,AveragingType> >(deltas,etas,gammas,gamma_parallel,
-                                                                                     std::forward<AveragingConstructorParameters>(a)...);
+                                                                                     FWD(a)...);
 
-  return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,0.,std::forward<AveragingConstructorParameters>(a)...);
+  return std::make_shared<DrivenDissipativeMultiLevelSch<NL,VP,VL,false,AveragingType> >(deltas,etas,gammas,0.,FWD(a)...);
 }
 
 /// \overload

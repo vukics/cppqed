@@ -62,7 +62,7 @@ template<size_t RANK,
 class TDP_DensityOperator
 {
 public:
-  TDP_DensityOperator(auto&& ev /*, EntanglementMeasuresSwitch ems*/) : ev{std::forward<decltype(ev)>(ev)} {}
+  TDP_DensityOperator(auto&& ev /*, EntanglementMeasuresSwitch ems*/) : ev{FWD(ev)} {}
 
   EV ev;
 //  const EntanglementMeasuresSwitch ems_;

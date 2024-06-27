@@ -18,7 +18,7 @@ _(SV_OR_DO&& initial,
   const evolution::Pars<mcwf::Pars<RandomEngine>>& p,
   bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return _<ODE_Engine,RandomEngine,0>(std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+  return _<ODE_Engine,RandomEngine,0>(FWD(initial),sys,p,doStreaming,returnStreamedArray);
 }
 
 
@@ -33,7 +33,7 @@ evolve(SV_OR_DO&& initial,
        bool doStreaming=true, bool returnStreamedArray=false)
 {
   return evolution::_<QUANTUM_EVOLUTION_DEFAULT_ODE_ENGINE,QUANTUM_EVOLUTION_DEFAULT_RANDOM_ENGINE,tmptools::Vector<0>>(
-    std::forward<SV_OR_DO>(initial),sys,p,doStreaming,returnStreamedArray);
+    FWD(initial),sys,p,doStreaming,returnStreamedArray);
 }
 
 

@@ -127,7 +127,7 @@ struct Base
   using Time=typename CES::time_type;
   
   Base(Time dtInit, auto&&... args)
-    : ces{MakeControlledErrorStepper<CES>::_(std::forward<decltype(args)>(args)...)},
+    : ces{MakeControlledErrorStepper<CES>::_(FWD(args)...)},
       dtTry(dtInit), logger{defaultLogger()} {}
 
   template <typename State> requires controlled_stepper<CES,State,Time>

@@ -61,8 +61,8 @@ evolveMaster(DO&& rho, ///<[in/out] density operator initial condition
   static constexpr auto RANK=std::decay_t<DO>::N_RANK;
   
   return cppqedutils::run(master::make<ODE_Engine<quantumdata::DensityOperatorLow<RANK>>,V>
-    (std::forward<SYS>(sys),
-     std::forward<quantumdata::DensityOperator<RANK>>(rho),
+    (FWD(sys),
+     FWD>(rho),
      p,p.ems),
      p,doStreaming,returnStreamedArray);
 }
@@ -72,7 +72,7 @@ template<template <typename StateType> class ODE_Engine, int... V, typename DO, 
 auto
 evolveMaster(DO&& rho, SYS&& sys, const Parameters& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return evolveMaster<ODE_Engine,tmptools::Vector<V...>>(std::forward<DO>(rho),std::forward<SYS>(sys),p,doStreaming,returnStreamedArray);
+  return evolveMaster<ODE_Engine,tmptools::Vector<V...>>(FWD(rho),FWD(sys),p,doStreaming,returnStreamedArray);
 }
 
 
@@ -108,13 +108,13 @@ _(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
       return cppqedutils::run(mcwf::makeEnsemble<OE,RandomEngine,V>(sys,initial,pe,pe.ems),pe,doStreaming,returnStreamedArray);
     }
     else {
-      return ::evolveMaster<ODE_Engine,V>(std::forward<quantumdata::DensityOperator<RANK>>(initial),sys,pe,doStreaming,returnStreamedArray);
+      return ::evolveMaster<ODE_Engine,V>(FWD>(initial),sys,pe,doStreaming,returnStreamedArray);
     }
   }
   // StateVector initial condition
   else {
     if (pe.evol==evolution::SINGLE) {
-      return cppqedutils::run(mcwf::make<OE,RandomEngine>(sys,std::forward<quantumdata::StateVector<RANK>>(initial),pe),
+      return cppqedutils::run(mcwf::make<OE,RandomEngine>(sys,FWD>(initial),pe),
                               pe,doStreaming,returnStreamedArray);
     }
     else if (pe.evol==evolution::ENSEMBLE) {
@@ -138,7 +138,7 @@ auto _(SV_OR_DO&& initial, SYS&& sys, const Parameters& p, bool doStreaming=true
 {
   static constexpr auto RANK=std::decay_t<SV_OR_DO>::N_RANK;
 
-  return details::_<RANK,ODE_Engine,RandomEngine,V>(std::forward<SV_OR_DO>(initial),std::forward<SYS>(sys),p,doStreaming,returnStreamedArray);
+  return details::_<RANK,ODE_Engine,RandomEngine,V>(FWD(initial),FWD(sys),p,doStreaming,returnStreamedArray);
 }
 
 
@@ -147,8 +147,8 @@ template<template <typename StateType> class ODE_Engine, typename RandomEngine,
 auto _(SV_OR_DO&& initial, SYS&& sys, const Parameters& p, bool doStreaming=true, bool returnStreamedArray=false)
 {
   return _<ODE_Engine,RandomEngine,tmptools::Vector<V...>>(
-    std::forward<SV_OR_DO>(initial),
-    std::forward<SYS>(sys),
+    FWD(initial),
+    FWD(sys),
     p,doStreaming,returnStreamedArray);
 }
 
@@ -178,8 +178,8 @@ evolve(SV_OR_DO&& initial, ///<[in/out] pure state-vector initial condition
        bool doStreaming=true, bool returnStreamedArray=false)
 {
   return evolution::_<QUANTUM_EVOLUTION_DEFAULT_ODE_ENGINE,QUANTUM_EVOLUTION_DEFAULT_RANDOM_ENGINE,V>(
-    std::forward<SV_OR_DO>(initial),
-    std::forward<SYS>(sys),
+    FWD(initial),
+    FWD(sys),
     p,doStreaming,returnStreamedArray);
 }
 
@@ -202,8 +202,8 @@ evolve(SV_OR_DO&& initial,
        const Parameters& p,
        bool doStreaming=true, bool returnStreamedArray=false)
 {
-  return evolve<tmptools::Vector<V...>>(std::forward<SV_OR_DO>(initial),
-                                        std::forward<SYS>(sys),
+  return evolve<tmptools::Vector<V...>>(FWD(initial),
+                                        FWD(sys),
                                         p,doStreaming,returnStreamedArray);
 }
 

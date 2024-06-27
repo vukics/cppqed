@@ -48,7 +48,7 @@ public:
   template <typename IA, typename ... T>
   static _ make(T&&... t)
   {
-    return _{std::make_shared<const IA>(std::forward<T>(t)...)};
+    return _{std::make_shared<const IA>(FWD(t)...)};
   }
 
   static constexpr auto retainedAxes=tmptools::vector<RetainedAxes...>;

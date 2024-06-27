@@ -1,6 +1,8 @@
 // Copyright András Vukics 2006–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
+#define FWD(x) std::forward<decltype(x)>(x)
+
 #include "ComplexExtensions.h"
 
 #include <boost/hana.hpp>
@@ -17,7 +19,7 @@ template <typename S> concept hana_sequence = hana::Sequence<S>::value;
 namespace json = boost::json ;
 using LogTree = json::object ;
 
-std::string toStringJSON(auto&& v) {return json::serialize( json::value_from( std::forward<decltype(v)>(v) ) ) ;}
+std::string toStringJSON(auto&& v) {return json::serialize( json::value_from( FWD(v) ) ) ;}
 
 // Helper template that is always false, used to induce a compilation error
 template <typename T>

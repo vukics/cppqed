@@ -13,7 +13,7 @@ template <template<size_t> typename TAG, size_t RANK>
 struct LDO : MultiArrayConstView<dcomp,multiArrayRank_v<TAG<RANK>>>
 {
   template <typename ... A>
-  LDO(A&& ... a) : MultiArrayConstView<dcomp,multiArrayRank_v<TAG<RANK>>>{std::forward<A>(a)...} {}
+  LDO(A&& ... a) : MultiArrayConstView<dcomp,multiArrayRank_v<TAG<RANK>>>{FWD(a)...} {}
 };
 
 

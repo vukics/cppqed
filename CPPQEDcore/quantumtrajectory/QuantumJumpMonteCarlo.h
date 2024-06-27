@@ -91,8 +91,8 @@ struct QuantumJumpMonteCarloBase
 
   QuantumJumpMonteCarloBase(auto&& ha, const Liouvillian<RANK>& li, auto&& ev, const json::object& descr,
                             auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re)
-  : ha{std::forward<decltype(ha)>(ha)}, li{li}, ev{std::forward<decltype(ev)>(ev)},
-    psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)}, re{re},
+  : ha{FWD(ha)}, li{li}, ev{FWD(ev)},
+    psi{FWD(psi)}, oe{FWD(oe)}, re{re},
     log_{qjmc::defaultLogger()},
     intro_{{"Quantum-Jump Monte Carlo",{{"odeEngine",logIntro(this->oe)},{"randomEngine",logIntro(this->re)}}},{"system",descr}}
     {
@@ -195,8 +195,8 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,HA,EV,OE,RandomEn
   QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK> li, auto&& ev, const json::object& descr,
                         auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double normTol)
     : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>{
-        std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),descr,
-        std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
+        FWD(ha),li,FWD(ev),descr,
+        FWD(psi),FWD(oe),re},
       normTol_{normTol}, normAt_{this->sampleRandom()}
   {
     this->log_["bisectMaxIter"]=0z;
@@ -319,8 +319,8 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,HA,EV,OE,RandomEngin
   QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK> li, auto&& ev, const json::object& descr,
                         auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
     : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>{
-        std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),descr,
-        std::forward<decltype(psi)>(psi),std::forward<decltype(oe)>(oe),re},
+        FWD(ha),li,FWD(ev),descr,
+        FWD(psi),FWD(oe),re},
       dpLimit_{dpLimit}
   {
     if (!time) manageTimeStep( this->calculateRates(this->li) ) ;
@@ -401,8 +401,8 @@ auto make(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const json::object& des
   double iDt=initialTimeStep(ha,getDimensions(state)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
   
   return QuantumJumpMonteCarlo<a,RANK,HA,EV,ODE,RandomEngine>{
-    std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),descr,
-    std::forward<SV>(state),
+    FWD(ha),li,FWD(ev),descr,
+    FWD(state),
     ODE{iDt,p.epsRel,p.epsAbs},
     randomutils::EngineWithParameters<RandomEngine>{p.seed,p.prngStream},
     [&] () -> double {
@@ -426,7 +426,7 @@ auto make(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const json::object& des
 //
 //   trajectory::Ensemble<Single,TDP_DensityOperator<RANK,EV>> res{
 //     .trajs{},
-//     .tdpCalculator{std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev)/*,ems*/},
+//     .tdpCalculator{FWD(ha),li,FWD(ev)/*,ems*/},
 //     // qjmc::EnsembleLogger{p.nBins,p.nJumpsPerBin},
 //     .ensembleAverageResult{DensityOperator<RANK>{getDimensions(psi),noInit}}
 //   };
@@ -445,13 +445,13 @@ auto make(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const json::object& des
 
 
 template <qjmc::Algorithm a, template<typename> class OE, typename RandomEngine, size_t RANK, typename HA, typename EV, typename SV, typename AH>
-void run(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const json::object& descr, SV&& state, trajectory::Pars<qjmc::Pars<a,RandomEngine>>& p, AH && observer)
+void run(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const json::object& descr, SV&& state, trajectory::Pars<qjmc::Pars<a,RandomEngine>>& p, AH && observer = trajectory::observerNoOp)
 {
   if (!p.nTraj) // single trajectory
-    run(qjmc::make<a,OE>(std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),descr,std::forward<SV>(state),p),p,std::forward<AH>(observer));
+    run(qjmc::make<a,OE>(FWD(ha),li,FWD(ev),descr,FWD(state),p),p,FWD(observer));
   else
     throw std::runtime_error("makeEnsemble out for the moment!");
-//    run(qjmc::makeEnsemble<a,OE>(std::forward<decltype(ha)>(ha),li,std::forward<decltype(ev)>(ev),state,p),p,std::forward<AH>(observer));
+//    run(qjmc::makeEnsemble<a,OE>(FWD(ha),li,FWD(ev),state,p),p,FWD(observer));
 }
 
 

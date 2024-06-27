@@ -21,7 +21,7 @@ template<typename ST, ode::system<ST> D, template <typename > typename OE> requi
 struct Simulated
 {
   Simulated(auto&& stateInit, D d, std::initializer_list<std::string> kl, OE<std::decay_t<ST>> oe, const LogTree& p={})
-  : state{std::forward<decltype(stateInit)>(stateInit)},
+  : state{FWD(stateInit)},
     derivs{d},
     keyLabels{kl},
     ode{oe},
@@ -82,7 +82,7 @@ template<template <typename > typename OE, typename ST, typename D, typename ...
 requires ::cppqedutils::ode::engine<OE<std::decay_t<ST>>,std::decay_t<ST>>
 auto make(ST&& stateInit, D derivs, std::initializer_list<std::string> keyLabels, const LogTree& parameters, ODE_EngineCtorParams&&... odePack)
 {
-  return Simulated<ST,D,OE>{std::forward<ST>(stateInit),derivs,keyLabels,OE<std::decay_t<ST>>{std::forward<ODE_EngineCtorParams>(odePack)...},parameters};
+  return Simulated<ST,D,OE>{FWD(stateInit),derivs,keyLabels,OE<std::decay_t<ST>>{FWD(odePack)...},parameters};
 }
 
 template <typename BASE = Empty>
@@ -91,7 +91,7 @@ using Pars=::trajectory::Pars<::ode::Pars<BASE>>;
 
 auto makeBoost(auto && stateInit, auto derivs, std::initializer_list<std::string> keyLabels, const LogTree& parameters, double dtInit, const auto& p)
 {
-  return make<ODE_EngineBoost>(std::forward<decltype(stateInit)>(stateInit),derivs,keyLabels,parameters,dtInit,p.epsRel,p.epsAbs);
+  return make<ODE_EngineBoost>(FWD(stateInit),derivs,keyLabels,parameters,dtInit,p.epsRel,p.epsAbs);
 }
 
 } // simulated

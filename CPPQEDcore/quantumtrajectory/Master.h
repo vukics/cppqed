@@ -26,7 +26,7 @@ template <size_t RANK,
 struct Master
 {
   Master(auto&& qsd, auto&& rho, auto&& oe)
-    : qsd{std::forward<decltype(qsd)>(qsd)}, rho{std::forward<decltype(rho)>(rho)}, oe{std::forward<decltype(oe)>(oe)},
+    : qsd{FWD(qsd)}, rho{FWD(rho)}, oe{FWD(oe)},
       rowIterationOffsets_{calculateSlicesOffsets<compileTimeOrdinals<RANK>>(this->rho.extents)} {}
 
   double time=0., time0=0.;
@@ -131,7 +131,7 @@ auto make(QSD&& qsd, DO&& state, const Pars& p)
 
   double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
 
-  return Master<RANK,QSD,ODE>{std::forward<QSD>(qsd),std::forward<DO>(state),ODE{iDt,p.epsRel,p.epsAbs}};
+  return Master<RANK,QSD,ODE>{FWD(qsd),FWD(state),ODE{iDt,p.epsRel,p.epsAbs}};
 }
 
 

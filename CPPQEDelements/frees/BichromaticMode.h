@@ -31,7 +31,7 @@ public:
     : mode::Liouvillian<TEMPERATURE>(p.kappa,p.nTh),
       mode::Hamiltonian<true>(0,dcomp(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.delta),p.eta,p.omegaKerr,p.omegaKerrAlter,p.cutoff),
       ModeBase(p.cutoff,RF{"deltaOther",p.deltaOther,1},{CF{"(kappa*(2*nTh+1),delta)",conj(get_zI()),1},CF{"eta",get_eta(),sqrt(p.cutoff)},CF{"etaOther",p.etaOther,sqrt(p.cutoff)}},"Bichromatic mode"),
-      AveragingType(std::forward<AveragingConstructorParameters>(a)...),
+      AveragingType(FWD(a)...),
       zI_Other(mode::finiteTemperatureHamiltonianDecay<TEMPERATURE>(p),-p.deltaOther)
   {
     mode::Hamiltonian<true>::getH_OverIs().push_back(

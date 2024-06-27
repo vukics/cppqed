@@ -17,7 +17,7 @@ template <size_t RANK,
 struct Schrödinger
 {
   Schrödinger(auto&& qsd, auto&& psi, auto&& oe)
-    : qsd{std::forward<decltype(qsd)>(qsd)}, psi{std::forward<decltype(psi)>(psi)}, oe{std::forward<decltype(oe)>(oe)} {}
+    : qsd{FWD(qsd)}, psi{FWD(psi)}, oe{FWD(oe)} {}
 
   double time=0., time0=0.;
   QSD qsd;
@@ -87,7 +87,7 @@ auto make(QSD&& qsd, SV&& state, const Pars& p)
 
   double iDt=initialTimeStep(getFreqs(qsd)); // precalculate, since qsd gets forwarded (i.e., potentially moved)
 
-  return Schrödinger<RANK,QSD,ODE>{std::forward<QSD>(qsd),std::forward<SV>(state),ODE{iDt,p.epsRel,p.epsAbs}};
+  return Schrödinger<RANK,QSD,ODE>{FWD(qsd),FWD(state),ODE{iDt,p.epsRel,p.epsAbs}};
 }
 
 

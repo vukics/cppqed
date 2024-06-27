@@ -36,7 +36,7 @@ public:
   template<typename F1, typename F2, typename... AveragingConstructorParameters>
   BIG_CLASS_NAME(F1 f1, F2 f2 BIG_ADDITIONAL_PARAMETERS , AveragingConstructorParameters&&... a)
     : BASE_class(f1,f2 BIG_ADDITIONAL_PARAMETERS_PASS),
-      AveragingType(std::forward<AveragingConstructorParameters>(a)...)
+      AveragingType(FWD(a)...)
   {}
 
 };

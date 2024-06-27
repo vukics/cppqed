@@ -59,7 +59,7 @@ public:
     : mode::HomodynedBase(p,p.homodyneAmplitude),
       ModeBase(p.cutoff,{CF{"(kappa*(2*nTh+1),delta)",conj(get_zSch()),1},CF{"eta",get_eta(),sqrt(p.cutoff)},CF{"homodyneAmplitude",p.homodyneAmplitude,1.}},
                "Homodyned mode"),
-      AveragingType(std::forward<AveragingConstructorParameters>(a)...)
+      AveragingType(FWD(a)...)
   {
     getParsStream()<<"Homodyne detection.\n";
   }

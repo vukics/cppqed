@@ -73,7 +73,7 @@ public:
   
   /// offset can come from a previous slicing
   MultiArrayView(Extents<RANK> extents, Extents<RANK> strides, size_t offset, auto&&... dataView)
-    : extents{extents}, strides{strides}, offset{offset}, dataView{std::forward<decltype(dataView)>(dataView)...} {}
+    : extents{extents}, strides{strides}, offset{offset}, dataView{FWD(dataView)...} {}
 
   /// implicit conversion to a const view
   operator MultiArrayView<const T, RANK>() const requires ( !std::is_const_v<T> ) {return {extents,strides,offset,dataView}; }
@@ -265,10 +265,10 @@ public:
   operator MultiArrayView<T,RANK>() {return mutableView();}
 
   /// non-const subscripting
-  T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...)) ;}
+  T& operator()(auto&&... i) {return const_cast<T&>(static_cast<MultiArrayConstView<T,RANK>>(*this)(FWD(i)...)) ;}
   
   /// this overload is needed, otherwise any call to operator() with a MultiArray object resolves to the previous function
-  const T& operator()(auto&&... i) const {return static_cast<MultiArrayConstView<T,RANK>>(*this)(std::forward<decltype(i)>(i)...) ;}
+  const T& operator()(auto&&... i) const {return static_cast<MultiArrayConstView<T,RANK>>(*this)(FWD(i)...) ;}
 
   /// access data storage
   StorageType& dataStorage() {return data_;}

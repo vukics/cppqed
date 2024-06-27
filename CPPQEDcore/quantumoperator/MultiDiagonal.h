@@ -67,7 +67,7 @@ struct MultiDiagonal
   MultiDiagonal(const MultiDiagonal&) = delete; MultiDiagonal& operator=(const MultiDiagonal&) = delete;
   MultiDiagonal(MultiDiagonal&&) = default; MultiDiagonal& operator=(MultiDiagonal&&) = default;
 
-  explicit MultiDiagonal(auto&&... args) : diagonals{std::forward<decltype(args)>(args)...} {}
+  explicit MultiDiagonal(auto&&... args) : diagonals{FWD(args)...} {}
 
   friend MultiDiagonal copy(const auto& md)
   {
