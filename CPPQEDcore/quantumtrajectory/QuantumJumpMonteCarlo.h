@@ -192,7 +192,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::integrating,RANK,HA,EV,OE,RandomEn
 {
   QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default;
 
-  QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK> li, auto&& ev, const json::object& descr,
+  QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK>& li, auto&& ev, const json::object& descr,
                         auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double normTol)
     : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>{
         FWD(ha),li,FWD(ev),descr,
@@ -316,7 +316,7 @@ struct QuantumJumpMonteCarlo<qjmc::Algorithm::stepwise,RANK,HA,EV,OE,RandomEngin
 {
   QuantumJumpMonteCarlo(QuantumJumpMonteCarlo&&) = default;
 
-  QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK> li, auto&& ev, const json::object& descr,
+  QuantumJumpMonteCarlo(auto&& ha, const Liouvillian<RANK>& li, auto&& ev, const json::object& descr,
                         auto&& psi, auto&& oe, randomutils::EngineWithParameters<RandomEngine> re, double dpLimit)
     : QuantumJumpMonteCarloBase<RANK,HA,EV,OE,RandomEngine>{
         FWD(ha),li,FWD(ev),descr,
