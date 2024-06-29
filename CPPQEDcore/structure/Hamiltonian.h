@@ -32,7 +32,7 @@ concept two_time_dependent_functional = requires (const H& h, double t, StateVec
 template <typename H, size_t RANK>
 concept functional = time_independent_functional<H,RANK> || one_time_dependent_functional<H,RANK> || two_time_dependent_functional<H,RANK> || std::same_as<std::decay_t<H>,NoOp>;
 
-template <typename H, size_t RANK> constexpr bool recursiveTrait = [] () {
+template <typename H, size_t RANK> constexpr bool recursiveTrait = [] {
   if constexpr (hana_sequence<H>)
     return !!hana::all_of(
       decltype(hana::transform(std::declval<H>(), hana::typeid_)){},

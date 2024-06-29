@@ -365,7 +365,7 @@ run(TRAJ&& traj, ///< the trajectory to run
   
   const bool
     streamToFile=(trajectoryFileName!=""),
-    continuing=[&]() {
+    continuing= [&] {
       if (trajectoryFileName!="") {
         ifstream trajectoryFile{trajectoryFileName.c_str()};
         if (trajectoryFile.is_open() && (trajectoryFile.peek(), !trajectoryFile.eof()) ) {
@@ -445,7 +445,7 @@ run(TRAJ&& traj, ///< the trajectory to run
         stateSaved=tdpStreamed=false;
       }
 
-      if (!count || [&]() {
+      if (!count || [&] {
         if constexpr (SFT==StreamFreqType::DT_MODE) return true;
         else return !(count%streamFreq); // here, we still use a lambda because this doesn’t compile if streamFreq is double
       }() ) {

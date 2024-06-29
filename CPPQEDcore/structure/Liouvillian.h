@@ -116,7 +116,7 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 
   auto sr=sliceRange<compileTimeOrdinals<RANK>>(rhoTemp.mutableView(),rowIterationOffsets);
 
-  auto unaryIteration=[&] () { for (auto& psiTemp : sr) applyJump(jump,t,psiTemp); };
+  auto unaryIteration=[&] { for (auto& psiTemp : sr) applyJump(jump,t,psiTemp); };
 
   unaryIteration(); hermitianConjugateSelf(rhoTemp); unaryIteration();
 

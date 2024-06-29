@@ -32,7 +32,7 @@ requires ( std::uniform_random_bit_generator<std::decay_t<Engine>> )
 auto fill(Array&& a, Engine&& re, auto&&... dp)
 {
   Distribution d{dp...};
-  return std::ranges::generate(a, [ & ]() {return d(re);});
+  return std::ranges::generate(a, [ & ] {return d(re);} );
 }
 
 

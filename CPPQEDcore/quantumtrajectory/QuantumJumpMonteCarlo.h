@@ -405,7 +405,7 @@ auto make(HA&& ha, const Liouvillian<RANK>& li, EV&& ev, const json::object& des
     FWD(state),
     ODE{iDt,p.epsRel,p.epsAbs},
     randomutils::EngineWithParameters<RandomEngine>{p.seed,p.prngStream},
-    [&] () -> double {
+    [&] -> double {
       if constexpr (a==Algorithm::stepwise) return p.dpLimit;
       else return p.normTol;
     } () };

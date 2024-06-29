@@ -43,7 +43,7 @@ public:
 
   using Impl=std::vector<Configuration>;
 
-  CWR_Dir(size_t k) : configurations{[=] () {
+  CWR_Dir(size_t k) : configurations{[=] {
     Impl res{static_cast<size_t>(multiChoose<double>(NoOfSites,k))};
 
     auto recurse=[&](typename Impl::iterator i, size_t actualSite, size_t remainingParticles, auto& recurseFunction) -> void {
