@@ -171,7 +171,27 @@ Lindblad<RANK> broadcast(const Broadcaster<RANK,ra...>& bc, const Lindblad<sizeo
 
 
 template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
-Liouvillian<RANK> broadcast(const Broadcaster<RANK,ra...>& bc, const Liouvillian<sizeof...(ra)>& l);
+Liouvillian<RANK> broadcast(const Broadcaster<RANK,ra...>& bc, const Liouvillian<sizeof...(ra)>& l)
+{
+  Liouvillian<RANK> result( size(l) );
+  std::ranges::transform( l, result.begin(), [&] (const Lindblad<sizeof...(ra)>& v) {return broadcast(bc,v);} );
+  return result;
+}
+
+
+auto concatenate(const auto&... lious)
+{
+  Liouvillian<
+    [] <size_t RANK> ( const Liouvillian<RANK>&, const auto&... ) {return RANK;} (lious...)
+    // TODO: this seems to be a very nice solution that should be generally applicable instead of metafunctions
+  > result( ( size(lious) + ... ) );
+  size_t index{};
+
+  ((std::copy_n(lious.begin(), size(lious), result.begin() + index), index += size(lious)), ...);
+
+  return result;
+}
+
 
 
 } // liouvillian_ns
