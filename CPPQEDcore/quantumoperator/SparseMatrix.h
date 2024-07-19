@@ -3,6 +3,8 @@
 
 #include "StateVector.h"
 
+#include <boost/serialization/list.hpp>
+
 #include <list>
 
 
@@ -26,6 +28,12 @@ struct SparseMatrix
   }
 
   void operator () (std::span<const dcomp> psi, std::span<dcomp> dpsidt) const;
+
+private:
+  friend class boost::serialization::access;
+
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int) {ar & elements;}
 
 };
 
