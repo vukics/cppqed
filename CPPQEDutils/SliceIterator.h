@@ -278,16 +278,6 @@ void broadcastFor(F&& f, ARGS&&... args)
 
 
 
-// broadcaster could have RANK as a top-level template parameter, to act as a tag in broadcasting functions, allowing for deducing RANK
-template <size_t RANK, size_t ... ra>
-struct Broadcaster
-{
-  Broadcaster(Extents<RANK> extents) : offsets{cso<ra...>(extents)} {}
-
-  const std::vector<size_t> offsets;
-};
-
-
 namespace multi_index_range_solution_by_chatgpt {
 
 

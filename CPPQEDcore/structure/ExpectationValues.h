@@ -5,8 +5,6 @@
 
 #include "TemporalDataPoint.h"
 
-#include <functional>
-
 
 namespace structure {
 
@@ -65,23 +63,6 @@ auto calculateExpectationValues(const EV& ev, double t, lazy_density_operator<RA
   else return ev(matrix);
 }
 
-
-namespace expectation_values_ns {
-
-template <
-  size_t RANK,
-  size_t ... ra,
-  functional<sizeof...(ra)> EV>
-auto broadcast(const Broadcaster<RANK,ra...>& bc, const EV& ev)
-{
-  return [&] (double t, lazy_density_operator<RANK> auto matrix) {
-    return partialTrace<retainedAxes<ra...>,RANK>( matrix, bc.offsets,
-                                                   [&] (auto psiElem) {return calculateExpectationValues<sizeof...(ra)>(ev,t,psiElem); },
-                                                   plusTDP{} );
-  };
-}
-
-} // expectation_values_ns
 
 
 /* Another definition of key_labels that mirrors that of temporal_data_points is probably an overkill

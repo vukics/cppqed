@@ -94,26 +94,11 @@ template <size_t RANK> using TimeDependentTerm = ODE_derivativeTimeDependentFunc
 
 
 
-#include "SliceIterator.h"
 #include "SparseMatrix.h"
 
 #include "progressbar.hpp"
 
 namespace structure::hamiltonian_ns {
-
-
-/// Maybe this can be just an overload of applyHamiltonian ?
-template <
-  size_t RANK,
-  size_t ... i,
-  functional<sizeof...(i)> T >
-auto broadcast(const Broadcaster<RANK,i...>& bc, const T& h)
-{
-  return [&] ( double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt, double t0 ) {
-    for ( auto&& [psi,dpsidt] : std::views::zip( sliceRange<retainedAxes<i...>>(psi,bc.offsets), sliceRange<retainedAxes<i...>>(dpsidt,bc.offsets) ) )
-      applyHamiltonian(h,t,psi,dpsidt,t0);
-  };
-}
 
 
 template <size_t RANK, hamiltonian<RANK> H>

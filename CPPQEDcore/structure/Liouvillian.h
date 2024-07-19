@@ -124,61 +124,6 @@ void superoperatorFromJump(double t, DensityOperatorConstView<RANK> rho, Density
 }
 
 
-
-namespace liouvillian_ns {
-
-
-template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
-Lindblad<RANK> broadcast(const Broadcaster<RANK,ra...>& bc, const Lindblad<sizeof...(ra)>& l)
-{
-  static constexpr std::array retainedAxes{ra...};
-  static constexpr size_t RRANK = std::size(retainedAxes);
-  
-  return {
-
-    .label{l.label} ,
-
-    .jump{ [&] (double t, StateVectorView<RANK> psi) {
-      for (auto&& psiElem : sliceRange<retainedAxes>(psi,bc.offsets)) applyJump(l.jump,t,psiElem);
-    } } ,
-
-    .rate{ [&] (double t, StateVectorConstView<RANK> psi) {
-      return partialTrace<retainedAxes,RANK>(LDO<StateVector,RANK>{psi},
-                                             bc.offsets,
-                                             [&] (StateVectorConstView<RANK-std::size(retainedAxes)> psiElem) {return calculateRate(l.rate,t,psiElem); },
-                                             std::plus{} );
-    } } ,
-
-    .superoperator{
-      [ &, matrixOffsets=std::vector<size_t>{} ] (double t, DensityOperatorConstView<RANK> rho, DensityOperatorView<RANK> drhodt) mutable {
-        // matrixOffsets is populated when the lambda is first called
-        if (!matrixOffsets.size()) {
-          matrixOffsets.resize(sqr(bc.offsets.size()));
-          size_t extent=std::lround(std::sqrt(rho.dataView.size()));
-          auto i=matrixOffsets.begin(); 
-          for (auto u=bc.offsets.begin(); u!=bc.offsets.end(); ++u )
-            for (auto v=bc.offsets.begin(); v!=bc.offsets.end(); (*i++) = (*u) + extent * (*v++) ) ;
-        }
-
-        for ( auto&& [rho,drhodt] : std::views::zip( sliceRange<extendedAxes<retainedAxes,RANK>>(rho,matrixOffsets), 
-                                                     sliceRange<extendedAxes<retainedAxes,RANK>>(drhodt,matrixOffsets) ) )
-          applySuperoperator<RRANK>(l.superoperator,t,rho,drhodt) ;
-      }
-    }
-
-  };
-}
-
-
-template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
-Liouvillian<RANK> broadcast(const Broadcaster<RANK,ra...>& bc, const Liouvillian<sizeof...(ra)>& l)
-{
-  Liouvillian<RANK> result( size(l) );
-  std::ranges::transform( l, result.begin(), [&] (const Lindblad<sizeof...(ra)>& v) {return broadcast(bc,v);} );
-  return result;
-}
-
-
 auto concatenate(const auto&... lious)
 {
   Liouvillian<
@@ -192,9 +137,6 @@ auto concatenate(const auto&... lious)
   return result;
 }
 
-
-
-} // liouvillian_ns
 
 
 // /**
