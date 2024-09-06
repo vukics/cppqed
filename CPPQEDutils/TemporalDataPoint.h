@@ -98,7 +98,7 @@ std::ostream& streamTDP(slv_ns::_<label,double> tdp, std::ostream& os) {return o
 template <slv_ns::fs label>
 std::ostream& streamTDP(slv_ns::_<label,dcomp > tdp, std::ostream& os) {return os<<tdp.value;}
 
-inline std::ostream& streamTDP(hana::tuple<> tdp, std::ostream& os) {return os;}
+inline std::ostream& streamTDP(hana::tuple<>, std::ostream& os) {return os;}
 
 std::ostream& streamTDP(const temporal_data_point auto& tdp, std::ostream& os)
 {

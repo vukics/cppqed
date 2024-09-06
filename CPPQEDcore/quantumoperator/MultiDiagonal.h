@@ -80,7 +80,7 @@ struct MultiDiagonal
   // double tCurrent=0;
 
   /// Applying as a Hamiltonian
-  void operator () (double t, StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt) const
+  void operator () (double , StateVectorConstView<RANK> psi, StateVectorView<RANK> dpsidt) const
   {
     if (diagonals.empty()) return;
 

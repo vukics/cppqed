@@ -25,7 +25,7 @@ typedef boost::archive::binary_oarchive oarchive; ///< \copydoc iarchive
 namespace boost::serialization {
 
 template <typename Archive, typename ... Ts>
-void serialize( Archive& ar, std::tuple<Ts...>& t, const unsigned int version )
+void serialize( Archive& ar, std::tuple<Ts...>& t, const unsigned int)
 {
   std::apply( [&ar] (Ts&... args) {
     ( ... , ( ar & args ) ) ;
