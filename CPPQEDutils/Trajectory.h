@@ -110,7 +110,7 @@ struct Pars : BASE
      _("NDt","Number of steps in Dt mode",0,NDt),
      _("o","Output file name for Trajectory, when empty, cout","",ofn),
      _("initialFileName","Trajectory initial file name","",initialFileName),
-//   _("precision","General precision of output",formdouble::Zero(FormDouble::defaultPrecision)),
+     _("precision","General precision of output",6,precision),
      _("streamSwitch","stream intro,  stream outro, stream log underway, serialize 1st state",StreamSwitch("1011"),streamSwitch),
      _("sdf","State output frequency",0,sdf),
      _("autoStopEpsilonRel","Relative precision for autostopping",ode::epsRelDefault,autoStopEpsilonRel),
@@ -317,25 +317,44 @@ void writeViaSStream(Trajectory& traj, // cannot be const, because traj.stateIO 
 }
 
 
-template <typename T, typename TRAJ>
-concept data_streamer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj, std::ostream& os) {
-  { t(traj,os) } -> std::convertible_to<decltype(temporalDataPoint(traj))> ;
-};
+// template <typename T, typename TRAJ>
+// concept data_streamer = uniform_step<TRAJ> && requires (T&& t, const TRAJ& traj, std::ostream& os) {
+//   { t(traj,os) } -> std::convertible_to<decltype(temporalDataPoint(traj))> ;
+// };
 
 
-const auto dataStreamerDefault = [] (const uniform_step auto& traj, std::ostream& os) {
-  auto tdp{temporalDataPoint(traj)};
-  streamTDP(tdp, os)<<std::endl; // Note: endl flushes the buffer
-  return tdp;
-};
+// ChatGPT’s solution for the formatting:
+// #include <format>
+//
+// int main() {
+//     double value = 123.456789;
+//     int precision = 5; // Total number of significant digits
+//     bool can_be_negative = false; // Change to true if the value can be negative
+//
+//     // Calculate the maximal possible width
+//     int max_exponent_digits = 2; // E.g., for 1.23e+05, exponent is +05, thus 2 digits
+//     int total_width = precision + 2 + max_exponent_digits; // 1 for the decimal point, 1 for 'e'
+//     if (can_be_negative) {
+//         total_width += 1; // 1 for the negative sign
+//     }
+//
+//     // Format the number with fixed precision and scientific notation
+//     std::string formatted_value = std::format("{:>{}.{}e}", value, total_width, precision - 1);
+//
+//     std::cout << "Formatted value: [" << formatted_value << "]" << std::endl;
+//
+//     return 0;
+// }
 
-
-/// TODO: factor out and unify observer, datastreamer (precision), calculation of TDP, return of DataStream, stateStream during run into a single OBSERVER + the number of steps can be logged directly within the run function
+/// TODO: factor out and unify observer, datastreamer (precision), calculation of TDP, return of DataStream, stateStream during run into a single OBSERVER
+/// + the number of steps can be logged directly within the run function
+/// (this is not true since this function uses the advance function for non-uniform step trajectories)
 /// then, for quantum trajectories, the expectation_values can be stored in an observer (only once even for Ensemble)
+/// OK, but then it again becomes questionnable what the added value of trajectories are
 
 /// The most general run function
 /** TODO: in-trajectory log in dc-mode will not appear for dc>1 */
-template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ, data_streamer<TRAJ> TDS = decltype(dataStreamerDefault) >
+template < RunLengthType RLT, StreamFreqType SFT, uniform_step TRAJ >
 requires ( ( SFT==StreamFreqType::DT_MODE || adaptive<TRAJ> ) && ( RLT==RunLengthType::T_MODE || SFT==StreamFreqType::DT_MODE ) )
 auto
 run(TRAJ&& traj, ///< the trajectory to run
@@ -347,10 +366,13 @@ run(TRAJ&& traj, ///< the trajectory to run
     int precision, ///< governs the overall precision (number of digits) of outputs in \link Trajectory::stream streamings\endlink
     StreamSwitch streamSwitch, bool doStreaming, ///< If false, all trajectory output is redirected to a null-stream
     bool returnStreamedArray, ///< If true, the streamed array is stored and returned by the function
-    observer<TRAJ> auto&& observer,
-    const TDS& tds = dataStreamerDefault)
+    observer<TRAJ> auto&& observer)
 {
-  auto streamWrapper=[&] (std::ostream& os) {return tds(traj,os<<getTime(traj)<<" "<<getDtDid(traj)<<"\t");};
+  auto streamWrapper=[&] (std::ostream& os) {
+    auto tdp{temporalDataPoint(traj)};
+    streamTDP(tdp, os<<getTime(traj)<<" "<<getDtDid(traj)<<"\t")<<std::endl; // Note: endl flushes the buffer
+    return tdp;
+  };
 
   using namespace std;
 
@@ -396,9 +418,9 @@ run(TRAJ&& traj, ///< the trajectory to run
   
   if (outstream->fail()) throw runtime_error("Trajectory stream opening error: "+trajectoryFileName);
   
-  ostream& os=*outstream;
+  ostream& os=*outstream; os<<setprecision(precision);
 
-  CommentingStream logStream{outstream};
+  CommentingStream logStream{outstream}; logStream<<setprecision(precision);
   
   ///////////////////////
   // Writing introduction
