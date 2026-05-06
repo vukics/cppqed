@@ -1,7 +1,7 @@
 # Copyright Raimar Sandner 2012–2020.
-# Copyright András Vukics 2020–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+# Copyright András Vukics 2020–2026. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required (VERSION 3.21)
 
 # ### Version management
 #
@@ -31,6 +31,8 @@ include(CTest)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
@@ -69,11 +71,11 @@ endif()
 set(CMAKE_DEBUG_POSTFIX "_d")
 
 # ### Compiler detection
-# Ubuntu 20.04LTS versions
+# Ubuntu 24.04LTS versions
 
-set(GCC_MINIMAL 9.3)
-set(CLANG_MINIMAL 10.0)
-set(BOOST_MINIMAL 1.71)
+set(GCC_MINIMAL 13.0)
+set(CLANG_MINIMAL 18.0)
+set(BOOST_MINIMAL 1.83)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL GNU AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS ${GCC_MINIMAL})
   message(FATAL_ERROR "GCC g++ version >= ${GCC_MINIMAL} needed.")
@@ -110,6 +112,6 @@ add_subdirectory(CPPQEDelements)
 
 add_subdirectory(dockerEntry)
 
-if (EXISTS ${PROJECT_SOURCE_DIR}/OwnScripts)
-  add_subdirectory(scripts)
-endif()
+#if (EXISTS ${PROJECT_SOURCE_DIR}/OwnScripts)
+#  add_subdirectory(scripts)
+#endif()

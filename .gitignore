@@ -14,3 +14,6 @@ OwnScripts/
 scripts/
 benchmarking/
 __pycache__/
+ClaudeDiscussion/
+.cache/
+dockerEntry/*.cc
