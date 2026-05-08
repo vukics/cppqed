@@ -5,6 +5,12 @@
 
 #include <iostream>
 
+#include <complex>
+
+/// Double-precision complex number
+/** Even though it is a type, we name it this way because we would like it to closely resemble built-in types */
+typedef std::complex<double> dcomp;
+
 
 namespace cppqedutils {
 

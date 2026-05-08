@@ -3,10 +3,12 @@
 
 #define FWD(x) std::forward<decltype(x)>(x)
 
-#include "ComplexExtensions.h"
-
 #include <boost/hana.hpp>
 namespace hana=boost::hana;
+
+#include <boost/json.hpp>
+
+#include <boost/serialization/split_free.hpp>
 
 #include <numeric>
 #include <type_traits>
@@ -80,9 +82,6 @@ auto getLabel(const H& h)
 /// this solution comes directly from ChatGPT
 template <size_t N> constexpr auto compileTimeOrdinals = [] {std::array<size_t,N> res{}; std::iota(res.begin(),res.end(),0); return res;} ();
 
-
-/// TODO: try to express this as any kind of floating type (perhaps arbitrary precision), or its corresponding complex type
-template <typename N> concept scalar = std::convertible_to<N,double> || std::convertible_to<N,dcomp>;
 
 
 /// cf. https://www.scs.stanford.edu/~dm/blog/param-pack.html#multilambda

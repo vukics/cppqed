@@ -9,5 +9,5 @@ add_library(CPPQEDelements_frees OBJECT
             )
 add_library(CPPQED::CPPQEDelements_frees ALIAS CPPQEDelements_frees)
 
-target_link_libraries(CPPQEDelements_frees PUBLIC CPPQED::CPPQEDelements_utils)
+target_link_libraries(CPPQEDelements_frees PUBLIC CPPQED::CPPQEDcore)
 target_include_directories(CPPQEDelements_frees PUBLIC .)

@@ -1,6 +1,5 @@
 build*
 html
-*.kdev4
 *.orig
 *~
 debianbuild
@@ -17,3 +16,5 @@ __pycache__/
 ClaudeDiscussion/
 .cache/
 dockerEntry/*.cc
+.build
+.clangd

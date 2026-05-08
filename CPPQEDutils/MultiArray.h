@@ -1,8 +1,6 @@
 // Copyright András Vukics 2022–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-#include "Algorithm.h"
-#include "Archive.h"
 #include "Traits.h"
 
 #include <boost/serialization/vector.hpp>
@@ -11,11 +9,37 @@
 #include <concepts>
 #include <span>
 #include <stdexcept>
-//#include <valarray>
+#include <ranges>
 #include <vector>
 
 
 namespace cppqedutils {
+
+/**
+ * @brief Concatenates multiple `std::array` instances of different sizes.
+ *
+ * This function overcomes the limitation that `std::views::join` cannot join `std::array` instances
+ * of different sizes since the size is part of the type. The implementation is based on C++17
+ * fold expressions.
+ *
+ * @tparam Type The type of elements stored in the arrays.
+ * @tparam sizes The sizes of the arrays being concatenated.
+ * @param arrays The arrays to be concatenated.
+ * @return A new `std::array` containing all elements from the input arrays.
+ *
+ * @see [StackOverflow source](http://stackoverflow.com/a/42774523/1171157)
+ */
+template <typename Type, std::size_t... sizes>
+constexpr auto concatenate(const std::array<Type, sizes>&... arrays)
+{
+  std::array<Type, (sizes + ...)> result;
+  std::size_t index{};
+
+  ((std::copy_n(arrays.begin(), sizes, result.begin() + index), index += sizes), ...);
+
+  return result;
+}
+
 
 /// should be passed by value, but can be `std::move`d when used in class constructors
 template <size_t RANK>
