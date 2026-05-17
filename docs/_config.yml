@@ -1,6 +1,6 @@
 title: C++QED v3
 description: Framework for simulating open quantum dynamics
-theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
 
 url: https://vukics.github.io
 baseurl: /cppqed           # the repo name, if it's not a user/org root page
