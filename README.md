@@ -122,7 +122,7 @@ Run it from bash as:
 ```
 
 
-### Photon blockade breakdown (single driven Kerr mode)
+### Photon blockade breakdown (driven-dissipative Jaynes-Cummings model)
 
 ![Example trajectories for the photon-blockade breakdown](exampleTrajectories.png)
 
