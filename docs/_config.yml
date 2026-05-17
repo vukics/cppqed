@@ -12,7 +12,7 @@ nav_sort: order            # respect the order: field in front matter
 search_enabled: true
 
 # Footer
-footer_content: "C++QED is developed at Wigner RCP. Distributed under the Boost Software License."
+footer_content: "C++QED is developed by András Vukics (Department of Quantum Technology, Wigner RCP). Distributed under the Boost Software License."
 
 # Syntax highlighting
 color_scheme: nil          # or "dark"
