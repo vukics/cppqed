@@ -1,0 +1,24 @@
+title: C++QED v3
+description: Framework for simulating open quantum dynamics
+theme: just-the-docs
+
+url: https://vukics.github.io
+baseurl: /cppqed           # the repo name, if it's not a user/org root page
+
+# Navigation
+nav_sort: order            # respect the order: field in front matter
+
+# Search
+search_enabled: true
+
+# Footer
+footer_content: "C++QED is developed at Wigner RCP. Distributed under the Boost Software License."
+
+# Syntax highlighting
+color_scheme: nil          # or "dark"
+
+# Aux links in the top-right (e.g. back to GitHub)
+aux_links:
+  "GitHub":
+    - "https://github.com/vukics/cppqed"
+aux_links_new_tab: true
