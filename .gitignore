@@ -18,3 +18,4 @@ ClaudeDiscussion/
 dockerEntry/*.cc
 .build
 .clangd
+.claude/settings.local.json
