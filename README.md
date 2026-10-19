@@ -29,16 +29,16 @@ If you are exploring a new system interactively, use QuTiP. If you are running t
 
 - **Compile-time tensor product structure.** The `RANK` (number of subsystems) and the axes retained in any partial operation are non-type template parameters, resolved entirely at compile time. You pay the compilation cost once; every trajectory runs at full speed.
 - **C++20 concepts and Boost.Hana sequences** replace the v2 template metaprogramming maze. Composite system Hamiltonians are heterogeneous Hana tuples; composition is recursive and zero-overhead.
-- **Multi-diagonal sparse operators.** Virtually all physically relevant operators in quantum optics (ladder, number, Kerr, displacement, squeezing) are multi-diagonal in the Fock basis. `MultiDiagonal` is closed under composition, direct product, and Hermitian conjugation, with exact offset arithmetic.
-- **Unified trajectory driver.** A single `run()` function handles checkpointing, automatic continuation, autostopping at steady state, adaptive output density, and structured JSON logging — everything needed for unattended HPC jobs.
+- **Multi-diagonal sparse operators.** The generators of quantum-optical dynamics (ladder, number, Kerr, two-photon drive, Jaynes–Cummings coupling) are multi-diagonal in the Fock basis; the unitaries they generate (displacement, squeezing) are not. `MultiDiagonal` is closed under composition, direct product, and Hermitian conjugation, with exact offset arithmetic.
+- **Unified trajectory driver.** A single `run()` function handles checkpointing, automatic continuation, adaptive output density, and structured JSON logging — everything needed for unattended HPC jobs. (Autostopping at steady state is currently broken.)
 - **QJMC ensemble parallelism.** The natural HTC model: submit N independent single-trajectory jobs; average in post-processing. `pcg64` provides provably independent parallel streams.
-- **Master equation.** Lindblad master equation on full density operators, using the same `H/i` convention and non-Hermitian picture as QJMC — state-vector operations are broadcast directly over density operator indices.
+- **Master equation.** Lindblad master equation on full density operators, using the same `H/i` convention and non-Hermitian picture as QJMC — state-vector operations are broadcast directly over density operator indices. Master-equation results are not yet verified in v3.
 
 ---
 
 ## Library structure
 
-The `MultiDiagonal` sparse operator library has been split into its own repository: **[cppqed-multidiagonal](https://github.com/vukics/cppqed-multidiagonal)**. It is a standalone, physics-agnostic C++ library for multi-diagonal sparse operators over tensor-product Hilbert spaces, and is a dependency of this repository.
+The `MultiDiagonal` sparse operator library is being split into its own repository: **[cppqed-multidiagonal](https://github.com/vukics/cppqed-multidiagonal)**. It is a standalone, physics-agnostic C++ library for multi-diagonal sparse operators over tensor-product Hilbert spaces. Until the switch-over is complete, this repository still builds against its in-tree copies of `MultiArray.h`, `SliceIterator.h`, and `MultiDiagonal.h`.
 
 ```
 cppqed-multidiagonal/           Standalone sparse operator library (separate repo)
@@ -46,24 +46,26 @@ cppqed-multidiagonal/           Standalone sparse operator library (separate rep
 
 CPPQEDutils/                    Generic scaffolding
   MultiArray.h                    Strided N-dimensional array
-  SliceIterator.h                 Compile-time axis slicing and partial trace
+  SliceIterator.h                 Compile-time axis slicing
   ODE.h                           Adaptive ODE engine (Boost.Odeint / RKCK54)
-  Trajectory.h                    run() driver: streaming, checkpointing, autostop
+  Trajectory.h                    run() driver: streaming, checkpointing
   StochasticTrajectory.h          Ensemble and stochastic trajectory concepts
   Pars.h                          Command-line / JSON parameter machinery
 
 CPPQEDcore/
-  quantumdata/                  LazyDensityOperator — lazy pure/mixed state
-  quantumoperator/              MultiDiagonal integration and quantum operator algebra
+  quantumdata/                  StateVector, DensityOperator, LazyDensityOperator (lazy pure/mixed state)
+  quantumoperator/              MultiDiagonal and quantum operator algebra
   quantumtrajectory/            Master equation and QJMC integrators
-  structure/                    Hamiltonian, Liouvillian, ExpectationValues
-    → quantumdynamics
+  structure/                    Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues,
+    → quantumdynamics             Composite.h (Broadcaster: lifts subsystems to full tensor-product rank)
 
 CPPQEDelements/
-  Mode.{h,cc}                   Harmonic oscillator (Kerr, drive, decay)
-  Qbit.{h,cc}                   Two-level system
-  JaynesCummings.h              Cavity–atom coupling
-  Composite.h                   Broadcaster: lifts subsystems to full tensor-product rank
+  frees/Mode.{h,cc}             Harmonic oscillator (Kerr, drive, decay)
+  frees/Qbit.{h,cc}             Two-level system
+  interactions/JaynesCummings.h Cavity–atom coupling
+
+dockerEntry/
+  jc_qjmc.cc                    Jaynes-Cummings QJMC example executable
 ```
 
 ---
@@ -72,7 +74,7 @@ CPPQEDelements/
 
 ### Jaynes-Cummings QJMC
 
-The canonical composite system: a two-level atom coupled to a driven, lossy cavity mode. This is the verified working example as of 2026-04.
+The canonical composite system: a two-level atom coupled to a driven, lossy cavity mode. This is the verified working example as of 2026-04 (source: [`dockerEntry/jc_qjmc.cc`](dockerEntry/jc_qjmc.cc)).
 
 ```cpp
 #include "Composite.h"
@@ -118,8 +120,10 @@ int main(int argc, const char* argv[])
 Run it from bash as:
 
 ```bash
-./jc_qjmc --T 500 --Dt 1 --o results/probe.out --kappaq 0.1 --kappam 0.1 --cutoffm 30 --g 5.0 --etam 10.
+./jc_qjmc --T 500 --dc 0 --Dt 1 --o results/probe.out --gamma_mq 0.1 --kappam 0.1 --cutoffm 30 --g 5.0 --etam 10.
 ```
+
+`--dc 0` is needed for `--Dt` to take effect, since `--dc` (stream every N ODE steps) defaults to 10 and takes precedence. The qubit's decay rate is `--gamma_mq`; `--help` lists all options.
 
 
 ### Photon blockade breakdown (driven-dissipative Jaynes-Cummings model)
@@ -137,11 +141,10 @@ The photon-blockade breakdown is a dissipative quantum phase transition of the s
 
 ## Building
 
-**Requirements:** C++20 compiler (GCC ≥ 12 or Clang ≥ 16), CMake ≥ 3.20, Boost (Odeint, Hana, Iostreams, JSON), Blitz++, [cppqed-multidiagonal](https://github.com/vukics/cppqed-multidiagonal).
+**Requirements:** C++23 compiler (GCC ≥ 13 or Clang ≥ 18), CMake ≥ 3.21, Boost ≥ 1.83 (Iostreams, JSON, Serialization; plus the header-only Odeint and Hana), Eigen ≥ 3.4. popl, pcg-cpp, and Xoshiro-cpp come in as git submodules.
 
 ```bash
-git clone https://github.com/vukics/cppqed-multidiagonal.git
-git clone https://github.com/vukics/cppqed.git
+git clone --recurse-submodules https://github.com/vukics/cppqed.git
 cd cppqed
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
@@ -159,7 +162,7 @@ The physics and algorithmic foundations of the framework are described in the v2
 
 - A. Vukics, H. Ritsch, *C++QED: an object-oriented framework for wave-function simulations of cavity QED systems*, **Eur. Phys. J. D** 44, 585 (2007). [DOI: 10.1140/epjd/e2007-00210-x](https://doi.org/10.1140/epjd/e2007-00210-x)
 - A. Vukics, *C++QEDv2: The multi-array concept and compile-time algorithms in the definition of composite quantum systems*, **Comput. Phys. Commun.** 183, 1381 (2012). [DOI: 10.1016/j.cpc.2012.01.004](https://doi.org/10.1016/j.cpc.2012.01.004)
-- A. Vukics, T. Grießer, P. Domokos, *C++QEDv2 Milestone 10: A C++/Python application-programming framework for simulating open quantum dynamics*, **Comput. Phys. Commun.** 183, 1381 (2014). [DOI: 10.1016/j.cpc.2014.02.011](https://doi.org/10.1016/j.cpc.2014.02.011)
+- A. Vukics, T. Grießer, P. Domokos, *C++QEDv2 Milestone 10: A C++/Python application-programming framework for simulating open quantum dynamics*, **Comput. Phys. Commun.** 185, 1381 (2014). [DOI: 10.1016/j.cpc.2014.02.011](https://doi.org/10.1016/j.cpc.2014.02.011)
 - M. Kornyik, A. Vukics, *The Monte Carlo wave-function method: A robust adaptive algorithm and a study in convergence*, **Comput. Phys. Commun.** 238, 88–101 (2019). [DOI: 10.1016/j.cpc.2018.12.015](https://doi.org/10.1016/j.cpc.2018.12.015)
 
 - [An introductory talk](https://youtu.be/yunR73LNJ1M) given at GPU Day 2019

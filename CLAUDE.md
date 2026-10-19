@@ -217,9 +217,8 @@ textbook commutators.
 - Physics facts to keep straight:
   - Generators (a, a†, n, Kerr, two-photon drive, JC coupling, e^{inkx}) are
     multidiagonal.
-  - The unitaries they generate (displacement, squeezing) are **not**.
-  - The developer guide's operator list (primer §7.11) still has this wrong and needs
-    fixing.
+  - The unitaries they generate (displacement, squeezing) are **not**. The developer
+    guide (§7.9) and README state this correctly; keep it that way.
 
 ## Working rules (Wigner Research Centre institutional policy)
 

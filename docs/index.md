@@ -37,7 +37,7 @@ C++QED is explicitly **not** designed for interactive prototyping (Jupyter noteb
 This intent is expressed at every level of the design:
 - The **highest-level user interface is an API for writing executables** — `Pars` structs + `run()`, not a scripting interface
 - The **command-line parameter machinery** (`Pars.h`) is designed for `--option value` invocation, making job array submission trivial
-- The **`run()` function** handles checkpointing, resumption, autostopping, and structured logging — all essential for long HPC jobs
+- The **`run()` function** handles checkpointing, resumption, autostopping (currently broken, see §7.1), and structured logging — all essential for long HPC jobs
 - The **compile-time tensor product structure** means you pay the compilation cost once, then run efficiently many times — the right trade-off for production use
 - **QJMC ensemble parallelism** in HTC: the natural model is submitting N independent single-trajectory jobs (`nTraj=0`) and averaging results in post-processing, rather than running N trajectories in a single process
 
@@ -105,7 +105,7 @@ The core mechanism for acting on subsystems. Given a rank-R array and a compile-
 - `SliceRangeOwning` / `SliceRangeReferencing` — owns or references the offset vector respectively
 - `transpose` — special case where `|retainedAxes| == RANK`
 
-**Potential bug:** `SliceRangeOwning` stores a `std::vector<size_t>` of offsets and initializes `b_` (a `SliceIterator`) with `offsets_.begin()` in the member initializer list. If `SliceRangeOwning` is ever **moved**, the vector relocates but `b_` retains an iterator into the old location — dangling iterator. Same class of bug as the `MultiArray` dangling span after move.
+**Note on `SliceRangeOwning`:** it stores a `std::vector<size_t>` of offsets and initializes `b_` (a `SliceIterator`) with `offsets_.begin()` in the member initializer list. This is safe as long as the class stays move-only (as it is now): a defaulted move transfers the vector's buffer, so `b_` keeps pointing at valid storage — the same reason `MultiArray` move construction is safe. Making the class copyable with a defaulted copy would leave `b_` pointing into the source's vector.
 
 **Open items:**
 - `broadcastFor` — stub, intended as the high-level functional primitive for applying a function across matching slices of multiple arrays simultaneously
@@ -143,14 +143,14 @@ The `run()` function template is the primary user-facing entry point. All mode s
 
 #### 3.4.1 User-Facing Capabilities of `run()`
 
-**Run length** — mutually exclusive; `NDt` takes precedence over `T`:
+**Run length** — mutually exclusive; in Dt mode `NDt` takes precedence over `T` (in dc mode `NDt` is ignored):
 
 | Parameter | Effect |
 |---|---|
 | `--T value` | Run until absolute simulation time T |
 | `--NDt N` | Run for exactly N streaming intervals — avoids floating-point accumulation (`0.1×10 ≠ 1.0`), preferred for reproducible runs |
 
-**Streaming frequency** — mutually exclusive; `dc` takes precedence over `Dt`:
+**Streaming frequency** — mutually exclusive; a nonzero `dc` takes precedence over `Dt`. Since `--dc` defaults to 10, Dt mode (and with it `--NDt`) needs an explicit `--dc 0`:
 
 | Parameter | Effect |
 |---|---|
@@ -172,9 +172,9 @@ The `run()` function template is the primary user-facing entry point. All mode s
 | `--initialFileName f` | Load initial state from file `f` |
 | (automatic) | If output file exists and is non-empty, `.state` file is read and run resumes — no special flag needed |
 
-State files are transparently bzip2-compressed if Boost.Iostreams is available. Each archive is self-contained with `SerializationMetadata` (typeID, trajectoryID, rank, protocolVersion) — prevents silent corruption from loading a wrong state file. `ARRAY_ONLY` mode allows loading raw array data (e.g. from NumPy) without full trajectory metadata.
+State files are uncompressed binary archives (bzip2 compression was removed in May 2026). Each archive is self-contained with `SerializationMetadata` (typeID, trajectoryID, rank, protocolVersion) — prevents silent corruption from loading a wrong state file. `ARRAY_ONLY` mode allows loading raw array data (e.g. from NumPy) without full trajectory metadata.
 
-**Output control** (`--streamSwitch`, 4-bit field, default `1011`):
+**Output control** (`--streamSwitch`, 4-bit field, default `1011`). The value is parsed as a `std::bitset` string, so bit 0 is the **rightmost** character: the default `1011` means intro on, outro on, in-trajectory log off, initial-state serialization on.
 
 | Bit | Effect |
 |---|---|
@@ -185,7 +185,7 @@ State files are transparently bzip2-compressed if Boost.Iostreams is available. 
 
 **Output precision:** `--precision N` — number of significant digits.
 
-**Autostopping** — detects convergence to steady state via sliding window:
+**Autostopping** — detects convergence to steady state via sliding window. **Currently broken** with the labelled Hana-tuple TDPs (see §7.1); pass `trajectory::observerNoOp` instead:
 
 | Parameter | Effect |
 |---|---|
@@ -195,7 +195,7 @@ State files are transparently bzip2-compressed if Boost.Iostreams is available. 
 
 #### 3.4.2 HPC/HTC Production Workflow
 
-A typical production run: compile once, submit a job array where each job varies `--o jobN.out` and some physical parameters. Each job streams data to its own file and checkpoints state to `jobN.out.state`. If a job is interrupted, resubmit with identical arguments — continuation is automatic. When steady state is reached, autostopping terminates the job cleanly without a wall-time kill. For QJMC parameter studies, each job runs with `nTraj=0` (single trajectory); post-processing averages results across jobs.
+A typical production run: compile once, submit a job array where each job varies `--o jobN.out` and some physical parameters. Each job streams data to its own file and checkpoints state to `jobN.out.state`. If a job is interrupted, resubmit with identical arguments — continuation is automatic. Once autostopping is restored (§7.1), it will terminate the job cleanly at steady state without a wall-time kill. For QJMC parameter studies, each job runs with `nTraj=0` (single trajectory); post-processing averages results across jobs.
 
 The introduction written by `streamSwitch[0]` records the full command line and all system parameters — every output file is fully self-documenting for reproducibility.
 
@@ -204,12 +204,12 @@ The introduction written by `streamSwitch[0]` records the full command line and 
 - `advance(traj, deltaT)` drives the trajectory for exactly `deltaT` by repeatedly calling `step()` — the loop handles the final partial step correctly
 - `CommentingStream` prefixes log lines with `#`, interleaving data and logs in the same file while keeping them distinguishable
 - `returnStreamedArray=true` accumulates all streamed TDPs into a returned `DataStream` — enables programmatic use of `run()` beyond pure file I/O
-- The `observer` callback receives each TDP at streaming time — `AutostopHandlerGeneric` is the default; custom observers can be passed for e.g. online analysis
+- The `observer` callback receives each TDP at streaming time — `AutostopHandlerGeneric` is the intended default (currently broken, §7.1); custom observers can be passed for e.g. online analysis
 
 **Open items:**
 - In-trajectory log in DC mode doesn't work for `dc > 1`
 - TODO at line 349: unify observer, datastreamer, TDP calculation, `DataStream` return, and state streaming into a single `OBSERVER` concept
-- `Read/WriteState` and `readViaSStream/writeViaSStream` will be partially superseded by the planned serialization modernization (section 7.10): array data moves to HDF5, small binary state (ODE/RNG) stays binary, metadata moves to JSON/HDF5 attributes — binary precision for continuation is a hard requirement that rules out JSON for state data
+- `Read/WriteState` and `readViaSStream/writeViaSStream` will be partially superseded by the planned serialization modernization: array data moves to HDF5, small binary state (ODE/RNG) stays binary, metadata moves to JSON/HDF5 attributes — binary precision for continuation is a hard requirement that rules out JSON for state data
 
 ### 3.5 StochasticTrajectory.h
 
@@ -236,7 +236,7 @@ The `stochastic` concept extends `uniform_step` with:
 |---|---|
 | `quantumdata` | Quantum state representations: `StateVector`, `DensityOperator`, `LazyDensityOperator` |
 | `quantumoperator` | Sparse operators over tensor-product Hilbert spaces: `MultiDiagonal`, `SparseMatrix` |
-| `quantumtrajectory` | Trajectory types satisfying `adaptive_steppable`: Schrödinger, Master, QJMC, QSD |
+| `quantumtrajectory` | Trajectory types satisfying `adaptive_steppable`: Master, QJMC (`Schrödinger.h` is a stale 2023 draft, see §7.3) |
 | `structure` (→ `quantumdynamics`) | Physical system descriptors: `Hamiltonian`, `Liouvillian`, `ExactPropagator`, `ExpectationValues` |
 
 ### 4.2 quantumdata: LazyDensityOperator.h
@@ -291,7 +291,7 @@ Operations:
 
 In v2, `Tridiagonal` fused static operator coefficients with interaction-picture phase rates (`freqs_`), and `propagate(t)` multiplied each element by `exp(freqs * t)` in place. This was necessary because `Tridiagonal` objects were passed between subsystems (via `dynamic_cast` on `particle::Ptr`) and had to carry picture information with them — the canonical example being `expINKX(particle::Ptr, nK)`, which would embed the particle's propagator frequencies into the coupling operator.
 
-In v3 this cross-subsystem coupling is eliminated: the interaction picture is a property of the trajectory, not of individual operators. `ExactPropagator` / `UnaryDiagonalPropagator` handle all picture transformations globally at the trajectory level. `MultiDiagonal` is therefore a purely structural, time-independent object — the right abstraction boundary, and essential for the standalone library (§7.11).
+In v3 this cross-subsystem coupling is eliminated: the interaction picture is a property of the trajectory, not of individual operators. `ExactPropagator` / `UnaryDiagonalPropagator` handle all picture transformations globally at the trajectory level. `MultiDiagonal` is therefore a purely structural, time-independent object — the right abstraction boundary, and essential for the standalone library (§7.9).
 
 When interaction-picture phase tabulation is genuinely needed (e.g. for the Particle subsystem, where $e^{inkx}$ couples momentum states with frequency differences $\omega_\text{rec}(k_j^2 - (k_j+n)^2)$), the correct representation is a **separate** `MultiDiagonal<RANK>` carrying the frequency values alongside the coefficient `MultiDiagonal<RANK>`:
 
@@ -446,11 +446,11 @@ Basic command-line parsing: register options with names, descriptions, defaults,
 
 **Hierarchical namespacing via `mod`:**
 
-Every `Pars` constructor accepts a `mod` string suffix appended to every option name. So `Mode::Pars` constructed with `mod="1"` registers `--cutoff1`, `--delta1`, etc. Two modes in a composite system use `mod="1"` and `mod="2"`, giving `--cutoff1`, `--cutoff2` — no name collisions, no special handling needed.
+Every `Pars` constructor accepts a `mod` string suffix appended to every option name. So `mode::Pars` constructed with `mod="1"` registers `--cutoff1`, `--delta1`, etc. Two modes in a composite system use `mod="1"` and `mod="2"`, giving `--cutoff1`, `--cutoff2` — no name collisions, no special handling needed.
 
 **Automatic JSON serialization via `to_json_converter`:**
 
-`to_json_converter` is a `std::list<std::function<void(json::object&)>>` accumulating closures — one per parameter, each capturing the option name and a reference to the bound variable. Calling `jsonize()` walks the list and builds a `json::object` of current parameter values. Parameters registered with `noJSON` are excluded — e.g. initial conditions in `Mode::Pars` that don't belong in the system descriptor JSON.
+`to_json_converter` is a `std::list<std::function<void(json::object&)>>` accumulating closures — one per parameter, each capturing the option name and a reference to the bound variable. Calling `jsonize()` walks the list and builds a `json::object` of current parameter values. Parameters registered with `noJSON` are excluded — e.g. initial conditions in `mode::Pars` that don't belong in the system descriptor JSON.
 
 **The `_()` helper for tuple-based registration:**
 
@@ -464,7 +464,7 @@ returns a 4-tuple. A `noJSON` variant returns a 5-tuple. These are unpacked by `
 - Wires up JSON serialization for all non-`noJSON` parameters
 - Inserts section titles in the `--help` output
 
-### 5.3 Example: Mode::Pars
+### 5.3 Example: mode::Pars
 
 ```cpp
 struct Pars : ::parameters::JSONizable
@@ -497,15 +497,17 @@ struct Pars : ::parameters::JSONizable
 
 ### 5.4 Hierarchical Composition
 
-Since every `Pars` struct takes `(popl::OptionParser&, std::string mod)` and `trajectory::Pars<BASE>` / `ode::Pars<BASE>` chain constructors via the `BASE` template parameter, a composite simulation's full parameter set is assembled by inheritance:
+Since every SubSystem `Pars` struct takes `(popl::OptionParser&, std::string mod)`, and `trajectory::Pars<BASE>` / `ode::Pars<BASE>` take `(popl::OptionParser&)` and chain constructors via the `BASE` template parameter, a composite simulation's full parameter set is assembled by inheritance plus members:
 
 ```cpp
-struct MyPars : trajectory::Pars<qjmc::Pars<RandomEngine>>
+using TrajPars = trajectory::Pars<qjmc::Pars<qjmc::Algorithm::integrating, RandomEngine>>;
+
+struct MyPars : TrajPars
 {
-  mode::Pars mode;
-  qbit::Pars qbit;
+  mode::Pars pm;
+  qbit::Pars pq;
   MyPars(popl::OptionParser& op)
-    : trajectory::Pars<...>{op}, mode{op,"m"}, qbit{op,"q"} {}
+    : TrajPars{op}, pm{op,"m"}, pq{op,"q"} {}
 };
 ```
 
@@ -540,7 +542,7 @@ Hamiltonian ($H_\text{eff}/i$, complex frequency $z = \kappa(2n_\text{th}+1) - i
 ```cpp
 ham -= z * nOp(cutoff);                     // detuning + decay (complex frequency)
 ham += (omegaKerr/1.i) * (aDag|aDag|a|a);  // Kerr nonlinearity a†a†aa
-ham += twoTimesImagPartOf(eta*aDag);         // coherent drive η a† + η* a
+ham += twoTimesImagPartOf(eta*aDag);         // coherent drive H = i(η a† − η* a)
 ```
 The Kerr term `aDag|aDag|a|a` is four chained compositions — impossible with `Tridiagonal`, trivial with `MultiDiagonal`.
 
@@ -559,15 +561,15 @@ Two-level system (qubit/spin-½). Hilbert space dimension is always 2 — operat
 Hamiltonian as composed lambdas:
 ```cpp
 diagonalH(z)      // dpsidt(1) -= z*psi(1)
-offDiagonalH(eta) // off-diagonal drive: η σ+ + η* σ-
+offDiagonalH(eta) // off-diagonal drive: H = i(η σ+ − η* σ-)
 fullH(z, eta)     // composition by lambda capture
 ```
 
 Lindblads: `loss(gamma_m)`, `gain(gamma_p)`, dephasing (commented out).
 
-`expectationValues`: population of ground state and polarization $\langle\sigma_-\rangle$.
+`expectationValues`: population of ground state and polarization $\langle\sigma_+\rangle = \rho_{01}$ (note: Mode's ladder-operator average is $\langle a\rangle$, the opposite convention).
 
-`UnaryDiagonalPropagator<> propagator(dcomp z)` **is implemented** in `Qbit.cc`:
+`UnaryDiagonalPropagator<> propagator(dcomp z)` **is implemented** in `Qbit.cc` (but not yet used by `qbit::make`):
 ```cpp
 return {"diagonalPropagator", 2, [=] (double t, auto& d) {d[0]=1; d[1]=exp(-z*t);}};
 ```
@@ -577,7 +579,7 @@ giving $U(t) = \text{diag}(1, e^{-zt})$ — but cannot be used yet because `Unar
 
 ### 6.3 Composite.h — Broadcaster
 
-`Broadcaster<RANK, ra...>` lifts a rank-`|ra|` system descriptor to rank-`RANK` by iterating `sliceRange<retainedAxes>` over the dummy axes. Template parameters `ra...` specify which axes the subsystem occupies in the composite system. This is the key composition primitive for building composite systems from SubSystems.
+`Composite.h` lives in `CPPQEDcore/structure/`. `Broadcaster<RANK, ra...>` lifts a rank-`|ra|` system descriptor to rank-`RANK` by iterating `sliceRange<retainedAxes>` over the dummy axes. Template parameters `ra...` specify which axes the subsystem occupies in the composite system. This is the key composition primitive for building composite systems from SubSystems.
 
 ```cpp
 Broadcaster<2,0> bQ{psi.extents};  // qubit on axis 0
@@ -597,7 +599,7 @@ Status: largely complete. May have minor issues to resolve before compiling clea
 
 ### 6.4 JaynesCummings.h — Cavity-Atom Interaction
 
-Interaction between a cavity mode and a two-level atom: $H_{JC} = g a^\dagger \sigma_- + g^* a \sigma_+$.
+Interaction between a cavity mode and a two-level atom: $H_{JC} = i\left(g^* a^\dagger \sigma_- - g\, a \sigma_+\right)$ (the same phase convention as the drive terms of Mode and Qbit).
 
 ```cpp
 template <size_t i, size_t j>
@@ -625,13 +627,13 @@ A particle moving in a periodic potential (e.g. a standing-wave optical lattice 
 
 $$U_\text{kin}(t,t_0) = \exp\!\bigl(-i\,\omega_\text{rec}\,k_j^2\,(t-t_0)\bigr)$$
 
-This makes the interaction picture essential: without it, the ODE timestep would be constrained by $1/(\omega_\text{rec} k_\text{max}^2)$, which for `fin=6` (dimension $2^6 = 64$) is already 4096 times smaller than the natural dynamics timescale. The exact propagator removes the kinetic term entirely from the ODE.
+This makes the interaction picture essential: without it, the ODE timestep would be constrained by $1/(\omega_\text{rec} k_\text{max}^2)$, which for `fin=6` (dimension $2^6 = 64$, $k_\text{max} = 32$ in units of $\Delta k$) is already $k_\text{max}^2 = 1024$ times smaller than the recoil timescale $1/\omega_\text{rec}$. The exact propagator removes the kinetic term entirely from the ODE.
 
 The optical potential introduces $\sin(nkx)$ or $\cos(nkx)$ terms. In momentum space, $e^{inkx}$ acts as a pure shift: $e^{inkx}|k_j\rangle = |k_j + n\rangle$. This is a `MultiDiagonal<1>` with a single off-diagonal band of ones at offset $+n$.
 
 #### `particle::Spatial`
 
-A pure data helper: for a given finesse `fin` (dimension $= 1\ll\text{fin}$) and lattice spacing $\Delta k$, it precomputes the coordinate grids
+A pure data helper: for a given finesse `fin` (dimension $= 2^\text{fin}$, i.e. `1<<fin`) and lattice spacing $\Delta k$, it precomputes the coordinate grids
 
 $$x_j = j\,\Delta x - x_\text{max}, \quad k_j = j\,\Delta k - k_\text{max}$$
 
@@ -663,7 +665,7 @@ In v2, `mfComposition` was an 80-line switch table computing $f^*(n_1 kx)\cdot g
 #### Initial conditions
 
 Three families:
-- **`wavePacket`**: Gaussian $\psi(x)\propto e^{-(x-x_0)^2/4\sigma^2+ik_0 x}$, FFT'd to momentum space if `kFlag=true`
+- **`wavePacket`**: Gaussian $\psi(x)\propto e^{-(x-x_0)^2/(4\sigma^2)+ik_0 x}$, FFT'd to momentum space if `kFlag=true`
 - **`hoState`**: harmonic oscillator eigenstate using Hermite polynomials (Boost.Math)
 - **`init()`**: dispatcher selecting wavepacket vs HO eigenstate based on `hoInitn`
 
@@ -673,7 +675,7 @@ In v2, `expINKX(particle::Ptr, nK)` detected (via `dynamic_cast<const particle::
 
 The `ParticleAlongCavity` and `ParticleOrthogonalToCavity` interactions migrate to v3 as rank-2 `hamiltonian<2>` functionals built from `Broadcaster`-lifted rank-1 operators. The `isSpecialH_` flag and the `addContribution_v` override both become unnecessary — `MultiDiagonal::operator|` handles arbitrary mode function products correctly and generally.
 
-### 6.6 Example: JaynesCummingsQJMC.cc
+### 6.6 Example: dockerEntry/jc_qjmc.cc
 
 A complete, **verified working** highest-level executable (first successfully compiled and run April 2026, after a 4-year development hiatus, on Windows 11 via WSL2/Ubuntu 24.04). Demonstrates the full composition pattern.
 
@@ -763,14 +765,13 @@ int main(int argc, const char* argv[])
 ### 7.1 Known Bugs
 
 - **`MultiArray::load()`** (Boost.Serialization): after deserializing `data_` into a freshly allocated vector, `dataView` is not re-seated to point to the new buffer — dangling span. `std::vector` move construction does **not** have this problem; the bug is specific to `load()`.
-- **`SliceRangeOwning` move**: `b_` iterator into `offsets_` vector becomes dangling after move — same class of bug.
 - **`AutostopHandlerGeneric`** in `Trajectory.h`: uses `std::ranges::fill`, arithmetic, and `abs()` directly on `TDP` — assumes `TDP` is a homogeneous numeric range like `std::valarray<dcomp>`. Broken when `TDP` is a Hana tuple of labelled `slv_ns::_` values (the current representation). This is a half-finished update: the TDP type was upgraded from `std::valarray` to a labelled Hana tuple, but `AutostopHandlerGeneric` was not updated to match. Workaround: pass `observerNoOp` explicitly to `run()`. Fix: either make `AutostopHandlerGeneric` work with Hana tuples via `hana::for_each`, or flatten TDP to `std::valarray<double>` before passing to it.
 - **`quantumtrajectory::run` default observer**: the default argument `AH&& observer = trajectory::observerNoOp` is dead code — C++ template deduction does not consider default arguments, so `AH` cannot be deduced and the caller must always pass the observer explicitly. The default should be removed to avoid confusion.
 - **`std::ranges::fill` in QJMC `step()`**: `std::ranges::fill` returns an iterator, not the range — cannot be used as a `StateVectorView` constructor argument. Fix: separate the fill from the view construction, use `dcomp{}` for zero-initialization.
 
 ### 7.2 High Priority: Unimplemented
 
-- **`UnaryDiagonalPropagator` operator bodies** — declared in `ExactPropagator.h` but not implemented. Blocks exact propagation for `Qbit` (wired up, just needs the body), `Mode` (needs `propagator()` reinstated), and the future Particle subsystem (the primary numerical motivation for MDoF in the framework). Significant numerical advantage: removes fast oscillations from the ODE, allowing much larger timesteps. For Particle with `fin=6`, the kinetic frequencies span a factor of 4096 — without exact propagation the ODE timestep is constrained accordingly.
+- **`UnaryDiagonalPropagator` operator bodies** — declared in `ExactPropagator.h` but not implemented. Blocks exact propagation for `Qbit` (`propagator()` defined, but not yet used by `make()`), `Mode` (needs `propagator()` reinstated), and the future Particle subsystem (the primary numerical motivation for MDoF in the framework). Significant numerical advantage: removes fast oscillations from the ODE, allowing much larger timesteps. For Particle with `fin=6`, the kinetic frequencies span a factor of $k_\text{max}^2 = 1024$ — without exact propagation the ODE timestep is constrained accordingly.
 - **QJMC stepwise algorithm** — stale references to `q.ex` and `q.qsd` from earlier refactor, currently broken.
 - **`makeEnsemble`** in `QuantumJumpMonteCarlo.h` — commented out, ensemble runs currently disabled.
 
@@ -781,7 +782,7 @@ int main(int argc, const char* argv[])
 - `Placeholder` slicing generalization beyond `RANK==2`
 - `MultiDiagonal operator|` composition — only rank-1 implemented
 - `InitializeEnsembleFromArrayOnlyArchive` for QJMC — just throws; design question unresolved
-- Schrödinger equation trajectory — not yet implemented
+- Schrödinger equation trajectory — not yet implemented (`Schrödinger.h` is a 2023 draft that still includes the removed `QuantumSystemDynamics.h`)
 - **Particle / MDoF subsystem** — v2 files reviewed (§6.5), migration not yet started
 
 ### 7.4 Design Improvements Under Consideration
@@ -794,17 +795,17 @@ int main(int argc, const char* argv[])
 - `Sigma` sparse type for two-level operators, leaner than `MultiDiagonal<1>` for `Qbit`
 - Compile-time leading dimensions for `StateVector` / `DensityOperator` — see section 10
 
-### 7.6 Naming Changes and Consistency
+### 7.5 Naming Changes and Consistency
 
 - **`structure/` → `quantumdynamics/`**: current name is opaque; `quantumdynamics` parallels the other CPPQEDcore folders (`quantumdata`, `quantumoperator`, `quantumtrajectory`) and accurately describes the contents
 - **`Free` → `SubSystem`**: "Free" has a specific field-theory meaning (quadratic Hamiltonian, exactly solvable) that doesn't hold for all unary systems (e.g. a driven qubit is not strictly free); `SubSystem` is more neutral and descriptive of the software role
 - **Acronym casing**: camelcase is the chosen convention throughout, but acronyms are not handled consistently. Recommended rule: **capitalise only the first letter of an acronym** in camelcase contexts (`Qjmc`, `Ode`, `Ldo`, `Tdp`). Cosmetic — defer until the codebase is otherwise stable.
 
-### 7.7 Planned: Test Suite
+### 7.6 Planned: Test Suite
 
 A clean, comprehensive test suite is a prerequisite for both confident development and the SciPost paper.
 
-#### 7.7.1 v2 Test Suite Architecture
+#### 7.6.1 v2 Test Suite Architecture
 
 The v2 test suite (`Testing/`) used a Python driver (`testdriver.py`, ~700 lines) orchestrating CTest, with configuration-file-driven test descriptions. The following sub-directories existed:
 
@@ -815,7 +816,7 @@ The v2 test suite (`Testing/`) used a Python driver (`testdriver.py`, ~700 lines
 - **`expected/`** — compares simulation output (trajectory data files and binary state files) against stored reference files. The `Verifier` class supports both full trajectory comparison (`verify=full`) and final-outcome-only comparison (`verify=outcome`). Changes in simulation output trigger test failures.
 - **`physics/`** — high-level correctness tests: runs a full simulation in a limit where approximate analytic theory applies (Rabi oscillations, free mechanical oscillations, thermal equilibration, etc.) and checks numerical agreement against the analytic prediction. These tests verify *physical correctness*, not just code correctness.
 
-#### 7.7.2 Test Suite for v3 / cppqed-multidiagonal
+#### 7.6.2 Test Suite for v3 / cppqed-multidiagonal
 
 The `physics/` layer belongs entirely to CPPQEDcore and CPPQEDelements — it is out of scope for the standalone `cppqed-multidiagonal` library.
 
@@ -833,7 +834,7 @@ For `cppqed-multidiagonal`, the relevant layers are:
 
 - **`expected/`** (lightweight, JSON-based): apply known operators to known Fock states, serialize the result via `toStringJSON`, compare against stored JSON reference files. Plain `diff` suffices — no Python/numpy required. This is the primary justification for retaining JSON serialization in the standalone library.
 
-#### 7.7.3 Test Suite for CPPQEDcore / CPPQEDelements (v3)
+#### 7.6.3 Test Suite for CPPQEDcore / CPPQEDelements (v3)
 
 The full v2 architecture ports naturally to v3 for the higher layers:
 
@@ -847,14 +848,14 @@ The full v2 architecture ports naturally to v3 for the higher layers:
 
 Benchmarks (for Paper 2): scaling of walltime with Hilbert space dimension, comparison against QuTiP for equivalent systems — run separately from the correctness suite, not part of CTest.
 
-### 7.8 Planned: API Documentation
+### 7.7 Planned: API Documentation
 
 Doxygen-style documentation to be added to all headers. Style questions to resolve:
 - Pure Doxygen (`/** */` with `\brief`, `\tparam`, `\param`) vs lighter `///` line comments (already used in places)
 - Scope: public API only vs internal namespaces (e.g. `slice_iterator`)
 - Convention for documenting C++20 concepts, which Doxygen doesn't natively render well
 
-### 7.9 Planned: Build System and Documentation
+### 7.8 Planned: Build System and Documentation
 
 #### Build system: CMake
 
@@ -882,17 +883,17 @@ Alternative: **Sphinx + Breathe + Exhale** (ingests Doxygen XML, produces better
 
 The framework builds cleanly under WSL2 (Ubuntu or Arch Linux) with the standard gcc/clang toolchain, CMake, and VS Code Remote-WSL + CMake Tools + clangd extensions.
 
-### 7.11 Planned: SciPost Physics Codebases Paper 1 — MultiDiagonal Library
+### 7.9 Planned: SciPost Physics Codebases Paper 1 — MultiDiagonal Library
 
 A standalone C++ library for multi-diagonal sparse operators over tensor-product Hilbert spaces, extracted from C++QED and published independently.
 
 **Key contributions:**
 - Algebraic closure under composition, direct product, Hermitian conjugation, and addition — with exact offset arithmetic
-- Composition rule: $\text{offset}_\text{result} = \text{offset}_a + \text{offset}_b$ — a homomorphism from $(\mathbb{Z}^R, +)$ into the operator algebra
+- Composition rule: $\text{offset}_\text{result} = \text{offset}_a + \text{offset}_b$ — the numbers of quanta moved by the two factors simply add up
 - Direct product rule: concatenation of offset arrays reflects tensor product structure exactly
-- Exact, computable representation of the Weyl algebra truncated to finite dimension
+- Products of truncated ladder operators are computed exactly in the truncated space (the result equals the truncated dense product, not the textbook commutation relations, which fail at the cutoff)
 - Application is $O(N \cdot d)$ where $d$ is the number of diagonals; composition is $O(d_a \cdot d_b)$ — far cheaper than general sparse-sparse multiply
-- In quantum optics, virtually all physically relevant operators (ladder, number, Kerr, cross-Kerr, displacement, squeezing) are multi-diagonal in the Fock basis — the algebra is closed over this physically relevant set
+- In quantum optics, the generators of the dynamics (ladder, number, Kerr, cross-Kerr, two-photon drive, Jaynes–Cummings coupling, $e^{inkx}$) are multi-diagonal in the Fock or momentum basis — the algebra is closed over this physically relevant set. The unitaries they generate (displacement, squeezing) are dense and **not** multi-diagonal
 - `MultiDiagonal` is deliberately free of physics-layer concerns — no frequency information, no interaction-picture assumptions (see §4.3)
 
 **Prerequisites before submission:**
@@ -901,7 +902,7 @@ A standalone C++ library for multi-diagonal sparse operators over tensor-product
 - Unit tests: algebraic identities
 - API documentation
 
-### 7.12 Planned: SciPost Physics Codebases Paper 2 — C++QED v3
+### 7.10 Planned: SciPost Physics Codebases Paper 2 — C++QED v3
 
 The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 
@@ -966,7 +967,7 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 | File | Description |
 |---|---|
 | `MultiDiagonal.h` | Multi-diagonal sparse operator: closed under composition, direct product, Hermitian conjugation; deliberately free of frequency/picture information |
-| `MultiDiagonal.cc` | Composition `operator|` (rank-1) and `identity()` implementations |
+| `MultiDiagonal.cc` | Composition `operator\|` (rank-1) and `identity()` implementations |
 
 ### 9.4 CPPQEDcore / quantumtrajectory
 | File | Description |
@@ -982,6 +983,7 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 | `ExactPropagator.h` | Per-subsystem diagonal propagator (not necessarily unitary) |
 | `Liouvillian.h` | Runtime vector of Lindblad operators with jump/rate/superoperator variants |
 | `ExpectationValues.h` | Recursive Hana-sequence expectation value functionals over `LazyDensityOperator` |
+| `Composite.h` | `Broadcaster<RANK,ra...>`: lifts rank-`\|ra\|` SubSystem descriptors to rank-`RANK` via slice iteration |
 
 ### 9.6 CPPQEDelements / SubSystems
 | File | Description |
@@ -994,10 +996,13 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 ### 9.7 CPPQEDelements / interactions
 | File | Description |
 |---|---|
-| `Composite.h` | `Broadcaster<RANK,ra...>`: lifts rank-`|ra|` SubSystem descriptors to rank-`RANK` via slice iteration |
 | `JaynesCummings.h` | Cavity-atom coupling via `Placeholder` slicing, compile-time level indices `<i,j>` |
-| `JaynesCummingsQJMC.cc` | Example highest-level executable: QJMC simulation of qubit + mode with JC interaction |
 | `ParticleCavity_.h` / `ParticleCavity.cc` | v2 — Particle-cavity interactions (`ParticleOrthogonalToCavity`, `ParticleAlongCavity`); not yet migrated to v3 |
+
+### 9.8 dockerEntry
+| File | Description |
+|---|---|
+| `jc_qjmc.cc` | Example highest-level executable (target `jc_qjmc`): QJMC simulation of qubit + mode with JC interaction |
 
 ---
 
@@ -1126,10 +1131,10 @@ In a typical Jaynes-Cummings simulation, the qubit's `Broadcaster<2,0>` preserve
 This is a non-trivial refactor touching `MultiArray.h`, `SliceIterator.h`, `StateVector`, `DensityOperator`, `LDO`, `Broadcaster`, and all SubSystem `make()` / `init()` functions. It should not be attempted until:
 
 1. The open correctness gaps are closed (§7.1 bugs, §7.2 `UnaryDiagonalPropagator`, QJMC stepwise, autostop fix)
-2. The test suite is in place (§7.7)
+2. The test suite is in place (§7.6)
 3. The `MultiDiagonal` signed-offset refactor (§7.4) is done
 
-The natural sequencing milestone: coordinate with the `SubSystem` rename (§7.6) and `structure/` → `quantumdynamics/` reorganisation into a single "type system" release.
+The natural sequencing milestone: coordinate with the `SubSystem` rename (§7.5) and `structure/` → `quantumdynamics/` reorganisation into a single "type system" release.
 
 For now, the design intent should be recorded in header comments: `Qbit.h` should note that `Dim=2` is a candidate for NTTP promotion, and `SliceIterator.h` should note the transposition constraint that any future static-dimension scheme must respect.
 
