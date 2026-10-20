@@ -15,7 +15,6 @@ benchmarking/
 __pycache__/
 ClaudeDiscussion/
 .cache/
-dockerEntry/*.cc
 .build
 .clangd
 .claude/settings.local.json

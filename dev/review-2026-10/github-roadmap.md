@@ -18,7 +18,7 @@ Starting state (2026-10-08):
    - ~~whether to keep Xoshiro~~ decided 2026-10-19: **keep it.** It is a second PRNG with independent streams, so it stays a dependency (C-07) and the RNG tests must cover it alongside `pcg64`.
    - ~~the Pages URL strategy~~ decided 2026-10-19: **`wignerquantumoptics.github.io/<repo>`**, no custom domain.
    - ~~whether the v2-era open issues get closed as obsolete~~ decided 2026-10-19: **close all v2-era open issues and projects as obsolete.** Most issues are already closed. Before closing the projects, skim their items for ideas worth bringing to v3 (Phase 4, step 3).
-2. **[C]** Commit the two `CLAUDE.md` files (after the corrections from the review: E2 and the library layout section) and the `.gitignore` change. Decide whether `jc_qjmc.cc` gets un-ignored now (C-52/C-74); that's needed for cppqed CI anyway.
+2. **[C]** Commit the two `CLAUDE.md` files (after the corrections from the review: E2 and the library layout section) and the `.gitignore` change. ~~Decide whether `jc_qjmc.cc` gets un-ignored now (C-52/C-74)~~ done 2026-10-20: un-ignored and committed; that's needed for cppqed CI anyway.
 3. **[A]** Push both repos.
 4. **[A]** Write down what the transfer could break. For each repo, record:
    - Pages source and branch
