@@ -31,12 +31,12 @@ Starting state (2026-10-08):
 ✔ Both repos clean and pushed; inventory of settings and issues saved locally.
 
 ## Phase 1: Check and configure the existing WignerQuantumOptics organization (nothing is created)
-1. **[A]** Check these organization settings and adjust only where they differ:
-   - require 2FA
-   - base member permission: Read
-   - Actions policy: allow GitHub-owned actions plus a selected list
-   - default `GITHUB_TOKEN`: read-only
-   - Pages allowed for public repos
+1. ~~**[A]** Check these organization settings and adjust only where they differ:~~ Done 2026-10-20.
+   - require 2FA: already on
+   - base member permission: Read (changed from Write; no member lost write access)
+   - Actions policy: allow GitHub-owned actions plus a selected list (changed from "all"). Selected: `snok/install-poetry@*` (Wigner_Time), `peaceiris/actions-gh-pages@*` (library docs). Verified by re-running Wigner_Time's tests workflow. SHA pinning not required for now (our workflows use tags; revisit in Phase 5).
+   - default `GITHUB_TOKEN`: read-only, already; Actions may not approve PRs
+   - Pages allowed for public repos: already
 2. **[A]** Define the native **issue types**: Bug, Feature, Task, plus custom Physics, Refactor and Docs if you want them. Types are per organization, so these replace the `type:` label family from the scheme.
 3. **[A]** Create the organization **Project** "C++QED v3" with fields:
    - Priority (P0–P3)
