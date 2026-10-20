@@ -148,7 +148,7 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 | C-53 | Remove or quarantine dead v2 code (Sigma.h, EntanglementMeasures.h, DistributionFunctions, LazyDensityOperatorFFT, Simulated.h, Profiling.h, Mode_.h, CoupledModes, unused frees/interactions). **Before removing `EntanglementMeasures.h`, decide:** `QuantumTrajectory.h` still includes it, and the v2-era card "Resurrect negativity calculation using Eigen" (plus mutual information) is marked Done; keep and wire up, or delete. Also small modernizations: `FormDouble` (`QuantumTrajectory.h`) → `std::format` (a commented draft is in `Trajectory.h`); should `precision` be unsigned? | type:cleanup, origin:v2-migration | C14 |
 | C-54 | Structure-layer defects (bundle): SparseMatrix offsets/strides + missing throw; Lindblad without rate; NoOp Hamiltonian; LDO ctor ambiguity; EV concept check; 3-arg H sees τ; static-const ODR; TemporalDataPoint label; superoperatorFromJump | type:bug, severity:S3-medium, area:core/structure | C14, C15, A7 |
 | C-55 | Performance bundle: variant-by-value offset cache; checkpoint copies stepper; .state grows unbounded | type:performance, area:utils/trajectory, core/structure | C16 |
-| C-56 | CLAUDE.md, README and version-banner corrections | type:docs | E2, E3 |
+| C-56 | ~~CLAUDE.md and README corrections~~ (done 2026-10-20: E2 in CLAUDE.md, README in f1f20c85; library CLAUDE.md layout, D11, also fixed) and the version-banner correction (E3, still open) | type:docs | E2, E3 |
 
 ### Roadmap and known problems (from CLAUDE.md)
 | ID | Title | Labels | Src |

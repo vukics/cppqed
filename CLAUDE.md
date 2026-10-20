@@ -16,46 +16,53 @@ License: BSL-1.0. Developer Guide: `docs/`, published at https://vukics.github.i
 
 ## Repository relationships
 
-- **The array and operator foundations live in a separate repo,
-  `cppqed-multidiagonal`.** That covers `Traits.h`, `MultiArray.h`, `MultiArrayComplex.h`,
-  `SliceIterator.h`, and `MultiDiagonal.h`.
-  - Changes to those files go **there**, not here. If a task needs one, stop and say so.
+- **The array and operator foundations are being split out into a separate repo,
+  `cppqed-multidiagonal`.** The library holds `Traits.h`, `MultiArray.h`,
+  `MultiArrayComplex.h`, and `MultiDiagonal.h`. The switch-over (epic E-1) is not done yet:
+  - This repo still builds against its own stale in-tree copies (`CPPQEDutils/Traits.h`,
+    `MultiArray.h`, `MultiArrayComplex.h`; `CPPQEDcore/quantumoperator/MultiDiagonal.h/.cc`).
+  - Changes to those foundations go to the **library**, not to the in-tree copies. If a
+    task needs one, stop and say so.
+  - `SliceIterator.h` exists only here, in `CPPQEDutils/`; where it ends up is open (C-04).
   - That repo has its own CLAUDE.md.
-- This repo's `Traits.h` holds framework-only extras and includes
+- After the switch, this repo's `Traits.h` holds only framework extras on top of
   `<multidiagonal/Traits.h>`. Never duplicate symbols that the library already defines
   (`passByValue_v`, `ReferenceMF`, …).
-- Dependencies come in via FetchContent pinned to **full commit SHAs**: cppqed-multidiagonal
-  plus forked popl, xoshiro, and pcg. Each fork should document why it diverges from
-  upstream.
-- `-DMULTIDIAGONAL_LOCAL=<path>` points the build at a sibling checkout of
-  cppqed-multidiagonal during co-development.
-- Cluster compute nodes have no outbound network. Builds there use
-  `FETCHCONTENT_FULLY_DISCONNECTED=ON` and `FETCHCONTENT_TRY_FIND_PACKAGE_MODE=OPT_IN`
-  with system Boost and Eigen. Don't introduce dependencies that break offline builds.
+- Dependencies today are **git submodules** under `CPPQEDutils/thirdParty/`: forks of popl,
+  pcg-cpp, and Xoshiro-cpp. Clone with `--recurse-submodules`.
+  - Planned (C-07, C-01): FetchContent pinned to **full commit SHAs** of the upstream repos
+    and of cppqed-multidiagonal, plus `-DMULTIDIAGONAL_LOCAL=<path>` for co-development
+    against a sibling checkout. Neither exists yet.
+- Cluster compute nodes have no outbound network, so builds there must work offline with
+  system Boost and Eigen (with FetchContent: `FETCHCONTENT_FULLY_DISCONNECTED=ON`). Don't
+  introduce dependencies that break offline builds.
 
 ## Layout
 
 ```
 CPPQEDutils/      physics-agnostic scaffolding: ODE.h (Boost.Odeint, RKCK54), Trajectory.h (run()),
-                  StochasticTrajectory.h (Ensemble, AverageTrajectories), Pars.h (popl + JSON), Random.h
+                  StochasticTrajectory.h (Ensemble, AverageTrajectories), Pars.h (popl + JSON), Random.h,
+                  SliceIterator.h; in-tree copies of MultiArray*.h and Traits.h (until E-1)
+  thirdParty/     git submodules: popl, pcg-cpp, Xoshiro-cpp
 CPPQEDcore/
   quantumdata/        StateVector, DensityOperator, LazyDensityOperator (LDO)
-  quantumoperator/    framework-side operator helpers (MultiDiagonal itself comes from the library)
+  quantumoperator/    MultiDiagonal (in-tree copy until E-1), SparseMatrix
   quantumtrajectory/  QuantumTrajectory.h, Master.h, QuantumJumpMonteCarlo.h — header-only
-  structure/          Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues (planned rename → quantumdynamics)
+  structure/          Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues,
+                      Composite.h (Broadcaster) (planned rename → quantumdynamics)
 CPPQEDelements/
   frees/          SubSystems: Mode, Qbit (planned rename Free → SubSystem)
-  interactions/   Composite.h (Broadcaster), JaynesCummings.h
+  interactions/   JaynesCummings.h
+dockerEntry/      jc_qjmc.cc, the reference executable (CMake builds every *.cc here)
 ```
 
-The reference executable is `JaynesCummingsQJMC.cc` (qubit on axis 0, mode on axis 1).
-It shows the whole user-facing API in about 40 lines.
+The reference executable is `dockerEntry/jc_qjmc.cc`, target `jc_qjmc` (qubit on axis 0,
+mode on axis 1). It shows the whole user-facing API in about 40 lines.
 
 ## Build
 
 ```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-      [-DMULTIDIAGONAL_LOCAL=../cppqed-multidiagonal]
+cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build --target <executable>
 ```
 
@@ -134,21 +141,27 @@ cmake --build build --target <executable>
 
 ## Current state and known problems
 
-Treat **master-equation results as unverified**.
+**The master equation does not compile**, so there are no current Master results at all.
+Finding IDs (B…) refer to `dev/review-2026-10/findings.md`.
 
-- **Suspected cause:** finding F5 in the library (`twoTimesRealPartOfSelf` quadrupled the
-  diagonal). That would mean doubled Hamiltonian flow on the diagonal plus artificial
-  dephasing from the post-step symmetrization.
+- `Master.h` (and `Schrödinger.h`) still use the API removed in 2bc5d3f8 (2024-04-30):
+  `QuantumSystemDynamics.h`, `getHa/getLi/getEx`, `hamiltonian_ns::broadcast`. Nothing
+  includes them, so the build doesn't notice (B4). Port Master to the `(ha, li, ev[, ex])`
+  API that QJMC uses.
+- Once it compiles, four known defects each corrupt it independently:
+  - library finding F5 (`twoTimesRealPartOfSelf` quadrupled the diagonal)
+  - B3: `conj(m.rho)` after every step
+  - B5: Mode superoperators get √rate instead of rate
+  - B7: the `SliceIterator` first-slice offset
 - **Confirmation:** a driven-qubit Bloch-equation test comparing three results:
   - Master
   - QJMC ensemble
   - the analytic optical-Bloch steady state
 
-  Run it with patched versus unpatched headers.
-
 Other known problems:
 - `UnaryDiagonalPropagator` operator bodies are unimplemented. This is the highest
-  priority, because it blocks exact propagation for Qbit (already wired up), Mode (where
+  priority, because it blocks exact propagation for Qbit (`propagator()` is defined in
+  Qbit.cc, but `qbit::make` doesn't use it yet), Mode (where
   `propagator()` needs reinstating), and the future MDoF subsystem.
 - QJMC `stepwise` is broken: it has stale `q.ex`/`q.qsd` references.
   - Open question before reinstating it: stepwise evolves under the physical H and
@@ -162,9 +175,9 @@ Other known problems:
     code because template deduction ignores defaults.
 - `structure::concatenate` fails with non-constexpr arguments. Concatenate Liouvillians
   manually.
-- `std::ranges::fill(dpsidtRaw, 0)` in QJMC `step()` misuses the returned iterator.
-  Separate the fill from the view construction and use `dcomp{}`.
-- `SliceRangeOwning` move leaves `b_` dangling into the moved-from vector.
+- `SliceIterator` (B7): the first slice drops the parent view's offset, and every
+  complete loop dereferences one past the end of the offsets. Top-level QJMC is not
+  affected; Master, nested Broadcasters, and `partialTrace` of sliced LDOs are.
 - Stubs:
   - `compose()` in Hamiltonian.h (interactions across composite boundaries)
   - `broadcastFor`
