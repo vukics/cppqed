@@ -29,7 +29,7 @@ So "finding #5" written in a cppqed issue links to an unrelated 2020 issue.
 
 | Family | Values | Rule |
 |---|---|---|
-| `type:` | `bug`, `physics` (wrong physical results), `build`, `performance`, `docs`, `test`, `enhancement`, `refactor` (renames, moves; no behavior change), `cleanup`, `discussion` | exactly one |
+| ~~`type:`~~ | replaced by the organization's native issue types (2026-10-20), see the mapping below | — |
 | `severity:` | `S1-critical` (silently wrong physics or data loss), `S2-high`, `S3-medium`, `S4-low` | bugs/physics only |
 | `area:` (cppqed) | `utils/ode`, `utils/trajectory`, `utils/slicing`, `utils/pars`, `utils/random`, `core/quantumdata`, `core/structure`, `core/qjmc`, `core/master`, `core/propagator`, `elements/mode`, `elements/qbit`, `elements/spin`, `elements/composite`, `cmake`, `docs` | one or more |
 | `area:` (library) | `multiarray`, `multidiagonal`, `complex`, `tests`, `benchmarks`, `cmake`, `ci`, `docs` | one or more |
@@ -37,10 +37,27 @@ So "finding #5" written in a cppqed issue links to an unrelated 2020 issue.
 | `origin:` | `split` (cppqed↔library), `v2-migration`, `review-2026-10` | optional; useful for tracing |
 
 Other GitHub dimensions:
-- **Native issue types** (Bug/Feature/Task) exist only for repos owned by an organization. If the repos are
-  personal, the `type:` labels stand in for them. If they are (or move) under an organization, use types and
-  drop `type:`.
-- **Priority** goes in a Project field (P0–P3), not a label. Priority changes over time; severity doesn't.
+- **Native issue types** (WignerQuantumOptics, set up 2026-10-20; exactly one per issue). The `type:` values
+  used in the tables below map as follows when filing:
+
+  | Issue type | Former `type:` label(s) | Count |
+  |---|---|---|
+  | Bug | `bug` | 26 |
+  | Physics | `physics` | 10 |
+  | Feature | `enhancement` | 10 |
+  | Task | `build`, `test`, `cleanup`, `performance` (the `area:` labels keep `cmake`/`ci`/`tests` apart) | 23 |
+  | Refactor | `refactor` | 9 |
+  | Docs | `docs` | 5 |
+  | Decision | `discussion` | 11 |
+
+  Task, Bug, Feature and Decision were already defined for Wigner_Time; Physics, Refactor and Docs were added
+  for us. The types are organization-wide, so don't rename or delete existing ones.
+- **Priority and Effort** are the organization's **issue fields**, not labels or Project-only fields:
+  - Priority: Urgent / High / Medium / Low
+  - Effort: High / Medium / Low
+
+  Priority changes over time; severity doesn't, so severity stays a label. The organization also has
+  Start date and Target date issue fields; we don't plan to use them for now.
 - **Milestones** (per repo):
   - cppqed:
     - `M0 split & build`
@@ -55,8 +72,8 @@ Other GitHub dimensions:
     - `v0.3.0` (layout change + apply performance)
 - **Sub-issues** model the epics below. **Dependencies** ("blocked by") model ordering, e.g. C-01 is blocked
   by M-01 and C-10 is blocked by M-02. Both features exist for personal repos.
-- **One user-level Project** spanning both repos.
-  - Fields: Priority, Effort (S/M/L), Roadmap item.
+- **One organization Project** "C++QED v3" spanning both repos.
+  - Fields: Status (default) and Roadmap item; Priority and Effort come from the issue fields.
   - Views: by milestone, by severity, cross-repo blockers.
 - **Granularity:** one issue per independently fixable defect. Small same-file items are bundled as a
   checklist issue (marked "bundle" below).

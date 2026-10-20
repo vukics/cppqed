@@ -37,12 +37,11 @@ Starting state (2026-10-08):
    - Actions policy: allow GitHub-owned actions plus a selected list (changed from "all"). Selected: `snok/install-poetry@*` (Wigner_Time), `peaceiris/actions-gh-pages@*` (library docs). Verified by re-running Wigner_Time's tests workflow. SHA pinning not required for now (our workflows use tags; revisit in Phase 5).
    - default `GITHUB_TOKEN`: read-only, already; Actions may not approve PRs
    - Pages allowed for public repos: already
-2. **[A]** Define the native **issue types**: Bug, Feature, Task, plus custom Physics, Refactor and Docs if you want them. Types are per organization, so these replace the `type:` label family from the scheme.
+2. ~~**[A]** Define the native **issue types**: Bug, Feature, Task, plus custom Physics, Refactor and Docs if you want them. Types are per organization, so these replace the `type:` label family from the scheme.~~ Done 2026-10-20: Task, Bug, Feature and Decision already existed (set up for Wigner_Time); Physics, Refactor and Docs added. The organization also already has issue fields Priority (Urgent/High/Medium/Low), Effort (High/Medium/Low), Start date and Target date. Mapping in the inventory, §2.
 3. **[A]** Create the organization **Project** "C++QED v3" with fields:
-   - Priority (P0–P3)
-   - Effort (S/M/L)
-   - Roadmap item
    - Status (default)
+   - Roadmap item
+   - (Priority and Effort are not created here: they come from the organization's issue fields)
 4. If you want to double-check, ask IBF whether institute-branded code under the group's organization needs anything. I don't expect it to; GitHub is already in use.
 
 ✔ Org ready; a test repo created in it shows the expected Actions and Pages behaviour (then delete it).
@@ -70,7 +69,7 @@ Starting state (2026-10-08):
 
 ## Phase 4: Publish the issues
 1. **[C]** Turn the inventory into batch scripts that stay idempotent on re-run:
-   1. labels: `severity:`, `area:`, `state:`, `origin:`, and any `type:` values not covered by native types
+   1. labels: `severity:`, `area:`, `state:`, `origin:` (no `type:` labels: issue types and the Priority/Effort issue fields replace them)
    2. milestones
    3. epics
    4. leaf issues, with bodies that cite paths at a fixed commit SHA
