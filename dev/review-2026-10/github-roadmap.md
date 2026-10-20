@@ -26,7 +26,7 @@ Starting state (2026-10-08):
    - webhooks and installed apps (Zenodo)
    - branch protection
    - collaborators
-5. **[A]** Dump the existing issues and PRs of both repos (JSON, the command I gave earlier) for deduplication. Also dump the v2-era projects with their items (JSON), so I can skim them for v3 ideas.
+5. **[A]** Dump the existing issues and PRs of both repos (JSON, the command I gave earlier) for deduplication. Also dump the v2-era projects with their items (JSON), so I can skim them for v3 ideas. *Projects dumped 2026-10-20 into `dev/review-2026-10/dumps/` (kept untracked).*
 
 ✔ Both repos clean and pushed; inventory of settings and issues saved locally.
 
@@ -78,8 +78,8 @@ Starting state (2026-10-08):
    6. adding everything to the Project
 2. **[A]** Review and run the scripts one repo at a time: library first, so cppqed issues can link to real library numbers.
 3. v2-era issues and projects:
-   1. **[C]** Skim the project dumps from Phase 0 for ideas worth carrying over to v3; propose them as inventory additions (`origin:v2-migration`, usually `type:discussion`) for you to accept or drop.
-   2. **[A]** Close the remaining v2-era open issues and all v2-era projects as obsolete, with a short note (pointing to the v3 issue where an idea was carried over).
+   1. ~~**[C]** Skim the project dumps from Phase 0 for ideas worth carrying over to v3; propose them as inventory additions (`origin:v2-migration`, usually `type:discussion`) for you to accept or drop.~~ Done 2026-10-20: accepted as C-90…C-96 and C-76, plus notes in C-14, C-51, C-53, C-67.
+   2. **[A]** ~~Close the remaining v2-era open issues~~ (done 2026-10-20). Close projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" as obsolete, with a short note pointing to the v3 issues filed for C-90…C-96 and C-76; delete the empty, untitled projects #5 and #6.
 4. **[A]** Dump again; **[C]** diff the result against the inventory.
 
 ✔ Every inventory item maps to exactly one GitHub issue; the epics show their children; the Project views (by milestone, by severity, cross-repo blockers) are populated.

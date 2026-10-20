@@ -109,7 +109,7 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 | C-11 | Master: trailing `conj(m.rho)` conjugates ρ every step | type:physics, severity:S1-critical, area:core/master, state:latent | B3 |
 | C-12 | Mode superoperators use √rate instead of rate | type:physics, severity:S1-critical, area:elements/mode | B5 |
 | C-13 | Driven-qubit Bloch test: Master vs QJMC ensemble vs analytic steady state | type:test, area:core/master | CLAUDE.md |
-| C-14 | Master with a non-unitary U needs interaction-picture-aware superoperators (or restrict to the unitary part, as v2 did) | type:physics, area:core/master, core/propagator | B14 |
+| C-14 | Master with a non-unitary U needs interaction-picture-aware superoperators (or restrict to the unitary part, as v2 did). Background: v3dev project card "QuantumSystems should report their picture" (Sch / UIP / IP; quoting it: "Master with no specific superoperator", "Integrating QJMC method can be used only for UIP and Sch") | type:physics, area:core/master, core/propagator | B14 |
 
 ### QJMC and elements physics (M1)
 | ID | Title | Labels | Src |
@@ -143,9 +143,9 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 | ID | Title | Labels | Src |
 |---|---|---|---|
 | C-50 | ODR violations in headers (defaultLogger, observerNoOp, Mode.h/Qbit.h functions); blocks multi-TU tests | type:bug, severity:S3-medium, area:cmake | C7 |
-| C-51 | Framework test suite (Catch2): Mode, Qbit, JC, Master invariants, QJMC→Master convergence | type:test; blocked by C-50 | CLAUDE.md |
+| C-51 | Framework test suite (Catch2): Mode, Qbit, JC, Master invariants, QJMC→Master convergence. Source of analytic cases: the physics tests of the C++QEDv2m9-beta package (MultiLevel tests spelled out in `testsuitePhysics/test.sh`, per a v3dev project card) | type:test; blocked by C-50 | CLAUDE.md |
 | C-52 | jc_qjmc.cc and benchmarking/ are gitignored | type:build, severity:S2-high | E1 |
-| C-53 | Remove or quarantine dead v2 code (Sigma.h, EntanglementMeasures.h, DistributionFunctions, LazyDensityOperatorFFT, Simulated.h, Profiling.h, Mode_.h, CoupledModes, unused frees/interactions) | type:cleanup, origin:v2-migration | C14 |
+| C-53 | Remove or quarantine dead v2 code (Sigma.h, EntanglementMeasures.h, DistributionFunctions, LazyDensityOperatorFFT, Simulated.h, Profiling.h, Mode_.h, CoupledModes, unused frees/interactions). **Before removing `EntanglementMeasures.h`, decide:** `QuantumTrajectory.h` still includes it, and the v2-era card "Resurrect negativity calculation using Eigen" (plus mutual information) is marked Done; keep and wire up, or delete. Also small modernizations: `FormDouble` (`QuantumTrajectory.h`) → `std::format` (a commented draft is in `Trajectory.h`); should `precision` be unsigned? | type:cleanup, origin:v2-migration | C14 |
 | C-54 | Structure-layer defects (bundle): SparseMatrix offsets/strides + missing throw; Lindblad without rate; NoOp Hamiltonian; LDO ctor ambiguity; EV concept check; 3-arg H sees τ; static-const ODR; TemporalDataPoint label; superoperatorFromJump | type:bug, severity:S3-medium, area:core/structure | C14, C15, A7 |
 | C-55 | Performance bundle: variant-by-value offset cache; checkpoint copies stepper; .state grows unbounded | type:performance, area:utils/trajectory, core/structure | C16 |
 | C-56 | CLAUDE.md, README and version-banner corrections | type:docs | E2, E3 |
@@ -160,8 +160,21 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 | C-64 | structure::concatenate fails for non-constexpr args (derive rank from Lindblad::N_RANK) | type:bug, severity:S4-low, area:core/structure | CLAUDE.md, C15 |
 | C-65 | Stubs: compose(), broadcastFor, Placeholder beyond RANK 2, InitializeEnsembleFromArrayOnlyArchive | type:enhancement | CLAUDE.md |
 | C-66 | Motional degree of freedom (Particle/ParticleCavity port) | type:enhancement → M5 | CLAUDE.md |
-| C-67 | Developer guide and tutorials; fix primer §7.11 operator list | type:docs → M6 | CLAUDE.md |
+| C-67 | Developer guide and tutorials (the operator-list fix in the guide is done, f1f20c85). Doxygen: MathJax physics extension, no class-hierarchy graphs, CMake switch for internal docs (Milestone 13 project card) | type:docs → M6 | CLAUDE.md |
 | C-68 | Discussion: compile-time leading dimensions, OBSERVER concept unification, HDF5 serialization (one issue each) | type:discussion, no milestone | CLAUDE.md |
+
+### Carried over from the v2-era GitHub projects (2026-10-20)
+Source: projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" (dumped 2026-10-20, 115 cards; the rest was done, v2-specific, rejected by the v3 design, or already covered). References are copied from the cards, not verified.
+
+| ID | Title | Labels | Src |
+|---|---|---|---|
+| C-90 | Benchmarks against QuTiP and QuantumOptics.jl, with and without output; prerequisite for Paper 2 | type:test, origin:v2-migration | #4 (in progress) |
+| C-91 | PRNG study: taus2 / mt19937 / pcg64 / xoshiro256, ensemble and time averages vs the exact Master solution (card's case: driven lossy mode, cutoff 100, n_th 5, κ 1, Δ 5, η 3, T 20); home of the Xoshiro decision and the planned CPC paper on PRNGs in MCWF. Blocked by C-62 and E-2 | type:discussion, area:utils/random, origin:v2-migration | #4 |
+| C-92 | Time averaging along a single trajectory, as an observer (ties to the OBSERVER discussion in C-68); unmerged 2017 local branch `timeAveraging` as reference | type:enhancement, area:utils/trajectory, origin:v2-migration | #4 |
+| C-93 | Steady-state solvers in the QuTiP style (card cites P. D. Nation, arXiv:1504.06768); also a reference for C-13 independent of Master time evolution | type:discussion, origin:v2-migration | #3 |
+| C-94 | Spectrum via the "faster-than-the-clock" algorithm (card cites Quantum, q-2022-02-10-649) | type:discussion, origin:v2-migration | #3 |
+| C-95 | Master integrators that preserve positivity and trace by construction (card cites Cao & Lu, arXiv:2103.01194; also check QTM's methods), instead of fixing Hermiticity and trace by hand after each step | type:discussion, area:core/master, origin:v2-migration | #3, #4 |
+| C-96 | numpy bridge for state files: numpy arrays as initial conditions (`ARRAY_ONLY`), `--sdf` state series into numpy; includes append-vs-replace for state saving and optional cleartext archives for debugging. Child of the serialization issue of C-68 | type:enhancement, area:utils/trajectory, origin:v2-migration | #3, #4 |
 
 ### mdspan migration (epic E-7)
 | ID | Title | Labels | Src |
@@ -174,7 +187,7 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 | C-85 | Follow-up: partly static extents (e.g. `extents<size_t,2,dynamic_extent>` for a qubit⊗mode system) realize "compile-time leading subsystem dimensions" (C-68) | type:enhancement | E-7, C-68 |
 
 ### Renames (epic E-6)
-- **E-6 Planned renames.** Children: C-70…C-75, plus M-01 and M-17 in the library. [type:refactor]
+- **E-6 Planned renames.** Children: C-70…C-76, plus M-01 and M-17 in the library. [type:refactor]
 - **Timing:** do the structural renames (C-70, C-71, C-73, C-74) in one batch together with the split (M0). The split already touches includes in almost every file, so one round of churn costs less than two.
 - **Issues to file before the renames** should cite file:line paths with a commit SHA, so the references stay valid afterwards.
 - **Acronym casing (C-72)** is cosmetic and touches the most lines. The library CLAUDE.md says "don't mass-rename". Keep it as a decision issue and do it opportunistically, or in one sweep at a release boundary.
@@ -187,6 +200,7 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 | C-73 | Rename the framework `Traits.h` (e.g. `FrameworkTraits.h`) so it can never be confused with `<multidiagonal/Traits.h>` | type:refactor, origin:split → M0 | every header that includes "Traits.h" | A3 / C-02 |
 | C-74 | Align the reference executable's name and location: `dockerEntry/jc_qjmc.cc` vs `JaynesCummingsQJMC.cc` in CLAUDE.md; consider `dockerEntry/` → `examples/` (do together with C-52, un-ignoring it) | type:refactor, area:cmake → M0 | 1 file, 1 CMake glob | E1, E2 |
 | C-75 | Ledger renamed to F1, F1b, F2…F11 in all Markdown (done 2026-10-15); test names renamed as well; the remaining work is in M-17. Listed here only for the record | type:cleanup | cppqed CLAUDE.md | §1 |
+| C-76 | Rename `qbit` → `qubit` (namespace, files, option suffixes in examples, docs); cosmetic | type:refactor, area:elements/qbit, origin:v2-migration | namespace + 2 files + docs | v3dev project card |
 
 ---
 
@@ -216,13 +230,13 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 
 Library renames (children of cppqed E-6, cross-repo): M-01 (headers → `include/multidiagonal/`) and M-17 (finding numbers in test names → F-prefix). If acronym casing (C-72) is adopted, `toStringJSON` in the library's Traits.h changes too.
 
-Counts: cppqed 7 epics + 58 leaf issues; library 19. Several are bundles with checklists.
+Counts: cppqed 7 epics + 66 leaf issues; library 19. Several are bundles with checklists.
 
 ---
 
 ## 5. Before filing
 1. **Dump existing issues in both repos** (you run it) and dedupe against them. Old v2-era cppqed issues may
-   still be open. Decided 2026-10-19: close them and all v2-era projects as obsolete; skim the projects for v3 ideas first (roadmap Phase 4, step 3).
+   still be open. Decided 2026-10-19: close them and all v2-era projects as obsolete. Issues: closed (2026-10-20). Projects: skimmed 2026-10-20 (C-90…C-96, C-76 and notes in C-14, C-51, C-53, C-67); #3 and #4 to be closed, the empty #5 and #6 deleted.
 2. ~~Settle the ledger renaming~~: done. Issue bodies must use F-numbers for old findings.
 3. **Order of creation:** labels → milestones → epics → leaf issues (so sub-issue and blocked-by links can
    point at real numbers) → project. Generate the batch script after these decisions.
