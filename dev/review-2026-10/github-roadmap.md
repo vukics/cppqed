@@ -57,7 +57,7 @@ Starting state (2026-10-08):
 
 ✔ Old URLs redirect (`git ls-remote https://github.com/vukics/cppqed` works); issues, releases and stars are present; Actions still run on push in the library.
 
-## Phase 3: URL and metadata fix-up (one commit per repo)
+## Phase 3: URL and metadata fix-up (one commit per repo) — done 2026-10-21
 1. ~~**[C]** Update every hard-coded URL:~~ Done 2026-10-21. `.gitmodules` intentionally still points at the archived forks under `vukics` (until C-07).
    - README badges and links
    - `HOMEPAGE_URL` in both CMakeLists
@@ -65,7 +65,7 @@ Starting state (2026-10-08):
    - Doxyfile and mainpage, the docs workflows
    - both CLAUDE.md files, the developer-guide link
 2. ~~**[C]** Add `CITATION.cff` to both repos, so GitHub shows "Cite this repository" (and Zenodo would pick up the metadata, if it is connected later). Optional, but it's the expected norm for research software.~~ Done 2026-10-21: minimal files (author, affiliation, license, URLs; the library also has version 0.2.0 and its tag date). No ORCID or paper reference yet.
-3. **[A]** Re-enable Pages under the organization; the sites live at `wignerquantumoptics.github.io/cppqed` and `wignerquantumoptics.github.io/cppqed-multidiagonal` (no custom domain). Check that the developer guide and the library's Doxygen docs build and are reachable.
+3. ~~**[A]** Re-enable Pages under the organization; the sites live at `wignerquantumoptics.github.io/cppqed` and `wignerquantumoptics.github.io/cppqed-multidiagonal` (no custom domain). Check that the developer guide and the library's Doxygen docs build and are reachable.~~ Done 2026-10-21: Pages carried over with the transfer (cppqed: GitHub Actions; library: branch `gh-pages`); both sites load. The library's Doxygen site uses the stock theme → M-20.
 
 ✔ No `vukics/` URLs left except intentional historical references; docs sites live at their new URLs.
 

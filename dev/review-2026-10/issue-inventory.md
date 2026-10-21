@@ -246,10 +246,11 @@ Source: projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" (dumped 2026-10-
 | M-16 | Install/export review; Boost.Serialization as optional dependency | type:build | CLAUDE.md item 5 |
 | M-17 | Give F8–F11 a named test or `[contract]` tag (F1b, F2 and F7 also lack `[contract]`). The F-renaming of the Markdown and the test names is done (2026-10-15) | type:cleanup, area:tests | §1 |
 | M-18 | MultiDiagonal JSON is write-only (no value_to) | type:enhancement, area:multidiagonal | D10 |
+| M-20 | Doxygen site uses the stock theme: no `HTML_EXTRA_STYLESHEET`/`HTML_HEADER` in the Doxyfile. Adopt Doxygen Awesome (the theme the cppqed developer guide §7.8 recommends), vendored at a pinned release or fetched at a pinned tag in `docs.yml`; check its license | type:docs, area:docs | András, 2026-10-21 (verified in Doxyfile) |
 
 Library renames (children of cppqed E-6, cross-repo): M-01 (headers → `include/multidiagonal/`) and M-17 (finding numbers in test names → F-prefix). If acronym casing (C-72) is adopted, `toStringJSON` in the library's Traits.h changes too.
 
-Counts: cppqed 7 epics + 66 leaf issues; library 19. Several are bundles with checklists.
+Counts: cppqed 7 epics + 66 leaf issues; library 20. Several are bundles with checklists.
 
 ---
 
