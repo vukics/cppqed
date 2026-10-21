@@ -12,7 +12,7 @@ and run it as thousands of job-array tasks.
 - Development resumed in 2026 after a pause in 2023. The first end-to-end executable ran
   in April 2026.
 
-License: BSL-1.0. Developer Guide: `docs/`, published at https://vukics.github.io/cppqed/.
+License: BSL-1.0. Developer Guide: `docs/`, published at https://wignerquantumoptics.github.io/cppqed/.
 
 ## Repository relationships
 

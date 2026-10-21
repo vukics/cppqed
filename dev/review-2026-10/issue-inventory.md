@@ -1,6 +1,6 @@
 # Issue inventory and labeling scheme: cppqed + cppqed-multidiagonal (draft, 2026-10-08)
 
-Temporary IDs: `C-nn` = vukics/cppqed, `M-nn` = vukics/cppqed-multidiagonal, `E-n` = parent/epic issue.
+Temporary IDs: `C-nn` = WignerQuantumOptics/cppqed, `M-nn` = WignerQuantumOptics/cppqed-multidiagonal (both under `vukics` until 2026-10-21), `E-n` = parent/epic issue.
 Labels in [brackets] follow the scheme in §2. "Src" points to findings.md (A1…E3), the library ledger (F1, F1b, F2…F11),
 CLAUDE.md, or your recollection (U).
 
@@ -21,7 +21,7 @@ CLAUDE.md, or your recollection (U).
 **Clash:** on GitHub, `#5` in any issue, PR or commit auto-links to issue/PR 5 of that repo. cppqed already has
 v2-era issues #4–#32 (commits reference #4, #5, #6, #9, #11, #12, #25–#32), plus SourceForge tickets.
 So "finding #5" written in a cppqed issue links to an unrelated 2020 issue.
-→ **Done (2026-10-15):** the ledger is renamed **F1, F1b, F2…F11**, with the numbers kept exactly as the tests had them (CLAUDE.md's list had omitted F2). Both CLAUDE.md files are updated. The F-series is closed: new findings get GitHub issue numbers, cited in test names and commits (`#N` in-repo, `vukics/cppqed-multidiagonal#N` from elsewhere). The test names in the library sources are renamed too; what remains is in M-17.
+→ **Done (2026-10-15):** the ledger is renamed **F1, F1b, F2…F11**, with the numbers kept exactly as the tests had them (CLAUDE.md's list had omitted F2). Both CLAUDE.md files are updated. The F-series is closed: new findings get GitHub issue numbers, cited in test names and commits (`#N` in-repo, `WignerQuantumOptics/cppqed-multidiagonal#N` from elsewhere). The test names in the library sources are renamed too; what remains is in M-17.
 
 ---
 
@@ -82,7 +82,7 @@ Other GitHub dimensions:
 
 ---
 
-## 3. vukics/cppqed
+## 3. WignerQuantumOptics/cppqed
 
 ### Epics (parents)
 - **E-1 Switch to cppqed-multidiagonal.** Children: C-01…C-05. [type:enhancement area:cmake origin:split] → M0
@@ -223,7 +223,7 @@ Source: projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" (dumped 2026-10-
 
 ---
 
-## 4. vukics/cppqed-multidiagonal
+## 4. WignerQuantumOptics/cppqed-multidiagonal
 
 | ID | Title | Labels | Src |
 |---|---|---|---|

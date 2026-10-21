@@ -4,7 +4,7 @@
 
 C++QED is a framework for simulating open quantum systems — master equations and quantum-jump Monte Carlo (QJMC) trajectories — targeting production-scale runs on HPC/HTC clusters. It is the successor to C++QED v2, rewritten in a modern C++20 functional style while preserving the core performance principle: **compile-time resolution of the full tensor-product structure of the Hilbert space**.
 
-📖 **[Developer Guide](https://vukics.github.io/cppqed/)** — narrative documentation, design rationale, and API reference.
+📖 **[Developer Guide](https://wignerquantumoptics.github.io/cppqed/)** — narrative documentation, design rationale, and API reference.
 
 ---
 
@@ -38,7 +38,7 @@ If you are exploring a new system interactively, use QuTiP. If you are running t
 
 ## Library structure
 
-The `MultiDiagonal` sparse operator library is being split into its own repository: **[cppqed-multidiagonal](https://github.com/vukics/cppqed-multidiagonal)**. It is a standalone, physics-agnostic C++ library for multi-diagonal sparse operators over tensor-product Hilbert spaces. Until the switch-over is complete, this repository still builds against its in-tree copies of `MultiArray.h`, `SliceIterator.h`, and `MultiDiagonal.h`.
+The `MultiDiagonal` sparse operator library is being split into its own repository: **[cppqed-multidiagonal](https://github.com/WignerQuantumOptics/cppqed-multidiagonal)**. It is a standalone, physics-agnostic C++ library for multi-diagonal sparse operators over tensor-product Hilbert spaces. Until the switch-over is complete, this repository still builds against its in-tree copies of `MultiArray.h`, `SliceIterator.h`, and `MultiDiagonal.h`.
 
 ```
 cppqed-multidiagonal/           Standalone sparse operator library (separate repo)
@@ -144,7 +144,7 @@ The photon-blockade breakdown is a dissipative quantum phase transition of the s
 **Requirements:** C++23 compiler (GCC ≥ 13 or Clang ≥ 18), CMake ≥ 3.21, Boost ≥ 1.83 (Iostreams, JSON, Serialization; plus the header-only Odeint and Hana), Eigen ≥ 3.4. popl, pcg-cpp, and Xoshiro-cpp come in as git submodules.
 
 ```bash
-git clone --recurse-submodules https://github.com/vukics/cppqed.git
+git clone --recurse-submodules https://github.com/WignerQuantumOptics/cppqed.git
 cd cppqed
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
@@ -171,7 +171,7 @@ The physics and algorithmic foundations of the framework are described in the v2
 
 Two papers are in preparation for *SciPost Physics Codebases*:
 
-- **Paper 1 — [cppqed-multidiagonal](https://github.com/vukics/cppqed-multidiagonal)**: a standalone C++ library for multi-diagonal sparse operators over tensor-product Hilbert spaces; algebraically closed under composition, direct product, and Hermitian conjugation.
+- **Paper 1 — [cppqed-multidiagonal](https://github.com/WignerQuantumOptics/cppqed-multidiagonal)**: a standalone C++ library for multi-diagonal sparse operators over tensor-product Hilbert spaces; algebraically closed under composition, direct product, and Hermitian conjugation.
 - **Paper 2 — C++QED v3**: the full framework; C++20 concepts + Boost.Hana replacing v2 TMP, with continuous interaction-picture reset, parallel-safe PRNG, and HPC/HTC production workflow.
 
 ---

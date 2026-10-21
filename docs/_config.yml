@@ -2,7 +2,7 @@ title: C++QED v3
 description: Framework for simulating open quantum dynamics
 remote_theme: just-the-docs/just-the-docs
 
-url: https://vukics.github.io
+url: https://wignerquantumoptics.github.io
 baseurl: /cppqed           # the repo name, if it's not a user/org root page
 
 # Navigation
@@ -20,5 +20,5 @@ color_scheme: nil          # or "dark"
 # Aux links in the top-right (e.g. back to GitHub)
 aux_links:
   "GitHub":
-    - "https://github.com/vukics/cppqed"
+    - "https://github.com/WignerQuantumOptics/cppqed"
 aux_links_new_tab: true

@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "C++QED"
+abstract: >-
+  A C++ framework for simulating open quantum dynamics: quantum-jump Monte Carlo
+  trajectories, the Lindblad master equation, and ensembles, targeting
+  production runs on HPC/HTC clusters.
+type: software
+authors:
+  - family-names: Vukics
+    given-names: András
+    affiliation: "HUN-REN Wigner Research Centre for Physics"
+license: BSL-1.0
+repository-code: "https://github.com/WignerQuantumOptics/cppqed"
+url: "https://wignerquantumoptics.github.io/cppqed/"
+keywords:
+  - quantum optics
+  - open quantum systems
+  - quantum trajectories
+  - master equation
+  - C++

@@ -24,7 +24,7 @@ set(CPPQED_ID "${CPPQED_VERSION_MAJOR}.${CPPQED_VERSION_MINOR}")
 project(cppqed VERSION ${CPPQED_VERSION}  
                LANGUAGES CXX
                DESCRIPTION "A framework for simulating open quantum dynamics"
-               HOMEPAGE_URL "https://github.com/vukics/cppqed")
+               HOMEPAGE_URL "https://github.com/WignerQuantumOptics/cppqed")
 
 include(CTest)
 
