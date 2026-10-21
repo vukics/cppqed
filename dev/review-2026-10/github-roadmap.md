@@ -42,7 +42,7 @@ Starting state (2026-10-08):
    - public, one view: Board by Status; further views (by milestone, critical, by repository) can be added in the browser later if needed (views cannot be created via `gh` or the API)
    - no "Roadmap item" field (it would duplicate the milestones)
    - built-in workflows reviewed and kept; auto-add is switched on after the transfer (Phase 2, step 6)
-   - **open:** where Priority and Effort live. The Project cannot show the organization's issue fields, so either Project fields with the same values (`gh project field-create`), or the issue fields on the issues and no priority in the Project
+   - Priority and Effort: decided 2026-10-21, the organization issue fields (as Wigner_Time), set by the Phase 4 script
 4. If you want to double-check, ask IBF whether institute-branded code under the group's organization needs anything. I don't expect it to; GitHub is already in use.
 
 ✔ Org ready; a test repo created in it shows the expected Actions and Pages behaviour (then delete it).
