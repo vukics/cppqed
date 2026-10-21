@@ -53,7 +53,7 @@ Starting state (2026-10-08):
 3. **[A]** Point local clones at the new URLs with `git remote set-url origin git@github.com:WignerQuantumOptics/<repo>.git`, in both checkouts and the cluster checkouts.
 4. ~~**[A]** Zenodo: enable the library repo under the organization in Zenodo's GitHub settings.~~ Not applicable: Zenodo was never connected (corrected 2026-10-21).
 5. **[A]** Archive the three forks under `vukics` (archive, don't delete: old `.gitmodules` reference them).
-6. **[A]** In the "C++QED v3" Project, switch on the built-in "Auto-add to project" workflow for the transferred repos (filter `is:issue is:open`). If the plan allows only one auto-add workflow, use it for cppqed; the Phase 4 script adds all filed issues anyway.
+6. ~~**[A]** In the "C++QED v3" Project, switch on the built-in "Auto-add to project" workflow for the transferred repos (filter `is:issue is:open`).~~ Done 2026-10-21 for cppqed only: the plan allows one auto-add workflow. Pull requests deliberately not auto-added (direct commits to the default branch; "Fixes #N" closes issues). For the library: **[C]** issue templates (`.github/ISSUE_TEMPLATE/*.yml`) with `projects:` pointing at the Project add issues opened from them; the Phase 4 script adds its issues itself.
 
 ✔ Old URLs redirect (`git ls-remote https://github.com/vukics/cppqed` works); issues, releases and stars are present; Actions still run on push in the library.
 
