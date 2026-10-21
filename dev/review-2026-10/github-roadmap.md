@@ -47,13 +47,13 @@ Starting state (2026-10-08):
 
 ✔ Org ready; a test repo created in it shows the expected Actions and Pages behaviour (then delete it).
 
-## Phase 2: Transfer
-1. **[A]** Transfer `cppqed-multidiagonal` first (it's the dependency), then `cppqed`. In each repo: Settings → Danger Zone → Transfer.
+## Phase 2: Transfer — done 2026-10-21
+1. ~~**[A]** Transfer `cppqed-multidiagonal` first (it's the dependency), then `cppqed`. In each repo: Settings → Danger Zone → Transfer.~~ Done 2026-10-21; pushing to the new URLs works. The Phase 1 test-repo checkpoint was skipped in favour of transferring directly.
 2. **[A]** Never create a repo named `cppqed` or `cppqed-multidiagonal` under `vukics` again; that would break the redirects.
-3. **[A]** Point local clones at the new URLs with `git remote set-url origin git@github.com:WignerQuantumOptics/<repo>.git`, in both checkouts and the cluster checkouts.
+3. ~~**[A]** Point local clones at the new URLs with `git remote set-url origin git@github.com:WignerQuantumOptics/<repo>.git`~~, done for both local checkouts 2026-10-21; **still to do in the cluster checkouts** (they work through the redirect until then).
 4. ~~**[A]** Zenodo: enable the library repo under the organization in Zenodo's GitHub settings.~~ Not applicable: Zenodo was never connected (corrected 2026-10-21).
-5. **[A]** Archive the three forks under `vukics` (archive, don't delete: old `.gitmodules` reference them).
-6. ~~**[A]** In the "C++QED v3" Project, switch on the built-in "Auto-add to project" workflow for the transferred repos (filter `is:issue is:open`).~~ Done 2026-10-21 for cppqed only: the plan allows one auto-add workflow. Pull requests deliberately not auto-added (direct commits to the default branch; "Fixes #N" closes issues). For the library: **[C]** issue templates (`.github/ISSUE_TEMPLATE/*.yml`) with `projects:` pointing at the Project add issues opened from them; the Phase 4 script adds its issues itself.
+5. ~~**[A]** Archive the three forks under `vukics` (archive, don't delete: old `.gitmodules` reference them).~~ Done 2026-10-21.
+6. ~~**[A]** In the "C++QED v3" Project, switch on the built-in "Auto-add to project" workflow for the transferred repos (filter `is:issue is:open`).~~ Done 2026-10-21 for cppqed only: the plan allows one auto-add workflow. Pull requests deliberately not auto-added (direct commits to the default branch; "Fixes #N" closes issues). For the library: issue templates `bug.yml` and `other.yml` with `projects:` pointing at the Project, blank issues disabled (library commit after 6dc2567; check the Project number with `gh project list --owner WignerQuantumOptics`). The Phase 4 script adds its issues itself.
 
 ✔ Old URLs redirect (`git ls-remote https://github.com/vukics/cppqed` works); issues, releases and stars are present; Actions still run on push in the library.
 
