@@ -7,7 +7,7 @@ Legend: **[A]** you do it (GitHub UI, `gh`, `git push`, anything network or cred
 Starting state (2026-10-08):
 - Both repos are under `vukics`, with nothing unpushed. Both have an untracked `CLAUDE.md`; cppqed also has a modified `.gitignore` (my local-settings entry).
 - cppqed has no CI, only `jekyll-gh-pages.yml`, which is still tracked even though the last commit message says it was removed. Its executable `jc_qjmc.cc` is gitignored.
-- The library has CI (gcc-14/clang-18 × Debug/Release on `ubuntu-latest`) and a docs workflow, plus a Zenodo DOI.
+- The library has CI (gcc-14/clang-18 × Debug/Release on `ubuntu-latest`) and a docs workflow. (Correction 2026-10-21: it has no Zenodo DOI; Zenodo was never used. The claim came from the library CLAUDE.md.)
 - The forks popl, pcg-cpp and Xoshiro-cpp are not needed (verified).
 
 ---
@@ -20,10 +20,10 @@ Starting state (2026-10-08):
    - ~~whether the v2-era open issues get closed as obsolete~~ decided 2026-10-19: **close all v2-era open issues and projects as obsolete.** Most issues are already closed. Before closing the projects, skim their items for ideas worth bringing to v3 (Phase 4, step 3).
 2. ~~**[C]** Commit the two `CLAUDE.md` files (after the corrections from the review: E2 and the library layout section) and the `.gitignore` change.~~ Done 2026-10-20: E2 applied to cppqed CLAUDE.md, D11 to the library CLAUDE.md. ~~Decide whether `jc_qjmc.cc` gets un-ignored now (C-52/C-74)~~ done 2026-10-20: un-ignored and committed; that's needed for cppqed CI anyway.
 3. ~~**[A]** Push both repos.~~ Done 2026-10-20 (the final Phase 0 commits still need one more push in each repo).
-4. ~~**[A]** Write down what the transfer could break. For each repo, record:~~ Done 2026-10-20: none of these exist, per András. (Phase 2, step 4 still re-enables Zenodo for the library.)
+4. ~~**[A]** Write down what the transfer could break. For each repo, record:~~ Done 2026-10-20: none of these exist, per András.
    - Pages source and branch
    - Actions secrets and variables (names only)
-   - webhooks and installed apps (Zenodo)
+   - webhooks and installed apps
    - branch protection
    - collaborators
 5. ~~**[A]** Dump the existing issues and PRs of both repos (JSON, the command I gave earlier) for deduplication.~~ Done 2026-10-20: neither repo has open issues or PRs, so there is nothing to dedupe against. Also dump the v2-era projects with their items (JSON), so I can skim them for v3 ideas. *Projects dumped 2026-10-20 into `dev/review-2026-10/dumps/` (kept untracked).*
@@ -51,7 +51,7 @@ Starting state (2026-10-08):
 1. **[A]** Transfer `cppqed-multidiagonal` first (it's the dependency), then `cppqed`. In each repo: Settings → Danger Zone → Transfer.
 2. **[A]** Never create a repo named `cppqed` or `cppqed-multidiagonal` under `vukics` again; that would break the redirects.
 3. **[A]** Point local clones at the new URLs with `git remote set-url origin git@github.com:WignerQuantumOptics/<repo>.git`, in both checkouts and the cluster checkouts.
-4. **[A]** Zenodo: enable the library repo under the organization in Zenodo's GitHub settings.
+4. ~~**[A]** Zenodo: enable the library repo under the organization in Zenodo's GitHub settings.~~ Not applicable: Zenodo was never connected (corrected 2026-10-21).
 5. **[A]** Archive the three forks under `vukics` (archive, don't delete: old `.gitmodules` reference them).
 6. **[A]** In the "C++QED v3" Project, switch on the built-in "Auto-add to project" workflow for the transferred repos (filter `is:issue is:open`). If the plan allows only one auto-add workflow, use it for cppqed; the Phase 4 script adds all filed issues anyway.
 
@@ -64,7 +64,7 @@ Starting state (2026-10-08):
    - `.gitmodules` (or skip, if C-07 FetchContent lands in Phase 5)
    - Doxyfile and mainpage, the docs workflows
    - both CLAUDE.md files, the developer-guide link
-2. **[C]** Add `CITATION.cff` to both repos, so GitHub shows "Cite this repository" and Zenodo picks up metadata. Optional, but it's the expected norm for research software.
+2. **[C]** Add `CITATION.cff` to both repos, so GitHub shows "Cite this repository" (and Zenodo would pick up the metadata, if it is connected later). Optional, but it's the expected norm for research software.
 3. **[A]** Re-enable Pages under the organization; the sites live at `wignerquantumoptics.github.io/cppqed` and `wignerquantumoptics.github.io/cppqed-multidiagonal` (no custom domain). Check that the developer guide and the library's Doxygen docs build and are reachable.
 
 ✔ No `vukics/` URLs left except intentional historical references; docs sites live at their new URLs.
@@ -98,7 +98,7 @@ Starting state (2026-10-08):
    - `apt-get update` in `docs.yml`
    - pin `runs-on: ubuntu-24.04` instead of `ubuntu-latest`
    - pin actions by SHA
-3. **[C]** Move the headers to `include/multidiagonal/` (M-01). Release v0.3.0 **[A tag/release]**, and check that Zenodo mints the DOI under the existing concept DOI.
+3. **[C]** Move the headers to `include/multidiagonal/` (M-01). Release v0.3.0 **[A tag/release]**. If you want a DOI for it (e.g. for the paper), connect Zenodo before this release; it then mints one per release.
 
 **cppqed** (no CI yet):
 4. **[C]** Track `jc_qjmc.cc` (C-52/C-74). Add `ci.yml`:
