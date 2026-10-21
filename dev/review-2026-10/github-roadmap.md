@@ -38,10 +38,11 @@ Starting state (2026-10-08):
    - default `GITHUB_TOKEN`: read-only, already; Actions may not approve PRs
    - Pages allowed for public repos: already
 2. ~~**[A]** Define the native **issue types**: Bug, Feature, Task, plus custom Physics, Refactor and Docs if you want them. Types are per organization, so these replace the `type:` label family from the scheme.~~ Done 2026-10-20: Task, Bug, Feature and Decision already existed (set up for Wigner_Time); Physics, Refactor and Docs added. The organization also already has issue fields Priority (Urgent/High/Medium/Low), Effort (High/Medium/Low), Start date and Target date. Mapping in the inventory, §2.
-3. **[A]** Create the organization **Project** "C++QED v3" with fields:
-   - Status (default)
-   - Roadmap item
-   - (Priority and Effort are not created here: they come from the organization's issue fields)
+3. ~~**[A]** Create the organization **Project** "C++QED v3"~~ Done 2026-10-21:
+   - public, one view: Board by Status; further views (by milestone, critical, by repository) can be added in the browser later if needed (views cannot be created via `gh` or the API)
+   - no "Roadmap item" field (it would duplicate the milestones)
+   - built-in workflows reviewed and kept; auto-add is switched on after the transfer (Phase 2, step 6)
+   - **open:** where Priority and Effort live. The Project cannot show the organization's issue fields, so either Project fields with the same values (`gh project field-create`), or the issue fields on the issues and no priority in the Project
 4. If you want to double-check, ask IBF whether institute-branded code under the group's organization needs anything. I don't expect it to; GitHub is already in use.
 
 ✔ Org ready; a test repo created in it shows the expected Actions and Pages behaviour (then delete it).
@@ -52,6 +53,7 @@ Starting state (2026-10-08):
 3. **[A]** Point local clones at the new URLs with `git remote set-url origin git@github.com:WignerQuantumOptics/<repo>.git`, in both checkouts and the cluster checkouts.
 4. **[A]** Zenodo: enable the library repo under the organization in Zenodo's GitHub settings.
 5. **[A]** Archive the three forks under `vukics` (archive, don't delete: old `.gitmodules` reference them).
+6. **[A]** In the "C++QED v3" Project, switch on the built-in "Auto-add to project" workflow for the transferred repos (filter `is:issue is:open`). If the plan allows only one auto-add workflow, use it for cppqed; the Phase 4 script adds all filed issues anyway.
 
 ✔ Old URLs redirect (`git ls-remote https://github.com/vukics/cppqed` works); issues, releases and stars are present; Actions still run on push in the library.
 
