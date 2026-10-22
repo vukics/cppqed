@@ -162,7 +162,7 @@ The physics and algorithmic foundations of the framework are described in the v2
 
 - A. Vukics, H. Ritsch, *C++QED: an object-oriented framework for wave-function simulations of cavity QED systems*, **Eur. Phys. J. D** 44, 585 (2007). [DOI: 10.1140/epjd/e2007-00210-x](https://doi.org/10.1140/epjd/e2007-00210-x)
 - A. Vukics, *C++QEDv2: The multi-array concept and compile-time algorithms in the definition of composite quantum systems*, **Comput. Phys. Commun.** 183, 1381 (2012). [DOI: 10.1016/j.cpc.2012.01.004](https://doi.org/10.1016/j.cpc.2012.01.004)
-- A. Vukics, T. Grießer, P. Domokos, *C++QEDv2 Milestone 10: A C++/Python application-programming framework for simulating open quantum dynamics*, **Comput. Phys. Commun.** 185, 1381 (2014). [DOI: 10.1016/j.cpc.2014.02.011](https://doi.org/10.1016/j.cpc.2014.02.011)
+- R. Sandner, A. Vukics, *C++QEDv2 Milestone 10: A C++/Python application-programming framework for simulating open quantum dynamics*, **Comput. Phys. Commun.** 185, 2380–2382 (2014). [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0010465514001349)
 - M. Kornyik, A. Vukics, *The Monte Carlo wave-function method: A robust adaptive algorithm and a study in convergence*, **Comput. Phys. Commun.** 238, 88–101 (2019). [DOI: 10.1016/j.cpc.2018.12.015](https://doi.org/10.1016/j.cpc.2018.12.015)
 
 - [An introductory talk](https://youtu.be/yunR73LNJ1M) given at GPU Day 2019
