@@ -235,17 +235,21 @@ textbook commutators.
 
 ## Working rules (Wigner Research Centre institutional policy)
 
-- **Network, credential, and out-of-tree filesystem commands:** show the command, explain
-  it, and let András run it. This covers:
-  - `git push/fetch/pull`
-  - configure steps that download
-  - package installs
-  - anything outside this repo
-  - anything touching keys or tokens
+- **git, gh, glab:** Claude runs them with András's existing logins and remotes: fetch, pull,
+  push, issues, labels, milestones, Project items, and CI runs. Ask first before:
+  - force-push or rebases of pushed history
+  - adding new remotes
+  - changing repository or organization settings
+  - deleting issues or other GitHub objects
+- **Other network commands** (downloads, configure steps that download) and **package
+  installs:** only on explicit request.
+- **Out-of-tree files and credentials:** commands that delete or move files outside this
+  repo, or that create, change, or reveal keys or tokens (e.g. `gh auth refresh`): show the
+  command, explain it, and let András run it.
 
   Building, testing, and editing inside the repo are fine.
-- **Destructive operations:** ask for confirmation first. This covers `rm -r`,
-  `git reset --hard`, `git clean`, force-push, and rebases of pushed history.
+- **Destructive local operations:** ask for confirmation first. This covers `rm -r`,
+  `git reset --hard`, and `git clean`.
 - **Simulation and research data:** process locally only. No telemetry, and no external
   APIs or services unless explicitly requested.
 - **Secrets:** never hardcode them.
