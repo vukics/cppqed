@@ -86,17 +86,20 @@ Other GitHub dimensions:
 
 ## 3. WignerQuantumOptics/cppqed
 
+Filing in progress (2026-10-22): the epics and the E-1 section are filed; their numbers are linked below. Labels use
+`area:core/composite` instead of `elements/composite` (Composite.h lives in CPPQEDcore/structure/).
+
 ### Epics (parents)
-- **E-1 Switch to cppqed-multidiagonal.** Children: C-01…C-05. [type:enhancement area:cmake origin:split] → M0
-- **E-2 Master equation gives physically wrong / diverging results (U).** [type:physics severity:S1-critical area:core/master] → M2
+- **E-1 [#14](https://github.com/WignerQuantumOptics/cppqed/issues/14) Switch to cppqed-multidiagonal.** Children: C-01…C-05. [type:enhancement area:cmake origin:split] → M0
+- **E-2 [#15](https://github.com/WignerQuantumOptics/cppqed/issues/15) Master equation gives physically wrong / diverging results (U).** [type:physics severity:S1-critical area:core/master] → M2
   - Symptom as you remember it; record the conditions if you can.
   - Note that Master has not compiled since 2bc5d3f8 (2024-04-30), so the observation predates that.
   - Children: C-10, C-11, C-12, C-23, the library fix F5 (arrives via E-1), M-02, and C-13 as acceptance.
-- **E-3 Third-party dependencies via FetchContent (U).** Children: C-07, C-08, and M-11 (cross-repo). [type:build area:cmake] → M0
-- **E-4 Robust unattended cluster runs.** Children: C-40…C-47. [type:bug area:utils/trajectory] → M1
-- **E-5 Interaction-picture propagators (roadmap 1).** Children: C-60, C-14, C-61. [type:enhancement area:core/propagator] → M3
+- **E-3 [#16](https://github.com/WignerQuantumOptics/cppqed/issues/16) Third-party dependencies via FetchContent (U).** Children: C-07, C-08, and M-11 (cross-repo). [type:build area:cmake] → M0
+- **E-4 [#17](https://github.com/WignerQuantumOptics/cppqed/issues/17) Robust unattended cluster runs.** Children: C-40…C-47. [type:bug area:utils/trajectory] → M1
+- **E-5 [#18](https://github.com/WignerQuantumOptics/cppqed/issues/18) Interaction-picture propagators (roadmap 1).** Children: C-60, C-14, C-61. [type:enhancement area:core/propagator] → M3
 
-- **E-7 Replace the own MultiArray(View) machinery with std::mdspan (cross-repo, decision first).** [type:discussion → enhancement, area:core/*, origin:split] → after M1; library side before the v1.0 / paper decision
+- **E-7 [#20](https://github.com/WignerQuantumOptics/cppqed/issues/20) Replace the own MultiArray(View) machinery with std::mdspan (cross-repo, decision first).** [type:discussion → enhancement, area:core/*, origin:split] → after M1; library side before the v1.0 / paper decision
   - Children: C-80…C-85 here, plus M-14 (the decision) and M-19 (library prototype).
   - Proposal:
     - the view becomes `std::mdspan` used directly through alias templates, with no wrapper class
@@ -107,11 +110,11 @@ Other GitHub dimensions:
 ### Split (E-1)
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-01 | Consume cppqed-multidiagonal via FetchContent (SHA-pinned); delete stale MultiArray*/MultiDiagonal copies and MultiDiagonal.cc | type:build, area:cmake, origin:split; blocked by M-01 | A1, A5 |
-| C-02 | Framework Traits.h: keep only the extras on top of `<multidiagonal/Traits.h>`; include it directly where used (consider renaming) | type:build, origin:split | A3 |
-| C-03 | Port Mode/Qbit/Spin operator construction to signed offsets (sign trap: lower → negative) | type:bug, area:elements/*, origin:split | A4 |
-| C-04 | Decide where SliceIterator.h lives (library or cppqed) | type:discussion, area:utils/slicing | A8 |
-| C-05 | Acceptance: jc_qjmc output identical before/after the switch (already shown in a scratch build; make it a test) | type:test, origin:split | A9 |
+| C-01 [#21](https://github.com/WignerQuantumOptics/cppqed/issues/21) | Consume cppqed-multidiagonal via FetchContent (SHA-pinned); delete stale MultiArray*/MultiDiagonal copies and MultiDiagonal.cc | type:build, area:cmake, origin:split; blocked by M-01 | A1, A5 |
+| C-02 [#22](https://github.com/WignerQuantumOptics/cppqed/issues/22) | Framework Traits.h: keep only the extras on top of `<multidiagonal/Traits.h>`; include it directly where used (consider renaming) | type:build, origin:split | A3 |
+| C-03 [#23](https://github.com/WignerQuantumOptics/cppqed/issues/23) | Port Mode/Qbit/Spin operator construction to signed offsets (sign trap: lower → negative) | type:bug, area:elements/*, origin:split | A4 |
+| C-04 [#24](https://github.com/WignerQuantumOptics/cppqed/issues/24) | Decide where SliceIterator.h lives (library or cppqed) | type:discussion, area:utils/slicing | A8 |
+| C-05 [#25](https://github.com/WignerQuantumOptics/cppqed/issues/25) | Acceptance: jc_qjmc output identical before/after the switch (already shown in a scratch build; make it a test) | type:test, origin:split | A9 |
 
 ### Dependencies (E-3)
 | ID | Title | Labels | Src |
@@ -208,7 +211,7 @@ Source: projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" (dumped 2026-10-
 | C-85 | Follow-up: partly static extents (e.g. `extents<size_t,2,dynamic_extent>` for a qubit⊗mode system) realize "compile-time leading subsystem dimensions" (C-68) | type:enhancement | E-7, C-68 |
 
 ### Renames (epic E-6)
-- **E-6 Planned renames.** Children: C-70…C-76, plus M-01 and M-17 in the library. [type:refactor]
+- **E-6 [#19](https://github.com/WignerQuantumOptics/cppqed/issues/19) Planned renames.** Children: C-70…C-76, plus M-01 and M-17 in the library. [type:refactor]
 - **Timing:** do the structural renames (C-70, C-71, C-73, C-74) in one batch together with the split (M0). The split already touches includes in almost every file, so one round of churn costs less than two.
 - **Issues to file before the renames** should cite file:line paths with a commit SHA, so the references stay valid afterwards.
 - **Acronym casing (C-72)** is cosmetic and touches the most lines. The library CLAUDE.md says "don't mass-rename". Keep it as a decision issue and do it opportunistically, or in one sweep at a release boundary.
