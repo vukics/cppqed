@@ -69,7 +69,7 @@ Starting state (2026-10-08):
 
 ✔ No `vukics/` URLs left except intentional historical references; docs sites live at their new URLs.
 
-## Phase 4: Publish the issues
+## Phase 4: Publish the issues — done 2026-10-22
 1. **[C]** Turn the inventory into batch scripts that stay idempotent on re-run:
    1. labels: `severity:`, `area:`, `state:`, `origin:` (no `type:` labels: issue types and the Priority/Effort issue fields replace them)
    2. milestones
@@ -82,8 +82,8 @@ Starting state (2026-10-08):
    - cppqed in progress 2026-10-22: 26 labels, milestones M0–M6, epics #14–#20, E-1 children #21–#25; library issues attached to their cppqed epics. #13 (developer-guide typos) closed as fixed in f1f20c85. Master (C-10…C-14 → #26–#30) and QJMC/elements physics (C-20…C-31 → #31–#42) filed. Cluster runs (C-40…C-47 → #43–#50) and build/tests/cleanup (C-50…C-55 → #51–#56) filed; C-56 fixed directly. Roadmap/known problems, renames, mdspan and carry-overs → #57–#86. cppqed complete: 73 issues, all with type, Priority/Effort, Project 1, epics as parents.
 3. v2-era issues and projects:
    1. ~~**[C]** Skim the project dumps from Phase 0 for ideas worth carrying over to v3; propose them as inventory additions (`origin:v2-migration`, usually `type:discussion`) for you to accept or drop.~~ Done 2026-10-20: accepted as C-90…C-96 and C-76, plus notes in C-14, C-51, C-53, C-67.
-   2. **[A]** ~~Close the remaining v2-era open issues~~ (done 2026-10-20). Close projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" as obsolete, with a short note pointing to the v3 issues filed for C-90…C-96 and C-76; delete the empty, untitled projects #5 and #6.
-4. **[A]** Dump again; **[C]** diff the result against the inventory.
+   2. **[A]** ~~Close the remaining v2-era open issues~~ (done 2026-10-20). ~~Close projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" as obsolete; delete the empty, untitled projects #5 and #6.~~ Done 2026-10-22: #3 and #4 closed (their ideas are in cppqed #80–#86, #73 and #64), #5 and #6 deleted.
+4. ~~**[A]** Dump again; **[C]** diff the result against the inventory.~~ Done 2026-10-22: verification queries after each batch (types, fields, Project, milestones, parents, blocked-by) and idempotent re-runs that skipped every filed item.
 
 ✔ Every inventory item maps to exactly one GitHub issue; the epics show their children; the Project views (by milestone, by severity, cross-repo blockers) are populated.
 
