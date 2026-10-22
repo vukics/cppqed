@@ -39,10 +39,10 @@ Starting state (2026-10-08):
    - Pages allowed for public repos: already
 2. ~~**[A]** Define the native **issue types**: Bug, Feature, Task, plus custom Physics, Refactor and Docs if you want them. Types are per organization, so these replace the `type:` label family from the scheme.~~ Done 2026-10-20: Task, Bug, Feature and Decision already existed (set up for Wigner_Time); Physics, Refactor and Docs added. The organization also already has issue fields Priority (Urgent/High/Medium/Low), Effort (High/Medium/Low), Start date and Target date. Mapping in the inventory, §2.
 3. ~~**[A]** Create the organization **Project** "C++QED v3"~~ Done 2026-10-21:
-   - public, one view: Board by Status; further views (by milestone, critical, by repository) can be added in the browser later if needed (views cannot be created via `gh` or the API)
+   - private since 2026-10-22 (the restricted-visibility issue fields cannot be added to a public Project); one view: Board by Status; further views (by milestone, critical, by repository) can be added in the browser later if needed (views cannot be created via `gh` or the API)
    - no "Roadmap item" field (it would duplicate the milestones)
    - built-in workflows reviewed and kept; auto-add is switched on after the transfer (Phase 2, step 6)
-   - Priority and Effort: decided 2026-10-21, the organization issue fields (as Wigner_Time), set by the Phase 4 script
+   - Priority and Effort: decided 2026-10-21, the organization issue fields (as Wigner_Time), set on each issue in Phase 4; added to the Project as fields 2026-10-22 (`createProjectV2IssueField`)
 4. If you want to double-check, ask IBF whether institute-branded code under the group's organization needs anything. I don't expect it to; GitHub is already in use.
 
 ✔ Org ready; a test repo created in it shows the expected Actions and Pages behaviour (then delete it).

@@ -73,10 +73,10 @@ Other GitHub dimensions:
 - **Sub-issues** model the epics below. **Dependencies** ("blocked by") model ordering, e.g. C-01 is blocked
   by M-01 and C-10 is blocked by M-02. Both features exist for personal repos.
 - **One organization Project** "C++QED v3" spanning both repos.
-  - Created 2026-10-21 (public), number 1. Fields: Status (default).
+  - Created 2026-10-21, number 1; private since 2026-10-22, because the restricted-visibility issue fields
+    cannot be added to a public Project. Fields: Status (default), Priority and Effort (the issue fields).
   - Priority and Effort: **decided 2026-10-21: the organization issue fields** (same convention as Wigner_Time),
-    set per issue by the Phase 4 script via `setIssueFieldValue`. The API also has
-    `createProjectV2IssueField`, which may make them visible in the Project (to check).
+    set on each issue in Phase 4 via `setIssueFieldValue`; shown in the Project since 2026-10-22.
   - Views: Board by Status for now; by milestone, critical (severity filter) and by repository can be added
     later in the browser.
 - **Granularity:** one issue per independently fixable defect. Small same-file items are bundled as a
