@@ -227,28 +227,31 @@ Source: projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" (dumped 2026-10-
 
 ## 4. WignerQuantumOptics/cppqed-multidiagonal
 
+Filed 2026-10-22 as #1–#20 (M-04 is the pre-existing #1, updated in place). Priority, Effort and the milestones of the
+unassigned items were proposed during filing; GitHub is now the source of truth for them.
+
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| M-01 | Move headers to include/multidiagonal/ (and install there); blocks cppqed C-01 | type:build, area:cmake, origin:split → v0.3.0 | A2, D3 |
-| M-02 | Const vectorize/matricize build mutable Eigen::Map from const pointer (regression, ad2836a) | type:bug, severity:S2-high, area:complex, state:reproduced → v0.2.1 | A6, D1 |
-| M-03 | Tests can't detect a missing conj in MultiDiagonal::hermitianConjugate; plus the test-gap checklist | type:test, area:tests, state:reproduced | D2, D10 |
-| M-04 | Multi-axis application 2–2.7× slower than Eigen sparse: overhaul apply (U) | type:performance, area:multidiagonal → v0.3.0 | U, CLAUDE.md item 1, D12 |
-| M-05 | Benchmark honesty: picture1 variants bypass operator(); "eigen_sparse_pernnz" label; inverted plot.py curve; constructJC unvalidated | type:test, area:benchmarks | D7 (agent 10, 16, 17) |
-| M-06 | README/mainpage: offset-sign formula backwards; (a†)²a² claim; C++20/GCC12; InteractionPictureDiagonal; Doxyfile version; performance claims | type:docs, severity:S2-high (the sign error misleads users) | D7 |
-| M-07 | Header docs: "applies H/i", "derived type in CPPQEDcore", "homomorphism", stale F5 docstring | type:docs, area:multidiagonal, complex | D8 |
-| M-08 | twoTimesRealPartOfSelf / hermitianConjugateSelf ignore view offset/strides: assert or document | type:bug, severity:S3-medium, area:complex | D9 |
-| M-09 | CMake: target_compile_features cxx_std_23; pin Boost/Eigen versions; SameMajorVersion on 0.x; ARCH_INDEPENDENT; no install as subproject; option to skip benchmarks | type:build, area:cmake | D5, D6, D14 |
-| M-10 | CI: -Werror; fix Clang warnings (MultiArray.h:135, :254); sanitizer job; find_package/FetchContent consumer job | type:build, area:ci, state:reproduced | D4 |
-| M-11 | Catch2: SHA pin, FIND_PACKAGE_ARGS for offline builds (cross-ref cppqed E-3) | type:build, area:cmake | D6 |
-| M-12 | Small header items (bundle): greedy variadic ctor; zero-extent diagonal; sqrAbs via std::norm; noInit zero-fills; twoTimesImagPartOf docs; internal-linkage ODR | type:bug, severity:S4-low | D13 |
-| M-13 | Reconcile the layout docstring (row-major vs first-index-fastest) | type:docs | CLAUDE.md item 2 |
-| M-14 | Decide std::mdspan migration vs current architecture (joint decision with cppqed E-7/C-80; affects the paper's API) | type:discussion | CLAUDE.md item 3 |
-| M-19 | Prototype: MultiDiagonal on mdspan (Diagonal storage, operator(), composition), validated by the dense-oracle tests and compared in the benchmarks (also an attempt at M-04) | type:enhancement, area:multidiagonal; blocked by M-14 | E-7 |
-| M-15 | README usage snippet and blessed construction API (fromStorage/singleDiag vs factory namespace) | type:discussion, docs | CLAUDE.md item 4 |
-| M-16 | Install/export review; Boost.Serialization as optional dependency | type:build | CLAUDE.md item 5 |
-| M-17 | Give F8–F11 a named test or `[contract]` tag (F1b, F2 and F7 also lack `[contract]`). The F-renaming of the Markdown and the test names is done (2026-10-15) | type:cleanup, area:tests | §1 |
-| M-18 | MultiDiagonal JSON is write-only (no value_to) | type:enhancement, area:multidiagonal | D10 |
-| M-20 | Doxygen site uses the stock theme: no `HTML_EXTRA_STYLESHEET`/`HTML_HEADER` in the Doxyfile. Adopt Doxygen Awesome (the theme the cppqed developer guide §7.8 recommends), vendored at a pinned release or fetched at a pinned tag in `docs.yml`; check its license | type:docs, area:docs | András, 2026-10-21 (verified in Doxyfile) |
+| M-01 [#2](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/2) | Move headers to include/multidiagonal/ (and install there); blocks cppqed C-01 | type:build, area:cmake, origin:split → v0.3.0 | A2, D3 |
+| M-02 [#3](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/3) | Const vectorize/matricize build mutable Eigen::Map from const pointer (regression, ad2836a) | type:bug, severity:S2-high, area:complex, state:reproduced → v0.2.1 | A6, D1 |
+| M-03 [#4](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/4) | Tests can't detect a missing conj in MultiDiagonal::hermitianConjugate; plus the test-gap checklist | type:test, area:tests, state:reproduced | D2, D10 |
+| M-04 [#1](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/1) | Multi-axis application 2–2.7× slower than Eigen sparse: overhaul apply (U) | type:performance, area:multidiagonal → v0.3.0 | U, CLAUDE.md item 1, D12 |
+| M-05 [#5](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/5) | Benchmark honesty: picture1 variants bypass operator(); "eigen_sparse_pernnz" label; inverted plot.py curve; constructJC unvalidated | type:test, area:benchmarks | D7 (agent 10, 16, 17) |
+| M-06 [#6](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/6) | README/mainpage: offset-sign formula backwards; (a†)²a² claim; C++20/GCC12; InteractionPictureDiagonal; Doxyfile version; performance claims | type:docs, severity:S2-high (the sign error misleads users) | D7 |
+| M-07 [#7](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/7) | Header docs: "applies H/i", "derived type in CPPQEDcore", "homomorphism", stale F5 docstring | type:docs, area:multidiagonal, complex | D8 |
+| M-08 [#8](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/8) | twoTimesRealPartOfSelf / hermitianConjugateSelf ignore view offset/strides: assert or document | type:bug, severity:S3-medium, area:complex | D9 |
+| M-09 [#9](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/9) | CMake: target_compile_features cxx_std_23; pin Boost/Eigen versions; SameMajorVersion on 0.x; ARCH_INDEPENDENT; no install as subproject; option to skip benchmarks | type:build, area:cmake | D5, D6, D14 |
+| M-10 [#10](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/10) | CI: -Werror; fix Clang warnings (MultiArray.h:135, :254); sanitizer job; find_package/FetchContent consumer job | type:build, area:ci, state:reproduced | D4 |
+| M-11 [#11](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/11) | Catch2: SHA pin, FIND_PACKAGE_ARGS for offline builds (cross-ref cppqed E-3) | type:build, area:cmake | D6 |
+| M-12 [#12](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/12) | Small header items (bundle): greedy variadic ctor; zero-extent diagonal; sqrAbs via std::norm; noInit zero-fills; twoTimesImagPartOf docs; internal-linkage ODR | type:bug, severity:S4-low | D13 |
+| M-13 [#13](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/13) | Reconcile the layout docstring (row-major vs first-index-fastest) | type:docs | CLAUDE.md item 2 |
+| M-14 [#14](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/14) | Decide std::mdspan migration vs current architecture (joint decision with cppqed E-7/C-80; affects the paper's API) | type:discussion | CLAUDE.md item 3 |
+| M-19 [#19](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/19) | Prototype: MultiDiagonal on mdspan (Diagonal storage, operator(), composition), validated by the dense-oracle tests and compared in the benchmarks (also an attempt at M-04) | type:enhancement, area:multidiagonal; blocked by M-14 | E-7 |
+| M-15 [#15](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/15) | README usage snippet and blessed construction API (fromStorage/singleDiag vs factory namespace) | type:discussion, docs | CLAUDE.md item 4 |
+| M-16 [#16](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/16) | Install/export review; Boost.Serialization as optional dependency | type:build | CLAUDE.md item 5 |
+| M-17 [#17](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/17) | Give F8–F11 a named test or `[contract]` tag (F1b, F2 and F7 also lack `[contract]`). The F-renaming of the Markdown and the test names is done (2026-10-15) | type:cleanup, area:tests | §1 |
+| M-18 [#18](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/18) | MultiDiagonal JSON is write-only (no value_to) | type:enhancement, area:multidiagonal | D10 |
+| M-20 [#20](https://github.com/WignerQuantumOptics/cppqed-multidiagonal/issues/20) | Doxygen site uses the stock theme: no `HTML_EXTRA_STYLESHEET`/`HTML_HEADER` in the Doxyfile. Adopt Doxygen Awesome (the theme the cppqed developer guide §7.8 recommends), vendored at a pinned release or fetched at a pinned tag in `docs.yml`; check its license | type:docs, area:docs | András, 2026-10-21 (verified in Doxyfile) |
 
 Library renames (children of cppqed E-6, cross-repo): M-01 (headers → `include/multidiagonal/`) and M-17 (finding numbers in test names → F-prefix). If acronym casing (C-72) is adopted, `toStringJSON` in the library's Traits.h changes too.
 
