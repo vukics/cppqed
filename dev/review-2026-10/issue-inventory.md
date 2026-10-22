@@ -86,7 +86,7 @@ Other GitHub dimensions:
 
 ## 3. WignerQuantumOptics/cppqed
 
-Filing in progress (2026-10-22): the epics and the E-1 section are filed; their numbers are linked below. Labels use
+Filing in progress (2026-10-22): the epics, E-1, Master (E-2) and the QJMC/elements physics sections are filed; their numbers are linked below. Labels use
 `area:core/composite` instead of `elements/composite` (Composite.h lives in CPPQEDcore/structure/).
 
 ### Epics (parents)
@@ -129,27 +129,27 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 ### Master (E-2)
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-10 | Port Master.h and Schrödinger.h to the (ha, li, ev[, ex]) API (they reference the deleted QuantumSystemDynamics.h) | type:bug, severity:S2-high, area:core/master, state:reproduced; blocked by M-02 | B4 |
-| C-11 | Master: trailing `conj(m.rho)` conjugates ρ every step | type:physics, severity:S1-critical, area:core/master, state:latent | B3 |
-| C-12 | Mode superoperators use √rate instead of rate | type:physics, severity:S1-critical, area:elements/mode | B5 |
-| C-13 | Driven-qubit Bloch test: Master vs QJMC ensemble vs analytic steady state | type:test, area:core/master | CLAUDE.md |
-| C-14 | Master with a non-unitary U needs interaction-picture-aware superoperators (or restrict to the unitary part, as v2 did). Background: v3dev project card "QuantumSystems should report their picture" (Sch / UIP / IP; quoting it: "Master with no specific superoperator", "Integrating QJMC method can be used only for UIP and Sch") | type:physics, area:core/master, core/propagator | B14 |
+| C-10 [#26](https://github.com/WignerQuantumOptics/cppqed/issues/26) | Port Master.h and Schrödinger.h to the (ha, li, ev[, ex]) API (they reference the deleted QuantumSystemDynamics.h) | type:bug, severity:S2-high, area:core/master, state:reproduced; blocked by M-02 | B4 |
+| C-11 [#27](https://github.com/WignerQuantumOptics/cppqed/issues/27) | Master: trailing `conj(m.rho)` conjugates ρ every step | type:physics, severity:S1-critical, area:core/master, state:latent | B3 |
+| C-12 [#28](https://github.com/WignerQuantumOptics/cppqed/issues/28) | Mode superoperators use √rate instead of rate | type:physics, severity:S1-critical, area:elements/mode | B5 |
+| C-13 [#29](https://github.com/WignerQuantumOptics/cppqed/issues/29) | Driven-qubit Bloch test: Master vs QJMC ensemble vs analytic steady state | type:test, area:core/master | CLAUDE.md |
+| C-14 [#30](https://github.com/WignerQuantumOptics/cppqed/issues/30) | Master with a non-unitary U needs interaction-picture-aware superoperators (or restrict to the unitary part, as v2 did). Background: v3dev project card "QuantumSystems should report their picture" (Sch / UIP / IP; quoting it: "Master with no specific superoperator", "Integrating QJMC method can be used only for UIP and Sch") | type:physics, area:core/master, core/propagator | B14 |
 
 ### QJMC and elements physics (M1)
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-20 | ODE abs/rel tolerances swapped in make_controlled | type:bug, severity:S2-high, area:utils/ode | B1 |
-| C-21 | H_eff misses ½ΣJ†J identity term → thermal mode from vacuum never jumps | type:physics, severity:S1-critical, area:elements/mode, elements/qbit, state:reproduced | B2 |
-| C-22 | Qbit gain channel built with γ_m | type:physics, severity:S2-high, area:elements/qbit | B6 |
-| C-23 | SliceIterator: first slice drops parent offset; reads past end of offsets | type:bug, severity:S1-critical, area:utils/slicing, state:reproduced | B7 |
-| C-24 | Composite rate lambda rank breaks every 3-subsystem QJMC at compile time | type:bug, severity:S2-high, area:elements/composite | B8 |
-| C-25 | Broadcaster offsets assume contiguous strides (cross-rank nesting) | type:bug, severity:S2-high, area:elements/composite | B9 |
-| C-26 | Broadcaster captures leaf descriptors by reference (dangling) | type:bug, severity:S3-medium, area:elements/composite | B10 |
-| C-27 | QJMC does not normalize initial ψ | type:physics, severity:S3-medium, area:core/qjmc | B11 |
-| C-28 | Conventions: qbit::sz sign; Qbit polarization ⟨σ†⟩ vs Mode ⟨a⟩ (bundle) | type:physics, severity:S4-low, area:elements/qbit | B15 |
-| C-29 | Mode gain rate counts the truncation edge | type:physics, severity:S4-low, area:elements/mode | B16 |
-| C-30 | QJMC bisection discards LogTree → no in-trajectory log for dc>1 | type:bug, severity:S4-low, area:core/qjmc | C12 + CLAUDE.md |
-| C-31 | `qbit::make(Pars)` passes δ as the complex frequency: no detuning, no γ_m in H_eff, excited amplitude grows | type:physics, severity:S1-critical, area:elements/qbit | B17 |
+| C-20 [#31](https://github.com/WignerQuantumOptics/cppqed/issues/31) | ODE abs/rel tolerances swapped in make_controlled | type:bug, severity:S2-high, area:utils/ode | B1 |
+| C-21 [#32](https://github.com/WignerQuantumOptics/cppqed/issues/32) | H_eff misses ½ΣJ†J identity term → thermal mode from vacuum never jumps | type:physics, severity:S1-critical, area:elements/mode, elements/qbit, state:reproduced | B2 |
+| C-22 [#33](https://github.com/WignerQuantumOptics/cppqed/issues/33) | Qbit gain channel built with γ_m | type:physics, severity:S2-high, area:elements/qbit | B6 |
+| C-23 [#34](https://github.com/WignerQuantumOptics/cppqed/issues/34) | SliceIterator: first slice drops parent offset; reads past end of offsets | type:bug, severity:S1-critical, area:utils/slicing, state:reproduced | B7 |
+| C-24 [#35](https://github.com/WignerQuantumOptics/cppqed/issues/35) | Composite rate lambda rank breaks every 3-subsystem QJMC at compile time | type:bug, severity:S2-high, area:elements/composite | B8 |
+| C-25 [#36](https://github.com/WignerQuantumOptics/cppqed/issues/36) | Broadcaster offsets assume contiguous strides (cross-rank nesting) | type:bug, severity:S2-high, area:elements/composite | B9 |
+| C-26 [#37](https://github.com/WignerQuantumOptics/cppqed/issues/37) | Broadcaster captures leaf descriptors by reference (dangling) | type:bug, severity:S3-medium, area:elements/composite | B10 |
+| C-27 [#38](https://github.com/WignerQuantumOptics/cppqed/issues/38) | QJMC does not normalize initial ψ | type:physics, severity:S3-medium, area:core/qjmc | B11 |
+| C-28 [#39](https://github.com/WignerQuantumOptics/cppqed/issues/39) | Conventions: qbit::sz sign; Qbit polarization ⟨σ†⟩ vs Mode ⟨a⟩ (bundle) | type:physics, severity:S4-low, area:elements/qbit | B15 |
+| C-29 [#40](https://github.com/WignerQuantumOptics/cppqed/issues/40) | Mode gain rate counts the truncation edge | type:physics, severity:S4-low, area:elements/mode | B16 |
+| C-30 [#41](https://github.com/WignerQuantumOptics/cppqed/issues/41) | QJMC bisection discards LogTree → no in-trajectory log for dc>1 | type:bug, severity:S4-low, area:core/qjmc | C12 + CLAUDE.md |
+| C-31 [#42](https://github.com/WignerQuantumOptics/cppqed/issues/42) | `qbit::make(Pars)` passes δ as the complex frequency: no detuning, no γ_m in H_eff, excited amplitude grows | type:physics, severity:S1-critical, area:elements/qbit | B17 |
 
 ### Cluster-run robustness (E-4)
 | ID | Title | Labels | Src |
