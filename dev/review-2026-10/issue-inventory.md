@@ -86,7 +86,7 @@ Other GitHub dimensions:
 
 ## 3. WignerQuantumOptics/cppqed
 
-Filing in progress (2026-10-22): the epics, E-1, Master (E-2) and the QJMC/elements physics sections are filed; their numbers are linked below. Labels use
+Filing in progress (2026-10-22): the epics, E-1, Master (E-2), QJMC/elements physics, cluster runs (E-4) and build/tests/cleanup are filed; their numbers are linked below. Labels use
 `area:core/composite` instead of `elements/composite` (Composite.h lives in CPPQEDcore/structure/).
 
 ### Epics (parents)
@@ -154,25 +154,25 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 ### Cluster-run robustness (E-4)
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-40 | Continuation silently restarts from t=0 with empty/stale .state | type:bug, severity:S1-critical, area:utils/trajectory, state:reproduced | C1 |
-| C-41 | Unknown command-line options must abort | type:bug, severity:S2-high, area:utils/pars, state:reproduced | C2 |
-| C-42 | Default --dc overrides --Dt/--NDt | type:bug, severity:S3-medium, area:utils/trajectory, state:reproduced | C3 |
-| C-43 | --streamSwitch bit order reversed vs help text | type:bug, severity:S3-medium, area:utils/trajectory | C4 |
-| C-44 | NDt mode not idempotent under continuation | type:bug, severity:S3-medium, area:utils/trajectory | C5 |
-| C-45 | State-file framing: unchecked gcount, checkpoints never flushed | type:bug, severity:S3-medium, area:utils/trajectory, state:needs-repro | C6 |
-| C-46 | ODE edge cases: backward first step → infinite loop; NaN accepted; FSAL guard (bundle) | type:bug, severity:S4-low, area:utils/ode | C11 |
-| C-47 | Pars objects must be non-copyable/non-movable | type:bug, severity:S4-low, area:utils/pars, state:needs-repro | C13 |
+| C-40 [#43](https://github.com/WignerQuantumOptics/cppqed/issues/43) | Continuation silently restarts from t=0 with empty/stale .state | type:bug, severity:S1-critical, area:utils/trajectory, state:reproduced | C1 |
+| C-41 [#44](https://github.com/WignerQuantumOptics/cppqed/issues/44) | Unknown command-line options must abort | type:bug, severity:S2-high, area:utils/pars, state:reproduced | C2 |
+| C-42 [#45](https://github.com/WignerQuantumOptics/cppqed/issues/45) | Default --dc overrides --Dt/--NDt | type:bug, severity:S3-medium, area:utils/trajectory, state:reproduced | C3 |
+| C-43 [#46](https://github.com/WignerQuantumOptics/cppqed/issues/46) | --streamSwitch bit order reversed vs help text | type:bug, severity:S3-medium, area:utils/trajectory | C4 |
+| C-44 [#47](https://github.com/WignerQuantumOptics/cppqed/issues/47) | NDt mode not idempotent under continuation | type:bug, severity:S3-medium, area:utils/trajectory | C5 |
+| C-45 [#48](https://github.com/WignerQuantumOptics/cppqed/issues/48) | State-file framing: unchecked gcount, checkpoints never flushed | type:bug, severity:S3-medium, area:utils/trajectory, state:needs-repro | C6 |
+| C-46 [#49](https://github.com/WignerQuantumOptics/cppqed/issues/49) | ODE edge cases: backward first step → infinite loop; NaN accepted; FSAL guard (bundle) | type:bug, severity:S4-low, area:utils/ode | C11 |
+| C-47 [#50](https://github.com/WignerQuantumOptics/cppqed/issues/50) | Pars objects must be non-copyable/non-movable | type:bug, severity:S4-low, area:utils/pars, state:needs-repro | C13 |
 
 ### Build quality, tests, cleanup
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-50 | ODR violations in headers (defaultLogger, observerNoOp, Mode.h/Qbit.h functions); blocks multi-TU tests | type:bug, severity:S3-medium, area:cmake | C7 |
-| C-51 | Framework test suite (Catch2): Mode, Qbit, JC, Master invariants, QJMC→Master convergence. Source of analytic cases: the physics tests of the C++QEDv2m9-beta package (MultiLevel tests spelled out in `testsuitePhysics/test.sh`, per a v3dev project card) | type:test; blocked by C-50 | CLAUDE.md |
-| C-52 | ~~jc_qjmc.cc~~ (un-ignored and committed 2026-10-20) and benchmarking/ are gitignored | type:build, severity:S2-high | E1 |
-| C-53 | Remove or quarantine dead v2 code (Sigma.h, EntanglementMeasures.h, DistributionFunctions, LazyDensityOperatorFFT, Simulated.h, Profiling.h, Mode_.h, CoupledModes, unused frees/interactions). **Before removing `EntanglementMeasures.h`, decide:** `QuantumTrajectory.h` still includes it, and the v2-era card "Resurrect negativity calculation using Eigen" (plus mutual information) is marked Done; keep and wire up, or delete. Also small modernizations: `FormDouble` (`QuantumTrajectory.h`) → `std::format` (a commented draft is in `Trajectory.h`); should `precision` be unsigned? | type:cleanup, origin:v2-migration | C14 |
-| C-54 | Structure-layer defects (bundle): SparseMatrix offsets/strides + missing throw; Lindblad without rate; NoOp Hamiltonian; LDO ctor ambiguity; EV concept check; 3-arg H sees τ; static-const ODR; TemporalDataPoint label; superoperatorFromJump | type:bug, severity:S3-medium, area:core/structure | C14, C15, A7 |
-| C-55 | Performance bundle: variant-by-value offset cache; checkpoint copies stepper; .state grows unbounded | type:performance, area:utils/trajectory, core/structure | C16 |
-| C-56 | ~~CLAUDE.md and README corrections~~ (done 2026-10-20: E2 in CLAUDE.md, README in f1f20c85; library CLAUDE.md layout, D11, also fixed) and the version-banner correction (E3, still open) | type:docs | E2, E3 |
+| C-50 [#51](https://github.com/WignerQuantumOptics/cppqed/issues/51) | ODR violations in headers (defaultLogger, observerNoOp, Mode.h/Qbit.h functions); blocks multi-TU tests | type:bug, severity:S3-medium, area:cmake | C7 |
+| C-51 [#52](https://github.com/WignerQuantumOptics/cppqed/issues/52) | Framework test suite (Catch2): Mode, Qbit, JC, Master invariants, QJMC→Master convergence. Source of analytic cases: the physics tests of the C++QEDv2m9-beta package (MultiLevel tests spelled out in `testsuitePhysics/test.sh`, per a v3dev project card) | type:test; blocked by C-50 | CLAUDE.md |
+| C-52 [#53](https://github.com/WignerQuantumOptics/cppqed/issues/53) | ~~jc_qjmc.cc~~ (un-ignored and committed 2026-10-20) and benchmarking/ are gitignored | type:build, severity:S2-high | E1 |
+| C-53 [#54](https://github.com/WignerQuantumOptics/cppqed/issues/54) | Remove or quarantine dead v2 code (Sigma.h, EntanglementMeasures.h, DistributionFunctions, LazyDensityOperatorFFT, Simulated.h, Profiling.h, Mode_.h, CoupledModes, unused frees/interactions). **Before removing `EntanglementMeasures.h`, decide:** `QuantumTrajectory.h` still includes it, and the v2-era card "Resurrect negativity calculation using Eigen" (plus mutual information) is marked Done; keep and wire up, or delete. Also small modernizations: `FormDouble` (`QuantumTrajectory.h`) → `std::format` (a commented draft is in `Trajectory.h`); should `precision` be unsigned? | type:cleanup, origin:v2-migration | C14 |
+| C-54 [#55](https://github.com/WignerQuantumOptics/cppqed/issues/55) | Structure-layer defects (bundle): SparseMatrix offsets/strides + missing throw; Lindblad without rate; NoOp Hamiltonian; LDO ctor ambiguity; EV concept check; 3-arg H sees τ; static-const ODR; TemporalDataPoint label; superoperatorFromJump | type:bug, severity:S3-medium, area:core/structure | C14, C15, A7 |
+| C-55 [#56](https://github.com/WignerQuantumOptics/cppqed/issues/56) | Performance bundle: variant-by-value offset cache; checkpoint copies stepper; .state grows unbounded | type:performance, area:utils/trajectory, core/structure | C16 |
+| C-56 (not filed; done) | ~~CLAUDE.md and README corrections~~ (done 2026-10-20: E2 in CLAUDE.md, README in f1f20c85; library CLAUDE.md layout, D11, also fixed) and ~~the version-banner correction~~ (E3, fixed directly 2026-10-22 instead of filing) | type:docs | E2, E3 |
 
 ### Roadmap and known problems (from CLAUDE.md)
 | ID | Title | Labels | Src |
