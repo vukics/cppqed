@@ -86,7 +86,7 @@ Other GitHub dimensions:
 
 ## 3. WignerQuantumOptics/cppqed
 
-Filing in progress (2026-10-22): the epics, E-1, Master (E-2), QJMC/elements physics, cluster runs (E-4) and build/tests/cleanup are filed; their numbers are linked below. Labels use
+Filed 2026-10-22 as #14–#86 (7 epics, 66 issues; C-56 fixed directly, C-75 only a record); their numbers are linked below. Labels use
 `area:core/composite` instead of `elements/composite` (Composite.h lives in CPPQEDcore/structure/).
 
 ### Epics (parents)
@@ -177,38 +177,38 @@ local co-development override, so a custom `MULTIDIAGONAL_LOCAL` variable is red
 ### Roadmap and known problems (from CLAUDE.md)
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-60 | UnaryDiagonalPropagator bodies; propagator composition/broadcast; QJMC propagator hook + interaction-picture reset; wire up Qbit and Mode | type:enhancement, area:core/propagator → M3 | CLAUDE.md, B12, C15 |
-| C-61 | Reinstate QJMC stepwise (needs full H_eff; anti-Hermitian part exactly once; fix `::time`, calculateRates) | type:bug, area:core/qjmc, state:latent → M3 | CLAUDE.md, B13 |
-| C-62 | Reinstate makeEnsemble (dangling average, unnormalized ψ, compile failure, nTraj in stateIO) + RNG stream mapping | type:bug, area:core/qjmc, utils/random, state:latent → M4 | CLAUDE.md, C8, C9 |
-| C-63 | Restore autostop | type:bug, area:utils/trajectory, state:latent → M4 | CLAUDE.md, C10 |
-| C-64 | structure::concatenate fails for non-constexpr args (derive rank from Lindblad::N_RANK) | type:bug, severity:S4-low, area:core/structure | CLAUDE.md, C15 |
-| C-65 | Stubs: compose(), broadcastFor, Placeholder beyond RANK 2, InitializeEnsembleFromArrayOnlyArchive | type:enhancement | CLAUDE.md |
-| C-66 | Motional degree of freedom (Particle/ParticleCavity port) | type:enhancement → M5 | CLAUDE.md |
-| C-67 | Developer guide and tutorials (the operator-list fix in the guide is done, f1f20c85). Doxygen: MathJax physics extension, no class-hierarchy graphs, CMake switch for internal docs (Milestone 13 project card) | type:docs → M6 | CLAUDE.md |
-| C-68 | Discussion: compile-time leading dimensions, OBSERVER concept unification, HDF5 serialization (one issue each) | type:discussion, no milestone | CLAUDE.md |
+| C-60 [#57](https://github.com/WignerQuantumOptics/cppqed/issues/57) | UnaryDiagonalPropagator bodies; propagator composition/broadcast; QJMC propagator hook + interaction-picture reset; wire up Qbit and Mode | type:enhancement, area:core/propagator → M3 | CLAUDE.md, B12, C15 |
+| C-61 [#58](https://github.com/WignerQuantumOptics/cppqed/issues/58) | Reinstate QJMC stepwise (needs full H_eff; anti-Hermitian part exactly once; fix `::time`, calculateRates) | type:bug, area:core/qjmc, state:latent → M3 | CLAUDE.md, B13 |
+| C-62 [#59](https://github.com/WignerQuantumOptics/cppqed/issues/59) | Reinstate makeEnsemble (dangling average, unnormalized ψ, compile failure, nTraj in stateIO) + RNG stream mapping | type:bug, area:core/qjmc, utils/random, state:latent → M4 | CLAUDE.md, C8, C9 |
+| C-63 [#60](https://github.com/WignerQuantumOptics/cppqed/issues/60) | Restore autostop | type:bug, area:utils/trajectory, state:latent → M4 | CLAUDE.md, C10 |
+| C-64 [#61](https://github.com/WignerQuantumOptics/cppqed/issues/61) | structure::concatenate fails for non-constexpr args (derive rank from Lindblad::N_RANK) | type:bug, severity:S4-low, area:core/structure | CLAUDE.md, C15 |
+| C-65 [#62](https://github.com/WignerQuantumOptics/cppqed/issues/62) | Stubs: compose(), broadcastFor, Placeholder beyond RANK 2, InitializeEnsembleFromArrayOnlyArchive | type:enhancement | CLAUDE.md |
+| C-66 [#63](https://github.com/WignerQuantumOptics/cppqed/issues/63) | Motional degree of freedom (Particle/ParticleCavity port) | type:enhancement → M5 | CLAUDE.md |
+| C-67 [#64](https://github.com/WignerQuantumOptics/cppqed/issues/64) | Developer guide and tutorials (the operator-list fix in the guide is done, f1f20c85). Doxygen: MathJax physics extension, no class-hierarchy graphs, CMake switch for internal docs (Milestone 13 project card) | type:docs → M6 | CLAUDE.md |
+| C-68 [#65](https://github.com/WignerQuantumOptics/cppqed/issues/65), [#66](https://github.com/WignerQuantumOptics/cppqed/issues/66), [#67](https://github.com/WignerQuantumOptics/cppqed/issues/67) (filed as three decisions: a leading dimensions, b OBSERVER, c HDF5) | Discussion: compile-time leading dimensions, OBSERVER concept unification, HDF5 serialization (one issue each) | type:discussion, no milestone | CLAUDE.md |
 
 ### Carried over from the v2-era GitHub projects (2026-10-20)
 Source: projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" (dumped 2026-10-20, 115 cards; the rest was done, v2-specific, rejected by the v3 design, or already covered). References are copied from the cards, not verified.
 
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-90 | Benchmarks against QuTiP and QuantumOptics.jl, with and without output; prerequisite for Paper 2 | type:test, origin:v2-migration | #4 (in progress) |
-| C-91 | PRNG study: taus2 / mt19937 / pcg64 / xoshiro256, ensemble and time averages vs the exact Master solution (card's case: driven lossy mode, cutoff 100, n_th 5, κ 1, Δ 5, η 3, T 20); home of the Xoshiro decision and the planned CPC paper on PRNGs in MCWF. Blocked by C-62 and E-2 | type:discussion, area:utils/random, origin:v2-migration | #4 |
-| C-92 | Time averaging along a single trajectory, as an observer (ties to the OBSERVER discussion in C-68); unmerged 2017 local branch `timeAveraging` as reference | type:enhancement, area:utils/trajectory, origin:v2-migration | #4 |
-| C-93 | Steady-state solvers in the QuTiP style (card cites P. D. Nation, arXiv:1504.06768); also a reference for C-13 independent of Master time evolution | type:discussion, origin:v2-migration | #3 |
-| C-94 | Spectrum via the "faster-than-the-clock" algorithm (card cites Quantum, q-2022-02-10-649) | type:discussion, origin:v2-migration | #3 |
-| C-95 | Master integrators that preserve positivity and trace by construction (card cites Cao & Lu, arXiv:2103.01194; also check QTM's methods), instead of fixing Hermiticity and trace by hand after each step | type:discussion, area:core/master, origin:v2-migration | #3, #4 |
-| C-96 | numpy bridge for state files: numpy arrays as initial conditions (`ARRAY_ONLY`), `--sdf` state series into numpy; includes append-vs-replace for state saving and optional cleartext archives for debugging. Child of the serialization issue of C-68 | type:enhancement, area:utils/trajectory, origin:v2-migration | #3, #4 |
+| C-90 [#80](https://github.com/WignerQuantumOptics/cppqed/issues/80) | Benchmarks against QuTiP and QuantumOptics.jl, with and without output; prerequisite for Paper 2 | type:test, origin:v2-migration | #4 (in progress) |
+| C-91 [#81](https://github.com/WignerQuantumOptics/cppqed/issues/81) | PRNG study: taus2 / mt19937 / pcg64 / xoshiro256, ensemble and time averages vs the exact Master solution (card's case: driven lossy mode, cutoff 100, n_th 5, κ 1, Δ 5, η 3, T 20); home of the Xoshiro decision and the planned CPC paper on PRNGs in MCWF. Blocked by C-62 and E-2 | type:discussion, area:utils/random, origin:v2-migration | #4 |
+| C-92 [#82](https://github.com/WignerQuantumOptics/cppqed/issues/82) | Time averaging along a single trajectory, as an observer (ties to the OBSERVER discussion in C-68); unmerged 2017 local branch `timeAveraging` as reference | type:enhancement, area:utils/trajectory, origin:v2-migration | #4 |
+| C-93 [#83](https://github.com/WignerQuantumOptics/cppqed/issues/83) | Steady-state solvers in the QuTiP style (card cites P. D. Nation, arXiv:1504.06768); also a reference for C-13 independent of Master time evolution | type:discussion, origin:v2-migration | #3 |
+| C-94 [#84](https://github.com/WignerQuantumOptics/cppqed/issues/84) | Spectrum via the "faster-than-the-clock" algorithm (card cites Quantum, q-2022-02-10-649) | type:discussion, origin:v2-migration | #3 |
+| C-95 [#85](https://github.com/WignerQuantumOptics/cppqed/issues/85) | Master integrators that preserve positivity and trace by construction (card cites Cao & Lu, arXiv:2103.01194; also check QTM's methods), instead of fixing Hermiticity and trace by hand after each step | type:discussion, area:core/master, origin:v2-migration | #3, #4 |
+| C-96 [#86](https://github.com/WignerQuantumOptics/cppqed/issues/86) | numpy bridge for state files: numpy arrays as initial conditions (`ARRAY_ONLY`), `--sdf` state series into numpy; includes append-vs-replace for state saving and optional cleartext archives for debugging. Child of the serialization issue of C-68 | type:enhancement, area:utils/trajectory, origin:v2-migration | #3, #4 |
 
 ### mdspan migration (epic E-7)
 | ID | Title | Labels | Src |
 |---|---|---|---|
-| C-80 | Decision record: mdspan vs own MultiArrayView; consequences for the library paper (joint with M-14) | type:discussion | library CLAUDE.md item 3 |
-| C-81 | Add the mdspan dependency: Kokkos reference implementation via FetchContent, behind a `cppqed::mdspan` namespace alias, switching to `std::` when `__cpp_lib_mdspan` is defined | type:build, area:cmake | E-7 |
-| C-82 | View aliases: `StateVectorView<R>` etc. become mdspan aliases (layout_left for owners, layout_stride for slices); replace `operator()` indexing with `[]`; Debug bounds checks via a checking accessor policy | type:refactor, area:core/quantumdata | E-7 |
-| C-83 | Thin owning array (vector + mapping, move-only, `.view()`, Boost.Serialization + JSON) replacing MultiArray | type:refactor, area:core/quantumdata | E-7 |
-| C-84 | Retained-axes slicing (SliceIterator, sliceRange, partialTrace, Broadcaster) rebuilt on submdspan; this structurally removes the C-23/C-25 class of bugs | type:refactor, area:utils/slicing, elements/composite | E-7, B7, B9 |
-| C-85 | Follow-up: partly static extents (e.g. `extents<size_t,2,dynamic_extent>` for a qubit⊗mode system) realize "compile-time leading subsystem dimensions" (C-68) | type:enhancement | E-7, C-68 |
+| C-80 [#74](https://github.com/WignerQuantumOptics/cppqed/issues/74) | Decision record: mdspan vs own MultiArrayView; consequences for the library paper (joint with M-14) | type:discussion | library CLAUDE.md item 3 |
+| C-81 [#75](https://github.com/WignerQuantumOptics/cppqed/issues/75) | Add the mdspan dependency: Kokkos reference implementation via FetchContent, behind a `cppqed::mdspan` namespace alias, switching to `std::` when `__cpp_lib_mdspan` is defined | type:build, area:cmake | E-7 |
+| C-82 [#76](https://github.com/WignerQuantumOptics/cppqed/issues/76) | View aliases: `StateVectorView<R>` etc. become mdspan aliases (layout_left for owners, layout_stride for slices); replace `operator()` indexing with `[]`; Debug bounds checks via a checking accessor policy | type:refactor, area:core/quantumdata | E-7 |
+| C-83 [#77](https://github.com/WignerQuantumOptics/cppqed/issues/77) | Thin owning array (vector + mapping, move-only, `.view()`, Boost.Serialization + JSON) replacing MultiArray | type:refactor, area:core/quantumdata | E-7 |
+| C-84 [#78](https://github.com/WignerQuantumOptics/cppqed/issues/78) | Retained-axes slicing (SliceIterator, sliceRange, partialTrace, Broadcaster) rebuilt on submdspan; this structurally removes the C-23/C-25 class of bugs | type:refactor, area:utils/slicing, elements/composite | E-7, B7, B9 |
+| C-85 [#79](https://github.com/WignerQuantumOptics/cppqed/issues/79) | Follow-up: partly static extents (e.g. `extents<size_t,2,dynamic_extent>` for a qubit⊗mode system) realize "compile-time leading subsystem dimensions" (C-68) | type:enhancement | E-7, C-68 |
 
 ### Renames (epic E-6)
 - **E-6 [#19](https://github.com/WignerQuantumOptics/cppqed/issues/19) Planned renames.** Children: C-70…C-76, plus M-01 and M-17 in the library. [type:refactor]
@@ -218,13 +218,13 @@ Source: projects #3 "C++QED v3dev" and #4 "C++QED Milestone 13" (dumped 2026-10-
 
 | ID | Title | Labels | Scope today | Src |
 |---|---|---|---|---|
-| C-70 | Rename `structure/` → `quantumdynamics/` (directory, namespace `structure`, CMake target `CPPQEDcore_structure`, docs) | type:refactor, area:core/structure → M0 | 130 lines in 46 files | CLAUDE.md |
-| C-71 | Rename Free → SubSystem: `CPPQEDelements/frees/` → `subsystems/`, target `CPPQEDelements_frees`, docs and comments. The remaining `Free`/`FreeExact` references are in dead v2 code (goes with C-53) | type:refactor, area:elements/* → M0 | directory + 2 CMake files; ~22 textual hits, all in v2 leftovers | CLAUDE.md |
-| C-72 | Acronym casing (capitalize first letter only: `Ode`, `Tdp`, `Ldo`, `Qjmc`, `Qsd`, `Ev`, `Json`): decide scope and timing | type:discussion → no milestone | ≈265 identifier occurrences in cppqed (ODE 94, EV 53, TDP 35, JSON 34, LDO 22, QSD 21, QJMC 6); in the library, `toStringJSON` sits in the shared Traits.h, so this is cross-repo | CLAUDE.md (both) |
-| C-73 | Rename the framework `Traits.h` (e.g. `FrameworkTraits.h`) so it can never be confused with `<multidiagonal/Traits.h>` | type:refactor, origin:split → M0 | every header that includes "Traits.h" | A3 / C-02 |
-| C-74 | Align the reference executable's name and location: `dockerEntry/jc_qjmc.cc` vs `JaynesCummingsQJMC.cc` in CLAUDE.md; consider `dockerEntry/` → `examples/` (do together with C-52, un-ignoring it) | type:refactor, area:cmake → M0 | 1 file, 1 CMake glob | E1, E2 |
-| C-75 | Ledger renamed to F1, F1b, F2…F11 in all Markdown (done 2026-10-15); test names renamed as well; the remaining work is in M-17. Listed here only for the record | type:cleanup | cppqed CLAUDE.md | §1 |
-| C-76 | Rename `qbit` → `qubit` (namespace, files, option suffixes in examples, docs); cosmetic | type:refactor, area:elements/qbit, origin:v2-migration | namespace + 2 files + docs | v3dev project card |
+| C-70 [#68](https://github.com/WignerQuantumOptics/cppqed/issues/68) | Rename `structure/` → `quantumdynamics/` (directory, namespace `structure`, CMake target `CPPQEDcore_structure`, docs) | type:refactor, area:core/structure → M0 | 130 lines in 46 files | CLAUDE.md |
+| C-71 [#69](https://github.com/WignerQuantumOptics/cppqed/issues/69) | Rename Free → SubSystem: `CPPQEDelements/frees/` → `subsystems/`, target `CPPQEDelements_frees`, docs and comments. The remaining `Free`/`FreeExact` references are in dead v2 code (goes with C-53) | type:refactor, area:elements/* → M0 | directory + 2 CMake files; ~22 textual hits, all in v2 leftovers | CLAUDE.md |
+| C-72 [#70](https://github.com/WignerQuantumOptics/cppqed/issues/70) | Acronym casing (capitalize first letter only: `Ode`, `Tdp`, `Ldo`, `Qjmc`, `Qsd`, `Ev`, `Json`): decide scope and timing | type:discussion → no milestone | ≈265 identifier occurrences in cppqed (ODE 94, EV 53, TDP 35, JSON 34, LDO 22, QSD 21, QJMC 6); in the library, `toStringJSON` sits in the shared Traits.h, so this is cross-repo | CLAUDE.md (both) |
+| C-73 [#71](https://github.com/WignerQuantumOptics/cppqed/issues/71) | Rename the framework `Traits.h` (e.g. `FrameworkTraits.h`) so it can never be confused with `<multidiagonal/Traits.h>` | type:refactor, origin:split → M0 | every header that includes "Traits.h" | A3 / C-02 |
+| C-74 [#72](https://github.com/WignerQuantumOptics/cppqed/issues/72) | Align the reference executable's name and location: `dockerEntry/jc_qjmc.cc` vs `JaynesCummingsQJMC.cc` in CLAUDE.md; consider `dockerEntry/` → `examples/` (do together with C-52, un-ignoring it) | type:refactor, area:cmake → M0 | 1 file, 1 CMake glob | E1, E2 |
+| C-75 (not filed; record only) | Ledger renamed to F1, F1b, F2…F11 in all Markdown (done 2026-10-15); test names renamed as well; the remaining work is in M-17. Listed here only for the record | type:cleanup | cppqed CLAUDE.md | §1 |
+| C-76 [#73](https://github.com/WignerQuantumOptics/cppqed/issues/73) | Rename `qbit` → `qubit` (namespace, files, option suffixes in examples, docs); cosmetic | type:refactor, area:elements/qbit, origin:v2-migration | namespace + 2 files + docs | v3dev project card |
 
 ---
 
