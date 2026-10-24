@@ -227,7 +227,7 @@ private:
 };
 
 
-auto observerNoOp = [] (const auto&) {};
+inline auto observerNoOp = [] (const auto&) {};
 
 
 template<temporal_data_point TDP>

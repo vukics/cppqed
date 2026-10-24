@@ -14,11 +14,11 @@ namespace qbit {
 
 using namespace ::quantumdynamics;
 
-auto diagonalH(dcomp z) { return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(1)-=z*psi(1);}; }
+inline auto diagonalH(dcomp z) { return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(1)-=z*psi(1);}; }
 
-auto offDiagonalH(dcomp eta) { return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(0)+=-conj(eta)*psi(1); dpsidt(1)+=eta*psi(0);}; }
+inline auto offDiagonalH(dcomp eta) { return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(0)+=-conj(eta)*psi(1); dpsidt(1)+=eta*psi(0);}; }
 
-auto fullH(dcomp z, dcomp eta) { return [diag=diagonalH(z),offDiag=offDiagonalH(eta)] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {
+inline auto fullH(dcomp z, dcomp eta) { return [diag=diagonalH(z),offDiag=offDiagonalH(eta)] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {
   diag(psi,dpsidt); offDiag(psi,dpsidt);
 };}
 
@@ -41,8 +41,8 @@ TimeIndependentRate<1> sigmaRate(double gamma_m);
 TimeIndependentRate<1> sigmaPlusRate(double gamma_p);
 /*TimeIndependentRate<1> sigma_zRate(double gamma_p);*/
 
-Lindblad<1> loss(double gamma_m) {return {"loss", sigmaJump(gamma_m), sigmaRate(gamma_m), sigmaSuperoperator(gamma_m)};}
-Lindblad<1> gain(double gamma_p) {return {"gain", sigmaPlusJump(gamma_p), sigmaPlusRate(gamma_p), sigmaPlusSuperoperator(gamma_p)};}
+inline Lindblad<1> loss(double gamma_m) {return {"loss", sigmaJump(gamma_m), sigmaRate(gamma_m), sigmaSuperoperator(gamma_m)};}
+inline Lindblad<1> gain(double gamma_p) {return {"gain", sigmaPlusJump(gamma_p), sigmaPlusRate(gamma_p), sigmaPlusSuperoperator(gamma_p)};}
 // Lindblad<1> dephasing(double gamma_phi) {return {"dephasing", sigma_zJump(gamma_phi), sigma_zRate(gamma_phi), sigma_zSuperoperator(gamma_phi)};}
 
 
@@ -52,7 +52,7 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 };
 
 
-auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/, const json::object& descr)
+inline auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*, double gamma_phi*/, const json::object& descr)
 {
   Liouvillian<1> liouvillian;
 
@@ -64,7 +64,7 @@ auto make(dcomp zSch/*, dcomp zI*/, dcomp eta, double gamma_m, double gamma_p/*,
 }
 
 
-auto make(double delta, dcomp eta, double gamma_m, double gamma_p, const json::object& descr)
+inline auto make(double delta, dcomp eta, double gamma_m, double gamma_p, const json::object& descr)
 {
   return make(dcomp{gamma_m-gamma_p,-delta},eta,gamma_m,gamma_p,descr);
 }
@@ -97,7 +97,7 @@ StateVector<1> init(dcomp psi1);
 inline StateVector<1> init(const Pars& p) {return init(p.init);}
 
 
-auto make(const Pars& p)
+inline auto make(const Pars& p)
 {
   return make(p.delta,p.eta,p.gamma_m,p.gamma_p,p.jsonize());
 }

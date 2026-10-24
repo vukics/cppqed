@@ -209,8 +209,20 @@ Later or under discussion, so **don't start these unasked**:
 
 ## Testing
 
-The framework-level suite is thin. Prefer Catch2 v3, as the library does. Test physics
-against analytic results:
+`ctest --test-dir build` runs everything; CI runs it on every push.
+- `tests/unit/` (target `cppqedTests`, Catch2 v3 as in the library, SHA-pinned):
+  - dense-matrix checks of the subsystem operators
+  - `testHeaders.cc`, compiled twice as two translation units, so a non-inline
+    definition in a framework header fails the link (#51). Keep framework headers
+    ODR-clean: `inline` or templates only.
+- `tests/regression/`: `jc_qjmc` against a stored reference (`compareTrajectory.py`).
+  Regenerate the reference only for an intended change of results, and say so in the
+  commit message.
+- Findings ledger: new findings get a GitHub issue; cite `#N` in the test name and the
+  commit message. `[!mayfail]` marks a test that documents an open issue, and goes when
+  the fix lands.
+
+The framework-level suite is still thin. Test physics against analytic results:
 - Mode: coherent-state evolution, thermal state
 - Qbit: Rabi oscillations
 - Jaynes–Cummings: vacuum Rabi splitting

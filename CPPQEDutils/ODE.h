@@ -114,7 +114,7 @@ struct SerializeControlledErrorStepper
 
 
 /// \note These cannot be unsigned because after serialization, they will not be parsed as such, so the as_uint64 will throw
-LogTree defaultLogger()
+inline LogTree defaultLogger()
 {
   return {{"nSteps",0z},{"nFailedSteps",0z},{"nDerivsCalls",0z}};
 }

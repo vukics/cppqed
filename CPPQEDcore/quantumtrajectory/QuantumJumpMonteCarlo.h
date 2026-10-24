@@ -59,7 +59,7 @@ struct Pars<Algorithm::integrating,RandomEngine> : public ParsBase<RandomEngine>
 };
 
 
-LogTree defaultLogger()
+inline LogTree defaultLogger()
 {
   return {{"Jump trajectory",json::array{}}};
 }

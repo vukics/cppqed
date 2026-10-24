@@ -24,7 +24,7 @@ MultiDiagonal aDagOp(size_t cutoff);
 MultiDiagonal nOp(size_t cutoff);
 
 
-double photonnumber(StateVectorConstView<1> psi)
+inline double photonnumber(StateVectorConstView<1> psi)
 {
   double res=0;
   for (size_t n=0; n<psi.extents[0]; ++n) res+=n*sqrAbs(psi(n));
@@ -32,7 +32,7 @@ double photonnumber(StateVectorConstView<1> psi)
 }
 
 
-auto hamiltonian(size_t cutoff, dcomp z, double omegaKerr, dcomp eta)
+inline auto hamiltonian(size_t cutoff, dcomp z, double omegaKerr, dcomp eta)
 {
   MultiDiagonal ham, a{aOp(cutoff)}, aDag{aDagOp(cutoff)};
 
@@ -43,7 +43,7 @@ auto hamiltonian(size_t cutoff, dcomp z, double omegaKerr, dcomp eta)
   return ham;
 }
 
-auto hamiltonian(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
+inline auto hamiltonian(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh)
 {
   return hamiltonian(cutoff,
                      {kappa*(2*nTh+1),-delta},
@@ -74,7 +74,7 @@ static constexpr auto expectationValues = [] (lazy_density_operator<1> auto rho)
 };
 
 
-auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh, json::object descr)
+inline auto make(size_t cutoff, double delta, double omegaKerr, dcomp eta, double kappa, double nTh, json::object descr)
 {
   Liouvillian<1> liouvillian;
 
@@ -118,7 +118,7 @@ struct Pars : ::parameters::JSONizable
 };
 
 
-auto make(const Pars& p)
+inline auto make(const Pars& p)
 {
   return make(p.cutoff,p.delta,p.omegaKerr,p.eta,p.kappa,p.nTh,p.jsonize());
 }

@@ -69,6 +69,7 @@ jobs:
             -DFETCHCONTENT_SOURCE_DIR_CPPQED-MULTIDIAGONAL=$S/cppqed-multidiagonal-src \
             -DFETCHCONTENT_SOURCE_DIR_POPL=$S/popl-src \
             -DFETCHCONTENT_SOURCE_DIR_PCG-CPP=$S/pcg-cpp-src \
-            -DFETCHCONTENT_SOURCE_DIR_XOSHIRO-CPP=$S/xoshiro-cpp-src
+            -DFETCHCONTENT_SOURCE_DIR_XOSHIRO-CPP=$S/xoshiro-cpp-src \
+            -DFETCHCONTENT_SOURCE_DIR_CATCH2=$S/catch2-src
           cmake --build build
           ctest --test-dir build --output-on-failure
