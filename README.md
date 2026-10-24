@@ -1,5 +1,7 @@
 # C++QED v3
 
+[![CI](https://github.com/WignerQuantumOptics/cppqed/actions/workflows/ci.yml/badge.svg)](https://github.com/WignerQuantumOptics/cppqed/actions/workflows/ci.yml)
+
 **A C++20 framework for high-performance simulation of open quantum dynamics**
 
 C++QED is a framework for simulating open quantum systems — master equations and quantum-jump Monte Carlo (QJMC) trajectories — targeting production-scale runs on HPC/HTC clusters. It is the successor to C++QED v2, rewritten in a modern C++20 functional style while preserving the core performance principle: **compile-time resolution of the full tensor-product structure of the Hilbert space**.

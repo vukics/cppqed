@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [g++-13, g++-14, clang++-18]
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          submodules: recursive
+
+      # system Boost and Eigen only, as on the cluster compute nodes (no network there)
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libboost-all-dev libeigen3-dev g++-13 g++-14 clang-18
+
+      - name: Configure
+        run: >
+          cmake -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+
+      - name: Build
+        run: cmake --build build
+
+      # vacuum Rabi oscillation with one photon, decay on: exercises Hamiltonian, jumps and output
+      - name: jc_qjmc smoke run
+        run: |
+          ./build/dockerEntry/jc_qjmc --T 1 --initFockm 1 --deltaq 0 --deltam 0 --kappam 1 --gamma_mq 1 > smoke.txt
+          cat smoke.txt
+          grep -q '^# OUTRO: ' smoke.txt
