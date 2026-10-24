@@ -9,7 +9,7 @@ using namespace std;
 
 string versionHelper()
 {
-  return "C++QEDv3 : a framework for simulating open quantum dynamics\nCopyright András Vukics 2006–2026. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)\nhttp://github.com/vukics/cppqed\ncommit# " +
+  return "C++QEDv3 : a framework for simulating open quantum dynamics\nCopyright András Vukics 2006–2026. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)\nhttps://github.com/WignerQuantumOptics/cppqed\ncommit# " +
          string(cppqed_GIT_SHA1) +
 #ifndef NDEBUG
          "\nDEBUG build" +
