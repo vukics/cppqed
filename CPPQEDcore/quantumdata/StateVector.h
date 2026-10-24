@@ -2,7 +2,7 @@
 /// \briefFileDefault
 #pragma once
 
-#include "MultiArrayComplex.h"
+#include <multidiagonal/MultiArrayComplex.h>
 
 
 namespace quantumdata {

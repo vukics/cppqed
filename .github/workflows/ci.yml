@@ -18,10 +18,8 @@ jobs:
         build_type: [Debug, Release]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with:
-          submodules: recursive
 
-      # system Boost and Eigen only, as on the cluster compute nodes (no network there)
+      # system Boost and Eigen, as on the cluster; the source dependencies come via FetchContent
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -45,3 +43,32 @@ jobs:
           ./build/examples/jc_qjmc --T 1 --initFockm 1 --deltaq 0 --deltam 0 --kappam 1 --gamma_mq 1 > smoke.txt
           cat smoke.txt
           grep -q '^# OUTRO: ' smoke.txt
+
+  # The cluster compute nodes have no network: a build from local copies of the fetched
+  # sources, fully disconnected, must keep working (see README, Building).
+  offline:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libboost-all-dev libeigen3-dev g++-13
+
+      - name: Fetch the sources once, then copy them
+        run: |
+          cmake -B fetch -G Ninja -DCMAKE_CXX_COMPILER=g++-13 -DCMAKE_BUILD_TYPE=Release
+          mkdir sources && cp -r fetch/_deps/*-src sources/
+
+      - name: Configure and build fully disconnected
+        run: |
+          S=$PWD/sources
+          cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=g++-13 -DCMAKE_BUILD_TYPE=Release \
+            -DFETCHCONTENT_FULLY_DISCONNECTED=ON \
+            -DFETCHCONTENT_SOURCE_DIR_CPPQED-MULTIDIAGONAL=$S/cppqed-multidiagonal-src \
+            -DFETCHCONTENT_SOURCE_DIR_POPL=$S/popl-src \
+            -DFETCHCONTENT_SOURCE_DIR_PCG-CPP=$S/pcg-cpp-src \
+            -DFETCHCONTENT_SOURCE_DIR_XOSHIRO-CPP=$S/xoshiro-cpp-src
+          cmake --build build
+          ctest --test-dir build --output-on-failure

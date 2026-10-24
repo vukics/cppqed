@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ExactPropagator.h"
+#include "FrameworkTraits.h"
 #include "Hamiltonian.h"
 
 #include "LazyDensityOperator.h"

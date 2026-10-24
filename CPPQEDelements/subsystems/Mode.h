@@ -4,7 +4,7 @@
 #include "ExpectationValues.h"
 #include "Liouvillian.h"
 
-#include "MultiDiagonal.h"
+#include <multidiagonal/MultiDiagonal.h>
 
 #include "Pars.h"
 

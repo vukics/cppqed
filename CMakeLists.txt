@@ -1,7 +1,7 @@
 # Copyright Raimar Sandner 2012–2020.
 # Copyright András Vukics 2020–2026. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 
-cmake_minimum_required (VERSION 3.21)
+cmake_minimum_required (VERSION 3.24) # as cppqed-multidiagonal
 
 # ### Version management
 #

@@ -2,7 +2,11 @@
 #pragma once
 
 
-#include "MultiArray.h"
+#include "FrameworkTraits.h"
+
+#include <multidiagonal/MultiArray.h>
+
+#include <boost/operators.hpp>
 
 
 

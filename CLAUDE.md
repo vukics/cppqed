@@ -16,37 +16,37 @@ License: BSL-1.0. Developer Guide: `docs/`, published at https://wignerquantumop
 
 ## Repository relationships
 
-- **The array and operator foundations are being split out into a separate repo,
-  `cppqed-multidiagonal`.** The library holds `Traits.h`, `MultiArray.h`,
-  `MultiArrayComplex.h`, and `MultiDiagonal.h`. The switch-over (epic E-1) is not done yet:
-  - This repo still builds against its own stale in-tree copies (`CPPQEDutils/Traits.h`,
-    `MultiArray.h`, `MultiArrayComplex.h`; `CPPQEDcore/quantumoperator/MultiDiagonal.h/.cc`).
-  - Changes to those foundations go to the **library**, not to the in-tree copies. If a
-    task needs one, stop and say so.
+- **The array and operator foundations live in a separate repo, `cppqed-multidiagonal`**
+  (`Traits.h`, `MultiArray.h`, `MultiArrayComplex.h`, `MultiDiagonal.h`), included as
+  `<multidiagonal/X.h>`. The switch-over (epic E-1) was done in 2026-10.
+  - Changes to those foundations go to the **library**. If a task needs one, stop and say
+    so. That repo has its own CLAUDE.md.
+  - `CPPQEDutils/FrameworkTraits.h` holds only framework extras on top of
+    `<multidiagonal/Traits.h>`. Never duplicate symbols that the library already defines
+    (`passByValue_v`, `ReferenceMF`, …). Include it directly where its symbols are used.
   - `SliceIterator.h` exists only here, in `CPPQEDutils/`; where it ends up is open (C-04).
-  - That repo has its own CLAUDE.md.
-- After the switch, this repo's `Traits.h` holds only framework extras on top of
-  `<multidiagonal/Traits.h>`. Never duplicate symbols that the library already defines
-  (`passByValue_v`, `ReferenceMF`, …).
-- Dependencies today are **git submodules** under `CPPQEDutils/thirdParty/`: forks of popl,
-  pcg-cpp, and Xoshiro-cpp. Clone with `--recurse-submodules`.
-  - Planned (C-07, C-01): FetchContent pinned to **full commit SHAs** of the upstream repos
-    and of cppqed-multidiagonal, plus `-DMULTIDIAGONAL_LOCAL=<path>` for co-development
-    against a sibling checkout. Neither exists yet.
+- Source dependencies come through **FetchContent pinned to full commit SHAs**
+  (`CPPQEDutils/CMakeLists.txt`): cppqed-multidiagonal, and the upstream popl, pcg-cpp and
+  Xoshiro-cpp. There are no submodules any more.
+  - An installed cppqed-multidiagonal ≥ 0.3 is preferred when found (`FIND_PACKAGE_ARGS`).
+  - Co-development against a sibling checkout:
+    `-DFETCHCONTENT_SOURCE_DIR_CPPQED-MULTIDIAGONAL=../cppqed-multidiagonal`.
+  - Bumping a pin: update the SHA (and its date comment); the jc_qjmc regression test
+    must still pass.
 - Cluster compute nodes have no outbound network, so builds there must work offline with
-  system Boost and Eigen (with FetchContent: `FETCHCONTENT_FULLY_DISCONNECTED=ON`). Don't
-  introduce dependencies that break offline builds.
+  system Boost and Eigen: `FETCHCONTENT_FULLY_DISCONNECTED=ON` plus
+  `FETCHCONTENT_SOURCE_DIR_<NAME>` for each dependency, pointing at copies of `_deps/*-src`
+  from a configured build. Don't introduce dependencies that break offline builds.
 
 ## Layout
 
 ```
 CPPQEDutils/      physics-agnostic scaffolding: ODE.h (Boost.Odeint, RKCK54), Trajectory.h (run()),
                   StochasticTrajectory.h (Ensemble, AverageTrajectories), Pars.h (popl + JSON), Random.h,
-                  SliceIterator.h; in-tree copies of MultiArray*.h and Traits.h (until E-1)
-  thirdParty/     git submodules: popl, pcg-cpp, Xoshiro-cpp
+                  SliceIterator.h, FrameworkTraits.h
 CPPQEDcore/
   quantumdata/        StateVector, DensityOperator, LazyDensityOperator (LDO)
-  quantumoperator/    MultiDiagonal (in-tree copy until E-1), SparseMatrix
+  quantumoperator/    SparseMatrix (MultiDiagonal comes from the library)
   quantumtrajectory/  QuantumTrajectory.h, Master.h, QuantumJumpMonteCarlo.h — header-only
   quantumdynamics/    Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues,
                       Composite.h (Broadcaster); namespace quantumdynamics
@@ -149,8 +149,9 @@ Finding IDs (B…) refer to `dev/review-2026-10/findings.md`.
   `QuantumSystemDynamics.h`, `getHa/getLi/getEx`, `hamiltonian_ns::broadcast`. Nothing
   includes them, so the build doesn't notice (B4). Port Master to the `(ha, li, ev[, ex])`
   API that QJMC uses.
-- Once it compiles, four known defects each corrupt it independently:
-  - library finding F5 (`twoTimesRealPartOfSelf` quadrupled the diagonal)
+- Once it compiles, three known defects each corrupt it independently (a fourth, library
+  finding F5, `twoTimesRealPartOfSelf` quadrupling the diagonal, arrived fixed with the
+  switch to the library):
   - B3: `conj(m.rho)` after every step
   - B5: Mode superoperators get √rate instead of rate
   - B7: the `SliceIterator` first-slice offset

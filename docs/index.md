@@ -256,36 +256,29 @@ struct LDO : MultiArrayConstView<dcomp, multiArrayRank_v<TAG<RANK>>>
 
 `partialTrace`: for `StateVector`, slices over dummy axes of the rank-R array. For `DensityOperator`, uses `extendedAxes` to slice only the diagonal in the dummy indices. Both accumulate via `fold_left_first` over a transformed `sliceRange`. Laziness is resolved entirely at compile time — no virtual dispatch, no type erasure.
 
-### 4.3 quantumoperator: MultiDiagonal.h / MultiDiagonal.cc
+### 4.3 quantumoperator: MultiDiagonal (from cppqed-multidiagonal)
 
-`MultiDiagonal<RANK>` is a sparse matrix representation storing an arbitrary set of diagonals, designed to replace the v2 `Tridiagonal` class. The key design motivation: `Tridiagonal` is not closed under composition (product of two tridiagonals is pentadiagonal in general), whereas `MultiDiagonal` is closed — composition produces new diagonals at all pairwise sums of offsets.
+`MultiDiagonal<RANK>` comes from the standalone library [cppqed-multidiagonal](https://github.com/WignerQuantumOptics/cppqed-multidiagonal), included as `<multidiagonal/MultiDiagonal.h>` and fetched at a pinned commit (§9). It is a sparse matrix representation storing an arbitrary set of diagonals, designed to replace the v2 `Tridiagonal` class. The key design motivation: `Tridiagonal` is not closed under composition (product of two tridiagonals is pentadiagonal in general), whereas `MultiDiagonal` is closed — composition produces new diagonals at all pairwise sums of offsets.
 
 Data structure:
 
 ```cpp
-using Index    = std::bitset<RANK>;        // true=upper (or main), false=lower, per axis
-using Offsets  = Extents<RANK>;            // distance from main diagonal per axis
-using Diagonal = MultiArray<dcomp,RANK>;   // the actual diagonal values
-using Diagonals = unordered_map<Index, map<Offsets, Diagonal>>;
+using Offsets  = std::array<ptrdiff_t,RANK>;  // signed offset per axis: + upper, − lower, 0 main
+using Diagonal = MultiArray<dcomp,RANK>;      // the actual diagonal values
+std::map<Offsets, Diagonal> diagonals;        // ordered: deterministic accumulation order
 ```
 
-The two-level map groups diagonals first by direction pattern (`Index` bitset), then by magnitude (`Offsets`). A single diagonal in a rank-R operator is fully characterized by its direction (upper/lower per axis) and its offset magnitude per axis.
+The key of a diagonal is the number of quanta it moves along each axis. A diagonal at offset $d$ on an axis of dimension $N$ has length $N-|d|$ along that axis, stored as `d[k] = A(k+d⁻, k+d⁺)`. Subsystem operators are built directly into the map, e.g. `res.diagonals.emplace(Offsets{+1}, multiarray::fromStorage(v))` for the ladder operator $a$; σ⁺ = |1⟩⟨0| is the **lower** diagonal, `Offsets{-1}`.
 
 Operations:
-- `operator()` — application as Hamiltonian: `dpsidt(idxLHS) += diag(idxDiag)*psi(idxRHS)`, iterating over each diagonal's valid index range
-- `operator*` — direct product: concatenates `Index` bitsets and `Offsets` arrays, takes `directProduct` of `Diagonal` arrays
-- `operator|` — composition (rank-1 only, in `.cc`): four cases based on upper/lower combination; result offset is sum or difference of input offsets
+- `operator()` — application with accumulate semantics: `dpsidt += A psi`, iterating over each diagonal's valid index range
+- `operator*` — direct product: concatenates the `Offsets` arrays, takes `directProduct` of the `Diagonal` arrays
+- `operator|` — composition, rank-general: offsets add per axis; colliding offset pairs accumulate into the same diagonal
 - `operator+=` / `-=` — addition: new diagonals may appear; existing ones accumulate element-wise
-- `hermitianConjugate()` — flips `Index` bits for nonzero offsets, conjugates diagonal values
+- `hermitianConjugate()` — negates all offsets and conjugates the diagonal values
 - `twoTimesRealPartOf` / `twoTimesImagPartOf` — Hermitian/anti-Hermitian combinations
 - `multidiagonal::identity(dim)` — constructs identity operator
 - `calculateAndCheckDimensions` — derives and validates Hilbert space dimension from diagonal extents+offsets
-
-**Design improvement under consideration:** `Index` (bitset) + `Offsets` (`size_t` array) should be replaced by a single `std::array<ptrdiff_t,RANK>` of signed offsets. Positive = upper, negative = lower, zero = main diagonal. Benefits:
-- Eliminates the two-level map, simplifying to a single `map<SignedOffsets,Diagonal>`
-- Composition arithmetic becomes `signedOffset_result = signedOffset_a + signedOffset_b` — no case analysis
-- `hermitianConjugate()` becomes simple negation of all offsets
-- `std::map` with `std::array<ptrdiff_t,RANK>` has lexicographic comparison out of the box — no custom hash needed
 
 **Design decision: `MultiDiagonal` carries no frequency information.**
 
@@ -764,7 +757,6 @@ int main(int argc, const char* argv[])
 
 ### 7.1 Known Bugs
 
-- **`MultiArray::load()`** (Boost.Serialization): after deserializing `data_` into a freshly allocated vector, `dataView` is not re-seated to point to the new buffer — dangling span. `std::vector` move construction does **not** have this problem; the bug is specific to `load()`.
 - **`AutostopHandlerGeneric`** in `Trajectory.h`: uses `std::ranges::fill`, arithmetic, and `abs()` directly on `TDP` — assumes `TDP` is a homogeneous numeric range like `std::valarray<dcomp>`. Broken when `TDP` is a Hana tuple of labelled `slv_ns::_` values (the current representation). This is a half-finished update: the TDP type was upgraded from `std::valarray` to a labelled Hana tuple, but `AutostopHandlerGeneric` was not updated to match. Workaround: pass `observerNoOp` explicitly to `run()`. Fix: either make `AutostopHandlerGeneric` work with Hana tuples via `hana::for_each`, or flatten TDP to `std::valarray<double>` before passing to it.
 - **`quantumtrajectory::run` default observer**: the default argument `AH&& observer = trajectory::observerNoOp` is dead code — C++ template deduction does not consider default arguments, so `AH` cannot be deduced and the caller must always pass the observer explicitly. The default should be removed to avoid confusion.
 
@@ -790,7 +782,6 @@ int main(int argc, const char* argv[])
 - `MultiIndexRange` as a proper `std::ranges::range`
 - Unification of observer/streamer/state concerns in `Trajectory.h` into a single `OBSERVER` concept
 - JSON interface to numpy (may make some Boost.Serialization `Read/WriteState` machinery redundant)
-- `MultiDiagonal`: replace `Index` (bitset) + `Offsets` (`size_t` array) with `std::array<ptrdiff_t,RANK>` signed offsets — eliminates two-level map, simplifies composition arithmetic and Hermitian conjugation
 - `Sigma` sparse type for two-level operators, leaner than `MultiDiagonal<1>` for `Qbit`
 - Compile-time leading dimensions for `StateVector` / `DensityOperator` — see section 10
 
@@ -950,7 +941,6 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 ### 9.1 CPPQEDutils
 | File | Description |
 |---|---|
-| `MultiArray.h` | Core strided array abstraction |
 | `SliceIterator.h` | Compile-time axis slicing and partial trace machinery |
 | `ODE.h` | Adaptive ODE engine (Boost.Odeint wrapper) |
 | `Trajectory.h` | Generic trajectory run/stream/checkpoint driver |
@@ -965,8 +955,9 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 ### 9.3 CPPQEDcore / quantumoperator
 | File | Description |
 |---|---|
-| `MultiDiagonal.h` | Multi-diagonal sparse operator: closed under composition, direct product, Hermitian conjugation; deliberately free of frequency/picture information |
-| `MultiDiagonal.cc` | Composition `operator\|` (rank-1) and `identity()` implementations |
+| `SparseMatrix.h` / `SparseMatrix.cc` | General sparse operator as a list of `(row, column, value)` triplets, applicable as a Hamiltonian |
+
+`MultiArray.h`, `MultiArrayComplex.h` and `MultiDiagonal.h` (the strided array and the multidiagonal operator algebra, deliberately free of frequency/picture information) come from cppqed-multidiagonal as `<multidiagonal/…>`; `CPPQEDutils/FrameworkTraits.h` adds the framework-only traits on top of `<multidiagonal/Traits.h>`.
 
 ### 9.4 CPPQEDcore / quantumtrajectory
 | File | Description |

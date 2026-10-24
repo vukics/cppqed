@@ -143,14 +143,17 @@ The photon-blockade breakdown is a dissipative quantum phase transition of the s
 
 ## Building
 
-**Requirements:** C++23 compiler (GCC ≥ 13 or Clang ≥ 18), CMake ≥ 3.21, Boost ≥ 1.83 (Iostreams, JSON, Serialization; plus the header-only Odeint and Hana), Eigen ≥ 3.4. popl, pcg-cpp, and Xoshiro-cpp come in as git submodules.
+**Requirements:** C++23 compiler (GCC ≥ 13 or Clang ≥ 18), CMake ≥ 3.24, Boost ≥ 1.83 (Iostreams, JSON, Serialization; plus the header-only Odeint and Hana), Eigen ≥ 3.4. CMake fetches [cppqed-multidiagonal](https://github.com/WignerQuantumOptics/cppqed-multidiagonal), popl, pcg-cpp, and Xoshiro-cpp at pinned commits (FetchContent) during configuration.
 
 ```bash
-git clone --recurse-submodules https://github.com/WignerQuantumOptics/cppqed.git
+git clone https://github.com/WignerQuantumOptics/cppqed.git
 cd cppqed
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j$(nproc)
+ctest --test-dir build
 ```
+
+Without network access (e.g. on cluster compute nodes), configure once where the network is available, copy the fetched sources from `build/_deps/*-src`, and point CMake at them: `-DFETCHCONTENT_FULLY_DISCONNECTED=ON -DFETCHCONTENT_SOURCE_DIR_CPPQED-MULTIDIAGONAL=… -DFETCHCONTENT_SOURCE_DIR_POPL=… -DFETCHCONTENT_SOURCE_DIR_PCG-CPP=… -DFETCHCONTENT_SOURCE_DIR_XOSHIRO-CPP=…`. An installed cppqed-multidiagonal ≥ 0.3 is used instead of the fetched one when CMake finds it.
 
 On Windows, [WSL2](https://learn.microsoft.com/en-us/windows/wsl/) with Ubuntu 24.04 is the recommended environment.
 

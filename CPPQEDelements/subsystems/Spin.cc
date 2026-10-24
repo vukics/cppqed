@@ -12,12 +12,12 @@ spin::MultiDiagonal spin::splus(size_t twoS, size_t dim)
 {
   MultiDiagonal res;
   decideDimension(twoS,dim);
-  res.diagonals[0].emplace( MultiDiagonal::Offsets{1}, MultiDiagonal::Diagonal{ [=] {
+  res.diagonals.emplace( MultiDiagonal::Offsets{-1}, multiarray::fromStorage( [=] { // S⁺ raises m: lower
     auto res{noInit(dim-1)};
     // i=m+s (m is the magnetic quantum number)
     for (size_t i=0; i<res.size(); ++i) res[i]=sqrt((twoS-i)*(i+1.));
     return res;
-  } () } );
+  } () ) );
   return res;
 }
 
@@ -32,12 +32,12 @@ spin::MultiDiagonal spin::sz(size_t twoS, size_t dim)
 {
   MultiDiagonal res;
   decideDimension(twoS,dim);
-  res.diagonals[1].emplace( MultiDiagonal::Offsets{0}, MultiDiagonal::Diagonal{ [=] {
+  res.diagonals.emplace( MultiDiagonal::Offsets{0}, multiarray::fromStorage( [=] {
     auto res{noInit(dim)};
     // i=m+s (m is the magnetic quantum number)
     for (size_t i=0; i<res.size(); ++i) res[i]=i-twoS/2.;
     return res;
-  } () } );
+  } () ) );
   return res;
 }
 
