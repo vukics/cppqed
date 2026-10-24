@@ -112,6 +112,10 @@ add_subdirectory(CPPQEDelements)
 
 add_subdirectory(dockerEntry)
 
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
+
 #if (EXISTS ${PROJECT_SOURCE_DIR}/OwnScripts)
 #  add_subdirectory(scripts)
 #endif()
