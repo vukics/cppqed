@@ -2,7 +2,7 @@
 #include "Spin.h"
 
 
-using namespace structure;
+using namespace quantumdynamics;
 
 
 void decideDimension(size_t twoS, size_t& dim) {dim = (dim && dim<twoS+1) ? dim : twoS+1;}
@@ -67,7 +67,7 @@ Diagonal mainDiagonal(size_t dim, size_t twoS, dcomp z)
 
 Tridiagonal sn(Ptr spin)
 {
-  return sn(spin->getDimension(),spin->getTwoS(),spin->get_z(),bool(dynamic_pointer_cast<const structure::FreeExact<false>>(spin)),spin->getTheta(),spin->getPhi());
+  return sn(spin->getDimension(),spin->getTwoS(),spin->get_z(),bool(dynamic_pointer_cast<const quantumdynamics::FreeExact<false>>(spin)),spin->getTheta(),spin->getPhi());
 } 
 
 
@@ -80,7 +80,7 @@ Tridiagonal sz(size_t dim, size_t twoS)
 Tridiagonal sz(Ptr spin) {return sz(spin->getDimension(),spin->getTwoS());}
 
 
-Tridiagonal splus(Ptr spin) {return splus(spin->getDimension(),spin->getTwoS(),spin->get_z(),bool(dynamic_pointer_cast<const structure::FreeExact<false>>(spin)));}
+Tridiagonal splus(Ptr spin) {return splus(spin->getDimension(),spin->getTwoS(),spin->get_z(),bool(dynamic_pointer_cast<const quantumdynamics::FreeExact<false>>(spin)));}
 
 
 
@@ -100,7 +100,7 @@ Pars::Pars(parameters::Table& p, const std::string& mod)
 
 SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double gamma, size_t dim) 
   : Free(spin::decideDimension(twoS,dim),{RF{"omega",omega,1},RF{"gamma",gamma,1}}),
-    structure::ElementAveraged<1>("Spin",{"<sz>","<sz^2>","real(<s^+>)","imag(\")","|Psi(dim-1)|^2"}), twoS_(twoS), theta_(theta), phi_(phi), omega_(omega), gamma_(gamma), s_(twoS/2.)
+    quantumdynamics::ElementAveraged<1>("Spin",{"<sz>","<sz^2>","real(<s^+>)","imag(\")","|Psi(dim-1)|^2"}), twoS_(twoS), theta_(theta), phi_(phi), omega_(omega), gamma_(gamma), s_(twoS/2.)
 {
   getParsStream()<<"Spin "<<s_<<endl;
   getParsStream()<<"theta="<<theta_<<" phi="<<phi_<<endl;
@@ -108,7 +108,7 @@ SpinBase::SpinBase(size_t twoS, double theta, double phi, double omega, double g
 
 
 
-const spin::Averages SpinBase::average_v(structure::NoTime, const LazyDensityOperator& matrix) const
+const spin::Averages SpinBase::average_v(quantumdynamics::NoTime, const LazyDensityOperator& matrix) const
 {
   auto averages(initializedAverages());
 
@@ -139,7 +139,7 @@ void SpinBase::process_v(spin::Averages& averages) const
 }
 
 
-void Spin::updateU(structure::OneTime dtDid) const
+void Spin::updateU(quantumdynamics::OneTime dtDid) const
 {
   Diagonal& factors(getDiagonal());
   for (int i=0; i<factors.size(); i++)
@@ -147,7 +147,7 @@ void Spin::updateU(structure::OneTime dtDid) const
 }
 
 
-void spin::Liouvillian::doActWithJ(structure::NoTime, structure::freesystem::StateVectorLow& psi) const
+void spin::Liouvillian::doActWithJ(quantumdynamics::NoTime, quantumdynamics::freesystem::StateVectorLow& psi) const
 {
   double fact=sqrt(2.*gamma_);
   int ubound=psi.ubound(0);
@@ -157,7 +157,7 @@ void spin::Liouvillian::doActWithJ(structure::NoTime, structure::freesystem::Sta
 }
 
 
-double spin::Liouvillian::rate(structure::NoTime, const structure::freesystem::LazyDensityOperator& matrix) const
+double spin::Liouvillian::rate(quantumdynamics::NoTime, const quantumdynamics::freesystem::LazyDensityOperator& matrix) const
 {
   double res=0;
   for (size_t n=1; n<matrix.getDimension(); ++n)

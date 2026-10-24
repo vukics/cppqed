@@ -764,14 +764,14 @@ WARN_LOGFILE           =
 INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/doc/main.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/genericElements.markdown \
                          @CMAKE_CURRENT_SOURCE_DIR@/doc/multiLevelBundle.markdown \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Mode_.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Qbit.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Qbit_.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Spin.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Particle.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/Particle_.h \
-                         @CMAKE_CURRENT_SOURCE_DIR@/frees/MultiLevel.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/Mode.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/Mode_.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/Qbit.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/Qbit_.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/Spin.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/Particle.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/Particle_.h \
+                         @CMAKE_CURRENT_SOURCE_DIR@/subsystems/MultiLevel.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/interactions/MLJC.h \
                          @CMAKE_CURRENT_SOURCE_DIR@/utils/
 

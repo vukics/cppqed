@@ -12,7 +12,7 @@ namespace schrödinger { typedef ode::Pars<> Pars; } // schrödinger
 
 
 template <size_t RANK,
-          ::structure::quantum_system_dynamics<RANK> QSD,
+          ::quantumdynamics::quantum_system_dynamics<RANK> QSD,
           ::cppqedutils::ode::engine<StorageType> OE>
 struct Schrödinger
 {

@@ -4,7 +4,7 @@
 #include "StateVector.h"
 
 
-namespace structure {
+namespace quantumdynamics {
 
 using namespace quantumdata;
 
@@ -98,7 +98,7 @@ template <size_t RANK> using TimeDependentTerm = ODE_derivativeTimeDependentFunc
 
 #include "progressbar.hpp"
 
-namespace structure::hamiltonian_ns {
+namespace quantumdynamics::hamiltonian_ns {
 
 
 template <size_t RANK, hamiltonian<RANK> H>
@@ -119,4 +119,4 @@ quantumoperator::SparseMatrix vectorize(H&& h, Dimensions<RANK> d)
 }
 
 
-} // structure::hamiltonian_ns
+} // quantumdynamics::hamiltonian_ns

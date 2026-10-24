@@ -12,7 +12,7 @@
 
 namespace quantumtrajectory {
 
-using namespace structure;
+using namespace quantumdynamics;
 
 
 using EntanglementMeasuresSwitch = std::bitset<3>;

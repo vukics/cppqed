@@ -19,7 +19,7 @@ template<int I, int J> using Coupling = multilevel::DynamicsPair<dcomp,I,J>;
 namespace mljc {
 
 template<int NL, typename VC>
-class Base : public structure::Interaction<2>, public structure::Hamiltonian<2>
+class Base : public quantumdynamics::Interaction<2>, public quantumdynamics::Hamiltonian<2>
 {
 public:
   typedef mode::Tridiagonal Tridiagonal;
@@ -27,8 +27,8 @@ public:
   typedef typename MultiLevelBase<NL>::Ptr MultiLevelPtr;
 
   Base(MultiLevelPtr ml, mode::Ptr mode, const VC& gs) 
-    : structure::Interaction<2>({ml,mode},{},[&] {
-        structure::DynamicsBase::ComplexFreqs res;
+    : quantumdynamics::Interaction<2>({ml,mode},{},[&] {
+        quantumdynamics::DynamicsBase::ComplexFreqs res;
         for_each(gs,multilevel::elementaryComplexFreqs(res,"g"));
         return res;
       } () ),
@@ -38,7 +38,7 @@ public:
   }
 
 private:
-  void addContribution_v(double t, const structure::StateVectorLow<2>& psi, structure::StateVectorLow<2>& dpsidt, double t0) const override
+  void addContribution_v(double t, const quantumdynamics::StateVectorLow<2>& psi, quantumdynamics::StateVectorLow<2>& dpsidt, double t0) const override
   {
     boost::fusion::for_each(mds_, [&] (const auto& modeDynamics) {
       using MD=std::decay_t<decltype(modeDynamics)>;

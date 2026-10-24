@@ -9,7 +9,7 @@ This is a list of general-purpose free and interaction elements (residing in `CP
 Frees {#genericelementsfrees}
 =====
 
-Reside in `CPPQEDelements/frees`
+Reside in `CPPQEDelements/subsystems`
 
 Mode {#genericelementsfreesmode}
 ----

@@ -9,18 +9,18 @@
 
 
 
-class ModeCorrelations : public structure::ElementAveraged<2>
+class ModeCorrelations : public quantumdynamics::ElementAveraged<2>
 {
 public:
 
   ModeCorrelations();
 
 protected:
-  typedef structure::ElementAveraged<2> EA_Base  ;
-  typedef structure::       Averaged<1> Averaged1;
+  typedef quantumdynamics::ElementAveraged<2> EA_Base  ;
+  typedef quantumdynamics::       Averaged<1> Averaged1;
 
 private:
-  const mode::Averages average_v(structure::NoTime, const quantumdata::LazyDensityOperator<2>&) const;
+  const mode::Averages average_v(quantumdynamics::NoTime, const quantumdata::LazyDensityOperator<2>&) const;
   void process_v(mode::Averages&) const;
 
   const mode::AveragedQuadratures averagedMode_;

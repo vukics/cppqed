@@ -18,7 +18,7 @@ class ModeBase;
 namespace mode {
 
 
-using namespace structure::freesystem; using structure::NoTime;
+using namespace quantumdynamics::freesystem; using quantumdynamics::NoTime;
 
 
 struct diagonalFrequencies
@@ -49,26 +49,26 @@ void aSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, d
 void aDagSuperoperator(const DensityOperatorLow& rho, DensityOperatorLow& drhodt, double fact); // fact = 2.*kappa*nTh
 
 
-structure::Lindblad<1> photonLoss(double kappaTimes_nThPlus1, double omegaInt = 0.); // no need for std::optional here, since there is a sensible default
+quantumdynamics::Lindblad<1> photonLoss(double kappaTimes_nThPlus1, double omegaInt = 0.); // no need for std::optional here, since there is a sensible default
 
-structure::Lindblad<1> photonGain(double kappaTimes_nTh, double omegaInt = 0.);
-
-
-structure::ElementLiouvillian<1> makeLiouvillian(double kappa, double nTh, double omegaInt = 0.);
+quantumdynamics::Lindblad<1> photonGain(double kappaTimes_nTh, double omegaInt = 0.);
 
 
-structure::ExpectationValue<1> photonnumberEV_Variance;
+quantumdynamics::ElementLiouvillian<1> makeLiouvillian(double kappa, double nTh, double omegaInt = 0.);
 
-structure::ExpectationValue<1> ladderOperatorEV;
+
+quantumdynamics::ExpectationValue<1> photonnumberEV_Variance;
+
+quantumdynamics::ExpectationValue<1> ladderOperatorEV;
 
 
 // Quadrature variances are somewhat problematic since they involve all the expectation values
 
 
-structure::ExpectationValue<1> monitorCutoff;
+quantumdynamics::ExpectationValue<1> monitorCutoff;
 
 
-const structure::ElementExpectationValues<1> defaultExpectationValues{
+const quantumdynamics::ElementExpectationValues<1> defaultExpectationValues{
   .label{"Mode"},
   .expectationValues{photonnumberEV_Variance,ladderOperatorEV}
 };
@@ -99,13 +99,13 @@ StateVector fock(size_t n, size_t dim, double phase=0);
 StateVector init(const Pars&);
 
 
-const Ptr make(const Pars&, QM_Picture, const structure::ElementExpectationValues<1>& = defaultExpectationValues);
+const Ptr make(const Pars&, QM_Picture, const quantumdynamics::ElementExpectationValues<1>& = defaultExpectationValues);
 
-const Ptr make(const ParsDissipative&, QM_Picture, const structure::ElementExpectationValues<1>& = defaultExpectationValues);
+const Ptr make(const ParsDissipative&, QM_Picture, const quantumdynamics::ElementExpectationValues<1>& = defaultExpectationValues);
 
-const Ptr make(const ParsDriven&, QM_Picture, const structure::ElementExpectationValues<1>& = defaultExpectationValues);
+const Ptr make(const ParsDriven&, QM_Picture, const quantumdynamics::ElementExpectationValues<1>& = defaultExpectationValues);
 
-const Ptr make(const ParsDrivenDissipative&, QM_Picture, const structure::ElementExpectationValues<1>& = defaultExpectationValues);
+const Ptr make(const ParsDrivenDissipative&, QM_Picture, const quantumdynamics::ElementExpectationValues<1>& = defaultExpectationValues);
 
 
 
@@ -129,7 +129,7 @@ const Tridiagonal pumping(dcomp eta, size_t dim);
 
 
 
-class Exact : public structure::FreeExact<false>
+class Exact : public quantumdynamics::FreeExact<false>
 {
 public:
   Exact(dcomp zI, double omegaKerr, size_t);
@@ -139,7 +139,7 @@ public:
   double get_omegaKerr() const {return omegaKerr_;}
   
 private:
-  void updateU(Time) const; ///< `Time` is structure::OneTime in this case
+  void updateU(Time) const; ///< `Time` is quantumdynamics::OneTime in this case
 
   bool applicableInMaster_v() const {return !bool(real(zI_));}
 
@@ -193,16 +193,16 @@ private:
 ////////////////
 
 
-struct ModeBase : structure::Free
+struct ModeBase : quantumdynamics::Free
 {
-  ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs, const structure::ElementExpectationValues<1>& = mode::defaultExpectationValues);
+  ModeBase(size_t dim, const RealFreqs& realFreqs, const ComplexFreqs& complexFreqs, const quantumdynamics::ElementExpectationValues<1>& = mode::defaultExpectationValues);
 
   virtual ~ModeBase() {}
   
   
-  std::optional<structure::ElementLiouvillian<1>> liouvillian;
+  std::optional<quantumdynamics::ElementLiouvillian<1>> liouvillian;
 
-  std::optional<structure::ElementExpectationValues<1>> expectationValues;
+  std::optional<quantumdynamics::ElementExpectationValues<1>> expectationValues;
 
 };
 
@@ -307,14 +307,14 @@ public:
 class DrivenDissipativeModeIP_NoExact
   : public ModeBase,
     public quantumoperator::TridiagonalHamiltonian<1,true>, 
-    public structure::ElementLiouvillian<1,1,true>,
-    public structure::ElementAveraged<1,true>
+    public quantumdynamics::ElementLiouvillian<1,1,true>,
+    public quantumdynamics::ElementAveraged<1,true>
 {
 public:
   DrivenDissipativeModeIP_NoExact(const mode::ParsDrivenDissipative&);
 
 private:
-  using OneTime = structure::OneTime;
+  using OneTime = quantumdynamics::OneTime;
 
   void   doActWithJ (OneTime, mode::StateVectorLow&           ) const;
   double rate       (OneTime, const mode::LazyDensityOperator&) const;

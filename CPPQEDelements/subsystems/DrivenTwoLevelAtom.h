@@ -20,7 +20,7 @@
 
 
 
-class DrivenTwoLevelAtom : public structure::Free, public structure::ElementLiouvillian<1,1>, public qbit::Averaged
+class DrivenTwoLevelAtom : public quantumdynamics::Free, public quantumdynamics::ElementLiouvillian<1,1>, public qbit::Averaged
 {
 public:
   const dcomp getZa() const {return za_;}
@@ -29,9 +29,9 @@ protected:
   DrivenTwoLevelAtom(const qbit::ParsDrivenDissipative&);
 
 private:
-  double rate(structure::NoTime, const qbit::LazyDensityOperator&) const;
+  double rate(quantumdynamics::NoTime, const qbit::LazyDensityOperator&) const;
 
-  void doActWithJ(structure::NoTime, qbit::StateVectorLow&) const;
+  void doActWithJ(quantumdynamics::NoTime, qbit::StateVectorLow&) const;
 
   const dcomp za_, eta_;
 
@@ -39,13 +39,13 @@ private:
 
 
 // In Schroedinger picture the Hamiltonian is implemented as a CMatrix
-class DrivenTwoLevelAtomSch : public DrivenTwoLevelAtom, public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
+class DrivenTwoLevelAtomSch : public DrivenTwoLevelAtom, public quantumdynamics::HamiltonianTimeDependenceDispatched<1,quantumdynamics::TimeDependence::NO>
 {
 public:
   DrivenTwoLevelAtomSch(const qbit::ParsDrivenDissipative&);
   
 private:
-  void addContribution_v(structure::NoTime, const qbit::StateVectorLow& psi, qbit::StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
+  void addContribution_v(quantumdynamics::NoTime, const qbit::StateVectorLow& psi, qbit::StateVectorLow& dpsidt) const {linalg::apply(psi,dpsidt,hamiltonianOverI_);}
 
   static const linalg::CMatrix hamiltonianOverI(dcomp za, dcomp etat);
 

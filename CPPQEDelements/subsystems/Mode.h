@@ -13,7 +13,7 @@
 namespace mode {
 
 
-using namespace ::structure;
+using namespace ::quantumdynamics;
 using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;
 
 

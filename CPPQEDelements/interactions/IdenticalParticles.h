@@ -8,11 +8,11 @@
 
 
 template<int NP>
-class IdenticalParticles : public structure::Interaction<NP>
+class IdenticalParticles : public quantumdynamics::Interaction<NP>
 // A dummy implementation
 {
 public:
-  typedef structure::Interaction<NP> Base;
+  typedef quantumdynamics::Interaction<NP> Base;
   typedef typename Base::Frees Particles;
 
   static const auto fill(particle::Ptr part) {Particles res; res.fill(part); return res;}

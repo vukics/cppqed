@@ -10,7 +10,7 @@
 
 #include "CMatrix.h"
 
-class TimeIndependentMatrixHamiltonian : public structure::Free, public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
+class TimeIndependentMatrixHamiltonian : public quantumdynamics::Free, public quantumdynamics::HamiltonianTimeDependenceDispatched<1,quantumdynamics::TimeDependence::NO>
 {
 public:
   typedef linalg::CMatrix CMatrix;
@@ -19,7 +19,7 @@ public:
   // For safety, the matrix will be copied in.
 
 private:
-  void addContribution_v(structure::NoTime, const structure::freesystem::StateVectorLow&, structure::freesystem::StateVectorLow&) const; 
+  void addContribution_v(quantumdynamics::NoTime, const quantumdynamics::freesystem::StateVectorLow&, quantumdynamics::freesystem::StateVectorLow&) const; 
 
   const CMatrix hamiltonianOverI_;
 

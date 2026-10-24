@@ -21,7 +21,7 @@ typedef tmptools::Vector<0> V0;
 typedef tmptools::Vector<1> V1;
 
 
-const mode::Averages ModeCorrelations::average_v(structure::NoTime, const quantumdata::LazyDensityOperator<2>& matrix) const
+const mode::Averages ModeCorrelations::average_v(quantumdynamics::NoTime, const quantumdata::LazyDensityOperator<2>& matrix) const
 {
   using quantumdata::partialTrace;
 

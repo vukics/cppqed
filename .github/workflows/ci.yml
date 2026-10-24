@@ -42,6 +42,6 @@ jobs:
       # vacuum Rabi oscillation with one photon, decay on: exercises Hamiltonian, jumps and output
       - name: jc_qjmc smoke run
         run: |
-          ./build/dockerEntry/jc_qjmc --T 1 --initFockm 1 --deltaq 0 --deltam 0 --kappam 1 --gamma_mq 1 > smoke.txt
+          ./build/examples/jc_qjmc --T 1 --initFockm 1 --deltaq 0 --deltam 0 --kappam 1 --gamma_mq 1 > smoke.txt
           cat smoke.txt
           grep -q '^# OUTRO: ' smoke.txt

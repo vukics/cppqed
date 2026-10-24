@@ -16,7 +16,7 @@
 using namespace cppqedutils;
 using namespace quantumdata;
 using namespace quantumtrajectory;
-using namespace structure;
+using namespace quantumdynamics;
 
 
 int main(int argc, const char* argv[])

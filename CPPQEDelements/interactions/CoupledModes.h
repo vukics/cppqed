@@ -24,7 +24,7 @@ class Base;
 typedef std::shared_ptr<const Base<false> > Ptr;
 
 template<>
-class Base<false> : public structure::Interaction<2>
+class Base<false> : public quantumdynamics::Interaction<2>
 {
 public:
   Base(mode::Ptr, mode::Ptr, dcomp);

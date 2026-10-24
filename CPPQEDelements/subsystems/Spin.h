@@ -12,7 +12,7 @@
 namespace spin {
 
 
-using namespace ::structure;
+using namespace ::quantumdynamics;
 using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;
 
 
@@ -48,14 +48,14 @@ struct Pars
 
 
 class Liouvillian
-  : public structure::ElementLiouvillian<1,1,false>
+  : public quantumdynamics::ElementLiouvillian<1,1,false>
 {
 protected:
-  Liouvillian(size_t twoS, double gamma) : structure::ElementLiouvillian<1,1,false>("Spin","S-"), twoS_(twoS), gamma_(gamma) {}
+  Liouvillian(size_t twoS, double gamma) : quantumdynamics::ElementLiouvillian<1,1,false>("Spin","S-"), twoS_(twoS), gamma_(gamma) {}
   
 private:
-  void   doActWithJ(structure::NoTime,       structure::freesystem::StateVectorLow     &) const ;
-  double rate      (structure::NoTime, const structure::freesystem::LazyDensityOperator& matrix) const ; // {return -1.;}
+  void   doActWithJ(quantumdynamics::NoTime,       quantumdynamics::freesystem::StateVectorLow     &) const ;
+  double rate      (quantumdynamics::NoTime, const quantumdynamics::freesystem::LazyDensityOperator& matrix) const ; // {return -1.;}
 
   const size_t twoS_;
   const double gamma_;
@@ -68,11 +68,11 @@ private:
 
 /** \todo Implement some spherical-coordinates class and use it here */ /*
 class SpinBase
-  : public structure::Free, 
-    public structure::ElementAveraged<1>
+  : public quantumdynamics::Free, 
+    public quantumdynamics::ElementAveraged<1>
 {
 public:
-  typedef structure::freesystem::LazyDensityOperator LazyDensityOperator;
+  typedef quantumdynamics::freesystem::LazyDensityOperator LazyDensityOperator;
 
   SpinBase(size_t twoS, double theta, double phi, double omega, double gamma, size_t dim=0);
 
@@ -89,7 +89,7 @@ public:
 private:
   void process_v(spin::Averages&) const;
 
-  const spin::Averages average_v(structure::NoTime, const LazyDensityOperator&) const;
+  const spin::Averages average_v(quantumdynamics::NoTime, const LazyDensityOperator&) const;
 
   const size_t twoS_;
 
@@ -101,7 +101,7 @@ private:
 
 class Spin 
   : public SpinBase,
-    public structure::FreeExact<false>
+    public quantumdynamics::FreeExact<false>
 {
 public:
 
@@ -111,7 +111,7 @@ public:
   {}
 
 private:
-  void updateU(structure::OneTime) const;
+  void updateU(quantumdynamics::OneTime) const;
 
   bool applicableInMaster_v() const {return !getGamma();}
 

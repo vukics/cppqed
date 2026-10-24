@@ -7,5 +7,5 @@ add_library(CPPQEDelements_interactions OBJECT
 )
 add_library(CPPQED::CPPQEDelements_interactions ALIAS CPPQEDelements_interactions)
 
-target_link_libraries(CPPQEDelements_interactions PUBLIC CPPQED::CPPQEDelements_frees)
+target_link_libraries(CPPQEDelements_interactions PUBLIC CPPQED::CPPQEDelements_subsystems)
 target_include_directories(CPPQEDelements_interactions PUBLIC .)

@@ -4,7 +4,7 @@
 #include <boost/math/special_functions/factorials.hpp>
 
 
-using namespace structure;
+using namespace quantumdynamics;
 
 
 mode::MultiDiagonal mode::aOp(size_t cutoff)

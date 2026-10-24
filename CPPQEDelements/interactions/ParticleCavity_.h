@@ -16,7 +16,7 @@ namespace particlecavity {
 
 typedef quantumoperator::Tridiagonal<2> Tridiagonal;
 
-typedef structure::Hamiltonian<2> Hamiltonian;
+typedef quantumdynamics::Hamiltonian<2> Hamiltonian;
 typedef quantumoperator::TridiagonalHamiltonian<2,true> TridiagonalHamiltonian;
 
 
@@ -24,7 +24,7 @@ typedef TridiagonalHamiltonian::Tridiagonals Tridiagonals;
 
 
 class Base
-  : public structure::Interaction<2>
+  : public quantumdynamics::Interaction<2>
 {
 protected:
   Base(mode::Ptr, particle::Ptr, double uNot, double etaeff);

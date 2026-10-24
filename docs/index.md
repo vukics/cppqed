@@ -17,7 +17,7 @@ C++QED is a framework for simulating open quantum dynamics, originally developed
 The framework is organized into three main libraries:
 
 - **CPPQEDutils** — generic scaffolding (arrays, ODE engine, trajectory driver, stochastic ensemble)
-- **CPPQEDcore** — quantum-specific layers (`quantumdata`, `quantumoperator`, `quantumtrajectory`, `structure` → `quantumdynamics`)
+- **CPPQEDcore** — quantum-specific layers (`quantumdata`, `quantumoperator`, `quantumtrajectory`, `quantumdynamics`)
 - **CPPQEDelements** — concrete physical systems (SubSystems) and interactions
 
 ### 1.1 Design Intent: Production, Not Prototyping
@@ -237,7 +237,7 @@ The `stochastic` concept extends `uniform_step` with:
 | `quantumdata` | Quantum state representations: `StateVector`, `DensityOperator`, `LazyDensityOperator` |
 | `quantumoperator` | Sparse operators over tensor-product Hilbert spaces: `MultiDiagonal`, `SparseMatrix` |
 | `quantumtrajectory` | Trajectory types satisfying `adaptive_steppable`: Master, QJMC (`Schrödinger.h` is a stale 2023 draft, see §7.3) |
-| `structure` (→ `quantumdynamics`) | Physical system descriptors: `Hamiltonian`, `Liouvillian`, `ExactPropagator`, `ExpectationValues` |
+| `quantumdynamics` | Physical system descriptors: `Hamiltonian`, `Liouvillian`, `ExactPropagator`, `ExpectationValues` |
 
 ### 4.2 quantumdata: LazyDensityOperator.h
 
@@ -304,7 +304,7 @@ with `operator()` evaluating `alpha(idx) * exp(freqs(idx) * t)` lazily. Composit
 
 ### 4.4 quantumtrajectory layer
 
-All trajectory types satisfy `adaptive_steppable` and compose `ode::Base` with physics from `structure`.
+All trajectory types satisfy `adaptive_steppable` and compose `ode::Base` with physics from `quantumdynamics`.
 
 #### 4.4.1 QuantumTrajectory.h
 
@@ -579,7 +579,7 @@ giving $U(t) = \text{diag}(1, e^{-zt})$ — but cannot be used yet because `Unar
 
 ### 6.3 Composite.h — Broadcaster
 
-`Composite.h` lives in `CPPQEDcore/structure/`. `Broadcaster<RANK, ra...>` lifts a rank-`|ra|` system descriptor to rank-`RANK` by iterating `sliceRange<retainedAxes>` over the dummy axes. Template parameters `ra...` specify which axes the subsystem occupies in the composite system. This is the key composition primitive for building composite systems from SubSystems.
+`Composite.h` lives in `CPPQEDcore/quantumdynamics/`. `Broadcaster<RANK, ra...>` lifts a rank-`|ra|` system descriptor to rank-`RANK` by iterating `sliceRange<retainedAxes>` over the dummy axes. Template parameters `ra...` specify which axes the subsystem occupies in the composite system. This is the key composition primitive for building composite systems from SubSystems.
 
 ```cpp
 Broadcaster<2,0> bQ{psi.extents};  // qubit on axis 0
@@ -675,7 +675,7 @@ In v2, `expINKX(particle::Ptr, nK)` detected (via `dynamic_cast<const particle::
 
 The `ParticleAlongCavity` and `ParticleOrthogonalToCavity` interactions migrate to v3 as rank-2 `hamiltonian<2>` functionals built from `Broadcaster`-lifted rank-1 operators. The `isSpecialH_` flag and the `addContribution_v` override both become unnecessary — `MultiDiagonal::operator|` handles arbitrary mode function products correctly and generally.
 
-### 6.6 Example: dockerEntry/jc_qjmc.cc
+### 6.6 Example: examples/jc_qjmc.cc
 
 A complete, **verified working** highest-level executable (first successfully compiled and run April 2026, after a 4-year development hiatus, on Windows 11 via WSL2/Ubuntu 24.04). Demonstrates the full composition pattern.
 
@@ -693,7 +693,7 @@ A complete, **verified working** highest-level executable (first successfully co
 using namespace cppqedutils;
 using namespace quantumdata;
 using namespace quantumtrajectory;
-using namespace structure;
+using namespace quantumdynamics;
 
 // pcg64 is the correct engine for parallel QJMC ensemble simulations:
 // std::mt19937 is NOT recommended — nearby seeds do not guarantee independent streams.
@@ -725,7 +725,7 @@ int main(int argc, const char* argv[])
   auto [cutoffM, haM, liM, evM, descrM] = mode::make(pm);
 
   // Compose: Hamiltonian as Hana tuple, Liouvillian by manual concatenation
-  // (structure::concatenate has a constexpr bug with non-constexpr arguments)
+  // (quantumdynamics::concatenate has a constexpr bug with non-constexpr arguments)
   auto ha = hana::make_tuple( bQ(haQ), bM(haM),
                                jaynescummings::hamiltonian<0,1>(pm.cutoff, g) );
   auto li = bQ(liQ);
@@ -748,13 +748,13 @@ int main(int argc, const char* argv[])
 - `Pars` instances registered directly into `op` — no custom struct needed
 - `operator*` builds the rank-2 tensor product initial state from rank-1 subsystem states
 - `Broadcaster` does all axis-embedding; `JaynesCummings` slots in as a third Hana element
-- `structure::concatenate` bypassed due to constexpr bug — manual `push_back` used instead
+- `quantumdynamics::concatenate` bypassed due to constexpr bug — manual `push_back` used instead
 - `trajectory::observerNoOp` must be passed explicitly (template deduction limitation)
 - `pcg64` used throughout for parallel-safe PRNG with independent streams
 
 **Known issues encountered during first compilation (April 2026):**
 - `qjmc::Pars` requires two template arguments: `<Algorithm, RandomEngine>`
-- `structure::concatenate` fails with non-constexpr arguments — see bug in section 7.1
+- `quantumdynamics::concatenate` fails with non-constexpr arguments — see bug in section 7.1
 - `quantumtrajectory::run` default observer argument is dead code — must pass explicitly
 - `AutostopHandlerGeneric` incompatible with Hana tuple TDPs — bypassed via `observerNoOp`
 
@@ -796,8 +796,8 @@ int main(int argc, const char* argv[])
 
 ### 7.5 Naming Changes and Consistency
 
-- **`structure/` → `quantumdynamics/`**: current name is opaque; `quantumdynamics` parallels the other CPPQEDcore folders (`quantumdata`, `quantumoperator`, `quantumtrajectory`) and accurately describes the contents
-- **`Free` → `SubSystem`**: "Free" has a specific field-theory meaning (quadratic Hamiltonian, exactly solvable) that doesn't hold for all unary systems (e.g. a driven qubit is not strictly free); `SubSystem` is more neutral and descriptive of the software role
+- **`structure/` → `quantumdynamics/`** (done 2026-10, together with the switch to cppqed-multidiagonal): the old name was opaque; `quantumdynamics` parallels the other CPPQEDcore folders (`quantumdata`, `quantumoperator`, `quantumtrajectory`) and accurately describes the contents
+- **`Free` → `SubSystem`** (directory `CPPQEDelements/subsystems/`, done 2026-10): "Free" has a specific field-theory meaning (quadratic Hamiltonian, exactly solvable) that doesn't hold for all unary systems (e.g. a driven qubit is not strictly free); `SubSystem` is more neutral and descriptive of the software role
 - **Acronym casing**: camelcase is the chosen convention throughout, but acronyms are not handled consistently. Recommended rule: **capitalise only the first letter of an acronym** in camelcase contexts (`Qjmc`, `Ode`, `Ldo`, `Tdp`). Cosmetic — defer until the codebase is otherwise stable.
 
 ### 7.6 Planned: Test Suite
@@ -975,7 +975,7 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 | `Master.h` | Lindblad master equation on `DensityOperator`, reusing state-vector broadcast operations |
 | `QuantumJumpMonteCarlo.h` | QJMC integrating and stepwise algorithms, `AverageTrajectories` specialization |
 
-### 9.5 CPPQEDcore / structure (→ `quantumdynamics`)
+### 9.5 CPPQEDcore / quantumdynamics
 | File | Description |
 |---|---|
 | `Hamiltonian.h` | Recursive compile-time Hamiltonian ($H/i$, non-Hermitian) composition via Hana sequences |
@@ -984,7 +984,7 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 | `ExpectationValues.h` | Recursive Hana-sequence expectation value functionals over `LazyDensityOperator` |
 | `Composite.h` | `Broadcaster<RANK,ra...>`: lifts rank-`\|ra\|` SubSystem descriptors to rank-`RANK` via slice iteration |
 
-### 9.6 CPPQEDelements / SubSystems
+### 9.6 CPPQEDelements / subsystems
 | File | Description |
 |---|---|
 | `Mode.h` / `Mode.cc` | Harmonic oscillator: `MultiDiagonal` operators, Kerr nonlinearity, coherent drive, photon loss/gain |
@@ -998,7 +998,7 @@ The main framework paper, citing Paper 1 for the `MultiDiagonal` component.
 | `JaynesCummings.h` | Cavity-atom coupling via `Placeholder` slicing, compile-time level indices `<i,j>` |
 | `ParticleCavity_.h` / `ParticleCavity.cc` | v2 — Particle-cavity interactions (`ParticleOrthogonalToCavity`, `ParticleAlongCavity`); not yet migrated to v3 |
 
-### 9.8 dockerEntry
+### 9.8 examples
 | File | Description |
 |---|---|
 | `jc_qjmc.cc` | Example highest-level executable (target `jc_qjmc`): QJMC simulation of qubit + mode with JC interaction |
@@ -1133,7 +1133,7 @@ This is a non-trivial refactor touching `MultiArray.h`, `SliceIterator.h`, `Stat
 2. The test suite is in place (§7.6)
 3. The `MultiDiagonal` signed-offset refactor (§7.4) is done
 
-The natural sequencing milestone: coordinate with the `SubSystem` rename (§7.5) and `structure/` → `quantumdynamics/` reorganisation into a single "type system" release.
+The natural sequencing milestone: coordinate with the acronym-casing decision (§7.5) into a single "type system" release; the `SubSystem` and `quantumdynamics/` renames are already done.
 
 For now, the design intent should be recorded in header comments: `Qbit.h` should note that `Dim=2` is a candidate for NTTP promotion, and `SliceIterator.h` should note the transposition constraint that any future static-dimension scheme must respect.
 

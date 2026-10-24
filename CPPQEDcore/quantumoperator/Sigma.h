@@ -74,7 +74,7 @@ public:
 
   DirectProduct(const OTHER& other) : other_(other) {} ///< The object has to store a reference to the `OTHER` object to enable DirectProduct::apply as an operator
   
-  /// Applies the clause on a state vector `psi`, adding the result to `dpsidt`, analogously to Tridiagonal::apply and structure::Hamiltonian::addContribution
+  /// Applies the clause on a state vector `psi`, adding the result to `dpsidt`, analogously to Tridiagonal::apply and quantumdynamics::Hamiltonian::addContribution
   /**
    * It is implemented as taking the partial projection (quantumoperator::partialProject) of the state vectors according to `L` and `R`
    * (which at this point are converted into runtime data), and calling the `apply` function of the `OTHER` type.

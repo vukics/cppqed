@@ -12,7 +12,7 @@
 
 namespace qbit {
 
-using namespace ::structure;
+using namespace ::quantumdynamics;
 
 auto diagonalH(dcomp z) { return [=] (StateVectorConstView<1> psi, StateVectorView<1> dpsidt) {dpsidt(1)-=z*psi(1);}; }
 
@@ -109,7 +109,7 @@ auto make(const Pars& p)
  */
 namespace multidiagonal {
 
-using namespace ::structure;
+using namespace ::quantumdynamics;
 using MultiDiagonal = ::quantumoperator::MultiDiagonal<1> ;
 
 

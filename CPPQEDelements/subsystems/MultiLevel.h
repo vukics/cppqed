@@ -38,7 +38,7 @@ namespace multilevel {
 const std::string keyTitle="MultiLevel";
 
 
-using namespace structure::freesystem; using structure::NoTime;
+using namespace quantumdynamics::freesystem; using quantumdynamics::NoTime;
 
 
 ////////
@@ -49,7 +49,7 @@ using namespace structure::freesystem; using structure::NoTime;
 
 /** \todo MultiLevel Exact not fully implemented, cf. the late 'shift' function. Maybe it's easier with something similar to Tridiagonal::freqs_ in Sigma */
 template<int NL>
-class Exact : public structure::FreeExact<false>
+class Exact : public quantumdynamics::FreeExact<false>
 {
 public:
   typedef ComplexPerLevel<NL> L;
@@ -96,7 +96,7 @@ template<int I, int J> using Drive = Pump<I,J>;
 
 template<int NL, typename VP>
 class HamiltonianIP 
-  : public structure::Hamiltonian<1>,
+  : public quantumdynamics::Hamiltonian<1>,
     public Exact<NL>
 {
 public:
@@ -119,7 +119,7 @@ private:
 
 template<int NL, typename VP>
 class HamiltonianSch 
-  : public structure::HamiltonianTimeDependenceDispatched<1,structure::TimeDependence::NO>
+  : public quantumdynamics::HamiltonianTimeDependenceDispatched<1,quantumdynamics::TimeDependence::NO>
 {
 public:
   typedef ComplexPerLevel<NL> L;
@@ -164,10 +164,10 @@ class LiouvillianRadiative;
 
 // With ORDO=-1, this doesn’t correspond to valid jumps, its function is to store data, fill keyLabels, etc.:
 template<int NL, typename VL>
-class LiouvillianRadiative<NL,VL,-1> : public structure::ElementLiouvillian<1, hana::size(VL{})>
+class LiouvillianRadiative<NL,VL,-1> : public quantumdynamics::ElementLiouvillian<1, hana::size(VL{})>
 {
 private:
-  typedef structure::ElementLiouvillian<1, hana::size(VL{})> Base;
+  typedef quantumdynamics::ElementLiouvillian<1, hana::size(VL{})> Base;
 
   typedef typename Base::KeyLabels KeyLabels;
   
@@ -222,7 +222,7 @@ private:
 
 
 // Just a convenience layer above ElementLiouvillianDiffusive
-#define BASE_class structure::ElementLiouvillianDiffusive<1,LiouvillianRadiative<NL,VL,mpl::size<VL>::value-1>>
+#define BASE_class quantumdynamics::ElementLiouvillianDiffusive<1,LiouvillianRadiative<NL,VL,mpl::size<VL>::value-1>>
 template<int NL, typename VL>
 class LiouvillianDiffusive : public BASE_class
 {
@@ -264,15 +264,15 @@ protected:
 
 template<int NL>
 class MultiLevelBase 
-  : public structure::Free
+  : public quantumdynamics::Free
 {
 public:
   typedef std::shared_ptr<const MultiLevelBase> Ptr;
 
-  using structure::Free::getParsStream;
+  using quantumdynamics::Free::getParsStream;
 
   MultiLevelBase(const RealFreqs& realFreqs=RealFreqs(), const ComplexFreqs& complexFreqs=ComplexFreqs())
-    : structure::Free(NL,realFreqs,complexFreqs)
+    : quantumdynamics::Free(NL,realFreqs,complexFreqs)
   {
     getParsStream()<<multilevel::keyTitle<<std::endl;
   }
@@ -284,7 +284,7 @@ public:
 
 namespace multilevel {
 
-auto elementaryComplexFreqs(structure::DynamicsBase::ComplexFreqs& cf, const std::string& label)
+auto elementaryComplexFreqs(quantumdynamics::DynamicsBase::ComplexFreqs& cf, const std::string& label)
 {
   return [&](auto eta) {cf.push_back({label+std::to_string(decltype(eta)::first)+std::to_string(decltype(eta)::second),eta.get(),1.});} ;
 }
@@ -328,7 +328,7 @@ public:
       } (), etas),
       Liouvillian(gammas,gamma_parallel),
       Base([this,&gamma_parallel] {
-        structure::DynamicsBase::RealFreqs res;
+        quantumdynamics::DynamicsBase::RealFreqs res;
         for (int i=0; i<NL; i++) if (!hasRealPart(this->get_zSchs()(i))) res.push_back({"delta"+std::to_string(i),-imag(this->get_zSchs()(i)),1.});
         if constexpr (std::is_same_v<std::decay_t<GPT>,double>) res.push_back({"gamma_parallel",gamma_parallel,1.});
         else if constexpr (std::is_same_v<std::decay_t<GPT>,typename Liouvillian::DiffusionCoeffs>) {
@@ -337,7 +337,7 @@ public:
         }
         return res;
       } () , [this,&etas] {
-        structure::DynamicsBase::ComplexFreqs res;
+        quantumdynamics::DynamicsBase::ComplexFreqs res;
         for (int i=0; i<NL; i++) if (hasRealPart(this->get_zSchs()(i))) res.push_back({"(gamma"+std::to_string(i)+",-delta"+std::to_string(i)+")",this->get_zSchs()(i),1.});
         for_each(etas,multilevel::elementaryComplexFreqs(res,"eta"));
         return res;        

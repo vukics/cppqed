@@ -4,7 +4,7 @@
 #include "Tridiagonal.tcc"
 
 
-using namespace structure;
+using namespace quantumdynamics;
 using namespace spin;
 using namespace mode;
 

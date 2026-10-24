@@ -6,7 +6,7 @@
 #include "TemporalDataPoint.h"
 
 
-namespace structure {
+namespace quantumdynamics {
 
 using namespace quantumdata;
 

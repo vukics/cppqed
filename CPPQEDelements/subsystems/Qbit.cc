@@ -2,7 +2,7 @@
 #include "Qbit.h"
 
 
-using namespace cppqedutils; using namespace structure;
+using namespace cppqedutils; using namespace quantumdynamics;
 
 
 UnaryDiagonalPropagator<> qbit::propagator(dcomp z)

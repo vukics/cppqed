@@ -1,0 +1,8 @@
+# Copyright Raimar Sandner 2012–2020.
+# Copyright András Vukics 2020–2023. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
+
+add_library(CPPQEDcore_quantumdynamics INTERFACE)
+add_library(CPPQED::CPPQEDcore_quantumdynamics ALIAS CPPQEDcore_quantumdynamics)
+
+target_link_libraries(CPPQEDcore_quantumdynamics INTERFACE CPPQED::CPPQEDcore_quantumdata)
+target_include_directories(CPPQEDcore_quantumdynamics INTERFACE .)

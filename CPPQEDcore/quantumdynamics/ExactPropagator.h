@@ -6,7 +6,7 @@
 #include <valarray>
 
 
-namespace structure {
+namespace quantumdynamics {
 
 using namespace quantumdata;
 

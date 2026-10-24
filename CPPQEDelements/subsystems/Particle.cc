@@ -42,7 +42,7 @@ particle::Exact::Exact(const Spatial& space, double omrec)
 {
 }
 
-void particle::Exact::updateU(structure::OneTime t) const
+void particle::Exact::updateU(quantumdynamics::OneTime t) const
 {
   getDiagonal()=exp(factorExponents_*t);
 }

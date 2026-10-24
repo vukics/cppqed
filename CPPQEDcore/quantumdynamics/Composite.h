@@ -7,7 +7,7 @@
 #include "SliceIterator.h"
 
 
-using namespace structure;
+using namespace quantumdynamics;
 
 template <size_t RANK, size_t ... ra> requires ( sizeof...(ra) < RANK )
 struct Broadcaster

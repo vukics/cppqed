@@ -3,7 +3,7 @@
 
 
 TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix& hamiltonianOverI)
-  : structure::Free(hamiltonianOverI.extent(0),{RF{"Largest frequency",max(abs(hamiltonianOverI)),1.}}),
+  : quantumdynamics::Free(hamiltonianOverI.extent(0),{RF{"Largest frequency",max(abs(hamiltonianOverI)),1.}}),
     hamiltonianOverI_(hamiltonianOverI.copy())
 {
   if (hamiltonianOverI_.extent(0)!=hamiltonianOverI_.extent(1)) throw std::invalid_argument("Matrix sot square in TimeIndependentMatrixHamiltonian");
@@ -11,7 +11,7 @@ TimeIndependentMatrixHamiltonian::TimeIndependentMatrixHamiltonian(const CMatrix
 }
 
 
-void TimeIndependentMatrixHamiltonian::addContribution_v(structure::NoTime, const structure::freesystem::StateVectorLow& psi, structure::freesystem::StateVectorLow& dpsidt) const
+void TimeIndependentMatrixHamiltonian::addContribution_v(quantumdynamics::NoTime, const quantumdynamics::freesystem::StateVectorLow& psi, quantumdynamics::freesystem::StateVectorLow& dpsidt) const
 {
   linalg::apply(psi,dpsidt,hamiltonianOverI_);
 }

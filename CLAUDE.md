@@ -48,15 +48,16 @@ CPPQEDcore/
   quantumdata/        StateVector, DensityOperator, LazyDensityOperator (LDO)
   quantumoperator/    MultiDiagonal (in-tree copy until E-1), SparseMatrix
   quantumtrajectory/  QuantumTrajectory.h, Master.h, QuantumJumpMonteCarlo.h — header-only
-  structure/          Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues,
-                      Composite.h (Broadcaster) (planned rename → quantumdynamics)
+  quantumdynamics/    Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues,
+                      Composite.h (Broadcaster); namespace quantumdynamics
 CPPQEDelements/
-  frees/          SubSystems: Mode, Qbit (planned rename Free → SubSystem)
+  subsystems/     Mode, Qbit, Spin
   interactions/   JaynesCummings.h
-dockerEntry/      jc_qjmc.cc, the reference executable (CMake builds every *.cc here)
+examples/         jc_qjmc.cc, the reference executable (CMake builds every *.cc here)
+tests/            regression/: jc_qjmc against a stored reference (CTest, Python 3)
 ```
 
-The reference executable is `dockerEntry/jc_qjmc.cc`, target `jc_qjmc` (qubit on axis 0,
+The reference executable is `examples/jc_qjmc.cc`, target `jc_qjmc` (qubit on axis 0,
 mode on axis 1). It shows the whole user-facing API in about 40 lines.
 
 ## Build
@@ -173,7 +174,7 @@ Other known problems:
   labelled Hana tuples.
   - Callers must pass `trajectory::observerNoOp` explicitly. The default argument is dead
     code because template deduction ignores defaults.
-- `structure::concatenate` fails with non-constexpr arguments. Concatenate Liouvillians
+- `quantumdynamics::concatenate` fails with non-constexpr arguments. Concatenate Liouvillians
   manually.
 - `SliceIterator` (B7): the first slice drops the parent view's offset, and every
   complete loop dereferences one past the end of the offsets. Top-level QJMC is not
@@ -200,7 +201,7 @@ Other known problems:
 5. Documentation and tutorials.
 
 Later or under discussion, so **don't start these unasked**:
-- renames (`structure/` → `quantumdynamics/`, Free → SubSystem, acronym casing)
+- renames: acronym casing (C-72), `qbit` → `qubit` (C-76). The structural renames are done.
 - compile-time leading subsystem dimensions
 - the `OBSERVER` concept unification in Trajectory.h
 - HDF5 serialization

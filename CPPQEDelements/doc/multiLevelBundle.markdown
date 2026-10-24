@@ -4,7 +4,7 @@ The MultiLevel bundle {#multilevelbundle}
 \tableofcontents
 
 \par Abstract
-The MultiLevel bundle is a framework for representing multi-level quantum systems, e.g. atoms or ions of arbitrary level structure. Coherent driving, loss, and interaction with harmonic-oscillator modes can also be defined. The framework is defined in the header files `CPPQEDelements/frees/MultiLevel.h` and `CPPQEDelements/interactions/MLJC.h`, the latter acronym standing for <b>m</b>ulti-<b>l</b>evel <b>J</b>aynes-<b>C</b>ummings.
+The MultiLevel bundle is a framework for representing multi-level quantum systems, e.g. atoms or ions of arbitrary level structure. Coherent driving, loss, and interaction with harmonic-oscillator modes can also be defined. The framework is defined in the header files `CPPQEDelements/subsystems/MultiLevel.h` and `CPPQEDelements/interactions/MLJC.h`, the latter acronym standing for <b>m</b>ulti-<b>l</b>evel <b>J</b>aynes-<b>C</b>ummings.
 
 Introduction {#multilevelintroduction}
 ============

@@ -110,7 +110,7 @@ add_subdirectory(CPPQEDcore)
 
 add_subdirectory(CPPQEDelements)
 
-add_subdirectory(dockerEntry)
+add_subdirectory(examples)
 
 if(BUILD_TESTING)
   add_subdirectory(tests)

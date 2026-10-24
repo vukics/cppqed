@@ -4,5 +4,5 @@
 add_library(CPPQEDcore_quantumtrajectory INTERFACE)
 add_library(CPPQED::CPPQEDcore_quantumtrajectory ALIAS CPPQEDcore_quantumtrajectory)
 
-target_link_libraries(CPPQEDcore_quantumtrajectory INTERFACE CPPQED::CPPQEDcore_structure)
+target_link_libraries(CPPQEDcore_quantumtrajectory INTERFACE CPPQED::CPPQEDcore_quantumdynamics)
 target_include_directories(CPPQEDcore_quantumtrajectory INTERFACE .)

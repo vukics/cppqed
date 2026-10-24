@@ -4,5 +4,5 @@
 add_library(CPPQEDcore_quantumoperator OBJECT MultiDiagonal.cc SparseMatrix.cc)
 add_library(CPPQED::CPPQEDcore_quantumoperator ALIAS CPPQEDcore_quantumoperator)
 
-target_link_libraries(CPPQEDcore_quantumoperator PUBLIC CPPQED::CPPQEDcore_structure)
+target_link_libraries(CPPQEDcore_quantumoperator PUBLIC CPPQED::CPPQEDcore_quantumdynamics)
 target_include_directories(CPPQEDcore_quantumoperator PUBLIC .)

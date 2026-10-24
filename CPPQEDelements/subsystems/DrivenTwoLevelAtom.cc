@@ -7,12 +7,12 @@
 
 using namespace linalg;
 using namespace std;
-using namespace structure;
+using namespace quantumdynamics;
 
 
 DrivenTwoLevelAtom::DrivenTwoLevelAtom(const qbit::ParsDrivenDissipative& pp2la)
   : Free(2,{},{CF{"(gamma,deltaA)",{pp2la.gamma,pp2la.delta},1.},CF{"eta",pp2la.eta,1.}}), 
-    structure::ElementLiouvillian<1,1>("Driven Two-Level Atom","atomic decay"),
+    quantumdynamics::ElementLiouvillian<1,1>("Driven Two-Level Atom","atomic decay"),
     za_(-pp2la.gamma,pp2la.delta), eta_(pp2la.eta)
 {
   getParsStream()<<"Driven Two-Level Atom\n";

@@ -5,7 +5,7 @@ message(STATUS "Configuring CPPQEDcore")
 
 add_subdirectory(quantumdata)
 
-add_subdirectory(structure)
+add_subdirectory(quantumdynamics)
 
 add_subdirectory(quantumoperator)
 

@@ -58,15 +58,15 @@ CPPQEDcore/
   quantumdata/                  StateVector, DensityOperator, LazyDensityOperator (lazy pure/mixed state)
   quantumoperator/              MultiDiagonal and quantum operator algebra
   quantumtrajectory/            Master equation and QJMC integrators
-  structure/                    Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues,
-    → quantumdynamics             Composite.h (Broadcaster: lifts subsystems to full tensor-product rank)
+  quantumdynamics/              Hamiltonian, Liouvillian, ExactPropagator, ExpectationValues,
+                                Composite.h (Broadcaster: lifts subsystems to full tensor-product rank)
 
 CPPQEDelements/
-  frees/Mode.{h,cc}             Harmonic oscillator (Kerr, drive, decay)
-  frees/Qbit.{h,cc}             Two-level system
+  subsystems/Mode.{h,cc}        Harmonic oscillator (Kerr, drive, decay)
+  subsystems/Qbit.{h,cc}        Two-level system
   interactions/JaynesCummings.h Cavity–atom coupling
 
-dockerEntry/
+examples/
   jc_qjmc.cc                    Jaynes-Cummings QJMC example executable
 ```
 
@@ -76,7 +76,7 @@ dockerEntry/
 
 ### Jaynes-Cummings QJMC
 
-The canonical composite system: a two-level atom coupled to a driven, lossy cavity mode. This is the verified working example as of 2026-04 (source: [`dockerEntry/jc_qjmc.cc`](dockerEntry/jc_qjmc.cc)).
+The canonical composite system: a two-level atom coupled to a driven, lossy cavity mode. This is the verified working example as of 2026-04 (source: [`examples/jc_qjmc.cc`](examples/jc_qjmc.cc)).
 
 ```cpp
 #include "Composite.h"
@@ -88,7 +88,7 @@ The canonical composite system: a two-level atom coupled to a driven, lossy cavi
 #include "pcg_random.hpp"
 
 using namespace cppqedutils; using namespace quantumdata;
-using namespace quantumtrajectory; using namespace structure;
+using namespace quantumtrajectory; using namespace quantumdynamics;
 
 int main(int argc, const char* argv[])
 {

@@ -26,7 +26,7 @@ struct ParsHomodyned : BASE // BASE either ParsDissipative or ParsDrivenDissipat
 
 
 class HomodynedBase
-  : public Hamiltonian<false>, public structure::ElementLiouvillian<1,2>
+  : public Hamiltonian<false>, public quantumdynamics::ElementLiouvillian<1,2>
 {
 protected:
   HomodynedBase(const ParsDissipative& p, dcomp homodyneAmplitude, dcomp eta=0.);

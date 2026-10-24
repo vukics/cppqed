@@ -52,7 +52,7 @@ private:
 };
 
 
-using namespace structure::freesystem; using structure::NoTime;
+using namespace quantumdynamics::freesystem; using quantumdynamics::NoTime;
 
 
 typedef std::shared_ptr<const ParticleBase> Ptr;
@@ -100,13 +100,13 @@ typedef std::tuple<const Spatial&, double> Storage;
 } // details
 
 
-class Exact : public structure::FreeExact<false>, public details::Storage
+class Exact : public quantumdynamics::FreeExact<false>, public details::Storage
 {
 public:
   Exact(const Spatial&, double omrec);
 
 private:
-  void updateU(structure::OneTime) const;
+  void updateU(quantumdynamics::OneTime) const;
 
   bool applicableInMaster_v() const {return true;}
 
@@ -136,10 +136,10 @@ public:
 
 
 class Averaged
-  : public structure::ElementAveraged<1>
+  : public quantumdynamics::ElementAveraged<1>
 {
 public:
-  typedef structure::ElementAveraged<1> Base;
+  typedef quantumdynamics::ElementAveraged<1> Base;
 
   Averaged(const Spatial&);
 
@@ -167,7 +167,7 @@ private:
 
 
 class ParticleBase
-  : public structure::Free, public particle::Averaged
+  : public quantumdynamics::Free, public particle::Averaged
 {
 protected:
   explicit ParticleBase(size_t fin, const RealFreqs& ={}, const ComplexFreqs& ={});

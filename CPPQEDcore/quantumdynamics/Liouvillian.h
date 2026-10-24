@@ -8,7 +8,7 @@
 
 #include <variant>
 
-namespace structure {
+namespace quantumdynamics {
 
 
 template <size_t RANK>

@@ -8,7 +8,7 @@
 
 
 
-class ParticleTwoModes : public structure::Interaction<3>, public structure::Hamiltonian<3>
+class ParticleTwoModes : public quantumdynamics::Interaction<3>, public quantumdynamics::Hamiltonian<3>
 {
 private:
   ParticleTwoModes(mode::Ptr, mode::Ptr, particle::Ptr, double uNot0, double uNot1, const ModeFunction&, const ModeFunction&, double);

@@ -5,18 +5,18 @@
 #include "ElementAveraged.h"
 
 
-class QbitModeCorrelations : public structure::ElementAveraged<2>
+class QbitModeCorrelations : public quantumdynamics::ElementAveraged<2>
 {
 public:
 
   QbitModeCorrelations();
 
 protected:
-  typedef structure::ElementAveraged<2> EA_Base;
-  typedef structure::ElementAveraged<2>::Time NoTime;
+  typedef quantumdynamics::ElementAveraged<2> EA_Base;
+  typedef quantumdynamics::ElementAveraged<2>::Time NoTime;
 
 private:
-  const structure::Averages average_v(NoTime, const quantumdata::LazyDensityOperator<2>&) const;
+  const quantumdynamics::Averages average_v(NoTime, const quantumdata::LazyDensityOperator<2>&) const;
 
 };
 

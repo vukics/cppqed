@@ -63,7 +63,7 @@ const particlecavity::Tridiagonals fillTTwoModeFN(mode::Ptr mode, particle::PtrD
 
 
 particlecavity::Base::Base(mode::Ptr mode, particle::Ptr particle, double uNot, double etaeff)
-  : structure::Interaction<2>({mode,particle},{RF{"Unot",uNot,mode->getDimension()},RF{"etaeff",etaeff,sqrt(mode->getDimension())}})
+  : quantumdynamics::Interaction<2>({mode,particle},{RF{"Unot",uNot,mode->getDimension()},RF{"etaeff",etaeff,sqrt(mode->getDimension())}})
 {
   getParsStream()<<"Particle-Cavity Interaction\n";
 }

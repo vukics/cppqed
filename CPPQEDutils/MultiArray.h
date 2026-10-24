@@ -1,7 +1,7 @@
 // Copyright András Vukics 2022–2026. Distributed under the Boost Software License, Version 1.0. (See accompanying file LICENSE.txt)
 #pragma once
 
-#include "Traits.h"
+#include "FrameworkTraits.h"
 
 #include <boost/serialization/vector.hpp>
 
