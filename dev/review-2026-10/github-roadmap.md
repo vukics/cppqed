@@ -87,35 +87,35 @@ Starting state (2026-10-08):
 
 ✔ Every inventory item maps to exactly one GitHub issue; the epics show their children; the Project views (by milestone, by severity, cross-repo blockers) are populated.
 
-## Phase 5: CI working (each change closes the matching issues via "Fixes #N")
+## Phase 5: CI working (each change closes the matching issues via "Fixes #N") — done 2026-10-24 except the [A] items (release, ruleset)
 **Library** (already has CI; make it strict):
-1. **[C]** Fix:
+1. ~~**[C]** Fix:~~ Done 2026-10-24 (library #3, #4 closed; the warnings under #10).
    - the Clang warnings (M-10)
    - the const `vectorize`/`matricize` overloads (M-02)
-   - the `conj` test gap (M-03)
-2. **[C]** Then add:
+   - the `conj` test gap (M-03): the whole #4 checklist, incl. rank-3 composition and constructJC validation
+2. ~~**[C]** Then add:~~ Done 2026-10-24 (#10 closed). The consumer job found a real bug: the installed package exported `cppqed::cppqed-multidiagonal`, not the documented `cppqed::multidiagonal` → library #21, fixed. Actions pinned at checkout v4.4.0 and actions-gh-pages v4.1.0 (latest v4; a major bump is a separate decision).
    - `-DCMAKE_COMPILE_WARNING_AS_ERROR=ON`
    - an ASan/UBSan job
    - a consumer job that installs the library and consumes it via `find_package`, plus one via FetchContent
    - `apt-get update` in `docs.yml`
    - pin `runs-on: ubuntu-24.04` instead of `ubuntu-latest`
    - pin actions by SHA
-3. **[C]** Move the headers to `include/multidiagonal/` (M-01). Release v0.3.0 **[A tag/release]**. If you want a DOI for it (e.g. for the paper), connect Zenodo before this release; it then mints one per release.
+3. ~~**[C]** Move the headers to `include/multidiagonal/` (M-01).~~ Done 2026-10-24 (#2 closed, f8492fd). Release v0.3.0 **[A tag/release]**: still open; the CMake version still says 0.2.0, and the v0.3.0 milestone still holds #1, #5, #9, #11 (and v0.2.1 holds #6–#8, #12, #13), so decide what the release contains. If you want a DOI for it (e.g. for the paper), connect Zenodo before this release; it then mints one per release.
 
 **cppqed** (no CI yet):
-4. **[C]** Track `jc_qjmc.cc` (C-52/C-74). Add `ci.yml`:
+4. ~~**[C]** Track `jc_qjmc.cc` (C-52/C-74). Add `ci.yml`:~~ Done 2026-10-24 (ddb9df71; green baseline on gcc-13/14, clang-18 × Debug/Release). Also fixed: the version banner still printed the `vukics` URL.
    - ubuntu-24.04, gcc-13/14 and clang-18, × Debug/Release
    - apt packages for Boost and Eigen
    - build all targets
    - a short `jc_qjmc` smoke run
    This first version runs on the *current* code (submodules), which gives a green baseline before anything changes.
-5. **[C]** The split itself (E-1, plus the structural renames from E-6 in the same batch):
+5. ~~**[C]** The split itself (E-1, plus the structural renames from E-6 in the same batch):~~ Done 2026-10-24, decided with András: downloads allowed for local verification; all four structural renames (C-70, C-71, C-73, C-74 → #68, #69, #71, #72). Order: regression reference from the pre-switch code (e661220c), renames (9f9ea671), switch (f5d4be20). #21, #22, #25 closed; #14 stays open for #24 (SliceIterator location), #16 for C-08 and library #11. A CI job builds fully disconnected from local source copies (the cluster recipe).
    - FetchContent for the library and the upstream popl/pcg (C-01, C-07)
    - the framework Traits.h (C-02/C-73)
    - the operator ports (C-03)
    - a regression job comparing `jc_qjmc` output against a stored reference (C-05)
    CI must be green before merging.
-6. **[C]** Fix the ODR problems (C-50), so a Catch2 test target can be added (C-51). From then on, CI runs `ctest`.
+6. ~~**[C]** Fix the ODR problems (C-50), so a Catch2 test target can be added (C-51). From then on, CI runs `ctest`.~~ Done 2026-10-24 (#51, #23 closed; #52 stays open for the physics tests). New finding: Qbit σz has the opposite sign of spin::sz → #87 (convention decision, `[!mayfail]` test).
 7. **[A]** Optional, when CI is stable: a ruleset on `v3/dev` / `main` that requires the CI checks.
 
 ✔ Both repos green on the default branch; cppqed builds against the library at a pinned SHA; the README CI badges show passing.
